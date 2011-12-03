@@ -1,0 +1,9 @@
+syntax: glob
+*.suo
+*.bak
+*.user
+*.ncb
+
+syntax: regexp
+^Build$
+^BuildTmp$

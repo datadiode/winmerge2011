@@ -1,0 +1,1097 @@
+/////////////////////////////////////////////////////////////////////////////
+//    License (GPLv2+):
+//    This program is free software; you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation; either version 2 of the License, or (at
+//    your option) any later version.
+//    
+//    This program is distributed in the hope that it will be useful, but
+//    WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with this program; if not, write to the Free Software
+//    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+/////////////////////////////////////////////////////////////////////////////
+/** 
+ * @file  DiffWrapper.cpp
+ *
+ * @brief Code for DiffWrapper class
+ *
+ * @date  Created: 2003-08-22
+ */
+// ID line follows -- this is updated by SVN
+// $Id$
+
+#include "StdAfx.h"
+#include "coretools.h"
+#include "DiffContext.h"
+#include "DiffList.h"
+#include "MovedLines.h"
+#include "FilterList.h"
+#include "DiffWrapper.h"
+#include "Merge.h"
+#include "MainFrm.h"
+#include "DIFF.H"
+#include "LogFile.h"
+#include "paths.h"
+#include "CompareOptions.h"
+#include "FileTextStats.h"
+#include "FolderCmp.h"
+#include "Environment.h"
+
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif
+
+extern int recursive;
+
+static void FreeDiffUtilsScript(struct change * & script);
+static void CopyTextStats(const file_data * inf, FileTextStats * myTextStats);
+static void CopyDiffutilTextStats(file_data *inf, DiffFileData * diffData);
+
+/**
+ * @brief Default constructor.
+ * Initializes members and creates new FilterCommentsManager.
+ */
+CDiffWrapper::CDiffWrapper()
+: m_bCreatePatchFile(FALSE)
+, m_bUseDiffList(FALSE)
+, m_bAddCmdLine(TRUE)
+, m_bAppendFiles(FALSE)
+, m_nDiffs(0)
+, m_codepage(0)
+, m_pDiffList(NULL)
+, m_bPathsAreTemp(FALSE)
+, m_pMovedLines(NULL)
+, m_pFilterList(NULL)
+{
+	// character that ends a line.  Currently this is always `\n'
+	line_end_char = '\n';
+}
+
+/**
+ * @brief Destructor.
+ */
+CDiffWrapper::~CDiffWrapper()
+{
+	delete m_pFilterList;
+	delete m_pMovedLines;
+}
+
+/**
+ * @brief Enables/disables patch-file creation and sets filename.
+ * This function enables or disables patch file creation. When
+ * @p filename is empty, patch files are disabled.
+ * @param [in] filename Filename for patch file, or empty string.
+ */
+void CDiffWrapper::SetCreatePatchFile(const String &filename)
+{
+	if (filename.empty())
+	{
+		m_bCreatePatchFile = FALSE;
+		m_sPatchFile.clear();
+	}
+	else
+	{
+		m_bCreatePatchFile = TRUE;
+		m_sPatchFile = filename;
+		string_replace(m_sPatchFile, _T("/"), _T("\\"));
+	}
+}
+
+/**
+ * @brief Enables/disabled DiffList creation ands sets DiffList.
+ * This function enables or disables DiffList creation. When
+ * @p diffList is NULL difflist is not created. When valid DiffList
+ * pointer is given, compare results are stored into it.
+ * @param [in] diffList Pointer to DiffList getting compare results.
+ */
+void CDiffWrapper::SetCreateDiffList(DiffList *diffList)
+{
+	if (diffList == NULL)
+	{
+		m_bUseDiffList = FALSE;
+		m_pDiffList = NULL;
+	}
+	else
+	{
+		m_bUseDiffList = TRUE;
+		m_pDiffList = diffList;
+	}
+}
+
+/**
+ * @brief Returns current set of options used by diff-engine.
+ * This function converts internally used diff-options to
+ * format used outside CDiffWrapper and returns them.
+ * @param [in,out] options Pointer to structure getting used options.
+ */
+void CDiffWrapper::GetOptions(DIFFOPTIONS &options)
+{
+	ZeroMemory(&options, sizeof options);
+	m_options.GetAsDiffOptions(options);
+}
+
+/**
+ * @brief Set options for Diff-engine.
+ * This function converts given options to format CDiffWrapper uses
+ * internally and stores them.
+ * @param [in] options Pointer to structure having new options.
+ */
+void CDiffWrapper::SetOptions(const DIFFOPTIONS &options)
+{
+	m_options.SetFromDiffOptions(options);
+}
+
+/**
+ * @brief Set options used for patch-file creation.
+ * @param [in] options Pointer to structure having new options.
+ */
+void CDiffWrapper::SetPatchOptions(const PATCHOPTIONS *options)
+{
+	ASSERT(options);
+	m_options.m_contextLines = options->nContext;
+
+	switch (options->outputStyle)
+	{
+	case OUTPUT_NORMAL:
+		m_options.m_outputStyle = DIFF_OUTPUT_NORMAL;
+		break;
+	case OUTPUT_CONTEXT:
+		m_options.m_outputStyle = DIFF_OUTPUT_CONTEXT;
+		break;
+	case OUTPUT_UNIFIED:
+		m_options.m_outputStyle = DIFF_OUTPUT_UNIFIED;
+		break;
+	default:
+		_RPTF0(_CRT_ERROR, "Unknown output style!");
+		break;
+	}
+
+	m_bAddCmdLine = options->bAddCommandline;
+}
+
+/**
+ * @brief Enables/disables moved block detection.
+ * @param [in] bDetectMovedBlocks If TRUE moved blocks are detected.
+ */
+void CDiffWrapper::SetDetectMovedBlocks(bool bDetectMovedBlocks)
+{
+	if (bDetectMovedBlocks)
+	{
+		if (m_pMovedLines == NULL)
+			m_pMovedLines = new MovedLines;
+	}
+	else
+	{
+		delete m_pMovedLines;
+		m_pMovedLines = NULL;
+	}
+}
+
+/**
+ * @brief Replace spaces in a string
+ * @param [in] str - String to search
+ * @param [in] rep - String to replace
+ */
+static void ReplaceSpaces(stl::string & str, const char *rep)
+{
+	stl::string::size_type pos = 0;
+	size_t replen = strlen(rep);
+	while ((pos = str.find_first_of(" \t", pos)) != stl::string::npos)
+	{
+		stl::string::size_type posend = str.find_first_not_of(" \t", pos);
+		if (posend != stl::string::npos)
+			str.replace(pos, posend - pos, rep);
+		else
+			str.replace(pos, 1, rep);
+		pos += replen;
+	}
+}
+
+/**
+@brief The main entry for post filtering.  Performs post-filtering, by setting comment blocks to trivial
+@param [in]  LineNumberLeft		- First line number to read from left file
+@param [in]  QtyLinesLeft		- Number of lines in the block for left file
+@param [in]  LineNumberRight		- First line number to read from right file
+@param [in]  QtyLinesRight		- Number of lines in the block for right file
+@param [in,out]  Op				- This variable is set to trivial if block should be ignored.
+@param [in]  filtercommentsset	- Comment marker set used to indicate comment blocks.
+@param [in]  FileNameExt			- The file name extension.  Needs to be lower case string ("cpp", "java", "c")
+*/
+void CDiffWrapper::PostFilter(int LineNumberLeft, int QtyLinesLeft,
+	int LineNumberRight, int QtyLinesRight, OP_TYPE &Op, const TCHAR *FileNameExt)
+{
+	if (Op == OP_TRIVIAL)
+		return;
+	
+	//First we need to get lowercase file name extension
+	FilterCommentsSet filtercommentsset = GetSetForFileType(FileNameExt);
+	if (filtercommentsset.StartMarker.empty() && 
+		filtercommentsset.EndMarker.empty() &&
+		filtercommentsset.InlineMarker.empty())
+	{
+		return;
+	}
+
+	OP_TYPE LeftOp = OP_NONE;
+	if (Op != OP_RIGHTONLY)
+		LeftOp = filtercommentsset.PostFilter(LineNumberLeft, QtyLinesLeft, &files[0]);
+
+	OP_TYPE RightOp = OP_NONE;
+	if (Op != OP_LEFTONLY)
+		RightOp = filtercommentsset.PostFilter(LineNumberRight, QtyLinesRight, &files[1]);
+
+	for (int i = 0; (i < QtyLinesLeft) || (i < QtyLinesRight); i++)
+	{
+		//Lets test  all lines if only a comment is different.
+		const char *LineStrLeft = "";
+		const char *EndLineLeft = LineStrLeft;
+		const char *LineStrRight = "";
+		const char *EndLineRight = LineStrRight;
+		if (i < QtyLinesLeft)
+		{
+			LineStrLeft = files[0].linbuf[LineNumberLeft + i];
+			EndLineLeft = files[0].linbuf[LineNumberLeft + i + 1];
+		}
+		if (i < QtyLinesRight)
+		{
+			LineStrRight = files[1].linbuf[LineNumberRight + i];
+			EndLineRight = files[1].linbuf[LineNumberRight + i + 1];
+		}
+			
+		if (EndLineLeft && EndLineRight)
+		{	
+			stl::string LineDataLeft(LineStrLeft, EndLineLeft);
+			stl::string LineDataRight(LineStrRight, EndLineRight);
+
+			if (!filtercommentsset.StartMarker.empty() && !filtercommentsset.EndMarker.empty())
+			{
+				//Lets remove block comments, and see if lines are equal
+				const char *CommentStrStart;
+				const char *CommentStrEnd;
+				do
+				{
+					CommentStrStart = FilterCommentsSet::FindCommentMarker(LineDataLeft.c_str(), filtercommentsset.StartMarker);
+					CommentStrEnd = FilterCommentsSet::FindCommentMarker(LineDataLeft.c_str(), filtercommentsset.EndMarker);
+					if (CommentStrStart < CommentStrEnd)
+					{
+						LineDataLeft.erase(CommentStrStart - LineDataLeft.c_str(), CommentStrEnd + filtercommentsset.EndMarker.size() - CommentStrStart);
+					}
+					else if (LeftOp == OP_TRIVIAL)
+					{
+						if (CommentStrEnd < CommentStrStart)
+							CommentStrEnd += filtercommentsset.EndMarker.size();
+						LineDataLeft.erase(0, CommentStrEnd - LineDataLeft.c_str());
+					}
+				} while (CommentStrStart < CommentStrEnd);
+				do
+				{
+					CommentStrStart = FilterCommentsSet::FindCommentMarker(LineDataRight.c_str(), filtercommentsset.StartMarker);
+					CommentStrEnd = FilterCommentsSet::FindCommentMarker(LineDataRight.c_str(), filtercommentsset.EndMarker);
+					if (CommentStrStart < CommentStrEnd)
+					{
+						LineDataRight.erase(CommentStrStart - LineDataRight.c_str(), CommentStrEnd + filtercommentsset.EndMarker.size() - CommentStrStart);
+					}
+					else if (RightOp == OP_TRIVIAL)
+					{
+						if (CommentStrEnd < CommentStrStart)
+							CommentStrEnd += filtercommentsset.EndMarker.size();
+						LineDataRight.erase(0, CommentStrEnd - LineDataRight.c_str());
+					}
+				} while (CommentStrStart < CommentStrEnd);
+			}
+
+			if (!filtercommentsset.InlineMarker.empty())
+			{
+				//Lets remove line comments
+				LineDataLeft.erase(
+					FilterCommentsSet::FindCommentMarker(
+						LineDataLeft.c_str(), filtercommentsset.InlineMarker
+					) - LineDataLeft.c_str()
+				);
+				LineDataRight.erase(
+					FilterCommentsSet::FindCommentMarker(
+						LineDataRight.c_str(), filtercommentsset.InlineMarker
+					) - LineDataRight.c_str()
+				);
+			}
+
+			if (m_options.m_ignoreWhitespace == WHITESPACE_IGNORE_ALL)
+			{
+				//Ignore character case
+				ReplaceSpaces(LineDataLeft, "");
+				ReplaceSpaces(LineDataRight, "");
+			}
+			else if (m_options.m_ignoreWhitespace == WHITESPACE_IGNORE_CHANGE)
+			{
+				//Ignore change in whitespace char count
+				ReplaceSpaces(LineDataLeft, " ");
+				ReplaceSpaces(LineDataRight, " ");
+			}
+
+			if (m_options.m_bIgnoreCase)
+			{
+				//ignore case
+				stl::transform(LineDataLeft.begin(), LineDataLeft.end(), LineDataLeft.begin(), ::toupper);
+				stl::transform(LineDataRight.begin(), LineDataRight.end(), LineDataRight.begin(), ::toupper);
+			}
+
+			if (LineDataLeft != LineDataRight)
+			{	
+				return;
+			}
+		}
+	}
+	//only difference is trival
+	Op = OP_TRIVIAL;
+}
+
+/**
+ * @brief Set source paths for diffing two files.
+ * Sets full paths to two files we are diffing. Paths can be actual user files
+ * or temporary copies of user files. Parameter @p tempPaths tells if paths
+ * are temporary paths that can be deleted.
+ * @param [in] filepath1 First file to compare "original file".
+ * @param [in] filepath2 Second file to compare "changed file".
+ * @param [in] tempPaths Are given paths temporary (can be deleted)?.
+ */
+void CDiffWrapper::SetPaths(const String &filepath1, const String &filepath2,
+		BOOL tempPaths)
+{
+	m_s1File = filepath1;
+	m_s2File = filepath2;
+	m_bPathsAreTemp = tempPaths;
+}
+
+/**
+ * @brief Set source paths for original (NON-TEMP) diffing two files.
+ * Sets full paths to two (NON-TEMP) files we are diffing.
+ * @param [in] OriginalFile1 First file to compare "(NON-TEMP) file".
+ * @param [in] OriginalFile2 Second file to compare "(NON-TEMP) file".
+ */
+void CDiffWrapper::SetCompareFiles(const String &OriginalFile1, const String &OriginalFile2)
+{
+	m_sOriginalFile1 = OriginalFile1;
+	m_sOriginalFile2 = OriginalFile2;
+}
+
+/**
+ * @brief Set alternative paths for compared files.
+ * Sets alternative paths for diff'ed files. These alternative paths might not
+ * be real paths. For example when creating a patch file from folder compare
+ * we want to use relative paths.
+ * @param [in] altPath1 Alternative file path of first file.
+ * @param [in] altPath2 Alternative file path of second file.
+ */
+void CDiffWrapper::SetAlternativePaths(const String &altPath1, const String &altPath2)
+{
+	m_s1AlternativePath = altPath1;
+	m_s2AlternativePath = altPath2;
+}
+
+BOOL CDiffWrapper::RunFileDiff(DiffFileData &diffdata)
+{
+	m_options.SetToDiffUtils();
+
+	if (m_bUseDiffList)
+		m_nDiffs = m_pDiffList->GetSize();
+
+	// Compare the files, if no error was found.
+	// Last param (bin_file) is NULL since we don't
+	// (yet) need info about binary sides.
+	int bin_flag = 0;
+	struct change *script = NULL;
+	BOOL bRet = Diff2Files(&script, &diffdata, &bin_flag, NULL);
+
+	// We don't anymore create diff-files for every rescan.
+	// User can create patch-file whenever one wants to.
+	// We don't need to waste time. But lets keep this as
+	// debugging aid. Sometimes it is very useful to see
+	// what differences diff-engine sees!
+#ifdef _DEBUG
+	// throw the diff into a temp file
+	String sTempPath = env_GetTempPath(); // get path to Temp folder
+	String path = paths_ConcatPath(sTempPath, _T("Diff.txt"));
+
+	outfile = _tfopen(path.c_str(), _T("w+"));
+	if (outfile != NULL)
+	{
+		print_normal_script(script);
+		fclose(outfile);
+		outfile = NULL;
+	}
+#endif
+
+	// First determine what happened during comparison
+	// If there were errors or files were binaries, don't bother
+	// creating diff-lists or patches
+	
+	// diff_2_files set bin_flag to -1 if different binary
+	// diff_2_files set bin_flag to +1 if same binary
+	if (bin_flag != 0)
+	{
+		m_status.bBinaries = TRUE;
+		if (bin_flag == -1)
+			m_status.bIdentical = FALSE;
+		else
+			m_status.bIdentical = TRUE;
+	}
+	else
+	{ // text files according to diffutils, so change script exists
+		m_status.bIdentical = (script == 0);
+		m_status.bBinaries = FALSE;
+	}
+	file_data * inf = diffdata.m_inf;
+	m_status.bLeftMissingNL = inf[0].missing_newline;
+	m_status.bRightMissingNL = inf[1].missing_newline;
+
+
+	// Create patch file
+	if (!m_status.bBinaries && m_bCreatePatchFile)
+	{
+		WritePatchFile(script, &inf[0]);
+	}
+	
+	// Go through diffs adding them to WinMerge's diff list
+	// This is done on every WinMerge's doc rescan!
+	if (!m_status.bBinaries && m_bUseDiffList)
+	{
+		bRet = LoadWinMergeDiffsFromDiffUtilsScript(script, diffdata.m_inf);
+	}			
+
+	FreeDiffUtilsScript(script);
+
+	// Done with diffutils filedata
+	diffdata.Close();
+
+	return bRet;
+}
+
+/**
+ * @brief Runs diff-engine.
+ */
+BOOL CDiffWrapper::RunFileDiff()
+{
+	String filepath1(m_s1File);
+	String filepath2(m_s2File);
+
+	BOOL bRet = TRUE;
+	String strFile1Temp(filepath1);
+	String strFile2Temp(filepath2);
+	
+	m_options.SetToDiffUtils();
+
+	if (m_bUseDiffList)
+		m_nDiffs = m_pDiffList->GetSize();
+
+	DiffFileData diffdata;
+	diffdata.SetDisplayFilepaths(filepath1.c_str(), filepath2.c_str()); // store true names for diff utils patch file
+	// This opens & fstats both files (if it succeeds)
+	if (!diffdata.OpenFiles(strFile1Temp.c_str(), strFile2Temp.c_str()))
+	{
+		return FALSE;
+	}
+
+	// Compare the files, if no error was found.
+	// Last param (bin_file) is NULL since we don't
+	// (yet) need info about binary sides.
+	int bin_flag = 0;
+	struct change *script = NULL;
+	bRet = Diff2Files(&script, &diffdata, &bin_flag, NULL);
+
+	// We don't anymore create diff-files for every rescan.
+	// User can create patch-file whenever one wants to.
+	// We don't need to waste time. But lets keep this as
+	// debugging aid. Sometimes it is very useful to see
+	// what differences diff-engine sees!
+#ifdef _DEBUG
+	// throw the diff into a temp file
+	String sTempPath = env_GetTempPath(); // get path to Temp folder
+	String path = paths_ConcatPath(sTempPath, _T("Diff.txt"));
+
+	outfile = _tfopen(path.c_str(), _T("w+"));
+	if (outfile != NULL)
+	{
+		print_normal_script(script);
+		fclose(outfile);
+		outfile = NULL;
+	}
+#endif
+
+	// First determine what happened during comparison
+	// If there were errors or files were binaries, don't bother
+	// creating diff-lists or patches
+	
+	// diff_2_files set bin_flag to -1 if different binary
+	// diff_2_files set bin_flag to +1 if same binary
+	if (bin_flag != 0)
+	{
+		m_status.bBinaries = TRUE;
+		if (bin_flag == -1)
+			m_status.bIdentical = FALSE;
+		else
+			m_status.bIdentical = TRUE;
+	}
+	else
+	{ // text files according to diffutils, so change script exists
+		m_status.bIdentical = (script == 0);
+		m_status.bBinaries = FALSE;
+	}
+	file_data * inf = diffdata.m_inf;
+	m_status.bLeftMissingNL = inf[0].missing_newline;
+	m_status.bRightMissingNL = inf[1].missing_newline;
+
+
+	// Create patch file
+	if (!m_status.bBinaries && m_bCreatePatchFile)
+	{
+		WritePatchFile(script, &inf[0]);
+	}
+	
+	// Go through diffs adding them to WinMerge's diff list
+	// This is done on every WinMerge's doc rescan!
+	if (!m_status.bBinaries && m_bUseDiffList)
+	{
+		bRet = LoadWinMergeDiffsFromDiffUtilsScript(script, diffdata.m_inf);
+	}			
+
+	FreeDiffUtilsScript(script);
+
+	// Done with diffutils filedata
+	diffdata.Close();
+
+	return bRet;
+}
+
+/**
+ * @brief Add diff to external diff-list
+ */
+BOOL CDiffWrapper::AddDiffRange(UINT begin0, UINT end0, UINT begin1, UINT end1, OP_TYPE op)
+{
+	BOOL ok = FALSE;
+	try
+	{
+		DIFFRANGE dr;
+		dr.begin0 = begin0;
+		dr.end0 = end0;
+		dr.begin1 = begin1;
+		dr.end1 = end1;
+		dr.op = op;
+		m_pDiffList->AddDiff(dr);
+		m_nDiffs++;
+		ok = TRUE;
+	}
+	catch (OException *e)
+	{
+		e->ReportError(GetMainFrame()->m_hWnd, MB_ICONSTOP);
+		delete e;
+	}
+	TRACE("left=%d,%d   right=%d,%d   op=%d\n",
+		begin0, end0, begin1, end1, op);
+	return ok;
+}
+
+/**
+ * @brief Expand last DIFFRANGE of file by one line to contain last line after EOL.
+ * @param [in] leftBufferLines size of array pane left
+ * @param [in] rightBufferLines size of array pane right
+ * @param [in] left on whitch side we have to insert
+ * @param [in] bIgnoreBlankLines, if true we allways add a new diff and make as trivial
+ */
+BOOL CDiffWrapper::FixLastDiffRange(int leftBufferLines, int rightBufferLines, BOOL left, bool bIgnoreBlankLines)
+{
+	DIFFRANGE dr;
+	const int count = m_pDiffList->GetSize();
+	if (count > 0 && !bIgnoreBlankLines)
+	{
+		m_pDiffList->GetDiff(count - 1, dr);
+
+		if (left)
+		{
+			if (dr.op == OP_RIGHTONLY)
+				dr.op = OP_DIFF;
+			dr.end0++;
+		}
+		else
+		{
+			if (dr.op == OP_LEFTONLY)
+				dr.op = OP_DIFF;
+			dr.end1++;
+		}
+		m_pDiffList->SetDiff(count - 1, dr);
+	}
+	else 
+	{
+		// we have to create the DIFF
+		dr.end0 = leftBufferLines - 1;
+		dr.end1 = rightBufferLines - 1;
+		if (left)
+		{
+			dr.begin0 = dr.end0;
+			dr.begin1 = dr.end1 + 1;
+			dr.op = OP_LEFTONLY;
+		}
+		else
+		{
+			dr.begin0 = dr.end0 + 1;
+			dr.begin1 = dr.end1;
+			dr.op = OP_RIGHTONLY;
+		}
+		if (bIgnoreBlankLines)
+			dr.op = OP_TRIVIAL;
+		ASSERT(dr.begin0 == dr.begin1);
+
+		if (!AddDiffRange(dr.begin0, dr.end0, dr.begin1, dr.end1, dr.op))
+			return FALSE;
+	}
+	return TRUE;
+}
+
+/**
+ * @brief Returns status-data from diff-engine last run
+ */
+void CDiffWrapper::GetDiffStatus(DIFFSTATUS *status)
+{
+	CopyMemory(status, &m_status, sizeof(DIFFSTATUS));
+}
+
+/**
+ * @brief Formats command-line for diff-engine last run (like it was called from command-line)
+ */
+String CDiffWrapper::FormatSwitchString()
+{
+	String switches;
+	TCHAR tmpNum[5] = {0};
+	
+	switch (m_options.m_outputStyle)
+	{
+	case OUTPUT_CONTEXT:
+		switches = _T(" C");
+		break;
+	case OUTPUT_UNIFIED:
+		switches = _T(" U");
+		break;
+	case OUTPUT_ED:
+		switches = _T(" e");
+		break;
+	case OUTPUT_FORWARD_ED:
+		switches = _T(" f");
+		break;
+	case OUTPUT_RCS:
+		switches = _T(" n");
+		break;
+	case OUTPUT_NORMAL:
+		switches = _T(" ");
+		break;
+	case OUTPUT_IFDEF:
+		switches = _T(" D");
+		break;
+	case OUTPUT_SDIFF:
+		switches = _T(" y");
+		break;
+	}
+
+	if (m_options.m_contextLines > 0)
+	{
+		_itot(m_options.m_contextLines, tmpNum, 10);
+		switches += tmpNum;
+	}
+
+	if (ignore_all_space_flag > 0)
+		switches += _T("w");
+
+	if (ignore_blank_lines_flag > 0)
+		switches += _T("B");
+
+	if (ignore_case_flag > 0)
+		switches += _T("i");
+
+	if (ignore_space_change_flag > 0)
+		switches += _T("b");
+
+	return switches;
+}
+
+/**
+ * @brief Enables/disables patch-file appending.
+ * If the file for patch already exists then the patch will be appended to
+ * existing file.
+ * @param [in] bAppendFiles If TRUE patch will be appended to existing file.
+ */
+void CDiffWrapper::SetAppendFiles(BOOL bAppendFiles)
+{
+	m_bAppendFiles = bAppendFiles;
+}
+
+/**
+ * @brief Compare two files using diffutils.
+ *
+ * Compare two files (in DiffFileData param) using diffutils. Run diffutils
+ * inside SEH so we can trap possible error and exceptions. If error or
+ * execption is trapped, return compare failure.
+ * @param [out] diffs Pointer to list of change structs where diffdata is stored.
+ * @param [in] diffData files to compare.
+ * @param [out] bin_status used to return binary status from compare.
+ * @param [out] bin_file Returns which file was binary file as bitmap.
+    So if first file is binary, first bit is set etc. Can be NULL if binary file
+    info is not needed (faster compare since diffutils don't bother checking
+    second file if first is binary).
+ * @return TRUE when compare succeeds, FALSE if error happened during compare.
+ * @note This function is used in file compare, not folder compare. Similar
+ * folder compare function is in DiffFileData.cpp.
+ */
+BOOL CDiffWrapper::Diff2Files(struct change **diffs, DiffFileData *diffData,
+	int *bin_status, int *bin_file)
+{
+	BOOL bRet = TRUE;
+	try
+	{
+		// Diff files. depth is zero because we are not 6comparing dirs
+		*diffs = diff_2_files(diffData->m_inf, 0, bin_status, m_pMovedLines != NULL, bin_file);
+		CopyDiffutilTextStats(diffData->m_inf, diffData);
+	}
+	catch (OException *e)
+	{
+		delete e;
+		*diffs = NULL;
+		bRet = FALSE;
+	}
+	return bRet;
+}
+
+/**
+ * @brief Free script (the diffutils linked list of differences)
+ */
+static void FreeDiffUtilsScript(struct change * & script)
+{
+	if (!script) return;
+	struct change *e=0, *p=0;
+	// cleanup the script
+	for (e = script; e; e = p)
+	{
+		p = e->link;
+		free(e);
+	}
+	script = 0;
+}
+
+/**
+ * @brief Match regular expression list against given difference.
+ * This function matches the regular expression list against the difference
+ * (given as start line and end line). Matching the diff requires that all
+ * lines in difference match.
+ * @param [in] StartPos First line of the difference.
+ * @param [in] endPos Last line of the difference.
+ * @param [in] FileNo File to match.
+ * return number of lines matching any of the expressions.
+ */
+int CDiffWrapper::RegExpFilter(int StartPos, int EndPos, int FileNo, bool BreakCondition)
+{
+	if (m_pFilterList == NULL)
+	{	
+		_RPTF0(_CRT_ERROR, "CDiffWrapper::RegExpFilter() called when "
+			"filterlist doesn't exist (=NULL)");
+		return false;
+	}
+	int line = StartPos;
+	while (line <= EndPos)
+	{
+		const char *string = files[FileNo].linbuf[line];
+		size_t stringlen = linelen(string);
+		if (m_pFilterList->Match(stringlen, string, m_codepage) == BreakCondition)
+			break;
+		++line;
+	}
+	return line - StartPos;
+}
+
+/**
+ * @brief Walk the diff utils change script, building the WinMerge list of diff blocks
+ */
+BOOL
+CDiffWrapper::LoadWinMergeDiffsFromDiffUtilsScript(struct change * script, const file_data * inf)
+{
+	//Logic needed for Ignore comment option
+	DIFFOPTIONS options;
+	GetOptions(options);
+	String asLwrCaseExt;
+	if (options.bFilterCommentsLines)
+	{
+		String LowerCaseExt = m_sOriginalFile1;
+		int PosOfDot = LowerCaseExt.rfind('.');
+		if (PosOfDot != -1)
+		{
+			LowerCaseExt.erase(0, PosOfDot + 1);
+			CharLower(&LowerCaseExt.front());
+			asLwrCaseExt = LowerCaseExt;
+		}
+	}
+
+	struct change *next = script;
+	while (next)
+	{
+		/* Find a set of changes that belong together.  */
+		struct change *thisob = next;
+		struct change *end = find_change(next);
+		
+#ifdef DEBUG
+		debug_script(thisob);
+#endif
+
+		/* Print thisob hunk.  */
+		//(*printfun) (thisob);
+		/* Determine range of line numbers involved in each file.  */
+		int first0=0, last0=0, first1=0, last1=0, deletes=0, inserts=0;
+
+		/* Disconnect them from the rest of the changes,
+		making them a hunk, and remember the rest for next iteration.  */
+		next = end->link;
+		end->link = 0;
+		analyze_hunk (thisob, &first0, &last0, &first1, &last1, &deletes, &inserts);
+		/* Reconnect the script so it will all be freed properly.  */
+		end->link = next;
+
+		OP_TYPE op = OP_NONE;
+		if (deletes || inserts || thisob->trivial)
+		{
+			if (deletes && inserts)
+				op = OP_DIFF;
+			else if (deletes)
+				op = OP_LEFTONLY;
+			else if (inserts)
+				op = OP_RIGHTONLY;
+			else
+				op = OP_TRIVIAL;
+				
+			/* Print the lines that the first file has.  */
+			int trans_a0=0, trans_b0=0, trans_a1=0, trans_b1=0;
+			translate_range(&inf[0], first0, last0, &trans_a0, &trans_b0);
+			translate_range(&inf[1], first1, last1, &trans_a1, &trans_b1);
+
+			// Store information about these blocks in moved line info
+			if (GetDetectMovedBlocks())
+			{
+				if (thisob->match0>=0)
+				{
+					ASSERT(thisob->inserted);
+					for (int i=0; i<thisob->inserted; ++i)
+					{
+						int line0 = i+thisob->match0 + (trans_a0-first0-1);
+						int line1 = i+thisob->line1 + (trans_a1-first1-1);
+						GetMovedLines()->Add(MovedLines::SIDE_RIGHT, line1, line0);
+					}
+				}
+				if (thisob->match1>=0)
+				{
+					ASSERT(thisob->deleted);
+					for (int i=0; i<thisob->deleted; ++i)
+					{
+						int line0 = i+thisob->line0 + (trans_a0-first0-1);
+						int line1 = i+thisob->match1 + (trans_a1-first1-1);
+						GetMovedLines()->Add(MovedLines::SIDE_LEFT, line0, line1);
+					}
+				}
+			}
+
+			if (options.bFilterCommentsLines)
+			{
+				int QtyLinesLeft = (trans_b0 - trans_a0) + 1; //Determine quantity of lines in this block for left side
+				int QtyLinesRight = (trans_b1 - trans_a1) + 1;//Determine quantity of lines in this block for right side
+				PostFilter(thisob->line0, QtyLinesLeft, thisob->line1, QtyLinesRight, op, asLwrCaseExt.c_str());
+			}
+
+			if (m_pFilterList && m_pFilterList->HasRegExps())
+			{
+				int line0 = thisob->line0;
+				int line1 = thisob->line1;
+				int end0 = line0 + (trans_b0 - trans_a0);
+				int end1 = line1 + (trans_b1 - trans_a1);
+				line0 += RegExpFilter(line0, end0, 0, false);
+				line1 += RegExpFilter(line1, end1, 1, false);
+				if (line0 > end0 && line1 > end1)
+					op = OP_TRIVIAL;
+			}
+			/*{
+				// Split into slices of trivial and non-trivial diff ranges
+				// (This follows a proposed but rejected patch and is left here
+				// as comment for academic reference.)
+				int line0 = thisob->line0;
+				int line1 = thisob->line1;
+				do
+				{
+					// Determine end positions in this block for both sides
+					int end0 = line0 + (trans_b0 - trans_a0);
+					int end1 = line1 + (trans_b1 - trans_a1);
+					// Match lines against regular expression filters
+					// Our strategy is that every line in both sides must
+					// match regexp before we mark difference as ignored.
+					OP_TYPE op_slice = op;
+					int match0 = RegExpFilter(line0, end0, 0, true);
+					int match1 = RegExpFilter(line1, end1, 1, true);
+					if (match0 == 0 && match1 == 0)
+					{
+						op_slice = OP_TRIVIAL;
+						// Optimization: Above results tell us enough about current line, so continue matching on next line
+						if (end0 >= line0)
+							match0 = 1 + RegExpFilter(line0 + 1, end0, 0, false);
+						if (end1 >= line1)
+							match1 = 1 + RegExpFilter(line1 + 1, end1, 1, false);
+					}
+					ASSERT(match0 != 0 || match1 != 0);
+					if (!AddDiffRange(trans_a0 - 1, trans_a0 - 1 + match0 - 1, trans_a1 - 1, trans_a1 - 1 + match1 - 1, op_slice))
+						return FALSE;
+					trans_a0 += match0;
+					trans_a1 += match1;
+					line0 += match0;
+					line1 += match1;
+				} while (trans_a0 <= trans_b0 || trans_a1 <= trans_b1);
+			}
+			else*/
+			{
+				if (!AddDiffRange(trans_a0 - 1, trans_b0 - 1, trans_a1 - 1, trans_b1 - 1, op))
+					return FALSE;
+			}
+		}
+	}
+	return TRUE;
+}
+
+/**
+ * @brief Write out a patch file.
+ * Writes patch file using already computed diffutils script. Converts path
+ * delimiters from \ to / since we want to keep compatibility with patch-tools.
+ * @param [in] script list of changes.
+ * @param [in] inf file_data table containing filenames
+ */
+void CDiffWrapper::WritePatchFile(struct change * script, file_data * inf)
+{
+	file_data inf_patch[2];
+	CopyMemory(&inf_patch, inf, sizeof inf_patch);
+	
+	// Get paths, primarily use alternative paths, only if they are empty
+	// use full filepaths
+	OString path1 = HString::Uni(!m_s1AlternativePath.empty() ?
+		m_s1AlternativePath.c_str() : m_s1File.c_str())->Oct(CP_THREAD_ACP);
+	OString path2 = HString::Uni(!m_s2AlternativePath.empty() ?
+		m_s2AlternativePath.c_str() : m_s2File.c_str())->Oct(CP_THREAD_ACP);
+	inf_patch[0].name = path1.A;
+	inf_patch[1].name = path2.A;
+
+	// If paths in m_s1File and m_s2File point to original files, then we can use
+	// them to fix potentially meaningless stats from potentially temporary files,
+	// resulting from whatever transforms may have taken place.
+	// If not, then we can't help it, and hence ASSERT that this won't happen.
+	if (!m_bPathsAreTemp)
+	{
+		_tstati64(m_s1File.c_str(), &inf_patch[0].stat);
+		_tstati64(m_s2File.c_str(), &inf_patch[1].stat);
+	}
+	else
+	{
+		ASSERT(FALSE);
+	}
+
+	outfile = NULL;
+	if (!m_sPatchFile.empty())
+	{
+		LPCTSTR mode = (m_bAppendFiles ? _T("a+") : _T("w+"));
+		outfile = _tfopen(m_sPatchFile.c_str(), mode);
+	}
+
+	if (!outfile)
+	{
+		m_status.bPatchFileFailed = TRUE;
+		return;
+	}
+
+	// Print "command line"
+	if (m_bAddCmdLine)
+	{
+		String switches = FormatSwitchString();
+		_ftprintf(outfile, _T("diff%s %s %s\n"),
+			switches.c_str(), path1.A, path2.A);
+	}
+
+	// Output patchfile
+	switch (output_style)
+	{
+	case OUTPUT_CONTEXT:
+		print_context_header(inf_patch, 0);
+		print_context_script(script, 0);
+		break;
+	case OUTPUT_UNIFIED:
+		print_context_header(inf_patch, 1);
+		print_context_script(script, 1);
+		break;
+	case OUTPUT_ED:
+		print_ed_script(script);
+		break;
+	case OUTPUT_FORWARD_ED:
+		pr_forward_ed_script(script);
+		break;
+	case OUTPUT_RCS:
+		print_rcs_script(script);
+		break;
+	case OUTPUT_NORMAL:
+		print_normal_script(script);
+		break;
+	case OUTPUT_IFDEF:
+		print_ifdef_script(script);
+		break;
+	case OUTPUT_SDIFF:
+		print_sdiff_script(script);
+	}
+	
+	fclose(outfile);
+	outfile = NULL;
+}
+
+/**
+ * @brief Set line filters, given as one string.
+ * @param [in] filterStr Filters.
+ */
+void CDiffWrapper::SetFilterList(LPCTSTR filterStr)
+{
+	// Remove filterlist if new filter is empty
+	if (*filterStr == '\0')
+	{
+		delete m_pFilterList;
+		m_pFilterList = NULL;
+		return;
+	}
+
+	// Adding new filter without previous filter
+	if (m_pFilterList == NULL)
+	{
+		m_pFilterList = new FilterList;
+	}
+
+	m_pFilterList->RemoveAllFilters();
+	assert(_tcspbrk(filterStr, _T("\r\n")) == NULL);
+	m_pFilterList->AddRegExp(filterStr);
+}
+
+/**
+ * @brief Copy text stat results from diffutils back into the FileTextStats structure
+ */
+void CopyTextStats(const file_data * inf, FileTextStats * myTextStats)
+{
+	myTextStats->ncrlfs = inf->count_crlfs;
+	myTextStats->ncrs = inf->count_crs;
+	myTextStats->nlfs = inf->count_lfs;
+	myTextStats->nzeros = inf->count_zeros;
+}
+
+/**
+ * @brief Copy both left & right text stats results back into the DiffFileData text stats
+ */
+void CopyDiffutilTextStats(file_data *inf, DiffFileData * diffData)
+{
+	CopyTextStats(&inf[0], &diffData->m_textStats[0]);
+	CopyTextStats(&inf[1], &diffData->m_textStats[1]);
+}

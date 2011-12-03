@@ -1,0 +1,22 @@
+<scriptlet>
+
+<implements type='automation'>
+	<method name='OpenTextFile'/>
+	<property name='ShowConsole'/>
+	<property name='ReadOnly'/>
+</implements>
+
+<script language='vbs'>
+Option Explicit
+
+Const ShowConsole = 0
+Const ReadOnly = True
+
+Dim sh
+Set sh = CreateObject("WScript.Shell")
+
+Function OpenTextFile(path)
+	Set OpenTextFile = sh.Exec("%xdoc2txt%\xdoc2txt.exe """ & path & """").StdOut
+End Function
+</script>
+</scriptlet>

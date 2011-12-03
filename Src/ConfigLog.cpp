@@ -1,0 +1,887 @@
+/////////////////////////////////////////////////////////////////////////////
+//    License (GPLv2+):
+//    This program is free software; you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation; either version 2 of the License, or (at
+//    your option) any later version.
+//    
+//    This program is distributed in the hope that it will be useful, but
+//    WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with this program; if not, write to the Free Software
+//    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+/////////////////////////////////////////////////////////////////////////////
+/** 
+ * @file  ConfigLog.cpp
+ *
+ * @brief CConfigLog implementation
+ */
+// ID line follows -- this is updated by SVN
+// $Id$
+
+#include "StdAfx.h"
+#include "Constants.h"
+#include "common/version.h"
+#include "UniFile.h"
+#include "DiffWrapper.h"
+#include "ConfigLog.h"
+#include "paths.h"
+#include "codepage.h"
+#include "7zCommon.h"
+#include "CompareOptions.h"
+#include "SettingStore.h"
+#include "Environment.h"
+
+// Static function declarations
+static bool LoadYesNoFromConfig(CfgSettings * cfgSettings, LPCTSTR name, bool * pbflag);
+
+
+
+CConfigLog::CConfigLog()
+: m_pCfgSettings(NULL)
+{
+	m_pfile = new UniStdioFile();
+}
+
+CConfigLog::~CConfigLog()
+{
+	CloseFile();
+	delete m_pfile;
+}
+
+
+
+/** 
+ * @brief Return logfile name and path
+ */
+String CConfigLog::GetFileName() const
+{
+	return m_sFileName;
+}
+
+/**
+ * @brief String wrapper around API call GetLocaleInfo
+ */
+static String GetLocaleString(LCID locid, LCTYPE lctype)
+{
+	TCHAR buffer[512];
+	if (!GetLocaleInfo(locid, lctype, buffer, _countof(buffer)))
+		buffer[0] = 0;
+	return buffer;
+}
+
+/**
+ * @brief Return Windows font charset constant name from constant value, eg, FontCharsetName() => "Hebrew"
+ */
+static String FontCharsetName(BYTE charset)
+{
+	switch(charset)
+	{
+	case ANSI_CHARSET: return _T("Ansi");
+	case BALTIC_CHARSET: return _T("Baltic");
+	case CHINESEBIG5_CHARSET: return _T("Chinese Big5");
+	case DEFAULT_CHARSET: return _T("Default");
+	case EASTEUROPE_CHARSET: return _T("East Europe");
+	case GB2312_CHARSET: return _T("Chinese GB2312");
+	case GREEK_CHARSET: return _T("Greek");
+	case HANGUL_CHARSET: return _T("Korean Hangul");
+	case MAC_CHARSET: return _T("Mac");
+	case OEM_CHARSET: return _T("OEM");
+	case RUSSIAN_CHARSET: return _T("Russian");
+	case SHIFTJIS_CHARSET: return _T("Japanese Shift-JIS");
+	case SYMBOL_CHARSET: return _T("Symbol");
+	case TURKISH_CHARSET: return _T("Turkish");
+	case VIETNAMESE_CHARSET: return _T("Vietnamese");
+	case JOHAB_CHARSET: return _T("Korean Johab");
+	case ARABIC_CHARSET: return _T("Arabic");
+	case HEBREW_CHARSET: return _T("Hebrew");
+	case THAI_CHARSET: return _T("Thai");
+	default: return _T("Unknown");
+	}
+}
+
+/**
+ * @brief Write string item
+ */
+void CConfigLog::WriteItem(int indent, LPCTSTR key, LPCTSTR value)
+{
+	// do nothing if actually reading config file
+	if (!m_writing)
+		return;
+
+	string_format text(value ? _T("%*.0s%s: %s\r\n") : _T("%*.0s%s:\r\n"), indent, key, key, value);
+	m_pfile->WriteString(text);
+}
+
+/**
+ * @brief Write string item
+ */
+void CConfigLog::WriteItem(int indent, LPCTSTR key, const String &str)
+{
+	WriteItem(indent, key, str.c_str());
+}
+
+/**
+ * @brief Write int item
+ */
+void CConfigLog::WriteItem(int indent, LPCTSTR key, long value)
+{
+	// do nothing if actually reading config file
+	if (!m_writing)
+		return;
+
+	string_format text(_T("%*.0s%s: %ld\r\n"), indent, key, key, value);
+	m_pfile->WriteString(text);
+}
+
+/**
+ * @brief Write boolean item using keywords (Yes|No)
+ */
+void CConfigLog::WriteItemYesNo(int indent, LPCTSTR key, bool *pvalue)
+{
+	if (m_writing)
+	{
+		string_format text(_T("%*.0s%s: %s\r\n"), indent, key, key, *pvalue ? _T("Yes") : _T("No"));
+		m_pfile->WriteString(text);
+	}
+	else
+	{
+		LoadYesNoFromConfig(m_pCfgSettings, key, pvalue);
+	}
+}
+
+/**
+ * @brief Same as WriteItemYesNo, except store Yes/No in reverse
+ */
+void CConfigLog::WriteItemYesNoInverted(int indent, LPCTSTR key, bool *pvalue)
+{
+	bool tempval = !(*pvalue);
+	WriteItemYesNo(indent, key, &tempval);
+	*pvalue = !(tempval);
+}
+
+/**
+ * @brief Same as WriteItemYesNo, except store Yes/No in reverse
+ */
+void CConfigLog::WriteItemYesNoInverted(int indent, LPCTSTR key, int *pvalue)
+{
+	bool tempval = !(*pvalue);
+	WriteItemYesNo(indent, key, &tempval);
+	*pvalue = !(tempval);
+}
+
+/**
+ * @brief Write out various possibly relevant windows locale information
+ */
+void CConfigLog::WriteLocaleSettings(LCID locid, LPCTSTR title)
+{
+	// do nothing if actually reading config file
+	if (!m_writing)
+		return;
+
+	WriteItem(1, title);
+	WriteItem(2, _T("Def ANSI codepage"), GetLocaleString(locid, LOCALE_IDEFAULTANSICODEPAGE));
+	WriteItem(2, _T("Def OEM codepage"), GetLocaleString(locid, LOCALE_IDEFAULTCODEPAGE));
+	WriteItem(2, _T("Country"), GetLocaleString(locid, LOCALE_SENGCOUNTRY));
+	WriteItem(2, _T("Language"), GetLocaleString(locid, LOCALE_SENGLANGUAGE));
+	WriteItem(2, _T("Language code"), GetLocaleString(locid, LOCALE_ILANGUAGE));
+	WriteItem(2, _T("ISO Language code"), GetLocaleString(locid, LOCALE_SISO639LANGNAME));
+}
+
+/**
+ * @brief Write version of a single executable file
+ */
+void CConfigLog::WriteVersionOf1(int indent, LPTSTR path, bool bDllGetVersion)
+{
+	// Do nothing if actually reading config file
+	if (!m_writing)
+		return;
+
+	LPTSTR name = PathFindFileName(path);
+	CVersionInfo vi(path);
+	String sVersion = vi.GetFixedProductVersion();
+
+	if (bDllGetVersion)
+	{
+		if (HINSTANCE hinstDll = LoadLibrary(path))
+		{
+			DLLGETVERSIONPROC DllGetVersion = (DLLGETVERSIONPROC) 
+				GetProcAddress(hinstDll, "DllGetVersion");
+			if (DllGetVersion)
+			{
+				DLLVERSIONINFO dvi;
+				ZeroMemory(&dvi, sizeof dvi);
+				dvi.cbSize = sizeof dvi;
+				if (SUCCEEDED(DllGetVersion(&dvi)))
+				{
+					sVersion += string_format(_T(" dllversion=%u.%u dllbuild=%u"),
+						dvi.dwMajorVersion, dvi.dwMinorVersion, dvi.dwBuildNumber);
+				}
+			}
+			FreeLibrary(hinstDll);
+		}
+	}
+	string_format text
+	(
+		name == path
+	?	_T("%*s%-24s %s\r\n")
+	:	_T("%*s%-24s %s path=%s\r\n"),
+		indent,
+		// Tilde prefix for modules currently mapped into WinMerge
+		GetModuleHandle(path) ? _T("~") : _T(""),
+		name,
+		sVersion.c_str(),
+		path
+	);
+	m_pfile->WriteString(text);
+}
+
+/**
+ * @brief Write version of a set of executable files
+ */
+void CConfigLog::WriteVersionOf(int indent, LPTSTR path)
+{
+	LPTSTR name = PathFindFileName(path);
+	WIN32_FIND_DATA ff;
+	HANDLE h = FindFirstFile(path, &ff);
+	if (h != INVALID_HANDLE_VALUE)
+	{
+		do
+		{
+			lstrcpy(name, ff.cFileName);
+			WriteVersionOf1(indent, path);
+		} while (FindNextFile(h, &ff));
+		FindClose(h);
+	}
+}
+
+/**
+ * @brief Write version of 7-Zip plugins and shell context menu handler
+ */
+void CConfigLog::WriteVersionOf7z(LPTSTR path)
+{
+	lstrcat(path, _T("\\7-zip*.dll"));
+	LPTSTR pattern = PathFindFileName(path);
+	WriteVersionOf(2, path);
+	WriteItem(2, _T("Codecs"));
+	lstrcpy(pattern, _T("codecs\\*.dll"));
+	WriteVersionOf(3, path);
+	WriteItem(2, _T("Formats"));
+	lstrcpy(pattern, _T("formats\\*.dll"));
+	WriteVersionOf(3, path);
+}
+
+/**
+ * @brief Write archive support stuff
+ */
+void CConfigLog::WriteArchiveSupport()
+{
+	DWORD registered = VersionOf7z(FALSE);
+	DWORD standalone = VersionOf7z(TRUE);
+	TCHAR path[MAX_PATH];
+	DWORD type = 0;
+	DWORD size = sizeof path;
+
+	WriteItem(0, _T("Archive support"));
+	WriteItem(1, _T("Enable"),
+		SettingStore.GetProfileInt(_T("Merge7z"), _T("Enable"), 0));
+
+	wsprintf(path, _T("%u.%02u"), UINT HIWORD(registered), UINT LOWORD(registered));
+	WriteItem(1, _T("7-Zip software installed on your computer"), path);
+	static const TCHAR szSubKey[] = _T("Software\\7-Zip");
+	static const TCHAR szValue[] = _T("Path");
+	SHGetValue(HKEY_LOCAL_MACHINE, szSubKey, szValue, &type, path, &size);
+	WriteVersionOf7z(path);
+
+	wsprintf(path, _T("%u.%02u"), UINT HIWORD(standalone), UINT LOWORD(standalone));
+	WriteItem(1, _T("7-Zip components for standalone operation"), path);
+	GetModuleFileName(0, path, _countof(path));
+	LPTSTR pattern = PathFindFileName(path);
+	PathRemoveFileSpec(path);
+	WriteVersionOf7z(path);
+
+	WriteItem(1, _T("Merge7z plugins on path"));
+	lstrcpy(pattern, _T("Merge7z*.dll"));
+	WriteVersionOf(2, path);
+	// now see what's on the path:
+	if (DWORD cchPath = GetEnvironmentVariable(_T("path"), 0, 0))
+	{
+		static const TCHAR cSep[] = _T(";");
+		LPTSTR pchPath = new TCHAR[cchPath];
+		GetEnvironmentVariable(_T("PATH"), pchPath, cchPath);
+		LPTSTR pchItem = pchPath;
+		while (int cchItem = StrCSpn(pchItem += StrSpn(pchItem, cSep), cSep))
+		{
+			if (cchItem < MAX_PATH)
+			{
+				CopyMemory(path, pchItem, cchItem*sizeof*pchItem);
+				path[cchItem] = 0;
+				PathAppend(path, _T("Merge7z*.dll"));
+				WriteVersionOf(2, path);
+			}
+			pchItem += cchItem;
+		}
+		delete[] pchPath;
+	}
+}
+
+struct NameMap { int ival; LPCTSTR sval; };
+/**
+ * @brief Write boolean item using keywords (Yes|No)
+ */
+void CConfigLog::WriteItemWhitespace(int indent, LPCTSTR key, int *pvalue)
+{
+	static NameMap namemap[] = {
+		{ WHITESPACE_COMPARE_ALL, _T("Compare all") }
+		, { WHITESPACE_IGNORE_CHANGE, _T("Ignore change") }
+		, { WHITESPACE_IGNORE_ALL, _T("Ignore all") }
+	};
+
+	if (m_writing)
+	{
+		String text = _T("Unknown");
+		for (int i=0; i<sizeof(namemap)/sizeof(namemap[0]); ++i)
+		{
+			if (*pvalue == namemap[i].ival)
+				text = namemap[i].sval;
+		}
+		WriteItem(indent, key, text);
+	}
+	else
+	{
+		*pvalue = namemap[0].ival;
+		String svalue = GetValueFromConfig(key);
+		for (int i = 0 ; i < _countof(namemap) ; ++i)
+		{
+			if (svalue == namemap[i].sval)
+				*pvalue = namemap[i].ival;
+		}
+	}
+}
+
+
+/** 
+ * @brief Write logfile
+ */
+bool CConfigLog::DoFile(bool writing, String &sError)
+{
+	CVersionInfo version;
+	String text;
+
+	m_writing = writing;
+
+	if (writing)
+	{
+		String sFileName = paths_ConcatPath(env_GetMyDocuments(), WinMergeDocumentsFolder);
+		paths_CreateIfNeeded(sFileName.c_str());
+		m_sFileName = paths_ConcatPath(sFileName, _T("WinMerge.txt"));
+
+		if (!m_pfile->OpenCreateUtf8(m_sFileName.c_str()))
+		{
+			const UniFile::UniError &err = m_pfile->GetLastUniError();
+			sError = err.GetError();
+			return false;
+		}
+		m_pfile->SetBom(true);
+		m_pfile->WriteBom();
+	}
+
+// Begin log
+	FileWriteString(_T("WinMerge configuration log\r\n"));
+	FileWriteString(_T("--------------------------\r\n"));
+	FileWriteString(_T("Saved to: "));
+	FileWriteString(m_sFileName.c_str());
+	FileWriteString(_T("\r\n* Please add this information (or attach this file)\r\n"));
+	FileWriteString(_T("* when reporting bugs.\r\n"));
+	FileWriteString(_T("Module names prefixed with tilda (~) are currently loaded in WinMerge process.\r\n"));
+
+// Platform stuff
+	FileWriteString(_T("\r\n\r\nVersion information:\r\n"));
+	FileWriteString(_T(" WinMerge.exe: "));
+	FileWriteString(version.GetFixedProductVersion().c_str());
+
+	String privBuild = version.GetPrivateBuild();
+	if (!privBuild.empty())
+	{
+		FileWriteString(_T(" - Private build: "));
+		FileWriteString(privBuild.c_str());
+	}
+
+	FileWriteString(
+		_T("\r\n Build config:")
+#		ifdef _DEBUG
+		_T(" _DEBUG")
+#		endif
+#		ifdef NDEBUG
+		_T(" NDEBUG")
+#		endif
+#		ifdef WIN64
+		_T(" WIN64")
+#		endif
+	);
+
+	LPCTSTR szCmdLine = ::GetCommandLine();
+	ASSERT(szCmdLine != NULL);
+	// Skip the quoted executable file name.
+	if (szCmdLine != NULL)
+	{
+		szCmdLine = ::PathGetArgs(szCmdLine);
+	}
+
+	// The command line include a space after the executable file name,
+	// which mean that empty command line will have length of one.
+	if (szCmdLine == NULL || szCmdLine[0] == _T('\0'))
+	{
+		szCmdLine = _T("none");
+	}
+
+	FileWriteString(_T("\r\n Command Line: "));
+	FileWriteString(szCmdLine);
+
+	FileWriteString(_T("\r\n Windows: "));
+	text = GetWindowsVer();
+	FileWriteString(text.c_str());
+
+	FileWriteString(_T("\r\n"));
+	WriteVersionOf1(1, _T("COMCTL32.dll"));
+	WriteVersionOf1(1, _T("shlwapi.dll"));
+	WriteVersionOf1(1, _T("MergeLang.dll"));
+	WriteVersionOf1(1, _T("ShellExtension.dll"), false);
+	WriteVersionOf1(1, _T("ShellExtensionU.dll"), false);
+	WriteVersionOf1(1, _T("ShellExtensionX64.dll"), false);
+
+// WinMerge settings
+	FileWriteString(_T("\r\nWinMerge configuration:\r\n"));
+	FileWriteString(_T(" Compare settings:\r\n"));
+
+	WriteItemYesNo(2, _T("Ignore blank lines"), &m_diffOptions.bIgnoreBlankLines);
+	WriteItemYesNo(2, _T("Ignore case"), &m_diffOptions.bIgnoreCase);
+	WriteItemYesNo(2, _T("Ignore carriage return differences"), &m_diffOptions.bIgnoreEol);
+
+	WriteItemWhitespace(2, _T("Whitespace compare"), &m_diffOptions.nIgnoreWhitespace);
+
+	WriteItemYesNo(2, _T("Detect moved blocks"), &m_miscSettings.bMovedBlocks);
+	WriteItem(2, _T("Compare method"), m_compareSettings.nCompareMethod);
+	WriteItemYesNo(2, _T("Stop after first diff"), &m_compareSettings.bStopAfterFirst);
+
+	FileWriteString(_T("\r\n Other settings:\r\n"));
+	WriteItemYesNo(2, _T("Automatic rescan"), &m_miscSettings.bAutomaticRescan);
+	WriteItemYesNoInverted(2, _T("Simple EOL"), &m_miscSettings.bAllowMixedEol);
+	WriteItemYesNo(2, _T("Automatic scroll to 1st difference"), &m_miscSettings.bScrollToFirst);
+	WriteItemYesNo(2, _T("Backup original file"), &m_miscSettings.bBackup);
+
+	FileWriteString(_T("\r\n Folder compare:\r\n"));
+	WriteItemYesNo(2, _T("Identical files"), &m_viewSettings.bShowIdent);
+	WriteItemYesNo(2, _T("Different files"), &m_viewSettings.bShowDiff);
+	WriteItemYesNo(2, _T("Left Unique files"), &m_viewSettings.bShowUniqueLeft);
+	WriteItemYesNo(2, _T("Right Unique files"), &m_viewSettings.bShowUniqueRight);
+	WriteItemYesNo(2, _T("Binary files"), &m_viewSettings.bShowBinaries);
+	WriteItemYesNo(2, _T("Skipped files"), &m_viewSettings.bShowSkipped);
+	WriteItemYesNo(2, _T("Tree-mode enabled"), &m_viewSettings.bTreeView);
+
+	FileWriteString(_T("\r\n File compare:\r\n"));
+	WriteItemYesNo(2, _T("Preserve filetimes"), &m_miscSettings.bPreserveFiletimes);
+	WriteItemYesNo(2, _T("Match similar lines"), &m_miscSettings.bMatchSimilarLines);
+
+	FileWriteString(_T("\r\n Editor settings:\r\n"));
+	WriteItemYesNo(2, _T("View Whitespace"), &m_miscSettings.bViewWhitespace);
+	WriteItemYesNo(2, _T("Merge Mode enabled"), &m_miscSettings.bMergeMode);
+	WriteItemYesNo(2, _T("Show linenumbers"), &m_miscSettings.bShowLinenumbers);
+	WriteItemYesNo(2, _T("Wrap lines"), &m_miscSettings.bWrapLines);
+	WriteItemYesNo(2, _T("Syntax Highlight"), &m_miscSettings.bSyntaxHighlight);
+	WriteItem(2, _T("Tab size"), m_miscSettings.nTabSize);
+	WriteItemYesNoInverted(2, _T("Insert tabs"), &m_miscSettings.nInsertTabs);
+	
+// Font settings
+	FileWriteString(_T("\r\n Font:\r\n"));
+	FileWriteString(Fmt(_T("  Font facename: %s\r\n"), m_fontSettings.sFacename.c_str()).c_str());
+	FileWriteString(Fmt(_T("  Font charset: %d (%s)\r\n"), m_fontSettings.nCharset, 
+		FontCharsetName(m_fontSettings.nCharset).c_str()).c_str());
+
+// System settings
+	FileWriteString(_T("\r\nSystem settings:\r\n"));
+	FileWriteString(_T(" codepage settings:\r\n"));
+	WriteItem(2, _T("ANSI codepage"), GetACP());
+	WriteItem(2, _T("OEM codepage"), GetOEMCP());
+	WriteLocaleSettings(GetThreadLocale(), _T("Locale (Thread)"));
+	WriteLocaleSettings(LOCALE_USER_DEFAULT, _T("Locale (User)"));
+	WriteLocaleSettings(LOCALE_SYSTEM_DEFAULT, _T("Locale (System)"));
+
+// Codepage settings
+	WriteItemYesNo(1, _T("Detect codepage automatically for RC and HTML files"), &m_cpSettings.bDetectCodepage);
+	WriteItem(1, _T("unicoder codepage"), getDefaultCodepage());
+
+	FileWriteString(_T("\r\n\r\n"));
+	WriteArchiveSupport();
+
+	CloseFile();
+
+	return true;
+}
+
+/** @brief osvi.wProductType that works with MSVC6 headers */
+static BYTE GetProductTypeFromOsvc(const OSVERSIONINFOEX & osvi)
+{
+	// wServicePackMinor (2 bytes)
+	// wSuiteMask (2 bytes)
+	// wProductType (1 byte)
+	const BYTE * ptr = reinterpret_cast<const BYTE *>(&osvi.wServicePackMinor);
+	return ptr[4];
+}
+
+/** @brief osvi.wSuiteMask that works with MSVC6 headers */
+static WORD GetSuiteMaskFromOsvc(const OSVERSIONINFOEX & osvi)
+{
+	// wServicePackMinor (2 bytes)
+	// wSuiteMask (2 bytes)
+	const WORD * ptr = reinterpret_cast<const WORD *>(&osvi.wServicePackMinor);
+	return ptr[1];
+}
+
+/** 
+ * @brief Extract any helpful product details from version info
+ */
+static String GetProductFromOsvi(const OSVERSIONINFOEX & osvi)
+{
+	String sProduct;
+	BYTE productType = GetProductTypeFromOsvc(osvi);
+	WORD suiteMask = GetSuiteMaskFromOsvc(osvi);
+
+	// Test for the workstation type.
+	if ( productType == VER_NT_WORKSTATION )
+	{
+		if( osvi.dwMajorVersion == 4 )
+			sProduct += _T( "Workstation 4.0 ");
+		else if( suiteMask & VER_SUITE_PERSONAL )
+			sProduct += _T( "Home Edition " );
+		else
+			sProduct += _T( "Professional " );
+	}
+
+	// Test for the server type.
+	else if ( productType == VER_NT_SERVER )
+	{
+		if( osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 2 )
+		{
+			if( suiteMask & VER_SUITE_DATACENTER )
+				sProduct += _T( "Datacenter Edition " );
+			else if( suiteMask & VER_SUITE_ENTERPRISE )
+				sProduct += _T( "Enterprise Edition " );
+			else if ( suiteMask == VER_SUITE_BLADE )
+				sProduct += _T( "Web Edition " );
+			else
+				sProduct += _T( "Standard Edition " );
+		}
+
+		else if( osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 0 )
+		{
+			if( suiteMask & VER_SUITE_DATACENTER )
+				sProduct += _T( "Datacenter Server " );
+			else if( suiteMask & VER_SUITE_ENTERPRISE )
+				sProduct += _T( "Advanced Server " );
+			else
+				sProduct += _T( "Server " );
+		}
+
+		else  // Windows NT 4.0
+		{
+			if( suiteMask & VER_SUITE_ENTERPRISE )
+				sProduct += _T("Server 4.0, Enterprise Edition " );
+			else
+				sProduct += _T( "Server 4.0 " );
+		}
+	}
+	return sProduct;
+}
+
+#define REGBUFSIZE 1024
+/** 
+ * @brief Extract any helpful product details from registry (for WinNT)
+ */
+static String GetNtProductFromRegistry(const OSVERSIONINFOEX & osvi)
+{
+	String sProduct;
+
+	HKEY hKey;
+	TCHAR szProductType[REGBUFSIZE];
+	DWORD dwBufLen = _countof(szProductType);
+	LONG lRet;
+
+	lRet = RegOpenKeyEx( HKEY_LOCAL_MACHINE,
+		_T("SYSTEM\\CurrentControlSet\\Control\\ProductOptions"),
+		0, KEY_QUERY_VALUE, &hKey );
+	if( lRet != ERROR_SUCCESS )
+		return _T("");
+
+	lRet = RegQueryValueEx( hKey, _T("ProductType"), NULL, NULL,
+		(LPBYTE) szProductType, &dwBufLen);
+	RegCloseKey( hKey );
+
+	if( (lRet != ERROR_SUCCESS) || (dwBufLen > REGBUFSIZE) )
+		return _T("");
+
+	if ( _tcsicmp( _T("WINNT"), szProductType) == 0 )
+		sProduct = _T( "Workstation " );
+	if ( _tcsicmp( _T("LANMANNT"), szProductType) == 0 )
+		sProduct = _T( "Server " );
+	if ( _tcsicmp( _T("SERVERNT"), szProductType) == 0 )
+		sProduct = _T( "Advanced Server " );
+
+	string_format ver(_T("%d.%d "), osvi.dwMajorVersion, osvi.dwMinorVersion);
+	sProduct += ver;
+	return sProduct;
+}
+
+/** 
+ * @brief Parse Windows version data to string.
+ * See info about how to determine Windows versions from URL:
+ * http://msdn.microsoft.com/en-us/library/ms724833(VS.85).aspx
+ * @return String describing Windows version.
+ */
+String CConfigLog::GetWindowsVer()
+{
+	OSVERSIONINFOEX osvi;
+	String sVersion;
+
+	// Try calling GetVersionEx using the OSVERSIONINFOEX structure.
+	// If that fails, try using the OSVERSIONINFO structure.
+
+	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+
+	if( !GetVersionEx ((OSVERSIONINFO *) &osvi) )
+	{
+		osvi.dwOSVersionInfoSize = sizeof (OSVERSIONINFO);
+		if (! GetVersionEx ( (OSVERSIONINFO *) &osvi) )
+			return _T("");
+	}
+
+	switch (osvi.dwPlatformId)
+	{
+		// Test for the Windows NT product family.
+		case VER_PLATFORM_WIN32_NT:
+
+		// Test for the specific product family.
+		if ( osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 2 )
+			sVersion = _T("Microsoft Windows Server 2003 family, ");
+		else if ( osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 1 )
+			sVersion = _T("Microsoft Windows XP ");
+		else if ( osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 0 )
+			sVersion = _T("Microsoft Windows 2000 ");
+		else if ( osvi.dwMajorVersion <= 4 )
+			sVersion = _T("Microsoft Windows NT ");
+		else if ( osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 0 )
+		{
+			if (osvi.wProductType == VER_NT_WORKSTATION)
+				sVersion = _T("Microsoft Windows Vista ");
+			else
+				sVersion = _T("Microsoft Windows Server 2008 ");
+		}
+		else if ( osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 1 )
+		{
+			if (osvi.wProductType == VER_NT_WORKSTATION)
+				sVersion = _T("Microsoft Windows 7 ");
+			else
+				sVersion = _T("Microsoft Windows Server 2008 R2 ");
+		}
+		else
+			sVersion = string_format(_T("[? WindowsNT %d.%d] "), 
+				osvi.dwMajorVersion, osvi.dwMinorVersion);
+
+		if (osvi.dwOSVersionInfoSize == sizeof(OSVERSIONINFOEX))
+		{
+			// Test for specific product on Windows NT 4.0 SP6 and later.
+			String sProduct = GetProductFromOsvi(osvi);
+			sVersion += sProduct;
+		}
+		else
+		{
+			// Test for specific product on Windows NT 4.0 SP5 and earlier
+			String sProduct = GetNtProductFromRegistry(osvi);
+			sVersion += sProduct;
+		}
+
+		// Display service pack (if any) and build number.
+		if( osvi.dwMajorVersion == 4 &&
+			_tcsicmp( osvi.szCSDVersion, _T("Service Pack 6") ) == 0 )
+		{
+			HKEY hKey;
+			LONG lRet;
+
+			// Test for SP6 versus SP6a.
+			lRet = RegOpenKeyEx( HKEY_LOCAL_MACHINE,
+				_T("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Hotfix\\Q246009"),
+				0, KEY_QUERY_VALUE, &hKey );
+			String ver;
+			if( lRet == ERROR_SUCCESS )
+				ver = string_format(_T("Service Pack 6a (Build %d)"), osvi.dwBuildNumber & 0xFFFF );
+			else // Windows NT 4.0 prior to SP6a
+			{
+				ver = string_format(_T("%s (Build %d)"),
+					osvi.szCSDVersion,
+					osvi.dwBuildNumber & 0xFFFF);
+			}
+
+			sVersion += ver;
+			RegCloseKey( hKey );
+		}
+		else // Windows NT 3.51 and earlier or Windows 2000 and later
+		{
+			String ver = string_format( _T("%s (Build %d)"),
+				osvi.szCSDVersion,
+				osvi.dwBuildNumber & 0xFFFF);
+			sVersion += ver;
+		}
+		break;
+
+	// Test for the Windows 95 product family.
+	case VER_PLATFORM_WIN32_WINDOWS:
+
+		if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 0)
+		{
+			sVersion = _T("Microsoft Windows 95 ");
+			if ( osvi.szCSDVersion[1] == 'C' || osvi.szCSDVersion[1] == 'B' )
+				sVersion += _T("OSR2 " );
+		}
+		else if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 10)
+		{
+			sVersion = _T("Microsoft Windows 98 ");
+			if ( osvi.szCSDVersion[1] == 'A' )
+				sVersion += _T("SE " );
+		}
+		else if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 90)
+		{
+			sVersion = _T("Microsoft Windows Millennium Edition");
+		}
+		else
+		{
+			sVersion = string_format(_T("[? Windows9x %d.%d] "), 
+				osvi.dwMajorVersion, osvi.dwMinorVersion);
+		}
+		break;
+
+	case VER_PLATFORM_WIN32s:
+		sVersion = _T("Microsoft Win32s\r\n");
+		break;
+
+	default:
+		sVersion = string_format(_T(" [? Windows? %d.%d] "),
+			osvi.dwMajorVersion, osvi.dwMinorVersion);
+	}
+	return sVersion;
+}
+
+/** 
+ * @brief  Collection of configuration settings found in config log (name/value map)
+ */
+class CfgSettings
+{
+public:
+	void Add(LPCTSTR name, LPCTSTR value)
+	{
+		m_settings[name] = value;
+	}
+	bool Lookup(LPCTSTR name, String & value)
+	{
+		stl::map<String, String>::iterator it = m_settings.find(name);
+		if (it == m_settings.end())
+			return false;
+		value = it->second;
+		return true;
+	}
+private:
+	stl::map<String, String> m_settings;
+};
+
+/**
+ * @brief  Lookup named setting in cfgSettings, and if found, set pbflag accordingly
+ */
+static bool LoadYesNoFromConfig(CfgSettings * cfgSettings, LPCTSTR name, bool * pbflag)
+{
+	String value;
+	if (cfgSettings->Lookup(name, value))
+	{
+		if (value == _T("Yes"))
+		{
+			*pbflag = true;
+			return true;
+		}
+		else if (value == _T("No"))
+		{
+			*pbflag = false;
+			return true;
+		}
+	}
+	return false;
+}
+
+bool CConfigLog::WriteLogFile(String &sError)
+{
+	CloseFile();
+	return DoFile(true, sError);
+}
+
+void CConfigLog::ReadLogFile(LPCTSTR Filepath)
+{
+	CloseFile();
+	String sError;
+	m_pCfgSettings = new CfgSettings;
+	if (!ParseSettings(Filepath))
+		return;
+	DoFile(false, sError);
+}
+
+/// Write line to file (if writing configuration log)
+void CConfigLog::FileWriteString(LPCTSTR lpsz)
+{
+	if (m_writing)
+		m_pfile->WriteString(lpsz);
+}
+
+/**
+ * @brief Close any open file
+ */
+void CConfigLog::CloseFile()
+{
+	if (m_pfile->IsOpen())
+		m_pfile->Close();
+	delete m_pCfgSettings;
+	m_pCfgSettings = NULL;
+}
+
+/**
+ * @brief  Store all name:value strings from file into m_pCfgSettings
+ */
+bool CConfigLog::ParseSettings(LPCTSTR Filepath)
+{
+	UniMemFile file;
+	if (!file.Open(Filepath))
+		return false;
+
+	String sLine, sEol;
+	bool lossy;
+	while (file.ReadString(sLine, sEol, &lossy))
+	{
+		int colon = sLine.find(_T(":"));
+		if (colon > 0)
+		{
+			String name = sLine.substr(0, colon);
+			String value = sLine.substr(colon + 1);
+			name = string_trim_ws(name);
+			value = string_trim_ws(value);
+			m_pCfgSettings->Add(name.c_str(), value.c_str());
+		}
+	}
+	file.Close();
+	return true;
+}
+
+String CConfigLog::GetValueFromConfig(LPCTSTR key)
+{
+	String value;
+	m_pCfgSettings->Lookup(key, value);
+	return value;
+}

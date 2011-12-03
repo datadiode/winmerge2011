@@ -1,0 +1,416 @@
+<!--
+This file is released under the MIT license.
+
+----- begin license block -----
+
+Copyright (c) 2011 Jochen Neubeck
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+----- end license block -----
+
+-->
+<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN' 'http://www.w3.org/TR/html4/loose.dtd'>
+<HTML XMLNS:IE>
+<HEAD>
+<?IMPORT namespace='ie' implementation='#default'?>
+<META http-equiv='MSThemeCompatible' content='yes'>
+<STYLE type='text/css'>
+BODY
+{
+	border-style: none;
+	margin: 0 0 2em 0;
+	font-family: sans-serif;
+}
+BUTTON
+{
+	padding-left: 1ex;
+	padding-right: 1ex;
+	margin-right: 1ex;
+}
+SELECT
+{
+	margin-left: 0.5ex;
+	margin-right: 0.5ex;
+}
+TABLE, IFRAME
+{
+	width: 100%;
+	height: 100%;
+}
+#devicerect
+{
+	/*
+	 * Set width and height to prevent the initial invocation from occasionaly
+	 * producing one single overpopulated page. An alert() at the beginning of
+	 * OnLoadBody() helps reproduce the issue.
+	 */
+	width: 0;
+	height: 0;
+	border: 0 solid white;
+	background: white;
+	overflow: hidden;
+}
+#header, #footer
+{
+	position: absolute;
+	left: 0;
+	width: 100%;
+}
+#dialogbar
+{
+	width: 100%;
+	height: 2em;
+	background: buttonface;
+	padding: 4;
+}
+#workspace
+{
+	width: 100%;
+	height: 100%;
+	overflow: auto;
+	background: teal;
+	padding: 4;
+}
+</STYLE>
+
+<COMMENT id='pagehtml'>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>
+<style type='text/css'>
+body { margin: 0; }
+table { font-size: 10pt; font-family: sans-serif; word-wrap: break-word; width: 100%; margin: 0; border: none; table-layout: fixed; }
+tr { vertical-align: top; height: 2.3ex; }
+th { color: white; background-color: blue; text-align: center; }
+code { line-height: 2.3ex; }
+</style>
+</head>
+<body scroll='no'>
+<table cellspacing='0' cellpadding='0'>
+<col style='width: 2.4em; background-color: lightgrey; text-align: right;'>
+<col style='width: 50%; background-color: white;'>
+<col style='width: 2.4em; background-color: lightgrey; text-align: right;'>
+<col style='width: 50%; background-color: white;'>
+<th colspan='2'></th><th colspan='2'></th>
+</table>
+</body>
+</html>
+</COMMENT>
+
+<SCRIPT id='script' type='text/javascript'>
+<!--
+
+script.addBehavior("#WinMerge#MergeDoc", dialogArguments);
+script.addBehavior("#WinMerge#MergeApp", dialogArguments);
+
+pagehtml.text = pagehtml.text.replace("</style>", script.GetStyleRules(0) + "</style>");
+
+var LineIndex = 0;
+var LineCount = Math.max(script.GetLineCount(0), script.GetLineCount(1));
+
+function Navigate(direction)
+{
+	if (direction > 0)
+	{
+		var body = cf.document.body;
+		var table = body.children[0];
+		if (LineIndex - table.rows.length < 0)
+			return false;
+		LineIndex -= table.rows.length;
+	}
+	else if (direction < 0)
+	{
+		if (LineIndex >= LineCount)
+			return false;
+	}
+	else
+	{
+		with (devicerect.runtimeStyle)
+		{
+			width = tp.pageWidth + "e-2in";
+			height = tp.pageHeight + "e-2in";
+			paddingTop = tp.marginTop + "e-2in";
+			paddingBottom = tp.marginBottom + "e-2in";
+			borderLeftWidth = tp.marginLeft + "e-2in";
+			borderRightWidth = tp.marginRight + "e-2in";
+		}
+		hf.page = 0;
+		LineIndex = 0;
+		direction = -1;
+	}
+
+	cf.document.write(pagehtml.text);
+	cf.document.close();
+
+	var body = cf.document.body;
+	var table = body.children[0];
+
+	with (table.rows[0])
+	{
+		cells[0].innerText = script.GetFilePath(0);
+		cells[1].innerText = script.GetFilePath(1);
+	}
+
+	var StopIndex = direction < 0 ? LineCount : -1;
+
+	LineIndex = script.PrepareHTML(LineIndex, StopIndex, cf);
+
+	/*var offsetHeight = cf.frameElement.offsetHeight;
+	while (LineIndex != StopIndex)
+	{
+		var row = table.insertRow(direction);
+		var SideIndex = 0;
+		do
+		{
+			var cell = row.insertCell();
+			var html = script.GetMarginHTML(SideIndex, LineIndex);
+			if (html)
+			{
+				cell.innerHTML = html;
+				cell = row.insertCell();
+			}
+			else
+			{
+				cell.colSpan = 2;
+				cell.align = "center";
+			}
+			cell.innerHTML = script.GetContentHTML(SideIndex, LineIndex);
+		} while (SideIndex ^= 1);
+		// Consume at least one line to avoid getting stuck on an overly huge
+		// line. If that causes the line content to be clipped, live with it.
+		if (body.offsetHeight > offsetHeight && table.rows.length > 2)
+		{
+			table.deleteRow(row.rowIndex);
+			break;
+		}
+		LineIndex -= direction;
+	}*/
+
+	if (direction > 0)
+		LineIndex += table.rows.length;
+
+	hf.page -= direction;
+	header.innerHTML = hf.htmlHead;
+	footer.innerHTML = hf.htmlFoot;
+	// StatusText property has builtin abort logic that throws upon VK_PAUSE
+	try
+	{
+		script.StatusText = "Page " + hf.page;
+	}
+	catch (e)
+	{
+		return false;
+	}
+	return true;
+}
+
+function OnLoadBody()
+{
+	// Translate UI elements to user's language
+	PageSetup.innerText = script.Strings.PAGE_SETUP;
+	Print.innerText = script.Strings.PRINT;
+	PageZoom.previousSibling.nodeValue = script.Strings.PAGE_ZOOM;
+	ContentZoom.previousSibling.nodeValue = script.Strings.CONTENT_ZOOM;
+
+	tp.orientation = "landscape";
+	tp.currentPageAvail = true;
+	tp.selectionEnabled = false;
+
+	hf.textHead = "&w&b&p";
+	hf.textFoot = "&u&b&d";
+	hf.url = "";
+	hf.title = "WinMerge File Compare Report";
+
+	header.runtimeStyle.top = tp.unprintableTop + "e-2in";
+	footer.runtimeStyle.bottom = tp.unprintableBottom + "e-2in";
+
+	Navigate(0);
+}
+
+function DoPrint()
+{
+	tp.startDoc("WinMergePrintDoc");
+	if (tp.currentPage)
+	{
+		tp.printPage(devicerect);
+	}
+	else
+	{
+		var direction = 0;
+		while (Navigate(direction))
+		{
+			tp.printPage(devicerect);
+			direction = 1;
+		}
+	}
+	tp.stopDoc();
+}
+
+function OnChangePageZoom()
+{
+	container.style.zoom = PageZoom.options(PageZoom.selectedIndex).innerHTML;
+}
+
+function OnChangeContentZoom()
+{
+	var zoom = ContentZoom.options(ContentZoom.selectedIndex).innerHTML;
+	cf.frameElement.runtimeStyle.zoom = zoom;
+	Navigate(0);
+}
+
+function OnClickPageSetup()
+{
+	var orientation = tp.orientation;
+	// Work around landscape option being disabled if not selected by default.
+	tp.header = hf.textHead;
+	tp.footer = hf.textFoot;
+	tp.orientation = "landscape";
+	if (tp.showPageSetupDialog())
+	{
+		Navigate(0);
+	}
+	else
+	{
+		tp.orientation = orientation;
+	}
+}
+
+function OnClickPrint()
+{
+	tp.pageFrom = 1;
+	tp.pageTo = hf.pageTotal;
+    if (tp.showPrintDialog())
+	{
+        DoPrint();
+	}
+}
+
+function PreviousPage()
+{
+	Navigate(1);
+}
+
+function NextPage()
+{
+	Navigate(-1);
+}
+
+function FirstPage()
+{
+	Navigate(0);
+}
+
+function LastPage()
+{
+	do; while (Navigate(-1));
+}
+
+document.onkeydown = function()
+{
+	switch (window.event.keyCode)
+	{
+	case 27:
+		window.close();
+		break;
+	case 33:
+		PreviousPage();
+		window.event.returnValue = false;
+		break;
+	case 34:
+		NextPage(1);
+		window.event.returnValue = false;
+		break;
+	case 36:
+		FirstPage();
+		window.event.returnValue = false;
+		break;
+	case 35:
+		LastPage();
+		window.event.returnValue = false;
+		break;
+	}
+}
+
+-->
+</SCRIPT>
+<TITLE>Print Preview</TITLE>
+</HEAD>
+<BODY onload='OnLoadBody()' scroll='no'>
+	<IE:TEMPLATEPRINTER id='tp'/>
+	<IE:HEADERFOOTER id='hf'/>
+	<DIV ID='dialogbar'>
+		<BUTTON id='PageSetup' onclick='OnClickPageSetup()'>Page Setup...</BUTTON>
+		<BUTTON id='Print' onclick='OnClickPrint()'>Print...</BUTTON>
+		Page Zoom:
+		<SELECT id='PageZoom' onchange='OnChangePageZoom()'>
+			<OPTION>10%</OPTION>
+			<OPTION>20%</OPTION>
+			<OPTION>30%</OPTION>
+			<OPTION>40%</OPTION>
+			<OPTION>50%</OPTION>
+			<OPTION>60%</OPTION>
+			<OPTION>70%</OPTION>
+			<OPTION>80%</OPTION>
+			<OPTION>90%</OPTION>
+			<OPTION selected>100%</OPTION>
+			<OPTION>125%</OPTION>
+			<OPTION>150%</OPTION>
+			<OPTION>175%</OPTION>
+			<OPTION>200%</OPTION>
+		</SELECT>
+		Content Zoom:
+		<SELECT id='ContentZoom' onchange='OnChangeContentZoom()'>
+			<OPTION>10%</OPTION>
+			<OPTION>20%</OPTION>
+			<OPTION>30%</OPTION>
+			<OPTION>40%</OPTION>
+			<OPTION>50%</OPTION>
+			<OPTION>60%</OPTION>
+			<OPTION>70%</OPTION>
+			<OPTION>80%</OPTION>
+			<OPTION>90%</OPTION>
+			<OPTION selected>100%</OPTION>
+			<OPTION>125%</OPTION>
+			<OPTION>150%</OPTION>
+			<OPTION>175%</OPTION>
+			<OPTION>200%</OPTION>
+		</SELECT>
+		<BUTTON onclick='FirstPage()'>|&larr;</BUTTON>
+		<BUTTON onclick='PreviousPage()'>&larr;</BUTTON>
+		<BUTTON onclick='NextPage()'>&rarr;</BUTTON>
+		<BUTTON onclick='LastPage()'>&rarr;|</BUTTON>
+		<BUTTON onclick='window.close()' style='position: absolute; right: 0;'>&times;</BUTTON>
+	</DIV>
+	<DIV id='workspace'>
+		<TABLE cellspacing='0' cellpadding='0'>
+			<TR>
+				<TD id='container' align='center' valign='middle'>
+					<IE:DEVICERECT id='devicerect' media='print'>
+						<DIV id='header'></DIV>
+						<IFRAME disabled id='cf' frameborder='0' src='about:blank'></IFRAME>
+						<DIV id='footer'></DIV>
+					</IE:DEVICERECT>
+				</TD>
+			</TR>
+		</TABLE>
+	</DIV>
+</BODY>
+</HTML>

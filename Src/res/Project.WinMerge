@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<project>
+   <paths>
+      <left>&project.paths.left;</left>
+      <right>&project.paths.right;</right>
+      <filter>&project.paths.filter;</filter>
+      <subfolders>&project.paths.subfolders;</subfolders>
+      <left-readonly>&project.paths.left-readonly;</left-readonly>
+      <right-readonly>&project.paths.right-readonly;</right-readonly>
+   </paths>
+</project>

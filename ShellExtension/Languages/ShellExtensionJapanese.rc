@@ -1,0 +1,38 @@
+//Microsoft Developer Studio generated resource script.
+//
+// This is an *automatic* generated file for the ShellExtension translation.
+// Please edit the PO file instead of this RC file for translation updates:
+//   ..\..\Translations\ShellExtension\<Languagename>.po
+//
+// $Id: ShellExtensionTemplate.rc 6792 2009-05-26 20:33:42Z gerundt $
+
+/////////////////////////////////////////////////////////////////////////////
+// Resources
+
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+#pragma code_page(932)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+//
+//  ***  TRANSLATED STRINGS ***
+// Translate strings  below
+// 
+STRINGTABLE 
+BEGIN
+    IDS_PROJNAME            "ShellExtension"
+    IDS_CONTEXT_MENU        "WinMerge"
+    IDS_CONTEXT_HELP        "WinMergeで開く"
+    IDS_CONTEXT_HELP_MANYITEMS "2項目以上は選択しないで下さい。"
+    IDS_COMPARE             "比較"
+    IDS_COMPARE_ELLIPSIS    "比較..."
+    IDS_COMPARE_TO          "比較対象として選択"
+    IDS_HELP_SAVETHIS       "このパスを保存します。 このパスと比較するために別のパスを選択してください。"
+    IDS_HELP_COMPARESAVED   "保存されたパス(%1)と比較します。"
+    IDS_RESELECT_FIRST      "一つ目のファイルを再選択"
+END
+
+/////////////////////////////////////////////////////////////////////////////

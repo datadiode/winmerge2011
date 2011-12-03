@@ -1,0 +1,38 @@
+//Microsoft Developer Studio generated resource script.
+//
+// This is an *automatic* generated file for the ShellExtension translation.
+// Please edit the PO file instead of this RC file for translation updates:
+//   ..\..\Translations\ShellExtension\<Languagename>.po
+//
+// $Id: ShellExtensionTemplate.rc 6792 2009-05-26 20:33:42Z gerundt $
+
+/////////////////////////////////////////////////////////////////////////////
+// Resources
+
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
+#pragma code_page(936)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+//
+//  ***  TRANSLATED STRINGS ***
+// Translate strings  below
+// 
+STRINGTABLE 
+BEGIN
+    IDS_PROJNAME            "ShellExtension"
+    IDS_CONTEXT_MENU        "WinMerge"
+    IDS_CONTEXT_HELP        "用 WinMerge 打开"
+    IDS_CONTEXT_HELP_MANYITEMS "请不要选中超过2个项目"
+    IDS_COMPARE             "对比"
+    IDS_COMPARE_ELLIPSIS    "对比..."
+    IDS_COMPARE_TO          "和另外一个对比"
+    IDS_HELP_SAVETHIS       "保存这个路径。选择另外一个路径与之进行对比。"
+    IDS_HELP_COMPARESAVED   "与保存的路径(%1)进行对比"
+    IDS_RESELECT_FIRST      "重新选择第一个路径"
+END
+
+/////////////////////////////////////////////////////////////////////////////

@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN' 'http://www.w3.org/TR/html4/loose.dtd'>
+<!-- $Id$ -->
+<html>
+<head>
+<title>Release Notes</title>
+<meta http-equiv='content-type' content='text/html; charset=ISO-8859-1'>
+<style type='text/css'>
+body
+{
+	font-family: verdana, sans-serif;
+	font-size: small;
+}
+li
+{
+	padding: 1ex;
+}
+</style>
+</head>
+<body>
+<h2>WinMerge 0.2011.001.497 Release Notes</h2>
+<p>
+This is intended to be the last beta before going stable.
+<p>
+A big win is <a target='_new' href='http://www31.ocn.ne.jp/~h_ishida/xdoc2txt.html'>xdoc2txt</a>, which enables WinMerge to compare the textual content of a large variety of office-type documents.
+Thanks to cecilyen for suggesting it in WinMerge Open Discussion forum.
+<p>
+The <a target='_new' href='http://mediainfo.sourceforge.net'>MediaInfo</a> file transform scriptlet was already present in the preceding release,
+but has been revised to use an environment variable to locate the MediaInfo.exe.
+<p>
+Steps to get xdoc2txt and MediaInfo operational:
+<ul>
+<li>Obtain a copy of <a target='_new' href='http://www31.ocn.ne.jp/~h_ishida/xdoc2txt.html#download'>d2txt*.zip</a>, and extract it into a folder of your choice.
+<li>Start WinMerge, invoke <i>Edit &rarr; Options</i> from the menu, go to page <i>System</i>, and look for the <i>Supple<u>m</u>ent folder</i>.
+	In this folder, look for a file named <i>Supplement.ini</i>. In section <i>Environment</i>, edit item <i>xdoc2txt</i> to reflect the folder
+	where the xdoc2txt.exe resides.
+<li>Do likewise to tell WinMerge where to find the command line version of <a target='_new' href='http://mediainfo.sourceforge.net/en/Download/Windows'>MediaInfo</a>.
+	Be sure to obtain the CLI version, not the GUI one.
+</ul>
+<p>
+Another new feature that has long been on my mind is archive vs. folder compare.
+<p>
+<i>Jochen Neubeck, December 2011</i>

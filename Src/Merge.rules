@@ -1,0 +1,64 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<VisualStudioToolFile
+	Name="Custom Build Rules"
+	Version="8,00"
+	>
+	<Rules>
+		<CustomBuildRule
+			Name="imp"
+			CommandLine="lib /MACHINE:X86 /DEF:$(InputPath) /OUT:$(IntDir)\$(InputName).lib"
+			Outputs="$(IntDir)\$(InputName).lib"
+			FileExtensions="*.imp"
+			>
+		</CustomBuildRule>
+		<CustomBuildRule
+			Name="po"
+			CommandLine="copy $(InputPath) $(OutDir)\Languages\$(InputFileName)"
+			Outputs="$(OutDir)\Languages\$(InputFileName)"
+			FileExtensions="*.po"
+			>
+		</CustomBuildRule>
+		<CustomBuildRule
+			Name="flt"
+			CommandLine="copy $(InputPath) $(OutDir)\Filters\$(InputFileName)"
+			Outputs="$(OutDir)\Filters\$(InputFileName)"
+			FileExtensions="*.flt"
+			>
+		</CustomBuildRule>
+		<CustomBuildRule
+			Name="PrintTemplates"
+			CommandLine="copy $(InputPath) $(OutDir)\PrintTemplates\$(InputFileName)"
+			Outputs="$(OutDir)\PrintTemplates\$(InputFileName)"
+			FileExtensions="*.html"
+			>
+		</CustomBuildRule>
+		<CustomBuildRule
+			Name="FileTransforms"
+			CommandLine="copy $(InputPath) $(OutDir)\FileTransforms\$(InputFileName)"
+			Outputs="$(OutDir)\FileTransforms\$(InputFileName)"
+			FileExtensions="*.wsc"
+			>
+		</CustomBuildRule>
+		<CustomBuildRule
+			Name="PluginMonikers"
+			CommandLine="copy $(InputPath) $(OutDir)\PluginMonikers\$(InputFileName)"
+			Outputs="$(OutDir)\PluginMonikers\$(InputFileName)"
+			FileExtensions="*.ini"
+			>
+		</CustomBuildRule>
+		<CustomBuildRule
+			Name="docs"
+			CommandLine="copy $(InputPath) $(OutDir)\Docs\$(InputFileName)"
+			Outputs="$(OutDir)\Docs\$(InputFileName)"
+			FileExtensions="*.chm"
+			>
+		</CustomBuildRule>
+		<CustomBuildRule
+			Name="setup"
+			CommandLine="copy $(InputPath) $(OutDir)\$(InputFileName)"
+			Outputs="$(OutDir)\$(InputFileName)"
+			FileExtensions="*.wsf"
+			>
+		</CustomBuildRule>
+	</Rules>
+</VisualStudioToolFile>

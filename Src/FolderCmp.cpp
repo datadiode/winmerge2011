@@ -1,0 +1,227 @@
+/** 
+ * @file  FolderCmp.cpp
+ *
+ * @brief Implementation file for FolderCmp
+ */
+// ID line follows -- this is updated by SVN
+// $Id$
+
+#include "StdAfx.h"
+#include "CompareOptions.h"
+#include "DiffUtils.h"
+#include "ByteCompare.h"
+#include "LogFile.h"
+#include "paths.h"
+#include "FilterList.h"
+#include "DiffContext.h"
+#include "DiffWrapper.h"
+#include "FileTransform.h"
+#include "DIFF.H"
+#include "IAbortable.h"
+#include "FolderCmp.h"
+#include "codepage_detect.h"
+#include "TimeSizeCompare.h"
+
+static void GetComparePaths(CDiffContext * pCtxt, const DIFFITEM &di, String & left, String & right);
+
+FolderCmp::FolderCmp(CDiffContext *pCtxt)
+: m_pDiffUtilsEngine(NULL)
+, m_pByteCompare(NULL)
+, m_pTimeSizeCompare(NULL)
+, m_ndiffs(CDiffContext::DIFFS_UNKNOWN)
+, m_ntrivialdiffs(CDiffContext::DIFFS_UNKNOWN)
+, m_pCtx(pCtxt)
+{
+}
+
+FolderCmp::~FolderCmp()
+{
+	setContext(NULL);
+}
+
+void FolderCmp::setContext(CDiffContext *pCtx)
+{
+	m_pCtx = pCtx;
+	delete m_pDiffUtilsEngine;
+	m_pDiffUtilsEngine = NULL;
+	delete m_pByteCompare;
+	m_pByteCompare = NULL;
+	delete m_pTimeSizeCompare;
+	m_pTimeSizeCompare = NULL;
+}
+
+/**
+ * @brief Prepare files (run plugins) & compare them, and return diffcode.
+ * This is function to compare two files in folder compare. It is not used in
+ * file compare.
+ * @param [in] pCtxt Pointer to compare context.
+ * @param [in, out] di Compared files with associated data.
+ * @return Compare result code.
+ */
+UINT FolderCmp::prepAndCompareTwoFiles(DIFFITEM &di)
+{
+	int nCompMethod = m_pCtx->GetCompareMethod();
+
+	// Reset text stats
+	m_diffFileData.m_textStats[0].clear();
+	m_diffFileData.m_textStats[1].clear();
+
+	UINT code = DIFFCODE::FILE | DIFFCODE::CMPERR;
+
+	HANDLE osfhandle[2] = { NULL, NULL };
+
+	if (nCompMethod == CMP_CONTENT || nCompMethod == CMP_QUICK_CONTENT)
+	{
+		String origFileName1;
+		String origFileName2;
+		GetComparePaths(m_pCtx, di, origFileName1, origFileName2);
+		// store true names for diff utils patch file
+		m_diffFileData.SetDisplayFilepaths(origFileName1.c_str(), origFileName2.c_str());
+	
+		if (!m_diffFileData.OpenFiles(origFileName1.c_str(), origFileName2.c_str()))
+		{
+			di.errorDesc = _T("Error opening compared files");
+			return false;
+		}
+
+		osfhandle[0] = m_diffFileData.GetFileHandle(0);
+		osfhandle[1] = m_diffFileData.GetFileHandle(1);
+
+		GuessCodepageEncoding(origFileName1.c_str(), &m_diffFileData.m_FileLocation[0].encoding, m_pCtx->m_bGuessEncoding, osfhandle[0]);
+		if (osfhandle[1] != osfhandle[0])
+			GuessCodepageEncoding(origFileName2.c_str(), &m_diffFileData.m_FileLocation[1].encoding, m_pCtx->m_bGuessEncoding, osfhandle[1]);
+		else
+			m_diffFileData.m_FileLocation[1].encoding = m_diffFileData.m_FileLocation[0].encoding;
+
+		// If either file is larger than limit compare files by quick contents
+		// This allows us to (faster) compare big binary files
+		if (di.left.size.int64 > m_pCtx->m_nQuickCompareLimit ||
+			di.right.size.int64 > m_pCtx->m_nQuickCompareLimit)
+		{
+			nCompMethod = CMP_QUICK_CONTENT;
+		}
+	}
+
+	if (nCompMethod == CMP_CONTENT)
+	{
+		if (m_pDiffUtilsEngine == NULL)
+		{
+			DiffutilsOptions options;
+			options.SetFromDiffOptions(m_pCtx->m_options);
+			m_pDiffUtilsEngine = new CompareEngines::DiffUtils(options);
+		}
+
+		m_pDiffUtilsEngine->SetCodepage(
+			m_diffFileData.m_FileLocation[0].encoding.m_unicoding ? 
+				CP_UTF8 : m_diffFileData.m_FileLocation[0].encoding.m_codepage);
+		m_pDiffUtilsEngine->SetFilterList(m_pCtx->m_pFilterList);
+		m_pDiffUtilsEngine->SetFileData(2, m_diffFileData.m_inf);
+		code = m_pDiffUtilsEngine->diffutils_compare_files();
+		m_pDiffUtilsEngine->GetDiffCounts(m_ndiffs, m_ntrivialdiffs);
+		m_pDiffUtilsEngine->GetTextStats(0, &m_diffFileData.m_textStats[0]);
+		m_pDiffUtilsEngine->GetTextStats(1, &m_diffFileData.m_textStats[1]);
+
+		// If unique item, it was being compared to itself to determine encoding
+		// and the #diffs is invalid
+		if (di.diffcode.isSideRightOnly() || di.diffcode.isSideLeftOnly())
+		{
+			m_ndiffs = CDiffContext::DIFFS_UNKNOWN;
+			m_ntrivialdiffs = CDiffContext::DIFFS_UNKNOWN;
+		}
+		if (DIFFCODE::isResultError(code))
+			di.errorDesc = _T("DiffUtils Error");
+	}
+	else if (nCompMethod == CMP_QUICK_CONTENT)
+	{
+		if (m_pByteCompare == NULL)
+		{
+			QuickCompareOptions options;
+			options.SetFromDiffOptions(m_pCtx->m_options);
+			m_pByteCompare = new CompareEngines::ByteCompare(options);
+		}
+
+		m_pByteCompare->SetAdditionalOptions(m_pCtx->m_bStopAfterFirstDiff);
+		m_pByteCompare->SetAbortable(m_pCtx->GetAbortable());
+		m_pByteCompare->SetFileData(2, m_diffFileData.m_inf);
+		//m_pByteCompare->SetFileHandles(2, osfhandle);
+
+		// use our own byte-by-byte compare
+		code = m_pByteCompare->CompareFiles(&m_diffFileData.m_FileLocation.front());
+
+		if (!di.diffcode.isSideRightOnly())
+			m_pByteCompare->GetTextStats(0, &m_diffFileData.m_textStats[0]);
+		if (!di.diffcode.isSideLeftOnly())
+			m_pByteCompare->GetTextStats(1, &m_diffFileData.m_textStats[1]);
+
+		// Quick contents doesn't know about diff counts
+		// Set to special value to indicate invalid
+		m_ndiffs = CDiffContext::DIFFS_UNKNOWN_QUICKCOMPARE;
+		m_ntrivialdiffs = CDiffContext::DIFFS_UNKNOWN_QUICKCOMPARE;
+		di.left.m_textStats = m_diffFileData.m_textStats[0];
+		di.right.m_textStats = m_diffFileData.m_textStats[1];
+	}
+	else if (nCompMethod == CMP_DATE || nCompMethod == CMP_DATE_SIZE || nCompMethod == CMP_SIZE)
+	{
+		if (m_pTimeSizeCompare == NULL)
+		{
+			m_pTimeSizeCompare = new CompareEngines::TimeSizeCompare();
+			m_pTimeSizeCompare->SetAdditionalOptions(m_pCtx->m_bIgnoreSmallTimeDiff);
+		}
+		code = m_pTimeSizeCompare->CompareFiles(nCompMethod, di);
+
+	}
+	else
+	{
+		// Print error since we should have handled by date compare earlier
+		_RPTF0(_CRT_ERROR, "Invalid compare type, DiffFileData can't handle it");
+		di.errorDesc = _T("Bad compare type");
+	}
+
+	// If compare tool leaves text vs. binary classification to caller, defer
+	// binaryness from number of zeros.
+	if ((code & DIFFCODE::TEXTFLAGS) == DIFFCODE::TEXTFLAGS)
+	{
+		code &= ~DIFFCODE::TEXTFLAGS;
+		if (m_diffFileData.m_textStats[0].nzeros > 0)
+			code |= DIFFCODE::BINSIDE1 | DIFFCODE::TEXT;
+		if (m_diffFileData.m_textStats[1].nzeros > 0)
+			code |= DIFFCODE::BINSIDE2 | DIFFCODE::TEXT;
+		code ^= DIFFCODE::TEXT; // revert reverse logic
+	}
+
+	m_diffFileData.Reset();
+
+	return code;
+}
+
+/**
+ * @brief Get actual compared paths from DIFFITEM.
+ * @param [in] pCtx Pointer to compare context.
+ * @param [in] di DiffItem from which the paths are created.
+ * @param [out] left Gets the left compare path.
+ * @param [out] right Gets the right compare path.
+ * @note If item is unique, same path is returned for both.
+ */
+void GetComparePaths(CDiffContext * pCtxt, const DIFFITEM &di, String & left, String & right)
+{
+	if (!di.diffcode.isSideRightOnly())
+	{
+		// Compare file to itself to detect encoding
+		left = pCtxt->GetLeftPath();
+		if (!di.left.path.empty())
+			left = paths_ConcatPath(left, di.left.path);
+		left = paths_ConcatPath(left, di.left.filename);
+		if (di.diffcode.isSideLeftOnly())
+			right = left;
+	}
+	if (!di.diffcode.isSideLeftOnly())
+	{
+		// Compare file to itself to detect encoding
+		right = pCtxt->GetRightPath();
+		if (!di.right.path.empty())
+			right = paths_ConcatPath(right, di.right.path);
+		right = paths_ConcatPath(right, di.right.filename);
+		if (di.diffcode.isSideRightOnly())
+			left = right;
+	}
+}

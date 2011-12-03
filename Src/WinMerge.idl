@@ -1,0 +1,82 @@
+// WinMerge.idl : IDL source for ShellExtension.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (WinMerge.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+#include "resource.h"
+
+[
+	object,
+	uuid(03779024-2643-4950-8E3A-27B64A05E853),
+	helpstring("IStrings Interface"),
+	pointer_default(unique)
+]
+interface IStrings : IDispatch
+{
+	[id(IDS_PRINT), propget]
+	HRESULT PRINT([out, retval] BSTR *);
+	[id(IDS_PAGE_SETUP), propget]
+	HRESULT PAGE_SETUP([out, retval] BSTR *);
+	[id(IDS_PAGE_ZOOM), propget]
+	HRESULT PAGE_ZOOM([out, retval] BSTR *);
+	[id(IDS_CONTENT_ZOOM), propget]
+	HRESULT CONTENT_ZOOM([out, retval] BSTR *);
+};
+
+[
+	object,
+	uuid(78BED1CB-571F-45ed-A608-B89C37A52C86),
+	dual,
+	helpstring("IMergeApp Interface"),
+	pointer_default(unique)
+]
+interface IMergeApp : IDispatch
+{
+	[id(1), propput]
+	HRESULT StatusText([in] BSTR bsStatusText);
+	[id(1), propget]
+	HRESULT StatusText([out, retval] BSTR *pbsStatusText);
+	[id(2), propget]
+	HRESULT Strings([out, retval] IDispatch **ppDispatch);
+	[id(3), helpstring("Invokes an HTML dialog")]
+	HRESULT ShowHTMLDialog([in] BSTR url, [in] VARIANT *arguments, [in] BSTR features, [out, retval] VARIANT *ret);
+};
+
+[
+	object,
+	uuid(54EA2FDC-3E91-421f-B8DC-79DEA93AC4C3),
+	dual,
+	helpstring("IMergeDoc Interface"),
+	pointer_default(unique)
+]
+interface IMergeDoc : IDispatch
+{
+	[id(1), helpstring("Returns the file path for side nSide")]
+	HRESULT GetFilePath([in] long nSide, [out, retval] BSTR *pbsPath);
+	[id(2), helpstring("Returns the style rules for side nSide")]
+	HRESULT GetStyleRules([in] long nSide, [out, retval] BSTR *pbsRules);
+	[id(3), helpstring("Returns the number of rows")]
+	HRESULT GetLineCount([in] long nSide, [out, retval] long *pnLines);
+	[id(4), helpstring("Returns HTML representing the margin of line nLine on side nSide")]
+	HRESULT GetMarginHTML([in] long nSide, [in] long nLine, [out, retval] BSTR *pbsHTML);
+	[id(5), helpstring("Returns HTML representing the content of line nLine on side nSide")]
+	HRESULT GetContentHTML([in] long nSide, [in] long nLine, [out, retval] BSTR *pbsHTML);
+	[id(6), helpstring("Prepares one page of HTML, starting at line nLine, and stopping before line nStop")]
+	HRESULT PrepareHTML([in] long nLine, [in] long nStop, [in] IDispatch *pFrame, [out, retval] long *pnLine);
+};
+
+[
+	uuid(0EB943A0-9233-4618-8147-C2AD5042D933),
+	version(1.0),
+	helpstring("WinMerge 2011 Type Library")
+]
+library WinMergeLib
+{
+	interface IStrings;
+	interface IMergeApp;
+	interface IMergeDoc;
+};

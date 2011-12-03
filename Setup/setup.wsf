@@ -1,0 +1,576 @@
+<package>
+<job>
+<script type='job' language='vbs'>
+Option Explicit
+
+Dim cmd, arg, sh, senv, penv
+
+cmd = "mshta.exe """ & WScript.ScriptFullName & """"
+For Each arg In WScript.arguments
+	cmd = cmd & " " & arg
+Next
+
+Set sh = CreateObject("WScript.Shell")
+Set senv = sh.Environment("System")
+Set penv = sh.Environment("Process")
+
+If senv("PROCESSOR_ARCHITECTURE") <> penv("PROCESSOR_ARCHITECTURE") Then
+	On Error Resume Next
+	sh.Run "%SystemRoot%\Sysnative\" & cmd, 1, True
+	If err.Number <> 0 Then
+		If vbYes = MsgBox(_
+			"Error accessing the Sysnative folder." & vbLf &_
+			"Browse for a hotfix that may fix the issue?",_
+			vbYesNo Or vbExclamation, WScript.ScriptName)_
+		Then
+			sh.Run "http://support.microsoft.com/kb/942589/en-us"
+		End If
+	End If
+	On Error GoTo 0
+Else
+	sh.Run "%SystemRoot%\System32\" & cmd, 1, True
+End If
+</script>
+</job>
+<head>
+<meta http-equiv='Content-Type' content='text/html; charset=ISO-8859-1'/>
+<hta:application
+	id='app'
+	version='XXXXX.2011.001.497'
+	applicationName='WinMerge &amp;version; Setup'
+	scroll='no'
+	singleInstance='yes'
+	icon='WinMergeU.exe'/>
+<comment id='setup_cfg'>
+;!@Install@!UTF-8!
+Title="WinMerge &version;"
+BeginPrompt="Do you want to install WinMerge &version;?"
+ExecuteFile="setup.wsf"
+ExecuteParameters="install"
+;!@InstallEnd@!
+</comment>
+<comment id='setup_bat'>
+set SevenZip=&SevenZip;
+del sources.7z "WinMerge_&version;.7z"
+"%SevenZip%\7z.exe" a sources.7z -r Docs\* Externals\* FileTransforms\* Filters\* PrintTemplates\* Setup\* ShellExtension\* Src\* Tools\* Translations\* WinMerge.sln ArchiveSupport\Merge7z\Merge7z.h -x!*.user -x!*.bak -x!*.idc -x!"Visual Studio *"
+"%SevenZip%\7z.exe" a "WinMerge_&version;.7z" -r .\Build\WinMerge\Release\* sources.7z -x!*.lib -x!*.exp -x!*.pdb
+copy /b "%SevenZip%\7zS.sfx" + Setup.cfg + "WinMerge_&version;.7z" "WinMerge_&version;_change_7z_to_exe_if_you_want_a_setup.7z"
+</comment>
+<comment id='version_h'>
+#define MAJOR &major;
+#define MINOR &minor;
+#define &kind; &www;
+#define PRIVATE_BUILD ""
+#define COMMENTS ""
+</comment>
+<style>
+body
+{
+	font: 10pt verdana;
+	margin: 10 10 16em 10;
+	background-color: lightblue;
+	overflow: hidden;
+}
+td label
+{
+	height: 1.3em;
+}
+#license
+{
+	display: inline;
+	vertical-align: top;
+	width: 100%;
+}
+#shortcuts
+{
+	position: absolute;
+	right: 10;
+	display: inline;
+	width: 19em;
+}
+table
+{
+	height: 6em;
+}
+textarea
+{
+	width: 100%;
+	height: 100%;
+	margin-right: 19em;
+}
+caption, td
+{
+	white-space: nowrap;
+	text-align: left;
+	font: 10pt verdana;
+}
+#south input
+{
+	font: 10pt verdana;
+}
+button
+{
+	font: 10pt verdana;
+	width: 5.5em;
+	margin-right: 10;
+}
+#StFolder
+{
+	width: 0;
+	height: 1.8em;
+	vertical-align: middle;
+}
+#EdFolder
+{
+	width: 100%;
+	margin-left: 1em;
+	margin-right: 26em;
+}
+#PbFolder
+{
+	position: absolute;
+	right: 12em;
+}
+#PbOK
+{
+	position: absolute;
+	right: 6em;
+}
+#PbCancel
+{
+	position: absolute;
+	right: 0;
+}
+#sheet
+{
+	height: 100%;
+}
+#north
+{
+	margin-bottom: 10;
+}
+#south
+{
+	white-space: nowrap;
+	margin-top: 10;
+}
+#readme
+{
+	width: 100%;
+	height: 100%;
+	display: block;
+}
+a
+{
+	line-height: 1.5;
+	color: windowtext;
+	background-color: buttonface;
+	text-decoration: none;
+	white-space: nowrap;
+	border: 2 outset;
+	padding: 0 4 1000 4;
+}
+a:active
+{
+	color: highlighttext;
+	background-color: buttonshadow;
+}
+a.selected, a:active.selected
+{
+	color: highlighttext;
+	background-color: highlight;
+}
+</style>
+<style id='maintenance'>
+#StFolder, #EdFolder, #PbFolder
+{
+	visibility: hidden;
+}
+</style>
+</head>
+
+<job id='uninstall'>
+<script language='vbs'>
+Option Explicit
+
+Const PROCESSOR_ARCHITECTURE_IA64 = 6
+Const PROCESSOR_ARCHITECTURE_AMD64 = 9
+
+Dim sh, fso, sha, env, explorer, version, argv, executable
+Dim sProgFolder, sThisFolder, sMoveFolder
+
+Set sh = CreateObject("WScript.Shell")
+Set fso = CreateObject("Scripting.FileSystemObject")
+Set sha = CreateObject("Shell.Application")
+Set env = sh.Environment("Process")
+explorer = sh.ExpandEnvironmentStrings("%WINDIR%\explorer.exe")
+
+On Error Resume Next
+executable = sh.RegRead("HKLM\Software\Thingamahoochie\WinMerge\Executable")
+On Error GoTo 0
+
+If TypeName(Me) = "Object" Then
+	sProgFolder = fso.GetParentFolderName(WScript.ScriptFullName)
+	If MsgBox("Are you sure you want to uninstall WinMerge 2011 from folder" & vbLf & sProgFolder & "?", vbYesNo Or vbExclamation, WScript.ScriptName) = vbYes Then
+		If TerminateWinMerge(WScript.ScriptName) Then
+			DeleteLink "Desktop"
+			DeleteLink "AllUsersDesktop"
+			DeleteLink "StartMenu"
+			DeleteLink "AllUsersStartMenu"
+			DeleteLink "Programs"
+			DeleteLink "AllUsersPrograms"
+			DeleteLink "QuickLaunch"
+			DeleteLink "ContextMenu"
+			' Terminate Explorer
+			sh.Run "wscript.exe /job:terminate_explorer """ & WScript.ScriptFullName & """", 1, True
+			On Error Resume Next
+			sh.RegDelete "HKCR\.WinMerge\"
+			sh.RegDelete "HKCR\WinMerge.Project.File\DefaultIcon\"
+			sh.RegDelete "HKCR\WinMerge.Project.File\shell\edit\command\"
+			sh.RegDelete "HKCR\WinMerge.Project.File\shell\edit\"
+			sh.RegDelete "HKCR\WinMerge.Project.File\shell\open\command\"
+			sh.RegDelete "HKCR\WinMerge.Project.File\shell\open\"
+			sh.RegDelete "HKCR\WinMerge.Project.File\shell\"
+			sh.RegDelete "HKCR\WinMerge.Project.File\"
+			sh.RegDelete "HKLM\Software\Thingamahoochie\WinMerge\"
+			' Unregister with ARP
+			sh.RegDelete "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\"
+			fso.DeleteFolder sProgFolder
+			On Error GoTo 0
+			' Restart Explorer
+			sh.Run explorer
+			MsgBox "Uninstall completed successfully", vbInformation Or vbSystemModal, WScript.ScriptName
+		End If
+	End If
+	WScript.Quit
+End If
+
+version = app.version
+version = Replace(version, "XXXXX.", "0.")
+version = Replace(version, "BUILD.", "")
+document.title = Replace(app.applicationName, "&version;", version)
+
+window.onload = GetRef("Job_Default")
+
+With New RegExp
+	.Pattern = "((\""[^\""]*\"")+|\S+)\s*"
+	.Global = True
+	Set argv = .Execute(app.commandLine)
+End With
+
+If argv.Count > 1 Then window.onload = GetRef("Job_" & Trim(argv(1)))
+
+Function TerminateWinMerge(ScriptName)
+	TerminateWinMerge = True
+	If IsEmpty(executable) Then Exit Function
+	Do
+		On Error Resume Next
+		fso.MoveFile executable, executable
+		If Err.Number <> 70 Then Exit Function
+		On Error GoTo 0
+	Loop Until MsgBox("Please close your current WinMerge sessions, then click OK", vbExclamation Or vbOkCancel, ScriptName) = vbCancel
+	TerminateWinMerge = False
+End Function
+
+Function Windows_NT
+	On Error Resume Next
+	Windows_NT = Eval(sh.RegRead("HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\CurrentVersion"))
+	On Error GoTo 0
+End Function
+
+Function BuildLinkName(ByVal sPath)
+	Select Case sPath
+	Case "QuickLaunch"
+		sPath = env("AppData") & "\Microsoft\Internet Explorer\Quick Launch"
+	Case Else
+		sPath = sh.SpecialFolders(sPath)
+	End Select
+	BuildLinkName = sPath & "\WinMerge.lnk"
+End Function
+
+Function LinkExists(ByVal sPath)
+	If sPath = "ContextMenu" Then
+		On Error Resume Next
+		LinkExists = Not IsEmpty(sh.RegRead("HKCR\CLSID\{4E716236-AA30-4C65-B225-D68BBA81E9C2}\"))
+		On Error GoTo 0
+	Else
+		sPath = BuildLinkName(sPath)
+		LinkExists = fso.FileExists(sPath)
+	End If
+End Function
+
+Sub RegisterShellExtension(flags)
+	Dim verb
+	If Windows_NT >= 6.0 Then
+		verb = "runas"
+	Else
+		verb = "open"
+	End If
+	Select Case sha.GetSystemInformation("ProcessorArchitecture")
+	Case PROCESSOR_ARCHITECTURE_IA64, PROCESSOR_ARCHITECTURE_AMD64
+		sha.ShellExecute "RegSvr32.exe", flags & """" & sProgFolder & "\ShellExtensionX64.dll""", "", verb
+	Case Else
+		sha.ShellExecute "RegSvr32.exe", flags & """" & sProgFolder & "\ShellExtensionU.dll""", "", verb
+	End Select
+End Sub
+
+Sub CreateLink(ByVal sPath)
+	If sPath = "ContextMenu" Then
+		RegisterShellExtension "/s "
+	Else
+		sPath = BuildLinkName(sPath)
+		With sh.CreateShortcut(sPath)
+			.TargetPath = sProgFolder & "\WinMergeU.exe"
+			.WindowStyle = 1
+			.Description = "WinMerge"
+			.WorkingDirectory = sProgFolder
+			.IconLocation = sProgFolder & "\WinMergeU.exe"
+			.Save
+		End With
+	End If
+End Sub
+
+Sub DeleteLink(ByVal sPath)
+	If sPath = "ContextMenu" Then
+		RegisterShellExtension "/s /u "
+	Else
+		sPath = BuildLinkName(sPath)
+		On Error Resume Next
+		fso.DeleteFile sPath
+		On Error GoTo 0
+	End If
+End Sub
+
+Sub Job_Install
+	maintenance.disabled = True
+	If IsEmpty(executable) Then
+		EdFolder.value = env("ProgramFiles") & "\WinMerge2011"
+	Else
+		EdFolder.value = fso.GetParentFolderName(executable)
+	End If
+	Job_Default
+End Sub
+
+Function TimeStampNow(length)
+	Dim clock
+	clock = Now
+	TimeStampNow = Left(10000000000 * Year(clock) +_
+		100000000 * Month(clock) + 1000000 * Day(clock) +_
+		10000 * Hour(clock) + 100 * Minute(clock) + Second(clock), length)
+End Function
+
+Function InstallFiles
+	If fso.FolderExists(sProgFolder) Then
+		If Not TerminateWinMerge(document.title) Then Exit Function
+		sMoveFolder = sProgFolder & ".RenamedBySetup-" & TimeStampNow(14)
+		fso.MoveFolder sProgFolder, sMoveFolder
+	End If
+	fso.CreateFolder sProgFolder
+	fso.CopyFolder sThisFolder, sProgFolder
+	InstallFiles = True
+End Function
+
+Sub PbOK_OnClick
+	document.body.style.cursor = "wait"
+	document.body.setCapture
+	setTimeout "Apply", 0, "VBS"
+End Sub
+
+Sub Apply
+	Dim element
+	document.body.style.cursor = "arrow"
+	sThisFolder = fso.GetParentFolderName(location.pathname)
+	If maintenance.disabled Then
+		sProgFolder = EdFolder.value
+		If Not InstallFiles Then Exit Sub
+	Else
+		sProgFolder = sThisFolder
+	End If
+	For Each element In shortcuts.getElementsByTagName("INPUT")
+		If element.defaultChecked Or maintenance.disabled Then
+			If element.checked Then
+				CreateLink element.id
+			Else
+				DeleteLink element.id
+			End If
+		End If
+	Next
+	If maintenance.disabled Then
+		sh.RegWrite "HKCR\.WinMerge\", "WinMerge.Project.File"
+		sh.RegWrite "HKCR\WinMerge.Project.File\", "WinMerge Project File"
+		sh.RegWrite "HKCR\WinMerge.Project.File\DefaultIcon\", """" & sProgFolder & "\WinMergeU.exe"",1"
+		sh.RegWrite "HKCR\WinMerge.Project.File\shell\edit\command\", """NOTEPAD.EXE"" ""%1"""
+		sh.RegWrite "HKCR\WinMerge.Project.File\shell\open\command\", """" & sProgFolder & "\WinMergeU.exe"" ""%1"""
+		sh.RegWrite "HKLM\Software\Thingamahoochie\WinMerge\Executable", sProgFolder & "\WinMergeU.exe"
+		' Do the ARP stuff
+		sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\DisplayIcon", sProgFolder & "\WinMergeU.exe"
+		sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\DisplayName", "WinMerge 2011"
+		sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\DisplayVersion", version
+		sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\InstallDate", TimeStampNow(8)
+		sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\InstallLocation", sProgFolder
+		sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\ModifyPath", "wscript.exe """ & sProgFolder & "\setup.wsf"""
+		sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\Publisher", "Jochen Neubeck"
+		sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\UninstallString", "wscript.exe /job:uninstall """ & sProgFolder & "\setup.wsf"""
+		If IsEmpty(sMoveFolder) Then
+			MsgBox "Setup completed successfully", vbInformation, document.title
+		ElseIf MsgBox("Setup completed successfully." & vbLf & vbLf &_
+				"The files from the previous installation have been moved to" & vbLf & vbLf &_
+				sMoveFolder & vbLf & vbLf &_
+				"Setup can try to delete this folder but would need to close" & vbLf &_
+				"and restart Windows Explorer. Do you want that to happen?" & vbLf & vbLf &_
+				"!!>    CAUTION:" & vbLf &_
+				"!!>    DO NOT CONFIRM THIS IF YOU HAVE MADE" & vbLf &_
+				"!!>    CHANGES TO THE PREVIOUS INSTALLATION" & vbLf &_
+				"!!>    AND WANT TO KEEP THEM FOR REFERENCE!",_
+				vbYesNo Or vbExclamation, document.title) = vbYes Then
+			sh.Run "wscript.exe /job:terminate_explorer """ & location.pathname & """", 1, True
+			On Error Resume Next
+			fso.DeleteFolder sMoveFolder
+			On Error GoTo 0
+			sh.Run explorer
+		End If
+	End If
+	close
+End Sub
+
+Sub PbCancel_OnClick
+	close
+End Sub
+
+Sub Job_Version
+	Dim parts, content, path
+	parts = Split(app.version, ".")
+	parts(3) = DatePart("ww", Now) & DatePart("w", Now)
+	parts(2) = Left(parts(2), 2) & (DatePart("yyyy", Now) - parts(1) + 1)
+	content = version_h.text
+	content = Replace(content, "&kind;", parts(0))
+	content = Replace(content, "&major;", parts(1))
+	content = Replace(content, "&minor;", parts(2))
+	content = Replace(content, "&www;", parts(3))
+	path = Replace(argv(2), """", "")
+	If fso.OpenTextFile(path).ReadAll <> content Then
+		fso.CreateTextFile(path, True).Write content
+	End If
+	version = Join(parts, ".")
+	If app.version <> version Then
+		path = location.pathname
+		content = Replace(fso.OpenTextFile(path).ReadAll, app.version, version)
+		fso.CreateTextFile(path, True).Write content
+		version = Replace(version, "XXXXX.", "0.")
+		version = Replace(version, "BUILD.", "")
+		content = Replace(setup_cfg.text, "&version;", version)
+		path = fso.GetParentFolderName(location.pathname) & ".cfg"
+		fso.CreateTextFile(path, True).Write content
+		content = Replace(setup_bat.text, "&version;", version)
+		content = Replace(content, "&SevenZip;", sh.RegRead("HKLM\Software\7-Zip\Path"))
+		path = fso.GetParentFolderName(location.pathname) & ".bat"
+		fso.CreateTextFile(path, True).Write content
+	End If
+	close
+End Sub
+
+Sub Job_Default
+	Dim element
+	For Each element In shortcuts.getElementsByTagName("INPUT")
+		element.checked = LinkExists(element.id)
+	Next
+	readme.frameElement.src = "Docs/ReleaseNotes.html"
+End Sub
+
+Sub Readme_OnLoad
+	Dim href, element
+	href = readme.document.location
+	For Each element In sheet.getElementsByTagName("A")
+		If element.href = href Then
+			element.className = "selected"
+		Else
+			element.className = ""
+		End If
+	Next
+End Sub
+
+Sub PbFolder_OnClick
+	Dim folder
+	Set folder = sha.BrowseForFolder(0, "Install into folder:", 0, 17)
+	If Not folder Is Nothing Then EdFolder.value = folder.Items.Item.path
+End Sub
+</script>
+</job>
+<body nowrap>
+<div id='north'>
+<table id='license'>
+<caption>Terms of use and distribution:</caption>
+<tr>
+<td>
+<textarea readonly>
+Copyright &#169; 1996-2011 Dean Grimm / Thingamahoochie Software
+Copyright &#169; 2002-2011 WinMerge Team
+
+WinMerge 2011 is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the rightmost tab below for more details.
+</textarea>
+</td>
+</tr>
+</table>
+<table id='shortcuts'>
+<caption>Create shortcuts in the following places:</caption>
+<tr>
+<td><input id='Desktop' type='checkbox' onchange='Me.defaultChecked=True'/><label for='Desktop'>Desktop</label></td>
+<td><input id='AllUsersDesktop' type='checkbox' onchange='Me.defaultChecked=True'/><label for='AllUsersDesktop'>All Users Desktop</label></td>
+</tr>
+<tr>
+<td><input id='StartMenu' type='checkbox' onchange='Me.defaultChecked=True'/><label for='StartMenu'>Start Menu</label></td>
+<td><input id='AllUsersStartMenu' type='checkbox' onchange='Me.defaultChecked=True'/><label for='AllUsersStartMenu'>All Users Start Menu</label></td>
+</tr>
+<tr>
+<td><input id='Programs' type='checkbox' onchange='Me.defaultChecked=True'/><label for='Programs'>Programs</label></td>
+<td><input id='AllUsersPrograms' type='checkbox' onchange='Me.defaultChecked=True'/><label for='AllUsersPrograms'>All Users Programs</label></td>
+</tr>
+<tr>
+<td><input id='QuickLaunch' type='checkbox' onchange='Me.defaultChecked=True'/><label for='QuickLaunch'>Quick Launch</label></td>
+<td><input id='ContextMenu' type='checkbox' onchange='Me.defaultChecked=True'/><label for='ContextMenu'>Shell Context Menu</label></td>
+</tr>
+</table>
+</div>
+<div id='sheet'>
+<a hidefocus href='Docs/ReleaseNotes.html' target='readme'>Release Notes</a>
+<a hidefocus href='Docs/ReadMe.txt' target='readme'>Readme</a>
+<a hidefocus href='Docs/CHANGES' target='readme'>Change Log</a>
+<a hidefocus href='Docs/COPYING' target='readme'>License Details</a>
+<iframe id='readme' name='readme'></iframe>
+</div>
+<div id='south'>
+<label id='StFolder'>Install to folder:<br/></label><input id='EdFolder'/><span id='buttons'>
+<button id='PbFolder' accesskey='B'><u>B</u>rowse</button>
+<button id='PbOK' accesskey='O'><u>O</u>K</button>
+<button id='PbCancel' accesskey='C'><u>C</u>ancel</button></span>
+</div>
+</body>
+<job id='terminate_explorer'>
+<script type='job' language='vbs'>
+Option Explicit
+
+Dim sh, sha
+Set sh = CreateObject("WScript.Shell")
+Set sha = CreateObject("Shell.Application")
+
+Function Windows_NT
+	On Error Resume Next
+	Windows_NT = Eval(sh.RegRead("HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\CurrentVersion"))
+	On Error GoTo 0
+End Function
+
+If Windows_NT >= 6.0 Then
+	sh.Run "taskkill.exe /f /im explorer.exe", 0, True
+Else
+	sh.Run "explorer.exe "":) This silly popup is for technical reasons..."""
+	WScript.Sleep 1000
+	sha.ShutdownWindows
+	WScript.Sleep 1000
+	sh.SendKeys "^+%({ESC})"
+	sh.Popup "Waiting 5 seconds for Explorer to terminate...", 5, WScript.ScriptName
+End If
+</script>
+</job>
+</package>

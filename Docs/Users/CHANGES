@@ -1,0 +1,77 @@
+0.2011.001.497 beta
+Changes since preceding release (not necessarily complete):
+• File transform scriptlet to drive xdoc2txt (http://shortlinks.de/4u23)
+• Allow file transform scriptlets to show a config dialog prior to comparison
+• Add icons to file/folder selection controls (adapted from Takashi's fork)
+• Consolidate unicode detection in DetermineEncoding() (file unicoder.cpp)
+• Fine-tune UCS-2 detection (in particular, don't assume UCS-2 from BOM only)
+• Do text vs. binary classification uniformly for both quick and full compare
+• Fix System32 build configuration for stack frames going beyond 4096 bytes
+• Adjust width of some dropdown lists so as to prevent items from being clipped
+• Make setup ARP aware, and offer removal of files from previous installation
+• Feature Request #3422386 Allow editing path names when unknown
+• Support archive vs. folder compare
+
+0.2011.001.464 beta
+Changes since preceding release (not necessarily complete):
+• Bug #3408554 Incorrect directory diff (as per my understanding of the issue)
+• Make support for pathnames longer than 260 characters UNC-aware
+• Hide \\?\ and \\?\UNC\ prefixes from user interface (work in progress)
+• Remove an unwanted iframe border in printouts that has been noticed with IE8
+• Make setup.wsf aware of Win64's Sysnative pseudo directory
+
+0.2011.001.461 beta
+Changes since preceding release (not necessarily complete):
+• Compare As > Archive allows users to be more specific about how to open files
+• Extensible "Compare As" menu to allow for script driven file transforms
+• Make "Compare As" option available in Open dialog
+• Simple UI to help tweak the ClearCase Type Manager map file
+• Fix setup.hta for 64-bit (by disguising it as a .wsf)
+• Patch #3065275 Detect UCS-2 (both endiannesses) without BOM
+• Partial support for pathnames longer than 260 characters
+
+0.2011.001.437 beta
+Changes since preceding release (not necessarily complete):
+• View > Context allows for limiting context above and below differences
+• Tools > Compare Selection allows for comparing otherwise unaligned sections
+• No longer duplicate the editor's undo/redo stack
+• Fix broken repainting of editor margin area after invalidation
+• Open print preview in an unadorned window to avoid "almost-maximizedness"
+• Add file description to FileLocation structure to help fix side-effect coding
+• Attempt to speed up print page preparation, albeit with no noticeable success
+• Make WinMerge UI translation facility operable for print preview
+
+0.2011.001.415 beta
+Changes since preceding release (not necessarily complete):
+• Applying of patches through drag & drop
+• Dropping a single file onto the application window was causing a crash
+• Print preview based on Internet Explorer backend with a custom print template
+• Continued attempts to understand and fix comments filtering
+• A DocFrame that was opened through ClearCase was not closing on Esc key press
+• Handle absence of heksedit gracefully when user invokes Compare As > Binary
+
+0.2011.001.371 beta
+Changes since preceding release (not necessarily complete):
+• Patch #3287270 Accepting command lines with quotes in the middle
+• Patch #3066200 PatchDlg swap files (releated to bug #3043635)
+• Bug #3348933 Search for string containing & goes wrong
+• Continued attempts to understand and fix comments filtering
+• Experimental System32 build configuration to share OS-provided MSVCRT.DLL
+• Following mainstream code, DirView now shows local rather than UTC times
+• Update PCRE to version 8.13
+• Cleanups
+
+0.2011.001.362 alpha
+Shares most bugtures of mainstream code, except for (not necessarily complete):
+• Support for plugins other than Merge7z and heksedit is discontinued
+• A file with extension .flt~ no longer aborts scanning of Filters directory
+• FileFilterMgr no longer disregards regexps which are not followed by ##
+• DiffUtils and ByteCompare results are more consistent
+• LineFilters no longer degrade folder compare performance
+• Changing fonts for folder and file compare windows finally works as designed
+• Some unstable aspects of unicode support start stabilizing
+• Issue described in Patch #3281234 support of Alt+Down/Up in Diff Pane
+• Bug #3108489 FolderCmp object instantiation degrades DirScan performance
+• Bug #2010049 Memory leak from line filters (related to patch #3064882)
+• Patch #3065283 "Swap Panes" (Ctrl+U)
+• CMessageBoxDialog::CreateIconControl() was leaking bitmap handles

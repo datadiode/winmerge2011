@@ -1,0 +1,114 @@
+<scriptlet>
+
+<implements type='automation'>
+	<property name='app' dispid='0'/>
+	<method name='OpenTextFile'/>
+	<property name='Options'/>
+</implements>
+
+<script language='vbs'>
+Option Explicit
+
+Const ShowConsole = 1
+Const TempDirHead = "%WINDIR%\Temp\WinMerge_"
+Const CommandHead = "%COMSPEC% /c "
+Const ShellFolder = "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders\AppData"
+Const DialogMoniker = "modal:\FileTransforms\xls2csv.html"
+Const DialogOptions = "dialogWidth: 4in; dialogHeight: 3in;"
+
+Dim app, sh, fso, xls2csv
+Set sh = CreateObject("WScript.Shell")
+Set fso = CreateObject("Scripting.FileSystemObject")
+
+xls2csv = sh.RegRead("HKCR\CLSID\{CFEC65BA-AC06-300F-BD99-67F2A08B1D29}\InprocServer32\CodeBase")
+With New RegExp
+	.Pattern = "file:/*(.*)dll"
+	.IgnoreCase = True
+	xls2csv = .Replace(xls2csv, "$1") & "exe"
+End With
+xls2csv = fso.GetFile(xls2csv).ShortPath
+
+Class COptions
+	Dim Confirmed, ConversionTemplate
+	Sub Query
+		Dim dir
+		dir = sh.RegRead(ShellFolder) & "\WinMerge"
+		If Not fso.FolderExists(dir) Then fso.CreateFolder dir
+		ConversionTemplate = fso.GetFolder(dir).ShortPath & "\xls2csv.x2c"
+		Confirmed = fso.FileExists(ConversionTemplate)
+		If Not Confirmed Then
+			app.ShowHTMLDialog DialogMoniker, Me, DialogOptions
+		End If
+	End Sub
+End Class
+
+Dim Options
+Set Options = New COptions
+
+Class CTextStream
+
+	Dim xls, tmp, Files(), FileIndex, FileCount, CurrentStream
+
+	Sub Open(path)
+		Dim cmd, File, FileSet
+		xls = fso.GetFile(path).ShortPath
+		tmp = sh.ExpandEnvironmentStrings(TempDirHead) & fso.GetTempName
+		cmd = CommandHead & Join(Array(xls2csv, xls, tmp, Options.ConversionTemplate), " ")
+		sh.Run cmd, ShowConsole, True
+		Set FileSet = fso.GetFolder(tmp).Files
+		ReDim Files(FileSet.Count)
+		FileIndex = 0
+		For Each File In FileSet
+			FileIndex = FileIndex + 1
+			Set Files(FileIndex) = File
+		Next
+		FileIndex = 0
+		FileCount = FileSet.Count
+	End Sub
+
+	Function ReadLine
+		If CurrentStream Is Nothing Then
+			If FileIndex < FileCount Then
+				FileIndex = FileIndex + 1
+				With Files(FileIndex)
+					ReadLine = "[" & .Name & "]"
+					Set CurrentStream = .OpenAsTextStream
+				End With
+			End If
+		Else
+			ReadLine = CurrentStream.ReadLine
+			If CurrentStream.AtEndOfStream Then Set CurrentStream = Nothing
+		End If
+	End Function
+
+	Property Get AtEndOfStream
+		If CurrentStream Is Nothing Then
+			AtEndOfStream = FileIndex = FileCount
+		Else
+			AtEndOfStream = CurrentStream.AtEndOfStream
+		End If
+	End Property
+
+	Private Sub Class_Initialize
+		Set CurrentStream = Nothing
+	End Sub
+
+	Private Sub Class_Terminate
+		If fso.FolderExists(tmp) Then fso.DeleteFolder tmp
+	End Sub
+
+End Class
+
+Function OpenTextFile(path)
+	path = Replace(path, "\\?\UNC\", "\\")
+	path = Replace(path, "\\?\", "")
+	If IsEmpty(Options.Confirmed) Then Options.Query
+	If Options.Confirmed Then
+		Set OpenTextFile = New CTextStream
+		OpenTextFile.Open path
+	Else
+		Set OpenTextFile = Nothing
+	End If
+End Function
+</script>
+</scriptlet>

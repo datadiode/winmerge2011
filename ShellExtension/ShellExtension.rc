@@ -1,0 +1,110 @@
+//WinMerge ShellExtension resource script
+//
+// $Id$
+
+#include "resource.h"
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+
+#ifdef APSTUDIO_INVOKED
+#error
+#endif    // APSTUDIO_INVOKED
+
+#include "../src/version.rc"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// REGISTRY
+//
+
+IDR_WINMERGESHELL       REGISTRY                "WinMergeShell.rgs"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_WINMERGE            BITMAP                  "WinMerge.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDS_PROJNAME            "ShellExtension"
+    IDS_CONTEXT_MENU        "&WinMerge"
+    IDS_CONTEXT_HELP        "Open with WinMerge"
+    IDS_CONTEXT_HELP_MANYITEMS "Please select no more than 2 items"
+    IDS_COMPARE             "&Compare"
+    IDS_COMPARE_ELLIPSIS    "&Compare..."
+    IDS_COMPARE_TO          "&Compare To"
+    IDS_HELP_SAVETHIS       "Save this path. Select another path to compare with this path."
+    IDS_HELP_COMPARESAVED   "Compare to saved path (%1)"
+    IDS_RESELECT_FIRST      "&Re-select First"
+END
+
+/////////////////////////////////////////////////////////////////////////////
+// NB: #pragma code_page() has no effect when issued inside #included files,
+// but does apply to #included files when issued beforehand.
+#pragma code_page(1252)
+#include "Languages\ShellExtensionBasque.rc"
+#pragma code_page(1252)
+#include "Languages\ShellExtensionBrazilian.rc"
+#pragma code_page(1251)
+#include "Languages\ShellExtensionBulgarian.rc"
+#pragma code_page(1252)
+#include "Languages\ShellExtensionCatalan.rc"
+#pragma code_page(936)
+#include "Languages\ShellExtensionChineseSimplified.rc"
+#pragma code_page(950)
+#include "Languages\ShellExtensionChineseTraditional.rc"
+#pragma code_page(1250)
+#include "Languages\ShellExtensionCroatian.rc"
+#pragma code_page(1250)
+#include "Languages\ShellExtensionCzech.rc"
+#pragma code_page(1252)
+#include "Languages\ShellExtensionDanish.rc"
+#pragma code_page(1252)
+#include "Languages\ShellExtensionDutch.rc"
+#pragma code_page(1252)
+#include "Languages\ShellExtensionFrench.rc"
+#pragma code_page(1252)
+#include "Languages\ShellExtensionGalician.rc"
+#pragma code_page(1252)
+#include "Languages\ShellExtensionGerman.rc"
+#pragma code_page(1253)
+#include "Languages\\ShellExtensionGreek.rc"
+#pragma code_page(1250)
+#include "Languages\ShellExtensionHungarian.rc"
+#pragma code_page(1252)
+#include "Languages\ShellExtensionItalian.rc"
+#pragma code_page(932)
+#include "Languages\ShellExtensionJapanese.rc"
+#pragma code_page(949)
+#include "Languages\ShellExtensionKorean.rc"
+#pragma code_page(1252)
+#include "Languages\ShellExtensionNorwegian.rc"
+#pragma code_page(1256)
+#include "Languages\ShellExtensionPersian.rc"
+#pragma code_page(1250)
+#include "Languages\ShellExtensionPolish.rc"
+#pragma code_page(1252)
+#include "Languages\ShellExtensionPortuguese.rc"
+#pragma code_page(1251)
+#include "Languages\ShellExtensionRussian.rc"
+#pragma code_page(1250)
+#include "Languages\ShellExtensionSlovak.rc"
+#pragma code_page(1252)
+#include "Languages\ShellExtensionSpanish.rc"
+#pragma code_page(1252)
+#include "Languages\ShellExtensionSwedish.rc"
+#pragma code_page(1254)
+#include "Languages\ShellExtensionTurkish.rc"
+#pragma code_page(1251)
+#include "Languages\ShellExtensionUkrainian.rc"

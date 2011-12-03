@@ -1,0 +1,53 @@
+#include "version.rh"
+
+#define STRINGIZE_(X) #X
+#define STRINGIZE(X) STRINGIZE_(X)
+#define DECIMAL3(X) 1##X-1000 // RC compiler might be aware of octal notation
+
+#if defined(XXXXX) && defined(BUILD)
+#error #undef either XXXXX or BUILD!
+#elif defined(XXXXX)
+#define VERSION_STRING 0.MAJOR.MINOR.XXXXX
+#define VERSION_VECTOR 0,MAJOR,DECIMAL3(MINOR),DECIMAL3(XXXXX)
+#elif defined(BUILD)
+#define VERSION_STRING MAJOR.MINOR.BUILD
+#define VERSION_VECTOR MAJOR,DECIMAL3(MINOR),DECIMAL3(BUILD)
+#else
+#error #define either XXXXX or BUILD!
+#endif
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION VERSION_VECTOR
+ PRODUCTVERSION VERSION_VECTOR
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x9L
+#else
+ FILEFLAGS 0x8L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904e4"
+        BEGIN
+            VALUE "Comments", COMMENTS
+            VALUE "CompanyName", "http://winmerge.org"
+            VALUE "FileDescription", "WinMerge Application"
+            VALUE "FileVersion", STRINGIZE(VERSION_STRING)
+            VALUE "InternalName", "WinMerge"
+            VALUE "LegalCopyright", "(c) 1996-2011 Dean P. Grimm / Thingamahoochie Software"
+            VALUE "OriginalFilename", "WinMerge.EXE"
+            VALUE "PrivateBuild", PRIVATE_BUILD
+            VALUE "ProductName", "WinMerge"
+            VALUE "ProductVersion", STRINGIZE(VERSION_STRING)
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1252
+    END
+END
+
