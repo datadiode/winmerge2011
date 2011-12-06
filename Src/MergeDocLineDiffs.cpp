@@ -162,7 +162,7 @@ void CChildFrame::Computelinediff(CCrystalTextView * pView1, CCrystalTextView * 
 	//Add a diff in case of EOL difference
 	if (!diffOptions.bIgnoreEol)
 	{
-		if (pView1->GetTextBufferEol(line) != pView1->GetTextBufferEol(line))
+		if (_tcscmp(pView1->GetTextBufferEol(line), pView2->GetTextBufferEol(line)))
 		{
 			worddiffs.push_back(wdiff(width1, width1, width2, width2));
 		}
@@ -277,7 +277,7 @@ void CChildFrame::GetWordDiffArray(int nLineIndex, vector<wdiff> *pworddiffs)
 	//Add a diff in case of EOL difference
 	if (!diffOptions.bIgnoreEol)
 	{
-		if (m_pView[0]->GetTextBufferEol(nLineIndex) != m_pView[1]->GetTextBufferEol(nLineIndex))
+		if (_tcscmp(m_pView[0]->GetTextBufferEol(nLineIndex), m_pView[1]->GetTextBufferEol(nLineIndex)))
 		{
 			pworddiffs->push_back(wdiff(i1, i1, i2, i2));
 		}
