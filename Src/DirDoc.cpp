@@ -703,6 +703,9 @@ void CDirFrame::ApplyLeftDisplayRoot(String &sText)
 	if (m_pTempPathContext)
 	{
 		sText.erase(0, m_pTempPathContext->m_strLeftRoot.length());
+		// Eat the trailing backslash when returning to an archive's root level
+		if (sText == _T("\\"))
+			sText.clear();
 		sText.insert(0, m_pTempPathContext->m_strLeftDisplayRoot.c_str());
 	}
 }
@@ -720,6 +723,9 @@ void CDirFrame::ApplyRightDisplayRoot(String &sText)
 	if (m_pTempPathContext)
 	{
 		sText.erase(0, m_pTempPathContext->m_strRightRoot.length());
+		// Eat the trailing backslash when returning to an archive's root level
+		if (sText == _T("\\"))
+			sText.clear();
 		sText.insert(0, m_pTempPathContext->m_strRightDisplayRoot.c_str());
 	}
 }
