@@ -341,6 +341,7 @@ void CEditReplaceDlg::OnEditReplaceAll()
     
 		//  We have highlighted text
 		VERIFY(m_pBuddy->ReplaceSelection(m_sNewText.c_str(), m_sNewText.size(), dwSearchFlags));
+		nNumReplaced++;
 
 		//  Manually recalculate points
 		if (m_bEnableScopeSelection)
@@ -387,7 +388,6 @@ void CEditReplaceDlg::OnEditReplaceAll()
 			m_bFound = FALSE;
 			break;
 		}
-		nNumReplaced++;
 
 		// find the next instance
 		m_bFound = DoHighlightText ( FALSE );
