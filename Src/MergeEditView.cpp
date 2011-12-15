@@ -89,29 +89,7 @@ CMergeEditView::CMergeEditView(
 {
 	SubclassWindow(pWnd);
 	RegisterDragDrop(m_hWnd, this);
-
 	SetParser(&m_xParser);
-	m_cachedColors.clrDiff = COptionsMgr::Get(OPT_CLR_DIFF);
-	m_cachedColors.clrSelDiff = COptionsMgr::Get(OPT_CLR_SELECTED_DIFF);
-	m_cachedColors.clrDiffDeleted = COptionsMgr::Get(OPT_CLR_DIFF_DELETED);
-	m_cachedColors.clrSelDiffDeleted = COptionsMgr::Get(OPT_CLR_SELECTED_DIFF_DELETED);
-	m_cachedColors.clrDiffText = COptionsMgr::Get(OPT_CLR_DIFF_TEXT);
-	m_cachedColors.clrSelDiffText = COptionsMgr::Get(OPT_CLR_SELECTED_DIFF_TEXT);
-	m_cachedColors.clrTrivial = COptionsMgr::Get(OPT_CLR_TRIVIAL_DIFF);
-	m_cachedColors.clrTrivialDeleted = COptionsMgr::Get(OPT_CLR_TRIVIAL_DIFF_DELETED);
-	m_cachedColors.clrTrivialText = COptionsMgr::Get(OPT_CLR_TRIVIAL_DIFF_TEXT);
-	m_cachedColors.clrMoved = COptionsMgr::Get(OPT_CLR_MOVEDBLOCK);
-	m_cachedColors.clrMovedDeleted = COptionsMgr::Get(OPT_CLR_MOVEDBLOCK_DELETED);
-	m_cachedColors.clrMovedText = COptionsMgr::Get(OPT_CLR_MOVEDBLOCK_TEXT);
-	m_cachedColors.clrSelMoved = COptionsMgr::Get(OPT_CLR_SELECTED_MOVEDBLOCK);
-	m_cachedColors.clrSelMovedDeleted = COptionsMgr::Get(OPT_CLR_SELECTED_MOVEDBLOCK_DELETED);
-	m_cachedColors.clrSelMovedText = COptionsMgr::Get(OPT_CLR_SELECTED_MOVEDBLOCK_TEXT);
-	m_cachedColors.clrWordDiff = COptionsMgr::Get(OPT_CLR_WORDDIFF);
-	m_cachedColors.clrWordDiffDeleted = COptionsMgr::Get(OPT_CLR_WORDDIFF_DELETED);
-	m_cachedColors.clrSelWordDiff = COptionsMgr::Get(OPT_CLR_SELECTED_WORDDIFF);
-	m_cachedColors.clrSelWordDiffDeleted = COptionsMgr::Get(OPT_CLR_SELECTED_WORDDIFF_DELETED);
-	m_cachedColors.clrWordDiffText = COptionsMgr::Get(OPT_CLR_WORDDIFF_TEXT);
-	m_cachedColors.clrSelWordDiffText = COptionsMgr::Get(OPT_CLR_SELECTED_WORDDIFF_TEXT);
 }
 
 CMergeEditView::~CMergeEditView()
@@ -1170,15 +1148,26 @@ void CMergeEditView::OnConvertEolTo(UINT nID )
  */
 void CMergeEditView::RefreshOptions()
 { 
+	// Enable/disable automatic rescan (rescanning after edit)
 	m_bAutomaticRescan = COptionsMgr::Get(OPT_AUTOMATIC_RESCAN);
+	// Set tab type (tabs/spaces)
 	SetInsertTabs(COptionsMgr::Get(OPT_TAB_TYPE) == 0);
 	SetSelectionMargin(COptionsMgr::Get(OPT_VIEW_FILEMARGIN));
 
 	if (!COptionsMgr::Get(OPT_SYNTAX_HIGHLIGHT))
 		SetTextType(CCrystalTextView::SRC_PLAIN);
 
+	// SetTextType will revert to language dependent defaults for tab
+	SetTabSize(COptionsMgr::Get(OPT_TAB_SIZE));
+	SetViewTabs(COptionsMgr::Get(OPT_VIEW_WHITESPACE));
+
 	SetWordWrapping(COptionsMgr::Get(OPT_WORDWRAP));
 	SetViewLineNumbers(COptionsMgr::Get(OPT_VIEW_LINENUMBERS));
+
+	const bool mixedEOLs = COptionsMgr::Get(OPT_ALLOW_MIXED_EOL) ||
+		m_pDocument->IsMixedEOL(m_nThisPane);
+	SetViewEols(COptionsMgr::Get(OPT_VIEW_WHITESPACE), mixedEOLs);
+
 	m_cachedColors.clrDiff = COptionsMgr::Get(OPT_CLR_DIFF);
 	m_cachedColors.clrSelDiff = COptionsMgr::Get(OPT_CLR_SELECTED_DIFF);
 	m_cachedColors.clrDiffDeleted = COptionsMgr::Get(OPT_CLR_DIFF_DELETED);
@@ -1197,6 +1186,7 @@ void CMergeEditView::RefreshOptions()
 	m_cachedColors.clrWordDiff = COptionsMgr::Get(OPT_CLR_WORDDIFF);
 	m_cachedColors.clrWordDiffDeleted = COptionsMgr::Get(OPT_CLR_WORDDIFF_DELETED);
 	m_cachedColors.clrSelWordDiff = COptionsMgr::Get(OPT_CLR_SELECTED_WORDDIFF);
+	m_cachedColors.clrSelWordDiffDeleted = COptionsMgr::Get(OPT_CLR_SELECTED_WORDDIFF_DELETED);
 	m_cachedColors.clrWordDiffText = COptionsMgr::Get(OPT_CLR_WORDDIFF_TEXT);
 	m_cachedColors.clrSelWordDiffText = COptionsMgr::Get(OPT_CLR_SELECTED_WORDDIFF_TEXT);
 }
@@ -1403,19 +1393,7 @@ bool CMergeEditView::IsDiffVisible(const DIFFRANGE& diff, int nLinesBelow /*=0*/
  */
 void CMergeEditView::DocumentsLoaded()
 {
-	// Enable/disable automatic rescan (rescanning after edit)
-	EnableRescan(COptionsMgr::Get(OPT_AUTOMATIC_RESCAN));
-	// SetTextType will revert to language dependent defaults for tab
-	SetTabSize(COptionsMgr::Get(OPT_TAB_SIZE));
-	SetViewTabs(COptionsMgr::Get(OPT_VIEW_WHITESPACE));
-	const bool mixedEOLs = COptionsMgr::Get(OPT_ALLOW_MIXED_EOL) ||
-		m_pDocument->IsMixedEOL(m_nThisPane);
-	SetViewEols(COptionsMgr::Get(OPT_VIEW_WHITESPACE), mixedEOLs);
-	SetWordWrapping(COptionsMgr::Get(OPT_WORDWRAP));
-	SetViewLineNumbers(COptionsMgr::Get(OPT_VIEW_LINENUMBERS));
-	SetSelectionMargin(COptionsMgr::Get(OPT_VIEW_FILEMARGIN));
-	// Set tab type (tabs/spaces)
-	SetInsertTabs(COptionsMgr::Get(OPT_TAB_TYPE) == 0);
+	RefreshOptions();
 	SetFont(GetMainFrame()->m_lfDiff);
 }
 
