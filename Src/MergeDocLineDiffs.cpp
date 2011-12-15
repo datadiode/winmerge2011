@@ -49,43 +49,29 @@ static void HighlightDiffRect(CCrystalTextView * pView, const RECT &rc)
 /**
  * @brief Highlight difference in current line (left & right panes)
  */
-void CChildFrame::Showlinediff(CMergeEditView * pView, DIFFLEVEL difflvl)
+void CChildFrame::Showlinediff(CCrystalTextView *pTextView, CMergeEditView *pActiveView, DIFFLEVEL difflvl)
 {
+	CCrystalTextView *pView[] = { m_pView[0], m_pView[1] };
+	// If focus is owned by a detail view, then operate on detail views
+	if (pTextView != pActiveView)
+	{
+		pView[0] = m_pDetailView[0];
+		pView[1] = m_pDetailView[1];
+	}
 	RECT rc1, rc2;
-	Computelinediff(m_pView[0], m_pView[1], pView->GetCursorPos().y, rc1, rc2, difflvl);
+	Computelinediff(pView[0], pView[1], pTextView->GetCursorPos().y, rc1, rc2, difflvl);
 
 	if (rc1.top == -1 && rc2.top == -1)
 	{
 		String caption = LanguageSelect.LoadString(IDS_LINEDIFF_NODIFF_CAPTION);
 		String msg = LanguageSelect.LoadString(IDS_LINEDIFF_NODIFF);
-		MessageBox(pView->m_hWnd, msg.c_str(), caption.c_str(), MB_OK);
+		pTextView->MessageBox(msg.c_str(), caption.c_str(), MB_OK);
 		return;
 	}
 
 	// Actually display selection areas on screen in both edit panels
-	HighlightDiffRect(m_pView[0], rc1);
-	HighlightDiffRect(m_pView[1], rc2);
-}
-
-/**
- * @brief Highlight difference in diff bar's current line (top & bottom panes)
- */
-void CChildFrame::Showlinediff(CMergeDiffDetailView * pView, DIFFLEVEL difflvl)
-{
-	RECT rc1, rc2;
-	Computelinediff(m_pDetailView[0], m_pDetailView[1], pView->GetCursorPos().y, rc1, rc2, difflvl);
-
-	if (rc1.top == -1 && rc2.top == -1)
-	{
-		String caption = LanguageSelect.LoadString(IDS_LINEDIFF_NODIFF_CAPTION);
-		String msg = LanguageSelect.LoadString(IDS_LINEDIFF_NODIFF);
-		MessageBox(pView->m_hWnd, msg.c_str(), caption.c_str(), MB_OK);
-		return;
-	}
-
-	// Actually display selection areas on screen in both detail panels
-	HighlightDiffRect(m_pDetailView[0], rc1);
-	HighlightDiffRect(m_pDetailView[1], rc2);
+	HighlightDiffRect(pView[0], rc1);
+	HighlightDiffRect(pView[1], rc2);
 }
 
 /**

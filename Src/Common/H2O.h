@@ -97,10 +97,15 @@ namespace H2O
 			assert(::IsWindow(m_hWnd));
 			return ::GetClassWord(m_hWnd, GCW_ATOM);
 		}
-		int GetClassName(LPTSTR lpClassName, int nMaxCount)
+		int GetClassNameA(LPSTR lpClassName, int nMaxCount)
 		{
 			assert(::IsWindow(m_hWnd));
-			return ::GetClassName(m_hWnd, lpClassName, nMaxCount);
+			return ::GetClassNameA(m_hWnd, lpClassName, nMaxCount);
+		}
+		int GetClassNameW(LPWSTR lpClassName, int nMaxCount)
+		{
+			assert(::IsWindow(m_hWnd));
+			return ::GetClassNameW(m_hWnd, lpClassName, nMaxCount);
 		}
 		DWORD GetStyle()
 		{
@@ -485,10 +490,15 @@ namespace H2O
 			assert(::IsWindow(m_hWnd));
 			return ::GetWindowTextLength(m_hWnd);
 		}
-		UINT GetWindowText(LPTSTR lpString, int nMaxCount)
+		UINT GetWindowTextA(LPSTR lpString, int nMaxCount)
 		{
 			assert(::IsWindow(m_hWnd));
-			return ::GetWindowText(m_hWnd, lpString, nMaxCount);
+			return ::GetWindowTextA(m_hWnd, lpString, nMaxCount);
+		}
+		UINT GetWindowTextW(LPWSTR lpString, int nMaxCount)
+		{
+			assert(::IsWindow(m_hWnd));
+			return ::GetWindowTextW(m_hWnd, lpString, nMaxCount);
 		}
 		UINT GetWindowText(String &s)
 		{
@@ -497,10 +507,15 @@ namespace H2O
 			s.resize(size);
 			return ::GetWindowText(m_hWnd, &s.front(), size + 1);
 		}
-		UINT GetDlgItemText(int nIDDlgItem, LPTSTR lpString, int nMaxCount)
+		UINT GetDlgItemTextA(int nIDDlgItem, LPSTR lpString, int nMaxCount)
 		{
 			assert(::IsWindow(m_hWnd));
-			return ::GetDlgItemText(m_hWnd, nIDDlgItem, lpString, nMaxCount);
+			return ::GetDlgItemTextA(m_hWnd, nIDDlgItem, lpString, nMaxCount);
+		}
+		UINT GetDlgItemTextW(int nIDDlgItem, LPWSTR lpString, int nMaxCount)
+		{
+			assert(::IsWindow(m_hWnd));
+			return ::GetDlgItemTextW(m_hWnd, nIDDlgItem, lpString, nMaxCount);
 		}
 		UINT GetDlgItemText(int id, String &s)
 		{
@@ -509,15 +524,25 @@ namespace H2O
 			s.resize(size);
 			return GetDlgItemText(id, &s.front(), size + 1);
 		}
-		void SetWindowText(LPCTSTR lpString)
+		void SetWindowTextA(LPCSTR lpString)
 		{
 			assert(::IsWindow(m_hWnd));
-			::SetWindowText(m_hWnd, lpString);
+			::SetWindowTextA(m_hWnd, lpString);
 		}
-		void SetDlgItemText(int nIDDlgItem, LPCTSTR lpString)
+		void SetWindowTextW(LPCWSTR lpString)
 		{
 			assert(::IsWindow(m_hWnd));
-			::SetDlgItemText(m_hWnd, nIDDlgItem, lpString);
+			::SetWindowTextW(m_hWnd, lpString);
+		}
+		void SetDlgItemTextA(int nIDDlgItem, LPCSTR lpString)
+		{
+			assert(::IsWindow(m_hWnd));
+			::SetDlgItemTextA(m_hWnd, nIDDlgItem, lpString);
+		}
+		void SetDlgItemTextW(int nIDDlgItem, LPCWSTR lpString)
+		{
+			assert(::IsWindow(m_hWnd));
+			::SetDlgItemTextW(m_hWnd, nIDDlgItem, lpString);
 		}
 		UINT GetDlgItemInt(int nIDDlgItem, BOOL *lpTranslated = NULL, BOOL bSigned = TRUE)
 		{
@@ -568,6 +593,16 @@ namespace H2O
 		{
 			assert(::IsWindow(m_hWnd));
 			return ::EndPaint(m_hWnd, pps);
+		}
+		int MessageBoxA(LPCSTR text, LPCSTR caption, UINT style)
+		{
+			assert(::IsWindow(m_hWnd));
+			return ::MessageBoxA(m_hWnd, text, caption, style);
+		}
+		int MessageBoxW(LPCWSTR text, LPCWSTR caption, UINT style)
+		{
+			assert(::IsWindow(m_hWnd));
+			return ::MessageBoxW(m_hWnd, text, caption, style);
 		}
 	};
 

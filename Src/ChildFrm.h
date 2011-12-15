@@ -220,8 +220,7 @@ public:
 // Implementation in MergeDocLineDiffs.cpp
 public:
 	typedef enum { BYTEDIFF, WORDDIFF } DIFFLEVEL;
-	void Showlinediff(CMergeEditView *, DIFFLEVEL);
-	void Showlinediff(CMergeDiffDetailView *, DIFFLEVEL);
+	void Showlinediff(CCrystalTextView *, CMergeEditView *, DIFFLEVEL);
 	void GetWordDiffArray(int nLineIndex, stl::vector<wdiff> *pworddiffs);
 private:
 	void Computelinediff(CCrystalTextView *, CCrystalTextView *, int, RECT &, RECT &, DIFFLEVEL);

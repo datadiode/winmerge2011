@@ -598,7 +598,7 @@ LRESULT CChildFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 		pActiveView->OnPrevdiff();
 		break;
 	case ID_SELECTLINEDIFF:
-		Showlinediff(pActiveView,
+		Showlinediff(pTextView, pActiveView,
 			COptionsMgr::Get(OPT_BREAK_ON_WORDS) ?
 			WORDDIFF : BYTEDIFF);
 		break;
