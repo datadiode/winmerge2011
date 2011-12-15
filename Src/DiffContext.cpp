@@ -74,8 +74,6 @@ CDiffContext::CDiffContext(LPCTSTR pszLeft, LPCTSTR pszRight)
 	memset(&m_options, 0, sizeof m_options);
 	m_paths[0] = paths_GetLongPath(pszLeft);
 	m_paths[1] = paths_GetLongPath(pszRight);
-	//paths_normalize(m_paths[0] = pszLeft);
-	//paths_normalize(m_paths[1] = pszRight);
 }
 
 /**
