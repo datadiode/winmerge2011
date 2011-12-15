@@ -388,8 +388,11 @@ void CLocationView::OnDraw(HSurface *pdc)
 	int nPrevEndY = -1;
 	const int nCurDiff = m_pMergeDoc->GetCurrentDiff();
 
+	// Protect against out of bound accesses after line deletions
+	const unsigned safe_line_count = min(pLeftView->GetLineCount(), pRightView->GetLineCount());
+
 	vector<DiffBlock>::const_iterator iter = m_diffBlocks.begin();
-	while (iter != m_diffBlocks.end())
+	while (iter != m_diffBlocks.end() && iter->top_line < safe_line_count)
 	{
 		const bool bInsideDiff = nCurDiff == iter->diff_index;
 
