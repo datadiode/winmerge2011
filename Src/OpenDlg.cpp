@@ -60,7 +60,9 @@ static TCHAR OpenDlgHelpLocation[] = _T("::/htmlhelp/Open_paths.html");
 static DWORD_PTR GetShellImageList()
 {
 	SHFILEINFO sfi;
-	return SHGetFileInfo(_T(""), 0,  &sfi, sizeof sfi, SHGFI_SMALLICON | SHGFI_SYSICONINDEX);
+	static DWORD_PTR dwpShellImageList = SHGetFileInfo(
+		_T(""), 0,	&sfi, sizeof sfi, SHGFI_SMALLICON | SHGFI_SYSICONINDEX);
+	return dwpShellImageList;
 }
 
 /**
@@ -515,8 +517,9 @@ void COpenDlg::OnEditchangePathCombo(HSuperComboBox *pCb)
 {
 	if (m_nAutoComplete == AUTO_COMPLETE_RECENTLY_USED)
 		pCb->AutoCompleteFromLB();
-	pCb->GetComboControl()->RedrawWindow(NULL, NULL,
-		RDW_INVALIDATE | RDW_UPDATENOW | RDW_NOCHILDREN);
+	if (!pCb->GetDroppedState())
+		if (DWORD_PTR dwpShellImageList = GetShellImageList())
+			pCb->SendMessage(CBEM_SETIMAGELIST, 0, dwpShellImageList);
 	// (Re)start timer to path validity check delay
 	// If timer starting fails, update buttonstates immediately
 	if (!SetTimer(IDT_CHECKFILES, CHECKFILES_TIMEOUT, NULL))
