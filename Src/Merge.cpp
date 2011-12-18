@@ -73,7 +73,7 @@ CLanguageSelect LanguageSelect;
 FileFilterHelper globalFileFilter;
 
 /** @brief Location for command line help to open. */
-static TCHAR CommandLineHelpLocation[] = _T("::/htmlhelp/Command_line.html");
+static const TCHAR CommandLineHelpLocation[] = _T("::/htmlhelp/Command_line.html");
 
 /////////////////////////////////////////////////////////////////////////////
 // CMergeApp

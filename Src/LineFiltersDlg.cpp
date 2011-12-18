@@ -20,7 +20,7 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 /** @brief Location for file compare specific help to open. */
-static TCHAR FilterHelpLocation[] = _T("::/htmlhelp/Filters.html");
+static const TCHAR FilterHelpLocation[] = _T("::/htmlhelp/Filters.html");
 
 /////////////////////////////////////////////////////////////////////////////
 // LineFiltersDlg property page

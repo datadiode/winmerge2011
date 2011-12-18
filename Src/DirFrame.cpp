@@ -47,7 +47,7 @@ static char THIS_FILE[] = __FILE__;
 /**
  * @brief Location for folder compare specific help to open.
  */
-static TCHAR DirViewHelpLocation[] = _T("::/htmlhelp/Compare_dirs.html");
+static const TCHAR DirViewHelpLocation[] = _T("::/htmlhelp/Compare_dirs.html");
 
 /**
  * @brief Statusbar pane indexes
