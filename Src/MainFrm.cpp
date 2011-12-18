@@ -2825,6 +2825,11 @@ void CMainFrame::ShowHelp(LPCTSTR helpLocation /*= NULL*/)
 			sPath += helpLocation;
 			::HtmlHelp(NULL, sPath.c_str(), HH_DISPLAY_TOPIC, NULL);
 		}
+		else if (LPCTSTR helpTarget = EatPrefix(helpLocation, _T("::/htmlhelp/")))
+		{
+			string_replace(sPath = DocsURL, _T("index.html"), helpTarget);
+			ShellExecute(NULL, _T("open"), sPath.c_str(), NULL, NULL, SW_SHOWNORMAL);
+		}
 	}
 }
 
