@@ -19,7 +19,7 @@ public:
 	int InsertString(int nIndex, LPCTSTR lpszItem);
 	void SaveState(LPCTSTR szRegSubKey, UINT nMaxItems = 20);
 	void LoadState(LPCTSTR szRegSubKey, UINT nMaxItems = 20);
-	void AutoCompleteFromLB();
+	void AutoCompleteFromLB(int nIndexFrom = -1);
 	void AdjustDroppedWidth();
 	void UpdateEditText();
 protected:

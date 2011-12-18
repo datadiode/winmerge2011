@@ -120,7 +120,7 @@ LRESULT COpenDlg::OnNotify(UNotify *pNM)
 		case CBEN_GETDISPINFO:
 			SHFILEINFO sfi;
 			DWORD_PTR result = 0;
-			if (!pNM->pCB->GetDroppedState())
+			if (pNM->COMBOBOXEX.ceItem.iItem == 0 && !pNM->pCB->GetDroppedState())
 			{
 				pNM->pCB->GetWindowText(pNM->COMBOBOXEX.ceItem.pszText, pNM->COMBOBOXEX.ceItem.cchTextMax);
 			}
@@ -218,12 +218,21 @@ LRESULT COpenDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			break;
 		case MAKEWPARAM(IDC_LEFT_COMBO, CBN_DROPDOWN):
 		case MAKEWPARAM(IDC_RIGHT_COMBO, CBN_DROPDOWN):
+			// Remove the icon issue placeholder.
+			reinterpret_cast<HSuperComboBox *>(lParam)->DeleteString(0);
+			// fall through
 		case MAKEWPARAM(IDC_EXT_COMBO, CBN_DROPDOWN):
 			reinterpret_cast<HSuperComboBox *>(lParam)->AdjustDroppedWidth();
 			RegisterHotKey(m_hWnd, MAKEWPARAM(LOWORD(wParam), VK_DELETE), MOD_SHIFT, VK_DELETE);
 			break;
 		case MAKEWPARAM(IDC_LEFT_COMBO, CBN_CLOSEUP):
 		case MAKEWPARAM(IDC_RIGHT_COMBO, CBN_CLOSEUP):
+			// Restore the icon issue placeholder.
+			reinterpret_cast<HSuperComboBox *>(lParam)->InsertString(0, LPSTR_TEXTCALLBACK);
+			// Select it if nothing else is selected.
+			if (reinterpret_cast<HSuperComboBox *>(lParam)->GetCurSel() == -1)
+				reinterpret_cast<HSuperComboBox *>(lParam)->SetCurSel(0);
+			// fall through
 		case MAKEWPARAM(IDC_EXT_COMBO, CBN_CLOSEUP):
 			UnregisterHotKey(m_hWnd, MAKEWPARAM(LOWORD(wParam), VK_DELETE));
 			break;
@@ -336,6 +345,13 @@ BOOL COpenDlg::OnInitDialog()
 		m_pCbExt->GetWindowText(m_strExt);
 
 	UpdateData<Set>();
+
+	// Insert placeholders to represent items which are not yet listed as MRU.
+	// These placeholders are removed upon dropdown and restored upon closeup.
+	// They are invisible to users, but exist merely to help fix icon issues.
+	m_pCbLeft->InsertString(0, LPSTR_TEXTCALLBACK);
+	m_pCbRight->InsertString(0, LPSTR_TEXTCALLBACK);
+
 	UpdateButtonStates();
 	SetStatus(IDS_OPEN_FILESDIRS);
 	return TRUE;
@@ -506,6 +522,8 @@ void COpenDlg::UpdateButtonStates()
  */
 void COpenDlg::OnSelchangePathCombo(HSuperComboBox *pCb)
 {
+	if (!pCb->GetDroppedState() && pCb->GetCurSel() == 0)
+		pCb->SetCurSel(1);
 	pCb->UpdateEditText();
 	UpdateButtonStates();
 }
@@ -516,7 +534,7 @@ void COpenDlg::OnSelchangePathCombo(HSuperComboBox *pCb)
 void COpenDlg::OnEditchangePathCombo(HSuperComboBox *pCb)
 {
 	if (m_nAutoComplete == AUTO_COMPLETE_RECENTLY_USED)
-		pCb->AutoCompleteFromLB();
+		pCb->AutoCompleteFromLB(0);
 	if (!pCb->GetDroppedState())
 		if (DWORD_PTR dwpShellImageList = GetShellImageList())
 			pCb->SendMessage(CBEM_SETIMAGELIST, 0, dwpShellImageList);

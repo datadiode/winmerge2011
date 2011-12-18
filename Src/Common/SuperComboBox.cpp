@@ -130,7 +130,7 @@ void HSuperComboBox::SaveState(LPCTSTR szRegSubKey, UINT nMaxItems)
 	}
 }
 
-void HSuperComboBox::AutoCompleteFromLB()
+void HSuperComboBox::AutoCompleteFromLB(int nIndexFrom)
 {
 	if (GetKeyState(VK_BACK) < 0 || GetKeyState(VK_DELETE) < 0)
 		return;
@@ -148,8 +148,8 @@ void HSuperComboBox::AutoCompleteFromLB()
 		return;
 	
 	// look for the string that is prefixed by the typed text
-	int idx = FindString(-1, s.c_str());
-	if (idx == CB_ERR)
+	int idx = FindString(nIndexFrom, s.c_str());
+	if (idx == CB_ERR && (idx = nIndexFrom) < 0)
 		return;
 
 	// get the current selection
