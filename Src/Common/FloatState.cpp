@@ -226,20 +226,40 @@ BOOL CFloatState::AdjustMax(HWND hWnd, MINMAXINFO *pParam)
 
 UINT CFloatState::AdjustHit(UINT uHitTest)
 {
-	switch (uHitTest)
+	if (uHitTest >= HTSIZEFIRST && uHitTest <= HTSIZELAST)
 	{
-	case HTLEFT: case HTRIGHT:
+		const UINT XLOCK = 0x20;
+		const UINT YLOCK = 0x40;
+		UINT uSwitch = uHitTest;
 		if ((flags & 0x00FF00FF) == 0)
-			uHitTest = HTNOWHERE;
-		break;
-	case HTTOP: case HTBOTTOM:
+			uSwitch |= XLOCK;
 		if ((flags & 0xFF00FF00) == 0)
+			uSwitch |= YLOCK;
+		switch (uSwitch)
+		{
+		case HTLEFT | XLOCK:
+		case HTRIGHT | XLOCK:
+		case HTTOP | YLOCK:
+		case HTBOTTOM | YLOCK:
 			uHitTest = HTNOWHERE;
-		break;
-	case HTTOPLEFT: case HTTOPRIGHT: case HTBOTTOMLEFT: case HTBOTTOMRIGHT:
-		if ((flags & 0x00FF00FF) == 0 || (flags & 0xFF00FF00) == 0)
-			uHitTest = HTNOWHERE;
-		break;
+			break;
+		case HTTOPLEFT | YLOCK:
+		case HTBOTTOMLEFT | YLOCK:
+			uHitTest = HTLEFT;
+			break;
+		case HTTOPRIGHT | YLOCK:
+		case HTBOTTOMRIGHT | YLOCK:
+			uHitTest = HTRIGHT;
+			break;
+		case HTTOPLEFT | XLOCK:
+		case HTTOPRIGHT | XLOCK:
+			uHitTest = HTTOP;
+			break;
+		case HTBOTTOMLEFT | XLOCK:
+		case HTBOTTOMRIGHT | XLOCK:
+			uHitTest = HTBOTTOM;
+			break;
+		}
 	}
 	return uHitTest;
 }
