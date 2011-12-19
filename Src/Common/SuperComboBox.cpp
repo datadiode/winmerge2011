@@ -234,13 +234,8 @@ void HSuperComboBox::AdjustDroppedWidth()
 	}
 }
 
-void HSuperComboBox::UpdateEditText()
+void HSuperComboBox::EnsureSelection()
 {
 	int sel = GetCurSel();
-	if (sel != CB_ERR)
-	{
-		String s;
-		GetLBText(sel, s);
-		SetWindowText(s.c_str());
-	}
+	SetCurSel(sel != CB_ERR ? sel : 0);
 }

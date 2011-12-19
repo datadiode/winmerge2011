@@ -21,7 +21,7 @@ public:
 	void LoadState(LPCTSTR szRegSubKey, UINT nMaxItems = 20);
 	void AutoCompleteFromLB(int nIndexFrom = -1);
 	void AdjustDroppedWidth();
-	void UpdateEditText();
+	void EnsureSelection();
 protected:
 	int FindString(int nIndexStart, LPCTSTR lpszString);
 };

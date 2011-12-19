@@ -229,9 +229,7 @@ LRESULT COpenDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		case MAKEWPARAM(IDC_RIGHT_COMBO, CBN_CLOSEUP):
 			// Restore the icon issue placeholder.
 			reinterpret_cast<HSuperComboBox *>(lParam)->InsertString(0, LPSTR_TEXTCALLBACK);
-			// Select it if nothing else is selected.
-			if (reinterpret_cast<HSuperComboBox *>(lParam)->GetCurSel() == -1)
-				reinterpret_cast<HSuperComboBox *>(lParam)->SetCurSel(0);
+			reinterpret_cast<HSuperComboBox *>(lParam)->EnsureSelection();
 			// fall through
 		case MAKEWPARAM(IDC_EXT_COMBO, CBN_CLOSEUP):
 			UnregisterHotKey(m_hWnd, MAKEWPARAM(LOWORD(wParam), VK_DELETE));
@@ -524,7 +522,6 @@ void COpenDlg::OnSelchangePathCombo(HSuperComboBox *pCb)
 {
 	if (!pCb->GetDroppedState() && pCb->GetCurSel() == 0)
 		pCb->SetCurSel(1);
-	pCb->UpdateEditText();
 	UpdateButtonStates();
 }
 
