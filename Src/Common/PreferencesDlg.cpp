@@ -31,7 +31,7 @@ static char THIS_FILE[] = __FILE__;
 /**
  * @brief Location for file compare specific help to open.
  */
-static TCHAR OptionsHelpLocation[] = _T("::/htmlhelp/Configuration.html");
+static const TCHAR OptionsHelpLocation[] = _T("::/htmlhelp/Configuration.html");
 
 /////////////////////////////////////////////////////////////////////////////
 // CPreferencesDlg dialog
