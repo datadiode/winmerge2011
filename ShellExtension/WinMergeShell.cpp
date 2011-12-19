@@ -188,16 +188,16 @@ HRESULT CWinMergeShell::Initialize(LPCITEMIDLIST pidlFolder,
 			return E_INVALIDARG;
 		}
 
-		if (fileCount > MaxFileCount)
-			fileCount = MaxFileCount;
-
 		hr = S_OK;
 
 		// Get all file names.
-		for (UINT i = 0 ; i < fileCount; i++)
+		for (UINT i = 0 ; i < MaxFileCount; i++)
 		{
-			// Get the number of bytes required by the file's full pathname
-			if (UINT len = DragQueryFile(hDropInfo, i, NULL, 0))
+			if (i >= fileCount)
+			{
+				m_strPaths[i].Empty();
+			}
+			else if (UINT len = DragQueryFile(hDropInfo, i, NULL, 0))
 			{
 				if (!SysReAllocStringLen(&m_strPaths[i].m_str, NULL, len))
 					return E_OUTOFMEMORY;
