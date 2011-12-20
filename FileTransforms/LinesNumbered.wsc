@@ -1,0 +1,39 @@
+<scriptlet>
+
+<implements type='automation'>
+	<method name='OpenTextFile'/>
+	<property name='ShowConsole'/>
+	<property name='ReadOnly'/>
+</implements>
+
+<script language='vbs'>
+Option Explicit
+
+Const ShowConsole = 0
+Const ReadOnly = True
+
+Dim sh, fso
+Set sh = CreateObject("WScript.Shell")
+Set fso = CreateObject("Scripting.FileSystemObject")
+
+Class CTextStream
+
+	Dim InputStream, LineNumber
+
+	Function ReadLine
+		LineNumber = LineNumber + 1
+		ReadLine = LineNumber & vbTab & InputStream.ReadLine
+	End Function
+
+	Property Get AtEndOfStream
+		AtEndOfStream = InputStream.AtEndOfStream
+	End Property
+
+End Class
+
+Function OpenTextFile(path)
+	Set OpenTextFile = New CTextStream
+	Set OpenTextFile.InputStream = fso.OpenTextFile(path)
+End Function
+</script>
+</scriptlet>
