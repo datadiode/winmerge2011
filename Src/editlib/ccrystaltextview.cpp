@@ -3977,10 +3977,9 @@ void CCrystalTextView::SetDisableDragAndDrop(BOOL bDDAD)
 	m_bDisableDragAndDrop = bDDAD;
 }
 
-//
-// Mouse wheel event.  zDelta is in multiples of 120.
-// Divide by 40 so each click is 3 lines.  I know some
-// drivers let you set the ammount of scroll, but I
+// Mouse wheel event. zDelta is in multiples of 120.
+// Divide by 40 so each click is 3 lines. I know some
+// drivers let you set the amount of scroll, but I
 // don't know how to retrieve this or if they just
 // adjust the zDelta you get here.
 BOOL CCrystalTextView::OnMouseWheel(WPARAM wParam, LPARAM lParam)
@@ -3988,12 +3987,8 @@ BOOL CCrystalTextView::OnMouseWheel(WPARAM wParam, LPARAM lParam)
 	POINT pt;
 	POINTSTOPOINT(pt, lParam);
 	short zDelta = GET_WHEEL_DELTA_WPARAM(wParam);
-	SCROLLINFO si;
-	si.cbSize = sizeof si;
-	si.fMask = SIF_PAGE | SIF_RANGE;
-	GetScrollInfo(SB_VERT, &si);
 	int nNewTopSubLine = m_nTopSubLine - zDelta / 40;
-	int nMaxTopSubLine = si.nMax - si.nPage + 1;
+	int nMaxTopSubLine = GetSubLineCount() - GetScreenLines();
 	if (nNewTopSubLine < 0)
 		nNewTopSubLine = 0;
 	if (nNewTopSubLine > nMaxTopSubLine)
