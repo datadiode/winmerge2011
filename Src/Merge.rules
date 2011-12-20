@@ -6,57 +6,57 @@
 	<Rules>
 		<CustomBuildRule
 			Name="imp"
-			CommandLine="lib /MACHINE:X86 /DEF:$(InputPath) /OUT:$(IntDir)\$(InputName).lib"
-			Outputs="$(IntDir)\$(InputName).lib"
+			CommandLine="lib /MACHINE:X86 /DEF:&quot;$(InputPath)&quot; /OUT:&quot;$(IntDir)\$(InputName).lib&quot;"
+			Outputs="&quot;$(IntDir)\$(InputName).lib&quot;"
 			FileExtensions="*.imp"
 			>
 		</CustomBuildRule>
 		<CustomBuildRule
 			Name="po"
-			CommandLine="copy $(InputPath) $(OutDir)\Languages\$(InputFileName)"
-			Outputs="$(OutDir)\Languages\$(InputFileName)"
+			CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\Languages\$(InputFileName)&quot;"
+			Outputs="&quot;$(OutDir)\Languages\$(InputFileName)&quot;"
 			FileExtensions="*.po"
 			>
 		</CustomBuildRule>
 		<CustomBuildRule
 			Name="flt"
-			CommandLine="copy $(InputPath) $(OutDir)\Filters\$(InputFileName)"
-			Outputs="$(OutDir)\Filters\$(InputFileName)"
+			CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\Filters\$(InputFileName)&quot;"
+			Outputs="&quot;$(OutDir)\Filters\$(InputFileName)&quot;"
 			FileExtensions="*.flt"
 			>
 		</CustomBuildRule>
 		<CustomBuildRule
 			Name="PrintTemplates"
-			CommandLine="copy $(InputPath) $(OutDir)\PrintTemplates\$(InputFileName)"
-			Outputs="$(OutDir)\PrintTemplates\$(InputFileName)"
+			CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\PrintTemplates\$(InputFileName)&quot;"
+			Outputs="&quot;$(OutDir)\PrintTemplates\$(InputFileName)&quot;"
 			FileExtensions="*.html"
 			>
 		</CustomBuildRule>
 		<CustomBuildRule
 			Name="FileTransforms"
-			CommandLine="copy $(InputPath) $(OutDir)\FileTransforms\$(InputFileName)"
-			Outputs="$(OutDir)\FileTransforms\$(InputFileName)"
+			CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\FileTransforms\$(InputFileName)&quot;"
+			Outputs="&quot;$(OutDir)\FileTransforms\$(InputFileName)&quot;"
 			FileExtensions="*.wsc"
 			>
 		</CustomBuildRule>
 		<CustomBuildRule
 			Name="PluginMonikers"
-			CommandLine="copy $(InputPath) $(OutDir)\PluginMonikers\$(InputFileName)"
-			Outputs="$(OutDir)\PluginMonikers\$(InputFileName)"
+			CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\PluginMonikers\$(InputFileName)&quot;"
+			Outputs="&quot;$(OutDir)\PluginMonikers\$(InputFileName)&quot;"
 			FileExtensions="*.ini"
 			>
 		</CustomBuildRule>
 		<CustomBuildRule
 			Name="docs"
-			CommandLine="copy $(InputPath) $(OutDir)\Docs\$(InputFileName)"
-			Outputs="$(OutDir)\Docs\$(InputFileName)"
+			CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\Docs\$(InputFileName)&quot;"
+			Outputs="&quot;$(OutDir)\Docs\$(InputFileName)&quot;"
 			FileExtensions="*.chm"
 			>
 		</CustomBuildRule>
 		<CustomBuildRule
 			Name="setup"
-			CommandLine="copy $(InputPath) $(OutDir)\$(InputFileName)"
-			Outputs="$(OutDir)\$(InputFileName)"
+			CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\$(InputFileName)&quot;"
+			Outputs="&quot;$(OutDir)\$(InputFileName)&quot;"
 			FileExtensions="*.wsf"
 			>
 		</CustomBuildRule>

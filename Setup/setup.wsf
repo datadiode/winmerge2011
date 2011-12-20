@@ -5,9 +5,9 @@ Option Explicit
 
 Dim cmd, arg, sh, senv, penv
 
-cmd = "mshta.exe """ & WScript.ScriptFullName & """"
+cmd = "mshta.exe """ & WScript.ScriptFullName & """ "
 For Each arg In WScript.arguments
-	cmd = cmd & " " & arg
+	cmd = cmd & "|" & arg
 Next
 
 Set sh = CreateObject("WScript.Shell")
@@ -36,7 +36,7 @@ End If
 <meta http-equiv='Content-Type' content='text/html; charset=ISO-8859-1'/>
 <hta:application
 	id='app'
-	version='XXXXX.2011.001.497'
+	version='XXXXX.2011.001.522'
 	applicationName='WinMerge &amp;version; Setup'
 	scroll='no'
 	singleInstance='yes'
@@ -251,14 +251,8 @@ version = Replace(version, "BUILD.", "")
 document.title = Replace(app.applicationName, "&version;", version)
 
 window.onload = GetRef("Job_Default")
-
-With New RegExp
-	.Pattern = "((\""[^\""]*\"")+|\S+)\s*"
-	.Global = True
-	Set argv = .Execute(app.commandLine)
-End With
-
-If argv.Count > 1 Then window.onload = GetRef("Job_" & Trim(argv(1)))
+argv = Split(app.commandLine, "|")
+If UBound(argv) > 0 Then window.onload = GetRef("Job_" & argv(1))
 
 Function TerminateWinMerge(ScriptName)
 	TerminateWinMerge = True
@@ -447,7 +441,7 @@ Sub Job_Version
 	content = Replace(content, "&major;", parts(1))
 	content = Replace(content, "&minor;", parts(2))
 	content = Replace(content, "&www;", parts(3))
-	path = Replace(argv(2), """", "")
+	path = argv(2)
 	If fso.OpenTextFile(path).ReadAll <> content Then
 		fso.CreateTextFile(path, True).Write content
 	End If
