@@ -46,49 +46,12 @@ public:
 		                                // (<> total of real lines after - total before  
 		                                //  as first/end line may be just truncated, not removed)
 
-public :
-	GhostUndoRecord () // default constructor
-		: UndoRecord()
-		, m_redo_ptStartPos_nGhost(0)
+public:
+	GhostUndoRecord() // default constructor
+		: m_redo_ptStartPos_nGhost(0)
 		, m_redo_ptEndPos_nGhost(0)
 		, m_nRealLinesCreated(0)
 		, m_nRealLinesInDeletedBlock(0)
-	{
-	}
-
-	GhostUndoRecord (const GhostUndoRecord & src) // copy constructor
-		: UndoRecord(src)
-	{
-		m_ptStartPos_nGhost = src.m_ptStartPos_nGhost;
-		m_ptEndPos_nGhost = src.m_ptEndPos_nGhost;
-		m_redo_ptStartPos = src.m_redo_ptStartPos;
-		m_redo_ptStartPos_nGhost = src.m_redo_ptStartPos_nGhost;
-		m_redo_ptEndPos = src.m_redo_ptEndPos;
-		m_redo_ptEndPos_nGhost = src.m_redo_ptEndPos_nGhost;
-		m_nRealLinesCreated = src.m_nRealLinesCreated;
-		m_nRealLinesInDeletedBlock = src.m_nRealLinesInDeletedBlock;
-	}
-
-	void Clone(const GhostUndoRecord &src)
-	{
-		UndoRecord::Clone(src);
-		m_ptStartPos_nGhost = src.m_ptStartPos_nGhost;
-		m_ptEndPos_nGhost = src.m_ptEndPos_nGhost;
-		m_redo_ptStartPos = src.m_redo_ptStartPos;
-		m_redo_ptStartPos_nGhost = src.m_redo_ptStartPos_nGhost;
-		m_redo_ptEndPos = src.m_redo_ptEndPos;
-		m_redo_ptEndPos_nGhost = src.m_redo_ptEndPos_nGhost;
-		m_nRealLinesCreated = src.m_nRealLinesCreated;
-		m_nRealLinesInDeletedBlock = src.m_nRealLinesInDeletedBlock;
-	}
-
-	GhostUndoRecord & operator=(const GhostUndoRecord & src) // copy assignment
-	{
-		Clone(src);
-		return *this;
-	}
-
-	~GhostUndoRecord () // destructor
 	{
 	}
 };
