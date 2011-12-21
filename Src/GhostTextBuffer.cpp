@@ -595,11 +595,6 @@ BOOL CGhostTextBuffer::InsertText(CCrystalTextView * pSource, int nLine,
 	if (!InternalInsertText(pSource, nLine, nPos, pszText, cchText, nEndLine, nEndChar))
 		return FALSE;
 	m_dwCurrentRevisionNumber++;
-	/*if (!CCrystalTextBuffer::InsertText(pSource, nLine, nPos, pszText,
-		cchText, nEndLine, nEndChar, nAction, FALSE))
-	{
-		return FALSE;
-	}*/
 
 	// set WinMerge flags
 	const DWORD bFirstLineGhost = GetLineFlags(nLine) & LF_GHOST;
@@ -734,11 +729,6 @@ BOOL CGhostTextBuffer::DeleteText(CCrystalTextView * pSource, int nStartLine,
 	if (!InternalDeleteText(pSource, nStartLine, nStartChar, nEndLine, nEndChar))
 	    return FALSE;
 	m_dwCurrentRevisionNumber++;
-	/*if (!CCrystalTextBuffer::DeleteText(pSource, nStartLine, nStartChar,
-		nEndLine, nEndChar, nAction, FALSE))
-	{
-		return FALSE;
-	}*/
 
 	OnNotifyLineHasBeenEdited(nStartLine);
 
