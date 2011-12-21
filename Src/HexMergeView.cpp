@@ -34,6 +34,7 @@
 #include "HexMergeView.h"
 #include "LanguageSelect.h"
 #include "OptionsDef.h"
+#include "paths.h"
 #include "Environment.h"
 
 #ifdef _DEBUG
@@ -290,7 +291,8 @@ HRESULT CHexMergeView::SaveFile(LPCTSTR path)
 	if (IsFileChangedOnDisk(path))
 	{
 		int response = LanguageSelect.FormatMessage(
-			IDS_FILECHANGED_ONDISK, path).MsgBox(MB_ICONWARNING | MB_YESNO);
+			IDS_FILECHANGED_ONDISK, paths_UndoMagic(&String(path).front())
+		).MsgBox(MB_ICONWARNING | MB_YESNO);
 		if (response == IDNO)
 			return S_OK;
 	}
