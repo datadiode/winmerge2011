@@ -1,29 +1,26 @@
-
 People who have contributed to WinMerge
 ---------------------------------------
 
-Original developer, project admin:
-* Dean Grimm <grimmdp@yahoo.com>
+Representatives of original WinMerge project on SourceForge:
+* Dean Grimm (Original Developer) <grimmdp@yahoo.com>
+* Christian List (Project Lead) <list1974@hotmail.com>
 
-Project lead:
-* Christian List <list1974@hotmail.com>
-
-Developers:
-* Denis Bradford <denisbradford@users.sourceforge.net>
-* Tim Gerundt <tim@gerundt.de>
-* Marcel Gosselin <marcelgosselin@users.sourceforge.net>
-* Gal Hammer <galh@users.sourceforge.net>
-* Takashi Sawanaka <sdottaka@users.sourceforge.net>
-* Alexander Skinner (Graphic Design) <neonapple@users.sourceforge.net>
-* Jochen Tucht <jtuc@users.sourceforge.net>
-* Kimmo Varis <kimmov@winmerge.org>
-
-Inactive/past developers:
-* Laurent Ganier
-* Dennis Limm
+Current and past members of WinMerge development staff:
 * Chris Mumford
+* Denis Bradford (Doc Writer) <denisbradford@users.sourceforge.net>
+* Dennis Limm
+* Gal Hammer <galh@users.sourceforge.net>
+* Tim Gerundt (Web Designer) <tim@gerundt.de>
+* Takashi Sawanaka <sdottaka@users.sourceforge.net>
+* Christian Blackburn (Installer)
+* Jochen Neubeck <jtuc@users.sourceforge.net>
+* Kimmo Varis <kimmov@winmerge.org>
+* Marcel Gosselin <marcelgosselin@users.sourceforge.net>
+* Alexander Skinner (Graphic Design) <neonapple@users.sourceforge.net>
+* Jan Hryz (Translator) <janhryz@users.sourceforge.net>
+* sf-mensch (Build Engineer)
+* Laurent Ganier
 * Perry Rapp
-* Christian "Seier" Blackburn (Installer)
 
 Localization:
 * Bulgarian:
@@ -202,9 +199,3 @@ Current or past versions of WinMerge include code from:
 * Andrei Stcherbatchenko (CrystalEditor)
 * Serge Baltic (SettingStore)
 * David Nash (Win32++, portions of which have made it into H2O)
-
-*** NOTE ***
-If your name is missing please email us at:
-winmerge-support@lists.sourceforge.net
-
-Thanks!
