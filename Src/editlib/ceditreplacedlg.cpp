@@ -190,7 +190,11 @@ BOOL CEditReplaceDlg::DoHighlightText(BOOL bNotifyIfNotFound)
 	if (m_bWholeWord)
 		dwSearchFlags |= FIND_WHOLE_WORD;
 	if (m_bRegExp)
+	{
 		dwSearchFlags |= FIND_REGEXP;
+		if (m_sText[0] == _T('^'))
+			m_ptFoundAt.x = 0;
+	}
 
 	BOOL bFound;
 	if (m_nScope == 0)
@@ -199,15 +203,10 @@ BOOL CEditReplaceDlg::DoHighlightText(BOOL bNotifyIfNotFound)
 		bFound = m_pBuddy->FindTextInBlock(m_sText.c_str(), m_ptFoundAt,
 			m_ptBlockBegin, m_ptBlockEnd, dwSearchFlags, FALSE, &m_ptFoundAt);
 	}
-	else if (m_bNoWrap)
-	{
-		// Searching whole text, no wrap
-		bFound = m_pBuddy->FindText(m_sText.c_str(), m_ptFoundAt, dwSearchFlags, FALSE, &m_ptFoundAt);
-	}
 	else
 	{
-		// Searching whole text, wrap
-		bFound = m_pBuddy->FindText(m_sText.c_str(), m_ptFoundAt, dwSearchFlags, TRUE, &m_ptFoundAt);
+		// Searching whole text, (no) wrap
+		bFound = m_pBuddy->FindText(m_sText.c_str(), m_ptFoundAt, dwSearchFlags, !m_bNoWrap, &m_ptFoundAt);
 	}
 
 	if (!bFound)
@@ -232,7 +231,7 @@ void CEditReplaceDlg::OnEditSkip()
 	if (!m_bFound)
 	{
 		m_ptFoundAt = m_ptCurrentPos;
-		m_bFound = DoHighlightText ( TRUE );
+		m_bFound = DoHighlightText(TRUE);
 		SetDefID(m_bFound ? IDC_EDIT_REPLACE : IDC_EDIT_SKIP);
 		return;
 	}
@@ -263,7 +262,7 @@ void CEditReplaceDlg::OnEditReplace()
 	if (!m_bFound)
 	{
 		m_ptFoundAt = m_ptCurrentPos;
-		m_bFound = DoHighlightText ( TRUE );
+		m_bFound = DoHighlightText(TRUE);
 		SetDefID(m_bFound ? IDC_EDIT_REPLACE : IDC_EDIT_SKIP);
 		return;
 	}
@@ -324,7 +323,7 @@ void CEditReplaceDlg::OnEditReplaceAll()
 	if (!m_bFound)
 	{
 		m_ptFoundAt = m_ptCurrentPos;
-		m_bFound = DoHighlightText ( FALSE );
+		m_bFound = DoHighlightText(FALSE);
 	}
 
 	POINT m_ptFirstFound = m_ptFoundAt;
@@ -338,14 +337,15 @@ void CEditReplaceDlg::OnEditReplaceAll()
 			dwSearchFlags |= FIND_WHOLE_WORD;
 		if (m_bRegExp)
 			dwSearchFlags |= FIND_REGEXP;
-    
+
 		//  We have highlighted text
+		m_pBuddy->m_nLastReplaceLen = 0;
 		VERIFY(m_pBuddy->ReplaceSelection(m_sNewText.c_str(), m_sNewText.size(), dwSearchFlags));
 		nNumReplaced++;
 
 		//  Manually recalculate points
 		if (m_bEnableScopeSelection)
-        {
+		{
 			if (m_ptBlockBegin.y == m_ptFoundAt.y && m_ptBlockBegin.x > m_ptFoundAt.x)
 			{
 				m_ptBlockBegin.x -= m_pBuddy->m_nLastFindWhatLen;
@@ -356,7 +356,7 @@ void CEditReplaceDlg::OnEditReplaceAll()
 				m_ptBlockEnd.x -= m_pBuddy->m_nLastFindWhatLen;
 				m_ptBlockEnd.x += m_pBuddy->m_nLastReplaceLen;
 			}
-        }
+		}
 		// recalculate m_ptFirstFound
 		if (m_ptFirstFound.y == m_ptFoundAt.y && m_ptFirstFound.x > m_ptFoundAt.x)
 		{
@@ -373,24 +373,32 @@ void CEditReplaceDlg::OnEditReplaceAll()
 		// (1) One is the position of the word that was found.
 		// (2) The other is next position to search.
 		// The code below calculates the latter.
-		if (m_pBuddy->m_nLastFindWhatLen)
+		if (m_pBuddy->m_nLastFindWhatLen || m_pBuddy->m_nLastReplaceLen)
 		{
 			m_ptFoundAt.x += m_pBuddy->m_nLastReplaceLen;
-			m_ptFoundAt = m_pBuddy->GetCursorPos ();
+			if (m_pBuddy->m_nLastFindWhatLen)
+			{
+				m_ptFoundAt = m_pBuddy->GetCursorPos();
+			}
+			else
+			{
+				m_ptFoundAt.x = 0;
+				m_ptFoundAt.y++;
+			}
 		}
-        else if (m_ptFoundAt.y + 1 < m_pBuddy->GetLineCount ())
+		else if (m_ptFoundAt.y + 1 < m_pBuddy->GetLineCount())
 		{
 			m_ptFoundAt.x = 0;
 			m_ptFoundAt.y++;
 		}
-        else
+		else
 		{
 			m_bFound = FALSE;
 			break;
 		}
 
 		// find the next instance
-		m_bFound = DoHighlightText ( FALSE );
+		m_bFound = DoHighlightText(FALSE);
 
 		// detect if we just wrapped at end of file
 		if (m_ptFoundAt.y < m_ptCurrentReplacedEnd.y ||
@@ -410,7 +418,7 @@ void CEditReplaceDlg::OnEditReplaceAll()
 				break;
 			}
 		}
-    }
+	}
 	// Let user know how many strings were replaced
 	LanguageSelect.FormatMessage(
 		IDS_NUM_REPLACED, NumToStr(nNumReplaced).c_str()
