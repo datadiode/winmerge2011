@@ -855,7 +855,7 @@ bool CChildFrame::ListCopy(int srcPane, int dstPane, int nDiff /* = -1*/,
 
 		String strLine;
 		// copy the selected text over
-		for (int i = cd_dbegin ; i <= cd_dend ; ++i)
+		for (int i = cd_dend ; i >= cd_dbegin ; --i)
 		{
 			// text exists on other side, so just replace
 			sbuf->GetFullLine(i, strLine);

@@ -274,7 +274,7 @@ BOOL CGhostTextBuffer::Undo(CCrystalTextView *pSource, POINT &ptCursorPos)
 				InsertGhostLine (pSource, apparent_ptStartPos.y);
 				// and recompute apparent_ptEndPos
 				apparent_ptEndPos.y = ComputeApparentLine (ur.m_ptEndPos.y, ur.m_ptEndPos_nGhost);
-			} 
+			}
 
 		// EndPos defined only for UNDO_INSERT (when we delete)
 		if (ur.m_dwFlags & UNDO_INSERT && ur.m_ptEndPos_nGhost > 0)
@@ -333,9 +333,17 @@ BOOL CGhostTextBuffer::Undo(CCrystalTextView *pSource, POINT &ptCursorPos)
 
 			OnNotifyLineHasBeenEdited(apparent_ptStartPos.y);
 
+			LineInfo &li = m_aLines[apparent_ptStartPos.y];
 			// default : the remaining line inherits the status of the last line of the deleted block
-			SetLineFlag(apparent_ptStartPos.y, LF_GHOST, bLastLineGhost, FALSE, FALSE);
-
+			if (bLastLineGhost)
+			{
+				li.m_dwFlags |= LF_GHOST;
+				li.m_nSkippedLines = 0;
+			}
+			else
+			{
+				li.m_dwFlags &= ~LF_GHOST;
+			}
 			// the number of real lines must be the same before the action and after undo
 			int nNumberDeletedRealLines = ur.m_ptEndPos.y - ur.m_ptStartPos.y;
 			if (nNumberDeletedRealLines == ur.m_nRealLinesCreated)
@@ -343,7 +351,6 @@ BOOL CGhostTextBuffer::Undo(CCrystalTextView *pSource, POINT &ptCursorPos)
 			else if (nNumberDeletedRealLines == ur.m_nRealLinesCreated-1)
 			{
 				// we inserted in a ghost line (which then became real), we must send it back to its world
-				LineInfo &li = m_aLines[apparent_ptStartPos.y];
 				li.m_dwFlags |= LF_GHOST;
 				li.m_nSkippedLines = 0;
 			}
@@ -737,13 +744,24 @@ BOOL CGhostTextBuffer::DeleteText(CCrystalTextView * pSource, int nStartLine,
 
 	// update line revision numbers of modified lines
 	m_dwCurrentRevisionNumber++;
+
+	LineInfo &li = m_aLines[nStartLine];
+
 	if (nStartChar != 0 || nEndChar != 0)
-		m_aLines[nStartLine].m_dwRevisionNumber = m_dwCurrentRevisionNumber;
+		li.m_dwRevisionNumber = m_dwCurrentRevisionNumber;
 
 	// the first line inherits the status of the last one 
 	// but exception... if the last line is a ghost, we preserve the status of the first line
 	// (then if we use backspace in a ghost line, we don't delete the previous line)
-	SetLineFlag(nStartLine, LF_GHOST, bLastLineGhost && bFirstLineGhost, FALSE, FALSE);
+	if (bLastLineGhost && bFirstLineGhost)
+	{
+		li.m_dwFlags |= LF_GHOST;
+		li.m_nSkippedLines = 0;
+	}
+	else
+	{
+		li.m_dwFlags &= ~LF_GHOST;
+	}
 
 	// now we can recompute
 	if (nStartLine != nEndLine)
