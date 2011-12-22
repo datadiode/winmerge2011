@@ -1,8 +1,3 @@
-////////////////////////////////////////////////////////////////////////////
-//  File:       GhostTextBuffer.cpp
-//  Version:    1.0.0.0
-//  Created:    31-Jul-2003
-//
 /////////////////////////////////////////////////////////////////////////////
 //    WinMerge:  an interactive diff/merge utility
 //    Copyright (C) 1997-2000  Thingamahoochie Software
@@ -346,15 +341,19 @@ BOOL CGhostTextBuffer::Undo(CCrystalTextView *pSource, POINT &ptCursorPos)
 			if (nNumberDeletedRealLines == ur.m_nRealLinesCreated)
 				;
 			else if (nNumberDeletedRealLines == ur.m_nRealLinesCreated-1)
+			{
 				// we inserted in a ghost line (which then became real), we must send it back to its world
-				SetLineFlag(apparent_ptStartPos.y, LF_GHOST, TRUE, FALSE, FALSE);
+				LineInfo &li = m_aLines[apparent_ptStartPos.y];
+				li.m_dwFlags |= LF_GHOST;
+				li.m_nSkippedLines = 0;
+			}
 			else
 				ASSERT(0);
 
 			// it is not easy to know when Recompute so we do it always
 			RecomputeRealityMapping();
 
-			RecomputeEOL (pSource, apparent_ptStartPos.y, apparent_ptStartPos.y);
+			RecomputeEOL(pSource, apparent_ptStartPos.y, apparent_ptStartPos.y);
 		}
 		else
 		{
@@ -380,18 +379,22 @@ BOOL CGhostTextBuffer::Undo(CCrystalTextView *pSource, POINT &ptCursorPos)
 			// there may be more lines (difficult to explain) then they must be ghost
 			for (i = apparent_ptStartPos.y ; i < apparent_ptStartPos.y + ur.m_nRealLinesInDeletedBlock ; i++)
 				SetLineFlag (i, LF_GHOST, FALSE, FALSE, FALSE);
-			for (   ; i <= nEndLine ; i++)
-				SetLineFlag (i, LF_GHOST, TRUE, FALSE, FALSE);
+			for ( ; i <= nEndLine ; i++)
+			{
+				LineInfo &li = m_aLines[i];
+				li.m_dwFlags |= LF_GHOST;
+				li.m_nSkippedLines = 0;
+			}
 
 			// it is not easy to know when Recompute so we do it always
 			RecomputeRealityMapping();
 
-			RecomputeEOL (pSource, apparent_ptStartPos.y, nEndLine);
+			RecomputeEOL(pSource, apparent_ptStartPos.y, nEndLine);
 		}
 
 		// store infos for redo
 		ur.m_redo_ptStartPos.x = apparent_ptStartPos.x;
-		ur.m_redo_ptStartPos.y = ComputeRealLineAndGhostAdjustment( apparent_ptStartPos.y, ur.m_redo_ptStartPos_nGhost);
+		ur.m_redo_ptStartPos.y = ComputeRealLineAndGhostAdjustment(apparent_ptStartPos.y, ur.m_redo_ptStartPos_nGhost);
 		if (ur.m_dwFlags & UNDO_INSERT)
 		{
 			ur.m_redo_ptEndPos.x = -1;
@@ -400,7 +403,7 @@ BOOL CGhostTextBuffer::Undo(CCrystalTextView *pSource, POINT &ptCursorPos)
 		else
 		{
 			ur.m_redo_ptEndPos.x = m_ptLastChange.x;
-			ur.m_redo_ptEndPos.y = ComputeRealLineAndGhostAdjustment (m_ptLastChange.y, ur.m_redo_ptEndPos_nGhost);
+			ur.m_redo_ptEndPos.y = ComputeRealLineAndGhostAdjustment(m_ptLastChange.y, ur.m_redo_ptEndPos_nGhost);
 		}
 
 		// restore line revision numbers
