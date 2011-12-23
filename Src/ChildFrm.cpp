@@ -855,10 +855,10 @@ void CChildFrame::CreateClient()
 {
 	m_wndLocationBar.SubclassWindow(HWindow::CreateEx(
 		0, WinMergeWindowClass, NULL, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
-		0, 0, 44, 10, m_pWnd, ID_VIEW_LOCATION_BAR));
+		0, 0, 24, 10, m_pWnd, ID_VIEW_LOCATION_BAR));
 	m_wndLocationView.SubclassWindow(HWindow::CreateEx(
 		WS_EX_CLIENTEDGE, WinMergeWindowClass, NULL, WS_CHILD | WS_VISIBLE,
-		0, 0, 40, 10, m_wndLocationBar.m_pWnd, 152, NULL));
+		0, 0, 20, 10, m_wndLocationBar.m_pWnd, 152, NULL));
 
 	m_wndDiffViewBar.SubclassWindow(HWindow::CreateEx(
 		0, WinMergeWindowClass, NULL, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,

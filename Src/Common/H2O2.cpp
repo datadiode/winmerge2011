@@ -289,7 +289,7 @@ OPropertySheet::OPropertySheet()
 {
 	ZeroMemory(&m_psh, sizeof m_psh);
 	m_psh.dwSize = sizeof m_psh;
-	m_psh.dwFlags = PSH_PROPSHEETPAGE | PSH_PROPTITLE | PSH_USECALLBACK;
+	m_psh.dwFlags = PSH_PROPSHEETPAGE | PSH_USECALLBACK;
 	m_psh.pfnCallback = PropSheetProc;
 }
 
