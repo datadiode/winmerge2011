@@ -2061,24 +2061,51 @@ bool CMainFrame::PrepareForClosing()
  */
 void CMainFrame::addToMru(LPCTSTR szItem, LPCTSTR szRegSubKey, UINT nMaxItems)
 {
-	UINT cnt = SettingStore.GetProfileInt(szRegSubKey, _T("Count"), 0) + 1;
-	if (cnt > nMaxItems)
-		cnt = nMaxItems;
-	// move items down a step
-	for (UINT i = cnt ; i != 0 ; --i)
+	if (HKEY hKey = SettingStore.GetSectionKey(szRegSubKey))
 	{
-		TCHAR s2[20];
-		wsprintf(s2, _T("Item_%d"), i - 1);
-		String s = SettingStore.GetProfileString(szRegSubKey, s2);
-		wsprintf(s2, _T("Item_%d"), i);
-		SettingStore.WriteProfileString(szRegSubKey, s2, s.c_str());
+		DWORD n = 0;
+		DWORD bufsize = 0;
+		RegQueryInfoKey(hKey, NULL, NULL, NULL, NULL, NULL, NULL, &n, NULL, &bufsize, NULL, NULL);
+		if (n > nMaxItems)
+			n = nMaxItems;
+		TCHAR *const s = reinterpret_cast<TCHAR *>(_alloca(bufsize));
+		String strItem = szItem;
+		szItem = paths_UndoMagic(&strItem.front());
+		UINT i = n;
+		// if item is already in MRU, exclude subsequent items from rotation
+		while (i != 0)
+		{
+			TCHAR name[20];
+			wsprintf(name, _T("Item_%d"), --i);
+			DWORD cb = bufsize;
+			DWORD type = REG_NONE;
+			if (RegQueryValueEx(hKey, name, NULL, &type,
+				reinterpret_cast<BYTE *>(s), &cb) == ERROR_SUCCESS &&
+				_tcscmp(s, szItem) == 0)
+			{
+				n = i;
+			}
+		}
+		// move items down a step
+		for (i = n ; i != 0 ; --i)
+		{
+			TCHAR name[20];
+			wsprintf(name, _T("Item_%d"), i - 1);
+			DWORD cb = bufsize;
+			DWORD type = REG_NONE;
+			if (RegQueryValueEx(hKey, name, NULL, &type,
+				reinterpret_cast<BYTE *>(s), &cb) == ERROR_SUCCESS)
+			{
+				wsprintf(name, _T("Item_%d"), i);
+				RegSetValueEx(hKey, name, 0L, REG_SZ,
+					reinterpret_cast<const BYTE *>(s), cb);
+			}
+		}
+		// add most recent item
+		RegSetValueEx(hKey, _T("Item_0"), 0L, REG_SZ,
+			reinterpret_cast<const BYTE *>(szItem),
+			(_tcslen(szItem) + 1) * sizeof(TCHAR));
 	}
-	// add most recent item
-	String strItem = szItem;
-	szItem = paths_UndoMagic(&strItem.front());
-	SettingStore.WriteProfileString(szRegSubKey, _T("Item_0"), szItem);
-	// update count
-	SettingStore.WriteProfileInt(szRegSubKey, _T("Count"), cnt);
 }
 
 /**

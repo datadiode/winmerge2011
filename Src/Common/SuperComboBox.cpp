@@ -113,14 +113,14 @@ void HSuperComboBox::SaveState(LPCTSTR szRegSubKey, UINT nMaxItems)
 		for (;;)
 		{
 			s = string_trim_ws(s);
-			if (s != strItem && !s.empty())
+			if (s != strItem)
 			{
 				TCHAR name[20];
 				wsprintf(name, _T("Item_%d"), j++);
 				RegSetValueEx(hKey, name, 0L, REG_SZ,
 					reinterpret_cast<const BYTE *>(s.c_str()),
 					(s.length() + 1) * sizeof(TCHAR));
-				strItem.swap(s);
+				GetWindowText(strItem);
 			}
 			if (i >= n || j >= nMaxItems)
 				break;
