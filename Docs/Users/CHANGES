@@ -1,3 +1,22 @@
+2011.001.527
+Changes since preceding release (not necessarily complete):
+• Fix occasional out-of-bound array accesses after line deletions
+• ShellExtension got easily confused by leftovers from previous invocation
+• Fix F4 Navigation between line diffs for diff detail views
+• File/folder selection controls were at times showing a wrong icon
+• Number of replacements reported by replace dialog could be off by 1
+• Fix issue #1: Can't expand Open File Dialog
+• A space in the directory path was breaking the build process
+• File transform scriptlet to add line numbers
+• Fix issue #2: Scrolling by mouse wheel stops in middle of file
+• Line revision numbers got lost when growing the undo stack
+• Fix wrap at EOF logic for find/replace with an RE that matches BOL or EOL
+• Undoing an insertion into a ghost line went wrong
+• Fix enabling of Compare command when comparing a folder to itself
+• LineDiffs logic was mistreating the line endings
+• Fix MRU list issues
+• Add a compiled help (CHM) file
+
 0.2011.001.497 beta
 Changes since preceding release (not necessarily complete):
 • File transform scriptlet to drive xdoc2txt (http://shortlinks.de/4u23)

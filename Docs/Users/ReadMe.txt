@@ -9,14 +9,10 @@ WinMerge has many helpful supporting features to make comparing, synchronising,
 and merging as easy and useful as possible. Several programming languages and
 other file formats are syntax-highlighted.
 
-The latest WinMerge version and WinMerge information is available at
-http://winmerge.org/.
-
 Quick start
 ===========
 To learn how to perform basic operations after installing WinMerge, click
-Help>WinMerge Help and navigate to the Quick start topic.  Or, go to the Web
-version at http://winmerge.org/docs/manual/QuickStart.html.
+Help>WinMerge Help and navigate to the Quick start topic.
 
 WinMerge Help
 ============= 
@@ -24,9 +20,6 @@ WinMerge Help is installed locally as a Microsoft HTML Help file, WinMerge.chm,
 when you install WinMerge. To open Help, click Help>WinMerge Help or press F1 in
 the WinMerge window. On the command line, run the WinMerge executable with the 
 /? help switch.
-
-You can also browse the HTML version of WinMerge Help at 
-http://winmerge.org/docs/manual/.
 
 Archive Support
 ===============
@@ -49,9 +42,8 @@ for WinMerge development issues.
 
 Bugs and feature requests
 =========================
-If an issue is not resolved in the the WinMerge forums, check the project
-trackers: go to http://project.winmerge.org/, and click a link in the Trackers
-menu, like Bugs and Feature Requests, where you can browse or submit items.
+If an issue is not resolved in the the WinMerge forums, check the issue tracker
+at https://bitbucket.org/jtuc/winmerge2011/issues.
 
 If you submit a bug, please include the WinMerge version number in your
 report. You can generate a configuration log by clicking Help>Configuration.

@@ -17,26 +17,18 @@ li
 </style>
 </head>
 <body>
-<h2>WinMerge 0.2011.001.497 Release Notes</h2>
+<h2>WinMerge 2011.001.527 Release Notes</h2>
 <p>
-This is intended to be the last beta before going stable.
+This is the first stable release of WinMerge 2011.
+It fixes a number of bugs and regressions that have been found in the last beta,
+and finally includes a compiled help file created from a revised version of the
+WinMerge&#160;2 DocBook sources. If you have worked with WinMerge&#160;2, and
+want to learn about the most relevant differences, section <i>File transforms</i>
+and the <i>Frequently asked questions</i> 3.6 and 7.2 are of particular interest.
 <p>
-A big win is <a target='_new' href='http://www31.ocn.ne.jp/~h_ishida/xdoc2txt.html'>xdoc2txt</a>, which enables WinMerge to compare the textual content of a large variety of office-type documents.
-Thanks to cecilyen for suggesting it in WinMerge Open Discussion forum.
-<p>
-The <a target='_new' href='http://mediainfo.sourceforge.net'>MediaInfo</a> file transform scriptlet was already present in the preceding release,
-but has been revised to use an environment variable to locate the MediaInfo.exe.
-<p>
-Steps to get xdoc2txt and MediaInfo operational:
-<ul>
-<li>Obtain a copy of <a target='_new' href='http://www31.ocn.ne.jp/~h_ishida/xdoc2txt.html#download'>d2txt*.zip</a>, and extract it into a folder of your choice.
-<li>Start WinMerge, invoke <i>Edit &rarr; Options</i> from the menu, go to page <i>System</i>, and look for the <i>Supple<u>m</u>ent folder</i>.
-	In this folder, look for a file named <i>Supplement.ini</i>. In section <i>Environment</i>, edit item <i>xdoc2txt</i> to reflect the folder
-	where the xdoc2txt.exe resides.
-<li>Do likewise to tell WinMerge where to find the command line version of <a target='_new' href='http://mediainfo.sourceforge.net/en/Download/Windows'>MediaInfo</a>.
-	Be sure to obtain the CLI version, not the GUI one.
-</ul>
-<p>
-Another new feature that has long been on my mind is archive vs. folder compare.
+WinMerge&#160;2011 still lacks an equivalent for WinMerge&#160;2's prediffer plugins.
+My vague plan with this is to provide line filters with knowledge of both side's content.
+This would kind of demand a bit more expressive power than regular expressions can offer,
+but JavaScript/VBScript are good options.
 <p>
 <i>Jochen Neubeck, December 2011</i>
