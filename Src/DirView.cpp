@@ -2375,7 +2375,17 @@ void CDirView::OnUpdateStatusNum()
 		if (!IsItemOpenable(di))
 			items = 0;
 	}
-	pMDIFrame->UpdateCmdUI<ID_MERGE_COMPARE>(items == 1 ? MF_ENABLED : MF_GRAYED);
+
+	int sel1, sel2;
+	GetSelectedItems(&sel1, &sel2);
+	pMDIFrame->UpdateCmdUI<ID_MERGE_COMPARE>
+	(
+		GetSelectedItems(&sel1, &sel2)
+	&&	(
+			sel2 == -1 && IsItemOpenable(GetDiffItem(sel1))
+		||	AreItemsOpenable(GetDiffItem(sel1), GetDiffItem(sel2))
+		) ? MF_ENABLED : MF_GRAYED
+	);
 
 	int count = GetItemCount();
 	int focusItem = GetFocusedItem();
