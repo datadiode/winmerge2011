@@ -1012,14 +1012,13 @@ bool CDirView::CreateFoldersPair(DIFFITEM & di, bool side1, String &newFolder)
 		basedir = GetDocument()->GetLeftBasePath();
 		basedir = di.GetRightFilepath(basedir);
 	}
-	String createpath = paths_ConcatPath(basedir, subdir);
-	newFolder = createpath;
+	newFolder = paths_ConcatPath(basedir, subdir);
 
 	int response = LanguageSelect.FormatMessage(
-		IDS_CREATE_PAIR_FOLDER, createpath.c_str()
+		IDS_CREATE_PAIR_FOLDER, paths_UndoMagic(&String(newFolder).front())
 	).MsgBox(MB_YESNO | MB_ICONWARNING);
 
-	return (response == IDYES) && paths_CreateIfNeeded(createpath.c_str());
+	return response == IDYES && paths_CreateIfNeeded(newFolder.c_str());
 }
 
 /**
