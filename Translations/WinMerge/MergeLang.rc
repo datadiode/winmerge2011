@@ -728,7 +728,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 1
     RTEXT           "Merge.rc:728", IDC_STATIC, 11, 26, 56, 8, SS_RIGHT
     ICON            "", IDC_STAT_INOTEQUAL, 131, 24, 16, 16, SS_ICON
     RTEXT           "Static", IDC_STAT_DIFFFILE, 146, 25, 38, 10, SS_RIGHT | SS_SUNKEN
-    RTEXT           "Merge.rc:731", IDC_STATIC, 10, 40, 56, 8, SS_RIGHT
+    RTEXT           "Merge.rc:731", IDC_STATIC, 11, 40, 56, 8, SS_RIGHT
     ICON            "", IDC_STAT_IDIFFBINFILE, 131, 37, 16, 16, SS_ICON
     RTEXT           "Static", IDC_STAT_DIFFBINARY, 146, 38, 38, 10, SS_RIGHT | SS_SUNKEN
     GROUPBOX        "Merge.rc:734", IDC_STATIC, 7, 55, 186, 40
@@ -747,11 +747,11 @@ FONT 8, "MS Shell Dlg", 0, 0, 1
     RTEXT           "Static", IDC_STAT_IDENTICFOLDER, 86, 103, 38, 10, SS_RIGHT | SS_SUNKEN
     ICON            "", IDC_STAT_IEQUALFILE, 131, 102, 16, 16, SS_ICON
     RTEXT           "Static", IDC_STAT_IDENTICFILE, 146, 103, 38, 10, SS_RIGHT | SS_SUNKEN
-    RTEXT           "Merge.rc:750", IDC_STATIC, 10, 117, 56, 8, SS_RIGHT
+    RTEXT           "Merge.rc:750", IDC_STATIC, 11, 117, 56, 8, SS_RIGHT
     ICON            "", IDC_STAT_IEQUALBINFILE, 131, 115, 16, 16, SS_ICON
     RTEXT           "Static", IDC_STAT_IDENTICBINARY, 146, 116, 38, 10, SS_RIGHT | SS_SUNKEN
     CONTROL         "", IDC_STATIC, WC_STATIC, SS_ETCHEDHORZ, 7, 136, 186, 1
-    RTEXT           "Merge.rc:754", IDC_STATIC, 13, 142, 56, 8, SS_RIGHT
+    RTEXT           "Merge.rc:754", IDC_STATIC, 11, 142, 56, 8, SS_RIGHT
     ICON            "", IDC_STAT_ITOTALFOLDERS, 72, 140, 16, 16, SS_ICON
     RTEXT           "Static", IDC_STAT_TOTALFOLDER, 86, 141, 38, 10, SS_RIGHT | SS_SUNKEN
     ICON            "", IDC_STAT_ITOTALFILES, 131, 140, 16, 16, SS_ICON
