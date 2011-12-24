@@ -3131,8 +3131,8 @@ void CMainFrame::OnSaveProject()
  */
 void CMainFrame::StartFlashing()
 {
-	HWND activeWindow = ::GetActiveWindow();
-	if (activeWindow != m_hWnd)
+	HWindow *const activeWindow = HWindow::GetActiveWindow();
+	if (activeWindow != GetLastActivePopup())
 	{
 		FlashWindow(TRUE);
 		m_bFlashing = true;
