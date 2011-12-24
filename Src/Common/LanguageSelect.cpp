@@ -952,6 +952,7 @@ void CLanguageSelect::TranslateMenu(HMENU h) const
 	DebugMenu = true;
 #endif
 	int i = ::GetMenuItemCount(h);
+	DWORD fMask = MIIM_BITMAP | MIIM_DATA;
 	while (i > 0)
 	{
 		--i;
@@ -976,7 +977,7 @@ void CLanguageSelect::TranslateMenu(HMENU h) const
 			mii.wID = reinterpret_cast<UINT>(mii.hSubMenu);
 		}
 		// Prevent some menues which happen to lack a bitmap from rendering differently
-		mii.fMask = MIIM_BITMAP | MIIM_DATA;
+		mii.fMask = fMask;
 		mii.hbmpItem = HBMMENU_CALLBACK;
 		mii.dwItemData = ~0U;
 		String s;
@@ -986,6 +987,7 @@ void CLanguageSelect::TranslateMenu(HMENU h) const
 			mii.dwTypeData = const_cast<LPTSTR>(s.c_str());
 		}
 		::SetMenuItemInfo(h, i, TRUE, &mii);
+		fMask = MIIM_DATA;
 	}
 }
 

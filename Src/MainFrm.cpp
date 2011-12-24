@@ -688,9 +688,10 @@ LRESULT CMainFrame::OnWndMsg<WM_MEASUREITEM>(WPARAM, LPARAM lParam)
 		}
 		return 0;
 	}
+	lpmis->itemWidth += 5;
 	if (lpmis->itemData != ~0)
 	{
-		lpmis->itemWidth += GetMenuBitmapExcessWidth() + 5;
+		lpmis->itemWidth += GetMenuBitmapExcessWidth();
 		if (lpmis->itemHeight < 16)
 			lpmis->itemHeight = 16;
 	}
