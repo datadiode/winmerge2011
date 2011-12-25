@@ -4,6 +4,7 @@ Changes since preceding release (not necessarily complete):
 • ShellExtension got easily confused by leftovers from previous invocation
 • Fix F4 Navigation between line diffs for diff detail views
 • File/folder selection controls were at times showing a wrong icon
+• The menu bar was misaligning accelerator key underlines on Vista
 • Number of replacements reported by replace dialog could be off by 1
 • Fix issue #1: Can't expand Open File Dialog
 • A space in the directory path was breaking the build process
