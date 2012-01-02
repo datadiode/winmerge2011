@@ -303,9 +303,8 @@ Sub RegisterShellExtension(flags)
 	Select Case sha.GetSystemInformation("ProcessorArchitecture")
 	Case PROCESSOR_ARCHITECTURE_IA64, PROCESSOR_ARCHITECTURE_AMD64
 		sha.ShellExecute "RegSvr32.exe", flags & """" & sProgFolder & "\ShellExtensionX64.dll""", "", verb
-	Case Else
-		sha.ShellExecute "RegSvr32.exe", flags & """" & sProgFolder & "\ShellExtensionU.dll""", "", verb
 	End Select
+	sha.ShellExecute "RegSvr32.exe", flags & """" & sProgFolder & "\ShellExtensionU.dll""", "", verb
 End Sub
 
 Sub CreateLink(ByVal sPath)
