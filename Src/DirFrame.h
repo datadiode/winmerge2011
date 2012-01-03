@@ -105,7 +105,7 @@ public:
 	void SetDiffSide(UINT diffcode, int idx);
 	void SetDiffCompare(UINT diffcode, int idx);
 	void UpdateStatusFromDisk(UINT_PTR diffPos, BOOL bLeft, BOOL bRight);
-	void ReloadItemStatus(UINT nIdx, BOOL bLeft, BOOL bRight);
+	void ReloadItemStatus(UINT_PTR diffPos, BOOL bLeft, BOOL bRight);
 	void Redisplay();
 	void AddMergeDoc(CChildFrame *);
 	void AddMergeDoc(CHexMergeFrame *);

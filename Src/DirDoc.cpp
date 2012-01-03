@@ -349,23 +349,23 @@ void CDirFrame::UpdateStatusFromDisk(UINT_PTR diffPos, BOOL bLeft, BOOL bRight)
 
 /**
  * @brief Update in-memory diffitem status from disk and update view.
- * @param [in] nIdx Index of item in UI list.
+ * @param [in] diffPos POSITION of item in UI list.
  * @param [in] bLeft If TRUE left-side item is updated.
  * @param [in] bRight If TRUE right-side item is updated.
  * @note Do not call this function from DirView code! This function
  * calls slow DirView functions to get item position and to update GUI.
  * Use UpdateStatusFromDisk() function instead.
  */
-void CDirFrame::ReloadItemStatus(UINT nIdx, BOOL bLeft, BOOL bRight)
+void CDirFrame::ReloadItemStatus(UINT_PTR diffPos, BOOL bLeft, BOOL bRight)
 {
-	// Get position of item in DiffContext
-	UINT_PTR diffpos = m_pDirView->GetItemKey(nIdx);
-
 	// in case just copied (into existence) or modified
-	UpdateStatusFromDisk(diffpos, bLeft, bRight);
-
-	// Update view
-	m_pDirView->UpdateDiffItemStatus(nIdx);
+	UpdateStatusFromDisk(diffPos, bLeft, bRight);
+	int nIdx = m_pDirView->GetItemIndex(diffPos);
+	if (nIdx != -1)
+	{
+		// Update view
+		m_pDirView->UpdateDiffItemStatus(nIdx);
+	}
 }
 
 /**
@@ -535,10 +535,9 @@ void CDirFrame::UpdateChangedItem(const CChildFrame *pMergeDoc)
 	// so there really is not status to update.
 	if (pos)
 	{
-		int ind = m_pDirView->GetItemIndex(pos);
-		ReloadItemStatus(ind, TRUE, TRUE);
+		ReloadItemStatus(pos, TRUE, TRUE);
 
-		DIFFITEM &di = m_pDirView->GetItemAt(ind);
+		DIFFITEM &di = m_pCtxt->GetDiffRefAt(pos);
 
 		di.nsdiffs = pMergeDoc->m_diffList.GetSignificantDiffs();
 		di.nidiffs = pMergeDoc->m_nTrivialDiffs;
