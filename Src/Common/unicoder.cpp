@@ -568,41 +568,45 @@ UNICODESET DetermineEncoding(unsigned char *pBuffer, size_t size, size_t *pBom)
 		return NONE;
 	// check for UCS2 the two possible 2 bytes signatures
 	size_t bufSize = min<size_t>(size, 8 * 1024);
-	int icheck = IS_TEXT_UNICODE_NOT_UNICODE_MASK ^
-		IS_TEXT_UNICODE_UNICODE_MASK ^ IS_TEXT_UNICODE_CONTROLS ^
-		IS_TEXT_UNICODE_REVERSE_MASK ^ IS_TEXT_UNICODE_REVERSE_CONTROLS;
-	IsTextUnicode(pBuffer, bufSize, &icheck);
-	if ((
-			icheck &
-			(
-				IS_TEXT_UNICODE_UNICODE_MASK ^
-				IS_TEXT_UNICODE_REVERSE_MASK ^
-				IS_TEXT_UNICODE_SIGNATURE ^
-				IS_TEXT_UNICODE_REVERSE_SIGNATURE
-			)
-		) > (icheck & IS_TEXT_UNICODE_NOT_UNICODE_MASK)
-	||	CoincidenceOf
-		(
-			icheck &
-			(
-				IS_TEXT_UNICODE_SIGNATURE |
-				IS_TEXT_UNICODE_STATISTICS
-			)
-		)
-	||	CoincidenceOf
-		(
-			icheck &
-			(
-				IS_TEXT_UNICODE_REVERSE_SIGNATURE |
-				IS_TEXT_UNICODE_REVERSE_STATISTICS
-			)
-		))
+	if (memchr(pBuffer, 0, bufSize))
 	{
-		*pBom = icheck &
-		(
-			IS_TEXT_UNICODE_SIGNATURE | IS_TEXT_UNICODE_REVERSE_SIGNATURE
-		) ? 2 : 0;
-		return (icheck & 0xF) >= ((icheck >> 4) & 0xF) ? UCS2LE : UCS2BE;
+		int icheck = IS_TEXT_UNICODE_NOT_UNICODE_MASK ^
+			IS_TEXT_UNICODE_UNICODE_MASK ^ IS_TEXT_UNICODE_CONTROLS ^
+			IS_TEXT_UNICODE_REVERSE_MASK ^ IS_TEXT_UNICODE_REVERSE_CONTROLS;
+		IsTextUnicode(pBuffer, bufSize, &icheck);
+		if ((
+				icheck &
+				(
+					IS_TEXT_UNICODE_UNICODE_MASK ^
+					IS_TEXT_UNICODE_REVERSE_MASK ^
+					IS_TEXT_UNICODE_SIGNATURE ^
+					IS_TEXT_UNICODE_REVERSE_SIGNATURE
+				)
+			) > (icheck & IS_TEXT_UNICODE_NOT_UNICODE_MASK)
+		||	CoincidenceOf
+			(
+				icheck &
+				(
+					IS_TEXT_UNICODE_SIGNATURE |
+					IS_TEXT_UNICODE_STATISTICS
+				)
+			)
+		||	CoincidenceOf
+			(
+				icheck &
+				(
+					IS_TEXT_UNICODE_REVERSE_SIGNATURE |
+					IS_TEXT_UNICODE_REVERSE_STATISTICS
+				)
+			))
+		{
+			*pBom = icheck &
+			(
+				IS_TEXT_UNICODE_SIGNATURE | IS_TEXT_UNICODE_REVERSE_SIGNATURE
+			) ? 2 : 0;
+			return (icheck & 0xF) >= ((icheck >> 4) & 0xF) ? UCS2LE : UCS2BE;
+		}
+		return NONE;
 	}
 	*pBom = 0;
 	return CheckForInvalidUtf8(pBuffer, bufSize) ? NONE : UTF8;

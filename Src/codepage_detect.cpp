@@ -217,7 +217,7 @@ void GuessCodepageEncoding(LPCTSTR filepath, FileTextEncoding * encoding, BOOL b
 		encoding->SetUnicoding(ucs);
 		encoding->m_bom = bom != 0;
 	}
-	else if (memchr(fi.pvImage, 0, fi.cbImage))
+	else if (bom)
 	{
 		encoding->m_binary = true;
 	}

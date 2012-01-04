@@ -364,6 +364,9 @@ bool UniMemFile::ReadBom()
 	case UTF8:
 		unicode = true;
 		break;
+	case NONE:
+		bom = 0;
+		break;
 	}
 
 	m_bom = bom != 0;
