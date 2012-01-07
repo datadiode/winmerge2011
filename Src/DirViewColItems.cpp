@@ -92,36 +92,13 @@ static String ColExtGet(const CDiffContext *, const void *p) //sfilename
 static String ColPathGet(const CDiffContext *, const void *p)
 {
 	const DIFFITEM &di = *static_cast<const DIFFITEM*>(p);
-	String s = di.right.path;
-	const String &t = di.left.path;
-
-	// If we have unique path, just print the existing path name
-	if (s.length() == 0 || t.length() == 0)
-	{
-		return s.length() == 0 ? t : s;
-	}
-
-	int i = 0, j = 0;
-	do
-	{
-		int i_ahead = s.find('\\', i);
-		int j_ahead = t.find('\\', j);
-		int length_s = (i_ahead != String::npos ? i_ahead : s.length()) - i;
-		int length_t = (j_ahead != String::npos ? j_ahead : t.length()) - j;
-		if (length_s != length_t ||
-			!StrIsIntlEqual(FALSE, s.c_str() + i, t.c_str() + j, length_s))
-		{
-			String u(t.c_str() + j, length_t + 1);
-			u[length_t] = '|';
-			s.insert(i, u.c_str());
-			i_ahead += u.length();
-		}
-		i = i_ahead + 1;
-		j = j_ahead + 1;
-	} while (i && j);
-	if (s.empty())
-		s = _T(".");
-	return s;
+	return
+	(
+		di.left.path.empty() ? di.right.path :
+		di.right.path.empty() ? di.left.path :
+		di.left.path == di.right.path ? di.left.path :
+		di.left.path + _T("|") + di.right.path
+	);
 }
 
 /**
