@@ -348,17 +348,6 @@ static void Append(String &strBuffer, LPCTSTR pchTail,
 }
 
 /**
- * @brief Record occurrence of binary zero to stats
- */
-static void RecordZero(UniFile::txtstats & txstats, INT64 offset)
-{
-	++txstats.nzeros;
-	if (txstats.first_zero == -1)
-		txstats.first_zero = offset;
-	txstats.last_zero = offset;
-}
-
-/**
  * @brief Read one (DOS or UNIX or Mac) line.
  * @param [out] line Line read.
  * @param [out] eol EOL bytes read (if any).
@@ -410,7 +399,7 @@ bool UniMemFile::ReadString(String & line, String & eol, bool * lossy)
 			}
 			if (!wch)
 			{
-				RecordZero(m_txtstats, wch_offset);
+				++m_txtstats.nzeros;
 			}
 			++cchLine;
 		}
@@ -435,8 +424,7 @@ bool UniMemFile::ReadString(String & line, String & eol, bool * lossy)
 			}
 			if (*eolptr == 0)
 			{
-				INT64 offset = (eolptr - m_base);
-				RecordZero(m_txtstats, offset);
+				++m_txtstats.nzeros;
 			}
 		}
 		bool success = ucr::maketstring(line, (LPCSTR)m_current, eolptr - m_current, m_codepage, lossy);
@@ -545,8 +533,7 @@ bool UniMemFile::ReadString(String & line, String & eol, bool * lossy)
 		}
 		else if (!ch)
 		{
-			INT64 offset = (m_current - m_base);
-			RecordZero(m_txtstats, offset);
+			++m_txtstats.nzeros;
 		}
 		// always advance to next character
 		if (m_unicoding == UTF8)

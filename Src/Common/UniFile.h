@@ -44,19 +44,14 @@ public:
 		int nlfs;
 		int ncrlfs;
 		int nzeros;
-		INT64 first_zero; // byte offset, initially -1
-		INT64 last_zero; // byte offset, initially -1
 		int nlosses;
-		txtstats()
-		{
-			clear();
-		}
 		void clear()
 		{
 			ncrs = nlfs = ncrlfs = nzeros = nlosses = 0;
-			first_zero = -1;
-			last_zero = -1;
 		}
+	private:
+		friend UniFile;
+		txtstats() { clear(); }
 	};
 
 	virtual ~UniFile() { }
@@ -65,8 +60,6 @@ public:
 	virtual void Close() = 0;
 	virtual bool IsOpen() const = 0;
 	virtual void ReadBom() = 0;
-
-public:
 	virtual bool ReadString(String &line, String &eol, bool *lossy) = 0;
 
 	const UniError &GetLastUniError() const { return m_lastError; }
@@ -125,9 +118,7 @@ public:
 	virtual void Close();
 	virtual bool IsOpen() const;
 	virtual void ReadBom();
-
-public:
-	virtual bool ReadString(String & line, String & eol, bool * lossy);
+	virtual bool ReadString(String &line, String &eol, bool *lossy);
 
 // Implementation methods
 protected:
