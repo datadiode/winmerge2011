@@ -2643,7 +2643,7 @@ LRESULT CDirView::HandleMenuMessage(UINT message, WPARAM wParam, LPARAM lParam)
  *
  * @param [out] pstm Stream where file list will be stored
  */
-void CDirView::PrepareDragData(UniFile &file)
+void CDirView::PrepareDragData(UniStdioFile &file)
 {
 	const CDiffContext *ctxt = GetDocument()->GetDiffContext();
 	int i = -1; 
