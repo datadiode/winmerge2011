@@ -858,7 +858,7 @@ void CConfigLog::CloseFile()
 bool CConfigLog::ParseSettings(LPCTSTR Filepath)
 {
 	UniMemFile file;
-	if (!file.Open(Filepath))
+	if (!file.OpenReadOnly(Filepath))
 		return false;
 
 	String sLine, sEol;
