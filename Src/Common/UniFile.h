@@ -38,34 +38,6 @@ public:
 		String GetError() const;
 	};
 
-	virtual ~UniFile() { }
-	virtual bool OpenReadOnly(LPCTSTR filename) = 0;
-	virtual void Close() = 0;
-	virtual bool IsOpen() const = 0;
-
-	virtual String GetFullyQualifiedPath() const = 0;
-	virtual const UniError &GetLastUniError() const = 0;
-
-	virtual bool IsUnicode() = 0;
-	virtual bool ReadBom() = 0;
-	virtual bool HasBom() const = 0;
-	virtual void SetBom(bool bom) = 0;
-
-	virtual UNICODESET GetUnicoding() const = 0;
-	virtual void SetUnicoding(UNICODESET unicoding) = 0;
-	virtual int GetCodepage() const = 0;
-	virtual void SetCodepage(int codepage) = 0;
-
-public:
-	virtual bool ReadString(String &line, String &eol, bool *lossy) = 0;
-	virtual int GetLineNumber() const = 0;
-	virtual bool WriteString(LPCTSTR line, size_t length) = 0;
-
-	bool WriteString(const String &line)
-	{
-		return WriteString(line.c_str(), line.length());
-	}
-
 	struct txtstats
 	{
 		int ncrs;
@@ -75,10 +47,48 @@ public:
 		INT64 first_zero; // byte offset, initially -1
 		INT64 last_zero; // byte offset, initially -1
 		int nlosses;
-		txtstats() { clear(); }
-		void clear() { ncrs = nlfs = ncrlfs = nzeros = nlosses = 0; first_zero = -1; last_zero = -1; }
+		txtstats()
+		{
+			clear();
+		}
+		void clear()
+		{
+			ncrs = nlfs = ncrlfs = nzeros = nlosses = 0;
+			first_zero = -1;
+			last_zero = -1;
+		}
 	};
-	virtual const txtstats & GetTxtStats() const = 0;
+
+	virtual ~UniFile() { }
+
+	virtual bool OpenReadOnly(LPCTSTR filename) = 0;
+	virtual void Close() = 0;
+	virtual bool IsOpen() const = 0;
+	virtual void ReadBom() = 0;
+
+public:
+	virtual bool ReadString(String &line, String &eol, bool *lossy) = 0;
+
+	const UniError &GetLastUniError() const { return m_lastError; }
+	const txtstats &GetTxtStats() const { return m_txtstats; }
+
+	UNICODESET GetUnicoding() const { return m_unicoding; }
+	void SetUnicoding(UNICODESET unicoding) { m_unicoding = unicoding; }
+	int GetCodepage() const { return m_codepage; }
+	void SetCodepage(int codepage) { m_codepage = codepage; }
+	bool HasBom() const { return m_bom; }
+	void SetBom(bool bom) { m_bom = bom; }
+
+protected:
+	void LastError(LPCTSTR apiname, int syserrnum);
+	void LastErrorCustom(LPCTSTR desc);
+
+protected:
+	UniError m_lastError;
+	txtstats m_txtstats;
+	UNICODESET m_unicoding;
+	int m_codepage; // only valid if m_unicoding == NONE
+	bool m_bom; /**< Did the file have a BOM when reading? */
 };
 
 /**
@@ -90,41 +100,14 @@ class UniLocalFile : public UniFile
 {
 public:
 	UniLocalFile();
-	void Clear();
-
-	virtual String GetFullyQualifiedPath() const { return m_filepath; }
-	virtual const UniError &GetLastUniError() const { return m_lastError; }
-
-	virtual UNICODESET GetUnicoding() const { return m_unicoding; }
-	virtual void SetUnicoding(UNICODESET unicoding) { m_unicoding = unicoding; }
-	virtual int GetCodepage() const { return m_codepage; }
-	virtual void SetCodepage(int codepage) { m_codepage = codepage; }
-	virtual bool HasBom() const { return m_bom; }
-	virtual void SetBom(bool bom) { m_bom = bom; }
-
-	virtual int GetLineNumber() const { return m_lineno; }
-	virtual const txtstats & GetTxtStats() const { return m_txtstats; }
-
-	bool IsUnicode();
 
 protected:
-	virtual void LastError(LPCTSTR apiname, int syserrnum);
-	virtual void LastErrorCustom(LPCTSTR desc);
+	void Clear();
 
 protected:
 	int m_statusFetched; // 0 not fetched, -1 error, +1 success
 	CY m_filesize;
-	String m_filepath;
-	String m_filename;
-	int m_lineno; // current 0-based line of m_current
-	UniError m_lastError;
-	UNICODESET m_unicoding;
 	int m_charsize; // 2 for UCS-2, else 1
-	int m_codepage; // only valid if m_unicoding==ucr::NONE;
-	txtstats m_txtstats;
-	bool m_bom; /**< Did the file have a BOM when reading? */
-	bool m_bUnicodingChecked; /**< Has unicoding been checked for the file? */
-	bool m_bUnicode; /**< Is the file unicode file? */
 };
 
 /**
@@ -138,24 +121,19 @@ public:
 	static UniFile *CreateInstance(PackingInfo *) { return new UniMemFile; }
 	virtual ~UniMemFile() { Close(); }
 
-	virtual bool GetFileStatus();
-	virtual bool DoGetFileStatus();
-
 	virtual bool OpenReadOnly(LPCTSTR filename);
-	virtual bool Open(LPCTSTR filename);
-	virtual bool Open(LPCTSTR filename, DWORD dwOpenAccess, DWORD dwOpenShareMode, DWORD dwOpenCreationDispostion, DWORD dwMappingProtect, DWORD dwMapViewAccess);
-	void Close();
+	virtual void Close();
 	virtual bool IsOpen() const;
-
-	virtual bool ReadBom();
+	virtual void ReadBom();
 
 public:
 	virtual bool ReadString(String & line, String & eol, bool * lossy);
-	virtual bool WriteString(LPCTSTR line, size_t length);
 
 // Implementation methods
 protected:
-	virtual bool DoOpen(LPCTSTR filename, DWORD dwOpenAccess, DWORD dwOpenShareMode, DWORD dwOpenCreationDispostion, DWORD dwMappingProtect, DWORD dwMapViewAccess);
+	bool DoOpen(LPCTSTR filename, DWORD dwOpenAccess, DWORD dwOpenShareMode, DWORD dwOpenCreationDispostion, DWORD dwMappingProtect, DWORD dwMapViewAccess);
+	bool Open(LPCTSTR filename, DWORD dwOpenAccess, DWORD dwOpenShareMode, DWORD dwOpenCreationDispostion, DWORD dwMappingProtect, DWORD dwMapViewAccess);
+	bool GetFileStatus(LPCTSTR filename);
 
 // Implementation data
 private:
@@ -182,30 +160,28 @@ public:
 	void Attach(ISequentialStream *pstm);
 	HGLOBAL CreateStreamOnHGlobal();
 
-	virtual bool GetFileStatus();
+	bool Open(LPCTSTR filename, LPCTSTR mode);
+	bool OpenCreate(LPCTSTR filename);
+	bool OpenCreateUtf8(LPCTSTR filename);
 
 	virtual bool OpenReadOnly(LPCTSTR filename);
-	virtual bool OpenCreate(LPCTSTR filename);
-	virtual bool OpenCreateUtf8(LPCTSTR filename);
-	virtual bool Open(LPCTSTR filename, LPCTSTR mode);
-	void Close();
-
+	virtual void Close();
 	virtual bool IsOpen() const;
+	virtual void ReadBom();
 
-	virtual bool ReadBom();
-
-	virtual void WriteBom();
-	using UniFile::WriteString; // make inherited overloads accessible
-	virtual bool WriteString(LPCTSTR line, size_t length);
+	void WriteBom();
+	bool WriteString(LPCTSTR line, size_t length);
+	bool WriteString(const String &line)
+	{
+		return WriteString(line.c_str(), line.length());
+	}
 
 protected:
 	virtual bool ReadString(String & line, String & eol, bool * lossy);
 
 // Implementation methods
 protected:
-	virtual bool DoOpen(LPCTSTR filename, LPCTSTR mode);
-	virtual void LastError(LPCTSTR apiname, int syserrnum);
-	virtual void LastErrorCustom(LPCTSTR desc);
+	bool DoOpen(LPCTSTR filename, LPCTSTR mode);
 
 // ISequentialStream methods
 private:

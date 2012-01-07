@@ -168,9 +168,8 @@ public:
 	{
 		return new UniPluginFile(packingInfo);
 	}
-	virtual bool ReadBom()
+	virtual void ReadBom()
 	{
-		return false;
 	}
 	virtual bool ReadString(String &line, String &eol, bool *lossy)
 	{
