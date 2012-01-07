@@ -40,7 +40,8 @@ bool UniMarkdownFile::DoOpen(LPCTSTR filename, DWORD dwOpenAccess,
 	{
 		// CMarkdown wants octets, so we may need to transcode to UTF8.
 		// As transcoding strips the BOM, we must check for it in advance.
-		if (IsUnicode())
+		ReadBom();
+		if (GetUnicoding() != NONE)
 			m_codepage = CP_UTF8;
 		// The CMarkdown::File constructor cares about transcoding.
 		CMarkdown::File f(
