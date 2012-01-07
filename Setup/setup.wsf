@@ -433,7 +433,7 @@ End Sub
 Sub Job_Version
 	Dim parts, content, path
 	parts = Split(app.version, ".")
-	parts(3) = DatePart("ww", Now) & DatePart("w", Now)
+	parts(3) = Right("0" & DatePart("ww", Now), 2) & DatePart("w", Now)
 	parts(2) = Left(parts(2), 2) & (DatePart("yyyy", Now) - parts(1) + 1)
 	content = version_h.text
 	content = Replace(content, "&kind;", parts(0))
