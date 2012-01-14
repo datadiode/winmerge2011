@@ -3989,10 +3989,10 @@ BOOL CCrystalTextView::OnMouseWheel(WPARAM wParam, LPARAM lParam)
 	short zDelta = GET_WHEEL_DELTA_WPARAM(wParam);
 	int nNewTopSubLine = m_nTopSubLine - zDelta / 40;
 	int nMaxTopSubLine = GetSubLineCount() - GetScreenLines();
-	if (nNewTopSubLine < 0)
-		nNewTopSubLine = 0;
 	if (nNewTopSubLine > nMaxTopSubLine)
 		nNewTopSubLine = nMaxTopSubLine;
+	if (nNewTopSubLine < 0)
+		nNewTopSubLine = 0;
 	ScrollToSubLine(nNewTopSubLine, TRUE);
 	UpdateSiblingScrollPos(FALSE);
 	return TRUE;
