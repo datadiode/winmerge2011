@@ -1,3 +1,11 @@
+2011.002.027
+Changes since preceding release (not necessarily complete):
+• If OS is 64-bit, register both 32-bit and 64-bit shell extensions (Issue #3)
+• Merge https://bitbucket.org/sdottaka/winmerge-v2/changeset/3fe9539c763c
+• Cosmetic: Rearrange Compare Statistics dialog for better comprehensibility
+• Bypass UCS2 guesswork when there are no null bytes
+• Issue #5 WM_MOUSEWHEEL caused crash when content was too small to scroll
+
 2011.001.527
 Changes since preceding release (not necessarily complete):
 • Fix occasional out-of-bound array accesses after line deletions
