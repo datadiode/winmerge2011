@@ -2970,6 +2970,10 @@
 			Name="File Transforms"
 			>
 			<File
+				RelativePath="..\FileTransforms\LinesNumbered.wsc"
+				>
+			</File>
+			<File
 				RelativePath="..\FileTransforms\LinesSorted.wsc"
 				>
 			</File>
