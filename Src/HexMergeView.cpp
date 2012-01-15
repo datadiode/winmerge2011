@@ -469,7 +469,12 @@ void CHexMergeView::OnEditClear()
  */
 BOOL CHexMergeView::PreTranslateMessage(MSG* pMsg)
 {
-	return m_pif->translate_accelerator(pMsg);
+	const int length = m_pif->get_length();
+	if (!m_pif->translate_accelerator(pMsg))
+		return FALSE;
+	if (length != m_pif->get_length())
+		m_pif->resize_window();
+	return TRUE;
 }
 
 /**
