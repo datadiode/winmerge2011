@@ -1393,9 +1393,6 @@ bool CMainFrame::DoFileOpen(FileLocation &filelocLeft, FileLocation &filelocRigh
 	if (IsComparing())
 		return false;
 
-	if (pDirDoc && !pDirDoc->CloseMergeDocs())
-		return false;
-
 	bool bROLeft = (dwLeftFlags & FFILEOPEN_READONLY) != 0;
 	bool bRORight = (dwRightFlags & FFILEOPEN_READONLY) != 0;
 
@@ -1654,6 +1651,9 @@ bool CMainFrame::DoFileOpen(FileLocation &filelocLeft, FileLocation &filelocRigh
 	// open the diff
 	if (pathsType == IS_EXISTING_DIR)
 	{
+		// TODO: Is there a good point in closing merge docs in this place?
+		if (pDirDoc && !pDirDoc->CloseMergeDocs())
+			return false;
 		if (pDirDoc != NULL || (pDirDoc = GetDirDocToShow()) != NULL)
 		{
 			// Anything that can go wrong inside InitCompare() will yield an
@@ -1674,6 +1674,11 @@ bool CMainFrame::DoFileOpen(FileLocation &filelocLeft, FileLocation &filelocRigh
 	}
 	else
 	{
+		if (!COptionsMgr::Get(OPT_MULTIDOC_MERGEDOCS))
+		{
+			if (!pDirDoc->CloseMergeDocs())
+				return false;
+		}
 		LogFile.Write(CLogFile::LNOTICE, _T("Open files: Left: %s\n\tRight: %s."),
 			filelocLeft.filepath.c_str(), filelocRight.filepath.c_str());
 		ShowMergeDoc(pDirDoc, filelocLeft, filelocRight, dwLeftFlags, dwRightFlags);
