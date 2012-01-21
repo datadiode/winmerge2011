@@ -131,7 +131,6 @@ public:
 	int GetFirstSelectedInd();
 	DIFFITEM & GetNextSelectedInd(int &ind);
 	DIFFITEM & GetItemAt(int ind);
-	void AddParentFolderItem(BOOL bEnable);
 
 	static bool IsShellMenuCmdID(UINT);
 	LRESULT HandleMenuMessage(UINT message, WPARAM wParam, LPARAM lParam);
@@ -279,6 +278,7 @@ protected:
 	stl::vector<int> m_colorder; /**< colorder[logical#]=physical# */
 	stl::vector<int> m_invcolorder; /**< invcolorder[physical]=logical# */
 	UINT m_nHiddenItems; /**< Count of items we have hidden */
+	UINT m_nSpecialItems; /**< Count of special items */
 	bool m_bTreeMode; /**< TRUE if tree mode is on*/
 	DirCompProgressDlg *m_pCmpProgressDlg;
 	clock_t m_compareStart; /**< Starting process time of the compare */

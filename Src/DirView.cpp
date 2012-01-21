@@ -108,6 +108,7 @@ CDirView::CDirView(CDirFrame *pFrame)
 	, m_dispcols(-1)
 	, m_pFrame(pFrame)
 	, m_nHiddenItems(0)
+	, m_nSpecialItems(0)
 	, m_pCmpProgressDlg(NULL)
 	, m_compareStart(0)
 	, m_bTreeMode(false)
@@ -431,6 +432,7 @@ void CDirView::Redisplay()
 	SetRedraw(FALSE);
 
 	DeleteAllItems();
+	m_nSpecialItems = 0;
 
 	SetImageList(m_bTreeMode && m_pFrame->GetRecursive() ?
 		m_imageState->m_hImageList : NULL, LVSIL_STATE);
@@ -440,7 +442,7 @@ void CDirView::Redisplay()
 	if (!m_pFrame->GetRecursive() ||
 		m_pFrame->AllowUpwardDirectory(leftParent, rightParent) == CDirFrame::AllowUpwardDirectory::ParentIsTempPath)
 	{
-		cnt += AddSpecialItems();
+		cnt += m_nSpecialItems = AddSpecialItems();
 	}
 
 	int alldiffs = 0;
@@ -1672,7 +1674,7 @@ LRESULT CDirView::ReflectKeydown(NMLVKEYDOWN *pParam)
 		DoDelAll();
 		return 1;
 	case VK_BACK:
-		if (!GetDocument()->GetRecursive())
+		if (m_nSpecialItems > 0 && GetItemKey(0) == SPECIAL_ITEM_POS)
 			OpenParentDirectory();
 		return 1;
 	case VK_RETURN:
@@ -1961,29 +1963,22 @@ void CDirView::OnToolsGenerateReport()
 int CDirView::AddSpecialItems()
 {
 	int retVal = 0;
-	BOOL bEnable = TRUE;
+	int iImgDirUp = DIFFIMG_DIRUP;
 	String leftParent, rightParent;
 	switch (m_pFrame->AllowUpwardDirectory(leftParent, rightParent))
 	{
 	case CDirFrame::AllowUpwardDirectory::No:
-		bEnable = FALSE;
+		iImgDirUp = DIFFIMG_DIRUP_DISABLE;
 		// fall through
 	default:
-		AddParentFolderItem(bEnable);
+		// Add "Parent folder" ("..") item to directory view
+		AddNewItem(0, SPECIAL_ITEM_POS, iImgDirUp, 0);
 		retVal = 1;
 		// fall through
 	case CDirFrame::AllowUpwardDirectory::Never:
 		break;
 	}
 	return retVal;
-}
-
-/**
- * @brief Add "Parent folder" ("..") item to directory view
- */
-void CDirView::AddParentFolderItem(BOOL bEnable)
-{
-	AddNewItem(0, SPECIAL_ITEM_POS, bEnable ? DIFFIMG_DIRUP : DIFFIMG_DIRUP_DISABLE, 0);
 }
 
 /**
@@ -2274,7 +2269,7 @@ void CDirView::OnHideFilenames()
 	while ((sel = GetNextItem(sel, LVNI_SELECTED)) != -1)
 	{
 		UINT_PTR pos = GetItemKey(sel);
-		if (pos == (UINT_PTR) SPECIAL_ITEM_POS)
+		if (pos == SPECIAL_ITEM_POS)
 			continue;
 		m_pFrame->SetItemViewFlag(pos, ViewCustomFlags::HIDDEN, ViewCustomFlags::VISIBILITY);
 		const DIFFITEM &di = GetDiffItem(sel);
@@ -2433,13 +2428,9 @@ void CDirView::OnUpdateStatusNum()
 		UINT_PTR pos = GetItemKey(focusItem);
 		if (pos != SPECIAL_ITEM_POS)
 		{
-			// If compare is non-recursive reduce special items count
-			BOOL bRecursive = GetDocument()->GetRecursive();
-			if (!bRecursive)
-			{
-				--focusItem;
-				--count;
-			}
+			// Reduce by special items count
+			focusItem -= m_nSpecialItems;
+			count -= m_nSpecialItems;
 			_itot(focusItem + 1, idx, 10);
 			_itot(count, cnt, 10);
 			// "Item %1 of %2"
