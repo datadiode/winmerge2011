@@ -1,6 +1,9 @@
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual C++ Express 2008
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ShellExtension", "ShellExtension\ShellExtension.vcproj", "{5615F4FD-FFC4-460F-9D12-26EFF2B558E4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{2A81DB64-C062-48AF-8D2E-23B68320142D} = {2A81DB64-C062-48AF-8D2E-23B68320142D}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Merge", "Src\Merge.vcproj", "{2A81DB64-C062-48AF-8D2E-23B68320142D}"
 	ProjectSection(ProjectDependencies) = postProject
