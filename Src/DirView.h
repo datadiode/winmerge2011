@@ -50,7 +50,7 @@ class CompareStats;
 struct DirColInfo;
 class CLoadSaveCodepageDlg;
 class CShellContextMenu;
-class UniFile;
+class UniStdioFile;
 
 struct ViewCustomFlags
 {
@@ -353,7 +353,7 @@ private:
 	BOOL IsItemSelectedSpecial();
 	void CollapseSubdir(int sel);
 	void ExpandSubdir(int sel);
-	void PrepareDragData(UniFile &);
+	void PrepareDragData(UniStdioFile &);
 };
 
 #endif // !defined(AFX_DirView_H__16E7C721_351C_11D1_95CD_444553540000__INCLUDED_)

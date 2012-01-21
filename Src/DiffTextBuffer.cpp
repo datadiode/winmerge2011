@@ -308,10 +308,10 @@ FileLoadResult::FILES_RESULT CDiffTextBuffer::LoadFromFile(LPCTSTR pszFileName,
 
 		if (pufile->OpenReadOnly(pszFileName))
 		{
+			pufile->ReadBom();
 			// If the file is not unicode file, use the codepage we were given to
-			// interpret the 8-bit characters. If the file is unicode file,
-			// determine its type (IsUnicode() does that).
-			if (!pufile->IsUnicode())
+			// interpret the 8-bit characters.
+			if (pufile->GetUnicoding() == NONE)
 				pufile->SetCodepage(encoding.m_codepage);
 			UINT lineno = 0;
 			String eol, preveol;

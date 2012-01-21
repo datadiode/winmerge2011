@@ -11,11 +11,11 @@ REM echo $(OutDir) = %2
 
 REM Create English.pot and MergeLang.rc from Merge.rc
 cd ..\Translations\WinMerge
-call CreateMasterPotFile.bat
+cscript CreateMasterPotFile.vbs
 
 REM Create MergeLang.dll from MergeLang.rc
-rc /fo%1\MergeLang.res /i..\..\Src MergeLang.rc
-link /DLL /NOENTRY /MACHINE:IX86 /OUT:%2\MergeLang.dll %1\MergeLang.res
+rc /fo%~1\MergeLang.res /i..\..\Src MergeLang.rc
+link /DLL /NOENTRY /MACHINE:IX86 /OUT:%~2\MergeLang.dll %~1\MergeLang.res
 
 exit
 
