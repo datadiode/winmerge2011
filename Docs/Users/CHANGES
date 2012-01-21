@@ -1,3 +1,9 @@
+2011.002.037
+Changes since preceding release (not necessarily complete):
+• Issue #7 Multipe file compare windows option not working as designed
+• Work around heksedit not repainting its sibling after deletions
+• Fix numbers in status bar when stepping into archives from non-recursive view
+
 2011.002.027
 Changes since preceding release (not necessarily complete):
 • If OS is 64-bit, register both 32-bit and 64-bit shell extensions (Issue #3)
