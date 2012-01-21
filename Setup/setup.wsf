@@ -41,7 +41,7 @@ End If
 	scroll='no'
 	singleInstance='yes'
 	icon='WinMergeU.exe'/>
-<comment id='setup_cfg'>
+<comment id='setup_cfg'>7z%BC%AF%27%1C
 ;!@Install@!UTF-8!
 Title="WinMerge &version;"
 BeginPrompt="Do you want to install WinMerge &version;?"
@@ -453,7 +453,7 @@ Sub Job_Version
 		version = Replace(version, "BUILD.", "")
 		content = Replace(setup_cfg.text, "&version;", version)
 		path = fso.GetParentFolderName(location.pathname) & ".cfg"
-		fso.CreateTextFile(path, True).Write content
+		fso.CreateTextFile(path, True).Write Unescape(content)
 		content = Replace(setup_bat.text, "&version;", version)
 		content = Replace(content, "&SevenZip;", sh.RegRead("HKLM\Software\7-Zip\Path"))
 		path = fso.GetParentFolderName(location.pathname) & ".bat"
