@@ -1574,11 +1574,13 @@ HMenu *CMergeEditView::ApplyPatch(IStream *pstm, int id)
 	{
 		if (line.find_first_not_of('-') == 3)
 		{
+			stl::replace(line.begin(), line.end(), '\t', ' ');
 			text.Free();
 			text.Append(HString::Oct(line.c_str())->Uni(CP_UTF8)->Trim());
 		}
 		else if (line.find_first_not_of('+') == 3)
 		{
+			stl::replace(line.begin(), line.end(), '\t', ' ');
 			text.Append(L"\t");
 			text.Append(HString::Oct(line.c_str())->Uni(CP_UTF8)->Trim());
 			if (pMenu)

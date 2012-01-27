@@ -337,7 +337,12 @@ namespace H2O
 		using SysString<Object>::W;
 		using SysString<Object>::T;
 		OString(HString *pStr = NULL) { m_pStr = pStr; }
-		~OString() { Free(); }
+		~OString() { SysString::Free(); }
+		void Free()
+		{
+			SysString::Free();
+			B = NULL;
+		}
 		void Append(LPCWSTR tail)
 		{
 			UINT len = Len();
