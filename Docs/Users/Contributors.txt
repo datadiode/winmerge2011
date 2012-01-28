@@ -101,6 +101,7 @@ Localization:
 
 * Portuguese (Portugal):
   Nelson Simão
+  David Cunha
 
 * Romanian:
   Cristian Arghiroiu <cristi.arghiroiu@gmail.com>
