@@ -1,5 +1,8 @@
-2011.002.037
+2011.002.047
 Changes since preceding release (not necessarily complete):
+• Fix menu text formatting when applying a patch targeted at multiple files
+• Issue #9 Drag and drop files\folders always overwrites Left selection
+• Issue #8 Portuguese (pt-PT) translation update by David Cunha
 • Issue #7 Multipe file compare windows option not working as designed
 • Work around heksedit not repainting its sibling after deletions
 • Fix numbers in status bar when stepping into archives from non-recursive view

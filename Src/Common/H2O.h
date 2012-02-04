@@ -262,6 +262,11 @@ namespace H2O
 			assert(::IsWindow(m_hWnd));
 			return reinterpret_cast<HWindow *>(::ChildWindowFromPoint(m_hWnd, pt));
 		}
+		HWindow *ChildWindowFromPoint(POINT pt, UINT nFlags)
+		{
+			assert(::IsWindow(m_hWnd));
+			return reinterpret_cast<HWindow *>(::ChildWindowFromPointEx(m_hWnd, pt, nFlags));
+		}
 		HWindow *GetWindow(UINT nDirection)
 		{
 			assert(::IsWindow(m_hWnd));

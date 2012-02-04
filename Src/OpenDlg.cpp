@@ -685,8 +685,6 @@ void COpenDlg::OnDropFiles(HDROP dropInfo)
 			DragQueryFile(dropInfo, i, files[i].begin(), len + 1);
 		}
 	}
-	// Free the memory block containing the dropped-file information
-	DragFinish(dropInfo);
 
 	for (i = 0; i < fileCount; i++)
 	{
@@ -711,11 +709,23 @@ void COpenDlg::OnDropFiles(HDROP dropInfo)
 	}
 	else if (fileCount == 1)
 	{
-		if (!m_strLeft.empty() && m_strRight.empty())
-			m_strRight = files[0];
-		else
-			m_strLeft = files[0];
+		String *pTarget = !m_strLeft.empty() && m_strRight.empty() ? &m_strRight : &m_strLeft;
+		POINT pt;
+		if (DragQueryPoint(dropInfo, &pt))
+		{
+			if (HWindow *pHit = ChildWindowFromPoint(pt,
+				CWP_SKIPINVISIBLE | CWP_SKIPDISABLED | CWP_SKIPTRANSPARENT))
+			{
+				if (pHit == m_pCbLeft)
+					pTarget = &m_strLeft;
+				else if (pHit == m_pCbRight)
+					pTarget = &m_strRight;
+			}
+		}
+		*pTarget = files[0];
 		UpdateData<Set>();
 		UpdateButtonStates();
 	}
+	// Free the memory block containing the dropped-file information
+	DragFinish(dropInfo);
 }

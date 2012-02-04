@@ -3,6 +3,8 @@
 #
 # Translators:
 # * Nelson Simão
+# Updated 2012-01-23
+# * David Cunha
 #
 # ID line follows -- this is updated by SVN
 # $Id: Portuguese.po 7202 2010-06-19 12:46:49Z kimmov $
@@ -12,8 +14,8 @@ msgstr ""
 "Project-Id-Version: WinMerge\n"
 "Report-Msgid-Bugs-To: http://bugs.winmerge.org/\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: \n"
-"Last-Translator: Nelson Simão\n"
+"PO-Revision-Date: 2012-01-23 12:00\n"
+"Last-Translator: David Cunha\n"
 "Language-Team: Portuguese <winmerge-translate@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=CP1252\n"
@@ -62,7 +64,7 @@ msgstr "&Abrir...\tCtrl+O"
 #: Merge.rc:325
 #, c-format
 msgid "Op&en Conflict File..."
-msgstr ""
+msgstr "Ab&rir ficheiro em conflito..."
 
 #: Merge.rc:21
 #: Merge.rc:136
@@ -70,7 +72,7 @@ msgstr ""
 #: Merge.rc:327
 #, c-format
 msgid "Open Pro&ject...\tCtrl+J"
-msgstr "Abrir pro&jecto...\Ctrl+J"
+msgstr "Abrir pro&jecto...\tCtrl+J"
 
 #: Merge.rc:22
 #: Merge.rc:137
@@ -86,7 +88,7 @@ msgstr "&Guardar projecto..."
 #: Merge.rc:330
 #, c-format
 msgid "Recent Projects"
-msgstr ""
+msgstr "Projectos recentes"
 
 #: Merge.rc:26
 #: Merge.rc:346
@@ -182,17 +184,17 @@ msgstr "Mostrar itens ocultados"
 #: Merge.rc:50
 #, c-format
 msgid "Tree &Mode"
-msgstr ""
+msgstr "&Modo em árvore"
 
 #: Merge.rc:51
 #, c-format
 msgid "E&xpand All Subfolders"
-msgstr ""
+msgstr "E&xpandir todas as subpastas"
 
 #: Merge.rc:52
 #, c-format
 msgid "&Collapse All Subfolders"
-msgstr ""
+msgstr "&Fechar todas as subpastas"
 
 #: Merge.rc:54
 #: Merge.rc:267
@@ -222,7 +224,7 @@ msgstr "&Barra de ferramentas"
 #: Merge.rc:462
 #, c-format
 msgid "&None"
-msgstr ""
+msgstr "&Nenhuma"
 
 #: Merge.rc:60
 #: Merge.rc:182
@@ -230,7 +232,7 @@ msgstr ""
 #: Merge.rc:463
 #, c-format
 msgid "&Small"
-msgstr ""
+msgstr "&Pequena"
 
 #: Merge.rc:61
 #: Merge.rc:183
@@ -238,7 +240,7 @@ msgstr ""
 #: Merge.rc:464
 #, c-format
 msgid "&Big"
-msgstr ""
+msgstr "&Grande"
 
 #: Merge.rc:63
 #: Merge.rc:185
@@ -254,12 +256,12 @@ msgstr "Barra de esta&do"
 #: Merge.rc:467
 #, c-format
 msgid "Ta&b Bar"
-msgstr ""
+msgstr "&Barra de separadores"
 
 #: Merge.rc:65
 #, c-format
 msgid "Comp&are Statistics"
-msgstr ""
+msgstr "Comp&arar estatísticas"
 
 #: Merge.rc:67
 #: Merge.rc:188
@@ -304,20 +306,20 @@ msgstr "Próxima diferença\tAlt+Down"
 #: Merge.rc:478
 #, c-format
 msgid "&Previous Difference\tAlt+Up"
-msgstr "Diferença anterior\tAlt+Up"
+msgstr "&Diferença anterior\tAlt+Up"
 
 #: Merge.rc:79
 #: Merge.rc:195
 #: Merge.rc:480
 #, c-format
 msgid "&First Difference\tAlt+Home"
-msgstr "Primeira diferença\tAlt+Home"
+msgstr "&Primeira diferença\tAlt+Home"
 
 #: Merge.rc:80
 #: Merge.rc:481
 #, c-format
 msgid "&Current Difference\tAlt+Enter"
-msgstr "Diferença actual\tAlt+Enter"
+msgstr "&Diferença actual\tAlt+Enter"
 
 #: Merge.rc:81
 #: Merge.rc:196
@@ -404,7 +406,7 @@ msgstr "Carregar configuração..."
 #: Merge.rc:503
 #, c-format
 msgid "&Reset Options"
-msgstr ""
+msgstr "&Repor opções"
 
 #: Merge.rc:100
 #: Merge.rc:218
@@ -428,7 +430,7 @@ msgstr "&Fechar"
 #: Merge.rc:508
 #, c-format
 msgid "Clo&se All"
-msgstr "Fechar &Todos"
+msgstr "Fechar &Todas"
 
 #: Merge.rc:105
 #: Merge.rc:223
@@ -444,7 +446,7 @@ msgstr "Mudar &Vista\tF6"
 #: Merge.rc:512
 #, c-format
 msgid "Tile &Horizontally"
-msgstr "Ordenar &horizontalmente"
+msgstr "Dispor na &horizontal"
 
 #: Merge.rc:108
 #: Merge.rc:226
@@ -452,7 +454,7 @@ msgstr "Ordenar &horizontalmente"
 #: Merge.rc:513
 #, c-format
 msgid "Tile &Vertically"
-msgstr "Ordenar &verticalmente"
+msgstr "Dispor na &vertical"
 
 #: Merge.rc:109
 #: Merge.rc:227
@@ -460,7 +462,7 @@ msgstr "Ordenar &verticalmente"
 #: Merge.rc:514
 #, c-format
 msgid "&Cascade"
-msgstr "Cascata"
+msgstr "Dispor em Cascata"
 
 #: Merge.rc:111
 #: Merge.rc:229
@@ -477,7 +479,7 @@ msgstr "A&juda"
 #: Merge.rc:518
 #, c-format
 msgid "&WinMerge Help\tF1"
-msgstr ""
+msgstr "Ajuda do &WinMergw\tF1"
 
 #: Merge.rc:115
 #: Merge.rc:233
@@ -485,7 +487,7 @@ msgstr ""
 #: Merge.rc:520
 #, c-format
 msgid "R&elease Notes"
-msgstr ""
+msgstr "Notas de lançam&ento"
 
 #: Merge.rc:116
 #: Merge.rc:234
@@ -493,7 +495,7 @@ msgstr ""
 #: Merge.rc:521
 #, c-format
 msgid "&Translations"
-msgstr ""
+msgstr "&Traduções"
 
 #: Merge.rc:117
 #: Merge.rc:235
@@ -501,7 +503,7 @@ msgstr ""
 #: Merge.rc:522
 #, c-format
 msgid "C&onfiguration"
-msgstr ""
+msgstr "C&onfiguração"
 
 #: Merge.rc:118
 #: Merge.rc:236
@@ -517,7 +519,7 @@ msgstr "Suporte de ar&quivo desactivado..."
 #: Merge.rc:525
 #, c-format
 msgid "&GNU General Public License"
-msgstr ""
+msgstr "&GNU General Public License"
 
 #: Merge.rc:121
 #: Merge.rc:239
@@ -525,7 +527,7 @@ msgstr ""
 #: Merge.rc:526
 #, c-format
 msgid "&About WinMerge..."
-msgstr "Acerca de &WinMerge..."
+msgstr "Sobre o &WinMerge..."
 
 #: Merge.rc:141
 #: Merge.rc:332
@@ -565,7 +567,7 @@ msgstr "Guardar lado direito"
 #: Merge.rc:367
 #, c-format
 msgid "Cu&t\tCtrl+X"
-msgstr ""
+msgstr "Cor&tar\tCtrl+X"
 
 #: Merge.rc:158
 #: Merge.rc:368
@@ -595,31 +597,31 @@ msgstr "Substituir...\tCtrl+H"
 #: Merge.rc:396
 #, c-format
 msgid "&Zoom"
-msgstr ""
+msgstr "&Zoom"
 
 #: Merge.rc:172
 #: Merge.rc:398
 #, c-format
 msgid "Zoom &In\tCtrl++"
-msgstr ""
+msgstr "Ampl&iar\tCtrl++"
 
 #: Merge.rc:173
 #: Merge.rc:399
 #, c-format
 msgid "Zoom &Out\tCtrl+-"
-msgstr ""
+msgstr "R&eduzir\tCtrl+-"
 
 #: Merge.rc:174
 #: Merge.rc:400
 #, c-format
 msgid "&Normal\tCtrl+*"
-msgstr ""
+msgstr "&Normal\tCtrl+*"
 
 #: Merge.rc:177
 #: Merge.rc:451
 #, c-format
 msgid "&Lock Panes"
-msgstr ""
+msgstr "B&loquear painéis"
 
 #: Merge.rc:201
 #: Merge.rc:487
@@ -658,17 +660,17 @@ msgstr "Converter final de linhas para"
 #: Merge.rc:351
 #, c-format
 msgid "&Windows (CRLF)"
-msgstr ""
+msgstr "&Windows (CRLF)"
 
 #: Merge.rc:352
 #, c-format
 msgid "&Unix (LF)"
-msgstr ""
+msgstr "&Unix (LF)"
 
 #: Merge.rc:353
 #, c-format
 msgid "&Mac (CR)"
-msgstr ""
+msgstr "&Mac (CR)"
 
 #: Merge.rc:356
 #, c-format
@@ -678,12 +680,12 @@ msgstr "Modo Combinar\tF9"
 #: Merge.rc:358
 #, c-format
 msgid "&File Encoding..."
-msgstr ""
+msgstr "Codificação de &ficheiro..."
 
 #: Merge.rc:364
 #, c-format
 msgid "&Undo\tCtrl+Z"
-msgstr "&Desfazer\tCtrl+Z"
+msgstr "&Anular\tCtrl+Z"
 
 #: Merge.rc:365
 #, c-format
@@ -718,7 +720,7 @@ msgstr "Alternar marcadores\tCtrl+F2"
 #: Merge.rc:384
 #, c-format
 msgid "&Next Bookmark\tF2"
-msgstr "Próximo marcador\tF2"
+msgstr "Marcador seguinte\tF2"
 
 #: Merge.rc:385
 #, c-format
@@ -743,7 +745,7 @@ msgstr "Combinar"
 #: Merge.rc:404
 #, c-format
 msgid "No Highlighting"
-msgstr ""
+msgstr "Não destacar"
 
 #: Merge.rc:406
 #, c-format
@@ -908,42 +910,42 @@ msgstr ""
 #: Merge.rc:439
 #, c-format
 msgid "&Context"
-msgstr ""
+msgstr "&Contexto"
 
 #: Merge.rc:441
 #, c-format
 msgid "&Unlimited"
-msgstr ""
+msgstr "&Ilimitado"
 
 #: Merge.rc:443
 #, c-format
 msgid "&0 Lines"
-msgstr ""
+msgstr "&0 Linhas"
 
 #: Merge.rc:444
 #, c-format
 msgid "&1 Line"
-msgstr ""
+msgstr "&1 Linha"
 
 #: Merge.rc:445
 #, c-format
 msgid "&2 Lines"
-msgstr ""
+msgstr "&2 Linhas"
 
 #: Merge.rc:446
 #, c-format
 msgid "&3 Lines"
-msgstr ""
+msgstr "&3 Linhas"
 
 #: Merge.rc:447
 #, c-format
 msgid "&4 Lines"
-msgstr ""
+msgstr "&4 Linhas"
 
 #: Merge.rc:448
 #, c-format
 msgid "&5 Lines"
-msgstr ""
+msgstr "&5 Linhas"
 
 #: Merge.rc:452
 #, c-format
@@ -958,12 +960,12 @@ msgstr "Ver diferenças de linha"
 #: Merge.rc:454
 #, c-format
 msgid "View Line &Numbers"
-msgstr "Ver nºs de linha"
+msgstr "Ver número de linha"
 
 #: Merge.rc:455
 #, c-format
 msgid "View &Margins"
-msgstr ""
+msgstr "Ver &margens"
 
 #: Merge.rc:456
 #, c-format
@@ -973,7 +975,7 @@ msgstr "Ajuste de linha"
 #: Merge.rc:458
 #, c-format
 msgid "Sw&ap Panes\tCtrl+U"
-msgstr ""
+msgstr "Trocar painéis"
 
 #: Merge.rc:468
 #, c-format
@@ -988,42 +990,42 @@ msgstr "Janela de localização"
 #: Merge.rc:498
 #, c-format
 msgid "Compare &Selection..."
-msgstr ""
+msgstr "Comparar &selecção..."
 
 #: Merge.rc:537
 #, c-format
 msgid "Co&mpare"
-msgstr ""
+msgstr "Co&mparar"
 
 #: Merge.rc:538
 #, c-format
 msgid "Compare &As"
-msgstr ""
+msgstr "Comparar &como"
 
 #: Merge.rc:540
 #, c-format
 msgid "&Text"
-msgstr ""
+msgstr "&Texto"
 
 #: Merge.rc:541
 #, c-format
 msgid "&Archive"
-msgstr ""
+msgstr "&Arquivo"
 
 #: Merge.rc:542
 #, c-format
 msgid "&Binary"
-msgstr ""
+msgstr "&Binário"
 
 #: Merge.rc:543
 #, c-format
 msgid "&XML"
-msgstr ""
+msgstr "&XML"
 
 #: Merge.rc:544
 #, c-format
 msgid "PluginMonikers\\English.ini"
-msgstr ""
+msgstr "PluginMonikers\\English.ini"
 
 #: Merge.rc:547
 #: Merge.rc:643
@@ -1035,22 +1037,22 @@ msgstr "Co&piar"
 #: Merge.rc:549
 #, c-format
 msgid "&Left to Right (%1 of %2)"
-msgstr ""
+msgstr "Da esquerda para a direita (%1 de %2)"
 
 #: Merge.rc:550
 #, c-format
 msgid "L&eft to... (%1 of %2)"
-msgstr ""
+msgstr "Da esquerda para... (%1 de %2)"
 
 #: Merge.rc:551
 #, c-format
 msgid "&Right to Left (%1 of %2)"
-msgstr ""
+msgstr "Da direita para aesquerda (%1 de %2)"
 
 #: Merge.rc:552
 #, c-format
 msgid "R&ight to... (%1 of %2)"
-msgstr ""
+msgstr "Da direita para... (%1 de %2)"
 
 #: Merge.rc:554
 #, c-format
@@ -1060,12 +1062,12 @@ msgstr "Mover"
 #: Merge.rc:556
 #, c-format
 msgid "&Left to... (%1 of %2)"
-msgstr ""
+msgstr "Da esquerda para... (%1 de %2)"
 
 #: Merge.rc:557
 #, c-format
 msgid "&Right to... (%1 of %2)"
-msgstr ""
+msgstr "Da direita para... (%1 de %2)"
 
 #: Merge.rc:559
 #, c-format
@@ -1082,7 +1084,7 @@ msgstr "Esquerda (%1 de 2)"
 #: Merge.rc:584
 #, c-format
 msgid "&Right (%1 of %2)"
-msgstr "Direito (%1 de 2)"
+msgstr "Direita (%1 de 2)"
 
 #: Merge.rc:563
 #: Merge.rc:585
@@ -1144,7 +1146,7 @@ msgstr "Co&piar localização"
 #: Merge.rc:589
 #, c-format
 msgid "&Zip"
-msgstr ""
+msgstr "&Zip"
 
 #: Merge.rc:591
 #, c-format
@@ -1252,17 +1254,17 @@ msgstr "&Abrir"
 #: Merge.rc:685
 #, c-format
 msgid "About WinMerge"
-msgstr "Acerca de WinMerge"
+msgstr "Acerca do WinMerge"
 
 #: Merge.rc:690
 #, c-format
 msgid "Version %s"
-msgstr ""
+msgstr "Versão %s"
 
 #: Merge.rc:691
 #, c-format
 msgid "Private Build: %s"
-msgstr ""
+msgstr "Compilação privada: %s"
 
 #: Merge.rc:692
 #, c-format
@@ -1281,7 +1283,7 @@ msgstr "Todos os direitos reservados."
 #: Merge.rc:1453
 #, c-format
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 #: Merge.rc:694
 #, c-format
@@ -1302,7 +1304,7 @@ msgstr "Alteração lógica de maiúsculas/minúsculas"
 #: Merge.rc:708
 #, c-format
 msgid "CheckOut"
-msgstr ""
+msgstr "CheckOut"
 
 #: Merge.rc:709
 #: Merge.rc:796
@@ -1401,7 +1403,7 @@ msgstr "Idêntico"
 #: Merge.rc:755
 #, c-format
 msgid "Total:"
-msgstr ""
+msgstr "Total:"
 
 #: Merge.rc:760
 #, c-format
@@ -1412,37 +1414,37 @@ msgstr "Fechar"
 #: Merge.rc:1747
 #, c-format
 msgid "Confirm Copy"
-msgstr ""
+msgstr "Confirmar cópia"
 
 #: Merge.rc:772
 #, c-format
 msgid "Are you sure you want to copy XXX items?"
-msgstr ""
+msgstr "Tem a certeza que pretende copiar XXX itens?"
 
 #: Merge.rc:773
 #, c-format
 msgid "From left"
-msgstr ""
+msgstr "Da esquerda"
 
 #: Merge.rc:775
 #, c-format
 msgid "To right"
-msgstr ""
+msgstr "Da direita"
 
 #: Merge.rc:777
 #, c-format
 msgid "Yes"
-msgstr ""
+msgstr "Sim"
 
 #: Merge.rc:778
 #, c-format
 msgid "No"
-msgstr ""
+msgstr "Não"
 
 #: Merge.rc:786
 #, c-format
 msgid "Folder Compare Report"
-msgstr "Relatório de comparação de arquivos"
+msgstr "Relatório de comparação de pastas"
 
 #: Merge.rc:789
 #, c-format
@@ -1475,12 +1477,12 @@ msgstr "Mostrar colunas"
 #: Merge.rc:808
 #, c-format
 msgid "Move &Up"
-msgstr ""
+msgstr "Mover para &cima"
 
 #: Merge.rc:809
 #, c-format
 msgid "Move &Down"
-msgstr ""
+msgstr "Mover para &baixo"
 
 #: Merge.rc:811
 #: Merge.rc:939
@@ -1495,7 +1497,7 @@ msgstr "Predefinição"
 #: Merge.rc:822
 #, c-format
 msgid " Folder Compare Progress"
-msgstr "Progresso da comparação de arquivos"
+msgstr "Progresso da comparação de pastas"
 
 #: Merge.rc:825
 #: Merge.rc:1590
@@ -1560,18 +1562,18 @@ msgstr "Direcção"
 #: Merge.rc:849
 #, c-format
 msgid "&Up"
-msgstr "Acima"
+msgstr "Para cima"
 
 #: Merge.rc:850
 #, c-format
 msgid "&Down"
-msgstr "Abaixo"
+msgstr "Para baixo"
 
 #: Merge.rc:851
 #: Merge.rc:874
 #, c-format
 msgid "&Find Next"
-msgstr "Localizar próximo"
+msgstr "Localizar Seguinte"
 
 #: Merge.rc:860
 #, c-format
@@ -1746,7 +1748,7 @@ msgstr "Incluir linha de comando"
 #: Merge.rc:938
 #, c-format
 msgid "Open to e&xternal editor"
-msgstr "Abrir em editor externo"
+msgstr "Abrir no editor externo"
 
 #: Merge.rc:949
 #, c-format
@@ -1801,7 +1803,7 @@ msgstr "Carregar &Ficheiro:"
 #: Merge.rc:977
 #, c-format
 msgid "..."
-msgstr ""
+msgstr "..."
 
 #: Merge.rc:975
 #, c-format
@@ -1827,17 +1829,17 @@ msgstr "Cancelar"
 #: Merge.rc:989
 #, c-format
 msgid "WinMerge - Archive support disabled"
-msgstr "WinMerge - suporte de arquivo desactivado"
+msgstr "WinMerge - Suporte de arquivo desactivado"
 
 #: Merge.rc:992
 #, c-format
 msgid "Unable to detect 7-Zip version (not installed?)"
-msgstr "Impossível detectar versão 7-Zip (não instalada?)"
+msgstr "Impossível detectar a versão do 7-Zip (não instalada?)"
 
 #: Merge.rc:994
 #, c-format
 msgid "Archive support requires 7-Zip 4.65 or later to be installed on your computer, or its\nessential components to be copied to the program directory for standalone operation."
-msgstr ""
+msgstr "O suporte de arquivo requer a instalação de 7-Zip 3.11 ou mais recente ou os seus\ncomponentes essenciais têm de ser copiados para a pasta de destino do programa para execução autónoma."
 
 #: Merge.rc:995
 #, c-format
@@ -1909,22 +1911,22 @@ msgstr "Plugins na pasta:"
 #: Merge.rc:1013
 #, c-format
 msgid "Don't display this &message again.\n(You can always recall this message from the Help menu.)"
-msgstr ""
+msgstr "Não mostrar esta mensagem novamente.\n(Pode voltar a chamar esta mensagem a partir do menu Ajuda.)"
 
 #: Merge.rc:1015
 #, c-format
 msgid "Plugin Download"
-msgstr "Descarregar plugin"
+msgstr "Transferir plugin"
 
 #: Merge.rc:1034
 #, c-format
 msgid "Select Files or Folders"
-msgstr "Seleccione ficheiros ou arquivos"
+msgstr "Seleccione ficheiros ou pastas"
 
 #: Merge.rc:1037
 #, c-format
 msgid "Files or Folders to Compare"
-msgstr "Ficheiros ou arquivos a comparar"
+msgstr "Ficheiros ou pastas a comparar"
 
 #: Merge.rc:1038
 #: Merge.rc:1083
@@ -1953,13 +1955,13 @@ msgstr "Seleccionar..."
 #: Merge.rc:1047
 #, c-format
 msgid "&Compare As:"
-msgstr ""
+msgstr "&Comparar como:"
 
 #: Merge.rc:1049
 #: Merge.rc:1094
 #, c-format
 msgid "&Include Subfolders"
-msgstr "Incluir sub-ficheiros"
+msgstr "Incluir subpastas"
 
 #: Merge.rc:1050
 #, c-format
@@ -1995,17 +1997,17 @@ msgstr "Exportar..."
 #: Merge.rc:1080
 #, c-format
 msgid "Paths"
-msgstr "Destino"
+msgstr "Caminhos"
 
 #: Merge.rc:1086
 #, c-format
 msgid "R&ead-only"
-msgstr "Apenas de leitura"
+msgstr "Só de leitura"
 
 #: Merge.rc:1090
 #, c-format
 msgid "Re&ad-only"
-msgstr "Apenas de leitura"
+msgstr "Só de leitura"
 
 #: Merge.rc:1095
 #, c-format
@@ -2030,7 +2032,7 @@ msgstr "O suporte de arquivo necessita o plugin 7-zip instalado:"
 #: Merge.rc:1108
 #, c-format
 msgid "Download 7-zip Plugin"
-msgstr "Descarregar o plugin 7-zip"
+msgstr "Transferir o plugin 7-zip"
 
 #: Merge.rc:1109
 #, c-format
@@ -2050,7 +2052,7 @@ msgstr "Utilizar 7-zip local da pasta WinMerge"
 #: Merge.rc:1112
 #, c-format
 msgid "&Detect archive type from file signature"
-msgstr "Detectar tipo de arquivo pela assinatura"
+msgstr "Detectar o tipo de arquivo pela assinatura"
 
 #: Merge.rc:1120
 #, c-format
@@ -2066,48 +2068,48 @@ msgstr "Sistema de versão:"
 #: Merge.rc:1657
 #, c-format
 msgid "&Path to cleartool.exe:"
-msgstr "Destino de cleartool.exe:"
+msgstr "Caminho do cleartool.exe:"
 
 #: Merge.rc:1128
 #, c-format
 msgid "ClearCase Type Manager Setup"
-msgstr ""
+msgstr "Setup do ClearCase Type Manager"
 
 #: Merge.rc:1130
 #, c-format
 msgid "compare"
-msgstr ""
+msgstr "comparar"
 
 #: Merge.rc:1131
 #, c-format
 msgid "xcompare"
-msgstr ""
+msgstr "xcomparar"
 
 #: Merge.rc:1132
 #, c-format
 msgid "merge"
-msgstr ""
+msgstr "combinar"
 
 #: Merge.rc:1133
 #, c-format
 msgid "xmerge"
-msgstr ""
+msgstr "xcombinar"
 
 #: Merge.rc:1141
 #, c-format
 msgid "Backup Files"
-msgstr ""
+msgstr "Backup de ficheiros"
 
 #: Merge.rc:1144
 #, c-format
 msgid "Create backup files in:"
-msgstr ""
+msgstr "Criar backup de ficheiros em:"
 
 #: Merge.rc:1145
 #: Merge.rc:1377
 #, c-format
 msgid "&Folder compare"
-msgstr "Comparação de arquivos"
+msgstr "Comparação de pastas"
 
 #: Merge.rc:1146
 #: Merge.rc:1378
@@ -2118,32 +2120,32 @@ msgstr "Comparação de ficheiros"
 #: Merge.rc:1147
 #, c-format
 msgid "Create backup files into:"
-msgstr ""
+msgstr "Criar backup de ficheiros em:"
 
 #: Merge.rc:1148
 #, c-format
 msgid "&Original file's folder"
-msgstr ""
+msgstr "Pasta &original dos ficheiros"
 
 #: Merge.rc:1149
 #, c-format
 msgid "&Global backup folder:"
-msgstr ""
+msgstr "Pasta &geral de backups:"
 
 #: Merge.rc:1152
 #, c-format
 msgid "Backup filename:"
-msgstr ""
+msgstr "Nome do ficheiro de backup:"
 
 #: Merge.rc:1153
 #, c-format
 msgid "&Append .bak -extension"
-msgstr ""
+msgstr "Adicionar extensão .bak"
 
 #: Merge.rc:1154
 #, c-format
 msgid "A&ppend timestamp"
-msgstr ""
+msgstr "Adicionar marca de tempo"
 
 #: Merge.rc:1165
 #, c-format
@@ -2153,12 +2155,12 @@ msgstr "Página de código predefinida"
 #: Merge.rc:1166
 #, c-format
 msgid "Select the default codepage assumed when loading non-Unicode files:"
-msgstr "Seleccionar a página de código predefinida quando carregar ficheiros non-Unicode:"
+msgstr "Seleccionar a página de código predefinida para quando abrir ficheiros non-Unicode:"
 
 #: Merge.rc:1167
 #, c-format
 msgid "Detect codepage info for these files: .html, .rc, .xml \nneed to restart session"
-msgstr ""
+msgstr "Detectar informação da página de código para os seguintes ficheiros: .html, .rc, .xml \nrequer reinicio da sessão"
 
 #: Merge.rc:1168
 #, c-format
@@ -2168,17 +2170,17 @@ msgstr "Página de código do sistema"
 #: Merge.rc:1169
 #, c-format
 msgid "According to WinMerge User Interface"
-msgstr "A mesma que o interface de utilizador do WinMerge"
+msgstr "A mesma da interface de utilizador do WinMerge"
 
 #: Merge.rc:1170
 #, c-format
 msgid "Custom codepage:"
-msgstr ""
+msgstr "Página de código personalizada:"
 
 #: Merge.rc:1179
 #, c-format
 msgid "Syntax"
-msgstr ""
+msgstr "Sintaxe"
 
 #: Merge.rc:1182
 #, c-format
@@ -2188,7 +2190,7 @@ msgstr "Palavras-chave:"
 #: Merge.rc:1183
 #, c-format
 msgid "Function names:"
-msgstr "Nomes das funções:"
+msgstr "Nome de funções:"
 
 #: Merge.rc:1184
 #, c-format
@@ -2208,7 +2210,7 @@ msgstr "Operadores:"
 #: Merge.rc:1187
 #, c-format
 msgid "Strings:"
-msgstr ""
+msgstr "Strings:"
 
 #: Merge.rc:1188
 #, c-format
@@ -2311,17 +2313,17 @@ msgstr "Movida:"
 #: Merge.rc:1262
 #, c-format
 msgid "Selected Moved:"
-msgstr "Movida seleccionada:"
+msgstr "Selecção movida:"
 
 #: Merge.rc:1266
 #, c-format
 msgid "Word Difference:"
-msgstr "Diferença de palavra:"
+msgstr "Diferença das palavras:"
 
 #: Merge.rc:1270
 #, c-format
 msgid "Selected Word Diff:"
-msgstr "Diferença de palavra seleccionada:"
+msgstr "Diferença na palavra seleccionada:"
 
 #: Merge.rc:1282
 #: Merge.rc:1612
@@ -2362,7 +2364,7 @@ msgstr "Ignorar maiúsculas/minúsculas"
 #: Merge.rc:1291
 #, c-format
 msgid "Igno&re carriage return differences (Windows/Unix/Mac)"
-msgstr ""
+msgstr "Igno&rar diferenças de mudança de linha (Windows/Unix/Mac)"
 
 #: Merge.rc:1292
 #, c-format
@@ -2372,7 +2374,7 @@ msgstr "Activar detecção de bloco movido"
 #: Merge.rc:1293
 #, c-format
 msgid "&Match similar lines"
-msgstr ""
+msgstr "Corresponder co&m linhas semelhantes"
 
 #: Merge.rc:1295
 #, c-format
@@ -2388,7 +2390,7 @@ msgstr "Pasta"
 #: Merge.rc:1307
 #, c-format
 msgid "&Compare method:"
-msgstr ""
+msgstr "Método de comparação:"
 
 #: Merge.rc:1309
 #, c-format
@@ -2403,17 +2405,17 @@ msgstr "Ignorar diferenças de tempo inferiores a 3 segundos"
 #: Merge.rc:1311
 #, c-format
 msgid "&Include unique subfolders contents"
-msgstr ""
+msgstr "&Incluir conteúdo exclusivo das subpastas"
 
 #: Merge.rc:1312
 #, c-format
 msgid "&Quick compare limit (MB):"
-msgstr ""
+msgstr "Limite comparação rápida (MB):"
 
 #: Merge.rc:1322
 #, c-format
 msgid "Editor"
-msgstr ""
+msgstr "Editor"
 
 #: Merge.rc:1325
 #, c-format
@@ -2438,7 +2440,7 @@ msgstr "Tabulações"
 #: Merge.rc:1329
 #, c-format
 msgid "&Tab size:"
-msgstr "Tamanho de tabs:"
+msgstr "Tamanho da tabulação:"
 
 #: Merge.rc:1331
 #, c-format
@@ -2473,7 +2475,7 @@ msgstr "A nível da palavra:"
 #: Merge.rc:1338
 #, c-format
 msgid "W&ord break characters:"
-msgstr ""
+msgstr "Quebra de caracteres:"
 
 #: Merge.rc:1347
 #, c-format
@@ -2493,17 +2495,17 @@ msgstr "Termos correntes (um por linha):"
 #: Merge.rc:1353
 #, c-format
 msgid "New"
-msgstr ""
+msgstr "Novo"
 
 #: Merge.rc:1354
 #, c-format
 msgid "Edit"
-msgstr ""
+msgstr "Editar"
 
 #: Merge.rc:1355
 #, c-format
 msgid "Remove"
-msgstr ""
+msgstr "Remover"
 
 #: Merge.rc:1363
 #, c-format
@@ -2538,17 +2540,17 @@ msgstr "Permitir apenas uma execução"
 #: Merge.rc:1371
 #, c-format
 msgid "As&k when closing multiple windows"
-msgstr ""
+msgstr "Pergun&tar quando fechar várias janelas"
 
 #: Merge.rc:1372
 #, c-format
 msgid "&Preserve file time in file compare"
-msgstr ""
+msgstr "&Preservar data do ficheiro na comparação"
 
 #: Merge.rc:1373
 #, c-format
 msgid "Show \"Select Files or Folders\" Dialog on Startup"
-msgstr ""
+msgstr "Mostrar janela \"Seleccionar ficheiros ou pastas\" ao iniciar"
 
 #: Merge.rc:1374
 #, c-format
@@ -2563,7 +2565,7 @@ msgstr "Activar janelas múltiplas de comparação para"
 #: Merge.rc:1379
 #, c-format
 msgid "WinMerge allows hiding some common messageboxes. Press the Reset button to make all messageboxes visible again."
-msgstr "WinMerge permite ocultar mensagens comuns. Prima o botão Repor para visualizar novamente todas as mensagens."
+msgstr "O WinMerge permite ocultar mensagens comuns. Prima o botão Repor para visualizar novamente todas as mensagens."
 
 #: Merge.rc:1380
 #, c-format
@@ -2573,12 +2575,12 @@ msgstr "Repor"
 #: Merge.rc:1388
 #, c-format
 msgid "Shell Integration"
-msgstr ""
+msgstr "Integração na Shell"
 
 #: Merge.rc:1391
 #, c-format
 msgid "Explorer"
-msgstr ""
+msgstr "Explorador"
 
 #: Merge.rc:1392
 #, c-format
@@ -2588,22 +2590,22 @@ msgstr "Activar menu avançado"
 #: Merge.rc:1393
 #, c-format
 msgid "In&clude subfolders by default"
-msgstr "Incluir sub-pastas por predefinição"
+msgstr "Incluir subpastas por predefinição"
 
 #: Merge.rc:1394
 #, c-format
 msgid "&Add to context menu"
-msgstr ""
+msgstr "Adicionar ao menu de contexto"
 
 #: Merge.rc:1395
 #, c-format
 msgid "Folder compare"
-msgstr ""
+msgstr "Comparação de pastas"
 
 #: Merge.rc:1396
 #, c-format
 msgid "Add &Shell menu to context menu"
-msgstr ""
+msgstr "Adicionar &Shell ao menu de contexto"
 
 #: Merge.rc:1404
 #, c-format
@@ -2618,37 +2620,37 @@ msgstr "Enviar ficheiros eliminados para a Reciclagem"
 #: Merge.rc:1408
 #, c-format
 msgid "&External editor:"
-msgstr "com editor &externo:"
+msgstr "Com editor &externo:"
 
 #: Merge.rc:1411
 #, c-format
 msgid "Supple&ment folder:"
-msgstr ""
+msgstr "Pasta de suple&mento:"
 
 #: Merge.rc:1413
 #, c-format
 msgid "B&rowse..."
-msgstr ""
+msgstr "Pesquisa&r..."
 
 #: Merge.rc:1414
 #, c-format
 msgid "Temporary files folder"
-msgstr ""
+msgstr "Pasta de ficheiros temporários"
 
 #: Merge.rc:1415
 #, c-format
 msgid "S&ystem's temp folder"
-msgstr ""
+msgstr "Pasta de ficheiros temporários do sistema"
 
 #: Merge.rc:1416
 #, c-format
 msgid "C&ustom folder:"
-msgstr ""
+msgstr "Pasta personalizada:"
 
 #: Merge.rc:1426
 #, c-format
 msgid "Save modified files?"
-msgstr "Guardar ficheiros modificados?"
+msgstr "Guardar ficheiros alterados?"
 
 #: Merge.rc:1429
 #, c-format
@@ -2683,7 +2685,7 @@ msgstr "Rejeitar alterações"
 #: Merge.rc:1437
 #, c-format
 msgid "Disca&rd All"
-msgstr ""
+msgstr "Rejeitar todas"
 
 #: Merge.rc:1447
 #, c-format
@@ -2723,7 +2725,7 @@ msgstr "Inserir texto a testar:"
 #: Merge.rc:1469
 #, c-format
 msgid "&Folder Name"
-msgstr "Nome do arquivo"
+msgstr "Nome da pasta"
 
 #: Merge.rc:1470
 #, c-format
@@ -2743,7 +2745,7 @@ msgstr "Fechar"
 #: Merge.rc:1481
 #, c-format
 msgid "Visual SourceSafe"
-msgstr ""
+msgstr "Visual SourceSafe"
 
 #: Merge.rc:1486
 #, c-format
@@ -2858,7 +2860,7 @@ msgstr "Imprimir o documento actual\nImprimir"
 #: Merge.rc:1538
 #, c-format
 msgid "Display full pages\nPrint Preview"
-msgstr "Exibir páginas inteiras\nPré-visualização"
+msgstr "Mostrar páginas inteiras\nPré-visualização"
 
 #: Merge.rc:1539
 #, c-format
@@ -2868,17 +2870,17 @@ msgstr "Mostrar todos os itens ocultados"
 #: Merge.rc:1540
 #, c-format
 msgid "Toggle tree mode"
-msgstr ""
+msgstr "Alternar modo de árvore"
 
 #: Merge.rc:1541
 #, c-format
 msgid "Expand all subfolders"
-msgstr ""
+msgstr "Expandir todas as subpastas"
 
 #: Merge.rc:1542
 #, c-format
 msgid "Collapse all subfolders"
-msgstr ""
+msgstr "Fechar todas as subpastas"
 
 #: Merge.rc:1543
 #, c-format
@@ -3007,13 +3009,21 @@ msgstr "Seleccionar todo o documento\nSelect All"
 
 #: Merge.rc:1580
 #, c-format
-msgid "Undo the last action\nUndo (Ctrl+Z)"
-msgstr "Anular a última acção\nUndo (Ctrl+Z)"
+msgid ""
+"Undo the last action\n"
+"Undo (Ctrl+Z)"
+msgstr ""
+"Anular a última ação\n"
+"Anular"
 
 #: Merge.rc:1581
 #, c-format
-msgid "Redo the previously undone action\nRedo (Ctrl+Y)"
-msgstr "Refazer a anterior acção anulada\nRedo (Ctrl+Y)"
+msgid ""
+"Redo the previously undone action\n"
+"Redo (Ctrl+Y)"
+msgstr ""
+"Refazer a ação anulada anteriormente\n"
+"Refazer"
 
 #: Merge.rc:1582
 #, c-format
@@ -3028,12 +3038,12 @@ msgstr "Mostrar/Ocultar a barra de estado\nToggle StatusBar"
 #: Merge.rc:1584
 #, c-format
 msgid "Show or hide the tab bar\nToggle TabBar"
-msgstr ""
+msgstr "Mostrar/Ocultar a barra de separadores"
 
 #: Merge.rc:1585
 #, c-format
 msgid "Automatically resize panes\nLock Panes"
-msgstr ""
+msgstr "Redimensionar painéis automaticamente\nBloquear painéis"
 
 #: Merge.rc:1587
 #, c-format
@@ -3069,7 +3079,7 @@ msgstr ""
 #: Merge.rc:1595
 #, c-format
 msgid "WinMerge comes with ABSOLUTELY NO WARRANTY. This is free software and you are welcome to redistribute it under certain circumstances; see the GNU General Public License in the Help menu for details."
-msgstr ""
+msgstr "O WinMerge não tem QUALQUER TIPO DE GARANTIA. Isto é um software livre e você está convidado a redistribui-lo sob certas circunstâncias, veja a GNU General Public License no menu Ajuda para obter mais detalhes.""
 
 #: Merge.rc:1596
 #, c-format
@@ -3124,17 +3134,17 @@ msgstr "Continuar"
 #: Merge.rc:1607
 #, c-format
 msgid "&Skip"
-msgstr "Avançar"
+msgstr "Ignorar"
 
 #: Merge.rc:1608
 #, c-format
 msgid "Skip &all"
-msgstr "Avançar todos"
+msgstr "Ignorar todos"
 
 #: Merge.rc:1610
 #, c-format
 msgid "Don't display this &message again."
-msgstr "Não voltar a exibir esta mensagem."
+msgstr "Não voltar a mostrar esta mensagem."
 
 #: Merge.rc:1611
 #, c-format
@@ -3149,27 +3159,27 @@ msgstr "Cores"
 #: Merge.rc:1614
 #, c-format
 msgid "To:"
-msgstr ""
+msgstr "Para:"
 
 #: Merge.rc:1615
 #, c-format
 msgid "From left:"
-msgstr ""
+msgstr "Da esquerda:"
 
 #: Merge.rc:1616
 #, c-format
 msgid "To left:"
-msgstr ""
+msgstr "Para a esquerda:"
 
 #: Merge.rc:1617
 #, c-format
 msgid "From right:"
-msgstr ""
+msgstr "Da direita:"
 
 #: Merge.rc:1618
 #, c-format
 msgid "To right:"
-msgstr ""
+msgstr "Para a direita:"
 
 #: Merge.rc:1619
 #, c-format
@@ -3199,7 +3209,7 @@ msgstr ""
 #: Merge.rc:1624
 #, c-format
 msgid "Are you sure you want to reset all WinMerge options to default values?\n\nPlease re-start WinMerge after the reset."
-msgstr ""
+msgstr "Tem a certeza que pretende repor todas as definições do WinMerge para as definições pré-definidas?\n\nPor favor, reinicie o WinMerge após a reposição."
 
 #: Merge.rc:1625
 #, c-format
@@ -3209,7 +3219,7 @@ msgstr "Abrir"
 #: Merge.rc:1626
 #, c-format
 msgid "Programs|*.exe;*.bat;*.cmd|All Files (*.*)|*.*||"
-msgstr ""
+msgstr "Programas|*.exe;*.bat;*.cmd|Todos os ficheiros (*.*)|*.*||"
 
 #: Merge.rc:1627
 #, c-format
@@ -3219,27 +3229,27 @@ msgstr "Todos os ficheiros (*.*)|*.*||"
 #: Merge.rc:1628
 #, c-format
 msgid "WinMerge Project Files (*.WinMerge)|*.WinMerge||"
-msgstr "Projectos WinMerge (*.WinMerge)|*.WinMerge||"
+msgstr "Projectos do WinMerge (*.WinMerge)|*.WinMerge||"
 
 #: Merge.rc:1629
 #, c-format
 msgid "Options files (*.ini)|*.ini|All Files (*.*)|*.*||"
-msgstr ""
+msgstr "Ficheiros de opções (*.ini)|*.ini|Todos os ficheiros (*.*)|*.*||"
 
 #: Merge.rc:1630
 #, c-format
 msgid "Text Files (*.csv;*.asc;*.rpt;*.txt)|*.csv;*.asc;*.rpt;*.txt|All Files (*.*)|*.*||"
-msgstr ""
+msgstr "Ficheiros de texto (*.csv;*.asc;*.rpt;*.txt)|*.csv;*.asc;*.rpt;*.txt|Todos os ficheiros (*.*)|*.*||"
 
 #: Merge.rc:1631
 #, c-format
 msgid "HTML Files (*.htm,*.html)|*.htm;*.html|All Files (*.*)|*.*||"
-msgstr ""
+msgstr "Ficheiros HTML (*.htm,*.html)|*.htm;*.html|Todos os ficheiros (*.*)|*.*||"
 
 #: Merge.rc:1632
 #, c-format
 msgid "XML Files (*.xml)|*.xml|All Files (*.*)|*.*||"
-msgstr ""
+msgstr "Fichiros XML (*.xml)|*.xml|Todos os ficheiros (*.*)|*.*||"
 
 #: Merge.rc:1633
 #, c-format
@@ -3264,7 +3274,7 @@ msgstr ""
 #: Merge.rc:1637
 #, c-format
 msgid "Full Contents"
-msgstr ""
+msgstr "Conteúdo completo"
 
 #: Merge.rc:1638
 #, c-format
@@ -3319,22 +3329,22 @@ msgstr "Ficheiros de filtros (*.ini)|*.ini|Todos os ficheiros (*.*)|*.*||"
 #: Merge.rc:1648
 #, c-format
 msgid "Cannot find file filter template file!\n\nPlease copy file %1 to WinMerge/Filters -folder:\n%2."
-msgstr ""
+msgstr "Não foi possível localizar o ficheiro de modelo de filtros!\n\nPor favor, copie o ficheiro %1 para a pasta WinMerge/Filtros:\n%2."
 
 #: Merge.rc:1649
 #, c-format
 msgid "Cannot copy filter template file to filter folder:\n%1\n\nPlease make sure the folder exists and is writable."
-msgstr ""
+msgstr "Não foi possível copiar o ficheiro de modelo de filtros para a pasta:\n%1\n\nPor favor, verifique se a pasta existe e se é gravável."
 
 #: Merge.rc:1650
 #, c-format
 msgid "User's filter file folder is not defined!\n\nPlease select filter folder in Options/System."
-msgstr ""
+msgstr "A pasta personalizada para ficheiros de filtros não está definida!\n\nPor favor, seleccione a pasta de filtros em Opções/Sistema."
 
 #: Merge.rc:1651
 #, c-format
 msgid "Failed to delete the filter file:\n%1\n\nMaybe the file is read-only?"
-msgstr ""
+msgstr "Não foi possível eliminar o ficheiro de filtros:\n%1\n\nTalvez o ficheiro seja só de leitura?"
 
 #: Merge.rc:1652
 #, c-format
@@ -3344,32 +3354,32 @@ msgstr "Localizar filtro a instalar"
 #: Merge.rc:1653
 #, c-format
 msgid "Installing filter file failed.\n\nCould not copy new filter file to filter folder."
-msgstr ""
+msgstr "A instalação o ficheiro de filtros falhou.\n\nNão foi possível copiar o novo ficheiro de filtros para a pasta de filtros."
 
 #: Merge.rc:1654
 #, c-format
 msgid "Filter file already exists. Overwrite existing filter?"
-msgstr ""
+msgstr "O ficheiro de filtros já existe. Deseja substituir o ficheiro existente?"
 
 #: Merge.rc:1655
 #, c-format
 msgid "Regular expression"
-msgstr ""
+msgstr "Expressão regular"
 
 #: Merge.rc:1656
 #, c-format
 msgid "Filters were updated. Refresh current folder compare?"
-msgstr ""
+msgstr "Os filtros foram actualizados. Deseja refrescar as pastas abertas actualmente na comparação?"
 
 #: Merge.rc:1658
 #, c-format
 msgid "&Path to SS.EXE:"
-msgstr ""
+msgstr "&Caminho para o SS.EXE:"
 
 #: Merge.rc:1659
 #, c-format
 msgid "Folder Comparison Results"
-msgstr "Relatório de comparação de arquivos"
+msgstr "Relatório de comparação de pastas"
 
 #: Merge.rc:1660
 #, c-format
@@ -3389,17 +3399,17 @@ msgstr "Sem título direita"
 #: Merge.rc:1663
 #, c-format
 msgid "Theirs File"
-msgstr ""
+msgstr "Ficheiro deles"
 
 #: Merge.rc:1664
 #, c-format
 msgid "Mine File"
-msgstr ""
+msgstr "Meus ficheiros"
 
 #: Merge.rc:1665
 #, c-format
 msgid "Scanning files..."
-msgstr "Analisando ficheiros..."
+msgstr "A analisar ficheiros..."
 
 #: Merge.rc:1666
 #, c-format
@@ -3449,12 +3459,12 @@ msgstr "A criar relatório..."
 #: Merge.rc:1675
 #, c-format
 msgid "Undoing the last operation..."
-msgstr ""
+msgstr "A anular a última operação..."
 
 #: Merge.rc:1676
 #, c-format
 msgid "Redoing the previous operation..."
-msgstr ""
+msgstr "A refazer a operação anterior..."
 
 #: Merge.rc:1677
 #, c-format
@@ -3559,12 +3569,12 @@ msgstr "Impossível abrir ficheiro\n%1\n\n%2"
 #: Merge.rc:1697
 #, c-format
 msgid "Failed to parse conflict file."
-msgstr ""
+msgstr "Falha ao analisar ficheiro em conflito."
 
 #: Merge.rc:1698
 #, c-format
 msgid "The file\n%1\nis not a conflict file."
-msgstr ""
+msgstr "O ficheiro\n%1\nnão é um ficheiro em conflito."
 
 #: Merge.rc:1699
 #, c-format
@@ -3594,7 +3604,7 @@ msgstr "Erro ao criar cópia de segurança"
 #: Merge.rc:1704
 #, c-format
 msgid "Unable to backup original file:\n%1\n\nContinue anyway?"
-msgstr ""
+msgstr "Não foi possível fazer o backup do ficheiro original:\n%1\n\nContinuar mesmo assim?"
 
 #: Merge.rc:1705
 #, c-format
@@ -3604,7 +3614,7 @@ msgstr "Erro ao guardar ficheiro.\n%1\n%2\nDeseja:\n\t-usar um nome diferente pa
 #: Merge.rc:1706
 #, c-format
 msgid "Another application has updated file\n%1\nsince WinMerge loaded it.\n\nOverwrite changed file?"
-msgstr "Outra aplicação actualizou o ficheiro\n%1\ndesde a incialização de WinMerge.\n\nSubstituir ficheiro modificado?"
+msgstr "Outra aplicação actualizou o ficheiro\n%1\ndesde a incialização de WinMerge.\n\nSubstituir ficheiro alterado?"
 
 #: Merge.rc:1707
 #, c-format
@@ -3614,7 +3624,7 @@ msgstr "%1\né apenas de leitura. Deseja substituir o item apenas de leitura?"
 #: Merge.rc:1708
 #, c-format
 msgid "Another application has updated file\n%1\nsince WinMerge scanned it last time.\n\nDo you want to reload the file?"
-msgstr ""
+msgstr "Outra aplicação actualizou o ficheiro\n%1\ndesde que o WinMerge o analizou pela última vez.\n\nDeseja recarregar novamente o ficheiro?"
 
 #: Merge.rc:1709
 #, c-format
@@ -3629,7 +3639,7 @@ msgstr "Guardar ficheiro direito como..."
 #: Merge.rc:1711
 #, c-format
 msgid "The file\n%1\nhas disappeared. Please save a copy of the file to continue."
-msgstr ""
+msgstr "O ficheiro\n%1\ndesapareceu. Por favor, guarde uma cópia do ficheiro para continuar."
 
 #: Merge.rc:1712
 #, c-format
@@ -3664,7 +3674,7 @@ msgstr "O ficheiro de trabalho de VSS e o destino do ficheiro actual não coincid
 #: Merge.rc:1718
 #, c-format
 msgid "No VSS database(s) found!"
-msgstr "Base(s) de dados VSS não encontrada(s)!"
+msgstr "Não foram encontrada as base de dados VSS!"
 
 #: Merge.rc:1719
 #, c-format
@@ -3772,32 +3782,32 @@ msgstr "Tem certeza que deseja eliminar\n\n%1 ?"
 #: Merge.rc:1742
 #, c-format
 msgid "Are you sure you want to copy:"
-msgstr ""
+msgstr "Tem a certeza que deseja copiar:"
 
 #: Merge.rc:1743
 #, c-format
 msgid "Are you sure you want to copy %d items:"
-msgstr ""
+msgstr "Tem a certeza que deseja copiar %d itens:"
 
 #: Merge.rc:1744
 #, c-format
 msgid "Operation aborted!\n\nFolder contents at disks has changed, path\n%1\nwas not found.\n\nPlease refresh the compare."
-msgstr ""
+msgstr "Operação cancelada!\n\nO conteúdo da pasta foi alterado, path\n%1\nnão foi encontrado.\n\nPor favor, refresque a comparação."
 
 #: Merge.rc:1745
 #, c-format
 msgid "Are you sure you want to move:"
-msgstr ""
+msgstr "Tem a certeza que deseja mover:"
 
 #: Merge.rc:1746
 #, c-format
 msgid "Are you sure you want to move %d items:"
-msgstr ""
+msgstr "Tem a certeza que deseja mover %d itens:"
 
 #: Merge.rc:1748
 #, c-format
 msgid "Confirm Move"
-msgstr ""
+msgstr "Confirmar mover"
 
 #: Merge.rc:1749
 #, c-format
@@ -3832,7 +3842,7 @@ msgstr "Abrir ficheiro direito com..."
 #: Merge.rc:1755
 #, c-format
 msgid "Failed to execute external editor: %1"
-msgstr "Erro ao executar editor externo: %1"
+msgstr "Erro ao executar o editor externo: %1"
 
 #: Merge.rc:1756
 #, c-format
@@ -3862,12 +3872,12 @@ msgstr "Copiar destino de ambos os lados para a Área de Transferência"
 #: Merge.rc:1761
 #, c-format
 msgid "Left Shell menu"
-msgstr ""
+msgstr "Menu esquerdo da Shell"
 
 #: Merge.rc:1762
 #, c-format
 msgid "Right Shell menu"
-msgstr ""
+msgstr "Menu direito da Shell"
 
 #: Merge.rc:1763
 #, c-format
@@ -3897,12 +3907,12 @@ msgstr "Adicionar outros itens ao arquivo (ambos os lados)"
 #: Merge.rc:1768
 #, c-format
 msgid "Move selected file on left to custom directory"
-msgstr ""
+msgstr "Mover ficheiro selecionado à esquerda para o diretório personalizado"
 
 #: Merge.rc:1769
 #, c-format
 msgid "Move selected file on right to custom directory"
-msgstr ""
+msgstr "Mover ficheiro selecionado à direita para o diretório personalizado"
 
 #: Merge.rc:1770
 #, c-format
@@ -4033,22 +4043,22 @@ msgstr "Item abortado"
 #: Merge.rc:1797
 #, c-format
 msgid "File skipped"
-msgstr "Ficheiro omitido"
+msgstr "Ficheiro ignorado"
 
 #: Merge.rc:1798
 #, c-format
 msgid "Folder skipped"
-msgstr "Arquivo omitido"
+msgstr "Pasta ignorada"
 
 #: Merge.rc:1799
 #, c-format
 msgid "Left only: %1"
-msgstr ""
+msgstr "Apenas esquerda: %1"
 
 #: Merge.rc:1800
 #, c-format
 msgid "Right only: %1"
-msgstr ""
+msgstr "Apenas direita: %1"
 
 #: Merge.rc:1801
 #, c-format
@@ -4068,7 +4078,7 @@ msgstr "Os ficheiros são diferentes"
 #: Merge.rc:1805
 #, c-format
 msgid "Folders are different"
-msgstr ""
+msgstr "As pastas são diferentes"
 
 #: Merge.rc:1806
 #, c-format
@@ -4083,17 +4093,17 @@ msgstr "Apenas direita"
 #: Merge.rc:1809
 #, c-format
 msgid "Error"
-msgstr ""
+msgstr "Erro"
 
 #: Merge.rc:1810
 #, c-format
 msgid "Text files are identical"
-msgstr ""
+msgstr "Os ficheiros de texto são idênticos"
 
 #: Merge.rc:1811
 #, c-format
 msgid "Text files are different"
-msgstr ""
+msgstr "Os ficheiros de texto são diferentes"
 
 #: Merge.rc:1812
 #, c-format
@@ -4118,7 +4128,7 @@ msgstr "Nome do ficheiro ou pasta."
 #: Merge.rc:1816
 #, c-format
 msgid "Subfolder name when subfolders are included."
-msgstr "Nome de sub-ficheiro quando sub-ficheiros incluídos."
+msgstr "Nome da subpasta quando subpastas estão incluídas."
 
 #: Merge.rc:1817
 #, c-format
@@ -4263,7 +4273,7 @@ msgstr "HTML simples"
 #: Merge.rc:1845
 #, c-format
 msgid "The report file already exists. Do you want to overwrite existing file?"
-msgstr ""
+msgstr "O ficheiro de relatório já existe. Deseja substituir o ficheiro existente?"
 
 #: Merge.rc:1846
 #, c-format
@@ -4298,17 +4308,17 @@ msgstr "Impossível criar ficheiros temporários. Verifique as suas definições de 
 #: Merge.rc:1852
 #, c-format
 msgid "These files use different carriage return types.\n\nDo you want to treat all carriage return types as equivalent for this comparison?\n\nNote: If you always want to treat all carriage return types as equivalent, set the option 'Ignore carriage return differences..' in the Compare tab of the options dialog (available under Edit/Options)."
-msgstr ""
+msgstr "Estes ficheiros tem diferentes tipos de mudança de linha\n\nDeseja tratar todos os tipos de mudança de linha como equivalentes para esta comparação\n\nNota:.? Se quiser tratar, sempre, todos os tipos de mudança de linha como equivalentes, deve definir a opção 'Ignorar diferenças de mudança de linha' no separador Comparar (disponível em Editar/Opções)."
 
 #: Merge.rc:1853
 #, c-format
 msgid "The EOL are of different types (Windows/Unix/Mac) in the file '%1'.\n With the current options, they will be unified to the main type.\n Do you want to change the options and preserve the different EOL ?"
-msgstr ""
+msgstr "Os tipos de mudança de linha são diferentes (Windows/Unix/Mac) no ficheiro '%1'.\n Com as opções actuais, eles serão unificados para o tipo principal.\n Deseja alterar as opções e preservar os diferentes tipos de mudança de linha?"
 
 #: Merge.rc:1854
 #, c-format
 msgid "The selected folder is invalid."
-msgstr "O arquivo seleccionado é inválido."
+msgstr "A pasta seleccionada é inválida."
 
 #: Merge.rc:1855
 #, c-format
@@ -4318,7 +4328,7 @@ msgstr "Impossível abrir ficheiro binário no editor."
 #: Merge.rc:1856
 #, c-format
 msgid "The folder exists only in other side and cannot be opened.\n\nDo you want to create a matching folder:\n%1\nto the other side and open these folders?"
-msgstr ""
+msgstr "A pasta só existe no outro lado e não pode ser aberta.\n\nDeseja criar a pasta:\n%1\n no outro lado e abrir estas pastas?""
 
 #: Merge.rc:1857
 #, c-format
@@ -4413,7 +4423,7 @@ msgstr "[%1 itens seleccionados]"
 #: Merge.rc:1875
 #, c-format
 msgid "Normal"
-msgstr ""
+msgstr "Normal"
 
 #: Merge.rc:1876
 #, c-format
@@ -4453,7 +4463,7 @@ msgstr "Impossível criar ficheiro patch a partir de directorias."
 #: Merge.rc:1883
 #, c-format
 msgid "Please save all files first.\n\nCreating a patch requires that there are no unsaved changes in files."
-msgstr "Por favor, guarde todos os ficheiros antes.\n\nCiar um ficheiro patch requer a inexistência de alterações por guardar nos ficheiros."
+msgstr "Por favor, guarde todos os ficheiros primeiro.\n\nCriar um ficheiro patch requer que todas as alterações estejam guardadas."
 
 #: Merge.rc:1884
 #, c-format
@@ -4468,7 +4478,7 @@ msgstr "Os resultados de comparação da directoria actual serão eliminados."
 #: Merge.rc:1886
 #, c-format
 msgid "Archive support is not enabled.\nAll needed components (7-zip and/or Merge7z*.dll) for archive support cannot be found.\nSee manual for more info about archive support and how to enable it."
-msgstr ""
+msgstr "O suporte de arquivo não está activo.\nTodos os componentes necessários (7-zip and/or Merge7z*.dll) para o suporte de arquivo, não foram encontrados.\nConsulte o manual, para mais informações sobre o suporte de arquivo e como activa-lo.""
 
 #: Merge.rc:1887
 #, c-format
@@ -4483,12 +4493,12 @@ msgstr "\nNota: integração 7-Zip está restricta a operação autónoma nas definiçõ
 #: Merge.rc:1889
 #, c-format
 msgid "Select file for export"
-msgstr "Seleccione ficheiro a exportar"
+msgstr "Seleccione o ficheiro a exportar"
 
 #: Merge.rc:1890
 #, c-format
 msgid "Select file for import"
-msgstr "Seleccione ficheiro a importar"
+msgstr "Seleccione o ficheiro a importar"
 
 #: Merge.rc:1891
 #, c-format
@@ -4503,17 +4513,17 @@ msgstr "Opções exportadas para o ficheiro."
 #: Merge.rc:1893
 #, c-format
 msgid "Failed to import options from the file."
-msgstr "Importação de opções do ficheiro falhou."
+msgstr "A importação de opções do ficheiro falhou."
 
 #: Merge.rc:1894
 #, c-format
 msgid "Failed to write options to the file."
-msgstr "Escrita de opções para o ficheiro falhou."
+msgstr "A escrita de opções para o ficheiro falhou."
 
 #: Merge.rc:1895
 #, c-format
 msgid "You are about to close several compare windows.\n\nDo you want to continue?"
-msgstr ""
+msgstr "Está prestes a fechar várias janelas de comparação.\n\nDeseja continuar?"
 
 #: Merge.rc:1896
 #, c-format
@@ -4523,7 +4533,7 @@ msgstr "Erro de expressão regular"
 #: Merge.rc:1897
 #, c-format
 msgid "No match"
-msgstr "Sem coincidências"
+msgstr "Sem correspondências"
 
 #: Merge.rc:1898
 #, c-format
@@ -4543,7 +4553,7 @@ msgstr "Nome de classe de caracter inválido"
 #: Merge.rc:1901
 #, c-format
 msgid "Trailing backslash"
-msgstr ""
+msgstr "Barra invertida (\)"
 
 #: Merge.rc:1902
 #, c-format
@@ -4658,27 +4668,27 @@ msgstr "Guardar ficheiro direito com o nome..."
 #: Merge.rc:1926
 #, c-format
 msgid "Change left side file/folder read-only status"
-msgstr ""
+msgstr "Alterar o estado só de leitura do ficheiro/pasta do lado esquerdo"
 
 #: Merge.rc:1927
 #, c-format
 msgid "Change right side file/folder read-only status"
-msgstr ""
+msgstr "Alterar o estado só de leitura do ficheiro/pasta do lado direito"
 
 #: Merge.rc:1928
 #, c-format
 msgid "Convert EOL to Windows mode"
-msgstr ""
+msgstr "Converter EOL para modo Windows"
 
 #: Merge.rc:1929
 #, c-format
 msgid "Convert EOL to Unix mode"
-msgstr ""
+msgstr "Converter EOL para modo Unix"
 
 #: Merge.rc:1930
 #, c-format
 msgid "Convert EOL to Mac mode"
-msgstr ""
+msgstr "Converter EOL para modo Mac"
 
 #: Merge.rc:1931
 #, c-format
@@ -4693,7 +4703,7 @@ msgstr "Ver e ajustar propriedades de codificação\nPropriedades de codificação d
 #: Merge.rc:1933
 #, c-format
 msgid "Open and resolve conflict file"
-msgstr ""
+msgstr "Abrir e resolver o ficheiro em conflito"
 
 #: Merge.rc:1934
 #, c-format
@@ -4733,7 +4743,7 @@ msgstr "Alternar marcações"
 #: Merge.rc:1941
 #, c-format
 msgid "Go to next bookmark"
-msgstr "Ir para a próxima marcação"
+msgstr "Ir para a marcação seguinte"
 
 #: Merge.rc:1942
 #, c-format
@@ -4773,7 +4783,7 @@ msgstr "Mostra ficheiros binários\nMostra ficheiros binários"
 #: Merge.rc:1949
 #, c-format
 msgid "Displays skipped items\nShow Skipped Items"
-msgstr "Mostra itens omitidos\nMostra itens omitidos"
+msgstr "Mostrar itens ignorados\nMostrar itens ignorados"
 
 #: Merge.rc:1950
 #, c-format
@@ -4788,7 +4798,7 @@ msgstr "Repor fonte do sistema predefinida de visualização\nFonte predefinida"
 #: Merge.rc:1952
 #, c-format
 msgid "Shows whitespace characters"
-msgstr "Mostra espaços em branco"
+msgstr "Mostrar espaços em branco"
 
 #: Merge.rc:1953
 #, c-format
@@ -4798,22 +4808,22 @@ msgstr "Mostrar/Ocultar janela de diferenças"
 #: Merge.rc:1954
 #, c-format
 msgid "Location pane shows overall picture from files"
-msgstr "Janela de localização mostra visão geral dosficheiros"
+msgstr "Janela de localização mostra visão geral dos ficheiros"
 
 #: Merge.rc:1955
 #, c-format
 msgid "Show folder compare statistics dialog"
-msgstr "Mostra estatísticas da comparação de arquivos"
+msgstr "Mostrar estatísticas da comparação de pastas"
 
 #: Merge.rc:1956
 #, c-format
 msgid "Select the current user interface language\nLanguage"
-msgstr ""
+msgstr "Seleccione o idioma para a interface do utilizador\nIdioma"
 
 #: Merge.rc:1957
 #, c-format
 msgid "Shows differences inside lines with different colors\nShow Line Difference"
-msgstr ""
+msgstr "Mostrar cores diferentes para diferenças dentro das linha\nMostrar diferenças nas linhas"
 
 #: Merge.rc:1958
 #, c-format
@@ -4833,77 +4843,77 @@ msgstr "Ajustar comprimento de linhas à largura da janela\nAjustar linhas"
 #: Merge.rc:1961
 #, c-format
 msgid "Shows selection margins for both panes\nShow Selection Margins"
-msgstr ""
+msgstr "Mostrar margens de selecção em ambos os painéis\mMostrar margesn de selecção"
 
 #: Merge.rc:1962
 #, c-format
 msgid "Increase text size"
-msgstr ""
+msgstr "Aumentar o tamanho do texto"
 
 #: Merge.rc:1963
 #, c-format
 msgid "Decrease text size"
-msgstr ""
+msgstr "Diminuir o tamanho do texto"
 
 #: Merge.rc:1964
 #, c-format
 msgid "Reset text zoom to default size"
-msgstr ""
+msgstr "Repor o tamanho do texto para o valor pré-definido"
 
 #: Merge.rc:1965
 #, c-format
 msgid "Scroll to the previous difference\nPrevious Difference (Alt+Up)"
-msgstr ""
+msgstr "Ir para a diferença anterior\nDiferença anterior (Alt+Up)"
 
 #: Merge.rc:1966
 #, c-format
 msgid "Scroll to the next difference\nNext Difference (Alt+Down)"
-msgstr ""
+msgstr "Ir para a próxima diferença\nPróxima diferença (Alt+Down)"
 
 #: Merge.rc:1967
 #, c-format
 msgid "Scroll to the first difference\nFirst Difference (Alt+Home)"
-msgstr ""
+msgstr "Ir para a primeira diferença\nPrimeira diferença (Alt+Home)"
 
 #: Merge.rc:1968
 #, c-format
 msgid "Scroll to the current difference\nCurrent Difference (Alt+Enter)"
-msgstr ""
+msgstr "Ir para a diferença actual\nDiferença actual (Alt+Enter)"
 
 #: Merge.rc:1969
 #, c-format
 msgid "Scroll to the last difference\nLast Difference (Alt+End)"
-msgstr ""
+msgstr "Ir para a última diferença\nÚltima diferença (Alt+End)"
 
 #: Merge.rc:1970
 #, c-format
 msgid "Copy the selected text to the right file\nCopy Right (Alt+Right)"
-msgstr "Copiar o texto seleccionado para oficheiro esquerdo\nCopiar à direita (Alt+Direita)"
+msgstr "Copiar o texto seleccionado para o ficheiro esquerdo\nCopiar para a direita (Alt+Direita)"
 
 #: Merge.rc:1971
 #, c-format
 msgid "Copy the selected text to the left file\nCopy Left (Alt+Left)"
-msgstr "Copiar o texto seleccionado para o ficheiro esquerdo\nCopiar à esquerda (Alt+Esquerda)"
+msgstr "Copiar o texto seleccionado para o ficheiro esquerdo\nCopiar para a esquerda (Alt+Esquerda)"
 
 #: Merge.rc:1972
 #, c-format
 msgid "Copy difference to right and advance to next\nCopy Right and Advance (Ctrl+Alt+Right)"
-msgstr "Copiar diferença para a direita e avançar para a próxima\nCopiar à direita e avançar (Ctrl+Alt+Direita)"
+msgstr "Copiar diferença para a direita e avançar para a próxima\nCopiar para a direita e avançar (Ctrl+Alt+Direita)"
 
 #: Merge.rc:1973
 #, c-format
 msgid "Copy difference to left and advance to next\nCopy Left and Advance (Ctrl+Alt+Left)"
-msgstr "Copiar diferença para a esquerda e avançar para a próxima\nCopiar à esquerda e avançar (Ctrl+Alt+Esquerda)"
+msgstr "Copiar diferença para a esquerda e avançar para a próxima\nCopiar para a esquerda e avançar (Ctrl+Alt+Esquerda)"
 
 #: Merge.rc:1974
 #, c-format
 msgid "Copy all differences to the right file\nAll Right"
-msgstr "Copiar todas as diferenças para o ficheiro da direita\nTodas à direita"
+msgstr "Copiar todas as diferenças para o ficheiro da direita\nCopiar todas para a direita"
 
 #: Merge.rc:1975
 #, c-format
 msgid "Copy all differences to the left file\nAll Left"
-msgstr "Copiar todas as diferenças para o ficheiro da esquerda\nTodas à esquerda"
+msgstr "Copiar todas as diferenças para o ficheiro da esquerda\nCopiar todas para a esquerda"
 
 #: Merge.rc:1976
 #, c-format
@@ -4938,7 +4948,7 @@ msgstr "Gera um relatório dos resultados de comparação"
 #: Merge.rc:1982
 #, c-format
 msgid "Activates next visible file\nActivate next File"
-msgstr ""
+msgstr "Activar o próximo ficheiro visível\nActivar o próximo ficheiro"
 
 #: Merge.rc:1983
 #, c-format
@@ -4948,7 +4958,7 @@ msgstr "Fecha todas as janelas abertas"
 #: Merge.rc:1984
 #, c-format
 msgid "Opens the WinMerge Help\nWinMerge Help"
-msgstr ""
+msgstr "Abre a ajuda do WinMerge\nAjuda do WinMerge"
 
 #: Merge.rc:1985
 #, c-format
@@ -4958,7 +4968,7 @@ msgstr "Exporta a versão actual de WinMerge e a configuração para um ficheiro de
 #: Merge.rc:1986
 #, c-format
 msgid "Display the GNU General Public License"
-msgstr ""
+msgstr "Mostra a GNU General Public License"
 
 #: Merge.rc:1987
 #, c-format
@@ -4968,12 +4978,12 @@ msgstr "Compilação privada: %1"
 #: Merge.rc:1988
 #, c-format
 msgid "Opens the release notes document\nRelease Notes"
-msgstr ""
+msgstr "Abre as notas de lançamento\nNotas de lançamento"
 
 #: Merge.rc:1989
 #, c-format
 msgid "Opens the translations website\nTranslations"
-msgstr ""
+msgstr "Abre a página web de traduções\nTraduções"
 
 #: Merge.rc:1990
 #, c-format
@@ -5003,7 +5013,7 @@ msgstr "Não mostrar blocos movidos"
 #: Merge.rc:1995
 #, c-format
 msgid "Display all moved blocks"
-msgstr ""
+msgstr "Mostrar todos os blocos movidos"
 
 #: Merge.rc:1996
 #, c-format
@@ -5043,55 +5053,55 @@ msgstr "Da lista MRU"
 #: Merge.rc:2003
 #, c-format
 msgid "Hide the toolbar"
-msgstr ""
+msgstr "Ocultar barra de ferramentas"
 
 #: Merge.rc:2004
 #, c-format
 msgid "Show small toolbar"
-msgstr ""
+msgstr "Mostrar barra de ferramentas pequena"
 
 #: Merge.rc:2005
 #, c-format
 msgid "Show big toolbar"
-msgstr ""
+msgstr "Mostrar barra de ferramentas grande"
 
 #: Merge.rc:2006
 #, c-format
 msgid "Selection left"
-msgstr ""
+msgstr "Selecção esquerda"
 
 #: Merge.rc:2007
 #, c-format
 msgid "Selection right"
-msgstr ""
+msgstr "Selecção direita"
 
 #: Merge.rc:2008
 #, c-format
 msgid "Print..."
-msgstr ""
+msgstr "Imprimir..."
 
 #: Merge.rc:2009
 #, c-format
 msgid "Page Setup..."
-msgstr ""
+msgstr "Configurar página..."
 
 #: Merge.rc:2010
 #, c-format
 msgid "Page Zoom:"
-msgstr ""
+msgstr "Zoom da página..."
 
 #: Merge.rc:2011
 #, c-format
 msgid "Content Zoom:"
-msgstr ""
+msgstr "Zoom do conteúdo..."
 
 #: Merge.rc:2012
 #, c-format
 msgid "%d line excluded"
-msgstr ""
+msgstr "%d linha excluída"
 
 #: Merge.rc:2013
 #, c-format
 msgid "%d lines excluded"
-msgstr ""
+msgstr "%d linhas excluídas"
 
