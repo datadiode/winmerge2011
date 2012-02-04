@@ -777,7 +777,7 @@ const DIFFITEM &CDirView::DirItemEnumerator::Next()
  */
 Merge7z::Envelope *CDirView::DirItemEnumerator::Enum(Item &item)
 {
-	CDirFrame *pDoc = m_pView->GetDocument();
+	CDirFrame *pDoc = m_pView->m_pFrame;
 	const DIFFITEM &di = Next();
 
 	if ((m_nFlags & DiffsOnly) && !m_pView->IsItemNavigableDiff(di))

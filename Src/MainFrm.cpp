@@ -1413,9 +1413,9 @@ bool CMainFrame::DoFileOpen(FileLocation &filelocLeft, FileLocation &filelocRigh
 		dlg.m_bRightReadOnly = bRORight;
 
 		if (dwLeftFlags & FFILEOPEN_PROJECT || dwRightFlags & FFILEOPEN_PROJECT)
-			dlg.m_bOverwriteRecursive = TRUE; // Use given value, not previously used value
+			dlg.m_bOverwriteRecursive = true; // Use given value, not previously used value
 		if (dwLeftFlags & FFILEOPEN_CMDLINE || dwRightFlags & FFILEOPEN_CMDLINE)
-			dlg.m_bOverwriteRecursive = TRUE; // Use given value, not previously used value
+			dlg.m_bOverwriteRecursive = true; // Use given value, not previously used value
 
 		if (LanguageSelect.DoModal(dlg, m_hWnd) != IDOK)
 			return false;

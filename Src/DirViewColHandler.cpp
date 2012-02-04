@@ -259,8 +259,8 @@ void CDirView::ReflectGetdispinfo(NMLVDISPINFO *pParam)
 		}
 		return;
 	}
-	const CDiffContext *ctxt = GetDocument()->GetDiffContext();
-	const DIFFITEM &di = GetDocument()->GetDiffRefByKey(key);
+	const CDiffContext *ctxt = m_pFrame->GetDiffContext();
+	const DIFFITEM &di = m_pFrame->GetDiffRefByKey(key);
 	if (pParam->item.mask & LVIF_TEXT)
 	{
 		String s = ColGetTextToDisplay(ctxt, i, di);

@@ -268,14 +268,14 @@ void CDirView::DoCopyRightToLeft()
 			FileActionItem act;
 			String sDest(slFile);
 
-			if (GetDocument()->GetRecursive())
+			if (m_pFrame->GetRecursive())
 			{
 				// If destination sides's relative path is empty it means we
 				// are copying unique items and need to get the real relative
 				// path from original side.
 				if (di.left.path.empty())
 				{
-					sDest = GetDocument()->GetLeftBasePath();
+					sDest = m_pFrame->GetLeftBasePath();
 					sDest = paths_ConcatPath(sDest, di.right.path);
 					sDest = paths_ConcatPath(sDest, di.right.filename);
 				}
@@ -329,14 +329,14 @@ void CDirView::DoCopyLeftToRight()
 			FileActionItem act;
 			String sDest(srFile);
 
-			if (GetDocument()->GetRecursive())
+			if (m_pFrame->GetRecursive())
 			{
 				// If destination sides's relative path is empty it means we
 				// are copying unique items and need to get the real relative
 				// path from original side.
 				if (di.right.path.empty())
 				{
-					sDest = GetDocument()->GetRightBasePath();
+					sDest = m_pFrame->GetRightBasePath();
 					sDest = paths_ConcatPath(sDest, di.left.path);
 					sDest = paths_ConcatPath(sDest, di.left.filename);
 				}
@@ -611,7 +611,7 @@ void CDirView::DoCopyLeftTo()
 
 			actionScript.m_destBase = sFullDest;
 
-			if (GetDocument()->GetRecursive())
+			if (m_pFrame->GetRecursive())
 			{
 				if (!di.left.path.empty())
 				{
@@ -679,7 +679,7 @@ void CDirView::DoCopyRightTo()
 
 			actionScript.m_destBase = sFullDest;
 
-			if (GetDocument()->GetRecursive())
+			if (m_pFrame->GetRecursive())
 			{
 				if (!di.right.path.empty())
 				{
@@ -745,7 +745,7 @@ void CDirView::DoMoveLeftTo()
 			FileActionItem act;
 			String sFullDest = destPath + _T("\\");
 			actionScript.m_destBase = sFullDest;
-			if (GetDocument()->GetRecursive())
+			if (m_pFrame->GetRecursive())
 			{
 				if (!di.left.path.empty())
 				{
@@ -811,7 +811,7 @@ void CDirView::DoMoveRightTo()
 			FileActionItem act;
 			String sFullDest = destPath + _T("\\");
 			actionScript.m_destBase = sFullDest;
-			if (GetDocument()->GetRecursive())
+			if (m_pFrame->GetRecursive())
 			{
 				if (!di.right.path.empty())
 				{
@@ -889,16 +889,16 @@ BOOL CDirView::ConfirmActionList(const FileActionScript & actionList, int selCou
 			String dst;
 
 			if (item.UIOrigin == FileActionItem::UI_LEFT)
-				src = GetDocument()->GetLeftBasePath();
+				src = m_pFrame->GetLeftBasePath();
 			else
-				src = GetDocument()->GetRightBasePath();
+				src = m_pFrame->GetRightBasePath();
 
 			if (bDestIsSide)
 			{
 				if (item.UIDestination == FileActionItem::UI_LEFT)
-					dst = GetDocument()->GetLeftBasePath();
+					dst = m_pFrame->GetLeftBasePath();
 				else
-					dst = GetDocument()->GetRightBasePath();
+					dst = m_pFrame->GetRightBasePath();
 			}
 			else
 			{
@@ -936,9 +936,9 @@ BOOL CDirView::ConfirmActionList(const FileActionScript & actionList, int selCou
 			String dst;
 
 			if (item.UIOrigin == FileActionItem::UI_LEFT)
-				src = GetDocument()->GetLeftBasePath();
+				src = m_pFrame->GetLeftBasePath();
 			else
-				src = GetDocument()->GetRightBasePath();
+				src = m_pFrame->GetRightBasePath();
 
 			if (!actionList.m_destBase.empty())
 				dst = actionList.m_destBase;
@@ -1327,12 +1327,12 @@ UINT CDirView::MarkSelectedForRescan()
 			continue;
 
 		const DIFFITEM &di = GetDiffItem(sel);
-		GetDocument()->SetDiffStatus(0, DIFFCODE::TEXTFLAGS | DIFFCODE::SIDEFLAGS | DIFFCODE::COMPAREFLAGS, sel);		
-		GetDocument()->SetDiffStatus(DIFFCODE::NEEDSCAN, DIFFCODE::SCANFLAGS, sel);
+		m_pFrame->SetDiffStatus(0, DIFFCODE::TEXTFLAGS | DIFFCODE::SIDEFLAGS | DIFFCODE::COMPAREFLAGS, sel);		
+		m_pFrame->SetDiffStatus(DIFFCODE::NEEDSCAN, DIFFCODE::SCANFLAGS, sel);
 		++items;
 	}
 	if (items > 0)
-		GetDocument()->SetMarkedRescan();
+		m_pFrame->SetMarkedRescan();
 	return items;
 }
 
@@ -1523,7 +1523,7 @@ BOOL CDirView::DoItemRename(LPCTSTR szNewItemName)
 
 	UINT_PTR key = GetItemKey(nSelItem);
 	ASSERT(key != SPECIAL_ITEM_POS);
-	ASSERT(&di == &GetDocument()->GetDiffRefByKey(key));
+	ASSERT(&di == &m_pFrame->GetDiffRefByKey(key));
 
 	BOOL bRenameLeft = FALSE;
 	BOOL bRenameRight = FALSE;

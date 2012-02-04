@@ -66,7 +66,7 @@ public:
 	BOOL	m_bRecurse;
 	bool m_bLeftReadOnly; /**< Is left path opened as read-only */
 	bool m_bRightReadOnly; /**< Is right path opened as read-only */
-	BOOL m_bOverwriteRecursive;  /**< If TRUE overwrite last used value of recursive */
+	bool m_bOverwriteRecursive;  /**< If TRUE overwrite last used value of recursive */
 	UINT m_idCompareAs;
 	TCHAR m_szCompareAs[MAX_PATH];
 

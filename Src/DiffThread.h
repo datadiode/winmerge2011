@@ -31,14 +31,6 @@
 #include "IAbortable.h"
 
 class DiffThreadAbortable;
-/**
- * @brief Structure used in sending data to the threads.
- * As thread functions have only one parameter we must pack all
- * the data we need inside structure.
- */
-/*struct DiffFuncStruct : public IAbortable
-{
-};*/
 
 /**
  * @brief Class for threaded folder compare.
@@ -95,7 +87,7 @@ private:
 		const String &rightsubdir, bool bRightUniq,
 		int depth, DIFFITEM *parent, bool bUniques);
 	DIFFITEM *AddToList(const String &sLeftDir, const String &sRightDir,
-		const DirItem * lent, const DirItem * rent, UINT code, DIFFITEM *parent);
+		const DirItem *lent, const DirItem *rent, UINT code, DIFFITEM *parent);
 	void SetDiffItemStats(DIFFITEM &);
 	void StoreDiffData(const DIFFITEM &);
 	bool UpdateDiffItem(DIFFITEM &);

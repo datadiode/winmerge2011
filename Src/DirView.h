@@ -99,7 +99,6 @@ public:
 // Operations
 public:
 	CDirFrame *const m_pFrame;
-	CDirFrame *GetDocument();
 
 	// IUnknown
 	STDMETHOD(QueryInterface)(REFIID, void **);

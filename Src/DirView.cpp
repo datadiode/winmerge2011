@@ -342,7 +342,7 @@ void CDirView::ReflectItemActivate(NMITEMACTIVATE *pNM)
 	if (pNM->iItem >= 0)
 	{
 		const DIFFITEM& di = GetDiffItem(pNM->iItem);
-		if (m_bTreeMode && GetDocument()->GetRecursive() && di.diffcode.isDirectory())
+		if (m_bTreeMode && m_pFrame->GetRecursive() && di.diffcode.isDirectory())
 		{
 			if (di.customFlags1 & ViewCustomFlags::EXPANDED)
 				CollapseSubdir(pNM->iItem);
@@ -808,7 +808,7 @@ void CDirView::OnReturn()
 	if (sel >= 0)
 	{
 		const DIFFITEM& di = GetDiffItem(sel);
-		if (m_bTreeMode && GetDocument()->GetRecursive() && di.diffcode.isDirectory())
+		if (m_bTreeMode && m_pFrame->GetRecursive() && di.diffcode.isDirectory())
 		{
 			if (di.customFlags1 & ViewCustomFlags::EXPANDED)
 				CollapseSubdir(sel);
@@ -1003,7 +1003,7 @@ bool CDirView::CreateFoldersPair(DIFFITEM & di, bool side1, String &newFolder)
 		// Get left side (side1) folder name (existing) and
 		// right side base path (where to create)
 		subdir = di.left.filename;
-		basedir = GetDocument()->GetRightBasePath();
+		basedir = m_pFrame->GetRightBasePath();
 		basedir = di.GetLeftFilepath(basedir);
 	}
 	else
@@ -1011,7 +1011,7 @@ bool CDirView::CreateFoldersPair(DIFFITEM & di, bool side1, String &newFolder)
 		// Get right side (side2) folder name (existing) and
 		// left side base path (where to create)
 		subdir = di.right.filename;
-		basedir = GetDocument()->GetLeftBasePath();
+		basedir = m_pFrame->GetLeftBasePath();
 		basedir = di.GetRightFilepath(basedir);
 	}
 	newFolder = paths_ConcatPath(basedir, subdir);
@@ -1416,7 +1416,7 @@ DIFFITEM & CDirView::GetDiffItemRef(int sel)
 		// static (shared) item
 		return DIFFITEM::emptyitem;
 	}
-	return GetDocument()->GetDiffRefByKey(diffpos);
+	return m_pFrame->GetDiffRefByKey(diffpos);
 }
 
 /**
@@ -1658,11 +1658,6 @@ void CDirView::MoveFocus(int currentInd, int i, int selCount)
 	// (this automatically defocuses old item)
 	SetItemState(i, LVIS_FOCUSED, LVIS_FOCUSED);
 	EnsureVisible(i, FALSE);
-}
-
-CDirFrame *CDirView::GetDocument()
-{
-	return m_pFrame;
 }
 
 LRESULT CDirView::ReflectKeydown(NMLVKEYDOWN *pParam)
@@ -2120,7 +2115,7 @@ void CDirView::OnCopyLeftPathnames()
 				// EOL since it allows copying to console/command line.
 				if (GlobalSize(hMem) != 0)
 					file.WriteString(_T(" "), 1);
-				String path = di.GetLeftFilepath(GetDocument()->GetLeftBasePath());
+				String path = di.GetLeftFilepath(m_pFrame->GetLeftBasePath());
 				// If item is a folder then subfolder (relative to base folder)
 				// is in filename member.
 				path = paths_ConcatPath(path, di.left.filename);
@@ -2155,7 +2150,7 @@ void CDirView::OnCopyRightPathnames()
 				// EOL since it allows copying to console/command line.
 				if (GlobalSize(hMem) != 0)
 					file.WriteString(_T(" "), 1);
-				String path = di.GetRightFilepath(GetDocument()->GetRightBasePath());
+				String path = di.GetRightFilepath(m_pFrame->GetRightBasePath());
 				// If item is a folder then subfolder (relative to base folder)
 				// is in filename member.
 				path = paths_ConcatPath(path, di.right.filename);
@@ -2190,7 +2185,7 @@ void CDirView::OnCopyBothPathnames()
 				// EOL since it allows copying to console/command line.
 				if (GlobalSize(hMem) != 0)
 					file.WriteString(_T(" "), 1);
-				String path = di.GetLeftFilepath(GetDocument()->GetLeftBasePath());
+				String path = di.GetLeftFilepath(m_pFrame->GetLeftBasePath());
 				// If item is a folder then subfolder (relative to base folder)
 				// is in filename member.
 				path = paths_ConcatPath(path, di.left.filename);
@@ -2202,7 +2197,7 @@ void CDirView::OnCopyBothPathnames()
 				// EOL since it allows copying to console/command line.
 				if (GlobalSize(hMem) != 0)
 					file.WriteString(_T(" "), 1);
-				String path = di.GetRightFilepath(GetDocument()->GetRightBasePath());
+				String path = di.GetRightFilepath(m_pFrame->GetRightBasePath());
 				// If item is a folder then subfolder (relative to base folder)
 				// is in filename member.
 				path = paths_ConcatPath(path, di.right.filename);
@@ -2445,7 +2440,7 @@ void CDirView::OnUpdateStatusNum()
  */
 void CDirView::OnViewShowHiddenItems()
 {
-	GetDocument()->SetItemViewFlag(ViewCustomFlags::VISIBLE, ViewCustomFlags::VISIBILITY);
+	m_pFrame->SetItemViewFlag(ViewCustomFlags::VISIBLE, ViewCustomFlags::VISIBILITY);
 	m_nHiddenItems = 0;
 	Redisplay();
 }
@@ -2492,7 +2487,7 @@ void CDirView::OnViewCollapseAllSubdirs()
 
 void CDirView::OnViewCompareStatistics()
 {
-	CompareStatisticsDlg dlg(GetDocument()->GetCompareStats());
+	CompareStatisticsDlg dlg(m_pFrame->GetCompareStats());
 	LanguageSelect.DoModal(dlg);
 }
 
@@ -2636,7 +2631,7 @@ LRESULT CDirView::HandleMenuMessage(UINT message, WPARAM wParam, LPARAM lParam)
  */
 void CDirView::PrepareDragData(UniStdioFile &file)
 {
-	const CDiffContext *ctxt = GetDocument()->GetDiffContext();
+	const CDiffContext *ctxt = m_pFrame->GetDiffContext();
 	int i = -1; 
 	while ((i = GetNextItem(i, LVNI_SELECTED)) != -1)
 	{ 

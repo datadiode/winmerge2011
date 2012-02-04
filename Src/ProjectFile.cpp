@@ -43,13 +43,13 @@ const char Right_ro_element_name[] = "right-readonly";
  * @brief Standard constructor.
  */
  ProjectFile::ProjectFile()
-: m_bHasLeft(FALSE)
-, m_bHasRight(FALSE)
-, m_bHasFilter(FALSE)
-, m_bHasSubfolders(FALSE)
+: m_bHasLeft(false)
+, m_bHasRight(false)
+, m_bHasFilter(false)
+, m_bHasSubfolders(false)
 , m_subfolders(-1)
-, m_bLeftReadOnly(FALSE)
-, m_bRightReadOnly(FALSE)
+, m_bLeftReadOnly(false)
+, m_bRightReadOnly(false)
 {
 }
 
@@ -72,22 +72,22 @@ bool ProjectFile::Read(LPCTSTR path, String &sError)
 			if (CMarkdown &node = CMarkdown(paths).Move(Left_element_name))
 			{
 				m_leftFile = OString(node.GetInnerText()->Uni(em)).W;
-				m_bHasLeft = TRUE;
+				m_bHasLeft = true;
 			}
 			if (CMarkdown &node = CMarkdown(paths).Move(Right_element_name))
 			{
 				m_rightFile = OString(node.GetInnerText()->Uni(em)).W;
-				m_bHasRight = TRUE;
+				m_bHasRight = true;
 			}
 			if (CMarkdown &node = CMarkdown(paths).Move(Filter_element_name))
 			{
 				m_filter = OString(node.GetInnerText()->Uni(em)).W;
-				m_bHasFilter = TRUE;
+				m_bHasFilter = true;
 			}
 			if (CMarkdown &node = CMarkdown(paths).Move(Subfolders_element_name))
 			{
 				m_subfolders = atoi(OString(node.GetInnerText()).A);
-				m_bHasSubfolders = TRUE;
+				m_bHasSubfolders = true;
 			}
 			if (CMarkdown &node = CMarkdown(paths).Move(Left_ro_element_name))
 			{
