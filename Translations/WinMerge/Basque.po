@@ -1963,7 +1963,7 @@ msgstr ""
 #: Merge.rc:1094
 #, c-format
 msgid "&Include Subfolders"
-msgstr "&Az&piagiritegiak Barne"
+msgstr "&Azpiagiritegiak Barne"
 
 #: Merge.rc:1050
 #, c-format
