@@ -355,17 +355,16 @@ LRESULT CHexMergeFrame::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_NCACTIVATE:
 		if (wParam)
 		{
-			CMainFrame *const pMDIFrame = GetMainFrame();
-			pMDIFrame->InitCmdUI();
-			pMDIFrame->UpdateCmdUI<ID_NEXTDIFF>(MF_ENABLED);
-			pMDIFrame->UpdateCmdUI<ID_PREVDIFF>(MF_ENABLED);
-			pMDIFrame->UpdateCmdUI<ID_EDIT_CUT>(MF_ENABLED);
-			pMDIFrame->UpdateCmdUI<ID_EDIT_COPY>(MF_ENABLED);
-			pMDIFrame->UpdateCmdUI<ID_EDIT_PASTE>(MF_ENABLED);
-			pMDIFrame->UpdateCmdUI<ID_L2R>(MF_ENABLED);
-			pMDIFrame->UpdateCmdUI<ID_R2L>(MF_ENABLED);
-			pMDIFrame->UpdateCmdUI<ID_ALL_LEFT>(MF_ENABLED);
-			pMDIFrame->UpdateCmdUI<ID_ALL_RIGHT>(MF_ENABLED);
+			m_pMDIFrame->InitCmdUI();
+			m_pMDIFrame->UpdateCmdUI<ID_NEXTDIFF>(MF_ENABLED);
+			m_pMDIFrame->UpdateCmdUI<ID_PREVDIFF>(MF_ENABLED);
+			m_pMDIFrame->UpdateCmdUI<ID_EDIT_CUT>(MF_ENABLED);
+			m_pMDIFrame->UpdateCmdUI<ID_EDIT_COPY>(MF_ENABLED);
+			m_pMDIFrame->UpdateCmdUI<ID_EDIT_PASTE>(MF_ENABLED);
+			m_pMDIFrame->UpdateCmdUI<ID_L2R>(MF_ENABLED);
+			m_pMDIFrame->UpdateCmdUI<ID_R2L>(MF_ENABLED);
+			m_pMDIFrame->UpdateCmdUI<ID_ALL_LEFT>(MF_ENABLED);
+			m_pMDIFrame->UpdateCmdUI<ID_ALL_RIGHT>(MF_ENABLED);
 		}
 		break;
 	case WM_CLOSE:

@@ -141,7 +141,7 @@ CDirFrame::~CDirFrame()
 template<>
 void CDirFrame::UpdateCmdUI<ID_FILE_LEFT_READONLY>()
 {
-	GetMainFrame()->UpdateCmdUI<ID_FILE_LEFT_READONLY>(m_bROLeft ? MF_CHECKED : 0);
+	m_pMDIFrame->UpdateCmdUI<ID_FILE_LEFT_READONLY>(m_bROLeft ? MF_CHECKED : 0);
 }
 
 /**
@@ -150,7 +150,7 @@ void CDirFrame::UpdateCmdUI<ID_FILE_LEFT_READONLY>()
 template<>
 void CDirFrame::UpdateCmdUI<ID_FILE_RIGHT_READONLY>()
 {
-	GetMainFrame()->UpdateCmdUI<ID_FILE_RIGHT_READONLY>(m_bRORight ? MF_CHECKED : 0);
+	m_pMDIFrame->UpdateCmdUI<ID_FILE_RIGHT_READONLY>(m_bRORight ? MF_CHECKED : 0);
 }
 
 /**
@@ -159,24 +159,24 @@ void CDirFrame::UpdateCmdUI<ID_FILE_RIGHT_READONLY>()
 template<>
 void CDirFrame::UpdateCmdUI<ID_VIEW_TREEMODE>()
 {
-	GetMainFrame()->UpdateCmdUI<ID_VIEW_TREEMODE>(
+	m_pMDIFrame->UpdateCmdUI<ID_VIEW_TREEMODE>(
 		(m_pDirView->m_bTreeMode ? MF_CHECKED : MF_UNCHECKED) |
 		(GetRecursive() ? MF_ENABLED : MF_GRAYED));
 	BYTE enable = m_pDirView->m_bTreeMode ? MF_ENABLED : MF_GRAYED;
-	GetMainFrame()->UpdateCmdUI<ID_VIEW_EXPAND_ALLSUBDIRS>(enable);
+	m_pMDIFrame->UpdateCmdUI<ID_VIEW_EXPAND_ALLSUBDIRS>(enable);
 }
 
 template<>
 void CDirFrame::UpdateCmdUI<ID_VIEW_SHOWHIDDENITEMS>()
 {
 	BYTE enable = m_pDirView->m_nHiddenItems ? MF_ENABLED : MF_GRAYED;
-	GetMainFrame()->UpdateCmdUI<ID_VIEW_SHOWHIDDENITEMS>(enable);
+	m_pMDIFrame->UpdateCmdUI<ID_VIEW_SHOWHIDDENITEMS>(enable);
 }
 
 template<>
 void CDirFrame::UpdateCmdUI<ID_REFRESH>()
 {
-	GetMainFrame()->UpdateCmdUI<ID_REFRESH>(
+	m_pMDIFrame->UpdateCmdUI<ID_REFRESH>(
 		waitStatusCursor.GetMsgId() != IDS_STATUS_RESCANNING ? MF_ENABLED : MF_GRAYED);
 }
 
@@ -197,7 +197,7 @@ void CDirFrame::UpdateCmdUI<ID_L2R>()
 			}
 		}
 	}
-	GetMainFrame()->UpdateCmdUI<ID_L2R>(enable);
+	m_pMDIFrame->UpdateCmdUI<ID_L2R>(enable);
 }
 
 template<>
@@ -217,7 +217,7 @@ void CDirFrame::UpdateCmdUI<ID_R2L>()
 			}
 		}
 	}
-	GetMainFrame()->UpdateCmdUI<ID_R2L>(enable);
+	m_pMDIFrame->UpdateCmdUI<ID_R2L>(enable);
 }
 
 template<>
@@ -241,7 +241,7 @@ void CDirFrame::UpdateCmdUI<ID_MERGE_DELETE>()
 			}
 		}
 	}
-	GetMainFrame()->UpdateCmdUI<ID_MERGE_DELETE>(enable);
+	m_pMDIFrame->UpdateCmdUI<ID_MERGE_DELETE>(enable);
 }
 
 template<>
@@ -447,14 +447,13 @@ LRESULT CDirFrame::OnWndMsg<WM_NCACTIVATE>(WPARAM wParam, LPARAM)
 {
 	if (wParam)
 	{
-		CMainFrame *const pMDIFrame = GetMainFrame();
-		pMDIFrame->InitCmdUI();
+		m_pMDIFrame->InitCmdUI();
 		UpdateCmdUI<ID_FILE_LEFT_READONLY>();
 		UpdateCmdUI<ID_FILE_RIGHT_READONLY>();
 		UpdateCmdUI<ID_VIEW_TREEMODE>();
 		UpdateCmdUI<ID_VIEW_SHOWHIDDENITEMS>();
 		UpdateCmdUI<ID_REFRESH>();
-		pMDIFrame->UpdateCmdUI<ID_TOOLS_GENERATEREPORT>(MF_ENABLED);
+		m_pMDIFrame->UpdateCmdUI<ID_TOOLS_GENERATEREPORT>(MF_ENABLED);
 	}
 	return 0;
 }

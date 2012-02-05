@@ -22,7 +22,7 @@ public:
 	~C7ZipMismatchException()
 	{
 	}
-	virtual int ReportError(UINT nType = MB_OK, UINT nMessageID = 0);
+	virtual int ReportError(HWND, UINT nType = MB_OK, UINT nMessageID = 0);
 protected:
 	DWORD m_dwVer7zInstalled;
 	DWORD m_dwVer7zLocal;
@@ -112,7 +112,7 @@ public:
 };
 
 int NTAPI HasZipSupport();
-void NTAPI Recall7ZipMismatchError();
+void NTAPI Recall7ZipMismatchError(HWND);
 
 DWORD NTAPI VersionOf7z(BOOL bLocal = FALSE);
 
