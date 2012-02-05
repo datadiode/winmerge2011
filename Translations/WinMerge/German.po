@@ -263,7 +263,7 @@ msgstr "Ta&b-Leiste"
 #: Merge.rc:65
 #, c-format
 msgid "Comp&are Statistics"
-msgstr ""
+msgstr "V&ergleichsstatistik"
 
 #: Merge.rc:67
 #: Merge.rc:188
