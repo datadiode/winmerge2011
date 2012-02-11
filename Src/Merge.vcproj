@@ -1263,6 +1263,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ListEntry.h"
+				>
+			</File>
+			<File
 				RelativePath="LoadSaveCodepageDlg.h"
 				>
 			</File>
