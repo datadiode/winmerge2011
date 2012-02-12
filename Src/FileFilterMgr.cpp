@@ -122,7 +122,7 @@ void FileFilterMgr::DeleteAllFilters()
  */
 static void AddFilterPattern(vector<FileFilterElement*> &filterList, String & str)
 {
-	LPCTSTR commentLeader = _T("##"); // Starts comment
+	static const TCHAR commentLeader[] = _T("##"); // Starts comment
 	str = string_trim_ws_begin(str);
 
 	// Ignore lines beginning with '##'

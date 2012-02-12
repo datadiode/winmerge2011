@@ -94,7 +94,7 @@ CDiffContext::~CDiffContext()
  */
 void CDiffContext::UpdateStatusFromDisk(UINT_PTR diffpos, BOOL bLeft, BOOL bRight)
 {
-	DIFFITEM &di = GetDiffRefAt(diffpos);
+	DIFFITEM &di = GetDiffAt(diffpos);
 	if (bLeft)
 	{
 		di.left.ClearPartial();

@@ -97,14 +97,11 @@ public:
 // Implementation
 public:
 	void InitCompare(LPCTSTR pszLeft, LPCTSTR pszRight, BOOL bRecursive, CTempPathContext *);
-	void Rescan();
+	void Rescan(bool bCompareSelected = false);
 	BOOL GetRecursive() const { return m_bRecursive; }
 	void CompareReady();
 	void UpdateChangedItem(const CChildFrame *);
 	UINT_PTR FindItemFromPaths(LPCTSTR pathLeft, LPCTSTR pathRight);
-	void SetDiffSide(UINT diffcode, int idx);
-	void SetDiffCompare(UINT diffcode, int idx);
-	void UpdateStatusFromDisk(UINT_PTR diffPos, BOOL bLeft, BOOL bRight);
 	void ReloadItemStatus(UINT_PTR diffPos, BOOL bLeft, BOOL bRight);
 	void Redisplay();
 	void AddMergeDoc(CChildFrame *);
@@ -112,9 +109,7 @@ public:
 	void MergeDocClosing(CChildFrame *);
 	void MergeDocClosing(CHexMergeFrame *);
 	CDiffThread m_diffThread;
-	void SetDiffStatus(UINT diffcode, UINT mask, int idx);
-	void SetDiffCounts(UINT diffs, UINT ignored, int idx);
-	void UpdateDiffAfterOperation(const FileActionItem & act, UINT_PTR pos);
+	void UpdateDiffAfterOperation(const FileActionItem &);
 	void UpdateHeaderPath(BOOL bLeft);
 	void AbortCurrentScan();
 	bool IsCurrentScanAbortable() const;
@@ -126,11 +121,9 @@ public:
 
 	CDiffContext *GetDiffContext() { return m_pCtxt; }
 	const DIFFITEM & GetDiffByKey(UINT_PTR key) const { return m_pCtxt->GetDiffAt(key); }
-	DIFFITEM & GetDiffRefByKey(UINT_PTR key) { return m_pCtxt->GetDiffRefAt(key); }
+	DIFFITEM & GetDiffRefByKey(UINT_PTR key) { return m_pCtxt->GetDiffAt(key); }
 	String GetLeftBasePath() const { return m_pCtxt->GetLeftPath(); }
 	String GetRightBasePath() const { return m_pCtxt->GetRightPath(); }
-	void RemoveDiffByKey(UINT_PTR key) { m_pCtxt->RemoveDiff(key); }
-	void SetMarkedRescan() {m_bMarkedRescan = TRUE; }
 	struct AllowUpwardDirectory
 	{
 		enum ReturnCode
@@ -159,7 +152,6 @@ private:
 	BOOL m_bRecursive; /**< Is current compare recursive? */
 	String m_strLeftDesc; /**< Left side desription text */
 	String m_strRightDesc; /**< Left side desription text */
-	BOOL m_bMarkedRescan; /**< If TRUE next rescan scans only marked items */
 };
 
 /////////////////////////////////////////////////////////////////////////////

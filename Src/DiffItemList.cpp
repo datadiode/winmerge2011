@@ -86,7 +86,7 @@ UINT_PTR DiffItemList::GetFirstChildDiffPosition(UINT_PTR parentdiffpos) const
  * @param diffpos position of current item, updated to next item position
  * @return Diff Item in current position
  */
-const DIFFITEM &DiffItemList::GetNextDiffPosition(UINT_PTR & diffpos) const
+DIFFITEM &DiffItemList::GetNextDiffPosition(UINT_PTR & diffpos) const
 {
 	DIFFITEM *p = (DIFFITEM *)diffpos;
 	if (p->HasChildren())
@@ -109,21 +109,11 @@ const DIFFITEM &DiffItemList::GetNextDiffPosition(UINT_PTR & diffpos) const
 }
 
 /**
- * @brief Get position of next item in structured DIFFITEM tree
- * @param diffpos position of current item, updated to next item position
- * @return Diff Item (by reference) in current position
- */
-DIFFITEM &DiffItemList::GetNextDiffRefPosition(UINT_PTR & diffpos)
-{
-	return (DIFFITEM &)GetNextDiffPosition(diffpos);
-}
-
-/**
  * @brief Get position of next sibling item in structured DIFFITEM tree
  * @param diffpos position of current item, updated to next sibling item position
  * @return Diff Item in current position
  */
-const DIFFITEM &DiffItemList::GetNextSiblingDiffPosition(UINT_PTR & diffpos) const
+DIFFITEM &DiffItemList::GetNextSiblingDiffPosition(UINT_PTR & diffpos) const
 {
 	DIFFITEM *p = (DIFFITEM *)diffpos;
 	if (p->parent)
@@ -131,71 +121,4 @@ const DIFFITEM &DiffItemList::GetNextSiblingDiffPosition(UINT_PTR & diffpos) con
 	else
 		diffpos = (UINT_PTR)m_root.IsSibling(p->Flink);
 	return *p;
-}
-
-/**
- * @brief Get position of next sibling item in structured DIFFITEM tree
- * @param diffpos position of current item, updated to next sibling item position
- * @return Diff Item (by reference) in current position
- */
-DIFFITEM &DiffItemList::GetNextSiblingDiffRefPosition(UINT_PTR & diffpos)
-{
-	return (DIFFITEM &)GetNextSiblingDiffPosition(diffpos);
-}
-
-/**
- * @brief Alter some bit flags of the diffcode.
- *
- * Examples:
- *  SetDiffStatusCode(pos, DIFFCODE::SAME, DIFFCODE::COMPAREFLAGS)
- *   changes the comparison result to be the same.
- * 
- *  SetDiffStatusCode(pos, DIFFCODE::BOTH, DIFFCODE::SIDEFLAG)
- *   changes the side status to be both (sides).
- *
- * SetDiffStatusCode(pos, DIFFCODE::SAME+DIFFCODE::BOTH, DIFFCODE::COMPAREFLAGS+DIFFCODE::SIDEFLAG);
- *  changes the comparison result to be the same and the side status to be both
- */
-void DiffItemList::SetDiffStatusCode(UINT_PTR diffpos, UINT diffcode, UINT mask)
-{
-	assert(diffpos);
-	DIFFITEM & di = GetDiffRefAt(diffpos);
-	assert(! ((~mask) & diffcode) ); // make sure they only set flags in their mask
-	di.diffcode.diffcode &= (~mask); // remove current data
-	di.diffcode.diffcode |= diffcode; // add new data
-}
-
-/**
- * @brief Update difference counts.
- */
-void DiffItemList::SetDiffCounts(UINT_PTR diffpos, UINT diffs, UINT ignored)
-{
-	assert(diffpos);
-	DIFFITEM & di = GetDiffRefAt(diffpos);
-	di.nidiffs = ignored; // see StoreDiffResult() in DirScan.cpp
-	di.nsdiffs = diffs;
-}
-
-/**
- * @brief Returns item's custom (user) flags.
- * @param [in] diffpos Position of item.
- * @return Custom flags from item.
- */
-UINT DiffItemList::GetCustomFlags1(UINT_PTR diffpos) const
-{
-	assert(diffpos);
-	const DIFFITEM & di = GetDiffAt(diffpos);
-	return di.customFlags1;
-}
-
-/**
- * @brief Sets item's custom (user) flags.
- * @param [in] diffpos Position of item.
- * @param [in] flag Value of flag to set.
- */
-void DiffItemList::SetCustomFlags1(UINT_PTR diffpos, UINT flag)
-{
-	assert(diffpos);
-	DIFFITEM & di = GetDiffRefAt(diffpos);
-	di.customFlags1 = flag;
 }

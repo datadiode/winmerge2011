@@ -290,7 +290,7 @@ int CDiffThread::DirScan_CompareItems(UINT_PTR parentdiffpos)
 			break;
 		}
 		WaitForSingleObject(hSemaphore, INFINITE);
-		DIFFITEM &di = context->GetNextSiblingDiffRefPosition(pos);
+		DIFFITEM &di = context->GetNextSiblingDiffPosition(pos);
 		if (di.diffcode.isDirectory() && context->m_bRecursive)
 		{
 			di.diffcode.diffcode &= ~(DIFFCODE::DIFF | DIFFCODE::SAME);
@@ -315,7 +315,7 @@ int CDiffThread::DirScan_CompareItems(UINT_PTR parentdiffpos)
 				res++;
 		}
 		pos = curpos;
-		context->GetNextSiblingDiffRefPosition(pos);
+		context->GetNextSiblingDiffPosition(pos);
 	}
 	return res;
 }
@@ -341,7 +341,7 @@ int CDiffThread::DirScan_CompareRequestedItems(UINT_PTR parentdiffpos)
 		}
 
 		UINT_PTR curpos = pos;
-		DIFFITEM &di = context->GetNextSiblingDiffRefPosition(pos);
+		DIFFITEM &di = context->GetNextSiblingDiffPosition(pos);
 		if (di.diffcode.isDirectory() && context->m_bRecursive)
 		{
 			di.diffcode.diffcode &= ~(DIFFCODE::DIFF | DIFFCODE::SAME);

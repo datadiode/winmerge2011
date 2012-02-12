@@ -92,7 +92,6 @@ CDirFrame::CDirFrame(CMainFrame *pMDIFrame)
 , m_pCtxt(NULL)
 , m_pCompareStats(new CompareStats)
 , m_bRecursive(FALSE)
-, m_bMarkedRescan(FALSE)
 , m_pTempPathContext(NULL)
 {
 	if (m_pHandleSet->m_cRef == 1)

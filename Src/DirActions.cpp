@@ -995,90 +995,26 @@ void CDirView::PerformActionList(FileActionScript & actionScript)
  * results (including UI).
  * @param [in] actionlist Script that was run.
  */
-void CDirView::UpdateAfterFileScript(FileActionScript & actionList)
+void CDirView::UpdateAfterFileScript(FileActionScript &actionList)
 {
-	BOOL bItemsRemoved = FALSE;
 	int curSel = GetFirstSelectedInd();
-	while (actionList.GetActionItemCount()>0)
+	while (actionList.GetActionItemCount() > 0)
 	{
 		// Start handling from tail of list, so removing items
 		// doesn't invalidate our item indexes.
 		FileActionItem act = actionList.RemoveTailActionItem();
-		UINT_PTR diffpos = GetItemKey(act.context);
-		DIFFCODE diffcode = m_pFrame->GetDiffByKey(diffpos).diffcode;
-		BOOL bUpdateLeft = FALSE;
-		BOOL bUpdateRight = FALSE;
-
-		// Synchronized items may need VCS operations
-		if (act.UIResult == FileActionItem::UI_SYNC)
-		{
-			if (GetMainFrame()->m_bCheckinVCS)
-				GetMainFrame()->CheckinToClearCase(act.dest.c_str());
-		}
-
-		// Update doc (difflist)
-		m_pFrame->UpdateDiffAfterOperation(act, diffpos);
-
-		// Update UI
-		switch (act.UIResult)
-		{
-		case FileActionItem::UI_SYNC:
-			bUpdateLeft = TRUE;
-			bUpdateRight = TRUE;
-			break;
-		
-		case FileActionItem::UI_DESYNC:
-			// Cannot happen yet since we have only "simple" operations
-			break;
-
-		case FileActionItem::UI_DEL_LEFT:
-			if (diffcode.isSideLeftOnly())
-			{
-				DeleteItem(act.context);
-				bItemsRemoved = TRUE;
-			}
-			else
-			{
-				bUpdateLeft = TRUE;
-			}
-			break;
-
-		case FileActionItem::UI_DEL_RIGHT:
-			if (diffcode.isSideRightOnly())
-			{
-				DeleteItem(act.context);
-				bItemsRemoved = TRUE;
-			}
-			else
-			{
-				bUpdateRight = TRUE;
-			}
-			break;
-
-		case FileActionItem::UI_DEL_BOTH:
-			DeleteItem(act.context);
-			bItemsRemoved = TRUE;
-			break;
-		}
-
-		if (bUpdateLeft || bUpdateRight)
-		{
-			m_pFrame->UpdateStatusFromDisk(diffpos, bUpdateLeft, bUpdateRight);
-			UpdateDiffItemStatus(act.context);
-		}
+		// Update item
+		m_pFrame->UpdateDiffAfterOperation(act);
 	}
 	
 	// Make sure selection is at sensible place if all selected items
 	// were removed.
-	if (bItemsRemoved == TRUE)
+	UINT selected = GetSelectedCount();
+	if (selected == 0)
 	{
-		UINT selected = GetSelectedCount();
-		if (selected == 0)
-		{
-			if (curSel < 1)
-				++curSel;
-			MoveFocus(0, curSel - 1, selected);
-		}
+		if (curSel < 1)
+			++curSel;
+		MoveFocus(0, curSel - 1, selected);
 	}
 }
 
@@ -1326,13 +1262,11 @@ UINT CDirView::MarkSelectedForRescan()
 		if (GetItemKey(sel) == SPECIAL_ITEM_POS)
 			continue;
 
-		const DIFFITEM &di = GetDiffItem(sel);
-		m_pFrame->SetDiffStatus(0, DIFFCODE::TEXTFLAGS | DIFFCODE::SIDEFLAGS | DIFFCODE::COMPAREFLAGS, sel);		
-		m_pFrame->SetDiffStatus(DIFFCODE::NEEDSCAN, DIFFCODE::SCANFLAGS, sel);
+		DIFFITEM &di = GetDiffItemRef(sel);
+		di.diffcode.diffcode &= ~DIFFCODE::TEXTFLAGS | DIFFCODE::SIDEFLAGS | DIFFCODE::COMPAREFLAGS | DIFFCODE::SCANFLAGS;
+		di.diffcode.diffcode |= DIFFCODE::NEEDSCAN;
 		++items;
 	}
-	if (items > 0)
-		m_pFrame->SetMarkedRescan();
 	return items;
 }
 

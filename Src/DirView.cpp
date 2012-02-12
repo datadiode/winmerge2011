@@ -2464,7 +2464,7 @@ void CDirView::OnViewExpandAllSubdirs()
 	UINT_PTR diffpos = ctxt->GetFirstDiffPosition();
 	while (diffpos)
 	{
-		DIFFITEM &di = ctxt->GetNextDiffRefPosition(diffpos);
+		DIFFITEM &di = ctxt->GetNextDiffPosition(diffpos);
 		di.customFlags1 |= ViewCustomFlags::EXPANDED;
 	}
 	Redisplay();
@@ -2479,7 +2479,7 @@ void CDirView::OnViewCollapseAllSubdirs()
 	UINT_PTR diffpos = ctxt->GetFirstDiffPosition();
 	while (diffpos)
 	{
-		DIFFITEM &di = ctxt->GetNextDiffRefPosition(diffpos);
+		DIFFITEM &di = ctxt->GetNextDiffPosition(diffpos);
 		di.customFlags1 &= ~ViewCustomFlags::EXPANDED;
 	}
 	Redisplay();

@@ -192,7 +192,7 @@ void CDirFrame::LoadLineFilterList()
 /**
  * @brief Perform directory comparison again from scratch
  */
-void CDirFrame::Rescan()
+void CDirFrame::Rescan(bool bCompareSelected)
 {
 	if (!m_pCtxt)
 		return;
@@ -211,7 +211,7 @@ void CDirFrame::Rescan()
 	m_pDirView->StartCompare(m_pCompareStats);
 
 	// Don't clear if only scanning selected items
-	if (!m_bMarkedRescan)
+	if (!bCompareSelected)
 	{
 		m_pDirView->DeleteAllItems();
 		m_pCtxt->RemoveAll();
@@ -234,7 +234,7 @@ void CDirFrame::Rescan()
 	m_pCtxt->m_bRecursive = !!m_bRecursive;
 
 	// Set total items count since we don't collect items
-	if (m_bMarkedRescan)
+	if (bCompareSelected)
 		m_pCompareStats->IncreaseTotalItems(m_pDirView->GetSelectedCount());
 
 	UpdateHeaderPath(0);
@@ -254,9 +254,8 @@ void CDirFrame::Rescan()
 	m_diffThread.SetContext(m_pCtxt);
 	m_diffThread.SetHwnd(m_pDirView->m_hWnd);
 	m_diffThread.SetMessageIDs(MSG_UI_UPDATE);
-	m_diffThread.SetCompareSelected(!!m_bMarkedRescan);
+	m_diffThread.SetCompareSelected(bCompareSelected);
 	m_diffThread.CompareDirectories(m_pCtxt->GetLeftPath(), m_pCtxt->GetRightPath());
-	m_bMarkedRescan = FALSE;
 }
 
 /**
@@ -337,17 +336,6 @@ void CDirFrame::Redisplay()
 }
 
 /**
- * @brief Update in-memory diffitem status from disk.
- * @param [in] diffPos POSITION of item in UI list.
- * @param [in] bLeft If TRUE left-side item is updated.
- * @param [in] bRight If TRUE right-side item is updated.
- */
-void CDirFrame::UpdateStatusFromDisk(UINT_PTR diffPos, BOOL bLeft, BOOL bRight)
-{
-	m_pCtxt->UpdateStatusFromDisk(diffPos, bLeft, bRight);
-}
-
-/**
  * @brief Update in-memory diffitem status from disk and update view.
  * @param [in] diffPos POSITION of item in UI list.
  * @param [in] bLeft If TRUE left-side item is updated.
@@ -359,7 +347,7 @@ void CDirFrame::UpdateStatusFromDisk(UINT_PTR diffPos, BOOL bLeft, BOOL bRight)
 void CDirFrame::ReloadItemStatus(UINT_PTR diffPos, BOOL bLeft, BOOL bRight)
 {
 	// in case just copied (into existence) or modified
-	UpdateStatusFromDisk(diffPos, bLeft, bRight);
+	m_pCtxt->UpdateStatusFromDisk(diffPos, bLeft, bRight);
 	int nIdx = m_pDirView->GetItemIndex(diffPos);
 	if (nIdx != -1)
 	{
@@ -537,7 +525,7 @@ void CDirFrame::UpdateChangedItem(const CChildFrame *pMergeDoc)
 	{
 		ReloadItemStatus(pos, TRUE, TRUE);
 
-		DIFFITEM &di = m_pCtxt->GetDiffRefAt(pos);
+		DIFFITEM &di = m_pCtxt->GetDiffAt(pos);
 
 		di.nsdiffs = pMergeDoc->m_diffList.GetSignificantDiffs();
 		di.nidiffs = pMergeDoc->m_nTrivialDiffs;
@@ -564,46 +552,6 @@ void CDirFrame::CompareReady()
 	LogFile.Write(CLogFile::LNOTICE, _T("Directory scan complete\n"));
 	waitStatusCursor.End();
 	UpdateCmdUI<ID_REFRESH>();
-}
-
-/**
- * @brief Set side status of diffitem
- * @note This does not update UI - ReloadItemStatus() does
- * @sa CDirFrame::ReloadItemStatus()
- */
-void CDirFrame::SetDiffSide(UINT diffcode, int idx)
-{
-	SetDiffStatus(diffcode, DIFFCODE::SIDEFLAGS, idx);
-}
-
-/**
- * @brief Set compare status of diffitem
- * @note This does not update UI - ReloadItemStatus() does
- * @sa CDirFrame::ReloadItemStatus()
- */
-void CDirFrame::SetDiffCompare(UINT diffcode, int idx)
-{
-	SetDiffStatus(diffcode, DIFFCODE::COMPAREFLAGS, idx);
-}
-
-/**
- * @brief Set status for diffitem
- * @param diffcode New code
- * @param mask Defines allowed set of flags to change
- * @param idx Item's index to list in UI
- */
-void CDirFrame::SetDiffStatus(UINT diffcode, UINT mask, int idx)
-{
-	// Get position of item in DiffContext 
-	UINT_PTR diffpos = m_pDirView->GetItemKey(idx);
-
-	// TODO: Why is the update broken into these pieces ?
-	// Someone could figure out these pieces and probably simplify this.
-
-	// Update DIFFITEM code (comparison result) to DiffContext
-	m_pCtxt->SetDiffStatusCode(diffpos, diffcode, mask);
-
-	// update DIFFITEM time (and other disk info), and tell views
 }
 
 /**
@@ -729,67 +677,77 @@ void CDirFrame::ApplyRightDisplayRoot(String &sText)
 	}
 }
 
-void CDirFrame::SetDiffCounts(UINT diffs, UINT ignored, int idx)
-{
-	// Get position of item in DiffContext 
-	UINT_PTR diffpos = m_pDirView->GetItemKey(idx);
-
-	// Update diff counts
-	m_pCtxt->SetDiffCounts(diffpos, diffs, ignored);
-}
-
 /**
  * @brief Update results for FileActionItem.
  * This functions is called to update DIFFITEM after FileActionItem.
  * @param [in] act Action that was done.
  * @param [in] pos List position for DIFFITEM affected.
  */
-void CDirFrame::UpdateDiffAfterOperation(const FileActionItem & act, UINT_PTR pos)
+void CDirFrame::UpdateDiffAfterOperation(const FileActionItem & act)
 {
+	UINT_PTR pos = m_pDirView->GetItemKey(act.context);
 	ASSERT(pos != NULL);
-	const DIFFITEM &di = GetDiffByKey(pos);
-
+	DIFFITEM &di = m_pCtxt->GetDiffAt(pos);
+	const DIFFCODE diffcode = di.diffcode;
+	BOOL bUpdateLeft = FALSE;
+	BOOL bUpdateRight = FALSE;
 	// Use FileActionItem types for simplicity for now.
 	// Better would be to use FileAction contained, since it is not
 	// UI dependent.
 	switch (act.UIResult)
 	{
 	case FileActionItem::UI_SYNC:
-		SetDiffSide(DIFFCODE::BOTH, act.context);
+		// Synchronized items may need VCS operations
+		if (m_pMDIFrame->m_bCheckinVCS)
+			m_pMDIFrame->CheckinToClearCase(act.dest.c_str());
+		di.diffcode.diffcode &= ~(DIFFCODE::SIDEFLAGS | DIFFCODE::COMPAREFLAGS);
 		if (act.dirflag)
-			SetDiffCompare(DIFFCODE::NOCMP, act.context);
+			di.diffcode.diffcode |= DIFFCODE::BOTH | DIFFCODE::NOCMP;
 		else
-			SetDiffCompare(DIFFCODE::SAME, act.context);
-		SetDiffCounts(0, 0, act.context);
+			di.diffcode.diffcode |= DIFFCODE::BOTH | DIFFCODE::SAME;
+		di.nidiffs = 0;
+		di.nsdiffs = 0;
+		bUpdateLeft = TRUE;
+		bUpdateRight = TRUE;
 		break;
 
 	case FileActionItem::UI_DEL_LEFT:
 		if (di.diffcode.isSideLeftOnly())
 		{
-			RemoveDiffByKey(pos);
+			m_pCtxt->RemoveDiff(pos);
+			m_pDirView->DeleteItem(act.context);
 		}
 		else
 		{
-			SetDiffSide(DIFFCODE::RIGHT, act.context);
-			SetDiffCompare(DIFFCODE::NOCMP, act.context);
+			di.diffcode.diffcode &= ~(DIFFCODE::SIDEFLAGS | DIFFCODE::COMPAREFLAGS);
+			di.diffcode.diffcode |= DIFFCODE::RIGHT | DIFFCODE::NOCMP;
+			bUpdateLeft = TRUE;
 		}
 		break;
 
 	case FileActionItem::UI_DEL_RIGHT:
 		if (di.diffcode.isSideRightOnly())
 		{
-			RemoveDiffByKey(pos);
+			m_pCtxt->RemoveDiff(pos);
+			m_pDirView->DeleteItem(act.context);
 		}
 		else
 		{
-			SetDiffSide(DIFFCODE::LEFT, act.context);
-			SetDiffCompare(DIFFCODE::NOCMP, act.context);
+			di.diffcode.diffcode &= ~(DIFFCODE::SIDEFLAGS | DIFFCODE::COMPAREFLAGS);
+			di.diffcode.diffcode |= DIFFCODE::LEFT | DIFFCODE::NOCMP;
+			bUpdateRight = TRUE;
 		}
 		break;
 
 	case FileActionItem::UI_DEL_BOTH:
-		RemoveDiffByKey(pos);
+		m_pCtxt->RemoveDiff(pos);
+		m_pDirView->DeleteItem(act.context);
 		break;
+	}
+	if (bUpdateLeft || bUpdateRight)
+	{
+		m_pCtxt->UpdateStatusFromDisk(pos, bUpdateLeft, bUpdateRight);
+		m_pDirView->UpdateDiffItemStatus(act.context);
 	}
 }
 
@@ -801,10 +759,9 @@ void CDirFrame::UpdateDiffAfterOperation(const FileActionItem & act, UINT_PTR po
  */
 void CDirFrame::SetItemViewFlag(UINT_PTR key, UINT flag, UINT mask)
 {
-	UINT curFlags = m_pCtxt->GetCustomFlags1(key);
-	curFlags &= ~mask; // Zero bits masked
-	curFlags |= flag;
-	m_pCtxt->SetCustomFlags1(key, curFlags);
+	DIFFITEM &di = m_pCtxt->GetDiffAt(key);
+	di.customFlags1 &= ~mask; // Zero bits masked
+	di.customFlags1 |= flag;
 }
 
 /**
@@ -815,13 +772,11 @@ void CDirFrame::SetItemViewFlag(UINT_PTR key, UINT flag, UINT mask)
 void CDirFrame::SetItemViewFlag(UINT flag, UINT mask)
 {
 	UINT_PTR pos = m_pCtxt->GetFirstDiffPosition();
-
 	while (pos != NULL)
 	{
-		UINT curFlags = m_pCtxt->GetCustomFlags1(pos);
-		curFlags &= ~mask; // Zero bits masked
-		curFlags |= flag;
-		m_pCtxt->SetCustomFlags1(pos, curFlags);
+		DIFFITEM &di = m_pCtxt->GetDiffAt(pos);
+		di.customFlags1 &= ~mask; // Zero bits masked
+		di.customFlags1 |= flag;
 		m_pCtxt->GetNextDiffPosition(pos);
 	}
 }
