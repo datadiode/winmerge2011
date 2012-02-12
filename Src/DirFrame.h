@@ -55,6 +55,7 @@ public:
 // Operations
 public:
 	virtual FRAMETYPE GetFrameType() const { return FRAME_FOLDER; }
+	BOOL PreTranslateMessage(MSG *);
 	void SetStatus(LPCTSTR szStatus);
 	void SetFilterStatusDisplay(LPCTSTR szFilter);
 	BOOL GetLeftReadOnly() const { return m_bROLeft; }

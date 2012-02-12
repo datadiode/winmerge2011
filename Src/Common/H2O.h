@@ -5,7 +5,7 @@
 // Both H2O and H2O2 share a common set of decorator templates.
 //
 // Copyright (c) 2005-2010  David Nash (as of Win32++ v7.0.2)
-// Copyright (c) 2011       Jochen Neubeck
+// Copyright (c) 2011-2012  Jochen Neubeck
 //
 // Permission is hereby granted, free of charge, to
 // any person obtaining a copy of this software and
@@ -2862,6 +2862,14 @@ namespace H2O
 			using ::SendMessage;
 			assert(::IsWindow(m_hWnd));
 			return ListView_EditLabel(m_hWnd, iItem);
+		}
+
+		void CancelEditLabel()
+		// Cancels the editing of a list-view item's label.
+		{
+			using ::SendMessage;
+			assert(::IsWindow(m_hWnd));
+			ListView_CancelEditLabel(m_hWnd);
 		}
 
 		BOOL EnsureVisible(int iItem, BOOL fPartialOK)

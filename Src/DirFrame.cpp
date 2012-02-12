@@ -624,3 +624,22 @@ void CDirFrame::SetRightReadOnly(BOOL bReadOnly)
 		sText = LanguageSelect.LoadString(IDS_STATUSBAR_READONLY);
 	m_wndStatusBar->SetPartText(PANE_RIGHT_RO, sText.c_str());
 }
+
+BOOL CDirFrame::PreTranslateMessage(MSG *pMsg)
+{
+	// Check if we got 'ESC pressed' -message
+	if (pMsg->message == WM_KEYDOWN)
+	{
+		switch (pMsg->wParam)
+		{
+		case VK_ESCAPE:
+			if (m_pDirView->GetEditControl())
+			{
+				DispatchMessage(pMsg);
+				return TRUE;
+			}
+			break;
+		}
+	}
+	return FALSE;
+}
