@@ -264,10 +264,10 @@ LRESULT CDirFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 		break;
 	case ID_DIR_RESCAN:
 		if (m_pDirView->MarkSelectedForRescan())
-		{
-		case ID_REFRESH:
-			Rescan();
-		}
+			Rescan(true);
+		break;
+	case ID_REFRESH:
+		Rescan(false);
 		break;
 	case ID_FIRSTDIFF:
 		m_pDirView->OnFirstdiff();

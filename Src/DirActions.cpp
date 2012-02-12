@@ -1263,7 +1263,7 @@ UINT CDirView::MarkSelectedForRescan()
 			continue;
 
 		DIFFITEM &di = GetDiffItemRef(sel);
-		di.diffcode.diffcode &= ~DIFFCODE::TEXTFLAGS | DIFFCODE::SIDEFLAGS | DIFFCODE::COMPAREFLAGS | DIFFCODE::SCANFLAGS;
+		di.diffcode.diffcode &= ~(DIFFCODE::TEXTFLAGS | DIFFCODE::SIDEFLAGS | DIFFCODE::COMPAREFLAGS | DIFFCODE::SCANFLAGS);
 		di.diffcode.diffcode |= DIFFCODE::NEEDSCAN;
 		++items;
 	}
