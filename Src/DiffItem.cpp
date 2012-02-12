@@ -10,16 +10,15 @@
 #include "DiffItem.h"
 #include "paths.h"
 
-DIFFITEM DIFFITEM::emptyitem;
+DIFFITEM DIFFITEM::emptyitem(NULL);
 
 /** @brief DIFFITEM's destructor */
 DIFFITEM::~DIFFITEM()
 {
-	while (children.IsSibling(children.Flink))
+	while (ListEntry *p = children.IsSibling(children.Flink))
 	{
-		DIFFITEM *p = (DIFFITEM *)children.Flink;
 		p->RemoveSelf();
-		delete p;
+		delete static_cast<DIFFITEM *>(p);
 	}
 }
 
@@ -48,10 +47,12 @@ String DIFFITEM::GetRightFilepath(const String &sRightRoot) const
 /** @brief Return depth of path */
 int DIFFITEM::GetDepth() const
 {
-	const DIFFITEM *cur;
-	int depth;
-	for (depth = 0, cur = parent; cur; depth++, cur = cur->parent)
-		;
+	int depth = 0;
+	const DIFFITEM *cur = this;
+	while ((cur = cur->parent) != NULL)
+	{
+		++depth;
+	}
 	return depth;
 }
 
@@ -60,19 +61,12 @@ int DIFFITEM::GetDepth() const
  */
 bool DIFFITEM::IsAncestor(const DIFFITEM *pdi) const
 {
-	const DIFFITEM *cur;
-	for (cur = this; cur; cur = cur->parent)
+	const DIFFITEM *cur = this;
+	while (const DIFFITEM *parent = cur->parent)
 	{
-		if (cur->parent == pdi)
+		if (parent == pdi)
 			return true;
+		cur = parent;
 	}
 	return false;
 }
-
-/** @brief Return whether the current item has children */
-bool DIFFITEM::HasChildren() const
-{
-	DIFFITEM *p = (DIFFITEM *)children.IsSibling(children.Flink);
-	return p ? true : false;
-}
-

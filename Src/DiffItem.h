@@ -13,19 +13,6 @@
 #include "DiffFileInfo.h"
 
 /**
- * @brief Bitfield values for binary file sides.
- * These values are used as bitfield values when determining which file(s)
- * are binary files. There is no "both" -value since in bitfield "both" is
- * when side1- and side2- bits are set (BINFILE_SIDE1 | BINFILE_SIDE2).
-enum BINFILE_SIDE
-{
-	BINFILE_NONE = 0, //**< No binary files detected. *
-	BINFILE_SIDE1, //**< First file was detected as binary file. *
-	BINFILE_SIDE2, //**< Second file was detected as binart file. *
-};
- */
-
-/**
  * @brief Status of one item comparison, stored as bitfields
  *
  * Bitmask can be seen as a 4 dimensional space; that is, there are four
@@ -128,8 +115,8 @@ public:
  */
 struct DIFFITEM : ListEntry
 {
-	DIFFITEM *parent; /**< Parent of current item */
-	ListEntry children; /**< Head of doubly linked list for chldren */
+	DIFFITEM *const parent; /**< Parent of current item */
+	ListEntry children; /**< Head of doubly linked list for children */
 
 	DiffFileInfo left; /**< Fileinfo for left file */
 	DiffFileInfo right; /**< Fileinfo for right file */
@@ -141,14 +128,16 @@ struct DIFFITEM : ListEntry
 
 	static DIFFITEM emptyitem; /**< singleton to represent a diffitem that doesn't have any data */
 
-	DIFFITEM() : parent(NULL), nidiffs(-1), nsdiffs(-1), customFlags1(0) { }
+	DIFFITEM(DIFFITEM *parent)
+		: parent(parent), nidiffs(-1), nsdiffs(-1), customFlags1(0) { }
 	~DIFFITEM();
 
 	String GetLeftFilepath(const String &sLeftRoot) const;
 	String GetRightFilepath(const String &sRightRoot) const;
 	int GetDepth() const;
 	bool IsAncestor(const DIFFITEM *pdi) const;
-	bool HasChildren() const;
+	/** @brief Return whether the current item has children */
+	bool HasChildren() const { return !children.IsSolitary(); }
 };
 
 #endif // _DIFF_ITEM_H_

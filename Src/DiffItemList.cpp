@@ -29,14 +29,13 @@ DiffItemList::~DiffItemList()
  * @param [in] parent Parent item, or NULL if no parent.
  * @return Pointer to the added item.
  */
-DIFFITEM* DiffItemList::AddDiff(DIFFITEM *parent)
+DIFFITEM *DiffItemList::AddDiff(DIFFITEM *parent)
 {
-	DIFFITEM *p = new DIFFITEM;
+	DIFFITEM *p = new DIFFITEM(parent);
 	if (parent)
 		parent->children.Append(p);
 	else
 		m_root.Append(p);
-	p->parent = parent;
 	return p;
 }
 

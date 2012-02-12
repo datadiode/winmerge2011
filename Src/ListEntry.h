@@ -31,9 +31,14 @@ public:
 		Flink->Blink = Blink;
 		Flink = Blink = this;
 	}
-	LIST_ENTRY *IsSibling(LIST_ENTRY *p) const
+	ListEntry *IsSibling(LIST_ENTRY *p) const
 	{
-		return p != static_cast<const LIST_ENTRY *>(this) ? p : 0;
+		return p != static_cast<const ListEntry *>(this) ?
+					static_cast<ListEntry *>(p) : 0;
+	}
+	bool IsSolitary() const
+	{
+		return Flink == this;
 	}
 private:
 	ListEntry(const ListEntry &); // disallow copy construction
