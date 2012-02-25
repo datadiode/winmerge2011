@@ -377,21 +377,18 @@ LRESULT CHexMergeFrame::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 BOOL CHexMergeFrame::PreTranslateMessage(MSG *pMsg)
 {
-	if (pMsg->message >= WM_KEYFIRST && pMsg->message <= WM_KEYLAST)
+	// First check our own accelerators, then pass down to heksedit.
+	// This is essential for, e.g., ID_VIEW_ZOOMIN/ID_VIEW_ZOOMOUT.
+	if (m_pMDIFrame->m_hAccelTable &&
+		::TranslateAccelerator(m_pMDIFrame->m_hWnd, m_pMDIFrame->m_hAccelTable, pMsg))
 	{
-		// First check our own accelerators, then pass down to heksedit.
-		// This is essential for, e.g., ID_VIEW_ZOOMIN/ID_VIEW_ZOOMOUT.
-		if (m_pMDIFrame->m_hAccelTable &&
-			::TranslateAccelerator(m_pMDIFrame->m_hWnd, m_pMDIFrame->m_hAccelTable, pMsg))
+		return TRUE;
+	}
+	if (CHexMergeView *pView = GetActiveView())
+	{
+		if (pView->PreTranslateMessage(pMsg))
 		{
 			return TRUE;
-		}
-		if (CHexMergeView *pView = GetActiveView())
-		{
-			if (pView->PreTranslateMessage(pMsg))
-			{
-				return TRUE;
-			}
 		}
 	}
 	return FALSE;

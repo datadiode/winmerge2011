@@ -250,7 +250,7 @@ void CCrystalEditView::OnEditDelete()
   EnsureVisible (ptCursorPos);
 
   m_pTextBuffer->DeleteText(this, ptSelStart.y, ptSelStart.x, ptSelEnd.y, ptSelEnd.x, CE_ACTION_DELETE);   // [JRT]
-  UpdateCaret();
+
 }
 
 void CCrystalEditView::OnChar(WPARAM nChar)

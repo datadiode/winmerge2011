@@ -230,15 +230,12 @@ void CChildFrame::ReloadDocs()
 
 BOOL CChildFrame::PreTranslateMessage(MSG *pMsg)
 {
-	if (pMsg->message >= WM_KEYFIRST && pMsg->message <= WM_KEYLAST)
+	if (CCrystalTextView *pTextView = GetActiveTextView())
 	{
-		if (CCrystalTextView *pTextView = GetActiveTextView())
+		HACCEL hAccel = m_pHandleSet->m_hAccelShared;
+		if (hAccel && ::TranslateAccelerator(m_hWnd, hAccel, pMsg))
 		{
-			HACCEL hAccel = m_pHandleSet->m_hAccelShared;
-			if (hAccel && ::TranslateAccelerator(m_hWnd, hAccel, pMsg))
-			{
-				return TRUE;
-			}
+			return TRUE;
 		}
 	}
 	return FALSE;
@@ -958,6 +955,32 @@ void CChildFrame::SetLastCompareResult(int nResult)
 	theApp.SetLastCompareResult(nResult);
 }
 
+void CChildFrame::UpdateEditCmdUI()
+{
+	BYTE enableSaveLeft = m_ptBuf[0]->IsSaveable() ? MF_ENABLED : MF_GRAYED;
+	BYTE enableSaveRight = m_ptBuf[1]->IsSaveable() ? MF_ENABLED : MF_GRAYED;
+	m_pMDIFrame->UpdateCmdUI<ID_FILE_SAVE_LEFT>(enableSaveLeft);
+	m_pMDIFrame->UpdateCmdUI<ID_FILE_SAVE_RIGHT>(enableSaveRight);
+	m_pMDIFrame->UpdateCmdUI<ID_FILE_SAVE>(enableSaveLeft & enableSaveRight);
+	m_pMDIFrame->UpdateCmdUI<ID_EDIT_UNDO>(
+		curUndo != undoTgt.begin() && (*(curUndo - 1))->QueryEditable() ?
+		MF_ENABLED : MF_GRAYED);
+	m_pMDIFrame->UpdateCmdUI<ID_EDIT_REDO>(
+		curUndo != undoTgt.end() && (*curUndo)->QueryEditable() ?
+		MF_ENABLED : MF_GRAYED);
+}
+
+void CChildFrame::UpdateClipboardCmdUI()
+{
+	CCrystalTextView *const pTextView = GetActiveTextView();
+	m_pMDIFrame->UpdateCmdUI<ID_EDIT_CUT>(
+		pTextView && pTextView->QueryEditable() && pTextView->IsSelection() ? MF_ENABLED : MF_GRAYED);
+	m_pMDIFrame->UpdateCmdUI<ID_EDIT_COPY>(
+		pTextView && pTextView->IsSelection() ? MF_ENABLED : MF_GRAYED);
+	m_pMDIFrame->UpdateCmdUI<ID_EDIT_PASTE>(
+		pTextView && pTextView->QueryEditable() && IsClipboardFormatAvailable(CF_UNICODETEXT) ? MF_ENABLED : MF_GRAYED);
+}
+
 void CChildFrame::UpdateCmdUI()
 {
 	if (m_pMDIFrame->GetActiveDocFrame() != this)
@@ -982,17 +1005,7 @@ void CChildFrame::UpdateCmdUI()
 		m_diffList.HasSignificantDiffs() &&
 		!m_ptBuf[1]->GetReadOnly() ? MF_ENABLED : MF_GRAYED);
 
-	BYTE enableSaveLeft = m_ptBuf[0]->IsSaveable() ? MF_ENABLED : MF_GRAYED;
-	BYTE enableSaveRight = m_ptBuf[1]->IsSaveable() ? MF_ENABLED : MF_GRAYED;
-	m_pMDIFrame->UpdateCmdUI<ID_FILE_SAVE_LEFT>(enableSaveLeft);
-	m_pMDIFrame->UpdateCmdUI<ID_FILE_SAVE_RIGHT>(enableSaveRight);
-	m_pMDIFrame->UpdateCmdUI<ID_FILE_SAVE>(enableSaveLeft & enableSaveRight);
-	m_pMDIFrame->UpdateCmdUI<ID_EDIT_UNDO>(
-		curUndo != undoTgt.begin() && (*(curUndo - 1))->QueryEditable() ?
-		MF_ENABLED : MF_GRAYED);
-	m_pMDIFrame->UpdateCmdUI<ID_EDIT_REDO>(
-		curUndo != undoTgt.end() && (*curUndo)->QueryEditable() ?
-		MF_ENABLED : MF_GRAYED);
+	UpdateEditCmdUI();
 
 	int firstDiff, lastDiff;
 	int currDiff = GetContextDiff(firstDiff, lastDiff);
@@ -1028,13 +1041,7 @@ void CChildFrame::UpdateCmdUI()
 		dfi && pos.y < (long)dfi->dbegin0 ? MF_ENABLED : MF_GRAYED);
 
 	// Clipboard
-	CCrystalTextView *const pTextView = GetActiveTextView();
-	m_pMDIFrame->UpdateCmdUI<ID_EDIT_CUT>(
-		pTextView && pTextView->QueryEditable() && pTextView->IsSelection() ? MF_ENABLED : MF_GRAYED);
-	m_pMDIFrame->UpdateCmdUI<ID_EDIT_COPY>(
-		pTextView && pTextView->IsSelection() ? MF_ENABLED : MF_GRAYED);
-	m_pMDIFrame->UpdateCmdUI<ID_EDIT_PASTE>(
-		pTextView && pTextView->QueryEditable() && IsClipboardFormatAvailable(CF_UNICODETEXT) ? MF_ENABLED : MF_GRAYED);
+	UpdateClipboardCmdUI();
 
 	// Tools
 	m_pMDIFrame->UpdateCmdUI<ID_TOOLS_COMPARE_SELECTION>(

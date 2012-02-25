@@ -115,6 +115,8 @@ public:
 	void UpdateResources();
 	void SetLastCompareResult(int nResult);
 	void UpdateCmdUI();
+	void UpdateEditCmdUI();
+	void UpdateClipboardCmdUI();
 	void UpdateBookmarkUI();
 	void UpdateSourceTypeUI();
 	void UpdateMergeStatusUI();

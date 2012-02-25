@@ -2756,15 +2756,13 @@ void CMainFrame::SelectFilter()
  */
 BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 {
-	CDocFrame *const pDocFrame = GetActiveDocFrame();
-
-	if (pDocFrame && pDocFrame->PreTranslateMessage(pMsg))
-	{
-		return TRUE;
-	}
-
 	if (pMsg->message >= WM_KEYFIRST && pMsg->message <= WM_KEYLAST)
 	{
+		CDocFrame *const pDocFrame = GetActiveDocFrame();
+		if (pDocFrame && pDocFrame->PreTranslateMessage(pMsg))
+		{
+			return TRUE;
+		}
 		// Check if we got 'ESC pressed' -message
 		if (pMsg->message == WM_KEYDOWN)
 		{
