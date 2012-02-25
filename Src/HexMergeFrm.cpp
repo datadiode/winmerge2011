@@ -355,17 +355,16 @@ LRESULT CHexMergeFrame::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_NCACTIVATE:
 		if (wParam)
 		{
-			CMainFrame *const pMDIFrame = GetMainFrame();
-			pMDIFrame->InitCmdUI();
-			pMDIFrame->UpdateCmdUI<ID_NEXTDIFF>(MF_ENABLED);
-			pMDIFrame->UpdateCmdUI<ID_PREVDIFF>(MF_ENABLED);
-			pMDIFrame->UpdateCmdUI<ID_EDIT_CUT>(MF_ENABLED);
-			pMDIFrame->UpdateCmdUI<ID_EDIT_COPY>(MF_ENABLED);
-			pMDIFrame->UpdateCmdUI<ID_EDIT_PASTE>(MF_ENABLED);
-			pMDIFrame->UpdateCmdUI<ID_L2R>(MF_ENABLED);
-			pMDIFrame->UpdateCmdUI<ID_R2L>(MF_ENABLED);
-			pMDIFrame->UpdateCmdUI<ID_ALL_LEFT>(MF_ENABLED);
-			pMDIFrame->UpdateCmdUI<ID_ALL_RIGHT>(MF_ENABLED);
+			m_pMDIFrame->InitCmdUI();
+			m_pMDIFrame->UpdateCmdUI<ID_NEXTDIFF>(MF_ENABLED);
+			m_pMDIFrame->UpdateCmdUI<ID_PREVDIFF>(MF_ENABLED);
+			m_pMDIFrame->UpdateCmdUI<ID_EDIT_CUT>(MF_ENABLED);
+			m_pMDIFrame->UpdateCmdUI<ID_EDIT_COPY>(MF_ENABLED);
+			m_pMDIFrame->UpdateCmdUI<ID_EDIT_PASTE>(MF_ENABLED);
+			m_pMDIFrame->UpdateCmdUI<ID_L2R>(MF_ENABLED);
+			m_pMDIFrame->UpdateCmdUI<ID_R2L>(MF_ENABLED);
+			m_pMDIFrame->UpdateCmdUI<ID_ALL_LEFT>(MF_ENABLED);
+			m_pMDIFrame->UpdateCmdUI<ID_ALL_RIGHT>(MF_ENABLED);
 		}
 		break;
 	case WM_CLOSE:
@@ -378,21 +377,18 @@ LRESULT CHexMergeFrame::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 BOOL CHexMergeFrame::PreTranslateMessage(MSG *pMsg)
 {
-	if (pMsg->message >= WM_KEYFIRST && pMsg->message <= WM_KEYLAST)
+	// First check our own accelerators, then pass down to heksedit.
+	// This is essential for, e.g., ID_VIEW_ZOOMIN/ID_VIEW_ZOOMOUT.
+	if (m_pMDIFrame->m_hAccelTable &&
+		::TranslateAccelerator(m_pMDIFrame->m_hWnd, m_pMDIFrame->m_hAccelTable, pMsg))
 	{
-		// First check our own accelerators, then pass down to heksedit.
-		// This is essential for, e.g., ID_VIEW_ZOOMIN/ID_VIEW_ZOOMOUT.
-		if (m_pMDIFrame->m_hAccelTable &&
-			::TranslateAccelerator(m_pMDIFrame->m_hWnd, m_pMDIFrame->m_hAccelTable, pMsg))
+		return TRUE;
+	}
+	if (CHexMergeView *pView = GetActiveView())
+	{
+		if (pView->PreTranslateMessage(pMsg))
 		{
 			return TRUE;
-		}
-		if (CHexMergeView *pView = GetActiveView())
-		{
-			if (pView->PreTranslateMessage(pMsg))
-			{
-				return TRUE;
-			}
 		}
 	}
 	return FALSE;

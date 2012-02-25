@@ -903,6 +903,8 @@ void CMergeEditView::OnEditOperation(int nAction, LPCTSTR pszText)
 
 	// Change header to inform about changed doc
 	m_pDocument->UpdateHeaderPath(m_nThisPane);
+	// Update Edit Command UI
+	m_pDocument->UpdateEditCmdUI();
 
 	// If automatic rescan enabled, rescan after edit events
 	if (m_bAutomaticRescan)
@@ -1082,7 +1084,7 @@ void CMergeEditView::OnUpdateCaret(bool bShowHide)
 		m_nTopSubLine, m_nTopSubLine + GetScreenLines());
 
 	// Update Command UI
-	m_pDocument->UpdateCmdUI();
+	m_pDocument->UpdateClipboardCmdUI();
 }
 
 /**
