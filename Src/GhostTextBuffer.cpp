@@ -699,6 +699,12 @@ BOOL CGhostTextBuffer::InsertText(CCrystalTextView * pSource, int nLine,
 BOOL CGhostTextBuffer::DeleteText(CCrystalTextView * pSource, int nStartLine,
 		int nStartChar, int nEndLine, int nEndChar, int nAction, BOOL bHistory)
 {
+	String sTextToDelete;
+	GetTextWithoutEmptys(nStartLine, nStartChar, nEndLine, nEndChar, sTextToDelete);
+	// If there is nothing to delete, bail out.
+	if (sTextToDelete.empty())
+		return FALSE;
+
 	// If we want to add undo record, but haven't created undo group yet,
 	// create new group for this action. It gets flushed at end of the
 	// function.
@@ -732,9 +738,6 @@ BOOL CGhostTextBuffer::DeleteText(CCrystalTextView * pSource, int nStartLine,
 	int nRealLinesInDeletedBlock = ComputeRealLine(nEndLine) - ComputeRealLine(nStartLine);
 	if (!bLastLineGhost)
 		++nRealLinesInDeletedBlock;
-
-	String sTextToDelete;
-	GetTextWithoutEmptys(nStartLine, nStartChar, nEndLine, nEndChar, sTextToDelete);
 
 	if (!InternalDeleteText(pSource, nStartLine, nStartChar, nEndLine, nEndChar))
 	    return FALSE;
