@@ -2756,53 +2756,51 @@ void CMainFrame::SelectFilter()
  */
 BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 {
-	CDocFrame *const pDocFrame = GetActiveDocFrame();
-	// Check if we got 'ESC pressed' -message
-	if (pMsg->message == WM_KEYDOWN)
-	{
-		switch (pMsg->wParam)
-		{
-		case VK_ESCAPE:
-			if (m_bEscShutdown)
-			{
-				PostMessage(WM_SYSCOMMAND, SC_CLOSE);
-				return TRUE;
-			}
-			if (m_bClearCaseTool)
-			{
-				// Close DocFrame, then move MainFrame out of the way.
-				if (pDocFrame)
-					pDocFrame->SendMessage(WM_CLOSE);
-				if (GetActiveDocFrame() != pDocFrame)
-				{
-					PostMessage(WM_SYSCOMMAND, SC_PREVWINDOW);
-					m_bClearCaseTool = false;
-				}
-				return TRUE;
-			}
-			if (COptionsMgr::Get(OPT_CLOSE_WITH_ESC))
-			{
-				if (pDocFrame)
-					pDocFrame->SendMessage(WM_CLOSE);
-				else
-					PostMessage(WM_SYSCOMMAND, SC_CLOSE);
-				return TRUE;
-			}
-			break;
-		case VK_CAPITAL:
-		case VK_NUMLOCK:
-			UpdateIndicators();
-			break;
-		}
-	}
-
-	if (pDocFrame && pDocFrame->PreTranslateMessage(pMsg))
-	{
-		return TRUE;
-	}
-
 	if (pMsg->message >= WM_KEYFIRST && pMsg->message <= WM_KEYLAST)
 	{
+		CDocFrame *const pDocFrame = GetActiveDocFrame();
+		if (pDocFrame && pDocFrame->PreTranslateMessage(pMsg))
+		{
+			return TRUE;
+		}
+		// Check if we got 'ESC pressed' -message
+		if (pMsg->message == WM_KEYDOWN)
+		{
+			switch (pMsg->wParam)
+			{
+			case VK_ESCAPE:
+				if (m_bEscShutdown)
+				{
+					PostMessage(WM_SYSCOMMAND, SC_CLOSE);
+					return TRUE;
+				}
+				if (m_bClearCaseTool)
+				{
+					// Close DocFrame, then move MainFrame out of the way.
+					if (pDocFrame)
+						pDocFrame->SendMessage(WM_CLOSE);
+					if (GetActiveDocFrame() != pDocFrame)
+					{
+						PostMessage(WM_SYSCOMMAND, SC_PREVWINDOW);
+						m_bClearCaseTool = false;
+					}
+					return TRUE;
+				}
+				if (COptionsMgr::Get(OPT_CLOSE_WITH_ESC))
+				{
+					if (pDocFrame)
+						pDocFrame->SendMessage(WM_CLOSE);
+					else
+						PostMessage(WM_SYSCOMMAND, SC_CLOSE);
+					return TRUE;
+				}
+				break;
+			case VK_CAPITAL:
+			case VK_NUMLOCK:
+				UpdateIndicators();
+				break;
+			}
+		}
 		if (m_hAccelTable != NULL &&
 			::TranslateAccelerator(m_hWnd, m_hAccelTable, pMsg))
 		{

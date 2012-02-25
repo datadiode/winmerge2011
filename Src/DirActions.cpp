@@ -1331,8 +1331,6 @@ UINT CDirView::MarkSelectedForRescan()
 		GetDocument()->SetDiffStatus(DIFFCODE::NEEDSCAN, DIFFCODE::SCANFLAGS, sel);
 		++items;
 	}
-	if (items > 0)
-		GetDocument()->SetMarkedRescan();
 	return items;
 }
 

@@ -55,6 +55,7 @@ public:
 // Operations
 public:
 	virtual FRAMETYPE GetFrameType() const { return FRAME_FOLDER; }
+	BOOL PreTranslateMessage(MSG *);
 	void SetStatus(LPCTSTR szStatus);
 	void SetFilterStatusDisplay(LPCTSTR szFilter);
 	BOOL GetLeftReadOnly() const { return m_bROLeft; }
@@ -97,7 +98,7 @@ public:
 // Implementation
 public:
 	void InitCompare(LPCTSTR pszLeft, LPCTSTR pszRight, BOOL bRecursive, CTempPathContext *);
-	void Rescan();
+	void Rescan(bool bCompareSelected = false);
 	BOOL GetRecursive() const { return m_bRecursive; }
 	void CompareReady();
 	void UpdateChangedItem(const CChildFrame *);
@@ -130,7 +131,6 @@ public:
 	String GetLeftBasePath() const { return m_pCtxt->GetLeftPath(); }
 	String GetRightBasePath() const { return m_pCtxt->GetRightPath(); }
 	void RemoveDiffByKey(UINT_PTR key) { m_pCtxt->RemoveDiff(key); }
-	void SetMarkedRescan() {m_bMarkedRescan = TRUE; }
 	struct AllowUpwardDirectory
 	{
 		enum ReturnCode
@@ -159,7 +159,6 @@ private:
 	BOOL m_bRecursive; /**< Is current compare recursive? */
 	String m_strLeftDesc; /**< Left side desription text */
 	String m_strRightDesc; /**< Left side desription text */
-	BOOL m_bMarkedRescan; /**< If TRUE next rescan scans only marked items */
 };
 
 /////////////////////////////////////////////////////////////////////////////

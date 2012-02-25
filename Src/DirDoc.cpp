@@ -192,7 +192,7 @@ void CDirFrame::LoadLineFilterList()
 /**
  * @brief Perform directory comparison again from scratch
  */
-void CDirFrame::Rescan()
+void CDirFrame::Rescan(bool bCompareSelected)
 {
 	if (!m_pCtxt)
 		return;
@@ -211,7 +211,7 @@ void CDirFrame::Rescan()
 	m_pDirView->StartCompare(m_pCompareStats);
 
 	// Don't clear if only scanning selected items
-	if (!m_bMarkedRescan)
+	if (!bCompareSelected)
 	{
 		m_pDirView->DeleteAllItems();
 		m_pCtxt->RemoveAll();
@@ -234,7 +234,7 @@ void CDirFrame::Rescan()
 	m_pCtxt->m_bRecursive = !!m_bRecursive;
 
 	// Set total items count since we don't collect items
-	if (m_bMarkedRescan)
+	if (bCompareSelected)
 		m_pCompareStats->IncreaseTotalItems(m_pDirView->GetSelectedCount());
 
 	UpdateHeaderPath(0);
@@ -254,9 +254,8 @@ void CDirFrame::Rescan()
 	m_diffThread.SetContext(m_pCtxt);
 	m_diffThread.SetHwnd(m_pDirView->m_hWnd);
 	m_diffThread.SetMessageIDs(MSG_UI_UPDATE);
-	m_diffThread.SetCompareSelected(!!m_bMarkedRescan);
+	m_diffThread.SetCompareSelected(bCompareSelected);
 	m_diffThread.CompareDirectories(m_pCtxt->GetLeftPath(), m_pCtxt->GetRightPath());
-	m_bMarkedRescan = FALSE;
 }
 
 /**
