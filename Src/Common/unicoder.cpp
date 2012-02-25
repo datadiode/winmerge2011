@@ -573,8 +573,8 @@ UNICODESET DetermineEncoding(unsigned char *pBuffer, size_t size, size_t *pBom)
 		int icheck = IS_TEXT_UNICODE_NOT_UNICODE_MASK ^
 			IS_TEXT_UNICODE_UNICODE_MASK ^ IS_TEXT_UNICODE_CONTROLS ^
 			IS_TEXT_UNICODE_REVERSE_MASK ^ IS_TEXT_UNICODE_REVERSE_CONTROLS;
-		IsTextUnicode(pBuffer, bufSize, &icheck);
-		if ((
+		if (IsTextUnicode(pBuffer, bufSize, &icheck)
+		||	(
 				icheck &
 				(
 					IS_TEXT_UNICODE_UNICODE_MASK ^
