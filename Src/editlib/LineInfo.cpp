@@ -113,29 +113,29 @@ LPCTSTR LineInfo::GetEol() const
  */
 BOOL LineInfo::ChangeEol(LPCTSTR lpEOL)
 {
-  const int nNewEolChars = (int) _tcslen(lpEOL);
+	const int nNewEolChars = static_cast<int>(_tcslen(lpEOL));
 
-  // Check if we really are changing EOL.
-  if (nNewEolChars == m_nEolChars)
-    if (_tcscmp(m_pcLine + m_nLength, lpEOL) == 0)
-      return FALSE;
+	// Check if we really are changing EOL.
+	if (nNewEolChars == m_nEolChars)
+		if (_tcscmp(m_pcLine + m_nLength, lpEOL) == 0)
+			return FALSE;
 
-  int nBufNeeded = m_nLength + nNewEolChars + 1;
-  if (nBufNeeded > m_nMax)
-    {
-      m_nMax = ALIGN_BUF_SIZE (nBufNeeded);
-      ASSERT (m_nMax >= nBufNeeded);
-      TCHAR *pcNewBuf = new TCHAR[m_nMax];
-      if (FullLength() > 0)
-        memcpy (pcNewBuf, m_pcLine, sizeof (TCHAR) * (FullLength() + 1));
-      delete[] m_pcLine;
-      m_pcLine = pcNewBuf;
-    }
+	int nBufNeeded = m_nLength + nNewEolChars + 1;
+	if (nBufNeeded > m_nMax)
+	{
+		m_nMax = ALIGN_BUF_SIZE (nBufNeeded);
+		ASSERT (m_nMax >= nBufNeeded);
+		TCHAR *pcNewBuf = new TCHAR[m_nMax];
+		if (FullLength() > 0)
+			memcpy(pcNewBuf, m_pcLine, sizeof(TCHAR) * (FullLength() + 1));
+		delete[] m_pcLine;
+		m_pcLine = pcNewBuf;
+	}
   
-  // copy also the 0 to zero-terminate the line
-  memcpy (m_pcLine + m_nLength, lpEOL, sizeof (TCHAR) * (nNewEolChars + 1));
-  m_nEolChars = nNewEolChars;
-  return TRUE;
+	// copy also the 0 to zero-terminate the line
+	memcpy(m_pcLine + m_nLength, lpEOL, sizeof(TCHAR) * (nNewEolChars + 1));
+	m_nEolChars = nNewEolChars;
+	return TRUE;
 }
 
 /**
@@ -145,14 +145,14 @@ BOOL LineInfo::ChangeEol(LPCTSTR lpEOL)
  */
 void LineInfo::Delete(int nStartChar, int nEndChar)
 {
-  if (nEndChar < Length() || m_nEolChars)
-    {
-      // preserve characters after deleted range by shifting up
-      memcpy (m_pcLine + nStartChar, m_pcLine + nEndChar,
-              sizeof (TCHAR) * (FullLength() - nEndChar));
-    }
-  m_nLength -= (nEndChar - nStartChar);
-  m_pcLine[FullLength()] = _T('\0');
+	if (nEndChar < Length() || m_nEolChars)
+	{
+		// preserve characters after deleted range by shifting up
+		memcpy(m_pcLine + nStartChar, m_pcLine + nEndChar,
+			sizeof(TCHAR) * (FullLength() - nEndChar));
+	}
+	m_nLength -= (nEndChar - nStartChar);
+	m_pcLine[FullLength()] = _T('\0');
 }
 
 /**
@@ -162,8 +162,7 @@ void LineInfo::Delete(int nStartChar, int nEndChar)
 void LineInfo::DeleteEnd(int nStartChar)
 {
 	m_nLength = nStartChar;
-	m_pcLine[nStartChar] = _T('\0');
-	m_nEolChars = 0;
+	RemoveEol();
 }
 
 /**
@@ -171,7 +170,8 @@ void LineInfo::DeleteEnd(int nStartChar)
  */
 void LineInfo::RemoveEol()
 {
-	m_pcLine[m_nLength] = _T('\0');
+	if (m_pcLine)
+		m_pcLine[m_nLength] = _T('\0');
 	m_nEolChars = 0;
 }
 
