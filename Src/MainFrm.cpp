@@ -1272,19 +1272,21 @@ int CMainFrame::HandleReadonlySave(String &strSavePath, BOOL bMultiFile,
 			userChoice = IDYES;
 		else
 		{
+			String strDisplayPath = strSavePath;
+			LPCTSTR pszDisplayPath = paths_UndoMagic(&strDisplayPath.front());
 			// Prompt for user choice
 			if (bMultiFile)
 			{
 				// Multiple files or folder
 				userChoice = LanguageSelect.FormatMessage(
-					IDS_SAVEREADONLY_MULTI, strSavePath.c_str()
+					IDS_SAVEREADONLY_MULTI, pszDisplayPath
 				).MsgBox(MB_YESNOCANCEL | MB_ICONWARNING | MB_DEFBUTTON3 | MB_DONT_ASK_AGAIN | MB_YES_TO_ALL);
 			}
 			else
 			{
 				// Single file
 				userChoice = LanguageSelect.FormatMessage(
-					IDS_SAVEREADONLY_FMT, strSavePath.c_str()
+					IDS_SAVEREADONLY_FMT, pszDisplayPath
 				).MsgBox(MB_YESNOCANCEL | MB_ICONWARNING | MB_DEFBUTTON2 | MB_DONT_ASK_AGAIN);
 			}
 		}
