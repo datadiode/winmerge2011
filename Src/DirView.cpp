@@ -2332,7 +2332,11 @@ LRESULT CDirView::ReflectEndLabelEdit(NMLVDISPINFO *pdi)
 {
 	LRESULT lResult = 0;
 	if (pdi->item.pszText && pdi->item.pszText[0])
+	{
+		// Prevent DocFrame from attempting to return focus to in-place edit.
+		SetFocus();
 		lResult = DoItemRename(pdi->item.pszText);
+	}
 	return lResult;
 }
 
