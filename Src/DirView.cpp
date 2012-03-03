@@ -2115,11 +2115,12 @@ void CDirView::OnCopyLeftPathnames()
 				// EOL since it allows copying to console/command line.
 				if (GlobalSize(hMem) != 0)
 					file.WriteString(_T(" "), 1);
-				String path = di.GetLeftFilepath(m_pFrame->GetLeftBasePath());
+				String spath = di.GetLeftFilepath(m_pFrame->GetLeftBasePath());
 				// If item is a folder then subfolder (relative to base folder)
 				// is in filename member.
-				path = paths_ConcatPath(path, di.left.filename);
-				file.WriteString(path);
+				spath = paths_ConcatPath(spath, di.left.filename);
+				LPCTSTR path = paths_UndoMagic(&spath.front());
+				file.WriteString(path, spath.c_str() + spath.length() - path);
 			}
 		}
 		file.WriteString(_T(""), 1);
@@ -2150,11 +2151,12 @@ void CDirView::OnCopyRightPathnames()
 				// EOL since it allows copying to console/command line.
 				if (GlobalSize(hMem) != 0)
 					file.WriteString(_T(" "), 1);
-				String path = di.GetRightFilepath(m_pFrame->GetRightBasePath());
+				String spath = di.GetRightFilepath(m_pFrame->GetRightBasePath());
 				// If item is a folder then subfolder (relative to base folder)
 				// is in filename member.
-				path = paths_ConcatPath(path, di.right.filename);
-				file.WriteString(path);
+				spath = paths_ConcatPath(spath, di.right.filename);
+				LPCTSTR path = paths_UndoMagic(&spath.front());
+				file.WriteString(path, spath.c_str() + spath.length() - path);
 			}
 		}
 		file.WriteString(_T(""), 1);
@@ -2185,11 +2187,12 @@ void CDirView::OnCopyBothPathnames()
 				// EOL since it allows copying to console/command line.
 				if (GlobalSize(hMem) != 0)
 					file.WriteString(_T(" "), 1);
-				String path = di.GetLeftFilepath(m_pFrame->GetLeftBasePath());
+				String spath = di.GetLeftFilepath(m_pFrame->GetLeftBasePath());
 				// If item is a folder then subfolder (relative to base folder)
 				// is in filename member.
-				path = paths_ConcatPath(path, di.left.filename);
-				file.WriteString(path);
+				spath = paths_ConcatPath(spath, di.left.filename);
+				LPCTSTR path = paths_UndoMagic(&spath.front());
+				file.WriteString(path, spath.c_str() + spath.length() - path);
 			}
 			if (!di.diffcode.isSideLeftOnly())
 			{
@@ -2197,11 +2200,12 @@ void CDirView::OnCopyBothPathnames()
 				// EOL since it allows copying to console/command line.
 				if (GlobalSize(hMem) != 0)
 					file.WriteString(_T(" "), 1);
-				String path = di.GetRightFilepath(m_pFrame->GetRightBasePath());
+				String spath = di.GetRightFilepath(m_pFrame->GetRightBasePath());
 				// If item is a folder then subfolder (relative to base folder)
 				// is in filename member.
-				path = paths_ConcatPath(path, di.right.filename);
-				file.WriteString(path);
+				spath = paths_ConcatPath(spath, di.right.filename);
+				LPCTSTR path = paths_UndoMagic(&spath.front());
+				file.WriteString(path, spath.c_str() + spath.length() - path);
 			}
 		}
 		file.WriteString(_T(""), 1);
@@ -2636,49 +2640,53 @@ LRESULT CDirView::HandleMenuMessage(UINT message, WPARAM wParam, LPARAM lParam)
 void CDirView::PrepareDragData(UniStdioFile &file)
 {
 	const CDiffContext *ctxt = m_pFrame->GetDiffContext();
-	int i = -1; 
+	int i = -1;
 	while ((i = GetNextItem(i, LVNI_SELECTED)) != -1)
-	{ 
+	{
 		const DIFFITEM &diffitem = GetItemAt(i);
-		// check for special items (e.g not "..") 
-		if (diffitem.diffcode.diffcode == 0) 
-		{ 
-			continue; 
-		} 
+		// check for special items (e.g not "..")
+		if (diffitem.diffcode.diffcode == 0)
+		{
+			continue;
+		}
 
-		if (diffitem.diffcode.isSideLeftOnly()) 
-		{ 
-			String spath = diffitem.GetLeftFilepath(ctxt->GetLeftPath()); 
+		if (diffitem.diffcode.isSideLeftOnly())
+		{
+			String spath = diffitem.GetLeftFilepath(ctxt->GetLeftPath());
 			spath = paths_ConcatPath(spath, diffitem.left.filename);
-			file.WriteString(spath);
-		} 
-		else if (diffitem.diffcode.isSideRightOnly()) 
-		{ 
-			String spath = diffitem.GetRightFilepath(ctxt->GetRightPath()); 
-			spath = paths_ConcatPath(spath, diffitem.right.filename); 
-			file.WriteString(spath);
-		} 
-		else if (diffitem.diffcode.isSideBoth()) 
-		{ 
+			LPCTSTR path = paths_UndoMagic(&spath.front());
+			file.WriteString(path, spath.c_str() + spath.length() - path);
+		}
+		else if (diffitem.diffcode.isSideRightOnly())
+		{
+			String spath = diffitem.GetRightFilepath(ctxt->GetRightPath());
+			spath = paths_ConcatPath(spath, diffitem.right.filename);
+			LPCTSTR path = paths_UndoMagic(&spath.front());
+			file.WriteString(path, spath.c_str() + spath.length() - path);
+		}
+		else if (diffitem.diffcode.isSideBoth())
+		{
 			// when both files equal, there is no difference between what file to drag 
-			// so we put file from the left panel 
-			String spath = diffitem.GetLeftFilepath(ctxt->GetLeftPath()); 
-			spath = paths_ConcatPath(spath, diffitem.left.filename); 
-			file.WriteString(spath);
+			// so we put file from the left panel
+			String spath = diffitem.GetLeftFilepath(ctxt->GetLeftPath());
+			spath = paths_ConcatPath(spath, diffitem.left.filename);
+			LPCTSTR path = paths_UndoMagic(&spath.front());
+			file.WriteString(path, spath.c_str() + spath.length() - path);
 
 			// if both files are different then we also put file from the right panel 
-			if (diffitem.diffcode.isResultDiff()) 
-			{ 
-				file.WriteString(_T("\n"), 1); // end of left file path 
-				String spath = diffitem.GetRightFilepath(ctxt->GetRightPath()); 
-				spath = paths_ConcatPath(spath, diffitem.right.filename); 
-				file.WriteString(spath);
-			} 
-		} 
-		file.WriteString(_T("\n"), 1); // end of file path 
+			if (diffitem.diffcode.isResultDiff())
+			{
+				file.WriteString(_T("\n"), 1); // end of left file path
+				String spath = diffitem.GetRightFilepath(ctxt->GetRightPath());
+				spath = paths_ConcatPath(spath, diffitem.right.filename);
+				LPCTSTR path = paths_UndoMagic(&spath.front());
+				file.WriteString(path, spath.c_str() + spath.length() - path);
+			}
+		}
+		file.WriteString(_T("\n"), 1); // end of file path
 	}
 	file.WriteString(_T(""), 1); // include terminating zero
-} 
+}
 
 /** 
  * @brief Drag files/directories from folder compare listing view. 
