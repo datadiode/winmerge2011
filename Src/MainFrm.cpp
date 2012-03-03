@@ -1644,7 +1644,7 @@ bool CMainFrame::DoFileOpen(FileLocation &filelocLeft, FileLocation &filelocRigh
 		}
 		catch (C7ZipMismatchException *e)
 		{
-			e->ReportError(MB_ICONSTOP);
+			e->ReportError(m_hWnd, MB_ICONSTOP);
 			delete e;
 		}
 	}
@@ -2871,7 +2871,7 @@ void CMainFrame::ShowHelp(LPCTSTR helpLocation /*= NULL*/)
  */
 void CMainFrame::OnHelpMerge7zmismatch() 
 {
-	Recall7ZipMismatchError();
+	Recall7ZipMismatchError(m_hWnd);
 }
 
 /**

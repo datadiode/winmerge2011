@@ -424,7 +424,7 @@ INT_PTR CALLBACK C7ZipMismatchException::DlgProc(HWND hWnd, UINT uMsg, WPARAM wP
 /**
  * @brief Tell user what went wrong and how she can help.
  */
-int C7ZipMismatchException::ReportError(UINT nType, UINT nMessageID)
+int C7ZipMismatchException::ReportError(HWND hWnd, UINT nType, UINT nMessageID)
 {
 	UINT_PTR response = -1;
 	m_bShowAllways = nMessageID;
@@ -440,7 +440,7 @@ int C7ZipMismatchException::ReportError(UINT nType, UINT nMessageID)
 	}
 	if (response == -1)
 	{
-		HWND hwndOwner = GetMainFrame()->GetLastActivePopup()->m_hWnd;
+		HWND hwndOwner = ::GetLastActivePopup(hWnd);
 		HINSTANCE hinst = LanguageSelect.FindResourceHandle(MAKEINTRESOURCE(IDD_MERGE7ZMISMATCH), RT_DIALOG);
 		response = DialogBoxParam(hinst, MAKEINTRESOURCE(IDD_MERGE7ZMISMATCH), hwndOwner, DlgProc, (LPARAM)this);
 		ASSERT(response != -1);
@@ -477,7 +477,7 @@ int NTAPI HasZipSupport()
 /**
  * @brief Tell user why archive support is not available.
  */
-void NTAPI Recall7ZipMismatchError()
+void NTAPI Recall7ZipMismatchError(HWND hWnd)
 {
 	try
 	{
@@ -485,7 +485,7 @@ void NTAPI Recall7ZipMismatchError()
 	}
 	catch (C7ZipMismatchException *e)
 	{
-		e->ReportError(MB_ICONEXCLAMATION, TRUE);
+		e->ReportError(hWnd, MB_ICONEXCLAMATION, TRUE);
 		delete e;
 	}
 }
@@ -777,7 +777,7 @@ const DIFFITEM &CDirView::DirItemEnumerator::Next()
  */
 Merge7z::Envelope *CDirView::DirItemEnumerator::Enum(Item &item)
 {
-	CDirFrame *pDoc = m_pView->GetDocument();
+	CDirFrame *pDoc = m_pView->m_pFrame;
 	const DIFFITEM &di = Next();
 
 	if ((m_nFlags & DiffsOnly) && !m_pView->IsItemNavigableDiff(di))
