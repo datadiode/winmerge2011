@@ -80,14 +80,9 @@ static char THIS_FILE[] = __FILE__;
 
 using stl::vector;
 
-const TCHAR crlf[] = _T ("\r\n");
-
 #ifdef _DEBUG
 #define _ADVANCED_BUGCHECK  1
 #endif
-
-int CCrystalTextBuffer::m_nDefaultEncoding = -1;
-
 
 /////////////////////////////////////////////////////////////////////////////
 // CCrystalTextBuffer::CUpdateContext
@@ -145,7 +140,6 @@ CCrystalTextBuffer::CCrystalTextBuffer()
 	m_bReadOnly = FALSE;
 	m_bModified = FALSE;
 	m_nCRLFMode = CRLF_STYLE_DOS;
-	m_bCreateBackupFile = FALSE;
 	m_nUndoPosition = 0;
 	m_bUndoGroup = m_bUndoBeginGroup = FALSE;
 	m_bInsertTabs = TRUE;
@@ -153,7 +147,6 @@ CCrystalTextBuffer::CCrystalTextBuffer()
 	//BEGIN SW
 	m_ptLastChange.x = m_ptLastChange.y = -1;
 	//END SW
-	m_nSourceEncoding = m_nDefaultEncoding;
 	m_dwCurrentRevisionNumber = 0;
 	m_dwRevisionNumberOnSave = 0;
 }
@@ -481,6 +474,8 @@ void CCrystalTextBuffer::GetText(int nStartLine, int nStartChar, int nEndLine, i
   // some edit functions (copy...) should do nothing when there is no selection.
   // assert to be sure to catch these 'do nothing' cases.
   ASSERT(nStartLine != nEndLine || nStartChar != nEndChar);
+
+  static const TCHAR crlf[] = _T("\r\n");
 
   if (pszCRLF == NULL)
     pszCRLF = crlf;
