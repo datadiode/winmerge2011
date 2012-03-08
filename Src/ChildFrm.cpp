@@ -979,6 +979,8 @@ void CChildFrame::UpdateClipboardCmdUI()
 		pTextView && pTextView->IsSelection() ? MF_ENABLED : MF_GRAYED);
 	m_pMDIFrame->UpdateCmdUI<ID_EDIT_PASTE>(
 		pTextView && pTextView->QueryEditable() && IsClipboardFormatAvailable(CF_UNICODETEXT) ? MF_ENABLED : MF_GRAYED);
+	m_pMDIFrame->UpdateCmdUI<ID_TOOLS_COMPARE_SELECTION>(
+		m_pOpener == NULL && m_pView[0]->IsSelection() && m_pView[1]->IsSelection() ? MF_ENABLED : MF_GRAYED);
 }
 
 void CChildFrame::UpdateCmdUI()
@@ -1042,10 +1044,6 @@ void CChildFrame::UpdateCmdUI()
 
 	// Clipboard
 	UpdateClipboardCmdUI();
-
-	// Tools
-	m_pMDIFrame->UpdateCmdUI<ID_TOOLS_COMPARE_SELECTION>(
-		m_pOpener == NULL && m_pView[0]->IsSelection() && m_pView[1]->IsSelection() ? MF_ENABLED : MF_GRAYED);
 
 	// Enable select difference menuitem if current line is inside difference.
 	m_pMDIFrame->UpdateCmdUI<ID_SELECTLINEDIFF>(
