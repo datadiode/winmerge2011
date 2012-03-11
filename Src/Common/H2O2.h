@@ -388,6 +388,7 @@ namespace H2O
 	};
 
 	// Utility functions
+	HWND GetTopLevelParent(HWND);
 	void GetDesktopWorkArea(HWND, LPRECT);
 	void CenterWindow(HWindow *);
 }

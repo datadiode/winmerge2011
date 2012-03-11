@@ -338,6 +338,13 @@ LRESULT OPropertySheet::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 	return ::DefDlgProc(hWnd, uMsg, wParam, lParam);
 }
 
+HWND H2O::GetTopLevelParent(HWND hWnd)
+{
+	while (HWND hWndParent = ::GetParent(hWnd))
+		hWnd = hWndParent;
+	return hWnd;
+}
+
 void H2O::GetDesktopWorkArea(HWND hWnd, LPRECT prcDesktop)
 {
 	// Get screen dimensions excluding task bar
