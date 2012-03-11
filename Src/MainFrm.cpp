@@ -62,7 +62,6 @@
 #include "OptionsMgr.h"
 #include "LanguageSelect.h"
 #include "codepage_detect.h"
-#include "VSSHelper.h"
 #include "codepage.h"
 #include "ProjectFile.h"
 #include "PreferencesDlg.h"
@@ -70,9 +69,7 @@
 #include "MergeCmdLineInfo.h"
 #include "FileOrFolderSelect.h"
 #include "stringdiffs.h"
-#include "MergeCmdLineInfo.h"
 #include "OpenDlg.h"
-#include <MyCom.h>
 #include <mlang.h>
 
 using stl::vector;
