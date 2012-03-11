@@ -550,6 +550,8 @@ inline int CoincidenceOf(int mask) { return mask & mask - 1; }
  */
 UNICODESET DetermineEncoding(unsigned char *pBuffer, size_t size, size_t *pBom)
 {
+	if (size == 0)
+		return NONE;
 	// initialize to a pattern that differs everywhere from all possible unicode signatures
 	unsigned long sig = 0x3F3F3F3F;
 	// copy at most 4 bytes from buffer
@@ -564,8 +566,6 @@ UNICODESET DetermineEncoding(unsigned char *pBuffer, size_t size, size_t *pBom)
 	reinterpret_cast<BYTE *>(&sig)[--*pBom] = 0x00;
 	if (sig == 0xBFBBEF)
 		return UTF8;
-	if (size == 0)
-		return NONE;
 	// check for UCS2 the two possible 2 bytes signatures
 	size_t bufSize = min<size_t>(size, 8 * 1024);
 	if (memchr(pBuffer, 0, bufSize))
