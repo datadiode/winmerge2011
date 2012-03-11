@@ -596,8 +596,7 @@ void CDirView::ListContextMenu(POINT point)
 	FormatContextMenu(pPopup, ID_DIR_OPEN_LEFT_WITHEDITOR, nOpenableOnLeftWith, nTotal);
 	FormatContextMenu(pPopup, ID_DIR_OPEN_RIGHT_WITHEDITOR, nOpenableOnRightWith, nTotal);
 	
-	pPopup->EnableMenuItem(ID_DIR_ITEM_RENAME,
-		nTotal == 1 && !IsItemSelectedSpecial() ? MF_ENABLED : MF_GRAYED);
+	pPopup->EnableMenuItem(ID_DIR_ITEM_RENAME, nTotal == 1 ? MF_ENABLED : MF_GRAYED);
 
 	bool bEnableShellContextMenu = COptionsMgr::Get(OPT_DIRVIEW_ENABLE_SHELL_CONTEXT_MENU);
 	if (bEnableShellContextMenu)
@@ -2252,10 +2251,7 @@ void CDirView::OnCopyFilenames()
  */
 void CDirView::OnItemRename()
 {
-	ASSERT(1 == GetSelectedCount());
-	int nSelItem = GetNextItem(-1, LVNI_SELECTED);
-	ASSERT(-1 != nSelItem);
-	EditLabel(nSelItem);
+	EditLabel(GetNextItem(-1, LVNI_SELECTED));
 }
 
 /**
@@ -2306,7 +2302,7 @@ LRESULT CDirView::ReflectCustomDraw(NMLVCUSTOMDRAW *pNM)
  */
 LRESULT CDirView::ReflectBeginLabelEdit(NMLVDISPINFO *pdi)
 {
-	if (IsItemSelectedSpecial())
+	if ((GetSelectedCount() != 1) || (pdi->item.lParam == SPECIAL_ITEM_POS))
 		return 1;
 	// If label edit is allowed.
 	// Locate the edit box on the right column in case the user changed the
@@ -2497,16 +2493,6 @@ void CDirView::OnViewCompareStatistics()
 {
 	CompareStatisticsDlg dlg(m_pFrame->GetCompareStats());
 	LanguageSelect.DoModal(dlg);
-}
-
-/**
- * @brief TRUE if selected item is a "special item".
- */
-BOOL CDirView::IsItemSelectedSpecial()
-{
-	int nSelItem = GetNextItem(-1, LVNI_SELECTED);
-	ASSERT(-1 != nSelItem);
-	return (SPECIAL_ITEM_POS == GetItemKey(nSelItem));
 }
 
 /**

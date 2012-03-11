@@ -349,7 +349,6 @@ private:
 	HMENU ListShellContextMenu(SIDE_TYPE);
 	void ReloadColumns();
 	void ResetColumnWidths();
-	BOOL IsItemSelectedSpecial();
 	void CollapseSubdir(int sel);
 	void ExpandSubdir(int sel);
 	void PrepareDragData(UniStdioFile &);
