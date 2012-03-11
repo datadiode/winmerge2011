@@ -234,7 +234,7 @@ static BOOL CheckPathsExist(LPCTSTR orig, LPCTSTR dest, int allowOrig,
  */
 void CDirView::WarnContentsChanged(LPCTSTR failedPath)
 {
-	LanguageSelect.MsgBox(IDS_DIRCMP_NOTSYNC, failedPath, MB_ICONWARNING);
+	LanguageSelect.MsgBox(IDS_DIRCMP_NOTSYNC, paths_UndoMagic(&String(failedPath).front()), MB_ICONWARNING);
 }
 
 /// Prompt & copy item from right to left, if legal
