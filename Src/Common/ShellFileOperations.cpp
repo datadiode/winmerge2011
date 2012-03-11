@@ -154,7 +154,7 @@ void ShellFileOperations::SetOperation(UINT operation, FILEOP_FLAGS flags,
 {
 	m_function = operation;
 	m_flags = flags;
-	m_parentWindow = parentWindow;
+	m_parentWindow = H2O::GetTopLevelParent(parentWindow);
 }
 
 /**
@@ -174,7 +174,10 @@ bool ShellFileOperations::Run()
 
 	SHFILEOPSTRUCT fileop = {m_parentWindow, m_function, sourceStr, destStr,
 			m_flags, FALSE, 0, 0};
+
+	EnableWindow(m_parentWindow, FALSE);
 	int ret = SHFileOperation(&fileop);
+	EnableWindow(m_parentWindow, TRUE);
 
 	if (ret == 0x75) // DE_OPCANCELLED
 		m_isCanceled = true;
