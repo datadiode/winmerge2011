@@ -26,192 +26,43 @@
 #include "paths.h"
 #include "ShellFileOperations.h"
 
-using stl::vector;
-
-/**
- * @brief Constructor.
- */
-ShellFileOperations::ShellFileOperations()
- : m_bOneToOneMapping(false)
- , m_function(0)
- , m_flags(0)
- , m_parentWindow(NULL)
- , m_isCanceled(false)
+ShellFileOperations::ShellFileOperations
+(
+	HWND hwnd, UINT wFunc, FILEOP_FLAGS fFlags, size_t fromMax, size_t toMax
+) :	pFrom(fromMax ? new TCHAR[fromMax + 1] : NULL),
+	pTo(toMax ? new TCHAR[toMax + 1] : NULL)
 {
+	SHFILEOPSTRUCT::hwnd = H2O::GetTopLevelParent(hwnd);
+	SHFILEOPSTRUCT::wFunc = wFunc;
+	SHFILEOPSTRUCT::fFlags = fFlags;
+	SHFILEOPSTRUCT::pFrom = pFrom;
+	SHFILEOPSTRUCT::pTo = pTo;
 }
 
-/**
- * @brief Add source- and destination paths.
- * @param [in] source Source path.
- * @param [in] destination Destination path.
- */
-void ShellFileOperations::AddSourceAndDestination(LPCTSTR source, LPCTSTR destination)
+ShellFileOperations::~ShellFileOperations()
 {
-	m_sources.push_back(paths_UndoMagic(&String(source).front()));
-	m_destinations.push_back(paths_UndoMagic(&String(destination).front()));
+	delete[] SHFILEOPSTRUCT::pFrom;
+	delete[] SHFILEOPSTRUCT::pTo;
 }
 
-/**
- * @brief Add source path.
- * @param [in] source Source path.
- */
-void ShellFileOperations::AddSource(LPCTSTR source)
-{
-	m_sources.push_back(paths_UndoMagic(&String(source).front()));
-	m_bOneToOneMapping = false;
-}
-
-/**
- * @brief Add destination path.
- * @param [in] destination Destination path.
- */
-void ShellFileOperations::SetDestination(LPCTSTR destination)
-{
-	m_destinations.push_back(paths_UndoMagic(&String(destination).front()));
-	m_bOneToOneMapping = false;
-}
-
-/**
- * @brief Get a path list as C string with NULLs.
- * This function returns C-string with NULLs between paths and two NULLs
- * at the end of the paths. As the ShellFileOp() requires.
- * @param [in] source If true, return source paths, else return destination
- *   paths.
- * @return C-string of the paths.
- * @note You must free the returned string after using it!
- */
-TCHAR* ShellFileOperations::GetPathList(bool source) const
-{
-	const int len = CountStringSize(source);
-	TCHAR *pStr = new TCHAR[len];
-	ZeroMemory(pStr, len * sizeof(TCHAR));
-
-	vector<String>::const_iterator iter;
-	vector<String>::const_iterator end;
-	if (source)
-	{
-		iter = m_sources.begin();
-		end = m_sources.end();
-	}
-	else
-	{
-		iter = m_destinations.begin();
-		end = m_destinations.end();
-	}
-
-	int ind = 0;
-	while (iter != end)
-	{
-		const int slen = (*iter).length();
-		memcpy(pStr + ind, (*iter).c_str(), slen * sizeof(TCHAR));
-		ind += slen;
-		ind++; // NULL between strings
-		iter++;
-	}
-	return pStr;
-}
-
-/**
- * @brief Calculate lenght of the C-string required for paths.
- * @param [in] source If true calculate source paths, else calculate
- *   destination paths.
- * @return Lenght of the string.
- */
-int ShellFileOperations::CountStringSize(bool source) const
-{
-	vector<String>::const_iterator iter;
-	vector<String>::const_iterator end;
-	if (source)
-	{
-		iter = m_sources.begin();
-		end = m_sources.end();
-	}
-	else
-	{
-		iter = m_destinations.begin();
-		end = m_destinations.end();
-	}
-
-	int size = 0;
-	while (iter != end)
-	{
-		size += (*iter).length() * sizeof(TCHAR);
-		size += sizeof(TCHAR); // NULL between strings
-		iter++;
-	}
-	size += 2; // Two zeros at end of the string
-	return size;
-}
-
-/**
- * @brief Set the operation, flags and parent window.
- * @param [in] operation Operation to run (copy/move/delete/rename).
- * @param [in] flags Flags related to the operation.
- * @param [in] parentWindow Window getting notifications.
- */
-void ShellFileOperations::SetOperation(UINT operation, FILEOP_FLAGS flags,
-		HWND parentWindow /*= NULL*/)
-{
-	m_function = operation;
-	m_flags = flags;
-	m_parentWindow = parentWindow;
-}
-
-/**
- * @brief Run the file operation(s).
- * This method runs the filesystem operation(s) added earlier.
- * @return true if succeeds and user did not cancel, false otherwise.
- */
 bool ShellFileOperations::Run()
 {
-	if (m_function == 0)
-		return false; // Operation not set!
-
-	TCHAR *sourceStr = GetPathList(true);
-	TCHAR *destStr = NULL;
-	if (m_function != FO_DELETE)
-		destStr = GetPathList(false);
-
-	SHFILEOPSTRUCT fileop = {m_parentWindow, m_function, sourceStr, destStr,
-			m_flags, FALSE, 0, 0};
-	int ret = SHFileOperation(&fileop);
-
-	if (ret == 0x75) // DE_OPCANCELLED
-		m_isCanceled = true;
-
-	delete [] sourceStr;
-	sourceStr = NULL;
-	delete [] destStr;
-	destStr = NULL;
-
-	BOOL anyAborted = fileop.fAnyOperationsAborted;
-
-	// SHFileOperation returns 0 when succeeds
-	if (ret == 0 && anyAborted == FALSE)
-		return true;
-	return false;
+	bool succeeded = true;
+	if (pFrom != NULL)
+	{
+		EnableWindow(hwnd, FALSE);
+		succeeded = SHFileOperation(this) == 0 && !fAnyOperationsAborted;
+		EnableWindow(hwnd, TRUE);
+	}
+	return succeeded;
 }
 
-/**
- * @brief Did the user cancel the operation?
- * @return true if the operation was canceled by the user.
- */
-bool ShellFileOperations::IsCanceled() const
+LPTSTR ShellFileOperations::AddPath(LPTSTR p, LPCTSTR path)
 {
-	return m_isCanceled;
-}
-
-/**
- * @brief Reset the class.
- */
-void ShellFileOperations::Reset()
-{
-	m_bOneToOneMapping = false;
-	m_function = 0;
-	m_flags = 0;
-	m_parentWindow = NULL;
-	m_isCanceled = false;
-
-	m_sources.clear();
-	m_destinations.clear();
+	_tcscpy(p, path);
+	LPCTSTR q = paths_UndoMagic(p);
+	size_t n = _tcslen(q) + 1;
+	memmove(p, q, n * sizeof(TCHAR));
+	*(p += n) = _T('\0');
+	return p;
 }

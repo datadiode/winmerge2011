@@ -14,9 +14,10 @@
  */
 typedef enum
 {
-	DOES_NOT_EXIST, /**< File or folder does not exist. */
-	IS_EXISTING_FILE, /**< It is existing file */
-	IS_EXISTING_DIR, /**< It is existing folder */
+	DOES_NOT_EXIST = 0, /**< File or folder does not exist. */
+	IS_EXISTING_FILE = 1, /**< It is existing file */
+	IS_EXISTING_DIR = 2, /**< It is existing folder */
+	IS_EXISTING = IS_EXISTING_FILE | IS_EXISTING_DIR
 } PATH_EXISTENCE;
 
 bool paths_EndsWithSlash(LPCTSTR);

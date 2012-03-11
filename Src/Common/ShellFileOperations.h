@@ -31,30 +31,29 @@
  * paths without needing to care about adding correct amount of NULLs.
  */
 class ShellFileOperations
+	: ZeroInit<ShellFileOperations>
+	, public SHFILEOPSTRUCT
 {
 public:
-	ShellFileOperations();
+	ShellFileOperations(HWND, UINT, FILEOP_FLAGS, size_t fromMax, size_t toMax);
+	~ShellFileOperations();
 
-	void AddSourceAndDestination(LPCTSTR source, LPCTSTR destination);
-	void AddSource(LPCTSTR source);
-	void SetDestination(LPCTSTR destination);
-	void SetOperation(UINT operation, FILEOP_FLAGS flags, HWND parentWindow = NULL);
 	bool Run();
-	bool IsCanceled() const;
-	void Reset();
 
-protected:
-	TCHAR* GetPathList(bool source) const;
-	int CountStringSize(bool source) const;
+	void AddSource(LPCTSTR source)
+	{
+		pFrom = AddPath(pFrom, source);
+	}
+	void AddDestination(LPCTSTR destination)
+	{
+		pTo = AddPath(pTo, destination);
+	}
 
 private:
-	stl::vector<String> m_sources; /**< Source paths. */
-	stl::vector<String> m_destinations; /**< Destination paths. */
-	UINT m_function; /**< Operation used, copy, move, rename or delete. */
-	FILEOP_FLAGS m_flags; /**< Flags for the operation. */
-	HWND m_parentWindow; /**< Parent window getting notifications. */
-	bool m_bOneToOneMapping; /**< Same amount of sources and destinations? */
-	bool m_isCanceled; /**< Did user cancel the operation? */
+	static LPTSTR AddPath(LPTSTR p, LPCTSTR path);
+
+	TCHAR *pFrom;
+	TCHAR *pTo;
 };
 
 #endif // _SHELL_FILE_OPERATIONS_H_

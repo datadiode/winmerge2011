@@ -25,19 +25,6 @@
 #ifndef _FILEACTIONSCRIPT_H_
 #define _FILEACTIONSCRIPT_H_
 
-class ShellFileOperations;
-
-/** 
- * @brief Return values for FileActionScript functions.
- */
-enum CreateScriptReturn
-{
-	SCRIPT_FAIL = 0,    /**< The script failed. */
-	SCRIPT_SUCCESS,     /**< The script succeeded. */
-	SCRIPT_USERCANCEL,  /**< The user cancelled the action. */
-	SCRIPT_USERSKIP,    /**< The user wanted to skip one or more items. */
-};
-
 /** 
  * @brief FileAction presents one filesystem action we want to do.
  *
@@ -54,15 +41,14 @@ struct FileAction
 	 */
 	enum ACT_TYPE
 	{ 
-		ACT_COPY = 1, /**< Copy the item(s). */
+		ACT_COPY,     /**< Copy the item(s). */
 		ACT_MOVE,     /**< Move the item(s). */
 		ACT_DEL,      /**< Delete the item(s). */
-	};
-
+		ACT_TYPE
+	} atype; /**< Action's type */
+	bool dirflag; /**< Is it directory? (TRUE means directory) */
 	String src; /**< Source for action */
 	String dest; /**< Destination action */
-	BOOL dirflag; /**< Is it directory? (TRUE means directory) */
-	ACT_TYPE atype; /**< Action's type */
 };
 
 /** 
@@ -120,18 +106,16 @@ public:
 	FileActionScript();
 	~FileActionScript();
 
-	void SetParentWindow(HWND hWnd);
-	void UseRecycleBin(BOOL bUseRecycleBin);
-	BOOL Run();
+	bool Run(HWND, FILEOP_FLAGS);
 
 	// Manipulate the FileActionList
-	int GetActionItemCount() const;
+	int GetActionItemCount() const { return m_actions.size(); }
 
 	/**
 	 * Add new item to the action list.
 	 * @param [in] item Item to add to the list.
 	 */
-	void AddActionItem(FileActionItem & item) { m_actions.push_back(item); }
+	void AddActionItem(const FileActionItem &item) { m_actions.push_back(item); }
 
 	FileActionItem RemoveTailActionItem();
 
@@ -143,21 +127,8 @@ public:
 
 	String m_destBase; /**< Base destination path for some operations */
 
-protected:
-	int VCSCheckOut(const String &path, BOOL &bApplyToAll);
-	int CreateOperationsScripts();
-	bool RunOp(ShellFileOperations *oplist, bool & userCancelled);
-
 private:
 	stl::vector<FileActionItem> m_actions; /**< List of all actions for this script. */
-	ShellFileOperations * m_pCopyOperations; /**< Copy operations. */
-	BOOL m_bHasCopyOperations; /**< flag if we've put anything into m_pCopyOperations */
-	ShellFileOperations * m_pMoveOperations; /**< Move operations. */
-	BOOL m_bHasMoveOperations; /**< flag if we've put anything into m_pMoveOperations */
-	ShellFileOperations * m_pDelOperations; /**< Delete operations. */
-	BOOL m_bHasDelOperations; /**< flag if we've put anything into m_pDelOperations */
-	BOOL m_bUseRecycleBin; /**< Use recycle bin for script actions? */
-	HWND m_hParentWindow; /**< Parent window for showing messages */
 };
 
 #endif // _FILEACTIONSCRIPT_H_

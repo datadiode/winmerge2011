@@ -179,8 +179,8 @@ private:
 	void UpdateAfterFileScript(FileActionScript & actionList);
 	UINT MarkSelectedForRescan();
 	void DoFileEncodingDialog();
-	BOOL DoItemRename(LPCTSTR szNewItemName);
-	BOOL RenameOnSameDir(LPCTSTR szOldFileName, LPCTSTR szNewFileName);
+	bool DoItemRename(int iItem, LPCTSTR szNewItemName);
+	bool RenameOnSameDir(LPCTSTR szOldFileName, LPCTSTR szNewFileName);
 // End DirActions.cpp
 	void ReflectGetdispinfo(NMLVDISPINFO *);
 	LRESULT ReflectKeydown(NMLVKEYDOWN *);
@@ -258,7 +258,6 @@ protected:
 	int GetDefaultColImage() const;
 	int AddSpecialItems();
 	void GetCurrentColRegKeys(stl::vector<String> &colKeys);
-	void WarnContentsChanged(LPCTSTR failedPath);
 	void OpenSpecialItems(UINT_PTR pos1, UINT_PTR pos2);
 	bool OpenOneItem(UINT_PTR pos1, DIFFITEM **di1, DIFFITEM **di2,
 			String &path1, String &path2, int & sel1, bool & isDir);
