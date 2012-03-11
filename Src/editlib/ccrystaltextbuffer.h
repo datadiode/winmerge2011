@@ -108,8 +108,6 @@ public:
 class EDITPADC_CLASS CCrystalTextBuffer
 {
 public:
-	int m_nSourceEncoding;
-	static int m_nDefaultEncoding;
 	DWORD m_dwCurrentRevisionNumber;
 	DWORD m_dwRevisionNumberOnSave;
 	BOOL IsTextBufferInitialized () const { return m_bInit; }
@@ -120,7 +118,6 @@ protected :
 	BOOL m_bModified;
 	CRLFSTYLE m_nCRLFMode;
 	BOOL m_IgnoreEol;
-	BOOL m_bCreateBackupFile;
 	BOOL m_bInsertTabs;
 	int  m_nTabSize;
 	int FindLineWithFlag (DWORD dwFlag) const;

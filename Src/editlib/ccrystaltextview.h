@@ -686,7 +686,6 @@ public :
 		TCHAR opencomment[8];
 		TCHAR closecomment[8];
 		TCHAR commentline[8];
-		DWORD encoding;
 	} TextDefinition;
 
 	static const DWORD SRCOPT_INSERTTABS = 1;

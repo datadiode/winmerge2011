@@ -305,7 +305,6 @@ void CChildFrame::SetUnpacker(PackingInfo * infoNewHandler)
  */
 static void SaveBuffForDiff(CDiffTextBuffer & buf, CDiffTextBuffer & buf2, DiffFileData &diffdata, int i)
 {
-	ASSERT(buf.m_nSourceEncoding == buf.m_nDefaultEncoding);  
 	int orig_codepage = buf.getCodepage();
 	UNICODESET orig_unicoding = buf.getUnicoding();
 

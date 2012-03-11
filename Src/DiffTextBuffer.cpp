@@ -286,16 +286,8 @@ FileLoadResult::FILES_RESULT CDiffTextBuffer::LoadFromFile(LPCTSTR pszFileName,
 	ASSERT(!m_bInit);
 	ASSERT(m_aLines.size() == 0);
 
-	String sExt;
 	FileLoadResult::FILES_RESULT nRetVal = FileLoadResult::FRESULT_OK;
 
-	// Set encoding based on extension, if we know one
-	SplitFilename(pszFileName, NULL, NULL, &sExt);
-	CCrystalTextView::TextDefinition *def = 
-		CCrystalTextView::GetTextType(sExt.c_str());
-	if (def && def->encoding != -1)
-		m_nSourceEncoding = def->encoding;
-	
 	UniFile *pufile = NULL;
 
 	try
