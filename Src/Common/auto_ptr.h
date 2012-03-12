@@ -1,6 +1,7 @@
 /* The following code example is taken from the book
  * "The C++ Standard Library - A Tutorial and Reference"
  * by Nicolai M. Josuttis, Addison-Wesley, 1999
+ * The use_vector_delete option was added for WinMerge 2011.
  *
  * (C) Copyright Nicolai M. Josuttis 1999.
  * Permission to copy, use, modify, sell and distribute this software
@@ -21,10 +22,19 @@ namespace eastl {
         }
     };
 
-    template<class T>
+    template<class T, bool use_vector_delete = false>
     class auto_ptr {
       private:
         T* ap;    // refers to the actual owned object (if any)
+
+        // deletion options
+        template<bool use_vector_delete>
+        static void do_delete(T *);
+        template<>
+        static void do_delete<false>(T *p) { delete p; }
+        template<>
+        static void do_delete<true>(T *p) { delete[] p; }
+
       public:
         typedef T element_type;
 
@@ -57,7 +67,7 @@ namespace eastl {
         
         // destructor
         ~auto_ptr() throw() {
-            delete ap;
+            do_delete<use_vector_delete>(ap);
         }
 
         // value access
@@ -81,7 +91,7 @@ namespace eastl {
         // reset value
         void reset (T* ptr=0) throw() {
             if (ap != ptr) {
-                delete ap;
+                do_delete<use_vector_delete>(ap);
                 ap = ptr;
             }
         }
