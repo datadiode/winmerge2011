@@ -689,11 +689,10 @@ FONT 8, "MS Shell Dlg", 0, 0, 1
     LTEXT           "WinMerge", IDC_STATIC, 63, 13, 63, 8, SS_LEFT | SS_NOPREFIX
     LTEXT           "Version %s", IDC_VERSION, 63, 23, 153, 8, SS_LEFT | SS_NOPREFIX
     LTEXT           "Private Build: %s", IDC_PRIVATEBUILD, 63, 33, 153, 8, SS_LEFT
-    LTEXT           "All rights reserved.", IDC_STATIC, 7, 60, 170, 8, SS_LEFT
     DEFPUSHBUTTON   "OK", IDOK, 166, 103, 50, 14
     CONTROL         "Visit the WinMerge HomePage!", IDC_WWW, WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW, 7, 79, 209, 8
     CONTROL         "", IDC_STATIC, WC_STATIC, SS_ETCHEDHORZ, 7, 95, 209, 1
-    LTEXT           "[VERSION COPYRIGHT GOES HERE]", IDC_COMPANY, 7, 49, 209, 8, SS_LEFT
+    LTEXT           "[VERSION COPYRIGHT GOES HERE]", IDC_COMPANY, 7, 49, 209, 20, SS_LEFT
     PUSHBUTTON      "Contributors", IDC_OPEN_CONTRIBUTORS, 7, 103, 65, 14
 }
 
