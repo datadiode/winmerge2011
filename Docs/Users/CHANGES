@@ -1,3 +1,12 @@
+2011.002.117
+Changes since preceding release (not necessarily complete):
+• Deletions involving ghost lines could cause crash or improper undo
+• Fix improper en/disabling of Save/Cut/Copy
+• Leave the view open when the user VK_ESCAPEs from renaming an item
+• Issue #15 Assume unicode if IsTextUnicode() returns TRUE regardless of flags
+• A few more places to hide \\?\ and \\?\UNC\ prefixes from user interface
+• Since 2011.002.027, empty files were unintentionally considered binary
+
 2011.002.047
 Changes since preceding release (not necessarily complete):
 • Fix menu text formatting when applying a patch targeted at multiple files
