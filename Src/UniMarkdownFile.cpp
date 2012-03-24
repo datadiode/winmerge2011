@@ -22,20 +22,12 @@ UniMarkdownFile::UniMarkdownFile()
 /**
  * @brief Open the XML file.
  * @param [in] filename Filename (and path) of the file to open.
- * @param [in] dwOpenAccess File access mode.
- * @param [in] dwOpenShareMode File's share mode when opened.
- * @param [in] dwOpenCreationDispostion Overwrite existing file?
- * @param [in] dwMappingProtect
- * @param [in] dwMapViewAccess
  * @return true if succeeds, false otherwise.
  */
-bool UniMarkdownFile::DoOpen(LPCTSTR filename, DWORD dwOpenAccess,
-		DWORD dwOpenShareMode, DWORD dwOpenCreationDispostion,
-		DWORD dwMappingProtect, DWORD dwMapViewAccess)
+bool UniMarkdownFile::OpenReadOnly(LPCTSTR filename)
 {
 	m_depth = 0;
-	bool bOpen = UniMemFile::DoOpen(filename, dwOpenAccess, dwOpenShareMode,
-			dwOpenCreationDispostion, dwMappingProtect, dwMapViewAccess);
+	bool bOpen = UniMemFile::OpenReadOnly(filename);
 	if (bOpen)
 	{
 		// CMarkdown wants octets, so we may need to transcode to UTF8.

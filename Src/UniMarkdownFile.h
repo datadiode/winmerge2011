@@ -21,12 +21,9 @@ public:
 	{
 		return new UniMarkdownFile;
 	}
-	virtual bool ReadString(String &line, String &eol, bool *lossy);
+	virtual bool OpenReadOnly(LPCTSTR filename);
 	virtual void Close();
-protected:
-	virtual bool DoOpen(LPCTSTR filename, DWORD dwOpenAccess,
-		DWORD dwOpenShareMode, DWORD dwOpenCreationDispostion,
-		DWORD dwMappingProtect, DWORD dwMapViewAccess);
+	virtual bool ReadString(String &line, String &eol, bool *lossy);
 private:
 	void Move();
 	String maketstring(LPCSTR lpd, UINT len);
