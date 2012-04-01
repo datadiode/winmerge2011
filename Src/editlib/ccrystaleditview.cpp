@@ -1060,22 +1060,22 @@ BOOL CCrystalEditView::DoEditRedo()
 
 static bool isopenbrace(TCHAR c)
 {
-	return c == _T ('{') || c == _T ('(') || c == _T ('[') || c == _T ('<');
+	return c == _T('{') || c == _T('(') || c == _T('[') || c == _T('<');
 }
 
 static bool isclosebrace(TCHAR c)
 {
-	return c == _T ('}') || c == _T ('}') || c == _T (']') || c == _T ('>');
+	return c == _T('}') || c == _T(')') || c == _T(']') || c == _T('>');
 }
 
 static bool isopenbrace(LPCTSTR s)
 {
-	return s[1] == _T ('\0') && isopenbrace (*s);
+	return s[1] == _T('\0') && isopenbrace(*s);
 }
 
 static bool isclosebrace(LPCTSTR s)
 {
-	return s[1] == _T ('\0') && isclosebrace (*s);
+	return s[1] == _T('\0') && isclosebrace(*s);
 }
 
 int bracetype(TCHAR c)

@@ -247,17 +247,12 @@ LRESULT CSplashWnd::OnCustomdraw(NMCUSTOMDRAW *pnm)
 		DEFAULT_QUALITY, DEFAULT_PITCH | FF_SWISS, FontName);
 	oldfont = pdc->SelectObject(font);
 	String text = LanguageSelect.LoadString(IDS_SPLASH_DEVELOPERS);
-	// avoid dereference of empty strings and the NULL terminated character
-	if (text.length() >= 0)
+	// Replace ", " with linefeed in developers list text to get
+	// developers listed a name per line in the about dialog
+	stl::string::size_type pos = stl::string::npos;
+	while ((pos = text.rfind(_T(", "), pos)) != stl::string::npos)
 	{
-		// Replace ", " with linefeed in developers list text to get
-		// developers listed a name per line in the about dialog
-		stl::string::size_type pos = text.rfind(_T(", "));
-		while (pos != stl::string::npos)
-		{
-			text.replace(pos, 2, _T("\n"), 1);
-			pos = text.rfind(_T(", "), pos - 1);
-		}
+		text.replace(pos, 2, _T("\n"), 1);
 	}
 
 	area = DevelopersArea;

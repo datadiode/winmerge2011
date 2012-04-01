@@ -72,7 +72,6 @@ int TimeSizeCompare::CompareFiles(int compMethod, const DIFFITEM &di)
 	{
 		if (di.left.size.int64 != di.right.size.int64)
 		{
-			code &= ~DIFFCODE::SAME;
 			code = DIFFCODE::DIFF;
 		}
 	}

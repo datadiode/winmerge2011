@@ -506,7 +506,7 @@ void CDiffThread::StoreDiffData(const DIFFITEM &di)
 	LogFile.Write
 	(
 		CLogFile::LCOMPAREDATA, _T("name=<%s>, leftdir=<%s>, rightdir=<%s>, code=%d"),
-		di.left.filename.c_str(), di.left.path.c_str(), di.right.path.c_str(), di.diffcode
+		di.left.filename.c_str(), di.left.path.c_str(), di.right.path.c_str(), di.diffcode.diffcode
 	);
 	context->m_pCompareStats->AddItem(di.diffcode.diffcode);
 }
