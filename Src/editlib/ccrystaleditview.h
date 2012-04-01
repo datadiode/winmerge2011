@@ -78,7 +78,7 @@ protected:
 	virtual void OnDropSource(DWORD de);
 	void Paste();
 	void Cut();
-	BOOL DeleteCurrentSelection();
+	void DeleteCurrentSelection();
 
 public:
 	bool GetAutoIndent() const { return m_bAutoIndent; }
@@ -92,24 +92,24 @@ public:
 	bool GetOverwriteMode() const { return m_bOvrMode; }
 	void SetOverwriteMode(bool bOvrMode = TRUE) { m_bOvrMode = bOvrMode; }
 
-    void ShowDropIndicator(const POINT & point);
+    void ShowDropIndicator(const POINT &point);
     void HideDropIndicator();
 
-    BOOL DoDropText(HGLOBAL hData, const POINT & ptClient);
-    void DoDragScroll(const POINT & point);
+    bool DoDropText(HGLOBAL hData, const POINT &ptClient);
+    void DoDragScroll(const POINT &point);
 
-	BOOL DoEditUndo();
-    BOOL DoEditRedo();
+	bool DoEditUndo();
+    bool DoEditRedo();
 
     bool QueryEditable();
 
-	virtual void UpdateView (CCrystalTextView * pSource, CUpdateContext * pContext, DWORD dwFlags, int nLineIndex = -1);
+	virtual void UpdateView(CCrystalTextView * pSource, CUpdateContext * pContext, DWORD dwFlags, int nLineIndex = -1);
 
-    BOOL ReplaceSelection (LPCTSTR pszNewText, int cchNewText, DWORD dwFlags);
+    void ReplaceSelection(LPCTSTR pszNewText, int cchNewText, DWORD dwFlags);
 
-    virtual void OnEditOperation (int nAction, LPCTSTR pszText);
+    virtual void OnEditOperation(int nAction, LPCTSTR pszText);
 
-    virtual bool DoSetTextType (TextDefinition *def);
+    virtual bool DoSetTextType(TextDefinition *def);
 
     // Implementation
 protected :

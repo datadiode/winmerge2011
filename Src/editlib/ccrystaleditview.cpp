@@ -123,25 +123,23 @@ bool CCrystalEditView::QueryEditable()
 	return m_pTextBuffer && !m_pTextBuffer->GetReadOnly();
 }
 
-BOOL CCrystalEditView::DeleteCurrentSelection()
+void CCrystalEditView::DeleteCurrentSelection()
 {
-  if (IsSelection ())
-    {
-      POINT ptSelStart, ptSelEnd;
-      GetSelection (ptSelStart, ptSelEnd);
+	if (IsSelection())
+	{
+		POINT ptSelStart, ptSelEnd;
+		GetSelection(ptSelStart, ptSelEnd);
 
-      POINT ptCursorPos = ptSelStart;
-      ASSERT_VALIDTEXTPOS (ptCursorPos);
-      SetAnchor (ptCursorPos);
-      SetSelection (ptCursorPos, ptCursorPos);
-      SetCursorPos (ptCursorPos);
-      EnsureVisible (ptCursorPos);
+		POINT ptCursorPos = ptSelStart;
+		ASSERT_VALIDTEXTPOS(ptCursorPos);
+		SetAnchor(ptCursorPos);
+		SetSelection(ptCursorPos, ptCursorPos);
+		SetCursorPos(ptCursorPos);
+		EnsureVisible(ptCursorPos);
 
-      // [JRT]:
-      m_pTextBuffer->DeleteText (this, ptSelStart.y, ptSelStart.x, ptSelEnd.y, ptSelEnd.x, CE_ACTION_DELSEL);
-      return TRUE;
-    }
-  return FALSE;
+		// [JRT]:
+		m_pTextBuffer->DeleteText(this, ptSelStart.y, ptSelStart.x, ptSelEnd.y, ptSelEnd.x, CE_ACTION_DELSEL);
+	}
 }
 
 void CCrystalEditView::Paste()
@@ -151,9 +149,9 @@ void CCrystalEditView::Paste()
 	if (!OpenClipboard())
 		return;
 	HGLOBAL hData = GetClipboardData(CF_UNICODETEXT);
-	if (LPCTSTR pszText = reinterpret_cast<LPTSTR>(GlobalLock(hData)))
+	if (LPCTSTR pszText = reinterpret_cast<LPTSTR>(::GlobalLock(hData)))
 	{
-		SIZE_T cbData = GlobalSize(hData);
+		SIZE_T cbData = ::GlobalSize(hData);
 		int cchText = cbData / sizeof(TCHAR) - 1;
 
 		if (cchText <= 0)
@@ -179,12 +177,8 @@ void CCrystalEditView::Paste()
 		}
 		ASSERT_VALIDTEXTPOS(ptCursorPos);
 
-		int x, y;
-		m_pTextBuffer->InsertText(this, ptCursorPos.y, ptCursorPos.x, pszText, cchText, y, x, CE_ACTION_PASTE);  //  [JRT]
-
-		ptCursorPos.x = x;
-		ptCursorPos.y = y;
-		ASSERT_VALIDTEXTPOS (ptCursorPos);
+		ptCursorPos = m_pTextBuffer->InsertText(this, ptCursorPos.y, ptCursorPos.x, pszText, cchText, CE_ACTION_PASTE);  //  [JRT]
+		ASSERT_VALIDTEXTPOS(ptCursorPos);
 		SetAnchor(ptCursorPos);
 		SetSelection(ptCursorPos, ptCursorPos);
 		SetCursorPos(ptCursorPos);
@@ -204,19 +198,19 @@ void CCrystalEditView::Cut()
     return;
 
   POINT ptSelStart, ptSelEnd;
-  GetSelection (ptSelStart, ptSelEnd);
+  GetSelection(ptSelStart, ptSelEnd);
   String text;
-  GetText (ptSelStart, ptSelEnd, text);
-  PutToClipboard (text.c_str(), text.size());
+  GetText(ptSelStart, ptSelEnd, text);
+  PutToClipboard(text.c_str(), text.size());
 
   POINT ptCursorPos = ptSelStart;
-  ASSERT_VALIDTEXTPOS (ptCursorPos);
-  SetAnchor (ptCursorPos);
-  SetSelection (ptCursorPos, ptCursorPos);
-  SetCursorPos (ptCursorPos);
-  EnsureVisible (ptCursorPos);
+  ASSERT_VALIDTEXTPOS(ptCursorPos);
+  SetAnchor(ptCursorPos);
+  SetSelection(ptCursorPos, ptCursorPos);
+  SetCursorPos(ptCursorPos);
+  EnsureVisible(ptCursorPos);
 
-  m_pTextBuffer->DeleteText (this, ptSelStart.y, ptSelStart.x, ptSelEnd.y, ptSelEnd.x, CE_ACTION_CUT);  // [JRT]
+  m_pTextBuffer->DeleteText(this, ptSelStart.y, ptSelStart.x, ptSelEnd.y, ptSelEnd.x, CE_ACTION_CUT);  // [JRT]
 
 }
 
@@ -243,11 +237,11 @@ void CCrystalEditView::OnEditDelete()
     }
 
   POINT ptCursorPos = ptSelStart;
-  ASSERT_VALIDTEXTPOS (ptCursorPos);
-  SetAnchor (ptCursorPos);
-  SetSelection (ptCursorPos, ptCursorPos);
-  SetCursorPos (ptCursorPos);
-  EnsureVisible (ptCursorPos);
+  ASSERT_VALIDTEXTPOS(ptCursorPos);
+  SetAnchor(ptCursorPos);
+  SetSelection(ptCursorPos, ptCursorPos);
+  SetCursorPos(ptCursorPos);
+  EnsureVisible(ptCursorPos);
 
   m_pTextBuffer->DeleteText(this, ptSelStart.y, ptSelStart.x, ptSelEnd.y, ptSelEnd.x, CE_ACTION_DELETE);   // [JRT]
 
@@ -255,26 +249,26 @@ void CCrystalEditView::OnEditDelete()
 
 void CCrystalEditView::OnChar(WPARAM nChar)
 {
-  if ((::GetAsyncKeyState (VK_LBUTTON) & 0x8000) != 0 ||
-        (::GetAsyncKeyState (VK_RBUTTON) & 0x8000) != 0)
+  if ((::GetAsyncKeyState(VK_LBUTTON) & 0x8000) != 0 ||
+        (::GetAsyncKeyState(VK_RBUTTON) & 0x8000) != 0)
     return;
 
   if (nChar == VK_RETURN)
     {
       if (m_bOvrMode)
         {
-          POINT ptCursorPos = GetCursorPos ();
-          ASSERT_VALIDTEXTPOS (ptCursorPos);
-          if (ptCursorPos.y < GetLineCount () - 1)
+          POINT ptCursorPos = GetCursorPos();
+          ASSERT_VALIDTEXTPOS(ptCursorPos);
+          if (ptCursorPos.y < GetLineCount() - 1)
             {
               ptCursorPos.x = 0;
               ptCursorPos.y++;
 
-              ASSERT_VALIDTEXTPOS (ptCursorPos);
-              SetSelection (ptCursorPos, ptCursorPos);
-              SetAnchor (ptCursorPos);
-              SetCursorPos (ptCursorPos);
-              EnsureVisible (ptCursorPos);
+              ASSERT_VALIDTEXTPOS(ptCursorPos);
+              SetSelection(ptCursorPos, ptCursorPos);
+              SetAnchor(ptCursorPos);
+              SetCursorPos(ptCursorPos);
+              EnsureVisible(ptCursorPos);
               return;
             }
         }
@@ -300,21 +294,17 @@ void CCrystalEditView::OnChar(WPARAM nChar)
               m_pTextBuffer->DeleteText (this, ptSelStart.y, ptSelStart.x, ptSelEnd.y, ptSelEnd.x, CE_ACTION_TYPING);
             }
           else
-            ptCursorPos = GetCursorPos ();
-          ASSERT_VALIDTEXTPOS (ptCursorPos);
+            ptCursorPos = GetCursorPos();
+          ASSERT_VALIDTEXTPOS(ptCursorPos);
           LPCTSTR pszText = m_pTextBuffer->GetDefaultEol();
           int cchText = _tcslen(pszText);
 
-          int x, y;
-          m_pTextBuffer->InsertText (this, ptCursorPos.y, ptCursorPos.x, pszText, cchText, y, x, CE_ACTION_TYPING);  //  [JRT]
-
-          ptCursorPos.x = x;
-          ptCursorPos.y = y;
-          ASSERT_VALIDTEXTPOS (ptCursorPos);
-          SetSelection (ptCursorPos, ptCursorPos);
-          SetAnchor (ptCursorPos);
-          SetCursorPos (ptCursorPos);
-          EnsureVisible (ptCursorPos);
+          ptCursorPos = m_pTextBuffer->InsertText(this, ptCursorPos.y, ptCursorPos.x, pszText, cchText, CE_ACTION_TYPING);  //  [JRT]
+          ASSERT_VALIDTEXTPOS(ptCursorPos);
+          SetSelection(ptCursorPos, ptCursorPos);
+          SetAnchor(ptCursorPos);
+          SetCursorPos(ptCursorPos);
+          EnsureVisible(ptCursorPos);
         }
 
       m_pTextBuffer->FlushUndoGroup (this);
@@ -358,25 +348,19 @@ void CCrystalEditView::OnChar(WPARAM nChar)
 
             }
 
-          ASSERT_VALIDTEXTPOS (ptCursorPos);
+          ASSERT_VALIDTEXTPOS(ptCursorPos);
 
-          TCHAR pszText[2];
-          pszText[0] = (TCHAR) nChar;
-          pszText[1] = 0;
+		  TCHAR pszText[2] = { static_cast<TCHAR>(nChar), _T('\0') };
 
-          int x, y;
-          m_pTextBuffer->InsertText (this, ptCursorPos.y, ptCursorPos.x, pszText, 1, y, x, CE_ACTION_TYPING);    // [JRT]
-
-          ptCursorPos.x = x;
-          ptCursorPos.y = y;
-          ASSERT_VALIDTEXTPOS (ptCursorPos);
-          SetSelection (ptCursorPos, ptCursorPos);
-          SetAnchor (ptCursorPos);
-          SetCursorPos (ptCursorPos);
-          EnsureVisible (ptCursorPos);
+          ptCursorPos = m_pTextBuffer->InsertText(this, ptCursorPos.y, ptCursorPos.x, pszText, 1, CE_ACTION_TYPING);    // [JRT]
+          ASSERT_VALIDTEXTPOS(ptCursorPos);
+          SetSelection(ptCursorPos, ptCursorPos);
+          SetAnchor(ptCursorPos);
+          SetCursorPos(ptCursorPos);
+          EnsureVisible(ptCursorPos);
 
 		  m_bMergeUndo = true;
-          m_pTextBuffer->FlushUndoGroup (this);
+          m_pTextBuffer->FlushUndoGroup(this);
         }
     }
 }
@@ -473,83 +457,61 @@ void CCrystalEditView::OnEditTab()
 		m_bHorzScrollBarLocked = TRUE;
 		for (int i = nStartLine ; i <= nEndLine ; ++i)
 		{
-			int x, y;
-			m_pTextBuffer->InsertText(this, i, 0, pszText, _tcslen(pszText), y, x, CE_ACTION_INDENT);  //  [JRT]
+			m_pTextBuffer->InsertText(this, i, 0, pszText, _tcslen(pszText), CE_ACTION_INDENT);  //  [JRT]
 		}
 		m_bHorzScrollBarLocked = FALSE;
 		RecalcHorzScrollBar();
 		m_pTextBuffer->FlushUndoGroup(this);
 		return;
 	}
-
-  // Overwrite mode, replace next char with tab/spaces
-  if (m_bOvrMode)
+	// Overwrite mode, replace next char with tab/spaces
+	if (m_bOvrMode)
     {
-      POINT ptCursorPos = GetCursorPos ();
-      ASSERT_VALIDTEXTPOS (ptCursorPos);
+		int nLineLength = GetLineLength(ptCursorPos.y);
+		LPCTSTR pszLineChars = GetLineChars(ptCursorPos.y);
+		// Not end of line
+		if (ptCursorPos.x < nLineLength)
+		{
+			while (nChars > 0)
+			{
+				if (ptCursorPos.x == nLineLength)
+					break;
+				if (pszLineChars[ptCursorPos.x] == _T('\t'))
+				{
+					++ptCursorPos.x;
+					break;
+				}
+				++ptCursorPos.x;
+				--nChars;
+			}
+			ASSERT(ptCursorPos.x <= nLineLength);
+			ASSERT_VALIDTEXTPOS(ptCursorPos);
+			SetSelection(ptCursorPos, ptCursorPos);
+			SetAnchor(ptCursorPos);
+			SetCursorPos(ptCursorPos);
+			EnsureVisible(ptCursorPos);
+			return;
+		}
+	}
 
-      int nLineLength = GetLineLength (ptCursorPos.y);
-      LPCTSTR pszLineChars = GetLineChars (ptCursorPos.y);
-		
-      // Not end of line
-      if (ptCursorPos.x < nLineLength)
-        {
-          while (nChars > 0)
-            {
-              if (ptCursorPos.x == nLineLength)
-                break;
-              if (pszLineChars[ptCursorPos.x] == _T ('\t'))
-                {
-                  ptCursorPos.x++;
-                  break;
-                }
-              ptCursorPos.x++;
-              nChars--;
-            }
-          ASSERT (ptCursorPos.x <= nLineLength);
-          ASSERT_VALIDTEXTPOS (ptCursorPos);
+	m_pTextBuffer->BeginUndoGroup();
 
-          SetSelection (ptCursorPos, ptCursorPos);
-          SetAnchor (ptCursorPos);
-          SetCursorPos (ptCursorPos);
-          EnsureVisible (ptCursorPos);
-          return;
-        }
-    }
+	// Text selected, no overwrite mode, replace sel with tab
+	if (IsSelection())
+	{
+		POINT ptSelEnd;
+		GetSelection(ptCursorPos, ptSelEnd);
+		// [JRT]:
+		m_pTextBuffer->DeleteText(this, ptCursorPos.y, ptCursorPos.x, ptSelEnd.y, ptSelEnd.x, CE_ACTION_TYPING);
+	}
 
-  m_pTextBuffer->BeginUndoGroup ();
-
-  int x, y;	// For cursor position
-
-  // Text selected, no overwrite mode, replace sel with tab
-  if (IsSelection ())
-    {
-      POINT ptSelStart, ptSelEnd;
-      GetSelection (ptSelStart, ptSelEnd);
-
-      /*SetAnchor (ptCursorPos);
-      SetSelection (ptCursorPos, ptCursorPos);
-      SetCursorPos (ptCursorPos);
-      EnsureVisible (ptCursorPos);*/
-
-      // [JRT]:
-      m_pTextBuffer->DeleteText (this, ptSelStart.y, ptSelStart.x, ptSelEnd.y, ptSelEnd.x, CE_ACTION_TYPING);
-      m_pTextBuffer->InsertText( this, ptSelStart.y, ptSelStart.x, pszText, _tcslen(pszText), y, x, CE_ACTION_TYPING );
-    }
-  // No selection, add tab
-  else
-    {
-      m_pTextBuffer->InsertText (this, ptCursorPos.y, ptCursorPos.x, pszText, _tcslen(pszText), y, x, CE_ACTION_TYPING);  //  [JRT]
-    }
-
-	ptCursorPos.x = x;
-	ptCursorPos.y = y;
+	// No selection, add tab
+	ptCursorPos = m_pTextBuffer->InsertText(this, ptCursorPos.y, ptCursorPos.x, pszText, _tcslen(pszText), CE_ACTION_TYPING);  //  [JRT]
 	ASSERT_VALIDTEXTPOS(ptCursorPos);
 	SetSelection(ptCursorPos, ptCursorPos);
 	SetAnchor(ptCursorPos);
 	SetCursorPos(ptCursorPos);
 	EnsureVisible(ptCursorPos);
-
 	m_pTextBuffer->FlushUndoGroup(this);
 }
 
@@ -636,7 +598,7 @@ void CCrystalEditView::OnEditUntab()
           int i = 0;
           while (nCurrentOffset < nNewOffset)
             {
-              if (pszChars[i] == _T ('\t'))
+              if (pszChars[i] == _T('\t'))
                 nCurrentOffset = nCurrentOffset / nTabSize * nTabSize + nTabSize;
               else
                 nCurrentOffset++;
@@ -753,7 +715,7 @@ void CCrystalEditView::DoDragScroll(const POINT & point)
   GetClientRect(&rcClientRect);
   if (point.y < rcClientRect.top + DRAG_BORDER_Y)
     {
-      HideDropIndicator ();
+      HideDropIndicator();
       ScrollUp();
       UpdateWindow();
       ShowDropIndicator(point);
@@ -781,54 +743,51 @@ void CCrystalEditView::DoDragScroll(const POINT & point)
     }
 }
 
-BOOL CCrystalEditView::DoDropText(HGLOBAL hData, const POINT & ptClient)
+bool CCrystalEditView::DoDropText(HGLOBAL hData, const POINT &ptClient)
 {
-  if (hData == NULL)
-    return FALSE;
+	if (hData == NULL)
+		return false;
 
-  POINT ptDropPos = ClientToText (ptClient);
-  if (IsDraggingText () && IsInsideSelection (ptDropPos))
-    {
-      SetAnchor (ptDropPos);
-      SetSelection (ptDropPos, ptDropPos);
-      SetCursorPos (ptDropPos);
-      EnsureVisible (ptDropPos);
-      return FALSE;
-    }
+	POINT ptDropPos = ClientToText(ptClient);
+	if (IsDraggingText() && IsInsideSelection(ptDropPos))
+	{
+		SetAnchor(ptDropPos);
+		SetSelection(ptDropPos, ptDropPos);
+		SetCursorPos(ptDropPos);
+		EnsureVisible(ptDropPos);
+		return false;
+	}
 
-  SIZE_T cbData = ::GlobalSize(hData);
-  int cchText = cbData / sizeof(TCHAR) - 1;
-  if (cchText < 0)
-    return FALSE;
-  LPTSTR pszText = (LPTSTR)::GlobalLock (hData);
-  if (pszText == NULL)
-    return FALSE;
+	SIZE_T cbData = ::GlobalSize(hData);
+	int cchText = cbData / sizeof(TCHAR) - 1;
+	if (cchText < 0)
+		return false;
+	LPTSTR pszText = reinterpret_cast<LPTSTR>(::GlobalLock(hData));
+	if (pszText == NULL)
+		return false;
 
-  // Open the undo group
-  // When we drag from the same panel, it is already open, so do nothing
-  // (we could test m_pTextBuffer->m_bUndoGroup if it were not a protected member)
-  BOOL bGroupFlag = FALSE;
-  if (! IsDraggingText())
-    {
-      m_pTextBuffer->BeginUndoGroup ();
-      bGroupFlag = TRUE;
-    } 
+	// Open the undo group
+	// When we drag from the same panel, it is already open, so do nothing
+	// (we could test m_pTextBuffer->m_bUndoGroup if it were not a protected member)
+	bool bGroupFlag = false;
+	if (!IsDraggingText())
+	{
+		m_pTextBuffer->BeginUndoGroup ();
+		bGroupFlag = true;
+	} 
 
-  int x, y;
-  m_pTextBuffer->InsertText(this, ptDropPos.y, ptDropPos.x, pszText, cchText, y, x, CE_ACTION_DRAGDROP);  //   [JRT]
+	POINT ptCurPos = m_pTextBuffer->InsertText(this, ptDropPos.y, ptDropPos.x, pszText, cchText, CE_ACTION_DRAGDROP);  //   [JRT]
+	ASSERT_VALIDTEXTPOS(ptCurPos);
+	SetAnchor(ptDropPos);
+	SetSelection(ptDropPos, ptCurPos);
+	SetCursorPos(ptCurPos);
+	EnsureVisible(ptCurPos);
 
-  POINT ptCurPos = { x, y };
-  ASSERT_VALIDTEXTPOS (ptCurPos);
-  SetAnchor(ptDropPos);
-  SetSelection(ptDropPos, ptCurPos);
-  SetCursorPos(ptCurPos);
-  EnsureVisible(ptCurPos);
+	if (bGroupFlag)
+		m_pTextBuffer->FlushUndoGroup(this);
 
-  if (bGroupFlag)
-    m_pTextBuffer->FlushUndoGroup (this);
-
-  ::GlobalUnlock (hData);
-  return TRUE;
+	::GlobalUnlock(hData);
+	return true;
 }
 
 void CCrystalEditView::ShowDropIndicator(const POINT & point)
@@ -858,8 +817,8 @@ void CCrystalEditView::HideDropIndicator()
 {
   if (m_bDropPosVisible)
     {
-      SetCursorPos (m_ptSavedCaretPos);
-      ShowCursor ();
+      SetCursorPos(m_ptSavedCaretPos);
+      ShowCursor();
       m_bDropPosVisible = FALSE;
     }
 }
@@ -983,79 +942,71 @@ void CCrystalEditView::OnEditReplace()
  * - FIND_REGEXP: use the regular expression.
  * @return TRUE if succeeded.
  */
-BOOL CCrystalEditView::ReplaceSelection(LPCTSTR pszNewText, int cchNewText, DWORD dwFlags)
+void CCrystalEditView::ReplaceSelection(LPCTSTR pszNewText, int cchNewText, DWORD dwFlags)
 {
-  if (!cchNewText)
-    return DeleteCurrentSelection();
-  ASSERT(pszNewText);
+	if (!cchNewText)
+	{
+		DeleteCurrentSelection();
+		return;
+	}
 
-  m_pTextBuffer->BeginUndoGroup();
+	ASSERT(pszNewText);
 
-  POINT ptCursorPos;
-  if (IsSelection ())
-    {
-      POINT ptSelStart, ptSelEnd;
-      GetSelection (ptSelStart, ptSelEnd);
+	m_pTextBuffer->BeginUndoGroup();
 
-      ptCursorPos = ptSelStart;
+	POINT ptCursorPos, ptEndOfBlock;
+	GetSelection(ptCursorPos, ptEndOfBlock);
+	if (IsSelection())
+		m_pTextBuffer->DeleteText(this, ptCursorPos.y, ptCursorPos.x, ptEndOfBlock.y, ptEndOfBlock.x, CE_ACTION_REPLACE);
 
-      m_pTextBuffer->DeleteText (this, ptSelStart.y, ptSelStart.x, ptSelEnd.y, ptSelEnd.x, CE_ACTION_REPLACE);
-    }
-  else
-    ptCursorPos = GetCursorPos ();
-  ASSERT_VALIDTEXTPOS (ptCursorPos);
+	ASSERT_VALIDTEXTPOS(ptCursorPos);
 
-  int x = 0;
-  int y = 0;
-  m_pTextBuffer->InsertText(this, ptCursorPos.y, ptCursorPos.x, pszNewText, cchNewText, y, x, CE_ACTION_REPLACE);  //  [JRT]
-  m_nLastReplaceLen = cchNewText;
+	ptEndOfBlock = m_pTextBuffer->InsertText(this, ptCursorPos.y, ptCursorPos.x, pszNewText, cchNewText, CE_ACTION_REPLACE);  //  [JRT]
+	m_nLastReplaceLen = cchNewText;
 
-  POINT ptEndOfBlock = { x, y };
-  ASSERT_VALIDTEXTPOS(ptCursorPos);
-  ASSERT_VALIDTEXTPOS(ptEndOfBlock);
-  SetAnchor(ptEndOfBlock);
-  SetSelection(ptCursorPos, ptEndOfBlock);
-  SetCursorPos(ptEndOfBlock);
+	ASSERT_VALIDTEXTPOS(ptCursorPos);
+	ASSERT_VALIDTEXTPOS(ptEndOfBlock);
+	SetAnchor(ptEndOfBlock);
+	SetSelection(ptCursorPos, ptEndOfBlock);
+	SetCursorPos(ptEndOfBlock);
 
-  m_pTextBuffer->FlushUndoGroup(this);
-
-  return TRUE;
+	m_pTextBuffer->FlushUndoGroup(this);
 }
 
-BOOL CCrystalEditView::DoEditUndo()
+bool CCrystalEditView::DoEditUndo()
 {
-  if (m_pTextBuffer != NULL && m_pTextBuffer->CanUndo())
-    {
-      POINT ptCursorPos;
-      if (m_pTextBuffer->Undo(this, ptCursorPos))
-        {
-          ASSERT_VALIDTEXTPOS(ptCursorPos);
-          SetAnchor(ptCursorPos);
-          SetSelection(ptCursorPos, ptCursorPos);
-          SetCursorPos(ptCursorPos);
-          EnsureVisible(ptCursorPos);
-          return TRUE;
-        }
-    }
-  return FALSE;
+	if (m_pTextBuffer != NULL && m_pTextBuffer->CanUndo())
+	{
+		POINT ptCursorPos;
+		if (m_pTextBuffer->Undo(this, ptCursorPos))
+		{
+			ASSERT_VALIDTEXTPOS(ptCursorPos);
+			SetAnchor(ptCursorPos);
+			SetSelection(ptCursorPos, ptCursorPos);
+			SetCursorPos(ptCursorPos);
+			EnsureVisible(ptCursorPos);
+			return true;
+		}
+	}
+	return false;
 }
 
-BOOL CCrystalEditView::DoEditRedo()
+bool CCrystalEditView::DoEditRedo()
 {
-  if (m_pTextBuffer != NULL && m_pTextBuffer->CanRedo())
-    {
-      POINT ptCursorPos;
-      if (m_pTextBuffer->Redo(this, ptCursorPos))
-        {
-          ASSERT_VALIDTEXTPOS(ptCursorPos);
-          SetAnchor(ptCursorPos);
-          SetSelection(ptCursorPos, ptCursorPos);
-          SetCursorPos(ptCursorPos);
-          EnsureVisible(ptCursorPos);
-          return TRUE;
-        }
-    }
-  return FALSE;
+	if (m_pTextBuffer != NULL && m_pTextBuffer->CanRedo())
+	{
+		POINT ptCursorPos;
+		if (m_pTextBuffer->Redo(this, ptCursorPos))
+		{
+			ASSERT_VALIDTEXTPOS(ptCursorPos);
+			SetAnchor(ptCursorPos);
+			SetSelection(ptCursorPos, ptCursorPos);
+			SetCursorPos(ptCursorPos);
+			EnsureVisible(ptCursorPos);
+			return true;
+		}
+	}
+	return false;
 }
 
 static bool isopenbrace(TCHAR c)
@@ -1112,9 +1063,9 @@ void CCrystalEditView::OnEditOperation(int nAction, LPCTSTR pszText)
 
           if (nPos > 0)
             {
-              if ((GetFlags () & SRCOPT_BRACEGNU) && isclosebrace (pszLineChars[nLength - 1]) && ptCursorPos.y > 0 && nPos && nPos == nLength - 1)
+              if ((GetFlags() & SRCOPT_BRACEGNU) && isclosebrace(pszLineChars[nLength - 1]) && ptCursorPos.y > 0 && nPos && nPos == nLength - 1)
                 {
-                  if (pszLineChars[nPos - 1] == _T ('\t'))
+                  if (pszLineChars[nPos - 1] == _T('\t'))
                     {
                       nPos--;
                     }
@@ -1135,13 +1086,13 @@ void CCrystalEditView::OnEditOperation(int nAction, LPCTSTR pszText)
                 }
               //  Insert part of the previos line
               TCHAR *pszInsertStr;
-              if ((GetFlags () & (SRCOPT_BRACEGNU|SRCOPT_BRACEANSI)) && isopenbrace (pszLineChars[nLength - 1]))
+              if ((GetFlags() & (SRCOPT_BRACEGNU|SRCOPT_BRACEANSI)) && isopenbrace(pszLineChars[nLength - 1]))
                 {
                   if (m_pTextBuffer->GetInsertTabs())
                     {
                       pszInsertStr = (TCHAR *) _alloca (sizeof (TCHAR) * (nPos + 2));
                       _tcsncpy (pszInsertStr, pszLineChars, nPos);
-                      pszInsertStr[nPos++] = _T ('\t');
+                      pszInsertStr[nPos++] = _T('\t');
                     }
                   else
                     {
@@ -1151,7 +1102,7 @@ void CCrystalEditView::OnEditOperation(int nAction, LPCTSTR pszText)
                       _tcsncpy (pszInsertStr, pszLineChars, nPos);
                       while (nChars--)
                         {
-                          pszInsertStr[nPos++] = _T (' ');
+                          pszInsertStr[nPos++] = _T(' ');
                         }
                     }
                 }
@@ -1163,26 +1114,24 @@ void CCrystalEditView::OnEditOperation(int nAction, LPCTSTR pszText)
               pszInsertStr[nPos] = 0;
 
               // m_pTextBuffer->BeginUndoGroup ();
-              int x, y;
-              m_pTextBuffer->InsertText (NULL, ptCursorPos.y, ptCursorPos.x,
-                                         pszInsertStr, nPos, y, x, CE_ACTION_AUTOINDENT);
-			  POINT pt = { x, y };
-              SetCursorPos (pt);
-              SetSelection (pt, pt);
-              SetAnchor (pt);
-              EnsureVisible (pt);
+              POINT pt = m_pTextBuffer->InsertText(NULL, ptCursorPos.y, ptCursorPos.x,
+                                         pszInsertStr, nPos, CE_ACTION_AUTOINDENT);
+              SetCursorPos(pt);
+              SetSelection(pt, pt);
+              SetAnchor(pt);
+              EnsureVisible(pt);
               // m_pTextBuffer->FlushUndoGroup (this);
             }
           else
             {
               //  Insert part of the previos line
               TCHAR *pszInsertStr;
-              if ((GetFlags () & (SRCOPT_BRACEGNU|SRCOPT_BRACEANSI)) && isopenbrace (pszLineChars[nLength - 1]))
+              if ((GetFlags() & (SRCOPT_BRACEGNU|SRCOPT_BRACEANSI)) && isopenbrace(pszLineChars[nLength - 1]))
                 {
                   if (m_pTextBuffer->GetInsertTabs())
                     {
                       pszInsertStr = (TCHAR *) _alloca (sizeof (TCHAR) * 2);
-                      pszInsertStr[nPos++] = _T ('\t');
+                      pszInsertStr[nPos++] = _T('\t');
                     }
                   else
                     {
@@ -1191,25 +1140,23 @@ void CCrystalEditView::OnEditOperation(int nAction, LPCTSTR pszText)
                       pszInsertStr = (TCHAR *) _alloca (sizeof (TCHAR) * (nChars + 1));
                       while (nChars--)
                         {
-                          pszInsertStr[nPos++] = _T (' ');
+                          pszInsertStr[nPos++] = _T(' ');
                         }
                     }
                   pszInsertStr[nPos] = 0;
 
                   // m_pTextBuffer->BeginUndoGroup ();
-                  int x, y;
-                  m_pTextBuffer->InsertText (NULL, ptCursorPos.y, ptCursorPos.x,
-                                             pszInsertStr, nPos, y, x, CE_ACTION_AUTOINDENT);
-				  POINT pt = { x, y };
-                  SetCursorPos (pt);
-                  SetSelection (pt, pt);
-                  SetAnchor (pt);
-                  EnsureVisible (pt);
+                  POINT pt = m_pTextBuffer->InsertText(NULL, ptCursorPos.y, ptCursorPos.x,
+                                             pszInsertStr, nPos, CE_ACTION_AUTOINDENT);
+                  SetCursorPos(pt);
+                  SetSelection(pt, pt);
+                  SetAnchor(pt);
+                  EnsureVisible(pt);
                   // m_pTextBuffer->FlushUndoGroup (this);
                 }
             }
         }
-      else if (nAction == CE_ACTION_TYPING && (GetFlags () & SRCOPT_FNBRACE) && bracetype (pszText) == 3)
+      else if (nAction == CE_ACTION_TYPING && (GetFlags() & SRCOPT_FNBRACE) && bracetype (pszText) == 3)
         {
           //  Enter stroke!
           POINT ptCursorPos = GetCursorPos();
@@ -1217,22 +1164,20 @@ void CCrystalEditView::OnEditOperation(int nAction, LPCTSTR pszText)
           if (ptCursorPos.x > 1 && xisalnum (pszChars[ptCursorPos.x - 2]))
             {
               LPTSTR pszInsertStr = (TCHAR *) _alloca (sizeof (TCHAR) * 2);
-              *pszInsertStr = _T (' ');
-              pszInsertStr[1] = _T ('\0');
+              *pszInsertStr = _T(' ');
+              pszInsertStr[1] = _T('\0');
               // m_pTextBuffer->BeginUndoGroup ();
-              int x, y;
-              m_pTextBuffer->InsertText (NULL, ptCursorPos.y, ptCursorPos.x - 1,
-                                         pszInsertStr, 1, y, x, CE_ACTION_AUTOINDENT);
-              ptCursorPos.x = x + 1;
-              ptCursorPos.y = y;
-              SetCursorPos (ptCursorPos);
-              SetSelection (ptCursorPos, ptCursorPos);
-              SetAnchor (ptCursorPos);
-              EnsureVisible (ptCursorPos);
+              ptCursorPos = m_pTextBuffer->InsertText(NULL, ptCursorPos.y, ptCursorPos.x - 1,
+                                         pszInsertStr, 1, CE_ACTION_AUTOINDENT);
+              ++ptCursorPos.x;
+              SetCursorPos(ptCursorPos);
+              SetSelection(ptCursorPos, ptCursorPos);
+              SetAnchor(ptCursorPos);
+              EnsureVisible(ptCursorPos);
               // m_pTextBuffer->FlushUndoGroup (this);
             }
         }
-      else if (nAction == CE_ACTION_TYPING && (GetFlags () & SRCOPT_BRACEGNU) && isopenbrace (pszText))
+      else if (nAction == CE_ACTION_TYPING && (GetFlags() & SRCOPT_BRACEGNU) && isopenbrace(pszText))
         {
           //  Enter stroke!
           POINT ptCursorPos = GetCursorPos ();
@@ -1249,7 +1194,7 @@ void CCrystalEditView::OnEditOperation(int nAction, LPCTSTR pszText)
               if (m_pTextBuffer->GetInsertTabs())
                 {
                   pszInsertStr = (TCHAR *) _alloca (sizeof (TCHAR) * 2);
-                  *pszInsertStr = _T ('\t');
+                  *pszInsertStr = _T('\t');
                   nPos = 1;
                 }
               else
@@ -1260,27 +1205,26 @@ void CCrystalEditView::OnEditOperation(int nAction, LPCTSTR pszText)
                   nPos = 0;
                   while (nChars--)
                     {
-                      pszInsertStr[nPos++] = _T (' ');
+                      pszInsertStr[nPos++] = _T(' ');
                     }
                 }
               pszInsertStr[nPos] = 0;
 
               // m_pTextBuffer->BeginUndoGroup ();
-              int x, y;
-              m_pTextBuffer->InsertText (NULL, ptCursorPos.y, ptCursorPos.x - 1,
-                                         pszInsertStr, nPos, y, x, CE_ACTION_AUTOINDENT);
-			  POINT pt = { x + 1, y };
-              SetCursorPos (pt);
-              SetSelection (pt, pt);
-              SetAnchor (pt);
-              EnsureVisible (pt);
+              POINT pt = m_pTextBuffer->InsertText(NULL, ptCursorPos.y, ptCursorPos.x - 1,
+                                         pszInsertStr, nPos, CE_ACTION_AUTOINDENT);
+			  ++pt.x;
+              SetCursorPos(pt);
+              SetSelection(pt, pt);
+              SetAnchor(pt);
+              EnsureVisible(pt);
               // m_pTextBuffer->FlushUndoGroup (this);
             }
         }
-      else if (nAction == CE_ACTION_TYPING && (GetFlags () & (SRCOPT_BRACEGNU|SRCOPT_BRACEANSI)) && isclosebrace (pszText))
+      else if (nAction == CE_ACTION_TYPING && (GetFlags() & (SRCOPT_BRACEGNU|SRCOPT_BRACEANSI)) && isclosebrace(pszText))
         {
           //  Enter stroke!
-          POINT ptCursorPos = GetCursorPos ();
+          POINT ptCursorPos = GetCursorPos();
 
           //  Take indentation from the previos line
           int nLength = m_pTextBuffer->GetLineLength (ptCursorPos.y);
@@ -1290,7 +1234,7 @@ void CCrystalEditView::OnEditOperation(int nAction, LPCTSTR pszText)
             nPos++;
           if (ptCursorPos.y > 0 && nPos && nPos == nLength - 1)
             {
-              if (pszLineChars[nPos - 1] == _T ('\t'))
+              if (pszLineChars[nPos - 1] == _T('\t'))
                 {
                   nPos = 1;
                 }
@@ -1308,13 +1252,13 @@ void CCrystalEditView::OnEditOperation(int nAction, LPCTSTR pszText)
                     }
                 }
               // m_pTextBuffer->BeginUndoGroup ();
-              m_pTextBuffer->DeleteText (NULL, ptCursorPos.y, ptCursorPos.x - nPos - 1,
+              m_pTextBuffer->DeleteText(NULL, ptCursorPos.y, ptCursorPos.x - nPos - 1,
                 ptCursorPos.y, ptCursorPos.x - 1, CE_ACTION_AUTOINDENT);
               ptCursorPos.x -= nPos;
-              SetCursorPos (ptCursorPos);
-              SetSelection (ptCursorPos, ptCursorPos);
-              SetAnchor (ptCursorPos);
-              EnsureVisible (ptCursorPos);
+              SetCursorPos(ptCursorPos);
+              SetSelection(ptCursorPos, ptCursorPos);
+              SetAnchor(ptCursorPos);
+              EnsureVisible(ptCursorPos);
               // m_pTextBuffer->FlushUndoGroup (this);
             }
         }
@@ -1323,246 +1267,154 @@ void CCrystalEditView::OnEditOperation(int nAction, LPCTSTR pszText)
 
 void CCrystalEditView::OnEditLowerCase()
 {
-  if (IsSelection ())
-    {
-      POINT ptCursorPos = GetCursorPos ();
-      POINT ptSelStart, ptSelEnd;
-      GetSelection (ptSelStart, ptSelEnd);
-      String text;
-      GetText (ptSelStart, ptSelEnd, text);
-	  CharLower(&text.front());
-
-      m_pTextBuffer->BeginUndoGroup ();
-
-      if (IsSelection ())
-        {
-          POINT ptSelStart, ptSelEnd;
-          GetSelection (ptSelStart, ptSelEnd);
-    
-          ptCursorPos = ptSelStart;
-          /*SetAnchor (ptCursorPos);
-          SetSelection (ptCursorPos, ptCursorPos);
-          SetCursorPos (ptCursorPos);
-          EnsureVisible (ptCursorPos);*/
-    
-          // [JRT]:
-          m_pTextBuffer->DeleteText (this, ptSelStart.y, ptSelStart.x, ptSelEnd.y, ptSelEnd.x, CE_ACTION_LOWERCASE);
-        }
-
-      int x, y;
-      m_pTextBuffer->InsertText (this, ptSelStart.y, ptSelStart.x, text.c_str(), text.size(), y, x, CE_ACTION_LOWERCASE);
-
-      ASSERT_VALIDTEXTPOS (ptCursorPos);
-      SetAnchor (ptCursorPos);
-      SetSelection (ptSelStart, ptSelEnd);
-      SetCursorPos (ptCursorPos);
-      EnsureVisible (ptCursorPos);
-
-      m_pTextBuffer->FlushUndoGroup (this);
-    }
+	if (IsSelection())
+	{
+		POINT ptSelStart, ptSelEnd;
+		GetSelection(ptSelStart, ptSelEnd);
+		String text;
+		GetText(ptSelStart, ptSelEnd, text);
+		CharLower(&text.front());
+		m_pTextBuffer->BeginUndoGroup();
+		// [JRT]:
+		m_pTextBuffer->DeleteText(this, ptSelStart.y, ptSelStart.x, ptSelEnd.y, ptSelEnd.x, CE_ACTION_LOWERCASE);
+		m_pTextBuffer->InsertText(this, ptSelStart.y, ptSelStart.x, text.c_str(), text.size(), CE_ACTION_LOWERCASE);
+		ASSERT_VALIDTEXTPOS(ptSelStart);
+		SetAnchor(ptSelStart);
+		SetSelection(ptSelStart, ptSelEnd);
+		SetCursorPos(ptSelStart);
+		EnsureVisible(ptSelStart);
+		m_pTextBuffer->FlushUndoGroup(this);
+	}
 }
 
 void CCrystalEditView::OnEditUpperCase()
 {
-  if (IsSelection ())
-    {
-      POINT ptCursorPos = GetCursorPos ();
-      POINT ptSelStart, ptSelEnd;
-      GetSelection (ptSelStart, ptSelEnd);
-      String text;
-      GetText (ptSelStart, ptSelEnd, text);
-      CharUpper(&text.front());
-
-      m_pTextBuffer->BeginUndoGroup ();
-
-      if (IsSelection ())
-        {
-          POINT ptSelStart, ptSelEnd;
-          GetSelection (ptSelStart, ptSelEnd);
-    
-          ptCursorPos = ptSelStart;
-          /*SetAnchor (ptCursorPos);
-          SetSelection (ptCursorPos, ptCursorPos);
-          SetCursorPos (ptCursorPos);
-          EnsureVisible (ptCursorPos);*/
-    
-          // [JRT]:
-          m_pTextBuffer->DeleteText (this, ptSelStart.y, ptSelStart.x, ptSelEnd.y, ptSelEnd.x, CE_ACTION_UPPERCASE);
-        }
-
-      int x, y;
-      m_pTextBuffer->InsertText (this, ptSelStart.y, ptSelStart.x, text.c_str(), text.size(), y, x, CE_ACTION_UPPERCASE);
-
-      ASSERT_VALIDTEXTPOS (ptCursorPos);
-      SetAnchor (ptCursorPos);
-      SetSelection (ptSelStart, ptSelEnd);
-      SetCursorPos (ptCursorPos);
-      EnsureVisible (ptCursorPos);
-
-      m_pTextBuffer->FlushUndoGroup (this);
-    }
+	if (IsSelection())
+	{
+		POINT ptSelStart, ptSelEnd;
+		GetSelection(ptSelStart, ptSelEnd);
+		String text;
+		GetText(ptSelStart, ptSelEnd, text);
+		CharUpper(&text.front());
+		m_pTextBuffer->BeginUndoGroup();
+		// [JRT]:
+		m_pTextBuffer->DeleteText(this, ptSelStart.y, ptSelStart.x, ptSelEnd.y, ptSelEnd.x, CE_ACTION_UPPERCASE);
+		m_pTextBuffer->InsertText(this, ptSelStart.y, ptSelStart.x, text.c_str(), text.size(), CE_ACTION_UPPERCASE);
+		ASSERT_VALIDTEXTPOS(ptSelStart);
+		SetAnchor(ptSelStart);
+		SetSelection(ptSelStart, ptSelEnd);
+		SetCursorPos(ptSelStart);
+		EnsureVisible(ptSelStart);
+		m_pTextBuffer->FlushUndoGroup(this);
+	}
 }
 
 void CCrystalEditView::OnEditSwapCase()
 {
-  if (IsSelection ())
-    {
-      POINT ptCursorPos = GetCursorPos ();
-      POINT ptSelStart, ptSelEnd;
-      GetSelection (ptSelStart, ptSelEnd);
-      String text;
-      GetText (ptSelStart, ptSelEnd, text);
-      int nLen = text.size();
-      LPTSTR pszText = &text.front();
-      while (*pszText)
-        *pszText++ = (TCHAR)(_istlower (*pszText) ? _totupper (*pszText) : _totlower (*pszText));
-
-      m_pTextBuffer->BeginUndoGroup ();
-
-      if (IsSelection ())
-        {
-          POINT ptSelStart, ptSelEnd;
-          GetSelection (ptSelStart, ptSelEnd);
-    
-          ptCursorPos = ptSelStart;
-          /*SetAnchor (ptCursorPos);
-          SetSelection (ptCursorPos, ptCursorPos);
-          SetCursorPos (ptCursorPos);
-          EnsureVisible (ptCursorPos);*/
-    
-          // [JRT]:
-          m_pTextBuffer->DeleteText (this, ptSelStart.y, ptSelStart.x, ptSelEnd.y, ptSelEnd.x, CE_ACTION_SWAPCASE);
-        }
-
-      int x, y;
-      m_pTextBuffer->InsertText (this, ptSelStart.y, ptSelStart.x, text.c_str(), text.size(), y, x, CE_ACTION_SWAPCASE);
-
-      ASSERT_VALIDTEXTPOS (ptCursorPos);
-      SetAnchor (ptCursorPos);
-      SetSelection (ptSelStart, ptSelEnd);
-      SetCursorPos (ptCursorPos);
-      EnsureVisible (ptCursorPos);
-
-      m_pTextBuffer->FlushUndoGroup (this);
-    }
+	if (IsSelection())
+	{
+		POINT ptSelStart, ptSelEnd;
+		GetSelection(ptSelStart, ptSelEnd);
+		String text;
+		GetText(ptSelStart, ptSelEnd, text);
+		int nLen = text.size();
+		LPTSTR pszText = &text.front();
+		while (*pszText)
+			*pszText++ ^= static_cast<TCHAR>(_totupper(*pszText)) ^ static_cast<TCHAR>(_totlower(*pszText));
+		m_pTextBuffer->BeginUndoGroup();
+		// [JRT]:
+		m_pTextBuffer->DeleteText(this, ptSelStart.y, ptSelStart.x, ptSelEnd.y, ptSelEnd.x, CE_ACTION_SWAPCASE);
+		m_pTextBuffer->InsertText(this, ptSelStart.y, ptSelStart.x, text.c_str(), text.size(), CE_ACTION_SWAPCASE);
+		ASSERT_VALIDTEXTPOS(ptSelStart);
+		SetAnchor(ptSelStart);
+		SetSelection(ptSelStart, ptSelEnd);
+		SetCursorPos(ptSelStart);
+		EnsureVisible(ptSelStart);
+		m_pTextBuffer->FlushUndoGroup(this);
+	}
 }
 
 void CCrystalEditView::OnEditCapitalize()
 {
-  if (IsSelection ())
-    {
-      POINT ptCursorPos = GetCursorPos ();
-      POINT ptSelStart, ptSelEnd;
-      GetSelection (ptSelStart, ptSelEnd);
-      String text;
-      GetText (ptSelStart, ptSelEnd, text);
-      int nLen = text.size();
-      LPTSTR pszText = &text.front();
-      bool bCapitalize = true;
-      while (*pszText)
-        {
-          if (xisspace (*pszText))
-            bCapitalize = true;
-          else if (_istalpha (*pszText))
-            if (bCapitalize)
-              {
-                *pszText = (TCHAR)_totupper (*pszText);
-                bCapitalize = false;
-              }
-            else
-              *pszText = (TCHAR)_totlower (*pszText);
-          pszText++;
-        }
+	if (IsSelection())
+	{
+		POINT ptSelStart, ptSelEnd;
+		GetSelection(ptSelStart, ptSelEnd);
+		String text;
+		GetText(ptSelStart, ptSelEnd, text);
+		int nLen = text.size();
+		LPTSTR pszText = &text.front();
+		bool bCapitalize = true;
+		while (*pszText)
+		{
+			if (xisspace(*pszText))
+				bCapitalize = true;
+			else if (_istalpha(*pszText))
+				if (bCapitalize)
+				{
+					*pszText = (TCHAR)_totupper(*pszText);
+					bCapitalize = false;
+				}
+				else
+					*pszText = (TCHAR)_totlower(*pszText);
+			pszText++;
+		}
 
-	  m_pTextBuffer->BeginUndoGroup ();
-
-      if (IsSelection ())
-        {
-          POINT ptSelStart, ptSelEnd;
-          GetSelection (ptSelStart, ptSelEnd);
-    
-          ptCursorPos = ptSelStart;
-          /*SetAnchor (ptCursorPos);
-          SetSelection (ptCursorPos, ptCursorPos);
-          SetCursorPos (ptCursorPos);
-          EnsureVisible (ptCursorPos);*/
-    
-          // [JRT]:
-          m_pTextBuffer->DeleteText (this, ptSelStart.y, ptSelStart.x, ptSelEnd.y, ptSelEnd.x, CE_ACTION_CAPITALIZE);
-        }
-
-      int x, y;
-      m_pTextBuffer->InsertText (this, ptSelStart.y, ptSelStart.x, text.c_str(), text.size(), y, x, CE_ACTION_CAPITALIZE);
-
-      ASSERT_VALIDTEXTPOS (ptCursorPos);
-      SetAnchor (ptCursorPos);
-      SetSelection (ptSelStart, ptSelEnd);
-      SetCursorPos (ptCursorPos);
-      EnsureVisible (ptCursorPos);
-
-      m_pTextBuffer->FlushUndoGroup (this);
-    }
+		m_pTextBuffer->BeginUndoGroup();
+		// [JRT]:
+		m_pTextBuffer->DeleteText(this, ptSelStart.y, ptSelStart.x, ptSelEnd.y, ptSelEnd.x, CE_ACTION_CAPITALIZE);
+		m_pTextBuffer->InsertText(this, ptSelStart.y, ptSelStart.x, text.c_str(), text.size(), CE_ACTION_CAPITALIZE);
+		ASSERT_VALIDTEXTPOS(ptSelStart);
+		SetAnchor(ptSelStart);
+		SetSelection(ptSelStart, ptSelEnd);
+		SetCursorPos(ptSelStart);
+		EnsureVisible(ptSelStart);
+		m_pTextBuffer->FlushUndoGroup(this);
+	}
 }
 
 void CCrystalEditView::OnEditSentence()
 {
-  if (IsSelection ())
-    {
-      POINT ptCursorPos = GetCursorPos ();
-      POINT ptSelStart, ptSelEnd;
-      GetSelection (ptSelStart, ptSelEnd);
-      String text;
-      GetText (ptSelStart, ptSelEnd, text);
-      int nLen = text.size();
-      LPTSTR pszText = &text.front();
-      bool bCapitalize = true;
-      while (*pszText)
-        {
-          if (!xisspace (*pszText))
-            if (*pszText == _T ('.'))
-              {
-                if (pszText[1] && !_istdigit (pszText[1]))
-                  bCapitalize = true;
-              }
-            else if (_istalpha (*pszText))
-              if (bCapitalize)
-                {
-                  *pszText = (TCHAR)_totupper (*pszText);
-                  bCapitalize = false;
-                }
-              else
-                *pszText = (TCHAR)_totlower (*pszText);
-          pszText++;
-        }
+	if (IsSelection ())
+	{
+		POINT ptSelStart, ptSelEnd;
+		GetSelection(ptSelStart, ptSelEnd);
+		String text;
+		GetText(ptSelStart, ptSelEnd, text);
+		int nLen = text.size();
+		LPTSTR pszText = &text.front();
+		bool bCapitalize = true;
+		while (*pszText)
+		{
+			if (!xisspace(*pszText))
+				if (*pszText == _T('.'))
+				{
+					if (pszText[1] && !_istdigit(pszText[1]))
+						bCapitalize = true;
+				}
+				else if (_istalpha(*pszText))
+					if (bCapitalize)
+					{
+						*pszText = (TCHAR)_totupper(*pszText);
+						bCapitalize = false;
+					}
+					else
+						*pszText = (TCHAR)_totlower(*pszText);
+			pszText++;
+		}
 
-      m_pTextBuffer->BeginUndoGroup ();
+		m_pTextBuffer->BeginUndoGroup();
 
-      if (IsSelection ())
-        {
-          POINT ptSelStart, ptSelEnd;
-          GetSelection (ptSelStart, ptSelEnd);
-    
-          ptCursorPos = ptSelStart;
-          /*SetAnchor (ptCursorPos);
-          SetSelection (ptCursorPos, ptCursorPos);
-          SetCursorPos (ptCursorPos);
-          EnsureVisible (ptCursorPos);*/
-    
-          // [JRT]:
-          m_pTextBuffer->DeleteText (this, ptSelStart.y, ptSelStart.x, ptSelEnd.y, ptSelEnd.x, CE_ACTION_SENTENCIZE);
-        }
-
-      int x, y;
-      m_pTextBuffer->InsertText (this, ptSelStart.y, ptSelStart.x, text.c_str(), text.size(), y, x, CE_ACTION_SENTENCIZE);
-
-      ASSERT_VALIDTEXTPOS (ptCursorPos);
-      SetAnchor (ptCursorPos);
-      SetSelection (ptSelStart, ptSelEnd);
-      SetCursorPos (ptCursorPos);
-      EnsureVisible (ptCursorPos);
-
-      m_pTextBuffer->FlushUndoGroup (this);
-    }
+		// [JRT]:
+		m_pTextBuffer->DeleteText(this, ptSelStart.y, ptSelStart.x, ptSelEnd.y, ptSelEnd.x, CE_ACTION_SENTENCIZE);
+		m_pTextBuffer->InsertText(this, ptSelStart.y, ptSelStart.x, text.c_str(), text.size(), CE_ACTION_SENTENCIZE);
+		ASSERT_VALIDTEXTPOS(ptSelStart);
+		SetAnchor(ptSelStart);
+		SetSelection(ptSelStart, ptSelEnd);
+		SetCursorPos(ptSelStart);
+		EnsureVisible(ptSelStart);
+		m_pTextBuffer->FlushUndoGroup(this);
+	}
 }
 
 //BEGIN SW
@@ -1581,46 +1433,42 @@ void CCrystalEditView::OnEditGotoLastChange()
 
 void CCrystalEditView::OnEditDeleteWord()
 {
-  if (!IsSelection())
-    MoveWordRight(TRUE);
-  if (IsSelection())
-    {
-      POINT ptSelStart, ptSelEnd;
-      GetSelection (ptSelStart, ptSelEnd);
-
-      m_pTextBuffer->BeginUndoGroup ();
-
-      m_pTextBuffer->DeleteText (this, ptSelStart.y, ptSelStart.x, ptSelEnd.y, ptSelEnd.x, CE_ACTION_DELETE);
-
-      ASSERT_VALIDTEXTPOS (ptSelStart);
-      SetAnchor (ptSelStart);
-      SetSelection (ptSelStart, ptSelStart);
-      SetCursorPos (ptSelStart);
-      EnsureVisible (ptSelStart);
-
-      m_pTextBuffer->FlushUndoGroup (this);
-    }
+	if (IsSelection())
+	{
+		POINT ptSelStart, ptSelEnd;
+		GetSelection(ptSelStart, ptSelEnd);
+		m_pTextBuffer->BeginUndoGroup();
+		m_pTextBuffer->DeleteText(this, ptSelStart.y, ptSelStart.x, ptSelEnd.y, ptSelEnd.x, CE_ACTION_DELETE);
+		ASSERT_VALIDTEXTPOS(ptSelStart);
+		SetAnchor(ptSelStart);
+		SetSelection(ptSelStart, ptSelStart);
+		SetCursorPos(ptSelStart);
+		EnsureVisible(ptSelStart);
+		m_pTextBuffer->FlushUndoGroup(this);
+	}
+	else
+	{
+		MoveWordRight(TRUE);
+	}
 }
 
 void CCrystalEditView::OnEditDeleteWordBack()
 {
-  if (!IsSelection())
-    MoveWordLeft(TRUE);
-  if (IsSelection())
-    {
-      POINT ptSelStart, ptSelEnd;
-      GetSelection (ptSelStart, ptSelEnd);
-
-      m_pTextBuffer->BeginUndoGroup ();
-
-      m_pTextBuffer->DeleteText (this, ptSelStart.y, ptSelStart.x, ptSelEnd.y, ptSelEnd.x, CE_ACTION_DELETE);
-
-      ASSERT_VALIDTEXTPOS (ptSelStart);
-      SetAnchor (ptSelStart);
-      SetSelection (ptSelStart, ptSelStart);
-      SetCursorPos (ptSelStart);
-      EnsureVisible (ptSelStart);
-
-      m_pTextBuffer->FlushUndoGroup (this);
-    }
+	if (IsSelection())
+	{
+		POINT ptSelStart, ptSelEnd;
+		GetSelection(ptSelStart, ptSelEnd);
+		m_pTextBuffer->BeginUndoGroup();
+		m_pTextBuffer->DeleteText(this, ptSelStart.y, ptSelStart.x, ptSelEnd.y, ptSelEnd.x, CE_ACTION_DELETE);
+		ASSERT_VALIDTEXTPOS(ptSelStart);
+		SetAnchor(ptSelStart);
+		SetSelection(ptSelStart, ptSelStart);
+		SetCursorPos(ptSelStart);
+		EnsureVisible(ptSelStart);
+		m_pTextBuffer->FlushUndoGroup(this);
+	}
+	else
+	{
+		MoveWordLeft(TRUE);
+	}
 }

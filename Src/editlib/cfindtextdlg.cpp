@@ -119,7 +119,7 @@ LRESULT CFindTextDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 /////////////////////////////////////////////////////////////////////////////
 // CFindTextDlg message handlers
 
-void CFindTextDlg::OnOK ()
+void CFindTextDlg::OnOK()
 {
 	UpdateData<Get>();
 	m_bConfirmed = true;
@@ -143,7 +143,7 @@ void CFindTextDlg::OnOK ()
 	if (!m_pBuddy->FindText(m_sText.c_str(), m_ptCurrentPos, dwSearchFlags, !m_bNoWrap, &ptTextPos))
 	{
 		LanguageSelect.Format(
-		IDS_EDIT_TEXT_NOT_FOUND, m_sText.c_str()
+			IDS_EDIT_TEXT_NOT_FOUND, m_sText.c_str()
 		).MsgBox(MB_ICONINFORMATION);
 		m_ptCurrentPos.x = 0;
 		m_ptCurrentPos.y = 0;

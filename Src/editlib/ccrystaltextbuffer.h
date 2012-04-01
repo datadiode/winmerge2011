@@ -149,15 +149,6 @@ protected:
 	//  Undo
 	virtual const UndoRecord &GetUndoRecord(size_t i) const = 0;
 	virtual size_t GetUndoRecordCount() const = 0;
-	/*stl::vector<UndoRecord> m_aUndoBuf;
-	virtual const UndoRecord &GetUndoRecord(size_t i) const
-	{
-		return m_aUndoBuf[i];
-	}
-	virtual size_t GetUndoRecordCount() const
-	{
-		return m_aUndoBuf.size();
-	}*/
 
 	size_t m_nUndoPosition;
 	size_t m_nSyncPosition;
@@ -177,8 +168,8 @@ protected:
 	void MoveLine(int line1, int line2, int newline1);
 
 	//  Implementation
-	BOOL InternalInsertText(CCrystalTextView *, int nLine, int nPos, LPCTSTR pszText, int cchText, int &nEndLine, int &nEndChar);
-	BOOL InternalDeleteText(CCrystalTextView *, int nStartLine, int nStartPos, int nEndLine, int nEndPos);
+	POINT InternalInsertText(CCrystalTextView *, int nLine, int nPos, LPCTSTR pszText, int cchText);
+	void InternalDeleteText(CCrystalTextView *, int nStartLine, int nStartPos, int nEndLine, int nEndPos);
 	String StripTail(int i, int bytes);
 
 	//  [JRT] Support For Descriptions On Undo/Redo Actions
@@ -251,14 +242,14 @@ public:
 	void SetIgnoreEol(BOOL IgnoreEol) { m_IgnoreEol = IgnoreEol; }
 
 	//  Text modification functions
-	virtual BOOL InsertText(CCrystalTextView *pSource, int nLine, int nPos, LPCTSTR pszText, int cchText, int &nEndLine, int &nEndChar, int nAction = CE_ACTION_UNKNOWN, BOOL bHistory = TRUE) = 0;
-	virtual BOOL DeleteText(CCrystalTextView *pSource, int nStartLine, int nStartPos, int nEndLine, int nEndPos, int nAction = CE_ACTION_UNKNOWN, BOOL bHistory = TRUE) = 0;
+	virtual POINT InsertText(CCrystalTextView *pSource, int nLine, int nPos, LPCTSTR pszText, int cchText, int nAction = CE_ACTION_UNKNOWN, BOOL bHistory = TRUE) = 0;
+	virtual void DeleteText(CCrystalTextView *pSource, int nStartLine, int nStartPos, int nEndLine, int nEndPos, int nAction = CE_ACTION_UNKNOWN, BOOL bHistory = TRUE) = 0;
 
 	//  Undo/Redo
-	BOOL CanUndo() const;
-	BOOL CanRedo() const;
-	virtual BOOL Undo(CCrystalTextView *pSource, POINT &ptCursorPos) = 0;
-	virtual BOOL Redo(CCrystalTextView *pSource, POINT &ptCursorPos) = 0;
+	bool CanUndo() const;
+	bool CanRedo() const;
+	virtual bool Undo(CCrystalTextView *pSource, POINT &ptCursorPos) = 0;
+	virtual bool Redo(CCrystalTextView *pSource, POINT &ptCursorPos) = 0;
 
 	//  Undo grouping
 	void BeginUndoGroup(BOOL bMergeWithPrevious = FALSE);

@@ -350,22 +350,6 @@ const LineInfo &CCrystalTextBuffer::GetLineInfo(int nLine) const
 	return m_aLines[nLine];
 }
 
-static int FlagToIndex(DWORD dwFlag)
-{
-  int nIndex = 0;
-  while ((dwFlag & 1) == 0)
-    {
-      dwFlag = dwFlag >> 1;
-      nIndex++;
-      if (nIndex == 32)
-        return -1;
-    }
-  dwFlag = dwFlag & 0xFFFFFFFE;
-  if (dwFlag != 0)
-    return -1;
-  return nIndex;
-}
-
 int CCrystalTextBuffer::FindLineWithFlag(DWORD dwFlag) const
 {
   const size_t nSize = m_aLines.size();
@@ -379,47 +363,34 @@ int CCrystalTextBuffer::FindLineWithFlag(DWORD dwFlag) const
 
 int CCrystalTextBuffer::GetLineWithFlag(DWORD dwFlag) const
 {
-  int nFlagIndex =::FlagToIndex (dwFlag);
-  if (nFlagIndex < 0)
-    {
-      ASSERT(FALSE);           //  Invalid flag passed in
-
-      return -1;
-    }
-  return FindLineWithFlag (dwFlag);
+  ASSERT((dwFlag != 0) && ((dwFlag & dwFlag - 1) == 0));
+  return FindLineWithFlag(dwFlag);
 }
 
 void CCrystalTextBuffer::SetLineFlag(int nLine, DWORD dwFlag, BOOL bSet, BOOL bRemoveFromPreviousLine, BOOL bUpdate)
 {
-  ASSERT(m_bInit);             //  Text buffer not yet initialized.
-  //  You must call InitNew() or LoadFromFile() first!
-  int nFlagIndex =::FlagToIndex (dwFlag);
-  if (nFlagIndex < 0 && (nLine == -1 || bRemoveFromPreviousLine))
-    {
-      ASSERT(FALSE);           //  Invalid flag passed in
+	//  You must call InitNew() or LoadFromFile() first!
+	ASSERT(m_bInit);             //  Text buffer not yet initialized.
+	ASSERT((dwFlag != 0) && ((dwFlag & dwFlag - 1) == 0));
 
-      return;
-    }
+	if (nLine == -1)
+	{
+		ASSERT(!bSet);
+		nLine = FindLineWithFlag(dwFlag);
+		if (nLine == -1)
+			return;
+		bRemoveFromPreviousLine = FALSE;
+	}
 
-  if (nLine == -1)
-    {
-      ASSERT(!bSet);
-      nLine = FindLineWithFlag (dwFlag);
-      if (nLine == -1)
-        return;
-      bRemoveFromPreviousLine = FALSE;
-    }
-
-  DWORD dwNewFlags = m_aLines[nLine].m_dwFlags;
-  if (bSet)
-  {
-    if (dwFlag==0)
-      dwNewFlags=0;
-    else
-    dwNewFlags = dwNewFlags | dwFlag;
-  }
-  else
-    dwNewFlags = dwNewFlags & ~dwFlag;
+	DWORD dwNewFlags = m_aLines[nLine].m_dwFlags;
+	if (bSet)
+	{
+		dwNewFlags |= dwFlag;
+	}
+	else
+	{
+		dwNewFlags &= ~dwFlag;
+	}
 
   if (m_aLines[nLine].m_dwFlags != dwNewFlags)
     {
@@ -578,7 +549,7 @@ void CCrystalTextBuffer::UpdateViews(CCrystalTextView *pSource, CUpdateContext *
  * @note Line numbers are apparent (screen) line numbers, not real
  * line numbers in the file.
  */
-BOOL CCrystalTextBuffer::InternalDeleteText(
+void CCrystalTextBuffer::InternalDeleteText(
 	CCrystalTextView *pSource,
 	int nStartLine, int nStartChar,
 	int nEndLine, int nEndChar)
@@ -594,8 +565,7 @@ BOOL CCrystalTextBuffer::InternalDeleteText(
   // some edit functions (delete...) should do nothing when there is no selection.
   // assert to be sure to catch these 'do nothing' cases.
   ASSERT(nStartLine != nEndLine || nStartChar != nEndChar);
-  if (m_bReadOnly)
-    return FALSE;
+  ASSERT(!m_bReadOnly);
 
   CDeleteContext context;
   context.m_ptStart.y = nStartLine;
@@ -641,7 +611,6 @@ BOOL CCrystalTextBuffer::InternalDeleteText(
   m_ptLastChange = context.m_ptStart;
   //END SW
 
-  return TRUE;
 }
 
 // Remove the last [bytes] characters from specified line, and return them
@@ -678,23 +647,21 @@ String CCrystalTextBuffer::StripTail(int i, int bytes)
  * @note Line numbers are apparent (screen) line numbers, not real
  * line numbers in the file.
  */
-BOOL CCrystalTextBuffer::
-InternalInsertText (CCrystalTextView * pSource, int nLine, int nPos,
-    LPCTSTR pszText, int cchText, int &nEndLine, int &nEndChar)
+POINT CCrystalTextBuffer::InternalInsertText(CCrystalTextView *pSource,
+	int nLine, int nPos, LPCTSTR pszText, int cchText)
 {
   ASSERT(m_bInit);             //  Text buffer not yet initialized.
   //  You must call InitNew() or LoadFromFile() first!
 
   ASSERT(nLine >= 0 && nLine < GetLineCount());
   ASSERT(nPos >= 0 && nPos <= m_aLines[nLine].Length());
-  if (m_bReadOnly)
-    return FALSE;
+  ASSERT(!m_bReadOnly);
 
   CInsertContext context;
   context.m_ptStart.x = nPos;
   context.m_ptStart.y = nLine;
-  nEndLine = 0;
-  nEndChar = 0;
+  int nEndLine = 0;
+  int nEndChar = 0;
 
   int nRestCount = GetFullLineLength(nLine) - nPos;
   String sTail;
@@ -809,16 +776,16 @@ InternalInsertText (CCrystalTextView * pSource, int nLine, int nPos,
   // remember current cursor position as last editing position
   m_ptLastChange.x = nEndChar;
   m_ptLastChange.y = nEndLine;
-  return TRUE;
+  return m_ptLastChange;
 }
 
-BOOL CCrystalTextBuffer::CanUndo() const
+bool CCrystalTextBuffer::CanUndo() const
 {
 	ASSERT(m_nUndoPosition >= 0 && m_nUndoPosition <= GetUndoRecordCount());
 	return m_nUndoPosition > 0;
 }
 
-BOOL CCrystalTextBuffer::CanRedo() const
+bool CCrystalTextBuffer::CanRedo() const
 {
 	ASSERT(m_nUndoPosition >= 0 && m_nUndoPosition <= GetUndoRecordCount());
 	return m_nUndoPosition < GetUndoRecordCount();

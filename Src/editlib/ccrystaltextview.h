@@ -217,8 +217,8 @@ public:
     LPCTSTR GetTextBufferEol(int nLine) const;
 
     CSyntaxColors *GetSyntaxColors() { return m_pColors; }
-    void SetColorContext(CSyntaxColors * pColors) { m_pColors = pColors; }
-    virtual void SetSelection (const POINT & ptStart, const POINT & ptEnd);
+    void SetColorContext(CSyntaxColors *pColors) { m_pColors = pColors; }
+    virtual void SetSelection(const POINT &ptStart, const POINT &ptEnd);
 
 	bool IsSelection();
 	bool HasFocus() const { return m_bFocused; }

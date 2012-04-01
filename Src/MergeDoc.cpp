@@ -2434,9 +2434,8 @@ void CChildFrame::OnToolsCompareSelection()
 		pView->GetTextWithoutEmptys(ptStart.y, ptStart.x, ptEnd.y, ptEnd.x, text);
 		// Trick the TextBuffer to flag the to-be-inserted text as revision 0.
 		--pTargetBuf->m_dwCurrentRevisionNumber;
-		int nLine, nChar;
 		pTargetBuf->InsertText(pTargetView, 0, 0,
-			text.c_str(), text.length(), nLine, nChar, CE_ACTION_UNKNOWN, FALSE);
+			text.c_str(), text.length(), CE_ACTION_UNKNOWN, FALSE);
 		pTargetBuf->SetModified(FALSE);
 	} while (nSide ^= 1);
 	pMergeDoc->FlushAndRescan();

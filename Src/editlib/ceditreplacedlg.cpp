@@ -275,7 +275,7 @@ void CEditReplaceDlg::OnEditReplace()
 		dwSearchFlags |= FIND_REGEXP;
 
 	//  We have highlighted text
-	VERIFY(m_pBuddy->ReplaceSelection(m_sNewText.c_str(), m_sNewText.size(), dwSearchFlags));
+	m_pBuddy->ReplaceSelection(m_sNewText.c_str(), m_sNewText.size(), dwSearchFlags);
 
 	//  Manually recalculate points
 	if (m_bEnableScopeSelection)
@@ -340,7 +340,7 @@ void CEditReplaceDlg::OnEditReplaceAll()
 
 		//  We have highlighted text
 		m_pBuddy->m_nLastReplaceLen = 0;
-		VERIFY(m_pBuddy->ReplaceSelection(m_sNewText.c_str(), m_sNewText.size(), dwSearchFlags));
+		m_pBuddy->ReplaceSelection(m_sNewText.c_str(), m_sNewText.size(), dwSearchFlags);
 		nNumReplaced++;
 
 		//  Manually recalculate points

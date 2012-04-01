@@ -2768,14 +2768,14 @@ void CCrystalTextView::InvalidateLines(int nLine1, int nLine2, BOOL bInvalidateM
     }
 }
 
-void CCrystalTextView::SetSelection(const POINT & ptStart, const POINT & ptEnd)
+void CCrystalTextView::SetSelection(const POINT &ptStart, const POINT &ptEnd)
 {
 	ASSERT_VALIDTEXTPOS(ptStart);
 	ASSERT_VALIDTEXTPOS(ptEnd);
 	if (m_ptSelStart == ptStart)
 	{
 		if (m_ptSelEnd != ptEnd)
-			InvalidateLines (ptEnd.y, m_ptSelEnd.y);
+			InvalidateLines(ptEnd.y, m_ptSelEnd.y);
 	}
 	else
 	{
@@ -2786,9 +2786,9 @@ void CCrystalTextView::SetSelection(const POINT & ptStart, const POINT & ptEnd)
 	m_ptSelEnd = ptEnd;
 }
 
-void CCrystalTextView::AdjustTextPoint(POINT & point)
+void CCrystalTextView::AdjustTextPoint(POINT &point)
 {
-	point.x += GetCharWidth () / 2;   //todo
+	point.x += GetCharWidth() / 2;   //todo
 }
 
 void CCrystalTextView::OnSetFocus()

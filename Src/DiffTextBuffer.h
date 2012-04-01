@@ -168,7 +168,6 @@ public:
 	virtual UndoRecord &AddUndoRecord(BOOL bInsert, const POINT &ptStartPos,
 		const POINT &ptEndPos, LPCTSTR pszText, int cchText,
 		int nLinesToValidate, int nActionType = CE_ACTION_UNKNOWN);
-	bool curUndoGroup();
 	void ReplaceLine(CCrystalTextView *pSource, int nLine, LPCTSTR pchText,
 		int cchText, int nAction = CE_ACTION_UNKNOWN);
 	void ReplaceFullLine(CCrystalTextView *pSource, int nLine,

@@ -1656,10 +1656,9 @@ HMenu *CMergeEditView::ApplyPatch(IStream *pstm, int id)
 						for (i = 0 ; i < len2 ; ++i)
 						{
 							BSTR bstrText = vec2[i];
-							int nEndLine, nEndChar;
 							int nApparentLine = pTextBuffer->ComputeApparentLine(pos2 + i);
 							pTextBuffer->InsertText(this, nApparentLine, 0,
-								bstrText, SysStringLen(bstrText), nEndLine, nEndChar);
+								bstrText, SysStringLen(bstrText));
 						}
 						pTextBuffer->FlushUndoGroup(this);
 					}

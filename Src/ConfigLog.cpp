@@ -24,7 +24,7 @@
 
 #include "StdAfx.h"
 #include "Constants.h"
-#include "common/version.h"
+#include "Common/version.h"
 #include "UniFile.h"
 #include "DiffWrapper.h"
 #include "ConfigLog.h"

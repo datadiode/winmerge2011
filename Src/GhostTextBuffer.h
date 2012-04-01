@@ -102,23 +102,23 @@ public:
 	but maybe it doesn't (if there is an assert to check there is an EOL,
 	or if it adds the default EOL)
 	*/
-	virtual void GetTextWithoutEmptys (int nStartLine, int nStartChar,
+	virtual void GetTextWithoutEmptys(int nStartLine, int nStartChar,
 			int nEndLine, int nEndChar, String &text,
-			CRLFSTYLE nCrlfStyle =CRLF_STYLE_AUTOMATIC);
+			CRLFSTYLE nCrlfStyle = CRLF_STYLE_AUTOMATIC);
 
 
 	// Text modification functions
-	virtual BOOL InsertText (CCrystalTextView * pSource, int nLine, int nPos,
-		LPCTSTR pszText, int cchText, int &nEndLine, int &nEndChar,
+	virtual POINT InsertText(CCrystalTextView *pSource, int nLine, int nPos,
+		LPCTSTR pszText, int cchText,
 		int nAction = CE_ACTION_UNKNOWN, BOOL bHistory = TRUE);
-	virtual BOOL DeleteText (CCrystalTextView * pSource, int nStartLine,
+	virtual void DeleteText(CCrystalTextView *pSource, int nStartLine,
 		int nStartPos, int nEndLine, int nEndPos,
 		int nAction = CE_ACTION_UNKNOWN, BOOL bHistory = TRUE);
-	BOOL InsertGhostLine (CCrystalTextView * pSource, int nLine);
+	BOOL InsertGhostLine(CCrystalTextView *pSource, int nLine);
 
 	// Undo/Redo
-	virtual BOOL Undo(CCrystalTextView *pSource, POINT &ptCursorPos);
-	virtual BOOL Redo(CCrystalTextView *pSource, POINT &ptCursorPos);
+	virtual bool Undo(CCrystalTextView *pSource, POINT &ptCursorPos);
+	virtual bool Redo(CCrystalTextView *pSource, POINT &ptCursorPos);
 
 public:
 	//@{

@@ -239,9 +239,6 @@ void CDiffTextBuffer::prepareForRescan()
 	{
 		--i;
 		m_aLines[i].m_dwFlags &= ~(LF_DIFF | LF_TRIVIAL | LF_MOVED);
-		/*SetLineFlag(i, LF_DIFF, FALSE, FALSE, FALSE);
-		SetLineFlag(i, LF_TRIVIAL, FALSE, FALSE, FALSE);
-		SetLineFlag(i, LF_MOVED, FALSE, FALSE, FALSE);*/
 	}
 }
 
@@ -573,11 +570,10 @@ int CDiffTextBuffer::SaveToFile(LPCTSTR pszFileName,
 void CDiffTextBuffer::ReplaceLine(CCrystalTextView * pSource, int nLine,
 		LPCTSTR pchText, int cchText, int nAction)
 {
-	if (GetLineLength(nLine)>0)
+	if (GetLineLength(nLine) > 0)
 		DeleteText(pSource, nLine, 0, nLine, GetLineLength(nLine), nAction);
-	int endl, endc;
 	if (cchText)
-		InsertText(pSource, nLine, 0, pchText, cchText, endl, endc, nAction);
+		InsertText(pSource, nLine, 0, pchText, cchText, nAction);
 }
 
 /// Replace line (removing any eol, and only including one if in strText)
@@ -610,13 +606,7 @@ void CDiffTextBuffer::ReplaceFullLine(CCrystalTextView * pSource, int nLine,
 
 	if (GetFullLineLength(nLine))
 		DeleteText(pSource, nLine, 0, nLine + 1, 0, nAction); 
-	int endl, endc;
 	const int cchText = strText.length();
 	if (cchText)
-		InsertText(pSource, nLine, 0, strText.c_str(), cchText, endl, endc, nAction);
-}
-
-bool CDiffTextBuffer::curUndoGroup()
-{
-	return (m_aUndoBuf.size() != 0 && m_aUndoBuf[0].m_dwFlags&UNDO_BEGINGROUP);
+		InsertText(pSource, nLine, 0, strText.c_str(), cchText, nAction);
 }

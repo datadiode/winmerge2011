@@ -13,7 +13,7 @@
 #define operator(args)
 #endif
 
-#include "common/coretypes.h"
+#include "Common/coretypes.h"
 
 class CRegKeyEx;
 

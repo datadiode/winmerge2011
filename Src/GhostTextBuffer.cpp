@@ -248,17 +248,15 @@ void CGhostTextBuffer::GetTextWithoutEmptys(int nStartLine, int nStartChar,
 ////////////////////////////////////////////////////////////////////////////
 // undo/redo functions
 
-BOOL CGhostTextBuffer::Undo(CCrystalTextView *pSource, POINT &ptCursorPos)
+bool CGhostTextBuffer::Undo(CCrystalTextView *pSource, POINT &ptCursorPos)
 {
 	ASSERT(CanUndo());
 	ASSERT((m_aUndoBuf[0].m_dwFlags & UNDO_BEGINGROUP) != 0);
-	BOOL failed = FALSE;
-	int tmpPos = m_nUndoPosition;
-
-	while (!failed)
+	DWORD dwFlags;
+	do
 	{
-		--tmpPos;
-		GhostUndoRecord &ur = m_aUndoBuf[tmpPos];
+		GhostUndoRecord &ur = m_aUndoBuf[--m_nUndoPosition];
+		dwFlags = ur.m_dwFlags;
 		// Undo records are stored in file line numbers
 		// and must be converted to apparent (screen) line numbers for use
 		POINT apparent_ptStartPos = ur.m_ptStartPos;
@@ -271,13 +269,13 @@ BOOL CGhostTextBuffer::Undo(CCrystalTextView *pSource, POINT &ptCursorPos)
 			if (apparent_ptStartPos.y >= GetLineCount() || (GetLineFlags(apparent_ptStartPos.y) & LF_GHOST) == 0)
 			{
 				// if we don't find it, we insert it 
-				InsertGhostLine (pSource, apparent_ptStartPos.y);
+				InsertGhostLine(pSource, apparent_ptStartPos.y);
 				// and recompute apparent_ptEndPos
-				apparent_ptEndPos.y = ComputeApparentLine (ur.m_ptEndPos.y, ur.m_ptEndPos_nGhost);
+				apparent_ptEndPos.y = ComputeApparentLine(ur.m_ptEndPos.y, ur.m_ptEndPos_nGhost);
 			}
 
 		// EndPos defined only for UNDO_INSERT (when we delete)
-		if (ur.m_dwFlags & UNDO_INSERT && ur.m_ptEndPos_nGhost > 0)
+		if (dwFlags & UNDO_INSERT && ur.m_ptEndPos_nGhost > 0)
 			// if we need a ghost line at position apparent_ptStartPos.y
 			if (apparent_ptEndPos.y >= GetLineCount() || (GetLineFlags(apparent_ptEndPos.y) & LF_GHOST) == 0)
 			{
@@ -285,7 +283,7 @@ BOOL CGhostTextBuffer::Undo(CCrystalTextView *pSource, POINT &ptCursorPos)
 				InsertGhostLine (pSource, apparent_ptEndPos.y);
 			}
 
-		if (ur.m_dwFlags & UNDO_INSERT)
+		if (dwFlags & UNDO_INSERT)
 		{
 			// WINMERGE -- Check that text in undo buffer matches text in
 			// file buffer. If not, then rescan() has moved lines and undo
@@ -308,8 +306,9 @@ BOOL CGhostTextBuffer::Undo(CCrystalTextView *pSource, POINT &ptCursorPos)
 				GetTextWithoutEmptys (apparent_ptStartPos.y, apparent_ptStartPos.x, apparent_ptEndPos.y, apparent_ptEndPos.x, text);
 				if (text.length() == ur.GetTextLength() && memcmp(text.c_str(), ur.GetText(), text.length() * sizeof(TCHAR)) == 0)
 				{
-					VERIFY(InternalDeleteText(pSource, 
-						apparent_ptStartPos.y, apparent_ptStartPos.x, apparent_ptEndPos.y, apparent_ptEndPos.x));
+					InternalDeleteText(pSource, 
+						apparent_ptStartPos.y, apparent_ptStartPos.x,
+						apparent_ptEndPos.y, apparent_ptEndPos.x);
 					m_dwCurrentRevisionNumber++;
 					ptCursorPos = apparent_ptStartPos;
 				}
@@ -320,14 +319,12 @@ BOOL CGhostTextBuffer::Undo(CCrystalTextView *pSource, POINT &ptCursorPos)
 #ifdef _ADVANCED_BUGCHECK
 					ASSERT(0);
 #endif
-					failed = TRUE;
 					break;
 				}
 
 			}
 			else
 			{
-				failed = TRUE;
 				break;
 			}
 
@@ -348,7 +345,7 @@ BOOL CGhostTextBuffer::Undo(CCrystalTextView *pSource, POINT &ptCursorPos)
 			int nNumberDeletedRealLines = ur.m_ptEndPos.y - ur.m_ptStartPos.y;
 			if (nNumberDeletedRealLines == ur.m_nRealLinesCreated)
 				;
-			else if (nNumberDeletedRealLines == ur.m_nRealLinesCreated-1)
+			else if (nNumberDeletedRealLines == ur.m_nRealLinesCreated - 1)
 			{
 				// we inserted in a ghost line (which then became real), we must send it back to its world
 				li.m_dwFlags |= LF_GHOST;
@@ -364,20 +361,19 @@ BOOL CGhostTextBuffer::Undo(CCrystalTextView *pSource, POINT &ptCursorPos)
 		}
 		else
 		{
-			int nEndLine, nEndChar;
-			VERIFY(InternalInsertText(pSource, 
-				apparent_ptStartPos.y, apparent_ptStartPos.x, ur.GetText(), ur.GetTextLength(), nEndLine, nEndChar));
+			ptCursorPos = InternalInsertText(pSource, 
+				apparent_ptStartPos.y, apparent_ptStartPos.x,
+				ur.GetText(), ur.GetTextLength());
 			m_dwCurrentRevisionNumber++;
-			ptCursorPos = m_ptLastChange;
 
 			// for the flags, the logic is nearly the same as in insertText
 			int bFirstLineGhost = ((GetLineFlags(apparent_ptStartPos.y) & LF_GHOST) != 0);
 			// when inserting an EOL terminated text into a ghost line,
 			// there is a dicrepancy between nInsertedLines and nEndLine-nRealLine
-			const bool bDiscrepancyInInsertedLines = bFirstLineGhost && nEndChar == 0;
+			const bool bDiscrepancyInInsertedLines = bFirstLineGhost && ptCursorPos.x == 0;
 
 			int i;
-			for (i = apparent_ptStartPos.y ; i < nEndLine ; i++)
+			for (i = apparent_ptStartPos.y ; i < ptCursorPos.y ; i++)
 				OnNotifyLineHasBeenEdited(i);
 			if (!bDiscrepancyInInsertedLines)
 				OnNotifyLineHasBeenEdited(i);
@@ -385,8 +381,8 @@ BOOL CGhostTextBuffer::Undo(CCrystalTextView *pSource, POINT &ptCursorPos)
 			// We know the number of real lines in the deleted block (including partial lines for extremities)
 			// there may be more lines (difficult to explain) then they must be ghost
 			for (i = apparent_ptStartPos.y ; i < apparent_ptStartPos.y + ur.m_nRealLinesInDeletedBlock ; i++)
-				SetLineFlag (i, LF_GHOST, FALSE, FALSE, FALSE);
-			for ( ; i <= nEndLine ; i++)
+				m_aLines[i].m_dwFlags &= ~LF_GHOST;
+			for ( ; i <= ptCursorPos.y ; i++)
 			{
 				LineInfo &li = m_aLines[i];
 				li.m_dwFlags |= LF_GHOST;
@@ -396,13 +392,13 @@ BOOL CGhostTextBuffer::Undo(CCrystalTextView *pSource, POINT &ptCursorPos)
 			// it is not easy to know when Recompute so we do it always
 			RecomputeRealityMapping();
 
-			RecomputeEOL(pSource, apparent_ptStartPos.y, nEndLine);
+			RecomputeEOL(pSource, apparent_ptStartPos.y, ptCursorPos.y);
 		}
 
 		// store infos for redo
 		ur.m_redo_ptStartPos.x = apparent_ptStartPos.x;
 		ur.m_redo_ptStartPos.y = ComputeRealLineAndGhostAdjustment(apparent_ptStartPos.y, ur.m_redo_ptStartPos_nGhost);
-		if (ur.m_dwFlags & UNDO_INSERT)
+		if (dwFlags & UNDO_INSERT)
 		{
 			ur.m_redo_ptEndPos.x = -1;
 			ur.m_redo_ptEndPos.y = 0;
@@ -418,31 +414,22 @@ BOOL CGhostTextBuffer::Undo(CCrystalTextView *pSource, POINT &ptCursorPos)
 		for (size_t i = 0; i < naSavedRevisonNumbersSize; i++)
 			m_aLines[apparent_ptStartPos.y + i].m_dwRevisionNumber = ur.m_paSavedRevisonNumbers[i];
 
-		//m_aUndoBuf[tmpPos] = ur;
-
-		if (ur.m_dwFlags & UNDO_BEGINGROUP)
-			break;
-	}
-	if (m_bModified && m_nSyncPosition == tmpPos)
+	} while ((dwFlags & UNDO_BEGINGROUP) == 0);
+	if (m_bModified && m_nSyncPosition == m_nUndoPosition)
 		SetModified(FALSE);
-	if (!m_bModified && m_nSyncPosition != tmpPos)
+	if (!m_bModified && m_nSyncPosition != m_nUndoPosition)
 		SetModified(TRUE);
-	if (failed)
-	{
-		// If the Undo failed, clear the entire Undo/Redo stack
-		// Not only can we not Redo the failed Undo, but the Undo
-		// may have partially completed (if in a group)
-		m_nUndoPosition = 0;
-		m_aUndoBuf.clear();
-	}
-	else
-	{
-		m_nUndoPosition = tmpPos;
-	}
-	return !failed;
+	if ((dwFlags & UNDO_BEGINGROUP) != 0)
+		return true;
+	// If the Undo failed, clear the entire Undo/Redo stack
+	// Not only can we not Redo the failed Undo, but the Undo
+	// may have partially completed (if in a group)
+	m_nUndoPosition = 0;
+	m_aUndoBuf.clear();
+	return false;
 }
 
-BOOL CGhostTextBuffer::Redo(CCrystalTextView *pSource, POINT &ptCursorPos)
+bool CGhostTextBuffer::Redo(CCrystalTextView *pSource, POINT &ptCursorPos)
 {
 	ASSERT(CanRedo());
 	ASSERT((m_aUndoBuf[0].m_dwFlags & UNDO_BEGINGROUP) != 0);
@@ -478,10 +465,8 @@ BOOL CGhostTextBuffer::Redo(CCrystalTextView *pSource, POINT &ptCursorPos)
 		// now we can use normal (CGhostTextBuffer::) insertTxt or deleteText
 		if (ur.m_dwFlags & UNDO_INSERT)
 		{
-			int nEndLine, nEndChar;
-			VERIFY(InsertText (pSource, apparent_ptStartPos.y, apparent_ptStartPos.x,
-				ur.GetText(), ur.GetTextLength(), nEndLine, nEndChar, 0, FALSE));
-			ptCursorPos = m_ptLastChange;
+			ptCursorPos = InsertText(pSource, apparent_ptStartPos.y, apparent_ptStartPos.x,
+				ur.GetText(), ur.GetTextLength(), 0, FALSE);
 		}
 		else
 		{
@@ -490,8 +475,8 @@ BOOL CGhostTextBuffer::Redo(CCrystalTextView *pSource, POINT &ptCursorPos)
 			GetTextWithoutEmptys (apparent_ptStartPos.y, apparent_ptStartPos.x, apparent_ptEndPos.y, apparent_ptEndPos.x, text);
 			ASSERT(text.length() == ur.GetTextLength() && memcmp(text.c_str(), ur.GetText(), text.length() * sizeof(TCHAR)) == 0);
 #endif
-			VERIFY(DeleteText(pSource, apparent_ptStartPos.y, apparent_ptStartPos.x, 
-				apparent_ptEndPos.y, apparent_ptEndPos.x, 0, FALSE));
+			DeleteText(pSource, apparent_ptStartPos.y, apparent_ptStartPos.x, 
+				apparent_ptEndPos.y, apparent_ptEndPos.x, 0, FALSE);
 			ptCursorPos = apparent_ptStartPos;
 		}
 		m_nUndoPosition++;
@@ -502,10 +487,10 @@ BOOL CGhostTextBuffer::Redo(CCrystalTextView *pSource, POINT &ptCursorPos)
 	}
 
 	if (m_bModified && m_nSyncPosition == m_nUndoPosition)
-		SetModified (FALSE);
+		SetModified(FALSE);
 	if (!m_bModified && m_nSyncPosition != m_nUndoPosition)
-		SetModified (TRUE);
-	return TRUE;
+		SetModified(TRUE);
+	return true;
 }
 
 
@@ -584,9 +569,8 @@ UndoRecord &CGhostTextBuffer::AddUndoRecord(BOOL bInsert, const POINT &ptStartPo
  *   variable which is preserved with real line number during Rescan
  *   (m_ptCursorPos, m_ptLastChange for example).
  */
-BOOL CGhostTextBuffer::InsertText(CCrystalTextView * pSource, int nLine,
-		int nPos, LPCTSTR pszText, int cchText, int &nEndLine, int &nEndChar,
-		int nAction, BOOL bHistory)
+POINT CGhostTextBuffer::InsertText(CCrystalTextView *pSource,
+	int nLine, int nPos, LPCTSTR pszText, int cchText, int nAction, BOOL bHistory)
 {
 	BOOL bGroupFlag = FALSE;
 	if (bHistory)
@@ -602,8 +586,8 @@ BOOL CGhostTextBuffer::InsertText(CCrystalTextView * pSource, int nLine,
 	vector<DWORD> paSavedRevisonNumbers;
 	paSavedRevisonNumbers.push_back(m_aLines[nLine].m_dwRevisionNumber);
 
-	if (!InternalInsertText(pSource, nLine, nPos, pszText, cchText, nEndLine, nEndChar))
-		return FALSE;
+	POINT ptCursorPos = InternalInsertText(pSource, nLine, nPos, pszText, cchText);
+
 	m_dwCurrentRevisionNumber++;
 
 	// set WinMerge flags
@@ -611,16 +595,16 @@ BOOL CGhostTextBuffer::InsertText(CCrystalTextView * pSource, int nLine,
 
 	// when inserting an EOL terminated text into a ghost line,
 	// there is a dicrepancy between nInsertedLines and nEndLine-nRealLine
-	const bool bDiscrepancyInInsertedLines = bFirstLineGhost && nEndChar == 0;
+	const bool bDiscrepancyInInsertedLines = bFirstLineGhost && ptCursorPos.x == 0;
 
 	// compute the number of real lines created (for undo)
-	int nRealLinesCreated = nEndLine - nLine;
-	if (bFirstLineGhost && nEndChar > 0)
+	int nRealLinesCreated = ptCursorPos.y - nLine;
+	if (bFirstLineGhost && ptCursorPos.x > 0)
 		// we create one more real line
-		nRealLinesCreated ++;
+		++nRealLinesCreated;
 
 	int i;
-	for (i = nLine ; i < nEndLine ; i++)
+	for (i = nLine ; i < ptCursorPos.y ; i++)
 	{
 		// update line revision numbers of modified lines
 		m_aLines[i].m_dwRevisionNumber = m_dwCurrentRevisionNumber;
@@ -637,7 +621,7 @@ BOOL CGhostTextBuffer::InsertText(CCrystalTextView * pSource, int nLine,
 	if (bFirstLineGhost)
 	{
 		// where is the first line after the inserted text ?
-		int nInsertedTextLinesCount = nEndLine - nLine + (bDiscrepancyInInsertedLines ? 0 : 1);
+		int nInsertedTextLinesCount = ptCursorPos.y - nLine + (bDiscrepancyInInsertedLines ? 0 : 1);
 		int nLineAfterInsertedBlock = nLine + nInsertedTextLinesCount;
 		// delete at most nInsertedTextLinesCount - 1 ghost lines
 		// as the first ghost line has been reused
@@ -648,41 +632,40 @@ BOOL CGhostTextBuffer::InsertText(CCrystalTextView * pSource, int nLine,
 		InternalDeleteGhostLine(pSource, nLineAfterInsertedBlock, i);
 	}
 
-	for (i = nLine ; i < nEndLine ; i++)
-		SetLineFlag(i, LF_GHOST, FALSE, FALSE, FALSE);
+	for (i = nLine ; i < ptCursorPos.y ; i++)
+		m_aLines[i].m_dwFlags &= ~LF_GHOST;
 	if (!bDiscrepancyInInsertedLines)
 		// if there is no discrepancy, the final cursor line is real
 		// as either some text was inserted in it, or it inherits the real status from the first line
-		SetLineFlag(i, LF_GHOST, FALSE, FALSE, FALSE);
+		m_aLines[i].m_dwFlags &= ~LF_GHOST;
 	else
 		// if there is a discrepancy, the final cursor line was not changed during insertion so we do nothing
 		;
 
 	// now we can recompute
-	if ((nEndLine > nLine) || bFirstLineGhost)
+	if ((ptCursorPos.y > nLine) || bFirstLineGhost)
 	{
 		// TODO: Be smarter, and don't recompute if it is easy to see what changed
 		RecomputeRealityMapping();
 	}
 
-	RecomputeEOL(pSource, nLine, nEndLine);
+	RecomputeEOL(pSource, nLine, ptCursorPos.y);
 
-	if (!bHistory)
-		return TRUE;
+	if (bHistory)
+	{
+		POINT ptStartPos = { nPos, nLine };
+		UndoRecord &ur = AddUndoRecord(TRUE, ptStartPos, ptCursorPos,
+			pszText, cchText, nRealLinesCreated, nAction);
+		ur.m_paSavedRevisonNumbers.swap(paSavedRevisonNumbers);
 
-	POINT ptStartPos = { nPos, nLine };
-	POINT ptEndPos = { nEndChar, nEndLine };
-	UndoRecord &ur = AddUndoRecord(TRUE, ptStartPos, ptEndPos,
-		pszText, cchText, nRealLinesCreated, nAction);
-	ur.m_paSavedRevisonNumbers.swap(paSavedRevisonNumbers);
+		if (bGroupFlag)
+			FlushUndoGroup(pSource);
 
-	if (bGroupFlag)
-		FlushUndoGroup(pSource);
-
-	// nEndLine may have changed during Rescan
-	nEndLine = m_ptLastChange.y;
-
-	return TRUE;
+		// nEndLine may have changed during Rescan
+		// (TODO: Shouldn't that happen outside the if?)
+		ptCursorPos.y = m_ptLastChange.y;
+	}
+	return ptCursorPos;
 }
 
 /**
@@ -696,14 +679,14 @@ BOOL CGhostTextBuffer::InsertText(CCrystalTextView * pSource, int nLine,
  * @param [in] bHistory Save insertion for undo/redo?
  * @return TRUE if the deletion succeeded, FALSE otherwise.
  */
-BOOL CGhostTextBuffer::DeleteText(CCrystalTextView * pSource, int nStartLine,
+void CGhostTextBuffer::DeleteText(CCrystalTextView * pSource, int nStartLine,
 		int nStartChar, int nEndLine, int nEndChar, int nAction, BOOL bHistory)
 {
 	String sTextToDelete;
 	GetTextWithoutEmptys(nStartLine, nStartChar, nEndLine, nEndChar, sTextToDelete);
 	// If there is nothing to delete, bail out.
 	if (sTextToDelete.empty())
-		return FALSE;
+		return;
 
 	// If we want to add undo record, but haven't created undo group yet,
 	// create new group for this action. It gets flushed at end of the
@@ -739,8 +722,8 @@ BOOL CGhostTextBuffer::DeleteText(CCrystalTextView * pSource, int nStartLine,
 	if (!bLastLineGhost)
 		++nRealLinesInDeletedBlock;
 
-	if (!InternalDeleteText(pSource, nStartLine, nStartChar, nEndLine, nEndChar))
-	    return FALSE;
+	InternalDeleteText(pSource, nStartLine, nStartChar, nEndLine, nEndChar);
+
 	m_dwCurrentRevisionNumber++;
 
 	OnNotifyLineHasBeenEdited(nStartLine);
@@ -775,19 +758,18 @@ BOOL CGhostTextBuffer::DeleteText(CCrystalTextView * pSource, int nStartLine,
 
 	RecomputeEOL(pSource, nStartLine, nStartLine);
 
-	if (!bHistory)
-		return TRUE;
+	if (bHistory)
+	{
+		POINT ptStartPos = { nStartChar, nStartLine };
+		POINT ptEndPos = { 0, -1 };
+		UndoRecord &ur = AddUndoRecord(FALSE, ptStartPos, ptEndPos,
+			sTextToDelete.c_str(), sTextToDelete.length(),
+			nRealLinesInDeletedBlock, nAction);
+		ur.m_paSavedRevisonNumbers.swap(paSavedRevisonNumbers);
 
-	POINT ptStartPos = { nStartChar, nStartLine };
-	POINT ptEndPos = { 0, -1 };
-	UndoRecord &ur = AddUndoRecord(FALSE, ptStartPos, ptEndPos,
-		sTextToDelete.c_str(), sTextToDelete.length(),
-		nRealLinesInDeletedBlock, nAction);
-	ur.m_paSavedRevisonNumbers.swap(paSavedRevisonNumbers);
-
-	if (bGroupFlag)
-		FlushUndoGroup(pSource);
-	return TRUE;
+		if (bGroupFlag)
+			FlushUndoGroup(pSource);
+	}
 }
 
 /**
@@ -801,7 +783,7 @@ BOOL CGhostTextBuffer::InsertGhostLine(CCrystalTextView * pSource, int nLine)
 	if (!InternalInsertGhostLine(pSource, nLine))
 		return FALSE;
 	// Set WinMerge flags  
-	SetLineFlag(nLine, LF_GHOST, TRUE, FALSE, FALSE);
+	m_aLines[nLine].m_dwFlags |= LF_GHOST;
 	RecomputeRealityMapping();
 	// Don't need to recompute EOL as real lines are unchanged.
 	// Never AddUndoRecord as Rescan clears the ghost lines.
