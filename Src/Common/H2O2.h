@@ -5,7 +5,7 @@
 // Both H2O and H2O2 share a common set of decorator templates.
 //
 // Copyright (c) 2005-2010  David Nash (as of Win32++ v7.0.2)
-// Copyright (c) 2011		Jochen Neubeck
+// Copyright (c) 2011-2012  Jochen Neubeck
 //
 // Permission is hereby granted, free of charge, to
 // any person obtaining a copy of this software and
@@ -286,9 +286,8 @@ namespace H2O
 		{
 			int i = SendDlgItemMessage(id, CB_FINDSTRINGEXACT, -1,
 				reinterpret_cast<LPARAM>(s.c_str()));
-			if (i >= 0)
-				SendDlgItemMessage(id, CB_SETCURSEL, i);
-			else
+			SendDlgItemMessage(id, CB_SETCURSEL, i);
+			if (i < 0)
 				SetDlgItemText(id, s.c_str());
 			return true;
 		}
