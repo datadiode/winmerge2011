@@ -101,7 +101,6 @@ const FilterCommentsSet &FilterCommentsManager::GetSetForFileType(const String& 
  */
 const char *FilterCommentsSet::FindCommentMarker(const char *target, const stl::string &marker)
 {
-	char prev = '\0';
 	char quote = '\0';
 	const char *marker_ptr = marker.c_str();
 	size_t marker_len = marker.length();
@@ -111,13 +110,12 @@ const char *FilterCommentsSet::FindCommentMarker(const char *target, const stl::
 			break;
 		if (quote == '\0' && memcmp(target, marker_ptr, marker_len) == 0)
 			break;
-		if ((prev != '\\') &&
-			(c == '"' || c == '\'') &&
-			(quote == '\0' || quote == c))
-		{
+		if (c == '\\')
+			quote ^= 0x80;
+		else if ((c == '"' || c == '\'') && (quote == '\0' || quote == c))
 			quote ^= c;
-		}
-		prev = c;
+		else
+			quote &= 0x7F;
 		++target;
 	}
 	return target;
