@@ -69,7 +69,9 @@
 #include "MergeCmdLineInfo.h"
 #include "FileOrFolderSelect.h"
 #include "stringdiffs.h"
+#include "MergeCmdLineInfo.h"
 #include "OpenDlg.h"
+#include <MyCom.h>
 #include <mlang.h>
 
 using stl::vector;
@@ -173,7 +175,6 @@ CMainFrame::CMainFrame(HWindow *pWnd)
 , m_CheckOutMulti(FALSE)
 , m_bVCProjSync(FALSE)
 , m_bVssSuppressPathCheck(FALSE)
-, m_pLineFilters(new LineFiltersList())
 , m_wndToolBar(NULL)
 , m_wndStatusBar(NULL)
 , m_wndTabBar(NULL)
@@ -193,14 +194,7 @@ CMainFrame::CMainFrame(HWindow *pWnd)
 
 	InitializeSourceControlMembers();
 
-	// If there are no filters loaded, and there is filter string in previous
-	// option string, import old filters to new place.
-	if (m_pLineFilters->GetCount() == 0)
-	{
-		String oldFilter = SettingStore.GetProfileString(_T("Settings"), _T("RegExps"));
-		if (!oldFilter.empty())
-			m_pLineFilters->Import(oldFilter.c_str());
-	}
+	globalLineFilters.LoadFilters();
 
 	LoadFilesMRU();
 
@@ -1380,19 +1374,19 @@ void CMainFrame::OnOptions()
  * @param [in] pszRight Right-side path.
  * @param [in] dwLeftFlags Left-side flags.
  * @param [in] dwRightFlags Right-side flags.
- * @param [in] bRecurse Do we run recursive (folder) compare?
+ * @param [in] nRecursive Do we run recursive (folder) compare?
  * @param [in] pDirDoc Dir compare document to use.
  * @return TRUE if opening files and compare succeeded, FALSE otherwise.
  */
 bool CMainFrame::DoFileOpen(FileLocation &filelocLeft, FileLocation &filelocRight,
-	DWORD dwLeftFlags, DWORD dwRightFlags, BOOL bRecurse, CDirFrame *pDirDoc)
+	DWORD dwLeftFlags, DWORD dwRightFlags, int nRecursive, CDirFrame *pDirDoc)
 {
 	// If the dirdoc we are supposed to use is busy doing a diff, bail out
 	if (IsComparing())
 		return false;
 
-	bool bROLeft = (dwLeftFlags & FFILEOPEN_READONLY) != 0;
-	bool bRORight = (dwRightFlags & FFILEOPEN_READONLY) != 0;
+	BOOL bROLeft = (dwLeftFlags & FFILEOPEN_READONLY) != 0;
+	BOOL bRORight = (dwRightFlags & FFILEOPEN_READONLY) != 0;
 
 	UINT idCompareAs = 0;
 	PackingInfo packingInfo;
@@ -1404,25 +1398,23 @@ bool CMainFrame::DoFileOpen(FileLocation &filelocLeft, FileLocation &filelocRigh
 	if (attrLeft == INVALID_FILE_ATTRIBUTES || attrRight == INVALID_FILE_ATTRIBUTES)
 	{
 		COpenDlg dlg;
-		dlg.m_strLeft = filelocLeft.filepath;
-		dlg.m_strRight = filelocRight.filepath;
-		dlg.m_bRecurse = bRecurse;
-		dlg.m_bLeftReadOnly = bROLeft;
-		dlg.m_bRightReadOnly = bRORight;
+		dlg.m_sLeftFile = filelocLeft.filepath;
+		dlg.m_sRightFile = filelocRight.filepath;
+		dlg.m_nRecursive = nRecursive;
+		dlg.m_bLeftPathReadOnly = bROLeft;
+		dlg.m_bRightPathReadOnly = bRORight;
 
-		if (dwLeftFlags & FFILEOPEN_PROJECT || dwRightFlags & FFILEOPEN_PROJECT)
-			dlg.m_bOverwriteRecursive = true; // Use given value, not previously used value
-		if (dwLeftFlags & FFILEOPEN_CMDLINE || dwRightFlags & FFILEOPEN_CMDLINE)
+		if ((dwLeftFlags | dwRightFlags) & (FFILEOPEN_PROJECT | FFILEOPEN_CMDLINE))
 			dlg.m_bOverwriteRecursive = true; // Use given value, not previously used value
 
 		if (LanguageSelect.DoModal(dlg, m_hWnd) != IDOK)
 			return false;
 
-		filelocLeft.filepath = dlg.m_strLeft;
-		filelocRight.filepath = dlg.m_strRight;
-		bRecurse = dlg.m_bRecurse;
-		bROLeft = dlg.m_bLeftReadOnly;
-		bRORight = dlg.m_bRightReadOnly;
+		filelocLeft.filepath = dlg.m_sLeftFile;
+		filelocRight.filepath = dlg.m_sRightFile;
+		nRecursive = dlg.m_nRecursive;
+		bROLeft = dlg.m_bLeftPathReadOnly;
+		bRORight = dlg.m_bRightPathReadOnly;
 		idCompareAs = dlg.m_idCompareAs;
 		// TODO: add codepage options to open dialog ?
 		if (idCompareAs != 0)
@@ -1472,7 +1464,7 @@ bool CMainFrame::DoFileOpen(FileLocation &filelocLeft, FileLocation &filelocRigh
 			_T("### End Comparison Parameters #############################\r\n"),
 			filelocLeft.filepath.c_str(),
 			filelocRight.filepath.c_str(),
-			bRecurse);
+			nRecursive);
 	}
 
 	CTempPathContext *pTempPathContext = NULL;
@@ -1658,7 +1650,7 @@ bool CMainFrame::DoFileOpen(FileLocation &filelocLeft, FileLocation &filelocRigh
 			// exception. There is no point in checking return value.
 			pDirDoc->InitCompare(
 				filelocLeft.filepath.c_str(), filelocRight.filepath.c_str(),
-				bRecurse, pTempPathContext);
+				nRecursive, pTempPathContext);
 			LogFile.Write(CLogFile::LNOTICE, _T("Open dirs: Left: %s\n\tRight: %s."),
 				filelocLeft.filepath.c_str(), filelocRight.filepath.c_str());
 
@@ -1695,16 +1687,16 @@ bool CMainFrame::DoFileOpen(FileLocation &filelocLeft, FileLocation &filelocRigh
  * @param [in] pszPath Full path to file to backup.
  * @return TRUE if backup succeeds, or isn't just done.
  */
-BOOL CMainFrame::CreateBackup(BOOL bFolder, LPCTSTR pszPath)
+bool CMainFrame::CreateBackup(BOOL bFolder, LPCTSTR pszPath)
 {
 	// If user doesn't want backups in given context, return success
 	// so operations don't abort.
 	if (!COptionsMgr::Get(bFolder ? OPT_BACKUP_FOLDERCMP : OPT_BACKUP_FILECMP))
-		return TRUE;
+		return true;
 
 	// create backup copy of file if destination file exists
 	if (!paths_DoesPathExist(pszPath) == IS_EXISTING_FILE)
-		return TRUE;
+		return true;
 
 	String bakPath;
 	String path;
@@ -1759,9 +1751,9 @@ BOOL CMainFrame::CreateBackup(BOOL bFolder, LPCTSTR pszPath)
 		int response = LanguageSelect.MsgBox(IDS_BACKUP_FAILED_PROMPT, pszPath,
 			MB_YESNO | MB_ICONWARNING | MB_DONT_ASK_AGAIN);
 		if (response != IDYES)
-			return FALSE;
+			return false;
 	}
-	return TRUE;
+	return true;
 }
 
 /**
@@ -1773,13 +1765,10 @@ BOOL CMainFrame::CreateBackup(BOOL bFolder, LPCTSTR pszPath)
  * @sa CMainFrame::HandleReadonlySave()
  * @sa CDirView::PerformActionList()
  */
-int CMainFrame::SyncFileToVCS(LPCTSTR pszDest, BOOL &bApplyToAll,
-	String *psError)
+int CMainFrame::SyncFileToVCS(LPCTSTR pszDest, BOOL &bApplyToAll, String *psError)
 {
 	String strSavePath(pszDest);
-	int nVerSys = 0;
-
-	nVerSys = COptionsMgr::Get(OPT_VCS_SYSTEM);
+	int nVerSys = COptionsMgr::Get(OPT_VCS_SYSTEM);
 	
 	int nRetVal = HandleReadonlySave(strSavePath, TRUE, bApplyToAll);
 	if (nRetVal == IDCANCEL || nRetVal == IDNO)
@@ -2648,9 +2637,8 @@ void CMainFrame::OnToolsFilters()
 	OPropertySheet sht;
 	sht.m_caption = LanguageSelect.LoadString(IDS_FILTER_TITLE);
 	sht.m_psh.dwFlags |= PSH_NOAPPLYNOW | PSH_NOCONTEXTHELP;
-	LineFiltersDlg lineFiltersDlg(m_pLineFilters.get());
+	LineFiltersDlg lineFiltersDlg;
 	FileFiltersDlg fileFiltersDlg;
-	LineFiltersList lineFilters(m_pLineFilters.get());
 	const String origFilter = globalFileFilter.GetFilterNameOrMask();
 	if (PROPSHEETPAGE *psp = sht.AddPage(fileFiltersDlg))
 	{
@@ -2665,6 +2653,19 @@ void CMainFrame::OnToolsFilters()
 		psp->hInstance = LanguageSelect.FindResourceHandle(lineFiltersDlg.m_idd, RT_DIALOG);
 		psp->pszTitle = lineFiltersDlg.m_strCaption.c_str();
 		psp->hIcon = LanguageSelect.LoadIcon(IDI_LINEFILTER);
+	}
+	if (CDocFrame *pFrame = GetActiveDocFrame())
+	{
+		FRAMETYPE frame = pFrame->GetFrameType();
+		if (frame == FRAME_FILE)
+		{
+			sht.m_psh.nStartPage = 1;
+			CChildFrame *pDoc = static_cast<CChildFrame *>(pFrame);
+			CMergeEditView *pView = pDoc->GetActiveMergeView();
+			POINT pt = pView->GetCursorPos();
+			if (int cchTestCase = pView->GetLineLength(pt.y))
+				pView->GetTextWithoutEmptys(pt.y, 0, pt.y, cchTestCase, lineFiltersDlg.m_strTestCase);
+		}
 	}
 	// Make sure all filters are up-to-date
 	globalFileFilter.ReloadUpdatedFilters();
@@ -2689,7 +2690,6 @@ void CMainFrame::OnToolsFilters()
 		else
 		{
 			globalFileFilter.SetFileFilterPath(path.c_str());
-			globalFileFilter.UseMask(FALSE);
 			String sFilter = globalFileFilter.GetFilterNameOrMask();
 			COptionsMgr::SaveOption(OPT_FILEFILTER_CURRENT, sFilter);
 		}
@@ -2697,13 +2697,12 @@ void CMainFrame::OnToolsFilters()
 		COptionsMgr::SaveOption(OPT_LINEFILTER_ENABLED, linefiltersEnabled != FALSE);
 
 		// Save new filters before (possibly) rescanning
-		m_pLineFilters->SaveFilters();
+		globalLineFilters.SaveFilters();
 
 		// Check if compare documents need rescanning
 		int idRefreshFiles = IDNO;
 		int idRefreshFolders = IDNO;
-		if (lineFiltersEnabledOrig != linefiltersEnabled || 
-			!lineFilters.Compare(m_pLineFilters.get()))
+		if (lineFiltersDlg.m_bLineFiltersDirty)
 		{
 			idRefreshFiles = IDYES; // Start without asking
 			idRefreshFolders = 0; // Ask before starting
@@ -2720,7 +2719,10 @@ void CMainFrame::OnToolsFilters()
 			{
 			case FRAME_FILE:
 				if (idRefreshFiles == IDYES)
+				{
+					static_cast<CChildFrame *>(pDocFrame)->RefreshOptions();
 					static_cast<CChildFrame *>(pDocFrame)->FlushAndRescan(TRUE);
+				}
 				break;
 			case FRAME_FOLDER:
 				if (idRefreshFolders == 0)
@@ -3121,7 +3123,7 @@ void CMainFrame::OnSaveProject()
 		{
 			// Get paths currently in compare
 			CDirFrame *pDoc = static_cast<CDirFrame *>(pFrame);
-			pathsDlg.m_bIncludeSubfolders = pDoc->GetRecursive();
+			pathsDlg.m_nRecursive = pDoc->GetRecursive();
 			pathsDlg.m_bLeftPathReadOnly = pDoc->GetLeftReadOnly();
 			pathsDlg.m_bRightPathReadOnly = pDoc->GetRightReadOnly();
 		}
@@ -3587,8 +3589,7 @@ void CMainFrame::OnToolTipText(NMHDR* pNMHDR)
 		strFullText = LanguageSelect.LoadString(nID);
 		// don't handle the message if no string resource found
 		String::size_type i = strFullText.find('\n');
-		if (i == String::npos)
-			return;
+		C_ASSERT(-1 == String::npos);
 		strTipText = strFullText.c_str() + i + 1;
 	}
 	lstrcpyn(pTTT->szText, strTipText, _countof(pTTT->szText));
@@ -3714,49 +3715,39 @@ bool CMainFrame::LoadAndOpenProjectFile(LPCTSTR lpProject)
 		return false;
 
 	ProjectFile project;
-	String sErr;
-	if (!project.Read(lpProject, sErr))
-	{
-		if (sErr.empty())
-			sErr = LanguageSelect.LoadString(IDS_UNK_ERROR_READING_PROJECT);
-		LanguageSelect.FormatMessage(
-			IDS_ERROR_FILEOPEN, lpProject, sErr.c_str()
-		).MsgBox(MB_ICONSTOP);
+	if (!project.Read(lpProject))
 		return false;
-	}
 
-	if (project.HasFilter())
+	if (!project.m_sFilter.empty())
 	{
-		String filter = project.GetFilter();
-		filter = string_trim_ws(filter);
-		globalFileFilter.SetFilter(filter);
+		globalFileFilter.SetFilter(project.m_sFilter);
 	}
 
-	bool bRecursive = project.HasSubfolders() && project.GetSubfolders() > 0;
+	int nRecursive = project.m_nRecursive;
 
 	FileLocation filelocLeft, filelocRight;
 
 	DWORD dwLeftFlags = FFILEOPEN_DETECT;
-	filelocLeft.filepath = project.GetLeft();
+	filelocLeft.filepath = project.m_sLeftFile;
 	if (!filelocLeft.filepath.empty())
 	{	
 		dwLeftFlags |= FFILEOPEN_PROJECT;
-		if (project.GetLeftReadOnly())
+		if (project.m_bLeftPathReadOnly)
 			dwLeftFlags |= FFILEOPEN_READONLY;
 	}
 
 	DWORD dwRightFlags = FFILEOPEN_DETECT;
-	filelocRight.filepath = project.GetRight();
+	filelocRight.filepath = project.m_sRightFile;
 	if (!filelocRight.filepath.empty())
 	{	
 		dwRightFlags |= FFILEOPEN_PROJECT;
-		if (project.GetRightReadOnly())
+		if (project.m_bRightPathReadOnly)
 			dwRightFlags |= FFILEOPEN_READONLY;
 	}
 
-	SettingStore.WriteProfileInt(_T("Settings"), _T("Recurse"), bRecursive);
+	SettingStore.WriteProfileInt(_T("Settings"), _T("Recurse"), nRecursive);
 
-	bool rtn = DoFileOpen(filelocLeft, filelocRight, dwLeftFlags, dwRightFlags, bRecursive);
+	bool rtn = DoFileOpen(filelocLeft, filelocRight, dwLeftFlags, dwRightFlags, nRecursive);
 
 	String sProject(lpProject); // !!! the erase() below may invalidate lpProject!
 	vector<String>::iterator it = find(m_FilesMRU.begin(), m_FilesMRU.end(), sProject);

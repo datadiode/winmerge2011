@@ -20,29 +20,34 @@ class LineFiltersDlg : public ODialog
 {
 // Construction
 public:
-	LineFiltersDlg(LineFiltersList *);
+	LineFiltersDlg();
 
 // Dialog Data
 	BOOL	m_bIgnoreRegExp;
+	BOOL	m_bLineFiltersDirty;
 	String	m_strCaption;
+	String	m_strTestCase;
 
 // Implementation
 protected:
 
 	virtual BOOL OnInitDialog();
 	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
-	LRESULT OnNotify(NMHDR *);
+	LRESULT OnNotify(UNotify *);
+	void OnCustomdraw(HSurface *);
 	void OnApply();
 	void OnBnClickedLfilterAddBtn();
 	void OnBnClickedLfilterEditbtn();
 	void OnBnClickedLfilterRemovebtn();
 
 	void InitList();
+	void DoInPlaceEditingEvents();
 	int AddRow(LPCTSTR filter = NULL, BOOL enabled = FALSE);
 	void EditSelectedFilter();
 
 private:
-	HListView *m_filtersList; /**< List control having filter strings */
-
-	LineFiltersList *const m_pList; /**< Helper list for getting/setting filters. */
+	HListView *m_LvFilter; /**< List control having filter strings */
+	HEdit *m_EdFilter;
+	HEdit *m_pEdTestCase;
+	HListView *m_pLvTestCase;
 };

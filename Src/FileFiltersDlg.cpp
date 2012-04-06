@@ -28,6 +28,7 @@
 #include "MainFrm.h"
 #include "FileFiltersDlg.h"
 #include "coretools.h"
+#include "FileFilter.h"
 #include "FileFilterMgr.h"
 #include "paths.h"
 #include "SharedFilterDlg.h"
@@ -57,8 +58,8 @@ static const TCHAR FilterHelpLocation[] = _T("::/htmlhelp/Filters.html");
 FileFiltersDlg::FileFiltersDlg()
 : ODialog(IDD_FILEFILTERS)
 , m_listFilters(NULL)
+, m_Filters(globalFileFilter.GetFileFilters(m_sFileFilterPath))
 {
-	globalFileFilter.GetFileFilters(&m_Filters, m_sFileFilterPath);
 	m_strCaption = LanguageSelect.LoadDialogCaption(m_idd);
 }
 
@@ -207,12 +208,12 @@ BOOL FileFiltersDlg::OnInitDialog()
  */
 void FileFiltersDlg::AddToGrid(int filterIndex)
 {
-	const FileFilterInfo & filterinfo = m_Filters.at(filterIndex);
+	const FileFilter *filter = m_Filters.at(filterIndex);
 	const int item = filterIndex + 1;
-	m_listFilters->InsertItem(item, filterinfo.name.c_str());
-	m_listFilters->SetItemText(item, 1, filterinfo.description.c_str());
-	m_listFilters->SetItemText(item, 2, filterinfo.fullpath.c_str());
-	if (m_sFileFilterPath == filterinfo.fullpath)
+	m_listFilters->InsertItem(item, filter->name.c_str());
+	m_listFilters->SetItemText(item, 1, filter->description.c_str());
+	m_listFilters->SetItemText(item, 2, filter->fullpath.c_str());
+	if (m_sFileFilterPath == filter->fullpath)
 		SelectFilterByIndex(item);
 }
 
@@ -404,11 +405,7 @@ void FileFiltersDlg::OnBnClickedFilterfileNewbutton()
 		if (retval == FILTER_OK)
 		{
 			// Remove all from filterslist and re-add so we can update UI
-			String selected;
-			m_Filters.clear();
 			globalFileFilter.LoadAllFileFilters();
-			globalFileFilter.GetFileFilters(&m_Filters, selected);
-
 			UpdateFiltersList();
 		}
 	}
@@ -419,7 +416,7 @@ void FileFiltersDlg::OnBnClickedFilterfileNewbutton()
  */
 void FileFiltersDlg::OnBnClickedFilterfileDelete()
 {
-	int sel =- 1;
+	int sel = -1;
 
 	sel = m_listFilters->GetNextItem(sel, LVNI_SELECTED);
 
@@ -436,12 +433,6 @@ void FileFiltersDlg::OnBnClickedFilterfileDelete()
 			{
 				FileFilterMgr *pMgr = globalFileFilter.GetManager();
 				pMgr->RemoveFilter(path.c_str());
-				
-				// Remove all from filterslist and re-add so we can update UI
-				String selected;
-				m_Filters.clear();
-				globalFileFilter.GetFileFilters(&m_Filters, selected);
-
 				UpdateFiltersList();
 			}
 			else
@@ -520,12 +511,6 @@ void FileFiltersDlg::OnBnClickedFilterfileInstall()
 		{
 			FileFilterMgr *pMgr = globalFileFilter.GetManager();
 			pMgr->AddFilter(userPath.c_str());
-
-			// Remove all from filterslist and re-add so we can update UI
-			String selected;
-			m_Filters.clear();
-			globalFileFilter.GetFileFilters(&m_Filters, selected);
-
 			UpdateFiltersList();
 		}
 	}

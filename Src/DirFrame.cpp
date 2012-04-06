@@ -91,7 +91,7 @@ CDirFrame::CDirFrame(CMainFrame *pMDIFrame)
 #pragma warning(default:warning_this_used_in_base_member_initializer_list)
 , m_pCtxt(NULL)
 , m_pCompareStats(new CompareStats)
-, m_bRecursive(FALSE)
+, m_nRecursive(0)
 , m_pTempPathContext(NULL)
 {
 	if (m_pHandleSet->m_cRef == 1)
@@ -160,9 +160,9 @@ void CDirFrame::UpdateCmdUI<ID_VIEW_TREEMODE>()
 {
 	m_pMDIFrame->UpdateCmdUI<ID_VIEW_TREEMODE>(
 		(m_pDirView->m_bTreeMode ? MF_CHECKED : MF_UNCHECKED) |
-		(GetRecursive() ? MF_ENABLED : MF_GRAYED));
-	BYTE enable = m_pDirView->m_bTreeMode ? MF_ENABLED : MF_GRAYED;
-	m_pMDIFrame->UpdateCmdUI<ID_VIEW_EXPAND_ALLSUBDIRS>(enable);
+		(GetRecursive() == 1 ? MF_ENABLED : MF_GRAYED));
+	m_pMDIFrame->UpdateCmdUI<ID_VIEW_EXPAND_ALLSUBDIRS>(
+		m_pDirView->m_bTreeMode && GetRecursive() == 1 ? MF_ENABLED : MF_GRAYED);
 }
 
 template<>

@@ -36,6 +36,8 @@ typedef unsigned word;
 #define EXTERN_C
 #include <common/unicoder.h> // DetermineEncoding()
 
+size_t apply_prediffer(struct file_data *current, short side, char *buffer, size_t length);
+
 /* Lines are put into equivalence classes (of lines that match in line_cmp).
    Each equivalence class is represented by one of these structures,
    but only while the classes are being computed.
@@ -67,7 +69,7 @@ static int equivs_alloc;
 
 static void find_and_hash_each_line PARAMS((struct file_data *));
 static void find_identical_ends PARAMS((struct file_data[]));
-static char *prepare_text_end PARAMS((struct file_data *));
+static char *prepare_text_end PARAMS((struct file_data *, short));
 static enum UNICODESET get_unicode_signature(struct file_data *, size_t *bom);
 
 /* Check for binary files and compare them for exact identity.  */
@@ -431,8 +433,9 @@ hashing_done:;
    Return effective start of text to be compared. */
 
 static char *
-prepare_text_end (current)
+prepare_text_end (current, side)
      struct file_data *current;
+	 short side;
 {
   FSIZE buffered_chars = current->buffered_chars;
   char *const p = current->buffer;
@@ -611,6 +614,19 @@ prepare_text_end (current)
       r = u; // skip the BOM
     }
 
+  if (buffered_chars == 0 || p[buffered_chars - 1] == '\n' || p[buffered_chars - 1] == '\r')
+    current->missing_newline = 0;
+  else
+    {
+      p[buffered_chars++] = '\n';
+      current->missing_newline = 1;
+    }
+
+	if (side != -1)
+		buffered_chars = apply_prediffer(current, side, p, buffered_chars);
+
+	current->buffered_chars = buffered_chars;
+
 	/* Count line endings and map them to '\n' if ignore_eol_diff is set. */
 	t = q = p + buffered_chars;
 	while (q > r)
@@ -641,19 +657,9 @@ prepare_text_end (current)
 		}
 	}
 
-  if (buffered_chars == 0 || p[buffered_chars - 1] == '\n' || p[buffered_chars - 1] == '\r')
-    current->missing_newline = 0;
-  else
-    {
-      p[buffered_chars++] = '\n';
-      current->missing_newline = 1;
-    }
-  current->buffered_chars = buffered_chars;
-  
   /* Don't use uninitialized storage when planting or using sentinels.  */
-  if (p)
-    bzero (p + buffered_chars, sizeof (word));
-  return ignore_eol_diff ? t : r;
+  bzero (p + buffered_chars, sizeof (word));
+  return t;
 }
 
 /* Given a vector of two file_data objects, find the identical
@@ -674,15 +680,17 @@ find_identical_ends (filevec)
   int buffered_prefix, prefix_count, prefix_mask;
   int ttt;
 
-  slurp (&filevec[0]);
-  buffer0 = prepare_text_end (&filevec[0]);
   if (filevec[0].desc != filevec[1].desc)
     {
+      slurp (&filevec[0]);
+      buffer0 = prepare_text_end (&filevec[0], 0);
       slurp (&filevec[1]);
-      buffer1 = prepare_text_end (&filevec[1]);
+      buffer1 = prepare_text_end (&filevec[1], 1);
     }
   else
     {
+      slurp (&filevec[0]);
+      buffer0 = prepare_text_end (&filevec[0], -1);
       filevec[1].buffer = filevec[0].buffer;
       filevec[1].bufsize = filevec[0].bufsize;
       filevec[1].buffered_chars = filevec[0].buffered_chars;

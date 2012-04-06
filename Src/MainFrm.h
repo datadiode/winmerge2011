@@ -84,13 +84,13 @@ public:
 	void InitialActivate(int nCmdShow);
 	void EnableModeless(BOOL bEnable);
 	void SetBitmaps(HMENU);
-	int SyncFileToVCS(LPCTSTR pszDest,	BOOL &bApplyToAll, String *psError);
+	int SyncFileToVCS(LPCTSTR pszDest, BOOL &bApplyToAll, String *psError);
 	bool DoFileOpen(
 		FileLocation &filelocLeft,
 		FileLocation &filelocRight,
 		DWORD dwLeftFlags = FFILEOPEN_DETECT,
 		DWORD dwRightFlags = FFILEOPEN_DETECT,
-		BOOL bRecurse = FALSE,
+		int nRecursive = 0,
 		CDirFrame * = NULL);
 	void ShowMergeDoc(CDirFrame *,
 		FileLocation & filelocLeft,
@@ -103,7 +103,7 @@ public:
 		const FileLocation &,
 		BOOL bLeftRO, BOOL bRightRO);
 	void UpdateResources();
-	BOOL CreateBackup(BOOL bFolder, LPCTSTR pszPath);
+	static bool CreateBackup(BOOL bFolder, LPCTSTR pszPath);
 	int HandleReadonlySave(String &strSavePath, BOOL bMultiFile, BOOL &bApplyToAll);
 	void SetStatus(UINT);
 	void SetStatus(LPCTSTR);
@@ -148,7 +148,6 @@ public:
 	bool m_bEscShutdown; /**< If commandline switch -e given ESC closes appliction */
 	bool m_bClearCaseTool; /**< WinMerge is executed as an external Rational ClearCase compare/merge tool. */
 	MergeCmdLineInfo::ExitNoDiff m_bExitIfNoDiff; /**< Exit if files are identical? */
-	const stl::auto_ptr<LineFiltersList> m_pLineFilters; /**< List of linefilters */
 
 	/**
 	 * @name Version Control System (VCS) integration.
@@ -193,8 +192,8 @@ protected:
 	 */
 	struct MENUITEM_ICON
 	{
-		int menuitemID;   /**< Menu item's ID. */
-		int iconResID;    /**< Icon's resource ID. */
+		WORD menuitemID;   /**< Menu item's ID. */
+		WORD iconResID;    /**< Icon's resource ID. */
 	};
 
 	static const MENUITEM_ICON m_MenuIcons[];

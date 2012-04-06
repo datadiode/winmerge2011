@@ -1,3 +1,21 @@
+0.2011.002.145
+Changes since preceding release (not necessarily complete):
+• Issue #4 Option to ignore folder structure when comparing recursively
+• http://winmerge.org/support/3405956 Support partial line filters
+• Fix ClearCase issue with "Allow only one instance to run" option disabled
+• Make FilterCommentsSet::FindCommentMarker() aware of escaped backslashes
+• Make Tools > Filters command accessible through toolbar
+• Fix issues as per http://winmerge.org/support/3512218
+
+2011.002.117
+Changes since preceding release (not necessarily complete):
+• Deletions involving ghost lines could cause crash or improper undo
+• Fix improper en/disabling of Save/Cut/Copy
+• Leave the view open when the user VK_ESCAPEs from renaming an item
+• Issue #15 Assume unicode if IsTextUnicode() returns TRUE regardless of flags
+• A few more places to hide \\?\ and \\?\UNC\ prefixes from user interface
+• Since 2011.002.027, empty files were unintentionally considered binary
+
 2011.002.047
 Changes since preceding release (not necessarily complete):
 • Fix menu text formatting when applying a patch targeted at multiple files

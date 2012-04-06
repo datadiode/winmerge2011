@@ -31,8 +31,7 @@
 /////////////////////////////////////////////////////////////////////////////
 // COpenDlg dialog
 #include "SuperComboBox.h"
-
-class ProjectFile;
+#include "ProjectFile.h"
 
 /**
  * @brief The Open-dialog class.
@@ -46,6 +45,7 @@ class ProjectFile;
 class COpenDlg
 	: ZeroInit<COpenDlg>
 	, public OResizableDialog
+	, public ProjectFile
 {
 // Construction
 public:
@@ -60,12 +60,6 @@ public:
 	HSuperComboBox	*m_pCbExt;
 	HComboBox		*m_pCbCompareAs;
 	HMenu			*m_pCompareAsScriptMenu;
-	String	m_strLeft;
-	String	m_strRight;
-	String	m_strExt;
-	BOOL	m_bRecurse;
-	bool m_bLeftReadOnly; /**< Is left path opened as read-only */
-	bool m_bRightReadOnly; /**< Is right path opened as read-only */
 	bool m_bOverwriteRecursive;  /**< If TRUE overwrite last used value of recursive */
 	UINT m_idCompareAs;
 	TCHAR m_szCompareAs[MAX_PATH];
@@ -84,7 +78,6 @@ private:
 protected:
 	void UpdateButtonStates();
 	void SetStatus(UINT msgID);
-	BOOL LoadProjectFile(LPCTSTR path);
 	void TrimPaths();
 
 	template<DDX_Operation>

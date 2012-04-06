@@ -25,10 +25,10 @@ namespace CompareEngines
  * This compare method compares files in small blocks. Code assumes block size
  * is in range of 32-bit int-type.
  */
-class ByteCompare
+class ByteCompare : public QuickCompareOptions
 {
 public:
-	ByteCompare(const QuickCompareOptions &);
+	ByteCompare(const DIFFOPTIONS &);
 	~ByteCompare();
 
 	void SetAdditionalOptions(bool stopAfterFirstDiff);
@@ -40,7 +40,6 @@ public:
 private:
 	template<class CodePoint, int CodeShift>
 	unsigned CompareFiles(size_t x = 1, size_t j = 0);
-	QuickCompareOptions m_options; /**< Compare options for diffutils. */
 	const IAbortable *m_piAbortable;
 	FileTextStats m_textStats[2];
 	HANDLE m_osfhandle[2];

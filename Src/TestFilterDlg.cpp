@@ -11,6 +11,7 @@
 #include "LanguageSelect.h"
 #include "resource.h"
 #include "TestFilterDlg.h"
+#include "FileFilter.h"
 #include "FileFilterMgr.h"
 
 #ifdef _DEBUG
@@ -25,7 +26,7 @@ static char THIS_FILE[] = __FILE__;
  * @param [in] pFileFilter File filter to test.
  * @param [in] pFilterMgr File filter manager.
  */
-CTestFilterDlg::CTestFilterDlg(FileFilter * pFileFilter, FileFilterMgr *pFilterMgr)
+CTestFilterDlg::CTestFilterDlg(FileFilter *pFileFilter, FileFilterMgr *pFilterMgr)
 : ODialog(IDD_TEST_FILTER)
 , m_pFileFilter(pFileFilter)
 , m_pFileFilterMgr(pFilterMgr)
@@ -66,8 +67,7 @@ BOOL CTestFilterDlg::OnInitDialog()
 
 	GetDlgItem(IDC_TEST_TEXT)->SetFocus();
 
-	String name = m_pFileFilterMgr->GetFilterName(m_pFileFilter);
-	SetDlgItemText(IDC_HEADER_FILTER_NAME, name.c_str());
+	SetDlgItemText(IDC_HEADER_FILTER_NAME, m_pFileFilter->name.c_str());
 	
 	return FALSE;
 }

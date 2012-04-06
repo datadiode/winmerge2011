@@ -9,21 +9,20 @@
 #ifndef _PROJECTFILEPATHSDLG_H_
 #define _PROJECTFILEPATHSDLG_H_
 
+#include "ProjectFile.h"
+
 /**
  * @brief Dialog allowing user to load, edit and save project files.
  */
-class ProjectFilePathsDlg : public ODialog
+class ProjectFilePathsDlg
+	: ZeroInit<ProjectFilePathsDlg>
+	, public ODialog
+	, public ProjectFile
 {
 public:
 	ProjectFilePathsDlg();   // standard constructor
 
 	String m_strCaption;
-	String m_sLeftFile;
-	String m_sRightFile;
-	String m_sFilter;
-	BOOL m_bIncludeSubfolders;
-	BOOL m_bLeftPathReadOnly;
-	BOOL m_bRightPathReadOnly;
 
 protected:
 	template<DDX_Operation>

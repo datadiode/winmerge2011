@@ -23,6 +23,7 @@
 // $Id$
 
 #include "pcre.h"
+#include "DirItem.h"
 
 /**
  * @brief FileFilter rule.
@@ -50,6 +51,9 @@ struct FileFilterElement
  * directories. That is to say, a filter is a set of file masks and
  * directory masks. Usually FileFilter contains rules from one filter
  * definition file. So it can be thought as filter file contents.
+ * fileinfo contains time of filter file's last modification time. By
+ * comparing fileinfo to filter file in disk we can determine if file
+ * is changed since we last time loaded it.
  * @sa FileFilterList
  */
 struct FileFilter
@@ -58,6 +62,7 @@ struct FileFilter
 	String name;			/**< Filter name (shown in UI) */
 	String description;	/**< Filter description text */
 	String fullpath;		/**< Full path to filter file */
+	DirItem fileinfo;		/**< For tracking if file has been modified */
 	stl::vector<FileFilterElement*> filefilters; /**< List of rules for files */
 	stl::vector<FileFilterElement*> dirfilters;  /**< List of rules for directories */
 	FileFilter() : default_include(true) { }

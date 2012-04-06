@@ -48,7 +48,7 @@ FileFilterMgr::~FileFilterMgr()
 int FileFilterMgr::AddFilter(LPCTSTR szFilterFile)
 {
 	int errorcode = FILTER_OK;
-	if (FileFilter *pFilter = LoadFilterFile(szFilterFile, errorcode))
+	if (FileFilter *pFilter = LoadFilterFile(szFilterFile))
 		m_filters.push_back(pFilter);
 	return errorcode;
 }
@@ -165,12 +165,11 @@ static void AddFilterPattern(vector<FileFilterElement*> &filterList, String & st
  * @param [out] error Error-code if loading failed (returned NULL).
  * @return Pointer to new filter, or NULL if error (check error code too).
  */
-FileFilter * FileFilterMgr::LoadFilterFile(LPCTSTR szFilepath, int & error)
+FileFilter *FileFilterMgr::LoadFilterFile(LPCTSTR szFilepath)
 {
 	UniMemFile file;
 	if (!file.OpenReadOnly(szFilepath))
 	{
-		error = FILTER_ERROR_FILEACCESS;
 		return NULL;
 	}
 
@@ -291,11 +290,11 @@ bool TestAgainstRegList(const vector<FileFilterElement*> &filterList, LPCTSTR sz
  * @param [in] szFileName Filename to test
  * @return TRUE if file passes the filter
  */
-bool FileFilterMgr::TestFileNameAgainstFilter(const FileFilter * pFilter,
+bool FileFilterMgr::TestFileNameAgainstFilter(const FileFilter *pFilter,
 	LPCTSTR szFileName) const
 {
 	if (!pFilter)
-		return TRUE;
+		return true;
 	if (TestAgainstRegList(pFilter->filefilters, szFileName))
 		return !pFilter->default_include;
 	return pFilter->default_include;
@@ -323,59 +322,6 @@ bool FileFilterMgr::TestDirNameAgainstFilter(const FileFilter * pFilter,
 }
 
 /**
- * @brief Return name of filter.
- *
- * @param [in] i Index of filter.
- * @return Name of filter in given index.
- */
-String FileFilterMgr::GetFilterName(int i) const
-{
-	return m_filters[i]->name; 
-}
-
-/**
- * @brief Return name of filter.
- * @param [in] pFilter Filter to get name for.
- * @return Given filter's name.
- */
-String FileFilterMgr::GetFilterName(const FileFilter *pFilter) const
-{
-	return pFilter->name; 
-}
-
-/**
- * @brief Return description of filter.
- *
- * @param [in] i Index of filter.
- * @return Description of filter in given index.
- */
-String FileFilterMgr::GetFilterDesc(int i) const
-{
-	return m_filters[i]->description; 
-}
-
-/**
- * @brief Return description of filter.
- * @param [in] pFilter Filter to get description for.
- * @return Given filter's description.
- */
-String FileFilterMgr::GetFilterDesc(const FileFilter *pFilter) const
-{
-	return pFilter->description;
-}
-
-/**
- * @brief Return full path to filter.
- *
- * @param [in] i Index of filter.
- * @return Full path of filter in given index.
- */
-String FileFilterMgr::GetFilterPath(int i) const
-{
-	return m_filters[i]->fullpath;
-}
-
-/**
  * @brief Return full path to filter.
  *
  * @param [in] pFilter Pointer to filter.
@@ -396,45 +342,23 @@ String FileFilterMgr::GetFullpath(FileFilter * pfilter) const
  * @note Given filter (pfilter) is freed and must not be used anymore.
  * @todo Should return new filter.
  */
-int FileFilterMgr::ReloadFilterFromDisk(FileFilter * pfilter)
+FileFilter *FileFilterMgr::ReloadFilterFromDisk(FileFilter *pfilter)
 {
-	int errorcode = FILTER_OK;
-	FileFilter * newfilter = LoadFilterFile(pfilter->fullpath.c_str(), errorcode);
-
-	if (newfilter == NULL)
+	FileFilter *const newfilter = LoadFilterFile(pfilter->fullpath.c_str());
+	if (newfilter)
 	{
-		return errorcode;
-	}
-
-	vector<FileFilter*>::iterator iter = m_filters.begin();
-	while (iter != m_filters.end())
-	{
-		if (pfilter == (*iter))
+		vector<FileFilter*>::iterator iter = m_filters.begin();
+		while (iter != m_filters.end())
 		{
-			delete (*iter);
-			m_filters.erase(iter);
-			break;
+			if (pfilter == *iter)
+			{
+				delete *iter;
+				m_filters.erase(iter);
+				break;
+			}
+			++iter;
 		}
+		m_filters.push_back(newfilter);
 	}
-	m_filters.push_back(newfilter);
-	return errorcode;
-}
-
-/**
- * @brief Reload filter from disk.
- *
- * Reloads filter from disk. This is done by creating a new one
- * to substitute for old one.
- * @param [in] szFullPath Full path to filter file to reload.
- * @return FILTER_OK when succeeds or one of FILTER_RETVALUE values when fails.
- */
-int FileFilterMgr::ReloadFilterFromDisk(LPCTSTR szFullPath)
-{
-	int errorcode = FILTER_OK;
-	FileFilter * filter = GetFilterByPath(szFullPath);
-	if (filter)
-		errorcode = ReloadFilterFromDisk(filter);
-	else
-		errorcode = FILTER_NOTFOUND;
-	return errorcode;
+	return newfilter;
 }

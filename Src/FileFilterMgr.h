@@ -59,26 +59,24 @@ public:
 	// Reload filter array from specified directory (passed to CFileFind)
 	void LoadFromDirectory(LPCTSTR dir, LPCTSTR szPattern);
 	// Reload an edited filter
-	int ReloadFilterFromDisk(FileFilter * pfilter);
-	int ReloadFilterFromDisk(LPCTSTR szFullPath);
+	FileFilter *ReloadFilterFromDisk(FileFilter *pfilter);
 	// Load a filter from a string
 	void LoadFilterString(LPCTSTR szFilterString);
 	int AddFilter(LPCTSTR szFilterFile);
 	void RemoveFilter(LPCTSTR szFilterFile);
 
 	// access to array of filters
-	int GetFilterCount() const { return m_filters.size(); }
-	String GetFilterName(int i) const;
-	String GetFilterName(const FileFilter *pFilter) const;
-	String GetFilterPath(int i) const;
-	String GetFilterDesc(int i) const;
-	String GetFilterDesc(const FileFilter *pFilter) const;
+	//String GetFilterName(int i) const;
+	//String GetFilterName(const FileFilter *pFilter) const;
+	//String GetFilterPath(int i) const;
+	//String GetFilterDesc(int i) const;
+	//String GetFilterDesc(const FileFilter *pFilter) const;
 	FileFilter * GetFilterByPath(LPCTSTR szFilterName);
-	String GetFullpath(FileFilter * pfilter) const;
+	String GetFullpath(FileFilter *) const;
 
 	// methods to actually use filter
-	bool TestFileNameAgainstFilter(const FileFilter * pFilter, LPCTSTR szFileName) const;
-	bool TestDirNameAgainstFilter(const FileFilter * pFilter, LPCTSTR szDirName) const;
+	bool TestFileNameAgainstFilter(const FileFilter *, LPCTSTR szFileName) const;
+	bool TestDirNameAgainstFilter(const FileFilter *, LPCTSTR szDirName) const;
 
 	void DeleteAllFilters();
 
@@ -86,11 +84,11 @@ public:
 protected:
 	// Clear the list of known filters
 	// Load a filter from a file (if syntax is valid)
-	FileFilter * LoadFilterFile(LPCTSTR szFilepath, int & errorcode);
+	FileFilter *LoadFilterFile(LPCTSTR szFilepath);
 
 // Implementation data
-private:
-	stl::vector<FileFilter*> m_filters; /*< List of filters loaded */
+public:
+	stl::vector<FileFilter *> m_filters; /*< List of filters loaded */
 };
 
 

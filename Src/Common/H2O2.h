@@ -181,6 +181,7 @@ namespace H2O
 		{
 			return reinterpret_cast<ODialog *>(::GetWindowLongPtr(pWnd->m_hWnd, DWLP_USER));
 		}
+		void Update3StateCheckBoxLabel(UINT id);
 	protected:
 		virtual BOOL OnInitDialog();
 		virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
@@ -388,6 +389,7 @@ namespace H2O
 
 	// Utility functions
 	HWND GetTopLevelParent(HWND);
+	HIMAGELIST Create3StateImageList();
 	void GetDesktopWorkArea(HWND, LPRECT);
 	void CenterWindow(HWindow *);
 }

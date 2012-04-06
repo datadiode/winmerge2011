@@ -342,7 +342,7 @@ void CDirView::ReflectItemActivate(NMITEMACTIVATE *pNM)
 	if (pNM->iItem >= 0)
 	{
 		const DIFFITEM& di = GetDiffItem(pNM->iItem);
-		if (m_bTreeMode && m_pFrame->GetRecursive() && di.diffcode.isDirectory())
+		if (m_bTreeMode && m_pFrame->GetRecursive() == 1 && di.diffcode.isDirectory())
 		{
 			if (di.customFlags1 & ViewCustomFlags::EXPANDED)
 				CollapseSubdir(pNM->iItem);
@@ -401,7 +401,7 @@ void CDirView::RedisplayChildren(UINT_PTR diffpos, int level, int &index, int &a
 			}
 			else
 			{
-				if (!m_pFrame->GetRecursive() ||
+				if (m_pFrame->GetRecursive() == 0 ||
 					!di.diffcode.isDirectory() ||
 					di.diffcode.isSideLeftOnly() ||
 					di.diffcode.isSideRightOnly())
@@ -434,12 +434,12 @@ void CDirView::Redisplay()
 	DeleteAllItems();
 	m_nSpecialItems = 0;
 
-	SetImageList(m_bTreeMode && m_pFrame->GetRecursive() ?
+	SetImageList(m_bTreeMode && m_pFrame->GetRecursive() == 1 ?
 		m_imageState->m_hImageList : NULL, LVSIL_STATE);
 
 	// If non-recursive compare, add special item(s)
 	String leftParent, rightParent;
-	if (!m_pFrame->GetRecursive() ||
+	if (m_pFrame->GetRecursive() == 0 ||
 		m_pFrame->AllowUpwardDirectory(leftParent, rightParent) == CDirFrame::AllowUpwardDirectory::ParentIsTempPath)
 	{
 		cnt += m_nSpecialItems = AddSpecialItems();
@@ -807,7 +807,7 @@ void CDirView::OnReturn()
 	if (sel >= 0)
 	{
 		const DIFFITEM& di = GetDiffItem(sel);
-		if (m_bTreeMode && m_pFrame->GetRecursive() && di.diffcode.isDirectory())
+		if (m_bTreeMode && m_pFrame->GetRecursive() == 1 && di.diffcode.isDirectory())
 		{
 			if (di.customFlags1 & ViewCustomFlags::EXPANDED)
 				CollapseSubdir(sel);

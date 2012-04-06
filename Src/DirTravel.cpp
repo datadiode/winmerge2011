@@ -9,20 +9,22 @@
 
 #include "StdAfx.h"
 #include "paths.h"
+#include "DiffThread.h"
+#include "FileFilterHelper.h"
 #include "DirItem.h"
-#include "DirTravel.h"
-
-static void LoadFiles(LPCTSTR sDir, DirItemArray * dirs, DirItemArray * files);
-static void Sort(DirItemArray * dirs, bool casesensitive);
+#include "CompareStats.h"
 
 /**
  * @brief Load arrays with all directories & files in specified dir
  */
-void LoadAndSortFiles(LPCTSTR sDir, DirItemArray * dirs, DirItemArray * files, bool casesensitive)
+void CDiffThread::LoadAndSortFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *files) const
 {
 	LoadFiles(sDir, dirs, files);
-	Sort(dirs, casesensitive);
-	Sort(files, casesensitive);
+	Sort(dirs);
+	Sort(files);
+	// If recursing the flat way, reset total count of items to 0
+	if (context->m_nRecursive == 2)
+		context->m_pCompareStats->SetTotalItems(0);
 }
 
 /**
@@ -37,47 +39,48 @@ void LoadAndSortFiles(LPCTSTR sDir, DirItemArray * dirs, DirItemArray * files, b
  * @param [in, out] dirs Array where subfolders are stored.
  * @param [in, out] files Array where files are stored.
  */
-static void LoadFiles(LPCTSTR sDir, DirItemArray * dirs, DirItemArray * files)
+void CDiffThread::LoadFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *files) const
 {
-	String sPattern = paths_ConcatPath(sDir, _T("*.*"));
 	WIN32_FIND_DATA ff;
-	HANDLE h = FindFirstFile(sPattern.c_str(), &ff);
+	HANDLE h = FindFirstFile(paths_ConcatPath(sDir, _T("*.*")).c_str(), &ff);
 	if (h != INVALID_HANDLE_VALUE)
 	{
 		do
 		{
-			bool bIsDirectory = (ff.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) > 0;
-			if (bIsDirectory && _tcsstr(_T(".."), ff.cFileName))
-				continue;
-
 			DirItem ent;
-
-			// Save filetimes as seconds since January 1, 1970
-			// Note that times can be < 0 if they are around that 1970..
-			// Anyway that is not sensible case for normal files so we can
-			// just use zero for their time.
+			ent.path = sDir;
 			ent.ctime = ff.ftCreationTime;
 			ent.mtime = ff.ftLastWriteTime;
-
+			ent.filename = ff.cFileName;
+			ent.flags.attributes = ff.dwFileAttributes;
 			if ((ff.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0)
 			{
 				ent.size.Lo = ff.nFileSizeLow;
 				ent.size.Hi = ff.nFileSizeHigh;
+				files->push_back(ent);
+				// If recursing the flat way, increment total count of items
+				if (context->m_nRecursive == 2)
+					context->m_pCompareStats->IncreaseTotalItems();
 			}
-
-			ent.path = sDir;
-			ent.filename = ff.cFileName;
-			ent.flags.attributes = ff.dwFileAttributes;
-
-			(bIsDirectory ? dirs : files)->push_back(ent);
+			else if (_tcsstr(_T(".."), ff.cFileName) == NULL)
+			{
+				if (context->m_nRecursive == 2)
+				{
+					// Allow user to abort scanning
+					if (context->ShouldAbort())
+						break;
+					String sDir = paths_ConcatPath(ent.path, ent.filename);
+					if (context->m_piFilterGlobal->includeDir(sDir.c_str()))
+						LoadFiles(sDir.c_str(), dirs, files);
+				}
+				else
+				{
+					dirs->push_back(ent);
+				}
+			}
 		} while (FindNextFile(h, &ff));
 		FindClose(h);
 	}
-}
-
-static int collate(const String &str1, const String &str2)
-{
-	return _tcscoll(str1.c_str(), str2.c_str());
 }
 
 /**
@@ -85,12 +88,10 @@ static int collate(const String &str1, const String &str2)
  */
 static bool __cdecl cmpstring(const DirItem &elem1, const DirItem &elem2)
 {
-	return collate(elem1.filename, elem2.filename) < 0;
-}
-
-static int collate_ignore_case(const String &str1, const String &str2)
-{
-	return _tcsicoll(str1.c_str(), str2.c_str());
+	int cmp = _tcscoll(elem1.filename.c_str(), elem2.filename.c_str());
+	if (cmp == 0)
+		cmp = _tcscoll(elem1.path.c_str(), elem2.path.c_str());
+	return cmp < 0;
 }
 
 /**
@@ -98,16 +99,22 @@ static int collate_ignore_case(const String &str1, const String &str2)
  */
 static bool __cdecl cmpistring(const DirItem &elem1, const DirItem &elem2)
 {
-	return collate_ignore_case(elem1.filename, elem2.filename) < 0;
+	if (int cmp = _tcsicoll(elem1.filename.c_str(), elem2.filename.c_str()))
+		return cmp < 0;
+	if (elem1.size.int64 != elem2.size.int64)
+		return elem1.size.int64 < elem2.size.int64;
+	if (elem1.mtime != elem2.mtime)
+		return elem1.mtime < elem2.mtime;
+	return _tcsicoll(elem1.path.c_str(), elem2.path.c_str()) < 0;
 }
 
 /**
  * @brief sort specified array
  */
-static void Sort(DirItemArray * dirs, bool casesensitive)
+void CDiffThread::Sort(DirItemArray *dirs) const
 {
 	if (casesensitive)
-        stl::sort(dirs->begin(), dirs->end(), cmpstring);
+		stl::sort(dirs->begin(), dirs->end(), cmpstring);
 	else
 		stl::sort(dirs->begin(), dirs->end(), cmpistring);
 }
@@ -116,10 +123,10 @@ static void Sort(DirItemArray * dirs, bool casesensitive)
  * @brief  Compare (NLS aware) two strings, either case-sensitive or
  * case-insensitive as caller specifies
  */
-int collstr(const String & s1, const String & s2, bool casesensitive)
+int CDiffThread::collstr(const String & s1, const String & s2) const
 {
 	if (casesensitive)
-		return collate(s1, s2);
+		return _tcscoll(s1.c_str(), s2.c_str());
 	else
-		return collate_ignore_case(s1, s2);
+		return _tcsicoll(s1.c_str(), s2.c_str());
 }

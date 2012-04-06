@@ -14,34 +14,31 @@
  */
 struct LineFilterItem
 {
-	bool enabled; /**< Is filter enabled? */
+	int usage; /**< Is filter enabled? */
+	HRESULT hr; /**< Is filter erroneous? */
 	String filterStr; /**< Filter string */
-	LineFilterItem() : enabled(false) { }
+	LineFilterItem() : usage(0), hr(S_OK) { }
 };
 
 /**
  @brief List of line filters.
  */
-class LineFiltersList
+extern class LineFiltersList
 {
 public:
-	LineFiltersList();
-	LineFiltersList(const LineFiltersList *list);
-	~LineFiltersList();
 
-	void AddFilter(LPCTSTR filter, bool enabled);
-	int GetCount() const;
-	void Empty();
-	String GetAsString() const;
-	const LineFilterItem & GetAt(size_t ind) const;
-	bool Compare(const LineFiltersList *list) const;
+	void AddFilter(LPCTSTR filter, int usage);
+	size_t GetCount() const { return m_items.size(); }
+	void Empty() { m_items.clear(); }
+	LineFilterItem &GetAt(size_t i) { return m_items[i]; }
+	bool Compare(LineFiltersList &);
 
+	void LoadFilters();
 	void SaveFilters();
-
-	void Import(LPCTSTR filters);
+	void swap(LineFiltersList &other) { m_items.swap(other.m_items); }
 
 private:
-	stl::vector<LineFilterItem*> m_items; /**< List for linefilter items */
-};
+	stl::vector<LineFilterItem> m_items; /**< List for linefilter items */
+} globalLineFilters;
 
 #endif // _LINEFILTERS_LIST_H_

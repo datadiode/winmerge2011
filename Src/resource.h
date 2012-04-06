@@ -127,6 +127,7 @@
 #define IDC_LEFT_EDIT                           1000
 #define IDC_FILE_EDIT                           1000
 #define IDC_LEFT_BUTTON                         1001
+#define IDC_LFILTER_EDIT                        1001
 #define IDC_TV_CLEARCASE_TYPEMGR_SETUP          1001
 #define IDC_RIGHT_EDIT                          1002
 #define IDC_LEFT_COMBO                          1002

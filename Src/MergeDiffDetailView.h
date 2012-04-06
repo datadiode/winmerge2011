@@ -62,7 +62,6 @@ public:
 	void UpdateResources();
 	BOOL IsModified() { return FALSE; }
 	BOOL PrimeListWithFile();
-	int ComputeInitialHeight();
 	void SetDisplayHeight(int h);
 	void OnUpdateCaret(bool bMove);
 	void DocumentsLoaded();

@@ -435,7 +435,7 @@ BOOL CMergeApp::ParseArgsAndDoOpen(MergeCmdLineInfo& cmdInfo, CMainFrame* pMainF
 					pMainFrame->m_strSaveAsPath = cmdInfo.m_Files[2].c_str();
 				filelocRight.filepath = cmdInfo.m_Files[1];
 				bCompared = pMainFrame->DoFileOpen(filelocLeft, filelocRight,
-					cmdInfo.m_dwLeftFlags, cmdInfo.m_dwRightFlags, cmdInfo.m_bRecurse);
+					cmdInfo.m_dwLeftFlags, cmdInfo.m_dwRightFlags, cmdInfo.m_nRecursive);
 			}
 			else if (ProjectFile::IsProjectFile(filelocLeft.filepath.c_str()))
 			{
@@ -448,7 +448,7 @@ BOOL CMergeApp::ParseArgsAndDoOpen(MergeCmdLineInfo& cmdInfo, CMainFrame* pMainF
 			else
 			{
 				bCompared = pMainFrame->DoFileOpen(filelocLeft, filelocRight,
-					cmdInfo.m_dwLeftFlags, cmdInfo.m_dwRightFlags, cmdInfo.m_bRecurse);
+					cmdInfo.m_dwLeftFlags, cmdInfo.m_dwRightFlags, cmdInfo.m_nRecursive);
 			}
 		}
 	}

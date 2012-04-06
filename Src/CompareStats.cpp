@@ -14,13 +14,8 @@
  * @brief Constructor, initializes critical section.
  */
 CompareStats::CompareStats()
-: m_nTotalItems(0)
-, m_nComparedItems(0)
-, m_state(STATE_IDLE)
-, m_bCompareDone(FALSE)
 {
-	InitializeCriticalSection(&m_csProtect);
-	ZeroMemory(&m_counts[0], sizeof(m_counts));
+	Reset();
 }
 
 /** 
@@ -28,18 +23,6 @@ CompareStats::CompareStats()
  */
 CompareStats::~CompareStats()
 {
-	DeleteCriticalSection(&m_csProtect);
-}
-
-/** 
- * @brief Increase found items (dirs and files) count.
- * @param [in] count Amount of items to add.
- */
-void CompareStats::IncreaseTotalItems(int count /*= 1*/)
-{
-	EnterCriticalSection(&m_csProtect);
-	m_nTotalItems += count;
-	LeaveCriticalSection(&m_csProtect);
 }
 
 /** 
@@ -48,13 +31,10 @@ void CompareStats::IncreaseTotalItems(int count /*= 1*/)
  */
 void CompareStats::AddItem(int code)
 {
-	EnterCriticalSection(&m_csProtect);
 	RESULT res = GetResultFromCode(code);
-	int index = static_cast<int>(res);
-	m_counts[index] += 1;
-	++m_nComparedItems;
+	InterlockedIncrement(&m_counts[res]);
+	InterlockedIncrement(&m_nComparedItems);
 	assert(m_nComparedItems <= m_nTotalItems);
-	LeaveCriticalSection(&m_csProtect);
 }
 
 /** 
@@ -68,24 +48,16 @@ int CompareStats::GetCount(CompareStats::RESULT result) const
 }
 
 /** 
- * @brief Return total count of items (so far) found.
- */
-int CompareStats::GetTotalItems() const
-{
-	return m_nTotalItems;
-}
-
-/** 
  * @brief Reset comparestats.
  * Use this function to reset stats before new compare.
  */
 void CompareStats::Reset()
 {
-	ZeroMemory(&m_counts[0], sizeof(m_counts));
-	SetCompareState(STATE_IDLE);
 	m_nTotalItems = 0;
 	m_nComparedItems = 0;
+	m_state = STATE_IDLE;
 	m_bCompareDone = FALSE;
+	ZeroMemory(m_counts, sizeof m_counts);
 }
 
 /** 

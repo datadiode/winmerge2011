@@ -14,8 +14,8 @@
 #include "FileFilterHelper.h"
 #include "codepage.h"
 #include "DirItem.h"
-#include "DirTravel.h"
 #include "paths.h"
+#include "Common/coretools.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -56,24 +56,27 @@ int CDiffThread::DirScan_GetItems(
 	String leftsubprefix;
 	String rightsubprefix;
 
+	DirItemArray leftDirs, leftFiles, rightDirs, rightFiles;
 	// Format paths for recursive compare (having basedir + subdir)
 	// Hint: Could try to share cow string buffers here.
-	if (!bRightUniq && !leftsubdir.empty())
-	{
-		sLeftDir = paths_ConcatPath(sLeftDir, leftsubdir);
-		leftsubprefix = leftsubdir + backslash;
-	}
-	if (!bLeftUniq && !rightsubdir.empty())
-	{
-		sRightDir = paths_ConcatPath(sRightDir, rightsubdir);
-		rightsubprefix = rightsubdir + backslash;
-	}
-
-	DirItemArray leftDirs, leftFiles, rightDirs, rightFiles;
 	if (!bRightUniq)
-		LoadAndSortFiles(sLeftDir.c_str(), &leftDirs, &leftFiles, casesensitive);
+	{
+		if (!leftsubdir.empty())
+		{
+			sLeftDir = paths_ConcatPath(sLeftDir, leftsubdir);
+			leftsubprefix = leftsubdir + backslash;
+		}
+		LoadAndSortFiles(sLeftDir.c_str(), &leftDirs, &leftFiles);
+	}
 	if (!bLeftUniq)
-		LoadAndSortFiles(sRightDir.c_str(), &rightDirs, &rightFiles, casesensitive);
+	{
+		if (!rightsubdir.empty())
+		{
+			sRightDir = paths_ConcatPath(sRightDir, rightsubdir);
+			rightsubprefix = rightsubdir + backslash;
+		}
+		LoadAndSortFiles(sRightDir.c_str(), &rightDirs, &rightFiles);
+	}
 
 	// Allow user to abort scanning
 	if (context->ShouldAbort())
@@ -105,7 +108,7 @@ int CDiffThread::DirScan_GetItems(
 		if (!bTreatDirAsEqual)
 		{
 			if (i < leftDirs.size() && (j == rightDirs.size() ||
-					collstr(leftDirs[i].filename, rightDirs[j].filename, casesensitive) < 0))
+					collstr(leftDirs[i].filename, rightDirs[j].filename) < 0))
 			{
 				UINT nDiffCode = DIFFCODE::LEFT | DIFFCODE::DIR;
 				if (depth && bUniques)
@@ -129,14 +132,14 @@ int CDiffThread::DirScan_GetItems(
 				}
 				else
 				{
-					AddToList(leftsubdir, rightsubdir, &leftDirs[i], 0, nDiffCode, parent);
+					AddToList(leftsubdir, rightsubdir, &leftDirs[i], NULL, nDiffCode, parent);
 				}
 				// Advance left pointer over left-only entry, and then retest with new pointers
 				++i;
 				continue;
 			}
 			if (j < rightDirs.size() && (i == leftDirs.size() ||
-					collstr(leftDirs[i].filename, rightDirs[j].filename, casesensitive) > 0))
+					collstr(leftDirs[i].filename, rightDirs[j].filename) > 0))
 			{
 				UINT nDiffCode = DIFFCODE::RIGHT | DIFFCODE::DIR;
 				if (depth && bUniques)
@@ -160,7 +163,7 @@ int CDiffThread::DirScan_GetItems(
 				}
 				else
 				{
-					AddToList(leftsubdir, rightsubdir, 0, &rightDirs[j], nDiffCode, parent);
+					AddToList(leftsubdir, rightsubdir, NULL, &rightDirs[j], nDiffCode, parent);
 				}
 				// Advance right pointer over right-only entry, and then retest with new pointers
 				++j;
@@ -238,7 +241,7 @@ int CDiffThread::DirScan_GetItems(
 		// Comparing file leftFiles[i].name to rightFiles[j].name
 		
 		if (i < leftFiles.size() && (j == rightFiles.size() ||
-				collstr(leftFiles[i].filename, rightFiles[j].filename, casesensitive) < 0))
+				collstr(leftFiles[i].filename, rightFiles[j].filename) < 0))
 		{
 			const UINT nDiffCode = DIFFCODE::LEFT | DIFFCODE::FILE;
 			AddToList(leftsubdir, rightsubdir, &leftFiles[i], 0, nDiffCode, parent);
@@ -247,7 +250,7 @@ int CDiffThread::DirScan_GetItems(
 			continue;
 		}
 		if (j < rightFiles.size() && (i == leftFiles.size() ||
-				collstr(leftFiles[i].filename, rightFiles[j].filename, casesensitive) > 0))
+				collstr(leftFiles[i].filename, rightFiles[j].filename) > 0))
 		{
 			const UINT nDiffCode = DIFFCODE::RIGHT | DIFFCODE::FILE;
 			AddToList(leftsubdir, rightsubdir, 0, &rightFiles[j], nDiffCode, parent);
@@ -291,7 +294,7 @@ int CDiffThread::DirScan_CompareItems(UINT_PTR parentdiffpos)
 		}
 		WaitForSingleObject(hSemaphore, INFINITE);
 		DIFFITEM &di = context->GetNextSiblingDiffPosition(pos);
-		if (di.diffcode.isDirectory() && context->m_bRecursive)
+		if (di.diffcode.isDirectory() && context->m_nRecursive)
 		{
 			di.diffcode.diffcode &= ~(DIFFCODE::DIFF | DIFFCODE::SAME);
 			int ndiff = DirScan_CompareItems(curpos);
@@ -342,7 +345,7 @@ int CDiffThread::DirScan_CompareRequestedItems(UINT_PTR parentdiffpos)
 
 		UINT_PTR curpos = pos;
 		DIFFITEM &di = context->GetNextSiblingDiffPosition(pos);
-		if (di.diffcode.isDirectory() && context->m_bRecursive)
+		if (di.diffcode.isDirectory() && context->m_nRecursive)
 		{
 			di.diffcode.diffcode &= ~(DIFFCODE::DIFF | DIFFCODE::SAME);
 			int ndiff = DirScan_CompareRequestedItems(curpos);
@@ -535,6 +538,17 @@ DIFFITEM *CDiffThread::AddToList(
 
 	if (lent)
 	{
+		if (context->m_nRecursive == 2)
+		{
+			if (LPCTSTR path = EatPrefix(lent->path.c_str(), context->GetLeftPath().c_str()))
+			{
+				di->left.path = path;
+			}
+			else
+			{
+				ASSERT(FALSE);
+			}
+		}
 		di->left.filename = lent->filename;
 		di->left.mtime = lent->mtime;
 		di->left.ctime = lent->ctime;
@@ -549,6 +563,17 @@ DIFFITEM *CDiffThread::AddToList(
 
 	if (rent)
 	{
+		if (context->m_nRecursive == 2)
+		{
+			if (LPCTSTR path = EatPrefix(rent->path.c_str(), context->GetRightPath().c_str()))
+			{
+				di->right.path = path;
+			}
+			else
+			{
+				ASSERT(FALSE);
+			}
+		}
 		di->right.filename = rent->filename;
 		di->right.mtime = rent->mtime;
 		di->right.ctime = rent->ctime;

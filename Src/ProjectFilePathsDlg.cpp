@@ -28,8 +28,6 @@ static char THIS_FILE[] = __FILE__;
  */
 ProjectFilePathsDlg::ProjectFilePathsDlg()
 : ODialog(IDD_PROJFILES_PATHS)
-, m_bLeftPathReadOnly(FALSE)
-, m_bRightPathReadOnly(FALSE)
 {
 	m_strCaption = LanguageSelect.LoadDialogCaption(m_idd);
 }
@@ -40,7 +38,7 @@ bool ProjectFilePathsDlg::UpdateData()
 	DDX_Text<op>(IDC_PROJ_LFILE_EDIT, m_sLeftFile);
 	DDX_Text<op>(IDC_PROJ_RFILE_EDIT, m_sRightFile);
 	DDX_Text<op>(IDC_PROJ_FILTER_EDIT, m_sFilter);
-	DDX_Check<op>(IDC_PROJ_INC_SUBFOLDERS, m_bIncludeSubfolders);
+	DDX_Check<op>(IDC_PROJ_INC_SUBFOLDERS, m_nRecursive);
 	DDX_Check<op>(IDC_PROJFILE_LREADONLY, m_bLeftPathReadOnly);
 	DDX_Check<op>(IDC_PROJFILE_RREADONLY, m_bRightPathReadOnly);
 	return true;
@@ -68,6 +66,9 @@ LRESULT ProjectFilePathsDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lPar
 		case MAKEWPARAM(IDC_PROJ_SAVE, BN_CLICKED):
 			OnBnClickedProjSave();
 			break;
+		case MAKEWPARAM(IDC_PROJ_INC_SUBFOLDERS, BN_CLICKED):
+			Update3StateCheckBoxLabel(IDC_PROJ_INC_SUBFOLDERS);
+			break;
 		}
 		break;
 	}
@@ -93,6 +94,7 @@ BOOL ProjectFilePathsDlg::OnInitDialog()
 	ODialog::OnInitDialog();
 	LanguageSelect.TranslateDialog(m_hWnd);
 	UpdateData<Set>();
+	Update3StateCheckBoxLabel(IDC_PROJ_INC_SUBFOLDERS);
 	return FALSE;
 }
 
@@ -135,27 +137,11 @@ void ProjectFilePathsDlg::OnBnClickedProjOpen()
 	if (fileName.empty())
 		return;
 
-	ProjectFile project;
+	if (!ProjectFile::Read(fileName.c_str()))
+		return;
 
-	String sErr;
-	if (!project.Read(fileName.c_str(), sErr))
-	{
-		if (sErr.empty())
-			sErr = LanguageSelect.LoadString(IDS_UNK_ERROR_SAVING_PROJECT);
-		LanguageSelect.FormatMessage(IDS_ERROR_FILEOPEN,
-			fileName.c_str(), sErr.c_str()).MsgBox(MB_ICONSTOP);
-	}
-	else
-	{
-		m_sLeftFile = project.GetLeft();
-		m_bLeftPathReadOnly = project.GetLeftReadOnly();
-		m_sRightFile = project.GetRight();
-		m_bRightPathReadOnly = project.GetRightReadOnly();
-		m_sFilter = project.GetFilter();
-		m_bIncludeSubfolders = project.GetSubfolders();
-		UpdateData<Set>();
-		LanguageSelect.MsgBox(IDS_PROJFILE_LOAD_SUCCESS, MB_ICONINFORMATION);
-	}
+	UpdateData<Set>();
+	LanguageSelect.MsgBox(IDS_PROJFILE_LOAD_SUCCESS, MB_ICONINFORMATION);
 }
 
 /** 
@@ -173,30 +159,10 @@ void ProjectFilePathsDlg::OnBnClickedProjSave()
 	if (fileName.empty())
 		return;
 
-	ProjectFile project;
+	if (!ProjectFile::Save(fileName.c_str()))
+		return;
 
-	if (!m_sLeftFile.empty())
-		project.SetLeft(m_sLeftFile, m_bLeftPathReadOnly != BST_UNCHECKED);
-	if (!m_sRightFile.empty())
-		project.SetRight(m_sRightFile, m_bRightPathReadOnly != BST_UNCHECKED);
-	if (!m_sFilter.empty())
-		project.SetFilter(m_sFilter);
-
-	project.SetSubfolders(m_bIncludeSubfolders);
-
-	String sErr;
-	if (!project.Save(fileName.c_str(), sErr))
-	{
-		if (sErr.empty())
-			sErr = LanguageSelect.LoadString(IDS_UNK_ERROR_SAVING_PROJECT);
-		LanguageSelect.FormatMessage(
-			IDS_ERROR_FILEOPEN, fileName.c_str(), sErr.c_str()
-		).MsgBox(MB_ICONSTOP);
-	}
-	else
-	{
-		LanguageSelect.MsgBox(IDS_PROJFILE_SAVE_SUCCESS, MB_ICONINFORMATION);
-	}
+	LanguageSelect.MsgBox(IDS_PROJFILE_SAVE_SUCCESS, MB_ICONINFORMATION);
 }
 
 /** 

@@ -15,7 +15,6 @@
 #include "DiffUtils.h"
 #include "coretools.h"
 #include "DiffList.h"
-#include "DiffWrapper.h"
 #include "FilterCommentsManager.h"
 
 namespace CompareEngines
@@ -25,13 +24,11 @@ static void CopyTextStats(const file_data * inf, FileTextStats * myTextStats);
 /**
  * @brief Default constructor.
  */
-DiffUtils::DiffUtils(const DiffutilsOptions &options)
-: m_options(options)
-, m_pFilterList(NULL)
-, m_inf(NULL)
-, m_pDiffWrapper(new ::CDiffWrapper)
+DiffUtils::DiffUtils(const DIFFOPTIONS &options)
+	: m_inf(NULL)
 {
-	m_options.SetToDiffUtils();
+	SetFromDiffOptions(options);
+	SetToDiffUtils();
 }
 
 /**
@@ -39,16 +36,6 @@ DiffUtils::DiffUtils(const DiffutilsOptions &options)
  */
 DiffUtils::~DiffUtils()
 {
-	delete m_pDiffWrapper;
-}
-
-/**
- * @brief Set line filters list to use.
- * @param [in] list List of line filters.
- */
-void DiffUtils::SetFilterList(FilterList * list)
-{
-	m_pFilterList = list;
 }
 
 /**
@@ -78,34 +65,31 @@ int DiffUtils::diffutils_compare_files()
 	if (!success)
 		return DIFFCODE::CMPERR;
 
-	UINT code = DIFFCODE::SAME;
+	// DIFFCODE::TEXTFLAGS leaves text vs. binary classification to caller
+	UINT code = DIFFCODE::SAME | DIFFCODE::FILE | DIFFCODE::TEXTFLAGS;
 
 	// make sure to start counting diffs at 0
 	// (usually it is -1 at this point, for unknown)
 	m_ndiffs = 0;
 	m_ntrivialdiffs = 0;
 
-	if (script && m_pFilterList && m_pFilterList->HasRegExps())
+	const bool bPostFilter = m_filterCommentsLines || m_bIgnoreBlankLines || m_bIgnoreCase;
+	if (script && (FilterList::HasRegExps() || bPostFilter))
 	{
 		struct change *next = script;
-		struct change *thisob = 0, *end = 0;
-
-		String asLwrCaseExt;
-		String LowerCaseExt = A2T(m_inf[0].name);
-		int PosOfDot = LowerCaseExt.rfind('.');
-		if (PosOfDot != -1)
+		String asLwrCaseExt = A2T(m_inf[0].name);
+		String::size_type PosOfDot = asLwrCaseExt.rfind('.');
+		if (PosOfDot != String::npos)
 		{
-			LowerCaseExt.erase(0, PosOfDot + 1);
-			CharLower(&LowerCaseExt.front());
-			asLwrCaseExt = LowerCaseExt;
+			asLwrCaseExt.erase(0, PosOfDot + 1);
+			CharLower(&asLwrCaseExt.front());
 		}
 
 		while (next)
 		{
 			/* Find a set of changes that belong together.  */
-			thisob = next;
-			end = find_change(next);
-
+			struct change *thisob = next;
+			struct change *end = find_change(next);
 			/* Disconnect them from the rest of the changes,
 			making them a hunk, and remember the rest for next iteration.  */
 			next = end->link;
@@ -113,99 +97,75 @@ int DiffUtils::diffutils_compare_files()
 #ifdef _DEBUG
 			debug_script(thisob);
 #endif
-
+			/* Determine range of line numbers involved in each file.  */
+			int first0 = 0, last0 = 0, first1 = 0, last1 = 0, deletes = 0, inserts = 0;
+			analyze_hunk(thisob, &first0, &last0, &first1, &last1, &deletes, &inserts);
+			if (deletes || inserts || thisob->trivial)
 			{
-				/* Determine range of line numbers involved in each file.  */
-				int first0 = 0, last0 = 0, first1 = 0, last1 = 0, deletes = 0, inserts = 0;
-				analyze_hunk(thisob, &first0, &last0, &first1, &last1, &deletes, &inserts);
-				if (deletes || inserts || thisob->trivial)
+				/* Print the lines that the first file has.  */
+				int trans_a0 = 0, trans_b0 = 0, trans_a1 = 0, trans_b1 = 0;
+				translate_range(&m_inf[0], first0, last0, &trans_a0, &trans_b0);
+				translate_range(&m_inf[1], first1, last1, &trans_a1, &trans_b1);
+
+				//Determine quantity of lines in this block for both sides
+				int QtyLinesLeft = trans_b0 - trans_a0;
+				int QtyLinesRight = trans_b1 - trans_a1;
+
+				if (bPostFilter && (deletes || inserts))
 				{
-					/* Print the lines that the first file has.  */
-					int trans_a0 = 0, trans_b0 = 0, trans_a1 = 0, trans_b1 = 0;
-					translate_range(&m_inf[0], first0, last0, &trans_a0, &trans_b0);
-					translate_range(&m_inf[1], first1, last1, &trans_a1, &trans_b1);
-
-					//Determine quantity of lines in this block for both sides
-					int QtyLinesLeft = (trans_b0 - trans_a0);
-					int QtyLinesRight = (trans_b1 - trans_a1);
-
-
-					if (m_options.m_filterCommentsLines || m_options.m_bIgnoreBlankLines || m_options.m_bIgnoreCase)
-					{
-						OP_TYPE op = OP_NONE;
-						if (!deletes && !inserts)
-							op = OP_TRIVIAL;
-						else
-							op = OP_DIFF;
-
-						DIFFOPTIONS options;
-						options.nIgnoreWhitespace = m_options.m_ignoreWhitespace;
-						options.bIgnoreBlankLines = m_options.m_bIgnoreBlankLines;
-						options.bFilterCommentsLines = m_options.m_filterCommentsLines;
-						options.bIgnoreCase = m_options.m_bIgnoreCase;
-						options.bIgnoreEol = m_options.m_bIgnoreEOLDifference;
-						m_pDiffWrapper->SetOptions(options);
-  						m_pDiffWrapper->PostFilter(thisob->line0, QtyLinesLeft+1, thisob->line1, QtyLinesRight+1, op, asLwrCaseExt.c_str());
-						if(op == OP_TRIVIAL)
-						{
-							thisob->trivial = 1;
-						}
-					}
-
-					// Match lines against regular expression filters
-					// Our strategy is that every line in both sides must
-					// match regexp before we mark difference as ignored.
-					if(m_pFilterList && m_pFilterList->HasRegExps())
-					{
-						bool match2 = false;
-						bool match1 = RegExpFilter(thisob->line0, thisob->line0 + QtyLinesLeft, 0);
-						if (match1)
-							match2 = RegExpFilter(thisob->line1, thisob->line1 + QtyLinesRight, 1);
-						if (match1 && match2)
-							thisob->trivial = 1;
-					}
-
+					OP_TYPE op = PostFilter(
+						thisob->line0, QtyLinesLeft + 1,
+						thisob->line1, QtyLinesRight + 1,
+						OP_DIFF, asLwrCaseExt.c_str());
+					if (op == OP_TRIVIAL)
+						thisob->trivial = 1;
 				}
-				/* Reconnect the script so it will all be freed properly.  */
-				end->link = next;
+
+				// Match lines against regular expression filters
+				// Our strategy is that every line in both sides must
+				// match regexp before we mark difference as ignored.
+				if (FilterList::HasRegExps())
+				{
+					bool match2 = false;
+					bool match1 = RegExpFilter(thisob->line0, thisob->line0 + QtyLinesLeft, 0);
+					if (match1)
+						match2 = RegExpFilter(thisob->line1, thisob->line1 + QtyLinesRight, 1);
+					if (match1 && match2)
+						thisob->trivial = 1;
+				}
+
 			}
+			/* Reconnect the script so it will all be freed properly.  */
+			end->link = next;
 		}
 	}
-
-
 	// Free change script (which we don't want)
-	if (script != NULL)
+
+	while (script != NULL)
 	{
-		struct change *p, *e;
-		for (e = script; e; e = p)
-		{
-			if (!e->trivial)
-				++m_ndiffs;
-			else
-				++m_ntrivialdiffs;
-			p = e->link;
-			free(e);
-		}
-		if (m_ndiffs > 0)
-			code = code & ~DIFFCODE::SAME | DIFFCODE::DIFF;
+		struct change *link = script->link;
+		if (!script->trivial)
+			++m_ndiffs;
+		else
+			++m_ntrivialdiffs;
+		free(script);
+		script = link;
 	}
 
 	// diff_2_files set bin_flag to -1 if different binary
 	// diff_2_files set bin_flag to +1 if same binary
-
+	if ((m_ndiffs > 0) || (bin_flag < 0))
+	{
+		// DIFFCODE::TEXTFLAGS leaves text vs. binary classification to caller
+		code = DIFFCODE::DIFF | DIFFCODE::FILE | DIFFCODE::TEXTFLAGS;
+	}
 	if (bin_flag != 0)
 	{
 		// We don't know diff counts for binary files
 		m_ndiffs = CDiffContext::DIFFS_UNKNOWN;
 	}
 
-	if (bin_flag < 0)
-	{
-		// Clear same-flag, set diff-flag
-		code = code & ~DIFFCODE::SAME | DIFFCODE::DIFF;
-	}
-	// Indicate that text vs. binary classification is up to caller.
-	return code | DIFFCODE::FILE | DIFFCODE::TEXTFLAGS;
+	return code;
 }
 
 /**
@@ -220,13 +180,6 @@ int DiffUtils::diffutils_compare_files()
  */
 bool DiffUtils::RegExpFilter(int StartPos, int EndPos, int FileNo)
 {
-	if (m_pFilterList == NULL)
-	{
-		_RPTF0(_CRT_ERROR, "DiffUtils::RegExpFilter() called when "
-				"filterlist doesn't exist (=NULL)");
-		return false;
-	}
-
 	bool linesMatch = true; // set to false when non-matching line is found.
 	int line = StartPos;
 
@@ -234,7 +187,7 @@ bool DiffUtils::RegExpFilter(int StartPos, int EndPos, int FileNo)
 	{
 		const char *string = files[FileNo].linbuf[line];
 		size_t stringlen = linelen(string);
-		if (!m_pFilterList->Match(stringlen, string, m_codepage))
+		if (!FilterList::Match(stringlen, string, m_codepage))
 		{
 			linesMatch = false;
 		}

@@ -105,16 +105,14 @@ UINT FolderCmp::prepAndCompareTwoFiles(DIFFITEM &di)
 	if (nCompMethod == CMP_CONTENT)
 	{
 		if (m_pDiffUtilsEngine == NULL)
-		{
-			DiffutilsOptions options;
-			options.SetFromDiffOptions(m_pCtx->m_options);
-			m_pDiffUtilsEngine = new CompareEngines::DiffUtils(options);
-		}
+			m_pDiffUtilsEngine = new CompareEngines::DiffUtils(m_pCtx->m_options);
 
 		m_pDiffUtilsEngine->SetCodepage(
 			m_diffFileData.m_FileLocation[0].encoding.m_unicoding ? 
 				CP_UTF8 : m_diffFileData.m_FileLocation[0].encoding.m_codepage);
-		m_pDiffUtilsEngine->SetFilterList(m_pCtx->m_pFilterList);
+		m_pDiffUtilsEngine->SetCompareFiles(
+			m_diffFileData.m_FileLocation[0].filepath,
+			m_diffFileData.m_FileLocation[1].filepath);
 		m_pDiffUtilsEngine->SetFileData(2, m_diffFileData.m_inf);
 		code = m_pDiffUtilsEngine->diffutils_compare_files();
 		m_pDiffUtilsEngine->GetDiffCounts(m_ndiffs, m_ntrivialdiffs);
@@ -135,15 +133,12 @@ UINT FolderCmp::prepAndCompareTwoFiles(DIFFITEM &di)
 	{
 		if (m_pByteCompare == NULL)
 		{
-			QuickCompareOptions options;
-			options.SetFromDiffOptions(m_pCtx->m_options);
-			m_pByteCompare = new CompareEngines::ByteCompare(options);
+			m_pByteCompare = new CompareEngines::ByteCompare(m_pCtx->m_options);
+			m_pByteCompare->SetAdditionalOptions(m_pCtx->m_bStopAfterFirstDiff);
+			m_pByteCompare->SetAbortable(m_pCtx->GetAbortable());
 		}
 
-		m_pByteCompare->SetAdditionalOptions(m_pCtx->m_bStopAfterFirstDiff);
-		m_pByteCompare->SetAbortable(m_pCtx->GetAbortable());
 		m_pByteCompare->SetFileData(2, m_diffFileData.m_inf);
-		//m_pByteCompare->SetFileHandles(2, osfhandle);
 
 		// use our own byte-by-byte compare
 		code = m_pByteCompare->CompareFiles(&m_diffFileData.m_FileLocation.front());

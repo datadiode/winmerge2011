@@ -97,9 +97,9 @@ public:
 
 // Implementation
 public:
-	void InitCompare(LPCTSTR pszLeft, LPCTSTR pszRight, BOOL bRecursive, CTempPathContext *);
+	void InitCompare(LPCTSTR pszLeft, LPCTSTR pszRight, int nRecursive, CTempPathContext *);
 	void Rescan(bool bCompareSelected = false);
-	BOOL GetRecursive() const { return m_bRecursive; }
+	int GetRecursive() const { return m_nRecursive; }
 	void CompareReady();
 	void UpdateChangedItem(const CChildFrame *);
 	UINT_PTR FindItemFromPaths(LPCTSTR pathLeft, LPCTSTR pathRight);
@@ -141,16 +141,13 @@ public:
 	const CompareStats * GetCompareStats() const { return m_pCompareStats; };
 	bool IsArchiveFolders();
 
-protected:
-	void LoadLineFilterList();
-
 	// Implementation data
 private:
 	CDiffContext *m_pCtxt; /**< Pointer to compare results-data */
 	CompareStats *const m_pCompareStats; /**< Compare statistics */
 	MergeDocPtrList m_MergeDocs; /**< List of file compares opened from this compare */
 	HexMergeDocPtrList m_HexMergeDocs; /**< List of hex file compares opened from this compare */
-	BOOL m_bRecursive; /**< Is current compare recursive? */
+	int m_nRecursive; /**< Is current compare recursive? (ternary logic - 2 means flat) */
 	String m_strLeftDesc; /**< Left side desription text */
 	String m_strRightDesc; /**< Left side desription text */
 };

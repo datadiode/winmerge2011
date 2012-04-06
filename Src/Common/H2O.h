@@ -599,6 +599,11 @@ namespace H2O
 			assert(::IsWindow(m_hWnd));
 			return ::EndPaint(m_hWnd, pps);
 		}
+		BOOL GetUpdateRect(LPRECT lpRect, BOOL bErase)
+		{
+			assert(::IsWindow(m_hWnd));
+			return ::GetUpdateRect(m_hWnd, lpRect, bErase);
+		}
 		int MessageBoxA(LPCSTR text, LPCSTR caption, UINT style)
 		{
 			assert(::IsWindow(m_hWnd));
@@ -1011,9 +1016,13 @@ namespace H2O
 		{
 			return ::ExtTextOut(m_hDC, x, y, options, prc, pch, cch, pdx);
 		}
-		int DrawText(LPCTSTR pch, int cch, RECT *prc, UINT format)
+		int DrawTextA(LPCSTR pch, int cch, RECT *prc, UINT format)
 		{
-			return ::DrawText(m_hDC, pch, cch, prc, format);
+			return ::DrawTextA(m_hDC, pch, cch, prc, format);
+		}
+		int DrawTextW(LPCWSTR pch, int cch, RECT *prc, UINT format)
+		{
+			return ::DrawTextW(m_hDC, pch, cch, prc, format);
 		}
 		int DrawText(const String &s, RECT *prc, UINT format)
 		{
@@ -2191,9 +2200,9 @@ namespace H2O
 	class HButton : public Button<HWindow>
 	{
 	public:
-		static HButton *Create(DWORD style, int x, int y, int cx, int cy, HWindow *parent, UINT id)
+		static HButton *Create(DWORD style, int x, int y, int cx, int cy, HWindow *parent, UINT id, DWORD xstyle = 0)
 		{
-			HWindow *pWnd = CreateEx(0, WC_BUTTON, NULL, style, x, y, cx, cy, parent, id);
+			HWindow *pWnd = CreateEx(xstyle, WC_BUTTON, NULL, style, x, y, cx, cy, parent, id);
 			return static_cast<HButton *>(pWnd);
 		}
 	};
@@ -4160,6 +4169,7 @@ namespace H2O
 		NMTVITEMCHANGE TVITEMCHANGE;
 		NMTVDISPINFO TVDISPINFO;
 		NMTVCUSTOMDRAW TVCUSTOMDRAW;
+		NMLVCUSTOMDRAW LVCUSTOMDRAW;
 		NMCOMBOBOXEX COMBOBOXEX;
 	};
 

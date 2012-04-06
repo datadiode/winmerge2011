@@ -177,7 +177,7 @@ void CDiffThread::DiffThreadCollect(LPVOID lpParam)
 	// Stash abortable interface into context
 	myStruct->context->SetAbortable(myStruct);
 
-	int depth = myStruct->context->m_bRecursive ? -1 : 0;
+	int depth = myStruct->context->m_nRecursive ? -1 : 0;
 
 	String subdir; // blank to start at roots specified in diff context
 #ifdef _DEBUG
@@ -211,7 +211,9 @@ void CDiffThread::DiffThreadCollect(LPVOID lpParam)
  */
 void CDiffThread::DiffThreadCompare(LPVOID lpParam)
 {
-	CDiffThread *myStruct = (CDiffThread *) lpParam;
+	CoInitializeEx(NULL, COINIT_MULTITHREADED);
+
+	CDiffThread *const myStruct = reinterpret_cast<CDiffThread *>(lpParam);
 
 	// Stash abortable interface into context
 	myStruct->context->SetAbortable(myStruct);
@@ -230,4 +232,6 @@ void CDiffThread::DiffThreadCompare(LPVOID lpParam)
 	myStruct->nThreadState = CDiffThread::THREAD_COMPLETED;
 	// msgID=MSG_UI_UPDATE=1025 (2005-11-29, Perry)
 	PostMessage(myStruct->hWindow, myStruct->msgUIUpdate, NULL, NULL);
+
+	CoUninitialize();
 }

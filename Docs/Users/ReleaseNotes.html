@@ -17,28 +17,52 @@ li
 </style>
 </head>
 <body>
-<h2>WinMerge 2011.002.047 Release Notes</h2>
-This is a maintenance/bugfix release of WinMerge 2011.
-It is intended as a replacement for any of the predecessor versions listed below:
+<h2>WinMerge 0.2011.002.145 Release Notes</h2>
+This <b>experimental</b>
+release of WinMerge&nbsp;2011 implements two substantial new features:
 <ul>
-<li>2011.002.027
-<li>2011.001.527
+<li>Line filters can now act as prediffers, i.e., operate on content before
+	WinMerge passes it down to the diff algorithm.
+	An example is given
+	<a target='_blank' href='http://shortlinks.de/l999'>here</a>.
+	More examples are to follow.
+	<p>
+	Prediffers can be specified in either of the following forms:
+	<ul>
+	<li>Capturing regular expressions
+		<p>
+		All parts of a match which are covered by a submatch are removed,
+		or replaced by a fixed sequence of characters, whose length is,
+		for technical reasons,
+		limited to the length of the shortest possible submatch.
+	<li>Prediffer scriptlets
+		<p>
+		A prediffer scriptlet implements a method with name
+		<code>ProcessLine</code>,
+		which is called once per line to perform preprocessing as desired,
+		subject to the limitation that the length of the processed line must not
+		exceed the length of the original line.
+		<p>
+		By maintaining state, prediffer scriptlets are also capable of taking
+		into consideration preceding content. For this purpose, they need to
+		expose a method with name <code>Reset</code> to reset their state.
+		WinMerge indicates the side on which a prediffer scriptlet is
+		subsequently going to operate by passing the <code>Reset</code> method
+		a value of 0&nbsp;or&nbsp;1. This allows a prediffer scriptlet to keep
+		knowledge gathered from the left side for reference during processing of
+		the right side.
+	</ul>
+<li>The Open dialog's <i>Include Subfolders</i> option has been extended to
+	support situations where folder structure differs between sides, but files
+	on both sides are uniquely identifiable by their names, and hence can be
+	matched without considering folder structure.
+	When encountering name collisions, WinMerge attempts to resolve them by also
+	considering sizes and modification dates of the involved files.
+	<p>
+	To enable this special mode of operation, repeat clicking the
+	<i>Include Subfolders</i> checkbox until it yields a visual appearance that
+	is different from <i>checked</i> and <i>unchecked</i>,
+	and an annotation shows up indicating that folder structure will be ignored.
 </ul>
 <p>
-<i>Jochen Neubeck, January 2012</i>
-
-<h2>WinMerge 2011.001.527 Release Notes</h2>
-<p>
-This is the first stable release of WinMerge 2011.
-It fixes a number of bugs and regressions that have been found in the last beta,
-and finally includes a compiled help file created from a revised version of the
-WinMerge&#160;2 DocBook sources. If you have worked with WinMerge&#160;2, and
-want to learn about the most relevant differences, section <i>File transforms</i>
-and the <i>Frequently asked questions</i> 3.6 and 7.2 are of particular interest.
-<p>
-WinMerge&#160;2011 still lacks an equivalent for WinMerge&#160;2's prediffer plugins.
-My vague plan with this is to provide line filters with knowledge of both side's content.
-This would kind of demand a bit more expressive power than regular expressions can offer,
-but JavaScript/VBScript are good options.
-<p>
-<i>Jochen Neubeck, December 2011</i>
+<i>Jochen Neubeck, April 2012</i>

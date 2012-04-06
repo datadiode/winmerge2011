@@ -24,10 +24,10 @@ static const size_t PADDING = 0x0008;
 /**
  * @brief Default constructor.
  */
-ByteCompare::ByteCompare(const QuickCompareOptions &options)
-	: m_options(options)
-	, m_piAbortable(NULL)
+ByteCompare::ByteCompare(const DIFFOPTIONS &options)
+	: m_piAbortable(NULL)
 {
+	SetFromDiffOptions(options);
 	m_osfhandle[0] = NULL;
 	m_osfhandle[1] = NULL;
 }
@@ -45,7 +45,7 @@ ByteCompare::~ByteCompare()
  */
 void ByteCompare::SetAdditionalOptions(bool stopAfterFirstDiff)
 {
-	m_options.m_bStopAfterFirstDiff = stopAfterFirstDiff;
+	m_bStopAfterFirstDiff = stopAfterFirstDiff;
 }
 
 /**
@@ -121,7 +121,7 @@ unsigned ByteCompare::CompareFiles(const size_t x, const size_t j)
 			{
 				if (m_piAbortable && m_piAbortable->ShouldAbort())
 					return DIFFCODE::CMPABORT;
-				if (m_options.m_bStopAfterFirstDiff && (diffcode == DIFFCODE::DIFF))
+				if (m_bStopAfterFirstDiff && (diffcode == DIFFCODE::DIFF))
 				{
 					// Do not read more data, but continue to process what is
 					// already in memory.
@@ -201,7 +201,7 @@ unsigned ByteCompare::CompareFiles(const size_t x, const size_t j)
 			if (mask & BLANK)
 			{
 				// There is a blank on one or both sides.
-				switch (m_options.m_ignoreWhitespace)
+				switch (m_ignoreWhitespace)
 				{
 				case WHITESPACE_IGNORE_ALL:
 					blankness_type_prev[0] = BLANK; // Simulate a preceding BLANK.
@@ -233,12 +233,12 @@ unsigned ByteCompare::CompareFiles(const size_t x, const size_t j)
 				// EOL on both sides, but different in style. Force bytes ahead
 				// to (un)equalness, depending on bIgnoreEOLDifference.
 				c[0] = true;
-				c[1] = m_options.m_bIgnoreEOLDifference;
+				c[1] = m_bIgnoreEOLDifference;
 			}
 			else if (blankness_type[0] & (CR | LF | CRLF))
 			{
 				// EOL on left side only
-				if (m_options.m_bIgnoreBlankLines)
+				if (m_bIgnoreBlankLines)
 				{
 					count[1] = NULL;
 					continue;
@@ -247,7 +247,7 @@ unsigned ByteCompare::CompareFiles(const size_t x, const size_t j)
 			else if (blankness_type[1] & (CR | LF | CRLF))
 			{
 				// EOL on right side only
-				if (m_options.m_bIgnoreBlankLines)
+				if (m_bIgnoreBlankLines)
 				{
 					count[0] = NULL;
 					continue;
@@ -260,7 +260,7 @@ unsigned ByteCompare::CompareFiles(const size_t x, const size_t j)
 				continue;
 			}
 		}
-		if (c[0] == c[1] || m_options.m_bIgnoreCase && tolower(c[0]) == tolower(c[1]))
+		if (c[0] == c[1] || m_bIgnoreCase && tolower(c[0]) == tolower(c[1]))
 			continue;
 		diffcode = DIFFCODE::DIFF;
 	}
@@ -284,7 +284,7 @@ unsigned ByteCompare::CompareFiles(FileLocation *location)
 	m_textStats[0].clear();
 	m_textStats[1].clear();
 
-	if (m_options.m_bStopAfterFirstDiff && (m_osfhandle[0] == m_osfhandle[1]))
+	if (m_bStopAfterFirstDiff && (m_osfhandle[0] == m_osfhandle[1]))
 		return DIFFCODE::SAME;
 
 	unsigned code = DIFFCODE::DIFF;

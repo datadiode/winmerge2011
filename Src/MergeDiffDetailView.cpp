@@ -96,15 +96,6 @@ BOOL CMergeDiffDetailView::PrimeListWithFile()
 }
 
 /**
- * @brief Compute initial height of view.
- * @return Initial height set for view.
- */
-int CMergeDiffDetailView::ComputeInitialHeight() 
-{
-	return GetLineHeight() * NROWS_INIT;
-}
-
-/**
  * @brief Set view's height.
  * @param [in] h new view height in lines
  * @todo Calculation seems suspicious...
@@ -124,7 +115,7 @@ void CMergeDiffDetailView::EnsureVisible(POINT pt)
 
 
 /// virtual, ensure we remain in diff
-void CMergeDiffDetailView::SetSelection (const POINT & ptStart, const POINT & ptEnd)
+void CMergeDiffDetailView::SetSelection(const POINT &ptStart, const POINT &ptEnd)
 {
 	POINT ptStartNew = ptStart;
 	EnsureInDiff(ptStartNew);

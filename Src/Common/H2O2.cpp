@@ -1,7 +1,7 @@
 // H2O2.cpp
 //
 // Copyright (c) 2005-2010  David Nash (as of Win32++ v7.0.2)
-// Copyright (c) 2011		Jochen Neubeck
+// Copyright (c) 2011-2012  Jochen Neubeck
 //
 // Permission is hereby granted, free of charge, to
 // any person obtaining a copy of this software and
@@ -258,6 +258,48 @@ HWND ODialog::Create(HINSTANCE hinst, HWND parent)
 	return CreateDialogParam(hinst, m_idd, parent, DlgProc, reinterpret_cast<LPARAM>(&psp));
 }
 
+void ODialog::Update3StateCheckBoxLabel(UINT id)
+{
+	String text;
+	HButton *const pButton = static_cast<HButton *>(GetDlgItem(id));
+	// Remember the initial text of the label in an invisible child window.
+	if (pButton->GetDlgItemText(1, text) == 0)
+	{
+		pButton->GetWindowText(text);
+		HWindow::CreateEx(0, WC_STATIC, text.c_str(), WS_CHILD, 0, 0, 0, 0, pButton, 1);
+	}
+	// If there is a \t to split the text in twice, the shorter part shows up
+	// for BST_(UN)CHECKED, and the longer part shows up for BST_INDETERMINATE.
+	// The shorter part is assumed to be a prefix of the longer part.
+	String::size_type i = text.find(_T('\t'));
+	if (i != String::npos)
+	{
+		String::size_type j = text.length() - i;
+		if (pButton->GetCheck() == BST_INDETERMINATE ? i <= j : i > j)
+		{
+			// If there is an &, move it where it belongs.
+			j = text.find(_T('&'));
+			if (j != String::npos)
+			{
+				text.erase(j, 1);
+				text.insert(i + j, 1, _T('&'));
+				--i;
+			}
+			// Swap texts before and after the \t.
+			TCHAR *const buf = &text.front();
+			buf[i] = _T('\0');
+			_tcsrev(buf);
+			_tcsrev(buf + i + 1);
+			buf[i] = _T('\t');
+			_tcsrev(buf);
+		}
+		// Exclude excess text from \t onwards. (In other words: Do not rely on
+		// Visual Styles being in effect, and empirics about their behaviors.)
+		text.resize(text.find(_T('\t')));
+		pButton->SetWindowText(text.c_str());
+	}
+}
+
 BOOL OResizableDialog::OnInitDialog()
 {
 	ODialog::OnInitDialog();
@@ -343,6 +385,45 @@ HWND H2O::GetTopLevelParent(HWND hWnd)
 	while (HWND hWndParent = ::GetParent(hWnd))
 		hWnd = hWndParent;
 	return hWnd;
+}
+
+HIMAGELIST H2O::Create3StateImageList()
+{
+	HIMAGELIST himlState = ImageList_Create(16, 16, ILC_COLOR | ILC_MASK, 3, 0);
+
+	RECT rc = { 0, 0, 48, 16 };
+
+	HDC hdcScreen = GetDC(0);
+
+	HDC hdc = CreateCompatibleDC(hdcScreen);
+	HBITMAP hbm = CreateCompatibleBitmap(hdcScreen, 48, 16);
+	HGDIOBJ hbmOld = SelectObject(hdc, hbm);
+	SetBkColor(hdc, RGB(255,255,255));
+	ExtTextOut(hdc, 0, 0, ETO_OPAQUE, &rc, NULL, 0, NULL);
+
+	SetRect(&rc, 1, 1, 14, 14);
+	DrawFrameControl(hdc, &rc, DFC_BUTTON,
+					 DFCS_FLAT|DFCS_BUTTONCHECK);
+
+	OffsetRect(&rc, 16, 0);
+	DrawFrameControl(hdc, &rc, DFC_BUTTON,
+					 DFCS_FLAT|DFCS_BUTTONCHECK|DFCS_CHECKED);
+
+	OffsetRect(&rc, 16, 0);
+	DrawFrameControl(hdc, &rc, DFC_BUTTON,
+					 DFCS_FLAT|DFCS_BUTTONCHECK);
+
+	InflateRect(&rc, -4, -4);
+	FillRect(hdc, &rc, (HBRUSH)GetStockObject(BLACK_BRUSH));
+
+	SelectObject(hdc, hbmOld);
+	ImageList_AddMasked(himlState, hbm, RGB(255,255,255));
+
+	DeleteObject(hbm);
+	DeleteDC(hdc);
+	ReleaseDC(0, hdcScreen);
+
+	return himlState;
 }
 
 void H2O::GetDesktopWorkArea(HWND hWnd, LPRECT prcDesktop)

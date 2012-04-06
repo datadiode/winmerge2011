@@ -221,9 +221,8 @@ void CChildFrame::ReloadDocs()
 		m_pView[MERGE_VIEW_RIGHT]->ReAttachToBuffer();
 		m_pDetailView[0]->ReAttachToBuffer();
 		m_pDetailView[1]->ReAttachToBuffer();
-		bool bBinary = false;
 		bool bIdentical = false;
-		Rescan2(bBinary, bIdentical);
+		Rescan2(bIdentical);
 	}
 	UpdateAllViews(NULL);
 }
@@ -746,17 +745,7 @@ CChildFrame::CChildFrame(CMainFrame *pMDIFrame, CChildFrame *pOpener)
 	m_bEditAfterRescan[1] = false;
 	m_ptBuf[0] = new CDiffTextBuffer(this, 0);
 	m_ptBuf[1] = new CDiffTextBuffer(this, 1);
-
-	m_diffWrapper.SetDetectMovedBlocks(COptionsMgr::Get(OPT_CMP_MOVED_BLOCKS));
-
-	DIFFOPTIONS options;
-	options.nIgnoreWhitespace = COptionsMgr::Get(OPT_CMP_IGNORE_WHITESPACE);
-	options.bIgnoreBlankLines = COptionsMgr::Get(OPT_CMP_IGNORE_BLANKLINES);
-	options.bFilterCommentsLines = COptionsMgr::Get(OPT_CMP_FILTER_COMMENTLINES);
-	options.bIgnoreCase = COptionsMgr::Get(OPT_CMP_IGNORE_CASE);
-	options.bIgnoreEol = COptionsMgr::Get(OPT_CMP_IGNORE_EOL);
-	m_diffWrapper.SetOptions(options);
-
+	m_diffWrapper.RefreshOptions();
 	SubclassWindow(pMDIFrame->CreateChildHandle());
 	CreateClient();
 	RecalcLayout();

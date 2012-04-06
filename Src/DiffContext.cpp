@@ -31,8 +31,9 @@
 #include "Merge.h"
 #include "CompareOptions.h"
 #include "CompareStats.h"
-#include "common/version.h"
+#include "Common/version.h"
 #include "FilterList.h"
+#include "LineFiltersList.h"
 #include "DiffContext.h"
 #include "paths.h"
 #include "coretools.h"
@@ -66,8 +67,8 @@ CDiffContext::CDiffContext(LPCTSTR pszLeft, LPCTSTR pszRight)
 , m_pCompareStats(NULL)
 , m_piAbortable(NULL)
 , m_bStopAfterFirstDiff(false)
-, m_pFilterList(NULL)
-, m_bRecursive(false)
+, m_pFilterList(new FilterList)
+, m_nRecursive(0)
 , m_bWalkUniques(true)
 , m_paths(2)
 {

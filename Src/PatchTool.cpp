@@ -93,8 +93,7 @@ void CPatchTool::AddFiles(LPCTSTR file1, LPCTSTR altPath1, LPCTSTR file2, LPCTST
 int CPatchTool::CreatePatch()
 {
 	DIFFSTATUS status;
-	BOOL bResult = TRUE;
-	BOOL bDiffSuccess;
+	bool bResult = true;
 	int retVal = 0;
 
 	// If files already inserted, add them to dialog
@@ -126,30 +125,26 @@ int CPatchTool::CreatePatch()
 			m_diffWrapper.SetPaths(files.lfile, files.rfile, FALSE);
 			m_diffWrapper.SetAlternativePaths(files.pathLeft, files.pathRight);
 			m_diffWrapper.SetCompareFiles(files.lfile, files.rfile);
-			bDiffSuccess = m_diffWrapper.RunFileDiff();
-			m_diffWrapper.GetDiffStatus(&status);
-
-			if (!bDiffSuccess)
+			if (!m_diffWrapper.RunFileDiff())
 			{
 				LanguageSelect.MsgBox(IDS_FILEERROR, MB_ICONSTOP);
-				bResult = FALSE;
+				bResult = false;
 				break;
 			}
-			else if (status.bBinaries)
+			if (m_diffWrapper.m_status.bBinaries)
 			{
 				LanguageSelect.MsgBox(IDS_CANNOT_CREATE_BINARYPATCH, MB_ICONSTOP);
-				bResult = FALSE;
+				bResult = false;
 				break;
 			}
-			else if (status.bPatchFileFailed)
+			if (m_diffWrapper.m_status.bPatchFileFailed)
 			{
 				LanguageSelect.FormatMessage(
 					IDS_FILEWRITE_ERROR, m_dlgPatch.m_fileResult.c_str()
 				).MsgBox(MB_ICONSTOP);
-				bResult = FALSE;
+				bResult = false;
 				break;
 			}
-
 			// Append next files...
 			m_diffWrapper.SetAppendFiles(TRUE);
 		}
@@ -172,7 +167,6 @@ int CPatchTool::CreatePatch()
  */
 BOOL CPatchTool::ShowDialog()
 {
-	PATCHOPTIONS patchOptions;
 	BOOL bRetVal = TRUE;
 
 	if (LanguageSelect.DoModal(m_dlgPatch) == IDOK)
@@ -181,13 +175,13 @@ BOOL CPatchTool::ShowDialog()
 		if (m_dlgPatch.GetItemCount() < 1)
 			bRetVal = FALSE;
 
+		PATCHOPTIONS patchOptions;
 		// These two are from dropdown list - can't be wrong
 		patchOptions.outputStyle = m_dlgPatch.m_outputStyle;
 		patchOptions.nContext = m_dlgPatch.m_contextLines;
-
 		// Checkbox - can't be wrong
-		patchOptions.bAddCommandline = m_dlgPatch.m_includeCmdLine;
-		m_diffWrapper.SetPatchOptions(&patchOptions);
+		patchOptions.bAddCommandline = m_dlgPatch.m_includeCmdLine != FALSE;
+		m_diffWrapper.SetPatchOptions(patchOptions);
 
 		// These are from checkboxes and radiobuttons - can't be wrong
 		DIFFOPTIONS diffOptions;
@@ -199,7 +193,7 @@ BOOL CPatchTool::ShowDialog()
 		diffOptions.bIgnoreEol = false;
 		diffOptions.bIgnoreCase = m_dlgPatch.m_caseSensitive == FALSE;
 		diffOptions.bFilterCommentsLines = false;
-		m_diffWrapper.SetOptions(diffOptions);
+		m_diffWrapper.SetFromDiffOptions(diffOptions);
 	}
 	else
 		return FALSE;

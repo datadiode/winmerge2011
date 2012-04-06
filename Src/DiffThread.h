@@ -93,6 +93,13 @@ private:
 	bool UpdateDiffItem(DIFFITEM &);
 	int DirScan_CompareItems(UINT_PTR parentdiffpos);
 	int DirScan_CompareRequestedItems(UINT_PTR parentdiffpos);
+
+	typedef stl::vector<DirItem> DirItemArray;
+
+	void LoadAndSortFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *files) const;
+	void LoadFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *files) const;
+	void Sort(DirItemArray *dirs) const;
+	int collstr(const String &, const String &) const;
 };
 
 #endif /* _DIFFTHREAD_H */

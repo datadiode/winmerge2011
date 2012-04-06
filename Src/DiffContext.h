@@ -77,7 +77,7 @@ public:
 	//@}
 
 	// change an existing difference
-	BOOL UpdateInfoFromDiskHalf(DIFFITEM & di, BOOL bLeft);
+	BOOL UpdateInfoFromDiskHalf(DIFFITEM &di, BOOL bLeft);
 	void UpdateStatusFromDisk(UINT_PTR diffpos, BOOL bLeft, BOOL bRight);
 
 	//@{
@@ -93,14 +93,14 @@ public:
 	 * user wants to.
 	 * @param [in] piAbortable Pointer to interface.
 	 */
-	void SetAbortable(IAbortable * piAbortable) { m_piAbortable = piAbortable; }
+	void SetAbortable(IAbortable *piAbortable) { m_piAbortable = piAbortable; }
 
 	/**
 	 * Returns a pointer to current IAbortable interface.
 	 * This function returns a pointer to interface used to abort the compare.
 	 * @return Pointer to current IAbortable interface.
 	 */
-	const IAbortable * GetAbortable() const { return m_piAbortable; }
+	const IAbortable *GetAbortable() const { return m_piAbortable; }
 	//@}
 
 	IDiffFilter * m_piFilterGlobal; /**< Interface for file filtering. */
@@ -145,8 +145,8 @@ public:
 	 */
 	bool m_bWalkUniques;
 
-	bool m_bRecursive; /**< Do we include subfolders to compare? */
-	FilterList * m_pFilterList; /**< Filter list for line filters */
+	int m_nRecursive; /**< Do we include subfolders to compare? */
+	FilterList *const m_pFilterList; /**< Filter list for line filters */
 
 	/**
 	 * The main compare method used.

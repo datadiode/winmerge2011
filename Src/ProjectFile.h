@@ -25,53 +25,28 @@
 #ifndef _PROJECT_FILE_H_
 #define _PROJECT_FILE_H_
 
-/** @brief File extension for path files */
-const TCHAR PROJECTFILE_EXT[] = _T(".WinMerge");
-
 /**
  * @brief Class for handling project files.
  *
- * This class loads and saves project files. Expat parser and SCEW wrapper for
- * expat are used for XML parsing. We use UTF-8 encoding so Unicode paths are
- * supported.
+ * This class loads and saves project files.
+ * We use UTF-8 encoding so Unicode paths are supported.
  */
 class ProjectFile
 {
 public:
 	ProjectFile();
-	bool Read(LPCTSTR path, String &sError);
-	bool Save(LPCTSTR path, String &sError);
+	bool Read(LPCTSTR);
+	bool Save(LPCTSTR);
 	
-	bool HasLeft() const;
-	bool HasRight() const;
-	bool HasFilter() const;
-	bool HasSubfolders() const;
+	static BOOL IsProjectFile(LPCTSTR);
 
-	String GetLeft() const;
-	bool GetLeftReadOnly() const;
-	String GetRight() const;
-	bool GetRightReadOnly() const;
-	String GetFilter() const;
-	int GetSubfolders() const;
-
-	void SetLeft(const String& sLeft, bool readOnly);
-	void SetRight(const String& sRight, bool readOnly);
-	void SetFilter(const String& sFilter);
-	void SetSubfolders(int iSubfolder);
-
-	static bool IsProjectFile(LPCTSTR filepath);
-
-private:
-	bool m_bHasLeft; /**< Has left path? */
-	String m_leftFile; /**< Left path */
-	bool m_bHasRight; /**< Has right path? */
-	String m_rightFile; /**< Right path */
-	bool m_bHasFilter; /**< Has filter? */
-	String m_filter; /**< Filter name or mask */
-	bool m_bHasSubfolders; /**< Has subfolders? */
-	int m_subfolders; /**< Are subfolders included (recursive scan) */
-	bool m_bLeftReadOnly; /**< Is left path opened as read-only */
-	bool m_bRightReadOnly; /**< Is right path opened as read-only */
+public:
+	String m_sLeftFile; /**< Left path */
+	String m_sRightFile; /**< Right path */
+	String m_sFilter; /**< Filter name or mask */
+	int m_nRecursive; /**< Are subfolders included (recursive scan) */
+	BOOL m_bLeftPathReadOnly; /**< Is left path opened as read-only */
+	BOOL m_bRightPathReadOnly; /**< Is right path opened as read-only */
 };
 
 #endif // #ifdef _PROJECT_FILE_H_

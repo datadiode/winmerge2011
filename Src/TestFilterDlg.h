@@ -20,12 +20,12 @@ class CTestFilterDlg : public ODialog
 {
 // Construction
 public:
-	CTestFilterDlg(FileFilter * pFileFilter, FileFilterMgr *pFilterMgr);
+	CTestFilterDlg(FileFilter *pFileFilter, FileFilterMgr *pFilterMgr);
 
 // Implementation data
 private:
-	FileFilter * m_pFileFilter; /**< Selected file filter. */
-	FileFilterMgr * m_pFileFilterMgr; /**< File filter manager. */
+	FileFilter *const m_pFileFilter; /**< Selected file filter. */
+	FileFilterMgr *const m_pFileFilterMgr; /**< File filter manager. */
 
 // Implementation methods
 private:

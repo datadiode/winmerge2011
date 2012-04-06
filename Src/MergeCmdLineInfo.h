@@ -56,7 +56,7 @@ public:
 	bool m_bClearCaseTool; /**< Running as Rational ClearCase external tool. */
 	bool m_bEscShutdown; /**< Pressing ESC will close the application */
 	ExitNoDiff m_bExitIfNoDiff; /**< Exit if files are identical. */
-	bool m_bRecurse; /**< Include sub folder in directories compare. */
+	int m_nRecursive; /**< Include sub folder in directories compare. */
 	bool m_bNonInteractive; /**< Suppress user's notifications. */
 	bool m_bSingleInstance; /**< Allow only one instance of WinMerge executable. */
 	bool m_bShowUsage; /**< Show a brief reminder to command line arguments. */

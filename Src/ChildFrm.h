@@ -180,8 +180,8 @@ public:
 	void RefreshOptions();
 	OPENRESULTS_TYPE OpenDocs(FileLocation &, FileLocation &, BOOL bROLeft, BOOL bRORight);
 	void RescanIfNeeded(float timeOutInSecond);
-	int Rescan(bool &bBinary, bool &bIdentical, bool bForced = false);
-	int Rescan2(bool &bBinary, bool &bIdentical);
+	int Rescan(bool &bIdentical, bool bForced = false);
+	int Rescan2(bool &bIdentical);
 	void ShowRescanError(int nRescanResult, BOOL bIdentical);
 	void AddUndoAction(UINT nBegin, UINT nEnd, UINT nDiff, int nBlanks, BOOL bInsert, CMergeEditView *pList);
 	bool Undo();

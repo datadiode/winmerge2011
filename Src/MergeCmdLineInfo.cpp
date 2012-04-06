@@ -117,7 +117,7 @@ MergeCmdLineInfo::MergeCmdLineInfo(LPCTSTR q):
 	m_bClearCaseTool(false),
 	m_bEscShutdown(false),
 	m_bExitIfNoDiff(Disabled),
-	m_bRecurse(false),
+	m_nRecursive(0),
 	m_bNonInteractive(false),
 	m_bSingleInstance(false),
 	m_bShowUsage(false),
@@ -297,7 +297,12 @@ void MergeCmdLineInfo::ParseWinMergeCmdLine(LPCTSTR q)
 		else if (param == _T("r"))
 		{
 			// -r to compare recursively
-			m_bRecurse = true;
+			m_nRecursive = 1;
+		}
+		else if (param == _T("r2"))
+		{
+			// -r to compare recursively
+			m_nRecursive = 2;
 		}
 		else if (param == _T("s"))
 		{

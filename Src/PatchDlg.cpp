@@ -57,9 +57,9 @@ bool CPatchDlg::UpdateData()
 {
 	DDX_Check<op>(IDC_DIFF_CASESENSITIVE, m_caseSensitive);
 	DDX_Check<op>(IDC_DIFF_WHITESPACE_IGNOREBLANKS, m_ignoreBlanks);
-	DDX_Check<op>(IDC_DIFF_WHITESPACE_COMPARE, m_whitespaceCompare, 0);
-	DDX_Check<op>(IDC_DIFF_WHITESPACE_IGNORE, m_whitespaceCompare, 1);
-	DDX_Check<op>(IDC_DIFF_WHITESPACE_IGNOREALL, m_whitespaceCompare, 2);
+	DDX_Check<op>(IDC_DIFF_WHITESPACE_COMPARE, m_whitespaceCompare, WHITESPACE_COMPARE_ALL);
+	DDX_Check<op>(IDC_DIFF_WHITESPACE_IGNORE, m_whitespaceCompare, WHITESPACE_IGNORE_CHANGE);
+	DDX_Check<op>(IDC_DIFF_WHITESPACE_IGNOREALL, m_whitespaceCompare, WHITESPACE_IGNORE_ALL);
 	DDX_Check<op>(IDC_DIFF_APPENDFILE, m_appendFile);
 	DDX_CBStringExact<op>(IDC_DIFF_FILE1, m_file1);
 	DDX_CBStringExact<op>(IDC_DIFF_FILE2, m_file2);
@@ -501,8 +501,8 @@ void CPatchDlg::UpdateSettings()
 void CPatchDlg::LoadSettings()
 {
 	int patchStyle = SettingStore.GetProfileInt(_T("PatchCreator"), _T("PatchStyle"), 0);
-	if (patchStyle < DIFF_OUTPUT_NORMAL || patchStyle > DIFF_OUTPUT_UNIFIED)
-		patchStyle = DIFF_OUTPUT_NORMAL;
+	if (patchStyle < OUTPUT_NORMAL || patchStyle > OUTPUT_UNIFIED)
+		patchStyle = OUTPUT_NORMAL;
 	m_outputStyle = (enum output_style) patchStyle;
 	
 	m_contextLines = SettingStore.GetProfileInt(_T("PatchCreator"), _T("ContextLines"), 0);

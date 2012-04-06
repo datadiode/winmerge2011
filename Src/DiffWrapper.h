@@ -116,7 +116,7 @@ struct PATCHOPTIONS
 {
 	enum output_style outputStyle; /**< Patch file style. */
 	int nContext; /**< Number of context lines. */
-	BOOL bAddCommandline; /**< Add diff-style commandline to patch file. */
+	bool bAddCommandline; /**< Add diff-style commandline to patch file. */
 };
 
 /**
@@ -126,9 +126,9 @@ struct DIFFSTATUS
 {
 	BOOL bLeftMissingNL; /**< Left file is missing EOL before EOF */
 	BOOL bRightMissingNL; /**< Right file is missing EOL before EOF */
-	BOOL bBinaries; /**< Files are binaries */
-	BOOL bIdentical; /**< diffutils said files are identical */
-	BOOL bPatchFileFailed; /**< Creating patch file failed */
+	bool bBinaries; /**< Files are binaries */
+	bool bIdentical; /**< diffutils said files are identical */
+	bool bPatchFileFailed; /**< Creating patch file failed */
 
 	DIFFSTATUS() { memset(this, 0, sizeof *this); } // start out with all flags clear
 };
@@ -143,50 +143,55 @@ class FilterCommentsManager;
  * DiffList or to patch file. Output type must be selected with member
  * functions SetCreatePatchFile() and SetCreateDiffList().
  */
-class CDiffWrapper : public FilterCommentsManager
+class CDiffWrapper
+	: public FilterCommentsManager
+	, public DiffutilsOptions
 {
 public:
 	CDiffWrapper();
 	~CDiffWrapper();
+	void SetToDiffUtils();
+	void RefreshOptions();
 	void SetCreatePatchFile(const String &filename);
 	void SetCreateDiffList(DiffList *diffList);
 	void SetDiffList(DiffList *diffList);
 	void GetOptions(DIFFOPTIONS &);
-	void SetOptions(const DIFFOPTIONS &);
-	void SetPatchOptions(const PATCHOPTIONS *options);
+	void SetPatchOptions(const PATCHOPTIONS &);
 	void SetDetectMovedBlocks(bool bDetectMovedBlocks);
-	bool GetDetectMovedBlocks() { return (m_pMovedLines != NULL); }
 	void SetAppendFiles(BOOL bAppendFiles);
 	void SetPaths(const String &filepath1, const String &filepath2, BOOL tempPaths);
 	void SetAlternativePaths(const String &altPath1, const String &altPath2);
 	void SetCodepage(int codepage) { m_codepage = codepage; }
-	BOOL RunFileDiff();
-	BOOL RunFileDiff(DiffFileData &diffdata);
-	void GetDiffStatus(DIFFSTATUS *status);
-	BOOL AddDiffRange(UINT begin0, UINT end0, UINT begin1, UINT end1, OP_TYPE op);
-	BOOL FixLastDiffRange(int leftBufferLines, int rightBufferLines, BOOL left, bool bIgnoreBlankLines);
-	MovedLines * GetMovedLines() { return m_pMovedLines; }
+	bool RunFileDiff();
+	bool RunFileDiff(DiffFileData &diffdata);
+	bool AddDiffRange(UINT begin0, UINT end0, UINT begin1, UINT end1, OP_TYPE op);
+	bool FixLastDiffRange(int leftBufferLines, int rightBufferLines, bool bIgnoreBlankLines);
+	MovedLines *GetMovedLines() { return m_pMovedLines; }
 	void SetCompareFiles(const String &OriginalFile1, const String &OriginalFile2);
-	void SetFilterList(LPCTSTR filterStr);
+
+	const String &GetCompareFile(int side) const
+	{
+		return side == 0 ? m_sOriginalFile1 : m_sOriginalFile2;
+	}
 
 	// Postfiltering
-	static OP_TYPE PostFilter(int StartPos, int QtyLinesInBlock, const file_data *inf,
-		const FilterCommentsSet& filtercommentsset);
-	void PostFilter(int LineNumberLeft, int QtyLinesLeft, int LineNumberRight,
-		int QtyLinesRight, OP_TYPE &Op, const TCHAR *FileNameExt);
+	OP_TYPE PostFilter(
+		int LineNumberLeft, int QtyLinesLeft,
+		int LineNumberRight, int QtyLinesRight,
+		OP_TYPE Op, const TCHAR *FileNameExt);
+
+	static CDiffWrapper *m_pActiveInstance;
+	DIFFSTATUS m_status; /**< Status of last compare */
 
 protected:
 	String FormatSwitchString();
-	BOOL Diff2Files(struct change **diffs, DiffFileData *diffData,
-		int *bin_status, int *bin_file);
-	BOOL LoadWinMergeDiffsFromDiffUtilsScript(struct change *script, const file_data *inf);
+	bool Diff2Files(struct change **, DiffFileData *, int *bin_status, int *bin_file);
+	bool LoadWinMergeDiffsFromDiffUtilsScript(struct change *, const file_data *);
 	void WritePatchFile(struct change *script, file_data *inf);
 	int RegExpFilter(int StartPos, int EndPos, int FileNo, bool BreakCondition);
 
 private:
-	DiffutilsOptions m_options;
-	DIFFSTATUS m_status; /**< Status of last compare */
-	FilterList * m_pFilterList; /**< List of linefilters. */
+	PATCHOPTIONS m_patchOptions;
 	String m_s1File; /**< Full path to first diff'ed file. */
 	String m_s2File; /**< Full path to second diff'ed file. */
 	String m_s1AlternativePath; /**< First file's alternative path (may be relative). */
@@ -195,15 +200,11 @@ private:
 	String m_sOriginalFile2; /**< Second file's original (NON-TEMP) path. */
 	String m_sPatchFile; /**< Full path to created patch file. */
 	BOOL m_bPathsAreTemp; /**< Are compared paths temporary? */
-	BOOL m_bUseDiffList; /**< Are results returned in difflist? */
-	BOOL m_bCreatePatchFile; /**< Do we create a patch file? */
-	BOOL m_bAddCmdLine; /**< Do we add commandline to patch file? */
 	BOOL m_bAppendFiles; /**< Do we append to existing patch file? */
 	int m_nDiffs; /**< Difference count */
 	int m_codepage; /**< Codepage used in line filter */
 	DiffList *m_pDiffList; /**< Pointer to external DiffList */
-	MovedLines * m_pMovedLines;
+	MovedLines *m_pMovedLines;
 };
-
 
 #endif // _DIFFWRAPPER_H

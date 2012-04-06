@@ -29,7 +29,6 @@
 #include "StdAfx.h"
 #include "paths.h"
 #include "Merge.h"
-#include "ProjectFile.h"
 #include "OpenDlg.h"
 #include "coretools.h"
 #include "environment.h"
@@ -49,7 +48,6 @@ static char THIS_FILE[] = __FILE__;
 // Timer ID and timeout for delaying path validity check
 const UINT IDT_CHECKFILES = 1;
 const UINT CHECKFILES_TIMEOUT = 1000; // milliseconds
-static const TCHAR EMPTY_EXTENSION[] = _T(".*");
 
 /** @brief Location for Open-dialog specific help to open. */
 static const TCHAR OpenDlgHelpLocation[] = _T("::/htmlhelp/Open_paths.html");
@@ -79,6 +77,7 @@ COpenDlg::COpenDlg()
 		IDC_RIGHT_COMBO,		BY<1000>::X2R,
 		IDC_EXT_COMBO,			BY<1000>::X2R,
 		IDC_COMPARE_AS_COMBO,	BY<1000>::X2R,
+		IDC_RECURS_CHECK,		BY<1000>::X2R,
 		IDC_FILES_DIRS_GROUP,	BY<1000>::X2R,
 		IDC_LEFT_BUTTON,		BY<1000>::X2L | BY<1000>::X2R,
 		IDC_RIGHT_BUTTON,		BY<1000>::X2L | BY<1000>::X2R,
@@ -102,10 +101,10 @@ COpenDlg::~COpenDlg()
 template<ODialog::DDX_Operation op>
 bool COpenDlg::UpdateData()
 {
-	DDX_CBStringExact<op>(IDC_LEFT_COMBO, m_strLeft);
-	DDX_CBStringExact<op>(IDC_RIGHT_COMBO, m_strRight);
-	DDX_CBStringExact<op>(IDC_EXT_COMBO, m_strExt);
-	DDX_Check<op>(IDC_RECURS_CHECK, m_bRecurse);
+	DDX_CBStringExact<op>(IDC_LEFT_COMBO, m_sLeftFile);
+	DDX_CBStringExact<op>(IDC_RIGHT_COMBO, m_sRightFile);
+	DDX_CBStringExact<op>(IDC_EXT_COMBO, m_sFilter);
+	DDX_Check<op>(IDC_RECURS_CHECK, m_nRecursive);
 	return true;
 }
 
@@ -179,6 +178,9 @@ LRESULT COpenDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			break;
 		case IDCANCEL:
 			OnCancel();
+			break;
+		case IDC_RECURS_CHECK:
+			Update3StateCheckBoxLabel(IDC_RECURS_CHECK);
 			break;
 		case MAKEWPARAM(IDC_LEFT_BUTTON, BN_CLICKED):
 			OnBrowseButton(IDC_LEFT_COMBO);
@@ -321,28 +323,24 @@ BOOL COpenDlg::OnInitDialog()
 		index = m_pCbExt->InsertString(0, filterString.c_str());
 	m_pCbExt->SetCurSel(index);
 
-	if (!COptionsMgr::Get(OPT_VERIFY_OPEN_PATHS))
-	{
-		m_pPbOk->EnableWindow(TRUE);
-	}
-
 	if (!m_bOverwriteRecursive)
-		m_bRecurse = SettingStore.GetProfileInt(_T("Settings"), _T("Recurse"), 0) == 1;
+		m_nRecursive = SettingStore.GetProfileInt(_T("Settings"), _T("Recurse"), 0);
 
-	if (m_strLeft.empty())
-		m_pCbLeft->GetWindowText(m_strLeft);
+	if (m_sLeftFile.empty())
+		m_pCbLeft->GetWindowText(m_sLeftFile);
 	else
-		m_strLeft.erase(0, paths_UndoMagic(&m_strLeft.front()) - m_strLeft.c_str());
+		m_sLeftFile.erase(0, paths_UndoMagic(&m_sLeftFile.front()) - m_sLeftFile.c_str());
 
-	if (m_strRight.empty())
-		m_pCbRight->GetWindowText(m_strRight);
+	if (m_sRightFile.empty())
+		m_pCbRight->GetWindowText(m_sRightFile);
 	else
-		m_strRight.erase(0, paths_UndoMagic(&m_strRight.front()) - m_strRight.c_str());
+		m_sRightFile.erase(0, paths_UndoMagic(&m_sRightFile.front()) - m_sRightFile.c_str());
 
-	if (m_strExt.empty())
-		m_pCbExt->GetWindowText(m_strExt);
+	if (m_sFilter.empty())
+		m_pCbExt->GetWindowText(m_sFilter);
 
 	UpdateData<Set>();
+	Update3StateCheckBoxLabel(IDC_RECURS_CHECK);
 
 	// Insert placeholders to represent items which are not yet listed as MRU.
 	// These placeholders are removed upon dropdown and restored upon closeup.
@@ -351,7 +349,6 @@ BOOL COpenDlg::OnInitDialog()
 	m_pCbRight->InsertString(0, LPSTR_TEXTCALLBACK);
 
 	UpdateButtonStates();
-	SetStatus(IDS_OPEN_FILESDIRS);
 	return TRUE;
 }
 
@@ -392,39 +389,40 @@ void COpenDlg::OnOK()
 	TrimPaths();
 
 	// If left path is a project-file, load it
-	if (m_strRight.empty() && ProjectFile::IsProjectFile(m_strLeft.c_str()))
-		LoadProjectFile(m_strLeft.c_str());
+	if (m_sRightFile.empty() && ProjectFile::IsProjectFile(m_sLeftFile.c_str()))
+		if (!ProjectFile::Read(m_sLeftFile.c_str()))
+			return;
 
-	const DWORD attrLeft = GetFileAttributes(m_strLeft.c_str());
-	const DWORD attrRight = GetFileAttributes(m_strRight.c_str());
+	const DWORD attrLeft = GetFileAttributes(m_sLeftFile.c_str());
+	const DWORD attrRight = GetFileAttributes(m_sRightFile.c_str());
 	if (attrLeft == INVALID_FILE_ATTRIBUTES || attrRight == INVALID_FILE_ATTRIBUTES)
 	{
 		LanguageSelect.MsgBox(IDS_ERROR_INCOMPARABLE, MB_ICONSTOP);
 		return;
 	}
 
-	m_strRight = paths_GetLongPath(m_strRight.c_str());
-	m_strLeft = paths_GetLongPath(m_strLeft.c_str());
+	m_sLeftFile = paths_GetLongPath(m_sLeftFile.c_str());
+	m_sRightFile = paths_GetLongPath(m_sRightFile.c_str());
 
 	// Add trailing '\' for directories if its missing
-	if ((attrLeft & FILE_ATTRIBUTE_DIRECTORY) && !paths_EndsWithSlash(m_strLeft.c_str()))
-		m_strLeft += '\\';
-	if ((attrRight & FILE_ATTRIBUTE_DIRECTORY) && !paths_EndsWithSlash(m_strRight.c_str()))
-		m_strRight += '\\';
+	if ((attrLeft & FILE_ATTRIBUTE_DIRECTORY) && !paths_EndsWithSlash(m_sLeftFile.c_str()))
+		m_sLeftFile += _T('\\');
+	if ((attrRight & FILE_ATTRIBUTE_DIRECTORY) && !paths_EndsWithSlash(m_sRightFile.c_str()))
+		m_sRightFile += _T('\\');
 
 	UpdateData<Set>();
 	// Hide magic prefix from users
-	m_pCbLeft->SetWindowText(paths_UndoMagic(&String(m_strLeft).front()));
-	m_pCbRight->SetWindowText(paths_UndoMagic(&String(m_strRight).front()));
+	m_pCbLeft->SetWindowText(paths_UndoMagic(&String(m_sLeftFile).front()));
+	m_pCbRight->SetWindowText(paths_UndoMagic(&String(m_sRightFile).front()));
 
 	KillTimer(IDT_CHECKFILES);
 
-	globalFileFilter.SetFilter(m_strExt);
-	m_strExt = globalFileFilter.GetFilterNameOrMask();
-	COptionsMgr::SaveOption(OPT_FILEFILTER_CURRENT, m_strExt);
+	globalFileFilter.SetFilter(m_sFilter);
+	m_sFilter = globalFileFilter.GetFilterNameOrMask();
+	COptionsMgr::SaveOption(OPT_FILEFILTER_CURRENT, m_sFilter);
 
 	SaveComboboxStates();
-	SettingStore.WriteProfileInt(_T("Settings"), _T("Recurse"), m_bRecurse);
+	SettingStore.WriteProfileInt(_T("Settings"), _T("Recurse"), m_nRecursive);
 
 	if ((attrLeft ^ attrRight) & FILE_ATTRIBUTE_DIRECTORY)
 	{
@@ -479,8 +477,8 @@ void COpenDlg::UpdateButtonStates()
 	TrimPaths();
 
 	int nShowFilter = SW_HIDE;
-	if (paths_EndsWithSlash(m_strLeft.c_str()) ||
-		paths_EndsWithSlash(m_strRight.c_str()))
+	if (paths_EndsWithSlash(m_sLeftFile.c_str()) ||
+		paths_EndsWithSlash(m_sRightFile.c_str()))
 	{
 		nShowFilter = SW_SHOW;
 	}
@@ -494,12 +492,12 @@ void COpenDlg::UpdateButtonStates()
 	// Enable buttons as appropriate
 	if (COptionsMgr::Get(OPT_VERIFY_OPEN_PATHS))
 	{
-		const DWORD attrLeft = GetFileAttributes(m_strLeft.c_str());
-		const DWORD attrRight = GetFileAttributes(m_strRight.c_str());
+		const DWORD attrLeft = GetFileAttributes(m_sLeftFile.c_str());
+		const DWORD attrRight = GetFileAttributes(m_sRightFile.c_str());
 		// If "both paths are valid", or
 		// if "left path refers to a project file and right path is empty"
 		if (attrLeft != INVALID_FILE_ATTRIBUTES && attrRight != INVALID_FILE_ATTRIBUTES ||
-			m_strRight.empty() && ProjectFile::IsProjectFile(m_strLeft.c_str()))
+			m_sRightFile.empty() && ProjectFile::IsProjectFile(m_sLeftFile.c_str()))
 		{
 			m_pPbOk->EnableWindow(TRUE);
 			SetStatus(IDS_OPEN_FILESDIRS);
@@ -512,6 +510,11 @@ void COpenDlg::UpdateButtonStates()
 				attrRight != INVALID_FILE_ATTRIBUTES ? IDS_OPEN_LEFTINVALID :
 				IDS_OPEN_BOTHINVALID);
 		}
+	}
+	else
+	{
+		m_pPbOk->EnableWindow(TRUE);
+		SetStatus(IDS_OPEN_FILESDIRS);
 	}
 }
 
@@ -575,59 +578,18 @@ void COpenDlg::OnSelectFilter()
 }
 
 /** 
- * @brief Read paths and filter from project file.
- * Reads the given project file. After the file is read, found paths and
- * filter is updated to dialog GUI. Other possible settings found in the
- * project file are kept in memory and used later when loading paths
- * selected.
- * @param [in] path Path to the project file.
- * @return TRUE if the project file was successfully loaded, FALSE otherwise.
- */
-BOOL COpenDlg::LoadProjectFile(LPCTSTR path)
-{
-	String err;
-
-	ProjectFile project;
-
-	if (!project.Read(path, err))
-	{
-		if (!err.empty())
-		{
-			LanguageSelect.FormatMessage(
-				IDS_ERROR_FILEOPEN, path, err.c_str()
-			).MsgBox(MB_ICONSTOP);
-		}
-		return FALSE;
-	}
-	else
-	{
-		m_strLeft = project.GetLeft();
-		m_strRight = project.GetRight();
-		m_bRecurse = project.GetSubfolders();
-		m_bLeftReadOnly = project.GetLeftReadOnly();
-		m_bRightReadOnly = project.GetRightReadOnly();
-		if (project.HasFilter())
-		{
-			m_strExt = project.GetFilter();
-			m_strExt = string_trim_ws(m_strExt);
-		}
-	}
-	return TRUE;
-}
-
-/** 
  * @brief Removes whitespaces from left and right paths
  * @note Assumes UpdateData(TRUE) is called before this function.
  */
 void COpenDlg::TrimPaths()
 {
-	m_strLeft = string_trim_ws(m_strLeft);
-	m_strRight = string_trim_ws(m_strRight);
+	m_sLeftFile = string_trim_ws(m_sLeftFile);
+	m_sRightFile = string_trim_ws(m_sRightFile);
 	// If user has edited path by hand, expand environment variables
 	if (m_pCbLeft->GetEditControl()->GetModify())
-		m_strLeft = env_ExpandVariables(m_strLeft.c_str());
+		m_sLeftFile = env_ExpandVariables(m_sLeftFile.c_str());
 	if (m_pCbRight->GetEditControl()->GetModify())
-		m_strRight = env_ExpandVariables(m_strRight.c_str());
+		m_sRightFile = env_ExpandVariables(m_sRightFile.c_str());
 }
 
 /** 
@@ -702,14 +664,14 @@ void COpenDlg::OnDropFiles(HDROP dropInfo)
 	UpdateData<Get>();
 	if (fileCount == 2)
 	{
-		m_strLeft = files[0];
-		m_strRight = files[1];
+		m_sLeftFile = files[0];
+		m_sRightFile = files[1];
 		UpdateData<Set>();
 		UpdateButtonStates();
 	}
 	else if (fileCount == 1)
 	{
-		String *pTarget = !m_strLeft.empty() && m_strRight.empty() ? &m_strRight : &m_strLeft;
+		String *pTarget = !m_sLeftFile.empty() && m_sRightFile.empty() ? &m_sRightFile : &m_sLeftFile;
 		POINT pt;
 		if (DragQueryPoint(dropInfo, &pt))
 		{
@@ -717,9 +679,9 @@ void COpenDlg::OnDropFiles(HDROP dropInfo)
 				CWP_SKIPINVISIBLE | CWP_SKIPDISABLED | CWP_SKIPTRANSPARENT))
 			{
 				if (pHit == m_pCbLeft)
-					pTarget = &m_strLeft;
+					pTarget = &m_sLeftFile;
 				else if (pHit == m_pCbRight)
-					pTarget = &m_strRight;
+					pTarget = &m_sRightFile;
 			}
 		}
 		*pTarget = files[0];

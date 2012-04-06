@@ -335,7 +335,6 @@ static void SaveBuffForDiff(CDiffTextBuffer & buf, CDiffTextBuffer & buf2, DiffF
 /**
  * @brief Save files to temp files & compare again.
  *
- * @param bBinary [in,out] [in] If TRUE, compare two binary files
  * [out] If TRUE binary file was detected.
  * @param bIdentical [out] If TRUE files were identical
  * @param bForced [in] If TRUE, suppressing is ignored and rescan
@@ -348,7 +347,7 @@ static void SaveBuffForDiff(CDiffTextBuffer & buf, CDiffTextBuffer & buf2, DiffF
  * touched by Rescan().
  * @sa CDiffWrapper::RunFileDiff()
  */
-int CChildFrame::Rescan(bool &bBinary, bool &bIdentical, bool bForced)
+int CChildFrame::Rescan(bool &bIdentical, bool bForced)
 {
 	DiffFileInfo fileInfo;
 
@@ -356,16 +355,6 @@ int CChildFrame::Rescan(bool &bBinary, bool &bIdentical, bool bForced)
 	{
 		if (!m_bEnableRescan)
 			return RESCAN_SUPPRESSED;
-	}
-
-	if (COptionsMgr::Get(OPT_LINEFILTER_ENABLED))
-	{
-		String regexp = m_pMDIFrame->m_pLineFilters->GetAsString();
-		m_diffWrapper.SetFilterList(regexp.c_str());
-	}
-	else
-	{
-		m_diffWrapper.SetFilterList(_T(""));
 	}
 
 	// Check if files have been modified since last rescan
@@ -399,15 +388,12 @@ int CChildFrame::Rescan(bool &bBinary, bool &bIdentical, bool bForced)
 		}
 	} while (nSide ^= 1);
 
-	return Rescan2(bBinary, bIdentical);
+	return Rescan2(bIdentical);
 }
 
-int CChildFrame::Rescan2(bool &bBinary, bool &bIdentical)
+int CChildFrame::Rescan2(bool &bIdentical)
 {
 	GetSystemTimeAsFileTime(&m_LastRescan);
-
-	// output buffers to temp files (in UTF-8 if TCHAR=wchar_t or buffer was Unicode)
-	ASSERT(bBinary == false);
 
 	DiffFileData diffdata;
 	SaveBuffForDiff(*m_ptBuf[0], *m_ptBuf[1], diffdata, 0);
@@ -422,35 +408,22 @@ int CChildFrame::Rescan2(bool &bBinary, bool &bIdentical)
 	m_diffList.Clear();
 	m_nCurDiff = -1;
 	// Clear moved lines lists
-	if (m_diffWrapper.GetDetectMovedBlocks())
-		m_diffWrapper.GetMovedLines()->Clear();
+	if (MovedLines *pMovedLines = m_diffWrapper.GetMovedLines())
+		pMovedLines->Clear();
 
 	// Set paths for diffing and run diff
 	m_diffWrapper.SetCompareFiles(m_strPath[0], m_strPath[1]);
 	m_diffWrapper.SetCodepage(m_ptBuf[0]->m_encoding.m_unicoding ?
 			CP_UTF8 : m_ptBuf[0]->m_encoding.m_codepage);
 
-	int nResult = RESCAN_OK;
-	BOOL diffSuccess = m_diffWrapper.RunFileDiff(diffdata);
-
-	// Read diff-status
-	DIFFSTATUS status;
-	m_diffWrapper.GetDiffStatus(&status);
-	if (bBinary) // believe caller if we were told these are binaries
-		status.bBinaries = TRUE;
-
+	int nResult = RESCAN_FILE_ERR;
+	const bool diffSuccess = m_diffWrapper.RunFileDiff(diffdata);
 	// set identical/diff result as recorded by diffutils
-	bIdentical = status.bIdentical != FALSE;
-
+	bIdentical = m_diffWrapper.m_status.bIdentical;
 	// Determine errors and binary file compares
-	if (!diffSuccess)
-		nResult = RESCAN_FILE_ERR;
-	else if (status.bBinaries)
+	if (diffSuccess && !m_diffWrapper.m_status.bBinaries)
 	{
-		bBinary = true;
-	}
-	else
-	{
+		nResult = RESCAN_OK;
 		// Now update views and buffers for ghost lines
 
 		// Prevent displaying views during this update 
@@ -467,16 +440,14 @@ int CChildFrame::Rescan2(bool &bBinary, bool &bIdentical)
 		m_ptBuf[0]->prepareForRescan();
 		m_ptBuf[1]->prepareForRescan();
 
-		// If one file has EOL before EOF and other not...
-		if (status.bLeftMissingNL != status.bRightMissingNL)
+		// ..lasf DIFFRANGE of file which has EOL must be
+		// fixed to contain last line too
+		if (!m_diffWrapper.FixLastDiffRange(
+				m_ptBuf[0]->GetLineCount(),
+				m_ptBuf[1]->GetLineCount(),
+				diffOptions.bIgnoreBlankLines))
 		{
-			// ..lasf DIFFRANGE of file which has EOL must be
-			// fixed to contain last line too
-			if (!m_diffWrapper.FixLastDiffRange(m_ptBuf[0]->GetLineCount(), m_ptBuf[1]->GetLineCount(),
-				status.bRightMissingNL, diffOptions.bIgnoreBlankLines))
-			{
-				nResult = RESCAN_FILE_ERR;
-			}
+			nResult = RESCAN_FILE_ERR;
 		}
 
 		// Divide diff blocks to match lines.
@@ -488,15 +459,15 @@ int CChildFrame::Rescan2(bool &bBinary, bool &bIdentical)
 		PrimeTextBuffers();
 
 		// Apply flags to lines that moved, to differentiate from appeared/disappeared lines
-		if (m_diffWrapper.GetDetectMovedBlocks())
-			FlagMovedLines(m_diffWrapper.GetMovedLines(), m_ptBuf[0], m_ptBuf[1]);
+		if (MovedLines *pMovedLines = m_diffWrapper.GetMovedLines())
+			FlagMovedLines(pMovedLines, m_ptBuf[0], m_ptBuf[1]);
 		
 		// After PrimeTextBuffers() we know amount of real diffs
 		// (m_nDiffs) and trivial diffs (m_nTrivialDiffs)
 
 		// Identical files are also updated
 		if (!m_diffList.HasSignificantDiffs())
-			bIdentical = TRUE;
+			bIdentical = true;
 
 		// just apply some options to the views
 		m_pView[MERGE_VIEW_LEFT]->PrimeListWithFile();
@@ -1172,43 +1143,39 @@ bool CChildFrame::DoSaveAs(int nBuffer)
 /**
  * @brief Get left->right info for a moved line (apparent line number)
  */
-int CChildFrame::RightLineInMovedBlock(int apparentLeftLine)
+int CChildFrame::RightLineInMovedBlock(int apparentLine)
 {
-	if (!(m_ptBuf[0]->GetLineFlags(apparentLeftLine) & LF_MOVED))
-		return -1;
-
-	int realLeftLine = m_ptBuf[0]->ComputeRealLine(apparentLeftLine);
-	int realRightLine = -1;
-	if (m_diffWrapper.GetDetectMovedBlocks())
+	int movedLine = -1;
+	if (m_ptBuf[0]->GetLineFlags(apparentLine) & LF_MOVED)
 	{
-		realRightLine = m_diffWrapper.GetMovedLines()->LineInBlock(realLeftLine,
-				MovedLines::SIDE_LEFT);
+		if (MovedLines *pMovedLines = m_diffWrapper.GetMovedLines())
+		{
+			int realLine = m_ptBuf[0]->ComputeRealLine(apparentLine);
+			movedLine = pMovedLines->LineInBlock(realLine, MovedLines::SIDE_LEFT);
+			if (movedLine != -1)
+				movedLine = m_ptBuf[1]->ComputeApparentLine(movedLine);
+		}
 	}
-	if (realRightLine != -1)
-		return m_ptBuf[1]->ComputeApparentLine(realRightLine);
-	else
-		return -1;
+	return movedLine;
 }
 
 /**
  * @brief Get right->left info for a moved line (apparent line number)
  */
-int CChildFrame::LeftLineInMovedBlock(int apparentRightLine)
+int CChildFrame::LeftLineInMovedBlock(int apparentLine)
 {
-	if (!(m_ptBuf[1]->GetLineFlags(apparentRightLine) & LF_MOVED))
-		return -1;
-
-	int realRightLine = m_ptBuf[1]->ComputeRealLine(apparentRightLine);
-	int realLeftLine = -1;
-	if (m_diffWrapper.GetDetectMovedBlocks())
+	int movedLine = -1;
+	if (m_ptBuf[1]->GetLineFlags(apparentLine) & LF_MOVED)
 	{
-		realLeftLine = m_diffWrapper.GetMovedLines()->LineInBlock(realRightLine,
-				MovedLines::SIDE_RIGHT);
+		if (MovedLines *pMovedLines = m_diffWrapper.GetMovedLines())
+		{
+			int realLine = m_ptBuf[1]->ComputeRealLine(apparentLine);
+			movedLine = pMovedLines->LineInBlock(realLine, MovedLines::SIDE_RIGHT);
+			if (movedLine != -1)
+				movedLine = m_ptBuf[0]->ComputeApparentLine(movedLine);
+		}
 	}
-	if (realLeftLine != -1)
-		return m_ptBuf[0]->ComputeApparentLine(realLeftLine);
-	else
-		return -1;
+	return movedLine;
 }
 
 /**
@@ -1267,9 +1234,8 @@ void CChildFrame::FlushAndRescan(bool bForced)
 	if (nActiveViewIndexType == MERGEVIEW_LEFT || nActiveViewIndexType == MERGEVIEW_RIGHT)
 		m_pView[nActiveViewIndexType]->HideCursor();
 
-	bool bBinary = false;
 	bool bIdentical = false;
-	int nRescanResult = Rescan(bBinary, bIdentical, bForced);
+	int nRescanResult = Rescan(bIdentical, bForced);
 
 	// restore cursors and caret
 	m_pView[MERGE_VIEW_LEFT]->PopCursors();
@@ -1281,7 +1247,7 @@ void CChildFrame::FlushAndRescan(bool bForced)
 
 	// because of ghostlines, m_nTopLine may differ just after Rescan
 	// scroll both views to the same top line
-	CMergeEditView * fixedView = m_pView[MERGE_VIEW_LEFT];
+	CMergeEditView *fixedView = m_pView[MERGE_VIEW_LEFT];
 	if (nActiveViewIndexType == MERGEVIEW_LEFT || nActiveViewIndexType == MERGEVIEW_RIGHT)
 		// only one view needs to scroll so do not scroll the active view
 		fixedView = m_pView[nActiveViewIndexType];
@@ -2012,12 +1978,11 @@ OPENRESULTS_TYPE CChildFrame::OpenDocs(
 		if (LanguageSelect.MsgBox(IDS_SUGGEST_IGNOREEOL, MB_YESNO | MB_ICONWARNING | MB_DONT_ASK_AGAIN | MB_IGNORE_IF_SILENCED) == IDYES)
 		{
 			diffOptions.bIgnoreEol = true;
-			m_diffWrapper.SetOptions(diffOptions);
+			m_diffWrapper.SetFromDiffOptions(diffOptions);
 		}
 	}
 
-	bool bBinary = false;
-	int nRescanResult = Rescan(bBinary, bIdentical);
+	int nRescanResult = Rescan(bIdentical);
 
 	// Open filed if rescan succeed and files are not binaries
 	if (nRescanResult == RESCAN_OK)
@@ -2179,16 +2144,7 @@ FileLoadResult::FILES_RESULT CChildFrame::ReloadDoc(int index)
  */
 void CChildFrame::RefreshOptions()
 {
-	m_diffWrapper.SetDetectMovedBlocks(COptionsMgr::Get(OPT_CMP_MOVED_BLOCKS));
-
-	DIFFOPTIONS options;
-	options.nIgnoreWhitespace = COptionsMgr::Get(OPT_CMP_IGNORE_WHITESPACE);
-	options.bIgnoreBlankLines = COptionsMgr::Get(OPT_CMP_IGNORE_BLANKLINES);
-	options.bFilterCommentsLines = COptionsMgr::Get(OPT_CMP_FILTER_COMMENTLINES);
-	options.bIgnoreCase = COptionsMgr::Get(OPT_CMP_IGNORE_CASE);
-	options.bIgnoreEol = COptionsMgr::Get(OPT_CMP_IGNORE_EOL);
-	m_diffWrapper.SetOptions(options);
-
+	m_diffWrapper.RefreshOptions();
 	// Refresh view options
 	m_pView[MERGE_VIEW_LEFT]->RefreshOptions();
 	m_pView[MERGE_VIEW_RIGHT]->RefreshOptions();
@@ -2253,11 +2209,8 @@ void CChildFrame::SetMergingMode(bool bMergingMode)
  */
 void CChildFrame::SetDetectMovedBlocks(bool bDetectMovedBlocks)
 {
-	if (bDetectMovedBlocks == m_diffWrapper.GetDetectMovedBlocks())
-		return;
-
-	COptionsMgr::SaveOption(OPT_CMP_MOVED_BLOCKS, bDetectMovedBlocks);
 	m_diffWrapper.SetDetectMovedBlocks(bDetectMovedBlocks);
+	COptionsMgr::SaveOption(OPT_CMP_MOVED_BLOCKS, bDetectMovedBlocks);
 	FlushAndRescan();
 }
 

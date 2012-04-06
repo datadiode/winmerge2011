@@ -60,9 +60,19 @@ public:
 	CompareStats();
 	~CompareStats();
 	void AddItem(int code);
-	void IncreaseTotalItems(int count = 1);
+	void IncreaseTotalItems()
+	{
+		InterlockedIncrement(&m_nTotalItems);
+	}
+	void SetTotalItems(long nTotalItems)
+	{
+		m_nTotalItems = nTotalItems;
+	}
+	long GetTotalItems() const
+	{
+		return m_nTotalItems;
+	}
 	int GetCount(CompareStats::RESULT result) const;
-	int GetTotalItems() const;
 	int GetComparedItems() const { return m_nComparedItems; }
 	void Reset();
 	void SetCompareState(CompareStats::CMP_STATE state);
@@ -72,8 +82,7 @@ public:
 	static CompareStats::RESULT GetResultFromCode(UINT diffcode);
 
 private:
-	int m_counts[RESULT_COUNT]; /**< Table storing result counts */
-	CRITICAL_SECTION m_csProtect; /**< For synchronizing read/write of counts */
+	long m_counts[RESULT_COUNT]; /**< Table storing result counts */
 	long m_nTotalItems; /**< Total items found to compare */
 	long m_nComparedItems; /**< Compared items so far */
 	CMP_STATE m_state; /**< State for compare (idle, collect, compare,..) */

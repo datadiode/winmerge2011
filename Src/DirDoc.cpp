@@ -69,9 +69,9 @@ bool CDirFrame::CanFrameClose()
  * Initialises directory compare with paths given and recursive choice.
  * Previous compare context is first free'd.
  * @param [in] paths Paths to compare
- * @param [in] bRecursive If TRUE subdirectories are included to compare.
+ * @param [in] nRecursive If != 0 subdirectories are included to compare.
  */
-void CDirFrame::InitCompare(LPCTSTR pszLeft, LPCTSTR pszRight, BOOL bRecursive, CTempPathContext *pTempPathContext)
+void CDirFrame::InitCompare(LPCTSTR pszLeft, LPCTSTR pszRight, int nRecursive, CTempPathContext *pTempPathContext)
 {
 	m_pDirView->DeleteAllItems();
 	// Anything that can go wrong here will yield an exception.
@@ -79,7 +79,7 @@ void CDirFrame::InitCompare(LPCTSTR pszLeft, LPCTSTR pszRight, BOOL bRecursive, 
 	delete m_pCtxt;
 	
 	m_pCtxt = new CDiffContext(pszLeft, pszRight);
-	m_pCtxt->m_bRecursive = !!bRecursive;
+	m_pCtxt->m_nRecursive = nRecursive;
 
 	if (pTempPathContext)
 	{
@@ -91,7 +91,7 @@ void CDirFrame::InitCompare(LPCTSTR pszLeft, LPCTSTR pszRight, BOOL bRecursive, 
 		m_pTempPathContext->m_strRightRoot = m_pCtxt->GetRightPath();
 	}
 	
-	m_bRecursive = bRecursive;
+	m_nRecursive = nRecursive;
 }
 
 /**
@@ -165,31 +165,6 @@ CDirFrame::AllowUpwardDirectory(String &leftParent, String &rightParent)
 }
 
 /**
- * @brief Load line filters to the compare context.
- * Loads linefilters, converts them to UTF-8 and sets them for compare context.
- */
-void CDirFrame::LoadLineFilterList()
-{
-	ASSERT(m_pCtxt);
-	
-	BOOL bFilters = COptionsMgr::Get(OPT_LINEFILTER_ENABLED);
-	String filters = GetMainFrame()->m_pLineFilters->GetAsString();
-	if (!bFilters || filters.empty())
-	{
-		delete m_pCtxt->m_pFilterList;
-		m_pCtxt->m_pFilterList = NULL;
-		return;
-	}
-
-	if (m_pCtxt->m_pFilterList)
-		m_pCtxt->m_pFilterList->RemoveAllFilters();
-	else
-		m_pCtxt->m_pFilterList = new FilterList();
-
-	m_pCtxt->m_pFilterList->AddRegExp(filters.c_str());
-}
-
-/**
  * @brief Perform directory comparison again from scratch
  */
 void CDirFrame::Rescan(bool bCompareSelected)
@@ -217,13 +192,12 @@ void CDirFrame::Rescan(bool bCompareSelected)
 		m_pCtxt->RemoveAll();
 	}
 
-	LoadLineFilterList();
-
 	m_pCtxt->m_options.nIgnoreWhitespace = COptionsMgr::Get(OPT_CMP_IGNORE_WHITESPACE);
 	m_pCtxt->m_options.bIgnoreBlankLines = COptionsMgr::Get(OPT_CMP_IGNORE_BLANKLINES);
 	m_pCtxt->m_options.bFilterCommentsLines = COptionsMgr::Get(OPT_CMP_FILTER_COMMENTLINES);
 	m_pCtxt->m_options.bIgnoreCase = COptionsMgr::Get(OPT_CMP_IGNORE_CASE);
 	m_pCtxt->m_options.bIgnoreEol = COptionsMgr::Get(OPT_CMP_IGNORE_EOL);
+	m_pCtxt->m_options.bApplyLineFilters = COptionsMgr::Get(OPT_LINEFILTER_ENABLED);
 	m_pCtxt->m_nCurrentCompMethod = m_pCtxt->m_nCompMethod = COptionsMgr::Get(OPT_CMP_METHOD);
 	m_pCtxt->m_bGuessEncoding = COptionsMgr::Get(OPT_CP_DETECT);
 	m_pCtxt->m_bIgnoreSmallTimeDiff = COptionsMgr::Get(OPT_IGNORE_SMALL_FILETIME);
@@ -231,11 +205,11 @@ void CDirFrame::Rescan(bool bCompareSelected)
 	m_pCtxt->m_nQuickCompareLimit = COptionsMgr::Get(OPT_CMP_QUICK_LIMIT);
 	m_pCtxt->m_bWalkUniques = COptionsMgr::Get(OPT_CMP_WALK_UNIQUE_DIRS);
 	m_pCtxt->m_pCompareStats = m_pCompareStats;
-	m_pCtxt->m_bRecursive = !!m_bRecursive;
+	m_pCtxt->m_nRecursive = m_nRecursive;
 
 	// Set total items count since we don't collect items
 	if (bCompareSelected)
-		m_pCompareStats->IncreaseTotalItems(m_pDirView->GetSelectedCount());
+		m_pCompareStats->SetTotalItems(m_pDirView->GetSelectedCount());
 
 	UpdateHeaderPath(0);
 	UpdateHeaderPath(1);
@@ -286,7 +260,7 @@ bool CDirFrame::IsShowable(const DIFFITEM &di)
 	if (di.diffcode.isDirectory())
 	{
 		// Subfolders in non-recursive compare can only be skipped or unique
-		if (m_bRecursive) // recursive mode (including tree-mode)
+		if (m_nRecursive) // recursive mode (including tree-mode)
 		{
 			// ONLY filter folders by result (identical/different) for tree-view.
 			// In the tree-view we show subfolders with identical/different

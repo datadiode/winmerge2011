@@ -34,29 +34,13 @@ struct FileFilter;
  */
 const TCHAR FileFilterExt[] = _T(".flt");
 
-/**
- * @brief Helper structure for UI and management of filters.
- *
- * This structure is mostly used as UI aid and to manage filters from UI.
- * fileinfo contains time of filter file's last modification time. By
- * comparing fileinfo to filter file in disk we can determine if file
- * is changed since we last time loaded it.
- */
-struct FileFilterInfo
-{
-	String name; 			/**< Name of filter */
-	String description; 	/**< Description of filter (shown in UI) */
-	String fullpath;		/**< Full path to filter file */
-	DirItem fileinfo;		/**< For tracking if file has been modified */
-};
-
 /// Interface for testing files & directories for exclusion, as diff traverses file tree
 class IDiffFilter
 {
 public:
-	virtual BOOL includeFile(LPCTSTR szFileName) = 0;
-	virtual BOOL includeDir(LPCTSTR szDirName) = 0;
-	BOOL includeFile(LPCTSTR szFileName1, LPCTSTR szFileName2)
+	virtual bool includeFile(LPCTSTR szFileName) = 0;
+	virtual bool includeDir(LPCTSTR szDirName) = 0;
+	bool includeFile(LPCTSTR szFileName1, LPCTSTR szFileName2)
 	{
 		return
 		(
@@ -64,7 +48,7 @@ public:
 		&&	(szFileName2[0] == '\0' || includeFile(szFileName2))
 		);
 	}
-	BOOL includeDir(LPCTSTR szDirName1, LPCTSTR szDirName2)
+	bool includeDir(LPCTSTR szDirName1, LPCTSTR szDirName2)
 	{
 		return
 		(
@@ -101,7 +85,8 @@ public:
 
 	FileFilterMgr * GetManager() const;
 	void SetFileFilterPath(LPCTSTR szFileFilterPath);
-	void GetFileFilters(stl::vector<FileFilterInfo> * filters, String & selected) const;
+	//void GetFileFilters(stl::vector<FileFilterInfo> * filters, String & selected) const;
+	const stl::vector<FileFilter *> &GetFileFilters(String & selected) const;
 	String GetFileFilterName(LPCTSTR filterPath) const;
 	String GetFileFilterPath(LPCTSTR filterName) const;
 	void SetUserFilterPath(LPCTSTR filterPath);
@@ -111,26 +96,23 @@ public:
 
 	void LoadFileFilterDirPattern(LPCTSTR dir, LPCTSTR szPattern);
 
-	void UseMask(BOOL bUseMask);
 	void SetMask(LPCTSTR strMask);
 
-	BOOL IsUsingMask() const;
+	bool IsUsingMask() const { return m_currentFilter == NULL; }
 	String GetFilterNameOrMask() const;
 	void SetFilter(const String &filter);
 
-	BOOL includeFile(LPCTSTR szFileName);
-	BOOL includeDir(LPCTSTR szDirName);
+	bool includeFile(LPCTSTR szFileName);
+	bool includeDir(LPCTSTR szDirName);
 
 protected:
 	String ParseExtensions(const String &extensions) const;
 
 private:
-	FilterList * m_pMaskFilter;       /*< Filter for filemasks (*.cpp) */
-	FileFilter * m_currentFilter;     /*< Currently selected filefilter */
-	FileFilterMgr * m_fileFilterMgr;  /*< Associated FileFilterMgr */
-	String m_sFileFilterPath;        /*< Path to current filter */
+	FilterList *const m_pMaskFilter;       /*< Filter for filemasks (*.cpp) */
+	FileFilter *m_currentFilter;     /*< Currently selected filefilter */
+	FileFilterMgr *const m_fileFilterMgr;  /*< Associated FileFilterMgr */
 	String m_sMask;   /*< File mask (if defined) "*.cpp *.h" etc */
-	BOOL m_bUseMask;   /*< If TRUE file mask is used, filter otherwise */
 	String m_sGlobalFilterPath;    /*< Path for shared filters */
 	String m_sUserSelFilterPath;     /*< Path for user's private filters */
 } globalFileFilter;

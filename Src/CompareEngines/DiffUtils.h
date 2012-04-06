@@ -17,6 +17,8 @@ struct FileTextStats;
 class FilterCommentsManager;
 class CDiffWrapper;
 
+#include "DiffWrapper.h"
+
 namespace CompareEngines
 {
 
@@ -28,29 +30,25 @@ namespace CompareEngines
  * Filters list being an exception - pcre structs are too complex to easily
  * copy so we'll only keep a pointer to external list.
  */
-class DiffUtils
+class DiffUtils : public CDiffWrapper
 {
 public:
-	DiffUtils(const DiffutilsOptions &);
+	DiffUtils(const DIFFOPTIONS &);
 	~DiffUtils();
-	void SetFilterList(FilterList * list);
 	void SetFileData(int items, file_data *data);
 	int diffutils_compare_files();
 	bool RegExpFilter(int StartPos, int EndPos, int FileNo);
-	void GetDiffCounts(int & diffs, int & trivialDiffs);
+	void GetDiffCounts(int &diffs, int &trivialDiffs);
 	void GetTextStats(int side, FileTextStats *stats);
-	bool Diff2Files(struct change ** diffs, int depth,
-			int * bin_status, bool bMovedBlocks, int * bin_file);
+	bool Diff2Files(struct change **diffs, int depth,
+			int *bin_status, bool bMovedBlocks, int *bin_file);
 	void SetCodepage(int codepage) { m_codepage = codepage; }
 
 private:
-	DiffutilsOptions m_options; /**< Compare options for diffutils. */
-	FilterList * m_pFilterList; /**< Filter list for line filters. */
-	file_data * m_inf; /**< Compared files data (for diffutils). */
+	file_data *m_inf; /**< Compared files data (for diffutils). */
 	int m_ndiffs; /**< Real diffs found. */
 	int m_ntrivialdiffs; /**< Ignored diffs found. */
 	int m_codepage; /**< Codepage used in line filter */
-	CDiffWrapper *const m_pDiffWrapper;
 };
 
 

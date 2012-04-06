@@ -39,7 +39,7 @@ public:
 // Implementation data
 private:
 	String m_sFileFilterPath;
-	stl::vector<FileFilterInfo> m_Filters;
+	const stl::vector<FileFilter *> &m_Filters;
 
 	HListView *m_listFilters;
 
