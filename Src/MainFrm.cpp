@@ -2777,9 +2777,12 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 					// Close DocFrame, then move MainFrame out of the way.
 					if (pDocFrame)
 						pDocFrame->SendMessage(WM_CLOSE);
-					if (GetActiveDocFrame() != pDocFrame)
+					CDocFrame *const pActiveDocFrame = GetActiveDocFrame();
+					if (pActiveDocFrame != pDocFrame)
 					{
-						PostMessage(WM_SYSCOMMAND, SC_PREVWINDOW);
+						PostMessage(WM_SYSCOMMAND,
+							pActiveDocFrame || COptionsMgr::Get(OPT_SINGLE_INSTANCE) ?
+							SC_PREVWINDOW : SC_CLOSE);
 						m_bClearCaseTool = false;
 					}
 					return TRUE;
