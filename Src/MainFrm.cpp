@@ -1510,7 +1510,6 @@ bool CMainFrame::DoFileOpen(FileLocation &filelocLeft, FileLocation &filelocRigh
 					pTempPathContext->m_strLeftDisplayRoot = filelocLeft.filepath;
 					pTempPathContext->m_strRightDisplayRoot = filelocRight.filepath;
 					pathsType = IS_EXISTING_DIR;
-					globalFileFilter.SetFilter(_T("*.*"));
 					if (filelocLeft.filepath == filelocRight.filepath)
 					{
 						filelocRight.filepath.clear();

@@ -70,8 +70,6 @@ CSettingStore SettingStore(_T("Thingamahoochie"), _T("WinMerge"));
 
 CLanguageSelect LanguageSelect;
 
-FileFilterHelper globalFileFilter;
-
 /** @brief Location for command line help to open. */
 static const TCHAR CommandLineHelpLocation[] = _T("::/htmlhelp/Command_line.html");
 

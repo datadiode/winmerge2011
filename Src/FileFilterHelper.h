@@ -35,11 +35,11 @@ struct FileFilter;
 const TCHAR FileFilterExt[] = _T(".flt");
 
 /// Interface for testing files & directories for exclusion, as diff traverses file tree
-class IDiffFilter
+extern class IDiffFilter
 {
 public:
-	virtual bool includeFile(LPCTSTR szFileName) = 0;
-	virtual bool includeDir(LPCTSTR szDirName) = 0;
+	virtual bool includeFile(LPCTSTR szFileName) { return true; }
+	virtual bool includeDir(LPCTSTR szDirName) { return true; }
 	bool includeFile(LPCTSTR szFileName1, LPCTSTR szFileName2)
 	{
 		return
@@ -56,7 +56,7 @@ public:
 		&&	(szDirName2[0] == '\0' || includeDir(szDirName2))
 		);
 	}
-};
+} transparentFileFilter;
 
 /**
  * @brief Helper class for using filefilters.

@@ -32,6 +32,9 @@
 
 using stl::vector;
 
+IDiffFilter transparentFileFilter;
+FileFilterHelper globalFileFilter;
+
 /** 
  * @brief Constructor, creates new filtermanager.
  */

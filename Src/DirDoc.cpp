@@ -217,12 +217,19 @@ void CDirFrame::Rescan(bool bCompareSelected)
 	m_wndFilePathBar.SetActive(0, true);
 	m_wndFilePathBar.SetActive(1, true);
 
-	// Make sure filters are up-to-date
-	globalFileFilter.ReloadUpdatedFilters();
-	m_pCtxt->m_piFilterGlobal = &globalFileFilter;
-
-	// Show active filter name in statusbar
-	SetFilterStatusDisplay(globalFileFilter.GetFilterNameOrMask().c_str());
+	if (m_pTempPathContext)
+	{
+		m_pCtxt->m_piFilterGlobal = &transparentFileFilter;
+		SetFilterStatusDisplay(NULL);
+	}
+	else
+	{
+		m_pCtxt->m_piFilterGlobal = &globalFileFilter;
+		// Make sure filters are up-to-date
+		globalFileFilter.ReloadUpdatedFilters();
+		// Show active filter name in statusbar
+		SetFilterStatusDisplay(globalFileFilter.GetFilterNameOrMask().c_str());
+	}
 
 	// Folder names to compare are in the compare context
 	m_diffThread.SetContext(m_pCtxt);
