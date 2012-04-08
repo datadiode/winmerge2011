@@ -60,7 +60,7 @@ CDiffThread::CDiffThread()
  */
 CDiffThread::~CDiffThread()
 {
-	CloseHandle(hSemaphore);
+	ASSERT(hSemaphore == NULL);
 }
 
 /**
@@ -96,13 +96,13 @@ bool CDiffThread::ShouldAbort() const
  */
 UINT CDiffThread::CompareDirectories()
 {
+	ASSERT(hSemaphore == NULL);
 	ASSERT(nThreadState != THREAD_COMPARING);
 
-	m_bAborting = FALSE;
-
-	nThreadState = THREAD_COMPARING;
+	m_bAborting = false;
 
 	hSemaphore = CreateSemaphore(0, 0, LONG_MAX, 0);
+	nThreadState = THREAD_COMPARING;
 
 	context->m_pCompareStats->SetCompareState(CompareStats::STATE_START);
 
@@ -225,8 +225,11 @@ void CDiffThread::DiffThreadCompare(LPVOID lpParam)
 
 	myStruct->context->m_pCompareStats->SetCompareState(CompareStats::STATE_IDLE);
 
-	// Send message to UI to update
+	CloseHandle(myStruct->hSemaphore);
+	myStruct->hSemaphore = NULL;
 	myStruct->nThreadState = CDiffThread::THREAD_COMPLETED;
+
+	// Send message to UI to update
 	// msgID=MSG_UI_UPDATE=1025 (2005-11-29, Perry)
 	PostMessage(myStruct->hWindow, myStruct->msgUIUpdate, NULL, NULL);
 
