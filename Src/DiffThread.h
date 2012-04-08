@@ -62,7 +62,7 @@ public:
 	CDiffThread();
 	~CDiffThread();
 	void SetContext(CDiffContext *);
-	UINT CompareDirectories(const String & dir1, const String & dir2);
+	UINT CompareDirectories();
 	void SetHwnd(HWND hWnd);
 	void SetMessageIDs(UINT updateMsg);
 	void SetCompareSelected(bool bSelected = false);

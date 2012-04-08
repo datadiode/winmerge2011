@@ -92,12 +92,9 @@ bool CDiffThread::ShouldAbort() const
 
 /**
  * @brief Start and run directory compare thread.
- * @param [in] dir1 First directory to compare.
- * @param [in] dir2 Second directory to compare.
  * @return Success (1) or error for thread. Currently always 1.
  */
-UINT CDiffThread::CompareDirectories(const String & dir1,
-		const String & dir2)
+UINT CDiffThread::CompareDirectories()
 {
 	ASSERT(nThreadState != THREAD_COMPARING);
 

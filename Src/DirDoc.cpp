@@ -236,7 +236,7 @@ void CDirFrame::Rescan(bool bCompareSelected)
 	m_diffThread.SetHwnd(m_pDirView->m_hWnd);
 	m_diffThread.SetMessageIDs(MSG_UI_UPDATE);
 	m_diffThread.SetCompareSelected(bCompareSelected);
-	m_diffThread.CompareDirectories(m_pCtxt->GetLeftPath(), m_pCtxt->GetRightPath());
+	m_diffThread.CompareDirectories();
 }
 
 /**
