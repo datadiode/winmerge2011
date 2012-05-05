@@ -235,7 +235,7 @@ unsigned ByteCompare::CompareFiles(const size_t x, const size_t j)
 				c[0] = true;
 				c[1] = m_bIgnoreEOLDifference;
 			}
-			else if (blankness_type[0] & (CR | LF | CRLF))
+			else if ((blankness_type[0] & (CR | LF | CRLF)) > (blankness_type[1] & (CR | LF | CRLF)))
 			{
 				// EOL on left side only
 				if (m_bIgnoreBlankLines)
@@ -244,7 +244,7 @@ unsigned ByteCompare::CompareFiles(const size_t x, const size_t j)
 					continue;
 				}
 			}
-			else if (blankness_type[1] & (CR | LF | CRLF))
+			else if ((blankness_type[1] & (CR | LF | CRLF)) > (blankness_type[0] & (CR | LF | CRLF)))
 			{
 				// EOL on right side only
 				if (m_bIgnoreBlankLines)
