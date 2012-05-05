@@ -198,6 +198,21 @@ unsigned ByteCompare::CompareFiles(const size_t x, const size_t j)
 			case EOF_0 | EOF_1:
 				return ok ? diffcode : DIFFCODE::CMPERR;
 			}
+			if (m_bIgnoreBlankLines)
+			{
+				if (blankness_type[0] & (CR | LF | CRLF))
+				{
+					// EOL on left side only
+					count[1] = NULL;
+					continue;
+				}
+				if (blankness_type[1] & (CR | LF | CRLF))
+				{
+					// EOL on right side only
+					count[0] = NULL;
+					continue;
+				}
+			}
 			if (mask & BLANK)
 			{
 				// There is a blank on one or both sides.
@@ -234,24 +249,6 @@ unsigned ByteCompare::CompareFiles(const size_t x, const size_t j)
 				// to (un)equalness, depending on bIgnoreEOLDifference.
 				c[0] = true;
 				c[1] = m_bIgnoreEOLDifference;
-			}
-			else if ((blankness_type[0] & (CR | LF | CRLF)) > (blankness_type[1] & (CR | LF | CRLF)))
-			{
-				// EOL on left side only
-				if (m_bIgnoreBlankLines)
-				{
-					count[1] = NULL;
-					continue;
-				}
-			}
-			else if ((blankness_type[1] & (CR | LF | CRLF)) > (blankness_type[0] & (CR | LF | CRLF)))
-			{
-				// EOL on right side only
-				if (m_bIgnoreBlankLines)
-				{
-					count[0] = NULL;
-					continue;
-				}
 			}
 			else if ((blankness_type[0] == EOF_0) || (blankness_type[1] == EOF_1))
 			{
