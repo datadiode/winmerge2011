@@ -108,7 +108,6 @@ extern "C" int NewHandler(size_t)
 CMergeApp::CMergeApp()
 : m_hInstance(NULL)
 , m_pMainWnd(NULL)
-, m_nLastCompareResult(0)
 , m_bNonInteractive(false)
 , m_nActiveOperations(0)
 {

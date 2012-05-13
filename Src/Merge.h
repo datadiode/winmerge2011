@@ -29,11 +29,8 @@
 #include "resource.h"       // main symbols
 #include "scriptable.h"
 
-struct FileFilter;
-class CAssureScriptsForThread;
 class CMainFrame;
 class MergeCmdLineInfo;
-class CLogFile;
 
 const TCHAR WinMergeWindowClass[] = _T("WinMergeWindowClassW");
 
@@ -68,7 +65,6 @@ public:
 	HINSTANCE m_hInstance;
 	CMainFrame *m_pMainWnd;
 
-	void SetLastCompareResult(int nResult) { m_nLastCompareResult = nResult; }
 
 	static String GetDefaultEditor();
 	static String GetDefaultSupplementFolder();
@@ -111,7 +107,6 @@ public:
 	//@}
 
 private:
-	int m_nLastCompareResult;
 	bool m_bNonInteractive;
 	LONG m_nActiveOperations; /**< Active operations count. */
 } theApp;

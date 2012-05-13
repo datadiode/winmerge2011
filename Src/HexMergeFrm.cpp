@@ -223,8 +223,6 @@ void CHexMergeFrame::SetLastCompareResult(int nResult)
 			m_pMDIFrame->DrawMenuBar();
 		}
 	}
-
-	theApp.SetLastCompareResult(nResult);
 }
 
 /**

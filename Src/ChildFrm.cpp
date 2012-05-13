@@ -940,8 +940,6 @@ void CChildFrame::SetLastCompareResult(int nResult)
 			m_pMDIFrame->DrawMenuBar();
 		}
 	}
-
-	theApp.SetLastCompareResult(nResult);
 }
 
 void CChildFrame::UpdateEditCmdUI()

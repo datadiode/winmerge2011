@@ -447,7 +447,6 @@ void CDirView::Redisplay()
 
 	int alldiffs = 0;
 	RedisplayChildren(ctxt->GetFirstDiffPosition(), 0, cnt, alldiffs);
-	theApp.SetLastCompareResult(alldiffs);
 	SortColumnsAppropriately();
 	SetRedraw(TRUE);
 }
