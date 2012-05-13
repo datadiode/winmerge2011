@@ -2203,7 +2203,7 @@ CChildFrame *CMainFrame::GetMergeDocToShow(CDirFrame *pDirDoc)
 		}
 	}
 	// Create a new merge doc
-	return new CChildFrame(GetMainFrame());
+	return new CChildFrame(this);
 }
 
 /**
@@ -2232,7 +2232,7 @@ CHexMergeFrame *CMainFrame::GetHexMergeDocToShow(CDirFrame *pDirDoc)
 		}
 	}
 	// Create a new merge doc
-	return new CHexMergeFrame(GetMainFrame());
+	return new CHexMergeFrame(this);
 }
 
 /// Get pointer to a dir doc for displaying a scan

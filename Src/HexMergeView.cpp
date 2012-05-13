@@ -299,11 +299,11 @@ HRESULT CHexMergeView::SaveFile(LPCTSTR path)
 	// Ask user what to do about FILE_ATTRIBUTE_READONLY
 	String strPath = path;
 	BOOL bApplyToAll = FALSE;
-	if (GetMainFrame()->HandleReadonlySave(strPath, FALSE, bApplyToAll) == IDCANCEL)
+	if (theApp.m_pMainWnd->HandleReadonlySave(strPath, FALSE, bApplyToAll) == IDCANCEL)
 		return S_OK;
 	path = strPath.c_str();
 	// Take a chance to create a backup
-	if (!GetMainFrame()->CreateBackup(FALSE, path))
+	if (!theApp.m_pMainWnd->CreateBackup(FALSE, path))
 		return S_OK;
 	// Write data to an intermediate file
 	String tempPath = env_GetTempPath();

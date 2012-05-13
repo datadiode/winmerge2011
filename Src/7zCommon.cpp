@@ -874,7 +874,7 @@ bool CDirView::DirItemEnumerator::MultiStepCompressArchive(LPCTSTR path)
 	DeleteFile(path);
 	if (Merge7z::Format *piHandler = ArchiveGuessFormat(path))
 	{
-		HWND hwndOwner = GetMainFrame()->GetLastActivePopup()->m_hWnd;
+		HWND hwndOwner = theApp.m_pMainWnd->GetLastActivePopup()->m_hWnd;
 		String pathIntermediate;
 		SysFreeString(Assign(pathIntermediate, piHandler->GetDefaultName(hwndOwner, path)));
 		String pathPrepend = path;
@@ -912,7 +912,7 @@ void CDirView::DirItemEnumerator::CompressArchive(LPCTSTR path)
 		OPENFILENAME ofn;
 		ZeroMemory(&ofn, OPENFILENAME_SIZE_VERSION_400);
 		ofn.lStructSize = OPENFILENAME_SIZE_VERSION_400;
-		ofn.hwndOwner = GetMainFrame()->GetLastActivePopup()->m_hWnd;
+		ofn.hwndOwner = theApp.m_pMainWnd->GetLastActivePopup()->m_hWnd;
 		ofn.lpstrFilter = CDirView::SuggestArchiveExtensions();
 		ofn.Flags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_NOREADONLYRETURN;
 		static TCHAR buffer[MAX_PATH];

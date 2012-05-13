@@ -252,7 +252,7 @@ LRESULT COpenDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			return lResult;
 		break;
 	case WM_HELP:
-		GetMainFrame()->ShowHelp(OpenDlgHelpLocation);
+		theApp.m_pMainWnd->ShowHelp(OpenDlgHelpLocation);
 		return 0;
 	}
 	return OResizableDialog::WindowProc(message, wParam, lParam);
@@ -288,7 +288,7 @@ BOOL COpenDlg::OnInitDialog()
 	{
 		// 1st submenu of IDR_POPUP_DIRVIEW is for item popup
 		HMenu *const pPopup = pMenu->GetSubMenu(0)->GetSubMenu(1);
-		m_pCompareAsScriptMenu = GetMainFrame()->SetScriptMenu(pPopup, "CompareAs.Menu");
+		m_pCompareAsScriptMenu = theApp.m_pMainWnd->SetScriptMenu(pPopup, "CompareAs.Menu");
 		int n = pPopup->GetMenuItemCount();
 		for (int i = 0 ; i < n ; ++i)
 		{
@@ -299,7 +299,7 @@ BOOL COpenDlg::OnInitDialog()
 			UINT id = pPopup->GetMenuItemID(i);
 			m_pCbCompareAs->SetItemData(j, id);
 		}
-		GetMainFrame()->SetScriptMenu(pPopup, NULL);
+		theApp.m_pMainWnd->SetScriptMenu(pPopup, NULL);
 		pMenu->DestroyMenu();
 	}
 
@@ -572,7 +572,7 @@ void COpenDlg::SetStatus(UINT msgID)
  */
 void COpenDlg::OnSelectFilter()
 {
-	GetMainFrame()->SelectFilter();
+	theApp.m_pMainWnd->SelectFilter();
 	String filterNameOrMask = globalFileFilter.GetFilterNameOrMask();
 	SetDlgItemText(IDC_EXT_COMBO, filterNameOrMask.c_str());
 }
@@ -611,7 +611,7 @@ void COpenDlg::OnActivate(UINT nState, HWND hWndOther, BOOL bMinimized)
  */
 void COpenDlg::OnHelp()
 {
-	GetMainFrame()->ShowHelp(OpenDlgHelpLocation);
+	theApp.m_pMainWnd->ShowHelp(OpenDlgHelpLocation);
 }
 
 /////////////////////////////////////////////////////////////////////////////

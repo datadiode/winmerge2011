@@ -795,8 +795,8 @@ void CDirView::PerformActionList(FileActionScript & actionScript)
 {
 	// Reset suppressing VSS dialog for multiple files.
 	// Set in CMainFrame::SaveToVersionControl().
-	GetMainFrame()->m_CheckOutMulti = FALSE;
-	GetMainFrame()->m_bVssSuppressPathCheck = FALSE;
+	m_pFrame->m_pMDIFrame->m_CheckOutMulti = FALSE;
+	m_pFrame->m_pMDIFrame->m_bVssSuppressPathCheck = false;
 
 	theApp.AddOperation();
 	try
@@ -1061,7 +1061,7 @@ void CDirView::DoOpenWith(SIDE_TYPE stype)
 {
 	String file = GetSelectedFileName(stype);
 	if (!file.empty())
-		GetMainFrame()->OpenFileWith(file.c_str());
+		m_pFrame->m_pMDIFrame->OpenFileWith(file.c_str());
 }
 
 /// Open selected file  on specified side to external editor
@@ -1069,7 +1069,7 @@ void CDirView::DoOpenWithEditor(SIDE_TYPE stype)
 {
 	String file = GetSelectedFileName(stype);
 	if (!file.empty())
-		GetMainFrame()->OpenFileToExternalEditor(file.c_str());
+		m_pFrame->m_pMDIFrame->OpenFileToExternalEditor(file.c_str());
 }
 
 /**

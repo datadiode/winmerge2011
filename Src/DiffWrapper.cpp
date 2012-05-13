@@ -528,7 +528,7 @@ bool CDiffWrapper::AddDiffRange(UINT begin0, UINT end0, UINT begin1, UINT end1, 
 	}
 	catch (OException *e)
 	{
-		e->ReportError(GetMainFrame()->m_hWnd, MB_ICONSTOP);
+		e->ReportError(theApp.m_pMainWnd->m_hWnd, MB_ICONSTOP);
 		delete e;
 	}
 	TRACE("left=%d,%d   right=%d,%d   op=%d\n",

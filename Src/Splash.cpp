@@ -135,7 +135,7 @@ LRESULT CSplashWnd::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_MDIACTIVATE:
 		// Don't surprise user by closing a wrong DocFrame.
-		GetMainFrame()->m_bClearCaseTool = false;
+		theApp.m_pMainWnd->m_bClearCaseTool = false;
 		fMaximized = FALSE;
 		if (OWindow::WindowProc(WM_MDIGETACTIVE, 0, (LPARAM)&fMaximized) == 0)
 			break;
@@ -159,22 +159,22 @@ LRESULT CSplashWnd::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		break;
 	case WM_MDICREATE:
 		lResult = OWindow::WindowProc(uMsg, wParam, lParam);
-		if (HTabCtrl *pTc = GetMainFrame()->GetTabBar())
+		if (HTabCtrl *pTc = theApp.m_pMainWnd->GetTabBar())
 		{
 			int index = pTc->GetItemCount();
 			TCITEM item;
 			item.mask = TCIF_PARAM;
 			item.lParam = lResult;
 			pTc->InsertItem(index, &item);
-			GetMainFrame()->RecalcLayout();
+			theApp.m_pMainWnd->RecalcLayout();
 		}
 		return lResult;
 	case WM_MDIDESTROY:
 		// Avoid InitCmdUI() if operating on a premature MDI child window.
 		if (reinterpret_cast<HWindow *>(wParam)->IsWindowVisible())
-			GetMainFrame()->InitCmdUI();
+			theApp.m_pMainWnd->InitCmdUI();
 		lResult = OWindow::WindowProc(uMsg, wParam, lParam);
-		if (HTabCtrl *pTc = GetMainFrame()->GetTabBar())
+		if (HTabCtrl *pTc = theApp.m_pMainWnd->GetTabBar())
 		{
 			int index = pTc->GetItemCount();
 			while (index)
@@ -185,7 +185,7 @@ LRESULT CSplashWnd::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 				if (item.lParam == wParam)
 					pTc->DeleteItem(index);
 			}
-			GetMainFrame()->RecalcLayout();
+			theApp.m_pMainWnd->RecalcLayout();
 		}
 		return lResult;
 	case WM_NOTIFY:

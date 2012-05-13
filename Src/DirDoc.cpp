@@ -251,7 +251,7 @@ void CDirFrame::Rescan(bool bCompareSelected)
  * @return true if item should be shown, false if not.
  * @sa CDirFrame::Redisplay()
  */
-bool CDirFrame::IsShowable(const DIFFITEM &di)
+bool CDirFrame::IsShowable(const DIFFITEM &di) const
 {
 	if (di.customFlags1 & ViewCustomFlags::HIDDEN)
 		return false;
@@ -459,7 +459,7 @@ bool CDirFrame::CloseMergeDocs()
  */
 CChildFrame *CDirFrame::GetMergeDocForDiff()
 {
-	CChildFrame *pMergeDoc = new CChildFrame(GetMainFrame());
+	CChildFrame *pMergeDoc = new CChildFrame(m_pMDIFrame);
 	AddMergeDoc(pMergeDoc);
 	pMergeDoc->SetDirDoc(this);
 	return pMergeDoc;
@@ -473,7 +473,7 @@ CChildFrame *CDirFrame::GetMergeDocForDiff()
  */
 CHexMergeFrame *CDirFrame::GetHexMergeDocForDiff()
 {
-	CHexMergeFrame *pHexMergeDoc = new CHexMergeFrame(GetMainFrame());
+	CHexMergeFrame *pHexMergeDoc = new CHexMergeFrame(m_pMDIFrame);
 	AddMergeDoc(pHexMergeDoc);
 	pHexMergeDoc->SetDirDoc(this);
 	return pHexMergeDoc;

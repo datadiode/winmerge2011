@@ -316,6 +316,4 @@ private:
 	UINT m_sourceType;
 };
 
-CMainFrame *GetMainFrame(); // access to the singleton main frame object
-
 /////////////////////////////////////////////////////////////////////////////

@@ -163,7 +163,7 @@ void CPreferencesDlg::OnDestroy()
 
 void CPreferencesDlg::OnHelpButton() 
 {
-	GetMainFrame()->ShowHelp(OptionsHelpLocation);
+	theApp.m_pMainWnd->ShowHelp(OptionsHelpLocation);
 }
 
 HTREEITEM CPreferencesDlg::AddBranch(UINT nTopHeading, HTREEITEM htiParent)

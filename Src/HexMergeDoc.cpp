@@ -74,8 +74,9 @@ static void UpdateDiffItem(DIFFITEM &di, CDiffContext *pCtxt)
 	// We must compare unique files to itself to detect encoding
 	if (di.diffcode.isSideLeftOnly() || di.diffcode.isSideRightOnly())
 	{
-		int compareMethod = pCtxt->GetCompareMethod();
-		if (compareMethod != CMP_DATE && compareMethod != CMP_DATE_SIZE &&
+		int compareMethod = pCtxt->m_nCompMethod;
+		if (compareMethod != CMP_DATE &&
+			compareMethod != CMP_DATE_SIZE &&
 			compareMethod != CMP_SIZE)
 		{
 			di.diffcode.diffcode |= DIFFCODE::SAME;
@@ -100,7 +101,7 @@ static void UpdateDiffItem(DIFFITEM &di, CDiffContext *pCtxt)
  */
 static int Try(HRESULT hr, UINT type)
 {
-	return hr ? OException(hr).ReportError(GetMainFrame()->m_hWnd, type) : 0;
+	return hr ? OException(hr).ReportError(theApp.m_pMainWnd->m_hWnd, type) : 0;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -293,7 +294,7 @@ void CHexMergeFrame::OnFileSaveAsLeft()
 {
 	const String &pathLeft = m_strPath[0];
 	String strPath;
-	if (SelectFile(GetMainFrame()->m_hWnd, strPath, pathLeft.c_str(), IDS_SAVE_LEFT_AS, NULL, FALSE))
+	if (SelectFile(m_pMDIFrame->m_hWnd, strPath, pathLeft.c_str(), IDS_SAVE_LEFT_AS, NULL, FALSE))
 	{
 		if (Try(m_pView[MERGE_VIEW_LEFT]->SaveFile(strPath.c_str())) == IDCANCEL)
 			return;
@@ -309,7 +310,7 @@ void CHexMergeFrame::OnFileSaveAsRight()
 {
 	const String &pathRight = m_strPath[1];
 	String strPath;
-	if (SelectFile(GetMainFrame()->m_hWnd, strPath, pathRight.c_str(), IDS_SAVE_LEFT_AS, NULL, FALSE))
+	if (SelectFile(m_pMDIFrame->m_hWnd, strPath, pathRight.c_str(), IDS_SAVE_LEFT_AS, NULL, FALSE))
 	{
 		if (Try(m_pView[MERGE_VIEW_RIGHT]->SaveFile(strPath.c_str())) == IDCANCEL)
 			return;

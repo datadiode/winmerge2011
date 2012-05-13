@@ -45,7 +45,7 @@ DirCompProgressDlg::DirCompProgressDlg(CDirFrame *pDirDoc)
 , m_pDirDoc(pDirDoc)
 , m_pStatsDlg(new CompareStatisticsDlg(pDirDoc->GetCompareStats()))
 {
-	LanguageSelect.Create(*this, GetMainFrame()->GetLastActivePopup()->m_hWnd);
+	LanguageSelect.Create(*this, theApp.m_pMainWnd->GetLastActivePopup()->m_hWnd);
 }
 
 DirCompProgressDlg::~DirCompProgressDlg()

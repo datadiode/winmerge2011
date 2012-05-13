@@ -126,8 +126,7 @@ void CMergeDiffDetailView::SetSelection(const POINT &ptStart, const POINT &ptEnd
 
 void CMergeDiffDetailView::OnInitialUpdate()
 {
-	//CCrystalTextView::OnInitialUpdate();
-	SetFont(GetMainFrame()->m_lfDiff);
+	SetFont(theApp.m_pMainWnd->m_lfDiff);
 }
 
 int CMergeDiffDetailView::GetAdditionalTextBlocks (int nLineIndex, TEXTBLOCK *pBuf)
@@ -543,7 +542,7 @@ void CMergeDiffDetailView::OnContextMenu(LPARAM lParam)
 		ClientToScreen(&point);
 	}
 	pSub->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON,
-		point.x, point.y, GetMainFrame()->m_hWnd);
+		point.x, point.y, theApp.m_pMainWnd->m_hWnd);
 	pMenu->DestroyMenu();
 }
 
@@ -566,5 +565,5 @@ void CMergeDiffDetailView::DocumentsLoaded()
 		m_pDocument->IsMixedEOL(m_nThisPane);
 	SetViewEols(COptionsMgr::Get(OPT_VIEW_WHITESPACE), bMixedEOL);
 	SetWordWrapping(FALSE);
-	SetFont(GetMainFrame()->m_lfDiff);
+	SetFont(theApp.m_pMainWnd->m_lfDiff);
 }

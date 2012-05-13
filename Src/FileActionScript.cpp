@@ -101,7 +101,7 @@ bool FileActionScript::Run(HWND hwnd, FILEOP_FLAGS flags)
 				if (COptionsMgr::Get(OPT_VCS_SYSTEM) != VCS_NONE)
 				{
 					String strErr;
-					int retVal = GetMainFrame()->SyncFileToVCS(
+					int retVal = theApp.m_pMainWnd->SyncFileToVCS(
 						iter->dest.c_str(), bApplyToAll, &strErr);
 					if (retVal == -1)
 					{
@@ -113,7 +113,7 @@ bool FileActionScript::Run(HWND hwnd, FILEOP_FLAGS flags)
 					if (retVal == IDNO) // Skip this item
 						continue; // NB: This also advances the iterator!
 				}
-				if (!GetMainFrame()->CreateBackup(TRUE, iter->dest.c_str()))
+				if (!theApp.m_pMainWnd->CreateBackup(TRUE, iter->dest.c_str()))
 				{
 					LanguageSelect.MsgBox(IDS_ERROR_BACKUP, MB_ICONERROR);
 					break;

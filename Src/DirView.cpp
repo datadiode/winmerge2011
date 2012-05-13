@@ -138,11 +138,11 @@ LRESULT CDirView::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		case EN_CHANGE:
 			// Update the tool bar's "Undo" icon. It should be enabled when
 			// renaming an item and undo is possible.
-			GetMainFrame()->UpdateCmdUI<ID_EDIT_UNDO>(
+			m_pFrame->m_pMDIFrame->UpdateCmdUI<ID_EDIT_UNDO>(
 				reinterpret_cast<HEdit *>(lParam)->CanUndo() ? MF_ENABLED : MF_GRAYED);
 			break;
 		case EN_KILLFOCUS:
-			GetMainFrame()->UpdateCmdUI<ID_EDIT_UNDO>(MF_GRAYED);
+			m_pFrame->m_pMDIFrame->UpdateCmdUI<ID_EDIT_UNDO>(MF_GRAYED);
 			break;
 		}
 		break;
@@ -171,7 +171,7 @@ LRESULT CDirView::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 void CDirView::AcquireSharedResources()
 {
 	// Load user-selected font
-	m_font = HFont::CreateIndirect(&GetMainFrame()->m_lfDir);
+	m_font = HFont::CreateIndirect(&theApp.m_pMainWnd->m_lfDir);
 	// Load the icons used for the list view (to reflect diff status)
 	// NOTE: these must be in the exactly the same order than in enum
 	// definition in begin of this file!
@@ -670,9 +670,8 @@ void CDirView::HeaderContextMenu(POINT point)
 	HMenu *const pSubMenu = pMenu->GetSubMenu(1);
 	// invoke context menu
 	// this will invoke all the OnUpdate methods to enable/disable the individual items
-	CMainFrame *pFrame = m_pFrame->m_pMDIFrame;
 	pSubMenu->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON,
-		point.x, point.y, pFrame->m_hWnd);
+		point.x, point.y, m_pFrame->m_pMDIFrame->m_hWnd);
 	pMenu->DestroyMenu();
 }
 
@@ -932,7 +931,7 @@ void CDirView::OpenParentDirectory()
 		m_pFrame->m_pTempPathContext = m_pFrame->m_pTempPathContext->DeleteHead();
 		// fall through (no break!)
 	case CDirFrame::AllowUpwardDirectory::ParentIsRegularPath:
-		GetMainFrame()->DoFileOpen(filelocLeft, filelocRight,
+		theApp.m_pMainWnd->DoFileOpen(filelocLeft, filelocRight,
 			FFILEOPEN_NOMRU, FFILEOPEN_NOMRU, m_pFrame->GetRecursive(), m_pFrame);
 		// fall through (no break!)
 	case CDirFrame::AllowUpwardDirectory::No:
@@ -1188,7 +1187,6 @@ void CDirView::OpenSelection(PackingInfo *infoUnpacker, DWORD commonFlags)
 	FileLocation filelocLeft, filelocRight;
 	DIFFITEM *di1 = NULL, *di2 = NULL; // left & right items (di1==di2 if single selection)
 	bool isdir = false; // set if we're comparing directories
-
 	if (pos2)
 	{
 		bool success = OpenTwoItems(pos1, pos2, &di1, &di2,
@@ -1213,7 +1211,7 @@ void CDirView::OpenSelection(PackingInfo *infoUnpacker, DWORD commonFlags)
 		// Open subfolders
 		// Don't add folders to MRU
 		// Or: Open archives, not adding paths to MRU
-		GetMainFrame()->DoFileOpen(
+		theApp.m_pMainWnd->DoFileOpen(
 			filelocLeft, filelocRight,
 			commonFlags, commonFlags,
 			m_pFrame->GetRecursive(), m_pFrame);
@@ -1239,7 +1237,7 @@ void CDirView::OpenSelection(PackingInfo *infoUnpacker, DWORD commonFlags)
 		DWORD leftFlags = bLeftRO ? FFILEOPEN_READONLY : 0;
 		DWORD rightFlags = bRightRO ? FFILEOPEN_READONLY : 0;
 
-		GetMainFrame()->ShowMergeDoc(m_pFrame, filelocLeft, filelocRight,
+		theApp.m_pMainWnd->ShowMergeDoc(m_pFrame, filelocLeft, filelocRight,
 			commonFlags | leftFlags, commonFlags | rightFlags, infoUnpacker);
 	}
 }
@@ -1274,7 +1272,6 @@ void CDirView::OpenSelectionZip()
 	FileLocation filelocLeft, filelocRight;
 	DIFFITEM *di1 = NULL, *di2 = NULL; // left & right items (di1==di2 if single selection)
 	bool isdir = false; // set if we're comparing directories
-
 	if (pos2)
 	{
 		bool success = OpenTwoItems(pos1, pos2, &di1, &di2,
@@ -1297,7 +1294,7 @@ void CDirView::OpenSelectionZip()
 	// Open subfolders
 	// Don't add folders to MRU
 	// Or: Open archives, not adding paths to MRU
-	GetMainFrame()->DoFileOpen(
+	theApp.m_pMainWnd->DoFileOpen(
 		filelocLeft, filelocRight,
 		FFILEOPEN_NOMRU | FFILEOPEN_DETECTZIP,
 		FFILEOPEN_NOMRU | FFILEOPEN_DETECTZIP,
@@ -1363,7 +1360,7 @@ void CDirView::OpenSelectionHex()
 	BOOL bLeftRO = m_pFrame->GetLeftReadOnly();
 	BOOL bRightRO = m_pFrame->GetRightReadOnly();
 
-	GetMainFrame()->ShowHexMergeDoc(m_pFrame,
+	theApp.m_pMainWnd->ShowHexMergeDoc(m_pFrame,
 		filelocLeft, filelocRight, bLeftRO, bRightRO);
 }
 
@@ -1405,7 +1402,6 @@ const DIFFITEM &CDirView::GetDiffItem(int sel) const
 DIFFITEM & CDirView::GetDiffItemRef(int sel)
 {
 	UINT_PTR diffpos = GetItemKey(sel);
-
 	// If it is special item, return empty DIFFITEM
 	if (diffpos == SPECIAL_ITEM_POS)
 	{
@@ -1462,7 +1458,6 @@ DIFFITEM &CDirView::GetNextSelectedInd(int &ind)
 	int sel = GetNextItem(ind, LVNI_SELECTED);
 	DIFFITEM &di = GetDiffItemRef(ind);
 	ind = sel;
-
 	return di;
 }
 
@@ -1712,10 +1707,10 @@ void CDirView::OnUpdateUIMessage()
 	}
 	// If compare took more than TimeToSignalCompare seconds, notify user
 	clock_t elapsed = clock() - m_compareStart;
-	GetMainFrame()->SetStatus(LanguageSelect.Format(IDS_ELAPSED_TIME, elapsed));
+	theApp.m_pMainWnd->SetStatus(LanguageSelect.Format(IDS_ELAPSED_TIME, elapsed));
 	if (elapsed > TimeToSignalCompare * CLOCKS_PER_SEC)
 		MessageBeep(IDOK);
-	GetMainFrame()->StartFlashing();
+	theApp.m_pMainWnd->StartFlashing();
 }
 
 LRESULT CDirView::OnNotify(LPARAM lParam)
@@ -2352,7 +2347,7 @@ void CDirView::OnUpdateStatusNum()
 	m_pFrame->SetStatus(LanguageSelect.FormatMessage(
 		items == 1 ? IDS_STATUS_SELITEM1 : IDS_STATUS_SELITEMS, num));
 
-	CMainFrame *const pMDIFrame = GetMainFrame();
+	CMainFrame *const pMDIFrame = m_pFrame->m_pMDIFrame;
 	if (!pMDIFrame->GetActiveDocFrame()->IsChild(m_pWnd))
 		return;
 
@@ -2610,7 +2605,7 @@ LRESULT CDirView::HandleMenuMessage(UINT message, WPARAM wParam, LPARAM lParam)
 	{
 		HMenu *const pMenu = reinterpret_cast<HMenu *>(wParam);
 		if (pMenu == m_pCompareAsScriptMenu)
-			m_pCompareAsScriptMenu = GetMainFrame()->SetScriptMenu(pMenu, "CompareAs.Menu");
+			m_pCompareAsScriptMenu = theApp.m_pMainWnd->SetScriptMenu(pMenu, "CompareAs.Menu");
 	}
 	m_pShellContextMenuLeft->HandleMenuMessage(message, wParam, lParam, res);
 	m_pShellContextMenuRight->HandleMenuMessage(message, wParam, lParam, res);

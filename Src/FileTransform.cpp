@@ -90,7 +90,7 @@ public:
 				reinterpret_cast<void **>(&m_spFactoryDispatch)));
 		CMyDispId DispId;
 		DispId.Call(m_spFactoryDispatch,
-			CMyDispParams<1>().Unnamed[static_cast<IMergeApp *>(GetMainFrame())], DISPATCH_PROPERTYPUTREF);
+			CMyDispParams<1>().Unnamed[static_cast<IMergeApp *>(theApp.m_pMainWnd)], DISPATCH_PROPERTYPUTREF);
 		if (SUCCEEDED(DispId.Init(m_spFactoryDispatch, L"ShowConsole")))
 		{
 			CMyVariant var;
@@ -123,36 +123,6 @@ public:
 				OException::Check(options.ChangeType(VT_DISPATCH));
 				packingInfo->pluginOptionsOwner = m_spFactoryDispatch;
 				packingInfo->pluginOptions = V_DISPATCH(&options);
-				/*if (SUCCEEDED(DispId.Init(V_DISPATCH(&options), L"URL")))
-				{
-					CMyVariant url, features;
-					OException::Check(DispId.Call(V_DISPATCH(&options),
-						CMyDispParams<0>().Unnamed,
-						DISPATCH_PROPERTYGET, &url));
-					OException::Check(url.ChangeType(VT_BSTR));
-					if (SysStringLen(V_BSTR(&url)) != 0)
-					{
-						if (SUCCEEDED(DispId.Init(V_DISPATCH(&options), L"Features")))
-						{
-							OException::Check(DispId.Call(V_DISPATCH(&options),
-								CMyDispParams<0>().Unnamed,
-								DISPATCH_PROPERTYGET, &features));
-						}
-						OException::Check(features.ChangeType(VT_BSTR));
-						String path;
-						if (LPCWSTR p = StrChrW(packingInfo->pluginMoniker.c_str(), L':'))
-							if (LPCWSTR q = StrRChr(p, NULL, L'\\'))
-								path.assign(p + 1, q - p);
-						path += V_BSTR(&url);
-						CMyComPtr<IMoniker> spMoniker;
-						OException::Check(URLMON->CreateURLMoniker(
-							NULL, path.c_str(), &spMoniker));
-						OException::Check(MSHTML->ShowHTMLDialogEx(
-							GetMainFrame()->m_hWnd, spMoniker,
-							HTMLDLG_MODAL | HTMLDLG_VERIFY,
-							&options, V_BSTR(&features), NULL));
-					}
-				}*/
 			}
 			else
 			{

@@ -359,7 +359,7 @@ void CEditorFilePathBar::OnContextMenu(POINT point)
 	// use flags TPM_NONOTIFY | TPM_RETURNCMD
 	// and handle the command after TrackPopupMenu
 	int command = pSub->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON |
-		TPM_NONOTIFY  | TPM_RETURNCMD, point.x, point.y, GetMainFrame()->m_hWnd);
+		TPM_NONOTIFY  | TPM_RETURNCMD, point.x, point.y, theApp.m_pMainWnd->m_hWnd);
 
 	pMenu->DestroyMenu();
 

@@ -118,7 +118,7 @@ public:
 	void ApplyLeftDisplayRoot(String &);
 	void ApplyRightDisplayRoot(String &);
 
-	bool IsShowable(const DIFFITEM &);
+	bool IsShowable(const DIFFITEM &) const;
 
 	CDiffContext *GetDiffContext() { return m_pCtxt; }
 	const DIFFITEM & GetDiffByKey(UINT_PTR key) const { return m_pCtxt->GetDiffAt(key); }

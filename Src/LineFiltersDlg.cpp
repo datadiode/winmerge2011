@@ -158,7 +158,7 @@ LRESULT LineFiltersDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	case WM_HELP:
-		GetMainFrame()->ShowHelp(FilterHelpLocation);
+		theApp.m_pMainWnd->ShowHelp(FilterHelpLocation);
 		return 0;
 	case WM_NOTIFY:
 		if (LRESULT lResult = OnNotify(reinterpret_cast<UNotify *>(lParam)))

@@ -1055,7 +1055,7 @@ HMenu *CLanguageSelect::LoadMenu(UINT id) const
 	HINSTANCE hinst = m_hCurrentDll ? m_hCurrentDll : GetModuleHandle(NULL);
 	HMENU hMenu = ::LoadMenu(hinst, MAKEINTRESOURCE(id));
 	TranslateMenu(hMenu);
-	GetMainFrame()->SetBitmaps(hMenu);
+	theApp.m_pMainWnd->SetBitmaps(hMenu);
 	return reinterpret_cast<HMenu *>(hMenu);
 }
 
@@ -1087,17 +1087,17 @@ HImageList *CLanguageSelect::LoadImageList(UINT id, int cx, int cGrow) const
 
 void CLanguageSelect::ReloadMenu() 
 {
-	CMainFrame *const pMainFrame = GetMainFrame();
 	// Create a temporary menu to collect the garbage
 	HMenu *const pGarbageMenu = HMenu::CreatePopupMenu();
 	// Populate it with MainFrame's default menu, and placeholders for DocFrame shared menus
-	pGarbageMenu->AppendMenu(MF_POPUP, reinterpret_cast<UINT_PTR>(pMainFrame->m_hMenuDefault), _T(""));
+	pGarbageMenu->AppendMenu(MF_POPUP,
+		reinterpret_cast<UINT_PTR>(theApp.m_pMainWnd->m_hMenuDefault), _T(""));
 	pGarbageMenu->AppendMenu(MF_SEPARATOR, FRAME_FOLDER);
 	pGarbageMenu->AppendMenu(MF_SEPARATOR, FRAME_FILE);
 	pGarbageMenu->AppendMenu(MF_SEPARATOR, FRAME_BINARY);
 
-	pMainFrame->m_hMenuDefault = LoadMenu(IDR_MAINFRAME)->m_hMenu;
-	HWindow *const pWndMDIClient = pMainFrame->m_pWndMDIClient;
+	theApp.m_pMainWnd->m_hMenuDefault = LoadMenu(IDR_MAINFRAME)->m_hMenu;
+	HWindow *const pWndMDIClient = theApp.m_pMainWnd->m_pWndMDIClient;
 	HWindow *pChild = NULL;
 	while ((pChild = pWndMDIClient->FindWindowEx(pChild, WinMergeWindowClass)) != NULL)
 	{
@@ -1111,12 +1111,12 @@ void CLanguageSelect::ReloadMenu()
 		}
 	}
 
-	HMENU hNewMenu = pMainFrame->m_hMenuDefault;
-	if (CDocFrame *pDocFrame = pMainFrame->GetActiveDocFrame())
+	HMENU hNewMenu = theApp.m_pMainWnd->m_hMenuDefault;
+	if (CDocFrame *pDocFrame = theApp.m_pMainWnd->GetActiveDocFrame())
 	{
 		hNewMenu = pDocFrame->m_pHandleSet->m_hMenuShared;
 	}
-	pMainFrame->SetActiveMenu(hNewMenu);
+	theApp.m_pMainWnd->SetActiveMenu(hNewMenu);
 	// Do away with the garbage
 	pGarbageMenu->DestroyMenu();
 }
@@ -1125,7 +1125,7 @@ int CLanguageSelect::DoModal(ODialog &dlg, HWND parent) const
 {
 	HINSTANCE hinst = m_hCurrentDll ? m_hCurrentDll : GetModuleHandle(NULL);
 	if (parent == NULL)
-		parent = GetMainFrame()->GetLastActivePopup()->m_hWnd;
+		parent = theApp.m_pMainWnd->GetLastActivePopup()->m_hWnd;
 	return dlg.DoModal(hinst, parent);
 }
 
@@ -1199,9 +1199,7 @@ void CLanguageSelect::OnOK()
 	{
 		if (SetLanguage(lang))
 			COptionsMgr::SaveOption(OPT_SELECTED_LANGUAGE, (int)lang);
-
-		CMainFrame *pMainFrame = GetMainFrame();
-		pMainFrame->UpdateCodepageModule();
+		theApp.m_pMainWnd->UpdateCodepageModule();
 		// Update the current menu
 		ReloadMenu();
 	}

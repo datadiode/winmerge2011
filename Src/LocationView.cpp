@@ -655,7 +655,7 @@ void CLocationView::OnContextMenu(LPARAM lParam)
 	// and handle the command after TrackPopupMenu
 	int command = pSub->TrackPopupMenu(
 		TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_NONOTIFY  | TPM_RETURNCMD,
-		point.x, point.y, GetMainFrame()->m_hWnd);
+		point.x, point.y, theApp.m_pMainWnd->m_hWnd);
 
 	pMenu->DestroyMenu();
 
@@ -667,7 +667,7 @@ void CLocationView::OnContextMenu(LPARAM lParam)
 			m_pMergeDoc->GetView(bar)->SetFocus();
 		break;
 	case ID_EDIT_WMGOTO:
-		GetMainFrame()->PostMessage(WM_COMMAND, ID_EDIT_WMGOTO);
+		theApp.m_pMainWnd->PostMessage(WM_COMMAND, ID_EDIT_WMGOTO);
 		break;
 	case ID_DISPLAY_MOVED_NONE:
 		SetConnectMovedBlocks(DISPLAY_MOVED_NONE);

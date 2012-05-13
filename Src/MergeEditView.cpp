@@ -1109,7 +1109,7 @@ void CMergeEditView::OnContextMenu(LPARAM lParam)
 		ClientToScreen(&point);
 	}
 	pSub->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON,
-		point.x, point.y, GetMainFrame()->m_hWnd);
+		point.x, point.y, theApp.m_pMainWnd->m_hWnd);
 	pMenu->DestroyMenu();
 }
 
@@ -1396,7 +1396,7 @@ bool CMergeEditView::IsDiffVisible(const DIFFRANGE& diff, int nLinesBelow /*=0*/
 void CMergeEditView::DocumentsLoaded()
 {
 	RefreshOptions();
-	SetFont(GetMainFrame()->m_lfDiff);
+	SetFont(theApp.m_pMainWnd->m_lfDiff);
 }
 
 /**
@@ -1471,7 +1471,7 @@ void CMergeEditView::ZoomText(short amount)
 
 		if ( amount == 0)
 		{
-			nPointSize = -MulDiv(GetMainFrame()->m_lfDiff.lfHeight, 72, nLogPixelsY);
+			nPointSize = -MulDiv(theApp.m_pMainWnd->m_lfDiff.lfHeight, 72, nLogPixelsY);
 		}
 
 		nPointSize += amount;

@@ -308,7 +308,7 @@ int CMergeApp::DoMessageBox(LPCTSTR lpszPrompt, UINT nType, UINT nIDPrompt)
 	if (m_bNonInteractive)
 		return IDCANCEL;
 
-	HWND owner = GetMainFrame()->GetLastActivePopup()->m_hWnd;
+	HWND owner = m_pMainWnd->GetLastActivePopup()->m_hWnd;
 
 	// Use our own message box implementation, which adds the
 	// do not show again checkbox, and implements it on subsequent calls
@@ -348,7 +348,7 @@ void CMergeApp::InitializeSupplements()
 			}
 		}
 		TCHAR *p = buffer;
-		while (TCHAR *q = _tcschr(p, '='))
+		while (TCHAR *q = _tcschr(p, _T('=')))
 		{
 			const size_t r = _tcslen(q);
 			*q++ = _T('\0');
@@ -508,7 +508,7 @@ LRESULT CDocFrame::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			if (m_pWndLastFocus && !IsChild(m_pWndLastFocus))
 				m_pWndLastFocus = NULL;
 		}
-		else if (HTabCtrl *pTc = GetMainFrame()->GetTabBar())
+		else if (HTabCtrl *pTc = m_pMDIFrame->GetTabBar())
 		{
 			// Window is going active => update TabBar selection
 			int index = pTc->GetItemCount();
@@ -545,7 +545,7 @@ LRESULT CDocFrame::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		m_pWndLastFocus->SetFocus();
 		break;
 	case WM_SETTEXT:
-		if (HTabCtrl *pTc = GetMainFrame()->GetTabBar())
+		if (HTabCtrl *pTc = m_pMDIFrame->GetTabBar())
 		{
 			int index = pTc->GetItemCount();
 			while (index)

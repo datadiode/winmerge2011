@@ -123,7 +123,7 @@ void ProjectFilePathsDlg::OnBnClickedProjRfileBrowse()
  */
 void ProjectFilePathsDlg::OnBnClickedProjFilterSelect()
 {
-	GetMainFrame()->SelectFilter();
+	theApp.m_pMainWnd->SelectFilter();
 	String filterNameOrMask = globalFileFilter.GetFilterNameOrMask();
 	SetDlgItemText(IDC_PROJ_FILTER_EDIT, filterNameOrMask.c_str());
 }
