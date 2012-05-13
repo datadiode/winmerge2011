@@ -454,14 +454,6 @@ BOOL CMergeApp::ParseArgsAndDoOpen(MergeCmdLineInfo& cmdInfo, CMainFrame* pMainF
 }
 
 /**
- * @brief Return windows language ID of current WinMerge GUI language
- */
-WORD CMergeApp::GetLangId() const
-{
-	return LanguageSelect.GetLangId();
-}
-
-/**
  * @brief Get default editor path.
  * @return full path to the editor program executable.
  */

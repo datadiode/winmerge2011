@@ -58,16 +58,13 @@ enum { IDLE_TIMER = 9754 };
 /** 
  * @brief WinMerge application class
  */
-class CMergeApp //: public CWinApp
+extern class CMergeApp
 {
 public:
-	WORD GetLangId() const;
-
 	CMergeApp();
 	~CMergeApp();
 
 public:
-
 	HINSTANCE m_hInstance;
 	CMainFrame *m_pMainWnd;
 
@@ -117,9 +114,7 @@ private:
 	int m_nLastCompareResult;
 	bool m_bNonInteractive;
 	LONG m_nActiveOperations; /**< Active operations count. */
-};
-
-extern CMergeApp theApp;
+} theApp;
 
 #include "EditorFilepathBar.h"
 

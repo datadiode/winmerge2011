@@ -25,9 +25,10 @@
 // $Id$
 
 #include "StdAfx.h"
-#include "Merge.h" // for theApp
+#include "LanguageSelect.h" // for CLanguageSelect::GetLangId()
+#include "FileLocation.h"
+#include "DiffFileInfo.h"
 #include "codepage.h"
-#include "DiffFileData.h" // for DiffFileData::SetDefaultCodepage
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -35,17 +36,11 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-using stl::map;
-
-static void initialize();
-
 static int f_nDefaultCodepage; // store the default codepage as specified by user in options
 
-static int f_bInitialized = false;
-
 // map number to bit code
-enum { CP_SUPPORTED_FLAG=0x01, CP_INSTALLED_FLAG=0x10 };
-static map<int, int> f_codepage_status;
+enum { CP_SUPPORTED_FLAG = 0x01, CP_INSTALLED_FLAG = 0x10 };
+static stl::map<int, int> f_codepage_status;
 
 /**
  * @brief Update the appropriate default codepage
@@ -55,30 +50,26 @@ void updateDefaultCodepage(int cpDefaultMode, int customCodepage)
 	int wLangId;
 	switch (cpDefaultMode)
 	{
-		case 0:
+	case 0:
+		f_nDefaultCodepage = GetACP();
+		break;
+	case 1:
+		TCHAR buff[32];
+		wLangId = LanguageSelect.GetLangId();
+		if (GetLocaleInfo(wLangId, LOCALE_IDEFAULTANSICODEPAGE, buff, _countof(buff)))
+			f_nDefaultCodepage = _ttol(buff);
+		else
 			f_nDefaultCodepage = GetACP();
-			break;
-		case 1:
-			TCHAR buff[32];
-			wLangId = theApp.GetLangId();
-			if (GetLocaleInfo(wLangId, LOCALE_IDEFAULTANSICODEPAGE, buff, sizeof(buff)/sizeof(buff[0])))
-				f_nDefaultCodepage = _ttol(buff);
-			else
-				f_nDefaultCodepage = GetACP();
-			break;
-		case 2:
-			f_nDefaultCodepage = customCodepage;
-			break;
-		default:
-			// no other valid option
-			ASSERT (0);
-			f_nDefaultCodepage = GetACP();
+		break;
+	case 2:
+		f_nDefaultCodepage = customCodepage;
+		break;
+	default:
+		// no other valid option
+		ASSERT(FALSE);
+		f_nDefaultCodepage = GetACP();
 	}
-
-	// Set default codepage
-	DiffFileData::SetDefaultCodepage(f_nDefaultCodepage);
 }
-
 
 /**
  * @brief Get appropriate default codepage 
@@ -117,10 +108,14 @@ static BOOL CALLBACK EnumSupportedCodePagesProc(LPTSTR lpCodePageString)
 /**
  * @brief Load information about codepages into local cache
  */
-static void initializeCodepageStatuses()
+static void initialize()
 {
-	EnumSystemCodePages(EnumInstalledCodePagesProc,  CP_INSTALLED);
+	static int f_bInitialized = false;
+	if (f_bInitialized)
+		return;
+	EnumSystemCodePages(EnumInstalledCodePagesProc, CP_INSTALLED);
 	EnumSystemCodePages(EnumSupportedCodePagesProc, CP_SUPPORTED);
+	f_bInitialized = true;
 }
 
 /**
@@ -133,14 +128,3 @@ bool isCodepageInstalled(int codepage)
     // but its value will be 0 which means not installed nor supported
 	return (f_codepage_status[codepage] & CP_INSTALLED_FLAG) == CP_INSTALLED_FLAG;
 }
-
-/**
- * @brief Initialize all local information stores (ie, maps)
- */
-static void initialize()
-{
-	if (f_bInitialized) return;
-	initializeCodepageStatuses();
-	f_bInitialized = true;
-}
-
