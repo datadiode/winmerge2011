@@ -630,7 +630,7 @@ void CDirView::ListContextMenu(POINT point)
 	// this will invoke all the OnUpdate methods to enable/disable the individual items
 	int nCmd = pPopup->TrackPopupMenu(
 		TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_RETURNCMD,
-		point.x, point.y, pMDIFrame->m_hWnd);
+		point.x, point.y, pMDIFrame->m_pWnd);
 
 	HMenu *pScriptMenu = pMDIFrame->SetScriptMenu(m_pCompareAsScriptMenu, NULL);
 
@@ -671,7 +671,7 @@ void CDirView::HeaderContextMenu(POINT point)
 	// invoke context menu
 	// this will invoke all the OnUpdate methods to enable/disable the individual items
 	pSubMenu->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON,
-		point.x, point.y, m_pFrame->m_pMDIFrame->m_hWnd);
+		point.x, point.y, m_pFrame->m_pMDIFrame->m_pWnd);
 	pMenu->DestroyMenu();
 }
 

@@ -655,7 +655,7 @@ void CLocationView::OnContextMenu(LPARAM lParam)
 	// and handle the command after TrackPopupMenu
 	int command = pSub->TrackPopupMenu(
 		TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_NONOTIFY  | TPM_RETURNCMD,
-		point.x, point.y, theApp.m_pMainWnd->m_hWnd);
+		point.x, point.y, theApp.m_pMainWnd->m_pWnd);
 
 	pMenu->DestroyMenu();
 

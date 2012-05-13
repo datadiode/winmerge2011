@@ -1109,7 +1109,7 @@ void CMergeEditView::OnContextMenu(LPARAM lParam)
 		ClientToScreen(&point);
 	}
 	pSub->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON,
-		point.x, point.y, theApp.m_pMainWnd->m_hWnd);
+		point.x, point.y, theApp.m_pMainWnd->m_pWnd);
 	pMenu->DestroyMenu();
 }
 
@@ -1684,7 +1684,7 @@ void CMergeEditView::ApplyPatch(IStream *pstm, const POINTL &pt)
 {
 	if (HMenu *pMenu = ApplyPatch(pstm, 0))
 	{
-		if (int id = pMenu->TrackPopupMenu(TPM_RETURNCMD, pt.x, pt.y, m_hWnd))
+		if (int id = pMenu->TrackPopupMenu(TPM_RETURNCMD, pt.x, pt.y, m_pWnd))
 		{
 			ApplyPatch(pstm, id);
 		}

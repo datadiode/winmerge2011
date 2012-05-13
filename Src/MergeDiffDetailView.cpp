@@ -542,7 +542,7 @@ void CMergeDiffDetailView::OnContextMenu(LPARAM lParam)
 		ClientToScreen(&point);
 	}
 	pSub->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON,
-		point.x, point.y, theApp.m_pMainWnd->m_hWnd);
+		point.x, point.y, theApp.m_pMainWnd->m_pWnd);
 	pMenu->DestroyMenu();
 }
 

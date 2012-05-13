@@ -678,10 +678,10 @@ namespace H2O
 			assert(::IsMenu(m_hMenu));
 			return ::RemoveMenu(m_hMenu, index, flags);
 		}
-		BOOL TrackPopupMenu(UINT nFlags, int x, int y, HWND hWnd, LPCRECT lpRect = NULL)
+		BOOL TrackPopupMenu(UINT nFlags, int x, int y, HWindow *pWnd, LPCRECT lpRect = NULL)
 		{
 			assert(::IsMenu(m_hMenu));
-			return ::TrackPopupMenu(m_hMenu, nFlags, x, y, NULL, hWnd, lpRect);
+			return ::TrackPopupMenu(m_hMenu, nFlags, x, y, NULL, pWnd->m_hWnd, lpRect);
 		}
 		BOOL GetMenuInfo(LPMENUINFO pmi)
 		{
