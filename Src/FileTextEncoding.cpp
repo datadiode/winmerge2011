@@ -41,18 +41,14 @@ void FileTextEncoding::Clear()
 void FileTextEncoding::SetCodepage(int codepage)
 {
 	m_codepage = codepage;
-	m_unicoding = NONE;
-	if (codepage == CP_UTF8)
-		m_unicoding = UTF8;
+	m_unicoding = codepage == CP_UTF8 ? UTF8 : NONE;
 }
 
 void FileTextEncoding::SetUnicoding(UNICODESET unicoding)
 {
-	if (unicoding == NONE)
-		m_codepage = CP_ACP; // not sure what to do here
+	ASSERT(unicoding != NONE);
 	m_unicoding = unicoding;
-	if (m_unicoding == UTF8)
-		m_codepage = CP_UTF8;
+	m_codepage = m_unicoding == UTF8 ? CP_UTF8 : CP_ACP;
 }
 
 /**
@@ -62,13 +58,7 @@ void FileTextEncoding::SetUnicoding(UNICODESET unicoding)
 String FileTextEncoding::GetName() const
 {
 	if (m_unicoding == UTF8)
-	{
-		if (m_bom)
-			return LanguageSelect.LoadString(IDS_UNICODING_UTF8_BOM);
-		else
-			return LanguageSelect.LoadString(IDS_UNICODING_UTF8);
-	}
-
+		return LanguageSelect.LoadString(m_bom ? IDS_UNICODING_UTF8_BOM : IDS_UNICODING_UTF8);
 	if (m_unicoding == UCS2LE)
 		return LanguageSelect.LoadString(IDS_UNICODING_UCS2_LE);
 	if (m_unicoding == UCS2BE)
@@ -77,9 +67,8 @@ String FileTextEncoding::GetName() const
 		return _T("UCS-4 LE");
 	if (m_unicoding == UCS4BE)
 		return _T("UCS-4 BE");
-
 	String str;
-	if (m_codepage > -1)
+	if (m_codepage != -1)
 	{
 		if (m_codepage == CP_UTF8)
 		{

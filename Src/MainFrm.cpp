@@ -2318,7 +2318,7 @@ void CMainFrame::OnToolsGeneratePatch()
 		int ind = pView->GetFirstSelectedInd();
 		while (ind != -1 && bValidFiles)
 		{
-			const DIFFITEM &item = pView->GetItemAt(ind);
+			const DIFFITEM &item = pView->GetDiffItem(ind);
 			if (item.diffcode.isBin())
 			{
 				LanguageSelect.MsgBox(IDS_CANNOT_CREATE_BINARYPATCH, MB_ICONWARNING |

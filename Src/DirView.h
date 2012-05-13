@@ -118,7 +118,7 @@ public:
 	STDMETHOD(DUnadvise)(DWORD);
 	STDMETHOD(EnumDAdvise)(LPENUMSTATDATA *);
 
-	HWND StartCompare(CompareStats *pCompareStats);
+	void StartCompare(CompareStats *);
 	void Redisplay();
 	void RedisplayChildren(UINT_PTR diffpos, int level, int &index, int &alldiffs);
 	void UpdateResources();
@@ -128,8 +128,8 @@ public:
 	void SetColumnWidths();
 	void SortColumnsAppropriately();
 	int GetFirstSelectedInd();
-	DIFFITEM & GetNextSelectedInd(int &ind);
-	DIFFITEM & GetItemAt(int ind);
+	DIFFITEM &GetDiffItem(int sel);
+	DIFFITEM &GetNextSelectedInd(int &ind);
 
 	static bool IsShellMenuCmdID(UINT);
 	LRESULT HandleMenuMessage(UINT message, WPARAM wParam, LPARAM lParam);
@@ -335,8 +335,6 @@ private:
 	void OpenSelectionXML();
 	bool GetSelectedItems(int * sel1, int * sel2);
 	void OpenParentDirectory();
-	const DIFFITEM & GetDiffItem(int sel) const;
-	DIFFITEM & GetDiffItemRef(int sel);
 	int GetSingleSelectedItem();
 	bool IsItemNavigableDiff(const DIFFITEM & di) const;
 	void MoveFocus(int currentInd, int i, int selCount);

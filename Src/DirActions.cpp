@@ -1086,7 +1086,7 @@ UINT CDirView::MarkSelectedForRescan()
 		if (GetItemKey(sel) == SPECIAL_ITEM_POS)
 			continue;
 
-		DIFFITEM &di = GetDiffItemRef(sel);
+		DIFFITEM &di = GetDiffItem(sel);
 		di.diffcode.diffcode &= ~(DIFFCODE::TEXTFLAGS | DIFFCODE::SIDEFLAGS | DIFFCODE::COMPAREFLAGS | DIFFCODE::SCANFLAGS);
 		di.diffcode.diffcode |= DIFFCODE::NEEDSCAN;
 		++items;
@@ -1184,7 +1184,7 @@ void CDirView::DoFileEncodingDialog()
 	int i = -1;
 	while ((i = GetNextItem(i, LVNI_SELECTED)) != -1)
 	{
-		DIFFITEM & di = GetDiffItemRef(i);
+		DIFFITEM &di = GetDiffItem(i);
 		if (di.diffcode.diffcode == 0) // Invalid value, this must be special item
 			continue;
 		if (di.diffcode.isDirectory())
@@ -1266,7 +1266,7 @@ bool CDirView::DoItemRename(int iItem, LPCTSTR szNewItemName)
 
 	// We must check that paths still exists
 	String failpath;
-	DIFFITEM &di = GetDiffItemRef(iItem);
+	DIFFITEM &di = GetDiffItem(iItem);
 	if (di.diffcode.isSideLeftOrBoth() && !CheckPathsExist(sLeftFile.c_str()) ||
 		di.diffcode.isSideRightOrBoth() && !CheckPathsExist(sRightFile.c_str()))
 	{

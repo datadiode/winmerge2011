@@ -89,10 +89,10 @@ void PropCompareFolder::ReadOptions()
  */
 void PropCompareFolder::WriteOptions()
 {
-	COptionsMgr::SaveOption(OPT_CMP_METHOD, (int)m_compareMethod);
-	COptionsMgr::SaveOption(OPT_CMP_STOP_AFTER_FIRST, m_bStopAfterFirst == TRUE);
-	COptionsMgr::SaveOption(OPT_IGNORE_SMALL_FILETIME, m_bIgnoreSmallTimeDiff == TRUE);
-	COptionsMgr::SaveOption(OPT_CMP_WALK_UNIQUE_DIRS, m_bIncludeUniqFolders == TRUE);
+	COptionsMgr::SaveOption(OPT_CMP_METHOD, m_compareMethod);
+	COptionsMgr::SaveOption(OPT_CMP_STOP_AFTER_FIRST, m_bStopAfterFirst != FALSE);
+	COptionsMgr::SaveOption(OPT_IGNORE_SMALL_FILETIME, m_bIgnoreSmallTimeDiff != FALSE);
+	COptionsMgr::SaveOption(OPT_CMP_WALK_UNIQUE_DIRS, m_bIncludeUniqFolders != FALSE);
 
 	if (m_nQuickCompareLimit > 2000)
 		m_nQuickCompareLimit = 2000;

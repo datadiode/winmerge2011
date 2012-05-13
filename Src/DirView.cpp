@@ -323,14 +323,13 @@ int CDirView::GetDefaultColImage() const
  * is good place to setup GUI for compare.
  * @param [in] pCompareStats Pointer to class having current compare stats.
  */
-HWND CDirView::StartCompare(CompareStats *pCompareStats)
+void CDirView::StartCompare(CompareStats *pCompareStats)
 {
 	if (m_pCmpProgressDlg == NULL)
 		m_pCmpProgressDlg = new DirCompProgressDlg(m_pFrame);
 	m_pCmpProgressDlg->ShowWindow(SW_SHOW);
 	m_pCmpProgressDlg->StartUpdating();
 	m_compareStart = clock();
-	return m_pCmpProgressDlg->m_hWnd;
 }
 
 /**
@@ -839,7 +838,7 @@ void CDirView::OnExpandFolder()
 	const int nSelItem = GetNextItem(-1, LVNI_SELECTED);
 	if (nSelItem == -1)
 		return;
-	const DIFFITEM &di = GetItemAt(nSelItem);
+	const DIFFITEM &di = GetDiffItem(nSelItem);
 	if (di.diffcode.isDirectory() && (di.customFlags1 &
 			ViewCustomFlags::EXPANDED) == 0)
 	{
@@ -855,7 +854,7 @@ void CDirView::OnCollapseFolder()
 	const int nSelItem = GetNextItem(-1, LVNI_SELECTED);
 	if (nSelItem == -1)
 		return;
-	const DIFFITEM &di = GetItemAt(nSelItem);
+	const DIFFITEM &di = GetDiffItem(nSelItem);
 	if (di.diffcode.isDirectory() && (di.customFlags1 &
 			ViewCustomFlags::EXPANDED))
 	{
@@ -869,7 +868,7 @@ void CDirView::OnCollapseFolder()
  */
 void CDirView::CollapseSubdir(int i)
 {
-	DIFFITEM& dip = GetDiffItemRef(i);
+	DIFFITEM &dip = GetDiffItem(i);
 	if (!m_bTreeMode || !(dip.customFlags1 & ViewCustomFlags::EXPANDED) || !dip.HasChildren())
 		return;
 
@@ -898,7 +897,7 @@ void CDirView::CollapseSubdir(int i)
  */
 void CDirView::ExpandSubdir(int i)
 {
-	DIFFITEM& dip = GetDiffItemRef(i);
+	DIFFITEM &dip = GetDiffItem(i);
 	if (!m_bTreeMode || (dip.customFlags1 & ViewCustomFlags::EXPANDED) || !dip.HasChildren())
 		return;
 
@@ -1384,21 +1383,9 @@ UINT_PTR CDirView::GetItemKey(int idx)
 // are mapped to DiffItems, which in turn are DiffContext keys to the actual DIFFITEM data
 
 /**
- * @brief Get DIFFITEM data for item.
- * This function returns DIFFITEM data for item in given index in GUI.
- * @param [in] sel Item's index in folder compare GUI list.
- * @return DIFFITEM for item.
- */
-const DIFFITEM &CDirView::GetDiffItem(int sel) const
-{
-	CDirView * pDirView = const_cast<CDirView *>(this);
-	return pDirView->GetDiffItemRef(sel);
-}
-
-/**
  * Given index in list control, get modifiable reference to its DIFFITEM data
  */
-DIFFITEM & CDirView::GetDiffItemRef(int sel)
+DIFFITEM &CDirView::GetDiffItem(int sel)
 {
 	UINT_PTR diffpos = GetItemKey(sel);
 	// If it is special item, return empty DIFFITEM
@@ -1455,20 +1442,9 @@ int CDirView::GetFirstSelectedInd()
 DIFFITEM &CDirView::GetNextSelectedInd(int &ind)
 {
 	int sel = GetNextItem(ind, LVNI_SELECTED);
-	DIFFITEM &di = GetDiffItemRef(ind);
+	DIFFITEM &di = GetDiffItem(ind);
 	ind = sel;
 	return di;
-}
-
-/**
- * @brief Return DIFFITEM from given index.
- * @param [in] ind Index from where DIFFITEM is wanted.
- * @return DIFFITEM in given index.
- */
-DIFFITEM &CDirView::GetItemAt(int ind)
-{
-	ASSERT(ind != -1); // Trap programmer errors in debug
-	return GetDiffItemRef(ind);
 }
 
 // Go to first diff
@@ -1484,7 +1460,7 @@ void CDirView::OnFirstdiff()
 
 	while (i < count && found == FALSE)
 	{
-		const DIFFITEM &di = GetItemAt(i);
+		const DIFFITEM &di = GetDiffItem(i);
 		if (IsItemNavigableDiff(di))
 		{
 			MoveFocus(currentInd, i, selCount);
@@ -1506,7 +1482,7 @@ void CDirView::OnLastdiff()
 
 	while (i > -1 && found == FALSE)
 	{
-		const DIFFITEM &di = GetItemAt(i);
+		const DIFFITEM &di = GetDiffItem(i);
 		if (IsItemNavigableDiff(di))
 		{
 			MoveFocus(currentInd, i, selCount);
@@ -1531,7 +1507,7 @@ void CDirView::OnNextdiff()
 
 	while (i < count && found == FALSE)
 	{
-		const DIFFITEM &di = GetItemAt(i);
+		const DIFFITEM &di = GetDiffItem(i);
 		if (IsItemNavigableDiff(di))
 		{
 			MoveFocus(currentInd, i, selCount);
@@ -1556,7 +1532,7 @@ void CDirView::OnPrevdiff()
 
 	while (i > -1 && found == FALSE)
 	{
-		const DIFFITEM &di = GetItemAt(i);
+		const DIFFITEM &di = GetDiffItem(i);
 		if (IsItemNavigableDiff(di))
 		{
 			MoveFocus(currentInd, i, selCount);
@@ -1585,7 +1561,7 @@ int CDirView::GetFirstDifferentItem()
 
 	while (i < count && found == FALSE)
 	{
-		const DIFFITEM &di = GetItemAt(i);
+		const DIFFITEM &di = GetDiffItem(i);
 		if (IsItemNavigableDiff(di))
 		{
 			foundInd = i;
@@ -1605,7 +1581,7 @@ int CDirView::GetLastDifferentItem()
 
 	while (i > 0 && found == FALSE)
 	{
-		const DIFFITEM &di = GetItemAt(i);
+		const DIFFITEM &di = GetDiffItem(i);
 		if (IsItemNavigableDiff(di))
 		{
 			foundInd = i;
@@ -2623,7 +2599,7 @@ void CDirView::PrepareDragData(UniStdioFile &file)
 	int i = -1;
 	while ((i = GetNextItem(i, LVNI_SELECTED)) != -1)
 	{
-		const DIFFITEM &diffitem = GetItemAt(i);
+		const DIFFITEM &diffitem = GetDiffItem(i);
 		// check for special items (e.g not "..")
 		if (diffitem.diffcode.diffcode == 0)
 		{

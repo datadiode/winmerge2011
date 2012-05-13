@@ -106,13 +106,6 @@ public:
 	IDiffFilter * m_piFilterGlobal; /**< Interface for file filtering. */
 	BOOL m_bGuessEncoding;
 
-	/**
-	 * The current and effective compare method.
-	 * During the compare we may change compare method per file. This may
-	 * happen for various reasons. But the change is always temporarily and
-	 * we must return to the main method indicated by m_nCompMethod.
-	 */
-	int m_nCurrentCompMethod;
 	DIFFOPTIONS m_options; /**< Generalized compare options. */
 
 	bool m_bIgnoreSmallTimeDiff; /**< Ignore small timedifferences when comparing by date */
@@ -149,10 +142,7 @@ public:
 	FilterList *const m_pFilterList; /**< Filter list for line filters */
 
 	/**
-	 * The main compare method used.
-	 * This is the main compare method set when compare is started. There
-	 * can be temporary switches to other method (e.g. for large file) but
-	 * this main method must be set back for next file.
+	 * The compare method used.
 	 */
 	int m_nCompMethod;
 private:

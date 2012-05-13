@@ -97,7 +97,7 @@ int CDiffThread::DirScan_GetItems(
 			(leftsubprefix + leftDirs[0].filename).c_str(),
 			(rightsubprefix + rightDirs[0].filename).c_str());
 
-    DirItemArray::size_type i = 0, j = 0; 
+	DirItemArray::size_type i = 0, j = 0; 
 	for (;;)
 	{
 		if (context->ShouldAbort())
@@ -456,9 +456,9 @@ void CDiffThread::CompareDiffItem(DIFFITEM &di)
 			}
 			// 3. Add unique files
 			// We must compare unique files to itself to detect encoding
-			else if (context->m_nCurrentCompMethod != CMP_DATE &&
-				context->m_nCurrentCompMethod != CMP_DATE_SIZE &&
-				context->m_nCurrentCompMethod != CMP_SIZE)
+			else if (context->m_nCompMethod != CMP_DATE &&
+				context->m_nCompMethod != CMP_DATE_SIZE &&
+				context->m_nCompMethod != CMP_SIZE)
 			{
 				UINT diffCode = folderCmp.prepAndCompareTwoFiles(di);
 				// Add possible binary flag for unique items

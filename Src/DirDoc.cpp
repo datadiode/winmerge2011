@@ -198,7 +198,7 @@ void CDirFrame::Rescan(bool bCompareSelected)
 	m_pCtxt->m_options.bIgnoreCase = COptionsMgr::Get(OPT_CMP_IGNORE_CASE);
 	m_pCtxt->m_options.bIgnoreEol = COptionsMgr::Get(OPT_CMP_IGNORE_EOL);
 	m_pCtxt->m_options.bApplyLineFilters = COptionsMgr::Get(OPT_LINEFILTER_ENABLED);
-	m_pCtxt->m_nCurrentCompMethod = m_pCtxt->m_nCompMethod = COptionsMgr::Get(OPT_CMP_METHOD);
+	m_pCtxt->m_nCompMethod = COptionsMgr::Get(OPT_CMP_METHOD);
 	m_pCtxt->m_bGuessEncoding = COptionsMgr::Get(OPT_CP_DETECT);
 	m_pCtxt->m_bIgnoreSmallTimeDiff = COptionsMgr::Get(OPT_IGNORE_SMALL_FILETIME);
 	m_pCtxt->m_bStopAfterFirstDiff = COptionsMgr::Get(OPT_CMP_STOP_AFTER_FIRST);

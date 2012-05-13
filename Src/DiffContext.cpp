@@ -62,7 +62,6 @@ static char THIS_FILE[]=__FILE__;
 CDiffContext::CDiffContext(LPCTSTR pszLeft, LPCTSTR pszRight)
 : m_piFilterGlobal(NULL)
 , m_nCompMethod(0)
-, m_nCurrentCompMethod(0)
 , m_bIgnoreSmallTimeDiff(false)
 , m_pCompareStats(NULL)
 , m_piAbortable(NULL)

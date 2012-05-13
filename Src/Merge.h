@@ -113,8 +113,6 @@ private:
 
 #include "EditorFilepathBar.h"
 
-class CMainFrame;
-
 class CDocFrame : public OWindow
 {
 public:

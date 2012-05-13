@@ -169,7 +169,7 @@ void CLogFile::WriteRaw(LPCTSTR msg)
 		{
 			_fputts(msg, f);
 			// prune the log if it gets too big
-			if (ftell(f) >= (int)m_nMaxSize)
+			if (ftell(f) >= static_cast<long>(m_nMaxSize))
 				Prune(f);
 			else
 				fclose(f);
