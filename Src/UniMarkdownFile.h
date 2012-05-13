@@ -1,5 +1,5 @@
 /**
- *  @file TempFile.h
+ *  @file UniMarkdownFile.h
  *
  *  @brief Declaration of UniMarkdownFile class.
  */

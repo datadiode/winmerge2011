@@ -60,13 +60,13 @@ LPCTSTR env_GetTempPath()
  * @brief Get filename for temporary file.
  * @param [in] lpPathName Temporary file folder.
  * @param [in] lpPrefixString Prefix to use for filename.
- * @param [out] pnerr Error code if error happened.
  * @return Full path for temporary file or empty string if error happened.
  */
 String env_GetTempFileName(LPCTSTR lpPathName, LPCTSTR lpPrefixString)
 {
 	TCHAR path[MAX_PATH];
-	return GetTempFileName(lpPathName, lpPrefixString, 0, path) ? path : String();
+	return lpPathName[0] != _T('\0') &&
+		GetTempFileName(lpPathName, lpPrefixString, 0, path) ? path : String();
 }
 
 /**

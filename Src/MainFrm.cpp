@@ -242,15 +242,6 @@ CMainFrame::~CMainFrame()
 	// Delete all temporary folders belonging to this process
 	GetClearTempPath(NULL, NULL);
 
-	// Remove files from temp file list.
-	while (!m_tempFiles.empty())
-	{
-		TempFile *temp = m_tempFiles.back();
-		temp->Delete();
-		delete temp;
-		m_tempFiles.pop_back();
-	}
-
 	sd_SetBreakChars(NULL);
 
 	if (m_imlMenu)
@@ -3086,14 +3077,6 @@ void CMainFrame::CheckinToClearCase(LPCTSTR strDestinationPath)
 	}
 }
 
-/**
- * @brief Access to the singleton main frame (where we have some globals)
- */
-CMainFrame *GetMainFrame()
-{
-	return theApp.m_pMainWnd;
-}
-
 /** 
  * @brief Opens dialog for user to Load, edit and save project files.
  * This dialog gets current compare paths and filter (+other properties
@@ -3665,33 +3648,24 @@ void CMainFrame::OnFileOpenConflict()
  * @param [in] checked If true, do not check if it really is project file.
  * @return TRUE if conflict file was opened for resolving.
  */
-BOOL CMainFrame::DoOpenConflict(LPCTSTR conflictFile)
+bool CMainFrame::DoOpenConflict(LPCTSTR conflictFile)
 {
-	BOOL conflictCompared = FALSE;
-
-	// Create temp files and put them into the list,
-	// from where they get deleted when MainFrame is deleted.
-	TempFile *wTemp = new TempFile();
-	String workFile = wTemp->Create(_T("confw_"));
-	m_tempFiles.push_back(wTemp);
-	TempFile *vTemp = new TempFile();
-	String revFile = vTemp->Create(_T("confv_"));
-	m_tempFiles.push_back(vTemp);
-
-	// Parse conflict file into two files.
+	bool conflictCompared = false;
+	// Parse conflict file into two temp files created in auto-deleted folder.
+	FileLocation filelocLeft, filelocRight;
+	filelocLeft.filepath = env_GetTempFileName(env_GetTempPath(), _T("confv_"));
+	filelocLeft.description = LanguageSelect.LoadString(IDS_CONFLICT_THEIRS_FILE);
+	filelocRight.filepath = env_GetTempFileName(env_GetTempPath(), _T("confw_"));
+	filelocRight.description = LanguageSelect.LoadString(IDS_CONFLICT_MINE_FILE);
 	bool inners;
-	bool success = ParseConflictFile(conflictFile, workFile.c_str(), revFile.c_str(), inners);
-
-	if (success)
+	if (ParseConflictFile(conflictFile,
+			filelocRight.filepath.c_str(),
+			filelocLeft.filepath.c_str(),
+			inners))
 	{
 		// Open two parsed files to WinMerge, telling WinMerge to
 		// save over original file (given as third filename).
 		m_strSaveAsPath = conflictFile;
-		FileLocation filelocLeft, filelocRight;
-		filelocLeft.filepath = revFile;
-		filelocLeft.description = LanguageSelect.LoadString(IDS_CONFLICT_THEIRS_FILE);
-		filelocRight.filepath = workFile;
-		filelocRight.description = LanguageSelect.LoadString(IDS_CONFLICT_MINE_FILE);
 		conflictCompared = DoFileOpen(filelocLeft, filelocRight,
 				FFILEOPEN_READONLY | FFILEOPEN_NOMRU,
 				FFILEOPEN_NOMRU | FFILEOPEN_MODIFIED);

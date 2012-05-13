@@ -918,10 +918,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="TempFile.cpp"
-				>
-			</File>
-			<File
 				RelativePath="TestFilterDlg.cpp"
 				>
 			</File>
@@ -1496,10 +1492,6 @@
 			</File>
 			<File
 				RelativePath="SyntaxColors.h"
-				>
-			</File>
-			<File
-				RelativePath="TempFile.h"
 				>
 			</File>
 			<File

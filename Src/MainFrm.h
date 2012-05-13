@@ -42,7 +42,6 @@ class CHexMergeFrame;
 class CMergeEditView;
 class CMergeDiffDetailView;
 class LineFiltersList;
-class TempFile;
 struct FileLocation;
 
 class PackingInfo;
@@ -56,7 +55,7 @@ class CMainFrame
 	, public IStatusDisplay
 	, public CScriptable<IMergeApp>
 {
-	friend class CLanguageSelect;
+	friend CLanguageSelect;
 public:
 	CMainFrame(HWindow *);
 
@@ -117,7 +116,7 @@ public:
 	void CheckinToClearCase(LPCTSTR strDestinationPath);
 	void StartFlashing();
 	bool AskCloseConfirmation();
-	BOOL DoOpenConflict(LPCTSTR conflictFile);
+	bool DoOpenConflict(LPCTSTR conflictFile);
 	bool LoadAndOpenProjectFile(LPCTSTR sProject);
 	HWindow *CreateChildHandle() const;
 	CDocFrame *GetActiveDocFrame(BOOL *pfActive = NULL);
@@ -176,8 +175,6 @@ public:
 	HStatusBar *GetStatusBar() { return m_wndStatusBar; }
 // Implementation data
 protected:
-
-
 	// control bar embedded members
 	HStatusBar *m_wndStatusBar;
 	HToolBar *m_wndToolBar;
@@ -198,8 +195,6 @@ protected:
 
 	static const MENUITEM_ICON m_MenuIcons[];
 
-	stl::vector<TempFile*> m_tempFiles; /**< List of possibly needed temp files. */
-	
 // Generated message map functions
 protected:
 	void GetMrgViewFontProperties();

@@ -187,7 +187,6 @@ public:
 #include "DiffWrapper.h"
 #include "DiffList.h"
 #include "stringdiffs.h"
-#include "TempFile.h"
 #include "DiffFileInfo.h"
 #include "FileFilterHelper.h"
 #include "FileTransform.h"

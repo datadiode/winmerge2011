@@ -59,13 +59,7 @@ BOOL VSSHelper::ReLinkVCProj(String strSavePath, String * psError)
 	TCHAR buffer[nBufferSize] = {0};
 	BOOL bVCPROJ = FALSE;
 
-	String tempPath = env_GetTempPath();
-	if (tempPath.empty())
-	{
-		LogErrorString(_T("CMainFrame::ReLinkVCProj() - couldn't get temppath"));
-		return FALSE;
-	}
-	String tempFile = env_GetTempFileName(tempPath.c_str(), _T("_LT"));
+	String tempFile = env_GetTempFileName(env_GetTempPath(), _T("_LT"));
 	if (tempFile.empty())
 	{
 		LogErrorString(_T("CMainFrame::ReLinkVCProj() - couldn't get tempfile"));
