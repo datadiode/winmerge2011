@@ -61,7 +61,6 @@ CDiffWrapper *CDiffWrapper::m_pActiveInstance = NULL;
  */
 CDiffWrapper::CDiffWrapper()
 : m_bAppendFiles(FALSE)
-, m_nDiffs(0)
 , m_codepage(0)
 , m_pDiffList(NULL)
 , m_bPathsAreTemp(FALSE)
@@ -422,9 +421,6 @@ bool CDiffWrapper::RunFileDiff(DiffFileData &diffdata)
 {
 	SetToDiffUtils();
 
-	if (m_pDiffList)
-		m_nDiffs = m_pDiffList->GetSize();
-
 	// Compare the files, if no error was found.
 	// Last param (bin_file) is NULL since we don't
 	// (yet) need info about binary sides.
@@ -523,7 +519,6 @@ bool CDiffWrapper::AddDiffRange(UINT begin0, UINT end0, UINT begin1, UINT end1, 
 		dr.end1 = end1;
 		dr.op = op;
 		m_pDiffList->AddDiff(dr);
-		m_nDiffs++;
 		ok = true;
 	}
 	catch (OException *e)

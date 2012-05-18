@@ -48,9 +48,7 @@ private:
 	file_data *m_inf; /**< Compared files data (for diffutils). */
 	int m_ndiffs; /**< Real diffs found. */
 	int m_ntrivialdiffs; /**< Ignored diffs found. */
-	int m_codepage; /**< Codepage used in line filter */
 };
-
 
 } // namespace CompareEngines
 

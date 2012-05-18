@@ -33,7 +33,6 @@
 #include "FilterCommentsManager.h"
 
 class CDiffContext;
-class PrediffingInfo;
 struct DIFFRANGE;
 class DiffList;
 struct DiffFileData;
@@ -133,8 +132,6 @@ struct DIFFSTATUS
 	DIFFSTATUS() { memset(this, 0, sizeof *this); } // start out with all flags clear
 };
 
-class FilterCommentsManager;
-
 /**
  * @brief Wrapper class for diffengine (diffutils and ByteComparator).
  * Diffwappre class is used to run selected diffengine. For folder compare
@@ -190,6 +187,8 @@ protected:
 	void WritePatchFile(struct change *script, file_data *inf);
 	int RegExpFilter(int StartPos, int EndPos, int FileNo, bool BreakCondition);
 
+	int m_codepage; /**< Codepage used in line filter */
+
 private:
 	PATCHOPTIONS m_patchOptions;
 	String m_s1File; /**< Full path to first diff'ed file. */
@@ -201,8 +200,6 @@ private:
 	String m_sPatchFile; /**< Full path to created patch file. */
 	BOOL m_bPathsAreTemp; /**< Are compared paths temporary? */
 	BOOL m_bAppendFiles; /**< Do we append to existing patch file? */
-	int m_nDiffs; /**< Difference count */
-	int m_codepage; /**< Codepage used in line filter */
 	DiffList *m_pDiffList; /**< Pointer to external DiffList */
 	MovedLines *m_pMovedLines;
 };
