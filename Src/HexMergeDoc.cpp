@@ -36,7 +36,6 @@
 #include "FolderCmp.h"
 #include "MainFrm.h"
 #include "Environment.h"
-#include "diffcontext.h"	// FILE_SAME
 #include "coretools.h"
 #include "DirFrame.h"
 #include "OptionsDef.h"

@@ -92,12 +92,12 @@ void PropCompare::ReadOptions()
 void PropCompare::WriteOptions()
 {
 	COptionsMgr::SaveOption(OPT_CMP_IGNORE_WHITESPACE, m_nIgnoreWhite);
-	COptionsMgr::SaveOption(OPT_CMP_IGNORE_BLANKLINES, m_bIgnoreBlankLines == TRUE);
-	COptionsMgr::SaveOption(OPT_CMP_FILTER_COMMENTLINES, m_bFilterCommentsLines == TRUE);
-	COptionsMgr::SaveOption(OPT_CMP_IGNORE_EOL, m_bIgnoreEol == TRUE);
-	COptionsMgr::SaveOption(OPT_CMP_IGNORE_CASE, m_bIgnoreCase == TRUE);
-	COptionsMgr::SaveOption(OPT_CMP_MOVED_BLOCKS, m_bMovedBlocks == TRUE);
-	COptionsMgr::SaveOption(OPT_CMP_MATCH_SIMILAR_LINES, m_bMatchSimilarLines == TRUE);
+	COptionsMgr::SaveOption(OPT_CMP_IGNORE_BLANKLINES, m_bIgnoreBlankLines != FALSE);
+	COptionsMgr::SaveOption(OPT_CMP_FILTER_COMMENTLINES, m_bFilterCommentsLines != FALSE);
+	COptionsMgr::SaveOption(OPT_CMP_IGNORE_EOL, m_bIgnoreEol != FALSE);
+	COptionsMgr::SaveOption(OPT_CMP_IGNORE_CASE, m_bIgnoreCase != FALSE);
+	COptionsMgr::SaveOption(OPT_CMP_MOVED_BLOCKS, m_bMovedBlocks != FALSE);
+	COptionsMgr::SaveOption(OPT_CMP_MATCH_SIMILAR_LINES, m_bMatchSimilarLines != FALSE);
 }
 
 /** 

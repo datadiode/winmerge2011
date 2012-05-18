@@ -108,7 +108,7 @@ public:
 	void SetStatus(LPCTSTR);
 	void UpdateIndicators();
 	void ApplyViewWhitespace();
-	void SetEOLMixed(BOOL bAllow);
+	void SetEOLMixed(bool bAllow);
 	void SelectFilter();
 	void ShowVSSError(HRESULT, LPCTSTR strItem);
 	void ShowHelp(LPCTSTR helpLocation = NULL);

@@ -24,9 +24,9 @@ static char THIS_FILE[] = __FILE__;
 
 PropArchive::PropArchive()
 : OptionsPanel(IDD_PROP_ARCHIVE)
-, m_bEnableSupport(false)
+, m_bEnableSupport(FALSE)
 , m_nInstallType(0)
-, m_bProbeType(false)
+, m_bProbeType(FALSE)
 {
 }
 
@@ -101,8 +101,8 @@ void PropArchive::WriteOptions()
 	if (m_bEnableSupport)
 		COptionsMgr::SaveOption(OPT_ARCHIVE_ENABLE, m_nInstallType + 1);
 	else
-		COptionsMgr::SaveOption(OPT_ARCHIVE_ENABLE, (int)0);
-	COptionsMgr::SaveOption(OPT_ARCHIVE_PROBETYPE, m_bProbeType == TRUE);
+		COptionsMgr::SaveOption(OPT_ARCHIVE_ENABLE, 0);
+	COptionsMgr::SaveOption(OPT_ARCHIVE_PROBETYPE, m_bProbeType != FALSE);
 }
 
 /** 

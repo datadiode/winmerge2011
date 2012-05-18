@@ -132,7 +132,7 @@ void PropRegistry::ReadOptions()
  */
 void PropRegistry::WriteOptions()
 {
-	COptionsMgr::SaveOption(OPT_USE_RECYCLE_BIN, m_bUseRecycleBin == TRUE);
+	COptionsMgr::SaveOption(OPT_USE_RECYCLE_BIN, m_bUseRecycleBin != FALSE);
 	String sExtEditor = string_trim_ws(m_strEditorPath);
 	if (sExtEditor.empty())
 		sExtEditor = COptionsMgr::GetDefault(OPT_EXT_EDITOR_CMD);

@@ -94,9 +94,9 @@ void PropCodepage::ReadOptions()
  */
 void PropCodepage::WriteOptions()
 {
-	COptionsMgr::SaveOption(OPT_CP_DEFAULT_MODE, (int)m_nCodepageSystem);
-	COptionsMgr::SaveOption(OPT_CP_DEFAULT_CUSTOM, (int)m_nCustomCodepageValue);
-	COptionsMgr::SaveOption(OPT_CP_DETECT, m_bDetectCodepage == TRUE);
+	COptionsMgr::SaveOption(OPT_CP_DEFAULT_MODE, m_nCodepageSystem);
+	COptionsMgr::SaveOption(OPT_CP_DEFAULT_CUSTOM, m_nCustomCodepageValue);
+	COptionsMgr::SaveOption(OPT_CP_DETECT, m_bDetectCodepage != FALSE);
 }
 
 void PropCodepage::UpdateScreen()

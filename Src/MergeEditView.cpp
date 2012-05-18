@@ -1116,24 +1116,24 @@ void CMergeEditView::OnContextMenu(LPARAM lParam)
 /**
  * @brief Change EOL mode and unify all the lines EOL to this new mode
  */
-void CMergeEditView::OnConvertEolTo(UINT nID )
+void CMergeEditView::OnConvertEolTo(UINT nID)
 {
 	CRLFSTYLE nStyle = CRLF_STYLE_AUTOMATIC;;
 	switch (nID)
 	{
-		case ID_EOL_TO_DOS:
-			nStyle = CRLF_STYLE_DOS;
-			break;
-		case ID_EOL_TO_UNIX:
-			nStyle = CRLF_STYLE_UNIX;
-			break;
-		case ID_EOL_TO_MAC:
-			nStyle = CRLF_STYLE_MAC;
-			break;
-		default:
-			// Catch errors
-			_RPTF0(_CRT_ERROR, "Unhandled EOL type conversion!");
-			break;
+	case ID_EOL_TO_DOS:
+		nStyle = CRLF_STYLE_DOS;
+		break;
+	case ID_EOL_TO_UNIX:
+		nStyle = CRLF_STYLE_UNIX;
+		break;
+	case ID_EOL_TO_MAC:
+		nStyle = CRLF_STYLE_MAC;
+		break;
+	default:
+		// Catch errors
+		_RPTF0(_CRT_ERROR, "Unhandled EOL type conversion!");
+		break;
 	}
 	m_pTextBuffer->SetCRLFMode(nStyle);
 

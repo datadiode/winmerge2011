@@ -13,7 +13,6 @@
 
 // forward declarations needed by DiffFileData
 struct file_data;
-class PrediffingInfo;
 class CDiffContext;
 
 /**

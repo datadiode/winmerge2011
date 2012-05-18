@@ -104,7 +104,7 @@ public:
 	//@}
 
 	IDiffFilter * m_piFilterGlobal; /**< Interface for file filtering. */
-	BOOL m_bGuessEncoding;
+	bool m_bGuessEncoding;
 
 	DIFFOPTIONS m_options; /**< Generalized compare options. */
 

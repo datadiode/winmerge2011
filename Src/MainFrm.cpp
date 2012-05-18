@@ -1047,11 +1047,9 @@ void CMainFrame::OnFileClose()
  *
  * Unpacks info from FileLocation & delegates all work to codepage_detect module
  */
-static void
-FileLocationGuessEncodings(FileLocation & fileloc, BOOL bGuessEncoding)
+static void FileLocationGuessEncodings(FileLocation &fileloc, bool bGuessEncoding)
 {
-	GuessCodepageEncoding(fileloc.filepath.c_str(), &fileloc.encoding,
-		bGuessEncoding);
+	GuessCodepageEncoding(fileloc.filepath.c_str(), &fileloc.encoding, bGuessEncoding);
 }
 
 /**
@@ -1070,7 +1068,7 @@ void CMainFrame::ShowMergeDoc(CDirFrame *pDirDoc,
 	PackingInfo * infoUnpacker /*= NULL*/)
 {
 	// detect codepage
-	BOOL bGuessEncoding = COptionsMgr::Get(OPT_CP_DETECT);
+	bool bGuessEncoding = COptionsMgr::Get(OPT_CP_DETECT);
 	if (filelocLeft.encoding.m_unicoding == -1)
 		filelocLeft.encoding.m_unicoding = NONE;
 	if (filelocLeft.encoding.m_unicoding == NONE && filelocLeft.encoding.m_codepage == -1)
@@ -1307,9 +1305,9 @@ int CMainFrame::HandleReadonlySave(String &strSavePath, BOOL bMultiFile,
 }
 
 /// Wrapper to set the global option 'm_bAllowMixedEol'
-void CMainFrame::SetEOLMixed(BOOL bAllow)
+void CMainFrame::SetEOLMixed(bool bAllow)
 {
-	COptionsMgr::SaveOption(OPT_ALLOW_MIXED_EOL, bAllow == TRUE);
+	COptionsMgr::SaveOption(OPT_ALLOW_MIXED_EOL, bAllow);
 	ApplyViewWhitespace();
 }
 

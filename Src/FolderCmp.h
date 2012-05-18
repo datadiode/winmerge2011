@@ -16,22 +16,6 @@
 
 class CDiffContext;
 class PackingInfo;
-class PrediffingInfo;
-
-/**
- * @brief Holds plugin-related paths and information.
- */
-/*struct PluginsContext
-{
-	String origFileName1;
-	String origFileName2;
-	String filepathUnpacked1;
-	String filepathUnpacked2;
-	String filepathTransformed1;
-	String filepathTransformed2;
-	PackingInfo * infoUnpacker;
-	PrediffingInfo * infoPrediffer;
-};*/
 
 /**
  * @brief Class implementing file compare for folder compare.

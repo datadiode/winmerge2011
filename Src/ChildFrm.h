@@ -88,7 +88,6 @@ class CMergeEditView;
 class CMergeDiffDetailView;
 class CLocationView;
 class PackingInfo;
-class PrediffingInfo;
 class CDirFrame;
 
 /** 

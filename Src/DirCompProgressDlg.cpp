@@ -10,7 +10,6 @@
 #include "Merge.h"
 #include "LanguageSelect.h"
 #include "DirCompProgressDlg.h"
-#include "DiffContext.h"
 #include "MainFrm.h"
 #include "DirFrame.h"
 #include "CompareStats.h"

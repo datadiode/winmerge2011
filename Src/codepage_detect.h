@@ -11,7 +11,7 @@
 
 struct FileTextEncoding;
 
-void GuessCodepageEncoding(LPCTSTR filepath, FileTextEncoding * encoding, BOOL bGuessEncoding, HANDLE osfhandle = NULL);
+void GuessCodepageEncoding(LPCTSTR filepath, FileTextEncoding *encoding, bool bGuessEncoding, HANDLE osfhandle = NULL);
 
 unsigned GuessEncoding_from_bytes(LPCTSTR ext, const char *src, size_t len);
 

@@ -201,7 +201,7 @@ unsigned GuessEncoding_from_bytes(LPCTSTR ext, const char *src, size_t len)
  * @param [in,out] encoding Structure getting the encoding info.
  * @param [in] bGuessEncoding Try to guess codepage (not just unicode encoding).
  */
-void GuessCodepageEncoding(LPCTSTR filepath, FileTextEncoding * encoding, BOOL bGuessEncoding, HANDLE osfhandle)
+void GuessCodepageEncoding(LPCTSTR filepath, FileTextEncoding *encoding, bool bGuessEncoding, HANDLE osfhandle)
 {
 	CMarkdown::FileImage fi(
 		osfhandle ? reinterpret_cast<LPCTSTR>(osfhandle) : filepath,

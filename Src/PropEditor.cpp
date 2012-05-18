@@ -111,11 +111,11 @@ void PropEditor::WriteOptions()
 		m_nTabSize = MAX_TABSIZE;
 	COptionsMgr::SaveOption(OPT_TAB_SIZE, (int)m_nTabSize);
 	COptionsMgr::SaveOption(OPT_TAB_TYPE, (int)m_nTabType);
-	COptionsMgr::SaveOption(OPT_AUTOMATIC_RESCAN, m_bAutomaticRescan == TRUE);
-	COptionsMgr::SaveOption(OPT_ALLOW_MIXED_EOL, m_bAllowMixedEol == TRUE);
-	COptionsMgr::SaveOption(OPT_SYNTAX_HIGHLIGHT, m_bHiliteSyntax == TRUE);
-	COptionsMgr::SaveOption(OPT_WORDDIFF_HIGHLIGHT, !!m_bViewLineDifferences);
-	COptionsMgr::SaveOption(OPT_BREAK_ON_WORDS, !!m_bBreakOnWords);
+	COptionsMgr::SaveOption(OPT_AUTOMATIC_RESCAN, m_bAutomaticRescan != FALSE);
+	COptionsMgr::SaveOption(OPT_ALLOW_MIXED_EOL, m_bAllowMixedEol != FALSE);
+	COptionsMgr::SaveOption(OPT_SYNTAX_HIGHLIGHT, m_bHiliteSyntax != FALSE);
+	COptionsMgr::SaveOption(OPT_WORDDIFF_HIGHLIGHT, m_bViewLineDifferences != FALSE);
+	COptionsMgr::SaveOption(OPT_BREAK_ON_WORDS, m_bBreakOnWords != FALSE);
 	COptionsMgr::SaveOption(OPT_BREAK_TYPE, m_nBreakType);
 	COptionsMgr::SaveOption(OPT_BREAK_SEPARATORS, m_breakChars);
 }
