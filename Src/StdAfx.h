@@ -155,6 +155,17 @@ String GetSysError(int nerr);
 /** @brief Send message to log file (in theory; actually doesn't yet) */
 void LogErrorString(LPCTSTR sz);
 
+template<class any>
+void LogErrorString(any fmt, ...)
+{
+	va_list args;
+	va_start(args, fmt);
+	String s;
+	s.append_sprintf_va_list(fmt, args);
+	LogErrorString(s.c_str());
+	va_end(args);
+}
+
 /** @brief include for the custom dialog boxes, with do not ask/display again */
 #include "MessageBoxDialog.h"
 

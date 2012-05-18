@@ -15,9 +15,6 @@
 #include "OptionsDef.h"
 #include "OptionsMgr.h"
 
-String GetSysError(int nerr);
-void LogErrorString(LPCTSTR sz);
-
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
@@ -110,10 +107,9 @@ void PropShell::GetContextRegValues()
 	LONG retVal = reg.Open(HKEY_CURRENT_USER, f_RegDir);
 	if (retVal != ERROR_SUCCESS)
 	{
-		string_format msg(
+		LogErrorString(
 			_T("Failed to open registry key HKCU/%s:\n\t%d : %s"),
 			f_RegDir, retVal, GetSysError(retVal).c_str());
-		LogErrorString(msg.c_str());
 		return;
 	}
 
@@ -137,10 +133,9 @@ void PropShell::SaveMergePath()
 	LONG retVal = reg.Open(HKEY_CURRENT_USER, f_RegDir);
 	if (retVal != ERROR_SUCCESS)
 	{
-		string_format msg(
+		LogErrorString(
 			_T("Failed to open registry key HKCU/%s:\n\t%d : %s"),
 			f_RegDir, retVal, GetSysError(retVal).c_str());
-		LogErrorString(msg.c_str());
 		return;
 	}
 
@@ -164,9 +159,8 @@ void PropShell::SaveMergePath()
 	retVal = reg.WriteDword(f_RegValueEnabled, dwContextEnabled);
 	if (retVal != ERROR_SUCCESS)
 	{
-		string_format msg(
+		LogErrorString(
 			_T("Failed to set registry value %s to %d:\n\t%d : %s"),
 			f_RegValueEnabled, dwContextEnabled, retVal, GetSysError(retVal).c_str());
-		LogErrorString(msg.c_str());
 	}
 }

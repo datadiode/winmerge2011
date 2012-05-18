@@ -91,18 +91,16 @@ BOOL VSSHelper::ReLinkVCProj(String strSavePath, String * psError)
 		{
 			if (hfile == INVALID_HANDLE_VALUE)
 			{
-				string_format msg(_T("CMainFrame::ReLinkVCProj() ")
+				LogErrorString(_T("CMainFrame::ReLinkVCProj() ")
 					_T("- failed to open file: %s"), strSavePath.c_str());
-				LogErrorString(msg.c_str());
 				String errMsg = GetSysError(GetLastError());
 				*psError = LanguageSelect.FormatMessage(
 					IDS_ERROR_FILEOPEN, errMsg.c_str(), strSavePath.c_str());
 			}
 			if (tfile == INVALID_HANDLE_VALUE)
 			{
-				string_format msg(_T("CMainFrame::ReLinkVCProj() ")
+				LogErrorString(_T("CMainFrame::ReLinkVCProj() ")
 					_T("- failed to open temporary file: %s"), tempFile.c_str());
-				LogErrorString(msg.c_str());
 				String errMsg = GetSysError(GetLastError());
 				*psError = LanguageSelect.FormatMessage(
 					IDS_ERROR_FILEOPEN, errMsg.c_str(), tempFile.c_str());
