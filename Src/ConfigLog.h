@@ -140,7 +140,7 @@ private:
 	// Implementation data
 private:
 	String m_sFileName;
-	UniStdioFile *m_pfile;
+	UniStdioFile *const m_pfile;
 	bool m_writing;
 	CfgSettings *m_pCfgSettings;
 };

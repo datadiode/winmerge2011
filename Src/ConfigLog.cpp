@@ -38,12 +38,10 @@
 // Static function declarations
 static bool LoadYesNoFromConfig(CfgSettings * cfgSettings, LPCTSTR name, bool * pbflag);
 
-
-
 CConfigLog::CConfigLog()
 : m_pCfgSettings(NULL)
+, m_pfile(new UniStdioFile())
 {
-	m_pfile = new UniStdioFile();
 }
 
 CConfigLog::~CConfigLog()
@@ -51,8 +49,6 @@ CConfigLog::~CConfigLog()
 	CloseFile();
 	delete m_pfile;
 }
-
-
 
 /** 
  * @brief Return logfile name and path
