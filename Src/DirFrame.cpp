@@ -602,26 +602,25 @@ void CDirFrame::AlignStatusBar(int cx)
 }
 
 /**
- * @brief Set left/right side readonly-status
- * @param bLeft Select side to set (TRUE = left)
- * @param bReadOnly New status of selected side
+ * @brief Set left side readonly-status
+ * @param bReadOnly New status
  */
 void CDirFrame::SetLeftReadOnly(BOOL bReadOnly)
 {
 	m_bROLeft = bReadOnly;
-	String sText;
-	if (m_bROLeft)
-		sText = LanguageSelect.LoadString(IDS_STATUSBAR_READONLY);
-	m_wndStatusBar->SetPartText(PANE_LEFT_RO, sText.c_str());
+	m_wndStatusBar->SetPartText(PANE_LEFT_RO, m_bROLeft ?
+		LanguageSelect.LoadString(IDS_STATUSBAR_READONLY).c_str() : NULL);
 }
 
+/**
+ * @brief Set right side readonly-status
+ * @param bReadOnly New status
+ */
 void CDirFrame::SetRightReadOnly(BOOL bReadOnly)
 {
 	m_bRORight = bReadOnly;
-	String sText;
-	if (m_bRORight)
-		sText = LanguageSelect.LoadString(IDS_STATUSBAR_READONLY);
-	m_wndStatusBar->SetPartText(PANE_RIGHT_RO, sText.c_str());
+	m_wndStatusBar->SetPartText(PANE_RIGHT_RO, m_bRORight ?
+		LanguageSelect.LoadString(IDS_STATUSBAR_READONLY).c_str() : NULL);
 }
 
 BOOL CDirFrame::PreTranslateMessage(MSG *pMsg)
