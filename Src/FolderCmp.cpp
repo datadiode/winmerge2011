@@ -41,6 +41,7 @@ FolderCmp::FolderCmp(CDiffContext *pCtxt)
 , m_ndiffs(CDiffContext::DIFFS_UNKNOWN)
 , m_ntrivialdiffs(CDiffContext::DIFFS_UNKNOWN)
 , m_pCtx(pCtxt)
+, m_diffFileData(getDefaultCodepage())
 {
 }
 

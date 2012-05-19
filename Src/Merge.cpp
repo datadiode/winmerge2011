@@ -300,9 +300,6 @@ BOOL CMergeApp::InitInstance()
 		// commandline (from other application, shellextension etc).
 		BOOL bCommandLineInvoke = cmdInfo.m_Files.size() > 0;
 
-		// Set default codepage
-		DiffFileData::SetDefaultCodepage(getDefaultCodepage());
-
 		// If cmdInfo.m_bClearCaseTool coincides with cmdInfo.m_bEscShutdown,
 		// then ClearCase waits for the process to produce an output file and
 		// terminate, in which case single instance logic is not applicable.

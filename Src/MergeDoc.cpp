@@ -395,7 +395,7 @@ int CChildFrame::Rescan2(bool &bIdentical)
 {
 	GetSystemTimeAsFileTime(&m_LastRescan);
 
-	DiffFileData diffdata;
+	DiffFileData diffdata(getDefaultCodepage());
 	SaveBuffForDiff(*m_ptBuf[0], *m_ptBuf[1], diffdata, 0);
 	SaveBuffForDiff(*m_ptBuf[1], *m_ptBuf[0], diffdata, 1);
 

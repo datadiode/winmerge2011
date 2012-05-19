@@ -16,13 +16,11 @@
 #include "Diff.h"
 #include "DiffFileData.h"
 
-static int f_defcp = 0; // default codepage
-
 /**
  * @brief Simple initialization of DiffFileData
  * @note Diffcounts are initialized to invalid values, not zeros.
  */
-DiffFileData::DiffFileData()
+DiffFileData::DiffFileData(int codepage)
 : m_inf(new file_data[2])
 , m_FileLocation(2)
 , m_textStats(2)
@@ -34,7 +32,7 @@ DiffFileData::DiffFileData()
 	// Set default codepages
 	for (size_t i = 0 ; i < m_FileLocation.size() ; ++i)
 	{
-		m_FileLocation[i].encoding.SetCodepage(f_defcp);
+		m_FileLocation[i].encoding.SetCodepage(codepage);
 	}
 }
 
@@ -43,12 +41,6 @@ DiffFileData::~DiffFileData()
 {
 	Reset();
 	delete [] m_inf;
-}
-
-/** @brief Allow caller to specify codepage to assume for all unknown files */
-void DiffFileData::SetDefaultCodepage(int defcp)
-{
-	f_defcp = defcp;
 }
 
 /** @brief Open file descriptors in the inf structure (return false if failure) */

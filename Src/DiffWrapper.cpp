@@ -495,7 +495,7 @@ bool CDiffWrapper::RunFileDiff(DiffFileData &diffdata)
  */
 bool CDiffWrapper::RunFileDiff()
 {
-	DiffFileData diffdata;
+	DiffFileData diffdata(getDefaultCodepage());
 	diffdata.SetDisplayFilepaths(m_s1File.c_str(), m_s2File.c_str()); // store true names for diff utils patch file
 	return RunFileDiff(diffdata);
 }
