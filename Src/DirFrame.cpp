@@ -575,8 +575,7 @@ void CDirFrame::UpdateResources()
 
 bool CDirFrame::PreventFromClosing()
 {
-	UINT threadState = m_diffThread.GetThreadState();
-	if (threadState == CDiffThread::THREAD_COMPARING)
+	if (m_pCtxt->IsBusy())
 		return true;
 	if (!CanFrameClose())
 	{

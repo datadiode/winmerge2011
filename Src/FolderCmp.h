@@ -26,9 +26,9 @@ class PackingInfo;
 class FolderCmp
 {
 public:
-	FolderCmp(CDiffContext * = NULL);
+	FolderCmp(CDiffContext *);
 	~FolderCmp();
-	void setContext(CDiffContext *);
+	void Reset();
 	UINT prepAndCompareTwoFiles(DIFFITEM &);
 
 	int m_ndiffs;
@@ -39,7 +39,7 @@ public:
 private:
 	void GetComparePaths(const DIFFITEM &di, String &left, String &right) const;
 
-	CDiffContext *m_pCtx;
+	CDiffContext *const m_pCtx;
 	CompareEngines::DiffUtils *m_pDiffUtilsEngine;
 	CompareEngines::ByteCompare *m_pByteCompare;
 	CompareEngines::TimeSizeCompare *m_pTimeSizeCompare;

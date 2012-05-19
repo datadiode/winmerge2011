@@ -17,7 +17,6 @@
 #include "DiffWrapper.h"
 #include "FileTransform.h"
 #include "DIFF.H"
-#include "IAbortable.h"
 #include "FolderCmp.h"
 #include "codepage_detect.h"
 #include "TimeSizeCompare.h"
@@ -45,20 +44,19 @@ FolderCmp::FolderCmp(CDiffContext *pCtxt)
 {
 }
 
-FolderCmp::~FolderCmp()
+void FolderCmp::Reset()
 {
-	setContext(NULL);
-}
-
-void FolderCmp::setContext(CDiffContext *pCtx)
-{
-	m_pCtx = pCtx;
 	delete m_pDiffUtilsEngine;
 	m_pDiffUtilsEngine = NULL;
 	delete m_pByteCompare;
 	m_pByteCompare = NULL;
 	delete m_pTimeSizeCompare;
 	m_pTimeSizeCompare = NULL;
+}
+
+FolderCmp::~FolderCmp()
+{
+	Reset();
 }
 
 /**
@@ -71,7 +69,7 @@ void FolderCmp::setContext(CDiffContext *pCtx)
  */
 UINT FolderCmp::prepAndCompareTwoFiles(DIFFITEM &di)
 {
-	int nCompMethod = m_pCtx->GetCompareMethod();
+	int nCompMethod = m_pCtx->m_nCompMethod;
 
 	// Reset text stats
 	m_diffFileData.m_textStats[0].clear();

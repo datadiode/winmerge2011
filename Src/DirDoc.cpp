@@ -78,8 +78,7 @@ void CDirFrame::InitCompare(LPCTSTR pszLeft, LPCTSTR pszRight, int nRecursive, C
 	// Default implementation of operator new() never returns NULL.
 	delete m_pCtxt;
 	
-	m_pCtxt = new CDiffContext(pszLeft, pszRight);
-	m_pCtxt->m_nRecursive = nRecursive;
+	m_pCtxt = new CDiffContext(m_pCompareStats, m_pDirView->m_pWnd, pszLeft, pszRight, nRecursive);
 
 	if (pTempPathContext)
 	{
@@ -173,8 +172,7 @@ void CDirFrame::Rescan(bool bCompareSelected)
 		return;
 
 	// If we're already doing a rescan, bail out
-	UINT threadState = m_diffThread.GetThreadState();
-	if (threadState == CDiffThread::THREAD_COMPARING)
+	if (m_pCtxt->IsBusy())
 		return;
 
 	waitStatusCursor.Begin(IDS_STATUS_RESCANNING);
@@ -204,8 +202,6 @@ void CDirFrame::Rescan(bool bCompareSelected)
 	m_pCtxt->m_bStopAfterFirstDiff = COptionsMgr::Get(OPT_CMP_STOP_AFTER_FIRST);
 	m_pCtxt->m_nQuickCompareLimit = COptionsMgr::Get(OPT_CMP_QUICK_LIMIT);
 	m_pCtxt->m_bWalkUniques = COptionsMgr::Get(OPT_CMP_WALK_UNIQUE_DIRS);
-	m_pCtxt->m_pCompareStats = m_pCompareStats;
-	m_pCtxt->m_nRecursive = m_nRecursive;
 
 	// Set total items count since we don't collect items
 	if (bCompareSelected)
@@ -232,11 +228,7 @@ void CDirFrame::Rescan(bool bCompareSelected)
 	}
 
 	// Folder names to compare are in the compare context
-	m_diffThread.SetContext(m_pCtxt);
-	m_diffThread.SetHwnd(m_pDirView->m_hWnd);
-	m_diffThread.SetMessageIDs(MSG_UI_UPDATE);
-	m_diffThread.SetCompareSelected(bCompareSelected);
-	m_diffThread.CompareDirectories();
+	m_pCtxt->CompareDirectories(bCompareSelected);
 }
 
 /**
@@ -578,16 +570,7 @@ void CDirFrame::UpdateHeaderPath(BOOL bLeft)
 void CDirFrame::AbortCurrentScan()
 {
 	LogFile.Write(CLogFile::LNOTICE, _T("Dircompare aborted!"));
-	m_diffThread.Abort();
-}
-
-/**
- * @brief Returns true if there is an active scan that hasn't been aborted.
- */
-bool CDirFrame::IsCurrentScanAbortable() const
-{
-	return (m_diffThread.GetThreadState() == CDiffThread::THREAD_COMPARING 
-		&& !m_diffThread.IsAborting());
+	m_pCtxt->Abort();
 }
 
 /**

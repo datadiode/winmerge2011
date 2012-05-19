@@ -9,7 +9,6 @@
 #include "StdAfx.h"
 #include <io.h>
 #include "FileLocation.h"
-#include "IAbortable.h"
 #include "CompareOptions.h"
 #include "DiffContext.h"
 #include "DIFF.H"

@@ -28,62 +28,13 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "StdAfx.h"
-#include "Merge.h"
-#include "CompareOptions.h"
-#include "CompareStats.h"
-#include "Common/version.h"
-#include "FilterList.h"
-#include "LineFiltersList.h"
+#include <process.h>
 #include "DiffContext.h"
 #include "paths.h"
-#include "coretools.h"
+#include "CompareStats.h"
 #include "codepage_detect.h"
 #include "DiffItemList.h"
-#include "IAbortable.h"
-
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
-#define new DEBUG_NEW
-#endif
-
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
-/**
- * @brief Construct CDiffContext.
- *
- * @param [in] pszLeft Initial left-side path.
- * @param [in] pszRight Initial right-side path.
- * @param [in] compareMethod Main compare method for this compare.
- */
-CDiffContext::CDiffContext(LPCTSTR pszLeft, LPCTSTR pszRight)
-: m_piFilterGlobal(NULL)
-, m_nCompMethod(0)
-, m_bIgnoreSmallTimeDiff(false)
-, m_pCompareStats(NULL)
-, m_piAbortable(NULL)
-, m_bStopAfterFirstDiff(false)
-, m_pFilterList(new FilterList)
-, m_nRecursive(0)
-, m_bWalkUniques(true)
-, m_paths(2)
-, m_options(NULL)
-{
-	memset(&m_options, 0, sizeof m_options);
-	m_paths[0] = paths_GetLongPath(pszLeft);
-	m_paths[1] = paths_GetLongPath(pszRight);
-}
-
-/**
- * @brief Destructor.
- */
-CDiffContext::~CDiffContext()
-{
-	delete m_pFilterList;
-}
+#include "Common/version.h"
 
 /**
  * @brief Update info in item in result list from disk.
@@ -123,7 +74,7 @@ BOOL CDiffContext::UpdateInfoFromDiskHalf(DIFFITEM & di, BOOL bLeft)
 {
 	String filepath;
 
-	if (bLeft == TRUE)
+	if (bLeft)
 		filepath = paths_ConcatPath(di.GetLeftFilepath(GetLeftPath()), di.left.filename);
 	else
 		filepath = paths_ConcatPath(di.GetRightFilepath(GetRightPath()), di.right.filename);
@@ -207,10 +158,176 @@ void CDiffContext::UpdateVersion(DIFFITEM & di, BOOL bLeft) const
 }
 
 /**
- * @brief Check if user has requested aborting the compare.
- * @return true if user has requested abort, false otherwise.
+ * @brief Force compare to be single-threaded.
+ * Set this to true in order to single step through entire compare process all
+ * in a single thread. Either edit this line, or breakpoint & change it in
+ * CompareDirectories() below.
+ *
+ * If you are going to debug compare procedure, you most probably need to set
+ * this to true. As Visual Studio seems to have real problems with debugging
+ * these threads otherwise.
+ */
+static bool bSinglethreaded = false;
+
+/**
+ * @brief Default constructor.
+ */
+CDiffContext::CDiffContext
+(
+	CompareStats *pCompareStats,
+	HWindow *pWindow,
+	LPCTSTR pszLeft,
+	LPCTSTR pszRight,
+	int nRecursive
+) : m_piFilterGlobal(NULL),
+	m_nCompMethod(0),
+	m_bIgnoreSmallTimeDiff(false),
+	m_pCompareStats(pCompareStats),
+	m_pWindow(pWindow),
+	m_bStopAfterFirstDiff(false),
+	m_pFilterList(new FilterList),
+	m_nRecursive(nRecursive),
+	m_bWalkUniques(true),
+	m_paths(2),
+#pragma warning(disable:warning_this_used_in_base_member_initializer_list)
+	m_folderCmp(this),
+#pragma warning(default:warning_this_used_in_base_member_initializer_list)
+	m_bOnlyRequested(false),
+	m_hSemaphore(NULL),
+	m_bAborting(false),
+	m_options(NULL)
+{
+	m_paths[0] = paths_GetLongPath(pszLeft);
+	m_paths[1] = paths_GetLongPath(pszRight);
+}
+
+/**
+ * @brief Destructor, release resources.
+ */
+CDiffContext::~CDiffContext()
+{
+	ASSERT(m_hSemaphore == NULL);
+	delete m_pFilterList;
+}
+
+/**
+ * @brief runtime interface for child thread, called on child thread
  */
 bool CDiffContext::ShouldAbort() const
 {
-	return m_piAbortable && m_piAbortable->ShouldAbort();
+	if (bSinglethreaded)
+	{
+		MSG msg;
+		while (::PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
+		{
+			::TranslateMessage(&msg);
+			::DispatchMessage(&msg);
+		}
+	}
+	return m_bAborting;
+}
+
+/**
+ * @brief Start and run directory compare thread.
+ * @return Success (1) or error for thread. Currently always 1.
+ */
+UINT CDiffContext::CompareDirectories(bool bOnlyRequested)
+{
+	m_folderCmp.Reset();
+
+	ASSERT(m_hSemaphore == NULL);
+
+	m_bAborting = false;
+	m_bOnlyRequested = bOnlyRequested;
+
+	m_hSemaphore = CreateSemaphore(0, 0, LONG_MAX, 0);
+
+	m_pCompareStats->SetCompareState(CompareStats::STATE_START);
+
+	if (bSinglethreaded)
+	{
+		if (!m_bOnlyRequested)
+			DiffThreadCollect(this);
+		DiffThreadCompare(this);
+	}
+	else
+	{
+		if (!m_bOnlyRequested)
+			_beginthread(DiffThreadCollect, 0, this);
+		_beginthread(DiffThreadCompare, 0, this);
+	}
+
+	return 1;
+}
+
+/**
+ * @brief Item collection thread function.
+ *
+ * This thread is responsible for finding and collecting all items to compare
+ * to the item list.
+ * @param [in] lpParam Pointer to parameter structure.
+ * @return Thread's return value.
+ */
+void CDiffContext::DiffThreadCollect(LPVOID lpParam)
+{
+	CDiffContext *myStruct = reinterpret_cast<CDiffContext *>(lpParam);
+
+	ASSERT(!myStruct->m_bOnlyRequested);
+
+	int depth = myStruct->m_nRecursive ? -1 : 0;
+
+	String subdir; // blank to start at roots specified in diff context
+#ifdef _DEBUG
+	_CrtMemState memStateBefore;
+	_CrtMemState memStateAfter;
+	_CrtMemState memStateDiff;
+	_CrtMemCheckpoint(&memStateBefore);
+#endif
+
+	// Build results list (except delaying file comparisons until below)
+	myStruct->DirScan_GetItems(subdir, false, subdir, false,
+			depth, NULL, myStruct->m_bWalkUniques);
+
+#ifdef _DEBUG
+	_CrtMemCheckpoint(&memStateAfter);
+	_CrtMemDifference(&memStateDiff, &memStateBefore, &memStateAfter);
+	_CrtMemDumpStatistics(&memStateDiff);
+#endif
+
+	// ReleaseSemaphore() once again to signal that collect phase is ready
+	ReleaseSemaphore(myStruct->m_hSemaphore, 1, 0);
+}
+
+/**
+ * @brief Folder compare thread function.
+ *
+ * Compares items in item list. After compare is ready
+ * sends message to UI so UI can update itself.
+ * @param [in] lpParam Pointer to parameter structure.
+ * @return Thread's return value.
+ */
+void CDiffContext::DiffThreadCompare(LPVOID lpParam)
+{
+	CoInitializeEx(NULL, COINIT_MULTITHREADED);
+
+	CDiffContext *const myStruct = reinterpret_cast<CDiffContext *>(lpParam);
+
+	myStruct->m_pCompareStats->SetCompareState(CompareStats::STATE_COMPARE);
+
+	// Now do all pending file comparisons
+	if (myStruct->m_bOnlyRequested)
+		myStruct->DirScan_CompareRequestedItems(NULL);
+	else
+		myStruct->DirScan_CompareItems(NULL);
+
+	myStruct->m_pCompareStats->SetCompareState(CompareStats::STATE_IDLE);
+
+	CloseHandle(myStruct->m_hSemaphore);
+	myStruct->m_hSemaphore = NULL;
+
+	// Send message to UI to update
+	// msgID=MSG_UI_UPDATE=1025 (2005-11-29, Perry)
+	myStruct->m_pWindow->PostMessage(MSG_UI_UPDATE);
+
+	CoUninitialize();
 }

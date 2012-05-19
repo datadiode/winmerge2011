@@ -32,7 +32,7 @@
 /////////////////////////////////////////////////////////////////////////////
 // CDirFrame frame
 
-#include "DiffThread.h"
+#include "DiffContext.h"
 
 class CDirView;
 class CHexMergeFrame;
@@ -109,11 +109,9 @@ public:
 	void AddMergeDoc(CHexMergeFrame *);
 	void MergeDocClosing(CChildFrame *);
 	void MergeDocClosing(CHexMergeFrame *);
-	CDiffThread m_diffThread;
 	void UpdateDiffAfterOperation(const FileActionItem &);
 	void UpdateHeaderPath(BOOL bLeft);
 	void AbortCurrentScan();
-	bool IsCurrentScanAbortable() const;
 	void SetDescriptions(const String &strLeftDesc, const String &strRightDesc);
 	void ApplyLeftDisplayRoot(String &);
 	void ApplyRightDisplayRoot(String &);

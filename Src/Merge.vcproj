@@ -498,10 +498,6 @@
 				>
 			</File>
 			<File
-				RelativePath="DiffThread.cpp"
-				>
-			</File>
-			<File
 				RelativePath="DiffWrapper.cpp"
 				>
 			</File>
@@ -1079,10 +1075,6 @@
 				>
 			</File>
 			<File
-				RelativePath="DiffThread.h"
-				>
-			</File>
-			<File
 				RelativePath="DiffWrapper.h"
 				>
 			</File>
@@ -1228,10 +1220,6 @@
 			</File>
 			<File
 				RelativePath=".\HexMergeView.h"
-				>
-			</File>
-			<File
-				RelativePath="IAbortable.h"
 				>
 			</File>
 			<File

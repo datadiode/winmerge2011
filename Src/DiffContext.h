@@ -13,16 +13,11 @@
 #include "CompareOptions.h"
 #include "DiffFileInfo.h"
 #include "DiffItemList.h"
+#include "FileLocation.h"
+#include "FolderCmp.h"
 
-class PackingInfo;
-class PrediffingInfo;
 class IDiffFilter;
-struct DIFFITEM;
 class CompareStats;
-class IAbortable;
-class FilterList;
-class CompareOptions;
-struct DIFFOPTIONS;
 
 /**
  * The folder compare context.
@@ -31,8 +26,10 @@ struct DIFFOPTIONS;
  * is also contained in this class. Many compare classes and functions have
  * a pointer to instance of this class. 
  *
- * @note If you add new member variables, remember to copy values in
- * CDiffContext::CDiffContext(..,CDiffContext) constructor!
+ * Folder compare comprises two phases executed in two threads:
+ * - first thread collects items to compare to compare-time list
+ *   (m_diffList).
+ * - second threads compares items in the list.
  */
 class CDiffContext : public DiffItemList
 {
@@ -44,16 +41,11 @@ public:
 		DIFFS_UNKNOWN_QUICKCOMPARE = -9, /**< Unknown because of quick-compare method. */
 	};
 
-	CDiffContext(LPCTSTR pszLeft, LPCTSTR pszRight);
+	CDiffContext(CompareStats *, HWindow *,
+		LPCTSTR pszLeft, LPCTSTR pszRight, int nRecursive);
 	~CDiffContext();
 
 	void UpdateVersion(DIFFITEM & di, BOOL bLeft) const;
-
-	/**
-	 * Get the main compare method used in this compare.
-	 * @return Compare method used.
-	 */
-	int GetCompareMethod(void) const { return m_nCompMethod; }
 
 	//@{
 	/**
@@ -80,36 +72,12 @@ public:
 	BOOL UpdateInfoFromDiskHalf(DIFFITEM &di, BOOL bLeft);
 	void UpdateStatusFromDisk(UINT_PTR diffpos, BOOL bLeft, BOOL bRight);
 
-	//@{
-	/**
-	 * @name Compare aborting interface.
-	 * These functions handle compare aborting using IAbortable interface.
-	 */
-	bool ShouldAbort() const;
-
-	/**
-	 * Set pointer to IAbortable interface.
-	 * This function sets pointer to interface used to abort the compare when
-	 * user wants to.
-	 * @param [in] piAbortable Pointer to interface.
-	 */
-	void SetAbortable(IAbortable *piAbortable) { m_piAbortable = piAbortable; }
-
-	/**
-	 * Returns a pointer to current IAbortable interface.
-	 * This function returns a pointer to interface used to abort the compare.
-	 * @return Pointer to current IAbortable interface.
-	 */
-	const IAbortable *GetAbortable() const { return m_piAbortable; }
-	//@}
-
 	IDiffFilter * m_piFilterGlobal; /**< Interface for file filtering. */
 	bool m_bGuessEncoding;
 
 	DIFFOPTIONS m_options; /**< Generalized compare options. */
 
 	bool m_bIgnoreSmallTimeDiff; /**< Ignore small timedifferences when comparing by date */
-	CompareStats *m_pCompareStats; /**< Pointer to compare statistics */
 
 	/**
 	 * Optimize compare by stopping after first difference.
@@ -138,17 +106,58 @@ public:
 	 */
 	bool m_bWalkUniques;
 
-	int m_nRecursive; /**< Do we include subfolders to compare? */
 	FilterList *const m_pFilterList; /**< Filter list for line filters */
 
 	/**
 	 * The compare method used.
 	 */
 	int m_nCompMethod;
-private:
 
+	FolderCmp m_folderCmp;
+
+	void CompareDiffItem(DIFFITEM &);
+// creation and use, called on main thread
+	UINT CompareDirectories(bool bOnlyRequested);
+
+// runtime interface for main thread, called on main thread
+	bool IsBusy() const { return m_hSemaphore != NULL; }
+	void Abort() { m_bAborting = true; }
+	bool IsAborting() const { return m_bAborting; }
+
+// runtime interface for child thread, called on child thread
+	bool ShouldAbort() const;
+
+private:
 	stl::vector<String> m_paths; /**< (root) paths for this context */
-	IAbortable *m_piAbortable; /**< Interface for aborting the compare. */
+	HANDLE m_hSemaphore; /**< Semaphore for synchronizing threads. */
+	CompareStats *const m_pCompareStats; /**< Pointer to compare statistics */
+	HWindow *const m_pWindow; /**< Window getting status updates. */
+	bool m_bAborting; /**< Is compare aborting? */
+	bool m_bOnlyRequested; /**< Compare only requested items? */
+	const int m_nRecursive; /**< Do we include subfolders to compare? */
+	const static bool casesensitive = false;
+	const String empty;
+// Thread functions
+	static void __cdecl DiffThreadCollect(LPVOID);
+	static void __cdecl DiffThreadCompare(LPVOID);
+	int DirScan_GetItems(
+		const String &leftsubdir, bool bLeftUniq,
+		const String &rightsubdir, bool bRightUniq,
+		int depth, DIFFITEM *parent, bool bUniques);
+	DIFFITEM *AddToList(const String &sLeftDir, const String &sRightDir,
+		const DirItem *lent, const DirItem *rent, UINT code, DIFFITEM *parent);
+	void SetDiffItemStats(DIFFITEM &);
+	void StoreDiffData(const DIFFITEM &);
+	bool UpdateDiffItem(DIFFITEM &);
+	int DirScan_CompareItems(UINT_PTR parentdiffpos);
+	int DirScan_CompareRequestedItems(UINT_PTR parentdiffpos);
+
+	typedef stl::vector<DirItem> DirItemArray;
+
+	void LoadAndSortFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *files) const;
+	void LoadFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *files) const;
+	void Sort(DirItemArray *dirs) const;
+	int collstr(const String &, const String &) const;
 };
 
 #endif // !defined(AFX_DIFFCONTEXT_H__D3CC86BE_F11E_11D2_826C_00A024706EDC__INCLUDED_)

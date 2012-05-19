@@ -9,7 +9,7 @@
 
 #include "StdAfx.h"
 #include "paths.h"
-#include "DiffThread.h"
+#include "DiffContext.h"
 #include "FileFilterHelper.h"
 #include "DirItem.h"
 #include "CompareStats.h"
@@ -17,14 +17,14 @@
 /**
  * @brief Load arrays with all directories & files in specified dir
  */
-void CDiffThread::LoadAndSortFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *files) const
+void CDiffContext::LoadAndSortFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *files) const
 {
 	LoadFiles(sDir, dirs, files);
 	Sort(dirs);
 	Sort(files);
 	// If recursing the flat way, reset total count of items to 0
-	if (context->m_nRecursive == 2)
-		context->m_pCompareStats->SetTotalItems(0);
+	if (m_nRecursive == 2)
+		m_pCompareStats->SetTotalItems(0);
 }
 
 /**
@@ -39,7 +39,7 @@ void CDiffThread::LoadAndSortFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArra
  * @param [in, out] dirs Array where subfolders are stored.
  * @param [in, out] files Array where files are stored.
  */
-void CDiffThread::LoadFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *files) const
+void CDiffContext::LoadFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *files) const
 {
 	WIN32_FIND_DATA ff;
 	HANDLE h = FindFirstFile(paths_ConcatPath(sDir, _T("*.*")).c_str(), &ff);
@@ -59,18 +59,18 @@ void CDiffThread::LoadFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *file
 				ent.size.Hi = ff.nFileSizeHigh;
 				files->push_back(ent);
 				// If recursing the flat way, increment total count of items
-				if (context->m_nRecursive == 2)
-					context->m_pCompareStats->IncreaseTotalItems();
+				if (m_nRecursive == 2)
+					m_pCompareStats->IncreaseTotalItems();
 			}
 			else if (_tcsstr(_T(".."), ff.cFileName) == NULL)
 			{
-				if (context->m_nRecursive == 2)
+				if (m_nRecursive == 2)
 				{
 					// Allow user to abort scanning
-					if (context->ShouldAbort())
+					if (ShouldAbort())
 						break;
 					String sDir = paths_ConcatPath(ent.path, ent.filename);
-					if (context->m_piFilterGlobal->includeDir(sDir.c_str()))
+					if (m_piFilterGlobal->includeDir(sDir.c_str()))
 						LoadFiles(sDir.c_str(), dirs, files);
 				}
 				else
@@ -111,7 +111,7 @@ static bool __cdecl cmpistring(const DirItem &elem1, const DirItem &elem2)
 /**
  * @brief sort specified array
  */
-void CDiffThread::Sort(DirItemArray *dirs) const
+void CDiffContext::Sort(DirItemArray *dirs) const
 {
 	if (casesensitive)
 		stl::sort(dirs->begin(), dirs->end(), cmpstring);
@@ -123,7 +123,7 @@ void CDiffThread::Sort(DirItemArray *dirs) const
  * @brief  Compare (NLS aware) two strings, either case-sensitive or
  * case-insensitive as caller specifies
  */
-int CDiffThread::collstr(const String & s1, const String & s2) const
+int CDiffContext::collstr(const String & s1, const String & s2) const
 {
 	if (casesensitive)
 		return _tcscoll(s1.c_str(), s2.c_str());
