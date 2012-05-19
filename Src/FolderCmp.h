@@ -37,6 +37,8 @@ public:
 	DiffFileData m_diffFileData;
 	
 private:
+	void GetComparePaths(const DIFFITEM &di, String &left, String &right) const;
+
 	CDiffContext *m_pCtx;
 	CompareEngines::DiffUtils *m_pDiffUtilsEngine;
 	CompareEngines::ByteCompare *m_pByteCompare;

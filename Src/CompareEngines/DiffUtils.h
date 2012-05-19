@@ -10,13 +10,6 @@
 #ifndef _DIFF_UTILS_H_
 #define _DIFF_UTILS_H_
 
-class CompareOptions;
-class FilterList;
-struct file_data;
-struct FileTextStats;
-class FilterCommentsManager;
-class CDiffWrapper;
-
 #include "DiffWrapper.h"
 
 namespace CompareEngines
@@ -33,19 +26,9 @@ namespace CompareEngines
 class DiffUtils : public CDiffWrapper
 {
 public:
-	DiffUtils(const DIFFOPTIONS &);
-	~DiffUtils();
-	void SetFileData(int items, file_data *data);
-	int diffutils_compare_files();
-	bool RegExpFilter(int StartPos, int EndPos, int FileNo);
-	void GetDiffCounts(int &diffs, int &trivialDiffs);
-	void GetTextStats(int side, FileTextStats *stats);
-	bool Diff2Files(struct change **diffs, int depth,
-			int *bin_status, bool bMovedBlocks, int *bin_file);
-	void SetCodepage(int codepage) { m_codepage = codepage; }
+	DiffUtils(const CDiffContext *);
+	int diffutils_compare_files(file_data *);
 
-private:
-	file_data *m_inf; /**< Compared files data (for diffutils). */
 	int m_ndiffs; /**< Real diffs found. */
 	int m_ntrivialdiffs; /**< Ignored diffs found. */
 };

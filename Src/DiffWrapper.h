@@ -31,16 +31,16 @@
 #include "FileTextStats.h"
 #include "CompareOptions.h"
 #include "FilterCommentsManager.h"
+#include "FilterList.h"
+#include "LineFiltersList.h"
 
 class CDiffContext;
 struct DIFFRANGE;
 class DiffList;
 struct DiffFileData;
 struct file_data;
-class FilterCommentsManager;
 struct FilterCommentsSet;
 class MovedLines;
-class FilterList;
 enum OP_TYPE;
 
 /** @enum COMPARE_TYPE
@@ -141,18 +141,19 @@ struct DIFFSTATUS
  * functions SetCreatePatchFile() and SetCreateDiffList().
  */
 class CDiffWrapper
-	: public FilterCommentsManager
-	, public DiffutilsOptions
+	: public DIFFOPTIONS
+	, public FilterCommentsManager
+	, public FilterList /**< Filter list for line filters. */
 {
 public:
 	CDiffWrapper();
 	~CDiffWrapper();
 	void SetToDiffUtils();
+	void RefreshFilters();
 	void RefreshOptions();
 	void SetCreatePatchFile(const String &filename);
 	void SetCreateDiffList(DiffList *diffList);
 	void SetDiffList(DiffList *diffList);
-	void GetOptions(DIFFOPTIONS &);
 	void SetPatchOptions(const PATCHOPTIONS &);
 	void SetDetectMovedBlocks(bool bDetectMovedBlocks);
 	void SetAppendFiles(BOOL bAppendFiles);

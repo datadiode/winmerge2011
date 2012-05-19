@@ -156,12 +156,9 @@ void CChildFrame::AdjustDiffBlocks()
  */
 int CChildFrame::GetMatchCost(const String &sLine0, const String &sLine1)
 {
-	DIFFOPTIONS diffOptions;
-	m_diffWrapper.GetOptions(diffOptions);
-
 	// Options that affect comparison
-	bool casitive = !diffOptions.bIgnoreCase;
-	int xwhite = diffOptions.nIgnoreWhitespace;
+	bool casitive = !m_diffWrapper.bIgnoreCase;
+	int xwhite = m_diffWrapper.nIgnoreWhitespace;
 	int breakType = GetBreakType(); // whitespace only or include punctuation
 	bool byteColoring = GetByteColoringOption();
 

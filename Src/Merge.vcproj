@@ -446,10 +446,6 @@
 				>
 			</File>
 			<File
-				RelativePath="CompareOptions.cpp"
-				>
-			</File>
-			<File
 				RelativePath="CompareStatisticsDlg.cpp"
 				>
 			</File>

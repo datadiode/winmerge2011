@@ -184,16 +184,15 @@ BOOL CPatchTool::ShowDialog()
 		m_diffWrapper.SetPatchOptions(patchOptions);
 
 		// These are from checkboxes and radiobuttons - can't be wrong
-		DIFFOPTIONS diffOptions;
-		diffOptions.nIgnoreWhitespace = m_dlgPatch.m_whitespaceCompare;
-		diffOptions.bIgnoreBlankLines = m_dlgPatch.m_ignoreBlanks != FALSE;
+		m_diffWrapper.nIgnoreWhitespace = m_dlgPatch.m_whitespaceCompare;
+		m_diffWrapper.bIgnoreBlankLines = m_dlgPatch.m_ignoreBlanks != FALSE;
 		m_diffWrapper.SetAppendFiles(m_dlgPatch.m_appendFile);
 		// Use this because non-sensitive setting can't write
 		// patch file EOLs correctly
-		diffOptions.bIgnoreEol = false;
-		diffOptions.bIgnoreCase = m_dlgPatch.m_caseSensitive == FALSE;
-		diffOptions.bFilterCommentsLines = false;
-		m_diffWrapper.SetFromDiffOptions(diffOptions);
+		m_diffWrapper.bIgnoreEol = false;
+		m_diffWrapper.bIgnoreCase = m_dlgPatch.m_caseSensitive == FALSE;
+		m_diffWrapper.bFilterCommentsLines = false;
+		m_diffWrapper.RefreshFilters();
 	}
 	else
 		return FALSE;

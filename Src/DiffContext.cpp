@@ -70,6 +70,7 @@ CDiffContext::CDiffContext(LPCTSTR pszLeft, LPCTSTR pszRight)
 , m_nRecursive(0)
 , m_bWalkUniques(true)
 , m_paths(2)
+, m_options(NULL)
 {
 	memset(&m_options, 0, sizeof m_options);
 	m_paths[0] = paths_GetLongPath(pszLeft);

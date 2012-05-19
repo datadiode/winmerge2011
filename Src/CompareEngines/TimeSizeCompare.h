@@ -9,6 +9,8 @@
 #ifndef _TIMESIZE_COMPARE_H_
 #define _TIMESIZE_COMPARE_H_
 
+struct DIFFITEM;
+
 namespace CompareEngines
 {
 
@@ -19,13 +21,11 @@ namespace CompareEngines
 class TimeSizeCompare
 {
 public:
-	TimeSizeCompare();
-	~TimeSizeCompare();
-	void SetAdditionalOptions(bool ignoreSmallDiff);
+	TimeSizeCompare(const CDiffContext *);
 	int CompareFiles(int compMethod, const DIFFITEM &di);
 
 private:
-	bool m_ignoreSmallDiff;
+	const CDiffContext *const m_pCtxt;
 };
 
 } // namespace CompareEngines

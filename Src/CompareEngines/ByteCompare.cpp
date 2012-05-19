@@ -24,37 +24,11 @@ static const size_t PADDING = 0x0008;
 /**
  * @brief Default constructor.
  */
-ByteCompare::ByteCompare(const DIFFOPTIONS &options)
-	: m_piAbortable(NULL)
+ByteCompare::ByteCompare(const CDiffContext *pCtxt)
+	: DIFFOPTIONS(pCtxt->m_options), m_pCtxt(pCtxt)
 {
-	SetFromDiffOptions(options);
 	m_osfhandle[0] = NULL;
 	m_osfhandle[1] = NULL;
-}
-
-/**
- * @brief Default destructor.
- */
-ByteCompare::~ByteCompare()
-{
-}
-
-/**
- * @brief Set compare-type specific options.
- * @param [in] stopAfterFirstDiff Do we stop compare after first found diff.
- */
-void ByteCompare::SetAdditionalOptions(bool stopAfterFirstDiff)
-{
-	m_bStopAfterFirstDiff = stopAfterFirstDiff;
-}
-
-/**
- * @brief Set Abortable-interface.
- * @param [in] piAbortable Pointer to abortable interface.
- */
-void ByteCompare::SetAbortable(const IAbortable * piAbortable)
-{
-	m_piAbortable = piAbortable;
 }
 
 /**
@@ -119,9 +93,9 @@ unsigned ByteCompare::CompareFiles(const size_t x, const size_t j)
 			}
 			if (bytes_ahead[i] < 8)
 			{
-				if (m_piAbortable && m_piAbortable->ShouldAbort())
+				if (m_pCtxt->ShouldAbort())
 					return DIFFCODE::CMPABORT;
-				if (m_bStopAfterFirstDiff && (diffcode == DIFFCODE::DIFF))
+				if (m_pCtxt->m_bStopAfterFirstDiff && (diffcode == DIFFCODE::DIFF))
 				{
 					// Do not read more data, but continue to process what is
 					// already in memory.
@@ -198,7 +172,7 @@ unsigned ByteCompare::CompareFiles(const size_t x, const size_t j)
 			case EOF_0 | EOF_1:
 				return ok ? diffcode : DIFFCODE::CMPERR;
 			}
-			if (m_bIgnoreBlankLines)
+			if (bIgnoreBlankLines)
 			{
 				if (blankness_type[0] & (CR | LF | CRLF))
 				{
@@ -216,7 +190,7 @@ unsigned ByteCompare::CompareFiles(const size_t x, const size_t j)
 			if (mask & BLANK)
 			{
 				// There is a blank on one or both sides.
-				switch (m_ignoreWhitespace)
+				switch (nIgnoreWhitespace)
 				{
 				case WHITESPACE_IGNORE_ALL:
 					blankness_type_prev[0] = BLANK; // Simulate a preceding BLANK.
@@ -248,7 +222,7 @@ unsigned ByteCompare::CompareFiles(const size_t x, const size_t j)
 				// EOL on both sides, but different in style. Force bytes ahead
 				// to (un)equalness, depending on bIgnoreEOLDifference.
 				c[0] = true;
-				c[1] = m_bIgnoreEOLDifference;
+				c[1] = bIgnoreEol;
 			}
 			else if ((blankness_type[0] == EOF_0) || (blankness_type[1] == EOF_1))
 			{
@@ -257,7 +231,7 @@ unsigned ByteCompare::CompareFiles(const size_t x, const size_t j)
 				continue;
 			}
 		}
-		if (c[0] == c[1] || m_bIgnoreCase && tolower(c[0]) == tolower(c[1]))
+		if (c[0] == c[1] || bIgnoreCase && tolower(c[0]) == tolower(c[1]))
 			continue;
 		diffcode = DIFFCODE::DIFF;
 	}
@@ -281,7 +255,7 @@ unsigned ByteCompare::CompareFiles(FileLocation *location)
 	m_textStats[0].clear();
 	m_textStats[1].clear();
 
-	if (m_bStopAfterFirstDiff && (m_osfhandle[0] == m_osfhandle[1]))
+	if (m_pCtxt->m_bStopAfterFirstDiff && (m_osfhandle[0] == m_osfhandle[1]))
 		return DIFFCODE::SAME;
 
 	unsigned code = DIFFCODE::DIFF;
@@ -341,17 +315,4 @@ unsigned ByteCompare::CompareFiles(FileLocation *location)
 	}
 	// Indicate that text vs. binary classification is up to caller.
 	return code | DIFFCODE::FILE | DIFFCODE::TEXTFLAGS;
-}
-
-/**
- * @brief Return text statistics for last compare.
- * @param [in] side For which file to return statistics.
- * @param [out] stats Stats as asked.
- */
-void ByteCompare::GetTextStats(int side, FileTextStats *stats)
-{
-	stats->ncrlfs = m_textStats[side].ncrlfs;
-	stats->ncrs = m_textStats[side].ncrs;
-	stats->nlfs = m_textStats[side].nlfs;
-	stats->nzeros = m_textStats[side].nzeros;
 }

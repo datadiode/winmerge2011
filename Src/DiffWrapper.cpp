@@ -26,7 +26,6 @@
 
 #include "StdAfx.h"
 #include "coretools.h"
-#include "DiffContext.h"
 #include "DiffList.h"
 #include "MovedLines.h"
 #include "FilterList.h"
@@ -37,10 +36,10 @@
 #include "DIFF.H"
 #include "LogFile.h"
 #include "paths.h"
-#include "CompareOptions.h"
 #include "FileTextStats.h"
 #include "FolderCmp.h"
 #include "Environment.h"
+#include "codepage.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -60,7 +59,8 @@ CDiffWrapper *CDiffWrapper::m_pActiveInstance = NULL;
  * Initializes members and creates new FilterCommentsManager.
  */
 CDiffWrapper::CDiffWrapper()
-: m_bAppendFiles(FALSE)
+: DIFFOPTIONS(NULL)
+, m_bAppendFiles(FALSE)
 , m_codepage(0)
 , m_pDiffList(NULL)
 , m_bPathsAreTemp(FALSE)
@@ -98,38 +98,38 @@ void CDiffWrapper::SetToDiffUtils()
 
 	context = m_patchOptions.nContext;
 
-	if (m_ignoreWhitespace == WHITESPACE_IGNORE_CHANGE)
+	if (nIgnoreWhitespace == WHITESPACE_IGNORE_CHANGE)
 		ignore_space_change_flag = 1;
 	else
 		ignore_space_change_flag = 0;
 
-	if (m_ignoreWhitespace == WHITESPACE_IGNORE_ALL)
+	if (nIgnoreWhitespace == WHITESPACE_IGNORE_ALL)
 		ignore_all_space_flag = 1;
 	else
 		ignore_all_space_flag = 0;
 
-	if (m_bIgnoreBlankLines)
+	if (bIgnoreBlankLines)
 		ignore_blank_lines_flag = 1;
 	else
 		ignore_blank_lines_flag = 0;
 
-	if (m_bIgnoreCase)
+	if (bIgnoreCase)
 		ignore_case_flag = 1;
 	else
 		ignore_case_flag = 0;
 
-	if (m_bIgnoreEOLDifference)
+	if (bIgnoreEol)
 		ignore_eol_diff = 1;
 	else
 		ignore_eol_diff = 0;
 
-	if (m_ignoreWhitespace != WHITESPACE_COMPARE_ALL || m_bIgnoreCase ||
-			m_bIgnoreBlankLines || m_bIgnoreEOLDifference)
+	if (nIgnoreWhitespace != WHITESPACE_COMPARE_ALL || bIgnoreCase ||
+			bIgnoreBlankLines || bIgnoreEol)
 		ignore_some_changes = 1;
 	else
 		ignore_some_changes = 0;
 
-	if (m_ignoreWhitespace != WHITESPACE_COMPARE_ALL)
+	if (nIgnoreWhitespace != WHITESPACE_COMPARE_ALL)
 		length_varies = 1;
 	else
 		length_varies = 0;
@@ -141,16 +141,24 @@ void CDiffWrapper::SetToDiffUtils()
 	recursive = 0;
 }
 
+void CDiffWrapper::RefreshFilters()
+{
+	FilterList::RemoveAllFilters();
+	if (bApplyLineFilters)
+	{
+		FilterList::AddFrom(globalLineFilters);
+	}
+}
+
 void CDiffWrapper::RefreshOptions()
 {
-	DIFFOPTIONS options;
-	options.nIgnoreWhitespace = COptionsMgr::Get(OPT_CMP_IGNORE_WHITESPACE);
-	options.bIgnoreBlankLines = COptionsMgr::Get(OPT_CMP_IGNORE_BLANKLINES);
-	options.bFilterCommentsLines = COptionsMgr::Get(OPT_CMP_FILTER_COMMENTLINES);
-	options.bIgnoreCase = COptionsMgr::Get(OPT_CMP_IGNORE_CASE);
-	options.bIgnoreEol = COptionsMgr::Get(OPT_CMP_IGNORE_EOL);
-	options.bApplyLineFilters = COptionsMgr::Get(OPT_LINEFILTER_ENABLED);
-	SetFromDiffOptions(options);
+	nIgnoreWhitespace = COptionsMgr::Get(OPT_CMP_IGNORE_WHITESPACE);
+	bIgnoreBlankLines = COptionsMgr::Get(OPT_CMP_IGNORE_BLANKLINES);
+	bFilterCommentsLines = COptionsMgr::Get(OPT_CMP_FILTER_COMMENTLINES);
+	bIgnoreCase = COptionsMgr::Get(OPT_CMP_IGNORE_CASE);
+	bIgnoreEol = COptionsMgr::Get(OPT_CMP_IGNORE_EOL);
+	bApplyLineFilters = COptionsMgr::Get(OPT_LINEFILTER_ENABLED);
+	RefreshFilters();
 	SetDetectMovedBlocks(COptionsMgr::Get(OPT_CMP_MOVED_BLOCKS));
 }
 
@@ -176,18 +184,6 @@ void CDiffWrapper::SetCreatePatchFile(const String &filename)
 void CDiffWrapper::SetCreateDiffList(DiffList *diffList)
 {
 	m_pDiffList = diffList;
-}
-
-/**
- * @brief Returns current set of options used by diff-engine.
- * This function converts internally used diff-options to
- * format used outside CDiffWrapper and returns them.
- * @param [in,out] options Pointer to structure getting used options.
- */
-void CDiffWrapper::GetOptions(DIFFOPTIONS &options)
-{
-	ZeroMemory(&options, sizeof options);
-	GetAsDiffOptions(options);
 }
 
 /**
@@ -344,20 +340,20 @@ OP_TYPE CDiffWrapper::PostFilter(int LineNumberLeft, int QtyLinesLeft,
 				);
 			}
 
-			if (m_ignoreWhitespace == WHITESPACE_IGNORE_ALL)
+			if (nIgnoreWhitespace == WHITESPACE_IGNORE_ALL)
 			{
 				//Ignore character case
 				ReplaceSpaces(LineDataLeft, "");
 				ReplaceSpaces(LineDataRight, "");
 			}
-			else if (m_ignoreWhitespace == WHITESPACE_IGNORE_CHANGE)
+			else if (nIgnoreWhitespace == WHITESPACE_IGNORE_CHANGE)
 			{
 				//Ignore change in whitespace char count
 				ReplaceSpaces(LineDataLeft, " ");
 				ReplaceSpaces(LineDataRight, " ");
 			}
 
-			if (m_bIgnoreCase)
+			if (bIgnoreCase)
 			{
 				//ignore case
 				stl::transform(LineDataLeft.begin(), LineDataLeft.end(), LineDataLeft.begin(), ::toupper);
@@ -723,10 +719,8 @@ int CDiffWrapper::RegExpFilter(int StartPos, int EndPos, int FileNo, bool BreakC
 bool CDiffWrapper::LoadWinMergeDiffsFromDiffUtilsScript(struct change *script, const file_data *inf)
 {
 	//Logic needed for Ignore comment option
-	DIFFOPTIONS options;
-	GetOptions(options);
 	String asLwrCaseExt;
-	if (options.bFilterCommentsLines)
+	if (bFilterCommentsLines)
 	{
 		asLwrCaseExt = m_sOriginalFile1;
 		String::size_type PosOfDot = asLwrCaseExt.rfind('.');
@@ -799,7 +793,7 @@ bool CDiffWrapper::LoadWinMergeDiffsFromDiffUtilsScript(struct change *script, c
 			//Determine quantity of lines in this block for both sides
 			int QtyLinesLeft = trans_b0 - trans_a0;
 			int QtyLinesRight = trans_b1 - trans_a1;
-			if (options.bFilterCommentsLines && (op != OP_TRIVIAL))
+			if (bFilterCommentsLines && (op != OP_TRIVIAL))
 			{
 				op = PostFilter(
 					thisob->line0, QtyLinesLeft + 1,
@@ -813,10 +807,11 @@ bool CDiffWrapper::LoadWinMergeDiffsFromDiffUtilsScript(struct change *script, c
 				int line1 = thisob->line1;
 				int end0 = line0 + QtyLinesLeft;
 				int end1 = line1 + QtyLinesRight;
-				line0 += RegExpFilter(line0, end0, 0, false);
-				line1 += RegExpFilter(line1, end1, 1, false);
-				if (line0 > end0 && line1 > end1)
+				if (line0 + RegExpFilter(line0, end0, 0, false) > end0 &&
+					line1 + RegExpFilter(line1, end1, 1, false) > end1)
+				{
 					op = OP_TRIVIAL;
+				}
 			}
 			/*{
 				// Split into slices of trivial and non-trivial diff ranges

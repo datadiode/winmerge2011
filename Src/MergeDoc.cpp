@@ -401,8 +401,6 @@ int CChildFrame::Rescan2(bool &bIdentical)
 
 	// Set up DiffWrapper
 	m_diffWrapper.SetCreateDiffList(&m_diffList);
-	DIFFOPTIONS diffOptions;
-	m_diffWrapper.GetOptions(diffOptions);
 	
 	// Clear diff list
 	m_diffList.Clear();
@@ -445,7 +443,7 @@ int CChildFrame::Rescan2(bool &bIdentical)
 		if (!m_diffWrapper.FixLastDiffRange(
 				m_ptBuf[0]->GetLineCount(),
 				m_ptBuf[1]->GetLineCount(),
-				diffOptions.bIgnoreBlankLines))
+				m_diffWrapper.bIgnoreBlankLines))
 		{
 			nResult = RESCAN_FILE_ERR;
 		}
@@ -1965,11 +1963,8 @@ OPENRESULTS_TYPE CChildFrame::OpenDocs(
 		filelocRight.encoding.GetName().c_str());
 
 	// Check the EOL sensitivity option (do it before Rescan)
-	DIFFOPTIONS diffOptions;
-	m_diffWrapper.GetOptions(diffOptions);
-
 	if (m_ptBuf[0]->GetCRLFMode() != m_ptBuf[1]->GetCRLFMode() &&
-		!COptionsMgr::Get(OPT_ALLOW_MIXED_EOL) && !diffOptions.bIgnoreEol)
+		!COptionsMgr::Get(OPT_ALLOW_MIXED_EOL) && !m_diffWrapper.bIgnoreEol)
 	{
 		// Options and files not are not compatible :
 		// Sensitive to EOL on, allow mixing EOL off, and files have a different EOL style.
@@ -1977,8 +1972,7 @@ OPENRESULTS_TYPE CChildFrame::OpenDocs(
 		// Propose to turn off the option 'sensitive to EOL'
 		if (LanguageSelect.MsgBox(IDS_SUGGEST_IGNOREEOL, MB_YESNO | MB_ICONWARNING | MB_DONT_ASK_AGAIN | MB_IGNORE_IF_SILENCED) == IDYES)
 		{
-			diffOptions.bIgnoreEol = true;
-			m_diffWrapper.SetFromDiffOptions(diffOptions);
+			m_diffWrapper.bIgnoreEol = true;
 		}
 	}
 

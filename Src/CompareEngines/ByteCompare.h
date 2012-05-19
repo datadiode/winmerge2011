@@ -11,9 +11,6 @@
 
 #include "FileTextStats.h"
 
-class CompareOptions;
-class QuickCompareOptions;
-class IAbortable;
 struct FileLocation;
 struct file_data;
 
@@ -25,23 +22,19 @@ namespace CompareEngines
  * This compare method compares files in small blocks. Code assumes block size
  * is in range of 32-bit int-type.
  */
-class ByteCompare : public QuickCompareOptions
+class ByteCompare : public DIFFOPTIONS
 {
 public:
-	ByteCompare(const DIFFOPTIONS &);
-	~ByteCompare();
-
-	void SetAdditionalOptions(bool stopAfterFirstDiff);
-	void SetAbortable(const IAbortable *piAbortable);
+	ByteCompare(const CDiffContext *);
 	void SetFileData(int items, file_data *data);
 	unsigned CompareFiles(FileLocation *location);
-	void GetTextStats(int side, FileTextStats *stats);
+
+	FileTextStats m_textStats[2];
 
 private:
 	template<class CodePoint, int CodeShift>
 	unsigned CompareFiles(size_t x = 1, size_t j = 0);
-	const IAbortable *m_piAbortable;
-	FileTextStats m_textStats[2];
+	const CDiffContext *const m_pCtxt;
 	HANDLE m_osfhandle[2];
 };
 

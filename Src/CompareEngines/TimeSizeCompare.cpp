@@ -8,28 +8,16 @@
 
 #include "StdAfx.h"
 #include "DiffItem.h"
-#include "TimeSizeCompare.h"
 #include "DiffWrapper.h"
+#include "DiffContext.h"
+#include "TimeSizeCompare.h"
 
 namespace CompareEngines
 {
 
-TimeSizeCompare::TimeSizeCompare()
-		: m_ignoreSmallDiff(false)
+TimeSizeCompare::TimeSizeCompare(const CDiffContext *pCtxt)
+	: m_pCtxt(pCtxt)
 {
-}
-
-TimeSizeCompare::~TimeSizeCompare()
-{
-}
-
-/**
- * @brief Set compare-type specific options.
- * @param [in] ignoreSmallDiff Ignore small time differences?
- */
-void TimeSizeCompare::SetAdditionalOptions(bool ignoreSmallDiff)
-{
-	m_ignoreSmallDiff = ignoreSmallDiff;
 }
 
 /**
@@ -49,7 +37,7 @@ int TimeSizeCompare::CompareFiles(int compMethod, const DIFFITEM &di)
 		{
 			UINT64 lower = min(di.left.mtime.castTo<UINT64>(), di.right.mtime.castTo<UINT64>());
 			UINT64 upper = max(di.left.mtime.castTo<UINT64>(), di.right.mtime.castTo<UINT64>());
-			UINT64 tolerance = m_ignoreSmallDiff ? SmallTimeDiff * FileTime::TicksPerSecond : 0;
+			UINT64 tolerance = m_pCtxt->m_bIgnoreSmallTimeDiff ? SmallTimeDiff * FileTime::TicksPerSecond : 0;
 			if (upper - lower <= tolerance)
 				code = DIFFCODE::SAME;
 			else

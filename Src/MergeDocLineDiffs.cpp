@@ -127,9 +127,6 @@ void CChildFrame::Computelinediff(CCrystalTextView * pView1, CCrystalTextView * 
 		whichdiff = -2; // reset to not in cycle
 	}
 
-	DIFFOPTIONS diffOptions;
-	m_diffWrapper.GetOptions(diffOptions);
-
 	// We truncate diffs to remain inside line (ie, to not flag eol characters)
 	const int width1 = m_pView[0]->GetLineLength(line);
 	const int width2 = m_pView[1]->GetLineLength(line);
@@ -138,15 +135,15 @@ void CChildFrame::Computelinediff(CCrystalTextView * pView1, CCrystalTextView * 
 	String str2(m_pView[1]->GetLineChars(line), width2);
 
 	// Options that affect comparison
-	bool casitive = !diffOptions.bIgnoreCase;
-	int xwhite = diffOptions.nIgnoreWhitespace;
+	bool casitive = !m_diffWrapper.bIgnoreCase;
+	int xwhite = m_diffWrapper.nIgnoreWhitespace;
 
 	// Make the call to stringdiffs, which does all the hard & tedious computations
 	vector<wdiff> worddiffs;
 	bool breakType = GetBreakType();
 	sd_ComputeWordDiffs(str1, str2, casitive, xwhite, breakType, difflvl == BYTEDIFF, &worddiffs);
 	//Add a diff in case of EOL difference
-	if (!diffOptions.bIgnoreEol)
+	if (!m_diffWrapper.bIgnoreEol)
 	{
 		if (_tcscmp(pView1->GetTextBufferEol(line), pView2->GetTextBufferEol(line)))
 		{
@@ -245,23 +242,21 @@ void CChildFrame::GetWordDiffArray(int nLineIndex, vector<wdiff> *pworddiffs)
 	if (nLineIndex >= m_pView[1]->GetLineCount())
 		return;
 
-	DIFFOPTIONS diffOptions;
-	m_diffWrapper.GetOptions(diffOptions);
 	int i1 = m_pView[0]->GetLineLength(nLineIndex);
 	int i2 = m_pView[1]->GetLineLength(nLineIndex);
 	String str1(m_pView[0]->GetLineChars(nLineIndex), i1);
 	String str2(m_pView[1]->GetLineChars(nLineIndex), i2);
 
 	// Options that affect comparison
-	bool casitive = !diffOptions.bIgnoreCase;
-	int xwhite = diffOptions.nIgnoreWhitespace;
+	bool casitive = !m_diffWrapper.bIgnoreCase;
+	int xwhite = m_diffWrapper.nIgnoreWhitespace;
 	int breakType = GetBreakType(); // whitespace only or include punctuation
 	bool byteColoring = GetByteColoringOption();
 
 	// Make the call to stringdiffs, which does all the hard & tedious computations
 	sd_ComputeWordDiffs(str1, str2, casitive, xwhite, breakType, byteColoring, pworddiffs);
 	//Add a diff in case of EOL difference
-	if (!diffOptions.bIgnoreEol)
+	if (!m_diffWrapper.bIgnoreEol)
 	{
 		if (_tcscmp(m_pView[0]->GetTextBufferEol(nLineIndex), m_pView[1]->GetTextBufferEol(nLineIndex)))
 		{

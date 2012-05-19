@@ -40,6 +40,7 @@ static bool LoadYesNoFromConfig(CfgSettings * cfgSettings, LPCTSTR name, bool * 
 
 CConfigLog::CConfigLog()
 : m_pCfgSettings(NULL)
+, m_diffOptions(NULL)
 , m_pfile(new UniStdioFile())
 {
 }

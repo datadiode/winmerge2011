@@ -21,8 +21,18 @@
 #include "FolderCmp.h"
 #include "codepage_detect.h"
 #include "TimeSizeCompare.h"
+#include "codepage.h"
 
-static void GetComparePaths(CDiffContext * pCtxt, const DIFFITEM &di, String & left, String & right);
+/**
+ * @brief Copy text stat results from diffutils back into the FileTextStats structure
+ */
+static void CopyTextStats(const file_data * inf, FileTextStats * myTextStats)
+{
+	myTextStats->ncrlfs = inf->count_crlfs;
+	myTextStats->ncrs = inf->count_crs;
+	myTextStats->nlfs = inf->count_lfs;
+	myTextStats->nzeros = inf->count_zeros;
+}
 
 FolderCmp::FolderCmp(CDiffContext *pCtxt)
 : m_pDiffUtilsEngine(NULL)
@@ -74,7 +84,7 @@ UINT FolderCmp::prepAndCompareTwoFiles(DIFFITEM &di)
 	{
 		String origFileName1;
 		String origFileName2;
-		GetComparePaths(m_pCtx, di, origFileName1, origFileName2);
+		GetComparePaths(di, origFileName1, origFileName2);
 		// store true names for diff utils patch file
 		m_diffFileData.SetDisplayFilepaths(origFileName1.c_str(), origFileName2.c_str());
 	
@@ -105,7 +115,7 @@ UINT FolderCmp::prepAndCompareTwoFiles(DIFFITEM &di)
 	if (nCompMethod == CMP_CONTENT)
 	{
 		if (m_pDiffUtilsEngine == NULL)
-			m_pDiffUtilsEngine = new CompareEngines::DiffUtils(m_pCtx->m_options);
+			m_pDiffUtilsEngine = new CompareEngines::DiffUtils(m_pCtx);
 
 		m_pDiffUtilsEngine->SetCodepage(
 			m_diffFileData.m_FileLocation[0].encoding.m_unicoding ? 
@@ -113,11 +123,12 @@ UINT FolderCmp::prepAndCompareTwoFiles(DIFFITEM &di)
 		m_pDiffUtilsEngine->SetCompareFiles(
 			m_diffFileData.m_FileLocation[0].filepath,
 			m_diffFileData.m_FileLocation[1].filepath);
-		m_pDiffUtilsEngine->SetFileData(2, m_diffFileData.m_inf);
-		code = m_pDiffUtilsEngine->diffutils_compare_files();
-		m_pDiffUtilsEngine->GetDiffCounts(m_ndiffs, m_ntrivialdiffs);
-		m_pDiffUtilsEngine->GetTextStats(0, &m_diffFileData.m_textStats[0]);
-		m_pDiffUtilsEngine->GetTextStats(1, &m_diffFileData.m_textStats[1]);
+		m_pDiffUtilsEngine->SetToDiffUtils();
+		code = m_pDiffUtilsEngine->diffutils_compare_files(m_diffFileData.m_inf);
+		m_ndiffs = m_pDiffUtilsEngine->m_ndiffs;
+		m_ntrivialdiffs = m_pDiffUtilsEngine->m_ntrivialdiffs;
+		CopyTextStats(&m_diffFileData.m_inf[0], &m_diffFileData.m_textStats[0]);
+		CopyTextStats(&m_diffFileData.m_inf[1], &m_diffFileData.m_textStats[1]);
 
 		// If unique item, it was being compared to itself to determine encoding
 		// and the #diffs is invalid
@@ -132,11 +143,7 @@ UINT FolderCmp::prepAndCompareTwoFiles(DIFFITEM &di)
 	else if (nCompMethod == CMP_QUICK_CONTENT)
 	{
 		if (m_pByteCompare == NULL)
-		{
-			m_pByteCompare = new CompareEngines::ByteCompare(m_pCtx->m_options);
-			m_pByteCompare->SetAdditionalOptions(m_pCtx->m_bStopAfterFirstDiff);
-			m_pByteCompare->SetAbortable(m_pCtx->GetAbortable());
-		}
+			m_pByteCompare = new CompareEngines::ByteCompare(m_pCtx);
 
 		m_pByteCompare->SetFileData(2, m_diffFileData.m_inf);
 
@@ -144,9 +151,9 @@ UINT FolderCmp::prepAndCompareTwoFiles(DIFFITEM &di)
 		code = m_pByteCompare->CompareFiles(&m_diffFileData.m_FileLocation.front());
 
 		if (!di.diffcode.isSideRightOnly())
-			m_pByteCompare->GetTextStats(0, &m_diffFileData.m_textStats[0]);
+			m_diffFileData.m_textStats[0] = m_pByteCompare->m_textStats[0];
 		if (!di.diffcode.isSideLeftOnly())
-			m_pByteCompare->GetTextStats(1, &m_diffFileData.m_textStats[1]);
+			m_diffFileData.m_textStats[1] = m_pByteCompare->m_textStats[1];
 
 		// Quick contents doesn't know about diff counts
 		// Set to special value to indicate invalid
@@ -158,12 +165,9 @@ UINT FolderCmp::prepAndCompareTwoFiles(DIFFITEM &di)
 	else if (nCompMethod == CMP_DATE || nCompMethod == CMP_DATE_SIZE || nCompMethod == CMP_SIZE)
 	{
 		if (m_pTimeSizeCompare == NULL)
-		{
-			m_pTimeSizeCompare = new CompareEngines::TimeSizeCompare();
-			m_pTimeSizeCompare->SetAdditionalOptions(m_pCtx->m_bIgnoreSmallTimeDiff);
-		}
-		code = m_pTimeSizeCompare->CompareFiles(nCompMethod, di);
+			m_pTimeSizeCompare = new CompareEngines::TimeSizeCompare(m_pCtx);
 
+		code = m_pTimeSizeCompare->CompareFiles(nCompMethod, di);
 	}
 	else
 	{
@@ -191,18 +195,17 @@ UINT FolderCmp::prepAndCompareTwoFiles(DIFFITEM &di)
 
 /**
  * @brief Get actual compared paths from DIFFITEM.
- * @param [in] pCtx Pointer to compare context.
  * @param [in] di DiffItem from which the paths are created.
  * @param [out] left Gets the left compare path.
  * @param [out] right Gets the right compare path.
  * @note If item is unique, same path is returned for both.
  */
-void GetComparePaths(CDiffContext * pCtxt, const DIFFITEM &di, String & left, String & right)
+void FolderCmp::GetComparePaths(const DIFFITEM &di, String &left, String &right) const
 {
 	if (!di.diffcode.isSideRightOnly())
 	{
 		// Compare file to itself to detect encoding
-		left = pCtxt->GetLeftPath();
+		left = m_pCtx->GetLeftPath();
 		if (!di.left.path.empty())
 			left = paths_ConcatPath(left, di.left.path);
 		left = paths_ConcatPath(left, di.left.filename);
@@ -212,7 +215,7 @@ void GetComparePaths(CDiffContext * pCtxt, const DIFFITEM &di, String & left, St
 	if (!di.diffcode.isSideLeftOnly())
 	{
 		// Compare file to itself to detect encoding
-		right = pCtxt->GetRightPath();
+		right = m_pCtx->GetRightPath();
 		if (!di.right.path.empty())
 			right = paths_ConcatPath(right, di.right.path);
 		right = paths_ConcatPath(right, di.right.filename);
