@@ -1416,7 +1416,10 @@ LRESULT CDirView::ReflectKeydown(NMLVKEYDOWN *pParam)
 		return 1;
 	case VK_BACK:
 		if (m_nSpecialItems > 0 && GetItemKey(0) == SPECIAL_ITEM_POS)
+		{
+			WaitStatusCursor waitstatus(IDS_STATUS_OPENING_SELECTION);
 			OpenParentDirectory();
+		}
 		return 1;
 	case VK_RETURN:
 		DoDefaultAction(GetFocusedItem());
