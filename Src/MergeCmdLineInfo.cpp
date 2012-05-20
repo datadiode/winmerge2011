@@ -294,6 +294,11 @@ void MergeCmdLineInfo::ParseWinMergeCmdLine(LPCTSTR q)
 			// -f "mask" - file filter mask ("*.h *.cpp")
 			q = EatParam(q, m_sFileFilter);
 		}
+		else if (param == _T("t"))
+		{
+			// -t "type" - builtin type specifier or file transform moniker
+			q = EatParam(q, m_sContentType);
+		}
 		else if (param == _T("r"))
 		{
 			// -r to compare recursively

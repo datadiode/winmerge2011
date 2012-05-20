@@ -178,9 +178,6 @@ CSettingStore SettingStore(_T("Thingamahoochie"), _T("WinMerge"));
 
 CLanguageSelect LanguageSelect;
 
-/** @brief Location for command line help to open. */
-static const TCHAR CommandLineHelpLocation[] = _T("::/htmlhelp/Command_line.html");
-
 /////////////////////////////////////////////////////////////////////////////
 // CMergeApp
 
@@ -224,7 +221,7 @@ CMergeApp theApp;
  * @todo We could handle these failure situations more gratefully, i.e. show
  *  at least some error message to the user..
  */
-BOOL CMergeApp::InitInstance()
+bool CMergeApp::InitInstance()
 {
 #ifndef SetDllDirectory
 #error #define WINVER 0x0502 to include the definition of SetDllDirectory
@@ -271,7 +268,7 @@ BOOL CMergeApp::InitInstance()
 	if (hMutex)
 		WaitForSingleObject(hMutex, INFINITE);
 
-	BOOL bContinue = TRUE;
+	bool bContinue = false;
 	try
 	{
 		// Drag and Drop functionality needs OleInitialize.
@@ -295,11 +292,6 @@ BOOL CMergeApp::InitInstance()
 
 		// Parse command-line arguments.
 		MergeCmdLineInfo cmdInfo = GetCommandLine();
-
-		// If paths were given to commandline we consider this being an invoke from
-		// commandline (from other application, shellextension etc).
-		BOOL bCommandLineInvoke = cmdInfo.m_Files.size() > 0;
-
 		// If cmdInfo.m_bClearCaseTool coincides with cmdInfo.m_bEscShutdown,
 		// then ClearCase waits for the process to produce an output file and
 		// terminate, in which case single instance logic is not applicable.
@@ -348,23 +340,15 @@ BOOL CMergeApp::InitInstance()
 		if (pWndMainFrame == NULL)
 			OException::Throw(GetLastError());
 
-		CMainFrame *const pMainFrame = new CMainFrame(pWndMainFrame);
-		// The main window has been initialized, so activate and update it.
-		pMainFrame->InitialActivate(cmdInfo.m_nCmdShow);
-		pMainFrame->UpdateWindow();
-		// Since this function actually opens paths for compare it must be
-		// called after initializing CMainFrame!
-		if (!ParseArgsAndDoOpen(cmdInfo, pMainFrame) && bCommandLineInvoke || m_bNonInteractive)
-		{
-			bContinue = FALSE;
-			pMainFrame->PostMessage(WM_CLOSE);
-		}
+		// subclass the window
+		new CMainFrame(pWndMainFrame, cmdInfo);
+
+		bContinue = true;
 	}
 	catch (OException *e)
 	{
 		e->ReportError(NULL);
 		delete e;
-		bContinue = FALSE;
 	}
 
 	if (hMutex)
@@ -465,82 +449,6 @@ void CMergeApp::InitializeSupplements()
 	globalFileFilter.LoadAllFileFilters();
 }
 
-/** @brief Read command line arguments and open files for comparison.
- *
- * The name of the function is a legacy code from the time that this function
- * actually parsed the command line. Today the parsing is done using the
- * MergeCmdLineInfo class.
- * @param [in] cmdInfo Commandline parameters info.
- * @param [in] pMainFrame Pointer to application main frame.
- * @return TRUE if we opened the compare, FALSE if the compare was canceled.
- */
-BOOL CMergeApp::ParseArgsAndDoOpen(MergeCmdLineInfo& cmdInfo, CMainFrame* pMainFrame)
-{
-	BOOL bCompared = FALSE;
-	m_bNonInteractive = cmdInfo.m_bNonInteractive;
-
-	// Set the global file filter.
-	if (!cmdInfo.m_sFileFilter.empty())
-		globalFileFilter.SetFilter(cmdInfo.m_sFileFilter.c_str());
-
-	// Set codepage.
-	if (cmdInfo.m_nCodepage)
-		updateDefaultCodepage(2, cmdInfo.m_nCodepage);
-
-	// Unless the user has requested to see WinMerge's usage open files for
-	// comparison.
-	if (cmdInfo.m_bShowUsage)
-	{
-		pMainFrame->ShowHelp(CommandLineHelpLocation);
-	}
-	else
-	{
-		// Set the required information we need from the command line:
-
-		pMainFrame->m_bClearCaseTool = cmdInfo.m_bClearCaseTool;
-		pMainFrame->m_bExitIfNoDiff = cmdInfo.m_bExitIfNoDiff;
-		pMainFrame->m_bEscShutdown = cmdInfo.m_bEscShutdown;
-
-		pMainFrame->m_strSaveAsPath = _T("");
-
-		FileLocation filelocLeft, filelocRight;
-		filelocLeft.description = cmdInfo.m_sLeftDesc;
-		filelocRight.description = cmdInfo.m_sRightDesc;
-
-		if (cmdInfo.m_Files.size() == 0) // if there are no input args, we can check the display file dialog flag
-		{
-			if (COptionsMgr::Get(OPT_SHOW_SELECT_FILES_AT_STARTUP))
-				pMainFrame->DoFileOpen(filelocLeft, filelocRight);
-		}
-		else
-		{
-			filelocLeft.filepath = cmdInfo.m_Files[0];
-			if (cmdInfo.m_Files.size() > 1)
-			{
-				if (cmdInfo.m_Files.size() > 2)
-					pMainFrame->m_strSaveAsPath = cmdInfo.m_Files[2].c_str();
-				filelocRight.filepath = cmdInfo.m_Files[1];
-				bCompared = pMainFrame->DoFileOpen(filelocLeft, filelocRight,
-					cmdInfo.m_dwLeftFlags, cmdInfo.m_dwRightFlags, cmdInfo.m_nRecursive);
-			}
-			else if (ProjectFile::IsProjectFile(filelocLeft.filepath.c_str()))
-			{
-				bCompared = pMainFrame->LoadAndOpenProjectFile(filelocLeft.filepath.c_str());
-			}
-			else if (IsConflictFile(filelocLeft.filepath.c_str()))
-			{
-				bCompared = pMainFrame->DoOpenConflict(filelocLeft.filepath.c_str());
-			}
-			else
-			{
-				bCompared = pMainFrame->DoFileOpen(filelocLeft, filelocRight,
-					cmdInfo.m_dwLeftFlags, cmdInfo.m_dwRightFlags, cmdInfo.m_nRecursive);
-			}
-		}
-	}
-	return bCompared;
-}
-
 /**
  * @brief Get default editor path.
  * @return full path to the editor program executable.
@@ -558,7 +466,7 @@ String CMergeApp::GetDefaultSupplementFolder()
 	return paths_ConcatPath(env_GetMyDocuments(), WinMergeDocumentsFolder);
 }
 
-BOOL CMergeApp::PreTranslateMessage(MSG* pMsg)
+bool CMergeApp::PreTranslateMessage(MSG *pMsg)
 {
 	if (pMsg->message == WM_KEYDOWN)
 	{
@@ -568,7 +476,7 @@ BOOL CMergeApp::PreTranslateMessage(MSG* pMsg)
 			{
 				if (::IsDialogMessage(hwndActive, pMsg))
 				{
-					return TRUE;
+					return true;
 				}
 			}
 		}

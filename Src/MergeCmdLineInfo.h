@@ -69,6 +69,7 @@ public:
 	String m_sRightDesc; /**< Right side file's description. */
 
 	String m_sFileFilter; /**< File filter mask. */
+	String m_sContentType; /**< Content type. */
 
 	stl::vector<String> m_Files; /**< Files (or directories) to compare. */
 

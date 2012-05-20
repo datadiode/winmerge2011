@@ -69,7 +69,6 @@
 #include "MergeCmdLineInfo.h"
 #include "FileOrFolderSelect.h"
 #include "stringdiffs.h"
-#include "MergeCmdLineInfo.h"
 #include "OpenDlg.h"
 #include <MyCom.h>
 #include <mlang.h>
@@ -151,6 +150,9 @@ static const UINT FILES_MRU_CAPACITY = 8;
 /** @brief Backup file extension. */
 static const TCHAR BACKUP_FILE_EXT[] = _T("bak");
 
+/** @brief Location for command line help to open. */
+static const TCHAR CommandLineHelpLocation[] = _T("::/htmlhelp/Command_line.html");
+
 static int GetMenuBitmapExcessWidth()
 {
 	int cxExcess = 16 - GetSystemMetrics(SM_CXMENUCHECK);
@@ -164,7 +166,7 @@ static int GetMenuBitmapExcessWidth()
  * @brief MainFrame constructor. Loads settings from registry.
  * @todo Preference for logging?
  */
-CMainFrame::CMainFrame(HWindow *pWnd)
+CMainFrame::CMainFrame(HWindow *pWnd, const MergeCmdLineInfo &cmdInfo)
 : m_pWndMDIClient(NULL)
 , m_hMenuDefault(NULL)
 , m_hAccelTable(NULL)
@@ -228,6 +230,14 @@ CMainFrame::CMainFrame(HWindow *pWnd)
 	::SetMenu(m_hWnd, m_hMenuDefault);
 
 	m_pWndMDIClient = (new CSplashWnd(m_pWnd))->m_pWnd;
+
+	// The main window has been initialized, so activate and update it.
+	InitialActivate(cmdInfo.m_nCmdShow);
+	UpdateWindow();
+	// Since this function actually opens paths for compare it must be
+	// called after initializing CMainFrame!
+	if (!ParseArgsAndDoOpen(cmdInfo))
+		PostMessage(WM_CLOSE);
 
 	m_bAutoDelete = true;
 }
@@ -1359,16 +1369,48 @@ void CMainFrame::OnOptions()
 
 /**
  * @brief Begin a diff: open dirdoc if it is directories, else open a mergedoc for editing.
- * @param [in] pszLeft Left-side path.
- * @param [in] pszRight Right-side path.
+ * @param [in] filelocLeft Left-side location.
+ * @param [in] filelocRight Right-side location.
  * @param [in] dwLeftFlags Left-side flags.
  * @param [in] dwRightFlags Right-side flags.
  * @param [in] nRecursive Do we run recursive (folder) compare?
  * @param [in] pDirDoc Dir compare document to use.
- * @return TRUE if opening files and compare succeeded, FALSE otherwise.
+ * @return true if opening files and compare succeeded, false otherwise.
  */
-bool CMainFrame::DoFileOpen(FileLocation &filelocLeft, FileLocation &filelocRight,
-	DWORD dwLeftFlags, DWORD dwRightFlags, int nRecursive, CDirFrame *pDirDoc)
+bool CMainFrame::DoFileOpen(
+	FileLocation &filelocLeft,
+	FileLocation &filelocRight,
+	DWORD dwLeftFlags,
+	DWORD dwRightFlags,
+	int nRecursive,
+	CDirFrame *pDirDoc)
+{
+	PackingInfo packingInfo;
+	return DoFileOpen(packingInfo, ID_MERGE_COMPARE,
+		filelocLeft, filelocRight, dwLeftFlags, dwRightFlags, nRecursive, pDirDoc);
+}
+
+/**
+ * @brief Begin a diff: open dirdoc if it is directories, else open a mergedoc for editing.
+ * @param [in] packingInfo Specifies file transform.
+ * @param [in] idCompareAs Indicates content type.
+ * @param [in] filelocLeft Left-side location.
+ * @param [in] filelocRight Right-side location.
+ * @param [in] dwLeftFlags Left-side flags.
+ * @param [in] dwRightFlags Right-side flags.
+ * @param [in] nRecursive Do we run recursive (folder) compare?
+ * @param [in] pDirDoc Dir compare document to use.
+ * @return true if opening files and compare succeeded, false otherwise.
+ */
+bool CMainFrame::DoFileOpen(
+	PackingInfo &packingInfo,
+	UINT idCompareAs,
+	FileLocation &filelocLeft,
+	FileLocation &filelocRight,
+	DWORD dwLeftFlags,
+	DWORD dwRightFlags,
+	int nRecursive,
+	CDirFrame *pDirDoc)
 {
 	// If the dirdoc we are supposed to use is busy doing a diff, bail out
 	if (IsComparing())
@@ -1377,13 +1419,9 @@ bool CMainFrame::DoFileOpen(FileLocation &filelocLeft, FileLocation &filelocRigh
 	BOOL bROLeft = (dwLeftFlags & FFILEOPEN_READONLY) != 0;
 	BOOL bRORight = (dwRightFlags & FFILEOPEN_READONLY) != 0;
 
-	UINT idCompareAs = 0;
-	PackingInfo packingInfo;
-
 	// pop up dialog unless arguments exist (and are compatible)
-	PATH_EXISTENCE pathsType = DOES_NOT_EXIST;
-	const DWORD attrLeft = GetFileAttributes(filelocLeft.filepath.c_str());
-	const DWORD attrRight = GetFileAttributes(filelocRight.filepath.c_str());
+	DWORD attrLeft = GetFileAttributes(filelocLeft.filepath.c_str());
+	DWORD attrRight = GetFileAttributes(filelocRight.filepath.c_str());
 	if (attrLeft == INVALID_FILE_ATTRIBUTES || attrRight == INVALID_FILE_ATTRIBUTES)
 	{
 		COpenDlg dlg;
@@ -1405,43 +1443,42 @@ bool CMainFrame::DoFileOpen(FileLocation &filelocLeft, FileLocation &filelocRigh
 		bROLeft = dlg.m_bLeftPathReadOnly;
 		bRORight = dlg.m_bRightPathReadOnly;
 		idCompareAs = dlg.m_idCompareAs;
-		// TODO: add codepage options to open dialog ?
-		if (idCompareAs != 0)
-		{
-			dwLeftFlags &= ~FFILEOPEN_DETECT;
-			dwRightFlags &= ~FFILEOPEN_DETECT;
-			if (idCompareAs >= IDC_SCRIPT_FIRST && idCompareAs <= IDC_SCRIPT_LAST)
-				packingInfo.SetPlugin(dlg.m_szCompareAs);
-			pathsType = IS_EXISTING_FILE;
-		}
-		else
-		{
-			pathsType = GetPairComparability(
-				filelocLeft.filepath.c_str(), filelocRight.filepath.c_str());
-		}
+		attrLeft = dlg.m_attrLeft;
+		attrRight = dlg.m_attrRight;
+		// TODO: add codepage options to open dialog?
+		if (idCompareAs >= IDC_SCRIPT_FIRST && idCompareAs <= IDC_SCRIPT_LAST)
+			packingInfo.SetPlugin(dlg.m_szCompareAs);
+		// Skip MRU logic since OpenDlg has done it already
+		dwLeftFlags |= FFILEOPEN_NOMRU;
+		dwRightFlags |= FFILEOPEN_NOMRU;
 	}
-	else
+
+	// For directories, add trailing '\' if missing, and skip detection logic
+	if (attrLeft & FILE_ATTRIBUTE_DIRECTORY)
 	{
-		// Add trailing '\' for directories if its missing
-		if (attrLeft & FILE_ATTRIBUTE_DIRECTORY)
-		{
-			if (!paths_EndsWithSlash(filelocLeft.filepath.c_str()))
-				filelocLeft.filepath += '\\';
-			dwLeftFlags &= ~FFILEOPEN_DETECT;
-		}
-		if (attrRight & FILE_ATTRIBUTE_DIRECTORY)
-		{
-			if (!paths_EndsWithSlash(filelocRight.filepath.c_str()))
-				filelocRight.filepath += '\\';
-			dwRightFlags &= ~FFILEOPEN_DETECT;
-		}
-		pathsType = attrLeft & attrRight & FILE_ATTRIBUTE_DIRECTORY ? IS_EXISTING_DIR : IS_EXISTING_FILE;
-		//save the MRU left and right files.
-		if (!(dwLeftFlags & FFILEOPEN_NOMRU))
-			addToMru(filelocLeft.filepath.c_str(), _T("Files\\Left"));
-		if (!(dwRightFlags & FFILEOPEN_NOMRU))
-			addToMru(filelocRight.filepath.c_str(), _T("Files\\Right"));
+		if (!paths_EndsWithSlash(filelocLeft.filepath.c_str()))
+			filelocLeft.filepath += '\\';
+		dwLeftFlags &= ~FFILEOPEN_DETECT;
 	}
+	if (attrRight & FILE_ATTRIBUTE_DIRECTORY)
+	{
+		if (!paths_EndsWithSlash(filelocRight.filepath.c_str()))
+			filelocRight.filepath += '\\';
+		dwRightFlags &= ~FFILEOPEN_DETECT;
+	}
+
+	// If content type was specified, skip detection logic
+	if (idCompareAs != ID_MERGE_COMPARE)
+	{
+		dwLeftFlags &= ~FFILEOPEN_DETECT;
+		dwRightFlags &= ~FFILEOPEN_DETECT;
+	}
+
+	// Save the MRU left and right files
+	if (!(dwLeftFlags & FFILEOPEN_NOMRU))
+		addToMru(filelocLeft.filepath.c_str(), _T("Files\\Left"));
+	if (!(dwRightFlags & FFILEOPEN_NOMRU))
+		addToMru(filelocRight.filepath.c_str(), _T("Files\\Right"));
 
 	if (1)
 	{
@@ -1456,13 +1493,12 @@ bool CMainFrame::DoFileOpen(FileLocation &filelocLeft, FileLocation &filelocRigh
 			nRecursive);
 	}
 
+	const DWORD fDirectory = attrLeft & attrRight & FILE_ATTRIBUTE_DIRECTORY;
 	CTempPathContext *pTempPathContext = NULL;
-	if (pathsType == IS_EXISTING_FILE)
+	if (fDirectory == 0)
 	{
 		switch (idCompareAs)
 		{
-		case 0:
-			// User is inspecific about how to open files
 		case ID_MERGE_COMPARE_TEXT:
 			break;
 		case ID_MERGE_COMPARE_XML:
@@ -1472,19 +1508,9 @@ bool CMainFrame::DoFileOpen(FileLocation &filelocLeft, FileLocation &filelocRigh
 			dwLeftFlags |= FFILEOPEN_DETECTZIP;
 			dwRightFlags |= FFILEOPEN_DETECTZIP;
 			break;
-		case ID_MERGE_COMPARE_ZIP_LEFT:
-			dwLeftFlags |= FFILEOPEN_DETECTZIP;
-			break;
-		case ID_MERGE_COMPARE_ZIP_RIGHT:
-			dwRightFlags |= FFILEOPEN_DETECTZIP;
-			break;
 		case ID_MERGE_COMPARE_HEX:
 			// Open files in binary editor
 			ShowHexMergeDoc(pDirDoc, filelocLeft, filelocRight, bROLeft, bRORight);
-			return true;
-		default:
-			// Open files with specified file transform method
-			ShowMergeDoc(pDirDoc, filelocLeft, filelocRight, dwLeftFlags, dwRightFlags, &packingInfo);
 			return true;
 		}
 		try
@@ -1498,7 +1524,6 @@ bool CMainFrame::DoFileOpen(FileLocation &filelocLeft, FileLocation &filelocRigh
 					String path = GetClearTempPath(pTempPathContext, _T("0"));
 					pTempPathContext->m_strLeftDisplayRoot = filelocLeft.filepath;
 					pTempPathContext->m_strRightDisplayRoot = filelocRight.filepath;
-					pathsType = IS_EXISTING_DIR;
 					if (filelocLeft.filepath == filelocRight.filepath)
 					{
 						filelocRight.filepath.clear();
@@ -1566,7 +1591,6 @@ bool CMainFrame::DoFileOpen(FileLocation &filelocLeft, FileLocation &filelocRigh
 					String path = GetClearTempPath(pTempPathContext, _T("0"));
 					pTempPathContext->m_strLeftDisplayRoot = filelocLeft.filepath;
 					pTempPathContext->m_strRightDisplayRoot = filelocRight.filepath;
-					pathsType = IS_EXISTING_DIR;
 					do
 					{
 						if FAILED(piHandler->DeCompressArchive(m_hWnd, filelocLeft.filepath.c_str(), path.c_str()))
@@ -1593,7 +1617,6 @@ bool CMainFrame::DoFileOpen(FileLocation &filelocLeft, FileLocation &filelocRigh
 					String path = GetClearTempPath(pTempPathContext, _T("1"));
 					pTempPathContext->m_strLeftDisplayRoot = filelocLeft.filepath;
 					pTempPathContext->m_strRightDisplayRoot = filelocRight.filepath;
-					pathsType = IS_EXISTING_DIR;
 					do
 					{
 						if FAILED(piHandler->DeCompressArchive(m_hWnd, filelocRight.filepath.c_str(), path.c_str()))
@@ -1627,7 +1650,7 @@ bool CMainFrame::DoFileOpen(FileLocation &filelocLeft, FileLocation &filelocRigh
 	// Determine if we want new a dirview open now that we know if it was
 	// and archive. Don't open new dirview if we are comparing files.
 	// open the diff
-	if (pathsType == IS_EXISTING_DIR)
+	if ((fDirectory != 0) || (pTempPathContext != NULL))
 	{
 		// TODO: Is there a good point in closing merge docs in this place?
 		if (pDirDoc && !pDirDoc->CloseMergeDocs())
@@ -1659,7 +1682,7 @@ bool CMainFrame::DoFileOpen(FileLocation &filelocLeft, FileLocation &filelocRigh
 		}
 		LogFile.Write(CLogFile::LNOTICE, _T("Open files: Left: %s\n\tRight: %s."),
 			filelocLeft.filepath.c_str(), filelocRight.filepath.c_str());
-		ShowMergeDoc(pDirDoc, filelocLeft, filelocRight, dwLeftFlags, dwRightFlags);
+		ShowMergeDoc(pDirDoc, filelocLeft, filelocRight, dwLeftFlags, dwRightFlags, &packingInfo);
 	}
 	return true;
 }
@@ -2312,48 +2335,43 @@ void CMainFrame::OnToolsGeneratePatch()
 		CDirView *pView = pDoc->m_pDirView;
 
 		// Get selected items from folder compare
-		BOOL bValidFiles = TRUE;
-		int ind = pView->GetFirstSelectedInd();
-		while (ind != -1 && bValidFiles)
+		int ind = -1;
+		while ((ind = pView->GetNextItem(ind, LVNI_SELECTED)) != -1)
 		{
 			const DIFFITEM &item = pView->GetDiffItem(ind);
 			if (item.diffcode.isBin())
 			{
-				LanguageSelect.MsgBox(IDS_CANNOT_CREATE_BINARYPATCH, MB_ICONWARNING |
-					MB_DONT_DISPLAY_AGAIN);
-				bValidFiles = FALSE;
+				LanguageSelect.MsgBox(IDS_CANNOT_CREATE_BINARYPATCH,
+					MB_ICONWARNING | MB_DONT_DISPLAY_AGAIN);
+				break;
 			}
-			else if (item.diffcode.isDirectory())
+			if (item.diffcode.isDirectory())
 			{
-				LanguageSelect.MsgBox(IDS_CANNOT_CREATE_DIRPATCH, MB_ICONWARNING |
-					MB_DONT_DISPLAY_AGAIN);
-				bValidFiles = FALSE;
+				LanguageSelect.MsgBox(IDS_CANNOT_CREATE_DIRPATCH,
+					MB_ICONWARNING | MB_DONT_DISPLAY_AGAIN);
+				break;
 			}
 
-			if (bValidFiles)
-			{
-				// Format full paths to files (leftFile/rightFile)
-				String leftFile = item.GetLeftFilepath(pDoc->GetLeftBasePath());
-				if (!leftFile.empty())
-					leftFile = paths_ConcatPath(leftFile, item.left.filename);
-				String rightFile = item.GetRightFilepath(pDoc->GetRightBasePath());
-				if (!rightFile.empty())
-					rightFile = paths_ConcatPath(rightFile, item.right.filename);
+			// Format full paths to files (leftFile/rightFile)
+			String leftFile = item.GetLeftFilepath(pDoc->GetLeftBasePath());
+			if (!leftFile.empty())
+				leftFile = paths_ConcatPath(leftFile, item.left.filename);
+			String rightFile = item.GetRightFilepath(pDoc->GetRightBasePath());
+			if (!rightFile.empty())
+				rightFile = paths_ConcatPath(rightFile, item.right.filename);
 
-				// Format relative paths to files in folder compare
-				String leftpatch = item.left.path;
-				if (!leftpatch.empty())
-					leftpatch += _T('/');
-				leftpatch += item.left.filename;
-				String rightpatch = item.right.path;
-				if (!rightpatch.empty())
-					rightpatch += _T('/');
-				rightpatch += item.right.filename;
-				patcher.AddFiles(
-					leftFile.c_str(), leftpatch.c_str(),
-					rightFile.c_str(), rightpatch.c_str());
-				pView->GetNextSelectedInd(ind);
-			}
+			// Format relative paths to files in folder compare
+			String leftpatch = item.left.path;
+			if (!leftpatch.empty())
+				leftpatch += _T('/');
+			leftpatch += item.left.filename;
+			String rightpatch = item.right.path;
+			if (!rightpatch.empty())
+				rightpatch += _T('/');
+			rightpatch += item.right.filename;
+			patcher.AddFiles(
+				leftFile.c_str(), leftpatch.c_str(),
+				rightFile.c_str(), rightpatch.c_str());
 		}
 	}
 	if (patcher.CreatePatch() && patcher.GetOpenToEditor())
@@ -2942,9 +2960,106 @@ LRESULT CMainFrame::OnWndMsg<WM_COPYDATA>(WPARAM, LPARAM lParam)
 	// Allow calling thread to resume
 	ReplyMessage(TRUE);
 	// Process command line
-	MergeCmdLineInfo cmdInfo = pchData;
-	theApp.ParseArgsAndDoOpen(cmdInfo, this);
+	ParseArgsAndDoOpen(pchData);
 	return TRUE;
+}
+
+/** @brief Read command line arguments and open files for comparison.
+ *
+ * The name of the function is a legacy code from the time that this function
+ * actually parsed the command line. Today the parsing is done using the
+ * MergeCmdLineInfo class.
+ * @param [in] cmdInfo Commandline parameters info.
+ * @param [in] pMainFrame Pointer to application main frame.
+ * @return TRUE if we opened the compare, FALSE if the compare was canceled.
+ */
+bool CMainFrame::ParseArgsAndDoOpen(const MergeCmdLineInfo &cmdInfo)
+{
+	bool bCompared = true;
+	theApp.m_bNonInteractive = cmdInfo.m_bNonInteractive;
+
+	// Set the global file filter.
+	if (!cmdInfo.m_sFileFilter.empty())
+		globalFileFilter.SetFilter(cmdInfo.m_sFileFilter.c_str());
+
+	// Set codepage.
+	if (cmdInfo.m_nCodepage)
+		updateDefaultCodepage(2, cmdInfo.m_nCodepage);
+
+	// Unless the user has requested to see WinMerge's usage open files for
+	// comparison.
+	if (cmdInfo.m_bShowUsage)
+	{
+		ShowHelp(CommandLineHelpLocation);
+	}
+	else
+	{
+		// Set the required information we need from the command line:
+
+		m_bClearCaseTool = cmdInfo.m_bClearCaseTool;
+		m_bExitIfNoDiff = cmdInfo.m_bExitIfNoDiff;
+		m_bEscShutdown = cmdInfo.m_bEscShutdown;
+
+		m_strSaveAsPath.clear();
+
+		FileLocation filelocLeft, filelocRight;
+		filelocLeft.description = cmdInfo.m_sLeftDesc;
+		filelocRight.description = cmdInfo.m_sRightDesc;
+
+		if (cmdInfo.m_Files.size() == 0) // if there are no input args, we can check the display file dialog flag
+		{
+			if (COptionsMgr::Get(OPT_SHOW_SELECT_FILES_AT_STARTUP))
+				DoFileOpen(filelocLeft, filelocRight);
+		}
+		else
+		{
+			filelocLeft.filepath = cmdInfo.m_Files[0];
+			if (cmdInfo.m_Files.size() > 1)
+			{
+				if (cmdInfo.m_Files.size() > 2)
+					m_strSaveAsPath = cmdInfo.m_Files[2].c_str();
+				filelocRight.filepath = cmdInfo.m_Files[1];
+
+				// If content type was specified, set up things accordingly.
+				UINT idCompareAs = 0;
+				PackingInfo packingInfo;
+				if (cmdInfo.m_sContentType == _T("text"))
+					idCompareAs = ID_MERGE_COMPARE_TEXT;
+				else if (cmdInfo.m_sContentType == _T("binary"))
+					idCompareAs = ID_MERGE_COMPARE_HEX;
+				else if (cmdInfo.m_sContentType == _T("archive"))
+					idCompareAs = ID_MERGE_COMPARE_ZIP;
+				else if (cmdInfo.m_sContentType == _T("xml"))
+					packingInfo.SetXML();
+				else if (!cmdInfo.m_sContentType.empty())
+					packingInfo.SetPlugin(cmdInfo.m_sContentType.c_str());
+				else
+					idCompareAs = ID_MERGE_COMPARE;
+
+				bCompared = DoFileOpen(
+					packingInfo, idCompareAs,
+					filelocLeft, filelocRight,
+					cmdInfo.m_dwLeftFlags, cmdInfo.m_dwRightFlags,
+					cmdInfo.m_nRecursive);
+			}
+			else if (ProjectFile::IsProjectFile(filelocLeft.filepath.c_str()))
+			{
+				bCompared = LoadAndOpenProjectFile(filelocLeft.filepath.c_str());
+			}
+			else if (IsConflictFile(filelocLeft.filepath.c_str()))
+			{
+				bCompared = DoOpenConflict(filelocLeft.filepath.c_str());
+			}
+			else
+			{
+				bCompared = DoFileOpen(
+					filelocLeft, filelocRight,
+					cmdInfo.m_dwLeftFlags, cmdInfo.m_dwRightFlags,
+					cmdInfo.m_nRecursive);
+			}
+		}
+	}
+	return bCompared && !cmdInfo.m_bNonInteractive;
 }
 
 /**
@@ -3643,8 +3758,7 @@ void CMainFrame::OnFileOpenConflict()
  * modified by default so user can just save it and accept workspace
  * file as resolved file.
  * @param [in] conflictFile Full path to conflict file to open.
- * @param [in] checked If true, do not check if it really is project file.
- * @return TRUE if conflict file was opened for resolving.
+ * @return true if conflict file was opened for resolving.
  */
 bool CMainFrame::DoOpenConflict(LPCTSTR conflictFile)
 {

@@ -393,9 +393,9 @@ void COpenDlg::OnOK()
 		if (!ProjectFile::Read(m_sLeftFile.c_str()))
 			return;
 
-	const DWORD attrLeft = GetFileAttributes(m_sLeftFile.c_str());
-	const DWORD attrRight = GetFileAttributes(m_sRightFile.c_str());
-	if (attrLeft == INVALID_FILE_ATTRIBUTES || attrRight == INVALID_FILE_ATTRIBUTES)
+	m_attrLeft = GetFileAttributes(m_sLeftFile.c_str());
+	m_attrRight = GetFileAttributes(m_sRightFile.c_str());
+	if ((m_attrLeft == INVALID_FILE_ATTRIBUTES) || (m_attrRight == INVALID_FILE_ATTRIBUTES))
 	{
 		LanguageSelect.MsgBox(IDS_ERROR_INCOMPARABLE, MB_ICONSTOP);
 		return;
@@ -405,9 +405,9 @@ void COpenDlg::OnOK()
 	m_sRightFile = paths_GetLongPath(m_sRightFile.c_str());
 
 	// Add trailing '\' for directories if its missing
-	if ((attrLeft & FILE_ATTRIBUTE_DIRECTORY) && !paths_EndsWithSlash(m_sLeftFile.c_str()))
+	if ((m_attrLeft & FILE_ATTRIBUTE_DIRECTORY) && !paths_EndsWithSlash(m_sLeftFile.c_str()))
 		m_sLeftFile += _T('\\');
-	if ((attrRight & FILE_ATTRIBUTE_DIRECTORY) && !paths_EndsWithSlash(m_sRightFile.c_str()))
+	if ((m_attrRight & FILE_ATTRIBUTE_DIRECTORY) && !paths_EndsWithSlash(m_sRightFile.c_str()))
 		m_sRightFile += _T('\\');
 
 	UpdateData<Set>();
@@ -424,10 +424,9 @@ void COpenDlg::OnOK()
 	SaveComboboxStates();
 	SettingStore.WriteProfileInt(_T("Settings"), _T("Recurse"), m_nRecursive);
 
-	if ((attrLeft ^ attrRight) & FILE_ATTRIBUTE_DIRECTORY)
+	if ((m_attrLeft ^ m_attrRight) & FILE_ATTRIBUTE_DIRECTORY)
 	{
-		m_idCompareAs = attrLeft & FILE_ATTRIBUTE_DIRECTORY ?
-			ID_MERGE_COMPARE_ZIP_RIGHT : ID_MERGE_COMPARE_ZIP_LEFT;
+		m_idCompareAs = 0;
 	}
 	else
 	{

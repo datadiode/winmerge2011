@@ -57,7 +57,7 @@ class CMainFrame
 {
 	friend CLanguageSelect;
 public:
-	CMainFrame(HWindow *);
+	CMainFrame(HWindow *, const MergeCmdLineInfo &);
 
 	// IElementBehaviorFactory
 	STDMETHOD(FindBehavior)(BSTR, BSTR, IElementBehaviorSite *, IElementBehavior **);
@@ -90,6 +90,15 @@ public:
 		DWORD dwLeftFlags = FFILEOPEN_DETECT,
 		DWORD dwRightFlags = FFILEOPEN_DETECT,
 		int nRecursive = 0,
+		CDirFrame * = NULL);
+	bool DoFileOpen(
+		PackingInfo &packingInfo,
+		UINT idCompareAs,
+		FileLocation &filelocLeft,
+		FileLocation &filelocRight,
+		DWORD dwLeftFlags,
+		DWORD dwRightFlags,
+		int nRecursive,
 		CDirFrame * = NULL);
 	void ShowMergeDoc(CDirFrame *,
 		FileLocation & filelocLeft,
@@ -126,6 +135,7 @@ public:
 
 	static void OpenFileToExternalEditor(LPCTSTR file);
 	void OpenFileWith(LPCTSTR file) const;
+	bool ParseArgsAndDoOpen(const MergeCmdLineInfo &);
 
 	virtual void RecalcLayout();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);

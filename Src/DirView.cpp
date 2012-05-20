@@ -338,21 +338,7 @@ void CDirView::StartCompare(CompareStats *pCompareStats)
  */
 void CDirView::ReflectItemActivate(NMITEMACTIVATE *pNM)
 {
-	if (pNM->iItem >= 0)
-	{
-		const DIFFITEM& di = GetDiffItem(pNM->iItem);
-		if (m_bTreeMode && m_pFrame->GetRecursive() == 1 && di.diffcode.isDirectory())
-		{
-			if (di.customFlags1 & ViewCustomFlags::EXPANDED)
-				CollapseSubdir(pNM->iItem);
-			else
-				ExpandSubdir(pNM->iItem);
-		}
-		else
-		{
-			OpenSelection();
-		}
-	}
+	DoDefaultAction(pNM->iItem);
 }
 
 /**
@@ -448,14 +434,6 @@ void CDirView::Redisplay()
 	RedisplayChildren(ctxt->GetFirstDiffPosition(), 0, cnt, alldiffs);
 	SortColumnsAppropriately();
 	SetRedraw(TRUE);
-}
-
-void CDirView::DoScript(LPCWSTR text)
-{
-	WaitStatusCursor waitstatus(IDS_STATUS_OPENING_SELECTION);
-	PackingInfo packingInfo;
-	packingInfo.SetPlugin(text);
-	OpenSelection(&packingInfo, 0);
 }
 
 /**
@@ -636,9 +614,9 @@ void CDirView::ListContextMenu(POINT point)
 	{
 		if (pScriptMenu)
 		{
-			WCHAR text[MAX_PATH];
-			pScriptMenu->GetMenuStringW(nCmd, text, _countof(text));
-			DoScript(text);
+			TCHAR szCompareAs[MAX_PATH];
+			pScriptMenu->GetMenuString(nCmd, szCompareAs, _countof(szCompareAs));
+			OpenSelection(szCompareAs, 0);
 		}
 	}
 	else if (nCmd)
@@ -798,9 +776,8 @@ void CDirView::OnDestroy()
 /**
  * @brief Open selected item when user presses ENTER key.
  */
-void CDirView::OnReturn()
+void CDirView::DoDefaultAction(int sel)
 {
-	int sel = GetFocusedItem();
 	if (sel >= 0)
 	{
 		const DIFFITEM& di = GetDiffItem(sel);
@@ -813,7 +790,7 @@ void CDirView::OnReturn()
 		}
 		else
 		{
-			OpenSelection();
+			OpenSelection(NULL, ID_MERGE_COMPARE);
 		}
 	}
 }
@@ -1155,7 +1132,7 @@ bool CDirView::OpenTwoItems(UINT_PTR pos1, UINT_PTR pos2, DIFFITEM **di1, DIFFIT
  * This handles the case that one item is selected
  * and the case that two items are selected (one on each side)
  */
-void CDirView::OpenSelection(PackingInfo *infoUnpacker, DWORD commonFlags)
+void CDirView::OpenSelection(LPCTSTR szCompareAs, UINT idCompareAs)
 {
 	WaitStatusCursor waitstatus(IDS_STATUS_OPENING_SELECTION);
 	// First, figure out what was selected (store into pos1 & pos2)
@@ -1204,169 +1181,27 @@ void CDirView::OpenSelection(PackingInfo *infoUnpacker, DWORD commonFlags)
 	// Now pathLeft, pathRight, di1, di2, and isdir are all set
 	// We have two items to compare, no matter whether same or different underlying DirView item
 
-	if (infoUnpacker == NULL)
-	{
-		// Open subfolders
-		// Don't add folders to MRU
-		// Or: Open archives, not adding paths to MRU
-		theApp.m_pMainWnd->DoFileOpen(
-			filelocLeft, filelocRight,
-			commonFlags, commonFlags,
-			m_pFrame->GetRecursive(), m_pFrame);
-	}
-	else
-	{
-		// Regular file case
+	PackingInfo packingInfo;
 
-		// Close open documents first (ask to save unsaved data)
-		if (!COptionsMgr::Get(OPT_MULTIDOC_MERGEDOCS))
-		{
-			if (!m_pFrame->CloseMergeDocs())
-				return;
-		}
-
-		// Open identical and different files
-		BOOL bLeftRO = m_pFrame->GetLeftReadOnly();
-		BOOL bRightRO = m_pFrame->GetRightReadOnly();
-
-		filelocLeft.encoding = di1->left.encoding;
-		filelocRight.encoding = di2->right.encoding;
-
-		DWORD leftFlags = bLeftRO ? FFILEOPEN_READONLY : 0;
-		DWORD rightFlags = bRightRO ? FFILEOPEN_READONLY : 0;
-
-		theApp.m_pMainWnd->ShowMergeDoc(m_pFrame, filelocLeft, filelocRight,
-			commonFlags | leftFlags, commonFlags | rightFlags, infoUnpacker);
-	}
-}
-
-void CDirView::OpenSelectionZip()
-{
-	WaitStatusCursor waitstatus(IDS_STATUS_OPENING_SELECTION);
-	// First, figure out what was selected (store into pos1 & pos2)
-	UINT_PTR pos1 = NULL, pos2 = NULL;
-	int sel1 = -1, sel2 = -1;
-	if (!GetSelectedItems(&sel1, &sel2))
-	{
-		// Must have 1 or 2 items selected
-		// Not valid action
-		return;
-	}
-
-	pos1 = GetItemKey(sel1);
-	ASSERT(pos1);
-	if (sel2 != -1)
-		pos2 = GetItemKey(sel2);
-
-	// Now handle the various cases of what was selected
-
-	if (pos1 == SPECIAL_ITEM_POS)
-	{
-		ASSERT(FALSE);
-		return;
-	}
-
-	// Common variables which both code paths below are responsible for setting
-	FileLocation filelocLeft, filelocRight;
-	DIFFITEM *di1 = NULL, *di2 = NULL; // left & right items (di1==di2 if single selection)
-	bool isdir = false; // set if we're comparing directories
-	if (pos2)
-	{
-		bool success = OpenTwoItems(pos1, pos2, &di1, &di2,
-			filelocLeft.filepath, filelocRight.filepath, sel1, sel2, isdir);
-		if (!success)
-			return;
-	}
-	else
-	{
-		// Only one item selected, so perform diff on its sides
-		bool success = OpenOneItem(pos1, &di1, &di2,
-			filelocLeft.filepath, filelocRight.filepath, sel1, isdir);
-		if (!success)
-			return;
-	}
-
-	// Now pathLeft, pathRight, di1, di2, and isdir are all set
-	// We have two items to compare, no matter whether same or different underlying DirView item
-
-	// Open subfolders
-	// Don't add folders to MRU
-	// Or: Open archives, not adding paths to MRU
-	theApp.m_pMainWnd->DoFileOpen(
-		filelocLeft, filelocRight,
-		FFILEOPEN_NOMRU | FFILEOPEN_DETECTZIP,
-		FFILEOPEN_NOMRU | FFILEOPEN_DETECTZIP,
-		m_pFrame->GetRecursive(), m_pFrame);
-}
-
-void CDirView::OpenSelectionHex()
-{
-	WaitStatusCursor waitstatus(IDS_STATUS_OPENING_SELECTION);
-	// First, figure out what was selected (store into pos1 & pos2)
-	UINT_PTR pos1 = NULL, pos2 = NULL;
-	int sel1 = -1, sel2 = -1;
-	if (!GetSelectedItems(&sel1, &sel2))
-	{
-		// Must have 1 or 2 items selected
-		// Not valid action
-		return;
-	}
-
-	pos1 = GetItemKey(sel1);
-	ASSERT(pos1);
-	if (sel2 != -1)
-		pos2 = GetItemKey(sel2);
-
-	// Now handle the various cases of what was selected
-
-	if (pos1 == SPECIAL_ITEM_POS)
-	{
-		ASSERT(FALSE);
-		return;
-	}
-
-	// Common variables which both code paths below are responsible for setting
-	FileLocation filelocLeft, filelocRight;
-	DIFFITEM *di1 = NULL, *di2 = NULL; // left & right items (di1==di2 if single selection)
-	bool isdir = false; // set if we're comparing directories
-	if (pos2)
-	{
-		bool success = OpenTwoItems(pos1, pos2, &di1, &di2,
-			filelocLeft.filepath, filelocRight.filepath, sel1, sel2, isdir);
-		if (!success)
-			return;
-	}
-	else
-	{
-		// Only one item selected, so perform diff on its sides
-		bool success = OpenOneItem(pos1, &di1, &di2,
-			filelocLeft.filepath, filelocRight.filepath, sel1, isdir);
-		if (!success)
-			return;
-	}
-
-	// Need to consider only regular file case here
-
-	// Close open documents first (ask to save unsaved data)
-	if (!COptionsMgr::Get(OPT_MULTIDOC_MERGEDOCS))
-	{
-		if (!m_pFrame->CloseMergeDocs())
-			return;
-	}
+	if (szCompareAs)
+		packingInfo.SetPlugin(szCompareAs);
 
 	// Open identical and different files
 	BOOL bLeftRO = m_pFrame->GetLeftReadOnly();
 	BOOL bRightRO = m_pFrame->GetRightReadOnly();
 
-	theApp.m_pMainWnd->ShowHexMergeDoc(m_pFrame,
-		filelocLeft, filelocRight, bLeftRO, bRightRO);
-}
+	filelocLeft.encoding = di1->left.encoding;
+	filelocRight.encoding = di2->right.encoding;
 
-void CDirView::OpenSelectionXML()
-{
-	PackingInfo packingInfo;
-	packingInfo.SetXML();
-	OpenSelection(&packingInfo, 0);
+	DWORD leftFlags = bLeftRO ? FFILEOPEN_READONLY : 0;
+	DWORD rightFlags = bRightRO ? FFILEOPEN_READONLY : 0;
+
+	theApp.m_pMainWnd->DoFileOpen(
+		packingInfo, idCompareAs,
+		filelocLeft, filelocRight,
+		FFILEOPEN_NOMRU | FFILEOPEN_DETECT,
+		FFILEOPEN_NOMRU | FFILEOPEN_DETECT,
+		m_pFrame->GetRecursive(), m_pFrame);
 }
 
 /**
@@ -1378,9 +1213,6 @@ UINT_PTR CDirView::GetItemKey(int idx)
 {
 	return GetItemData(idx);
 }
-
-// SetItemKey & GetItemKey encapsulate how the display list items
-// are mapped to DiffItems, which in turn are DiffContext keys to the actual DIFFITEM data
 
 /**
  * Given index in list control, get modifiable reference to its DIFFITEM data
@@ -1407,44 +1239,9 @@ DIFFITEM &CDirView::GetDiffItem(int sel)
 int CDirView::GetItemIndex(UINT_PTR key)
 {
 	LVFINDINFO findInfo;
-
 	findInfo.flags = LVFI_PARAM;  // Search for itemdata
 	findInfo.lParam = (LPARAM)key;
 	return FindItem(&findInfo);
-}
-
-// return selected item index, or -1 if none or multiple
-int CDirView::GetSingleSelectedItem()
-{
-	int sel = -1, sel2 = -1;
-	sel = GetNextItem(sel, LVNI_SELECTED);
-	if (sel == -1) return -1;
-	sel2 = GetNextItem(sel, LVNI_SELECTED);
-	if (sel2 != -1) return -1;
-	return sel;
-}
-
-/**
- * @brief Return index of first selected item in folder compare.
- */
-int CDirView::GetFirstSelectedInd()
-{
-	return GetNextItem(-1, LVNI_SELECTED);
-}
-
-/**
- * @brief Get index of next selected item in folder compare.
- * @param [in,out] ind
- * - IN current index, for which next index is searched
- * - OUT new index of found item
- * @return DIFFITEM in found index.
- */
-DIFFITEM &CDirView::GetNextSelectedInd(int &ind)
-{
-	int sel = GetNextItem(ind, LVNI_SELECTED);
-	DIFFITEM &di = GetDiffItem(ind);
-	ind = sel;
-	return di;
 }
 
 // Go to first diff
@@ -1453,18 +1250,15 @@ DIFFITEM &CDirView::GetNextSelectedInd(int &ind)
 void CDirView::OnFirstdiff()
 {
 	const int count = GetItemCount();
-	BOOL found = FALSE;
 	int i = 0;
-	int currentInd = GetFirstSelectedInd();
-	int selCount = GetSelectedCount();
-
-	while (i < count && found == FALSE)
+	int currentInd = GetNextItem(-1, LVNI_SELECTED);
+	while (i < count)
 	{
 		const DIFFITEM &di = GetDiffItem(i);
 		if (IsItemNavigableDiff(di))
 		{
-			MoveFocus(currentInd, i, selCount);
-			found = TRUE;
+			MoveFocus(currentInd, i);
+			break;
 		}
 		i++;
 	}
@@ -1474,21 +1268,17 @@ void CDirView::OnFirstdiff()
 // If none or one item selected select found item
 void CDirView::OnLastdiff()
 {
-	BOOL found = FALSE;
-	const int count = GetItemCount();
-	int i = count - 1;
-	int currentInd = GetFirstSelectedInd();
-	int selCount = GetSelectedCount();
-
-	while (i > -1 && found == FALSE)
+	int i = GetItemCount();
+	int currentInd = GetNextItem(-1, LVNI_SELECTED);
+	while (i > 0)
 	{
+		--i;
 		const DIFFITEM &di = GetDiffItem(i);
 		if (IsItemNavigableDiff(di))
 		{
-			MoveFocus(currentInd, i, selCount);
-			found = TRUE;
+			MoveFocus(currentInd, i);
+			break;
 		}
-		i--;
 	}
 }
 
@@ -1497,23 +1287,16 @@ void CDirView::OnLastdiff()
 void CDirView::OnNextdiff()
 {
 	const int count = GetItemCount();
-	BOOL found = FALSE;
 	int i = GetFocusedItem();
-	int currentInd = 0;
-	int selCount = GetSelectedCount();
-
-	currentInd = i;
-	i++;
-
-	while (i < count && found == FALSE)
+	int currentInd = i;
+	while (++i < count)
 	{
 		const DIFFITEM &di = GetDiffItem(i);
 		if (IsItemNavigableDiff(di))
 		{
-			MoveFocus(currentInd, i, selCount);
-			found = TRUE;
+			MoveFocus(currentInd, i);
+			break;
 		}
-		i++;
 	}
 }
 
@@ -1521,24 +1304,17 @@ void CDirView::OnNextdiff()
 // If none or one item selected select found item
 void CDirView::OnPrevdiff()
 {
-	BOOL found = FALSE;
 	int i = GetFocusedItem();
-	int currentInd = 0;
-	int selCount = GetSelectedCount();
-
-	currentInd = i;
-	if (i > 0)
-		i--;
-
-	while (i > -1 && found == FALSE)
+	int currentInd = i;
+	while (i > 0)
 	{
+		--i;
 		const DIFFITEM &di = GetDiffItem(i);
 		if (IsItemNavigableDiff(di))
 		{
-			MoveFocus(currentInd, i, selCount);
-			found = TRUE;
+			MoveFocus(currentInd, i);
+			break;
 		}
-		i--;
 	}
 }
 
@@ -1613,13 +1389,14 @@ bool CDirView::IsItemNavigableDiff(const DIFFITEM & di) const
  * Additionally, if there are not multiple items selected,
  *  deselects item [currentInd] and selects item [i]
  */
-void CDirView::MoveFocus(int currentInd, int i, int selCount)
+void CDirView::MoveFocus(int currentInd, int i)
 {
+	int selCount = GetSelectedCount();
 	if (selCount <= 1)
 	{
 		// Not multiple items selected, so bring selection with us
 		SetItemState(currentInd, 0, LVIS_SELECTED);
-		SetItemState(currentInd, 0, LVIS_FOCUSED);
+		//SetItemState(currentInd, 0, LVIS_FOCUSED);
 		SetItemState(i, LVIS_SELECTED, LVIS_SELECTED);
 	}
 
@@ -1642,7 +1419,7 @@ LRESULT CDirView::ReflectKeydown(NMLVKEYDOWN *pParam)
 			OpenParentDirectory();
 		return 1;
 	case VK_RETURN:
-		OnReturn();
+		DoDefaultAction(GetFocusedItem());
 		return 1;
 	case VK_LEFT:
 		if (!m_bTreeMode)
@@ -1678,7 +1455,7 @@ void CDirView::OnUpdateUIMessage()
 		if (COptionsMgr::Get(OPT_SCROLL_TO_FIRST))
 			OnFirstdiff();
 		else
-			MoveFocus(0, 0, 0);
+			MoveFocus(0, 0);
 	}
 	// If compare took more than TimeToSignalCompare seconds, notify user
 	clock_t elapsed = clock() - m_compareStart;
@@ -2360,7 +2137,7 @@ void CDirView::OnUpdateStatusNum()
 	int i = focusItem;
 	while (--i >= 0)
 	{
-		const DIFFITEM& di = GetDiffItem(i);
+		const DIFFITEM &di = GetDiffItem(i);
 		if (IsItemNavigableDiff(di))
 		{
 			enable = MF_ENABLED;
@@ -2373,7 +2150,7 @@ void CDirView::OnUpdateStatusNum()
 	i = focusItem;
 	while (++i < count)
 	{
-		const DIFFITEM& di = GetDiffItem(i);
+		const DIFFITEM &di = GetDiffItem(i);
 		if (IsItemNavigableDiff(di))
 		{
 			enable = MF_ENABLED;

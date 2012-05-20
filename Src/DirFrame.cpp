@@ -246,7 +246,7 @@ void CDirFrame::UpdateCmdUI<ID_MERGE_DELETE>()
 template<>
 LRESULT CDirFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 {
-	switch (lParam ? wParam : LOWORD(wParam))
+	switch (UINT id = lParam ? wParam : LOWORD(wParam))
 	{
 	case ID_FILE_LEFT_READONLY:
 		// Change left-side readonly-status
@@ -365,19 +365,11 @@ LRESULT CDirFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 		m_pDirView->OnSelectAll();
 		break;
 	case ID_MERGE_COMPARE:
-		m_pDirView->OpenSelection();
-		break;
 	case ID_MERGE_COMPARE_TEXT:
-		m_pDirView->OpenSelection(NULL, FFILEOPEN_NOMRU);
-		break;
 	case ID_MERGE_COMPARE_ZIP:
-		m_pDirView->OpenSelectionZip();
-		break;
 	case ID_MERGE_COMPARE_HEX:
-		m_pDirView->OpenSelectionHex();
-		break;
 	case ID_MERGE_COMPARE_XML:
-		m_pDirView->OpenSelectionXML();
+		m_pDirView->OpenSelection(NULL, id);
 		break;
 	case ID_VIEW_TREEMODE:
 		m_pDirView->OnViewTreeMode();

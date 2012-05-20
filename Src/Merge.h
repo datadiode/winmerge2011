@@ -30,7 +30,6 @@
 #include "scriptable.h"
 
 class CMainFrame;
-class MergeCmdLineInfo;
 
 const TCHAR WinMergeWindowClass[] = _T("WinMergeWindowClassW");
 
@@ -64,21 +63,20 @@ public:
 public:
 	HINSTANCE m_hInstance;
 	CMainFrame *m_pMainWnd;
-
+	bool m_bNonInteractive;
 
 	static String GetDefaultEditor();
 	static String GetDefaultSupplementFolder();
 
 	void ResetOptions();
 
-	BOOL PreTranslateMessage(MSG* pMsg);
+	bool PreTranslateMessage(MSG *);
 
-	BOOL InitInstance();
+	bool InitInstance();
 	int ExitInstance();
 	int DoMessageBox(LPCTSTR lpszPrompt, UINT nType = MB_OK, UINT nIDPrompt = 0);
 
 	static void InitializeSupplements();
-	BOOL ParseArgsAndDoOpen(MergeCmdLineInfo& cmdInfo, CMainFrame* pMainFrame);
 	// End MergeArgs.cpp
 
 	//@{
@@ -107,7 +105,6 @@ public:
 	//@}
 
 private:
-	bool m_bNonInteractive;
 	LONG m_nActiveOperations; /**< Active operations count. */
 } theApp;
 

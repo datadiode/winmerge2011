@@ -839,12 +839,6 @@
 #define ID_MERGE_COMPARE_ZIP                    32871
 #define ID_MERGE_COMPARE_HEX                    32872
 #define ID_MERGE_COMPARE_XML                    32873
-#define ID_MERGE_COMPARE_ZIP_LEFT               32874
-#define ID_MERGE_COMPARE_ZIP_RIGHT              32875
-#define ID_UNPACK_MANUAL                        32880
-#define ID_UNPACK_AUTO                          32881
-#define ID_POPUP_OPEN_WITH_UNPACKER             32882
-#define ID_NO_PREDIFFER                         32883
 #define ID_DEBUG_LOADCONFIG                     32884
 #define ID_WINDOW_CHANGE_PANE                   32896
 #define ID_WINDOW_CLOSEALL                      32897

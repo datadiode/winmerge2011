@@ -127,9 +127,7 @@ public:
 	int GetItemIndex(UINT_PTR key);
 	void SetColumnWidths();
 	void SortColumnsAppropriately();
-	int GetFirstSelectedInd();
 	DIFFITEM &GetDiffItem(int sel);
-	DIFFITEM &GetNextSelectedInd(int &ind);
 
 	static bool IsShellMenuCmdID(UINT);
 	LRESULT HandleMenuMessage(UINT message, WPARAM wParam, LPARAM lParam);
@@ -172,7 +170,6 @@ private:
 	void DoOpen(SIDE_TYPE);
 	void DoOpenWith(SIDE_TYPE);
 	void DoOpenWithEditor(SIDE_TYPE);
-	void DoScript(LPCWSTR);
 	void ConfirmAndPerformActions(FileActionScript & actions, int selCount);
 	BOOL ConfirmActionList(const FileActionScript & actions, int selCount);
 	void PerformActionList(FileActionScript & actions);
@@ -326,18 +323,13 @@ protected:
 	LRESULT OnNotify(LPARAM);
 
 	LRESULT WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam);
-	void OnReturn();
+	void DoDefaultAction(int sel);
 private:
-	void OpenSelection(PackingInfo *infoUnpacker = NULL,
-		DWORD commonFlags = FFILEOPEN_NOMRU | FFILEOPEN_DETECT);
-	void OpenSelectionZip();
-	void OpenSelectionHex();
-	void OpenSelectionXML();
+	void OpenSelection(LPCTSTR szCompareAs, UINT idCompareAs);
 	bool GetSelectedItems(int * sel1, int * sel2);
 	void OpenParentDirectory();
-	int GetSingleSelectedItem();
 	bool IsItemNavigableDiff(const DIFFITEM & di) const;
-	void MoveFocus(int currentInd, int i, int selCount);
+	void MoveFocus(int, int);
 	void SaveColumnWidths();
 	void SaveColumnOrders();
 	void FixReordering();

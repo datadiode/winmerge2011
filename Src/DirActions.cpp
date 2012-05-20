@@ -821,7 +821,7 @@ void CDirView::PerformActionList(FileActionScript & actionScript)
  */
 void CDirView::UpdateAfterFileScript(FileActionScript &actionList)
 {
-	int curSel = GetFirstSelectedInd();
+	int curSel = GetNextItem(-1, LVNI_SELECTED);
 	while (actionList.GetActionItemCount() > 0)
 	{
 		// Start handling from tail of list, so removing items
@@ -836,9 +836,9 @@ void CDirView::UpdateAfterFileScript(FileActionScript &actionList)
 	UINT selected = GetSelectedCount();
 	if (selected == 0)
 	{
-		if (curSel < 1)
-			++curSel;
-		MoveFocus(0, curSel - 1, selected);
+		if (curSel > 0)
+			--curSel;
+		MoveFocus(0, curSel);
 	}
 }
 
