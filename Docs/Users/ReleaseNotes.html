@@ -17,6 +17,24 @@ li
 </style>
 </head>
 <body>
+<h2>WinMerge 0.2011.002.211 Release Notes</h2>
+This <b>experimental</b> release of WinMerge&nbsp;2011 makes the
+<i>Compare As</i> option accessible through the command line.
+The feature aims at supporting use cases like the one outlined
+<a target='_blank' href='http://bernhardelbl.wordpress.com/2012/04/05/compare-excel-word-and-pdf-files-in-visual-studio-team-foundation-server-2010'>here</a>.
+In the given example, an extra parameter
+<code><nobr>-t</nobr>&nbsp;"script:\FileTransforms\xdoc2txt.wsc"</code>
+is needed to tell WinMerge&nbsp;2011 to pipe files through
+<a target='_blank' href='http://www31.ocn.ne.jp/~h_ishida/xdoc2txt.html'>xdoc2txt</a>.
+The reason is that WinMerge&nbsp;2011 does not provide file transform
+automatisms like WinMerge&nbsp;2 does
+(which is an explicit design decision driven by the realization that file
+transform automatisms have caused much confusion for WinMerge&nbsp;2 users).
+<p>
+Furthermore, a fix is included to address
+<a target='_blank' href='https://bitbucket.org/jtuc/winmerge2011/issue/18'>Issue #18 Binary compare reports false positives</a>.
+<p>
+<i>Jochen Neubeck, May 2012</i>
 <h2>WinMerge 0.2011.002.145 Release Notes</h2>
 This <b>experimental</b>
 release of WinMerge&nbsp;2011 implements two substantial new features:
