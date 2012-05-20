@@ -278,6 +278,7 @@ BOOL COpenDlg::OnInitDialog()
 
 	m_pCbCompareAs = static_cast<HComboBox *>(GetDlgItem(IDC_COMPARE_AS_COMBO));
 	m_pCbCompareAs->AddString(_T(""));
+	m_pCbCompareAs->SetItemData(0, ID_MERGE_COMPARE);
 	m_pCbCompareAs->SetCurSel(0);
 
 	m_pCbLeft->LoadState(_T("Files\\Left"));
@@ -426,7 +427,7 @@ void COpenDlg::OnOK()
 
 	if ((m_attrLeft ^ m_attrRight) & FILE_ATTRIBUTE_DIRECTORY)
 	{
-		m_idCompareAs = 0;
+		m_idCompareAs = ID_MERGE_COMPARE;
 	}
 	else
 	{
