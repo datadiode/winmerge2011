@@ -125,6 +125,7 @@ CDirFrame::~CDirFrame()
 	// Delete all temporary folders belonging to this document
 	while (m_pTempPathContext)
 	{
+		WaitStatusCursor waitstatus(IDS_STATUS_DELETEFILES);
 		m_pTempPathContext = m_pTempPathContext->DeleteHead();
 	}
 	delete m_pDirView;
