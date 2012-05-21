@@ -93,7 +93,6 @@ protected:
 	void OnBrowseButton(UINT id);
 	void OnOK();
 	void OnCancel();
-	void SaveComboboxStates();
 	void OnSelchangePathCombo(HSuperComboBox *);
 	void OnEditchangePathCombo(HSuperComboBox *);
 	void OnEditEvent();

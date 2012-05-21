@@ -405,24 +405,15 @@ void COpenDlg::OnOK()
 	m_sLeftFile = paths_GetLongPath(m_sLeftFile.c_str());
 	m_sRightFile = paths_GetLongPath(m_sRightFile.c_str());
 
-	// Add trailing '\' for directories if its missing
-	if ((m_attrLeft & FILE_ATTRIBUTE_DIRECTORY) && !paths_EndsWithSlash(m_sLeftFile.c_str()))
-		m_sLeftFile += _T('\\');
-	if ((m_attrRight & FILE_ATTRIBUTE_DIRECTORY) && !paths_EndsWithSlash(m_sRightFile.c_str()))
-		m_sRightFile += _T('\\');
-
-	UpdateData<Set>();
-	// Hide magic prefix from users
-	m_pCbLeft->SetWindowText(paths_UndoMagic(&String(m_sLeftFile).front()));
-	m_pCbRight->SetWindowText(paths_UndoMagic(&String(m_sRightFile).front()));
-
 	KillTimer(IDT_CHECKFILES);
 
 	globalFileFilter.SetFilter(m_sFilter);
 	m_sFilter = globalFileFilter.GetFilterNameOrMask();
 	COptionsMgr::SaveOption(OPT_FILEFILTER_CURRENT, m_sFilter);
 
-	SaveComboboxStates();
+	// Caller saves MRU left and right files, so don't save them here.
+	m_pCbExt->SaveState(_T("Files\\Ext"));
+
 	SettingStore.WriteProfileInt(_T("Settings"), _T("Recurse"), m_nRecursive);
 
 	if ((m_attrLeft ^ m_attrRight) & FILE_ATTRIBUTE_DIRECTORY)
@@ -455,16 +446,6 @@ void COpenDlg::OnCancel()
 	if (m_pCbExt->GetWindowTextLength() == 0)
 		m_pCbExt->SaveState(_T("Files\\Ext"));
 	EndDialog(IDCANCEL);
-}
-
-/** 
- * @brief Save File- and filter-combobox states.
- */
-void COpenDlg::SaveComboboxStates()
-{
-	m_pCbLeft->SaveState(_T("Files\\Left"));
-	m_pCbRight->SaveState(_T("Files\\Right"));
-	m_pCbExt->SaveState(_T("Files\\Ext"));
 }
 
 /** 

@@ -1448,9 +1448,6 @@ bool CMainFrame::DoFileOpen(
 		// TODO: add codepage options to open dialog?
 		if (idCompareAs >= IDC_SCRIPT_FIRST && idCompareAs <= IDC_SCRIPT_LAST)
 			packingInfo.SetPlugin(dlg.m_szCompareAs);
-		// Skip MRU logic since OpenDlg has done it already
-		dwLeftFlags |= FFILEOPEN_NOMRU;
-		dwRightFlags |= FFILEOPEN_NOMRU;
 	}
 
 	// For directories, add trailing '\' if missing, and skip detection logic
