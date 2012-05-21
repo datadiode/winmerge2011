@@ -664,13 +664,21 @@ CSubFrame::CSubFrame(CDocFrame *pDocFrame, const LONG *FloatScript, UINT uHitTes
 
 LRESULT CSubFrame::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+	static UINT uLayoutMsg = 0;
 	switch (uMsg)
 	{
 	case WM_WINDOWPOSCHANGING:
 		CFloatState::Float(reinterpret_cast<WINDOWPOS *>(lParam));
 		break;
+	case WM_ENTERSIZEMOVE:
+		uLayoutMsg = WM_EXITSIZEMOVE;
+		break;
 	case WM_SIZE:
 		if (::GetCapture() == m_hWnd)
+			uLayoutMsg = WM_SIZE;
+		// fall through
+	case WM_EXITSIZEMOVE:
+		if (uMsg == uLayoutMsg)
 		{
 			m_pDocFrame->RecalcLayout();
 			m_pDocFrame->RedrawWindow();
