@@ -75,7 +75,7 @@ UINT FolderCmp::prepAndCompareTwoFiles(DIFFITEM &di)
 	m_diffFileData.m_textStats[0].clear();
 	m_diffFileData.m_textStats[1].clear();
 
-	UINT code = DIFFCODE::FILE | DIFFCODE::CMPERR;
+	UINT code = DIFFCODE::FILE | DIFFCODE::CMPERR; // yields a warning icon
 
 	HANDLE osfhandle[2] = { NULL, NULL };
 
@@ -89,8 +89,7 @@ UINT FolderCmp::prepAndCompareTwoFiles(DIFFITEM &di)
 	
 		if (!m_diffFileData.OpenFiles(origFileName1.c_str(), origFileName2.c_str()))
 		{
-			di.errorDesc = _T("Error opening compared files");
-			return false;
+			return 0; // yields an error icon
 		}
 
 		osfhandle[0] = m_diffFileData.GetFileHandle(0);
@@ -136,8 +135,6 @@ UINT FolderCmp::prepAndCompareTwoFiles(DIFFITEM &di)
 			m_ndiffs = CDiffContext::DIFFS_UNKNOWN;
 			m_ntrivialdiffs = CDiffContext::DIFFS_UNKNOWN;
 		}
-		if (DIFFCODE::isResultError(code))
-			di.errorDesc = _T("DiffUtils Error");
 	}
 	else if (nCompMethod == CMP_QUICK_CONTENT)
 	{
@@ -172,7 +169,6 @@ UINT FolderCmp::prepAndCompareTwoFiles(DIFFITEM &di)
 	{
 		// Print error since we should have handled by date compare earlier
 		_RPTF0(_CRT_ERROR, "Invalid compare type, DiffFileData can't handle it");
-		di.errorDesc = _T("Bad compare type");
 	}
 
 	// If compare tool leaves text vs. binary classification to caller, defer
