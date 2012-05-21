@@ -311,12 +311,13 @@ HEdit *CEditorFilePathBar::GetControlRect(int pane, LPRECT prc)
 
 HBRUSH CEditorFilePathBar::OnCtlColorPane(HSurface *pDC, bool bActive)
 {
-	int nTextColor = bActive ? COLOR_CAPTIONTEXT : COLOR_BTNTEXT;
+	int nTextColor = COLOR_BTNTEXT;
 	int nBackColor = bActive ? COLOR_GRADIENTACTIVECAPTION : COLOR_BTNFACE;
 	HBRUSH hBackBrush = GetSysColorBrush(nBackColor);
 	// if assigned nBackColor is not supported, fall back to COLOR_ACTIVECAPTION
 	if (hBackBrush == NULL)
 	{
+		nTextColor = COLOR_CAPTIONTEXT;
 		nBackColor = COLOR_ACTIVECAPTION;
 		hBackBrush = GetSysColorBrush(nBackColor);
 	}
