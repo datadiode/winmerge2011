@@ -1,8 +1,9 @@
-0.2011.002.211
+0.2011.002.212
 Changes since preceding release (not necessarily complete):
 • Fix "Ignore blank lines" for quick compare (Issue #18)
 • Make "Compare As" logic accessible through command line
 • Issue #17 File header of active window is not readable
+• Issue #19 diff pane size not remembered
 
 0.2011.002.145
 Changes since preceding release (not necessarily complete):
