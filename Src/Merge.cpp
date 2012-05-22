@@ -683,9 +683,10 @@ LRESULT CSubFrame::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			m_pDocFrame->RecalcLayout();
 			m_pDocFrame->RedrawWindow();
 		}
-		break;
-	case WM_CAPTURECHANGED:
-		m_pDocFrame->SavePosition();
+		if (uMsg == WM_EXITSIZEMOVE)
+		{
+			m_pDocFrame->SavePosition();
+		}
 		break;
 	case WM_NCHITTEST:
 		return m_uHitTestCode;
