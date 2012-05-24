@@ -50,7 +50,6 @@ static char THIS_FILE[] = __FILE__;
 extern int recursive;
 
 static void CopyTextStats(const file_data *, FileTextStats *);
-static void CopyDiffutilTextStats(const file_data *, DiffFileData *);
 
 CDiffWrapper *CDiffWrapper::m_pActiveInstance = NULL;
 
@@ -58,11 +57,11 @@ CDiffWrapper *CDiffWrapper::m_pActiveInstance = NULL;
  * @brief Default constructor.
  * Initializes members and creates new FilterCommentsManager.
  */
-CDiffWrapper::CDiffWrapper()
+CDiffWrapper::CDiffWrapper(DiffList *pDiffList)
 : DIFFOPTIONS(NULL)
 , m_bAppendFiles(FALSE)
 , m_codepage(0)
-, m_pDiffList(NULL)
+, m_pDiffList(pDiffList)
 , m_bPathsAreTemp(FALSE)
 , m_pMovedLines(NULL)
 {
@@ -172,18 +171,6 @@ void CDiffWrapper::SetCreatePatchFile(const String &filename)
 {
 	m_sPatchFile = filename;
 	string_replace(m_sPatchFile, _T("/"), _T("\\"));
-}
-
-/**
- * @brief Enables/disabled DiffList creation ands sets DiffList.
- * This function enables or disables DiffList creation. When
- * @p diffList is NULL difflist is not created. When valid DiffList
- * pointer is given, compare results are stored into it.
- * @param [in] diffList Pointer to DiffList getting compare results.
- */
-void CDiffWrapper::SetCreateDiffList(DiffList *diffList)
-{
-	m_pDiffList = diffList;
 }
 
 /**
@@ -422,7 +409,12 @@ bool CDiffWrapper::RunFileDiff(DiffFileData &diffdata)
 	// (yet) need info about binary sides.
 	int bin_flag = 0;
 	struct change *script = NULL;
-	bool bRet = Diff2Files(&script, &diffdata, &bin_flag, NULL);
+	bool bRet = Diff2Files(&script, diffdata.m_inf, &bin_flag, NULL);
+	if (bRet)
+	{
+		CopyTextStats(&diffdata.m_inf[0], &diffdata.m_textStats[0]);
+		CopyTextStats(&diffdata.m_inf[1], &diffdata.m_textStats[1]);
+	}
 
 	// We don't anymore create diff-files for every rescan.
 	// User can create patch-file whenever one wants to.
@@ -497,6 +489,8 @@ bool CDiffWrapper::RunFileDiff()
 {
 	DiffFileData diffdata(getDefaultCodepage());
 	diffdata.SetDisplayFilepaths(m_s1File.c_str(), m_s2File.c_str()); // store true names for diff utils patch file
+	if (!diffdata.OpenFiles(m_s1File.c_str(), m_s2File.c_str()))
+		return false;
 	return RunFileDiff(diffdata);
 }
 
@@ -670,15 +664,13 @@ void CDiffWrapper::SetAppendFiles(BOOL bAppendFiles)
  * @note This function is used in file compare, not folder compare. Similar
  * folder compare function is in DiffFileData.cpp.
  */
-bool CDiffWrapper::Diff2Files(struct change **diffs, DiffFileData *diffData,
-	int *bin_status, int *bin_file)
+bool CDiffWrapper::Diff2Files(struct change **diffs, file_data *inf, int *bin_status, int *bin_file)
 {
 	bool bRet = true;
 	try
 	{
 		// Diff files. depth is zero because we are not 6comparing dirs
-		*diffs = diff_2_files(diffData->m_inf, 0, bin_status, m_pMovedLines != NULL, bin_file);
-		CopyDiffutilTextStats(diffData->m_inf, diffData);
+		*diffs = diff_2_files(inf, 0, bin_status, m_pMovedLines != NULL, bin_file);
 	}
 	catch (OException *e)
 	{
@@ -957,13 +949,4 @@ void CopyTextStats(const file_data *inf, FileTextStats *myTextStats)
 	myTextStats->ncrs = inf->count_crs;
 	myTextStats->nlfs = inf->count_lfs;
 	myTextStats->nzeros = inf->count_zeros;
-}
-
-/**
- * @brief Copy both left & right text stats results back into the DiffFileData text stats
- */
-void CopyDiffutilTextStats(const file_data *inf, DiffFileData *diffData)
-{
-	CopyTextStats(&inf[0], &diffData->m_textStats[0]);
-	CopyTextStats(&inf[1], &diffData->m_textStats[1]);
 }

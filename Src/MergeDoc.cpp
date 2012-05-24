@@ -399,9 +399,6 @@ int CChildFrame::Rescan2(bool &bIdentical)
 	SaveBuffForDiff(*m_ptBuf[0], *m_ptBuf[1], diffdata, 0);
 	SaveBuffForDiff(*m_ptBuf[1], *m_ptBuf[0], diffdata, 1);
 
-	// Set up DiffWrapper
-	m_diffWrapper.SetCreateDiffList(&m_diffList);
-	
 	// Clear diff list
 	m_diffList.Clear();
 	m_nCurDiff = -1;

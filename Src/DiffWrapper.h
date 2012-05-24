@@ -146,14 +146,12 @@ class CDiffWrapper
 	, public FilterList /**< Filter list for line filters. */
 {
 public:
-	CDiffWrapper();
+	CDiffWrapper(DiffList * = NULL);
 	~CDiffWrapper();
 	void SetToDiffUtils();
 	void RefreshFilters();
 	void RefreshOptions();
 	void SetCreatePatchFile(const String &filename);
-	void SetCreateDiffList(DiffList *diffList);
-	void SetDiffList(DiffList *diffList);
 	void SetPatchOptions(const PATCHOPTIONS &);
 	void SetDetectMovedBlocks(bool bDetectMovedBlocks);
 	void SetAppendFiles(BOOL bAppendFiles);
@@ -183,7 +181,7 @@ public:
 
 protected:
 	String FormatSwitchString();
-	bool Diff2Files(struct change **, DiffFileData *, int *bin_status, int *bin_file);
+	bool Diff2Files(struct change **, file_data *inf, int *bin_status, int *bin_file);
 	bool LoadWinMergeDiffsFromDiffUtilsScript(struct change *, const file_data *);
 	void WritePatchFile(struct change *script, file_data *inf);
 	int RegExpFilter(int StartPos, int EndPos, int FileNo, bool BreakCondition);
@@ -201,7 +199,7 @@ private:
 	String m_sPatchFile; /**< Full path to created patch file. */
 	BOOL m_bPathsAreTemp; /**< Are compared paths temporary? */
 	BOOL m_bAppendFiles; /**< Do we append to existing patch file? */
-	DiffList *m_pDiffList; /**< Pointer to external DiffList */
+	DiffList *const m_pDiffList; /**< Pointer to external DiffList */
 	MovedLines *m_pMovedLines;
 };
 

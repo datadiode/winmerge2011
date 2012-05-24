@@ -41,16 +41,8 @@ int DiffUtils::diffutils_compare_files(file_data *data)
 
 	// Do the actual comparison (generating a change script)
 	struct change *script = NULL;
-
-	try
-	{
-		script = diff_2_files(data, 0, &bin_flag, false, &bin_file);
-	}
-	catch (OException *e)
-	{
-		delete e;
+	if (!Diff2Files(&script, data, &bin_flag, &bin_file))
 		return DIFFCODE::CMPERR;
-	}
 
 	// DIFFCODE::TEXTFLAGS leaves text vs. binary classification to caller
 	UINT code = DIFFCODE::SAME | DIFFCODE::FILE | DIFFCODE::TEXTFLAGS;
