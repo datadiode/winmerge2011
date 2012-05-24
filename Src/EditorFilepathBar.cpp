@@ -298,7 +298,7 @@ void CEditorFilePathBar::SetActive(int pane, bool bActive)
 		return;
 	m_rgActive[pane] = bActive;
 	if (m_hWnd)
-		m_Edit[pane]->Invalidate();
+		m_Edit[pane]->RedrawWindow(NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW | RDW_ERASE | RDW_FRAME);
 }
 
 HEdit *CEditorFilePathBar::GetControlRect(int pane, LPRECT prc)
