@@ -1115,10 +1115,10 @@ static bool matchchar(TCHAR ch1, TCHAR ch2, bool casitive)
  */
 static bool isWordBreak(int breakType, TCHAR ch)
 {
-	// breakType==0 means whitespace only
-	if (!breakType)
+	// breakType == 0 means whitespace only
+	if (breakType == 0)
 		return false;
-	// breakType==1 means break also on punctuation
+	// breakType == 1 means break also on punctuation
 	return _tcschr(BreakChars, ch) != 0;
 }
 

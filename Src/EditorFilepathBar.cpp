@@ -186,11 +186,8 @@ BOOL CEditorFilePathBar::Create(HWND parent)
 	CFloatState::Clear();
 	LanguageSelect.Create(*this, parent);
 	SetDlgCtrlID(0x1000);
-	// subclass the two custom edit boxes
 	m_Edit[0] = static_cast<HEdit *>(GetDlgItem(IDC_STATIC_TITLE_LEFT));
-	//.SubclassDlgItem(IDC_STATIC_TITLE_LEFT, this);
 	m_Edit[1] = static_cast<HEdit *>(GetDlgItem(IDC_STATIC_TITLE_RIGHT));
-	//.SubclassDlgItem(IDC_STATIC_TITLE_RIGHT, this);
 	m_pToolTips = HToolTips::Create(WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP);
 	TOOLINFO ti;
 	ti.cbSize = TTTOOLINFO_V1_SIZE;
@@ -202,7 +199,7 @@ BOOL CEditorFilePathBar::Create(HWND parent)
 	m_pToolTips->AddTool(&ti);
 	ti.uId = reinterpret_cast<UINT_PTR>(m_Edit[1]->m_hWnd);
 	m_pToolTips->AddTool(&ti);
-	// Set TTM_SETMAXTIPWIDTH to allow for \n in tooltips
+	// Send TTM_SETMAXTIPWIDTH to allow for \n in tooltips
 	m_pToolTips->SetMaxTipWidth(5000);
 	m_pToolTips->Activate();
 	return TRUE;
