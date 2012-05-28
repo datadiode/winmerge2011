@@ -32,6 +32,7 @@ public:
 	int     m_nIgnoreWhite;
 	BOOL    m_bMovedBlocks;
 	BOOL    m_bMatchSimilarLines;
+	int     m_nMatchSimilarLinesMax;
 	BOOL    m_bFilterCommentsLines;
 
 // Implementation

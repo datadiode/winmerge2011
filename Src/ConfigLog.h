@@ -72,6 +72,7 @@ struct MISCSETTINGS
 	bool bPluginsEnabled;
 	bool bPreserveFiletimes;
 	bool bMatchSimilarLines;
+	int  nMatchSimilarLinesMax;
 };
 
 /** 

@@ -27,31 +27,17 @@
 #include "DiffTextBuffer.h"
 #include "MergeLineFlags.h"
 
-using stl::swap;
-using stl::vector;
-
 /**
  * @brief Swap diff sides.
  */
 void DIFFRANGE::swap_sides()
 {
-	swap(begin0, begin1);
-	swap(end0, end1);
-	swap(dbegin0, dbegin1);
-	swap(dend0, dend1);
-	swap(blank0, blank1);
+	stl::swap(begin0, begin1);
+	stl::swap(end0, end1);
+	stl::swap(dbegin0, dbegin1);
+	stl::swap(dend0, dend1);
+	stl::swap(blank0, blank1);
 }
-
-/**
- * @brief Initialize DiffMap.
- * @param [in] nlines Lines to add to the list.
- */
-void DiffMap::InitDiffMap(int nlines)
-{
-	// sentry value so we can check later that we set them all
-	m_map.assign(nlines, BAD_MAP_ENTRY);
-}
-
 
 /**
  * @brief Default constructor, initialises difflist to 64 items.
@@ -435,10 +421,10 @@ const DIFFRANGE *DiffList::LastSignificantDiffRange() const
 /**
  * @brief Swap sides in diffrange.
  */
-void DiffList::Swap()
+void DiffList::SwapSides()
 {
-	vector<DiffRangeInfo>::iterator iter = m_diffs.begin();
-	vector<DiffRangeInfo>::const_iterator iterEnd = m_diffs.end();
+	stl::vector<DiffRangeInfo>::iterator iter = m_diffs.begin();
+	stl::vector<DiffRangeInfo>::const_iterator iterEnd = m_diffs.end();
 	while (iter != iterEnd)
 	{
 		iter->diffrange.swap_sides();
@@ -455,8 +441,8 @@ void DiffList::AddExtraLinesCounts(
 	UINT &rnLeftLines, UINT &rnRightLines,
 	CDiffTextBuffer **ptBuf, UINT nContextLines)
 {
-	vector<DiffRangeInfo>::iterator iter = m_diffs.begin();
-	vector<DiffRangeInfo>::iterator iterEnd = m_diffs.end();
+	stl::vector<DiffRangeInfo>::iterator iter = m_diffs.begin();
+	stl::vector<DiffRangeInfo>::iterator iterEnd = m_diffs.end();
 	UINT nLeftLines = 0;
 	UINT nRightLines = 0;
 	UINT end0 = 0;
@@ -535,4 +521,11 @@ void DiffList::AddExtraLinesCounts(
 	rnLeftLines += nLeftLines;
 	rnRightLines -= skip1;
 	rnRightLines += nRightLines;
+}
+
+void DiffList::swap(DiffList &other)
+{
+	stl::swap(m_firstSignificant, other.m_firstSignificant);
+	stl::swap(m_lastSignificant, other.m_lastSignificant);
+	m_diffs.swap(other.m_diffs);
 }

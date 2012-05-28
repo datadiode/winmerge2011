@@ -69,30 +69,6 @@ struct DIFFRANGE
 };
 
 /**
- * @brief Relation from left side (0) to right side (1) of a DIFFRANGE
- *
- * Map lines from file1 to file2
- */
-class DiffMap
-{
-public:
-	enum
-	{
-		BAD_MAP_ENTRY = -999999999,
-		GHOST_MAP_ENTRY = 888888888
-	};
-
-	stl::vector<int> m_map;
-
-	// boilerplate ctr, copy ctr
-	DiffMap() { }
-	void InitDiffMap(int nlines);
-private:
-	DiffMap(const DiffMap &);
-	void operator=(const DiffMap &);
-};
-
-/**
  * @brief DIFFRANGE with links for chain of non-trivial entries
  *
  * Next and prev are array indices used by the owner (DiffList)
@@ -146,9 +122,11 @@ public:
 	const DIFFRANGE *DiffRangeAt(int nDiff) const;
 
 	void ConstructSignificantChain(); // must be called after diff list is entirely populated
-	void Swap();
+	void SwapSides();
 	void AddExtraLinesCounts(UINT &nLeftLines, UINT &nRightLines,
 		CDiffTextBuffer **ptBuf = NULL, UINT nContextLines = UINT_MAX);
+
+	void swap(DiffList &);
 
 private:
 	stl::vector<DiffRangeInfo> m_diffs; /**< Difference list. */

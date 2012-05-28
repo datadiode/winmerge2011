@@ -1286,12 +1286,14 @@ FONT 8, "MS Shell Dlg", 0, 0, 1
     AUTORADIOBUTTON "&Ignore change", IDC_WHITE_CHANGE, 14, 30, 206, 10
     AUTORADIOBUTTON "I&gnore all", IDC_ALL_WHITE, 14, 41, 206, 10
     AUTOCHECKBOX    "Ignore blan&k lines", IDC_IGNBLANKS_CHECK, 7, 60, 221, 10, WS_GROUP
-    AUTOCHECKBOX    "Ignore &case", IDC_IGNCASE_CHECK, 7, 70, 221, 10
+    AUTOCHECKBOX    "Ignore c&ase", IDC_IGNCASE_CHECK, 7, 70, 221, 10
     AUTOCHECKBOX    "Igno&re carriage return differences (Windows/Unix/Mac)", IDC_EOL_SENSITIVE, 7, 80, 221, 10
     AUTOCHECKBOX    "E&nable moved block detection", IDC_MOVED_BLOCKS, 7, 90, 221, 10
     AUTOCHECKBOX    "&Match similar lines", IDC_MATCH_SIMILAR_LINES, 7, 100, 221, 10
-    GROUPBOX        "Comments", IDC_STATIC, 7, 114, 221, 32
-    AUTOCHECKBOX    "Filter Comments", IDC_FILTERCOMMENTS_CHECK, 15, 127, 205, 10
+    RTEXT           "C&ontext limit:", IDC_STATIC, 7, 112, 155, 8
+    EDITTEXT        IDC_MATCH_SIMILAR_LINES_MAX, 169, 110, 50, 12, ES_AUTOHSCROLL | ES_NUMBER,WS_EX_RTLREADING
+    GROUPBOX        "Comments", IDC_STATIC, 7, 151, 221, 32
+    AUTOCHECKBOX    "Filter Comments", IDC_FILTERCOMMENTS_CHECK, 15, 161, 205, 10
     PUSHBUTTON      "Defaults", IDC_COMPARE_DEFAULTS, 160, 187, 70, 14
 }
 

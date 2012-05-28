@@ -482,6 +482,7 @@ bool CConfigLog::DoFile(bool writing, String &sError)
 	FileWriteString(_T("\r\n File compare:\r\n"));
 	WriteItemYesNo(2, _T("Preserve filetimes"), &m_miscSettings.bPreserveFiletimes);
 	WriteItemYesNo(2, _T("Match similar lines"), &m_miscSettings.bMatchSimilarLines);
+	WriteItem(2, _T("MatchSimilarLinesMax"), m_miscSettings.nMatchSimilarLinesMax);
 
 	FileWriteString(_T("\r\n Editor settings:\r\n"));
 	WriteItemYesNo(2, _T("View Whitespace"), &m_miscSettings.bViewWhitespace);

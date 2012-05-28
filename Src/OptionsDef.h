@@ -301,6 +301,8 @@ extern COptionDef
 extern COptionDef
 <bool> OPT_CMP_MATCH_SIMILAR_LINES operator((_T("Settings/MatchSimilarLines"), false));
 extern COptionDef
+<int> OPT_CMP_MATCH_SIMILAR_LINES_MAX operator((_T("Settings/MatchSimilarLinesMax"), 15));
+extern COptionDef
 <bool> OPT_CMP_STOP_AFTER_FIRST operator((_T("Settings/StopAfterFirst"), false));
 extern COptionDef
 <UINT> OPT_CMP_QUICK_LIMIT operator((_T("Settings/QuickMethodLimit"), 4 * 1024 * 1024));

@@ -140,7 +140,7 @@ void CChildFrame::Computelinediff(CCrystalTextView * pView1, CCrystalTextView * 
 
 	// Make the call to stringdiffs, which does all the hard & tedious computations
 	vector<wdiff> worddiffs;
-	bool breakType = GetBreakType();
+	int breakType = GetBreakType();
 	sd_ComputeWordDiffs(str1, str2, casitive, xwhite, breakType, difflvl == BYTEDIFF, &worddiffs);
 	//Add a diff in case of EOL difference
 	if (!m_diffWrapper.bIgnoreEol)

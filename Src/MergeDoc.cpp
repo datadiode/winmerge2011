@@ -2269,18 +2269,16 @@ void CChildFrame::SetTitle(LPCTSTR lpszTitle)
 }
 
 // Return current word breaking break type setting (whitespace only or include punctuation)
-bool CChildFrame::GetBreakType() const
+int CChildFrame::GetBreakType()
 {
-	BOOL breakType = COptionsMgr::Get(OPT_BREAK_TYPE);
-	return breakType > 0;
+	return COptionsMgr::Get(OPT_BREAK_TYPE);
 }
 
 // Return true to do line diff colors at the byte level (false to do them at word level)
-bool CChildFrame::GetByteColoringOption() const
+bool CChildFrame::GetByteColoringOption()
 {
 	// color at byte level if 'break_on_words' option not set
-	BOOL breakWords = COptionsMgr::Get(OPT_BREAK_ON_WORDS);
-	return !breakWords;
+	return !COptionsMgr::Get(OPT_BREAK_ON_WORDS);
 }
 
 /// Swap files and update views
@@ -2305,7 +2303,7 @@ void CChildFrame::SwapFiles()
 	m_strDesc[0].swap(m_strDesc[1]);
 
 	m_strPath[0].swap(m_strPath[1]);
-	m_diffList.Swap();
+	m_diffList.SwapSides();
 
 	m_ptBuf[0]->m_nThisPane = 0;
 	m_pView[0]->m_nThisPane = 0;

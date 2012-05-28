@@ -2567,6 +2567,7 @@ static void LoadConfigLog(CConfigLog &configLog, LOGFONT &lfDiff, ConfigLogDirec
 	LoadConfigIntSetting(configLog.m_miscSettings.nInsertTabs, OPT_TAB_TYPE, cfgdir);
 	LoadConfigIntSetting(configLog.m_miscSettings.nTabSize, OPT_TAB_SIZE, cfgdir);
 	LoadConfigBoolSetting(configLog.m_miscSettings.bMatchSimilarLines, OPT_CMP_MATCH_SIMILAR_LINES, cfgdir);	
+	LoadConfigIntSetting(configLog.m_miscSettings.nMatchSimilarLinesMax, OPT_CMP_MATCH_SIMILAR_LINES_MAX, cfgdir);
 
 	LoadConfigIntSetting(configLog.m_cpSettings.nDefaultMode, OPT_CP_DEFAULT_MODE, cfgdir);
 	LoadConfigIntSetting(configLog.m_cpSettings.nDefaultCustomValue, OPT_CP_DEFAULT_CUSTOM, cfgdir);

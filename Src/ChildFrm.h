@@ -98,6 +98,8 @@ class CChildFrame
 	, public CScriptable<IMergeDoc>
 	, private CFloatFlags
 {
+	class DiffMap;
+	friend DiffMap;
 public:
 	CChildFrame(CMainFrame *, CChildFrame *pOpener = NULL);
 
@@ -298,12 +300,11 @@ private:
 	void WriteReport(UniStdioFile &);
 	void PrimeTextBuffers();
 	void AdjustDiffBlocks();
-	void AdjustDiffBlock(DiffMap &, const DIFFRANGE &, int lo0, int hi0, int lo1, int hi1);
-	int GetMatchCost(const String &Line0, const String &Line1);
+	int GetMatchCost(const String &sLine0, const String &sLine1);
 	void FlagMovedLines(MovedLines *, CDiffTextBuffer *, CDiffTextBuffer *);
 	String GetFileExt(LPCTSTR sFileName, LPCTSTR sDescription);
-	bool GetBreakType() const;
-	bool GetByteColoringOption() const;
+	static int GetBreakType();
+	static bool GetByteColoringOption();
 	static bool IsValidCodepageForMergeEditor(unsigned cp);
 	static void SanityCheckCodepage(FileLocation &fileinfo);
 	FileLoadResult::FILES_RESULT LoadOneFile(int index, BOOL &readOnly, const FileLocation &);

@@ -9,6 +9,7 @@
 
 #include "StdAfx.h"
 #include "Merge.h"
+#include "OptionsMgr.h"
 #include "DiffList.h"
 #include "MergeLineFlags.h"
 
@@ -18,164 +19,40 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-using stl::vector;
-
-/**
- * @brief Divide diff blocks to match lines in diff blocks.
- */
-void CChildFrame::AdjustDiffBlocks()
+class CChildFrame::DiffMap
 {
-	int nDiff;
-	int nDiffCount = m_diffList.GetSize();
-
-	// Go through and do our best to line up lines within each diff block
-	// between left side and right side
-	DiffList newDiffList;
-	newDiffList.Clear();
-	for (nDiff = 0; nDiff < nDiffCount; nDiff++)
+public:
+	enum
 	{
-		const DIFFRANGE & diffrange = *m_diffList.DiffRangeAt(nDiff);
-		// size map correctly (it will hold one entry for each left-side line
-		int nlines0 = diffrange.end0 - diffrange.begin0 + 1;
-		int nlines1 = diffrange.end1 - diffrange.begin1 + 1;
-		if (nlines0>0 && nlines1>0)
+		BAD_MAP_ENTRY = -999999999,
+		GHOST_MAP_ENTRY = 888888888
+	};
+	DiffMap(CChildFrame *, int begin0, int begin1, int lines0, int lines1);
+	int operator[](int i) { return map[i]; }
+private:
+	stl::vector<int> map;
+	stl::vector<int> cost;
+	void AdjustDiffBlock(int lo0, int hi0, const int lo1, const int hi1);
+};
+
+CChildFrame::DiffMap::DiffMap(CChildFrame *pDoc,
+	int begin0, int begin1, int lines0, int lines1
+) :	map(lines0, BAD_MAP_ENTRY), cost(lines0 * lines1)
+{
+	CDiffTextBuffer *tbuf0 = pDoc->m_ptBuf[0];
+	CDiffTextBuffer *tbuf1 = pDoc->m_ptBuf[1];
+	String sLine0, sLine1;
+	for (int j = 0 ; j < lines1 ; ++j)
+	{
+		tbuf1->GetLine(begin1 + j, sLine1);
+		const int k = j * map.size();
+		for (int i = 0 ; i < lines0 ; ++i)
 		{
-			// Call worker to do all lines in block
-			int lo0 = 0, hi0 = nlines0-1;
-			int lo1 = 0, hi1 = nlines1-1;
-			DiffMap diffmap;
-			diffmap.InitDiffMap(nlines0);
-			AdjustDiffBlock(diffmap, diffrange, lo0, hi0, lo1, hi1);
-
-#ifdef _DEBUG
-			stl::vector<int>::const_iterator iter = diffmap.m_map.begin();
-			int i = 0;
-			while (iter != diffmap.m_map.end())
-			{
-				TCHAR buf[256];
-				wsprintf(buf, _T("begin0=%d begin1=%d diffmap[%d]=%d\n"),
-						diffrange.begin0, diffrange.begin1, i, iter);
-				OutputDebugString(buf);
-				iter++;
-				i++;
-			}
-#endif
-
-			// divide diff blocks
-			DIFFRANGE dr;
-			int line0, line1, lineend0;
-			for (line0 = 0, line1 = 0; line0 < nlines0;)
-			{
-				const int map_line0 = diffmap.m_map[line0];
-				if (map_line0 == DiffMap::GHOST_MAP_ENTRY ||
-						map_line0 == DiffMap::BAD_MAP_ENTRY)
-				{
-					for (lineend0 = line0; lineend0 < nlines0; lineend0++)
-					{
-						if (map_line0 != DiffMap::GHOST_MAP_ENTRY &&
-								map_line0 != DiffMap::BAD_MAP_ENTRY)
-							break;
-					}
-					dr.begin0  = diffrange.begin0 + line0;
-					dr.begin1  = diffrange.begin1 + line1;
-					dr.end0    = diffrange.begin0 + lineend0 - 1;
-					dr.end1    = dr.begin1 - 1;
-					dr.blank0  = dr.blank1 = 0;
-					dr.op      = OP_DIFF;
-					newDiffList.AddDiff(dr);
-					line0 = lineend0;
-				}
-				else
-				{
-					if (map_line0 > line1)
-					{
-						dr.begin0  = diffrange.begin0 + line0;
-						dr.begin1  = diffrange.begin1 + line1;
-						dr.end0    = dr.begin0 - 1;
-						dr.end1    = diffrange.begin1 + map_line0 - 1;
-						dr.blank0  = dr.blank1 = 0;
-						dr.op      = OP_DIFF;
-						newDiffList.AddDiff(dr);
-						line1 = map_line0;
-					} 
-
-					for (lineend0 = line0 + 1; lineend0 < nlines0; lineend0++)
-					{
-						if (map_line0 != diffmap.m_map[lineend0 - 1] + 1)
-							break;
-					}
-					dr.begin0  = diffrange.begin0 + line0;
-					dr.begin1  = diffrange.begin1 + line1;
-					dr.end0    = diffrange.begin0 + lineend0 - 1;
-					dr.end1    = diffrange.begin1 + diffmap.m_map[lineend0 - 1];
-					dr.blank0  = dr.blank1 = 0;
-					dr.op      = diffrange.op == OP_TRIVIAL ? OP_TRIVIAL : OP_DIFF;
-					newDiffList.AddDiff(dr);
-					line0 = lineend0;
-					line1 = diffmap.m_map[lineend0 - 1] + 1;
-				}
-			}
-			if (line1 <= hi1)
-			{
-				dr.begin0  = diffrange.begin0 + line0;
-				dr.begin1  = diffrange.begin1 + line1;
-				dr.end0    = dr.begin0 - 1;
-				dr.end1    = diffrange.begin1 + hi1;
-				dr.blank0  = dr.blank1 = 0;
-				dr.op      = diffrange.op == OP_TRIVIAL ? OP_TRIVIAL : OP_DIFF;
-				newDiffList.AddDiff(dr);
-			}
-		}
-		else
-		{
-			newDiffList.AddDiff(diffrange);
+			tbuf0->GetLine(begin0 + i, sLine0);
+			cost[k + i] = pDoc->GetMatchCost(sLine0, sLine1);
 		}
 	}
-
-	// recreate m_diffList
-	m_diffList.Clear();
-	nDiffCount = newDiffList.GetSize();
-	for (nDiff = 0; nDiff < nDiffCount; nDiff++)
-	{
-#ifdef _DEBUG
-		TCHAR buf[256];
-		DIFFRANGE di = *newDiffList.DiffRangeAt(nDiff);
-		wsprintf(buf, _T("%d: begin0=%d end0=%d begin1=%d end1=%d\n"), nDiff,
-				di.begin0, di.end0, di.begin1, di.end1);
-		OutputDebugString(buf);
-#endif
-		m_diffList.AddDiff(*newDiffList.DiffRangeAt(nDiff));
-	}
-}
-
-/**
- * @brief Return cost of making strings equal
- *
- * The cost of making them equal is the measure of their dissimilarity
- * which is their Levenshtein distance.
- */
-int CChildFrame::GetMatchCost(const String &sLine0, const String &sLine1)
-{
-	// Options that affect comparison
-	bool casitive = !m_diffWrapper.bIgnoreCase;
-	int xwhite = m_diffWrapper.nIgnoreWhitespace;
-	int breakType = GetBreakType(); // whitespace only or include punctuation
-	bool byteColoring = GetByteColoringOption();
-
-	vector<wdiff> worddiffs;
-	sd_ComputeWordDiffs(sLine0, sLine1, casitive, xwhite, breakType, byteColoring, &worddiffs);
-
-	int nDiffLenSum = 0;
-	int i;
-	int nCount = worddiffs.size();
-	for (i = 0; i < nCount; i++)
-	{
-		const wdiff &wd = worddiffs[i];
-		int nDiffLen0 = wd.end[0] - wd.start[0] + 1;
-		int nDiffLen1 = wd.end[1] - wd.start[1] + 1;
-		nDiffLenSum += max(nDiffLen0, nDiffLen1);
-	}
-	return nDiffLenSum;
+	AdjustDiffBlock(0, lines0 - 1, 0, lines1 - 1);
 }
 
 /**
@@ -187,68 +64,25 @@ int CChildFrame::GetMatchCost(const String &sLine0, const String &sLine1)
  * Find best match, and use that to split problem into two parts (above & below match)
  * and call ourselves recursively to solve each smaller problem
  */
-void CChildFrame::AdjustDiffBlock(DiffMap & diffMap, const DIFFRANGE & diffrange, int lo0, int hi0, int lo1, int hi1)
+void CChildFrame::DiffMap::AdjustDiffBlock(int lo0, int hi0, const int lo1, const int hi1)
 {
-	// Map & lo & hi numbers are all relative to this block
-	// We need to know offsets to find actual line strings from buffer
-	int offset0 = diffrange.begin0;
-	int offset1 = diffrange.begin1;
-
-	// # of lines on left and right
-	int lines0 = hi0 - lo0 + 1;
-	int lines1 = hi1 - lo1 + 1;
-
-
-	ASSERT(lines0 > 0 && lines1 > 0);
-
+	// Map & lo & hi numbers are all relative to begin0 & begin1
 	// shortcut special case
-	if (lines0 == 1 && lines1 == 1)
+	if ((lo0 == hi0) && (lo1 == hi1))
 	{
-		diffMap.m_map[lo0] = hi1;
+		map[lo0] = hi1;
 		return;
 	}
-
-	// Bail out if range is large
-	if (lines0 > 15 || lines1 > 15)
-	{
-		// Do simple 1:1 mapping
-		// but try to stay within original block
-		// Cannot be outside both sides, so just test for outside one side
-		int tlo=0, thi=0;
-		if (lo1 < 0)
-		{
-			// right side is off the bottom
-			// so put it as close to bottom as possible
-			tlo = hi1 - (hi0-lo0);
-			thi = hi1;
-		}
-		else
-		{
-			// put it as close to top as possible
-			tlo = lo1;
-			thi = lo1 + (hi0-lo0);
-		}
-
-		for (int w=0; w<lines0; ++w)
-		{
-			if (w < lines1)
-				diffMap.m_map[w] = w + tlo;
-			else
-				diffMap.m_map[w] = DiffMap::GHOST_MAP_ENTRY;
-		}
-		return;
-	}
-
 	// Find best fit
-	int ibest=-1, isavings=0x7fffffff, itarget=-1;
-	String sLine0, sLine1;
-	for (int i=lo0; i<=hi0; ++i)
+	int ibest = -1;
+	int isavings = INT_MAX;
+	int itarget = -1;
+	for (int j = lo1 ; j <= hi1 ; ++j)
 	{
-		m_ptBuf[0]->GetLine(offset0 + i, sLine0);
-		for (int j=lo1; j<=hi1; ++j)
+		const int k = j * map.size();
+		for (int i = lo0 ; i <= hi0 ; ++i)
 		{
-			m_ptBuf[1]->GetLine(offset1 + j, sLine1);
-			int savings = GetMatchCost(sLine0.c_str(), sLine1.c_str());
+			const int savings = cost[k + i];
 			// TODO
 			// Need to penalize assignments that push us outside the box
 			// further than is required
@@ -265,42 +99,156 @@ void CChildFrame::AdjustDiffBlock(DiffMap & diffMap, const DIFFRANGE & diffrange
 	// so cost is always nonnegative
 	ASSERT(ibest >= 0);
 
-	ASSERT(diffMap.m_map[ibest] == DiffMap::BAD_MAP_ENTRY);
+	ASSERT(map[ibest] == BAD_MAP_ENTRY);
 
-	diffMap.m_map[ibest] = itarget;
+	map[ibest] = itarget;
 
 	// Half of the remaining problem is below our match
-	if (lo0 < ibest)
+	while (lo0 < ibest)
 	{
 		if (lo1 < itarget)
 		{
-			AdjustDiffBlock(diffMap, diffrange, lo0, ibest-1, lo1, itarget-1);
+			AdjustDiffBlock(lo0, ibest - 1, lo1, itarget - 1);
+			break;
 		}
-		else
-		{
-			// No target space for the ones below our match
-			for (int x = lo0; x < ibest; ++x)
-			{
-				diffMap.m_map[x] = DiffMap::GHOST_MAP_ENTRY;
-			}
-		}
+		// No target space for the ones below our match
+		map[lo0++] = GHOST_MAP_ENTRY;
 	}
 
 	// Half of the remaining problem is above our match
-	if (hi0 > ibest)
+	while (hi0 > ibest)
 	{
-		if (itarget < hi1)
+		if (hi1 > itarget)
 		{
-			AdjustDiffBlock(diffMap, diffrange, ibest + 1, hi0,
-					itarget + 1, hi1);
+			AdjustDiffBlock(ibest + 1, hi0, itarget + 1, hi1);
+			break;
+		}
+		// No target space for the ones above our match
+		map[hi0--] = GHOST_MAP_ENTRY;
+	}
+}
+
+/**
+ * @brief Divide diff blocks to match lines in diff blocks.
+ */
+void CChildFrame::AdjustDiffBlocks()
+{
+	int nMatchSimilarLinesMax = COptionsMgr::Get(OPT_CMP_MATCH_SIMILAR_LINES_MAX);
+	// Go through and do our best to line up lines within each diff block
+	// between left side and right side
+	DiffList newDiffList;
+	const int nDiffCount = m_diffList.GetSize();
+	for (int nDiff = 0; nDiff < nDiffCount; ++nDiff)
+	{
+		const DIFFRANGE *pdr = m_diffList.DiffRangeAt(nDiff);
+		// size map correctly (it will hold one entry for each left-side line
+		int nlines0 = pdr->end0 - pdr->begin0 + 1;
+		int nlines1 = pdr->end1 - pdr->begin1 + 1;
+		if (nlines0 > 0 && nlines1 > 0 &&		// Only if both sides nonempty
+			nlines0 <= nMatchSimilarLinesMax &&
+			nlines1 <= nMatchSimilarLinesMax)	// Only if range isn't large
+		{
+			// Map lines from file1 to file2
+			//stl::vector<int> diffmap(nlines0, BAD_MAP_ENTRY);
+			DiffMap diffmap(this, pdr->begin0, pdr->begin1, nlines0, nlines1);
+			//AdjustDiffBlock(diffmap, pdr->begin0, pdr->begin1, 0, nlines0 - 1, 0, nlines1 - 1);
+#ifdef _DEBUG
+			for (int i = 0 ; i < nlines0 ; ++i)
+			{
+				TRACE("begin0=%d begin1=%d diffmap[%d]=%d\n",
+					pdr->begin0, pdr->begin1, i, diffmap[i]);
+			}
+#endif
+			// divide diff blocks
+			DIFFRANGE dr;
+			dr.op = pdr->op;
+			int line0 = 0;
+			int line1 = 0;
+			while (line0 < nlines0)
+			{
+				int map_line0 = diffmap[line0];
+				if (map_line0 == DiffMap::GHOST_MAP_ENTRY ||
+					map_line0 == DiffMap::BAD_MAP_ENTRY)
+				{
+					// insert ghostlines on right side
+					dr.begin0  = pdr->begin0 + line0;
+					dr.begin1  = pdr->begin1 + line1;
+					while ((map_line0 == DiffMap::GHOST_MAP_ENTRY ||
+						map_line0 == DiffMap::BAD_MAP_ENTRY) &&
+						(++line0 < nlines0))
+					{
+						map_line0 = diffmap[line0];
+ 					}
+					dr.end0    = pdr->begin0 + line0 - 1;
+					dr.end1    = dr.begin1 - 1;
+					newDiffList.AddDiff(dr);
+				}
+				else
+				{
+					// insert ghostlines on left side
+					dr.begin0  = pdr->begin0 + line0;
+					if (line1 < map_line0)
+					{
+						dr.begin1  = pdr->begin1 + line1;
+						dr.end0    = dr.begin0 - 1;
+						dr.end1    = pdr->begin1 + map_line0 - 1;
+						newDiffList.AddDiff(dr);
+						line1 = map_line0;
+					} 
+					dr.begin1  = pdr->begin1 + line1;
+					do
+					{
+						line1 = diffmap[line0++] + 1;
+					} while ((map_line0 == line1) && (line0 < nlines0));
+					dr.end0    = pdr->begin0 + line0 - 1;
+					dr.end1    = pdr->begin1 + line1 - 1;
+					newDiffList.AddDiff(dr);
+				}
+			}
+			if (line1 < nlines1)
+			{
+				dr.begin0  = pdr->begin0 + line0;
+				dr.begin1  = pdr->begin1 + line1;
+				dr.end0    = dr.begin0 - 1;
+				dr.end1    = pdr->begin1 + nlines1 - 1;
+				newDiffList.AddDiff(dr);
+			}
 		}
 		else
 		{
-			// No target space for the ones above our match
-			for (int x = ibest + 1; x <= hi0; ++x)
-			{
-				diffMap.m_map[x] = DiffMap::GHOST_MAP_ENTRY;
-			}
+			newDiffList.AddDiff(*pdr);
 		}
 	}
+
+	// Swap into m_diffList
+	m_diffList.swap(newDiffList);
+}
+
+/**
+ * @brief Return cost of making strings equal
+ *
+ * The cost of making them equal is the measure of their dissimilarity
+ * which is their Levenshtein distance.
+ */
+int CChildFrame::GetMatchCost(const String &sLine0, const String &sLine1)
+{
+	// Options that affect comparison
+	bool casitive = !m_diffWrapper.bIgnoreCase;
+	int xwhite = m_diffWrapper.nIgnoreWhitespace;
+	int breakType = GetBreakType(); // whitespace only or include punctuation
+	bool byteColoring = GetByteColoringOption();
+
+	stl::vector<wdiff> worddiffs;
+	sd_ComputeWordDiffs(sLine0, sLine1, casitive, xwhite, breakType, byteColoring, &worddiffs);
+
+	int nDiffLenSum = 0;
+	stl::vector<wdiff>::const_iterator it = worddiffs.begin();
+	while (it != worddiffs.end())
+	{
+		const wdiff &wd = *it++;
+		int nDiffLen0 = wd.end[0] - wd.start[0] + 1;
+		int nDiffLen1 = wd.end[1] - wd.start[1] + 1;
+		nDiffLenSum += max(nDiffLen0, nDiffLen1);
+	}
+	return nDiffLenSum;
 }

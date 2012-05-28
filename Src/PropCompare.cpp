@@ -32,6 +32,7 @@ PropCompare::PropCompare()
 , m_bMovedBlocks(FALSE)
 , m_bMatchSimilarLines(FALSE)
 , m_bFilterCommentsLines(FALSE)
+, m_nMatchSimilarLinesMax(15)
 {
 }
 
@@ -47,6 +48,12 @@ bool PropCompare::UpdateData()
 	DDX_Check<op>(IDC_ALL_WHITE, m_nIgnoreWhite, 2);
 	DDX_Check<op>(IDC_MOVED_BLOCKS, m_bMovedBlocks);
 	DDX_Check<op>(IDC_MATCH_SIMILAR_LINES, m_bMatchSimilarLines);
+	DDX_Text<op>(IDC_MATCH_SIMILAR_LINES_MAX, m_nMatchSimilarLinesMax);
+	if (HEdit *pEdit = static_cast<HEdit *>(GetDlgItem(IDC_MATCH_SIMILAR_LINES_MAX)))
+	{
+		pEdit->EnableWindow(m_bMatchSimilarLines);
+		pEdit->LimitText(3);
+	}
 	return true;
 }
 
@@ -79,9 +86,10 @@ void PropCompare::ReadOptions()
 	m_bIgnoreBlankLines = COptionsMgr::Get(OPT_CMP_IGNORE_BLANKLINES);
 	m_bFilterCommentsLines = COptionsMgr::Get(OPT_CMP_FILTER_COMMENTLINES);
 	m_bIgnoreCase = COptionsMgr::Get(OPT_CMP_IGNORE_CASE);
-	m_bIgnoreEol = COptionsMgr::Get(OPT_CMP_IGNORE_EOL) ? true : false;
+	m_bIgnoreEol = COptionsMgr::Get(OPT_CMP_IGNORE_EOL);
 	m_bMovedBlocks = COptionsMgr::Get(OPT_CMP_MOVED_BLOCKS);
 	m_bMatchSimilarLines = COptionsMgr::Get(OPT_CMP_MATCH_SIMILAR_LINES);
+	m_nMatchSimilarLinesMax = COptionsMgr::Get(OPT_CMP_MATCH_SIMILAR_LINES_MAX);
 }
 
 /** 
@@ -98,6 +106,7 @@ void PropCompare::WriteOptions()
 	COptionsMgr::SaveOption(OPT_CMP_IGNORE_CASE, m_bIgnoreCase != FALSE);
 	COptionsMgr::SaveOption(OPT_CMP_MOVED_BLOCKS, m_bMovedBlocks != FALSE);
 	COptionsMgr::SaveOption(OPT_CMP_MATCH_SIMILAR_LINES, m_bMatchSimilarLines != FALSE);
+	COptionsMgr::SaveOption(OPT_CMP_MATCH_SIMILAR_LINES_MAX, m_nMatchSimilarLinesMax);
 }
 
 /** 
