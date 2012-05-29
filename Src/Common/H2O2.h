@@ -391,5 +391,5 @@ namespace H2O
 	HWND GetTopLevelParent(HWND);
 	HIMAGELIST Create3StateImageList();
 	void GetDesktopWorkArea(HWND, LPRECT);
-	void CenterWindow(HWindow *);
+	void CenterWindow(HWindow *, HWindow *pParent = NULL);
 }

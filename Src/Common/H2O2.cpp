@@ -451,7 +451,7 @@ void H2O::GetDesktopWorkArea(HWND hWnd, LPRECT prcDesktop)
 #endif
 }
 
-void H2O::CenterWindow(HWindow *pWnd)
+void H2O::CenterWindow(HWindow *pWnd, HWindow *pParent)
 // Centers this window over its parent
 {
 	RECT rc;
@@ -460,7 +460,7 @@ void H2O::CenterWindow(HWindow *pWnd)
 	GetDesktopWorkArea(pWnd->m_hWnd, &rcBounds);
 	// Get the parent window dimensions (parent could be the desktop)
 	RECT rcParent = rcBounds;
-	if (HWindow *pParent = pWnd->GetParent())
+	if ((pParent != NULL) || (pParent = pWnd->GetParent()) != NULL)
 		pParent->GetWindowRect(&rcParent);
 	// Calculate point to center the dialog over the portion of parent window on this monitor
 	::IntersectRect(&rcParent, &rcParent, &rcBounds);

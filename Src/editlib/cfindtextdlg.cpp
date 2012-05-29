@@ -112,6 +112,10 @@ LRESULT CFindTextDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			OnChangeEditText();
 		}
 		break;
+	case WM_SHOWWINDOW:
+		if (wParam != FALSE)
+			CenterWindow(m_pWnd, m_pBuddy->m_pWnd);
+		break;
 	}
 	return ODialog::WindowProc(message, wParam, lParam);
 }
