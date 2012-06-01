@@ -25,6 +25,7 @@
 #include "StdAfx.h"
 #include "Merge.h"
 #include "LanguageSelect.h"
+#include "MergeEditView.h"
 #include "WMGotoDlg.h"
 
 #ifdef _DEBUG
@@ -39,10 +40,9 @@ static char THIS_FILE[] = __FILE__;
 /**
  * @brief Constructor.
  */
-WMGotoDlg::WMGotoDlg()
+WMGotoDlg::WMGotoDlg(CMergeEditView *pBuddy)
 	: ODialog(IDD_WMGOTO)
-	, m_nFile(-1)
-	, m_nGotoWhat(-1)
+	, m_pBuddy(pBuddy)
 {
 }
 
@@ -82,6 +82,10 @@ LRESULT WMGotoDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			EndDialog(wParam);
 			break;
 		}
+		break;
+	case WM_SHOWWINDOW:
+		if (wParam != FALSE)
+			CenterWindow(m_pWnd, m_pBuddy->m_pWnd);
 		break;
 	}
 	return ODialog::WindowProc(message, wParam, lParam);

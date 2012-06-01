@@ -34,11 +34,13 @@
  * choice for target panel. When dialog is opened, its values are initialized
  * for active file's line number.
  */
-class WMGotoDlg : public ODialog
+class WMGotoDlg
+	: ZeroInit<WMGotoDlg>
+	, public ODialog
 {
 // Construction
 public:
-	WMGotoDlg();   // standard constructor
+	WMGotoDlg(CMergeEditView *); // constructor
 
 // Dialog Data
 	String m_strParam;   /**< Line/difference number. */
@@ -51,6 +53,8 @@ protected:
 			bool UpdateData();
 	virtual BOOL OnInitDialog();
 	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
+private:
+	CMergeEditView *const m_pBuddy;
 };
 
 //{{AFX_INSERT_LOCATION}}

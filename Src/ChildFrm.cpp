@@ -117,44 +117,34 @@ void CChildFrame::OnEditRedo()
  */
 void CChildFrame::OnWMGoto()
 {
-	WMGotoDlg dlg;
-	CMergeEditView *const pMergeView = GetActiveMergeView();
-	POINT pos = pMergeView->GetCursorPos();
-
-	int nLineCount = m_ptBuf[pMergeView->m_nThisPane]->GetLineCount();
-	int nRealLine = m_ptBuf[pMergeView->m_nThisPane]->ComputeRealLine(pos.y);
-	int nLastLine = m_ptBuf[pMergeView->m_nThisPane]->ComputeRealLine(nLineCount - 1);
-
+	CMergeEditView *pMergeView = GetActiveMergeView();
+	WMGotoDlg dlg(pMergeView);
 	// Set active file and current line selected in dialog
-	dlg.m_strParam = string_format(_T("%d"), nRealLine + 1);
 	dlg.m_nFile = pMergeView->m_nThisPane;
-	dlg.m_nGotoWhat = 0;
-
+	POINT pos = pMergeView->GetCursorPos();
+	int nParam = m_ptBuf[dlg.m_nFile]->ComputeRealLine(pos.y);
+	dlg.m_strParam = string_format(_T("%d"), nParam + 1);
 	if (LanguageSelect.DoModal(dlg) == IDOK)
 	{
-		// Get views
-		CMergeEditView *pCurrentView = GetView(dlg.m_nFile);
-		pCurrentView->SetFocus();
-
+		// Reassign pMergeView because user may have altered the target pane
+		pMergeView = GetView(dlg.m_nFile);
+		pMergeView->SetFocus();
+		nParam = _ttoi(dlg.m_strParam.c_str()) - 1;
+		if (nParam < 0)
+			nParam = 0;
 		if (dlg.m_nGotoWhat == 0)
 		{
-			int nRealLine = _ttoi(dlg.m_strParam.c_str()) - 1;
-			if (nRealLine < 0)
-				nRealLine = 0;
-			if (nRealLine > nLastLine)
-				nRealLine = nLastLine;
-
-			pCurrentView->GotoLine(nRealLine, true, dlg.m_nFile);
+			int nLineCount = m_ptBuf[dlg.m_nFile]->GetLineCount();
+			int nLastLine = m_ptBuf[dlg.m_nFile]->ComputeRealLine(nLineCount - 1);
+			if (nParam > nLastLine)
+				nParam = nLastLine;
+			pMergeView->GotoLine(nParam, true, dlg.m_nFile);
 		}
 		else
 		{
-			int diff = _ttoi(dlg.m_strParam.c_str()) - 1;
-			if (diff < 0)
-				diff = 0;
-			if (diff >= m_diffList.GetSize())
-				diff = m_diffList.GetSize();
-
-			pCurrentView->SelectDiff(diff, true, false);
+			if (nParam > m_diffList.GetSize())
+				nParam = m_diffList.GetSize();
+			pMergeView->SelectDiff(nParam, true, false);
 		}
 	}
 }
