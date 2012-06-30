@@ -45,10 +45,10 @@ TimeString::TimeString(const FILETIME &tim)
 {
 	SYSTEMTIME sysTime;
 	::FileTimeToSystemTime(&tim, &sysTime);
-	if (int len = ::GetDateFormat(LOCALE_USER_DEFAULT, LOCALE_NOUSEROVERRIDE, &sysTime, NULL, out, 60))
+	if (int len = ::GetDateFormat(LOCALE_USER_DEFAULT, 0, &sysTime, NULL, out, 60))
 	{
 		out[len - 1] = _T(' ');
-		::GetTimeFormat(LOCALE_USER_DEFAULT, LOCALE_NOUSEROVERRIDE, &sysTime, NULL, out + len, 60);
+		::GetTimeFormat(LOCALE_USER_DEFAULT, 0, &sysTime, NULL, out + len, 60);
 	}
 	else
 	{
