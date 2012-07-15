@@ -39,6 +39,7 @@ CChildFrame::DiffMap::DiffMap(CChildFrame *pDoc,
 	int begin0, int begin1, int lines0, int lines1
 ) :	map(lines0, BAD_MAP_ENTRY), cost(lines0 * lines1)
 {
+	// Map & lo & hi numbers are all relative to begin0 & begin1
 	CDiffTextBuffer *tbuf0 = pDoc->m_ptBuf[0];
 	CDiffTextBuffer *tbuf1 = pDoc->m_ptBuf[1];
 	String sLine0, sLine1;
@@ -66,7 +67,6 @@ CChildFrame::DiffMap::DiffMap(CChildFrame *pDoc,
  */
 void CChildFrame::DiffMap::AdjustDiffBlock(int lo0, int hi0, const int lo1, const int hi1)
 {
-	// Map & lo & hi numbers are all relative to begin0 & begin1
 	// shortcut special case
 	if ((lo0 == hi0) && (lo1 == hi1))
 	{
@@ -178,7 +178,7 @@ void CChildFrame::AdjustDiffBlocks()
 						(++line0 < nlines0))
 					{
 						map_line0 = diffmap[line0];
- 					}
+					}
 					dr.end0    = pdr->begin0 + line0 - 1;
 					dr.end1    = dr.begin1 - 1;
 					newDiffList.AddDiff(dr);
