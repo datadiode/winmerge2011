@@ -46,11 +46,11 @@
 #define MB_DONT_ASK_AGAIN			0x02000000L	// Additional style.
 #define MB_YES_TO_ALL				0x04000000L	// Additional style.
 #define MB_NO_TO_ALL				0x08000000L	// Additional style.
-#define MB_IGNORE_IF_SILENCED		0x10000000L // Additional style.
 
 #define MB_DEFAULT_CHECKED			0x10000000L // Additional style.
 #define MB_RIGHT_ALIGN				0x20000000L	// Additional style.
 #define MB_NO_SOUND					0x40000000L	// Additional style.
+#define MB_IGNORE_IF_SILENCED		0x80000000L // Additional style.
 
 #define MB_DEFBUTTON5				0x00000400L	// Additional style.
 #define MB_DEFBUTTON6				0x00000500L	// Additional style.
