@@ -284,6 +284,7 @@ void CDirView::DoDelLeft()
 	// Now we prompt, and execute actions
 	ConfirmAndPerformActions(actionScript, selCount);
 }
+
 /// Prompt & delete right, if legal
 void CDirView::DoDelRight()
 {
