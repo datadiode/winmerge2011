@@ -34,7 +34,6 @@ static char THIS_FILE[] = __FILE__;
  *
  * Items are tested against file filters in this function.
  * 
- * @param [in] paths Root paths of compare
  * @param [in] leftsubdir Left side subdirectory under root path
  * @param [in] bLeftUniq Is left-side folder unique folder?
  * @param [in] rightsubdir Right side subdirectory under root path
