@@ -202,7 +202,7 @@ void CPreferencesDlg::OnSelchangingPages(NMTREEVIEW *pNM)
 			htiSel = htiChild;
 
 		OptionsPanel* pPage = (OptionsPanel*) m_tcPages->GetItemData(htiSel);
-		_ASSERTE(pPage);
+		ASSERT(pPage);
 
 		pPage->ShowWindow(SW_HIDE);
 	}	
@@ -216,7 +216,7 @@ void CPreferencesDlg::OnSelchangedPages(NMTREEVIEW *pNM)
 			htiSel = htiChild;
 
 		OptionsPanel* pPage = (OptionsPanel*) m_tcPages->GetItemData(htiSel);
-		_ASSERTE(pPage);
+		ASSERT(pPage);
 		if (!pPage->m_hWnd && !LanguageSelect.Create(*pPage, m_hWnd))
 			return;
 

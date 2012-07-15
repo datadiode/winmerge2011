@@ -77,7 +77,7 @@ BOOL SelectFile(HWND parent, String& path, LPCTSTR initialPath,
 		}
 	}
 
-	_ASSERTE(parent != NULL);
+	ASSERT(parent != NULL);
 	
 	if (!filterid)
 		filterid = IDS_ALLFILES;
@@ -134,7 +134,7 @@ BOOL SelectFolder(HWND parent, String& path, LPCTSTR root_path, UINT titleid)
 	BOOL bRet = FALSE;
 	String title = LanguageSelect.LoadString(titleid);
 
-	_ASSERTE(parent != NULL);
+	ASSERT(parent != NULL);
 
 	TCHAR szPath[MAX_PATH];
 
@@ -210,7 +210,7 @@ BOOL SelectFileOrFolder(HWND parent, String& path, LPCTSTR initialPath /*=NULL*/
 		}
 	}
 
-	_ASSERTE(parent != NULL);
+	ASSERT(parent != NULL);
 
 	int filterid = IDS_ALLFILES;
 

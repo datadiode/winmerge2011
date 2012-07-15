@@ -20,8 +20,8 @@ CSettingStore::CSettingStore(LPCTSTR sCompanyName, LPCTSTR sApplicationName)
 
 int CSettingStore::GetProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nDefault) const
 {
-	_ASSERTE(lpszSection != NULL);
-	_ASSERTE(lpszEntry != NULL);
+	ASSERT(lpszSection != NULL);
+	ASSERT(lpszEntry != NULL);
 
 	HKEY hSecKey = GetSectionKey(lpszSection);
 	if (hSecKey == NULL)
@@ -34,8 +34,8 @@ int CSettingStore::GetProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nDe
 	RegCloseKey(hSecKey);
 	if (lResult == ERROR_SUCCESS)
 	{
-		_ASSERTE(dwType == REG_DWORD);
-		_ASSERTE(dwCount == sizeof(dwValue));
+		ASSERT(dwType == REG_DWORD);
+		ASSERT(dwCount == sizeof(dwValue));
 		return (UINT)dwValue;
 	}
 	return nDefault;
@@ -43,8 +43,8 @@ int CSettingStore::GetProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nDe
 
 String CSettingStore::GetProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPCTSTR lpszDefault) const
 {
-	_ASSERTE(lpszSection != NULL);
-	_ASSERTE(lpszEntry != NULL);
+	ASSERT(lpszSection != NULL);
+	ASSERT(lpszEntry != NULL);
 
 	HKEY hSecKey = GetSectionKey(lpszSection);
 	if (hSecKey == NULL)
@@ -55,7 +55,7 @@ String CSettingStore::GetProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, L
 		NULL, &dwCount);
 	if (lResult == ERROR_SUCCESS)
 	{
-		_ASSERTE(dwType == REG_SZ);
+		ASSERT(dwType == REG_SZ);
 		strValue.resize(dwCount / sizeof(TCHAR));
 		lResult = RegQueryValueEx(hSecKey, (LPTSTR)lpszEntry, NULL, &dwType,
 			(LPBYTE)&strValue[0], &dwCount);
@@ -63,7 +63,7 @@ String CSettingStore::GetProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, L
 	RegCloseKey(hSecKey);
 	if (lResult == ERROR_SUCCESS)
 	{
-		_ASSERTE(dwType == REG_SZ);
+		ASSERT(dwType == REG_SZ);
 		return strValue;
 	}
 	return lpszDefault;
@@ -71,10 +71,10 @@ String CSettingStore::GetProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, L
 
 BOOL CSettingStore::GetProfileBinary(LPCTSTR lpszSection, LPCTSTR lpszEntry, BYTE** ppData, UINT* pBytes) const
 {
-	_ASSERTE(lpszSection != NULL);
-	_ASSERTE(lpszEntry != NULL);
-	_ASSERTE(ppData != NULL);
-	_ASSERTE(pBytes != NULL);
+	ASSERT(lpszSection != NULL);
+	ASSERT(lpszEntry != NULL);
+	ASSERT(ppData != NULL);
+	ASSERT(pBytes != NULL);
 	*ppData = NULL;
 	*pBytes = 0;
 
@@ -88,7 +88,7 @@ BOOL CSettingStore::GetProfileBinary(LPCTSTR lpszSection, LPCTSTR lpszEntry, BYT
 	*pBytes = dwCount;
 	if (lResult == ERROR_SUCCESS)
 	{
-		_ASSERTE(dwType == REG_BINARY);
+		ASSERT(dwType == REG_BINARY);
 		*ppData = new BYTE[*pBytes];
 		lResult = RegQueryValueEx(hSecKey, (LPTSTR)lpszEntry, NULL, &dwType,
 			*ppData, &dwCount);
@@ -96,7 +96,7 @@ BOOL CSettingStore::GetProfileBinary(LPCTSTR lpszSection, LPCTSTR lpszEntry, BYT
 	RegCloseKey(hSecKey);
 	if (lResult == ERROR_SUCCESS)
 	{
-		_ASSERTE(dwType == REG_BINARY);
+		ASSERT(dwType == REG_BINARY);
 		return TRUE;
 	}
 	else
@@ -110,8 +110,8 @@ BOOL CSettingStore::GetProfileBinary(LPCTSTR lpszSection, LPCTSTR lpszEntry, BYT
 
 BOOL CSettingStore::WriteProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nValue) const
 {
-	_ASSERTE(lpszSection != NULL);
-	_ASSERTE(lpszEntry != NULL);
+	ASSERT(lpszSection != NULL);
+	ASSERT(lpszEntry != NULL);
 
 	HKEY hSecKey = GetSectionKey(lpszSection);
 	if (hSecKey == NULL)
@@ -124,7 +124,7 @@ BOOL CSettingStore::WriteProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int 
 
 BOOL CSettingStore::WriteProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPCTSTR lpszValue) const
 {
-	_ASSERTE(lpszSection != NULL);
+	ASSERT(lpszSection != NULL);
 
 	LONG lResult;
 	if (lpszEntry == NULL) //delete whole section
@@ -158,7 +158,7 @@ BOOL CSettingStore::WriteProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, L
 
 BOOL CSettingStore::WriteProfileBinary(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPBYTE pData, UINT nBytes) const
 {
-	_ASSERTE(lpszSection != NULL);
+	ASSERT(lpszSection != NULL);
 
 	LONG lResult;
 	HKEY hSecKey = GetSectionKey(lpszSection);
@@ -175,8 +175,8 @@ BOOL CSettingStore::WriteProfileBinary(LPCTSTR lpszSection, LPCTSTR lpszEntry, L
 // responsibility of the caller to call RegCloseKey() on the returned HKEY
 HKEY CSettingStore::GetAppRegistryKey() const
 {
-	_ASSERTE(!m_sCompanyName.empty());
-	_ASSERTE(!m_sApplicationName.empty());
+	ASSERT(!m_sCompanyName.empty());
+	ASSERT(!m_sApplicationName.empty());
 
 	HKEY hAppKey = NULL;
 	HKEY hSoftKey = NULL;
@@ -208,7 +208,7 @@ HKEY CSettingStore::GetAppRegistryKey() const
 // responsibility of the caller to call RegCloseKey() on the returned HKEY
 HKEY CSettingStore::GetSectionKey(LPCTSTR lpszSection, DWORD dwCreationDisposition) const
 {
-	_ASSERTE(lpszSection != NULL);
+	ASSERT(lpszSection != NULL);
 
 	HKEY hSectionKey = NULL;
 	HKEY hAppKey = GetAppRegistryKey();

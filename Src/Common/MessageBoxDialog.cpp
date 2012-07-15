@@ -112,7 +112,7 @@ public:
 	, m_bDontDisplayAgain(FALSE)
 	, m_nDefaultButton(-1)
 {
-	_ASSERTE(!m_strMessage.empty());
+	ASSERT(!m_strMessage.empty());
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -203,7 +203,7 @@ BOOL CMessageBoxDialog::OnInitDialog()
 	::SetWindowText(m_hWnd, m_strTitle.c_str());
 
 	// Set the help ID of the dialog.
-	_ASSERTE(((m_nStyle & (MB_DONT_DISPLAY_AGAIN | MB_DONT_ASK_AGAIN)) == 0) || (m_nHelp != 0));
+	ASSERT(((m_nStyle & (MB_DONT_DISPLAY_AGAIN | MB_DONT_ASK_AGAIN)) == 0) || (m_nHelp != 0));
 
 	// Parse the style of the message box.
 	ParseStyle();
@@ -477,7 +477,7 @@ void CMessageBoxDialog::ParseStyle()
 		break;
 
 	default:
-		_ASSERTE(FALSE);
+		ASSERT(FALSE);
 		// fall through
 	case MB_OK:
 		// Add just one button: "Ok".
@@ -579,7 +579,7 @@ LPARAM CMessageBoxDialog::CreateIconControl()
  */
 LPARAM CMessageBoxDialog::CreateMessageControl(int nXPosition, int nYPosition)
 {
-	_ASSERTE(!m_strMessage.empty());
+	ASSERT(!m_strMessage.empty());
 	// Define the maximum width of the message.
 	RECT rect = { 0, 0, GetSystemMetrics(SM_CXSCREEN) / 2 + 100, 0 };
 	// Check whether an icon is displayed.
@@ -626,7 +626,7 @@ LPARAM CMessageBoxDialog::CreateCheckboxControl(int nXPosition, int nYPosition)
 		strCheckboxTitle = LanguageSelect.LoadString(IDS_MESSAGEBOX_DONT_ASK_AGAIN);
 	}
 
-	_ASSERTE(!strCheckboxTitle.empty());
+	ASSERT(!strCheckboxTitle.empty());
 
 	RECT rect = { 0, 0, 0, 0 };
 	CFontDC dc(m_hWnd);

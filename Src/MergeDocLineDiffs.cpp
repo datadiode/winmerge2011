@@ -100,7 +100,7 @@ static void SetLineHighlightRect(int begin, int end, int line, int width, RECT &
  */
 static void ComputeHighlightRects(const vector<wdiff> & worddiffs, int whichdiff, int line, int width1, int width2, RECT &rc1, RECT &rc2)
 {
-	_ASSERTE(whichdiff >= 0 && whichdiff < static_cast<int>(worddiffs.size()));
+	ASSERT(whichdiff >= 0 && whichdiff < static_cast<int>(worddiffs.size()));
 	const wdiff &diff = worddiffs[whichdiff];
 	SetLineHighlightRect(diff.start[0], diff.end[0], line, width1, rc1);
 	SetLineHighlightRect(diff.start[1], diff.end[1], line, width2, rc2);
