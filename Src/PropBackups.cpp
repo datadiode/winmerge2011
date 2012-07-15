@@ -83,7 +83,7 @@ void PropBackups::ReadOptions()
  */
 void PropBackups::WriteOptions()
 {
-	m_sGlobalFolder = string_trim_ws(m_sGlobalFolder);
+	string_trim_ws(m_sGlobalFolder);
 	if (m_sGlobalFolder.size() > 3 &&
 		m_sGlobalFolder[m_sGlobalFolder.size() - 1] != '\\')
 	{

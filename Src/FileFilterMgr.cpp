@@ -123,7 +123,7 @@ void FileFilterMgr::DeleteAllFilters()
 static void AddFilterPattern(vector<FileFilterElement*> &filterList, String & str)
 {
 	static const TCHAR commentLeader[] = _T("##"); // Starts comment
-	str = string_trim_ws_begin(str);
+	string_trim_ws_begin(str);
 
 	// Ignore lines beginning with '##'
 	size_t pos = str.find(commentLeader);
@@ -137,7 +137,7 @@ static void AddFilterPattern(vector<FileFilterElement*> &filterList, String & st
 	// Remove comment and whitespaces before it
 	if (pos != String::npos)
 		str.resize(pos);
-	str = string_trim_ws_end(str);
+	string_trim_ws_end(str);
 	if (str.empty())
 		return;
 
@@ -188,13 +188,13 @@ FileFilter *FileFilterMgr::LoadFilterFile(LPCTSTR szFilepath)
 	{
 		// Returns false when last line is read
 		bLinesLeft = file.ReadString(sLine, sEol, &lossy);
-		sLine = string_trim_ws(sLine);
+		string_trim_ws(sLine);
 
 		if (0 == _tcsncmp(sLine.c_str(), _T("name:"), 5))
 		{
 			// specifies display name
 			String str = sLine.substr(5);
-			str = string_trim_ws_begin(str);
+			string_trim_ws_begin(str);
 			if (!str.empty())
 				pfilter->name = str;
 		}
@@ -202,7 +202,7 @@ FileFilter *FileFilterMgr::LoadFilterFile(LPCTSTR szFilepath)
 		{
 			// specifies display name
 			String str = sLine.substr(5);
-			str = string_trim_ws_begin(str);
+			string_trim_ws_begin(str);
 			if (!str.empty())
 				pfilter->description = str;
 		}
@@ -210,7 +210,7 @@ FileFilter *FileFilterMgr::LoadFilterFile(LPCTSTR szFilepath)
 		{
 			// specifies default
 			String str = sLine.substr(4);
-			str = string_trim_ws_begin(str);
+			string_trim_ws_begin(str);
 			if (str == _T("0") || str == _T("no") || str == _T("exclude"))
 				pfilter->default_include = false;
 			else if (str == _T("1") || str == _T("yes") || str == _T("include"))

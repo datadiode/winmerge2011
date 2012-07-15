@@ -133,13 +133,15 @@ void PropRegistry::ReadOptions()
 void PropRegistry::WriteOptions()
 {
 	COptionsMgr::SaveOption(OPT_USE_RECYCLE_BIN, m_bUseRecycleBin != FALSE);
-	String sExtEditor = string_trim_ws(m_strEditorPath);
-	if (sExtEditor.empty())
-		sExtEditor = COptionsMgr::GetDefault(OPT_EXT_EDITOR_CMD);
-	COptionsMgr::SaveOption(OPT_EXT_EDITOR_CMD, sExtEditor);
-	COptionsMgr::SaveOption(OPT_SUPPLEMENT_FOLDER, string_trim_ws(m_supplementFolder));
+	string_trim_ws(m_strEditorPath);
+	if (m_strEditorPath.empty())
+		m_strEditorPath = COptionsMgr::GetDefault(OPT_EXT_EDITOR_CMD);
+	COptionsMgr::SaveOption(OPT_EXT_EDITOR_CMD, m_strEditorPath);
+	string_trim_ws(m_supplementFolder);
+	COptionsMgr::SaveOption(OPT_SUPPLEMENT_FOLDER, m_supplementFolder);
 	COptionsMgr::SaveOption(OPT_USE_SYSTEM_TEMP_PATH, m_tempFolderType != 0);
-	COptionsMgr::SaveOption(OPT_CUSTOM_TEMP_PATH, string_trim_ws(m_tempFolder));
+	string_trim_ws(m_tempFolder);
+	COptionsMgr::SaveOption(OPT_CUSTOM_TEMP_PATH, m_tempFolder);
 }
 
 void PropRegistry::UpdateScreen()

@@ -151,9 +151,9 @@ void ProjectFilePathsDlg::OnBnClickedProjSave()
 {
 	UpdateData<Get>();
 
-	m_sLeftFile = string_trim_ws(m_sLeftFile);
-	m_sRightFile = string_trim_ws(m_sRightFile);
-	m_sFilter = string_trim_ws(m_sFilter);
+	string_trim_ws(m_sLeftFile);
+	string_trim_ws(m_sRightFile);
+	string_trim_ws(m_sFilter);
 
 	String fileName = AskProjectFileName(FALSE);
 	if (fileName.empty())

@@ -868,8 +868,8 @@ bool CConfigLog::ParseSettings(LPCTSTR Filepath)
 		{
 			String name = sLine.substr(0, colon);
 			String value = sLine.substr(colon + 1);
-			name = string_trim_ws(name);
-			value = string_trim_ws(value);
+			string_trim_ws(name);
+			string_trim_ws(value);
 			m_pCfgSettings->Add(name.c_str(), value.c_str());
 		}
 	}

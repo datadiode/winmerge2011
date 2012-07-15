@@ -309,7 +309,8 @@ String FileFilterHelper::GetFilterNameOrMask() const
 void FileFilterHelper::SetFilter(const String &filter)
 {
 	// Remove leading and trailing whitespace characters from the string.
-	String flt = string_trim_ws(filter);
+	String flt = filter;
+	string_trim_ws(flt);
 	if (LPCTSTR filterName = EatPrefix(flt.c_str(), _T("[F] ")))
 	{
 		flt = GetFileFilterPath(filterName);

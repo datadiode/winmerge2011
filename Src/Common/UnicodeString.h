@@ -43,9 +43,9 @@ void string_replace(String &target, const String &find, const String &replace);
 int string_compare_nocase(const String &str1, const String &str2);
 
 // Trimming
-String string_trim_ws(const String & str);
-String string_trim_ws_begin(const String & str);
-String string_trim_ws_end(const String & str);
+void string_trim_ws(String &);
+void string_trim_ws_begin(String &);
+void string_trim_ws_end(String &);
 
 // Formatting
 class string_format : public String

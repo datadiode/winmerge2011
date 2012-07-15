@@ -564,8 +564,8 @@ void COpenDlg::OnSelectFilter()
  */
 void COpenDlg::TrimPaths()
 {
-	m_sLeftFile = string_trim_ws(m_sLeftFile);
-	m_sRightFile = string_trim_ws(m_sRightFile);
+	string_trim_ws(m_sLeftFile);
+	string_trim_ws(m_sRightFile);
 	// If user has edited path by hand, expand environment variables
 	if (m_pCbLeft->GetEditControl()->GetModify())
 		m_sLeftFile = env_ExpandVariables(m_sLeftFile.c_str());

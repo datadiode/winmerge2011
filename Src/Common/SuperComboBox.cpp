@@ -112,7 +112,7 @@ void HSuperComboBox::SaveState(LPCTSTR szRegSubKey, UINT nMaxItems)
 		UINT n = GetCount();
 		for (;;)
 		{
-			s = string_trim_ws(s);
+			string_trim_ws(s);
 			if (s != strItem)
 			{
 				TCHAR name[20];

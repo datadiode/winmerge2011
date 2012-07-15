@@ -90,72 +90,37 @@ int string_compare_nocase(const String &str1, const String &str2)
 
 /**
  * @brief Trims whitespace chars from begin and end of the string.
- * @param [in] str the original string.
- * @return Trimmed string.
  */
-String string_trim_ws(const String & str)
+void string_trim_ws(String &result)
 {
-	if (str.empty())
-		return str;
-
-	String result(str);
-	String::iterator it = result.begin();
-	while (it != result.end() && _istspace(*it))
-		++it;
-	
-	if (it != result.begin())
-		result.erase(result.begin(), it);
-
-	if (result.empty())
-		return result;
-
-	it = result.end() - 1;
-	while (it != result.begin() &&_istspace(*it))
-		--it;
-
-	if (it != result.end() - 1)
-		result.erase(it + 1, result.end());
-	return result;
+	string_trim_ws_begin(result);
+	string_trim_ws_end(result);
 }
 
 /**
  * @brief Trims whitespace chars from begin of the string.
- * @param [in] str the original string.
- * @return Trimmed string.
  */
-String string_trim_ws_begin(const String & str)
+void string_trim_ws_begin(String &result)
 {
-	if (str.empty())
-		return str;
-
-	String result(str);
 	String::iterator it = result.begin();
 	while (_istspace(*it))
 		++it;
 	
 	if (it != result.begin())
 		result.erase(result.begin(), it);
-	return result;
 }
 
 /**
  * @brief Trims whitespace chars from end of the string.
- * @param [in] str the original string.
- * @return Trimmed string.
  */
-String string_trim_ws_end(const String & str)
+void string_trim_ws_end(String &result)
 {
-	if (str.empty())
-		return str;
-
-	String result(str);
 	String::iterator it = result.end() - 1;
 	while (_istspace(*it))
 		--it;
 
 	if (it != result.end() - 1)
 		result.erase(it + 1, result.end());
-	return result;
 }
 
 /**
