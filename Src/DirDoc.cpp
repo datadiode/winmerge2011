@@ -678,6 +678,7 @@ void CDirFrame::UpdateDiffAfterOperation(const FileActionItem & act)
 	case FileActionItem::UI_DEL_LEFT:
 		if (di.diffcode.isSideLeftOnly())
 		{
+			m_pDirView->CollapseSubdir(act.context);
 			m_pCtxt->RemoveDiff(pos);
 			m_pDirView->DeleteItem(act.context);
 		}
@@ -692,6 +693,7 @@ void CDirFrame::UpdateDiffAfterOperation(const FileActionItem & act)
 	case FileActionItem::UI_DEL_RIGHT:
 		if (di.diffcode.isSideRightOnly())
 		{
+			m_pDirView->CollapseSubdir(act.context);
 			m_pCtxt->RemoveDiff(pos);
 			m_pDirView->DeleteItem(act.context);
 		}
@@ -704,6 +706,7 @@ void CDirFrame::UpdateDiffAfterOperation(const FileActionItem & act)
 		break;
 
 	case FileActionItem::UI_DEL_BOTH:
+		m_pDirView->CollapseSubdir(act.context);
 		m_pCtxt->RemoveDiff(pos);
 		m_pDirView->DeleteItem(act.context);
 		break;
