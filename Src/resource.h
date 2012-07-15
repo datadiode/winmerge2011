@@ -430,8 +430,9 @@
 #define IDC_COLDLG_LIST                         1336
 #define IDC_PRESERVE_FILETIME                   1337
 #define IDC_TMPFOLDER_SYSTEM                    1338
-#define IDC_TMPFOLDER_BROWSE                    1339
-#define IDC_TMPFOLDER_NAME                      1340
+#define IDC_TMPFOLDER_CUSTOM                    1339
+#define IDC_TMPFOLDER_BROWSE                    1340
+#define IDC_TMPFOLDER_NAME                      1341
 #define IDC_ENABLE_SHELL_CONTEXT_MENU           1343
 #define IDC_STARTUP_FOLDER_SELECT               1344
 #define IDC_BREAK_CHARS                         1345

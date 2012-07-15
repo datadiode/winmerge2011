@@ -53,7 +53,8 @@ bool PropRegistry::UpdateData()
 	DDX_Text<op>(IDC_EXT_EDITOR_PATH, m_strEditorPath);
 	DDX_Check<op>(IDC_USE_RECYCLE_BIN, m_bUseRecycleBin);
 	DDX_Text<op>(IDC_SUPPLEMENT_FOLDER, m_supplementFolder);
-	DDX_Check<op>(IDC_TMPFOLDER_SYSTEM, m_tempFolderType);
+	DDX_Check<op>(IDC_TMPFOLDER_CUSTOM, m_tempFolderType, 0);
+	DDX_Check<op>(IDC_TMPFOLDER_SYSTEM, m_tempFolderType, 1);
 	DDX_Text<op>(IDC_TMPFOLDER_NAME, m_tempFolder);
 	return true;
 }
