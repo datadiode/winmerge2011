@@ -82,8 +82,7 @@ LPCTSTR MergeCmdLineInfo::EatParam(LPCTSTR p, String &param, bool *flag)
 		CharLower(&param.front());
 	}
 	// Strip any leading or trailing whitespace
-	param.erase(0, param.find_first_not_of(_T(" \t\r\n")));
-	param.erase(param.find_last_not_of(_T(" \t\r\n")) + 1);
+	string_trim_ws(param);
 	// Remove any double quotes
 	param.erase(stl::remove(param.begin(), param.end(), _T('"')), param.end());
 	return q;

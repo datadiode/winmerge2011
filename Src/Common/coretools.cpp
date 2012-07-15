@@ -188,19 +188,6 @@ String GetModulePath(HMODULE hModule /* = NULL*/)
 }
 
 /**
- * @brief Return path component from full path.
- * @param [in] fullpath Full path to split.
- * @return Path without filename.
- */
-String GetPathOnly(LPCTSTR fullpath)
-{
-	if (!fullpath || !fullpath[0]) return _T("");
-	String spath;
-	SplitFilename(fullpath, &spath, 0, 0);
-	return spath;
-}
-
-/**
  * @brief Decorates commandline for giving to CreateProcess() or
  * ShellExecute().
  *
@@ -222,14 +209,10 @@ void GetDecoratedCmdLine(String sCmdLine, String &sDecoratedCmdLine,
 	sExecutable.clear();
 
 	// Remove whitespaces from begin and and
-	String::size_type clpos = sCmdLine.find_first_not_of(_T(" \n\t"));
-	if (clpos != 0)
-		sCmdLine.erase(0, clpos);
-	clpos = sCmdLine.find_last_not_of(_T(" \n\t"));
-	if (clpos != sCmdLine.length() - 1)
-		sCmdLine.erase(clpos, clpos - sCmdLine.length());
+	// (Earlier code was cutting off last non-ws character)
+	string_trim_ws(sCmdLine);
 
-	String::size_type pos = sCmdLine.find(_T(" "));
+	String::size_type pos = sCmdLine.find(_T(' '));
 	if (pos != String::npos)
 	{
 		// First space was before switch, we don't need "s
@@ -241,14 +224,14 @@ void GetDecoratedCmdLine(String sCmdLine, String &sDecoratedCmdLine,
 		else
 		{
 			addQuote = TRUE;
-			sDecoratedCmdLine = _T("\"");
+			sDecoratedCmdLine = _T('"');
 		}
 
 		// Loop until executable path end (first switch) is found
 		while (pathEndFound == FALSE)
 		{
 			prevPos = pos;
-			pos = sCmdLine.find(_T(" "), prevPos + 1);
+			pos = sCmdLine.find(_T(' '), prevPos + 1);
 
 			if (pos != String::npos)
 			{
@@ -269,14 +252,14 @@ void GetDecoratedCmdLine(String sCmdLine, String &sDecoratedCmdLine,
 			{
 				sExecutable = sCmdLine.substr(0, pos);
 				sDecoratedCmdLine += sExecutable;
-				sDecoratedCmdLine += _T("\"");
+				sDecoratedCmdLine += _T('"');
 				sDecoratedCmdLine += sCmdLine.substr(pos, sCmdLine.length() - pos);
 			}
 			else
 			{
 				sExecutable = sCmdLine;
 				sDecoratedCmdLine += sCmdLine;
-				sDecoratedCmdLine += _T("\"");
+				sDecoratedCmdLine += _T('"');
 			}
 		}
 		else
