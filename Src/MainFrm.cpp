@@ -1293,11 +1293,8 @@ int CMainFrame::HandleReadonlySave(String &strSavePath, BOOL bMultiFile,
 		case IDNO:
 			if (!bMultiFile)
 			{
-				if (SelectFile(m_hWnd, s, strSavePath.c_str(), IDS_SAVE_AS_TITLE, NULL, FALSE))
-				{
-					strSavePath = s;
+				if (SelectFile(m_hWnd, strSavePath, IDS_SAVE_AS_TITLE, NULL, FALSE))
 					nRetVal = IDNO;
-				}
 				else
 					nRetVal = IDCANCEL;
 			}
@@ -2924,15 +2921,12 @@ void CMainFrame::OnResizePanes()
  */
 void CMainFrame::OnFileOpenProject()
 {
-	String sFilepath;
-	
 	// get the default projects path
-	String strProjectPath = COptionsMgr::Get(OPT_PROJECTS_PATH);
-	if (!SelectFile(m_hWnd, sFilepath, strProjectPath.c_str(), IDS_OPEN_TITLE,
-			IDS_PROJECTFILES, TRUE))
+	String sFilepath = COptionsMgr::Get(OPT_PROJECTS_PATH);
+	if (!SelectFile(m_hWnd, sFilepath, IDS_OPEN_TITLE, IDS_PROJECTFILES, TRUE))
 		return;
 	
-	strProjectPath = paths_GetParentPath(sFilepath.c_str());
+	String strProjectPath = paths_GetParentPath(sFilepath.c_str());
 	// store this as the new project path
 	COptionsMgr::SaveOption(OPT_PROJECTS_PATH, strProjectPath);
 

@@ -291,9 +291,8 @@ void CHexMergeFrame::OnFileSaveRight()
  */
 void CHexMergeFrame::OnFileSaveAsLeft()
 {
-	const String &pathLeft = m_strPath[0];
-	String strPath;
-	if (SelectFile(m_pMDIFrame->m_hWnd, strPath, pathLeft.c_str(), IDS_SAVE_LEFT_AS, NULL, FALSE))
+	String strPath = m_strPath[0];
+	if (SelectFile(m_pMDIFrame->m_hWnd, strPath, IDS_SAVE_LEFT_AS, NULL, FALSE))
 	{
 		if (Try(m_pView[MERGE_VIEW_LEFT]->SaveFile(strPath.c_str())) == IDCANCEL)
 			return;
@@ -307,9 +306,8 @@ void CHexMergeFrame::OnFileSaveAsLeft()
  */
 void CHexMergeFrame::OnFileSaveAsRight()
 {
-	const String &pathRight = m_strPath[1];
-	String strPath;
-	if (SelectFile(m_pMDIFrame->m_hWnd, strPath, pathRight.c_str(), IDS_SAVE_LEFT_AS, NULL, FALSE))
+	String strPath = m_strPath[1];
+	if (SelectFile(m_pMDIFrame->m_hWnd, strPath, IDS_SAVE_LEFT_AS, NULL, FALSE))
 	{
 		if (Try(m_pView[MERGE_VIEW_RIGHT]->SaveFile(strPath.c_str())) == IDCANCEL)
 			return;

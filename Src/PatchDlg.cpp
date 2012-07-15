@@ -74,6 +74,8 @@ LRESULT CPatchDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	switch (message)
 	{
 	case WM_COMMAND:
+		if (IsUserInputCommand(wParam))
+			UpdateData<Get>();
 		switch (wParam)
 		{
 		case IDOK:
@@ -144,8 +146,6 @@ LRESULT CPatchDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
  */
 void CPatchDlg::OnOK()
 {
-	UpdateData<Get>();
-
 	// There are two different cases: single files or
 	// multiple files.  Multiple files are selected from DirView.
 	// Only if single files selected, filenames are checked here.
@@ -286,8 +286,8 @@ BOOL CPatchDlg::OnInitDialog()
  */
 void CPatchDlg::OnDiffBrowseFile1()
 {
-	String s;
-	if (SelectFile(m_hWnd, s, m_file1.c_str(), IDS_OPEN_TITLE, NULL, TRUE))
+	String s = m_file1;
+	if (SelectFile(m_hWnd, s, IDS_OPEN_TITLE, NULL, TRUE))
 	{
 		ChangeFile(s.c_str(), TRUE);
 		m_pCbFile1->SetWindowText(s.c_str());
@@ -299,8 +299,8 @@ void CPatchDlg::OnDiffBrowseFile1()
  */
 void CPatchDlg::OnDiffBrowseFile2()
 {
-	String s;
-	if (SelectFile(m_hWnd, s, m_file2.c_str(), IDS_OPEN_TITLE, NULL, TRUE))
+	String s = m_file2;
+	if (SelectFile(m_hWnd, s, IDS_OPEN_TITLE, NULL, TRUE))
 	{
 		ChangeFile(s.c_str(), FALSE);
 		m_pCbFile2->SetWindowText(s.c_str());
@@ -350,11 +350,9 @@ void CPatchDlg::ChangeFile(LPCTSTR sFile, BOOL bLeft)
  */
 void CPatchDlg::OnDiffBrowseResult()
 {
-	String s;
-	if (SelectFile(m_hWnd, s, m_fileResult.c_str(), IDS_SAVE_AS_TITLE, NULL, FALSE))
+	if (SelectFile(m_hWnd, m_fileResult, IDS_SAVE_AS_TITLE, NULL, FALSE))
 	{
-		m_fileResult = s;
-		m_pCbResult->SetWindowText(s.c_str());
+		m_pCbResult->SetWindowText(m_fileResult.c_str());
 	}
 }
 

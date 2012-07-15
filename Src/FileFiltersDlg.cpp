@@ -370,38 +370,22 @@ void FileFiltersDlg::OnBnClickedFilterfileNewbutton()
 	if (!paths_EndsWithSlash(path.c_str()))
 		path += '\\';
 	
-	String s;
-	if (SelectFile(m_hWnd, s, path.c_str(), IDS_FILEFILTER_SAVENEW, IDS_FILEFILTER_FILEMASK,
-		FALSE))
+	if (SelectFile(m_hWnd, path, IDS_FILEFILTER_SAVENEW, IDS_FILEFILTER_FILEMASK, FALSE))
 	{
 		// Fix file extension
-		TCHAR file[_MAX_FNAME] = {0};
-		TCHAR ext[_MAX_EXT] = {0};
-		TCHAR dir[_MAX_DIR] = {0};
-		TCHAR drive[_MAX_DRIVE] = {0};
-		_tsplitpath(s.c_str(), drive, dir, file, ext);
-		if (_tcslen(ext) == 0)
-		{
-			s += FileFilterExt;
-		}
-		else if (_tcsicmp(ext, FileFilterExt) != 0)
-		{
-			s = drive;
-			s += dir;
-			s += file;
-			s += FileFilterExt;
-		}
-
+		LPCTSTR ext = PathFindExtension(path.c_str());
+		if (lstrcmpi(ext, FileFilterExt) != 0)
+			path += FileFilterExt;
 		// Open-dialog asks about overwriting, so we can overwrite filter file
 		// user has already allowed it.
-		if (!CopyFile(templatePath.c_str(), s.c_str(), FALSE))
+		if (!CopyFile(templatePath.c_str(), path.c_str(), FALSE))
 		{
 			LanguageSelect.MsgBox(IDS_FILEFILTER_TMPL_COPY, templatePath.c_str(), MB_ICONERROR);
 			return;
 		}
-		EditFileFilter(s.c_str());
+		EditFileFilter(path.c_str());
 		FileFilterMgr *pMgr = globalFileFilter.GetManager();
-		int retval = pMgr->AddFilter(s.c_str());
+		int retval = pMgr->AddFilter(path.c_str());
 		if (retval == FILTER_OK)
 		{
 			// Remove all from filterslist and re-add so we can update UI
@@ -416,10 +400,7 @@ void FileFiltersDlg::OnBnClickedFilterfileNewbutton()
  */
 void FileFiltersDlg::OnBnClickedFilterfileDelete()
 {
-	int sel = -1;
-
-	sel = m_listFilters->GetNextItem(sel, LVNI_SELECTED);
-
+	int sel = m_listFilters->GetNextItem(-1, LVNI_SELECTED);
 	// Can't delete first "None"
 	if (sel > 0)
 	{
@@ -473,20 +454,14 @@ void FileFiltersDlg::UpdateFiltersList()
  */
 void FileFiltersDlg::OnBnClickedFilterfileInstall()
 {
-	String s;
 	String path;
 	String userPath = globalFileFilter.GetUserFilterPathWithCreate();
 
-	if (SelectFile(m_hWnd, s, path.c_str(), IDS_FILEFILTER_INSTALL, IDS_FILEFILTER_FILEMASK,
-		TRUE))
+	if (SelectFile(m_hWnd, path, IDS_FILEFILTER_INSTALL, IDS_FILEFILTER_FILEMASK, TRUE))
 	{
-		String sfile, sext;
-		SplitFilename(s.c_str(), NULL, &sfile, &sext);
-		String filename = sfile;
-		filename += _T(".");
-		filename += sext;
+		LPCTSTR filename = PathFindFileName(path.c_str());
 		userPath = paths_ConcatPath(userPath, filename);
-		if (!CopyFile(s.c_str(), userPath.c_str(), TRUE))
+		if (!CopyFile(path.c_str(), userPath.c_str(), TRUE))
 		{
 			// If file already exists, ask from user
 			// If user wants to, overwrite existing filter
@@ -496,7 +471,7 @@ void FileFiltersDlg::OnBnClickedFilterfileInstall()
 					MB_ICONWARNING);
 				if (res == IDYES)
 				{
-					if (!CopyFile(s.c_str(), userPath.c_str(), FALSE))
+					if (!CopyFile(path.c_str(), userPath.c_str(), FALSE))
 					{
 						LanguageSelect.MsgBox(IDS_FILEFILTER_INSTALLFAIL, MB_ICONSTOP);
 					}

@@ -136,12 +136,9 @@ void DirCmpReportDlg::OnBtnClickReportBrowse()
 {
 	m_pCbReportFile->GetWindowText(m_sReportFile);
 	int filterid = f_types[m_ctlStyle->GetCurSel()].browseFilter;
-	String chosenFilepath;
-	if (SelectFile(m_hWnd, chosenFilepath, m_sReportFile.c_str(),
-		IDS_SAVE_AS_TITLE, filterid, FALSE))
+	if (SelectFile(m_hWnd, m_sReportFile, IDS_SAVE_AS_TITLE, filterid, FALSE))
 	{
-		m_sReportFile = chosenFilepath;
-		m_pCbReportFile->SetWindowText(chosenFilepath.c_str());
+		m_pCbReportFile->SetWindowText(m_sReportFile.c_str());
 	}
 }
 

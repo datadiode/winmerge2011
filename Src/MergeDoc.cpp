@@ -869,8 +869,7 @@ bool CChildFrame::ListCopy(int srcPane, int dstPane, int nDiff /* = -1*/,
 bool CChildFrame::TrySaveAs(String &strPath, int &nSaveResult, String & sError,
 	int nBuffer, PackingInfo * pInfoTempUnpacker)
 {
-	String s;
-	String strSavePath; // New path for next saving try
+	String strSavePath = strPath; // New path for next saving try
 	bool result = true;
 	int response = IDOK; // Set default we use for scratchpads
 	int nActiveViewIndexType = GetActiveMergeViewIndexType();
@@ -902,12 +901,11 @@ bool CChildFrame::TrySaveAs(String &strPath, int &nSaveResult, String & sError,
 	switch (response)
 	{
 	case IDOK:
-		if (SelectFile(parent, s, strPath.c_str(),
+		if (SelectFile(parent, strSavePath,
 			nBuffer == 0 ? IDS_SAVE_LEFT_AS : IDS_SAVE_RIGHT_AS,
 			NULL, FALSE))
 		{
 			CDiffTextBuffer *pBuffer = m_ptBuf[nBuffer];
-			strSavePath = s;
 			nSaveResult = pBuffer->SaveToFile(strSavePath.c_str(), FALSE, sError,
 				pInfoTempUnpacker);
 
@@ -919,7 +917,6 @@ bool CChildFrame::TrySaveAs(String &strPath, int &nSaveResult, String & sError,
 					m_nBufferType[nBuffer] = BUFFER_UNNAMED_SAVED;
 					m_strDesc[nBuffer].clear();
 				}
-					
 				strPath = strSavePath;
 				UpdateHeaderPath(nBuffer);
 			}
@@ -2390,7 +2387,7 @@ void CChildFrame::OnToolsCompareSelection()
 void CChildFrame::OnToolsGenerateReport()
 {
 	String s;
-	if (!SelectFile(m_pMDIFrame->m_hWnd, s, NULL, IDS_SAVE_AS_TITLE, IDS_HTML_REPORT_FILES, FALSE, _T("htm")))
+	if (!SelectFile(m_pMDIFrame->m_hWnd, s, IDS_SAVE_AS_TITLE, IDS_HTML_REPORT_FILES, FALSE, _T("htm")))
 		return;
 	// create HTML report
 	UniStdioFile file;

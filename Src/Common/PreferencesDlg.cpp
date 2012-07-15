@@ -289,7 +289,7 @@ void CPreferencesDlg::SaveOptions()
 void CPreferencesDlg::OnImportButton()
 {
 	String s;
-	if (SelectFile(m_hWnd, s, NULL, IDS_OPT_IMPORT_CAPTION, IDS_INIFILES, TRUE))
+	if (SelectFile(m_hWnd, s, IDS_OPT_IMPORT_CAPTION, IDS_INIFILES, TRUE))
 	{
 		if (IOptionDef::ImportOptions(s.c_str()) == ERROR_SUCCESS &&
 			SyntaxColors.ImportOptions(s.c_str()) == ERROR_SUCCESS)

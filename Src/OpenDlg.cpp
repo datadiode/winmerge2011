@@ -367,12 +367,11 @@ void COpenDlg::OnDestroy()
  */
 void COpenDlg::OnBrowseButton(UINT id) 
 {
-	String sfolder;
-	GetDlgItemText(id, sfolder);
-	if (paths_DoesPathExist(sfolder.c_str()) == IS_EXISTING_FILE)
-		sfolder = paths_GetParentPath(sfolder.c_str());
 	String s;
-	if (SelectFileOrFolder(m_hWnd, s, sfolder.c_str()))
+	GetDlgItemText(id, s);
+	if (paths_DoesPathExist(s.c_str()) == IS_EXISTING_FILE)
+		s = paths_GetParentPath(s.c_str());
+	if (SelectFileOrFolder(m_hWnd, s))
 	{
 		SetDlgItemText(id, s.c_str());
 		UpdateButtonStates();

@@ -103,9 +103,8 @@ BOOL ProjectFilePathsDlg::OnInitDialog()
  */
 void ProjectFilePathsDlg::OnBnClickedProjLfileBrowse()
 {
-	String s;
-	if (::SelectFileOrFolder(m_hWnd, s, m_sLeftFile.c_str()))
-		SetDlgItemText(IDC_PROJ_LFILE_EDIT, s.c_str());
+	if (::SelectFileOrFolder(m_hWnd, m_sLeftFile))
+		SetDlgItemText(IDC_PROJ_LFILE_EDIT, m_sLeftFile.c_str());
 }
 
 /** 
@@ -113,9 +112,8 @@ void ProjectFilePathsDlg::OnBnClickedProjLfileBrowse()
  */
 void ProjectFilePathsDlg::OnBnClickedProjRfileBrowse()
 {
-	String s;
-	if (::SelectFileOrFolder(m_hWnd, s, m_sRightFile.c_str()))
-		SetDlgItemText(IDC_PROJ_RFILE_EDIT, s.c_str());
+	if (::SelectFileOrFolder(m_hWnd, m_sRightFile))
+		SetDlgItemText(IDC_PROJ_RFILE_EDIT, m_sRightFile.c_str());
 }
 
 /** 
@@ -171,16 +169,15 @@ void ProjectFilePathsDlg::OnBnClickedProjSave()
 String ProjectFilePathsDlg::AskProjectFileName(BOOL bOpen)
 {
 	// get the default projects path
-	String strProjectFileName;
-	String strProjectPath = COptionsMgr::Get(OPT_PROJECTS_PATH);
-	if (SelectFile(m_hWnd, strProjectFileName, strProjectPath.c_str(), NULL, IDS_PROJECTFILES, bOpen))
+	String strProjectFileName = COptionsMgr::Get(OPT_PROJECTS_PATH);
+	if (SelectFile(m_hWnd, strProjectFileName, IDS_OPEN_TITLE, IDS_PROJECTFILES, bOpen))
 	{
 		// Add projectfile extension if it is missing
 		// So we allow 'filename.otherext' but add extension for 'filename'
 		if (*PathFindExtension(strProjectFileName.c_str()) == _T('\0'))
 			strProjectFileName += _T(".WinMerge");
 		// get the path part from the filename
-		strProjectPath = paths_GetParentPath(strProjectFileName.c_str());
+		String strProjectPath = paths_GetParentPath(strProjectFileName.c_str());
 		// store this as the new project path
 		COptionsMgr::SaveOption(OPT_PROJECTS_PATH, strProjectPath);
 	}

@@ -435,10 +435,8 @@ void CDirView::DoDelAll()
  */
 void CDirView::DoCopyLeftTo()
 {
-	String destPath;
-	if (!SelectFolder(m_hWnd, destPath, m_lastCopyFolder.c_str(), IDS_SELECT_DEST_LEFT))
+	if (!SelectFolder(m_hWnd, m_lastCopyFolder, IDS_SELECT_DEST_LEFT))
 		return;
-	m_lastCopyFolder = destPath;
 
 	WaitStatusCursor waitstatus(IDS_STATUS_COPYFILES);
 
@@ -458,7 +456,7 @@ void CDirView::DoCopyLeftTo()
 				return;
 
 			FileActionItem act;
-			String sFullDest = destPath + _T("\\");
+			String sFullDest = m_lastCopyFolder + _T('\\');
 
 			actionScript.m_destBase = sFullDest;
 
@@ -467,7 +465,7 @@ void CDirView::DoCopyLeftTo()
 				if (!di.left.path.empty())
 				{
 					sFullDest += di.left.path;
-					sFullDest += _T("\\");
+					sFullDest += _T('\\');
 				}
 			}
 			sFullDest += di.left.filename;
@@ -495,10 +493,8 @@ void CDirView::DoCopyLeftTo()
  */
 void CDirView::DoCopyRightTo()
 {
-	String destPath;
-	if (!SelectFolder(m_hWnd, destPath, m_lastCopyFolder.c_str(), IDS_SELECT_DEST_RIGHT))
+	if (!SelectFolder(m_hWnd, m_lastCopyFolder, IDS_SELECT_DEST_RIGHT))
 		return;
-	m_lastCopyFolder = destPath;
 
 	WaitStatusCursor waitstatus(IDS_STATUS_COPYFILES);
 
@@ -518,7 +514,7 @@ void CDirView::DoCopyRightTo()
 				return;
 
 			FileActionItem act;
-			String sFullDest = destPath + _T("\\");
+			String sFullDest = m_lastCopyFolder + _T('\\');
 
 			actionScript.m_destBase = sFullDest;
 
@@ -527,7 +523,7 @@ void CDirView::DoCopyRightTo()
 				if (!di.right.path.empty())
 				{
 					sFullDest += di.right.path;
-					sFullDest += _T("\\");
+					sFullDest += _T('\\');
 				}
 			}
 			sFullDest += di.right.filename;
@@ -555,10 +551,8 @@ void CDirView::DoCopyRightTo()
  */
 void CDirView::DoMoveLeftTo()
 {
-	String destPath;
-	if (!SelectFolder(m_hWnd, destPath, m_lastCopyFolder.c_str(), IDS_SELECT_DEST_LEFT))
+	if (!SelectFolder(m_hWnd, m_lastCopyFolder, IDS_SELECT_DEST_LEFT))
 		return;
-	m_lastCopyFolder = destPath;
 
 	WaitStatusCursor waitstatus(IDS_STATUS_MOVEFILES);
 
@@ -578,14 +572,14 @@ void CDirView::DoMoveLeftTo()
 				return;
 
 			FileActionItem act;
-			String sFullDest = destPath + _T("\\");
+			String sFullDest = m_lastCopyFolder + _T('\\');
 			actionScript.m_destBase = sFullDest;
 			if (m_pFrame->GetRecursive())
 			{
 				if (!di.left.path.empty())
 				{
 					sFullDest += di.left.path;
-					sFullDest += _T("\\");
+					sFullDest += _T('\\');
 				}
 			}
 			sFullDest += di.left.filename;
@@ -613,10 +607,8 @@ void CDirView::DoMoveLeftTo()
  */
 void CDirView::DoMoveRightTo()
 {
-	String destPath;
-	if (!SelectFolder(m_hWnd, destPath, m_lastCopyFolder.c_str(), IDS_SELECT_DEST_RIGHT))
+	if (!SelectFolder(m_hWnd, m_lastCopyFolder, IDS_SELECT_DEST_RIGHT))
 		return;
-	m_lastCopyFolder = destPath;
 
 	WaitStatusCursor waitstatus(IDS_STATUS_MOVEFILES);
 
@@ -636,14 +628,14 @@ void CDirView::DoMoveRightTo()
 				return;
 
 			FileActionItem act;
-			String sFullDest = destPath + _T("\\");
+			String sFullDest = m_lastCopyFolder + _T('\\');
 			actionScript.m_destBase = sFullDest;
 			if (m_pFrame->GetRecursive())
 			{
 				if (!di.right.path.empty())
 				{
 					sFullDest += di.right.path;
-					sFullDest += _T("\\");
+					sFullDest += _T('\\');
 				}
 			}
 			sFullDest += di.right.filename;

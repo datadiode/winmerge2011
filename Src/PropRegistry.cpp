@@ -153,20 +153,20 @@ void PropRegistry::UpdateScreen()
 /// Open file browse dialog to locate editor
 void PropRegistry::OnBrowseEditor()
 {
-	if (SelectFile(m_hWnd, m_strEditorPath, m_strEditorPath.c_str(), IDS_OPEN_TITLE, IDS_PROGRAMFILES, TRUE))
+	if (SelectFile(m_hWnd, m_strEditorPath, IDS_OPEN_TITLE, IDS_PROGRAMFILES, TRUE))
 		UpdateData<Set>();
 }
 
 /// Open Folder selection dialog for user to select filter folder.
 void PropRegistry::OnBrowseSupplementFolder()
 {
-	if (SelectFolder(m_hWnd, m_supplementFolder, m_supplementFolder.c_str(), IDS_OPEN_TITLE))
+	if (SelectFolder(m_hWnd, m_supplementFolder, 0))
 		UpdateData<Set>();
 }
 
 /// Select temporary files folder.
 void PropRegistry::OnBrowseTmpFolder()
 {
-	if (SelectFolder(m_hWnd, m_tempFolder, m_tempFolder.c_str(), NULL))
+	if (SelectFolder(m_hWnd, m_tempFolder, 0))
 		UpdateData<Set>();
 }

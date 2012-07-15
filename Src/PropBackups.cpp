@@ -110,9 +110,8 @@ void PropBackups::UpdateScreen()
  */
 void PropBackups::OnBnClickedBackupBrowse()
 {
-	String path;
-	if (SelectFolder(m_hWnd, path, m_sGlobalFolder.c_str(), 0))
+	if (SelectFolder(m_hWnd, m_sGlobalFolder, 0))
 	{
-		SetDlgItemText(IDC_BACKUP_FOLDER, path.c_str());
+		SetDlgItemText(IDC_BACKUP_FOLDER, m_sGlobalFolder.c_str());
 	}
 }
