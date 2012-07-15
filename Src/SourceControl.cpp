@@ -16,6 +16,7 @@
 #include "OptionsDef.h"
 #include "RegKey.h"
 #include "coretools.h"
+#include "paths.h"
 #include "VssPrompt.h"
 #include "CCPrompt.h"
 #include <MyCom.h>
@@ -37,7 +38,7 @@ void CMainFrame::InitializeSourceControlMembers()
 		if (reg.QueryRegMachine(_T("SOFTWARE\\Microsoft\\SourceSafe")) == ERROR_SUCCESS)
 		{
 			vssPath = reg.ReadString(_T("SCCServerPath"), _T(""));
-			vssPath = GetPathOnly(vssPath.c_str()) + _T("\\Ss.exe");
+			vssPath = paths_GetParentPath(vssPath.c_str()) + _T("\\Ss.exe");
 			COptionsMgr::SaveOption(OPT_VSS_PATH, vssPath);
 		}
 	}

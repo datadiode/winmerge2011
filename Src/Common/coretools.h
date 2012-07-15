@@ -21,7 +21,6 @@ void TestSplitFilename();
 #endif
 
 String GetModulePath(HMODULE hModule = NULL);
-String GetPathOnly(LPCTSTR fullpath);
 
 size_t linelen(const char *string);
 

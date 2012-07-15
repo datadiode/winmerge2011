@@ -256,7 +256,7 @@ BOOL SelectFileOrFolder(HWND parent, String& path, LPCTSTR initialPath /*=NULL*/
 		{
 			// We have a valid folder name, but propably garbage as a filename.
 			// Return folder name
-			path = GetPathOnly(path.c_str()) + _T("\\");
+			path = paths_GetParentPath(path.c_str()) + _T("\\");
 		}
 	}
 	return bRetVal;

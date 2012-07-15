@@ -370,7 +370,7 @@ void COpenDlg::OnBrowseButton(UINT id)
 	String sfolder;
 	GetDlgItemText(id, sfolder);
 	if (paths_DoesPathExist(sfolder.c_str()) == IS_EXISTING_FILE)
-		sfolder = GetPathOnly(sfolder.c_str());
+		sfolder = paths_GetParentPath(sfolder.c_str());
 	String s;
 	if (SelectFileOrFolder(m_hWnd, s, sfolder.c_str()))
 	{

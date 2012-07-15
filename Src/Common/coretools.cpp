@@ -9,6 +9,7 @@
 
 #include "StdAfx.h"
 #include "coretools.h"
+#include "paths.h"
 
 size_t linelen(const char *string)
 {
@@ -183,7 +184,7 @@ String GetModulePath(HMODULE hModule /* = NULL*/)
 {
 	TCHAR temp[MAX_PATH] = {0};
 	GetModuleFileName(hModule, temp, MAX_PATH);
-	return GetPathOnly(temp);
+	return paths_GetParentPath(temp);
 }
 
 /**
