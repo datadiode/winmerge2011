@@ -184,9 +184,7 @@ String paths_GetLongPath(LPCTSTR szPath)
 /**
  * @brief Check if the path exist and create the folder if needed.
  * This function checks if path exists. If path does not yet exist
- * function created needed folder structure. So this function is the
- * easy way to create a needed folder structure. Environment strings are
- * expanded when handling paths.
+ * function creates needed folder structure.
  * @param [in] sPath Path to check/create.
  * @return true if path exists or if we successfully created it.
  */
