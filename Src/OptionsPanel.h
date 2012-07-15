@@ -23,5 +23,4 @@ public:
 	virtual void UpdateScreen() = 0;
 protected:
 	virtual BOOL OnInitDialog();
-	BOOL IsUserInputCommand(WPARAM);
 };

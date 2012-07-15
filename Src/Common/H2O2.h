@@ -181,10 +181,12 @@ namespace H2O
 		{
 			return reinterpret_cast<ODialog *>(::GetWindowLongPtr(pWnd->m_hWnd, DWLP_USER));
 		}
-		void Update3StateCheckBoxLabel(UINT id);
 	protected:
 		virtual BOOL OnInitDialog();
 		virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
+
+		BOOL IsUserInputCommand(WPARAM wParam);
+		void Update3StateCheckBoxLabel(UINT id);
 
 		// Dialog data exchange
 		enum DDX_Operation { Set, Get };
