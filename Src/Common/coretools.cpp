@@ -33,6 +33,15 @@ LPCWSTR NTAPI EatPrefix(LPCWSTR text, LPCWSTR prefix)
 }
 
 /**
+ * @brief Eat prefix and whitespace and return pointer to remaining text
+ */
+LPCWSTR NTAPI EatPrefixTrim(LPCWSTR text, LPCWSTR prefix)
+{
+	text = EatPrefix(text, prefix);
+	return text ? text + StrSpn(text, _T(" \t\r\n")) : NULL;
+}
+
+/**
  * @brief Return true if *pszChar is a slash (either direction) or a colon
  *
  * begin points to start of string, in case multibyte trail test is needed

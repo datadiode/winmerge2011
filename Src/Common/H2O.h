@@ -4150,6 +4150,16 @@ namespace H2O
 			pStr = reinterpret_cast<HString *>(B);
 			return pStr;
 		}
+		HString *ToLower()
+		{
+			CharLowerW(W);
+			return this;
+		}
+		HString *ToUpper()
+		{
+			CharUpperW(W);
+			return this;
+		}
 	};
 
 	union UNotify

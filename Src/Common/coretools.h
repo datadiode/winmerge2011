@@ -12,6 +12,7 @@
 /******** function protos ********/
 
 LPCWSTR NTAPI EatPrefix(LPCWSTR text, LPCWSTR prefix);
+LPCWSTR NTAPI EatPrefixTrim(LPCWSTR text, LPCWSTR prefix);
 
 void SplitFilename(LPCTSTR s, String * path, String * name, String * ext);
 void SplitViewName(LPCTSTR s, String * path, String * name, String * ext);
