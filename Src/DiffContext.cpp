@@ -185,7 +185,6 @@ CDiffContext::CDiffContext
 	m_pCompareStats(pCompareStats),
 	m_pWindow(pWindow),
 	m_bStopAfterFirstDiff(false),
-	m_pFilterList(new FilterList),
 	m_nRecursive(nRecursive),
 	m_bWalkUniques(true),
 	m_paths(2),
@@ -207,7 +206,6 @@ CDiffContext::CDiffContext
 CDiffContext::~CDiffContext()
 {
 	ASSERT(m_hSemaphore == NULL);
-	delete m_pFilterList;
 }
 
 /**

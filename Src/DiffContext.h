@@ -106,8 +106,6 @@ public:
 	 */
 	bool m_bWalkUniques;
 
-	FilterList *const m_pFilterList; /**< Filter list for line filters */
-
 	/**
 	 * The compare method used.
 	 */
