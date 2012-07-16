@@ -189,7 +189,7 @@ bool FileFilterHelper::includeFile(LPCTSTR szFileName)
 	}
 	else
 	{
-		return m_fileFilterMgr->TestFileNameAgainstFilter(m_currentFilter, szFileName);
+		return m_currentFilter->TestFileNameAgainstFilter(szFileName);
 	}
 }
 
@@ -212,8 +212,28 @@ bool FileFilterHelper::includeDir(LPCTSTR szDirName)
 		String strDirName(_T("\\"));
 		strDirName += szDirName;
 
-		return m_fileFilterMgr->TestDirNameAgainstFilter(m_currentFilter, strDirName.c_str());
+		return m_currentFilter->TestDirNameAgainstFilter(strDirName.c_str());
 	}
+}
+
+int FileFilterHelper::collateFile(LPCTSTR p, LPCTSTR q)
+{
+	if (m_currentFilter && !m_currentFilter->fileprefilters.empty() &&
+		regexp_item::indifferent(m_currentFilter->fileprefilters, p, q))
+	{
+		return 0;
+	}
+	return IDiffFilter::collateFile(p, q);
+}
+
+int FileFilterHelper::collateDir(LPCTSTR p, LPCTSTR q)
+{
+	if (m_currentFilter && !m_currentFilter->dirprefilters.empty() &&
+		regexp_item::indifferent(m_currentFilter->dirprefilters, p, q))
+	{
+		return 0;
+	}
+	return IDiffFilter::collateDir(p, q);
 }
 
 /**

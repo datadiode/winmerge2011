@@ -37,9 +37,22 @@ const TCHAR FileFilterExt[] = _T(".flt");
 /// Interface for testing files & directories for exclusion, as diff traverses file tree
 extern class IDiffFilter
 {
+private:
+	const static bool casesensitive = false;
 public:
 	virtual bool includeFile(LPCTSTR szFileName) { return true; }
 	virtual bool includeDir(LPCTSTR szDirName) { return true; }
+	virtual bool isCaseSensitive() { return casesensitive; }
+	// Compare (NLS aware) two filenames, potentially ignoring character case
+	virtual int collateFile(LPCTSTR szFileName1, LPCTSTR szFileName2)
+	{
+		return (casesensitive ? _tcscoll : _tcsicoll)(szFileName1, szFileName2);
+	}
+	// Compare (NLS aware) two dirnames, potentially ignoring character case
+	virtual int collateDir(LPCTSTR szDirName1, LPCTSTR szDirName2)
+	{
+		return (casesensitive ? _tcscoll : _tcsicoll)(szDirName1, szDirName2);
+	}
 	bool includeFile(LPCTSTR szFileName1, LPCTSTR szFileName2)
 	{
 		return
@@ -85,7 +98,6 @@ public:
 
 	FileFilterMgr * GetManager() const;
 	void SetFileFilterPath(LPCTSTR szFileFilterPath);
-	//void GetFileFilters(stl::vector<FileFilterInfo> * filters, String & selected) const;
 	const stl::vector<FileFilter *> &GetFileFilters(String & selected) const;
 	String GetFileFilterName(LPCTSTR filterPath) const;
 	String GetFileFilterPath(LPCTSTR filterName) const;
@@ -102,8 +114,11 @@ public:
 	String GetFilterNameOrMask() const;
 	void SetFilter(const String &filter);
 
-	bool includeFile(LPCTSTR szFileName);
-	bool includeDir(LPCTSTR szDirName);
+	// Overrides
+	virtual bool includeFile(LPCTSTR);
+	virtual bool includeDir(LPCTSTR);
+	virtual int collateFile(LPCTSTR, LPCTSTR);
+	virtual int collateDir(LPCTSTR, LPCTSTR);
 
 protected:
 	String ParseExtensions(const String &extensions) const;

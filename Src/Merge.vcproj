@@ -814,6 +814,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\RegExpItem.cpp"
+				>
+			</File>
+			<File
 				RelativePath="Common\RegKey.cpp"
 				>
 			</File>
@@ -1407,6 +1411,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\RegExpItem.h"
+				>
+			</File>
+			<File
 				RelativePath="Common\RegKey.h"
 				>
 			</File>
@@ -1420,6 +1428,10 @@
 			</File>
 			<File
 				RelativePath=".\scriptable.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ScriptItem.h"
 				>
 			</File>
 			<File

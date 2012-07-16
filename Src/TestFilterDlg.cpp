@@ -95,9 +95,9 @@ bool CTestFilterDlg::CheckText(String text)
 	// Convert any forward slashes to canonical Windows-style backslashes
 	string_replace(text, _T("/"), _T("\\"));
 	if (IsDlgButtonChecked(IDC_IS_DIRECTORY))
-		return m_pFileFilterMgr->TestDirNameAgainstFilter(m_pFileFilter, text.c_str());
+		return m_pFileFilter->TestDirNameAgainstFilter(text.c_str());
 	else
-		return m_pFileFilterMgr->TestFileNameAgainstFilter(m_pFileFilter, text.c_str());
+		return m_pFileFilter->TestFileNameAgainstFilter(text.c_str());
 }
 
 /**

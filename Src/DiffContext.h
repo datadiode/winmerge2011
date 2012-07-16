@@ -133,7 +133,6 @@ private:
 	bool m_bAborting; /**< Is compare aborting? */
 	bool m_bOnlyRequested; /**< Compare only requested items? */
 	const int m_nRecursive; /**< Do we include subfolders to compare? */
-	const static bool casesensitive = false;
 	const String empty;
 // Thread functions
 	static void __cdecl DiffThreadCollect(LPVOID);
@@ -155,7 +154,6 @@ private:
 	void LoadAndSortFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *files) const;
 	void LoadFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *files) const;
 	void Sort(DirItemArray *dirs) const;
-	int collstr(const String &, const String &) const;
 };
 
 #endif // !defined(AFX_DIFFCONTEXT_H__D3CC86BE_F11E_11D2_826C_00A024706EDC__INCLUDED_)

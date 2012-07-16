@@ -24,25 +24,7 @@
 
 #include "pcre.h"
 #include "DirItem.h"
-
-/**
- * @brief FileFilter rule.
- *
- * Contains one filtering element definition (rule). In addition to
- * regular expression there is boolean value for defining if rule
- * is inclusive or exclusive. File filters have global inclusive/exclusive
- * selection but this per-rule setting overwrites it.
- *
- * We are using PCRE for regular expressions and pRegExp points to compiled
- * regular expression. pRegExpExtra contains additional information about
- * the expression used to optimize matching.
- */
-struct FileFilterElement
-{
-	pcre *pRegExp; /**< Compiled regular expression */
-	pcre_extra *pRegExpExtra; /**< Additional information got from regex study */
-	FileFilterElement() : pRegExp(NULL), pRegExpExtra(NULL) { };
-};
+#include "RegExpItem.h"
 
 /**
  * @brief One actual filter.
@@ -63,10 +45,17 @@ struct FileFilter
 	String description;	/**< Filter description text */
 	String fullpath;		/**< Full path to filter file */
 	DirItem fileinfo;		/**< For tracking if file has been modified */
-	stl::vector<FileFilterElement*> filefilters; /**< List of rules for files */
-	stl::vector<FileFilterElement*> dirfilters;  /**< List of rules for directories */
+	stl::vector<regexp_item> filefilters;		/**< List of rules for files */
+	stl::vector<regexp_item> dirfilters;		/**< List of rules for directories */
+	stl::vector<regexp_item> fileprefilters;  /**< List of prefilter rules for files */
+	stl::vector<regexp_item> dirprefilters;	/**< List of prefilter rules for directories */
 	FileFilter() : default_include(true) { }
 	~FileFilter();
-	
-	static void EmptyFilterList(stl::vector<FileFilterElement*> *filterList);
+	// methods to actually use filter
+	bool TestFileNameAgainstFilter(LPCTSTR szFileName) const;
+	bool TestDirNameAgainstFilter(LPCTSTR szDirName) const;
+	static size_t ApplyPrefilterRegExps(const stl::vector<regexp_item> &, char *dst, const char *src, size_t len);
+private:
+	static bool TestAgainstRegList(const stl::vector<regexp_item> &, LPCTSTR);
+	static void EmptyFilterList(stl::vector<regexp_item> &);
 };

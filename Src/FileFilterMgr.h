@@ -23,9 +23,6 @@
 #ifndef FileFilterMgr_h_included
 #define FileFilterMgr_h_included
 
-#include "pcre.h"
-
-struct FileFilterElement;
 struct FileFilter;
 
 /**
@@ -52,8 +49,6 @@ enum FILTER_RETVALUE
  */
 class FileFilterMgr
 {
-private:
-
 public:
 	~FileFilterMgr();
 	// Reload filter array from specified directory (passed to CFileFind)
@@ -66,17 +61,8 @@ public:
 	void RemoveFilter(LPCTSTR szFilterFile);
 
 	// access to array of filters
-	//String GetFilterName(int i) const;
-	//String GetFilterName(const FileFilter *pFilter) const;
-	//String GetFilterPath(int i) const;
-	//String GetFilterDesc(int i) const;
-	//String GetFilterDesc(const FileFilter *pFilter) const;
-	FileFilter * GetFilterByPath(LPCTSTR szFilterName);
+	FileFilter *GetFilterByPath(LPCTSTR szFilterName) const;
 	String GetFullpath(FileFilter *) const;
-
-	// methods to actually use filter
-	bool TestFileNameAgainstFilter(const FileFilter *, LPCTSTR szFileName) const;
-	bool TestDirNameAgainstFilter(const FileFilter *, LPCTSTR szDirName) const;
 
 	void DeleteAllFilters();
 
@@ -90,8 +76,5 @@ protected:
 public:
 	stl::vector<FileFilter *> m_filters; /*< List of filters loaded */
 };
-
-
-bool TestAgainstRegList(const stl::vector<FileFilterElement*> &filterList, LPCTSTR szTest);
 
 #endif // FileFilterMgr_h_included

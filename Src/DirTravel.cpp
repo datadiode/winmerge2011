@@ -113,20 +113,6 @@ static bool __cdecl cmpistring(const DirItem &elem1, const DirItem &elem2)
  */
 void CDiffContext::Sort(DirItemArray *dirs) const
 {
-	if (casesensitive)
-		stl::sort(dirs->begin(), dirs->end(), cmpstring);
-	else
-		stl::sort(dirs->begin(), dirs->end(), cmpistring);
-}
-
-/**
- * @brief  Compare (NLS aware) two strings, either case-sensitive or
- * case-insensitive as caller specifies
- */
-int CDiffContext::collstr(const String & s1, const String & s2) const
-{
-	if (casesensitive)
-		return _tcscoll(s1.c_str(), s2.c_str());
-	else
-		return _tcsicoll(s1.c_str(), s2.c_str());
+	stl::sort(dirs->begin(), dirs->end(),
+		m_piFilterGlobal->isCaseSensitive() ? cmpstring : cmpistring);
 }

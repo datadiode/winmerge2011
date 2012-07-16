@@ -78,72 +78,6 @@ extern "C" size_t apply_prediffer(struct file_data *current, short side, char *b
 	return len;
 }
 
-static size_t FindSlash(LPCTSTR buf, size_t len)
-{
-	if (len > 0 && *buf == '/')
-	{
-		int e = 0;
-		size_t i = 0;
-		while (i < len)
-		{
-			switch (buf[++i])
-			{
-			case '\\':
-				e ^= 1;
-				break;
-			case '/':
-				if (e == 0)
-					return i;
-				break;
-			default:
-				e = 0;
-				break;
-			}
-		}
-	}
-	return 0;
-}
-
-const char *filter_item::assign(LPCTSTR pch, size_t cch)
-{
-	if (const size_t i = FindSlash(pch, cch))
-	{
-		size_t j = i;
-		while (++j < cch)
-		{
-			switch (pch[j])
-			{
-			case _T('i'):
-				options |= PCRE_CASELESS;
-				break;
-			case _T('g'):
-				global = true;
-				break;
-			case _T(':'):
-			case _T('<'):
-				if (const wchar_t *const p = wmemchr(pch + j, _T('<'), cch - j))
-				{
-					const wchar_t *const q = p + 1;
-					injectString = HString::Uni(q, pch + cch - q)->Oct(CP_UTF8);
-					// Exclude the <injectString from further processing.
-					cch = p - pch;
-					// Bail out if the colon was omitted.
-					if (cch == j)
-						break;
-				}
-				filenameSpec = HString::Uni(pch + j + 1, cch - j - 1);
-				cch = 0;
-				break;
-			}
-
-		}
-		++pch;
-		cch = i - 1;
-	}
-	filterString = HString::Uni(pch, cch)->Oct(CP_UTF8);
-	return filterString->A;
-}
-
 /**
  * @brief Constructor.
  */
@@ -170,13 +104,12 @@ void FilterList::AddRegExp(LPCTSTR regularExpression)
 {
 	if (size_t len = _tcslen(regularExpression))
 	{
-		filter_item item;
+		regexp_item item;
 		if (const char *octets = item.assign(regularExpression, len))
 		{
 			if (octets[len] != '\0')
 				m_utf8 = true;
-			if (item.compile())
-				m_list.push_back(item);
+			m_list.push_back(item);
 		}
 	}
 }
@@ -193,8 +126,8 @@ void FilterList::AddFrom(LineFiltersList &list)
 		{
 			if (LPCTSTR regexp = EatPrefix(item.filterStr.c_str(), _T("regexp:")))
 			{
-				filter_item filter;
-				if (filter.assign(regexp, _tcslen(regexp)) && filter.compile())
+				regexp_item filter;
+				if (filter.assign(regexp, _tcslen(regexp)))
 				{
 					m_predifferRegExps.push_back(filter);
 				}
@@ -267,10 +200,10 @@ bool FilterList::Match(size_t stringlen, const char *string, int codepage)
 		string = (const char *)buf.ptr;
 		stringlen = buf.size;
 	}
-	stl::vector<filter_item>::const_iterator iter = m_list.begin();
+	stl::vector<regexp_item>::const_iterator iter = m_list.begin();
 	while (iter != m_list.end())
 	{
-		const filter_item &item = *iter++;
+		const regexp_item &item = *iter++;
 		int ovector[30];
 		int result = item.execute(string, stringlen, 0, 0, ovector, 30);
 		if (result >= 0)
@@ -309,67 +242,9 @@ BSTR FilterList::ApplyPredifferScripts(LPCTSTR filename, BSTR bstr)
 	return V_BSTR(&var);
 }
 
-size_t FilterList::ApplyPredifferRegExps(LPCTSTR filename, char *dst, const char *src, size_t len)
+size_t FilterList::ApplyPredifferRegExps(LPCTSTR filename, char *dst, const char *src, size_t len) const
 {
-	stl::vector<filter_item>::const_iterator iter = m_predifferRegExps.begin();
-	while (iter != m_predifferRegExps.end())
-	{
-		const filter_item &filter = *iter++;
-		if (filter.filenameSpec && !::PathMatchSpec(filename, filter.filenameSpec->T))
-			continue;
-		char *buf = dst;
-		size_t i = 0;
-		while (i < len)
-		{
-			int ovector[33];
-			int matches = filter.execute(src, len, i, 0, ovector, _countof(ovector) - 1);
-			if ((matches <= 0) || (ovector[1] == 0))
-			{
-				ovector[1] = len;
-				matches = 0;
-			}
-			int matches2 = matches * 2;
-			ovector[matches2] = ovector[1];
-			ovector[1] = ovector[0];
-			HString *const injectString = filter.injectString;
-			size_t const injectLength = injectString->ByteLen();
-			int index = 1;
-			size_t j;
-			do
-			{
-				j = ovector[index];
-				if (i < j)
-				{
-					size_t d = j - i;
-					if (index == 1 || (index & 1) == 0)
-					{
-						memcpy(buf, src + i, d);
-						buf += d;
-					}
-					else if (injectLength <= d)
-					{
-						memcpy(buf, injectString, injectLength);
-						buf += injectLength;
-					}
-					i = j;
-				}
-			} while (++index <= matches2);
-			if (!filter.global)
-			{
-				j = len;
-				if (i < j)
-				{
-					size_t d = j - i;
-					memcpy(buf, src + i, d);
-					buf += d;
-				}
-			}
-			i = j;
-		}
-		len = buf - dst;
-		src = dst;
-	}
-	return len;
+	return regexp_item::process(m_predifferRegExps, dst, src, len, filename);
 }
 
 void FilterList::ResetPrediffers(short side)

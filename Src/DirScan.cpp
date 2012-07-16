@@ -107,7 +107,7 @@ int CDiffContext::DirScan_GetItems(
 		if (!bTreatDirAsEqual)
 		{
 			if (i < leftDirs.size() && (j == rightDirs.size() ||
-					collstr(leftDirs[i].filename, rightDirs[j].filename) < 0))
+					m_piFilterGlobal->collateDir(leftDirs[i].filename.c_str(), rightDirs[j].filename.c_str()) < 0))
 			{
 				UINT nDiffCode = DIFFCODE::LEFT | DIFFCODE::DIR;
 				if (depth && bUniques)
@@ -138,7 +138,7 @@ int CDiffContext::DirScan_GetItems(
 				continue;
 			}
 			if (j < rightDirs.size() && (i == leftDirs.size() ||
-					collstr(leftDirs[i].filename, rightDirs[j].filename) > 0))
+					m_piFilterGlobal->collateDir(leftDirs[i].filename.c_str(), rightDirs[j].filename.c_str()) > 0))
 			{
 				UINT nDiffCode = DIFFCODE::RIGHT | DIFFCODE::DIR;
 				if (depth && bUniques)
@@ -240,7 +240,7 @@ int CDiffContext::DirScan_GetItems(
 		// Comparing file leftFiles[i].name to rightFiles[j].name
 		
 		if (i < leftFiles.size() && (j == rightFiles.size() ||
-				collstr(leftFiles[i].filename, rightFiles[j].filename) < 0))
+				m_piFilterGlobal->collateFile(leftFiles[i].filename.c_str(), rightFiles[j].filename.c_str()) < 0))
 		{
 			const UINT nDiffCode = DIFFCODE::LEFT | DIFFCODE::FILE;
 			AddToList(leftsubdir, rightsubdir, &leftFiles[i], 0, nDiffCode, parent);
@@ -249,7 +249,7 @@ int CDiffContext::DirScan_GetItems(
 			continue;
 		}
 		if (j < rightFiles.size() && (i == leftFiles.size() ||
-				collstr(leftFiles[i].filename, rightFiles[j].filename) > 0))
+				m_piFilterGlobal->collateFile(leftFiles[i].filename.c_str(), rightFiles[j].filename.c_str()) > 0))
 		{
 			const UINT nDiffCode = DIFFCODE::RIGHT | DIFFCODE::FILE;
 			AddToList(leftsubdir, rightsubdir, 0, &rightFiles[j], nDiffCode, parent);

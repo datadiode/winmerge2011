@@ -66,8 +66,8 @@ void LineFiltersDlg::OnCustomdraw(HSurface *pDC)
 		pchExpression = p;
 	}
 
-	filter_item item;
-	if (item.assign(pchExpression, cchExpression) && item.compile())
+	regexp_item item;
+	if (item.assign(pchExpression, cchExpression))
 	{
 		HGdiObj *pTmp = pDC->SelectObject(m_pEdTestCase->GetFont());
 		RECT rc = { -m_pEdTestCase->GetScrollPos(SB_HORZ), 0, 0, 0 };

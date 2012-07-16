@@ -339,10 +339,6 @@ UINT_PTR CDirFrame::FindItemFromPaths(LPCTSTR pathLeft, LPCTSTR pathRight)
 	LPCTSTR file1 = PathFindFileName(pathLeft);
 	LPCTSTR file2 = PathFindFileName(pathRight);
 
-	// Filenames must be identical
-	if (lstrcmpi(file1, file2) != 0)
-		return NULL;
-
 	String path1(pathLeft, file1 - pathLeft); // include trailing backslash
 	String path2(pathRight, file2 - pathRight); // include trailing backslash
 

@@ -30,7 +30,7 @@
 
 using stl::vector;
 
-static void AddFilterPattern(vector<FileFilterElement*> &filterList, String & str);
+static void AddFilterPattern(vector<regexp_item> &filterList, LPCTSTR psz);
 
 /**
  * @brief Destructor, frees all filters.
@@ -120,40 +120,19 @@ void FileFilterMgr::DeleteAllFilters()
  * @param [in] filterList List where pattern is added.
  * @param [in] str Temporary variable (ie, it may be altered)
  */
-static void AddFilterPattern(vector<FileFilterElement*> &filterList, String & str)
+static void AddFilterPattern(vector<regexp_item> &filterList, LPCTSTR psz)
 {
-	static const TCHAR commentLeader[] = _T("##"); // Starts comment
-	string_trim_ws_begin(str);
-
-	// Ignore lines beginning with '##'
-	size_t pos = str.find(commentLeader);
-	if (pos == 0)
-		return;
-
-	// Find possible comment-separator '<whitespace>##'
-	while (pos != String::npos && !_istspace(str[pos - 1]))
-		pos = str.find(commentLeader, pos + 1);
-
-	// Remove comment and whitespaces before it
-	if (pos != String::npos)
-		str.resize(pos);
-	string_trim_ws_end(str);
-	if (str.empty())
-		return;
-
-	const char * errormsg = NULL;
+	const char *errormsg = NULL;
 	int erroroffset = 0;
-
-	const OString regexString = HString::Uni(str.c_str())->Oct(CP_UTF8);
-	pcre *regexp = pcre_compile(regexString.A, PCRE_CASELESS, &errormsg,
-		&erroroffset, NULL);
-	if (regexp)
+	const OString regexString = HString::Uni(psz)->Oct(CP_UTF8);
+	if (pcre *regexp = pcre_compile(regexString.A,
+			PCRE_CASELESS, &errormsg, &erroroffset, NULL))
 	{
-		FileFilterElement *elem = new FileFilterElement();
+		regexp_item elem;
 		errormsg = NULL;
 		pcre_extra *pe = pcre_study(regexp, 0, &errormsg);
-		elem->pRegExp = regexp;
-		elem->pRegExpExtra = pe;
+		elem.pRegExp = regexp;
+		elem.pRegExpExtra = pe;
 		filterList.push_back(elem);
 	}
 }
@@ -188,45 +167,66 @@ FileFilter *FileFilterMgr::LoadFilterFile(LPCTSTR szFilepath)
 	{
 		// Returns false when last line is read
 		bLinesLeft = file.ReadString(sLine, sEol, &lossy);
+		static const TCHAR commentLeader[] = _T("##"); // Starts comment
+		// Ignore lines beginning with '##'
+		size_t pos = sLine.find(commentLeader);
+		if (pos != 0)
+		{
+			// Find possible comment-separator '<whitespace>##'
+			while (pos != String::npos && !_istspace(sLine[pos - 1]))
+				pos = sLine.find(commentLeader, pos + 1);
+		}
+		// Remove comment and whitespaces before it
+		if (pos != String::npos)
+			sLine.resize(pos);
 		string_trim_ws(sLine);
 
-		if (0 == _tcsncmp(sLine.c_str(), _T("name:"), 5))
+		if (LPCTSTR psz = EatPrefixTrim(sLine.c_str(), _T("name:")))
 		{
 			// specifies display name
-			String str = sLine.substr(5);
-			string_trim_ws_begin(str);
-			if (!str.empty())
-				pfilter->name = str;
+			pfilter->name = psz;
 		}
-		else if (0 == _tcsncmp(sLine.c_str(), _T("desc:"), 5))
+		else if (LPCTSTR psz = EatPrefixTrim(sLine.c_str(), _T("desc:")))
 		{
-			// specifies display name
-			String str = sLine.substr(5);
-			string_trim_ws_begin(str);
-			if (!str.empty())
-				pfilter->description = str;
+			// specifies description
+			pfilter->description = psz;
 		}
-		else if (0 == _tcsncmp(sLine.c_str(), _T("def:"), 4))
+		else if (LPCTSTR psz = EatPrefixTrim(sLine.c_str(), _T("def:")))
 		{
 			// specifies default
-			String str = sLine.substr(4);
-			string_trim_ws_begin(str);
-			if (str == _T("0") || str == _T("no") || str == _T("exclude"))
+			String str = psz;
+			if (PathMatchSpec(psz, _T("0;no;exclude")))
 				pfilter->default_include = false;
-			else if (str == _T("1") || str == _T("yes") || str == _T("include"))
+			else if (PathMatchSpec(psz, _T("1;yes;include")))
 				pfilter->default_include = true;
 		}
-		else if (0 == _tcsncmp(sLine.c_str(), _T("f:"), 2))
+		else if (LPCTSTR psz = EatPrefixTrim(sLine.c_str(), _T("f:")))
 		{
 			// file filter
-			String str = sLine.substr(2);
-			AddFilterPattern(pfilter->filefilters, str);
+			AddFilterPattern(pfilter->filefilters, psz);
 		}
-		else if (0 == _tcsncmp(sLine.c_str(), _T("d:"), 2))
+		else if (LPCTSTR psz = EatPrefixTrim(sLine.c_str(), _T("d:")))
 		{
 			// directory filter
-			String str = sLine.substr(2);
-			AddFilterPattern(pfilter->dirfilters, str);
+			AddFilterPattern(pfilter->dirfilters, psz);
+		}
+		else if (LPCTSTR psz = EatPrefixTrim(sLine.c_str(), _T("equiv-f:")))
+		{
+			// file prefilter
+			regexp_item item;
+			if (item.assign(psz, _tcslen(psz)))
+			{
+				pfilter->fileprefilters.push_back(item);
+			}
+		}
+		else if (LPCTSTR psz = EatPrefixTrim(sLine.c_str(), _T("equiv-d:")))
+		{
+			// directory prefilter
+			regexp_item item;
+			if (item.assign(psz, _tcslen(psz)))
+			{
+				pfilter->dirprefilters.push_back(item);
+			}
 		}
 	} while (bLinesLeft);
 
@@ -240,85 +240,16 @@ FileFilter *FileFilterMgr::LoadFilterFile(LPCTSTR szFilepath)
  * @return Pointer to found filefilter or NULL;
  * @note We just do a linear search, because this is seldom called
  */
-FileFilter * FileFilterMgr::GetFilterByPath(LPCTSTR szFilterPath)
+FileFilter *FileFilterMgr::GetFilterByPath(LPCTSTR szFilterPath) const
 {
 	vector<FileFilter*>::const_iterator iter = m_filters.begin();
 	while (iter != m_filters.end())
 	{
 		if (string_compare_nocase((*iter)->fullpath, szFilterPath) == 0)
-			return (*iter);
+			return *iter;
 		++iter;
 	}
 	return 0;
-}
-
-/**
- * @brief Test given string against given regexp list.
- *
- * @param [in] filterList List of regexps to test against.
- * @param [in] szTest String to test against regexps.
- * @return TRUE if string passes
- * @note Matching stops when first match is found.
- */
-bool TestAgainstRegList(const vector<FileFilterElement*> &filterList, LPCTSTR szTest)
-{
-	const OString compString = HString::Uni(szTest)->Oct(CP_UTF8);
-	int result = -1;
-	vector<FileFilterElement*>::const_iterator iter = filterList.begin();
-	while (iter != filterList.end())
-	{
-		pcre *regexp = (*iter)->pRegExp;
-		pcre_extra *extra = (*iter)->pRegExpExtra;
-		int ovector[30];
-		result = pcre_exec(regexp, extra, compString.A, compString.ByteLen(),
-			0, 0, ovector, 30);
-		if (result >= 0)
-			break;
-		++iter;
-	}
-	return result >= 0;
-}
-
-/**
- * @brief Test given filename against filefilter.
- *
- * Test filename against active filefilter. If matching rule is found
- * we must first determine type of rule that matched. If we return FALSE
- * from this function directory scan marks file as skipped.
- *
- * @param [in] pFilter Pointer to filefilter
- * @param [in] szFileName Filename to test
- * @return TRUE if file passes the filter
- */
-bool FileFilterMgr::TestFileNameAgainstFilter(const FileFilter *pFilter,
-	LPCTSTR szFileName) const
-{
-	if (!pFilter)
-		return true;
-	if (TestAgainstRegList(pFilter->filefilters, szFileName))
-		return !pFilter->default_include;
-	return pFilter->default_include;
-}
-
-/**
- * @brief Test given directory name against filefilter.
- *
- * Test directory name against active filefilter. If matching rule is found
- * we must first determine type of rule that matched. If we return FALSE
- * from this function directory scan marks file as skipped.
- *
- * @param [in] pFilter Pointer to filefilter
- * @param [in] szDirName Directory name to test
- * @return TRUE if directory name passes the filter
- */
-bool FileFilterMgr::TestDirNameAgainstFilter(const FileFilter * pFilter,
-	LPCTSTR szDirName) const
-{
-	if (!pFilter)
-		return true;
-	if (TestAgainstRegList(pFilter->dirfilters, szDirName))
-		return !pFilter->default_include;
-	return pFilter->default_include;
 }
 
 /**
