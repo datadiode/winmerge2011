@@ -120,13 +120,13 @@ CMergeEditView *CChildFrame::GetActiveMergeView() const
 	}
 	if (nActiveViewIndexType >= _countof(m_pView))
 	{
-		assert(false);
+		ASSERT(FALSE);
 		return m_pView[0];
 	}
 	return m_pView[nActiveViewIndexType];
 }
 
-int CChildFrame::GetContextDiff(int & firstDiff, int & lastDiff)
+int CChildFrame::GetContextDiff(int &firstDiff, int &lastDiff) const
 {
 	firstDiff = -1;
 	lastDiff = -1;

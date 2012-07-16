@@ -950,6 +950,44 @@ void CChildFrame::UpdateEditCmdUI()
 
 void CChildFrame::UpdateClipboardCmdUI()
 {
+	int firstDiff, lastDiff;
+	int currDiff = GetContextDiff(firstDiff, lastDiff);
+	BYTE enable = MF_GRAYED;
+	if (firstDiff != -1 && lastDiff != -1 && (lastDiff >= firstDiff) ||
+		currDiff != -1 && m_diffList.IsDiffSignificant(currDiff))
+	{
+		enable = MF_ENABLED;
+	}
+
+	// Merging
+	m_pMDIFrame->UpdateCmdUI<ID_L2R>(
+		!m_ptBuf[1]->GetReadOnly() ? enable : MF_GRAYED);
+	m_pMDIFrame->UpdateCmdUI<ID_R2L>(
+		!m_ptBuf[0]->GetReadOnly() ? enable : MF_GRAYED);
+
+	// Navigation
+	CMergeEditView *const pMergeView = GetActiveMergeView();
+
+	const POINT pos = pMergeView->GetCursorPos();
+
+	if (currDiff == -1)
+		currDiff = m_diffList.LineToDiff(pos.y);
+	m_pMDIFrame->UpdateCmdUI<ID_CURDIFF>(
+		currDiff != -1 && m_diffList.IsDiffSignificant(currDiff) ?
+		MF_ENABLED : MF_GRAYED);
+
+	const DIFFRANGE *dfi = m_diffList.FirstSignificantDiffRange();
+	m_pMDIFrame->UpdateCmdUI<ID_PREVDIFF>(
+		dfi && pos.y > (long)dfi->dend0 ? MF_ENABLED : MF_GRAYED);
+	dfi = m_diffList.LastSignificantDiffRange();
+	m_pMDIFrame->UpdateCmdUI<ID_NEXTDIFF>(
+		dfi && pos.y < (long)dfi->dbegin0 ? MF_ENABLED : MF_GRAYED);
+
+	// Enable select difference menuitem if current line is inside difference.
+	m_pMDIFrame->UpdateCmdUI<ID_SELECTLINEDIFF>(
+		pMergeView->GetLineFlags(pos.y) & LF_DIFF ? MF_ENABLED : MF_GRAYED);
+
+	// Clipboard
 	CCrystalTextView *const pTextView = GetActiveTextView();
 	m_pMDIFrame->UpdateCmdUI<ID_EDIT_CUT>(
 		pTextView && pTextView->QueryEditable() && pTextView->IsSelection() ? MF_ENABLED : MF_GRAYED);
@@ -987,48 +1025,12 @@ void CChildFrame::UpdateCmdUI()
 
 	UpdateEditCmdUI();
 
-	int firstDiff, lastDiff;
-	int currDiff = GetContextDiff(firstDiff, lastDiff);
-	BYTE enable = MF_GRAYED;
-	if (firstDiff != -1 && lastDiff != -1 && (lastDiff >= firstDiff) ||
-		currDiff != -1 && m_diffList.IsDiffSignificant(currDiff))
-	{
-		enable = MF_ENABLED;
-	}
-
-	// Merging
-	m_pMDIFrame->UpdateCmdUI<ID_L2R>(
-		!m_ptBuf[1]->GetReadOnly() ? enable : MF_GRAYED);
-	m_pMDIFrame->UpdateCmdUI<ID_R2L>(
-		!m_ptBuf[0]->GetReadOnly() ? enable : MF_GRAYED);
-
-	// Navigation
-	CMergeEditView *const pMergeView = GetActiveMergeView();
-
-	const POINT pos = pMergeView->GetCursorPos();
-
-	if (currDiff == -1)
-		currDiff = m_diffList.LineToDiff(pos.y);
-	m_pMDIFrame->UpdateCmdUI<ID_CURDIFF>(
-		currDiff != -1 && m_diffList.IsDiffSignificant(currDiff) ?
-		MF_ENABLED : MF_GRAYED);
-
-	const DIFFRANGE *dfi = m_diffList.FirstSignificantDiffRange();
-	m_pMDIFrame->UpdateCmdUI<ID_PREVDIFF>(
-		dfi && pos.y > (long)dfi->dend0 ? MF_ENABLED : MF_GRAYED);
-	dfi = m_diffList.LastSignificantDiffRange();
-	m_pMDIFrame->UpdateCmdUI<ID_NEXTDIFF>(
-		dfi && pos.y < (long)dfi->dbegin0 ? MF_ENABLED : MF_GRAYED);
-
 	// Clipboard
 	UpdateClipboardCmdUI();
 
-	// Enable select difference menuitem if current line is inside difference.
-	m_pMDIFrame->UpdateCmdUI<ID_SELECTLINEDIFF>(
-		pMergeView->GetLineFlags(pos.y) & LF_DIFF ? MF_ENABLED : MF_GRAYED);
-
 	// General editing
-	enable = pMergeView->QueryEditable() ? MF_ENABLED : MF_GRAYED;
+	CMergeEditView *const pMergeView = GetActiveMergeView();
+	BYTE enable = pMergeView->QueryEditable() ? MF_ENABLED : MF_GRAYED;
 	m_pMDIFrame->UpdateCmdUI<ID_EDIT_REPLACE>(enable);
 
 	// EOL style
