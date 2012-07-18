@@ -93,8 +93,8 @@ int string_compare_nocase(const String &str1, const String &str2)
  */
 void string_trim_ws(String &result)
 {
-	string_trim_ws_begin(result);
 	string_trim_ws_end(result);
+	string_trim_ws_begin(result);
 }
 
 /**
@@ -103,11 +103,11 @@ void string_trim_ws(String &result)
 void string_trim_ws_begin(String &result)
 {
 	String::iterator it = result.begin();
-	while (_istspace(*it))
+	while (it != result.end() && _istspace(*it))
+	{
 		++it;
-	
-	if (it != result.begin())
-		result.erase(result.begin(), it);
+	}
+	result.erase(result.begin(), it);
 }
 
 /**
@@ -115,12 +115,13 @@ void string_trim_ws_begin(String &result)
  */
 void string_trim_ws_end(String &result)
 {
-	String::iterator it = result.end() - 1;
-	while (_istspace(*it))
-		--it;
-
-	if (it != result.end() - 1)
-		result.erase(it + 1, result.end());
+	String::iterator it = result.end();
+	String::iterator pos;
+	do
+	{
+		pos = it;
+	} while (it != result.begin() && _istspace(*--it));
+	result.erase(pos, result.end());
 }
 
 /**
