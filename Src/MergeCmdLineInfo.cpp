@@ -81,8 +81,6 @@ LPCTSTR MergeCmdLineInfo::EatParam(LPCTSTR p, String &param, bool *flag)
 	{
 		CharLower(&param.front());
 	}
-	// Strip any leading or trailing whitespace
-	string_trim_ws(param);
 	// Remove any double quotes
 	param.erase(stl::remove(param.begin(), param.end(), _T('"')), param.end());
 	return q;
