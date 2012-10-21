@@ -201,7 +201,7 @@ void CCrystalEditView::Cut()
   GetSelection(ptSelStart, ptSelEnd);
   String text;
   GetText(ptSelStart, ptSelEnd, text);
-  PutToClipboard(text.c_str(), text.size());
+  PutToClipboard(text);
 
   POINT ptCursorPos = ptSelStart;
   ASSERT_VALIDTEXTPOS(ptCursorPos);

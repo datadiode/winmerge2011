@@ -1038,12 +1038,11 @@ bool CCrystalTextView::IsSelection()
 
 void CCrystalTextView::Copy()
 {
-	if (m_ptSelStart == m_ptSelEnd)
-		return;
-	PrepareSelBounds();
-	String text;
-	GetText(m_ptDrawSelStart, m_ptDrawSelEnd, text);
-	PutToClipboard(text.c_str(), text.size());
+	WaitStatusCursor wc;
+	if (HGLOBAL hData = PrepareDragData())
+	{
+		PutToClipboard(hData);
+	}
 }
 
 bool CCrystalTextView::QueryEditable()
@@ -1051,30 +1050,35 @@ bool CCrystalTextView::QueryEditable()
 	return false;
 }
 
-BOOL CCrystalTextView::PutToClipboard(LPCTSTR pszText, int cchText)
+void CCrystalTextView::PutToClipboard(HGLOBAL hData)
 {
-  if (pszText == NULL || cchText == 0)
-    return FALSE;
+	if (OpenClipboard())
+	{
+		EmptyClipboard();
+		if (SetClipboardData(CF_UNICODETEXT, hData))
+		{
+			SetClipboardData(RegisterClipboardFormat(_T("WinMergeClipboard")), NULL);
+		}
+		CloseClipboard();
+	}
+	else
+	{
+		::GlobalFree(hData);
+	}
+}
 
-  WaitStatusCursor wc;
-  BOOL bOK = FALSE;
-  if (OpenClipboard ())
-    {
-      EmptyClipboard ();
-      SIZE_T cbData = (cchText + 1) * sizeof(TCHAR);
-      HGLOBAL hData = GlobalAlloc (GMEM_MOVEABLE | GMEM_DDESHARE, cbData);
-      if (hData != NULL)
-        {
-          GlobalReAlloc(hData, cbData, 0);
-          ASSERT(GlobalSize(hData) == cbData);
-          LPTSTR pszData = (LPTSTR)::GlobalLock (hData);
-          memcpy (pszData, pszText, cbData);
-          GlobalUnlock (hData);
-          bOK = SetClipboardData (CF_UNICODETEXT, hData) != NULL;
-          if (bOK)
-            SetClipboardData (RegisterClipboardFormat (_T("WinMergeClipboard")), NULL);
-        }
-      CloseClipboard ();
-    }
-  return bOK;
+void CCrystalTextView::PutToClipboard(const String &text)
+{
+	WaitStatusCursor wc;
+	LPCTSTR pszText = text.c_str();
+	SIZE_T cbData = (text.length() + 1) * sizeof(TCHAR);
+	if (HGLOBAL hData = ::GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, cbData))
+	{
+		::GlobalReAlloc(hData, cbData, 0);
+		ASSERT(::GlobalSize(hData) == cbData);
+		LPTSTR pszData = (LPTSTR)::GlobalLock(hData);
+		memcpy(pszData, pszText, cbData);
+		::GlobalUnlock(hData);
+		PutToClipboard(hData);
+	}
 }

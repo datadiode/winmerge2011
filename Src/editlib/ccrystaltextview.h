@@ -430,7 +430,8 @@ protected:
     virtual void GetText(const POINT & ptStart, const POINT & ptEnd, String & text);
 
     //  Clipboard overridable
-    virtual BOOL PutToClipboard (LPCTSTR pszText, int cchText);
+	void PutToClipboard(HGLOBAL);
+	void PutToClipboard(const String &);
 
     //  Drag-n-drop overrideable
     virtual HGLOBAL PrepareDragData ();

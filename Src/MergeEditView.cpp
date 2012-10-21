@@ -606,7 +606,7 @@ void CMergeEditView::OnEditCopy()
 	String text;
 	LocateTextBuffer()->GetTextWithoutEmptys(
 		ptSelStart.y, ptSelStart.x, ptSelEnd.y, ptSelEnd.x, text);
-	PutToClipboard(text.c_str(), text.length());
+	PutToClipboard(text);
 }
 
 /**
@@ -625,7 +625,7 @@ void CMergeEditView::OnEditCut()
 	String text;
 	LocateTextBuffer()->GetTextWithoutEmptys(
 		ptSelStart.y, ptSelStart.x, ptSelEnd.y, ptSelEnd.x, text);
-	PutToClipboard(text.c_str(), text.length());
+	PutToClipboard(text);
 
 	POINT ptCursorPos = ptSelStart;
 	ASSERT_VALIDTEXTPOS(ptCursorPos);
@@ -1265,7 +1265,7 @@ void CMergeEditView::OnEditCopyLineNumbers()
 		if (LPCTSTR pszLine = GetLineChars(i))
 			strText += pszLine;
 	}
-	PutToClipboard(strText.c_str(), strText.size());
+	PutToClipboard(strText);
 }
 
 void CMergeEditView::OnSize() 
