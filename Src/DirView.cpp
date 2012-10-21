@@ -1199,8 +1199,8 @@ void CDirView::OpenSelection(LPCTSTR szCompareAs, UINT idCompareAs)
 	theApp.m_pMainWnd->DoFileOpen(
 		packingInfo, idCompareAs,
 		filelocLeft, filelocRight,
-		FFILEOPEN_NOMRU | FFILEOPEN_DETECT,
-		FFILEOPEN_NOMRU | FFILEOPEN_DETECT,
+		leftFlags | FFILEOPEN_NOMRU | FFILEOPEN_DETECT,
+		rightFlags | FFILEOPEN_NOMRU | FFILEOPEN_DETECT,
 		m_pFrame->GetRecursive(), m_pFrame);
 }
 
