@@ -16,6 +16,7 @@
 #include "DirReportTypes.h"
 #include "paths.h"
 #include "FileOrFolderSelect.h"
+#include "SettingStore.h"
 
 /**
  * @brief Constructor.
@@ -80,7 +81,7 @@ struct ReportTypeInfo
  * @brief List of report types.
  * This list is used to initialize the GUI.
  */
-static ReportTypeInfo f_types[] = {
+static const ReportTypeInfo f_types[] = {
 	{ REPORT_TYPE_COMMALIST,
 		IDS_REPORT_COMMALIST,
 		IDS_TEXT_REPORT_FILES
@@ -114,14 +115,18 @@ BOOL DirCmpReportDlg::OnInitDialog()
 
 	m_pCbReportFile->LoadState(_T("ReportFiles"));
 
-	for (int i = 0; i < sizeof(f_types) / sizeof(f_types[0]); ++i)
+	m_nReportType = static_cast<REPORT_TYPE>(
+		SettingStore.GetProfileInt(_T("Settings"), _T("DirCmpReportStyle"), 0));
+	for (int i = 0; i < _countof(f_types); ++i)
 	{
-		const ReportTypeInfo & info = f_types[i];
+		const ReportTypeInfo &info = f_types[i];
 		int ind = m_ctlStyle->InsertString(i, LanguageSelect.LoadString(info.idDisplay).c_str());
 		m_ctlStyle->SetItemData(ind, info.reportType);
-
+		if (info.reportType == m_nReportType)
+		{
+			m_ctlStyle->SetCurSel(ind);
+		}
 	}
-	m_ctlStyle->SetCurSel(0);
 	// Set selected path to variable so file selection dialog shows
 	// correct filename and path.
 	m_pCbReportFile->GetWindowText(m_sReportFile);
@@ -158,7 +163,7 @@ void DirCmpReportDlg::OnOK()
 	m_pCbReportFile->GetWindowText(m_sReportFile);
 	m_bCopyToClipboard = IsDlgButtonChecked(IDC_REPORT_COPYCLIPBOARD);
 	int sel = m_ctlStyle->GetCurSel();
-	m_nReportType = (REPORT_TYPE)m_ctlStyle->GetItemData(sel);
+	m_nReportType = static_cast<REPORT_TYPE>(m_ctlStyle->GetItemData(sel));
 
 	if (m_sReportFile.empty() && !m_bCopyToClipboard)
 	{
@@ -179,5 +184,6 @@ void DirCmpReportDlg::OnOK()
 	}
 
 	m_pCbReportFile->SaveState(_T("ReportFiles"));
+	SettingStore.WriteProfileInt(_T("Settings"), _T("DirCmpReportStyle"), m_nReportType);
 	EndDialog(IDOK);
 }
