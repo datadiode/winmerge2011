@@ -55,38 +55,7 @@ void CompareStats::Reset()
 {
 	m_nTotalItems = 0;
 	m_nComparedItems = 0;
-	m_state = STATE_IDLE;
-	m_bCompareDone = FALSE;
 	ZeroMemory(m_counts, sizeof m_counts);
-}
-
-/** 
- * @brief Change compare state.
- * @param [in] state New compare state.
- */
-void CompareStats::SetCompareState(CompareStats::CMP_STATE state)
-{
-#ifdef _DEBUG
-	if (state == STATE_START && m_state != STATE_IDLE)
-		_RPTF2(_CRT_ERROR, "Invalid state change from %d to %d", m_state, state);
-#endif //_DEBUG
-
-	// New compare starting so reset ready status
-	if (state == STATE_START)
-		m_bCompareDone = FALSE;
-	// Compare ready
-	if (state == STATE_IDLE && m_state == STATE_COMPARE)
-		m_bCompareDone = TRUE;
-
-	m_state = state;
-}
-
-/** 
- * @brief Return current comparestate.
- */
-CompareStats::CMP_STATE CompareStats::GetCompareState() const
-{
-	return m_state;
 }
 
 /** 

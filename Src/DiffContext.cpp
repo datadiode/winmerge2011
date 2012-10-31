@@ -240,8 +240,6 @@ UINT CDiffContext::CompareDirectories(bool bOnlyRequested)
 
 	m_hSemaphore = CreateSemaphore(0, 0, LONG_MAX, 0);
 
-	m_pCompareStats->SetCompareState(CompareStats::STATE_START);
-
 	if (bSinglethreaded)
 	{
 		if (!m_bOnlyRequested)
@@ -310,21 +308,16 @@ void CDiffContext::DiffThreadCompare(LPVOID lpParam)
 
 	CDiffContext *const myStruct = reinterpret_cast<CDiffContext *>(lpParam);
 
-	myStruct->m_pCompareStats->SetCompareState(CompareStats::STATE_COMPARE);
-
 	// Now do all pending file comparisons
 	if (myStruct->m_bOnlyRequested)
 		myStruct->DirScan_CompareRequestedItems(NULL);
 	else
 		myStruct->DirScan_CompareItems(NULL);
 
-	myStruct->m_pCompareStats->SetCompareState(CompareStats::STATE_IDLE);
-
 	CloseHandle(myStruct->m_hSemaphore);
 	myStruct->m_hSemaphore = NULL;
 
 	// Send message to UI to update
-	// msgID=MSG_UI_UPDATE=1025 (2005-11-29, Perry)
 	myStruct->m_pWindow->PostMessage(MSG_UI_UPDATE);
 
 	CoUninitialize();
