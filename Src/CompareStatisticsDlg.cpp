@@ -86,35 +86,35 @@ void CompareStatisticsDlg::Update()
 	int totalFolders = 0;
 
 	// Identical
-	int count = m_pCompareStats->GetCount(CompareStats::RESULT_DIR);
+	int count = m_pCompareStats->GetCount(CompareStats::DIFFIMG_DIR);
 	totalFolders += count;
 	SetDlgItemInt(IDC_STAT_IDENTICFOLDER, count);
-	count = m_pCompareStats->GetCount(CompareStats::RESULT_SAME);
+	count = m_pCompareStats->GetCount(CompareStats::DIFFIMG_TEXTSAME);
 	totalFiles += count;
 	SetDlgItemInt(IDC_STAT_IDENTICFILE, count);
-	count = m_pCompareStats->GetCount(CompareStats::RESULT_BINSAME);
+	count = m_pCompareStats->GetCount(CompareStats::DIFFIMG_BINSAME);
 	totalFiles += count;
 	SetDlgItemInt(IDC_STAT_IDENTICBINARY, count);
 
 	// Different
-	count = m_pCompareStats->GetCount(CompareStats::RESULT_DIFF);
+	count = m_pCompareStats->GetCount(CompareStats::DIFFIMG_TEXTDIFF);
 	totalFiles += count;
 	SetDlgItemInt(IDC_STAT_DIFFFILE, count);
-	count = m_pCompareStats->GetCount(CompareStats::RESULT_BINDIFF);
+	count = m_pCompareStats->GetCount(CompareStats::DIFFIMG_BINDIFF);
 	totalFiles += count;
 	SetDlgItemInt(IDC_STAT_DIFFBINARY, count);
 
 	// Unique
-	count = m_pCompareStats->GetCount(CompareStats::RESULT_LDIRUNIQUE);
+	count = m_pCompareStats->GetCount(CompareStats::DIFFIMG_LDIRUNIQUE);
 	totalFolders += count;
 	SetDlgItemInt(IDC_STAT_LUNIQFOLDER, count);
-	count = m_pCompareStats->GetCount(CompareStats::RESULT_LUNIQUE);
+	count = m_pCompareStats->GetCount(CompareStats::DIFFIMG_LUNIQUE);
 	totalFiles += count;
 	SetDlgItemInt(IDC_STAT_LUNIQFILE, count);
-	count = m_pCompareStats->GetCount(CompareStats::RESULT_RDIRUNIQUE);
+	count = m_pCompareStats->GetCount(CompareStats::DIFFIMG_RDIRUNIQUE);
 	totalFolders += count;
 	SetDlgItemInt(IDC_STAT_RUNIQFOLDER, count);
-	count = m_pCompareStats->GetCount(CompareStats::RESULT_RUNIQUE);
+	count = m_pCompareStats->GetCount(CompareStats::DIFFIMG_RUNIQUE);
 	totalFiles += count;
 	SetDlgItemInt(IDC_STAT_RUNIQFILE, count);
 

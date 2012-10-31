@@ -10,6 +10,8 @@
 #ifndef _COMPARESTATS_H_
 #define _COMPARESTATS_H_
 
+struct DIFFCODE;
+
 /**
  * @brief Class holding directory compare stats.
  *
@@ -21,28 +23,38 @@ class CompareStats
 public:
 
 	/**
-	* @brief Resultcodes we store.
-	*/
+	 * @brief Folder compare icon indexes.
+	 * This enum defines indexes for imagelist used for folder compare icons.
+	 * Note that this enum must be in synch with code in OnInitialUpdate() and
+	 * GetColImage(). Also remember that icons are in resource file...
+	 */
 	enum RESULT
 	{
-		RESULT_LUNIQUE = 0,
-		RESULT_RUNIQUE,
-		RESULT_DIFF,
-		RESULT_SAME,
-		RESULT_BINSAME,
-		RESULT_BINDIFF,
-		RESULT_LDIRUNIQUE,
-		RESULT_RDIRUNIQUE,
-		RESULT_SKIP,
-		RESULT_DIRSKIP,
-		RESULT_DIR,
-		RESULT_ERROR,
-		RESULT_COUNT  //THIS MUST BE THE LAST ITEM
+		DIFFIMG_LUNIQUE,
+		DIFFIMG_RUNIQUE,
+		DIFFIMG_DIFF,
+		DIFFIMG_SAME,
+		DIFFIMG_BINSAME,
+		DIFFIMG_BINDIFF,
+		DIFFIMG_LDIRUNIQUE,
+		DIFFIMG_RDIRUNIQUE,
+		DIFFIMG_SKIP,
+		DIFFIMG_DIRSKIP,
+		DIFFIMG_DIRDIFF,
+		DIFFIMG_DIRSAME,
+		DIFFIMG_DIR,
+		DIFFIMG_ERROR,
+		DIFFIMG_DIRUP,
+		DIFFIMG_DIRUP_DISABLE,
+		DIFFIMG_ABORT,
+		DIFFIMG_TEXTDIFF,
+		DIFFIMG_TEXTSAME,
+		N_DIFFIMG
 	};
 
 	CompareStats();
 	~CompareStats();
-	void AddItem(int code);
+	void AddItem(UINT code);
 	void IncreaseTotalItems()
 	{
 		InterlockedIncrement(&m_nTotalItems);
@@ -58,11 +70,11 @@ public:
 	int GetCount(CompareStats::RESULT result) const;
 	int GetComparedItems() const { return m_nComparedItems; }
 	void Reset();
-	static CompareStats::RESULT GetResultFromCode(UINT diffcode);
+	static RESULT GetColImage(const DIFFCODE &);
 
 private:
 
-	long m_counts[RESULT_COUNT]; /**< Table storing result counts */
+	long m_counts[N_DIFFIMG]; /**< Table storing result counts */
 	long m_nTotalItems; /**< Total items found to compare */
 	long m_nComparedItems; /**< Compared items so far */
 };

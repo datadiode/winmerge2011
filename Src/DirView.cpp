@@ -60,36 +60,6 @@ static char THIS_FILE[] = __FILE__;
  */
 const int TimeToSignalCompare = 3;
 
-/**
- * @brief Folder compare icon indexes.
- * This enum defines indexes for imagelist used for folder compare icons.
- * Note that this enum must be in synch with code in OnInitialUpdate() and
- * GetColImage(). Also remember that icons are in resource file...
- */
-static enum
-{
-	DIFFIMG_LUNIQUE,
-	DIFFIMG_RUNIQUE,
-	DIFFIMG_DIFF,
-	DIFFIMG_SAME,
-	DIFFIMG_BINSAME,
-	DIFFIMG_BINDIFF,
-	DIFFIMG_LDIRUNIQUE,
-	DIFFIMG_RDIRUNIQUE,
-	DIFFIMG_SKIP,
-	DIFFIMG_DIRSKIP,
-	DIFFIMG_DIRDIFF,
-	DIFFIMG_DIRSAME,
-	DIFFIMG_DIR,
-	DIFFIMG_ERROR,
-	DIFFIMG_DIRUP,
-	DIFFIMG_DIRUP_DISABLE,
-	DIFFIMG_ABORT,
-	DIFFIMG_TEXTDIFF,
-	DIFFIMG_TEXTSAME,
-	N_DIFFIMG
-};
-
 // The resource ID constants/limits for the Shell context menu
 static const UINT LeftCmdFirst	= 0x9000;
 static const UINT LeftCmdLast	= 0xAFFF;
@@ -177,8 +147,8 @@ void CDirView::AcquireSharedResources()
 	// definition in begin of this file!
 	const int iconCX = 16;
 	const int iconCY = 16;
-	m_imageList = HImageList::Create(iconCX, iconCY, ILC_COLOR32 | ILC_MASK, N_DIFFIMG, 0);
-	static const WORD rgIDI[N_DIFFIMG] =
+	m_imageList = HImageList::Create(iconCX, iconCY, ILC_COLOR32 | ILC_MASK, CompareStats::N_DIFFIMG, 0);
+	static const WORD rgIDI[CompareStats::N_DIFFIMG] =
 	{
 		IDI_LFILE,
 		IDI_RFILE,
@@ -204,7 +174,7 @@ void CDirView::AcquireSharedResources()
 	do
 	{
 		VERIFY(-1 != m_imageList->Add(LanguageSelect.LoadIcon(rgIDI[i])));
-	} while (++i < N_DIFFIMG);
+	} while (++i < CompareStats::N_DIFFIMG);
 	// Load the icons used for the list view (expanded/collapsed state icons)
 	m_imageState = LanguageSelect.LoadImageList(IDB_TREE_STATE, 16);
 }
@@ -259,62 +229,6 @@ void CDirView::OnInitialUpdate()
 	// Also enable infotips.
 	DWORD exstyle = LVS_EX_FULLROWSELECT | LVS_EX_HEADERDRAGDROP | LVS_EX_INFOTIP;
 	SetExtendedStyle(exstyle);
-}
-
-/**
- * @brief Return image index appropriate for this row
- */
-int CDirView::GetColImage(const DIFFITEM & di) const
-{
-	// Must return an image index into image list created above in OnInitDialog
-	if (di.diffcode.isResultError())
-		return DIFFIMG_ERROR;
-	if (di.diffcode.isResultAbort())
-		return DIFFIMG_ABORT;
-	if (di.diffcode.isResultFiltered())
-		return (di.diffcode.isDirectory() ? DIFFIMG_DIRSKIP : DIFFIMG_SKIP);
-	if (di.diffcode.isSideLeftOnly())
-		return (di.diffcode.isDirectory() ? DIFFIMG_LDIRUNIQUE : DIFFIMG_LUNIQUE);
-	if (di.diffcode.isSideRightOnly())
-		return (di.diffcode.isDirectory() ? DIFFIMG_RDIRUNIQUE : DIFFIMG_RUNIQUE);
-	if (di.diffcode.isResultSame())
-	{
-		if (di.diffcode.isDirectory())
-			return DIFFIMG_DIRSAME;
-		else
-		{
-			if (di.diffcode.isText())
-				return DIFFIMG_TEXTSAME;
-			else if (di.diffcode.isBin())
-				return DIFFIMG_BINSAME;
-			else
-				return DIFFIMG_SAME;
-		}
-	}
-	// diff
-	if (di.diffcode.isResultDiff())
-	{
-		if (di.diffcode.isDirectory())
-			return DIFFIMG_DIRDIFF;
-		else
-		{
-			if (di.diffcode.isText())
-				return DIFFIMG_TEXTDIFF;
-			else if (di.diffcode.isBin())
-				return DIFFIMG_BINDIFF;
-			else
-				return DIFFIMG_DIFF;
-		}
-	}
-	return (di.diffcode.isDirectory() ? DIFFIMG_DIR : DIFFIMG_ABORT);
-}
-
-/**
- * @brief Get default folder compare status image.
- */
-int CDirView::GetDefaultColImage() const
-{
-	return DIFFIMG_ERROR;
 }
 
 /**
@@ -1687,12 +1601,12 @@ void CDirView::OnToolsGenerateReport()
 int CDirView::AddSpecialItems()
 {
 	int retVal = 0;
-	int iImgDirUp = DIFFIMG_DIRUP;
+	int iImgDirUp = CompareStats::DIFFIMG_DIRUP;
 	String leftParent, rightParent;
 	switch (m_pFrame->AllowUpwardDirectory(leftParent, rightParent))
 	{
 	case CDirFrame::AllowUpwardDirectory::No:
-		iImgDirUp = DIFFIMG_DIRUP_DISABLE;
+		iImgDirUp = CompareStats::DIFFIMG_DIRUP_DISABLE;
 		// fall through
 	default:
 		// Add "Parent folder" ("..") item to directory view

@@ -46,6 +46,7 @@ class CDirFrame;
 class PackingInfo;
 class PathContext;
 class DirCmpReport;
+class CDiffContext;
 class DirCompProgressDlg;
 struct DirColInfo;
 class CLoadSaveCodepageDlg;
@@ -252,8 +253,6 @@ protected:
 	int GetFocusedItem();
 	int GetFirstDifferentItem();
 	int GetLastDifferentItem();
-	int GetColImage(const DIFFITEM & di) const;
-	int GetDefaultColImage() const;
 	int AddSpecialItems();
 	void GetCurrentColRegKeys(stl::vector<String> &colKeys);
 	void OpenSpecialItems(UINT_PTR pos1, UINT_PTR pos2);

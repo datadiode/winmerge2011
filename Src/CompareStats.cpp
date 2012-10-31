@@ -29,9 +29,9 @@ CompareStats::~CompareStats()
  * @brief Add compared item.
  * @param [in] code Resultcode to add.
  */
-void CompareStats::AddItem(int code)
+void CompareStats::AddItem(UINT code)
 {
-	RESULT res = GetResultFromCode(code);
+	RESULT res = GetColImage(code);
 	InterlockedIncrement(&m_counts[res]);
 	InterlockedIncrement(&m_nComparedItems);
 	assert(m_nComparedItems <= m_nTotalItems);
@@ -58,87 +58,42 @@ void CompareStats::Reset()
 	ZeroMemory(m_counts, sizeof m_counts);
 }
 
-/** 
- * @brief Convert diffcode to compare-result.
- * @param [in] diffcode DIFFITEM.diffcode to convert.
- * @return Compare result.
+/**
+ * @brief Return image index appropriate for this row
  */
-CompareStats::RESULT CompareStats::GetResultFromCode(UINT diffcode)
+CompareStats::RESULT CompareStats::GetColImage(const DIFFCODE &diffcode)
 {
-	DIFFCODE di = diffcode;
-	
-	// Test first for skipped so we pick all skipped items as such 
-	if (di.isResultFiltered())
+	// Must return an image index into image list created above in OnInitDialog
+	if (diffcode.isResultError())
+		return DIFFIMG_ERROR;
+	if (diffcode.isResultAbort())
+		return DIFFIMG_ABORT;
+	if (diffcode.isResultFiltered())
+		return diffcode.isDirectory() ? DIFFIMG_DIRSKIP : DIFFIMG_SKIP;
+	if (diffcode.isSideLeftOnly())
+		return diffcode.isDirectory() ? DIFFIMG_LDIRUNIQUE : DIFFIMG_LUNIQUE;
+	if (diffcode.isSideRightOnly())
+		return diffcode.isDirectory() ? DIFFIMG_RDIRUNIQUE : DIFFIMG_RUNIQUE;
+	if (diffcode.isResultSame())
 	{
-		// skipped
-		if (di.isDirectory())
-		{
-			return RESULT_DIRSKIP;
-		}
-		else
-		{
-			return RESULT_SKIP;
-		}
+		if (diffcode.isDirectory())
+			return DIFFIMG_DIRSAME;
+		if (diffcode.isText())
+			return DIFFIMG_TEXTSAME;
+		if (diffcode.isBin())
+			return DIFFIMG_BINSAME;
+		return DIFFIMG_SAME;
 	}
-	else if (di.isSideLeftOnly())
+	// diff
+	if (diffcode.isResultDiff())
 	{
-		// left-only
-		if (di.isDirectory())
-		{
-			return RESULT_LDIRUNIQUE;
-		}
-		else
-		{
-			return RESULT_LUNIQUE;
-		}
+		if (diffcode.isDirectory())
+			return DIFFIMG_DIRDIFF;
+		if (diffcode.isText())
+			return DIFFIMG_TEXTDIFF;
+		if (diffcode.isBin())
+			return DIFFIMG_BINDIFF;
+		return DIFFIMG_DIFF;
 	}
-	else if (di.isSideRightOnly())
-	{
-		// right-only
-		if (di.isDirectory())
-		{
-			return RESULT_RDIRUNIQUE;
-		}
-		else
-		{
-			return RESULT_RUNIQUE;
-		}
-	}
-	else if (di.isResultError())
-	{
-		// could be directory error ?
-		return RESULT_ERROR;
-	}
-	// Now we know it was on both sides & compared!
-	else if (di.isResultSame())
-	{
-		// same
-		if (di.isBin())
-		{
-			return RESULT_BINSAME;
-		}
-		else
-		{
-			return RESULT_SAME;
-		}
-	}
-	else
-	{
-		// presumably it is diff
-		if (di.isDirectory())
-		{
-			return RESULT_DIR;
-		}
-		else
-		{
-			if (di.isBin())
-			{
-				return RESULT_BINDIFF;
-			}
-			else
-			{
-				return RESULT_DIFF;
-			}
-		}
-	}
+	return diffcode.isDirectory() ? DIFFIMG_DIR : DIFFIMG_ABORT;
 }

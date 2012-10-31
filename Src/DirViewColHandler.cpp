@@ -22,6 +22,7 @@
 #include "DirColsDlg.h"
 #include "OptionsDef.h"
 #include "OptionsMgr.h"
+#include "CompareStats.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -277,7 +278,7 @@ void CDirView::ReflectGetdispinfo(NMLVDISPINFO *pParam)
 	}
 	if (pParam->item.mask & LVIF_IMAGE)
 	{
-		pParam->item.iImage = GetColImage(di);
+		pParam->item.iImage = CompareStats::GetColImage(di.diffcode);
 	}
 }
 
