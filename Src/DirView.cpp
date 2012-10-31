@@ -321,9 +321,8 @@ int CDirView::GetDefaultColImage() const
  * @brief Called before compare is started.
  * CDirDoc calls this function before new compare is started, so this
  * is good place to setup GUI for compare.
- * @param [in] pCompareStats Pointer to class having current compare stats.
  */
-void CDirView::StartCompare(CompareStats *pCompareStats)
+void CDirView::StartCompare()
 {
 	if (m_pCmpProgressDlg == NULL)
 		m_pCmpProgressDlg = new DirCompProgressDlg(m_pFrame);

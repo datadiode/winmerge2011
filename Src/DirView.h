@@ -47,7 +47,6 @@ class PackingInfo;
 class PathContext;
 class DirCmpReport;
 class DirCompProgressDlg;
-class CompareStats;
 struct DirColInfo;
 class CLoadSaveCodepageDlg;
 class CShellContextMenu;
@@ -120,7 +119,7 @@ public:
 	STDMETHOD(DUnadvise)(DWORD);
 	STDMETHOD(EnumDAdvise)(LPENUMSTATDATA *);
 
-	void StartCompare(CompareStats *);
+	void StartCompare();
 	void Redisplay();
 	void RedisplayChildren(UINT_PTR diffpos, int level, int &index, int &alldiffs);
 	void UpdateResources();

@@ -181,7 +181,7 @@ void CDirFrame::Rescan(bool bCompareSelected)
 	LogFile.Write(CLogFile::LNOTICE, _T("Starting directory scan:\n\tLeft: %s\n\tRight: %s\n"),
 			m_pCtxt->GetLeftPath().c_str(), m_pCtxt->GetRightPath().c_str());
 	m_pCompareStats->Reset();
-	m_pDirView->StartCompare(m_pCompareStats);
+	m_pDirView->StartCompare();
 
 	// Don't clear if only scanning selected items
 	if (!bCompareSelected)
