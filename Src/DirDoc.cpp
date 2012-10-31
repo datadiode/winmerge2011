@@ -115,7 +115,7 @@ CDirFrame::AllowUpwardDirectory(String &leftParent, String &rightParent)
 	const String & right = GetRightBasePath();
 
 	// If we have temp context it means we are comparing archives
-	if (IsArchiveFolders())
+	if (m_pTempPathContext != NULL)
 	{
 		LPCTSTR lname = PathFindFileName(left.c_str());
 		LPCTSTR rname = PathFindFileName(right.c_str());
@@ -742,13 +742,4 @@ void CDirFrame::SetItemViewFlag(UINT flag, UINT mask)
 		di.customFlags1 |= flag;
 		m_pCtxt->GetNextDiffPosition(pos);
 	}
-}
-
-/**
- * @brief Checks if current folders are opened from archive file.
- * @return true if we are inside archive, false otherwise.
- */
-bool CDirFrame::IsArchiveFolders()
-{
-	return m_pTempPathContext != NULL;
 }

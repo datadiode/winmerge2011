@@ -136,8 +136,7 @@ public:
 	AllowUpwardDirectory::ReturnCode AllowUpwardDirectory(String &leftParent, String &rightParent);
 	void SetItemViewFlag(UINT_PTR key, UINT flag, UINT mask);
 	void SetItemViewFlag(UINT flag, UINT mask);
-	const CompareStats * GetCompareStats() const { return m_pCompareStats; };
-	bool IsArchiveFolders();
+	const CompareStats *GetCompareStats() const { return m_pCompareStats; };
 
 	// Implementation data
 private:
