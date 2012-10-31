@@ -27,14 +27,6 @@ static const UINT IDT_UPDATE = 1;
 /** @brief Interval (in milliseconds) for UI updates. */
 static const UINT UPDATE_INTERVAL = 400;
 
-/** @brief Reset all UI fields to zero. */
-void DirCompProgressDlg::ClearStat()
-{
-	SendDlgItemMessage(IDC_PROGRESSCOMPARE, PBM_SETPOS, 0);
-	SetDlgItemInt(IDC_ITEMSCOMPARED, 0);
-	SetDlgItemInt(IDC_ITEMSTOTAL, 0);
-}
-
 /**
  * @brief Constructor.
  * @param [in] pParent Parent window for progress dialog.
@@ -49,6 +41,8 @@ DirCompProgressDlg::DirCompProgressDlg(CDirFrame *pDirDoc)
 
 DirCompProgressDlg::~DirCompProgressDlg()
 {
+	KillTimer(IDT_UPDATE);
+	DestroyWindow();
 	delete m_pStatsDlg;
 }
 
@@ -100,6 +94,13 @@ BOOL DirCompProgressDlg::OnInitDialog()
 		(rectOuter.right - rectGroup.left - rectGroup.right) / 2,
 		rectOuter.bottom - rectInner.bottom, 0, 0, SWP_NOSIZE | SWP_NOZORDER |
 		SWP_NOACTIVATE | SWP_SHOWWINDOW | SWP_FRAMECHANGED);
+
+	// Reset all UI fields to zero.
+	SendDlgItemMessage(IDC_PROGRESSCOMPARE, PBM_SETPOS, 0);
+	SetDlgItemInt(IDC_ITEMSCOMPARED, 0);
+	SetDlgItemInt(IDC_ITEMSTOTAL, 0);
+
+	SetTimer(IDT_UPDATE, UPDATE_INTERVAL, NULL);
 	return TRUE;
 }
 
@@ -120,33 +121,5 @@ void DirCompProgressDlg::OnTimer(UINT_PTR nIDEvent)
 		SendDlgItemMessage(IDC_PROGRESSCOMPARE, PBM_SETRANGE32, 0, totalItems);
 		SendDlgItemMessage(IDC_PROGRESSCOMPARE, PBM_SETPOS, comparedItems);
 		m_pStatsDlg->Update();
-		if (pCompareStats->IsCompareDone())
-			EndUpdating();
 	}
-}
-
-/**
- * @brief Start timer for UI updating.
- */
-void DirCompProgressDlg::StartUpdating()
-{
-	ClearStat();
-	SetTimer(IDT_UPDATE, UPDATE_INTERVAL, NULL);
-}
-
-/**
- * @brief Stop timer updating UI.
- */
-void DirCompProgressDlg::EndUpdating()
-{
-	KillTimer(IDT_UPDATE);
-}
-
-/** 
- * @brief Closes the dialog.
- */
-void DirCompProgressDlg::CloseDialog()
-{
-	EndUpdating();
-	DestroyWindow();
 }

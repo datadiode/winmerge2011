@@ -326,8 +326,6 @@ void CDirView::StartCompare()
 {
 	if (m_pCmpProgressDlg == NULL)
 		m_pCmpProgressDlg = new DirCompProgressDlg(m_pFrame);
-	m_pCmpProgressDlg->ShowWindow(SW_SHOW);
-	m_pCmpProgressDlg->StartUpdating();
 	m_compareStart = clock();
 }
 
@@ -1445,7 +1443,6 @@ LRESULT CDirView::ReflectKeydown(NMLVKEYDOWN *pParam)
 void CDirView::OnUpdateUIMessage()
 {
 	// Close and destroy the dialog after compare
-	m_pCmpProgressDlg->CloseDialog();
 	delete m_pCmpProgressDlg;
 	m_pCmpProgressDlg = NULL;
 

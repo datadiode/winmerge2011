@@ -30,10 +30,6 @@ class CompareStatisticsDlg;
  * datastructure with compare code. Compare code updates status information
  * to datastructure during compare. When timer event fires, dialog reads
  * that datastructure and updates the GUI.
- * 
- * @todo Now we update total count of items with same timer than we update
- * compared items count. Maybe we should use different timer and bigger
- * interval for total count updates?
  */
 class DirCompProgressDlg : public ODialog
 {
@@ -41,16 +37,12 @@ class DirCompProgressDlg : public ODialog
 public:
 	DirCompProgressDlg(CDirFrame *);
 	~DirCompProgressDlg();
-	void StartUpdating();
-	void EndUpdating();
-	void CloseDialog();
 
 // Implementation
 protected:
 	virtual BOOL OnInitDialog();
 	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
 
-	void ClearStat();
 	void OnTimer(UINT_PTR nIDEvent);
 
 private:
@@ -62,4 +54,3 @@ private:
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
 
 #endif // !defined(AFX_DIRCOMPPROGRESSDLG_H__8F66C090_C232_429F_A4A2_18D43CCC6C38__INCLUDED_)
-
