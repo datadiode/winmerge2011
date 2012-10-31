@@ -258,10 +258,10 @@ protected:
 	void GetCurrentColRegKeys(stl::vector<String> &colKeys);
 	void OpenSpecialItems(UINT_PTR pos1, UINT_PTR pos2);
 	bool OpenOneItem(UINT_PTR pos1, DIFFITEM **di1, DIFFITEM **di2,
-			String &path1, String &path2, int & sel1, bool & isDir);
+			String &path1, String &path2, int &sel1, bool &isDir);
 	bool OpenTwoItems(UINT_PTR pos1, UINT_PTR pos2, DIFFITEM **di1, DIFFITEM **di2,
-			String &path1, String &path2, int & sel1, int & sel2, bool & isDir);
-	bool CreateFoldersPair(DIFFITEM & di, bool side1, String &newFolder);
+			String &path1, String &path2, int &sel1, int &sel2, bool &isDir);
+	bool CreateFoldersPair(const DIFFITEM &di, bool side1, String &newFolder);
 
 // Implementation data
 protected:

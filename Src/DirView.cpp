@@ -966,7 +966,7 @@ void CDirView::OpenSpecialItems(UINT_PTR pos1, UINT_PTR pos2)
  * @param [out] newFolder New created folder (full folder path).
  * @return true if user agreed and folder was created.
  */
-bool CDirView::CreateFoldersPair(DIFFITEM & di, bool side1, String &newFolder)
+bool CDirView::CreateFoldersPair(const DIFFITEM &di, bool side1, String &newFolder)
 {
 	String subdir;
 	String basedir;
