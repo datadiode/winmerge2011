@@ -28,15 +28,14 @@ class DirCmpReport
 {
 public:
 
-	DirCmpReport(const stl::vector<String> & colRegKeys);
-	void SetList(HListView *);
-	void SetRootPaths(LPCTSTR left, LPCTSTR right);
-	void SetColumns(int columns);
-	BOOL GenerateReport(String &errStr);
+	DirCmpReport(CDirView *);
+	bool GenerateReport(String &errStr);
 
 protected:
 	void GenerateReport(REPORT_TYPE nReportType);
+	void WriteString(HString *);
 	void WriteString(LPCTSTR);
+	void WriteStringEntityAware(LPCTSTR);
 	void GenerateHeader();
 	void GenerateContent();
 	void GenerateHTMLHeader();
@@ -47,13 +46,13 @@ protected:
 	void GenerateXmlFooter();
 
 private:
-	HListView *m_pList; /**< Pointer to UI-list */
+	CDirView *const m_pList; /**< Pointer to UI-list */
 	stl::vector<String> m_rootPaths; /**< Root paths, printed to report */
 	String m_sTitle; /**< Report title, built from root paths */
 	int m_nColumns; /**< Columns in UI */
 	String m_sSeparator; /**< Column separator for report */
 	IStream *m_pFile; /**< File to write report to */
-	const stl::vector<String> & m_colRegKeys; /**< Key names for currently displayed columns */
+	stl::vector<String> m_colRegKeys; /**< Key names for currently displayed columns */
 };
 
 #endif // _DIRCMPREPORT_H_

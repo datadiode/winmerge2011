@@ -8,10 +8,14 @@
 // $Id$
 //
 
-#include <StdAfx.h>
+#include "StdAfx.h"
 #include "resource.h"
+#include "markdown.h"
 #include "LanguageSelect.h"
 #include "WaitStatusCursor.h"
+#include "Merge.h"
+#include "DirView.h"
+#include "DirFrame.h"
 #include "DirCmpReport.h"
 #include "DirCmpReportDlg.h"
 #include "coretools.h"
@@ -34,7 +38,7 @@ static locality::TimeString GetCurrentTimeString()
  * @param [in] elName String to format as beginning tag.
  * @return String formatted as beginning tag.
  */
-static String BeginEl(LPCTSTR elName)
+static string_format BeginEl(LPCTSTR elName)
 {
 	return string_format(_T("<%s>"), elName);
 }
@@ -44,7 +48,7 @@ static String BeginEl(LPCTSTR elName)
  * @param [in] elName String to format as ending tag.
  * @return String formatted as ending tag.
  */
-static String EndEl(LPCTSTR elName)
+static string_format EndEl(LPCTSTR elName)
 {
 	return string_format(_T("</%s>"), elName);
 }
@@ -52,40 +56,18 @@ static String EndEl(LPCTSTR elName)
 /**
  * @brief Constructor.
  */
-DirCmpReport::DirCmpReport(const stl::vector<String> & colRegKeys)
-: m_pList(NULL)
-, m_pFile(NULL)
-, m_nColumns(0)
-, m_colRegKeys(colRegKeys)
-, m_sSeparator(_T(","))
-, m_rootPaths(2)
+DirCmpReport::DirCmpReport(CDirView *pList)
+	: m_pList(pList), m_pFile(NULL), m_sSeparator(_T(",")), m_rootPaths(2)
 {
-}
-
-/**
- * @brief Set UI-list pointer.
- */
-void DirCmpReport::SetList(HListView *pList)
-{
-	m_pList = pList;
-}
-
-/**
- * @brief Set root-paths of current compare so we can add them to report.
- */
-void DirCmpReport::SetRootPaths(LPCTSTR left, LPCTSTR right)
-{
-	m_rootPaths[0] = left;
-	m_rootPaths[1] = right;
-	m_sTitle = LanguageSelect.FormatMessage(IDS_DIRECTORY_REPORT_TITLE, left, right);
-}
-
-/**
- * @brief Set column-count.
- */
-void DirCmpReport::SetColumns(int columns)
-{
-	m_nColumns = columns;
+	m_pList->GetCurrentColRegKeys(m_colRegKeys);
+	m_nColumns = m_colRegKeys.size();
+	m_rootPaths[0] = pList->m_pFrame->GetLeftBasePath();
+	m_rootPaths[1] = pList->m_pFrame->GetRightBasePath();
+	// If inside archive, convert paths
+	pList->m_pFrame->ApplyLeftDisplayRoot(m_rootPaths[0]);
+	pList->m_pFrame->ApplyRightDisplayRoot(m_rootPaths[1]);
+	m_rootPaths[0].erase(0, paths_UndoMagic(&m_rootPaths[0].front()) - m_rootPaths[0].c_str());
+	m_rootPaths[1].erase(0, paths_UndoMagic(&m_rootPaths[1].front()) - m_rootPaths[1].c_str());
 }
 
 /**
@@ -93,11 +75,11 @@ void DirCmpReport::SetColumns(int columns)
  * @param [out] errStr Empty if succeeded, otherwise contains error message.
  * @return TRUE if report was created, FALSE if user canceled report.
  */
-BOOL DirCmpReport::GenerateReport(String &errStr)
+bool DirCmpReport::GenerateReport(String &errStr)
 {
 	assert(m_pList != NULL);
 	assert(m_pFile == NULL);
-	BOOL bRet = FALSE;
+	bool bRet = false;
 
 	DirCmpReportDlg dlg;
 	if (LanguageSelect.DoModal(dlg) == IDOK) try
@@ -106,9 +88,9 @@ BOOL DirCmpReport::GenerateReport(String &errStr)
 		if (dlg.m_bCopyToClipboard)
 		{
 			if (!m_pList->OpenClipboard())
-				return FALSE;
+				return false;
 			if (!EmptyClipboard())
-				return FALSE;
+				return false;
 			CreateStreamOnHGlobal(NULL, FALSE, &m_pFile);
 			GenerateReport(dlg.m_nReportType);
 			IStream_Write(m_pFile, "", sizeof ""); // write terminating zero
@@ -158,7 +140,7 @@ BOOL DirCmpReport::GenerateReport(String &errStr)
 			if (!paths_CreateIfNeeded(path.c_str()))
 			{
 				errStr = LanguageSelect.LoadString(IDS_FOLDER_NOTEXIST);
-				return FALSE;
+				return false;
 			}
 			SHCreateStreamOnFile(dlg.m_sReportFile.c_str(),
 				STGM_WRITE | STGM_CREATE | STGM_SHARE_DENY_WRITE, &m_pFile);
@@ -166,11 +148,12 @@ BOOL DirCmpReport::GenerateReport(String &errStr)
 			m_pFile->Release();
 			m_pFile = NULL;
 		}
-		bRet = TRUE;
+		bRet = true;
 	}
 	catch (OException *e)
 	{
 		e->ReportError(m_pList->m_hWnd, MB_ICONSTOP);
+		delete e;
 	}
 	m_pFile = NULL;
 	return bRet;
@@ -182,6 +165,8 @@ BOOL DirCmpReport::GenerateReport(String &errStr)
  */
 void DirCmpReport::GenerateReport(REPORT_TYPE nReportType)
 {
+	m_sTitle = LanguageSelect.FormatMessage(IDS_DIRECTORY_REPORT_TITLE,
+		m_rootPaths[0].c_str(), m_rootPaths[1].c_str());
 	switch (nReportType)
 	{
 	case REPORT_TYPE_SIMPLEHTML:
@@ -209,11 +194,11 @@ void DirCmpReport::GenerateReport(REPORT_TYPE nReportType)
 
 /**
  * @brief Write text to report file.
- * @param [in] pszText Text to write to report file.
+ * @param [in] H Text to write to report file.
  */
-void DirCmpReport::WriteString(LPCTSTR pszText)
+void DirCmpReport::WriteString(HString *H)
 {
-	const OString strOctets = HString::Uni(pszText)->Oct(CP_THREAD_ACP);
+	const OString strOctets = H->Oct(CP_THREAD_ACP);
 	LPCSTR pchOctets = strOctets.A;
 	size_t cchAhead = strOctets.ByteLen();
 	while (LPCSTR pchAhead = (LPCSTR)memchr(pchOctets, '\n', cchAhead))
@@ -227,6 +212,24 @@ void DirCmpReport::WriteString(LPCTSTR pszText)
 		cchAhead -= cchLine;
 	}
 	IStream_Write(m_pFile, pchOctets, cchAhead);
+}
+
+/**
+ * @brief Write text to report file.
+ * @param [in] pszText Text to write to report file.
+ */
+void DirCmpReport::WriteString(LPCTSTR pszText)
+{
+	WriteString(HString::Uni(pszText));
+}
+
+/**
+ * @brief Write text to report file while turning special chars to entities.
+ * @param [in] pszText Text to write to report file.
+ */
+void DirCmpReport::WriteStringEntityAware(LPCTSTR pszText)
+{
+	WriteString(CMarkdown::Entities(pszText));
 }
 
 /**
@@ -267,20 +270,21 @@ void DirCmpReport::GenerateContent()
 		for (int currCol = 0; currCol < m_nColumns; currCol++)
 		{
 			String value = m_pList->GetItemText(currRow, currCol);
-			if (value.find(m_sSeparator) != String::npos) {
+			if (value.find(m_sSeparator) != String::npos)
+			{
 				WriteString(_T("\""));
 				WriteString(value.c_str());
 				WriteString(_T("\""));
 			}
 			else
+			{
 				WriteString(value.c_str());
-
+			}
 			// Add col-separator, but not after last column
 			if (currCol < m_nColumns - 1)
 				WriteString(m_sSeparator.c_str());
 		}
 	}
-
 }
 
 /**
@@ -289,31 +293,31 @@ void DirCmpReport::GenerateContent()
 void DirCmpReport::GenerateHTMLHeader()
 {
 	WriteString(_T("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\n")
-		_T("\t\"http://www.w3.org/TR/html4/loose.dtd\">\n")
-		_T("<html>\n<head>\n\t<title>"));
+				_T("\t\"http://www.w3.org/TR/html4/loose.dtd\">\n")
+				_T("<html>\n<head>\n\t<title>"));
 	WriteString(m_sTitle.c_str());
-	WriteString(_T("</title>\n"));
-	WriteString(_T("\t<style type=\"text/css\">\n\t<!--\n"));
-	WriteString(_T("\t\tbody {\n"));
-	WriteString(_T("\t\t\tfont-family: sans-serif;\n"));
-	WriteString(_T("\t\t\tfont-size: smaller;\n"));
-	WriteString(_T("\t\t}\n"));
-	WriteString(_T("\t\ttable {\n"));
-	WriteString(_T("\t\t\tborder-collapse: collapse;\n"));
-	WriteString(_T("\t\t\tborder: 1px solid gray;\n"));
-	WriteString(_T("\t\t}\n"));
-	WriteString(_T("\t\tth,td {\n"));
-	WriteString(_T("\t\t\tpadding: 3px;\n"));
-	WriteString(_T("\t\t\ttext-align: left;\n"));
-	WriteString(_T("\t\t\tvertical-align: top;\n"));
-	WriteString(_T("\t\t\tborder: 1px solid gray;\n"));
-	WriteString(_T("\t\t}\n"));
-	WriteString(_T("\t\tth {\n"));
-	WriteString(_T("\t\t\tcolor: black;\n"));
-	WriteString(_T("\t\t\tbackground: silver;\n"));
-	WriteString(_T("\t\t}\n"));
-	WriteString(_T("\t-->\n\t</style>\n"));
-	WriteString(_T("</head>\n<body>\n"));
+	WriteString(_T("</title>\n")
+				_T("\t<style type=\"text/css\">\n\t<!--\n")
+				_T("\t\tbody {\n")
+				_T("\t\t\tfont-family: sans-serif;\n")
+				_T("\t\t\tfont-size: smaller;\n")
+				_T("\t\t}\n")
+				_T("\t\ttable {\n")
+				_T("\t\t\tborder-collapse: collapse;\n")
+				_T("\t\t\tborder: 1px solid gray;\n")
+				_T("\t\t}\n")
+				_T("\t\tth,td {\n")
+				_T("\t\t\tpadding: 3px;\n")
+				_T("\t\t\ttext-align: left;\n")
+				_T("\t\t\tvertical-align: top;\n")
+				_T("\t\t\tborder: 1px solid gray;\n")
+				_T("\t\t}\n")
+				_T("\t\tth {\n")
+				_T("\t\t\tcolor: black;\n")
+				_T("\t\t\tbackground: silver;\n")
+				_T("\t\t}\n")
+				_T("\t-->\n\t</style>\n")
+				_T("</head>\n<body>\n"));
 	GenerateHTMLHeaderBodyPortion();
 }
 
@@ -326,8 +330,8 @@ void DirCmpReport::GenerateHTMLHeaderBodyPortion()
 	WriteString(m_sTitle.c_str());
 	WriteString(_T("</h2>\n<p>"));
 	WriteString(GetCurrentTimeString().c_str());
-	WriteString(_T("</p>\n"));
-	WriteString(_T("<table border=\"1\">\n<tr>\n"));
+	WriteString(_T("</p>\n")
+				_T("<table border=\"1\">\n<tr>\n"));
 
 	for (int currCol = 0; currCol < m_nColumns; currCol++)
 	{
@@ -351,33 +355,36 @@ void DirCmpReport::GenerateHTMLHeaderBodyPortion()
  */
 void DirCmpReport::GenerateXmlHeader()
 {
-	WriteString(_T("")); // @todo xml declaration
-	WriteString(_T("<WinMergeDiffReport version=\"1\">\n"));
-	WriteString(Fmt(_T("<left>%s</left>\n"), m_rootPaths[0].c_str()).c_str());
-	WriteString(Fmt(_T("<right>%s</right>\n"), m_rootPaths[1].c_str()).c_str());
-	WriteString(Fmt(_T("<time>%s</time>\n"), GetCurrentTimeString().c_str()).c_str());
+	WriteString(_T("") // @todo xml declaration
+				_T("<WinMergeDiffReport version=\"1\">\n")
+				_T("<left>"));
+	WriteStringEntityAware(m_rootPaths[0].c_str());
+	WriteString(_T("</left>\n")
+				_T("<right>"));
+	WriteStringEntityAware(m_rootPaths[1].c_str());
+	WriteString(_T("</right>\n")
+				_T("<time>"));
+	WriteStringEntityAware(GetCurrentTimeString().c_str());
+	WriteString(_T("</time>\n"));
 
 	// Add column headers
-	static const TCHAR rowEl[] = _T("column_name");
-	WriteString(BeginEl(rowEl).c_str());
+	WriteString(_T("<column_name>"));
 	for (int currCol = 0; currCol < m_nColumns; currCol++)
 	{
 		TCHAR columnName[160]; // Assuming max col header will never be > 160
 		LVCOLUMN lvc;
 		lvc.mask = LVCF_TEXT;
-		lvc.pszText = &columnName[0];
+		lvc.pszText = columnName;
 		lvc.cchTextMax = _countof(columnName);
-		
 		LPCTSTR colEl = m_colRegKeys[currCol].c_str();
 		if (m_pList->GetColumn(currCol, &lvc))
 		{
 			WriteString(BeginEl(colEl).c_str());
-			WriteString(lvc.pszText);
+			WriteStringEntityAware(lvc.pszText);
 			WriteString(EndEl(colEl).c_str());
 		}
 	}
-	WriteString(EndEl(rowEl).c_str());
-	WriteString(_T("\n"));
+	WriteString(_T("</column_name>\n"));
 }
 
 /**
@@ -395,7 +402,7 @@ void DirCmpReport::GenerateXmlHtmlContent(bool xml)
 		{
 			LPCTSTR const colEl = xml ? m_colRegKeys[currCol].c_str() : _T("td");
 			WriteString(BeginEl(colEl).c_str());
-			WriteString(m_pList->GetItemText(currRow, currCol).c_str());
+			WriteStringEntityAware(m_pList->GetItemText(currRow, currCol).c_str());
 			WriteString(EndEl(colEl).c_str());
 		}
 		WriteString(EndEl(rowEl).c_str());

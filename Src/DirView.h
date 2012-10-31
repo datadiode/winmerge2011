@@ -45,6 +45,7 @@ class CDirFrame;
 
 class PackingInfo;
 class PathContext;
+class DirCmpReport;
 class DirCompProgressDlg;
 class CompareStats;
 struct DirColInfo;
@@ -92,6 +93,7 @@ class CDirView
 	class DirItemEnumerator;
 	friend DirItemEnumerator;
 	friend CDirFrame;
+	friend DirCmpReport;
 public:
 	CDirView(CDirFrame *);           // protected constructor used by dynamic creation
 	virtual ~CDirView();

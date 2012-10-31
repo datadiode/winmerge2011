@@ -1668,31 +1668,15 @@ void CDirView::OnToolsGenerateReport()
 {
 	// Make list of registry keys for columns
 	// (needed for XML reports)
-	stl::vector<String> colKeys;
-	GetCurrentColRegKeys(colKeys);
+	DirCmpReport report(this);
 
-	DirCmpReport report(colKeys);
-	report.SetList(static_cast<HListView *>(m_pWnd));
-
-	String left = m_pFrame->GetLeftBasePath().c_str();
-	String right = m_pFrame->GetRightBasePath().c_str();
-
-	// If inside archive, convert paths
-	if (m_pFrame->IsArchiveFolders())
-	{
-		m_pFrame->ApplyLeftDisplayRoot(left);
-		m_pFrame->ApplyRightDisplayRoot(right);
-	}
-
-	report.SetRootPaths(left.c_str(), right.c_str());
-	report.SetColumns(m_dispcols);
 	String errStr;
 	if (report.GenerateReport(errStr))
 	{
 		if (errStr.empty())
-			LanguageSelect.MsgBox(IDS_REPORT_SUCCESS, MB_OK | MB_ICONINFORMATION);
+			LanguageSelect.MsgBox(IDS_REPORT_SUCCESS, MB_ICONINFORMATION);
 		else
-			LanguageSelect.MsgBox(IDS_REPORT_ERROR, errStr.c_str(), MB_OK | MB_ICONSTOP);
+			LanguageSelect.MsgBox(IDS_REPORT_ERROR, errStr.c_str(), MB_ICONSTOP);
 	}
 }
 
