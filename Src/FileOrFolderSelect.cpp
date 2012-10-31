@@ -73,7 +73,7 @@ BOOL SelectFile(HWND parent, String &path,
 	ofn.hwndOwner = parent;
 	ofn.lpstrFilter = filters.c_str();
 	ofn.nFilterIndex = 1;
-	ofn.lpstrFile = lstrcpyn(sSelectedFile, path.c_str(), MAX_PATH);
+	ofn.lpstrFile = lstrcpyn(sSelectedFile, paths_UndoMagic(&path.front()), MAX_PATH);
 	ofn.nMaxFile = MAX_PATH;
 	ofn.lpstrTitle = title.c_str();
 	ofn.lpstrDefExt = defaultExtension;
