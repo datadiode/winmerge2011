@@ -318,17 +318,15 @@ protected:
 	void OnEditCut();
 	void OnEditPaste();
 	void OnEditUndo();
-	void OnExpandFolder();
-	void OnCollapseFolder();
 	LRESULT OnNotify(LPARAM);
 
 	LRESULT WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam);
 	void DoDefaultAction(int sel);
 private:
 	void OpenSelection(LPCTSTR szCompareAs, UINT idCompareAs);
-	bool GetSelectedItems(int * sel1, int * sel2);
+	bool GetSelectedItems(int *sel1, int *sel2);
 	void OpenParentDirectory();
-	bool IsItemNavigableDiff(const DIFFITEM & di) const;
+	bool IsItemNavigableDiff(const DIFFITEM &) const;
 	void MoveFocus(int, int);
 	void SaveColumnWidths();
 	void SaveColumnOrders();
@@ -338,8 +336,10 @@ private:
 	HMENU ListShellContextMenu(SIDE_TYPE);
 	void ReloadColumns();
 	void ResetColumnWidths();
-	void CollapseSubdir(int sel);
-	void ExpandSubdir(int sel);
+	void DeleteChildren(const DIFFITEM &, int);
+	int CollapseSubdir(int);
+	int ExpandSubdir(int);
+	void DeepExpandSubdir(int);
 	void PrepareDragData(UniStdioFile &);
 };
 

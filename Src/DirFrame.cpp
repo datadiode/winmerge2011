@@ -390,12 +390,6 @@ LRESULT CDirFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 	case ID_VIEW_COLLAPSE_ALLSUBDIRS:
 		m_pDirView->OnViewCollapseAllSubdirs();
 		break;
-	case ID_VIEW_EXPAND:
-		m_pDirView->OnExpandFolder();
-		break;
-	case ID_VIEW_COLLAPSE:
-		m_pDirView->OnCollapseFolder();
-		break;
 	case ID_VIEW_DIR_STATISTICS:
 		m_pDirView->OnViewCompareStatistics();
 		break;

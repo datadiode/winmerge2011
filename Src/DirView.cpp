@@ -718,90 +718,97 @@ void CDirView::ReflectClick(NMITEMACTIVATE *pNM)
 }
 
 /**
- * @brief Expand collapsed folder in tree-view mode.
+ * @brief Delete children
+ * @param [in] dpi Ancestor item.
+ * @param [in] i First child item index in listview.
  */
-void CDirView::OnExpandFolder()
+void CDirView::DeleteChildren(const DIFFITEM &dip, int i)
 {
-	const int nSelItem = GetNextItem(-1, LVNI_SELECTED);
-	if (nSelItem == -1)
-		return;
-	const DIFFITEM &di = GetDiffItem(nSelItem);
-	if (di.diffcode.isDirectory() && (di.customFlags1 &
-			ViewCustomFlags::EXPANDED) == 0)
-	{
-		ExpandSubdir(nSelItem);
-	}
-}
-
-/**
- * @brief Collapse expanded folder in tree-view mode.
- */
-void CDirView::OnCollapseFolder()
-{
-	const int nSelItem = GetNextItem(-1, LVNI_SELECTED);
-	if (nSelItem == -1)
-		return;
-	const DIFFITEM &di = GetDiffItem(nSelItem);
-	if (di.diffcode.isDirectory() && (di.customFlags1 &
-			ViewCustomFlags::EXPANDED))
-	{
-		CollapseSubdir(nSelItem);
-	}
-}
-
-/**
- * @brief Collapse subfolder
- * @param [in] sel Folder item index in listview.
- */
-void CDirView::CollapseSubdir(int i)
-{
-	DIFFITEM &dip = GetDiffItem(i);
-	if (!m_bTreeMode || !(dip.customFlags1 & ViewCustomFlags::EXPANDED) || !dip.HasChildren())
-		return;
-
-	SetRedraw(FALSE);	// Turn off updating (better performance)
-
-	dip.customFlags1 &= ~ViewCustomFlags::EXPANDED;
-	SetItemState(i, INDEXTOSTATEIMAGEMASK(1), LVIS_STATEIMAGEMASK);
-
-	++i;
 	int count = GetItemCount();
 	while (count > i)
 	{
-		const DIFFITEM& di = GetDiffItem(i);
+		const DIFFITEM &di = GetDiffItem(i);
 		if (!di.IsAncestor(&dip))
 			break;
 		DeleteItem(i);
 		--count;
 	}
+}
 
+/**
+ * @brief Collapse subfolder
+ * @param [in] i Folder item index in listview.
+ */
+int CDirView::CollapseSubdir(int i)
+{
+	DIFFITEM &dip = GetDiffItem(i);
+	if (!(dip.customFlags1 & ViewCustomFlags::EXPANDED))
+	{
+		return GetItemIndex((UINT_PTR)dip.parent);
+	}
+	SetRedraw(FALSE);	// Turn off updating (better performance)
+	dip.customFlags1 &= ~ViewCustomFlags::EXPANDED;
+	SetItemState(i, INDEXTOSTATEIMAGEMASK(1), LVIS_STATEIMAGEMASK);
+	DeleteChildren(dip, ++i);
 	SetRedraw(TRUE);	// Turn updating back on
+	return -1;
 }
 
 /**
  * @brief Expand subfolder
- * @param [in] sel Folder item index in listview.
+ * @param [in] i Folder item index in listview.
  */
-void CDirView::ExpandSubdir(int i)
+int CDirView::ExpandSubdir(int i)
 {
 	DIFFITEM &dip = GetDiffItem(i);
-	if (!m_bTreeMode || (dip.customFlags1 & ViewCustomFlags::EXPANDED) || !dip.HasChildren())
-		return;
+	if (dip.customFlags1 & ViewCustomFlags::EXPANDED)
+	{
+		DIFFITEM &di = GetDiffItem(++i);
+		return di.parent == &dip ? i : -1;
+	}
+	const CDiffContext *const ctxt = m_pFrame->GetDiffContext();
+	if (UINT_PTR firstChildPos = ctxt->GetFirstChildDiffPosition(GetItemKey(i)))
+	{
+		SetRedraw(FALSE);	// Turn off updating (better performance)
+		dip.customFlags1 |= ViewCustomFlags::EXPANDED;
+		SetItemState(i, INDEXTOSTATEIMAGEMASK(2), LVIS_STATEIMAGEMASK);
+		++i;
+		int alldiffs;
+		RedisplayChildren(firstChildPos, dip.GetDepth() + 1, i, alldiffs);
+		SortColumnsAppropriately();
+		SetRedraw(TRUE);	// Turn updating back on
+	}
+	return -1;
+}
 
-	SetRedraw(FALSE);	// Turn off updating (better performance)
-
-	dip.customFlags1 |= ViewCustomFlags::EXPANDED;
-	SetItemState(i, INDEXTOSTATEIMAGEMASK(2), LVIS_STATEIMAGEMASK);
-
-	const CDiffContext *ctxt = m_pFrame->GetDiffContext();
-	UINT_PTR diffpos = ctxt->GetFirstChildDiffPosition(GetItemKey(i));
-	++i;
-	int alldiffs;
-	RedisplayChildren(diffpos, dip.GetDepth() + 1, i, alldiffs);
-
-	SortColumnsAppropriately();
-
-	SetRedraw(TRUE);	// Turn updating back on
+/**
+ * @brief Expand subfolder
+ * @param [in] i Folder item index in listview.
+ */
+void CDirView::DeepExpandSubdir(int i)
+{
+	const CDiffContext *const ctxt = m_pFrame->GetDiffContext();
+	if (UINT_PTR firstChildPos = ctxt->GetFirstChildDiffPosition(GetItemKey(i)))
+	{
+		DIFFITEM &dip = GetDiffItem(i);
+		SetRedraw(FALSE);	// Turn off updating (better performance)
+		dip.customFlags1 |= ViewCustomFlags::EXPANDED;
+		SetItemState(i, INDEXTOSTATEIMAGEMASK(2), LVIS_STATEIMAGEMASK);
+		UINT_PTR diffpos = firstChildPos;
+		while (diffpos)
+		{
+			DIFFITEM &di = ctxt->GetNextDiffPosition(diffpos);
+			if (!di.IsAncestor(&dip))
+				break;
+			if (di.diffcode.isDirectory())
+				di.customFlags1 |= ViewCustomFlags::EXPANDED;
+		}
+		DeleteChildren(dip, ++i);
+		int alldiffs;
+		RedisplayChildren(firstChildPos, dip.GetDepth() + 1, i, alldiffs);
+		SortColumnsAppropriately();
+		SetRedraw(TRUE);	// Turn updating back on
+	}
 }
 
 /**
@@ -1335,15 +1342,53 @@ LRESULT CDirView::ReflectKeydown(NMLVKEYDOWN *pParam)
 		DoDefaultAction(GetFocusedItem());
 		return 1;
 	case VK_LEFT:
-		if (!m_bTreeMode)
-			break;
-		CollapseSubdir(GetFocusedItem());
-		return 1;
+		if (m_bTreeMode)
+		{
+			int currentInd = GetFocusedItem();
+			int i = CollapseSubdir(currentInd);
+			if (i != -1)
+			{
+				MoveFocus(currentInd, i);
+			}
+			return 1;
+		}
+		break;
 	case VK_RIGHT:
-		if (!m_bTreeMode)
-			break;
-		ExpandSubdir(GetFocusedItem());
-		return 1;
+		if (m_bTreeMode)
+		{
+			int currentInd = GetFocusedItem();
+			int i = ExpandSubdir(currentInd);
+			if (i != -1)
+			{
+				MoveFocus(currentInd, i);
+			}
+			return 1;
+		}
+		break;
+	case VK_SUBTRACT:
+		if (m_bTreeMode)
+		{
+			int currentInd = GetFocusedItem();
+			CollapseSubdir(currentInd);
+			return 1;
+		}
+		break;
+	case VK_ADD:
+		if (m_bTreeMode)
+		{
+			int currentInd = GetFocusedItem();
+			ExpandSubdir(currentInd);
+			return 1;
+		}
+		break;
+	case VK_MULTIPLY:
+		if (m_bTreeMode)
+		{
+			int currentInd = GetFocusedItem();
+			DeepExpandSubdir(currentInd);
+			return 1;
+		}
+		break;
 	}
 	return 0;
 }
@@ -2112,7 +2157,8 @@ void CDirView::OnViewExpandAllSubdirs()
 	while (diffpos)
 	{
 		DIFFITEM &di = ctxt->GetNextDiffPosition(diffpos);
-		di.customFlags1 |= ViewCustomFlags::EXPANDED;
+		if (di.diffcode.isDirectory())
+			di.customFlags1 |= ViewCustomFlags::EXPANDED;
 	}
 	Redisplay();
 }

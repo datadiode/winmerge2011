@@ -944,8 +944,6 @@
 #define ID_VIEW_ZOOMOUT                         33170
 #define ID_HELP_TRANSLATIONS                    33171
 #define ID_VIEW_ZOOMNORMAL                      33172
-#define ID_VIEW_EXPAND                          33173
-#define ID_VIEW_COLLAPSE                        33174
 #define IDS_IDLEMESSAGE                         33175
 #define IDS_SELECTION_LEFT                      33176
 #define IDS_SELECTION_RIGHT                     33177
