@@ -128,6 +128,7 @@ public:
 	{
 	}
 	virtual void RecalcLayout();
+	virtual void UpdateResources() = 0;
 	virtual BOOL PreTranslateMessage(MSG *)
 	{
 		return FALSE;

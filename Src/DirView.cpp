@@ -635,7 +635,6 @@ HMENU CDirView::ListShellContextMenu(SIDE_TYPE side)
 void CDirView::UpdateResources()
 {
 	UpdateColumnNames();
-	m_pFrame->UpdateResources();
 }
 
 /**

@@ -187,6 +187,8 @@ CDiffTextBuffer *CMergeEditView::LocateTextBuffer()
  */
 void CMergeEditView::UpdateResources()
 {
+	// Update static texts in status bars.
+	OnUpdateCaret();
 	// Update annotated ghost lines when operating in limited context mode.
 	Invalidate();
 }

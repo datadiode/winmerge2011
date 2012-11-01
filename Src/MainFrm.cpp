@@ -1141,9 +1141,8 @@ void CMainFrame::ShowHexMergeDoc(CDirFrame *pDirDoc,
 
 void CMainFrame::RedisplayAllDirDocs()
 {
-	HWindow *pMDIClient = reinterpret_cast<HWindow *>(m_pWndMDIClient);
 	HWindow *pChild = NULL;
-	while ((pChild = pMDIClient->FindWindowEx(pChild, WinMergeWindowClass)) != NULL)
+	while ((pChild = m_pWndMDIClient->FindWindowEx(pChild, WinMergeWindowClass)) != NULL)
 	{
 		CDocFrame *pDocFrame = static_cast<CDocFrame *>(CDocFrame::FromHandle(pChild));
 		if (pDocFrame->GetFrameType() == FRAME_FOLDER)
@@ -1346,9 +1345,8 @@ void CMainFrame::OnOptions()
 		UpdateMrgViewFont();
 
 		// make an attempt at rescanning any open diff sessions
-		HWindow *pMDIClient = reinterpret_cast<HWindow *>(m_pWndMDIClient);
 		HWindow *pChild = NULL;
-		while ((pChild = pMDIClient->FindWindowEx(pChild, WinMergeWindowClass)) != NULL)
+		while ((pChild = m_pWndMDIClient->FindWindowEx(pChild, WinMergeWindowClass)) != NULL)
 		{
 			CDocFrame *pDocFrame = static_cast<CDocFrame *>(CDocFrame::FromHandle(pChild));
 			switch (pDocFrame->GetFrameType())
@@ -1793,9 +1791,8 @@ void CMainFrame::UpdateDirViewFont()
 	// Update document fonts
 	if (HFont *pOldFont = CDirView::ReplaceFont(&m_lfDir))
 	{
-		HWindow *pMDIClient = reinterpret_cast<HWindow *>(m_pWndMDIClient);
 		HWindow *pChild = NULL;
-		while ((pChild = pMDIClient->FindWindowEx(pChild, WinMergeWindowClass)) != NULL)
+		while ((pChild = m_pWndMDIClient->FindWindowEx(pChild, WinMergeWindowClass)) != NULL)
 		{
 			CDocFrame *pAbstract = static_cast<CDocFrame *>(CDocFrame::FromHandle(pChild));
 			if (pAbstract->GetFrameType() == FRAME_FOLDER)
@@ -1811,9 +1808,8 @@ void CMainFrame::UpdateDirViewFont()
 void CMainFrame::UpdateMrgViewFont()
 {
 	// Update document fonts
-	HWindow *pMDIClient = reinterpret_cast<HWindow *>(m_pWndMDIClient);
 	HWindow *pChild = NULL;
-	while ((pChild = pMDIClient->FindWindowEx(pChild, WinMergeWindowClass)) != NULL)
+	while ((pChild = m_pWndMDIClient->FindWindowEx(pChild, WinMergeWindowClass)) != NULL)
 	{
 		CDocFrame *pAbstract = static_cast<CDocFrame *>(CDocFrame::FromHandle(pChild));
 		if (pAbstract->GetFrameType() == FRAME_FILE)
@@ -1953,6 +1949,12 @@ void CMainFrame::OnViewUsedefaultfont()
 void CMainFrame::UpdateResources()
 {
 	m_wndStatusBar->SetPartText(0, LanguageSelect.LoadString(IDS_IDLEMESSAGE).c_str());
+	HWindow *pChild = NULL;
+	while ((pChild = m_pWndMDIClient->FindWindowEx(pChild, WinMergeWindowClass)) != NULL)
+	{
+		CDocFrame *pDocFrame = static_cast<CDocFrame *>(CDocFrame::FromHandle(pChild));
+		pDocFrame->UpdateResources();
+	}
 }
 
 BOOL CMainFrame::IsComparing()
@@ -2111,11 +2113,10 @@ void CMainFrame::addToMru(LPCTSTR szItem, LPCTSTR szRegSubKey, UINT nMaxItems)
  */
 void CMainFrame::ApplyViewWhitespace() 
 {
-	HWindow *pMDIClient = reinterpret_cast<HWindow *>(m_pWndMDIClient);
 	HWindow *pChild = NULL;
 	bool opt_view_whitespace = COptionsMgr::Get(OPT_VIEW_WHITESPACE);
 	bool opt_allow_mixed_eol = COptionsMgr::Get(OPT_ALLOW_MIXED_EOL);
-	while ((pChild = pMDIClient->FindWindowEx(pChild, WinMergeWindowClass)) != NULL)
+	while ((pChild = m_pWndMDIClient->FindWindowEx(pChild, WinMergeWindowClass)) != NULL)
 	{
 		CDocFrame *pAbstract = static_cast<CDocFrame *>(CDocFrame::FromHandle(pChild));
 		if (pAbstract->GetFrameType() == FRAME_FILE)
@@ -2156,9 +2157,8 @@ void CMainFrame::OnViewWhitespace()
 
 CDocFrame *CMainFrame::FindFrameOfType(FRAMETYPE frameType)
 {
-	HWindow *pMDIClient = reinterpret_cast<HWindow *>(m_pWndMDIClient);
 	HWindow *pChild = NULL;
-	while ((pChild = pMDIClient->FindWindowEx(pChild, WinMergeWindowClass)) != NULL)
+	while ((pChild = m_pWndMDIClient->FindWindowEx(pChild, WinMergeWindowClass)) != NULL)
 	{
 		CDocFrame *pDocFrame = static_cast<CDocFrame *>(CDocFrame::FromHandle(pChild));
 		if (pDocFrame->GetFrameType() == frameType)
