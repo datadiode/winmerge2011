@@ -33,7 +33,7 @@ public:
 
 protected:
 	void GenerateReport(REPORT_TYPE nReportType);
-	void WriteString(HString *);
+	void WriteString(HString *, UINT = CP_THREAD_ACP);
 	void WriteString(LPCTSTR);
 	void WriteStringEntityAware(LPCTSTR);
 	void GenerateHeader();

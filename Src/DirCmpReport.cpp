@@ -195,9 +195,9 @@ void DirCmpReport::GenerateReport(REPORT_TYPE nReportType)
  * @brief Write text to report file.
  * @param [in] H Text to write to report file.
  */
-void DirCmpReport::WriteString(HString *H)
+void DirCmpReport::WriteString(HString *H, UINT codepage)
 {
-	const OString strOctets = H->Oct(CP_UTF8);
+	const OString strOctets = H->Oct(codepage);
 	LPCSTR pchOctets = strOctets.A;
 	size_t cchAhead = strOctets.ByteLen();
 	while (LPCSTR pchAhead = (LPCSTR)memchr(pchOctets, '\n', cchAhead))
@@ -228,7 +228,7 @@ void DirCmpReport::WriteString(LPCTSTR pszText)
  */
 void DirCmpReport::WriteStringEntityAware(LPCTSTR pszText)
 {
-	WriteString(CMarkdown::Entities(pszText));
+	WriteString(CMarkdown::Entities(pszText), CP_UTF8);
 }
 
 /**
