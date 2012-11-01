@@ -258,10 +258,7 @@ void CDirView::ReflectItemActivate(NMITEMACTIVATE *pNM)
 void CDirView::ReloadColumns()
 {
 	LoadColumnHeaderItems();
-
-	UpdateColumnNames();
-	SetColumnWidths();
-	SetColAlignments();
+	UpdateColumns(LVCF_TEXT | LVCF_FMT | LVCF_WIDTH);
 }
 
 /**
@@ -634,7 +631,7 @@ HMENU CDirView::ListShellContextMenu(SIDE_TYPE side)
  */
 void CDirView::UpdateResources()
 {
-	UpdateColumnNames();
+	UpdateColumns(LVCF_TEXT);
 }
 
 /**
@@ -655,8 +652,7 @@ void CDirView::ReflectColumnClick(NM_LISTVIEW *pNMListView)
 	{
 		COptionsMgr::SaveOption(OPT_DIRVIEW_SORT_COLUMN, sortcol);
 		// most columns start off ascending, but not dates
-		bool bSortAscending = IsDefaultSortAscending(sortcol);
-		COptionsMgr::SaveOption(OPT_DIRVIEW_SORT_ASCENDING, bSortAscending);
+		COptionsMgr::SaveOption(OPT_DIRVIEW_SORT_ASCENDING, f_cols[sortcol].defSortUp);
 	}
 
 	SortColumnsAppropriately();
@@ -1550,22 +1546,6 @@ void CDirView::LoadColumnHeaderItems()
 
 }
 
-/// Update all column widths (from registry to screen)
-// Necessary when user reorders columns
-void CDirView::SetColumnWidths()
-{
-	for (int i = 0; i < m_numcols; ++i)
-	{
-		int phy = ColLogToPhys(i);
-		if (phy >= 0)
-		{
-			String sWidthKey = GetColRegValueNameBase(i) + _T("_Width");
-			int w = max(10, SettingStore.GetProfileInt(_T("DirView"), sWidthKey.c_str(), DefColumnWidth));
-			SetColumnWidth(m_colorder[i], w);
-		}
-	}
-}
-
 /** @brief store current column widths into registry */
 void CDirView::SaveColumnWidths()
 {
@@ -1574,7 +1554,7 @@ void CDirView::SaveColumnWidths()
 		int phy = ColLogToPhys(i);
 		if (phy >= 0)
 		{
-			String sWidthKey = GetColRegValueNameBase(i) + _T("_Width");
+			string_format sWidthKey(_T("WDirHdr_%s_Width"), GetColRegValueNameBase(i));
 			int w = GetColumnWidth(phy);
 			SettingStore.WriteProfileInt(_T("DirView"), sWidthKey.c_str(), w);
 		}
@@ -1587,8 +1567,7 @@ void CDirView::InitiateSort()
 	// Remove the windows reordering, as we're doing it ourselves
 	FixReordering();
 	// Now redraw screen
-	UpdateColumnNames();
-	SetColumnWidths();
+	UpdateColumns(LVCF_TEXT | LVCF_WIDTH);
 	Redisplay();
 }
 
@@ -1600,19 +1579,6 @@ void CDirView::OnCustomizeColumns()
 	// Located in DirViewColHandler.cpp
 	OnEditColumns();
 	SaveColumnOrders();
-}
-
-/**
- * @brief Fill string list with current dirview column registry key names
- */
-void CDirView::GetCurrentColRegKeys(stl::vector<String> &colKeys)
-{
-	int nphyscols = GetHeaderCtrl()->GetItemCount();
-	for (int col = 0; col < nphyscols; ++col)
-	{
-		int logcol = ColPhysToLog(col);
-		colKeys.push_back(GetColRegValueNameBase(logcol));
-	}
 }
 
 /**
@@ -1775,7 +1741,7 @@ void CDirView::ResetColumnWidths()
 		int phy = ColLogToPhys(i);
 		if (phy >= 0)
 		{
-			String sWidthKey = GetColRegValueNameBase(i) + _T("_Width");
+			string_format sWidthKey(_T("WDirHdr_%s_Width"), GetColRegValueNameBase(i));
 			SettingStore.WriteProfileInt(_T("DirView"), sWidthKey.c_str(), DefColumnWidth);
 		}
 	}

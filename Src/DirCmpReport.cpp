@@ -59,8 +59,7 @@ static string_format EndEl(LPCTSTR elName)
 DirCmpReport::DirCmpReport(CDirView *pList)
 	: m_pList(pList), m_pFile(NULL), m_sSeparator(_T(",")), m_rootPaths(2)
 {
-	m_pList->GetCurrentColRegKeys(m_colRegKeys);
-	m_nColumns = m_colRegKeys.size();
+	m_nColumns = pList->GetHeaderCtrl()->GetItemCount();
 	m_rootPaths[0] = pList->m_pFrame->GetLeftBasePath();
 	m_rootPaths[1] = pList->m_pFrame->GetRightBasePath();
 	// If inside archive, convert paths
@@ -198,7 +197,7 @@ void DirCmpReport::GenerateReport(REPORT_TYPE nReportType)
  */
 void DirCmpReport::WriteString(HString *H)
 {
-	const OString strOctets = H->Oct(CP_THREAD_ACP);
+	const OString strOctets = H->Oct(CP_UTF8);
 	LPCSTR pchOctets = strOctets.A;
 	size_t cchAhead = strOctets.ByteLen();
 	while (LPCSTR pchAhead = (LPCSTR)memchr(pchOctets, '\n', cchAhead))
@@ -246,7 +245,7 @@ void DirCmpReport::GenerateHeader()
 		TCHAR columnName[160]; // Assuming max col header will never be > 160
 		LVCOLUMN lvc;
 		lvc.mask = LVCF_TEXT;
-		lvc.pszText = &columnName[0];
+		lvc.pszText = columnName;
 		lvc.cchTextMax = _countof(columnName);
 		if (m_pList->GetColumn(currCol, &lvc))
 			WriteString(lvc.pszText);
@@ -294,8 +293,11 @@ void DirCmpReport::GenerateHTMLHeader()
 {
 	WriteString(_T("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\n")
 				_T("\t\"http://www.w3.org/TR/html4/loose.dtd\">\n")
-				_T("<html>\n<head>\n\t<title>"));
-	WriteString(m_sTitle.c_str());
+				_T("<html>\n")
+				_T("<head>\n")
+				_T("\t<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\">\n")
+				_T("\t<title>"));
+	WriteStringEntityAware(m_sTitle.c_str());
 	WriteString(_T("</title>\n")
 				_T("\t<style type=\"text/css\">\n\t<!--\n")
 				_T("\t\tbody {\n")
@@ -338,7 +340,7 @@ void DirCmpReport::GenerateHTMLHeaderBodyPortion()
 		TCHAR columnName[160]; // Assuming max col header will never be > 160
 		LVCOLUMN lvc;
 		lvc.mask = LVCF_TEXT;
-		lvc.pszText = &columnName[0];
+		lvc.pszText = columnName;
 		lvc.cchTextMax = _countof(columnName);
 		if (m_pList->GetColumn(currCol, &lvc))
 		{
@@ -355,8 +357,8 @@ void DirCmpReport::GenerateHTMLHeaderBodyPortion()
  */
 void DirCmpReport::GenerateXmlHeader()
 {
-	WriteString(_T("") // @todo xml declaration
-				_T("<WinMergeDiffReport version=\"1\">\n")
+	WriteString(_T("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
+				_T("<WinMergeDiffReport version=\"2\">\n")
 				_T("<left>"));
 	WriteStringEntityAware(m_rootPaths[0].c_str());
 	WriteString(_T("</left>\n")
@@ -376,7 +378,8 @@ void DirCmpReport::GenerateXmlHeader()
 		lvc.mask = LVCF_TEXT;
 		lvc.pszText = columnName;
 		lvc.cchTextMax = _countof(columnName);
-		LPCTSTR colEl = m_colRegKeys[currCol].c_str();
+		int logcol = m_pList->ColPhysToLog(currCol);
+		LPCTSTR colEl = m_pList->GetColRegValueNameBase(logcol);
 		if (m_pList->GetColumn(currCol, &lvc))
 		{
 			WriteString(BeginEl(colEl).c_str());
@@ -400,7 +403,8 @@ void DirCmpReport::GenerateXmlHtmlContent(bool xml)
 		WriteString(BeginEl(rowEl).c_str());
 		for (int currCol = 0; currCol < m_nColumns; currCol++)
 		{
-			LPCTSTR const colEl = xml ? m_colRegKeys[currCol].c_str() : _T("td");
+			int logcol = m_pList->ColPhysToLog(currCol);
+			LPCTSTR const colEl = xml ? m_pList->GetColRegValueNameBase(logcol) : _T("td");
 			WriteString(BeginEl(colEl).c_str());
 			WriteStringEntityAware(m_pList->GetItemText(currRow, currCol).c_str());
 			WriteString(EndEl(colEl).c_str());

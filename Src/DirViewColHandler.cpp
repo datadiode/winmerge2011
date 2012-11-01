@@ -18,7 +18,6 @@
 #include "DirView.h"
 #include "DirFrame.h"
 #include "coretools.h"
-#include "DirViewColItems.h"
 #include "DirColsDlg.h"
 #include "OptionsDef.h"
 #include "OptionsMgr.h"
@@ -42,19 +41,11 @@ static char THIS_FILE[] = __FILE__;
  * @param [in] di Difference data.
  * @return Text for the specified column.
  */
-String CDirView::ColGetTextToDisplay(const CDiffContext *pCtxt, int col,
-		const DIFFITEM & di)
+String CDirView::ColGetTextToDisplay(const CDiffContext *pCtxt, int col, const DIFFITEM &di)
 {
 	// Custom properties have custom get functions
-	const DirColInfo * pColInfo = DirViewColItems_GetDirColInfo(col);
-	if (!pColInfo)
-	{
-		ASSERT(0); // fix caller, should not ask for nonexistent columns
-		return _T("???");
-	}
-	ColGetFncPtrType fnc = pColInfo->getfnc;
-	SIZE_T offset = pColInfo->offset;
-	return (*fnc)(pCtxt, reinterpret_cast<const char *>(&di) + offset);
+	const DirColInfo &colInfo = f_cols[col];
+	return (*colInfo.getfnc)(pCtxt, reinterpret_cast<const char *>(&di) + colInfo.offset);
 }
 
 /**
@@ -67,33 +58,28 @@ String CDirView::ColGetTextToDisplay(const CDiffContext *pCtxt, int col,
  * @param [in] rdi Right difference item data.
  * @return Order of items.
  */
-int CDirView::ColSort(const CDiffContext *pCtxt, int col, const DIFFITEM & ldi,
-		const DIFFITEM & rdi) const
+int CDirView::ColSort(const CDiffContext *pCtxt, int col, const DIFFITEM &ldi, const DIFFITEM &rdi) const
 {
 	// Custom properties have custom sort functions
-	const DirColInfo * pColInfo = DirViewColItems_GetDirColInfo(col);
-	if (!pColInfo)
-	{
-		ASSERT(0); // fix caller, should not ask for nonexistent columns
-		return 0;
-	}
-	SIZE_T offset = pColInfo->offset;
-	const void * arg1;
-	const void * arg2;
+	const DirColInfo &colInfo = f_cols[col];
+	const size_t offset = colInfo.offset;
+	const void *arg1;
+	const void *arg2;
 	if (m_bTreeMode)
 	{
-		int lLevel = ldi.GetDepth();
-		int rLevel = rdi.GetDepth();
-		const DIFFITEM *lcur = &ldi, *rcur = &rdi;
-		if (lLevel < rLevel)
+		const DIFFITEM *lcur = &ldi;
+		const DIFFITEM *rcur = &rdi;
+		int lLevel = lcur->GetDepth();
+		int rLevel = rcur->GetDepth();
+		while (lLevel < rLevel)
 		{
-			for (; lLevel != rLevel; rLevel--)
-				rcur = rcur->parent;
+			--rLevel;
+			rcur = rcur->parent;
 		}
-		else if (rLevel < lLevel)
+		while (lLevel > rLevel)
 		{
-			for (; lLevel != rLevel; lLevel--)
-				lcur = lcur->parent;
+			--lLevel;
+			lcur = lcur->parent;
 		}
 		while (lcur->parent != rcur->parent)
 		{
@@ -108,11 +94,11 @@ int CDirView::ColSort(const CDiffContext *pCtxt, int col, const DIFFITEM & ldi,
 		arg1 = reinterpret_cast<const char *>(&ldi) + offset;
 		arg2 = reinterpret_cast<const char *>(&rdi) + offset;
 	}
-	if (ColSortFncPtrType fnc = pColInfo->sortfnc)
+	if (ColSortFncPtrType fnc = colInfo.sortfnc)
 	{
 		return (*fnc)(pCtxt, arg1, arg2);
 	}
-	if (ColGetFncPtrType fnc = pColInfo->getfnc)
+	if (ColGetFncPtrType fnc = colInfo.getfnc)
 	{
 		String p = (*fnc)(pCtxt, arg1);
 		String q = (*fnc)(pCtxt, arg2);
@@ -121,56 +107,27 @@ int CDirView::ColSort(const CDiffContext *pCtxt, int col, const DIFFITEM & ldi,
 	return 0;
 }
 
-/**
- * @brief return whether column normally sorts ascending (dates do not)
- */
-bool CDirView::IsDefaultSortAscending(int col) const
+/// Update column names (as per selected UI language) / width / alignment
+void CDirView::UpdateColumns(UINT lvcf)
 {
-	const DirColInfo * pColInfo = DirViewColItems_GetDirColInfo(col);
-	if (!pColInfo)
+	for (int i = 0; i < g_ncols; ++i)
 	{
-		ASSERT(0); // fix caller, should not ask for nonexistent columns
-		return 0;
-	}
-	return pColInfo->defSortUp;
-}
-
-/// Assign column name, using string resource & current column ordering
-void CDirView::NameColumn(int id, int subitem)
-{
-	int phys = ColLogToPhys(subitem);
-	if (phys>=0)
-	{
-		String s = LanguageSelect.LoadString(id);
-		LV_COLUMN lvc;
-		lvc.mask = LVCF_TEXT;
-		lvc.pszText = const_cast<LPTSTR>(s.c_str());
-		SetColumn(m_colorder[subitem], &lvc);
-	}
-}
-
-/// Load column names from string table
-void CDirView::UpdateColumnNames()
-{
-	for (int i=0; i<g_ncols; ++i)
-	{
-		const DirColInfo * col = DirViewColItems_GetDirColInfo(i);
-		NameColumn(col->idName, i);
-	}
-}
-
-/**
- * @brief Set alignment of columns.
- */
-void CDirView::SetColAlignments()
-{
-	for (int i=0; i<g_ncols; ++i)
-	{
-		const DirColInfo * col = DirViewColItems_GetDirColInfo(i);
-		LVCOLUMN lvc;
-		lvc.mask = LVCF_FMT;
-		lvc.fmt = col->alignment;
-		SetColumn(m_colorder[i], &lvc);
+		const DirColInfo &colInfo = f_cols[i];
+		int phys = ColLogToPhys(i);
+		if (phys >= 0)
+		{
+			String s = LanguageSelect.LoadString(colInfo.idName);
+			LV_COLUMN lvc;
+			lvc.mask = lvcf;
+			lvc.pszText = const_cast<LPTSTR>(s.c_str());
+			lvc.fmt = colInfo.alignment;
+			if (lvc.mask & LVCF_WIDTH)
+			{
+				string_format sWidthKey(_T("WDirHdr_%s_Width"), GetColRegValueNameBase(i));
+				lvc.cx = max(10, SettingStore.GetProfileInt(_T("DirView"), sWidthKey.c_str(), DefColumnWidth));
+			}
+			SetColumn(phys, &lvc);
+		}
 	}
 }
 
@@ -249,12 +206,13 @@ static LPTSTR NTAPI AllocDispinfoText(const String &s)
  */
 void CDirView::ReflectGetdispinfo(NMLVDISPINFO *pParam)
 {
-	int nIdx = pParam->item.iItem;
-	int i = ColPhysToLog(pParam->item.iSubItem);
+	const int nIdx = pParam->item.iItem;
+	const int i = ColPhysToLog(pParam->item.iSubItem);
+	const WORD idName = f_cols[i].idName;
 	UINT_PTR key = GetItemKey(nIdx);
 	if (key == SPECIAL_ITEM_POS)
 	{
-		if (IsColName(i))
+		if (idName == IDS_COLHDR_FILENAME)
 		{
 			pParam->item.pszText = _T("..");
 		}
@@ -268,8 +226,8 @@ void CDirView::ReflectGetdispinfo(NMLVDISPINFO *pParam)
 		// Add '*' to newer time field
 		if (di.left.mtime != 0 || di.right.mtime != 0)
 		{
-			if ((IsColLmTime(i) && di.left.mtime > di.right.mtime) ||
-				(IsColRmTime(i) && di.left.mtime < di.right.mtime))
+			if ((idName == IDS_COLHDR_LTIMEM && di.left.mtime > di.right.mtime) ||
+				(idName == IDS_COLHDR_RTIMEM && di.left.mtime < di.right.mtime))
 			{
 				s.insert(0, _T("* "));
 			}
@@ -287,9 +245,9 @@ void CDirView::SaveColumnOrders()
 {
 	ASSERT(m_colorder.size() == m_numcols);
 	ASSERT(m_invcolorder.size() == m_numcols);
-    for (int i=0; i < m_numcols; i++)
+    for (int i = 0; i < m_numcols; ++i)
 	{
-		String RegName = GetColRegValueNameBase(i) + _T("_Order");
+		string_format RegName(_T("WDirHdr_%s_Order"), GetColRegValueNameBase(i));
 		int ord = m_colorder[i];
 		SettingStore.WriteProfileInt(_T("DirView"), RegName.c_str(), ord);
 	}
@@ -301,22 +259,22 @@ void CDirView::SaveColumnOrders()
 void CDirView::LoadColumnOrders()
 {
 	ASSERT(m_numcols == -1);
-	m_numcols = GetColLogCount();
+	m_numcols = g_ncols;
 	ClearColumnOrders();
 	m_dispcols = 0;
 
 	// Load column orders
 	// Break out if one is missing
 	// Break out & mark failure (m_dispcols == -1) if one is invalid
-	int i=0;
-	for (i=0; i<m_numcols; ++i)
+	int i;
+	for (i = 0; i < m_numcols; ++i)
 	{
-		String RegName = GetColRegValueNameBase(i) + _T("_Order");
+		string_format RegName(_T("WDirHdr_%s_Order"), GetColRegValueNameBase(i));
 		int ord = SettingStore.GetProfileInt(_T("DirView"), RegName.c_str(), -2);
-		if (ord<-1 || ord >= m_numcols)
+		if (ord < -1 || ord >= m_numcols)
 			break;
 		m_colorder[i] = ord;
-		if (ord>=0)
+		if (ord >= 0)
 		{
 			++m_dispcols;
 			if (m_invcolorder[ord] != -1)
@@ -328,7 +286,7 @@ void CDirView::LoadColumnOrders()
 		}
 	}
 	// Check that a contiguous range was set
-	for (i=0; i<m_dispcols; ++i)
+	for (i = 0; i < m_dispcols; ++i)
 	{
 		if (m_invcolorder[i] < 0)
 		{
@@ -337,11 +295,10 @@ void CDirView::LoadColumnOrders()
 		}
 	}
 	// Must have at least one column
-	if (m_dispcols<=1)
+	if (m_dispcols < 1)
 	{
 		ResetColumnOrdering();
 	}
-
 	ValidateColumnOrdering();
 }
 
@@ -352,7 +309,7 @@ void CDirView::ValidateColumnOrdering()
 {
 #if _DEBUG
 	ASSERT(m_invcolorder[0]>=0);
-	ASSERT(m_numcols == GetColLogCount());
+	ASSERT(m_numcols == g_ncols);
 	// Check that any logical->physical mapping is reversible
 	for (int i=0; i<m_numcols; ++i)
 	{
@@ -379,11 +336,11 @@ void CDirView::ResetColumnOrdering()
 {
 	ClearColumnOrders();
 	m_dispcols = 0;
-	for (int i=0; i<m_numcols; ++i)
+	for (int i = 0; i < m_numcols; ++i)
 	{
-		int phy = GetColDefaultOrder(i);
+		int phy = f_cols[i].physicalIndex;
 		m_colorder[i] = phy;
-		if (phy>=0)
+		if (phy >= 0)
 		{
 			m_invcolorder[phy] = i;
 			++m_dispcols;
@@ -399,7 +356,7 @@ void CDirView::ClearColumnOrders()
 {
 	m_colorder.resize(m_numcols);
 	m_invcolorder.resize(m_numcols);
-	for (int i=0; i<m_numcols; ++i)
+	for (int i = 0; i < m_numcols; ++i)
 	{
 		m_colorder[i] = -1;
 		m_invcolorder[i] = -1;
@@ -411,8 +368,7 @@ void CDirView::ClearColumnOrders()
  */
 String CDirView::GetColDisplayName(int col) const
 {
-	const DirColInfo * colinfo = DirViewColItems_GetDirColInfo(col);
-	return LanguageSelect.LoadString(colinfo->idName);
+	return LanguageSelect.LoadString(f_cols[col].idName);
 }
 
 /**
@@ -420,16 +376,7 @@ String CDirView::GetColDisplayName(int col) const
  */
 String CDirView::GetColDescription(int col) const
 {
-	const DirColInfo * colinfo = DirViewColItems_GetDirColInfo(col);
-	return LanguageSelect.LoadString(colinfo->idDesc);
-}
-
-/**
- * @brief Return total number of known columns
- */
-int CDirView::GetColLogCount() const
-{
-	return g_ncols;
+	return LanguageSelect.LoadString(f_cols[col].idDesc);
 }
 
 /**
@@ -441,16 +388,17 @@ void CDirView::MoveColumn(int psrc, int pdest)
 	m_colorder[m_invcolorder[psrc]] = pdest;
 	// shift all other affected columns
 	int dir = psrc > pdest ? +1 : -1;
-	int i=0;
-	for (i=pdest; i!=psrc; i += dir)
+	int i;
+	for (i = pdest; i != psrc; i += dir)
 	{
-		m_colorder[m_invcolorder[i]] = i+dir;
+		m_colorder[m_invcolorder[i]] = i + dir;
 	}
 	// fix inverse mapping
-	for (i=0; i<m_numcols; ++i)
+	for (i = 0; i < m_numcols; ++i)
 	{
-		if (m_colorder[i] >= 0)
-			m_invcolorder[m_colorder[i]] = i;
+		int ord = m_colorder[i];
+		if (ord >= 0)
+			m_invcolorder[ord] = i;
 	}
 	ValidateColumnOrdering();
 	InitiateSort();
@@ -464,26 +412,22 @@ void CDirView::OnEditColumns()
 {
 	CDirColsDlg dlg;
 	// List all the currently displayed columns
-	for (int col=0; col<GetHeaderCtrl()->GetItemCount(); ++col)
+	int log, phy;
+	for (phy = 0; phy < m_dispcols; ++phy)
 	{
-		int l = ColPhysToLog(col);
-		dlg.AddColumn(GetColDisplayName(l), GetColDescription(l), l, col);
+		log = ColPhysToLog(phy);
+		dlg.AddColumn(GetColDisplayName(log), GetColDescription(log), log, phy);
 	}
 	// Now add all the columns not currently displayed
-	int l=0;
-	for (l=0; l<GetColLogCount(); ++l)
+	for (log = 0; log < m_numcols; ++log)
 	{
-		if (ColLogToPhys(l)==-1)
+		String displayName = GetColDisplayName(log);
+		if (ColLogToPhys(log) == -1)
 		{
-			dlg.AddColumn(GetColDisplayName(l), GetColDescription(l), l);
+			dlg.AddColumn(displayName, GetColDescription(log), log);
 		}
-	}
-
-	// Add default order of columns for resetting to defaults
-	for (l = 0; l < m_numcols; ++l)
-	{
-		int phy = GetColDefaultOrder(l);
-		dlg.AddDefColumn(GetColDisplayName(l), l, phy);
+		// Add default order of columns for resetting to defaults
+		dlg.AddDefColumn(displayName, log, f_cols[log].physicalIndex);
 	}
 
 	if (LanguageSelect.DoModal(dlg) != IDOK)
@@ -495,17 +439,17 @@ void CDirView::OnEditColumns()
 		SaveColumnWidths(); // save current widths to registry
 
 	// Reset our data to reflect the new data from the dialog
-	const CDirColsDlg::ColumnArray & cols = dlg.GetColumns();
+	const CDirColsDlg::ColumnArray &cols = dlg.GetColumns();
 	ClearColumnOrders();
 	m_dispcols = 0;
 	const int sortColumn = COptionsMgr::Get(OPT_DIRVIEW_SORT_COLUMN);
 	for (CDirColsDlg::ColumnArray::const_iterator iter = cols.begin();
 		iter != cols.end(); ++iter)
 	{
-		int log = iter->log_col;
-		int phy = iter->phy_col;
+		log = iter->log_col;
+		phy = iter->phy_col;
 		m_colorder[log] = phy;
-		if (phy>=0)
+		if (phy >= 0)
 		{
 			++m_dispcols;
 			m_invcolorder[phy] = log;

@@ -52,7 +52,6 @@ private:
 	int m_nColumns; /**< Columns in UI */
 	String m_sSeparator; /**< Column separator for report */
 	IStream *m_pFile; /**< File to write report to */
-	stl::vector<String> m_colRegKeys; /**< Key names for currently displayed columns */
 };
 
 #endif // _DIRCMPREPORT_H_

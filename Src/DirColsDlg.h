@@ -47,11 +47,11 @@ public:
 // Construction
 public:
 	CDirColsDlg();   // standard constructor
-	void AddColumn(const String & name, const String & desc, int log, int phy=-1)
+	void AddColumn(const String &name, const String &desc, int log, int phy = -1)
 		{ column c(name, desc, log, phy); m_cols.push_back(c); }
-	void AddDefColumn(const String & name, int log, int phy=-1)
+	void AddDefColumn(const String &name, int log, int phy = -1)
 		{ column c(name, _T(""), log, phy); m_defCols.push_back(c); }
-	const ColumnArray & GetColumns() const { return m_cols; }
+	const ColumnArray &GetColumns() const { return m_cols; }
 
 // Dialog Data
 	HListView *m_listColumns;

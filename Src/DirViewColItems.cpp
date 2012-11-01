@@ -14,7 +14,6 @@
 #include "LanguageSelect.h"
 #include "DiffContext.h"
 #include "DirView.h"
-#include "DirViewColItems.h"
 #include "locality.h"
 #include "paths.h"
 
@@ -612,7 +611,7 @@ static int ColEncodingSort(const CDiffContext *, const void *p, const void *q)
  *  - ascending (TRUE) or descending (FALSE) default sort order
  *  - alignment of column contents: numbers are usually right-aligned
  */
-static DirColInfo f_cols[] =
+const CDirView::DirColInfo CDirView::f_cols[] =
 {
 	{ _T("Name"), IDS_COLHDR_FILENAME, IDS_COLDESC_FILENAME, &ColFileNameGet, &ColFileNameSort, 0, 0, true, LVCFMT_LEFT },
 	{ _T("Path"), IDS_COLHDR_DIR, IDS_COLDESC_DIR, &ColPathGet, &ColPathSort, 0, 1, true, LVCFMT_LEFT },
@@ -644,93 +643,13 @@ static DirColInfo f_cols[] =
 /**
  * @brief Count of all known columns
  */
-int g_ncols = _countof(f_cols);
+const int CDirView::g_ncols = _countof(CDirView::f_cols);
 
 /**
  * @brief Registry base value name for saving/loading info for this column
  */
-String
-CDirView::GetColRegValueNameBase(int col) const
+LPCTSTR CDirView::GetColRegValueNameBase(int col)
 {
 	ASSERT(col >= 0 && col < _countof(f_cols));
-	return string_format(_T("WDirHdr_%s"), f_cols[col].regName);
-}
-
-/**
- * @brief Get default physical order for specified logical column
- */
-int
-CDirView::GetColDefaultOrder(int col) const
-{
-	ASSERT(col >= 0 && col < _countof(f_cols));
-	return f_cols[col].physicalIndex;
-}
-
-/**
- * @brief Return the info about the specified physical column
- */
-const DirColInfo *
-CDirView::DirViewColItems_GetDirColInfo(int col) const
-{
-	if (col < 0 || col >= _countof(f_cols))
-	{
-		ASSERT(0); // fix caller, should not ask for nonexistent columns
-		return 0;
-	}
-	return &f_cols[col];
-}
-
-/**
- * @brief Check if specified physical column has specified resource id name
- */
-static bool
-IsColById(int col, int id)
-{
-	if (col < 0 || col >= _countof(f_cols))
-	{
-		ASSERT(0); // fix caller, should not ask for nonexistent columns
-		return false;
-	}
-	return f_cols[col].idName == id;
-}
-
-/**
- * @brief Is specified physical column the name column?
- */
-bool
-CDirView::IsColName(int col) const
-{
-	return IsColById(col, IDS_COLHDR_FILENAME);
-}
-/**
- * @brief Is specified physical column the left modification time column?
- */
-bool
-CDirView::IsColLmTime(int col) const
-{
-	return IsColById(col, IDS_COLHDR_LTIMEM);
-}
-/**
- * @brief Is specified physical column the right modification time column?
- */
-bool
-CDirView::IsColRmTime(int col) const
-{
-	return IsColById(col, IDS_COLHDR_RTIMEM);
-}
-/**
- * @brief Is specified physical column the full status (result) column?
- */
-bool
-CDirView::IsColStatus(int col) const
-{
-	return IsColById(col, IDS_COLHDR_RESULT);
-}
-/**
- * @brief Is specified physical column the full status (result) column?
- */
-bool
-CDirView::IsColStatusAbbr(int col) const
-{
-	return IsColById(col, IDS_COLHDR_RESULT_ABBR);
+	return f_cols[col].regName;
 }

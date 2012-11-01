@@ -127,7 +127,6 @@ public:
 	void LoadColumnHeaderItems();
 	UINT_PTR GetItemKey(int idx);
 	int GetItemIndex(UINT_PTR key);
-	void SetColumnWidths();
 	void SortColumnsAppropriately();
 	DIFFITEM &GetDiffItem(int sel);
 
@@ -192,8 +191,6 @@ private:
 	void ReflectBeginDrag();
 // Implementation in DirViewColHandler.cpp
 public:
-	void UpdateColumnNames();
-	void SetColAlignments();
 	// class CompareState is used to pass parameters to the PFNLVCOMPARE callback function.
 	class CompareState
 	{
@@ -208,33 +205,43 @@ public:
 	} friend;
 	void UpdateDiffItemStatus(UINT nIdx);
 private:
+	void UpdateColumns(UINT lvcf);
 	void InitiateSort();
-	void NameColumn(int id, int subitem);
 	int AddNewItem(int i, UINT_PTR diffpos, int iImage, int iIndent);
-	bool IsDefaultSortAscending(int col) const;
 	int ColPhysToLog(int i) const { return m_invcolorder[i]; }
 	int ColLogToPhys(int i) const { return m_colorder[i]; } /**< -1 if not displayed */
 	String GetColDisplayName(int col) const;
 	String GetColDescription(int col) const;
-	int GetColLogCount() const;
 	void LoadColumnOrders();
 	void ValidateColumnOrdering();
 	void ClearColumnOrders();
 	void ResetColumnOrdering();
 	void MoveColumn(int psrc, int pdest);
-	String GetColRegValueNameBase(int col) const;
+	static LPCTSTR GetColRegValueNameBase(int col);
 	String ColGetTextToDisplay(const CDiffContext *pCtxt, int col, const DIFFITEM & di);
 	int ColSort(const CDiffContext *pCtxt, int col, const DIFFITEM & ldi, const DIFFITEM &rdi) const;
 // End DirViewCols.cpp
 
 // Implementation in DirViewColItems.cpp
-	int GetColDefaultOrder(int col) const;
-	const DirColInfo * DirViewColItems_GetDirColInfo(int col) const;
-	bool IsColName(int col) const;
-	bool IsColLmTime(int col) const;
-	bool IsColRmTime(int col) const;
-	bool IsColStatus(int col) const;
-	bool IsColStatusAbbr(int col) const;
+// DirViewColItems typedefs
+	typedef String (*ColGetFncPtrType)(const CDiffContext *, const void *);
+	typedef int (*ColSortFncPtrType)(const CDiffContext *, const void *, const void *);
+
+	struct DirColInfo /**< Information about one column of dirview list info */
+	{
+		LPCTSTR regName; /**< Internal name used for registry entries etc */
+		// localized string resources
+		WORD idName; /**< Displayed name, ID of string resource */
+		WORD idDesc; /**< Description, ID of string resource */
+		ColGetFncPtrType getfnc; /**< Handler giving display string */
+		ColSortFncPtrType sortfnc; /**< Handler for sorting this column */
+		WORD offset;
+		short physicalIndex; /**< Current physical index, -1 if not displayed */
+		bool defSortUp; /**< Does column start with ascending sort (most do) */
+		char alignment; /**< Column alignment */
+	};
+	static const DirColInfo f_cols[];
+	static const int g_ncols;
 // End DirViewColItems.cpp
 
 private:
@@ -254,7 +261,6 @@ protected:
 	int GetFirstDifferentItem();
 	int GetLastDifferentItem();
 	int AddSpecialItems();
-	void GetCurrentColRegKeys(stl::vector<String> &colKeys);
 	void OpenSpecialItems(UINT_PTR pos1, UINT_PTR pos2);
 	bool OpenOneItem(UINT_PTR pos1, DIFFITEM **di1, DIFFITEM **di2,
 			String &path1, String &path2, int &sel1, bool &isDir);
