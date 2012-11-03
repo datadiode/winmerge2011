@@ -6,6 +6,8 @@
 	#error this file is not editable by Microsoft Visual C++
 #endif //APSTUDIO_INVOKED
 
+#pragma code_page(1252)
+
 #include "../resource.h"
 
 /////////////////////////////////////////////////////////////////////////////
