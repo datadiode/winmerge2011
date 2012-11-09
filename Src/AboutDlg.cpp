@@ -128,8 +128,8 @@ void CAboutDlg::OnBnClickedOpenContributors()
 	{
 		// Now, add quotation marks so ShellExecute() doesn't fail if path
 		// includes spaces
-		docPath.insert(0, _T("\""));
-		docPath.insert(docPath.length(), _T("\""));
+		docPath.insert(docPath.begin(), _T('"'));
+		docPath.push_back(_T('"'));
 		HINSTANCE ret = ShellExecute(m_hWnd, NULL, _T("notepad"), docPath.c_str(), defPath.c_str(), SW_SHOWNORMAL);
 
 		// values < 32 are errors (ref to MSDN)

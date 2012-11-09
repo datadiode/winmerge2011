@@ -111,15 +111,15 @@ void CDirFrame::InitCompare(LPCTSTR pszLeft, LPCTSTR pszRight, int nRecursive, C
 CDirFrame::AllowUpwardDirectory::ReturnCode
 CDirFrame::AllowUpwardDirectory(String &leftParent, String &rightParent)
 {
-	const String & left = GetLeftBasePath();
-	const String & right = GetRightBasePath();
+	const String &left = GetLeftBasePath();
+	const String &right = GetRightBasePath();
 
 	// If we have temp context it means we are comparing archives
 	if (m_pTempPathContext != NULL)
 	{
 		LPCTSTR lname = PathFindFileName(left.c_str());
 		LPCTSTR rname = PathFindFileName(right.c_str());
-        String::size_type cchLeftRoot = m_pTempPathContext->m_strLeftRoot.length();
+		String::size_type cchLeftRoot = m_pTempPathContext->m_strLeftRoot.length();
 
 		if (left.length() <= cchLeftRoot + 1) // + 1 balances a trailing backslash
 		{

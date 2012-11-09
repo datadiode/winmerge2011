@@ -178,11 +178,11 @@ bool FileFilterHelper::includeFile(LPCTSTR szFileName)
 		// preprend a backslash if there is none
 		String strFileName = szFileName;
 		string_makelower(strFileName);
-		if (strFileName[0] != '\\')
-			strFileName = _T("\\") + strFileName;
+		if (strFileName[0] != _T('\\'))
+			strFileName.insert(strFileName.begin(), _T('\\'));
 		// append a point if there is no extension
-		if (strFileName.find('.') == -1)
-			strFileName = strFileName + _T(".");
+		if (strFileName.find(_T('.')) == String::npos)
+			strFileName.push_back(_T('.'));
 
 		const OString name_utf = HString::Uni(strFileName.c_str())->Oct(CP_UTF8);
 		return m_pMaskFilter->Match(name_utf.ByteLen(), name_utf.A);
