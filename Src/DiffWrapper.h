@@ -155,7 +155,7 @@ public:
 	void SetPatchOptions(const PATCHOPTIONS &);
 	void SetDetectMovedBlocks(bool bDetectMovedBlocks);
 	void SetAppendFiles(BOOL bAppendFiles);
-	void SetPaths(const String &filepath1, const String &filepath2, BOOL tempPaths);
+	void SetPaths(const String &filepath1, const String &filepath2);
 	void SetAlternativePaths(const String &altPath1, const String &altPath2);
 	void SetCodepage(int codepage) { m_codepage = codepage; }
 	bool RunFileDiff();
@@ -197,7 +197,6 @@ private:
 	String m_sOriginalFile1; /**< First file's original (NON-TEMP) path. */
 	String m_sOriginalFile2; /**< Second file's original (NON-TEMP) path. */
 	String m_sPatchFile; /**< Full path to created patch file. */
-	BOOL m_bPathsAreTemp; /**< Are compared paths temporary? */
 	BOOL m_bAppendFiles; /**< Do we append to existing patch file? */
 	DiffList *const m_pDiffList; /**< Pointer to external DiffList */
 	MovedLines *m_pMovedLines;

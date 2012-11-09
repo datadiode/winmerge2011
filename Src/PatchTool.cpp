@@ -122,7 +122,7 @@ int CPatchTool::CreatePatch()
 			const PATCHFILES& files = m_dlgPatch.GetItemAt(index);
 			
 			// Set up DiffWrapper
-			m_diffWrapper.SetPaths(files.lfile, files.rfile, FALSE);
+			m_diffWrapper.SetPaths(files.lfile, files.rfile);
 			m_diffWrapper.SetAlternativePaths(files.pathLeft, files.pathRight);
 			m_diffWrapper.SetCompareFiles(files.lfile, files.rfile);
 			if (!m_diffWrapper.RunFileDiff())

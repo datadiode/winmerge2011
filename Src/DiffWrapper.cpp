@@ -62,7 +62,6 @@ CDiffWrapper::CDiffWrapper(DiffList *pDiffList)
 , m_bAppendFiles(FALSE)
 , m_codepage(0)
 , m_pDiffList(pDiffList)
-, m_bPathsAreTemp(FALSE)
 , m_pMovedLines(NULL)
 {
 	m_patchOptions.outputStyle = OUTPUT_NORMAL;
@@ -364,14 +363,11 @@ OP_TYPE CDiffWrapper::PostFilter(int LineNumberLeft, int QtyLinesLeft,
  * are temporary paths that can be deleted.
  * @param [in] filepath1 First file to compare "original file".
  * @param [in] filepath2 Second file to compare "changed file".
- * @param [in] tempPaths Are given paths temporary (can be deleted)?.
  */
-void CDiffWrapper::SetPaths(const String &filepath1, const String &filepath2,
-		BOOL tempPaths)
+void CDiffWrapper::SetPaths(const String &filepath1, const String &filepath2)
 {
 	m_s1File = filepath1;
 	m_s2File = filepath2;
-	m_bPathsAreTemp = tempPaths;
 }
 
 /**
@@ -871,19 +867,8 @@ void CDiffWrapper::WritePatchFile(struct change * script, file_data * inf)
 	inf_patch[0].name = path1.A;
 	inf_patch[1].name = path2.A;
 
-	// If paths in m_s1File and m_s2File point to original files, then we can use
-	// them to fix potentially meaningless stats from potentially temporary files,
-	// resulting from whatever transforms may have taken place.
-	// If not, then we can't help it, and hence ASSERT that this won't happen.
-	if (!m_bPathsAreTemp)
-	{
-		_tstati64(m_s1File.c_str(), &inf_patch[0].stat);
-		_tstati64(m_s2File.c_str(), &inf_patch[1].stat);
-	}
-	else
-	{
-		ASSERT(FALSE);
-	}
+	_tstati64(m_s1File.c_str(), &inf_patch[0].stat);
+	_tstati64(m_s2File.c_str(), &inf_patch[1].stat);
 
 	outfile = NULL;
 	if (!m_sPatchFile.empty())
