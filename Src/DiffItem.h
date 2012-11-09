@@ -52,54 +52,26 @@ struct DIFFCODE
 
 	DIFFCODE(UINT diffcode = 0) : diffcode(diffcode) { }
 
-protected:
-	/// Worker function, to check one area (mask) of code for a particular value (result)
-	static bool Check(UINT code, int mask, int result) { return ((code & mask) == result); }
-	/// Convenience function to check the part of the code for comparison results
-	static bool CheckCompare(UINT code, int result) { return Check(code, DIFFCODE::COMPAREFLAGS, result); }
-	/// Convenience function to check the part of the code for filter status
-	static bool CheckFilter(UINT code, int result) { return Check(code, DIFFCODE::FILTERFLAGS, result); }
-	/// Convenience function to check the part of the code for side status (eg, left-only)
-	static bool CheckSide(UINT code, int result) { return Check(code, DIFFCODE::SIDEFLAGS, result); }
-
-	/// Worker function to set the area indicated by mask to specified result
-	void Set(int mask, UINT result) { diffcode &= (~mask); diffcode |= result; }
-	/// Convenience function to set the side status, eg, SetSide(DIFFCODE::LEFT)
-	void SetSide(UINT result) { Set(DIFFCODE::SIDEFLAGS, result); }
-public:
-
 	// file/directory
-	bool isDirectory() const { return Check(diffcode, DIFFCODE::TYPEFLAGS, DIFFCODE::DIR); }
+	bool isDirectory() const { return (diffcode & TYPEFLAGS) == DIR; }
 	// left/right
-	bool isSideLeftOnly() const { return CheckSide(diffcode, DIFFCODE::LEFT); }
-	bool isSideLeftOrBoth() const { return isSideLeftOnly() || isSideBoth(); }
-	void setSideLeft() { SetSide(DIFFCODE::LEFT); }
-	bool isSideRightOnly() const { return CheckSide(diffcode, DIFFCODE::RIGHT); }
-	bool isSideRightOrBoth() const { return isSideRightOnly() || isSideBoth(); }
-	void setSideRight() { SetSide(DIFFCODE::RIGHT); }
-	bool isSideBoth() const { return CheckSide(diffcode, DIFFCODE::BOTH); }
-	void setSideBoth() { SetSide(DIFFCODE::BOTH); }
-	void setSideNone() { SetSide(0); }
+	bool isSideLeftOnly() const { return (diffcode & SIDEFLAGS) == LEFT; }
+	bool isSideLeftOrBoth() const { return (diffcode & LEFT) != 0; }
+	bool isSideRightOnly() const { return (diffcode & SIDEFLAGS) == RIGHT; }
+	bool isSideRightOrBoth() const { return (diffcode & RIGHT) != 0; }
+	bool isSideBoth() const { return (diffcode & SIDEFLAGS) == BOTH; }
 	// compare result
-	bool isResultSame() const { return CheckCompare(diffcode, DIFFCODE::SAME); }
-	bool isResultDiff() const { return (CheckCompare(diffcode, DIFFCODE::DIFF) && !isResultFiltered() &&
-			!isSideLeftOnly() && !isSideRightOnly()); }
-	static bool isResultError(UINT code) { return CheckCompare(code, DIFFCODE::CMPERR); }
-	bool isResultError() const { return isResultError(diffcode); }
-	static bool isResultAbort(UINT code) { return CheckCompare(code, DIFFCODE::CMPABORT); }
-	bool isResultAbort() const { return isResultAbort(diffcode); }
+	bool isResultSame() const { return (diffcode & COMPAREFLAGS) == SAME; }
+	bool isResultDiff() const { return (diffcode & COMPAREFLAGS) == DIFF; }
+	bool isResultError() const { return (diffcode & COMPAREFLAGS) == CMPERR; }
+	bool isResultAbort() const { return (diffcode & COMPAREFLAGS) == CMPABORT; }
 	// filter status
-	bool isResultFiltered() const { return CheckFilter(diffcode, DIFFCODE::SKIPPED); }
+	bool isResultFiltered() const { return (diffcode & FILTERFLAGS) == SKIPPED; }
 	// type
-	bool isText() const { return Check(diffcode, DIFFCODE::TEXTFLAGS, DIFFCODE::TEXT); }
-	void setText() { Set(DIFFCODE::TEXTFLAGS, DIFFCODE::TEXT); }
-	bool isBin() const { return Check(diffcode, DIFFCODE::TEXTFLAGS, DIFFCODE::BIN) ||
-			Check(diffcode, DIFFCODE::TEXTFLAGS, DIFFCODE::BINSIDE1) ||
-			Check(diffcode, DIFFCODE::TEXTFLAGS, DIFFCODE::BINSIDE2); }
-	void setBin() { Set(DIFFCODE::TEXTFLAGS, DIFFCODE::BIN); }
+	bool isText() const { return (diffcode & TEXT) != 0; }
+	bool isBin() const { return (diffcode & BIN) != 0; }
 	// rescan
-	bool isScanNeeded() const { return ((diffcode & DIFFCODE::SCANFLAGS) == DIFFCODE::NEEDSCAN); }
-
+	bool isScanNeeded() const { return (diffcode & SCANFLAGS) == NEEDSCAN; }
 };
 
 /**
