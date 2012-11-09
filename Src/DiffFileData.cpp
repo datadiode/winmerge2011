@@ -120,8 +120,7 @@ bool DiffFileData::DoOpenFiles()
 			return false;
 		}
 		
-		if (string_compare_nocase(m_FileLocation[0].filepath,
-				m_FileLocation[1].filepath) == 0)
+		if (_tcsicmp(m_FileLocation[0].filepath.c_str(), m_FileLocation[1].filepath.c_str()) == 0)
 		{
 			m_inf[1].desc = m_inf[0].desc;
 		}

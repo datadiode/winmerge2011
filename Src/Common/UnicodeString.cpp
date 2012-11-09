@@ -57,35 +57,16 @@ void string_makeupper(String &str)
  * @param [in] find A string to search and replace with another (@p replace).
  * @param [in] replace A string used to replace original (@p find).
  */
-void string_replace(String &target, const String &find, const String &replace)
+void string_replace(String &target, LPCTSTR find, LPCTSTR replace)
 {
-	const String::size_type find_len = find.length();
-	const String::size_type replace_len = replace.length();
+	const String::size_type find_len = _tcslen(find);
+	const String::size_type replace_len = _tcslen(replace);
 	String::size_type pos = 0;
 	while ((pos = target.find(find, pos)) != String::npos)
 	{
-		target.replace(pos, find_len, replace);
+		target.replace(pos, find_len, replace, replace_len);
 		pos += replace_len;
 	}
-}
-
-/**
- * @brief Compare two strings ignoring the character casing.
- * @param [in] str1 First string to compare.
- * @param [in] str2 Second string to compare.
- * @return As strcmp(), 0 if strings match.
- */
-int string_compare_nocase(const String &str1, const String &str2)
-{
-	String s1(str1);
-	String s2(str2);
-	String::size_type i = 0;
-	for (i = 0; i < s1.length(); i++)
-		s1[i] = _totlower(s1[i]);
-	for (i = 0; i < s2.length(); i++)
-		s2[i] = _totlower(s2[i]);
-
-	return s1.compare(s2);
 }
 
 /**

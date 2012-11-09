@@ -91,7 +91,7 @@ void FileFilterMgr::RemoveFilter(LPCTSTR szFilterFile)
 	vector<FileFilter*>::iterator iter = m_filters.begin();
 	while (iter != m_filters.end())
 	{
-		if (string_compare_nocase((*iter)->fullpath, szFilterFile) == 0)
+		if (_tcsicmp((*iter)->fullpath.c_str(), szFilterFile) == 0)
 		{
 			delete (*iter);
 			m_filters.erase(iter);
@@ -245,7 +245,7 @@ FileFilter *FileFilterMgr::GetFilterByPath(LPCTSTR szFilterPath) const
 	vector<FileFilter*>::const_iterator iter = m_filters.begin();
 	while (iter != m_filters.end())
 	{
-		if (string_compare_nocase((*iter)->fullpath, szFilterPath) == 0)
+		if (_tcsicmp((*iter)->fullpath.c_str(), szFilterPath) == 0)
 			return *iter;
 		++iter;
 	}
