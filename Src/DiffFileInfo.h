@@ -68,9 +68,6 @@ struct DiffFileInfo : public DirItem
 	FileTextEncoding encoding; /**< unicode or codepage info */
 	FileTextStats m_textStats; /**< EOL, zero-byte etc counts */
 
-	// We could stash a pointer here to the parent DIFFITEM
-	// but, I ran into trouble with, I think, the DIFFITEM copy constructor
-
 // methods
 
 	DiffFileInfo(): bVersionChecked(false) { }
