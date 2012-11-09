@@ -119,10 +119,12 @@ public:
 	bool IsShowable(const DIFFITEM &) const;
 
 	CDiffContext *GetDiffContext() { return m_pCtxt; }
-	const DIFFITEM & GetDiffByKey(UINT_PTR key) const { return m_pCtxt->GetDiffAt(key); }
-	DIFFITEM & GetDiffRefByKey(UINT_PTR key) { return m_pCtxt->GetDiffAt(key); }
+	const DIFFITEM &GetDiffByKey(UINT_PTR key) const { return m_pCtxt->GetDiffAt(key); }
+	DIFFITEM &GetDiffRefByKey(UINT_PTR key) { return m_pCtxt->GetDiffAt(key); }
 	String GetLeftBasePath() const { return m_pCtxt->GetLeftPath(); }
 	String GetRightBasePath() const { return m_pCtxt->GetRightPath(); }
+	String GetLeftFilepath(const DIFFITEM &di) const { return di.GetLeftFilepath(m_pCtxt->GetLeftPath()); }
+	String GetRightFilepath(const DIFFITEM &di) const { return di.GetRightFilepath(m_pCtxt->GetRightPath()); }
 	struct AllowUpwardDirectory
 	{
 		enum ReturnCode

@@ -39,15 +39,14 @@ struct PATCHFILES
 	String pathLeft; /**< Left path added to patch file */
 	String rfile; /**< Right file */
 	String pathRight; /**< Right path added to patch file */
-	FileTime ltime; /**< Left time */
-	FileTime rtime; /**< Right time */
 	// Swap sides
 	void swap_sides()
 	{
 		stl::swap(lfile, rfile);
 		stl::swap(pathLeft, pathRight);
-		stl::swap(ltime, rtime);
 	}
+	PATCHFILES() { }
+	PATCHFILES(const PATCHFILES &);
 };
 
 /** 
@@ -61,23 +60,11 @@ class CPatchTool
 public:
 	CPatchTool();
 	~CPatchTool();
-
-	void AddFiles(LPCTSTR file1, LPCTSTR file2);
-	void AddFiles(LPCTSTR file1, LPCTSTR altPath1,
-		LPCTSTR file2, LPCTSTR altPath2);
-	int CreatePatch();
-	String GetPatchFile() const;
-	BOOL GetOpenToEditor() const;
-
-protected:
-	BOOL ShowDialog();
-
+	void AddFiles(const PATCHFILES &);
+	void Run();
 private:
-    stl::vector<PATCHFILES> m_fileList; /**< List of files to patch. */
 	CDiffWrapper m_diffWrapper; /**< DiffWrapper instance we use to create patch. */
 	CPatchDlg m_dlgPatch; /**< Dialog for selecting files and options. */
-	String m_sPatchFile; /**< Patch file path and filename. */
-	BOOL m_bOpenToEditor; /**< Is patch file opened to external editor? */
 };
 
 #endif	// _PATCHTOOL_H_

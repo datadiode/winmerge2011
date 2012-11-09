@@ -53,20 +53,24 @@ static void CopyTextStats(const file_data *, FileTextStats *);
 
 CDiffWrapper *CDiffWrapper::m_pActiveInstance = NULL;
 
+PATCHOPTIONS::PATCHOPTIONS()
+	: outputStyle(OUTPUT_NORMAL)
+	, nContext(0)
+	, bAddCommandline(true)
+	, bAppendFiles(false)
+{
+}
+
 /**
  * @brief Default constructor.
  * Initializes members and creates new FilterCommentsManager.
  */
 CDiffWrapper::CDiffWrapper(DiffList *pDiffList)
 : DIFFOPTIONS(NULL)
-, m_bAppendFiles(FALSE)
 , m_codepage(0)
 , m_pDiffList(pDiffList)
 , m_pMovedLines(NULL)
 {
-	m_patchOptions.outputStyle = OUTPUT_NORMAL;
-	m_patchOptions.nContext = 0;
-	m_patchOptions.bAddCommandline = true;
 	// character that ends a line.  Currently this is always `\n'
 	line_end_char = '\n';
 }
@@ -92,9 +96,9 @@ void CDiffWrapper::SetToDiffUtils()
 {
 	m_pActiveInstance = this;
 
-	output_style = m_patchOptions.outputStyle;
+	output_style = outputStyle;
 
-	context = m_patchOptions.nContext;
+	context = nContext;
 
 	if (nIgnoreWhitespace == WHITESPACE_IGNORE_CHANGE)
 		ignore_space_change_flag = 1;
@@ -170,15 +174,6 @@ void CDiffWrapper::SetCreatePatchFile(const String &filename)
 {
 	m_sPatchFile = filename;
 	string_replace(m_sPatchFile, _T("/"), _T("\\"));
-}
-
-/**
- * @brief Set options used for patch-file creation.
- * @param [in] options Pointer to structure having new options.
- */
-void CDiffWrapper::SetPatchOptions(const PATCHOPTIONS &options)
-{
-	m_patchOptions = options;
 }
 
 /**
@@ -582,7 +577,7 @@ bool CDiffWrapper::FixLastDiffRange(int leftBufferLines, int rightBufferLines, b
 String CDiffWrapper::FormatSwitchString()
 {
 	String switches;
-	switch (m_patchOptions.outputStyle)
+	switch (outputStyle)
 	{
 	case OUTPUT_CONTEXT:
 		switches = _T(" C");
@@ -610,10 +605,10 @@ String CDiffWrapper::FormatSwitchString()
 		break;
 	}
 
-	if (m_patchOptions.nContext > 0)
+	if (nContext > 0)
 	{
 		TCHAR tmpNum[12];
-		_itot(m_patchOptions.nContext, tmpNum, 10);
+		_itot(nContext, tmpNum, 10);
 		switches += tmpNum;
 	}
 
@@ -630,17 +625,6 @@ String CDiffWrapper::FormatSwitchString()
 		switches += _T("b");
 
 	return switches;
-}
-
-/**
- * @brief Enables/disables patch-file appending.
- * If the file for patch already exists then the patch will be appended to
- * existing file.
- * @param [in] bAppendFiles If TRUE patch will be appended to existing file.
- */
-void CDiffWrapper::SetAppendFiles(BOOL bAppendFiles)
-{
-	m_bAppendFiles = bAppendFiles;
 }
 
 /**
@@ -873,7 +857,7 @@ void CDiffWrapper::WritePatchFile(struct change * script, file_data * inf)
 	outfile = NULL;
 	if (!m_sPatchFile.empty())
 	{
-		LPCTSTR mode = m_bAppendFiles ? _T("a+") : _T("w+");
+		LPCTSTR mode = bAppendFiles ? _T("a+") : _T("w+");
 		outfile = _tfopen(m_sPatchFile.c_str(), mode);
 	}
 
@@ -884,7 +868,7 @@ void CDiffWrapper::WritePatchFile(struct change * script, file_data * inf)
 	}
 
 	// Print "command line"
-	if (m_patchOptions.bAddCommandline)
+	if (bAddCommandline)
 	{
 		String switches = FormatSwitchString();
 		_ftprintf(outfile, _T("diff%s %s %s\n"),

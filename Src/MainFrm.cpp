@@ -2311,23 +2311,25 @@ void CMainFrame::OnToolsGeneratePatch()
 	// Mergedoc active?
 	if (frame == FRAME_FILE)
 	{
-		CChildFrame *pDoc = static_cast<CChildFrame *>(pFrame);
+		CChildFrame *const pDoc = static_cast<CChildFrame *>(pFrame);
 		// If there are changes in files, tell user to save them first
 		if (pDoc->m_ptBuf[0]->IsModified() || pDoc->m_ptBuf[1]->IsModified())
 		{
 			LanguageSelect.MsgBox(IDS_SAVEFILES_FORPATCH, MB_ICONSTOP);
 			return;
 		}
-		patcher.AddFiles(
-			pDoc->m_strPath[0].c_str(), pDoc->m_wndFilePathBar.GetTitle(0).c_str(),
-			pDoc->m_strPath[1].c_str(), pDoc->m_wndFilePathBar.GetTitle(1).c_str());
+		PATCHFILES files;
+		files.lfile = pDoc->m_strPath[0];
+		files.pathLeft = pDoc->m_wndFilePathBar.GetTitle(0);
+		files.rfile = pDoc->m_strPath[1];
+		files.pathRight = pDoc->m_wndFilePathBar.GetTitle(1);
+		patcher.AddFiles(files);
 	}
 	// Dirview active
 	else if (frame == FRAME_FOLDER)
 	{
-		CDirFrame *pDoc = static_cast<CDirFrame *>(pFrame);
-		CDirView *pView = pDoc->m_pDirView;
-
+		CDirFrame *const pDoc = static_cast<CDirFrame *>(pFrame);
+		CDirView *const pView = pDoc->m_pDirView;
 		// Get selected items from folder compare
 		int ind = -1;
 		while ((ind = pView->GetNextItem(ind, LVNI_SELECTED)) != -1)
@@ -2345,31 +2347,27 @@ void CMainFrame::OnToolsGeneratePatch()
 					MB_ICONWARNING | MB_DONT_DISPLAY_AGAIN);
 				break;
 			}
-
+			PATCHFILES files;
 			// Format full paths to files (leftFile/rightFile)
-			String leftFile = item.GetLeftFilepath(pDoc->GetLeftBasePath());
-			if (!leftFile.empty())
-				leftFile = paths_ConcatPath(leftFile, item.left.filename);
-			String rightFile = item.GetRightFilepath(pDoc->GetRightBasePath());
-			if (!rightFile.empty())
-				rightFile = paths_ConcatPath(rightFile, item.right.filename);
-
 			// Format relative paths to files in folder compare
-			String leftpatch = item.left.path;
-			if (!leftpatch.empty())
-				leftpatch += _T('/');
-			leftpatch += item.left.filename;
-			String rightpatch = item.right.path;
-			if (!rightpatch.empty())
-				rightpatch += _T('/');
-			rightpatch += item.right.filename;
-			patcher.AddFiles(
-				leftFile.c_str(), leftpatch.c_str(),
-				rightFile.c_str(), rightpatch.c_str());
+			files.lfile = pDoc->GetLeftFilepath(item);
+			if (!files.lfile.empty())
+			{
+				files.lfile = paths_ConcatPath(files.lfile, item.left.filename);
+				files.pathLeft = paths_ConcatPath(item.left.path, item.left.filename);
+				string_replace(files.pathLeft, _T("\\"), _T("/"));
+			}
+			files.rfile = pDoc->GetRightFilepath(item);
+			if (!files.rfile.empty())
+			{
+				files.rfile = paths_ConcatPath(files.rfile, item.right.filename);
+				files.pathRight = paths_ConcatPath(item.right.path, item.right.filename);
+				string_replace(files.pathRight, _T("\\"), _T("/"));
+			}
+			patcher.AddFiles(files);
 		}
 	}
-	if (patcher.CreatePatch() && patcher.GetOpenToEditor())
-		OpenFileToExternalEditor(patcher.GetPatchFile().c_str());
+	patcher.Run();
 }
 
 /////////////////////////////////////////////////////////////////////////////

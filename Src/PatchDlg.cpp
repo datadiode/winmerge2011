@@ -150,7 +150,7 @@ void CPatchDlg::OnOK()
 	// multiple files.  Multiple files are selected from DirView.
 	// Only if single files selected, filenames are checked here.
 	// Filenames read from Dirview must be valid ones.
-	int selectCount = m_fileList.size();
+	size_t selectCount = m_fileList.size();
 	if (selectCount == 1)
 	{
 		PATH_EXISTENCE file1Exist = paths_DoesPathExist(m_file1.c_str());
@@ -209,7 +209,7 @@ void CPatchDlg::OnOK()
 		m_pCbFile1->SaveState(_T("Files\\DiffFile1"));
 		m_pCbFile2->SaveState(_T("Files\\DiffFile2"));
 	}
-	EndDialog(IDOK);
+	EndDialog(selectCount > 0 ? IDOK : IDCANCEL);
 }
 
 /** 

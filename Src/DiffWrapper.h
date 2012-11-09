@@ -116,6 +116,9 @@ struct PATCHOPTIONS
 	enum output_style outputStyle; /**< Patch file style. */
 	int nContext; /**< Number of context lines. */
 	bool bAddCommandline; /**< Add diff-style commandline to patch file. */
+	bool bAppendFiles; /**< Do we append to existing patch file? */
+protected:
+	PATCHOPTIONS();
 };
 
 /**
@@ -142,6 +145,7 @@ struct DIFFSTATUS
  */
 class CDiffWrapper
 	: public DIFFOPTIONS
+	, public PATCHOPTIONS
 	, public FilterCommentsManager
 	, public FilterList /**< Filter list for line filters. */
 {
@@ -152,9 +156,7 @@ public:
 	void RefreshFilters();
 	void RefreshOptions();
 	void SetCreatePatchFile(const String &filename);
-	void SetPatchOptions(const PATCHOPTIONS &);
 	void SetDetectMovedBlocks(bool bDetectMovedBlocks);
-	void SetAppendFiles(BOOL bAppendFiles);
 	void SetPaths(const String &filepath1, const String &filepath2);
 	void SetAlternativePaths(const String &altPath1, const String &altPath2);
 	void SetCodepage(int codepage) { m_codepage = codepage; }
@@ -189,7 +191,6 @@ protected:
 	int m_codepage; /**< Codepage used in line filter */
 
 private:
-	PATCHOPTIONS m_patchOptions;
 	String m_s1File; /**< Full path to first diff'ed file. */
 	String m_s2File; /**< Full path to second diff'ed file. */
 	String m_s1AlternativePath; /**< First file's alternative path (may be relative). */
@@ -197,7 +198,6 @@ private:
 	String m_sOriginalFile1; /**< First file's original (NON-TEMP) path. */
 	String m_sOriginalFile2; /**< Second file's original (NON-TEMP) path. */
 	String m_sPatchFile; /**< Full path to created patch file. */
-	BOOL m_bAppendFiles; /**< Do we append to existing patch file? */
 	DiffList *const m_pDiffList; /**< Pointer to external DiffList */
 	MovedLines *m_pMovedLines;
 };
