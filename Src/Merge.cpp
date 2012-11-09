@@ -368,6 +368,8 @@ bool CMergeApp::InitInstance()
  */
 int CMergeApp::ExitInstance() 
 {
+	// Deallocate custom parser associations
+	CCrystalTextView::FreeParserAssociations();
 	charsets_cleanup();
 	// Remove tempfolder
 	ClearTempfolder(env_GetTempPath());
@@ -438,6 +440,15 @@ void CMergeApp::InitializeSupplements()
 					LoadLibrary(path.c_str());
 				pch += cch + 1;
 			}
+		}
+		if (GetPrivateProfileSection(_T("Parsers"), buffer, _countof(buffer), ini.c_str()))
+		{
+			CCrystalTextView::ScanParserAssociations(buffer);
+		}
+		else
+		{
+			CCrystalTextView::DumpParserAssociations(buffer);
+			WritePrivateProfileSection(_T("Parsers"), buffer, ini.c_str());
 		}
 	}
 	else

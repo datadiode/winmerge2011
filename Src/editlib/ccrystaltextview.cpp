@@ -266,7 +266,7 @@ LRESULT CCrystalTextView::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 // Tabsize is commented out since we have only GUI setting for it now.
 // Not removed because we may later want to have per-filetype settings again.
 // See ccrystaltextview.h for table declaration.
-CCrystalTextView::TextDefinition CCrystalTextView::m_SourceDefs[] =
+CCrystalTextView::TextDefinition CCrystalTextView::m_StaticSourceDefs[] =
 {
 	SRC_PLAIN, _T ("Plain"), _T ("txt;doc;diz"), &ParseLinePlain, SRCOPT_AUTOINDENT, /*4,*/ _T (""), _T (""), _T (""),
 	SRC_ASP, _T ("ASP"), _T ("asp"), &ParseLineAsp, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T (""), _T (""), _T ("'"),
@@ -301,10 +301,60 @@ CCrystalTextView::TextDefinition CCrystalTextView::m_SourceDefs[] =
 	SRC_TEX, _T ("TEX"), _T ("tex;sty;clo;ltx;fd;dtx"), &ParseLineTex, SRCOPT_AUTOINDENT, /*4,*/ _T (""), _T (""), _T ("%"),
 	SRC_VERILOG, _T ("Verilog"), _T ("v;vh"), &ParseLineVerilog, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T ("/*"), _T ("*/"), _T ("//"),
 	SRC_XML, _T ("XML"), _T ("xml"), &ParseLineXml, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T ("<!--"), _T ("-->"), _T ("")
-};
+}, *CCrystalTextView::m_SourceDefs = m_StaticSourceDefs;
 
 /////////////////////////////////////////////////////////////////////////////
 // CCrystalTextView construction/destruction
+
+void CCrystalTextView::ScanParserAssociations(LPTSTR p)
+{
+	struct tagTextDefinition *defs = new tagTextDefinition[_countof(m_StaticSourceDefs)];
+	memcpy(defs, m_StaticSourceDefs, sizeof m_StaticSourceDefs);
+	m_SourceDefs = defs;
+	while (TCHAR *q = _tcschr(p, _T('=')))
+	{
+		const size_t r = _tcslen(q);
+		*q++ = _T('\0');
+		size_t i;
+		for (i = 0 ; i < _countof(m_StaticSourceDefs) ; ++i)
+		{
+			tagTextDefinition &def = defs[i];
+			if (_tcsicmp(def.name, p) == 0)
+			{
+				def.exts = _tcsdup(q);
+				break;
+			}
+		}
+		ASSERT(i < _countof(m_StaticSourceDefs));
+		p = q + r;
+	}
+}
+
+void CCrystalTextView::DumpParserAssociations(LPTSTR p)
+{
+	TextDefinition *def = m_SourceDefs;
+	do
+	{
+		p += wsprintf(p, _T("%-16s= %s"), def->name, def->exts) + 1;
+	} while (++def < m_SourceDefs + _countof(m_StaticSourceDefs));
+	*p = _T('\0');
+}
+
+void CCrystalTextView::FreeParserAssociations()
+{
+	if (m_SourceDefs != m_StaticSourceDefs)
+	{
+		size_t i;
+		for (i = 0 ; i < _countof(m_StaticSourceDefs) ; ++i)
+		{
+			TextDefinition &def = m_SourceDefs[i];
+			if (def.exts != m_StaticSourceDefs[i].exts)
+				free(const_cast<LPTSTR>(def.exts));
+		}
+		delete[] m_SourceDefs;
+		m_SourceDefs = m_StaticSourceDefs;
+	}
+}
 
 bool CCrystalTextView::DoSetTextType(TextDefinition *def)
 {
@@ -319,7 +369,7 @@ CCrystalTextView::TextDefinition *CCrystalTextView::GetTextType(LPCTSTR pszExt)
 	do if (PathMatchSpec(pszExt, def->exts))
 	{
 		return def;
-	} while (++def < m_SourceDefs + _countof(m_SourceDefs));
+	} while (++def < m_SourceDefs + _countof(m_StaticSourceDefs));
 	return NULL;
 }
 
@@ -337,7 +387,7 @@ bool CCrystalTextView::SetTextType(TextType enuType)
 	do if (def->type == enuType)
 	{
 		return SetTextType(def);
-	} while (++def < m_SourceDefs + _countof(m_SourceDefs));
+	} while (++def < m_SourceDefs + _countof(m_StaticSourceDefs));
 	return false;
 }
 

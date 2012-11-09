@@ -680,13 +680,13 @@ public :
 	typedef const struct tagTextDefinition
 	{
 		TextType type;
-		TCHAR name[256];
-		TCHAR exts[256];
+		LPCTSTR name;
+		LPCTSTR exts;
 		DWORD (CCrystalTextView::*ParseLineX)(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
 		DWORD flags;
-		TCHAR opencomment[8];
-		TCHAR closecomment[8];
-		TCHAR commentline[8];
+		LPCTSTR opencomment;
+		LPCTSTR closecomment;
+		LPCTSTR commentline;
 	} TextDefinition;
 
 	static const DWORD SRCOPT_INSERTTABS = 1;
@@ -704,9 +704,13 @@ public :
 
     //  Source type
     TextDefinition *m_CurSourceDef;
-    static TextDefinition m_SourceDefs[];
+    static TextDefinition m_StaticSourceDefs[];
+    static TextDefinition *m_SourceDefs;
     virtual bool DoSetTextType(TextDefinition *);
     static TextDefinition *GetTextType(LPCTSTR pszExt);
+    static void ScanParserAssociations(LPTSTR);
+    static void DumpParserAssociations(LPTSTR);
+    static void FreeParserAssociations();
     virtual bool SetTextType(LPCTSTR pszExt);
     virtual bool SetTextType(TextType enuType);
     virtual bool SetTextType(TextDefinition *);
