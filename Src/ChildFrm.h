@@ -218,7 +218,7 @@ public:
 			{ return m_ptBuf[file]->getEncoding(); }
 
 	bool SaveModified();
-	void SetTitle(LPCTSTR);
+	void SetTitle();
 
 // Implementation in MergeDocLineDiffs.cpp
 public:

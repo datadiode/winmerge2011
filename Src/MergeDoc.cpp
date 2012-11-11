@@ -2159,7 +2159,7 @@ void CChildFrame::UpdateHeaderPath(int pane)
 
 	m_wndFilePathBar.SetText(pane, sText.c_str(), m_ptBuf[pane]->IsModified(), m_nBufferType[pane]);
 
-	SetTitle(NULL);
+	SetTitle();
 }
 
 /**
@@ -2216,47 +2216,11 @@ void CChildFrame::SetEditedAfterRescan(int nBuffer)
 /**
  * @brief Update document filenames to title
  */
-void CChildFrame::SetTitle(LPCTSTR lpszTitle)
+void CChildFrame::SetTitle()
 {
-	const TCHAR pszSeparator[] = _T(" - ");
-	String sTitle;
-
-	if (lpszTitle)
-		sTitle = lpszTitle;
-	else
-	{
-		if (!m_strDesc[0].empty())
-			sTitle += m_strDesc[0];
-		else
-		{
-			String file;
-			String ext;
-			SplitFilename(m_strPath[0].c_str(), NULL, &file, &ext);
-			sTitle += file;
-			if (!ext.empty())
-			{
-				sTitle += _T(".");
-				sTitle += ext;
-			}
-		}
-
-		sTitle += pszSeparator;
-
-		if (!m_strDesc[1].empty())
-			sTitle += m_strDesc[1];
-		else
-		{
-			String file;
-			String ext;
-			SplitFilename(m_strPath[1].c_str(), NULL, &file, &ext);
-			sTitle += file;
-			if (!ext.empty())
-			{
-				sTitle += _T(".");
-				sTitle += ext;
-			}
-		}
-	}
+	string_format sTitle(_T("%s - %s"),
+		!m_strDesc[0].empty() ? m_strDesc[0].c_str() : PathFindFileName(m_strPath[0].c_str()),
+		!m_strDesc[1].empty() ? m_strDesc[1].c_str() : PathFindFileName(m_strPath[1].c_str()));
 	SetWindowText(sTitle.c_str());
 }
 

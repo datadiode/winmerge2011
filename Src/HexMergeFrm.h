@@ -69,8 +69,8 @@ public:
 public:	
 	void SetMergeViews(CHexMergeView * pLeft, CHexMergeView * pRight);
 
-	virtual bool SaveModified();
-	virtual void SetTitle(LPCTSTR lpszTitle);
+	bool SaveModified();
+	void SetTitle();
 
 // Implementation
 public:
