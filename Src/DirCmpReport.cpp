@@ -379,7 +379,7 @@ void DirCmpReport::GenerateXmlHeader()
 		lvc.pszText = columnName;
 		lvc.cchTextMax = _countof(columnName);
 		int logcol = m_pList->ColPhysToLog(currCol);
-		LPCTSTR colEl = m_pList->GetColRegValueNameBase(logcol);
+		LPCTSTR colEl = CDirView::f_cols[logcol].regName;
 		if (m_pList->GetColumn(currCol, &lvc))
 		{
 			WriteString(BeginEl(colEl).c_str());
@@ -404,7 +404,7 @@ void DirCmpReport::GenerateXmlHtmlContent(bool xml)
 		for (int currCol = 0; currCol < m_nColumns; currCol++)
 		{
 			int logcol = m_pList->ColPhysToLog(currCol);
-			LPCTSTR const colEl = xml ? m_pList->GetColRegValueNameBase(logcol) : _T("td");
+			LPCTSTR const colEl = xml ? CDirView::f_cols[logcol].regName : _T("td");
 			WriteString(BeginEl(colEl).c_str());
 			WriteStringEntityAware(m_pList->GetItemText(currRow, currCol).c_str());
 			WriteString(EndEl(colEl).c_str());

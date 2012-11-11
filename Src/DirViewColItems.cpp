@@ -251,10 +251,10 @@ static String ColNewerGet(const CDiffContext *, const void *p)
  * @param [in] bLeft Is the item left-size item?
  * @return String proper to show in the GUI.
  */
-static String GetVersion(const CDiffContext * pCtxt, const DIFFITEM * pdi, BOOL bLeft)
+static String GetVersion(const CDiffContext *pCtxt, const DIFFITEM *pdi, BOOL bLeft)
 {
-	DIFFITEM & di = const_cast<DIFFITEM &>(*pdi);
-	DiffFileInfo & dfi = bLeft ? di.left : di.right;
+	DIFFITEM &di = const_cast<DIFFITEM &>(*pdi);
+	DiffFileInfo &dfi = bLeft ? di.left : di.right;
 	if (!dfi.bVersionChecked)
 	{
 		pCtxt->UpdateVersion(di, bLeft);
@@ -269,7 +269,7 @@ static String GetVersion(const CDiffContext * pCtxt, const DIFFITEM * pdi, BOOL 
  * @return String to show in the column.
  */
 template<BOOL bLeft>
-static String ColVersionGet(const CDiffContext * pCtxt, const void *p)
+static String ColVersionGet(const CDiffContext *pCtxt, const void *p)
 {
 	const DIFFITEM &di = *static_cast<const DIFFITEM *>(p);
 	return GetVersion(pCtxt, &di, bLeft);
@@ -644,12 +644,3 @@ const CDirView::DirColInfo CDirView::f_cols[] =
  * @brief Count of all known columns
  */
 const int CDirView::g_ncols = _countof(CDirView::f_cols);
-
-/**
- * @brief Registry base value name for saving/loading info for this column
- */
-LPCTSTR CDirView::GetColRegValueNameBase(int col)
-{
-	ASSERT(col >= 0 && col < _countof(f_cols));
-	return f_cols[col].regName;
-}

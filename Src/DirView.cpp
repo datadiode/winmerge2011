@@ -584,8 +584,8 @@ HMENU CDirView::ListShellContextMenu(SIDE_TYPE side)
 		if (di.diffcode.diffcode == 0) // Invalid value, this must be special item
 			continue;
 		String currentDir = (side == SIDE_LEFT) ?
-			di.GetLeftFilepath(m_pFrame->GetLeftBasePath()) :
-			di.GetRightFilepath(m_pFrame->GetRightBasePath());
+			m_pFrame->GetLeftFilepath(di) :
+			m_pFrame->GetRightFilepath(di);
 		String filename = (side == SIDE_LEFT) ? di.left.filename : di.right.filename;
 		if (parentDir.empty()) // first iteration, initialize parentDir and pCurrFolder
 		{
@@ -1554,7 +1554,7 @@ void CDirView::SaveColumnWidths()
 		int phy = ColLogToPhys(i);
 		if (phy >= 0)
 		{
-			string_format sWidthKey(_T("WDirHdr_%s_Width"), GetColRegValueNameBase(i));
+			string_format sWidthKey(_T("WDirHdr_%s_Width"), f_cols[i].regName);
 			int w = GetColumnWidth(phy);
 			SettingStore.WriteProfileInt(_T("DirView"), sWidthKey.c_str(), w);
 		}
@@ -1741,7 +1741,7 @@ void CDirView::ResetColumnWidths()
 		int phy = ColLogToPhys(i);
 		if (phy >= 0)
 		{
-			string_format sWidthKey(_T("WDirHdr_%s_Width"), GetColRegValueNameBase(i));
+			string_format sWidthKey(_T("WDirHdr_%s_Width"), f_cols[i].regName);
 			SettingStore.WriteProfileInt(_T("DirView"), sWidthKey.c_str(), DefColumnWidth);
 		}
 	}
@@ -1768,7 +1768,7 @@ void CDirView::OnCopyLeftPathnames()
 				// EOL since it allows copying to console/command line.
 				if (GlobalSize(hMem) != 0)
 					file.WriteString(_T(" "), 1);
-				String spath = di.GetLeftFilepath(m_pFrame->GetLeftBasePath());
+				String spath = m_pFrame->GetLeftFilepath(di);
 				// If item is a folder then subfolder (relative to base folder)
 				// is in filename member.
 				spath = paths_ConcatPath(spath, di.left.filename);
@@ -1804,7 +1804,7 @@ void CDirView::OnCopyRightPathnames()
 				// EOL since it allows copying to console/command line.
 				if (GlobalSize(hMem) != 0)
 					file.WriteString(_T(" "), 1);
-				String spath = di.GetRightFilepath(m_pFrame->GetRightBasePath());
+				String spath = m_pFrame->GetRightFilepath(di);
 				// If item is a folder then subfolder (relative to base folder)
 				// is in filename member.
 				spath = paths_ConcatPath(spath, di.right.filename);
@@ -1840,7 +1840,7 @@ void CDirView::OnCopyBothPathnames()
 				// EOL since it allows copying to console/command line.
 				if (GlobalSize(hMem) != 0)
 					file.WriteString(_T(" "), 1);
-				String spath = di.GetLeftFilepath(m_pFrame->GetLeftBasePath());
+				String spath = m_pFrame->GetLeftFilepath(di);
 				// If item is a folder then subfolder (relative to base folder)
 				// is in filename member.
 				spath = paths_ConcatPath(spath, di.left.filename);
@@ -1853,7 +1853,7 @@ void CDirView::OnCopyBothPathnames()
 				// EOL since it allows copying to console/command line.
 				if (GlobalSize(hMem) != 0)
 					file.WriteString(_T(" "), 1);
-				String spath = di.GetRightFilepath(m_pFrame->GetRightBasePath());
+				String spath = m_pFrame->GetRightFilepath(di);
 				// If item is a folder then subfolder (relative to base folder)
 				// is in filename member.
 				spath = paths_ConcatPath(spath, di.right.filename);

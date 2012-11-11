@@ -217,9 +217,8 @@ private:
 	void ClearColumnOrders();
 	void ResetColumnOrdering();
 	void MoveColumn(int psrc, int pdest);
-	static LPCTSTR GetColRegValueNameBase(int col);
-	String ColGetTextToDisplay(const CDiffContext *pCtxt, int col, const DIFFITEM & di);
-	int ColSort(const CDiffContext *pCtxt, int col, const DIFFITEM & ldi, const DIFFITEM &rdi) const;
+	String ColGetTextToDisplay(const CDiffContext *pCtxt, int col, const DIFFITEM &di);
+	int ColSort(const CDiffContext *pCtxt, int col, const DIFFITEM &ldi, const DIFFITEM &rdi) const;
 // End DirViewCols.cpp
 
 // Implementation in DirViewColItems.cpp

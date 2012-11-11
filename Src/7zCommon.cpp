@@ -801,8 +801,8 @@ Merge7z::Envelope *CDirView::DirItemEnumerator::Enum(Item &item)
 	envelope->FullPath = sFilename;
 	envelope->FullPath.insert(0, _T("\\"));
 	envelope->FullPath.insert(0, m_bRight ?
-		di.GetRightFilepath(pDoc->GetRightBasePath()) :
-		di.GetLeftFilepath(pDoc->GetLeftBasePath()));
+		pDoc->GetRightFilepath(di) :
+		pDoc->GetLeftFilepath(di));
 
 	UINT32 Recurse = item.Mask.Recurse;
 
@@ -820,7 +820,7 @@ Merge7z::Envelope *CDirView::DirItemEnumerator::Enum(Item &item)
 					// Folder is not implied by some other file, and has
 					// not been enumerated so far, so enumerate it now!
 					envelope->Name = di.left.path;
-					envelope->FullPath = di.GetLeftFilepath(pDoc->GetLeftBasePath());
+					envelope->FullPath = pDoc->GetLeftFilepath(di);
 					implied = PVOID(2); // Don't enumerate same folder twice!
 					isSideLeft = false;
 					Recurse = 0;
@@ -839,7 +839,7 @@ Merge7z::Envelope *CDirView::DirItemEnumerator::Enum(Item &item)
 					// Folder is not implied by some other file, and has
 					// not been enumerated so far, so enumerate it now!
 					envelope->Name = di.right.path;
-					envelope->FullPath = di.GetRightFilepath(pDoc->GetRightBasePath());
+					envelope->FullPath = pDoc->GetRightFilepath(di);
 					implied = PVOID(2); // Don't enumerate same folder twice!
 					isSideRight = false;
 					Recurse = 0;
