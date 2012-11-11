@@ -434,10 +434,10 @@ protected:
 	void PutToClipboard(const String &);
 
     //  Drag-n-drop overrideable
-    virtual HGLOBAL PrepareDragData ();
-    virtual DWORD GetDropEffect ();
-    virtual void OnDropSource (DWORD de);
-	BOOL IsDraggingText () const { return m_bDraggingText; }
+    virtual HGLOBAL PrepareDragData();
+    virtual DWORD GetDropEffect();
+    virtual void OnDropSource(DWORD de);
+	BOOL IsDraggingText() const { return m_bDraggingText; }
 
     virtual COLORREF GetColor (int nColorIndex);
     virtual void GetLineColors (int nLineIndex, COLORREF & crBkgnd,
@@ -450,9 +450,8 @@ protected:
     virtual void DrawSingleLine (HSurface * pdc, const RECT & rect, int nLineIndex);
     virtual void DrawMargin (HSurface *pdc, const RECT & rect, int nLineIndex, int nLineNumber);
 
-    int GetCharWidthFromChar(TCHAR ch);
-    int GetCharWidthFromString(LPCTSTR lpsz);
-    int GetCharWidthFromDisplayableChar(const ViewableWhitespaceChars * lpspc, TCHAR ch);
+    int GetCharWidthFromChar(TCHAR);
+    int GetCharWidthFromDisplayableChar(TCHAR);
 
     BOOL m_bChWidthsCalculated[65536/256];
     int m_iChDoubleWidthFlags[65536/32];
@@ -718,13 +717,13 @@ public :
 
     // Operations
 public :
-    virtual void ReAttachToBuffer (CCrystalTextBuffer * pBuf = NULL);
-    virtual void AttachToBuffer (CCrystalTextBuffer * pBuf = NULL);
-    virtual void DetachFromBuffer ();
+    virtual void ReAttachToBuffer(CCrystalTextBuffer *pBuf = NULL);
+    virtual void AttachToBuffer(CCrystalTextBuffer *pBuf = NULL);
+    virtual void DetachFromBuffer();
 
     //  Buffer-view interaction, multiple views
     virtual CCrystalTextBuffer *LocateTextBuffer() = 0;
-    virtual void UpdateView (CCrystalTextView * pSource, CUpdateContext * pContext, DWORD dwFlags, int nLineIndex = -1);
+    virtual void UpdateView(CCrystalTextView *pSource, CUpdateContext *pContext, DWORD dwFlags, int nLineIndex = -1);
 
     //  Attributes
     const POINT & GetCursorPos () const;

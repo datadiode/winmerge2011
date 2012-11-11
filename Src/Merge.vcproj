@@ -942,10 +942,6 @@
 				>
 			</File>
 			<File
-				RelativePath="ViewableWhitespace.cpp"
-				>
-			</File>
-			<File
 				RelativePath="VSSHelper.cpp"
 				>
 			</File>

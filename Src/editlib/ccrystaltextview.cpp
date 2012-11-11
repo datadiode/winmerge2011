@@ -659,41 +659,23 @@ void CCrystalTextView::ScrollToLine(int nNewTopLine, BOOL bNoSmoothScroll, BOOL 
 		ScrollToSubLine(GetSubLineIndex(nNewTopLine), bNoSmoothScroll, bTrackScrollBar);
 }
 
-/** Append szadd to string str, and advance position curpos */
-static void AppendStringAdv(String & str, int & curpos, LPCTSTR szadd)
-{
-	str += szadd;
-	curpos += _tcslen(szadd);
-}
-
-/** Append escaped control char to string str, and advance position curpos */
-static void AppendEscapeAdv(String & str, int & curpos, TCHAR c)
-{
-	String::size_type curlen = str.size();
-	str.resize(curlen + 3);
-	curpos += wsprintf(&str.front() + curlen, _T("\t%02X"), static_cast<int>(c));
-}
-
 int CCrystalTextView::ExpandChars(LPCTSTR pszChars, int nOffset, int nCount, String &line, int nActualOffset)
 {
 	line.clear();
-	// Request whitespace characters for codepage ACP
-	// because that is the codepage used by ExtTextOut
-	const ViewableWhitespaceChars * lpspc = GetViewableWhitespaceChars(GetACP());
 
 	if (nCount <= 0)
 	{
 		return 0;
 	}
 
-	const int nTabSize = GetTabSize ();
+	const int nTabSize = GetTabSize();
 
 	pszChars += nOffset;
 	int nLength = nCount;
 
 	int i;
 	for (i = 0; i < nLength; i++)
-    {
+	{
 		TCHAR c = pszChars[i];
 		if (c == _T('\t'))
 			nCount += nTabSize - 1;
@@ -706,66 +688,60 @@ int CCrystalTextView::ExpandChars(LPCTSTR pszChars, int nOffset, int nCount, Str
 	int nCurPos = 0;
 
 	if (nCount > nLength || m_bViewTabs || m_bViewEols)
-    {
+	{
 		for (i = 0; i < nLength; i++)
 		{
 			if (pszChars[i] == _T('\t'))
 			{
+				TCHAR c = m_bViewTabs ? ViewableWhitespaceChars::c_tab : _T(' ');
 				int nSpaces = nTabSize - (nActualOffset + nCurPos) % nTabSize;
-				if (m_bViewTabs)
+				do
 				{
-					AppendStringAdv(line, nCurPos, lpspc->c_tab);
-					nSpaces--;
-				}
-				while (nSpaces > 0)
-				{
-					line += _T(' ');
+					line.push_back(c);
+					c = _T(' ');
 					nCurPos++;
 					nSpaces--;
-				}
+				} while (nSpaces > 0);
 			}
-			else if (pszChars[i] == ' ' && m_bViewTabs)
+			else if (pszChars[i] == _T(' ') && m_bViewTabs)
 			{
-				AppendStringAdv(line, nCurPos, lpspc->c_space);
+				line.push_back(ViewableWhitespaceChars::c_space);
+				nCurPos++;
 			}
-			else if (pszChars[i] == '\r' || pszChars[i] == '\n')
+			else if (pszChars[i] == _T('\r') || pszChars[i] == _T('\n'))
 			{
 				if (m_bViewEols)
 				{
-					if (pszChars[i] == '\n' && !m_bDistinguishEols && i+nOffset>0 && pszChars[i-1] == '\r')
+					if (m_bDistinguishEols)
 					{
-						// Ignore \n after \r
+						line.push_back(pszChars[i] == _T('\r') ?
+							ViewableWhitespaceChars::c_cr : ViewableWhitespaceChars::c_lf);
+						nCurPos++;
 					}
-					else if (pszChars[i] == '\r' && m_bDistinguishEols)
+					else if (i + nOffset == 0 || pszChars[i - 1] != _T('\r'))
 					{
-						AppendStringAdv(line, nCurPos, lpspc->c_cr);
-					}
-					else if (pszChars[i] == '\n' && m_bDistinguishEols)
-					{
-						AppendStringAdv(line, nCurPos, lpspc->c_lf);
-					}
-					else
-					{
-						AppendStringAdv(line, nCurPos, lpspc->c_eol);
+						line.push_back(ViewableWhitespaceChars::c_eol);
+						nCurPos++;
 					}
 				}
 			}
 			else if (pszChars[i] >= _T('\x00') && pszChars[i] <= _T('\x1F'))
 			{
-				AppendEscapeAdv(line, nCurPos, pszChars[i]);
+				line.append_sprintf(_T("\t%02X"), static_cast<int>(pszChars[i]));
+				nCurPos += 3;
 			}
 			else
 			{
-				line += pszChars[i];
+				line.push_back(pszChars[i]);
 				nCurPos += GetCharWidthFromChar(pszChars[i]) / GetCharWidth();
 			}
 		}
 	}
 	else
-    {
-		for (int i=0; i<nLength; ++i)
+	{
+		for (i = 0; i < nLength; ++i)
 		{
-			line += pszChars[i];
+			line.push_back(pszChars[i]);
 			nCurPos += GetCharWidthFromChar(pszChars[i]) / GetCharWidth();
 		}
 	}
@@ -777,7 +753,7 @@ int CCrystalTextView::ExpandChars(LPCTSTR pszChars, int nOffset, int nCount, Str
  */
 int CCrystalTextView::GetCharWidthFromChar(TCHAR ch)
 {
-	if (ch >= _T('\x00') && ch <= _T('\x1F') && ch != '\t')
+	if (ch >= _T('\x00') && ch <= _T('\x1F') && ch != _T('\t'))
 		return GetCharWidth() * 3;
 	// This assumes a fixed width font
 	// But the UNICODE case handles double-wide glyphs (primarily Chinese characters)
@@ -785,30 +761,14 @@ int CCrystalTextView::GetCharWidthFromChar(TCHAR ch)
 }
 
 /**
- * @brief Return width of specified string
- */
-int CCrystalTextView::GetCharWidthFromString(LPCTSTR lpsz)
-{
-	// This assumes a fixed width font
-	// But the UNICODE case handles double-wide glyphs (primarily Chinese characters)
-	int n = 0;
-	for (LPCTSTR p = lpsz; *p; ++p)
-		n += GetCharWidthUnicodeChar(*p);
-	return n;
-}
-
-/**
  * @brief Return width of displayable version of character
  *
  * Differs from GetCharWidthFromChar when viewable whitespace is involved
  */
-int CCrystalTextView::GetCharWidthFromDisplayableChar(const ViewableWhitespaceChars * lpspc, TCHAR ch)
+int CCrystalTextView::GetCharWidthFromDisplayableChar(TCHAR ch)
 {
-	if (ch == ' ')
-	{
-		if (m_bViewTabs)
-			return GetCharWidthFromString(lpspc->c_space);
-	}
+	if (ch == _T(' ') && m_bViewTabs)
+		ch = ViewableWhitespaceChars::c_space;
 	return GetCharWidthFromChar(ch);
 }
 
@@ -880,10 +840,10 @@ void CCrystalTextView::DrawLineHelperImpl(
 				int* pnWidths = new int[nCount + 2];
 				for ( ; i < nCount + ibegin ; i++)
 				{
-					if (line[i] == '\t') // Escape sequence leadin?
+					if (line[i] == _T('\t')) // Escape sequence leadin?
 					{
 						// Substitute a space narrowed to half the width of a character cell.
-						line[i] = ' ';
+						line[i] = _T(' ');
 						nSumWidth += pnWidths[i - ibegin] = nCharWidthNarrowed;
 						// 1st hex digit has normal width.
 						nSumWidth += pnWidths[++i - ibegin] = nCharWidth;
@@ -907,11 +867,10 @@ void CCrystalTextView::DrawLineHelperImpl(
 					else
 						pdc->SetBkColor(crBkgnd);
 
-					pdc->SelectObject(GetFont(GetItalic(nColorIndex),
-					GetBold(nColorIndex)));
+					pdc->SelectObject(GetFont(GetItalic(nColorIndex), GetBold(nColorIndex)));
 					// we are sure to have less than 4095 characters because all the chars are visible
 					VERIFY(pdc->ExtTextOut(ptOrigin.x, ptOrigin.y, ETO_CLIPPED,
-					&rcClip, line.c_str() + ibegin, nCount, pnWidths));
+						&rcClip, line.c_str() + ibegin, nCount, pnWidths));
 					// Draw rounded rectangles around control characters
 					pdc->SaveDC();
 					pdc->IntersectClipRect(rcClip.left, rcClip.top, rcClip.right, rcClip.bottom);
@@ -921,7 +880,7 @@ void CCrystalTextView::DrawLineHelperImpl(
 					for (int j = 0 ; j < nCount ; ++j)
 					{
 						// Assume narrowed space is converted escape sequence leadin.
-						if (line[ibegin + j] == ' ' && pnWidths[j] < nCharWidth)
+						if (line[ibegin + j] == _T(' ') && pnWidths[j] < nCharWidth)
 						{
 							pdc->RoundRect(x + 2, ptOrigin.y + 1,
 							x + 3 * nCharWidth - 2, ptOrigin.y + nLineHeight - 1,
@@ -993,9 +952,10 @@ void CCrystalTextView::DrawLineHelper(
 			if (nSelBegin < nSelEnd)
 			{
 				DrawLineHelperImpl(pdc, ptOrigin, rcClip,
-				nColorIndex & ~COLORINDEX_APPLYFORCE, nBgColorIndex & ~COLORINDEX_APPLYFORCE, 
-				GetColor(COLORINDEX_SELTEXT),
-				GetColor(COLORINDEX_SELBKGND),
+					nColorIndex & ~COLORINDEX_APPLYFORCE,
+					nBgColorIndex & ~COLORINDEX_APPLYFORCE, 
+					GetColor(COLORINDEX_SELTEXT),
+					GetColor(COLORINDEX_SELBKGND),
 					pszChars, nOffset + nSelBegin, nSelEnd - nSelBegin, nActualOffset);
 			}
 			if (nSelEnd < nCount)
@@ -1553,7 +1513,7 @@ void CCrystalTextView::GetHTMLLine(int nLineIndex, String &strHTML)
 
 	String strExpanded;
 	BOOL bLastCharSpace = FALSE;
-	const int nScreenChars = GetScreenChars ();
+	const int nScreenChars = GetScreenChars();
 
 	int nActualOffset = 0;
 
@@ -2011,7 +1971,6 @@ int CCrystalTextView::CharPosToPoint( int nLineIndex, int nCharPos, POINT &charP
 
 int CCrystalTextView::CursorPointToCharPos( int nLineIndex, const POINT &curPoint )
 {
-	const ViewableWhitespaceChars *lpspc = GetViewableWhitespaceChars(GetACP());
 	// calculate char pos out of point
 	const int nLength = GetLineLength(nLineIndex);
 	const int nScreenChars = GetScreenChars();
@@ -2046,7 +2005,7 @@ int CCrystalTextView::CursorPointToCharPos( int nLineIndex, const POINT &curPoin
 		}
 		else
 		{
-			int delta = GetCharWidthFromDisplayableChar(lpspc, szLine[nIndex]) / GetCharWidth();
+			int delta = GetCharWidthFromDisplayableChar(szLine[nIndex]) / GetCharWidth();
 			nXPos += delta;
 			nCurPos += delta;
 		}
@@ -2616,7 +2575,6 @@ BOOL CCrystalTextView::OnSetCursor(UINT nHitTest)
  */
 POINT CCrystalTextView::ClientToText(const POINT &point)
 {
-	const ViewableWhitespaceChars * lpspc = GetViewableWhitespaceChars(GetACP());
 	//BEGIN SW
 	const int nSubLineCount = GetSubLineCount();
 	const int nLineCount = GetLineCount();
@@ -2681,7 +2639,7 @@ POINT CCrystalTextView::ClientToText(const POINT &point)
 		}
 		else
 		{
-			n += GetCharWidthFromDisplayableChar(lpspc, pszLine[nIndex]) / GetCharWidth();
+			n += GetCharWidthFromDisplayableChar(pszLine[nIndex]) / GetCharWidth();
 			nCurPos++;
 		}
 		if (n > nPos && i == nSubLineOffset)
@@ -2729,7 +2687,6 @@ bool CCrystalTextView::IsValidTextPosY(int y)
 
 POINT CCrystalTextView::TextToClient(const POINT &point)
 {
-	const ViewableWhitespaceChars * lpspc = GetViewableWhitespaceChars(GetACP());
 	ASSERT_VALIDTEXTPOS(point);
 	LPCTSTR pszLine = GetLineChars (point.y);
 
@@ -2766,13 +2723,13 @@ POINT CCrystalTextView::TextToClient(const POINT &point)
 		if (pszLine[nIndex] == _T ('\t'))
 			pt.x += (nTabSize - pt.x % nTabSize);
 		else
-			pt.x += GetCharWidthFromDisplayableChar(lpspc, pszLine[nIndex]) / GetCharWidth();
+			pt.x += GetCharWidthFromDisplayableChar(pszLine[nIndex]) / GetCharWidth();
 	}
 	//BEGIN SW
 	pt.x-= nPreOffset;
 	//END SW
 
-	pt.x = (pt.x - m_nOffsetChar) * GetCharWidth () + GetMarginWidth();
+	pt.x = (pt.x - m_nOffsetChar) * GetCharWidth() + GetMarginWidth();
 	return pt;
 }
 
@@ -2861,7 +2818,6 @@ DWORD CCrystalTextView::ParseLine(DWORD dwCookie, int nLineIndex, TEXTBLOCK * pB
 
 int CCrystalTextView::CalculateActualOffset(int nLineIndex, int nCharIndex, BOOL bAccumulate)
 {
-	const ViewableWhitespaceChars * lpspc = GetViewableWhitespaceChars(GetACP());
 	const int nLength = GetLineLength (nLineIndex);
 	ASSERT(nCharIndex >= 0 && nCharIndex <= nLength);
 	LPCTSTR pszChars = GetLineChars (nLineIndex);
@@ -2898,7 +2854,7 @@ int CCrystalTextView::CalculateActualOffset(int nLineIndex, int nCharIndex, BOOL
 		if (pszChars[i] == _T ('\t'))
 			nOffset += (nTabSize - nOffset % nTabSize);
 		else
-			nOffset += GetCharWidthFromDisplayableChar(lpspc, pszChars[i]) / GetCharWidth();
+			nOffset += GetCharWidthFromDisplayableChar(pszChars[i]) / GetCharWidth();
 	}
 	if (bAccumulate)
 		return nOffset;
