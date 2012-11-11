@@ -34,12 +34,13 @@ public:
 	/** @brief One column's information. */
 	struct column
 	{
-		String name; /**< Column name */
-		String desc; /**< Description for column */
-		int log_col; /**< Logical (shown) order number */
-		int phy_col; /**< Physical (in memory) order number */
-		column(const String & colName, const String & dsc, int log, int phy)
-			: name(colName), desc(dsc), log_col(log), phy_col(phy)
+		WORD idName; /**< Column name */
+		WORD idDesc; /**< Description for column */
+		int log; /**< Logical (shown) order number */
+		int phy; /**< Physical (in memory) order number */
+		int def_phy;
+		column(WORD idName, WORD idDesc, int log, int phy, int def_phy)
+			: idName(idName), idDesc(idDesc), log(log), phy(phy), def_phy(def_phy)
 		{ } 
 	};
 	typedef stl::vector<column> ColumnArray;
@@ -47,27 +48,24 @@ public:
 // Construction
 public:
 	CDirColsDlg();   // standard constructor
-	void AddColumn(const String &name, const String &desc, int log, int phy = -1)
-		{ column c(name, desc, log, phy); m_cols.push_back(c); }
-	void AddDefColumn(const String &name, int log, int phy = -1)
-		{ column c(name, _T(""), log, phy); m_defCols.push_back(c); }
+	void AddColumn(WORD idName, WORD idDesc, int log, int phy, int def_phy)
+	{
+		column c(idName, idDesc, log, phy, def_phy);
+		m_cols.push_back(c);
+	}
 	const ColumnArray &GetColumns() const { return m_cols; }
 
 // Dialog Data
 	HListView *m_listColumns;
-	BOOL m_bReset;
+	bool m_bReset;
 
 // Implementation methods
 protected:
-	void InitList();
 	void LoadLists();
 	void SelectItem(int index);
-	void LoadDefLists();
-	void SortArrayToLogicalOrder();
 	void MoveItem(int index, int newIndex);
-	void SanitizeOrder();
 
-	static bool CompareColumnsByLogicalOrder( const column & el1, const column & el2 );
+	static bool CompareColumnsByLogicalOrder(const column &, const column &);
 
 	virtual BOOL OnInitDialog();
 	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
@@ -82,7 +80,6 @@ protected:
 	// Implementation data
 private:
 	ColumnArray m_cols; /**< Column list. */
-	ColumnArray m_defCols; /**< Default columns. */
 };
 
 //{{AFX_INSERT_LOCATION}}

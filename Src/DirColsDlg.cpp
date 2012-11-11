@@ -28,7 +28,7 @@ static char THIS_FILE[] = __FILE__;
  */
 CDirColsDlg::CDirColsDlg()
 	: ODialog(IDD_DIRCOLS)
-	, m_bReset(FALSE)
+	, m_bReset(false)
 	, m_listColumns(NULL)
 {
 }
@@ -85,17 +85,6 @@ LRESULT CDirColsDlg::OnNotify(NMHDR *pNMHDR)
 // CDirColsDlg message handlers
 
 /**
- * @brief Initialize listcontrol in dialog.
- */
-void CDirColsDlg::InitList()
-{
-	// Show selection across entire row.
-	// Also enable infotips.
-	m_listColumns->SetExtendedStyle(LVS_EX_CHECKBOXES | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP);
-	m_listColumns->InsertColumn(0, _T(""), LVCFMT_LEFT, 150);
-}
-
-/**
  * @brief Dialog initialisation. Load column lists.
  */
 BOOL CDirColsDlg::OnInitDialog() 
@@ -103,8 +92,13 @@ BOOL CDirColsDlg::OnInitDialog()
 	ODialog::OnInitDialog();
 	LanguageSelect.TranslateDialog(m_hWnd);
 	m_listColumns = static_cast<HListView *>(GetDlgItem(IDC_COLDLG_LIST));
-	InitList();
+	// Show selection across entire row, plus enable infotips
+	m_listColumns->SetExtendedStyle(LVS_EX_CHECKBOXES | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP);
+	m_listColumns->InsertColumn(0, _T(""));
 	LoadLists();
+	m_listColumns->SetColumnWidth(0, LVSCW_AUTOSIZE_USEHEADER);
+	// Sort m_cols so that it is in logical column order
+	stl::sort(m_cols.begin(), m_cols.end(), &CompareColumnsByLogicalOrder);
 	return TRUE;
 }
 
@@ -113,16 +107,16 @@ BOOL CDirColsDlg::OnInitDialog()
  */
 void CDirColsDlg::LoadLists()
 {
-	for (ColumnArray::iterator iter = m_cols.begin(); iter != m_cols.end(); ++iter)
+	int i = 0;
+	ColumnArray::iterator iter = m_cols.begin();
+	while (iter != m_cols.end())
 	{
-		const column & c = *iter;
-		int x = m_listColumns->InsertItem(m_listColumns->GetItemCount(),
-			c.name.c_str());
-		m_listColumns->SetItemData(x, c.log_col);
-		if (c.phy_col >= 0)
+		const column &c = *iter++;
+		int x = m_listColumns->InsertItem(i++, LanguageSelect.LoadString(c.idName).c_str());
+		m_listColumns->SetItemData(x, c.log);
+		if ((m_bReset ? c.def_phy : c.phy) >= 0)
 			m_listColumns->SetCheck(x, TRUE);
 	}
-	SortArrayToLogicalOrder();
 	// Set first item to selected state
 	SelectItem(0);
 }
@@ -137,30 +131,6 @@ void CDirColsDlg::SelectItem(int index)
 }
 
 /**
- * @brief Load listboxes on screen from defaults column array
- */
-void CDirColsDlg::LoadDefLists()
-{
-	for (ColumnArray::iterator iter = m_defCols.begin(); iter != m_defCols.end(); ++iter)
-	{
-		const column & c = *iter;
-		int x = m_listColumns->InsertItem(m_listColumns->GetItemCount(),
-			c.name.c_str());
-		m_listColumns->SetItemData(x, c.log_col);
-		if (c.phy_col >= 0)
-			m_listColumns->SetCheck(x, TRUE);
-	}
-	SortArrayToLogicalOrder();
-}
-/**
- * @brief Sort m_cols so that it is in logical column order.
- */
-void CDirColsDlg::SortArrayToLogicalOrder()
-{
-	stl::sort(m_cols.begin(), m_cols.end(), &CompareColumnsByLogicalOrder);
-}
-
-/**
  * @brief Compare column order of two columns.
  * @param [in] el1 First column to compare.
  * @param [in] el2 Second column to compare.
@@ -168,7 +138,7 @@ void CDirColsDlg::SortArrayToLogicalOrder()
  */
 bool CDirColsDlg::CompareColumnsByLogicalOrder( const column & el1, const column & el2 )
 {
-   return el1.log_col < el2.log_col;
+	return el1.log < el2.log;
 }
 
 /**
@@ -220,40 +190,16 @@ void CDirColsDlg::OnDown()
 }
 
 /**
- * @brief Move hidden columns as last items in the list.
- */
-void CDirColsDlg::SanitizeOrder()
-{
-	// Find last visible column.
-	int i = m_listColumns->GetItemCount() - 1;
-	for ( ; i >= 0; i--)
-	{
-		if (m_listColumns->GetCheck(i))
-			break;
-	}
-
-	// Move all hidden columns below last visible column.
-	for (int j = i; j >= 0; j--)
-	{
-		if (!m_listColumns->GetCheck(j))
-		{
-			MoveItem(j, i);
-			i--;
-		}
-	}
-}
-
-/**
  * @brief User clicked ok, so we update m_cols and close.
  */
 void CDirColsDlg::OnOK() 
 {
-	SanitizeOrder();
+	int phy = 0;
 	for (int i = 0; i < m_listColumns->GetItemCount(); i++)
 	{
 		BOOL checked = m_listColumns->GetCheck(i);
 		DWORD_PTR data = m_listColumns->GetItemData(i);
-		m_cols[data].phy_col = checked ? i : -1;
+		m_cols[data].phy = checked ? phy++ : -1;
 	}
 	EndDialog(IDOK);
 }
@@ -264,8 +210,8 @@ void CDirColsDlg::OnOK()
 void CDirColsDlg::OnDefaults()
 {
 	m_listColumns->DeleteAllItems();
-	m_bReset = TRUE;
-	LoadDefLists();
+	m_bReset = true;
+	LoadLists();
 }
 
 void CDirColsDlg::EnableUpDown()
@@ -289,7 +235,7 @@ void CDirColsDlg::OnLvnItemchangedColdlgList(NMLISTVIEW *pNM)
 		if (ind != -1)
 		{
 			DWORD_PTR data = m_listColumns->GetItemData(ind);
-			SetDlgItemText(IDC_COLDLG_DESC, m_cols[data].desc.c_str());
+			SetDlgItemText(IDC_COLDLG_DESC, LanguageSelect.LoadString(m_cols[data].idDesc).c_str());
 			EnableUpDown();
 		}
 	}

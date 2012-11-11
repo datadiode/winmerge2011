@@ -123,7 +123,7 @@ void CDirView::UpdateColumns(UINT lvcf)
 			lvc.fmt = colInfo.alignment;
 			if (lvc.mask & LVCF_WIDTH)
 			{
-				string_format sWidthKey(_T("WDirHdr_%s_Width"), GetColRegValueNameBase(i));
+				string_format sWidthKey(_T("WDirHdr_%s_Width"), f_cols[i].regName);
 				lvc.cx = max(10, SettingStore.GetProfileInt(_T("DirView"), sWidthKey.c_str(), DefColumnWidth));
 			}
 			SetColumn(phys, &lvc);
@@ -247,7 +247,7 @@ void CDirView::SaveColumnOrders()
 	ASSERT(m_invcolorder.size() == m_numcols);
     for (int i = 0; i < m_numcols; ++i)
 	{
-		string_format RegName(_T("WDirHdr_%s_Order"), GetColRegValueNameBase(i));
+		string_format RegName(_T("WDirHdr_%s_Order"), f_cols[i].regName);
 		int ord = m_colorder[i];
 		SettingStore.WriteProfileInt(_T("DirView"), RegName.c_str(), ord);
 	}
@@ -269,7 +269,7 @@ void CDirView::LoadColumnOrders()
 	int i;
 	for (i = 0; i < m_numcols; ++i)
 	{
-		string_format RegName(_T("WDirHdr_%s_Order"), GetColRegValueNameBase(i));
+		string_format RegName(_T("WDirHdr_%s_Order"), f_cols[i].regName);
 		int ord = SettingStore.GetProfileInt(_T("DirView"), RegName.c_str(), -2);
 		if (ord < -1 || ord >= m_numcols)
 			break;
@@ -416,18 +416,17 @@ void CDirView::OnEditColumns()
 	for (phy = 0; phy < m_dispcols; ++phy)
 	{
 		log = ColPhysToLog(phy);
-		dlg.AddColumn(GetColDisplayName(log), GetColDescription(log), log, phy);
+		const DirColInfo &col = f_cols[log];
+		dlg.AddColumn(col.idName, col.idDesc, log, phy, col.physicalIndex);
 	}
 	// Now add all the columns not currently displayed
 	for (log = 0; log < m_numcols; ++log)
 	{
-		String displayName = GetColDisplayName(log);
 		if (ColLogToPhys(log) == -1)
 		{
-			dlg.AddColumn(displayName, GetColDescription(log), log);
+			const DirColInfo &col = f_cols[log];
+			dlg.AddColumn(col.idName, col.idDesc, log, -1, col.physicalIndex);
 		}
-		// Add default order of columns for resetting to defaults
-		dlg.AddDefColumn(displayName, log, f_cols[log].physicalIndex);
 	}
 
 	if (LanguageSelect.DoModal(dlg) != IDOK)
@@ -443,11 +442,10 @@ void CDirView::OnEditColumns()
 	ClearColumnOrders();
 	m_dispcols = 0;
 	const int sortColumn = COptionsMgr::Get(OPT_DIRVIEW_SORT_COLUMN);
-	for (CDirColsDlg::ColumnArray::const_iterator iter = cols.begin();
-		iter != cols.end(); ++iter)
+	for (CDirColsDlg::ColumnArray::const_iterator iter = cols.begin(); iter != cols.end(); ++iter)
 	{
-		log = iter->log_col;
-		phy = iter->phy_col;
+		log = iter->log;
+		phy = iter->phy;
 		m_colorder[log] = phy;
 		if (phy >= 0)
 		{
