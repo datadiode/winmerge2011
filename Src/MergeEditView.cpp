@@ -193,14 +193,6 @@ void CMergeEditView::UpdateResources()
 	Invalidate();
 }
 
-void CMergeEditView::PrimeListWithFile()
-{
-	// Set the tab size now, just in case the options change...
-	// We don't update it at the end of OnOptions,
-	// we can update it safely now
-	SetTabSize(COptionsMgr::Get(OPT_TAB_SIZE));
-}
-
 /**
  * @brief Get diffs inside selection.
  * @param [out] firstDiff First diff inside selection

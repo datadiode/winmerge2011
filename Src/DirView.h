@@ -244,8 +244,6 @@ private:
 	static const int g_ncols;
 // End DirViewColItems.cpp
 
-private:
-
 public:
 	void UpdateFont();
 	void OnInitialUpdate();

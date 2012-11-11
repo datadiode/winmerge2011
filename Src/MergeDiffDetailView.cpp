@@ -85,16 +85,6 @@ void CMergeDiffDetailView::UpdateResources()
 {
 }
 
-BOOL CMergeDiffDetailView::PrimeListWithFile()
-{
-	// Set the tab size now, just in case the options change...
-	// We don't update it at the end of OnOptions, 
-	// we can update it safely now
-	SetTabSize(COptionsMgr::Get(OPT_TAB_SIZE));
-
-	return TRUE;
-}
-
 /**
  * @brief Set view's height.
  * @param [in] h new view height in lines

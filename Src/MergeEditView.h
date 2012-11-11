@@ -154,10 +154,8 @@ public:
 	void GetFullySelectedDiffs(int & firstDiff, int & lastDiff);
 	void UpdateResources();
 	virtual void RecalcVertScrollBar(BOOL bPositionOnly = FALSE);
-	BOOL IsModified() { return LocateTextBuffer()->IsModified(); }
-	void PrimeListWithFile();
-	virtual void UpdateSiblingScrollPos (BOOL bHorz);
-	virtual int GetAdditionalTextBlocks (int nLineIndex, TEXTBLOCK *pBuf);
+	virtual void UpdateSiblingScrollPos(BOOL bHorz);
+	virtual int GetAdditionalTextBlocks(int nLineIndex, TEXTBLOCK *pBuf);
 	virtual COLORREF GetColor(int nColorIndex);
 	virtual void GetLineColors (int nLineIndex, COLORREF & crBkgnd,
 			COLORREF & crText, BOOL & bDrawWhitespace);

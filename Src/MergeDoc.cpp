@@ -465,12 +465,6 @@ int CChildFrame::Rescan2(bool &bIdentical)
 		if (!m_diffList.HasSignificantDiffs())
 			bIdentical = true;
 
-		// just apply some options to the views
-		m_pView[MERGE_VIEW_LEFT]->PrimeListWithFile();
-		m_pView[MERGE_VIEW_RIGHT]->PrimeListWithFile();
-		m_pDetailView[0]->PrimeListWithFile();
-		m_pDetailView[1]->PrimeListWithFile();
-
 		// Now buffers data are valid
 		m_pView[MERGE_VIEW_LEFT]->ReAttachToBuffer();
 		m_pView[MERGE_VIEW_RIGHT]->ReAttachToBuffer();

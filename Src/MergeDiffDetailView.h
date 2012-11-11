@@ -60,8 +60,6 @@ private:
 public:
 	virtual CCrystalTextBuffer *LocateTextBuffer ();
 	void UpdateResources();
-	BOOL IsModified() { return FALSE; }
-	BOOL PrimeListWithFile();
 	void SetDisplayHeight(int h);
 	void OnUpdateCaret(bool bMove);
 	void DocumentsLoaded();
@@ -101,7 +99,7 @@ protected:
 // Implementation
 protected:
 	virtual ~CMergeDiffDetailView();
-	virtual int GetAdditionalTextBlocks (int nLineIndex, TEXTBLOCK *pBuf);
+	virtual int GetAdditionalTextBlocks(int nLineIndex, TEXTBLOCK *pBuf);
 	virtual COLORREF GetColor(int nColorIndex);
 	virtual void GetLineColors (int nLineIndex, COLORREF & crBkgnd,
                               COLORREF & crText, BOOL & bDrawWhitespace);
