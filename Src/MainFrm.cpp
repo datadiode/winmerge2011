@@ -2454,35 +2454,29 @@ LRESULT CMainFrame::OnWndMsg<WM_DROPFILES>(WPARAM wParam, LPARAM)
  */
 void CMainFrame::OpenFileToExternalEditor(LPCTSTR file)
 {
-	String sExtEditor = COptionsMgr::Get(OPT_EXT_EDITOR_CMD);
-	String sCmd, sExecutable;
-	GetDecoratedCmdLine(sExtEditor, sCmd, sExecutable);
+	string_format sCmd(_T("%s \"%s\""), COptionsMgr::Get(OPT_EXT_EDITOR_CMD).c_str(), file);
+	String sExecutable;
+	DecorateCmdLine(sCmd, sExecutable);
 	if (paths_PathIsExe(sExecutable.c_str()))
 	{
-		sCmd += _T(" \"");
-		sCmd += file;
-		sCmd += _T("\"");
-
 		STARTUPINFO startupInfo;
 		ZeroMemory(&startupInfo, sizeof startupInfo);
 		startupInfo.cb = sizeof startupInfo;
 		PROCESS_INFORMATION processInfo;
-
 		BOOL retVal = CreateProcess(NULL, const_cast<LPTSTR>(sCmd.c_str()),
 			NULL, NULL, FALSE, CREATE_DEFAULT_ERROR_MODE, NULL, NULL,
 			&startupInfo, &processInfo);
-
 		if (!retVal)
 		{
 			// Error invoking external editor
-			LanguageSelect.FormatMessage(IDS_ERROR_EXECUTE_FILE, sExtEditor.c_str()).MsgBox(MB_ICONSTOP);
+			LanguageSelect.FormatMessage(IDS_ERROR_EXECUTE_FILE, sExecutable.c_str()).MsgBox(MB_ICONSTOP);
 		}
 	}
 	else
 	{
 		// Don't know how to invoke external editor (it doesn't end with
 		// an obvious executable extension)
-		LanguageSelect.FormatMessage(IDS_UNKNOWN_EXECUTE_FILE, sExtEditor.c_str()).MsgBox(MB_ICONSTOP);
+		LanguageSelect.FormatMessage(IDS_UNKNOWN_EXECUTE_FILE, sExecutable.c_str()).MsgBox(MB_ICONSTOP);
 	}
 }
 
@@ -3144,8 +3138,7 @@ void CMainFrame::CheckinToClearCase(LPCTSTR strDestinationPath)
 	// checkin operation
 	String args = string_format(_T("checkin -nc \"%s\""), sname.c_str());
 	String vssPath = COptionsMgr::Get(OPT_VSS_PATH);
-	HANDLE hVss = RunIt(vssPath.c_str(), args.c_str(), TRUE, FALSE);
-	if (hVss != INVALID_HANDLE_VALUE)
+	if (HANDLE hVss = RunIt(vssPath.c_str(), args.c_str()))
 	{
 		WaitForSingleObject(hVss, INFINITE);
 		GetExitCodeProcess(hVss, &code);
@@ -3156,8 +3149,7 @@ void CMainFrame::CheckinToClearCase(LPCTSTR strDestinationPath)
 			{
 				// undo checkout operation
 				args = string_format(_T("uncheckout -rm \"%s\""), sname.c_str());
-				HANDLE hVss = RunIt(vssPath.c_str(), args.c_str(), TRUE, TRUE);
-				if (hVss != INVALID_HANDLE_VALUE)
+				if (HANDLE hVss = RunIt(vssPath.c_str(), args.c_str()))
 				{
 					WaitForSingleObject(hVss, INFINITE);
 					GetExitCodeProcess(hVss, &code);

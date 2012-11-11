@@ -161,27 +161,23 @@ void TestSplitFilename()
 }
 #endif
 
-HANDLE RunIt(LPCTSTR szExeFile, LPCTSTR szArgs, BOOL bMinimized /*= TRUE*/, BOOL bNewConsole /*= FALSE*/)
+HANDLE RunIt(LPCTSTR szExeFile, LPCTSTR szArgs)
 {
-    STARTUPINFO si = {0};
-	PROCESS_INFORMATION procInfo = {0};
-
-    si.cb = sizeof(STARTUPINFO);
-    si.lpDesktop = _T("");
-    si.dwFlags = STARTF_USESHOWWINDOW;
-    si.wShowWindow = (bMinimized) ? SW_MINIMIZE : SW_HIDE;
-
+	STARTUPINFO si;
+	ZeroMemory(&si, sizeof si);
+	PROCESS_INFORMATION pi;
+	si.cb = sizeof si;
+	si.dwFlags = STARTF_USESHOWWINDOW;
+	si.wShowWindow = SW_MINIMIZE;
 	TCHAR args[4096];
 	_sntprintf(args, _countof(args), _T("\"%s\" %s"), szExeFile, szArgs);
-    if (CreateProcess(szExeFile, args, NULL, NULL,
-		FALSE, NORMAL_PRIORITY_CLASS|(bNewConsole? CREATE_NEW_CONSOLE:0),
-                         NULL, _T(".\\"), &si, &procInfo))
+	if (CreateProcess(szExeFile, args, NULL, NULL, FALSE,
+			CREATE_NEW_CONSOLE, NULL, NULL, &si, &pi))
 	{
-		CloseHandle(procInfo.hThread);
-		return procInfo.hProcess;
+		CloseHandle(pi.hThread);
+		return pi.hProcess;
 	}
-
-	return INVALID_HANDLE_VALUE;
+	return NULL;
 }
 
 /**
@@ -191,7 +187,8 @@ HANDLE RunIt(LPCTSTR szExeFile, LPCTSTR szArgs, BOOL bMinimized /*= TRUE*/, BOOL
  */
 String GetModulePath(HMODULE hModule /* = NULL*/)
 {
-	TCHAR temp[MAX_PATH] = {0};
+	TCHAR temp[MAX_PATH];
+	temp[0] = _T('\0');
 	GetModuleFileName(hModule, temp, MAX_PATH);
 	return paths_GetParentPath(temp);
 }
@@ -203,83 +200,24 @@ String GetModulePath(HMODULE hModule /* = NULL*/)
  * Adds quotation marks around executable path if needed, but not
  * around commandline switches. For example (C:\p ath\ex.exe -p -o)
  * becomes ("C:\p ath\ex.exe" -p -o)
- * @param [in] sCmdLine commandline to decorate
- * @param [out] sDecoratedCmdLine decorated commandline
+ * @param [bi] sCmdLine commandline to decorate
  * @param [out] sExecutable Executable for validating file extension etc
  */
-void GetDecoratedCmdLine(String sCmdLine, String &sDecoratedCmdLine,
-	String &sExecutable)
+void DecorateCmdLine(String &sCmdLine, String &sExecutable)
 {
-	BOOL pathEndFound = FALSE;
-	BOOL addQuote = FALSE;
-	size_t prevPos = 0;
-
-	sDecoratedCmdLine.clear();
-	sExecutable.clear();
-
 	// Remove whitespaces from begin and and
 	// (Earlier code was cutting off last non-ws character)
 	string_trim_ws(sCmdLine);
-
-	String::size_type pos = sCmdLine.find(_T(' '));
+	String::size_type pos = sCmdLine.find_first_of(_T("\"/-"));
 	if (pos != String::npos)
 	{
-		// First space was before switch, we don't need "s
-		// (executable path didn't contain spaces)
-		if (sCmdLine[pos + 1] == '/' || sCmdLine[pos + 1] == '-')
-		{
-			pathEndFound = TRUE;
-		}
-		else
-		{
-			addQuote = TRUE;
-			sDecoratedCmdLine = _T('"');
-		}
-
-		// Loop until executable path end (first switch) is found
-		while (pathEndFound == FALSE)
-		{
-			prevPos = pos;
-			pos = sCmdLine.find(_T(' '), prevPos + 1);
-
-			if (pos != String::npos)
-			{
-				if (sCmdLine[pos + 1] == '/' || sCmdLine[pos + 1] == '-')
-				{
-					pathEndFound = TRUE;
-				}
-			}
-			else
-			{
-				pathEndFound = TRUE;
-			}
-		}
-
-		if (addQuote)
-		{
-			if (pos != String::npos)
-			{
-				sExecutable = sCmdLine.substr(0, pos);
-				sDecoratedCmdLine += sExecutable;
-				sDecoratedCmdLine += _T('"');
-				sDecoratedCmdLine += sCmdLine.substr(pos, sCmdLine.length() - pos);
-			}
-			else
-			{
-				sExecutable = sCmdLine;
-				sDecoratedCmdLine += sCmdLine;
-				sDecoratedCmdLine += _T('"');
-			}
-		}
-		else
-		{
-			sDecoratedCmdLine = sCmdLine;
-			sExecutable = sCmdLine;
-		}
+		sExecutable = sCmdLine.substr(0U, pos);
+		string_trim_ws(sExecutable);
+		sCmdLine.insert(sExecutable.length(), 1U, _T('"'));
+		sCmdLine.insert(0U, 1U, _T('"'));
 	}
 	else
 	{
-		sDecoratedCmdLine = sCmdLine;
 		sExecutable = sCmdLine;
 	}
 }

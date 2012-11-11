@@ -25,8 +25,7 @@ String GetModulePath(HMODULE hModule = NULL);
 
 size_t linelen(const char *string);
 
-HANDLE RunIt(LPCTSTR szExeFile, LPCTSTR szArgs, BOOL bMinimized = TRUE, BOOL bNewConsole = FALSE);
+HANDLE RunIt(LPCTSTR szExeFile, LPCTSTR szArgs);
 
-void GetDecoratedCmdLine(String sCmdLine, String &sDecoratedCmdLine,
-	String &sExecutable);
+void DecorateCmdLine(String &sDecoratedCmdLine, String &sExecutable);
 #endif

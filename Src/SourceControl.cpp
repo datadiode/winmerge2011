@@ -87,8 +87,7 @@ BOOL CMainFrame::SaveToVersionControl(String &strSavePath)
 				SetCurrentDirectory(path.c_str());
 			string_format args(_T("checkout \"%s/%s\""), m_vssHelper.GetProjectBase().c_str(), name.c_str());
 			String vssPath = COptionsMgr::Get(OPT_VSS_PATH);
-			HANDLE hVss = RunIt(vssPath.c_str(), args.c_str(), TRUE, FALSE);
-			if (hVss != INVALID_HANDLE_VALUE)
+			if (HANDLE hVss = RunIt(vssPath.c_str(), args.c_str()))
 			{
 				WaitForSingleObject(hVss, INFINITE);
 				DWORD code;
@@ -268,8 +267,7 @@ BOOL CMainFrame::SaveToVersionControl(String &strSavePath)
 			string_replace(m_strCCComment, _T("\""), _T("\\\""));
 			string_format args(_T("checkout -c \"%s\" \"%s\""), m_strCCComment.c_str(), name.c_str());
 			String vssPath = COptionsMgr::Get(OPT_VSS_PATH);
-			HANDLE hVss = RunIt(vssPath.c_str(), args.c_str(), TRUE, FALSE);
-			if (hVss != INVALID_HANDLE_VALUE)
+			if (HANDLE hVss = RunIt(vssPath.c_str(), args.c_str()))
 			{
 				WaitForSingleObject(hVss, INFINITE);
 				GetExitCodeProcess(hVss, &code);
