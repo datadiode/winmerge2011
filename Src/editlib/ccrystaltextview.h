@@ -439,11 +439,10 @@ protected:
     virtual void OnDropSource(DWORD de);
 	BOOL IsDraggingText() const { return m_bDraggingText; }
 
-    virtual COLORREF GetColor (int nColorIndex);
-    virtual void GetLineColors (int nLineIndex, COLORREF & crBkgnd,
-                                COLORREF & crText, BOOL & bDrawWhitespace);
-    virtual BOOL GetItalic (int nColorIndex);
-    virtual BOOL GetBold (int nColorIndex);
+    virtual COLORREF GetColor(int nColorIndex);
+    virtual void GetLineColors(int nLineIndex, COLORREF &crBkgnd, COLORREF &crText);
+    virtual BOOL GetItalic(int nColorIndex);
+    virtual BOOL GetBold(int nColorIndex);
 
     void DrawLineHelper(HSurface *pdc, POINT & ptOrigin, const RECT & rcClip, int nColorIndex, int nBgColorIndex,
                         COLORREF crText, COLORREF crBkgnd, LPCTSTR pszChars, int nOffset, int nCount, int &nActualOffset, POINT ptTextPos);
@@ -549,7 +548,7 @@ protected:
 	// (a wrapped line can consist of many screen lines
 	virtual void DrawScreenLine(HSurface *pdc, POINT &ptOrigin, const RECT &rcClip,
 		TEXTBLOCK *pBuf, int nBlocks, int &nActualItem,
-		COLORREF crText, COLORREF crBkgnd, BOOL bDrawWhitespace,
+		COLORREF crText, COLORREF crBkgnd,
 		LPCTSTR pszChars,
 		int nOffset, int nCount, int &nActualOffset, int nLineIndex);
 	//END SW

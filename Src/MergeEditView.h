@@ -157,10 +157,7 @@ public:
 	virtual void UpdateSiblingScrollPos(BOOL bHorz);
 	virtual int GetAdditionalTextBlocks(int nLineIndex, TEXTBLOCK *pBuf);
 	virtual COLORREF GetColor(int nColorIndex);
-	virtual void GetLineColors (int nLineIndex, COLORREF & crBkgnd,
-			COLORREF & crText, BOOL & bDrawWhitespace);
-	virtual void GetLineColors2 (int nLineIndex, DWORD ignoreFlags
-		, COLORREF & crBkgnd, COLORREF & crText, BOOL & bDrawWhitespace);
+	virtual void GetLineColors(int nLineIndex, COLORREF &crBkgnd, COLORREF &crText);
 	void GotoLine(UINT nLine, bool bRealLine, int pane);
 	int GetTopLine() { return m_nTopLine; }
 	int GetTopSubLine() { return m_nTopSubLine; }
@@ -181,7 +178,7 @@ protected:
 	virtual ~CMergeEditView();
 	virtual void DrawScreenLine(HSurface *pdc, POINT &ptOrigin, const RECT &rcClip,
 		TEXTBLOCK *pBuf, int nBlocks, int &nActualItem,
-		COLORREF crText, COLORREF crBkgnd, BOOL bDrawWhitespace,
+		COLORREF crText, COLORREF crBkgnd,
 		LPCTSTR pszChars,
 		int nOffset, int nCount, int &nActualOffset, int nLineIndex);
 	virtual void OnUpdateSibling(CCrystalTextView *pUpdateSource, BOOL bHorz);

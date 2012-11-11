@@ -186,53 +186,36 @@ COLORREF CMergeDiffDetailView::GetColor(int nColorIndex)
 }
 
 /// virtual, avoid coloring the whole diff with diff color 
-void CMergeDiffDetailView::GetLineColors(int nLineIndex, COLORREF & crBkgnd,
-                                COLORREF & crText, BOOL & bDrawWhitespace)
-{
-	DWORD ignoreFlags = 0;
-	GetLineColors2(nLineIndex, ignoreFlags, crBkgnd, crText, bDrawWhitespace);
-}
-/// virtual, avoid coloring the whole diff with diff color 
-void CMergeDiffDetailView::GetLineColors2(int nLineIndex, DWORD ignoreFlags,
-							COLORREF & crBkgnd, COLORREF & crText, BOOL & bDrawWhitespace)
+void CMergeDiffDetailView::GetLineColors(int nLineIndex, COLORREF &crBkgnd, COLORREF &crText)
 {
 	DWORD dwLineFlags = GetLineFlags(nLineIndex);
-
-	if (dwLineFlags & ignoreFlags)
-		dwLineFlags &= (~ignoreFlags);
-
 	// Line with WinMerge flag, 
 	// Lines with only the LF_DIFF/LF_TRIVIAL flags are not colored with Winmerge colors
 	if (dwLineFlags & (LF_WINMERGE_FLAGS & ~LF_DIFF & ~LF_TRIVIAL & ~LF_MOVED))
 	{
 		crText = COptionsMgr::Get(OPT_CLR_DIFF);
-		bDrawWhitespace = TRUE;
 
 		if (dwLineFlags & LF_GHOST)
 		{
 			crBkgnd = COptionsMgr::Get(OPT_CLR_DIFF_DELETED);
 		}
-
 	}
 	else
 	{
 		// If no syntax hilighting
 		if (!COptionsMgr::Get(OPT_SYNTAX_HIGHLIGHT))
 		{
-			crBkgnd = GetColor (COLORINDEX_BKGND);
-			crText = GetColor (COLORINDEX_NORMALTEXT);
-			bDrawWhitespace = FALSE;
+			crBkgnd = GetColor(COLORINDEX_BKGND);
+			crText = GetColor(COLORINDEX_NORMALTEXT);
 		}
 		else
 			// Line not inside diff, get colors from CrystalEditor
-			CCrystalTextView::GetLineColors(nLineIndex, crBkgnd,
-				crText, bDrawWhitespace);
+			CCrystalTextView::GetLineColors(nLineIndex, crBkgnd, crText);
 	}
 	if (nLineIndex < m_lineBegin || nLineIndex > m_lineEnd)
-		{
-			crBkgnd = GetColor (COLORINDEX_WHITESPACE);
-			crText = GetColor (COLORINDEX_WHITESPACE);
-			bDrawWhitespace = FALSE;
+	{
+		crBkgnd = GetColor(COLORINDEX_WHITESPACE);
+		crText = GetColor(COLORINDEX_WHITESPACE);
 	}
 }
 

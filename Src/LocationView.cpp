@@ -362,7 +362,6 @@ void CLocationView::OnDraw(HSurface *pdc)
 	COLORREF cr0 = CLR_NONE; // Left side color
 	COLORREF cr1 = CLR_NONE; // Right side color
 	COLORREF crt = CLR_NONE; // Text color
-	BOOL bwh = FALSE;
 
 	m_movedLines.clear();
 
@@ -399,12 +398,12 @@ void CLocationView::OnDraw(HSurface *pdc)
 		if ((nPrevEndY != iter->bottom_coord) || bInsideDiff)
 		{
 			// Draw left side block
-			pLeftView->GetLineColors2(iter->top_line, 0, cr0, crt, bwh);
+			pLeftView->GetLineColors(iter->top_line, cr0, crt);
 			RECT r0 = { m_leftBar.left, iter->top_coord, m_leftBar.right, iter->bottom_coord };
 			DrawRect(dc.m_pDC, r0, cr0, bInsideDiff);
 
 			// Draw right side block
-			pRightView->GetLineColors2(iter->top_line, 0, cr1, crt, bwh);
+			pRightView->GetLineColors(iter->top_line, cr1, crt);
 			RECT r1 = { m_rightBar.left, iter->top_coord, m_rightBar.right, iter->bottom_coord };
 			DrawRect(dc.m_pDC, r1, cr1, bInsideDiff);
 		}

@@ -970,11 +970,9 @@ void CCrystalTextView::DrawLineHelper(
 	}
 }
 
-void CCrystalTextView::GetLineColors(int nLineIndex,
-	COLORREF &crBkgnd, COLORREF &crText, BOOL &bDrawWhitespace)
+void CCrystalTextView::GetLineColors(int nLineIndex, COLORREF &crBkgnd, COLORREF &crText)
 {
 	DWORD dwLineFlags = GetLineFlags(nLineIndex);
-	bDrawWhitespace = TRUE;
 	crText = RGB(255, 255, 255);
 	if (dwLineFlags & LF_EXECUTION)
 	{
@@ -993,7 +991,6 @@ void CCrystalTextView::GetLineColors(int nLineIndex,
 	}
 	crBkgnd = CLR_NONE;
 	crText = CLR_NONE;
-	bDrawWhitespace = FALSE;
 }
 
 DWORD CCrystalTextView::GetParseCookie(int nLineIndex)
@@ -1107,7 +1104,7 @@ void CCrystalTextView::InvalidateScreenRect()
 void CCrystalTextView::DrawScreenLine(
 	HSurface *pdc, POINT &ptOrigin, const RECT &rcClip,
 	TEXTBLOCK *pBuf, int nBlocks, int &nActualItem, 
-	COLORREF crText, COLORREF crBkgnd, BOOL bDrawWhitespace,
+	COLORREF crText, COLORREF crBkgnd,
 	LPCTSTR pszChars, int nOffset, int nCount, int &nActualOffset, int nLineIndex)
 {
 	POINT ptTextPos = { nOffset, nLineIndex };
@@ -1172,7 +1169,7 @@ void CCrystalTextView::DrawScreenLine(
 
 	if (frect.right > frect.left)
 	{
-		pdc->SetBkColor(bDrawWhitespace ? crBkgnd : GetColor(COLORINDEX_WHITESPACE));
+		pdc->SetBkColor(crBkgnd == CLR_NONE ? GetColor(COLORINDEX_WHITESPACE) : crBkgnd);
 		pdc->ExtTextOut(0, 0, ETO_OPAQUE, &frect, NULL, 0);
 	}
 	// set origin to beginning of next screen line
@@ -1251,9 +1248,8 @@ void CCrystalTextView::DrawSingleLine(HSurface *pdc, const RECT & rc, int nLineI
 	}
 
 	//  Acquire the background color for the current line
-	BOOL bDrawWhitespace = FALSE;
 	COLORREF crBkgnd, crText;
-	GetLineColors (nLineIndex, crBkgnd, crText, bDrawWhitespace);
+	GetLineColors(nLineIndex, crBkgnd, crText);
 
 	int nLength = GetViewableLineLength(nLineIndex);
 	LPCTSTR pszChars = GetLineChars(nLineIndex);
@@ -1312,7 +1308,7 @@ void CCrystalTextView::DrawSingleLine(HSurface *pdc, const RECT & rc, int nLineI
 		DrawScreenLine(
 			pdc, origin, rc,
 			pBuf, nBlocks, nActualItem,
-			crText, crBkgnd, bDrawWhitespace,
+			crText, crBkgnd,
 			pszChars, anBreaks[i], anBreaks[i + 1] - anBreaks[i],
 			nActualOffset, nLineIndex);
 	}
@@ -1458,9 +1454,8 @@ void CCrystalTextView::GetHTMLLine(int nLineIndex, String &strHTML)
 	LPCTSTR pszChars = GetLineChars (nLineIndex);
 
 	// Acquire the background color for the current line
-	BOOL bDrawWhitespace = FALSE;
 	COLORREF crBkgnd, crText;
-	GetLineColors (nLineIndex, crBkgnd, crText, bDrawWhitespace);
+	GetLineColors(nLineIndex, crBkgnd, crText);
 
 	// Parse the line
 	DWORD dwCookie = GetParseCookie(nLineIndex - 1);

@@ -332,36 +332,16 @@ COLORREF CMergeEditView::GetColor(int nColorIndex)
  * @param [in] nLineIndex Index of line in view (NOT line in file)
  * @param [out] crBkgnd Backround color for line
  * @param [out] crText Text color for line
- */
-void CMergeEditView::GetLineColors(int nLineIndex, COLORREF & crBkgnd,
-                                COLORREF & crText, BOOL & bDrawWhitespace)
-{
-	DWORD ignoreFlags = 0;
-	GetLineColors2(nLineIndex, ignoreFlags, crBkgnd, crText, bDrawWhitespace);
-}
-
-/**
- * @brief Determine text and background color for line
- * @param [in] nLineIndex Index of line in view (NOT line in file)
- * @param [in] ignoreFlags Flags that caller wishes ignored
- * @param [out] crBkgnd Backround color for line
- * @param [out] crText Text color for line
  *
  * This version allows caller to suppress particular flags
  */
-void CMergeEditView::GetLineColors2(int nLineIndex, DWORD ignoreFlags, COLORREF & crBkgnd,
-                                COLORREF & crText, BOOL & bDrawWhitespace)
+void CMergeEditView::GetLineColors(int nLineIndex, COLORREF &crBkgnd, COLORREF &crText)
 {
 	DWORD dwLineFlags = GetLineFlags(nLineIndex);
-
-	if (dwLineFlags & ignoreFlags)
-		dwLineFlags &= (~ignoreFlags);
-
 	// Line inside diff
 	if (dwLineFlags & LF_WINMERGE_FLAGS)
 	{
 		crText = m_cachedColors.clrDiffText;
-		bDrawWhitespace = true;
 		bool lineInCurrentDiff = IsLineInCurrentDiff(nLineIndex);
 
 		if (dwLineFlags & LF_DIFF)
@@ -424,21 +404,19 @@ void CMergeEditView::GetLineColors2(int nLineIndex, DWORD ignoreFlags, COLORREF 
 		if (!COptionsMgr::Get(OPT_SYNTAX_HIGHLIGHT))
 		{
 			// If no syntax hilighting, get windows default colors
-			crBkgnd = GetColor (COLORINDEX_BKGND);
-			crText = GetColor (COLORINDEX_NORMALTEXT);
-			bDrawWhitespace = false;
+			crBkgnd = GetColor(COLORINDEX_BKGND);
+			crText = GetColor(COLORINDEX_NORMALTEXT);
 		}
 		else
 			// Syntax highlighting, get colors from CrystalEditor
-			CCrystalEditViewEx::GetLineColors(nLineIndex, crBkgnd,
-				crText, bDrawWhitespace);
+			CCrystalEditViewEx::GetLineColors(nLineIndex, crBkgnd, crText);
 	}
 }
 
 void CMergeEditView::DrawScreenLine(
 	HSurface *pdc, POINT &ptOrigin, const RECT &rcClip,
 	TEXTBLOCK *pBuf, int nBlocks, int &nActualItem,
-	COLORREF crText, COLORREF crBkgnd, BOOL bDrawWhitespace,
+	COLORREF crText, COLORREF crBkgnd,
 	LPCTSTR pszChars, int nOffset, int nCount, int &nActualOffset, int nLineIndex)
 {
 	const int nLineHeight = GetLineHeight();
@@ -447,7 +425,7 @@ void CMergeEditView::DrawScreenLine(
 	frect.bottom = frect.top + nLineHeight;
 
 	CCrystalTextView::DrawScreenLine(pdc, ptOrigin, rcClip, pBuf, nBlocks,
-		nActualItem, crText, crBkgnd, bDrawWhitespace, pszChars, nOffset,
+		nActualItem, crText, crBkgnd, pszChars, nOffset,
 		nCount, nActualOffset, nLineIndex);
 
 	if (nLineIndex != -1)
