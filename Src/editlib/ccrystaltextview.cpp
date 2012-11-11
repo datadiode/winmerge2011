@@ -1333,51 +1333,31 @@ void CCrystalTextView::DrawSingleLine(HSurface *pdc, const RECT & rc, int nLineI
 /**
  * @brief Escape special characters
  * @param [in]      strText The text to escape
- * @param [in, out] bLastCharSpace Whether last char processed was white space
  * @param [in, out] nNonbreakChars The number of non-break characters in the text
  * @param [in]      nScreenChars   The maximum number of characters to display per line
  * @return The escaped text
  */
-static String EscapeHTML(LPCTSTR pch, BOOL & bLastCharSpace, int nScreenChars)
+static String EscapeHTML(LPCTSTR pch, int nScreenChars)
 {
 	String strHTML;
 	while (TCHAR ch = *pch++)
 	{
 		switch (ch)
 		{
-		case '&':
+		case _T('&'):
 			strHTML += _T("&amp;");
-			bLastCharSpace = FALSE;
 			break;
-		case '<':
+		case _T('<'):
 			strHTML += _T("&lt;");
-			bLastCharSpace = FALSE;
 			break;
-		case '>':
+		case _T('>'):
 			strHTML += _T("&gt;");
-			bLastCharSpace = FALSE;
 			break;
-		/*case 0xB7:
-		case 0xBB:
-			strHTML += ch;
-			strHTML += _T("<wbr>");
-			bLastCharSpace = FALSE;
-			break;*/
-		case ' ':
-			if (bLastCharSpace)
-			{
-				strHTML += _T("\xA0"); //_T("&nbsp;");
-				bLastCharSpace = FALSE;
-			}
-			else
-			{
-				strHTML += _T("\xA0");
-				bLastCharSpace = TRUE;
-			}
-			break;
+		case _T(' '):
+			ch = _T('\xA0');
+			// fall through
 		default:
 			strHTML += ch;
-			bLastCharSpace = FALSE;
 			break;
 		}
 	}
@@ -1512,7 +1492,6 @@ void CCrystalTextView::GetHTMLLine(int nLineIndex, String &strHTML)
 	///////
 
 	String strExpanded;
-	BOOL bLastCharSpace = FALSE;
 	const int nScreenChars = GetScreenChars();
 
 	int nActualOffset = 0;
@@ -1530,7 +1509,7 @@ void CCrystalTextView::GetHTMLLine(int nLineIndex, String &strHTML)
 			strHTML += _T("<span ");
 			GetHTMLAttribute(pBuf[i].m_nColorIndex, pBuf[i].m_nBgColorIndex, crText, crBkgnd, strHTML);
 			strHTML += _T(">");
-			strHTML += EscapeHTML(strExpanded.c_str(), bLastCharSpace, nScreenChars);
+			strHTML += EscapeHTML(strExpanded.c_str(), nScreenChars);
 			strHTML += _T("</span>");
 		}
 		i = j;
