@@ -208,7 +208,11 @@ void DecorateCmdLine(String &sCmdLine, String &sExecutable)
 	// Remove whitespaces from begin and and
 	// (Earlier code was cutting off last non-ws character)
 	string_trim_ws(sCmdLine);
-	String::size_type pos = sCmdLine.find_first_of(_T("\"/-"));
+	String::size_type pos = 0;
+	do
+	{
+		pos = sCmdLine.find_first_of(_T("\"/-"), pos + 1);
+	} while (pos != String::npos && sCmdLine[pos - 1] != _T(' '));
 	if (pos != String::npos)
 	{
 		sExecutable = sCmdLine.substr(0U, pos);
