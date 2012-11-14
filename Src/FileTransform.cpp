@@ -24,14 +24,20 @@ static HWND NTAPI AllocConsoleHidden(LPCTSTR lpTitle)
 	TCHAR path[MAX_PATH];
 	GetSystemDirectory(path, MAX_PATH);
 	PathAppend(path, _T("ping.exe -n 2 127.0.0.1"));
+	HWND hWnd = NULL;
 	if (CreateProcess(NULL, path, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi))
 	{
-		Sleep(200);
-		AttachConsole(pi.dwProcessId);
+    	DWORD dwExitCode;
+		do
+		{
+			Sleep(100);
+			GetExitCodeProcess(pi.hProcess, &dwExitCode);
+		} while (!AttachConsole(pi.dwProcessId) && dwExitCode == STILL_ACTIVE);
+        hWnd = GetConsoleWindow();
 		CloseHandle(pi.hThread);
 		CloseHandle(pi.hProcess);
 	}
-	return ::GetConsoleWindow();
+	return hWnd;
 }
 
 static BOOL WINAPI ConsoleCtrlHandler(DWORD CtrlType)
