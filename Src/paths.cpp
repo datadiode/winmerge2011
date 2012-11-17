@@ -374,10 +374,44 @@ bool paths_EnsurePathExist(LPCTSTR path)
 bool paths_PathIsExe(LPCTSTR path)
 {
 	LPCTSTR ext = PathFindExtension(path);
-	if (int len = lstrlen(ext))
+	static const TCHAR extensions[] = _T("EXE;COM;PIF;CMD;BAT;SCF;SCR");
+	return *ext == _T('.') && PathMatchSpec(ext + 1, extensions);
+}
+
+/**
+ * @brief paths_CompactPath
+ */
+void paths_CompactPath(HEdit *pEdit, String &path)
+{
+	// we want to keep the first and the last path component, and in between,
+	// as much characters as possible from the right
+	// PathCompactPath keeps, in between, as much characters as possible from the left
+	// so we reverse everything between the first and the last component before calling PathCompactPath
+	if (LPTSTR pathWithoutRoot = PathSkipRoot(path.c_str()))
+		_tcsrev(pathWithoutRoot);
+
+	// resize to at least MAX_PATH characters
+	if (path.size() < MAX_PATH)
+		path.resize(MAX_PATH);
+
+	// get a device context object
+	if (HSurface *pDC = pEdit->GetDC())
 	{
-		ext = StrStrI(_T(".exe.com.pif.cmd.bat.scf.scr"), ext);
-		return ext && ext[len] <= '.';
+		RECT rect;
+		pEdit->GetRect(&rect);
+		// and use the correct font
+		HGdiObj *pFontOld = pDC->SelectObject(pEdit->GetFont());
+		pDC->PathCompactPath(&path.front(), rect.right - rect.left);
+		// set old font back
+		pDC->SelectObject(pFontOld);
+		pEdit->ReleaseDC(pDC);
 	}
-	return false;
+
+	// downsize to reflect the actual length
+	path.resize(_tcslen(path.c_str()));
+
+	// we reverse back everything between the first and the last component
+	// it works OK as "..." reversed = "..." again
+	if (LPTSTR pathWithoutRoot = PathSkipRoot(path.c_str()))
+		_tcsrev(pathWithoutRoot);
 }

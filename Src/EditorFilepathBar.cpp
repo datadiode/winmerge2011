@@ -102,53 +102,7 @@ static void RefreshDisplayText(HEdit *pEdit, LPCTSTR szOriginalText)
 	const BOOL bModify = pEdit->GetModify();
 	if (bModify && (pEdit->GetStyle() & ES_READONLY) != 0)
 		line.insert(0, _T("* "));
-
-	// we want to keep the first and the last path component, and in between,
-	// as much characters as possible from the right
-	// PathCompactPath keeps, in between, as much characters as possible from the left
-	// so we reverse everything between the first and the last component before calling PathCompactPath
-	int iBeginLast = line.rfind(_T('\\'));
-	int iEndIntro = line.find(_T('\\'));
-	if (iBeginLast >= 0 && iEndIntro != iBeginLast)
-	{
-		String textToReverse = line.substr(iEndIntro + 1, iBeginLast -
-				(iEndIntro + 1));
-		_tcsrev(&textToReverse[0]);
-		line = line.substr(0, iEndIntro + 1) + textToReverse + line.substr(iBeginLast);
-	}
-
-	// compact the path
-	RECT rect;
-	pEdit->GetRect(&rect);
-
-	// resize to at least MAX_PATH characters
-	if (line.size() < MAX_PATH)
-		line.resize(MAX_PATH);
-
-	// get a device context object
-	if (HSurface *pDC = pEdit->GetDC())
-	{
-		// and use the correct font
-		HGdiObj *pFontOld = pDC->SelectObject(pEdit->GetFont());
-		pDC->PathCompactPath(&line.front(), rect.right - rect.left);
-		// set old font back
-		pDC->SelectObject(pFontOld);
-		pEdit->ReleaseDC(pDC);
-	}
-	// downsize to reflect the actual length
-	line.resize(_tcslen(line.c_str()));
-
-	// we reverse back everything between the first and the last component
-	// it works OK as "..." reversed = "..." again
-	iBeginLast = line.rfind('\\');
-	iEndIntro = line.find('\\');
-	if (iBeginLast >= 0 && iEndIntro != iBeginLast)
-	{
-		++iEndIntro;
-		String textToReverse = line.substr(iEndIntro, iBeginLast - iEndIntro);
-		_tcsrev(&textToReverse[0]);
-		line = line.substr(0, iEndIntro) + textToReverse + line.substr(iBeginLast);
-	}
+	paths_CompactPath(pEdit, line);
 	pEdit->SetWindowText(line.c_str());
 	pEdit->SetModify(bModify);
 }
