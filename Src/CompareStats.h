@@ -11,7 +11,7 @@
 #define _COMPARESTATS_H_
 
 struct DIFFITEM;
-
+class CDiffContext;
 
 /**
  * @brief Class holding directory compare stats.
@@ -70,6 +70,8 @@ public:
 	}
 	int GetCount(CompareStats::RESULT result) const;
 	int GetComparedItems() const { return m_nComparedItems; }
+	String GetLeftPath(CDiffContext *) const;
+	String GetRightPath(CDiffContext *) const;
 	void Reset();
 	static RESULT GetColImage(const DIFFITEM *);
 
@@ -78,6 +80,7 @@ private:
 	long m_counts[N_DIFFIMG]; /**< Table storing result counts */
 	long m_nTotalItems; /**< Total items found to compare */
 	long m_nComparedItems; /**< Compared items so far */
+	const DIFFITEM *m_pCurDiffItem;
 };
 
 #endif // _COMPARESTATS_H_

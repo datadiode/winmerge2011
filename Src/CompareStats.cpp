@@ -8,6 +8,7 @@
 
 #include "StdAfx.h"
 #include "DiffItem.h"
+#include "DiffContext.h"
 #include "CompareStats.h"
 
 /** 
@@ -35,6 +36,7 @@ void CompareStats::AddItem(const DIFFITEM *di)
 	InterlockedIncrement(&m_counts[res]);
 	InterlockedIncrement(&m_nComparedItems);
 	assert(m_nComparedItems <= m_nTotalItems);
+	m_pCurDiffItem = di;
 }
 
 /** 
@@ -47,6 +49,16 @@ int CompareStats::GetCount(CompareStats::RESULT result) const
 	return m_counts[result];
 }
 
+String CompareStats::GetLeftPath(CDiffContext *ctxt) const
+{
+	return ctxt->GetLeftFilepathAndName(m_pCurDiffItem);
+}
+
+String CompareStats::GetRightPath(CDiffContext *ctxt) const
+{
+	return ctxt->GetRightFilepathAndName(m_pCurDiffItem);
+}
+
 /** 
  * @brief Reset comparestats.
  * Use this function to reset stats before new compare.
@@ -56,6 +68,7 @@ void CompareStats::Reset()
 	m_nTotalItems = 0;
 	m_nComparedItems = 0;
 	ZeroMemory(m_counts, sizeof m_counts);
+	m_pCurDiffItem = NULL;
 }
 
 /**

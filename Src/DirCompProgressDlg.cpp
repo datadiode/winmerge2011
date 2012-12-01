@@ -14,6 +14,7 @@
 #include "DirFrame.h"
 #include "CompareStats.h"
 #include "CompareStatisticsDlg.h"
+#include "paths.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -114,12 +115,31 @@ void DirCompProgressDlg::OnTimer(UINT_PTR nIDEvent)
 	if (nIDEvent == IDT_UPDATE)
 	{
 		const CompareStats *const pCompareStats = m_pDirDoc->GetCompareStats();
-		const int totalItems = pCompareStats->GetTotalItems();
-		const int comparedItems = pCompareStats->GetComparedItems();
-		SetDlgItemInt(IDC_ITEMSTOTAL, totalItems);
-		SetDlgItemInt(IDC_ITEMSCOMPARED, comparedItems);
-		SendDlgItemMessage(IDC_PROGRESSCOMPARE, PBM_SETRANGE32, 0, totalItems);
-		SendDlgItemMessage(IDC_PROGRESSCOMPARE, PBM_SETPOS, comparedItems);
-		m_pStatsDlg->Update();
+		if (const int totalItems = pCompareStats->GetTotalItems())
+		{
+			SetDlgItemInt(IDC_ITEMSTOTAL, totalItems);
+			SendDlgItemMessage(IDC_PROGRESSCOMPARE, PBM_SETRANGE32, 0, totalItems);
+			if (const int comparedItems = pCompareStats->GetComparedItems())
+			{
+				CDiffContext *ctxt = m_pDirDoc->GetDiffContext();
+				SetDlgItemInt(IDC_ITEMSCOMPARED, comparedItems);
+				SendDlgItemMessage(IDC_PROGRESSCOMPARE, PBM_SETPOS, comparedItems);
+				if (HEdit *pEdit = static_cast<HEdit *>(GetDlgItem(IDC_LEFT_EDIT)))
+				{
+					String path = pCompareStats->GetLeftPath(ctxt);
+					path.erase(0, paths_UndoMagic(&path.front()) - path.c_str());
+					paths_CompactPath(pEdit, path);
+					pEdit->SetWindowText(path.c_str());
+				}
+				if (HEdit *pEdit = static_cast<HEdit *>(GetDlgItem(IDC_RIGHT_EDIT)))
+				{
+					String path = pCompareStats->GetRightPath(ctxt);
+					path.erase(0, paths_UndoMagic(&path.front()) - path.c_str());
+					paths_CompactPath(pEdit, path);
+					pEdit->SetWindowText(path.c_str());
+				}
+			}
+			m_pStatsDlg->Update();
+		}
 	}
 }
