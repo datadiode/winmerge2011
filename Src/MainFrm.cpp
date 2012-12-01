@@ -1246,7 +1246,7 @@ int CMainFrame::HandleReadonlySave(String &strSavePath, BOOL bMultiFile, BOOL &b
 		int nVerSys = COptionsMgr::Get(OPT_VCS_SYSTEM);
 		if (nVerSys != VCS_NONE)
 		{
-			BOOL bRetVal = SaveToVersionControl(strSavePath);
+			BOOL bRetVal = SaveToVersionControl(strSavePath.c_str());
 			if (bRetVal)
 				return IDYES;
 			else
@@ -1447,13 +1447,13 @@ bool CMainFrame::DoFileOpen(
 	if (attrLeft & FILE_ATTRIBUTE_DIRECTORY)
 	{
 		if (!paths_EndsWithSlash(filelocLeft.filepath.c_str()))
-			filelocLeft.filepath += '\\';
+			filelocLeft.filepath.push_back(_T('\\'));
 		dwLeftFlags &= ~FFILEOPEN_DETECT;
 	}
 	if (attrRight & FILE_ATTRIBUTE_DIRECTORY)
 	{
 		if (!paths_EndsWithSlash(filelocRight.filepath.c_str()))
-			filelocRight.filepath += '\\';
+			filelocRight.filepath.push_back(_T('\\'));
 		dwRightFlags &= ~FFILEOPEN_DETECT;
 	}
 
@@ -1727,7 +1727,7 @@ bool CMainFrame::CreateBackup(BOOL bFolder, LPCTSTR pszPath)
 	{
 		// Don't add dot if there is no existing extension
 		if (ext.size() > 0)
-			ext += _T(".");
+			ext.push_back(_T('.'));
 		ext += BACKUP_FILE_EXT;
 	}
 
@@ -3118,43 +3118,27 @@ void CMainFrame::OnWindowCloseAll()
  */ 
 void CMainFrame::CheckinToClearCase(LPCTSTR strDestinationPath)
 {
-	String spath, sname;
-	SplitFilename(strDestinationPath, &spath, &sname, 0);
-	DWORD code;
+	String spath = paths_GetParentPath(strDestinationPath);
+	String sname = PathFindFileName(strDestinationPath);
 	// checkin operation
 	String args = string_format(_T("checkin -nc \"%s\""), sname.c_str());
 	String vssPath = COptionsMgr::Get(OPT_VSS_PATH);
-	if (HANDLE hVss = RunIt(vssPath.c_str(), args.c_str()))
+	if (DWORD code = RunIt(vssPath.c_str(), args.c_str(), NULL))
 	{
-		WaitForSingleObject(hVss, INFINITE);
-		GetExitCodeProcess(hVss, &code);
-		CloseHandle(hVss);
-		if (code != 0)
+		if (code == STILL_ACTIVE)
 		{
-			if (LanguageSelect.MsgBox(IDS_VSS_CHECKINERROR, MB_ICONWARNING | MB_YESNO) == IDYES)
+			LanguageSelect.MsgBox(IDS_VSS_RUN_ERROR, MB_ICONSTOP);
+		}
+		else if (LanguageSelect.MsgBox(IDS_VSS_CHECKINERROR, MB_ICONWARNING | MB_YESNO) == IDYES)
+		{
+			// undo checkout operation
+			args = string_format(_T("uncheckout -rm \"%s\""), sname.c_str());
+			if (DWORD code = RunIt(vssPath.c_str(), args.c_str(), NULL))
 			{
-				// undo checkout operation
-				args = string_format(_T("uncheckout -rm \"%s\""), sname.c_str());
-				if (HANDLE hVss = RunIt(vssPath.c_str(), args.c_str()))
-				{
-					WaitForSingleObject(hVss, INFINITE);
-					GetExitCodeProcess(hVss, &code);
-					CloseHandle(hVss);
-					if (code != 0)
-					{
-						LanguageSelect.MsgBox(IDS_VSS_UNCOERROR, MB_ICONSTOP);
-					}
-				}
-				else
-				{
-					LanguageSelect.MsgBox(IDS_VSS_RUN_ERROR, MB_ICONSTOP);
-				}				
+				LanguageSelect.MsgBox(code != STILL_ACTIVE ?
+					IDS_VSS_UNCOERROR : IDS_VSS_RUN_ERROR, MB_ICONSTOP);
 			}
 		}
-	}
-	else
-	{
-		LanguageSelect.MsgBox(IDS_VSS_RUN_ERROR, MB_ICONSTOP);
 	}
 }
 

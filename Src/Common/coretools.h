@@ -25,7 +25,7 @@ String GetModulePath(HMODULE hModule = NULL);
 
 size_t linelen(const char *string);
 
-HANDLE RunIt(LPCTSTR szExeFile, LPCTSTR szArgs);
+DWORD NTAPI RunIt(LPCTSTR szExeFile, LPCTSTR szArgs, LPCTSTR szDir);
 
 void DecorateCmdLine(String &sDecoratedCmdLine, String &sExecutable);
 #endif

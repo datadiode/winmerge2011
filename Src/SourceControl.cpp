@@ -45,8 +45,12 @@ void CMainFrame::InitializeSourceControlMembers()
 * @return Tells if caller can continue (no errors happened)
 * @sa CheckSavePath()
 */
-BOOL CMainFrame::SaveToVersionControl(String &strSavePath)
+BOOL CMainFrame::SaveToVersionControl(LPCTSTR pszSavePath)
 {
+	String strSavePath = pszSavePath;
+	pszSavePath = paths_UndoMagic(&strSavePath.front());
+	String path = paths_GetParentPath(pszSavePath);
+	String name = PathFindFileName(pszSavePath);
 	int userChoice = IDOK;
 	int nVerSys = COptionsMgr::Get(OPT_VCS_SYSTEM);
 	switch (nVerSys)
@@ -58,7 +62,7 @@ BOOL CMainFrame::SaveToVersionControl(String &strSavePath)
 		{
 			// Prompt for user choice
 			CVssPrompt dlg;
-			dlg.m_strMessage = LanguageSelect.FormatMessage(IDS_SAVE_FMT, strSavePath.c_str());
+			dlg.m_strMessage = LanguageSelect.FormatMessage(IDS_SAVE_FMT, pszSavePath);
 			dlg.m_strProject = m_vssHelper.GetProjectBase();
 			dlg.m_strUser = m_strVssUser;          // BSP - Add VSS user name to dialog box
 			dlg.m_strPassword = m_strVssPassword;
@@ -76,27 +80,12 @@ BOOL CMainFrame::SaveToVersionControl(String &strSavePath)
 			WaitStatusCursor waitstatus(IDS_VSS_CHECKOUT_STATUS);
 			m_vssHelper.SetProjectBase(dlg.m_strProject.c_str());
 			SettingStore.WriteProfileString(_T("Settings"), _T("VssProject"), m_vssHelper.GetProjectBase().c_str());
-			String path, name;
-			SplitFilename(strSavePath.c_str(), &path, &name, NULL);
-			if (!path.empty())
-				SetCurrentDirectory(path.c_str());
 			string_format args(_T("checkout \"%s/%s\""), m_vssHelper.GetProjectBase().c_str(), name.c_str());
 			String vssPath = COptionsMgr::Get(OPT_VSS_PATH);
-			if (HANDLE hVss = RunIt(vssPath.c_str(), args.c_str()))
+			if (DWORD code = RunIt(vssPath.c_str(), args.c_str(), path.c_str()))
 			{
-				WaitForSingleObject(hVss, INFINITE);
-				DWORD code;
-				GetExitCodeProcess(hVss, &code);
-				CloseHandle(hVss);
-				if (code != 0)
-				{
-					LanguageSelect.MsgBox(IDS_VSSERROR, MB_ICONSTOP);
-					return FALSE;
-				}
-			}
-			else
-			{
-				LanguageSelect.MsgBox(IDS_VSS_RUN_ERROR, MB_ICONSTOP);
+				LanguageSelect.MsgBox(code != STILL_ACTIVE ?
+					IDS_VSSERROR : IDS_VSS_RUN_ERROR, MB_ICONSTOP);
 				return FALSE;
 			}
 		}
@@ -107,7 +96,7 @@ BOOL CMainFrame::SaveToVersionControl(String &strSavePath)
 			CVssPrompt dlg;
 			CRegKeyEx reg;
 
-			dlg.m_strMessage = LanguageSelect.FormatMessage(IDS_SAVE_FMT, strSavePath.c_str());
+			dlg.m_strMessage = LanguageSelect.FormatMessage(IDS_SAVE_FMT, pszSavePath);
 			dlg.m_strProject = m_vssHelper.GetProjectBase();
 			dlg.m_strUser = m_strVssUser;          // BSP - Add VSS user name to dialog box
 			dlg.m_strPassword = m_strVssPassword;
@@ -125,14 +114,13 @@ BOOL CMainFrame::SaveToVersionControl(String &strSavePath)
 				return FALSE;
 			WaitStatusCursor waitstatus(IDS_VSS_CHECKOUT_STATUS);
 			m_vssHelper.SetProjectBase(dlg.m_strProject.c_str());
-			m_strVssUser = dlg.m_strUser;
-			m_strVssPassword = dlg.m_strPassword;
+			m_strVssUser = dlg.m_strUser.c_str();
+			m_strVssPassword = dlg.m_strPassword.c_str();
 			m_strVssDatabase = dlg.m_strSelectedDatabase;
 
 			SettingStore.WriteProfileString(_T("Settings"), _T("VssDatabase"), m_strVssDatabase.c_str());
 			SettingStore.WriteProfileString(_T("Settings"), _T("VssProject"), m_vssHelper.GetProjectBase().c_str());
-			SettingStore.WriteProfileString(_T("Settings"), _T("VssUser"), m_strVssUser.c_str());
-//			SettingStore.WriteProfileString(_T("Settings"), _T("VssPassword"), m_strVssPassword);
+			SettingStore.WriteProfileString(_T("Settings"), _T("VssUser"), m_strVssUser);
 
 			HRESULT hr;
 			CMyComPtr<IVSSDatabase> vssdb;
@@ -150,14 +138,11 @@ BOOL CMainFrame::SaveToVersionControl(String &strSavePath)
 			if (FAILED(hr = vssdb->Open(
 				CMyComBSTR(!m_strVssDatabase.empty() ?
 					(m_strVssDatabase + _T("\\srcsafe.ini")).c_str() : NULL),
-				CMyComBSTR(m_strVssUser.c_str()),
-				CMyComBSTR(m_strVssPassword.c_str()))))
+				m_strVssUser,
+				m_strVssPassword)))
 			{
 				ShowVSSError(hr, _T(""));
 			}
-
-			String path, name;
-			SplitFilename(strSavePath.c_str(), &path, &name, 0);
 
 			// BSP - Combine the project entered on the dialog box with the file name...
 			const UINT nBufferSize = 1024;
@@ -165,7 +150,7 @@ BOOL CMainFrame::SaveToVersionControl(String &strSavePath)
 			TCHAR buffer1[nBufferSize];
 			TCHAR buffer2[nBufferSize];
 
-			_tcscpy(buffer1, strSavePath.c_str());
+			_tcscpy(buffer1, pszSavePath);
 			_tcscpy(buffer2, m_vssHelper.GetProjectBase().c_str());
 			_tcslwr(buffer1);
 			_tcslwr(buffer2);
@@ -207,7 +192,7 @@ BOOL CMainFrame::SaveToVersionControl(String &strSavePath)
 				CMyComBSTR bstrLocalSpec;
 				vssi->get_LocalSpec(&bstrLocalSpec);
 				// BSP - ...and compare it to the directory WinMerge is using.
-				if (lstrcmpi(bstrLocalSpec, strSavePath.c_str()))
+				if (lstrcmpi(bstrLocalSpec, pszSavePath))
 				{
 					// BSP - if the directories are different, let the user confirm the CheckOut
 					int iRes = LanguageSelect.MsgBox(IDS_VSSFOLDER_AND_FILE_NOMATCH, 
@@ -226,9 +211,9 @@ BOOL CMainFrame::SaveToVersionControl(String &strSavePath)
 			// BSP - Finally! Check out the file!
 			if (FAILED(hr = vssi->Checkout(
 				CMyComBSTR(_T("")),
-				CMyComBSTR(strSavePath.c_str()), 0)))
+				CMyComBSTR(pszSavePath), 0)))
 			{
-				ShowVSSError(hr, strSavePath.c_str());
+				ShowVSSError(hr, pszSavePath);
 				return FALSE;
 			}
 		}
@@ -251,30 +236,14 @@ BOOL CMainFrame::SaveToVersionControl(String &strSavePath)
 			if (userChoice != IDOK)
 				return FALSE;
 			WaitStatusCursor waitstatus;
-			String path, name;
-			SplitFilename(strSavePath.c_str(), &path, &name, NULL);
-			if (!path.empty())
-				SetCurrentDirectory(path.c_str());
-			DWORD code;
 			// checkout operation
 			string_replace(m_strCCComment, _T("\""), _T("\\\""));
 			string_format args(_T("checkout -c \"%s\" \"%s\""), m_strCCComment.c_str(), name.c_str());
 			String vssPath = COptionsMgr::Get(OPT_VSS_PATH);
-			if (HANDLE hVss = RunIt(vssPath.c_str(), args.c_str()))
+			if (DWORD code = RunIt(vssPath.c_str(), args.c_str(), path.c_str()))
 			{
-				WaitForSingleObject(hVss, INFINITE);
-				GetExitCodeProcess(hVss, &code);
-				CloseHandle(hVss);
-				
-				if (code != 0)
-				{
-					LanguageSelect.MsgBox(IDS_VSSERROR, MB_ICONSTOP);
-					return FALSE;
-				}
-			}
-			else
-			{
-				LanguageSelect.MsgBox(IDS_VSS_RUN_ERROR, MB_ICONSTOP);
+				LanguageSelect.MsgBox(code != STILL_ACTIVE ?
+					IDS_VSSERROR : IDS_VSS_RUN_ERROR, MB_ICONSTOP);
 				return FALSE;
 			}
 		}

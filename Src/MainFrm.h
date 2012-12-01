@@ -137,15 +137,15 @@ public:
 	void OpenFileWith(LPCTSTR file) const;
 	bool ParseArgsAndDoOpen(const MergeCmdLineInfo &);
 
-	virtual void RecalcLayout();
-	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	void RecalcLayout();
+	BOOL PreTranslateMessage(MSG *);
 
 // Implementation methods
 protected:
 	virtual ~CMainFrame();
 // Implementation in SourceControl.cpp
 	void InitializeSourceControlMembers();
-	BOOL SaveToVersionControl(String &strSavePath);
+	BOOL SaveToVersionControl(LPCTSTR pszSavePath);
 // End SourceControl.cpp
 
 
@@ -163,14 +163,13 @@ public:
 	 */
 	/*@{*/ 
 protected:
-	String m_strVssUser; /**< Visual Source Safe User ID */
-	String m_strVssPassword; /**< Visual Source Safe Password */
+	CMyComBSTR m_strVssUser; /**< Visual Source Safe User ID */
+	CMyComBSTR m_strVssPassword; /**< Visual Source Safe Password */
 	String m_strVssDatabase; /**< Visual Source Safe database */
 	String m_strCCComment; /**< ClearCase comment */
 public:
 	BOOL m_bCheckinVCS;     /**< TRUE if files should be checked in after checkout */
 	BOOL m_CheckOutMulti; /**< Suppresses VSS int. code asking checkout for every file */
-	BOOL m_bVCProjSync; /**< VC project opened from VSS sync? */
 	BOOL m_bVssSuppressPathCheck; /**< Suppresses VSS int code asking about different path */
 	/*@}*/
 

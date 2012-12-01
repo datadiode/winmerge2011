@@ -161,7 +161,7 @@ void TestSplitFilename()
 }
 #endif
 
-HANDLE RunIt(LPCTSTR szExeFile, LPCTSTR szArgs)
+DWORD NTAPI RunIt(LPCTSTR szExeFile, LPCTSTR szArgs, LPCTSTR szDir)
 {
 	STARTUPINFO si;
 	ZeroMemory(&si, sizeof si);
@@ -171,13 +171,16 @@ HANDLE RunIt(LPCTSTR szExeFile, LPCTSTR szArgs)
 	si.wShowWindow = SW_MINIMIZE;
 	TCHAR args[4096];
 	_sntprintf(args, _countof(args), _T("\"%s\" %s"), szExeFile, szArgs);
+	DWORD code = STILL_ACTIVE;
 	if (CreateProcess(szExeFile, args, NULL, NULL, FALSE,
-			CREATE_NEW_CONSOLE, NULL, NULL, &si, &pi))
+			CREATE_NEW_CONSOLE, NULL, szDir, &si, &pi))
 	{
 		CloseHandle(pi.hThread);
-		return pi.hProcess;
+		WaitForSingleObject(pi.hProcess, INFINITE);
+		GetExitCodeProcess(pi.hProcess, &code);
+		CloseHandle(pi.hProcess);
 	}
-	return NULL;
+	return code;
 }
 
 /**
