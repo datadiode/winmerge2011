@@ -125,10 +125,10 @@ LRESULT COpenDlg::OnNotify(UNotify *pNM)
 			}
 			if (paths_EndsWithSlash(pNM->COMBOBOXEX.ceItem.pszText))
 			{
-				TCHAR path[MAX_PATH];
-				GetWindowsDirectory(path, MAX_PATH);
 				if (LPCTSTR p = PathSkipRoot(pNM->COMBOBOXEX.ceItem.pszText))
 				{
+					TCHAR path[MAX_PATH];
+					GetWindowsDirectory(path, MAX_PATH);
 					if (*p == _T('\0'))
 					{
 						*PathSkipRoot(path) = _T('\0');
@@ -367,13 +367,13 @@ void COpenDlg::OnDestroy()
  */
 void COpenDlg::OnBrowseButton(UINT id) 
 {
-	String s;
-	GetDlgItemText(id, s);
-	if (paths_DoesPathExist(s.c_str()) == IS_EXISTING_FILE)
-		s = paths_GetParentPath(s.c_str());
-	if (SelectFileOrFolder(m_hWnd, s))
+	String path;
+	GetDlgItemText(id, path);
+	if (paths_DoesPathExist(path.c_str()) == IS_EXISTING_FILE)
+		path.resize(path.rfind(_T('\\')) + 1);
+	if (SelectFileOrFolder(m_hWnd, path))
 	{
-		SetDlgItemText(id, s.c_str());
+		SetDlgItemText(id, path.c_str());
 		UpdateButtonStates();
 	}	
 }

@@ -167,7 +167,7 @@ BOOL SelectFileOrFolder(HWND parent, String &path)
 
 	String sSelectedFile = LanguageSelect.LoadString(IDS_DIRSEL_TAG);
 	// Set initial filename to folder selection tag
-	sSelectedFile += _T('.'); // Treat it as filename
+	sSelectedFile.push_back(_T('.')); // Treat it as filename
 	sSelectedFile.resize(MAX_PATH);
 
 	OPENFILENAME ofn;
@@ -188,12 +188,12 @@ BOOL SelectFileOrFolder(HWND parent, String &path)
 
 	if (bRetVal)
 	{
-		path = sSelectedFile.c_str();
+		path = sSelectedFile;
 		if (!PathFileExists(path.c_str()))
 		{
 			// We have a valid folder name, but propably garbage as a filename.
 			// Return folder name
-			path = paths_GetParentPath(path.c_str()) + _T('\\');
+			path.resize(path.rfind(_T('\\')) + 1);
 		}
 	}
 	return bRetVal;
