@@ -56,9 +56,8 @@ struct DirItem
 	FileFlags flags; /**< file attributes */
 
 	DirItem() { size.int64 = -1; }
-	void SetFile(LPCTSTR);
 	BOOL Update(LPCTSTR);
-	BOOL UpdateFileTime() const;
+	BOOL ApplyFileTimeTo(LPCTSTR) const;
 	void ClearPartial();
 };
 

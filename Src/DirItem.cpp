@@ -28,18 +28,6 @@
 #include "paths.h"
 
 /**
- * @brief Set filename and path for the item.
- * @param [in] fullpath Full path to file to set to item.
- */
-void DirItem::SetFile(LPCTSTR fullPath)
-{
-	String ext;
-	SplitFilename(fullPath, &path, &filename, &ext);
-	filename += _T(".");
-	filename += ext;
-}
-
-/**
  * @brief Update fileinfo from given file.
  * This function updates file's information from given item. Function
  * does not set filename and path.
@@ -84,10 +72,9 @@ BOOL DirItem::Update(LPCTSTR sFilePath)
 /**
  * @brief Update file's modification time.
  */
-BOOL DirItem::UpdateFileTime() const
+BOOL DirItem::ApplyFileTimeTo(LPCTSTR path) const
 {
-	String path = paths_ConcatPath(path, filename);
-	HANDLE h = ::CreateFile(path.c_str(), GENERIC_WRITE,
+	HANDLE h = ::CreateFile(path, GENERIC_WRITE,
 							FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
 							OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
 	BOOL bRet = FALSE;

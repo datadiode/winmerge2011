@@ -1053,10 +1053,8 @@ bool CChildFrame::DoSave(bool &bSaveSuccess, int nBuffer)
 		// Preserve file times if user wants to
 		if (COptionsMgr::Get(OPT_PRESERVE_FILETIMES))
 		{
-			fileInfo.SetFile(strSavePath.c_str());
-			fileInfo.UpdateFileTime();
+			fileInfo.ApplyFileTimeTo(strSavePath.c_str());
 		}
-
 		m_ptBuf[nBuffer]->SetModified(FALSE);
 		m_pSaveFileInfo[nBuffer].Update(strSavePath.c_str());
 		m_strPath[nBuffer] = strSavePath;
