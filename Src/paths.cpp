@@ -383,11 +383,13 @@ bool paths_PathIsExe(LPCTSTR path)
  */
 void paths_CompactPath(HEdit *pEdit, String &path)
 {
+	// cope with modifiation indicator
+	const size_t offset = path.find_first_not_of(_T("* "));
 	// we want to keep the first and the last path component, and in between,
 	// as much characters as possible from the right
 	// PathCompactPath keeps, in between, as much characters as possible from the left
 	// so we reverse everything between the first and the last component before calling PathCompactPath
-	if (LPTSTR pathWithoutRoot = PathSkipRoot(path.c_str()))
+	if (LPTSTR pathWithoutRoot = PathSkipRoot(path.c_str() + offset))
 		_tcsrev(pathWithoutRoot);
 
 	// resize to at least MAX_PATH characters
@@ -401,7 +403,7 @@ void paths_CompactPath(HEdit *pEdit, String &path)
 		pEdit->GetRect(&rect);
 		// and use the correct font
 		HGdiObj *pFontOld = pDC->SelectObject(pEdit->GetFont());
-		pDC->PathCompactPath(&path.front(), rect.right - rect.left);
+		pDC->PathCompactPath(&path.front() + offset, rect.right - rect.left);
 		// set old font back
 		pDC->SelectObject(pFontOld);
 		pEdit->ReleaseDC(pDC);
@@ -412,6 +414,6 @@ void paths_CompactPath(HEdit *pEdit, String &path)
 
 	// we reverse back everything between the first and the last component
 	// it works OK as "..." reversed = "..." again
-	if (LPTSTR pathWithoutRoot = PathSkipRoot(path.c_str()))
+	if (LPTSTR pathWithoutRoot = PathSkipRoot(path.c_str() + offset))
 		_tcsrev(pathWithoutRoot);
 }
