@@ -16,22 +16,12 @@
  */
 class FileVersion
 {
-private:
-	bool m_bFileVersionSet; //*< Is file version set? */
-	bool m_bProductVersionSet; //*< Is product version set? */
-	DWORD m_fileVersionMS; //*< File version most significant dword. */
-	DWORD m_fileVersionLS; //*< File version least significant dword. */
-	DWORD m_productVersionMS; //*< Product version most significant dword. */
-	DWORD m_productVersionLS; //*< Product version least significant dword. */
-
 public:
-	FileVersion();
-	void Clear();
-	void SetFileVersion(DWORD versionMS, DWORD versionLS);
-	void SetProductVersion(DWORD versionMS, DWORD versionLS);
-
-	String GetFileVersionString();
-	String GetProductVersionString();
+	DWORD m_versionMS; //*< File version most significant dword. */
+	DWORD m_versionLS; //*< File version least significant dword. */
+	FileVersion(): m_versionMS(0), m_versionLS(0) { }
+	void Clear() { m_versionMS = m_versionLS = 0; }
+	String GetVersionString() const;
 };
 
 #endif // _FILE_VERSION_H_

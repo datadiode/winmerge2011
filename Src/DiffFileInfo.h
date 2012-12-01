@@ -47,7 +47,12 @@ struct DiffFileFlags : public FileFlags
 struct DiffFileInfo : public DirItem
 {
 // data
-	bool bVersionChecked; /**< true if version string is up-to-date */
+	enum VersionChecked
+	{
+		VersionMissing,
+		VersionPresent,
+		VersionInvalid
+	} versionChecked;
 	FileVersion version; /**< string of fixed file version, eg, 1.2.3.4 */
 	DiffFileFlags flags; /**< file attributes */
 	FileTextEncoding encoding; /**< unicode or codepage info */
@@ -55,8 +60,7 @@ struct DiffFileInfo : public DirItem
 
 // methods
 
-	DiffFileInfo(): bVersionChecked(false) { }
-	//void Clear();
+	DiffFileInfo(): versionChecked(VersionInvalid) { }
 	void ClearPartial();
 	bool IsEditableEncoding() const;
 };

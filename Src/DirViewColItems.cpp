@@ -245,24 +245,6 @@ static String ColNewerGet(const CDiffContext *, const void *p)
 }
 
 /**
- * @brief Format Version info to string.
- * @param [in] pCtxt Pointer to compare context.
- * @param [in] pdi Pointer to DIFFITEM.
- * @param [in] bLeft Is the item left-size item?
- * @return String proper to show in the GUI.
- */
-static String GetVersion(const CDiffContext *pCtxt, const DIFFITEM *pdi, BOOL bLeft)
-{
-	DIFFITEM &di = const_cast<DIFFITEM &>(*pdi);
-	DiffFileInfo &dfi = bLeft ? di.left : di.right;
-	if (!dfi.bVersionChecked)
-	{
-		pCtxt->UpdateVersion(di, bLeft);
-	}
-	return dfi.version.GetFileVersionString();
-}
-
-/**
  * @brief Format Version column data.
  * @param [in] pCtxt Pointer to compare context.
  * @param [in] p Pointer to DIFFITEM.
@@ -271,8 +253,13 @@ static String GetVersion(const CDiffContext *pCtxt, const DIFFITEM *pdi, BOOL bL
 template<BOOL bLeft>
 static String ColVersionGet(const CDiffContext *pCtxt, const void *p)
 {
-	const DIFFITEM &di = *static_cast<const DIFFITEM *>(p);
-	return GetVersion(pCtxt, &di, bLeft);
+	DIFFITEM &di = *const_cast<DIFFITEM *>(static_cast<const DIFFITEM *>(p));
+	DiffFileInfo &dfi = bLeft ? di.left : di.right;
+	if (dfi.versionChecked == DiffFileInfo::VersionInvalid)
+	{
+		pCtxt->UpdateVersion(di, bLeft);
+	}
+	return dfi.versionChecked ? dfi.version.GetVersionString() : String();
 }
 
 /**
@@ -539,7 +526,21 @@ static int ColNewerSort(const CDiffContext *pCtxt, const void *p, const void *q)
 template<BOOL bLeft>
 static int ColVersionSort(const CDiffContext *pCtxt, const void *p, const void *q)
 {
-	return ColVersionGet<bLeft>(pCtxt, p).compare(ColVersionGet<bLeft>(pCtxt, q));
+	DIFFITEM &dip = *const_cast<DIFFITEM *>(static_cast<const DIFFITEM *>(p));
+	DIFFITEM &diq = *const_cast<DIFFITEM *>(static_cast<const DIFFITEM *>(q));
+	DiffFileInfo &dfip = bLeft ? dip.left : dip.right;
+	DiffFileInfo &dfiq = bLeft ? diq.left : diq.right;
+	if (dfip.versionChecked == DiffFileInfo::VersionInvalid)
+		pCtxt->UpdateVersion(dip, bLeft);
+	if (dfiq.versionChecked == DiffFileInfo::VersionInvalid)
+		pCtxt->UpdateVersion(diq, bLeft);
+	if (int ret = cmp(dfip.versionChecked, dfiq.versionChecked))
+		return ret;
+	if (int ret = cmp(dfip.version.m_versionMS, dfiq.version.m_versionMS))
+		return ret;
+	if (int ret = cmp(dfip.version.m_versionLS, dfiq.version.m_versionLS))
+		return ret;
+	return 0;
 }
 
 /**

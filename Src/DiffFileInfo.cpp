@@ -54,7 +54,7 @@ void DiffFileInfo::ClearPartial()
 {
 	DirItem::ClearPartial();
 	version.Clear();
-	bVersionChecked = false;
+	versionChecked = VersionInvalid;
 	encoding.Clear();
 	m_textStats.clear();
 }

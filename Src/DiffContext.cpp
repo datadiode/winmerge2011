@@ -122,7 +122,7 @@ void CDiffContext::UpdateVersion(DIFFITEM & di, BOOL bLeft) const
 	DiffFileInfo & dfi = bLeft ? di.left : di.right;
 	// Check only binary files
 	dfi.version.Clear();
-	dfi.bVersionChecked = true;
+	dfi.versionChecked = DiffFileInfo::VersionMissing;
 
 	if (di.diffcode.isDirectory())
 		return;
@@ -151,10 +151,8 @@ void CDiffContext::UpdateVersion(DIFFITEM & di, BOOL bLeft) const
 	
 	// Get version info if it exists
 	CVersionInfo ver(spath.c_str());
-	DWORD verMS = 0;
-	DWORD verLS = 0;
-	if (ver.GetFixedFileVersion(verMS, verLS))
-		dfi.version.SetFileVersion(verMS, verLS);
+	if (ver.GetFixedFileVersion(dfi.version.m_versionMS, dfi.version.m_versionLS))
+		dfi.versionChecked = DiffFileInfo::VersionPresent;
 }
 
 /**
