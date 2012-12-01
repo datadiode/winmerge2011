@@ -516,9 +516,10 @@ void CCrystalTextBuffer::RemoveView(CCrystalTextView *pView)
 
 CCrystalTextView::TextDefinition *CCrystalTextBuffer::RetypeViews(LPCTSTR lpszFileName)
 {
-	String sNew;
-	SplitFilename(lpszFileName, NULL, NULL, &sNew);
-	CCrystalTextView::TextDefinition *def = CCrystalTextView::GetTextType(sNew.c_str());
+	LPCTSTR ext = PathFindExtension(lpszFileName);
+	if (*ext == _T('.'))
+		++ext;
+	CCrystalTextView::TextDefinition *def = CCrystalTextView::GetTextType(ext);
 	stl::list<CCrystalTextView *>::iterator pos = m_lpViews.begin();
 	while (pos != m_lpViews.end())
 	{

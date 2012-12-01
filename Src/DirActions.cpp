@@ -123,10 +123,10 @@ static bool ConfirmDialog(UINT caption, UINT question,
 
 	dlg.m_fromPath = src;
 	if (paths_DoesPathExist(src) == IS_EXISTING_DIR && !paths_EndsWithSlash(src))
-		dlg.m_fromPath += _T("\\");
+		dlg.m_fromPath.push_back(_T('\\'));
 	dlg.m_toPath = dest;
 	if (paths_DoesPathExist(dest) == IS_EXISTING_DIR && !paths_EndsWithSlash(dest))
-		dlg.m_toPath += _T("\\");
+		dlg.m_toPath.push_back(_T('\\'));
 
 	return LanguageSelect.DoModal(dlg) == IDYES;
 }
@@ -1219,9 +1219,7 @@ bool CDirView::RenameOnSameDir(LPCTSTR szOldFileName, LPCTSTR szNewFileName)
 
 	if (DOES_NOT_EXIST != paths_DoesPathExist(szOldFileName))
 	{
-		String sFullName;
-
-		SplitFilename(szOldFileName, &sFullName, NULL, NULL);
+		String sFullName = paths_GetParentPath(szOldFileName);
 		sFullName = paths_ConcatPath(sFullName, szNewFileName);
 
 		// No need to rename if new file already exist.

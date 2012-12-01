@@ -2288,22 +2288,23 @@ void CChildFrame::OnFileEncoding()
 // external Rational ClearCase tool.
 String CChildFrame::GetFileExt(LPCTSTR sFileName, LPCTSTR sDescription)
 {
-	String sExt;
-	SplitFilename(sFileName, NULL, NULL, &sExt);
-
-	if (m_pMDIFrame->m_bClearCaseTool)
+	String sExt = PathFindExtension(sFileName);
+	if (m_pMDIFrame->m_bClearCaseTool && sExt.empty())
 	{
-		// If no extension found in real file name.
-		if (sExt.empty())
+		if (LPCTSTR atat = _tcsstr(sFileName, _T("@@")))
 		{
-			SplitViewName(sFileName, NULL, NULL, &sExt);
+			sExt = PathFindExtension(String(sFileName, atat - sFileName).c_str());
 		}
 		// If no extension found in repository file name.
 		if (sExt.empty())
 		{
-			SplitViewName(sDescription, NULL, NULL, &sExt);
+			if (LPCTSTR atat = _tcsstr(sDescription, _T("@@")))
+			{
+				sExt = PathFindExtension(String(sDescription, atat - sDescription).c_str());
+			}
 		}
 	}
+	sExt.erase(0, sExt.rfind('.') + 1);
 	return sExt;
 }
 

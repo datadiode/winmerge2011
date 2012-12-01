@@ -154,11 +154,9 @@ FileFilter *FileFilterMgr::LoadFilterFile(LPCTSTR szFilepath)
 
 	file.ReadBom(); // in case it is a Unicode file, let UniMemFile handle BOM
 
-	String fileName;
-	SplitFilename(szFilepath, NULL, &fileName, NULL);
 	FileFilter *pfilter = new FileFilter;
 	pfilter->fullpath = szFilepath;
-	pfilter->name = fileName.c_str(); // Filename is the default name
+	pfilter->name = PathFindFileName(szFilepath); // Filename is the default name
 
 	String sLine, sEol;
 	bool lossy = false;

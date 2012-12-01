@@ -368,7 +368,7 @@ void FileFiltersDlg::OnBnClickedFilterfileNewbutton()
 	}
 
 	if (!paths_EndsWithSlash(path.c_str()))
-		path += '\\';
+		path.push_back(_T('\\'));
 	
 	if (SelectFile(m_hWnd, path, IDS_FILEFILTER_SAVENEW, IDS_FILEFILTER_FILEMASK, FALSE))
 	{

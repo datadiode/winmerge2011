@@ -94,8 +94,7 @@ void CPatchTool::Run()
 		m_diffWrapper.bFilterCommentsLines = false;
 		m_diffWrapper.RefreshFilters();
 
-		String path;
-		SplitFilename(m_dlgPatch.m_fileResult.c_str(), &path, NULL, NULL);
+		String path = paths_GetParentPath(m_dlgPatch.m_fileResult.c_str());
 		if (!paths_CreateIfNeeded(path.c_str()))
 		{
 			LanguageSelect.MsgBox(IDS_FOLDER_NOTEXIST, MB_ICONSTOP);

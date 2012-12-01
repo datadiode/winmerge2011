@@ -466,7 +466,7 @@ void CMergeApp::InitializeSupplements()
  */
 String CMergeApp::GetDefaultEditor()
 {
-	return env_GetWindowsDirectory() + _T("\\NOTEPAD.EXE");
+	return paths_ConcatPath(env_GetWindowsDirectory(), _T("NOTEPAD.EXE"));
 }
 
 /**
