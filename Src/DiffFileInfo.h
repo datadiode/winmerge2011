@@ -35,23 +35,8 @@
  */
 struct DiffFileFlags : public FileFlags
 {
-	/**
-	* @brief Encodings supported.
-	*/
-	enum
-	{ 
-		UTF_8 = 0x1000,
-		UCS_4 = 0x2000,
-		UCS_2BE = 0x3000,
-		UCS_2LE = 0x4000,
-		coding_mask = 0x7000,
-	};
-
-	DWORD coding; /**< Coding info for item */
-	DiffFileFlags() : coding(0) { }
 	String ToString() const;
 };
-
 
 /**
  * @brief Information for file.

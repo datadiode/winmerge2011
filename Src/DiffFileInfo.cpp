@@ -37,22 +37,13 @@ String DiffFileFlags::ToString() const
 {
 	String sflags;
 	if (attributes & FILE_ATTRIBUTE_READONLY)
-		sflags += _T("R");
+		sflags.push_back(_T('R'));
 	if (attributes & FILE_ATTRIBUTE_HIDDEN)
-		sflags += _T("H");
+		sflags.push_back(_T('H'));
 	if (attributes & FILE_ATTRIBUTE_SYSTEM)
-		sflags += _T("S");
+		sflags.push_back(_T('S'));
 	if (attributes & FILE_ATTRIBUTE_ARCHIVE)
-		sflags += _T("A");
-
-	if ((coding & coding_mask) == UTF_8)
-		sflags += _T("8");
-	if ((coding & coding_mask) == UCS_2BE)
-		sflags += _T("B");
-	if ((coding & coding_mask) == UCS_2LE)
-		sflags += _T("L");
-	if ((coding & coding_mask) == UCS_4)
-		sflags += _T("4");
+		sflags.push_back(_T('A'));
 	return sflags;
 }
 
