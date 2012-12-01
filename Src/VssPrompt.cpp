@@ -60,7 +60,6 @@ bool CVssPrompt::UpdateData()
 	DDX_Text<op>(IDC_MESSAGE, m_strMessage);
 	DDX_CBStringExact<op>(IDC_DATABASE_LIST, m_strSelectedDatabase);
 	DDX_Check<op>(IDC_MULTI_CHECKOUT, m_bMultiCheckouts);
-	DDX_Check<op>(IDC_VCPROJ_SYNC, m_bVCProjSync);
 	return true;
 }
 

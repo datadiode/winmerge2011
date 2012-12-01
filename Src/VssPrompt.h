@@ -45,7 +45,6 @@ public:
 	String	m_strMessage;
 	String	m_strSelectedDatabase;
 	BOOL	m_bMultiCheckouts;
-	BOOL	m_bVCProjSync;
 
 protected:
 	HSuperComboBox		*m_pCbProject;

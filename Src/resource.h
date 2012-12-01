@@ -213,7 +213,6 @@
 #define IDC_CHECK2                              1083
 #define IDC_BREAK_ON_WORDS                      1083
 #define IDC_CHECKIN                             1083
-#define IDC_VCPROJ_SYNC                         1084
 #define IDC_EXT_EDITOR_BROWSE                   1091
 #define IDC_EXT_EDITOR_PATH                     1092
 #define IDC_DIFF_SWAPFILES                      1093

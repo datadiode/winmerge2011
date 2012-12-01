@@ -173,8 +173,8 @@ CMainFrame::CMainFrame(HWindow *pWnd, const MergeCmdLineInfo &cmdInfo)
 , m_bEscShutdown(false)
 , m_bClearCaseTool(false)
 , m_bExitIfNoDiff(MergeCmdLineInfo::Disabled)
+, m_bCheckinVCS(FALSE)
 , m_CheckOutMulti(FALSE)
-, m_bVCProjSync(FALSE)
 , m_bVssSuppressPathCheck(FALSE)
 , m_wndToolBar(NULL)
 , m_wndStatusBar(NULL)
@@ -1232,8 +1232,7 @@ void CMainFrame::OnHelpGnulicense()
  * @sa CMainFrame::SyncFileToVCS()
  * @sa CChildFrame::DoSave()
  */
-int CMainFrame::HandleReadonlySave(String &strSavePath, BOOL bMultiFile,
-		BOOL &bApplyToAll)
+int CMainFrame::HandleReadonlySave(String &strSavePath, BOOL bMultiFile, BOOL &bApplyToAll)
 {
 	UINT userChoice = 0;
 	int nRetVal = IDOK;
@@ -1770,19 +1769,7 @@ bool CMainFrame::CreateBackup(BOOL bFolder, LPCTSTR pszPath)
 int CMainFrame::SyncFileToVCS(LPCTSTR pszDest, BOOL &bApplyToAll, String *psError)
 {
 	String strSavePath(pszDest);
-	int nVerSys = COptionsMgr::Get(OPT_VCS_SYSTEM);
-	
-	int nRetVal = HandleReadonlySave(strSavePath, TRUE, bApplyToAll);
-	if (nRetVal == IDCANCEL || nRetVal == IDNO)
-		return nRetVal;
-	
-	// If VC project opened from VSS sync and version control used
-	if ((nVerSys == VCS_VSS4 || nVerSys == VCS_VSS5) && m_bVCProjSync)
-	{
-		if (!m_vssHelper.ReLinkVCProj(strSavePath.c_str(), psError))
-			nRetVal = -1;
-	}
-	return nRetVal;
+	return HandleReadonlySave(strSavePath, TRUE, bApplyToAll);
 }
 
 void CMainFrame::UpdateDirViewFont()

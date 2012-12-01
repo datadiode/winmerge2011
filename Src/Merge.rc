@@ -1493,7 +1493,6 @@ FONT 8, "MS Shell Dlg", 0, 0, 1
     EDITTEXT        IDC_USER, 62, 96, 63, 14, ES_AUTOHSCROLL
     RTEXT           "Password:", IDC_STATIC, 132, 99, 55, 8, SS_RIGHT
     EDITTEXT        IDC_PASSWORD, 190, 96, 60, 14, ES_AUTOHSCROLL | ES_PASSWORD
-    AUTOCHECKBOX    "Link to Destination VSS project", IDC_VCPROJ_SYNC, 7, 115, 235, 8
     AUTOCHECKBOX    "Apply to all items", IDC_MULTI_CHECKOUT, 7, 125, 235, 8
     DEFPUSHBUTTON   "Check Out", IDOK, 41, 145, 70, 14
     PUSHBUTTON      "Save As...", IDC_SAVE_AS, 115, 145, 70, 14

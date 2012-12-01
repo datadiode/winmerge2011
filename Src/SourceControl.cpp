@@ -22,13 +22,9 @@
 
 void CMainFrame::InitializeSourceControlMembers()
 {
-	m_vssHelper.SetProjectBase(SettingStore.GetProfileString(_T("Settings"), _T("VssProject"), _T("")));
-	m_strVssUser = SettingStore.GetProfileString(_T("Settings"), _T("VssUser"), _T(""));
-//	m_strVssPassword = SettingStore.GetProfileString(_T("Settings"), _T("VssPassword"), _T(""));
-	SettingStore.WriteProfileString(_T("Settings"), _T("VssPassword"), _T(""));
-	m_strVssDatabase = SettingStore.GetProfileString(_T("Settings"), _T("VssDatabase"),_T(""));
-	m_strCCComment = _T("");
-	m_bCheckinVCS = FALSE;
+	m_vssHelper.SetProjectBase(SettingStore.GetProfileString(_T("Settings"), _T("VssProject")));
+	m_strVssUser = SettingStore.GetProfileString(_T("Settings"), _T("VssUser")).c_str();
+	m_strVssDatabase = SettingStore.GetProfileString(_T("Settings"), _T("VssDatabase")).c_str();
 
 	String vssPath = COptionsMgr::Get(OPT_VSS_PATH);
 	if (vssPath.empty())
@@ -116,7 +112,6 @@ BOOL CMainFrame::SaveToVersionControl(String &strSavePath)
 			dlg.m_strUser = m_strVssUser;          // BSP - Add VSS user name to dialog box
 			dlg.m_strPassword = m_strVssPassword;
 			dlg.m_strSelectedDatabase = m_strVssDatabase;
-			dlg.m_bVCProjSync = TRUE;
 
 			// Dialog not suppressed - show it and allow user to select "checkout all"
 			if (!m_CheckOutMulti)
@@ -133,7 +128,6 @@ BOOL CMainFrame::SaveToVersionControl(String &strSavePath)
 			m_strVssUser = dlg.m_strUser;
 			m_strVssPassword = dlg.m_strPassword;
 			m_strVssDatabase = dlg.m_strSelectedDatabase;
-			m_bVCProjSync = dlg.m_bVCProjSync;					
 
 			SettingStore.WriteProfileString(_T("Settings"), _T("VssDatabase"), m_strVssDatabase.c_str());
 			SettingStore.WriteProfileString(_T("Settings"), _T("VssProject"), m_vssHelper.GetProjectBase().c_str());

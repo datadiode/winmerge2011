@@ -42,24 +42,10 @@ enum
 class VSSHelper
 {
 public:
-	String GetProjectBase();
+	const String &GetProjectBase();
 	BOOL SetProjectBase(String strPath);
-
-	BOOL ReLinkVCProj(String strSavePath, String * psError);
-	void GetFullVSSPath(String strSavePath, BOOL & bVCProj);
-
-protected:
-	BOOL GetWordFromFile(HANDLE pfile, TCHAR * buffer, DWORD dwBufferSize, TCHAR * charset = NULL);
-	int GetWordFromBuffer(TCHAR * inBuffer, DWORD dwInBufferSize,
-		TCHAR * outBuffer, DWORD dwOutBufferSize, TCHAR * charset = NULL);
-	BOOL GetVCProjName(HANDLE hFile, HANDLE tFile);
-	BOOL GetSLNProjUniqueName(HANDLE hFile, HANDLE tFile, TCHAR * buf);
-	BOOL GetSLNProjName(HANDLE hFile, HANDLE tFile, TCHAR * buf);
-
 private:
 	String m_strVssProjectBase;
-	String m_strVssProjectFull;
-
 };
 
 #endif // _VSSHELPER_H_
