@@ -484,10 +484,6 @@ static unsigned NTAPI TransformIndex(LPCSTR rc)
 	unsigned i;
 	if (sscanf(rc, " Merge.rc:%u", &i) == 1)
 		return i;
-	if (sscanf(rc, " afxres.rc:%u", &i) == 1)
-		return i | 0x10000U;
-	if (sscanf(rc, " afxprint.rc:%u", &i) == 1)
-		return i | 0x20000U;
 	return 0;
 }
 
@@ -496,10 +492,6 @@ static unsigned NTAPI TransformIndex(LPCWSTR rc)
 	unsigned i;
 	if (swscanf(rc, L" Merge.rc:%u", &i) == 1)
 		return i;
-	if (swscanf(rc, L" afxres.rc:%u", &i) == 1)
-		return i | 0x10000U;
-	if (swscanf(rc, L" afxprint.rc:%u", &i) == 1)
-		return i | 0x20000U;
 	return 0;
 }
 
@@ -688,11 +680,12 @@ BOOL CLanguageSelect::LoadLanguageFile(LANGID wLangId)
 			else
 			{
 				ps = 0;
+				const char *text = msgid.c_str();
 				stl::vector<unsigned>::iterator pline = lines.begin();
 				while (pline < lines.end())
 				{
 					unsigned line = *pline++;
-					m_strarray[line] = msgid;
+					text = m_strarray.setAtGrow(line, text);
 				}
 				lines.clear();
 				msgid.clear();
@@ -761,14 +754,20 @@ BOOL CLanguageSelect::LoadLanguageFile(LANGID wLangId)
 				if (msgstr.empty())
 					msgstr = msgid;
 				unslash(m_codepage, msgstr);
+				const char *text = msgstr.c_str();
 				stl::vector<unsigned>::iterator pline = lines.begin();
 				while (pline < lines.end())
 				{
 					unsigned line = *pline++;
-					if (m_strarray[line] == msgid)
-						m_strarray[line] = msgstr;
-					else
+					if (m_strarray[line] != msgid)
 						++mismatched;
+				}
+				pline = lines.begin();
+				while (pline < lines.end())
+				{
+					unsigned line = *pline++;
+					if (m_strarray[line] == msgid)
+						text = m_strarray.setAtGrow(line, text);
 				}
 				lines.clear();
 				if (directive == "Codepage")

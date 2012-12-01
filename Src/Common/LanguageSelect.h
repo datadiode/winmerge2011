@@ -70,36 +70,55 @@ private:
 	LANGID m_wCurLanguage;
 	class strarray
 	{
-		stl::vector<stl::vector<stl::string> > m_partition;
+		stl::vector<LPCSTR> m_vec;
 	public:
-		strarray(): m_partition(3)
+		strarray()
+		{
+			clear();
+		}
+		~strarray()
 		{
 			clear();
 		}
 		void clear()
 		{
-			size_t i = m_partition.size();
-			do
+			size_t i = m_vec.size();
+			while (i > 1)
 			{
-				m_partition[--i].resize(1);
-			} while (i > 0);
+				--i;
+				LPCSTR text = m_vec[i];
+				if (HIWORD(text))
+					free(const_cast<LPSTR>(text));
+			}
+			m_vec.resize(1, "");
 		}
-		stl::string &operator[](unsigned i)
+		LPCSTR setAtGrow(size_t i, LPCSTR text)
 		{
-			assert(i > 0);
-			assert((i >> 16) < m_partition.size());
-			stl::vector<stl::string> &partition = m_partition[i >> 16];
-			i &= 0xFFFF;
-			if (partition.size() <= i)
-				partition.resize(i + 1);
-			return partition[i];
+			if (m_vec.size() <= i)
+			{
+				m_vec.resize(i + 1, NULL);
+			}
+			else
+			{
+				LPCSTR text = m_vec[i];
+				if (HIWORD(text))
+					free(const_cast<LPSTR>(text));
+			}
+			LPCSTR link = text;
+			if (HIWORD(text))
+			{
+				text = _strdup(text);
+				link = reinterpret_cast<LPCSTR>(i);
+			}
+			m_vec[i] = text;
+			return link;
 		}
-		const stl::string &operator[](unsigned i) const
+		LPCSTR operator[](size_t i) const
 		{
-			assert((i >> 16) < m_partition.size());
-			const stl::vector<stl::string> &partition = m_partition[i >> 16];
-			i &= 0xFFFF;
-			return partition[i < partition.size() ? i : 0];
+			LPCSTR text = m_vec[i < m_vec.size() ? i : 0];
+			if (HIWORD(text) == 0)
+				text = m_vec[LOWORD(text)];
+			return text;
 		}
 	} m_strarray;
 	unsigned m_codepage;
