@@ -14,7 +14,6 @@
 #include "SettingStore.h"
 #include "LanguageSelect.h"
 #include "OptionsDef.h"
-#include "RegKey.h"
 #include "coretools.h"
 #include "paths.h"
 #include "VssPrompt.h"

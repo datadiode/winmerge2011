@@ -12,7 +12,6 @@
 
 #include "OptionsDef.h"
 #include "OptionsMgr.h"
-#include "RegKey.h"
 #include "SettingStore.h"
 #include "DiffWrapper.h" // CMP_CONTENT
 
@@ -49,12 +48,12 @@ static void SplitName(String strName, String &strPath, String &strValue)
  * @brief Load option from registry.
  * @note Currently handles only integer and string options!
  */
-void IOptionDef::LoadOption(const CRegKeyEx &key)
+void IOptionDef::LoadOption(HKEY key)
 {
 	CRegKeyEx section;
 	String path, entry;
 	SplitName(name, path, entry);
-	section.OpenWithAccess(key.GetKey(), path.c_str(), KEY_READ);
+	section.OpenWithAccess(key, path.c_str(), KEY_READ);
 	UOptionPtr u = { this + 1 };
 	switch (type)
 	{
@@ -82,12 +81,12 @@ void IOptionDef::LoadOption(const CRegKeyEx &key)
  * @brief Save option to registry
  * @note Currently handles only integer and string options!
  */
-void IOptionDef::SaveOption(const CRegKeyEx &key)
+void IOptionDef::SaveOption(HKEY key)
 {
 	CRegKeyEx section;
 	String path, entry;
 	SplitName(name, path, entry);
-	LONG error = section.OpenWithAccess(key.GetKey(), path.c_str(), KEY_WRITE);
+	LONG error = section.OpenWithAccess(key, path.c_str(), KEY_WRITE);
 	if (error == ERROR_SUCCESS)
 	{
 		if (!IsDefault())
@@ -231,7 +230,7 @@ void IOptionDef::ResetOptions()
 	}
 }
 
-void IOptionDef::InitOptions(const CRegKeyEx &rk)
+void IOptionDef::InitOptions(HKEY rk)
 {
 	IOptionDef *p = First;
 	while (p)

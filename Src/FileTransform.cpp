@@ -4,7 +4,6 @@
 #include "Merge.h"
 #include "MainFrm.h"
 #include "Environment.h"
-#include "Common/RegKey.h"
 #include "Common/SettingStore.h"
 #include "Common/WindowPlacement.h"
 #include "FileTransform.h"
@@ -48,7 +47,7 @@ static BOOL WINAPI ConsoleCtrlHandler(DWORD CtrlType)
 		if (GetWindowPlacement(hWnd, &wp))
 		{
 			CRegKeyEx rk = SettingStore.GetSectionKey(_T("Settings"));
-			wp.RegWrite(rk.GetKey(), _T("ConsoleWindowPlacement"));
+			wp.RegWrite(rk, _T("ConsoleWindowPlacement"));
 		}
 		FreeConsole();
 		PostMessage(hWnd, WM_CLOSE, 0, 0);
@@ -71,7 +70,7 @@ static void NTAPI ShowConsoleWindow(int showCmd)
 		}
 		CWindowPlacement wp;
 		CRegKeyEx rk = SettingStore.GetSectionKey(_T("Settings"));
-		if (wp.RegQuery(rk.GetKey(), _T("ConsoleWindowPlacement")))
+		if (wp.RegQuery(rk, _T("ConsoleWindowPlacement")))
 		{
 			wp.showCmd = showCmd;
 			SetWindowPlacement(hWnd, &wp);

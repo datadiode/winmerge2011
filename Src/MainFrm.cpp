@@ -34,7 +34,6 @@
 #include "OptionsDef.h"
 #include <htmlhelp.h>  // From HTMLHelp Workshop (incl. in Platform SDK)
 #include "Constants.h"
-#include "Common/RegKey.h"
 #include "Common/SettingStore.h"
 #include "Common/WindowPlacement.h"
 #include "AboutDlg.h"
@@ -1991,7 +1990,7 @@ void CMainFrame::InitialActivate(int nCmdShow)
 {
 	CWindowPlacement wp;
 	CRegKeyEx rk = SettingStore.GetSectionKey(_T("Settings"));
-	if (!wp.RegQuery(rk.GetKey(), _T("MainWindowPlacement")))
+	if (!wp.RegQuery(rk, _T("MainWindowPlacement")))
 		GetWindowPlacement(&wp);
 	if (nCmdShow == SW_MINIMIZE)
 		wp.showCmd = nCmdShow;
@@ -2031,7 +2030,7 @@ void CMainFrame::SaveWindowPlacement()
 	if (GetWindowPlacement(&wp))
 	{
 		CRegKeyEx rk = SettingStore.GetSectionKey(_T("Settings"));
-		wp.RegWrite(rk.GetKey(), _T("MainWindowPlacement"));
+		wp.RegWrite(rk, _T("MainWindowPlacement"));
 	}
 }
 

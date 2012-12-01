@@ -132,7 +132,7 @@ BOOL CVssPrompt::OnInitDialog()
 		TCHAR cString[MAX_PATH];
 		DWORD cssize = MAX_PATH;
 		DWORD csize = MAX_PATH;
-		retval = RegEnumValue(reg.GetKey(), i, cName, &csize, NULL,
+		retval = RegEnumValue(reg, i, cName, &csize, NULL,
 			NULL, (LPBYTE)cString, &cssize);
 		if (retval != ERROR_SUCCESS && retval != ERROR_MORE_DATA)
 			break;

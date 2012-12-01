@@ -15,8 +15,6 @@
 
 #include "Common/coretypes.h"
 
-class CRegKeyEx;
-
 class IOptionDef : public SINGLE_LIST_ENTRY
 {
 public:
@@ -25,13 +23,13 @@ public:
 	virtual void Reset() = 0;
 	virtual bool IsDefault() const = 0;
 	void Parse(LPCTSTR);
-	void LoadOption(const CRegKeyEx &);
-	void SaveOption(const CRegKeyEx &);
+	void LoadOption(HKEY);
+	void SaveOption(HKEY);
 	void SaveOption();
 	// ResetOptions() - just Reset()
 	static void ResetOptions();
 	// InitOptions() - first Reset(), then LoadOption()
-	static void InitOptions(const CRegKeyEx &);
+	static void InitOptions(HKEY);
 	static int ExportOptions(LPCTSTR filename);
 	static int ImportOptions(LPCTSTR filename);
 protected:

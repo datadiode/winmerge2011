@@ -23,9 +23,8 @@ LineFiltersList globalLineFilters;
  */
 void LineFiltersList::LoadFilters()
 {
-	if (HKEY h = SettingStore.GetSectionKey(FiltersRegPath))
+	if (CRegKeyEx key = SettingStore.GetSectionKey(FiltersRegPath))
 	{
-		CRegKeyEx key = h;
 		UINT count = key.ReadDword(_T("Values"), 0);
 		for (UINT i = 0; i < count; i++)
 		{
@@ -81,9 +80,8 @@ bool LineFiltersList::Compare(LineFiltersList &list)
  */
 void LineFiltersList::SaveFilters()
 {
-	if (HKEY h = SettingStore.GetSectionKey(FiltersRegPath, CREATE_ALWAYS))
+	if (CRegKeyEx key = SettingStore.GetSectionKey(FiltersRegPath, CREATE_ALWAYS))
 	{
-		CRegKeyEx key = h;
 		UINT count = m_items.size();
 		key.WriteDword(_T("Values"), count);
 		for (UINT i = 0; i < count; i++)

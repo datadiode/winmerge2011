@@ -179,6 +179,7 @@ public:
 	}
 };
 
+#include "Common/RegKey.h"
 #include "DiffTextBuffer.h"
 #include "DiffWrapper.h"
 #include "DiffList.h"
