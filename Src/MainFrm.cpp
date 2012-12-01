@@ -1700,11 +1700,11 @@ bool CMainFrame::CreateBackup(BOOL bFolder, LPCTSTR pszPath)
 		return true;
 
 	String bakPath;
-	String path;
-	String filename;
-	String ext;
 
-	SplitFilename(pszPath, &path, &filename, &ext);
+	LPCTSTR pszFileName = PathFindFileName(pszPath);
+	LPCTSTR pszExt = PathFindExtension(pszFileName);
+	String filename(pszFileName, pszExt - pszFileName);
+	String ext = pszExt;
 
 	// Determine backup folder
 	switch (COptionsMgr::Get(OPT_BACKUP_LOCATION))
@@ -1717,7 +1717,7 @@ bool CMainFrame::CreateBackup(BOOL bFolder, LPCTSTR pszPath)
 		// fall through
 	case PropBackups::FOLDER_ORIGINAL:
 		// Put backups to same folder than original file
-		bakPath = path;
+		bakPath = paths_GetParentPath(pszPath);
 		break;
 	default:
 		ASSERT(FALSE);
@@ -1731,18 +1731,16 @@ bool CMainFrame::CreateBackup(BOOL bFolder, LPCTSTR pszPath)
 		ext += BACKUP_FILE_EXT;
 	}
 
-	// Append time to filename if wanted so
-	// NOTE just adds timestamp at the moment as I couldn't figure out
-	// nice way to add a real time (invalid chars etc).
+	// Append time in basic date time ISO format to filename if wanted so
 	if (COptionsMgr::Get(OPT_BACKUP_ADD_TIME))
 	{
 		time_t curtime = 0;
 		time(&curtime);
-		TCHAR timestr[24];
-		filename += _T("-");
-		filename += _ui64tot(curtime, timestr, 10);
+		struct tm *tm = localtime(&curtime);
+		TCHAR timestr[20];
+		_tcsftime(timestr, _countof(timestr), _T("-%Y%m%dT%H%M%S"), tm);
+		filename += timestr;
 	}
-	filename += _T(".");
 	filename += ext;
 	// Append filename and extension (+ optional .bak) to path
 	bakPath = paths_ConcatPath(bakPath, filename);
