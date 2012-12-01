@@ -76,7 +76,7 @@ static String ColExtGet(const CDiffContext *, const void *p) //sfilename
 {
 	const DIFFITEM &di = *static_cast<const DIFFITEM*>(p);
 	// We don't show extension for folder names
-	if (di.diffcode.isDirectory())
+	if (di.isDirectory())
 		return _T("");
 	const String &r = di.left.filename;
 	LPCTSTR s = PathFindExtension(r.c_str());
@@ -112,47 +112,47 @@ static String ColStatusGet(const CDiffContext *pCtxt, const void *p)
 	// Note that order of items does matter. We must check for
 	// skipped items before unique items, for example, so that
 	// skipped unique items are labeled as skipped, not unique.
-	if (di.diffcode.isResultError())
+	if (di.isResultError())
 	{
 		return LanguageSelect.LoadString(IDS_CANT_COMPARE_FILES);
 	}
-	if (di.diffcode.isResultAbort())
+	if (di.isResultAbort())
 	{
 		return LanguageSelect.LoadString(IDS_ABORTED_ITEM);
 	}
-	if (di.diffcode.isResultFiltered())
+	if (di.isResultFiltered())
 	{
 		return LanguageSelect.LoadString(
-			di.diffcode.isDirectory() ? IDS_DIR_SKIPPED :
+			di.isDirectory() ? IDS_DIR_SKIPPED :
 			IDS_FILE_SKIPPED);
 	}
-	if (di.diffcode.isSideLeftOnly())
+	if (di.isSideLeftOnly())
 	{
 		String path = di.GetLeftFilepath(pCtxt->GetLeftPath());
 		LPCTSTR pathUI = paths_UndoMagic(&path.front());
 		return static_cast<LPCTSTR>(
 			LanguageSelect.FormatMessage(IDS_LEFT_ONLY_IN_FMT, pathUI));
 	}
-	if (di.diffcode.isSideRightOnly())
+	if (di.isSideRightOnly())
 	{
 		String path = di.GetRightFilepath(pCtxt->GetRightPath());
 		LPCTSTR pathUI = paths_UndoMagic(&path.front());
 		return static_cast<LPCTSTR>(
 			LanguageSelect.FormatMessage(IDS_RIGHT_ONLY_IN_FMT, pathUI));
 	}
-	if (di.diffcode.isResultSame())
+	if (di.isResultSame())
 	{
 		return LanguageSelect.LoadString(
-			di.diffcode.isText() ? IDS_TEXT_FILES_SAME :
-			di.diffcode.isBin() ? IDS_BIN_FILES_SAME :
+			di.isText() ? IDS_TEXT_FILES_SAME :
+			di.isBin() ? IDS_BIN_FILES_SAME :
 			IDS_IDENTICAL);
 	}
-	if (di.diffcode.isResultDiff()) // diff
+	if (di.isResultDiff()) // diff
 	{
 		return LanguageSelect.LoadString(
-			di.diffcode.isText() ? IDS_TEXT_FILES_DIFF :
-			di.diffcode.isBin() ? IDS_BIN_FILES_DIFF :
-			di.diffcode.isDirectory() ? IDS_FOLDERS_ARE_DIFFERENT :
+			di.isText() ? IDS_TEXT_FILES_DIFF :
+			di.isBin() ? IDS_BIN_FILES_DIFF :
+			di.isDirectory() ? IDS_FOLDERS_ARE_DIFFERENT :
 			IDS_FILES_ARE_DIFFERENT);
 	}
 	return String();
@@ -221,11 +221,11 @@ static String ColDiffsGet(const CDiffContext *, const void *p)
 static String ColNewerGet(const CDiffContext *, const void *p)
 {
 	const DIFFITEM &di = *static_cast<const DIFFITEM *>(p);
-	if (di.diffcode.isSideLeftOnly())
+	if (di.isSideLeftOnly())
 	{
 		return _T("<*<");
 	}
-	if (di.diffcode.isSideRightOnly())
+	if (di.isSideRightOnly())
 	{
 		return _T(">*>");
 	}
@@ -245,6 +245,24 @@ static String ColNewerGet(const CDiffContext *, const void *p)
 }
 
 /**
+ * @brief Format Version info to string.
+ * @param [in] pCtxt Pointer to compare context.
+ * @param [in] pdi Pointer to DIFFITEM.
+ * @param [in] bLeft Is the item left-size item?
+ * @return String proper to show in the GUI.
+ */
+static String GetVersion(const CDiffContext *pCtxt, const DIFFITEM *pdi, BOOL bLeft)
+{
+	DIFFITEM *di = const_cast<DIFFITEM *>(pdi);
+	DiffFileInfo &dfi = bLeft ? di->left : di->right;
+	if (dfi.versionChecked == DiffFileInfo::VersionInvalid)
+	{
+		pCtxt->UpdateVersion(di, bLeft);
+	}
+	return dfi.versionChecked ? dfi.version.GetVersionString() : String();
+}
+
+/**
  * @brief Format Version column data.
  * @param [in] pCtxt Pointer to compare context.
  * @param [in] p Pointer to DIFFITEM.
@@ -253,13 +271,8 @@ static String ColNewerGet(const CDiffContext *, const void *p)
 template<BOOL bLeft>
 static String ColVersionGet(const CDiffContext *pCtxt, const void *p)
 {
-	DIFFITEM &di = *const_cast<DIFFITEM *>(static_cast<const DIFFITEM *>(p));
-	DiffFileInfo &dfi = bLeft ? di.left : di.right;
-	if (dfi.versionChecked == DiffFileInfo::VersionInvalid)
-	{
-		pCtxt->UpdateVersion(di, bLeft);
-	}
-	return dfi.versionChecked ? dfi.version.GetVersionString() : String();
+	const DIFFITEM &di = *static_cast<const DIFFITEM *>(p);
+	return GetVersion(pCtxt, &di, bLeft);
 }
 
 /**
@@ -271,43 +284,41 @@ static String ColStatusAbbrGet(const CDiffContext *, const void *p)
 {
 	const DIFFITEM &di = *static_cast<const DIFFITEM *>(p);
 	int id = 0;
-
 	// Note that order of items does matter. We must check for
 	// skipped items before unique items, for example, so that
 	// skipped unique items are labeled as skipped, not unique.
-	if (di.diffcode.isResultError())
+	if (di.isResultError())
 	{
 		id = IDS_CMPRES_ERROR;
 	}
-	else if (di.diffcode.isResultAbort())
+	else if (di.isResultAbort())
 	{
 		id = IDS_ABORTED_ITEM;
 	}
-	else if (di.diffcode.isResultFiltered())
+	else if (di.isResultFiltered())
 	{
-		if (di.diffcode.isDirectory())
+		if (di.isDirectory())
 			id = IDS_DIR_SKIPPED;
 		else
 			id = IDS_FILE_SKIPPED;
 	}
-	else if (di.diffcode.isSideLeftOnly())
+	else if (di.isSideLeftOnly())
 	{
 		id = IDS_LEFTONLY;
 	}
-	else if (di.diffcode.isSideRightOnly())
+	else if (di.isSideRightOnly())
 	{
 		id = IDS_RIGHTONLY;
 	}
-	else if (di.diffcode.isResultSame())
+	else if (di.isResultSame())
 	{
 		id = IDS_IDENTICAL;
 	}
-	else if (di.diffcode.isResultDiff())
+	else if (di.isResultDiff())
 	{
 		id = IDS_DIFFERENT;
 	}
-
-	return id ? LanguageSelect.LoadString(id) : _T("");
+	return id ? LanguageSelect.LoadString(id) : String();
 }
 
 /**
@@ -318,11 +329,10 @@ static String ColStatusAbbrGet(const CDiffContext *, const void *p)
 static String ColBinGet(const CDiffContext *, const void *p)
 {
 	const DIFFITEM &di = *static_cast<const DIFFITEM *>(p);
-
-	if (di.diffcode.isBin())
+	if (di.isBin())
 		return _T("*");
 	else
-		return _T("");
+		return String();
 }
 
 /**
@@ -414,10 +424,8 @@ static int ColFileNameSort(const CDiffContext *pCtxt, const void *p, const void 
 {
 	const DIFFITEM &ldi = *static_cast<const DIFFITEM *>(p);
 	const DIFFITEM &rdi = *static_cast<const DIFFITEM *>(q);
-	if (ldi.diffcode.isDirectory() && !rdi.diffcode.isDirectory())
-		return -1;
-	if (!ldi.diffcode.isDirectory() && rdi.diffcode.isDirectory())
-		return 1;
+	if (int cmp = rdi.isDirectory() - ldi.isDirectory())
+		return cmp;
 	return lstrcmpi(ColFileNameGet(pCtxt, p).c_str(), ColFileNameGet(pCtxt, q).c_str());
 }
 
@@ -432,10 +440,8 @@ static int ColExtSort(const CDiffContext *pCtxt, const void *p, const void *q)
 {
 	const DIFFITEM &ldi = *static_cast<const DIFFITEM *>(p);
 	const DIFFITEM &rdi = *static_cast<const DIFFITEM *>(q);
-	if (ldi.diffcode.isDirectory() && !rdi.diffcode.isDirectory())
-		return -1;
-	if (!ldi.diffcode.isDirectory() && rdi.diffcode.isDirectory())
-		return 1;
+	if (int cmp = rdi.isDirectory() - ldi.isDirectory())
+		return cmp;
 	return lstrcmpi(ColExtGet(pCtxt, p).c_str(), ColExtGet(pCtxt, q).c_str());
 }
 
@@ -461,7 +467,7 @@ static int ColStatusSort(const CDiffContext *, const void *p, const void *q)
 {
 	const DIFFITEM &ldi = *static_cast<const DIFFITEM *>(p);
 	const DIFFITEM &rdi = *static_cast<const DIFFITEM *>(q);
-	return cmp(rdi.diffcode.diffcode, ldi.diffcode.diffcode);
+	return cmp(rdi.diffcode, ldi.diffcode);
 }
 
 /**
@@ -526,21 +532,7 @@ static int ColNewerSort(const CDiffContext *pCtxt, const void *p, const void *q)
 template<BOOL bLeft>
 static int ColVersionSort(const CDiffContext *pCtxt, const void *p, const void *q)
 {
-	DIFFITEM &dip = *const_cast<DIFFITEM *>(static_cast<const DIFFITEM *>(p));
-	DIFFITEM &diq = *const_cast<DIFFITEM *>(static_cast<const DIFFITEM *>(q));
-	DiffFileInfo &dfip = bLeft ? dip.left : dip.right;
-	DiffFileInfo &dfiq = bLeft ? diq.left : diq.right;
-	if (dfip.versionChecked == DiffFileInfo::VersionInvalid)
-		pCtxt->UpdateVersion(dip, bLeft);
-	if (dfiq.versionChecked == DiffFileInfo::VersionInvalid)
-		pCtxt->UpdateVersion(diq, bLeft);
-	if (int ret = cmp(dfip.versionChecked, dfiq.versionChecked))
-		return ret;
-	if (int ret = cmp(dfip.version.m_versionMS, dfiq.version.m_versionMS))
-		return ret;
-	if (int ret = cmp(dfip.version.m_versionLS, dfiq.version.m_versionLS))
-		return ret;
-	return 0;
+	return ColVersionGet<bLeft>(pCtxt, p).compare(ColVersionGet<bLeft>(pCtxt, q));
 }
 
 /**
@@ -557,17 +549,7 @@ static int ColBinSort(const CDiffContext *, const void *p, const void *q)
 {
 	const DIFFITEM &ldi = *static_cast<const DIFFITEM *>(p);
 	const DIFFITEM &rdi = *static_cast<const DIFFITEM *>(q);
-	const bool i = ldi.diffcode.isBin();
-	const bool j = rdi.diffcode.isBin();
-
-	if (!i && !j)
-		return 0;
-	else if (i && !j)
-		return 1;
-	else if (!i && j)
-		return -1;
-	else
-		return 0;
+	return ldi.isBin() - rdi.isBin();
 }
 
 /**

@@ -66,11 +66,6 @@ struct ViewCustomFlags
 	};
 };
 
-/**
- * @brief Position value for special items (..) in directory compare view.
- */
-const UINT_PTR SPECIAL_ITEM_POS = (UINT_PTR) - 1L;
-
 /** Default column width in directory compare */
 const UINT DefColumnWidth = 150;
 
@@ -122,13 +117,11 @@ public:
 
 	void StartCompare();
 	void Redisplay();
-	void RedisplayChildren(UINT_PTR diffpos, int level, int &index, int &alldiffs);
+	void RedisplayChildren(DIFFITEM *diffpos, int level, int &index, int &alldiffs);
 	void UpdateResources();
-	void LoadColumnHeaderItems();
-	UINT_PTR GetItemKey(int idx);
-	int GetItemIndex(UINT_PTR key);
+	int GetItemIndex(DIFFITEM *);
 	void SortColumnsAppropriately();
-	DIFFITEM &GetDiffItem(int sel);
+	DIFFITEM *GetDiffItem(int sel);
 
 	static bool IsShellMenuCmdID(UINT);
 	LRESULT HandleMenuMessage(UINT message, WPARAM wParam, LPARAM lParam);
@@ -143,21 +136,10 @@ private:
 // Implementation in DirActions.cpp
 private:
 	String GetSelectedFileName(SIDE_TYPE stype);
-	void GetItemFileNames(int sel, String& strLeft, String& strRight);
+	void GetItemFileNames(const DIFFITEM *, String &strLeft, String &strRight);
 	void FormatEncodingDialogDisplays(CLoadSaveCodepageDlg &);
-	static BOOL IsItemCopyableToLeft(const DIFFITEM & di);
-	static BOOL IsItemCopyableToRight(const DIFFITEM & di);
-	static BOOL IsItemDeletableOnLeft(const DIFFITEM & di);
-	static BOOL IsItemDeletableOnRight(const DIFFITEM & di);
-	static BOOL IsItemDeletableOnBoth(const DIFFITEM & di);
-	BOOL IsItemOpenable(const DIFFITEM & di) const;
-	BOOL AreItemsOpenable(const DIFFITEM & di1, const DIFFITEM & di2) const;
-	BOOL IsItemOpenableOnLeft(const DIFFITEM & di) const;
-	BOOL IsItemOpenableOnRight(const DIFFITEM & di) const;
-	BOOL IsItemOpenableOnLeftWith(const DIFFITEM & di) const;
-	BOOL IsItemOpenableOnRightWith(const DIFFITEM & di) const;
-	static BOOL IsItemCopyableToOnLeft(const DIFFITEM & di);
-	static BOOL IsItemCopyableToOnRight(const DIFFITEM & di);
+	BOOL IsItemOpenable(const DIFFITEM *) const;
+	BOOL AreItemsOpenable(const DIFFITEM *, const DIFFITEM *) const;
 	void DoCopyLeftToRight();
 	void DoCopyRightToLeft();
 	void DoDelLeft();
@@ -206,8 +188,7 @@ public:
 	void UpdateDiffItemStatus(UINT nIdx);
 private:
 	void UpdateColumns(UINT lvcf);
-	void InitiateSort();
-	int AddNewItem(int i, UINT_PTR diffpos, int iImage, int iIndent);
+	int AddNewItem(int i, const DIFFITEM *di, int iImage, int iIndent);
 	int ColPhysToLog(int i) const { return m_invcolorder[i]; }
 	int ColLogToPhys(int i) const { return m_colorder[i]; } /**< -1 if not displayed */
 	String GetColDisplayName(int col) const;
@@ -217,8 +198,8 @@ private:
 	void ClearColumnOrders();
 	void ResetColumnOrdering();
 	void MoveColumn(int psrc, int pdest);
-	String ColGetTextToDisplay(const CDiffContext *pCtxt, int col, const DIFFITEM &di);
-	int ColSort(const CDiffContext *pCtxt, int col, const DIFFITEM &ldi, const DIFFITEM &rdi) const;
+	String ColGetTextToDisplay(const CDiffContext *pCtxt, int col, const DIFFITEM *di);
+	int ColSort(const CDiffContext *pCtxt, int col, const DIFFITEM *ldi, const DIFFITEM *rdi) const;
 // End DirViewCols.cpp
 
 // Implementation in DirViewColItems.cpp
@@ -258,12 +239,9 @@ protected:
 	int GetFirstDifferentItem();
 	int GetLastDifferentItem();
 	int AddSpecialItems();
-	void OpenSpecialItems(UINT_PTR pos1, UINT_PTR pos2);
-	bool OpenOneItem(UINT_PTR pos1, DIFFITEM **di1, DIFFITEM **di2,
-			String &path1, String &path2, int &sel1, bool &isDir);
-	bool OpenTwoItems(UINT_PTR pos1, UINT_PTR pos2, DIFFITEM **di1, DIFFITEM **di2,
-			String &path1, String &path2, int &sel1, int &sel2, bool &isDir);
-	bool CreateFoldersPair(const DIFFITEM &di, bool side1, String &newFolder);
+	bool OpenOneItem(DIFFITEM *, String &path1, String &path2);
+	bool OpenTwoItems(DIFFITEM *, DIFFITEM *, String &path1, String &path2);
+	bool CreatePairFolder(LPCTSTR newFolder);
 
 // Implementation data
 protected:
@@ -281,6 +259,8 @@ protected:
 	DirCompProgressDlg *m_pCmpProgressDlg;
 	clock_t m_compareStart; /**< Starting process time of the compare */
 	String m_lastCopyFolder; /**< Last Copy To -target folder. */
+	String m_lastLeftPath;
+	String m_lastRightPath;
 
 	CShellContextMenu *m_pShellContextMenuLeft; /**< Shell context menu for group of left files */
 	HMENU m_hShellContextMenuLeft;
@@ -327,19 +307,18 @@ protected:
 	void DoDefaultAction(int sel);
 private:
 	void OpenSelection(LPCTSTR szCompareAs, UINT idCompareAs);
-	bool GetSelectedItems(int *sel1, int *sel2);
+	int GetSelectedItems(DIFFITEM **);
 	void OpenParentDirectory();
-	bool IsItemNavigableDiff(const DIFFITEM &) const;
+	bool IsItemNavigableDiff(const DIFFITEM *) const;
 	void MoveFocus(int, int);
 	void SaveColumnWidths();
 	void SaveColumnOrders();
-	void FixReordering();
 	void HeaderContextMenu(POINT);
 	void ListContextMenu(POINT);
 	HMENU ListShellContextMenu(SIDE_TYPE);
 	void ReloadColumns();
 	void ResetColumnWidths();
-	void DeleteChildren(const DIFFITEM &, int);
+	void DeleteChildren(const DIFFITEM *, int);
 	int CollapseSubdir(int);
 	int ExpandSubdir(int);
 	void DeepExpandSubdir(int);

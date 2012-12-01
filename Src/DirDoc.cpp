@@ -111,8 +111,8 @@ void CDirFrame::InitCompare(LPCTSTR pszLeft, LPCTSTR pszRight, int nRecursive, C
 CDirFrame::AllowUpwardDirectory::ReturnCode
 CDirFrame::AllowUpwardDirectory(String &leftParent, String &rightParent)
 {
-	const String &left = GetLeftBasePath();
-	const String &right = GetRightBasePath();
+	const String &left = m_pCtxt->GetLeftPath();
+	const String &right = m_pCtxt->GetRightPath();
 
 	// If we have temp context it means we are comparing archives
 	if (m_pTempPathContext != NULL)
@@ -243,20 +243,20 @@ void CDirFrame::Rescan(bool bCompareSelected)
  * @return true if item should be shown, false if not.
  * @sa CDirFrame::Redisplay()
  */
-bool CDirFrame::IsShowable(const DIFFITEM &di) const
+bool CDirFrame::IsShowable(const DIFFITEM *di) const
 {
-	if (di.customFlags1 & ViewCustomFlags::HIDDEN)
+	if (di->customFlags1 & ViewCustomFlags::HIDDEN)
 		return false;
 	// Treat SKIPPED as a 'super'-flag. If item is skipped and user
 	// wants to see skipped items show item regardless of other flags
-	if (di.diffcode.isResultFiltered())
+	if (di->isResultFiltered())
 		return COptionsMgr::Get(OPT_SHOW_SKIPPED);
 	// left/right filters
-	if (di.diffcode.isSideLeftOnly() && !COptionsMgr::Get(OPT_SHOW_UNIQUE_LEFT))
+	if (di->isSideLeftOnly() && !COptionsMgr::Get(OPT_SHOW_UNIQUE_LEFT))
 		return false;
-	if (di.diffcode.isSideRightOnly() && !COptionsMgr::Get(OPT_SHOW_UNIQUE_RIGHT))
+	if (di->isSideRightOnly() && !COptionsMgr::Get(OPT_SHOW_UNIQUE_RIGHT))
 		return false;
-	if (di.diffcode.isDirectory())
+	if (di->isDirectory())
 	{
 		// Subfolders in non-recursive compare can only be skipped or unique
 		if (m_nRecursive) // recursive mode (including tree-mode)
@@ -269,9 +269,9 @@ bool CDirFrame::IsShowable(const DIFFITEM &di) const
 			if (COptionsMgr::Get(OPT_TREE_MODE))
 			{
 				// result filters
-				if (di.diffcode.isResultSame() && !COptionsMgr::Get(OPT_SHOW_IDENTICAL))
+				if (di->isResultSame() && !COptionsMgr::Get(OPT_SHOW_IDENTICAL))
 					return false;
-				if (di.diffcode.isResultDiff() && !COptionsMgr::Get(OPT_SHOW_DIFFERENT))
+				if (di->isResultDiff() && !COptionsMgr::Get(OPT_SHOW_DIFFERENT))
 					return false;
 			}
 		}
@@ -279,12 +279,12 @@ bool CDirFrame::IsShowable(const DIFFITEM &di) const
 	else
 	{
 		// file type filters
-		if (di.diffcode.isBin() && !COptionsMgr::Get(OPT_SHOW_BINARIES))
+		if (di->isBin() && !COptionsMgr::Get(OPT_SHOW_BINARIES))
 			return false;
 		// result filters
-		if (di.diffcode.isResultSame() && !COptionsMgr::Get(OPT_SHOW_IDENTICAL))
+		if (di->isResultSame() && !COptionsMgr::Get(OPT_SHOW_IDENTICAL))
 			return false;
-		if (di.diffcode.isResultDiff() && !COptionsMgr::Get(OPT_SHOW_DIFFERENT))
+		if (di->isResultDiff() && !COptionsMgr::Get(OPT_SHOW_DIFFERENT))
 			return false;
 	}
 	return true;
@@ -317,11 +317,11 @@ void CDirFrame::Redisplay()
  * calls slow DirView functions to get item position and to update GUI.
  * Use UpdateStatusFromDisk() function instead.
  */
-void CDirFrame::ReloadItemStatus(UINT_PTR diffPos, BOOL bLeft, BOOL bRight)
+void CDirFrame::ReloadItemStatus(DIFFITEM *di, BOOL bLeft, BOOL bRight)
 {
 	// in case just copied (into existence) or modified
-	m_pCtxt->UpdateStatusFromDisk(diffPos, bLeft, bRight);
-	int nIdx = m_pDirView->GetItemIndex(diffPos);
+	m_pCtxt->UpdateStatusFromDisk(di, bLeft, bRight);
+	int nIdx = m_pDirView->GetItemIndex(di);
 	if (nIdx != -1)
 	{
 		// Update view
@@ -334,7 +334,7 @@ void CDirFrame::ReloadItemStatus(UINT_PTR diffPos, BOOL bLeft, BOOL bRight)
  * @return POSITION to item, NULL if not found.
  * @note Filenames must be same, if they differ NULL is returned.
  */
-UINT_PTR CDirFrame::FindItemFromPaths(LPCTSTR pathLeft, LPCTSTR pathRight)
+DIFFITEM *CDirFrame::FindItemFromPaths(LPCTSTR pathLeft, LPCTSTR pathRight)
 {
 	LPCTSTR file1 = PathFindFileName(pathLeft);
 	LPCTSTR file2 = PathFindFileName(pathRight);
@@ -356,19 +356,19 @@ UINT_PTR CDirFrame::FindItemFromPaths(LPCTSTR pathLeft, LPCTSTR pathRight)
 	if (String::size_type length = path2.length())
 		path2.resize(length - 1); // remove trailing backslash
 
-	UINT_PTR pos = m_pCtxt->GetFirstDiffPosition();
-	while (UINT_PTR currentPos = pos) // Save our current pos before getting next
+	DIFFITEM *di = m_pCtxt->GetFirstChildDiff(NULL);
+	while (di)
 	{
-		const DIFFITEM &di = m_pCtxt->GetNextDiffPosition(pos);
-		if (di.left.path == path1 &&
-			di.right.path == path2 &&
-			di.left.filename == file1 &&
-			di.right.filename == file2)
+		if (di->left.path == path1 &&
+			di->right.path == path2 &&
+			di->left.filename == file1 &&
+			di->right.filename == file2)
 		{
-			return currentPos;
+			break;
 		}
+		di = m_pCtxt->GetNextDiff(di);
 	}
-	return 0;
+	return di;
 }
 
 /**
@@ -482,34 +482,32 @@ void CDirFrame::UpdateChangedItem(const CChildFrame *pMergeDoc)
 		pMergeDoc->m_strPath[1].c_str()
 	};
 
-	UINT_PTR pos = FindItemFromPaths(paths[0], paths[1]);
+	DIFFITEM *di = FindItemFromPaths(paths[0], paths[1]);
 	// If we failed files could have been swapped so lets try again
-	if (!pos)
-		pos = FindItemFromPaths(paths[1], paths[0]);
+	if (!di)
+		di = FindItemFromPaths(paths[1], paths[0]);
 	
 	// Update status if paths were found for items.
 	// Fail means we had unique items compared as 'renamed' items
 	// so there really is not status to update.
-	if (pos)
+	if (di)
 	{
-		ReloadItemStatus(pos, TRUE, TRUE);
+		ReloadItemStatus(di, TRUE, TRUE);
 
-		DIFFITEM &di = m_pCtxt->GetDiffAt(pos);
+		di->nsdiffs = pMergeDoc->m_diffList.GetSignificantDiffs();
+		di->nidiffs = pMergeDoc->m_nTrivialDiffs;
 
-		di.nsdiffs = pMergeDoc->m_diffList.GetSignificantDiffs();
-		di.nidiffs = pMergeDoc->m_nTrivialDiffs;
+		di->diffcode &= ~(DIFFCODE::COMPAREFLAGS | DIFFCODE::TEXTFLAGS);
+		di->diffcode |= di->nsdiffs ? DIFFCODE::DIFF : DIFFCODE::SAME;
 
-		di.diffcode.diffcode &= ~(DIFFCODE::COMPAREFLAGS | DIFFCODE::TEXTFLAGS);
-		di.diffcode.diffcode |= di.nsdiffs ? DIFFCODE::DIFF : DIFFCODE::SAME;
+		di->left.m_textStats = pMergeDoc->m_pFileTextStats[0];
+		di->right.m_textStats = pMergeDoc->m_pFileTextStats[1];
 
-		di.left.m_textStats = pMergeDoc->m_pFileTextStats[0];
-		di.right.m_textStats = pMergeDoc->m_pFileTextStats[1];
-
-		if (di.left.m_textStats.nzeros > 0)
-			di.diffcode.diffcode |= DIFFCODE::BINSIDE1 | DIFFCODE::TEXT;
-		if (di.right.m_textStats.nzeros > 0)
-			di.diffcode.diffcode |= DIFFCODE::BINSIDE2 | DIFFCODE::TEXT;
-		di.diffcode.diffcode ^= DIFFCODE::TEXT; // revert reverse logic
+		if (di->left.m_textStats.nzeros > 0)
+			di->diffcode |= DIFFCODE::BINSIDE1 | DIFFCODE::TEXT;
+		if (di->right.m_textStats.nzeros > 0)
+			di->diffcode |= DIFFCODE::BINSIDE2 | DIFFCODE::TEXT;
+		di->diffcode ^= DIFFCODE::TEXT; // revert reverse logic
 	}
 }
 
@@ -645,12 +643,10 @@ void CDirFrame::ApplyRightDisplayRoot(String &sText)
  */
 void CDirFrame::UpdateDiffAfterOperation(const FileActionItem & act)
 {
-	UINT_PTR pos = m_pDirView->GetItemKey(act.context);
-	ASSERT(pos != NULL);
-	DIFFITEM &di = m_pCtxt->GetDiffAt(pos);
-	const DIFFCODE diffcode = di.diffcode;
-	BOOL bUpdateLeft = FALSE;
-	BOOL bUpdateRight = FALSE;
+	DIFFITEM *di = m_pDirView->GetDiffItem(act.context);
+	ASSERT(di != NULL);
+	bool bUpdateLeft = false;
+	bool bUpdateRight = false;
 	// Use FileActionItem types for simplicity for now.
 	// Better would be to use FileAction contained, since it is not
 	// UI dependent.
@@ -660,56 +656,56 @@ void CDirFrame::UpdateDiffAfterOperation(const FileActionItem & act)
 		// Synchronized items may need VCS operations
 		if (m_pMDIFrame->m_bCheckinVCS)
 			m_pMDIFrame->CheckinToClearCase(act.dest.c_str());
-		di.diffcode.diffcode &= ~(DIFFCODE::SIDEFLAGS | DIFFCODE::COMPAREFLAGS);
+		di->diffcode &= ~(DIFFCODE::SIDEFLAGS | DIFFCODE::COMPAREFLAGS);
 		if (act.dirflag)
-			di.diffcode.diffcode |= DIFFCODE::BOTH | DIFFCODE::NOCMP;
+			di->diffcode |= DIFFCODE::BOTH | DIFFCODE::NOCMP;
 		else
-			di.diffcode.diffcode |= DIFFCODE::BOTH | DIFFCODE::SAME;
-		di.nidiffs = 0;
-		di.nsdiffs = 0;
-		bUpdateLeft = TRUE;
-		bUpdateRight = TRUE;
+			di->diffcode |= DIFFCODE::BOTH | DIFFCODE::SAME;
+		di->nidiffs = 0;
+		di->nsdiffs = 0;
+		bUpdateLeft = true;
+		bUpdateRight = true;
 		break;
 
 	case FileActionItem::UI_DEL_LEFT:
-		if (di.diffcode.isSideLeftOnly())
+		if (di->isSideLeftOnly())
 		{
 			m_pDirView->CollapseSubdir(act.context);
-			m_pCtxt->RemoveDiff(pos);
+			m_pCtxt->RemoveDiff(di);
 			m_pDirView->DeleteItem(act.context);
 		}
 		else
 		{
-			di.diffcode.diffcode &= ~(DIFFCODE::SIDEFLAGS | DIFFCODE::COMPAREFLAGS);
-			di.diffcode.diffcode |= DIFFCODE::RIGHT | DIFFCODE::NOCMP;
-			bUpdateLeft = TRUE;
+			di->diffcode &= ~(DIFFCODE::SIDEFLAGS | DIFFCODE::COMPAREFLAGS);
+			di->diffcode |= DIFFCODE::RIGHT | DIFFCODE::NOCMP;
+			bUpdateLeft = true;
 		}
 		break;
 
 	case FileActionItem::UI_DEL_RIGHT:
-		if (di.diffcode.isSideRightOnly())
+		if (di->isSideRightOnly())
 		{
 			m_pDirView->CollapseSubdir(act.context);
-			m_pCtxt->RemoveDiff(pos);
+			m_pCtxt->RemoveDiff(di);
 			m_pDirView->DeleteItem(act.context);
 		}
 		else
 		{
-			di.diffcode.diffcode &= ~(DIFFCODE::SIDEFLAGS | DIFFCODE::COMPAREFLAGS);
-			di.diffcode.diffcode |= DIFFCODE::LEFT | DIFFCODE::NOCMP;
-			bUpdateRight = TRUE;
+			di->diffcode &= ~(DIFFCODE::SIDEFLAGS | DIFFCODE::COMPAREFLAGS);
+			di->diffcode |= DIFFCODE::LEFT | DIFFCODE::NOCMP;
+			bUpdateRight = true;
 		}
 		break;
 
 	case FileActionItem::UI_DEL_BOTH:
 		m_pDirView->CollapseSubdir(act.context);
-		m_pCtxt->RemoveDiff(pos);
+		m_pCtxt->RemoveDiff(di);
 		m_pDirView->DeleteItem(act.context);
 		break;
 	}
 	if (bUpdateLeft || bUpdateRight)
 	{
-		m_pCtxt->UpdateStatusFromDisk(pos, bUpdateLeft, bUpdateRight);
+		m_pCtxt->UpdateStatusFromDisk(di, bUpdateLeft, bUpdateRight);
 		m_pDirView->UpdateDiffItemStatus(act.context);
 	}
 }
@@ -720,11 +716,10 @@ void CDirFrame::UpdateDiffAfterOperation(const FileActionItem & act)
  * @param [in] flag Flag value to set.
  * @param [in] mask Mask for possible flag values.
  */
-void CDirFrame::SetItemViewFlag(UINT_PTR key, UINT flag, UINT mask)
+void CDirFrame::SetItemViewFlag(DIFFITEM *di, UINT flag, UINT mask)
 {
-	DIFFITEM &di = m_pCtxt->GetDiffAt(key);
-	di.customFlags1 &= ~mask; // Zero bits masked
-	di.customFlags1 |= flag;
+	di->customFlags1 &= ~mask; // Zero bits masked
+	di->customFlags1 |= flag;
 }
 
 /**
@@ -734,12 +729,11 @@ void CDirFrame::SetItemViewFlag(UINT_PTR key, UINT flag, UINT mask)
  */
 void CDirFrame::SetItemViewFlag(UINT flag, UINT mask)
 {
-	UINT_PTR pos = m_pCtxt->GetFirstDiffPosition();
-	while (pos != NULL)
+	DIFFITEM *di = m_pCtxt->GetFirstChildDiff(NULL);
+	while (di != NULL)
 	{
-		DIFFITEM &di = m_pCtxt->GetDiffAt(pos);
-		di.customFlags1 &= ~mask; // Zero bits masked
-		di.customFlags1 |= flag;
-		m_pCtxt->GetNextDiffPosition(pos);
+		di->customFlags1 &= ~mask; // Zero bits masked
+		di->customFlags1 |= flag;
+		di = m_pCtxt->GetNextDiff(di);
 	}
 }

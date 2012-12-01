@@ -41,11 +41,11 @@ static char THIS_FILE[] = __FILE__;
  * @param [in] di Difference data.
  * @return Text for the specified column.
  */
-String CDirView::ColGetTextToDisplay(const CDiffContext *pCtxt, int col, const DIFFITEM &di)
+String CDirView::ColGetTextToDisplay(const CDiffContext *pCtxt, int col, const DIFFITEM *di)
 {
 	// Custom properties have custom get functions
 	const DirColInfo &colInfo = f_cols[col];
-	return (*colInfo.getfnc)(pCtxt, reinterpret_cast<const char *>(&di) + colInfo.offset);
+	return (*colInfo.getfnc)(pCtxt, reinterpret_cast<const char *>(di) + colInfo.offset);
 }
 
 /**
@@ -58,7 +58,7 @@ String CDirView::ColGetTextToDisplay(const CDiffContext *pCtxt, int col, const D
  * @param [in] rdi Right difference item data.
  * @return Order of items.
  */
-int CDirView::ColSort(const CDiffContext *pCtxt, int col, const DIFFITEM &ldi, const DIFFITEM &rdi) const
+int CDirView::ColSort(const CDiffContext *pCtxt, int col, const DIFFITEM *ldi, const DIFFITEM *rdi) const
 {
 	// Custom properties have custom sort functions
 	const DirColInfo &colInfo = f_cols[col];
@@ -67,8 +67,8 @@ int CDirView::ColSort(const CDiffContext *pCtxt, int col, const DIFFITEM &ldi, c
 	const void *arg2;
 	if (m_bTreeMode)
 	{
-		const DIFFITEM *lcur = &ldi;
-		const DIFFITEM *rcur = &rdi;
+		const DIFFITEM *lcur = ldi;
+		const DIFFITEM *rcur = rdi;
 		int lLevel = lcur->GetDepth();
 		int rLevel = rcur->GetDepth();
 		while (lLevel < rLevel)
@@ -91,8 +91,8 @@ int CDirView::ColSort(const CDiffContext *pCtxt, int col, const DIFFITEM &ldi, c
 	}
 	else
 	{
-		arg1 = reinterpret_cast<const char *>(&ldi) + offset;
-		arg2 = reinterpret_cast<const char *>(&rdi) + offset;
+		arg1 = reinterpret_cast<const char *>(ldi) + offset;
+		arg2 = reinterpret_cast<const char *>(rdi) + offset;
 	}
 	if (ColSortFncPtrType fnc = colInfo.sortfnc)
 	{
@@ -110,6 +110,7 @@ int CDirView::ColSort(const CDiffContext *pCtxt, int col, const DIFFITEM &ldi, c
 /// Update column names (as per selected UI language) / width / alignment
 void CDirView::UpdateColumns(UINT lvcf)
 {
+	SetRedraw(FALSE);
 	for (int i = 0; i < g_ncols; ++i)
 	{
 		const DirColInfo &colInfo = f_cols[i];
@@ -129,6 +130,11 @@ void CDirView::UpdateColumns(UINT lvcf)
 			SetColumn(phys, &lvc);
 		}
 	}
+	const int sortCol = COptionsMgr::Get(OPT_DIRVIEW_SORT_COLUMN);
+	bool bSortAscending = COptionsMgr::Get(OPT_DIRVIEW_SORT_ASCENDING);
+	m_ctlSortHeader.SetSortImage(ColLogToPhys(sortCol), bSortAscending);
+	SetRedraw(TRUE);
+	Invalidate();
 }
 
 CDirView::CompareState::CompareState(const CDirView *pView, int sortCol, bool bSortAscending)
@@ -144,15 +150,13 @@ int CALLBACK CDirView::CompareState::CompareFunc(LPARAM lParam1, LPARAM lParam2,
 {
 	CompareState *pThis = reinterpret_cast<CompareState*>(lParamSort);
 	// Sort special items always first in dir view
-	if (lParam1 == -1)
+	if (lParam1 == 0)
 		return -1;
-	if (lParam2 == -1)
+	if (lParam2 == 0)
 		return 1;
 
-	UINT_PTR diffposl = (UINT_PTR)lParam1;
-	UINT_PTR diffposr = (UINT_PTR)lParam2;
-	const DIFFITEM &ldi = pThis->pCtxt->GetDiffAt(diffposl);
-	const DIFFITEM &rdi = pThis->pCtxt->GetDiffAt(diffposr);
+	const DIFFITEM *ldi = reinterpret_cast<DIFFITEM *>(lParam1);
+	const DIFFITEM *rdi = reinterpret_cast<DIFFITEM *>(lParam2);
 	// compare 'left' and 'right' parameters as appropriate
 	int retVal = pThis->pView->ColSort(pThis->pCtxt, pThis->sortCol, ldi, rdi);
 	// return compare result, considering sort direction
@@ -160,7 +164,7 @@ int CALLBACK CDirView::CompareState::CompareFunc(LPARAM lParam1, LPARAM lParam2,
 }
 
 /// Add new item to list view
-int CDirView::AddNewItem(int i, UINT_PTR diffpos, int iImage, int iIndent)
+int CDirView::AddNewItem(int i, const DIFFITEM *di, int iImage, int iIndent)
 {
 	LV_ITEM lvItem;
 	lvItem.mask = LVIF_TEXT | LVIF_PARAM | LVIF_IMAGE | LVIF_INDENT;
@@ -168,7 +172,7 @@ int CDirView::AddNewItem(int i, UINT_PTR diffpos, int iImage, int iIndent)
 	lvItem.iIndent = iIndent;
 	lvItem.iSubItem = 0;
 	lvItem.pszText = LPSTR_TEXTCALLBACK;
-	lvItem.lParam = (LPARAM)diffpos;
+	lvItem.lParam = reinterpret_cast<LPARAM>(di);
 	lvItem.iImage = iImage;
 	return InsertItem(&lvItem);
 }
@@ -209,8 +213,8 @@ void CDirView::ReflectGetdispinfo(NMLVDISPINFO *pParam)
 	const int nIdx = pParam->item.iItem;
 	const int i = ColPhysToLog(pParam->item.iSubItem);
 	const WORD idName = f_cols[i].idName;
-	UINT_PTR key = GetItemKey(nIdx);
-	if (key == SPECIAL_ITEM_POS)
+	DIFFITEM *di = GetDiffItem(nIdx);
+	if (di == NULL)
 	{
 		if (idName == IDS_COLHDR_FILENAME)
 		{
@@ -219,15 +223,14 @@ void CDirView::ReflectGetdispinfo(NMLVDISPINFO *pParam)
 		return;
 	}
 	const CDiffContext *ctxt = m_pFrame->GetDiffContext();
-	const DIFFITEM &di = m_pFrame->GetDiffRefByKey(key);
 	if (pParam->item.mask & LVIF_TEXT)
 	{
 		String s = ColGetTextToDisplay(ctxt, i, di);
 		// Add '*' to newer time field
-		if (di.left.mtime != 0 || di.right.mtime != 0)
+		if (di->left.mtime != 0 || di->right.mtime != 0)
 		{
-			if ((idName == IDS_COLHDR_LTIMEM && di.left.mtime > di.right.mtime) ||
-				(idName == IDS_COLHDR_RTIMEM && di.left.mtime < di.right.mtime))
+			if ((idName == IDS_COLHDR_LTIMEM && di->left.mtime > di->right.mtime) ||
+				(idName == IDS_COLHDR_RTIMEM && di->left.mtime < di->right.mtime))
 			{
 				s.insert(0, _T("* "));
 			}
@@ -236,7 +239,7 @@ void CDirView::ReflectGetdispinfo(NMLVDISPINFO *pParam)
 	}
 	if (pParam->item.mask & LVIF_IMAGE)
 	{
-		pParam->item.iImage = CompareStats::GetColImage(di.diffcode);
+		pParam->item.iImage = CompareStats::GetColImage(di);
 	}
 }
 
@@ -401,7 +404,7 @@ void CDirView::MoveColumn(int psrc, int pdest)
 			m_invcolorder[ord] = i;
 	}
 	ValidateColumnOrdering();
-	InitiateSort();
+	UpdateColumns(LVCF_TEXT | LVCF_WIDTH);
 	ValidateColumnOrdering();
 }
 
@@ -468,7 +471,6 @@ void CDirView::OnEditColumns()
 	else
 	{
 		ReloadColumns();
-		Redisplay();
 	}
 	ValidateColumnOrdering();
 }

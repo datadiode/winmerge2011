@@ -275,16 +275,16 @@ int CDiffContext::DirScan_GetItems(
  * @brief Compare DiffItems in list and add results to compare context.
  *
  * @param myStruct [in] A structure containing compare-related data.
- * @param parentdiffpos [in] Position of parent diff item 
+ * @param parent [in] Pointer to parent diff item 
  * @return >= 0 number of diff items, -1 if compare was aborted
  */
-int CDiffContext::DirScan_CompareItems(UINT_PTR parentdiffpos)
+int CDiffContext::DirScan_CompareItems(DIFFITEM *parent)
 {
 	int res = 0;
-	if (!parentdiffpos)
+	if (parent == NULL)
 		WaitForSingleObject(m_hSemaphore, INFINITE);
-	UINT_PTR pos = GetFirstChildDiffPosition(parentdiffpos);
-	while (UINT_PTR curpos = pos)
+	DIFFITEM *di = GetFirstChildDiff(parent);
+	while (di != NULL)
 	{
 		if (ShouldAbort())
 		{
@@ -292,32 +292,30 @@ int CDiffContext::DirScan_CompareItems(UINT_PTR parentdiffpos)
 			break;
 		}
 		WaitForSingleObject(m_hSemaphore, INFINITE);
-		DIFFITEM &di = GetNextSiblingDiffPosition(pos);
-		if (di.diffcode.isDirectory() && m_nRecursive)
+		if (di->isDirectory() && m_nRecursive)
 		{
-			di.diffcode.diffcode &= ~(DIFFCODE::DIFF | DIFFCODE::SAME);
-			int ndiff = DirScan_CompareItems(curpos);
+			di->diffcode &= ~(DIFFCODE::DIFF | DIFFCODE::SAME);
+			int ndiff = DirScan_CompareItems(di);
 			if (ndiff > 0)
 			{
-				if (di.diffcode.isSideBoth())
-					di.diffcode.diffcode |= DIFFCODE::DIFF;
+				if (di->isSideBoth())
+					di->diffcode |= DIFFCODE::DIFF;
 				res += ndiff;
 			}
 			else if (ndiff == 0)
 			{
-				if (di.diffcode.isSideBoth())
-					di.diffcode.diffcode |= DIFFCODE::SAME;
+				if (di->isSideBoth())
+					di->diffcode |= DIFFCODE::SAME;
 			}
 		}
 		else
 		{
 			CompareDiffItem(di);
-			if (di.diffcode.isResultDiff() ||
-				(!di.diffcode.isSideBoth() && !di.diffcode.isResultFiltered()))
+			if (di->isResultDiff() ||
+				(!di->isSideBoth() && !di->isResultFiltered()))
 				res++;
 		}
-		pos = curpos;
-		GetNextSiblingDiffPosition(pos);
+		di = GetNextSiblingDiff(di);
 	}
 	return res;
 }
@@ -329,12 +327,12 @@ int CDiffContext::DirScan_CompareItems(UINT_PTR parentdiffpos)
  * @param parentdiffpos [in] Position of parent diff item 
  * @return >= 0 number of diff items, -1 if compare was aborted
  */
-int CDiffContext::DirScan_CompareRequestedItems(UINT_PTR parentdiffpos)
+int CDiffContext::DirScan_CompareRequestedItems(DIFFITEM *parent)
 {
 	int res = 0;
-	UINT_PTR pos = GetFirstChildDiffPosition(parentdiffpos);
+	DIFFITEM *di = GetFirstChildDiff(parent);
 	
-	while (pos != NULL)
+	while (di != NULL)
 	{
 		if (ShouldAbort())
 		{
@@ -342,37 +340,36 @@ int CDiffContext::DirScan_CompareRequestedItems(UINT_PTR parentdiffpos)
 			break;
 		}
 
-		UINT_PTR curpos = pos;
-		DIFFITEM &di = GetNextSiblingDiffPosition(pos);
-		if (di.diffcode.isDirectory() && m_nRecursive)
+		if (di->isDirectory() && m_nRecursive)
 		{
-			di.diffcode.diffcode &= ~(DIFFCODE::DIFF | DIFFCODE::SAME);
-			int ndiff = DirScan_CompareRequestedItems(curpos);
+			di->diffcode &= ~(DIFFCODE::DIFF | DIFFCODE::SAME);
+			int ndiff = DirScan_CompareRequestedItems(di);
 			if (ndiff > 0)
 			{
-				if (di.diffcode.isSideBoth())
-					di.diffcode.diffcode |= DIFFCODE::DIFF;
+				if (di->isSideBoth())
+					di->diffcode |= DIFFCODE::DIFF;
 				res += ndiff;
 			}
 			else if (ndiff == 0)
 			{
-				if (di.diffcode.isSideBoth())
-					di.diffcode.diffcode |= DIFFCODE::SAME;
+				if (di->isSideBoth())
+					di->diffcode |= DIFFCODE::SAME;
 			}		
 		}
 		else
 		{
-			if (di.diffcode.isScanNeeded())
+			if (di->isScanNeeded())
 			{
 				if (UpdateDiffItem(di))
 				{
 					CompareDiffItem(di);
 				}
 			}
-			if (di.diffcode.isResultDiff() ||
-				(!di.diffcode.isSideBoth() && !di.diffcode.isResultFiltered()))
+			if (di->isResultDiff() ||
+				(!di->isSideBoth() && !di->isResultFiltered()))
 				res++;
 		}
+		di = GetNextSiblingDiff(di);
 	}
 	return res;
 }
@@ -391,21 +388,21 @@ int CDiffContext::DirScan_CompareRequestedItems(UINT_PTR parentdiffpos)
  *  - FALSE if items were deleted, so diffitem is not valid
  * @param [in] pCtxt Compare context
  */
-bool CDiffContext::UpdateDiffItem(DIFFITEM & di)
+bool CDiffContext::UpdateDiffItem(DIFFITEM *di)
 {
 	bool bExists = false;
 	// Clear side-info and file-infos
-	di.left.ClearPartial();
-	di.right.ClearPartial();
-	di.diffcode.diffcode |= DIFFCODE::BOTH;
+	di->left.ClearPartial();
+	di->right.ClearPartial();
+	di->diffcode |= DIFFCODE::BOTH;
 	if (UpdateInfoFromDiskHalf(di, TRUE))
 		bExists = true;
 	else
-		di.diffcode.diffcode &= ~DIFFCODE::LEFT;
+		di->diffcode &= ~DIFFCODE::LEFT;
 	if (UpdateInfoFromDiskHalf(di, FALSE))
 		bExists = true;
 	else
-		di.diffcode.diffcode &= ~DIFFCODE::RIGHT;
+		di->diffcode &= ~DIFFCODE::RIGHT;
 	return bExists;
 }
 
@@ -424,18 +421,18 @@ bool CDiffContext::UpdateDiffItem(DIFFITEM & di)
  * @todo For date compare, maybe we should use creation date if modification
  * date is missing?
  */
-void CDiffContext::CompareDiffItem(DIFFITEM &di)
+void CDiffContext::CompareDiffItem(DIFFITEM *di)
 {
 	// Clear rescan-request flag (not set by all codepaths)
-	di.diffcode.diffcode &= ~DIFFCODE::NEEDSCAN;
+	di->diffcode &= ~DIFFCODE::NEEDSCAN;
 	// Is it a directory?
-	if (di.diffcode.isDirectory())
+	if (di->isDirectory())
 	{
 		// 1. Test against filters
-		if (m_piFilterGlobal->includeDir(di.left.filename.c_str(), di.right.filename.c_str()))
-			di.diffcode.diffcode |= DIFFCODE::INCLUDED;
+		if (m_piFilterGlobal->includeDir(di->left.filename.c_str(), di->right.filename.c_str()))
+			di->diffcode |= DIFFCODE::INCLUDED;
 		else
-			di.diffcode.diffcode |= DIFFCODE::SKIPPED;
+			di->diffcode |= DIFFCODE::SKIPPED;
 		// We don't actually 'compare' directories, just add non-ignored
 		// directories to list.
 		StoreDiffData(di);
@@ -443,14 +440,14 @@ void CDiffContext::CompareDiffItem(DIFFITEM &di)
 	else
 	{
 		// 1. Test against filters
-		if (m_piFilterGlobal->includeFile(di.left.filename.c_str(), di.right.filename.c_str()))
+		if (m_piFilterGlobal->includeFile(di->left.filename.c_str(), di->right.filename.c_str()))
 		{
-			di.diffcode.diffcode |= DIFFCODE::INCLUDED;
+			di->diffcode |= DIFFCODE::INCLUDED;
 			// 2. Compare two files
-			if (di.diffcode.isSideBoth())
+			if (di->isSideBoth())
 			{
 				// Really compare
-				di.diffcode.diffcode |= m_folderCmp.prepAndCompareTwoFiles(di);
+				di->diffcode |= m_folderCmp.prepAndCompareTwoFiles(di);
 				SetDiffItemStats(di);
 			}
 			// 3. Add unique files
@@ -462,14 +459,14 @@ void CDiffContext::CompareDiffItem(DIFFITEM &di)
 				UINT diffCode = m_folderCmp.prepAndCompareTwoFiles(di);
 				// Add possible binary flag for unique items
 				if (diffCode & DIFFCODE::BIN)
-					di.diffcode.diffcode |= DIFFCODE::BIN;
+					di->diffcode |= DIFFCODE::BIN;
 				SetDiffItemStats(di);
 			}
 			StoreDiffData(di);
 		}
 		else
 		{
-			di.diffcode.diffcode |= DIFFCODE::SKIPPED;
+			di->diffcode |= DIFFCODE::SKIPPED;
 			StoreDiffData(di);
 		}
 	}
@@ -481,36 +478,36 @@ void CDiffContext::CompareDiffItem(DIFFITEM &di)
  * @param [in] pCtxt Compare context.
  * @param [in] pCmpData Folder compare data.
  */
-void CDiffContext::SetDiffItemStats(DIFFITEM &di)
+void CDiffContext::SetDiffItemStats(DIFFITEM *di)
 {
 	// Set text statistics
-	if (di.diffcode.isSideLeftOrBoth())
-		di.left.m_textStats = m_folderCmp.m_diffFileData.m_textStats[0];
-	if (di.diffcode.isSideRightOrBoth())
-		di.right.m_textStats = m_folderCmp.m_diffFileData.m_textStats[1];
+	if (di->isSideLeftOrBoth())
+		di->left.m_textStats = m_folderCmp.m_diffFileData.m_textStats[0];
+	if (di->isSideRightOrBoth())
+		di->right.m_textStats = m_folderCmp.m_diffFileData.m_textStats[1];
 
-	di.nsdiffs = m_folderCmp.m_ndiffs;
-	di.nidiffs = m_folderCmp.m_ntrivialdiffs;
+	di->nsdiffs = m_folderCmp.m_ndiffs;
+	di->nidiffs = m_folderCmp.m_ntrivialdiffs;
 
-	if (!di.diffcode.isSideLeftOnly())
+	if (!di->isSideLeftOnly())
 	{
-		di.right.encoding = m_folderCmp.m_diffFileData.m_FileLocation[1].encoding;
+		di->right.encoding = m_folderCmp.m_diffFileData.m_FileLocation[1].encoding;
 	}
 	
-	if (!di.diffcode.isSideRightOnly())
+	if (!di->isSideRightOnly())
 	{
-		di.left.encoding = m_folderCmp.m_diffFileData.m_FileLocation[0].encoding;
+		di->left.encoding = m_folderCmp.m_diffFileData.m_FileLocation[0].encoding;
 	}
 }
 
-void CDiffContext::StoreDiffData(const DIFFITEM &di)
+void CDiffContext::StoreDiffData(const DIFFITEM *di)
 {
 	LogFile.Write
 	(
 		CLogFile::LCOMPAREDATA, _T("name=<%s>, leftdir=<%s>, rightdir=<%s>, code=%d"),
-		di.left.filename.c_str(), di.left.path.c_str(), di.right.path.c_str(), di.diffcode.diffcode
+		di->left.filename.c_str(), di->left.path.c_str(), di->right.path.c_str(), di->diffcode
 	);
-	m_pCompareStats->AddItem(di.diffcode.diffcode);
+	m_pCompareStats->AddItem(di);
 }
 
 /**

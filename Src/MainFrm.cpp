@@ -2313,19 +2313,20 @@ void CMainFrame::OnToolsGeneratePatch()
 	else if (frame == FRAME_FOLDER)
 	{
 		CDirFrame *const pDoc = static_cast<CDirFrame *>(pFrame);
+		const CDiffContext *ctxt = pDoc->GetDiffContext();
 		CDirView *const pView = pDoc->m_pDirView;
 		// Get selected items from folder compare
 		int ind = -1;
 		while ((ind = pView->GetNextItem(ind, LVNI_SELECTED)) != -1)
 		{
-			const DIFFITEM &item = pView->GetDiffItem(ind);
-			if (item.diffcode.isBin())
+			const DIFFITEM *item = pView->GetDiffItem(ind);
+			if (item->isBin())
 			{
 				LanguageSelect.MsgBox(IDS_CANNOT_CREATE_BINARYPATCH,
 					MB_ICONWARNING | MB_DONT_DISPLAY_AGAIN);
 				break;
 			}
-			if (item.diffcode.isDirectory())
+			if (item->isDirectory())
 			{
 				LanguageSelect.MsgBox(IDS_CANNOT_CREATE_DIRPATCH,
 					MB_ICONWARNING | MB_DONT_DISPLAY_AGAIN);
@@ -2334,18 +2335,18 @@ void CMainFrame::OnToolsGeneratePatch()
 			PATCHFILES files;
 			// Format full paths to files (leftFile/rightFile)
 			// Format relative paths to files in folder compare
-			files.lfile = pDoc->GetLeftFilepath(item);
+			files.lfile = ctxt->GetLeftFilepath(item);
 			if (!files.lfile.empty())
 			{
-				files.lfile = paths_ConcatPath(files.lfile, item.left.filename);
-				files.pathLeft = paths_ConcatPath(item.left.path, item.left.filename);
+				files.lfile = paths_ConcatPath(files.lfile, item->left.filename);
+				files.pathLeft = paths_ConcatPath(item->left.path, item->left.filename);
 				string_replace(files.pathLeft, _T("\\"), _T("/"));
 			}
-			files.rfile = pDoc->GetRightFilepath(item);
+			files.rfile = ctxt->GetRightFilepath(item);
 			if (!files.rfile.empty())
 			{
-				files.rfile = paths_ConcatPath(files.rfile, item.right.filename);
-				files.pathRight = paths_ConcatPath(item.right.path, item.right.filename);
+				files.rfile = paths_ConcatPath(files.rfile, item->right.filename);
+				files.pathRight = paths_ConcatPath(item->right.path, item->right.filename);
 				string_replace(files.pathRight, _T("\\"), _T("/"));
 			}
 			patcher.AddFiles(files);
@@ -2443,14 +2444,12 @@ void CMainFrame::OpenFileToExternalEditor(LPCTSTR file)
 	DecorateCmdLine(sCmd, sExecutable);
 	if (paths_PathIsExe(sExecutable.c_str()))
 	{
-		STARTUPINFO startupInfo;
-		ZeroMemory(&startupInfo, sizeof startupInfo);
-		startupInfo.cb = sizeof startupInfo;
-		PROCESS_INFORMATION processInfo;
-		BOOL retVal = CreateProcess(NULL, const_cast<LPTSTR>(sCmd.c_str()),
-			NULL, NULL, FALSE, CREATE_DEFAULT_ERROR_MODE, NULL, NULL,
-			&startupInfo, &processInfo);
-		if (!retVal)
+		STARTUPINFO si;
+		ZeroMemory(&si, sizeof si);
+		si.cb = sizeof si;
+		PROCESS_INFORMATION pi;
+		if (!CreateProcess(NULL, const_cast<LPTSTR>(sCmd.c_str()),
+				NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi))
 		{
 			// Error invoking external editor
 			LanguageSelect.FormatMessage(IDS_ERROR_EXECUTE_FILE, sExecutable.c_str()).MsgBox(MB_ICONSTOP);

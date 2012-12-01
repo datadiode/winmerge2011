@@ -93,7 +93,7 @@ private:
 	stl::map<String, void *> m_rgImpliedFoldersLeft;
 	stl::map<String, void *> m_rgImpliedFoldersRight;
 //	helper methods
-	const DIFFITEM &Next();
+	const DIFFITEM *Next();
 	bool MultiStepCompressArchive(LPCTSTR);
 public:
 	enum

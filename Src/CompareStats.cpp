@@ -29,9 +29,9 @@ CompareStats::~CompareStats()
  * @brief Add compared item.
  * @param [in] code Resultcode to add.
  */
-void CompareStats::AddItem(UINT code)
+void CompareStats::AddItem(const DIFFITEM *di)
 {
-	RESULT res = GetColImage(code);
+	RESULT res = GetColImage(di);
 	InterlockedIncrement(&m_counts[res]);
 	InterlockedIncrement(&m_nComparedItems);
 	assert(m_nComparedItems <= m_nTotalItems);
@@ -61,39 +61,39 @@ void CompareStats::Reset()
 /**
  * @brief Return image index appropriate for this row
  */
-CompareStats::RESULT CompareStats::GetColImage(const DIFFCODE &diffcode)
+CompareStats::RESULT CompareStats::GetColImage(const DIFFITEM *di)
 {
 	// Must return an image index into image list created above in OnInitDialog
-	if (diffcode.isResultError())
+	if (di->isResultError())
 		return DIFFIMG_ERROR;
-	if (diffcode.isResultAbort())
+	if (di->isResultAbort())
 		return DIFFIMG_ABORT;
-	if (diffcode.isResultFiltered())
-		return diffcode.isDirectory() ? DIFFIMG_DIRSKIP : DIFFIMG_SKIP;
-	if (diffcode.isSideLeftOnly())
-		return diffcode.isDirectory() ? DIFFIMG_LDIRUNIQUE : DIFFIMG_LUNIQUE;
-	if (diffcode.isSideRightOnly())
-		return diffcode.isDirectory() ? DIFFIMG_RDIRUNIQUE : DIFFIMG_RUNIQUE;
-	if (diffcode.isResultSame())
+	if (di->isResultFiltered())
+		return di->isDirectory() ? DIFFIMG_DIRSKIP : DIFFIMG_SKIP;
+	if (di->isSideLeftOnly())
+		return di->isDirectory() ? DIFFIMG_LDIRUNIQUE : DIFFIMG_LUNIQUE;
+	if (di->isSideRightOnly())
+		return di->isDirectory() ? DIFFIMG_RDIRUNIQUE : DIFFIMG_RUNIQUE;
+	if (di->isResultSame())
 	{
-		if (diffcode.isDirectory())
+		if (di->isDirectory())
 			return DIFFIMG_DIRSAME;
-		if (diffcode.isText())
+		if (di->isText())
 			return DIFFIMG_TEXTSAME;
-		if (diffcode.isBin())
+		if (di->isBin())
 			return DIFFIMG_BINSAME;
 		return DIFFIMG_SAME;
 	}
 	// diff
-	if (diffcode.isResultDiff())
+	if (di->isResultDiff())
 	{
-		if (diffcode.isDirectory())
+		if (di->isDirectory())
 			return DIFFIMG_DIRDIFF;
-		if (diffcode.isText())
+		if (di->isText())
 			return DIFFIMG_TEXTDIFF;
-		if (diffcode.isBin())
+		if (di->isBin())
 			return DIFFIMG_BINDIFF;
 		return DIFFIMG_DIFF;
 	}
-	return diffcode.isDirectory() ? DIFFIMG_DIR : DIFFIMG_ABORT;
+	return di->isDirectory() ? DIFFIMG_DIR : DIFFIMG_ABORT;
 }

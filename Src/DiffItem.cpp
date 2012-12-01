@@ -10,8 +10,6 @@
 #include "DiffItem.h"
 #include "paths.h"
 
-DIFFITEM DIFFITEM::emptyitem(NULL);
-
 /** @brief DIFFITEM's destructor */
 DIFFITEM::~DIFFITEM()
 {
@@ -26,7 +24,7 @@ DIFFITEM::~DIFFITEM()
 String DIFFITEM::GetLeftFilepath(const String &sLeftRoot) const
 {
 	String sPath;
-	if (!diffcode.isSideRightOnly())
+	if (!isSideRightOnly())
 	{
 		sPath = paths_ConcatPath(sLeftRoot, left.path);
 	}
@@ -37,7 +35,7 @@ String DIFFITEM::GetLeftFilepath(const String &sLeftRoot) const
 String DIFFITEM::GetRightFilepath(const String &sRightRoot) const
 {
 	String sPath;
-	if (!diffcode.isSideLeftOnly())
+	if (!isSideLeftOnly())
 	{
 		sPath = paths_ConcatPath(sRightRoot, right.path);
 	}

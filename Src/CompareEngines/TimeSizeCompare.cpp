@@ -26,17 +26,17 @@ TimeSizeCompare::TimeSizeCompare(const CDiffContext *pCtxt)
  * @param [in] di Diffitem info.
  * @return DIFFCODE
  */
-int TimeSizeCompare::CompareFiles(int compMethod, const DIFFITEM &di)
+int TimeSizeCompare::CompareFiles(int compMethod, const DIFFITEM *di)
 {
 	UINT code = DIFFCODE::SAME;
 	if ((compMethod == CMP_DATE) || (compMethod == CMP_DATE_SIZE))
 	{
 		// Compare by modified date
 		// Check that we have both filetimes
-		if (di.left.mtime != 0 && di.right.mtime != 0)
+		if (di->left.mtime != 0 && di->right.mtime != 0)
 		{
-			UINT64 lower = min(di.left.mtime.castTo<UINT64>(), di.right.mtime.castTo<UINT64>());
-			UINT64 upper = max(di.left.mtime.castTo<UINT64>(), di.right.mtime.castTo<UINT64>());
+			UINT64 lower = min(di->left.mtime.castTo<UINT64>(), di->right.mtime.castTo<UINT64>());
+			UINT64 upper = max(di->left.mtime.castTo<UINT64>(), di->right.mtime.castTo<UINT64>());
 			UINT64 tolerance = m_pCtxt->m_bIgnoreSmallTimeDiff ? SmallTimeDiff * FileTime::TicksPerSecond : 0;
 			if (upper - lower <= tolerance)
 				code = DIFFCODE::SAME;
@@ -58,7 +58,7 @@ int TimeSizeCompare::CompareFiles(int compMethod, const DIFFITEM &di)
 	// If file sizes differ mark them different
 	if ((compMethod == CMP_DATE_SIZE) || (compMethod == CMP_SIZE))
 	{
-		if (di.left.size.int64 != di.right.size.int64)
+		if (di->left.size.int64 != di->right.size.int64)
 		{
 			code = DIFFCODE::DIFF;
 		}

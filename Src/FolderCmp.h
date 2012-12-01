@@ -29,7 +29,7 @@ public:
 	FolderCmp(CDiffContext *);
 	~FolderCmp();
 	void Reset();
-	UINT prepAndCompareTwoFiles(DIFFITEM &);
+	UINT prepAndCompareTwoFiles(DIFFITEM *);
 
 	int m_ndiffs;
 	int m_ntrivialdiffs;
@@ -37,7 +37,7 @@ public:
 	DiffFileData m_diffFileData;
 	
 private:
-	void GetComparePaths(const DIFFITEM &di, String &left, String &right) const;
+	void GetComparePaths(const DIFFITEM *di, String &left, String &right) const;
 
 	CDiffContext *const m_pCtx;
 	CompareEngines::DiffUtils *m_pDiffUtilsEngine;

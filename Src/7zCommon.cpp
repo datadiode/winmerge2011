@@ -695,7 +695,7 @@ CDirView::DirItemEnumerator::DirItemEnumerator(CDirView *pView, int nFlags)
 		// Collect implied folders
 		for (UINT i = Open() ; i-- ; )
 		{
-			const DIFFITEM &di = Next();
+			const DIFFITEM *di = Next();
 			if ((m_nFlags & DiffsOnly) && !m_pView->IsItemNavigableDiff(di))
 			{
 				continue;
@@ -703,19 +703,19 @@ CDirView::DirItemEnumerator::DirItemEnumerator(CDirView *pView, int nFlags)
 			if (m_bRight) 
 			{
 				// Enumerating items on right side
-				if (!di.diffcode.isSideLeftOnly())
+				if (!di->isSideLeftOnly())
 				{
 					// Item is present on right side, i.e. folder is implied
-					m_rgImpliedFoldersRight[di.right.path] = PVOID(1);
+					m_rgImpliedFoldersRight[di->right.path] = PVOID(1);
 				}
 			}
 			else
 			{
 				// Enumerating items on left side
-				if (!di.diffcode.isSideRightOnly())
+				if (!di->isSideRightOnly())
 				{
 					// Item is present on left side, i.e. folder is implied
-					m_rgImpliedFoldersLeft[di.left.path] = PVOID(1);
+					m_rgImpliedFoldersLeft[di->left.path] = PVOID(1);
 				}
 			}
 		}
@@ -750,7 +750,7 @@ UINT CDirView::DirItemEnumerator::Open()
 /**
  * @brief Return next item.
  */
-const DIFFITEM &CDirView::DirItemEnumerator::Next()
+const DIFFITEM *CDirView::DirItemEnumerator::Next()
 {
 	enum {nMask = LVNI_FOCUSED|LVNI_SELECTED|LVNI_CUT|LVNI_DROPHILITED};
 	while ((m_nIndex = m_pView->GetNextItem(m_nIndex, m_nFlags & nMask)) == -1)
@@ -778,20 +778,21 @@ const DIFFITEM &CDirView::DirItemEnumerator::Next()
 Merge7z::Envelope *CDirView::DirItemEnumerator::Enum(Item &item)
 {
 	CDirFrame *pDoc = m_pView->m_pFrame;
-	const DIFFITEM &di = Next();
+	const CDiffContext *ctxt = pDoc->GetDiffContext();
+	const DIFFITEM *di = Next();
 
 	if ((m_nFlags & DiffsOnly) && !m_pView->IsItemNavigableDiff(di))
 	{
 		return 0;
 	}
 
-	bool isSideLeft = di.diffcode.isSideLeftOnly();
-	bool isSideRight = di.diffcode.isSideRightOnly();
+	bool isSideLeft = di->isSideLeftOnly();
+	bool isSideRight = di->isSideRightOnly();
 
 	Envelope *envelope = new Envelope;
 
-	const String &sFilename = m_bRight ? di.right.filename : di.left.filename;
-	const String &sSubdir = m_bRight ? di.right.path : di.left.path;
+	const String &sFilename = m_bRight ? di->right.filename : di->left.filename;
+	const String &sSubdir = m_bRight ? di->right.path : di->left.path;
 	envelope->Name = sFilename;
 	if (sSubdir.length())
 	{
@@ -801,8 +802,8 @@ Merge7z::Envelope *CDirView::DirItemEnumerator::Enum(Item &item)
 	envelope->FullPath = sFilename;
 	envelope->FullPath.insert(0, _T("\\"));
 	envelope->FullPath.insert(0, m_bRight ?
-		pDoc->GetRightFilepath(di) :
-		pDoc->GetLeftFilepath(di));
+		ctxt->GetRightFilepath(di) :
+		ctxt->GetLeftFilepath(di));
 
 	UINT32 Recurse = item.Mask.Recurse;
 
@@ -814,13 +815,13 @@ Merge7z::Envelope *CDirView::DirItemEnumerator::Enum(Item &item)
 			if (isSideLeft)
 			{
 				// Item is missing on right side
-				PVOID &implied = m_rgImpliedFoldersRight[di.left.path.c_str()];
+				PVOID &implied = m_rgImpliedFoldersRight[di->left.path.c_str()];
 				if (!implied)
 				{
 					// Folder is not implied by some other file, and has
 					// not been enumerated so far, so enumerate it now!
-					envelope->Name = di.left.path;
-					envelope->FullPath = pDoc->GetLeftFilepath(di);
+					envelope->Name = di->left.path;
+					envelope->FullPath = ctxt->GetLeftFilepath(di);
 					implied = PVOID(2); // Don't enumerate same folder twice!
 					isSideLeft = false;
 					Recurse = 0;
@@ -833,13 +834,13 @@ Merge7z::Envelope *CDirView::DirItemEnumerator::Enum(Item &item)
 			if (isSideRight)
 			{
 				// Item is missing on left side
-				PVOID &implied = m_rgImpliedFoldersLeft[di.right.path.c_str()];
+				PVOID &implied = m_rgImpliedFoldersLeft[di->right.path.c_str()];
 				if (!implied)
 				{
 					// Folder is not implied by some other file, and has
 					// not been enumerated so far, so enumerate it now!
-					envelope->Name = di.right.path;
-					envelope->FullPath = pDoc->GetRightFilepath(di);
+					envelope->Name = di->right.path;
+					envelope->FullPath = ctxt->GetRightFilepath(di);
 					implied = PVOID(2); // Don't enumerate same folder twice!
 					isSideRight = false;
 					Recurse = 0;

@@ -189,8 +189,10 @@ void CDirFrame::UpdateCmdUI<ID_L2R>()
 		int i = -1;
 		while ((i = m_pDirView->GetNextItem(i, LVNI_SELECTED)) != -1)
 		{
-			const DIFFITEM& di = m_pDirView->GetDiffItem(i);
-			if (di.diffcode.diffcode != 0 && m_pDirView->IsItemCopyableToRight(di))
+			const DIFFITEM *di = m_pDirView->GetDiffItem(i);
+			if (di == NULL)
+				break;
+			if (di->isSideLeftOrBoth())
 			{
 				enable = MF_ENABLED;
 				break;
@@ -209,8 +211,10 @@ void CDirFrame::UpdateCmdUI<ID_R2L>()
 		int i = -1;
 		while ((i = m_pDirView->GetNextItem(i, LVNI_SELECTED)) != -1)
 		{
-			const DIFFITEM& di = m_pDirView->GetDiffItem(i);
-			if (di.diffcode.diffcode != 0 && m_pDirView->IsItemCopyableToLeft(di))
+			const DIFFITEM *di = m_pDirView->GetDiffItem(i);
+			if (di == NULL)
+				break;
+			if (di->isSideRightOrBoth())
 			{
 				enable = MF_ENABLED;
 				break;
@@ -231,10 +235,11 @@ void CDirFrame::UpdateCmdUI<ID_MERGE_DELETE>()
 		int i = -1;
 		while ((i = m_pDirView->GetNextItem(i, LVNI_SELECTED)) != -1)
 		{
-			const DIFFITEM& di = m_pDirView->GetDiffItem(i);
-			if (di.diffcode.diffcode != 0 && (
-				m_pDirView->IsItemDeletableOnLeft(di) && !m_bROLeft ||
-				m_pDirView->IsItemDeletableOnRight(di) && !m_bRORight))
+			const DIFFITEM *di = m_pDirView->GetDiffItem(i);
+			if (di == NULL)
+				break;
+			if (di->isDeletableOnLeft() && !m_bROLeft ||
+				di->isDeletableOnRight() && !m_bRORight)
 			{
 				enable = MF_ENABLED;
 				break;

@@ -55,6 +55,8 @@ void CDiffContext::LoadFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *fil
 			ent.flags.attributes = ff.dwFileAttributes;
 			if ((ff.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0)
 			{
+				// Ensure attributes to be nonzero for existing files
+				ent.flags.attributes |= FILE_ATTRIBUTE_NORMAL;
 				ent.size.Lo = ff.nFileSizeLow;
 				ent.size.Hi = ff.nFileSizeHigh;
 				files->push_back(ent);

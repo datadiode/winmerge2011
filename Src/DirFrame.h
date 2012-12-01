@@ -102,8 +102,8 @@ public:
 	int GetRecursive() const { return m_nRecursive; }
 	void CompareReady();
 	void UpdateChangedItem(const CChildFrame *);
-	UINT_PTR FindItemFromPaths(LPCTSTR pathLeft, LPCTSTR pathRight);
-	void ReloadItemStatus(UINT_PTR diffPos, BOOL bLeft, BOOL bRight);
+	DIFFITEM *FindItemFromPaths(LPCTSTR pathLeft, LPCTSTR pathRight);
+	void ReloadItemStatus(DIFFITEM *, BOOL bLeft, BOOL bRight);
 	void Redisplay();
 	void AddMergeDoc(CChildFrame *);
 	void AddMergeDoc(CHexMergeFrame *);
@@ -116,15 +116,9 @@ public:
 	void ApplyLeftDisplayRoot(String &);
 	void ApplyRightDisplayRoot(String &);
 
-	bool IsShowable(const DIFFITEM &) const;
+	bool IsShowable(const DIFFITEM *) const;
 
 	CDiffContext *GetDiffContext() { return m_pCtxt; }
-	const DIFFITEM &GetDiffByKey(UINT_PTR key) const { return m_pCtxt->GetDiffAt(key); }
-	DIFFITEM &GetDiffRefByKey(UINT_PTR key) { return m_pCtxt->GetDiffAt(key); }
-	String GetLeftBasePath() const { return m_pCtxt->GetLeftPath(); }
-	String GetRightBasePath() const { return m_pCtxt->GetRightPath(); }
-	String GetLeftFilepath(const DIFFITEM &di) const { return di.GetLeftFilepath(m_pCtxt->GetLeftPath()); }
-	String GetRightFilepath(const DIFFITEM &di) const { return di.GetRightFilepath(m_pCtxt->GetRightPath()); }
 	struct AllowUpwardDirectory
 	{
 		enum ReturnCode
@@ -136,7 +130,7 @@ public:
 		};
 	};
 	AllowUpwardDirectory::ReturnCode AllowUpwardDirectory(String &leftParent, String &rightParent);
-	void SetItemViewFlag(UINT_PTR key, UINT flag, UINT mask);
+	void SetItemViewFlag(DIFFITEM *, UINT flag, UINT mask);
 	void SetItemViewFlag(UINT flag, UINT mask);
 	const CompareStats *GetCompareStats() const { return m_pCompareStats; };
 

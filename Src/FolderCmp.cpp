@@ -67,7 +67,7 @@ FolderCmp::~FolderCmp()
  * @param [in, out] di Compared files with associated data.
  * @return Compare result code.
  */
-UINT FolderCmp::prepAndCompareTwoFiles(DIFFITEM &di)
+UINT FolderCmp::prepAndCompareTwoFiles(DIFFITEM *di)
 {
 	int nCompMethod = m_pCtx->m_nCompMethod;
 
@@ -103,8 +103,8 @@ UINT FolderCmp::prepAndCompareTwoFiles(DIFFITEM &di)
 
 		// If either file is larger than limit compare files by quick contents
 		// This allows us to (faster) compare big binary files
-		if (di.left.size.int64 > m_pCtx->m_nQuickCompareLimit ||
-			di.right.size.int64 > m_pCtx->m_nQuickCompareLimit)
+		if (di->left.size.int64 > m_pCtx->m_nQuickCompareLimit ||
+			di->right.size.int64 > m_pCtx->m_nQuickCompareLimit)
 		{
 			nCompMethod = CMP_QUICK_CONTENT;
 		}
@@ -130,7 +130,7 @@ UINT FolderCmp::prepAndCompareTwoFiles(DIFFITEM &di)
 
 		// If unique item, it was being compared to itself to determine encoding
 		// and the #diffs is invalid
-		if (di.diffcode.isSideRightOnly() || di.diffcode.isSideLeftOnly())
+		if (di->isSideRightOnly() || di->isSideLeftOnly())
 		{
 			m_ndiffs = CDiffContext::DIFFS_UNKNOWN;
 			m_ntrivialdiffs = CDiffContext::DIFFS_UNKNOWN;
@@ -146,17 +146,17 @@ UINT FolderCmp::prepAndCompareTwoFiles(DIFFITEM &di)
 		// use our own byte-by-byte compare
 		code = m_pByteCompare->CompareFiles(&m_diffFileData.m_FileLocation.front());
 
-		if (!di.diffcode.isSideRightOnly())
+		if (!di->isSideRightOnly())
 			m_diffFileData.m_textStats[0] = m_pByteCompare->m_textStats[0];
-		if (!di.diffcode.isSideLeftOnly())
+		if (!di->isSideLeftOnly())
 			m_diffFileData.m_textStats[1] = m_pByteCompare->m_textStats[1];
 
 		// Quick contents doesn't know about diff counts
 		// Set to special value to indicate invalid
 		m_ndiffs = CDiffContext::DIFFS_UNKNOWN_QUICKCOMPARE;
 		m_ntrivialdiffs = CDiffContext::DIFFS_UNKNOWN_QUICKCOMPARE;
-		di.left.m_textStats = m_diffFileData.m_textStats[0];
-		di.right.m_textStats = m_diffFileData.m_textStats[1];
+		di->left.m_textStats = m_diffFileData.m_textStats[0];
+		di->right.m_textStats = m_diffFileData.m_textStats[1];
 	}
 	else if (nCompMethod == CMP_DATE || nCompMethod == CMP_DATE_SIZE || nCompMethod == CMP_SIZE)
 	{
@@ -195,26 +195,26 @@ UINT FolderCmp::prepAndCompareTwoFiles(DIFFITEM &di)
  * @param [out] right Gets the right compare path.
  * @note If item is unique, same path is returned for both.
  */
-void FolderCmp::GetComparePaths(const DIFFITEM &di, String &left, String &right) const
+void FolderCmp::GetComparePaths(const DIFFITEM *di, String &left, String &right) const
 {
-	if (!di.diffcode.isSideRightOnly())
+	if (!di->isSideRightOnly())
 	{
 		// Compare file to itself to detect encoding
 		left = m_pCtx->GetLeftPath();
-		if (!di.left.path.empty())
-			left = paths_ConcatPath(left, di.left.path);
-		left = paths_ConcatPath(left, di.left.filename);
-		if (di.diffcode.isSideLeftOnly())
+		if (!di->left.path.empty())
+			left = paths_ConcatPath(left, di->left.path);
+		left = paths_ConcatPath(left, di->left.filename);
+		if (di->isSideLeftOnly())
 			right = left;
 	}
-	if (!di.diffcode.isSideLeftOnly())
+	if (!di->isSideLeftOnly())
 	{
 		// Compare file to itself to detect encoding
 		right = m_pCtx->GetRightPath();
-		if (!di.right.path.empty())
-			right = paths_ConcatPath(right, di.right.path);
-		right = paths_ConcatPath(right, di.right.filename);
-		if (di.diffcode.isSideRightOnly())
+		if (!di->right.path.empty())
+			right = paths_ConcatPath(right, di->right.path);
+		right = paths_ConcatPath(right, di->right.filename);
+		if (di->isSideRightOnly())
 			left = right;
 	}
 }

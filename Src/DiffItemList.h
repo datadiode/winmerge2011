@@ -25,27 +25,16 @@ public:
 	~DiffItemList();
 	// add & remove differences
 	DIFFITEM *AddDiff(DIFFITEM *parent);
-	void RemoveDiff(UINT_PTR diffpos);
+	void RemoveDiff(DIFFITEM *);
 	void RemoveAll();
 
 	// to iterate over all differences on list
-	UINT_PTR GetFirstDiffPosition() const;
-	UINT_PTR GetFirstChildDiffPosition(UINT_PTR parentdiffpos) const;
-	DIFFITEM &GetNextDiffPosition(UINT_PTR & diffpos) const;
-	DIFFITEM &GetNextSiblingDiffPosition(UINT_PTR & diffpos) const;
-	DIFFITEM &GetDiffAt(UINT_PTR diffpos) const;
+	DIFFITEM *GetFirstChildDiff(const DIFFITEM *) const;
+	DIFFITEM *GetNextDiff(const DIFFITEM *) const;
+	DIFFITEM *GetNextSiblingDiff(const DIFFITEM *) const;
 
 protected:
 	ListEntry m_root; /**< Root of list of diffitems */
 };
-
-/**
- * @brief Get Diff Item (by reference) at given position in difflist.
- * @param diffpos position of item to return
- */
-inline DIFFITEM & DiffItemList::GetDiffAt(UINT_PTR diffpos) const
-{
-	return *reinterpret_cast<DIFFITEM *>(diffpos);
-}
 
 #endif // _DIFF_ITEM_LIST_H_

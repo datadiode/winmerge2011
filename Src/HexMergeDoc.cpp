@@ -52,38 +52,35 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-static void UpdateDiffItem(DIFFITEM &di, CDiffContext *pCtxt);
-static int Try(HRESULT hr, UINT type = MB_OKCANCEL|MB_ICONSTOP);
-
 /**
  * @brief Update diff item
  */
-static void UpdateDiffItem(DIFFITEM &di, CDiffContext *pCtxt)
+static void UpdateDiffItem(DIFFITEM *di, CDiffContext *pCtxt)
 {
-	di.diffcode.diffcode |= DIFFCODE::SIDEFLAGS;
-	di.left.ClearPartial();
-	di.right.ClearPartial();
+	di->diffcode |= DIFFCODE::SIDEFLAGS;
+	di->left.ClearPartial();
+	di->right.ClearPartial();
 	if (!pCtxt->UpdateInfoFromDiskHalf(di, TRUE))
-		di.diffcode.diffcode &= ~DIFFCODE::LEFT;
+		di->diffcode &= ~DIFFCODE::LEFT;
 	if (!pCtxt->UpdateInfoFromDiskHalf(di, FALSE))
-		di.diffcode.diffcode &= ~DIFFCODE::RIGHT;
+		di->diffcode &= ~DIFFCODE::RIGHT;
 	// 1. Clear flags
-	di.diffcode.diffcode &= ~(DIFFCODE::TEXTFLAGS | DIFFCODE::COMPAREFLAGS);
+	di->diffcode &= ~(DIFFCODE::TEXTFLAGS | DIFFCODE::COMPAREFLAGS);
 	// 2. Process unique files
 	// We must compare unique files to itself to detect encoding
-	if (di.diffcode.isSideLeftOnly() || di.diffcode.isSideRightOnly())
+	if (di->isSideLeftOnly() || di->isSideRightOnly())
 	{
 		int compareMethod = pCtxt->m_nCompMethod;
 		if (compareMethod != CMP_DATE &&
 			compareMethod != CMP_DATE_SIZE &&
 			compareMethod != CMP_SIZE)
 		{
-			di.diffcode.diffcode |= DIFFCODE::SAME;
+			di->diffcode |= DIFFCODE::SAME;
 			FolderCmp folderCmp(pCtxt);
 			int diffCode = folderCmp.prepAndCompareTwoFiles(di);
 			// Add possible binary flag for unique items
 			if (diffCode & DIFFCODE::BIN)
-				di.diffcode.diffcode |= DIFFCODE::BIN;
+				di->diffcode |= DIFFCODE::BIN;
 		}
 	}
 	// 3. Compare two files
@@ -91,14 +88,14 @@ static void UpdateDiffItem(DIFFITEM &di, CDiffContext *pCtxt)
 	{
 		// Really compare
 		FolderCmp folderCmp(pCtxt);
-		di.diffcode.diffcode |= folderCmp.prepAndCompareTwoFiles(di);
+		di->diffcode |= folderCmp.prepAndCompareTwoFiles(di);
 	}
 }
 
 /**
  * @brief Issue an error popup if passed in HRESULT is nonzero
  */
-static int Try(HRESULT hr, UINT type)
+static int Try(HRESULT hr, UINT type = MB_OKCANCEL | MB_ICONSTOP)
 {
 	return hr ? OException(hr).ReportError(theApp.m_pMainWnd->m_hWnd, type) : 0;
 }
@@ -124,9 +121,8 @@ void CHexMergeFrame::UpdateDiffItem(CDirFrame *pDirDoc)
 	{
 		const String &pathLeft = m_strPath[0];
 		const String &pathRight = m_strPath[1];
-		if (UINT_PTR pos = pDirDoc->FindItemFromPaths(pathLeft.c_str(), pathRight.c_str()))
+		if (DIFFITEM *di = pDirDoc->FindItemFromPaths(pathLeft.c_str(), pathRight.c_str()))
 		{
-			DIFFITEM &di = pDirDoc->GetDiffRefByKey(pos);
 			::UpdateDiffItem(di, pDirDoc->GetDiffContext());
 		}
 	}

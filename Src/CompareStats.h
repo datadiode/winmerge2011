@@ -10,7 +10,8 @@
 #ifndef _COMPARESTATS_H_
 #define _COMPARESTATS_H_
 
-struct DIFFCODE;
+struct DIFFITEM;
+
 
 /**
  * @brief Class holding directory compare stats.
@@ -54,7 +55,7 @@ public:
 
 	CompareStats();
 	~CompareStats();
-	void AddItem(UINT code);
+	void AddItem(const DIFFITEM *);
 	void IncreaseTotalItems()
 	{
 		InterlockedIncrement(&m_nTotalItems);
@@ -70,7 +71,7 @@ public:
 	int GetCount(CompareStats::RESULT result) const;
 	int GetComparedItems() const { return m_nComparedItems; }
 	void Reset();
-	static RESULT GetColImage(const DIFFCODE &);
+	static RESULT GetColImage(const DIFFITEM *);
 
 private:
 

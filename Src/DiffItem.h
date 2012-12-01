@@ -47,31 +47,6 @@ struct DIFFCODE
 		FILTERFLAGS=0x30000, INCLUDED=0x10000, SKIPPED=0x20000,
 		SCANFLAGS=0x100000, NEEDSCAN=0x100000,
 	};
-
-	UINT diffcode;
-
-	DIFFCODE(UINT diffcode = 0) : diffcode(diffcode) { }
-
-	// file/directory
-	bool isDirectory() const { return (diffcode & TYPEFLAGS) == DIR; }
-	// left/right
-	bool isSideLeftOnly() const { return (diffcode & SIDEFLAGS) == LEFT; }
-	bool isSideLeftOrBoth() const { return (diffcode & LEFT) != 0; }
-	bool isSideRightOnly() const { return (diffcode & SIDEFLAGS) == RIGHT; }
-	bool isSideRightOrBoth() const { return (diffcode & RIGHT) != 0; }
-	bool isSideBoth() const { return (diffcode & SIDEFLAGS) == BOTH; }
-	// compare result
-	bool isResultSame() const { return (diffcode & COMPAREFLAGS) == SAME; }
-	bool isResultDiff() const { return (diffcode & COMPAREFLAGS) == DIFF; }
-	bool isResultError() const { return (diffcode & COMPAREFLAGS) == CMPERR; }
-	bool isResultAbort() const { return (diffcode & COMPAREFLAGS) == CMPABORT; }
-	// filter status
-	bool isResultFiltered() const { return (diffcode & FILTERFLAGS) == SKIPPED; }
-	// type
-	bool isText() const { return (diffcode & TEXT) != 0; }
-	bool isBin() const { return (diffcode & BIN) != 0; }
-	// rescan
-	bool isScanNeeded() const { return (diffcode & SCANFLAGS) == NEEDSCAN; }
 };
 
 /**
@@ -94,14 +69,54 @@ struct DIFFITEM : ListEntry
 	DiffFileInfo right; /**< Fileinfo for right file */
 	int	nsdiffs; /**< Amount of non-ignored differences */
 	int nidiffs; /**< Amount of ignored differences */
+	UINT diffcode; /**< Compare result */
 	UINT customFlags1; /**< Custom flags set 1 */
-	DIFFCODE diffcode; /**< Compare result */
 
-	static DIFFITEM emptyitem; /**< singleton to represent a diffitem that doesn't have any data */
-
-	DIFFITEM(DIFFITEM *parent)
-		: parent(parent), nidiffs(-1), nsdiffs(-1), customFlags1(0) { }
+	explicit DIFFITEM(DIFFITEM *parent)
+		: parent(parent), nidiffs(-1), nsdiffs(-1), diffcode(0), customFlags1(0) { }
 	~DIFFITEM();
+
+	// file/directory
+	bool isDirectory() const { return (diffcode & DIFFCODE::TYPEFLAGS) == DIFFCODE::DIR; }
+	// left/right
+	bool isSideLeftOnly() const { return (diffcode & DIFFCODE::SIDEFLAGS) == DIFFCODE::LEFT; }
+	bool isSideLeftOrBoth() const { return (diffcode & DIFFCODE::LEFT) != 0; }
+	bool isSideRightOnly() const { return (diffcode & DIFFCODE::SIDEFLAGS) == DIFFCODE::RIGHT; }
+	bool isSideRightOrBoth() const { return (diffcode & DIFFCODE::RIGHT) != 0; }
+	bool isSideBoth() const { return (diffcode & DIFFCODE::SIDEFLAGS) == DIFFCODE::BOTH; }
+	// compare result
+	bool isResultSame() const { return (diffcode & DIFFCODE::COMPAREFLAGS) == DIFFCODE::SAME; }
+	bool isResultDiff() const { return (diffcode & DIFFCODE::COMPAREFLAGS) == DIFFCODE::DIFF; }
+	bool isResultError() const { return (diffcode & DIFFCODE::COMPAREFLAGS) == DIFFCODE::CMPERR; }
+	bool isResultAbort() const { return (diffcode & DIFFCODE::COMPAREFLAGS) == DIFFCODE::CMPABORT; }
+	// filter status
+	bool isResultFiltered() const { return (diffcode & DIFFCODE::FILTERFLAGS) == DIFFCODE::SKIPPED; }
+	// type
+	bool isText() const { return (diffcode & DIFFCODE::TEXT) != 0; }
+	bool isBin() const { return (diffcode & DIFFCODE::BIN) != 0; }
+	// rescan
+	bool isScanNeeded() const { return (diffcode & DIFFCODE::SCANFLAGS) == DIFFCODE::NEEDSCAN; }
+
+	bool isDeletableOnLeft() const
+	{
+		return (diffcode & DIFFCODE::LEFT) != 0
+			// don't let them mess with error items
+			&& (diffcode & DIFFCODE::COMPAREFLAGS) != DIFFCODE::CMPERR;
+	}
+
+	bool isDeletableOnRight() const
+	{
+		return (diffcode & DIFFCODE::RIGHT) != 0
+			// don't let them mess with error items
+			&& (diffcode & DIFFCODE::COMPAREFLAGS) != DIFFCODE::CMPERR;
+	}
+
+	bool isDeletableOnBoth() const
+	{
+		return (diffcode & DIFFCODE::SIDEFLAGS) == DIFFCODE::BOTH
+			// don't let them mess with error items
+			&& (diffcode & DIFFCODE::COMPAREFLAGS) != DIFFCODE::CMPERR;
+	}
 
 	String GetLeftFilepath(const String &sLeftRoot) const;
 	String GetRightFilepath(const String &sRightRoot) const;

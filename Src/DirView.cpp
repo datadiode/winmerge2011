@@ -257,7 +257,17 @@ void CDirView::ReflectItemActivate(NMITEMACTIVATE *pNM)
  */
 void CDirView::ReloadColumns()
 {
-	LoadColumnHeaderItems();
+	int i = GetHeaderCtrl()->GetItemCount();
+	while (i > m_dispcols)
+	{
+		DeleteColumn(--i);
+	}
+	while (i < m_dispcols)
+	{
+		LVCOLUMN lvc;
+		lvc.mask = 0;
+		InsertColumn(i++, &lvc);
+	}
 	UpdateColumns(LVCF_TEXT | LVCF_FMT | LVCF_WIDTH);
 }
 
@@ -268,46 +278,45 @@ void CDirView::ReloadColumns()
  * @param [in,out] index Index of the item to be inserted.
  * @param [in,out] alldiffs Number of different items
  */
-void CDirView::RedisplayChildren(UINT_PTR diffpos, int level, int &index, int &alldiffs)
+void CDirView::RedisplayChildren(DIFFITEM *di, int level, int &index, int &alldiffs)
 {
 	const CDiffContext *ctxt = m_pFrame->GetDiffContext();
-	while (diffpos)
+	di = ctxt->GetFirstChildDiff(di);
+	while (di != NULL)
 	{
-		UINT_PTR curdiffpos = diffpos;
-		const DIFFITEM &di = ctxt->GetNextSiblingDiffPosition(diffpos);
-
-		if (!di.diffcode.isResultSame())
+		if (!di->isResultSame())
 			++alldiffs;
 
 		if (m_pFrame->IsShowable(di))
 		{
 			if (m_bTreeMode)
 			{
-				AddNewItem(index, curdiffpos, I_IMAGECALLBACK, level);
+				AddNewItem(index, di, I_IMAGECALLBACK, level);
 				index++;
-				if (di.HasChildren())
+				if (di->HasChildren())
 				{
-					SetItemState(index - 1, INDEXTOSTATEIMAGEMASK((di.customFlags1 & ViewCustomFlags::EXPANDED) ? 2 : 1), LVIS_STATEIMAGEMASK);
-					if (di.customFlags1 & ViewCustomFlags::EXPANDED)
-						RedisplayChildren(ctxt->GetFirstChildDiffPosition(curdiffpos), level + 1, index, alldiffs);
+					SetItemState(index - 1, INDEXTOSTATEIMAGEMASK((di->customFlags1 & ViewCustomFlags::EXPANDED) ? 2 : 1), LVIS_STATEIMAGEMASK);
+					if (di->customFlags1 & ViewCustomFlags::EXPANDED)
+						RedisplayChildren(di, level + 1, index, alldiffs);
 				}
 			}
 			else
 			{
 				if (m_pFrame->GetRecursive() == 0 ||
-					!di.diffcode.isDirectory() ||
-					di.diffcode.isSideLeftOnly() ||
-					di.diffcode.isSideRightOnly())
+					!di->isDirectory() ||
+					di->isSideLeftOnly() ||
+					di->isSideRightOnly())
 				{
-					AddNewItem(index, curdiffpos, I_IMAGECALLBACK, 0);
+					AddNewItem(index, di, I_IMAGECALLBACK, 0);
 					index++;
 				}
-				if (di.HasChildren())
+				if (di->HasChildren())
 				{
-					RedisplayChildren(ctxt->GetFirstChildDiffPosition(curdiffpos), level + 1, index, alldiffs);
+					RedisplayChildren(di, level + 1, index, alldiffs);
 				}
 			}
 		}
+		di = ctxt->GetNextSiblingDiff(di);
 	}
 }
 
@@ -339,7 +348,7 @@ void CDirView::Redisplay()
 	}
 
 	int alldiffs = 0;
-	RedisplayChildren(ctxt->GetFirstDiffPosition(), 0, cnt, alldiffs);
+	RedisplayChildren(NULL, 0, cnt, alldiffs);
 	SortColumnsAppropriately();
 	SetRedraw(TRUE);
 }
@@ -405,41 +414,41 @@ void CDirView::ListContextMenu(POINT point)
 	int i = -1;
 	while ((i = GetNextItem(i, LVNI_SELECTED)) != -1)
 	{
-		const DIFFITEM& di = GetDiffItem(i);
-		if (di.diffcode.diffcode == 0) // Invalid value, this must be special item
-			continue;
+		const DIFFITEM *di = GetDiffItem(i);
+		if (di == NULL) // Invalid value, this must be special item
+			break;
 
-		if (!di.diffcode.isDirectory())
+		if (!di->isDirectory())
 			++nFileNames;
 
-		if (IsItemDeletableOnBoth(di) && !leftRO && !rightRO)
+		if (di->isDeletableOnBoth() && !leftRO && !rightRO)
 			++nDeletableOnBoth;
 
-		if (IsItemOpenableOnLeft(di))
+		if (di->isSideLeftOrBoth())
 		{
 			++nOpenableOnLeft;
-			if (!di.diffcode.isDirectory())
+			if (!di->isDirectory())
 				++nOpenableOnLeftWith;
-			if (IsItemCopyableToRight(di) && !rightRO)
+			if (!rightRO)
 				++nCopyableToRight;
-			if (IsItemDeletableOnLeft(di) && !leftRO)
+			if (di->isDeletableOnLeft() && !leftRO)
 				++nDeletableOnLeft;
 		}
 
-		if (IsItemOpenableOnRight(di))
+		if (di->isSideRightOrBoth())
 		{
 			++nOpenableOnRight;
-			if (!di.diffcode.isDirectory())
+			if (!di->isDirectory())
 				++nOpenableOnRightWith;
-			if (IsItemCopyableToLeft(di) && !leftRO)
+			if (!leftRO)
 				++nCopyableToLeft;
-			if (IsItemDeletableOnRight(di) && !rightRO)
+			if (di->isDeletableOnRight() && !rightRO)
 				++nDeletableOnRight;
 		}
 
 		if (IsItemNavigableDiff(di))
 			++nDiffItems;
-		if (IsItemOpenableOnLeft(di) || IsItemOpenableOnRight(di))
+		if (di->isSideLeftOrBoth() || di->isSideRightOrBoth())
 			++nOpenableOnBoth;
 
 		++nTotal;
@@ -568,6 +577,8 @@ void CDirView::HeaderContextMenu(POINT point)
  */
 HMENU CDirView::ListShellContextMenu(SIDE_TYPE side)
 {
+	const CDiffContext *ctxt = m_pFrame->GetDiffContext();
+
 	CMyComPtr<IShellFolder> pDesktop;
 	HRESULT hr = SHGetDesktopFolder(&pDesktop);
 	if (FAILED(hr))
@@ -580,13 +591,13 @@ HMENU CDirView::ListShellContextMenu(SIDE_TYPE side)
 	int i = -1;
 	while ((i = GetNextItem(i, LVNI_SELECTED)) != -1)
 	{
-		const DIFFITEM& di = GetDiffItem(i);
-		if (di.diffcode.diffcode == 0) // Invalid value, this must be special item
+		const DIFFITEM *di = GetDiffItem(i);
+		if (di == NULL) // Invalid value, this must be special item
 			continue;
 		String currentDir = (side == SIDE_LEFT) ?
-			m_pFrame->GetLeftFilepath(di) :
-			m_pFrame->GetRightFilepath(di);
-		String filename = (side == SIDE_LEFT) ? di.left.filename : di.right.filename;
+			ctxt->GetLeftFilepath(di) :
+			ctxt->GetRightFilepath(di);
+		String filename = (side == SIDE_LEFT) ? di->left.filename : di->right.filename;
 		if (parentDir.empty()) // first iteration, initialize parentDir and pCurrFolder
 		{
 			parentDir = currentDir;
@@ -686,10 +697,10 @@ void CDirView::DoDefaultAction(int sel)
 {
 	if (sel >= 0)
 	{
-		const DIFFITEM& di = GetDiffItem(sel);
-		if (m_bTreeMode && m_pFrame->GetRecursive() == 1 && di.diffcode.isDirectory())
+		const DIFFITEM *di = GetDiffItem(sel);
+		if (m_bTreeMode && m_pFrame->GetRecursive() == 1 && di->isDirectory())
 		{
-			if (di.customFlags1 & ViewCustomFlags::EXPANDED)
+			if (di->customFlags1 & ViewCustomFlags::EXPANDED)
 				CollapseSubdir(sel);
 			else
 				ExpandSubdir(sel);
@@ -718,13 +729,13 @@ void CDirView::ReflectClick(NMITEMACTIVATE *pNM)
  * @param [in] dpi Ancestor item.
  * @param [in] i First child item index in listview.
  */
-void CDirView::DeleteChildren(const DIFFITEM &dip, int i)
+void CDirView::DeleteChildren(const DIFFITEM *dip, int i)
 {
 	int count = GetItemCount();
 	while (count > i)
 	{
-		const DIFFITEM &di = GetDiffItem(i);
-		if (!di.IsAncestor(&dip))
+		const DIFFITEM *di = GetDiffItem(i);
+		if (!di->IsAncestor(dip))
 			break;
 		DeleteItem(i);
 		--count;
@@ -737,16 +748,18 @@ void CDirView::DeleteChildren(const DIFFITEM &dip, int i)
  */
 int CDirView::CollapseSubdir(int i)
 {
-	DIFFITEM &dip = GetDiffItem(i);
-	if (!(dip.customFlags1 & ViewCustomFlags::EXPANDED))
+	if (DIFFITEM *dip = GetDiffItem(i))
 	{
-		return GetItemIndex((UINT_PTR)dip.parent);
+		if (!(dip->customFlags1 & ViewCustomFlags::EXPANDED))
+		{
+			return GetItemIndex(dip->parent);
+		}
+		SetRedraw(FALSE);	// Turn off updating (better performance)
+		dip->customFlags1 &= ~ViewCustomFlags::EXPANDED;
+		SetItemState(i, INDEXTOSTATEIMAGEMASK(1), LVIS_STATEIMAGEMASK);
+		DeleteChildren(dip, ++i);
+		SetRedraw(TRUE);	// Turn updating back on
 	}
-	SetRedraw(FALSE);	// Turn off updating (better performance)
-	dip.customFlags1 &= ~ViewCustomFlags::EXPANDED;
-	SetItemState(i, INDEXTOSTATEIMAGEMASK(1), LVIS_STATEIMAGEMASK);
-	DeleteChildren(dip, ++i);
-	SetRedraw(TRUE);	// Turn updating back on
 	return -1;
 }
 
@@ -756,23 +769,25 @@ int CDirView::CollapseSubdir(int i)
  */
 int CDirView::ExpandSubdir(int i)
 {
-	DIFFITEM &dip = GetDiffItem(i);
-	if (dip.customFlags1 & ViewCustomFlags::EXPANDED)
+	if (DIFFITEM *dip = GetDiffItem(i))
 	{
-		DIFFITEM &di = GetDiffItem(++i);
-		return di.parent == &dip ? i : -1;
-	}
-	const CDiffContext *const ctxt = m_pFrame->GetDiffContext();
-	if (UINT_PTR firstChildPos = ctxt->GetFirstChildDiffPosition(GetItemKey(i)))
-	{
-		SetRedraw(FALSE);	// Turn off updating (better performance)
-		dip.customFlags1 |= ViewCustomFlags::EXPANDED;
-		SetItemState(i, INDEXTOSTATEIMAGEMASK(2), LVIS_STATEIMAGEMASK);
-		++i;
-		int alldiffs;
-		RedisplayChildren(firstChildPos, dip.GetDepth() + 1, i, alldiffs);
-		SortColumnsAppropriately();
-		SetRedraw(TRUE);	// Turn updating back on
+		if (dip->customFlags1 & ViewCustomFlags::EXPANDED)
+		{
+			DIFFITEM *di = GetDiffItem(++i);
+			return di->parent == dip ? i : -1;
+		}
+		const CDiffContext *const ctxt = m_pFrame->GetDiffContext();
+		if (DIFFITEM *di = ctxt->GetFirstChildDiff(dip))
+		{
+			SetRedraw(FALSE);	// Turn off updating (better performance)
+			dip->customFlags1 |= ViewCustomFlags::EXPANDED;
+			SetItemState(i, INDEXTOSTATEIMAGEMASK(2), LVIS_STATEIMAGEMASK);
+			++i;
+			int alldiffs;
+			RedisplayChildren(dip, dip->GetDepth() + 1, i, alldiffs);
+			SortColumnsAppropriately();
+			SetRedraw(TRUE);	// Turn updating back on
+		}
 	}
 	return -1;
 }
@@ -784,26 +799,27 @@ int CDirView::ExpandSubdir(int i)
 void CDirView::DeepExpandSubdir(int i)
 {
 	const CDiffContext *const ctxt = m_pFrame->GetDiffContext();
-	if (UINT_PTR firstChildPos = ctxt->GetFirstChildDiffPosition(GetItemKey(i)))
+	if (DIFFITEM *dip = GetDiffItem(i))
 	{
-		DIFFITEM &dip = GetDiffItem(i);
-		SetRedraw(FALSE);	// Turn off updating (better performance)
-		dip.customFlags1 |= ViewCustomFlags::EXPANDED;
-		SetItemState(i, INDEXTOSTATEIMAGEMASK(2), LVIS_STATEIMAGEMASK);
-		UINT_PTR diffpos = firstChildPos;
-		while (diffpos)
+		if (DIFFITEM *di = ctxt->GetFirstChildDiff(dip))
 		{
-			DIFFITEM &di = ctxt->GetNextDiffPosition(diffpos);
-			if (!di.IsAncestor(&dip))
-				break;
-			if (di.diffcode.isDirectory())
-				di.customFlags1 |= ViewCustomFlags::EXPANDED;
+			SetRedraw(FALSE);	// Turn off updating (better performance)
+			dip->customFlags1 |= ViewCustomFlags::EXPANDED;
+			SetItemState(i, INDEXTOSTATEIMAGEMASK(2), LVIS_STATEIMAGEMASK);
+			while (di)
+			{
+				if (!di->IsAncestor(dip))
+					break;
+				if (di->isDirectory())
+					di->customFlags1 |= ViewCustomFlags::EXPANDED;
+				di = ctxt->GetNextDiff(di);
+			}
+			DeleteChildren(dip, ++i);
+			int alldiffs;
+			RedisplayChildren(dip, dip->GetDepth() + 1, i, alldiffs);
+			SortColumnsAppropriately();
+			SetRedraw(TRUE);	// Turn updating back on
 		}
-		DeleteChildren(dip, ++i);
-		int alldiffs;
-		RedisplayChildren(firstChildPos, dip.GetDepth() + 1, i, alldiffs);
-		SortColumnsAppropriately();
-		SetRedraw(TRUE);	// Turn updating back on
 	}
 }
 
@@ -812,16 +828,30 @@ void CDirView::DeepExpandSubdir(int i)
  */
 void CDirView::OpenParentDirectory()
 {
+	const CDiffContext *ctxt = m_pFrame->GetDiffContext();
 	FileLocation filelocLeft, filelocRight;
 	switch (m_pFrame->AllowUpwardDirectory(filelocLeft.filepath, filelocRight.filepath))
 	{
-	case CDirFrame::AllowUpwardDirectory::ParentIsTempPath:
-		m_pFrame->m_pTempPathContext = m_pFrame->m_pTempPathContext->DeleteHead();
-		// fall through (no break!)
-	case CDirFrame::AllowUpwardDirectory::ParentIsRegularPath:
+		for (;;)
+		{
+		case CDirFrame::AllowUpwardDirectory::ParentIsTempPath:
+			m_lastLeftPath = m_pFrame->m_pTempPathContext->m_strLeftDisplayRoot;
+			m_lastRightPath = m_pFrame->m_pTempPathContext->m_strRightDisplayRoot;
+			m_pFrame->m_pTempPathContext = m_pFrame->m_pTempPathContext->DeleteHead();
+			break;
+		case CDirFrame::AllowUpwardDirectory::ParentIsRegularPath:
+			// Below assignments exclude any trailing backslashes
+			const String &leftPath = ctxt->GetLeftPath();
+			m_lastLeftPath.assign(leftPath.c_str(),
+				leftPath.find_last_not_of(_T('\\')) + 1);
+			const String &rightPath = ctxt->GetRightPath();
+			m_lastRightPath.assign(rightPath.c_str(),
+				rightPath.find_last_not_of(_T('\\')) + 1);
+			break;
+		}
 		theApp.m_pMainWnd->DoFileOpen(filelocLeft, filelocRight,
 			FFILEOPEN_NOMRU, FFILEOPEN_NOMRU, m_pFrame->GetRecursive(), m_pFrame);
-		// fall through (no break!)
+		break;
 	case CDirFrame::AllowUpwardDirectory::No:
 		break;
 	default:
@@ -835,39 +865,20 @@ void CDirView::OpenParentDirectory()
  *
  * Returns false if 0 or more than 2 items selecte
  */
-bool CDirView::GetSelectedItems(int * sel1, int * sel2)
+int CDirView::GetSelectedItems(DIFFITEM **rgdi)
 {
-	*sel2 = -1;
-	*sel1 = GetNextItem(-1, LVNI_SELECTED);
-	if (*sel1 == -1)
-		return false;
-	*sel2 = GetNextItem(*sel1, LVNI_SELECTED);
-	if (*sel2 == -1)
-		return true;
-	int extra = GetNextItem(*sel2, LVNI_SELECTED);
-	return (extra == -1);
-}
-
-/**
- * @brief Open special items (parent folders etc).
- * @param [in] pos1 First item position.
- * @param [in] pos2 Second item position.
- */
-void CDirView::OpenSpecialItems(UINT_PTR pos1, UINT_PTR pos2)
-{
-	if (!pos2)
+	int i = -1;
+	int j = 0;
+	while ((i = GetNextItem(i, LVNI_SELECTED)) != -1)
 	{
-		// Browse to parent folder(s) selected
-		// SPECIAL_ITEM_POS is position for
-		// special items, but there is currenly
-		// only one (parent folder)
-		OpenParentDirectory();
+		DIFFITEM *di = GetDiffItem(i);
+		if (di == NULL)
+			return -i; // minus index of special item
+		if (j < 2)
+			rgdi[j] = di;
+		++j;
 	}
-	else
-	{
-		// Parent directory & something else selected
-		// Not valid action
-	}
+	return j; // number of regular items
 }
 
 /**
@@ -875,38 +886,15 @@ void CDirView::OpenSpecialItems(UINT_PTR pos1, UINT_PTR pos2)
  * This function creates a pairing folder for unique folder item in
  * folder compare. This way user can browse into unique folder's
  * contents and don't necessarily need to copy whole folder structure.
- * @param [in] di DIFFITEM for folder compare item.
- * @param [in] side1 true if our unique folder item is side1 item.
- * @param [out] newFolder New created folder (full folder path).
+ * @param [in] newFolder New created folder (full folder path).
  * @return true if user agreed and folder was created.
  */
-bool CDirView::CreateFoldersPair(const DIFFITEM &di, bool side1, String &newFolder)
+bool CDirView::CreatePairFolder(LPCTSTR newFolder)
 {
-	String subdir;
-	String basedir;
-	if (side1)
-	{
-		// Get left side (side1) folder name (existing) and
-		// right side base path (where to create)
-		subdir = di.left.filename;
-		basedir = m_pFrame->GetRightBasePath();
-		basedir = di.GetLeftFilepath(basedir);
-	}
-	else
-	{
-		// Get right side (side2) folder name (existing) and
-		// left side base path (where to create)
-		subdir = di.right.filename;
-		basedir = m_pFrame->GetLeftBasePath();
-		basedir = di.GetRightFilepath(basedir);
-	}
-	newFolder = paths_ConcatPath(basedir, subdir);
-
 	int response = LanguageSelect.FormatMessage(
 		IDS_CREATE_PAIR_FOLDER, paths_UndoMagic(&String(newFolder).front())
 	).MsgBox(MB_YESNO | MB_ICONWARNING);
-
-	return response == IDYES && paths_CreateIfNeeded(newFolder.c_str());
+	return response == IDYES && paths_CreateIfNeeded(newFolder);
 }
 
 /**
@@ -920,18 +908,12 @@ bool CDirView::CreateFoldersPair(const DIFFITEM &di, bool side1, String &newFold
  * @param [in,out] isDir Is item folder?
  * return false if there was error or item was completely processed.
  */
-bool CDirView::OpenOneItem(UINT_PTR pos1, DIFFITEM **di1, DIFFITEM **di2,
-		String &path1, String &path2, int & sel1, bool & isDir)
+bool CDirView::OpenOneItem(DIFFITEM *di, String &path1, String &path2)
 {
-	*di1 = &m_pFrame->GetDiffRefByKey(pos1);
-	*di2 = *di1;
-
-	GetItemFileNames(sel1, path1, path2);
-
-	if ((*di1)->diffcode.isDirectory())
-		isDir = true;
-
-	if (isDir && (*di1)->diffcode.isSideBoth())
+	const CDiffContext *ctxt = m_pFrame->GetDiffContext();
+	GetItemFileNames(di, path1, path2);
+	const bool isDir = di->isDirectory();
+	if (isDir && di->isSideBoth())
 	{
 		// Check both folders exist. If either folder is missing that means
 		// folder has been changed behind our back, so we just tell user to
@@ -945,33 +927,35 @@ bool CDirView::OpenOneItem(UINT_PTR pos1, DIFFITEM **di1, DIFFITEM **di2,
 			return false;
 		}
 	}
-	else if ((*di1)->diffcode.isSideLeftOnly())
+	else if (di->isSideLeftOnly())
 	{
 		// Open left-only item to editor if its not a folder or binary
 		if (isDir)
 		{
-			if (CreateFoldersPair(**di1, true, path2))
+			path2 = paths_ConcatPath(di->GetLeftFilepath(ctxt->GetRightPath()), di->left.filename);
+			if (CreatePairFolder(path2.c_str()))
 			{
 				return true;
 			}
 		}
-		else if ((*di1)->diffcode.isBin())
+		else if (di->isBin())
 			LanguageSelect.MsgBox(IDS_CANNOT_OPEN_BINARYFILE, MB_ICONSTOP);
 		else
 			DoOpenWithEditor(SIDE_LEFT);
 		return false;
 	}
-	else if ((*di1)->diffcode.isSideRightOnly())
+	else if (di->isSideRightOnly())
 	{
 		// Open right-only item to editor if its not a folder or binary
 		if (isDir)
 		{
-			if (CreateFoldersPair(**di1, false, path1))
+			path1 = paths_ConcatPath(di->GetRightFilepath(ctxt->GetLeftPath()), di->right.filename);
+			if (CreatePairFolder(path1.c_str()))
 			{
 				return true;
 			}
 		}
-		else if ((*di1)->diffcode.isBin())
+		else if (di->isBin())
 			LanguageSelect.MsgBox(IDS_CANNOT_OPEN_BINARYFILE, MB_ICONSTOP);
 		else
 			DoOpenWithEditor(SIDE_RIGHT);
@@ -990,42 +974,28 @@ bool CDirView::OpenOneItem(UINT_PTR pos1, DIFFITEM **di1, DIFFITEM **di2,
  * @param [in,out] di2 Pointer to second diffitem.
  * @param [out] path1 First path.
  * @param [out] path2 Second path.
- * @param [out] sel1 First item's selection index in listview.
- * @param [out] sel2 Second item's selection index in listview.
  * @param [in,out] isDir Is item folder?
  * return false if there was error or item was completely processed.
  */
-bool CDirView::OpenTwoItems(UINT_PTR pos1, UINT_PTR pos2, DIFFITEM **di1, DIFFITEM **di2,
-		String &path1, String &path2, int & sel1, int & sel2, bool & isDir)
+bool CDirView::OpenTwoItems(DIFFITEM *di1, DIFFITEM *di2, String &path1, String &path2)
 {
-	// Two items selected, get their info
-	*di1 = &m_pFrame->GetDiffRefByKey(pos1);
-	*di2 = &m_pFrame->GetDiffRefByKey(pos2);
-
 	// Check for binary & side compatibility & file/dir compatibility
-	if (!AreItemsOpenable(**di1, **di2))
+	if (!AreItemsOpenable(di1, di2))
 	{
 		return false;
 	}
 	// Ensure that di1 is on left (swap if needed)
-	if ((*di1)->diffcode.isSideRightOnly() || ((*di1)->diffcode.isSideBoth() &&
-			(*di2)->diffcode.isSideLeftOnly()))
+	if (di1->isSideRightOnly() || (di1->isSideBoth() && di2->isSideLeftOnly()))
 	{
-		DIFFITEM * temp = *di1;
-		*di1 = *di2;
-		*di2 = temp;
-		int num = sel1;
-		sel1 = sel2;
-		sel2 = num;
+		stl::swap(di1, di2);
 	}
 	// Fill in pathLeft & pathRight
 	String temp;
-	GetItemFileNames(sel1, path1, temp);
-	GetItemFileNames(sel2, temp, path2);
+	GetItemFileNames(di1, path1, temp);
+	GetItemFileNames(di2, temp, path2);
 
-	if ((*di1)->diffcode.isDirectory())
+	if (di1->isDirectory())
 	{
-		isDir = true;
 		if (GetPairComparability(path1.c_str(), path2.c_str()) != IS_EXISTING_DIR)
 		{
 			LanguageSelect.MsgBox(IDS_INVALID_DIRECTORY, MB_ICONSTOP);
@@ -1048,112 +1018,73 @@ bool CDirView::OpenTwoItems(UINT_PTR pos1, UINT_PTR pos2, DIFFITEM **di1, DIFFIT
 void CDirView::OpenSelection(LPCTSTR szCompareAs, UINT idCompareAs)
 {
 	WaitStatusCursor waitstatus(IDS_STATUS_OPENING_SELECTION);
-	// First, figure out what was selected (store into pos1 & pos2)
-	UINT_PTR pos1 = NULL, pos2 = NULL;
-	int sel1 = -1, sel2 = -1;
-	if (!GetSelectedItems(&sel1, &sel2))
-	{
-		// Must have 1 or 2 items selected
-		// Not valid action
-		return;
-	}
-
-	pos1 = GetItemKey(sel1);
-	ASSERT(pos1);
-	if (sel2 != -1)
-		pos2 = GetItemKey(sel2);
-
-	// Now handle the various cases of what was selected
-
-	if (pos1 == SPECIAL_ITEM_POS)
-	{
-		OpenSpecialItems(pos1, pos2);
-		return;
-	}
-
-	// Common variables which both code paths below are responsible for setting
+	// First, figure out what was selected (store into di[])
+	DIFFITEM *di[] = { NULL, NULL };
 	FileLocation filelocLeft, filelocRight;
-	DIFFITEM *di1 = NULL, *di2 = NULL; // left & right items (di1==di2 if single selection)
-	bool isdir = false; // set if we're comparing directories
-	if (pos2)
+	switch (int selected = GetSelectedItems(di))
 	{
-		bool success = OpenTwoItems(pos1, pos2, &di1, &di2,
-			filelocLeft.filepath, filelocRight.filepath, sel1, sel2, isdir);
-		if (!success)
-			return;
+	case 0:
+		OpenParentDirectory();
+		break;
+
+		// Now handle the various cases of what was selected
+		for (;;)
+		{
+		case 1:
+			// Only one item selected, so perform diff on its sides
+			if (!OpenOneItem(di[1] = di[0], filelocLeft.filepath, filelocRight.filepath))
+				return;
+			break;
+		case 2:
+			if (!OpenTwoItems(di[0], di[1], filelocLeft.filepath, filelocRight.filepath))
+				return;
+			break;
+		}
+
+		// Now pathLeft, pathRight, di1, di2, and isdir are all set
+		// We have two items to compare, no matter whether same or different underlying DirView item
+
+		PackingInfo packingInfo;
+
+		if (szCompareAs)
+			packingInfo.SetPlugin(szCompareAs);
+
+		// Open identical and different files
+		BOOL bLeftRO = m_pFrame->GetLeftReadOnly();
+		BOOL bRightRO = m_pFrame->GetRightReadOnly();
+
+		filelocLeft.encoding = di[0]->left.encoding;
+		filelocRight.encoding = di[1]->right.encoding;
+
+		DWORD leftFlags = bLeftRO ? FFILEOPEN_READONLY : 0;
+		DWORD rightFlags = bRightRO ? FFILEOPEN_READONLY : 0;
+
+		theApp.m_pMainWnd->DoFileOpen(
+			packingInfo, idCompareAs,
+			filelocLeft, filelocRight,
+			leftFlags | FFILEOPEN_NOMRU | FFILEOPEN_DETECT,
+			rightFlags | FFILEOPEN_NOMRU | FFILEOPEN_DETECT,
+			m_pFrame->GetRecursive(), m_pFrame);
 	}
-	else
-	{
-		// Only one item selected, so perform diff on its sides
-		bool success = OpenOneItem(pos1, &di1, &di2,
-			filelocLeft.filepath, filelocRight.filepath, sel1, isdir);
-		if (!success)
-			return;
-	}
-
-	// Now pathLeft, pathRight, di1, di2, and isdir are all set
-	// We have two items to compare, no matter whether same or different underlying DirView item
-
-	PackingInfo packingInfo;
-
-	if (szCompareAs)
-		packingInfo.SetPlugin(szCompareAs);
-
-	// Open identical and different files
-	BOOL bLeftRO = m_pFrame->GetLeftReadOnly();
-	BOOL bRightRO = m_pFrame->GetRightReadOnly();
-
-	filelocLeft.encoding = di1->left.encoding;
-	filelocRight.encoding = di2->right.encoding;
-
-	DWORD leftFlags = bLeftRO ? FFILEOPEN_READONLY : 0;
-	DWORD rightFlags = bRightRO ? FFILEOPEN_READONLY : 0;
-
-	theApp.m_pMainWnd->DoFileOpen(
-		packingInfo, idCompareAs,
-		filelocLeft, filelocRight,
-		leftFlags | FFILEOPEN_NOMRU | FFILEOPEN_DETECT,
-		rightFlags | FFILEOPEN_NOMRU | FFILEOPEN_DETECT,
-		m_pFrame->GetRecursive(), m_pFrame);
-}
-
-/**
- * @brief Get keydata associated with item in given index.
- * @param [in] idx Item's index to list in UI.
- * @return Key for item in given index.
- */
-UINT_PTR CDirView::GetItemKey(int idx)
-{
-	return GetItemData(idx);
 }
 
 /**
  * Given index in list control, get modifiable reference to its DIFFITEM data
  */
-DIFFITEM &CDirView::GetDiffItem(int sel)
+DIFFITEM *CDirView::GetDiffItem(int sel)
 {
-	UINT_PTR diffpos = GetItemKey(sel);
-	// If it is special item, return empty DIFFITEM
-	if (diffpos == SPECIAL_ITEM_POS)
-	{
-		// TODO: It would be better if there were individual items
-		// for whatever these special items are
-		// because here we have to hope client does not modify this
-		// static (shared) item
-		return DIFFITEM::emptyitem;
-	}
-	return m_pFrame->GetDiffRefByKey(diffpos);
+	return reinterpret_cast<DIFFITEM *>(GetItemData(sel));
 }
 
 /**
  * @brief Given key, get index of item which has it stored.
  * This function searches from list in UI.
  */
-int CDirView::GetItemIndex(UINT_PTR key)
+int CDirView::GetItemIndex(DIFFITEM *di)
 {
 	LVFINDINFO findInfo;
 	findInfo.flags = LVFI_PARAM;  // Search for itemdata
-	findInfo.lParam = (LPARAM)key;
+	findInfo.lParam = reinterpret_cast<LPARAM>(di);
 	return FindItem(&findInfo);
 }
 
@@ -1167,7 +1098,7 @@ void CDirView::OnFirstdiff()
 	int currentInd = GetNextItem(-1, LVNI_SELECTED);
 	while (i < count)
 	{
-		const DIFFITEM &di = GetDiffItem(i);
+		const DIFFITEM *di = GetDiffItem(i);
 		if (IsItemNavigableDiff(di))
 		{
 			MoveFocus(currentInd, i);
@@ -1186,7 +1117,7 @@ void CDirView::OnLastdiff()
 	while (i > 0)
 	{
 		--i;
-		const DIFFITEM &di = GetDiffItem(i);
+		const DIFFITEM *di = GetDiffItem(i);
 		if (IsItemNavigableDiff(di))
 		{
 			MoveFocus(currentInd, i);
@@ -1204,7 +1135,7 @@ void CDirView::OnNextdiff()
 	int currentInd = i;
 	while (++i < count)
 	{
-		const DIFFITEM &di = GetDiffItem(i);
+		const DIFFITEM *di = GetDiffItem(i);
 		if (IsItemNavigableDiff(di))
 		{
 			MoveFocus(currentInd, i);
@@ -1222,7 +1153,7 @@ void CDirView::OnPrevdiff()
 	while (i > 0)
 	{
 		--i;
-		const DIFFITEM &di = GetDiffItem(i);
+		const DIFFITEM *di = GetDiffItem(i);
 		if (IsItemNavigableDiff(di))
 		{
 			MoveFocus(currentInd, i);
@@ -1250,7 +1181,7 @@ int CDirView::GetFirstDifferentItem()
 
 	while (i < count && found == FALSE)
 	{
-		const DIFFITEM &di = GetDiffItem(i);
+		const DIFFITEM *di = GetDiffItem(i);
 		if (IsItemNavigableDiff(di))
 		{
 			foundInd = i;
@@ -1270,7 +1201,7 @@ int CDirView::GetLastDifferentItem()
 
 	while (i > 0 && found == FALSE)
 	{
-		const DIFFITEM &di = GetDiffItem(i);
+		const DIFFITEM *di = GetDiffItem(i);
 		if (IsItemNavigableDiff(di))
 		{
 			foundInd = i;
@@ -1282,15 +1213,15 @@ int CDirView::GetLastDifferentItem()
 }
 
 // When navigating differences, do we stop at this one ?
-bool CDirView::IsItemNavigableDiff(const DIFFITEM & di) const
+bool CDirView::IsItemNavigableDiff(const DIFFITEM *di) const
 {
 	// Not a valid diffitem, one of special items (e.g "..")
-	if (di.diffcode.diffcode == 0)
+	if (di == NULL)
 		return false;
-	if (di.diffcode.isResultFiltered() || di.diffcode.isResultError())
+	if (di->isResultFiltered() || di->isResultError())
 		return false;
-	if (!di.diffcode.isResultDiff() && !di.diffcode.isSideLeftOnly() &&
-			!di.diffcode.isSideRightOnly())
+	if (!di->isResultDiff() && !di->isSideLeftOnly() &&
+			!di->isSideRightOnly())
 		return false;
 	return true;
 }
@@ -1328,7 +1259,7 @@ LRESULT CDirView::ReflectKeydown(NMLVKEYDOWN *pParam)
 		DoDelAll();
 		return 1;
 	case VK_BACK:
-		if (m_nSpecialItems > 0 && GetItemKey(0) == SPECIAL_ITEM_POS)
+		if (m_nSpecialItems > 0 && GetDiffItem(0) == NULL)
 		{
 			WaitStatusCursor waitstatus(IDS_STATUS_OPENING_SELECTION);
 			OpenParentDirectory();
@@ -1405,10 +1336,24 @@ void CDirView::OnUpdateUIMessage()
 	if (GetItemCount() == 0)
 	{
 		Redisplay();
-		if (COptionsMgr::Get(OPT_SCROLL_TO_FIRST))
+		if (DIFFITEM *di = m_pFrame->FindItemFromPaths(m_lastLeftPath.c_str(), m_lastRightPath.c_str()))
+		{
+			int i = GetItemIndex(di);
+			if (i != -1)
+			{
+				MoveFocus(i, i);
+			}
+		}
+		else if (COptionsMgr::Get(OPT_SCROLL_TO_FIRST))
+		{
 			OnFirstdiff();
+		}
 		else
+		{
 			MoveFocus(0, 0);
+		}
+		m_lastLeftPath.clear();
+		m_lastRightPath.clear();
 	}
 	// If compare took more than TimeToSignalCompare seconds, notify user
 	clock_t elapsed = clock() - m_compareStart;
@@ -1500,52 +1445,6 @@ LRESULT CDirView::ReflectNotify(LPARAM lParam)
 	return 0;
 }
 
-/**
- * @brief Remove any windows reordering of columns
- */
-void CDirView::FixReordering()
-{
-	LVCOLUMN lvcol;
-	lvcol.mask = LVCF_ORDER;
-	lvcol.fmt = 0;
-	lvcol.cx = 0;
-	lvcol.pszText = 0;
-	lvcol.iSubItem = 0;
-	for (int i = 0; i < m_numcols; ++i)
-	{
-		lvcol.iOrder = i;
-		SetColumn(i, &lvcol);
-	}
-}
-
-/** @brief Add columns to display, loading width & order from registry. */
-void CDirView::LoadColumnHeaderItems()
-{
-	bool dummyflag = false;
-
-	HHeaderCtrl *const h = GetHeaderCtrl();
-	if (h->GetItemCount())
-	{
-		dummyflag = true;
-		while (h->GetItemCount() > 1)
-			DeleteColumn(1);
-	}
-
-	for (int i = 0; i < m_dispcols; ++i)
-	{
-		LVCOLUMN lvc;
-		lvc.mask = LVCF_FMT + LVCF_SUBITEM + LVCF_TEXT;
-		lvc.fmt = LVCFMT_LEFT;
-		lvc.cx = 0;
-		lvc.pszText = _T("text");
-		lvc.iSubItem = i;
-		InsertColumn(i, &lvc);
-	}
-	if (dummyflag)
-		DeleteColumn(1);
-
-}
-
 /** @brief store current column widths into registry */
 void CDirView::SaveColumnWidths()
 {
@@ -1559,16 +1458,6 @@ void CDirView::SaveColumnWidths()
 			SettingStore.WriteProfileInt(_T("DirView"), sWidthKey.c_str(), w);
 		}
 	}
-}
-
-/** @brief Fire off a resort of the data, to take place when things stabilize. */
-void CDirView::InitiateSort()
-{
-	// Remove the windows reordering, as we're doing it ourselves
-	FixReordering();
-	// Now redraw screen
-	UpdateColumns(LVCF_TEXT | LVCF_WIDTH);
-	Redisplay();
 }
 
 /**
@@ -1620,7 +1509,7 @@ int CDirView::AddSpecialItems()
 		// fall through
 	default:
 		// Add "Parent folder" ("..") item to directory view
-		AddNewItem(0, SPECIAL_ITEM_POS, iImgDirUp, 0);
+		AddNewItem(0, NULL, iImgDirUp, 0);
 		retVal = 1;
 		// fall through
 	case CDirFrame::AllowUpwardDirectory::Never:
@@ -1719,13 +1608,11 @@ void CDirView::OnSelectAll()
 	}
 	else
 	{
-		int selCount = GetItemCount();
-
-		for (int i = 0; i < selCount; i++)
+		int n = GetItemCount();
+		for (int i = 0; i < n; i++)
 		{
 			// Don't select special items (SPECIAL_ITEM_POS)
-			UINT_PTR diffpos = GetItemKey(i);
-			if (diffpos != SPECIAL_ITEM_POS)
+			if (GetDiffItem(i) != NULL)
 				SetItemState(i, LVIS_SELECTED, LVIS_SELECTED);
 		}
 	}
@@ -1754,6 +1641,7 @@ void CDirView::OnCopyLeftPathnames()
 {
 	if (!OpenClipboard())
 		return;
+	const CDiffContext *ctxt = m_pFrame->GetDiffContext();
 	UniStdioFile file;
 	file.SetUnicoding(UCS2LE);
 	if (HGLOBAL hMem = file.CreateStreamOnHGlobal())
@@ -1761,17 +1649,14 @@ void CDirView::OnCopyLeftPathnames()
 		int sel = -1;
 		while ((sel = GetNextItem(sel, LVNI_SELECTED)) != -1)
 		{
-			const DIFFITEM& di = GetDiffItem(sel);
-			if (!di.diffcode.isSideRightOnly())
+			const DIFFITEM *di = GetDiffItem(sel);
+			if (!di->isSideRightOnly())
 			{
 				// Append space between paths. Space is better than
 				// EOL since it allows copying to console/command line.
 				if (GlobalSize(hMem) != 0)
 					file.WriteString(_T(" "), 1);
-				String spath = m_pFrame->GetLeftFilepath(di);
-				// If item is a folder then subfolder (relative to base folder)
-				// is in filename member.
-				spath = paths_ConcatPath(spath, di.left.filename);
+				String spath = ctxt->GetLeftFilepathAndName(di);
 				LPCTSTR path = paths_UndoMagic(&spath.front());
 				file.WriteString(path, spath.c_str() + spath.length() - path);
 			}
@@ -1790,6 +1675,7 @@ void CDirView::OnCopyRightPathnames()
 {
 	if (!OpenClipboard())
 		return;
+	const CDiffContext *ctxt = m_pFrame->GetDiffContext();
 	UniStdioFile file;
 	file.SetUnicoding(UCS2LE);
 	if (HGLOBAL hMem = file.CreateStreamOnHGlobal())
@@ -1797,17 +1683,14 @@ void CDirView::OnCopyRightPathnames()
 		int sel = -1;
 		while ((sel = GetNextItem(sel, LVNI_SELECTED)) != -1)
 		{
-			const DIFFITEM& di = GetDiffItem(sel);
-			if (!di.diffcode.isSideLeftOnly())
+			const DIFFITEM *di = GetDiffItem(sel);
+			if (!di->isSideLeftOnly())
 			{
 				// Append space between paths. Space is better than
 				// EOL since it allows copying to console/command line.
 				if (GlobalSize(hMem) != 0)
 					file.WriteString(_T(" "), 1);
-				String spath = m_pFrame->GetRightFilepath(di);
-				// If item is a folder then subfolder (relative to base folder)
-				// is in filename member.
-				spath = paths_ConcatPath(spath, di.right.filename);
+				String spath = ctxt->GetRightFilepathAndName(di);
 				LPCTSTR path = paths_UndoMagic(&spath.front());
 				file.WriteString(path, spath.c_str() + spath.length() - path);
 			}
@@ -1826,6 +1709,7 @@ void CDirView::OnCopyBothPathnames()
 {
 	if (!OpenClipboard())
 		return;
+	const CDiffContext *ctxt = m_pFrame->GetDiffContext();
 	UniStdioFile file;
 	file.SetUnicoding(UCS2LE);
 	if (HGLOBAL hMem = file.CreateStreamOnHGlobal())
@@ -1833,30 +1717,24 @@ void CDirView::OnCopyBothPathnames()
 		int sel = -1;
 		while ((sel = GetNextItem(sel, LVNI_SELECTED)) != -1)
 		{
-			const DIFFITEM& di = GetDiffItem(sel);
-			if (!di.diffcode.isSideRightOnly())
+			const DIFFITEM *di = GetDiffItem(sel);
+			if (!di->isSideRightOnly())
 			{
 				// Append space between paths. Space is better than
 				// EOL since it allows copying to console/command line.
 				if (GlobalSize(hMem) != 0)
 					file.WriteString(_T(" "), 1);
-				String spath = m_pFrame->GetLeftFilepath(di);
-				// If item is a folder then subfolder (relative to base folder)
-				// is in filename member.
-				spath = paths_ConcatPath(spath, di.left.filename);
+				String spath = ctxt->GetLeftFilepathAndName(di);
 				LPCTSTR path = paths_UndoMagic(&spath.front());
 				file.WriteString(path, spath.c_str() + spath.length() - path);
 			}
-			if (!di.diffcode.isSideLeftOnly())
+			if (!di->isSideLeftOnly())
 			{
 				// Append space between paths. Space is better than
 				// EOL since it allows copying to console/command line.
 				if (GlobalSize(hMem) != 0)
 					file.WriteString(_T(" "), 1);
-				String spath = m_pFrame->GetRightFilepath(di);
-				// If item is a folder then subfolder (relative to base folder)
-				// is in filename member.
-				spath = paths_ConcatPath(spath, di.right.filename);
+				String spath = ctxt->GetRightFilepathAndName(di);
 				LPCTSTR path = paths_UndoMagic(&spath.front());
 				file.WriteString(path, spath.c_str() + spath.length() - path);
 			}
@@ -1882,14 +1760,14 @@ void CDirView::OnCopyFilenames()
 		int sel = -1;
 		while ((sel = GetNextItem(sel, LVNI_SELECTED)) != -1)
 		{
-			const DIFFITEM& di = GetDiffItem(sel);
-			if (!di.diffcode.isDirectory())
+			const DIFFITEM *di = GetDiffItem(sel);
+			if (!di->isDirectory())
 			{
 				// Append space between paths. Space is better than
 				// EOL since it allows copying to console/command line.
 				if (GlobalSize(hMem) != 0)
 					file.WriteString(_T(" "), 1);
-				file.WriteString(di.left.filename);
+				file.WriteString(di->left.filename);
 			}
 		}
 		file.WriteString(_T(""), 1);
@@ -1917,18 +1795,17 @@ void CDirView::OnHideFilenames()
 	SetRedraw(FALSE);	// Turn off updating (better performance)
 	while ((sel = GetNextItem(sel, LVNI_SELECTED)) != -1)
 	{
-		UINT_PTR pos = GetItemKey(sel);
-		if (pos == SPECIAL_ITEM_POS)
+		DIFFITEM *di = GetDiffItem(sel);
+		if (di == NULL)
 			continue;
-		m_pFrame->SetItemViewFlag(pos, ViewCustomFlags::HIDDEN, ViewCustomFlags::VISIBILITY);
-		const DIFFITEM &di = GetDiffItem(sel);
-		if (m_bTreeMode && di.diffcode.isDirectory())
+		(di->customFlags1 &= ~ViewCustomFlags::VISIBILITY) |= ViewCustomFlags::HIDDEN;
+		if (m_bTreeMode && di->isDirectory())
 		{
 			int count = GetItemCount();
 			for (int i = sel + 1; i < count; i++)
 			{
-				const DIFFITEM &dic = GetDiffItem(i);
-				if (!dic.IsAncestor(&di))
+				const DIFFITEM *dic = GetDiffItem(i);
+				if (!dic->IsAncestor(di))
 					break;
 				DeleteItem(i--);
 				count--;
@@ -1956,7 +1833,7 @@ LRESULT CDirView::ReflectCustomDraw(NMLVCUSTOMDRAW *pNM)
  */
 LRESULT CDirView::ReflectBeginLabelEdit(NMLVDISPINFO *pdi)
 {
-	if ((GetSelectedCount() != 1) || (pdi->item.lParam == SPECIAL_ITEM_POS))
+	if ((GetSelectedCount() != 1) || (pdi->item.lParam == NULL))
 		return 1;
 	// If label edit is allowed.
 	// Locate the edit box on the right column in case the user changed the
@@ -2007,7 +1884,8 @@ void CDirView::OnUpdateStatusNum()
 		items == 1 ? IDS_STATUS_SELITEM1 : IDS_STATUS_SELITEMS, num));
 
 	CMainFrame *const pMDIFrame = m_pFrame->m_pMDIFrame;
-	if (!pMDIFrame->GetActiveDocFrame()->IsChild(m_pWnd))
+	CDocFrame *const pDocFrame = pMDIFrame->GetActiveDocFrame();
+	if (pDocFrame == NULL || !pDocFrame->IsChild(m_pWnd))
 		return;
 
 	m_pFrame->UpdateCmdUI<ID_L2R>();
@@ -2015,26 +1893,17 @@ void CDirView::OnUpdateStatusNum()
 	m_pFrame->UpdateCmdUI<ID_MERGE_DELETE>();
 
 	pMDIFrame->UpdateCmdUI<ID_FILE_ENCODING>(items != 0 ? 0 : MF_GRAYED);
-	if (items == 1)
-	{
-		int i = GetNextItem(-1, LVNI_SELECTED);
-		const DIFFITEM& di = GetDiffItem(i);
-		if (!IsItemOpenable(di))
-			items = 0;
-	}
 
-	int sel1, sel2;
-	GetSelectedItems(&sel1, &sel2);
+	DIFFITEM *di[] = { NULL, NULL };
+	items = GetSelectedItems(di);
 	pMDIFrame->UpdateCmdUI<ID_MERGE_COMPARE>
 	(
-		GetSelectedItems(&sel1, &sel2)
-	&&	(
-			sel2 == -1 && IsItemOpenable(GetDiffItem(sel1))
-		||	AreItemsOpenable(GetDiffItem(sel1), GetDiffItem(sel2))
-		) ? MF_ENABLED : MF_GRAYED
+		items == 1 && IsItemOpenable(di[0]) ||
+		items == 2 && AreItemsOpenable(di[0], di[1]) ?
+		MF_ENABLED : MF_GRAYED
 	);
 
-	int count = GetItemCount();
+	items = GetItemCount();
 	int focusItem = GetFocusedItem();
 
 	pMDIFrame->UpdateCmdUI<ID_CURDIFF>( 
@@ -2044,7 +1913,7 @@ void CDirView::OnUpdateStatusNum()
 	int i = focusItem;
 	while (--i >= 0)
 	{
-		const DIFFITEM &di = GetDiffItem(i);
+		const DIFFITEM *di = GetDiffItem(i);
 		if (IsItemNavigableDiff(di))
 		{
 			enable = MF_ENABLED;
@@ -2055,9 +1924,9 @@ void CDirView::OnUpdateStatusNum()
 
 	enable = MF_GRAYED;
 	i = focusItem;
-	while (++i < count)
+	while (++i < items)
 	{
-		const DIFFITEM &di = GetDiffItem(i);
+		const DIFFITEM *di = GetDiffItem(i);
 		if (IsItemNavigableDiff(di))
 		{
 			enable = MF_ENABLED;
@@ -2070,7 +1939,7 @@ void CDirView::OnUpdateStatusNum()
 	if (focusItem == -1)
 	{
 		// No item has focus
-		_itot(count, cnt, 10);
+		_itot(items, cnt, 10);
 		// "Items: %1"
 		s = LanguageSelect.FormatMessage(IDS_DIRVIEW_STATUS_FMT_NOFOCUS, cnt);
 	}
@@ -2078,14 +1947,13 @@ void CDirView::OnUpdateStatusNum()
 	{
 		// An item has focus
 		// Don't show number to special items
-		UINT_PTR pos = GetItemKey(focusItem);
-		if (pos != SPECIAL_ITEM_POS)
+		if (GetDiffItem(focusItem) != NULL)
 		{
 			// Reduce by special items count
 			focusItem -= m_nSpecialItems;
-			count -= m_nSpecialItems;
+			items -= m_nSpecialItems;
 			_itot(focusItem + 1, idx, 10);
-			_itot(count, cnt, 10);
+			_itot(items, cnt, 10);
 			// "Item %1 of %2"
 			s = LanguageSelect.FormatMessage(IDS_DIRVIEW_STATUS_FMT_FOCUS, idx, cnt);
 		}
@@ -2119,12 +1987,12 @@ void CDirView::OnViewTreeMode()
 void CDirView::OnViewExpandAllSubdirs()
 {
 	CDiffContext *ctxt = m_pFrame->GetDiffContext();
-	UINT_PTR diffpos = ctxt->GetFirstDiffPosition();
-	while (diffpos)
+	DIFFITEM *di = ctxt->GetFirstChildDiff(NULL);
+	while (di)
 	{
-		DIFFITEM &di = ctxt->GetNextDiffPosition(diffpos);
-		if (di.diffcode.isDirectory())
-			di.customFlags1 |= ViewCustomFlags::EXPANDED;
+		if (di->isDirectory())
+			di->customFlags1 |= ViewCustomFlags::EXPANDED;
+		di = ctxt->GetNextDiff(di);
 	}
 	Redisplay();
 }
@@ -2135,11 +2003,11 @@ void CDirView::OnViewExpandAllSubdirs()
 void CDirView::OnViewCollapseAllSubdirs()
 {
 	CDiffContext *ctxt = m_pFrame->GetDiffContext();
-	UINT_PTR diffpos = ctxt->GetFirstDiffPosition();
-	while (diffpos)
+	DIFFITEM *di = ctxt->GetFirstChildDiff(NULL);
+	while (di)
 	{
-		DIFFITEM &di = ctxt->GetNextDiffPosition(diffpos);
-		di.customFlags1 &= ~ViewCustomFlags::EXPANDED;
+		di->customFlags1 &= ~ViewCustomFlags::EXPANDED;
+		di = ctxt->GetNextDiff(di);
 	}
 	Redisplay();
 }
@@ -2284,42 +2152,38 @@ void CDirView::PrepareDragData(UniStdioFile &file)
 	int i = -1;
 	while ((i = GetNextItem(i, LVNI_SELECTED)) != -1)
 	{
-		const DIFFITEM &diffitem = GetDiffItem(i);
+		const DIFFITEM *diffitem = GetDiffItem(i);
 		// check for special items (e.g not "..")
-		if (diffitem.diffcode.diffcode == 0)
+		if (diffitem->diffcode == 0)
 		{
 			continue;
 		}
 
-		if (diffitem.diffcode.isSideLeftOnly())
+		if (diffitem->isSideLeftOnly())
 		{
-			String spath = diffitem.GetLeftFilepath(ctxt->GetLeftPath());
-			spath = paths_ConcatPath(spath, diffitem.left.filename);
+			String spath = ctxt->GetLeftFilepathAndName(diffitem);
 			LPCTSTR path = paths_UndoMagic(&spath.front());
 			file.WriteString(path, spath.c_str() + spath.length() - path);
 		}
-		else if (diffitem.diffcode.isSideRightOnly())
+		else if (diffitem->isSideRightOnly())
 		{
-			String spath = diffitem.GetRightFilepath(ctxt->GetRightPath());
-			spath = paths_ConcatPath(spath, diffitem.right.filename);
+			String spath = ctxt->GetRightFilepathAndName(diffitem);
 			LPCTSTR path = paths_UndoMagic(&spath.front());
 			file.WriteString(path, spath.c_str() + spath.length() - path);
 		}
-		else if (diffitem.diffcode.isSideBoth())
+		else if (diffitem->isSideBoth())
 		{
 			// when both files equal, there is no difference between what file to drag 
 			// so we put file from the left panel
-			String spath = diffitem.GetLeftFilepath(ctxt->GetLeftPath());
-			spath = paths_ConcatPath(spath, diffitem.left.filename);
+			String spath = ctxt->GetLeftFilepathAndName(diffitem);
 			LPCTSTR path = paths_UndoMagic(&spath.front());
 			file.WriteString(path, spath.c_str() + spath.length() - path);
 
 			// if both files are different then we also put file from the right panel 
-			if (diffitem.diffcode.isResultDiff())
+			if (diffitem->isResultDiff())
 			{
 				file.WriteString(_T("\n"), 1); // end of left file path
-				String spath = diffitem.GetRightFilepath(ctxt->GetRightPath());
-				spath = paths_ConcatPath(spath, diffitem.right.filename);
+				String spath = ctxt->GetRightFilepathAndName(diffitem);
 				LPCTSTR path = paths_UndoMagic(&spath.front());
 				file.WriteString(path, spath.c_str() + spath.length() - path);
 			}

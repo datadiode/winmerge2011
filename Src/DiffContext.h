@@ -45,7 +45,7 @@ public:
 		LPCTSTR pszLeft, LPCTSTR pszRight, int nRecursive);
 	~CDiffContext();
 
-	void UpdateVersion(DIFFITEM & di, BOOL bLeft) const;
+	void UpdateVersion(DIFFITEM *, BOOL bLeft) const;
 
 	//@{
 	/**
@@ -68,9 +68,14 @@ public:
 	const String &GetRightPath() const { return m_paths[1]; }
 	//@}
 
+	String GetLeftFilepath(const DIFFITEM *di) const { return di->GetLeftFilepath(GetLeftPath()); }
+	String GetRightFilepath(const DIFFITEM *di) const { return di->GetRightFilepath(GetRightPath()); }
+	String GetLeftFilepathAndName(const DIFFITEM *di) const;
+	String GetRightFilepathAndName(const DIFFITEM *di) const;
+
 	// change an existing difference
-	BOOL UpdateInfoFromDiskHalf(DIFFITEM &di, BOOL bLeft);
-	void UpdateStatusFromDisk(UINT_PTR diffpos, BOOL bLeft, BOOL bRight);
+	BOOL UpdateInfoFromDiskHalf(DIFFITEM *, BOOL bLeft);
+	void UpdateStatusFromDisk(DIFFITEM *, BOOL bLeft, BOOL bRight);
 
 	IDiffFilter * m_piFilterGlobal; /**< Interface for file filtering. */
 	bool m_bGuessEncoding;
@@ -113,7 +118,7 @@ public:
 
 	FolderCmp m_folderCmp;
 
-	void CompareDiffItem(DIFFITEM &);
+	void CompareDiffItem(DIFFITEM *);
 // creation and use, called on main thread
 	UINT CompareDirectories(bool bOnlyRequested);
 
@@ -143,11 +148,11 @@ private:
 		int depth, DIFFITEM *parent, bool bUniques);
 	DIFFITEM *AddToList(const String &sLeftDir, const String &sRightDir,
 		const DirItem *lent, const DirItem *rent, UINT code, DIFFITEM *parent);
-	void SetDiffItemStats(DIFFITEM &);
-	void StoreDiffData(const DIFFITEM &);
-	bool UpdateDiffItem(DIFFITEM &);
-	int DirScan_CompareItems(UINT_PTR parentdiffpos);
-	int DirScan_CompareRequestedItems(UINT_PTR parentdiffpos);
+	void SetDiffItemStats(DIFFITEM *);
+	void StoreDiffData(const DIFFITEM *);
+	bool UpdateDiffItem(DIFFITEM *);
+	int DirScan_CompareItems(DIFFITEM *parent);
+	int DirScan_CompareRequestedItems(DIFFITEM *parent);
 
 	typedef stl::vector<DirItem> DirItemArray;
 

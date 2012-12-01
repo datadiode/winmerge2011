@@ -36,6 +36,18 @@
 #include "DiffItemList.h"
 #include "Common/version.h"
 
+String CDiffContext::GetLeftFilepathAndName(const DIFFITEM *di) const
+{
+	String path = GetLeftFilepath(di);
+	return path.empty() ? path : paths_ConcatPath(path, di->left.filename);
+}
+
+String CDiffContext::GetRightFilepathAndName(const DIFFITEM *di) const
+{
+	String path = GetRightFilepath(di);
+	return path.empty() ? path : paths_ConcatPath(path, di->right.filename);
+}
+
 /**
  * @brief Update info in item in result list from disk.
  * This function updates result list item's file information from actual
@@ -44,19 +56,18 @@
  * @param [in] bLeft Update left-side info.
  * @param [in] bRight Update right-side info.
  */
-void CDiffContext::UpdateStatusFromDisk(UINT_PTR diffpos, BOOL bLeft, BOOL bRight)
+void CDiffContext::UpdateStatusFromDisk(DIFFITEM *di, BOOL bLeft, BOOL bRight)
 {
-	DIFFITEM &di = GetDiffAt(diffpos);
 	if (bLeft)
 	{
-		di.left.ClearPartial();
-		if (!di.diffcode.isSideRightOnly())
+		di->left.ClearPartial();
+		if (!di->isSideRightOnly())
 			UpdateInfoFromDiskHalf(di, TRUE);
 	}
 	if (bRight)
 	{
-		di.right.ClearPartial();
-		if (!di.diffcode.isSideLeftOnly())
+		di->right.ClearPartial();
+		if (!di->isSideLeftOnly())
 			UpdateInfoFromDiskHalf(di, FALSE);
 	}
 }
@@ -70,16 +81,16 @@ void CDiffContext::UpdateStatusFromDisk(UINT_PTR diffpos, BOOL bLeft, BOOL bRigh
  *  right side otherwise.
  * @return TRUE if file exists
  */
-BOOL CDiffContext::UpdateInfoFromDiskHalf(DIFFITEM & di, BOOL bLeft)
+BOOL CDiffContext::UpdateInfoFromDiskHalf(DIFFITEM *di, BOOL bLeft)
 {
 	String filepath;
 
 	if (bLeft)
-		filepath = paths_ConcatPath(di.GetLeftFilepath(GetLeftPath()), di.left.filename);
+		filepath = GetLeftFilepathAndName(di);
 	else
-		filepath = paths_ConcatPath(di.GetRightFilepath(GetRightPath()), di.right.filename);
+		filepath = GetRightFilepathAndName(di);
 
-	DiffFileInfo & dfi = bLeft ? di.left : di.right;
+	DiffFileInfo &dfi = bLeft ? di->left : di->right;
 	if (!dfi.Update(filepath.c_str()))
 		return FALSE;
 	UpdateVersion(di, bLeft);
@@ -97,16 +108,8 @@ BOOL CDiffContext::UpdateInfoFromDiskHalf(DIFFITEM & di, BOOL bLeft)
  */
 static bool CheckFileForVersion(LPCTSTR ext)
 {
-	if (!lstrcmpi(ext, _T(".EXE")) || !lstrcmpi(ext, _T(".DLL")) || !lstrcmpi(ext, _T(".SYS")) ||
-	    !lstrcmpi(ext, _T(".DRV")) || !lstrcmpi(ext, _T(".OCX")) || !lstrcmpi(ext, _T(".CPL")) ||
-	    !lstrcmpi(ext, _T(".SCR")) || !lstrcmpi(ext, _T(".LANG")))
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+	static const TCHAR extensions[] = _T("EXE;DLL;SYS;DRV;OCX;CPL;SCR");
+	return *ext == _T('.') && PathMatchSpec(ext + 1, extensions);
 }
 
 /**
@@ -117,36 +120,34 @@ static bool CheckFileForVersion(LPCTSTR ext)
  * @param [in,out] di DIFFITEM to update.
  * @param [in] bLeft If TRUE left-side file is updated, right-side otherwise.
  */
-void CDiffContext::UpdateVersion(DIFFITEM & di, BOOL bLeft) const
+void CDiffContext::UpdateVersion(DIFFITEM *di, BOOL bLeft) const
 {
-	DiffFileInfo & dfi = bLeft ? di.left : di.right;
+	DiffFileInfo &dfi = bLeft ? di->left : di->right;
 	// Check only binary files
 	dfi.version.Clear();
 	dfi.versionChecked = DiffFileInfo::VersionMissing;
 
-	if (di.diffcode.isDirectory())
+	if (di->isDirectory())
 		return;
 	
 	String spath;
 	if (bLeft)
 	{
-		if (di.diffcode.isSideRightOnly())
+		if (di->isSideRightOnly())
 			return;
-		LPCTSTR ext = PathFindExtension(di.left.filename.c_str());
+		LPCTSTR ext = PathFindExtension(di->left.filename.c_str());
 		if (!CheckFileForVersion(ext))
 			return;
-		spath = di.GetLeftFilepath(GetLeftPath());
-		spath = paths_ConcatPath(spath, di.left.filename);
+		spath = GetLeftFilepathAndName(di);
 	}
 	else
 	{
-		if (di.diffcode.isSideLeftOnly())
+		if (di->isSideLeftOnly())
 			return;
-		LPCTSTR ext = PathFindExtension(di.right.filename.c_str());
+		LPCTSTR ext = PathFindExtension(di->right.filename.c_str());
 		if (!CheckFileForVersion(ext))
 			return;
-		spath = di.GetRightFilepath(GetRightPath());
-		spath = paths_ConcatPath(spath, di.right.filename);
+		spath = GetRightFilepathAndName(di);
 	}
 	
 	// Get version info if it exists

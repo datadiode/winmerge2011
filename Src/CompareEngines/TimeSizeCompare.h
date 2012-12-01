@@ -22,7 +22,7 @@ class TimeSizeCompare
 {
 public:
 	TimeSizeCompare(const CDiffContext *);
-	int CompareFiles(int compMethod, const DIFFITEM &di);
+	int CompareFiles(int compMethod, const DIFFITEM *di);
 
 private:
 	const CDiffContext *const m_pCtxt;

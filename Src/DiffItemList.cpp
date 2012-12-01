@@ -41,11 +41,10 @@ DIFFITEM *DiffItemList::AddDiff(DIFFITEM *parent)
 
 /**
  * @brief Remove diffitem from structured DIFFITEM tree
- * @param diffpos position of item to remove
+ * @param Pointer to item to remove
  */
-void DiffItemList::RemoveDiff(UINT_PTR diffpos)
+void DiffItemList::RemoveDiff(DIFFITEM *p)
 {
-	DIFFITEM *p = (DIFFITEM *)diffpos;
 	p->RemoveSelf();
 	delete p;
 }
@@ -56,69 +55,45 @@ void DiffItemList::RemoveDiff(UINT_PTR diffpos)
 void DiffItemList::RemoveAll()
 {
 	while (m_root.IsSibling(m_root.Flink))
-		RemoveDiff((UINT_PTR)m_root.Flink);
+		RemoveDiff(static_cast<DIFFITEM *>(m_root.Flink));
 }
 
 /**
- * @brief Get position of first item in structured DIFFITEM tree
+ * @brief Get pointer to first child item in structured DIFFITEM tree
+ * @param  parent [in] Pointer to parent item 
+ * @return Pointer to first child item
  */
-UINT_PTR DiffItemList::GetFirstDiffPosition() const
+DIFFITEM *DiffItemList::GetFirstChildDiff(const DIFFITEM *parent) const
 {
-	return (UINT_PTR)m_root.IsSibling(m_root.Flink);
-}
-
-/**
- * @brief Get position of first child item in structured DIFFITEM tree
- * @param  parentdiffpos [in] Position of parent diff item 
- * @return Position of first child item
- */
-UINT_PTR DiffItemList::GetFirstChildDiffPosition(UINT_PTR parentdiffpos) const
-{
-	DIFFITEM *parent = (DIFFITEM *)parentdiffpos;
 	if (parent)
-		return (UINT_PTR)parent->children.IsSibling(parent->children.Flink);
+		return static_cast<DIFFITEM *>(parent->children.IsSibling(parent->children.Flink));
 	else
-		return (UINT_PTR)m_root.IsSibling(m_root.Flink);
+		return static_cast<DIFFITEM *>(m_root.IsSibling(m_root.Flink));
 }
 
 /**
- * @brief Get position of next item in structured DIFFITEM tree
- * @param diffpos position of current item, updated to next item position
- * @return Diff Item in current position
+ * @brief Get pointer to next item in structured DIFFITEM tree
+ * @param Pointer to current item
+ * @return Pointer to next item
  */
-DIFFITEM &DiffItemList::GetNextDiffPosition(UINT_PTR & diffpos) const
+DIFFITEM *DiffItemList::GetNextDiff(const DIFFITEM *p) const
 {
-	DIFFITEM *p = (DIFFITEM *)diffpos;
-	if (p->HasChildren())
+	DIFFITEM *q = GetFirstChildDiff(p);
+	while (q == NULL && p != NULL)
 	{
-		diffpos = GetFirstChildDiffPosition(diffpos);
+		q = GetNextSiblingDiff(p);
+		p = p->parent;
 	}
-	else
-	{
-		DIFFITEM *cur = p;
-		do
-		{
-			if (cur->parent)
-				diffpos = (UINT_PTR)cur->parent->children.IsSibling(cur->Flink);
-			else
-				diffpos = (UINT_PTR)m_root.IsSibling(cur->Flink);
-			cur = cur->parent;
-		} while (!diffpos && cur);
-	}
-	return *p;
+	return q;
 }
 
 /**
- * @brief Get position of next sibling item in structured DIFFITEM tree
- * @param diffpos position of current item, updated to next sibling item position
- * @return Diff Item in current position
+ * @brief Get pointer to next sibling item in structured DIFFITEM tree
+ * @param Pointer to current item
+ * @return Pointer to next sibling item
  */
-DIFFITEM &DiffItemList::GetNextSiblingDiffPosition(UINT_PTR & diffpos) const
+DIFFITEM *DiffItemList::GetNextSiblingDiff(const DIFFITEM *p) const
 {
-	DIFFITEM *p = (DIFFITEM *)diffpos;
-	if (p->parent)
-		diffpos = (UINT_PTR)p->parent->children.IsSibling(p->Flink);
-	else
-		diffpos = (UINT_PTR)m_root.IsSibling(p->Flink);
-	return *p;
+	const ListEntry &root = p->parent ? p->parent->children : m_root;
+	return static_cast<DIFFITEM *>(root.IsSibling(p->Flink));
 }

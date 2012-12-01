@@ -59,12 +59,14 @@ static string_format EndEl(LPCTSTR elName)
 DirCmpReport::DirCmpReport(CDirView *pList)
 	: m_pList(pList), m_pFile(NULL), m_sSeparator(_T(",")), m_rootPaths(2)
 {
+	CDirFrame *const pDoc = pList->m_pFrame;
+	const CDiffContext *ctxt = pDoc->GetDiffContext();
 	m_nColumns = pList->GetHeaderCtrl()->GetItemCount();
-	m_rootPaths[0] = pList->m_pFrame->GetLeftBasePath();
-	m_rootPaths[1] = pList->m_pFrame->GetRightBasePath();
+	m_rootPaths[0] = ctxt->GetLeftPath();
+	m_rootPaths[1] = ctxt->GetRightPath();
 	// If inside archive, convert paths
-	pList->m_pFrame->ApplyLeftDisplayRoot(m_rootPaths[0]);
-	pList->m_pFrame->ApplyRightDisplayRoot(m_rootPaths[1]);
+	pDoc->ApplyLeftDisplayRoot(m_rootPaths[0]);
+	pDoc->ApplyRightDisplayRoot(m_rootPaths[1]);
 	m_rootPaths[0].erase(0, paths_UndoMagic(&m_rootPaths[0].front()) - m_rootPaths[0].c_str());
 	m_rootPaths[1].erase(0, paths_UndoMagic(&m_rootPaths[1].front()) - m_rootPaths[1].c_str());
 }
