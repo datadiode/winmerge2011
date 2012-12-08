@@ -560,6 +560,7 @@ OException::OException(DWORD err, LPCTSTR fmt)
 								_countof(msg) - len, _T("%ls"), bstr);
 							SysFreeString(bstr);
 						}
+						perrinfo->Release();
 					}
 				}
 			}
