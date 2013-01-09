@@ -125,7 +125,7 @@
 #define IDI_EQUALTEXTFILE                       520
 #define IDI_NOTEQUALTEXTFILE                    521
 #define IDC_LEFT_EDIT                           1000
-#define IDC_FILE_EDIT                           1000
+#define IDC_COMPARE_SELFCOMPARE                 1001
 #define IDC_LEFT_BUTTON                         1001
 #define IDC_LFILTER_EDIT                        1001
 #define IDC_TV_CLEARCASE_TYPEMGR_SETUP          1001
@@ -438,7 +438,7 @@
 #define IDC_WORDDIFF_DELETED_COLOR              1346
 #define IDC_SEL_WORDDIFF_DELETED_COLOR          1347
 #define IDC_COMPAREFOLDER_DEFAULTS              1348
-#define IDC_COMPARE_WALKSUBDIRS                 1349
+#define IDC_COMPARE_WALKUNIQUES                 1349
 #define IDC_COMPARE_QUICKC_LIMIT                1350
 #define IDC_MATCH_SIMILAR_LINES_MAX             1351
 #define IDC_EDIT_WHOLE_WORD                     8603

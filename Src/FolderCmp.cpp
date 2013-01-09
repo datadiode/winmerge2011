@@ -84,29 +84,36 @@ UINT FolderCmp::prepAndCompareTwoFiles(DIFFITEM *di)
 		String origFileName1;
 		String origFileName2;
 		GetComparePaths(di, origFileName1, origFileName2);
-		// store true names for diff utils patch file
-		m_diffFileData.SetDisplayFilepaths(origFileName1.c_str(), origFileName2.c_str());
-	
-		if (!m_diffFileData.OpenFiles(origFileName1.c_str(), origFileName2.c_str()))
+		if (m_pCtx->m_bSelfCompare || origFileName1 != origFileName2)
 		{
-			return 0; // yields an error icon
+			// store true names for diff utils patch file
+			m_diffFileData.SetDisplayFilepaths(origFileName1.c_str(), origFileName2.c_str());
+		
+			if (!m_diffFileData.OpenFiles(origFileName1.c_str(), origFileName2.c_str()))
+			{
+				return 0; // yields an error icon
+			}
+
+			osfhandle[0] = m_diffFileData.GetFileHandle(0);
+			osfhandle[1] = m_diffFileData.GetFileHandle(1);
+
+			GuessCodepageEncoding(origFileName1.c_str(), &m_diffFileData.m_FileLocation[0].encoding, m_pCtx->m_bGuessEncoding, osfhandle[0]);
+			if (osfhandle[1] != osfhandle[0])
+				GuessCodepageEncoding(origFileName2.c_str(), &m_diffFileData.m_FileLocation[1].encoding, m_pCtx->m_bGuessEncoding, osfhandle[1]);
+			else
+				m_diffFileData.m_FileLocation[1].encoding = m_diffFileData.m_FileLocation[0].encoding;
+
+			// If either file is larger than limit compare files by quick contents
+			// This allows us to (faster) compare big binary files
+			if (di->left.size.int64 > m_pCtx->m_nQuickCompareLimit ||
+				di->right.size.int64 > m_pCtx->m_nQuickCompareLimit)
+			{
+				nCompMethod = CMP_QUICK_CONTENT;
+			}
 		}
-
-		osfhandle[0] = m_diffFileData.GetFileHandle(0);
-		osfhandle[1] = m_diffFileData.GetFileHandle(1);
-
-		GuessCodepageEncoding(origFileName1.c_str(), &m_diffFileData.m_FileLocation[0].encoding, m_pCtx->m_bGuessEncoding, osfhandle[0]);
-		if (osfhandle[1] != osfhandle[0])
-			GuessCodepageEncoding(origFileName2.c_str(), &m_diffFileData.m_FileLocation[1].encoding, m_pCtx->m_bGuessEncoding, osfhandle[1]);
 		else
-			m_diffFileData.m_FileLocation[1].encoding = m_diffFileData.m_FileLocation[0].encoding;
-
-		// If either file is larger than limit compare files by quick contents
-		// This allows us to (faster) compare big binary files
-		if (di->left.size.int64 > m_pCtx->m_nQuickCompareLimit ||
-			di->right.size.int64 > m_pCtx->m_nQuickCompareLimit)
 		{
-			nCompMethod = CMP_QUICK_CONTENT;
+			nCompMethod = CMP_DATE_SIZE;
 		}
 	}
 

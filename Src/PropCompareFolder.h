@@ -34,7 +34,8 @@ public:
 	int     m_compareMethod;
 	BOOL    m_bStopAfterFirst;
 	BOOL    m_bIgnoreSmallTimeDiff;
-	BOOL    m_bIncludeUniqFolders;
+	BOOL    m_bSelfCompare;
+	BOOL    m_bWalkUniques;
 	UINT    m_nQuickCompareLimit;
 // Implementation
 protected:

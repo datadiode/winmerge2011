@@ -186,6 +186,7 @@ CDiffContext::CDiffContext
 	m_bStopAfterFirstDiff(false),
 	m_nRecursive(nRecursive),
 	m_bWalkUniques(true),
+	m_bSelfCompare(true),
 	m_paths(2),
 #pragma warning(disable:warning_this_used_in_base_member_initializer_list)
 	m_folderCmp(this),
@@ -280,8 +281,7 @@ void CDiffContext::DiffThreadCollect(LPVOID lpParam)
 #endif
 
 	// Build results list (except delaying file comparisons until below)
-	myStruct->DirScan_GetItems(subdir, false, subdir, false,
-			depth, NULL, myStruct->m_bWalkUniques);
+	myStruct->DirScan_GetItems(subdir, false, subdir, false, depth, NULL);
 
 #ifdef _DEBUG
 	_CrtMemCheckpoint(&memStateAfter);

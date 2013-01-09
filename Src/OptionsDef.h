@@ -305,7 +305,9 @@ extern COptionDef
 extern COptionDef
 <UINT> OPT_CMP_QUICK_LIMIT operator((_T("Settings/QuickMethodLimit"), 4 * 1024 * 1024));
 extern COptionDef
-<bool> OPT_CMP_WALK_UNIQUE_DIRS operator((_T("Settings/WalkUniqueDirs"), true));
+<bool> OPT_CMP_SELF_COMPARE operator((_T("Settings/SelfCompare"), true));
+extern COptionDef
+<bool> OPT_CMP_WALK_UNIQUES operator((_T("Settings/WalkUniqueDirs"), true));
 
 // Multidoc enable/disable per document type
 extern COptionDef

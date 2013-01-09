@@ -40,13 +40,12 @@ static char THIS_FILE[] = __FILE__;
  * @param [in] bRightUniq Is right-side folder unique folder?
  * @param [in] depth Levels of subdirectories to scan, -1 scans all
  * @param [in] parent Folder diff item to be scanned
- * @param [in] bUniques If true, walk into unique folders.
  * @return 1 normally, -1 if compare was aborted
  */
 int CDiffContext::DirScan_GetItems(
 		const String &leftsubdir, bool bLeftUniq,
 		const String &rightsubdir, bool bRightUniq,
-		int depth, DIFFITEM *parent, bool bUniques)
+		int depth, DIFFITEM *parent)
 {
 	ASSERT(!bLeftUniq || !bRightUniq); // Both folders cannot be unique
 	static const TCHAR backslash[] = _T("\\");
@@ -110,7 +109,7 @@ int CDiffContext::DirScan_GetItems(
 					m_piFilterGlobal->collateDir(leftDirs[i].filename.c_str(), rightDirs[j].filename.c_str()) < 0))
 			{
 				UINT nDiffCode = DIFFCODE::LEFT | DIFFCODE::DIR;
-				if (depth && bUniques)
+				if (depth && m_bWalkUniques)
 				{
 					// Recurse into unique subfolder and get all items in it
 					String leftnewsub = leftsubprefix + leftDirs[i].filename;
@@ -122,8 +121,7 @@ int CDiffContext::DirScan_GetItems(
 					else
 					{
 						DIFFITEM *me = AddToList(leftsubdir, empty, &leftDirs[i], NULL, nDiffCode, parent);
-						if (DirScan_GetItems(leftnewsub, true, empty, false,
-								depth - 1, me, bUniques) == -1)
+						if (DirScan_GetItems(leftnewsub, true, empty, false, depth - 1, me) == -1)
 						{
 							return -1;
 						}
@@ -141,7 +139,7 @@ int CDiffContext::DirScan_GetItems(
 					m_piFilterGlobal->collateDir(leftDirs[i].filename.c_str(), rightDirs[j].filename.c_str()) > 0))
 			{
 				UINT nDiffCode = DIFFCODE::RIGHT | DIFFCODE::DIR;
-				if (depth && bUniques)
+				if (depth && m_bWalkUniques)
 				{
 					// Recurse into unique subfolder and get all items in it
 					String rightnewsub = rightsubprefix + rightDirs[j].filename;
@@ -153,8 +151,7 @@ int CDiffContext::DirScan_GetItems(
 					else
 					{
 						DIFFITEM *me = AddToList(empty, rightsubdir, NULL, &rightDirs[j], nDiffCode, parent);
-						if (DirScan_GetItems(empty, false, rightnewsub, true,
-								depth - 1, me, bUniques) == -1)
+						if (DirScan_GetItems(empty, false, rightnewsub, true, depth - 1, me) == -1)
 						{
 							return -1;
 						}
@@ -198,8 +195,7 @@ int CDiffContext::DirScan_GetItems(
 					const UINT nDiffCode = DIFFCODE::BOTH | DIFFCODE::DIR;
 					DIFFITEM *me = AddToList(leftsubdir, rightsubdir, &leftDirs[i], &rightDirs[j], nDiffCode, parent);
 					// Scan recursively all subdirectories too, we are not adding folders
-					if (DirScan_GetItems(leftnewsub, false, rightnewsub, false,
-							depth - 1, me, bUniques) == -1)
+					if (DirScan_GetItems(leftnewsub, false, rightnewsub, false, depth - 1, me) == -1)
 					{
 						return -1;
 					}

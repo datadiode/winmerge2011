@@ -31,7 +31,7 @@ PropCompareFolder::PropCompareFolder()
 , m_compareMethod(-1)
 , m_bStopAfterFirst(FALSE)
 , m_bIgnoreSmallTimeDiff(FALSE)
-, m_bIncludeUniqFolders(TRUE)
+, m_bWalkUniques(TRUE)
 , m_nQuickCompareLimit(4 * Mega)
 {
 }
@@ -42,7 +42,8 @@ bool PropCompareFolder::UpdateData()
 	DDX_CBIndex<op>(IDC_COMPAREMETHODCOMBO, m_compareMethod);
 	DDX_Check<op>(IDC_COMPARE_STOPFIRST, m_bStopAfterFirst);
 	DDX_Check<op>(IDC_IGNORE_SMALLTIMEDIFF, m_bIgnoreSmallTimeDiff);
-	DDX_Check<op>(IDC_COMPARE_WALKSUBDIRS, m_bIncludeUniqFolders);
+	DDX_Check<op>(IDC_COMPARE_SELFCOMPARE, m_bSelfCompare);
+	DDX_Check<op>(IDC_COMPARE_WALKSUBDIRS, m_bWalkUniques);
 	DDX_Text<op>(IDC_COMPARE_QUICKC_LIMIT, m_nQuickCompareLimit);
 	return true;
 }
@@ -78,7 +79,8 @@ void PropCompareFolder::ReadOptions()
 	m_compareMethod = COptionsMgr::Get(OPT_CMP_METHOD);
 	m_bStopAfterFirst = COptionsMgr::Get(OPT_CMP_STOP_AFTER_FIRST);
 	m_bIgnoreSmallTimeDiff = COptionsMgr::Get(OPT_IGNORE_SMALL_FILETIME);
-	m_bIncludeUniqFolders = COptionsMgr::Get(OPT_CMP_WALK_UNIQUE_DIRS);
+	m_bSelfCompare = COptionsMgr::Get(OPT_CMP_SELF_COMPARE);
+	m_bWalkUniques = COptionsMgr::Get(OPT_CMP_WALK_UNIQUES);
 	m_nQuickCompareLimit = COptionsMgr::Get(OPT_CMP_QUICK_LIMIT) / Mega;
 }
 
@@ -92,7 +94,8 @@ void PropCompareFolder::WriteOptions()
 	COptionsMgr::SaveOption(OPT_CMP_METHOD, m_compareMethod);
 	COptionsMgr::SaveOption(OPT_CMP_STOP_AFTER_FIRST, m_bStopAfterFirst != FALSE);
 	COptionsMgr::SaveOption(OPT_IGNORE_SMALL_FILETIME, m_bIgnoreSmallTimeDiff != FALSE);
-	COptionsMgr::SaveOption(OPT_CMP_WALK_UNIQUE_DIRS, m_bIncludeUniqFolders != FALSE);
+	COptionsMgr::SaveOption(OPT_CMP_SELF_COMPARE, m_bSelfCompare != FALSE);
+	COptionsMgr::SaveOption(OPT_CMP_WALK_UNIQUES, m_bWalkUniques != FALSE);
 
 	if (m_nQuickCompareLimit > 2000)
 		m_nQuickCompareLimit = 2000;
@@ -127,7 +130,8 @@ void PropCompareFolder::OnDefaults()
 {
 	m_compareMethod = COptionsMgr::GetDefault(OPT_CMP_METHOD);
 	m_bStopAfterFirst = COptionsMgr::GetDefault(OPT_CMP_STOP_AFTER_FIRST);
-	m_bIncludeUniqFolders = COptionsMgr::GetDefault(OPT_CMP_WALK_UNIQUE_DIRS);
+	m_bSelfCompare = COptionsMgr::GetDefault(OPT_CMP_SELF_COMPARE);
+	m_bWalkUniques = COptionsMgr::GetDefault(OPT_CMP_WALK_UNIQUES);
 	m_nQuickCompareLimit = COptionsMgr::GetDefault(OPT_CMP_QUICK_LIMIT) / Mega;
 	UpdateScreen();
 }

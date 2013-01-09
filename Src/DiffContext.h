@@ -101,6 +101,13 @@ public:
 	int m_nQuickCompareLimit;
 
 	/**
+	 * Self-compare unique files to detect encoding and EOL style.
+	 *
+	 * This value is true by default.
+	 */
+	bool m_bSelfCompare;
+
+	/**
 	 * Walk into unique folders and add contents.
 	 * This enables/disables walking into unique folders. If we don't walk into
 	 * unique folders, they are shown as such in folder compare results. If we
@@ -145,7 +152,7 @@ private:
 	int DirScan_GetItems(
 		const String &leftsubdir, bool bLeftUniq,
 		const String &rightsubdir, bool bRightUniq,
-		int depth, DIFFITEM *parent, bool bUniques);
+		int depth, DIFFITEM *parent);
 	DIFFITEM *AddToList(const String &sLeftDir, const String &sRightDir,
 		const DirItem *lent, const DirItem *rent, UINT code, DIFFITEM *parent);
 	void SetDiffItemStats(DIFFITEM *);
