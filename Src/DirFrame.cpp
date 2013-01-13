@@ -404,6 +404,12 @@ LRESULT CDirFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 	case ID_TOOLS_GENERATEREPORT:
 		m_pDirView->OnToolsGenerateReport();
 		break;
+	case ID_TOOLS_VIEW_AS_XLS:
+		m_pDirView->OnToolsSaveToXLS(SW_SHOWNORMAL);
+		break;
+	case ID_TOOLS_SAVE_TO_XLS:
+		m_pDirView->OnToolsSaveToXLS(SW_HIDE);
+		break;
 	case ID_DIR_ZIP_LEFT:
 		m_pDirView->OnCtxtDirZipLeft();
 		break;

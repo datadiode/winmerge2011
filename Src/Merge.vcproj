@@ -566,6 +566,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ExcelExport.cpp"
+				>
+			</File>
+			<File
 				RelativePath="FileActionScript.cpp"
 				>
 			</File>
@@ -1132,6 +1136,10 @@
 			</File>
 			<File
 				RelativePath="Environment.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ExcelExport.h"
 				>
 			</File>
 			<File
@@ -3002,4 +3010,6 @@
 			</FileConfiguration>
 		</File>
 	</Files>
+	<Globals>
+	</Globals>
 </VisualStudioProject>

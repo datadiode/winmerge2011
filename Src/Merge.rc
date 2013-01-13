@@ -91,6 +91,8 @@ IDR_DIRDOCTYPE MENU
         MENUITEM "&Filters...", ID_TOOLS_FILTERS
         MENUITEM "&Generate Patch...", ID_TOOLS_GENERATEPATCH
         MENUITEM "Generate &Report...", ID_TOOLS_GENERATEREPORT
+        MENUITEM "Save to &Excel spreadsheet...", ID_TOOLS_SAVE_TO_XLS
+        MENUITEM "Show in Excel &Viewer...", ID_TOOLS_VIEW_AS_XLS
     }
     POPUP "&Debug"
     {
@@ -1634,6 +1636,7 @@ STRINGTABLE
     IDS_TEXT_REPORT_FILES         "Text Files (*.csv;*.asc;*.rpt;*.txt)|*.csv;*.asc;*.rpt;*.txt|All Files (*.*)|*.*||"
     IDS_HTML_REPORT_FILES         "HTML Files (*.htm,*.html)|*.htm;*.html|All Files (*.*)|*.*||"
     IDS_XML_REPORT_FILES          "XML Files (*.xml)|*.xml|All Files (*.*)|*.*||"
+    IDS_XLS_REPORT_FILES          "XLS Files (*.xls)|*.xls|All Files (*.*)|*.*||"
     IDS_UNICODING_UTF8            "UTF-8"
     IDS_UNICODING_UTF8_BOM        "UTF-8 (B)"
     IDS_UNICODING_UCS2_LE         "UCS-2 LE"

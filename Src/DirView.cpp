@@ -39,6 +39,7 @@
 #include "coretools.h"
 #include "FileTransform.h"
 #include "paths.h"
+#include "Environment.h"
 #include "7zCommon.h"
 #include "OptionsDef.h"
 #include "DirCmpReport.h"
@@ -46,6 +47,8 @@
 #include "CompareStatisticsDlg.h"
 #include "ShellContextMenu.h"
 #include "PidlContainer.h"
+#include "ExcelExport.h"
+#include "FileOrFolderSelect.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -1475,8 +1478,6 @@ void CDirView::OnCustomizeColumns()
  */
 void CDirView::OnToolsGenerateReport()
 {
-	// Make list of registry keys for columns
-	// (needed for XML reports)
 	DirCmpReport report(this);
 
 	String errStr;
@@ -1487,6 +1488,52 @@ void CDirView::OnToolsGenerateReport()
 		else
 			LanguageSelect.MsgBox(IDS_REPORT_ERROR, errStr.c_str(), MB_ICONSTOP);
 	}
+}
+
+/**
+ * @brief Save dir compare results to Excel spreadsheet.
+ */
+void CDirView::OnToolsSaveToXLS(int nShowViewer)
+{
+	String path;
+	if (nShowViewer != SW_HIDE)
+	{
+		path = paths_ConcatPath(env_GetTempPath(), _T("xlview.xls"));
+	}
+	else if (!SelectFile(m_hWnd, path,
+		IDS_SAVE_AS_TITLE, IDS_XLS_REPORT_FILES, FALSE, _T("xls")))
+	{
+		return;
+	}
+	CExcelExport exp;
+	if (exp.Open(path.c_str()))
+	{
+		// Set up some reasonable defaults
+		exp.fPrintGrid = true;
+		exp.sHeader = _T("&L<left> ~ <right>&RPage &P of &N");
+		exp.sFooter = _T("&LWinMerge 2011&R&D &T");
+		// Default to Excel Viewer 2003
+		exp.sViewer = _T("ExcelViewer.Sheet.8");
+		exp.nShowViewer = SW_MAXIMIZE;
+		// Load custom settings from Supplement.ini
+		String tmp = COptionsMgr::Get(OPT_SUPPLEMENT_FOLDER);
+		String ini = paths_ConcatPath(tmp, _T("Supplement.ini"));
+		exp.ApplyProfile(_T("ExcelExport"), ini.c_str(), true);
+		// Resolve placeholders in header/footer strings
+		tmp = m_pFrame->m_wndFilePathBar.GetTitle(0);
+		string_replace(tmp, _T("&"), _T("&&"));
+		string_replace(exp.sHeader, _T("<left>"), tmp.c_str());
+		string_replace(exp.sFooter, _T("<left>"), tmp.c_str());
+		tmp = m_pFrame->m_wndFilePathBar.GetTitle(1);
+		string_replace(tmp, _T("&"), _T("&&"));
+		string_replace(exp.sHeader, _T("<right>"), tmp.c_str());
+		string_replace(exp.sFooter, _T("<right>"), tmp.c_str());
+		// Write the workbook
+		exp.WriteWorkbook(static_cast<HListView *>(m_pWnd));
+		// Close the file, and optionally launch Excel Viewer
+		exp.Close(nShowViewer);
+	}
+	OException::Check(exp);
 }
 
 /**

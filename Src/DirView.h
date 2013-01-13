@@ -280,6 +280,7 @@ protected:
 	void OnEditColumns();
 	void OnCustomizeColumns();
 	void OnToolsGenerateReport();
+	void OnToolsSaveToXLS(int nShowViewer);
 	void OnCtxtDirZipLeft();
 	void OnCtxtDirZipRight();
 	void OnCtxtDirZipBoth();

@@ -768,6 +768,7 @@
 #define IDS_TEXT_REPORT_FILES                   18540
 #define IDS_HTML_REPORT_FILES                   18541
 #define IDS_XML_REPORT_FILES                    18542
+#define IDS_XLS_REPORT_FILES                    18543
 #define IDS_UNICODING_UTF8                      18592
 #define IDS_UNICODING_UTF8_BOM                  18593
 #define IDS_UNICODING_UCS2_LE                   18594
@@ -835,11 +836,13 @@
 #define ID_TOOLS_FILTERS                        32866
 #define ID_TOOLS_COMPARE_SELECTION              32867
 #define ID_TOOLS_GENERATEREPORT                 32868
-#define ID_MERGE_COMPARE                        32869
-#define ID_MERGE_COMPARE_TEXT                   32870
-#define ID_MERGE_COMPARE_ZIP                    32871
-#define ID_MERGE_COMPARE_HEX                    32872
-#define ID_MERGE_COMPARE_XML                    32873
+#define ID_TOOLS_SAVE_TO_XLS                    32869
+#define ID_TOOLS_VIEW_AS_XLS                    32870
+#define ID_MERGE_COMPARE                        32879
+#define ID_MERGE_COMPARE_TEXT                   32880
+#define ID_MERGE_COMPARE_ZIP                    32881
+#define ID_MERGE_COMPARE_HEX                    32882
+#define ID_MERGE_COMPARE_XML                    32883
 #define ID_DEBUG_LOADCONFIG                     32884
 #define ID_WINDOW_CHANGE_PANE                   32896
 #define ID_WINDOW_CLOSEALL                      32897
