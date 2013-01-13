@@ -197,10 +197,11 @@ static stl::vector<String> rgDispinfoText(2); // used in function below
  *	latter case, you must not change or delete the string until the corresponding
  *	item text is deleted or two additional LVN_GETDISPINFO messages have been sent.
  */
-static LPTSTR NTAPI AllocDispinfoText(const String &s)
+static LPTSTR NTAPI AllocDispinfoText(String &s)
 {
 	static int i = 0;
-	LPCTSTR pszText = (rgDispinfoText[i] = s).c_str();
+	rgDispinfoText[i].swap(s);
+	LPCTSTR pszText = rgDispinfoText[i].c_str();
 	i ^= 1;
 	return (LPTSTR)pszText;
 }
@@ -404,7 +405,7 @@ void CDirView::MoveColumn(int psrc, int pdest)
 			m_invcolorder[ord] = i;
 	}
 	ValidateColumnOrdering();
-	UpdateColumns(LVCF_TEXT | LVCF_WIDTH);
+	UpdateColumns(LVCF_TEXT | LVCF_FMT | LVCF_WIDTH);
 	ValidateColumnOrdering();
 }
 
