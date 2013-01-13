@@ -30,7 +30,7 @@ public:
 		_HSTR *Trim(const OLECHAR *);
 		HString *Uni(const EntityMap &, unsigned = CP_UTF8);
 	} *HSTR;
-	static HString *Entities(const OLECHAR *, unsigned = CP_UTF8);
+	static HString *Entitify(const OLECHAR *);
 	typedef H2O::OString String;
 	const char *first;	// first char of current markup (valid after Move)
 	const char *lower;	// beginning of enclosed text (valid after Move)

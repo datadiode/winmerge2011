@@ -125,17 +125,17 @@ bool ProjectFile::Save(LPCTSTR path)
 	OString xml = HString::Oct(reinterpret_cast<LPCSTR>(pv), cb)->Uni(CP_UTF8);
 	if (HString *tail = xml.SplitAt(L"&project.paths.left;"))
 	{
-		xml.Append(CMarkdown::Entities(m_sLeftFile.c_str()));
+		xml.Append(CMarkdown::Entitify(m_sLeftFile.c_str()));
 		xml.Append(tail);
 	}
 	if (HString *tail = xml.SplitAt(L"&project.paths.right;"))
 	{
-		xml.Append(CMarkdown::Entities(m_sRightFile.c_str()));
+		xml.Append(CMarkdown::Entitify(m_sRightFile.c_str()));
 		xml.Append(tail);
 	}
 	if (HString *tail = xml.SplitAt(L"&project.paths.filter;"))
 	{
-		xml.Append(CMarkdown::Entities(m_sFilter.c_str()));
+		xml.Append(CMarkdown::Entitify(m_sFilter.c_str()));
 		xml.Append(tail);
 	}
 	if (HString *tail = xml.SplitAt(L"&project.paths.subfolders;"))

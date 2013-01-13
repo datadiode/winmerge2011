@@ -235,7 +235,7 @@ HString *CMarkdown::_HSTR::Uni(const EntityMap &map, unsigned cp)
 	return H;
 }
 
-HString *CMarkdown::Entities(const OLECHAR *text, unsigned cp)
+HString *CMarkdown::Entitify(const OLECHAR *text)
 {
 	HString *H = HString::Uni(text);
 	BSTR p, q = H->B;

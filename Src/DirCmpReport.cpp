@@ -229,7 +229,7 @@ void DirCmpReport::WriteString(LPCTSTR pszText)
  */
 void DirCmpReport::WriteStringEntityAware(LPCTSTR pszText)
 {
-	WriteString(CMarkdown::Entities(pszText), CP_UTF8);
+	WriteString(CMarkdown::Entitify(pszText), CP_UTF8);
 }
 
 /**

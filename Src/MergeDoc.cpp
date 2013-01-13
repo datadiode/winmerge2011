@@ -2411,8 +2411,8 @@ void CChildFrame::WriteReport(UniStdioFile &file)
 		_T("<tbody>\n"),
 		nFontSize,
 		styles.c_str(),
-		OString(CMarkdown::Entities(m_wndFilePathBar.GetTitle(0).c_str())).W,
-		OString(CMarkdown::Entities(m_wndFilePathBar.GetTitle(1).c_str())).W);
+		OString(CMarkdown::Entitify(m_wndFilePathBar.GetTitle(0).c_str())).W,
+		OString(CMarkdown::Entitify(m_wndFilePathBar.GetTitle(1).c_str())).W);
 	file.WriteString(header);
 	// write the body of the report
 	int nLineCount[2] = { m_ptBuf[0]->GetLineCount(), m_ptBuf[1]->GetLineCount() };
