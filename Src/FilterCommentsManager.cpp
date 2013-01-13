@@ -23,7 +23,7 @@
 #include "StdAfx.h"
 #include "coretools.h"
 #include "paths.h"
-#include "environment.h"
+#include "Environment.h"
 #include "FilterCommentsManager.h"
 #include "DIFF.H"
 #include "DiffList.H"

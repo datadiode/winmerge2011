@@ -31,7 +31,7 @@
 #include "Merge.h"
 #include "OpenDlg.h"
 #include "coretools.h"
-#include "environment.h"
+#include "Environment.h"
 #include "OptionsDef.h"
 #include "MainFrm.h"
 #include "OptionsMgr.h"

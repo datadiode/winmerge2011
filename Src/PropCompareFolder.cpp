@@ -43,7 +43,7 @@ bool PropCompareFolder::UpdateData()
 	DDX_Check<op>(IDC_COMPARE_STOPFIRST, m_bStopAfterFirst);
 	DDX_Check<op>(IDC_IGNORE_SMALLTIMEDIFF, m_bIgnoreSmallTimeDiff);
 	DDX_Check<op>(IDC_COMPARE_SELFCOMPARE, m_bSelfCompare);
-	DDX_Check<op>(IDC_COMPARE_WALKSUBDIRS, m_bWalkUniques);
+	DDX_Check<op>(IDC_COMPARE_WALKUNIQUES, m_bWalkUniques);
 	DDX_Text<op>(IDC_COMPARE_QUICKC_LIMIT, m_nQuickCompareLimit);
 	return true;
 }
