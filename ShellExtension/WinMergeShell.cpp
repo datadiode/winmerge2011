@@ -326,6 +326,8 @@ HRESULT CWinMergeShell::InvokeCommand(LPCMINVOKECOMMANDINFO pCmdInfo)
 	if (!PathFileExists(strWinMergePath))
 		return S_FALSE;
 
+	PathQuoteSpaces(strWinMergePath);
+
 	if (LOWORD(pCmdInfo->lpVerb) == 0)
 	{
 		switch (m_dwMenuState)
