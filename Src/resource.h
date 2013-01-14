@@ -838,6 +838,7 @@
 #define ID_TOOLS_GENERATEREPORT                 32868
 #define ID_TOOLS_SAVE_TO_XLS                    32869
 #define ID_TOOLS_VIEW_AS_XLS                    32870
+#define ID_TOOLS_PRINT_AS_XLS                   32871
 #define ID_MERGE_COMPARE                        32879
 #define ID_MERGE_COMPARE_TEXT                   32880
 #define ID_MERGE_COMPARE_ZIP                    32881

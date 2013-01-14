@@ -5,7 +5,7 @@ public:
 	~CExcelExport();
 	operator HRESULT() { return hr; }
 	bool Open(LPCWSTR);
-	void Close(int nShow = SW_HIDE);
+	void Close(LPCTSTR lpVerb = NULL);
 	void ApplyProfile(LPCTSTR app, LPCTSTR ini, bool fWriteDefaults = false);
 	void WriteWorkbook(HListView *);
 	BOOL fPrintGrid : 1;

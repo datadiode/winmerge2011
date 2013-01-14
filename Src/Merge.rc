@@ -93,6 +93,7 @@ IDR_DIRDOCTYPE MENU
         MENUITEM "Generate &Report...", ID_TOOLS_GENERATEREPORT
         MENUITEM "Save to &Excel spreadsheet...", ID_TOOLS_SAVE_TO_XLS
         MENUITEM "Show in Excel &Viewer...", ID_TOOLS_VIEW_AS_XLS
+        MENUITEM "&Print with Excel Viewer...", ID_TOOLS_PRINT_AS_XLS
     }
     POPUP "&Debug"
     {
