@@ -153,12 +153,33 @@ void CExcelExport::Close(LPCTSTR lpVerb)
 		SHELLEXECUTEINFO sei;
 		ZeroMemory(&sei, sizeof sei);
 		sei.cbSize = sizeof sei;
-		sei.fMask = SEE_MASK_CLASSNAME;
+		sei.fMask = SEE_MASK_CLASSNAME | SEE_MASK_NOCLOSEPROCESS | SEE_MASK_WAITFORINPUTIDLE;
 		sei.nShow = nShowViewer;
 		sei.lpFile = lpFile;
 		sei.lpVerb = lpVerb;
 		sei.lpClass = sViewer.c_str();
 		ShellExecuteEx(&sei);
+		// Cope with possible DDE conversation issues
+		DWORD dwWait;
+		do
+		{
+			dwWait = MsgWaitForMultipleObjects(1, &sei.hProcess, FALSE, INFINITE, QS_ALLINPUT);
+			MSG msg;
+			while (dwWait == WAIT_OBJECT_0 + 1 && PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+			{
+				DispatchMessage(&msg);
+				if (HWND hWnd = GetForegroundWindow())
+				{
+					DWORD dwForegroundProcessId = 0;
+					GetWindowThreadProcessId(hWnd, &dwForegroundProcessId);
+					if (dwForegroundProcessId == GetCurrentProcessId())
+					{
+						dwWait = WAIT_OBJECT_0;
+					}
+				}
+			}
+		} while (dwWait != WAIT_OBJECT_0);
+		CloseHandle(sei.hProcess);
 		CoTaskMemFree(lpFile);
 	}
 }
