@@ -156,17 +156,13 @@ UINT FolderCmp::prepAndCompareTwoFiles(DIFFITEM *di)
 		// use our own byte-by-byte compare
 		code = m_pByteCompare->CompareFiles(&m_diffFileData.m_FileLocation.front());
 
-		if (!di->isSideRightOnly())
-			m_diffFileData.m_textStats[0] = m_pByteCompare->m_textStats[0];
-		if (!di->isSideLeftOnly())
-			m_diffFileData.m_textStats[1] = m_pByteCompare->m_textStats[1];
+		m_diffFileData.m_textStats[0] = m_pByteCompare->m_textStats[0];
+		m_diffFileData.m_textStats[1] = m_pByteCompare->m_textStats[1];
 
 		// Quick contents doesn't know about diff counts
 		// Set to special value to indicate invalid
 		m_ndiffs = CDiffContext::DIFFS_UNKNOWN_QUICKCOMPARE;
 		m_ntrivialdiffs = CDiffContext::DIFFS_UNKNOWN_QUICKCOMPARE;
-		di->left.m_textStats = m_diffFileData.m_textStats[0];
-		di->right.m_textStats = m_diffFileData.m_textStats[1];
 	}
 	else if (nCompMethod == CMP_DATE || nCompMethod == CMP_DATE_SIZE || nCompMethod == CMP_SIZE)
 	{
