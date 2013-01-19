@@ -26,13 +26,13 @@ static HWND NTAPI AllocConsoleHidden(LPCTSTR lpTitle)
 	HWND hWnd = NULL;
 	if (CreateProcess(NULL, path, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi))
 	{
-    	DWORD dwExitCode;
+		DWORD dwExitCode;
 		do
 		{
 			Sleep(100);
 			GetExitCodeProcess(pi.hProcess, &dwExitCode);
 		} while (!AttachConsole(pi.dwProcessId) && dwExitCode == STILL_ACTIVE);
-        hWnd = GetConsoleWindow();
+		hWnd = GetConsoleWindow();
 		CloseHandle(pi.hThread);
 		CloseHandle(pi.hProcess);
 	}
