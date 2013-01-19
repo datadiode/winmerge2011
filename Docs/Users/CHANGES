@@ -1,3 +1,33 @@
+0.2011.003.037
+Changes since preceding release (not necessarily complete):
+• An occasional extra newline added by DiffUtils was wrongly included in stats
+• Wrongly assumed UTF-8 w/o BOM prevented rc/html/xml encoding detection
+• Trying to sort DirView by encoding yielded surprising results
+• DirView Tools menu addition: Print with Excel Viewer
+• DirView Tools menu addition: Show in Excel Viewer
+• DirView Tools menu addition: Save to Excel spreadsheet
+• Issue #26 Make self-comparison of unique files optional
+• DirCompProgressDlg: Show paths of files being compared (lazily updated)
+• DirView: Make version column sort numerically rather than alphabetically
+• "Preserve file time in file compare" option was broken
+• Decorate backup file names with timestamp in basic date time ISO format
+• SetCurrentDirectory() with long path caused failure of ClearCase checkout
+• Issue #25 Apply syntax coloring as per file type assignments in Supplement.ini
+• Change directory comparison report encoding to UTF-8
+• Make Numpad +-* and Cursor left/right keys fully functional in TreeView mode
+• UI texts inside MDI child windows did not update when switching UI language
+• Remember last chosen directory comparison report style in registry
+• Entitify file paths in HTML & XML directory comparison reports
+• Entitify file paths in HTML file comparison report
+• File > Save As was broken by earlier efforts to support long path names
+• Issue #23 Copy text block without empty spacer lines
+• Keep enabling of navigation and merging commands in sync with caret movement
+• Address the most worrisome aspects of http://winmerge.org/support/3540610
+• Format dates as per regional settings (http://winmerge.org/support/3538659)
+• Center Goto dialog over avtive pane, and fix border cases
+• Center Find/Replace dialogs as per http://winmerge.org/support/1189076
+• Adopt patches 1/3/4 from www.winmerge.org/support/3036433
+
 0.2011.002.212
 Changes since preceding release (not necessarily complete):
 • Fix "Ignore blank lines" for quick compare (Issue #18)
