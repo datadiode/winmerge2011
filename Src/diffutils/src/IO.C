@@ -620,6 +620,7 @@ prepare_text_end (current, side)
     {
       p[buffered_chars++] = '\n';
       current->missing_newline = 1;
+      --current->count_lfs; // compensate for extra newline
     }
 
 	if (side != -1)
