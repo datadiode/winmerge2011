@@ -570,6 +570,18 @@ $loop:	sub esp,4092
 	}
 }
 
+__declspec(naked) void _ftol2()
+{
+	extern void _ftol();
+	__asm jmp _ftol
+}
+
+__declspec(naked) void _ftol2_sse()
+{
+	extern void _ftol();
+	__asm jmp _ftol
+}
+
 int _fltused = 1;
 
 typedef void (__cdecl *_PVFV)(void);
