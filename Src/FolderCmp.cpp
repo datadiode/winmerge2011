@@ -71,19 +71,18 @@ UINT FolderCmp::prepAndCompareTwoFiles(DIFFITEM *di)
 {
 	int nCompMethod = m_pCtx->m_nCompMethod;
 
-	// Reset text stats
-	m_diffFileData.m_textStats[0].clear();
-	m_diffFileData.m_textStats[1].clear();
-
 	UINT code = DIFFCODE::FILE | DIFFCODE::CMPERR; // yields a warning icon
-
-	HANDLE osfhandle[2] = { NULL, NULL };
 
 	if (nCompMethod == CMP_CONTENT || nCompMethod == CMP_QUICK_CONTENT)
 	{
+		// Reset text stats
+		m_diffFileData.m_textStats[0].clear();
+		m_diffFileData.m_textStats[1].clear();
+
 		String origFileName1;
 		String origFileName2;
 		GetComparePaths(di, origFileName1, origFileName2);
+
 		if (m_pCtx->m_bSelfCompare || origFileName1 != origFileName2)
 		{
 			// store true names for diff utils patch file
@@ -94,8 +93,10 @@ UINT FolderCmp::prepAndCompareTwoFiles(DIFFITEM *di)
 				return 0; // yields an error icon
 			}
 
-			osfhandle[0] = m_diffFileData.GetFileHandle(0);
-			osfhandle[1] = m_diffFileData.GetFileHandle(1);
+			HANDLE osfhandle[2] =
+			{
+				m_diffFileData.GetFileHandle(0), m_diffFileData.GetFileHandle(1)
+			};
 
 			GuessCodepageEncoding(origFileName1.c_str(), &m_diffFileData.m_FileLocation[0].encoding, m_pCtx->m_bGuessEncoding, osfhandle[0]);
 			if (osfhandle[1] != osfhandle[0])
@@ -113,6 +114,8 @@ UINT FolderCmp::prepAndCompareTwoFiles(DIFFITEM *di)
 		}
 		else
 		{
+			m_diffFileData.m_FileLocation[0].encoding.Clear();
+			m_diffFileData.m_FileLocation[1].encoding.Clear();
 			nCompMethod = CMP_DATE_SIZE;
 		}
 	}
