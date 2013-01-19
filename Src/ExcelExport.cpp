@@ -1,6 +1,6 @@
 /*/ExcelExport.cpp
 
-Last edit: 2013-01-13 Jochen Neubeck
+Last edit: 2013-01-19 Jochen Neubeck
 
 [The MIT license]
 
@@ -25,7 +25,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include "stdafx.h"
-#include <MyCom.h>
 #include "ExcelExport.h"
 
 #undef EOF
