@@ -221,7 +221,7 @@ void GuessCodepageEncoding(LPCTSTR filepath, FileTextEncoding *encoding, bool bG
 	{
 		encoding->m_binary = true;
 	}
-	else if (bGuessEncoding)
+	if (bGuessEncoding && bom == 0)
 	{
 		LPCTSTR ext = PathFindExtension(filepath);
 		if (unsigned cp = GuessEncoding_from_bytes(ext, fi.pcImage, fi.cbImage))
