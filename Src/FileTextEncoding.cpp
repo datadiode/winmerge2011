@@ -88,10 +88,14 @@ int FileTextEncoding::Collate(const FileTextEncoding & fte1, const FileTextEncod
 	if (fte1.m_unicoding > fte2.m_unicoding)
 		return 1;
 	if (fte1.m_unicoding < fte2.m_unicoding)
+		return -1;
+	if (fte1.m_bom > fte2.m_bom)
 		return 1;
+	if (fte1.m_bom < fte2.m_bom)
+		return -1;
 	if (fte1.m_codepage > fte2.m_codepage)
 		return 1;
 	if (fte1.m_codepage < fte2.m_codepage)
-		return 1;
+		return -1;
 	return 0;
 }
