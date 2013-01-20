@@ -89,30 +89,35 @@ static unsigned demoGuessEncoding_html(const char *src, size_t len)
 	//markdown.Move("html").Pop().Move("head").Pop();
 	while (markdown.Move("meta"))
 	{
-		CMarkdown::String http_equiv = markdown.GetAttribute("http-equiv");
-		if (http_equiv.A && lstrcmpiA(http_equiv.A, "content-type") == 0)
+		if (CMarkdown::HSTR hstr = markdown.GetAttribute("http-equiv"))
 		{
-			CMarkdown::String content = markdown.GetAttribute("content");
-			if (char *pchKey = content.A)
+			if (lstrcmpiA(CMarkdown::String(hstr).A, "content-type") == 0)
 			{
-				while (int cchKey = strcspn(pchKey += strspn(pchKey, "; \t\r\n"), ";="))
+				CMarkdown::String content = markdown.GetAttribute("content");
+				if (char *pchKey = content.A)
 				{
-					char *pchValue = pchKey + cchKey;
-					int cchValue = strcspn(pchValue += strspn(pchValue, "= \t\r\n"), "; \t\r\n");
-					if (cchKey >= 7 && _memicmp(pchKey, "charset", 7) == 0 && (cchKey == 7 || strchr(" \t\r\n", pchKey[7])))
+					while (int cchKey = strcspn(pchKey += strspn(pchKey, "; \t\r\n"), ";="))
 					{
-						pchValue[cchValue] = '\0';
-						// Is it an encoding name known to charsets module ?
-						unsigned encodingId = FindEncodingIdFromNameOrAlias(pchValue);
-						if (encodingId)
+						char *pchValue = pchKey + cchKey;
+						int cchValue = strcspn(pchValue += strspn(pchValue, "= \t\r\n"), "; \t\r\n");
+						if (cchKey >= 7 && _memicmp(pchKey, "charset", 7) == 0 && (cchKey == 7 || strchr(" \t\r\n", pchKey[7])))
 						{
-							return GetEncodingCodePageFromId(encodingId);
+							pchValue[cchValue] = '\0';
+							// Is it an encoding name known to charsets module ?
+							if (unsigned encodingId = FindEncodingIdFromNameOrAlias(pchValue))
+								return GetEncodingCodePageFromId(encodingId);
+							return 0;
 						}
-						return 0;
+						pchKey = pchValue + cchValue;
 					}
-					pchKey = pchValue + cchValue;
 				}
 			}
+		}
+		else if (CMarkdown::HSTR hstr = markdown.GetAttribute("charset"))
+		{
+			// HTML5 encoding specifier
+			if (unsigned encodingId = FindEncodingIdFromNameOrAlias(CMarkdown::String(hstr).A))
+				return GetEncodingCodePageFromId(encodingId);
 		}
 	}
 	return 0;
@@ -147,18 +152,17 @@ static unsigned demoGuessEncoding_xml(const char *src, size_t len)
  */
 static unsigned demoGuessEncoding_rc(const char *src, size_t len)
 {
-	// NB: Diffutils may replace line endings by '\0'
 	unsigned cp = 0;
 	char line[80];
 	do
 	{
-		while (len && (*src == '\r' || *src == '\n' || *src == '\0'))
+		while (len && (*src == '\r' || *src == '\n'))
 		{
 			++src;
 			--len;
 		}
 		const char *base = src;
-		while (len && *src != '\r' && *src != '\n' && *src != '\0')
+		while (len && (*src != '\r' && *src != '\n'))
 		{
 			++src;
 			--len;
