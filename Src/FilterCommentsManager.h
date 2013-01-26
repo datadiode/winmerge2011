@@ -43,7 +43,8 @@ struct FilterCommentsSet
 	stl::string StartMarker;
 	stl::string EndMarker;
 	stl::string InlineMarker;
-	static const char *FindCommentMarker(const char *target, const stl::string &marker);
+	static const char quote_flag_ignore = '\x7F';
+	static const char *FindCommentMarker(const char *target, const stl::string &marker, char quote_flag = '\0');
 	OP_TYPE PostFilter(int StartPos, int QtyLinesInBlock, const file_data *inf) const;
 };
 

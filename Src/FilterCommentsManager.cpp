@@ -62,11 +62,11 @@ FilterCommentsManager::FilterCommentsManager()
 		{
 			link = q;
 			TCHAR marker[40];
-			GetPrivateProfileString(q, _T("StartMarker"), _T(""), marker, _countof(marker), sFileName.c_str());
+			GetPrivateProfileString(q, _T("StartMarker"), NULL, marker, _countof(marker), sFileName.c_str());
 			filtercommentsset.StartMarker = T2A(marker);
-			GetPrivateProfileString(q, _T("EndMarker"), _T(""), marker, _countof(marker), sFileName.c_str());
+			GetPrivateProfileString(q, _T("EndMarker"), NULL, marker, _countof(marker), sFileName.c_str());
 			filtercommentsset.EndMarker = T2A(marker);
-			GetPrivateProfileString(q, _T("InlineMarker"), _T(""), marker, _countof(marker), sFileName.c_str());
+			GetPrivateProfileString(q, _T("InlineMarker"), NULL, marker, _countof(marker), sFileName.c_str());
 			filtercommentsset.InlineMarker = T2A(marker);
 		}
 		while (LPTSTR q = StrChr(p, _T('=')))
@@ -94,13 +94,17 @@ const FilterCommentsSet &FilterCommentsManager::GetSetForFileType(const String& 
 }
 
 /**
- * @brief Find comment marker in string, excluding portions enclosed in quotation marks or apostrophes
- * @param [in] target				- string to search
- * @param [in] marker				- marker to search for
- * @return Returns position of marker, or NULL if none is present
+ * @brief Find comment marker in string
+ * @param [in]	target string to search
+ * @param [in]	marker marker to search for
+ * @param [in]	quote_flag controls inclusion of portions enclosed in
+ *				apostrophes or quotation marks
+ * @return Points to marker, or to EOL if no marker is present
  */
-const char *FilterCommentsSet::FindCommentMarker(const char *target, const stl::string &marker)
+const char *FilterCommentsSet::FindCommentMarker(const char *target, const stl::string &marker, char quote_flag)
 {
+	C_ASSERT(('"' & 0x3F) == '"');
+	C_ASSERT(('\'' & 0x3F) == '\'');
 	char quote = '\0';
 	const char *marker_ptr = marker.c_str();
 	size_t marker_len = marker.length();
@@ -108,14 +112,14 @@ const char *FilterCommentsSet::FindCommentMarker(const char *target, const stl::
 	{
 		if (c == '\r' || c == '\n')
 			break;
-		if (quote == '\0' && memcmp(target, marker_ptr, marker_len) == 0)
+		if (quote <= quote_flag && memcmp(target, marker_ptr, marker_len) == 0)
 			break;
 		if (c == '\\')
-			quote ^= 0x80;
+			quote ^= 0x40;
 		else if ((c == '"' || c == '\'') && (quote == '\0' || quote == c))
 			quote ^= c;
 		else
-			quote &= 0x7F;
+			quote &= 0x3F;
 		++target;
 	}
 	return target;
@@ -130,7 +134,6 @@ const char *FilterCommentsSet::FindCommentMarker(const char *target, const stl::
 */
 OP_TYPE FilterCommentsSet::PostFilter(int StartPos, int QtyLinesInBlock, const file_data *inf) const
 {
-	//OP_TYPE OpDefault = OP_NONE;
 	const char **const linebuf = inf->linbuf;
 	const int linbuf_base = inf->linbuf_base;
 	const int valid_lines = inf->valid_lines;
@@ -167,12 +170,11 @@ OP_TYPE FilterCommentsSet::PostFilter(int StartPos, int QtyLinesInBlock, const f
 			if (c != '\0' && c != '\r' && c != '\n')
 			{
 				// NB: A StartMarker appearing to the right of an inline marker doesn't count.
-				if (FindCommentMarker(lower, StartMarker) < upper)
+				if (FindCommentMarker(lower, StartMarker, quote_flag_ignore) < upper)
 					return OP_NONE;
-				c = *FindCommentMarker(lower, EndMarker);
+				c = *FindCommentMarker(lower, EndMarker, quote_flag_ignore);
 				if (c != '\0' && c != '\r' && c != '\n')
 					return OP_NONE;
-				//OpDefault = OP_TRIVIAL;
 			}
 		}
 	}
@@ -206,7 +208,9 @@ OP_TYPE FilterCommentsSet::PostFilter(int StartPos, int QtyLinesInBlock, const f
 	q = linebuf[StartPos];
 	if (FindCommentMarker(q, StartMarker) == q)
 	{
-		return OP_TRIVIAL;
+		char c = *q;
+		if (c != '\0' && c != '\r' && c != '\n')
+			return OP_TRIVIAL;
 	}
 	i = StartPos;
 	while (i > linbuf_base)
@@ -216,7 +220,7 @@ OP_TYPE FilterCommentsSet::PostFilter(int StartPos, int QtyLinesInBlock, const f
 		do
 		{
 			bool endMarkerFound = false;
-			q = FindCommentMarker(p, EndMarker);
+			q = FindCommentMarker(p, EndMarker, quote_flag_ignore);
 			char c = *q;
 			if (c != '\0' && c != '\r' && c != '\n')
 			{
