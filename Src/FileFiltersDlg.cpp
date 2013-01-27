@@ -434,7 +434,7 @@ void FileFiltersDlg::UpdateFiltersList()
 	m_listFilters->DeleteAllItems();
 
 	String title = LanguageSelect.LoadString(IDS_USERCHOICE_NONE);
-	m_listFilters->InsertItem(1, title.c_str());
+	m_listFilters->InsertItem(0, title.c_str());
 	m_listFilters->SetItemText(0, 1, title.c_str());
 	m_listFilters->SetItemText(0, 2, title.c_str());
 

@@ -269,25 +269,18 @@ String FileFilterMgr::GetFullpath(FileFilter * pfilter) const
  * @param [in] pFilter Pointer to filter to reload.
  * @return FILTER_OK when succeeds, one of FILTER_RETVALUE values on error.
  * @note Given filter (pfilter) is freed and must not be used anymore.
- * @todo Should return new filter.
  */
 FileFilter *FileFilterMgr::ReloadFilterFromDisk(FileFilter *pfilter)
 {
-	FileFilter *const newfilter = LoadFilterFile(pfilter->fullpath.c_str());
-	if (newfilter)
+	vector<FileFilter *>::iterator iter = stl::find(
+		m_filters.begin(), m_filters.end(), pfilter);
+	if (iter != m_filters.end())
 	{
-		vector<FileFilter*>::iterator iter = m_filters.begin();
-		while (iter != m_filters.end())
+		if (FileFilter *const newfilter = LoadFilterFile(pfilter->fullpath.c_str()))
 		{
-			if (pfilter == *iter)
-			{
-				delete *iter;
-				m_filters.erase(iter);
-				break;
-			}
-			++iter;
+			delete pfilter;
+			*iter = pfilter = newfilter;
 		}
-		m_filters.push_back(newfilter);
 	}
-	return newfilter;
+	return pfilter;
 }
