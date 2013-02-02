@@ -131,8 +131,11 @@ void CDirView::UpdateColumns(UINT lvcf)
 		}
 	}
 	const int sortCol = COptionsMgr::Get(OPT_DIRVIEW_SORT_COLUMN);
-	bool bSortAscending = COptionsMgr::Get(OPT_DIRVIEW_SORT_ASCENDING);
-	m_ctlSortHeader.SetSortImage(ColLogToPhys(sortCol), bSortAscending);
+	if (sortCol >= 0 && sortCol < m_numcols)
+	{
+		bool bSortAscending = COptionsMgr::Get(OPT_DIRVIEW_SORT_ASCENDING);
+		m_ctlSortHeader.SetSortImage(ColLogToPhys(sortCol), bSortAscending);
+	}
 	SetRedraw(TRUE);
 	Invalidate();
 }
