@@ -36,7 +36,7 @@ End If
 <meta http-equiv='Content-Type' content='text/html; charset=ISO-8859-1'/>
 <hta:application
 	id='app'
-	version='XXXXX.2011.003.037'
+	version='XXXXX.2011.003.057'
 	applicationName='WinMerge &amp;version; Setup'
 	scroll='no'
 	singleInstance='yes'
@@ -372,7 +372,7 @@ End Sub
 Sub Apply
 	Dim element
 	document.body.style.cursor = "arrow"
-	sThisFolder = fso.GetParentFolderName(location.pathname)
+	sThisFolder = fso.GetParentFolderName(app.icon)
 	If maintenance.disabled Then
 		sProgFolder = EdFolder.value
 		If Not InstallFiles Then Exit Sub
