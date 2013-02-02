@@ -89,10 +89,7 @@
 
 #include "StdAfx.h"
 #include "LanguageSelect.h"
-#include <malloc.h>
 #include <imm.h> /* IME */
-#include <mbctype.h>
-#include <shlwapi.h>
 #include "editcmd.h"
 #include "ccrystaltextview.h"
 #include "ccrystaltextbuffer.h"
@@ -736,7 +733,7 @@ int CCrystalTextView::ExpandChars(LPCTSTR pszChars, int nOffset, int nCount, Str
 			else
 			{
 				line.push_back(c);
-				nCurPos += GetCharWidthFromChar(pszChars + i) / GetCharWidth();
+				nCurPos += GetCharWidthFromChar(pszChars + i);
 			}
 		}
 	}
@@ -746,7 +743,7 @@ int CCrystalTextView::ExpandChars(LPCTSTR pszChars, int nOffset, int nCount, Str
 		{
 			TCHAR c = pszChars[i];
 			line.push_back(c);
-			nCurPos += GetCharWidthFromChar(pszChars + i) / GetCharWidth();
+			nCurPos += GetCharWidthFromChar(pszChars + i);
 		}
 	}
 	return nCurPos;
@@ -759,7 +756,7 @@ int CCrystalTextView::GetCharWidthFromChar(LPCTSTR pch)
 {
 	UINT ch = *pch;
 	if (ch >= _T('\x00') && ch <= _T('\x1F') && ch != _T('\t'))
-		return GetCharWidth() * 3;
+		return 3;
 
 	if (ch >= UNI_SUR_LOW_START && ch <= UNI_SUR_LOW_END)
 		return 0;
@@ -779,13 +776,13 @@ int CCrystalTextView::GetCharWidthFromChar(LPCTSTR pch)
 		}
     }
 	/*if (ch >= UNI_SUR_MIN && ch <= UNI_SUR_MAX)
-		return GetCharWidth() * 5;*/
+		return 5;*/
 	// This assumes a fixed width font
 	// But the UNICODE case handles double-wide glyphs (primarily Chinese characters)
 	int wcwidth = mk_wcwidth(ch);
 	if (wcwidth < 0)
 		wcwidth = 1; // applies to 8-bit control characters in range 0x7F..0x9F
-	return wcwidth * GetCharWidth();
+	return wcwidth;
 }
 
 /**
@@ -840,7 +837,8 @@ void CCrystalTextView::DrawLineHelperImpl(
 			const int clipLeft = rcClip.left - nCharWidth * nMaxEscapement;
 			for ( ; i < nLength; ++i)
 			{
-				int pnWidthsCurrent = szLine[i] < _T('\t') ? nCharWidth : GetCharWidthFromChar(szLine + i);
+				int pnWidthsCurrent = szLine[i] < _T('\t') ?
+					nCharWidth : nCharWidth * GetCharWidthFromChar(szLine + i);
 				ptOrigin.x += pnWidthsCurrent;
 				if (ptOrigin.x >= clipLeft)
 				{
@@ -896,7 +894,7 @@ void CCrystalTextView::DrawLineHelperImpl(
 					}*/
 					else
 					{
-						nSumWidth += pnWidths[i - ibegin] = GetCharWidthFromChar(szLine + i);
+						nSumWidth += pnWidths[i - ibegin] = nCharWidth * GetCharWidthFromChar(szLine + i);
 					}
 				}
 
@@ -946,7 +944,8 @@ void CCrystalTextView::DrawLineHelperImpl(
 		// Update the final position after the right clipped characters
 		for ( ; i < nLength; ++i)
 		{
-			ptOrigin.x += szLine[i] < _T('\t') ? nCharWidth : GetCharWidthFromChar(szLine + i);
+			ptOrigin.x += szLine[i] < _T('\t') ?
+				nCharWidth : nCharWidth * GetCharWidthFromChar(szLine + i);
 		}
 	}
 }
@@ -1496,8 +1495,8 @@ void CCrystalTextView::GetHTMLLine(int nLineIndex, String &strHTML)
 {
 	ASSERT(nLineIndex >= -1 && nLineIndex < GetLineCount ());
 
-	int nLength = GetViewableLineLength (nLineIndex);
-	LPCTSTR pszChars = GetLineChars (nLineIndex);
+	int nLength = GetViewableLineLength(nLineIndex);
+	LPCTSTR pszChars = GetLineChars(nLineIndex);
 
 	// Acquire the background color for the current line
 	COLORREF crBkgnd, crText;
@@ -1988,7 +1987,7 @@ int CCrystalTextView::CharPosToPoint( int nLineIndex, int nCharPos, POINT &charP
 	return nReturnVal;
 }
 
-int CCrystalTextView::CursorPointToCharPos( int nLineIndex, const POINT &curPoint )
+int CCrystalTextView::CursorPointToCharPos(int nLineIndex, const POINT &curPoint)
 {
 	// calculate char pos out of point
 	const int nLength = GetLineLength(nLineIndex);
@@ -1999,7 +1998,7 @@ int CCrystalTextView::CursorPointToCharPos( int nLineIndex, const POINT &curPoin
 	int *anBreaks = new int[nLength];
 	int nBreaks = 0;
 
-	WrapLineCached( nLineIndex, nScreenChars, anBreaks, nBreaks );
+	WrapLineCached(nLineIndex, nScreenChars, anBreaks, nBreaks);
 
 	// find char pos that matches cursor position
 	int nXPos = 0;
@@ -2016,18 +2015,11 @@ int CCrystalTextView::CursorPointToCharPos( int nLineIndex, const POINT &curPoin
 			nYPos++;
 		}
 
-		if (szLine[nIndex] == _T('\t'))
-		{
-			const int nOffset = nTabSize - nCurPos % nTabSize;
-			nXPos += nOffset;
-			nCurPos += nOffset;
-		}
-		else
-		{
-			int delta = GetCharWidthFromDisplayableChar(szLine + nIndex) / GetCharWidth();
-			nXPos += delta;
-			nCurPos += delta;
-		}
+		const int nOffset = szLine[nIndex] == _T('\t') ?
+			nTabSize - nCurPos % nTabSize :
+			GetCharWidthFromDisplayableChar(szLine + nIndex);
+		nXPos += nOffset;
+		nCurPos += nOffset;
 
 		if (nXPos > curPoint.x && nYPos == curPoint.y)
 		{
@@ -2648,24 +2640,18 @@ POINT CCrystalTextView::ClientToText(const POINT &point)
 		if (nBreaks && nIndex == anBreaks[i])
 		{
 			n = nIndex;
-			i++;
+			++i;
 		}
-		if (pszLine[nIndex] == '\t')
-		{
-			const int nOffset = nTabSize - nCurPos % nTabSize;
-			n += nOffset;
-			nCurPos += nOffset;
-		}
-		else
-		{
-			n += GetCharWidthFromDisplayableChar(pszLine + nIndex) / GetCharWidth();
-			nCurPos++;
-		}
+		const int nOffset = pszLine[nIndex] == _T('\t')
+			? nTabSize - nCurPos % nTabSize
+			: GetCharWidthFromDisplayableChar(pszLine + nIndex);
+		n += nOffset;
+		nCurPos += nOffset;
 		if (n > nPos && i == nSubLineOffset)
 		{
 			break;
 		}
-		nIndex ++;
+		++nIndex;
 	}
 
 	delete[] anBreaks;
@@ -2677,11 +2663,11 @@ POINT CCrystalTextView::ClientToText(const POINT &point)
 #ifdef _DEBUG
 void CCrystalTextView::AssertValidTextPos(const POINT & point)
 {
-	if (GetLineCount () > 0)
+	if (GetLineCount() > 0)
 	{
 		ASSERT(m_nTopLine >= 0 && m_nOffsetChar >= 0);
-		ASSERT(point.y >= 0 && point.y < GetLineCount ());
-		ASSERT(point.x >= 0 && point.x <= GetViewableLineLength (point.y));
+		ASSERT(point.y >= 0 && point.y < GetLineCount());
+		ASSERT(point.x >= 0 && point.x <= GetViewableLineLength(point.y));
 	}
 }
 #endif
@@ -2707,7 +2693,7 @@ bool CCrystalTextView::IsValidTextPosY(int y)
 POINT CCrystalTextView::TextToClient(const POINT &point)
 {
 	ASSERT_VALIDTEXTPOS(point);
-	LPCTSTR pszLine = GetLineChars (point.y);
+	LPCTSTR pszLine = GetLineChars(point.y);
 
 	POINT pt;
 	//BEGIN SW
@@ -2732,20 +2718,19 @@ POINT CCrystalTextView::TextToClient(const POINT &point)
 	*/
 	//END SW
 	pt.x = 0;
-	int nTabSize = GetTabSize ();
+	int nTabSize = GetTabSize();
 	for (int nIndex = 0; nIndex < point.x; nIndex++)
 	{
 		//BEGIN SW
 		if (nIndex == nSubLineStart)
 			nPreOffset = pt.x;
 		//END SW
-		if (pszLine[nIndex] == _T ('\t'))
-			pt.x += (nTabSize - pt.x % nTabSize);
-		else
-			pt.x += GetCharWidthFromDisplayableChar(pszLine + nIndex) / GetCharWidth();
+		pt.x += pszLine[nIndex] == _T('\t') ?
+			nTabSize - pt.x % nTabSize :
+			GetCharWidthFromDisplayableChar(pszLine + nIndex);
 	}
 	//BEGIN SW
-	pt.x-= nPreOffset;
+	pt.x -= nPreOffset;
 	//END SW
 
 	pt.x = (pt.x - m_nOffsetChar) * GetCharWidth() + GetMarginWidth();
@@ -2870,10 +2855,9 @@ int CCrystalTextView::CalculateActualOffset(int nLineIndex, int nCharIndex, BOOL
 		if (nPreBreak == i && nBreaks)
 			nPreOffset = nOffset;
 		//END SW
-		if (pszChars[i] == _T('\t'))
-			nOffset += (nTabSize - nOffset % nTabSize);
-		else
-			nOffset += GetCharWidthFromDisplayableChar(pszChars + i) / GetCharWidth();
+		nOffset += pszChars[i] == _T('\t') ?
+			nTabSize - nOffset % nTabSize :
+			GetCharWidthFromDisplayableChar(pszChars + i);
 	}
 	if (bAccumulate)
 		return nOffset;
@@ -3166,11 +3150,9 @@ void CCrystalTextView::UpdateCompositionWindowPos() /* IME */
 {
 	HIMC hIMC = ImmGetContext(m_hWnd);
 	COMPOSITIONFORM compform;
-
 	compform.dwStyle = CFS_FORCE_POSITION;
 	GetCaretPos(&compform.ptCurrentPos);
 	ImmSetCompositionWindow(hIMC, &compform);
-
 	ImmReleaseContext(m_hWnd, hIMC);
 }
 
@@ -3538,10 +3520,10 @@ BOOL CCrystalTextView::FindTextInBlock(
                 {
                   for (int i = 0; i <= nEolns && ptCurrentPos.y >= i; i++)
                     {
-                      LPCTSTR pszChars = GetLineChars (ptCurrentPos.y - i);
+                      LPCTSTR pszChars = GetLineChars(ptCurrentPos.y - i);
                       if (i)
                         {
-                          nLineLength = GetLineLength (ptCurrentPos.y - i);
+                          nLineLength = GetLineLength(ptCurrentPos.y - i);
                           ptCurrentPos.x = 0;
                           line = _T ('\n') + line;
                         }
@@ -3620,8 +3602,8 @@ BOOL CCrystalTextView::FindTextInBlock(
                   nLines = m_pTextBuffer->GetLineCount ();
                   for (int i = 0; i <= nEolns && ptCurrentPos.y + i < nLines; i++)
                     {
-                      LPCTSTR pszChars = GetLineChars (ptCurrentPos.y + i);
-                      nLineLength = GetLineLength (ptCurrentPos.y + i);
+                      LPCTSTR pszChars = GetLineChars(ptCurrentPos.y + i);
+                      nLineLength = GetLineLength(ptCurrentPos.y + i);
                       if (i)
                         {
                           line += _T ('\n');
@@ -3640,14 +3622,14 @@ BOOL CCrystalTextView::FindTextInBlock(
                 }
               else
                 {
-                  nLineLength = GetLineLength (ptCurrentPos.y) - ptCurrentPos.x;
+                  nLineLength = GetLineLength(ptCurrentPos.y) - ptCurrentPos.x;
                   if (nLineLength <= 0)
                     {
                       ptCurrentPos.x = 0;
                       ptCurrentPos.y++;
                       continue;
                     }
-                  LPCTSTR pszChars = GetLineChars (ptCurrentPos.y);
+                  LPCTSTR pszChars = GetLineChars(ptCurrentPos.y);
                   pszChars += ptCurrentPos.x;
                   //  Prepare necessary part of line
                   line.assign(pszChars, nLineLength);
@@ -4028,26 +4010,26 @@ int bracetype(TCHAR);
 void CCrystalTextView::OnMatchBrace()
 {
   POINT ptCursorPos = GetCursorPos ();
-  int nLength = m_pTextBuffer->GetLineLength (ptCursorPos.y);
-  LPCTSTR pszText = m_pTextBuffer->GetLineChars (ptCursorPos.y), pszEnd = pszText + ptCursorPos.x;
+  int nLength = m_pTextBuffer->GetLineLength(ptCursorPos.y);
+  LPCTSTR pszText = m_pTextBuffer->GetLineChars(ptCursorPos.y), pszEnd = pszText + ptCursorPos.x;
   bool bAfter = false;
   int nType = 0;
   if (ptCursorPos.x < nLength)
     {
-      nType = bracetype (*pszEnd);
+      nType = bracetype(*pszEnd);
       if (nType)
         {
           bAfter = false;
         }
       else if (!nType && ptCursorPos.x > 0)
         {
-          nType = bracetype (pszEnd[-1]);
+          nType = bracetype(pszEnd[-1]);
           bAfter = true;
         }
     }
   else if (ptCursorPos.x > 0)
     {
-      nType = bracetype (pszEnd[-1]);
+      nType = bracetype(pszEnd[-1]);
       bAfter = true;
     }
   if (nType)
@@ -4078,7 +4060,7 @@ void CCrystalTextView::OnMatchBrace()
               while (--pszEnd >= pszText)
                 {
                   pszTest = pszEnd - nOpenComment + 1;
-                  if (pszTest >= pszText && !_tcsnicmp (pszTest, pszOpenComment, nOpenComment))
+                  if (pszTest >= pszText && !_tcsnicmp(pszTest, pszOpenComment, nOpenComment))
                     {
                       nComment--;
                       pszEnd = pszTest;
@@ -4088,7 +4070,7 @@ void CCrystalTextView::OnMatchBrace()
                         }
                     }
                   pszTest = pszEnd - nCloseComment + 1;
-                  if (pszTest >= pszText && !_tcsnicmp (pszTest, pszCloseComment, nCloseComment))
+                  if (pszTest >= pszText && !_tcsnicmp(pszTest, pszCloseComment, nCloseComment))
                     {
                       nComment++;
                       pszEnd = pszTest;
@@ -4100,15 +4082,15 @@ void CCrystalTextView::OnMatchBrace()
                   if (!nComment)
                     {
                       pszTest = pszEnd - nCommentLine + 1;
-                      if (pszTest >= pszText && !_tcsnicmp (pszTest, pszCommentLine, nCommentLine))
+                      if (pszTest >= pszText && !_tcsnicmp(pszTest, pszCommentLine, nCommentLine))
                         {
                           break;
                         }
-                      if (bracetype (*pszEnd) == nType)
+                      if (bracetype(*pszEnd) == nType)
                         {
                           nCount++;
                         }
-                      else if (bracetype (*pszEnd) == nOther)
+                      else if (bracetype(*pszEnd) == nOther)
                         {
                           if (!nCount--)
                             {
@@ -4126,8 +4108,8 @@ void CCrystalTextView::OnMatchBrace()
                 }
               if (ptCursorPos.y)
                 {
-                  ptCursorPos.x = m_pTextBuffer->GetLineLength (--ptCursorPos.y);
-                  pszText = m_pTextBuffer->GetLineChars (ptCursorPos.y);
+                  ptCursorPos.x = m_pTextBuffer->GetLineLength(--ptCursorPos.y);
+                  pszText = m_pTextBuffer->GetLineChars(ptCursorPos.y);
                   pszEnd = pszText + ptCursorPos.x;
                 }
               else
@@ -4139,13 +4121,13 @@ void CCrystalTextView::OnMatchBrace()
           LPCTSTR pszBegin = pszText;
           pszText = pszEnd;
           pszEnd = pszBegin + nLength;
-          int nLines = m_pTextBuffer->GetLineCount ();
+          int nLines = m_pTextBuffer->GetLineCount();
           for (;;)
             {
               while (pszText < pszEnd)
                 {
                   pszTest = pszText + nCloseComment;
-                  if (pszTest <= pszEnd && !_tcsnicmp (pszText, pszCloseComment, nCloseComment))
+                  if (pszTest <= pszEnd && !_tcsnicmp(pszText, pszCloseComment, nCloseComment))
                     {
                       nComment--;
                       pszText = pszTest;
@@ -4155,7 +4137,7 @@ void CCrystalTextView::OnMatchBrace()
                         }
                     }
                   pszTest = pszText + nOpenComment;
-                  if (pszTest <= pszEnd && !_tcsnicmp (pszText, pszOpenComment, nOpenComment))
+                  if (pszTest <= pszEnd && !_tcsnicmp(pszText, pszOpenComment, nOpenComment))
                     {
                       nComment++;
                       pszText = pszTest;
@@ -4167,15 +4149,15 @@ void CCrystalTextView::OnMatchBrace()
                   if (!nComment)
                     {
                       pszTest = pszText + nCommentLine;
-                      if (pszTest <= pszEnd && !_tcsnicmp (pszText, pszCommentLine, nCommentLine))
+                      if (pszTest <= pszEnd && !_tcsnicmp(pszText, pszCommentLine, nCommentLine))
                         {
                           break;
                         }
-                      if (bracetype (*pszText) == nType)
+                      if (bracetype(*pszText) == nType)
                         {
                           nCount++;
                         }
-                      else if (bracetype (*pszText) == nOther)
+                      else if (bracetype(*pszText) == nOther)
                         {
                           if (!nCount--)
                             {
@@ -4195,8 +4177,8 @@ void CCrystalTextView::OnMatchBrace()
               if (ptCursorPos.y < nLines)
                 {
                   ptCursorPos.x = 0;
-                  nLength = m_pTextBuffer->GetLineLength (++ptCursorPos.y);
-                  pszBegin = pszText = m_pTextBuffer->GetLineChars (ptCursorPos.y);
+                  nLength = m_pTextBuffer->GetLineLength(++ptCursorPos.y);
+                  pszBegin = pszText = m_pTextBuffer->GetLineChars(ptCursorPos.y);
                   pszEnd = pszBegin + nLength;
                 }
               else

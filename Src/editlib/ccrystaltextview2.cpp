@@ -48,7 +48,6 @@
 #include "editcmd.h"
 #include "ccrystaltextview.h"
 #include "ccrystaltextbuffer.h"
-#include <malloc.h>
 #include "string_util.h"
 
 #ifdef _DEBUG

@@ -63,7 +63,6 @@
 // $Id$
 
 #include "StdAfx.h"
-#include <malloc.h>
 #include "editcmd.h"
 #include "LineInfo.h"
 #include "UndoRecord.h"

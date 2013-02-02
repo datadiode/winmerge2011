@@ -72,7 +72,7 @@ void CCrystalParser::WrapLine(int nLineIndex, int nMaxLineWidth, int *anBreaks, 
 		// increment char counter (evtl. expand tab)
 		int nIncrement = szLine[i] == _T('\t') ?
 			nTabWidth - nCharCount % nTabWidth :
-			m_pTextView->GetCharWidthFromChar(szLine + i) / m_pTextView->GetCharWidth();
+			m_pTextView->GetCharWidthFromChar(szLine + i);
 		nLineCharCount += nIncrement;
 		nCharCount += nIncrement;
 
