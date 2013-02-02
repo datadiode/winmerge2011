@@ -503,7 +503,7 @@ POINT CCrystalTextView::WordToRight(POINT pt)
 	ASSERT_VALIDTEXTPOS(pt);
 	int nLength = GetLineLength(pt.y);
 	LPCTSTR pszChars = GetLineChars(pt.y);
-	while (pt.x < nLength && !xisalnum(pszChars[pt.x]))
+	while (pt.x < nLength && xisalnum(pszChars[pt.x]))
 	{
 		++pt.x;
 	}
@@ -516,7 +516,7 @@ POINT CCrystalTextView::WordToLeft(POINT pt)
 	ASSERT_VALIDTEXTPOS(pt);
 	LPCTSTR pszChars = GetLineChars(pt.y);
 	int nPrevX = pt.x;
-	while (pt.x > 0 && !xisalnum(pszChars[--nPrevX]))
+	while (pt.x > 0 && xisalnum(pszChars[--nPrevX]))
 	{
 		pt.x = nPrevX;
 	}
@@ -624,13 +624,13 @@ void CCrystalTextView::OnLButtonDown(LPARAM lParam)
               if (m_ptCursorPos.y < m_ptAnchor.y ||
                     m_ptCursorPos.y == m_ptAnchor.y && m_ptCursorPos.x < m_ptAnchor.x)
                 {
-                  ptStart = WordToLeft (m_ptCursorPos);
-                  ptEnd = WordToRight (m_ptAnchor);
+                  ptStart = WordToLeft(m_ptCursorPos);
+                  ptEnd = WordToRight(m_ptAnchor);
                 }
               else
                 {
-                  ptStart = WordToLeft (m_ptAnchor);
-                  ptEnd = WordToRight (m_ptCursorPos);
+                  ptStart = WordToLeft(m_ptAnchor);
+                  ptEnd = WordToRight(m_ptCursorPos);
                 }
             }
           else
@@ -733,13 +733,13 @@ void CCrystalTextView::OnMouseMove(LPARAM lParam)
           if (ptNewCursorPos.y < m_ptAnchor.y ||
                 ptNewCursorPos.y == m_ptAnchor.y && ptNewCursorPos.x < m_ptAnchor.x)
             {
-              ptStart = WordToLeft (ptNewCursorPos);
-              ptEnd = WordToRight (m_ptAnchor);
+              ptStart = WordToLeft(ptNewCursorPos);
+              ptEnd = WordToRight(m_ptAnchor);
             }
           else
             {
-              ptStart = WordToLeft (m_ptAnchor);
-              ptEnd = WordToRight (ptNewCursorPos);
+              ptStart = WordToLeft(m_ptAnchor);
+              ptEnd = WordToRight(ptNewCursorPos);
             }
         }
       else
@@ -844,13 +844,13 @@ void CCrystalTextView::OnLButtonUp(LPARAM lParam)
               if (ptNewCursorPos.y < m_ptAnchor.y ||
                     ptNewCursorPos.y == m_ptAnchor.y && ptNewCursorPos.x < m_ptAnchor.x)
                 {
-                  ptStart = WordToLeft (ptNewCursorPos);
-                  ptEnd = WordToRight (m_ptAnchor);
+                  ptStart = WordToLeft(ptNewCursorPos);
+                  ptEnd = WordToRight(m_ptAnchor);
                 }
               else
                 {
-                  ptStart = WordToLeft (m_ptAnchor);
-                  ptEnd = WordToRight (ptNewCursorPos);
+                  ptStart = WordToLeft(m_ptAnchor);
+                  ptEnd = WordToRight(ptNewCursorPos);
                 }
             }
           else
@@ -994,13 +994,13 @@ void CCrystalTextView::OnLButtonDblClk(LPARAM lParam)
       if (m_ptCursorPos.y < m_ptAnchor.y ||
             m_ptCursorPos.y == m_ptAnchor.y && m_ptCursorPos.x < m_ptAnchor.x)
         {
-          ptStart = WordToLeft (m_ptCursorPos);
-          ptEnd = WordToRight (m_ptAnchor);
+          ptStart = WordToLeft(m_ptCursorPos);
+          ptEnd = WordToRight(m_ptAnchor);
         }
       else
         {
-          ptStart = WordToLeft (m_ptAnchor);
-          ptEnd = WordToRight (m_ptCursorPos);
+          ptStart = WordToLeft(m_ptAnchor);
+          ptEnd = WordToRight(m_ptCursorPos);
         }
 
       m_ptCursorPos = ptEnd;
