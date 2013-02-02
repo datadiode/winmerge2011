@@ -152,7 +152,7 @@ static const UINT SmallTimeDiff = 2;
 /** @brief Retrieve error description from Windows; uses FormatMessage */
 String GetSysError(int nerr);
 
-/** @brief Send message to log file (in theory; actually doesn't yet) */
+/** @brief Send message to log file */
 void LogErrorString(LPCTSTR sz);
 
 template<class any>
