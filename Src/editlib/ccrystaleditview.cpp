@@ -370,29 +370,16 @@ void CCrystalEditView::OnEditDeleteBack()
 	if (!QueryEditable())
 		return;
 
-	POINT ptCursorPos = GetCursorPos();
-	POINT ptCurrentCursorPos = ptCursorPos;
 	if (IsSelection())
 	{
 		OnEditDelete();
+		return;
 	}
-	else if (ptCursorPos.x > 0)		// If At Start Of Line
+	POINT ptCurrentCursorPos = m_ptCursorPos;
+	MoveLeft(FALSE);
+	if (ptCurrentCursorPos != m_ptCursorPos)
 	{
-		--ptCursorPos.x;			// Decrement Position
-	}
-	else if (ptCursorPos.y > 0)		// If Previous Lines Available
-	{
-		--ptCursorPos.y;		// Decrement To Previous Line
-		ptCursorPos.x = GetLineLength(ptCursorPos.y); // Set Cursor To End Of Previous Line
-	}
-	if (ptCurrentCursorPos != ptCursorPos)
-	{
-		ASSERT_VALIDTEXTPOS(ptCursorPos);
-		SetAnchor(ptCursorPos);
-		SetSelection(ptCursorPos, ptCursorPos);
-		SetCursorPos(ptCursorPos);
-		EnsureVisible(ptCursorPos);
-		m_pTextBuffer->DeleteText(this, ptCursorPos.y, ptCursorPos.x,
+		m_pTextBuffer->DeleteText(this, m_ptCursorPos.y, m_ptCursorPos.x,
 			ptCurrentCursorPos.y, ptCurrentCursorPos.x, CE_ACTION_BACKSPACE);  // [JRT]
 	}
 }

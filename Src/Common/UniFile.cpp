@@ -36,6 +36,11 @@ THE SOFTWARE.
 #include "codepage.h"
 #include "paths.h" // paths_GetLongPath()
 
+namespace convert_utf
+{
+#	include "convert_utf/ConvertUTF.h"
+}
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
@@ -457,49 +462,42 @@ bool UniMemFile::ReadString(String & line, String & eol, bool * lossy)
 
 	while (m_current - m_base + (m_charsize - 1) < m_filesize.int64)
 	{
-		UINT ch = 0;
-		UINT utf8len = 0;
+		ULONG ch = 0;
+		UINT len = m_charsize;
 		bool doneline = false;
 
 		if (m_unicoding == UTF8)
 		{
-			// check for end in middle of UTF-8 character
-			utf8len = ucr::Utf8len_fromLeadByte(*m_current);
-			if (m_current - m_base + utf8len > m_filesize.int64)
+			const convert_utf::UTF8 *sourceStart = m_current;
+			convert_utf::UTF32 *targetStart = &ch;
+			convert_utf::ConversionResult result = convert_utf::ConvertUTF8toUTF32(
+				&sourceStart, m_base + m_filesize.int64,
+				&targetStart, targetStart + 1,
+				convert_utf::lenientConversion);
+			switch (result)
 			{
-				ch = '?';
+			case convert_utf::conversionOK:
+			case convert_utf::targetExhausted:
+				len = sourceStart - m_current;
+				break;
+			case convert_utf::sourceExhausted:
 				m_current = m_base + m_filesize.int64;
 				doneline = true;
-			}
-			// Handle bad UTF-8 or UTF-8 outside of UCS-2
-			// (Convert bad bytes individually to '?'
-			else if (utf8len < 1 || utf8len > 4)
-			{
+				// fall through
+			default:
 				ch = '?';
-				utf8len = 1;
-			}
-			else
-			{
-				ch = ucr::GetUtf8Char(m_current);
+				++m_txtstats.nlosses;
+				break;
 			}
 		}
 		else
 		{
 			ch = ucr::get_unicode_char(m_current, m_unicoding, m_codepage);
-			if (!ch)
-				doneline = true;
 		}
 		// convert from Unicode codepoint to TCHAR string
 		// could be multicharacter if decomposition took place, for example
-		if (ch >= 0x10000)
-		{
-			ch = '?';
-			++m_txtstats.nlosses;
-		}
-
 		if (ch == '\r')
 		{
-			eol = _T("\r");
 			doneline = true;
 			bool crlf = false;
 			// check for crlf pair
@@ -522,6 +520,7 @@ bool UniMemFile::ReadString(String & line, String & eol, bool * lossy)
 			}
 			else
 			{
+				eol = _T("\r");
 				++m_txtstats.ncrs;
 			}
 		}
@@ -531,24 +530,25 @@ bool UniMemFile::ReadString(String & line, String & eol, bool * lossy)
 			doneline = true;
 			++m_txtstats.nlfs;
 		}
-		else if (!ch)
+		else if (ch == '\0')
 		{
+			doneline = true;
 			++m_txtstats.nzeros;
 		}
 		// always advance to next character
-		if (m_unicoding == UTF8)
-		{
-			m_current += utf8len;
-		}
-		else
-		{
-			m_current += m_charsize;
-		}
+		m_current += len;
 		if (doneline)
 		{
 			return true;
 		}
-		Append(line, (TCHAR *)&ch, 1);
+		TCHAR targetBuf[2];
+		convert_utf::UTF16 *targetStart = targetBuf;
+		const convert_utf::UTF32 *sourceStart = &ch;
+		convert_utf::ConversionResult result = convert_utf::ConvertUTF32toUTF16(
+			&sourceStart, sourceStart + 1,
+			&targetStart, targetStart + 2,
+			convert_utf::lenientConversion);
+		Append(line, targetBuf, targetStart - targetBuf);
 	}
 	return true;
 }

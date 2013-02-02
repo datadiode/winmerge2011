@@ -45,24 +45,24 @@ static LPTSTR NTAPI EnsureCharNext(LPCTSTR current)
 	return next > current ? next : next + 1;
 }
 
-void CCrystalParser::WrapLine( int nLineIndex, int nMaxLineWidth, int *anBreaks, int &nBreaks )
+void CCrystalParser::WrapLine(int nLineIndex, int nMaxLineWidth, int *anBreaks, int &nBreaks)
 {
 	// The parser must be attached to a view!
-	ASSERT( m_pTextView );
+	ASSERT(m_pTextView);
 
-	int			nLineLength = m_pTextView->GetLineLength( nLineIndex );
-	int			nTabWidth = m_pTextView->GetTabSize();
-	int			nLineCharCount = 0;
-	int			nCharCount = 0;
-	LPCTSTR	szLine = m_pTextView->GetLineChars( nLineIndex );
-	int			nLastBreakPos = 0;
-	int			nLastCharBreakPos = 0;
-	BOOL		bBreakable = FALSE;
+	int nLineLength = m_pTextView->GetLineLength(nLineIndex);
+	int nTabWidth = m_pTextView->GetTabSize();
+	int nLineCharCount = 0;
+	int nCharCount = 0;
+	LPCTSTR	szLine = m_pTextView->GetLineChars(nLineIndex);
+	int nLastBreakPos = 0;
+	int nLastCharBreakPos = 0;
+	BOOL bBreakable = FALSE;
 
-	for( int i = 0; i < nLineLength; i += EnsureCharNext(szLine + i) - (szLine + i) )
+	for (int i = 0; i < nLineLength; i += EnsureCharNext(szLine + i) - (szLine + i))
 	{
 		// remember position of whitespace for wrap
-		if( bBreakable )
+		if (bBreakable)
 		{
 			nLastBreakPos = i;
 			nLastCharBreakPos = nCharCount;
@@ -70,33 +70,20 @@ void CCrystalParser::WrapLine( int nLineIndex, int nMaxLineWidth, int *anBreaks,
 		}
 
 		// increment char counter (evtl. expand tab)
-		if( szLine[i] == _T('\t') )
-		{
-			nLineCharCount+= (nTabWidth - nCharCount % nTabWidth);
-			nCharCount+= (nTabWidth - nCharCount % nTabWidth);
-		}
-		else
-		{
-			if( IsDBCSLeadByte((BYTE)szLine[i]) )
-			{
-				nLineCharCount += 2;
-				nCharCount += 2;
-			}
-			else
-			{
-				nLineCharCount += m_pTextView->GetCharWidthFromChar(szLine[i]) / m_pTextView->GetCharWidth();
-				nCharCount += m_pTextView->GetCharWidthFromChar(szLine[i]) / m_pTextView->GetCharWidth();
-			}
-		}
+		int nIncrement = szLine[i] == _T('\t') ?
+			nTabWidth - nCharCount % nTabWidth :
+			m_pTextView->GetCharWidthFromChar(szLine + i) / m_pTextView->GetCharWidth();
+		nLineCharCount += nIncrement;
+		nCharCount += nIncrement;
 
 		// remember whitespace
 		WORD wCharType;
 		GetStringTypeW(CT_CTYPE3, &szLine[i], 1, &wCharType);
-		if( szLine[i] == _T('\t') || szLine[i] == _T(' ') || (wCharType & (C3_IDEOGRAPH | C3_HIRAGANA | C3_KATAKANA)))
+		if (szLine[i] == _T('\t') || szLine[i] == _T(' ') || (wCharType & (C3_IDEOGRAPH | C3_HIRAGANA | C3_KATAKANA)))
 			bBreakable = TRUE;
 
 		// wrap line
-		if( nLineCharCount >= nMaxLineWidth )
+		if (nLineCharCount >= nMaxLineWidth)
 		{
 			// if no wrap position found, but line is to wide, 
 			// wrap at current position

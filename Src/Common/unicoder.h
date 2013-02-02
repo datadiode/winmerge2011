@@ -41,17 +41,8 @@ namespace ucr
 		void resize(unsigned int newSize);
 	};
 
-	int Ucs4_to_Utf8(unsigned int unich, unsigned char * utf8);
-	int Utf8len_fromLeadByte(unsigned char ch);
-	int Utf8len_fromCodepoint(unsigned int ch);
-	unsigned int Utf8len_of_string(const wchar_t* text, int size);
-	unsigned int stringlen_of_utf8(const char* text, int size);
-	unsigned int GetUtf8Char(unsigned char * str);
-	int to_utf8_advance(unsigned int u, unsigned char * &lpd);
-	int writeBom(void* dest, UNICODESET unicoding);
 	unsigned int get_unicode_char(unsigned char * ptr, UNICODESET unicoding, int codepage = 0);
 	bool maketstring(String & str, const char* lpd, unsigned int len, int codepage, bool * lossy);
-	unsigned int byteToUnicode(unsigned char ch);
 	unsigned int byteToUnicode(unsigned char ch, unsigned int codepage);
 
 	// generic function to do all conversions

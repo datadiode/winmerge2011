@@ -59,193 +59,198 @@ static char THIS_FILE[] = __FILE__;
 
 #define CRYSTAL_TIMER_DRAGSEL   1001
 
-static LPTSTR NTAPI EnsureCharNext(LPCTSTR current)
-{
-  LPTSTR next = ::CharNext(current);
-  return next > current ? next : next + 1;
-}
-
-static LPTSTR NTAPI EnsureCharPrev(LPCTSTR start, LPCTSTR current)
-{
-  LPTSTR prev = ::CharPrev(start, current);
-  return prev < current ? prev : prev - 1;
-}
-
 /////////////////////////////////////////////////////////////////////////////
 // CCrystalTextView
 
+void CCrystalTextView::AdjustCursorAfterMoveLeft()
+{
+	LPCTSTR pszChars = GetLineChars(m_ptCursorPos.y);
+	while (m_ptCursorPos.x > 0 && GetCharWidthFromChar(pszChars + m_ptCursorPos.x) == 0)
+		--m_ptCursorPos.x;
+}
+
+void CCrystalTextView::AdjustCursorAfterMoveRight()
+{
+	int nLength = GetLineLength(m_ptCursorPos.y);
+	LPCTSTR pszChars = GetLineChars(m_ptCursorPos.y);
+	while (m_ptCursorPos.x < nLength && GetCharWidthFromChar(pszChars + m_ptCursorPos.x) == 0)
+		++m_ptCursorPos.x;
+}
+
 void CCrystalTextView::MoveLeft(BOOL bSelect)
 {
-  PrepareSelBounds ();
-  if (m_ptDrawSelStart != m_ptDrawSelEnd && !bSelect)
-    {
-      m_ptCursorPos = m_ptDrawSelStart;
-    }
-  else
-    {
-      if (m_ptCursorPos.x == 0)
-        {
-          if (m_ptCursorPos.y > 0)
-            {
-              m_ptCursorPos.y--;
-              m_ptCursorPos.x = GetLineLength (m_ptCursorPos.y);
-            }
-        }
-      else
-        {
-          m_ptCursorPos.x--;
-        }
-    }
-  m_nIdealCharPos = CalculateActualOffset (m_ptCursorPos.y, m_ptCursorPos.x);
-  if (!bSelect)
-    m_ptAnchor = m_ptCursorPos;
-  EnsureVisible(m_ptCursorPos);
-  SetSelection(m_ptAnchor, m_ptCursorPos);
-  UpdateCaret();
+	PrepareSelBounds();
+	if (m_ptDrawSelStart != m_ptDrawSelEnd && !bSelect)
+	{
+		m_ptCursorPos = m_ptDrawSelStart;
+	}
+	else
+	{
+		if (m_ptCursorPos.x == 0)
+		{
+			if (m_ptCursorPos.y > 0)
+			{
+				--m_ptCursorPos.y;
+				m_ptCursorPos.x = GetLineLength(m_ptCursorPos.y);
+			}
+		}
+		else
+		{
+			--m_ptCursorPos.x;
+		}
+	}
+	m_nIdealCharPos = CalculateActualOffset(m_ptCursorPos.y, m_ptCursorPos.x);
+	AdjustCursorAfterMoveLeft();
+	if (!bSelect)
+		m_ptAnchor = m_ptCursorPos;
+	EnsureVisible(m_ptCursorPos);
+	SetSelection(m_ptAnchor, m_ptCursorPos);
+	UpdateCaret();
 }
 
 void CCrystalTextView::MoveRight(BOOL bSelect)
 {
-  PrepareSelBounds ();
-  if (m_ptDrawSelStart != m_ptDrawSelEnd && !bSelect)
-    {
-      m_ptCursorPos = m_ptDrawSelEnd;
-    }
-  else
-    {
-      if (m_ptCursorPos.x == GetLineLength (m_ptCursorPos.y))
-        {
-          if (m_ptCursorPos.y < GetLineCount () - 1)
-            {
-              m_ptCursorPos.y++;
-              m_ptCursorPos.x = 0;
-            }
-        }
-      else
-        {
-          m_ptCursorPos.x++;
-        }
-    }
-  m_nIdealCharPos = CalculateActualOffset (m_ptCursorPos.y, m_ptCursorPos.x);
-  if (!bSelect)
-    m_ptAnchor = m_ptCursorPos;
-  EnsureVisible(m_ptCursorPos);
-  SetSelection(m_ptAnchor, m_ptCursorPos);
-  UpdateCaret();
+	PrepareSelBounds();
+	if (m_ptDrawSelStart != m_ptDrawSelEnd && !bSelect)
+	{
+		m_ptCursorPos = m_ptDrawSelEnd;
+	}
+	else
+	{
+		if (m_ptCursorPos.x == GetLineLength(m_ptCursorPos.y))
+		{
+			if (m_ptCursorPos.y < GetLineCount() - 1)
+			{
+				m_ptCursorPos.y++;
+				m_ptCursorPos.x = 0;
+			}
+		}
+		else
+		{
+			m_ptCursorPos.x++;
+		}
+	}
+	m_nIdealCharPos = CalculateActualOffset(m_ptCursorPos.y, m_ptCursorPos.x);
+	AdjustCursorAfterMoveRight();
+	if (!bSelect)
+		m_ptAnchor = m_ptCursorPos;
+	EnsureVisible(m_ptCursorPos);
+	SetSelection(m_ptAnchor, m_ptCursorPos);
+	UpdateCaret();
 }
 
 void CCrystalTextView::MoveWordLeft(BOOL bSelect)
 {
-  PrepareSelBounds ();
-  if (m_ptDrawSelStart != m_ptDrawSelEnd && !bSelect)
-    {
-      MoveLeft (bSelect);
-      return;
-    }
+	PrepareSelBounds();
+	if (m_ptDrawSelStart != m_ptDrawSelEnd && !bSelect)
+	{
+		MoveLeft(bSelect);
+		return;
+	}
 
-  if (m_ptCursorPos.x == 0)
-    {
-      if (m_ptCursorPos.y == 0)
-        return;
-      m_ptCursorPos.y--;
-      m_ptCursorPos.x = GetLineLength (m_ptCursorPos.y);
-    }
+	if (m_ptCursorPos.x == 0)
+	{
+		if (m_ptCursorPos.y == 0)
+			return;
+		--m_ptCursorPos.y;
+		m_ptCursorPos.x = GetLineLength(m_ptCursorPos.y);
+	}
 
-  LPCTSTR pszChars = GetLineChars (m_ptCursorPos.y);
-  int nPos = m_ptCursorPos.x;
-  int nPrevPos;
-  while (nPos > 0 && xisspace (pszChars[nPrevPos = ::EnsureCharPrev(pszChars, pszChars + nPos) - pszChars]))
-    nPos = nPrevPos;
+	LPCTSTR pszChars = GetLineChars(m_ptCursorPos.y);
+	int nPos = m_ptCursorPos.x;
+	int nPrevPos;
+	while (nPos > 0 && xisspace(pszChars[nPrevPos = nPos - 1]))
+		nPos = nPrevPos;
 
-  if (nPos > 0)
-    {
-      int nPrevPos = ::CharPrev(pszChars, pszChars + nPos) - pszChars;
-      nPos = nPrevPos;
-      if (xisalnum (pszChars[nPos]))
-        {
-          while (nPos > 0 && (xisalnum (pszChars[nPrevPos = ::EnsureCharPrev(pszChars, pszChars + nPos) - pszChars])))
-            nPos = nPrevPos;
-        }
-      else
-        {
-          while (nPos > 0 && !xisalnum (pszChars[nPrevPos = ::EnsureCharPrev(pszChars, pszChars + nPos) - pszChars])
-                && !xisspace (pszChars[nPrevPos]))
-            nPos = nPrevPos;
-        }
-    }
+	if (nPos > 0)
+	{
+		int nPrevPos = nPos - 1;
+		nPos = nPrevPos;
+		if (xisalnum(pszChars[nPos]))
+		{
+			while (nPos > 0 && xisalnum(pszChars[--nPrevPos]))
+				nPos = nPrevPos;
+		}
+		else
+		{
+			while (nPos > 0 && !xisalnum(pszChars[--nPrevPos]) && !xisspace(pszChars[nPrevPos]))
+				nPos = nPrevPos;
+		}
+	}
 
-  m_ptCursorPos.x = nPos;
-  m_nIdealCharPos = CalculateActualOffset (m_ptCursorPos.y, m_ptCursorPos.x);
-  if (!bSelect)
-    m_ptAnchor = m_ptCursorPos;
-  EnsureVisible(m_ptCursorPos);
-  SetSelection(m_ptAnchor, m_ptCursorPos);
-  UpdateCaret();
+	m_ptCursorPos.x = nPos;
+	m_nIdealCharPos = CalculateActualOffset(m_ptCursorPos.y, m_ptCursorPos.x);
+	AdjustCursorAfterMoveLeft();
+	if (!bSelect)
+		m_ptAnchor = m_ptCursorPos;
+	EnsureVisible(m_ptCursorPos);
+	SetSelection(m_ptAnchor, m_ptCursorPos);
+	UpdateCaret();
 }
 
 void CCrystalTextView::MoveWordRight(BOOL bSelect)
 {
-  PrepareSelBounds ();
-  if (m_ptDrawSelStart != m_ptDrawSelEnd && !bSelect)
-    {
-      MoveRight (bSelect);
-      return;
-    }
+	PrepareSelBounds();
+	if (m_ptDrawSelStart != m_ptDrawSelEnd && !bSelect)
+	{
+		MoveRight(bSelect);
+		return;
+	}
 
-  if (m_ptCursorPos.x == GetLineLength (m_ptCursorPos.y))
-    {
-      if (m_ptCursorPos.y == GetLineCount () - 1)
-        return;
-      m_ptCursorPos.y++;
-      m_ptCursorPos.x = 0;
-    }
+	if (m_ptCursorPos.x == GetLineLength (m_ptCursorPos.y))
+	{
+		if (m_ptCursorPos.y == GetLineCount() - 1)
+			return;
+		++m_ptCursorPos.y;
+		m_ptCursorPos.x = 0;
+	}
 
-  int nLength = GetLineLength (m_ptCursorPos.y);
-  if (m_ptCursorPos.x == nLength)
-    {
-      MoveRight (bSelect);
-      return;
-    }
+	int nLength = GetLineLength(m_ptCursorPos.y);
+	if (m_ptCursorPos.x == nLength)
+	{
+		MoveRight(bSelect);
+		return;
+	}
 
-  LPCTSTR pszChars = GetLineChars (m_ptCursorPos.y);
-  int nPos = m_ptCursorPos.x;
-  if (xisalnum (pszChars[nPos]))
-    {
-      while (nPos < nLength && xisalnum (pszChars[nPos]))
-        nPos = ::EnsureCharNext(pszChars + nPos) - pszChars;
-    }
-  else
-    {
-      while (nPos < nLength && !xisalnum (pszChars[nPos])
-            && !xisspace (pszChars[nPos]))
-        nPos = ::EnsureCharNext(pszChars + nPos) - pszChars;
-    }
+	LPCTSTR pszChars = GetLineChars(m_ptCursorPos.y);
+	int nPos = m_ptCursorPos.x;
+	if (xisalnum (pszChars[nPos]))
+	{
+		while (nPos < nLength && xisalnum(pszChars[nPos]))
+			++nPos;
+	}
+	else
+	{
+		while (nPos < nLength && !xisalnum(pszChars[nPos]) && !xisspace(pszChars[nPos]))
+			++nPos;
+	}
 
-  while (nPos < nLength && xisspace (pszChars[nPos]))
-    nPos = ::EnsureCharNext(pszChars + nPos) - pszChars;
+	while (nPos < nLength && xisspace(pszChars[nPos]))
+		++nPos;
 
-  m_ptCursorPos.x = nPos;
-  m_nIdealCharPos = CalculateActualOffset (m_ptCursorPos.y, m_ptCursorPos.x);
-  if (!bSelect)
-    m_ptAnchor = m_ptCursorPos;
-  EnsureVisible(m_ptCursorPos);
-  SetSelection(m_ptAnchor, m_ptCursorPos);
-  UpdateCaret();
+	m_ptCursorPos.x = nPos;
+	m_nIdealCharPos = CalculateActualOffset (m_ptCursorPos.y, m_ptCursorPos.x);
+	AdjustCursorAfterMoveRight();
+	if (!bSelect)
+		m_ptAnchor = m_ptCursorPos;
+	EnsureVisible(m_ptCursorPos);
+	SetSelection(m_ptAnchor, m_ptCursorPos);
+	UpdateCaret();
 }
 
 void CCrystalTextView::MoveUp(BOOL bSelect)
 {
-  PrepareSelBounds ();
-  if (m_ptDrawSelStart != m_ptDrawSelEnd && !bSelect)
-    m_ptCursorPos = m_ptDrawSelStart;
+	PrepareSelBounds();
+	if (m_ptDrawSelStart != m_ptDrawSelEnd && !bSelect)
+		m_ptCursorPos = m_ptDrawSelStart;
 
 	//BEGIN SW
 	POINT subLinePos;
 	CharPosToPoint(m_ptCursorPos.y, m_ptCursorPos.x, subLinePos);
 
-	int			nSubLine = GetSubLineIndex( m_ptCursorPos.y ) + subLinePos.y;
+	int nSubLine = GetSubLineIndex(m_ptCursorPos.y) + subLinePos.y;
 
-	if( nSubLine > 0 )
+	if (nSubLine > 0)
 	/*ORIGINAL
 	if (m_ptCursorPos.y > 0)
 	*///END SW
@@ -261,14 +266,15 @@ void CCrystalTextView::MoveUp(BOOL bSelect)
 		m_ptCursorPos.y --;
 		m_ptCursorPos.x = ApproxActualOffset(m_ptCursorPos.y, m_nIdealCharPos);
 		*///END SW
-      if (m_ptCursorPos.x > GetLineLength (m_ptCursorPos.y))
-        m_ptCursorPos.x = GetLineLength (m_ptCursorPos.y);
+      if (m_ptCursorPos.x > GetLineLength(m_ptCursorPos.y))
+        m_ptCursorPos.x = GetLineLength(m_ptCursorPos.y);
     }
-  if (!bSelect)
-    m_ptAnchor = m_ptCursorPos;
-  EnsureVisible(m_ptCursorPos);
-  SetSelection(m_ptAnchor, m_ptCursorPos);
-  UpdateCaret();
+	AdjustCursorAfterMoveLeft();
+	if (!bSelect)
+		m_ptAnchor = m_ptCursorPos;
+	EnsureVisible(m_ptCursorPos);
+	SetSelection(m_ptAnchor, m_ptCursorPos);
+	UpdateCaret();
 }
 
 void CCrystalTextView::MoveDown(BOOL bSelect)
@@ -299,9 +305,10 @@ void CCrystalTextView::MoveDown(BOOL bSelect)
 		m_ptCursorPos.y ++;
 		m_ptCursorPos.x = ApproxActualOffset(m_ptCursorPos.y, m_nIdealCharPos);
 		*///END SW
-      if (m_ptCursorPos.x > GetLineLength (m_ptCursorPos.y))
-        m_ptCursorPos.x = GetLineLength (m_ptCursorPos.y);
+      if (m_ptCursorPos.x > GetLineLength(m_ptCursorPos.y))
+        m_ptCursorPos.x = GetLineLength(m_ptCursorPos.y);
     }
+	AdjustCursorAfterMoveLeft();
 	if (!bSelect)
 		m_ptAnchor = m_ptCursorPos;
 	EnsureVisible(m_ptCursorPos);
@@ -311,8 +318,8 @@ void CCrystalTextView::MoveDown(BOOL bSelect)
 
 void CCrystalTextView::MoveHome(BOOL bSelect)
 {
-	int nLength = GetLineLength (m_ptCursorPos.y);
-	LPCTSTR pszChars = GetLineChars (m_ptCursorPos.y);
+	int nLength = GetLineLength(m_ptCursorPos.y);
+	LPCTSTR pszChars = GetLineChars(m_ptCursorPos.y);
 	//BEGIN SW
 	POINT pos;
 	CharPosToPoint( m_ptCursorPos.y, m_ptCursorPos.x, pos );
@@ -343,8 +350,8 @@ void CCrystalTextView::MoveEnd(BOOL bSelect)
 {
 	//BEGIN SW
 	POINT pos;
-	CharPosToPoint( m_ptCursorPos.y, m_ptCursorPos.x, pos );
-	m_ptCursorPos.x = SubLineEndToCharPos( m_ptCursorPos.y, pos.y );
+	CharPosToPoint(m_ptCursorPos.y, m_ptCursorPos.x, pos);
+	m_ptCursorPos.x = SubLineEndToCharPos(m_ptCursorPos.y, pos.y);
 	/*ORIGINAL
 	m_ptCursorPos.x = GetLineLength(m_ptCursorPos.y);
 	*///END SW
@@ -358,36 +365,37 @@ void CCrystalTextView::MoveEnd(BOOL bSelect)
 
 void CCrystalTextView::MovePgUp(BOOL bSelect)
 {
-  // scrolling windows
-  int nNewTopSubLine = m_nTopSubLine - GetScreenLines() + 1;
-  if (nNewTopSubLine < 0)
-    nNewTopSubLine = 0;
-  if (m_nTopSubLine != nNewTopSubLine)
-    {
-      ScrollToSubLine(nNewTopSubLine);
-      UpdateSiblingScrollPos(FALSE);
-    }
+	// scrolling windows
+	int nNewTopSubLine = m_nTopSubLine - GetScreenLines() + 1;
+	if (nNewTopSubLine < 0)
+		nNewTopSubLine = 0;
+	if (m_nTopSubLine != nNewTopSubLine)
+	{
+		ScrollToSubLine(nNewTopSubLine);
+		UpdateSiblingScrollPos(FALSE);
+	}
 
-  // setting cursor
-  POINT subLinePos;
-  CharPosToPoint(m_ptCursorPos.y, m_ptCursorPos.x, subLinePos);
+	// setting cursor
+	POINT subLinePos;
+	CharPosToPoint(m_ptCursorPos.y, m_ptCursorPos.x, subLinePos);
 
-  int nSubLine = GetSubLineIndex( m_ptCursorPos.y ) + subLinePos.y - GetScreenLines() + 1;
+	int nSubLine = GetSubLineIndex(m_ptCursorPos.y) + subLinePos.y - GetScreenLines() + 1;
 
-  if (nSubLine < nNewTopSubLine || nSubLine >= nNewTopSubLine + GetScreenLines())
-    nSubLine = nNewTopSubLine;
+	if (nSubLine < nNewTopSubLine || nSubLine >= nNewTopSubLine + GetScreenLines())
+		nSubLine = nNewTopSubLine;
 
-  if ( nSubLine < 0 )
-    nSubLine = 0;
+	if (nSubLine < 0)
+		nSubLine = 0;
 
-  SubLineCursorPosToTextPos(m_nIdealCharPos, nSubLine, m_ptCursorPos);
+	SubLineCursorPosToTextPos(m_nIdealCharPos, nSubLine, m_ptCursorPos);
 
-  m_nIdealCharPos = CalculateActualOffset (m_ptCursorPos.y, m_ptCursorPos.x);
-  if (!bSelect)
-    m_ptAnchor = m_ptCursorPos;
-  EnsureVisible(m_ptCursorPos);    //todo: no vertical scroll
-  SetSelection(m_ptAnchor, m_ptCursorPos);
-  UpdateCaret();
+	m_nIdealCharPos = CalculateActualOffset (m_ptCursorPos.y, m_ptCursorPos.x);
+	AdjustCursorAfterMoveLeft();
+	if (!bSelect)
+		m_ptAnchor = m_ptCursorPos;
+	EnsureVisible(m_ptCursorPos);    //todo: no vertical scroll
+	SetSelection(m_ptAnchor, m_ptCursorPos);
+	UpdateCaret();
 }
 
 void CCrystalTextView::MovePgDn(BOOL bSelect)
@@ -419,107 +427,101 @@ void CCrystalTextView::MovePgDn(BOOL bSelect)
 
 	SubLineCursorPosToTextPos(m_nIdealCharPos, nSubLine, m_ptCursorPos);
 
-  m_nIdealCharPos = CalculateActualOffset (m_ptCursorPos.y, m_ptCursorPos.x);
-  if (!bSelect)
-    m_ptAnchor = m_ptCursorPos;
-  EnsureVisible(m_ptCursorPos);    //todo: no vertical scroll
-  SetSelection(m_ptAnchor, m_ptCursorPos);
-  UpdateCaret();
+	m_nIdealCharPos = CalculateActualOffset (m_ptCursorPos.y, m_ptCursorPos.x);
+	AdjustCursorAfterMoveLeft();
+	if (!bSelect)
+		m_ptAnchor = m_ptCursorPos;
+	EnsureVisible(m_ptCursorPos);    //todo: no vertical scroll
+	SetSelection(m_ptAnchor, m_ptCursorPos);
+	UpdateCaret();
 }
 
 void CCrystalTextView::MoveCtrlHome(BOOL bSelect)
 {
-  m_ptCursorPos.x = 0;
-  m_ptCursorPos.y = 0;
-  m_nIdealCharPos = CalculateActualOffset (m_ptCursorPos.y, m_ptCursorPos.x);
-  if (!bSelect)
-    m_ptAnchor = m_ptCursorPos;
-  EnsureVisible(m_ptCursorPos);
-  SetSelection(m_ptAnchor, m_ptCursorPos);
-  UpdateCaret();
+	m_ptCursorPos.x = 0;
+	m_ptCursorPos.y = 0;
+	m_nIdealCharPos = CalculateActualOffset(m_ptCursorPos.y, m_ptCursorPos.x);
+	if (!bSelect)
+		m_ptAnchor = m_ptCursorPos;
+	EnsureVisible(m_ptCursorPos);
+	SetSelection(m_ptAnchor, m_ptCursorPos);
+	UpdateCaret();
 }
 
 void CCrystalTextView::MoveCtrlEnd(BOOL bSelect)
 {
-  m_ptCursorPos.y = GetLineCount () - 1;
-  m_ptCursorPos.x = GetLineLength (m_ptCursorPos.y);
-  m_nIdealCharPos = CalculateActualOffset (m_ptCursorPos.y, m_ptCursorPos.x);
-  if (!bSelect)
-    m_ptAnchor = m_ptCursorPos;
-  EnsureVisible(m_ptCursorPos);
-  SetSelection(m_ptAnchor, m_ptCursorPos);
-  UpdateCaret();
+	m_ptCursorPos.y = GetLineCount() - 1;
+	m_ptCursorPos.x = GetLineLength(m_ptCursorPos.y);
+	m_nIdealCharPos = CalculateActualOffset (m_ptCursorPos.y, m_ptCursorPos.x);
+	if (!bSelect)
+		m_ptAnchor = m_ptCursorPos;
+	EnsureVisible(m_ptCursorPos);
+	SetSelection(m_ptAnchor, m_ptCursorPos);
+	UpdateCaret();
 }
 
 void CCrystalTextView::ScrollUp()
 {
-  if (m_nTopLine > 0)
-    {
-      ScrollToLine(m_nTopLine - 1);
-      UpdateSiblingScrollPos(FALSE);
-    }
+	if (m_nTopLine > 0)
+	{
+		ScrollToLine(m_nTopLine - 1);
+		UpdateSiblingScrollPos(FALSE);
+	}
 }
 
 void CCrystalTextView::ScrollDown()
 {
-  if (m_nTopLine < GetLineCount() - 1)
-    {
-      ScrollToLine(m_nTopLine + 1);
-      UpdateSiblingScrollPos(FALSE);
-    }
+	if (m_nTopLine < GetLineCount() - 1)
+	{
+		ScrollToLine(m_nTopLine + 1);
+		UpdateSiblingScrollPos(FALSE);
+	}
 }
 
-void CCrystalTextView::
-ScrollLeft ()
+void CCrystalTextView::ScrollLeft()
 {
-  if (m_nOffsetChar > 0)
-    {
-      ScrollToChar (m_nOffsetChar - 1);
-      UpdateCaret ();
-      UpdateSiblingScrollPos (TRUE);
-    }
+	if (m_nOffsetChar > 0)
+	{
+		ScrollToChar(m_nOffsetChar - 1);
+		UpdateCaret();
+		UpdateSiblingScrollPos(TRUE);
+	}
 }
 
 void CCrystalTextView::ScrollRight()
 {
-  if (m_nOffsetChar < GetMaxLineLength () - 1)
-    {
-      ScrollToChar (m_nOffsetChar + 1);
-      UpdateCaret ();
-      UpdateSiblingScrollPos (TRUE);
-    }
+	if (m_nOffsetChar < GetMaxLineLength() - 1)
+	{
+		ScrollToChar(m_nOffsetChar + 1);
+		UpdateCaret();
+		UpdateSiblingScrollPos(TRUE);
+	}
 }
 
 POINT CCrystalTextView::WordToRight(POINT pt)
 {
-  ASSERT_VALIDTEXTPOS (pt);
-  int nLength = GetLineLength (pt.y);
-  LPCTSTR pszChars = GetLineChars (pt.y);
-  while (pt.x < nLength)
-    {
-      if (!xisalnum (pszChars[pt.x]))
-        break;
-      pt.x += ::CharNext (&pszChars[pt.x]) - &pszChars[pt.x];
-    }
-  ASSERT_VALIDTEXTPOS (pt);
-  return pt;
+	ASSERT_VALIDTEXTPOS(pt);
+	int nLength = GetLineLength(pt.y);
+	LPCTSTR pszChars = GetLineChars(pt.y);
+	while (pt.x < nLength && !xisalnum(pszChars[pt.x]))
+	{
+		++pt.x;
+	}
+	ASSERT_VALIDTEXTPOS(pt);
+	return pt;
 }
 
-POINT CCrystalTextView::
-WordToLeft (POINT pt)
+POINT CCrystalTextView::WordToLeft(POINT pt)
 {
-  ASSERT_VALIDTEXTPOS (pt);
-  LPCTSTR pszChars = GetLineChars (pt.y);
-  int nPrevX = pt.x;
-  while (pt.x > 0)
-    {
-      nPrevX -= &pszChars[pt.x] - ::CharPrev (pszChars, &pszChars[pt.x]);
-      if (!xisalnum (pszChars[nPrevX]))
-        break;
-      pt.x = nPrevX;
-    }
-  ASSERT_VALIDTEXTPOS (pt);
-  return pt;
+	ASSERT_VALIDTEXTPOS(pt);
+	LPCTSTR pszChars = GetLineChars(pt.y);
+	int nPrevX = pt.x;
+	while (pt.x > 0 && !xisalnum(pszChars[--nPrevX]))
+	{
+		pt.x = nPrevX;
+	}
+	ASSERT_VALIDTEXTPOS(pt);
+	return pt;
 }
 
 void CCrystalTextView::SelectAll()

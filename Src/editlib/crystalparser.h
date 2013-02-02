@@ -96,7 +96,7 @@ public:
 
 	@see WrapLineCached()
 	*/
-	virtual void WrapLine(int nLineIndex, int nMaxLineWidth, int *anBreaks, int &nBreaks);
+	void WrapLine(int nLineIndex, int nMaxLineWidth, int *anBreaks, int &nBreaks);
 
 // attributes
 protected:

@@ -465,6 +465,34 @@
 				>
 			</File>
 			<File
+				RelativePath=".\convert_utf\ConvertUTF.c"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="System32|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath="Common\coretools.cpp"
 				>
 			</File>
@@ -1042,6 +1070,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\convert_utf\ConvertUTF.h"
+				>
+			</File>
+			<File
 				RelativePath="Common\coretools.h"
 				>
 			</File>
@@ -1579,10 +1611,6 @@
 				>
 			</File>
 			<File
-				RelativePath="Common\wclassdefines.h"
-				>
-			</File>
-			<File
 				RelativePath="WMGotoDlg.h"
 				>
 			</File>
@@ -1958,6 +1986,38 @@
 			</File>
 			<File
 				RelativePath="editlib\verilog.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\editlib\wcwidth.c"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="System32|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\editlib\wcwidth.h"
 				>
 			</File>
 			<File

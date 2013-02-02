@@ -103,6 +103,7 @@
 #include "SettingStore.h"
 #include "string_util.h"
 #include "pcre.h"
+#include "wcwidth.h"
 
 using stl::vector;
 
@@ -116,11 +117,6 @@ using stl::vector;
 static char THIS_FILE[] = __FILE__;
 #endif
 
-
-#define DEFAULT_PRINT_MARGIN        1000    //  10 millimeters
-
-/** @brief Maximum tab-char width. */
-const UINT MAX_TAB_LEN = 64;
 /** @brief Width of revision marks. */
 const UINT MARGIN_REV_WIDTH = 3;
 /** @brief Width of icons printed in the margin. */
@@ -132,8 +128,6 @@ const UINT MARGIN_ICON_HEIGHT = 12;
 const COLORREF UNSAVED_REVMARK_CLR = RGB(0xD7, 0xD7, 0x00);
 /** @brief Color of saved line revision mark (green). */
 const COLORREF SAVED_REVMARK_CLR = RGB(0x00, 0xFF, 0x00);
-
-#define SMOOTH_SCROLL_FACTOR        6
 
 #define ICON_INDEX_WRAPLINE         15
 
@@ -410,8 +404,7 @@ CCrystalTextView::CCrystalTextView(size_t ZeroInit)
 	ResetView();
 	SetTextType(SRC_PLAIN);
 
-	memset(&m_lfBaseFont, 0, sizeof (m_lfBaseFont));
-	_tcscpy(m_lfBaseFont.lfFaceName, _T ("FixedSys"));
+	_tcscpy(m_lfBaseFont.lfFaceName, _T("FixedSys"));
 	m_lfBaseFont.lfHeight = 0;
 	m_lfBaseFont.lfWeight = FW_NORMAL;
 	m_lfBaseFont.lfItalic = FALSE;
@@ -422,7 +415,7 @@ CCrystalTextView::CCrystalTextView(size_t ZeroInit)
 	m_lfBaseFont.lfPitchAndFamily = DEFAULT_PITCH;
 }
 
-CCrystalTextView::~CCrystalTextView ()
+CCrystalTextView::~CCrystalTextView()
 {
 	ASSERT(m_pTextBuffer == NULL);   //  Must be correctly detached
 	free(m_pszMatched); // Allocated by _tcsdup()
@@ -572,11 +565,11 @@ int CCrystalTextView::GetLineActualLength(int nLineIndex)
 
 	//  Actual line length is not determined yet, let's calculate a little
 	int nActualLength = 0;
-	int nLength = GetLineLength (nLineIndex);
+	int nLength = GetLineLength(nLineIndex);
 	if (nLength > 0)
     {
-		LPCTSTR pszChars = GetLineChars (nLineIndex);
-		const int nTabSize = GetTabSize ();
+		LPCTSTR pszChars = GetLineChars(nLineIndex);
+		const int nTabSize = GetTabSize();
 		int i;
 		for (i = 0; i < nLength; i++)
 		{
@@ -585,6 +578,8 @@ int CCrystalTextView::GetLineActualLength(int nLineIndex)
 				nActualLength += (nTabSize - nActualLength % nTabSize);
 			else if (c >= _T('\x00') && c <= _T('\x1F') && c != _T('\r') && c != _T('\n'))
 				nActualLength += 3;
+			/*else if (c >= UNI_SUR_MIN && c <= UNI_SUR_MAX)
+				nActualLength += 5;*/
 			else
 				nActualLength++;
 		}
@@ -681,6 +676,8 @@ int CCrystalTextView::ExpandChars(LPCTSTR pszChars, int nOffset, int nCount, Str
 			nCount += nTabSize - 1;
 		else if (c >= _T('\x00') && c <= _T('\x1F') && c != _T('\r') && c != _T('\n'))
 			nCount += 2;
+		/*else if (c >= UNI_SUR_MIN && c <= UNI_SUR_MAX)
+			nCount += 4;*/
 	}
 
 	// Preallocate line buffer, to avoid reallocations as we add characters
@@ -691,9 +688,10 @@ int CCrystalTextView::ExpandChars(LPCTSTR pszChars, int nOffset, int nCount, Str
 	{
 		for (i = 0; i < nLength; i++)
 		{
-			if (pszChars[i] == _T('\t'))
+			TCHAR c = pszChars[i];
+			if (c == _T('\t'))
 			{
-				TCHAR c = m_bViewTabs ? ViewableWhitespaceChars::c_tab : _T(' ');
+				c = m_bViewTabs ? ViewableWhitespaceChars::c_tab : _T(' ');
 				int nSpaces = nTabSize - (nActualOffset + nCurPos) % nTabSize;
 				do
 				{
@@ -703,12 +701,12 @@ int CCrystalTextView::ExpandChars(LPCTSTR pszChars, int nOffset, int nCount, Str
 					nSpaces--;
 				} while (nSpaces > 0);
 			}
-			else if (pszChars[i] == _T(' ') && m_bViewTabs)
+			else if (c == _T(' ') && m_bViewTabs)
 			{
 				line.push_back(ViewableWhitespaceChars::c_space);
 				nCurPos++;
 			}
-			else if (pszChars[i] == _T('\r') || pszChars[i] == _T('\n'))
+			else if (c == _T('\r') || c == _T('\n'))
 			{
 				if (m_bViewEols)
 				{
@@ -725,15 +723,20 @@ int CCrystalTextView::ExpandChars(LPCTSTR pszChars, int nOffset, int nCount, Str
 					}
 				}
 			}
-			else if (pszChars[i] >= _T('\x00') && pszChars[i] <= _T('\x1F'))
+			else if (c >= _T('\x00') && c <= _T('\x1F'))
 			{
-				line.append_sprintf(_T("\t%02X"), static_cast<int>(pszChars[i]));
+				line.append_sprintf(_T("\1%02X"), static_cast<int>(c));
 				nCurPos += 3;
 			}
+			/*else if (c >= UNI_SUR_MIN && c <= UNI_SUR_MAX)
+			{
+				line.append_sprintf(_T("\2%04X"), static_cast<int>(c));
+				nCurPos += 5;
+			}*/
 			else
 			{
-				line.push_back(pszChars[i]);
-				nCurPos += GetCharWidthFromChar(pszChars[i]) / GetCharWidth();
+				line.push_back(c);
+				nCurPos += GetCharWidthFromChar(pszChars + i) / GetCharWidth();
 			}
 		}
 	}
@@ -741,8 +744,9 @@ int CCrystalTextView::ExpandChars(LPCTSTR pszChars, int nOffset, int nCount, Str
 	{
 		for (i = 0; i < nLength; ++i)
 		{
-			line.push_back(pszChars[i]);
-			nCurPos += GetCharWidthFromChar(pszChars[i]) / GetCharWidth();
+			TCHAR c = pszChars[i];
+			line.push_back(c);
+			nCurPos += GetCharWidthFromChar(pszChars + i) / GetCharWidth();
 		}
 	}
 	return nCurPos;
@@ -751,13 +755,37 @@ int CCrystalTextView::ExpandChars(LPCTSTR pszChars, int nOffset, int nCount, Str
 /**
  * @brief Return width of specified character
  */
-int CCrystalTextView::GetCharWidthFromChar(TCHAR ch)
+int CCrystalTextView::GetCharWidthFromChar(LPCTSTR pch)
 {
+	UINT ch = *pch;
 	if (ch >= _T('\x00') && ch <= _T('\x1F') && ch != _T('\t'))
 		return GetCharWidth() * 3;
+
+	if (ch >= UNI_SUR_LOW_START && ch <= UNI_SUR_LOW_END)
+		return 0;
+
+	if (ch >= UNI_SUR_HIGH_START && ch <= UNI_SUR_HIGH_END)
+	{
+		/* If the 16 bits following the high surrogate are in the source buffer... */
+		UINT ch2 = *++pch;
+		/* If it's a low surrogate, convert to UTF32. */
+		if (ch2 >= UNI_SUR_LOW_START && ch2 <= UNI_SUR_LOW_END)
+		{
+			ch = ((ch - UNI_SUR_HIGH_START) << 10) + (ch2 - UNI_SUR_LOW_START) + 0x10000;
+		}
+		else
+		{
+			ch = '?';
+		}
+    }
+	/*if (ch >= UNI_SUR_MIN && ch <= UNI_SUR_MAX)
+		return GetCharWidth() * 5;*/
 	// This assumes a fixed width font
 	// But the UNICODE case handles double-wide glyphs (primarily Chinese characters)
-	return GetCharWidthUnicodeChar(ch);
+	int wcwidth = mk_wcwidth(ch);
+	if (wcwidth < 0)
+		wcwidth = 1; // applies to 8-bit control characters in range 0x7F..0x9F
+	return wcwidth * GetCharWidth();
 }
 
 /**
@@ -765,11 +793,11 @@ int CCrystalTextView::GetCharWidthFromChar(TCHAR ch)
  *
  * Differs from GetCharWidthFromChar when viewable whitespace is involved
  */
-int CCrystalTextView::GetCharWidthFromDisplayableChar(TCHAR ch)
+int CCrystalTextView::GetCharWidthFromDisplayableChar(LPCTSTR pch)
 {
-	if (ch == _T(' ') && m_bViewTabs)
-		ch = ViewableWhitespaceChars::c_space;
-	return GetCharWidthFromChar(ch);
+	if (*pch == _T(' ') && m_bViewTabs)
+		pch = &ViewableWhitespaceChars::c_space;
+	return GetCharWidthFromChar(pch);
 }
 
 /**
@@ -786,8 +814,11 @@ void CCrystalTextView::DrawLineHelperImpl(
 	if (nCount > 0)
 	{
 		String line;
-		nActualOffset += ExpandChars (pszChars, nOffset, nCount, line, nActualOffset);
-		const int lineLen = line.length();
+		nActualOffset += ExpandChars(pszChars, nOffset, nCount, line, nActualOffset);
+		const int nMaxEscapement = 2;
+		// TODO: When implementing fallback to %04X format, set nMaxEscapement to 4.
+		const LPCTSTR szLine = line.c_str();
+		const int nLength = line.length();
 		const int nCharWidth = GetCharWidth();
 		const int nCharWidthNarrowed = nCharWidth / 2;
 		const int nCharWidthWidened = nCharWidth * 2 - nCharWidthNarrowed;
@@ -806,10 +837,10 @@ void CCrystalTextView::DrawLineHelperImpl(
 
 			// Update the position after the left clipped characters
 			// stop for i = first visible character, at least partly
-			const int clipLeft = rcClip.left - nCharWidth * 2;
-			for ( ; i < lineLen; i++)
+			const int clipLeft = rcClip.left - nCharWidth * nMaxEscapement;
+			for ( ; i < nLength; ++i)
 			{
-				int pnWidthsCurrent = GetCharWidthFromChar(line[i]);
+				int pnWidthsCurrent = szLine[i] < _T('\t') ? nCharWidth : GetCharWidthFromChar(szLine + i);
 				ptOrigin.x += pnWidthsCurrent;
 				if (ptOrigin.x >= clipLeft)
 				{
@@ -817,8 +848,8 @@ void CCrystalTextView::DrawLineHelperImpl(
 					break;
 				}
 			}
-        
-			if (i < lineLen)
+
+			if (i < nLength)
 			{
 				// We have to draw some characters
 				int ibegin = i;
@@ -827,7 +858,7 @@ void CCrystalTextView::DrawLineHelperImpl(
 				// A raw estimate of the number of characters to display
 				// For wide characters, nCountFit may be overvalued
 				int nWidth = rcClip.right - ptOrigin.x;
-				int nCount = lineLen - ibegin;
+				int nCount = nLength - ibegin;
 				int nCountFit = nWidth / nCharWidth + 2/* wide char */;
 				if (nCount > nCountFit) {
 					nCount = nCountFit;
@@ -837,10 +868,11 @@ void CCrystalTextView::DrawLineHelperImpl(
 				// Seems that CrystalEditor's and ExtTextOut()'s charwidths aren't
 				// same with some fonts and text is drawn only partially
 				// if this table is not used.
-				int* pnWidths = new int[nCount + 2];
+				int *pnWidths = new int[nCount + nMaxEscapement];
 				for ( ; i < nCount + ibegin ; i++)
 				{
-					if (line[i] == _T('\t')) // Escape sequence leadin?
+					TCHAR c = szLine[i];
+					if (c == _T('\1')) // %02X escape sequence leadin?
 					{
 						// Substitute a space narrowed to half the width of a character cell.
 						line[i] = _T(' ');
@@ -850,9 +882,21 @@ void CCrystalTextView::DrawLineHelperImpl(
 						// 2nd hex digit is padded by half the width of a character cell.
 						nSumWidth += pnWidths[++i - ibegin] = nCharWidthWidened;
 					}
+					/*else if (c == _T('\2')) // %04X escape sequence leadin?
+					{
+						line[i] = _T(' ');
+						// Substitute a space narrowed to half the width of a character cell.
+						nSumWidth += pnWidths[i - ibegin] = nCharWidthNarrowed;
+						// 1st..3rd hex digit has normal width.
+						nSumWidth += pnWidths[++i - ibegin] = nCharWidth;
+						nSumWidth += pnWidths[++i - ibegin] = nCharWidth;
+						nSumWidth += pnWidths[++i - ibegin] = nCharWidth;
+						// 4th hex digit is padded by half the width of a character cell.
+						nSumWidth += pnWidths[++i - ibegin] = nCharWidthWidened;
+					}*/
 					else
 					{
-						nSumWidth += pnWidths[i - ibegin] = GetCharWidthFromChar(line[i]);
+						nSumWidth += pnWidths[i - ibegin] = GetCharWidthFromChar(szLine + i);
 					}
 				}
 
@@ -882,8 +926,10 @@ void CCrystalTextView::DrawLineHelperImpl(
 						// Assume narrowed space is converted escape sequence leadin.
 						if (line[ibegin + j] == _T(' ') && pnWidths[j] < nCharWidth)
 						{
+							int n = 1;
+							do { } while (pnWidths[j + n++] == nCharWidth);
 							pdc->RoundRect(x + 2, ptOrigin.y + 1,
-							x + 3 * nCharWidth - 2, ptOrigin.y + nLineHeight - 1,
+							x + n * nCharWidth - 2, ptOrigin.y + nLineHeight - 1,
 							nCharWidth / 2, nLineHeight / 2);
 						}
 						x += pnWidths[j];
@@ -898,11 +944,11 @@ void CCrystalTextView::DrawLineHelperImpl(
 			}
 		}
 		// Update the final position after the right clipped characters
-		for ( ; i < lineLen; i++)
+		for ( ; i < nLength; ++i)
 		{
-			ptOrigin.x += GetCharWidthFromChar(line[i]);
+			ptOrigin.x += szLine[i] < _T('\t') ? nCharWidth : GetCharWidthFromChar(szLine + i);
 		}
-    }
+	}
 }
 
 void CCrystalTextView::DrawLineHelper(
@@ -1731,7 +1777,6 @@ void CCrystalTextView::OnDraw(HSurface *pdc)
 
 void CCrystalTextView::ResetView()
 {
-	ResetCharWidths();
 	// m_bWordWrap = FALSE;
 	m_nTopLine = 0;
 	m_nTopSubLine = 0;
@@ -1979,7 +2024,7 @@ int CCrystalTextView::CursorPointToCharPos( int nLineIndex, const POINT &curPoin
 		}
 		else
 		{
-			int delta = GetCharWidthFromDisplayableChar(szLine[nIndex]) / GetCharWidth();
+			int delta = GetCharWidthFromDisplayableChar(szLine + nIndex) / GetCharWidth();
 			nXPos += delta;
 			nCurPos += delta;
 		}
@@ -2613,7 +2658,7 @@ POINT CCrystalTextView::ClientToText(const POINT &point)
 		}
 		else
 		{
-			n += GetCharWidthFromDisplayableChar(pszLine[nIndex]) / GetCharWidth();
+			n += GetCharWidthFromDisplayableChar(pszLine + nIndex) / GetCharWidth();
 			nCurPos++;
 		}
 		if (n > nPos && i == nSubLineOffset)
@@ -2697,7 +2742,7 @@ POINT CCrystalTextView::TextToClient(const POINT &point)
 		if (pszLine[nIndex] == _T ('\t'))
 			pt.x += (nTabSize - pt.x % nTabSize);
 		else
-			pt.x += GetCharWidthFromDisplayableChar(pszLine[nIndex]) / GetCharWidth();
+			pt.x += GetCharWidthFromDisplayableChar(pszLine + nIndex) / GetCharWidth();
 	}
 	//BEGIN SW
 	pt.x-= nPreOffset;
@@ -2792,11 +2837,11 @@ DWORD CCrystalTextView::ParseLine(DWORD dwCookie, int nLineIndex, TEXTBLOCK * pB
 
 int CCrystalTextView::CalculateActualOffset(int nLineIndex, int nCharIndex, BOOL bAccumulate)
 {
-	const int nLength = GetLineLength (nLineIndex);
+	const int nLength = GetLineLength(nLineIndex);
 	ASSERT(nCharIndex >= 0 && nCharIndex <= nLength);
-	LPCTSTR pszChars = GetLineChars (nLineIndex);
+	LPCTSTR pszChars = GetLineChars(nLineIndex);
 	int nOffset = 0;
-	const int nTabSize = GetTabSize ();
+	const int nTabSize = GetTabSize();
 	//BEGIN SW
 	int *anBreaks = new int[nLength];
 	int nBreaks = 0;
@@ -2825,10 +2870,10 @@ int CCrystalTextView::CalculateActualOffset(int nLineIndex, int nCharIndex, BOOL
 		if (nPreBreak == i && nBreaks)
 			nPreOffset = nOffset;
 		//END SW
-		if (pszChars[i] == _T ('\t'))
+		if (pszChars[i] == _T('\t'))
 			nOffset += (nTabSize - nOffset % nTabSize);
 		else
-			nOffset += GetCharWidthFromDisplayableChar(pszChars[i]) / GetCharWidth();
+			nOffset += GetCharWidthFromDisplayableChar(pszChars + i) / GetCharWidth();
 	}
 	if (bAccumulate)
 		return nOffset;
@@ -4205,49 +4250,6 @@ bool CCrystalTextView::IsTextBufferInitialized() const
 LPCTSTR CCrystalTextView::GetTextBufferEol(int nLine) const
 {
 	return m_pTextBuffer->GetLineEol(nLine); 
-}
-
-int CCrystalTextView::GetCharWidthUnicodeChar(wchar_t ch)
-{
-  if (!m_bChWidthsCalculated[ch/256])
-    {
-      if (ch >= 0x4e00 && ch < 0xe000)
-        {
-          // CJK Unified Ideograph + Hangul
-          memset(&m_iChDoubleWidthFlags[0x4e00/32], 0xff, ((0xe000-0x4e00)/32)*4);
-          for (int i = 0x4e00; i < 0xe000; i+=256) 
-            m_bChWidthsCalculated[i / 256] = TRUE;
-        }
-      else
-        {
-          int nWidthArray[256];
-          int nStart = ch/256*256;
-          int nEnd = nStart + 255;
-		  HSurface *pdc = GetDC();
-          HGdiObj *pOldFont = pdc->SelectObject(GetFont());
-          pdc->GetCharWidth(nStart, nEnd, nWidthArray);
-          pdc->SelectObject(pOldFont);
-		  ReleaseDC(pdc);
-          int nCharWidth = GetCharWidth();
-          for (int i = 0; i < 256; i++) 
-            {
-              if (nCharWidth * 15 < nWidthArray[i] * 10)
-                m_iChDoubleWidthFlags[(nStart+i)/32] |= 1 << (i % 32);
-            }
-          m_bChWidthsCalculated[ch / 256] = TRUE;
-        }
-    }
-  if (m_iChDoubleWidthFlags[ch / 32] & (1 << (ch % 32)))
-    return GetCharWidth() * 2;
-  else
-    return GetCharWidth();
-}
-
-/** @brief Reset computed unicode character widths. */
-void CCrystalTextView::ResetCharWidths()
-{
-	ZeroMemory(m_bChWidthsCalculated, sizeof m_bChWidthsCalculated);
-	ZeroMemory(m_iChDoubleWidthFlags, sizeof m_iChDoubleWidthFlags);
 }
 
 // This function assumes selection is in one line

@@ -97,10 +97,9 @@ protected:
     bool m_bCursorHidden;
 
 private:
-
     //  Line/character dimensions
     int m_nLineHeight, m_nCharWidth;
-    void CalcLineCharDim ();
+    void CalcLineCharDim();
 
     //  Text attributes
     BOOL m_bViewTabs;
@@ -137,7 +136,6 @@ protected:
     POINT m_ptAnchor;
 private:
     LOGFONT m_lfBaseFont;
-	LOGFONT m_lfSavedBaseFont;
     HFont *m_apFonts[4];
 
     //  Parsing stuff
@@ -362,18 +360,18 @@ protected :
 	*/
 	int SubLineHomeToCharPos( int nLineIndex, int nSubLineOffset );
 	//END SW
-    int GetCharWidth ();
-    int GetMaxLineLength ();
-    int GetScreenLines ();
-    int GetScreenChars ();
+    int GetCharWidth();
+    int GetMaxLineLength();
+    int GetScreenLines();
+    int GetScreenChars();
     HFont *GetFont (BOOL bItalic = FALSE, BOOL bBold = FALSE);
 
 	virtual void RecalcVertScrollBar(BOOL bPositionOnly = FALSE);
 	virtual void RecalcHorzScrollBar(BOOL bPositionOnly = FALSE);
 
     //  Scrolling helpers
-    void ScrollToChar (int nNewOffsetChar, BOOL = FALSE, BOOL bTrackScrollBar = TRUE);
-    void ScrollToLine (int nNewTopLine, BOOL = FALSE, BOOL bTrackScrollBar = TRUE);
+    void ScrollToChar(int nNewOffsetChar, BOOL = FALSE, BOOL bTrackScrollBar = TRUE);
+    void ScrollToLine(int nNewTopLine, BOOL = FALSE, BOOL bTrackScrollBar = TRUE);
 
 	//BEGIN SW
 	/**
@@ -449,14 +447,11 @@ protected:
     virtual void DrawSingleLine (HSurface * pdc, const RECT & rect, int nLineIndex);
     virtual void DrawMargin (HSurface *pdc, const RECT & rect, int nLineIndex, int nLineNumber);
 
-    int GetCharWidthFromChar(TCHAR);
-    int GetCharWidthFromDisplayableChar(TCHAR);
+    int GetCharWidthFromChar(LPCTSTR);
+    int GetCharWidthFromDisplayableChar(LPCTSTR);
 
-    BOOL m_bChWidthsCalculated[65536/256];
-    int m_iChDoubleWidthFlags[65536/32];
-    int GetCharWidthUnicodeChar(wchar_t ch);
-
-	void ResetCharWidths();
+	void AdjustCursorAfterMoveLeft();
+    void AdjustCursorAfterMoveRight();
 
 	//BEGIN SW
 	// word wrapping
@@ -486,7 +481,7 @@ protected:
 
 	@see WrapLineCached()
 	*/
-	virtual void WrapLine(int nLineIndex, int nMaxLineWidth, int *anBreaks, int &nBreaks);
+	void WrapLine(int nLineIndex, int nMaxLineWidth, int *anBreaks, int &nBreaks);
 
 	/**
 	Called to wrap the line with the given index into sublines.

@@ -2,7 +2,7 @@
  *  @file   unicoder.cpp
  *  @author Perry Rapp, Creator, 2003-2006
  *  @date   Created: 2003-10
- *  @date   Edited:  2006-02-20 (Perry Rapp)
+ *  @date   Edited:  2013-02-02 (Jochen Neubeck)
  *
  *  @brief  Implementation of utility unicode conversion routines
  */
@@ -36,309 +36,18 @@ namespace ucr
 {
 
 /**
- * @brief Convert unicode codepoint to UTF-8 byte string
- *
- * utf8 must be a 7+ byte buffer
- * returns length of byte string written
- * Does not zero-terminate!
- */
-int Ucs4_to_Utf8(unsigned int unich, unsigned char * utf8)
-{
-#pragma warning(disable: 4244) // possible loss of data due to type conversion
-	if (unich <= 0x7f)
-	{
-		utf8[0] = (unsigned char)unich;
-		return 1;
-	}
-	else if (unich <= 0x7ff)
-	{
-		utf8[0] = 0xc0 + (unich >> 6);
-		utf8[1] = 0x80 + (unich & 0x3f);
-		return 2;
-	}
-	else if (unich <= 0xffff)
-	{
-		utf8[0] = 0xe0 + (unich >> 12);
-		utf8[1] = 0x80 + ((unich >> 6) & 0x3f);
-		utf8[2] = 0x80 + (unich & 0x3f);
-		return 3;
-	}
-	else if (unich <= 0x1fffff)
-	{
-		utf8[0] = 0xf0 + (unich >> 18);
-		utf8[1] = 0x80 + ((unich >> 12) & 0x3f);
-		utf8[2] = 0x80 + ((unich >> 6) & 0x3f);
-		utf8[3] = 0x80 + (unich & 0x3f);
-		return 4;
-	}
-	else if (unich <= 0x3ffffff)
-	{
-		utf8[0] = 0xf8 + (unich >> 24);
-		utf8[1] = 0x80 + ((unich >> 18) & 0x3f);
-		utf8[2] = 0x80 + ((unich >> 12) & 0x3f);
-		utf8[3] = 0x80 + ((unich >> 6) & 0x3f);
-		utf8[4] = 0x80 + (unich & 0x3f);
-		return 5;
-	}
-	else if (unich <= 0x7fffffff)
-	{
-		utf8[0] = 0xfc + (unich >> 30);
-		utf8[1] = 0x80 + ((unich >> 24) & 0x3f);
-		utf8[2] = 0x80 + ((unich >> 18) & 0x3f);
-		utf8[3] = 0x80 + ((unich >> 12) & 0x3f);
-		utf8[4] = 0x80 + ((unich >> 6) & 0x3f);
-		utf8[5] = 0x80 + (unich & 0x3f);
-		return 6;
-	}
-	else
-	{
-		// Invalid Unicode codepoint (high bit was set)
-		// TODO: What do we do ?
-		utf8[0] = '?';
-		return 1;
-	}
-#pragma warning(default: 4244) // possible loss of data due to type conversion
-}
-
-/**
- * @brief Gets a length of UTF-8 character in bytes.
- * @param [in] ch The character for which to get the length.
- * @return Byte length of UTF-8 character, -1 if invalid.
- */
-int Utf8len_fromLeadByte(unsigned char ch)
-{
-	if (ch < 0x80) return 1;
-	if (ch < 0xC0) return -1;
-	if (ch < 0xE0) return 2;
-	if (ch < 0xF0) return 3;
-	if (ch < 0xF8) return 4;
-	if (ch < 0xFC) return 5;
-	if (ch < 0xFE) return 6;
-	return -1;
-}
-
-/**
- * @brief return #bytes required to represent Unicode codepoint as UTF-8
- */
-int Utf8len_fromCodepoint(unsigned int ch)
-{
-	if (ch <= 0x7F) return 1;
-	if (ch <= 0x7FF) return 2;
-	if (ch <= 0xFFFF) return 3;
-	if (ch <= 0x1FFFFF) return 4;
-	if (ch <= 0x3FFFFFF) return 5;
-	if (ch <= 0x7FFFFFFF) return 6;
-	return -1;
-}
-
-/**
- * @brief How many bytes will it take to write string as UTF-8 ?
- *
- * @param size size argument as filemapping are not 0 terminated
- *
- * @bug Fails for files larger than 2gigs
- */
-unsigned int Utf8len_of_string(const wchar_t* text, int size)
-{
-	unsigned int len = 0;
-	for (int i = 0; i < size; ++i)
-	{
-		int chlen = Utf8len_fromCodepoint(text[i]);
-		if (chlen < 1) chlen = 1;
-		len += chlen;
-	}
-	return len;
-}
-/**
- * @brief How many chars in this UTF-8 string ?
- *
- * @param size size argument as filemapping are not 0 terminated
- *
- * @bug Fails for files larger than 2gigs
- */
-unsigned int stringlen_of_utf8(const char* text, int size)
-{
-	unsigned int len = 0;
-	for (int i = 0; i < size;)
-	{
-		int chlen = Utf8len_fromLeadByte(text[i]);
-		if (chlen < 1) chlen = 1;
-		i += chlen;
-		len ++;
-	}
-	return len;
-}
-
-/**
- * @brief Read UTF-8 character and return as Unicode
- */
-unsigned int GetUtf8Char(unsigned char * str)
-{
-	/* test short cases first, as probably much more common */
-	if (!(*str & 0x80 && *str & 0x40))
-	{
-		return str[0];
-	}
-	if (!(*str & 0x20))
-	{
-		unsigned int ch = ((str[0] & 0x1F) << 6)
-				+ (str[1] & 0x3F);
-		return ch;
-	}
-	if (!(*str & 0x10))
-	{
-		unsigned int ch = ((str[0] & 0x0f) << 12)
-				+ ((str[1] & 0x3F) << 6)
-				+ (str[2] & 0x3F);
-		return ch;
-	}
-	if (!(*str & 0x08))
-	{
-		unsigned int ch = ((str[0] & 0x0F) << 18)
-				+ ((str[1] & 0x3F) << 12)
-				+ ((str[2] & 0x3F) << 6)
-				+ (str[3] & 0x3F);
-		return ch;
-	}
-	if (!(*str & 0x04))
-	{
-		unsigned int ch = ((str[0] & 0x0F) << 24)
-				+ ((str[1] & 0x3F) << 18)
-				+ ((str[2] & 0x3F) << 12)
-				+ ((str[3] & 0x3F) << 6)
-				+ (str[4] & 0x3F);
-		return ch;
-	}
-	else
-	{
-		unsigned int ch = ((str[0] & 0x0F) << 30)
-				+ ((str[1] & 0x3F) << 24)
-				+ ((str[2] & 0x3F) << 18)
-				+ ((str[3] & 0x3F) << 12)
-				+ ((str[4] & 0x3F) << 6)
-				+ (str[5] & 0x3F);
-		return ch;
-	}
-}
-
-/**
- * @brief Write unicode codepoint u out as UTF-8 to lpd, and advance lpd
- *
- * Returns number of bytes written (or -1 for error, in which case it writes '?')
- */
-int to_utf8_advance(unsigned int u, unsigned char * &lpd)
-{
-#pragma warning(disable: 4244) // possible loss of data due to type conversion
-	if (u < 0x80)
-	{
-		*lpd++ = u;
-		return 1;
-	}
-	else if (u < 0x800)
-	{
-		*lpd++ = 0xC0 + (u >> 6);
-		*lpd++ = 0x80 + (u & 0x3F);
-		return 2;
-	}
-	else if (u < 0x10000)
-	{
-		*lpd++ = 0xE0 + (u >> 12);
-		*lpd++ = 0x80 + ((u >> 6) & 0x3F);
-		*lpd++ = 0x80 + (u & 0x3F);
-		return 3;
-	}
-	else if (u < 0x200000)
-	{
-		*lpd++ = 0xF0 + (u >> 18);
-		*lpd++ = 0x80 + ((u >> 12) & 0x3F);
-		*lpd++ = 0x80 + ((u >> 6) & 0x3F);
-		*lpd++ = 0x80 + (u & 0x3F);
-		return 4;
-	}
-	else if (u < 0x4000000)
-	{
-		*lpd++ = 0xF8 + (u >> 24);
-		*lpd++ = 0x80 + ((u >> 18) & 0x3F);
-		*lpd++ = 0x80 + ((u >> 12) & 0x3F);
-		*lpd++ = 0x80 + ((u >> 6) & 0x3F);
-		*lpd++ = 0x80 + (u & 0x3F);
-		return 5;
-	}
-	else if (u < 0x80000000)
-	{
-		*lpd++ = 0xFC + (u >> 30);
-		*lpd++ = 0x80 + ((u >> 24) & 0x3F);
-		*lpd++ = 0x80 + ((u >> 18) & 0x3F);
-		*lpd++ = 0x80 + ((u >> 12) & 0x3F);
-		*lpd++ = 0x80 + ((u >> 6) & 0x3F);
-		*lpd++ = 0x80 + (u & 0x3F);
-		return 6;
-	}
-	else
-	{
-		*lpd++ = '?';
-		return 1;
-	}
-#pragma warning(default: 4244) // possible loss of data due to type conversion
-}
-
-/**
- * @brief convert 8-bit character input to Unicode codepoint and return it
- */
-unsigned int byteToUnicode(unsigned char ch)
-{
-	static unsigned int codepage = CP_ACP;
-	// NB: Windows always draws in CP_ACP, not CP_THREAD_ACP, so we must use CP_ACP as an internal codepage
-
-	return byteToUnicode(ch, codepage);
-}
-
-/**
  * @brief convert 8-bit character input to Unicode codepoint and return it
  */
 unsigned int byteToUnicode(unsigned char ch, unsigned int codepage)
 {
-
 	if (ch < 0x80)
 		return ch;
-
-	DWORD flags = 0;
 	wchar_t wbuff;
-	int n = MultiByteToWideChar(codepage, flags, (const char*) & ch, 1, &wbuff, 1);
+	int n = MultiByteToWideChar(codepage, 0, (const char*) & ch, 1, &wbuff, 1);
 	if (n > 0)
 		return wbuff;
 	else
 		return '?';
-}
-
-/**
- * @brief Write appropriate BOM (Unicode byte order marker)
- * returns #bytes written
- */
-int writeBom(void* dest, UNICODESET unicoding)
-{
-	unsigned char * lpd = reinterpret_cast<unsigned char *>(dest);
-	// write Unicode byte order marker (BOM)
-	if (unicoding == UCS2LE)
-	{
-		*lpd++ = 0xFF;
-		*lpd++ = 0xFE;
-		return 2;
-	}
-	else if (unicoding == UCS2BE)
-	{
-		*lpd++ = 0xFE;
-		*lpd++ = 0xFF;
-		return 2;
-	}
-	else if (unicoding == UTF8)
-	{
-		*lpd++ = 0xEF;
-		*lpd++ = 0xBB;
-		*lpd++ = 0xBF;
-		return 3;
-	}
-	return 0;
 }
 
 /**
@@ -361,6 +70,7 @@ unsigned int get_unicode_char(unsigned char * ptr, UNICODESET codeset, int codep
 		// TODO: How do we recognize valid codepage ?
 		// if not, use byteToUnicode(*ptr)
 		ch = byteToUnicode(*ptr, codepage);
+		break;
 	}
 	return ch;
 }
@@ -420,15 +130,7 @@ bool maketstring(String & str, const char* lpd, unsigned int len, int codepage, 
 				ASSERT(FALSE);
 				--n;
 			}
-			try
-			{
-				str.resize(n);
-			}
-			catch (std::bad_alloc)
-			{
-				// Not enough memory - exit
-				return false;
-			}
+			str.resize(n);
 			return true;
 		}
 		*lossy = true;
