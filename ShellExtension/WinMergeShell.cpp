@@ -21,15 +21,9 @@
 //  HKEY_CURRENT_USER\Software\Thingamahoochie\WinMerge\ContextMenuEnabled
 //   defines if context menu is shown (extension enabled) and if
 //   we show simple or advanced menu
-//  HKEY_CURRENT_USER\Software\Thingamahoochie\WinMerge\Executable
-//   contains path to program to run (can be batch file too)
 //
-// HKEY_CURRENT_USER\Software\Thingamahoochie\WinMerge\FirstSelection
-//  is used to store path for first selection in advanced mode
-//
-//  HKEY_CURRENT_USER\Software\Thingamahoochie\WinMerge\PriExecutable
-//   overwrites 'Executable' if defined. Useful to overwrite
-//   option set from UI when debugging/testing.
+//  HKEY_CURRENT_USER\Software\Thingamahoochie\WinMerge\FirstSelection
+//   is used to store path for first selection in advanced mode
 /////////////////////////////////////////////////////////////////////////////
 /**
  * @file  WinMergeShell.cpp
@@ -44,8 +38,6 @@
 #include "ShellExtension.h"
 #include "WinMergeShell.h"
 #include "RegKey.h"
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <atliface_h.h>
 
 /**
@@ -84,10 +76,10 @@ static const TCHAR f_LanguageId[] = _T("LanguageId");
  */
 enum
 {
-	MENU_SIMPLE = 0,  /**< Simple menu, only "Compare item" is shown. */
-	MENU_ONESEL_NOPREV,  /**< One item selected, no previous selections. */
-	MENU_ONESEL_PREV,  /**< One item selected, previous selection exists. */
-	MENU_TWOSEL,  /**< Two items are selected. */
+	MENU_SIMPLE,		/**< Simple menu, only "Compare item" is shown. */
+	MENU_ONESEL_NOPREV,	/**< One item selected, no previous selections. */
+	MENU_ONESEL_PREV,	/**< One item selected, previous selection exists. */
+	MENU_TWOSEL,		/**< Two items are selected. */
 };
 
 void CWinMergeShell::SetWinMergeLocale()
