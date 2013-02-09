@@ -1052,9 +1052,6 @@ void CMergeEditView::OnUpdateCaret(bool bShowHide)
 	SetLineInfoStatus(sLine, column, columns,
 		curChar, chars, sEol, editMode);
 
-	m_pDocument->m_wndLocationView.UpdateVisiblePos(
-		m_nTopSubLine, m_nTopSubLine + GetScreenLines());
-
 	// Update Command UI
 	m_pDocument->UpdateClipboardCmdUI();
 }
@@ -1277,8 +1274,15 @@ void CMergeEditView::OnSize()
 void CMergeEditView::RecalcVertScrollBar(BOOL bPositionOnly)
 {
 	CGhostTextView::RecalcVertScrollBar(bPositionOnly);
-	if (!bPositionOnly)
+	if (bPositionOnly)
+	{
+		m_pDocument->m_wndLocationView.UpdateVisiblePos(
+			m_nTopSubLine, m_nTopSubLine + GetScreenLines());
+	}
+	else
+	{
 		m_pDocument->m_wndLocationView.ForceRecalculate();
+	}
 }
 
 /**
