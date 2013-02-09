@@ -1369,6 +1369,7 @@ void CMergeEditView::DocumentsLoaded()
 {
 	RefreshOptions();
 	SetFont(theApp.m_pMainWnd->m_lfDiff);
+	OnUpdateCaret();
 }
 
 /**
@@ -1598,7 +1599,7 @@ HMenu *CMergeEditView::ApplyPatch(IStream *pstm, int id)
 			{
 				TRACE("#VALID ");
 				int nLineCount = pTextBuffer->GetLineCount();
-				size_t i;
+				unsigned i;
 				for (i = 0 ; i < len1 ; ++i)
 				{
 					int nApparentLine = pTextBuffer->ComputeApparentLine(pos1 + i);
