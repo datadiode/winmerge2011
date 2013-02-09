@@ -59,10 +59,10 @@ void LineFiltersDlg::OnCustomdraw(HSurface *pDC)
 	}
 
 	LPCTSTR pchExpression = strExpression.c_str();
-	size_t cchExpression = strExpression.length();
+	String::size_type cchExpression = strExpression.length();
 	if (LPCTSTR p = EatPrefix(pchExpression, _T("regexp:")))
 	{
-		cchExpression -= p - pchExpression;
+		cchExpression -= static_cast<String::size_type>(p - pchExpression);
 		pchExpression = p;
 	}
 
@@ -93,7 +93,7 @@ void LineFiltersDlg::OnCustomdraw(HSurface *pDC)
 				j = ovector[index];
 				if (i < j)
 				{
-					pDC->DrawTextA(buf + i, j - i, &rc, DT_CALCRECT | DT_EDITCONTROL);
+					pDC->DrawTextA(buf + i, j - i, &rc, DT_CALCRECT | DT_EDITCONTROL | DT_NOPREFIX);
 					if (index > 1)
 					{
 						rc.bottom = 2;
@@ -109,7 +109,7 @@ void LineFiltersDlg::OnCustomdraw(HSurface *pDC)
 				j = len;
 				if (i < j)
 				{
-					pDC->DrawTextA(buf + i, j - i, &rc, DT_CALCRECT | DT_EDITCONTROL);
+					pDC->DrawTextA(buf + i, j - i, &rc, DT_CALCRECT | DT_EDITCONTROL | DT_NOPREFIX);
 					rc.left = rc.right;
 				}
 			}
@@ -209,7 +209,7 @@ LRESULT LineFiltersDlg::OnNotify(UNotify *pNM)
 				{
 					// Don't trust NMCUSTOMDRAW::uItemState!
 					UINT uItemState = pNM->pLV->GetItemState(
-						pNM->CUSTOMDRAW.dwItemSpec, LVIS_SELECTED | LVIS_FOCUSED);
+						static_cast<int>(pNM->CUSTOMDRAW.dwItemSpec), LVIS_SELECTED | LVIS_FOCUSED);
 					pNM->LVCUSTOMDRAW.clrText = RGB(255,0,0);
 					if (uItemState & LVIS_SELECTED)
 					{

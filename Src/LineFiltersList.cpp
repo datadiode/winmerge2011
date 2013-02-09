@@ -61,7 +61,7 @@ bool LineFiltersList::Compare(LineFiltersList &list)
 	if (list.GetCount() != GetCount())
 		return false;
 
-	for (size_t i = 0; i < GetCount(); i++)
+	for (t_items::size_type i = 0; i < GetCount(); i++)
 	{
 		LineFilterItem &item1 = list.GetAt(i);
 		LineFilterItem &item2 = GetAt(i);

@@ -25,12 +25,13 @@ struct LineFilterItem
  */
 extern class LineFiltersList
 {
+	typedef stl::vector<LineFilterItem> t_items;
 public:
 
 	void AddFilter(LPCTSTR filter, int usage);
-	size_t GetCount() const { return m_items.size(); }
+	t_items::size_type GetCount() const { return m_items.size(); }
 	void Empty() { m_items.clear(); }
-	LineFilterItem &GetAt(size_t i) { return m_items[i]; }
+	LineFilterItem &GetAt(t_items::size_type i) { return m_items[i]; }
 	bool Compare(LineFiltersList &);
 
 	void LoadFilters();
@@ -38,7 +39,7 @@ public:
 	void swap(LineFiltersList &other) { m_items.swap(other.m_items); }
 
 private:
-	stl::vector<LineFilterItem> m_items; /**< List for linefilter items */
+	t_items m_items; /**< List for linefilter items */
 } globalLineFilters;
 
 #endif // _LINEFILTERS_LIST_H_
