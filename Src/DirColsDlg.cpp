@@ -198,7 +198,7 @@ void CDirColsDlg::OnOK()
 	for (int i = 0; i < m_listColumns->GetItemCount(); i++)
 	{
 		BOOL checked = m_listColumns->GetCheck(i);
-		DWORD_PTR data = m_listColumns->GetItemData(i);
+		stl_size_t data = static_cast<stl_size_t>(m_listColumns->GetItemData(i));
 		m_cols[data].phy = checked ? phy++ : -1;
 	}
 	EndDialog(IDOK);
@@ -234,7 +234,7 @@ void CDirColsDlg::OnLvnItemchangedColdlgList(NMLISTVIEW *pNM)
 		int ind = m_listColumns->GetNextItem(-1, LVNI_SELECTED);
 		if (ind != -1)
 		{
-			DWORD_PTR data = m_listColumns->GetItemData(ind);
+			stl_size_t data = static_cast<stl_size_t>(m_listColumns->GetItemData(ind));
 			SetDlgItemText(IDC_COLDLG_DESC, LanguageSelect.LoadString(m_cols[data].idDesc).c_str());
 			EnableUpDown();
 		}

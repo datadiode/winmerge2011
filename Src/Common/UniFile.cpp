@@ -433,7 +433,7 @@ bool UniMemFile::ReadString(String & line, String & eol, bool * lossy)
 			}
 		}
 		bool success = ucr::maketstring(line, (LPCSTR)m_current,
-			static_cast<String::size_type>(eolptr - m_current), m_codepage, lossy);
+			static_cast<int>(eolptr - m_current), m_codepage, lossy);
 		if (!success)
 		{
 			return false;
@@ -479,7 +479,7 @@ bool UniMemFile::ReadString(String & line, String & eol, bool * lossy)
 			{
 			case convert_utf::conversionOK:
 			case convert_utf::targetExhausted:
-				len = static_cast<String::size_type>(sourceStart - m_current);
+				len = static_cast<UINT>(sourceStart - m_current);
 				break;
 			case convert_utf::sourceExhausted:
 				m_current = m_base + m_filesize.int64;

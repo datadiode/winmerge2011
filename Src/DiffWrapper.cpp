@@ -199,10 +199,10 @@ void CDiffWrapper::SetDetectMovedBlocks(bool bDetectMovedBlocks)
  * @param [in] str - String to search
  * @param [in] rep - String to replace
  */
-static void ReplaceSpaces(stl::string & str, const char *rep)
+static void ReplaceSpaces(stl::string &str, const char *rep)
 {
 	stl::string::size_type pos = 0;
-	size_t replen = strlen(rep);
+	stl::string::size_type replen = static_cast<stl::string::size_type>(strlen(rep));
 	while ((pos = str.find_first_of(" \t", pos)) != stl::string::npos)
 	{
 		stl::string::size_type posend = str.find_first_not_of(" \t", pos);
@@ -280,13 +280,14 @@ OP_TYPE CDiffWrapper::PostFilter(int LineNumberLeft, int QtyLinesLeft,
 					CommentStrEnd = FilterCommentsSet::FindCommentMarker(LineDataLeft.c_str(), filtercommentsset.EndMarker);
 					if (CommentStrStart < CommentStrEnd)
 					{
-						LineDataLeft.erase(CommentStrStart - LineDataLeft.c_str(), CommentStrEnd + filtercommentsset.EndMarker.size() - CommentStrStart);
+						LineDataLeft.erase(static_cast<stl::string::size_type>(CommentStrStart - LineDataLeft.c_str()),
+							static_cast<stl::string::size_type>(CommentStrEnd + filtercommentsset.EndMarker.size() - CommentStrStart));
 					}
 					else if (LeftOp == OP_TRIVIAL)
 					{
 						if (CommentStrEnd < CommentStrStart)
 							CommentStrEnd += filtercommentsset.EndMarker.size();
-						LineDataLeft.erase(0, CommentStrEnd - LineDataLeft.c_str());
+						LineDataLeft.erase(0, static_cast<stl::string::size_type>(CommentStrEnd - LineDataLeft.c_str()));
 					}
 				} while (CommentStrStart < CommentStrEnd);
 				do
@@ -295,13 +296,14 @@ OP_TYPE CDiffWrapper::PostFilter(int LineNumberLeft, int QtyLinesLeft,
 					CommentStrEnd = FilterCommentsSet::FindCommentMarker(LineDataRight.c_str(), filtercommentsset.EndMarker);
 					if (CommentStrStart < CommentStrEnd)
 					{
-						LineDataRight.erase(CommentStrStart - LineDataRight.c_str(), CommentStrEnd + filtercommentsset.EndMarker.size() - CommentStrStart);
+						LineDataRight.erase(static_cast<stl::string::size_type>(CommentStrStart - LineDataRight.c_str()),
+							static_cast<stl::string::size_type>(CommentStrEnd + filtercommentsset.EndMarker.size() - CommentStrStart));
 					}
 					else if (RightOp == OP_TRIVIAL)
 					{
 						if (CommentStrEnd < CommentStrStart)
 							CommentStrEnd += filtercommentsset.EndMarker.size();
-						LineDataRight.erase(0, CommentStrEnd - LineDataRight.c_str());
+						LineDataRight.erase(0, static_cast<stl::string::size_type>(CommentStrEnd - LineDataRight.c_str()));
 					}
 				} while (CommentStrStart < CommentStrEnd);
 			}
@@ -309,16 +311,16 @@ OP_TYPE CDiffWrapper::PostFilter(int LineNumberLeft, int QtyLinesLeft,
 			if (!filtercommentsset.InlineMarker.empty())
 			{
 				//Lets remove line comments
-				LineDataLeft.erase(
+				LineDataLeft.erase(static_cast<stl::string::size_type>(
 					FilterCommentsSet::FindCommentMarker(
 						LineDataLeft.c_str(), filtercommentsset.InlineMarker
 					) - LineDataLeft.c_str()
-				);
-				LineDataRight.erase(
+				));
+				LineDataRight.erase(static_cast<stl::string::size_type>(
 					FilterCommentsSet::FindCommentMarker(
 						LineDataRight.c_str(), filtercommentsset.InlineMarker
 					) - LineDataRight.c_str()
-				);
+				));
 			}
 
 			if (nIgnoreWhitespace == WHITESPACE_IGNORE_ALL)
@@ -677,7 +679,7 @@ int CDiffWrapper::RegExpFilter(int StartPos, int EndPos, int FileNo, bool BreakC
 	while (line <= EndPos)
 	{
 		const char *string = files[FileNo].linbuf[line];
-		size_t stringlen = linelen(string);
+		int stringlen = linelen(string);
 		if (FilterList::Match(stringlen, string, m_codepage) == BreakCondition)
 			break;
 		++line;

@@ -383,7 +383,7 @@ void CMainFrame::SaveFilesMRU()
 {
 	if (HKEY hKey = SettingStore.GetSectionKey(_T("Recent File List"), CREATE_ALWAYS))
 	{
-		size_t i = 0;
+		stl_size_t i = 0;
 		while (i < m_FilesMRU.size())
 		{
 			TCHAR name[20];
@@ -656,7 +656,7 @@ LRESULT CMainFrame::OnWndMsg<WM_DRAWITEM>(WPARAM, LPARAM lParam)
 		fStyle |= ILD_BLEND;
 	if (lpdis->itemData != ~0)
 	{
-		m_imlMenu->Draw(lpdis->itemData, lpdis->hDC,
+		m_imlMenu->Draw(static_cast<int>(lpdis->itemData), lpdis->hDC,
 			lpdis->rcItem.left + GetMenuBitmapExcessWidth() - 16,
 			lpdis->rcItem.top + (lpdis->rcItem.bottom - lpdis->rcItem.top - 16) / 2,
 			fStyle);
@@ -918,12 +918,12 @@ LRESULT CMainFrame::OnWndMsg<WM_INITMENUPOPUP>(WPARAM wParam, LPARAM lParam)
 			{
 				pMenu->DeleteMenu(mii.wID);
 			} while (++mii.wID <= ID_FILE_MRU_FILE16);
-			if (size_t n = m_FilesMRU.size())
+			if (stl_size_t n = m_FilesMRU.size())
 			{
 				mii.fState = m_wndTabBar->IsWindowEnabled() ? MF_ENABLED : MF_GRAYED;
 				do
 				{
-					size_t u = n--;
+					stl_size_t u = n--;
 					string_format text(_T("&%u %s"), u, m_FilesMRU[n].c_str());
 					pMenu->InsertMenu(i, MF_BYPOSITION | mii.fState, ID_FILE_MRU_FILE1 + n, text.c_str());
 				} while (n);
@@ -1703,7 +1703,7 @@ bool CMainFrame::CreateBackup(BOOL bFolder, LPCTSTR pszPath)
 
 	LPCTSTR pszFileName = PathFindFileName(pszPath);
 	LPCTSTR pszExt = PathFindExtension(pszFileName);
-	String filename(pszFileName, pszExt - pszFileName);
+	String filename(pszFileName, static_cast<String::size_type>(pszExt - pszFileName));
 	String ext = pszExt;
 
 	// Determine backup folder
@@ -2088,7 +2088,7 @@ void CMainFrame::addToMru(LPCTSTR szItem, LPCTSTR szRegSubKey, UINT nMaxItems)
 		// add most recent item
 		RegSetValueEx(hKey, _T("Item_0"), 0L, REG_SZ,
 			reinterpret_cast<const BYTE *>(szItem),
-			(_tcslen(szItem) + 1) * sizeof(TCHAR));
+			static_cast<DWORD>((_tcslen(szItem) + 1) * sizeof(TCHAR)));
 	}
 }
 
@@ -3223,7 +3223,7 @@ LRESULT CMainFrame::OnWndMsg<WM_ACTIVATE>(WPARAM wParam, LPARAM lParam)
 template<>
 LRESULT CMainFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 {
-	switch (const UINT id = lParam ? wParam : LOWORD(wParam))
+	switch (const UINT id = lParam ? static_cast<UINT>(wParam) : LOWORD(wParam))
 	{
 	case ID_FILE_MRU_FILE1:
 	case ID_FILE_MRU_FILE2:
@@ -3630,7 +3630,7 @@ void CMainFrame::OnToolTipText(NMHDR* pNMHDR)
 	}
 	if (nID != 0) // will be zero on a separator
 	{
-		strFullText = LanguageSelect.LoadString(nID);
+		strFullText = LanguageSelect.LoadString(static_cast<UINT>(nID));
 		// don't handle the message if no string resource found
 		String::size_type i = strFullText.find('\n');
 		C_ASSERT(-1 == String::npos);

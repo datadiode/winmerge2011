@@ -26,7 +26,7 @@ struct regexp_item
 		, global(false)
 	{
 	}
-	const char *assign(LPCTSTR pch, size_t cch);
+	const char *assign(LPCTSTR pch, int cch);
 	int execute(const char *subject, int length, int start,
 		int options, int *offsets, int offsetcount) const
 	{
@@ -41,7 +41,7 @@ struct regexp_item
 		pcre_free(pRegExp);
 		pcre_free(pRegExpExtra);
 	}
-	static size_t process(const stl::vector<regexp_item> &,
-		char *dst, const char *src, size_t len, LPCTSTR filename = NULL);
+	static int process(const stl::vector<regexp_item> &,
+		char *dst, const char *src, int len, LPCTSTR filename = NULL);
 	static bool indifferent(const stl::vector<regexp_item> &, LPCTSTR, LPCTSTR);
 };

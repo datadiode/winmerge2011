@@ -167,7 +167,7 @@ FileFilter *FileFilterMgr::LoadFilterFile(LPCTSTR szFilepath)
 		bLinesLeft = file.ReadString(sLine, sEol, &lossy);
 		static const TCHAR commentLeader[] = _T("##"); // Starts comment
 		// Ignore lines beginning with '##'
-		size_t pos = sLine.find(commentLeader);
+		String::size_type pos = sLine.find(commentLeader);
 		if (pos != 0)
 		{
 			// Find possible comment-separator '<whitespace>##'
@@ -212,7 +212,7 @@ FileFilter *FileFilterMgr::LoadFilterFile(LPCTSTR szFilepath)
 		{
 			// file prefilter
 			regexp_item item;
-			if (item.assign(psz, _tcslen(psz)))
+			if (item.assign(psz, static_cast<int>(_tcslen(psz))))
 			{
 				pfilter->fileprefilters.push_back(item);
 			}
@@ -221,7 +221,7 @@ FileFilter *FileFilterMgr::LoadFilterFile(LPCTSTR szFilepath)
 		{
 			// directory prefilter
 			regexp_item item;
-			if (item.assign(psz, _tcslen(psz)))
+			if (item.assign(psz, static_cast<int>(_tcslen(psz))))
 			{
 				pfilter->dirprefilters.push_back(item);
 			}

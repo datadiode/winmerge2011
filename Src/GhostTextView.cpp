@@ -43,24 +43,22 @@ CGhostTextView::CGhostTextView(size_t ZeroInit)
 {
 }
 
-void CGhostTextView::
-ReAttachToBuffer (CCrystalTextBuffer * pBuf /*= NULL*/ )
+void CGhostTextView::ReAttachToBuffer(CCrystalTextBuffer *pBuf /*= NULL*/ )
 {
 	if (pBuf == NULL)
 	{
-		pBuf = LocateTextBuffer ();
+		pBuf = LocateTextBuffer();
 		// ...
 	}
 	m_pGhostTextBuffer = static_cast<CGhostTextBuffer*>(pBuf);
 	CCrystalEditViewEx::ReAttachToBuffer(pBuf);
 }
 
-void CGhostTextView::
-AttachToBuffer (CCrystalTextBuffer * pBuf /*= NULL*/ )
+void CGhostTextView::AttachToBuffer(CCrystalTextBuffer *pBuf /*= NULL*/ )
 {
 	if (pBuf == NULL)
 	{
-		pBuf = LocateTextBuffer ();
+		pBuf = LocateTextBuffer();
 		// ...
 	}
 	m_pGhostTextBuffer = static_cast<CGhostTextBuffer*> (pBuf);

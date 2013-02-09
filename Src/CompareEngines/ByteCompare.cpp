@@ -63,16 +63,16 @@ inline bool is_single_bit(unsigned mask)
 }
 
 template<class CodePoint, int CodeShift>
-unsigned ByteCompare::CompareFiles(const size_t x, const size_t j)
+unsigned ByteCompare::CompareFiles(const stl_size_t x, const stl_size_t j)
 {
 	char buff[2][CMPBUFF + PADDING];
-	size_t bytes_ahead[2] = { 0, 0 };
-	size_t read_ahead_size[2] = { CMPBUFF, CMPBUFF };
+	stl_size_t bytes_ahead[2] = { 0, 0 };
+	stl_size_t read_ahead_size[2] = { CMPBUFF, CMPBUFF };
 	unsigned blankness_type[2] = { START, START };
 	unsigned blankness_type_prev[2];
 	unsigned nocount[2] = { 0, 0 };
 	unsigned *count[2] = { NULL, NULL };
-	size_t advancement[2];
+	stl_size_t advancement[2];
 	CodePoint c[2] = { '?', '?' };
 	CodePoint *cursor[2] = { c, c };
 	unsigned diffcode = DIFFCODE::SAME;
@@ -80,7 +80,7 @@ unsigned ByteCompare::CompareFiles(const size_t x, const size_t j)
 
 	while (true)
 	{
-		size_t i = j;
+		stl_size_t i = j;
 		do
 		{
 			if (unsigned *pcount = count[i])
@@ -281,7 +281,7 @@ unsigned ByteCompare::CompareFiles(FileLocation *location)
 		code = CompareFiles<ULONG, 16>();
 		break;
 	default:
-		size_t i = 0;
+		stl_size_t i = 0;
 		do
 		{
 			switch (location[i].encoding.m_unicoding)

@@ -260,16 +260,16 @@ String FileFilterHelper::ParseExtensions(const String &extensions) const
 
 	ext += _T(";"); // Add one separator char to end
 
-	size_t pos;
+	String::size_type pos;
 	while ((pos = ext.find_first_of(pszSeps)) != String::npos)
 	{
 		String token = ext.substr(0, pos); // Get first extension
 		ext = ext.substr(pos + 1); // Remove extension + separator
 		
-		if (size_t lentoken = token.length())
+		if (String::size_type lentoken = token.length())
 		{
 			strPattern += &_T("|\\\\")[strPattern.empty()]; // Omit the '|' if strPattern is still empty
-			for (size_t postoken = 0 ; postoken < lentoken ; ++postoken)
+			for (String::size_type postoken = 0 ; postoken < lentoken ; ++postoken)
 			{
 				switch (TCHAR c = token[postoken])
 				{

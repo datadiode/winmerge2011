@@ -69,7 +69,7 @@ struct CExcelExport::BiffRecord
 		size += sizeof value;
 		return *this;
 	}
-	BiffRecord &Append(const void *pv, size_t cb)
+	BiffRecord &Append(const void *pv, WORD cb)
 	{
 		memcpy(data + size, pv, cb);
 		size += cb;

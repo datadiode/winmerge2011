@@ -59,11 +59,11 @@ protected:
 	We share m_nUndoBufSize which is the max buffer size.
 	*/
 	stl::vector<GhostUndoRecord> m_aUndoBuf;
-	virtual const UndoRecord &GetUndoRecord(size_t i) const
+	virtual const UndoRecord &GetUndoRecord(stl_size_t i) const
 	{
 		return m_aUndoBuf[i];
 	}
-	virtual size_t GetUndoRecordCount() const
+	virtual stl_size_t GetUndoRecordCount() const
 	{
 		return m_aUndoBuf.size();
 	}

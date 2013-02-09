@@ -82,7 +82,7 @@ FindEncodingIdFromNameOrAlias(const char *encodingName)
 /**
  * @brief Parser for HTML files to find encoding information
  */
-static unsigned demoGuessEncoding_html(const char *src, size_t len)
+static unsigned demoGuessEncoding_html(const char *src, stl_size_t len)
 {
 	CMarkdown markdown(src, src + len, CMarkdown::Html);
 	//As <html> and <head> are optional, there is nothing to pull...
@@ -96,10 +96,10 @@ static unsigned demoGuessEncoding_html(const char *src, size_t len)
 				CMarkdown::String content = markdown.GetAttribute("content");
 				if (char *pchKey = content.A)
 				{
-					while (int cchKey = strcspn(pchKey += strspn(pchKey, "; \t\r\n"), ";="))
+					while (size_t cchKey = strcspn(pchKey += strspn(pchKey, "; \t\r\n"), ";="))
 					{
 						char *pchValue = pchKey + cchKey;
-						int cchValue = strcspn(pchValue += strspn(pchValue, "= \t\r\n"), "; \t\r\n");
+						size_t cchValue = strcspn(pchValue += strspn(pchValue, "= \t\r\n"), "; \t\r\n");
 						if (cchKey >= 7 && _memicmp(pchKey, "charset", 7) == 0 && (cchKey == 7 || strchr(" \t\r\n", pchKey[7])))
 						{
 							pchValue[cchValue] = '\0';
@@ -126,7 +126,7 @@ static unsigned demoGuessEncoding_html(const char *src, size_t len)
 /**
  * @brief Parser for XML files to find encoding information
  */
-static unsigned demoGuessEncoding_xml(const char *src, size_t len)
+static unsigned demoGuessEncoding_xml(const char *src, stl_size_t len)
 {
 	CMarkdown xml(src, src + len);
 	if (xml.Move("?xml"))
@@ -150,7 +150,7 @@ static unsigned demoGuessEncoding_xml(const char *src, size_t len)
  * @note sscanf() requires first argument to be zero-terminated so we must
  * copy lines to temporary buffer.
  */
-static unsigned demoGuessEncoding_rc(const char *src, size_t len)
+static unsigned demoGuessEncoding_rc(const char *src, stl_size_t len)
 {
 	unsigned cp = 0;
 	char line[80];
@@ -179,7 +179,7 @@ static unsigned demoGuessEncoding_rc(const char *src, size_t len)
  * @param [in] len Size of the file contents string.
  * @return Codepage number.
  */
-unsigned GuessEncoding_from_bytes(LPCTSTR ext, const char *src, size_t len)
+unsigned GuessEncoding_from_bytes(LPCTSTR ext, const char *src, stl_size_t len)
 {
 	if (len > BufSize)
 		len = BufSize;

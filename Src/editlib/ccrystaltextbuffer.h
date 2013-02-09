@@ -147,11 +147,11 @@ protected:
 	stl::vector<LineInfo> m_aLines; /**< Text lines. */
 
 	//  Undo
-	virtual const UndoRecord &GetUndoRecord(size_t i) const = 0;
-	virtual size_t GetUndoRecordCount() const = 0;
+	virtual const UndoRecord &GetUndoRecord(stl_size_t i) const = 0;
+	virtual stl_size_t GetUndoRecordCount() const = 0;
 
-	size_t m_nUndoPosition;
-	size_t m_nSyncPosition;
+	stl_size_t m_nUndoPosition;
+	stl_size_t m_nSyncPosition;
 	BOOL m_bUndoGroup, m_bUndoBeginGroup;
 
 	//BEGIN SW
@@ -266,8 +266,8 @@ public:
 
 
 	//  Browse undo sequence
-	size_t GetUndoActionCode(int &nAction, size_t pos = 0) const;
-	size_t GetRedoActionCode(int &nAction, size_t pos = 0) const;
+	stl_size_t GetUndoActionCode(int &nAction, stl_size_t pos = 0) const;
+	stl_size_t GetRedoActionCode(int &nAction, stl_size_t pos = 0) const;
 
 	//  Notify all connected views about changes in name of file
 	CCrystalTextView::TextDefinition *RetypeViews(LPCTSTR lpszFileName);

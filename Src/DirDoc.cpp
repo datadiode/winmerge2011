@@ -340,8 +340,8 @@ DIFFITEM *CDirFrame::FindItemFromPaths(LPCTSTR pathLeft, LPCTSTR pathRight)
 	LPCTSTR file1 = PathFindFileName(pathLeft);
 	LPCTSTR file2 = PathFindFileName(pathRight);
 
-	String path1(pathLeft, file1 - pathLeft); // include trailing backslash
-	String path2(pathRight, file2 - pathRight); // include trailing backslash
+	String path1(pathLeft, static_cast<String::size_type>(file1 - pathLeft)); // include trailing backslash
+	String path2(pathRight, static_cast<String::size_type>(file2 - pathRight)); // include trailing backslash
 
 	String base1 = m_pCtxt->GetLeftPath();
 	if (path1.compare(0, base1.length(), base1.c_str()) != 0)

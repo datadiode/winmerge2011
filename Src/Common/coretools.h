@@ -16,7 +16,7 @@ LPCWSTR NTAPI EatPrefixTrim(LPCWSTR text, LPCWSTR prefix);
 
 String GetModulePath(HMODULE hModule = NULL);
 
-size_t linelen(const char *string);
+int linelen(const char *string);
 
 DWORD NTAPI RunIt(LPCTSTR szExeFile, LPCTSTR szArgs, LPCTSTR szDir);
 

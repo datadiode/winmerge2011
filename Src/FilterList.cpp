@@ -33,7 +33,7 @@ extern "C" size_t apply_prediffer(struct file_data *current, short side, char *b
 		size_t s = 0;
 		while (s < len)
 		{
-			size_t d = s;
+			stl_size_t d = static_cast<stl_size_t>(s);
 			switch (char c = src[s++])
 			{
 			case '\r':
@@ -43,7 +43,7 @@ extern "C" size_t apply_prediffer(struct file_data *current, short side, char *b
 					if (pOptions->HasPredifferScripts())
 					{
 						BSTR chunk = ::SysAllocStringLen(NULL, d);
-						size_t i;
+						stl_size_t i;
 						for (i = 0 ; i < d ; ++i)
 							chunk[i] = static_cast<BYTE>(src[i]);
 						chunk = pOptions->ApplyPredifferScripts(filename.c_str(), chunk);
@@ -102,7 +102,7 @@ FilterList::~FilterList()
  */
 void FilterList::AddRegExp(LPCTSTR regularExpression)
 {
-	if (size_t len = _tcslen(regularExpression))
+	if (int len = static_cast<int>(_tcslen(regularExpression)))
 	{
 		regexp_item item;
 		if (const char *octets = item.assign(regularExpression, len))
@@ -116,8 +116,8 @@ void FilterList::AddRegExp(LPCTSTR regularExpression)
 
 void FilterList::AddFrom(LineFiltersList &list)
 {
-	size_t i = 0;
-	size_t n = list.GetCount();
+	stl_size_t i = 0;
+	stl_size_t n = list.GetCount();
 	String filter;
 	while (i < n)
 	{
@@ -127,7 +127,7 @@ void FilterList::AddFrom(LineFiltersList &list)
 			if (LPCTSTR regexp = EatPrefix(item.filterStr.c_str(), _T("regexp:")))
 			{
 				regexp_item filter;
-				if (filter.assign(regexp, _tcslen(regexp)))
+				if (filter.assign(regexp, static_cast<int>(_tcslen(regexp))))
 				{
 					m_predifferRegExps.push_back(filter);
 				}
@@ -138,7 +138,7 @@ void FilterList::AddFrom(LineFiltersList &list)
 				String moniker = item.filterStr;
 				env_ResolveMoniker(moniker);
 				String::size_type colon = moniker.find(
-					_T(':'), path - item.filterStr.c_str() + 2);
+					_T(':'), static_cast<String::size_type>(path - item.filterStr.c_str()) + 2);
 				C_ASSERT(String::npos == -1);
 				if (String::size_type extra = colon + 1)
 				{
@@ -188,7 +188,7 @@ void FilterList::RemoveAllFilters()
  * @param [in] codepage codepage of string.
  * @return true if any of the expressions did match the string.
  */
-bool FilterList::Match(size_t stringlen, const char *string, int codepage)
+bool FilterList::Match(int stringlen, const char *string, int codepage)
 {
 	// convert string into UTF-8
 	ucr::buffer buf(0);
@@ -242,7 +242,7 @@ BSTR FilterList::ApplyPredifferScripts(LPCTSTR filename, BSTR bstr)
 	return V_BSTR(&var);
 }
 
-size_t FilterList::ApplyPredifferRegExps(LPCTSTR filename, char *dst, const char *src, size_t len) const
+int FilterList::ApplyPredifferRegExps(LPCTSTR filename, char *dst, const char *src, int len) const
 {
 	return regexp_item::process(m_predifferRegExps, dst, src, len, filename);
 }

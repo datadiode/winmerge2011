@@ -242,7 +242,7 @@ void CGhostTextBuffer::GetTextWithoutEmptys(int nStartLine, int nStartChar,
 			}
 		}
 	}
-	text.resize(pszBuf - text.c_str());
+	text.resize(static_cast<String::size_type>(pszBuf - text.c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -410,8 +410,8 @@ bool CGhostTextBuffer::Undo(CCrystalTextView *pSource, POINT &ptCursorPos)
 		}
 
 		// restore line revision numbers
-		size_t naSavedRevisonNumbersSize = ur.m_paSavedRevisonNumbers.size();
-		for (size_t i = 0; i < naSavedRevisonNumbersSize; i++)
+		stl_size_t naSavedRevisonNumbersSize = ur.m_paSavedRevisonNumbers.size();
+		for (stl_size_t i = 0; i < naSavedRevisonNumbersSize; i++)
 			m_aLines[apparent_ptStartPos.y + i].m_dwRevisionNumber = ur.m_paSavedRevisonNumbers[i];
 
 	} while ((dwFlags & UNDO_BEGINGROUP) == 0);
@@ -796,8 +796,8 @@ BOOL CGhostTextBuffer::InsertGhostLine(CCrystalTextView * pSource, int nLine)
 void CGhostTextBuffer::RemoveAllGhostLines(DWORD dwMask)
 {
 	const size_t n = m_aLines.size();
-	size_t i = 0;
-	size_t j = 0;
+	stl_size_t i = 0;
+	stl_size_t j = 0;
 	// Free the buffer of ghost lines, and compact non-ghost lines
 	// (we copy the buffer address, so the buffer don't move and we don't free it)
 	while (i < n)
@@ -1049,9 +1049,9 @@ void CGhostTextBuffer::FinishLoading()
 void CGhostTextBuffer::RecomputeRealityMapping()
 {
 	m_RealityBlocks.clear();
-	size_t reality = 0; // last encountered real line
-	size_t i = 0; // current line
-	const size_t n = m_aLines.size();
+	stl_size_t reality = 0; // last encountered real line
+	stl_size_t i = 0; // current line
+	const stl_size_t n = m_aLines.size();
 
 	// This used to be a state machine with 2 states, but has been converted to
 	// human-readable code to help get an idea how to account for skipped lines.

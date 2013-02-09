@@ -213,7 +213,7 @@ void CCrystalTextView::MoveWordRight(BOOL bSelect)
 
 	LPCTSTR pszChars = GetLineChars(m_ptCursorPos.y);
 	int nPos = m_ptCursorPos.x;
-	if (xisalnum (pszChars[nPos]))
+	if (xisalnum(pszChars[nPos]))
 	{
 		while (nPos < nLength && xisalnum(pszChars[nPos]))
 			++nPos;
@@ -592,9 +592,9 @@ void CCrystalTextView::OnLButtonDown(LPARAM lParam)
           SetSelection(ptStart, ptEnd);
           UpdateCaret();
 
-          SetCapture ();
-          m_nDragSelTimer = SetTimer (CRYSTAL_TIMER_DRAGSEL, 100, NULL);
-          ASSERT (m_nDragSelTimer != 0);
+          SetCapture();
+          m_nDragSelTimer = SetTimer(CRYSTAL_TIMER_DRAGSEL, 100, NULL);
+          ASSERT(m_nDragSelTimer != 0);
           m_bWordSelection = false;
           m_bLineSelection = true;
           m_bDragSelection = true;

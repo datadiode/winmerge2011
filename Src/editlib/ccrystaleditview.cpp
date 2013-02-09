@@ -152,13 +152,13 @@ void CCrystalEditView::Paste()
 	if (LPCTSTR pszText = reinterpret_cast<LPTSTR>(::GlobalLock(hData)))
 	{
 		SIZE_T cbData = ::GlobalSize(hData);
-		int cchText = cbData / sizeof(TCHAR) - 1;
+		int cchText = static_cast<int>(cbData / sizeof(TCHAR) - 1);
 
 		if (cchText <= 0)
 			cchText = 0;
 		// If in doubt, assume zero-terminated string
 		else if (!IsClipboardFormatAvailable(RegisterClipboardFormat(_T("WinMergeClipboard"))))
-			cchText = _tcslen(pszText);
+			cchText = static_cast<int>(_tcslen(pszText));
 
 		m_pTextBuffer->BeginUndoGroup();
 
@@ -297,7 +297,7 @@ void CCrystalEditView::OnChar(WPARAM nChar)
             ptCursorPos = GetCursorPos();
           ASSERT_VALIDTEXTPOS(ptCursorPos);
           LPCTSTR pszText = m_pTextBuffer->GetDefaultEol();
-          int cchText = _tcslen(pszText);
+          int cchText = static_cast<int>(_tcslen(pszText));
 
           ptCursorPos = m_pTextBuffer->InsertText(this, ptCursorPos.y, ptCursorPos.x, pszText, cchText, CE_ACTION_TYPING);  //  [JRT]
           ASSERT_VALIDTEXTPOS(ptCursorPos);
@@ -444,7 +444,7 @@ void CCrystalEditView::OnEditTab()
 		m_bHorzScrollBarLocked = TRUE;
 		for (int i = nStartLine ; i <= nEndLine ; ++i)
 		{
-			m_pTextBuffer->InsertText(this, i, 0, pszText, _tcslen(pszText), CE_ACTION_INDENT);  //  [JRT]
+			m_pTextBuffer->InsertText(this, i, 0, pszText, static_cast<int>(_tcslen(pszText)), CE_ACTION_INDENT);  //  [JRT]
 		}
 		m_bHorzScrollBarLocked = FALSE;
 		RecalcHorzScrollBar();
@@ -493,7 +493,7 @@ void CCrystalEditView::OnEditTab()
 	}
 
 	// No selection, add tab
-	ptCursorPos = m_pTextBuffer->InsertText(this, ptCursorPos.y, ptCursorPos.x, pszText, _tcslen(pszText), CE_ACTION_TYPING);  //  [JRT]
+	ptCursorPos = m_pTextBuffer->InsertText(this, ptCursorPos.y, ptCursorPos.x, pszText, static_cast<int>(_tcslen(pszText)), CE_ACTION_TYPING);  //  [JRT]
 	ASSERT_VALIDTEXTPOS(ptCursorPos);
 	SetSelection(ptCursorPos, ptCursorPos);
 	SetAnchor(ptCursorPos);
@@ -746,7 +746,7 @@ bool CCrystalEditView::DoDropText(HGLOBAL hData, const POINT &ptClient)
 	}
 
 	SIZE_T cbData = ::GlobalSize(hData);
-	int cchText = cbData / sizeof(TCHAR) - 1;
+	int cchText = static_cast<int>(cbData / sizeof(TCHAR) - 1);
 	if (cchText < 0)
 		return false;
 	LPTSTR pszText = reinterpret_cast<LPTSTR>(::GlobalLock(hData));
@@ -1020,7 +1020,7 @@ int bracetype(TCHAR c)
 {
 	static const TCHAR braces[] = _T("{}()[]<>");
 	LPCTSTR pos = _tcschr(braces, c);
-	return pos ? pos - braces + 1 : 0;
+	return pos ? static_cast<int>(pos - braces) + 1 : 0;
 }
 
 static int bracetype(LPCTSTR s)
@@ -1148,7 +1148,7 @@ void CCrystalEditView::OnEditOperation(int nAction, LPCTSTR pszText)
           //  Enter stroke!
           POINT ptCursorPos = GetCursorPos();
           LPCTSTR pszChars = m_pTextBuffer->GetLineChars(ptCursorPos.y);
-          if (ptCursorPos.x > 1 && xisalnum (pszChars[ptCursorPos.x - 2]))
+          if (ptCursorPos.x > 1 && xisalnum(pszChars[ptCursorPos.x - 2]))
             {
               LPTSTR pszInsertStr = (TCHAR *) _alloca (sizeof (TCHAR) * 2);
               *pszInsertStr = _T(' ');

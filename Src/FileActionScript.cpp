@@ -67,9 +67,9 @@ bool FileActionScript::Run(HWND hwnd, FILEOP_FLAGS flags)
 
 	for (iter = m_actions.begin() ; iter != m_actions.end() ; ++iter)
 	{
-		if (size_t len = iter->src.length())
+		if (String::size_type len = iter->src.length())
 			cchSource[iter->atype] += len + 1;
-		if (size_t len = iter->dest.length())
+		if (String::size_type len = iter->dest.length())
 			cchDestination[iter->atype] += len + 1;
 	}
 

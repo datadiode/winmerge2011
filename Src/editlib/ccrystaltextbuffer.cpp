@@ -351,13 +351,13 @@ const LineInfo &CCrystalTextBuffer::GetLineInfo(int nLine) const
 
 int CCrystalTextBuffer::FindLineWithFlag(DWORD dwFlag) const
 {
-  const size_t nSize = m_aLines.size();
-  for (size_t L = 0; L < nSize; L++)
-    {
-      if ((m_aLines[L].m_dwFlags & dwFlag) != 0)
-        return (int) L;
-    }
-  return -1;
+	const stl_size_t nSize = m_aLines.size();
+	for (stl_size_t L = 0; L < nSize; L++)
+	{
+		if ((m_aLines[L].m_dwFlags & dwFlag) != 0)
+			return static_cast<int>(L);
+	}
+	return -1;
 }
 
 int CCrystalTextBuffer::GetLineWithFlag(DWORD dwFlag) const
@@ -431,7 +431,7 @@ void CCrystalTextBuffer::GetTextWithoutEmptys(int nStartLine, int nStartChar,
 
 
 void CCrystalTextBuffer::GetText(int nStartLine, int nStartChar, int nEndLine, int nEndChar,
-	String & text, LPCTSTR pszCRLF) const
+	String &text, LPCTSTR pszCRLF) const
 {
   ASSERT(m_bInit);             //  Text buffer not yet initialized.
   //  You must call InitNew() or LoadFromFile() first!
@@ -449,7 +449,7 @@ void CCrystalTextBuffer::GetText(int nStartLine, int nStartChar, int nEndLine, i
 
   if (pszCRLF == NULL)
     pszCRLF = crlf;
-  int nCRLFLength = (int) _tcslen (pszCRLF);
+  int nCRLFLength = static_cast<int>(_tcslen(pszCRLF));
   ASSERT(nCRLFLength > 0);
 
   int nBufSize = 0;
@@ -468,10 +468,10 @@ void CCrystalTextBuffer::GetText(int nStartLine, int nStartChar, int nEndLine, i
       int nCount = startLine.Length() - nStartChar;
       if (nCount > 0)
         {
-          memcpy (pszBuf, startLine.GetLine(nStartChar), sizeof (TCHAR) * nCount);
+          memcpy(pszBuf, startLine.GetLine(nStartChar), sizeof(TCHAR) * nCount);
           pszBuf += nCount;
         }
-      memcpy (pszBuf, pszCRLF, sizeof (TCHAR) * nCRLFLength);
+      memcpy(pszBuf, pszCRLF, sizeof(TCHAR) * nCRLFLength);
       pszBuf += nCRLFLength;
       for (int I = nStartLine + 1; I < nEndLine; I++)
         {
@@ -479,25 +479,25 @@ void CCrystalTextBuffer::GetText(int nStartLine, int nStartChar, int nEndLine, i
           nCount = li.Length();
           if (nCount > 0)
             {
-              memcpy (pszBuf, li.GetLine(), sizeof (TCHAR) * nCount);
+              memcpy(pszBuf, li.GetLine(), sizeof(TCHAR) * nCount);
               pszBuf += nCount;
             }
-          memcpy (pszBuf, pszCRLF, sizeof (TCHAR) * nCRLFLength);
+          memcpy(pszBuf, pszCRLF, sizeof(TCHAR) * nCRLFLength);
           pszBuf += nCRLFLength;
         }
       if (nEndChar > 0)
         {
-          memcpy (pszBuf, m_aLines[nEndLine].GetLine(), sizeof (TCHAR) * nEndChar);
+          memcpy(pszBuf, m_aLines[nEndLine].GetLine(), sizeof(TCHAR) * nEndChar);
           pszBuf += nEndChar;
         }
     }
   else
     {
       int nCount = nEndChar - nStartChar;
-      memcpy (pszBuf, startLine.GetLine(nStartChar), sizeof (TCHAR) * nCount);
+      memcpy(pszBuf, startLine.GetLine(nStartChar), sizeof(TCHAR) * nCount);
       pszBuf += nCount;
     }
-  text.resize(pszBuf - text.c_str());
+  text.resize(static_cast<String::size_type>(pszBuf - text.c_str()));
 }
 
 void CCrystalTextBuffer::AddView(CCrystalTextView * pView)
@@ -791,7 +791,7 @@ bool CCrystalTextBuffer::CanRedo() const
 	return m_nUndoPosition < GetUndoRecordCount();
 }
 
-size_t CCrystalTextBuffer::GetUndoActionCode(int & nAction, size_t pos) const
+stl_size_t CCrystalTextBuffer::GetUndoActionCode(int & nAction, stl_size_t pos) const
 {
 	ASSERT(CanUndo());          //  Please call CanUndo() first
 	ASSERT((GetUndoRecord(0).m_dwFlags & UNDO_BEGINGROUP) != 0);
@@ -817,7 +817,7 @@ size_t CCrystalTextBuffer::GetUndoActionCode(int & nAction, size_t pos) const
 	return pos;
 }
 
-size_t CCrystalTextBuffer::GetRedoActionCode(int & nAction, size_t pos) const
+stl_size_t CCrystalTextBuffer::GetRedoActionCode(int & nAction, stl_size_t pos) const
 {
 	ASSERT(CanRedo());          //  Please call CanRedo() before!
 	ASSERT((GetUndoRecord(0).m_dwFlags & UNDO_BEGINGROUP) != 0);
@@ -927,11 +927,11 @@ int CCrystalTextBuffer::FindNextBookmarkLine(int nCurrentLine) const
 int CCrystalTextBuffer::FindPrevBookmarkLine(int nCurrentLine) const
 {
   BOOL bWrapIt = TRUE;
-  DWORD dwFlags = GetLineFlags (nCurrentLine);
+  DWORD dwFlags = GetLineFlags(nCurrentLine);
   if ((dwFlags & LF_BOOKMARKS) != 0)
     nCurrentLine--;
 
-  const size_t nSize = m_aLines.size ();
+  const stl_size_t nSize = m_aLines.size();
   for (;;)
     {
       while (nCurrentLine >= 0)

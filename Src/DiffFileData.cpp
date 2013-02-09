@@ -30,7 +30,7 @@ DiffFileData::DiffFileData(int codepage)
 	m_used = false;
 	Reset();
 	// Set default codepages
-	for (size_t i = 0 ; i < m_FileLocation.size() ; ++i)
+	for (stl_size_t i = 0 ; i < m_FileLocation.size() ; ++i)
 	{
 		m_FileLocation[i].encoding.SetCodepage(codepage);
 	}

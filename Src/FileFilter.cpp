@@ -99,14 +99,14 @@ bool FileFilter::TestDirNameAgainstFilter(LPCTSTR szDirName) const
 	return default_include;
 }
 
-size_t FileFilter::ApplyPrefilterRegExps(const vector<regexp_item> &filterList, char *dst, const char *src, size_t len)
+stl_size_t FileFilter::ApplyPrefilterRegExps(const vector<regexp_item> &filterList, char *dst, const char *src, stl_size_t len)
 {
 	stl::vector<regexp_item>::const_iterator iter = filterList.begin();
 	while (iter != filterList.end())
 	{
 		const regexp_item &filter = *iter++;
 		char *buf = dst;
-		size_t i = 0;
+		stl_size_t i = 0;
 		while (i < len)
 		{
 			int ovector[33];
@@ -120,15 +120,15 @@ size_t FileFilter::ApplyPrefilterRegExps(const vector<regexp_item> &filterList, 
 			ovector[matches2] = ovector[1];
 			ovector[1] = ovector[0];
 			HString *const injectString = filter.injectString;
-			size_t const injectLength = injectString->ByteLen();
+			stl_size_t const injectLength = injectString->ByteLen();
 			int index = 1;
-			size_t j;
+			stl_size_t j;
 			do
 			{
 				j = ovector[index];
 				if (i < j)
 				{
-					size_t d = j - i;
+					stl_size_t d = j - i;
 					if (index == 1 || (index & 1) == 0)
 					{
 						memcpy(buf, src + i, d);
@@ -147,14 +147,14 @@ size_t FileFilter::ApplyPrefilterRegExps(const vector<regexp_item> &filterList, 
 				j = len;
 				if (i < j)
 				{
-					size_t d = j - i;
+					stl_size_t d = j - i;
 					memcpy(buf, src + i, d);
 					buf += d;
 				}
 			}
 			i = j;
 		}
-		len = buf - dst;
+		len = static_cast<stl_size_t>(buf - dst);
 		src = dst;
 	}
 	return len;

@@ -1705,7 +1705,7 @@ void CDirView::OnCopyLeftPathnames()
 					file.WriteString(_T(" "), 1);
 				String spath = ctxt->GetLeftFilepathAndName(di);
 				LPCTSTR path = paths_UndoMagic(&spath.front());
-				file.WriteString(path, spath.c_str() + spath.length() - path);
+				file.WriteString(path, static_cast<String::size_type>(spath.c_str() + spath.length() - path));
 			}
 		}
 		file.WriteString(_T(""), 1);
@@ -1739,7 +1739,7 @@ void CDirView::OnCopyRightPathnames()
 					file.WriteString(_T(" "), 1);
 				String spath = ctxt->GetRightFilepathAndName(di);
 				LPCTSTR path = paths_UndoMagic(&spath.front());
-				file.WriteString(path, spath.c_str() + spath.length() - path);
+				file.WriteString(path, static_cast<String::size_type>(spath.c_str() + spath.length() - path));
 			}
 		}
 		file.WriteString(_T(""), 1);
@@ -1773,7 +1773,7 @@ void CDirView::OnCopyBothPathnames()
 					file.WriteString(_T(" "), 1);
 				String spath = ctxt->GetLeftFilepathAndName(di);
 				LPCTSTR path = paths_UndoMagic(&spath.front());
-				file.WriteString(path, spath.c_str() + spath.length() - path);
+				file.WriteString(path, static_cast<String::size_type>(spath.c_str() + spath.length() - path));
 			}
 			if (!di->isSideLeftOnly())
 			{
@@ -1783,7 +1783,7 @@ void CDirView::OnCopyBothPathnames()
 					file.WriteString(_T(" "), 1);
 				String spath = ctxt->GetRightFilepathAndName(di);
 				LPCTSTR path = paths_UndoMagic(&spath.front());
-				file.WriteString(path, spath.c_str() + spath.length() - path);
+				file.WriteString(path, static_cast<String::size_type>(spath.c_str() + spath.length() - path));
 			}
 		}
 		file.WriteString(_T(""), 1);
@@ -2210,13 +2210,13 @@ void CDirView::PrepareDragData(UniStdioFile &file)
 		{
 			String spath = ctxt->GetLeftFilepathAndName(diffitem);
 			LPCTSTR path = paths_UndoMagic(&spath.front());
-			file.WriteString(path, spath.c_str() + spath.length() - path);
+			file.WriteString(path, static_cast<String::size_type>(spath.c_str() + spath.length() - path));
 		}
 		else if (diffitem->isSideRightOnly())
 		{
 			String spath = ctxt->GetRightFilepathAndName(diffitem);
 			LPCTSTR path = paths_UndoMagic(&spath.front());
-			file.WriteString(path, spath.c_str() + spath.length() - path);
+			file.WriteString(path, static_cast<String::size_type>(spath.c_str() + spath.length() - path));
 		}
 		else if (diffitem->isSideBoth())
 		{
@@ -2224,7 +2224,7 @@ void CDirView::PrepareDragData(UniStdioFile &file)
 			// so we put file from the left panel
 			String spath = ctxt->GetLeftFilepathAndName(diffitem);
 			LPCTSTR path = paths_UndoMagic(&spath.front());
-			file.WriteString(path, spath.c_str() + spath.length() - path);
+			file.WriteString(path, static_cast<String::size_type>(spath.c_str() + spath.length() - path));
 
 			// if both files are different then we also put file from the right panel 
 			if (diffitem->isResultDiff())
@@ -2232,7 +2232,7 @@ void CDirView::PrepareDragData(UniStdioFile &file)
 				file.WriteString(_T("\n"), 1); // end of left file path
 				String spath = ctxt->GetRightFilepathAndName(diffitem);
 				LPCTSTR path = paths_UndoMagic(&spath.front());
-				file.WriteString(path, spath.c_str() + spath.length() - path);
+				file.WriteString(path, static_cast<String::size_type>(spath.c_str() + spath.length() - path));
 			}
 		}
 		file.WriteString(_T("\n"), 1); // end of file path

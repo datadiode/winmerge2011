@@ -247,7 +247,7 @@ template<>
 LRESULT CHexMergeFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 {
 	CHexMergeView *pActiveView = GetActiveView();
-	switch (const UINT id = lParam ? wParam : LOWORD(wParam))
+	switch (const UINT id = lParam ? static_cast<UINT>(wParam) : LOWORD(wParam))
 	{
 	case ID_FIRSTDIFF:
 		pActiveView->OnFirstdiff();

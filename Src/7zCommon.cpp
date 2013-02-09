@@ -730,7 +730,7 @@ UINT CDirView::DirItemEnumerator::Open()
 	m_nIndex = -1;
 	m_curFolderPrefix = m_rgFolderPrefix.begin();
 	m_bRight = (m_nFlags & Right) != 0;
-	stl::list<String>::size_type nrgFolderPrefix = m_rgFolderPrefix.size();
+	stl_size_t nrgFolderPrefix = m_rgFolderPrefix.size();
 	if (nrgFolderPrefix)
 	{
 		m_strFolderPrefix = *m_curFolderPrefix++;

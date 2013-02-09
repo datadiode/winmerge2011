@@ -54,7 +54,7 @@ struct FileFilter
 	// methods to actually use filter
 	bool TestFileNameAgainstFilter(LPCTSTR szFileName) const;
 	bool TestDirNameAgainstFilter(LPCTSTR szDirName) const;
-	static size_t ApplyPrefilterRegExps(const stl::vector<regexp_item> &, char *dst, const char *src, size_t len);
+	static stl_size_t ApplyPrefilterRegExps(const stl::vector<regexp_item> &, char *dst, const char *src, stl_size_t len);
 private:
 	static bool TestAgainstRegList(const stl::vector<regexp_item> &, LPCTSTR);
 	static void EmptyFilterList(stl::vector<regexp_item> &);

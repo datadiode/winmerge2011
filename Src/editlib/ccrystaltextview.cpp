@@ -128,7 +128,7 @@ const COLORREF SAVED_REVMARK_CLR = RGB(0x00, 0xFF, 0x00);
 
 #define ICON_INDEX_WRAPLINE         15
 
-static void setAtGrow(stl::vector<int> &v, size_t index, int value)
+static void setAtGrow(stl::vector<int> &v, stl_size_t index, int value)
 {
 	if (v.size() <= index)
 	{
@@ -1824,7 +1824,7 @@ void CCrystalTextView::UpdateCaret(bool bShowHide)
 {
 	ASSERT_VALIDTEXTPOS(m_ptCursorPos);
 	if (m_bFocused && !m_bCursorHidden &&
-		CalculateActualOffset (m_ptCursorPos.y, m_ptCursorPos.x) >= m_nOffsetChar)
+		CalculateActualOffset(m_ptCursorPos.y, m_ptCursorPos.x) >= m_nOffsetChar)
 	{
 		CreateCaret(NULL, m_bOverrideCaret ? GetCharWidth() : 2, GetLineHeight());
 		POINT ptCaretPos = TextToClient(m_ptCursorPos);
@@ -3044,35 +3044,35 @@ void CCrystalTextView::UpdateView(CCrystalTextView *pSource, CUpdateContext *pCo
       //  All text below this line should be reparsed
       if (m_ParseCookies.size())
         {
-          size_t arrSize = m_ParseCookies.size();
+          stl_size_t arrSize = m_ParseCookies.size();
           if (arrSize != nLineCount)
             {
-              size_t oldsize = arrSize; 
+              stl_size_t oldsize = arrSize; 
               m_ParseCookies.resize(nLineCount);
               arrSize = nLineCount;
               // must be initialized to invalid value (DWORD) - 1
-              for (size_t i = oldsize; i < arrSize; ++i)
+              for (stl_size_t i = oldsize; i < arrSize; ++i)
                 m_ParseCookies[i] = -1;
             }
-          for (size_t i = nLineIndex; i < arrSize; ++i)
+          for (stl_size_t i = nLineIndex; i < arrSize; ++i)
             m_ParseCookies[i] = -1;
         }
 
       //  Recalculate actual length for all lines below this
       if (m_pnActualLineLength.size())
         {
-			size_t arrsize = m_pnActualLineLength.size();
+			stl_size_t arrsize = m_pnActualLineLength.size();
 			if (arrsize != nLineCount)
             {
               //  Reallocate actual length array
-              size_t oldsize = arrsize; 
+              stl_size_t oldsize = arrsize; 
               m_pnActualLineLength.resize(nLineCount);
 			  arrsize = nLineCount;
               // must be initialized to invalid code -1
-              for (size_t i = oldsize; i < arrsize; ++i)
+              for (stl_size_t i = oldsize; i < arrsize; ++i)
                 m_pnActualLineLength[i] = -1;
             }
-          for (size_t i = nLineIndex; i < arrsize; ++i)
+          for (stl_size_t i = nLineIndex; i < arrsize; ++i)
             m_pnActualLineLength[i] = -1;
         }
     //BEGIN SW
@@ -3358,28 +3358,28 @@ static int FindStringHelper(LPCTSTR pszFindWhere, LPCTSTR pszFindWhat, DWORD dwF
       ASSERT(pszFindWhere != NULL);
       ASSERT(pszFindWhat != NULL);
       int nCur = 0;
-      int nLength = _tcslen (pszFindWhat);
+      int nLength = static_cast<int>(_tcslen(pszFindWhat));
       nLen = nLength;
       for (;;)
         {
-          LPCTSTR pszPos = _tcsstr (pszFindWhere, pszFindWhat);
+          LPCTSTR pszPos = _tcsstr(pszFindWhere, pszFindWhat);
           if (pszPos == NULL)
             return -1;
           if ((dwFlags & FIND_WHOLE_WORD) == 0)
-            return nCur + (pszPos - pszFindWhere);
-          if (pszPos > pszFindWhere && xisalnum (pszPos[-1]))
+            return nCur + static_cast<int>(pszPos - pszFindWhere);
+          if (pszPos > pszFindWhere && xisalnum(pszPos[-1]))
             {
-              nCur += (pszPos - pszFindWhere + 1);
+              nCur += static_cast<int>(pszPos - pszFindWhere + 1);
               pszFindWhere = pszPos + 1;
               continue;
             }
-          if (xisalnum (pszPos[nLength]))
+          if (xisalnum(pszPos[nLength]))
             {
-              nCur += (pszPos - pszFindWhere + 1);
+              nCur += static_cast<int>(pszPos - pszFindWhere + 1);
               pszFindWhere = pszPos + 1;
               continue;
             }
-          return nCur + (pszPos - pszFindWhere);
+          return nCur + static_cast<int>(pszPos - pszFindWhere);
         }
     }
   ASSERT(FALSE);               // Unreachable
@@ -3445,28 +3445,28 @@ BOOL CCrystalTextView::FindText(
 		dwFlags, bWrapSearch, pptFoundPos);
 }
 
-int HowManyStr (LPCTSTR s, LPCTSTR m)
+int HowManyStr(LPCTSTR s, LPCTSTR m)
 {
-  LPCTSTR p = s;
-  int n = 0, l = _tcslen (m);
-  while ((p = _tcsstr (p, m)) != NULL)
-    {
-      n++;
-      p += l;
-    }
-  return n;
+	LPCTSTR p = s;
+	int n = 0, l = static_cast<int>(_tcslen(m));
+	while ((p = _tcsstr(p, m)) != NULL)
+	{
+		n++;
+		p += l;
+	}
+	return n;
 }
 
-int HowManyStr (LPCTSTR s, TCHAR c)
+int HowManyStr(LPCTSTR s, TCHAR c)
 {
-  LPCTSTR p = s;
-  int n = 0;
-  while ((p = _tcschr (p, c)) != NULL)
-    {
-      n++;
-      p++;
-    }
-  return n;
+	LPCTSTR p = s;
+	int n = 0;
+	while ((p = _tcschr(p, c)) != NULL)
+	{
+		n++;
+		p++;
+	}
+	return n;
 }
 
 BOOL CCrystalTextView::FindTextInBlock(
@@ -3656,11 +3656,11 @@ BOOL CCrystalTextView::FindTextInBlock(
                       if (nEolns)
                         {
                           ptCurrentPos.y += nEolns;
-                          ptCurrentPos.x = nPos - (current - item.c_str());
+                          ptCurrentPos.x = nPos - static_cast<int>(current - item.c_str());
                         }
                       else
                         {
-                          ptCurrentPos.x += nPos - (current - item.c_str());
+                          ptCurrentPos.x += nPos - static_cast<int>(current - item.c_str());
                         }
                       if (ptCurrentPos.x < 0)
                         ptCurrentPos.x = 0;
@@ -4047,19 +4047,19 @@ void CCrystalTextView::OnMatchBrace()
           if (!(nOther & 1))
             pszEnd++;
         }
-      LPCTSTR pszOpenComment = m_CurSourceDef->opencomment,
-        pszCloseComment = m_CurSourceDef->closecomment,
-        pszCommentLine = m_CurSourceDef->commentline, pszTest;
-      int nOpenComment = _tcslen (pszOpenComment),
-        nCloseComment = _tcslen (pszCloseComment),
-        nCommentLine = _tcslen (pszCommentLine);
+      LPCTSTR pszOpenComment = m_CurSourceDef->opencomment;
+      LPCTSTR pszCloseComment = m_CurSourceDef->closecomment;
+      LPCTSTR pszCommentLine = m_CurSourceDef->commentline;
+      int nOpenComment = static_cast<int>(_tcslen(pszOpenComment));
+      int nCloseComment = static_cast<int>(_tcslen(pszCloseComment));
+      int nCommentLine = static_cast<int>(_tcslen(pszCommentLine));
       if (nOther & 1)
         {
           for (;;)
             {
               while (--pszEnd >= pszText)
                 {
-                  pszTest = pszEnd - nOpenComment + 1;
+                  LPCTSTR pszTest = pszEnd - nOpenComment + 1;
                   if (pszTest >= pszText && !_tcsnicmp(pszTest, pszOpenComment, nOpenComment))
                     {
                       nComment--;
@@ -4094,7 +4094,7 @@ void CCrystalTextView::OnMatchBrace()
                         {
                           if (!nCount--)
                             {
-                              ptCursorPos.x = pszEnd - pszText;
+                              ptCursorPos.x = static_cast<int>(pszEnd - pszText);
                               if (bAfter)
                                 ptCursorPos.x++;
                               SetSelection(ptCursorPos, ptCursorPos);
@@ -4126,7 +4126,7 @@ void CCrystalTextView::OnMatchBrace()
             {
               while (pszText < pszEnd)
                 {
-                  pszTest = pszText + nCloseComment;
+                  LPCTSTR pszTest = pszText + nCloseComment;
                   if (pszTest <= pszEnd && !_tcsnicmp(pszText, pszCloseComment, nCloseComment))
                     {
                       nComment--;
@@ -4161,7 +4161,7 @@ void CCrystalTextView::OnMatchBrace()
                         {
                           if (!nCount--)
                             {
-                              ptCursorPos.x = pszText - pszBegin;
+                              ptCursorPos.x = static_cast<int>(pszText - pszBegin);
                               if (bAfter)
                                 ptCursorPos.x++;
                               SetSelection(ptCursorPos, ptCursorPos);

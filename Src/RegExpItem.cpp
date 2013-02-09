@@ -2,12 +2,12 @@
 #include "pcre.h"
 #include "RegExpItem.h"
 
-static size_t FindSlash(LPCTSTR buf, size_t len)
+static int FindSlash(LPCTSTR buf, int len)
 {
 	if (len > 0 && *buf == '/')
 	{
 		int e = 0;
-		size_t i = 0;
+		int i = 0;
 		while (i < len)
 		{
 			switch (buf[++i])
@@ -28,12 +28,12 @@ static size_t FindSlash(LPCTSTR buf, size_t len)
 	return 0;
 }
 
-const char *regexp_item::assign(LPCTSTR pch, size_t cch)
+const char *regexp_item::assign(LPCTSTR pch, int cch)
 {
 	UINT codepage = CP_ACP;
-	if (const size_t i = FindSlash(pch, cch))
+	if (const int i = FindSlash(pch, cch))
 	{
-		size_t j = i;
+		int j = i;
 		while (++j < cch)
 		{
 			switch (pch[j])
@@ -56,7 +56,7 @@ const char *regexp_item::assign(LPCTSTR pch, size_t cch)
 					injectString = HString::Uni(q,
 						static_cast<UINT>(pch + cch - q))->Oct(codepage);
 					// Exclude the <injectString from further processing.
-					cch = p - pch;
+					cch = static_cast<int>(p - pch);
 					// Bail out if the colon was omitted.
 					if (cch == j)
 						break;
@@ -87,8 +87,8 @@ const char *regexp_item::assign(LPCTSTR pch, size_t cch)
 	return filterString->A;
 }
 
-size_t regexp_item::process(const stl::vector<regexp_item> &relist,
-	char *dst, const char *src, size_t len, LPCTSTR filename)
+int regexp_item::process(const stl::vector<regexp_item> &relist,
+	char *dst, const char *src, int len, LPCTSTR filename)
 {
 	stl::vector<regexp_item>::const_iterator iter = relist.begin();
 	while (iter != relist.end())
@@ -97,7 +97,7 @@ size_t regexp_item::process(const stl::vector<regexp_item> &relist,
 		if (filename && filter.filenameSpec && !::PathMatchSpec(filename, filter.filenameSpec->T))
 			continue;
 		char *buf = dst;
-		size_t i = 0;
+		int i = 0;
 		while (i < len)
 		{
 			int ovector[33];
@@ -111,9 +111,9 @@ size_t regexp_item::process(const stl::vector<regexp_item> &relist,
 			ovector[matches2] = ovector[1];
 			ovector[1] = ovector[0];
 			HString *const injectString = filter.injectString;
-			size_t const injectLength = injectString->ByteLen();
+			UINT const injectLength = injectString->ByteLen();
 			int index = 1;
-			size_t j;
+			int j;
 			do
 			{
 				j = ovector[index];
@@ -138,14 +138,14 @@ size_t regexp_item::process(const stl::vector<regexp_item> &relist,
 				j = len;
 				if (i < j)
 				{
-					size_t d = j - i;
+					int d = j - i;
 					memcpy(buf, src + i, d);
 					buf += d;
 				}
 			}
 			i = j;
 		}
-		len = buf - dst;
+		len = static_cast<int>(buf - dst);
 		src = dst;
 	}
 	return len;

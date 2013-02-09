@@ -235,7 +235,7 @@ LRESULT CChildFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 {
 	CCrystalTextView *const pTextView = GetActiveTextView();
 	CMergeEditView *const pActiveView = GetActiveMergeView();
-	switch (const UINT id = lParam ? wParam : LOWORD(wParam))
+	switch (const UINT id = lParam ? static_cast<UINT>(wParam) : LOWORD(wParam))
 	{
 	case ID_FILE_SAVE:
 		OnFileSave();

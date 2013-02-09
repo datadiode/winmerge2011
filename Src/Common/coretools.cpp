@@ -11,9 +11,9 @@
 #include "coretools.h"
 #include "paths.h"
 
-size_t linelen(const char *string)
+int linelen(const char *string)
 {
-	size_t stringlen = 0;
+	int stringlen = 0;
 	while (char c = string[stringlen])
 	{
 		if (c == '\r' || c == '\n')

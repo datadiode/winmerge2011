@@ -33,7 +33,7 @@ public:
 
 private:
 	template<class CodePoint, int CodeShift>
-	unsigned CompareFiles(size_t x = 1, size_t j = 0);
+	unsigned CompareFiles(stl_size_t x = 1, stl_size_t j = 0);
 	const CDiffContext *const m_pCtxt;
 	HANDLE m_osfhandle[2];
 };

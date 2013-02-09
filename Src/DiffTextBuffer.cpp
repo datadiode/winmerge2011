@@ -485,8 +485,8 @@ int CDiffTextBuffer::SaveToFile(LPCTSTR pszFileName,
 	// line loop : get each real line and write it in the file
 	String sLine;
 	LPCTSTR sEol = GetStringEol(nCrlfStyle);
-	const size_t nLineCount = m_aLines.size();
-	for (size_t line = 0 ; line < nLineCount ; ++line)
+	const stl_size_t nLineCount = m_aLines.size();
+	for (stl_size_t line = 0 ; line < nLineCount ; ++line)
 	{
 		if (GetLineFlags(line) & LF_GHOST)
 			continue;
@@ -595,7 +595,7 @@ void CDiffTextBuffer::ReplaceFullLine(CCrystalTextView * pSource, int nLine,
 	{
 		// (optimization) eols are the same, so just replace text inside line
 		// we must clean strText from its eol...
-		int eolLength = _tcslen(eol);
+		int eolLength = static_cast<int>(_tcslen(eol));
 		ReplaceLine(pSource, nLine, strText.c_str(), strText.length() - eolLength, nAction);
 		return;
 	}

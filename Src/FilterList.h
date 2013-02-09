@@ -40,7 +40,7 @@ public:
 	bool HasPredifferRegExps() const { return !m_predifferRegExps.empty(); }
 	bool HasPredifferScripts() const { return !m_predifferScripts.empty(); }
 	bool HasPrediffers() const { return HasPredifferRegExps() || HasPredifferScripts(); }
-	bool Match(size_t stringlen, const char *string, int codepage = CP_UTF8);
+	bool Match(int stringlen, const char *string, int codepage = CP_UTF8);
 
 private:
 	friend size_t apply_prediffer(struct file_data *current, short side, char *buf, size_t len);
@@ -52,7 +52,7 @@ private:
 			(p++)->dispose();
 	}
 
-	size_t ApplyPredifferRegExps(LPCTSTR filename, char *dst, const char *src, size_t len) const;
+	int ApplyPredifferRegExps(LPCTSTR filename, char *dst, const char *src, int len) const;
 	BSTR ApplyPredifferScripts(LPCTSTR filename, BSTR bstr);
 	void ResetPrediffers(short side);
 

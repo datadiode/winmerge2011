@@ -165,7 +165,7 @@ public:
 		eol = _T("\r\n");
 		return true;
 	}
-	virtual bool WriteString(LPCTSTR line, size_t length)
+	virtual bool WriteString(LPCTSTR, stl_size_t)
 	{
 		return false;
 	}

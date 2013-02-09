@@ -321,7 +321,7 @@ static void SaveBuffForDiff(CDiffTextBuffer & buf, CDiffTextBuffer & buf2, DiffF
 	String sError;
 	NulWriteStream nws;
 	int retVal = buf.SaveToFile(NULL, &nws, sError);
-	size_t len = nws.GetSize();
+	ULONG len = nws.GetSize();
 	if (void *buffer = diffdata.AllocBuffer(i, len))
 	{
 		MemWriteStream mws(buffer, len);
@@ -495,8 +495,8 @@ int CChildFrame::Rescan2(bool &bIdentical)
 }
 
 /** @brief Adjust all different lines that were detected as actually matching moved lines */
-void CChildFrame::FlagMovedLines(MovedLines * pMovedLines, CDiffTextBuffer * pBuffer1,
-		CDiffTextBuffer * pBuffer2)
+void CChildFrame::FlagMovedLines(MovedLines *pMovedLines,
+	CDiffTextBuffer *pBuffer1, CDiffTextBuffer *pBuffer2)
 {
 	int i;
 	for (i = 0; i < pBuffer1->GetLineCount(); ++i)
@@ -2294,14 +2294,14 @@ String CChildFrame::GetFileExt(LPCTSTR sFileName, LPCTSTR sDescription)
 	{
 		if (LPCTSTR atat = _tcsstr(sFileName, _T("@@")))
 		{
-			sExt = PathFindExtension(String(sFileName, atat - sFileName).c_str());
+			sExt = PathFindExtension(String(sFileName, static_cast<String::size_type>(atat - sFileName)).c_str());
 		}
 		// If no extension found in repository file name.
 		if (sExt.empty())
 		{
 			if (LPCTSTR atat = _tcsstr(sDescription, _T("@@")))
 			{
-				sExt = PathFindExtension(String(sDescription, atat - sDescription).c_str());
+				sExt = PathFindExtension(String(sDescription, static_cast<String::size_type>(atat - sDescription)).c_str());
 			}
 		}
 	}

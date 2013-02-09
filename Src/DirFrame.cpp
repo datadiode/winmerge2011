@@ -252,7 +252,7 @@ void CDirFrame::UpdateCmdUI<ID_MERGE_DELETE>()
 template<>
 LRESULT CDirFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 {
-	switch (UINT id = lParam ? wParam : LOWORD(wParam))
+	switch (UINT id = lParam ? static_cast<UINT>(wParam) : LOWORD(wParam))
 	{
 	case ID_FILE_LEFT_READONLY:
 		// Change left-side readonly-status
