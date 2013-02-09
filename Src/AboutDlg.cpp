@@ -94,8 +94,8 @@ BOOL CAboutDlg::OnInitDialog()
 	if (GetDlgItemText(IDC_VERSION, fmt, _countof(fmt)))
 	{
 		String s = version.GetProductVersion();
-#ifdef WIN64
-		s += _T(" [X64]");
+#ifdef _WIN64
+		s += _T(" [64 bit]");
 #endif
 #ifdef _DEBUG
 		s += _T(" [Debug]");
