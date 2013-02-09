@@ -167,8 +167,8 @@ void CMarkdown::Load(EntityMap &entityMap, const Converter &converter)
 CMarkdown::HSTR CMarkdown::_HSTR::Convert(const Converter &converter)
 {
 	HSTR H = this;
-	size_t s = SysStringByteLen(B);
-	if (size_t d = converter.Convert(A, s, 0, 0))
+	UINT s = SysStringByteLen(B);
+	if (UINT d = static_cast<UINT>(converter.Convert(A, s, 0, 0)))
 	{
 		H = (HSTR)SysAllocStringByteLen(0, d);
 		converter.Convert(A, s, H->A, d);
@@ -204,9 +204,9 @@ HString *CMarkdown::_HSTR::Uni(const EntityMap &map, unsigned cp)
 		++q;
 		if (int cchValue = value.length())
 		{
-			int i = p - H->B;
-			int j = q - H->B;
-			int cchKey = q - p;
+			int i = static_cast<int>(p - H->B);
+			int j = static_cast<int>(q - H->B);
+			int cchKey = static_cast<int>(q - p);
 			if (int cchGrow = cchValue - cchKey)
 			{
 				BSTR B = H->B;
@@ -253,8 +253,8 @@ HString *CMarkdown::Entitify(const OLECHAR *text)
 		++q;
 		if (value)
 		{
-			int i = p - H->B;
-			int j = q - H->B;
+			int i = static_cast<int>(p - H->B);
+			int j = static_cast<int>(q - H->B);
 			int cchValue = lstrlenW(value);
 			if (int cchGrow = cchValue - 1)
 			{
@@ -496,7 +496,7 @@ CMarkdown &CMarkdown::Move(const char *name)
 		{
 			++q;
 		} while (q <= ahead && !isspace(c = *q) && c != '[' && c != '>' && c != '"' && c != '\'' && c != '=');
-		int length = q - p;
+		int length = static_cast<int>(q - p);
 		if (memcmp(p, name, length) == 0 && name[length] == '\0')
 		{
 			break;
@@ -594,7 +594,7 @@ CMarkdown::HSTR CMarkdown::GetTagName()
 			}
 		}
 	}
-	return (HSTR)SysAllocStringByteLen(p, q - p);
+	return (HSTR)SysAllocStringByteLen(p, static_cast<UINT>(q - p));
 }
 
 CMarkdown::HSTR CMarkdown::GetTagText()
@@ -626,7 +626,7 @@ CMarkdown::HSTR CMarkdown::GetTagText()
 			}
 		}
 	}
-	return (HSTR)SysAllocStringByteLen(p, q - p);
+	return (HSTR)SysAllocStringByteLen(p, static_cast<UINT>(q - p));
 }
 
 CMarkdown::HSTR CMarkdown::GetInnerText()
@@ -664,7 +664,7 @@ CMarkdown::HSTR CMarkdown::GetInnerText()
 	{
 		++p;
 	}
-	return (HSTR)SysAllocStringByteLen(p, q - p);
+	return (HSTR)SysAllocStringByteLen(p, static_cast<UINT>(q - p));
 }
 
 CMarkdown::HSTR CMarkdown::GetOuterText()
@@ -678,7 +678,7 @@ CMarkdown::HSTR CMarkdown::GetOuterText()
 			++q;
 		}
 	}
-	return (HSTR)SysAllocStringByteLen(lower, q - first);
+	return (HSTR)SysAllocStringByteLen(lower, static_cast<UINT>(q - first));
 }
 
 class CMarkdown::Token
@@ -731,9 +731,9 @@ CMarkdown::HSTR CMarkdown::GetAttribute(const char *key, const void *pv)
 {
 	typedef HSTR *strName;
 	const char *name = 0;
-	int cname = 0;
+	UINT cname = 0;
 	const char *value = 0;
-	int cvalue = 0;
+	UINT cvalue = 0;
 	bool equals = false;
 	const char *p = lower;
 	Token token;
@@ -749,7 +749,7 @@ CMarkdown::HSTR CMarkdown::GetAttribute(const char *key, const void *pv)
 			case '"':
 			case '\'':
 				equals = false;
-				cvalue = token.upper - (value = token.lower); 
+				cvalue = static_cast<UINT>(token.upper - (value = token.lower)); 
 				if (cvalue >= 2)
 				{
 					++value;
@@ -767,11 +767,11 @@ CMarkdown::HSTR CMarkdown::GetAttribute(const char *key, const void *pv)
 			if (equals)
 			{
 				equals = false;
-				cvalue = token.upper - (value = token.lower);
+				cvalue = static_cast<UINT>(token.upper - (value = token.lower));
 			}
 			else
 			{
-				cname = token.upper - (name = token.lower);
+				cname = static_cast<UINT>(token.upper - (name = token.lower));
 			}
 		}
 		p = token.upper;
@@ -832,12 +832,12 @@ int CMarkdown::FileImage::GuessByteOrder(DWORD dwBOM)
 		}
 		if (wBOM == 0xFEFF || wBOM == 0xFFFE)
 		{
-			nByteOrder += 8 + ((char *)memchr(&dwBOM, 0xFF, 4) - (char *)&dwBOM);
+			nByteOrder += 8 + static_cast<int>((char *)memchr(&dwBOM, 0xFF, 4) - (char *)&dwBOM);
 		}
 		else if (LOBYTE(wBOM) == 0 || HIBYTE(wBOM) == 0)
 		{
 			BYTE cBOM = LOBYTE(wBOM) | HIBYTE(wBOM);
-			nByteOrder += ((char *)memchr(&dwBOM, cBOM, 4) - (char *)&dwBOM);
+			nByteOrder += static_cast<int>((char *)memchr(&dwBOM, cBOM, 4) - (char *)&dwBOM);
 		}
 		else if ((dwBOM & 0xFFFFFF) == 0xBFBBEF)
 		{
@@ -953,7 +953,7 @@ CMarkdown::FileImage::FileImage(LPCTSTR path, DWORD trunc, int flags)
 					cchImage -= 4;
 				}
 				Converter converter("utf-8", nByteOrder & 2 ? "ucs-4be" : "ucs-4le");
-				cbImage = converter.Convert(pchImage, cchImage, 0, 0);
+				cbImage = static_cast<DWORD>(converter.Convert(pchImage, cchImage, 0, 0));
 				pCopy = MapFile(INVALID_HANDLE_VALUE, cbImage);
 				if (pCopy)
 				{

@@ -1325,13 +1325,13 @@ void sd_ComputeByteDiff(String & str1, String & str2,
 
 	// Store results of advance into return variables (begin1 & begin2)
 	// -1 in a begin variable means no visible diff area
-	begin1 = (py1 > pen1) ? -1 : (py1 - pbeg1);
-	begin2 = (py2 > pen2) ? -1 : (py2 - pbeg2);
+	begin1 = (py1 > pen1) ? -1 : static_cast<int>(py1 - pbeg1);
+	begin2 = (py2 > pen2) ? -1 : static_cast<int>(py2 - pbeg2);
 
 	if (alldone)
 	{
-		end1 = pen1 - pbeg1;
-		end2 = pen2 - pbeg2;
+		end1 = static_cast<int>(pen1 - pbeg1);
+		end2 = static_cast<int>(pen2 - pbeg2);
     }
 	else
 	{
@@ -1451,7 +1451,7 @@ void sd_ComputeByteDiff(String & str1, String & str2,
 		else
 		{
 			// Found on distance line 1
-			end1 = pz1 - pbeg1;
+			end1 = static_cast<int>(pz1 - pbeg1);
 		}
 		if (found && pz2 == pbeg2 ) 
 		{
@@ -1466,7 +1466,7 @@ void sd_ComputeByteDiff(String & str1, String & str2,
 		else
 		{
 			// Found on distance line 2
-			end2 = pz2 - pbeg2;
+			end2 = static_cast<int>(pz2 - pbeg2);
 		}
 	}
 }
