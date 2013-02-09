@@ -298,7 +298,7 @@ void UniMemFile::ReadBom()
 	PBYTE lpByte = m_base;
 	m_current = m_data = m_base;
 	m_charsize = 1;
-	size_t bom = 0;
+	unsigned bom = 0;
 
 	m_unicoding = DetermineEncoding(lpByte, m_filesize.Lo, &bom);
 	switch (m_unicoding)

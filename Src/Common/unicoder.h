@@ -52,7 +52,7 @@ namespace ucr
 
 #endif
 
-EXTERN_C UNICODESET DetermineEncoding(unsigned char *pBuffer, size_t size, size_t *pBom);
+EXTERN_C UNICODESET DetermineEncoding(unsigned char *pBuffer, size_t size, unsigned *pBom);
 EXTERN_C int EqualCodepages(int cp1, int cp2);
 
 #endif // unicoder_h_included

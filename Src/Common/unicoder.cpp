@@ -250,7 +250,7 @@ inline int CoincidenceOf(int mask) { return mask & mask - 1; }
  * FF FE 00 00 UTF-32, little endian
  * 00 00 FE FF UTF-32, big-endian
  */
-UNICODESET DetermineEncoding(unsigned char *pBuffer, size_t size, size_t *pBom)
+UNICODESET DetermineEncoding(unsigned char *pBuffer, size_t size, unsigned *pBom)
 {
 	if (size == 0)
 		return NONE;
@@ -269,7 +269,7 @@ UNICODESET DetermineEncoding(unsigned char *pBuffer, size_t size, size_t *pBom)
 	if (sig == 0xBFBBEF)
 		return UTF8;
 	// check for UCS2 the two possible 2 bytes signatures
-	size_t bufSize = min<size_t>(size, 8 * 1024);
+	int bufSize = static_cast<int>(min<size_t>(size, 8 * 1024));
 	if (memchr(pBuffer, 0, bufSize))
 	{
 		int icheck = IS_TEXT_UNICODE_NOT_UNICODE_MASK ^

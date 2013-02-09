@@ -42,7 +42,7 @@ static const char *f_wincp_prefixes[] =
  */
 static const char *EatPrefix(const char *text, const char *prefix)
 {
-	int len = strlen(prefix);
+	size_t len = strlen(prefix);
 	if (len)
 		if (_memicmp(text, prefix, len) == 0)
 			return text + len;
@@ -215,7 +215,7 @@ void GuessCodepageEncoding(LPCTSTR filepath, FileTextEncoding *encoding, bool bG
 	encoding->m_bom = false;
 	encoding->m_guessed = false;
 	encoding->m_binary = false;
-	size_t bom = 0;
+	unsigned bom = 0;
 	if (UNICODESET ucs = DetermineEncoding(fi.pbImage, fi.cbImage, &bom))
 	{
 		encoding->SetUnicoding(ucs);

@@ -70,7 +70,7 @@ static int equivs_alloc;
 static void find_and_hash_each_line PARAMS((struct file_data *));
 static void find_identical_ends PARAMS((struct file_data[]));
 static char *prepare_text_end PARAMS((struct file_data *, short));
-static enum UNICODESET get_unicode_signature(struct file_data *, size_t *bom);
+static enum UNICODESET get_unicode_signature(struct file_data *, unsigned *bom);
 
 /* Check for binary files and compare them for exact identity.  */
 
@@ -80,9 +80,9 @@ static enum UNICODESET get_unicode_signature(struct file_data *, size_t *bom);
 #define binary_file_p(buf, size) (size != 0 && memchr (buf, '\0', size) != 0)
 
 /** @brief Get unicode signature from file_data. */
-static enum UNICODESET get_unicode_signature(struct file_data *current, size_t *bom)
+static enum UNICODESET get_unicode_signature(struct file_data *current, unsigned *bom)
 {
-  size_t dummy = 0;
+  unsigned dummy = 0;
   return DetermineEncoding(current->buffer, current->buffered_chars, bom ? bom : &dummy);
 }
 
@@ -441,7 +441,7 @@ prepare_text_end (current, side)
   char *const p = current->buffer;
   char *r = p; // receives the return value
   char *q, *t;
-  size_t bom = 0;
+  unsigned bom = 0;
   enum UNICODESET sig = get_unicode_signature(current, &bom);
   char *const u = p + bom;
 
