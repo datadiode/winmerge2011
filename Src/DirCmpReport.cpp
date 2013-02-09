@@ -67,8 +67,8 @@ DirCmpReport::DirCmpReport(CDirView *pList)
 	// If inside archive, convert paths
 	pDoc->ApplyLeftDisplayRoot(m_rootPaths[0]);
 	pDoc->ApplyRightDisplayRoot(m_rootPaths[1]);
-	m_rootPaths[0].erase(0, paths_UndoMagic(&m_rootPaths[0].front()) - m_rootPaths[0].c_str());
-	m_rootPaths[1].erase(0, paths_UndoMagic(&m_rootPaths[1].front()) - m_rootPaths[1].c_str());
+	paths_UndoMagic(m_rootPaths[0]);
+	paths_UndoMagic(m_rootPaths[1]);
 }
 
 /**
@@ -200,10 +200,10 @@ void DirCmpReport::WriteString(HString *H, UINT codepage)
 {
 	const OString strOctets = H->Oct(codepage);
 	LPCSTR pchOctets = strOctets.A;
-	size_t cchAhead = strOctets.ByteLen();
+	UINT cchAhead = strOctets.ByteLen();
 	while (LPCSTR pchAhead = (LPCSTR)memchr(pchOctets, '\n', cchAhead))
 	{
-		int cchLine = pchAhead - pchOctets;
+		ULONG cchLine = static_cast<ULONG>(pchAhead - pchOctets);
 		IStream_Write(m_pFile, pchOctets, cchLine);
 		static const char eol[] = { '\r', '\n' };
 		IStream_Write(m_pFile, eol, sizeof eol);

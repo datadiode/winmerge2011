@@ -330,12 +330,12 @@ BOOL COpenDlg::OnInitDialog()
 	if (m_sLeftFile.empty())
 		m_pCbLeft->GetWindowText(m_sLeftFile);
 	else
-		m_sLeftFile.erase(0, paths_UndoMagic(&m_sLeftFile.front()) - m_sLeftFile.c_str());
+		paths_UndoMagic(m_sLeftFile);
 
 	if (m_sRightFile.empty())
 		m_pCbRight->GetWindowText(m_sRightFile);
 	else
-		m_sRightFile.erase(0, paths_UndoMagic(&m_sRightFile.front()) - m_sRightFile.c_str());
+		paths_UndoMagic(m_sRightFile);
 
 	if (m_sFilter.empty())
 		m_pCbExt->GetWindowText(m_sFilter);

@@ -49,16 +49,6 @@ PATH_EXISTENCE paths_DoesPathExist(LPCTSTR szPath)
 		return IS_EXISTING_FILE;
 }
 
-/** 
- * @brief Eat the magic pefix.
- * This is intended to hide the magic pefix from users. Change to return NULL
- * if you want the magic pefix to show up in the UI for debugging purposes.
- */
-/*LPCTSTR paths_EatMagicPrefix(LPCTSTR path)
-{
-	return EatPrefix(path, paths_magic_prefix);
-}*/
-
 static const String &paths_DoMagic(String &path)
 {
 	// As for now no magic prefix on UNC paths!
@@ -85,6 +75,12 @@ LPCTSTR paths_UndoMagic(LPTSTR path)
 		}
 	}
 	return path + i;
+}
+
+void paths_UndoMagic(String &path)
+{
+	LPTSTR p = &path.front();
+	path.erase(0, static_cast<String::size_type>(paths_UndoMagic(p) - p));
 }
 
 /**
@@ -383,8 +379,10 @@ bool paths_PathIsExe(LPCTSTR path)
  */
 void paths_CompactPath(HEdit *pEdit, String &path)
 {
-	// cope with modifiation indicator
-	const size_t offset = path.find_first_not_of(_T("* "));
+	// cope with modification indicator
+	const String::size_type offset = path.find_first_not_of(_T("* "));
+	if (offset == String::npos)
+		return;
 	// we want to keep the first and the last path component, and in between,
 	// as much characters as possible from the right
 	// PathCompactPath keeps, in between, as much characters as possible from the left
@@ -410,7 +408,7 @@ void paths_CompactPath(HEdit *pEdit, String &path)
 	}
 
 	// downsize to reflect the actual length
-	path.resize(_tcslen(path.c_str()));
+	path.resize(static_cast<String::size_type>(_tcslen(path.c_str())));
 
 	// we reverse back everything between the first and the last component
 	// it works OK as "..." reversed = "..." again
