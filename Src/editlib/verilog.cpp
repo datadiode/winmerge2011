@@ -365,30 +365,22 @@ if (pBuf != NULL)\
 #define COOKIE_STRING           0x0008
 #define COOKIE_CHAR             0x0010
 
-DWORD CCrystalTextView::
-ParseLineVerilog (DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActualItems)
+DWORD CCrystalTextView::ParseLineVerilog(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems)
 {
-  int nLength = GetLineLength (nLineIndex);
+  const int nLength = GetLineLength(nLineIndex);
   if (nLength == 0)
     return dwCookie & COOKIE_EXT_COMMENT;
 
-  LPCTSTR pszChars = GetLineChars (nLineIndex);
+  LPCTSTR pszChars = GetLineChars(nLineIndex);
   BOOL bFirstChar = (dwCookie & ~COOKIE_EXT_COMMENT) == 0;
   BOOL bRedefineBlock = TRUE;
   BOOL bWasCommentStart = FALSE;
   BOOL bDecIndex = FALSE;
   int nIdentBegin = -1;
   int nPrevI = -1;
-  int I=0;
-  for (I = 0;; nPrevI = I, I = CharNext(pszChars+I) - pszChars)
+  int I;
+  for (I = 0; I < nLength; nPrevI = I++)
     {
-      if (I == nPrevI)
-        {
-          // CharNext did not advance, so we're at the end of the string
-          // and we already handled this character, so stop
-          break;
-        }
-
       if (bRedefineBlock)
         {
           int nPos = I;
@@ -408,7 +400,7 @@ ParseLineVerilog (DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActual
             }
           else
             {
-              if (xisalnum (pszChars[nPos]) || pszChars[nPos] == '$' || (pszChars[nPos] == '\'' && nPos > 0 && (xisalpha (*::CharNext(pszChars + nPos)))))
+              if (xisalnum(pszChars[nPos]) || pszChars[nPos] == '$' || (pszChars[nPos] == '\'' && nPos > 0 && (xisalpha(pszChars[nPos + 1]))))
                 {
                   DEFINE_BLOCK (nPos, COLORINDEX_NORMALTEXT);
                 }
@@ -440,7 +432,7 @@ out:
       //  String constant "..."
       if (dwCookie & COOKIE_STRING)
         {
-          if (pszChars[I] == '"' && (I == 0 || I == 1 && pszChars[nPrevI] != '\\' || I >= 2 && (pszChars[nPrevI] != '\\' || pszChars[nPrevI] == '\\' && *::CharPrev(pszChars, pszChars + nPrevI) == '\\')))
+          if (pszChars[I] == '"' && (I == 0 || I == 1 && pszChars[nPrevI] != '\\' || I >= 2 && (pszChars[nPrevI] != '\\' || pszChars[nPrevI] == '\\' && pszChars[nPrevI - 1] == '\\')))
             {
               dwCookie &= ~COOKIE_STRING;
               bRedefineBlock = TRUE;
@@ -512,7 +504,7 @@ out:
         continue;               //  We don't need to extract keywords,
       //  for faster parsing skip the rest of loop
 
-      if (xisalnum (pszChars[I]) || pszChars[I] == '$' || pszChars[I] == '\'')
+      if (xisalnum(pszChars[I]) || pszChars[I] == '$' || pszChars[I] == '\'')
         {
           if (nIdentBegin == -1)
             nIdentBegin = I;

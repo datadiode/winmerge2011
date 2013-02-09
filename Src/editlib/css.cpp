@@ -223,30 +223,22 @@ if (pBuf != NULL)\
 #define COOKIE_EXT_DEFINITION   0x0020
 #define COOKIE_EXT_VALUE        0x0040
 
-DWORD CCrystalTextView::
-ParseLineCss (DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActualItems)
+DWORD CCrystalTextView::ParseLineCss(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems)
 {
-  int nLength = GetLineLength (nLineIndex);
+  const int nLength = GetLineLength(nLineIndex);
   if (nLength == 0)
     return dwCookie & (COOKIE_EXT_COMMENT|COOKIE_EXT_DEFINITION|COOKIE_EXT_VALUE);
 
-  LPCTSTR pszChars = GetLineChars (nLineIndex);
+  LPCTSTR pszChars = GetLineChars(nLineIndex);
   BOOL bFirstChar = (dwCookie & ~(COOKIE_EXT_COMMENT|COOKIE_EXT_DEFINITION|COOKIE_EXT_VALUE)) == 0;
   BOOL bRedefineBlock = TRUE;
   BOOL bWasCommentStart = FALSE;
   BOOL bDecIndex = FALSE;
   int nIdentBegin = -1;
   int nPrevI = -1;
-  int I=0;
-  for (I = 0;; nPrevI = I, I = CharNext(pszChars+I) - pszChars)
+  int I;
+  for (I = 0; I < nLength; nPrevI = I++)
     {
-      if (I == nPrevI)
-        {
-          // CharNext did not advance, so we're at the end of the string
-          // and we already handled this character, so stop
-          break;
-        }
-
       if (bRedefineBlock)
         {
           int nPos = I;
@@ -258,7 +250,7 @@ ParseLineCss (DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActualItem
             }
           else
             {
-              if (xisalnum (pszChars[nPos]) || pszChars[nPos] == '.' || pszChars[nPos] == '-' || pszChars[nPos] == '%')
+              if (xisalnum(pszChars[nPos]) || pszChars[nPos] == '.' || pszChars[nPos] == '-' || pszChars[nPos] == '%')
                 {
                   if (dwCookie & COOKIE_EXT_VALUE)
                     {
@@ -342,7 +334,7 @@ out:
         continue;               //  We don't need to extract keywords,
       //  for faster parsing skip the rest of loop
 
-      if (xisalnum (pszChars[I]) || pszChars[I] == '.' || pszChars[I] == '-' || pszChars[I] == '%')
+      if (xisalnum(pszChars[I]) || pszChars[I] == '.' || pszChars[I] == '-' || pszChars[I] == '%')
         {
           if (nIdentBegin == -1)
             nIdentBegin = I;

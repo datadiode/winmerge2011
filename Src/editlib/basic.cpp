@@ -372,29 +372,21 @@ if (pBuf != NULL)\
 #define COOKIE_STRING           0x0008
 #define COOKIE_CHAR             0x0010
 
-DWORD CCrystalTextView::
-ParseLineBasic (DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActualItems)
+DWORD CCrystalTextView::ParseLineBasic(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems)
 {
-  int nLength = GetLineLength (nLineIndex);
+  const int nLength = GetLineLength(nLineIndex);
   if (nLength == 0)
     return dwCookie & COOKIE_EXT_COMMENT;
 
-  LPCTSTR pszChars = GetLineChars (nLineIndex);
+  LPCTSTR pszChars = GetLineChars(nLineIndex);
   BOOL bFirstChar = (dwCookie & ~COOKIE_EXT_COMMENT) == 0;
   BOOL bRedefineBlock = TRUE;
   BOOL bDecIndex = FALSE;
   int nIdentBegin = -1;
   int nPrevI = -1;
-  int I=0;
-  for (I = 0;; nPrevI = I, I = ::CharNext(pszChars+I) - pszChars)
+  int I;
+  for (I = 0; I < nLength; nPrevI = I++)
     {
-      if (I == nPrevI)
-        {
-          // CharNext did not advance, so we're at the end of the string
-          // and we already handled this character, so stop
-          break;
-        }
-
       if (bRedefineBlock)
         {
           int nPos = I;
@@ -410,7 +402,7 @@ ParseLineBasic (DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActualIt
             }
           else
             {
-              if (xisalnum (pszChars[nPos]) || pszChars[nPos] == '.' && nPos > 0 && (!xisalpha (*::CharPrev(pszChars, pszChars + nPos)) && !xisalpha (*::CharNext(pszChars + nPos))))
+              if (xisalnum(pszChars[nPos]) || pszChars[nPos] == '.' && nPos > 0 && (!xisalpha(pszChars[nPos - 1]) && !xisalpha(pszChars[nPos + 1])))
                 {
                   DEFINE_BLOCK (nPos, COLORINDEX_NORMALTEXT);
                 }
@@ -475,7 +467,7 @@ out:
         continue;               //  We don't need to extract keywords,
       //  for faster parsing skip the rest of loop
 
-      if (xisalnum (pszChars[I]) || pszChars[I] == '.' && I > 0 && (!xisalpha (pszChars[nPrevI]) && !xisalpha (pszChars[I + 1])))
+      if (xisalnum(pszChars[I]) || pszChars[I] == '.' && I > 0 && (!xisalpha(pszChars[nPrevI]) && !xisalpha(pszChars[I + 1])))
         {
           if (nIdentBegin == -1)
             nIdentBegin = I;

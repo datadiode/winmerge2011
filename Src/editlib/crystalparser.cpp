@@ -39,12 +39,6 @@ DWORD CCrystalParser::ParseLine(DWORD, int, CCrystalTextBlock *)
 	return 0;
 }
 
-static LPTSTR NTAPI EnsureCharNext(LPCTSTR current)
-{
-	LPTSTR next = ::CharNext(current);
-	return next > current ? next : next + 1;
-}
-
 void CCrystalParser::WrapLine(int nLineIndex, int nMaxLineWidth, int *anBreaks, int &nBreaks)
 {
 	// The parser must be attached to a view!
@@ -59,7 +53,7 @@ void CCrystalParser::WrapLine(int nLineIndex, int nMaxLineWidth, int *anBreaks, 
 	int nLastCharBreakPos = 0;
 	BOOL bBreakable = FALSE;
 
-	for (int i = 0; i < nLineLength; i += EnsureCharNext(szLine + i) - (szLine + i))
+	for (int i = 0; i < nLineLength; ++i)
 	{
 		// remember position of whitespace for wrap
 		if (bBreakable)

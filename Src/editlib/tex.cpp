@@ -927,29 +927,21 @@ if (pBuf != NULL)\
 #define COOKIE_STRING           0x0008
 #define COOKIE_CHAR             0x0010
 
-DWORD CCrystalTextView::
-ParseLineTex (DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActualItems)
+DWORD CCrystalTextView::ParseLineTex(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems)
 {
-  int nLength = GetLineLength (nLineIndex);
+  const int nLength = GetLineLength(nLineIndex);
   if (nLength == 0)
     return dwCookie & COOKIE_EXT_COMMENT;
 
-  LPCTSTR pszChars = GetLineChars (nLineIndex);
+  LPCTSTR pszChars = GetLineChars(nLineIndex);
   BOOL bFirstChar = (dwCookie & ~COOKIE_EXT_COMMENT) == 0;
   BOOL bRedefineBlock = TRUE;
   BOOL bDecIndex = FALSE;
   int nIdentBegin = -1;
   int nPrevI = -1;
-  int I=0;
-  for (I = 0;; nPrevI = I, I = ::CharNext(pszChars+I) - pszChars)
+  int I;
+  for (I = 0; I < nLength; nPrevI = I++)
     {
-      if (I == nPrevI)
-        {
-          // CharNext did not advance, so we're at the end of the string
-          // and we already handled this character, so stop
-          break;
-        }
-
       if (bRedefineBlock)
         {
           int nPos = I;
@@ -965,7 +957,7 @@ ParseLineTex (DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActualItem
             }
           else
             {
-              if (xisalnum (pszChars[nPos]) || pszChars[nPos] == '.')
+              if (xisalnum(pszChars[nPos]) || pszChars[nPos] == '.')
                 {
                   DEFINE_BLOCK (nPos, COLORINDEX_NORMALTEXT);
                 }
@@ -997,7 +989,7 @@ out:
       //  String constant "...."
       if (dwCookie & COOKIE_STRING)
         {
-          if (pszChars[I] == '"' && (I == 0 || I == 1 && pszChars[nPrevI] != '\\' || I >= 2 && (pszChars[nPrevI] != '\\' || pszChars[nPrevI] == '\\' && *::CharPrev(pszChars, pszChars + nPrevI) == '\\')))
+          if (pszChars[I] == '"' && (I == 0 || I == 1 && pszChars[nPrevI] != '\\' || I >= 2 && (pszChars[nPrevI] != '\\' || pszChars[nPrevI] == '\\' && pszChars[nPrevI - 1] == '\\')))
             {
               dwCookie &= ~COOKIE_STRING;
               bRedefineBlock = TRUE;
@@ -1008,7 +1000,7 @@ out:
       //  Char constant '..'
       if (dwCookie & COOKIE_CHAR)
         {
-          if (pszChars[I] == '\'' && (I == 0 || I == 1 && pszChars[nPrevI] != '\\' || I >= 2 && (pszChars[nPrevI] != '\\' || pszChars[nPrevI] == '\\' && *::CharPrev(pszChars, pszChars + nPrevI) == '\\')))
+          if (pszChars[I] == '\'' && (I == 0 || I == 1 && pszChars[nPrevI] != '\\' || I >= 2 && (pszChars[nPrevI] != '\\' || pszChars[nPrevI] == '\\' && pszChars[nPrevI - 1] == '\\')))
             {
               dwCookie &= ~COOKIE_CHAR;
               bRedefineBlock = TRUE;
@@ -1033,7 +1025,7 @@ out:
       if (pszChars[I] == '\'')
         {
           // if (I + 1 < nLength && pszChars[I + 1] == '\'' || I + 2 < nLength && pszChars[I + 1] != '\\' && pszChars[I + 2] == '\'' || I + 3 < nLength && pszChars[I + 1] == '\\' && pszChars[I + 3] == '\'')
-          if (!I || !xisalnum (pszChars[nPrevI]))
+          if (!I || !xisalnum(pszChars[nPrevI]))
             {
               DEFINE_BLOCK (I, COLORINDEX_STRING);
               dwCookie |= COOKIE_CHAR;
@@ -1051,7 +1043,7 @@ out:
         continue;               //  We don't need to extract keywords,
       //  for faster parsing skip the rest of loop
 
-      if (xisalnum (pszChars[I]) || pszChars[I] == '.')
+      if (xisalnum(pszChars[I]) || pszChars[I] == '.')
         {
           if (nIdentBegin == -1)
             nIdentBegin = I;
