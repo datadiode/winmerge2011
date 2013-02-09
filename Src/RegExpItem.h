@@ -22,7 +22,7 @@ struct regexp_item
 		, filenameSpec(NULL)
 		, pRegExp(NULL)
 		, pRegExpExtra(NULL)
-		, options(PCRE_UTF8)
+		, options(0)
 		, global(false)
 	{
 	}

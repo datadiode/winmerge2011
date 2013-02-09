@@ -30,6 +30,7 @@ static size_t FindSlash(LPCTSTR buf, size_t len)
 
 const char *regexp_item::assign(LPCTSTR pch, size_t cch)
 {
+	UINT codepage = CP_ACP;
 	if (const size_t i = FindSlash(pch, cch))
 	{
 		size_t j = i;
@@ -40,6 +41,10 @@ const char *regexp_item::assign(LPCTSTR pch, size_t cch)
 			case _T('i'):
 				options |= PCRE_CASELESS;
 				break;
+			case _T('u'):
+				options |= PCRE_UTF8;
+				codepage = CP_UTF8;
+				break;
 			case _T('g'):
 				global = true;
 				break;
@@ -48,7 +53,8 @@ const char *regexp_item::assign(LPCTSTR pch, size_t cch)
 				if (const wchar_t *const p = wmemchr(pch + j, _T('<'), cch - j))
 				{
 					const wchar_t *const q = p + 1;
-					injectString = HString::Uni(q, pch + cch - q)->Oct(CP_UTF8);
+					injectString = HString::Uni(q,
+						static_cast<UINT>(pch + cch - q))->Oct(codepage);
 					// Exclude the <injectString from further processing.
 					cch = p - pch;
 					// Bail out if the colon was omitted.
@@ -63,7 +69,7 @@ const char *regexp_item::assign(LPCTSTR pch, size_t cch)
 		++pch;
 		cch = i - 1;
 	}
-	filterString = HString::Uni(pch, cch)->Oct(CP_UTF8);
+	filterString = HString::Uni(pch, cch)->Oct(codepage);
 	const char *errormsg = NULL;
 	int erroroffset = 0;
 	if (pcre *regexp = pcre_compile(
