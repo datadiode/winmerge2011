@@ -525,7 +525,8 @@ namespace H2O
 		UINT GetDlgItemText(int id, String &s)
 		{
 			assert(::IsWindow(m_hWnd));
-			LRESULT size = SendDlgItemMessage(id, WM_GETTEXTLENGTH, 0, 0);
+			String::size_type size = static_cast<String::size_type>(
+				SendDlgItemMessage(id, WM_GETTEXTLENGTH, 0, 0));
 			s.resize(size);
 			return GetDlgItemText(id, &s.front(), size + 1);
 		}

@@ -270,7 +270,7 @@ LRESULT CFloatState::CallWindowProc(WNDPROC pfnSuper, HWND hWnd, UINT uMsg, WPAR
 	switch (uMsg)
 	{
 	case WM_NCHITTEST:
-		lResult = CFloatState::AdjustHit(lResult);
+		lResult = CFloatState::AdjustHit(static_cast<UINT>(lResult));
 		break;
 	case WM_WINDOWPOSCHANGING:
 		CFloatState::Float(reinterpret_cast<WINDOWPOS *>(lParam));

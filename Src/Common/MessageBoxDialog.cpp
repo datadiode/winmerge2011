@@ -169,7 +169,7 @@ int CMessageBoxDialog::DoModal(HINSTANCE hinst, HWND parent, HKEY hKey)
 		}
 	}
 	// Call the parent method.
-	int nResult = ODialog::DoModal(hinst, parent);
+	int nResult = static_cast<int>(ODialog::DoModal(hinst, parent));
 	if ((m_nStyle & (MB_DONT_DISPLAY_AGAIN | MB_DONT_ASK_AGAIN)) && m_bDontDisplayAgain)
 	{
 		// Store the result of the dialog in the registry.
@@ -189,7 +189,7 @@ BOOL CMessageBoxDialog::OnInitDialog()
 {
 	ODialog::OnInitDialog();
 
-	size_t i = _countof(DialogUnitToPixel);
+	LONG i = _countof(DialogUnitToPixel);
 	do
 	{
 		RECT *prc = reinterpret_cast<RECT *>(DialogUnitToPixel + i - 2);

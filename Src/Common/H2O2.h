@@ -163,7 +163,7 @@ namespace H2O
 		LPCTSTR const m_idd;
 		ODialog(LPCTSTR idd): m_idd(idd) { }
 		ODialog(UINT idd): m_idd(MAKEINTRESOURCE(idd)) { }
-		virtual int DoModal(HINSTANCE hinst, HWND parent);
+		virtual INT_PTR DoModal(HINSTANCE hinst, HWND parent);
 		virtual HWND Create(HINSTANCE hinst, HWND parent);
 		BOOL EndDialog(INT_PTR nResult)
 		{
@@ -247,7 +247,7 @@ namespace H2O
 		template<>
 		bool DDX_CBIndex<Get>(UINT id, int &n)
 		{
-			n = SendDlgItemMessage(id, CB_GETCURSEL);
+			n = static_cast<int>(SendDlgItemMessage(id, CB_GETCURSEL));
 			return true;
 		}
 
@@ -287,8 +287,8 @@ namespace H2O
 		template<>
 		bool DDX_CBStringExact<Set>(UINT id, String &s)
 		{
-			int i = SendDlgItemMessage(id, CB_FINDSTRINGEXACT, -1,
-				reinterpret_cast<LPARAM>(s.c_str()));
+			int i = static_cast<int>(SendDlgItemMessage(id,
+				CB_FINDSTRINGEXACT, -1, reinterpret_cast<LPARAM>(s.c_str())));
 			SendDlgItemMessage(id, CB_SETCURSEL, i);
 			if (i < 0)
 				SetDlgItemText(id, s.c_str());
@@ -313,7 +313,7 @@ namespace H2O
 		String m_caption;
 		OPropertySheet();
 		PROPSHEETPAGE *AddPage(ODialog &page);
-		int DoModal(HINSTANCE hinst, HWND parent);
+		INT_PTR DoModal(HINSTANCE hinst, HWND parent);
 	private:
 		stl::vector<PROPSHEETPAGE> m_pages;
 		static int CALLBACK PropSheetProc(HWND, UINT, LPARAM);
@@ -366,7 +366,7 @@ namespace H2O
 				pStr = HString::Uni(match + lstrlenW(pattern));
 				if (pStr)
 				{
-					SysReAllocStringLen(&B, NULL, match - W);
+					SysReAllocStringLen(&B, NULL, static_cast<UINT>(match - W));
 				}
 			}
 			return pStr;

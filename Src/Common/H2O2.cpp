@@ -244,7 +244,7 @@ LRESULT ODialog::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return ::DefDlgProc(m_hWnd, uMsg, wParam, lParam);
 }
 
-int ODialog::DoModal(HINSTANCE hinst, HWND parent)
+INT_PTR ODialog::DoModal(HINSTANCE hinst, HWND parent)
 {
 	PROPSHEETPAGE psp;
 	psp.lParam = reinterpret_cast<LPARAM>(this);
@@ -361,7 +361,7 @@ OPropertySheet::OPropertySheet()
 
 PROPSHEETPAGE *OPropertySheet::AddPage(ODialog &page)
 {
-	size_t index = m_pages.size();
+	stl::vector<PROPSHEETPAGE>::size_type index = m_pages.size();
 	m_pages.resize(index + 1);
 	PROPSHEETPAGE *psp = &m_pages.back();
 	ZeroMemory(psp, sizeof *psp);
@@ -372,7 +372,7 @@ PROPSHEETPAGE *OPropertySheet::AddPage(ODialog &page)
 	return psp;
 }
 
-int OPropertySheet::DoModal(HINSTANCE hinst, HWND parent)
+INT_PTR OPropertySheet::DoModal(HINSTANCE hinst, HWND parent)
 {
 	m_psh.ppsp = &m_pages.front();
 	m_psh.nPages = m_pages.size();
