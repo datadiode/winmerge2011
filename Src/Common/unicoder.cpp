@@ -88,7 +88,7 @@ unsigned int get_unicode_char(unsigned char * ptr, UNICODESET codeset, int codep
  *  In fact, this doesn't even know. Probably going to have to make
  *  two passes, the first with MB_ERR_INVALID_CHARS. Ugh. :(
  */
-bool maketstring(String & str, const char* lpd, unsigned int len, int codepage, bool * lossy)
+bool maketstring(String &str, const char *lpd, int len, int codepage, bool *lossy)
 {
 	int defcodepage = getDefaultCodepage();
 
@@ -112,8 +112,7 @@ bool maketstring(String & str, const char* lpd, unsigned int len, int codepage, 
 	LPWSTR wbuff = &str.front();
 	do
 	{
-		int n = MultiByteToWideChar(codepage, flags, lpd, len, wbuff, wlen - 1);
-		if (n)
+		if (int n = MultiByteToWideChar(codepage, flags, lpd, len, wbuff, wlen - 1))
 		{
 			/*
 			NB: MultiByteToWideChar is documented as only zero-terminating
@@ -125,7 +124,7 @@ bool maketstring(String & str, const char* lpd, unsigned int len, int codepage, 
 			// the last input character. As we don't expect MultiByteToWideChar to
 			// add a zero that does not originate from the input string, it is a
 			// good idea to ASSERT that the assumption holds.
-			if (wbuff[n-1] == 0 && lpd[len-1] != 0)
+			if (wbuff[n - 1] == 0 && lpd[len - 1] != 0)
 			{
 				ASSERT(FALSE);
 				--n;

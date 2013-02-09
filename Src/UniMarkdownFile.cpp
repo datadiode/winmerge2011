@@ -125,7 +125,7 @@ void UniMarkdownFile::Move()
 	}
 }
 
-String UniMarkdownFile::maketstring(LPCSTR lpd, UINT len)
+String UniMarkdownFile::maketstring(LPCSTR lpd, int len)
 {
 	bool lossy = false;
 	String s;
@@ -144,7 +144,7 @@ bool UniMarkdownFile::ReadString(String &line, String &eol, bool *lossy)
 	bool bDone = false;
 	if (m_current < (LPBYTE)m_pMarkdown->lower)
 	{
-		line = maketstring((const char *)m_current, m_pMarkdown->lower - (const char *)m_current);
+		line = maketstring((const char *)m_current, static_cast<int>(m_pMarkdown->lower - (const char *)m_current));
 		CollapseWhitespace(line);
 		bDone = !line.empty();
 		m_current = (LPBYTE)m_pMarkdown->lower;
@@ -163,7 +163,7 @@ bool UniMarkdownFile::ReadString(String &line, String &eol, bool *lossy)
 			{
 				++m_current;
 			}
-			line = maketstring((const char *)current, m_current - current);
+			line = maketstring((const char *)current, static_cast<int>(m_current - current));
 			if (m_current < m_transparent)
 			{
 				current = m_current;
@@ -216,14 +216,14 @@ bool UniMarkdownFile::ReadString(String &line, String &eol, bool *lossy)
 			}
 			if (bDone)
 			{
-				line = maketstring((const char *)m_current, m_pMarkdown->first - (const char *)m_current);
+				line = maketstring((const char *)m_current, static_cast<int>(m_pMarkdown->first - (const char *)m_current));
 				CollapseWhitespace(line);
 				m_current = (LPBYTE)m_pMarkdown->first;
 			}
 			else if (m_current < m_base + m_filesize.Lo)
 			{
 				bDone = true;
-				line = maketstring((const char *)m_current, m_base + m_filesize.Lo - m_current);
+				line = maketstring((const char *)m_current, static_cast<int>(m_base + m_filesize.Lo - m_current));
 				CollapseWhitespace(line);
 				m_current = m_base + m_filesize.Lo;
 			}

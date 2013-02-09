@@ -26,7 +26,7 @@ public:
 	virtual bool ReadString(String &line, String &eol, bool *lossy);
 private:
 	void Move();
-	String maketstring(LPCSTR lpd, UINT len);
+	String maketstring(LPCSTR lpd, int len);
 	int m_depth;
 	bool m_bMove;
 	LPBYTE m_transparent;
