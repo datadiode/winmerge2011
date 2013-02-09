@@ -404,7 +404,7 @@ INT_PTR CALLBACK C7ZipMismatchException::DlgProc(HWND hWnd, UINT uMsg, WPARAM wP
 				case IDOK:
 				case IDCANCEL:
 				{
-					int nDontShowAgain = SendDlgItemMessage(hWnd, 106, BM_GETCHECK, 0, 0);
+					UINT nDontShowAgain = IsDlgButtonChecked(hWnd, 106);
 					EndDialog(hWnd, MAKEWORD(IDOK, nDontShowAgain));
 				} break;
 				case 108:
@@ -426,7 +426,7 @@ INT_PTR CALLBACK C7ZipMismatchException::DlgProc(HWND hWnd, UINT uMsg, WPARAM wP
  */
 int C7ZipMismatchException::ReportError(HWND hWnd, UINT nType, UINT nMessageID)
 {
-	UINT_PTR response = -1;
+	int response = -1;
 	m_bShowAllways = nMessageID;
 	if (!m_bShowAllways)
 	{
@@ -442,7 +442,7 @@ int C7ZipMismatchException::ReportError(HWND hWnd, UINT nType, UINT nMessageID)
 	{
 		HWND hwndOwner = ::GetLastActivePopup(hWnd);
 		HINSTANCE hinst = LanguageSelect.FindResourceHandle(MAKEINTRESOURCE(IDD_MERGE7ZMISMATCH), RT_DIALOG);
-		response = DialogBoxParam(hinst, MAKEINTRESOURCE(IDD_MERGE7ZMISMATCH), hwndOwner, DlgProc, (LPARAM)this);
+		response = static_cast<int>(DialogBoxParam(hinst, MAKEINTRESOURCE(IDD_MERGE7ZMISMATCH), hwndOwner, DlgProc, (LPARAM)this));
 		ASSERT(response != -1);
 		if (HIBYTE(response) == 1)
 		{
@@ -730,7 +730,7 @@ UINT CDirView::DirItemEnumerator::Open()
 	m_nIndex = -1;
 	m_curFolderPrefix = m_rgFolderPrefix.begin();
 	m_bRight = (m_nFlags & Right) != 0;
-	size_t nrgFolderPrefix = m_rgFolderPrefix.size();
+	stl::list<String>::size_type nrgFolderPrefix = m_rgFolderPrefix.size();
 	if (nrgFolderPrefix)
 	{
 		m_strFolderPrefix = *m_curFolderPrefix++;

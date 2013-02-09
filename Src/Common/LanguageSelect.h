@@ -70,7 +70,8 @@ private:
 	LANGID m_wCurLanguage;
 	class strarray
 	{
-		stl::vector<LPCSTR> m_vec;
+		typedef stl::vector<LPCSTR> t_vec;
+		t_vec m_vec;
 	public:
 		strarray()
 		{
@@ -82,7 +83,7 @@ private:
 		}
 		void clear()
 		{
-			size_t i = m_vec.size();
+			t_vec::size_type i = m_vec.size();
 			while (i > 1)
 			{
 				--i;
@@ -92,7 +93,7 @@ private:
 			}
 			m_vec.resize(1, "");
 		}
-		LPCSTR setAtGrow(size_t i, LPCSTR text)
+		LPCSTR setAtGrow(t_vec::size_type i, LPCSTR text)
 		{
 			if (m_vec.size() <= i)
 			{
@@ -113,7 +114,7 @@ private:
 			m_vec[i] = text;
 			return link;
 		}
-		LPCSTR operator[](size_t i) const
+		LPCSTR operator[](t_vec::size_type i) const
 		{
 			LPCSTR text = m_vec[i < m_vec.size() ? i : 0];
 			if (HIWORD(text) == 0)

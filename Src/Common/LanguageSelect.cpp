@@ -528,7 +528,7 @@ CLanguageSelect::CLanguageSelect()
  */
 static char *EatPrefix(char *text, const char *prefix)
 {
-	if (int len = strlen(prefix))
+	if (size_t len = strlen(prefix))
 		if (_memicmp(text, prefix, len) == 0)
 			return text + len;
 	return 0;
@@ -591,7 +591,7 @@ static void unslash(unsigned codepage, stl::string &s)
 		}
 		++p;
 	} while (c != '\0');
-	s.resize(p - 1 - &s.front());
+	s.resize(static_cast<stl::string::size_type>(p - 1 - &s.front()));
 }
 
 /**
@@ -673,7 +673,7 @@ BOOL CLanguageSelect::LoadLanguageFile(LANGID wLangId)
 		{
 			char *p = strchr(buf, '"');
 			char *q = strrchr(buf, '"');
-			if (stl::string::size_type n = q - p)
+			if (stl::string::size_type n = static_cast<stl::string::size_type>(q - p))
 			{
 				ps->append(p + 1, n - 1);
 			}
@@ -744,7 +744,7 @@ BOOL CLanguageSelect::LoadLanguageFile(LANGID wLangId)
 		{
 			char *p = strchr(buf, '"');
 			char *q = strrchr(buf, '"');
-			if (stl::string::size_type n = q - p)
+			if (stl::string::size_type n = static_cast<stl::string::size_type>(q - p))
 			{
 				ps->append(p + 1, n - 1);
 			}
@@ -1125,7 +1125,7 @@ int CLanguageSelect::DoModal(ODialog &dlg, HWND parent) const
 	HINSTANCE hinst = m_hCurrentDll ? m_hCurrentDll : GetModuleHandle(NULL);
 	if (parent == NULL)
 		parent = theApp.m_pMainWnd->GetLastActivePopup()->m_hWnd;
-	return dlg.DoModal(hinst, parent);
+	return static_cast<int>(dlg.DoModal(hinst, parent));
 }
 
 HWND CLanguageSelect::Create(ODialog &dlg, HWND parent) const

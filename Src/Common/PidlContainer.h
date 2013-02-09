@@ -42,6 +42,7 @@
  */
 class CPidlContainer
 {
+	typedef stl::vector<LPITEMIDLIST> PidlContainer;
 public:
 	/**
 	 * @brief Constructor
@@ -75,12 +76,11 @@ public:
 	 *
 	 * @return Number of items in container
 	 */
-	size_t Size() const { return m_container.size(); }
+	PidlContainer::size_type Size() const { return m_container.size(); }
 
 	void Free(LPITEMIDLIST pidl) const { if (m_pMalloc) m_pMalloc->Free(pidl); }
 
 private:
-	typedef stl::vector<LPITEMIDLIST> PidlContainer;
 	PidlContainer m_container; /**< stores items */
 	CMyComPtr<IMalloc> m_pMalloc;
 };
