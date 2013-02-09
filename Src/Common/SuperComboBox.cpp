@@ -51,7 +51,7 @@ int HSuperComboBox::InsertString(int nIndex, LPCTSTR lpszItem)
 		cbitem.iItem = nIndex;
 		cbitem.iImage = I_IMAGECALLBACK;
 		cbitem.iSelectedImage = I_IMAGECALLBACK;
-		return SendMessage(CBEM_INSERTITEM, 0, reinterpret_cast<LPARAM>(&cbitem)) ;
+		return static_cast<int>(SendMessage(CBEM_INSERTITEM, 0, reinterpret_cast<LPARAM>(&cbitem)));
 	}
 	else
 	{
@@ -167,7 +167,7 @@ static LRESULT CALLBACK WndProcDropping(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
 	switch (uMsg)
 	{
 	case WM_CTLCOLORLISTBOX:
-		::SetWindowLongPtr(hWnd, GWL_WNDPROC, reinterpret_cast<LONG_PTR>(DefWndProcDropping));
+		::SetWindowLongPtr(hWnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(DefWndProcDropping));
 		DefWndProcDropping = NULL;
 		if (HListBox *pLb = reinterpret_cast<HListBox *>(lParam))
 		{
@@ -229,7 +229,7 @@ void HSuperComboBox::AdjustDroppedWidth()
 	if (DefWndProcDropping == NULL)
 	{
 		DefWndProcDropping = reinterpret_cast<WNDPROC>(
-			SetWindowLongPtr(m_hWnd, GWL_WNDPROC,
+			SetWindowLongPtr(m_hWnd, GWLP_WNDPROC,
 			reinterpret_cast<LONG_PTR>(WndProcDropping)));
 	}
 }
