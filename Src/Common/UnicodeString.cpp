@@ -59,8 +59,10 @@ void string_makeupper(String &str)
  */
 void string_replace(String &target, LPCTSTR find, LPCTSTR replace)
 {
-	const String::size_type find_len = _tcslen(find);
-	const String::size_type replace_len = _tcslen(replace);
+	const String::size_type find_len =
+		static_cast<String::size_type>(_tcslen(find));
+	const String::size_type replace_len =
+		static_cast<String::size_type>(_tcslen(replace));
 	String::size_type pos = 0;
 	while ((pos = target.find(find, pos)) != String::npos)
 	{

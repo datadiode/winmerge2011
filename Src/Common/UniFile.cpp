@@ -47,8 +47,8 @@ namespace convert_utf
 static char THIS_FILE[] = __FILE__;
 #endif
 
-static void Append(String &strBuffer, LPCTSTR pchTail, size_t cchTail,
-		size_t cchBufferMin = 1024);
+static void Append(String &strBuffer, LPCTSTR pchTail,
+	String::size_type cchTail, String::size_type cchBufferMin = 1024);
 
 /**
  * @brief The constructor.
@@ -335,11 +335,11 @@ void UniMemFile::ReadBom()
  * @return New length of the string.
  */
 static void Append(String &strBuffer, LPCTSTR pchTail,
-		size_t cchTail, size_t cchBufferMin)
+	String::size_type cchTail, String::size_type cchBufferMin)
 {
-	size_t cchBuffer = strBuffer.capacity();
-	size_t cchHead = strBuffer.length();
-	size_t cchLength = cchHead + cchTail;
+	String::size_type cchBuffer = strBuffer.capacity();
+	String::size_type cchHead = strBuffer.length();
+	String::size_type cchLength = cchHead + cchTail;
 	while (cchBuffer < cchLength)
 	{
 		ASSERT((cchBufferMin & cchBufferMin - 1) == 0); // must be a power of 2
@@ -432,7 +432,8 @@ bool UniMemFile::ReadString(String & line, String & eol, bool * lossy)
 				++m_txtstats.nzeros;
 			}
 		}
-		bool success = ucr::maketstring(line, (LPCSTR)m_current, eolptr - m_current, m_codepage, lossy);
+		bool success = ucr::maketstring(line, (LPCSTR)m_current,
+			static_cast<String::size_type>(eolptr - m_current), m_codepage, lossy);
 		if (!success)
 		{
 			return false;
@@ -478,7 +479,7 @@ bool UniMemFile::ReadString(String & line, String & eol, bool * lossy)
 			{
 			case convert_utf::conversionOK:
 			case convert_utf::targetExhausted:
-				len = sourceStart - m_current;
+				len = static_cast<String::size_type>(sourceStart - m_current);
 				break;
 			case convert_utf::sourceExhausted:
 				m_current = m_base + m_filesize.int64;
@@ -548,7 +549,7 @@ bool UniMemFile::ReadString(String & line, String & eol, bool * lossy)
 			&sourceStart, sourceStart + 1,
 			&targetStart, targetStart + 2,
 			convert_utf::lenientConversion);
-		Append(line, targetBuf, targetStart - targetBuf);
+		Append(line, targetBuf, static_cast<String::size_type>(targetStart - targetBuf));
 	}
 	return true;
 }
@@ -684,7 +685,7 @@ void UniStdioFile::WriteBom()
 /**
  * @brief Write one line (doing any needed conversions)
  */
-bool UniStdioFile::WriteString(LPCTSTR line, size_t length)
+bool UniStdioFile::WriteString(LPCTSTR line, String::size_type length)
 {
 	// shortcut the easy cases
 	if (m_unicoding == UCS2LE)
@@ -692,7 +693,7 @@ bool UniStdioFile::WriteString(LPCTSTR line, size_t length)
 		return SUCCEEDED(m_pstm->Write(line, length * sizeof(TCHAR), NULL));
 	}
 	const BYTE *src = reinterpret_cast<const BYTE *>(line);
-	size_t srcbytes = length * sizeof(TCHAR);
+	String::size_type srcbytes = length * sizeof(TCHAR);
 	BOOL loss = FALSE;
 	ucr::convert(UCS2LE, 0, src, srcbytes, m_unicoding, m_codepage, &m_ucrbuff, &loss);
 	// TODO: What to do about lossy conversion ?
@@ -723,7 +724,7 @@ HRESULT STDMETHODCALLTYPE UniStdioFile::Read(void *, ULONG, ULONG *)
 
 HRESULT STDMETHODCALLTYPE UniStdioFile::Write(const void *pv, ULONG cb, ULONG *pcbWritten)
 {
-	cb = fwrite(pv, 1, cb, m_fp);
+	cb = static_cast<ULONG>(fwrite(pv, 1, cb, m_fp));
 	m_filesize.int64 += cb;
 	if (pcbWritten)
 		*pcbWritten = cb;

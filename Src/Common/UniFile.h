@@ -161,7 +161,7 @@ public:
 	virtual void ReadBom();
 
 	void WriteBom();
-	bool WriteString(LPCTSTR line, size_t length);
+	bool WriteString(LPCTSTR line, String::size_type length);
 	bool WriteString(const String &line)
 	{
 		return WriteString(line.c_str(), line.length());

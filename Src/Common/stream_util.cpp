@@ -68,15 +68,15 @@ size_t StreamLineReader::readLine(stl::string &s)
 	s.resize(0);
 	do 
 	{
-		size_t n = s.size();
+		stl::string::size_type n = s.size();
 		s.resize(n + ahead);
 		char *lower = &s[n];
 		if (char *upper = (char *)_memccpy(lower, chunk + index, '\n', ahead))
 		{
-			n = upper - lower;
+			n = static_cast<stl::string::size_type>(upper - lower);
 			index += n;
 			ahead -= n;
-			s.resize(upper - &s.front());
+			s.resize(static_cast<stl::string::size_type>(upper - s.c_str()));
 			break;
 		}
 		index = ahead = 0;
