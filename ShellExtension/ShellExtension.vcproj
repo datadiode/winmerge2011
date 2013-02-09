@@ -21,8 +21,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="$(SolutionDir)Build\$(SolutionName)\$(ConfigurationName)"
-			IntermediateDirectory="$(SolutionDir)BuildTmp\$(ProjectName)\$(PlatformName)$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)Build\$(SolutionName)\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(SolutionDir)BuildTmp\$(ProjectName)\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
@@ -44,13 +44,13 @@
 			<Tool
 				Name="VCMIDLTool"
 				GenerateTypeLibrary="false"
-				OutputDirectory="$(IntDir)\midl"
+				OutputDirectory="$(IntDir)\..\..\midl"
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories=".,../src/eastl/include,../src/common,$(IntDir)/midl"
+				AdditionalIncludeDirectories=".,../src/eastl/include,../src/common,$(IntDir)/../../midl"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS=1;_CRT_SECURE_NO_DEPRECATE;_USRDLL;UNICODE;_ATL_NO_UUIDOF;USE_EASTL"
 				ExceptionHandling="0"
 				RuntimeLibrary="1"
@@ -112,8 +112,8 @@
 		</Configuration>
 		<Configuration
 			Name="Debug|x64"
-			OutputDirectory="$(SolutionDir)Build\$(SolutionName)\$(ConfigurationName)"
-			IntermediateDirectory="$(SolutionDir)BuildTmp\$(ProjectName)\$(PlatformName)$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)Build\$(SolutionName)\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(SolutionDir)BuildTmp\$(ProjectName)\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
@@ -136,13 +136,13 @@
 				Name="VCMIDLTool"
 				TargetEnvironment="3"
 				GenerateTypeLibrary="false"
-				OutputDirectory="$(IntDir)\midl"
+				OutputDirectory="$(IntDir)\..\..\midl"
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories=".,../src/eastl/include,../src/common,$(IntDir)/midl"
+				AdditionalIncludeDirectories=".,../src/eastl/include,../src/common,$(IntDir)/../../midl"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS=1;_CRT_SECURE_NO_DEPRECATE;_USRDLL;UNICODE;_ATL_NO_UUIDOF;USE_EASTL"
 				ExceptionHandling="0"
 				RuntimeLibrary="1"
@@ -204,8 +204,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(SolutionDir)Build\$(SolutionName)\$(ConfigurationName)"
-			IntermediateDirectory="$(SolutionDir)BuildTmp\$(ProjectName)\$(PlatformName)$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)Build\$(SolutionName)\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(SolutionDir)BuildTmp\$(ProjectName)\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
@@ -228,14 +228,14 @@
 			<Tool
 				Name="VCMIDLTool"
 				GenerateTypeLibrary="false"
-				OutputDirectory="$(IntDir)\midl"
+				OutputDirectory="$(IntDir)\..\..\midl"
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="1"
 				InlineFunctionExpansion="1"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories=".,../src/eastl/include,../src/common,$(IntDir)/midl"
+				AdditionalIncludeDirectories=".,../src/eastl/include,../src/common,$(IntDir)/../../midl"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS=1;_CRT_SECURE_NO_DEPRECATE;_USRDLL;UNICODE;_ATL_NO_UUIDOF;USE_EASTL"
 				StringPooling="true"
 				ExceptionHandling="0"
@@ -297,8 +297,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|x64"
-			OutputDirectory="$(SolutionDir)Build\$(SolutionName)\$(ConfigurationName)"
-			IntermediateDirectory="$(SolutionDir)BuildTmp\$(ProjectName)\$(PlatformName)$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)Build\$(SolutionName)\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(SolutionDir)BuildTmp\$(ProjectName)\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
@@ -322,14 +322,14 @@
 				Name="VCMIDLTool"
 				TargetEnvironment="3"
 				GenerateTypeLibrary="false"
-				OutputDirectory="$(IntDir)\midl"
+				OutputDirectory="$(IntDir)\..\..\midl"
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="1"
 				InlineFunctionExpansion="1"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories=".,../src/eastl/include,../src/common,$(IntDir)/midl"
+				AdditionalIncludeDirectories=".,../src/eastl/include,../src/common,$(IntDir)/../../midl"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS=1;_CRT_SECURE_NO_DEPRECATE;_USRDLL;UNICODE;_ATL_NO_UUIDOF;USE_EASTL"
 				StringPooling="true"
 				ExceptionHandling="0"

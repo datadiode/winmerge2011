@@ -36,25 +36,25 @@ End If
 <meta http-equiv='Content-Type' content='text/html; charset=ISO-8859-1'/>
 <hta:application
 	id='app'
-	version='XXXXX.2011.003.057'
+	version='XXXXX.2011.003.067'
 	applicationName='WinMerge &amp;version; Setup'
 	scroll='no'
 	singleInstance='yes'
 	icon='WinMergeU.exe'/>
 <comment id='setup_cfg'>7z%BC%AF%27%1C
 ;!@Install@!UTF-8!
-Title="WinMerge &version;"
+Title="WinMerge &version; [&platform;]"
 BeginPrompt="Do you want to install WinMerge &version;?"
 ExecuteFile="setup.wsf"
-ExecuteParameters="install"
+ExecuteParameters="install &platform;"
 ;!@InstallEnd@!
 </comment>
 <comment id='setup_bat'>
 set SevenZip=&SevenZip;
-del sources.7z "WinMerge_&version;.7z"
-"%SevenZip%\7z.exe" a sources.7z -r Docs\* Externals\* FileTransforms\* Filters\* PrintTemplates\* Setup\* ShellExtension\* Src\* Tools\* Translations\* WinMerge.sln ArchiveSupport\Merge7z\Merge7z.h -x!*.user -x!*.bak -x!*.idc -x!"Visual Studio *"
-"%SevenZip%\7z.exe" a "WinMerge_&version;.7z" -r .\Build\WinMerge\Release\* sources.7z -x!*.lib -x!*.exp -x!*.pdb
-copy /b "%SevenZip%\7zS.sfx" + Setup.cfg + "WinMerge_&version;.7z" "WinMerge_&version;_change_7z_to_exe_if_you_want_a_setup.7z"
+del sources.7z "WinMerge_&version;_&platform;.7z"
+"%SevenZip%\7z.exe" a sources.7z -r Docs\* Externals\* FileTransforms\* Filters\* PrintTemplates\* Setup\* ShellExtension\* Src\* Tools\* Translations\* vsprops\* WinMerge.sln ArchiveSupport\Merge7z\Merge7z.h -x!*.user -x!*.bak -x!*.idc -x!"Visual Studio *"
+"%SevenZip%\7z.exe" a "WinMerge_&version;_&platform;.7z" -r .\Build\WinMerge\&platform;\Release\* .\Build\WinMerge\Win32\Release\ShellExtensionU.dll .\Build\WinMerge\x64\Release\ShellExtensionX64.dll sources.7z -x!*.lib -x!*.exp -x!*.pdb
+copy /b "%SevenZip%\7zS.sfx" + Setup_&platform;.cfg + "WinMerge_&version;_&platform;.7z" "WinMerge_&version;_&platform;_change_7z_to_exe_if_you_want_a_setup.7z"
 </comment>
 <comment id='version_h'>
 #define MAJOR &major;
@@ -335,6 +335,14 @@ Sub DeleteLink(ByVal sPath)
 End Sub
 
 Sub Job_Install
+	Select Case sha.GetSystemInformation("ProcessorArchitecture")
+	Case PROCESSOR_ARCHITECTURE_IA64, PROCESSOR_ARCHITECTURE_AMD64
+	Case Else
+		If argv(2) = "x64" Then
+			MsgBox "This software is for 64 bit only. It cannot run on a 32 bit operating system.", vbError, document.title
+			close
+		End If
+	End Select
 	maintenance.disabled = True
 	If IsEmpty(executable) Then
 		EdFolder.value = env("ProgramFiles") & "\WinMerge2011"
@@ -431,7 +439,7 @@ Sub PbCancel_OnClick
 End Sub
 
 Sub Job_Version
-	Dim parts, content, path
+	Dim parts, content, path, platform
 	parts = Split(app.version, ".")
 	parts(3) = Right("0" & DatePart("ww", Now), 2) & DatePart("w", Now)
 	parts(2) = Left(parts(2), 2) & (DatePart("yyyy", Now) - parts(1) + 1)
@@ -444,21 +452,22 @@ Sub Job_Version
 	If fso.OpenTextFile(path).ReadAll <> content Then
 		fso.CreateTextFile(path, True).Write content
 	End If
+	platform = argv(3)
 	version = Join(parts, ".")
-	If app.version <> version Then
-		path = location.pathname
-		content = Replace(fso.OpenTextFile(path).ReadAll, app.version, version)
-		fso.CreateTextFile(path, True).Write content
-		version = Replace(version, "XXXXX.", "0.")
-		version = Replace(version, "BUILD.", "")
-		content = Replace(setup_cfg.text, "&version;", version)
-		path = fso.GetParentFolderName(location.pathname) & ".cfg"
-		fso.CreateTextFile(path, True).Write Unescape(content)
-		content = Replace(setup_bat.text, "&version;", version)
-		content = Replace(content, "&SevenZip;", sh.RegRead("HKLM\Software\7-Zip\Path"))
-		path = fso.GetParentFolderName(location.pathname) & ".bat"
-		fso.CreateTextFile(path, True).Write content
-	End If
+	path = location.pathname
+	content = Replace(fso.OpenTextFile(path).ReadAll, app.version, version)
+	fso.CreateTextFile(path, True).Write content
+	version = Replace(version, "XXXXX.", "0.")
+	version = Replace(version, "BUILD.", "")
+	content = Replace(setup_cfg.text, "&version;", version)
+	content = Replace(content, "&platform;", platform)
+	path = fso.GetParentFolderName(location.pathname) & "_" & platform & ".cfg"
+	fso.CreateTextFile(path, True).Write Unescape(content)
+	content = Replace(setup_bat.text, "&version;", version)
+	content = Replace(content, "&platform;", platform)
+	content = Replace(content, "&SevenZip;", sh.RegRead("HKLM\Software\7-Zip\Path"))
+	path = fso.GetParentFolderName(location.pathname) & "_" & platform & ".bat"
+	fso.CreateTextFile(path, True).Write content
 	close
 End Sub
 

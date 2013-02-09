@@ -6,7 +6,7 @@
 	<Rules>
 		<CustomBuildRule
 			Name="imp"
-			CommandLine="lib /MACHINE:X86 /DEF:&quot;$(InputPath)&quot; /OUT:&quot;$(IntDir)\$(InputName).lib&quot;"
+			CommandLine="lib /MACHINE:$(TargetMachine) /DEF:&quot;$(InputPath)&quot; /OUT:&quot;$(IntDir)\$(InputName).lib&quot;"
 			Outputs="&quot;$(IntDir)\$(InputName).lib&quot;"
 			FileExtensions="*.imp"
 			>
