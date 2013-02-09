@@ -508,14 +508,15 @@ void CChildFrame::FlagMovedLines(MovedLines *pMovedLines,
 			ASSERT(j>=0);
 			// We only flag lines that are already marked as being different
 			int apparent = pBuffer1->ComputeApparentLine(i);
-			if (pBuffer1->FlagIsSet(apparent, LF_DIFF))
+			LineInfo &info = pBuffer1->m_aLines[apparent];
+			if (info.m_dwFlags & LF_DIFF)
 			{
-				pBuffer1->SetLineFlag(apparent, LF_MOVED, TRUE, FALSE, FALSE);
+				info.m_dwFlags |= LF_MOVED;
 			}
 		}
 	}
 
-	for (i=0; i<pBuffer2->GetLineCount(); ++i)
+	for (i = 0; i < pBuffer2->GetLineCount(); ++i)
 	{
 		int j = pMovedLines->LineInBlock(i, MovedLines::SIDE_RIGHT);
 		if (j != -1)
@@ -524,9 +525,10 @@ void CChildFrame::FlagMovedLines(MovedLines *pMovedLines,
 			ASSERT(j>=0);
 			// We only flag lines that are already marked as being different
 			int apparent = pBuffer2->ComputeApparentLine(i);
-			if (pBuffer2->FlagIsSet(apparent, LF_DIFF))
+			LineInfo &info = pBuffer2->m_aLines[apparent];
+			if (info.m_dwFlags & LF_DIFF)
 			{
-				pBuffer2->SetLineFlag(apparent, LF_MOVED, TRUE, FALSE, FALSE);
+				info.m_dwFlags |= LF_MOVED;
 			}
 		}
 	}
@@ -1506,7 +1508,7 @@ void CChildFrame::PrimeTextBuffers()
 			curDiff.blank1 = curDiff.dbegin1;
 			// flag lines
 			for (i = curDiff.dbegin0 ; i <= curDiff.dend0; i++)
-				m_ptBuf[0]->SetLineFlag(i, LF_DIFF, TRUE, FALSE, FALSE);
+				m_ptBuf[0]->m_aLines[i].m_dwFlags |= LF_DIFF;
 			// blanks are already inserted (and flagged) to compensate for diff on other side
 			break;
 		case OP_RIGHTONLY:
@@ -1519,7 +1521,7 @@ void CChildFrame::PrimeTextBuffers()
 			curDiff.blank1 = 0;
 			// flag lines
 			for (i = curDiff.dbegin1 ; i <= curDiff.dend1 ; i++)
-				m_ptBuf[1]->SetLineFlag(i, LF_DIFF, TRUE, FALSE, FALSE);
+				m_ptBuf[1]->m_aLines[i].m_dwFlags |= LF_DIFF;
 			// blanks are already inserted (and flagged) to compensate for diff on other side
 			break;
 		case OP_TRIVIAL:
@@ -1547,13 +1549,13 @@ void CChildFrame::PrimeTextBuffers()
 				{
 					// set diff or trivial flag
 					DWORD dflag = curDiff.op == OP_DIFF ? LF_DIFF : LF_TRIVIAL;
-					m_ptBuf[0]->SetLineFlag(i, dflag, TRUE, FALSE, FALSE);
+					m_ptBuf[0]->m_aLines[i].m_dwFlags |= dflag;
 				}
 				else if (curDiff.op == OP_TRIVIAL)
 				{
 					// ghost lines are already inserted (and flagged)
 					// ghost lines opposite to trivial lines are ghost and trivial
-					m_ptBuf[0]->SetLineFlag(i, LF_TRIVIAL, TRUE, FALSE, FALSE);
+					m_ptBuf[0]->m_aLines[i].m_dwFlags |= LF_TRIVIAL;
 				}
 			}
 			// right side
@@ -1563,18 +1565,38 @@ void CChildFrame::PrimeTextBuffers()
 				{
 					// set diff or trivial flag
 					DWORD dflag = curDiff.op == OP_DIFF ? LF_DIFF : LF_TRIVIAL;
-					m_ptBuf[1]->SetLineFlag(i, dflag, TRUE, FALSE, FALSE);
+					m_ptBuf[1]->m_aLines[i].m_dwFlags |= dflag;
 				}
 				else if (curDiff.op == OP_TRIVIAL)
 				{
 					// ghost lines are already inserted (and flagged)
 					// ghost lines opposite to trivial lines are ghost and trivial
-					m_ptBuf[1]->SetLineFlag(i, LF_TRIVIAL, TRUE, FALSE, FALSE);
+					m_ptBuf[1]->m_aLines[i].m_dwFlags |= LF_TRIVIAL;
 				}
 			}
 			break;
 		}
 		VERIFY(m_diffList.SetDiff(nDiff, curDiff));
+	}
+
+	// Flag any remaining differences which were trivialized by prediffing,
+	// and hence did not make it into the DiffList produced by DiffUtils.
+	UINT n = min(m_ptBuf[0]->GetLineCount(), m_ptBuf[1]->GetLineCount());
+	UINT i;
+	for (i = 0; i < n; ++i)
+	{
+		LineInfo &info0 = m_ptBuf[0]->m_aLines[i];
+		LineInfo &info1 = m_ptBuf[1]->m_aLines[i];
+		if (((info0.m_dwFlags | info1.m_dwFlags) & LF_WINMERGE_FLAGS) == 0)
+		{
+			int len = info0.Length();
+			if (len != info1.Length() ||
+				memcmp(info0.GetLine(), info1.GetLine(), len * sizeof(TCHAR)) != 0)
+			{
+				info0.m_dwFlags |= LF_TRIVIAL;
+				info1.m_dwFlags |= LF_TRIVIAL;
+			}
+		}
 	}
 
 	m_diffList.ConstructSignificantChain();
