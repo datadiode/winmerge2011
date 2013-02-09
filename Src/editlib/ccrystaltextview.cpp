@@ -1831,12 +1831,12 @@ void CCrystalTextView::UpdateCaret(bool bShowHide)
 		SetCaretPos(ptCaretPos.x, ptCaretPos.y);
 		ShowCaret();
 		UpdateCompositionWindowPos(); /* IME */
+		OnUpdateCaret(bShowHide);
 	}
 	else
 	{
 		HideCaret();
 	}
-	OnUpdateCaret(bShowHide);
 }
 
 void CCrystalTextView::OnUpdateCaret(bool)

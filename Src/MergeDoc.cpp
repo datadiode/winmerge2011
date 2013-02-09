@@ -312,7 +312,7 @@ static void SaveBuffForDiff(CDiffTextBuffer & buf, CDiffTextBuffer & buf2, DiffF
 	// If file was in Unicode
 	if ((orig_unicoding != NONE) || (buf2.getUnicoding() != NONE))
 	{
-	// we subvert the buffer's memory of the original file encoding
+		// we subvert the buffer's memory of the original file encoding
 		buf.setUnicoding(UCS2LE);  // write as UCS-2LE (for preprocessing)
 		buf.setCodepage(0); // should not matter
 	}
@@ -450,7 +450,7 @@ int CChildFrame::Rescan2(bool &bIdentical)
 		if (COptionsMgr::Get(OPT_CMP_MATCH_SIMILAR_LINES))
 			AdjustDiffBlocks();
 
-		// Analyse diff-list (updating real line-numbers)
+		// Analyze diff-list (updating real line-numbers)
 		// this operation does not change the modified flag
 		PrimeTextBuffers();
 
@@ -1251,6 +1251,7 @@ void CChildFrame::FlushAndRescan(bool bForced)
 
 	// Refresh display
 	UpdateAllViews(NULL);
+	UpdateCmdUI();
 
 	// Show possible error after updating screen
 	if (nRescanResult != RESCAN_SUPPRESSED)
@@ -1418,7 +1419,7 @@ void CChildFrame::OnUpdateStatusNum()
  * synchronization is needed after the last line. So no ghost line will be created
  * to face an ignored difference in the last line (typically : 'ignore blank lines' 
  * + empty last line on one side).
- * If you fell that different length buffers are really strange, CHANGE FIRST
+ * If you feel that different length buffers are really strange, CHANGE FIRST
  * the last diff to take into account the empty last line.
  */
 void CChildFrame::PrimeTextBuffers()
