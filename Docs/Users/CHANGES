@@ -1,3 +1,10 @@
+0.2011.003.071
+Changes since preceding release (not necessarily complete):
+• Create a distinct 64 bit version of WinMergeU.exe
+• OpenDlg: Add option to remember "Compare As" selection as default
+• Differences trivialized by prediffing were not being colorized as they should
+• Some commands wrongly kept their enable state when opening/closing a view
+
 0.2011.003.061
 Changes since preceding release (not necessarily complete):
 • Fix tab stop logic in CCrystalTextView::ClientToText()
