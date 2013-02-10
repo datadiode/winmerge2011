@@ -36,9 +36,8 @@ void CSyntaxColors::LoadFromRegistry()
 			m_bolds[i] = key.ReadDword(name, m_bolds[i]) != 0;
 		}
 	}
-	if (HKEY h = SettingStore.GetSectionKey(CustomColors))
+	if (CRegKeyEx key = SettingStore.GetSectionKey(CustomColors))
 	{
-		CRegKeyEx key = h;
 		for (UINT i = 0; i < _countof(m_rgCustColors); i++)
 		{
 			TCHAR name[40];
