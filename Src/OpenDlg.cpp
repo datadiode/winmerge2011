@@ -83,6 +83,7 @@ COpenDlg::COpenDlg()
 		IDC_RIGHT_BUTTON,		BY<1000>::X2L | BY<1000>::X2R,
 		IDC_OPEN_STATUS,		BY<1000>::X2R,
 		IDC_SELECT_FILTER,		BY<1000>::X2L | BY<1000>::X2R,
+		IDC_COMPARE_AS_CHECK,	BY<1000>::X2L | BY<1000>::X2R,
 		IDOK,					BY<1000>::X2L | BY<1000>::X2R,
 		IDCANCEL,				BY<1000>::X2L | BY<1000>::X2R,
 		ID_HELP,				BY<1000>::X2L | BY<1000>::X2R,
@@ -104,6 +105,7 @@ bool COpenDlg::UpdateData()
 	DDX_CBStringExact<op>(IDC_LEFT_COMBO, m_sLeftFile);
 	DDX_CBStringExact<op>(IDC_RIGHT_COMBO, m_sRightFile);
 	DDX_CBStringExact<op>(IDC_EXT_COMBO, m_sFilter);
+	DDX_CBStringExact<op>(IDC_COMPARE_AS_COMBO, m_sCompareAs);
 	DDX_Check<op>(IDC_RECURS_CHECK, m_nRecursive);
 	return true;
 }
@@ -236,6 +238,9 @@ LRESULT COpenDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		case MAKEWPARAM(IDC_EXT_COMBO, CBN_CLOSEUP):
 			UnregisterHotKey(m_hWnd, MAKEWPARAM(LOWORD(wParam), VK_DELETE));
 			break;
+		case MAKEWPARAM(IDC_COMPARE_AS_COMBO, CBN_SELCHANGE):
+			OnSelchangeCompareAs();
+			break;
 		}
 		break;
 	case WM_HOTKEY:
@@ -277,9 +282,10 @@ BOOL COpenDlg::OnInitDialog()
 	m_pCbExt = static_cast<HSuperComboBox *>(GetDlgItem(IDC_EXT_COMBO));
 
 	m_pCbCompareAs = static_cast<HComboBox *>(GetDlgItem(IDC_COMPARE_AS_COMBO));
+	m_pTgCompareAs = static_cast<HButton *>(GetDlgItem(IDC_COMPARE_AS_CHECK));
+
 	m_pCbCompareAs->AddString(_T(""));
 	m_pCbCompareAs->SetItemData(0, ID_MERGE_COMPARE);
-	m_pCbCompareAs->SetCurSel(0);
 
 	m_pCbLeft->LoadState(_T("Files\\Left"));
 	m_pCbRight->LoadState(_T("Files\\Right"));
@@ -324,8 +330,12 @@ BOOL COpenDlg::OnInitDialog()
 		index = m_pCbExt->InsertString(0, filterString.c_str());
 	m_pCbExt->SetCurSel(index);
 
-	if (!m_bOverwriteRecursive)
-		m_nRecursive = SettingStore.GetProfileInt(_T("Settings"), _T("Recurse"), 0);
+	if (CRegKeyEx key = SettingStore.GetSectionKey(_T("Settings")))
+	{
+		if (!m_bOverwriteRecursive)
+			m_nRecursive = key.ReadDword(_T("Recurse"), 0);
+		m_sCompareAs = key.ReadString(_T("CompareAs"), _T(""));
+	}
 
 	if (m_sLeftFile.empty())
 		m_pCbLeft->GetWindowText(m_sLeftFile);
@@ -341,6 +351,14 @@ BOOL COpenDlg::OnInitDialog()
 		m_pCbExt->GetWindowText(m_sFilter);
 
 	UpdateData<Set>();
+
+	m_nCompareAs = m_pCbCompareAs->GetCurSel();
+	if (m_nCompareAs < 0)
+		m_pCbCompareAs->SetCurSel(0);
+	else if (m_nCompareAs == 0)
+		m_nCompareAs = -1;
+
+	OnSelchangeCompareAs();
 	Update3StateCheckBoxLabel(IDC_RECURS_CHECK);
 
 	// Insert placeholders to represent items which are not yet listed as MRU.
@@ -362,10 +380,10 @@ void COpenDlg::OnDestroy()
 	}
 }
 
-/** 
+/**
  * @brief Called when "Browse..." button is selected for left or right path.
  */
-void COpenDlg::OnBrowseButton(UINT id) 
+void COpenDlg::OnBrowseButton(UINT id)
 {
 	String path;
 	GetDlgItemText(id, path);
@@ -376,6 +394,13 @@ void COpenDlg::OnBrowseButton(UINT id)
 		SetDlgItemText(id, path.c_str());
 		UpdateButtonStates();
 	}	
+}
+
+void COpenDlg::OnSelchangeCompareAs()
+{
+	int nCurSel = m_pCbCompareAs->GetCurSel();
+	m_pTgCompareAs->EnableWindow(nCurSel > 0);
+	m_pTgCompareAs->SetCheck(m_nCompareAs == nCurSel);
 }
 
 /** 
@@ -413,7 +438,17 @@ void COpenDlg::OnOK()
 	// Caller saves MRU left and right files, so don't save them here.
 	m_pCbExt->SaveState(_T("Files\\Ext"));
 
-	SettingStore.WriteProfileInt(_T("Settings"), _T("Recurse"), m_nRecursive);
+	if (CRegKeyEx key = SettingStore.GetSectionKey(_T("Settings")))
+	{
+		if (!m_bOverwriteRecursive)
+			key.WriteDword(_T("Recurse"), m_nRecursive);
+		int nCompareAs = m_pCbCompareAs->GetCurSel();
+		UINT fCompareAs = m_pTgCompareAs->GetCheck();
+		if (m_nCompareAs != nCompareAs && fCompareAs)
+			key.WriteString(_T("CompareAs"), m_sCompareAs.c_str());
+		else if (m_nCompareAs == nCompareAs && !fCompareAs)
+			key.WriteString(_T("CompareAs"), _T(""));
+	}
 
 	if ((m_attrLeft ^ m_attrRight) & FILE_ATTRIBUTE_DIRECTORY)
 	{
@@ -423,7 +458,6 @@ void COpenDlg::OnOK()
 	{
 		int i = m_pCbCompareAs->GetCurSel();
 		m_idCompareAs = m_pCbCompareAs->GetItemData(i);
-		m_pCompareAsScriptMenu->GetMenuString(m_idCompareAs, m_szCompareAs, _countof(m_szCompareAs));
 	}
 
 	EndDialog(IDOK);
@@ -468,6 +502,7 @@ void COpenDlg::UpdateButtonStates()
 	nShowFilter ^= SW_SHOW;
 	m_pCbCompareAs->ShowWindow(nShowFilter);
 	m_pCbCompareAs->GetWindow(GW_HWNDPREV)->ShowWindow(nShowFilter); // asociated label
+	m_pTgCompareAs->ShowWindow(nShowFilter);
 
 	// Enable buttons as appropriate
 	if (COptionsMgr::Get(OPT_VERIFY_OPEN_PATHS))

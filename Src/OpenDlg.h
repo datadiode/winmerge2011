@@ -59,12 +59,12 @@ public:
 	HSuperComboBox	*m_pCbRight;
 	HSuperComboBox	*m_pCbExt;
 	HComboBox		*m_pCbCompareAs;
+	HButton			*m_pTgCompareAs;
 	HMenu			*m_pCompareAsScriptMenu;
 	bool m_bOverwriteRecursive;  /**< If TRUE overwrite last used value of recursive */
 	UINT m_idCompareAs;
 	DWORD m_attrLeft;
 	DWORD m_attrRight;
-	TCHAR m_szCompareAs[MAX_PATH];
 
 // Implementation data
 private:
@@ -75,6 +75,7 @@ private:
 		AUTO_COMPLETE_RECENTLY_USED
 	};
 	const int m_nAutoComplete;
+	int m_nCompareAs;
 
 // Implementation
 protected:
@@ -91,6 +92,7 @@ protected:
 
 	void OnDestroy();
 	void OnBrowseButton(UINT id);
+	void OnSelchangeCompareAs();
 	void OnOK();
 	void OnCancel();
 	void OnSelchangePathCombo(HSuperComboBox *);

@@ -44,6 +44,7 @@ public:
 	String m_sLeftFile; /**< Left path */
 	String m_sRightFile; /**< Right path */
 	String m_sFilter; /**< Filter name or mask */
+	String m_sCompareAs; /**< How to compare */
 	int m_nRecursive; /**< Are subfolders included (recursive scan) */
 	BOOL m_bLeftPathReadOnly; /**< Is left path opened as read-only */
 	BOOL m_bRightPathReadOnly; /**< Is right path opened as read-only */

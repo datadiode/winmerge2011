@@ -1440,7 +1440,7 @@ bool CMainFrame::DoFileOpen(
 		attrRight = dlg.m_attrRight;
 		// TODO: add codepage options to open dialog?
 		if (idCompareAs >= IDC_SCRIPT_FIRST && idCompareAs <= IDC_SCRIPT_LAST)
-			packingInfo.SetPlugin(dlg.m_szCompareAs);
+			packingInfo.SetPlugin(dlg.m_sCompareAs.c_str());
 	}
 
 	// For directories, add trailing '\' if missing, and skip detection logic

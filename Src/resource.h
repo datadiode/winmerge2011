@@ -137,6 +137,7 @@
 #define IDC_MESSAGE                             1005
 #define IDC_EXT_COMBO                           1005
 #define IDC_COMPARE_AS_COMBO                    1006
+#define IDC_COMPARE_AS_CHECK                    1007
 #define IDC_PATH_EDIT                           1007
 #define IDC_BROWSE_BUTTON                       1008
 #define IDC_BACKUP_CHECK                        1009
