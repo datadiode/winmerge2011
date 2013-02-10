@@ -105,7 +105,6 @@ bool COpenDlg::UpdateData()
 	DDX_CBStringExact<op>(IDC_LEFT_COMBO, m_sLeftFile);
 	DDX_CBStringExact<op>(IDC_RIGHT_COMBO, m_sRightFile);
 	DDX_CBStringExact<op>(IDC_EXT_COMBO, m_sFilter);
-	DDX_CBStringExact<op>(IDC_COMPARE_AS_COMBO, m_sCompareAs);
 	DDX_Check<op>(IDC_RECURS_CHECK, m_nRecursive);
 	return true;
 }
@@ -291,6 +290,13 @@ BOOL COpenDlg::OnInitDialog()
 	m_pCbRight->LoadState(_T("Files\\Right"));
 	m_pCbExt->LoadState(_T("Files\\Ext"));
 
+	if (CRegKeyEx key = SettingStore.GetSectionKey(_T("Settings")))
+	{
+		if (!m_bOverwriteRecursive)
+			m_nRecursive = key.ReadDword(_T("Recurse"), 0);
+		m_sCompareAs = key.ReadString(_T("CompareAs"), _T(""));
+	}
+
 	if (HMenu *const pMenu = LanguageSelect.LoadMenu(IDR_POPUP_DIRVIEW))
 	{
 		// 1st submenu of IDR_POPUP_DIRVIEW is for item popup
@@ -305,6 +311,11 @@ BOOL COpenDlg::OnInitDialog()
 			int j = m_pCbCompareAs->AddString(text);
 			UINT id = pPopup->GetMenuItemID(i);
 			m_pCbCompareAs->SetItemData(j, id);
+			TCHAR moniker[MAX_PATH];
+			if (!m_pCompareAsScriptMenu->GetMenuString(id, moniker, _countof(moniker)))
+				GetAtomName(id, moniker, _countof(moniker));
+			if (m_sCompareAs == moniker)
+				m_pCbCompareAs->SetCurSel(j);
 		}
 		theApp.m_pMainWnd->SetScriptMenu(pPopup, NULL);
 		pMenu->DestroyMenu();
@@ -329,13 +340,6 @@ BOOL COpenDlg::OnInitDialog()
 	if (index == CB_ERR)
 		index = m_pCbExt->InsertString(0, filterString.c_str());
 	m_pCbExt->SetCurSel(index);
-
-	if (CRegKeyEx key = SettingStore.GetSectionKey(_T("Settings")))
-	{
-		if (!m_bOverwriteRecursive)
-			m_nRecursive = key.ReadDword(_T("Recurse"), 0);
-		m_sCompareAs = key.ReadString(_T("CompareAs"), _T(""));
-	}
 
 	if (m_sLeftFile.empty())
 		m_pCbLeft->GetWindowText(m_sLeftFile);
@@ -438,6 +442,20 @@ void COpenDlg::OnOK()
 	// Caller saves MRU left and right files, so don't save them here.
 	m_pCbExt->SaveState(_T("Files\\Ext"));
 
+	if ((m_attrLeft ^ m_attrRight) & FILE_ATTRIBUTE_DIRECTORY)
+	{
+		m_idCompareAs = ID_MERGE_COMPARE;
+	}
+	else
+	{
+		int i = m_pCbCompareAs->GetCurSel();
+		m_idCompareAs = m_pCbCompareAs->GetItemData(i);
+		TCHAR moniker[MAX_PATH];
+		if (!m_pCompareAsScriptMenu->GetMenuString(m_idCompareAs, moniker, _countof(moniker)))
+			GetAtomName(m_idCompareAs, moniker, _countof(moniker));
+		m_sCompareAs = moniker;
+	}
+
 	if (CRegKeyEx key = SettingStore.GetSectionKey(_T("Settings")))
 	{
 		if (!m_bOverwriteRecursive)
@@ -448,16 +466,6 @@ void COpenDlg::OnOK()
 			key.WriteString(_T("CompareAs"), m_sCompareAs.c_str());
 		else if (m_nCompareAs == nCompareAs && !fCompareAs)
 			key.WriteString(_T("CompareAs"), _T(""));
-	}
-
-	if ((m_attrLeft ^ m_attrRight) & FILE_ATTRIBUTE_DIRECTORY)
-	{
-		m_idCompareAs = ID_MERGE_COMPARE;
-	}
-	else
-	{
-		int i = m_pCbCompareAs->GetCurSel();
-		m_idCompareAs = m_pCbCompareAs->GetItemData(i);
 	}
 
 	EndDialog(IDOK);
