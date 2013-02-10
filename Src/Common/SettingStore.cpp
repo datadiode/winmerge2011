@@ -29,7 +29,7 @@ int CSettingStore::GetProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nDe
 	DWORD dwValue;
 	DWORD dwType;
 	DWORD dwCount = sizeof(DWORD);
-	LONG lResult = RegQueryValueEx(hSecKey, (LPTSTR)lpszEntry, NULL, &dwType,
+	LONG lResult = RegQueryValueEx(hSecKey, lpszEntry, NULL, &dwType,
 		(LPBYTE)&dwValue, &dwCount);
 	RegCloseKey(hSecKey);
 	if (lResult == ERROR_SUCCESS)
@@ -51,13 +51,13 @@ String CSettingStore::GetProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, L
 		return lpszDefault;
 	String strValue;
 	DWORD dwType, dwCount;
-	LONG lResult = RegQueryValueEx(hSecKey, (LPTSTR)lpszEntry, NULL, &dwType,
+	LONG lResult = RegQueryValueEx(hSecKey, lpszEntry, NULL, &dwType,
 		NULL, &dwCount);
 	if (lResult == ERROR_SUCCESS)
 	{
 		ASSERT(dwType == REG_SZ);
 		strValue.resize(dwCount / sizeof(TCHAR));
-		lResult = RegQueryValueEx(hSecKey, (LPTSTR)lpszEntry, NULL, &dwType,
+		lResult = RegQueryValueEx(hSecKey, lpszEntry, NULL, &dwType,
 			(LPBYTE)&strValue[0], &dwCount);
 	}
 	RegCloseKey(hSecKey);
@@ -83,14 +83,14 @@ BOOL CSettingStore::GetProfileBinary(LPCTSTR lpszSection, LPCTSTR lpszEntry, BYT
 		return FALSE;
 
 	DWORD dwType, dwCount;
-	LONG lResult = RegQueryValueEx(hSecKey, (LPTSTR)lpszEntry, NULL, &dwType,
+	LONG lResult = RegQueryValueEx(hSecKey, lpszEntry, NULL, &dwType,
 		NULL, &dwCount);
 	*pBytes = dwCount;
 	if (lResult == ERROR_SUCCESS)
 	{
 		ASSERT(dwType == REG_BINARY);
 		*ppData = new BYTE[*pBytes];
-		lResult = RegQueryValueEx(hSecKey, (LPTSTR)lpszEntry, NULL, &dwType,
+		lResult = RegQueryValueEx(hSecKey, lpszEntry, NULL, &dwType,
 			*ppData, &dwCount);
 	}
 	RegCloseKey(hSecKey);
