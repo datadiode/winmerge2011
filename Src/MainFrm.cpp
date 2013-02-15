@@ -1442,6 +1442,16 @@ bool CMainFrame::DoFileOpen(
 		if (idCompareAs >= IDC_SCRIPT_FIRST && idCompareAs <= IDC_SCRIPT_LAST)
 			packingInfo.SetPlugin(dlg.m_sCompareAs.c_str());
 	}
+	else if (idCompareAs == ID_MERGE_COMPARE &&
+		((attrLeft | attrRight) & FILE_ATTRIBUTE_DIRECTORY) == 0)
+	{
+		// No specific idCompareAs passed as argument, and no directory involved
+		String sCompareAs = SettingStore.GetProfileString(_T("Settings"), _T("CompareAs"));
+		if (sCompareAs.find(_T('#')) == 0)
+			idCompareAs = FindAtom(sCompareAs.c_str());
+		else if (!sCompareAs.empty())
+			packingInfo.SetPlugin(sCompareAs.c_str());
+	}
 
 	// For directories, add trailing '\' if missing, and skip detection logic
 	if (attrLeft & FILE_ATTRIBUTE_DIRECTORY)

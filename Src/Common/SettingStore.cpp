@@ -56,9 +56,12 @@ String CSettingStore::GetProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, L
 	if (lResult == ERROR_SUCCESS)
 	{
 		ASSERT(dwType == REG_SZ);
-		strValue.resize(dwCount / sizeof(TCHAR));
+		String::size_type length = dwCount / sizeof(TCHAR);
+		strValue.resize(length);
 		lResult = RegQueryValueEx(hSecKey, lpszEntry, NULL, &dwType,
-			(LPBYTE)&strValue[0], &dwCount);
+			(LPBYTE)&strValue.front(), &dwCount);
+		if (length != 0 && strValue[--length] == _T('\0'))
+			strValue.resize(length);
 	}
 	RegCloseKey(hSecKey);
 	if (lResult == ERROR_SUCCESS)
