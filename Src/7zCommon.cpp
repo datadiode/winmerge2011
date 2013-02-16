@@ -195,7 +195,7 @@ const TCHAR C7ZipMismatchException::m_strRegistryKey[] = _T("7ZipMismatch");
 /**
  * @brief Download URL for C7ZipMismatchException's ReportError() popup.
  */
-const TCHAR C7ZipMismatchException::m_strDownloadURL[] = _T("https://sourceforge.net/project/showfiles.php?group_id=13216&package_id=143957");
+const TCHAR C7ZipMismatchException::m_strDownloadURL[] = _T("http://sourceforge.net/projects/winmerge/files/7-zip-plugin/");
 
 /**
  * @brief Retrieve build number of given DLL.
