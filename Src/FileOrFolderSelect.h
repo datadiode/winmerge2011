@@ -35,6 +35,6 @@ BOOL SelectFile(HWND parent, String &path,
 
 BOOL SelectFolder(HWND parent, String &path, UINT titleid);
 
-BOOL SelectFileOrFolder(HWND parent, String &path);
+BOOL SelectFileOrFolder(HWND parent, String &path, const String &filter);
 
 #endif

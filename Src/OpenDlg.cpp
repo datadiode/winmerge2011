@@ -184,10 +184,10 @@ LRESULT COpenDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			Update3StateCheckBoxLabel(IDC_RECURS_CHECK);
 			break;
 		case MAKEWPARAM(IDC_LEFT_BUTTON, BN_CLICKED):
-			OnBrowseButton(IDC_LEFT_COMBO);
+			OnBrowseButton(IDC_LEFT_COMBO, IDC_RIGHT_COMBO);
 			break;
 		case MAKEWPARAM(IDC_RIGHT_BUTTON, BN_CLICKED):
-			OnBrowseButton(IDC_RIGHT_COMBO);
+			OnBrowseButton(IDC_RIGHT_COMBO, IDC_LEFT_COMBO);
 			break;
 		case MAKEWPARAM(IDC_SELECT_FILTER, BN_CLICKED):
 			OnSelectFilter();
@@ -387,15 +387,17 @@ void COpenDlg::OnDestroy()
 /**
  * @brief Called when "Browse..." button is selected for left or right path.
  */
-void COpenDlg::OnBrowseButton(UINT id)
+void COpenDlg::OnBrowseButton(UINT idPath, UINT idFilter)
 {
-	String path;
-	GetDlgItemText(id, path);
+	String path, filter;
+	GetDlgItemText(idPath, path);
+	GetDlgItemText(idFilter, filter);
 	if (paths_DoesPathExist(path.c_str()) == IS_EXISTING_FILE)
 		path.resize(path.rfind(_T('\\')) + 1);
-	if (SelectFileOrFolder(m_hWnd, path))
+	filter.erase(0, filter.rfind(_T('\\')) + 1);
+	if (SelectFileOrFolder(m_hWnd, path, filter))
 	{
-		SetDlgItemText(id, path.c_str());
+		SetDlgItemText(idPath, path.c_str());
 		UpdateButtonStates();
 	}	
 }

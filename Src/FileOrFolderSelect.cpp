@@ -155,12 +155,18 @@ static int CALLBACK BrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM lParam, LPAR
  * @param [out] path Selected folder/filename
  * @return TRUE if user choosed a file/folder, FALSE if user canceled dialog.
  */
-BOOL SelectFileOrFolder(HWND parent, String &path)
+BOOL SelectFileOrFolder(HWND parent, String &path, const String &filter)
 {
 	ASSERT(parent != NULL);
 
 	String title = LanguageSelect.LoadString(IDS_OPEN_TITLE);
 	String filters = LanguageSelect.LoadString(IDS_ALLFILES);
+	string_replace(filters, _T("||"), _T("|"));
+	if (String::size_type len = filter.size())
+	{
+		filters.append(filter.c_str(), len + 1);
+		filters.append(filter.c_str(), len + 1);
+	}
 	// Convert extension mask from MFC style separators ('|')
 	//  to Win32 style separators ('\0')
 	stl::replace(filters.begin(), filters.end(), _T('|'), _T('\0'));
@@ -188,12 +194,17 @@ BOOL SelectFileOrFolder(HWND parent, String &path)
 
 	if (bRetVal)
 	{
-		path = sSelectedFile;
+		path = ofn.lpstrFile;
 		if (!PathFileExists(path.c_str()))
 		{
 			// We have a valid folder name, but propably garbage as a filename.
 			// Return folder name
 			path.resize(path.rfind(_T('\\')) + 1);
+			if (ofn.nFilterIndex == 2)
+			{
+				// Filename from other side was selected from filter combobox.
+				path += filter;
+			}
 		}
 	}
 	return bRetVal;

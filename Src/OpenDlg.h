@@ -91,7 +91,7 @@ protected:
 	LRESULT OnNotify(UNotify *);
 
 	void OnDestroy();
-	void OnBrowseButton(UINT id);
+	void OnBrowseButton(UINT idPath, UINT idFilter);
 	void OnSelchangeCompareAs();
 	void OnOK();
 	void OnCancel();

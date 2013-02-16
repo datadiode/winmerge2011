@@ -103,8 +103,11 @@ BOOL ProjectFilePathsDlg::OnInitDialog()
  */
 void ProjectFilePathsDlg::OnBnClickedProjLfileBrowse()
 {
-	if (::SelectFileOrFolder(m_hWnd, m_sLeftFile))
+	if (SelectFileOrFolder(m_hWnd, m_sLeftFile,
+		PathFindFileName(m_sRightFile.c_str())))
+	{
 		SetDlgItemText(IDC_PROJ_LFILE_EDIT, m_sLeftFile.c_str());
+	}
 }
 
 /** 
@@ -112,8 +115,11 @@ void ProjectFilePathsDlg::OnBnClickedProjLfileBrowse()
  */
 void ProjectFilePathsDlg::OnBnClickedProjRfileBrowse()
 {
-	if (::SelectFileOrFolder(m_hWnd, m_sRightFile))
+	if (SelectFileOrFolder(m_hWnd, m_sRightFile,
+		PathFindFileName(m_sLeftFile.c_str())))
+	{
 		SetDlgItemText(IDC_PROJ_RFILE_EDIT, m_sRightFile.c_str());
+	}
 }
 
 /** 
