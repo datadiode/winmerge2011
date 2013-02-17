@@ -17,7 +17,7 @@
 	</Platforms>
 	<ToolFiles>
 		<ToolFile
-			RelativePath=".\Merge.rules"
+			RelativePath="Merge.rules"
 		/>
 	</ToolFiles>
 	<Configurations>
@@ -723,7 +723,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Common\Bitmap.cpp"
+				RelativePath="Common\Bitmap.cpp"
 				>
 			</File>
 			<File
@@ -807,7 +807,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\convert_utf\ConvertUTF.c"
+				RelativePath="convert_utf\ConvertUTF.c"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -951,7 +951,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ExcelExport.cpp"
+				RelativePath="ExcelExport.cpp"
 				>
 			</File>
 			<File
@@ -983,7 +983,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\FileTransform.cpp"
+				RelativePath="FileTransform.cpp"
 				>
 			</File>
 			<File
@@ -999,7 +999,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Common\FloatState.cpp"
+				RelativePath="Common\FloatState.cpp"
 				>
 			</File>
 			<File
@@ -1015,19 +1015,19 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Common\H2O2.cpp"
+				RelativePath="Common\H2O2.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\HexMergeDoc.cpp"
+				RelativePath="HexMergeDoc.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\HexMergeFrm.cpp"
+				RelativePath="HexMergeFrm.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\HexMergeView.cpp"
+				RelativePath="HexMergeView.cpp"
 				>
 			</File>
 			<File
@@ -1035,7 +1035,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\LineFiltersDlg.cpp"
+				RelativePath="LineFiltersDlg.cpp"
 				>
 			</File>
 			<File
@@ -1203,7 +1203,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\RegExpItem.cpp"
+				RelativePath="RegExpItem.cpp"
 				>
 			</File>
 			<File
@@ -1215,7 +1215,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Common\SettingStore.cpp"
+				RelativePath="Common\SettingStore.cpp"
 				>
 			</File>
 			<File
@@ -1227,7 +1227,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Common\ShellFileOperations.cpp"
+				RelativePath="Common\ShellFileOperations.cpp"
 				>
 			</File>
 			<File
@@ -1243,7 +1243,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Common\SplitState.cpp"
+				RelativePath="Common\SplitState.cpp"
 				>
 			</File>
 			<File
@@ -1291,7 +1291,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\Common\stream_util.cpp"
+				RelativePath="Common\stream_util.cpp"
 				>
 			</File>
 			<File
@@ -1367,15 +1367,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Common\WindowPlacement.cpp"
+				RelativePath="Common\WindowPlacement.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Common\WindowPlacement.h"
+				RelativePath="Common\WindowPlacement.h"
 				>
 			</File>
 			<File
-				RelativePath=".\WinMerge.idl"
+				RelativePath="WinMerge.idl"
 				>
 			</File>
 			<File
@@ -1396,7 +1396,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Common\Bitmap.h"
+				RelativePath="Common\Bitmap.h"
 				>
 			</File>
 			<File
@@ -1452,7 +1452,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\convert_utf\ConvertUTF.h"
+				RelativePath="convert_utf\ConvertUTF.h"
 				>
 			</File>
 			<File
@@ -1552,7 +1552,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ExcelExport.h"
+				RelativePath="ExcelExport.h"
 				>
 			</File>
 			<File
@@ -1608,7 +1608,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Common\FloatState.h"
+				RelativePath="Common\FloatState.h"
 				>
 			</File>
 			<File
@@ -1624,23 +1624,23 @@
 				>
 			</File>
 			<File
-				RelativePath=".\GhostUndorecord.h"
+				RelativePath="GhostUndorecord.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Common\H2O.h"
+				RelativePath="Common\H2O.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Common\H2O2.h"
+				RelativePath="Common\H2O2.h"
 				>
 			</File>
 			<File
-				RelativePath=".\HexMergeFrm.h"
+				RelativePath="HexMergeFrm.h"
 				>
 			</File>
 			<File
-				RelativePath=".\HexMergeView.h"
+				RelativePath="HexMergeView.h"
 				>
 			</File>
 			<File
@@ -1656,7 +1656,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\LineFiltersDlg.h"
+				RelativePath="LineFiltersDlg.h"
 				>
 			</File>
 			<File
@@ -1664,7 +1664,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ListEntry.h"
+				RelativePath="ListEntry.h"
 				>
 			</File>
 			<File
@@ -1692,7 +1692,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Common\memdc.h"
+				RelativePath="Common\memdc.h"
 				>
 			</File>
 			<File
@@ -1724,11 +1724,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Common\MyCom.h"
+				RelativePath="Common\MyCom.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Common\ntdll.h"
+				RelativePath="Common\ntdll.h"
 				>
 			</File>
 			<File
@@ -1828,7 +1828,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\RegExpItem.h"
+				RelativePath="RegExpItem.h"
 				>
 			</File>
 			<File
@@ -1844,15 +1844,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\scriptable.h"
+				RelativePath="scriptable.h"
 				>
 			</File>
 			<File
-				RelativePath=".\ScriptItem.h"
+				RelativePath="ScriptItem.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Common\SettingStore.h"
+				RelativePath="Common\SettingStore.h"
 				>
 			</File>
 			<File
@@ -1864,7 +1864,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Common\ShellFileOperations.h"
+				RelativePath="Common\ShellFileOperations.h"
 				>
 			</File>
 			<File
@@ -1876,7 +1876,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Common\SplitState.h"
+				RelativePath="Common\SplitState.h"
 				>
 			</File>
 			<File
@@ -1884,7 +1884,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Common\stream_util.h"
+				RelativePath="Common\stream_util.h"
 				>
 			</File>
 			<File
@@ -1972,7 +1972,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\version.rh"
+				RelativePath="version.rh"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -2107,7 +2107,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\res\Merge.rc"
+				RelativePath="res\Merge.rc"
 				>
 			</File>
 			<File
@@ -2139,7 +2139,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\res\PrintTemplate.html"
+				RelativePath="res\PrintTemplate.html"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -2334,7 +2334,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\editlib\LineInfo.cpp"
+				RelativePath="editlib\LineInfo.cpp"
 				>
 			</File>
 			<File
@@ -2422,7 +2422,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\editlib\wcwidth.c"
+				RelativePath="editlib\wcwidth.c"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -2466,7 +2466,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\editlib\wcwidth.h"
+				RelativePath="editlib\wcwidth.h"
 				>
 			</File>
 			<File
@@ -3083,11 +3083,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\PostBuild.bat"
+				RelativePath="PostBuild.bat"
 				>
 			</File>
 			<File
-				RelativePath=".\SetResourceVersions.bat"
+				RelativePath="SetResourceVersions.bat"
 				>
 			</File>
 			<File
@@ -3099,7 +3099,7 @@
 			Name="EASTL"
 			>
 			<File
-				RelativePath=".\EASTL\src\allocator.cpp"
+				RelativePath="EASTL\src\allocator.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -3148,7 +3148,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\EASTL\src\assert.cpp"
+				RelativePath="EASTL\src\assert.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -3192,56 +3192,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\EASTL\src\fixed_pool.cpp"
-				>
-				<FileConfiguration
-					Name="Release|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="System32|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\EASTL\src\hashtable.cpp"
+				RelativePath="EASTL\src\fixed_pool.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -3290,7 +3241,56 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\EASTL\src\red_black_tree.cpp"
+				RelativePath="EASTL\src\hashtable.cpp"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="System32|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="EASTL\src\red_black_tree.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -3334,7 +3334,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\EASTL\src\string.cpp"
+				RelativePath="EASTL\src\string.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -3678,7 +3678,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\COPYING"
+				RelativePath="COPYING"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -3799,7 +3799,7 @@
 			Name="system32"
 			>
 			<File
-				RelativePath=".\system32\system32.cpp"
+				RelativePath="system32\system32.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -3835,11 +3835,11 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\system32\system32.h"
+				RelativePath="system32\system32.h"
 				>
 			</File>
 			<File
-				RelativePath=".\system32\system32.imp"
+				RelativePath="system32\system32.imp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -3916,7 +3916,7 @@
 			</File>
 		</Filter>
 		<File
-			RelativePath=".\Common\ntdll.imp"
+			RelativePath="Common\ntdll.imp"
 			>
 			<FileConfiguration
 				Name="Release|Win32"
