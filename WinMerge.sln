@@ -12,6 +12,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Merge", "Src\Merge.vcproj",
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pcre", "Externals\pcre\Win32\pcre.vcproj", "{F7E6A782-1C15-46E3-B645-922494B9F146}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Merge7z", "ArchiveSupport\Merge7z\Merge7z.vcproj", "{D81E504D-E716-456E-BEAC-26F0FCCD7E8C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -55,6 +57,17 @@ Global
 		{F7E6A782-1C15-46E3-B645-922494B9F146}.System32|Win32.ActiveCfg = System32|Win32
 		{F7E6A782-1C15-46E3-B645-922494B9F146}.System32|Win32.Build.0 = System32|Win32
 		{F7E6A782-1C15-46E3-B645-922494B9F146}.System32|x64.ActiveCfg = System32|Win32
+		{D81E504D-E716-456E-BEAC-26F0FCCD7E8C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D81E504D-E716-456E-BEAC-26F0FCCD7E8C}.Debug|Win32.Build.0 = Debug|Win32
+		{D81E504D-E716-456E-BEAC-26F0FCCD7E8C}.Debug|x64.ActiveCfg = Debug|x64
+		{D81E504D-E716-456E-BEAC-26F0FCCD7E8C}.Debug|x64.Build.0 = Debug|x64
+		{D81E504D-E716-456E-BEAC-26F0FCCD7E8C}.Release|Win32.ActiveCfg = Release|Win32
+		{D81E504D-E716-456E-BEAC-26F0FCCD7E8C}.Release|Win32.Build.0 = Release|Win32
+		{D81E504D-E716-456E-BEAC-26F0FCCD7E8C}.Release|x64.ActiveCfg = Release|x64
+		{D81E504D-E716-456E-BEAC-26F0FCCD7E8C}.Release|x64.Build.0 = Release|x64
+		{D81E504D-E716-456E-BEAC-26F0FCCD7E8C}.System32|Win32.ActiveCfg = Release|Win32
+		{D81E504D-E716-456E-BEAC-26F0FCCD7E8C}.System32|Win32.Build.0 = Release|Win32
+		{D81E504D-E716-456E-BEAC-26F0FCCD7E8C}.System32|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
