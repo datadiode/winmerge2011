@@ -29,6 +29,5 @@ protected:
 
 public:
 	BOOL m_bEnableSupport;
-	int m_nInstallType;
 	BOOL m_bProbeType;
 };

@@ -255,92 +255,23 @@ void CConfigLog::WriteVersionOf(int indent, LPTSTR path)
 	}
 }
 
-/**
- * @brief Write version of 7-Zip plugins and shell context menu handler
- */
-void CConfigLog::WriteVersionOf7z(LPTSTR path)
-{
-	lstrcat(path, _T("\\7-zip*.dll"));
-	LPTSTR pattern = PathFindFileName(path);
-	WriteVersionOf(2, path);
-	WriteItem(2, _T("Codecs"));
-	lstrcpy(pattern, _T("codecs\\*.dll"));
-	WriteVersionOf(3, path);
-	WriteItem(2, _T("Formats"));
-	lstrcpy(pattern, _T("formats\\*.dll"));
-	WriteVersionOf(3, path);
-}
-
-/**
- * @brief Write archive support stuff
- */
-void CConfigLog::WriteArchiveSupport()
-{
-	DWORD registered = VersionOf7z(FALSE);
-	DWORD standalone = VersionOf7z(TRUE);
-	TCHAR path[MAX_PATH];
-	DWORD type = 0;
-	DWORD size = sizeof path;
-
-	WriteItem(0, _T("Archive support"));
-	WriteItem(1, _T("Enable"),
-		SettingStore.GetProfileInt(_T("Merge7z"), _T("Enable"), 0));
-
-	wsprintf(path, _T("%u.%02u"), UINT HIWORD(registered), UINT LOWORD(registered));
-	WriteItem(1, _T("7-Zip software installed on your computer"), path);
-	static const TCHAR szSubKey[] = _T("Software\\7-Zip");
-	static const TCHAR szValue[] = _T("Path");
-	SHGetValue(HKEY_LOCAL_MACHINE, szSubKey, szValue, &type, path, &size);
-	WriteVersionOf7z(path);
-
-	wsprintf(path, _T("%u.%02u"), UINT HIWORD(standalone), UINT LOWORD(standalone));
-	WriteItem(1, _T("7-Zip components for standalone operation"), path);
-	GetModuleFileName(0, path, _countof(path));
-	LPTSTR pattern = PathFindFileName(path);
-	PathRemoveFileSpec(path);
-	WriteVersionOf7z(path);
-
-	WriteItem(1, _T("Merge7z plugins on path"));
-	lstrcpy(pattern, _T("Merge7z*.dll"));
-	WriteVersionOf(2, path);
-	// now see what's on the path:
-	if (DWORD cchPath = GetEnvironmentVariable(_T("path"), 0, 0))
-	{
-		static const TCHAR cSep[] = _T(";");
-		LPTSTR pchPath = new TCHAR[cchPath];
-		GetEnvironmentVariable(_T("PATH"), pchPath, cchPath);
-		LPTSTR pchItem = pchPath;
-		while (int cchItem = StrCSpn(pchItem += StrSpn(pchItem, cSep), cSep))
-		{
-			if (cchItem < MAX_PATH)
-			{
-				CopyMemory(path, pchItem, cchItem*sizeof*pchItem);
-				path[cchItem] = 0;
-				PathAppend(path, _T("Merge7z*.dll"));
-				WriteVersionOf(2, path);
-			}
-			pchItem += cchItem;
-		}
-		delete[] pchPath;
-	}
-}
-
 struct NameMap { int ival; LPCTSTR sval; };
+
 /**
  * @brief Write boolean item using keywords (Yes|No)
  */
 void CConfigLog::WriteItemWhitespace(int indent, LPCTSTR key, int *pvalue)
 {
-	static NameMap namemap[] = {
-		{ WHITESPACE_COMPARE_ALL, _T("Compare all") }
-		, { WHITESPACE_IGNORE_CHANGE, _T("Ignore change") }
-		, { WHITESPACE_IGNORE_ALL, _T("Ignore all") }
+	static const NameMap namemap[] =
+	{
+		{ WHITESPACE_COMPARE_ALL, _T("Compare all") },
+		{ WHITESPACE_IGNORE_CHANGE, _T("Ignore change") },
+		{ WHITESPACE_IGNORE_ALL, _T("Ignore all") },
 	};
-
 	if (m_writing)
 	{
-		String text = _T("Unknown");
-		for (int i=0; i<sizeof(namemap)/sizeof(namemap[0]); ++i)
+		LPCTSTR text = _T("Unknown");
+		for (int i = 0; i < _countof(namemap); ++i)
 		{
 			if (*pvalue == namemap[i].ival)
 				text = namemap[i].sval;
@@ -358,7 +289,6 @@ void CConfigLog::WriteItemWhitespace(int indent, LPCTSTR key, int *pvalue)
 		}
 	}
 }
-
 
 /** 
  * @brief Write logfile
@@ -415,8 +345,8 @@ bool CConfigLog::DoFile(bool writing, String &sError)
 #		ifdef NDEBUG
 		_T(" NDEBUG")
 #		endif
-#		ifdef WIN64
-		_T(" WIN64")
+#		ifdef _WIN64
+		_T(" _WIN64")
 #		endif
 	);
 
@@ -446,9 +376,14 @@ bool CConfigLog::DoFile(bool writing, String &sError)
 	WriteVersionOf1(1, _T("COMCTL32.dll"));
 	WriteVersionOf1(1, _T("shlwapi.dll"));
 	WriteVersionOf1(1, _T("MergeLang.dll"));
-	WriteVersionOf1(1, _T("ShellExtension.dll"), false);
 	WriteVersionOf1(1, _T("ShellExtensionU.dll"), false);
 	WriteVersionOf1(1, _T("ShellExtensionX64.dll"), false);
+
+	TCHAR path[MAX_PATH];
+	GetModuleFileName(0, path, _countof(path));
+	LPTSTR pattern = PathFindFileName(path);
+	lstrcpy(pattern, _T("Merge7z\\*.dll"));
+	WriteVersionOf(1, path);
 
 // WinMerge settings
 	FileWriteString(_T("\r\nWinMerge configuration:\r\n"));
@@ -469,6 +404,8 @@ bool CConfigLog::DoFile(bool writing, String &sError)
 	WriteItemYesNoInverted(2, _T("Simple EOL"), &m_miscSettings.bAllowMixedEol);
 	WriteItemYesNo(2, _T("Automatic scroll to 1st difference"), &m_miscSettings.bScrollToFirst);
 	WriteItemYesNo(2, _T("Backup original file"), &m_miscSettings.bBackup);
+	WriteItemYesNo(2, _T("Enable archive file support"), &m_miscSettings.bMerge7zEnable);
+	WriteItemYesNo(2, _T("Detect archive type from file signature"), &m_miscSettings.bMerge7zProbeSignature);
 
 	FileWriteString(_T("\r\n Folder compare:\r\n"));
 	WriteItemYesNo(2, _T("Identical files"), &m_viewSettings.bShowIdent);
@@ -511,9 +448,6 @@ bool CConfigLog::DoFile(bool writing, String &sError)
 // Codepage settings
 	WriteItemYesNo(1, _T("Detect codepage automatically for RC and HTML files"), &m_cpSettings.bDetectCodepage);
 	WriteItem(1, _T("unicoder codepage"), getDefaultCodepage());
-
-	FileWriteString(_T("\r\n\r\n"));
-	WriteArchiveSupport();
 
 	CloseFile();
 

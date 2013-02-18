@@ -25,7 +25,6 @@ static char THIS_FILE[] = __FILE__;
 PropArchive::PropArchive()
 : OptionsPanel(IDD_PROP_ARCHIVE)
 , m_bEnableSupport(FALSE)
-, m_nInstallType(0)
 , m_bProbeType(FALSE)
 {
 }
@@ -37,8 +36,6 @@ template<ODialog::DDX_Operation op>
 bool PropArchive::UpdateData()
 {
 	DDX_Check<op>(IDC_ARCHIVE_ENABLE, m_bEnableSupport);
-	DDX_Check<op>(IDC_ARCHIVE_INSTALSTANDALONE, m_nInstallType, 0);
-	DDX_Check<op>(IDC_ARCHIVE_INSTALLOCAL, m_nInstallType, 1);
 	DDX_Check<op>(IDC_ARCHIVE_DETECTTYPE, m_bProbeType);
 	return true;
 }
@@ -55,41 +52,18 @@ LRESULT PropArchive::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		case MAKEWPARAM(IDC_ARCHIVE_ENABLE, BN_CLICKED):
 			UpdateScreen();
 			break;
-		case MAKEWPARAM(IDC_ARCHIVE_WWW, BN_CLICKED):
-			if ((UINT)ShellExecute(NULL, _T("open"), DownloadUrl, NULL, NULL, SW_SHOWNORMAL) > 32)
-				MessageReflect_WebLinkButton<WM_COMMAND>(wParam, lParam);
-			else
-				MessageBeep(0); // unable to execute file!
-			break;
-		}
-		break;
-	case WM_DRAWITEM:
-		switch (wParam)
-		{
-		case IDC_ARCHIVE_WWW:
-			return MessageReflect_WebLinkButton<WM_DRAWITEM>(wParam, lParam);
-		}
-		break;
-	case WM_SETCURSOR:
-		switch (::GetDlgCtrlID(reinterpret_cast<HWND>(wParam)))
-		{
-		case IDC_ARCHIVE_WWW:
-			return MessageReflect_WebLinkButton<WM_SETCURSOR>(wParam, lParam);
 		}
 		break;
 	}
 	return OptionsPanel::WindowProc(message, wParam, lParam);
 }
 
-
 /** 
  * @brief Reads options values from storage to UI.
  */
 void PropArchive::ReadOptions()
 {
-	int enable = COptionsMgr::Get(OPT_ARCHIVE_ENABLE);
-	m_bEnableSupport = enable > 0;
-	m_nInstallType = enable > 1 ? enable - 1 : 0;
+	m_bEnableSupport = COptionsMgr::Get(OPT_ARCHIVE_ENABLE);
 	m_bProbeType = COptionsMgr::Get(OPT_ARCHIVE_PROBETYPE);
 }
 
@@ -98,10 +72,7 @@ void PropArchive::ReadOptions()
  */
 void PropArchive::WriteOptions()
 {
-	if (m_bEnableSupport)
-		COptionsMgr::SaveOption(OPT_ARCHIVE_ENABLE, m_nInstallType + 1);
-	else
-		COptionsMgr::SaveOption(OPT_ARCHIVE_ENABLE, 0);
+	COptionsMgr::SaveOption(OPT_ARCHIVE_ENABLE, m_bEnableSupport != FALSE);
 	COptionsMgr::SaveOption(OPT_ARCHIVE_PROBETYPE, m_bProbeType != FALSE);
 }
 
@@ -111,7 +82,5 @@ void PropArchive::WriteOptions()
 void PropArchive::UpdateScreen()
 {
 	UpdateData<Set>();
-	GetDlgItem(IDC_ARCHIVE_INSTALLOCAL)->EnableWindow(m_bEnableSupport);
-	GetDlgItem(IDC_ARCHIVE_INSTALSTANDALONE)->EnableWindow(m_bEnableSupport);
 	GetDlgItem(IDC_ARCHIVE_DETECTTYPE)->EnableWindow(m_bEnableSupport);
 }

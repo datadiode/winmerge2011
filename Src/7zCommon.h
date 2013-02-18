@@ -7,34 +7,6 @@
 
 #include "DirView.h"
 
-/**
- * @brief Exception class for more explicit error message.
- */
-class C7ZipMismatchException
-{
-public:
-	C7ZipMismatchException(DWORD dwVer7zInstalled, DWORD dwVer7zLocal, LPCTSTR cause)
-	{
-		m_dwVer7zInstalled = dwVer7zInstalled;
-		m_dwVer7zLocal = dwVer7zLocal;
-		m_cause = cause;
-	}
-	~C7ZipMismatchException()
-	{
-	}
-	virtual int ReportError(HWND, UINT nType = MB_OK, UINT nMessageID = 0);
-protected:
-	DWORD m_dwVer7zInstalled;
-	DWORD m_dwVer7zLocal;
-	String m_cause;
-	BOOL m_bShowAllways;
-	static const DWORD m_dwVer7zRecommended;
-	static const TCHAR m_strRegistryKey[];
-	static const TCHAR m_strDownloadURL[];
-	static INT_PTR CALLBACK DlgProc(HWND, UINT, WPARAM, LPARAM);
-	static DWORD FormatVersion(LPTSTR, LPTSTR, DWORD);
-};
-
 extern Merge7z::Proxy Merge7z;
 
 Merge7z::Format *ArchiveGuessFormat(LPCTSTR);
@@ -111,10 +83,7 @@ public:
 	void CompressArchive(LPCTSTR = 0);
 };
 
-int NTAPI HasZipSupport();
-void NTAPI Recall7ZipMismatchError(HWND);
-
-DWORD NTAPI VersionOf7z(BOOL bLocal = FALSE);
+DWORD NTAPI VersionOf7z();
 
 /**
  * @brief assign BSTR to String, and return BSTR for optional SysFreeString()

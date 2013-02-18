@@ -230,7 +230,6 @@ protected:
 	void OnFileNew();
 	void OnToolsFilters();
 	void OnDebugLoadConfig();
-	void OnHelpMerge7zmismatch();
 	void OnViewStatusBar();
 	void OnViewToolbar();
 	void OnViewTabBar();

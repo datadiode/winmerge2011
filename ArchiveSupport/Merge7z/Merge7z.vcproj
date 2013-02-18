@@ -68,7 +68,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="shlwapi.lib odbc32.lib odbccp32.lib"
-				OutputFile="$(OutDir)\Merge7z920U.dll"
+				OutputFile="$(OutDir)\Merge7z\Merge7z920U.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile="Merge7z.def"
@@ -97,6 +97,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="PostBuild.bat &quot;\7z920\7z920.msi&quot; &quot;$(OutDir)&quot;"
 			/>
 		</Configuration>
 		<Configuration
@@ -148,7 +149,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="shlwapi.lib odbc32.lib odbccp32.lib"
-				OutputFile="$(OutDir)\Merge7z920U.dll"
+				OutputFile="$(OutDir)\Merge7z\Merge7z920U.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile="Merge7z.def"
@@ -177,6 +178,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="PostBuild.bat &quot;\7z920\7z920-x64.msi&quot; &quot;$(OutDir)&quot;"
 			/>
 		</Configuration>
 		<Configuration
@@ -230,7 +232,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="shlwapi.lib odbc32.lib odbccp32.lib"
-				OutputFile="$(OutDir)\Merge7z920U.dll"
+				OutputFile="$(OutDir)\Merge7z\Merge7z920U.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile="Merge7z.def"
@@ -257,6 +259,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="PostBuild.bat &quot;\7z920\7z920.msi&quot; &quot;$(OutDir)&quot;"
 			/>
 		</Configuration>
 		<Configuration
@@ -309,7 +312,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="shlwapi.lib odbc32.lib odbccp32.lib"
-				OutputFile="$(OutDir)\Merge7z920U.dll"
+				OutputFile="$(OutDir)\Merge7z\Merge7z920U.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile="Merge7z.def"
@@ -336,6 +339,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="PostBuild.bat &quot;\7z920\7z920-x64.msi&quot; &quot;$(OutDir)&quot;"
 			/>
 		</Configuration>
 	</Configurations>

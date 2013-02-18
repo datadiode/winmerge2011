@@ -69,10 +69,11 @@ struct MISCSETTINGS
 	bool bSyntaxHighlight;
 	int  nInsertTabs;
 	int  nTabSize;
-	bool bPluginsEnabled;
 	bool bPreserveFiletimes;
 	bool bMatchSimilarLines;
 	int  nMatchSimilarLinesMax;
+	bool bMerge7zEnable;
+	bool bMerge7zProbeSignature;
 };
 
 /** 
@@ -122,8 +123,6 @@ protected:
 	void WriteVersionOf1(int indent, LPTSTR path, bool bDllGetVersion = true);
 	void WriteVersionOf(int indent, LPTSTR path);
 	void WriteLocaleSettings(LCID locid, LPCTSTR title);
-	void WriteArchiveSupport();
-	void WriteVersionOf7z(LPTSTR path);
 
 private:
 	bool DoFile(bool writing, String &sError);

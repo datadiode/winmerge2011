@@ -13,7 +13,6 @@
 #define IDR_POPUP_DIRVIEW                       105
 #define IDR_POPUP_LOCATIONBAR                   106
 #define IDD_SAVECLOSING                         107
-#define IDD_MERGE7ZMISMATCH                     108
 #define IDR_MERGEDOCTYPE                        109
 #define IDR_DIRDOCTYPE                          110
 #define IDR_HEXDOCTYPE                          111
@@ -316,10 +315,7 @@
 #define IDC_PRIVATE                             1198
 #define IDC_COMPARE_STOPFIRST                   1199
 #define IDC_ARCHIVE_DETECTTYPE                  1200
-#define IDC_ARCHIVE_WWW                         1201
 #define IDC_ARCHIVE_ENABLE                      1202
-#define IDC_ARCHIVE_INSTALSTANDALONE            1203
-#define IDC_ARCHIVE_INSTALLOCAL                 1204
 #define IDC_STAT_IDENTICFOLDER                  1205
 #define IDC_STAT_IDENTICFILE                    1206
 #define IDC_STAT_IDENTICBINARY                  1207
@@ -728,9 +724,6 @@
 #define IDS_MUST_SPECIFY_OUTPUT                 18413
 #define IDS_FOLDER_NOTEXIST                     18414
 #define IDS_DIR_RESULTS_EMPTIED                 18448
-#define IDS_NO_ZIP_SUPPORT                      18449
-#define IDS_MERGE7Z_ENABLE_0                    18450
-#define IDS_MERGE7Z_ENABLE_2                    18451
 #define IDS_OPT_EXPORT_CAPTION                  18452
 #define IDS_OPT_IMPORT_CAPTION                  18453
 #define IDS_OPT_IMPORT_DONE                     18454
@@ -884,7 +877,6 @@
 #define ID_LOCBAR_GOTODIFF                      33091
 #define ID_LOCBAR_GOTODIFF_FMT                  33092
 #define ID_LOCBAR_GOTOLINE_FMT                  33093
-#define ID_HELP_MERGE7ZMISMATCH                 33094
 #define ID_FILE_OPENPROJECT                     33095
 #define ID_VIEW_SHOWHIDDENITEMS                 33096
 #define ID_VIEW_SWAPPANES                       33097

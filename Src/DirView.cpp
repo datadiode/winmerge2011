@@ -1570,12 +1570,6 @@ int CDirView::AddSpecialItems()
  */
 void CDirView::OnCtxtDirZipLeft()
 {
-	if (!HasZipSupport())
-	{
-		LanguageSelect.MsgBox(IDS_NO_ZIP_SUPPORT, MB_ICONINFORMATION);
-		return;
-	}
-
 	DirItemEnumerator
 	(
 		this, LVNI_SELECTED
@@ -1588,12 +1582,6 @@ void CDirView::OnCtxtDirZipLeft()
  */
 void CDirView::OnCtxtDirZipRight()
 {
-	if (!HasZipSupport())
-	{
-		LanguageSelect.MsgBox(IDS_NO_ZIP_SUPPORT, MB_ICONINFORMATION);
-		return;
-	}
-
 	DirItemEnumerator
 	(
 		this, LVNI_SELECTED
@@ -1606,12 +1594,6 @@ void CDirView::OnCtxtDirZipRight()
  */
 void CDirView::OnCtxtDirZipBoth()
 {
-	if (!HasZipSupport())
-	{
-		LanguageSelect.MsgBox(IDS_NO_ZIP_SUPPORT, MB_ICONINFORMATION);
-		return;
-	}
-
 	DirItemEnumerator
 	(
 		this, LVNI_SELECTED
@@ -1626,12 +1608,6 @@ void CDirView::OnCtxtDirZipBoth()
  */
 void CDirView::OnCtxtDirZipBothDiffsOnly()
 {
-	if (!HasZipSupport())
-	{
-		LanguageSelect.MsgBox(IDS_NO_ZIP_SUPPORT, MB_ICONINFORMATION);
-		return;
-	}
-
 	DirItemEnumerator
 	(
 		this, LVNI_SELECTED

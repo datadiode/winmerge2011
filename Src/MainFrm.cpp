@@ -959,10 +959,6 @@ LRESULT CMainFrame::OnWndMsg<WM_INITMENUPOPUP>(WPARAM wParam, LPARAM lParam)
 		case ID_WINDOW_CASCADE:
 			pMenu->EnableMenuItem(mii.wID, pDocFrame ? MF_ENABLED : MF_GRAYED);
 			continue;
-		case ID_HELP_MERGE7ZMISMATCH:
-			if (HasZipSupport())
-				pMenu->RemoveMenu(i, MF_BYPOSITION);
-			continue;
 		case ID_VIEW_LOCATION_BAR:
 		case ID_VIEW_DETAIL_BAR:
 			if (HWindow *pBar = pDocFrame ?
@@ -1638,12 +1634,7 @@ bool CMainFrame::DoFileOpen(
 		}
 		catch (OException *e)
 		{
-			e->ReportError(m_hWnd, MB_ICONSTOP);
-			delete e;
-		}
-		catch (C7ZipMismatchException *e)
-		{
-			e->ReportError(m_hWnd, MB_ICONSTOP);
+			//e->ReportError(m_hWnd, MB_ICONSTOP);
 			delete e;
 		}
 	}
@@ -2535,8 +2526,6 @@ static void LoadConfigLog(CConfigLog &configLog, LOGFONT &lfDiff, ConfigLogDirec
 	LoadConfigBoolSetting(configLog.m_viewSettings.bShowSkipped, OPT_SHOW_SKIPPED, cfgdir);
 	LoadConfigBoolSetting(configLog.m_viewSettings.bTreeView, OPT_TREE_MODE, cfgdir);
 
-	LoadConfigBoolSetting(configLog.m_miscSettings.bPreserveFiletimes, OPT_PRESERVE_FILETIMES, cfgdir);
-
 	LoadConfigBoolSetting(configLog.m_miscSettings.bAutomaticRescan, OPT_AUTOMATIC_RESCAN, cfgdir);
 	LoadConfigBoolSetting(configLog.m_miscSettings.bAllowMixedEol, OPT_ALLOW_MIXED_EOL, cfgdir);
 	LoadConfigBoolSetting(configLog.m_miscSettings.bScrollToFirst, OPT_SCROLL_TO_FIRST, cfgdir);
@@ -2548,8 +2537,11 @@ static void LoadConfigLog(CConfigLog &configLog, LOGFONT &lfDiff, ConfigLogDirec
 	LoadConfigBoolSetting(configLog.m_miscSettings.bSyntaxHighlight, OPT_SYNTAX_HIGHLIGHT, cfgdir);
 	LoadConfigIntSetting(configLog.m_miscSettings.nInsertTabs, OPT_TAB_TYPE, cfgdir);
 	LoadConfigIntSetting(configLog.m_miscSettings.nTabSize, OPT_TAB_SIZE, cfgdir);
+	LoadConfigBoolSetting(configLog.m_miscSettings.bPreserveFiletimes, OPT_PRESERVE_FILETIMES, cfgdir);
 	LoadConfigBoolSetting(configLog.m_miscSettings.bMatchSimilarLines, OPT_CMP_MATCH_SIMILAR_LINES, cfgdir);	
 	LoadConfigIntSetting(configLog.m_miscSettings.nMatchSimilarLinesMax, OPT_CMP_MATCH_SIMILAR_LINES_MAX, cfgdir);
+	LoadConfigBoolSetting(configLog.m_miscSettings.bMerge7zEnable, OPT_ARCHIVE_ENABLE, cfgdir);
+	LoadConfigBoolSetting(configLog.m_miscSettings.bMerge7zProbeSignature, OPT_ARCHIVE_PROBETYPE, cfgdir);
 
 	LoadConfigIntSetting(configLog.m_cpSettings.nDefaultMode, OPT_CP_DEFAULT_MODE, cfgdir);
 	LoadConfigIntSetting(configLog.m_cpSettings.nDefaultCustomValue, OPT_CP_DEFAULT_CUSTOM, cfgdir);
@@ -2851,14 +2843,6 @@ void CMainFrame::ShowHelp(LPCTSTR helpLocation /*= NULL*/)
 			ShellExecute(NULL, _T("open"), sPath.c_str(), NULL, NULL, SW_SHOWNORMAL);
 		}
 	}
-}
-
-/**
- * @brief Tell user why archive support is not available.
- */
-void CMainFrame::OnHelpMerge7zmismatch() 
-{
-	Recall7ZipMismatchError(m_hWnd);
 }
 
 /**
@@ -3383,9 +3367,6 @@ LRESULT CMainFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 		break;
 	case ID_HELP_GETCONFIG:
 		OnSaveConfigData();
-		break;
-	case ID_HELP_MERGE7ZMISMATCH:
-		OnHelpMerge7zmismatch();
 		break;
 	case ID_APP_EXIT:
 		SendMessage(WM_CLOSE);
