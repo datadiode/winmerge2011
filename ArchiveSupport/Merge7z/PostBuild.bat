@@ -4,9 +4,11 @@ if not exist %1 rem: goto :usage
 if not exist %2 rem: goto :usage
 
 set SevenZip=C:\7z920bin
-"%SevenZip%\7z.exe" e -y -o%~2\Merge7z\Lang %~1 *.ttt *.txt
 "%SevenZip%\7z.exe" e -so %~1 _7z.dll > %~2\Merge7z\7z.dll
-copy "%SevenZip%\7zip_pad.xml" %~2\Merge7z
+copy "%SevenZip%\History.txt" %~2\Merge7z
+copy "%SevenZip%\License.txt" %~2\Merge7z
+md %~2\Merge7z\Lang
+copy "%SevenZip%\Lang" %~2\Merge7z\Lang
 
 exit
 
