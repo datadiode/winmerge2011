@@ -385,7 +385,7 @@ DWORD CCrystalTextView::ParseLineBasic(DWORD dwCookie, int nLineIndex, TEXTBLOCK
   int nIdentBegin = -1;
   int nPrevI = -1;
   int I;
-  for (I = 0; I < nLength; nPrevI = I++)
+  for (I = 0; I <= nLength; nPrevI = I++)
     {
       if (bRedefineBlock)
         {
