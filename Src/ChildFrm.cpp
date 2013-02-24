@@ -35,7 +35,6 @@
 #include "MainFrm.h"
 #include "LanguageSelect.h"
 #include "MergeEditView.h"
-#include "MergeLineFlags.h"
 #include "MergeDiffDetailView.h"
 #include "LocationView.h"
 #include "WMGotoDlg.h"

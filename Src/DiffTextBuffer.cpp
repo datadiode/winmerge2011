@@ -16,7 +16,6 @@
 #include "OptionsMgr.h"
 #include "OptionsDef.h"
 #include "Environment.h"
-#include "MergeLineFlags.h"
 #include "FileTransform.h"
 #include "FileTextEncoding.h"
 #include "DiffTextBuffer.h"

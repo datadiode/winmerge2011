@@ -1603,7 +1603,7 @@ void CCrystalTextView::DrawMargin(HSurface * pdc, const RECT & rect, int nLineIn
 	{
 		const LineInfo &li = m_pTextBuffer->GetLineInfo(nLineIndex);
 		// get line revision marks color
-		if (li.m_dwRevisionNumber > 0)
+		if (nLineNumber != -1 && li.m_dwRevisionNumber > 0)
 		{
 			if (m_pTextBuffer->m_dwRevisionNumberOnSave < li.m_dwRevisionNumber)
 				clrRevisionMark = UNSAVED_REVMARK_CLR;

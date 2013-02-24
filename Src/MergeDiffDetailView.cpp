@@ -19,7 +19,6 @@
 #include "ChildFrm.h"
 #include "OptionsDef.h"
 #include "SyntaxColors.h"
-#include "MergeLineFlags.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

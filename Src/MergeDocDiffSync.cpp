@@ -11,7 +11,6 @@
 #include "Merge.h"
 #include "OptionsMgr.h"
 #include "DiffList.h"
-#include "MergeLineFlags.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

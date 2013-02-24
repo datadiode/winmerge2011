@@ -37,7 +37,6 @@
 #include "MergeEditView.h"
 #include "LocationView.h"
 #include "OptionsDef.h"
-#include "MergeLineFlags.h"
 #include "Bitmap.h"
 #include "memdc.h"
 #include "SyntaxColors.h"

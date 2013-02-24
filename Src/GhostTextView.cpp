@@ -241,7 +241,7 @@ HGLOBAL CGhostTextView::PrepareDragData ()
 void CGhostTextView::DrawMargin (HSurface * pdc, const RECT & rect, int nLineIndex, int nLineNumber)
 {
 	int nRealLineNumber;
-	if (nLineIndex < 0 || GetLineFlags(nLineIndex) & LF_GHOST)
+	if (nLineIndex < 0 || GetLineFlags(nLineIndex) & (LF_GHOST | LF_SKIPPED))
 		nRealLineNumber = -1;
 	else
 		nRealLineNumber = ComputeRealLine(nLineIndex) + 1;

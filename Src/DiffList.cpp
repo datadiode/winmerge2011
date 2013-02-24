@@ -25,7 +25,6 @@
 #include "coretools.h"
 #include "DiffList.h"
 #include "DiffTextBuffer.h"
-#include "MergeLineFlags.h"
 
 /**
  * @brief Swap diff sides.

@@ -54,7 +54,6 @@
 #include "OptionsMgr.h"
 #include "SyntaxColors.h"
 #include "ProjectFile.h"
-#include "MergeLineFlags.h"
 #include "FileOrFolderSelect.h"
 #include "LineFiltersList.h"
 #include "MergeCmdLineInfo.h"

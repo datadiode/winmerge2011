@@ -39,7 +39,6 @@
 #include "WMGotoDlg.h"
 #include "OptionsDef.h"
 #include "SyntaxColors.h"
-#include "MergeLineFlags.h"
 #include "Common/stream_util.h"
 
 #ifdef _DEBUG

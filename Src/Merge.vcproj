@@ -1712,10 +1712,6 @@
 				>
 			</File>
 			<File
-				RelativePath="MergeLineFlags.h"
-				>
-			</File>
-			<File
 				RelativePath="Common\MessageBoxDialog.h"
 				>
 			</File>

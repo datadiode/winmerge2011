@@ -15,9 +15,13 @@
 /////////////////////////////////////////////////////////////////////////////
 
 /**
- * We use the current ccrystalEditor flags 
+ * The Crystal Editor keeps a DWORD of flags for each line.
+ * It does not use all of the available bits.
+ * WinMerge uses some of the high bits to keep WinMerge-specific
+ * information; here are the list of WinMerge flags.
+ * So, these constants are used with the SetLineFlags(2) calls.
  *
- * This flag must be cleared and set in GhostTextBuffer.cpp 
+ * LF_GHOST must be cleared and set in GhostTextBuffer.cpp 
  * and MergeDoc.cpp (Rescan) only.
  *
  * GetLineColors (in MergeEditView) reads it to choose the line color.
@@ -25,7 +29,20 @@
 enum GHOST_LINEFLAGS
 {
 	LF_GHOST = 0x00400000L, /**< Ghost line. */
+	LF_DIFF = 0x00200000L,
+	LF_TRIVIAL = 0x00800000L,
+	LF_MOVED = 0x01000000L,
+	LF_SKIPPED = 0x02000000L, /**< Skipped line. */
 };
+
+// WINMERGE_FLAGS is MERGE_LINEFLAGS | GHOST_LINEFLAGS | LF_TRIVIAL | LF_MOVED
+#define LF_WINMERGE_FLAGS    0x03E00000
+
+C_ASSERT(LF_WINMERGE_FLAGS == (LF_TRIVIAL | LF_MOVED | LF_DIFF | LF_SKIPPED | LF_GHOST));
+
+// Flags for non-ignored difference
+// Note that we must include ghost flag to include ghost lines
+#define LF_NONTRIVIAL_DIFF ((LF_DIFF | LF_GHOST) & (~LF_TRIVIAL))
 
 /////////////////////////////////////////////////////////////////////////////
 // CCrystalTextBuffer command target
