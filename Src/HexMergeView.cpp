@@ -163,7 +163,8 @@ LPCTSTR CHexMergeView::RegisterClass()
 	{
 		static const CLSID clsid = { 0xBCA3CA6B, 0xCC6B, 0x4F79,
 			{ 0xA2, 0xC2, 0xDD, 0xBE, 0x86, 0x4B, 0x1C, 0x90 } };
-		::CoGetClassObject(clsid, CLSCTX_INPROC_SERVER, NULL, IID_IUnknown, &pv);
+		if (FAILED(::CoGetClassObject(clsid, CLSCTX_INPROC_SERVER, NULL, IID_IUnknown, &pv)))
+			pv = LoadLibrary(_T("Frhed\\hekseditU.dll"));
 		WNDCLASS wc;
 		if (!::GetClassInfo(NULL, _T("heksedit"), &wc))
 			OException::Throw(GetLastError());
