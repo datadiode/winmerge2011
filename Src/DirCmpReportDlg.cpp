@@ -39,6 +39,12 @@ LRESULT DirCmpReportDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		case IDCANCEL:
 			EndDialog(IDCANCEL);
 			break;
+		case MAKEWPARAM(IDC_REPORT_FILE, CBN_SELCHANGE):
+			OnSelchangeFile();
+			break;
+		case MAKEWPARAM(IDC_REPORT_STYLECOMBO, CBN_SELCHANGE):
+			OnSelchangeStyle();
+			break;
 		case MAKEWPARAM(IDC_REPORT_BROWSEFILE, BN_CLICKED):
 			OnBtnClickReportBrowse();
 			break;
@@ -73,31 +79,20 @@ LRESULT DirCmpReportDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 struct ReportTypeInfo
 {
 	REPORT_TYPE reportType; /**< Report-type ID */
-	int idDisplay; /**< Resource-string ID (shown in file-selection dialog) */
-	int browseFilter; /**< File-extension filter (resource-string ID) */
+	WORD idDisplay; /**< Resource-string ID (shown in file-selection dialog) */
+	WORD browseFilter; /**< File-extension filter (resource-string ID) */
 };
 
 /**
  * @brief List of report types.
  * This list is used to initialize the GUI.
  */
-static const ReportTypeInfo f_types[] = {
-	{ REPORT_TYPE_COMMALIST,
-		IDS_REPORT_COMMALIST,
-		IDS_TEXT_REPORT_FILES
-	},
-	{ REPORT_TYPE_TABLIST,
-		IDS_REPORT_TABLIST,
-		IDS_TEXT_REPORT_FILES
-	},
-	{ REPORT_TYPE_SIMPLEHTML,
-		IDS_REPORT_SIMPLEHTML,
-		IDS_HTML_REPORT_FILES
-	},
-	{ REPORT_TYPE_SIMPLEXML,
-		IDS_REPORT_SIMPLEXML,
-		IDS_XML_REPORT_FILES
-	},
+static const ReportTypeInfo f_types[] =
+{
+	{ REPORT_TYPE_COMMALIST,	IDS_REPORT_COMMALIST,	IDS_TEXT_REPORT_FILES	},
+	{ REPORT_TYPE_TABLIST,		IDS_REPORT_TABLIST,		IDS_TEXT_REPORT_FILES	},
+	{ REPORT_TYPE_SIMPLEHTML,	IDS_REPORT_SIMPLEHTML,	IDS_HTML_REPORT_FILES	},
+	{ REPORT_TYPE_SIMPLEXML,	IDS_REPORT_SIMPLEXML,	IDS_XML_REPORT_FILES	},
 };
 
 /**
@@ -110,7 +105,7 @@ BOOL DirCmpReportDlg::OnInitDialog()
 
 	m_ctlStyle = static_cast<HComboBox *>(GetDlgItem(IDC_REPORT_STYLECOMBO));
 	m_pCbReportFile = static_cast<HSuperComboBox *>(GetDlgItem(IDC_REPORT_FILE));
-	
+
 	CheckDlgButton(IDC_REPORT_COPYCLIPBOARD, m_bCopyToClipboard);
 
 	m_pCbReportFile->LoadState(_T("ReportFiles"));
@@ -132,6 +127,59 @@ BOOL DirCmpReportDlg::OnInitDialog()
 	m_pCbReportFile->GetWindowText(m_sReportFile);
 
 	return TRUE;
+}
+
+/**
+ * @brief Set a report style matching the selected filename's extension.
+ */
+void DirCmpReportDlg::OnSelchangeFile()
+{
+	m_pCbReportFile->SetCurSel(m_pCbReportFile->GetCurSel());
+	m_pCbReportFile->GetWindowText(m_sReportFile);
+	int nCurSel = m_ctlStyle->GetCurSel();
+	int filterid = f_types[nCurSel].browseFilter;
+	String sFilter = LanguageSelect.LoadString(filterid);
+	sFilter.erase(0, sFilter.find(_T('|')) + 1);
+	sFilter.resize(sFilter.find(_T('|')));
+	int i = 0;
+	int n = m_ctlStyle->GetCount();
+	while (!PathMatchSpec(m_sReportFile.c_str(), sFilter.c_str()) && i < n)
+	{
+		nCurSel = i++;
+		filterid = f_types[nCurSel].browseFilter;
+		sFilter = LanguageSelect.LoadString(filterid);
+		sFilter.erase(0, sFilter.find(_T('|')) + 1);
+		sFilter.resize(sFilter.find(_T('|')));
+	}
+	m_ctlStyle->SetCurSel(nCurSel);
+}
+
+/**
+ * @brief Set default filename extension for selected report style.
+ */
+void DirCmpReportDlg::OnSelchangeStyle()
+{
+	String sReportFile;
+	m_pCbReportFile->GetWindowText(sReportFile);
+	if (String::size_type i = sReportFile.rfind(_T('.')) + 1)
+	{
+		int nCurSel = m_ctlStyle->GetCurSel();
+		int filterid = f_types[nCurSel].browseFilter;
+		String sFilter = LanguageSelect.LoadString(filterid);
+		sFilter.erase(0, sFilter.find(_T('|')) + 1);
+		sFilter.resize(sFilter.find(_T('|')));
+		if (PathMatchSpec(m_sReportFile.c_str(), sFilter.c_str()))
+		{
+			sReportFile = m_sReportFile;
+		}
+		else
+		{
+			sReportFile.resize(i);
+			LPCTSTR ext = sFilter.c_str() + sFilter.find(_T('.')) + 1;
+			sReportFile.append(ext, _tcscspn(ext, _T(";")));
+		}
+		m_pCbReportFile->SetWindowText(sReportFile.c_str());
+	}
 }
 
 /**

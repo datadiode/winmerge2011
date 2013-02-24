@@ -29,6 +29,8 @@ public:
 	virtual BOOL OnInitDialog();
 	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
 	void OnOK();
+	void OnSelchangeFile();
+	void OnSelchangeStyle();
 	void OnBtnClickReportBrowse();
 	void OnBtnDblclickCopyClipboard();
 
