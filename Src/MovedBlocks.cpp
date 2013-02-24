@@ -32,7 +32,7 @@ public:
 	void Remove(int val) { m_map.erase(val); }
 	int count() const { return m_map.size(); }
 	bool isPresent(int val) const { m_map.find(val) != m_map.end(); }
-	int getSingle() const { return m_map.begin()->second; }
+	int getSingle() const { return m_map.begin()->first; }
 private:
 	stl::map<int, int> m_map;
 };
