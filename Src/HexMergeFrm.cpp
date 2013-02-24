@@ -384,6 +384,11 @@ BOOL CHexMergeFrame::PreTranslateMessage(MSG *pMsg)
 	}
 	if (CHexMergeView *pView = GetActiveView())
 	{
+		HACCEL hAccel = m_pHandleSet->m_hAccelShared;
+		if (hAccel && ::TranslateAccelerator(m_hWnd, hAccel, pMsg))
+		{
+			return TRUE;
+		}
 		if (pView->PreTranslateMessage(pMsg))
 		{
 			return TRUE;
