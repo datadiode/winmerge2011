@@ -1033,13 +1033,13 @@ namespace H2O
 		{
 			return ::PathCompactPath(m_hDC, path, dx);
 		}
-		int FrameRect(const RECT *prc, HBRUSH hbr)
+		int FrameRect(const RECT *prc, HBrush *pbr)
 		{
-			return ::FrameRect(m_hDC, prc, hbr);
+			return ::FrameRect(m_hDC, prc, pbr->m_hBrush);
 		}
-		int FillRect(const RECT *prc, HBRUSH hbr)
+		int FillRect(const RECT *prc, HBrush *pbr)
 		{
-			return ::FillRect(m_hDC, prc, hbr);
+			return ::FillRect(m_hDC, prc, pbr->m_hBrush);
 		}
 		BOOL MoveTo(int x, int y, POINT *ppt = NULL)
 		{
@@ -1116,10 +1116,6 @@ namespace H2O
 		BOOL DeleteDC()
 		{
 			return ::DeleteDC(m_hDC);
-		}
-		int ReleaseDC(HWND hWnd)
-		{
-			return ::ReleaseDC(hWnd, m_hDC);
 		}
 	};
 
