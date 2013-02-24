@@ -19,6 +19,14 @@ void MovedLines::Clear()
 }
 
 /**
+ * @brief Swap the maps.
+ */
+void MovedLines::SwapSides()
+{
+	swap(m_moved0, m_moved1);
+}
+
+/**
  * @brief Add moved block to the list.
  * @param [in] side1 First side we are mapping.
  * @param [in] line1 Linenumber in side first side.

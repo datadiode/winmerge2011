@@ -2296,6 +2296,11 @@ void CChildFrame::SwapFiles()
 	UpdateHeaderPath(1);
 	m_wndFilePathBar.SetActive(1, pWndFocus->m_hWnd == m_pView[1]->m_hWnd);
 
+	if (MovedLines *pMovedLines = m_diffWrapper.GetMovedLines())
+	{
+		pMovedLines->SwapSides();
+	}
+
 	UpdateAllViews(NULL);
 }
 

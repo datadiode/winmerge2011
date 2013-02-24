@@ -25,6 +25,7 @@ public:
 	void Clear();
 	void Add(ML_SIDE side1, unsigned int line1, unsigned int line2);
 	int LineInBlock(unsigned int line, ML_SIDE side);
+	void SwapSides();
 
 protected:
 	int FirstSideInMovedBlock(unsigned int secondSideLine);
