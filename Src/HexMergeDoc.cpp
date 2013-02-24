@@ -367,7 +367,7 @@ HRESULT CHexMergeFrame::OpenDocs(
 		// also triggers initial diff coloring by invalidating the client area.
 		m_pView[MERGE_VIEW_LEFT]->ResizeWindow();
 		if (COptionsMgr::Get(OPT_SCROLL_TO_FIRST))
-			m_pView[MERGE_VIEW_LEFT]->SendMessage(WM_COMMAND, ID_FIRSTDIFF);
+			SendMessage(WM_COMMAND, ID_FIRSTDIFF);
 		ActivateFrame();
 	}
 	else
