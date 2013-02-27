@@ -1,3 +1,14 @@
+0.2011.003.093
+• Utf8FileDetect: Fix http://sourceforge.net/p/winmerge/bugs/2129/
+• HexMerge window: "Scroll to first difference" option failed to take effect
+• HexMerge window: F3 key did not behave as it should
+• Editor: Skipped lines appeared in indicator margin as if having been edited
+• CChildFrame::SwapFiles() missed to swap the moved block mappings
+• Merge from https://bitbucket.org/sdottaka/winmerge-v2/commits/42376bf38ecc
+• DirCmpReportDlg: Make filename extension follow selected report style, & v.v.
+• OpenDlg: Add filename from other side to browse dialog's filter combobox
+• Issue #34 Default "Compare As" selection ignored when invoked through shell
+
 0.2011.003.071
 Changes since preceding release (not necessarily complete):
 • Create a distinct 64 bit version of WinMergeU.exe
