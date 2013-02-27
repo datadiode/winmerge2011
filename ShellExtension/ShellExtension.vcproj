@@ -398,24 +398,8 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
-				RelativePath=".\atliface.idl"
+				RelativePath="atliface.idl"
 				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCMIDLTool"
-						GenerateTypeLibrary="false"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCMIDLTool"
-						GenerateTypeLibrary="false"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\src\common\RegKey.cpp"
