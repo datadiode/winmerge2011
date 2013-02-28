@@ -72,6 +72,8 @@ public :
 
 	// Implement IFilepathHeaders
 	void SetText(int pane, LPCTSTR, BOOL bDirty, BUFFERTYPE = BUFFER_NORMAL);
+	BOOL GetModify(int pane);
+	void SetModify(int pane, BOOL bDirty);
 	void SetActive(int pane, bool bActive);
 	HEdit *GetControlRect(int pane, LPRECT);
 	const String &GetTitle(int pane);

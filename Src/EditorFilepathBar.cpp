@@ -212,6 +212,7 @@ const String &CEditorFilePathBar::GetTitle(int pane)
  *
  * @param [in] pane Index (0-based) of pane to update.
  * @param [in] lpszString New text for pane.
+ * @param [in] bDirty Whether content has been edited after load/save.
  */
 void CEditorFilePathBar::SetText(int pane, LPCTSTR lpszString, BOOL bDirty, BUFFERTYPE bufferType)
 {
@@ -229,10 +230,30 @@ void CEditorFilePathBar::SetText(int pane, LPCTSTR lpszString, BOOL bDirty, BUFF
 		bDirty = TRUE;
 	}
 	// Hide magic prefix from users
-	String &sOriginalText = m_rgOriginalText[pane];
-	sOriginalText = paths_UndoMagic(&String(lpszString).front());
+	paths_UndoMagic(m_rgOriginalText[pane] = lpszString);
+	SetModify(pane, bDirty);
+}
+
+/** 
+ * @brief Get the modification flag for one side
+ *
+ * @param [in] pane Index (0-based) of pane to query.
+ */
+BOOL CEditorFilePathBar::GetModify(int pane)
+{
+	return m_Edit[pane]->GetModify();
+}
+
+/** 
+ * @brief Set the modification flag for one side
+ *
+ * @param [in] pane Index (0-based) of pane to update.
+ * @param [in] bDirty Whether content has been edited after load/save.
+ */
+void CEditorFilePathBar::SetModify(int pane, BOOL bDirty)
+{
 	m_Edit[pane]->SetModify(bDirty);
-	RefreshDisplayText(m_Edit[pane], sOriginalText.c_str());
+	RefreshDisplayText(m_Edit[pane], m_rgOriginalText[pane].c_str());
 }
 
 /** 

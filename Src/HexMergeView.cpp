@@ -129,6 +129,8 @@ LRESULT CHexMergeView::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_APP:
 		if (GetModified())
 		{
+			if (!m_pDocument->m_wndFilePathBar.GetModify(m_nThisPane))
+				m_pDocument->m_wndFilePathBar.SetModify(m_nThisPane, TRUE);
 			m_pDocument->UpdateCmdUI();
 		}
 		break;

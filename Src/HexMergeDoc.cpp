@@ -241,6 +241,7 @@ void CHexMergeFrame::OnFileSave()
 		const String &pathLeft = m_strPath[0];
 		if (Try(m_pView[MERGE_VIEW_LEFT]->SaveFile(pathLeft.c_str())) == IDCANCEL)
 			return;
+		UpdateHeaderPath(0);
 		bUpdate = TRUE;
 	}
 	if (m_pView[MERGE_VIEW_RIGHT]->GetModified())
@@ -248,6 +249,7 @@ void CHexMergeFrame::OnFileSave()
 		const String &pathRight = m_strPath[1];
 		if (Try(m_pView[MERGE_VIEW_RIGHT]->SaveFile(pathRight.c_str())) == IDCANCEL)
 			return;
+		UpdateHeaderPath(1);
 		bUpdate = TRUE;
 	}
 	if (bUpdate)
