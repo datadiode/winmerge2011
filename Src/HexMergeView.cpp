@@ -331,6 +331,7 @@ HRESULT CHexMergeView::SaveFile(LPCTSTR path)
 	if (hr != S_OK)
 		return hr;
 	m_mtime = mtime;
+	m_size = length;
 	SetModified(FALSE);
 	hr = SE(DeleteFile(sIntermediateFilename.c_str()));
 	if (hr != S_OK)
