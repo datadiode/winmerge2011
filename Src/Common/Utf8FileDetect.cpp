@@ -59,13 +59,19 @@ bool CheckForInvalidUtf8(LPBYTE pBuffer, size_t size)
 				{
 					if ((c & 0xF8) != 0xF0)
 						return true;
-					if (p == q || (*p++ & 0xC0) != 0x80)
+					if (p == q)
+						break;
+					if ((*p++ & 0xC0) != 0x80)
 						return true;
 				}
-				if (p == q || (*p++ & 0xC0) != 0x80)
+				if (p == q)
+					break;
+				if ((*p++ & 0xC0) != 0x80)
 					return true;
 			}
-			if (p == q || (*p++ & 0xC0) != 0x80)
+			if (p == q)
+				break;
+			if ((*p++ & 0xC0) != 0x80)
 				return true;
 			bUTF8 = true;
 		}
