@@ -63,6 +63,21 @@ static DWORD_PTR GetShellImageList()
 	return dwpShellImageList;
 }
 
+static void EnsureCurSelPathCombo(HSuperComboBox *pCb)
+{
+	if (pCb->GetCurSel() < 0)
+	{
+		String path;
+		pCb->GetWindowText(path);
+		if (!paths_EndsWithSlash(path.c_str()) && PathIsDirectory(path.c_str()))
+		{
+			path.push_back(_T('\\'));
+			pCb->SetWindowText(path.c_str());
+		}
+		pCb->SetCurSel(0);
+	}
+}
+
 /**
  * @brief Standard constructor.
  */
@@ -180,6 +195,9 @@ LRESULT COpenDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		case IDCANCEL:
 			OnCancel();
 			break;
+		case ID_HELP:
+			OnHelp();
+			break;
 		case IDC_RECURS_CHECK:
 			Update3StateCheckBoxLabel(IDC_RECURS_CHECK);
 			break;
@@ -256,7 +274,7 @@ LRESULT COpenDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			return lResult;
 		break;
 	case WM_HELP:
-		theApp.m_pMainWnd->ShowHelp(OpenDlgHelpLocation);
+		OnHelp();
 		return 0;
 	}
 	return OResizableDialog::WindowProc(message, wParam, lParam);
@@ -372,6 +390,9 @@ BOOL COpenDlg::OnInitDialog()
 	m_pCbRight->InsertString(0, LPSTR_TEXTCALLBACK);
 
 	UpdateButtonStates();
+	// Make the icons show up
+	EnsureCurSelPathCombo(m_pCbLeft);
+	EnsureCurSelPathCombo(m_pCbRight);
 	return TRUE;
 }
 
@@ -691,8 +712,6 @@ void COpenDlg::OnDropFiles(HDROP dropInfo)
 	{
 		m_sLeftFile = files[0];
 		m_sRightFile = files[1];
-		UpdateData<Set>();
-		UpdateButtonStates();
 	}
 	else if (fileCount == 1)
 	{
@@ -710,9 +729,12 @@ void COpenDlg::OnDropFiles(HDROP dropInfo)
 			}
 		}
 		*pTarget = files[0];
-		UpdateData<Set>();
-		UpdateButtonStates();
 	}
+	UpdateData<Set>();
+	UpdateButtonStates();
+	// Make the icons show up
+	EnsureCurSelPathCombo(m_pCbLeft);
+	EnsureCurSelPathCombo(m_pCbRight);
 	// Free the memory block containing the dropped-file information
 	DragFinish(dropInfo);
 }
