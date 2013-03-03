@@ -387,17 +387,17 @@ msgstr "&Gerar relatório..."
 #: Merge.rc:94
 #, c-format
 msgid "Save to &Excel spreadsheet..."
-msgstr ""
+msgstr "Guardar como Livro do &Excel..."
 
 #: Merge.rc:95
 #, c-format
 msgid "Show in Excel &Viewer..."
-msgstr ""
+msgstr "Mostrar no Excel &Viewer..."
 
 #: Merge.rc:96
 #, c-format
 msgid "&Print with Excel Viewer..."
-msgstr ""
+msgstr "&Imprimir com o Excel Viewer..."
 
 #: Merge.rc:98
 #: Merge.rc:215
@@ -1869,13 +1869,13 @@ msgstr "&Comparar como:"
 #: Merge.rc:1013
 #, c-format
 msgid "By Default"
-msgstr ""
+msgstr "Por Defeito"
 
 #: Merge.rc:1014
 #: Merge.rc:1059
 #, c-format
 msgid "&Include Subfolders\tInclude Subfolders but ignore folder structure"
-msgstr "Incluir subpastas\tIncluir subpastas but ignore folder structure"
+msgstr "Incluir subpastas\tIncluir subpastas mas ignorar a estrutuda da pasta"
 
 #: Merge.rc:1015
 #, c-format
@@ -2273,7 +2273,7 @@ msgstr "Corresponder co&m linhas semelhantes"
 #: Merge.rc:1255
 #, c-format
 msgid "C&ontext limit:"
-msgstr ""
+msgstr "Limite de c&ontexto:"
 
 #: Merge.rc:1258
 #, c-format
@@ -2304,7 +2304,7 @@ msgstr "Ignorar diferenças de tempo inferiores a 3 segundos"
 #: Merge.rc:1274
 #, c-format
 msgid "&Self-compare unique files"
-msgstr ""
+msgstr "&Auto-comparar ficheiros únicos"
 
 #: Merge.rc:1275
 #, c-format
@@ -2674,7 +2674,7 @@ msgstr "Palavra-passe:"
 #: Merge.rc:1460
 #, c-format
 msgid "Check Out"
-msgstr ""
+msgstr "Confira"
 
 #: Merge.rc:1470
 #, c-format
@@ -3153,7 +3153,7 @@ msgstr "Fichiros XML (*.xml)|*.xml|Todos os ficheiros (*.*)|*.*||"
 #: Merge.rc:1597
 #, c-format
 msgid "XLS Files (*.xls)|*.xls|All Files (*.*)|*.*||"
-msgstr ""
+msgstr "Ficheiros XLS (*.xls)|*.xls|Todos os ficheiros (*.*)|*.*||"
 
 #: Merge.rc:1598
 #, c-format
@@ -3423,7 +3423,7 @@ msgstr "Item %1"
 #: Merge.rc:1652
 #, c-format
 msgid "Select two existing folders or files to compare"
-msgstr "Seleccione dois arquivos ou ficheiros existentes para comparar"
+msgstr "Seleccione duas pastas ou ficheiros existentes para comparar"
 
 #: Merge.rc:1653
 #, c-format
@@ -3433,27 +3433,27 @@ msgstr "Selecção de pasta"
 #: Merge.rc:1654
 #, c-format
 msgid "Select two folders or two files to compare."
-msgstr "Seleccione dois arquivos ou ficheiros para comparar."
+msgstr "Seleccione duas pastas ou ficheiros para comparar."
 
 #: Merge.rc:1655
 #, c-format
 msgid "Left path is invalid!"
-msgstr "A pasta de destino da esquerda é inválido!"
+msgstr "O caminho da esquerda é inválido!"
 
 #: Merge.rc:1656
 #, c-format
 msgid "Right path is invalid!"
-msgstr "A pasta de destino da direita é inválida!"
+msgstr "O caminho da direita é inválido!"
 
 #: Merge.rc:1657
 #, c-format
 msgid "Both paths are invalid!"
-msgstr "Ambas as pastas de destino são inválidas!"
+msgstr "Ambos os caminhos são inválidos!"
 
 #: Merge.rc:1658
 #, c-format
 msgid "Cannot compare file and folder!"
-msgstr "Impossível comparar ficheiro ou arquivo!"
+msgstr "Impossível comparar o ficheiro ou pasta!"
 
 #: Merge.rc:1659
 #, c-format
