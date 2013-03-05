@@ -131,6 +131,7 @@ BOOL CFloatState::Float(WINDOWPOS *pParam)
 					if (!::EqualRect(&rcNormalPosition, &wp.rcNormalPosition))
 					{
 						pParam->flags |= SWP_NOCOPYBITS;
+						wp.flags = WPF_SETMINPOSITION;
 						if ((::GetWindowLong(hwndInner, GWL_STYLE) & WS_VISIBLE) == 0)
 						{
 							wp.showCmd = SW_HIDE;
