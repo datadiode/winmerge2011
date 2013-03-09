@@ -135,12 +135,23 @@ LRESULT COpenDlg::OnNotify(UNotify *pNM)
 		case CBEN_GETDISPINFO:
 			SHFILEINFO sfi;
 			DWORD_PTR result = 0;
+			if (pNM->COMBOBOXEX.ceItem.pszText == NULL)
+			{
+				// WINEBUG: Wine does not provide a buffer.
+				if (pNM->COMBOBOXEX.ceItem.iItem == 0 && !pNM->pCB->GetDroppedState())
+				{
+					pNM->COMBOBOXEX.ceItem.cchTextMax = pNM->pCB->GetWindowTextLength() + 1;
+					pNM->COMBOBOXEX.ceItem.pszText = (LPTSTR)_alloca(pNM->COMBOBOXEX.ceItem.cchTextMax * sizeof(TCHAR));
+				}
+				else
+				{
+					pNM->COMBOBOXEX.ceItem.cchTextMax = pNM->pCB->GetLBTextLen(pNM->COMBOBOXEX.ceItem.iItem) + 1;
+					pNM->COMBOBOXEX.ceItem.pszText = (LPTSTR)_alloca(pNM->COMBOBOXEX.ceItem.cchTextMax * sizeof(TCHAR));
+					pNM->pCB->GetLBText(pNM->COMBOBOXEX.ceItem.iItem, pNM->COMBOBOXEX.ceItem.pszText);
+				}
+			}
 			if (pNM->COMBOBOXEX.ceItem.iItem == 0 && !pNM->pCB->GetDroppedState())
 			{
-				// WINEBUG: Wine does not provide a buffer when querying an LPSTR_TEXTCALLBACK item.
-				static TCHAR path[MAX_PATH];
-				pNM->COMBOBOXEX.ceItem.pszText = path;
-				pNM->COMBOBOXEX.ceItem.cchTextMax = MAX_PATH;
 				pNM->pCB->GetWindowText(pNM->COMBOBOXEX.ceItem.pszText, pNM->COMBOBOXEX.ceItem.cchTextMax);
 			}
 			if (paths_EndsWithSlash(pNM->COMBOBOXEX.ceItem.pszText))
