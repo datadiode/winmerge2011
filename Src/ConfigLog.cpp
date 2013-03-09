@@ -296,7 +296,6 @@ void CConfigLog::WriteItemWhitespace(int indent, LPCTSTR key, int *pvalue)
 bool CConfigLog::DoFile(bool writing, String &sError)
 {
 	CVersionInfo version;
-	String text;
 
 	m_writing = writing;
 
@@ -369,8 +368,9 @@ bool CConfigLog::DoFile(bool writing, String &sError)
 	FileWriteString(szCmdLine);
 
 	FileWriteString(_T("\r\n Windows: "));
-	text = GetWindowsVer();
-	FileWriteString(text.c_str());
+	FileWriteString(GetWindowsVer().c_str());
+
+	FileWriteString(_T("\r\n Wine: %hs\r\n"), wine_version ? wine_version : "N/A");
 
 	FileWriteString(_T("\r\n"));
 	WriteVersionOf1(1, _T("COMCTL32.dll"));
@@ -378,6 +378,7 @@ bool CConfigLog::DoFile(bool writing, String &sError)
 	WriteVersionOf1(1, _T("MergeLang.dll"));
 	WriteVersionOf1(1, _T("ShellExtensionU.dll"), false);
 	WriteVersionOf1(1, _T("ShellExtensionX64.dll"), false);
+	WriteVersionOf1(1, _T("Frhed\\hekseditU.dll"), false);
 
 	TCHAR path[MAX_PATH];
 	GetModuleFileName(0, path, _countof(path));
@@ -432,9 +433,9 @@ bool CConfigLog::DoFile(bool writing, String &sError)
 	
 // Font settings
 	FileWriteString(_T("\r\n Font:\r\n"));
-	FileWriteString(Fmt(_T("  Font facename: %s\r\n"), m_fontSettings.sFacename.c_str()).c_str());
-	FileWriteString(Fmt(_T("  Font charset: %d (%s)\r\n"), m_fontSettings.nCharset, 
-		FontCharsetName(m_fontSettings.nCharset).c_str()).c_str());
+	FileWriteString(_T("  Font facename: %s\r\n"), m_fontSettings.sFacename.c_str());
+	FileWriteString(_T("  Font charset: %d (%s)\r\n"), m_fontSettings.nCharset,
+		FontCharsetName(m_fontSettings.nCharset).c_str());
 
 // System settings
 	FileWriteString(_T("\r\nSystem settings:\r\n"));
@@ -454,82 +455,57 @@ bool CConfigLog::DoFile(bool writing, String &sError)
 	return true;
 }
 
-/** @brief osvi.wProductType that works with MSVC6 headers */
-static BYTE GetProductTypeFromOsvc(const OSVERSIONINFOEX & osvi)
-{
-	// wServicePackMinor (2 bytes)
-	// wSuiteMask (2 bytes)
-	// wProductType (1 byte)
-	const BYTE * ptr = reinterpret_cast<const BYTE *>(&osvi.wServicePackMinor);
-	return ptr[4];
-}
-
-/** @brief osvi.wSuiteMask that works with MSVC6 headers */
-static WORD GetSuiteMaskFromOsvc(const OSVERSIONINFOEX & osvi)
-{
-	// wServicePackMinor (2 bytes)
-	// wSuiteMask (2 bytes)
-	const WORD * ptr = reinterpret_cast<const WORD *>(&osvi.wServicePackMinor);
-	return ptr[1];
-}
-
 /** 
  * @brief Extract any helpful product details from version info
  */
 static String GetProductFromOsvi(const OSVERSIONINFOEX & osvi)
 {
 	String sProduct;
-	BYTE productType = GetProductTypeFromOsvc(osvi);
-	WORD suiteMask = GetSuiteMaskFromOsvc(osvi);
-
+	switch (osvi.wProductType)
+	{
 	// Test for the workstation type.
-	if ( productType == VER_NT_WORKSTATION )
-	{
-		if( osvi.dwMajorVersion == 4 )
-			sProduct += _T( "Workstation 4.0 ");
-		else if( suiteMask & VER_SUITE_PERSONAL )
-			sProduct += _T( "Home Edition " );
+	case VER_NT_WORKSTATION:
+		if (osvi.dwMajorVersion == 4)
+			sProduct += _T("Workstation 4.0 ");
+		else if( osvi.wSuiteMask & VER_SUITE_PERSONAL )
+			sProduct += _T("Home Edition ");
 		else
-			sProduct += _T( "Professional " );
-	}
-
+			sProduct += _T("Professional ");
+		break;
 	// Test for the server type.
-	else if ( productType == VER_NT_SERVER )
-	{
-		if( osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 2 )
+	case VER_NT_SERVER:
+		if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 2)
 		{
-			if( suiteMask & VER_SUITE_DATACENTER )
-				sProduct += _T( "Datacenter Edition " );
-			else if( suiteMask & VER_SUITE_ENTERPRISE )
-				sProduct += _T( "Enterprise Edition " );
-			else if ( suiteMask == VER_SUITE_BLADE )
-				sProduct += _T( "Web Edition " );
+			if (osvi.wSuiteMask & VER_SUITE_DATACENTER)
+				sProduct += _T("Datacenter Edition ");
+			else if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE)
+				sProduct += _T("Enterprise Edition ");
+			else if (osvi.wSuiteMask == VER_SUITE_BLADE)
+				sProduct += _T("Web Edition ");
 			else
-				sProduct += _T( "Standard Edition " );
+				sProduct += _T("Standard Edition ");
 		}
-
-		else if( osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 0 )
+		else if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 0)
 		{
-			if( suiteMask & VER_SUITE_DATACENTER )
-				sProduct += _T( "Datacenter Server " );
-			else if( suiteMask & VER_SUITE_ENTERPRISE )
-				sProduct += _T( "Advanced Server " );
+			if (osvi.wSuiteMask & VER_SUITE_DATACENTER)
+				sProduct += _T("Datacenter Server ");
+			else if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE)
+				sProduct += _T("Advanced Server ");
 			else
-				sProduct += _T( "Server " );
+				sProduct += _T("Server ");
 		}
-
-		else  // Windows NT 4.0
+		else // Windows NT 4.0
 		{
-			if( suiteMask & VER_SUITE_ENTERPRISE )
-				sProduct += _T("Server 4.0, Enterprise Edition " );
+			if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE)
+				sProduct += _T("Server 4.0, Enterprise Edition ");
 			else
-				sProduct += _T( "Server 4.0 " );
+				sProduct += _T("Server 4.0 ");
 		}
+		break;
 	}
 	return sProduct;
 }
 
-#define REGBUFSIZE 1024
 /** 
  * @brief Extract any helpful product details from registry (for WinNT)
  */
@@ -537,30 +513,29 @@ static String GetNtProductFromRegistry(const OSVERSIONINFOEX & osvi)
 {
 	String sProduct;
 
-	HKEY hKey;
-	TCHAR szProductType[REGBUFSIZE];
-	DWORD dwBufLen = _countof(szProductType);
-	LONG lRet;
+	TCHAR szProductType[64];
 
-	lRet = RegOpenKeyEx( HKEY_LOCAL_MACHINE,
+	HKEY hKey = NULL;
+	LONG lRet = RegOpenKeyEx(HKEY_LOCAL_MACHINE,
 		_T("SYSTEM\\CurrentControlSet\\Control\\ProductOptions"),
-		0, KEY_QUERY_VALUE, &hKey );
-	if( lRet != ERROR_SUCCESS )
-		return _T("");
+		0, KEY_QUERY_VALUE, &hKey);
 
-	lRet = RegQueryValueEx( hKey, _T("ProductType"), NULL, NULL,
-		(LPBYTE) szProductType, &dwBufLen);
-	RegCloseKey( hKey );
+	if (lRet == ERROR_SUCCESS)
+	{
+		DWORD dwBufLen = _countof(szProductType);
+		lRet = RegQueryValueEx(hKey, _T("ProductType"), NULL, NULL,
+			(LPBYTE) szProductType, &dwBufLen);
+		RegCloseKey(hKey);
+	}
 
-	if( (lRet != ERROR_SUCCESS) || (dwBufLen > REGBUFSIZE) )
-		return _T("");
-
-	if ( _tcsicmp( _T("WINNT"), szProductType) == 0 )
-		sProduct = _T( "Workstation " );
-	if ( _tcsicmp( _T("LANMANNT"), szProductType) == 0 )
-		sProduct = _T( "Server " );
-	if ( _tcsicmp( _T("SERVERNT"), szProductType) == 0 )
-		sProduct = _T( "Advanced Server " );
+	if (lRet != ERROR_SUCCESS)
+		sProduct = _T("?ProductType? ");
+	else if (_tcsicmp(_T("WINNT"), szProductType) == 0)
+		sProduct = _T("Workstation ");
+	else if (_tcsicmp(_T("LANMANNT"), szProductType) == 0)
+		sProduct = _T("Server ");
+	else if (_tcsicmp(_T("SERVERNT"), szProductType) == 0)
+		sProduct = _T("Advanced Server ");
 
 	string_format ver(_T("%d.%d "), osvi.dwMajorVersion, osvi.dwMinorVersion);
 	sProduct += ver;
@@ -580,21 +555,19 @@ String CConfigLog::GetWindowsVer()
 
 	// Try calling GetVersionEx using the OSVERSIONINFOEX structure.
 	// If that fails, try using the OSVERSIONINFO structure.
-
 	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
 	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
-
-	if( !GetVersionEx ((OSVERSIONINFO *) &osvi) )
+	if (!GetVersionEx((OSVERSIONINFO *)&osvi))
 	{
-		osvi.dwOSVersionInfoSize = sizeof (OSVERSIONINFO);
-		if (! GetVersionEx ( (OSVERSIONINFO *) &osvi) )
+		osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+		if (!GetVersionEx((OSVERSIONINFO *)&osvi))
 			return _T("");
 	}
 
 	switch (osvi.dwPlatformId)
 	{
-		// Test for the Windows NT product family.
-		case VER_PLATFORM_WIN32_NT:
+	// Test for the Windows NT product family.
+	case VER_PLATFORM_WIN32_NT:
 
 		// Test for the specific product family.
 		if ( osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 2 )
@@ -640,25 +613,24 @@ String CConfigLog::GetWindowsVer()
 		if( osvi.dwMajorVersion == 4 &&
 			_tcsicmp( osvi.szCSDVersion, _T("Service Pack 6") ) == 0 )
 		{
-			HKEY hKey;
-			LONG lRet;
-
+			HKEY hKey = NULL;
 			// Test for SP6 versus SP6a.
-			lRet = RegOpenKeyEx( HKEY_LOCAL_MACHINE,
+			LONG lRet = RegOpenKeyEx(HKEY_LOCAL_MACHINE,
 				_T("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Hotfix\\Q246009"),
-				0, KEY_QUERY_VALUE, &hKey );
+				0, KEY_QUERY_VALUE, &hKey);
 			String ver;
-			if( lRet == ERROR_SUCCESS )
-				ver = string_format(_T("Service Pack 6a (Build %d)"), osvi.dwBuildNumber & 0xFFFF );
+			if (lRet == ERROR_SUCCESS)
+			{
+				ver = string_format(_T("Service Pack 6a (Build %d)"), osvi.dwBuildNumber & 0xFFFF);
+				RegCloseKey(hKey);
+			}
 			else // Windows NT 4.0 prior to SP6a
 			{
 				ver = string_format(_T("%s (Build %d)"),
 					osvi.szCSDVersion,
 					osvi.dwBuildNumber & 0xFFFF);
 			}
-
 			sVersion += ver;
-			RegCloseKey( hKey );
 		}
 		else // Windows NT 3.51 and earlier or Windows 2000 and later
 		{

@@ -519,15 +519,17 @@ void CDirFrame::CreateClient()
 	RECT rect;
 	m_wndFilePathBar.GetClientRect(&rect);
 	// Directory frame has a status bar
+	HWindow *pParent = wine_version ? m_wndFilePathBar.m_pWnd : m_pWnd;
 	m_wndStatusBar = HStatusBar::Create(
 		WS_CHILD | WS_VISIBLE | CCS_NOPARENTALIGN,
 		rect.left, rect.top, rect.right - rect.left, rect.bottom,
-		m_pWnd, 0x6000);
-	m_wndStatusBar->SetParent(m_wndFilePathBar.m_pWnd);
-
+		pParent, 0x6000);
 	m_wndStatusBar->GetWindowRect(&rect);
-	m_wndFilePathBar.ScreenToClient(&rect);
+	pParent->ScreenToClient(&rect);
+	m_wndStatusBar->SetParent(m_wndFilePathBar.m_pWnd);
 	rect.bottom -= rect.top;
+	m_wndStatusBar->SetStyle(m_wndStatusBar->GetStyle() | CCS_NORESIZE);
+
 	// Show selection all the time, so user can see current item even when
 	// focus is elsewhere (ie, on file edit window)
 	HListView *pLv = HListView::Create(

@@ -1084,16 +1084,9 @@ HImageList *CLanguageSelect::LoadImageList(UINT id, int cx, int cGrow) const
 		cx, cGrow, RGB(255, 0, 255), IMAGE_BITMAP, LR_CREATEDIBSECTION);
 }
 
-void CLanguageSelect::ReloadMenu() 
+void CLanguageSelect::ReloadMenu()
 {
-	// Create a temporary menu to collect the garbage
-	HMenu *const pGarbageMenu = HMenu::CreatePopupMenu();
-	// Populate it with MainFrame's default menu, and placeholders for DocFrame shared menus
-	pGarbageMenu->AppendMenu(MF_POPUP,
-		reinterpret_cast<UINT_PTR>(theApp.m_pMainWnd->m_hMenuDefault), _T(""));
-	pGarbageMenu->AppendMenu(MF_SEPARATOR, FRAME_FOLDER);
-	pGarbageMenu->AppendMenu(MF_SEPARATOR, FRAME_FILE);
-	pGarbageMenu->AppendMenu(MF_SEPARATOR, FRAME_BINARY);
+	HMENU rghGarbageMenu[] = { theApp.m_pMainWnd->m_hMenuDefault, NULL, NULL, NULL };
 
 	theApp.m_pMainWnd->m_hMenuDefault = LoadMenu(IDR_MAINFRAME)->m_hMenu;
 	HWindow *const pWndMDIClient = theApp.m_pMainWnd->m_pWndMDIClient;
@@ -1103,13 +1096,14 @@ void CLanguageSelect::ReloadMenu()
 		CDocFrame *const pDocFrame = static_cast<CDocFrame *>(CDocFrame::FromHandle(pChild));
 		FRAMETYPE const frameType = pDocFrame->GetFrameType();
 		CDocFrame::HandleSet *const pHandleSet = pDocFrame->m_pHandleSet;
-		if (pGarbageMenu->ModifyMenu(frameType, MF_POPUP,
-				reinterpret_cast<UINT_PTR>(pHandleSet->m_hMenuShared)))
+		ASSERT(frameType > 0 && frameType < _countof(rghGarbageMenu));
+		if (frameType < _countof(rghGarbageMenu) && rghGarbageMenu[frameType] == NULL)
 		{
+			rghGarbageMenu[frameType] = pHandleSet->m_hMenuShared;
 			pHandleSet->m_hMenuShared = LoadMenu(pHandleSet->m_id)->m_hMenu;
 		}
 	}
-
+	// Replace the active window
 	HMENU hNewMenu = theApp.m_pMainWnd->m_hMenuDefault;
 	if (CDocFrame *pDocFrame = theApp.m_pMainWnd->GetActiveDocFrame())
 	{
@@ -1117,7 +1111,11 @@ void CLanguageSelect::ReloadMenu()
 	}
 	theApp.m_pMainWnd->SetActiveMenu(hNewMenu);
 	// Do away with the garbage
-	pGarbageMenu->DestroyMenu();
+	for (int i = 0 ; i < _countof(rghGarbageMenu) ; ++i)
+	{
+		if (HMENU hMenu = rghGarbageMenu[i])
+			::DestroyMenu(hMenu);
+	}
 }
 
 int CLanguageSelect::DoModal(ODialog &dlg, HWND parent) const

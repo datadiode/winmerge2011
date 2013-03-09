@@ -73,3 +73,18 @@ int Vsnprintf16(wchar_t* pDestination, size_t n, const wchar_t* pFormat, va_list
 	// The _vscwprintf() avoids reallocations by pretending C99 conformance.
 	return n ? _vsnwprintf(pDestination, n, pFormat, arguments) : _vscwprintf(pFormat, arguments);
 }
+
+// Try get the wine version.
+static const char *wine_get_version()
+{
+	if (HMODULE h = GetModuleHandle(_T("ntdll.dll")))
+	{
+		typedef const char *(*wine_get_version)();
+		if (FARPROC f = GetProcAddress(h, "wine_get_version"))
+			return reinterpret_cast<wine_get_version>(f)();
+	}
+	return NULL;
+}
+
+// Provide the wine version in a global variable.
+const char *const wine_version = wine_get_version();

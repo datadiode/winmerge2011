@@ -129,6 +129,16 @@ private:
 	void WritePluginsInLogFile(LPCWSTR transformationEvent);
 	String GetWindowsVer();
 	void FileWriteString(LPCTSTR lpsz);
+	template<class any>
+	void FileWriteString(any fmt, ...)
+	{
+		va_list args;
+		va_start(args, fmt);
+		String s;
+		s.append_sprintf_va_list(fmt, args);
+		FileWriteString(s.c_str());
+		va_end(args);
+	}
 	void CloseFile();
     void WriteItemYesNo(int indent, LPCTSTR key, bool *pvalue);
 	void WriteItemYesNoInverted(int indent, LPCTSTR key, bool *pvalue);

@@ -128,6 +128,7 @@ CHexMergeView *CHexMergeFrame::CreatePane(int iPane)
 {
 	RECT rect;
 	HEdit *pEdit = m_wndFilePathBar.GetControlRect(iPane, &rect);
+	const int xFilePathEdit = rect.left;
 	const int cyFilePathEdit = rect.bottom;
 
 	LONG additionalStyles = 0;
@@ -143,23 +144,32 @@ CHexMergeView *CHexMergeFrame::CreatePane(int iPane)
 		rect.left, rect.bottom, rect.right - rect.left, 0,
 		m_wndFilePathBar.m_pWnd, 0x1000 + iPane));
 
+	HWindow *pParent = wine_version ? m_wndFilePathBar.m_pWnd : pView->m_pWnd;
+	const int cxStatusBar = rect.right - rect.left;
 	HStatusBar *pBar = HStatusBar::Create(
 		WS_CHILD | WS_VISIBLE | CCS_NOPARENTALIGN | additionalStyles & SBS_SIZEGRIP,
-		rect.left, rect.bottom, rect.right - rect.left, rect.bottom,
-		pView->m_pWnd, 0x6000 + iPane);
-	pBar->SetParent(m_wndFilePathBar.m_pWnd);
-	pBar->SetWindowPos(reinterpret_cast<HWindow *>(HWND_BOTTOM),
-		0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
-
+		rect.left, rect.bottom, cxStatusBar, rect.bottom,
+		pParent, 0x6000 + iPane);
 	pBar->GetWindowRect(&rect);
+	pParent->ScreenToClient(&rect);
+	if (wine_version)
+	{
+		pBar->SetParent(pView->m_pWnd);
+		pView->SendMessage(WM_PARENTNOTIFY, MAKEWPARAM(WM_CREATE, 0x6000 + iPane), (LPARAM)pBar);
+	}
+	pBar->SetParent(m_wndFilePathBar.m_pWnd);
+	const int cyStatusBar = rect.bottom - rect.top;
 	pBar->SetStyle(pBar->GetStyle() | CCS_NORESIZE);
-	m_wndFilePathBar.ScreenToClient(&rect);
-	int cxStatusBar = rect.right - rect.left;
-	int cyStatusBar = rect.bottom - rect.top;
+
+	pBar->SetWindowPos(reinterpret_cast<HWindow *>(HWND_BOTTOM),
+		xFilePathEdit, rect.top, cxStatusBar, cyStatusBar,
+		SWP_NOACTIVATE);
+
 	pView->SetWindowPos(NULL,
-		rect.left, cyStatusBar,
+		xFilePathEdit, cyStatusBar,
 		cxStatusBar, cyFilePathEdit - cyStatusBar,
 		SWP_NOZORDER | SWP_NOACTIVATE);
+
 	pEdit->SetWindowPos(NULL, 0, 0,
 		cxStatusBar, cyStatusBar,
 		SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);

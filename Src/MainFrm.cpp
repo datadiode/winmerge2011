@@ -3808,11 +3808,11 @@ void CMainFrame::SetActiveMenu(HMENU hMenu)
 	}
 	else
 	{
-	UINT n = GetMenuItemCount(hMenu);
-	HMENU hWindowMenu = GetSubMenu(hMenu, n - 2);
-	m_pWndMDIClient->SendMessage(WM_MDISETMENU,
-		reinterpret_cast<WPARAM>(hMenu),
-		reinterpret_cast<LPARAM>(hWindowMenu));
+		UINT n = GetMenuItemCount(hMenu);
+		HMENU hWindowMenu = GetSubMenu(hMenu, n - 2);
+		m_pWndMDIClient->SendMessage(WM_MDISETMENU,
+			reinterpret_cast<WPARAM>(hMenu),
+			reinterpret_cast<LPARAM>(hWindowMenu));
 	}
 	DrawMenuBar();
 }

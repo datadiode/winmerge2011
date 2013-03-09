@@ -95,6 +95,9 @@ using H2O::OListView;
 using H2O::OString;
 using H2O::ZeroInit;
 
+// Global variable to hold the wine version.
+extern const char *const wine_version;
+
 #ifdef _DEBUG
 #	include "common/ntdll.h"
 #	define TRACE DbgPrint

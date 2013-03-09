@@ -137,6 +137,10 @@ LRESULT COpenDlg::OnNotify(UNotify *pNM)
 			DWORD_PTR result = 0;
 			if (pNM->COMBOBOXEX.ceItem.iItem == 0 && !pNM->pCB->GetDroppedState())
 			{
+				// WINEBUG: Wine does not provide a buffer when querying an LPSTR_TEXTCALLBACK item.
+				static TCHAR path[MAX_PATH];
+				pNM->COMBOBOXEX.ceItem.pszText = path;
+				pNM->COMBOBOXEX.ceItem.cchTextMax = MAX_PATH;
 				pNM->pCB->GetWindowText(pNM->COMBOBOXEX.ceItem.pszText, pNM->COMBOBOXEX.ceItem.cchTextMax);
 			}
 			if (paths_EndsWithSlash(pNM->COMBOBOXEX.ceItem.pszText))
@@ -507,7 +511,8 @@ void COpenDlg::OnCancel()
 		m_pCbLeft->SaveState(_T("Files\\Left"));
 	if (m_pCbRight->GetWindowTextLength() == 0)
 		m_pCbRight->SaveState(_T("Files\\Right"));
-	if (m_pCbExt->GetWindowTextLength() == 0)
+	TCHAR text[10];
+	if (m_pCbExt->GetWindowText(text, _countof(text)) == 0 || lstrcmp(text, _T("*.*")) == 0)
 		m_pCbExt->SaveState(_T("Files\\Ext"));
 	EndDialog(IDCANCEL);
 }

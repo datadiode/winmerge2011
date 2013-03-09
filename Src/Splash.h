@@ -43,6 +43,8 @@ private:
 	~CSplashWnd();
 	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
 	LRESULT OnCustomdraw(NMCUSTOMDRAW *);
+
+	CMyComPtr<IPicture> m_spIPicture;
 };
 
 #endif

@@ -1,4 +1,4 @@
-/*/FloatState.cpp
+/* FloatState.cpp
 
 [The MIT license]
 
@@ -22,23 +22,43 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-DATE:		BY:					DESCRIPTION:
-==========	==================	================================================
-2006-02-19	Jochen Tucht		Created
-2006-09-12	Jochen Neubeck		Be aware of SWP_FRAMECHANGED
-2006-09-21	Jochen Neubeck		Avoid unnecessary SWP_NOCOPYBITS
-2006-09-23	Jochen Neubeck		New methods AdjustMax(), AdjustHit()
-2006-10-08	Jochen Neubeck		Fix avoid unnecessary SWP_NOCOPYBITS
-2007-04-25	Jochen Neubeck		Assume transparent STATICs are group boxes
-2009-04-30	Jochen Neubeck		Fix AdjustMax() for left or top aligned taskbar
-2011-03-27	Jochen Neubeck		New method CallWindowProc() to ease subclassing
-2011-04-01	Jochen Neubeck		Preserve edit selection in dropdown comboboxes
-2011-05-14	Jochen Neubeck		SWP_FRAMECHANGED | SWP_NOCOPYBITS forces layout
-2011-07-24	Jochen Neubeck		Stop moving when SC_SIZE shrinks beyond limits
-2011-12-01	Jochen Neubeck		Fix SC_SIZE with left or top aligned taskbar
+Last change: 2013-03-09 by Jochen Neubeck
 */
 #include "StdAfx.h"
 #include "FloatState.h"
+
+static void NTAPI WineAwareSetWindowPlacement(HWND hwnd, const WINDOWPLACEMENT *pwp)
+{
+	if (wine_version)
+	{
+		// Compensate for http://bugs.winehq.org/show_bug.cgi?id=33124
+		if (pwp->flags & WPF_SETMINPOSITION)
+		{
+			WINDOWPLACEMENT wp;
+			LONG style = GetWindowLong(hwnd, GWL_STYLE);
+			SetWindowLong(hwnd, GWL_STYLE, style | WS_MINIMIZE);
+			SetWindowPos(hwnd, NULL,
+				pwp->ptMinPosition.x, pwp->ptMinPosition.y, 0, 0,
+				SWP_NOSIZE | SWP_NOZORDER | SWP_NOREDRAW | SWP_NOACTIVATE);
+			GetWindowPlacement(hwnd, &wp);
+			SetWindowLong(hwnd, GWL_STYLE, style | WS_MAXIMIZE);
+			SetWindowPos(hwnd, NULL,
+				pwp->ptMaxPosition.x, pwp->ptMaxPosition.y, 0, 0,
+				SWP_NOSIZE | SWP_NOZORDER | SWP_NOREDRAW | SWP_NOACTIVATE);
+			GetWindowPlacement(hwnd, &wp);
+			SetWindowLong(hwnd, GWL_STYLE, style);
+		}
+		SetWindowPos(hwnd, NULL,
+			pwp->rcNormalPosition.left, pwp->rcNormalPosition.top,
+			pwp->rcNormalPosition.right - pwp->rcNormalPosition.left,
+			pwp->rcNormalPosition.bottom - pwp->rcNormalPosition.top,
+			SWP_NOZORDER | SWP_NOACTIVATE);
+	}
+	else
+	{
+		SetWindowPlacement(hwnd, pwp);
+	}
+}
 
 static HWND NTAPI GetNextDlgGroupSibling(HWND hwndThis)
 {
@@ -113,9 +133,11 @@ BOOL CFloatState::Float(WINDOWPOS *pParam)
 				if (wIDCtrl == LOWORD(nIDCtrl) || wIDCtrl == 0xFFFF)
 				{
 					::GetWindowPlacement(hwndInner, &wp);
+					wp.flags = 0;
 					if (wp.ptMinPosition.x == -1 && wp.ptMinPosition.y == -1)
 					{
 						*(LPRECT)&wp.ptMinPosition = wp.rcNormalPosition;
+						wp.flags = WPF_SETMINPOSITION;
 					}
 					RECT rcNormalPosition = wp.rcNormalPosition;
 					if (cxGrow || (wpflags & SWP_NOCOPYBITS))
@@ -131,7 +153,6 @@ BOOL CFloatState::Float(WINDOWPOS *pParam)
 					if (!::EqualRect(&rcNormalPosition, &wp.rcNormalPosition))
 					{
 						pParam->flags |= SWP_NOCOPYBITS;
-						wp.flags = WPF_SETMINPOSITION;
 						if ((::GetWindowLong(hwndInner, GWL_STYLE) & WS_VISIBLE) == 0)
 						{
 							wp.showCmd = SW_HIDE;
@@ -141,12 +162,12 @@ BOOL CFloatState::Float(WINDOWPOS *pParam)
 							(::SendDlgItemMessage(hwndInner, 1001, WM_GETDLGCODE, 0, 0) & DLGC_HASSETSEL))
 						{
 							LPARAM sel = ::SendMessage(hwndInner, CB_GETEDITSEL, 0, 0);
-							::SetWindowPlacement(hwndInner, &wp);
+							::WineAwareSetWindowPlacement(hwndInner, &wp);
 							::SendMessage(hwndInner, CB_SETEDITSEL, 0, sel);
 						}
 						else
 						{
-							::SetWindowPlacement(hwndInner, &wp);
+							::WineAwareSetWindowPlacement(hwndInner, &wp);
 						}
 					}
 				}
@@ -199,13 +220,18 @@ BOOL CFloatState::Float(WINDOWPOS *pParam)
 				}
 			}
 		}
-		if ((flags & 0x00FF00FF) == 0)
+		if (wine_version == NULL)
 		{
-			pParam->cx = cx;
-		}
-		if ((flags & 0xFF00FF00) == 0)
-		{
-			pParam->cy = cy;
+			// Not for Wine because the native desktop's host window doesn't
+			// respect any limits WM_WINDOWPOSCHANGING attempts to enforce.
+			if ((flags & 0x00FF00FF) == 0)
+			{
+				pParam->cx = cx;
+			}
+			if ((flags & 0xFF00FF00) == 0)
+			{
+				pParam->cy = cy;
+			}
 		}
 	}
 	return Float;

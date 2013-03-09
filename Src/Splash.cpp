@@ -34,6 +34,7 @@
 #include "OptionsMgr.h"
 #include "OptionsDef.h"
 #include "Splash.h"
+#include "common/ResourceStream.h"
 #include "common/version.h"
 
 #pragma comment(lib, "wininet.lib")
@@ -92,32 +93,19 @@ CSplashWnd::CSplashWnd(HWindow *pWndMain)
 		0, 0, 0, 0, pWndMain, 0x1000, NULL, &ccs));
 
 	//BringWindowToTop(m_hWnd);
-
 	m_bAutoDelete = true;
 	if (COptionsMgr::Get(OPT_DISABLE_SPLASH))
 		return;
 	SetTimer(SplashTimerID, 5000, NULL);
 	HListView *pLv = HListView::Create(WS_CHILD | WS_VISIBLE, 0, 0,
 		ImageDimensions.cx, ImageDimensions.cy, m_pWnd, SplashTimerID, WS_EX_NOPARENTNOTIFY);
-	TCHAR path[MAX_PATH];
-	TCHAR extraInfo[20];
-	TCHAR url[MAX_PATH + 40];
-	URL_COMPONENTS urlComponents;
-	ZeroMemory(&urlComponents, sizeof urlComponents);
-	urlComponents.dwStructSize = sizeof urlComponents;
-	urlComponents.nScheme = INTERNET_SCHEME_RES;
-	urlComponents.lpszUrlPath = path;
-	urlComponents.dwUrlPathLength = GetModuleFileName(NULL, path, _countof(path));
-	urlComponents.lpszExtraInfo = extraInfo;
-	urlComponents.dwExtraInfoLength = wsprintf(extraInfo, _T("/IMAGE/%u"), IDR_SPLASH);
-	DWORD len = _countof(url);
-	if (!InternetCreateUrl(&urlComponents, 0, url, &len))
-		return;
-	LVBKIMAGE lvbkimg;
-	ZeroMemory(&lvbkimg, sizeof lvbkimg);
-	lvbkimg.ulFlags = LVBKIF_SOURCE_URL;
-	lvbkimg.pszImage = url;
-	pLv->SetBkImage(&lvbkimg);
+	CMyComPtr<IStream> pstm;
+	if (SUCCEEDED(ResourceStream::Create(NULL, MAKEINTRESOURCE(IDR_SPLASH), _T("IMAGE"), &pstm)))
+	{
+		STATSTG stat;
+		pstm->Stat(&stat, STATFLAG_NONAME);
+		OleLoadPicture(pstm, stat.cbSize.LowPart, FALSE, IID_IPicture, (void**)&m_spIPicture);
+	}
 }
 
 /** 
@@ -222,6 +210,15 @@ LRESULT CSplashWnd::OnCustomdraw(NMCUSTOMDRAW *pnm)
 		return CDRF_DODEFAULT;
 
 	HSurface *pdc = reinterpret_cast<HSurface *>(pnm->hdc);
+
+	if (m_spIPicture)
+	{
+		long hmWidth = 0;
+		long hmHeight = 0;
+		m_spIPicture->get_Width(&hmWidth);
+		m_spIPicture->get_Height(&hmHeight);
+		m_spIPicture->Render(pdc->m_hDC, 0, 0, ImageDimensions.cx, ImageDimensions.cy, 0, hmHeight, hmWidth, -hmHeight, NULL);
+	}
 
 	CVersionInfo version;
 

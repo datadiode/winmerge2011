@@ -692,8 +692,7 @@ LRESULT CSubFrame::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		if (uMsg == uLayoutMsg)
 		{
 			uLayoutMsg = 0;
-			m_pDocFrame->RecalcLayout();
-			m_pDocFrame->RedrawWindow();
+			m_pDocFrame->PostMessage(WM_SIZE);
 		}
 		if (uMsg == WM_EXITSIZEMOVE)
 		{

@@ -176,7 +176,7 @@ void CDirView::AcquireSharedResources()
 	int i = 0;
 	do
 	{
-		VERIFY(-1 != m_imageList->Add(LanguageSelect.LoadIcon(rgIDI[i])));
+		VERIFY(-1 != m_imageList->Add(LanguageSelect.LoadSmallIcon(rgIDI[i])));
 	} while (++i < CompareStats::N_DIFFIMG);
 	// Load the icons used for the list view (expanded/collapsed state icons)
 	m_imageState = LanguageSelect.LoadImageList(IDB_TREE_STATE, 16);

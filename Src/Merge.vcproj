@@ -1206,6 +1206,10 @@
 				>
 			</File>
 			<File
+				RelativePath="Common\ResourceStream.cpp"
+				>
+			</File>
+			<File
 				RelativePath="SaveClosingDlg.cpp"
 				>
 			</File>
@@ -1831,6 +1835,10 @@
 				>
 			</File>
 			<File
+				RelativePath="Common\ResourceStream.h"
+				>
+			</File>
+			<File
 				RelativePath="SaveClosingDlg.h"
 				>
 			</File>
@@ -1970,7 +1978,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="..\Setup\setup.wsf version &quot;$(InputPath)&quot; $(PlatformName)&#x0D;&#x0A;"
+						CommandLine="..\Setup\setup.wsf version &quot;$(InputPath)&quot; $(PlatformName)"
 						Outputs="$(OutDir)\$(InputFileName)"
 					/>
 				</FileConfiguration>

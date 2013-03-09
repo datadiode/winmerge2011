@@ -55,15 +55,6 @@ OWindow::~OWindow()
 		DestroyWindow();
 }
 
-/**
- * @brief Load a cursor from COMCTL32.DLL.
- */
-static HCURSOR NTAPI CommCtrl_LoadCursor(LPCTSTR lpCursorName)
-{
-	HMODULE hModule = GetModuleHandle(_T("COMCTL32.DLL"));
-	return hModule ? LoadCursor(hModule, lpCursorName) : NULL;
-}
-
 struct DrawItemStruct_WebLinkButton : DRAWITEMSTRUCT
 {
 	void DrawItem()
@@ -116,7 +107,7 @@ LRESULT OWindow::MessageReflect_WebLinkButton<WM_DRAWITEM>(WPARAM, LPARAM lParam
 template<>
 LRESULT OWindow::MessageReflect_WebLinkButton<WM_SETCURSOR>(WPARAM, LPARAM lParam)
 {
-	HCURSOR hCursor = CommCtrl_LoadCursor(MAKEINTRESOURCE(108));
+	HCURSOR hCursor = ::LoadCursor(NULL, MAKEINTRESOURCE(IDC_HAND));
 	::SetCursor(hCursor);
 	return TRUE;
 }
