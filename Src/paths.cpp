@@ -375,6 +375,16 @@ bool paths_PathIsExe(LPCTSTR path)
 }
 
 /**
+ * @brief paths_SkipRootForCompactPath
+ */
+static LPTSTR paths_SkipRootForCompactPath(LPCTSTR path)
+{
+	if (LPTSTR tail = PathSkipRoot(path))
+		return tail;
+	return PathFindFileName(path);
+}
+
+/**
  * @brief paths_CompactPath
  */
 void paths_CompactPath(HEdit *pEdit, String &path)
@@ -387,7 +397,7 @@ void paths_CompactPath(HEdit *pEdit, String &path)
 	// as much characters as possible from the right
 	// PathCompactPath keeps, in between, as much characters as possible from the left
 	// so we reverse everything between the first and the last component before calling PathCompactPath
-	if (LPTSTR pathWithoutRoot = PathSkipRoot(path.c_str() + offset))
+	if (LPTSTR pathWithoutRoot = paths_SkipRootForCompactPath(path.c_str() + offset))
 		_tcsrev(pathWithoutRoot);
 
 	// resize to at least MAX_PATH characters
@@ -412,6 +422,6 @@ void paths_CompactPath(HEdit *pEdit, String &path)
 
 	// we reverse back everything between the first and the last component
 	// it works OK as "..." reversed = "..." again
-	if (LPTSTR pathWithoutRoot = PathSkipRoot(path.c_str() + offset))
+	if (LPTSTR pathWithoutRoot = paths_SkipRootForCompactPath(path.c_str() + offset))
 		_tcsrev(pathWithoutRoot);
 }
