@@ -63,7 +63,7 @@ LPCTSTR MergeCmdLineInfo::EatParam(LPCTSTR p, String &param, bool *flag) const
 	}
 	if (q > p && flag)
 	{
-		if (m_sOptionChars.find(*p) != String::npos)
+		if (m_sOptionChars.find(*p) != String::npos && StrRChr(p, q, _T('/')) <= p)
 		{
 			*flag = true;
 			++p;
