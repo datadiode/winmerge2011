@@ -1,4 +1,4 @@
-: echo << :sh
+: << :sh
 @echo off
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 :: This shell script grabs Windows Script 5.6 from download.microsoft.com   ::
