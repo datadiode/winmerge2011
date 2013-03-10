@@ -44,7 +44,7 @@
  * @param [out] flag Tells whether param is the name of a flag.
  * @return Points to the remaining portion of the command line.
  */
-LPCTSTR MergeCmdLineInfo::EatParam(LPCTSTR p, String &param, bool *flag)
+LPCTSTR MergeCmdLineInfo::EatParam(LPCTSTR p, String &param, bool *flag) const
 {
 	if (p && *(p += StrSpn(p, _T(" \t\r\n"))) == _T('\0'))
 		p = 0;
@@ -63,7 +63,7 @@ LPCTSTR MergeCmdLineInfo::EatParam(LPCTSTR p, String &param, bool *flag)
 	}
 	if (q > p && flag)
 	{
-		if (*p == _T('-') || *p == _T('/'))
+		if (m_sOptionChars.find(*p) != String::npos)
 		{
 			*flag = true;
 			++p;
@@ -93,7 +93,7 @@ LPCTSTR MergeCmdLineInfo::EatParam(LPCTSTR p, String &param, bool *flag)
  * @param [in] value Default value in case none is specified.
  * @return Points to the remaining portion of the command line.
  */
-LPCTSTR MergeCmdLineInfo::SetOption(LPCTSTR q, IOptionDef &opt, LPCTSTR value)
+LPCTSTR MergeCmdLineInfo::SetOption(LPCTSTR q, IOptionDef &opt, LPCTSTR value) const
 {
 	String s;
 	if (*q == _T(':'))
@@ -111,6 +111,7 @@ LPCTSTR MergeCmdLineInfo::SetOption(LPCTSTR q, IOptionDef &opt, LPCTSTR value)
  */
 MergeCmdLineInfo::MergeCmdLineInfo(LPCTSTR q):
 	m_nCmdShow(SW_SHOWNORMAL),
+	m_sOptionChars(_T("/-")),
 	m_bClearCaseTool(false),
 	m_bEscShutdown(false),
 	m_bExitIfNoDiff(Disabled),
@@ -230,7 +231,6 @@ void MergeCmdLineInfo::ParseClearCaseCmdLine(LPCTSTR q, LPCTSTR basedesc)
 void MergeCmdLineInfo::AddPath(const String &path)
 {
 	String param(path);
-
 	// Convert paths given in Linux-style ('/' as separator) given from
 	// Cygwin to Windows style ('\' as separator)
 	string_replace(param, _T("/"), _T("\\"));
@@ -310,6 +310,11 @@ void MergeCmdLineInfo::ParseWinMergeCmdLine(LPCTSTR q)
 		{
 			// -s to allow only one instance
 			m_bSingleInstance = true;
+		}
+		else if (param == _T("option"))
+		{
+			// -optchars to assign a custom set of option indicators
+			q = EatParam(q, m_sOptionChars);
 		}
 		else if (param == _T("noninteractive"))
 		{

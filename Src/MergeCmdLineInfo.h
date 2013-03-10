@@ -70,13 +70,14 @@ public:
 
 	String m_sFileFilter; /**< File filter mask. */
 	String m_sContentType; /**< Content type. */
+	String m_sOptionChars; /**< Set of accepted option indicators. */
 
 	stl::vector<String> m_Files; /**< Files (or directories) to compare. */
 
 private:
 
-	static LPCTSTR EatParam(LPCTSTR, String &, bool *flag = 0);
-	static LPCTSTR SetOption(LPCTSTR, IOptionDef &, LPCTSTR value = _T("1"));
+	LPCTSTR EatParam(LPCTSTR, String &, bool *flag = 0) const;
+	LPCTSTR SetOption(LPCTSTR, IOptionDef &, LPCTSTR value = _T("1")) const;
 	void ParseClearCaseCmdLine(LPCTSTR, LPCTSTR basedesc);
 	void ParseWinMergeCmdLine(LPCTSTR);
 	void AddPath(const String &path);
