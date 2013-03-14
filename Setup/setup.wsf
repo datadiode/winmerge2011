@@ -36,7 +36,7 @@ End If
 <meta http-equiv='Content-Type' content='text/html; charset=ISO-8859-1'/>
 <hta:application
 	id='app'
-	version='XXXXX.2011.003.083'
+	version='XXXXX.2011.003.115'
 	applicationName='WinMerge &amp;version; Setup'
 	scroll='no'
 	singleInstance='yes'
@@ -469,6 +469,10 @@ Sub Job_Version
 	content = Replace(content, "&SevenZip;", sh.RegRead("HKLM\Software\7-Zip\Path"))
 	path = fso.GetParentFolderName(location.pathname) & "_" & platform & ".bat"
 	fso.CreateTextFile(path, True).Write content
+	path = fso.GetParentFolderName(location.pathname) & "\WinMerge2011.nsi"
+	parts = Split(fso.OpenTextFile(path).ReadAll, """", 3)
+	parts(1) = version
+	fso.CreateTextFile(path, True).Write Join(parts, """")
 	close
 End Sub
 

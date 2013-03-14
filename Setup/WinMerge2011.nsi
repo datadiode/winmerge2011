@@ -22,9 +22,9 @@
 
 ;    3. This notice may not be removed or altered from any source distribution.
 
-!define version "0.2011.XXX.XXX"
+!define version "0.2011.003.115"
 !define srcdir "..\Build\WinMerge\Win32\Release"
-!define setup "..\Build\WinMerge\Win32\WinMerge_${version}_setup.exe"
+!define setup "..\Build\WinMerge\Win32\WinMerge_${version}_wine_setup.exe"
 
 !define script56 "$%ProgramFiles%\Windows Script 5.6"
 !define script56url "ftp://ftp.uni-rostock.de/pub/tools/microsoft/Scripting/us/WSH_5.6/scripten.exe"
@@ -66,6 +66,7 @@ Page license
 
 ; Page components
 Page directory
+Page components
 Page instfiles
 
 UninstPage uninstConfirm
@@ -76,12 +77,12 @@ UninstPage instfiles
 AutoCloseWindow false
 ShowInstDetails show
 
-; beginning (invisible) section
-Section
+; install main application
+Section "Main Application (GNU GPLv2)"
 
+	; write executable path to (ir)relevant places
 	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\WinMerge.exe" "" "$INSTDIR\WinMergeU.exe"
 	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\WinMergeU.exe" "" "$INSTDIR\WinMergeU.exe"
-
 	WriteRegStr HKLM "${regkey}" "Executable" "$INSTDIR\WinMergeU.exe"
 
 	; write uninstall strings
@@ -101,18 +102,27 @@ Section
 	; package all files, recursively, preserving attributes
 	; assume files are in the correct places
 
-	File /r /x *.lib /x *.exp /x *.pdb /x *.wsf /x ShellExtension*.dll "${srcdir}\*.*"
-
-	File "/oname=$INSTDIR\ShellExtensionU.new" ..\Build\WinMerge\Win32\Release\ShellExtensionU.dll
-	Delete /REBOOTOK "$INSTDIR\ShellExtensionU.dll"
-	Rename /REBOOTOK "$INSTDIR\ShellExtensionU.new" "$INSTDIR\ShellExtensionU.dll"
-
-	File "/oname=$INSTDIR\ShellExtensionX64.new" ..\Build\WinMerge\x64\Release\ShellExtensionX64.dll
-	Delete /REBOOTOK "$INSTDIR\ShellExtensionX64.dll"
-	Rename /REBOOTOK $INSTDIR\ShellExtensionX64.new" "$INSTDIR\ShellExtensionX64.dll"
+	File /a /r /x *.lib /x *.exp /x *.pdb /x *.wsf "${srcdir}\*.*"
 
 	RegDLL "$INSTDIR\ShellExtensionU.dll"
-	RegDLL "$INSTDIR\ShellExtensionX64.dll"
+
+	WriteUninstaller "${uninstaller}"
+
+	; create a WinMerge launch script in /usr/local/bin
+	IfFileExists "$SYSDIR\winecfg.exe" 0 EndWaitCreateLaunchScript
+
+		Exec '/usr/bin/xterm -e sh ./CreateLaunchScript.sh "$INSTDIR\WinMergeU.exe"'
+
+		WaitCreateLaunchScript:
+			Sleep 1000
+		IfFileExists "$INSTDIR\CreateLaunchScript.sh" WaitCreateLaunchScript
+
+	EndWaitCreateLaunchScript:
+
+SectionEnd
+
+; download and install Windows Script 5.6
+Section "Windows Script 5.6 (separate EULA)"
 
 	IfFileExists "$SYSDIR\winecfg.exe" 0 EndInstallScript56
 	IfFileExists "${script56}" EndInstallScript56
@@ -135,8 +145,6 @@ Section
 		Delete "${script56}\scriptde.inf"
 		Delete "${script56}\scriptde.cat"
 	EndInstallScript56:
-
-	WriteUninstaller "${uninstaller}"
 
 SectionEnd
 
@@ -163,6 +171,5 @@ Section "Uninstall"
 	Delete "${startmenu}\WinMerge.lnk"
 
 	UnRegDLL $INSTDIR\ShellExtensionU.dll
-	UnRegDLL $INSTDIR\ShellExtensionX64.dll
 
 SectionEnd

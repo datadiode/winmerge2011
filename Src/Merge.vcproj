@@ -3630,6 +3630,31 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath="..\Setup\CreateLaunchScript.sh"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="setup"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="setup"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="System32|Win32"
+					>
+					<Tool
+						Name="setup"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath="..\setup\setup.wsf"
 				>
 			</File>
