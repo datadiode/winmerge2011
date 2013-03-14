@@ -57,6 +57,7 @@
 #include "PatchTool.h"
 #include "ConfigLog.h"
 #include "7zCommon.h"
+#include "dllpstub.h"
 #include "FileFiltersDlg.h"
 #include "OptionsMgr.h"
 #include "LanguageSelect.h"
@@ -1978,7 +1979,7 @@ void CMainFrame::InitialActivate(int nCmdShow)
 	CRegKeyEx rk = SettingStore.GetSectionKey(_T("Settings"));
 	if (!wp.RegQuery(rk, _T("MainWindowPlacement")))
 		GetWindowPlacement(&wp);
-	if (nCmdShow == SW_MINIMIZE)
+	if (nCmdShow != SW_SHOWNORMAL)
 		wp.showCmd = nCmdShow;
 	// Ensure top-left corner is on visible area,
 	// 20 points margin is added to prevent "lost" window
