@@ -566,7 +566,12 @@ LRESULT CDocFrame::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		return OWindow::WindowProc(uMsg, wParam, lParam);
 	case WM_SIZE:
 		if (wParam != SIZE_MINIMIZED)
+		{
+		case WM_CAPTURECHANGED:
 			RecalcLayout();
+			if (::GetCapture() == NULL)
+				SavePosition();
+		}
 		break;
 	case WM_GETMINMAXINFO:
 		::DefMDIChildProc(m_hWnd, uMsg, wParam, lParam);
@@ -675,28 +680,16 @@ CSubFrame::CSubFrame(CDocFrame *pDocFrame, const LONG *FloatScript, UINT uHitTes
 
 LRESULT CSubFrame::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	static UINT uLayoutMsg = 0;
 	switch (uMsg)
 	{
 	case WM_WINDOWPOSCHANGING:
 		CFloatState::Float(reinterpret_cast<WINDOWPOS *>(lParam));
 		break;
-	case WM_ENTERSIZEMOVE:
-		uLayoutMsg = WM_EXITSIZEMOVE;
-		break;
 	case WM_SIZE:
 		if (::GetCapture() == m_hWnd)
-			uLayoutMsg = WM_SIZE;
-		// fall through
-	case WM_EXITSIZEMOVE:
-		if (uMsg == uLayoutMsg)
 		{
-			uLayoutMsg = 0;
-			m_pDocFrame->PostMessage(WM_SIZE);
-		}
-		if (uMsg == WM_EXITSIZEMOVE)
-		{
-			m_pDocFrame->SavePosition();
+		case WM_CAPTURECHANGED:
+			m_pDocFrame->PostMessage(uMsg);
 		}
 		break;
 	case WM_NCHITTEST:
