@@ -107,6 +107,7 @@ DATE:		BY:					DESCRIPTION:
 #include "DirFrame.h"
 #include "MainFrm.h"
 #include "7zCommon.h"
+#include "dllpstub.h"
 //#include "ExternalArchiveFormat.h"
 #include "common/version.h"
 #include <paths.h>
@@ -242,48 +243,68 @@ DWORD NTAPI VersionOf7z()
 }
 
 /**
+ * @brief Proxy for Merge7z
+ */
+Merge7z::Proxy Merge7z = { NULL };
+
+/**
  * @brief Access dll functions through proxy.
  */
 interface Merge7z *Merge7z::Proxy::operator->()
 {
+	struct Merge7zDLL
+	{
+		DLLGETVERSIONPROC DllGetVersion;
+		interface Merge7z *Merge7z;
+		HMODULE H;
+	};
+	static DllProxy::Instance<struct Merge7zDLL> DLL =
+	{
+		"Merge7z\\Merge7z%u%02u"DECORATE_U".dll",
+		"DllGetVersion",
+		"Merge7z",
+		(HMODULE)0
+	};
 	// As long as the Merge7z*.DLL has not yet been loaded, Merge7z
 	// [0] points to the name of the DLL (with placeholders for 7-
 	// Zip major and minor version numbers). Once the DLL has been
 	// loaded successfully, Merge7z[0] is set to NULL, causing the
 	// if to fail on subsequent calls.
-	if (const char *format = Merge7z[0])
+	if (DLL.H == NULL)
 	{
 		// Merge7z has not yet been loaded
 		if (!COptionsMgr::Get(OPT_ARCHIVE_ENABLE))
 			OException::ThrowSilent();
 		static char name[MAX_PATH];
-		if (format != name)
+		if (DLL.Names[0] != name)
 		{
 			DWORD ver = VersionOf7z();
-			wsprintfA(name, format, UINT HIWORD(ver), UINT LOWORD(ver));
-			Merge7z[0] = name;
+			wsprintfA(name, DLL.Names[0], UINT HIWORD(ver), UINT LOWORD(ver));
+			DLL.Names[0] = name;
 		}
-		stub.Load();
 		LANGID wLangID = (LANGID)GetThreadLocale();
 		DWORD flags = Initialize::Default | Initialize::Local7z | wLangID << 16;
 		if (COptionsMgr::Get(OPT_ARCHIVE_PROBETYPE))
 		{
 			flags |= Initialize::GuessFormatBySignature | Initialize::GuessFormatByExtension;
 		}
-		((interface Merge7z *)Merge7z[1])->Initialize(flags);
+		// Is the DLL up to date?
+		DLLVERSIONINFO dvi;
+		dvi.cbSize = sizeof dvi;
+		dvi.dwMajorVersion = 0;
+		dvi.dwMinorVersion = 0;
+		dvi.dwBuildNumber = 0;
+		if (SUCCEEDED(DLL->DllGetVersion(&dvi)) &&
+			dvi.dwBuildNumber >= DllBuild_Merge7z)
+		{
+			pMerge7z = DLL->Merge7z;
+			pMerge7z->Initialize(flags);
+		}
 	}
-	return ((interface Merge7z *)Merge7z[1]);
+	if (pMerge7z == NULL)
+		OException::Throw(CO_S_NOTALLINTERFACES);
+	return pMerge7z;
 }
-
-/**
- * @brief Proxy for Merge7z
- */
-Merge7z::Proxy Merge7z =
-{
-	{ 0, 0, DllBuild_Merge7z },
-	"Merge7z\\Merge7z%u%02u"DECORATE_U".dll",
-	"Merge7z"
-};
 
 /**
  * @brief Tell Merge7z we are going to enumerate just 1 item.

@@ -1,151 +1,100 @@
-/* dllpstub.cpp: Help implement DLL proxies
- * Copyright (c) 2005 Jochen Tucht
- *
- * License:	This program is free software; you can redistribute it and/or modify
- *			it under the terms of the GNU General Public License as published by
- *			the Free Software Foundation; either version 2 of the License, or
- *			(at your option) any later version.
- *
- *			This program is distributed in the hope that it will be useful,
- *			but WITHOUT ANY WARRANTY; without even the implied warranty of
- *			MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *			GNU General Public License for more details.
- *
- *			You should have received a copy of the GNU General Public License
- *			along with this program; if not, write to the Free Software
- *			Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+/*
+[The MIT license]
 
-Please mind 2. a) of the GNU General Public License, and log your changes below.
+Copyright (c) 2007 Jochen Neubeck
 
-DATE:		BY:					DESCRIPTION:
-==========	==================	================================================
-2005-02-26	Jochen Tucht		Created
-2006-09-10	Kimmo Varis			Don't use 'export' as variable name
-								Visual Studio 2005 warns about it.
-2011-08-08	Jochen Neubeck		Remove MFC dependencies.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+Last change: 2013-03-10 by Jochen Neubeck
 */
-
 #include "stdafx.h"
 #include "dllpstub.h"
 
 /**
- * @brief Throw DLLPSTUB related exception.
+ * @brief Load a dll and import a number of functions.
  */
-void DLLPSTUB::Throw(LPCSTR name, HMODULE handle, DWORD dwError, BOOL bFreeLibrary)
+LPVOID DllProxy::Load()
 {
-	string_format strError(_T("%hs"), name);
-	if (handle)
+	if (Names[0])
 	{
-		TCHAR module[1024];
-		module[0] = '@';
-		if (::GetModuleFileName(handle, module + 1, 1023) == 0)
+		if (Names[1] == 0 || Names[1] == Names[0])
+			return 0;
+		HMODULE handle = LoadLibraryA(Names[0]);
+		if (handle == 0)
 		{
-			wsprintf(module + 1, _T("%08lX"), handle);
+			Names[1] = 0;
+			return 0;
 		}
-		strError += strError.empty() ? module + 1 : module;
+		LPCSTR *p = Names;
+		*Names = 0;
+		while (LPCSTR name = *++p)
+		{
+			*p = (LPCSTR)GetProcAddress(handle, name);
+			if (*p == 0)
+			{
+				Names[0] = Names[1] = name;
+				Names[2] = (LPCSTR)handle;
+				return 0;
+			}
+		}
+		*p = (LPCSTR)handle;
 	}
-	TCHAR szError[512];
-	if (::FormatMessage(
-		FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-		NULL, dwError, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-		szError + 2, 510, NULL))
-	{
-		szError[0] = ':';
-		szError[1] = '\n';
-		strError += szError;
-	}
-	if (bFreeLibrary)
-	{
-		FreeLibrary(handle);
-	}
-	OException::Throw(0, strError.c_str());
+	return this + 1;
 }
 
 /**
- * @brief Load a dll and import a number of functions.
+ * @brief Load a dll and import a number of functions, or throw an exception.
  */
-HMODULE DLLPSTUB::Load()
+LPVOID DllProxy::EnsureLoad()
 {
-	// DLLPSTUB assumes that it is embedded in its owner
-	// followed by a char array of the DLL name to load
-	// so it access the char array via *(this + 1)
-	LPCSTR *proxy = (LPCSTR *) (this + 1);
-	HMODULE handle = NULL;
-	if (LPCSTR name = *proxy)
+	if (!Load())
 	{
-		if (proxy[1] && proxy[1] != name)
-		{
-			handle = LoadLibraryA(name);
-			if (handle)
-			{
-				// If any of the version members are non-zero
-				// then we require that DLL export "DllGetVersion"
-				// and report a version as least as high as our
-				// version number members
-				if (dwMajorVersion || dwMinorVersion || dwBuildNumber)
-				{
-					// Is the DLL up to date?
-					DLLVERSIONINFO dvi;
-					dvi.cbSize = sizeof dvi;
-					dvi.dwMajorVersion = 0;
-					dvi.dwMinorVersion = 0;
-					dvi.dwBuildNumber = 0;
-					DLLGETVERSIONPROC DllGetVersion = (DLLGETVERSIONPROC)GetProcAddress(handle, "DllGetVersion");
-					if
-					(
-						DllGetVersion == NULL
-					||	FAILED(DllGetVersion(&dvi))
-					||	(
-							dwMajorVersion && dvi.dwMajorVersion != dwMajorVersion
-							? dvi.dwMajorVersion < dwMajorVersion :
-							dwMinorVersion && dvi.dwMinorVersion != dwMinorVersion
-							? dvi.dwMinorVersion < dwMinorVersion :
-							dvi.dwBuildNumber < dwBuildNumber
-						)
-					)
-					{
-						// Well, that's the most appropriate canned system
-						// message I came across: If DLL is outdated, it may
-						// actually lack some interface we need...
-						Throw(0, handle, CO_S_NOTALLINTERFACES, TRUE);
-					}
-				}
-				LPCSTR *pszExport = proxy;
-				*proxy = NULL;
-				while ((name = *++pszExport) != NULL)
-				{
-					*pszExport = (LPCSTR)GetProcAddress(handle, name);
-					if (*pszExport == NULL)
-					{
-						*proxy = proxy[1] = name;
-						pszExport = proxy + 2;
-						break;
-					}
-				}
-				*pszExport = (LPCSTR)handle;
-			}
-		}
-		if ((name = *proxy) != NULL)
-		{
-			DWORD dwError = ERROR_MOD_NOT_FOUND;
-			HMODULE handle = 0;
-			if (proxy[1] == name)
-			{
-				dwError = ERROR_PROC_NOT_FOUND;
-				handle = (HMODULE)proxy[2];
-			}
-			Throw(name, handle, dwError, FALSE);
-		}
+		TCHAR buf[1024];
+		FormatMessage(buf);
+		OException::Throw(0, buf);
 	}
-	return handle;
+	return this + 1;
+}
+
+/**
+ * @brief Format an appropriate error message.
+ */
+void DllProxy::FormatMessage(LPTSTR buf)
+{
+	int cch = wsprintf(buf, _T("%hs"), Names[0]);
+	DWORD error = ERROR_MOD_NOT_FOUND;
+	if (Names[1])
+	{
+		buf[cch++] = '@';
+		cch += ::GetModuleFileName((HMODULE)Names[2], buf + cch, MAX_PATH);
+		error = ERROR_PROC_NOT_FOUND;
+	}
+	buf[cch++] = ':';
+	buf[cch++] = '\n';
+	::FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, 0, error, 0, buf + cch, MAX_PATH, 0);
 }
 
 /**
  * @brief ICONV dll proxy
  */
-DllProxy<struct ICONV> ICONV =
+DllProxy::Instance<struct ICONV> ICONV =
 {
-	{ 0, 0, 0 },
 	"ICONV.DLL",
 	"libiconv_open",
 	"libiconv",
@@ -159,9 +108,8 @@ DllProxy<struct ICONV> ICONV =
 /**
  * @brief URLMON dll proxy
  */
-DllProxy<struct URLMON> URLMON =
+DllProxy::Instance<struct URLMON> URLMON =
 {
-	{ 0, 0, 0 },
 	"URLMON.DLL",
 	"CreateURLMoniker",
 	(HMODULE)0
@@ -170,9 +118,8 @@ DllProxy<struct URLMON> URLMON =
 /**
  * @brief MSHTML dll proxy
  */
-DllProxy<struct MSHTML> MSHTML =
+DllProxy::Instance<struct MSHTML> MSHTML =
 {
-	{ 0, 0, 0 },
 	"MSHTML.DLL",
 	"CreateHTMLPropertyPage",
 	"ShowHTMLDialogEx",

@@ -15,45 +15,36 @@
 #endif
 #define DECORATE_AW DECORATE_A DECORATE_W
 
-/**
- * @brief stub class to help implement DLL proxies
- *
- * A DLLPSTUB must be embedded in an object followed immediately by an array
- * of names, comprising the DLL's name followed by the exported symbol names.
- *
- * If dll is not found, DLLPSTUB::Load will throw an exception
- * If any of dwMajorVersion, dwMinorVersion, dwBuildNumber are non-zero
- * the DLLPSTUB::Load will throw an exception (CO_S_NOTALLINTERFACES) unless
- * the dll exports DllGetVersion and reports a version at least as high as
- * requested by these members
- */
-struct DLLPSTUB
-{
-	DWORD dwMajorVersion;					// Major version
-	DWORD dwMinorVersion;					// Minor version
-	DWORD dwBuildNumber;					// Build number
-	DWORD dwPadding;						// Pad to 64 bit boundary
-	static void Throw(LPCSTR name, HMODULE, DWORD dwError, BOOL bFreeLibrary);
-	HMODULE Load();
-};
-
-template<class T>
 struct DllProxy
 {
-	DLLPSTUB stub;
-	LPCSTR names[&static_cast<T *>(0)->END - &static_cast<T *>(0)->BEGIN];
-	HMODULE handle;
+	LPCSTR Names[1];
+	LPVOID Load() throw();
+	LPVOID EnsureLoad();
+	void FormatMessage(LPTSTR);
+	template<class T> struct Instance;
+};
+
+template<class T> struct DllProxy::Instance
+{
+	union
+	{
+		LPCSTR Names[sizeof(T) / sizeof(LPCSTR)];
+		DllProxy Proxy;
+	};
+	HMODULE H;
+	operator T *() throw()
+	{
+		return (T *)Proxy.Load();
+	}
 	T *operator->()
 	{
-		stub.Load();
-		return (T *) names;
+		return (T *)Proxy.EnsureLoad();
 	}
 };
 
 // ICONV dll interface
 struct ICONV
 {
-	HMODULE BEGIN;
 	HANDLE (*iconv_open)(const char *tocode, const char *fromcode);
 	size_t (*iconv)(HANDLE, const char **inbuf, size_t *inbytesleft, char **outbuf, size_t *outbytesleft);
 	int (*iconv_close)(HANDLE);
@@ -64,30 +55,28 @@ struct ICONV
 		void *data
 	);
 	int *_libiconv_version;
-	HMODULE END;
+	HMODULE H;
 };
 
-extern DllProxy<struct ICONV> ICONV;
+extern DllProxy::Instance<struct ICONV> ICONV;
 
-// MSHTML dll interface
+// URLMON dll interface
 struct URLMON
 {
-	HMODULE BEGIN;
 	HRESULT(STDAPICALLTYPE*CreateURLMoniker)(IMoniker *, LPCWSTR, IMoniker **);
-	HMODULE END;
+	HMODULE H;
 };
 
-extern DllProxy<struct URLMON> URLMON;
+extern DllProxy::Instance<struct URLMON> URLMON;
 
 // MSHTML dll interface
 struct MSHTML
 {
-	HMODULE BEGIN;
 	HRESULT(STDAPICALLTYPE*CreateHTMLPropertyPage)(IMoniker *, IPropertyPage **);
 	HRESULT(STDAPICALLTYPE*ShowHTMLDialogEx)(HWND, IMoniker *, DWORD, VARIANT *, LPWSTR, VARIANT *);
-	HMODULE END;
+	HMODULE H;
 };
 
-extern DllProxy<struct MSHTML> MSHTML;
+extern DllProxy::Instance<struct MSHTML> MSHTML;
 
 #endif

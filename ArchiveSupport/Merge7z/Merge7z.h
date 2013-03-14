@@ -12,7 +12,6 @@
 #define DllBuild_Merge7z_10 public
 #else
 #define DllBuild_Merge7z_10 private
-#define DLLPSTUB /##/
 #endif
 
 #if DllBuild_Merge7z >= 13
@@ -23,13 +22,7 @@
 
 interface Merge7z
 {
-	struct Proxy
-	{
-		DLLPSTUB stub;
-		LPCSTR Merge7z[2];
-		HMODULE handle;
-		interface Merge7z *operator->();
-	};
+	struct Proxy { Merge7z *pMerge7z, *operator->(); };
 	struct Initialize
 	{
 		enum
