@@ -53,7 +53,7 @@ ExecuteParameters="install &platform;"
 set SevenZip=&SevenZip;
 del sources.7z "WinMerge_&version;_&platform;.7z"
 "%SevenZip%\7z.exe" a sources.7z -r Docs\* Externals\* FileTransforms\* Filters\* PrintTemplates\* Setup\* ShellExtension\* Src\* Tools\* Translations\* vsprops\* WinMerge.sln ArchiveSupport\* -x!*.user -x!*.bak -x!*.idc -x!"Visual Studio *"
-"%SevenZip%\7z.exe" a "WinMerge_&version;_&platform;.7z" -r .\Build\WinMerge\&platform;\Release\* .\Build\WinMerge\Win32\Release\ShellExtensionU.dll .\Build\WinMerge\x64\Release\ShellExtensionX64.dll sources.7z -x!*.lib -x!*.exp -x!*.pdb
+"%SevenZip%\7z.exe" a "WinMerge_&version;_&platform;.7z" -r .\Build\WinMerge\&platform;\Release\* .\Build\WinMerge\Win32\Release\ShellExtensionU.dll .\Build\WinMerge\x64\Release\ShellExtensionX64.dll sources.7z -x!*.lib -x!*.exp -x!*.pdb -x!*.sh
 copy /b "%SevenZip%\7zS.sfx" + Setup_&platform;.cfg + "WinMerge_&version;_&platform;.7z" "WinMerge_&version;_&platform;_change_7z_to_exe_if_you_want_a_setup.7z"
 </comment>
 <comment id='version_h'>
