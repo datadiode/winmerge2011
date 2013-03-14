@@ -6,5 +6,5 @@ if [ "$(id -u)" != "0" ]; then
 	exit
 fi
 echo "#!/bin/sh" > /usr/local/bin/WinMerge
-echo "wine \"$1\" \${WINMERGE_OPTIONS} \$*" >> /usr/local/bin/WinMerge
+echo "wine \"$1\" \${WINMERGE_OPTIONS} \$* 2> /dev/null" >> /usr/local/bin/WinMerge
 chmod +x /usr/local/bin/WinMerge
