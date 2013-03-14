@@ -337,6 +337,11 @@ void MergeCmdLineInfo::ParseWinMergeCmdLine(LPCTSTR q)
 			// -maximize means maximize the main window.
 			m_nCmdShow = SW_MAXIMIZE;
 		}
+		else if (param == _T("winebugs"))
+		{
+			// -winebugs means don't work around wine bugs.
+			const_cast<const char *&>(wine_version) = NULL;
+		}
 		else if (param == _T("wl"))
 		{
 			// -wl to open left path as read-only
