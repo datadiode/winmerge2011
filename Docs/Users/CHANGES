@@ -1,4 +1,12 @@
+0.2011.003.115
+Changes since preceding release (not necessarily complete):
+• Make WinMerge 2011 work with Wine and create a supportive installer
+• DirView: Add option to ConfirmFolderCopyDlg to make target items writable
+• HexMergeView: Reflect modification state in filepath bar
+• HexMergeView: Fix a bogus warning about file having been changed from outside
+
 0.2011.003.093
+Changes since preceding release (not necessarily complete):
 • Utf8FileDetect: Fix http://sourceforge.net/p/winmerge/bugs/2129/
 • HexMerge window: "Scroll to first difference" option failed to take effect
 • HexMerge window: F3 key did not behave as it should
