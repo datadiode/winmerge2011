@@ -27,6 +27,7 @@
 #include "paths.h"
 #include "LanguageSelect.h"
 #include "ConfirmFolderCopyDlg.h"
+#include "SettingStore.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -38,6 +39,7 @@ static char THIS_FILE[] = __FILE__;
 
 ConfirmFolderCopyDlg::ConfirmFolderCopyDlg()
 : OResizableDialog(IDD_CONFIRM_COPY)
+, m_bMakeTargetItemWritable(FALSE)
 {
 	// configure how individual controls adjust when dialog resizes
 	static const LONG FloatScript[] =
@@ -73,6 +75,9 @@ BOOL ConfirmFolderCopyDlg::OnInitDialog()
 	SetDlgItemText(IDC_FLDCONFIRM_FROM_PATH, paths_UndoMagic(&m_fromPath.front()));
 	SetDlgItemText(IDC_FLDCONFIRM_TO_PATH, paths_UndoMagic(&m_toPath.front()));
 	SetDlgItemText(IDC_FLDCONFIRM_QUERY, m_question.c_str());
+	m_bMakeTargetItemWritable = SettingStore.GetProfileInt(
+		_T("Settings"), _T("DirViewMakeTargetItemWritable"), 0);
+	CheckDlgButton(IDC_FLDCONFIRM_MAKE_WRITABLE, m_bMakeTargetItemWritable);
 
 	return TRUE;
 }
@@ -84,10 +89,12 @@ LRESULT ConfirmFolderCopyDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lPa
 	case WM_COMMAND:
 		switch (wParam)
 		{
-		case IDOK:
-		case IDCANCEL:
 		case IDYES:
+			m_bMakeTargetItemWritable = IsDlgButtonChecked(IDC_FLDCONFIRM_MAKE_WRITABLE);
+			SettingStore.WriteProfileInt(_T("Settings"),
+				_T("DirViewMakeTargetItemWritable"), m_bMakeTargetItemWritable);
 		case IDNO:
+		case IDCANCEL:
 			EndDialog(wParam);
 			break;
 		}

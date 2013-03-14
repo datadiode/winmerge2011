@@ -56,19 +56,19 @@ String CDiffContext::GetRightFilepathAndName(const DIFFITEM *di) const
  * @param [in] bLeft Update left-side info.
  * @param [in] bRight Update right-side info.
  */
-void CDiffContext::UpdateStatusFromDisk(DIFFITEM *di, BOOL bLeft, BOOL bRight)
+void CDiffContext::UpdateStatusFromDisk(DIFFITEM *di, bool bLeft, bool bRight, bool bMakeWritable)
 {
 	if (bLeft)
 	{
 		di->left.ClearPartial();
 		if (!di->isSideRightOnly())
-			UpdateInfoFromDiskHalf(di, TRUE);
+			UpdateInfoFromDiskHalf(di, true, bMakeWritable);
 	}
 	if (bRight)
 	{
 		di->right.ClearPartial();
 		if (!di->isSideLeftOnly())
-			UpdateInfoFromDiskHalf(di, FALSE);
+			UpdateInfoFromDiskHalf(di, false, bMakeWritable);
 	}
 }
 
@@ -81,21 +81,23 @@ void CDiffContext::UpdateStatusFromDisk(DIFFITEM *di, BOOL bLeft, BOOL bRight)
  *  right side otherwise.
  * @return TRUE if file exists
  */
-BOOL CDiffContext::UpdateInfoFromDiskHalf(DIFFITEM *di, BOOL bLeft)
+bool CDiffContext::UpdateInfoFromDiskHalf(DIFFITEM *di, bool bLeft, bool bMakeWritable)
 {
-	String filepath;
-
-	if (bLeft)
-		filepath = GetLeftFilepathAndName(di);
-	else
-		filepath = GetRightFilepathAndName(di);
-
+	String filepath = bLeft ? GetLeftFilepathAndName(di) : GetRightFilepathAndName(di);
 	DiffFileInfo &dfi = bLeft ? di->left : di->right;
+
+	if (bMakeWritable)
+	{
+		DWORD attr = GetFileAttributes(filepath.c_str());
+		if ((attr & (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_READONLY)) == FILE_ATTRIBUTE_READONLY)
+			SetFileAttributes(filepath.c_str(), attr & ~FILE_ATTRIBUTE_READONLY);
+	}
+
 	if (!dfi.Update(filepath.c_str()))
-		return FALSE;
+		return false;
 	UpdateVersion(di, bLeft);
 	GuessCodepageEncoding(filepath.c_str(), &dfi.encoding, m_bGuessEncoding);
-	return TRUE;
+	return true;
 }
 
 /**

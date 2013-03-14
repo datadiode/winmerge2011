@@ -32,7 +32,6 @@
 #include "LoadSaveCodepageDlg.h"
 #include "IntToIntMap.h"
 #include "FileOrFolderSelect.h"
-#include "ConfirmFolderCopyDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -40,96 +39,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-static bool ConfirmCopy(int origin, int destination, int count,
-		LPCTSTR src, LPCTSTR dest, BOOL destIsSide);
-static bool ConfirmMove(int origin, int destination, int count,
-		LPCTSTR src, LPCTSTR dest, BOOL destIsSide);
-static bool ConfirmDialog(UINT caption, UINT question,
-		int origin, int destination, int count,
-		LPCTSTR src, LPCTSTR dest, BOOL destIsSide);
 static bool CheckPathsExist(LPCTSTR path, int allow = IS_EXISTING);
-
-/**
- * @brief Ask user a confirmation for copying item(s).
- * Shows a confirmation dialog for copy operation. Depending ont item count
- * dialog shows full paths to items (single item) or base paths of compare
- * (multiple items).
- * @param [in] origin Origin side of the item(s).
- * @param [in] destination Destination side of the item(s).
- * @param [in] count Number of items.
- * @param [in] src Source path.
- * @param [in] dest Destination path.
- * @param [in] destIsSide Is destination path either of compare sides?
- * @return TRUE if copy should proceed, FALSE if aborted.
- */
-static bool ConfirmCopy(int origin, int destination, int count,
-		LPCTSTR src, LPCTSTR dest, BOOL destIsSide)
-{
-	bool ret = ConfirmDialog(
-		IDS_CONFIRM_COPY_CAPTION,
-		count == 1 ? IDS_CONFIRM_SINGLE_COPY : IDS_CONFIRM_MULTIPLE_COPY,
-		origin,
-		destination, count,	src, dest, destIsSide);
-	return ret;
-}
-
-/**
- * @brief Ask user a confirmation for moving item(s).
- * Shows a confirmation dialog for move operation. Depending ont item count
- * dialog shows full paths to items (single item) or base paths of compare
- * (multiple items).
- * @param [in] origin Origin side of the item(s).
- * @param [in] destination Destination side of the item(s).
- * @param [in] count Number of items.
- * @param [in] src Source path.
- * @param [in] dest Destination path.
- * @param [in] destIsSide Is destination path either of compare sides?
- * @return TRUE if copy should proceed, FALSE if aborted.
- */
-static bool ConfirmMove(int origin, int destination, int count,
-		LPCTSTR src, LPCTSTR dest, BOOL destIsSide)
-{
-	bool ret = ConfirmDialog(
-		IDS_CONFIRM_MOVE_CAPTION,
-		count == 1 ? IDS_CONFIRM_SINGLE_MOVE : IDS_CONFIRM_MULTIPLE_MOVE,
-		origin,
-		destination, count,	src, dest, destIsSide);
-	return ret;
-}
-
-/**
- * @brief Show a (copy/move) confirmation dialog.
- * @param [in] caption Caption of the dialog.
- * @param [in] question Guestion to ask from user.
- * @param [in] origin Origin side of the item(s).
- * @param [in] destination Destination side of the item(s).
- * @param [in] count Number of items.
- * @param [in] src Source path.
- * @param [in] dest Destination path.
- * @param [in] destIsSide Is destination path either of compare sides?
- * @return TRUE if copy should proceed, FALSE if aborted.
- */
-static bool ConfirmDialog(UINT caption, UINT question,
-		int origin, int destination, int count,
-		LPCTSTR src, LPCTSTR dest, BOOL destIsSide)
-{
-	ConfirmFolderCopyDlg dlg;
-	dlg.m_caption = LanguageSelect.LoadString(caption);
-	dlg.m_question = LanguageSelect.Format(question, count);
-	dlg.m_fromText = LanguageSelect.LoadString(
-		origin == FileActionItem::UI_LEFT ? IDS_FROM_LEFT : IDS_FROM_RIGHT);
-	dlg.m_toText = LanguageSelect.LoadString(!destIsSide ? IDS_TO :
-		destination == FileActionItem::UI_LEFT ? IDS_TO_LEFT : IDS_TO_RIGHT);
-
-	dlg.m_fromPath = src;
-	if (paths_DoesPathExist(src) == IS_EXISTING_DIR && !paths_EndsWithSlash(src))
-		dlg.m_fromPath.push_back(_T('\\'));
-	dlg.m_toPath = dest;
-	if (paths_DoesPathExist(dest) == IS_EXISTING_DIR && !paths_EndsWithSlash(dest))
-		dlg.m_toPath.push_back(_T('\\'));
-
-	return LanguageSelect.DoModal(dlg) == IDYES;
-}
 
 /**
  * @brief Checks if path (to be operated) exists.
@@ -675,14 +585,14 @@ void CDirView::ConfirmAndPerformActions(FileActionScript &actionList, int selCou
  * @brief Confirm actions with user as appropriate
  * (type, whether single or multiple).
  */
-BOOL CDirView::ConfirmActionList(const FileActionScript &actionList, int selCount)
+bool CDirView::ConfirmActionList(FileActionScript &actionList, int selCount)
 {
 	// TODO: We need better confirmation for file actions.
 	// Maybe we should show a list of files with actions done..
 	const CDiffContext *ctxt = m_pFrame->GetDiffContext();
 	FileActionItem item = actionList.GetHeadActionItem();
 
-	BOOL bDestIsSide = TRUE;
+	bool bDestIsSide = true;
 
 	// special handling for the single item case, because it is probably the most common,
 	// and we can give the user exact details easily for it
@@ -690,15 +600,14 @@ BOOL CDirView::ConfirmActionList(const FileActionScript &actionList, int selCoun
 	{
 	case FileAction::ACT_COPY:
 		if (item.UIResult == FileActionItem::UI_DONT_CARE)
-			bDestIsSide = FALSE;
+			bDestIsSide = false;
 
 		if (actionList.GetActionItemCount() == 1)
 		{
-			if (!ConfirmCopy(item.UIOrigin, item.UIDestination,
-				actionList.GetActionItemCount(), item.src.c_str(), item.dest.c_str(),
-				bDestIsSide))
+			if (!actionList.ConfirmCopy(item.UIOrigin, item.UIDestination,
+				item.src.c_str(), item.dest.c_str(), bDestIsSide))
 			{
-				return FALSE;
+				return false;
 			}
 		}
 		else
@@ -726,10 +635,10 @@ BOOL CDirView::ConfirmActionList(const FileActionScript &actionList, int selCoun
 					dst = item.dest;
 			}
 
-			if (!ConfirmCopy(item.UIOrigin, item.UIDestination,
-				actionList.GetActionItemCount(), src.c_str(), dst.c_str(), bDestIsSide))
+			if (!actionList.ConfirmCopy(item.UIOrigin, item.UIDestination,
+				src.c_str(), dst.c_str(), bDestIsSide))
 			{
-				return FALSE;
+				return false;
 			}
 		}
 		break;
@@ -738,14 +647,13 @@ BOOL CDirView::ConfirmActionList(const FileActionScript &actionList, int selCoun
 		break;
 
 	case FileAction::ACT_MOVE:
-		bDestIsSide = FALSE;
+		bDestIsSide = false;
 		if (actionList.GetActionItemCount() == 1)
 		{
-			if (!ConfirmMove(item.UIOrigin, item.UIDestination,
-				actionList.GetActionItemCount(), item.src.c_str(), item.dest.c_str(),
-				bDestIsSide))
+			if (!actionList.ConfirmMove(item.UIOrigin, item.UIDestination,
+				item.src.c_str(), item.dest.c_str(), bDestIsSide))
 			{
-				return FALSE;
+				return false;
 			}
 		}
 		else
@@ -763,10 +671,10 @@ BOOL CDirView::ConfirmActionList(const FileActionScript &actionList, int selCoun
 			else
 				dst = item.dest;
 
-			if (!ConfirmMove(item.UIOrigin, item.UIDestination,
-				actionList.GetActionItemCount(), src.c_str(), dst.c_str(), bDestIsSide))
+			if (!actionList.ConfirmMove(item.UIOrigin, item.UIDestination,
+				src.c_str(), dst.c_str(), bDestIsSide))
 			{
-				return FALSE;
+				return false;
 			}
 		}
 		break;
@@ -777,7 +685,7 @@ BOOL CDirView::ConfirmActionList(const FileActionScript &actionList, int selCoun
 		_RPTF0(_CRT_ERROR, "Unknown fileoperation in CDirView::ConfirmActionList()");
 		break;
 	}
-	return TRUE;
+	return true;
 }
 
 /**
@@ -823,7 +731,7 @@ void CDirView::UpdateAfterFileScript(FileActionScript &actionList)
 		// doesn't invalidate our item indexes.
 		FileActionItem act = actionList.RemoveTailActionItem();
 		// Update item
-		m_pFrame->UpdateDiffAfterOperation(act);
+		m_pFrame->UpdateDiffAfterOperation(act, actionList.m_bMakeTargetItemWritable);
 	}
 	
 	// Make sure selection is at sensible place if all selected items

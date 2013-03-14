@@ -153,10 +153,10 @@ private:
 	void DoOpen(SIDE_TYPE);
 	void DoOpenWith(SIDE_TYPE);
 	void DoOpenWithEditor(SIDE_TYPE);
-	void ConfirmAndPerformActions(FileActionScript & actions, int selCount);
-	BOOL ConfirmActionList(const FileActionScript & actions, int selCount);
-	void PerformActionList(FileActionScript & actions);
-	void UpdateAfterFileScript(FileActionScript & actionList);
+	void ConfirmAndPerformActions(FileActionScript &, int selCount);
+	bool ConfirmActionList(FileActionScript &, int selCount);
+	void PerformActionList(FileActionScript &);
+	void UpdateAfterFileScript(FileActionScript &);
 	UINT MarkSelectedForRescan();
 	void DoFileEncodingDialog();
 	bool DoItemRename(int iItem, LPCTSTR szNewItemName);

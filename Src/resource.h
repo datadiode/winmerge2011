@@ -125,6 +125,7 @@
 #define IDI_NOTEQUALTEXTFILE                    521
 #define IDC_LEFT_EDIT                           1000
 #define IDC_COMPARE_SELFCOMPARE                 1001
+#define IDC_FLDCONFIRM_MAKE_WRITABLE            1001
 #define IDC_LEFT_BUTTON                         1001
 #define IDC_LFILTER_EDIT                        1001
 #define IDC_TV_CLEARCASE_TYPEMGR_SETUP          1001

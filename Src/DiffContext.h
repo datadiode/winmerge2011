@@ -74,8 +74,8 @@ public:
 	String GetRightFilepathAndName(const DIFFITEM *di) const;
 
 	// change an existing difference
-	BOOL UpdateInfoFromDiskHalf(DIFFITEM *, BOOL bLeft);
-	void UpdateStatusFromDisk(DIFFITEM *, BOOL bLeft, BOOL bRight);
+	bool UpdateInfoFromDiskHalf(DIFFITEM *, bool bLeft, bool bMakeWritable = false);
+	void UpdateStatusFromDisk(DIFFITEM *, bool bLeft, bool bRight, bool bMakeWritable = false);
 
 	IDiffFilter * m_piFilterGlobal; /**< Interface for file filtering. */
 	bool m_bGuessEncoding;

@@ -318,7 +318,7 @@ void CDirFrame::Redisplay()
  * calls slow DirView functions to get item position and to update GUI.
  * Use UpdateStatusFromDisk() function instead.
  */
-void CDirFrame::ReloadItemStatus(DIFFITEM *di, BOOL bLeft, BOOL bRight)
+void CDirFrame::ReloadItemStatus(DIFFITEM *di, bool bLeft, bool bRight)
 {
 	// in case just copied (into existence) or modified
 	m_pCtxt->UpdateStatusFromDisk(di, bLeft, bRight);
@@ -642,7 +642,7 @@ void CDirFrame::ApplyRightDisplayRoot(String &sText)
  * @param [in] act Action that was done.
  * @param [in] pos List position for DIFFITEM affected.
  */
-void CDirFrame::UpdateDiffAfterOperation(const FileActionItem & act)
+void CDirFrame::UpdateDiffAfterOperation(const FileActionItem & act, bool bMakeTargetItemWritable)
 {
 	DIFFITEM *di = m_pDirView->GetDiffItem(act.context);
 	ASSERT(di != NULL);
@@ -664,8 +664,16 @@ void CDirFrame::UpdateDiffAfterOperation(const FileActionItem & act)
 			di->diffcode |= DIFFCODE::BOTH | DIFFCODE::SAME;
 		di->nidiffs = 0;
 		di->nsdiffs = 0;
-		bUpdateLeft = true;
-		bUpdateRight = true;
+		switch (act.UIDestination)
+		{
+		case FileActionItem::UI_LEFT:
+			bUpdateLeft = true;
+			break;
+
+		case FileActionItem::UI_RIGHT:
+			bUpdateRight = true;
+			break;
+		}
 		break;
 
 	case FileActionItem::UI_DEL_LEFT:
@@ -706,7 +714,7 @@ void CDirFrame::UpdateDiffAfterOperation(const FileActionItem & act)
 	}
 	if (bUpdateLeft || bUpdateRight)
 	{
-		m_pCtxt->UpdateStatusFromDisk(di, bUpdateLeft, bUpdateRight);
+		m_pCtxt->UpdateStatusFromDisk(di, bUpdateLeft, bUpdateRight, bMakeTargetItemWritable);
 		m_pDirView->UpdateDiffItemStatus(act.context);
 	}
 }

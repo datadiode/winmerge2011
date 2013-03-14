@@ -103,13 +103,13 @@ public:
 	void CompareReady();
 	void UpdateChangedItem(const CChildFrame *);
 	DIFFITEM *FindItemFromPaths(LPCTSTR pathLeft, LPCTSTR pathRight);
-	void ReloadItemStatus(DIFFITEM *, BOOL bLeft, BOOL bRight);
+	void ReloadItemStatus(DIFFITEM *, bool bLeft, bool bRight);
 	void Redisplay();
 	void AddMergeDoc(CChildFrame *);
 	void AddMergeDoc(CHexMergeFrame *);
 	void MergeDocClosing(CChildFrame *);
 	void MergeDocClosing(CHexMergeFrame *);
-	void UpdateDiffAfterOperation(const FileActionItem &);
+	void UpdateDiffAfterOperation(const FileActionItem &, bool bMakeTargetItemWritable);
 	void UpdateHeaderPath(BOOL bLeft);
 	void AbortCurrentScan();
 	void SetDescriptions(const String &strLeftDesc, const String &strRightDesc);

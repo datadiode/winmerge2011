@@ -106,6 +106,19 @@ public:
 	FileActionScript();
 	~FileActionScript();
 
+	bool ConfirmCopy(
+		int origin, int destination,
+		LPCTSTR src, LPCTSTR dest, bool destIsSide);
+
+	bool ConfirmMove(
+		int origin, int destination,
+		LPCTSTR src, LPCTSTR dest, bool destIsSide);
+
+	bool ConfirmDialog(
+		UINT caption, UINT question,
+		int origin, int destination,
+		LPCTSTR src, LPCTSTR dest, bool destIsSide);
+
 	bool Run(HWND, FILEOP_FLAGS);
 
 	// Manipulate the FileActionList
@@ -126,6 +139,7 @@ public:
 	FileActionItem GetHeadActionItem() const { return m_actions[0]; }
 
 	String m_destBase; /**< Base destination path for some operations */
+	bool m_bMakeTargetItemWritable; /**< Whether to make copy/move target items writable */
 
 private:
 	stl::vector<FileActionItem> m_actions; /**< List of all actions for this script. */

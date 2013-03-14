@@ -31,7 +31,7 @@
 class ConfirmFolderCopyDlg : public OResizableDialog
 {
 public:
-	ConfirmFolderCopyDlg();   // standard constructor
+	ConfirmFolderCopyDlg();
 
 	String m_question;
 	String m_fromText;
@@ -39,6 +39,7 @@ public:
 	String m_toText;
 	String m_toPath;
 	String m_caption;
+	BOOL m_bMakeTargetItemWritable;
 
 protected:
 	virtual BOOL OnInitDialog();

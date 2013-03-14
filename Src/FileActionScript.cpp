@@ -30,6 +30,7 @@
 #include "FileActionScript.h"
 #include "ShellFileOperations.h"
 #include "paths.h"
+#include "ConfirmFolderCopyDlg.h"
 
 using stl::vector;
 
@@ -37,14 +38,92 @@ using stl::vector;
  * @brief Standard constructor.
  */
 FileActionScript::FileActionScript()
+: m_bMakeTargetItemWritable(false)
 {
 }
 
 /**
- * @brief Standard destructor.
+ * @brief Destructor.
  */
 FileActionScript::~FileActionScript()
 {
+}
+
+/**
+ * @brief Ask user a confirmation for copying item(s).
+ * Shows a confirmation dialog for copy operation. Depending ont item count
+ * dialog shows full paths to items (single item) or base paths of compare
+ * (multiple items).
+ * @param [in] origin Origin side of the item(s).
+ * @param [in] destination Destination side of the item(s).
+ * @param [in] src Source path.
+ * @param [in] dest Destination path.
+ * @param [in] destIsSide Is destination path either of compare sides?
+ * @return TRUE if copy should proceed, FALSE if aborted.
+ */
+bool FileActionScript::ConfirmCopy(
+	int origin, int destination, LPCTSTR src, LPCTSTR dest, bool destIsSide)
+{
+	bool ret = ConfirmDialog(IDS_CONFIRM_COPY_CAPTION,
+		GetActionItemCount() == 1 ? IDS_CONFIRM_SINGLE_COPY : IDS_CONFIRM_MULTIPLE_COPY,
+		origin, destination, src, dest, destIsSide);
+	return ret;
+}
+
+/**
+ * @brief Ask user a confirmation for moving item(s).
+ * Shows a confirmation dialog for move operation. Depending ont item count
+ * dialog shows full paths to items (single item) or base paths of compare
+ * (multiple items).
+ * @param [in] origin Origin side of the item(s).
+ * @param [in] destination Destination side of the item(s).
+ * @param [in] src Source path.
+ * @param [in] dest Destination path.
+ * @param [in] destIsSide Is destination path either of compare sides?
+ * @return TRUE if copy should proceed, FALSE if aborted.
+ */
+bool FileActionScript::ConfirmMove(
+	int origin, int destination, LPCTSTR src, LPCTSTR dest, bool destIsSide)
+{
+	bool ret = ConfirmDialog(IDS_CONFIRM_MOVE_CAPTION,
+		GetActionItemCount() == 1 ? IDS_CONFIRM_SINGLE_MOVE : IDS_CONFIRM_MULTIPLE_MOVE,
+		origin, destination, src, dest, destIsSide);
+	return ret;
+}
+
+/**
+ * @brief Show a (copy/move) confirmation dialog.
+ * @param [in] caption Caption of the dialog.
+ * @param [in] question Guestion to ask from user.
+ * @param [in] origin Origin side of the item(s).
+ * @param [in] destination Destination side of the item(s).
+ * @param [in] src Source path.
+ * @param [in] dest Destination path.
+ * @param [in] destIsSide Is destination path either of compare sides?
+ * @return TRUE if copy should proceed, FALSE if aborted.
+ */
+bool FileActionScript::ConfirmDialog(
+	UINT caption, UINT question,
+	int origin, int destination, LPCTSTR src, LPCTSTR dest, bool destIsSide)
+{
+	ConfirmFolderCopyDlg dlg;
+	dlg.m_caption = LanguageSelect.LoadString(caption);
+	dlg.m_question = LanguageSelect.Format(question, GetActionItemCount());
+	dlg.m_fromText = LanguageSelect.LoadString(
+		origin == FileActionItem::UI_LEFT ? IDS_FROM_LEFT : IDS_FROM_RIGHT);
+	dlg.m_toText = LanguageSelect.LoadString(!destIsSide ? IDS_TO :
+		destination == FileActionItem::UI_LEFT ? IDS_TO_LEFT : IDS_TO_RIGHT);
+
+	dlg.m_fromPath = src;
+	if (paths_DoesPathExist(src) == IS_EXISTING_DIR && !paths_EndsWithSlash(src))
+		dlg.m_fromPath.push_back(_T('\\'));
+	dlg.m_toPath = dest;
+	if (paths_DoesPathExist(dest) == IS_EXISTING_DIR && !paths_EndsWithSlash(dest))
+		dlg.m_toPath.push_back(_T('\\'));
+
+	bool ret = LanguageSelect.DoModal(dlg) == IDYES;
+	m_bMakeTargetItemWritable = dlg.m_bMakeTargetItemWritable != FALSE;
+	return ret;
 }
 
 /**
