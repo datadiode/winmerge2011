@@ -43,10 +43,10 @@ const TCHAR WinMergeWindowClass[] = _T("WinMergeWindowClassW");
  */
 enum FRAMETYPE
 {
+	FRAME_OTHER, /**< No frame? */
 	FRAME_FOLDER, /**< Folder compare frame. */
 	FRAME_FILE, /**< File compare frame. */
 	FRAME_BINARY, /**< Binary compare frame. */
-	FRAME_OTHER, /**< No frame? */
 };
 
 enum { IDLE_TIMER = 9754 };
