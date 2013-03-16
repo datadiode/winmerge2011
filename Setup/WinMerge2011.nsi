@@ -27,7 +27,9 @@
 !define setup "..\Build\WinMerge\Win32\WinMerge_${version}_wine_setup.exe"
 
 !define script56 "$%ProgramFiles%\Windows Script 5.6"
-!define script56url "ftp://ftp.uni-rostock.de/pub/tools/microsoft/Scripting/us/WSH_5.6/scripten.exe"
+!define script56url "ftp://ftp.bestzvit.com.ua/ARM_ZS/Redist/SCR56EN.EXE"
+; possible fallback(s):
+; "ftp://24-129-233-75.eastlink.ca/array1/SKC/Support/WindowsScript/scripten.exe"
 
 ; registry stuff
 
@@ -125,10 +127,12 @@ SectionEnd
 Section "Windows Script 5.6 (separate EULA)"
 
 	IfFileExists "$SYSDIR\winecfg.exe" 0 EndInstallScript56
-	IfFileExists "${script56}" EndInstallScript56
-		InetLoad::load "${script56url}" "$INSTDIR\script56.exe"
-		ExecWait '"$INSTDIR\script56.exe" /C /T:"${script56}"'
-		Delete "$INSTDIR\script56.exe"
+
+		IfFileExists "${script56}\setup.exe" EndDownloadScript56
+			InetLoad::load /POPUP "Windows Script 5.6" "${script56url}" "${script56}\setup.exe"
+		EndDownloadScript56:
+
+		ExecWait '"${script56}\setup.exe" /C /T:"${script56}"'
 
 		RegDLL "${script56}\jscript.dll"
 		RegDLL "${script56}\vbscript.dll"
