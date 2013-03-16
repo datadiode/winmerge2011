@@ -1,3 +1,7 @@
+0.2011.003.117
+• Wine setup: Change Windows Script 5.6 download link due to version issues
+• Switching UI language with any folder compare windows open was causing issues
+
 0.2011.003.115
 Changes since preceding release (not necessarily complete):
 • Make WinMerge 2011 work with Wine and create a supportive installer
