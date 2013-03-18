@@ -570,27 +570,34 @@ String CConfigLog::GetWindowsVer()
 	case VER_PLATFORM_WIN32_NT:
 
 		// Test for the specific product family.
-		if ( osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 2 )
+		if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 2)
 			sVersion = _T("Microsoft Windows Server 2003 family, ");
-		else if ( osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 1 )
+		else if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 1)
 			sVersion = _T("Microsoft Windows XP ");
-		else if ( osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 0 )
+		else if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 0)
 			sVersion = _T("Microsoft Windows 2000 ");
-		else if ( osvi.dwMajorVersion <= 4 )
+		else if (osvi.dwMajorVersion <= 4)
 			sVersion = _T("Microsoft Windows NT ");
-		else if ( osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 0 )
+		else if (osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 0)
 		{
 			if (osvi.wProductType == VER_NT_WORKSTATION)
 				sVersion = _T("Microsoft Windows Vista ");
 			else
 				sVersion = _T("Microsoft Windows Server 2008 ");
 		}
-		else if ( osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 1 )
+		else if (osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 1)
 		{
 			if (osvi.wProductType == VER_NT_WORKSTATION)
 				sVersion = _T("Microsoft Windows 7 ");
 			else
 				sVersion = _T("Microsoft Windows Server 2008 R2 ");
+		}
+		else if (osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 2)
+		{
+			if (osvi.wProductType == VER_NT_WORKSTATION)
+				sVersion = _T("Microsoft Windows 8 ");
+			else
+				sVersion = _T("Microsoft Windows Server 2012 ");
 		}
 		else
 			sVersion = string_format(_T("[? WindowsNT %d.%d] "), 
@@ -610,8 +617,8 @@ String CConfigLog::GetWindowsVer()
 		}
 
 		// Display service pack (if any) and build number.
-		if( osvi.dwMajorVersion == 4 &&
-			_tcsicmp( osvi.szCSDVersion, _T("Service Pack 6") ) == 0 )
+		if (osvi.dwMajorVersion == 4 &&
+			_tcsicmp(osvi.szCSDVersion, _T("Service Pack 6")) == 0)
 		{
 			HKEY hKey = NULL;
 			// Test for SP6 versus SP6a.
@@ -634,7 +641,7 @@ String CConfigLog::GetWindowsVer()
 		}
 		else // Windows NT 3.51 and earlier or Windows 2000 and later
 		{
-			String ver = string_format( _T("%s (Build %d)"),
+			String ver = string_format(_T("%s (Build %d)"),
 				osvi.szCSDVersion,
 				osvi.dwBuildNumber & 0xFFFF);
 			sVersion += ver;
