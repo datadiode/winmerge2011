@@ -599,21 +599,14 @@ static void unslash(unsigned codepage, stl::string &s)
  * @param [in] wLangId 
  * @return TRUE on success, FALSE otherwise.
  */
-BOOL CLanguageSelect::LoadLanguageFile(LANGID wLangId)
+bool CLanguageSelect::LoadLanguageFile(LANGID wLangId)
 {
 	String strPath = GetFileName(wLangId);
 	if (strPath.empty())
-		return FALSE;
-
-	m_hCurrentDll = LoadLibrary(_T("MergeLang.dll"));
-	// There is no point in translating error messages about inoperational
-	// translation system, so go without string resources here.
+		return false;
 	if (m_hCurrentDll == 0)
-	{
-		if (m_hWnd)
-			theApp.DoMessageBox(_T("Failed to load MergeLang.dll"), MB_ICONSTOP);
-		return FALSE;
-	}
+		m_hCurrentDll = LoadLibraryEx(_T("MergeLang.dll"), 0, LOAD_LIBRARY_AS_DATAFILE);
+	// Failure of LoadLibraryEx() will cause the MERGEPOT blob fail to load.
 	CVersionInfo viInstance;
 	DWORD instanceVerMS = 0;
 	DWORD instanceVerLS = 0;
@@ -622,20 +615,20 @@ BOOL CLanguageSelect::LoadLanguageFile(LANGID wLangId)
 	DWORD resourceVerMS = 0;
 	DWORD resourceVerLS = 0;
 	viResource.GetFixedFileVersion(resourceVerMS, resourceVerLS);
+	// There is no point in translating error messages about inoperational
+	// translation system, so go without string resources here.
 	if (instanceVerMS != resourceVerMS || instanceVerLS != resourceVerLS)
 	{
-		FreeLibrary(m_hCurrentDll);
-		m_hCurrentDll = 0;
 		if (m_hWnd)
 			theApp.DoMessageBox(_T("MergeLang.dll version mismatch"), MB_ICONSTOP);
-		return FALSE;
+		return false;
 	}
 	HRSRC mergepot = FindResource(m_hCurrentDll, _T("MERGEPOT"), RT_RCDATA);
 	if (mergepot == 0)
 	{
 		if (m_hWnd)
-			theApp.DoMessageBox(_T("MergeLang.dll is invalid"), MB_ICONSTOP);
-		return FALSE;
+			theApp.DoMessageBox(_T("MergeLang.dll is missing or invalid"), MB_ICONSTOP);
+		return false;
 	}
 	size_t size = SizeofResource(m_hCurrentDll, mergepot);
 	const char *data = (const char *)LoadResource(m_hCurrentDll, mergepot);
@@ -695,14 +688,12 @@ BOOL CLanguageSelect::LoadLanguageFile(LANGID wLangId)
 	FILE *f = _tfopen(strPath.c_str(), _T("r"));
 	if (f == 0)
 	{
-		FreeLibrary(m_hCurrentDll);
-		m_hCurrentDll = 0;
 		if (m_hWnd)
 		{
 			String str = _T("Failed to load ") + strPath;
 			theApp.DoMessageBox(str.c_str(), MB_ICONSTOP);
 		}
-		return FALSE;
+		return false;
 	}
 	ps = 0;
 	msgid.clear();
@@ -748,6 +739,11 @@ BOOL CLanguageSelect::LoadLanguageFile(LANGID wLangId)
 			{
 				ps->append(p + 1, n - 1);
 			}
+			else if (msgid.empty() && !msgstr.empty())
+			{
+				unslash(CP_ACP, msgstr);
+				m_poheader.swap(msgstr);
+			}
 			else
 			{
 				ps = 0;
@@ -785,9 +781,6 @@ BOOL CLanguageSelect::LoadLanguageFile(LANGID wLangId)
 	fclose(f);
 	if (m_codepage == 0)
 	{
-		FreeLibrary(m_hCurrentDll);
-		m_hCurrentDll = 0;
-		m_strarray.clear();
 		if (m_hWnd)
 		{
 			String stm;
@@ -795,23 +788,19 @@ BOOL CLanguageSelect::LoadLanguageFile(LANGID wLangId)
 			stm += strPath.c_str();
 			theApp.DoMessageBox(stm.c_str(), MB_ICONSTOP);
 		}
-		return FALSE;
+		return false;
 	}
 	if (unresolved != 0 || mismatched != 0)
 	{
-		FreeLibrary(m_hCurrentDll);
-		m_hCurrentDll = 0;
-		m_strarray.clear();
-		m_codepage = 0;
 		if (m_hWnd)
 		{
 			String str = _T("Unresolved or mismatched references detected when ")
 				_T("attempting to read translations from\n") + strPath;
 			theApp.DoMessageBox(str.c_str(), MB_ICONSTOP);
 		}
-		return FALSE;
+		return false;
 	}
-	return TRUE;
+	return true;
 }
 
 /**
@@ -819,27 +808,47 @@ BOOL CLanguageSelect::LoadLanguageFile(LANGID wLangId)
  * @param [in] wLangId 
  * @return TRUE on success, FALSE otherwise.
  */
-BOOL CLanguageSelect::SetLanguage(LANGID wLangId)
+bool CLanguageSelect::SetLanguage(LANGID wLangId)
 {
 	if (wLangId == 0)
-		return FALSE;
+		return false;
 	if (m_wCurLanguage == wLangId)
-		return TRUE;
-	// free the existing DLL
-	if (m_hCurrentDll)
+		return true;
+	if (wLangId == wSourceLangId || !LoadLanguageFile(wLangId))
 	{
-		FreeLibrary(m_hCurrentDll);
-		m_hCurrentDll = NULL;
-	}
-	m_strarray.clear();
-	m_codepage = 0;
-	if (wLangId != wSourceLangId && !LoadLanguageFile(wLangId))
-	{
+		m_poheader.clear();
+		m_strarray.clear();
+		m_codepage = 0;
+		// free the existing DLL
+		if (m_hCurrentDll)
+		{
+			FreeLibrary(m_hCurrentDll);
+			m_hCurrentDll = 0;
+		}
 		wLangId = wSourceLangId;
 	}
 	m_wCurLanguage = wLangId;
 	SetThreadLocale(MAKELCID(m_wCurLanguage, SORT_DEFAULT));
-	return TRUE;
+	return true;
+}
+
+bool CLanguageSelect::GetPoHeaderProperty(const char *name, String &value) const
+{
+	size_t len = strlen(name);
+	const char *p = m_poheader.c_str();
+	while (const char *q = strchr(p, '\n'))
+	{
+		if (memcmp(p, name, len) == 0 && p[len] == ':')
+		{
+			p += len + 1;
+			p += strspn(p, " \t");
+			bool lossy = false;
+			ucr::maketstring(value, p, strcspn(p, " \t\r\n"), CP_ACP, &lossy);
+			return true;
+		}
+		p = q + 1;
+	}
+	return false;
 }
 
 /**
@@ -866,32 +875,6 @@ String CLanguageSelect::GetFileName(LANGID wLangId)
 			filename.clear();
 	}
 	return filename;
-}
-
-/**
- * @brief Check if there are language files installed.
- *
- * This function does as fast as possible check for installed language
- * files. It needs to be fast since it is used in enabling/disabling
- * GUI item(s). So the simple check we do is just find one .po file.
- * If there is a .po file we assume we have at least one language
- * installed.
- * @return TRUE if at least one lang file is found. FALSE if no lang
- * files are found.
- */
-BOOL CLanguageSelect::AreLangsInstalled() const
-{
-	BOOL bFound = FALSE;
-	String path = GetModulePath().append(szRelativePath);
-	String pattern = path + _T("*.po");
-	WIN32_FIND_DATA ff;
-	HANDLE h = INVALID_HANDLE_VALUE;
-	while ((h = FindFile(h, pattern.c_str(), &ff)) != INVALID_HANDLE_VALUE)
-	{
-		ff.dwFileAttributes = INVALID_FILE_ATTRIBUTES;
-		bFound = TRUE;
-	}
-	return bFound;
 }
 
 HINSTANCE CLanguageSelect::FindResourceHandle(LPCTSTR id, LPCTSTR type) const

@@ -3,13 +3,8 @@
  *
  * @brief Declaration file for CLanguageSelect dialog.
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-#if !defined(AFX_LANGUAGESELECT_H__4395A84F_E8DF_11D1_BBCB_00A024706EDC__INCLUDED_)
-#define AFX_LANGUAGESELECT_H__4395A84F_E8DF_11D1_BBCB_00A024706EDC__INCLUDED_
-
-class CStatusBar;
+#ifndef _LANGUAGESELECT_H_
+#define _LANGUAGESELECT_H_
 
 /////////////////////////////////////////////////////////////////////////////
 // CLanguageSelect dialog
@@ -38,10 +33,8 @@ public:
  */
 extern class CLanguageSelect : public OResizableDialog
 {
-// Construction
 public:
-	CLanguageSelect(); // standard constructor
-	BOOL AreLangsInstalled() const;
+	CLanguageSelect();
 	WORD GetLangId() const { return m_wCurLanguage; };
 	void InitializeLanguage();
 	void ReloadMenu();
@@ -64,10 +57,13 @@ public:
 
 	int MsgBox(UINT, UINT = MB_OK) const;
 	int MsgBox(UINT, LPCTSTR, UINT = MB_OK) const;
+
+	bool GetPoHeaderProperty(const char *name, String &value) const;
 // Implementation data
 private:
 	HINSTANCE m_hCurrentDll;
 	LANGID m_wCurLanguage;
+	stl::string m_poheader;
 	class strarray
 	{
 		stl::vector<LPCSTR> m_vec;
@@ -125,8 +121,8 @@ private:
 // Implementation methods
 private:
 	String GetFileName(LANGID);
-	BOOL LoadLanguageFile(LANGID);
-	BOOL SetLanguage(LANGID);
+	bool LoadLanguageFile(LANGID);
+	bool SetLanguage(LANGID);
 	void LoadAndDisplayLanguages();
 	void TranslateMenu(HMENU) const;
 
@@ -140,7 +136,4 @@ protected:
 	void OnOK();
 } LanguageSelect;
 
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Developer Studio will insert additional declarations immediately before the previous line.
-
-#endif // !defined(AFX_LANGUAGESELECT_H__4395A84F_E8DF_11D1_BBCB_00A024706EDC__INCLUDED_)
+#endif // _LANGUAGESELECT_H_
