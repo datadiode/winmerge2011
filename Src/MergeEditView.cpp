@@ -35,6 +35,7 @@
 #include "MergeDiffDetailView.h"
 #include "MainFrm.h"
 #include "OptionsMgr.h"
+#include "Environment.h"
 #include "FileTransform.h"
 #include "WMGotoDlg.h"
 #include "OptionsDef.h"
@@ -1055,6 +1056,42 @@ void CMergeEditView::OnUpdateCaret(bool bShowHide)
 	m_pDocument->UpdateClipboardCmdUI();
 }
 
+static int QueryScriptMethods(HMenu *pMenu, IDispatch *piDispatch, int nCmd, int nMax)
+{
+	HRESULT hr;
+	ITypeInfo *piTypeInfo = NULL;
+	if (SUCCEEDED(hr = piDispatch->GetTypeInfo(0, 0, &piTypeInfo)))
+	{
+		TYPEATTR *pTypeAttr = NULL;
+		if (SUCCEEDED(hr = piTypeInfo->GetTypeAttr(&pTypeAttr)))
+		{
+			UINT iFunc = pTypeAttr->cFuncs;
+			while (iFunc > 0 && nCmd <= nMax)
+			{
+				FUNCDESC *pFuncDesc;
+				if (SUCCEEDED(hr = piTypeInfo->GetFuncDesc(--iFunc, &pFuncDesc)))
+				{
+					// exclude properties
+					// exclude IDispatch inherited methods
+					if ((pFuncDesc->invkind & INVOKE_FUNC) && !(pFuncDesc->wFuncFlags & 1))
+					{
+						CMyComBSTR bstrName;
+						UINT cNames;
+						if SUCCEEDED(hr = piTypeInfo->GetNames(pFuncDesc->memid, &bstrName, 1, &cNames))
+						{
+							pMenu->AppendMenu(MF_STRING, nCmd++, bstrName);
+						}
+					}
+					piTypeInfo->ReleaseFuncDesc(pFuncDesc);
+				}
+			}
+			piTypeInfo->ReleaseTypeAttr(pTypeAttr);
+		}
+		piTypeInfo->Release();
+	}
+	return nCmd;
+}
+
 /**
  * @brief Offer a context menu built with scriptlet/ActiveX functions
  */
@@ -1065,6 +1102,7 @@ void CMergeEditView::OnContextMenu(LPARAM lParam)
 	// Create the menu and populate it with the available functions
 	HMenu *const pMenu = LanguageSelect.LoadMenu(IDR_POPUP_MERGEVIEW);
 	HMenu *const pSub = pMenu->GetSubMenu(0);
+	SetFocus();
 	// Remove copying item copying from active side
 	if (m_nThisPane == 0) // left?
 		pSub->RemoveMenu(ID_R2L, MF_BYCOMMAND);
@@ -1076,8 +1114,67 @@ void CMergeEditView::OnContextMenu(LPARAM lParam)
 		point.x = point.y = 5;
 		ClientToScreen(&point);
 	}
-	pSub->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON,
+
+	String language;
+	bool bLocalized = LanguageSelect.GetPoHeaderProperty("X-Poedit-Language", language);
+	LPCTSTR fmt =
+		_T("script:%%SupplementFolder%%\\EditorScripts\\%s.wsc\0")
+		_T("script:%%SupplementFolder%%\\EditorScripts\\English.wsc\0")
+		_T("script:\\EditorScripts\\%s.wsc\0")
+		_T("script:\\EditorScripts\\English.wsc\0");
+	CMyComPtr<IDispatch> spDispatch;
+	while (int len = _tcslen(fmt))
+	{
+		string_format pluginMoniker(fmt, language.c_str());
+		if (pluginMoniker.find(_T("\\.")) == String::npos)
+		{
+			env_ResolveMoniker(pluginMoniker);
+			HRESULT hr = CoGetObject(pluginMoniker.c_str(), NULL, IID_IDispatch,
+				reinterpret_cast<void **>(&spDispatch));
+			if (SUCCEEDED(hr))
+			{
+				pSub->AppendMenu(MF_SEPARATOR);
+				QueryScriptMethods(pSub, spDispatch, IDC_SCRIPT_FIRST, IDC_SCRIPT_LAST);
+				break;
+			}
+			if (hr != INET_E_RESOURCE_NOT_FOUND)
+			{
+				pSub->AppendMenu(MF_SEPARATOR);
+				pluginMoniker += _T("\t");
+				pluginMoniker += OException(hr).msg;
+				pSub->AppendMenu(MF_STRING, 0, pluginMoniker.c_str());
+				break;
+			}
+		}
+		fmt += len + 1;
+	}
+	int nCmd = pSub->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_RETURNCMD,
 		point.x, point.y, theApp.m_pMainWnd->m_pWnd);
+	if (nCmd >= IDC_SCRIPT_FIRST && nCmd <= IDC_SCRIPT_LAST)
+	{
+		TCHAR method[INFOTIPSIZE];
+		pSub->GetMenuString(nCmd, method, INFOTIPSIZE);
+		CMyDispId DispId;
+		DispId.Init(spDispatch, method);
+		String text;
+		if (IsSelection())
+		{
+			POINT ptStart, ptEnd;
+			GetSelection(ptStart, ptEnd);
+			GetText(ptStart, ptEnd, text);
+		}
+		CMyVariant varRet;
+		DispId.Call(spDispatch, CMyDispParams<1>().Unnamed[text.c_str()], DISPATCH_METHOD, &varRet);
+		if (SUCCEEDED(varRet.ChangeType(VT_BSTR)))
+		{
+			BSTR bstrText = V_BSTR(&varRet);
+			ReplaceSelection(bstrText, SysStringLen(bstrText), 0);
+		}
+	}
+	else
+	{
+		m_pDocument->PostMessage(WM_COMMAND, nCmd);
+	}
 	pMenu->DestroyMenu();
 }
 

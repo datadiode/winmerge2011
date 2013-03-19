@@ -1,0 +1,19 @@
+Option Explicit
+
+Function MakeUpper(Text)
+	MakeUpper = UCase(Text)
+End Function
+
+Function MakeLower(Text)
+	MakeLower = LCase(Text)
+End Function
+
+Function InsertDate(Text)
+	Dim now
+	now = Date
+	InsertDate = Replace(CStr(Year(now)) & CStr(-100-Month(now)) & CStr(-100-Day(now)), "-1", "-")
+End Function
+
+Function InsertTime(Text)
+	InsertTime = FormatDateTime(Time, vbShortTime)
+End Function

@@ -41,6 +41,9 @@
 				Name="VCCustomBuildTool"
 			/>
 			<Tool
+				Name="EditorScripts"
+			/>
+			<Tool
 				Name="FileTransforms"
 			/>
 			<Tool
@@ -159,6 +162,9 @@
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="EditorScripts"
 			/>
 			<Tool
 				Name="FileTransforms"
@@ -282,6 +288,9 @@
 				Name="VCCustomBuildTool"
 			/>
 			<Tool
+				Name="EditorScripts"
+			/>
+			<Tool
 				Name="FileTransforms"
 			/>
 			<Tool
@@ -396,6 +405,9 @@
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="EditorScripts"
 			/>
 			<Tool
 				Name="FileTransforms"
@@ -515,6 +527,9 @@
 				Name="VCCustomBuildTool"
 			/>
 			<Tool
+				Name="EditorScripts"
+			/>
+			<Tool
 				Name="FileTransforms"
 			/>
 			<Tool
@@ -632,6 +647,9 @@
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="EditorScripts"
 			/>
 			<Tool
 				Name="FileTransforms"
@@ -1933,42 +1951,6 @@
 			<File
 				RelativePath="Common\version.h"
 				>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine=""
-						Outputs=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine=""
-						Outputs=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine=""
-						Outputs=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine=""
-						Outputs=""
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="version.rh"
@@ -1979,7 +1961,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						CommandLine="..\Setup\setup.wsf version &quot;$(InputPath)&quot; $(PlatformName)"
-						Outputs="$(OutDir)\$(InputFileName)"
+						Outputs="$(SolutionDir)Setup_$(PlatformName).cfg"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1988,27 +1970,43 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						CommandLine="..\Setup\setup.wsf version &quot;$(InputPath)&quot; $(PlatformName)"
-						Outputs="$(OutDir)\$(InputFileName)"
+						Outputs="$(SolutionDir)Setup_$(PlatformName).cfg"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
-					ExcludedFromBuild="true"
 					>
 					<Tool
 						Name="VCCustomBuildTool"
 						CommandLine="..\Setup\setup.wsf version &quot;$(InputPath)&quot; $(PlatformName)"
-						Outputs="$(OutDir)\$(InputFileName)"
+						Outputs="$(SolutionDir)Setup_$(PlatformName).cfg"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|x64"
-					ExcludedFromBuild="true"
 					>
 					<Tool
 						Name="VCCustomBuildTool"
 						CommandLine="..\Setup\setup.wsf version &quot;$(InputPath)&quot; $(PlatformName)"
-						Outputs="$(OutDir)\$(InputFileName)"
+						Outputs="$(SolutionDir)Setup_$(PlatformName).cfg"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="System32|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="..\Setup\setup.wsf version &quot;$(InputPath)&quot; $(PlatformName)"
+						Outputs="$(SolutionDir)Setup_$(PlatformName).cfg"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="System32|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="..\Setup\setup.wsf version &quot;$(InputPath)&quot; $(PlatformName)"
+						Outputs="$(SolutionDir)Setup_$(PlatformName).cfg"
 					/>
 				</FileConfiguration>
 			</File>
@@ -3529,34 +3527,6 @@
 			<File
 				RelativePath="..\Filters\FileFilter.tmpl"
 				>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="flt"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="flt"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="flt"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="flt"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\Filters\MASM.flt"
@@ -3936,6 +3906,30 @@
 			</File>
 			<File
 				RelativePath="..\Translations\PluginMonikers\German.ini"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Editor Scripts"
+			>
+			<File
+				RelativePath="..\EditorScripts\Basic.vbs.EditorScript"
+				>
+			</File>
+			<File
+				RelativePath="..\EditorScripts\English.wsc.EditorScript"
+				>
+			</File>
+			<File
+				RelativePath="..\EditorScripts\ExecFilterCommand.vbs.EditorScript"
+				>
+			</File>
+			<File
+				RelativePath="..\EditorScripts\German.wsc.EditorScript"
+				>
+			</File>
+			<File
+				RelativePath="..\EditorScripts\SortLines.js.EditorScript"
 				>
 			</File>
 		</Filter>

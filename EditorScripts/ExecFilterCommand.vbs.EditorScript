@@ -1,0 +1,42 @@
+' Adapted from Takashi's fork
+
+Option Explicit
+
+Function ExecFilterCommand(Text)
+	Dim cmd
+	cmd = InputBox("Command:")
+	If cmd = "" Then
+		Exit Function
+	End If
+
+	On Error Resume Next
+
+	Dim wsh
+	Dim path
+	Set wsh = CreateObject("WScript.Shell")
+	path = wsh.ExpandEnvironmentStrings("%TEMP%\_winmerge_addin_temp_.txt")
+
+	Dim fso
+	Dim ts
+	Set fso = CreateObject("Scripting.FileSystemObject")
+	Set ts = fso.CreateTextFile(path)
+	If ts Is Nothing Then
+		MsgBox Err.Source & ": " & vbLf & Err.Description
+		Exit Function
+	End If
+	ts.Write Text
+	ts.Close
+
+	Dim exe
+	Set exe = wsh.Exec("cmd /c " & cmd & " < " & path & " 2>&1")
+	If exe Is Nothing Then
+		MsgBox Err.Source & ":" & vbLf & Err.Description
+		fso.DeleteFile path
+		Exit Function
+	End If
+
+	ExecFilterCommand = exe.StdOut.ReadAll
+
+	fso.DeleteFile path
+
+End Function

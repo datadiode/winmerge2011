@@ -22,7 +22,7 @@
 			Name="flt"
 			CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\Filters\$(InputFileName)&quot;"
 			Outputs="&quot;$(OutDir)\Filters\$(InputFileName)&quot;"
-			FileExtensions="*.flt"
+			FileExtensions="*.flt;*.tmpl"
 			>
 		</CustomBuildRule>
 		<CustomBuildRule
@@ -44,6 +44,13 @@
 			CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\PluginMonikers\$(InputFileName)&quot;"
 			Outputs="&quot;$(OutDir)\PluginMonikers\$(InputFileName)&quot;"
 			FileExtensions="*.ini"
+			>
+		</CustomBuildRule>
+		<CustomBuildRule
+			Name="EditorScript"
+			CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\EditorScripts\$(InputName)&quot;"
+			Outputs="&quot;$(OutDir)\EditorScripts\$(InputFileName)&quot;"
+			FileExtensions="*.EditorScript"
 			>
 		</CustomBuildRule>
 		<CustomBuildRule
