@@ -49,7 +49,7 @@
 		<CustomBuildRule
 			Name="EditorScript"
 			CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\EditorScripts\$(InputName)&quot;"
-			Outputs="&quot;$(OutDir)\EditorScripts\$(InputFileName)&quot;"
+			Outputs="&quot;$(OutDir)\EditorScripts\$(InputName)&quot;"
 			FileExtensions="*.EditorScript"
 			>
 		</CustomBuildRule>
