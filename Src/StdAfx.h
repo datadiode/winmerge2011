@@ -135,20 +135,10 @@ extern const char *const wine_version;
 const UINT MSG_UI_UPDATE = WM_APP + 1;
 /* @} */
 
-/**
- * @brief Indexes to Merge views (file compare).
- * We currently have two views, left and right, but in future there
- * can be more views.
- */
-enum MERGE_VIEW_ID
-{
-	MERGE_VIEW_LEFT, /**< Left view */
-	MERGE_VIEW_RIGHT, /**< Right view */
-	MERGE_VIEW_COUNT, /**< Count of views */
-};
+const UINT MERGE_VIEW_COUNT = 2;
 
 /// Seconds ignored in filetime differences if option enabled
-static const UINT SmallTimeDiff = 2;
+const UINT SmallTimeDiff = 2;
 
 #include "UnicodeString.h"
 
