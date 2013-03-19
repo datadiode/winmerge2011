@@ -126,10 +126,10 @@ void CHexMergeFrame::UpdateDiffItem(CDirFrame *pDirDoc)
 			::UpdateDiffItem(di, pDirDoc->GetDiffContext());
 		}
 	}
-	int lengthLeft = m_pView[MERGE_VIEW_LEFT]->GetLength();
-	void *bufferLeft = m_pView[MERGE_VIEW_LEFT]->GetBuffer(lengthLeft);
-	int lengthRight = m_pView[MERGE_VIEW_RIGHT]->GetLength();
-	void *bufferRight = m_pView[MERGE_VIEW_RIGHT]->GetBuffer(lengthRight);
+	int lengthLeft = m_pView[0]->GetLength();
+	void *bufferLeft = m_pView[0]->GetBuffer(lengthLeft);
+	int lengthRight = m_pView[1]->GetLength();
+	void *bufferRight = m_pView[1]->GetBuffer(lengthRight);
 	SetLastCompareResult(lengthLeft != lengthRight ||
 		bufferLeft && bufferRight && memcmp(bufferLeft, bufferRight, lengthLeft));
 }
@@ -139,8 +139,8 @@ void CHexMergeFrame::UpdateDiffItem(CDirFrame *pDirDoc)
  */
 bool CHexMergeFrame::PromptAndSaveIfNeeded(bool bAllowCancel)
 {
-	const BOOL bLModified = m_pView[MERGE_VIEW_LEFT]->GetModified();
-	const BOOL bRModified = m_pView[MERGE_VIEW_RIGHT]->GetModified();
+	const BOOL bLModified = m_pView[0]->GetModified();
+	const BOOL bRModified = m_pView[1]->GetModified();
 
 	if (!bLModified && !bRModified) //Both files unmodified
 		return true;
@@ -172,7 +172,7 @@ bool CHexMergeFrame::PromptAndSaveIfNeeded(bool bAllowCancel)
 		{
 			if (dlg.m_leftSave == SaveClosingDlg::SAVECLOSING_SAVE)
 			{
-				switch (Try(m_pView[MERGE_VIEW_LEFT]->SaveFile(pathLeft.c_str())))
+				switch (Try(m_pView[0]->SaveFile(pathLeft.c_str())))
 				{
 				case 0:
 					bLSaveSuccess = true;
@@ -184,14 +184,14 @@ bool CHexMergeFrame::PromptAndSaveIfNeeded(bool bAllowCancel)
 			}
 			else
 			{
-				m_pView[MERGE_VIEW_LEFT]->SetModified(FALSE);
+				m_pView[0]->SetModified(FALSE);
 			}
 		}
 		if (bRModified)
 		{
 			if (dlg.m_rightSave == SaveClosingDlg::SAVECLOSING_SAVE)
 			{
-				switch (Try(m_pView[MERGE_VIEW_RIGHT]->SaveFile(pathRight.c_str())))
+				switch (Try(m_pView[1]->SaveFile(pathRight.c_str())))
 				{
 				case 0:
 					bRSaveSuccess = true;
@@ -203,7 +203,7 @@ bool CHexMergeFrame::PromptAndSaveIfNeeded(bool bAllowCancel)
 			}
 			else
 			{
-				m_pView[MERGE_VIEW_RIGHT]->SetModified(FALSE);
+				m_pView[1]->SetModified(FALSE);
 			}
 		}
 	}
@@ -236,18 +236,18 @@ bool CHexMergeFrame::SaveModified()
 void CHexMergeFrame::OnFileSave() 
 {
 	BOOL bUpdate = FALSE;
-	if (m_pView[MERGE_VIEW_LEFT]->GetModified())
+	if (m_pView[0]->GetModified())
 	{
 		const String &pathLeft = m_strPath[0];
-		if (Try(m_pView[MERGE_VIEW_LEFT]->SaveFile(pathLeft.c_str())) == IDCANCEL)
+		if (Try(m_pView[0]->SaveFile(pathLeft.c_str())) == IDCANCEL)
 			return;
 		UpdateHeaderPath(0);
 		bUpdate = TRUE;
 	}
-	if (m_pView[MERGE_VIEW_RIGHT]->GetModified())
+	if (m_pView[1]->GetModified())
 	{
 		const String &pathRight = m_strPath[1];
-		if (Try(m_pView[MERGE_VIEW_RIGHT]->SaveFile(pathRight.c_str())) == IDCANCEL)
+		if (Try(m_pView[1]->SaveFile(pathRight.c_str())) == IDCANCEL)
 			return;
 		UpdateHeaderPath(1);
 		bUpdate = TRUE;
@@ -261,10 +261,10 @@ void CHexMergeFrame::OnFileSave()
  */
 void CHexMergeFrame::OnFileSaveLeft()
 {
-	if (m_pView[MERGE_VIEW_LEFT]->GetModified())
+	if (m_pView[0]->GetModified())
 	{
 		const String &pathLeft = m_strPath[0];
-		if (Try(m_pView[MERGE_VIEW_LEFT]->SaveFile(pathLeft.c_str())) == IDCANCEL)
+		if (Try(m_pView[0]->SaveFile(pathLeft.c_str())) == IDCANCEL)
 			return;
 		UpdateDiffItem(m_pDirDoc);
 	}
@@ -275,10 +275,10 @@ void CHexMergeFrame::OnFileSaveLeft()
  */
 void CHexMergeFrame::OnFileSaveRight()
 {
-	if (m_pView[MERGE_VIEW_RIGHT]->GetModified())
+	if (m_pView[1]->GetModified())
 	{
 		const String &pathRight = m_strPath[1];
-		if (Try(m_pView[MERGE_VIEW_RIGHT]->SaveFile(pathRight.c_str())) == IDCANCEL)
+		if (Try(m_pView[1]->SaveFile(pathRight.c_str())) == IDCANCEL)
 			return;
 		UpdateDiffItem(m_pDirDoc);
 	}
@@ -292,7 +292,7 @@ void CHexMergeFrame::OnFileSaveAsLeft()
 	String strPath = m_strPath[0];
 	if (SelectFile(m_pMDIFrame->m_hWnd, strPath, IDS_SAVE_LEFT_AS, NULL, FALSE))
 	{
-		if (Try(m_pView[MERGE_VIEW_LEFT]->SaveFile(strPath.c_str())) == IDCANCEL)
+		if (Try(m_pView[0]->SaveFile(strPath.c_str())) == IDCANCEL)
 			return;
 		m_strPath[0] = strPath;
 		UpdateDiffItem(m_pDirDoc);
@@ -307,7 +307,7 @@ void CHexMergeFrame::OnFileSaveAsRight()
 	String strPath = m_strPath[1];
 	if (SelectFile(m_pMDIFrame->m_hWnd, strPath, IDS_SAVE_LEFT_AS, NULL, FALSE))
 	{
-		if (Try(m_pView[MERGE_VIEW_RIGHT]->SaveFile(strPath.c_str())) == IDCANCEL)
+		if (Try(m_pView[1]->SaveFile(strPath.c_str())) == IDCANCEL)
 			return;
 		m_strPath[1] = strPath;
 		UpdateDiffItem(m_pDirDoc);
@@ -361,13 +361,13 @@ HRESULT CHexMergeFrame::OpenDocs(
 	BOOL bROLeft, BOOL bRORight)
 {
 	HRESULT hr;
-	if (SUCCEEDED(hr = LoadOneFile(MERGE_VIEW_LEFT, filelocLeft, bROLeft)) &&
-		SUCCEEDED(hr = LoadOneFile(MERGE_VIEW_RIGHT, filelocRight, bRORight)))
+	if (SUCCEEDED(hr = LoadOneFile(0, filelocLeft, bROLeft)) &&
+		SUCCEEDED(hr = LoadOneFile(1, filelocRight, bRORight)))
 	{
 		UpdateDiffItem(0);
 		// An extra ResizeWindow() on the left view aligns scroll ranges, and
 		// also triggers initial diff coloring by invalidating the client area.
-		m_pView[MERGE_VIEW_LEFT]->ResizeWindow();
+		m_pView[0]->ResizeWindow();
 		if (COptionsMgr::Get(OPT_SCROLL_TO_FIRST))
 			SendMessage(WM_COMMAND, ID_FIRSTDIFF);
 		ActivateFrame();
@@ -424,10 +424,10 @@ void CHexMergeFrame::SetTitle()
  */
 void CHexMergeFrame::SetMergeViews(CHexMergeView * pLeft, CHexMergeView * pRight)
 {
-	ASSERT(pLeft && !m_pView[MERGE_VIEW_LEFT]);
-	m_pView[MERGE_VIEW_LEFT] = pLeft;
-	ASSERT(pRight && !m_pView[MERGE_VIEW_RIGHT]);
-	m_pView[MERGE_VIEW_RIGHT] = pRight;
+	ASSERT(pLeft && !m_pView[0]);
+	m_pView[0] = pLeft;
+	ASSERT(pRight && !m_pView[1]);
+	m_pView[1] = pRight;
 }
 
 /**
@@ -485,7 +485,7 @@ void CHexMergeFrame::CopyAll(CHexMergeView *pViewSrc, CHexMergeView *pViewDst)
  */
 void CHexMergeFrame::OnL2r()
 {
-	CopySel(m_pView[MERGE_VIEW_LEFT], m_pView[MERGE_VIEW_RIGHT]);
+	CopySel(m_pView[0], m_pView[1]);
 }
 
 /**
@@ -493,7 +493,7 @@ void CHexMergeFrame::OnL2r()
  */
 void CHexMergeFrame::OnR2l()
 {
-	CopySel(m_pView[MERGE_VIEW_RIGHT], m_pView[MERGE_VIEW_LEFT]);
+	CopySel(m_pView[1], m_pView[0]);
 }
 
 /**
@@ -501,7 +501,7 @@ void CHexMergeFrame::OnR2l()
  */
 void CHexMergeFrame::OnAllRight()
 {
-	CopyAll(m_pView[MERGE_VIEW_LEFT], m_pView[MERGE_VIEW_RIGHT]);
+	CopyAll(m_pView[0], m_pView[1]);
 }
 
 /**
@@ -509,7 +509,7 @@ void CHexMergeFrame::OnAllRight()
  */
 void CHexMergeFrame::OnAllLeft()
 {
-	CopyAll(m_pView[MERGE_VIEW_RIGHT], m_pView[MERGE_VIEW_LEFT]);
+	CopyAll(m_pView[1], m_pView[0]);
 }
 
 /**
@@ -517,8 +517,8 @@ void CHexMergeFrame::OnAllLeft()
  */
 void CHexMergeFrame::OnViewZoomIn()
 {
-	m_pView[MERGE_VIEW_LEFT]->ZoomText(1);
-	m_pView[MERGE_VIEW_RIGHT]->ZoomText(1);
+	m_pView[0]->ZoomText(1);
+	m_pView[1]->ZoomText(1);
 }
 
 /**
@@ -526,8 +526,8 @@ void CHexMergeFrame::OnViewZoomIn()
  */
 void CHexMergeFrame::OnViewZoomOut()
 {
-	m_pView[MERGE_VIEW_LEFT]->ZoomText(-1);
-	m_pView[MERGE_VIEW_RIGHT]->ZoomText(-1);
+	m_pView[0]->ZoomText(-1);
+	m_pView[1]->ZoomText(-1);
 }
 
 /**
@@ -535,6 +535,6 @@ void CHexMergeFrame::OnViewZoomOut()
  */
 void CHexMergeFrame::OnViewZoomNormal()
 {
-	m_pView[MERGE_VIEW_LEFT]->ZoomText(0);
-	m_pView[MERGE_VIEW_RIGHT]->ZoomText(0);
+	m_pView[0]->ZoomText(0);
+	m_pView[1]->ZoomText(0);
 }

@@ -206,8 +206,8 @@ void CChildFrame::ReloadDocs()
 	if (!FileLoadResult::IsError(ReloadDoc(0)) &&
 		!FileLoadResult::IsError(ReloadDoc(1)))
 	{
-		m_pView[MERGE_VIEW_LEFT]->ReAttachToBuffer();
-		m_pView[MERGE_VIEW_RIGHT]->ReAttachToBuffer();
+		m_pView[0]->ReAttachToBuffer();
+		m_pView[1]->ReAttachToBuffer();
 		m_pDetailView[0]->ReAttachToBuffer();
 		m_pDetailView[1]->ReAttachToBuffer();
 		bool bIdentical = false;
@@ -724,8 +724,8 @@ CChildFrame::CChildFrame(CMainFrame *pMDIFrame, CChildFrame *pOpener)
 , m_pFileTextStats(2)
 {
 	curUndo = undoTgt.begin();
-	m_pView[MERGE_VIEW_LEFT] = NULL;
-	m_pView[MERGE_VIEW_RIGHT] = NULL;
+	m_pView[0] = NULL;
+	m_pView[1] = NULL;
 	m_pDetailView[0] = NULL;
 	m_pDetailView[1] = NULL;
 	m_nBufferType[0] = BUFFER_NORMAL;

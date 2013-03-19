@@ -205,8 +205,8 @@ public:
 	void DirDocClosing(CDirFrame *);
 	void SwapFiles();
 
-	CMergeEditView *GetLeftView() const { return m_pView[MERGE_VIEW_LEFT]; }
-	CMergeEditView *GetRightView() const { return m_pView[MERGE_VIEW_RIGHT]; }
+	CMergeEditView *GetLeftView() const { return m_pView[0]; }
+	CMergeEditView *GetRightView() const { return m_pView[1]; }
 	CMergeEditView *GetView(int pane) const { return m_pView[pane]; }
 	CMergeDiffDetailView *GetLeftDetailView() const { return m_pDetailView[0]; }
 	CMergeDiffDetailView *GetRightDetailView() const { return m_pDetailView[1]; }

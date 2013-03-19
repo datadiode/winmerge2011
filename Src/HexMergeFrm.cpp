@@ -71,8 +71,8 @@ CHexMergeFrame::CHexMergeFrame(CMainFrame *pMDIFrame)
 , m_strPath(2)
 , m_strDesc(2)
 {
-	m_pView[MERGE_VIEW_LEFT] = NULL;
-	m_pView[MERGE_VIEW_RIGHT] = NULL;
+	m_pView[0] = NULL;
+	m_pView[1] = NULL;
 	m_nBufferType[0] = BUFFER_NORMAL;
 	m_nBufferType[1] = BUFFER_NORMAL;
 	SubclassWindow(pMDIFrame->CreateChildHandle());
