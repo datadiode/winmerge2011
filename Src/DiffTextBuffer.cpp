@@ -29,8 +29,6 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 static bool IsTextFileStylePure(const UniMemFile::txtstats & stats);
-static void EscapeControlChars(String &s);
-static LPCTSTR GetEol(const String &str);
 static CRLFSTYLE GetTextFileStyle(const UniMemFile::txtstats & stats);
 
 /**
@@ -43,73 +41,11 @@ static bool IsTextFileStylePure(const UniMemFile::txtstats & stats)
 	int nType = 0;
 	if (stats.ncrlfs > 0)
 		nType++;
-	if ( stats.ncrs > 0)
+	if (stats.ncrs > 0)
 		nType++;
 	if (stats.nlfs > 0)
 		nType++;
-	return (nType <= 1);
-}
-
-/**
- * @brief Escape control characters.
- * @param [in,out] s Line of text excluding eol chars.
- *
- * @note Escape sequences follow the pattern
- * (leadin character, high nibble, low nibble, leadout character).
- * The leadin character is '\x0F'. The leadout character is a backslash.
- */
-static void EscapeControlChars(String &s)
-{
-	// Compute buffer length required for escaping
-	int n = s.size();
-	LPCTSTR q = s.c_str();
-	int i = n;
-	while (i)
-	{
-		TCHAR c = q[--i];
-		// Is it a control character in the range 0..31 except TAB?
-		if (!(c & ~_T('\x1F')) && c != _T('\t'))
-		{
-			n += 3; // Need 3 extra characters to escape
-		}
-	}
-	// Reallocate accordingly
-	i = s.size();
-	s.resize(n);
-	LPTSTR p = &s.front();
-	// Copy/translate characters starting at end of string
-	while (i)
-	{
-		TCHAR c = p[--i];
-		// Is it a control character in the range 0..31 except TAB?
-		if (!(c & ~_T('\x1F')) && c != _T('\t'))
-		{
-			// Bitwise OR with 0x100 so _itot() will output 3 hex digits
-			_itot(0x100 | c, p + n - 4, 16);
-			// Replace terminating zero with leadout character
-			p[n - 1] = _T('\\');
-			// Prepare to replace 1st hex digit with leadin character
-			c = _T('\x0F');
-			n -= 3;
-		}
-		p[--n] = c;
-	}
-}
-
-/**
- * @brief Get EOL of the string.
- * This function returns a pointer to the EOL chars in the given string.
- * Behavior is similar to CCrystalTextBuffer::GetLineEol().
- * @param [in] str String whose EOL chars are returned.
- * @return Pointer to string's EOL chars, or empty string if no EOL found.
- */
-static LPCTSTR GetEol(const String &str)
-{
-	if (str.length()>1 && str[str.length()-2]=='\r' && str[str.length()-1]=='\n')
-		return str.c_str() + str.length()-2;
-	if (str.length()>0 && (str[str.length()-1]=='\r' || str[str.length()-1]=='\n'))
-		return str.c_str() + str.length()-1;
-	return _T("");
+	return nType <= 1;
 }
 
 /**
@@ -121,7 +57,7 @@ static CRLFSTYLE GetTextFileStyle(const UniMemFile::txtstats & stats)
 {
 	// Check if file has more than one EOL type.
 	if (!IsTextFileStylePure(stats))
-			return CRLF_STYLE_MIXED;
+		return CRLF_STYLE_MIXED;
 	else if (stats.ncrlfs >= stats.nlfs)
 	{
 		if (stats.ncrlfs >= stats.ncrs)
@@ -174,27 +110,6 @@ bool CDiffTextBuffer::GetLine(int nLineIndex, String &strLine) const
 		strLine.resize(nLineLength);
 		_tcsncpy(&strLine.front(), CCrystalTextBuffer::GetLineChars(nLineIndex), nLineLength);
 	}
-	return true;
-}
-
-/**
- * @brief Get a line (with EOL bytes) from the buffer.
- * This function is like GetLine() but it also includes line's EOL to the
- * returned string.
- * @param [in] nLineIndex Index of the line to get.
- * @param [out] strLine Returns line text in the index. Existing content
- * of this string is overwritten.
- */
-bool CDiffTextBuffer::GetFullLine(int nLineIndex, String &strLine) const
-{
-	int cchText = GetFullLineLength(nLineIndex);
-	if (cchText == 0)
-	{
-		strLine.clear();
-		return false;
-	}
-	strLine.resize(cchText);
-	memcpy(&strLine.front(), GetLineChars(nLineIndex), cchText * sizeof(TCHAR));
 	return true;
 }
 
@@ -487,22 +402,18 @@ int CDiffTextBuffer::SaveToFile(LPCTSTR pszFileName,
 	const stl_size_t nLineCount = m_aLines.size();
 	for (stl_size_t line = 0 ; line < nLineCount ; ++line)
 	{
-		if (GetLineFlags(line) & LF_GHOST)
+		const LineInfo &li = GetLineInfo(line);
+		if (li.m_dwFlags & LF_GHOST)
 			continue;
 
 		// get the characters of the line (excluding EOL)
-		if (GetLineLength(line) > 0)
-			GetText(line, 0, line, GetLineLength(line), sLine, 0);
-		else
-			sLine = _T("");
+		sLine.assign(li.GetLine(), li.Length());
 
-		if (pTempStream)
-			EscapeControlChars(sLine);
 		// last real line ?
 		if (line == ApparentLastRealLine())
 		{
 			// last real line is never EOL terminated
-			ASSERT(_tcslen(GetLineEol(line)) == 0);
+			ASSERT(li.GetEol() == NULL);
 			// write the line and exit loop
 			file.WriteString(sLine.c_str(), sLine.size());
 			break;
@@ -512,7 +423,7 @@ int CDiffTextBuffer::SaveToFile(LPCTSTR pszFileName,
 		if (nCrlfStyle == CRLF_STYLE_AUTOMATIC || nCrlfStyle == CRLF_STYLE_MIXED)
 		{
 			// either the EOL of the line (when preserve original EOL chars is on)
-			sLine += GetLineEol(line);
+			sLine += li.GetEol();
 		}
 		else
 		{
@@ -554,58 +465,4 @@ int CDiffTextBuffer::SaveToFile(LPCTSTR pszFileName,
 	// redraw line revision marks
 	UpdateViews(NULL, NULL, UPDATE_FLAGSONLY);	
 	return SAVE_DONE;
-}
-
-/**
- * @brief Replace a line with new text.
- * This function replaces line's text without changing the EOL style/bytes
- * of the line.
- * @param [in] pSource Editor view where text is changed.
- * @param [in] nLine Index of the line to change.
- * @param [in] pchText New text of the line.
- * @param [in] cchText New length of the line (not inc. EOL bytes).
- * @param [in] nAction Edit action to use.
- */
-void CDiffTextBuffer::ReplaceLine(CCrystalTextView * pSource, int nLine,
-		LPCTSTR pchText, int cchText, int nAction)
-{
-	if (GetLineLength(nLine) > 0)
-		DeleteText(pSource, nLine, 0, nLine, GetLineLength(nLine), nAction);
-	if (cchText)
-		InsertText(pSource, nLine, 0, pchText, cchText, nAction);
-}
-
-/// Replace line (removing any eol, and only including one if in strText)
-/**
- * @brief Replace a line with new text.
- * This function replaces line's text including EOL bytes. If the @p strText
- * does not include EOL bytes, the "line" does not get EOL bytes.
- * @param [in] pSource Editor view where text is changed.
- * @param [in] nLine Index of the line to change.
- * @param [in] pchText New text of the line.
- * @param [in] cchText New length of the line (not inc. EOL bytes).
- * @param [in] nAction Edit action to use.
- */
-void CDiffTextBuffer::ReplaceFullLine(CCrystalTextView * pSource, int nLine,
-		const String &strText, int nAction)
-{
-	LPCTSTR eol = GetEol(strText);
-	if (_tcscmp(GetLineEol(nLine), eol) == 0)
-	{
-		// (optimization) eols are the same, so just replace text inside line
-		// we must clean strText from its eol...
-		int eolLength = static_cast<int>(_tcslen(eol));
-		ReplaceLine(pSource, nLine, strText.c_str(), strText.length() - eolLength, nAction);
-		return;
-	}
-
-	// we may need a last line as the DeleteText end is (x=0,y=line+1)
-	if (nLine + 1 == GetLineCount())
-		InsertGhostLine(pSource, GetLineCount());
-
-	if (GetFullLineLength(nLine))
-		DeleteText(pSource, nLine, 0, nLine + 1, 0, nAction); 
-	const int cchText = strText.length();
-	if (cchText)
-		InsertText(pSource, nLine, 0, strText.c_str(), cchText, nAction);
 }

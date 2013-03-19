@@ -168,10 +168,6 @@ public:
 	virtual UndoRecord &AddUndoRecord(BOOL bInsert, const POINT &ptStartPos,
 		const POINT &ptEndPos, LPCTSTR pszText, int cchText,
 		int nLinesToValidate, int nActionType = CE_ACTION_UNKNOWN);
-	void ReplaceLine(CCrystalTextView *pSource, int nLine, LPCTSTR pchText,
-		int cchText, int nAction = CE_ACTION_UNKNOWN);
-	void ReplaceFullLine(CCrystalTextView *pSource, int nLine,
-		const String &strText, int nAction = CE_ACTION_UNKNOWN);
 
 	FileLoadResult::FILES_RESULT LoadFromFile(LPCTSTR pszFileName,
 		PackingInfo *infoUnpacker, BOOL &readOnly, CRLFSTYLE nCrlfStyle,
@@ -188,9 +184,6 @@ public:
 
 	// If line has text (excluding eol), set strLine to text (excluding eol)
 	bool GetLine(int nLineIndex, String &strLine) const;
-
-	// if line has any text (including eol), set strLine to text (including eol)
-	bool GetFullLine(int nLineIndex, String &strLine) const;
 
 	void prepareForRescan();
 	virtual void OnNotifyLineHasBeenEdited(int nLine);

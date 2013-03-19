@@ -425,8 +425,8 @@ int CChildFrame::Rescan2(bool &bIdentical)
 		// BTW, this solves the problem of double asserts
 		// (during the display of an assert message box, a second assert in one of the 
 		//  display functions happens, and hides the first assert)
-		m_pView[MERGE_VIEW_LEFT]->DetachFromBuffer();
-		m_pView[MERGE_VIEW_RIGHT]->DetachFromBuffer();
+		m_pView[0]->DetachFromBuffer();
+		m_pView[1]->DetachFromBuffer();
 		m_pDetailView[0]->DetachFromBuffer();
 		m_pDetailView[1]->DetachFromBuffer();
 
@@ -465,8 +465,8 @@ int CChildFrame::Rescan2(bool &bIdentical)
 			bIdentical = true;
 
 		// Now buffers data are valid
-		m_pView[MERGE_VIEW_LEFT]->ReAttachToBuffer();
-		m_pView[MERGE_VIEW_RIGHT]->ReAttachToBuffer();
+		m_pView[0]->ReAttachToBuffer();
+		m_pView[1]->ReAttachToBuffer();
 		m_pDetailView[0]->ReAttachToBuffer();
 		m_pDetailView[1]->ReAttachToBuffer();
 
@@ -475,10 +475,10 @@ int CChildFrame::Rescan2(bool &bIdentical)
 	}
 
 	bool bAllowmixedEOL = COptionsMgr::Get(OPT_ALLOW_MIXED_EOL);
-	m_pView[MERGE_VIEW_LEFT]->SetCRLFModeStatus(
+	m_pView[0]->SetCRLFModeStatus(
 		bAllowmixedEOL && m_ptBuf[0]->IsMixedEOL() ?
 		CRLF_STYLE_MIXED : m_ptBuf[0]->GetCRLFMode());
-	m_pView[MERGE_VIEW_RIGHT]->SetCRLFModeStatus(
+	m_pView[1]->SetCRLFModeStatus(
 		bAllowmixedEOL && m_ptBuf[1]->IsMixedEOL() ?
 		CRLF_STYLE_MIXED : m_ptBuf[1]->GetCRLFMode());
 
@@ -777,53 +777,42 @@ bool CChildFrame::ListCopy(int srcPane, int dstPane, int nDiff /* = -1*/,
 			return false; // abort copying
 		}
 
+		// curView is the view which is changed, so the opposite of the source view
+		CMergeEditView *const dstView = m_pView[dstPane];
+
 		// If we remove whole diff from current view, we must fix cursor
 		// position first. Normally we would move to end of previous line,
 		// but we want to move to begin of that line for usability.
 		if ((pcd->op == OP_LEFTONLY && dstPane == 0) ||
 			(pcd->op == OP_RIGHTONLY && dstPane == 1))
 		{
-			CCrystalTextView *const pCurView = m_pView[dstPane];
-			POINT currentPos = pCurView->GetCursorPos();
+			POINT currentPos = dstView->GetCursorPos();
 			currentPos.x = 0;
 			if (currentPos.y > 0)
 				--currentPos.y;
-			pCurView->SetCursorPos(currentPos);
+			dstView->SetCursorPos(currentPos);
 		}
-
-		// curView is the view which is changed, so the opposite of the source view
-		CCrystalTextView* dstView = m_pView[dstPane];
 
 		dbuf->BeginUndoGroup(bGroupWithPrevious);
-		// if the current diff contains missing lines, remove them from both sides
-		if (cd_blank > 0)
-		{
-			// text was missing, so delete rest of lines on both sides
-			// delete only on destination side since rescan will clear the other side
-			if (cd_dend + 1 < dbuf->GetLineCount())
-			{
-				dbuf->DeleteText(dstView, cd_blank, 0, cd_dend + 1, 0, CE_ACTION_MERGE);
-			}
-			else
-			{
-				// To removing EOL chars of last line, deletes from the end of the line (cd_blank - 1).
-				dbuf->DeleteText(dstView, cd_blank - 1, dbuf->GetLineLength(cd_blank - 1), cd_dend, dbuf->GetLineLength(cd_dend), CE_ACTION_MERGE);
-			}
-			cd_dend = cd_blank - 1;
-			dbuf->FlushUndoGroup(dstView);
-			dbuf->BeginUndoGroup(TRUE);
-		}
 
+		ASSERT(cd_dend >= cd_dbegin);
+
+		CRLFSTYLE nCrlfStyle = dbuf->GetCRLFMode();
+		if (nCrlfStyle == CRLF_STYLE_MIXED)
+			nCrlfStyle = CRLF_STYLE_AUTOMATIC;
 		String strLine;
-		// copy the selected text over
-		for (int i = cd_dend ; i >= cd_dbegin ; --i)
-		{
-			// text exists on other side, so just replace
-			sbuf->GetFullLine(i, strLine);
-			dbuf->ReplaceFullLine(dstView, i, strLine, CE_ACTION_MERGE);
-			dbuf->FlushUndoGroup(dstView);
-			dbuf->BeginUndoGroup(TRUE);
-		}
+		int cd_dpastend = cd_dend + 1;
+		sbuf->GetTextWithoutEmptys(cd_dbegin, 0,
+			nCrlfStyle == CRLF_STYLE_AUTOMATIC ? cd_dpastend : cd_dend,
+			nCrlfStyle == CRLF_STYLE_AUTOMATIC ? 0 : sbuf->GetLineLength(cd_dend),
+			strLine, nCrlfStyle);
+		dbuf->DeleteText(dstView, cd_dbegin, 0,
+			cd_dpastend < dbuf->GetLineCount() ? cd_dpastend : cd_dend,
+			cd_dpastend < dbuf->GetLineCount() ? 0 : dbuf->GetLineLength(cd_dend),
+			CE_ACTION_MERGE);
+		if (int cchText = strLine.length())
+			dbuf->InsertText(dstView, cd_dbegin, 0, strLine.c_str(), cchText, CE_ACTION_MERGE);
+
 		dbuf->FlushUndoGroup(dstView);
 
 		// remove the diff
@@ -1213,8 +1202,8 @@ void CChildFrame::FlushAndRescan(bool bForced)
 	int nActiveViewIndexType = GetActiveMergeViewIndexType();
 
 	// store cursors and hide caret
-	m_pView[MERGE_VIEW_LEFT]->PushCursors();
-	m_pView[MERGE_VIEW_RIGHT]->PushCursors();
+	m_pView[0]->PushCursors();
+	m_pView[1]->PushCursors();
 	m_pDetailView[0]->PushCursors();
 	m_pDetailView[1]->PushCursors();
 	if (nActiveViewIndexType == MERGEVIEW_LEFT || nActiveViewIndexType == MERGEVIEW_RIGHT)
@@ -1224,8 +1213,8 @@ void CChildFrame::FlushAndRescan(bool bForced)
 	int nRescanResult = Rescan(bIdentical, bForced);
 
 	// restore cursors and caret
-	m_pView[MERGE_VIEW_LEFT]->PopCursors();
-	m_pView[MERGE_VIEW_RIGHT]->PopCursors();
+	m_pView[0]->PopCursors();
+	m_pView[1]->PopCursors();
 	m_pDetailView[0]->PopCursors();
 	m_pDetailView[1]->PopCursors();
 	if (nActiveViewIndexType == MERGEVIEW_LEFT || nActiveViewIndexType == MERGEVIEW_RIGHT)
@@ -1233,22 +1222,16 @@ void CChildFrame::FlushAndRescan(bool bForced)
 
 	// because of ghostlines, m_nTopLine may differ just after Rescan
 	// scroll both views to the same top line
-	CMergeEditView *fixedView = m_pView[MERGE_VIEW_LEFT];
-	if (nActiveViewIndexType == MERGEVIEW_LEFT || nActiveViewIndexType == MERGEVIEW_RIGHT)
-		// only one view needs to scroll so do not scroll the active view
-		fixedView = m_pView[nActiveViewIndexType];
-	fixedView->UpdateSiblingScrollPos(FALSE);
+	m_pView[0]->UpdateSiblingScrollPos(FALSE);
+	m_pView[1]->UpdateSiblingScrollPos(FALSE);
 
 	// make sure we see the cursor from the curent view
 	if (nActiveViewIndexType == MERGEVIEW_LEFT || nActiveViewIndexType == MERGEVIEW_RIGHT)
 		m_pView[nActiveViewIndexType]->EnsureVisible(m_pView[nActiveViewIndexType]->GetCursorPos());
 
 	// scroll both diff views to the same top line
-	CMergeDiffDetailView * fixedDetailView = m_pDetailView[0];
-	if (nActiveViewIndexType == MERGEVIEW_LEFT_DETAIL || nActiveViewIndexType == MERGEVIEW_RIGHT_DETAIL)
-		// only one view needs to scroll so do not scroll the active view
-		fixedDetailView = m_pDetailView[nActiveViewIndexType - MERGEVIEW_LEFT_DETAIL];
-	fixedDetailView->UpdateSiblingScrollPos(FALSE);
+	m_pDetailView[0]->UpdateSiblingScrollPos(FALSE);
+	m_pDetailView[1]->UpdateSiblingScrollPos(FALSE);
 
 	// Refresh display
 	UpdateAllViews(NULL);
@@ -1725,10 +1708,10 @@ void CChildFrame::RescanIfNeeded(float timeOutInSecond)
  */
 void CChildFrame::SetMergeViews(CMergeEditView * pLeft, CMergeEditView * pRight)
 {
-	ASSERT(pLeft && !m_pView[MERGE_VIEW_LEFT]);
-	m_pView[MERGE_VIEW_LEFT] = pLeft;
-	ASSERT(pRight && !m_pView[MERGE_VIEW_RIGHT]);
-	m_pView[MERGE_VIEW_RIGHT] = pRight;
+	ASSERT(pLeft && !m_pView[0]);
+	m_pView[0] = pLeft;
+	ASSERT(pRight && !m_pView[1]);
+	m_pView[1] = pRight;
 }
 
 /**
@@ -1770,15 +1753,14 @@ void CChildFrame::DirDocClosing(CDirFrame *pDirDoc)
  * @return Tells if files were loaded successfully
  * @sa CChildFrame::OpenDocs()
  **/
-FileLoadResult::FILES_RESULT CChildFrame::LoadFile(int nBuffer, BOOL & readOnly, const FileLocation & fileinfo)
+FileLoadResult::FILES_RESULT CChildFrame::LoadFile(int nBuffer, BOOL &readOnly, const FileLocation &fileinfo)
 {
 	CDiffTextBuffer *pBuf = m_ptBuf[nBuffer];
 	m_strPath[nBuffer] = fileinfo.filepath;
 
-	CRLFSTYLE nCrlfStyle = CRLF_STYLE_AUTOMATIC;
 	String sOpenError;
 	FileLoadResult::FILES_RESULT retVal = pBuf->LoadFromFile(fileinfo.filepath.c_str(),
-		m_pInfoUnpacker.get(), readOnly, nCrlfStyle, fileinfo.encoding, sOpenError);
+		m_pInfoUnpacker.get(), readOnly, CRLF_STYLE_AUTOMATIC, fileinfo.encoding, sOpenError);
 
 	// if CChildFrame::CDiffTextBuffer::LoadFromFile failed,
 	// it left the pBuf in a valid (but empty) state via a call to InitNew
@@ -1904,8 +1886,8 @@ OPENRESULTS_TYPE CChildFrame::OpenDocs(
 
 	// Prevent displaying views during LoadFile
 	// Note : attach buffer again only if both loads succeed
-	m_pView[MERGE_VIEW_LEFT]->DetachFromBuffer();
-	m_pView[MERGE_VIEW_RIGHT]->DetachFromBuffer();
+	m_pView[0]->DetachFromBuffer();
+	m_pView[1]->DetachFromBuffer();
 	m_pDetailView[0]->DetachFromBuffer();
 	m_pDetailView[1]->DetachFromBuffer();
 
@@ -1950,25 +1932,25 @@ OPENRESULTS_TYPE CChildFrame::OpenDocs(
 	}
 
 	// Now buffers data are valid
-	m_pView[MERGE_VIEW_LEFT]->AttachToBuffer();
-	m_pView[MERGE_VIEW_RIGHT]->AttachToBuffer();
+	m_pView[0]->AttachToBuffer();
+	m_pView[1]->AttachToBuffer();
 	m_pDetailView[0]->AttachToBuffer();
 	m_pDetailView[1]->AttachToBuffer();
 
 	// Currently there is only one set of syntax colors, which all documents & views share
-	m_pView[MERGE_VIEW_LEFT]->SetColorContext(&SyntaxColors);
-	m_pView[MERGE_VIEW_RIGHT]->SetColorContext(&SyntaxColors);
+	m_pView[0]->SetColorContext(&SyntaxColors);
+	m_pView[1]->SetColorContext(&SyntaxColors);
 	m_pDetailView[0]->SetColorContext(&SyntaxColors);
 	m_pDetailView[1]->SetColorContext(&SyntaxColors);
 
 	// Set read-only etc. statuses.
 	// CRLF mode is volatile, so update it upon Rescan().
 	m_ptBuf[0]->SetReadOnly(bROLeft);
-	m_pView[MERGE_VIEW_LEFT]->SetEncodingStatus(
+	m_pView[0]->SetEncodingStatus(
 		filelocLeft.encoding.GetName().c_str());
 
 	m_ptBuf[1]->SetReadOnly(bRORight);
-	m_pView[MERGE_VIEW_RIGHT]->SetEncodingStatus(
+	m_pView[1]->SetEncodingStatus(
 		filelocRight.encoding.GetName().c_str());
 
 	// Check the EOL sensitivity option (do it before Rescan)
@@ -2127,9 +2109,6 @@ FileLoadResult::FILES_RESULT CChildFrame::ReloadDoc(int index)
 	// Note : attach buffer again only if both loads succeed
 	// clear undo buffers
 	// free the buffers
-	C_ASSERT(MERGE_VIEW_LEFT == 0);
-	C_ASSERT(MERGE_VIEW_RIGHT == 1);
-
 	m_pView[index]->DetachFromBuffer();
 	m_pDetailView[index]->DetachFromBuffer();
 	m_ptBuf[index]->FreeAll();
@@ -2149,8 +2128,8 @@ void CChildFrame::RefreshOptions()
 {
 	m_diffWrapper.RefreshOptions();
 	// Refresh view options
-	m_pView[MERGE_VIEW_LEFT]->RefreshOptions();
-	m_pView[MERGE_VIEW_RIGHT]->RefreshOptions();
+	m_pView[0]->RefreshOptions();
+	m_pView[1]->RefreshOptions();
 }
 
 /**
