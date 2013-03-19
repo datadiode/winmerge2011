@@ -227,7 +227,7 @@ private:
 public:
 	void UpdateFont();
 	void OnInitialUpdate();
-	LRESULT ReflectNotify(LPARAM);
+	LRESULT ReflectNotify(UNotify *);
 
 	static void AcquireSharedResources();
 	static void ReleaseSharedResources();
@@ -302,7 +302,6 @@ protected:
 	void OnEditCut();
 	void OnEditPaste();
 	void OnEditUndo();
-	LRESULT OnNotify(LPARAM);
 
 	LRESULT WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam);
 	void DoDefaultAction(int sel);

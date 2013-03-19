@@ -496,7 +496,7 @@ LRESULT CDirFrame::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		m_pMDIFrame->ShowHelp(DirViewHelpLocation);
 		return 0;
 	case WM_NOTIFY:
-		if (LRESULT lResult = m_pDirView->ReflectNotify(lParam))
+		if (LRESULT lResult = m_pDirView->ReflectNotify(reinterpret_cast<UNotify *>(lParam)))
 			return lResult;
 		break;
 	case WM_NCACTIVATE:

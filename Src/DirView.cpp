@@ -120,7 +120,7 @@ LRESULT CDirView::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	case WM_NOTIFY:
-		if (LRESULT lResult = OnNotify(lParam))
+		if (LRESULT lResult = ReflectNotify(reinterpret_cast<UNotify *>(lParam)))
 			return lResult;
 		break;
 	case WM_WINDOWPOSCHANGED:
@@ -1366,51 +1366,13 @@ void CDirView::OnUpdateUIMessage()
 	theApp.m_pMainWnd->StartFlashing();
 }
 
-LRESULT CDirView::OnNotify(LPARAM lParam)
+LRESULT CDirView::ReflectNotify(UNotify *pNM)
 {
-	union
+	if (pNM->HDR.hwndFrom == m_pFrame->m_wndStatusBar->m_hWnd)
 	{
-		LPARAM lp;
-		NMHDR *hdr;
-		NMHEADER *header;
-	} const nm = { lParam };
-	if (nm.hdr->code == HDN_ENDDRAG)
-	{
-		// User just finished dragging a column header
-		int src = nm.header->iItem;
-		int dest = nm.header->pitem->iOrder;
-		if (src != dest && dest != -1)
-			MoveColumn(src, dest);
-		return 1;
-	}
-	if (nm.hdr->code == HDN_BEGINDRAG)
-	{
-		// User is starting to drag a column header
-		// save column widths before user reorders them
-		// so we can reload them on the end drag
-		SaveColumnWidths();
-	}
-	return 0;
-}
-
-LRESULT CDirView::ReflectNotify(LPARAM lParam)
-{
-	union
-	{
-		LPARAM lp;
-		NMHDR *hdr;
-		NMMOUSE *mouse;
-		NMITEMACTIVATE *itemactivate;
-		NMLISTVIEW *listview;
-		NMLVCUSTOMDRAW *lvcustomdraw;
-		NMLVDISPINFO *lvdispinfo;
-		NMLVKEYDOWN *lvkeydown;
-	} const nm = { lParam };
-	if (nm.hdr->hwndFrom == m_pFrame->m_wndStatusBar->m_hWnd)
-	{
-		if (nm.hdr->code == NM_CLICK)
+		if (pNM->HDR.code == NM_CLICK)
 		{
-			switch (nm.mouse->dwItemSpec)
+			switch (pNM->MOUSE.dwItemSpec)
 			{
 			case 1:
 				m_pFrame->m_pMDIFrame->PostMessage(WM_COMMAND, ID_TOOLS_FILTERS);
@@ -1419,31 +1381,41 @@ LRESULT CDirView::ReflectNotify(LPARAM lParam)
 		}
 		return 0;
 	}
-	switch (nm.hdr->code)
+	switch (pNM->HDR.code)
 	{
 	case LVN_GETDISPINFO:
-		ReflectGetdispinfo(nm.lvdispinfo);
+		ReflectGetdispinfo(&pNM->LVDISPINFO);
 		break;
 	case LVN_KEYDOWN:
-		return ReflectKeydown(nm.lvkeydown);
+		return ReflectKeydown(&pNM->LVKEYDOWN);
 	case LVN_BEGINLABELEDIT:
-		return ReflectBeginLabelEdit(nm.lvdispinfo);
+		return ReflectBeginLabelEdit(&pNM->LVDISPINFO);
 	case LVN_ENDLABELEDIT:
-		return ReflectEndLabelEdit(nm.lvdispinfo);
+		return ReflectEndLabelEdit(&pNM->LVDISPINFO);
 	case LVN_COLUMNCLICK:
-		ReflectColumnClick(nm.listview);
+		ReflectColumnClick(&pNM->LISTVIEW);
 		break;
 	case NM_CLICK:
-		ReflectClick(nm.itemactivate);
+		ReflectClick(&pNM->ITEMACTIVATE);
 		break;
 	case LVN_ITEMACTIVATE:
-		ReflectItemActivate(nm.itemactivate);
+		ReflectItemActivate(&pNM->ITEMACTIVATE);
 		break;
 	case LVN_BEGINDRAG:
 		ReflectBeginDrag();
 		break;
 	case NM_CUSTOMDRAW:
-		return ReflectCustomDraw(nm.lvcustomdraw);
+		return ReflectCustomDraw(&pNM->LVCUSTOMDRAW);
+	case HDN_ENDDRAG:
+		// User just finished dragging a column header
+		MoveColumn(pNM->HEADER.iItem, pNM->HEADER.pitem->iOrder);
+		return 1;
+	case HDN_BEGINDRAG:
+		// User is starting to drag a column header
+		// save column widths before user reorders them
+		// so we can reload them on the end drag
+		SaveColumnWidths();
+		break;
 	}
 	return 0;
 }

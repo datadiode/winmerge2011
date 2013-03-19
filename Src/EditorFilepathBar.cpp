@@ -400,6 +400,20 @@ LRESULT CEditorFilePathBar::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		case TTN_NEEDTEXT:
 			OnToolTipNotify(reinterpret_cast<TOOLTIPTEXT *>(lParam));
 			break;
+		case NM_CLICK:
+			if (wine_version)
+			{
+				switch (int idFrom = static_cast<int>(
+					reinterpret_cast<NMHDR *>(lParam)->idFrom))
+				{
+				case 0x6000:
+				case 0x6001:
+					if (HWindow *pContentView = GetDlgItem(idFrom - 0x5000))
+						return pContentView->SendMessage(uMsg, wParam, lParam);
+					break;
+				}
+			}
+			break;
 		}
 		break;
 	case WM_CTLCOLOREDIT:

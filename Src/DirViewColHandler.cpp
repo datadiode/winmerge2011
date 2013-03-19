@@ -391,6 +391,8 @@ String CDirView::GetColDescription(int col) const
  */
 void CDirView::MoveColumn(int psrc, int pdest)
 {
+	if (psrc == pdest || pdest == -1)
+		return;
 	// actually moved column
 	m_colorder[m_invcolorder[psrc]] = pdest;
 	// shift all other affected columns
