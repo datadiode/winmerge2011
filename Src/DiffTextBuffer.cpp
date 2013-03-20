@@ -397,7 +397,6 @@ int CDiffTextBuffer::SaveToFile(LPCTSTR pszFileName,
 	file.WriteBom();
 
 	// line loop : get each real line and write it in the file
-	String sLine;
 	LPCTSTR sEol = GetStringEol(nCrlfStyle);
 	const stl_size_t nLineCount = m_aLines.size();
 	for (stl_size_t line = 0 ; line < nLineCount ; ++line)
@@ -406,33 +405,22 @@ int CDiffTextBuffer::SaveToFile(LPCTSTR pszFileName,
 		if (li.m_dwFlags & LF_GHOST)
 			continue;
 
-		// get the characters of the line (excluding EOL)
-		sLine.assign(li.GetLine(), li.Length());
+		// write the characters of the line (excluding EOL)
+		file.WriteString(li.GetLine(), li.Length());
 
-		// last real line ?
-		if (line == ApparentLastRealLine())
-		{
-			// last real line is never EOL terminated
-			ASSERT(li.GetEol() == NULL);
-			// write the line and exit loop
-			file.WriteString(sLine.c_str(), sLine.size());
+		LPCTSTR sOriginalEol = li.GetEol();
+		// last real line is never EOL terminated
+		if (sOriginalEol == NULL)
 			break;
-		}
 
 		// normal real line : append an EOL
+		// either the EOL of the line (when preserve original EOL chars is on)
+		// or the default EOL for this file
 		if (nCrlfStyle == CRLF_STYLE_AUTOMATIC || nCrlfStyle == CRLF_STYLE_MIXED)
-		{
-			// either the EOL of the line (when preserve original EOL chars is on)
-			sLine += li.GetEol();
-		}
-		else
-		{
-			// or the default EOL for this file
-			sLine += sEol;
-		}
+			sEol = sOriginalEol;
 
 		// write this line to the file (codeset or unicode conversions are done there)
-		file.WriteString(sLine.c_str(), sLine.size());
+		file.WriteString(sEol, _tcslen(sEol));
 	}
 
 	// If we are saving temp files, we are done
