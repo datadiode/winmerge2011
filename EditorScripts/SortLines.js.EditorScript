@@ -1,27 +1,29 @@
 // Adapted from Takashi's fork
 
 function SortLinesAscending(Text) {
-	var lines = Text.replace("\r", "").split("\n");
+	var eol = Text.match(/\r\n|\r|\n/);
+	var lines = Text.split(eol);
 	var tail = lines.pop();
 	if (tail.length == 0) {
-		tail = "\n";
+		tail = eol;
 	} else {
 		lines.push(tail);
 		tail = "";
 	}
 	lines.sort();
-	return lines.join("\n") + tail;
+	return lines.join(eol) + tail;
 }
 
 function SortLinesDescending(Text) {
-	var lines = Text.replace("\r", "").split("\n");
+	var eol = Text.match(/\r\n|\r|\n/);
+	var lines = Text.split(eol);
 	var tail = lines.pop();
 	if (tail.length == 0) {
-		tail = "\n";
+		tail = eol;
 	} else {
 		lines.push(tail);
 		tail = "";
 	}
 	lines.sort(function(a, b) { return a < b ? 1 : -1; });
-	return lines.join("\n") + tail;
+	return lines.join(eol) + tail;
 }
