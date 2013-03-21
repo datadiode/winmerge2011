@@ -165,8 +165,8 @@ BOOL CGhostTextBuffer::InternalDeleteGhostLine(CCrystalTextView *pSource, int nL
  * These two base functions never read the EOL from the line buffer, they
  * use CRLF_STYLE_DOS when nCrlfStyle equals CRLF_STYLE_AUTOMATIC.
  */
-void CGhostTextBuffer::GetTextWithoutEmptys(int nStartLine, int nStartChar, 
-                 int nEndLine, int nEndChar, 
+void CGhostTextBuffer::GetTextWithoutEmptys(int nStartLine, int nStartChar,
+                 int nEndLine, int nEndChar,
                  String &text, CRLFSTYLE nCrlfStyle /* CRLF_STYLE_AUTOMATIC */)
 {
 	const int lines = GetLineCount();
@@ -181,9 +181,9 @@ void CGhostTextBuffer::GetTextWithoutEmptys(int nStartLine, int nStartChar,
 
 	// estimate size (upper bound)
 	int nBufSize = 0;
-	int i = 0;
+	int i;
 	for (i = nStartLine; i <= nEndLine; ++i)
-		nBufSize += (GetFullLineLength(i) + 2); // in case we insert EOLs
+		nBufSize += m_aLines[i].Length() + 2; // in case we insert EOLs
 	text.resize(nBufSize);
 	LPTSTR pszBuf = &text.front();
 
@@ -196,19 +196,19 @@ void CGhostTextBuffer::GetTextWithoutEmptys(int nStartLine, int nStartChar,
 		for (i = nStartLine; i <= nEndLine; ++i)
 		{
 			// exclude ghost lines
-			if (GetLineFlags(i) & LF_GHOST)
+			const LineInfo &li = m_aLines[i];
+			if (li.m_dwFlags & LF_GHOST)
 				continue;
 
 			// copy the line, excluding the EOL
-			int soffset = (i == nStartLine ? nStartChar : 0);
-			int eoffset = (i == nEndLine ? nEndChar : GetLineLength(i));
-			int chars = eoffset - soffset;
-			LPCTSTR szLine = m_aLines[i].GetLine(soffset);
+			int chars = (i == nEndLine ? nEndChar : li.Length()) - nStartChar;
+			LPCTSTR szLine = li.GetLine(nStartChar);
 			CopyMemory(pszBuf, szLine, chars * sizeof(TCHAR));
 			pszBuf += chars;
+			nStartChar = 0;
 
 			// copy the EOL of the requested type
-			if (i != ApparentLastRealLine())
+			if (li.GetEol())
 			{
 				CopyMemory(pszBuf, pszCRLF, nCRLFLength * sizeof(TCHAR));
 				pszBuf += nCRLFLength;
@@ -220,26 +220,16 @@ void CGhostTextBuffer::GetTextWithoutEmptys(int nStartLine, int nStartChar,
 		for (i = nStartLine; i <= nEndLine; ++i)
 		{
 			// exclude ghost lines
-			if (GetLineFlags(i) & LF_GHOST)
+			const LineInfo &li = m_aLines[i];
+			if (li.m_dwFlags & LF_GHOST)
 				continue;
 
 			// copy the line including the EOL
-			int soffset = (i == nStartLine ? nStartChar : 0);
-			int eoffset = (i == nEndLine ? nEndChar : GetFullLineLength(i));
-			int chars = eoffset - soffset;
-			LPCTSTR szLine = m_aLines[i].GetLine(soffset);
+			int chars = (i == nEndLine ? nEndChar : li.FullLength()) - nStartChar;
+			LPCTSTR szLine = li.GetLine(nStartChar);
 			CopyMemory(pszBuf, szLine, chars * sizeof(TCHAR));
 			pszBuf += chars;
-
-			// check that we really have an EOL
-			if (i != ApparentLastRealLine() && GetLineLength(i) == GetFullLineLength(i))
-			{
-				// Oops, real line lacks EOL
-				// (If this happens, editor probably has bug)
-				ASSERT(0);
-				CopyMemory(pszBuf, pszCRLF, nCRLFLength * sizeof(TCHAR));
-				pszBuf += nCRLFLength;
-			}
+			nStartChar = 0;
 		}
 	}
 	text.resize(static_cast<String::size_type>(pszBuf - text.c_str()));
@@ -1092,51 +1082,38 @@ void CGhostTextBuffer::RecomputeRealityMapping()
 }
 
 /** we recompute EOL from the real line before nStartLine to nEndLine */
-void CGhostTextBuffer::RecomputeEOL(CCrystalTextView * pSource, int nStartLine, int nEndLine)
+void CGhostTextBuffer::RecomputeEOL(CCrystalTextView *pSource, int nStartLine, int nEndLine)
 {
-	if (ApparentLastRealLine() <= nEndLine)
+	int nApparentLastRealLine = ApparentLastRealLine();
+	if (nApparentLastRealLine <= nEndLine)
 	{
 		// EOL may have to change on the real line before nStartLine
-		int nRealBeforeStart;
-		for (nRealBeforeStart = nStartLine-1 ; nRealBeforeStart >= 0 ; nRealBeforeStart--)
+		int nRealBeforeStart = nStartLine;
+		while (--nRealBeforeStart >= 0)
 			if ((GetLineFlags(nRealBeforeStart) & LF_GHOST) == 0)
 				break;
 		if (nRealBeforeStart >= 0)
 			nStartLine = nRealBeforeStart;
 	}
-	bool bLastRealLine = ApparentLastRealLine() <= nEndLine;
-	for (int i = nEndLine ; i >= nStartLine ; i --)
+	for (int i = nEndLine ; i >= nStartLine ; i--)
 	{
-		if ((GetLineFlags(i) & LF_GHOST) == 0)
+		LineInfo &li = m_aLines[i];
+		if ((li.m_dwFlags & LF_GHOST) != 0 || i == nApparentLastRealLine)
 		{
-			if (bLastRealLine)
-			{
-				bLastRealLine = false;
-				if (m_aLines[i].HasEol()) 
-				{
-					// if the last real line has an EOL, remove it
-					m_aLines[i].RemoveEol();
-					if (pSource != NULL)
-						UpdateViews(pSource, NULL, UPDATE_HORZRANGE | UPDATE_SINGLELINE, i);
-				}
-			}
-			else
-			{
-				if (!m_aLines[i].HasEol()) 
-				{
-					// if a real line (not the last) has no EOL, add one
-					AppendLine(i, GetDefaultEol(), (int) _tcslen(GetDefaultEol()));
-					if (pSource != NULL)
-						UpdateViews(pSource, NULL, UPDATE_HORZRANGE | UPDATE_SINGLELINE, i);
-				}
-			}
-		}
-		else 
-		{
-			if (m_aLines[i].HasEol()) 
+			if (li.HasEol()) 
 			{
 				// if a ghost line has an EOL, remove it
-				m_aLines[i].RemoveEol();
+				li.RemoveEol();
+				if (pSource != NULL)
+					UpdateViews(pSource, NULL, UPDATE_HORZRANGE | UPDATE_SINGLELINE, i);
+			}
+		}
+		else
+		{
+			if (!li.HasEol()) 
+			{
+				// if a real line (not the last) has no EOL, add one
+				AppendLine(i, GetDefaultEol(), (int) _tcslen(GetDefaultEol()));
 				if (pSource != NULL)
 					UpdateViews(pSource, NULL, UPDATE_HORZRANGE | UPDATE_SINGLELINE, i);
 			}
