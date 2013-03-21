@@ -48,6 +48,9 @@ const char *regexp_item::assign(LPCTSTR pch, int cch)
 			case _T('g'):
 				global = true;
 				break;
+			case _T('p'):
+				permutive = true;
+				break;
 			case _T(':'):
 			case _T('<'):
 				if (const wchar_t *const p = wmemchr(pch + j, _T('<'), cch - j))
@@ -96,6 +99,8 @@ int regexp_item::process(const stl::vector<regexp_item> &relist,
 		const regexp_item &filter = *iter++;
 		if (filename && filter.filenameSpec && !::PathMatchSpec(filename, filter.filenameSpec->T))
 			continue;
+		HString *const injectString = filter.injectString;
+		UINT const injectLength = injectString->ByteLen();
 		char *buf = dst;
 		int i = 0;
 		while (i < len)
@@ -107,32 +112,80 @@ int regexp_item::process(const stl::vector<regexp_item> &relist,
 				ovector[1] = len;
 				matches = 0;
 			}
-			int matches2 = matches * 2;
-			ovector[matches2] = ovector[1];
-			ovector[1] = ovector[0];
-			HString *const injectString = filter.injectString;
-			UINT const injectLength = injectString->ByteLen();
-			int index = 1;
-			int j;
-			do
+			matches *= 2;
+			int j = ovector[1];
+			if (filter.permutive && matches != 0)
 			{
-				j = ovector[index];
-				if (i < j)
+				int tmplen = ovector[1] - ovector[0];
+				char *const tmpbuf = new char[tmplen];
+				const char *q = injectString->A;
+				char *p = tmpbuf;
+				while (char c = *q++)
 				{
-					size_t d = j - i;
-					if (index == 1 || (index & 1) == 0)
+					if (p - tmpbuf >= tmplen) // overflow
 					{
-						memcpy(buf, src + i, d);
-						buf += d;
+						q = NULL;
+						break;
 					}
-					else if (injectLength <= d)
+					int d = 1;
+					*p = c;
+					if (c == '$' && *q >= '1' && *q <= '9')
 					{
-						memcpy(buf, injectString, injectLength);
-						buf += injectLength;
+						int arg = (*q++ - '0') * 2;
+						if (arg < matches)
+						{
+							int start = ovector[arg];
+							int end = ovector[arg + 1];
+							d = end - start;
+							if (p - tmpbuf + d > tmplen) // overflow
+							{
+								q = NULL;
+								break;
+							}
+							memcpy(p, src + start, d);
+						}
 					}
-					i = j;
+					p += d;
 				}
-			} while (++index <= matches2);
+				if (q != NULL)
+				{
+					// no overflow -> replace input text with permuted text
+					tmplen = p - tmpbuf;
+					memcpy(buf, tmpbuf, tmplen);
+				}
+				else
+				{
+					// overflow -> leave input text alone
+					memcpy(buf, src, tmplen);
+				}
+				buf += tmplen;
+				delete[] tmpbuf;
+			}
+			else
+			{
+				int index = 1;
+				ovector[matches] = ovector[1];
+				ovector[1] = ovector[0];
+				do
+				{
+					j = ovector[index];
+					if (i < j)
+					{
+						size_t d = j - i;
+						if (index == 1 || (index & 1) == 0)
+						{
+							memcpy(buf, src + i, d);
+							buf += d;
+						}
+						else if (injectLength <= d)
+						{
+							memcpy(buf, injectString, injectLength);
+							buf += injectLength;
+						}
+						i = j;
+					}
+				} while (++index <= matches);
+			}
 			if (!filter.global)
 			{
 				j = len;

@@ -15,6 +15,7 @@ struct regexp_item
 	pcre_extra *pRegExpExtra; /**< Additional information got from regex study */
 	int options;
 	bool global;
+	bool permutive;
 
 	regexp_item()
 		: filterString(NULL)
@@ -24,6 +25,7 @@ struct regexp_item
 		, pRegExpExtra(NULL)
 		, options(0)
 		, global(false)
+		, permutive(false)
 	{
 	}
 	const char *assign(LPCTSTR pch, int cch);
