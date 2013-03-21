@@ -1161,14 +1161,18 @@ void CMergeEditView::OnContextMenu(LPARAM lParam)
 		{
 			POINT ptStart, ptEnd;
 			GetSelection(ptStart, ptEnd);
-			GetText(ptStart, ptEnd, text);
+			GetTextWithoutEmptys(ptStart.y, ptStart.x, ptEnd.y, ptEnd.x, text);
 		}
 		CMyVariant varRet;
-		DispId.Call(spDispatch, CMyDispParams<1>().Unnamed[text.c_str()], DISPATCH_METHOD, &varRet);
-		if (SUCCEEDED(varRet.ChangeType(VT_BSTR)))
+		HRESULT hr = DispId.Call(spDispatch, CMyDispParams<1>().Unnamed[text.c_str()], DISPATCH_METHOD, &varRet);
+		if (SUCCEEDED(hr) && SUCCEEDED(hr = varRet.ChangeType(VT_BSTR)))
 		{
 			BSTR bstrText = V_BSTR(&varRet);
 			ReplaceSelection(bstrText, SysStringLen(bstrText), 0);
+		}
+		else
+		{
+			OException(hr).ReportError(m_hWnd, MB_ICONSTOP);
 		}
 	}
 	else
