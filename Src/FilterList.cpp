@@ -114,6 +114,44 @@ void FilterList::AddRegExp(LPCTSTR regularExpression)
 	}
 }
 
+void FilterList::AddFromIniFile(LPCTSTR inifile)
+{
+	String filter;
+	TCHAR buffer[0x8000];
+	if (GetPrivateProfileSection(_T("*"), buffer, _countof(buffer), inifile))
+	{
+		LPTSTR section = buffer;
+		while (const size_t n = _tcslen(section))
+		{
+			if (LPTSTR check = _tcschr(section, _T('=')))
+			{
+				*check++ = _T('\0');
+				if (_tcschr(check, _T('1')) != 0)
+				{
+					TCHAR buffer[0x8000];
+					if (GetPrivateProfileSection(section, buffer, _countof(buffer), inifile))
+					{
+						LPTSTR filterStr = buffer;
+						DWORD index = 0;
+						DWORD count = static_cast<DWORD>(_tcslen(check));
+						while (const size_t n = _tcslen(filterStr))
+						{
+							if (index < count && check[index] == _T('1'))
+							{
+								AddFilter(filter, filterStr, NULL);
+							}
+							filterStr += n + 1;
+							++index;
+						}
+					}
+				}
+			}
+			section += n + 1;
+		}
+	}
+	AddRegExp(filter.c_str());
+}
+
 void FilterList::AddFrom(LineFiltersList &list)
 {
 	stl_size_t i = 0;
@@ -123,46 +161,51 @@ void FilterList::AddFrom(LineFiltersList &list)
 	{
 		LineFilterItem &item = list.GetAt(i++);
 		if (item.usage)
-		{
-			if (LPCTSTR regexp = EatPrefix(item.filterStr.c_str(), _T("regexp:")))
-			{
-				regexp_item filter;
-				if (filter.assign(regexp, static_cast<int>(_tcslen(regexp))))
-				{
-					m_predifferRegExps.push_back(filter);
-				}
-			}
-			else if (LPCTSTR path = EatPrefix(item.filterStr.c_str(), _T("script:")))
-			{
-				script_item script(&item);
-				String moniker = item.filterStr;
-				env_ResolveMoniker(moniker);
-				String::size_type colon = moniker.find(
-					_T(':'), static_cast<String::size_type>(path - item.filterStr.c_str()) + 2);
-				C_ASSERT(String::npos == -1);
-				if (String::size_type extra = colon + 1)
-				{
-					script.filenameSpec = HString::Uni(
-						moniker.c_str() + extra, moniker.length() - extra);
-					moniker.resize(colon);
-				}
-				if (SUCCEEDED(item.hr = CoGetObject(moniker.c_str(), NULL, IID_IDispatch,
-						reinterpret_cast<void **>(&script.object))) &&
-					SUCCEEDED(item.hr = script.Reset.Init(script.object, L"Reset")) &&
-					SUCCEEDED(item.hr = script.ProcessLine.Init(script.object, L"ProcessLine")))
-				{
-					m_predifferScripts.push_back(script);
-				}
-			}
-			else
-			{
-				if (!filter.empty())
-					filter += _T("|");
-				filter += item.filterStr;
-			}
-		}
+			item.hr = AddFilter(filter, item.filterStr.c_str(), &item);
 	}
 	AddRegExp(filter.c_str());
+}
+
+HRESULT FilterList::AddFilter(String &filter, LPCTSTR filterStr, LineFilterItem *item)
+{
+	HRESULT hr = S_OK;
+	if (LPCTSTR regexp = EatPrefix(filterStr, _T("regexp:")))
+	{
+		regexp_item filter;
+		if (filter.assign(regexp, static_cast<int>(_tcslen(regexp))))
+		{
+			m_predifferRegExps.push_back(filter);
+		}
+	}
+	else if (LPCTSTR path = EatPrefix(filterStr, _T("script:")))
+	{
+		script_item script(item);
+		String moniker = filterStr;
+		env_ResolveMoniker(moniker);
+		String::size_type colon = moniker.find(
+			_T(':'), static_cast<String::size_type>(path - filterStr) + 2);
+		C_ASSERT(String::npos == -1);
+		if (String::size_type extra = colon + 1)
+		{
+			script.filenameSpec = HString::Uni(
+				moniker.c_str() + extra, moniker.length() - extra);
+			moniker.resize(colon);
+		}
+		if (SUCCEEDED(hr = CoGetObject(moniker.c_str(), NULL, IID_IDispatch,
+				reinterpret_cast<void **>(&script.object))) &&
+			SUCCEEDED(hr = script.Reset.Init(script.object, L"Reset")) &&
+			SUCCEEDED(hr = script.ProcessLine.Init(script.object, L"ProcessLine")))
+		{
+			m_predifferScripts.push_back(script);
+		}
+	}
+	else
+	{
+		if (!filter.empty())
+			filter.push_back(_T('|'));
+		filter += filterStr;
+	}
+	return hr;
 }
 
 /**

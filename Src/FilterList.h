@@ -32,8 +32,9 @@ public:
 	
 	FilterList();
 	~FilterList();
-	
+
 	void AddRegExp(LPCTSTR);
+	void AddFromIniFile(LPCTSTR);
 	void AddFrom(LineFiltersList &);
 	void RemoveAllFilters();
 	bool HasRegExps() const { return !m_list.empty(); }
@@ -52,6 +53,7 @@ private:
 			(p++)->dispose();
 	}
 
+	HRESULT AddFilter(String &, LPCTSTR, LineFilterItem *);
 	int ApplyPredifferRegExps(LPCTSTR filename, char *dst, const char *src, int len) const;
 	BSTR ApplyPredifferScripts(LPCTSTR filename, BSTR bstr);
 	void ResetPrediffers(short side);

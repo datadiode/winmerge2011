@@ -148,6 +148,9 @@ void CDiffWrapper::RefreshFilters()
 	FilterList::RemoveAllFilters();
 	if (bApplyLineFilters)
 	{
+		String inifile = COptionsMgr::Get(OPT_SUPPLEMENT_FOLDER);
+		inifile = paths_ConcatPath(inifile, _T("LineFilters.ini"));
+		FilterList::AddFromIniFile(inifile.c_str());
 		FilterList::AddFrom(globalLineFilters);
 	}
 }

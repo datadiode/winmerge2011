@@ -3051,12 +3051,12 @@ namespace H2O
 			return TreeView_GetDropHilight(m_hWnd);
 		}
 
-		HWND GetEditControl()
+		HEdit *GetEditControl()
 		// Retrieves the handle to the edit control being used to edit a tree-view item's text.
 		{
 			using ::SendMessage;
 			assert(::IsWindow(m_hWnd));
-			return TreeView_GetEditControl(m_hWnd);
+			return reinterpret_cast<HEdit *>(TreeView_GetEditControl(m_hWnd));
 		}
 
 		HTREEITEM GetFirstVisible()
@@ -3136,7 +3136,7 @@ namespace H2O
 			return TreeView_GetItemRect(m_hWnd, hItem, prc, bTextOnly);
 		}
 
-		String GetItemText(HTREEITEM hItem, UINT cchTextMax = 260)
+		BOOL GetItemText(HTREEITEM hItem, LPTSTR pszText, UINT cchTextMax)
 		// Retrieves the text for a tree-view item.
 		// Note: Although the tree-view control allows any length string to be stored 
 		//       as item text, only the first 260 characters are displayed.
@@ -3147,10 +3147,19 @@ namespace H2O
 			tvi.hItem = hItem;
 			tvi.mask = TVIF_TEXT;
 			tvi.cchTextMax = cchTextMax;
-			tvi.pszText = (LPTSTR)_alloca(cchTextMax * sizeof(TCHAR));
-			if (!TreeView_GetItem(m_hWnd, &tvi))
-				tvi.pszText[0] = _T('\0');
-			return tvi.pszText;
+			tvi.pszText = pszText;
+			return TreeView_GetItem(m_hWnd, &tvi);
+		}
+
+		String GetItemText(HTREEITEM hItem, UINT cchTextMax = 260)
+		// Retrieves the text for a tree-view item.
+		// Note: Although the tree-view control allows any length string to be stored 
+		//       as item text, only the first 260 characters are displayed.
+		{
+			LPTSTR pszText = (LPTSTR)_alloca(cchTextMax * sizeof(TCHAR));
+			if (!GetItemText(hItem, pszText, cchTextMax))
+				pszText[0] = _T('\0');
+			return pszText;
 		}
 
 		HTREEITEM GetLastVisibleItem()

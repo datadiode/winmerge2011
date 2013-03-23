@@ -39,14 +39,20 @@ protected:
 	void OnBnClickedLfilterAddBtn();
 	void OnBnClickedLfilterEditbtn();
 	void OnBnClickedLfilterRemovebtn();
+	void OnClick(UNotify *);
+	void OnSelchanged();
+	void OnCheckStateChange(HTREEITEM);
 
 	void InitList();
+	void PopulateSection(HTREEITEM);
 	void DoInPlaceEditingEvents();
-	int AddRow(LPCTSTR filter = NULL, BOOL enabled = FALSE);
+	HTREEITEM AddRow(LPCTSTR filter = NULL, int usage = 0, int cChildren = 0);
+	HTREEITEM GetEditableItem();
 	void EditSelectedFilter();
 
 private:
-	HListView *m_LvFilter; /**< List control having filter strings */
+	String m_inifile;
+	HTreeView *m_TvFilter; /**< List control having filter strings */
 	HEdit *m_EdFilter;
 	HEdit *m_pEdTestCase;
 	HListView *m_pLvTestCase;
