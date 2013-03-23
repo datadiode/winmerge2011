@@ -150,7 +150,7 @@ int regexp_item::process(const stl::vector<regexp_item> &relist,
 				if (q != NULL)
 				{
 					// no overflow -> replace input text with permuted text
-					tmplen = p - tmpbuf;
+					tmplen = static_cast<int>(p - tmpbuf);
 					memcpy(buf, tmpbuf, tmplen);
 				}
 				else

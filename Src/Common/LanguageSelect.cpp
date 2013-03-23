@@ -843,7 +843,7 @@ bool CLanguageSelect::GetPoHeaderProperty(const char *name, String &value) const
 			p += len + 1;
 			p += strspn(p, " \t");
 			bool lossy = false;
-			ucr::maketstring(value, p, strcspn(p, " \t\r\n"), CP_ACP, &lossy);
+			ucr::maketstring(value, p, static_cast<int>(strcspn(p, " \t\r\n")), CP_ACP, &lossy);
 			return true;
 		}
 		p = q + 1;

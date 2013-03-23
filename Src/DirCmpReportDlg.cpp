@@ -175,8 +175,9 @@ void DirCmpReportDlg::OnSelchangeStyle()
 		else
 		{
 			sReportFile.resize(i);
-			LPCTSTR ext = sFilter.c_str() + sFilter.find(_T('.')) + 1;
-			sReportFile.append(ext, _tcscspn(ext, _T(";")));
+			String::size_type ext = sFilter.find(_T('.')) + 1;
+			String::size_type end = stl::min(sFilter.find(_T(';'), ext), sFilter.length());
+			sReportFile.append(sFilter.c_str() + ext, end - ext);
 		}
 		m_pCbReportFile->SetWindowText(sReportFile.c_str());
 	}

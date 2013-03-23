@@ -1123,7 +1123,7 @@ void CMergeEditView::OnContextMenu(LPARAM lParam)
 		_T("script:\\EditorScripts\\%s.wsc\0")
 		_T("script:\\EditorScripts\\English.wsc\0");
 	CMyComPtr<IDispatch> spDispatch;
-	while (int len = _tcslen(fmt))
+	while (size_t len = _tcslen(fmt))
 	{
 		string_format pluginMoniker(fmt, language.c_str());
 		if (pluginMoniker.find(_T("\\.")) == String::npos)

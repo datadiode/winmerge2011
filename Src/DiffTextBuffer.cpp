@@ -418,9 +418,7 @@ int CDiffTextBuffer::SaveToFile(LPCTSTR pszFileName,
 		// or the default EOL for this file
 		if (nCrlfStyle == CRLF_STYLE_AUTOMATIC || nCrlfStyle == CRLF_STYLE_MIXED)
 			sEol = sOriginalEol;
-
-		// write this line to the file (codeset or unicode conversions are done there)
-		file.WriteString(sEol, _tcslen(sEol));
+		file.WriteString(sEol, static_cast<String::size_type>(_tcslen(sEol)));
 	}
 
 	// If we are saving temp files, we are done

@@ -141,13 +141,16 @@ LRESULT COpenDlg::OnNotify(UNotify *pNM)
 				if (pNM->COMBOBOXEX.ceItem.iItem == 0 && !pNM->pCB->GetDroppedState())
 				{
 					pNM->COMBOBOXEX.ceItem.cchTextMax = pNM->pCB->GetWindowTextLength() + 1;
-					pNM->COMBOBOXEX.ceItem.pszText = (LPTSTR)_alloca(pNM->COMBOBOXEX.ceItem.cchTextMax * sizeof(TCHAR));
+					pNM->COMBOBOXEX.ceItem.pszText = (LPTSTR)_alloca(
+						pNM->COMBOBOXEX.ceItem.cchTextMax * sizeof(TCHAR));
 				}
 				else
 				{
-					pNM->COMBOBOXEX.ceItem.cchTextMax = pNM->pCB->GetLBTextLen(pNM->COMBOBOXEX.ceItem.iItem) + 1;
-					pNM->COMBOBOXEX.ceItem.pszText = (LPTSTR)_alloca(pNM->COMBOBOXEX.ceItem.cchTextMax * sizeof(TCHAR));
-					pNM->pCB->GetLBText(pNM->COMBOBOXEX.ceItem.iItem, pNM->COMBOBOXEX.ceItem.pszText);
+					int index = static_cast<int>(pNM->COMBOBOXEX.ceItem.iItem);
+					pNM->COMBOBOXEX.ceItem.cchTextMax = pNM->pCB->GetLBTextLen(index) + 1;
+					pNM->COMBOBOXEX.ceItem.pszText = (LPTSTR)_alloca(
+						pNM->COMBOBOXEX.ceItem.cchTextMax * sizeof(TCHAR));
+					pNM->pCB->GetLBText(index, pNM->COMBOBOXEX.ceItem.pszText);
 				}
 			}
 			if (pNM->COMBOBOXEX.ceItem.iItem == 0 && !pNM->pCB->GetDroppedState())
