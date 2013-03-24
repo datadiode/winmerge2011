@@ -112,7 +112,7 @@ public:
 	DWORD m_dwRevisionNumberOnSave;
 	BOOL IsTextBufferInitialized () const { return m_bInit; }
 
-protected :
+protected:
 	BOOL m_bInit;
 	BOOL m_bReadOnly;
 	BOOL m_bModified;
@@ -120,9 +120,7 @@ protected :
 	BOOL m_IgnoreEol;
 	BOOL m_bInsertTabs;
 	int  m_nTabSize;
-	int FindLineWithFlag (DWORD dwFlag) const;
 
-protected:
 	enum
 	{
 		UNDO_INSERT = 0x0001,
@@ -220,9 +218,8 @@ public:
 	{
 		return GetLineInfo(nLine).m_dwFlags;
 	}
-	int GetLineWithFlag (DWORD dwFlag) const;
-	void SetLineFlag (int nLine, DWORD dwFlag, BOOL bSet,
-			BOOL bRemoveFromPreviousLine = TRUE, BOOL bUpdate = TRUE);
+	int FindLineWithFlag(DWORD dwFlag) const;
+	void SetLineFlags(int nLine, DWORD dwFlags);
 	void GetText (int nStartLine, int nStartChar, int nEndLine, int nEndChar,
 			String & text, LPCTSTR pszCRLF = NULL) const;
 	virtual void GetTextWithoutEmptys (int nStartLine, int nStartChar,
@@ -284,8 +281,7 @@ public:
 	void SetTabSize(int nTabSize);
 
 	// More bookmarks
-	int FindNextBookmarkLine(int nCurrentLine = 0) const;
-	int FindPrevBookmarkLine(int nCurrentLine = 0) const;
+	int FindNextBookmarkLine(int nCurrentLine, int nDirection) const;
 };
 
 /////////////////////////////////////////////////////////////////////////////

@@ -3227,44 +3227,45 @@ void CCrystalTextView::OnToggleBookmark(UINT nCmdID)
 {
 	int nBookmarkID = nCmdID - ID_EDIT_TOGGLE_BOOKMARK0;
 	ASSERT(nBookmarkID >= 0 && nBookmarkID <= 9);
-	if (m_pTextBuffer != NULL)
+	DWORD dwBit = LF_BOOKMARK(nBookmarkID);
+	DWORD dwFlags = m_pTextBuffer->GetLineFlags(m_ptCursorPos.y);
+	if ((dwFlags & dwBit) == 0)
 	{
-		DWORD dwFlags = GetLineFlags(m_ptCursorPos.y);
-		DWORD dwMask = LF_BOOKMARK(nBookmarkID);
-		m_pTextBuffer->SetLineFlag(m_ptCursorPos.y, dwMask, (dwFlags & dwMask) == 0);
+		int nLine = m_pTextBuffer->FindLineWithFlag(dwBit);
+		if (nLine != -1)
+		{
+			DWORD dwFlags = m_pTextBuffer->GetLineFlags(nLine);
+			m_pTextBuffer->SetLineFlags(nLine, dwFlags ^ dwBit);
+		}
 	}
+	m_pTextBuffer->SetLineFlags(m_ptCursorPos.y, dwFlags ^ dwBit);
 }
 
 void CCrystalTextView::OnGoBookmark(UINT nCmdID)
 {
 	int nBookmarkID = nCmdID - ID_EDIT_GO_BOOKMARK0;
 	ASSERT(nBookmarkID >= 0 && nBookmarkID <= 9);
-	if (m_pTextBuffer != NULL)
+	int nLine = m_pTextBuffer->FindLineWithFlag(LF_BOOKMARK(nBookmarkID));
+	if (nLine >= 0)
 	{
-		int nLine = m_pTextBuffer->GetLineWithFlag(LF_BOOKMARK(nBookmarkID));
-		if (nLine >= 0)
-		{
-			POINT pt = { 0, nLine };
-			ASSERT_VALIDTEXTPOS(pt);
-			SetSelection(pt, pt);
-			SetCursorPos(pt);
-			SetAnchor(pt);
-			EnsureVisible(pt);
-		}
+		POINT pt = { 0, nLine };
+		ASSERT_VALIDTEXTPOS(pt);
+		SetSelection(pt, pt);
+		SetCursorPos(pt);
+		SetAnchor(pt);
+		EnsureVisible(pt);
 	}
 }
 
 void CCrystalTextView::OnClearBookmarks()
 {
-	if (m_pTextBuffer != NULL)
+	for (DWORD dwBit = LF_BOOKMARK(0); dwBit <= LF_BOOKMARK(9); dwBit <<= 1)
 	{
-		for (int nBookmarkID = 0; nBookmarkID <= 9; nBookmarkID++)
+		int nLine = m_pTextBuffer->FindLineWithFlag(dwBit);
+		if (nLine >= 0)
 		{
-			int nLine = m_pTextBuffer->GetLineWithFlag(LF_BOOKMARK(nBookmarkID));
-			if (nLine >= 0)
-			{
-				m_pTextBuffer->SetLineFlag(nLine, LF_BOOKMARK(nBookmarkID), FALSE);
-			}
+			DWORD dwFlags = m_pTextBuffer->GetLineFlags(nLine);
+			m_pTextBuffer->SetLineFlags(nLine, dwFlags & ~dwBit);
 		}
 	}
 }
@@ -3832,12 +3833,12 @@ void CCrystalTextView::OnEditRepeat()
 void CCrystalTextView::ToggleBookmark(int nLine)
 {
 	ASSERT(nLine < GetSubLineCount());
-	DWORD dwFlags = GetLineFlags(nLine);
-	DWORD dwMask = LF_BOOKMARKS;
-	m_pTextBuffer->SetLineFlag (nLine, dwMask, (dwFlags & dwMask) == 0, FALSE);
-	const int nBookmarkLine = m_pTextBuffer->GetLineWithFlag(LF_BOOKMARKS);
+	DWORD dwFlags = m_pTextBuffer->GetLineFlags(nLine);
+	m_pTextBuffer->SetLineFlags(nLine, dwFlags ^ LF_BOOKMARKS);
+	const int nBookmarkLine = m_pTextBuffer->FindLineWithFlag(LF_BOOKMARKS);
 	m_bBookmarkExist = nBookmarkLine >= 0;
 }
+
 /** 
  * @brief Called when Toggle Bookmark is selected from the GUI.
  */
@@ -3848,8 +3849,8 @@ void CCrystalTextView::OnToggleBookmark()
 
 void CCrystalTextView::OnNextBookmark()
 {
-	int nLine = m_pTextBuffer->FindNextBookmarkLine(m_ptCursorPos.y);
-	if (nLine >= 0)
+	int nLine = m_pTextBuffer->FindNextBookmarkLine(m_ptCursorPos.y, +1);
+	if (nLine != m_ptCursorPos.y)
 	{
 		POINT pt = { 0, nLine };
 		ASSERT_VALIDTEXTPOS(pt);
@@ -3862,8 +3863,8 @@ void CCrystalTextView::OnNextBookmark()
 
 void CCrystalTextView::OnPrevBookmark()
 {
-	int nLine = m_pTextBuffer->FindPrevBookmarkLine(m_ptCursorPos.y);
-	if (nLine >= 0)
+	int nLine = m_pTextBuffer->FindNextBookmarkLine(m_ptCursorPos.y, -1);
+	if (nLine != m_ptCursorPos.y)
 	{
 		POINT pt = { 0, nLine };
 		ASSERT_VALIDTEXTPOS(pt);
@@ -3876,11 +3877,11 @@ void CCrystalTextView::OnPrevBookmark()
 
 void CCrystalTextView::OnClearAllBookmarks()
 {
-	int nLineCount = GetLineCount ();
-	for (int i = 0; i < nLineCount; i++)
+	int nLineCount = GetLineCount();
+	for (int nLine = 0; nLine < nLineCount; ++nLine)
 	{
-		if (m_pTextBuffer->GetLineFlags(i) & LF_BOOKMARKS)
-			m_pTextBuffer->SetLineFlag(i, LF_BOOKMARKS, FALSE);
+		DWORD dwFlags = m_pTextBuffer->GetLineFlags(nLine);
+		m_pTextBuffer->SetLineFlags(nLine, dwFlags & ~LF_BOOKMARKS);
 	}
 	m_bBookmarkExist = false;
 }

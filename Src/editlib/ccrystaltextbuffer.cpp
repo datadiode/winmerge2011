@@ -360,64 +360,17 @@ int CCrystalTextBuffer::FindLineWithFlag(DWORD dwFlag) const
 	return -1;
 }
 
-int CCrystalTextBuffer::GetLineWithFlag(DWORD dwFlag) const
-{
-  ASSERT((dwFlag != 0) && ((dwFlag & dwFlag - 1) == 0));
-  return FindLineWithFlag(dwFlag);
-}
-
-void CCrystalTextBuffer::SetLineFlag(int nLine, DWORD dwFlag, BOOL bSet, BOOL bRemoveFromPreviousLine, BOOL bUpdate)
+void CCrystalTextBuffer::SetLineFlags(int nLine, DWORD dwFlags)
 {
 	//  You must call InitNew() or LoadFromFile() first!
 	ASSERT(m_bInit);             //  Text buffer not yet initialized.
-	ASSERT((dwFlag != 0) && ((dwFlag & dwFlag - 1) == 0));
-
-	if (nLine == -1)
+	ASSERT(nLine != -1);
+	if (m_aLines[nLine].m_dwFlags != dwFlags)
 	{
-		ASSERT(!bSet);
-		nLine = FindLineWithFlag(dwFlag);
-		if (nLine == -1)
-			return;
-		bRemoveFromPreviousLine = FALSE;
+		m_aLines[nLine].m_dwFlags = dwFlags;
+		UpdateViews(NULL, NULL, UPDATE_SINGLELINE | UPDATE_FLAGSONLY, nLine);
 	}
-
-	DWORD dwNewFlags = m_aLines[nLine].m_dwFlags;
-	if (bSet)
-	{
-		dwNewFlags |= dwFlag;
-	}
-	else
-	{
-		dwNewFlags &= ~dwFlag;
-	}
-
-  if (m_aLines[nLine].m_dwFlags != dwNewFlags)
-    {
-      if (bRemoveFromPreviousLine)
-        {
-          int nPrevLine = FindLineWithFlag (dwFlag);
-          if (bSet)
-            {
-              if (nPrevLine >= 0)
-                {
-                  ASSERT((m_aLines[nPrevLine].m_dwFlags & dwFlag) != 0);
-                  m_aLines[nPrevLine].m_dwFlags &= ~dwFlag;
-          if (bUpdate)
-          UpdateViews (NULL, NULL, UPDATE_SINGLELINE | UPDATE_FLAGSONLY, nPrevLine);
-                }
-            }
-          else
-            {
-              ASSERT(nPrevLine == nLine);
-            }
-        }
-
-      m_aLines[nLine].m_dwFlags = dwNewFlags;
-      if (bUpdate)
-      UpdateViews (NULL, NULL, UPDATE_SINGLELINE | UPDATE_FLAGSONLY, nLine);
-    }
 }
-
 
 /**
  * @brief Get text of specified line range (excluding ghost lines)
@@ -428,7 +381,6 @@ void CCrystalTextBuffer::GetTextWithoutEmptys(int nStartLine, int nStartChar,
   LPCTSTR sEol = GetStringEol (nCrlfStyle);
   GetText(nStartLine, nStartChar, nEndLine, nEndChar, text, sEol);
 }
-
 
 void CCrystalTextBuffer::GetText(int nStartLine, int nStartChar, int nEndLine, int nEndChar,
 	String &text, LPCTSTR pszCRLF) const
@@ -896,60 +848,22 @@ void CCrystalTextBuffer::FlushUndoGroup(CCrystalTextView *pSource)
 	m_bUndoGroup = FALSE;
 }
 
-int CCrystalTextBuffer::FindNextBookmarkLine(int nCurrentLine) const
+int CCrystalTextBuffer::FindNextBookmarkLine(int nCurrentLine, int nDirection) const
 {
-  BOOL bWrapIt = TRUE;
-  DWORD dwFlags = GetLineFlags (nCurrentLine);
-  if ((dwFlags & LF_BOOKMARKS) != 0)
-    nCurrentLine++;
-
-  const int nSize = GetLineCount();
-  for (;;)
-    {
-      while (nCurrentLine < nSize)
-        {
-          if ((m_aLines[nCurrentLine].m_dwFlags & LF_BOOKMARKS) != 0)
-            return nCurrentLine;
-          // Keep going
-          nCurrentLine++;
-        }
-      // End of text reached
-      if (!bWrapIt)
-        return -1;
-
-      // Start from the beginning of text
-      bWrapIt = FALSE;
-      nCurrentLine = 0;
-    }
-  return -1;
-}
-
-int CCrystalTextBuffer::FindPrevBookmarkLine(int nCurrentLine) const
-{
-  BOOL bWrapIt = TRUE;
-  DWORD dwFlags = GetLineFlags(nCurrentLine);
-  if ((dwFlags & LF_BOOKMARKS) != 0)
-    nCurrentLine--;
-
-  const stl_size_t nSize = m_aLines.size();
-  for (;;)
-    {
-      while (nCurrentLine >= 0)
-        {
-          if ((m_aLines[nCurrentLine].m_dwFlags & LF_BOOKMARKS) != 0)
-            return nCurrentLine;
-          // Keep moving up
-          nCurrentLine--;
-        }
-      // Beginning of text reached
-      if (!bWrapIt)
-        return -1;
-
-      // Start from the end of text
-      bWrapIt = FALSE;
-      nCurrentLine = nSize - 1;
-    }
-  return -1;
+	const int nSize = GetLineCount();
+	const int nStartingPoint = nCurrentLine;
+	for (;;)
+	{
+		nCurrentLine += nDirection;
+		if (nCurrentLine < 0 || nCurrentLine >= nSize)
+			nCurrentLine -= nDirection * nSize;
+		if (nCurrentLine == nStartingPoint ||
+			(m_aLines[nCurrentLine].m_dwFlags & LF_BOOKMARKS) != 0)
+		{
+			break;
+		}
+	}
+	return nCurrentLine;
 }
 
 //BEGIN SW
