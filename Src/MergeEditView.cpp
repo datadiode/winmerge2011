@@ -1056,42 +1056,6 @@ void CMergeEditView::OnUpdateCaret(bool bShowHide)
 	m_pDocument->UpdateClipboardCmdUI();
 }
 
-static int QueryScriptMethods(HMenu *pMenu, IDispatch *piDispatch, int nCmd, int nMax)
-{
-	HRESULT hr;
-	ITypeInfo *piTypeInfo = NULL;
-	if (SUCCEEDED(hr = piDispatch->GetTypeInfo(0, 0, &piTypeInfo)))
-	{
-		TYPEATTR *pTypeAttr = NULL;
-		if (SUCCEEDED(hr = piTypeInfo->GetTypeAttr(&pTypeAttr)))
-		{
-			UINT iFunc = pTypeAttr->cFuncs;
-			while (iFunc > 0 && nCmd <= nMax)
-			{
-				FUNCDESC *pFuncDesc;
-				if (SUCCEEDED(hr = piTypeInfo->GetFuncDesc(--iFunc, &pFuncDesc)))
-				{
-					// exclude properties
-					// exclude IDispatch inherited methods
-					if ((pFuncDesc->invkind & INVOKE_FUNC) && !(pFuncDesc->wFuncFlags & 1))
-					{
-						CMyComBSTR bstrName;
-						UINT cNames;
-						if SUCCEEDED(hr = piTypeInfo->GetNames(pFuncDesc->memid, &bstrName, 1, &cNames))
-						{
-							pMenu->AppendMenu(MF_STRING, nCmd++, bstrName);
-						}
-					}
-					piTypeInfo->ReleaseFuncDesc(pFuncDesc);
-				}
-			}
-			piTypeInfo->ReleaseTypeAttr(pTypeAttr);
-		}
-		piTypeInfo->Release();
-	}
-	return nCmd;
-}
-
 /**
  * @brief Offer a context menu built with scriptlet/ActiveX functions
  */
@@ -1117,45 +1081,45 @@ void CMergeEditView::OnContextMenu(LPARAM lParam)
 
 	String language;
 	bool bLocalized = LanguageSelect.GetPoHeaderProperty("X-Poedit-Language", language);
-	LPCTSTR fmt =
-		_T("script:%%SupplementFolder%%\\EditorScripts\\%s.wsc\0")
-		_T("script:%%SupplementFolder%%\\EditorScripts\\English.wsc\0")
-		_T("script:\\EditorScripts\\%s.wsc\0")
-		_T("script:\\EditorScripts\\English.wsc\0");
-	CMyComPtr<IDispatch> spDispatch;
-	while (size_t len = _tcslen(fmt))
+	HMenu *pScriptMenu;
+	do
 	{
-		string_format pluginMoniker(fmt, language.c_str());
-		if (pluginMoniker.find(_T("\\.")) == String::npos)
+		pScriptMenu = theApp.m_pMainWnd->SetScriptMenu(pSub, NULL);
+		if (language.empty())
 		{
-			env_ResolveMoniker(pluginMoniker);
-			HRESULT hr = CoGetObject(pluginMoniker.c_str(), NULL, IID_IDispatch,
-				reinterpret_cast<void **>(&spDispatch));
-			if (SUCCEEDED(hr))
-			{
-				pSub->AppendMenu(MF_SEPARATOR);
-				QueryScriptMethods(pSub, spDispatch, IDC_SCRIPT_FIRST, IDC_SCRIPT_LAST);
-				break;
-			}
-			if (hr != INET_E_RESOURCE_NOT_FOUND)
-			{
-				pSub->AppendMenu(MF_SEPARATOR);
-				pluginMoniker += _T("\t");
-				pluginMoniker += OException(hr).msg;
-				pSub->AppendMenu(MF_STRING, 0, pluginMoniker.c_str());
-				break;
-			}
+			language = _T("English");
+			bLocalized = false;
 		}
-		fmt += len + 1;
-	}
+		language.insert(0, _T("PluginMonikers\\"));
+		language.append(_T(".ini"));
+		pSub->AppendMenu(MF_STRING, IDC_SCRIPT_LAST, language.c_str());
+		pScriptMenu = theApp.m_pMainWnd->SetScriptMenu(pSub, "EditorScripts.Menu");
+		if (pScriptMenu->GetMenuItemCount())
+		{
+			pSub->InsertMenu(IDC_SCRIPT_FIRST, MF_SEPARATOR);
+			break;
+		}
+		language.clear();
+	} while (bLocalized);
+
 	int nCmd = pSub->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_RETURNCMD,
 		point.x, point.y, theApp.m_pMainWnd->m_pWnd);
-	if (nCmd >= IDC_SCRIPT_FIRST && nCmd <= IDC_SCRIPT_LAST)
+	if (nCmd >= IDC_SCRIPT_FIRST && nCmd <= IDC_SCRIPT_LAST) try
 	{
 		TCHAR method[INFOTIPSIZE];
-		pSub->GetMenuString(nCmd, method, INFOTIPSIZE);
+		pScriptMenu->GetMenuString(nCmd, method, INFOTIPSIZE);
+		String pluginMoniker;
+		if (LPTSTR p = _tcschr(method, _T('@')))
+		{
+			*p++ = _T('\0');
+			pluginMoniker = p;
+		}
+		env_ResolveMoniker(pluginMoniker);
+		CMyComPtr<IDispatch> spDispatch;
+		OException::Check(CoGetObject(pluginMoniker.c_str(), NULL,
+			IID_IDispatch, reinterpret_cast<void **>(&spDispatch)));
 		CMyDispId DispId;
-		DispId.Init(spDispatch, method);
+		OException::Check(DispId.Init(spDispatch, method));
 		String text;
 		if (IsSelection())
 		{
@@ -1163,23 +1127,25 @@ void CMergeEditView::OnContextMenu(LPARAM lParam)
 			GetSelection(ptStart, ptEnd);
 			GetTextWithoutEmptys(ptStart.y, ptStart.x, ptEnd.y, ptEnd.x, text);
 		}
-		CMyVariant varRet;
-		HRESULT hr = DispId.Call(spDispatch, CMyDispParams<1>().Unnamed[text.c_str()], DISPATCH_METHOD, &varRet);
-		if (SUCCEEDED(hr) && SUCCEEDED(hr = varRet.ChangeType(VT_BSTR)))
-		{
-			BSTR bstrText = V_BSTR(&varRet);
-			ReplaceSelection(bstrText, SysStringLen(bstrText), 0);
-		}
-		else
-		{
-			OException(hr).ReportError(m_hWnd, MB_ICONSTOP);
-		}
+		CMyVariant var;
+		OException::Check(DispId.Call(spDispatch,
+			CMyDispParams<1>().Unnamed[text.c_str()], DISPATCH_METHOD, &var));
+		OException::Check(var.ChangeType(VT_BSTR));
+		BSTR bstr = V_BSTR(&var);
+		ReplaceSelection(bstr, SysStringLen(bstr), 0);
+	}
+	catch (OException *e)
+	{
+		e->ReportError(m_hWnd, MB_ICONSTOP);
+		delete e;
 	}
 	else
 	{
 		m_pDocument->PostMessage(WM_COMMAND, nCmd);
 	}
+	theApp.m_pMainWnd->SetScriptMenu(pSub, NULL);
 	pMenu->DestroyMenu();
+	pScriptMenu->DestroyMenu();
 }
 
 /**

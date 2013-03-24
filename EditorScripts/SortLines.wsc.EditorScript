@@ -1,3 +1,11 @@
+<scriptlet>
+
+<implements type="Automation">
+	<method name="SortLinesAscending"/>
+	<method name="SortLinesDescending"/>
+</implements>
+
+<script language="JScript">
 // Adapted from Takashi's fork
 
 function SortLinesAscending(Text) {
@@ -27,3 +35,6 @@ function SortLinesDescending(Text) {
 	lines.sort(function(a, b) { return a < b ? 1 : -1; });
 	return lines.join(eol) + tail;
 }
+
+</script>
+</scriptlet>

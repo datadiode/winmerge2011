@@ -32,45 +32,6 @@
 			CharacterSet="1"
 			>
 			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="PluginMonikers"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="EditorScripts"
-			/>
-			<Tool
-				Name="FileTransforms"
-			/>
-			<Tool
-				Name="PrintTemplates"
-			/>
-			<Tool
-				Name="flt"
-			/>
-			<Tool
-				Name="docs"
-			/>
-			<Tool
-				Name="setup"
-			/>
-			<Tool
-				Name="po"
-			/>
-			<Tool
-				Name="imp"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
 				Name="VCMIDLTool"
 				SuppressStartupBanner="false"
 				GenerateStublessProxies="true"
@@ -93,9 +54,6 @@
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 				DebugInformationFormat="0"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
@@ -121,23 +79,8 @@
 				DataExecutionPrevention="0"
 			/>
 			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
 				Name="VCManifestTool"
 				EmbedManifest="true"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -155,45 +98,6 @@
 			CharacterSet="1"
 			>
 			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="PluginMonikers"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="EditorScripts"
-			/>
-			<Tool
-				Name="FileTransforms"
-			/>
-			<Tool
-				Name="PrintTemplates"
-			/>
-			<Tool
-				Name="flt"
-			/>
-			<Tool
-				Name="docs"
-			/>
-			<Tool
-				Name="setup"
-			/>
-			<Tool
-				Name="po"
-			/>
-			<Tool
-				Name="imp"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
 				Name="VCMIDLTool"
 				SuppressStartupBanner="false"
 				TargetEnvironment="3"
@@ -219,9 +123,6 @@
 				DebugInformationFormat="0"
 			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="NDEBUG"
 				Culture="1033"
@@ -245,23 +146,8 @@
 				DataExecutionPrevention="0"
 			/>
 			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
 				Name="VCManifestTool"
 				EmbedManifest="true"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -278,45 +164,6 @@
 			ATLMinimizesCRunTimeLibraryUsage="false"
 			CharacterSet="1"
 			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="PluginMonikers"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="EditorScripts"
-			/>
-			<Tool
-				Name="FileTransforms"
-			/>
-			<Tool
-				Name="PrintTemplates"
-			/>
-			<Tool
-				Name="flt"
-			/>
-			<Tool
-				Name="docs"
-			/>
-			<Tool
-				Name="setup"
-			/>
-			<Tool
-				Name="po"
-			/>
-			<Tool
-				Name="imp"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
 			<Tool
 				Name="VCMIDLTool"
 				SuppressStartupBanner="false"
@@ -340,15 +187,9 @@
 				DebugInformationFormat="3"
 			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="_DEBUG"
 				Culture="1033"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
 			/>
 			<Tool
 				Name="VCLinkerTool"
@@ -364,23 +205,8 @@
 				DataExecutionPrevention="0"
 			/>
 			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
 				Name="VCManifestTool"
 				EmbedManifest="true"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -397,45 +223,6 @@
 			ATLMinimizesCRunTimeLibraryUsage="false"
 			CharacterSet="1"
 			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="PluginMonikers"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="EditorScripts"
-			/>
-			<Tool
-				Name="FileTransforms"
-			/>
-			<Tool
-				Name="PrintTemplates"
-			/>
-			<Tool
-				Name="flt"
-			/>
-			<Tool
-				Name="docs"
-			/>
-			<Tool
-				Name="setup"
-			/>
-			<Tool
-				Name="po"
-			/>
-			<Tool
-				Name="imp"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
 			<Tool
 				Name="VCMIDLTool"
 				SuppressStartupBanner="false"
@@ -460,15 +247,9 @@
 				DebugInformationFormat="3"
 			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="_DEBUG"
 				Culture="1033"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
 			/>
 			<Tool
 				Name="VCLinkerTool"
@@ -484,23 +265,8 @@
 				DataExecutionPrevention="0"
 			/>
 			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
 				Name="VCManifestTool"
 				EmbedManifest="true"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -517,45 +283,6 @@
 			ATLMinimizesCRunTimeLibraryUsage="false"
 			CharacterSet="1"
 			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="PluginMonikers"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="EditorScripts"
-			/>
-			<Tool
-				Name="FileTransforms"
-			/>
-			<Tool
-				Name="PrintTemplates"
-			/>
-			<Tool
-				Name="flt"
-			/>
-			<Tool
-				Name="docs"
-			/>
-			<Tool
-				Name="setup"
-			/>
-			<Tool
-				Name="po"
-			/>
-			<Tool
-				Name="imp"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
 			<Tool
 				Name="VCMIDLTool"
 				SuppressStartupBanner="false"
@@ -583,15 +310,9 @@
 				DebugInformationFormat="3"
 			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="NDEBUG"
 				Culture="1033"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
 			/>
 			<Tool
 				Name="VCLinkerTool"
@@ -610,23 +331,8 @@
 				DataExecutionPrevention="0"
 			/>
 			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
 				Name="VCManifestTool"
 				EmbedManifest="true"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -640,83 +346,8 @@
 			ConfigurationType="1"
 			>
 			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="PluginMonikers"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="EditorScripts"
-			/>
-			<Tool
-				Name="FileTransforms"
-			/>
-			<Tool
-				Name="PrintTemplates"
-			/>
-			<Tool
-				Name="flt"
-			/>
-			<Tool
-				Name="docs"
-			/>
-			<Tool
-				Name="setup"
-			/>
-			<Tool
-				Name="po"
-			/>
-			<Tool
-				Name="imp"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
 				Name="VCMIDLTool"
 				OutputDirectory="$(IntDir)\..\..\midl"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
 	</Configurations>
@@ -3913,23 +3544,15 @@
 			Name="Editor Scripts"
 			>
 			<File
-				RelativePath="..\EditorScripts\Basic.vbs.EditorScript"
+				RelativePath="..\EditorScripts\Basic.wsc.EditorScript"
 				>
 			</File>
 			<File
-				RelativePath="..\EditorScripts\English.wsc.EditorScript"
+				RelativePath="..\EditorScripts\ExecFilterCommand.wsc.EditorScript"
 				>
 			</File>
 			<File
-				RelativePath="..\EditorScripts\ExecFilterCommand.vbs.EditorScript"
-				>
-			</File>
-			<File
-				RelativePath="..\EditorScripts\German.wsc.EditorScript"
-				>
-			</File>
-			<File
-				RelativePath="..\EditorScripts\SortLines.js.EditorScript"
+				RelativePath="..\EditorScripts\SortLines.wsc.EditorScript"
 				>
 			</File>
 		</Filter>
