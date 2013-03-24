@@ -22,7 +22,7 @@
 
 ;    3. This notice may not be removed or altered from any source distribution.
 
-!define version "0.2011.003.115"
+!define version "0.2011.003.131"
 !define srcdir "..\Build\WinMerge\Win32\Release"
 !define setup "..\Build\WinMerge\Win32\WinMerge_${version}_wine_setup.exe"
 
@@ -129,6 +129,7 @@ Section "Windows Script 5.6 (separate EULA)"
 	IfFileExists "$SYSDIR\winecfg.exe" 0 EndInstallScript56
 
 		IfFileExists "${script56}\setup.exe" EndDownloadScript56
+			CreateDirectory "${script56}"
 			InetLoad::load /POPUP "Windows Script 5.6" "${script56url}" "${script56}\setup.exe"
 		EndDownloadScript56:
 
