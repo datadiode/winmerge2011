@@ -131,16 +131,20 @@ void FilterList::AddFromIniFile(LPCTSTR inifile)
 					TCHAR buffer[0x8000];
 					if (GetPrivateProfileSection(section, buffer, _countof(buffer), inifile))
 					{
-						LPTSTR filterStr = buffer;
+						LPTSTR p = buffer;
 						DWORD index = 0;
-						DWORD count = static_cast<DWORD>(_tcslen(check));
-						while (const size_t n = _tcslen(filterStr))
+						DWORD count = static_cast<DWORD>(_tcslen(p));
+						while (const size_t n = _tcslen(p))
 						{
 							if (index < count && check[index] == _T('1'))
 							{
-								AddFilter(filter, filterStr, NULL);
+								if (LPTSTR q = _tcschr(p, _T('=')))
+								{
+									LPTSTR filterStr = q + 1;
+									AddFilter(filter, filterStr, NULL);
+								}
 							}
-							filterStr += n + 1;
+							p += n + 1;
 							++index;
 						}
 					}

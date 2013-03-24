@@ -212,6 +212,8 @@ LRESULT LineFiltersDlg::OnNotify(UNotify *pNM)
 			}
 			break;
 		case TVN_BEGINLABELEDIT:
+			if (!GetEditableItem())
+				return 1;
 			m_EdFilter = m_TvFilter->GetEditControl();
 			PostMessage(WM_APP_DoInPlaceEditingEvents);
 			break;
@@ -322,10 +324,13 @@ void LineFiltersDlg::InitList()
 			_T("UnifyDateFormat=\0");
 		static const TCHAR UnifyDateFormat[] =
 			// ISO date format - remove leading zeros
+			_T("ISO date format						= ")
 			_T("regexp:/0*(\\d+)-0*(\\d+)-0*(\\d+)/gp<$1-$2-$3\0")
 			// US civilian vernacular date format - remove leading zeros and permute accordingly
+			_T("US civilian vernacular date format	= ")
 			_T("regexp:/0*(\\d+)\\/0*(\\d+)\\/0*(\\d+)/gp<$3-$1-$2\0")
 			// Traditional German date format - remove leading zeros and permute accordingly
+			_T("Traditional German date format		= ")
 			_T("regexp:/0*(\\d+)\\.0*(\\d+)\\.0*(\\d+)/gp<$3-$2-$1\0");
 		if (WritePrivateProfileSection(_T("*"), toc, m_inifile.c_str()) &&
 			WritePrivateProfileSection(_T("UnifyDateFormat"), UnifyDateFormat, m_inifile.c_str()))
