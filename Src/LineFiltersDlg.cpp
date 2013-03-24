@@ -177,6 +177,23 @@ LRESULT LineFiltersDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_APP_CheckStateChange:
 		OnCheckStateChange(reinterpret_cast<HTREEITEM>(lParam));
 		break;
+	case WM_HOTKEY:
+		switch (wParam)
+		{
+		case MAKEWPARAM(IDC_LFILTER_LIST, VK_F2):
+			EditSelectedFilter();
+			break;
+		case MAKEWPARAM(IDC_LFILTER_LIST, VK_SPACE):
+			if (HTREEITEM hItem = m_TvFilter->GetSelection())
+			{
+				m_TvFilter->SendMessage(WM_KEYDOWN, VK_SPACE);
+				PostMessage(WM_APP_CheckStateChange,
+					reinterpret_cast<WPARAM>(m_TvFilter),
+					reinterpret_cast<LPARAM>(hItem));
+			}
+			break;
+		}
+		break;
 	}
 	return ODialog::WindowProc(message, wParam, lParam);
 }
@@ -188,27 +205,19 @@ LRESULT LineFiltersDlg::OnNotify(UNotify *pNM)
 	case IDC_LFILTER_LIST:
 		switch (pNM->HDR.code)
 		{
+		case NM_SETFOCUS:
+			RegisterHotKey(m_hWnd, MAKEWPARAM(IDC_LFILTER_LIST, VK_F2), 0, VK_F2);
+			RegisterHotKey(m_hWnd, MAKEWPARAM(IDC_LFILTER_LIST, VK_SPACE), 0, VK_SPACE);
+			break;
+		case NM_KILLFOCUS:
+			UnregisterHotKey(m_hWnd, MAKEWPARAM(IDC_LFILTER_LIST, VK_F2));
+			UnregisterHotKey(m_hWnd, MAKEWPARAM(IDC_LFILTER_LIST, VK_SPACE));
+			break;
 		case TVN_ITEMEXPANDING:
 			if (pNM->TREEVIEW.action == TVE_EXPAND &&
 				(pNM->TREEVIEW.itemNew.state & TVIS_EXPANDEDONCE) == 0)
 			{
 				PopulateSection(pNM->TREEVIEW.itemNew.hItem);
-			}
-			break;
-		case TVN_KEYDOWN:
-			switch (LOWORD(pNM->KEY.nVKey))
-			{
-			case VK_F2:
-				EditSelectedFilter();
-				break;
-			case VK_SPACE:
-				if (HTREEITEM hItem = m_TvFilter->GetSelection())
-				{
-					PostMessage(WM_APP_CheckStateChange,
-						reinterpret_cast<WPARAM>(pNM->hwndFrom),
-						reinterpret_cast<LPARAM>(hItem));
-				}
-				break;
 			}
 			break;
 		case TVN_BEGINLABELEDIT:
@@ -538,8 +547,9 @@ void LineFiltersDlg::OnClick(UNotify *pNM)
 	m_TvFilter->ScreenToClient(&ht.pt);
 	if (m_TvFilter->HitTest(&ht) && (TVHT_ONITEMSTATEICON & ht.flags) != 0)
 	{
+		m_TvFilter->SelectItem(ht.hItem);
 		PostMessage(WM_APP_CheckStateChange,
-			reinterpret_cast<WPARAM>(pNM->hwndFrom),
+			reinterpret_cast<WPARAM>(m_TvFilter),
 			reinterpret_cast<LPARAM>(ht.hItem));
 	}
 }
