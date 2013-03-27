@@ -1130,9 +1130,12 @@ void CMergeEditView::OnContextMenu(LPARAM lParam)
 		CMyVariant var;
 		OException::Check(DispId.Call(spDispatch,
 			CMyDispParams<1>().Unnamed[text.c_str()], DISPATCH_METHOD, &var));
-		OException::Check(var.ChangeType(VT_BSTR));
-		BSTR bstr = V_BSTR(&var);
-		ReplaceSelection(bstr, SysStringLen(bstr), 0);
+		if (V_VT(&var) != VT_EMPTY)
+		{
+			OException::Check(var.ChangeType(VT_BSTR));
+			BSTR bstr = V_BSTR(&var);
+			ReplaceSelection(bstr, SysStringLen(bstr), 0);
+		}
 	}
 	catch (OException *e)
 	{
