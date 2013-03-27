@@ -3555,6 +3555,10 @@
 				RelativePath="..\EditorScripts\SortLines.wsc.EditorScript"
 				>
 			</File>
+			<File
+				RelativePath="..\EditorScripts\Tabify.wsc.EditorScript"
+				>
+			</File>
 		</Filter>
 		<File
 			RelativePath="Common\ntdll.imp"

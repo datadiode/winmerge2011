@@ -1,0 +1,75 @@
+<scriptlet>
+
+<implements type="Automation">
+	<method name="Tabify"/>
+	<method name="Untabify"/>
+</implements>
+
+<script language="VBS">
+Option Explicit
+
+Dim wsh
+Set wsh = CreateObject("WScript.Shell")
+
+Dim TabWidth
+TabWidth = 4
+
+On Error Resume Next
+TabWidth = wsh.RegRead("HKCU\Software\Thingamahoochie\WinMerge\Settings\TabSize")
+On Error GoTo 0
+
+Function GetEOL(Text)
+	Dim match
+	With New RegExp
+		.Pattern = vbCrLf & "|" & vbCr & "|" & vbLf
+		For Each match In .Execute(Text)
+			GetEOL = match.Value
+		Next
+	End With
+End Function
+
+Function EatIndent(Text)
+	Dim i, indent
+	indent = 0
+	For i = 1 To Len(Text)
+		Select Case Mid(Text, i, 1)
+		Case " "
+			indent = indent + 1
+		Case vbTab
+			indent = ((indent + TabWidth) \ TabWidth) * TabWidth
+		Case Else
+			Exit For
+		End Select
+	Next
+	Text = Mid(Text, i)
+	EatIndent = indent
+End Function
+
+Function Tabify(Text)
+	Dim lines, eol, i, indent
+	eol = GetEOL(Text)
+	lines = Split(Text, eol)
+	For i = LBound(lines) To UBound(lines)
+		If Len(lines(i)) <> 0 Then
+			indent = EatIndent(lines(i))
+			lines(i) = Replace(Space(indent), Space(TabWidth), vbTab) & lines(i)
+		End If
+	Next
+	Tabify = Join(lines, eol)
+End Function
+
+Function Untabify(Text)
+	Dim lines, eol, i, indent
+	eol = GetEOL(Text)
+	lines = Split(Text, eol)
+	For i = LBound(lines) To UBound(lines)
+		If Len(lines(i)) <> 0 Then
+			indent = EatIndent(lines(i))
+			lines(i) = Space(indent) & lines(i)
+		End If
+	Next
+	Untabify = Join(lines, eol)
+End Function
+
+</script>
+</scriptlet>
