@@ -125,8 +125,9 @@ public:
 	void CheckinToClearCase(LPCTSTR strDestinationPath);
 	void StartFlashing();
 	bool AskCloseConfirmation();
-	bool DoOpenConflict(LPCTSTR conflictFile);
-	bool LoadAndOpenProjectFile(LPCTSTR sProject);
+	void DoOpenMrgman(LPCTSTR);
+	bool DoOpenConflict(LPCTSTR);
+	bool LoadAndOpenProjectFile(LPCTSTR);
 	HWindow *CreateChildHandle() const;
 	CDocFrame *GetActiveDocFrame(BOOL *pfActive = NULL);
 	void SetActiveMenu(HMENU);

@@ -40,6 +40,7 @@
 #include "DirView.h"
 #include "MainFrm.h"
 #include "coretools.h"
+#include "markdown.h"
 #include "LogFile.h"
 #include "paths.h"
 #include "OptionsDef.h"
@@ -91,6 +92,80 @@ void CDirFrame::InitCompare(LPCTSTR pszLeft, LPCTSTR pszRight, int nRecursive, C
 	}
 	
 	m_nRecursive = nRecursive;
+}
+
+void CDirFrame::InitMrgmanCompare(LPCTSTR mrgmanFile)
+{
+	m_bAllowRescan = false;
+	SetWindowText(mrgmanFile);
+	String root;
+	CRegKeyEx rk;
+	if (ERROR_SUCCESS == rk.OpenWithAccess(HKEY_LOCAL_MACHINE,
+		_T("SYSTEM\\ControlSet001\\Services\\Mvfs\\Parameters"), KEY_READ))
+	{
+		root = rk.ReadString(_T("drive"), _T("?"));
+		root += _T(":\\");
+	}
+	CMarkdown::File xml(mrgmanFile);
+	CMarkdown::EntityMap entities;
+	CMarkdown::Load(entities);
+	if (xml.Move("cfl") && xml.Pull())
+	{
+		if (xml.Move("session") && xml.Pull())
+		{
+			OString view_root = CMarkdown(xml).Move("to-view").Pop().Move("view-root").GetInnerText()->Uni(entities);
+			root += view_root.W;
+			m_pCtxt = new CDiffContext(m_pCompareStats, m_pDirView->m_pWnd, root.c_str(), root.c_str(), 0);
+			m_pCtxt->m_piFilterGlobal = &transparentFileFilter;
+			if (xml.Move("files") && xml.Pull())
+			{
+				while (xml.Move("file") && xml.Pull())
+				{
+					String file_type;
+					if (HString *hstr = CMarkdown(xml).Move("file-type").GetInnerText()->Uni(entities))
+					{
+						file_type = hstr->W;
+						hstr->Free();
+					}
+					if (file_type == _T("File"))
+					{
+						m_pCompareStats->IncreaseTotalItems();
+						String path;
+						if (HString *hstr = CMarkdown(xml).Move("path").GetInnerText()->Uni(entities))
+						{
+							path = hstr->W;
+							string_replace(path, _T("/"), _T("\\"));
+							hstr->Free();
+						}
+						String base_version;
+						if (HString *hstr = CMarkdown(xml).Move("base-version").Pop().Move("selector").GetInnerText()->Uni(entities))
+						{
+							base_version = hstr->W;
+							string_replace(base_version, _T("/"), _T("\\"));
+							hstr->Free();
+						}
+						DIFFITEM *di = m_pCtxt->AddDiff(NULL);
+						di->diffcode = DIFFCODE::NEEDSCAN;
+						di->left.path = di->right.path = paths_GetParentPath(path.c_str());
+						di->left.filename = di->right.filename = PathFindFileName(path.c_str());
+						di->left.filename += _T("@@") + base_version;
+					}
+					do; while (xml.Move());
+					xml.Push();
+				}
+				do; while (xml.Move());
+				xml.Push();
+			}
+			do; while (xml.Move());
+			xml.Push();
+		}
+		do; while (xml.Move());
+		xml.Push();
+	}
+	int cnt = 0;
+	int alldiffs = 0;
+	m_pDirView->RedisplayChildren(NULL, 0, cnt, alldiffs);
+	Rescan(m_pDirView->GetItemCount());
 }
 
 /**
@@ -166,7 +241,7 @@ CDirFrame::AllowUpwardDirectory(String &leftParent, String &rightParent)
 /**
  * @brief Perform directory comparison again from scratch
  */
-void CDirFrame::Rescan(bool bCompareSelected)
+void CDirFrame::Rescan(int nCompareSelected)
 {
 	if (!m_pCtxt)
 		return;
@@ -183,13 +258,6 @@ void CDirFrame::Rescan(bool bCompareSelected)
 	m_pCompareStats->Reset();
 	m_pDirView->StartCompare();
 
-	// Don't clear if only scanning selected items
-	if (!bCompareSelected)
-	{
-		m_pDirView->DeleteAllItems();
-		m_pCtxt->RemoveAll();
-	}
-
 	m_pCtxt->m_options.nIgnoreWhitespace = COptionsMgr::Get(OPT_CMP_IGNORE_WHITESPACE);
 	m_pCtxt->m_options.bIgnoreBlankLines = COptionsMgr::Get(OPT_CMP_IGNORE_BLANKLINES);
 	m_pCtxt->m_options.bFilterCommentsLines = COptionsMgr::Get(OPT_CMP_FILTER_COMMENTLINES);
@@ -205,8 +273,29 @@ void CDirFrame::Rescan(bool bCompareSelected)
 	m_pCtxt->m_bWalkUniques = COptionsMgr::Get(OPT_CMP_WALK_UNIQUES);
 
 	// Set total items count since we don't collect items
-	if (bCompareSelected)
-		m_pCompareStats->SetTotalItems(m_pDirView->GetSelectedCount());
+	// Don't clear if only scanning selected items
+	if (nCompareSelected)
+	{
+		m_pCompareStats->SetTotalItems(nCompareSelected);
+	}
+	else
+	{
+		m_pDirView->DeleteAllItems();
+		m_pCtxt->RemoveAll();
+		if (m_pTempPathContext)
+		{
+			m_pCtxt->m_piFilterGlobal = &transparentFileFilter;
+			SetFilterStatusDisplay(NULL);
+		}
+		else
+		{
+			m_pCtxt->m_piFilterGlobal = &globalFileFilter;
+			// Make sure filters are up-to-date
+			globalFileFilter.ReloadUpdatedFilters();
+			// Show active filter name in statusbar
+			SetFilterStatusDisplay(globalFileFilter.GetFilterNameOrMask().c_str());
+		}
+	}
 
 	UpdateHeaderPath(0);
 	UpdateHeaderPath(1);
@@ -214,22 +303,8 @@ void CDirFrame::Rescan(bool bCompareSelected)
 	m_wndFilePathBar.SetActive(0, true);
 	m_wndFilePathBar.SetActive(1, true);
 
-	if (m_pTempPathContext)
-	{
-		m_pCtxt->m_piFilterGlobal = &transparentFileFilter;
-		SetFilterStatusDisplay(NULL);
-	}
-	else
-	{
-		m_pCtxt->m_piFilterGlobal = &globalFileFilter;
-		// Make sure filters are up-to-date
-		globalFileFilter.ReloadUpdatedFilters();
-		// Show active filter name in statusbar
-		SetFilterStatusDisplay(globalFileFilter.GetFilterNameOrMask().c_str());
-	}
-
 	// Folder names to compare are in the compare context
-	m_pCtxt->CompareDirectories(bCompareSelected);
+	m_pCtxt->CompareDirectories(nCompareSelected != 0);
 }
 
 /**

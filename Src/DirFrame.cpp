@@ -86,6 +86,7 @@ CDirFrame::CDirFrame(CMainFrame *pMDIFrame)
 , m_wndStatusBar(NULL)
 , m_bROLeft(FALSE)
 , m_bRORight(FALSE)
+, m_bAllowRescan(true)
 #pragma warning(disable:warning_this_used_in_base_member_initializer_list)
 , m_pDirView(new CDirView(this))
 #pragma warning(default:warning_this_used_in_base_member_initializer_list)
@@ -176,7 +177,7 @@ void CDirFrame::UpdateCmdUI<ID_VIEW_SHOWHIDDENITEMS>()
 template<>
 void CDirFrame::UpdateCmdUI<ID_REFRESH>()
 {
-	m_pMDIFrame->UpdateCmdUI<ID_REFRESH>(
+	m_pMDIFrame->UpdateCmdUI<ID_REFRESH>(m_bAllowRescan &&
 		waitStatusCursor.GetMsgId() != IDS_STATUS_RESCANNING ? MF_ENABLED : MF_GRAYED);
 }
 
@@ -269,11 +270,11 @@ LRESULT CDirFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 		UpdateCmdUI<ID_MERGE_DELETE>();
 		break;
 	case ID_DIR_RESCAN:
-		if (m_pDirView->MarkSelectedForRescan())
-			Rescan(true);
+		if (int nCompareSelected = m_pDirView->MarkSelectedForRescan())
+			Rescan(nCompareSelected);
 		break;
 	case ID_REFRESH:
-		Rescan(false);
+		Rescan();
 		break;
 	case ID_FIRSTDIFF:
 		m_pDirView->OnFirstdiff();

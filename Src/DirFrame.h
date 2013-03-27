@@ -74,6 +74,7 @@ protected:
 
 	BOOL m_bROLeft; /**< Is left side read-only */
 	BOOL m_bRORight; /**< Is right side read-only */
+	bool m_bAllowRescan; /**< Is rescan allowed */
 
 	virtual ~CDirFrame();
 	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
@@ -98,7 +99,8 @@ public:
 // Implementation
 public:
 	void InitCompare(LPCTSTR pszLeft, LPCTSTR pszRight, int nRecursive, CTempPathContext *);
-	void Rescan(bool bCompareSelected = false);
+	void InitMrgmanCompare(LPCTSTR mrgmanFile);
+	void Rescan(int nCompareSelected = 0);
 	int GetRecursive() const { return m_nRecursive; }
 	void CompareReady();
 	void UpdateChangedItem(const CChildFrame *);

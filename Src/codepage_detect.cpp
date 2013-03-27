@@ -15,6 +15,7 @@
 #include "markdown.h"
 #include "FileTextEncoding.h"
 #include "Utf8FileDetect.h"
+#include "Common/coretools.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -179,20 +180,20 @@ static unsigned demoGuessEncoding_rc(const char *src, stl_size_t len)
  * @param [in] len Size of the file contents string.
  * @return Codepage number.
  */
-unsigned GuessEncoding_from_bytes(LPCTSTR ext, const char *src, stl_size_t len)
+unsigned GuessEncoding_from_bytes(LPCTSTR ext, LPCTSTR pastext, const char *src, stl_size_t len)
 {
 	if (len > BufSize)
 		len = BufSize;
 	unsigned cp = 0;
-	if (lstrcmpi(ext, _T(".rc")) ==  0)
+	if (EatPrefix(ext, _T(".rc")) == pastext)
 	{
 		cp = demoGuessEncoding_rc(src, len);
 	}
-	else if (lstrcmpi(ext, _T(".htm")) == 0 || lstrcmpi(ext, _T(".html")) == 0)
+	else if (EatPrefix(ext, _T(".htm")) == pastext || EatPrefix(ext, _T(".html")) == pastext)
 	{
 		cp = demoGuessEncoding_html(src, len);
 	}
-	else if (lstrcmpi(ext, _T(".xml")) == 0 || lstrcmpi(ext, _T(".xsl")) == 0)
+	else if (EatPrefix(ext, _T(".xml")) == pastext || EatPrefix(ext, _T(".xsl")) == pastext)
 	{
 		cp = demoGuessEncoding_xml(src, len);
 	}
@@ -228,7 +229,20 @@ void GuessCodepageEncoding(LPCTSTR filepath, FileTextEncoding *encoding, bool bG
 	if (bGuessEncoding && bom == 0)
 	{
 		LPCTSTR ext = PathFindExtension(filepath);
-		if (unsigned cp = GuessEncoding_from_bytes(ext, fi.pcImage, fi.cbImage))
+		LPCTSTR pastext = ext;
+		if (int len = lstrlen(ext))
+		{
+			pastext += len;
+		}
+		else if (LPCTSTR atat = StrStr(filepath, _T("@@")))
+		{
+			pastext = atat;
+			if (LPCTSTR backslash = StrRChr(filepath, pastext, _T('\\')))
+			{
+				ext = StrRChr(backslash, pastext, _T('.'));
+			}
+		}
+		if (unsigned cp = GuessEncoding_from_bytes(ext, pastext, fi.pcImage, fi.cbImage))
 		{
 			encoding->SetCodepage(cp);
 			encoding->m_guessed = true;

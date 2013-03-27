@@ -157,7 +157,7 @@ private:
 	bool ConfirmActionList(FileActionScript &, int selCount);
 	void PerformActionList(FileActionScript &);
 	void UpdateAfterFileScript(FileActionScript &);
-	UINT MarkSelectedForRescan();
+	int MarkSelectedForRescan();
 	void DoFileEncodingDialog();
 	bool DoItemRename(int iItem, LPCTSTR szNewItemName);
 	bool RenameOnSameDir(LPCTSTR szOldFileName, LPCTSTR szNewFileName);

@@ -2401,7 +2401,7 @@ LRESULT CMainFrame::OnWndMsg<WM_DROPFILES>(WPARAM wParam, LPARAM)
 	}
 
 	// If Ctrl pressed, do recursive compare
-	BOOL ctrlKey = ::GetAsyncKeyState(VK_CONTROL);
+	int nRecursive = ::GetAsyncKeyState(VK_CONTROL) < 0 ? 1 : 0;
 
 	// If user has <Shift> pressed with one file selected,
 	// assume it is an archive and set filenames to same
@@ -2421,6 +2421,11 @@ LRESULT CMainFrame::OnWndMsg<WM_DROPFILES>(WPARAM wParam, LPARAM)
 			LoadAndOpenProjectFile(files[0].c_str());
 			return 0;
 		}
+		if (PathMatchSpec(files[0].c_str(), _T("*.mrgman")))
+		{
+			DoOpenMrgman(files[0].c_str());
+			return 0;
+		}
 		if (IsConflictFile(files[0].c_str()))
 		{
 			DoOpenConflict(files[0].c_str());
@@ -2431,7 +2436,7 @@ LRESULT CMainFrame::OnWndMsg<WM_DROPFILES>(WPARAM wParam, LPARAM)
 	FileLocation filelocLeft, filelocRight;
 	filelocLeft.filepath = files[0];
 	filelocRight.filepath = files[1];
-	DoFileOpen(filelocLeft, filelocRight, FFILEOPEN_DETECT, FFILEOPEN_DETECT, ctrlKey);
+	DoFileOpen(filelocLeft, filelocRight, FFILEOPEN_DETECT, FFILEOPEN_DETECT, nRecursive);
 	return 0;
 }
 
@@ -3787,6 +3792,15 @@ bool CMainFrame::LoadAndOpenProjectFile(LPCTSTR lpProject)
 		SaveFilesMRU();
 	}
 	return rtn;
+}
+
+void CMainFrame::DoOpenMrgman(LPCTSTR mrgmanFile)
+{
+	if (CDirFrame *pDirDoc = GetDirDocToShow())
+	{
+		pDirDoc->InitMrgmanCompare(mrgmanFile);
+		pDirDoc->ActivateFrame();
+	}
 }
 
 /**

@@ -1358,6 +1358,10 @@ void CDirView::OnUpdateUIMessage()
 		m_lastLeftPath.clear();
 		m_lastRightPath.clear();
 	}
+	else
+	{
+		Invalidate();
+	}
 	// If compare took more than TimeToSignalCompare seconds, notify user
 	clock_t elapsed = clock() - m_compareStart;
 	theApp.m_pMainWnd->SetStatus(LanguageSelect.Format(IDS_ELAPSED_TIME, elapsed));

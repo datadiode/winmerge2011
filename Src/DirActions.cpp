@@ -878,7 +878,7 @@ void CDirView::DoOpenWithEditor(SIDE_TYPE stype)
  * @brief Mark selected items as needing for rescan.
  * @return Count of items to rescan.
  */
-UINT CDirView::MarkSelectedForRescan()
+int CDirView::MarkSelectedForRescan()
 {
 	int sel = -1;
 	int items = 0;
