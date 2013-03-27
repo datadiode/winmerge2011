@@ -10,42 +10,24 @@
 Option Explicit
 
 Function ExecFilterCommand(Text)
-	Dim cmd
+	Dim cmd, wsh, fso, exe, path
+
 	cmd = InputBox("Command:")
-	If cmd = "" Then
-		Exit Function
-	End If
+	If cmd = "" Then Exit Function
 
-	On Error Resume Next
-
-	Dim wsh
-	Dim path
 	Set wsh = CreateObject("WScript.Shell")
+	Set fso = CreateObject("Scripting.FileSystemObject")
 	path = wsh.ExpandEnvironmentStrings("%TEMP%\_winmerge_addin_temp_.txt")
 
-	Dim fso
-	Dim ts
-	Set fso = CreateObject("Scripting.FileSystemObject")
-	Set ts = fso.CreateTextFile(path)
-	If ts Is Nothing Then
-		MsgBox Err.Source & ": " & vbLf & Err.Description
-		Exit Function
-	End If
-	ts.Write Text
-	ts.Close
+	With wsh.Exec("cmd /u /c " & cmd & " > " & path & " 2>&1")
+		.StdIn.Write Text
+		.StdIn.Close
+		Do While .Status = 0
+		Loop
+	End With
 
-	Dim exe
-	Set exe = wsh.Exec("cmd /c " & cmd & " < " & path & " 2>&1")
-	If exe Is Nothing Then
-		MsgBox Err.Source & ":" & vbLf & Err.Description
-		fso.DeleteFile path
-		Exit Function
-	End If
-
-	ExecFilterCommand = exe.StdOut.ReadAll
-
+	ExecFilterCommand = fso.OpenTextFile(path, 1, False, -2).ReadAll
 	fso.DeleteFile path
-
 End Function
 </script>
 </scriptlet>
