@@ -943,6 +943,14 @@ void CCrystalEditView::ReplaceSelection(LPCTSTR pszNewText, int cchNewText, DWOR
 
 	POINT ptCursorPos, ptEndOfBlock;
 	GetSelection(ptCursorPos, ptEndOfBlock);
+
+	// Avoid bogus EOL insertion when selection ends on a ghost line
+	while (ptEndOfBlock.y < m_pTextBuffer->GetLineCount() &&
+		m_pTextBuffer->GetFullLineLength(ptEndOfBlock.y) == 0)
+	{
+		++ptEndOfBlock.y;
+	}
+
 	if (IsSelection())
 		m_pTextBuffer->DeleteText(this, ptCursorPos.y, ptCursorPos.x, ptEndOfBlock.y, ptEndOfBlock.x, CE_ACTION_REPLACE);
 
