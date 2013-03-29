@@ -85,6 +85,7 @@ CDirView::CDirView(CDirFrame *pFrame)
 	, m_pCmpProgressDlg(NULL)
 	, m_compareStart(0)
 	, m_bTreeMode(false)
+	, m_bAllowRescan(true)
 	, m_pShellContextMenuLeft(new CShellContextMenu(LeftCmdFirst, LeftCmdLast))
 	, m_hShellContextMenuLeft(NULL)
 	, m_pShellContextMenuRight(new CShellContextMenu(RightCmdFirst, RightCmdLast))
@@ -342,12 +343,15 @@ void CDirView::Redisplay()
 	SetImageList(m_bTreeMode && m_pFrame->GetRecursive() == 1 ?
 		m_imageState->m_hImageList : NULL, LVSIL_STATE);
 
-	// If non-recursive compare, add special item(s)
-	String leftParent, rightParent;
-	if (m_pFrame->GetRecursive() == 0 ||
-		m_pFrame->AllowUpwardDirectory(leftParent, rightParent) == CDirFrame::AllowUpwardDirectory::ParentIsTempPath)
+	if (m_bAllowRescan)
 	{
-		cnt += m_nSpecialItems = AddSpecialItems();
+		// If non-recursive compare, add special item(s)
+		String leftParent, rightParent;
+		if (m_pFrame->GetRecursive() == 0 ||
+			m_pFrame->AllowUpwardDirectory(leftParent, rightParent) == CDirFrame::AllowUpwardDirectory::ParentIsTempPath)
+		{
+			cnt += m_nSpecialItems = AddSpecialItems();
+		}
 	}
 
 	int alldiffs = 0;

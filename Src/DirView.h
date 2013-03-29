@@ -256,6 +256,7 @@ protected:
 	UINT m_nHiddenItems; /**< Count of items we have hidden */
 	UINT m_nSpecialItems; /**< Count of special items */
 	bool m_bTreeMode; /**< TRUE if tree mode is on*/
+	bool m_bAllowRescan; /**< Is rescan allowed */
 	DirCompProgressDlg *m_pCmpProgressDlg;
 	clock_t m_compareStart; /**< Starting process time of the compare */
 	String m_lastCopyFolder; /**< Last Copy To -target folder. */

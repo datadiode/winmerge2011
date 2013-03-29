@@ -118,8 +118,8 @@ CEditorFilePathBar::CEditorFilePathBar(
 	, m_rgOriginalText(2)
 	, m_pToolTips(NULL)
 {
-	m_rgActive[0] = FALSE;
-	m_rgActive[1] = FALSE;
+	m_rgActive[0] = false;
+	m_rgActive[1] = false;
 }
 
 /**
@@ -141,7 +141,9 @@ BOOL CEditorFilePathBar::Create(HWND parent)
 	LanguageSelect.Create(*this, parent);
 	SetDlgCtrlID(0x1000);
 	m_Edit[0] = static_cast<HEdit *>(GetDlgItem(IDC_STATIC_TITLE_LEFT));
+	m_Edit[0]->SetLimitText(0x7FFF);
 	m_Edit[1] = static_cast<HEdit *>(GetDlgItem(IDC_STATIC_TITLE_RIGHT));
+	m_Edit[1]->SetLimitText(0x7FFF);
 	m_pToolTips = HToolTips::Create(WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP);
 	TOOLINFO ti;
 	ti.cbSize = TTTOOLINFO_V1_SIZE;
@@ -328,7 +330,16 @@ void CEditorFilePathBar::OnContextMenu(POINT point)
 	}
 	const String &sOriginalText = m_rgOriginalText[pane];
 	HMenu *const pMenu = LanguageSelect.LoadMenu(IDR_POPUP_EDITOR_HEADERBAR);
-	HMenu *const pSub = pMenu->GetSubMenu(0);
+
+	HMenu *pSub = NULL;
+	UINT id = m_Edit[pane]->GetLimitText();
+	UINT uSubMenu = pMenu->GetMenuItemCount();
+	while (uSubMenu > 0)
+	{
+		pSub = pMenu->GetSubMenu(--uSubMenu);
+		if (pSub->CheckMenuRadioItem(id, id, id))
+			break;
+	}
 
 	if (paths_EndsWithSlash(sOriginalText.c_str()))
 		// no filename, we have to disable the unwanted menu entry
@@ -347,6 +358,8 @@ void CEditorFilePathBar::OnContextMenu(POINT point)
 	int iBegin = 0;
 	switch (command)
 	{
+	case 0:
+		break;
 	case ID_EDITOR_COPY_FILENAME:
 		iBegin = sOriginalText.rfind(_T('\\')) + 1;
 		break;
@@ -355,6 +368,8 @@ void CEditorFilePathBar::OnContextMenu(POINT point)
 		iBegin = sOriginalText[0] == _T('*') ? 2 : 0;
 		break;
 	default:
+		m_Edit[pane]->SetLimitText(command);
+		GetParent()->PostMessage(WM_COMMAND, m_Edit[pane]->GetDlgCtrlID());
 		return;
 	}
 	if (OpenClipboard())

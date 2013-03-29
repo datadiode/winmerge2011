@@ -611,6 +611,12 @@ IDR_POPUP_EDITOR_HEADERBAR MENU
         MENUITEM "&Copy Full Path", ID_EDITOR_COPY_PATH
         MENUITEM "Copy &Filename", ID_EDITOR_COPY_FILENAME
     }
+    POPUP "_POPUP_"
+    {
+        MENUITEM "Base Version", ID_MRGMAN_BASE
+        MENUITEM "Source Version", ID_MRGMAN_SOURCE
+        MENUITEM "Destination Version", ID_MRGMAN_DESTINATION
+    }
 }
 
 

@@ -94,10 +94,43 @@ void CDirFrame::InitCompare(LPCTSTR pszLeft, LPCTSTR pszRight, int nRecursive, C
 	m_nRecursive = nRecursive;
 }
 
-void CDirFrame::InitMrgmanCompare(LPCTSTR mrgmanFile)
+void CDirFrame::InitMrgmanCompare()
 {
-	m_bAllowRescan = false;
-	SetWindowText(mrgmanFile);
+	if (m_pDirView->m_bAllowRescan)
+	{
+		m_wndFilePathBar.SendDlgItemMessage(
+			IDC_STATIC_TITLE_LEFT, EM_SETLIMITTEXT, ID_MRGMAN_BASE);
+		m_wndFilePathBar.SendDlgItemMessage(
+			IDC_STATIC_TITLE_RIGHT, EM_SETLIMITTEXT, ID_MRGMAN_DESTINATION);
+		m_pDirView->m_bAllowRescan = false;
+	}
+	else
+	{
+		m_pDirView->DeleteAllItems();
+		delete m_pCtxt;
+		m_pCtxt = NULL;
+	}
+
+	UINT idLeftContent = m_wndFilePathBar.SendDlgItemMessage(IDC_STATIC_TITLE_LEFT, EM_GETLIMITTEXT);
+	UINT idRightContent = m_wndFilePathBar.SendDlgItemMessage(IDC_STATIC_TITLE_RIGHT, EM_GETLIMITTEXT);
+
+	SetLeftReadOnly(idLeftContent != ID_MRGMAN_DESTINATION);
+	SetRightReadOnly(idRightContent != ID_MRGMAN_DESTINATION);
+
+	String mrgmanFile;
+	GetWindowText(mrgmanFile);
+
+	if (HMenu *const pMenu = LanguageSelect.LoadMenu(IDR_POPUP_EDITOR_HEADERBAR))
+	{
+		HMenu *const pSub = pMenu->GetSubMenu(1);
+		TCHAR text[INFOTIPSIZE];
+		pSub->GetMenuString(idLeftContent, text, _countof(text));
+		m_wndFilePathBar.SetText(0, text, FALSE);
+		pSub->GetMenuString(idRightContent, text, _countof(text));
+		m_wndFilePathBar.SetText(1, text, FALSE);
+		pMenu->DestroyMenu();
+	}
+
 	String root;
 	CRegKeyEx rk;
 	if (ERROR_SUCCESS == rk.OpenWithAccess(HKEY_LOCAL_MACHINE,
@@ -106,9 +139,11 @@ void CDirFrame::InitMrgmanCompare(LPCTSTR mrgmanFile)
 		root = rk.ReadString(_T("drive"), _T("?"));
 		root += _T(":\\");
 	}
-	CMarkdown::File xml(mrgmanFile);
+
+	CMarkdown::File xml(mrgmanFile.c_str());
 	CMarkdown::EntityMap entities;
 	CMarkdown::Load(entities);
+
 	if (xml.Move("cfl") && xml.Pull())
 	{
 		if (xml.Move("session") && xml.Pull())
@@ -137,18 +172,42 @@ void CDirFrame::InitMrgmanCompare(LPCTSTR mrgmanFile)
 							string_replace(path, _T("/"), _T("\\"));
 							hstr->Free();
 						}
-						String base_version;
+						String base_version = _T("@@");
 						if (HString *hstr = CMarkdown(xml).Move("base-version").Pop().Move("selector").GetInnerText()->Uni(entities))
 						{
-							base_version = hstr->W;
+							base_version += hstr->W;
 							string_replace(base_version, _T("/"), _T("\\"));
+							hstr->Free();
+						}
+						String from_version = _T("@@");
+						if (HString *hstr = CMarkdown(xml).Move("from-version").Pop().Move("selector").GetInnerText()->Uni(entities))
+						{
+							from_version += hstr->W;
+							string_replace(from_version, _T("/"), _T("\\"));
 							hstr->Free();
 						}
 						DIFFITEM *di = m_pCtxt->AddDiff(NULL);
 						di->diffcode = DIFFCODE::NEEDSCAN;
 						di->left.path = di->right.path = paths_GetParentPath(path.c_str());
 						di->left.filename = di->right.filename = PathFindFileName(path.c_str());
-						di->left.filename += _T("@@") + base_version;
+						switch (idLeftContent)
+						{
+						case ID_MRGMAN_BASE:
+							di->left.filename += base_version;
+							break;
+						case ID_MRGMAN_SOURCE:
+							di->left.filename += from_version;
+							break;
+						}
+						switch (idRightContent)
+						{
+						case ID_MRGMAN_BASE:
+							di->right.filename += base_version;
+							break;
+						case ID_MRGMAN_SOURCE:
+							di->right.filename += from_version;
+							break;
+						}
 					}
 					do; while (xml.Move());
 					xml.Push();
@@ -162,10 +221,11 @@ void CDirFrame::InitMrgmanCompare(LPCTSTR mrgmanFile)
 		do; while (xml.Move());
 		xml.Push();
 	}
-	int cnt = 0;
-	int alldiffs = 0;
-	m_pDirView->RedisplayChildren(NULL, 0, cnt, alldiffs);
-	Rescan(m_pDirView->GetItemCount());
+
+	m_pDirView->Redisplay();
+
+	if (int nCompareSelected = m_pDirView->GetItemCount())
+		Rescan(nCompareSelected);
 }
 
 /**
@@ -297,8 +357,12 @@ void CDirFrame::Rescan(int nCompareSelected)
 		}
 	}
 
-	UpdateHeaderPath(0);
-	UpdateHeaderPath(1);
+	if (m_pDirView->m_bAllowRescan)
+	{
+		UpdateHeaderPath(0);
+		UpdateHeaderPath(1);
+	}
+
 	// draw the headers as active ones
 	m_wndFilePathBar.SetActive(0, true);
 	m_wndFilePathBar.SetActive(1, true);

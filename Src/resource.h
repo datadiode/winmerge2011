@@ -707,6 +707,9 @@
 #define IDS_EDIT_TEXT_NOT_FOUND                 18033
 #define ID_EDITOR_COPY_PATH                     18048
 #define ID_EDITOR_COPY_FILENAME                 18049
+#define ID_MRGMAN_BASE                          18050
+#define ID_MRGMAN_SOURCE                        18051
+#define ID_MRGMAN_DESTINATION                   18052
 #define IDS_LOCBAR_CAPTION                      18064
 #define IDS_DIFFBAR_CAPTION                     18065
 #define IDS_DIFF_SUCCEEDED                      18400

@@ -3798,8 +3798,9 @@ void CMainFrame::DoOpenMrgman(LPCTSTR mrgmanFile)
 {
 	if (CDirFrame *pDirDoc = GetDirDocToShow())
 	{
-		pDirDoc->InitMrgmanCompare(mrgmanFile);
+		pDirDoc->SetWindowText(mrgmanFile);
 		pDirDoc->ActivateFrame();
+		pDirDoc->InitMrgmanCompare();
 	}
 }
 
