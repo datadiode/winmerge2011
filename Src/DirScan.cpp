@@ -391,11 +391,11 @@ bool CDiffContext::UpdateDiffItem(DIFFITEM *di)
 	di->left.ClearPartial();
 	di->right.ClearPartial();
 	di->diffcode |= DIFFCODE::BOTH;
-	if (UpdateInfoFromDiskHalf(di, TRUE))
+	if (UpdateInfoFromDiskHalf(di, true))
 		bExists = true;
 	else
 		di->diffcode &= ~DIFFCODE::LEFT;
-	if (UpdateInfoFromDiskHalf(di, FALSE))
+	if (UpdateInfoFromDiskHalf(di, false))
 		bExists = true;
 	else
 		di->diffcode &= ~DIFFCODE::RIGHT;

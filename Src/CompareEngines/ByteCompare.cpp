@@ -255,7 +255,11 @@ unsigned ByteCompare::CompareFiles(FileLocation *location)
 	m_textStats[1].clear();
 
 	if (m_pCtxt->m_bStopAfterFirstDiff && (m_osfhandle[0] == m_osfhandle[1]))
-		return DIFFCODE::SAME;
+	{
+		m_textStats[0].nzeros = location[0].encoding.m_binary;
+		m_textStats[1].nzeros = location[1].encoding.m_binary;
+		return DIFFCODE::SAME | DIFFCODE::FILE | DIFFCODE::TEXTFLAGS;
+	}
 
 	unsigned code = DIFFCODE::DIFF;
 
