@@ -832,7 +832,7 @@ bool CLanguageSelect::SetLanguage(LANGID wLangId)
 	return true;
 }
 
-bool CLanguageSelect::GetPoHeaderProperty(const char *name, String &value) const
+bool CLanguageSelect::GetPoHeaderProperty(const char *name, stl::string &value) const
 {
 	size_t len = strlen(name);
 	const char *p = m_poheader.c_str();
@@ -843,7 +843,8 @@ bool CLanguageSelect::GetPoHeaderProperty(const char *name, String &value) const
 			p += len + 1;
 			p += strspn(p, " \t");
 			bool lossy = false;
-			ucr::maketstring(value, p, static_cast<int>(strcspn(p, " \t\r\n")), CP_ACP, &lossy);
+			len = strcspn(p, " \t\r\n");
+			value.assign(p, static_cast<stl::string::size_type>(len));
 			return true;
 		}
 		p = q + 1;

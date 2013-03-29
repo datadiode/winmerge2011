@@ -540,7 +540,7 @@ IDR_POPUP_DIRVIEW MENU
             MENUITEM "&Archive", ID_MERGE_COMPARE_ZIP
             MENUITEM "&Binary", ID_MERGE_COMPARE_HEX
             MENUITEM "&XML", ID_MERGE_COMPARE_XML
-            MENUITEM "PluginMonikers\\English.ini", IDC_SCRIPT_LAST
+            MENUITEM "PluginMonikers", IDC_SCRIPT_LAST
         }
         MENUITEM SEPARATOR
         POPUP "&Copy"

@@ -58,7 +58,7 @@ public:
 	int MsgBox(UINT, UINT = MB_OK) const;
 	int MsgBox(UINT, LPCTSTR, UINT = MB_OK) const;
 
-	bool GetPoHeaderProperty(const char *name, String &value) const;
+	bool GetPoHeaderProperty(const char *name, stl::string &value) const;
 // Implementation data
 private:
 	HINSTANCE m_hCurrentDll;

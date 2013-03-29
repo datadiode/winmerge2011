@@ -1031,7 +1031,7 @@ msgstr "&XML"
 
 #: Merge.rc:543
 #, c-format
-msgid "PluginMonikers\\English.ini"
+msgid "PluginMonikers"
 msgstr ""
 
 #: Merge.rc:546

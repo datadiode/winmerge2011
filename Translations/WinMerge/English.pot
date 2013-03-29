@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WinMerge\n"
 "Report-Msgid-Bugs-To: http://bugs.winmerge.org/\n"
-"POT-Creation-Date: 2013-03-29 06:43+0000\n"
+"POT-Creation-Date: 2013-03-29 07:15+0000\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: English <winmerge-translate@lists.sourceforge.net>\n"
@@ -1026,7 +1026,7 @@ msgstr ""
 
 #: Merge.rc:543
 #, c-format
-msgid "PluginMonikers\\English.ini"
+msgid "PluginMonikers"
 msgstr ""
 
 #: Merge.rc:546

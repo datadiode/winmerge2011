@@ -3843,34 +3843,47 @@ HMenu *CMainFrame::SetScriptMenu(HMenu *pMenu, LPCSTR section)
 	else if (pMenu && pMenu->GetMenuStringA(IDC_SCRIPT_LAST, text, _countof(text)))
 	{
 		m_pScriptMenu = HMenu::CreatePopupMenu();
+		stl::string language;
+		bool bLocalized = LanguageSelect.GetPoHeaderProperty("X-Poedit-Language", language);
 		char path[MAX_PATH];
 		GetModuleFileNameA(NULL, path, MAX_PATH);
 		PathRemoveFileSpecA(path);
 		DWORD cchSupplementFolder = 0;
 		do
 		{
-			PathAppendA(path, text);
-			UINT cp = GetPrivateProfileIntA("Locale", "CodePage", CP_ACP, path);
-			char buffer[0x8000];
-			if (GetPrivateProfileSectionA(section, buffer, _countof(buffer), path))
+			if (language.empty())
 			{
-				char *p = buffer;
-				unsigned id = IDC_SCRIPT_FIRST;
-				while (char *q = strchr(p, '='))
-				{
-					const size_t r = strlen(q);
-					*q++ = _T('\0');
-					if (id < IDC_SCRIPT_LAST)
-					{
-						pMenu->InsertMenuW(IDC_SCRIPT_LAST, MF_STRING, id, OString(HString::Oct(p)->Uni(cp)).W);
-						m_pScriptMenu->AppendMenuW(MF_STRING, id, OString(HString::Oct(q)->Uni(cp)).W);
-						++id;
-					}
-					p = q + r;
-				}
+				language = "English";
+				bLocalized = false;
 			}
-			cchSupplementFolder ^= ExpandEnvironmentStringsA("%SupplementFolder%", path, MAX_PATH);
-		} while ((cchSupplementFolder > 0) && (cchSupplementFolder < MAX_PATH));
+			do
+			{
+				PathAppendA(path, text);
+				PathAppendA(path, language.c_str());
+				PathAddExtensionA(path, ".ini");
+				UINT cp = GetPrivateProfileIntA("Locale", "CodePage", CP_ACP, path);
+				char buffer[0x8000];
+				if (GetPrivateProfileSectionA(section, buffer, _countof(buffer), path))
+				{
+					char *p = buffer;
+					unsigned id = IDC_SCRIPT_FIRST;
+					while (char *q = strchr(p, '='))
+					{
+						const size_t r = strlen(q);
+						*q++ = _T('\0');
+						if (id < IDC_SCRIPT_LAST)
+						{
+							pMenu->InsertMenuW(IDC_SCRIPT_LAST, MF_STRING, id, OString(HString::Oct(p)->Uni(cp)).W);
+							m_pScriptMenu->AppendMenuW(MF_STRING, id, OString(HString::Oct(q)->Uni(cp)).W);
+							++id;
+						}
+						p = q + r;
+					}
+				}
+				cchSupplementFolder ^= ExpandEnvironmentStringsA("%SupplementFolder%", path, MAX_PATH);
+			} while ((cchSupplementFolder > 0) && (cchSupplementFolder < MAX_PATH));
+			language.clear();
+		} while (bLocalized && m_pScriptMenu->GetMenuItemCount() == 0);
 		pMenu->DeleteMenu(IDC_SCRIPT_LAST);
 		pMenu = m_pScriptMenu;
 	}

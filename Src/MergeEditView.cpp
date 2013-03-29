@@ -1083,27 +1083,10 @@ void CMergeEditView::OnContextMenu(LPARAM lParam)
 	HMenu *pScriptMenu = NULL;
 	if (QueryEditable())
 	{
-		String language;
-		bool bLocalized = LanguageSelect.GetPoHeaderProperty("X-Poedit-Language", language);
-		do
-		{
-			pScriptMenu = theApp.m_pMainWnd->SetScriptMenu(pSub, NULL);
-			if (language.empty())
-			{
-				language = _T("English");
-				bLocalized = false;
-			}
-			language.insert(0, _T("PluginMonikers\\"));
-			language.append(_T(".ini"));
-			pSub->AppendMenu(MF_STRING, IDC_SCRIPT_LAST, language.c_str());
-			pScriptMenu = theApp.m_pMainWnd->SetScriptMenu(pSub, "EditorScripts.Menu");
-			if (pScriptMenu->GetMenuItemCount())
-			{
-				pSub->InsertMenu(IDC_SCRIPT_FIRST, MF_SEPARATOR);
-				break;
-			}
-			language.clear();
-		} while (bLocalized);
+		pSub->AppendMenu(MF_STRING, IDC_SCRIPT_LAST, _T("PluginMonikers"));
+		pScriptMenu = theApp.m_pMainWnd->SetScriptMenu(pSub, "EditorScripts.Menu");
+		if (pScriptMenu->GetMenuItemCount())
+			pSub->InsertMenu(IDC_SCRIPT_FIRST, MF_SEPARATOR);
 	}
 
 	int nCmd = pSub->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_RETURNCMD,
