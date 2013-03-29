@@ -2444,9 +2444,11 @@ LRESULT CMainFrame::OnWndMsg<WM_DROPFILES>(WPARAM wParam, LPARAM)
  * @brief Open given file to external editor specified in options.
  * @param [in] file Full path to file to open.
  */
-void CMainFrame::OpenFileToExternalEditor(LPCTSTR file)
+void CMainFrame::OpenFileToExternalEditor(LPCTSTR file, LPCTSTR editor)
 {
-	string_format sCmd(_T("%s \"%s\""), COptionsMgr::Get(OPT_EXT_EDITOR_CMD).c_str(), file);
+	if (editor == NULL)
+		editor = COptionsMgr::Get(OPT_EXT_EDITOR_CMD).c_str();
+	string_format sCmd(_T("%s \"%s\""), editor, file);
 	String sExecutable;
 	DecorateCmdLine(sCmd, sExecutable);
 	if (paths_PathIsExe(sExecutable.c_str()))

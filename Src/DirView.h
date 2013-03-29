@@ -152,7 +152,8 @@ private:
 	void DoMoveRightTo();
 	void DoOpen(SIDE_TYPE);
 	void DoOpenWith(SIDE_TYPE);
-	void DoOpenWithEditor(SIDE_TYPE);
+	void DoOpenWithEditor(SIDE_TYPE, LPCTSTR = NULL);
+	void DoOpenWithFrhed(SIDE_TYPE);
 	void ConfirmAndPerformActions(FileActionScript &, int selCount);
 	bool ConfirmActionList(FileActionScript &, int selCount);
 	void PerformActionList(FileActionScript &);

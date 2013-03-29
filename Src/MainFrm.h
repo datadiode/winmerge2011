@@ -134,7 +134,7 @@ public:
 
 	HMenu *SetScriptMenu(HMenu *, LPCSTR section);
 
-	static void OpenFileToExternalEditor(LPCTSTR file);
+	static void OpenFileToExternalEditor(LPCTSTR file, LPCTSTR editor = NULL);
 	void OpenFileWith(LPCTSTR file) const;
 	bool ParseArgsAndDoOpen(const MergeCmdLineInfo &);
 

@@ -850,12 +850,15 @@ void CDirView::GetItemFileNames(const DIFFITEM *di, String &strLeft, String &str
 void CDirView::DoOpen(SIDE_TYPE stype)
 {
 	String file = GetSelectedFileName(stype);
-	if (file.empty()) return;
-	int rtn = (int)ShellExecute(::GetDesktopWindow(), _T("edit"), file.c_str(), 0, 0, SW_SHOWNORMAL);
-	if (rtn==SE_ERR_NOASSOC)
-		rtn = (int)ShellExecute(::GetDesktopWindow(), _T("open"), file.c_str(), 0, 0, SW_SHOWNORMAL);
-	if (rtn==SE_ERR_NOASSOC)
-		DoOpenWith(stype);
+	if (file.empty())
+		return;
+	int rtn = (int)ShellExecute(NULL, _T("edit"), file.c_str(), 0, 0, SW_SHOWNORMAL);
+	if (rtn != SE_ERR_NOASSOC)
+		return;
+	rtn = (int)ShellExecute(NULL, _T("open"), file.c_str(), 0, 0, SW_SHOWNORMAL);
+	if (rtn != SE_ERR_NOASSOC)
+		return;
+	DoOpenWith(stype);
 }
 
 /// Open with dialog for file on selected side
@@ -866,12 +869,19 @@ void CDirView::DoOpenWith(SIDE_TYPE stype)
 		m_pFrame->m_pMDIFrame->OpenFileWith(file.c_str());
 }
 
-/// Open selected file  on specified side to external editor
-void CDirView::DoOpenWithEditor(SIDE_TYPE stype)
+/// Open selected file on specified side to external editor
+void CDirView::DoOpenWithEditor(SIDE_TYPE stype, LPCTSTR editor)
 {
 	String file = GetSelectedFileName(stype);
 	if (!file.empty())
-		m_pFrame->m_pMDIFrame->OpenFileToExternalEditor(file.c_str());
+		m_pFrame->m_pMDIFrame->OpenFileToExternalEditor(file.c_str(), editor);
+}
+
+/// Open selected file on specified side to Frhed
+void CDirView::DoOpenWithFrhed(SIDE_TYPE stype)
+{
+	String editor = GetModulePath() + _T("\\Frhed\\Frhed.exe");
+	DoOpenWithEditor(stype, editor.c_str());
 }
 
 /**

@@ -946,7 +946,7 @@ bool CDirView::OpenOneItem(DIFFITEM *di, String &path1, String &path2)
 			}
 		}
 		else if (di->isBin())
-			LanguageSelect.MsgBox(IDS_CANNOT_OPEN_BINARYFILE, MB_ICONSTOP);
+			DoOpenWithFrhed(SIDE_LEFT);
 		else
 			DoOpenWithEditor(SIDE_LEFT);
 		return false;
@@ -963,7 +963,7 @@ bool CDirView::OpenOneItem(DIFFITEM *di, String &path1, String &path2)
 			}
 		}
 		else if (di->isBin())
-			LanguageSelect.MsgBox(IDS_CANNOT_OPEN_BINARYFILE, MB_ICONSTOP);
+			DoOpenWithFrhed(SIDE_RIGHT);
 		else
 			DoOpenWithEditor(SIDE_RIGHT);
 		return false;
