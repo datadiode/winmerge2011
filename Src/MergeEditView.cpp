@@ -1079,28 +1079,32 @@ void CMergeEditView::OnContextMenu(LPARAM lParam)
 		ClientToScreen(&point);
 	}
 
-	String language;
-	bool bLocalized = LanguageSelect.GetPoHeaderProperty("X-Poedit-Language", language);
-	HMenu *pScriptMenu;
-	do
+	// If view is editable, add available editor scripts
+	HMenu *pScriptMenu = NULL;
+	if (QueryEditable())
 	{
-		pScriptMenu = theApp.m_pMainWnd->SetScriptMenu(pSub, NULL);
-		if (language.empty())
+		String language;
+		bool bLocalized = LanguageSelect.GetPoHeaderProperty("X-Poedit-Language", language);
+		do
 		{
-			language = _T("English");
-			bLocalized = false;
-		}
-		language.insert(0, _T("PluginMonikers\\"));
-		language.append(_T(".ini"));
-		pSub->AppendMenu(MF_STRING, IDC_SCRIPT_LAST, language.c_str());
-		pScriptMenu = theApp.m_pMainWnd->SetScriptMenu(pSub, "EditorScripts.Menu");
-		if (pScriptMenu->GetMenuItemCount())
-		{
-			pSub->InsertMenu(IDC_SCRIPT_FIRST, MF_SEPARATOR);
-			break;
-		}
-		language.clear();
-	} while (bLocalized);
+			pScriptMenu = theApp.m_pMainWnd->SetScriptMenu(pSub, NULL);
+			if (language.empty())
+			{
+				language = _T("English");
+				bLocalized = false;
+			}
+			language.insert(0, _T("PluginMonikers\\"));
+			language.append(_T(".ini"));
+			pSub->AppendMenu(MF_STRING, IDC_SCRIPT_LAST, language.c_str());
+			pScriptMenu = theApp.m_pMainWnd->SetScriptMenu(pSub, "EditorScripts.Menu");
+			if (pScriptMenu->GetMenuItemCount())
+			{
+				pSub->InsertMenu(IDC_SCRIPT_FIRST, MF_SEPARATOR);
+				break;
+			}
+			language.clear();
+		} while (bLocalized);
+	}
 
 	int nCmd = pSub->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_RETURNCMD,
 		point.x, point.y, theApp.m_pMainWnd->m_pWnd);
@@ -1146,9 +1150,12 @@ void CMergeEditView::OnContextMenu(LPARAM lParam)
 	{
 		m_pDocument->PostMessage(WM_COMMAND, nCmd);
 	}
-	theApp.m_pMainWnd->SetScriptMenu(pSub, NULL);
+	if (pScriptMenu)
+	{
+		theApp.m_pMainWnd->SetScriptMenu(pSub, NULL);
+		pScriptMenu->DestroyMenu();
+	}
 	pMenu->DestroyMenu();
-	pScriptMenu->DestroyMenu();
 }
 
 /**
