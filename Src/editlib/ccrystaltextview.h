@@ -31,12 +31,7 @@
 // ID line follows -- this is updated by SVN
 // $Id$
 
-#if !defined(AFX_CCRYSTALTEXTVIEW_H__AD7F2F41_6CB3_11D2_8C32_0080ADB86836__INCLUDED_)
-#define AFX_CCRYSTALTEXTVIEW_H__AD7F2F41_6CB3_11D2_8C32_0080ADB86836__INCLUDED_
-
-#if _MSC_VER >= 1000
 #pragma once
-#endif // _MSC_VER >= 1000
 
 #include "crystalparser.h"
 
@@ -47,7 +42,6 @@ class CCrystalTextBuffer;
 class CUpdateContext;
 struct ViewableWhitespaceChars;
 class CSyntaxColors;
-
 
 ////////////////////////////////////////////////////////////////////////////
 // CCrystalTextView class declaration
@@ -91,7 +85,7 @@ class EDITPADC_CLASS CCrystalTextView
 
 protected:
     //  Search parameters
-    BOOL m_bLastSearch;
+    bool m_bLastSearch;
     DWORD m_dwLastSearchFlags;
     String m_strLastFindWhat;
     bool m_bCursorHidden;
@@ -102,11 +96,11 @@ private:
     void CalcLineCharDim();
 
     //  Text attributes
-    BOOL m_bViewTabs;
-    BOOL m_bViewEols;
-    BOOL m_bDistinguishEols;
-    BOOL m_bSelMargin;
-    BOOL m_bViewLineNumbers;
+    bool m_bViewTabs;
+    bool m_bViewEols;
+    bool m_bDistinguishEols;
+    bool m_bSelMargin;
+    bool m_bViewLineNumbers;
     DWORD m_dwFlags;
 
     //  Amount of lines/characters that completely fits the client area
@@ -229,26 +223,25 @@ public:
     void UpdateCaret(bool bShowHide = false);
     void SetAnchor(const POINT &);
 
-protected :
+protected:
     POINT WordToRight(POINT pt);
     POINT WordToLeft(POINT pt);
-    bool m_bOverrideCaret;
+    bool m_bOvrMode;
 
     HImageList *m_pIcons;
     CCrystalTextBuffer *m_pTextBuffer;
-    BOOL m_bVertScrollBarLocked, m_bHorzScrollBarLocked;
     POINT m_ptDraggedTextBegin, m_ptDraggedTextEnd;
     int GetMarginWidth();
     bool IsValidTextPos(const POINT &);
     bool IsValidTextPosX(const POINT &);
     bool IsValidTextPosY(int);
 
-    BOOL m_bShowInactiveSelection;
+    bool m_bShowInactiveSelection;
     //  [JRT]
-    BOOL m_bDisableDragAndDrop;
+    bool m_bDisableDragAndDrop;
 
     //BEGIN SW
-    BOOL m_bWordWrap;
+    bool m_bWordWrap;
     CCrystalParser *m_pParser;
     //END SW
 
@@ -556,66 +549,66 @@ public:
     void GetHTMLStyles(String &);
     void GetHTMLAttribute(int nColorIndex, int nBgColorIndex, COLORREF crText, COLORREF crBkgnd, String &);
 
-    void GoToLine (int nLine, bool bRelative);
-    DWORD ParseLine (DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActualItems);
-    DWORD ParseLinePlain (DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActualItems);
-    DWORD ParseLineAsp (DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActualItems);
-    DWORD ParseLineBasic (DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActualItems);
-    DWORD ParseLineBatch (DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActualItems);
-    DWORD ParseLineC (DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActualItems);
-    DWORD ParseLineCSharp (DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActualItems);
-    DWORD ParseLineCss (DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActualItems);
-    DWORD ParseLineDcl (DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActualItems);
-    DWORD ParseLineFortran (DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActualItems);
-    DWORD ParseLineHtml (DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActualItems);
-    DWORD ParseLineIni (DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActualItems);
-    DWORD ParseLineInnoSetup (DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActualItems);
-    DWORD ParseLineIS (DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActualItems);
-    DWORD ParseLineJava (DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActualItems);
-    DWORD ParseLineLisp (DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActualItems);
-    DWORD ParseLineNsis (DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActualItems);
-    DWORD ParseLinePascal (DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActualItems);
-    DWORD ParseLinePerl (DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActualItems);
-    DWORD ParseLinePhp (DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActualItems);
-    DWORD ParseLinePo (DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActualItems);
-    DWORD ParseLinePowerShell (DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActualItems);
-    DWORD ParseLinePython (DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActualItems);
-    DWORD ParseLineRexx (DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActualItems);
-    DWORD ParseLineRsrc (DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActualItems);
-	DWORD ParseLineRuby (DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActualItems);
-    DWORD ParseLineSgml (DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActualItems);
-    DWORD ParseLineSh (DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActualItems);
-    DWORD ParseLineSiod (DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActualItems);
-    DWORD ParseLineSql (DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActualItems);
-    DWORD ParseLineTcl (DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActualItems);
-    DWORD ParseLineTex (DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActualItems);
-    DWORD ParseLineVerilog (DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActualItems);
-    DWORD ParseLineXml (DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActualItems);
+    void GoToLine(int nLine, bool bRelative);
+    DWORD ParseLine(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+    DWORD ParseLinePlain(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+    DWORD ParseLineAsp(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+    DWORD ParseLineBasic(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+    DWORD ParseLineBatch(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+    DWORD ParseLineC(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+    DWORD ParseLineCSharp(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+    DWORD ParseLineCss(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+    DWORD ParseLineDcl(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+    DWORD ParseLineFortran(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+    DWORD ParseLineHtml(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+    DWORD ParseLineIni(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+    DWORD ParseLineInnoSetup(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+    DWORD ParseLineIS(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+    DWORD ParseLineJava(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+    DWORD ParseLineLisp(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+    DWORD ParseLineNsis(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+    DWORD ParseLinePascal(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+    DWORD ParseLinePerl(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+    DWORD ParseLinePhp(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+    DWORD ParseLinePo(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+    DWORD ParseLinePowerShell(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+    DWORD ParseLinePython(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+    DWORD ParseLineRexx(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+    DWORD ParseLineRsrc(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+    DWORD ParseLineRuby(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+    DWORD ParseLineSgml(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+    DWORD ParseLineSh(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+    DWORD ParseLineSiod(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+    DWORD ParseLineSql(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+    DWORD ParseLineTcl(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+    DWORD ParseLineTex(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+    DWORD ParseLineVerilog(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+    DWORD ParseLineXml(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
 
     // Attributes
-public :
+public:
     int GetCRLFMode() const;
     void SetCRLFMode(enum CRLFSTYLE nCRLFMode);
-    BOOL GetViewTabs() const;
-    void SetViewTabs(BOOL bViewTabs);
-    void SetViewEols(BOOL bViewEols, BOOL bDistinguishEols);
+    bool GetViewTabs() const;
+    void SetViewTabs(bool);
+    void SetViewEols(bool bViewEols, bool bDistinguishEols);
     int GetTabSize() const;
     void SetTabSize(int nTabSize);
-    BOOL GetSelectionMargin() const;
-    void SetSelectionMargin(BOOL bSelMargin);
-	BOOL GetViewLineNumbers() const;
-	void SetViewLineNumbers(BOOL bViewLineNumbers);
+    bool GetSelectionMargin() const;
+    void SetSelectionMargin(bool);
+	bool GetViewLineNumbers() const;
+	void SetViewLineNumbers(bool);
     void GetFont(LOGFONT &) const;
     void SetFont(const LOGFONT &);
-    DWORD GetFlags ();
-    void SetFlags (DWORD dwFlags);
+    DWORD GetFlags();
+    void SetFlags(DWORD dwFlags);
     //  [JRT]:
-    BOOL GetDisableDragAndDrop () const;
-    void SetDisableDragAndDrop (BOOL bDDAD);
+    bool GetDisableDragAndDrop() const;
+    void SetDisableDragAndDrop(bool);
 
 	//BEGIN SW
-	BOOL GetWordWrapping() const;
-	void SetWordWrapping( BOOL bWordWrap );
+	bool GetWordWrapping() const;
+	void SetWordWrapping(bool);
 
 	/**
 	Sets the Parser to use to parse the file.
@@ -720,11 +713,11 @@ public :
     virtual void UpdateView(CCrystalTextView *pSource, CUpdateContext *pContext, DWORD dwFlags, int nLineIndex = -1);
 
     //  Attributes
-    const POINT & GetCursorPos () const;
-    void SetCursorPos (const POINT & ptCursorPos);
-    void ShowCursor ();
-    void HideCursor ();
-    void SetNewAnchor (const POINT & ptNewAnchor) { SetAnchor(ptNewAnchor); }
+    const POINT &GetCursorPos() const;
+    void SetCursorPos(const POINT & ptCursorPos);
+    void ShowCursor();
+    void HideCursor();
+    void SetNewAnchor(const POINT & ptNewAnchor) { SetAnchor(ptNewAnchor); }
 
     //  Operations
     virtual void EnsureVisible(POINT pt);
@@ -812,10 +805,3 @@ public:
 #else
 #define ASSERT_VALIDTEXTPOS(pt)
 #endif
-
-/////////////////////////////////////////////////////////////////////////////
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Developer Studio will insert additional declarations immediately before the previous line.
-
-#endif // !defined(AFX_CCRYSTALTEXTVIEW_H__AD7F2F41_6CB3_11D2_8C32_0080ADB86836__INCLUDED_)

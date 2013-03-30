@@ -2,18 +2,12 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_CRYSTALEDITVIEWEX_H__5353A214_1059_11D3_929E_CEFE4CA77E5E__INCLUDED_)
-#define AFX_CRYSTALEDITVIEWEX_H__5353A214_1059_11D3_929E_CEFE4CA77E5E__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include "ccrystaleditview.h"
 #include "crystalparser.h"
 
-
-class EDITPADC_CLASS CCrystalEditViewEx : public CCrystalEditView  
+class EDITPADC_CLASS CCrystalEditViewEx : public CCrystalEditView
 {
 
 protected:
@@ -76,5 +70,3 @@ protected:
 	*/
 	CCrystalParser *m_pSyntaxParser;
 };
-
-#endif // !defined(AFX_CRYSTALEDITVIEWEX_H__5353A214_1059_11D3_929E_CEFE4CA77E5E__INCLUDED_)

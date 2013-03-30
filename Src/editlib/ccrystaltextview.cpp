@@ -394,7 +394,7 @@ bool CCrystalTextView::SetTextType(TextDefinition *def)
 
 CCrystalTextView::CCrystalTextView(size_t ZeroInit)
 : ZeroInit(ZeroInit)
-, m_bSelMargin(TRUE)
+, m_bSelMargin(true)
 , m_nLastLineIndexCalculatedSubLineIndex(-1)
 {
 	m_bAutoDelete = true;
@@ -1813,11 +1813,9 @@ void CCrystalTextView::ResetView()
 		KillTimer(m_nDragSelTimer);
 	}
 	m_bDragSelection = false;
-	m_bVertScrollBarLocked = FALSE;
-	m_bHorzScrollBarLocked = FALSE;
 	if (m_hWnd)
 		UpdateCaret();
-	m_bShowInactiveSelection = TRUE; // FP: reverted because I like it
+	m_bShowInactiveSelection = true; // FP: reverted because I like it
 }
 
 void CCrystalTextView::UpdateCaret(bool bShowHide)
@@ -1826,7 +1824,16 @@ void CCrystalTextView::UpdateCaret(bool bShowHide)
 	if (m_bFocused && !m_bCursorHidden &&
 		CalculateActualOffset(m_ptCursorPos.y, m_ptCursorPos.x) >= m_nOffsetChar)
 	{
-		CreateCaret(NULL, m_bOverrideCaret ? GetCharWidth() : 2, GetLineHeight());
+		int nWidth = 2;
+		if (m_bOvrMode && !IsSelection() &&
+			m_ptCursorPos.x < GetLineLength(m_ptCursorPos.y))
+		{
+			if (LPCTSTR pch = GetLineChars(m_ptCursorPos.y))
+			{
+				nWidth = GetCharWidth() * GetCharWidthFromChar(pch + m_ptCursorPos.x);
+			}
+		}
+		CreateCaret(NULL, nWidth, GetLineHeight());
 		POINT ptCaretPos = TextToClient(m_ptCursorPos);
 		SetCaretPos(ptCaretPos.x, ptCaretPos.y);
 		ShowCaret();
@@ -2353,7 +2360,7 @@ void CCrystalTextView::DetachFromBuffer()
 {
 	if (m_pTextBuffer)
 	{
-		m_pTextBuffer->RemoveView (this);
+		m_pTextBuffer->RemoveView(this);
 		m_pTextBuffer = NULL;
 		// don't reset CCrystalEditView options
 		CCrystalTextView::ResetView();
@@ -3004,123 +3011,123 @@ void CCrystalTextView::UpdateView(CCrystalTextView *pSource, CUpdateContext *pCo
 		return;
 	}
 
-  int nLineCount = GetLineCount ();
-  ASSERT(nLineCount > 0);
-  ASSERT(nLineIndex >= -1 && nLineIndex < nLineCount);
-  if ((dwFlags & UPDATE_SINGLELINE) != 0)
-    {
-      ASSERT(nLineIndex != -1);
-      //  All text below this line should be reparsed
-      const int cookiesSize = m_ParseCookies.size();
-      if (cookiesSize > 0)
-        {
-          ASSERT(cookiesSize == nLineCount);
-          // must be reinitialized to invalid value (DWORD) - 1
-          for (int i = nLineIndex; i < cookiesSize; ++i)
-            m_ParseCookies[i] = -1;
-        }
-      //  This line'th actual length must be recalculated
-      if (m_pnActualLineLength.size())
-        {
-          ASSERT(m_pnActualLineLength.size() == nLineCount);
-          // must be initialized to invalid code -1
-          m_pnActualLineLength[nLineIndex] = -1;
-      //BEGIN SW
-          InvalidateLineCache(nLineIndex, nLineIndex);
-      //END SW
-        }
-      //  Repaint the lines
-      InvalidateLines(nLineIndex, -1, TRUE);
-    }
-  else
-    {
-      if (m_bViewLineNumbers)
-        // if enabling linenumber, we must invalidate all line-cache in visible area because selection margin width changes dynamically.
-        nLineIndex = m_nTopLine < nLineIndex ? m_nTopLine : nLineIndex;
+	int nLineCount = GetLineCount ();
+	ASSERT(nLineCount > 0);
+	ASSERT(nLineIndex >= -1 && nLineIndex < nLineCount);
+	if ((dwFlags & UPDATE_SINGLELINE) != 0)
+	{
+		if (nLineIndex != -1)
+		{
+			//  All text below this line should be reparsed
+			const int cookiesSize = m_ParseCookies.size();
+			if (cookiesSize > 0)
+			{
+				ASSERT(cookiesSize == nLineCount);
+				// must be reinitialized to invalid value (DWORD) - 1
+				for (int i = nLineIndex; i < cookiesSize; ++i)
+					m_ParseCookies[i] = -1;
+			}
+			//  This line'th actual length must be recalculated
+			if (m_pnActualLineLength.size())
+			{
+				ASSERT(m_pnActualLineLength.size() == nLineCount);
+				// must be initialized to invalid code -1
+				m_pnActualLineLength[nLineIndex] = -1;
+				//BEGIN SW
+				InvalidateLineCache(nLineIndex, nLineIndex);
+				//END SW
+			}
+			//  Repaint the lines
+			InvalidateLines(nLineIndex, -1, TRUE);
+		}
+	}
+	else
+	{
+		if (m_bViewLineNumbers)
+			// if enabling linenumber, we must invalidate all line-cache in visible area because selection margin width changes dynamically.
+			nLineIndex = m_nTopLine < nLineIndex ? m_nTopLine : nLineIndex;
 
-      if (nLineIndex == -1)
-        nLineIndex = 0;         //  Refresh all text
+		if (nLineIndex == -1)
+			nLineIndex = 0;         //  Refresh all text
 
-      //  All text below this line should be reparsed
-      if (m_ParseCookies.size())
-        {
-          stl_size_t arrSize = m_ParseCookies.size();
-          if (arrSize != nLineCount)
-            {
-              stl_size_t oldsize = arrSize; 
-              m_ParseCookies.resize(nLineCount);
-              arrSize = nLineCount;
-              // must be initialized to invalid value (DWORD) - 1
-              for (stl_size_t i = oldsize; i < arrSize; ++i)
-                m_ParseCookies[i] = -1;
-            }
-          for (stl_size_t i = nLineIndex; i < arrSize; ++i)
-            m_ParseCookies[i] = -1;
-        }
+		//  All text below this line should be reparsed
+		if (m_ParseCookies.size())
+		{
+			stl_size_t arrSize = m_ParseCookies.size();
+			if (arrSize != nLineCount)
+			{
+				stl_size_t oldsize = arrSize; 
+				m_ParseCookies.resize(nLineCount);
+				arrSize = nLineCount;
+				// must be initialized to invalid value (DWORD) - 1
+				for (stl_size_t i = oldsize; i < arrSize; ++i)
+				m_ParseCookies[i] = -1;
+			}
+			for (stl_size_t i = nLineIndex; i < arrSize; ++i)
+				m_ParseCookies[i] = -1;
+		}
 
-      //  Recalculate actual length for all lines below this
-      if (m_pnActualLineLength.size())
-        {
+		//  Recalculate actual length for all lines below this
+		if (m_pnActualLineLength.size())
+		{
 			stl_size_t arrsize = m_pnActualLineLength.size();
 			if (arrsize != nLineCount)
-            {
-              //  Reallocate actual length array
-              stl_size_t oldsize = arrsize; 
-              m_pnActualLineLength.resize(nLineCount);
-			  arrsize = nLineCount;
-              // must be initialized to invalid code -1
-              for (stl_size_t i = oldsize; i < arrsize; ++i)
-                m_pnActualLineLength[i] = -1;
-            }
-          for (stl_size_t i = nLineIndex; i < arrsize; ++i)
-            m_pnActualLineLength[i] = -1;
-        }
-    //BEGIN SW
-    InvalidateLineCache( nLineIndex, -1 );
-    //END SW
-      //  Repaint the lines
-      InvalidateLines (nLineIndex, -1, TRUE);
-    }
+			{
+				//  Reallocate actual length array
+				stl_size_t oldsize = arrsize; 
+				m_pnActualLineLength.resize(nLineCount);
+				arrsize = nLineCount;
+				// must be initialized to invalid code -1
+				for (stl_size_t i = oldsize; i < arrsize; ++i)
+				m_pnActualLineLength[i] = -1;
+			}
+			for (stl_size_t i = nLineIndex; i < arrsize; ++i)
+				m_pnActualLineLength[i] = -1;
+		}
+		//BEGIN SW
+		InvalidateLineCache(nLineIndex, -1);
+		//END SW
+		//  Repaint the lines
+		InvalidateLines(nLineIndex, -1, TRUE);
+	}
 
-  //  All those points must be recalculated and validated
-  if (pContext != NULL)
-    {
-      pContext->RecalcPoint(m_ptCursorPos);
-      pContext->RecalcPoint(m_ptSelStart);
-      pContext->RecalcPoint(m_ptSelEnd);
-      pContext->RecalcPoint(m_ptAnchor);
-      ASSERT_VALIDTEXTPOS(m_ptCursorPos);
-      ASSERT_VALIDTEXTPOS(m_ptSelStart);
-      ASSERT_VALIDTEXTPOS(m_ptSelEnd);
-      ASSERT_VALIDTEXTPOS(m_ptAnchor);
-      if (m_bDraggingText)
-        {
-          pContext->RecalcPoint(m_ptDraggedTextBegin);
-          pContext->RecalcPoint(m_ptDraggedTextEnd);
-          ASSERT_VALIDTEXTPOS(m_ptDraggedTextBegin);
-          ASSERT_VALIDTEXTPOS(m_ptDraggedTextEnd);
-        }
-	  POINT ptTopLine = { 0, m_nTopLine };
-      pContext->RecalcPoint(ptTopLine);
-      ASSERT_VALIDTEXTPOS(ptTopLine);
-      m_nTopLine = ptTopLine.y;
-      UpdateCaret ();
-    }
+	//  All those points must be recalculated and validated
+	if (pContext != NULL)
+	{
+		pContext->RecalcPoint(m_ptCursorPos);
+		pContext->RecalcPoint(m_ptSelStart);
+		pContext->RecalcPoint(m_ptSelEnd);
+		pContext->RecalcPoint(m_ptAnchor);
+		ASSERT_VALIDTEXTPOS(m_ptCursorPos);
+		ASSERT_VALIDTEXTPOS(m_ptSelStart);
+		ASSERT_VALIDTEXTPOS(m_ptSelEnd);
+		ASSERT_VALIDTEXTPOS(m_ptAnchor);
+		if (m_bDraggingText)
+		{
+			pContext->RecalcPoint(m_ptDraggedTextBegin);
+			pContext->RecalcPoint(m_ptDraggedTextEnd);
+			ASSERT_VALIDTEXTPOS(m_ptDraggedTextBegin);
+			ASSERT_VALIDTEXTPOS(m_ptDraggedTextEnd);
+		}
+		POINT ptTopLine = { 0, m_nTopLine };
+		pContext->RecalcPoint(ptTopLine);
+		ASSERT_VALIDTEXTPOS(ptTopLine);
+		m_nTopLine = ptTopLine.y;
+		UpdateCaret();
+	}
 
-  //  Recalculate vertical scrollbar, if needed
-  if ((dwFlags & UPDATE_VERTRANGE) != 0)
-    {
-      if (!m_bVertScrollBarLocked)
-        RecalcVertScrollBar ();
-    }
+	//  Recalculate vertical scrollbar, if needed
+	if ((dwFlags & UPDATE_VERTRANGE) != 0)
+	{
+		RecalcVertScrollBar();
+	}
 
-  //  Recalculate horizontal scrollbar, if needed
-  if ((dwFlags & UPDATE_HORZRANGE) != 0)
-    {
-      m_nMaxLineLength = -1;
-      if (!m_bHorzScrollBarLocked)
-        RecalcHorzScrollBar ();
-    }
+	//  Recalculate horizontal scrollbar, if needed
+	if ((dwFlags & UPDATE_HORZRANGE) != 0)
+	{
+		m_nMaxLineLength = -1;
+		RecalcHorzScrollBar();
+	}
 }
 
 void CCrystalTextView::SetAnchor(const POINT & ptNewAnchor)
@@ -3165,7 +3172,7 @@ void CCrystalTextView::UpdateCompositionWindowFont() /* IME */
 	ImmReleaseContext(m_hWnd, hIMC);
 }
 
-void CCrystalTextView::SetSelectionMargin(BOOL bSelMargin)
+void CCrystalTextView::SetSelectionMargin(bool bSelMargin)
 {
 	if (m_bSelMargin != bSelMargin)
 	{
@@ -3180,7 +3187,7 @@ void CCrystalTextView::SetSelectionMargin(BOOL bSelMargin)
 	}
 }
 
-void CCrystalTextView::SetViewLineNumbers(BOOL bViewLineNumbers)
+void CCrystalTextView::SetViewLineNumbers(bool bViewLineNumbers)
 {
 	if (m_bViewLineNumbers != bViewLineNumbers)
 	{
@@ -3747,7 +3754,7 @@ void CCrystalTextView::OnEditFind()
 	if (dlg.m_bConfirmed)
 	{
 		//  Save search parameters for 'F3' command
-		m_bLastSearch = TRUE;
+		m_bLastSearch = true;
 		m_strLastFindWhat = dlg.m_sText;
 		m_dwLastSearchFlags = 0;
 		if (dlg.m_bMatchCase)
@@ -3767,10 +3774,10 @@ void CCrystalTextView::OnEditFind()
 
 void CCrystalTextView::OnEditRepeat()
 {
-  BOOL bEnable = m_bLastSearch;
+  bool bEnable = m_bLastSearch;
   // Show dialog if no last find text
   if (m_strLastFindWhat.empty())
-    bEnable = FALSE;
+    bEnable = false;
   String sText;
   if (bEnable)
     sText = m_strLastFindWhat;
@@ -3787,12 +3794,12 @@ void CCrystalTextView::OnEditRepeat()
     }
 
   // CTRL-F3 will find selected text..
-  BOOL bControlKey = (::GetAsyncKeyState(VK_CONTROL)& 0x8000) != 0;
+  bool bControlKey = (::GetAsyncKeyState(VK_CONTROL)& 0x8000) != 0;
   // CTRL-SHIFT-F3 will find selected text, but opposite direction
-  BOOL bShiftKey = (::GetAsyncKeyState(VK_SHIFT)& 0x8000) != 0;
+  bool bShiftKey = (::GetAsyncKeyState(VK_SHIFT)& 0x8000) != 0;
   if (bControlKey && IsSelection())
     {
-      bEnable = TRUE;
+      bEnable = true;
       POINT ptSelStart, ptSelEnd;
       GetSelection (ptSelStart, ptSelEnd);
       GetText (ptSelStart, ptSelEnd, sText);
@@ -3807,19 +3814,19 @@ void CCrystalTextView::OnEditRepeat()
       //BEGIN SW
       // for correct backward search we need some changes:
       POINT ptSearchPos = m_ptCursorPos;
-      if( m_dwLastSearchFlags & FIND_DIRECTION_UP && IsSelection() )
+      if (m_dwLastSearchFlags & FIND_DIRECTION_UP && IsSelection())
         {
           POINT ptDummy;
           GetSelection( ptSearchPos, ptDummy );
         }
 
-      if (! FindText(sText.c_str(), ptSearchPos, m_dwLastSearchFlags,
+      if (!FindText(sText.c_str(), ptSearchPos, m_dwLastSearchFlags,
             (m_dwLastSearchFlags & FIND_NO_WRAP) == 0, &ptFoundPos))
         {
           LanguageSelect.Format(IDS_EDIT_TEXT_NOT_FOUND, sText.c_str()).MsgBox();
           return;
         }
-      HighlightText (ptFoundPos, m_nLastFindWhatLen, (m_dwLastSearchFlags & FIND_DIRECTION_UP) != 0);
+      HighlightText(ptFoundPos, m_nLastFindWhatLen, (m_dwLastSearchFlags & FIND_DIRECTION_UP) != 0);
     }
   else
     OnEditFind(); // No previous find, open Find-dialog
@@ -3886,12 +3893,12 @@ void CCrystalTextView::OnClearAllBookmarks()
 	m_bBookmarkExist = false;
 }
 
-BOOL CCrystalTextView::GetViewTabs() const
+bool CCrystalTextView::GetViewTabs() const
 {
 	return m_bViewTabs;
 }
 
-void CCrystalTextView::SetViewTabs(BOOL bViewTabs)
+void CCrystalTextView::SetViewTabs(bool bViewTabs)
 {
 	if (bViewTabs != m_bViewTabs)
 	{
@@ -3901,7 +3908,7 @@ void CCrystalTextView::SetViewTabs(BOOL bViewTabs)
 	}
 }
 
-void CCrystalTextView::SetViewEols(BOOL bViewEols, BOOL bDistinguishEols)
+void CCrystalTextView::SetViewEols(bool bViewEols, bool bDistinguishEols)
 {
 	if (bViewEols != m_bViewEols || bDistinguishEols != m_bDistinguishEols)
 	{
@@ -3927,12 +3934,12 @@ void CCrystalTextView::SetFlags(DWORD dwFlags)
 	}
 }
 
-BOOL CCrystalTextView::GetSelectionMargin() const
+bool CCrystalTextView::GetSelectionMargin() const
 {
 	return m_bSelMargin;
 }
 
-BOOL CCrystalTextView::GetViewLineNumbers() const
+bool CCrystalTextView::GetViewLineNumbers() const
 {
 	return m_bViewLineNumbers;
 }
@@ -3974,15 +3981,15 @@ int CCrystalTextView::GetMarginWidth()
 }
 
 //  [JRT]
-BOOL CCrystalTextView::GetDisableDragAndDrop() const
+bool CCrystalTextView::GetDisableDragAndDrop() const
 {
 	return m_bDisableDragAndDrop;
 }
 
 //  [JRT]
-void CCrystalTextView::SetDisableDragAndDrop(BOOL bDDAD)
+void CCrystalTextView::SetDisableDragAndDrop(bool bDisableDragAndDrop)
 {
-	m_bDisableDragAndDrop = bDDAD;
+	m_bDisableDragAndDrop = bDisableDragAndDrop;
 }
 
 // Mouse wheel event. zDelta is in multiples of 120.
@@ -4198,12 +4205,12 @@ BOOL CCrystalTextView::CanMatchBrace()
 }
 
 //BEGIN SW
-BOOL CCrystalTextView::GetWordWrapping() const
+bool CCrystalTextView::GetWordWrapping() const
 {
 	return m_bWordWrap;
 }
 
-void CCrystalTextView::SetWordWrapping(BOOL bWordWrap)
+void CCrystalTextView::SetWordWrapping(bool bWordWrap)
 {
 	m_bWordWrap = bWordWrap;
 	if (m_hWnd)

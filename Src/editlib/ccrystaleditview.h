@@ -24,12 +24,7 @@
 //        and maybe "ugly" code ...
 ////////////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_CCRYSTALEDITVIEW_H__8F3F8B63_6F66_11D2_8C34_0080ADB86836__INCLUDED_)
-#define AFX_CCRYSTALEDITVIEW_H__8F3F8B63_6F66_11D2_8C34_0080ADB86836__INCLUDED_
-
-#if _MSC_VER >= 1000
 #pragma once
-#endif // _MSC_VER >= 1000
 
 #include "ccrystaltextview.h"
 #include "ccrystaltextbuffer.h"
@@ -58,7 +53,6 @@ protected:
     bool m_bSelectionPushed;
     POINT m_ptSavedSelStart, m_ptSavedSelEnd;
 private:
-    bool m_bOvrMode;
     POINT m_ptDropPos;
     bool m_bAutoIndent;
 
@@ -132,10 +126,3 @@ public:
 	void OnEditDeleteWord ();
 	void OnEditDeleteWordBack ();
   };
-
-/////////////////////////////////////////////////////////////////////////////
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Developer Studio will insert additional declarations immediately before the previous line.
-
-#endif // !defined(AFX_CCRYSTALEDITVIEW_H__8F3F8B63_6F66_11D2_8C34_0080ADB86836__INCLUDED_)

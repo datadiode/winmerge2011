@@ -31,7 +31,6 @@
 // ID line follows -- this is updated by SVN
 // $Id$
 
-
 #pragma once
 
 #include "LineInfo.h"
@@ -283,5 +282,3 @@ public:
 	// More bookmarks
 	int FindNextBookmarkLine(int nCurrentLine, int nDirection) const;
 };
-
-/////////////////////////////////////////////////////////////////////////////

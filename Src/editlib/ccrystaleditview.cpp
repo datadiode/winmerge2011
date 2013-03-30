@@ -441,13 +441,12 @@ void CCrystalEditView::OnEditTab()
 		EnsureVisible(ptSelEnd);
 
 		//  Shift selection to right
-		m_bHorzScrollBarLocked = TRUE;
 		for (int i = nStartLine ; i <= nEndLine ; ++i)
 		{
-			m_pTextBuffer->InsertText(this, i, 0, pszText, static_cast<int>(_tcslen(pszText)), CE_ACTION_INDENT);  //  [JRT]
+			m_pTextBuffer->InsertText(NULL, i, 0, pszText, static_cast<int>(_tcslen(pszText)), CE_ACTION_INDENT);  //  [JRT]
+			m_pTextBuffer->UpdateViews(this, NULL, UPDATE_SINGLELINE, i);
 		}
-		m_bHorzScrollBarLocked = FALSE;
-		RecalcHorzScrollBar();
+		m_pTextBuffer->UpdateViews(this, NULL, UPDATE_SINGLELINE | UPDATE_HORZRANGE);
 		m_pTextBuffer->FlushUndoGroup(this);
 		return;
 	}
@@ -536,7 +535,6 @@ void CCrystalEditView::OnEditUntab()
 		EnsureVisible(ptSelEnd);
 
 		//  Shift selection to left
-		m_bHorzScrollBarLocked = TRUE;
 		for (int i = nStartLine ; i <= nEndLine ; ++i)
         {
 			int nLength = GetLineLength(i);
@@ -560,11 +558,13 @@ void CCrystalEditView::OnEditUntab()
 					}
 				}
 				if (nPos > 0)
-					m_pTextBuffer->DeleteText(this, i, 0, i, nPos, CE_ACTION_INDENT);  // [JRT]
+				{
+					m_pTextBuffer->DeleteText(NULL, i, 0, i, nPos, CE_ACTION_INDENT);  // [JRT]
+					m_pTextBuffer->UpdateViews(this, NULL, UPDATE_SINGLELINE, i);
+				}
 			}
 		}
-		m_bHorzScrollBarLocked = FALSE;
-		RecalcHorzScrollBar();
+		m_pTextBuffer->UpdateViews(this, NULL, UPDATE_SINGLELINE | UPDATE_HORZRANGE);
 		m_pTextBuffer->FlushUndoGroup(this);
 	}
   else
