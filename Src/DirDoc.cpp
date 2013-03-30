@@ -111,8 +111,10 @@ void CDirFrame::InitMrgmanCompare()
 		m_pCtxt = NULL;
 	}
 
-	UINT idLeftContent = m_wndFilePathBar.SendDlgItemMessage(IDC_STATIC_TITLE_LEFT, EM_GETLIMITTEXT);
-	UINT idRightContent = m_wndFilePathBar.SendDlgItemMessage(IDC_STATIC_TITLE_RIGHT, EM_GETLIMITTEXT);
+	UINT idLeftContent = static_cast<UINT>(
+		m_wndFilePathBar.SendDlgItemMessage(IDC_STATIC_TITLE_LEFT, EM_GETLIMITTEXT));
+	UINT idRightContent = static_cast<UINT>(
+		m_wndFilePathBar.SendDlgItemMessage(IDC_STATIC_TITLE_RIGHT, EM_GETLIMITTEXT));
 
 	SetLeftReadOnly(idLeftContent != ID_MRGMAN_DESTINATION);
 	SetRightReadOnly(idRightContent != ID_MRGMAN_DESTINATION);
