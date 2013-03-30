@@ -1821,29 +1821,36 @@ void CCrystalTextView::ResetView()
 void CCrystalTextView::UpdateCaret(bool bShowHide)
 {
 	ASSERT_VALIDTEXTPOS(m_ptCursorPos);
-	if (m_bFocused && !m_bCursorHidden &&
-		CalculateActualOffset(m_ptCursorPos.y, m_ptCursorPos.x) >= m_nOffsetChar)
+	if (m_bFocused && !m_bCursorHidden)
 	{
-		int nWidth = 2;
-		if (m_bOvrMode && !IsSelection() &&
-			m_ptCursorPos.x < GetLineLength(m_ptCursorPos.y))
+		int nActualOffset = CalculateActualOffset(m_ptCursorPos.y, m_ptCursorPos.x);
+		if (nActualOffset >= m_nOffsetChar)
 		{
-			if (LPCTSTR pch = GetLineChars(m_ptCursorPos.y))
+			int nWidth = 2;
+			if (m_bOvrMode && !IsSelection() &&
+				m_ptCursorPos.x < GetLineLength(m_ptCursorPos.y))
 			{
-				nWidth = GetCharWidth() * GetCharWidthFromChar(pch + m_ptCursorPos.x);
+				if (LPCTSTR pch = GetLineChars(m_ptCursorPos.y))
+				{
+					pch += m_ptCursorPos.x;
+					nWidth = GetCharWidth() * GetCharWidthFromChar(pch);
+					if (*pch == _T('\t'))
+					{
+						int nTabSize = GetTabSize();
+						nWidth *= nTabSize - nActualOffset % nTabSize;
+					}
+				}
 			}
+			CreateCaret(NULL, nWidth, GetLineHeight());
+			POINT ptCaretPos = TextToClient(m_ptCursorPos);
+			SetCaretPos(ptCaretPos.x, ptCaretPos.y);
+			ShowCaret();
+			UpdateCompositionWindowPos(); /* IME */
+			OnUpdateCaret(bShowHide);
+			return;
 		}
-		CreateCaret(NULL, nWidth, GetLineHeight());
-		POINT ptCaretPos = TextToClient(m_ptCursorPos);
-		SetCaretPos(ptCaretPos.x, ptCaretPos.y);
-		ShowCaret();
-		UpdateCompositionWindowPos(); /* IME */
-		OnUpdateCaret(bShowHide);
 	}
-	else
-	{
-		HideCaret();
-	}
+	HideCaret();
 }
 
 void CCrystalTextView::OnUpdateCaret(bool)
