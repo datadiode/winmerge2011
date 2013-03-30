@@ -451,8 +451,11 @@ void CCrystalEditView::OnEditTab()
 		//  Shift selection to right
 		for (int i = nStartLine ; i <= nEndLine ; ++i)
 		{
-			m_pTextBuffer->InsertText(NULL, i, 0, pszText, static_cast<int>(_tcslen(pszText)), CE_ACTION_INDENT);  //  [JRT]
-			m_pTextBuffer->UpdateViews(this, NULL, UPDATE_SINGLELINE, i);
+			if (GetLineLength(i))
+			{
+				m_pTextBuffer->InsertText(NULL, i, 0, pszText, static_cast<int>(_tcslen(pszText)), CE_ACTION_INDENT);  //  [JRT]
+				m_pTextBuffer->UpdateViews(this, NULL, UPDATE_SINGLELINE, i);
+			}
 		}
 		m_pTextBuffer->UpdateViews(this, NULL, UPDATE_SINGLELINE | UPDATE_HORZRANGE);
 		m_pTextBuffer->FlushUndoGroup(this);
