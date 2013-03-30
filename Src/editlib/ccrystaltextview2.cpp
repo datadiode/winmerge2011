@@ -228,7 +228,7 @@ void CCrystalTextView::MoveWordRight(BOOL bSelect)
 		++nPos;
 
 	m_ptCursorPos.x = nPos;
-	m_nIdealCharPos = CalculateActualOffset (m_ptCursorPos.y, m_ptCursorPos.x);
+	m_nIdealCharPos = CalculateActualOffset(m_ptCursorPos.y, m_ptCursorPos.x);
 	AdjustCursorAfterMoveRight();
 	if (!bSelect)
 		m_ptAnchor = m_ptCursorPos;
@@ -548,232 +548,169 @@ void CCrystalTextView::OnLButtonDown(LPARAM lParam)
 	bool bShift = GetKeyState(VK_SHIFT) < 0;
 	bool bControl = GetKeyState(VK_CONTROL) < 0;
 
-  if (point.x < GetMarginWidth ())
+	if (point.x < GetMarginWidth())
+	{
+		if (bControl)
+		{
+			SelectAll();
+		}
+		else
+		{
+			AdjustTextPoint(point);
+			m_ptCursorPos = ClientToText(point);
+			// Find char pos that is the beginning of the subline clicked on
+			POINT pos;
+			CharPosToPoint(m_ptCursorPos.y, m_ptCursorPos.x, pos);
+			m_ptCursorPos.x = SubLineHomeToCharPos(m_ptCursorPos.y, pos.y);
+			if (!bShift)
+				m_ptAnchor = m_ptCursorPos;
+			SetCapture();
+			m_nDragSelTimer = SetTimer(CRYSTAL_TIMER_DRAGSEL, 100, NULL);
+			ASSERT(m_nDragSelTimer != 0);
+			m_bWordSelection = false;
+			m_bLineSelection = true;
+			m_bDragSelection = true;
+			OnMouseMove(lParam);
+		}
+	}
+	else
     {
-      AdjustTextPoint (point);
-      if (bControl)
-        {
-          SelectAll ();
-        }
-      else
-        {
-          m_ptCursorPos = ClientToText(point);
-          const int nSubLines = GetSubLineCount();
+		POINT ptText = ClientToText(point);
+		PrepareSelBounds();
+		//  [JRT]:  Support For Disabling Drag and Drop...
+		if (IsInsideSelBlock(ptText) &&    // If Inside Selection Area
+			!m_bDisableDragAndDrop)    // And D&D Not Disabled
+		{
+			m_bPreparingToDrag = true;
+		}
+		else
+		{
+			AdjustTextPoint(point);
+			m_ptCursorPos = ClientToText(point);
+			if (!bShift)
+				m_ptAnchor = m_ptCursorPos;
+			SetCapture();
+			m_nDragSelTimer = SetTimer(CRYSTAL_TIMER_DRAGSEL, 100, NULL);
+			ASSERT(m_nDragSelTimer != 0);
+			m_bWordSelection = bControl;
+			m_bLineSelection = false;
+			m_bDragSelection = true;
+			OnMouseMove(lParam);
+		}
+	}
 
-          // Find char pos that is the beginning of the subline clicked on
-          POINT pos;
-          CharPosToPoint(m_ptCursorPos.y, m_ptCursorPos.x, pos);
-          m_ptCursorPos.x = SubLineHomeToCharPos(m_ptCursorPos.y, pos.y);
-
-          if (!bShift)
-            m_ptAnchor = m_ptCursorPos;
-
-          POINT ptStart, ptEnd;
-          CharPosToPoint (m_ptAnchor.y, m_ptAnchor.x, pos);
-          ptStart.x = 0;
-          ptStart.y = m_ptAnchor.y;
-          const int nSublineIndex = GetSubLineIndex (ptStart.y);
-          if (nSublineIndex + pos.y >= nSubLines - 1)
-            {
-              // Select last line to end of subline
-              ptEnd.y = GetLineCount() - 1;
-              ptEnd.x = SubLineEndToCharPos (ptStart.y, pos.y);
-            }
-          else
-            {
-              int nLine, nSubLine;
-              GetLineBySubLine (nSublineIndex + pos.y + 1, nLine, nSubLine);
-              ptEnd.y = nLine;
-              ptEnd.x = SubLineHomeToCharPos (nLine, nSubLine);
-            }
-
-          m_ptCursorPos = ptEnd;
-          EnsureVisible(m_ptCursorPos);
-          SetSelection(ptStart, ptEnd);
-          UpdateCaret();
-
-          SetCapture();
-          m_nDragSelTimer = SetTimer(CRYSTAL_TIMER_DRAGSEL, 100, NULL);
-          ASSERT(m_nDragSelTimer != 0);
-          m_bWordSelection = false;
-          m_bLineSelection = true;
-          m_bDragSelection = true;
-        }
-    }
-  else
-    {
-      POINT ptText = ClientToText (point);
-      PrepareSelBounds ();
-      //  [JRT]:  Support For Disabling Drag and Drop...
-      if ((IsInsideSelBlock (ptText)) &&    // If Inside Selection Area
-            (!m_bDisableDragAndDrop))    // And D&D Not Disabled
-        {
-          m_bPreparingToDrag = true;
-        }
-      else
-        {
-          AdjustTextPoint (point);
-          m_ptCursorPos = ClientToText (point);
-          if (!bShift)
-            m_ptAnchor = m_ptCursorPos;
-
-          POINT ptStart, ptEnd;
-          if (bControl)
-            {
-              if (m_ptCursorPos.y < m_ptAnchor.y ||
-                    m_ptCursorPos.y == m_ptAnchor.y && m_ptCursorPos.x < m_ptAnchor.x)
-                {
-                  ptStart = WordToLeft(m_ptCursorPos);
-                  ptEnd = WordToRight(m_ptAnchor);
-                }
-              else
-                {
-                  ptStart = WordToLeft(m_ptAnchor);
-                  ptEnd = WordToRight(m_ptCursorPos);
-                }
-            }
-          else
-            {
-              ptStart = m_ptAnchor;
-              ptEnd = m_ptCursorPos;
-            }
-
-          m_ptCursorPos = ptEnd;
-          EnsureVisible(m_ptCursorPos);
-          SetSelection(ptStart, ptEnd);
-          UpdateCaret();
-
-          SetCapture();
-          m_nDragSelTimer = SetTimer(CRYSTAL_TIMER_DRAGSEL, 100, NULL);
-          ASSERT(m_nDragSelTimer != 0);
-          m_bWordSelection = bControl;
-          m_bLineSelection = false;
-          m_bDragSelection = true;
-        }
-    }
-
-  ASSERT_VALIDTEXTPOS (m_ptCursorPos);
-  // we must set the ideal character position here!
-  m_nIdealCharPos = CalculateActualOffset( m_ptCursorPos.y, m_ptCursorPos.x );
+	ASSERT_VALIDTEXTPOS(m_ptCursorPos);
+	// we must set the ideal character position here!
+	m_nIdealCharPos = CalculateActualOffset(m_ptCursorPos.y, m_ptCursorPos.x);
 }
 
 void CCrystalTextView::OnMouseMove(LPARAM lParam)
 {
 	POINT point;
 	POINTSTOPOINT(point, lParam);
-  if (m_bDragSelection)
-    {
-      BOOL bOnMargin = point.x < GetMarginWidth ();
+	if (m_bDragSelection)
+	{
+		bool bOnMargin = point.x < GetMarginWidth();
 
-      AdjustTextPoint (point);
-      POINT ptNewCursorPos = ClientToText (point);
+		AdjustTextPoint(point);
+		POINT ptNewCursorPos = ClientToText(point);
 
-      POINT ptStart, ptEnd;
-      if (m_bLineSelection)
-        {
-          if (bOnMargin)
-            {
-              if (ptNewCursorPos.y < m_ptAnchor.y ||
-                    ptNewCursorPos.y == m_ptAnchor.y && ptNewCursorPos.x < m_ptAnchor.x)
-                {
-					POINT pos;
-					ptEnd = m_ptAnchor;
-					CharPosToPoint(ptEnd.y, ptEnd.x, pos);
-					if (GetSubLineIndex(ptEnd.y) + pos.y == GetSubLineCount() - 1)
+		POINT ptStart, ptEnd;
+		if (m_bLineSelection)
+		{
+			if (bOnMargin)
+			{
+				POINT pos;
+				ptEnd = m_ptAnchor;
+				CharPosToPoint(ptEnd.y, ptEnd.x, pos);
+				if (ptNewCursorPos.y < m_ptAnchor.y ||
+					ptNewCursorPos.y == m_ptAnchor.y && ptNewCursorPos.x < m_ptAnchor.x)
+				{
+					const int nSublineIndex = GetSubLineIndex(ptEnd.y) + pos.y + 1;
+					if (nSublineIndex >= GetSubLineCount())
 						ptEnd.x = SubLineEndToCharPos(ptEnd.y, pos.y);
 					else
 					{
 						int	nLine, nSubLine;
-						GetLineBySubLine(GetSubLineIndex(ptEnd.y) + pos.y + 1, nLine, nSubLine);
+						GetLineBySubLine(nSublineIndex, nLine, nSubLine);
 						ptEnd.y = nLine;
 						ptEnd.x = SubLineHomeToCharPos(nLine, nSubLine);
 					}
 					CharPosToPoint(ptNewCursorPos.y, ptNewCursorPos.x, pos);
 					ptNewCursorPos.x = SubLineHomeToCharPos(ptNewCursorPos.y, pos.y);
-                  m_ptCursorPos = ptNewCursorPos;
-                }
-              else
-                {
-                  ptEnd = m_ptAnchor;
-
-					POINT pos;
-					CharPosToPoint(ptEnd.y, ptEnd.x, pos);
+				}
+				else
+				{
 					ptEnd.x = SubLineHomeToCharPos(ptEnd.y, pos.y);
-
 					m_ptCursorPos = ptNewCursorPos;
 					CharPosToPoint(ptNewCursorPos.y, ptNewCursorPos.x, pos);
-					if (GetSubLineIndex(ptNewCursorPos.y) + pos.y == GetSubLineCount() - 1)
+					const int nSublineIndex = GetSubLineIndex(ptNewCursorPos.y) + pos.y + 1;
+					if (nSublineIndex >= GetSubLineCount())
 						ptNewCursorPos.x = SubLineEndToCharPos(ptNewCursorPos.y, pos.y);
 					else
 					{
 						int	nLine, nSubLine;
-						GetLineBySubLine(GetSubLineIndex(ptNewCursorPos.y) + pos.y + 1, nLine, nSubLine);
+						GetLineBySubLine(nSublineIndex, nLine, nSubLine);
 						ptNewCursorPos.y = nLine;
 						ptNewCursorPos.x = SubLineHomeToCharPos(nLine, nSubLine);
 					}
+				}
+				m_ptCursorPos = ptNewCursorPos;
+				SetSelection(ptNewCursorPos, ptEnd);
+				UpdateCaret();
+				return;
+			}
+			//  Moving to normal selection mode
+			::SetCursor(::LoadCursor(NULL, MAKEINTRESOURCE(IDC_IBEAM)));
+			m_bLineSelection = m_bWordSelection = false;
+		}
 
-					int nLine, nSubLine;
-					GetLineBySubLine(GetSubLineIndex(m_ptCursorPos.y) + pos.y, nLine, nSubLine);
-					m_ptCursorPos.y = nLine;
-					m_ptCursorPos.x = SubLineHomeToCharPos(nLine, nSubLine);
-                }
-              SetSelection(ptNewCursorPos, ptEnd);
-              UpdateCaret();
-              return;
-            }
+		if (m_bWordSelection)
+		{
+			if (ptNewCursorPos.y < m_ptAnchor.y ||
+				ptNewCursorPos.y == m_ptAnchor.y && ptNewCursorPos.x < m_ptAnchor.x)
+			{
+				ptStart = WordToLeft(ptNewCursorPos);
+				ptEnd = WordToRight(m_ptAnchor);
+			}
+			else
+			{
+				ptStart = WordToLeft(m_ptAnchor);
+				ptEnd = WordToRight(ptNewCursorPos);
+			}
+		}
+		else
+		{
+			ptStart = m_ptAnchor;
+			ptEnd = ptNewCursorPos;
+		}
 
-          //  Moving to normal selection mode
-          ::SetCursor (::LoadCursor (NULL, MAKEINTRESOURCE (IDC_IBEAM)));
-          m_bLineSelection = m_bWordSelection = false;
-        }
+		m_ptCursorPos = ptEnd;
+		SetSelection(ptStart, ptEnd);
+		UpdateCaret();
+	}
 
-      if (m_bWordSelection)
-        {
-          if (ptNewCursorPos.y < m_ptAnchor.y ||
-                ptNewCursorPos.y == m_ptAnchor.y && ptNewCursorPos.x < m_ptAnchor.x)
-            {
-              ptStart = WordToLeft(ptNewCursorPos);
-              ptEnd = WordToRight(m_ptAnchor);
-            }
-          else
-            {
-              ptStart = WordToLeft(m_ptAnchor);
-              ptEnd = WordToRight(ptNewCursorPos);
-            }
-        }
-      else
-        {
-          ptStart = m_ptAnchor;
-          ptEnd = ptNewCursorPos;
-        }
+	if (m_bPreparingToDrag)
+	{
+		m_bPreparingToDrag = false;
+		if (HGLOBAL hData = PrepareDragData())
+		{
+			if (QueryEditable())
+				m_pTextBuffer->BeginUndoGroup();
 
-      m_ptCursorPos = ptEnd;
-      SetSelection(ptStart, ptEnd);
-      UpdateCaret();
-    }
+			m_bDraggingText = true;
+			DWORD de = GetDropEffect();
+			HRESULT hr = DoDragDrop(this, this, de, &de);
+			if (SUCCEEDED(hr) && de != DROPEFFECT_NONE)
+				OnDropSource(de);
+			m_bDraggingText = false;
 
-  if (m_bPreparingToDrag)
-    {
-      m_bPreparingToDrag = false;
-      HGLOBAL hData = PrepareDragData ();
-      if (hData != NULL)
-        {
-          if (QueryEditable())
-            m_pTextBuffer->BeginUndoGroup();
+			if (QueryEditable())
+				m_pTextBuffer->FlushUndoGroup(this);
+		}
+	}
 
-		  m_bDraggingText = true;
-          DWORD de = GetDropEffect();
-		  HRESULT hr = DoDragDrop(this, this, de, &de);
-          if (SUCCEEDED(hr) && de != DROPEFFECT_NONE)
-            OnDropSource(de);
-          m_bDraggingText = false;
-
-          if (QueryEditable())
-            m_pTextBuffer->FlushUndoGroup(this);
-        }
-    }
-
-  ASSERT_VALIDTEXTPOS (m_ptCursorPos);
+	ASSERT_VALIDTEXTPOS(m_ptCursorPos);
 }
 
 void CCrystalTextView::OnLButtonUp(LPARAM lParam)
@@ -781,183 +718,102 @@ void CCrystalTextView::OnLButtonUp(LPARAM lParam)
 	POINT point;
 	POINTSTOPOINT(point, lParam);
 
-  if (m_bDragSelection)
-    {
-      AdjustTextPoint(point);
-      POINT ptNewCursorPos = ClientToText(point);
+	if (m_bDragSelection)
+	{
+		EnsureVisible(m_ptCursorPos);
+		ReleaseCapture();
+		KillTimer(m_nDragSelTimer);
+		m_bDragSelection = false;
+	}
 
-      POINT ptStart, ptEnd;
-      if (m_bLineSelection)
-        {
-          POINT ptEnd;
-          if (ptNewCursorPos.y < m_ptAnchor.y ||
-                ptNewCursorPos.y == m_ptAnchor.y && ptNewCursorPos.x < m_ptAnchor.x)
-            {
-				//BEGIN SW
-				POINT pos;
-				ptEnd = m_ptAnchor;
-				CharPosToPoint( ptEnd.y, ptEnd.x, pos );
-				if( GetSubLineIndex( ptEnd.y ) + pos.y == GetSubLineCount() - 1 )
-					ptEnd.x = SubLineEndToCharPos( ptEnd.y, pos.y );
-				else
-				{
-					int	nLine, nSubLine;
-					GetLineBySubLine( GetSubLineIndex( ptEnd.y ) + pos.y + 1, nLine, nSubLine );
-					ptEnd.y = nLine;
-					ptEnd.x = SubLineHomeToCharPos( nLine, nSubLine );
-				}
-				CharPosToPoint( ptNewCursorPos.y, ptNewCursorPos.x, pos );
-				ptNewCursorPos.x = SubLineHomeToCharPos( ptNewCursorPos.y, pos.y );
-              m_ptCursorPos = ptNewCursorPos;
-            }
-          else
-            {
-              ptEnd = m_ptAnchor;
-				//BEGIN SW
+	if (m_bPreparingToDrag)
+	{
+		m_bPreparingToDrag = false;
+		AdjustTextPoint(point);
+		m_ptCursorPos = ClientToText(point);
+		EnsureVisible(m_ptCursorPos);
+		SetSelection(m_ptCursorPos, m_ptCursorPos);
+		UpdateCaret();
+	}
 
-				POINT pos;
-				CharPosToPoint( ptEnd.y, ptEnd.x, pos );
-				ptEnd.x = SubLineHomeToCharPos( ptEnd.y, pos.y );
-
-				m_ptCursorPos = ptNewCursorPos;
-				CharPosToPoint( ptNewCursorPos.y, ptNewCursorPos.x, pos );
-				if( GetSubLineIndex( ptNewCursorPos.y ) + pos.y == GetSubLineCount() - 1 )
-					ptNewCursorPos.x = SubLineEndToCharPos( ptNewCursorPos.y, pos.y );
-				else
-				{
-					int	nLine, nSubLine;
-					GetLineBySubLine( GetSubLineIndex( ptNewCursorPos.y ) + pos.y + 1, nLine, nSubLine );
-					ptNewCursorPos.y = nLine;
-					ptNewCursorPos.x = SubLineHomeToCharPos( nLine, nSubLine );
-				}
-				m_ptCursorPos = ptNewCursorPos;
-            }
-          EnsureVisible(m_ptCursorPos);
-          SetSelection(ptNewCursorPos, ptEnd);
-          UpdateCaret();
-        }
-      else
-        {
-          if (m_bWordSelection)
-            {
-              if (ptNewCursorPos.y < m_ptAnchor.y ||
-                    ptNewCursorPos.y == m_ptAnchor.y && ptNewCursorPos.x < m_ptAnchor.x)
-                {
-                  ptStart = WordToLeft(ptNewCursorPos);
-                  ptEnd = WordToRight(m_ptAnchor);
-                }
-              else
-                {
-                  ptStart = WordToLeft(m_ptAnchor);
-                  ptEnd = WordToRight(ptNewCursorPos);
-                }
-            }
-          else
-            {
-              ptStart = m_ptAnchor;
-              ptEnd = m_ptCursorPos;
-            }
-
-          m_ptCursorPos = ptEnd;
-          EnsureVisible(m_ptCursorPos);
-          SetSelection(ptStart, ptEnd);
-          UpdateCaret();
-        }
-
-      ReleaseCapture ();
-      KillTimer (m_nDragSelTimer);
-      m_bDragSelection = false;
-    }
-
-  if (m_bPreparingToDrag)
-    {
-      m_bPreparingToDrag = false;
-
-      AdjustTextPoint(point);
-      m_ptCursorPos = ClientToText(point);
-      EnsureVisible(m_ptCursorPos);
-      SetSelection(m_ptCursorPos, m_ptCursorPos);
-      UpdateCaret();
-    }
-
-  ASSERT_VALIDTEXTPOS (m_ptCursorPos);
+	ASSERT_VALIDTEXTPOS(m_ptCursorPos);
 }
 
 void CCrystalTextView::OnTimer(UINT_PTR nIDEvent)
 {
-  if (nIDEvent == CRYSTAL_TIMER_DRAGSEL)
-    {
-      ASSERT (m_bDragSelection);
-      POINT pt;
-      ::GetCursorPos (&pt);
-      ScreenToClient (&pt);
-      RECT rcClient;
-      GetClientRect (&rcClient);
+	if (nIDEvent == CRYSTAL_TIMER_DRAGSEL)
+	{
+		ASSERT(m_bDragSelection);
+		POINT pt;
+		::GetCursorPos(&pt);
+		ScreenToClient(&pt);
+		RECT rcClient;
+		GetClientRect(&rcClient);
 
-      BOOL bChanged = FALSE;
+		bool bChanged = false;
 
-      //  Scroll vertically, if necessary
-      int nNewTopLine = m_nTopLine;
-      int nLineCount = GetLineCount ();
-      if (pt.y < rcClient.top)
-        {
-          nNewTopLine--;
-          if (pt.y < rcClient.top - GetLineHeight ())
-            nNewTopLine -= 2;
-        }
-      else if (pt.y >= rcClient.bottom)
-        {
-          nNewTopLine++;
-          if (pt.y >= rcClient.bottom + GetLineHeight ())
-            nNewTopLine += 2;
-        }
+		//  Scroll vertically, if necessary
+		int nNewTopLine = m_nTopLine;
+		int nLineCount = GetLineCount();
+		if (pt.y < rcClient.top)
+		{
+			nNewTopLine--;
+			if (pt.y < rcClient.top - GetLineHeight())
+				nNewTopLine -= 2;
+		}
+		else if (pt.y >= rcClient.bottom)
+		{
+			nNewTopLine++;
+			if (pt.y >= rcClient.bottom + GetLineHeight())
+				nNewTopLine += 2;
+		}
 
-      if (nNewTopLine < 0)
-        nNewTopLine = 0;
-      if (nNewTopLine >= nLineCount)
-        nNewTopLine = nLineCount - 1;
+		if (nNewTopLine < 0)
+			nNewTopLine = 0;
+		if (nNewTopLine >= nLineCount)
+			nNewTopLine = nLineCount - 1;
 
-      if (m_nTopLine != nNewTopLine)
-        {
-          ScrollToLine (nNewTopLine);
-          UpdateSiblingScrollPos (FALSE);
-          bChanged = TRUE;
-        }
+		if (m_nTopLine != nNewTopLine)
+		{
+			ScrollToLine(nNewTopLine);
+			UpdateSiblingScrollPos (FALSE);
+			bChanged = true;
+		}
 
-      //  Scroll horizontally, if necessary
-      int nNewOffsetChar = m_nOffsetChar;
-      int nMaxLineLength = GetMaxLineLength ();
-      if (pt.x < rcClient.left)
-        nNewOffsetChar--;
-      else if (pt.x >= rcClient.right)
-        nNewOffsetChar++;
+		//  Scroll horizontally, if necessary
+		int nNewOffsetChar = m_nOffsetChar;
+		int nMaxLineLength = GetMaxLineLength();
+		if (pt.x < rcClient.left)
+			nNewOffsetChar--;
+		else if (pt.x >= rcClient.right)
+			nNewOffsetChar++;
 
-      if (nNewOffsetChar >= nMaxLineLength)
-        nNewOffsetChar = nMaxLineLength - 1;
-      if (nNewOffsetChar < 0)
-        nNewOffsetChar = 0;
+		if (nNewOffsetChar >= nMaxLineLength)
+			nNewOffsetChar = nMaxLineLength - 1;
+		if (nNewOffsetChar < 0)
+			nNewOffsetChar = 0;
 
-      if (m_nOffsetChar != nNewOffsetChar)
-        {
-          ScrollToChar (nNewOffsetChar);
-          UpdateCaret ();
-          UpdateSiblingScrollPos (TRUE);
-          bChanged = TRUE;
-        }
+		if (m_nOffsetChar != nNewOffsetChar)
+		{
+			ScrollToChar(nNewOffsetChar);
+			UpdateCaret();
+			UpdateSiblingScrollPos(TRUE);
+			bChanged = true;
+		}
 
-      //  Fix changes
-      if (bChanged)
-        {
-          AdjustTextPoint (pt);
-          POINT ptNewCursorPos = ClientToText (pt);
-          if (ptNewCursorPos != m_ptCursorPos)
-            {
-              m_ptCursorPos = ptNewCursorPos;
-	          SetSelection(m_ptAnchor, m_ptCursorPos);
-              UpdateCaret();
-            }
-        }
-    }
+		//  Fix changes
+		if (bChanged)
+		{
+			AdjustTextPoint(pt);
+			POINT ptNewCursorPos = ClientToText(pt);
+			if (ptNewCursorPos != m_ptCursorPos)
+			{
+				m_ptCursorPos = ptNewCursorPos;
+				SetSelection(m_ptAnchor, m_ptCursorPos);
+				UpdateCaret();
+			}
+		}
+	}
 }
 
 /** 
@@ -974,46 +830,27 @@ void CCrystalTextView::OnLButtonDblClk(LPARAM lParam)
 	POINT point;
 	POINTSTOPOINT(point, lParam);
 
-  if (point.x < GetMarginWidth ())
-    {
-      AdjustTextPoint (point);
-      POINT ptCursorPos = ClientToText (point);
-      ToggleBookmark(ptCursorPos.y);
-      return;
-    }
+	if (point.x < GetMarginWidth())
+	{
+		AdjustTextPoint(point);
+		POINT ptCursorPos = ClientToText(point);
+		ToggleBookmark(ptCursorPos.y);
+		return;
+	}
 
-  if (!m_bDragSelection)
-    {
-      AdjustTextPoint (point);
-
-      m_ptCursorPos = ClientToText (point);
-      m_ptAnchor = m_ptCursorPos;
-
-      POINT ptStart, ptEnd;
-      if (m_ptCursorPos.y < m_ptAnchor.y ||
-            m_ptCursorPos.y == m_ptAnchor.y && m_ptCursorPos.x < m_ptAnchor.x)
-        {
-          ptStart = WordToLeft(m_ptCursorPos);
-          ptEnd = WordToRight(m_ptAnchor);
-        }
-      else
-        {
-          ptStart = WordToLeft(m_ptAnchor);
-          ptEnd = WordToRight(m_ptCursorPos);
-        }
-
-      m_ptCursorPos = ptEnd;
-      EnsureVisible(m_ptCursorPos);
-      SetSelection(ptStart, ptEnd);
-      UpdateCaret();
-
-      SetCapture();
-      m_nDragSelTimer = SetTimer(CRYSTAL_TIMER_DRAGSEL, 100, NULL);
-      ASSERT(m_nDragSelTimer != 0);
-      m_bWordSelection = true;
-      m_bLineSelection = false;
-      m_bDragSelection = true;
-    }
+	if (!m_bDragSelection)
+	{
+		AdjustTextPoint(point);
+		m_ptCursorPos = ClientToText(point);
+		m_ptAnchor = m_ptCursorPos;
+		SetCapture();
+		m_nDragSelTimer = SetTimer(CRYSTAL_TIMER_DRAGSEL, 100, NULL);
+		ASSERT(m_nDragSelTimer != 0);
+		m_bWordSelection = true;
+		m_bLineSelection = false;
+		m_bDragSelection = true;
+		OnMouseMove(lParam);
+	}
 }
 
 void CCrystalTextView::OnRButtonDown(LPARAM lParam)

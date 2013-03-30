@@ -148,7 +148,7 @@ private:
     So we just set all these values to invalid code (DWORD) - 1.
     */
     stl::vector<DWORD> m_ParseCookies;
-    DWORD GetParseCookie (int nLineIndex);
+    DWORD GetParseCookie(int nLineIndex);
 
     /**
     Pre-calculated line lengths (in characters)
