@@ -780,7 +780,7 @@ int CCrystalTextView::GetCharWidthFromChar(LPCTSTR pch)
 	// This assumes a fixed width font
 	// But the UNICODE case handles double-wide glyphs (primarily Chinese characters)
 	int wcwidth = mk_wcwidth(ch);
-	if (wcwidth < 0)
+	if (wcwidth < (m_bSeparateCombinedChars ? 1 : 0))
 		wcwidth = 1; // applies to 8-bit control characters in range 0x7F..0x9F
 	return wcwidth;
 }
@@ -1866,14 +1866,16 @@ int CCrystalTextView::GetTabSize() const
 	return m_pTextBuffer ? m_pTextBuffer->GetTabSize() : 4;
 }
 
-void CCrystalTextView::SetTabSize(int nTabSize)
+void CCrystalTextView::SetTabSize(int nTabSize, bool bSeparateCombinedChars)
 {
 	ASSERT(nTabSize >= 0 && nTabSize <= 64);
 	if (m_pTextBuffer == NULL)
 		return;
-	if (m_pTextBuffer && m_pTextBuffer->GetTabSize() != nTabSize)
+	if (m_pTextBuffer->GetTabSize() != nTabSize ||
+		m_bSeparateCombinedChars != bSeparateCombinedChars)
 	{
 		m_pTextBuffer->SetTabSize(nTabSize);
+		m_bSeparateCombinedChars = bSeparateCombinedChars;
 		m_pnActualLineLength.clear();
 		m_nMaxLineLength = -1;
 		RecalcHorzScrollBar();

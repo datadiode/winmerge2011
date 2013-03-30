@@ -30,6 +30,7 @@ public:
 	UINT    m_nTabSize;
 	BOOL    m_bAutomaticRescan;
 	BOOL    m_bAllowMixedEol;
+	BOOL    m_bSeparateCombiningChars;
 	BOOL    m_bViewLineDifferences;
 	BOOL    m_bBreakOnWords;
 	int     m_nBreakType;

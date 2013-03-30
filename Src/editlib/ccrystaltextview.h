@@ -101,6 +101,7 @@ private:
     bool m_bDistinguishEols;
     bool m_bSelMargin;
     bool m_bViewLineNumbers;
+    bool m_bSeparateCombinedChars;
     DWORD m_dwFlags;
 
     //  Amount of lines/characters that completely fits the client area
@@ -593,7 +594,7 @@ public:
     void SetViewTabs(bool);
     void SetViewEols(bool bViewEols, bool bDistinguishEols);
     int GetTabSize() const;
-    void SetTabSize(int nTabSize);
+    void SetTabSize(int nTabSize, bool bSeparateCombinedChars);
     bool GetSelectionMargin() const;
     void SetSelectionMargin(bool);
 	bool GetViewLineNumbers() const;

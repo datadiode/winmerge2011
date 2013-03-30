@@ -1188,7 +1188,8 @@ void CMergeEditView::RefreshOptions()
 		SetTextType(CCrystalTextView::SRC_PLAIN);
 
 	// SetTextType will revert to language dependent defaults for tab
-	SetTabSize(COptionsMgr::Get(OPT_TAB_SIZE));
+	SetTabSize(COptionsMgr::Get(OPT_TAB_SIZE),
+		COptionsMgr::Get(OPT_SEPARATE_COMBINING_CHARS));
 	SetViewTabs(COptionsMgr::Get(OPT_VIEW_WHITESPACE));
 
 	SetWordWrapping(COptionsMgr::Get(OPT_WORDWRAP));
