@@ -317,7 +317,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/verbose:lib /SAFESEH:NO /IGNORE:4210"
-				AdditionalDependencies="version.lib shlwapi.lib imm32.lib wininet.lib comctl32.lib oleacc.lib"
+				AdditionalDependencies="version.lib shlwapi.lib imm32.lib wininet.lib comctl32.lib oleacc.lib chkstk.obj"
 				OutputFile="$(OutDir)\WinMergeU.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"

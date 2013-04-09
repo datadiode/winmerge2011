@@ -523,50 +523,17 @@ void __stdcall _CxxThrowException(ULONG_PTR pObj, ULONG_PTR pInfo)
 	RaiseException(0xE06D7363, 1, 3, throwParams);
 }
 
-__declspec(naked) void _alloca_probe()
-{
-	__asm
-	{
-$loop:	sub esp,4092
-		push [esp+4092]
-		sub eax,4096
-		ja $loop
-		sub esp,eax
-		mov eax,[esp+eax]
-		mov [esp],eax
-		ret
-	}
-}
-
 __declspec(naked) void _alloca_probe_16()
 {
+	extern void _alloca_probe();
 	__asm
 	{
-$loop:	sub esp,4092
-		push [esp+4092]
-		sub eax,4096
-		ja $loop
-		sub esp,eax
-		mov eax,[esp+eax]
-		add esp,4
-		and esp,~15
-		push eax
-		ret
-	}
-}
-
-__declspec(naked) void _chkstk()
-{
-	__asm
-	{
-$loop:	sub esp,4092
-		push [esp+4092]
-		sub eax,4096
-		ja $loop
-		sub esp,eax
-		mov eax,[esp+eax]
-		mov [esp],eax
-		ret
+		neg eax
+		lea eax,[eax+esp+4]
+		and eax,~15
+		neg eax
+		lea eax,[eax+esp+4]
+		jmp _alloca_probe
 	}
 }
 
