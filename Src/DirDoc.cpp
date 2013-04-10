@@ -224,7 +224,8 @@ void CDirFrame::InitMrgmanCompare()
 		xml.Push();
 	}
 
-	m_pDirView->Redisplay();
+	if (m_pCtxt)
+		m_pDirView->Redisplay();
 
 	if (int nCompareSelected = m_pDirView->GetItemCount())
 		Rescan(nCompareSelected);
@@ -364,10 +365,6 @@ void CDirFrame::Rescan(int nCompareSelected)
 		UpdateHeaderPath(0);
 		UpdateHeaderPath(1);
 	}
-
-	// draw the headers as active ones
-	m_wndFilePathBar.SetActive(0, true);
-	m_wndFilePathBar.SetActive(1, true);
 
 	// Folder names to compare are in the compare context
 	m_pCtxt->CompareDirectories(nCompareSelected != 0);

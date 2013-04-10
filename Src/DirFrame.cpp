@@ -552,6 +552,9 @@ void CDirFrame::CreateClient()
 	pEdit = m_wndFilePathBar.GetControlRect(1, &rect);
 	pEdit->SetWindowPos(NULL, 0, 0, rect.right - rect.left, cyBar, SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
 	pEdit->SetFont(pFont);
+	// draw the headers as active ones
+	m_wndFilePathBar.SetActive(0, true);
+	m_wndFilePathBar.SetActive(1, true);
 }
 
 /**
@@ -582,7 +585,7 @@ void CDirFrame::UpdateResources()
 
 bool CDirFrame::PreventFromClosing()
 {
-	if (m_pCtxt->IsBusy())
+	if (m_pCtxt && m_pCtxt->IsBusy())
 		return true;
 	if (!CanFrameClose())
 	{
