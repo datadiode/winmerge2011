@@ -122,5 +122,8 @@ Project.WinMerge        RCDATA                  "res/Project.WinMerge"
 //
 // TypeLib
 //
-
-1                       TYPELIB                 "../BuildTmp/Merge/midl/WinMerge.tlb"
+#ifdef _WIN64
+1                       TYPELIB                 "../BuildTmp/Merge/x64/midl/WinMerge.tlb"
+#else
+1                       TYPELIB                 "../BuildTmp/Merge/Win32/midl/WinMerge.tlb"
+#endif

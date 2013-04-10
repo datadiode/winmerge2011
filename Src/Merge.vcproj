@@ -33,9 +33,7 @@
 			>
 			<Tool
 				Name="VCMIDLTool"
-				SuppressStartupBanner="false"
-				GenerateStublessProxies="true"
-				TypeLibraryName="$(IntDir)\..\..\midl\$(InputName).tlb"
+				TypeLibraryName="$(IntDir)\..\midl\$(InputName).tlb"
 				OutputDirectory="$(IntDir)\..\..\midl"
 			/>
 			<Tool
@@ -52,7 +50,6 @@
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="stdafx.h"
 				WarningLevel="3"
-				SuppressStartupBanner="true"
 				DebugInformationFormat="0"
 			/>
 			<Tool
@@ -69,14 +66,10 @@
 				AdditionalDependencies="version.lib shlwapi.lib imm32.lib HtmlHelp.lib comctl32.lib oleacc.lib"
 				OutputFile="$(OutDir)\WinMergeU.exe"
 				LinkIncremental="1"
-				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="$(IntDir)"
-				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="false"
 				SubSystem="2"
-				EntryPointSymbol="wWinMainCRTStartup"
 				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
 			/>
 			<Tool
 				Name="VCManifestTool"
@@ -99,10 +92,8 @@
 			>
 			<Tool
 				Name="VCMIDLTool"
-				SuppressStartupBanner="false"
 				TargetEnvironment="3"
-				GenerateStublessProxies="true"
-				TypeLibraryName="$(IntDir)\..\..\midl\$(InputName).tlb"
+				TypeLibraryName="$(IntDir)\..\midl\$(InputName).tlb"
 				OutputDirectory="$(IntDir)\..\..\midl"
 			/>
 			<Tool
@@ -119,7 +110,6 @@
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="stdafx.h"
 				WarningLevel="3"
-				SuppressStartupBanner="true"
 				DebugInformationFormat="0"
 			/>
 			<Tool
@@ -136,14 +126,10 @@
 				AdditionalDependencies="version.lib shlwapi.lib imm32.lib HtmlHelp.lib comctl32.lib oleacc.lib"
 				OutputFile="$(OutDir)\WinMergeU.exe"
 				LinkIncremental="1"
-				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="$(IntDir)"
-				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="false"
 				SubSystem="2"
-				EntryPointSymbol="wWinMainCRTStartup"
 				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
 			/>
 			<Tool
 				Name="VCManifestTool"
@@ -166,9 +152,7 @@
 			>
 			<Tool
 				Name="VCMIDLTool"
-				SuppressStartupBanner="false"
-				GenerateStublessProxies="true"
-				TypeLibraryName="$(IntDir)\..\..\midl\$(InputName).tlb"
+				TypeLibraryName="$(IntDir)\..\midl\$(InputName).tlb"
 				OutputDirectory="$(IntDir)\..\..\midl"
 			/>
 			<Tool
@@ -183,7 +167,6 @@
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="stdafx.h"
 				WarningLevel="3"
-				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -196,13 +179,10 @@
 				AdditionalDependencies="version.lib shlwapi.lib imm32.lib HtmlHelp.lib comctl32.lib oleacc.lib"
 				OutputFile="$(OutDir)\WinMergeU.exe"
 				LinkIncremental="1"
-				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="$(IntDir)"
 				GenerateDebugInformation="true"
 				SubSystem="2"
-				EntryPointSymbol="wWinMainCRTStartup"
 				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
 			/>
 			<Tool
 				Name="VCManifestTool"
@@ -225,10 +205,8 @@
 			>
 			<Tool
 				Name="VCMIDLTool"
-				SuppressStartupBanner="false"
 				TargetEnvironment="3"
-				GenerateStublessProxies="true"
-				TypeLibraryName="$(IntDir)\..\..\midl\$(InputName).tlb"
+				TypeLibraryName="$(IntDir)\..\midl\$(InputName).tlb"
 				OutputDirectory="$(IntDir)\..\..\midl"
 			/>
 			<Tool
@@ -243,7 +221,6 @@
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="stdafx.h"
 				WarningLevel="3"
-				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -256,13 +233,10 @@
 				AdditionalDependencies="version.lib shlwapi.lib imm32.lib HtmlHelp.lib comctl32.lib oleacc.lib"
 				OutputFile="$(OutDir)\WinMergeU.exe"
 				LinkIncremental="1"
-				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="$(IntDir)"
 				GenerateDebugInformation="true"
 				SubSystem="2"
-				EntryPointSymbol="wWinMainCRTStartup"
 				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
 			/>
 			<Tool
 				Name="VCManifestTool"
@@ -285,9 +259,7 @@
 			>
 			<Tool
 				Name="VCMIDLTool"
-				SuppressStartupBanner="false"
-				GenerateStublessProxies="true"
-				TypeLibraryName="$(IntDir)\..\..\midl\$(InputName).tlb"
+				TypeLibraryName="$(IntDir)\..\midl\$(InputName).tlb"
 				OutputDirectory="$(IntDir)\..\..\midl"
 			/>
 			<Tool
@@ -306,7 +278,6 @@
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="stdafx.h"
 				WarningLevel="3"
-				SuppressStartupBanner="true"
 				DebugInformationFormat="0"
 			/>
 			<Tool
@@ -320,15 +291,11 @@
 				AdditionalDependencies="version.lib shlwapi.lib imm32.lib HtmlHelp.lib comctl32.lib oleacc.lib RunTmChk.lib"
 				OutputFile="$(OutDir)\WinMergeU.exe"
 				LinkIncremental="1"
-				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="$(IntDir)"
 				IgnoreAllDefaultLibraries="true"
-				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="false"
 				SubSystem="2"
-				EntryPointSymbol="wWinMainCRTStartup"
 				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
 			/>
 			<Tool
 				Name="VCManifestTool"
@@ -337,17 +304,6 @@
 			<Tool
 				Name="VCPostBuildEventTool"
 				CommandLine="PostBuild.bat &quot;$(IntDir)&quot; &quot;$(OutDir)&quot;"
-			/>
-		</Configuration>
-		<Configuration
-			Name="System32|x64"
-			OutputDirectory="$(SolutionDir)Build\$(SolutionName)\$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(SolutionDir)BuildTmp\$(ProjectName)\$(PlatformName)\$(ConfigurationName)"
-			ConfigurationType="1"
-			>
-			<Tool
-				Name="VCMIDLTool"
-				OutputDirectory="$(IntDir)\..\..\midl"
 			/>
 		</Configuration>
 	</Configurations>
@@ -1624,15 +1580,6 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="System32|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine="..\Setup\setup.wsf version &quot;$(InputPath)&quot; $(PlatformName)"
-						Outputs="$(SolutionDir)Setup_$(PlatformName).cfg"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="System32|x64"
 					>
 					<Tool
 						Name="VCCustomBuildTool"
