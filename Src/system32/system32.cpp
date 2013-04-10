@@ -573,23 +573,4 @@ void wWinMainCRTStartup()
 	exit(nRet);
 }
 
-HWND WINAPI HtmlHelp(HWND hwndCaller, LPCTSTR pszFile, UINT uCommand, DWORD_PTR dwData)
-{
-	HWND hwndHelp = NULL;
-	static HINSTANCE hinst = NULL;
-	if (hinst == NULL)
-		hinst = ::LoadLibrary(_T("HHCTRL.OCX"));
-	if (hinst != NULL)
-	{
-		union
-		{
-			FARPROC GetProcAddress;
-			HWND (WINAPI*HtmlHelp)(HWND, LPCTSTR, UINT, DWORD_PTR);
-		} u = { GetProcAddress(hinst, _CRT_STRINGIZE(HtmlHelp)) };
-		if (u.HtmlHelp)
-			hwndHelp = u.HtmlHelp(hwndCaller, pszFile, uCommand, dwData);
-	}
-	return hwndHelp;
-}
-
 } // extern "C" namespace

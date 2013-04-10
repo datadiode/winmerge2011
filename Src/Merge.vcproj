@@ -307,7 +307,7 @@
 				PrecompiledHeaderThrough="stdafx.h"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
-				DebugInformationFormat="3"
+				DebugInformationFormat="0"
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
@@ -317,14 +317,14 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/verbose:lib /SAFESEH:NO /IGNORE:4210"
-				AdditionalDependencies="version.lib shlwapi.lib imm32.lib wininet.lib comctl32.lib oleacc.lib chkstk.obj"
+				AdditionalDependencies="version.lib shlwapi.lib imm32.lib HtmlHelp.lib comctl32.lib oleacc.lib RunTmChk.lib"
 				OutputFile="$(OutDir)\WinMergeU.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="$(IntDir)"
 				IgnoreAllDefaultLibraries="true"
 				IgnoreDefaultLibraryNames=""
-				GenerateDebugInformation="true"
+				GenerateDebugInformation="false"
 				SubSystem="2"
 				EntryPointSymbol="wWinMainCRTStartup"
 				RandomizedBaseAddress="1"
