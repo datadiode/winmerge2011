@@ -17,126 +17,24 @@ li
 </head>
 <body>
 
-<h2>WinMerge 0.2011.003.117 Release Notes</h2>
-This <b>experimental</b> release of WinMerge&nbsp;2011 can work with Wine. A dedicated installer
-exists to support this setup. Besides installing WinMerge inside the Wine subsystem, the installer
-also creates a launch script in /usr/local/bin to make it available as a shell command. Opting to
-additionally install Windows&nbsp;Script&nbsp;5.6 enables the use of file transform scriptlets.
-<p>
-<i>Jochen Neubeck, March 2013</i>
+<h2>WinMerge 0.2011.003.154 Release Notes</h2>
+This is a <b>beta</b> release of WinMerge&nbsp;2011.
 
-<h2>WinMerge 0.2011.003.093 Release Notes</h2>
-This <b>experimental</b> release of WinMerge&nbsp;2011 provides out-of-the-box support for <i>Compare As Archive</i> and <i>Compare As Binary</i>.
-It therefore includes components from 7-Zip&nbsp;9.20 and Frhed&nbsp;0.10901.
-<p>
-7-Zip sources can be obtained from <a href='http://www.7-zip.org/'>http://www.7-zip.org</a>.
-<p>
-Frhed sources can be obtained from <a href='https://bitbucket.org/jtuc/frhed'>https://bitbucket.org/jtuc/frhed</a>.
-<p>
-<i>Jochen Neubeck, February 2013</i>
-
-<h2>WinMerge 0.2011.003.071 Release Notes</h2>
-This <b>experimental</b> release of WinMerge&nbsp;2011 comes with a distinct 64&nbsp;bit version of WinMergeU.exe.
-The 64&nbsp;bit version may be capable of handling larger files and directory trees than is possible with the 32&nbsp;bit version.
-<p>
-<i>Jochen Neubeck, February 2013</i>
-
-<h2>WinMerge 0.2011.003.061 Release Notes</h2>
-This <b>experimental</b> release of WinMerge&nbsp;2011 enhances Unicode support by adding awareness of surrogate pairs,
-and is motivated by issue <a target='_blank' href='https://bitbucket.org/jtuc/winmerge2011/issue/22'>#22 Unicode ExtB+ Support</a>.
-<p>
-<i>Jochen Neubeck, February 2013</i>
-
-<h2>WinMerge 0.2011.003.037 Release Notes</h2>
-This <b>experimental</b> release of WinMerge&nbsp;2011 allows for saving folder comparison results to an Excel spreadsheet.
-<p>
-The related commands can be invoked from the Folder Compare window's <i>Tools</i> menu:
+Significant new features since latest stable release include:
 <ul>
-	<li>Save to Excel spreadsheet
-	<li>Show in Excel Viewer
-	<li>Print with Excel Viewer
-</ul>
-Note that the above commands apply to only the selected lines, so you may need to <i>Select All</i> from the <i>Edit</i> menu or hit <i>Ctrl+A</i> first.
-<p>
-If you face issues with some recent version of Excel Viewer, then Excel Viewer 2003 may be your friend.
-<p>
-Minor usability improvements:
-<ul>
-	<li>The folder compare progress dialog now shows the paths of the files being compared.
-		It was argued by some that, being lazily updated, this information is wrong most of the time.
-		It was argued by others that they still want this information because it gives them a clue about files which require an unexpectedly large amount of processing time.
-		I agree with the others.
-	<li>Rearranging columns in Folder Compare window now preserves the current selection.
-	<li>When navigating from a subfolder back to its parent, the selection within the parent folder will be set to the previously listed subfolder.
+<li>Line filters exist in a new flavor referred to as <i>early-applied</i> line filters:
+	<p><a href='https://bitbucket.org/jtuc/winmerge2011_help/downloads/WinMerge.chm'>WinMerge.chm</a> &rarr; <i>Using Filters</i> &rarr; <i>Using line filters</i> &rarr; <i>Early-applied line filter syntax</i>
+<li>The Open dialog's <i>Include Subfolders</i> option can be adjusted to ignore folder structure:
+	<p><a href='https://bitbucket.org/jtuc/winmerge2011_help/downloads/WinMerge.chm'>WinMerge.chm</a> &rarr; <i>Quick start</i> &rarr; <i>Selecting files and folders to compare</i> &rarr; <i>5.</i>
+<li>Editor scriptlets are back:
+	<p><a href='https://bitbucket.org/jtuc/winmerge2011_help/downloads/WinMerge.chm'>WinMerge.chm</a> &rarr; <i>Plugin scriptlets</i>
+<li>ClearCase .mrgman files can be opened to a folder compare window, by dropping them onto the WinMerge main window.
+	<br>The header bars provide context menus to switch between base, source, and destination versions of the referenced files.
 </ul>
 <p>
-<i>Jochen Neubeck, January 2013</i>
-
-<h2>WinMerge 0.2011.002.212 Release Notes</h2>
-This <b>experimental</b> release of WinMerge&nbsp;2011 makes the
-<i>Compare As</i> option accessible through the command line.
-The feature aims at supporting use cases like the one outlined
-<a target='_blank' href='http://bernhardelbl.wordpress.com/2012/04/05/compare-excel-word-and-pdf-files-in-visual-studio-team-foundation-server-2010'>here</a>.
-In the given example, an extra parameter
-<code><nobr>-t</nobr>&nbsp;"script:\FileTransforms\xdoc2txt.wsc"</code>
-is needed to tell WinMerge&nbsp;2011 to pipe files through
-<a target='_blank' href='http://www31.ocn.ne.jp/~h_ishida/xdoc2txt.html'>xdoc2txt</a>.
-The reason is that WinMerge&nbsp;2011 does not provide file transform
-automatisms like WinMerge&nbsp;2 does
-(which is an explicit design decision driven by the realization that file
-transform automatisms have caused much confusion for WinMerge&nbsp;2 users).
+Click <a href='https://bitbucket.org/jtuc/winmerge2011/get/0.2011.003.154.zip'>here</a> to obtain the source code for this release.
 <p>
-Furthermore, fixes are included to address issues
-<a target='_blank' href='https://bitbucket.org/jtuc/winmerge2011/issue/18'>#18 Binary compare reports false positives</a> and
-<a target='_blank' href='https://bitbucket.org/jtuc/winmerge2011/issue/19'>#19 diff pane size not remembered</a>.
+Click <a href='https://bitbucket.org/jtuc/frhed/get/0.10902.2013.zip'>here</a> to obtain source code for Frhed binaries included in this release.
 <p>
-<i>Jochen Neubeck, May 2012</i>
-<h2>WinMerge 0.2011.002.145 Release Notes</h2>
-This <b>experimental</b>
-release of WinMerge&nbsp;2011 implements two substantial new features:
-<ul>
-<li>Line filters can now act as prediffers, i.e., operate on content before
-	WinMerge passes it down to the diff algorithm.
-	An example is given
-	<a target='_blank' href='http://shortlinks.de/l999'>here</a>.
-	More examples are to follow.
-	<p>
-	Prediffers can be specified in either of the following forms:
-	<ul>
-	<li>Capturing regular expressions
-		<p>
-		All parts of a match which are covered by a submatch are removed,
-		or replaced by a fixed sequence of characters, whose length is,
-		for technical reasons,
-		limited to the length of the shortest possible submatch.
-	<li>Prediffer scriptlets
-		<p>
-		A prediffer scriptlet implements a method with name
-		<code>ProcessLine</code>,
-		which is called once per line to perform preprocessing as desired,
-		subject to the limitation that the length of the processed line must not
-		exceed the length of the original line.
-		<p>
-		By maintaining state, prediffer scriptlets are also capable of taking
-		into consideration preceding content. For this purpose, they need to
-		expose a method with name <code>Reset</code> to reset their state.
-		WinMerge indicates the side on which a prediffer scriptlet is
-		subsequently going to operate by passing the <code>Reset</code> method
-		a value of 0&nbsp;or&nbsp;1. This allows a prediffer scriptlet to keep
-		knowledge gathered from the left side for reference during processing of
-		the right side.
-	</ul>
-<li>The Open dialog's <i>Include Subfolders</i> option has been extended to
-	support situations where folder structure differs between sides, but files
-	on both sides are uniquely identifiable by their names, and hence can be
-	matched without considering folder structure.
-	When encountering name collisions, WinMerge attempts to resolve them by also
-	considering sizes and modification dates of the involved files.
-	<p>
-	To enable this special mode of operation, repeat clicking the
-	<i>Include Subfolders</i> checkbox until it yields a visual appearance that
-	is different from <i>checked</i> and <i>unchecked</i>,
-	and an annotation shows up indicating that folder structure will be ignored.
-</ul>
-<p>
-<i>Jochen Neubeck, April 2012</i>
+<i>Jochen Neubeck, April 2013</i>
+</body>

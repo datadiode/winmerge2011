@@ -1,4 +1,22 @@
+0.2011.003.154
+Changes since preceding release (not necessarily complete):
+• Editlib: Fix a minor selection margin misbehavior when Wrap Lines option is on
+• Editlib: Changing line indentation was erroneously affecting empty lines
+• Editlib: Option to separate combining characters (like HTML's <code> tag does)
+• Editlib: Overtyping of combined characters excluded combining characters
+• Editlib: Create a block-shaped caret to indicate overwrite mode
+• DirView: Open binary files in Frhed rather than claiming you can't open them
+• Enable WinMerge to open ClearCase .mrgman files to a folder compare window
+• LineFiltersDlg: Cope with Wine not sending TVN_KEYDOWN
+• Wine setup: After downloading SCR56EN.EXE, verify its MD5 hash
+• Wine setup: Missed to create target directory for Windows Script 5.6
+• Allow for collecting line filters in groups (maintained in LineFilters.ini)
+• RegExpItem: Add support for permutive filters
+• Fix occasional misalignment after merge
+• MergeEditView: Bring back support for editor scripts
+
 0.2011.003.117
+Changes since preceding release (not necessarily complete):
 • Wine setup: Change Windows Script 5.6 download link due to version issues
 • Switching UI language with any folder compare windows open was causing issues
 
