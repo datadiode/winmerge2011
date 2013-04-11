@@ -269,6 +269,11 @@ UNICODESET DetermineEncoding(unsigned char *pBuffer, size_t size, unsigned *pBom
 		return UTF8;
 	// check for UCS2 the two possible 2 bytes signatures
 	int bufSize = static_cast<int>(min<size_t>(size, 8 * 1024));
+	if (wine_version &&
+		wmemchr(reinterpret_cast<wchar_t *>(pBuffer), L'\0', bufSize / 2))
+	{
+		return NONE;
+	}
 	if (memchr(pBuffer, 0, bufSize))
 	{
 		int icheck = IS_TEXT_UNICODE_NOT_UNICODE_MASK ^
