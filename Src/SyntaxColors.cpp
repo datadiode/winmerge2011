@@ -70,7 +70,7 @@ bool CSyntaxColors::GetSystemColorIndex(UINT nColorIndex, int * pSysIndex) const
 {
 	switch (nColorIndex)
 	{
-	case COLORINDEX_WHITESPACE :
+	case COLORINDEX_WHITESPACE:
 	case COLORINDEX_BKGND:
 		*pSysIndex = COLOR_WINDOW;
 		return true;

@@ -11,8 +11,6 @@
 #include "resource.h"
 #include "LanguageSelect.h"
 #include "PropCompareFolder.h"
-#include "OptionsDef.h"
-#include "OptionsMgr.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

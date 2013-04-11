@@ -18,6 +18,7 @@
 #include "PropRegistry.h"
 #include "PropColors.h"
 #include "PropTextColors.h"
+#include "PropListColors.h"
 #include "PropSyntaxColors.h"
 #include "PropCodepage.h"
 #include "PropArchive.h"
@@ -51,6 +52,7 @@ protected:
 	PropCodepage m_pageCodepage;
 	PropMergeColors m_pageMergeColors;
 	PropTextColors m_pageTextColors;
+	PropListColors m_pageListColors;
 	PropSyntaxColors m_pageSyntaxColors;
 	PropArchive m_pageArchive;
 	PropBackups m_pageBackups;

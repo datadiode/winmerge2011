@@ -46,13 +46,8 @@ private:
 // Implementation
 protected:
 
-	typedef enum { SET_DEFAULTS, WRITE_OPTIONS, READ_OPTIONS, INVALIDATE } OPERATION;
 
 	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
 
-	void LoadCustomColors();
-	void SaveCustomColors();
-	void BrowseColor(int id, COLORREF & currentColor);
 	void SerializeColors(OPERATION op);
-	void SerializeColor(OPERATION op, int id, COptionDef<COLORREF> &optionName, COLORREF & color);
 };

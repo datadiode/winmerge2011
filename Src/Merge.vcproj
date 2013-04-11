@@ -783,6 +783,10 @@
 				>
 			</File>
 			<File
+				RelativePath="PropListColors.cpp"
+				>
+			</File>
+			<File
 				RelativePath="PropRegistry.cpp"
 				>
 			</File>
@@ -1405,6 +1409,10 @@
 			</File>
 			<File
 				RelativePath="PropGeneral.h"
+				>
+			</File>
+			<File
+				RelativePath="PropListColors.h"
 				>
 			</File>
 			<File

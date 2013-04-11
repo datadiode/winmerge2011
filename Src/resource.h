@@ -52,6 +52,7 @@
 #define IDD_CONFIRM_COPY                        235
 #define IDD_PROPPAGE_SHELL                      237
 #define IDD_PROPPAGE_COMPARE_FOLDER             238
+#define IDD_PROPPAGE_COLORS_LIST                239
 #define IDR_SPLASH                              308
 #define IDB_WINMERGE                            309
 #define IDB_OLDSPLASH                           310
@@ -375,13 +376,19 @@
 #define IDC_DEFAULT_STANDARD_COLORS             1281
 #define IDC_CUSTOM_COLORS_GROUP                 1282
 #define IDC_WHITESPACE_COLOR_LABEL              1283
+#define IDC_LEFTONLY_COLOR_LABEL                1283
 #define IDC_TEXT_COLOR_LABEL                    1284
+#define IDC_RIGHTONLY_COLOR_LABEL               1284
 #define IDC_SELECTION_COLOR_LABEL               1285
+#define IDC_SUSPICIOUS_COLOR_LABEL              1285
 #define IDC_TEXT_COLUMN_LABEL                   1286
 #define IDC_BACKGROUND_COLUMN_LABEL             1287
 #define IDC_WHITESPACE_BKGD_COLOR               1288
+#define IDC_LIST_LEFTONLY_BKGD_COLOR            1288
 #define IDC_REGULAR_BKGD_COLOR                  1289
+#define IDC_LIST_RIGHTONLY_BKGD_COLOR           1289
 #define IDC_SELECTION_BKGD_COLOR                1290
+#define IDC_LIST_SUSPICIOUS_BKGD_COLOR          1290
 #define IDC_SELECTION_TEXT_COLOR                1291
 #define IDC_REGULAR_TEXT_COLOR                  1292
 #define IDC_AUTO_COMPLETE_SOURCE                1293

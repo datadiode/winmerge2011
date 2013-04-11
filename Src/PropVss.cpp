@@ -33,8 +33,6 @@
 #include "FileOrFolderSelect.h"
 #include "VSSHelper.h" // VCS_* constants
 #include "PropVss.h"
-#include "OptionsDef.h"
-#include "OptionsMgr.h"
 #include "Common/MyCom.h"
 #include "Common/stream_util.h"
 

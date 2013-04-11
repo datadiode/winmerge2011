@@ -10,8 +10,6 @@
 #include "OptionsPanel.h"
 #include "resource.h"
 #include "PropBackups.h"
-#include "OptionsDef.h"
-#include "OptionsMgr.h"
 #include "FileOrFolderSelect.h"
 
 #ifdef _DEBUG

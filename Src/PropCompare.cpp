@@ -10,8 +10,6 @@
 #include "OptionsPanel.h"
 #include "resource.h"
 #include "PropCompare.h"
-#include "OptionsDef.h"
-#include "OptionsMgr.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

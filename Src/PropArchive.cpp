@@ -11,8 +11,6 @@
 #include "Constants.h"
 #include "resource.h"
 #include "PropArchive.h"
-#include "OptionsDef.h"
-#include "OptionsMgr.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

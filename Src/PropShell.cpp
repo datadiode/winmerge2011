@@ -12,8 +12,6 @@
 #include "resource.h"
 #include "PropShell.h"
 #include "RegKey.h"
-#include "OptionsDef.h"
-#include "OptionsMgr.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

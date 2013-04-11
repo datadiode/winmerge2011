@@ -7,7 +7,7 @@
 // ID line follows -- this is updated by SVN
 // $Id$
 
-class COptionsMgr;
+#include "OptionsMgr.h"
 
 /**
  * @brief A base class for WinMerge options dialogs.
@@ -23,4 +23,7 @@ public:
 	virtual void UpdateScreen() = 0;
 protected:
 	virtual BOOL OnInitDialog();
+	typedef enum { SET_DEFAULTS, WRITE_OPTIONS, READ_OPTIONS, INVALIDATE } OPERATION;
+	void BrowseColor(int id, COLORREF &currentColor);
+	void SerializeColor(OPERATION op, int id, COptionDef<COLORREF> &optionName, COLORREF &color);
 };

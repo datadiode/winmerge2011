@@ -33,8 +33,6 @@
 #include "SettingStore.h"
 #include "LanguageSelect.h"
 #include "PropGeneral.h"
-#include "OptionsDef.h"
-#include "OptionsMgr.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

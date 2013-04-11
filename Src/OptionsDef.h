@@ -282,7 +282,15 @@ extern COptionDef
 // Whether to use default (theme) text colors
 extern COptionDef
 <bool> OPT_CLR_DEFAULT_TEXT_COLORING operator((_T("Settings/DefaultTextColoring"), true));
-
+// Whether to use default (theme) list colors
+extern COptionDef
+<bool> OPT_CLR_DEFAULT_LIST_COLORING operator((_T("Settings/DefaultListColoring"), true));
+extern COptionDef
+<COLORREF> OPT_LIST_LEFTONLY_BKGD_COLOR operator((_T("Settings/LeftOnlyColor"), RGB(0xFF, 0xCC, 0xCC)));
+extern COptionDef
+<COLORREF> OPT_LIST_RIGHTONLY_BKGD_COLOR operator((_T("Settings/RightOnlyColor"), RGB(0xCC, 0xFF, 0xCC)));
+extern COptionDef
+<COLORREF> OPT_LIST_SUSPICIOUS_BKGD_COLOR operator((_T("Settings/SuspiciousColor"), RGB(0xFF, 0xFF, 0x80)));
 // Compare options
 extern COptionDef
 <int> OPT_CMP_IGNORE_WHITESPACE operator((_T("Settings/IgnoreSpace"), 0));

@@ -7,12 +7,10 @@
 // $Id$
 
 #include "StdAfx.h"
-#include "OptionsDef.h"
 #include "OptionsPanel.h"
 #include "resource.h"
 #include "SyntaxColors.h"
 #include "PropColors.h"
-#include "OptionsMgr.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -133,15 +131,6 @@ void PropMergeColors::WriteOptions()
 	SerializeColors(WRITE_OPTIONS);
 }
 
-/** 
- * @brief Let user browse common color dialog, and select a color
- */
-void PropMergeColors::BrowseColor(int id, COLORREF & currentColor)
-{
-	if (SyntaxColors.ChooseColor(m_hWnd, id))
-		currentColor = GetDlgItemInt(id);
-}
-
 void PropMergeColors::SerializeColors(OPERATION op)
 {
 	SerializeColor(op, IDC_DIFFERENCE_COLOR, OPT_CLR_DIFF, m_clrDiff);
@@ -171,26 +160,4 @@ void PropMergeColors::SerializeColors(OPERATION op)
 	SerializeColor(op, IDC_SEL_WORDDIFF_COLOR, OPT_CLR_SELECTED_WORDDIFF, m_clrSelWordDiff);
 	SerializeColor(op, IDC_SEL_WORDDIFF_DELETED_COLOR, OPT_CLR_SELECTED_WORDDIFF_DELETED, m_clrSelWordDiffDeleted);
 	SerializeColor(op, IDC_SEL_WORDDIFF_TEXT_COLOR, OPT_CLR_SELECTED_WORDDIFF_TEXT, m_clrSelWordDiffText);
-}
-
-void PropMergeColors::SerializeColor(OPERATION op, int id, COptionDef<COLORREF> &optionName, COLORREF & color)
-{
-	switch (op)
-	{
-	case SET_DEFAULTS:
-		color = COptionsMgr::GetDefault(optionName);
-		break;
-
-	case WRITE_OPTIONS:
-		COptionsMgr::SaveOption(optionName, color);
-		break;
-
-	case READ_OPTIONS:
-		color = COptionsMgr::Get(optionName);
-		break;
-
-	case INVALIDATE:
-		SetDlgItemInt(id, color);
-		break;
-	}
 }

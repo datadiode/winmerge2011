@@ -31,8 +31,6 @@
 #include "Common/coretools.h"
 #include "Common/SuperComboBox.h"
 #include "FileOrFolderSelect.h"
-#include "OptionsDef.h"
-#include "OptionsMgr.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

@@ -11,17 +11,12 @@
 #include "resource.h"
 #include "SyntaxColors.h"
 #include "PropTextColors.h"
-#include "OptionsDef.h"
-#include "OptionsMgr.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
-
-/** @brief Section name for settings in registry. */
-static const TCHAR Section[] = _T("Custom Colors");
 
 /** 
  * @brief Default constructor.

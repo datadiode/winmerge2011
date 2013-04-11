@@ -1822,9 +1822,39 @@ void CDirView::OnHideFilenames()
 
 LRESULT CDirView::ReflectCustomDraw(NMLVCUSTOMDRAW *pNM)
 {
-	if (pNM->nmcd.dwDrawStage == CDDS_PREPAINT)
+	switch (pNM->nmcd.dwDrawStage)
 	{
+	case CDDS_PREPAINT:
 		OnUpdateStatusNum();
+		if (COptionsMgr::Get(OPT_CLR_DEFAULT_LIST_COLORING))
+			break;
+		// fall through
+	case CDDS_ITEMPREPAINT:
+		return CDRF_NOTIFYITEMDRAW;
+	case CDDS_ITEMPREPAINT | CDDS_SUBITEM:
+		if (DIFFITEM *di = reinterpret_cast<DIFFITEM *>(pNM->nmcd.lItemlParam))
+		{
+			switch (di->diffcode & (DIFFCODE::SIDEFLAGS | DIFFCODE::COMPAREFLAGS))
+			{
+			case DIFFCODE::BOTH | DIFFCODE::NOCMP:
+			case DIFFCODE::BOTH | DIFFCODE::SAME:
+				// either identical or irrelevant
+				break;
+			case DIFFCODE::LEFT:
+				// left-only
+				pNM->clrTextBk = COptionsMgr::Get(OPT_LIST_LEFTONLY_BKGD_COLOR);
+				break;
+			case DIFFCODE::RIGHT:
+				// right-only
+				pNM->clrTextBk = COptionsMgr::Get(OPT_LIST_RIGHTONLY_BKGD_COLOR);
+				break;
+			default:
+				// otherwise suspicious
+				pNM->clrTextBk = COptionsMgr::Get(OPT_LIST_SUSPICIOUS_BKGD_COLOR);
+				break;
+			}
+		}
+		break;
 	}
 	return 0;
 }

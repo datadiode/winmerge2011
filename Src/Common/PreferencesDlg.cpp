@@ -12,8 +12,6 @@
 
 #include "StdAfx.h"
 #include "resource.h"
-#include "OptionsDef.h"
-#include "OptionsMgr.h"
 #include "SyntaxColors.h"
 #include "PreferencesDlg.h"
 #include "Merge.h"
@@ -135,6 +133,7 @@ BOOL CPreferencesDlg::OnInitDialog()
 		AddPage(&m_pageMergeColors, htiBranch);
 		AddPage(&m_pageSyntaxColors, htiBranch);
 		AddPage(&m_pageTextColors, htiBranch);
+		AddPage(&m_pageListColors, htiBranch);
 	}
 	AddPage(&m_pageArchive);
 	AddPage(&m_pageSystem);
@@ -246,6 +245,7 @@ void CPreferencesDlg::ReadOptions()
 	ReadOptions(&m_pageGeneral);
 	ReadOptions(&m_pageMergeColors);
 	ReadOptions(&m_pageTextColors);
+	ReadOptions(&m_pageListColors);
 	ReadOptions(&m_pageSyntaxColors);
 	ReadOptions(&m_pageSystem);
 	ReadOptions(&m_pageCompare);
@@ -271,6 +271,7 @@ void CPreferencesDlg::SaveOptions()
 	m_pageEditor.WriteOptions();
 	m_pageMergeColors.WriteOptions();
 	m_pageTextColors.WriteOptions();
+	m_pageListColors.WriteOptions();
 	m_pageSyntaxColors.WriteOptions();
 	SyntaxColors.SaveToRegistry();
 	m_pageCodepage.WriteOptions();
