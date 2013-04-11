@@ -26,7 +26,7 @@ struct DiffFileData
 
 	bool OpenFiles(LPCTSTR szFilepath1, LPCTSTR szFilepath2);
 	HANDLE GetFileHandle(int i);
-	void *AllocBuffer(int i, size_t len);
+	void *AllocBuffer(int i, size_t len, size_t alloc_extra);
 	void Reset();
 	void Close() { Reset(); }
 	void SetDisplayFilepaths(LPCTSTR szTrueFilepath1, LPCTSTR szTrueFilepath2);

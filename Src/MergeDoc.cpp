@@ -308,12 +308,14 @@ static void SaveBuffForDiff(CDiffTextBuffer & buf, CDiffTextBuffer & buf2, DiffF
 	int orig_codepage = buf.getCodepage();
 	UNICODESET orig_unicoding = buf.getUnicoding();
 
+	size_t alloc_extra = 0;
 	// If file was in Unicode
 	if ((orig_unicoding != NONE) || (buf2.getUnicoding() != NONE))
 	{
 		// we subvert the buffer's memory of the original file encoding
 		buf.setUnicoding(UCS2LE);  // write as UCS-2LE (for preprocessing)
 		buf.setCodepage(0); // should not matter
+		alloc_extra = ~0U; // allocate extra room for transcoding
 	}
 
 	// write buffer out to temporary file
@@ -321,7 +323,7 @@ static void SaveBuffForDiff(CDiffTextBuffer & buf, CDiffTextBuffer & buf2, DiffF
 	NulWriteStream nws;
 	int retVal = buf.SaveToFile(NULL, &nws, sError);
 	ULONG len = nws.GetSize();
-	if (void *buffer = diffdata.AllocBuffer(i, len))
+	if (void *buffer = diffdata.AllocBuffer(i, len, alloc_extra))
 	{
 		MemWriteStream mws(buffer, len);
 		buf.SaveToFile(NULL, &mws, sError);

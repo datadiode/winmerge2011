@@ -68,13 +68,13 @@ void DiffFileData::SetDisplayFilepaths(LPCTSTR szTrueFilepath1, LPCTSTR szTrueFi
 }
 
 /** @brief Allocate a buffer in the inf structure (return NULL if failure) */
-void *DiffFileData::AllocBuffer(int i, size_t len)
+void *DiffFileData::AllocBuffer(int i, size_t len, size_t alloc_extra)
 {
 	typedef unsigned word;
 	m_inf[i].desc = i;
 	m_inf[i].name = allocated_buffer_name;
 	m_inf[i].buffered_chars = len;
-	len += sizeof(word) + 1; 
+	len += (alloc_extra & len / 2) + sizeof(word) + 1;
 	m_inf[i].bufsize = len;
 	void *buffer = malloc(len);
 	m_inf[i].buffer = (char *)buffer;
