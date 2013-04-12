@@ -56,7 +56,8 @@ public:
 	String	m_file1;
 	String	m_file2;
 	String	m_fileResult;
-	BOOL m_ignoreBlanks;
+	BOOL m_ignoreBlankLines;
+	BOOL m_applyLineFilters;
 	int m_whitespaceCompare;
 	BOOL m_appendFile;
 	BOOL m_openToEditor;

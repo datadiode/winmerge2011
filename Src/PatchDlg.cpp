@@ -56,7 +56,8 @@ template<ODialog::DDX_Operation op>
 bool CPatchDlg::UpdateData()
 {
 	DDX_Check<op>(IDC_DIFF_CASESENSITIVE, m_caseSensitive);
-	DDX_Check<op>(IDC_DIFF_WHITESPACE_IGNOREBLANKS, m_ignoreBlanks);
+	DDX_Check<op>(IDC_DIFF_IGNORE_BLANK_LINES, m_ignoreBlankLines);
+	DDX_Check<op>(IDC_DIFF_APPLY_LINE_FILTERS, m_applyLineFilters);
 	DDX_Check<op>(IDC_DIFF_WHITESPACE_COMPARE, m_whitespaceCompare, WHITESPACE_COMPARE_ALL);
 	DDX_Check<op>(IDC_DIFF_WHITESPACE_IGNORE, m_whitespaceCompare, WHITESPACE_IGNORE_CHANGE);
 	DDX_Check<op>(IDC_DIFF_WHITESPACE_IGNOREALL, m_whitespaceCompare, WHITESPACE_IGNORE_ALL);
@@ -508,7 +509,8 @@ void CPatchDlg::LoadSettings()
 		m_contextLines = 0;
 
 	m_caseSensitive = SettingStore.GetProfileInt(_T("PatchCreator"), _T("CaseSensitive"), TRUE);
-	m_ignoreBlanks = SettingStore.GetProfileInt(_T("PatchCreator"), _T("IgnoreBlankLines"), FALSE);
+	m_ignoreBlankLines = SettingStore.GetProfileInt(_T("PatchCreator"), _T("IgnoreBlankLines"), FALSE);
+	m_applyLineFilters = SettingStore.GetProfileInt(_T("PatchCreator"), _T("ApplyLineFilters"), FALSE);
 	
 	m_whitespaceCompare = SettingStore.GetProfileInt(_T("PatchCreator"), _T("Whitespace"), WHITESPACE_COMPARE_ALL);
 	if (m_whitespaceCompare < WHITESPACE_COMPARE_ALL ||
@@ -531,7 +533,8 @@ void CPatchDlg::SaveSettings()
 	SettingStore.WriteProfileInt(_T("PatchCreator"), _T("PatchStyle"), m_outputStyle);
 	SettingStore.WriteProfileInt(_T("PatchCreator"), _T("ContextLines"), m_contextLines);
 	SettingStore.WriteProfileInt(_T("PatchCreator"), _T("CaseSensitive"), m_caseSensitive);
-	SettingStore.WriteProfileInt(_T("PatchCreator"), _T("IgnoreBlankLines"), m_ignoreBlanks);
+	SettingStore.WriteProfileInt(_T("PatchCreator"), _T("IgnoreBlankLines"), m_ignoreBlankLines);
+	SettingStore.WriteProfileInt(_T("PatchCreator"), _T("ApplyLineFilters"), m_applyLineFilters);
 	SettingStore.WriteProfileInt(_T("PatchCreator"), _T("Whitespace"), m_whitespaceCompare);
 	SettingStore.WriteProfileInt(_T("PatchCreator"), _T("OpenToEditor"), m_openToEditor);
 	SettingStore.WriteProfileInt(_T("PatchCreator"), _T("IncludeCmdLine"), m_includeCmdLine);
@@ -542,10 +545,11 @@ void CPatchDlg::SaveSettings()
  */
 void CPatchDlg::OnDefaultSettings()
 {
-	m_outputStyle = OUTPUT_NORMAL;
-	m_contextLines = 0;
+	m_outputStyle = OUTPUT_UNIFIED;
+	m_contextLines = 5;
 	m_caseSensitive = TRUE;
-	m_ignoreBlanks = FALSE;
+	m_ignoreBlankLines = FALSE;
+	m_applyLineFilters = FALSE;
 	m_whitespaceCompare = WHITESPACE_COMPARE_ALL;
 	m_openToEditor = FALSE;
 	m_includeCmdLine = FALSE;

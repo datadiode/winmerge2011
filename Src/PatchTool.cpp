@@ -86,12 +86,13 @@ void CPatchTool::Run()
 
 		// These are from checkboxes and radiobuttons - can't be wrong
 		m_diffWrapper.nIgnoreWhitespace = m_dlgPatch.m_whitespaceCompare;
-		m_diffWrapper.bIgnoreBlankLines = m_dlgPatch.m_ignoreBlanks != FALSE;
+		m_diffWrapper.bIgnoreBlankLines = m_dlgPatch.m_ignoreBlankLines != FALSE;
 		// Use this because non-sensitive setting can't write
 		// patch file EOLs correctly
 		m_diffWrapper.bIgnoreEol = false;
 		m_diffWrapper.bIgnoreCase = m_dlgPatch.m_caseSensitive == FALSE;
 		m_diffWrapper.bFilterCommentsLines = false;
+		m_diffWrapper.bApplyLineFilters = m_dlgPatch.m_applyLineFilters != FALSE;;
 		m_diffWrapper.RefreshFilters();
 
 		String path = paths_GetParentPath(m_dlgPatch.m_fileResult.c_str());
