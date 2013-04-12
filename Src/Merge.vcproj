@@ -407,6 +407,10 @@
 				>
 			</File>
 			<File
+				RelativePath="ConsoleWindow.cpp"
+				>
+			</File>
+			<File
 				RelativePath="convert_utf\ConvertUTF.c"
 				>
 				<FileConfiguration
@@ -1053,6 +1057,10 @@
 			</File>
 			<File
 				RelativePath="ConflictFileParser.h"
+				>
+			</File>
+			<File
+				RelativePath="ConsoleWindow.h"
 				>
 			</File>
 			<File
