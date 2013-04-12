@@ -52,3 +52,38 @@ void UndoRecord::FreeText()
 		free(m_pszText);
 	m_pszText = NULL;
 }
+
+bool UndoRecord::VerifyText(const String &text) const
+{
+	// Verify recorded text against passed-in text, regardless of the former's
+	// EOL style, but assuming the latter to follow Unix EOL style.
+	LPCTSTR p = text.c_str();
+	LPCTSTR r = p + text.length();
+	LPCTSTR p2 = GetText();
+	LPCTSTR r2 = p2 + GetTextLength();
+	while (size_t n = r - p)
+	{
+		LPCTSTR q = wmemchr(p, L'\n', n);
+		if (q == NULL)
+			q = p + n;
+		size_t delta = q - p;
+		if (delta > static_cast<size_t>(r2 - p2))
+			break;
+		if (memcmp(p, p2, delta * sizeof(TCHAR)) != 0)
+			break;
+		p2 += delta;
+		p = q;
+		if (p < r)
+		{
+			if (p2 == r2)
+				break;
+			TCHAR c = *p2;
+			if (c != '\r' && c != '\n')
+				break;
+			if (++p2 < r2 && c == '\r' && *p2 == '\n')
+				++p2;
+			++p;
+		}
+	}
+	return p == r;
+}

@@ -208,7 +208,7 @@ void CGhostTextBuffer::GetTextWithoutEmptys(int nStartLine, int nStartChar,
 			nStartChar = 0;
 
 			// copy the EOL of the requested type
-			if (li.GetEol())
+			if (i < nEndLine && li.GetEol())
 			{
 				CopyMemory(pszBuf, pszCRLF, nCRLFLength * sizeof(TCHAR));
 				pszBuf += nCRLFLength;
@@ -285,7 +285,7 @@ bool CGhostTextBuffer::Undo(CCrystalTextView *pSource, POINT &ptCursorPos)
 			ur.m_redo_ptEndPos.y = ComputeRealLineAndGhostAdjustment (apparent_ptEndPos.y, ur.m_redo_ptEndPos_nGhost);
 
 			// flags are going to be deleted so we store them now
-			int bLastLineGhost = ((GetLineFlags(apparent_ptEndPos.y) & LF_GHOST) != 0);
+			const DWORD bLastLineGhost = GetLineFlags(apparent_ptEndPos.y) & LF_GHOST;
 
 			const int size = GetLineCount();
 			if ((apparent_ptStartPos.y < size) &&
@@ -293,15 +293,25 @@ bool CGhostTextBuffer::Undo(CCrystalTextView *pSource, POINT &ptCursorPos)
 				(apparent_ptEndPos.y < size) &&
 				(apparent_ptEndPos.x <= m_aLines[apparent_ptEndPos.y].Length()))
 			{
-				GetTextWithoutEmptys(apparent_ptStartPos.y, apparent_ptStartPos.x, apparent_ptEndPos.y, apparent_ptEndPos.x, text);
-				// TODO: This ASSERT fires after changing EOL style. If it fires
-				// for other reasons, fix them but keep EOL style change intact.
-				ASSERT(text.length() == ur.GetTextLength() && memcmp(text.c_str(), ur.GetText(), text.length() * sizeof(TCHAR)) == 0);
-				InternalDeleteText(pSource, 
-					apparent_ptStartPos.y, apparent_ptStartPos.x,
-					apparent_ptEndPos.y, apparent_ptEndPos.x);
-				m_dwCurrentRevisionNumber++;
-				ptCursorPos = apparent_ptStartPos;
+				GetTextWithoutEmptys(apparent_ptStartPos.y, apparent_ptStartPos.x,
+					apparent_ptEndPos.y, apparent_ptEndPos.x, text, CRLF_STYLE_UNIX);
+				if (ur.VerifyText(text))
+				{
+					InternalDeleteText(pSource, 
+						apparent_ptStartPos.y, apparent_ptStartPos.x,
+						apparent_ptEndPos.y, apparent_ptEndPos.x);
+					m_dwCurrentRevisionNumber++;
+					ptCursorPos = apparent_ptStartPos;
+				}
+				else
+				{
+					//..Try to ensure that we are undoing correctly...
+					//  Just compare the text as it was before Undo operation
+#ifdef _ADVANCED_BUGCHECK
+					ASSERT(0);
+#endif
+					break;
+				}
 			}
 			else
 			{
@@ -452,8 +462,9 @@ bool CGhostTextBuffer::Redo(CCrystalTextView *pSource, POINT &ptCursorPos)
 		{
 #ifdef _ADVANCED_BUGCHECK
 			String text;
-			GetTextWithoutEmptys (apparent_ptStartPos.y, apparent_ptStartPos.x, apparent_ptEndPos.y, apparent_ptEndPos.x, text);
-			ASSERT(text.length() == ur.GetTextLength() && memcmp(text.c_str(), ur.GetText(), text.length() * sizeof(TCHAR)) == 0);
+			GetTextWithoutEmptys(apparent_ptStartPos.y, apparent_ptStartPos.x,
+				apparent_ptEndPos.y, apparent_ptEndPos.x, text, CRLF_STYLE_UNIX);
+			ASSERT(ur.VerifyText(text));
 #endif
 			DeleteText(pSource, apparent_ptStartPos.y, apparent_ptStartPos.x, 
 				apparent_ptEndPos.y, apparent_ptEndPos.x, 0, FALSE);

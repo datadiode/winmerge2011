@@ -69,6 +69,7 @@ public:
 
 	void SetText(LPCTSTR pszText, int cchText);
 	void FreeText();
+	bool VerifyText(const String &) const;
 
 	LPCTSTR GetText() const
 	{
