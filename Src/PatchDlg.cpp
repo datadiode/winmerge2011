@@ -31,7 +31,6 @@
 #include "DIFF.H"
 #include "coretools.h"
 #include "paths.h"
-#include "CompareOptions.h"
 #include "FileOrFolderSelect.h"
 
 #ifdef _DEBUG

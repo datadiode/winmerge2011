@@ -11,7 +11,6 @@
 #include "LanguageSelect.h"
 #include "MainFrm.h"
 #include "paths.h"
-#include "OptionsDef.h"
 #include "ProjectFile.h"
 #include "coretools.h"
 #include "ProjectFilePathsDlg.h"

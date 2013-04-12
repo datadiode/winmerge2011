@@ -33,7 +33,6 @@
 #include "paths.h"
 #include "CompareStats.h"
 #include "codepage_detect.h"
-#include "DiffItemList.h"
 #include "Common/version.h"
 
 String CDiffContext::GetLeftFilepathAndName(const DIFFITEM *di) const

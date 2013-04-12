@@ -41,7 +41,6 @@
 #include "paths.h"
 #include "Environment.h"
 #include "7zCommon.h"
-#include "OptionsDef.h"
 #include "DirCmpReport.h"
 #include "DirCompProgressDlg.h"
 #include "CompareStatisticsDlg.h"

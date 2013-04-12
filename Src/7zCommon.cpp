@@ -98,10 +98,8 @@ DATE:		BY:					DESCRIPTION:
 // $Id$
 
 #include "StdAfx.h"
-#include "OptionsDef.h"
 #include "Merge.h"
 #include "SettingStore.h"
-#include "OptionsMgr.h"
 #include "LanguageSelect.h"
 #include "resource.h"
 #include "DirFrame.h"

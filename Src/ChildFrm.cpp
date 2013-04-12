@@ -38,7 +38,6 @@
 #include "MergeDiffDetailView.h"
 #include "LocationView.h"
 #include "WMGotoDlg.h"
-#include "OptionsDef.h"
 #include "Common/SettingStore.h"
 #include "Common/stream_util.h"
 #include "Common/coretools.h"

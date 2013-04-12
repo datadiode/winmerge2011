@@ -28,7 +28,6 @@
 #include "LanguageSelect.h"
 #include "common/coretypes.h"
 #include "common/coretools.h"
-#include "DiffWrapper.h"
 #include "PatchTool.h"
 #include "paths.h"
 

@@ -14,7 +14,6 @@
 #include "Merge.h"
 #include "LogFile.h"
 #include "OptionsMgr.h"
-#include "OptionsDef.h"
 #include "Environment.h"
 #include "FileTransform.h"
 #include "FileTextEncoding.h"

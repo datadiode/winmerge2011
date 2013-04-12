@@ -10,10 +10,7 @@
 #include "Merge.h"
 #include "MainFrm.h"
 
-#include "OptionsDef.h"
-#include "OptionsMgr.h"
 #include "SettingStore.h"
-#include "DiffWrapper.h" // CMP_CONTENT
 
 IOptionDef *IOptionDef::First = NULL;
 

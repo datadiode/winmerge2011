@@ -32,18 +32,12 @@
 #include "LanguageSelect.h"
 #include "HexMergeFrm.h"
 #include "HexMergeView.h"
-#include "DiffItem.h"
-#include "FolderCmp.h"
 #include "MainFrm.h"
 #include "Environment.h"
 #include "coretools.h"
 #include "DirFrame.h"
-#include "OptionsDef.h"
-#include "DiffFileInfo.h"
 #include "SaveClosingDlg.h"
-#include "DiffList.h"
 #include "paths.h"
-#include "OptionsMgr.h"
 #include "FileOrFolderSelect.h"
 
 #ifdef _DEBUG

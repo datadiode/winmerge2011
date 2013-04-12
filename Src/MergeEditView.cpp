@@ -34,11 +34,9 @@
 #include "MergeEditView.h"
 #include "MergeDiffDetailView.h"
 #include "MainFrm.h"
-#include "OptionsMgr.h"
 #include "Environment.h"
 #include "ConsoleWindow.h"
 #include "WMGotoDlg.h"
-#include "OptionsDef.h"
 #include "SyntaxColors.h"
 #include "Common/stream_util.h"
 

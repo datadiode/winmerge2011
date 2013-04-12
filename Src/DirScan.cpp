@@ -11,7 +11,6 @@
 #include "LogFile.h"
 #include "CompareStats.h"
 #include "DiffContext.h"
-#include "FileFilterHelper.h"
 #include "codepage.h"
 #include "DirItem.h"
 #include "paths.h"

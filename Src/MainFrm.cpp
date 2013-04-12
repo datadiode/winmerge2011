@@ -27,13 +27,10 @@
 // $Id$
 
 #include "StdAfx.h"
-#include "DiffWrapper.h"
 #include "VSSHelper.h"
 #include "Merge.h"
 #define operator(args) args
-#include "OptionsDef.h"
 #include <htmlhelp.h>  // From HTMLHelp Workshop (incl. in Platform SDK)
-#include "Constants.h"
 #include "Common/SettingStore.h"
 #include "Common/WindowPlacement.h"
 #include "AboutDlg.h"
@@ -59,16 +56,13 @@
 #include "7zCommon.h"
 #include "dllpstub.h"
 #include "FileFiltersDlg.h"
-#include "OptionsMgr.h"
 #include "LanguageSelect.h"
 #include "codepage_detect.h"
 #include "codepage.h"
 #include "ProjectFile.h"
 #include "PreferencesDlg.h"
 #include "ProjectFilePathsDlg.h"
-#include "MergeCmdLineInfo.h"
 #include "FileOrFolderSelect.h"
-#include "stringdiffs.h"
 #include "OpenDlg.h"
 #include <MyCom.h>
 #include <mlang.h>

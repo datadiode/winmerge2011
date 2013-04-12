@@ -7,12 +7,10 @@
 // $Id$
 
 #include "StdAfx.h"
-#include "CompareOptions.h"
 #include "DiffUtils.h"
 #include "ByteCompare.h"
 #include "LogFile.h"
 #include "paths.h"
-#include "FilterList.h"
 #include "DiffContext.h"
 #include "DiffWrapper.h"
 #include "FileTransform.h"

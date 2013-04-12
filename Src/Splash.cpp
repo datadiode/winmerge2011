@@ -31,8 +31,6 @@
 #include "Merge.h"
 #include "MainFrm.h"
 #include "LanguageSelect.h"
-#include "OptionsMgr.h"
-#include "OptionsDef.h"
 #include "Splash.h"
 #include "common/ResourceStream.h"
 #include "common/version.h"

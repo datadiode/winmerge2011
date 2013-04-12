@@ -13,7 +13,6 @@
 #include "MainFrm.h"
 #include "SettingStore.h"
 #include "LanguageSelect.h"
-#include "OptionsDef.h"
 #include "coretools.h"
 #include "paths.h"
 #include "VssPrompt.h"

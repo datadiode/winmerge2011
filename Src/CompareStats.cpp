@@ -7,7 +7,6 @@
 // $Id$
 
 #include "StdAfx.h"
-#include "DiffItem.h"
 #include "DiffContext.h"
 #include "CompareStats.h"
 

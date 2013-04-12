@@ -35,7 +35,6 @@
 #include "HexMergeFrm.h"
 #include "7zCommon.h"
 #include "CompareStats.h"
-#include "FilterList.h"
 #include "DirFrame.h"
 #include "DirView.h"
 #include "MainFrm.h"
@@ -43,9 +42,7 @@
 #include "markdown.h"
 #include "LogFile.h"
 #include "paths.h"
-#include "OptionsDef.h"
 #include "FileActionScript.h"
-#include "LineFiltersList.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

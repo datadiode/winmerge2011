@@ -11,7 +11,6 @@
 #include "Environment.h"
 #include "Merge.h"
 #include "OptionsMgr.h"
-#include "OptionsDef.h"
 
 /**
  * @brief Temp path.

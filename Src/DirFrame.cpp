@@ -36,7 +36,6 @@
 #include "LanguageSelect.h"
 #include "DirFrame.h"
 #include "DirView.h"
-#include "OptionsDef.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

@@ -33,7 +33,6 @@
 #include "HexMergeFrm.h"
 #include "HexMergeView.h"
 #include "LanguageSelect.h"
-#include "OptionsDef.h"
 #include "paths.h"
 #include "Environment.h"
 

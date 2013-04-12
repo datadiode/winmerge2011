@@ -31,9 +31,7 @@
 #include <new.h> // _set_new_handler
 #include <process.h> // _cexit
 #include <tlhelp32.h> 
-#include "Constants.h"
 #include "Environment.h"
-#include "OptionsMgr.h"
 #include "Common/SettingStore.h"
 #include "Common/WindowPlacement.h"
 #include "Merge.h"
@@ -47,12 +45,9 @@
 #include "LogFile.h"
 #include "coretools.h"
 #include "paths.h"
-#include "FileFilterHelper.h"
 #include "ProjectFile.h"
 #include "MergeEditView.h"
 #include "LanguageSelect.h"
-#include "OptionsDef.h"
-#include "MergeCmdLineInfo.h"
 #include "ConflictFileParser.h"
 #include "codepage.h"
 

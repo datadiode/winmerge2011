@@ -7,10 +7,9 @@
 // $Id$
 
 #include "StdAfx.h"
-#include "merge.h"
+#include "Merge.h"
 #include "LanguageSelect.h"
 #include "SharedFilterDlg.h"
-#include "OptionsDef.h"
 #include "OptionsMgr.h"
 
 #ifdef _DEBUG

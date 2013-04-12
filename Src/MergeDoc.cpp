@@ -45,18 +45,13 @@
 #include "DirFrame.h"
 #include "FileTransform.h"
 #include "UniFile.h"
-#include "OptionsDef.h"
-#include "DiffFileInfo.h"
 #include "SaveClosingDlg.h"
-#include "DiffList.h"
 #include "codepage.h"
 #include "paths.h"
-#include "OptionsMgr.h"
 #include "SyntaxColors.h"
 #include "ProjectFile.h"
 #include "FileOrFolderSelect.h"
 #include "LineFiltersList.h"
-#include "MergeCmdLineInfo.h"
 #include "stream_util.h"
 
 #ifdef _DEBUG

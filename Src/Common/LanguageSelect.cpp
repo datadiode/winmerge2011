@@ -7,7 +7,6 @@
 // $Id$
 
 #include "StdAfx.h"
-#include "OptionsDef.h"
 #include "Merge.h"
 #include "version.h"
 #include "resource.h"

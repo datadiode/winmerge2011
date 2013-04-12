@@ -10,7 +10,6 @@
 #include "StdAfx.h"
 #include "Merge.h"
 #include "OptionsMgr.h"
-#include "DiffList.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

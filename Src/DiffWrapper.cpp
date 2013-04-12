@@ -26,11 +26,7 @@
 
 #include "StdAfx.h"
 #include "coretools.h"
-#include "DiffList.h"
 #include "MovedLines.h"
-#include "FilterList.h"
-#include "LineFiltersList.h"
-#include "DiffWrapper.h"
 #include "Merge.h"
 #include "MainFrm.h"
 #include "DIFF.H"

@@ -25,7 +25,6 @@
 #include "StdAfx.h"
 #include "Merge.h"
 #include "LanguageSelect.h"
-#include "OptionsDef.h"
 #include "MainFrm.h"
 #include "FileActionScript.h"
 #include "ShellFileOperations.h"

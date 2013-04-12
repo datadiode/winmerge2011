@@ -8,7 +8,6 @@
 
 #include "StdAfx.h"
 #include "OptionsPanel.h"
-#include "Constants.h"
 #include "resource.h"
 #include "PropArchive.h"
 

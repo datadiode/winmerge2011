@@ -34,7 +34,6 @@
 #include "LanguageSelect.h"
 #include "HexMergeFrm.h"
 #include "HexMergeView.h"
-#include "OptionsDef.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

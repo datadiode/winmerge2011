@@ -8,14 +8,10 @@
 
 
 #include "StdAfx.h"
-#include "CompareOptions.h"
-#include "FilterList.h"
 #include "DiffContext.h"
 #include "DIFF.H"
-#include "DiffUtils.h"
 #include "coretools.h"
 #include "DiffList.h"
-#include "FilterCommentsManager.h"
 
 namespace CompareEngines
 {

@@ -15,9 +15,7 @@
 #include "LanguageSelect.h"
 #include "MergeDiffDetailView.h"
 #include "MainFrm.h"
-#include "OptionsMgr.h"
 #include "ChildFrm.h"
-#include "OptionsDef.h"
 #include "SyntaxColors.h"
 
 #ifdef _DEBUG

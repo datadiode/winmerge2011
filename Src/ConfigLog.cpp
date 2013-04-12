@@ -31,7 +31,6 @@
 #include "paths.h"
 #include "codepage.h"
 #include "7zCommon.h"
-#include "CompareOptions.h"
 #include "SettingStore.h"
 #include "Environment.h"
 

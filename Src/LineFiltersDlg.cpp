@@ -9,8 +9,6 @@
 #include "StdAfx.h"
 #include "Merge.h"
 #include "LanguageSelect.h"
-#include "FilterList.h"
-#include "LineFiltersList.h"
 #include "MainFrm.h"
 #include "LineFiltersDlg.h"
 #include "pcre.h"
