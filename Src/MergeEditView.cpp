@@ -36,7 +36,7 @@
 #include "MainFrm.h"
 #include "OptionsMgr.h"
 #include "Environment.h"
-#include "FileTransform.h"
+#include "ConsoleWindow.h"
 #include "WMGotoDlg.h"
 #include "OptionsDef.h"
 #include "SyntaxColors.h"
@@ -1106,6 +1106,16 @@ void CMergeEditView::OnContextMenu(LPARAM lParam)
 		OException::Check(CoGetObject(pluginMoniker.c_str(), NULL,
 			IID_IDispatch, reinterpret_cast<void **>(&spDispatch)));
 		CMyDispId DispId;
+
+		if (SUCCEEDED(DispId.Init(spDispatch, L"ShowConsole")))
+		{
+			CMyVariant var;
+			OException::Check(DispId.Call(spDispatch,
+				CMyDispParams<0>().Unnamed, DISPATCH_PROPERTYGET, &var));
+			OException::Check(var.ChangeType(VT_UI2));
+			ShowConsoleWindow(V_UI2(&var));
+		}
+
 		OException::Check(DispId.Init(spDispatch, method));
 		String text;
 		if (IsSelection())
