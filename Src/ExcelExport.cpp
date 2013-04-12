@@ -212,8 +212,8 @@ void CExcelExport::ApplyProfile(LPCTSTR app, LPCTSTR ini, bool fWriteDefaults)
 
 void CExcelExport::WriteWorkbook(HListView *pLv)
 {
-	HWND hHd = ListView_GetHeader(pLv->m_hWnd);
-	int const nCols = Header_GetItemCount(hHd);
+	HHeaderCtrl *const pHd = pLv->GetHeaderCtrl();
+	int const nCols = pHd->GetItemCount();
 	stl::vector<WORD> rgFormatIndex;
 	rgFormatIndex.resize(nCols);
 	int cxChar = pLv->GetStringWidth(_T("0"));
