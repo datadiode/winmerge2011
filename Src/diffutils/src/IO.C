@@ -83,6 +83,12 @@ static enum UNICODESET get_unicode_signature(struct file_data *, unsigned *bom);
 static enum UNICODESET get_unicode_signature(struct file_data *current, unsigned *bom)
 {
   unsigned dummy = 0;
+  /* Prevent bogus BOMs from crashing in-place transcoding upon Rescan(). */
+  if (current->name == allocated_buffer_name &&
+      current->buffered_chars + sizeof(word) + 1 == current->bufsize)
+    {
+      return NONE;
+    }
   return DetermineEncoding(current->buffer, current->buffered_chars, bom ? bom : &dummy);
 }
 
