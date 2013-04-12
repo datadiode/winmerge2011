@@ -2862,12 +2862,12 @@ namespace H2O
 			return ListView_DeleteItem(m_hWnd, iItem);
 		}
 
-		HWND EditLabel(int iItem)
+		HEdit *EditLabel(int iItem)
 		// Begins in-place editing of the specified list-view item's text.
 		{
 			using ::SendMessage;
 			assert(::IsWindow(m_hWnd));
-			return ListView_EditLabel(m_hWnd, iItem);
+			return reinterpret_cast<HEdit *>(ListView_EditLabel(m_hWnd, iItem));
 		}
 
 		void CancelEditLabel()
@@ -3452,14 +3452,14 @@ namespace H2O
 			return TreeView_DeleteItem(m_hWnd, hItem);
 		}
 
-		HWND EditLabel(HTREEITEM hItem)
+		HEdit *EditLabel(HTREEITEM hItem)
 		// Begins in-place editing of the specified item's text, replacing the text of the item
 		// with a single-line edit control containing the text.
 		// The specified item is implicitly selected and focused.
 		{
 			using ::SendMessage;
 			assert(::IsWindow(m_hWnd));
-			return TreeView_EditLabel(m_hWnd, hItem);
+			return reinterpret_cast<HEdit *>(TreeView_EditLabel(m_hWnd, hItem));
 		}
 
 		BOOL EndEditLabelNow(BOOL fCancel)
