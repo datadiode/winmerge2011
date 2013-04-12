@@ -293,25 +293,15 @@ bool CGhostTextBuffer::Undo(CCrystalTextView *pSource, POINT &ptCursorPos)
 				(apparent_ptEndPos.y < size) &&
 				(apparent_ptEndPos.x <= m_aLines[apparent_ptEndPos.y].Length()))
 			{
-				GetTextWithoutEmptys (apparent_ptStartPos.y, apparent_ptStartPos.x, apparent_ptEndPos.y, apparent_ptEndPos.x, text);
-				if (text.length() == ur.GetTextLength() && memcmp(text.c_str(), ur.GetText(), text.length() * sizeof(TCHAR)) == 0)
-				{
-					InternalDeleteText(pSource, 
-						apparent_ptStartPos.y, apparent_ptStartPos.x,
-						apparent_ptEndPos.y, apparent_ptEndPos.x);
-					m_dwCurrentRevisionNumber++;
-					ptCursorPos = apparent_ptStartPos;
-				}
-				else
-				{
-					//..Try to ensure that we are undoing correctly...
-					//  Just compare the text as it was before Undo operation
-#ifdef _ADVANCED_BUGCHECK
-					ASSERT(0);
-#endif
-					break;
-				}
-
+				GetTextWithoutEmptys(apparent_ptStartPos.y, apparent_ptStartPos.x, apparent_ptEndPos.y, apparent_ptEndPos.x, text);
+				// TODO: This ASSERT fires after changing EOL style. If it fires
+				// for other reasons, fix them but keep EOL style change intact.
+				ASSERT(text.length() == ur.GetTextLength() && memcmp(text.c_str(), ur.GetText(), text.length() * sizeof(TCHAR)) == 0);
+				InternalDeleteText(pSource, 
+					apparent_ptStartPos.y, apparent_ptStartPos.x,
+					apparent_ptEndPos.y, apparent_ptEndPos.x);
+				m_dwCurrentRevisionNumber++;
+				ptCursorPos = apparent_ptStartPos;
 			}
 			else
 			{
