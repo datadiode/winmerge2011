@@ -57,7 +57,7 @@ OWindow::~OWindow()
 
 struct DrawItemStruct_WebLinkButton : DRAWITEMSTRUCT
 {
-	void DrawItem()
+	void DrawItem() const
 	{
 		TCHAR cText[INTERNET_MAX_PATH_LENGTH];
 		int cchText = ::GetWindowText(hwndItem, cText, _countof(cText));
@@ -68,9 +68,6 @@ struct DrawItemStruct_WebLinkButton : DRAWITEMSTRUCT
 		}
 		RECT rcText = rcItem;
 		::DrawText(hDC, cText, cchText, &rcText, DT_LEFT | DT_CALCRECT);
-		::OffsetRect(&rcText, 1, 0);
-		rcItem.right = rcText.right + 1;
-		rcItem.bottom = rcText.bottom + 1;
 		switch (itemAction)
 		{
 		case ODA_DRAWENTIRE:
@@ -86,10 +83,12 @@ struct DrawItemStruct_WebLinkButton : DRAWITEMSTRUCT
 			case ODA_FOCUS:
 				if (!(itemState & ODS_NOFOCUSRECT))
 				{
-					::SetTextColor(hDC, 0);
+					::SetTextColor(hDC, RGB(0,0,0));
 					::SetBkColor(hDC, RGB(255,255,255));
 					::SetBkMode(hDC, OPAQUE);
-					::DrawFocusRect(hDC, &rcItem);
+					rcText.top = rcText.bottom - 1;
+					++rcText.bottom;
+					::DrawFocusRect(hDC, &rcText);
 				}
 			}
 			break;
