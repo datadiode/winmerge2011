@@ -108,6 +108,26 @@ LRESULT PropRegistry::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		case MAKEWPARAM(IDC_SUPPLEMENT_FOLDER, CBN_DROPDOWN):
 			reinterpret_cast<HSuperComboBox *>(lParam)->AdjustDroppedWidth();
 			break;
+		case IDC_LABEL_SUPPLEMENT_FOLDER:
+			if ((UINT)ShellExecute(NULL, _T("open"), m_supplementFolder.c_str(), NULL, NULL, SW_SHOWNORMAL) > 32)
+				MessageReflect_WebLinkButton<WM_COMMAND>(wParam, lParam);
+			else
+				MessageBeep(0); // unable to open folder
+			break;
+		}
+		break;
+	case WM_DRAWITEM:
+		switch (wParam)
+		{
+		case IDC_LABEL_SUPPLEMENT_FOLDER:
+			return MessageReflect_WebLinkButton<WM_DRAWITEM>(wParam, lParam);
+		}
+		break;
+	case WM_SETCURSOR:
+		switch (::GetDlgCtrlID(reinterpret_cast<HWND>(wParam)))
+		{
+		case IDC_LABEL_SUPPLEMENT_FOLDER:
+			return MessageReflect_WebLinkButton<WM_SETCURSOR>(wParam, lParam);
 		}
 		break;
 	}

@@ -374,6 +374,7 @@
 #define IDC_RESULTS                             1275
 #define IDC_IS_DIRECTORY                        1276
 #define IDC_HEADER_FILTER_NAME                  1277
+#define IDC_LABEL_SUPPLEMENT_FOLDER             1278
 #define IDC_DEFAULT_STANDARD_COLORS             1281
 #define IDC_CUSTOM_COLORS_GROUP                 1282
 #define IDC_WHITESPACE_COLOR_LABEL              1283
