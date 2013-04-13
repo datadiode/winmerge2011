@@ -1082,8 +1082,8 @@ void CMainFrame::ShowMergeDoc(CDirFrame *pDirDoc,
 		FileLocationGuessEncodings(filelocRight, bGuessEncoding);
 	}
 
-	BOOL bLeftRO = (dwLeftFlags & FFILEOPEN_READONLY) > 0;
-	BOOL bRightRO = (dwRightFlags & FFILEOPEN_READONLY) > 0;
+	bool bLeftRO = (dwLeftFlags & FFILEOPEN_READONLY) > 0;
+	bool bRightRO = (dwRightFlags & FFILEOPEN_READONLY) > 0;
 
 	if ((dwLeftFlags & FFILEOPEN_DETECTBIN) && filelocLeft.encoding.m_binary ||
 		(dwRightFlags & FFILEOPEN_DETECTBIN) && filelocRight.encoding.m_binary)
@@ -1111,12 +1111,12 @@ void CMainFrame::ShowMergeDoc(CDirFrame *pDirDoc,
 	{
 		if (dwLeftFlags & FFILEOPEN_MODIFIED)
 		{
-			pMergeDoc->m_ptBuf[0]->SetModified(TRUE);
+			pMergeDoc->m_ptBuf[0]->SetModified(true);
 			pMergeDoc->UpdateHeaderPath(0);
 		}
 		if (dwRightFlags & FFILEOPEN_MODIFIED)
 		{
-			pMergeDoc->m_ptBuf[1]->SetModified(TRUE);
+			pMergeDoc->m_ptBuf[1]->SetModified(true);
 			pMergeDoc->UpdateHeaderPath(1);
 		}
 	}
@@ -2644,7 +2644,7 @@ void CMainFrame::OnToolsFilters()
 			CMergeEditView *pView = pDoc->GetActiveMergeView();
 			POINT pt = pView->GetCursorPos();
 			if (int cchTestCase = pView->GetLineLength(pt.y))
-				pView->GetTextWithoutEmptys(pt.y, 0, pt.y, cchTestCase, lineFiltersDlg.m_strTestCase);
+				pView->GetText(pt.y, 0, pt.y, cchTestCase, lineFiltersDlg.m_strTestCase);
 		}
 	}
 	// Make sure all filters are up-to-date
@@ -3409,7 +3409,7 @@ LRESULT CMainFrame::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		switch (reinterpret_cast<NMHDR *>(lParam)->code)
 		{
 		case TTN_NEEDTEXT:
-			OnToolTipText(reinterpret_cast<NMHDR *>(lParam));
+			OnToolTipText(reinterpret_cast<TOOLTIPTEXT *>(lParam));
 			break;
 		case TCN_SELCHANGE:
 			int index = m_wndTabBar->GetCurSel();
@@ -3607,32 +3607,29 @@ void CMainFrame::OnToolbarBig()
 }
 
 /** @brief Lang aware version of CFrameWnd::OnToolTipText() */
-void CMainFrame::OnToolTipText(NMHDR* pNMHDR)
+void CMainFrame::OnToolTipText(TOOLTIPTEXT *pTTT)
 {
-	ASSERT(pNMHDR->code == TTN_NEEDTEXT);
-
 	// need to handle both ANSI and UNICODE versions of the message
-	TOOLTIPTEXT* pTTT = (TOOLTIPTEXT*)pNMHDR;
 	String strFullText;
 	LPCTSTR strTipText = _T("");
-	UINT_PTR nID = pNMHDR->idFrom;
-	if (pNMHDR->code == TTN_NEEDTEXT && (pTTT->uFlags & TTF_IDISHWND))
+	UINT_PTR nID = pTTT->hdr.idFrom;
+	if (pTTT->uFlags & TTF_IDISHWND)
 	{
 		// idFrom is actually the HWND of the tool
-		nID = ::GetDlgCtrlID((HWND)nID);
+		nID = ::GetDlgCtrlID(reinterpret_cast<HWND>(nID));
 	}
 	if (nID != 0) // will be zero on a separator
 	{
 		strFullText = LanguageSelect.LoadString(static_cast<UINT>(nID));
 		// don't handle the message if no string resource found
-		String::size_type i = strFullText.find('\n');
+		String::size_type i = strFullText.find(_T('\n'));
 		C_ASSERT(-1 == String::npos);
 		strTipText = strFullText.c_str() + i + 1;
 	}
 	lstrcpyn(pTTT->szText, strTipText, _countof(pTTT->szText));
 	// bring the tooltip window above other popup windows
-	::SetWindowPos(pNMHDR->hwndFrom, HWND_TOP, 0, 0, 0, 0,
-		SWP_NOACTIVATE|SWP_NOSIZE|SWP_NOMOVE|SWP_NOOWNERZORDER);
+	::SetWindowPos(pTTT->hdr.hwndFrom, HWND_TOP, 0, 0, 0, 0,
+		SWP_NOACTIVATE | SWP_NOSIZE | SWP_NOMOVE | SWP_NOOWNERZORDER);
 }
 
 /**

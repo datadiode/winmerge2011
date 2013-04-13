@@ -70,15 +70,11 @@ public:
 protected:
 	virtual DWORD GetDropEffect();
 	virtual void OnDropSource(DWORD de);
-	void Paste();
-	void Cut();
 	void DeleteCurrentSelection();
 
 public:
 	bool GetAutoIndent() const { return m_bAutoIndent; }
 	void SetAutoIndent(bool bAutoIndent) { m_bAutoIndent = bAutoIndent; }
-	BOOL GetInsertTabs() const { return m_pTextBuffer->GetInsertTabs(); }
-	void SetInsertTabs(BOOL bInsertTabs) { m_pTextBuffer->SetInsertTabs(bInsertTabs); }
 
     CCrystalEditView(size_t);
     ~CCrystalEditView();
@@ -110,6 +106,8 @@ protected :
     // Generated message map functions
     bool m_bMergeUndo;
 public:
+	void OnEditCut();
+	void OnEditPaste();
     void OnEditDelete();
     void OnChar(WPARAM);
     void OnEditDeleteBack();

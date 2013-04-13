@@ -170,7 +170,7 @@ public:
 		int nLinesToValidate, int nActionType = CE_ACTION_UNKNOWN);
 
 	FileLoadResult::FILES_RESULT LoadFromFile(LPCTSTR pszFileName,
-		PackingInfo *infoUnpacker, BOOL &readOnly, CRLFSTYLE nCrlfStyle,
+		PackingInfo *infoUnpacker, bool &readOnly, CRLFSTYLE nCrlfStyle,
 		const FileTextEncoding &encoding, String &sError);
 	int SaveToFile(LPCTSTR pszFileName, ISequentialStream *pTempStream, String &sError,
 		PackingInfo *infoUnpacker = NULL, CRLFSTYLE nCrlfStyle = CRLF_STYLE_AUTOMATIC);

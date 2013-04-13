@@ -4,7 +4,6 @@
  * @brief Declaration of CGhostTextView (subclasses CCrystalEditViewEx to handle ghost lines)
  */
 
-
 #ifndef __GHOSTTEXTVIEW_H__
 #define __GHOSTTEXTVIEW_H__
 
@@ -14,7 +13,6 @@
 // Forward class declarations
 
 class CGhostTextBuffer;
-
 
 ////////////////////////////////////////////////////////////////////////////
 // CCrystalTextView class declaration
@@ -36,7 +34,7 @@ protected:
 	CGhostTextView(size_t);           // protected constructor used by dynamic creation
 
 private:
-	CGhostTextBuffer * m_pGhostTextBuffer;
+	CGhostTextBuffer *m_pGhostTextBuffer;
 
 	/** 
 	 * @brief Real point structure to preserve a position during Rescan 
@@ -64,13 +62,13 @@ private:
 	 * @note We can only push/pop valid positions
 	 * For positions which are sometimes invalid, use a flag
 	 */
-	void pushPosition(SCursorPushed & Sdest, POINT pt);
+	void pushPosition(SCursorPushed &Sdest, POINT pt);
 	/** 
 	 * @brief Restore cursors after Rescan.
 	 *
 	 * @note : also scroll to the old top line
 	 */
-	void popPosition(SCursorPushed Ssrc, POINT & pt);
+	void popPosition(SCursorPushed Ssrc, POINT &pt);
 
 	/// basic cursor
 	SCursorPushed m_ptCursorPosPushed;
@@ -95,31 +93,18 @@ private:
 	//   m_ptDropPos : only used inside one function which does not change the buffer
 
 public:
-	virtual void ReAttachToBuffer (CCrystalTextBuffer * pBuf = NULL);
-	virtual void AttachToBuffer (CCrystalTextBuffer * pBuf = NULL);
-	virtual void DetachFromBuffer ();
+	virtual void ReAttachToBuffer(CCrystalTextBuffer * = NULL);
+	virtual void AttachToBuffer(CCrystalTextBuffer * = NULL);
+	virtual void DetachFromBuffer();
 
 	/** real cursor function to preserve cursor during Rescan */
-	void PopCursors ();
+	void PopCursors();
 	/** real cursor function to preserve cursor during Rescan */
-	void PushCursors ();
+	void PushCursors();
 
-	virtual void GetTextWithoutEmptys (int nStartLine, int nStartChar,
-			int nEndLine, int nEndChar, String &text,
-			CRLFSTYLE nCrlfStyle =CRLF_STYLE_AUTOMATIC);
-	/** 
-	 * @brief Override this drag-n-drop function to call GetTextWithoutEmptys
-	 */
-	virtual HGLOBAL PrepareDragData ();
-
-	int ComputeApparentLine (int nRealLine) const;
-	int ComputeRealLine (int nApparentLine) const;
-	virtual void DrawMargin (HSurface * pdc, const RECT & rect, int nLineIndex, int nLineNumber);
-
+	int ComputeApparentLine(int nRealLine) const;
+	int ComputeRealLine(int nApparentLine) const;
+	virtual void DrawMargin(HSurface *, const RECT &, int nLineIndex, int nLineNumber);
 };
-
-
-/////////////////////////////////////////////////////////////////////////////
-
 
 #endif //__GHOSTTEXTVIEW_H__

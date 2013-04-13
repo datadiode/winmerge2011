@@ -190,8 +190,8 @@ bool CDiffTextBuffer::IsSaveable() const
  * @note If this method fails, it calls InitNew so the CDiffTextBuffer is in a valid state
  */
 FileLoadResult::FILES_RESULT CDiffTextBuffer::LoadFromFile(LPCTSTR pszFileName,
-		PackingInfo * infoUnpacker, BOOL & readOnly,
-		CRLFSTYLE nCrlfStyle, const FileTextEncoding & encoding, String &sError)
+		PackingInfo *infoUnpacker, bool &readOnly,
+		CRLFSTYLE nCrlfStyle, const FileTextEncoding &encoding, String &sError)
 {
 	ASSERT(!m_bInit);
 	ASSERT(m_aLines.size() == 0);
@@ -276,8 +276,8 @@ FileLoadResult::FILES_RESULT CDiffTextBuffer::LoadFromFile(LPCTSTR pszFileName,
 			// (view does not work for empty buffers)
 			ASSERT(m_aLines.size() > 0);
 			
-			m_bInit = TRUE;
-			m_bModified = FALSE;
+			m_bInit = true;
+			m_bModified = false;
 			m_bUndoGroup = m_bUndoBeginGroup = FALSE;
 			m_nSyncPosition = m_nUndoPosition = 0;
 			ASSERT(m_aUndoBuf.size() == 0);

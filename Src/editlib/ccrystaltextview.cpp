@@ -1857,17 +1857,6 @@ void CCrystalTextView::OnUpdateCaret(bool)
 {
 }
 
-int CCrystalTextView::GetCRLFMode() const
-{
-	return m_pTextBuffer ? m_pTextBuffer->GetCRLFMode() : -1;
-}
-
-void CCrystalTextView::SetCRLFMode(CRLFSTYLE nCRLFMode)
-{
-	if (m_pTextBuffer)
-		m_pTextBuffer->SetCRLFMode(nCRLFMode);
-}
-
 int CCrystalTextView::GetTabSize() const
 {
 	return m_pTextBuffer ? m_pTextBuffer->GetTabSize() : 4;
@@ -3002,12 +2991,12 @@ void CCrystalTextView::OnKillFocus()
 	}
 }
 
-void CCrystalTextView::GetText(const POINT & ptStart, const POINT & ptEnd, String & text)
+void CCrystalTextView::GetText(int nStartLine, int nStartChar, int nEndLine, int nEndChar, String &text)
 {
 	if (m_pTextBuffer != NULL)
-		m_pTextBuffer->GetText (ptStart.y, ptStart.x, ptEnd.y, ptEnd.x, text);
+		m_pTextBuffer->GetText(nStartLine, nStartChar, nEndLine, nEndChar, text);
 	else
-		text = _T ("");
+		text.clear();
 }
 
 void CCrystalTextView::UpdateView(CCrystalTextView *pSource, CUpdateContext *pContext, DWORD dwFlags, int nLineIndex)
@@ -3310,27 +3299,27 @@ void CCrystalTextView::OnDropSource(DWORD de)
 
 HGLOBAL CCrystalTextView::PrepareDragData()
 {
-  PrepareSelBounds ();
-  if (m_ptDrawSelStart == m_ptDrawSelEnd)
-    return NULL;
+	PrepareSelBounds();
+	if (m_ptDrawSelStart == m_ptDrawSelEnd)
+		return NULL;
 
-  String text;
-  GetText (m_ptDrawSelStart, m_ptDrawSelEnd, text);
-  int cchText = text.size();
-  SIZE_T cbData = (cchText + 1) * sizeof(TCHAR);
-  HGLOBAL hData =::GlobalAlloc (GMEM_MOVEABLE | GMEM_DDESHARE, cbData);
-  if (hData == NULL)
-    return NULL;
-  ::GlobalReAlloc(hData, cbData, 0);
-  ASSERT(::GlobalSize(hData) == cbData);
+	String text;
+	GetText(m_ptDrawSelStart, m_ptDrawSelEnd, text);
+	int cchText = text.size();
+	SIZE_T cbData = (cchText + 1) * sizeof(TCHAR);
+	HGLOBAL hData = ::GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, cbData);
+	if (hData == NULL)
+		return NULL;
+	::GlobalReAlloc(hData, cbData, 0);
+	ASSERT(::GlobalSize(hData) == cbData);
 
-  LPTSTR pszData = (LPTSTR)::GlobalLock (hData);
-  memcpy (pszData, text.c_str(), cbData);
-  ::GlobalUnlock (hData);
+	LPTSTR pszData = reinterpret_cast<LPTSTR>(::GlobalLock(hData));
+	memcpy(pszData, text.c_str(), cbData);
+	::GlobalUnlock (hData);
 
-  m_ptDraggedTextBegin = m_ptDrawSelStart;
-  m_ptDraggedTextEnd = m_ptDrawSelEnd;
-  return hData;
+	m_ptDraggedTextBegin = m_ptDrawSelStart;
+	m_ptDraggedTextEnd = m_ptDrawSelEnd;
+	return hData;
 }
 
 static int FindStringHelper(LPCTSTR pszFindWhere, LPCTSTR pszFindWhat, DWORD dwFlags, int &nLen)

@@ -179,7 +179,7 @@ public:
 	void UpdateHeaderPath(int pane);
 	void UpdateHeaderActivity(int pane, bool bActivate);
 	void RefreshOptions();
-	OPENRESULTS_TYPE OpenDocs(FileLocation &, FileLocation &, BOOL bROLeft, BOOL bRORight);
+	OPENRESULTS_TYPE OpenDocs(FileLocation &, FileLocation &, bool bROLeft, bool bRORight);
 	void RescanIfNeeded(float timeOutInSecond);
 	int Rescan(bool &bIdentical, bool bForced = false);
 	int Rescan2(bool &bIdentical);
@@ -307,9 +307,9 @@ private:
 	static bool GetByteColoringOption();
 	static bool IsValidCodepageForMergeEditor(unsigned cp);
 	static void SanityCheckCodepage(FileLocation &fileinfo);
-	FileLoadResult::FILES_RESULT LoadOneFile(int index, BOOL &readOnly, const FileLocation &);
+	FileLoadResult::FILES_RESULT LoadOneFile(int index, bool &readOnly, const FileLocation &);
 	FileLoadResult::FILES_RESULT ReloadDoc(int index);
-	FileLoadResult::FILES_RESULT LoadFile(int nBuffer, BOOL &readOnly, const FileLocation &);
+	FileLoadResult::FILES_RESULT LoadFile(int nBuffer, bool &readOnly, const FileLocation &);
 };
 
 /////////////////////////////////////////////////////////////////////////////

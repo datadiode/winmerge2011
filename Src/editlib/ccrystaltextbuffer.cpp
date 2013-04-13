@@ -135,13 +135,13 @@ void CCrystalTextBuffer::CDeleteContext::RecalcPoint(POINT & ptPoint)
 
 CCrystalTextBuffer::CCrystalTextBuffer()
 {
-	m_bInit = FALSE;
-	m_bReadOnly = FALSE;
-	m_bModified = FALSE;
+	m_bInit = false;
+	m_bReadOnly = false;
+	m_bModified = false;
 	m_nCRLFMode = CRLF_STYLE_DOS;
 	m_nUndoPosition = 0;
 	m_bUndoGroup = m_bUndoBeginGroup = FALSE;
-	m_bInsertTabs = TRUE;
+	m_bInsertTabs = true;
 	m_nTabSize = 4;
 	//BEGIN SW
 	m_ptLastChange.x = m_ptLastChange.y = -1;
@@ -248,7 +248,7 @@ void CCrystalTextBuffer::FreeAll()
 	}
 	//m_aUndoBuf.clear();
 	m_aLines.clear();
-	m_bInit = FALSE;
+	m_bInit = false;
 	//BEGIN SW
 	m_ptLastChange.x = m_ptLastChange.y = -1;
 	//END SW
@@ -260,11 +260,11 @@ BOOL CCrystalTextBuffer::InitNew(CRLFSTYLE nCrlfStyle)
 	ASSERT(m_aLines.size() == 0);
 	ASSERT(nCrlfStyle >= 0 && nCrlfStyle <= 2);
 	InsertLine(_T(""), 0);
-	m_bInit = TRUE;
-	m_bReadOnly = FALSE;
+	m_bInit = true;
+	m_bReadOnly = false;
 	m_nCRLFMode = nCrlfStyle;
-	m_bModified = FALSE;
-	m_bInsertTabs = TRUE;
+	m_bModified = false;
+	m_bInsertTabs = true;
 	m_nTabSize = 4;
 	m_nSyncPosition = m_nUndoPosition = 0;
 	m_bUndoGroup = m_bUndoBeginGroup = FALSE;
@@ -278,14 +278,14 @@ BOOL CCrystalTextBuffer::InitNew(CRLFSTYLE nCrlfStyle)
 	return TRUE;
 }
 
-BOOL CCrystalTextBuffer::GetReadOnly() const
+bool CCrystalTextBuffer::GetReadOnly() const
 {
 	ASSERT(m_bInit);        //  Text buffer not yet initialized.
 	//  You must call InitNew() or LoadFromFile() first!
 	return m_bReadOnly;
 }
 
-void CCrystalTextBuffer::SetReadOnly(BOOL bReadOnly)
+void CCrystalTextBuffer::SetReadOnly(bool bReadOnly)
 {
 	ASSERT(m_bInit);             //  Text buffer not yet initialized.
 	//  You must call InitNew() or LoadFromFile() first!
@@ -309,21 +309,20 @@ void CCrystalTextBuffer::SetCRLFMode(CRLFSTYLE nCRLFMode)
 		m_nCRLFMode == CRLF_STYLE_MAC || m_nCRLFMode == CRLF_STYLE_MIXED);
 }
 
-BOOL CCrystalTextBuffer::applyEOLMode()
+bool CCrystalTextBuffer::applyEOLMode()
 {
 	LPCTSTR lpEOLtoApply = GetDefaultEol();
-	BOOL bChanged = FALSE;
+	bool bChanged = false;
 	const int size = m_aLines.size();
 	for (int i = 0 ; i < size; i++)
 	{
 		// the last real line has no EOL
-		if (!m_aLines[i].HasEol())
-			continue;
-		bChanged |= ChangeLineEol(i, lpEOLtoApply);
+		if (m_aLines[i].HasEol())
+			bChanged |= ChangeLineEol(i, lpEOLtoApply);
 	}
 
 	if (bChanged)
-		SetModified(TRUE);
+		SetModified(true);
 
 	return bChanged;
 }
@@ -337,7 +336,7 @@ LPCTSTR CCrystalTextBuffer::GetLineEol(int nLine) const
 	return _T("");
 }
 
-BOOL CCrystalTextBuffer::ChangeLineEol(int nLine, LPCTSTR lpEOL) 
+bool CCrystalTextBuffer::ChangeLineEol(int nLine, LPCTSTR lpEOL) 
 {
 	return m_aLines[nLine].ChangeEol(lpEOL);
 }
@@ -373,83 +372,73 @@ void CCrystalTextBuffer::SetLineFlags(int nLine, DWORD dwFlags)
 }
 
 /**
- * @brief Get text of specified line range (excluding ghost lines)
+ * @brief Get text of specified line range
  */
-void CCrystalTextBuffer::GetTextWithoutEmptys(int nStartLine, int nStartChar, 
-	int nEndLine, int nEndChar, String &text, CRLFSTYLE nCrlfStyle) const
+void CCrystalTextBuffer::GetText(int nStartLine, int nStartChar,
+	int nEndLine, int nEndChar, String &text, LPCTSTR pszCRLF) const
 {
-  LPCTSTR sEol = GetStringEol (nCrlfStyle);
-  GetText(nStartLine, nStartChar, nEndLine, nEndChar, text, sEol);
-}
+	const int lines = GetLineCount();
+	ASSERT(nStartLine >= 0 && nStartLine < lines);
+	ASSERT(nStartChar >= 0 && nStartChar <= GetLineLength(nStartLine));
+	ASSERT(nEndLine >= 0 && nEndLine < lines);
+	ASSERT(nEndChar >= 0 && nEndChar <= GetFullLineLength(nEndLine));
+	ASSERT(nStartLine < nEndLine || nStartLine == nEndLine && nStartChar <= nEndChar);
+	// some edit functions (copy...) should do nothing when there is no selection.
+	// assert to be sure to catch these 'do nothing' cases.
+	//ASSERT(nStartLine != nEndLine || nStartChar != nEndChar);
 
-void CCrystalTextBuffer::GetText(int nStartLine, int nStartChar, int nEndLine, int nEndChar,
-	String &text, LPCTSTR pszCRLF) const
-{
-  ASSERT(m_bInit);             //  Text buffer not yet initialized.
-  //  You must call InitNew() or LoadFromFile() first!
+	// estimate size (upper bound)
+	int nBufSize = 0;
+	int i;
+	for (i = nStartLine; i <= nEndLine; ++i)
+		nBufSize += m_aLines[i].Length() + 2; // in case we insert EOLs
+	text.resize(nBufSize);
+	LPTSTR pszBuf = &text.front();
 
-  ASSERT(nStartLine >= 0 && nStartLine < GetLineCount());
-  ASSERT(nStartChar >= 0 && nStartChar <= m_aLines[nStartLine].Length());
-  ASSERT(nEndLine >= 0 && nEndLine < GetLineCount());
-  ASSERT(nEndChar >= 0 && nEndChar <= m_aLines[nEndLine].Length());
-  ASSERT(nStartLine < nEndLine || nStartLine == nEndLine && nStartChar <= nEndChar);
-  // some edit functions (copy...) should do nothing when there is no selection.
-  // assert to be sure to catch these 'do nothing' cases.
-  ASSERT(nStartLine != nEndLine || nStartChar != nEndChar);
+	if (pszCRLF != NULL)
+	{
+		// we must copy this EOL type only
+		const size_t nCRLFLength = _tcslen(pszCRLF);
+		for (i = nStartLine; i <= nEndLine; ++i)
+		{
+			// exclude ghost lines
+			const LineInfo &li = m_aLines[i];
+			if (li.FullLength() == 0)
+				continue;
 
-  static const TCHAR crlf[] = _T("\r\n");
+			// copy the line, excluding the EOL
+			int chars = (i == nEndLine ? nEndChar : li.Length()) - nStartChar;
+			LPCTSTR szLine = li.GetLine(nStartChar);
+			CopyMemory(pszBuf, szLine, chars * sizeof(TCHAR));
+			pszBuf += chars;
+			nStartChar = 0;
 
-  if (pszCRLF == NULL)
-    pszCRLF = crlf;
-  int nCRLFLength = static_cast<int>(_tcslen(pszCRLF));
-  ASSERT(nCRLFLength > 0);
+			// copy the EOL of the requested type
+			if (i < nEndLine && li.GetEol())
+			{
+				CopyMemory(pszBuf, pszCRLF, nCRLFLength * sizeof(TCHAR));
+				pszBuf += nCRLFLength;
+			}
+		}
+	}
+	else
+	{
+		for (i = nStartLine; i <= nEndLine; ++i)
+		{
+			// exclude ghost lines
+			const LineInfo &li = m_aLines[i];
+			if (li.FullLength() == 0)
+				continue;
 
-  int nBufSize = 0;
-  for (int L = nStartLine; L <= nEndLine; L++)
-    {
-      nBufSize += m_aLines[L].Length();
-      nBufSize += nCRLFLength;
-    }
-
-  text.resize(nBufSize);
-  LPTSTR pszBuf = &text.front();
-
-  const LineInfo &startLine = m_aLines[nStartLine];
-  if (nStartLine < nEndLine)
-    {
-      int nCount = startLine.Length() - nStartChar;
-      if (nCount > 0)
-        {
-          memcpy(pszBuf, startLine.GetLine(nStartChar), sizeof(TCHAR) * nCount);
-          pszBuf += nCount;
-        }
-      memcpy(pszBuf, pszCRLF, sizeof(TCHAR) * nCRLFLength);
-      pszBuf += nCRLFLength;
-      for (int I = nStartLine + 1; I < nEndLine; I++)
-        {
-          const LineInfo &li = m_aLines[I];
-          nCount = li.Length();
-          if (nCount > 0)
-            {
-              memcpy(pszBuf, li.GetLine(), sizeof(TCHAR) * nCount);
-              pszBuf += nCount;
-            }
-          memcpy(pszBuf, pszCRLF, sizeof(TCHAR) * nCRLFLength);
-          pszBuf += nCRLFLength;
-        }
-      if (nEndChar > 0)
-        {
-          memcpy(pszBuf, m_aLines[nEndLine].GetLine(), sizeof(TCHAR) * nEndChar);
-          pszBuf += nEndChar;
-        }
-    }
-  else
-    {
-      int nCount = nEndChar - nStartChar;
-      memcpy(pszBuf, startLine.GetLine(nStartChar), sizeof(TCHAR) * nCount);
-      pszBuf += nCount;
-    }
-  text.resize(static_cast<String::size_type>(pszBuf - text.c_str()));
+			// copy the line including the EOL
+			int chars = (i == nEndLine ? nEndChar : li.FullLength()) - nStartChar;
+			LPCTSTR szLine = li.GetLine(nStartChar);
+			CopyMemory(pszBuf, szLine, chars * sizeof(TCHAR));
+			pszBuf += chars;
+			nStartChar = 0;
+		}
+	}
+	text.resize(static_cast<String::size_type>(pszBuf - text.c_str()));
 }
 
 void CCrystalTextBuffer::AddView(CCrystalTextView * pView)
@@ -557,7 +546,7 @@ void CCrystalTextBuffer::InternalDeleteText(
     }
 
   if (!m_bModified)
-    SetModified (TRUE);
+    SetModified(true);
   //BEGIN SW
   // remember current cursor position as last editing position
   m_ptLastChange = context.m_ptStart;
@@ -723,7 +712,7 @@ POINT CCrystalTextBuffer::InternalInsertText(CCrystalTextView *pSource,
     }
 
   if (!m_bModified)
-    SetModified (TRUE);
+    SetModified(true);
 
   // remember current cursor position as last editing position
   m_ptLastChange.x = nEndChar;
@@ -821,7 +810,7 @@ LPCTSTR CCrystalTextBuffer::GetDefaultEol() const
 	return GetStringEol(m_nCRLFMode);
 }
 
-void CCrystalTextBuffer::SetModified(BOOL bModified)
+void CCrystalTextBuffer::SetModified(bool bModified)
 {
 	m_bModified = bModified;
 }

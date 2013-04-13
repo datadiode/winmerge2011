@@ -220,7 +220,6 @@ public:
 	bool HasBookmarks() const { return m_bBookmarkExist; }
 
 	void SelectAll();
-    void Copy();
     void UpdateCaret(bool bShowHide = false);
     void SetAnchor(const POINT &);
 
@@ -381,8 +380,8 @@ protected:
 	//END SW
 
     //  Splitter support
-    virtual void UpdateSiblingScrollPos (BOOL bHorz) = 0;
-    virtual void OnUpdateSibling (CCrystalTextView * pUpdateSource, BOOL bHorz);
+    virtual void UpdateSiblingScrollPos(BOOL bHorz) = 0;
+    virtual void OnUpdateSibling(CCrystalTextView * pUpdateSource, BOOL bHorz);
 
 	//BEGIN SW
 	/**
@@ -392,7 +391,7 @@ protected:
 
 	@return Number of sublines in the whole text buffer.
 	*/
-	virtual int GetSubLineCount();
+	int GetSubLineCount();
 
 	/**
 	Returns the zero-based subline index of the given line.
@@ -401,7 +400,7 @@ protected:
 
 	@return The zero-based subline index of the given line.
 	*/
-	virtual int GetSubLineIndex( int nLineIndex );
+	int GetSubLineIndex(int nLineIndex);
 
     /**
      * @brief Splits the given subline index into line and sub line of this line.
@@ -409,37 +408,42 @@ protected:
      * @param [out] nLine Gets the line number the give subline is included in
      * @param [out] nSubLine Get the subline of the given subline relative to nLine
      */
-    virtual void GetLineBySubLine(int nSubLineIndex, int &nLine, int &nSubLine);
+    void GetLineBySubLine(int nSubLineIndex, int &nLine, int &nSubLine);
 
 public:
-    virtual int GetLineLength(int nLineIndex) const;
-    virtual int GetFullLineLength(int nLineIndex) const;
-	virtual int GetViewableLineLength(int nLineIndex) const;
-    virtual int GetLineActualLength(int nLineIndex);
-    virtual LPCTSTR GetLineChars(int nLineIndex) const;
-    virtual DWORD GetLineFlags(int nLineIndex) const;
+    int GetLineLength(int nLineIndex) const;
+    int GetFullLineLength(int nLineIndex) const;
+	int GetViewableLineLength(int nLineIndex) const;
+    int GetLineActualLength(int nLineIndex);
+    LPCTSTR GetLineChars(int nLineIndex) const;
+    DWORD GetLineFlags(int nLineIndex) const;
+	void GetText(int nStartLine, int nStartChar, int nEndLine, int nEndChar, String &text);
+
 protected:
-    virtual void GetText(const POINT & ptStart, const POINT & ptEnd, String & text);
+	void GetText(const POINT &ptStart, const POINT &ptEnd, String &text)
+	{
+		GetText(ptStart.y, ptStart.x, ptEnd.y, ptEnd.x, text);
+	}
 
     //  Clipboard overridable
 	void PutToClipboard(HGLOBAL);
 	void PutToClipboard(const String &);
 
     //  Drag-n-drop overrideable
-    virtual HGLOBAL PrepareDragData();
+    HGLOBAL PrepareDragData();
     virtual DWORD GetDropEffect();
     virtual void OnDropSource(DWORD de);
-	BOOL IsDraggingText() const { return m_bDraggingText; }
 
     virtual COLORREF GetColor(int nColorIndex);
     virtual void GetLineColors(int nLineIndex, COLORREF &crBkgnd, COLORREF &crText);
     virtual BOOL GetItalic(int nColorIndex);
     virtual BOOL GetBold(int nColorIndex);
 
-    void DrawLineHelper(HSurface *pdc, POINT & ptOrigin, const RECT & rcClip, int nColorIndex, int nBgColorIndex,
-                        COLORREF crText, COLORREF crBkgnd, LPCTSTR pszChars, int nOffset, int nCount, int &nActualOffset, POINT ptTextPos);
-    virtual void DrawSingleLine (HSurface * pdc, const RECT & rect, int nLineIndex);
-    virtual void DrawMargin (HSurface *pdc, const RECT & rect, int nLineIndex, int nLineNumber);
+    void DrawLineHelper(HSurface *, POINT &ptOrigin, const RECT &rcClip,
+        int nColorIndex, int nBgColorIndex, COLORREF crText, COLORREF crBkgnd,
+        LPCTSTR pszChars, int nOffset, int nCount, int &nActualOffset, POINT ptTextPos);
+    virtual void DrawSingleLine(HSurface *, const RECT &, int nLineIndex);
+    virtual void DrawMargin(HSurface *, const RECT &, int nLineIndex, int nLineNumber);
 
     int GetCharWidthFromChar(LPCTSTR);
     int GetCharWidthFromDisplayableChar(LPCTSTR);
@@ -588,8 +592,6 @@ public:
 
     // Attributes
 public:
-    int GetCRLFMode() const;
-    void SetCRLFMode(enum CRLFSTYLE nCRLFMode);
     bool GetViewTabs() const;
     void SetViewTabs(bool);
     void SetViewEols(bool bViewEols, bool bDistinguishEols);
@@ -772,6 +774,7 @@ public:
     void OnKillFocus();
     void OnLButtonDblClk(LPARAM);
     void OnRButtonDown(LPARAM);
+    void OnEditCopy();
     void OnEditFind();
     void OnEditRepeat();
     BOOL OnMouseWheel(WPARAM, LPARAM);

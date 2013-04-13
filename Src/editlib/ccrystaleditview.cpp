@@ -93,7 +93,7 @@ static const unsigned int MAX_TAB_LEN = 64;  // Same as in CrystalViewText.cpp
 
 CCrystalEditView::CCrystalEditView(size_t ZeroInit)
 : CCrystalTextView(ZeroInit)
-, m_bAutoIndent(TRUE)
+, m_bAutoIndent(true)
 {
 }
 
@@ -142,7 +142,7 @@ void CCrystalEditView::DeleteCurrentSelection()
 	}
 }
 
-void CCrystalEditView::Paste()
+void CCrystalEditView::OnEditPaste()
 {
 	if (!QueryEditable())
 		return;
@@ -188,30 +188,31 @@ void CCrystalEditView::Paste()
 		GlobalUnlock(hData);
 	}
 	CloseClipboard();
+	m_pTextBuffer->SetModified(true);
 }
 
-void CCrystalEditView::Cut()
+void CCrystalEditView::OnEditCut()
 {
-  if (!QueryEditable())
-    return;
-  if (!IsSelection())
-    return;
+	if (!QueryEditable())
+		return;
+	if (!IsSelection())
+		return;
 
-  POINT ptSelStart, ptSelEnd;
-  GetSelection(ptSelStart, ptSelEnd);
-  String text;
-  GetText(ptSelStart, ptSelEnd, text);
-  PutToClipboard(text);
+	POINT ptSelStart, ptSelEnd;
+	GetSelection(ptSelStart, ptSelEnd);
+	String text;
+	GetText(ptSelStart, ptSelEnd, text);
+	PutToClipboard(text);
 
-  POINT ptCursorPos = ptSelStart;
-  ASSERT_VALIDTEXTPOS(ptCursorPos);
-  SetAnchor(ptCursorPos);
-  SetSelection(ptCursorPos, ptCursorPos);
-  SetCursorPos(ptCursorPos);
-  EnsureVisible(ptCursorPos);
+	POINT ptCursorPos = ptSelStart;
+	ASSERT_VALIDTEXTPOS(ptCursorPos);
+	SetAnchor(ptCursorPos);
+	SetSelection(ptCursorPos, ptCursorPos);
+	SetCursorPos(ptCursorPos);
+	EnsureVisible(ptCursorPos);
 
-  m_pTextBuffer->DeleteText(this, ptSelStart.y, ptSelStart.x, ptSelEnd.y, ptSelEnd.x, CE_ACTION_CUT);  // [JRT]
-
+	m_pTextBuffer->DeleteText(this, ptSelStart.y, ptSelStart.x, ptSelEnd.y, ptSelEnd.x, CE_ACTION_CUT);  // [JRT]
+	m_pTextBuffer->SetModified(true);
 }
 
 void CCrystalEditView::OnEditDelete()
@@ -748,7 +749,7 @@ bool CCrystalEditView::DoDropText(HGLOBAL hData, const POINT &ptClient)
 		return false;
 
 	POINT ptDropPos = ClientToText(ptClient);
-	if (IsDraggingText() && IsInsideSelection(ptDropPos))
+	if (m_bDraggingText && IsInsideSelection(ptDropPos))
 	{
 		SetAnchor(ptDropPos);
 		SetSelection(ptDropPos, ptDropPos);
@@ -769,7 +770,7 @@ bool CCrystalEditView::DoDropText(HGLOBAL hData, const POINT &ptClient)
 	// When we drag from the same panel, it is already open, so do nothing
 	// (we could test m_pTextBuffer->m_bUndoGroup if it were not a protected member)
 	bool bGroupFlag = false;
-	if (!IsDraggingText())
+	if (!m_bDraggingText)
 	{
 		m_pTextBuffer->BeginUndoGroup();
 		bGroupFlag = true;
@@ -829,18 +830,18 @@ DWORD CCrystalEditView::GetDropEffect()
 
 void CCrystalEditView::OnDropSource(DWORD de)
 {
-  if (!IsDraggingText ())
-    return;
+	if (!m_bDraggingText)
+		return;
 
-  ASSERT_VALIDTEXTPOS (m_ptDraggedTextBegin);
-  ASSERT_VALIDTEXTPOS (m_ptDraggedTextEnd);
+	ASSERT_VALIDTEXTPOS(m_ptDraggedTextBegin);
+	ASSERT_VALIDTEXTPOS(m_ptDraggedTextEnd);
 
-  if (de == DROPEFFECT_MOVE)
-    {
-      m_pTextBuffer->DeleteText (this, m_ptDraggedTextBegin.y, m_ptDraggedTextBegin.x, m_ptDraggedTextEnd.y,
-                                 m_ptDraggedTextEnd.x, CE_ACTION_DRAGDROP);     // [JRT]
-
-    }
+	if (de == DROPEFFECT_MOVE)
+	{
+		m_pTextBuffer->DeleteText(this,
+			m_ptDraggedTextBegin.y, m_ptDraggedTextBegin.x,
+			m_ptDraggedTextEnd.y, m_ptDraggedTextEnd.x, CE_ACTION_DRAGDROP);
+	}
 }
 
 void CCrystalEditView::UpdateView(CCrystalTextView * pSource, CUpdateContext * pContext, DWORD dwFlags, int nLineIndex)

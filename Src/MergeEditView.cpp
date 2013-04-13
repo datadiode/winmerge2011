@@ -564,65 +564,6 @@ void CMergeEditView::OnCurdiff()
 }
 
 /**
- * @brief Copy selected text to clipboard
- */
-void CMergeEditView::OnEditCopy()
-{
-	POINT ptSelStart, ptSelEnd;
-	GetSelection(ptSelStart, ptSelEnd);
-	// Nothing selected
-	if (ptSelStart == ptSelEnd)
-		return;
-	String text;
-	LocateTextBuffer()->GetTextWithoutEmptys(
-		ptSelStart.y, ptSelStart.x, ptSelEnd.y, ptSelEnd.x, text);
-	PutToClipboard(text);
-}
-
-/**
- * @brief Cut current selection to clipboard
- */
-void CMergeEditView::OnEditCut()
-{
-	if (!QueryEditable())
-		return;
-
-	POINT ptSelStart, ptSelEnd;
-	GetSelection(ptSelStart, ptSelEnd);
-	// Nothing selected
-	if (ptSelStart == ptSelEnd)
-		return;
-	String text;
-	LocateTextBuffer()->GetTextWithoutEmptys(
-		ptSelStart.y, ptSelStart.x, ptSelEnd.y, ptSelEnd.x, text);
-	PutToClipboard(text);
-
-	POINT ptCursorPos = ptSelStart;
-	ASSERT_VALIDTEXTPOS(ptCursorPos);
-	SetAnchor(ptCursorPos);
-	SetSelection(ptCursorPos, ptCursorPos);
-	SetCursorPos(ptCursorPos);
-	EnsureVisible(ptCursorPos);
-
-	LocateTextBuffer()->DeleteText(this,
-		ptSelStart.y, ptSelStart.x, ptSelEnd.y, ptSelEnd.x, CE_ACTION_CUT);
-
-	m_pTextBuffer->SetModified(true);
-}
-
-/**
- * @brief Paste text from clipboard
- */
-void CMergeEditView::OnEditPaste()
-{
-	if (!QueryEditable())
-		return;
-
-	CCrystalEditViewEx::Paste();
-	m_pTextBuffer->SetModified(true);
-}
-
-/**
  * @brief Go to first diff
  *
  * Called when user selects "First Difference"
@@ -1120,7 +1061,7 @@ void CMergeEditView::OnContextMenu(LPARAM lParam)
 		{
 			POINT ptStart, ptEnd;
 			GetSelection(ptStart, ptEnd);
-			GetTextWithoutEmptys(ptStart.y, ptStart.x, ptEnd.y, ptEnd.x, text);
+			GetText(ptStart, ptEnd, text);
 		}
 		CMyVariant var;
 		OException::Check(DispId.Call(spDispatch,
@@ -1154,7 +1095,7 @@ void CMergeEditView::OnContextMenu(LPARAM lParam)
  */
 void CMergeEditView::OnConvertEolTo(UINT nID)
 {
-	CRLFSTYLE nStyle = CRLF_STYLE_AUTOMATIC;;
+	CRLFSTYLE nStyle = CRLF_STYLE_AUTOMATIC;
 	switch (nID)
 	{
 	case ID_EOL_TO_DOS:
@@ -1189,7 +1130,7 @@ void CMergeEditView::RefreshOptions()
 	// Enable/disable automatic rescan (rescanning after edit)
 	m_bAutomaticRescan = COptionsMgr::Get(OPT_AUTOMATIC_RESCAN);
 	// Set tab type (tabs/spaces)
-	SetInsertTabs(COptionsMgr::Get(OPT_TAB_TYPE) == 0);
+	m_pTextBuffer->SetInsertTabs(COptionsMgr::Get(OPT_TAB_TYPE) == 0);
 	SetSelectionMargin(COptionsMgr::Get(OPT_VIEW_FILEMARGIN));
 
 	if (!COptionsMgr::Get(OPT_SYNTAX_HIGHLIGHT))
@@ -1363,13 +1304,13 @@ int CMergeEditView::GetEmptySubLines( int nLineIndex )
 	{
 		if (nLineIndex >= pLeftView->GetLineCount())
 			return 0;
-		pLeftView->WrapLineCached( nLineIndex, pLeftView->GetScreenChars(), NULL, nBreaks[0] );
+		pLeftView->WrapLineCached(nLineIndex, pLeftView->GetScreenChars(), NULL, nBreaks[0]);
 	}
 	if (CMergeEditView *pRightView = m_pDocument->GetRightView())
 	{
 		if (nLineIndex >= pRightView->GetLineCount())
 			return 0;
-		pRightView->WrapLineCached( nLineIndex, pRightView->GetScreenChars(), NULL, nBreaks[1] );
+		pRightView->WrapLineCached(nLineIndex, pRightView->GetScreenChars(), NULL, nBreaks[1]);
 	}
 
 	if (nBreaks[m_nThisPane] < nBreaks[1 - m_nThisPane])

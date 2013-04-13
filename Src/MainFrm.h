@@ -242,7 +242,7 @@ protected:
 	void OnToolbarNone();
 	void OnToolbarSmall();
 	void OnToolbarBig();
-	void OnToolTipText(NMHDR *);
+	void OnToolTipText(TOOLTIPTEXT *);
 	void OnHelpReleasenotes();
 	void OnHelpTranslations();
 	void OnFileOpenConflict();

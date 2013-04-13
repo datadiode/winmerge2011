@@ -92,7 +92,7 @@ void LineInfo::Append(LPCTSTR pszChars, int nLength)
  * @brief Has the line EOL?
  * @return TRUE if the line has EOL bytes.
  */
-BOOL LineInfo::HasEol() const
+bool LineInfo::HasEol() const
 {
 	return m_nEolChars != 0;
 }
@@ -111,14 +111,14 @@ LPCTSTR LineInfo::GetEol() const
  * @param [in] lpEOL New EOL bytes.
  * @return TRUE if succeeded, FALSE if failed (nothing to change).
  */
-BOOL LineInfo::ChangeEol(LPCTSTR lpEOL)
+bool LineInfo::ChangeEol(LPCTSTR lpEOL)
 {
 	const int nNewEolChars = static_cast<int>(_tcslen(lpEOL));
 
 	// Check if we really are changing EOL.
 	if (nNewEolChars == m_nEolChars)
 		if (_tcscmp(m_pcLine + m_nLength, lpEOL) == 0)
-			return FALSE;
+			return false;
 
 	int nBufNeeded = m_nLength + nNewEolChars + 1;
 	if (nBufNeeded > m_nMax)
@@ -135,7 +135,7 @@ BOOL LineInfo::ChangeEol(LPCTSTR lpEOL)
 	// copy also the 0 to zero-terminate the line
 	memcpy(m_pcLine + m_nLength, lpEOL, sizeof(TCHAR) * (nNewEolChars + 1));
 	m_nEolChars = nNewEolChars;
-	return TRUE;
+	return true;
 }
 
 /**

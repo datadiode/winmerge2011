@@ -109,15 +109,14 @@ class EDITPADC_CLASS CCrystalTextBuffer
 public:
 	DWORD m_dwCurrentRevisionNumber;
 	DWORD m_dwRevisionNumberOnSave;
-	BOOL IsTextBufferInitialized () const { return m_bInit; }
+	bool IsTextBufferInitialized () const { return m_bInit; }
 
 protected:
-	BOOL m_bInit;
-	BOOL m_bReadOnly;
-	BOOL m_bModified;
+	bool m_bInit;
+	bool m_bReadOnly;
+	bool m_bModified;
+	bool m_bInsertTabs;
 	CRLFSTYLE m_nCRLFMode;
-	BOOL m_IgnoreEol;
-	BOOL m_bInsertTabs;
 	int  m_nTabSize;
 
 	enum
@@ -184,8 +183,8 @@ public:
 	void FreeAll();
 
 	//  'Dirty' flag
-	virtual void SetModified (BOOL bModified = TRUE);
-	BOOL IsModified () const { return m_bModified; }
+	virtual void SetModified(bool bModified = true);
+	bool IsModified() const { return m_bModified; }
 
 	//  Connect/disconnect views
 	void AddView (CCrystalTextView * pView);
@@ -196,8 +195,8 @@ public:
 	{
 		return static_cast<int>(m_aLines.size());
 	}
-	LPCTSTR GetLineEol (int nLine) const;
-	BOOL ChangeLineEol (int nLine, LPCTSTR lpEOL);
+	LPCTSTR GetLineEol(int nLine) const;
+	bool ChangeLineEol(int nLine, LPCTSTR lpEOL);
 	const LineInfo &GetLineInfo(int nLine) const;
 	// number of characters in line (excluding any trailing eol characters)
 	int GetLineLength(int nLine) const
@@ -219,23 +218,18 @@ public:
 	}
 	int FindLineWithFlag(DWORD dwFlag) const;
 	void SetLineFlags(int nLine, DWORD dwFlags);
-	void GetText (int nStartLine, int nStartChar, int nEndLine, int nEndChar,
-			String & text, LPCTSTR pszCRLF = NULL) const;
-	virtual void GetTextWithoutEmptys (int nStartLine, int nStartChar,
-			int nEndLine, int nEndChar, String &text,
-			CRLFSTYLE nCrlfStyle = CRLF_STYLE_AUTOMATIC) const;
+	void GetText(int nStartLine, int nStartChar, int nEndLine, int nEndChar,
+			String &text, LPCTSTR pszCRLF = NULL) const;
 
 	//  Attributes
-	CRLFSTYLE GetCRLFMode () const;
-	void SetCRLFMode (CRLFSTYLE nCRLFMode);
+	CRLFSTYLE GetCRLFMode() const;
+	void SetCRLFMode(CRLFSTYLE nCRLFMode);
 	/// Adjust all the lines in the buffer to the buffer default EOL Mode
-	virtual BOOL applyEOLMode();
+	bool applyEOLMode();
 	LPCTSTR GetDefaultEol() const;
 	static LPCTSTR GetStringEol(CRLFSTYLE nCRLFMode);
-	BOOL GetReadOnly () const;
-	void SetReadOnly (BOOL bReadOnly = TRUE);
-
-	void SetIgnoreEol(BOOL IgnoreEol) { m_IgnoreEol = IgnoreEol; }
+	bool GetReadOnly() const;
+	void SetReadOnly(bool bReadOnly = true);
 
 	//  Text modification functions
 	virtual POINT InsertText(CCrystalTextView *pSource, int nLine, int nPos, LPCTSTR pszText, int cchText, int nAction = CE_ACTION_UNKNOWN, BOOL bHistory = TRUE) = 0;
@@ -258,8 +252,6 @@ public:
 	POINT GetLastChangePos() const;
 	//END SW
 	void RestoreLastChangePos(POINT pt);
-	//void DeleteLine(int line, int nCount = 1);
-
 
 	//  Browse undo sequence
 	stl_size_t GetUndoActionCode(int &nAction, stl_size_t pos = 0) const;
@@ -269,11 +261,11 @@ public:
 	CCrystalTextView::TextDefinition *RetypeViews(LPCTSTR lpszFileName);
 	//  Notify all connected views about changes in text
 	void UpdateViews(CCrystalTextView *pSource, CUpdateContext *pContext,
-					 DWORD dwUpdateFlags, int nLineIndex = -1);
+		DWORD dwUpdateFlags, int nLineIndex = -1);
 
 	// Tabs/space inserting
-	BOOL GetInsertTabs() const { return m_bInsertTabs; }
-	void SetInsertTabs(BOOL bInsertTabs) { m_bInsertTabs = bInsertTabs; }
+	bool GetInsertTabs() const { return m_bInsertTabs; }
+	void SetInsertTabs(bool bInsertTabs) { m_bInsertTabs = bInsertTabs; }
 
 	// Tabbing
 	int GetTabSize() const;

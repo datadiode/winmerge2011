@@ -56,8 +56,8 @@ void CChildFrame::DoFileEncodingDialog()
 		return;
 
 	FileLocation filelocLeft, filelocRight;
-	BOOL bROLeft = m_ptBuf[0]->GetReadOnly();
-	BOOL bRORight = m_ptBuf[1]->GetReadOnly();
+	bool bROLeft = m_ptBuf[0]->GetReadOnly();
+	bool bRORight = m_ptBuf[1]->GetReadOnly();
 	if (dlg.m_bAffectsLeft)
 	{
 		filelocLeft.encoding.m_unicoding = NONE;

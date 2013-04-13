@@ -114,16 +114,6 @@ public:
 	BOOL InitNew(CRLFSTYLE nCrlfStyle = CRLF_STYLE_DOS);
 	void FreeAll();
 
-	/** 
-	This should work in base code as ghost lines are real empty lines
-	but maybe it doesn't (if there is an assert to check there is an EOL,
-	or if it adds the default EOL)
-	*/
-	virtual void GetTextWithoutEmptys(int nStartLine, int nStartChar,
-			int nEndLine, int nEndChar, String &text,
-			CRLFSTYLE nCrlfStyle = CRLF_STYLE_AUTOMATIC);
-
-
 	// Text modification functions
 	virtual POINT InsertText(CCrystalTextView *pSource, int nLine, int nPos,
 		LPCTSTR pszText, int cchText,

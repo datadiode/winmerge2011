@@ -184,51 +184,16 @@ void CGhostTextView::PushCursors()
 
 
 
-int CGhostTextView::ComputeRealLine (int nApparentLine) const
+int CGhostTextView::ComputeRealLine(int nApparentLine) const
 {
 	if (!m_pGhostTextBuffer)
 		return 0;
 	return m_pGhostTextBuffer->ComputeRealLine(nApparentLine);
 }
 
-int CGhostTextView::ComputeApparentLine (int nRealLine) const
+int CGhostTextView::ComputeApparentLine(int nRealLine) const
 {
 	return m_pGhostTextBuffer->ComputeApparentLine(nRealLine);
-}
-
-void CGhostTextView::GetTextWithoutEmptys (int nStartLine, int nStartChar,
-		int nEndLine, int nEndChar, String &text,
-		CRLFSTYLE nCrlfStyle /*=CRLF_STYLE_AUTOMATIC*/ )
-{
-  if (m_pGhostTextBuffer != NULL)
-    m_pGhostTextBuffer->GetTextWithoutEmptys (nStartLine, nStartChar, nEndLine, nEndChar, text, nCrlfStyle);
-  else
-    text = _T ("");
-}
-
-HGLOBAL CGhostTextView::PrepareDragData ()
-{
-	PrepareSelBounds ();
-	if (m_ptDrawSelStart == m_ptDrawSelEnd)
-		return NULL;
-
-	String text;
-	GetTextWithoutEmptys (m_ptDrawSelStart.y, m_ptDrawSelStart.x, m_ptDrawSelEnd.y, m_ptDrawSelEnd.x, text);
-	int cchText = text.length();
-	SIZE_T cbData = (cchText + 1) * sizeof(TCHAR);
-	HGLOBAL hData =::GlobalAlloc (GMEM_MOVEABLE | GMEM_DDESHARE, cbData);
-	if (hData == NULL)
-		return NULL;
-	::GlobalReAlloc(hData, cbData, 0);
-	ASSERT(::GlobalSize(hData) == cbData);
-
-	LPTSTR pszData = (LPTSTR)::GlobalLock (hData);
-	memcpy (pszData, text.c_str(), cbData);
-	::GlobalUnlock (hData);
-
-	m_ptDraggedTextBegin = m_ptDrawSelStart;
-	m_ptDraggedTextEnd = m_ptDrawSelEnd;
-	return hData;
 }
 
 /**
@@ -238,7 +203,7 @@ HGLOBAL CGhostTextView::PrepareDragData ()
  * @param [in] nLineIndex  Index of line in view.
  * @param [in] nLineNumber Line number to display. if -1, it's not displayed.
  */
-void CGhostTextView::DrawMargin (HSurface * pdc, const RECT & rect, int nLineIndex, int nLineNumber)
+void CGhostTextView::DrawMargin(HSurface * pdc, const RECT & rect, int nLineIndex, int nLineNumber)
 {
 	int nRealLineNumber;
 	if (nLineIndex < 0 || GetLineFlags(nLineIndex) & (LF_GHOST | LF_SKIPPED))

@@ -874,7 +874,7 @@ bool CCrystalTextView::IsSelection()
 	return m_ptSelStart != m_ptSelEnd;
 }
 
-void CCrystalTextView::Copy()
+void CCrystalTextView::OnEditCopy()
 {
 	WaitStatusCursor wc;
 	if (HGLOBAL hData = PrepareDragData())

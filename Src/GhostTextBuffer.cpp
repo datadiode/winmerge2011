@@ -90,7 +90,7 @@ BOOL CGhostTextBuffer::InternalInsertGhostLine(CCrystalTextView *pSource, int nL
 		UpdateViews (pSource, &context, UPDATE_HORZRANGE | UPDATE_VERTRANGE, nLine);
 
 	if (!m_bModified)
-		SetModified (TRUE);
+		SetModified(true);
 
 	OnNotifyLineHasBeenEdited(nLine);
 	return TRUE;
@@ -148,91 +148,9 @@ BOOL CGhostTextBuffer::InternalDeleteGhostLine(CCrystalTextView *pSource, int nL
 	}
 
 	if (!m_bModified)
-		SetModified (TRUE);
+		SetModified(true);
 
 	return TRUE;
-}
-
-/**
- * @brief Get text of specified lines (ghost lines will not contribute to text).
- * 
- * @param nCrlfStyle determines the EOL type in the returned buffer.
- * If nCrlfStyle equals CRLF_STYLE_AUTOMATIC, we read the EOL from the line buffer
- * 
- * @note This function has its base in CrystalTextBuffer
- * CrystalTextBuffer::GetTextWithoutEmptys() is for a buffer with no ghost lines.
- * CrystalTextBuffer::GetText() returns text including ghost lines.
- * These two base functions never read the EOL from the line buffer, they
- * use CRLF_STYLE_DOS when nCrlfStyle equals CRLF_STYLE_AUTOMATIC.
- */
-void CGhostTextBuffer::GetTextWithoutEmptys(int nStartLine, int nStartChar,
-                 int nEndLine, int nEndChar,
-                 String &text, CRLFSTYLE nCrlfStyle /* CRLF_STYLE_AUTOMATIC */)
-{
-	const int lines = GetLineCount();
-	ASSERT(nStartLine >= 0 && nStartLine < lines);
-	ASSERT(nStartChar >= 0 && nStartChar <= GetLineLength(nStartLine));
-	ASSERT(nEndLine >= 0 && nEndLine < lines);
-	ASSERT(nEndChar >= 0 && nEndChar <= GetFullLineLength(nEndLine));
-	ASSERT(nStartLine < nEndLine || nStartLine == nEndLine && nStartChar <= nEndChar);
-	// some edit functions (copy...) should do nothing when there is no selection.
-	// assert to be sure to catch these 'do nothing' cases.
-	//ASSERT(nStartLine != nEndLine || nStartChar != nEndChar);
-
-	// estimate size (upper bound)
-	int nBufSize = 0;
-	int i;
-	for (i = nStartLine; i <= nEndLine; ++i)
-		nBufSize += m_aLines[i].Length() + 2; // in case we insert EOLs
-	text.resize(nBufSize);
-	LPTSTR pszBuf = &text.front();
-
-	const LPCTSTR pszCRLF = GetStringEol(nCrlfStyle);
-	const size_t nCRLFLength = _tcslen(pszCRLF);
-
-	if (nCrlfStyle != CRLF_STYLE_AUTOMATIC)
-	{
-		// we must copy this EOL type only
-		for (i = nStartLine; i <= nEndLine; ++i)
-		{
-			// exclude ghost lines
-			const LineInfo &li = m_aLines[i];
-			if (li.m_dwFlags & LF_GHOST)
-				continue;
-
-			// copy the line, excluding the EOL
-			int chars = (i == nEndLine ? nEndChar : li.Length()) - nStartChar;
-			LPCTSTR szLine = li.GetLine(nStartChar);
-			CopyMemory(pszBuf, szLine, chars * sizeof(TCHAR));
-			pszBuf += chars;
-			nStartChar = 0;
-
-			// copy the EOL of the requested type
-			if (i < nEndLine && li.GetEol())
-			{
-				CopyMemory(pszBuf, pszCRLF, nCRLFLength * sizeof(TCHAR));
-				pszBuf += nCRLFLength;
-			}
-		}
-	} 
-	else 
-	{
-		for (i = nStartLine; i <= nEndLine; ++i)
-		{
-			// exclude ghost lines
-			const LineInfo &li = m_aLines[i];
-			if (li.m_dwFlags & LF_GHOST)
-				continue;
-
-			// copy the line including the EOL
-			int chars = (i == nEndLine ? nEndChar : li.FullLength()) - nStartChar;
-			LPCTSTR szLine = li.GetLine(nStartChar);
-			CopyMemory(pszBuf, szLine, chars * sizeof(TCHAR));
-			pszBuf += chars;
-			nStartChar = 0;
-		}
-	}
-	text.resize(static_cast<String::size_type>(pszBuf - text.c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -293,8 +211,8 @@ bool CGhostTextBuffer::Undo(CCrystalTextView *pSource, POINT &ptCursorPos)
 				(apparent_ptEndPos.y < size) &&
 				(apparent_ptEndPos.x <= m_aLines[apparent_ptEndPos.y].Length()))
 			{
-				GetTextWithoutEmptys(apparent_ptStartPos.y, apparent_ptStartPos.x,
-					apparent_ptEndPos.y, apparent_ptEndPos.x, text, CRLF_STYLE_UNIX);
+				GetText(apparent_ptStartPos.y, apparent_ptStartPos.x,
+					apparent_ptEndPos.y, apparent_ptEndPos.x, text, _T("\n"));
 				if (ur.VerifyText(text))
 				{
 					InternalDeleteText(pSource, 
@@ -406,9 +324,9 @@ bool CGhostTextBuffer::Undo(CCrystalTextView *pSource, POINT &ptCursorPos)
 
 	} while ((dwFlags & UNDO_BEGINGROUP) == 0);
 	if (m_bModified && m_nSyncPosition == m_nUndoPosition)
-		SetModified(FALSE);
+		SetModified(false);
 	if (!m_bModified && m_nSyncPosition != m_nUndoPosition)
-		SetModified(TRUE);
+		SetModified(true);
 	if ((dwFlags & UNDO_BEGINGROUP) != 0)
 		return true;
 	// If the Undo failed, clear the entire Undo/Redo stack
@@ -462,8 +380,8 @@ bool CGhostTextBuffer::Redo(CCrystalTextView *pSource, POINT &ptCursorPos)
 		{
 #ifdef _ADVANCED_BUGCHECK
 			String text;
-			GetTextWithoutEmptys(apparent_ptStartPos.y, apparent_ptStartPos.x,
-				apparent_ptEndPos.y, apparent_ptEndPos.x, text, CRLF_STYLE_UNIX);
+			GetText(apparent_ptStartPos.y, apparent_ptStartPos.x,
+				apparent_ptEndPos.y, apparent_ptEndPos.x, text, _T("\n"));
 			ASSERT(ur.VerifyText(text));
 #endif
 			DeleteText(pSource, apparent_ptStartPos.y, apparent_ptStartPos.x, 
@@ -478,9 +396,9 @@ bool CGhostTextBuffer::Redo(CCrystalTextView *pSource, POINT &ptCursorPos)
 	}
 
 	if (m_bModified && m_nSyncPosition == m_nUndoPosition)
-		SetModified(FALSE);
+		SetModified(false);
 	if (!m_bModified && m_nSyncPosition != m_nUndoPosition)
-		SetModified(TRUE);
+		SetModified(true);
 	return true;
 }
 
@@ -674,7 +592,7 @@ void CGhostTextBuffer::DeleteText(CCrystalTextView * pSource, int nStartLine,
 		int nStartChar, int nEndLine, int nEndChar, int nAction, BOOL bHistory)
 {
 	String sTextToDelete;
-	GetTextWithoutEmptys(nStartLine, nStartChar, nEndLine, nEndChar, sTextToDelete);
+	GetText(nStartLine, nStartChar, nEndLine, nEndChar, sTextToDelete);
 	// If there is nothing to delete, bail out.
 	if (sTextToDelete.empty())
 		return;

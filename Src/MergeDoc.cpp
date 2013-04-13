@@ -762,7 +762,7 @@ bool CChildFrame::ListCopy(int srcPane, int dstPane, int nDiff /* = -1*/,
 		const DIFFRANGE *const pcd = m_diffList.DiffRangeAt(nDiff);
 		CDiffTextBuffer *const sbuf = m_ptBuf[srcPane];
 		CDiffTextBuffer *const dbuf = m_ptBuf[dstPane];
-		BOOL bSrcWasMod = sbuf->IsModified();
+		const bool bSrcWasMod = sbuf->IsModified();
 		const int cd_dbegin = srcPane == 0 ? pcd->dbegin0 : pcd->dbegin1;
 		int cd_dend = srcPane == 0 ? pcd->dend0 : pcd->dend1;
 		const int cd_blank = srcPane == 0 ? pcd->blank0 : pcd->blank1;
@@ -794,15 +794,13 @@ bool CChildFrame::ListCopy(int srcPane, int dstPane, int nDiff /* = -1*/,
 
 		ASSERT(cd_dend >= cd_dbegin);
 
-		CRLFSTYLE nCrlfStyle = dbuf->GetCRLFMode();
-		if (nCrlfStyle == CRLF_STYLE_MIXED)
-			nCrlfStyle = CRLF_STYLE_AUTOMATIC;
+		const CRLFSTYLE nCrlfStyle = dbuf->GetCRLFMode();
+		const LPCTSTR pszCRLF = nCrlfStyle != CRLF_STYLE_MIXED ?
+			CCrystalTextBuffer::GetStringEol(nCrlfStyle) : NULL;
+
 		String strLine;
 		int cd_dpastend = cd_dend + 1;
-		sbuf->GetTextWithoutEmptys(cd_dbegin, 0,
-			nCrlfStyle == CRLF_STYLE_AUTOMATIC ? cd_dpastend : cd_dend,
-			nCrlfStyle == CRLF_STYLE_AUTOMATIC ? 0 : sbuf->GetLineLength(cd_dend),
-			strLine, nCrlfStyle);
+		sbuf->GetText(cd_dbegin, 0, cd_dpastend, 0, strLine, pszCRLF);
 		dbuf->DeleteText(dstView, cd_dbegin, 0,
 			cd_dpastend < dbuf->GetLineCount() ? cd_dpastend : cd_dend,
 			cd_dpastend < dbuf->GetLineCount() ? 0 : dbuf->GetLineLength(cd_dend),
@@ -945,11 +943,11 @@ bool CChildFrame::DoSave(bool &bSaveSuccess, int nBuffer)
 		const int nEndLine = pView->GetLineCount() - 1;
 		const int nEndChar = pView->GetLineLength(nEndLine);
 		String text;
-		pView->GetTextWithoutEmptys(0, 0, nEndLine, nEndChar, text);
+		pView->GetText(0, 0, nEndLine, nEndChar, text);
 		m_pOpener->m_pView[nBuffer]->ReplaceSelection(text.c_str(), text.length(), 0);
 		CDiffTextBuffer *const pBuf = m_ptBuf[nBuffer];
 		pBuf->m_nSyncPosition = pBuf->m_nUndoPosition;
-		pBuf->SetModified(FALSE);
+		pBuf->SetModified(false);
 		// remember revision number on save
 		pBuf->m_dwRevisionNumberOnSave = pBuf->m_dwCurrentRevisionNumber;
 		// redraw line revision marks
@@ -1042,7 +1040,7 @@ bool CChildFrame::DoSave(bool &bSaveSuccess, int nBuffer)
 		{
 			fileInfo.ApplyFileTimeTo(strSavePath.c_str());
 		}
-		m_ptBuf[nBuffer]->SetModified(FALSE);
+		m_ptBuf[nBuffer]->SetModified(false);
 		m_pSaveFileInfo[nBuffer].Update(strSavePath.c_str());
 		m_strPath[nBuffer] = strSavePath;
 		m_pRescanFileInfo[nBuffer].Update(strSavePath.c_str());
@@ -1750,7 +1748,7 @@ void CChildFrame::DirDocClosing(CDirFrame *pDirDoc)
  * @return Tells if files were loaded successfully
  * @sa CChildFrame::OpenDocs()
  **/
-FileLoadResult::FILES_RESULT CChildFrame::LoadFile(int nBuffer, BOOL &readOnly, const FileLocation &fileinfo)
+FileLoadResult::FILES_RESULT CChildFrame::LoadFile(int nBuffer, bool &readOnly, const FileLocation &fileinfo)
 {
 	CDiffTextBuffer *pBuf = m_ptBuf[nBuffer];
 	m_strPath[nBuffer] = fileinfo.filepath;
@@ -1828,7 +1826,7 @@ void CChildFrame::SanityCheckCodepage(FileLocation & fileinfo)
  * @return One of FileLoadResult values.
  */
 FileLoadResult::FILES_RESULT CChildFrame::LoadOneFile(
-	int index, BOOL &readOnly, const FileLocation &fileinfo)
+	int index, bool &readOnly, const FileLocation &fileinfo)
 {
 	FileLoadResult::FILES_RESULT loadSuccess = FileLoadResult::FRESULT_ERROR;
 	if (!fileinfo.filepath.empty())
@@ -1869,7 +1867,7 @@ FileLoadResult::FILES_RESULT CChildFrame::LoadOneFile(
 OPENRESULTS_TYPE CChildFrame::OpenDocs(
 	FileLocation &filelocLeft,
 	FileLocation &filelocRight,
-	BOOL bROLeft, BOOL bRORight)
+	bool bROLeft, bool bRORight)
 {
 	bool bIdentical = false;
 
@@ -2100,7 +2098,7 @@ FileLoadResult::FILES_RESULT CChildFrame::ReloadDoc(int index)
 	fileinfo.encoding = m_ptBuf[index]->getEncoding();
 	fileinfo.description = m_strDesc[index];
 
-	BOOL readOnly = m_ptBuf[index]->GetReadOnly();
+	bool readOnly = m_ptBuf[index]->GetReadOnly();
 
 	// Prevent displaying views during LoadFile
 	// Note : attach buffer again only if both loads succeed
@@ -2331,12 +2329,12 @@ void CChildFrame::OnToolsCompareSelection()
 		POINT ptStart, ptEnd;
 		pView->GetSelection(ptStart, ptEnd);
 		String text;
-		pView->GetTextWithoutEmptys(ptStart.y, ptStart.x, ptEnd.y, ptEnd.x, text);
+		pView->GetText(ptStart.y, ptStart.x, ptEnd.y, ptEnd.x, text);
 		// Trick the TextBuffer to flag the to-be-inserted text as revision 0.
 		--pTargetBuf->m_dwCurrentRevisionNumber;
 		pTargetBuf->InsertText(pTargetView, 0, 0,
 			text.c_str(), text.length(), CE_ACTION_UNKNOWN, FALSE);
-		pTargetBuf->SetModified(FALSE);
+		pTargetBuf->SetModified(false);
 	} while (nSide ^= 1);
 	pMergeDoc->FlushAndRescan();
 	pMergeDoc->ActivateFrame();

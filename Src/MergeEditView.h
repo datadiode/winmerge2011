@@ -130,11 +130,6 @@ protected:
 	bool m_bAutomaticRescan;
 
 private:
-	/** 
-	This flag is set when we receive an OnTimer command, and we want 
-	to wait for theApp::OnIdle before processing it 
-	*/
-	//BOOL m_fTimerWaitingForIdle;
 	COLORSETTINGS m_cachedColors; /**< Cached color settings */
 
 // Operations
@@ -198,9 +193,6 @@ protected:
 
 public:
 	void OnCurdiff();
-	void OnEditCopy();
-	void OnEditCut();
-	void OnEditPaste();
 	void OnFirstdiff();
 	void OnLastdiff();
 	void OnNextdiff();

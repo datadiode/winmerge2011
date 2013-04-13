@@ -355,7 +355,7 @@ LRESULT CChildFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 		pTextView->SelectAll();
 		break;
 	case ID_EDIT_COPY:
-		pTextView->Copy();
+		pTextView->OnEditCopy();
 		break;
 	case ID_EDIT_CUT:
 		pActiveView->OnEditCut();
@@ -1088,7 +1088,7 @@ void CChildFrame::UpdateMergeStatusUI()
  */
 void CChildFrame::OnLeftReadOnly()
 {
-	BOOL bReadOnly = !m_ptBuf[0]->GetReadOnly();
+	bool bReadOnly = !m_ptBuf[0]->GetReadOnly();
 	m_ptBuf[0]->SetReadOnly(bReadOnly);
 	GetLeftView()->OnUpdateCaret();
 	UpdateCmdUI();
@@ -1099,7 +1099,7 @@ void CChildFrame::OnLeftReadOnly()
  */
 void CChildFrame::OnRightReadOnly()
 {
-	BOOL bReadOnly = !m_ptBuf[1]->GetReadOnly();
+	bool bReadOnly = !m_ptBuf[1]->GetReadOnly();
 	m_ptBuf[1]->SetReadOnly(bReadOnly);
 	GetRightView()->OnUpdateCaret();
 	UpdateCmdUI();
