@@ -674,7 +674,8 @@ HRESULT CCrystalEditView::DragOver(DWORD grfKeyState, POINTL pt, DWORD *pdwEffec
 	{
 		POINT ptClient = { pt.x, pt.y };
 		ScreenToClient(&ptClient);
-		DoDragScroll(ptClient);
+		if ((grfKeyState & MK_SHIFT) == 0)
+			DoDragScroll(ptClient);
 		ShowDropIndicator(ptClient);
 		if (*pdwEffect != DROPEFFECT_COPY)
 			*pdwEffect = grfKeyState & MK_CONTROL ? DROPEFFECT_COPY : DROPEFFECT_MOVE;
@@ -709,36 +710,36 @@ HRESULT CCrystalEditView::Drop(IDataObject *pDataObj, DWORD grfKeyState, POINTL 
 
 void CCrystalEditView::DoDragScroll(const POINT & point)
 {
-  RECT rcClientRect;
-  GetClientRect(&rcClientRect);
-  if (point.y < rcClientRect.top + DRAG_BORDER_Y)
-    {
-      HideDropIndicator();
-      ScrollUp();
-      UpdateWindow();
-      ShowDropIndicator(point);
-    }
-  else if (point.y >= rcClientRect.bottom - DRAG_BORDER_Y)
-    {
-      HideDropIndicator();
-      ScrollDown();
-      UpdateWindow();
-      ShowDropIndicator(point);
-    }
-  else if (point.x < rcClientRect.left + GetMarginWidth () + DRAG_BORDER_X)
-    {
-      HideDropIndicator();
-      ScrollLeft();
-      UpdateWindow();
-      ShowDropIndicator(point);
-    }
-  else if (point.x >= rcClientRect.right - DRAG_BORDER_X)
-    {
-      HideDropIndicator();
-      ScrollRight();
-      UpdateWindow();
-      ShowDropIndicator(point);
-    }
+	RECT rcClientRect;
+	GetClientRect(&rcClientRect);
+	if (point.y < rcClientRect.top + DRAG_BORDER_Y)
+	{
+		HideDropIndicator();
+		ScrollUp();
+		UpdateWindow();
+		ShowDropIndicator(point);
+	}
+	else if (point.y >= rcClientRect.bottom - DRAG_BORDER_Y)
+	{
+		HideDropIndicator();
+		ScrollDown();
+		UpdateWindow();
+		ShowDropIndicator(point);
+	}
+	else if (point.x < rcClientRect.left + GetMarginWidth () + DRAG_BORDER_X)
+	{
+		HideDropIndicator();
+		ScrollLeft();
+		UpdateWindow();
+		ShowDropIndicator(point);
+	}
+	else if (point.x >= rcClientRect.right - DRAG_BORDER_X)
+	{
+		HideDropIndicator();
+		ScrollRight();
+		UpdateWindow();
+		ShowDropIndicator(point);
+	}
 }
 
 bool CCrystalEditView::DoDropText(HGLOBAL hData, const POINT &ptClient)
@@ -770,7 +771,7 @@ bool CCrystalEditView::DoDropText(HGLOBAL hData, const POINT &ptClient)
 	bool bGroupFlag = false;
 	if (!IsDraggingText())
 	{
-		m_pTextBuffer->BeginUndoGroup ();
+		m_pTextBuffer->BeginUndoGroup();
 		bGroupFlag = true;
 	} 
 

@@ -93,6 +93,54 @@ CLocationView::~CLocationView()
 		m_pSavedBackgroundBitmap->DeleteObject();
 }
 
+HRESULT CLocationView::QueryInterface(REFIID iid, void **ppv)
+{
+	static const QITAB rgqit[] = 
+	{   
+		QITABENT(CLocationView, IDropTarget),
+		{ 0 }
+	};
+	return QISearch(this, rgqit, iid, ppv);
+}
+
+ULONG CLocationView::AddRef()
+{
+	return 1;
+}
+
+ULONG CLocationView::Release()
+{
+	return 1;
+}
+
+HRESULT CLocationView::DragEnter(IDataObject *pDataObj, DWORD grfKeyState, POINTL pt, DWORD *pdwEffect)
+{
+	return CMyFormatEtc(CF_UNICODETEXT).QueryGetData(pDataObj);
+}
+
+HRESULT CLocationView::DragLeave()
+{
+	return S_OK;
+}
+
+HRESULT CLocationView::DragOver(DWORD grfKeyState, POINTL pt, DWORD *pdwEffect)
+{
+	if ((grfKeyState & MK_SHIFT) == 0)
+	{
+		POINT ptClient = { pt.x, pt.y };
+		ScreenToClient(&ptClient);
+		OnDrag(POINTTOPOINTS(ptClient));
+	}
+	*pdwEffect = DROPEFFECT_NONE;
+	return S_OK;
+}
+
+HRESULT CLocationView::Drop(IDataObject *pDataObj, DWORD grfKeyState, POINTL pt, DWORD *pdwEffect)
+{
+	*pdwEffect = DROPEFFECT_NONE;
+	return S_OK;
+}
+
 LRESULT CLocationView::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
@@ -101,11 +149,12 @@ LRESULT CLocationView::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		OnContextMenu(lParam);
 		break;
 	case WM_MOUSEMOVE:
-		OnMouseMove(lParam);
+		if (::GetCapture() == m_hWnd)
+			OnDrag(lParam);
 		break;
 	case WM_LBUTTONDOWN:
 		SetCapture();
-		OnLButtonDown(lParam);
+		OnDown(lParam);
 		break;
 	case WM_LBUTTONUP:
 		ReleaseCapture();
@@ -518,7 +567,7 @@ void CLocationView::DrawRect(HSurface *pDC, const RECT& r, COLORREF cr, BOOL bSe
 /**
  * @brief Capture the mouse target.
  */
-void CLocationView::OnLButtonDown(LPARAM lParam)
+void CLocationView::OnDown(LPARAM lParam)
 {
 	POINT point;
 	POINTSTOPOINT(point, lParam);
@@ -531,31 +580,29 @@ void CLocationView::OnLButtonDown(LPARAM lParam)
  * Reposition on every dragged movement.
  * The Screen update stress will be similar to a mouse wheeling.:-)
  */
-void CLocationView::OnMouseMove(LPARAM lParam)
+void CLocationView::OnDrag(LPARAM lParam)
 {
 	POINT point;
 	POINTSTOPOINT(point, lParam);
-	if (::GetCapture() == m_hWnd)
-	{
-		// Don't go above bars.
-		point.y = max<long>(point.y, Y_OFFSET);
 
-		// Vertical scroll handlers are range safe, so there is no need to
-		// make sure value is valid and in range.
-		// Just a random choose as both view share the same scroll bar.
-		CMergeEditView *const pView = m_pMergeDoc->GetRightView();
-		int nSubLine = (int) (m_pixInLines * (point.y - Y_OFFSET));
-		nSubLine -= pView->GetScreenLines() / 2;
-		if (nSubLine < 0)
-			nSubLine = 0;
+	// Don't go above bars.
+	point.y = max<long>(point.y, Y_OFFSET);
 
-		SCROLLINFO si;
-		si.cbSize = sizeof si;
-		si.fMask = SIF_POS;
-		si.nPos = nSubLine;
-		pView->SetScrollInfo(SB_VERT, &si);
-		pView->SendMessage(WM_VSCROLL, MAKEWPARAM(SB_THUMBPOSITION, 0), NULL);
-	}
+	// Vertical scroll handlers are range safe, so there is no need to
+	// make sure value is valid and in range.
+	// Just a random choose as both view share the same scroll bar.
+	CMergeEditView *const pView = m_pMergeDoc->GetRightView();
+	int nSubLine = (int) (m_pixInLines * (point.y - Y_OFFSET));
+	nSubLine -= pView->GetScreenLines() / 2;
+	if (nSubLine < 0)
+		nSubLine = 0;
+
+	SCROLLINFO si;
+	si.cbSize = sizeof si;
+	si.fMask = SIF_POS;
+	si.nPos = nSubLine;
+	pView->SetScrollInfo(SB_VERT, &si);
+	pView->SendMessage(WM_VSCROLL, MAKEWPARAM(SB_THUMBPOSITION, 0), NULL);
 }
 
 /**

@@ -59,7 +59,9 @@ struct DiffBlock
  * These visualizations allow user to easily see a overall picture of the files
  * in comparison. Using mouse it allows easy and fast moving in files.
  */
-class CLocationView : public OWindow
+class CLocationView
+	: public OWindow
+	, public IDropTarget
 {
 public:
 	CLocationView(CChildFrame *);
@@ -67,6 +69,20 @@ public:
 	void SetConnectMovedBlocks(int displayMovedBlocks);
 	void UpdateVisiblePos(int nTopLine, int nBottomLine);
 	void ForceRecalculate();
+
+	void SubclassWindow(HWindow *pWnd)
+	{
+		OWindow::SubclassWindow(pWnd);
+		RegisterDragDrop(m_hWnd, this);
+	}
+
+	STDMETHOD(QueryInterface)(REFIID, void **);
+	STDMETHOD_(ULONG, AddRef)();
+	STDMETHOD_(ULONG, Release)();
+	STDMETHOD(DragEnter)(IDataObject *pDataObj, DWORD grfKeyState, POINTL pt, DWORD *pdwEffect);
+	STDMETHOD(DragLeave)();
+	STDMETHOD(DragOver)(DWORD grfKeyState, POINTL pt, DWORD *pdwEffect);
+	STDMETHOD(Drop)(IDataObject *pDataObj, DWORD grfKeyState, POINTL pt, DWORD *pdwEffect);
 
 protected:
 	CChildFrame *const m_pMergeDoc;
@@ -99,8 +115,8 @@ private:
 	// Generated message map functions
 protected:
 	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
-	void OnLButtonDown(LPARAM);
-	void OnMouseMove(LPARAM);
+	void OnDown(LPARAM);
+	void OnDrag(LPARAM);
 	void OnContextMenu(LPARAM);
 	void OnDraw(HSurface *);
 };
