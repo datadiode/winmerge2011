@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WinMerge\n"
 "Report-Msgid-Bugs-To: http://bugs.winmerge.org/\n"
-"POT-Creation-Date: 2013-04-12 14:26+0000\n"
+"POT-Creation-Date: 2013-04-13 23:18+0000\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: English <winmerge-translate@lists.sourceforge.net>\n"
@@ -2271,9 +2271,9 @@ msgid "Selected Word Diff:"
 msgstr ""
 
 #: Merge.rc:1270
-#: Merge.rc:1604
+#: Merge.rc:1356
 #, c-format
-msgid "Compare"
+msgid "General"
 msgstr ""
 
 #: Merge.rc:1273
@@ -2465,11 +2465,6 @@ msgstr ""
 #: Merge.rc:1348
 #, c-format
 msgid "Remove"
-msgstr ""
-
-#: Merge.rc:1356
-#, c-format
-msgid "General"
 msgstr ""
 
 #: Merge.rc:1359
@@ -3096,6 +3091,11 @@ msgstr ""
 #: Merge.rc:1603
 #, c-format
 msgid "Don't ask this &question again."
+msgstr ""
+
+#: Merge.rc:1604
+#, c-format
+msgid "Compare"
 msgstr ""
 
 #: Merge.rc:1605

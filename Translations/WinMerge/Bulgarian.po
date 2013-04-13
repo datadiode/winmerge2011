@@ -2279,10 +2279,10 @@ msgid "Selected Word Diff:"
 msgstr "В избраните думи:"
 
 #: Merge.rc:1270
-#: Merge.rc:1604
+#: Merge.rc:1356
 #, c-format
-msgid "Compare"
-msgstr "Сравняване"
+msgid "General"
+msgstr "Основни"
 
 #: Merge.rc:1273
 #, c-format
@@ -2474,11 +2474,6 @@ msgstr "Редактирай"
 #, c-format
 msgid "Remove"
 msgstr "Премахни"
-
-#: Merge.rc:1356
-#, c-format
-msgid "General"
-msgstr "Основни"
 
 #: Merge.rc:1359
 #, c-format
@@ -3261,6 +3256,11 @@ msgstr "Не показвай това съобщение отново."
 #, c-format
 msgid "Don't ask this &question again."
 msgstr "Не питай пак този въпрос."
+
+#: Merge.rc:1604
+#, c-format
+msgid "Compare"
+msgstr "Сравняване"
 
 #: Merge.rc:1605
 #, c-format

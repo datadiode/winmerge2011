@@ -2275,10 +2275,10 @@ msgid "Selected Word Diff:"
 msgstr "选中的单词不同:"
 
 #: Merge.rc:1270
-#: Merge.rc:1604
+#: Merge.rc:1356
 #, c-format
-msgid "Compare"
-msgstr "对比"
+msgid "General"
+msgstr "常规"
 
 #: Merge.rc:1273
 #, c-format
@@ -2470,11 +2470,6 @@ msgstr "编辑"
 #, c-format
 msgid "Remove"
 msgstr "删除"
-
-#: Merge.rc:1356
-#, c-format
-msgid "General"
-msgstr "常规"
 
 #: Merge.rc:1359
 #, c-format
@@ -3221,6 +3216,11 @@ msgstr "不再提示此消息(&M)。"
 #, c-format
 msgid "Don't ask this &question again."
 msgstr "不再询问此问题(&Q)。"
+
+#: Merge.rc:1604
+#, c-format
+msgid "Compare"
+msgstr "对比"
 
 #: Merge.rc:1605
 #, c-format

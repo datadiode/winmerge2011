@@ -2278,10 +2278,10 @@ msgid "Selected Word Diff:"
 msgstr "選択された単語の差異:"
 
 #: Merge.rc:1270
-#: Merge.rc:1604
+#: Merge.rc:1356
 #, c-format
-msgid "Compare"
-msgstr "比較"
+msgid "General"
+msgstr "一般"
 
 #: Merge.rc:1273
 #, c-format
@@ -2473,11 +2473,6 @@ msgstr "編集(&E)"
 #, c-format
 msgid "Remove"
 msgstr "削除(&R)"
-
-#: Merge.rc:1356
-#, c-format
-msgid "General"
-msgstr "一般"
 
 #: Merge.rc:1359
 #, c-format
@@ -3260,6 +3255,11 @@ msgstr "再びこのメッセージを表示しない(&M)"
 #, c-format
 msgid "Don't ask this &question again."
 msgstr "再びこの質問をしない(&Q)"
+
+#: Merge.rc:1604
+#, c-format
+msgid "Compare"
+msgstr "比較"
 
 #: Merge.rc:1605
 #, c-format

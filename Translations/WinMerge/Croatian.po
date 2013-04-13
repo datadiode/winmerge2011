@@ -2279,10 +2279,10 @@ msgid "Selected Word Diff:"
 msgstr "Razlike oznaèene rijeèi:"
 
 #: Merge.rc:1270
-#: Merge.rc:1604
+#: Merge.rc:1356
 #, c-format
-msgid "Compare"
-msgstr "Usporedba"
+msgid "General"
+msgstr "Opæe"
 
 #: Merge.rc:1273
 #, c-format
@@ -2474,11 +2474,6 @@ msgstr "Ureðivanje"
 #, c-format
 msgid "Remove"
 msgstr "Ukloni"
-
-#: Merge.rc:1356
-#, c-format
-msgid "General"
-msgstr "Opæe"
 
 #: Merge.rc:1359
 #, c-format
@@ -3261,6 +3256,11 @@ msgstr "Ne prikazuj više ovu poruku."
 #, c-format
 msgid "Don't ask this &question again."
 msgstr "Ne &pitaj ponovo."
+
+#: Merge.rc:1604
+#, c-format
+msgid "Compare"
+msgstr "Usporedba"
 
 #: Merge.rc:1605
 #, c-format

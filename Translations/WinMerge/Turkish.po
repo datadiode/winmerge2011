@@ -2279,10 +2279,10 @@ msgid "Selected Word Diff:"
 msgstr "Seçili Sözcük Farklýlýðý:"
 
 #: Merge.rc:1270
-#: Merge.rc:1604
+#: Merge.rc:1356
 #, c-format
-msgid "Compare"
-msgstr "Karþýlaþtýrma"
+msgid "General"
+msgstr "Genel"
 
 #: Merge.rc:1273
 #, c-format
@@ -2474,11 +2474,6 @@ msgstr "Düzenle"
 #, c-format
 msgid "Remove"
 msgstr "Kaldýr"
-
-#: Merge.rc:1356
-#, c-format
-msgid "General"
-msgstr "Genel"
 
 #: Merge.rc:1359
 #, c-format
@@ -3264,6 +3259,11 @@ msgstr "Bu Mesajý Tekrar Gösterme!"
 #, c-format
 msgid "Don't ask this &question again."
 msgstr "Bu Soruyu Tekrar Sorma!"
+
+#: Merge.rc:1604
+#, c-format
+msgid "Compare"
+msgstr "Karþýlaþtýrma"
 
 #: Merge.rc:1605
 #, c-format

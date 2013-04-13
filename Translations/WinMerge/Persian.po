@@ -2278,10 +2278,10 @@ msgid "Selected Word Diff:"
 msgstr "  ›«Ê  Ê«éÂ «‰ Œ«»Ì : "
 
 #: Merge.rc:1270
-#: Merge.rc:1604
+#: Merge.rc:1356
 #, c-format
-msgid "Compare"
-msgstr " „ﬁ«Ì”Â ò—œ‰ "
+msgid "General"
+msgstr " ⁄„Ê„Ì "
 
 #: Merge.rc:1273
 #, c-format
@@ -2473,11 +2473,6 @@ msgstr " ÊÌ—«Ì‘ "
 #, c-format
 msgid "Remove"
 msgstr " »—œ«‘ ‰ "
-
-#: Merge.rc:1356
-#, c-format
-msgid "General"
-msgstr " ⁄„Ê„Ì "
 
 #: Merge.rc:1359
 #, c-format
@@ -3258,6 +3253,11 @@ msgstr "&m œÊ»«—Â «Ì‰ ÅÌ«„ —« ‰„«Ì‘ ‰œÂ "
 #, c-format
 msgid "Don't ask this &question again."
 msgstr "&q œÊ»«—Â «Ì‰ Å—”‘ —« ‰Å—” "
+
+#: Merge.rc:1604
+#, c-format
+msgid "Compare"
+msgstr " „ﬁ«Ì”Â ò—œ‰ "
 
 #: Merge.rc:1605
 #, c-format

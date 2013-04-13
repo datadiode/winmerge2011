@@ -2274,10 +2274,10 @@ msgid "Selected Word Diff:"
 msgstr "Επιλεγμένη Διαφορά Λέξεως:"
 
 #: Merge.rc:1270
-#: Merge.rc:1604
+#: Merge.rc:1356
 #, c-format
-msgid "Compare"
-msgstr "Σύγκριση"
+msgid "General"
+msgstr "Γενικά"
 
 #: Merge.rc:1273
 #, c-format
@@ -2469,11 +2469,6 @@ msgstr "Επεξεργασία"
 #, c-format
 msgid "Remove"
 msgstr "Διαγραφή"
-
-#: Merge.rc:1356
-#, c-format
-msgid "General"
-msgstr "Γενικά"
 
 #: Merge.rc:1359
 #, c-format
@@ -3256,6 +3251,11 @@ msgstr "Να μην εμφανισθεί ξανά αυτό το &Μήνυμα."
 #, c-format
 msgid "Don't ask this &question again."
 msgstr "Να μην ξαναγίνει αυτή η &ερώτηση."
+
+#: Merge.rc:1604
+#, c-format
+msgid "Compare"
+msgstr "Σύγκριση"
 
 #: Merge.rc:1605
 #, c-format

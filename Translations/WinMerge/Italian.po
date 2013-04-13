@@ -2275,10 +2275,10 @@ msgid "Selected Word Diff:"
 msgstr "Diff. parole selezionata:"
 
 #: Merge.rc:1270
-#: Merge.rc:1604
+#: Merge.rc:1356
 #, c-format
-msgid "Compare"
-msgstr "Confronto"
+msgid "General"
+msgstr "Generale"
 
 #: Merge.rc:1273
 #, c-format
@@ -2470,11 +2470,6 @@ msgstr "Modifica"
 #, c-format
 msgid "Remove"
 msgstr "Rimuovi"
-
-#: Merge.rc:1356
-#, c-format
-msgid "General"
-msgstr "Generale"
 
 #: Merge.rc:1359
 #, c-format
@@ -3250,6 +3245,11 @@ msgstr "Non visualizzare questo &messaggio di nuovo."
 #, c-format
 msgid "Don't ask this &question again."
 msgstr "Non farmi più &questa domanda."
+
+#: Merge.rc:1604
+#, c-format
+msgid "Compare"
+msgstr "Confronto"
 
 #: Merge.rc:1605
 #, c-format
