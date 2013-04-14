@@ -1,3 +1,11 @@
+0.2011.003.157
+Changes since preceding release (not necessarily complete):
+• Edit > Options > System: Have Supplement folder label appear and act as link
+• MergeEditView: Make location bar responsive during drag-drop editing
+• PatchTool: Default to unified patch format / Optionally apply line filters
+• Fix Edit > Undo after File > Convert Line Endings to > ...
+• DirView: Add customizable background colors to make differences more visible
+
 0.2011.003.154
 Changes since preceding release (not necessarily complete):
 • Editlib: Fix a minor selection margin misbehavior when Wrap Lines option is on
