@@ -35,6 +35,16 @@ protected:
 	void GenerateReport(REPORT_TYPE nReportType);
 	void WriteString(HString *, UINT = CP_THREAD_ACP);
 	void WriteString(LPCTSTR);
+	template<class any>
+	void WriteString(any fmt, ...)
+	{
+		va_list args;
+		va_start(args, fmt);
+		String s;
+		s.append_sprintf_va_list(fmt, args);
+		WriteString(s.c_str());
+		va_end(args);
+	}
 	void WriteStringEntityAware(LPCTSTR);
 	void GenerateHeader();
 	void GenerateContent();

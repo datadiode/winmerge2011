@@ -20,6 +20,7 @@
 #include "DirCmpReportDlg.h"
 #include "coretools.h"
 #include "paths.h"
+#include "OptionsMgr.h"
 
 UINT CF_HTML = RegisterClipboardFormat(_T("HTML Format"));
 
@@ -34,23 +35,11 @@ static locality::TimeString GetCurrentTimeString()
 }
 
 /**
- * @brief Format string as beginning tag.
- * @param [in] elName String to format as beginning tag.
- * @return String formatted as beginning tag.
+ * @brief Permute COLORREF such that printf("#%06x") yields equivalent HTML.
  */
-static string_format BeginEl(LPCTSTR elName)
+static DWORD MakeHtmlColor(COLORREF cr)
 {
-	return string_format(_T("<%s>"), elName);
-}
-
-/**
- * @brief Format string as ending tag.
- * @param [in] elName String to format as ending tag.
- * @return String formatted as ending tag.
- */
-static string_format EndEl(LPCTSTR elName)
-{
-	return string_format(_T("</%s>"), elName);
+	return (cr & 0x0000FF) << 16 | (cr & 0x00FF00) | (cr & 0xFF0000) >> 16;
 }
 
 /**
@@ -319,8 +308,25 @@ void DirCmpReport::GenerateHTMLHeader()
 				_T("\t\t\tcolor: black;\n")
 				_T("\t\t\tbackground: silver;\n")
 				_T("\t\t}\n")
-				_T("\t-->\n\t</style>\n")
-				_T("</head>\n<body>\n"));
+				_T("\t-->\n\t</style>\n"));
+
+	WriteString(_T("\t<style%s type=\"text/css\">\n\t<!--\n")
+				_T("\t\ttr.leftonly {\n")
+				_T("\t\t\tbackground-color: #%06x;\n")
+				_T("\t\t}\n")
+				_T("\t\ttr.rightonly {\n")
+				_T("\t\t\tbackground-color: #%06x;\n")
+				_T("\t\t}\n")
+				_T("\t\ttr.suspicious {\n")
+				_T("\t\t\tbackground-color: #%06x;\n")
+				_T("\t\t}\n")
+				_T("\t-->\n\t</style>\n"),
+				&_T("\0 disabled")[COptionsMgr::Get(OPT_CLR_DEFAULT_LIST_COLORING)],
+				MakeHtmlColor(COptionsMgr::Get(OPT_LIST_LEFTONLY_BKGD_COLOR)),
+				MakeHtmlColor(COptionsMgr::Get(OPT_LIST_RIGHTONLY_BKGD_COLOR)),
+				MakeHtmlColor(COptionsMgr::Get(OPT_LIST_SUSPICIOUS_BKGD_COLOR)));
+
+	WriteString(_T("</head>\n<body>\n"));
 	GenerateHTMLHeaderBodyPortion();
 }
 
@@ -383,9 +389,9 @@ void DirCmpReport::GenerateXmlHeader()
 		LPCTSTR colEl = CDirView::f_cols[logcol].regName;
 		if (m_pList->GetColumn(currCol, &lvc))
 		{
-			WriteString(BeginEl(colEl).c_str());
+			WriteString(_T("<%s>"), colEl);
 			WriteStringEntityAware(lvc.pszText);
-			WriteString(EndEl(colEl).c_str());
+			WriteString(_T("</%s>"), colEl);
 		}
 	}
 	WriteString(_T("</column_name>\n"));
@@ -400,17 +406,39 @@ void DirCmpReport::GenerateXmlHtmlContent(bool xml)
 	// Report:Detail. All currently displayed columns will be added
 	for (int currRow = 0; currRow < nRows; currRow++)
 	{
-		LPCTSTR const rowEl = xml ? _T("filediff") : _T("tr");
-		WriteString(BeginEl(rowEl).c_str());
+		LPCTSTR tr = _T("<tr>");
+		if (DIFFITEM *di = m_pList->GetDiffItem(currRow))
+		{
+			switch (di->diffcode & (DIFFCODE::SIDEFLAGS | DIFFCODE::COMPAREFLAGS))
+			{
+			case DIFFCODE::BOTH | DIFFCODE::NOCMP:
+			case DIFFCODE::BOTH | DIFFCODE::SAME:
+				// either identical or irrelevant
+				break;
+			case DIFFCODE::LEFT:
+				// left-only
+				tr = _T("<tr class='leftonly'>");
+				break;
+			case DIFFCODE::RIGHT:
+				// right-only
+				tr = _T("<tr class='rightonly'>");
+				break;
+			default:
+				// otherwise suspicious
+				tr = _T("<tr class='suspicious'>");
+				break;
+			}
+		}
+		WriteString(xml ? _T("<filediff>") : tr);
 		for (int currCol = 0; currCol < m_nColumns; currCol++)
 		{
 			int logcol = m_pList->ColPhysToLog(currCol);
 			LPCTSTR const colEl = xml ? CDirView::f_cols[logcol].regName : _T("td");
-			WriteString(BeginEl(colEl).c_str());
+			WriteString(_T("<%s>"), colEl);
 			WriteStringEntityAware(m_pList->GetItemText(currRow, currCol).c_str());
-			WriteString(EndEl(colEl).c_str());
+			WriteString(_T("</%s>"), colEl);
 		}
-		WriteString(EndEl(rowEl).c_str());
+		WriteString(xml ? _T("</filediff>") : _T("</tr>"));
 		WriteString(_T("\n"));
 	}
 	if (!xml)
