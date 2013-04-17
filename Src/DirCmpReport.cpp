@@ -29,9 +29,9 @@ UINT CF_HTML = RegisterClipboardFormat(_T("HTML Format"));
  */
 static locality::TimeString GetCurrentTimeString()
 {
-	FILETIME ft;
-	GetSystemTimeAsFileTime(&ft);
-	return ft;
+	SYSTEMTIME st;
+	GetLocalTime(&st);
+	return st;
 }
 
 /**

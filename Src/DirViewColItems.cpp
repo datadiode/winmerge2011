@@ -168,7 +168,9 @@ static String ColTimeGet(const CDiffContext *, const void *p)
 	using locality::TimeString;
 	const FileTime &r = *static_cast<const FileTime *>(p);
 	FILETIME ft;
-	return r != 0 && FileTimeToLocalFileTime(&r, &ft) ? TimeString(ft) : String();
+	SYSTEMTIME st;
+	return r != 0 && FileTimeToLocalFileTime(&r, &ft) &&
+		FileTimeToSystemTime(&ft, &st) ? TimeString(st) : String();
 }
 
 /**

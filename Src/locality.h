@@ -49,7 +49,7 @@ namespace locality
 	class TimeString : public string<128>
 	{
 	public:
-		TimeString(const FILETIME &);
+		TimeString(const SYSTEMTIME &);
 	};
 };
 

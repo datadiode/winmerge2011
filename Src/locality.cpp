@@ -41,10 +41,8 @@ void NumToLocaleStr::getLocaleStr(LPCTSTR str)
 /**
  * @brief Convert FILETIME to string to show in the GUI.
  */
-TimeString::TimeString(const FILETIME &tim)
+TimeString::TimeString(const SYSTEMTIME &sysTime)
 {
-	SYSTEMTIME sysTime;
-	::FileTimeToSystemTime(&tim, &sysTime);
 	if (int len = ::GetDateFormat(LOCALE_USER_DEFAULT, 0, &sysTime, NULL, out, 60))
 	{
 		out[len - 1] = _T(' ');
