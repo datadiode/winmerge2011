@@ -20,8 +20,8 @@ using stl::vector;
 // #define STRINGDIFF_LOGGING
 
 static bool CustomChars;
-static TCHAR BreakCharDefaults[] = _T(",.;:");
-static TCHAR *BreakChars = BreakCharDefaults;
+static const TCHAR BreakCharDefaults[] = _T(",.;:");
+static const TCHAR *BreakChars = BreakCharDefaults;
 
 static bool isWordBreak(int breakType, TCHAR ch);
 static void wordLevelToByteLevel(vector<wdiff> * pDiffs, const String& str1,
@@ -36,7 +36,7 @@ void sd_SetBreakChars(const TCHAR *breakChars)
 {
 	TRACE("Setting BreakChars to %ls\n", breakChars);
 	if (BreakChars != BreakCharDefaults)
-		free(BreakChars);
+		free(const_cast<TCHAR *>(BreakChars));
 	BreakChars = breakChars ? _tcsdup(breakChars) : BreakCharDefaults;
 }
 
@@ -1141,13 +1141,13 @@ static LPCTSTR AdvanceOverWhitespace(LPCTSTR pcurrent, LPCTSTR end)
  * @param start [in] first valid position (do not go before this)
  *
  * NB: Unlike AdvanceOverWhitespace, this will not go over the start
- * This because WinMerge doesn't need to, and also CharPrev cannot easily do so
+ * This because WinMerge doesn't need to
  */
 static LPCTSTR RetreatOverWhitespace(LPCTSTR pcurrent, LPCTSTR start)
 {
 	// back over whitespace
 	while (pcurrent > start && xisspace(*pcurrent))
-		pcurrent = CharPrev(start, pcurrent); // DBCS safe because of xisspace above
+		--pcurrent;
 	return pcurrent;
 }
 
@@ -1221,9 +1221,9 @@ void sd_ComputeByteDiff(String & str1, String & str2,
 		else
 		{
 			while (pen1 > py1 && xisspace(*pen1))
-				pen1 = CharPrev(py1, pen1);
+				--pen1;
 			while (pen2 > py2 && xisspace(*pen2))
-				pen2 = CharPrev(py2, pen2);
+				--pen2;
 		}
 	}
 	//check for excaption of empty string on one side
@@ -1247,22 +1247,18 @@ void sd_ComputeByteDiff(String & str1, String & str2,
 		// Potential difference extends from py1 to pen1 and py2 to pen2
 
 		// Check if either side finished
-		if (py1 > pen1 && py2 > pen2)
-		{
-			begin1 = end1 = begin2 = end2 = -1;
-			alldone = true;
-			break;
-		}
 		if (py1 > pen1 || py2 > pen2)
 		{
+			if (py1 > pen1 && py2 > pen2)
+				begin1 = end1 = begin2 = end2 = -1;
 			alldone = true;
 			break;
 		}
 
 		// handle all the whitespace logic (due to WinMerge whitespace settings)
-		if (xwhite!=WHITESPACE_COMPARE_ALL && xisspace(*py1))
+		if (xwhite != WHITESPACE_COMPARE_ALL && xisspace(*py1))
 		{
-			if (xwhite==WHITESPACE_IGNORE_CHANGE && !xisspace(*py2))
+			if (xwhite == WHITESPACE_IGNORE_CHANGE && !xisspace(*py2))
 			{
 				// py1 is white but py2 is not
 				// in WHITESPACE_IGNORE_CHANGE mode,
@@ -1275,9 +1271,9 @@ void sd_ComputeByteDiff(String & str1, String & str2,
 			continue;
 
 		}
-		if (xwhite!=WHITESPACE_COMPARE_ALL && xisspace(*py2))
+		if (xwhite != WHITESPACE_COMPARE_ALL && xisspace(*py2))
 		{
-			if (xwhite==WHITESPACE_IGNORE_CHANGE && !xisspace(*py1))
+			if (xwhite == WHITESPACE_IGNORE_CHANGE && !xisspace(*py1))
 			{
 				// py2 is white but py1 is not
 				// in WHITESPACE_IGNORE_CHANGE mode,
@@ -1307,8 +1303,10 @@ void sd_ComputeByteDiff(String & str1, String & str2,
 				}
 				else
 				{
-					py1 = CharPrev(pbeg1, py1);
-					py2 = CharPrev(pbeg2, py2);
+					if (py1 > pbeg1)
+						--py1;
+					if (py2 > pbeg2)
+						--py2;
 					break; // done with forward search
 				}
 			}
@@ -1426,14 +1424,8 @@ void sd_ComputeByteDiff(String & str1, String & str2,
 				}
 			}
 			// decrement pz1 and pz2
-			if (pz1 == pbeg1)
-				pz1 = pbeg1 - 1; // earlier than pbeg1 signifies no difference
-			else
-				pz1 = CharPrev(pbeg1, pz1);
-			if (pz2 == pbeg2)
-				pz2 = pbeg2 - 1; // earlier than pbeg1 signifies no difference
-			else
-				pz2 = CharPrev(pbeg2, pz2);
+			--pz1; // earlier than pbeg1 signifies no difference
+			--pz2; // earlier than pbeg1 signifies no difference
 		}
 
 		// Store results of advance into return variables (end1 & end2)
