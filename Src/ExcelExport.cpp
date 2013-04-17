@@ -1,6 +1,8 @@
 /*/ExcelExport.cpp
 
-Last edit: 2013-01-19 Jochen Neubeck
+Last edit: 2013-04-17 Jochen Neubeck
+
+See https://github.com/Lafriks/nix-spreadsheet if in need for C# code.
 
 [The MIT license]
 
@@ -25,6 +27,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include "stdafx.h"
+#include "DiffItem.h"
+#include "OptionsMgr.h"
 #include "ExcelExport.h"
 
 #undef EOF
@@ -55,6 +59,7 @@ struct CExcelExport::BiffRecord
 		SUPBOOK			= 0x01AE, // Supporting Workbook
 		EXTERNSHEET		= 0x0017, // External Reference
 		NAME			= 0x0018, // Defined Name
+		PALETTE			= 0x0092, // Palette
 	};
 	WORD id;
 	WORD size;
@@ -220,6 +225,9 @@ void CExcelExport::WriteWorkbook(HListView *pLv)
 	TCHAR szText[INFOTIPSIZE];
 	LVITEM item;
 
+	const WORD wCellBorders = 0x1111;
+	const WORD wCellBorderColors = 8 | 8 << 7; // 1st color from PALETTE record
+
 	BiffRecord(BiffRecord::BOF)
 		.Append<WORD>(0x0600)
 		.Append<WORD>(0x0005)
@@ -305,6 +313,14 @@ void CExcelExport::WriteWorkbook(HListView *pLv)
 		.AppendString<WORD>("0")
 		.WriteTo(pstm);
 
+	BiffRecord(BiffRecord::PALETTE)
+		.Append<WORD>(4)
+		.Append<COLORREF>(RGB(192,192,192))
+		.Append<COLORREF>(COptionsMgr::Get(OPT_LIST_LEFTONLY_BKGD_COLOR))
+		.Append<COLORREF>(COptionsMgr::Get(OPT_LIST_RIGHTONLY_BKGD_COLOR))
+		.Append<COLORREF>(COptionsMgr::Get(OPT_LIST_SUSPICIOUS_BKGD_COLOR))
+		.WriteTo(pstm);
+
 	for (item.iSubItem = 0 ; item.iSubItem < nCols ; ++item.iSubItem)
 	{
 		LVCOLUMN lvc;
@@ -327,9 +343,9 @@ void CExcelExport::WriteWorkbook(HListView *pLv)
 			.Append<WORD>(0xFFF5)
 			.Append<WORD>(0x0020)
 			.Append<WORD>(0x0000)
-			.Append<WORD>(0x0000)
-			.Append<WORD>(0x0000)
-			.Append<WORD>(0x0000)
+			.Append<WORD>(wCellBorders)
+			.Append<WORD>(wCellBorderColors)
+			.Append<WORD>(wCellBorderColors)
 			.Append<WORD>(0x0000)
 			.Append<WORD>(0x20C0)
 			.WriteTo(pstm);
@@ -341,9 +357,9 @@ void CExcelExport::WriteWorkbook(HListView *pLv)
 			.Append<WORD>(0xFFF5)
 			.Append<WORD>(0x0020)
 			.Append<WORD>(0xF400)
-			.Append<WORD>(0x0000)
-			.Append<WORD>(0x0000)
-			.Append<WORD>(0x0000)
+			.Append<WORD>(wCellBorders)
+			.Append<WORD>(wCellBorderColors)
+			.Append<WORD>(wCellBorderColors)
 			.Append<WORD>(0x0000)
 			.Append<WORD>(0x20C0)
 			.WriteTo(pstm);
@@ -355,9 +371,9 @@ void CExcelExport::WriteWorkbook(HListView *pLv)
 			.Append<WORD>(0xFFF5)
 			.Append<WORD>(0x0020)
 			.Append<WORD>(0xF400)
-			.Append<WORD>(0x0000)
-			.Append<WORD>(0x0000)
-			.Append<WORD>(0x0000)
+			.Append<WORD>(wCellBorders)
+			.Append<WORD>(wCellBorderColors)
+			.Append<WORD>(wCellBorderColors)
 			.Append<WORD>(0x0000)
 			.Append<WORD>(0x20C0)
 			.WriteTo(pstm);
@@ -370,9 +386,9 @@ void CExcelExport::WriteWorkbook(HListView *pLv)
 			.Append<WORD>(0xFFF5)
 			.Append<WORD>(0x0020)
 			.Append<WORD>(0xF400)
-			.Append<WORD>(0x0000)
-			.Append<WORD>(0x0000)
-			.Append<WORD>(0x0000)
+			.Append<WORD>(wCellBorders)
+			.Append<WORD>(wCellBorderColors)
+			.Append<WORD>(wCellBorderColors)
 			.Append<WORD>(0x0000)
 			.Append<WORD>(0x20C0)
 			.WriteTo(pstm);
@@ -384,9 +400,9 @@ void CExcelExport::WriteWorkbook(HListView *pLv)
 			.Append<WORD>(0x0001)
 			.Append<WORD>(0x0020)
 			.Append<WORD>(0x0000)
-			.Append<WORD>(0x0000)
-			.Append<WORD>(0x0000)
-			.Append<WORD>(0x0000)
+			.Append<WORD>(wCellBorders)
+			.Append<WORD>(wCellBorderColors)
+			.Append<WORD>(wCellBorderColors)
 			.Append<WORD>(0x0000)
 			.Append<WORD>(0x20C0)
 			.WriteTo(pstm);
@@ -398,9 +414,9 @@ void CExcelExport::WriteWorkbook(HListView *pLv)
 			.Append<WORD>(0x0001)
 			.Append<WORD>(0x0020)
 			.Append<WORD>(0x0800)
-			.Append<WORD>(0x0000)
-			.Append<WORD>(0x0000)
-			.Append<WORD>(0x0000)
+			.Append<WORD>(wCellBorders)
+			.Append<WORD>(wCellBorderColors)
+			.Append<WORD>(wCellBorderColors)
 			.Append<WORD>(0x0000)
 			.Append<WORD>(0x20C0)
 			.WriteTo(pstm);
@@ -412,9 +428,9 @@ void CExcelExport::WriteWorkbook(HListView *pLv)
 			.Append<WORD>(0x0001)
 			.Append<WORD>(0x0020)
 			.Append<WORD>(0x0400)
-			.Append<WORD>(0x0000)
-			.Append<WORD>(0x0000)
-			.Append<WORD>(0x0000)
+			.Append<WORD>(wCellBorders)
+			.Append<WORD>(wCellBorderColors)
+			.Append<WORD>(wCellBorderColors)
 			.Append<WORD>(0x0000)
 			.Append<WORD>(0x20C0)
 			.WriteTo(pstm);
@@ -426,9 +442,9 @@ void CExcelExport::WriteWorkbook(HListView *pLv)
 			.Append<WORD>(0x0001)
 			.Append<WORD>(0x0023)
 			.Append<WORD>(0x0400)
-			.Append<WORD>(0x0000)
-			.Append<WORD>(0x0000)
-			.Append<WORD>(0x0000)
+			.Append<WORD>(wCellBorders)
+			.Append<WORD>(wCellBorderColors)
+			.Append<WORD>(wCellBorderColors)
 			.Append<WORD>(0x0000)
 			.Append<WORD>(0x20C0)
 			.WriteTo(pstm);
@@ -440,11 +456,95 @@ void CExcelExport::WriteWorkbook(HListView *pLv)
 			.Append<WORD>(0x0001)
 			.Append<WORD>(0x0023)
 			.Append<WORD>(0x0400)
-			.Append<WORD>(0x0000)
-			.Append<WORD>(0x0000)
-			.Append<WORD>(0x0000)
+			.Append<WORD>(wCellBorders)
+			.Append<WORD>(wCellBorderColors)
+			.Append<WORD>(wCellBorderColors)
 			.Append<WORD>(0x0000)
 			.Append<WORD>(0x20C0)
+			.WriteTo(pstm);
+		break;
+	case 20: // format "0", left-aligned, left-only
+		BiffRecord(BiffRecord::XF)
+			.Append<WORD>(0x0000) // ifnt
+			.Append<WORD>(0x00A5) // ifmt
+			.Append<WORD>(0x0001)
+			.Append<WORD>(0x0020) // alignment and rotation
+			.Append<WORD>(0x0400)
+			.Append<WORD>(wCellBorders)
+			.Append<WORD>(wCellBorderColors)
+			.Append<WORD>(wCellBorderColors)
+			.Append<WORD>(0x0400) // solid fill pattern
+			.Append<WORD>(0x2088 + 1) // 1st color after grid color
+			.WriteTo(pstm);
+		break;
+	case 21: // format "0", right-aligned, left-only
+		BiffRecord(BiffRecord::XF)
+			.Append<WORD>(0x0000) // ifnt
+			.Append<WORD>(0x00A5) // ifmt
+			.Append<WORD>(0x0001)
+			.Append<WORD>(0x0023) // alignment and rotation
+			.Append<WORD>(0x0400)
+			.Append<WORD>(wCellBorders)
+			.Append<WORD>(wCellBorderColors)
+			.Append<WORD>(wCellBorderColors)
+			.Append<WORD>(0x0400) // solid fill pattern
+			.Append<WORD>(0x2088 + 1) // 1st color after grid color
+			.WriteTo(pstm);
+		break;
+	case 22: // format "0", left-aligned, right-only
+		BiffRecord(BiffRecord::XF)
+			.Append<WORD>(0x0000) // ifnt
+			.Append<WORD>(0x00A5) // ifmt
+			.Append<WORD>(0x0001)
+			.Append<WORD>(0x0020) // alignment and rotation
+			.Append<WORD>(0x0400)
+			.Append<WORD>(wCellBorders)
+			.Append<WORD>(wCellBorderColors)
+			.Append<WORD>(wCellBorderColors)
+			.Append<WORD>(0x0400) // solid fill pattern
+			.Append<WORD>(0x2088 + 2) // 2nd color after grid color
+			.WriteTo(pstm);
+		break;
+	case 23: // format "0", right-aligned, right-only
+		BiffRecord(BiffRecord::XF)
+			.Append<WORD>(0x0000) // ifnt
+			.Append<WORD>(0x00A5) // ifmt
+			.Append<WORD>(0x0001)
+			.Append<WORD>(0x0023) // alignment and rotation
+			.Append<WORD>(0x0400)
+			.Append<WORD>(wCellBorders)
+			.Append<WORD>(wCellBorderColors)
+			.Append<WORD>(wCellBorderColors)
+			.Append<WORD>(0x0400) // solid fill pattern
+			.Append<WORD>(0x2088 + 2) // 2nd color after grid color
+			.WriteTo(pstm);
+		break;
+	case 24: // format "0", left-aligned, otherwise suspicious
+		BiffRecord(BiffRecord::XF)
+			.Append<WORD>(0x0000) // ifnt
+			.Append<WORD>(0x00A5) // ifmt
+			.Append<WORD>(0x0001)
+			.Append<WORD>(0x0020) // alignment and rotation
+			.Append<WORD>(0x0400)
+			.Append<WORD>(wCellBorders)
+			.Append<WORD>(wCellBorderColors)
+			.Append<WORD>(wCellBorderColors)
+			.Append<WORD>(0x0400) // solid fill pattern
+			.Append<WORD>(0x2088 + 3) // 3rd color after grid color
+			.WriteTo(pstm);
+		break;
+	case 25: // format "0", right-aligned, otherwise suspicious
+		BiffRecord(BiffRecord::XF)
+			.Append<WORD>(0x0000) // ifnt
+			.Append<WORD>(0x00A5) // ifmt
+			.Append<WORD>(0x0001)
+			.Append<WORD>(0x0023) // alignment and rotation
+			.Append<WORD>(0x0400)
+			.Append<WORD>(wCellBorders)
+			.Append<WORD>(wCellBorderColors)
+			.Append<WORD>(wCellBorderColors)
+			.Append<WORD>(0x0400) // solid fill pattern
+			.Append<WORD>(0x2088 + 3) // 3rd color after grid color
 			.WriteTo(pstm);
 		break;
 	default:
@@ -596,10 +696,40 @@ void CExcelExport::WriteWorkbook(HListView *pLv)
 			item.cchTextMax = _countof(szText);
 			if (pLv->GetItem(&item))
 			{
+				WORD wFormatIndex = 0;
+				if (!COptionsMgr::Get(OPT_CLR_DEFAULT_LIST_COLORING))
+				{
+					if (DIFFITEM *di = reinterpret_cast<DIFFITEM *>(item.lParam))
+					{
+						switch (di->diffcode & (DIFFCODE::SIDEFLAGS | DIFFCODE::COMPAREFLAGS))
+						{
+						case DIFFCODE::BOTH | DIFFCODE::NOCMP:
+						case DIFFCODE::BOTH | DIFFCODE::SAME:
+							// either identical or irrelevant
+							break;
+						case DIFFCODE::LEFT:
+							// left-only
+							wFormatIndex = 20;
+							break;
+						case DIFFCODE::RIGHT:
+							// right-only
+							wFormatIndex = 22;
+							break;
+						default:
+							// otherwise suspicious
+							wFormatIndex = 24;
+							break;
+						}
+					}
+				}
+				if (WORD wDefFormatIndex = rgFormatIndex[item.iSubItem])
+				{
+					wFormatIndex = wFormatIndex ? wFormatIndex + 1 : wDefFormatIndex;
+				}
 				BiffRecord(BiffRecord::LABEL)
 					.Append<WORD>(iRow)
 					.Append<WORD>(item.iSubItem)
-					.Append<WORD>(rgFormatIndex[item.iSubItem])
+					.Append<WORD>(wFormatIndex)
 					.AppendString<WORD>(item.pszText)
 					.WriteTo(pstm);
 			}
