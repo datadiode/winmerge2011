@@ -160,9 +160,12 @@ private:
 	We should call a CCrystalTextBuffer function to add the correct EOL
 	(if CCrystalTextBuffer keeps the default EOL for the file)
 	*/
-	void RecomputeEOL(CCrystalTextView * pSource, int nStartLine, int nEndLine);
+	void RecomputeEOL(CCrystalTextView *pSource, int nStartLine, int nEndLine);
+
+#ifdef _DEBUG
 	/** For debugging purpose */
-	void checkFlagsFromReality(BOOL bFlag) const;
+	void checkFlagsFromReality() const;
+#endif
 
 protected:
 	virtual void OnNotifyLineHasBeenEdited(int nLine) = 0;

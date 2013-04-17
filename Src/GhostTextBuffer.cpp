@@ -1040,11 +1040,12 @@ void CGhostTextBuffer::RecomputeEOL(CCrystalTextView *pSource, int nStartLine, i
 	}
 }
 
+#ifdef _DEBUG
 /** 
 Check all lines, and ASSERT if reality blocks differ from flags. 
 This means that this only has effect in DEBUG build
 */
-void CGhostTextBuffer::checkFlagsFromReality(BOOL bFlag) const
+void CGhostTextBuffer::checkFlagsFromReality() const
 {
 	const int size = m_RealityBlocks.size();
 	int i = 0;
@@ -1060,3 +1061,4 @@ void CGhostTextBuffer::checkFlagsFromReality(BOOL bFlag) const
 	for ( ; i < GetLineCount() ; i++)
 		ASSERT((GetLineFlags(i) & LF_GHOST) != 0);
 }
+#endif
