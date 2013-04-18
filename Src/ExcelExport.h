@@ -7,7 +7,7 @@ public:
 	bool Open(LPCWSTR);
 	void Close(LPCTSTR lpVerb = NULL);
 	void ApplyProfile(LPCTSTR app, LPCTSTR ini, bool fWriteDefaults = false);
-	void WriteWorkbook(HListView *);
+	void WriteWorkbook(HListView *, int flags);
 	BOOL fPrintGrid : 1;
 	String sHeader;
 	String sFooter;

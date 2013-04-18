@@ -282,7 +282,7 @@ protected:
 	void OnEditColumns();
 	void OnCustomizeColumns();
 	void OnToolsGenerateReport();
-	void OnToolsSaveToXLS(LPCTSTR lpVerb);
+	void OnToolsSaveToXLS(LPCTSTR verb, int flags = LVNI_ALL);
 	void OnCtxtDirZipLeft();
 	void OnCtxtDirZipRight();
 	void OnCtxtDirZipBoth();

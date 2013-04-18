@@ -91,9 +91,21 @@ IDR_DIRDOCTYPE MENU
         MENUITEM "&Filters...", ID_TOOLS_FILTERS
         MENUITEM "&Generate Patch...", ID_TOOLS_GENERATEPATCH
         MENUITEM "Generate &Report...", ID_TOOLS_GENERATEREPORT
-        MENUITEM "Save to &Excel spreadsheet...", ID_TOOLS_SAVE_TO_XLS
-        MENUITEM "Show in Excel &Viewer...", ID_TOOLS_VIEW_AS_XLS
-        MENUITEM "&Print with Excel Viewer...", ID_TOOLS_PRINT_AS_XLS
+        POPUP "Save to &Excel spreadsheet"
+        {
+            MENUITEM "&All", ID_TOOLS_SAVE_TO_XLS_ALL
+            MENUITEM "&Selected", ID_TOOLS_SAVE_TO_XLS_SELECTED
+        }
+        POPUP "Show in Excel &Viewer"
+        {
+            MENUITEM "&All", ID_TOOLS_VIEW_AS_XLS_ALL
+            MENUITEM "&Selected", ID_TOOLS_VIEW_AS_XLS_SELECTED
+        }
+        POPUP "&Print with Excel Viewer"
+        {
+            MENUITEM "&All", ID_TOOLS_PRINT_AS_XLS_ALL
+            MENUITEM "&Selected", ID_TOOLS_PRINT_AS_XLS_SELECTED
+        }
     }
     POPUP "&Debug"
     {

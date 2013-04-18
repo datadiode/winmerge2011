@@ -215,7 +215,7 @@ void CExcelExport::ApplyProfile(LPCTSTR app, LPCTSTR ini, bool fWriteDefaults)
 	}
 }
 
-void CExcelExport::WriteWorkbook(HListView *pLv)
+void CExcelExport::WriteWorkbook(HListView *pLv, int flags)
 {
 	HHeaderCtrl *const pHd = pLv->GetHeaderCtrl();
 	int const nCols = pHd->GetItemCount();
@@ -686,7 +686,7 @@ void CExcelExport::WriteWorkbook(HListView *pLv)
 	}
 
 	item.iItem = -1;
-	while ((item.iItem = pLv->GetNextItem(item.iItem, LVNI_SELECTED)) != -1)
+	while ((item.iItem = pLv->GetNextItem(item.iItem, flags)) != -1)
 	{
 		++iRow;
 		item.mask = LVIF_TEXT | LVIF_PARAM;

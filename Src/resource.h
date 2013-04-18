@@ -844,9 +844,6 @@
 #define ID_TOOLS_FILTERS                        32866
 #define ID_TOOLS_COMPARE_SELECTION              32867
 #define ID_TOOLS_GENERATEREPORT                 32868
-#define ID_TOOLS_SAVE_TO_XLS                    32869
-#define ID_TOOLS_VIEW_AS_XLS                    32870
-#define ID_TOOLS_PRINT_AS_XLS                   32871
 #define ID_MERGE_COMPARE                        32879
 #define ID_MERGE_COMPARE_TEXT                   32880
 #define ID_MERGE_COMPARE_ZIP                    32881
@@ -872,6 +869,13 @@
 #define ID_VIEW_CONTEXT_4                       32954
 #define ID_VIEW_CONTEXT_5                       32955
 #define ID_VIEW_CONTEXT_UNLIMITED               32956
+
+#define ID_TOOLS_SAVE_TO_XLS_ALL                32960
+#define ID_TOOLS_SAVE_TO_XLS_SELECTED           32961
+#define ID_TOOLS_VIEW_AS_XLS_ALL                32962
+#define ID_TOOLS_VIEW_AS_XLS_SELECTED           32963
+#define ID_TOOLS_PRINT_AS_XLS_ALL               32964
+#define ID_TOOLS_PRINT_AS_XLS_SELECTED          32965
 
 #define ID_DIR_ZIP_LEFT                         32976
 #define ID_DIR_ZIP_RIGHT                        32977

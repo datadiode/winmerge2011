@@ -1472,10 +1472,10 @@ void CDirView::OnToolsGenerateReport()
 /**
  * @brief Save dir compare results to Excel spreadsheet.
  */
-void CDirView::OnToolsSaveToXLS(LPCTSTR lpVerb)
+void CDirView::OnToolsSaveToXLS(LPCTSTR verb, int flags)
 {
 	String path;
-	if (lpVerb != NULL)
+	if (verb != NULL)
 	{
 		path = paths_ConcatPath(env_GetTempPath(), _T("xlview.xls"));
 	}
@@ -1508,9 +1508,9 @@ void CDirView::OnToolsSaveToXLS(LPCTSTR lpVerb)
 		string_replace(exp.sHeader, _T("<right>"), tmp.c_str());
 		string_replace(exp.sFooter, _T("<right>"), tmp.c_str());
 		// Write the workbook
-		exp.WriteWorkbook(static_cast<HListView *>(m_pWnd));
+		exp.WriteWorkbook(static_cast<HListView *>(m_pWnd), flags);
 		// Close the file, and optionally launch Excel Viewer
-		exp.Close(lpVerb);
+		exp.Close(verb);
 	}
 	OException::Check(exp);
 }
