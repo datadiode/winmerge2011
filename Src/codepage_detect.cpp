@@ -236,10 +236,12 @@ void GuessCodepageEncoding(LPCTSTR filepath, FileTextEncoding *encoding, bool bG
 		}
 		else if (LPCTSTR atat = StrStr(filepath, _T("@@")))
 		{
-			pastext = atat;
-			if (LPCTSTR backslash = StrRChr(filepath, pastext, _T('\\')))
+			if (LPCTSTR backslash = StrRChr(filepath, atat, _T('\\')))
+				filepath = backslash;
+			if (LPCTSTR dot = StrRChr(filepath, atat, _T('.')))
 			{
-				ext = StrRChr(backslash, pastext, _T('.'));
+				ext = dot; // extension including dot
+				pastext = atat;
 			}
 		}
 		if (unsigned cp = GuessEncoding_from_bytes(ext, pastext, fi.pcImage, fi.cbImage))

@@ -75,12 +75,29 @@ static String ColFileNameGet(const CDiffContext *, const void *p) //sfilename
 static String ColExtGet(const CDiffContext *, const void *p) //sfilename
 {
 	const DIFFITEM &di = *static_cast<const DIFFITEM*>(p);
+	LPCTSTR filename = di.left.filename.c_str();
+	LPCTSTR ext = PathFindExtension(filename);
+	LPCTSTR pastext = ext;
 	// We don't show extension for folder names
-	if (di.isDirectory())
-		return _T("");
-	const String &r = di.left.filename;
-	LPCTSTR s = PathFindExtension(r.c_str());
-	return s + _tcsspn(s, _T("."));
+	if (!di.isDirectory())
+	{
+		if (int len = lstrlen(ext))
+		{
+			++ext;
+			pastext += len;
+		}
+		else if (LPCTSTR atat = StrStr(filename, _T("@@")))
+		{
+			if (LPCTSTR backslash = StrRChr(filename, atat, _T('\\')))
+				filename = backslash;
+			if (LPCTSTR dot = StrRChr(filename, atat, _T('.')))
+			{
+				ext = dot + 1; // extension excluding dot
+				pastext = atat;
+			}
+		}
+	}
+	return String(ext, pastext - ext);
 }
 
 /**
