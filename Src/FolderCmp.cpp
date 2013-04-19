@@ -168,6 +168,9 @@ UINT FolderCmp::prepAndCompareTwoFiles(DIFFITEM *di)
 			m_pTimeSizeCompare = new CompareEngines::TimeSizeCompare(m_pCtx);
 
 		code = m_pTimeSizeCompare->CompareFiles(nCompMethod, di);
+
+		m_ndiffs = CDiffContext::DIFFS_UNKNOWN;
+		m_ntrivialdiffs = CDiffContext::DIFFS_UNKNOWN;
 	}
 	else
 	{
