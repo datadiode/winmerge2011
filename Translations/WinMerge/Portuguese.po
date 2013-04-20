@@ -387,7 +387,7 @@ msgstr "&Gerar relatório..."
 #: Merge.rc:94
 #, c-format
 msgid "Save to &Excel spreadsheet"
-msgstr ""
+msgstr "Guardar como Livro do &Excel"
 
 #: Merge.rc:96
 #: Merge.rc:101
@@ -406,12 +406,12 @@ msgstr ""
 #: Merge.rc:99
 #, c-format
 msgid "Show in Excel &Viewer"
-msgstr ""
+msgstr "Mostrar no Excel &Viewer"
 
 #: Merge.rc:104
 #, c-format
 msgid "&Print with Excel Viewer"
-msgstr ""
+msgstr "&Imprimir com o Excel Viewer"
 
 #: Merge.rc:110
 #: Merge.rc:227
@@ -1207,17 +1207,17 @@ msgstr "Co&piar nome de ficheiro"
 #: Merge.rc:628
 #, c-format
 msgid "Base Version"
-msgstr ""
+msgstr "Versão Base"
 
 #: Merge.rc:629
 #, c-format
 msgid "Source Version"
-msgstr ""
+msgstr "Versão do Cód. Fonte"
 
 #: Merge.rc:630
 #, c-format
 msgid "Destination Version"
-msgstr ""
+msgstr "Versão de Destino"
 
 #: Merge.rc:641
 #, c-format
@@ -1464,7 +1464,7 @@ msgstr "Da direita"
 #: Merge.rc:793
 #, c-format
 msgid "Make &writable"
-msgstr ""
+msgstr "Tornar &gravável"
 
 #: Merge.rc:794
 #, c-format
@@ -1564,7 +1564,7 @@ msgstr "Localizar"
 #: Merge.rc:882
 #, c-format
 msgid "Fi&nd what:"
-msgstr "Localizar:"
+msgstr "Localizar o quê:"
 
 #: Merge.rc:863
 #: Merge.rc:886
@@ -1587,7 +1587,7 @@ msgstr "Termo corrente"
 #: Merge.rc:866
 #, c-format
 msgid "D&on't wrap end of file"
-msgstr "Não ultrapassar fim de ficheiro"
+msgstr "Não ultrapassar o fim do ficheiro"
 
 #: Merge.rc:867
 #, c-format
@@ -1623,7 +1623,7 @@ msgstr "Substituir por:"
 #: Merge.rc:889
 #, c-format
 msgid "&Don't wrap end of file"
-msgstr "Não ultrapassar fim de ficheiro"
+msgstr "Não ultrapassar o fim do ficheiro"
 
 #: Merge.rc:890
 #, c-format
@@ -1773,7 +1773,7 @@ msgstr "Ignorar linhas em branco"
 #: Merge.rc:955
 #, c-format
 msgid "Apply &line filters"
-msgstr ""
+msgstr "Aplicar filtros de &linha"
 
 #: Merge.rc:956
 #, c-format
@@ -2216,32 +2216,32 @@ msgstr "Fundo"
 #: Merge.rc:1221
 #, c-format
 msgid "List"
-msgstr ""
+msgstr "Lista"
 
 #: Merge.rc:1224
 #, c-format
 msgid "&Use customized list colors"
-msgstr ""
+msgstr "Usar lista personalizada de cores"
 
 #: Merge.rc:1225
 #, c-format
 msgid "Custom list colors"
-msgstr ""
+msgstr "Lista personalizada de cores"
 
 #: Merge.rc:1226
 #, c-format
 msgid "Left-only items:"
-msgstr ""
+msgstr "Só itens da esquerda:"
 
 #: Merge.rc:1227
 #, c-format
 msgid "Right-only items:"
-msgstr ""
+msgstr "Só itens da direita:"
 
 #: Merge.rc:1228
 #, c-format
 msgid "Otherwise suspicious items:"
-msgstr ""
+msgstr "Caso contrário, itens suspeitos:"
 
 #: Merge.rc:1240
 #: Merge.rc:1798
@@ -2409,7 +2409,7 @@ msgstr "Manter caracteres EOL originais"
 #: Merge.rc:1331
 #, c-format
 msgid "Separate com&bining characters"
-msgstr ""
+msgstr "Combinação de caracteres separados"
 
 #: Merge.rc:1332
 #, c-format
@@ -2982,7 +2982,7 @@ msgid ""
 "Undo the last action\n"
 "Undo (Ctrl+Z)"
 msgstr ""
-"Anular a última ação\n"
+"Anular a última acção\n"
 "Anular"
 
 #: Merge.rc:1585
@@ -2991,7 +2991,7 @@ msgid ""
 "Redo the previously undone action\n"
 "Redo (Ctrl+Y)"
 msgstr ""
-"Refazer a ação anulada anteriormente\n"
+"Refazer a acção anulada anteriormente\n"
 "Refazer"
 
 #: Merge.rc:1586
@@ -3448,7 +3448,7 @@ msgstr "A refazer a operação anterior..."
 #: Merge.rc:1682
 #, c-format
 msgid "Ln: %s  Col: %d/%d  Ch: %d/%d  EOL: %s"
-msgstr ""
+msgstr "Ln: %s  Col: %d/%d  Car: %d/%d  FDL: %s"
 
 #: Merge.rc:1683
 #, c-format
@@ -3458,7 +3458,7 @@ msgstr "Linha: %s"
 #: Merge.rc:1684
 #, c-format
 msgid "Ln: %s  Col: %d/%d  Ch: %d/%d"
-msgstr ""
+msgstr "Ln: %s  Col: %d/%d  Car: %d/%d"
 
 #: Merge.rc:1685
 #, c-format
@@ -3981,12 +3981,12 @@ msgstr "Atributos dta"
 #: Merge.rc:1793
 #, c-format
 msgid "Left EOL"
-msgstr "EOL esq"
+msgstr "FDL esq"
 
 #: Merge.rc:1794
 #, c-format
 msgid "Right EOL"
-msgstr "EOL dta"
+msgstr "FDL dta"
 
 #: Merge.rc:1795
 #, c-format
