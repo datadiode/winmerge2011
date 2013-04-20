@@ -70,7 +70,8 @@ void LineFiltersDlg::OnCustomdraw(HSurface *pDC)
 	if (item.assign(pchExpression, cchExpression))
 	{
 		HGdiObj *pTmp = pDC->SelectObject(m_pEdTestCase->GetFont());
-		RECT rc = { -m_pEdTestCase->GetScrollPos(SB_HORZ), 0, 0, 0 };
+		int org = -m_pEdTestCase->GetScrollPos(SB_HORZ);
+		int pos = org;
 		char buf[1024];
 		int len = m_pEdTestCase->GetWindowTextA(buf, _countof(buf));
 		int i = 0;
@@ -93,27 +94,20 @@ void LineFiltersDlg::OnCustomdraw(HSurface *pDC)
 				j = ovector[index];
 				if (i < j)
 				{
-					pDC->DrawTextA(buf + i, j - i, &rc, DT_CALCRECT | DT_EDITCONTROL | DT_NOPREFIX | DT_EXPANDTABS);
+					RECT rc = { org, 0, org, 0 };
+					pDC->DrawTextA(buf, j, &rc, DT_CALCRECT | DT_EDITCONTROL | DT_NOPREFIX | DT_EXPANDTABS);
 					if (index > 1)
 					{
+						rc.left = pos;
 						rc.bottom = 2;
 						pDC->SetBkColor(index & 1 ? RGB(255,99,71) : RGB(0,192,0));
 						pDC->ExtTextOut(0, 0, ETO_OPAQUE, &rc, NULL, 0);
 					}
-					rc.left = rc.right;
+					pos = rc.right;
 					i = j;
 				}
 			} while (++index <= matches2);
-			if (!item.global)
-			{
-				j = len;
-				if (i < j)
-				{
-					pDC->DrawTextA(buf + i, j - i, &rc, DT_CALCRECT | DT_EDITCONTROL | DT_NOPREFIX | DT_EXPANDTABS);
-					rc.left = rc.right;
-				}
-			}
-			i = j;
+			i = item.global ? j : len;
 		}
 		item.dispose();
 		pDC->SelectObject(pTmp);
