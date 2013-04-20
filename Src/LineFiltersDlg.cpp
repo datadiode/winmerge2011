@@ -53,9 +53,8 @@ void LineFiltersDlg::OnCustomdraw(HSurface *pDC)
 	{
 		m_EdFilter->GetWindowText(strExpression);
 	}
-	else
+	else if (HTREEITEM hItem = GetEditableItem())
 	{
-		HTREEITEM hItem = m_TvFilter->GetSelection();
 		strExpression = m_TvFilter->GetItemText(hItem);
 	}
 
@@ -94,7 +93,7 @@ void LineFiltersDlg::OnCustomdraw(HSurface *pDC)
 				j = ovector[index];
 				if (i < j)
 				{
-					pDC->DrawTextA(buf + i, j - i, &rc, DT_CALCRECT | DT_EDITCONTROL | DT_NOPREFIX);
+					pDC->DrawTextA(buf + i, j - i, &rc, DT_CALCRECT | DT_EDITCONTROL | DT_NOPREFIX | DT_EXPANDTABS);
 					if (index > 1)
 					{
 						rc.bottom = 2;
@@ -110,7 +109,7 @@ void LineFiltersDlg::OnCustomdraw(HSurface *pDC)
 				j = len;
 				if (i < j)
 				{
-					pDC->DrawTextA(buf + i, j - i, &rc, DT_CALCRECT | DT_EDITCONTROL | DT_NOPREFIX);
+					pDC->DrawTextA(buf + i, j - i, &rc, DT_CALCRECT | DT_EDITCONTROL | DT_NOPREFIX | DT_EXPANDTABS);
 					rc.left = rc.right;
 				}
 			}
