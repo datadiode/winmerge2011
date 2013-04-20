@@ -71,6 +71,17 @@ void LineFiltersDlg::OnCustomdraw(HSurface *pDC)
 	{
 		HGdiObj *pTmp = pDC->SelectObject(m_pEdTestCase->GetFont());
 		int org = -m_pEdTestCase->GetScrollPos(SB_HORZ);
+		if (wine_version)
+		{
+			SCROLLINFO si;
+			si.cbSize = sizeof si;
+			si.fMask = SIF_POS | SIF_TRACKPOS;
+			m_pEdTestCase->GetScrollInfo(SB_HORZ, &si);
+			SCROLLBARINFO sbi;
+			sbi.cbSize = sizeof sbi;
+			m_pEdTestCase->GetScrollBarInfo(OBJID_HSCROLL, &sbi);
+			org = 3 - (sbi.rgstate[3] & STATE_SYSTEM_PRESSED ? si.nTrackPos : si.nPos);
+		}
 		int pos = org;
 		char buf[1024];
 		int len = m_pEdTestCase->GetWindowTextA(buf, _countof(buf));
@@ -148,6 +159,12 @@ LRESULT LineFiltersDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			break;
 		case MAKEWPARAM(IDC_LFILTER_REMOVEBTN, BN_CLICKED):
 			OnBnClickedLfilterRemovebtn();
+			break;
+		case MAKEWPARAM(IDC_LFILTER_EDIT, EN_CHANGE):
+			if (wine_version)
+			{
+				m_pEdTestCase->Invalidate();
+			}
 			break;
 		}
 		break;

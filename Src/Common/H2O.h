@@ -151,6 +151,12 @@ namespace H2O
 			assert(psi->cbSize == sizeof *psi);
 			return ::SetScrollInfo(m_hWnd, nBar, psi, bRedraw);
 		}
+		int GetScrollBarInfo(int nBar, SCROLLBARINFO *psbi)
+		{
+			assert(::IsWindow(m_hWnd));
+			assert(psbi->cbSize == sizeof *psbi);
+			return ::GetScrollBarInfo(m_hWnd, nBar, psbi);
+		}
 		int GetDlgCtrlID()
 		{
 			assert(::IsWindow(m_hWnd));
