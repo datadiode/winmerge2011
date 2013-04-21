@@ -1,8 +1,9 @@
-/*/ExcelExport.cpp
+/* ExcelExport.cpp
 
-Last edit: 2013-04-17 Jochen Neubeck
+Last edit: 2013-04-21 Jochen Neubeck
 
 See https://github.com/Lafriks/nix-spreadsheet if in need for C# code.
+See http://dmcritchie.mvps.org/excel/colors.htm for default Excel colors.
 
 [The MIT license]
 
@@ -109,6 +110,8 @@ CExcelExport::CExcelExport()
 	, pstg(NULL)
 	, pstm(NULL)
 	, fPrintGrid(false)
+	, wBorderStyle(BorderStyle::THIN)
+	, crBorderColor(RGB(192,192,192))
 	, sSheetName("Sheet1")
 	, nShowViewer(0)
 {
@@ -191,10 +194,21 @@ void CExcelExport::Close(LPCTSTR lpVerb)
 void CExcelExport::ApplyProfile(LPCTSTR app, LPCTSTR ini, bool fWriteDefaults)
 {
 	TCHAR tmp[1024];
+	const LPCTSTR fWriteDefaultFlag = &_T("\0") _T("%d")[fWriteDefaults];
+	const LPCTSTR fWriteDefaultHex4 = &_T("\0") _T("0x%04X")[fWriteDefaults];
+	const LPCTSTR fWriteDefaultHex6 = &_T("\0") _T("0x%06X")[fWriteDefaults];
 	if (GetPrivateProfileString(app, _T("PrintGrid"), NULL, tmp, _countof(tmp), ini))
 		fPrintGrid = PathMatchSpec(tmp, _T("1;yes;true"));
-	else if (fWriteDefaults)
-		WritePrivateProfileString(app, _T("PrintGrid"), fPrintGrid ? _T("1") : _T("0"), ini);
+	else if (wsprintf(tmp, fWriteDefaultFlag, fPrintGrid))
+		WritePrivateProfileString(app, _T("PrintGrid"), tmp, ini);
+	if (GetPrivateProfileString(app, _T("BorderStyle"), NULL, tmp, _countof(tmp), ini))
+		wBorderStyle = static_cast<BorderStyle::WORD_BorderStyle>(_tcstol(tmp, NULL, 0));
+	else if (wsprintf(tmp, fWriteDefaultHex4, wBorderStyle))
+		WritePrivateProfileString(app, _T("BorderStyle"), tmp, ini);
+	if (GetPrivateProfileString(app, _T("BorderColor"), NULL, tmp, _countof(tmp), ini))
+		crBorderColor = static_cast<COLORREF>(_tcstol(tmp, NULL, 0));
+	else if (wsprintf(tmp, fWriteDefaultHex6, crBorderColor))
+		WritePrivateProfileString(app, _T("BorderColor"), tmp, ini);
 	if (GetPrivateProfileString(app, _T("Header"), NULL, tmp, _countof(tmp), ini))
 		sHeader = tmp;
 	else if (fWriteDefaults)
@@ -225,7 +239,6 @@ void CExcelExport::WriteWorkbook(HListView *pLv, int flags)
 	TCHAR szText[INFOTIPSIZE];
 	LVITEM item;
 
-	const WORD wCellBorders = 0x1111;
 	const WORD wCellBorderColors = 8 | 8 << 7; // 1st color from PALETTE record
 
 	BiffRecord(BiffRecord::BOF)
@@ -315,7 +328,7 @@ void CExcelExport::WriteWorkbook(HListView *pLv, int flags)
 
 	BiffRecord(BiffRecord::PALETTE)
 		.Append<WORD>(4)
-		.Append<COLORREF>(RGB(192,192,192))
+		.Append<COLORREF>(crBorderColor)
 		.Append<COLORREF>(COptionsMgr::Get(OPT_LIST_LEFTONLY_BKGD_COLOR))
 		.Append<COLORREF>(COptionsMgr::Get(OPT_LIST_RIGHTONLY_BKGD_COLOR))
 		.Append<COLORREF>(COptionsMgr::Get(OPT_LIST_SUSPICIOUS_BKGD_COLOR))
@@ -343,7 +356,7 @@ void CExcelExport::WriteWorkbook(HListView *pLv, int flags)
 			.Append<WORD>(0xFFF5)
 			.Append<WORD>(0x0020)
 			.Append<WORD>(0x0000)
-			.Append<WORD>(wCellBorders)
+			.Append<WORD>(wBorderStyle)
 			.Append<WORD>(wCellBorderColors)
 			.Append<WORD>(wCellBorderColors)
 			.Append<WORD>(0x0000)
@@ -357,7 +370,7 @@ void CExcelExport::WriteWorkbook(HListView *pLv, int flags)
 			.Append<WORD>(0xFFF5)
 			.Append<WORD>(0x0020)
 			.Append<WORD>(0xF400)
-			.Append<WORD>(wCellBorders)
+			.Append<WORD>(wBorderStyle)
 			.Append<WORD>(wCellBorderColors)
 			.Append<WORD>(wCellBorderColors)
 			.Append<WORD>(0x0000)
@@ -371,7 +384,7 @@ void CExcelExport::WriteWorkbook(HListView *pLv, int flags)
 			.Append<WORD>(0xFFF5)
 			.Append<WORD>(0x0020)
 			.Append<WORD>(0xF400)
-			.Append<WORD>(wCellBorders)
+			.Append<WORD>(wBorderStyle)
 			.Append<WORD>(wCellBorderColors)
 			.Append<WORD>(wCellBorderColors)
 			.Append<WORD>(0x0000)
@@ -386,7 +399,7 @@ void CExcelExport::WriteWorkbook(HListView *pLv, int flags)
 			.Append<WORD>(0xFFF5)
 			.Append<WORD>(0x0020)
 			.Append<WORD>(0xF400)
-			.Append<WORD>(wCellBorders)
+			.Append<WORD>(wBorderStyle)
 			.Append<WORD>(wCellBorderColors)
 			.Append<WORD>(wCellBorderColors)
 			.Append<WORD>(0x0000)
@@ -400,7 +413,7 @@ void CExcelExport::WriteWorkbook(HListView *pLv, int flags)
 			.Append<WORD>(0x0001)
 			.Append<WORD>(0x0020)
 			.Append<WORD>(0x0000)
-			.Append<WORD>(wCellBorders)
+			.Append<WORD>(wBorderStyle)
 			.Append<WORD>(wCellBorderColors)
 			.Append<WORD>(wCellBorderColors)
 			.Append<WORD>(0x0000)
@@ -414,7 +427,7 @@ void CExcelExport::WriteWorkbook(HListView *pLv, int flags)
 			.Append<WORD>(0x0001)
 			.Append<WORD>(0x0020)
 			.Append<WORD>(0x0800)
-			.Append<WORD>(wCellBorders)
+			.Append<WORD>(wBorderStyle)
 			.Append<WORD>(wCellBorderColors)
 			.Append<WORD>(wCellBorderColors)
 			.Append<WORD>(0x0000)
@@ -428,7 +441,7 @@ void CExcelExport::WriteWorkbook(HListView *pLv, int flags)
 			.Append<WORD>(0x0001)
 			.Append<WORD>(0x0020)
 			.Append<WORD>(0x0400)
-			.Append<WORD>(wCellBorders)
+			.Append<WORD>(wBorderStyle)
 			.Append<WORD>(wCellBorderColors)
 			.Append<WORD>(wCellBorderColors)
 			.Append<WORD>(0x0000)
@@ -442,7 +455,7 @@ void CExcelExport::WriteWorkbook(HListView *pLv, int flags)
 			.Append<WORD>(0x0001)
 			.Append<WORD>(0x0023)
 			.Append<WORD>(0x0400)
-			.Append<WORD>(wCellBorders)
+			.Append<WORD>(wBorderStyle)
 			.Append<WORD>(wCellBorderColors)
 			.Append<WORD>(wCellBorderColors)
 			.Append<WORD>(0x0000)
@@ -456,7 +469,7 @@ void CExcelExport::WriteWorkbook(HListView *pLv, int flags)
 			.Append<WORD>(0x0001)
 			.Append<WORD>(0x0023)
 			.Append<WORD>(0x0400)
-			.Append<WORD>(wCellBorders)
+			.Append<WORD>(wBorderStyle)
 			.Append<WORD>(wCellBorderColors)
 			.Append<WORD>(wCellBorderColors)
 			.Append<WORD>(0x0000)
@@ -470,7 +483,7 @@ void CExcelExport::WriteWorkbook(HListView *pLv, int flags)
 			.Append<WORD>(0x0001)
 			.Append<WORD>(0x0020) // alignment and rotation
 			.Append<WORD>(0x0400)
-			.Append<WORD>(wCellBorders)
+			.Append<WORD>(wBorderStyle)
 			.Append<WORD>(wCellBorderColors)
 			.Append<WORD>(wCellBorderColors)
 			.Append<WORD>(0x0400) // solid fill pattern
@@ -484,7 +497,7 @@ void CExcelExport::WriteWorkbook(HListView *pLv, int flags)
 			.Append<WORD>(0x0001)
 			.Append<WORD>(0x0023) // alignment and rotation
 			.Append<WORD>(0x0400)
-			.Append<WORD>(wCellBorders)
+			.Append<WORD>(wBorderStyle)
 			.Append<WORD>(wCellBorderColors)
 			.Append<WORD>(wCellBorderColors)
 			.Append<WORD>(0x0400) // solid fill pattern
@@ -498,7 +511,7 @@ void CExcelExport::WriteWorkbook(HListView *pLv, int flags)
 			.Append<WORD>(0x0001)
 			.Append<WORD>(0x0020) // alignment and rotation
 			.Append<WORD>(0x0400)
-			.Append<WORD>(wCellBorders)
+			.Append<WORD>(wBorderStyle)
 			.Append<WORD>(wCellBorderColors)
 			.Append<WORD>(wCellBorderColors)
 			.Append<WORD>(0x0400) // solid fill pattern
@@ -512,7 +525,7 @@ void CExcelExport::WriteWorkbook(HListView *pLv, int flags)
 			.Append<WORD>(0x0001)
 			.Append<WORD>(0x0023) // alignment and rotation
 			.Append<WORD>(0x0400)
-			.Append<WORD>(wCellBorders)
+			.Append<WORD>(wBorderStyle)
 			.Append<WORD>(wCellBorderColors)
 			.Append<WORD>(wCellBorderColors)
 			.Append<WORD>(0x0400) // solid fill pattern
@@ -526,7 +539,7 @@ void CExcelExport::WriteWorkbook(HListView *pLv, int flags)
 			.Append<WORD>(0x0001)
 			.Append<WORD>(0x0020) // alignment and rotation
 			.Append<WORD>(0x0400)
-			.Append<WORD>(wCellBorders)
+			.Append<WORD>(wBorderStyle)
 			.Append<WORD>(wCellBorderColors)
 			.Append<WORD>(wCellBorderColors)
 			.Append<WORD>(0x0400) // solid fill pattern
@@ -540,7 +553,7 @@ void CExcelExport::WriteWorkbook(HListView *pLv, int flags)
 			.Append<WORD>(0x0001)
 			.Append<WORD>(0x0023) // alignment and rotation
 			.Append<WORD>(0x0400)
-			.Append<WORD>(wCellBorders)
+			.Append<WORD>(wBorderStyle)
 			.Append<WORD>(wCellBorderColors)
 			.Append<WORD>(wCellBorderColors)
 			.Append<WORD>(0x0400) // solid fill pattern
