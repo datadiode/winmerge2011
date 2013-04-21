@@ -2,22 +2,20 @@
 # Released under the "GNU General Public License"
 #
 # Maintainer:
-# * Tim Gerundt <tim at gerundt.de>
+# * Jochen Neubeck
 #
 # Translators:
 # * Winfried Peter <winfried.peter at omicron.at>
 # * Jörg Schneider <tonda at users.sourceforge.net>
-#
-# ID line follows -- this is updated by SVN
-# $Id: German.po 7202 2010-06-19 12:46:49Z kimmov $
+# * Tim Gerundt
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: WinMerge\n"
 "Report-Msgid-Bugs-To: http://bugs.winmerge.org/\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2009-08-02 18:57+0100\n"
-"Last-Translator: Tim Gerundt <tim at gerundt.de>\n"
+"PO-Revision-Date: 2013-04-21 14:13+0100\n"
+"Last-Translator: Jochen Neubeck\n"
 "Language-Team: German <winmerge-translate@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=CP1252\n"
@@ -389,31 +387,31 @@ msgstr "&Bericht generieren..."
 #: Merge.rc:94
 #, c-format
 msgid "Save to &Excel spreadsheet"
-msgstr ""
+msgstr "Als &Excel-Tabelle speichern"
 
 #: Merge.rc:96
 #: Merge.rc:101
 #: Merge.rc:106
 #, c-format
 msgid "&All"
-msgstr ""
+msgstr "&Alle"
 
 #: Merge.rc:97
 #: Merge.rc:102
 #: Merge.rc:107
 #, c-format
 msgid "&Selected"
-msgstr ""
+msgstr "Au&sgewählte"
 
 #: Merge.rc:99
 #, c-format
 msgid "Show in Excel &Viewer"
-msgstr ""
+msgstr "Im Excel-&Viewer anzeigen"
 
 #: Merge.rc:104
 #, c-format
 msgid "&Print with Excel Viewer"
-msgstr ""
+msgstr "Mit Excel-Viewer &drucken"
 
 #: Merge.rc:110
 #: Merge.rc:227
@@ -2222,32 +2220,32 @@ msgstr "Hintergrund"
 #: Merge.rc:1221
 #, c-format
 msgid "List"
-msgstr ""
+msgstr "Liste"
 
 #: Merge.rc:1224
 #, c-format
 msgid "&Use customized list colors"
-msgstr ""
+msgstr "&Benutzerdefinierte Listenfarben verwenden"
 
 #: Merge.rc:1225
 #, c-format
 msgid "Custom list colors"
-msgstr ""
+msgstr "Benutzerdefinierte Listenfarben"
 
 #: Merge.rc:1226
 #, c-format
 msgid "Left-only items:"
-msgstr ""
+msgstr "Nur linksseitig vorhandene Einträge:"
 
 #: Merge.rc:1227
 #, c-format
 msgid "Right-only items:"
-msgstr ""
+msgstr "Nur rechtsseitig vorhandene Einträge:"
 
 #: Merge.rc:1228
 #, c-format
 msgid "Otherwise suspicious items:"
-msgstr ""
+msgstr "Anderweitig verdächtige Einträge:"
 
 #: Merge.rc:1240
 #: Merge.rc:1798
@@ -2349,7 +2347,7 @@ msgstr "Ä&hnliche Zeilen angleichen"
 #: Merge.rc:1294
 #, c-format
 msgid "C&ontext limit:"
-msgstr ""
+msgstr "K&ontextbegrenzung:"
 
 #: Merge.rc:1297
 #, c-format
@@ -2370,7 +2368,7 @@ msgstr "Vergleichs&methode:"
 #: Merge.rc:1311
 #, c-format
 msgid "S&top after first difference"
-msgstr "Nach dem ersten Unterschied &stoppen"
+msgstr "Nach dem ersten Unterschied s&toppen"
 
 #: Merge.rc:1312
 #, c-format
@@ -2380,7 +2378,7 @@ msgstr "Ignoriere &Zeitunterschiede kleiner als 3 Sekunden"
 #: Merge.rc:1313
 #, c-format
 msgid "&Self-compare unique files"
-msgstr ""
+msgstr "&Selbstvergleich einseitiger Dateien durchführen"
 
 #: Merge.rc:1314
 #, c-format
@@ -2415,7 +2413,7 @@ msgstr "&Mischen der Zeilenumbruch-Formate erlauben"
 #: Merge.rc:1331
 #, c-format
 msgid "Separate com&bining characters"
-msgstr ""
+msgstr "Kom&binierende Zeichen trennen"
 
 #: Merge.rc:1332
 #, c-format
