@@ -53,9 +53,20 @@ void LineFiltersDlg::OnCustomdraw(HSurface *pDC)
 	{
 		m_EdFilter->GetWindowText(strExpression);
 	}
-	else if (HTREEITEM hItem = GetEditableItem())
+	else if (HTREEITEM hItem = m_TvFilter->GetSelection())
 	{
-		strExpression = m_TvFilter->GetItemText(hItem);
+		TVITEM item;
+		item.mask = TVIF_CHILDREN;
+		item.hItem = hItem;
+		m_TvFilter->GetItem(&item);
+		if (item.cChildren == 0)
+		{
+			strExpression = m_TvFilter->GetItemText(hItem);
+			if (m_TvFilter->GetParentItem(hItem))
+			{
+				strExpression.erase(0, strExpression.find(_T('=')) + 1);
+			}
+		}
 	}
 
 	LPCTSTR pchExpression = strExpression.c_str();
