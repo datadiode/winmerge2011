@@ -1558,9 +1558,8 @@ static void wordLevelToByteLevel(vector<wdiff> * pDiffs, const String& str1,
 		{
 			// define offset to zero
 			s1 = 0,e1 = 0,s2 = 0,e2 = 0; 
-			bool bsynchron = false;
 			// Try to synchron side1 from begin
-			bsynchron = sd_findsyn(pDiff, str1, str2, casitive, xwhite,
+			bool bsynchron = sd_findsyn(pDiff, str1, str2, casitive, xwhite,
 				begin1, begin2, end1, end2,
 				true, synbegin1, s1, e1, s2, e2);
 

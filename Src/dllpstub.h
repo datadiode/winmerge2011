@@ -34,11 +34,11 @@ template<class T> struct DllProxy::Instance
 	HMODULE H;
 	operator T *() throw()
 	{
-		return (T *)Proxy.Load();
+		return static_cast<T *>(Proxy.Load());
 	}
 	T *operator->()
 	{
-		return (T *)Proxy.EnsureLoad();
+		return static_cast<T *>(Proxy.EnsureLoad());
 	}
 };
 

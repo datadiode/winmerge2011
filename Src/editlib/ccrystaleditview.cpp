@@ -1326,7 +1326,6 @@ void CCrystalEditView::OnEditSwapCase()
 		GetSelection(ptSelStart, ptSelEnd);
 		String text;
 		GetText(ptSelStart, ptSelEnd, text);
-		int nLen = text.size();
 		LPTSTR pszText = &text.front();
 		while (*pszText)
 			*pszText++ ^= static_cast<TCHAR>(_totupper(*pszText)) ^ static_cast<TCHAR>(_totlower(*pszText));
@@ -1351,7 +1350,6 @@ void CCrystalEditView::OnEditCapitalize()
 		GetSelection(ptSelStart, ptSelEnd);
 		String text;
 		GetText(ptSelStart, ptSelEnd, text);
-		int nLen = text.size();
 		LPTSTR pszText = &text.front();
 		bool bCapitalize = true;
 		while (*pszText)
@@ -1384,13 +1382,12 @@ void CCrystalEditView::OnEditCapitalize()
 
 void CCrystalEditView::OnEditSentence()
 {
-	if (IsSelection ())
+	if (IsSelection())
 	{
 		POINT ptSelStart, ptSelEnd;
 		GetSelection(ptSelStart, ptSelEnd);
 		String text;
 		GetText(ptSelStart, ptSelEnd, text);
-		int nLen = text.size();
 		LPTSTR pszText = &text.front();
 		bool bCapitalize = true;
 		while (*pszText)

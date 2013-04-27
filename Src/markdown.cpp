@@ -564,7 +564,7 @@ bool CMarkdown::Push()
 {
 	if (upper < ahead)
 	{
-		switch MAKEWORD(upper[0], upper[1])
+		switch (MAKEWORD(upper[0], upper[1]))
 		{
 		case MAKEWORD('<', '/'):
 		case MAKEWORD(']', '>'):

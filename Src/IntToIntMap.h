@@ -23,10 +23,8 @@ public:
 	}
 	int FindMaxKey() const
 	{
-		int max=0;
-		int maxKey=0;
-		int key=0;
-		int n=0;
+		int max = 0;
+		int maxKey = 0;
 		stl::map<int, int>::const_iterator pos = m_map.begin();
 		while (pos != m_map.end())
 		{

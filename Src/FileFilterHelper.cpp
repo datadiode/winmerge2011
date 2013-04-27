@@ -41,6 +41,7 @@ FileFilterHelper globalFileFilter;
 FileFilterHelper::FileFilterHelper()
 : m_pMaskFilter(new FilterList)
 , m_fileFilterMgr(new FileFilterMgr)
+, m_currentFilter(NULL)
 {
 }
 
@@ -113,7 +114,7 @@ String FileFilterHelper::GetFileFilterName(LPCTSTR filterPath) const
 			name = (*iter)->name;
 			break;
 		}
-		iter++;
+		++iter;
 	}
 	return name;
 }
@@ -134,7 +135,7 @@ String FileFilterHelper::GetFileFilterPath(LPCTSTR filterName) const
 			path = (*iter)->fullpath;
 			break;
 		}
-		iter++;
+		++iter;
 	}
 	return path;
 }

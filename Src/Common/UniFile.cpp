@@ -3,7 +3,7 @@
  *  @author Perry Rapp, Creator, 2003-2006
  *  @author Kimmo Varis, 2004-2006
  *  @date   Created: 2003-10
- *  @date   Edited:  2006-12-07 (Kimmo Varis)
+ *  @date   Edited:  2013-04-27 Jochen Neubeck
  *
  *  @brief Implementation of Unicode enabled file classes.
  *  Classes include memory-mapped reader class and Stdio replacement class.
@@ -377,7 +377,6 @@ bool UniMemFile::ReadString(String & line, String & eol, bool * lossy)
 		while (m_current - m_base + 1 < m_filesize.int64)
 		{
 			wchar_t wch = *(wchar_t *)m_current;
-			INT64 wch_offset = (m_current - m_base);
 			m_current += 2;
 			if (wch == '\n' || wch == '\r')
 			{

@@ -316,7 +316,7 @@ static void SaveBuffForDiff(CDiffTextBuffer & buf, CDiffTextBuffer & buf2, DiffF
 	// write buffer out to temporary file
 	String sError;
 	NulWriteStream nws;
-	int retVal = buf.SaveToFile(NULL, &nws, sError);
+	buf.SaveToFile(NULL, &nws, sError);
 	ULONG len = nws.GetSize();
 	if (void *buffer = diffdata.AllocBuffer(i, len, alloc_extra))
 	{
@@ -765,7 +765,6 @@ bool CChildFrame::ListCopy(int srcPane, int dstPane, int nDiff /* = -1*/,
 		const bool bSrcWasMod = sbuf->IsModified();
 		const int cd_dbegin = srcPane == 0 ? pcd->dbegin0 : pcd->dbegin1;
 		int cd_dend = srcPane == 0 ? pcd->dend0 : pcd->dend1;
-		const int cd_blank = srcPane == 0 ? pcd->blank0 : pcd->blank1;
 		bool bInSync = SanityCheckDiff(pcd);
 
 		if (!bInSync)

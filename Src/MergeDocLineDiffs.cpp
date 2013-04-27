@@ -195,7 +195,7 @@ void CChildFrame::Computelinediff(CCrystalTextView * pView1, CCrystalTextView * 
 				begin2 = it->start[1];
 			if (begin1 != -1 && begin2 != -1)
 				break; // found both
-			it++;
+			++it;
 		}
 		// Find ending locations for both sides
 		// Have to look for last valid starting location for each side
@@ -204,7 +204,7 @@ void CChildFrame::Computelinediff(CCrystalTextView * pView1, CCrystalTextView * 
 			vector<wdiff>::const_iterator it = worddiffs.end();
 			do
 			{
-				it--;
+				--it;
 				if (end1 == -1 && it->end[0] != -1)
 					end1 = it->end[0];
 				if (end2 == -1 && it->end[1] != -1)

@@ -330,8 +330,6 @@ void CDirView::RedisplayChildren(DIFFITEM *di, int level, int &index, int &alldi
  */
 void CDirView::Redisplay()
 {
-	const CDiffContext *ctxt = m_pFrame->GetDiffContext();
-
 	int cnt = 0;
 	// Disable redrawing while adding new items
 	SetRedraw(FALSE);

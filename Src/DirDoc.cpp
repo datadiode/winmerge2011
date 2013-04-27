@@ -287,7 +287,6 @@ CDirFrame::AllowUpwardDirectory(String &leftParent, String &rightParent)
 			}
 			return AllowUpwardDirectory::No;
 		}
-		rname = lname;
 	}
 
 	// If regular parent folders exist, allow opening them

@@ -1521,7 +1521,7 @@ bool CMainFrame::DoFileOpen(
 					}
 					do
 					{
-						if FAILED(piHandler->DeCompressArchive(m_hWnd, filelocLeft.filepath.c_str(), path.c_str()))
+						if (FAILED(piHandler->DeCompressArchive(m_hWnd, filelocLeft.filepath.c_str(), path.c_str())))
 							break;
 						if (filelocLeft.filepath.find(path) == 0)
 						{

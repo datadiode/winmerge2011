@@ -185,7 +185,6 @@ void MergeCmdLineInfo::ParseClearCaseCmdLine(LPCTSTR q, LPCTSTR basedesc)
 				if ((!m_sRightDesc.empty() && m_sRightDesc != path) || (attr & FILE_ATTRIBUTE_READONLY))
 					m_dwRightFlags |= FFILEOPEN_READONLY;
 			}
-			q = q;
 		}
 		else if (param == _T("base"))
 		{
@@ -203,13 +202,9 @@ void MergeCmdLineInfo::ParseClearCaseCmdLine(LPCTSTR q, LPCTSTR basedesc)
 			if (sBaseDesc.empty())
 				q = EatParam(q, sBaseDesc);
 			else if (m_sLeftDesc.empty())
-			{
 				q = EatParam(q, m_sLeftDesc);
-			}
 			else if (m_sRightDesc.empty())
-			{
 				q = EatParam(q, m_sRightDesc);
-			}
 			else
 				q = EatParam(q, param); // ignore excess arguments
 		}

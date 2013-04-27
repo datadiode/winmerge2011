@@ -1183,7 +1183,6 @@ void CMergeEditView::GotoLine(UINT nLine, bool bRealLine, int pane)
 	CMergeEditView *pLeftView = m_pDocument->GetLeftView();
 	CMergeEditView *pRightView = m_pDocument->GetRightView();
 	CMergeEditView *pCurrentView = m_pDocument->GetActiveMergeView();
-	bool bLeftIsCurrent = pLeftView == pCurrentView;
 	int nRealLine = nLine;
 	int nApparentLine = nLine;
 
@@ -1208,12 +1207,6 @@ void CMergeEditView::GotoLine(UINT nLine, bool bRealLine, int pane)
 	pRightView->SetCursorPos(ptPos);
 	pLeftView->SetAnchor(ptPos);
 	pRightView->SetAnchor(ptPos);
-
-	// If goto target is another view - activate another view.
-	// This is done for user convenience as user probably wants to
-	// work with goto target file.
-	//if ((bLeftIsCurrent && pane == 1) || (!bLeftIsCurrent && pane == 0))
-	//	pSplitterWnd->ActivateNext();
 }
 
 /**
