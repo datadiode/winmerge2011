@@ -1382,7 +1382,7 @@ msgid "Files:"
 msgstr "Agiriak:"
 
 #: Merge.rc:743
-#: Merge.rc:1813
+#: Merge.rc:1815
 #, c-format
 msgid "Different"
 msgstr "Ezberdin"
@@ -1415,7 +1415,7 @@ msgid "Right:"
 msgstr "Eskuin:"
 
 #: Merge.rc:761
-#: Merge.rc:1807
+#: Merge.rc:1809
 #, c-format
 msgid "Identical"
 msgstr "Berdin"
@@ -2238,7 +2238,7 @@ msgid "Otherwise suspicious items:"
 msgstr ""
 
 #: Merge.rc:1240
-#: Merge.rc:1798
+#: Merge.rc:1800
 #, c-format
 msgid "Differences"
 msgstr "Ezberdintasunak"
@@ -2345,7 +2345,7 @@ msgid "Filter Comments"
 msgstr "Iragazki Aipamenak"
 
 #: Merge.rc:1306
-#: Merge.rc:1776
+#: Merge.rc:1778
 #, c-format
 msgid "Folder"
 msgstr "Agiritegia"
@@ -3941,7 +3941,7 @@ msgstr ""
 "Mesedez, egiaztatu  erabilitako ikuspen itxurap. berez."
 
 #: Merge.rc:1727
-#: Merge.rc:1923
+#: Merge.rc:1925
 #, c-format
 msgid "None"
 msgstr "Bat ere ez"
@@ -4155,396 +4155,406 @@ msgstr "Agiri heuskarri ezezaguna"
 
 #: Merge.rc:1769
 #, c-format
+msgid "%1:\n\nCan't store as \"%2\""
+msgstr ""
+
+#: Merge.rc:1770
+#, c-format
+msgid "Exit code #%d"
+msgstr ""
+
+#: Merge.rc:1771
+#, c-format
 msgid "Add items from left side to archive"
 msgstr "Gehitu gaiak ezkerraldetik agirira"
 
-#: Merge.rc:1770
+#: Merge.rc:1772
 #, c-format
 msgid "Add items from right side to archive"
 msgstr "Gehitu gaiak eskuinaldetik agirira"
 
-#: Merge.rc:1771
+#: Merge.rc:1773
 #, c-format
 msgid "Add items from both sides to archive"
 msgstr "Gehitu gaiak bi aldeetatik agirira"
 
-#: Merge.rc:1772
+#: Merge.rc:1774
 #, c-format
 msgid "Add different items to archive (both sides)"
 msgstr "Gehitu gai ezberdinak agirira (bi aldeetatik)"
 
-#: Merge.rc:1773
+#: Merge.rc:1775
 #, c-format
 msgid "Move selected file on left to custom directory"
 msgstr "Mugitu ezkerrean hautatutako agiria egile zuzenbidera"
 
-#: Merge.rc:1774
+#: Merge.rc:1776
 #, c-format
 msgid "Move selected file on right to custom directory"
 msgstr "Mugitu eskuinean hautatutako agiria egile zuzenbidera"
 
-#: Merge.rc:1775
+#: Merge.rc:1777
 #, c-format
 msgid "Filename"
 msgstr "Agirizena"
 
-#: Merge.rc:1777
+#: Merge.rc:1779
 #, c-format
 msgid "Comparison result"
 msgstr "Alderaketa emaitza"
 
-#: Merge.rc:1778
+#: Merge.rc:1780
 #, c-format
 msgid "Left Date"
 msgstr "Ezker Eguna"
 
-#: Merge.rc:1779
+#: Merge.rc:1781
 #, c-format
 msgid "Right Date"
 msgstr "Eskuin Eguna"
 
-#: Merge.rc:1780
+#: Merge.rc:1782
 #, c-format
 msgid "Extension"
 msgstr "Luzapena"
 
-#: Merge.rc:1781
+#: Merge.rc:1783
 #, c-format
 msgid "Left Size"
 msgstr "Ezker Neurria"
 
-#: Merge.rc:1782
+#: Merge.rc:1784
 #, c-format
 msgid "Right Size"
 msgstr "Eskuin Neurria"
 
-#: Merge.rc:1783
+#: Merge.rc:1785
 #, c-format
 msgid "Right Size (Short)"
 msgstr "Eskuin Neurria (Laburra)"
 
-#: Merge.rc:1784
+#: Merge.rc:1786
 #, c-format
 msgid "Left Size (Short)"
 msgstr "Ezker Neurria (Laburra)"
 
-#: Merge.rc:1785
+#: Merge.rc:1787
 #, c-format
 msgid "Left Creation Time"
 msgstr "Ezkerreko Sortze Denbora"
 
-#: Merge.rc:1786
+#: Merge.rc:1788
 #, c-format
 msgid "Right Creation Time"
 msgstr "Eskuineko Sortze Denbora"
 
-#: Merge.rc:1787
+#: Merge.rc:1789
 #, c-format
 msgid "Newer File"
 msgstr "Agiri Berriena"
 
-#: Merge.rc:1788
+#: Merge.rc:1790
 #, c-format
 msgid "Left File Version"
 msgstr "Ezkerreko Agiri Bertsioa"
 
-#: Merge.rc:1789
+#: Merge.rc:1791
 #, c-format
 msgid "Right File Version"
 msgstr "Eskuineko Agiri Bertsioa"
 
-#: Merge.rc:1790
+#: Merge.rc:1792
 #, c-format
 msgid "Short Result"
 msgstr "Emaitz Laburra"
 
-#: Merge.rc:1791
+#: Merge.rc:1793
 #, c-format
 msgid "Left Attributes"
 msgstr "Ezkerraren Ezaugarriak"
 
-#: Merge.rc:1792
+#: Merge.rc:1794
 #, c-format
 msgid "Right Attributes"
 msgstr "Eskuinaren Ezaugarriak"
 
-#: Merge.rc:1793
+#: Merge.rc:1795
 #, c-format
 msgid "Left EOL"
 msgstr "Ezker EOL"
 
-#: Merge.rc:1794
+#: Merge.rc:1796
 #, c-format
 msgid "Right EOL"
 msgstr "Eskuin EOL"
 
-#: Merge.rc:1795
+#: Merge.rc:1797
 #, c-format
 msgid "Left Encoding"
 msgstr "Ezker Kodeaketa"
 
-#: Merge.rc:1796
+#: Merge.rc:1798
 #, c-format
 msgid "Right Encoding"
 msgstr "Eskuin Kodeaketa"
 
-#: Merge.rc:1797
+#: Merge.rc:1799
 #, c-format
 msgid "Ignored Diff."
 msgstr "Ezikusitako Ezberd."
 
-#: Merge.rc:1799
-#: Merge.rc:1919
+#: Merge.rc:1801
+#: Merge.rc:1921
 #, c-format
 msgid "Binary"
 msgstr "Binarioa"
 
-#: Merge.rc:1800
+#: Merge.rc:1802
 #, c-format
 msgid "Unable to compare files"
 msgstr "Ezinezkoa agiriak alderatzea"
 
-#: Merge.rc:1801
+#: Merge.rc:1803
 #, c-format
 msgid "Item aborted"
 msgstr "Gaia utzita"
 
-#: Merge.rc:1802
+#: Merge.rc:1804
 #, c-format
 msgid "File skipped"
 msgstr "Agiria Jauzita"
 
-#: Merge.rc:1803
+#: Merge.rc:1805
 #, c-format
 msgid "Folder skipped"
 msgstr "Agiritegia jauzita"
 
-#: Merge.rc:1804
+#: Merge.rc:1806
 #, c-format
 msgid "Left only: %1"
 msgstr "Ezkerra bakarrik: %1"
 
-#: Merge.rc:1805
+#: Merge.rc:1807
 #, c-format
 msgid "Right only: %1"
 msgstr "Eskuina bakarrik: %1"
 
-#: Merge.rc:1806
+#: Merge.rc:1808
 #, c-format
 msgid "Binary files are identical"
 msgstr "Agiri binarioak berdinak dira"
 
-#: Merge.rc:1808
+#: Merge.rc:1810
 #, c-format
 msgid "Binary files are different"
 msgstr "Agiri binarioak ezberdinak dira"
 
-#: Merge.rc:1809
+#: Merge.rc:1811
 #, c-format
 msgid "Files are different"
 msgstr "Agiriak ezberdinak dira"
 
-#: Merge.rc:1810
+#: Merge.rc:1812
 #, c-format
 msgid "Folders are different"
 msgstr "Agiritegiak ezberdinak dira"
 
-#: Merge.rc:1811
+#: Merge.rc:1813
 #, c-format
 msgid "Left Only"
 msgstr "Ezkerra Bakarrik"
 
-#: Merge.rc:1812
+#: Merge.rc:1814
 #, c-format
 msgid "Right Only"
 msgstr "Eskuina Bakarrik"
 
-#: Merge.rc:1814
+#: Merge.rc:1816
 #, c-format
 msgid "Error"
 msgstr "Akatsa"
 
-#: Merge.rc:1815
+#: Merge.rc:1817
 #, c-format
 msgid "Text files are identical"
 msgstr "Idazki agiriak berdinak dira"
 
-#: Merge.rc:1816
+#: Merge.rc:1818
 #, c-format
 msgid "Text files are different"
 msgstr "Idazki agiriak ezberdinak dira"
 
-#: Merge.rc:1817
+#: Merge.rc:1819
 #, c-format
 msgid "Elapsed time: %ld ms"
 msgstr "Igarotako denbora: %ld sm"
 
-#: Merge.rc:1818
+#: Merge.rc:1820
 #, c-format
 msgid "1 item selected"
 msgstr "1 gai hautatuta"
 
-#: Merge.rc:1819
+#: Merge.rc:1821
 #, c-format
 msgid "%1 items selected"
 msgstr "%1 gai hautatuta"
 
-#: Merge.rc:1820
+#: Merge.rc:1822
 #, c-format
 msgid "Filename or folder name."
 msgstr "Agirizena edo agiritegi izena"
 
-#: Merge.rc:1821
+#: Merge.rc:1823
 #, c-format
 msgid "Subfolder name when subfolders are included."
 msgstr "Azpiagiritegi izena azpiagiritegiak barne direnean."
 
-#: Merge.rc:1822
+#: Merge.rc:1824
 #, c-format
 msgid "Comparison result, long form."
 msgstr "Alderaketa emaitza, modu luzean."
 
-#: Merge.rc:1823
+#: Merge.rc:1825
 #, c-format
 msgid "Left side modification date."
 msgstr "Ezkerralde aldaketa eguna."
 
-#: Merge.rc:1824
+#: Merge.rc:1826
 #, c-format
 msgid "Right side modification date."
 msgstr "Eskuinalde aldaketa eguna."
 
-#: Merge.rc:1825
+#: Merge.rc:1827
 #, c-format
 msgid "File's extension."
 msgstr "Agiriaren luzapena."
 
-#: Merge.rc:1826
+#: Merge.rc:1828
 #, c-format
 msgid "Left file size in bytes."
 msgstr "Ezkerreko agiriaren neurria byte-tan"
 
-#: Merge.rc:1827
+#: Merge.rc:1829
 #, c-format
 msgid "Right file size in bytes."
 msgstr "Eskuineko agiriaren neurria byte-tan"
 
-#: Merge.rc:1828
+#: Merge.rc:1830
 #, c-format
 msgid "Left file size abbreviated."
 msgstr "Ezkerreko agiri neurria laburtuta."
 
-#: Merge.rc:1829
+#: Merge.rc:1831
 #, c-format
 msgid "Right file size abbreviated."
 msgstr "Eskuineko agiri neurria laburtuta."
 
-#: Merge.rc:1830
+#: Merge.rc:1832
 #, c-format
 msgid "Left side creation time."
 msgstr "Ezkerraldearen sortze denbora."
 
-#: Merge.rc:1831
+#: Merge.rc:1833
 #, c-format
 msgid "Right side creation time."
 msgstr "Eskuinaldearen sortze denbora."
 
-#: Merge.rc:1832
+#: Merge.rc:1834
 #, c-format
 msgid "Tells which side has newer modification date."
 msgstr "Esaten du zein aldek duen aldaketa egun berriagoa."
 
-#: Merge.rc:1833
+#: Merge.rc:1835
 #, c-format
 msgid "Left side file version, only for some filetypes."
 msgstr "Ezkerraldeko agiri bertsioa, agiri-mota batzuentzat bakarrik."
 
-#: Merge.rc:1834
+#: Merge.rc:1836
 #, c-format
 msgid "Right side file version, only for some filetypes."
 msgstr "Eskuinaldeko agiri bertsioa, agiri-mota batzuentzat bakarrik."
 
-#: Merge.rc:1835
+#: Merge.rc:1837
 #, c-format
 msgid "Short comparison result."
 msgstr "Alderaketa laburraren emaitza."
 
-#: Merge.rc:1836
+#: Merge.rc:1838
 #, c-format
 msgid "Left side attributes."
 msgstr "Ezkerraldearen ezaugarriak."
 
-#: Merge.rc:1837
+#: Merge.rc:1839
 #, c-format
 msgid "Right side attributes."
 msgstr "Eskuinaldearen ezaugarriak."
 
-#: Merge.rc:1838
+#: Merge.rc:1840
 #, c-format
 msgid "Left side file EOL type"
 msgstr "Ezkerraldeko agiria EOL motakoa da"
 
-#: Merge.rc:1839
+#: Merge.rc:1841
 #, c-format
 msgid "Right side file EOL type"
 msgstr "Eskuinaldeko agiria EOL motakoa da"
 
-#: Merge.rc:1840
+#: Merge.rc:1842
 #, c-format
 msgid "Left side encoding."
 msgstr "Eskuinalde kodeaketa."
 
-#: Merge.rc:1841
+#: Merge.rc:1843
 #, c-format
 msgid "Right side encoding."
 msgstr "Ezkerralde kodeaketa."
 
-#: Merge.rc:1842
+#: Merge.rc:1844
 #, c-format
 msgid "Number of ignored differences in file. These differences are ignored by WinMerge and cannot be merged."
 msgstr "Agirian ezikusitako ezberdintasun zenbatekoa. Ezberdintasun hauek WinMergek ezikusi ditu eta ezin dira batu."
 
-#: Merge.rc:1843
+#: Merge.rc:1845
 #, c-format
 msgid "Number of differences in file. This number does not include ignored differences."
 msgstr "Agirian dauden ezberdintasun zenbatekoa. Zenbateko honek ez ditu barnebiltzen ezikusitako ezberdintasunak."
 
-#: Merge.rc:1844
+#: Merge.rc:1846
 #, c-format
 msgid "Shows an asterisk (*) if the file is binary."
 msgstr "Erakutsi asteriskoa (*) agiria binarioa bada."
 
-#: Merge.rc:1845
+#: Merge.rc:1847
 #, c-format
 msgid "Compare %1 with %2"
 msgstr "Alderatu %1 %2-rekin"
 
-#: Merge.rc:1846
+#: Merge.rc:1848
 #, c-format
 msgid "Comma-separated list"
 msgstr "Kakotxaz banandutako zerrenda"
 
-#: Merge.rc:1847
+#: Merge.rc:1849
 #, c-format
 msgid "Tab-separated list"
 msgstr "Fitxaz banandutako zerrenda"
 
-#: Merge.rc:1848
+#: Merge.rc:1850
 #, c-format
 msgid "Simple HTML"
 msgstr "HTML Arrunta"
 
-#: Merge.rc:1849
+#: Merge.rc:1851
 #, c-format
 msgid "Simple XML"
 msgstr "XML Arrunta"
 
-#: Merge.rc:1850
+#: Merge.rc:1852
 #, c-format
 msgid "The report file already exists. Do you want to overwrite existing file?"
 msgstr "Jakinarazpen agiria jadanik badago. Dagoen agiria gainidaztea nahi duzu?"
 
-#: Merge.rc:1851
+#: Merge.rc:1853
 #, c-format
 msgid ""
 "Error creating the report:\n"
@@ -4553,32 +4563,32 @@ msgstr ""
 "Akatsa jakinarazpena sortzean:\n"
 "%1"
 
-#: Merge.rc:1852
+#: Merge.rc:1854
 #, c-format
 msgid "The report has been created successfully."
 msgstr "Jakinarazpena ongi sortu da."
 
-#: Merge.rc:1853
+#: Merge.rc:1855
 #, c-format
 msgid "The same file is opened in both panels."
 msgstr "Agiri berdina dago irekita bi paneletan."
 
-#: Merge.rc:1854
+#: Merge.rc:1856
 #, c-format
 msgid "The selected files are identical."
 msgstr "Hautatutako agiriak berdinak dira."
 
-#: Merge.rc:1855
+#: Merge.rc:1857
 #, c-format
 msgid "An error occurred while comparing the files."
 msgstr "Akats bat gertatu da agiriak alderatzerakoan."
 
-#: Merge.rc:1856
+#: Merge.rc:1858
 #, c-format
 msgid "Temporary files could not be created. Check your temporary path settings."
 msgstr "Aldibaterako agiriak ezin izan dira sortu. Egiaztatu zure aldibaterako helburu ezarpenak."
 
-#: Merge.rc:1857
+#: Merge.rc:1859
 #, c-format
 msgid ""
 "These files use different carriage return types.\n"
@@ -4593,7 +4603,7 @@ msgstr ""
 "\n"
 "Oharra: Gurdi itzulera mota guztiak berdin bezala tratatzea nahi badituzu, ezarri 'Ezikusi gurdi itzulera ezberdintasunak...' aukera Alderaketa fitxan aukeren elkarrizketan (eskuragarri hemen: Editatu/Aukerak)."
 
-#: Merge.rc:1858
+#: Merge.rc:1860
 #, c-format
 msgid ""
 "The EOL are of different types (Windows/Unix/Mac) in the file '%1'.\n"
@@ -4604,17 +4614,17 @@ msgstr ""
 " Uneko aukerekin, mota nagusian batuko dira.\n"
 " Nahi duzu aukerak aldatzea eta EOL ezberdinari heustea?"
 
-#: Merge.rc:1859
+#: Merge.rc:1861
 #, c-format
 msgid "The selected folder is invalid."
 msgstr "Hautatutako agiritegia ez da baliogarria"
 
-#: Merge.rc:1860
+#: Merge.rc:1862
 #, c-format
 msgid "Cannot open a binary file to editor."
 msgstr "Ezinenezkoa agiri binarioa editatzailera irekitzea"
 
-#: Merge.rc:1861
+#: Merge.rc:1863
 #, c-format
 msgid ""
 "The folder exists only in other side and cannot be opened.\n"
@@ -4629,7 +4639,7 @@ msgstr ""
 "%1\n"
 "beste aldean eta agiritegi hauek irekitzea?"
 
-#: Merge.rc:1862
+#: Merge.rc:1864
 #, c-format
 msgid ""
 "Different codepages found in left (cp%d) and right (cp%d) files. \n"
@@ -4640,132 +4650,132 @@ msgstr ""
 "Erakutsiz agiri bakoitza kode-orrialde horretan erakuspen hobeago bat emango du baina batzea/kopiatzea kaltegarria izango da.\n"
 "Nahi duzu agiri biak tratatzea windowsen kode-orrialde berezkoan (gomendatuta)?"
 
-#: Merge.rc:1863
+#: Merge.rc:1865
 #, c-format
 msgid "Warning: Files use different encodings, left=%s and right=%s, and merging may lead to information loss."
 msgstr "Kontuz: Agiriek kodeaketa ezberdina erabiltzen dute, ezkerrak=%s eta eskuinak=%s, eta batzeak informazio galera eragin dezake."
 
-#: Merge.rc:1864
+#: Merge.rc:1866
 #, c-format
 msgid "Information lost due to encoding errors: both files"
 msgstr "Informazioa galduta kodeaketa akatsengaitik: bi agirietan"
 
-#: Merge.rc:1865
+#: Merge.rc:1867
 #, c-format
 msgid "Information lost due to encoding errors: right file"
 msgstr "Informazioa galduta kodeaketa akatsengaitik: eskuineko agiria"
 
-#: Merge.rc:1866
+#: Merge.rc:1868
 #, c-format
 msgid "Information lost due to encoding errors: left file"
 msgstr "Informazioa galduta kodeaketa akatsengaitik: ezkerreko agiria"
 
-#: Merge.rc:1867
+#: Merge.rc:1869
 #, c-format
 msgid "No difference"
 msgstr "Ezberdintasunik ez"
 
-#: Merge.rc:1868
+#: Merge.rc:1870
 #, c-format
 msgid "Line difference"
 msgstr "Lerro ezberdintasuna"
 
-#: Merge.rc:1869
+#: Merge.rc:1871
 #, c-format
 msgid "Replaced %1 string(s)."
 msgstr "Ordeztuta %1 kate."
 
-#: Merge.rc:1870
+#: Merge.rc:1872
 #, c-format
 msgid "Cannot find string \"%s\""
 msgstr "Ezin da kate hau aurkitu: \"%s\""
 
-#: Merge.rc:1871
+#: Merge.rc:1873
 #, c-format
 msgid "Copy Full Path"
 msgstr "Kopiatu Helburu Osoa"
 
-#: Merge.rc:1872
+#: Merge.rc:1874
 #, c-format
 msgid "Copy Filename"
 msgstr "Kopiatu Agirizena"
 
-#: Merge.rc:1873
+#: Merge.rc:1875
 #, c-format
 msgid "Location Pane"
 msgstr "Kokaleku Panela"
 
-#: Merge.rc:1874
+#: Merge.rc:1876
 #, c-format
 msgid "Diff Pane"
 msgstr "Ezberdint. Panela"
 
-#: Merge.rc:1875
+#: Merge.rc:1877
 #, c-format
 msgid "Patch file successfully written."
 msgstr "Helburu agiria ongi idatzi da."
 
-#: Merge.rc:1876
+#: Merge.rc:1878
 #, c-format
 msgid "1. item is not found or is directory!"
 msgstr "1. gaia ez da aurkitu edo zuzenbidea da!"
 
-#: Merge.rc:1877
+#: Merge.rc:1879
 #, c-format
 msgid "2. item is not found or is directory!"
 msgstr "2. gaia ez da aurkitu edo zuzenbidea da!"
 
-#: Merge.rc:1878
+#: Merge.rc:1880
 #, c-format
 msgid "The patch file already exists. Do you want to overwrite it?"
 msgstr "Helburu agiria jadanik badago. Gainidaztea nahi duzu?"
 
-#: Merge.rc:1879
+#: Merge.rc:1881
 #, c-format
 msgid "[%1 files selected]"
 msgstr "[%1 agiri hautatuta]"
 
-#: Merge.rc:1880
+#: Merge.rc:1882
 #, c-format
 msgid "Normal"
 msgstr "Normala"
 
-#: Merge.rc:1881
+#: Merge.rc:1883
 #, c-format
 msgid "Context"
 msgstr "Hitzingurua"
 
-#: Merge.rc:1882
+#: Merge.rc:1884
 #, c-format
 msgid "Unified"
 msgstr "Bateratuta"
 
-#: Merge.rc:1883
+#: Merge.rc:1885
 #, c-format
 msgid "Could not write to file %1."
 msgstr "Ezin da %1 agirira idatzi."
 
-#: Merge.rc:1884
+#: Merge.rc:1886
 #, c-format
 msgid "The specified output path is not an absolute path: %1"
 msgstr "Adierazitako irteera helburua ez helburu osoa: %1"
 
-#: Merge.rc:1885
+#: Merge.rc:1887
 #, c-format
 msgid "Specify an output file"
 msgstr "Adierazi irteera agiri bat"
 
-#: Merge.rc:1886
+#: Merge.rc:1888
 #, c-format
 msgid "Cannot create a patch file from binary files."
 msgstr "Ezin da helburu agiria sortu agiri binarioetatik"
 
-#: Merge.rc:1887
+#: Merge.rc:1889
 #, c-format
 msgid "Cannot create a patch file from directories."
 msgstr "Ezin da helburu agiria sortu zuzenbideetatik"
 
-#: Merge.rc:1888
+#: Merge.rc:1890
 #, c-format
 msgid ""
 "Please save all files first.\n"
@@ -4776,47 +4786,47 @@ msgstr ""
 "\n"
 "Helburua sortzeak agirietan gordegabeko aldaketarik ez egotea eskatzen du."
 
-#: Merge.rc:1889
+#: Merge.rc:1891
 #, c-format
 msgid "Folder does not exist."
 msgstr "Agiritegia ez dago."
 
-#: Merge.rc:1890
+#: Merge.rc:1892
 #, c-format
 msgid "Current directory comparison results will be cleared."
 msgstr "Uneko zuzenbide alderaketa emaitzak ezabatu egingo dira."
 
-#: Merge.rc:1891
+#: Merge.rc:1893
 #, c-format
 msgid "Select file for export"
 msgstr "Hautatu esportatzeko agiria"
 
-#: Merge.rc:1892
+#: Merge.rc:1894
 #, c-format
 msgid "Select file for import"
 msgstr "Hautatu inportatzeko agiria"
 
-#: Merge.rc:1893
+#: Merge.rc:1895
 #, c-format
 msgid "Options imported from the file."
 msgstr "Agiritik inportatutako aukerak"
 
-#: Merge.rc:1894
+#: Merge.rc:1896
 #, c-format
 msgid "Options exported to the file."
 msgstr "Agiritik esportatutako aukerak"
 
-#: Merge.rc:1895
+#: Merge.rc:1897
 #, c-format
 msgid "Failed to import options from the file."
 msgstr "Hutsegitea agiritik aukerak inportatzerakoan."
 
-#: Merge.rc:1896
+#: Merge.rc:1898
 #, c-format
 msgid "Failed to write options to the file."
 msgstr "Hutsegitea aukerak agirian idazterakoan."
 
-#: Merge.rc:1897
+#: Merge.rc:1899
 #, c-format
 msgid ""
 "You are about to close several compare windows.\n"
@@ -4827,177 +4837,177 @@ msgstr ""
 "\n"
 "Jarraitzea nahi duzu?"
 
-#: Merge.rc:1898
+#: Merge.rc:1900
 #, c-format
 msgid "Regular expression error"
 msgstr "Adierazpen arrunt akatsa"
 
-#: Merge.rc:1899
+#: Merge.rc:1901
 #, c-format
 msgid "No match"
 msgstr "Emaitzik ez"
 
-#: Merge.rc:1900
+#: Merge.rc:1902
 #, c-format
 msgid "Invalid regular expression"
 msgstr "Adierazpen arrunt baliogabea"
 
-#: Merge.rc:1901
+#: Merge.rc:1903
 #, c-format
 msgid "Invalid collation character"
 msgstr "Elkar hizki baliogabea"
 
-#: Merge.rc:1902
+#: Merge.rc:1904
 #, c-format
 msgid "Invalid character class name"
 msgstr "Hizki klase izen baliogabea"
 
-#: Merge.rc:1903
+#: Merge.rc:1905
 #, c-format
 msgid "Trailing backslash"
 msgstr "Amaierako ezkerbarra"
 
-#: Merge.rc:1904
+#: Merge.rc:1906
 #, c-format
 msgid "Invalid back reference"
 msgstr "Xehetasun baliogabea atzera"
 
-#: Merge.rc:1905
+#: Merge.rc:1907
 #, c-format
 msgid "Unmatched [ or [^"
 msgstr "Berdingabe [ edo [^"
 
-#: Merge.rc:1906
+#: Merge.rc:1908
 #, c-format
 msgid "Unmatched ( or \\("
 msgstr "Berdingabe ( edo \\("
 
-#: Merge.rc:1907
+#: Merge.rc:1909
 #, c-format
 msgid "Unmatched \\{"
 msgstr "Berdingabe \\{"
 
-#: Merge.rc:1908
+#: Merge.rc:1910
 #, c-format
 msgid "Invalid content of \\{\\}"
 msgstr "Eduki baliogabea \\{\\}"
 
-#: Merge.rc:1909
+#: Merge.rc:1911
 #, c-format
 msgid "Invalid range end"
 msgstr "neurri amaiera baliogabea"
 
-#: Merge.rc:1910
+#: Merge.rc:1912
 #, c-format
 msgid "Out of memory"
 msgstr "Oroimenetik kanpo"
 
-#: Merge.rc:1911
+#: Merge.rc:1913
 #, c-format
 msgid "Invalid preceding regular expression"
 msgstr "Aurreko adierazpen arrunta baliogabea da"
 
-#: Merge.rc:1912
+#: Merge.rc:1914
 #, c-format
 msgid "Premature end of regular expression"
 msgstr "Adierazpen arruntean amaiera aurreregi"
 
-#: Merge.rc:1913
+#: Merge.rc:1915
 #, c-format
 msgid "Regular expression too big"
 msgstr "Adierazpen arrunt handiegia"
 
-#: Merge.rc:1914
+#: Merge.rc:1916
 #, c-format
 msgid "Unmatched ) or \\)"
 msgstr "Berdingabe ) edo \\)"
 
-#: Merge.rc:1915
+#: Merge.rc:1917
 #, c-format
 msgid "Win"
 msgstr "Win"
 
-#: Merge.rc:1916
+#: Merge.rc:1918
 #, c-format
 msgid "Mac"
 msgstr "Mac"
 
-#: Merge.rc:1917
+#: Merge.rc:1919
 #, c-format
 msgid "Unix"
 msgstr "Unix"
 
-#: Merge.rc:1918
+#: Merge.rc:1920
 #, c-format
 msgid "Mixed"
 msgstr "Mixed"
 
-#: Merge.rc:1920
+#: Merge.rc:1922
 #, c-format
 msgid "LF"
 msgstr "LF"
 
-#: Merge.rc:1921
+#: Merge.rc:1923
 #, c-format
 msgid "CR"
 msgstr "CR"
 
-#: Merge.rc:1922
+#: Merge.rc:1924
 #, c-format
 msgid "CRLF"
 msgstr "CRLF"
 
-#: Merge.rc:1924
+#: Merge.rc:1926
 #, c-format
 msgid "Save the left file"
 msgstr "Gorde ezkerreko agiria"
 
-#: Merge.rc:1925
+#: Merge.rc:1927
 #, c-format
 msgid "Save the right file"
 msgstr "Gorde eskuineko agiria"
 
-#: Merge.rc:1926
+#: Merge.rc:1928
 #, c-format
 msgid "Save the left file with name..."
 msgstr "Gorde ezkerreko agiria izen honekin..."
 
-#: Merge.rc:1927
+#: Merge.rc:1929
 #, c-format
 msgid "Save the right file with name..."
 msgstr "Gorde eskuineko agiria izen honekin..."
 
-#: Merge.rc:1928
+#: Merge.rc:1930
 #, c-format
 msgid "Change left side file/folder read-only status"
 msgstr "Aldatu ezkerralldeko agiria\agiritegia irakurtzeko-bakarrik egoerara"
 
-#: Merge.rc:1929
+#: Merge.rc:1931
 #, c-format
 msgid "Change right side file/folder read-only status"
 msgstr "Aldatu eskuinaldeko agiria\agiritegia irakurtzeko-bakarrik egoerara"
 
-#: Merge.rc:1930
+#: Merge.rc:1932
 #, c-format
 msgid "Convert EOL to Windows mode"
 msgstr "Bihurtu EOL-ak Windows modura"
 
-#: Merge.rc:1931
+#: Merge.rc:1933
 #, c-format
 msgid "Convert EOL to Unix mode"
 msgstr "Bihurtu EOL-ak Unix modura"
 
-#: Merge.rc:1932
+#: Merge.rc:1934
 #, c-format
 msgid "Convert EOL to Mac mode"
 msgstr "Bihurtu EOL-ak Mac modura"
 
-#: Merge.rc:1933
+#: Merge.rc:1935
 #, c-format
 msgid "Switch between editing and merging modes"
 msgstr "Aldatu editatzen eta batzen moduen artean"
 
-#: Merge.rc:1934
+#: Merge.rc:1936
 #, c-format
 msgid ""
 "View and adjust file encoding properties\n"
@@ -5006,12 +5016,12 @@ msgstr ""
 "Ikusi eta zehaztu agiri kodeaketa ezaugarriak\n"
 "Agiri kodeaketa ezaugarriak"
 
-#: Merge.rc:1935
+#: Merge.rc:1937
 #, c-format
 msgid "Open and resolve conflict file"
 msgstr "Ireki eta konpondu gatazka agiria"
 
-#: Merge.rc:1936
+#: Merge.rc:1938
 #, c-format
 msgid ""
 "Select difference area in the current line\n"
@@ -5020,7 +5030,7 @@ msgstr ""
 "Hautatu ezberdintasun eremua uneko lerroan\n"
 "Ezberdintasuna Uneko Lerroan"
 
-#: Merge.rc:1937
+#: Merge.rc:1939
 #, c-format
 msgid ""
 "Go to line or difference\n"
@@ -5029,7 +5039,7 @@ msgstr ""
 "Joan lerrora edo ezberdintasunera\n"
 "Joan (Ctrl+G)"
 
-#: Merge.rc:1938
+#: Merge.rc:1940
 #, c-format
 msgid ""
 "Set program options\n"
@@ -5038,7 +5048,7 @@ msgstr ""
 "Ezarri programaren aukerak\n"
 "Aukerak"
 
-#: Merge.rc:1939
+#: Merge.rc:1941
 #, c-format
 msgid ""
 "Refresh display\n"
@@ -5047,37 +5057,37 @@ msgstr ""
 "Berritu erakuspena\n"
 "Berritu (F5)"
 
-#: Merge.rc:1940
+#: Merge.rc:1942
 #, c-format
 msgid "Copy selected lines to clipboard adding linenumbers to line begin"
 msgstr "Kopiatu hautatutako lerroak gakoan lerro-zenbakia gehituz hasierako lerroan"
 
-#: Merge.rc:1941
+#: Merge.rc:1943
 #, c-format
 msgid "Refresh selected items"
 msgstr "Berritu hautatutako gaiak"
 
-#: Merge.rc:1942
+#: Merge.rc:1944
 #, c-format
 msgid "Toggle bookmark"
 msgstr "Aldatu lastermarka"
 
-#: Merge.rc:1943
+#: Merge.rc:1945
 #, c-format
 msgid "Go to next bookmark"
 msgstr "Joan hurrengo lastermarkara"
 
-#: Merge.rc:1944
+#: Merge.rc:1946
 #, c-format
 msgid "Go to previous bookmark"
 msgstr "Joan aurreko lastermarkara"
 
-#: Merge.rc:1945
+#: Merge.rc:1947
 #, c-format
 msgid "Clear all bookmarks"
 msgstr "Garbitu lastermarka guztiak"
 
-#: Merge.rc:1946
+#: Merge.rc:1948
 #, c-format
 msgid ""
 "Displays items that are exactly the same\n"
@@ -5086,7 +5096,7 @@ msgstr ""
 "Berdin-berdinak diren gaiak erakusten ditu\n"
 "Erakutsi Gai Berdinak"
 
-#: Merge.rc:1947
+#: Merge.rc:1949
 #, c-format
 msgid ""
 "Displays items that have differences\n"
@@ -5095,7 +5105,7 @@ msgstr ""
 "Ezberdintasunak ditzuten gaiak erakusten ditu\n"
 "Erakutsi Gai Ezberdinak"
 
-#: Merge.rc:1948
+#: Merge.rc:1950
 #, c-format
 msgid ""
 "Displays items that exist in only on the left side\n"
@@ -5104,7 +5114,7 @@ msgstr ""
 "Ezkerraldean bakarrik dauden gaiak erakusten ditu\n"
 "Erakutsi Ezkerreko Gaiak Bakarrik"
 
-#: Merge.rc:1949
+#: Merge.rc:1951
 #, c-format
 msgid ""
 "Displays items that exist in only on the right side\n"
@@ -5113,7 +5123,7 @@ msgstr ""
 "Eskuinaldean bakarrik dauden gaiak erakusten ditu\n"
 "Erakutsi Eskuineko Gaiak Bakarrik"
 
-#: Merge.rc:1950
+#: Merge.rc:1952
 #, c-format
 msgid ""
 "Displays binary files\n"
@@ -5122,7 +5132,7 @@ msgstr ""
 "Agiri binarioak erakutsi\n"
 "Erakutsi Agiri Binarioak"
 
-#: Merge.rc:1951
+#: Merge.rc:1953
 #, c-format
 msgid ""
 "Displays skipped items\n"
@@ -5131,7 +5141,7 @@ msgstr ""
 "Jauzi egindako gaiak erakusten ditu\n"
 "Erakutsi Jauzitako Gaiak"
 
-#: Merge.rc:1952
+#: Merge.rc:1954
 #, c-format
 msgid ""
 "Select the font for the view\n"
@@ -5140,7 +5150,7 @@ msgstr ""
 "Ikusteko hizkia hautatzen du\n"
 "Hautatu Ikus Hizkia"
 
-#: Merge.rc:1953
+#: Merge.rc:1955
 #, c-format
 msgid ""
 "Revert to using the default system font for view\n"
@@ -5149,27 +5159,27 @@ msgstr ""
 "Berriro erabili sistemaren berezko hizkia ikusteko\n"
 "Berezko Hizkia"
 
-#: Merge.rc:1954
+#: Merge.rc:1956
 #, c-format
 msgid "Shows whitespace characters"
 msgstr "Zurigune hizkiak erakusten ditu"
 
-#: Merge.rc:1955
+#: Merge.rc:1957
 #, c-format
 msgid "Toggle Diff Pane"
 msgstr "Aldatu Ezberd Panela"
 
-#: Merge.rc:1956
+#: Merge.rc:1958
 #, c-format
 msgid "Location pane shows overall picture from files"
 msgstr "Kokaleku panelak agirien ikuspegi orokor bat  erakusten du"
 
-#: Merge.rc:1957
+#: Merge.rc:1959
 #, c-format
 msgid "Show folder compare statistics dialog"
 msgstr "Erakutsi agiritegi alderaketa estatistika elkarrizketa"
 
-#: Merge.rc:1958
+#: Merge.rc:1960
 #, c-format
 msgid ""
 "Select the current user interface language\n"
@@ -5178,7 +5188,7 @@ msgstr ""
 "Hautatu uneko erabiltzaile interfaze hizkuntza\n"
 "Hizkuntza"
 
-#: Merge.rc:1959
+#: Merge.rc:1961
 #, c-format
 msgid ""
 "Shows differences inside lines with different colors\n"
@@ -5187,12 +5197,12 @@ msgstr ""
 "Lerroen arteko ezberdintasunak margo ezberdinez erakusten ditu\n"
 "Erakutsi Lerro Ezberdintasuna"
 
-#: Merge.rc:1960
+#: Merge.rc:1962
 #, c-format
 msgid "Swap the positions of the two panes"
 msgstr "Trukatu bi panelen kokalekua"
 
-#: Merge.rc:1961
+#: Merge.rc:1963
 #, c-format
 msgid ""
 "Shows line numbers\n"
@@ -5201,7 +5211,7 @@ msgstr ""
 "Lerroen zenbakia erakusten du\n"
 "Erakutsi Lerro Zenbakia"
 
-#: Merge.rc:1962
+#: Merge.rc:1964
 #, c-format
 msgid ""
 "Enable word wrap\n"
@@ -5210,7 +5220,7 @@ msgstr ""
 "Gaitu hitz inguratzea\n"
 "Inguratu Lerroak"
 
-#: Merge.rc:1963
+#: Merge.rc:1965
 #, c-format
 msgid ""
 "Shows selection margins for both panes\n"
@@ -5219,22 +5229,22 @@ msgstr ""
 "Bi panelentzako bazter hautapenak erakusten ditu\n"
 "Erakutsi Bazter Hautapena"
 
-#: Merge.rc:1964
+#: Merge.rc:1966
 #, c-format
 msgid "Increase text size"
 msgstr "Handitu idazkiaren neurria"
 
-#: Merge.rc:1965
+#: Merge.rc:1967
 #, c-format
 msgid "Decrease text size"
 msgstr "Gutxitu idazkiaren neurria"
 
-#: Merge.rc:1966
+#: Merge.rc:1968
 #, c-format
 msgid "Reset text zoom to default size"
 msgstr "Birrezarri idazkiaren zooma berezko neurrian"
 
-#: Merge.rc:1967
+#: Merge.rc:1969
 #, c-format
 msgid ""
 "Scroll to the previous difference\n"
@@ -5243,7 +5253,7 @@ msgstr ""
 "Irristatu aurreko ezberdintasunera\n"
 "Aurreko Ezberdintasuna (Alt+Up)"
 
-#: Merge.rc:1968
+#: Merge.rc:1970
 #, c-format
 msgid ""
 "Scroll to the next difference\n"
@@ -5252,7 +5262,7 @@ msgstr ""
 "Irristatu hurrengo ezberdintasunera\n"
 "Hurrengo Ezberdintasuna (Alt+Down)"
 
-#: Merge.rc:1969
+#: Merge.rc:1971
 #, c-format
 msgid ""
 "Scroll to the first difference\n"
@@ -5261,7 +5271,7 @@ msgstr ""
 "Irristatu lehen ezberdintasunera\n"
 "Lehen Ezberdintasuna (Alt+Home)"
 
-#: Merge.rc:1970
+#: Merge.rc:1972
 #, c-format
 msgid ""
 "Scroll to the current difference\n"
@@ -5270,7 +5280,7 @@ msgstr ""
 "Irristatu uneko ezberdintasunera\n"
 "Uneko Ezberdintasuna (Alt+Enter)"
 
-#: Merge.rc:1971
+#: Merge.rc:1973
 #, c-format
 msgid ""
 "Scroll to the last difference\n"
@@ -5279,7 +5289,7 @@ msgstr ""
 "Irristatu azken ezberdintasunera\n"
 "Azken Ezberdintasuna (Alt+End)"
 
-#: Merge.rc:1972
+#: Merge.rc:1974
 #, c-format
 msgid ""
 "Copy the selected text to the right file\n"
@@ -5288,7 +5298,7 @@ msgstr ""
 "Kopiatu hautatutako idazkia eskuineko agirira\n"
 "Kopiatu Eskuinera (Alt+Right)"
 
-#: Merge.rc:1973
+#: Merge.rc:1975
 #, c-format
 msgid ""
 "Copy the selected text to the left file\n"
@@ -5297,7 +5307,7 @@ msgstr ""
 "Kopiatu hautatutako idazkia ezkerreko agirira\n"
 "Kopiatu Ezkerrera (Alt+Left)"
 
-#: Merge.rc:1974
+#: Merge.rc:1976
 #, c-format
 msgid ""
 "Copy difference to right and advance to next\n"
@@ -5306,7 +5316,7 @@ msgstr ""
 "Kopiatu ezberdintasuna eskuinera eta hurrengora joan\n"
 "Kopiatu Eskuinean eta Aurrera (Ctrl+Alt+Right)"
 
-#: Merge.rc:1975
+#: Merge.rc:1977
 #, c-format
 msgid ""
 "Copy difference to left and advance to next\n"
@@ -5315,7 +5325,7 @@ msgstr ""
 "Kopiatu ezberdintasuna ezkerrera eta hurrengora joan\n"
 "Kopiatu Ezkerrean eta Aurrera (Ctrl+Alt+Right)"
 
-#: Merge.rc:1976
+#: Merge.rc:1978
 #, c-format
 msgid ""
 "Copy all differences to the right file\n"
@@ -5324,7 +5334,7 @@ msgstr ""
 "Kopiatu ezberdintasun guztiak eskuineko agirian\n"
 "Dena Eskuinera"
 
-#: Merge.rc:1977
+#: Merge.rc:1979
 #, c-format
 msgid ""
 "Copy all differences to the left file\n"
@@ -5333,37 +5343,37 @@ msgstr ""
 "Kopiatu ezberdintasun guztiak ezkerreko agirian\n"
 "Dena Ezkerrera"
 
-#: Merge.rc:1978
+#: Merge.rc:1980
 #, c-format
 msgid "Delete selected items from both directories"
 msgstr "Ezabatu hautatutako gaiak bien zuzenbideetatik"
 
-#: Merge.rc:1979
+#: Merge.rc:1981
 #, c-format
 msgid "Compare selected item (compare first item if multiple items selected)"
 msgstr "Alderatu hautatutako gaiak (alderatu lehen gaia hautatuta gai anitz badaude)"
 
-#: Merge.rc:1980
+#: Merge.rc:1982
 #, c-format
 msgid "Select and reorder directory compare columns"
 msgstr "Hautatu eta birrantolatu alderatu zutabeak zuzenbidea"
 
-#: Merge.rc:1981
+#: Merge.rc:1983
 #, c-format
 msgid "Generate a patch-file"
 msgstr "Helburu-agiri bat sortu"
 
-#: Merge.rc:1982
+#: Merge.rc:1984
 #, c-format
 msgid "Select and modify filters\nFilters"
 msgstr "Hautatu eta aldatu iragazkiak\nIragazkiak"
 
-#: Merge.rc:1983
+#: Merge.rc:1985
 #, c-format
 msgid "Generates a report from compare results"
 msgstr "Alderaketa emaitzekin jakinarazpen bat sortzen du"
 
-#: Merge.rc:1984
+#: Merge.rc:1986
 #, c-format
 msgid ""
 "Activates next visible file\n"
@@ -5372,12 +5382,12 @@ msgstr ""
 "Hurrengo agiri ikusgarria eragiten du\n"
 "Hurrengo Agiria Eragin"
 
-#: Merge.rc:1985
+#: Merge.rc:1987
 #, c-format
 msgid "Closes all open windows"
 msgstr "Irekitako leiho guztiak isten ditu"
 
-#: Merge.rc:1986
+#: Merge.rc:1988
 #, c-format
 msgid ""
 "Opens the WinMerge Help\n"
@@ -5386,22 +5396,22 @@ msgstr ""
 "WinMerge Laguntza irekitzen du\n"
 "WinMerge Laguntza"
 
-#: Merge.rc:1987
+#: Merge.rc:1989
 #, c-format
 msgid "Outputs current WinMerge version info and configuration to text file"
 msgstr "Irteerak uneko WinMerge bertsio argibideak eta idazki agiri itxurapena "
 
-#: Merge.rc:1988
+#: Merge.rc:1990
 #, c-format
 msgid "Display the GNU General Public License"
 msgstr "GNU Baimen Publiko Orokorra erakusten du"
 
-#: Merge.rc:1989
+#: Merge.rc:1991
 #, c-format
 msgid "Private Build: %1"
 msgstr "Bilduma Pribatua: %1"
 
-#: Merge.rc:1990
+#: Merge.rc:1992
 #, c-format
 msgid ""
 "Opens the release notes document\n"
@@ -5410,7 +5420,7 @@ msgstr ""
 "Argitalpen oharrak irekitzen ditu\n"
 "Argitalpen Oharrak"
 
-#: Merge.rc:1991
+#: Merge.rc:1993
 #, c-format
 msgid ""
 "Opens the translations website\n"
@@ -5419,122 +5429,122 @@ msgstr ""
 "Itzulpen webgunea irekitzen du\n"
 "Itzulpenak"
 
-#: Merge.rc:1992
+#: Merge.rc:1994
 #, c-format
 msgid "<None>"
 msgstr "<Ezer ez>"
 
-#: Merge.rc:1993
+#: Merge.rc:1995
 #, c-format
 msgid "Open the file with registered application"
 msgstr "Ireki agiria erregistratutako aplikazio batekin"
 
-#: Merge.rc:1994
+#: Merge.rc:1996
 #, c-format
 msgid "Open the file with external editor"
 msgstr "Ireki agiria kanpoko editatzaile batekin"
 
-#: Merge.rc:1995
+#: Merge.rc:1997
 #, c-format
 msgid "Open the file with a particular program"
 msgstr "Ireki agiria programa jakin batekin"
 
-#: Merge.rc:1996
+#: Merge.rc:1998
 #, c-format
 msgid "Do not display moved blocks"
 msgstr "Ez erakutsi mugitutako blokeak"
 
-#: Merge.rc:1997
+#: Merge.rc:1999
 #, c-format
 msgid "Display all moved blocks"
 msgstr "Erakutsi mugitutako bloke guztiak"
 
-#: Merge.rc:1998
+#: Merge.rc:2000
 #, c-format
 msgid "Display moved blocks only from current diff"
 msgstr "Erakutsi mugitutako blokeak uneko ezberd. bakarrik"
 
-#: Merge.rc:1999
+#: Merge.rc:2001
 #, c-format
 msgid "Go to diff under cursor"
 msgstr "Joan kurtsorepeko ezberd."
 
-#: Merge.rc:2000
+#: Merge.rc:2002
 #, c-format
 msgid "G&oto Diff %1 of %2"
 msgstr "Joan %1 %2-tik Ezberd"
 
-#: Merge.rc:2001
+#: Merge.rc:2003
 #, c-format
 msgid "G&oto Line %1"
 msgstr "&Joan lerro honetara: %1"
 
-#: Merge.rc:2002
+#: Merge.rc:2004
 #, c-format
 msgid "Disabled"
 msgstr "Ezgaituta"
 
-#: Merge.rc:2003
+#: Merge.rc:2005
 #, c-format
 msgid "From file system"
 msgstr "Agiri sistematik"
 
-#: Merge.rc:2004
+#: Merge.rc:2006
 #, c-format
 msgid "From MRU list"
 msgstr "MRU zerrendatik"
 
-#: Merge.rc:2005
+#: Merge.rc:2007
 #, c-format
 msgid "Hide the toolbar"
 msgstr "Ezkutatu tresnabarra"
 
-#: Merge.rc:2006
+#: Merge.rc:2008
 #, c-format
 msgid "Show small toolbar"
 msgstr "Erakutsi tresnabarra txikia"
 
-#: Merge.rc:2007
+#: Merge.rc:2009
 #, c-format
 msgid "Show big toolbar"
 msgstr "Erakutsi tresnabarra handia"
 
-#: Merge.rc:2008
+#: Merge.rc:2010
 #, c-format
 msgid "Selection left"
 msgstr ""
 
-#: Merge.rc:2009
+#: Merge.rc:2011
 #, c-format
 msgid "Selection right"
 msgstr ""
 
-#: Merge.rc:2010
+#: Merge.rc:2012
 #, c-format
 msgid "Print..."
 msgstr ""
 
-#: Merge.rc:2011
+#: Merge.rc:2013
 #, c-format
 msgid "Page Setup..."
 msgstr ""
 
-#: Merge.rc:2012
+#: Merge.rc:2014
 #, c-format
 msgid "Page Zoom:"
 msgstr ""
 
-#: Merge.rc:2013
+#: Merge.rc:2015
 #, c-format
 msgid "Content Zoom:"
 msgstr ""
 
-#: Merge.rc:2014
+#: Merge.rc:2016
 #, c-format
 msgid "%d line excluded"
 msgstr ""
 
-#: Merge.rc:2015
+#: Merge.rc:2017
 #, c-format
 msgid "%d lines excluded"
 msgstr ""
