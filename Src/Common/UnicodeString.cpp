@@ -75,6 +75,29 @@ String::size_type string_replace(String &target, LPCTSTR find, LPCTSTR replace)
 }
 
 /**
+ * @brief Replace a character inside a string with another character.
+ * This function searches for a character inside an string an if found,
+ * replaces it with another character. Function can replace several instances
+ * of the character inside one string.
+ * @param [in] target A string containing an character to replace.
+ * @param [in] find A character to search and replace with another (@p replace).
+ * @param [in] replace A character used to replace original (@p find).
+ */
+String::size_type string_replace(String &target, TCHAR find, TCHAR replace)
+{
+	String::size_type n = 0;
+	for (String::iterator it = target.begin(); it != target.end(); ++it)
+	{
+		if (*it == find)
+		{
+			*it = replace;
+			++n;
+		}
+	}
+	return n;
+}
+
+/**
  * @brief Trims whitespace chars from begin and end of the string.
  */
 void string_trim_ws(String &result)
