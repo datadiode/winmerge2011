@@ -429,12 +429,16 @@ bool CDirView::DirItemEnumerator::MultiStepCompressArchive(LPCTSTR path)
 	if (Merge7z::Format *piHandler = ArchiveGuessFormat(path))
 	{
 		HWND hwndOwner = theApp.m_pMainWnd->GetLastActivePopup()->m_hWnd;
+		bool bDone = false;
 		String pathIntermediate;
-		SysFreeString(Assign(pathIntermediate, piHandler->GetDefaultName(hwndOwner, path)));
-		String pathPrepend = path;
-		pathPrepend.resize(pathPrepend.rfind('\\') + 1);
-		pathIntermediate.insert(0, pathPrepend);
-		bool bDone = MultiStepCompressArchive(pathIntermediate.c_str());
+		if (BSTR bstrDefaultName = piHandler->GetDefaultName(hwndOwner, path))
+		{
+			SysFreeString(Assign(pathIntermediate, bstrDefaultName));
+			String pathPrepend = path;
+			pathPrepend.resize(pathPrepend.rfind('\\') + 1);
+			pathIntermediate.insert(0, pathPrepend);
+			bDone = MultiStepCompressArchive(pathIntermediate.c_str());
+		}
 		if (bDone)
 		{
 			piHandler->CompressArchive(hwndOwner, path,
@@ -460,14 +464,14 @@ void CDirView::DirItemEnumerator::CompressArchive(LPCTSTR path)
 		// No path given, so prompt for path!
 		static const TCHAR _T_Merge7z[] = _T("Merge7z");
 		static const TCHAR _T_FilterIndex[] = _T("FilterIndex");
-		/*String strFilter; // = CExternalArchiveFormat::GetOpenFileFilterString();
-		strFilter.insert(0, _T_Filter);
-		strFilter += _T("|");*/
+		String strFilter = CExternalArchiveFormat::GetOpenFileFilterString();
+		strFilter.insert(0, CDirView::SuggestArchiveExtensions());
+		string_replace(strFilter, _T('|'), _T('\0'));
 		OPENFILENAME ofn;
 		ZeroMemory(&ofn, OPENFILENAME_SIZE_VERSION_400);
 		ofn.lStructSize = OPENFILENAME_SIZE_VERSION_400;
 		ofn.hwndOwner = theApp.m_pMainWnd->GetLastActivePopup()->m_hWnd;
-		ofn.lpstrFilter = CDirView::SuggestArchiveExtensions();
+		ofn.lpstrFilter = strFilter.c_str();
 		ofn.Flags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_NOREADONLYRETURN;
 		static TCHAR buffer[MAX_PATH];
 		ofn.lpstrFile = buffer;

@@ -296,6 +296,10 @@ HRESULT CExternalArchiveFormat::CompressArchive(HWND, LPCTSTR path, Merge7z::Dir
 			)
 			{
 				String strDirAhead(etorItem.FullPath, cchDir);
+				if (!m_bLongPathPrefix)
+				{
+					paths_UndoMagic(strDirAhead);
+				}
 				if
 				(
 					strDir != strDirAhead
@@ -324,7 +328,7 @@ HRESULT CExternalArchiveFormat::CompressArchive(HWND, LPCTSTR path, Merge7z::Dir
 			else
 			{
 				response = LanguageSelect.FormatMessage(IDS_CANT_STORE_1_AS_2,
-					SP2NBSP(etorItem.FullPath), SP2NBSP(etorItem.Name)
+					SP2NBSP(etorItem.FullPath).c_str(), SP2NBSP(etorItem.Name).c_str()
 				).MsgBox(MB_ICONSTOP | MB_OKCANCEL);
 			}
 		}
@@ -333,7 +337,7 @@ HRESULT CExternalArchiveFormat::CompressArchive(HWND, LPCTSTR path, Merge7z::Dir
 			envelope->Free();
 		}
 	}
-	if (nProcessed)
+	if (response != IDCANCEL && nProcessed)
 	{
 		SetPath(strCmd, _T("\"<filename>"), strItem.c_str());
 		response = RunModal(strCmd.c_str(), strDir.c_str(), MB_ICONSTOP | MB_OKCANCEL);
@@ -406,7 +410,7 @@ Merge7z::Format *CExternalArchiveFormat::GuessFormat(LPCTSTR path)
 /**
  * @brief Build file filter string to be passed to CFileDialog constructor
  */
-/*String CExternalArchiveFormat::GetOpenFileFilterString()
+String CExternalArchiveFormat::GetOpenFileFilterString()
 {
 	String strFileFilter;
 	Profile const *pProfile = GetProfile();
@@ -439,4 +443,4 @@ Merge7z::Format *CExternalArchiveFormat::GuessFormat(LPCTSTR path)
 		}
 	}
 	return strFileFilter;
-}*/
+}
