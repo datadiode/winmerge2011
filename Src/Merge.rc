@@ -1766,6 +1766,8 @@ STRINGTABLE
     IDS_SHELL_CONTEXT_MENU_LEFT   "Left Shell menu"
     IDS_SHELL_CONTEXT_MENU_RIGHT  "Right Shell menu"
     IDS_UNKNOWN_ARCHIVE_FORMAT    "Unknown archive format"
+    IDS_CANT_STORE_1_AS_2         "%1:\n\nCan't store as ""%2"""
+    IDS_EXITCODE                  "Exit code #%d"
     ID_DIR_ZIP_LEFT               "Add items from left side to archive"
     ID_DIR_ZIP_RIGHT              "Add items from right side to archive"
     ID_DIR_ZIP_BOTH               "Add items from both sides to archive"

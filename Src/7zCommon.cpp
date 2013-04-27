@@ -1,102 +1,23 @@
-/////////////////////////////////////////////////////////////////////////////
-//    WinMerge:  an interactive diff/merge utility
-//    Copyright (C) 1997-2000  Thingamahoochie Software
-//    Author: Dean Grimm
-//
-//    This program is free software; you can redistribute it and/or modify
-//    it under the terms of the GNU General Public License as published by
-//    the Free Software Foundation; either version 2 of the License, or
-//    (at your option) any later version.
-//
-//    This program is distributed in the hope that it will be useful,
-//    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//    GNU General Public License for more details.
-//
-//    You should have received a copy of the GNU General Public License
-//    along with this program; if not, write to the Free Software
-//    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-//
-/////////////////////////////////////////////////////////////////////////////
-
 /* 7zCommon.cpp: Implement 7z related classes and functions
- * Copyright (c) 2003 Jochen Tucht
- *
- * Remarks:	Different versions of 7-Zip are interfaced through specific
- *			versions of Merge7z (Merge7z311.dll, Merge7z312.dll, etc.)
- *			WinMerge can either use an installed copy of the 7-Zip software,
- *			or fallback to a local set of 7-Zip DLLs, which are to be included
- *			in the WinMerge binary distribution.
- *
- *			Fallback policies are as follows:
- *
- *			1. Detect 7-Zip version installed (XXX).
- *			2. If there is a Merge7zXXX.dll, be happy to use it
- *			3. Detect 7-Zip version from WinMerge distribution (YYY).
- *			4. If there is a Merge7zYYY.dll, be happy to use it.
- *			5. Sorry, no way.
- *
- *			These rules can be customized by setting a registry variable
- *			*Merge7z/Enable* of type DWORD to one of the following values:
- *
- *			0 - Entirely disable 7-Zip integration.
- *			1 - Use installed 7-Zip if present. Otherwise, use local 7-Zip.
- *			2 - Always use local 7-Zip.
- *
 
-Please mind 2. a) of the GNU General Public License, and log your changes below.
+Copyright (c) 2003 Jochen Tucht
 
-DATE:		BY:					DESCRIPTION:
-==========	==================	================================================
-2003-12-09	Jochen Tucht		Created
-2003-12-16	Jochen Tucht		Properly generate .tar.gz and .tar.bz2
-2003-12-16	Jochen Tucht		Obtain long path to temporary folder
-2004-01-20	Jochen Tucht		Complain only once if Merge7z*.dll is missing
-2004-01-25	Jochen Tucht		Fix bad default for OPENFILENAME::nFilterIndex
-2004-03-15	Jochen Tucht		Fix Visual Studio 2003 build issue
-2004-04-13	Jochen Tucht		Avoid StrNCat to get away with shlwapi 4.70
-2004-08-25	Jochen Tucht		More explicit error message
-2004-10-17	Jochen Tucht		Leave decision whether to recurse into folders
-								to enumerator (Mask.Recurse)
-2004-11-03	Jochen Tucht		FIX [1048997] as proposed by Kimmo 2004-11-02
-2005-01-15	Jochen Tucht		Read 7-Zip version from 7zip_pad.xml
-								Set Merge7z UI language if DllBuild_Merge7z >= 9
-2005-01-22	Jochen Tucht		Better explain what's present/missing/outdated
-2005-02-05	Jochen Tucht		Fall back to IDD_MERGE7ZMISMATCH template from
-								.exe if .lang file isn't up to date.
-2005-02-26	Jochen Tucht		Add download link to error message
-2005-02-26	Jochen Tucht		Use WinAPI to obtain ISO language/region codes
-2005-02-27	Jochen Tucht		FIX [1152375]
-2005-04-24	Kimmo Varis			Don't use DiffContext exported from DirView
-2005-06-08	Kimmo Varis			Use DIFFITEM, not reference to it (hopefully only
-								temporarily, to sort out new directory compare)
-2005-06-22	Jochen Tucht		Change recommended version of 7-Zip to 4.20
-								Remove noise from Nagbox
-2005-07-03	Jochen Tucht		DIFFITEM has changed due to RFE [ 1205516 ]
-2005-07-04	Jochen Tucht		New global ArchiveGuessFormat() checks for
-								formats to be handled by external command line
-								tools. These take precedence over Merge7z
-								internal handlers.
-2005-07-05	Jochen Tucht		Move to Merge7z::Format::GetDefaultName() to
-								build intermediate filenames for multi-step
-								compression.
-2005-07-15	Jochen Tucht		Remove external command line tool integration
-								for now. Rethink about it after 2.4 branch.
-2005-08-20	Jochen Tucht		Option to guess archive format by signature
-								Map extensions through ExternalArchiveFormat.ini
-2005-08-23	Jochen Tucht		Option to entirely disable 7-Zip integration
-2007-01-04	Kimmo Varis			Convert using COptionsMgr for options.
-2007-06-16	Jochen Neubeck		FIX [1723263] "Zip --> Both" operation...
-2007-12-22	Jochen Neubeck		Fix Merge7z UI lang for new translation system
-								Change recommended version of 7-Zip to 4.57
-2010-05-16	Jochen Neubeck		Read 7-Zip version from 7z.dll (which has long
-								ago replaced the various format and codec DLLs)
-								Change recommended version of 7-Zip to 4.65
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+Last change: 2013-04-27 by Jochen Neubeck
 */
-
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "Merge.h"
 #include "SettingStore.h"
@@ -106,7 +27,7 @@ DATE:		BY:					DESCRIPTION:
 #include "MainFrm.h"
 #include "7zCommon.h"
 #include "dllpstub.h"
-//#include "ExternalArchiveFormat.h"
+#include "ExternalArchiveFormat.h"
 #include "common/version.h"
 #include <paths.h>
 #include "Environment.h"
@@ -121,6 +42,7 @@ static char THIS_FILE[] = __FILE__;
  * @brief Wrap Merge7z::GuessFormat() to allow for some customizing:
  * - Check if 7-Zip integration is enabled.
  * - Check for filename extension mappings.
+ * - Check for external command line tools.
  */
 Merge7z::Format *ArchiveGuessFormat(LPCTSTR path)
 {
@@ -128,44 +50,7 @@ Merge7z::Format *ArchiveGuessFormat(LPCTSTR path)
 		return NULL;
 	if (PathIsDirectory(path))
 		return NULL;
-	// Map extensions through ExternalArchiveFormat.ini
-	static const TCHAR null[] = _T("");
-	static const TCHAR section[] = _T("extensions");
-	LPCTSTR entry = PathFindExtension(path);
-	TCHAR value[20];
-	static LPCTSTR filename = NULL;
-	if (filename == NULL)
-	{
-		TCHAR cPath[INTERNET_MAX_PATH_LENGTH];
-		DWORD cchPath = SearchPath(NULL, _T("ExternalArchiveFormat.ini"), NULL,
-			INTERNET_MAX_PATH_LENGTH, cPath, NULL);
-		filename = cchPath && cchPath < INTERNET_MAX_PATH_LENGTH ? StrDup(cPath) : null;
-	}
-	if (*filename &&
-		GetPrivateProfileString(section, entry, null, value, 20, filename) &&
-		*value == '.')
-	{
-		// Remove end-of-line comments (in string returned from GetPrivateProfileString)
-		// that is, remove semicolon & whatever follows it
-		if (LPTSTR p = StrChr(value, ';'))
-		{
-			*p = '\0';
-			StrTrim(value, _T(" \t"));
-		}
-		path = value;
-	}
-
-	// PATCH [ 1229867 ] RFE [ 1205516 ], RFE [ 887948 ], and other issues
-	// command line integration portion is not yet applied
-	// so following code not yet valid, so temporarily commented out
-	// Look for command line tool first
-	/*Merge7z::Format *pFormat;
-	if (CExternalArchiveFormat::GuessFormat(path, pFormat))
-	{
-		return pFormat;
-	}*/
-	// Default to Merge7z*.dll
-	return Merge7z->GuessFormat(path);
+	return CExternalArchiveFormat::GuessFormat(path);
 }
 
 /**

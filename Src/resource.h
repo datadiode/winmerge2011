@@ -618,6 +618,8 @@
 #define IDS_ERROR_EXECUTE_FILE                  17659
 #define IDS_UNKNOWN_EXECUTE_FILE                17660
 #define IDS_UNKNOWN_ARCHIVE_FORMAT              17664
+#define IDS_CANT_STORE_1_AS_2                   17665
+#define IDS_EXITCODE                            17666
 #define IDS_COLHDR_FILENAME                     17696
 #define IDS_COLHDR_DIR                          17697
 #define IDS_COLHDR_RESULT                       17698

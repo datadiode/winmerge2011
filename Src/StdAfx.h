@@ -159,6 +159,9 @@ void LogErrorString(any fmt, ...)
 	va_end(args);
 }
 
+#define strdupa(s) strcpy((char *)_alloca(strlen(s) + 1), s)
+#define wcsdupa(s) wcscpy((wchar_t *)_alloca((wcslen(s) + 1) * sizeof(wchar_t)), s)
+
 /** @brief include for the custom dialog boxes, with do not ask/display again */
 #include "MessageBoxDialog.h"
 

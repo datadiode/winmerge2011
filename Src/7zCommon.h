@@ -87,6 +87,6 @@ DWORD NTAPI VersionOf7z();
  */
 inline BSTR Assign(String &dst, BSTR src)
 {
-	dst = src;
+	dst.assign(src, SysStringLen(src));
 	return src;
 }
