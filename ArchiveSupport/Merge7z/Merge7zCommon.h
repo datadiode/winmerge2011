@@ -14,7 +14,6 @@
 // Merge7z includes
 #include "tools.h"
 #define DllBuild_Merge7z 29
-#define DLLPSTUB /##/
 #include "Merge7z.h"
 
 typedef char SZ_EXTENSION[8];
