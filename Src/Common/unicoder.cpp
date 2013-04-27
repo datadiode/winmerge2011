@@ -169,7 +169,10 @@ void buffer::resize(unsigned int newSize)
 	if (capacity < newSize)
 	{
 		capacity = newSize;
-		ptr = (unsigned char *)realloc(ptr, capacity);
+		unsigned char *tmp = static_cast<unsigned char *>(realloc(ptr, capacity));
+		if (tmp == NULL)
+			OException::Throw(ERROR_OUTOFMEMORY);
+		ptr = tmp;
 	}
 }
 
