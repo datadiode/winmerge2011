@@ -95,7 +95,7 @@ CSplashWnd::CSplashWnd(HWindow *pWndMain)
 	if (COptionsMgr::Get(OPT_DISABLE_SPLASH))
 		return;
 	SetTimer(SplashTimerID, 5000, NULL);
-	HListView *pLv = HListView::Create(WS_CHILD | WS_VISIBLE, 0, 0,
+	HListView::Create(WS_CHILD | WS_VISIBLE, 0, 0,
 		ImageDimensions.cx, ImageDimensions.cy, m_pWnd, SplashTimerID, WS_EX_NOPARENTNOTIFY);
 	CMyComPtr<IStream> pstm;
 	if (SUCCEEDED(ResourceStream::Create(NULL, MAKEINTRESOURCE(IDR_SPLASH), _T("IMAGE"), &pstm)))
@@ -140,6 +140,7 @@ LRESULT CSplashWnd::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		case WM_CREATE:
 			KillTimer(SplashTimerID);
 			SendDlgItemMessage(SplashTimerID, WM_CLOSE);
+			m_spIPicture.Release();
 			break;
 		}
 		break;
