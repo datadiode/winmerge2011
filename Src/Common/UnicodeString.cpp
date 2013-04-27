@@ -57,18 +57,21 @@ void string_makeupper(String &str)
  * @param [in] find A string to search and replace with another (@p replace).
  * @param [in] replace A string used to replace original (@p find).
  */
-void string_replace(String &target, LPCTSTR find, LPCTSTR replace)
+String::size_type string_replace(String &target, LPCTSTR find, LPCTSTR replace)
 {
 	const String::size_type find_len =
 		static_cast<String::size_type>(_tcslen(find));
 	const String::size_type replace_len =
 		static_cast<String::size_type>(_tcslen(replace));
 	String::size_type pos = 0;
+	String::size_type n = 0;
 	while ((pos = target.find(find, pos)) != String::npos)
 	{
 		target.replace(pos, find_len, replace, replace_len);
 		pos += replace_len;
+		++n;
 	}
+	return n;
 }
 
 /**

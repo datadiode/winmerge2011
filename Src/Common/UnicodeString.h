@@ -37,7 +37,7 @@ typedef std_tchar(string) String;
 void string_makelower(String &);
 void string_makeupper(String &);
 
-void string_replace(String &target, LPCTSTR find, LPCTSTR replace);
+String::size_type string_replace(String &, LPCTSTR find, LPCTSTR replace);
 
 // Trimming
 void string_trim_ws(String &);
