@@ -755,7 +755,7 @@ int CCrystalTextView::ExpandChars(LPCTSTR pszChars, int nOffset, int nCount, Str
 int CCrystalTextView::GetCharWidthFromChar(LPCTSTR pch)
 {
 	UINT ch = *pch;
-	if (ch >= _T('\x00') && ch <= _T('\x1F') && ch != _T('\t'))
+	if (ch >= _T('\x00') && ch <= _T('\x1F') && ch != _T('\t') && ch != _T('\r') && ch != _T('\n'))
 		return 3;
 
 	if (ch >= UNI_SUR_LOW_START && ch <= UNI_SUR_LOW_END)
