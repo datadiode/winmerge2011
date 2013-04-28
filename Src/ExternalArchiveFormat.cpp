@@ -24,6 +24,7 @@ Last change: 2013-04-27 by Jochen Neubeck
 #include "paths.h"
 #include "environment.h"
 #include "LanguageSelect.h"
+#include "ConsoleWindow.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -66,25 +67,37 @@ static String GetCurrentDirectory()
 	return strDir;
 }
 
+CExternalArchiveFormat::Map CExternalArchiveFormat::m_map;
+
 /**
  * @brief Encapsulate good old INI file APIs (as far as we need them)
  */
 class CExternalArchiveFormat::Profile
 {
-	String m_strFileName;
 public:
-	Profile(LPCTSTR);
+	static const Profile &Get();
 	DWORD GetSize() const;
+	UINT GetProfileInt(LPCTSTR, LPCTSTR, INT) const;
 	DWORD GetProfileString(LPCTSTR, LPCTSTR, LPTSTR, DWORD) const;
 	DWORD GetProfileSection(LPCTSTR, LPTSTR, DWORD) const;
-};
+private:
+	String m_strFileName;
+	static Profile m_instance;
+} CExternalArchiveFormat::Profile::m_instance;
 
 /**
- * @brief Get full path to INI file in constructor so we have it at hand later
+ * @brief Return a reference to the initialized instance
  */
-CExternalArchiveFormat::Profile::Profile(LPCTSTR lpName)
-	: m_strFileName(env_ExpandVariables(lpName))
+const CExternalArchiveFormat::Profile &CExternalArchiveFormat::Profile::Get()
 {
+	static LPCTSTR initializer = _T("%SupplementFolder%\\ExternalArchiveFormat.ini");
+	// Initialize the instance if not yet done
+	if (initializer != NULL)
+	{
+		m_instance.m_strFileName = env_ExpandVariables(initializer);
+		initializer = NULL;
+	}
+	return m_instance;
 }
 
 /**
@@ -102,6 +115,14 @@ DWORD CExternalArchiveFormat::Profile::GetSize() const
 		CloseHandle(h);
 	}
 	return size;
+}
+
+/**
+ * @brief Simple wrapper around WINAPI GetPrivateProfileInt()
+ */
+UINT CExternalArchiveFormat::Profile::GetProfileInt(LPCTSTR lpAppName, LPCTSTR lpKeyName, INT nDefault) const
+{
+	return GetPrivateProfileInt(lpAppName, lpKeyName, nDefault, m_strFileName.c_str());
 }
 
 /**
@@ -123,31 +144,32 @@ DWORD CExternalArchiveFormat::Profile::GetProfileSection(LPCTSTR lpAppName, LPTS
 /**
  * @brief CExternalArchiveFormat constructor
  */
-CExternalArchiveFormat::CExternalArchiveFormat(const Profile *pProfile, LPCTSTR format)
+CExternalArchiveFormat::CExternalArchiveFormat(const Profile &profile, LPCTSTR format)
 : m_bLongPathPrefix(TRUE)
 , m_nBulkSize(1)
 , m_cchCmdMax(4095)
 {
 	TCHAR tmp[1024];
-	if (pProfile->GetProfileString(format, _T("DeCompress"), tmp, _countof(tmp)))
+	if (profile.GetProfileString(format, _T("DeCompress"), tmp, _countof(tmp)))
 	{
 		m_strCmdDeCompress = env_ExpandVariables(tmp);
 	}
-	if (pProfile->GetProfileString(format, _T("Compress"), tmp, _countof(tmp)))
+	if (profile.GetProfileString(format, _T("Compress"), tmp, _countof(tmp)))
 	{
 		m_strCmdCompress = env_ExpandVariables(tmp);
 	}
-	if (pProfile->GetProfileString(format, _T("BulkSize"), tmp, _countof(tmp)))
+	if (profile.GetProfileString(format, _T("BulkSize"), tmp, _countof(tmp)))
 	{
 		if (int ival = PathParseIconLocation(tmp))
 			m_cchCmdMax = ival;
 		if (int ival = StrToInt(tmp))
 			m_nBulkSize = ival;
 	}
-	if (pProfile->GetProfileString(format, _T("LongPathPrefix"), tmp, _countof(tmp)))
+	if (profile.GetProfileString(format, _T("LongPathPrefix"), tmp, _countof(tmp)))
 	{
 		m_bLongPathPrefix = PathMatchSpec(tmp, _T("1;yes;true"));
 	}
+	m_nShowConsole = profile.GetProfileInt(format, _T("ShowConsole"), SW_HIDE);
 }
 
 /**
@@ -263,6 +285,7 @@ int CExternalArchiveFormat::RunModal(LPCTSTR lpCmd, LPCTSTR lpDir, UINT uStyle)
  */
 HRESULT CExternalArchiveFormat::DeCompressArchive(HWND, LPCTSTR path, LPCTSTR folder)
 {
+	ShowConsoleWindow(m_nShowConsole);
 	String strCmd = m_strCmdDeCompress;
 	SetPath(strCmd, _T("\"<archive>"), path);
 	SetPath(strCmd, _T("\"<dir>"), folder, FILE_ATTRIBUTE_DIRECTORY);
@@ -274,6 +297,7 @@ HRESULT CExternalArchiveFormat::DeCompressArchive(HWND, LPCTSTR path, LPCTSTR fo
  */
 HRESULT CExternalArchiveFormat::CompressArchive(HWND, LPCTSTR path, Merge7z::DirItemEnumerator *etor)
 {
+	ShowConsoleWindow(m_nShowConsole);
 	String strRestoreDir = GetCurrentDirectory();
 	int response = 0;
 	int nProcessed = 0;
@@ -347,24 +371,15 @@ HRESULT CExternalArchiveFormat::CompressArchive(HWND, LPCTSTR path, Merge7z::Dir
 }
 
 /**
- * @brief Get the Profile * to access ExternalArchiveFormat.ini
- */
-CExternalArchiveFormat::Profile const *CExternalArchiveFormat::GetProfile()
-{
-	static Profile prof = _T("%SupplementFolder%\\ExternalArchiveFormat.ini");
-	return &prof;
-}
-
-/**
  * @brief Return a Merge7z::Format * to handle given archive file
  */
 Merge7z::Format *CExternalArchiveFormat::GuessFormat(LPCTSTR path)
 {
-	const Profile *const pProfile = GetProfile();
+	const Profile &profile = Profile::Get();
 	const LPCTSTR ext = PathFindExtension(path);
 	TCHAR format[MAX_PATH];
 	Merge7z::Format *pFormat = NULL;
-	if (pProfile->GetProfileString(_T("extensions"), ext, format, _countof(format)))
+	if (profile.GetProfileString(_T("extensions"), ext, format, _countof(format)))
 	{
 		// Remove end-of-line comments (in string returned from GetPrivateProfileString)
 		// that is, remove semicolon & whatever follows it
@@ -385,15 +400,13 @@ Merge7z::Format *CExternalArchiveFormat::GuessFormat(LPCTSTR path)
 			if (lstrcmpi(format, _T("none")))
 			{
 				// Rather invoke an external command line tool
-				typedef stl::map<String, stl::auto_ptr<CExternalArchiveFormat> > Map;
-				static Map rgFormats;
-				Map::iterator lookup = rgFormats.find(format);
-				if (lookup == rgFormats.end())
+				Map::iterator lookup = m_map.find(format);
+				if (lookup == m_map.end())
 				{
 					// This overload of map::insert() goes beyond the standard.
 					// It avoids dependency on a value type copy constructor.
-					lookup = rgFormats.insert(format).first;
-					lookup->second.reset(new CExternalArchiveFormat(pProfile, format));
+					lookup = m_map.insert(format).first;
+					lookup->second.reset(new CExternalArchiveFormat(profile, format));
 				}
 				pFormat = lookup->second.get();
 			}
@@ -413,12 +426,12 @@ Merge7z::Format *CExternalArchiveFormat::GuessFormat(LPCTSTR path)
 String CExternalArchiveFormat::GetOpenFileFilterString()
 {
 	String strFileFilter;
-	Profile const *pProfile = GetProfile();
-	if (DWORD cchProfile = pProfile->GetSize())
+	const Profile &profile = Profile::Get();
+	if (DWORD cchProfile = profile.GetSize())
 	{
 		strFileFilter.resize(cchProfile);
 		LPTSTR pchProfile = &strFileFilter.front();
-		cchProfile = pProfile->GetProfileSection(_T("extensions"), pchProfile, cchProfile);
+		cchProfile = profile.GetProfileSection(_T("extensions"), pchProfile, cchProfile);
 		strFileFilter.resize(cchProfile + 1);
 		if (cchProfile)
 		{

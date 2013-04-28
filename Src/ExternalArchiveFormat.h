@@ -1,21 +1,23 @@
 class CExternalArchiveFormat : public Merge7z::Format
 {
 private:
+	typedef stl::map<String, stl::auto_ptr<CExternalArchiveFormat> > Map;
+	static Map m_map;
 	static String GetShortPathName(LPCTSTR, DWORD = 0);
 	int SetPath(String &, LPCTSTR, LPCTSTR, DWORD = 0) const;
 	static int RunModal(LPCTSTR, LPCTSTR, UINT);
 	class Profile;
 	friend Profile;
-	static Profile const *GetProfile();
 	String m_strCmdDeCompress;			// decompression command with placeholders
 	String m_strCmdCompress;			// compression command with placeholders
 	int m_nBulkSize;					// maximum # of items to pass on command line
 	String::size_type m_cchCmdMax;		// maximum length of command line
 	BOOL m_bLongPathPrefix;				// whether to allow a long path prefix
+	int m_nShowConsole;
 public:
 	static Merge7z::Format *GuessFormat(LPCTSTR);
 	static String GetOpenFileFilterString();
-	CExternalArchiveFormat(const Profile *, LPCTSTR);
+	CExternalArchiveFormat(const Profile &, LPCTSTR);
 	virtual HRESULT DeCompressArchive(HWND, LPCTSTR path, LPCTSTR folder);
 	virtual HRESULT CompressArchive(HWND, LPCTSTR path, Merge7z::DirItemEnumerator *);
 DllBuild_Merge7z_9:
