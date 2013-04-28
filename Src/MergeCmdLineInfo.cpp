@@ -228,7 +228,7 @@ void MergeCmdLineInfo::AddPath(const String &path)
 	String param(path);
 	// Convert paths given in Linux-style ('/' as separator) given from
 	// Cygwin to Windows style ('\' as separator)
-	string_replace(param, _T("/"), _T("\\"));
+	string_replace(param, _T('/'), _T('\\'));
 
 	// If shortcut, expand it first
 	if (paths_IsShortcut(param.c_str()))

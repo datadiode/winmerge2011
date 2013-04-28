@@ -2336,14 +2336,14 @@ void CMainFrame::OnToolsGeneratePatch()
 			{
 				files.lfile = paths_ConcatPath(files.lfile, item->left.filename);
 				files.pathLeft = paths_ConcatPath(item->left.path, item->left.filename);
-				string_replace(files.pathLeft, _T("\\"), _T("/"));
+				string_replace(files.pathLeft, _T('\\'), _T('/'));
 			}
 			files.rfile = ctxt->GetRightFilepath(item);
 			if (!files.rfile.empty())
 			{
 				files.rfile = paths_ConcatPath(files.rfile, item->right.filename);
 				files.pathRight = paths_ConcatPath(item->right.path, item->right.filename);
-				string_replace(files.pathRight, _T("\\"), _T("/"));
+				string_replace(files.pathRight, _T('\\'), _T('/'));
 			}
 			patcher.AddFiles(files);
 		}

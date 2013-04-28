@@ -172,7 +172,7 @@ void CDiffWrapper::RefreshOptions()
 void CDiffWrapper::SetCreatePatchFile(const String &filename)
 {
 	m_sPatchFile = filename;
-	string_replace(m_sPatchFile, _T("/"), _T("\\"));
+	string_replace(m_sPatchFile, _T('/'), _T('\\'));
 }
 
 /**

@@ -40,7 +40,7 @@ static char THIS_FILE[] = __FILE__;
 static String SP2NBSP(LPCTSTR pszText, String::size_type nWidth = 120)
 {
 	String strText = pszText;
-	string_replace(strText, _T("\x20"), _T("\xA0"));
+	string_replace(strText, _T('\x20'), _T('\xA0'));
 	if (nWidth)
 	{
 		String::size_type i = (strText.length() + nWidth - 1) / nWidth * nWidth;

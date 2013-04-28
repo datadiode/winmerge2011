@@ -168,21 +168,21 @@ void CDirFrame::InitMrgmanCompare()
 						if (HString *hstr = CMarkdown(xml).Move("path").GetInnerText()->Uni(entities))
 						{
 							path = hstr->W;
-							string_replace(path, _T("/"), _T("\\"));
+							string_replace(path, _T('/'), _T('\\'));
 							hstr->Free();
 						}
 						String base_version = _T("@@");
 						if (HString *hstr = CMarkdown(xml).Move("base-version").Pop().Move("selector").GetInnerText()->Uni(entities))
 						{
 							base_version += hstr->W;
-							string_replace(base_version, _T("/"), _T("\\"));
+							string_replace(base_version, _T('/'), _T('\\'));
 							hstr->Free();
 						}
 						String from_version = _T("@@");
 						if (HString *hstr = CMarkdown(xml).Move("from-version").Pop().Move("selector").GetInnerText()->Uni(entities))
 						{
 							from_version += hstr->W;
-							string_replace(from_version, _T("/"), _T("\\"));
+							string_replace(from_version, _T('/'), _T('\\'));
 							hstr->Free();
 						}
 						DIFFITEM *di = m_pCtxt->AddDiff(NULL);

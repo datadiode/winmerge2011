@@ -37,7 +37,7 @@ BOOL VSSHelper::SetProjectBase(String strPath)
 		return FALSE;
 
 	m_strVssProjectBase = strPath;
-	string_replace(m_strVssProjectBase, _T("/"), _T("\\"));
+	string_replace(m_strVssProjectBase, _T('/'), _T('\\'));
 
 	// Check if m_strVssProjectBase has leading $\\, if not put them in:
 	if (EatPrefix(m_strVssProjectBase.c_str(), _T("$\\")) == NULL)
