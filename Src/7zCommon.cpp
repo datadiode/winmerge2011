@@ -48,6 +48,8 @@ Merge7z::Format *ArchiveGuessFormat(LPCTSTR path)
 {
 	if (COptionsMgr::Get(OPT_ARCHIVE_ENABLE) == 0)
 		return NULL;
+	if (path[0] == _T('\0'))
+		return NULL;
 	if (PathIsDirectory(path))
 		return NULL;
 	return CExternalArchiveFormat::GuessFormat(path);
