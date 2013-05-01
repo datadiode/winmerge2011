@@ -270,7 +270,7 @@ CDirFrame::AllowUpwardDirectory(String &leftParent, String &rightParent)
 			rightParent = m_pTempPathContext->m_strRightDisplayRoot;
 			if (!m_pCtxt->m_piFilterGlobal->includeFile(leftParent.c_str(), rightParent.c_str()))
 				return AllowUpwardDirectory::Never;
-			if (lstrcmpi(lname, _T("ORIGINAL")) == 0 && lstrcmpi(rname, _T("ALTERED")) == 0)
+			if (lstrcmpi(lname, _T("ORIGINAL\\")) == 0 && lstrcmpi(rname, _T("ALTERED\\")) == 0)
 			{
 				leftParent = paths_GetParentPath(leftParent.c_str());
 				rightParent = paths_GetParentPath(rightParent.c_str());

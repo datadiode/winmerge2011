@@ -1559,8 +1559,8 @@ bool CMainFrame::DoFileOpen(
 					{
 						// assume Perry style patch
 						filelocRight.filepath = path;
-						filelocLeft.filepath += _T("\\ORIGINAL");
-						filelocRight.filepath += _T("\\ALTERED");
+						filelocLeft.filepath += _T("\\ORIGINAL\\");
+						filelocRight.filepath += _T("\\ALTERED\\");
 						if (GetPairComparability(filelocLeft.filepath.c_str(), filelocRight.filepath.c_str()) != IS_EXISTING_DIR)
 						{
 							// not a Perry style patch: diff with itself...
@@ -1568,8 +1568,8 @@ bool CMainFrame::DoFileOpen(
 						}
 						else
 						{
-							pTempPathContext->m_strLeftDisplayRoot += _T("\\ORIGINAL");
-							pTempPathContext->m_strRightDisplayRoot += _T("\\ALTERED");
+							pTempPathContext->m_strLeftDisplayRoot += _T("\\ORIGINAL\\");
+							pTempPathContext->m_strRightDisplayRoot += _T("\\ALTERED\\");
 						}
 					}
 				}
