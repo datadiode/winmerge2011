@@ -288,6 +288,7 @@ HRESULT CExternalArchiveFormat::DeCompressArchive(HWND, LPCTSTR path, LPCTSTR fo
 	ShowConsoleWindow(m_nShowConsole);
 	String strCmd = m_strCmdDeCompress;
 	SetPath(strCmd, _T("\"<archive>"), path);
+	CreateDirectory(folder, NULL);
 	SetPath(strCmd, _T("\"<dir>"), folder, FILE_ATTRIBUTE_DIRECTORY);
 	return RunModal(strCmd.c_str(), folder, MB_ICONSTOP);
 }
