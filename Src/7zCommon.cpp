@@ -349,13 +349,13 @@ Merge7z::Envelope *CDirView::DirItemEnumerator::Enum(Item &item)
 	const String &sFilename = m_bRight ? di->right.filename : di->left.filename;
 	const String &sSubdir = m_bRight ? di->right.path : di->left.path;
 	envelope->Name = sFilename;
+	envelope->FullPath = sFilename;
 	if (sSubdir.length())
 	{
 		envelope->Name.insert(0, _T("\\"));
 		envelope->Name.insert(0, sSubdir);
+		envelope->FullPath.insert(0, _T("\\"));
 	}
-	envelope->FullPath = sFilename;
-	envelope->FullPath.insert(0, _T("\\"));
 	envelope->FullPath.insert(0, m_bRight ?
 		ctxt->GetRightFilepath(di) :
 		ctxt->GetLeftFilepath(di));
