@@ -63,7 +63,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/verbose:lib"
-				AdditionalDependencies="version.lib shlwapi.lib imm32.lib HtmlHelp.lib comctl32.lib oleacc.lib"
+				AdditionalDependencies="version.lib shlwapi.lib imm32.lib HtmlHelp.lib comctl32.lib oleacc.lib noarg.obj noenv.obj"
 				OutputFile="$(OutDir)\WinMergeU.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="$(IntDir)"
@@ -123,7 +123,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/verbose:lib"
-				AdditionalDependencies="version.lib shlwapi.lib imm32.lib HtmlHelp.lib comctl32.lib oleacc.lib"
+				AdditionalDependencies="version.lib shlwapi.lib imm32.lib HtmlHelp.lib comctl32.lib oleacc.lib noarg.obj noenv.obj"
 				OutputFile="$(OutDir)\WinMergeU.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="$(IntDir)"
@@ -161,6 +161,7 @@
 				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories=".;.\CompareEngines;.\Common;EASTL\include;.\editlib;.\diffutils;.\diffutils\lib;.\diffutils\src;..\Externals\expat\lib;..\Externals\expat\xmlwf;..\Externals\scew;..\Externals\pcre\Win32"
 				PreprocessorDefinitions="_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS=1;_CRT_SECURE_NO_DEPRECATE;_STATIC_CPPLIB;HAVE_STDLIB_H;STDC_HEADERS;HAVE_STRING_H=1;PR_FILE_NAME=\&quot;pr\&quot;;DIFF_PROGRAM=\&quot;diff\&quot;;REGEX_MALLOC;__MSC__;__NT__;USG=1;EDITPADC_CLASS=;UNICODE;PCRE_STATIC;USE_EASTL"
+				StringPooling="true"
 				RuntimeLibrary="1"
 				TreatWChar_tAsBuiltInType="false"
 				RuntimeTypeInfo="false"
@@ -176,7 +177,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="version.lib shlwapi.lib imm32.lib HtmlHelp.lib comctl32.lib oleacc.lib"
+				AdditionalDependencies="version.lib shlwapi.lib imm32.lib HtmlHelp.lib comctl32.lib oleacc.lib noarg.obj noenv.obj"
 				OutputFile="$(OutDir)\WinMergeU.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="$(IntDir)"
@@ -215,6 +216,7 @@
 				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories=".;.\CompareEngines;.\Common;EASTL\include;.\editlib;.\diffutils;.\diffutils\lib;.\diffutils\src;..\Externals\expat\lib;..\Externals\expat\xmlwf;..\Externals\scew;..\Externals\pcre\Win32"
 				PreprocessorDefinitions="_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS=1;_CRT_SECURE_NO_DEPRECATE;_STATIC_CPPLIB;HAVE_STDLIB_H;STDC_HEADERS;HAVE_STRING_H=1;PR_FILE_NAME=\&quot;pr\&quot;;DIFF_PROGRAM=\&quot;diff\&quot;;REGEX_MALLOC;__MSC__;__NT__;USG=1;EDITPADC_CLASS=;UNICODE;PCRE_STATIC;USE_EASTL"
+				StringPooling="true"
 				RuntimeLibrary="1"
 				TreatWChar_tAsBuiltInType="false"
 				RuntimeTypeInfo="false"
@@ -230,7 +232,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="version.lib shlwapi.lib imm32.lib HtmlHelp.lib comctl32.lib oleacc.lib"
+				AdditionalDependencies="version.lib shlwapi.lib imm32.lib HtmlHelp.lib comctl32.lib oleacc.lib noarg.obj noenv.obj"
 				OutputFile="$(OutDir)\WinMergeU.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="$(IntDir)"
