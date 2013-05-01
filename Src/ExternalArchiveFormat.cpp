@@ -440,16 +440,25 @@ String CExternalArchiveFormat::GetOpenFileFilterString()
 			LPCTSTR pszKey;
 			while (int cchKey = lstrlen(pszKey = strFileFilter.c_str() + i))
 			{
-				LPTSTR pszValue = StrChr(pszKey, _T('='));
-				String strInsert;
-				if (pszValue && lstrcmpi(pszValue + 1, _T("none")))
+				if (LPTSTR pszValue = StrChr(pszKey, _T('=')))
 				{
-					cchKey = lstrlen(pszValue + 1);
-					*pszValue = _T('\0');
-					strInsert.append_sprintf(_T("%s (%s)|*"), pszKey + 1, pszValue + 1);
-					*pszValue = _T('|');
-					strFileFilter.insert(i, strInsert);
-					i += strInsert.length() + static_cast<int>(pszValue - pszKey) + 1;
+					int cchValue = lstrlen(pszValue + 1);
+					// Remove end-of-line comments (in string returned from GetPrivateProfileString)
+					// that is, remove semicolon & whatever follows it
+					if (LPTSTR p = StrChr(pszValue + 1, ';'))
+					{
+						*p = '\0';
+						StrTrim(pszValue + 1, _T(" \t"));
+					}
+					if (lstrcmpi(pszValue + 1, _T("none")))
+					{
+						cchKey = cchValue;
+						*pszValue = _T('\0');
+						string_format strInsert(_T("%s (%s)|*"), pszKey + 1, pszValue + 1);
+						*pszValue = _T('|');
+						strFileFilter.insert(i, strInsert);
+						i += strInsert.length() + static_cast<int>(pszValue - pszKey) + 1;
+					}
 				}
 				strFileFilter.erase(i, cchKey + 1);
 			}
