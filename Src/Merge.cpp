@@ -266,9 +266,6 @@ bool CMergeApp::InitInstance()
 	bool bContinue = false;
 	try
 	{
-		// Drag and Drop functionality needs OleInitialize.
-		OException::Check(OleInitialize(NULL));
-
 		ResetOptions(); // Implementation in OptionsInit.cpp
 
 		// Cleanup left over tempfiles from previous instances.
@@ -306,6 +303,11 @@ bool CMergeApp::InitInstance()
 					OException::ThrowSilent();
 			}
 		}
+
+		// Drag and Drop functionality needs OleInitialize
+		OException::Check(CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE));
+		OException::Check(OleInitialize(NULL));
+
 		InitializeSupplements();
 
 		// Read last used filter from registry
@@ -368,6 +370,9 @@ int CMergeApp::ExitInstance()
 	charsets_cleanup();
 	// Remove tempfolder
 	ClearTempfolder(env_GetTempPath());
+	// Stay balanced
+	OleUninitialize();
+	CoUninitialize();
 	return 0;
 }
 
