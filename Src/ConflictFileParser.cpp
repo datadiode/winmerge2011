@@ -53,7 +53,7 @@ bool IsConflictFile(LPCTSTR conflictFileName)
 	bool startFound = false;
 
 	// open input file
-	bool success = conflictFile.OpenReadOnly(conflictFileName);
+	VERIFY(conflictFile.OpenReadOnly(conflictFileName));
 
 	// Search for a conflict marker
 	bool linesToRead = true;
@@ -101,11 +101,11 @@ bool ParseConflictFile(LPCTSTR conflictFileName,
 	bNestedConflicts = false;
 
 	// open input file
-	bool success = conflictFile.OpenReadOnly(conflictFileName);
+	VERIFY(conflictFile.OpenReadOnly(conflictFileName));
 
 	// Create output files
-	bool success2 = workingCopy.Open(workingCopyFileName, _T("wb"));
-	bool success3 = newRevision.Open(newRevisionFileName, _T("wb"));
+	VERIFY(workingCopy.Open(workingCopyFileName, _T("wb")));
+	VERIFY(newRevision.Open(newRevisionFileName, _T("wb")));
 
 	state = 0;
 	bool linesToRead = true;

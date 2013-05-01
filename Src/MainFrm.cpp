@@ -1540,7 +1540,7 @@ bool CMainFrame::DoFileOpen(
 						path = GetClearTempPath(pTempPathContext, _T("1"));
 						do
 						{
-							if FAILED(piHandler->DeCompressArchive(m_hWnd, filelocRight.filepath.c_str(), path.c_str()))
+							if (FAILED(piHandler->DeCompressArchive(m_hWnd, filelocRight.filepath.c_str(), path.c_str())))
 								break;
 							if (filelocRight.filepath.find(path) == 0)
 							{
@@ -1584,7 +1584,7 @@ bool CMainFrame::DoFileOpen(
 					pTempPathContext->m_strRightDisplayRoot = filelocRight.filepath;
 					do
 					{
-						if FAILED(piHandler->DeCompressArchive(m_hWnd, filelocLeft.filepath.c_str(), path.c_str()))
+						if (FAILED(piHandler->DeCompressArchive(m_hWnd, filelocLeft.filepath.c_str(), path.c_str())))
 							break;
 						if (filelocLeft.filepath.find(path) == 0)
 						{
@@ -1610,7 +1610,7 @@ bool CMainFrame::DoFileOpen(
 					pTempPathContext->m_strRightDisplayRoot = filelocRight.filepath;
 					do
 					{
-						if FAILED(piHandler->DeCompressArchive(m_hWnd, filelocRight.filepath.c_str(), path.c_str()))
+						if (FAILED(piHandler->DeCompressArchive(m_hWnd, filelocRight.filepath.c_str(), path.c_str())))
 							break;
 						if (filelocRight.filepath.find(path) == 0)
 						{
@@ -3528,7 +3528,6 @@ void CMainFrame::LoadToolbarImages()
 	if (m_imlMenu)
 		m_imlMenu->Destroy();
 	m_imlMenu = LanguageSelect.LoadImageList(IDB_TOOLBAR_ENABLED, 16, _countof(m_MenuIcons));
-	int j = m_imlMenu->GetImageCount();
 	for (int i = 0 ; i < _countof(m_MenuIcons) ; ++i)
 	{
 		LPCTSTR lpResID = MAKEINTRESOURCE(m_MenuIcons[i].iconResID);

@@ -25,7 +25,7 @@ public:
   }
   ~CMyComPtr() { if (_p) _p->Release(); }
   void Release() { if (_p) { _p->Release(); _p = NULL; } }
-  operator T*() const {  return (T*)_p;  }
+  operator T*() const { return _p; }
   // T& operator*() const {  return *_p; }
   T** operator&() { return &_p; }
   T* operator->() const { return _p; }
@@ -38,7 +38,6 @@ public:
     _p = p;
     return p;
   }
-  T* operator=(const CMyComPtr<T>& lp) { return (*this = lp._p); }
   bool operator!() const { return (_p == NULL); }
   // bool operator==(T* pT) const {  return _p == pT; }
   // Compare two objects for equivalence

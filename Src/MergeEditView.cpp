@@ -1182,7 +1182,6 @@ void CMergeEditView::GotoLine(UINT nLine, bool bRealLine, int pane)
 {
 	CMergeEditView *pLeftView = m_pDocument->GetLeftView();
 	CMergeEditView *pRightView = m_pDocument->GetRightView();
-	CMergeEditView *pCurrentView = m_pDocument->GetActiveMergeView();
 	int nRealLine = nLine;
 	int nApparentLine = nLine;
 
