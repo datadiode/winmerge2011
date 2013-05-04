@@ -23,6 +23,10 @@ namespace locality
 	class NumToLocaleStr : public string<48>
 	{
 	public:
+		NumToLocaleStr(INT n, INT r)
+		{
+			_ltot(n, out, r);
+		}
 		NumToLocaleStr(INT n)
 		{
 			TCHAR numbuff[24];
