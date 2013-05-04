@@ -133,6 +133,8 @@ public:
 
 	HMenu *SetScriptMenu(HMenu *, LPCSTR section);
 
+	BYTE QueryCmdState(UINT id) const;
+
 	static void OpenFileToExternalEditor(LPCTSTR file, LPCTSTR editor = NULL);
 	void OpenFileWith(LPCTSTR file) const;
 	bool ParseArgsAndDoOpen(const MergeCmdLineInfo &);
@@ -314,7 +316,7 @@ private:
 		BYTE CompareSelection;
 		BYTE ToggleBookmark;
 		BYTE NavigateBookmarks;
-		const BYTE *Lookup(UINT id);
+		const BYTE *Lookup(UINT id) const;
 	} m_cmdState;
 	UINT m_sourceType;
 };

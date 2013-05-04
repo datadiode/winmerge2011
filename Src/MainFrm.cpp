@@ -718,7 +718,7 @@ void CMainFrame::SetBitmaps(HMENU hMenu)
 	::SetMenuItemInfo(hMenu, ID_EOL_TO_MAC, FALSE, &mii);
 }
 
-const BYTE *CMainFrame::CmdState::Lookup(UINT id)
+const BYTE *CMainFrame::CmdState::Lookup(UINT id) const
 {
 	switch (id)
 	{
@@ -3827,6 +3827,14 @@ HMenu *CMainFrame::SetScriptMenu(HMenu *pMenu, LPCSTR section)
 		pMenu = m_pScriptMenu;
 	}
 	return pMenu;
+}
+
+BYTE CMainFrame::QueryCmdState(UINT id) const
+{
+	BYTE state = 0;
+	if (const BYTE *pbState = m_cmdState.Lookup(id))
+		state = *pbState;
+	return state;
 }
 
 /**

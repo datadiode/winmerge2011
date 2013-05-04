@@ -391,6 +391,8 @@ static void NTAPI FormatContextMenu(HMenu *pPopup, UINT uIDItem, int n1, int n2)
  */
 void CDirView::ListContextMenu(POINT point)
 {
+	CMainFrame *const pMDIFrame = m_pFrame->m_pMDIFrame;
+
 	const BOOL leftRO = m_pFrame->GetLeftReadOnly();
 	const BOOL rightRO = m_pFrame->GetRightReadOnly();
 	// TODO: It would be more efficient to set
@@ -519,10 +521,9 @@ void CDirView::ListContextMenu(POINT point)
 	m_pCompareAsScriptMenu = pPopup->GetSubMenu(1);
 	// Disable "Compare As" if multiple items are selected, or if the selected
 	// item is unique or represents a folder.
-	if (nTotal != 1 || nFileNames != 1 || nOpenableOnLeft != 1 || nOpenableOnRight != 1)
+	if (pMDIFrame->QueryCmdState(ID_MERGE_COMPARE) & MF_GRAYED)
 		pPopup->EnableMenuItem(1, MF_GRAYED | MF_BYPOSITION);
 
-	CMainFrame *pMDIFrame = m_pFrame->m_pMDIFrame;
 	// invoke context menu
 	// this will invoke all the OnUpdate methods to enable/disable the individual items
 	int nCmd = pPopup->TrackPopupMenu(
