@@ -58,22 +58,22 @@ void FileTextEncoding::SetUnicoding(UNICODESET unicoding)
 String FileTextEncoding::GetName() const
 {
 	if (m_unicoding == UTF8)
-		return LanguageSelect.LoadString(m_bom ? IDS_UNICODING_UTF8_BOM : IDS_UNICODING_UTF8);
+		return m_bom ? _T("UTF-8 (B)") : _T("UTF-8");
 	if (m_unicoding == UCS2LE)
-		return LanguageSelect.LoadString(IDS_UNICODING_UCS2_LE);
+		return m_bom ? _T("UCS-2 LE (B)") : _T("UCS-2 LE");
 	if (m_unicoding == UCS2BE)
-		return LanguageSelect.LoadString(IDS_UNICODING_UCS2_BE);
+		return m_bom ? _T("UCS-2 BE (B)") : _T("UCS-2 BE");
 	if (m_unicoding == UCS4LE)
-		return _T("UCS-4 LE");
+		return m_bom ? _T("UCS-4 LE (B)") : _T("UCS-4 LE");
 	if (m_unicoding == UCS4BE)
-		return _T("UCS-4 BE");
+		return m_bom ? _T("UCS-4 BE (B)") : _T("UCS-4 BE");
 	String str;
 	if (m_codepage != -1)
 	{
 		if (m_codepage == CP_UTF8)
 		{
 			// We detected codepage to be UTF-8, but unicoding was not set
-			str = LanguageSelect.LoadString(IDS_UNICODING_UTF8);
+			str = _T("UTF-8");
 		}
 		else
 		{
