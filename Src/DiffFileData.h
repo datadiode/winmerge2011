@@ -41,6 +41,8 @@ struct DiffFileData
 
 private:
 	bool DoOpenFiles();
+	DiffFileData(const DiffFileData &); // disallow copy construction
+	void operator=(const DiffFileData &); // disallow assignment
 };
 
 #endif // _DIFFFILEDATA_H_
