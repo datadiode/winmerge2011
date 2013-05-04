@@ -606,11 +606,13 @@ HMENU CDirView::ListShellContextMenu(SIDE_TYPE side)
 		{
 			parentDir = currentDir;
 			LPITEMIDLIST dirPidl;
-			LPCTSTR displayName = paths_UndoMagic(&currentDir.front());
-			hr = pDesktop->ParseDisplayName(NULL, NULL, const_cast<LPOLESTR>(displayName), NULL, &dirPidl, NULL);
+			paths_UndoMagic(currentDir);
+			hr = pDesktop->ParseDisplayName(NULL, NULL,
+				const_cast<LPOLESTR>(currentDir.c_str()), NULL, &dirPidl, NULL);
 			if (FAILED(hr))
 				return NULL;
-			hr = pDesktop->BindToObject(dirPidl, NULL, IID_IShellFolder, reinterpret_cast<void**>(&pCurrFolder));
+			hr = pDesktop->BindToObject(dirPidl, NULL,
+				IID_IShellFolder, reinterpret_cast<void**>(&pCurrFolder));
 			pidls.Free(dirPidl);
 			if (FAILED(hr))
 				return NULL;
@@ -620,7 +622,8 @@ HMENU CDirView::ListShellContextMenu(SIDE_TYPE side)
 			return NULL;
 		}
 		LPITEMIDLIST pidl;
-		hr = pCurrFolder->ParseDisplayName(NULL, NULL, const_cast<LPOLESTR>(filename.c_str()), NULL, &pidl, NULL);
+		hr = pCurrFolder->ParseDisplayName(NULL, NULL,
+			const_cast<LPOLESTR>(filename.c_str()), NULL, &pidl, NULL);
 		if (FAILED(hr))
 			return NULL;
 		pidls.Add(pidl);
@@ -896,7 +899,7 @@ int CDirView::GetSelectedItems(DIFFITEM **rgdi)
 bool CDirView::CreatePairFolder(LPCTSTR newFolder)
 {
 	int response = LanguageSelect.FormatMessage(
-		IDS_CREATE_PAIR_FOLDER, paths_UndoMagic(&String(newFolder).front())
+		IDS_CREATE_PAIR_FOLDER, paths_UndoMagic(wcsdupa(newFolder))
 	).MsgBox(MB_YESNO | MB_ICONWARNING);
 	return response == IDYES && paths_CreateIfNeeded(newFolder);
 }
@@ -1656,9 +1659,9 @@ void CDirView::OnCopyLeftPathnames()
 				// EOL since it allows copying to console/command line.
 				if (GlobalSize(hMem) != 0)
 					file.WriteString(_T(" "), 1);
-				String spath = ctxt->GetLeftFilepathAndName(di);
-				LPCTSTR path = paths_UndoMagic(&spath.front());
-				file.WriteString(path, static_cast<String::size_type>(spath.c_str() + spath.length() - path));
+				String path = ctxt->GetLeftFilepathAndName(di);
+				paths_UndoMagic(path);
+				file.WriteString(path);
 			}
 		}
 		file.WriteString(_T(""), 1);
@@ -1690,9 +1693,9 @@ void CDirView::OnCopyRightPathnames()
 				// EOL since it allows copying to console/command line.
 				if (GlobalSize(hMem) != 0)
 					file.WriteString(_T(" "), 1);
-				String spath = ctxt->GetRightFilepathAndName(di);
-				LPCTSTR path = paths_UndoMagic(&spath.front());
-				file.WriteString(path, static_cast<String::size_type>(spath.c_str() + spath.length() - path));
+				String path = ctxt->GetRightFilepathAndName(di);
+				paths_UndoMagic(path);
+				file.WriteString(path);
 			}
 		}
 		file.WriteString(_T(""), 1);
@@ -1724,9 +1727,9 @@ void CDirView::OnCopyBothPathnames()
 				// EOL since it allows copying to console/command line.
 				if (GlobalSize(hMem) != 0)
 					file.WriteString(_T(" "), 1);
-				String spath = ctxt->GetLeftFilepathAndName(di);
-				LPCTSTR path = paths_UndoMagic(&spath.front());
-				file.WriteString(path, static_cast<String::size_type>(spath.c_str() + spath.length() - path));
+				String path = ctxt->GetLeftFilepathAndName(di);
+				paths_UndoMagic(path);
+				file.WriteString(path);
 			}
 			if (!di->isSideLeftOnly())
 			{
@@ -1734,9 +1737,9 @@ void CDirView::OnCopyBothPathnames()
 				// EOL since it allows copying to console/command line.
 				if (GlobalSize(hMem) != 0)
 					file.WriteString(_T(" "), 1);
-				String spath = ctxt->GetRightFilepathAndName(di);
-				LPCTSTR path = paths_UndoMagic(&spath.front());
-				file.WriteString(path, static_cast<String::size_type>(spath.c_str() + spath.length() - path));
+				String path = ctxt->GetRightFilepathAndName(di);
+				paths_UndoMagic(path);
+				file.WriteString(path);
 			}
 		}
 		file.WriteString(_T(""), 1);
@@ -1906,12 +1909,10 @@ LRESULT CDirView::ReflectEndLabelEdit(NMLVDISPINFO *pdi)
  */
 void CDirView::OnUpdateStatusNum()
 {
-	TCHAR num[20], idx[20], cnt[20];
-
 	int items = GetSelectedCount();
-	_itot(items, num, 10);
 	m_pFrame->SetStatus(LanguageSelect.FormatMessage(
-		items == 1 ? IDS_STATUS_SELITEM1 : IDS_STATUS_SELITEMS, num));
+		items == 1 ? IDS_STATUS_SELITEM1 : IDS_STATUS_SELITEMS,
+		NumToStr(items, 10).c_str()));
 
 	CMainFrame *const pMDIFrame = m_pFrame->m_pMDIFrame;
 	CDocFrame *const pDocFrame = pMDIFrame->GetActiveDocFrame();
@@ -1969,9 +1970,10 @@ void CDirView::OnUpdateStatusNum()
 	if (focusItem == -1)
 	{
 		// No item has focus
-		_itot(items, cnt, 10);
 		// "Items: %1"
-		s = LanguageSelect.FormatMessage(IDS_DIRVIEW_STATUS_FMT_NOFOCUS, cnt);
+		s = LanguageSelect.FormatMessage(
+			IDS_DIRVIEW_STATUS_FMT_NOFOCUS,
+			NumToStr(items, 10).c_str());
 	}
 	else
 	{
@@ -1982,10 +1984,11 @@ void CDirView::OnUpdateStatusNum()
 			// Reduce by special items count
 			focusItem -= m_nSpecialItems;
 			items -= m_nSpecialItems;
-			_itot(focusItem + 1, idx, 10);
-			_itot(items, cnt, 10);
 			// "Item %1 of %2"
-			s = LanguageSelect.FormatMessage(IDS_DIRVIEW_STATUS_FMT_FOCUS, idx, cnt);
+			s = LanguageSelect.FormatMessage(
+				IDS_DIRVIEW_STATUS_FMT_FOCUS,
+				NumToStr(focusItem + 1, 10).c_str(),
+				NumToStr(items, 10).c_str());
 		}
 	}
 	pMDIFrame->GetStatusBar()->SetPartText(2, s.c_str());
@@ -2190,31 +2193,31 @@ void CDirView::PrepareDragData(UniStdioFile &file)
 
 		if (diffitem->isSideLeftOnly())
 		{
-			String spath = ctxt->GetLeftFilepathAndName(diffitem);
-			LPCTSTR path = paths_UndoMagic(&spath.front());
-			file.WriteString(path, static_cast<String::size_type>(spath.c_str() + spath.length() - path));
+			String path = ctxt->GetLeftFilepathAndName(diffitem);
+			paths_UndoMagic(path);
+			file.WriteString(path);
 		}
 		else if (diffitem->isSideRightOnly())
 		{
-			String spath = ctxt->GetRightFilepathAndName(diffitem);
-			LPCTSTR path = paths_UndoMagic(&spath.front());
-			file.WriteString(path, static_cast<String::size_type>(spath.c_str() + spath.length() - path));
+			String path = ctxt->GetRightFilepathAndName(diffitem);
+			paths_UndoMagic(path);
+			file.WriteString(path);
 		}
 		else if (diffitem->isSideBoth())
 		{
 			// when both files equal, there is no difference between what file to drag 
 			// so we put file from the left panel
-			String spath = ctxt->GetLeftFilepathAndName(diffitem);
-			LPCTSTR path = paths_UndoMagic(&spath.front());
-			file.WriteString(path, static_cast<String::size_type>(spath.c_str() + spath.length() - path));
+			String path = ctxt->GetLeftFilepathAndName(diffitem);
+			paths_UndoMagic(path);
+			file.WriteString(path);
 
 			// if both files are different then we also put file from the right panel 
 			if (diffitem->isResultDiff())
 			{
 				file.WriteString(_T("\n"), 1); // end of left file path
-				String spath = ctxt->GetRightFilepathAndName(diffitem);
-				LPCTSTR path = paths_UndoMagic(&spath.front());
-				file.WriteString(path, static_cast<String::size_type>(spath.c_str() + spath.length() - path));
+				String path = ctxt->GetRightFilepathAndName(diffitem);
+				paths_UndoMagic(path);
+				file.WriteString(path);
 			}
 		}
 		file.WriteString(_T("\n"), 1); // end of file path
