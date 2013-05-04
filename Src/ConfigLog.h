@@ -118,7 +118,6 @@ public:
 	// Implementation methods
 protected:
 	void WriteItem(int indent, LPCTSTR key, LPCTSTR value = 0);
-	void WriteItem(int indent, LPCTSTR key, const String &str);
 	void WriteItem(int indent, LPCTSTR key, long value);
 	void WriteVersionOf1(int indent, LPTSTR path, bool bDllGetVersion = true);
 	void WriteVersionOf(int indent, LPTSTR path);
@@ -145,14 +144,17 @@ private:
     void WriteItemYesNoInverted(int indent, LPCTSTR key, int *pvalue);
 	void WriteItemWhitespace(int indent, LPCTSTR key, int *pvalue);
 	bool ParseSettings(LPCTSTR Filepath);
-	String GetValueFromConfig(LPCTSTR key);
+
+	CConfigLog(const CConfigLog &); // disallow copy construction
+	void operator=(const CConfigLog &); // disallow assignment
 
 	// Implementation data
 private:
 	String m_sFileName;
 	UniStdioFile *const m_pfile;
 	bool m_writing;
-	CfgSettings *m_pCfgSettings;
+	// Collection of configuration settings found in config log (name/value map)
+	stl::map<String, String> m_settings;
 };
 
 #endif /* _CONFIGLOG_H_ */

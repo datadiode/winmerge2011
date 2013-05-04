@@ -34,19 +34,14 @@
 #include "SettingStore.h"
 #include "Environment.h"
 
-// Static function declarations
-static bool LoadYesNoFromConfig(CfgSettings * cfgSettings, LPCTSTR name, bool * pbflag);
-
 CConfigLog::CConfigLog()
-: m_pCfgSettings(NULL)
-, m_diffOptions(NULL)
+: m_diffOptions(NULL)
 , m_pfile(new UniStdioFile())
 {
 }
 
 CConfigLog::~CConfigLog()
 {
-	CloseFile();
 	delete m_pfile;
 }
 
@@ -72,9 +67,9 @@ static String GetLocaleString(LCID locid, LCTYPE lctype)
 /**
  * @brief Return Windows font charset constant name from constant value, eg, FontCharsetName() => "Hebrew"
  */
-static String FontCharsetName(BYTE charset)
+static LPCTSTR FontCharsetName(BYTE charset)
 {
-	switch(charset)
+	switch (charset)
 	{
 	case ANSI_CHARSET: return _T("Ansi");
 	case BALTIC_CHARSET: return _T("Baltic");
@@ -113,14 +108,6 @@ void CConfigLog::WriteItem(int indent, LPCTSTR key, LPCTSTR value)
 }
 
 /**
- * @brief Write string item
- */
-void CConfigLog::WriteItem(int indent, LPCTSTR key, const String &str)
-{
-	WriteItem(indent, key, str.c_str());
-}
-
-/**
  * @brief Write int item
  */
 void CConfigLog::WriteItem(int indent, LPCTSTR key, long value)
@@ -145,7 +132,18 @@ void CConfigLog::WriteItemYesNo(int indent, LPCTSTR key, bool *pvalue)
 	}
 	else
 	{
-		LoadYesNoFromConfig(m_pCfgSettings, key, pvalue);
+		stl::map<String, String>::iterator it = m_settings.find(key);
+		if (it != m_settings.end())
+		{
+			if (it->second == _T("Yes"))
+			{
+				*pvalue = true;
+			}
+			else if (it->second == _T("No"))
+			{
+				*pvalue = false;
+			}
+		}
 	}
 }
 
@@ -179,12 +177,12 @@ void CConfigLog::WriteLocaleSettings(LCID locid, LPCTSTR title)
 		return;
 
 	WriteItem(1, title);
-	WriteItem(2, _T("Def ANSI codepage"), GetLocaleString(locid, LOCALE_IDEFAULTANSICODEPAGE));
-	WriteItem(2, _T("Def OEM codepage"), GetLocaleString(locid, LOCALE_IDEFAULTCODEPAGE));
-	WriteItem(2, _T("Country"), GetLocaleString(locid, LOCALE_SENGCOUNTRY));
-	WriteItem(2, _T("Language"), GetLocaleString(locid, LOCALE_SENGLANGUAGE));
-	WriteItem(2, _T("Language code"), GetLocaleString(locid, LOCALE_ILANGUAGE));
-	WriteItem(2, _T("ISO Language code"), GetLocaleString(locid, LOCALE_SISO639LANGNAME));
+	WriteItem(2, _T("Def ANSI codepage"), GetLocaleString(locid, LOCALE_IDEFAULTANSICODEPAGE).c_str());
+	WriteItem(2, _T("Def OEM codepage"), GetLocaleString(locid, LOCALE_IDEFAULTCODEPAGE).c_str());
+	WriteItem(2, _T("Country"), GetLocaleString(locid, LOCALE_SENGCOUNTRY).c_str());
+	WriteItem(2, _T("Language"), GetLocaleString(locid, LOCALE_SENGLANGUAGE).c_str());
+	WriteItem(2, _T("Language code"), GetLocaleString(locid, LOCALE_ILANGUAGE).c_str());
+	WriteItem(2, _T("ISO Language code"), GetLocaleString(locid, LOCALE_SISO639LANGNAME).c_str());
 }
 
 /**
@@ -280,11 +278,14 @@ void CConfigLog::WriteItemWhitespace(int indent, LPCTSTR key, int *pvalue)
 	else
 	{
 		*pvalue = namemap[0].ival;
-		String svalue = GetValueFromConfig(key);
-		for (int i = 0 ; i < _countof(namemap) ; ++i)
+		stl::map<String, String>::iterator it = m_settings.find(key);
+		if (it != m_settings.end())
 		{
-			if (svalue == namemap[i].sval)
-				*pvalue = namemap[i].ival;
+			for (int i = 0 ; i < _countof(namemap) ; ++i)
+			{
+				if (it->second == namemap[i].sval)
+					*pvalue = namemap[i].ival;
+			}
 		}
 	}
 }
@@ -434,7 +435,7 @@ bool CConfigLog::DoFile(bool writing, String &sError)
 	FileWriteString(_T("\r\n Font:\r\n"));
 	FileWriteString(_T("  Font facename: %s\r\n"), m_fontSettings.sFacename.c_str());
 	FileWriteString(_T("  Font charset: %d (%s)\r\n"), m_fontSettings.nCharset,
-		FontCharsetName(m_fontSettings.nCharset).c_str());
+		FontCharsetName(m_fontSettings.nCharset));
 
 // System settings
 	FileWriteString(_T("\r\nSystem settings:\r\n"));
@@ -684,50 +685,6 @@ String CConfigLog::GetWindowsVer()
 	return sVersion;
 }
 
-/** 
- * @brief  Collection of configuration settings found in config log (name/value map)
- */
-class CfgSettings
-{
-public:
-	void Add(LPCTSTR name, LPCTSTR value)
-	{
-		m_settings[name] = value;
-	}
-	bool Lookup(LPCTSTR name, String & value)
-	{
-		stl::map<String, String>::iterator it = m_settings.find(name);
-		if (it == m_settings.end())
-			return false;
-		value = it->second;
-		return true;
-	}
-private:
-	stl::map<String, String> m_settings;
-};
-
-/**
- * @brief  Lookup named setting in cfgSettings, and if found, set pbflag accordingly
- */
-static bool LoadYesNoFromConfig(CfgSettings * cfgSettings, LPCTSTR name, bool * pbflag)
-{
-	String value;
-	if (cfgSettings->Lookup(name, value))
-	{
-		if (value == _T("Yes"))
-		{
-			*pbflag = true;
-			return true;
-		}
-		else if (value == _T("No"))
-		{
-			*pbflag = false;
-			return true;
-		}
-	}
-	return false;
-}
-
 bool CConfigLog::WriteLogFile(String &sError)
 {
 	CloseFile();
@@ -738,7 +695,6 @@ void CConfigLog::ReadLogFile(LPCTSTR Filepath)
 {
 	CloseFile();
 	String sError;
-	m_pCfgSettings = new CfgSettings;
 	if (!ParseSettings(Filepath))
 		return;
 	DoFile(false, sError);
@@ -756,10 +712,9 @@ void CConfigLog::FileWriteString(LPCTSTR lpsz)
  */
 void CConfigLog::CloseFile()
 {
+	m_settings.clear();
 	if (m_pfile->IsOpen())
 		m_pfile->Close();
-	delete m_pCfgSettings;
-	m_pCfgSettings = NULL;
 }
 
 /**
@@ -782,16 +737,9 @@ bool CConfigLog::ParseSettings(LPCTSTR Filepath)
 			String value = sLine.substr(colon + 1);
 			string_trim_ws(name);
 			string_trim_ws(value);
-			m_pCfgSettings->Add(name.c_str(), value.c_str());
+			m_settings[name] = value;
 		}
 	}
 	file.Close();
 	return true;
-}
-
-String CConfigLog::GetValueFromConfig(LPCTSTR key)
-{
-	String value;
-	m_pCfgSettings->Lookup(key, value);
-	return value;
 }
