@@ -84,7 +84,7 @@ String NTAPI GetClearTempPath(LPVOID pOwner, LPCTSTR pchExt)
 {
 	string_format strPath
 	(
-		pOwner ? _T("%s\\%08lX.7z%s") : _T("%s"),
+		pOwner ? _T("%s\\%p.7z%s") : _T("%s"),
 		env_GetTempPath(), pOwner, pchExt
 	);
 	// SHFileOperation expects a ZZ terminated list of paths!
