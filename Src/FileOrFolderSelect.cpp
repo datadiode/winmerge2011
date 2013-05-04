@@ -66,14 +66,15 @@ BOOL SelectFile(HWND parent, String &path,
 	// Convert extension mask from MFC style separators ('|')
 	//  to Win32 style separators ('\0')
 	stl::replace(filters.begin(), filters.end(), _T('|'), _T('\0'));
-	
+	paths_UndoMagic(path);
+
 	OPENFILENAME ofn;
 	memset(&ofn, 0, OPENFILENAME_SIZE_VERSION_400);
 	ofn.lStructSize = OPENFILENAME_SIZE_VERSION_400;
 	ofn.hwndOwner = parent;
 	ofn.lpstrFilter = filters.c_str();
 	ofn.nFilterIndex = 1;
-	ofn.lpstrFile = lstrcpyn(sSelectedFile, paths_UndoMagic(&path.front()), MAX_PATH);
+	ofn.lpstrFile = lstrcpyn(sSelectedFile, path.c_str(), MAX_PATH);
 	ofn.nMaxFile = MAX_PATH;
 	ofn.lpstrTitle = title.c_str();
 	ofn.lpstrDefExt = defaultExtension;

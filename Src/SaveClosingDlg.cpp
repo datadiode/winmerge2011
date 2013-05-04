@@ -110,10 +110,14 @@ BOOL SaveClosingDlg::OnInitDialog()
 {
 	OResizableDialog::OnInitDialog();
 	LanguageSelect.TranslateDialog(m_hWnd);
+
+	paths_UndoMagic(m_sLeftFile);
+	paths_UndoMagic(m_sRightFile);
+
 	UpdateData<Set>();
 
-	SetDlgItemText(IDC_SAVECLOSING_LEFTFILE, paths_UndoMagic(&m_sLeftFile.front()));
-	SetDlgItemText(IDC_SAVECLOSING_RIGHTFILE, paths_UndoMagic(&m_sRightFile.front()));
+	SetDlgItemText(IDC_SAVECLOSING_LEFTFILE, m_sLeftFile.c_str());
+	SetDlgItemText(IDC_SAVECLOSING_RIGHTFILE, m_sRightFile.c_str());
 
 	int idFocus = IDC_SAVECLOSING_SAVELEFT;
 	if (!m_bAskForLeft)

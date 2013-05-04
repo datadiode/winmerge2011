@@ -38,11 +38,15 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 PATCHFILES::PATCHFILES(const PATCHFILES &r)
-	: lfile(paths_UndoMagic(&String(r.lfile).front()))
-	, rfile(paths_UndoMagic(&String(r.rfile).front()))
-	, pathLeft(paths_UndoMagic(&String(r.pathLeft).front()))
-	, pathRight(paths_UndoMagic(&String(r.pathRight).front()))
+	: lfile(r.lfile)
+	, rfile(r.rfile)
+	, pathLeft(r.pathLeft)
+	, pathRight(r.pathRight)
 {
+	paths_UndoMagic(lfile);
+	paths_UndoMagic(rfile);
+	paths_UndoMagic(pathLeft);
+	paths_UndoMagic(pathRight);
 }
 
 /**

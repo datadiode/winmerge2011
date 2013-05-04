@@ -146,16 +146,16 @@ static String ColStatusGet(const CDiffContext *pCtxt, const void *p)
 	if (di.isSideLeftOnly())
 	{
 		String path = di.GetLeftFilepath(pCtxt->GetLeftPath());
-		LPCTSTR pathUI = paths_UndoMagic(&path.front());
+		paths_UndoMagic(path);
 		return static_cast<LPCTSTR>(
-			LanguageSelect.FormatMessage(IDS_LEFT_ONLY_IN_FMT, pathUI));
+			LanguageSelect.FormatMessage(IDS_LEFT_ONLY_IN_FMT, path.c_str()));
 	}
 	if (di.isSideRightOnly())
 	{
 		String path = di.GetRightFilepath(pCtxt->GetRightPath());
-		LPCTSTR pathUI = paths_UndoMagic(&path.front());
+		paths_UndoMagic(path);
 		return static_cast<LPCTSTR>(
-			LanguageSelect.FormatMessage(IDS_RIGHT_ONLY_IN_FMT, pathUI));
+			LanguageSelect.FormatMessage(IDS_RIGHT_ONLY_IN_FMT, path.c_str()));
 	}
 	if (di.isResultSame())
 	{

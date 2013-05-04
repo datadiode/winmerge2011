@@ -50,7 +50,8 @@ LPCTSTR env_GetTempPath()
 			paths_CreateIfNeeded(strTempPath.c_str());
 		}
 		// Existing code that involves temporary paths cannot handle the magic prefix so far.
-		pszTempPath = paths_UndoMagic(&strTempPath.front());
+		paths_UndoMagic(strTempPath);
+		pszTempPath = strTempPath.c_str();
 	}
 	return pszTempPath;
 }

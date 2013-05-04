@@ -70,10 +70,13 @@ BOOL ConfirmFolderCopyDlg::OnInitDialog()
 	if (!m_caption.empty())
 		SetWindowText(m_caption.c_str());
 
+	paths_UndoMagic(m_fromPath);
+	paths_UndoMagic(m_toPath);
+
 	SetDlgItemText(IDC_FLDCONFIRM_FROM_TEXT, m_fromText.c_str());
 	SetDlgItemText(IDC_FLDCONFIRM_TO_TEXT, m_toText.c_str());
-	SetDlgItemText(IDC_FLDCONFIRM_FROM_PATH, paths_UndoMagic(&m_fromPath.front()));
-	SetDlgItemText(IDC_FLDCONFIRM_TO_PATH, paths_UndoMagic(&m_toPath.front()));
+	SetDlgItemText(IDC_FLDCONFIRM_FROM_PATH, m_fromPath.c_str());
+	SetDlgItemText(IDC_FLDCONFIRM_TO_PATH, m_toPath.c_str());
 	SetDlgItemText(IDC_FLDCONFIRM_QUERY, m_question.c_str());
 	m_bMakeTargetItemWritable = SettingStore.GetProfileInt(
 		_T("Settings"), _T("DirViewMakeTargetItemWritable"), 0);
