@@ -106,7 +106,6 @@ public:
 	int GetSignificantIndex(int nDiff) const;
 	bool GetDiff(int nDiff, DIFFRANGE & di) const;
 	bool SetDiff(int nDiff, const DIFFRANGE & di);
-	int LineRelDiff(UINT nLine, int nDiff) const;
 	bool LineInDiff(UINT nLine, int nDiff) const;
 	int LineToDiff(UINT nLine) const;
 	bool HasSignificantDiffs() const;

@@ -193,24 +193,6 @@ bool DiffList::SetDiff(int nDiff, const DIFFRANGE & di)
 }
 
 /**
- * @brief Checks if line is before, inside or after diff
- * @param [in] nLine Linenumber to text buffer (not "real" number)
- * @param [in] nDiff Index to diff table
- * @return -1 if line is before diff, 0 if line is in diff and
- * 1 if line is after diff.
- */
-int DiffList::LineRelDiff(UINT nLine, int nDiff) const
-{
-	const DIFFRANGE *dfi = DiffRangeAt(nDiff);
-	if (nLine < dfi->dbegin0)
-		return -1;
-	else if (nLine > dfi->dend0)
-		return 1;
-	else
-		return 0;
-}
-
-/**
  * @brief Checks if line is inside given diff
  * @param [in] nLine Linenumber to text buffer (not "real" number)
  * @param [in] nDiff Index to diff table
@@ -218,11 +200,8 @@ int DiffList::LineRelDiff(UINT nLine, int nDiff) const
  */
 bool DiffList::LineInDiff(UINT nLine, int nDiff) const
 {
-	const DIFFRANGE *dfi = DiffRangeAt(nDiff);
-	if (nLine >= dfi->dbegin0 && nLine <= dfi->dend0)
-		return true;
-	else
-		return false;
+	const DIFFRANGE *const dfi = DiffRangeAt(nDiff);
+	return nLine >= dfi->dbegin0 && nLine <= dfi->dend0;
 }
 
 /**
@@ -232,41 +211,19 @@ bool DiffList::LineInDiff(UINT nLine, int nDiff) const
  */
 int DiffList::LineToDiff(UINT nLine) const
 {
-	const int nDiffCount = GetSize();
-	if (nDiffCount == 0)
-		return -1;
-
-	// First check line is not before first or after last diff
-	if (nLine < DiffRangeAt(0)->dbegin0)
-		return -1;
-	if (nLine > DiffRangeAt(nDiffCount - 1)->dend0)
-		return -1;
-
 	// Use binary search to search for a diff.
 	int left = 0; // Left limit
-	int middle = 0; // Compared item
-	int right = nDiffCount - 1; // Right limit
-
+	int right = GetSize() - 1; // Right limit
 	while (left <= right)
 	{
-		middle = (left + right) / 2;
-		int result = LineRelDiff(nLine, middle);
-		switch (result)
-		{
-		case -1: // Line is before diff in file
+		int middle = (left + right) / 2;
+		const DIFFRANGE *const dfi = DiffRangeAt(middle);
+		if (nLine < dfi->dbegin0) // Line is before diff in file
 			right = middle - 1;
-			break;
-		case 0: // Line is in diff
-			return middle;
-			break;
-		case 1: // Line is after diff in file
+		else if (nLine > dfi->dend0) // Line is after diff in file
 			left = middle + 1;
-			break;
-		default:
-			_RPTF1(_CRT_ERROR, "Invalid return value %d from LineRelDiff(): "
-				"-1, 0 or 1 expected!", result); 
-			break;
-		}
+		else // Line is in diff
+			return middle;
 	}
 	return -1;
 }
