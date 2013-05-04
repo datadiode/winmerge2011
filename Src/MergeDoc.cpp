@@ -872,8 +872,8 @@ bool CChildFrame::TrySaveAs(String &strPath, int &nSaveResult, String & sError,
 	// So don't ask about saving in that case.
 	if (nSaveResult != SAVE_NO_FILENAME)
 	{
-		response = LanguageSelect.FormatMessage(
-			IDS_FILESAVE_FAILED, strPath.c_str(), sError.c_str()
+		response = LanguageSelect.FormatMessage(IDS_FILESAVE_FAILED,
+			paths_UndoMagic(wcsdupa(strPath.c_str())), sError.c_str()
 		).MsgBox(MB_OKCANCEL | MB_ICONWARNING);
 	}
 

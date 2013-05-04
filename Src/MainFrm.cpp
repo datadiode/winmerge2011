@@ -1705,7 +1705,8 @@ bool CMainFrame::CreateBackup(bool bFolder, LPCTSTR pszPath)
 
 	if (!CopyFile(pszPath, bakPath.c_str(), FALSE))
 	{
-		int response = LanguageSelect.MsgBox(IDS_BACKUP_FAILED_PROMPT, pszPath,
+		int response = LanguageSelect.MsgBox(IDS_BACKUP_FAILED_PROMPT,
+			paths_UndoMagic(wcsdupa(pszPath)),
 			MB_YESNO | MB_ICONWARNING | MB_DONT_ASK_AGAIN);
 		if (response != IDYES)
 			return false;
