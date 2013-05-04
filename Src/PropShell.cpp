@@ -11,7 +11,8 @@
 #include "OptionsPanel.h"
 #include "resource.h"
 #include "PropShell.h"
-#include "RegKey.h"
+#include "SettingStore.h"
+#include "Common/RegKey.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -24,12 +25,8 @@ static char THIS_FILE[] = __FILE__;
 #define CONTEXT_F_ADVANCED 0x02
 #define CONTEXT_F_SUBFOLDERS 0x04
 
- // registry dir to WinMerge
-static const TCHAR f_RegDir[] = _T("Software\\Thingamahoochie\\WinMerge");
-
 // registry values
 static const TCHAR f_RegValueEnabled[] = _T("ContextMenuEnabled");
-
 
 PropShell::PropShell() 
 : OptionsPanel(IDD_PROPPAGE_SHELL)
@@ -101,64 +98,44 @@ void PropShell::WriteOptions()
 /// Get registry values for ShellExtension
 void PropShell::GetContextRegValues()
 {
-	CRegKeyEx reg;
-	LONG retVal = reg.Open(HKEY_CURRENT_USER, f_RegDir);
-	if (retVal != ERROR_SUCCESS)
+	if (CRegKeyEx reg = SettingStore.GetAppRegistryKey())
 	{
-		LogErrorString(
-			_T("Failed to open registry key HKCU/%s:\n\t%d : %s"),
-			f_RegDir, retVal, GetSysError(retVal).c_str());
-		return;
+		// Read bitmask for shell extension settings
+		DWORD dwContextEnabled = reg.ReadDword(f_RegValueEnabled, 0);
+
+		if (dwContextEnabled & CONTEXT_F_ENABLED)
+			m_bContextAdded = TRUE;
+
+		if (dwContextEnabled & CONTEXT_F_ADVANCED)
+			m_bContextAdvanced = TRUE;
+
+		if (dwContextEnabled & CONTEXT_F_SUBFOLDERS)
+			m_bContextSubfolders = TRUE;
 	}
-
-	// Read bitmask for shell extension settings
-	DWORD dwContextEnabled = reg.ReadDword(f_RegValueEnabled, 0);
-
-	if (dwContextEnabled & CONTEXT_F_ENABLED)
-		m_bContextAdded = TRUE;
-
-	if (dwContextEnabled & CONTEXT_F_ADVANCED)
-		m_bContextAdvanced = TRUE;
-
-	if (dwContextEnabled & CONTEXT_F_SUBFOLDERS)
-		m_bContextSubfolders = TRUE;
 }
 
 /// Saves given path to registry for ShellExtension, and Context Menu settings
 void PropShell::SaveMergePath()
 {
-	CRegKeyEx reg;
-	LONG retVal = reg.Open(HKEY_CURRENT_USER, f_RegDir);
-	if (retVal != ERROR_SUCCESS)
+	if (CRegKeyEx reg = SettingStore.GetAppRegistryKey())
 	{
-		LogErrorString(
-			_T("Failed to open registry key HKCU/%s:\n\t%d : %s"),
-			f_RegDir, retVal, GetSysError(retVal).c_str());
-		return;
-	}
+		// Determine bitmask for shell extension
+		DWORD dwContextEnabled = reg.ReadDword(f_RegValueEnabled, 0);
+		if (m_bContextAdded)
+			dwContextEnabled |= CONTEXT_F_ENABLED;
+		else
+			dwContextEnabled &= ~CONTEXT_F_ENABLED;
 
-	// Determine bitmask for shell extension
-	DWORD dwContextEnabled = reg.ReadDword(f_RegValueEnabled, 0);
-	if (m_bContextAdded)
-		dwContextEnabled |= CONTEXT_F_ENABLED;
-	else
-		dwContextEnabled &= ~CONTEXT_F_ENABLED;
+		if (m_bContextAdvanced)
+			dwContextEnabled |= CONTEXT_F_ADVANCED;
+		else
+			dwContextEnabled &= ~CONTEXT_F_ADVANCED;
 
-	if (m_bContextAdvanced)
-		dwContextEnabled |= CONTEXT_F_ADVANCED;
-	else
-		dwContextEnabled &= ~CONTEXT_F_ADVANCED;
+		if (m_bContextSubfolders)
+			dwContextEnabled |= CONTEXT_F_SUBFOLDERS;
+		else
+			dwContextEnabled &= ~CONTEXT_F_SUBFOLDERS;
 
-	if (m_bContextSubfolders)
-		dwContextEnabled |= CONTEXT_F_SUBFOLDERS;
-	else
-		dwContextEnabled &= ~CONTEXT_F_SUBFOLDERS;
-
-	retVal = reg.WriteDword(f_RegValueEnabled, dwContextEnabled);
-	if (retVal != ERROR_SUCCESS)
-	{
-		LogErrorString(
-			_T("Failed to set registry value %s to %d:\n\t%d : %s"),
-			f_RegValueEnabled, dwContextEnabled, retVal, GetSysError(retVal).c_str());
+		reg.WriteDword(f_RegValueEnabled, dwContextEnabled);
 	}
 }
