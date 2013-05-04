@@ -49,7 +49,7 @@ static bool CheckPathsExist(LPCTSTR path, int allow)
 	if (allow != 0 && (allow & paths_DoesPathExist(path)) == 0)
 	{
 		LanguageSelect.MsgBox(IDS_DIRCMP_NOTSYNC,
-			paths_UndoMagic(&String(path).front()), MB_ICONWARNING);
+			paths_UndoMagic(wcsdupa(path)), MB_ICONWARNING);
 		return false;
 	}
 	return true;
