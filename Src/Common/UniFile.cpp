@@ -664,20 +664,23 @@ bool UniStdioFile::ReadString(String & line, String & eol, bool * lossy)
 /** @brief Write BOM (byte order mark) if Unicode file */
 void UniStdioFile::WriteBom()
 {
-	if (m_unicoding == UCS2LE)
+	if (m_bom)
 	{
-		unsigned char bom[] = "\xFF\xFE";
-		m_pstm->Write(bom, 2, NULL);
-	}
-	else if (m_unicoding == UCS2BE)
-	{
-		unsigned char bom[] = "\xFE\xFF";
-		m_pstm->Write(bom, 2, NULL);
-	}
-	else if (m_unicoding == UTF8 && m_bom)
-	{
-		unsigned char bom[] = "\xEF\xBB\xBF";
-		m_pstm->Write(bom, 3, NULL);
+		if (m_unicoding == UCS2LE)
+		{
+			static const unsigned char bom[] = { '\xFF', '\xFE' };
+			m_pstm->Write(bom, sizeof bom, NULL);
+		}
+		else if (m_unicoding == UCS2BE)
+		{
+			static const unsigned char bom[] = { '\xFE', '\xFF' };
+			m_pstm->Write(bom, sizeof bom, NULL);
+		}
+		else if (m_unicoding == UTF8)
+		{
+			static const unsigned char bom[] = { '\xEF', '\xBB', '\xBF' };
+			m_pstm->Write(bom, sizeof bom, NULL);
+		}
 	}
 }
 
