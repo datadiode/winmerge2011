@@ -174,15 +174,15 @@ void MergeCmdLineInfo::ParseClearCaseCmdLine(LPCTSTR q, LPCTSTR basedesc)
 			m_Files.push_back(param);
 			String folder = paths_GetParentPath(param.c_str());
 			DWORD attr = GetFileAttributes(folder.c_str());
-			LPCTSTR path = paths_UndoMagic(&param.front());
+			paths_UndoMagic(param);
 			if (ord == 0)
 			{
-				if ((!m_sLeftDesc.empty() && m_sLeftDesc != path) || (attr & FILE_ATTRIBUTE_READONLY))
+				if ((!m_sLeftDesc.empty() && m_sLeftDesc != param) || (attr & FILE_ATTRIBUTE_READONLY))
 					m_dwLeftFlags |= FFILEOPEN_READONLY;
 			}
 			else if (ord == 1)
 			{
-				if ((!m_sRightDesc.empty() && m_sRightDesc != path) || (attr & FILE_ATTRIBUTE_READONLY))
+				if ((!m_sRightDesc.empty() && m_sRightDesc != param) || (attr & FILE_ATTRIBUTE_READONLY))
 					m_dwRightFlags |= FFILEOPEN_READONLY;
 			}
 		}
@@ -319,8 +319,8 @@ void MergeCmdLineInfo::ParseWinMergeCmdLine(LPCTSTR q)
 		else if (param == _T("noprefs"))
 		{
 			// -noprefs means do not load or remember options (preferences)
-			// Load all default settings.
-			IOptionDef::ResetOptions();
+			// Load all default settings, but don't save them in registry.
+			IOptionDef::InitOptions(NULL, NULL);
 		}
 		else if (param == _T("minimize"))
 		{

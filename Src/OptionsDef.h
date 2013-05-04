@@ -26,10 +26,8 @@ public:
 	void LoadOption(HKEY);
 	void SaveOption(HKEY);
 	void SaveOption();
-	// ResetOptions() - just Reset()
-	static void ResetOptions();
-	// InitOptions() - first Reset(), then LoadOption()
-	static void InitOptions(HKEY);
+	// InitOptions() - first Reset(), then LoadOption() and / or SaveOption()
+	static void InitOptions(HKEY loadkey, HKEY savekey);
 	static int ExportOptions(LPCTSTR filename);
 	static int ImportOptions(LPCTSTR filename);
 protected:

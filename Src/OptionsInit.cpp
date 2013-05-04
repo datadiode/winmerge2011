@@ -7,10 +7,9 @@
 // $Id$
 
 #include "StdAfx.h"
-#include "Merge.h"
-#include "MainFrm.h"
-
+#include "OptionsDef.h"
 #include "SettingStore.h"
+#include "Common/RegKey.h"
 
 IOptionDef *IOptionDef::First = NULL;
 
@@ -217,37 +216,16 @@ void IOptionDef::Parse(LPCTSTR value)
 	}
 }
 
-void IOptionDef::ResetOptions()
+void IOptionDef::InitOptions(HKEY loadkey, HKEY savekey)
 {
 	IOptionDef *p = First;
 	while (p)
 	{
 		p->Reset();
+		if (loadkey)
+			p->LoadOption(loadkey);
+		if (savekey)
+			p->SaveOption(savekey);
 		p = static_cast<IOptionDef *>(p->Next);
 	}
-}
-
-void IOptionDef::InitOptions(HKEY rk)
-{
-	IOptionDef *p = First;
-	while (p)
-	{
-		p->Reset();
-		p->LoadOption(rk);
-		p = static_cast<IOptionDef *>(p->Next);
-	}
-}
-
-/**
- * @brief Initialise options and set default values.
- *
- * @note Remember default values are what users see first time
- * using WinMerge and many users never change them. So pick
- * default values carefully!
- */
-void CMergeApp::ResetOptions()
-{
-	// Initialize options from registry
-	CRegKeyEx rk = SettingStore.GetAppRegistryKey();
-	IOptionDef::InitOptions(rk);
 }

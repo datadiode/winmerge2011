@@ -266,7 +266,8 @@ bool CMergeApp::InitInstance()
 	bool bContinue = false;
 	try
 	{
-		ResetOptions(); // Implementation in OptionsInit.cpp
+		CRegKeyEx loadkey = SettingStore.GetAppRegistryKey();
+		IOptionDef::InitOptions(loadkey, NULL);
 
 		// Cleanup left over tempfiles from previous instances.
 		// Normally this should not neet to do anything - but if for some reason

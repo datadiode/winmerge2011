@@ -68,8 +68,6 @@ public:
 	static String GetDefaultEditor();
 	static String GetDefaultSupplementFolder();
 
-	void ResetOptions();
-
 	bool PreTranslateMessage(MSG *);
 
 	bool InitInstance();
