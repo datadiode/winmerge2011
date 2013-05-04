@@ -247,12 +247,12 @@ protected:
 
     POINT ClientToText(const POINT &);
     POINT TextToClient(const POINT &);
-    void InvalidateLines (int nLine1, int nLine2, BOOL bInvalidateMargin = FALSE);
-    int CalculateActualOffset (int nLineIndex, int nCharIndex, BOOL bAccumulate = FALSE);
+    void InvalidateLines(int nLine1, int nLine2, BOOL bInvalidateMargin = FALSE);
+    int CalculateActualOffset(int nLineIndex, int nCharIndex, BOOL bAccumulate = FALSE);
 
-    BOOL IsInsideSelection (const POINT & ptTextPos);
-    void GetSelection (POINT & ptStart, POINT & ptEnd);
-    void GetFullySelectedLines(int & firstLine, int & lastLine);
+    BOOL IsInsideSelection(const POINT &ptTextPos);
+    void GetSelection(POINT &ptStart, POINT &ptEnd);
+    void GetFullySelectedLines(int &firstLine, int &lastLine);
 
     int m_nTopLine, m_nOffsetChar;
     //BEGIN SW
@@ -262,7 +262,7 @@ protected:
     int m_nTopSubLine;
     //END SW
 
-    int GetLineHeight ();
+    int GetLineHeight();
 	//BEGIN SW
 	/**
 	Returns the number of sublines the given line contains of.
@@ -272,10 +272,10 @@ protected:
 
 	@return Number of sublines the given line contains of
 	*/
-	int GetSubLines( int nLineIndex );
+	int GetSubLines(int nLineIndex);
 
-	virtual int GetEmptySubLines( int nLineIndex );
-	BOOL IsEmptySubLineIndex( int nSubLineIndex );
+	virtual int GetEmptySubLines(int nLineIndex);
+	BOOL IsEmptySubLineIndex(int nSubLineIndex);
 
 	/**
 	Converts the given character position for the given line into a point.
@@ -717,19 +717,20 @@ public :
 
     //  Attributes
     const POINT &GetCursorPos() const;
-    void SetCursorPos(const POINT & ptCursorPos);
+    void SetCursorPos(const POINT &ptCursorPos);
     void ShowCursor();
     void HideCursor();
-    void SetNewAnchor(const POINT & ptNewAnchor) { SetAnchor(ptNewAnchor); }
 
     //  Operations
-    virtual void EnsureVisible(POINT pt);
+    void EnsureVisible(POINT pt);
     void EnsureVisible(POINT ptStart, POINT ptEnd);
 
     //  Text search helpers
-    BOOL FindText (LPCTSTR pszText, const POINT & ptStartPos, DWORD dwFlags, BOOL bWrapSearch, POINT * pptFoundPos);
-    BOOL FindTextInBlock (LPCTSTR pszText, const POINT & ptStartPos, const POINT & ptBlockBegin, const POINT & ptBlockEnd,
-                          DWORD dwFlags, BOOL bWrapSearch, POINT * pptFoundPos);
+    BOOL FindText(LPCTSTR pszText, const POINT &ptStartPos,
+        DWORD dwFlags, BOOL bWrapSearch, POINT *pptFoundPos);
+    BOOL FindTextInBlock(LPCTSTR pszText, const POINT &ptStartPos,
+        const POINT &ptBlockBegin, const POINT &ptBlockEnd,
+        DWORD dwFlags, BOOL bWrapSearch, POINT *pptFoundPos);
     BOOL HighlightText(const POINT & ptStartPos, int nLength, BOOL bCursorToLeft = FALSE);
 
     // IME (input method editor)
@@ -737,7 +738,7 @@ public :
     void UpdateCompositionWindowFont();
 
     //  Overridable: an opportunity for Auto-Indent, Smart-Indent etc.
-    virtual void OnEditOperation (int nAction, LPCTSTR pszText);
+    virtual void OnEditOperation(int nAction, LPCTSTR pszText);
 
 public:
     CCrystalTextView(size_t);

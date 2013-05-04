@@ -40,7 +40,7 @@ static void HighlightDiffRect(CCrystalTextView * pView, const RECT &rc)
 		POINT ptBottomRight = { rc.right, rc.bottom };
 		pView->SetSelection(ptTopLeft, ptBottomRight);
 		pView->SetCursorPos(ptBottomRight);
-		pView->SetNewAnchor(ptTopLeft);
+		pView->SetAnchor(ptTopLeft);
 		// try to ensure that selected area is visible
 		pView->EnsureVisible(ptTopLeft, ptBottomRight);
 	}

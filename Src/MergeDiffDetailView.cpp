@@ -93,21 +93,13 @@ void CMergeDiffDetailView::SetDisplayHeight(int h)
 }
 
 /// virtual, ensure we remain in diff
-void CMergeDiffDetailView::EnsureVisible(POINT pt)
-{
-	if (EnsureInDiff(pt))
-		SetCursorPos(pt);
-	CCrystalTextView::EnsureVisible(pt);
-}
-
-
-/// virtual, ensure we remain in diff
 void CMergeDiffDetailView::SetSelection(const POINT &ptStart, const POINT &ptEnd)
 {
 	POINT ptStartNew = ptStart;
 	EnsureInDiff(ptStartNew);
 	POINT ptEndNew = ptEnd;
 	EnsureInDiff(ptEndNew);
+	EnsureInDiff(m_ptCursorPos);
 	CCrystalTextView::SetSelection(ptStartNew, ptEndNew);
 }
 
@@ -216,7 +208,7 @@ void CMergeDiffDetailView::GetLineColors(int nLineIndex, COLORREF &crBkgnd, COLO
 	}
 }
 
-void CMergeDiffDetailView::OnDisplayDiff(int nDiff /*=0*/)
+void CMergeDiffDetailView::OnDisplayDiff(int nDiff)
 {
 	int newlineBegin, newlineEnd;
 	if (nDiff < 0 || nDiff >= m_pDocument->m_diffList.GetSize())
@@ -236,6 +228,7 @@ void CMergeDiffDetailView::OnDisplayDiff(int nDiff /*=0*/)
 
 	if (newlineBegin == m_lineBegin && newlineEnd == m_lineEnd)
 		return;
+
 	m_lineBegin = newlineBegin;
 	m_lineEnd = newlineEnd;
 	m_diffLength = m_lineEnd - m_lineBegin + 1;
@@ -251,7 +244,7 @@ void CMergeDiffDetailView::OnDisplayDiff(int nDiff /*=0*/)
  *
  * @return Tells if the point has been changed
  */
-BOOL CMergeDiffDetailView::EnsureInDiff(POINT & pt)
+BOOL CMergeDiffDetailView::EnsureInDiff(POINT &pt)
 {
 	// first get the degenerate case out of the way
 	// no diff ?
