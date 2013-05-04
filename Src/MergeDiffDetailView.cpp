@@ -54,7 +54,7 @@ LRESULT CMergeDiffDetailView::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam
 	switch (uMsg)
 	{
 	case WM_SIZE:
-		SetDisplayHeight(SHORT LOWORD(lParam));
+		SetDisplayHeight(SHORT HIWORD(lParam));
 		break;
 	case WM_CONTEXTMENU:
 		OnContextMenu(lParam);
