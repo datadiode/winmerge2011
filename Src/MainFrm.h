@@ -83,7 +83,6 @@ public:
 	void InitialActivate(int nCmdShow);
 	void EnableModeless(BOOL bEnable);
 	void SetBitmaps(HMENU);
-	int SyncFileToVCS(LPCTSTR pszDest, BOOL &bApplyToAll, String *psError);
 	bool DoFileOpen(
 		FileLocation &filelocLeft,
 		FileLocation &filelocRight,
@@ -111,8 +110,8 @@ public:
 		const FileLocation &,
 		BOOL bLeftRO, BOOL bRightRO);
 	void UpdateResources();
-	static bool CreateBackup(BOOL bFolder, LPCTSTR pszPath);
-	int HandleReadonlySave(String &strSavePath, BOOL bMultiFile, BOOL &bApplyToAll);
+	static bool CreateBackup(bool bFolder, LPCTSTR pszPath);
+	int HandleReadonlySave(String &strSavePath, int choice = 0);
 	void SetStatus(UINT);
 	void SetStatus(LPCTSTR);
 	void UpdateIndicators();
@@ -146,7 +145,7 @@ protected:
 	virtual ~CMainFrame();
 // Implementation in SourceControl.cpp
 	void InitializeSourceControlMembers();
-	BOOL SaveToVersionControl(LPCTSTR pszSavePath);
+	int SaveToVersionControl(LPCTSTR pszSavePath);
 // End SourceControl.cpp
 
 

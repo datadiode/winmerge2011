@@ -1223,80 +1223,42 @@ void CMainFrame::OnHelpGnulicense()
  * @sa CMainFrame::SyncFileToVCS()
  * @sa CChildFrame::DoSave()
  */
-int CMainFrame::HandleReadonlySave(String &strSavePath, BOOL bMultiFile, BOOL &bApplyToAll)
+int CMainFrame::HandleReadonlySave(String &strSavePath, int choice)
 {
-	UINT userChoice = 0;
-	int nRetVal = IDOK;
-	String s;
 	DWORD attr = GetFileAttributes(strSavePath.c_str());
-	if ((attr != INVALID_FILE_ATTRIBUTES) && ((attr & FILE_ATTRIBUTE_READONLY) != 0))
-	{
-		// Version control system used?
-		// Checkout file from VCS and modify, don't ask about overwriting
-		// RO files etc.
-		int nVerSys = COptionsMgr::Get(OPT_VCS_SYSTEM);
-		if (nVerSys != VCS_NONE)
-		{
-			BOOL bRetVal = SaveToVersionControl(strSavePath.c_str());
-			if (bRetVal)
-				return IDYES;
-			else
-				return IDCANCEL;
-		}
-		
-		// Don't ask again if its already asked
-		if (bApplyToAll)
-			userChoice = IDYES;
-		else
-		{
-			String strDisplayPath = strSavePath;
-			LPCTSTR pszDisplayPath = paths_UndoMagic(&strDisplayPath.front());
-			// Prompt for user choice
-			if (bMultiFile)
-			{
-				// Multiple files or folder
-				userChoice = LanguageSelect.FormatMessage(
-					IDS_SAVEREADONLY_MULTI, pszDisplayPath
-				).MsgBox(MB_YESNOCANCEL | MB_ICONWARNING | MB_DEFBUTTON3 | MB_DONT_ASK_AGAIN | MB_YES_TO_ALL);
-			}
-			else
-			{
-				// Single file
-				userChoice = LanguageSelect.FormatMessage(
-					IDS_SAVEREADONLY_FMT, pszDisplayPath
-				).MsgBox(MB_YESNOCANCEL | MB_ICONWARNING | MB_DEFBUTTON2 | MB_DONT_ASK_AGAIN);
-			}
-		}
-		switch (userChoice)
-		{
-		// Overwrite read-only file
-		case IDYESTOALL:
-			bApplyToAll = TRUE;  // Don't ask again (no break here)
-		case IDYES:
-			SetFileAttributes(strSavePath.c_str(), attr & ~FILE_ATTRIBUTE_READONLY);
-			nRetVal = IDYES;
-			break;
-		
-		// Save to new filename (single) /skip this item (multiple)
-		case IDNO:
-			if (!bMultiFile)
-			{
-				if (SelectFile(m_hWnd, strSavePath, IDS_SAVE_AS_TITLE, NULL, FALSE))
-					nRetVal = IDNO;
-				else
-					nRetVal = IDCANCEL;
-			}
-			else
-				nRetVal = IDNO;
-			break;
+	if ((attr & (FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_DIRECTORY)) != FILE_ATTRIBUTE_READONLY)
+		return IDOK;
 
-		// Cancel saving
-		case IDCANCEL:
-			nRetVal = IDCANCEL;
-			break;
-		}
+	// Version control system used?
+	// Checkout file from VCS and modify, don't ask about overwriting
+	// RO files etc.
+	if (int tmp = SaveToVersionControl(strSavePath.c_str()))
+		return tmp;
+
+	LPCTSTR pszDisplayPath = paths_UndoMagic(wcsdupa(strSavePath.c_str()));
+	// Prompt for user choice unless user chose IDYESTOALL when prompted before
+	if (choice == 0)
+	{
+		// Single file
+		choice = LanguageSelect.FormatMessage(
+			IDS_SAVEREADONLY_FMT, pszDisplayPath
+		).MsgBox(MB_YESNOCANCEL | MB_ICONWARNING | MB_DEFBUTTON2 | MB_DONT_ASK_AGAIN);
+		if (choice == IDNO && !SelectFile(m_hWnd, strSavePath, IDS_SAVE_AS_TITLE, NULL, FALSE))
+			choice = IDCANCEL;
 	}
-	return nRetVal;
+	else if (choice != IDYESTOALL) // Don't ask again
+	{
+		// Multiple files or folder
+		choice = LanguageSelect.FormatMessage(
+			IDS_SAVEREADONLY_MULTI, pszDisplayPath
+		).MsgBox(MB_YESNOCANCEL | MB_ICONWARNING | MB_DEFBUTTON3 | MB_DONT_ASK_AGAIN | MB_YES_TO_ALL);
+	}
+	if (choice == IDYES || choice == IDYESTOALL)
+	{
+		// Overwrite read-only file
+		SetFileAttributes(strSavePath.c_str(), attr & ~FILE_ATTRIBUTE_READONLY);
+	}
+	return choice;
 }
 
 /// Wrapper to set the global option 'm_bAllowMixedEol'
@@ -1684,7 +1646,7 @@ bool CMainFrame::DoFileOpen(
  * @param [in] pszPath Full path to file to backup.
  * @return TRUE if backup succeeds, or isn't just done.
  */
-bool CMainFrame::CreateBackup(BOOL bFolder, LPCTSTR pszPath)
+bool CMainFrame::CreateBackup(bool bFolder, LPCTSTR pszPath)
 {
 	// If user doesn't want backups in given context, return success
 	// so operations don't abort.
@@ -1749,21 +1711,6 @@ bool CMainFrame::CreateBackup(BOOL bFolder, LPCTSTR pszPath)
 			return false;
 	}
 	return true;
-}
-
-/**
- * @brief Sync file to Version Control System
- * @param pszDest [in] Where to copy (incl. filename)
- * @param bApplyToAll [in,out] Apply user selection to all items
- * @param psError [out] Error string that can be shown to user in caller func
- * @return User selection or -1 if error happened
- * @sa CMainFrame::HandleReadonlySave()
- * @sa CDirView::PerformActionList()
- */
-int CMainFrame::SyncFileToVCS(LPCTSTR pszDest, BOOL &bApplyToAll, String *psError)
-{
-	String strSavePath(pszDest);
-	return HandleReadonlySave(strSavePath, TRUE, bApplyToAll);
 }
 
 void CMainFrame::UpdateDirViewFont()
@@ -2049,8 +1996,7 @@ void CMainFrame::addToMru(LPCTSTR szItem, LPCTSTR szRegSubKey, UINT nMaxItems)
 		if (n > nMaxItems)
 			n = nMaxItems;
 		TCHAR *const s = reinterpret_cast<TCHAR *>(_alloca(bufsize));
-		String strItem = szItem;
-		szItem = paths_UndoMagic(&strItem.front());
+		szItem = paths_UndoMagic(wcsdupa(szItem));
 		UINT i = n;
 		// if item is already in MRU, exclude subsequent items from rotation
 		while (i != 0)
@@ -3573,7 +3519,8 @@ void CMainFrame::OnDebugResetOptions()
 		MB_YESNO | MB_DEFBUTTON2 | MB_ICONWARNING);
 	if (response == IDYES)
 	{
-		theApp.ResetOptions();
+		CRegKeyEx savekey = SettingStore.GetAppRegistryKey();
+		IOptionDef::InitOptions(NULL, savekey);
 	}
 }
 

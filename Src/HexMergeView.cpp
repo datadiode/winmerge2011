@@ -293,19 +293,18 @@ HRESULT CHexMergeView::SaveFile(LPCTSTR path)
 	if (IsFileChangedOnDisk(path))
 	{
 		int response = LanguageSelect.FormatMessage(
-			IDS_FILECHANGED_ONDISK, paths_UndoMagic(&String(path).front())
+			IDS_FILECHANGED_ONDISK, paths_UndoMagic(wcsdupa(path))
 		).MsgBox(MB_ICONWARNING | MB_YESNO);
 		if (response == IDNO)
 			return S_OK;
 	}
 	// Ask user what to do about FILE_ATTRIBUTE_READONLY
 	String strPath = path;
-	BOOL bApplyToAll = FALSE;
-	if (theApp.m_pMainWnd->HandleReadonlySave(strPath, FALSE, bApplyToAll) == IDCANCEL)
+	if (theApp.m_pMainWnd->HandleReadonlySave(strPath) == IDCANCEL)
 		return S_OK;
 	path = strPath.c_str();
 	// Take a chance to create a backup
-	if (!theApp.m_pMainWnd->CreateBackup(FALSE, path))
+	if (!theApp.m_pMainWnd->CreateBackup(false, path))
 		return S_OK;
 	// Write data to an intermediate file
 	String sIntermediateFilename = env_GetTempFileName(env_GetTempPath(), _T("MRG_"));

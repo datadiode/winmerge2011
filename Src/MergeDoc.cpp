@@ -366,7 +366,7 @@ int CChildFrame::Rescan(bool &bIdentical, bool bForced)
 		if (fileChanged == FileRemoved)
 		{
 			LanguageSelect.FormatMessage(
-				IDS_FILE_DISAPPEARED, paths_UndoMagic(&String(path).front())
+				IDS_FILE_DISAPPEARED, paths_UndoMagic(wcsdupa(path))
 			).MsgBox(MB_ICONWARNING);
 			if (!DoSaveAs(nSide))
 				return RESCAN_FILE_ERR;
@@ -374,7 +374,7 @@ int CChildFrame::Rescan(bool &bIdentical, bool bForced)
 		else if (fileChanged == FileChanged)
 		{
 			int response = LanguageSelect.FormatMessage(
-				IDS_FILECHANGED_RESCAN, paths_UndoMagic(&String(path).front())
+				IDS_FILECHANGED_RESCAN, paths_UndoMagic(wcsdupa(path))
 			).MsgBox(MB_YESNO | MB_ICONWARNING);
 			if (response == IDYES)
 			{
@@ -964,7 +964,7 @@ bool CChildFrame::DoSave(bool &bSaveSuccess, int nBuffer)
 	if (fileChanged == FileChanged)
 	{
 		int response = LanguageSelect.FormatMessage(
-			IDS_FILECHANGED_ONDISK, paths_UndoMagic(&String(szPath).front())
+			IDS_FILECHANGED_ONDISK, paths_UndoMagic(wcsdupa(szPath))
 		).MsgBox(MB_ICONWARNING | MB_YESNO);
 		if (response == IDNO)
 		{
@@ -992,12 +992,10 @@ bool CChildFrame::DoSave(bool &bSaveSuccess, int nBuffer)
 		}
 	}
 
-	BOOL bApplyToAll = FALSE;
-	int nRetVal = m_pMDIFrame->HandleReadonlySave(strSavePath, FALSE, bApplyToAll);
-	if (nRetVal == IDCANCEL)
+	if (m_pMDIFrame->HandleReadonlySave(strSavePath) == IDCANCEL)
 		return false;
 
-	if (!m_pMDIFrame->CreateBackup(FALSE, strSavePath.c_str()))
+	if (!m_pMDIFrame->CreateBackup(false, strSavePath.c_str()))
 		return false;
 
 	// FALSE as long as the user is not satisfied
@@ -1361,8 +1359,6 @@ void CChildFrame::OnUpdateStatusNum()
 	if (m_pMDIFrame->GetActiveDocFrame() != this)
 		return;
 
-	TCHAR sIdx[32];
-	TCHAR sCnt[32];
 	String s;
 	const int nDiffs = m_diffList.GetSignificantDiffs();
 	
@@ -1375,7 +1371,7 @@ void CChildFrame::OnUpdateStatusNum()
 	else if (GetCurrentDiff() < 0)
 	{
 		s = LanguageSelect.LoadString(nDiffs == 1 ? IDS_1_DIFF_FOUND : IDS_NO_DIFF_SEL_FMT);
-		string_replace(s, _T("%1"), _itot(nDiffs, sCnt, 10));
+		string_replace(s, _T("%1"), NumToStr(nDiffs, 10).c_str());
 	}
 	
 	// There are differences and diff selected
@@ -1384,8 +1380,8 @@ void CChildFrame::OnUpdateStatusNum()
 	{
 		s = LanguageSelect.LoadString(IDS_DIFF_NUMBER_STATUS_FMT);
 		const int signInd = m_diffList.GetSignificantIndex(GetCurrentDiff());
-		string_replace(s, _T("%1"), _itot(signInd + 1, sIdx, 10));
-		string_replace(s, _T("%2"), _itot(nDiffs, sCnt, 10));
+		string_replace(s, _T("%1"), NumToStr(signInd + 1, 10).c_str());
+		string_replace(s, _T("%2"), NumToStr(nDiffs, 10).c_str());
 	}
 	m_pMDIFrame->GetStatusBar()->SetPartText(2, s.c_str());
 }
@@ -1774,10 +1770,10 @@ FileLoadResult::FILES_RESULT CChildFrame::LoadFile(int nBuffer, bool &readOnly, 
 	if (FileLoadResult::IsError(retVal))
 	{
 		// Error from Unifile/system
-		String path = fileinfo.filepath;
 		LanguageSelect.FormatMessage(
 			sOpenError.empty() ? IDS_ERROR_FILE_NOT_FOUND : IDS_ERROR_FILEOPEN,
-			paths_UndoMagic(&path.front()), sOpenError.c_str()
+			paths_UndoMagic(wcsdupa(fileinfo.filepath.c_str())),
+			sOpenError.c_str()
 		).MsgBox(MB_ICONSTOP);
 	}
 	return retVal;

@@ -44,19 +44,17 @@ void CMainFrame::InitializeSourceControlMembers()
 * @return Tells if caller can continue (no errors happened)
 * @sa CheckSavePath()
 */
-BOOL CMainFrame::SaveToVersionControl(LPCTSTR pszSavePath)
+int CMainFrame::SaveToVersionControl(LPCTSTR pszSavePath)
 {
-	String strSavePath = pszSavePath;
-	pszSavePath = paths_UndoMagic(&strSavePath.front());
+	pszSavePath = paths_UndoMagic(wcsdupa(pszSavePath));
 	String path = paths_GetParentPath(pszSavePath);
 	String name = PathFindFileName(pszSavePath);
-	int userChoice = IDOK;
 	int nVerSys = COptionsMgr::Get(OPT_VCS_SYSTEM);
 	switch (nVerSys)
 	{
 	case VCS_NONE:	//no versioning system
 		// Already handled in CheckSavePath()
-		break;
+		return 0;
 	case VCS_VSS4:	// Visual Source Safe
 		{
 			// Prompt for user choice
@@ -70,12 +68,12 @@ BOOL CMainFrame::SaveToVersionControl(LPCTSTR pszSavePath)
 			if (!m_CheckOutMulti)
 			{
 				dlg.m_bMultiCheckouts = FALSE;
-				userChoice = LanguageSelect.DoModal(dlg);
+				int choice = LanguageSelect.DoModal(dlg);
 				m_CheckOutMulti = dlg.m_bMultiCheckouts;
+				if (choice != IDOK)
+					return IDCANCEL;
 			}
 			// process versioning system specific action
-			if (userChoice != IDOK)
-				return FALSE;
 			WaitStatusCursor waitstatus(IDS_VSS_CHECKOUT_STATUS);
 			m_vssHelper.SetProjectBase(dlg.m_strProject.c_str());
 			SettingStore.WriteProfileString(_T("Settings"), _T("VssProject"), m_vssHelper.GetProjectBase().c_str());
@@ -85,7 +83,7 @@ BOOL CMainFrame::SaveToVersionControl(LPCTSTR pszSavePath)
 			{
 				LanguageSelect.MsgBox(code != STILL_ACTIVE ?
 					IDS_VSSERROR : IDS_VSS_RUN_ERROR, MB_ICONSTOP);
-				return FALSE;
+				return IDCANCEL;
 			}
 		}
 		break;
@@ -105,12 +103,12 @@ BOOL CMainFrame::SaveToVersionControl(LPCTSTR pszSavePath)
 			if (!m_CheckOutMulti)
 			{
 				dlg.m_bMultiCheckouts = FALSE;
-				userChoice = LanguageSelect.DoModal(dlg);
+				int choice = LanguageSelect.DoModal(dlg);
 				m_CheckOutMulti = dlg.m_bMultiCheckouts;
+				if (choice != IDOK)
+					return IDCANCEL;
 			}
 			// process versioning system specific action
-			if (userChoice != IDOK)
-				return FALSE;
 			WaitStatusCursor waitstatus(IDS_VSS_CHECKOUT_STATUS);
 			m_vssHelper.SetProjectBase(dlg.m_strProject.c_str());
 			m_strVssUser = dlg.m_strUser.c_str();
@@ -130,7 +128,7 @@ BOOL CMainFrame::SaveToVersionControl(LPCTSTR pszSavePath)
 			if (FAILED(hr = vssdb.CoCreateInstance(CLSID_VSSDatabase, IID_IVSSDatabase)))
 			{
 				ShowVSSError(hr, _T(""));
-				return FALSE;
+				return IDCANCEL;
 			}
 			// BSP - Open the specific VSS data file  using info from VSS dialog box
 			// let vss try to find one if not specified
@@ -182,7 +180,7 @@ BOOL CMainFrame::SaveToVersionControl(LPCTSTR pszSavePath)
 				CMyComBSTR(strItem.c_str()), VARIANT_FALSE, &vssi)))
 			{
 				ShowVSSError(hr, strItem.c_str());
-				return FALSE;
+				return IDCANCEL;
 			}
 
 			if (!m_bVssSuppressPathCheck)
@@ -201,7 +199,7 @@ BOOL CMainFrame::SaveToVersionControl(LPCTSTR pszSavePath)
 					{
 						m_bVssSuppressPathCheck = FALSE;
 						m_CheckOutMulti = FALSE; // Reset, we don't want 100 of the same errors
-						return FALSE;   // No means user has to start from begin
+						return IDCANCEL;   // No means user has to start from begin
 					}
 					else if (iRes == IDYESTOALL)
 						m_bVssSuppressPathCheck = TRUE; // Don't ask again with selected files
@@ -213,7 +211,7 @@ BOOL CMainFrame::SaveToVersionControl(LPCTSTR pszSavePath)
 				CMyComBSTR(pszSavePath), 0)))
 			{
 				ShowVSSError(hr, pszSavePath);
-				return FALSE;
+				return IDCANCEL;
 			}
 		}
 		break;
@@ -226,14 +224,14 @@ BOOL CMainFrame::SaveToVersionControl(LPCTSTR pszSavePath)
 				dlg.m_bMultiCheckouts = FALSE;
 				dlg.m_comments = _T("");
 				dlg.m_bCheckin = FALSE;
-				userChoice = LanguageSelect.DoModal(dlg);
+				int choice = LanguageSelect.DoModal(dlg);
 				m_CheckOutMulti = dlg.m_bMultiCheckouts;
 				m_strCCComment = dlg.m_comments;
 				m_bCheckinVCS = dlg.m_bCheckin;
+				if (choice != IDOK)
+					return IDCANCEL;
 			}
 			// process versioning system specific action
-			if (userChoice != IDOK)
-				return FALSE;
 			WaitStatusCursor waitstatus;
 			// checkout operation
 			string_replace(m_strCCComment, _T("\""), _T("\\\""));
@@ -243,10 +241,10 @@ BOOL CMainFrame::SaveToVersionControl(LPCTSTR pszSavePath)
 			{
 				LanguageSelect.MsgBox(code != STILL_ACTIVE ?
 					IDS_VSSERROR : IDS_VSS_RUN_ERROR, MB_ICONSTOP);
-				return FALSE;
+				return IDCANCEL;
 			}
 		}
 		break;
 	}
-	return TRUE;
+	return IDYES;
 }

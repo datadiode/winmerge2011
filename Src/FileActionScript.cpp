@@ -161,7 +161,7 @@ bool FileActionScript::Run(HWND hwnd, FILEOP_FLAGS flags)
 		flags,
 		cchSource[FileAction::ACT_DEL] + cchDestination[FileAction::ACT_DEL], 0);
 
-	BOOL bApplyToAll = FALSE;
+	int choice = IDYES;
 	for (iter = m_actions.begin() ; iter != m_actions.end() ; ++iter)
 	{
 		if (iter->atype == FileAction::ACT_COPY)
@@ -178,20 +178,15 @@ bool FileActionScript::Run(HWND hwnd, FILEOP_FLAGS flags)
 				// has been modified.
 				if (COptionsMgr::Get(OPT_VCS_SYSTEM) != VCS_NONE)
 				{
-					String strErr;
-					int retVal = theApp.m_pMainWnd->SyncFileToVCS(
-						iter->dest.c_str(), bApplyToAll, &strErr);
-					if (retVal == -1)
-					{
-						theApp.DoMessageBox(strErr.c_str(), MB_ICONERROR);
+					ASSERT(choice != 0); // or else expect a side effect on iter->dest
+					choice = theApp.m_pMainWnd->HandleReadonlySave(
+						const_cast<String &>(iter->dest), choice);
+					if (choice == IDCANCEL)
 						break;
-					}
-					if (retVal == IDCANCEL)
-						break;
-					if (retVal == IDNO) // Skip this item
+					if (choice == IDNO) // Skip this item
 						continue; // NB: This also advances the iterator!
 				}
-				if (!theApp.m_pMainWnd->CreateBackup(TRUE, iter->dest.c_str()))
+				if (!theApp.m_pMainWnd->CreateBackup(true, iter->dest.c_str()))
 				{
 					LanguageSelect.MsgBox(IDS_ERROR_BACKUP, MB_ICONERROR);
 					break;
