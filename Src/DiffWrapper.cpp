@@ -607,11 +607,7 @@ String CDiffWrapper::FormatSwitchString()
 	}
 
 	if (nContext > 0)
-	{
-		TCHAR tmpNum[12];
-		_itot(nContext, tmpNum, 10);
-		switches += tmpNum;
-	}
+		switches += NumToStr(nContext, 10).c_str();
 
 	if (ignore_all_space_flag > 0)
 		switches += _T("w");
