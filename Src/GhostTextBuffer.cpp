@@ -769,10 +769,9 @@ int CGhostTextBuffer::ComputeRealLine(int nApparentLine) const
 	// binary search to find correct (or nearest block)
 	int blo = 0;
 	int bhi = size - 1;
-	int i;
 	while (blo <= bhi)
 	{
-		i = (blo + bhi) / 2;
+		int i = (blo + bhi) / 2;
 		const RealityBlock &block = m_RealityBlocks[i];
 		if (nApparentLine < block.nStartApparent)
 			bhi = i - 1;
@@ -805,10 +804,9 @@ int CGhostTextBuffer::ComputeApparentLine(int nRealLine) const
 	// binary search to find correct (or nearest block)
 	int blo = 0;
 	int bhi = size - 1;
-	int i;
 	while (blo <= bhi)
 	{
-		i = (blo + bhi) / 2;
+		int i = (blo + bhi) / 2;
 		const RealityBlock & block = m_RealityBlocks[i];
 		if (nRealLine < block.nStartReal)
 			bhi = i - 1;
@@ -856,10 +854,9 @@ int CGhostTextBuffer::ComputeRealLineAndGhostAdjustment(int nApparentLine,
 	// binary search to find correct (or nearest block)
 	int blo = 0;
 	int bhi = size - 1;
-	int i;
 	while (blo <= bhi)
 	{
-		i = (blo + bhi) / 2;
+		int i = (blo + bhi) / 2;
 		const RealityBlock & block = m_RealityBlocks[i];
 		if (nApparentLine < block.nStartApparent)
 			bhi = i - 1;
