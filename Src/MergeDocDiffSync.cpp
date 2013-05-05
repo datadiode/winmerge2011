@@ -231,10 +231,10 @@ void CChildFrame::AdjustDiffBlocks()
 int CChildFrame::GetMatchCost(const String &sLine0, const String &sLine1)
 {
 	// Options that affect comparison
-	bool casitive = !m_diffWrapper.bIgnoreCase;
-	int xwhite = m_diffWrapper.nIgnoreWhitespace;
-	int breakType = GetBreakType(); // whitespace only or include punctuation
-	bool byteColoring = GetByteColoringOption();
+	const bool casitive = !m_diffWrapper.bIgnoreCase;
+	const int xwhite = m_diffWrapper.nIgnoreWhitespace;
+	const int breakType = GetBreakType(); // whitespace only or include punctuation
+	const bool byteColoring = GetByteColoringOption();
 
 	stl::vector<wdiff> worddiffs;
 	sd_ComputeWordDiffs(sLine0, sLine1, casitive, xwhite, breakType, byteColoring, &worddiffs);

@@ -97,48 +97,41 @@ void stringdiffs::BuildWordDiffList()
 	if (m_whitespace == WHITESPACE_IGNORE_ALL && m_matchblock)
 	{
 		// Remove a leading whitespace
-		if (((int) m_words1.size() > 0) && (IsSpace(m_words1[0])))
+		if (m_words1.size() > 0 && IsSpace(m_words1[0]))
 		{
-			RemoveItem(m_words1,0);
+			RemoveItem(m_words1, 0);
 		}
-		if ((int)m_words1.size() > 0)
+		// Remove a ending whitespace
+		if (m_words1.size() > 0 && IsSpace(m_words1[m_words1.size() - 1]))
 		{
-			// Remove a ending whitespace
-			if (IsSpace(m_words1[m_words1.size() - 1]))
-				RemoveItem(m_words1,m_words1.size() - 1);
+			RemoveItem(m_words1, m_words1.size() - 1);
 		}
 		// Remove a leading whitespace
-		if (((int)m_words2.size() > 0) && (IsSpace(m_words2[0])))
+		if (m_words2.size() > 0 && IsSpace(m_words2[0]))
 		{
-			RemoveItem(m_words2,0);
+			RemoveItem(m_words2, 0);
 		}
-		if ((int)m_words2.size() > 0)
+		// Remove a ending whitespace
+		if (m_words2.size() > 0 && IsSpace(m_words2[m_words2.size() - 1]))
 		{
-			// Remove a ending whitespace
-			if (IsSpace(m_words2[m_words2.size() - 1]))
-				RemoveItem(m_words2,m_words2.size() - 1);
+			RemoveItem(m_words2,m_words2.size() - 1);
 		}
 	}
 	// Look for a match of word2 in word1
 	// not found put an empty record at beginn of word1
 	// if distance to far, crosscheck match word1 in word2
 	// whatever is shorter, it's result.
-	int w1 = 0, w2 = 0;		// position found in array
-	int bw1 = 0;			// start position in m_words1
-	int bw2 = 0;			// start position in m_words2
-	bool lbreak = false;	// repeat
-	if (m_matchblock && (int)m_words1.size() > 0 && (int)m_words2.size() > 0)
+	if (m_matchblock)
 	{
-		bw1 = 0;
-		bw2 = 0;
+		int bw1 = 0;			// start position in m_words1
+		int bw2 = 0;			// start position in m_words2
 		while (bw2 < (int)m_words2.size())
 		{
-			w2 = 0;
-			lbreak = false;
 			if (bw1 >= (int)m_words1.size())
 				break;
 			if (m_whitespace == WHITESPACE_IGNORE_ALL)
 			{
+				bool lbreak = false; // repeat
 				if (IsSpace(m_words1[bw1]))
 				{
 					RemoveItem(m_words1,bw1);
@@ -153,10 +146,10 @@ void stringdiffs::BuildWordDiffList()
 					continue;
 			}
 			// Are we looking for a spacebreak, so just look for word->bBreak
-			if (IsSpace(m_words2[bw2]))
-				w1 = FindNextSpaceInWords(m_words1, bw1);
-			else
-				w1 = FindNextMatchInWords(m_words1, m_words2[bw2], bw1,1);
+			// position found in array
+			int w1 = IsSpace(m_words2[bw2]) ?
+				FindNextSpaceInWords(m_words1, bw1) :
+				FindNextMatchInWords(m_words1, m_words2[bw2], bw1,1);
 			// Found at same position, so go on with next word 
 			if (w1 == bw1)
 			{
@@ -164,7 +157,7 @@ void stringdiffs::BuildWordDiffList()
 				bw2++;
 				continue;
 			}
-			w2 = w1;
+			int w2 = w1;
 			// Not found, not same, check whitch distance is shorter
 			if (w1 == -1 || (w1 - bw1) > 0)
 			{
@@ -324,9 +317,9 @@ void stringdiffs::BuildWordDiffList()
 	}
 
 	// Make both array to same length
-	if ((int) m_words1.size() > 0 || (int) m_words2.size() > 0)
+	if (m_words1.size() > 0 || m_words2.size() > 0)
 	{
-		if ((int)m_words1.size() != (int)m_words2.size())
+		if (m_words1.size() != m_words2.size())
 		{
 			int length1 = (int)m_words1.size() - 1;
 			int length2 = (int)m_words2.size() - 1;
@@ -373,9 +366,8 @@ void stringdiffs::BuildWordDiffList()
 
 		// Look for a match of word2 in word1
 		// We do it from back to get more acurated matches
-		w1 = 0, w2 = 0;		// position found in array
-		bw1 = (int)m_words1.size() - 1;			// start position in m_words1
-		bw2 = (int)m_words2.size() - 1;			// start position in m_words2
+		int bw1 = (int)m_words1.size() - 1;	// start position in m_words1
+		int bw2 = (int)m_words2.size() - 1;	// start position in m_words2
 		if (m_matchblock && bw1 > 0 && bw2 > 0)
 		{
 			while (bw1 > 1 && bw2 > 1)
@@ -387,7 +379,7 @@ void stringdiffs::BuildWordDiffList()
 					bw2--;
 					continue;
 				}
-				w1 = -2, w2 = -2;
+				int w1 = -2, w2 = -2; // position found in array
 
 				// Normaly we synchronise with a *word2 to a match in word1
 				// If it is an Insert in word2 so look for a *word1 in word2
@@ -515,22 +507,22 @@ void stringdiffs::BuildWordDiffList()
 // I care about consistency and I think most apps will highlight the space
 //  after the word so that would be my preference.
 // to get this we need a thirt run, only look for inserts now!
-		w1 = 0, w2 = 0;		// position found in array
+		int w1, w2;			// position found in array
 		bw1 = 0;			// start position in m_words1
 		bw2 = 0;			// start position in m_words2
-			while (w1 >= 0 || w2 >= 0)
+			do
 			{
-				w1 = FindNextInsertInWords(m_words1,bw1);
-				w2 = FindNextInsertInWords(m_words2,bw2);
+				w1 = FindNextInsertInWords(m_words1, bw1);
+				w2 = FindNextInsertInWords(m_words2, bw2);
 				if (w1 == w2)
 				{
 					bw1++;
 					bw2++;
 				}
 				// word1 is first
-				else if(w1 >= 0 && (w1 < w2 || w2 == -1))
+				else if (w1 >= 0 && (w1 < w2 || w2 == -1))
 				{
-					bw1 = FindNextNoInsertInWords(m_words1,w1);
+					bw1 = FindNextNoInsertInWords(m_words1, w1);
 					
 					if (bw1 >=0 && !AreWordsSame(m_words1[bw1], m_words2[bw1]))
 					{
@@ -551,7 +543,7 @@ void stringdiffs::BuildWordDiffList()
 					bw1 = ++w2;
 					bw2 = bw1;
 				}		
-			}
+			} while (w1 >= 0 || w2 >= 0);
 
 		// Remove empty records on both side
 #ifdef STRINGDIFF_LOGGING
@@ -587,8 +579,8 @@ void stringdiffs::BuildWordDiffList()
 			}
 			if (IsInsert(m_words1[i + 1]) && IsInsert(m_words2[i]))
 			{
-				RemoveItem(m_words1,i + 1);
-				RemoveItem(m_words2,i);
+				RemoveItem(m_words1, i + 1);
+				RemoveItem(m_words2, i);
 				continue;
 			}
 			i++;
@@ -599,10 +591,10 @@ void stringdiffs::BuildWordDiffList()
 		i = 0; 
 		while ((i < (int) m_words1.size() - 1) && (i < (int) m_words2.size() - 1))
 		{
-			if  (AreWordsSame(m_words1[i], m_words2[i]))
+			if (AreWordsSame(m_words1[i], m_words2[i]))
 			{
-				RemoveItem(m_words1,i);
-				RemoveItem(m_words2,i);
+				RemoveItem(m_words1, i);
+				RemoveItem(m_words2, i);
 				continue;
 			}
 			i++;
@@ -615,10 +607,10 @@ void stringdiffs::BuildWordDiffList()
 			i = 0; 
 			while ((i < (int)m_words1.size()) && (i < (int)m_words2.size()))
 			{
-				if (IsSpace(m_words1[i]) && IsSpace(m_words2[i]) )
+				if (IsSpace(m_words1[i]) && IsSpace(m_words2[i]))
 				{
-					RemoveItem(m_words1,i);
-					RemoveItem(m_words2,i);
+					RemoveItem(m_words1, i);
+					RemoveItem(m_words2, i);
 					continue;
 				}
 				i++;
@@ -1172,17 +1164,8 @@ void sd_ComputeByteDiff(String & str1, String & str2,
 	// Also this way can distinguish if we set begin1 to -1 for no diff in line
 	begin1 = end1 = begin2 = end2 = 0;
 
-	int len1 = str1.length();
-	int len2 = str2.length();
-
-	LPCTSTR pbeg1 = str1.c_str();
-	LPCTSTR pbeg2 = str2.c_str();
-	// cursors from front, which we advance to beginning of difference
-	LPCTSTR py1 = 0;
-	LPCTSTR py2 = 0;
-	// cursors from front, which we advance to ending of difference
-	LPCTSTR pz1 = 0;
-	LPCTSTR pz2 = 0;
+	const int len1 = str1.length();
+	const int len2 = str2.length();
 
 	if (len1 == 0 || len2 == 0)
 	{
@@ -1196,9 +1179,12 @@ void sd_ComputeByteDiff(String & str1, String & str2,
 		return;
 	}
 
+	LPCTSTR pbeg1 = str1.c_str();
+	LPCTSTR pbeg2 = str2.c_str();
+
 	// cursors from front, which we advance to beginning of difference
-	py1 = pbeg1;
-	py2 = pbeg2;
+	LPCTSTR py1 = pbeg1;
+	LPCTSTR py2 = pbeg2;
 
 	// pen1,pen2 point to the last valid character
 	LPCTSTR pen1 = py1 + len1 - 1;
@@ -1333,8 +1319,9 @@ void sd_ComputeByteDiff(String & str1, String & str2,
     }
 	else
 	{
-		pz1 = pen1;
-		pz2 = pen2;
+		// cursors from front, which we advance to ending of difference
+		LPCTSTR pz1 = pen1;
+		LPCTSTR pz2 = pen2;
 
 		// Retreat over matching ends of lines
 		// Retreat pz1 & pz2 from end until find difference or beginning
@@ -1473,14 +1460,12 @@ void sd_ComputeByteDiff(String & str1, String & str2,
 static void wordLevelToByteLevel(vector<wdiff> * pDiffs, const String& str1,
 		const String& str2, bool casitive, int xwhite)
 {
-	bool bRepeat = true;
-	String str1_2, str2_2;
 	int s1 = 0,e1 = 0,s2 = 0,e2 = 0; 
 
 	for (int i = 0; i < (int)pDiffs->size(); i++)
 	{
 		wdiff *pDiff = &(*pDiffs)[i];
-		bRepeat = true;
+		bool bRepeat = true;
 
 		// Something to differ?
 		if (pDiff->start[0] > pDiff->end[0] || pDiff->start[1] > pDiff->end[1])
@@ -1491,8 +1476,8 @@ static void wordLevelToByteLevel(vector<wdiff> * pDiffs, const String& str1,
 #endif	
 
 		// Check for first and last difference in word
-		str1_2 = str1.substr(pDiff->start[0], pDiff->end[0] - pDiff->start[0] + 1);
-		str2_2 = str2.substr(pDiff->start[1], pDiff->end[1] - pDiff->start[1] + 1);
+		String str1_2 = str1.substr(pDiff->start[0], pDiff->end[0] - pDiff->start[0] + 1);
+		String str2_2 = str2.substr(pDiff->start[1], pDiff->end[1] - pDiff->start[1] + 1);
 		int begin1, begin2, end1, end2;
 		sd_ComputeByteDiff(str1_2, str2_2, casitive, xwhite, begin1, begin2, end1, end2, false);
 		if (begin1 == -1)

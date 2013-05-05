@@ -109,12 +109,12 @@ static void ComputeHighlightRects(const vector<wdiff> & worddiffs, int whichdiff
 /**
  * @brief Returns rectangles to highlight in both views (to show differences in line specified)
  */
-void CChildFrame::Computelinediff(CCrystalTextView * pView1, CCrystalTextView * pView2, int line, RECT &rc1, RECT &rc2, DIFFLEVEL difflvl)
+void CChildFrame::Computelinediff(CCrystalTextView *pView1, CCrystalTextView *pView2, int line, RECT &rc1, RECT &rc2, DIFFLEVEL difflvl)
 {
 	// Local statics are used so we can cycle through diffs in one line
 	// We store previous state, both to find next state, and to verify
 	// that nothing has changed (else, we reset the cycle)
-	static CCrystalTextView * lastView = 0;
+	static CCrystalTextView *lastView = NULL;
 	static int lastLine = -1;
 	static RECT lastRc1, lastRc2;
 	static int whichdiff = -2; // last diff highlighted (-2==none, -1=whole line)
@@ -179,10 +179,9 @@ void CChildFrame::Computelinediff(CCrystalTextView * pView1, CCrystalTextView * 
 		}
 	}
 
-	int begin1=-1, end1=-1, begin2=-1, end2=-1;
-
 	if (whichdiff == -2)
 	{
+		int begin1 = -1, end1 = -1, begin2 = -1, end2 = -1;
 		// Find starting locations for both sides
 		// Have to look for first valid starting location for each side
 		vector<wdiff>::const_iterator it = worddiffs.begin();
@@ -248,10 +247,10 @@ void CChildFrame::GetWordDiffArray(int nLineIndex, vector<wdiff> *pworddiffs)
 	String str2(m_pView[1]->GetLineChars(nLineIndex), i2);
 
 	// Options that affect comparison
-	bool casitive = !m_diffWrapper.bIgnoreCase;
-	int xwhite = m_diffWrapper.nIgnoreWhitespace;
-	int breakType = GetBreakType(); // whitespace only or include punctuation
-	bool byteColoring = GetByteColoringOption();
+	const bool casitive = !m_diffWrapper.bIgnoreCase;
+	const int xwhite = m_diffWrapper.nIgnoreWhitespace;
+	const int breakType = GetBreakType(); // whitespace only or include punctuation
+	const bool byteColoring = GetByteColoringOption();
 
 	// Make the call to stringdiffs, which does all the hard & tedious computations
 	sd_ComputeWordDiffs(str1, str2, casitive, xwhite, breakType, byteColoring, pworddiffs);
