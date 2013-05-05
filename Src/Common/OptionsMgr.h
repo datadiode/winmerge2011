@@ -34,10 +34,10 @@ public:
 		return opt.defValue;
 	}
 	template<class T>
-	static void SaveOption(COptionDef<T> &opt, T value)
+	static LSTATUS SaveOption(COptionDef<T> &opt, T value)
 	{
 		stl::swap(opt.curValue, value);
-		opt.SaveOption();
+		return opt.SaveOption();
 	}
 };
 

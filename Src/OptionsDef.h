@@ -24,8 +24,8 @@ public:
 	virtual bool IsDefault() const = 0;
 	void Parse(LPCTSTR);
 	void LoadOption(HKEY);
-	void SaveOption(HKEY);
-	void SaveOption();
+	LSTATUS SaveOption(HKEY);
+	LSTATUS SaveOption();
 	// InitOptions() - first Reset(), then LoadOption() and / or SaveOption()
 	static void InitOptions(HKEY loadkey, HKEY savekey);
 	static int ExportOptions(LPCTSTR filename);

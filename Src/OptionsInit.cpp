@@ -77,12 +77,12 @@ void IOptionDef::LoadOption(HKEY key)
  * @brief Save option to registry
  * @note Currently handles only integer and string options!
  */
-void IOptionDef::SaveOption(HKEY key)
+LSTATUS IOptionDef::SaveOption(HKEY key)
 {
 	CRegKeyEx section;
 	String path, entry;
 	SplitName(name, path, entry);
-	LONG error = section.OpenWithAccess(key, path.c_str(), KEY_WRITE);
+	LSTATUS error = section.OpenWithAccess(key, path.c_str(), KEY_WRITE);
 	if (error == ERROR_SUCCESS)
 	{
 		if (!IsDefault())
@@ -113,12 +113,13 @@ void IOptionDef::SaveOption(HKEY key)
 			error = section.DeleteValue(entry.c_str());
 		}
 	}
+	return error;
 }
 
-void IOptionDef::SaveOption()
+LSTATUS IOptionDef::SaveOption()
 {
 	CRegKeyEx rk = SettingStore.GetAppRegistryKey();
-	SaveOption(rk);
+	return SaveOption(rk);
 }
 
 int IOptionDef::ExportOptions(LPCTSTR filename)
@@ -129,9 +130,9 @@ int IOptionDef::ExportOptions(LPCTSTR filename)
 	{
 		UOptionPtr u = { p + 1 };
 		LPCTSTR val = NULL;
-		TCHAR num[128]; // Mind the VT_FONT case
 		if (!p->IsDefault())
 		{
+			TCHAR num[128]; // Mind the VT_FONT case
 			switch (p->type)
 			{
 			case VT_UI1:
