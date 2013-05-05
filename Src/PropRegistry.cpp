@@ -39,9 +39,7 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 PropRegistry::PropRegistry()
-: OptionsPanel(IDD_PROPPAGE_SYSTEM)
-, m_bUseRecycleBin(TRUE)
-, m_tempFolderType(0)
+: OptionsPanel(IDD_PROPPAGE_SYSTEM, sizeof *this)
 {
 }
 

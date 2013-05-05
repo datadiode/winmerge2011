@@ -20,15 +20,9 @@ static char THIS_FILE[] = __FILE__;
 
 /** 
  * @brief Constructor taking OptionsManager parameter.
- * @param [in] optionsMgr Pointer to OptionsManager.
  */
 PropBackups::PropBackups()
-: OptionsPanel(IDD_PROPPAGE_BACKUPS)
-, m_bCreateForFolderCmp(FALSE)
-, m_bCreateForFileCmp(FALSE)
-, m_bAppendBak(FALSE)
-, m_bAppendTime(FALSE)
-, m_nBackupFolder(0)
+: OptionsPanel(IDD_PROPPAGE_BACKUPS, sizeof *this)
 {
 }
 

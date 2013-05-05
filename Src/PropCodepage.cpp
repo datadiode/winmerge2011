@@ -39,10 +39,7 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 PropCodepage::PropCodepage()
-: OptionsPanel(IDD_PROPPAGE_CODEPAGE)
-, m_nCodepageSystem(-1)
-, m_nCustomCodepageValue(0)
-, m_bDetectCodepage(FALSE)
+: OptionsPanel(IDD_PROPPAGE_CODEPAGE, sizeof *this)
 {
 }
 

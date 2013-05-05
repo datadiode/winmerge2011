@@ -19,18 +19,9 @@ static char THIS_FILE[] = __FILE__;
 
 /** 
  * @brief Constructor.
- * @param [in] optionsMgr Pointer to CCOptionsMgr::
  */
 PropCompare::PropCompare()
-: OptionsPanel(IDD_PROPPAGE_COMPARE)
-, m_bIgnoreCase(FALSE)
-, m_bIgnoreBlankLines(FALSE)
-, m_bIgnoreEol(TRUE)
-, m_nIgnoreWhite(-1)
-, m_bMovedBlocks(FALSE)
-, m_bMatchSimilarLines(FALSE)
-, m_bFilterCommentsLines(FALSE)
-, m_nMatchSimilarLinesMax(15)
+: OptionsPanel(IDD_PROPPAGE_COMPARE, sizeof *this)
 {
 }
 

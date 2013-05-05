@@ -19,7 +19,7 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 PropSyntaxColors::PropSyntaxColors()
-: OptionsPanel(IDD_PROPPAGE_COLORS_SYNTAX)
+: OptionsPanel(IDD_PROPPAGE_COLORS_SYNTAX, sizeof *this)
 {
 }
 

@@ -22,7 +22,7 @@ static char THIS_FILE[] = __FILE__;
  * @brief Default constructor.
  */
 PropMergeColors::PropMergeColors()
-: OptionsPanel(IDD_PROPPAGE_COLORS_WINMERGE)
+: OptionsPanel(IDD_PROPPAGE_COLORS_WINMERGE, sizeof *this)
 {
 }
 

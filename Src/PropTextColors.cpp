@@ -22,8 +22,7 @@ static char THIS_FILE[] = __FILE__;
  * @brief Default constructor.
  */
 PropTextColors::PropTextColors()
-: OptionsPanel(IDD_PROPPAGE_COLORS_TEXT)
-, m_bCustomColors(FALSE)
+: OptionsPanel(IDD_PROPPAGE_COLORS_TEXT, sizeof *this)
 {
 }
 

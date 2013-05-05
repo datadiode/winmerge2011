@@ -26,15 +26,7 @@ static char THIS_FILE[] = __FILE__;
  * @param [in] optionsMgr Pointer to options manager for handling options.
  */
 PropEditor::PropEditor()
-: OptionsPanel(IDD_PROPPAGE_EDITOR)
-, m_bHiliteSyntax(FALSE)
-, m_nTabType(-1)
-, m_nTabSize(0)
-, m_bAutomaticRescan(FALSE)
-, m_bAllowMixedEol(FALSE)
-, m_bViewLineDifferences(FALSE)
-, m_bBreakOnWords(FALSE)
-, m_nBreakType(0)
+: OptionsPanel(IDD_PROPPAGE_EDITOR, sizeof *this)
 {
 }
 

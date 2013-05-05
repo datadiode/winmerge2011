@@ -25,8 +25,7 @@ static const TCHAR Section[] = _T("Custom Colors");
  * @brief Default constructor.
  */
 PropListColors::PropListColors()
-: OptionsPanel(IDD_PROPPAGE_COLORS_LIST)
-, m_bCustomColors(FALSE)
+: OptionsPanel(IDD_PROPPAGE_COLORS_LIST, sizeof *this)
 {
 }
 

@@ -12,16 +12,18 @@
 /**
  * @brief A base class for WinMerge options dialogs.
  */
-class OptionsPanel : public ODialog //, public IOptionsPanel
+class OptionsPanel
+: public ZeroInit<OptionsPanel>
+, public ODialog
 {
 public:
-	OptionsPanel(UINT nIDTemplate);
 	int m_nPageIndex;
 	using ODialog::m_idd;
 	virtual void ReadOptions() { }
 	virtual void WriteOptions() { }
 	virtual void UpdateScreen() = 0;
 protected:
+	OptionsPanel(UINT nIDTemplate, size_t cb);
 	virtual BOOL OnInitDialog();
 	typedef enum { SET_DEFAULTS, WRITE_OPTIONS, READ_OPTIONS, INVALIDATE } OPERATION;
 	void BrowseColor(int id, COLORREF &currentColor);

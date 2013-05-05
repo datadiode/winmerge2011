@@ -22,15 +22,9 @@ static const int Mega = 1024 * 1024;
 
 /** 
  * @brief Constructor.
- * @param [in] optionsMgr Pointer to CCOptionsMgr::
  */
 PropCompareFolder::PropCompareFolder()
-: OptionsPanel(IDD_PROPPAGE_COMPARE_FOLDER)
-, m_compareMethod(-1)
-, m_bStopAfterFirst(FALSE)
-, m_bIgnoreSmallTimeDiff(FALSE)
-, m_bWalkUniques(TRUE)
-, m_nQuickCompareLimit(4 * Mega)
+: OptionsPanel(IDD_PROPPAGE_COMPARE_FOLDER, sizeof *this)
 {
 }
 

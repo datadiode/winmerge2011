@@ -29,11 +29,7 @@ static char THIS_FILE[] = __FILE__;
 static const TCHAR f_RegValueEnabled[] = _T("ContextMenuEnabled");
 
 PropShell::PropShell() 
-: OptionsPanel(IDD_PROPPAGE_SHELL)
-, m_bEnableShellContextMenu(FALSE)
-, m_bContextAdded(FALSE)
-, m_bContextAdvanced(FALSE)
-, m_bContextSubfolders(FALSE)
+: OptionsPanel(IDD_PROPPAGE_SHELL, sizeof *this)
 {
 }
 

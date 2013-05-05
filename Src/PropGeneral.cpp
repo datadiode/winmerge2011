@@ -44,18 +44,7 @@ static char THIS_FILE[] = __FILE__;
  * @brief Constructor initialising members.
  */
 PropGeneral::PropGeneral()
-: OptionsPanel(IDD_PROPPAGE_GENERAL)
-, m_bScroll(FALSE)
-, m_bDisableSplash(FALSE)
-, m_bSingleInstance(FALSE)
-, m_bVerifyPaths(FALSE)
-, m_bCloseWindowWithEsc(TRUE)
-, m_bAskMultiWindowClose(FALSE)
-, m_bMultipleFileCmp(FALSE)
-, m_bMultipleDirCmp(FALSE)
-, m_nAutoCompleteSource(0)
-, m_bPreserveFiletime(FALSE)
-, m_bShowSelectFolderOnStartup(FALSE)
+: OptionsPanel(IDD_PROPPAGE_GENERAL, sizeof *this)
 {
 }
 

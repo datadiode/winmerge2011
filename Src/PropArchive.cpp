@@ -20,9 +20,7 @@ static char THIS_FILE[] = __FILE__;
 // PropArchive dialog
 
 PropArchive::PropArchive()
-: OptionsPanel(IDD_PROP_ARCHIVE)
-, m_bEnableSupport(FALSE)
-, m_bProbeType(FALSE)
+: OptionsPanel(IDD_PROP_ARCHIVE, sizeof *this)
 {
 }
 

@@ -14,8 +14,9 @@
 /**
  * @brief Constructor.
  */
-OptionsPanel::OptionsPanel(UINT nIDTemplate)
-: ODialog(nIDTemplate)
+OptionsPanel::OptionsPanel(UINT nIDTemplate, size_t cb)
+: ZeroInit(cb)
+, ODialog(nIDTemplate)
 , m_nPageIndex(0)
 {
 }

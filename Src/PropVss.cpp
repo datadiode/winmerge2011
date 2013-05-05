@@ -151,10 +151,7 @@ namespace NClearCase
  * @param [in] optionsMgr Pointer to options manager.
  */
 PropVss::PropVss()
-: OptionsPanel(IDD_PROP_VSS)
-, m_nVerSys(-1)
-, m_pTvClearCaseTypeMgrSetup(NULL)
-, m_bClearCaseTypeMgrSetupModified(false)
+: OptionsPanel(IDD_PROP_VSS, sizeof *this)
 {
 }
 
