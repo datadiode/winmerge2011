@@ -77,11 +77,11 @@ public:
 	bool UpdateInfoFromDiskHalf(DIFFITEM *, bool bLeft, bool bMakeWritable = false);
 	void UpdateStatusFromDisk(DIFFITEM *, bool bLeft, bool bRight, bool bMakeWritable = false);
 
-	IDiffFilter * m_piFilterGlobal; /**< Interface for file filtering. */
-	bool m_bGuessEncoding;
+	IDiffFilter *m_piFilterGlobal; /**< Interface for file filtering. */
 
 	DIFFOPTIONS m_options; /**< Generalized compare options. */
 
+	bool m_bGuessEncoding; /**< Guess encoding from file content. */
 	bool m_bIgnoreSmallTimeDiff; /**< Ignore small timedifferences when comparing by date */
 
 	/**

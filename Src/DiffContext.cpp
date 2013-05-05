@@ -181,6 +181,8 @@ CDiffContext::CDiffContext
 	int nRecursive
 ) : m_piFilterGlobal(NULL),
 	m_nCompMethod(0),
+	m_nQuickCompareLimit(0),
+	m_bGuessEncoding(false),
 	m_bIgnoreSmallTimeDiff(false),
 	m_pCompareStats(pCompareStats),
 	m_pWindow(pWindow),
