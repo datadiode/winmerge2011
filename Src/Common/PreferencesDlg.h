@@ -75,6 +75,7 @@ protected:
 protected:
 	HTREEITEM AddBranch(UINT, HTREEITEM = TVI_ROOT);
 	HTREEITEM AddPage(OptionsPanel *, HTREEITEM = TVI_ROOT);
+	HTREEITEM GetSelector(HTREEITEM, HTREEITEM);
 	String GetItemPath(HTREEITEM);
 	void ReadOptions();
 	void SaveOptions();

@@ -195,30 +195,25 @@ HTREEITEM CPreferencesDlg::AddPage(OptionsPanel* pPage, HTREEITEM htiParent)
 
 void CPreferencesDlg::OnSelchangingPages(NMTREEVIEW *pNM)
 {
-	if (HTREEITEM htiSel = pNM->itemOld.hItem)
+	if (HTREEITEM htiSel = GetSelector(pNM->itemOld.hItem, pNM->itemNew.hItem))
 	{
-		while (HTREEITEM htiChild = m_tcPages->GetChildItem(htiSel))
-			htiSel = htiChild;
-
-		OptionsPanel* pPage = (OptionsPanel*) m_tcPages->GetItemData(htiSel);
+		OptionsPanel *pPage =
+			reinterpret_cast<OptionsPanel *>(m_tcPages->GetItemData(htiSel));
 		ASSERT(pPage);
-
 		pPage->ShowWindow(SW_HIDE);
 	}	
 }
 
 void CPreferencesDlg::OnSelchangedPages(NMTREEVIEW *pNM)
 {
-	if (HTREEITEM htiSel = pNM->itemNew.hItem)
+	if (HTREEITEM htiSel = GetSelector(pNM->itemNew.hItem, pNM->itemOld.hItem))
 	{
-		while (HTREEITEM htiChild = m_tcPages->GetChildItem(htiSel))
-			htiSel = htiChild;
-
-		OptionsPanel* pPage = (OptionsPanel*) m_tcPages->GetItemData(htiSel);
+		OptionsPanel *pPage =
+			reinterpret_cast<OptionsPanel *>(m_tcPages->GetItemData(htiSel));
 		ASSERT(pPage);
+		// create the page if not yet done
 		if (!pPage->m_hWnd && !LanguageSelect.Create(*pPage, m_hWnd))
 			return;
-
 		pPage->ShowWindow(SW_SHOW);
 		m_nPageIndex = pPage->m_nPageIndex;
 		// update caption
@@ -226,6 +221,22 @@ void CPreferencesDlg::OnSelchangedPages(NMTREEVIEW *pNM)
 		SetWindowText(LanguageSelect.FormatMessage(IDS_OPTIONS_TITLE, sPath.c_str()));
 		m_tcPages->SetFocus();
 	}
+}
+
+HTREEITEM CPreferencesDlg::GetSelector(HTREEITEM htiSel, HTREEITEM htiUnSel)
+{
+	if (htiSel != NULL)
+	{
+		if (HTREEITEM htiChild = m_tcPages->GetChildItem(htiSel))
+		{
+			htiSel = htiChild != htiUnSel ? htiChild : NULL;
+		}
+		else if (m_tcPages->GetChildItem(htiUnSel) == htiSel)
+		{
+			htiSel = NULL;
+		}
+	}
+	return htiSel;
 }
 
 String CPreferencesDlg::GetItemPath(HTREEITEM hti)
