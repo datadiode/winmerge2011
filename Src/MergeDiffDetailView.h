@@ -41,13 +41,13 @@ protected:
 	int m_lineBegin;
 	/// last line of diff (last displayable line)
 	int m_lineEnd; 
-	/// number of displayed lines
-	int m_diffLength;
 	/// height (in lines) of the view
 	int m_displayLength;
 
 	/// memorize first line of diff
 	int m_lineBeginPushed;
+	/// memorize last line of diff
+	int m_lineEndPushed;
 	/// memorize cursor position
 	POINT m_ptCursorPosPushed;
 	/// memorize top line positions
@@ -56,11 +56,12 @@ protected:
 // Operations
 private:
 	int GetDiffLineLength();
+	bool EnsureInDiff(POINT &);
 
 public:
 	virtual CCrystalTextBuffer *LocateTextBuffer();
 	void UpdateResources();
-	void SetDisplayHeight(int h);
+	void SetDisplayHeight(int);
 	void OnUpdateCaret(bool bMove);
 	void DocumentsLoaded();
 
@@ -84,27 +85,16 @@ public:
 	 */
 	void PopCursors();
 
-protected:
-	BOOL EnsureInDiff(POINT &pt);
-	virtual void ScrollToSubLine(int nNewTopLine, BOOL bNoSmoothScroll = FALSE, BOOL bTrackScrollBar = TRUE);
-
-// Overrides
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CMergeDiffDetailView)
-	public:
 	virtual void OnInitialUpdate();
-	//}}AFX_VIRTUAL
 
 // Implementation
 protected:
+	virtual void ScrollToSubLine(int nNewTopLine, BOOL bNoSmoothScroll = FALSE, BOOL bTrackScrollBar = TRUE);
 	virtual ~CMergeDiffDetailView();
 	virtual int GetAdditionalTextBlocks(int nLineIndex, TEXTBLOCK *pBuf);
 	virtual COLORREF GetColor(int nColorIndex);
 	virtual void GetLineColors(int nLineIndex, COLORREF &crBkgnd, COLORREF &crText);
 	virtual void OnUpdateSibling(CCrystalTextView *pUpdateSource, BOOL bHorz);
-
-	// Generated message map functions
-protected:
 	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
 	void OnContextMenu(LPARAM);
 };
