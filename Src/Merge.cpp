@@ -690,7 +690,7 @@ LRESULT CSubFrame::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		if (::GetCapture() == m_hWnd)
 		{
 		case WM_CAPTURECHANGED:
-			m_pDocFrame->PostMessage(uMsg);
+			m_pDocFrame->PostMessage(WM_CAPTURECHANGED);
 		}
 		break;
 	case WM_NCHITTEST:
