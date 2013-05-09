@@ -204,7 +204,8 @@ public:
 	STDMETHOD(DUnadvise)(DWORD);
 	STDMETHOD(EnumDAdvise)(LPENUMSTATDATA *);
 	
-	virtual int GetLineCount();
+	int GetLineCount();
+	virtual int ComputeRealLine(int nApparentLine) const;
     virtual void OnUpdateCaret(bool bShowHide);
     bool IsTextBufferInitialized() const;
     LPCTSTR GetTextBufferEol(int nLine) const;

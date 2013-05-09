@@ -2189,6 +2189,11 @@ void CCrystalTextView::GoToLine(int nLine, bool bRelative)
 /////////////////////////////////////////////////////////////////////////////
 // CCrystalTextView message handlers
 
+int CCrystalTextView::ComputeRealLine(int nApparentLine) const
+{
+	return nApparentLine;
+}
+
 int CCrystalTextView::GetLineCount()
 {
 	if (m_pTextBuffer == NULL)
@@ -2704,7 +2709,7 @@ POINT CCrystalTextView::TextToClient(const POINT &point)
 	//BEGIN SW
 	POINT charPoint;
 	int nSubLineStart = CharPosToPoint(point.y, point.x, charPoint);
-	charPoint.y+= GetSubLineIndex(point.y);
+	charPoint.y += GetSubLineIndex(point.y);
 
 	// compute y-position
 	pt.y = (charPoint.y - m_nTopSubLine) * GetLineHeight();
@@ -2744,44 +2749,44 @@ POINT CCrystalTextView::TextToClient(const POINT &point)
 
 void CCrystalTextView::InvalidateLines(int nLine1, int nLine2, BOOL bInvalidateMargin)
 {
-  bInvalidateMargin = TRUE;
-  const int nLineHeight = GetLineHeight();
-  if (nLine2 == -1)
-    {
-      RECT rcInvalid;
-      GetClientRect(&rcInvalid);
-      if (!bInvalidateMargin)
-        rcInvalid.left += GetMarginWidth();
-      //BEGIN SW
-      rcInvalid.top = (GetSubLineIndex( nLine1 ) - m_nTopSubLine) * nLineHeight;
-      /*ORIGINAL
-      rcInvalid.top = (nLine1 - m_nTopLine) * GetLineHeight();
-      */
-      //END SW
-      InvalidateRect (&rcInvalid, FALSE);
-    }
-  else
-    {
-      if (nLine2 < nLine1)
-        {
-          int nTemp = nLine1;
-          nLine1 = nLine2;
-          nLine2 = nTemp;
-        }
-      RECT rcInvalid;
-      GetClientRect(&rcInvalid);
-      if (!bInvalidateMargin)
-        rcInvalid.left += GetMarginWidth();
-      //BEGIN SW
-      rcInvalid.top = (GetSubLineIndex( nLine1 ) - m_nTopSubLine) * nLineHeight;
-      rcInvalid.bottom = (GetSubLineIndex( nLine2 ) - m_nTopSubLine + GetSubLines( nLine2 )) * nLineHeight;
-      /*ORIGINAL
-      rcInvalid.top = (nLine1 - m_nTopLine) * GetLineHeight();
-      rcInvalid.bottom = (nLine2 - m_nTopLine + 1) * GetLineHeight();
-      */
-      //END SW
-      InvalidateRect (&rcInvalid, FALSE);
-    }
+	bInvalidateMargin = TRUE;
+	const int nLineHeight = GetLineHeight();
+	if (nLine2 == -1)
+	{
+		RECT rcInvalid;
+		GetClientRect(&rcInvalid);
+		if (!bInvalidateMargin)
+			rcInvalid.left += GetMarginWidth();
+		//BEGIN SW
+		rcInvalid.top = (GetSubLineIndex(nLine1) - m_nTopSubLine) * nLineHeight;
+		/*ORIGINAL
+		rcInvalid.top = (nLine1 - m_nTopLine) * GetLineHeight();
+		*/
+		//END SW
+		InvalidateRect(&rcInvalid, FALSE);
+	}
+	else
+	{
+		if (nLine2 < nLine1)
+		{
+			int nTemp = nLine1;
+			nLine1 = nLine2;
+			nLine2 = nTemp;
+		}
+		RECT rcInvalid;
+		GetClientRect(&rcInvalid);
+		if (!bInvalidateMargin)
+			rcInvalid.left += GetMarginWidth();
+		//BEGIN SW
+		rcInvalid.top = (GetSubLineIndex(nLine1) - m_nTopSubLine) * nLineHeight;
+		rcInvalid.bottom = (GetSubLineIndex(nLine2) - m_nTopSubLine + GetSubLines(nLine2)) * nLineHeight;
+		/*ORIGINAL
+		rcInvalid.top = (nLine1 - m_nTopLine) * GetLineHeight();
+		rcInvalid.bottom = (nLine2 - m_nTopLine + 1) * GetLineHeight();
+		*/
+		//END SW
+		InvalidateRect(&rcInvalid, FALSE);
+	}
 }
 
 void CCrystalTextView::SetSelection(const POINT &ptStart, const POINT &ptEnd)
@@ -3138,12 +3143,12 @@ void CCrystalTextView::OnEditOperation(int nAction, LPCTSTR pszText)
 {
 }
 
-const POINT & CCrystalTextView::GetCursorPos() const
+const POINT &CCrystalTextView::GetCursorPos() const
 {
 	return m_ptCursorPos;
 }
 
-void CCrystalTextView::SetCursorPos(const POINT & ptCursorPos)
+void CCrystalTextView::SetCursorPos(const POINT &ptCursorPos)
 {
 	ASSERT_VALIDTEXTPOS(ptCursorPos);
 	m_ptCursorPos = ptCursorPos;
@@ -3952,30 +3957,25 @@ bool CCrystalTextView::GetViewLineNumbers() const
  */
 int CCrystalTextView::GetMarginWidth()
 {
-  int nMarginWidth = 0;
-
-  if (m_bViewLineNumbers)
-    {
-      const int nLines = GetLineCount();
-      int nNumbers = 0;
-      int n = 1;
-      for (n = 1; n <= nLines; n *= 10)
-        ++nNumbers;
-      nMarginWidth += GetCharWidth () * nNumbers;
-      if (!m_bSelMargin)
-        nMarginWidth += 2; // Small gap when symbol part disabled
-    }
-
-  if (m_bSelMargin)
-    {
-      nMarginWidth += MARGIN_ICON_WIDTH  + 7;  // Width for icon markers and some margin
-    }
-  else
-    {
-      nMarginWidth += MARGIN_REV_WIDTH; // Space for revision marks
-    }
-
-  return nMarginWidth;
+	int nMarginWidth = 0;
+	if (m_bViewLineNumbers)
+	{
+		int nLines = GetLineCount();
+		if (nLines != 0)
+			nLines = ComputeRealLine(nLines - 1) + 1;
+		int nNumbers = 0;
+		int n;
+		for (n = 1; n <= nLines; n *= 10)
+			++nNumbers;
+		nMarginWidth += GetCharWidth() * nNumbers;
+		if (!m_bSelMargin)
+			nMarginWidth += 2; // Small gap when symbol part disabled
+	}
+	if (m_bSelMargin)
+		nMarginWidth += MARGIN_ICON_WIDTH  + 7; // Width for icon markers and some margin
+	else
+		nMarginWidth += MARGIN_REV_WIDTH; // Space for revision marks
+	return nMarginWidth;
 }
 
 //  [JRT]
