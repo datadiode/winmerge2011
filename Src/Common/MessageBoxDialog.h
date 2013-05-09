@@ -135,11 +135,11 @@ private:
 	// Method for creating the icon control.
 	LPARAM CreateIconControl();
 	// Method for creating the message control.
-	LPARAM CreateMessageControl(int nXPosition, int nYPosition);
+	LPARAM CreateMessageControl(HSurface *, int nXPosition, int nYPosition);
 	// Method for creating the checkbox control.
-	LPARAM CreateCheckboxControl(int nXPosition, int nYPosition);
+	LPARAM CreateCheckboxControl(HSurface *, int nXPosition, int nYPosition);
 	// Method for creating the button controls.
-	LPARAM ComputeButtonSize();
+	LPARAM ComputeButtonSize(HSurface *);
 	// Method for defining the layout of the dialog.
 	void DefineLayout();
 };

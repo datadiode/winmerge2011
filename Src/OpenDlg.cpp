@@ -603,7 +603,7 @@ void COpenDlg::OnEditchangePathCombo(HSuperComboBox *pCb)
 			pCb->SendMessage(CBEM_SETIMAGELIST, 0, dwpShellImageList);
 	// (Re)start timer to path validity check delay
 	// If timer starting fails, update buttonstates immediately
-	if (!SetTimer(IDT_CHECKFILES, CHECKFILES_TIMEOUT, NULL))
+	if (!SetTimer(IDT_CHECKFILES, CHECKFILES_TIMEOUT))
 		UpdateButtonStates();
 }
 

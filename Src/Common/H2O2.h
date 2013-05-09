@@ -167,7 +167,13 @@ namespace H2O
 		virtual HWND Create(HINSTANCE hinst, HWND parent);
 		BOOL EndDialog(INT_PTR nResult)
 		{
+			assert(::IsWindow(m_hWnd));
 			return ::EndDialog(m_hWnd, nResult);
+		}
+		BOOL MapDialogRect(RECT *prc)
+		{
+			assert(::IsWindow(m_hWnd));
+			return ::MapDialogRect(m_hWnd, prc);
 		}
 		void SetDefID(UINT id)
 		{
@@ -176,6 +182,10 @@ namespace H2O
 		UINT GetDefID()
 		{
 			return static_cast<UINT>(SendMessage(DM_GETDEFID));
+		}
+		void GotoDlgCtrl(HWindow *pCtl)
+		{
+			SendMessage(WM_NEXTDLGCTL, reinterpret_cast<WPARAM>(pCtl), 1);
 		}
 		static ODialog *FromHandle(HWindow *pWnd)
 		{

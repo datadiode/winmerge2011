@@ -406,7 +406,7 @@ namespace H2O
 			assert(::IsWindow(m_hWnd));
 			::SendMessage(m_hWnd, WM_SETREDRAW, bRedraw, 0);
 		}
-		UINT_PTR SetTimer(UINT_PTR nIDEvent, UINT uElapse, TIMERPROC lpTimerFunc)
+		UINT_PTR SetTimer(UINT_PTR nIDEvent, UINT uElapse, TIMERPROC lpTimerFunc = NULL)
 		{
 			assert(::IsWindow(m_hWnd));
 			return ::SetTimer(m_hWnd, nIDEvent, uElapse, lpTimerFunc);
@@ -1422,9 +1422,10 @@ namespace H2O
 	class HListBox : public ListBox<HWindow>
 	{
 	public:
-		static HListBox *Create(DWORD style, int x, int y, int cx, int cy, HWindow *parent, UINT id)
+		static HListBox *Create(DWORD style, int x, int y, int cx, int cy,
+			HWindow *parent, UINT id, LPCTSTR caption = NULL, DWORD xstyle = 0)
 		{
-			HWindow *pWnd = CreateEx(0, WC_LISTBOX, NULL, style, x, y, cx, cy, parent, id);
+			HWindow *pWnd = CreateEx(xstyle, WC_LISTBOX, caption, style, x, y, cx, cy, parent, id);
 			return static_cast<HListBox *>(pWnd);
 		}
 	};
@@ -1728,9 +1729,10 @@ namespace H2O
 	class HComboBox : public ComboBox<HWindow>
 	{
 	public:
-		static HComboBox *Create(DWORD style, int x, int y, int cx, int cy, HWindow *parent, UINT id)
+		static HComboBox *Create(DWORD style, int x, int y, int cx, int cy,
+			HWindow *parent, UINT id, LPCTSTR caption = NULL, DWORD xstyle = 0)
 		{
-			HWindow *pWnd = CreateEx(0, WC_COMBOBOX, NULL, style, x, y, cx, cy, parent, id);
+			HWindow *pWnd = CreateEx(xstyle, WC_COMBOBOX, caption, style, x, y, cx, cy, parent, id);
 			return static_cast<HComboBox *>(pWnd);
 		}
 	};
@@ -2033,9 +2035,10 @@ namespace H2O
 	class HEdit : public Edit<HWindow>
 	{
 	public:
-		static HEdit *Create(DWORD style, int x, int y, int cx, int cy, HWindow *parent, UINT id)
+		static HEdit *Create(DWORD style, int x, int y, int cx, int cy,
+			HWindow *parent, UINT id, LPCTSTR caption = NULL, DWORD xstyle = 0)
 		{
-			HWindow *pWnd = CreateEx(0, WC_EDIT, NULL, style, x, y, cx, cy, parent, id);
+			HWindow *pWnd = CreateEx(xstyle, WC_EDIT, caption, style, x, y, cx, cy, parent, id);
 			return static_cast<HEdit *>(pWnd);
 		}
 	};
@@ -2104,9 +2107,10 @@ namespace H2O
 	class HStatic : public Static<HWindow>
 	{
 	public:
-		static HStatic *Create(DWORD style, int x, int y, int cx, int cy, HWindow *parent, UINT id)
+		static HStatic *Create(DWORD style, int x, int y, int cx, int cy,
+			HWindow *parent, UINT id, LPCTSTR caption = NULL, DWORD xstyle = 0)
 		{
-			HWindow *pWnd = CreateEx(0, WC_STATIC, NULL, style, x, y, cx, cy, parent, id);
+			HWindow *pWnd = CreateEx(xstyle, WC_STATIC, caption, style, x, y, cx, cy, parent, id);
 			return static_cast<HStatic *>(pWnd);
 		}
 	};
@@ -2203,9 +2207,10 @@ namespace H2O
 	class HButton : public Button<HWindow>
 	{
 	public:
-		static HButton *Create(DWORD style, int x, int y, int cx, int cy, HWindow *parent, UINT id, DWORD xstyle = 0)
+		static HButton *Create(DWORD style, int x, int y, int cx, int cy,
+			HWindow *parent, UINT id, LPCTSTR caption = NULL, DWORD xstyle = 0)
 		{
-			HWindow *pWnd = CreateEx(xstyle, WC_BUTTON, NULL, style, x, y, cx, cy, parent, id);
+			HWindow *pWnd = CreateEx(xstyle, WC_BUTTON, caption, style, x, y, cx, cy, parent, id);
 			return static_cast<HButton *>(pWnd);
 		}
 	};
@@ -2237,9 +2242,10 @@ namespace H2O
 	class HHeaderCtrl : public HeaderCtrl<HWindow>
 	{
 	public:
-		static HHeaderCtrl *Create(DWORD style, int x, int y, int cx, int cy, HWindow *parent, UINT id)
+		static HHeaderCtrl *Create(DWORD style, int x, int y, int cx, int cy,
+			HWindow *parent, UINT id, LPCTSTR caption = NULL, DWORD xstyle = 0)
 		{
-			HWindow *pWnd = CreateEx(0, WC_HEADER, NULL, style, x, y, cx, cy, parent, id);
+			HWindow *pWnd = CreateEx(xstyle, WC_HEADER, caption, style, x, y, cx, cy, parent, id);
 			return static_cast<HHeaderCtrl *>(pWnd);
 		}
 	};
@@ -3014,9 +3020,10 @@ namespace H2O
 	class HListView : public ListView<HWindow>
 	{
 	public:
-		static HListView *Create(DWORD style, int x, int y, int cx, int cy, HWindow *parent, UINT id, DWORD xstyle = 0)
+		static HListView *Create(DWORD style, int x, int y, int cx, int cy,
+			HWindow *parent, UINT id, LPCTSTR caption = NULL, DWORD xstyle = 0)
 		{
-			HWindow *pWnd = CreateEx(xstyle, WC_LISTVIEW, NULL, style, x, y, cx, cy, parent, id);
+			HWindow *pWnd = CreateEx(xstyle, WC_LISTVIEW, caption, style, x, y, cx, cy, parent, id);
 			return static_cast<HListView *>(pWnd);
 		}
 	};
@@ -3565,9 +3572,10 @@ namespace H2O
 	class HTreeView : public TreeView<HWindow>
 	{
 	public:
-		static HTreeView *Create(DWORD style, int x, int y, int cx, int cy, HWindow *parent, UINT id)
+		static HTreeView *Create(DWORD style, int x, int y, int cx, int cy,
+			HWindow *parent, UINT id, LPCTSTR caption = NULL, DWORD xstyle = 0)
 		{
-			HWindow *pWnd = CreateEx(0, WC_TREEVIEW, NULL, style, x, y, cx, cy, parent, id);
+			HWindow *pWnd = CreateEx(xstyle, WC_TREEVIEW, caption, style, x, y, cx, cy, parent, id);
 			return static_cast<HTreeView *>(pWnd);
 		}
 	};
@@ -3753,15 +3761,15 @@ namespace H2O
 			assert(::IsWindow(m_hWnd));
 			return (BOOL)::SendMessage(m_hWnd, TB_SETBUTTONINFO, id, (LPARAM)pButtonInfo);
 		}
-
 	};
 
 	class HToolBar : public ToolBar<HWindow>
 	{
 	public:
-		static HToolBar *Create(DWORD style, int x, int y, int cx, int cy, HWindow *parent, UINT id)
+		static HToolBar *Create(DWORD style, int x, int y, int cx, int cy,
+			HWindow *parent, UINT id, LPCTSTR caption = NULL, DWORD xstyle = 0)
 		{
-			HWindow *pWnd = CreateEx(0, TOOLBARCLASSNAME, NULL, style, x, y, cx, cy, parent, id);
+			HWindow *pWnd = CreateEx(xstyle, TOOLBARCLASSNAME, caption, style, x, y, cx, cy, parent, id);
 			return static_cast<HToolBar *>(pWnd);
 		}
 	};
@@ -3836,15 +3844,15 @@ namespace H2O
 			assert(::IsWindow(m_hWnd));
 			::SendMessage(m_hWnd, SB_SIMPLE, (WPARAM)fSimple, 0L);
 		}
-
 	};
 
 	class HStatusBar : public StatusBar<HWindow>
 	{
 	public:
-		static HStatusBar *Create(DWORD style, int x, int y, int cx, int cy, HWindow *parent, UINT id)
+		static HStatusBar *Create(DWORD style, int x, int y, int cx, int cy,
+			HWindow *parent, UINT id, LPCTSTR caption = NULL, DWORD xstyle = 0)
 		{
-			HWindow *pWnd = CreateEx(0, STATUSCLASSNAME, NULL, style, x, y, cx, cy, parent, id);
+			HWindow *pWnd = CreateEx(xstyle, STATUSCLASSNAME, caption, style, x, y, cx, cy, parent, id);
 			return static_cast<HStatusBar *>(pWnd);
 		}
 	};
@@ -4020,15 +4028,15 @@ namespace H2O
 			assert(::IsWindow(m_hWnd));
 			return TabCtrl_GetExtendedStyle(m_hWnd);
 		}
-
 	};
 
 	class HTabCtrl : public TabCtrl<HWindow>
 	{
 	public:
-		static HTabCtrl *Create(DWORD style, int x, int y, int cx, int cy, HWindow *parent, UINT id, DWORD xstyle = 0)
+		static HTabCtrl *Create(DWORD style, int x, int y, int cx, int cy,
+			HWindow *parent, UINT id, LPCTSTR caption = NULL, DWORD xstyle = 0)
 		{
-			HWindow *pWnd = CreateEx(xstyle, WC_TABCONTROL, NULL, style, x, y, cx, cy, parent, id);
+			HWindow *pWnd = CreateEx(xstyle, WC_TABCONTROL, caption, style, x, y, cx, cy, parent, id);
 			return static_cast<HTabCtrl *>(pWnd);
 		}
 	};

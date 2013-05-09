@@ -71,27 +71,6 @@ using stl::vector;
 
 #define MESSAGE_BOX_TIMER			2201	// Event identifier for the timer.
 
-class CFontDC
-{
-	HWND const hWnd;
-	HDC const hDC;
-public:
-	operator HDC() const { return hDC; }
-	CFontDC(HWND hWnd): hWnd(hWnd), hDC(::GetDC(hWnd))
-	{
-		HFONT hFont = reinterpret_cast<HFONT>(::SendMessage(hWnd, WM_GETFONT, 0, 0));
-		::SelectObject(hDC, hFont);
-	}
-	~CFontDC()
-	{
-		::ReleaseDC(hWnd, hDC);
-	}
-	int DrawText(const String &s, RECT *prc, UINT flags)
-	{
-		return ::DrawText(hDC, s.c_str(), s.length(), prc, flags);
-	}
-};
-
 /*
  *	Constructor of the class.
  *
@@ -102,7 +81,7 @@ public:
  CMessageBoxDialog::CMessageBoxDialog(LPCTSTR strMessage, 
 	LPCTSTR strTitle, UINT nStyle, UINT nHelp) 
 	: ODialog(IDD_MESSAGE_BOX)
-	, m_strMessage(strMessage ? strMessage : _T(""))
+	, m_strMessage(strMessage)
 	, m_strTitle(strTitle)
 	, m_nStyle(nStyle)
 	, m_nHelp(nHelp)
@@ -195,12 +174,12 @@ BOOL CMessageBoxDialog::OnInitDialog()
 		RECT *prc = reinterpret_cast<RECT *>(DialogUnitToPixel + i - 2);
 		prc->left = prc->top = 0;
 		prc->right = prc->bottom = i;
-		::MapDialogRect(m_hWnd, prc);
+		MapDialogRect(prc);
 		--i;
 	} while (i >= 2);
 
 	// Set the title of the dialog.
-	::SetWindowText(m_hWnd, m_strTitle.c_str());
+	SetWindowText(m_strTitle.c_str());
 
 	// Set the help ID of the dialog.
 	ASSERT(((m_nStyle & (MB_DONT_DISPLAY_AGAIN | MB_DONT_ASK_AGAIN)) == 0) || (m_nHelp != 0));
@@ -222,38 +201,36 @@ BOOL CMessageBoxDialog::OnInitDialog()
 	if (m_nStyle & MB_SETFOREGROUND)
 	{
 		// Bring the window to the foreground.
-		::SetForegroundWindow(m_hWnd);
+		SetForegroundWindow();
 	}
 
 	// Check whether the window should be the topmost window.
 	if (m_nStyle & (MB_TOPMOST | MB_SYSTEMMODAL))
 	{
-		::SetWindowPos(m_hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+		SetWindowPos(reinterpret_cast<HWindow *>(HWND_TOPMOST), 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 	}
 
 	// Disable SC_CLOSE if neither IDOK nor IDCANCEL are present.
-	if (::GetDlgItem(m_hWnd, IDOK) == ::GetDlgItem(m_hWnd, IDCANCEL))
+	if (GetDlgItem(IDOK) == GetDlgItem(IDCANCEL))
 	{
 		// Disable the close item from the system menu.
-		HMENU hMenu = ::GetSystemMenu(m_hWnd, FALSE);
-		::EnableMenuItem(hMenu, SC_CLOSE, MF_GRAYED);
+		GetSystemMenu(FALSE)->EnableMenuItem(SC_CLOSE, MF_GRAYED);
 	}
 
 	// Set the focus to the default button.
-	HWND hwndCtrl = ::GetDlgItem(m_hWnd, m_nDefaultButton);
-	::SendMessage(m_hWnd, WM_NEXTDLGCTL, reinterpret_cast<WPARAM>(hwndCtrl), 1);
+	GotoDlgCtrl(GetDlgItem(m_nDefaultButton));
 	// Check whether a timeout is set.
 	if (m_nTimeoutSeconds > 0)
 	{
 		// Install a timer.
-		::SetTimer(m_hWnd, MESSAGE_BOX_TIMER, 1000, NULL);
+		SetTimer(MESSAGE_BOX_TIMER, 1000);
 		// Check whether it's a disabled timeout.
 		if (m_bTimeoutDisabled)
 		{
-			HWND hwndButton = NULL;
-			while (hwndButton = ::FindWindowEx(m_hWnd, hwndButton, WC_BUTTON, NULL))
+			HWindow *pwndButton = NULL;
+			while ((pwndButton = FindWindowEx(pwndButton, WC_BUTTON)) != NULL)
 			{
-				::EnableWindow(hwndButton, FALSE);
+				pwndButton->EnableWindow(FALSE);
 			}
 		}
 	}
@@ -333,32 +310,31 @@ void CMessageBoxDialog::OnTimer(UINT_PTR nIDEvent)
 		if (m_nTimeoutSeconds == 0)
 		{
 			// Kill the timer for this event and reset the handle.
-			::KillTimer(m_hWnd, MESSAGE_BOX_TIMER);
+			KillTimer(MESSAGE_BOX_TIMER);
 			// Check whether it has been a disabled timeout.
 			if (m_bTimeoutDisabled)
 			{
-				HWND hwndButton = NULL;
-				while (hwndButton = ::FindWindowEx(m_hWnd, hwndButton, WC_BUTTON, NULL))
+				HWindow *pwndButton = NULL;
+				while ((pwndButton = FindWindowEx(pwndButton, WC_BUTTON)) != NULL)
 				{
-					::EnableWindow(hwndButton, TRUE);
+					pwndButton->EnableWindow(TRUE);
 				}
 				// Set the focus to the default button.
-				HWND hwndCtrl = ::GetDlgItem(m_hWnd, m_nDefaultButton);
-				::SendMessage(m_hWnd, WM_NEXTDLGCTL, reinterpret_cast<WPARAM>(hwndCtrl), 1);
+				GotoDlgCtrl(GetDlgItem(m_nDefaultButton));
 			}
 			else
 			{
 				// End the dialog with the default button.
-				::EndDialog(m_hWnd, m_nDefaultButton);
+				EndDialog(m_nDefaultButton);
 			}
 		}
 		TCHAR title[100];
-		if (::GetDlgItemText(m_hWnd, m_nDefaultButton, title, _countof(title) - 15))
+		if (GetDlgItemText(m_nDefaultButton, title, _countof(title) - 15))
 		{
 			if (LPTSTR equals = _tcsrchr(title, _T('=')))
 			{
 				wsprintf(equals, _T("= %d"), m_nTimeoutSeconds);
-				::SetDlgItemText(m_hWnd, m_nDefaultButton, title);
+				SetDlgItemText(m_nDefaultButton, title);
 			}
 		}
 	}
@@ -507,7 +483,7 @@ void CMessageBoxDialog::ParseStyle()
 		nDefaultIndex = 0;
 	// Set the new default button.
 	m_nDefaultButton = m_aButtons[nDefaultIndex].id;
-	::SendMessage(m_hWnd, DM_SETDEFID, m_nDefaultButton, 0);
+	SetDefID(m_nDefaultButton);
 
 	if (m_nTimeoutSeconds > 0)
 	{
@@ -557,13 +533,13 @@ LPARAM CMessageBoxDialog::CreateIconControl()
 	// Create the control for the icon.
 	RECT rect;
 	::SetRectEmpty(&rect);
-	if (HWND hwndIcon = ::CreateWindow(WC_STATIC, NULL,
+	if (HStatic *pwndIcon = HStatic::Create(
 		WS_CHILD | WS_VISIBLE | WS_DISABLED | SS_ICON,
 		DialogUnitToPixel[CX_BORDER].x, DialogUnitToPixel[CY_BORDER].y,
-		0, 0, m_hWnd, NULL, NULL, 0))
+		0, 0, m_pWnd, 0))
 	{
-		::SendMessage(hwndIcon, STM_SETICON, reinterpret_cast<WPARAM>(m_hIcon), 0);
-		::GetClientRect(hwndIcon, &rect);
+		pwndIcon->SetIcon(m_hIcon);
+		pwndIcon->GetClientRect(&rect);
 	}
 
 	// Return the size of the icon.
@@ -577,7 +553,7 @@ LPARAM CMessageBoxDialog::CreateIconControl()
  *	message box. It will also try to determine the size required for the
  *	message.
  */
-LPARAM CMessageBoxDialog::CreateMessageControl(int nXPosition, int nYPosition)
+LPARAM CMessageBoxDialog::CreateMessageControl(HSurface *pdc, int nXPosition, int nYPosition)
 {
 	ASSERT(!m_strMessage.empty());
 	// Define the maximum width of the message.
@@ -585,9 +561,8 @@ LPARAM CMessageBoxDialog::CreateMessageControl(int nXPosition, int nYPosition)
 	// Check whether an icon is displayed.
 	if (nXPosition > DialogUnitToPixel[CX_BORDER].x)
 		rect.right -= nXPosition; // Decrease the maximum width.
-	CFontDC dc(m_hWnd);
 	// Draw the text and retrieve the size of the text.
-	dc.DrawText(m_strMessage, &rect, DT_NOPREFIX | DT_WORDBREAK | DT_EXPANDTABS | DT_CALCRECT);
+	pdc->DrawText(m_strMessage, &rect, DT_NOPREFIX | DT_WORDBREAK | DT_EXPANDTABS | DT_CALCRECT);
 	// Create a variable with the style of the control.
 	DWORD dwStyle = WS_CHILD | WS_VISIBLE | SS_NOPREFIX;
 	// Check whether the text should be right aligned.
@@ -610,7 +585,7 @@ LPARAM CMessageBoxDialog::CreateMessageControl(int nXPosition, int nYPosition)
  *	MB_DONT_ASK_AGAIN flag, this method will create a checkbox in the dialog
  *	for enabling the user to disable this dialog in the future.
  */
-LPARAM CMessageBoxDialog::CreateCheckboxControl(int nXPosition, int nYPosition)
+LPARAM CMessageBoxDialog::CreateCheckboxControl(HSurface *pdc, int nXPosition, int nYPosition)
 {
 	// Create a variable for storing the title of the checkbox.
 	String strCheckboxTitle;
@@ -629,24 +604,22 @@ LPARAM CMessageBoxDialog::CreateCheckboxControl(int nXPosition, int nYPosition)
 	ASSERT(!strCheckboxTitle.empty());
 
 	RECT rect = { 0, 0, 0, 0 };
-	CFontDC dc(m_hWnd);
 
 	// Retrieve the size of the text.
-	dc.DrawText(strCheckboxTitle, &rect, DT_SINGLELINE | DT_CALCRECT);
+	pdc->DrawText(strCheckboxTitle, &rect, DT_SINGLELINE | DT_CALCRECT);
 
 	// Add the additional value to the width of the checkbox.
 	rect.right += DialogUnitToPixel[CX_CHECKBOX_ADDON].x;
 
 	// Create the checkbox.
-	::CreateWindow(WC_BUTTON, strCheckboxTitle.c_str(),
-		WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX,
+	HButton::Create(WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX,
 		nXPosition, nYPosition, rect.right, rect.bottom,
-		m_hWnd, reinterpret_cast<HMENU>(IDCHECKBOX), NULL, NULL);
+		m_pWnd, IDCHECKBOX, strCheckboxTitle.c_str());
 
 	// Check whether the checkbox should be marked checked at startup.
 	if (m_nStyle & MB_DEFAULT_CHECKED)
 	{
-		::CheckDlgButton(m_hWnd, IDCHECKBOX, BST_CHECKED);
+		CheckDlgButton(IDCHECKBOX, BST_CHECKED);
 		m_bDontDisplayAgain = TRUE;
 	}
 	return MAKELPARAM(rect.right, rect.bottom);
@@ -658,20 +631,19 @@ LPARAM CMessageBoxDialog::CreateCheckboxControl(int nXPosition, int nYPosition)
  *	According to the list of buttons, which should be displayed in this
  *	message box, this method will create them and add them to the dialog.
  */
-LPARAM CMessageBoxDialog::ComputeButtonSize()
+LPARAM CMessageBoxDialog::ComputeButtonSize(HSurface *pdc)
 {
 	SIZE sButton =
 	{ DialogUnitToPixel[CX_BUTTON].x, DialogUnitToPixel[CY_BUTTON].y };
 
 	RECT rect = { 0, 0, 0, 0 };
-	CFontDC dc(m_hWnd);
 
 	vector<MSGBOXBTN>::iterator iter;
 	// Run through all buttons defined in the list of the buttons.
 	for (iter = m_aButtons.begin(); iter != m_aButtons.end(); ++iter)
 	{
 		// Retrieve the size of the text.
-		dc.DrawText(iter->title, &rect, DT_SINGLELINE | DT_CALCRECT);
+		pdc->DrawText(iter->title, &rect, DT_SINGLELINE | DT_CALCRECT);
 		// Resize the button.
 		if (sButton.cx < rect.right)
 			sButton.cx = rect.right;
@@ -694,6 +666,8 @@ LPARAM CMessageBoxDialog::ComputeButtonSize()
  */
 void CMessageBoxDialog::DefineLayout()
 {
+	HSurface *pdc = GetDC();
+	pdc->SelectObject(GetFont());
 	// Create a variable for storing the size of the dialog.
 	SIZE sClient =
 	{ 2 * DialogUnitToPixel[CX_BORDER].x, 2 * DialogUnitToPixel[CY_BORDER].y };
@@ -714,7 +688,7 @@ void CMessageBoxDialog::DefineLayout()
 		nXPosition += GET_X_LPARAM(sIcon) + DialogUnitToPixel[CX_BORDER].x;
 	}
 
-	LPARAM sMessage = CreateMessageControl(nXPosition, nYPosition);
+	LPARAM sMessage = CreateMessageControl(pdc, nXPosition, nYPosition);
 	// Change the size of the dialog according to the size of the message.
 	sClient.cx += GET_X_LPARAM(sMessage) + DialogUnitToPixel[CX_BORDER].x;
 	sClient.cy = max(sClient.cy, GET_Y_LPARAM(sMessage) + 2 *
@@ -727,7 +701,7 @@ void CMessageBoxDialog::DefineLayout()
 	// Check whether an checkbox is defined.
 	if (m_nStyle & (MB_DONT_DISPLAY_AGAIN | MB_DONT_ASK_AGAIN))
 	{
-		LPARAM sCheckbox = CreateCheckboxControl(nXPosition, nYPosition);
+		LPARAM sCheckbox = CreateCheckboxControl(pdc, nXPosition, nYPosition);
 		// Try to determine the control element for the checkbox.
 		// Resize the dialog if necessary.
 		sClient.cx = max(sClient.cx, nXPosition + GET_X_LPARAM(sCheckbox) +
@@ -739,7 +713,7 @@ void CMessageBoxDialog::DefineLayout()
 		nYPosition += GET_Y_LPARAM(sCheckbox) + DialogUnitToPixel[CY_BORDER].y;
 	}
 
-	LPARAM sButton = ComputeButtonSize();
+	LPARAM sButton = ComputeButtonSize(pdc);
 	// Calculate the width of the buttons.
 	int cxButtons =
 		(m_aButtons.size() - 1) * DialogUnitToPixel[CX_BUTTON_SPACE].x +
@@ -766,10 +740,11 @@ void CMessageBoxDialog::DefineLayout()
 	for (vector<MSGBOXBTN>::iterator iter = m_aButtons.begin(); iter != m_aButtons.end(); ++iter)
 	{
 		// Create the button.
-		HWND hwndCtrl = ::CreateWindow(WC_BUTTON, iter->title.c_str(),
+		HButton::Create(
 			WS_CHILD | WS_VISIBLE | WS_TABSTOP,
-			nXButtonPosition, nYButtonPosition, GET_X_LPARAM(sButton), GET_Y_LPARAM(sButton),
-			m_hWnd, reinterpret_cast<HMENU>(iter->id), NULL, NULL);
+			nXButtonPosition, nYButtonPosition,
+			GET_X_LPARAM(sButton), GET_Y_LPARAM(sButton),
+			m_pWnd, iter->id, iter->title.c_str());
 
 		nXButtonPosition += GET_X_LPARAM(sButton) + DialogUnitToPixel[CX_BUTTON_SPACE].x;
 	}
@@ -777,13 +752,13 @@ void CMessageBoxDialog::DefineLayout()
 	// Set the dimensions of the dialog.
 	RECT rcClient = { 0, 0, sClient.cx, sClient.cy };
 	// Calculate the window rect.
-	::AdjustWindowRect(&rcClient, ::GetWindowLong(m_hWnd, GWL_STYLE), FALSE);
+	::AdjustWindowRect(&rcClient, GetStyle(), FALSE);
 	RECT rcParent;
-	HWND hwndParent = ::GetParent(m_hWnd);
-	::GetWindowRect(hwndParent, &rcParent);
+	GetParent()->GetWindowRect(&rcParent);
 	// Move the window.
-	::MoveWindow(m_hWnd,
+	MoveWindow(
 		(rcParent.left + rcParent.right) / 2 - (rcClient.right - rcClient.left) / 2,
 		(rcParent.top + rcParent.bottom) / 2 - (rcClient.bottom - rcClient.top) / 2,
-		rcClient.right - rcClient.left, rcClient.bottom - rcClient.top, TRUE);
+		rcClient.right - rcClient.left, rcClient.bottom - rcClient.top);
+	ReleaseDC(pdc);
 }

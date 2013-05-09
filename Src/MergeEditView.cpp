@@ -833,7 +833,7 @@ void CMergeEditView::OnEditOperation(int nAction, LPCTSTR pszText)
 		case CE_ACTION_DELSEL:
 		case CE_ACTION_DELETE:
 		case CE_ACTION_CUT:
-			if (!SetTimer(IDT_RESCAN, RESCAN_TIMEOUT, NULL))
+			if (!SetTimer(IDT_RESCAN, RESCAN_TIMEOUT))
 			{
 			default:
 				m_pDocument->FlushAndRescan();

@@ -101,7 +101,7 @@ BOOL DirCompProgressDlg::OnInitDialog()
 	SetDlgItemInt(IDC_ITEMSCOMPARED, 0);
 	SetDlgItemInt(IDC_ITEMSTOTAL, 0);
 
-	SetTimer(IDT_UPDATE, UPDATE_INTERVAL, NULL);
+	SetTimer(IDT_UPDATE, UPDATE_INTERVAL);
 	return TRUE;
 }
 

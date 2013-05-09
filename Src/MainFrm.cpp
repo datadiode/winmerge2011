@@ -3142,7 +3142,7 @@ void CMainFrame::StartFlashing()
 	{
 		FlashWindow(TRUE);
 		m_bFlashing = true;
-		SetTimer(ID_TIMER_FLASH, WINDOW_FLASH_TIMEOUT, NULL);
+		SetTimer(ID_TIMER_FLASH, WINDOW_FLASH_TIMEOUT);
 	}
 }
 
