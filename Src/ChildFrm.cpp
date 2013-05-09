@@ -305,8 +305,7 @@ LRESULT CChildFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 	case ID_REFRESH:
 		if (m_idContextLines != ID_VIEW_CONTEXT_UNLIMITED)
 		{
-			m_idContextLines = ID_VIEW_CONTEXT_UNLIMITED;
-			ReloadDocs();
+			PostMessage(WM_COMMAND, ID_VIEW_CONTEXT_UNLIMITED);
 		}
 		else
 		{
@@ -348,6 +347,9 @@ LRESULT CChildFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 		GetRightView()->OnUpdateCaret();
 		// fall through
 	case ID_VIEW_CONTEXT_UNLIMITED:
+		// Clear the detail views or else they will go out of sync.
+		GetLeftDetailView()->OnDisplayDiff(-1);
+		GetRightDetailView()->OnDisplayDiff(-1);
 		m_idContextLines = id;
 		ReloadDocs();
 		break;
