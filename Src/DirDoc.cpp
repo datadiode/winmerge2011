@@ -333,33 +333,33 @@ void CDirFrame::Rescan(int nCompareSelected)
 
 	// Set total items count since we don't collect items
 	// Don't clear if only scanning selected items
+	bool bDisableFilter = false;
 	if (nCompareSelected)
 	{
 		m_pCompareStats->SetTotalItems(nCompareSelected);
+		if (m_pMDIFrame->m_pCollectingDirFrame == this)
+			bDisableFilter = true;
 	}
 	else
 	{
 		m_pDirView->DeleteAllItems();
 		m_pCtxt->RemoveAll();
-		if (m_pTempPathContext)
-		{
-			m_pCtxt->m_piFilterGlobal = &transparentFileFilter;
-			SetFilterStatusDisplay(NULL);
-		}
-		else
-		{
-			m_pCtxt->m_piFilterGlobal = &globalFileFilter;
-			// Make sure filters are up-to-date
-			globalFileFilter.ReloadUpdatedFilters();
-			// Show active filter name in statusbar
-			SetFilterStatusDisplay(globalFileFilter.GetFilterNameOrMask().c_str());
-		}
+		if (m_pTempPathContext != NULL)
+			bDisableFilter = true;
 	}
 
-	if (m_pDirView->m_bAllowRescan)
+	if (bDisableFilter)
 	{
-		UpdateHeaderPath(0);
-		UpdateHeaderPath(1);
+		m_pCtxt->m_piFilterGlobal = &transparentFileFilter;
+		SetFilterStatusDisplay(NULL);
+	}
+	else
+	{
+		m_pCtxt->m_piFilterGlobal = &globalFileFilter;
+		// Make sure filters are up-to-date
+		globalFileFilter.ReloadUpdatedFilters();
+		// Show active filter name in statusbar
+		SetFilterStatusDisplay(globalFileFilter.GetFilterNameOrMask().c_str());
 	}
 
 	// Folder names to compare are in the compare context
@@ -728,6 +728,8 @@ void CDirFrame::SetDescriptions(const String &strLeftDesc, const String &strRigh
 		strTitle += PathFindFileName(strPath.c_str());
 	}
 	SetWindowText(strTitle.c_str());
+	UpdateHeaderPath(0);
+	UpdateHeaderPath(1);
 }
 
 /**

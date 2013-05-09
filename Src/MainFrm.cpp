@@ -110,7 +110,6 @@ const CMainFrame::MENUITEM_ICON CMainFrame::m_MenuIcons[] = {
 	{ ID_VIEW_ZOOMOUT,				IDB_VIEW_ZOOMOUT,				},
 	{ ID_MERGE_COMPARE,				IDB_MERGE_COMPARE,				},
 	{ ID_MERGE_DELETE,				IDB_MERGE_DELETE,				},
-	{ ID_TOOLS_GENERATEREPORT,		IDB_TOOLS_GENERATEREPORT,		},
 	{ ID_DIR_COPY_LEFT_TO_RIGHT,	IDB_LEFT_TO_RIGHT,				},
 	{ ID_DIR_COPY_RIGHT_TO_LEFT,	IDB_RIGHT_TO_LEFT,				},
 	{ ID_DIR_COPY_LEFT_TO_BROWSE,	IDB_LEFT_TO_BROWSE,				},
@@ -164,6 +163,7 @@ CMainFrame::CMainFrame(HWindow *pWnd, const MergeCmdLineInfo &cmdInfo)
 : m_pWndMDIClient(NULL)
 , m_hMenuDefault(NULL)
 , m_hAccelTable(NULL)
+, m_pCollectingDirFrame(NULL)
 , m_bFlashing(false)
 , m_bEscShutdown(false)
 , m_bClearCaseTool(false)
@@ -614,6 +614,12 @@ void CMainFrame::UpdateCmdUI<ID_TOOLS_GENERATEREPORT>(BYTE uFlags)
 }
 
 template<>
+void CMainFrame::UpdateCmdUI<ID_FILE_COLLECTMODE>(BYTE uFlags)
+{
+	m_cmdState.CollectMode = uFlags;
+}
+
+template<>
 void CMainFrame::UpdateCmdUI<ID_TOOLS_COMPARE_SELECTION>(BYTE uFlags)
 {
 	m_cmdState.CompareSelection = uFlags;
@@ -792,6 +798,8 @@ const BYTE *CMainFrame::CmdState::Lookup(UINT id) const
 		return &EolToMac;
 	case ID_TOOLS_GENERATEREPORT:
 		return &GenerateReport;
+	case ID_FILE_COLLECTMODE:
+		return &CollectMode;
 	case ID_TOOLS_COMPARE_SELECTION:
 		return &CompareSelection;
 	case ID_EDIT_TOGGLE_BOOKMARK:
@@ -2926,31 +2934,35 @@ bool CMainFrame::ParseArgsAndDoOpen(const MergeCmdLineInfo &cmdInfo)
 			filelocLeft.filepath = cmdInfo.m_Files[0];
 			if (cmdInfo.m_Files.size() > 1)
 			{
-				if (cmdInfo.m_Files.size() > 2)
-					m_strSaveAsPath = cmdInfo.m_Files[2].c_str();
 				filelocRight.filepath = cmdInfo.m_Files[1];
+				if (!m_pCollectingDirFrame ||
+					!m_pCollectingDirFrame->AddToCollection(filelocLeft, filelocRight))
+				{
+					if (cmdInfo.m_Files.size() > 2)
+						m_strSaveAsPath = cmdInfo.m_Files[2].c_str();
 
-				// If content type was specified, set up things accordingly.
-				UINT idCompareAs = 0;
-				PackingInfo packingInfo;
-				if (cmdInfo.m_sContentType == _T("text"))
-					idCompareAs = ID_MERGE_COMPARE_TEXT;
-				else if (cmdInfo.m_sContentType == _T("binary"))
-					idCompareAs = ID_MERGE_COMPARE_HEX;
-				else if (cmdInfo.m_sContentType == _T("archive"))
-					idCompareAs = ID_MERGE_COMPARE_ZIP;
-				else if (cmdInfo.m_sContentType == _T("xml"))
-					packingInfo.SetXML();
-				else if (!cmdInfo.m_sContentType.empty())
-					packingInfo.SetPlugin(cmdInfo.m_sContentType.c_str());
-				else
-					idCompareAs = ID_MERGE_COMPARE;
+					// If content type was specified, set up things accordingly.
+					UINT idCompareAs = 0;
+					PackingInfo packingInfo;
+					if (cmdInfo.m_sContentType == _T("text"))
+						idCompareAs = ID_MERGE_COMPARE_TEXT;
+					else if (cmdInfo.m_sContentType == _T("binary"))
+						idCompareAs = ID_MERGE_COMPARE_HEX;
+					else if (cmdInfo.m_sContentType == _T("archive"))
+						idCompareAs = ID_MERGE_COMPARE_ZIP;
+					else if (cmdInfo.m_sContentType == _T("xml"))
+						packingInfo.SetXML();
+					else if (!cmdInfo.m_sContentType.empty())
+						packingInfo.SetPlugin(cmdInfo.m_sContentType.c_str());
+					else
+						idCompareAs = ID_MERGE_COMPARE;
 
-				bCompared = DoFileOpen(
-					packingInfo, idCompareAs,
-					filelocLeft, filelocRight,
-					cmdInfo.m_dwLeftFlags, cmdInfo.m_dwRightFlags,
-					cmdInfo.m_nRecursive);
+					bCompared = DoFileOpen(
+						packingInfo, idCompareAs,
+						filelocLeft, filelocRight,
+						cmdInfo.m_dwLeftFlags, cmdInfo.m_dwRightFlags,
+						cmdInfo.m_nRecursive);
+				}
 			}
 			else if (ProjectFile::IsProjectFile(filelocLeft.filepath.c_str()))
 			{

@@ -552,6 +552,7 @@
 #define IDS_STATUSBAR_READONLY                  16839
 #define IDS_DIRVIEW_STATUS_FMT_FOCUS            16840
 #define IDS_DIRVIEW_STATUS_FMT_NOFOCUS          16841
+#define IDS_DIRVIEW_STATUS_COLLECTMODE          16842
 #define IDS_ERROR_INCOMPARABLE                  17200
 #define IDS_DIRSEL_TAG                          17201
 #define IDS_OPEN_FILESDIRS                      17202
@@ -799,6 +800,7 @@
 #define ID_EOL_TO_UNIX                          32775
 #define ID_EOL_TO_MAC                           32776
 #define ID_FILE_MERGINGMODE                     32777
+#define ID_FILE_COLLECTMODE                     32778
 #define ID_SELECTLINEDIFF                       32784
 #define ID_EDIT_WMGOTO                          32785
 #define ID_OPTIONS                              32786

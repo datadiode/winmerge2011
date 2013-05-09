@@ -68,12 +68,13 @@ public:
 	STDMETHOD(ShowHTMLDialog)(BSTR url, VARIANT *arguments, BSTR features, VARIANT *ret);
 
 // Attributes
-public:	
+public:
 	HWindow *m_pWndMDIClient;
 	HMENU m_hMenuDefault;
 	HACCEL m_hAccelTable;
 	LogFont m_lfDiff; /**< MergeView user-selected font */
 	LogFont m_lfDir; /**< DirView user-selected font */
+	CDirFrame *m_pCollectingDirFrame;
 // Operations
 public:
 	void InitCmdUI();
@@ -313,6 +314,7 @@ private:
 		BYTE EolToUnix;
 		BYTE EolToMac;
 		BYTE GenerateReport;
+		BYTE CollectMode;
 		BYTE CompareSelection;
 		BYTE ToggleBookmark;
 		BYTE NavigateBookmarks;

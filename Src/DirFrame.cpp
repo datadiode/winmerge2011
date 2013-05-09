@@ -36,6 +36,8 @@
 #include "LanguageSelect.h"
 #include "DirFrame.h"
 #include "DirView.h"
+#include "Common/coretools.h"
+#include "paths.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -150,6 +152,20 @@ template<>
 void CDirFrame::UpdateCmdUI<ID_FILE_RIGHT_READONLY>()
 {
 	m_pMDIFrame->UpdateCmdUI<ID_FILE_RIGHT_READONLY>(m_bRORight ? MF_CHECKED : 0);
+}
+
+/**
+ * @brief Update collect mode menuitem and statusbar indicator
+ */
+template<>
+void CDirFrame::UpdateCmdUI<ID_FILE_COLLECTMODE>()
+{
+	m_pMDIFrame->UpdateCmdUI<ID_FILE_COLLECTMODE>(
+		m_pMDIFrame->m_pCollectingDirFrame == this ?
+		MF_CHECKED : MF_UNCHECKED);
+	m_pMDIFrame->GetStatusBar()->SetPartText(1,
+		m_pMDIFrame->m_pCollectingDirFrame == this ?
+		LanguageSelect.LoadString(IDS_DIRVIEW_STATUS_COLLECTMODE).c_str() : NULL);
 }
 
 /**
@@ -363,6 +379,12 @@ LRESULT CDirFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 	case ID_DIR_MOVE_RIGHT_TO_BROWSE:
 		m_pDirView->DoMoveRightTo();
 		break;
+	case ID_FILE_MERGINGMODE: // This is to catch the VK_F9 accelerator
+	case ID_FILE_COLLECTMODE:
+		m_pMDIFrame->m_pCollectingDirFrame =
+			m_pMDIFrame->m_pCollectingDirFrame != this ? this : NULL;
+		UpdateCmdUI<ID_FILE_COLLECTMODE>();
+		break;
 	case ID_FILE_ENCODING:
 		m_pDirView->DoFileEncodingDialog();
 		break;
@@ -462,6 +484,7 @@ LRESULT CDirFrame::OnWndMsg<WM_NCACTIVATE>(WPARAM wParam, LPARAM)
 		m_pMDIFrame->InitCmdUI();
 		UpdateCmdUI<ID_FILE_LEFT_READONLY>();
 		UpdateCmdUI<ID_FILE_RIGHT_READONLY>();
+		UpdateCmdUI<ID_FILE_COLLECTMODE>();
 		UpdateCmdUI<ID_VIEW_TREEMODE>();
 		UpdateCmdUI<ID_VIEW_SHOWHIDDENITEMS>();
 		UpdateCmdUI<ID_REFRESH>();
@@ -499,6 +522,8 @@ LRESULT CDirFrame::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_CLOSE:
 		if (PreventFromClosing())
 			return 0;
+		if (m_pMDIFrame->m_pCollectingDirFrame == this)
+			m_pMDIFrame->m_pCollectingDirFrame = NULL;
 		break;
 	case WM_COMMAND:
 		if (LRESULT lResult = OnWndMsg<WM_COMMAND>(wParam, lParam))
@@ -639,6 +664,47 @@ void CDirFrame::SetRightReadOnly(BOOL bReadOnly)
 	m_bRORight = bReadOnly;
 	m_wndStatusBar->SetPartText(PANE_RIGHT_RO, m_bRORight ?
 		LanguageSelect.LoadString(IDS_STATUSBAR_READONLY).c_str() : NULL);
+}
+
+bool CDirFrame::AddToCollection(FileLocation &filelocLeft, FileLocation &filelocRight)
+{
+	const String &lpath = m_pCtxt->GetLeftPath();
+	const String &rpath = m_pCtxt->GetRightPath();
+	LPCTSTR lname = EatPrefix(filelocLeft.filepath.c_str(), lpath.c_str());
+	LPCTSTR rname = EatPrefix(filelocRight.filepath.c_str(), rpath.c_str());
+	if (lname == NULL || rname == NULL)
+	{
+		stl::swap(filelocLeft, filelocRight);
+		lname = EatPrefix(filelocLeft.filepath.c_str(), lpath.c_str());
+		rname = EatPrefix(filelocRight.filepath.c_str(), rpath.c_str());
+		if (lname == NULL || rname == NULL)
+		{
+			stl::swap(filelocLeft, filelocRight);
+			return false;
+		}
+	}
+	int i = -1;
+	if (DIFFITEM *di = FindItemFromPaths(filelocLeft.filepath.c_str(), filelocRight.filepath.c_str()))
+	{
+		i = m_pDirView->GetItemIndex(di);
+	}
+	else
+	{
+		di = m_pCtxt->AddDiff(NULL);
+		di->diffcode = DIFFCODE::NEEDSCAN;
+		di->left.path = paths_GetParentPath(lname);
+		di->left.filename = PathFindFileName(lname);
+		di->right.path = paths_GetParentPath(rname);
+		di->right.filename = PathFindFileName(rname);
+		i = m_pDirView->AddNewItem(m_pDirView->GetItemCount(), di, I_IMAGECALLBACK, 0);
+		Rescan(1);
+	}
+	if (i != -1)
+	{
+		m_pDirView->SetItemState(i, LVIS_SELECTED, LVIS_SELECTED);
+		m_pDirView->EnsureVisible(i, FALSE);
+	}
+	return true;
 }
 
 BOOL CDirFrame::PreTranslateMessage(MSG *pMsg)

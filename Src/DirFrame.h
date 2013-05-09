@@ -62,6 +62,7 @@ public:
 	BOOL GetRightReadOnly() const { return m_bRORight; }
 	void SetLeftReadOnly(BOOL bReadOnly);
 	void SetRightReadOnly(BOOL bReadOnly);
+	bool AddToCollection(FileLocation &, FileLocation &);
 	HStatusBar *m_wndStatusBar;
 	void UpdateResources();
 	void CreateClient();
