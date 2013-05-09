@@ -81,9 +81,7 @@ CMergeEditView::CMergeEditView(
 	size_t ZeroInit
 ) : CGhostTextView(ZeroInit),
 	m_pDocument(pDocument),
-	m_nThisPane(nThisPane),
-	m_bAutomaticRescan(false),
-	m_pStatusBar(NULL)
+	m_nThisPane(nThisPane)
 {
 	SubclassWindow(pWnd);
 	RegisterDragDrop(m_hWnd, this);
@@ -255,7 +253,7 @@ int CMergeEditView::GetAdditionalTextBlocks (int nLineIndex, TEXTBLOCK *pBuf)
 
 	int nLineLength = GetLineLength(nLineIndex);
 	vector<wdiff> worddiffs;
-	m_pDocument->GetWordDiffArray(nLineIndex, &worddiffs);
+	m_pDocument->GetWordDiffArray(nLineIndex, worddiffs);
 
 	if (nLineLength == 0 || worddiffs.size() == 0 || // Both sides are empty
 		IsSide0Empty(worddiffs, nLineLength) || IsSide1Empty(worddiffs, nLineLength))
@@ -406,8 +404,10 @@ void CMergeEditView::GetLineColors(int nLineIndex, COLORREF &crBkgnd, COLORREF &
 			crText = GetColor(COLORINDEX_NORMALTEXT);
 		}
 		else
+		{
 			// Syntax highlighting, get colors from CrystalEditor
 			CCrystalEditViewEx::GetLineColors(nLineIndex, crBkgnd, crText);
+		}
 	}
 }
 

@@ -141,7 +141,7 @@ void CChildFrame::Computelinediff(CCrystalTextView *pView1, CCrystalTextView *pV
 	// Make the call to stringdiffs, which does all the hard & tedious computations
 	vector<wdiff> worddiffs;
 	int breakType = GetBreakType();
-	sd_ComputeWordDiffs(str1, str2, casitive, xwhite, breakType, difflvl == BYTEDIFF, &worddiffs);
+	sd_ComputeWordDiffs(str1, str2, casitive, xwhite, breakType, difflvl == BYTEDIFF, worddiffs);
 	//Add a diff in case of EOL difference
 	if (!m_diffWrapper.bIgnoreEol)
 	{
@@ -234,7 +234,7 @@ void CChildFrame::Computelinediff(CCrystalTextView *pView1, CCrystalTextView *pV
  * This is used by algorithm for line diff coloring
  * (Line diff coloring is distinct from the selection highlight code)
  */
-void CChildFrame::GetWordDiffArray(int nLineIndex, vector<wdiff> *pworddiffs)
+void CChildFrame::GetWordDiffArray(int nLineIndex, vector<wdiff> &worddiffs)
 {
 	if (nLineIndex >= m_pView[0]->GetLineCount())
 		return;
@@ -253,13 +253,13 @@ void CChildFrame::GetWordDiffArray(int nLineIndex, vector<wdiff> *pworddiffs)
 	const bool byteColoring = GetByteColoringOption();
 
 	// Make the call to stringdiffs, which does all the hard & tedious computations
-	sd_ComputeWordDiffs(str1, str2, casitive, xwhite, breakType, byteColoring, pworddiffs);
+	sd_ComputeWordDiffs(str1, str2, casitive, xwhite, breakType, byteColoring, worddiffs);
 	//Add a diff in case of EOL difference
 	if (!m_diffWrapper.bIgnoreEol)
 	{
 		if (_tcscmp(m_pView[0]->GetTextBufferEol(nLineIndex), m_pView[1]->GetTextBufferEol(nLineIndex)))
 		{
-			pworddiffs->push_back(wdiff(i1, i1, i2, i2));
+			worddiffs.push_back(wdiff(i1, i1, i2, i2));
 		}
 	}
 }

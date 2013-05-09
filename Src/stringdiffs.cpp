@@ -4,9 +4,6 @@
  * @brief Implementation file for sd_ComputeWordDiffs (q.v.)
  *
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "string_util.h"
 #include "stringdiffs.h"
@@ -19,18 +16,17 @@ using stl::vector;
 // We don't use _DEBUG since stringdiff logging is verbose and slows down WinMerge
 // #define STRINGDIFF_LOGGING
 
-static bool CustomChars;
 static const TCHAR BreakCharDefaults[] = _T(",.;:");
 static const TCHAR *BreakChars = BreakCharDefaults;
 
 static bool isWordBreak(int breakType, TCHAR ch);
-static void wordLevelToByteLevel(vector<wdiff> * pDiffs, const String& str1,
-		const String& str2, bool casitive, int xwhite);
+static void wordLevelToByteLevel(vector<wdiff> &diffs,
+	const String &str1, const String &str2, bool casitive, int xwhite);
 
-static bool sd_findsyn(wdiff* pDiff, const String & str1, const String & str2, 
-            bool casitive, int xwhite, 
-            int &begin1, int &begin2, int &end1, int &end2, bool equal, int func,
-            int &s1,int &e1,int &s2,int &e2);
+static bool sd_findsyn(const wdiff &diff,
+	const String &str1, const String &str2, bool casitive, int xwhite,
+	int &begin1, int &begin2, int &end1, int &end2, bool equal,
+	enum sd_findsyn_func func, int &s1, int &e1, int &s2, int &e2);
 
 void sd_SetBreakChars(const TCHAR *breakChars)
 {
@@ -45,9 +41,9 @@ void sd_SetBreakChars(const TCHAR *breakChars)
  */
 void sd_ComputeWordDiffs(const String & str1, const String & str2,
 	bool case_sensitive, int whitespace, int breakType, bool byte_level,
-	vector<wdiff> * pDiffs)
+	vector<wdiff> &diffs)
 {
-	stringdiffs sdiffs(str1, str2, case_sensitive, whitespace, breakType, pDiffs);
+	stringdiffs sdiffs(str1, str2, case_sensitive, whitespace, breakType, diffs);
 	// Hash all words in both lines and then compare them word by word
 	// storing differences into m_wdiffs
 	sdiffs.BuildWordDiffList();
@@ -55,21 +51,20 @@ void sd_ComputeWordDiffs(const String & str1, const String & str2,
 	sdiffs.PopulateDiffs();
 	// Adjust the range of the word diff down to byte (char) level.
 	if (byte_level)
-		wordLevelToByteLevel(pDiffs, str1, str2, case_sensitive, whitespace);
+		wordLevelToByteLevel(diffs, str1, str2, case_sensitive, whitespace);
 }
 
 /**
  * @brief stringdiffs constructor simply loads all members from arguments
  */
-stringdiffs::stringdiffs(const String & str1, const String & str2,
-	bool case_sensitive, int whitespace, int breakType,
-	vector<wdiff> * pDiffs)
+stringdiffs::stringdiffs(const String &str1, const String &str2,
+	bool case_sensitive, int whitespace, int breakType, vector<wdiff> &diffs)
 : m_str1(str1)
 , m_str2(str2)
 , m_case_sensitive(case_sensitive)
 , m_whitespace(whitespace)
 , m_breakType(breakType)
-, m_pDiffs(pDiffs)
+, m_diffs(diffs)
 , m_matchblock(true) // Change to false to get word to word compare
 {
 }
@@ -87,8 +82,8 @@ stringdiffs::~stringdiffs()
  */
 void stringdiffs::BuildWordDiffList()
 {
-	BuildWordsArray(m_str1, &m_words1);
-	BuildWordsArray(m_str2, &m_words2);
+	BuildWordsArray(m_str1, m_words1);
+	BuildWordsArray(m_str2, m_words2);
 
 	int start = 0;
 	int end = 0;
@@ -99,22 +94,22 @@ void stringdiffs::BuildWordDiffList()
 		// Remove a leading whitespace
 		if (m_words1.size() > 0 && IsSpace(m_words1[0]))
 		{
-			RemoveItem(m_words1, 0);
+			m_words1.erase(m_words1.begin());
 		}
 		// Remove a ending whitespace
 		if (m_words1.size() > 0 && IsSpace(m_words1[m_words1.size() - 1]))
 		{
-			RemoveItem(m_words1, m_words1.size() - 1);
+			m_words1.pop_back();
 		}
 		// Remove a leading whitespace
 		if (m_words2.size() > 0 && IsSpace(m_words2[0]))
 		{
-			RemoveItem(m_words2, 0);
+			m_words2.erase(m_words2.begin());
 		}
 		// Remove a ending whitespace
 		if (m_words2.size() > 0 && IsSpace(m_words2[m_words2.size() - 1]))
 		{
-			RemoveItem(m_words2,m_words2.size() - 1);
+			m_words2.pop_back();
 		}
 	}
 	// Look for a match of word2 in word1
@@ -123,8 +118,8 @@ void stringdiffs::BuildWordDiffList()
 	// whatever is shorter, it's result.
 	if (m_matchblock)
 	{
-		int bw1 = 0;			// start position in m_words1
-		int bw2 = 0;			// start position in m_words2
+		int bw1 = 0; // start position in m_words1
+		int bw2 = 0; // start position in m_words2
 		while (bw2 < (int)m_words2.size())
 		{
 			if (bw1 >= (int)m_words1.size())
@@ -134,12 +129,12 @@ void stringdiffs::BuildWordDiffList()
 				bool lbreak = false; // repeat
 				if (IsSpace(m_words1[bw1]))
 				{
-					RemoveItem(m_words1,bw1);
+					m_words1.erase(m_words1.begin() + bw1);
 					lbreak = true;
 				}
 				if (IsSpace(m_words2[bw2]))
 				{
-					RemoveItem(m_words2,bw2);
+					m_words2.erase(m_words2.begin() + bw2);
 					lbreak = true;
 				}
 				if (lbreak)
@@ -184,10 +179,9 @@ void stringdiffs::BuildWordDiffList()
 								m_words2[bw2].end = m_words2[bw2 + 2].end;
 								m_words2[bw1].hash = m_words1[bw1].hash;
 								// Now remove the detected blocks on side2.
-								RemoveItem(m_words2,bw2 + 1);
-								RemoveItem(m_words2,bw2 + 1);
-								bw1++;
-								bw2++;
+								m_words2.erase(m_words2.begin() + bw2 + 1, m_words2.begin() + bw2 + 2);
+								++bw1;
+								++bw2;
 								continue;
 							}
 						}
@@ -204,10 +198,9 @@ void stringdiffs::BuildWordDiffList()
 								m_words1[bw1].end = m_words1[bw1 + 2].end;
 								m_words1[bw1].hash = m_words2[bw1].hash;
 								// Now remove the detected blocks on side2.
-								RemoveItem(m_words1,bw1 + 1);
-								RemoveItem(m_words1,bw1 + 1);
-								bw1++;
-								bw2++;
+								m_words1.erase(m_words1.begin() + bw1 + 1, m_words1.begin() + bw1 + 2);
+								++bw1;
+								++bw2;
 								continue;
 							}
 						}
@@ -230,8 +223,8 @@ void stringdiffs::BuildWordDiffList()
 							if (AreWordsSame(m_words1[bw1 + 3], m_words2[bw2 + 3]) || AreWordsSame(m_words1[bw1 + 4], m_words2[bw2 + 4]))
 							{
 								// Ok than keep it as a differ
-								bw1 = bw1 + 2;
-								bw2 = bw2 + 2;
+								bw1 += 2;
+								bw2 += 2;
 								continue;
 							}
 						}
@@ -242,8 +235,8 @@ void stringdiffs::BuildWordDiffList()
 						if (AreWordsSame(m_words1[bw1 + 1], m_words2[bw2 + 1]))
 						{
 							// Ok than keep it as a differ
-							bw1 = bw1 + 2;
-							bw2 = bw2 + 2;
+							bw1 += 2;
+							bw2 += 2;
 							continue;
 						}
 					}
@@ -281,8 +274,8 @@ void stringdiffs::BuildWordDiffList()
 					vector<word>::iterator iter = m_words1.begin() + bw1;
 					m_words1.insert(iter, word(start, end, dlinsert, 0));
 				}
-				bw1 = bw1 + k + 1;
-				bw2 = bw2 + k + 1; // Next record
+				bw1 += k + 1;
+				bw2 += k + 1; // Next record
 				continue;
 			}
 			else if (w1 > bw2)
@@ -304,14 +297,14 @@ void stringdiffs::BuildWordDiffList()
 					vector<word>::iterator iter = m_words2.begin() + bw2;
 					m_words2.insert(iter, word(start, end, dlinsert, 0));
 				}
-				bw1 = bw1 + k + 1;
-				bw2 = bw2 + k + 1; // Next record
+				bw1 += k + 1;
+				bw2 += k + 1; // Next record
 				continue;
 			}
 			else if (w1 == bw2)
 			{
-				bw1++;
-				bw2++;
+				++bw1;
+				++bw2;
 			}
 		}
 	}
@@ -364,19 +357,17 @@ void stringdiffs::BuildWordDiffList()
 			}
 		}
 
-		// Look for a match of word2 in word1
-		// We do it from back to get more acurated matches
-		int bw1 = (int)m_words1.size() - 1;	// start position in m_words1
-		int bw2 = (int)m_words2.size() - 1;	// start position in m_words2
-		if (m_matchblock && bw1 > 0 && bw2 > 0)
+		if (m_matchblock)
 		{
-			while (bw1 > 1 && bw2 > 1)
+			// Look for a match of word2 in word1
+			// We do it from back to get more acurated matches
+			int bw1 = (int)m_words1.size(); // start position in m_words1
+			int bw2 = (int)m_words2.size(); // start position in m_words2
+			while (--bw1 > 1 && --bw2 > 1)
 			{
-				if (AreWordsSame(m_words1[bw1], m_words2[bw2])
-					|| (IsSpace(m_words1[bw1]) && IsSpace(m_words2[bw2])))
+				if (AreWordsSame(m_words1[bw1], m_words2[bw2]) ||
+					IsSpace(m_words1[bw1]) && IsSpace(m_words2[bw2]))
 				{
-					bw1--;
-					bw2--;
 					continue;
 				}
 				int w1 = -2, w2 = -2; // position found in array
@@ -384,9 +375,9 @@ void stringdiffs::BuildWordDiffList()
 				// Normaly we synchronise with a *word2 to a match in word1
 				// If it is an Insert in word2 so look for a *word1 in word2
 				if (IsInsert(m_words2[bw2]))
-					w2 = FindPreMatchInWords(m_words2, m_words1[bw1], bw2,2);
+					w2 = FindPreMatchInWords(m_words2, m_words1[bw1], bw2, 2);
 				else
-					w1 = FindPreMatchInWords(m_words1, m_words2[bw2], bw1,1);
+					w1 = FindPreMatchInWords(m_words1, m_words2[bw2], bw1, 1);
 				// check all between are inserts
 				// if so, so exchange the position
 				if (w1 >= 0)
@@ -403,19 +394,15 @@ void stringdiffs::BuildWordDiffList()
 					if ((k - l) == 0)
 					{
 						MoveInWordsUp(m_words1, w1, bw1);
-						bw1--;
-						bw2--;
 						continue;
 					}
 					else if (((k - l) == 1) && !AreWordsSame(m_words1[bw1-l], m_words2[bw2-l]))
 					{
-						MoveInWordsUp(m_words1, bw2-l, bw1);
-						MoveInWordsUp(m_words1, w1, bw1-1);
+						MoveInWordsUp(m_words1, bw2 - l, bw1);
+						MoveInWordsUp(m_words1, w1, bw1 - 1);
 						//insert a record before in words1 , after in words2
 						InsertInWords(m_words2, bw2);
 						InsertInWords(m_words1, w1);
-						bw1--;
-						bw2--;
 						continue;
 					}
 				}
@@ -433,19 +420,15 @@ void stringdiffs::BuildWordDiffList()
 					if ((k - l) == 0)
 					{
 						MoveInWordsUp(m_words2, w2, bw2);
-						bw1--;
-						bw2--;
 						continue;
 					}
 					else if (((k - l) == 1) && !AreWordsSame(m_words1[bw1-l], m_words2[bw2-l]))
 					{
-						MoveInWordsUp(m_words2, bw1-l, bw2);
-						MoveInWordsUp(m_words2, w2, bw2-1);
+						MoveInWordsUp(m_words2, bw1 - l, bw2);
+						MoveInWordsUp(m_words2, w2, bw2 - 1);
 						//insert a record before in words2 , after in words1
 						InsertInWords(m_words1, bw1);
 						InsertInWords(m_words2, w2);
-						bw1--;
-						bw2--;
 						continue;
 					}
 				}
@@ -454,96 +437,72 @@ void stringdiffs::BuildWordDiffList()
 				// if so move next preblock to this position
 				if (IsInsert(m_words1[bw1]))
 				{
-					int k = FindPreNoInsertInWords(m_words1,bw1);
+					int k = FindPreNoInsertInWords(m_words1, bw1);
 					if (k == 1)
 					{
-						bw1--;
-						bw2--;
 						continue;
 					}
-					bool ok =false;
-					if (k >=0 )
-					{
-						if (k > 0)
-						{
-							ok = !(AreWordsSame(m_words1[k], m_words2[k]) &&
-								AreWordsSame(m_words1[k - 1], m_words2[k - 1]));
-						}
-						else
-							ok = !(AreWordsSame(m_words1[k], m_words2[k]));
-					}
-					if(ok)
+					if (k >= 0 && !AreWordsSame(m_words1[k], m_words2[k]) ||
+						k > 0 && !AreWordsSame(m_words1[k - 1], m_words2[k - 1]))
 					{
 						MoveInWordsUp(m_words1, k, bw1);
 					}
 				}
 				if (IsInsert(m_words2[bw2]))
 				{
-					int k = FindPreNoInsertInWords(m_words2,bw2);
+					int k = FindPreNoInsertInWords(m_words2, bw2);
 					if (k == 1)
 					{
-						bw1--;
-						bw2--;
 						continue;
 					}
-					bool ok =false;
-					if (k >=0 )
+					if (k >= 0 && !AreWordsSame(m_words1[k], m_words2[k]) ||
+						k > 0 && !AreWordsSame(m_words1[k - 1], m_words2[k - 1]))
 					{
-						if (k > 0)
-							ok = !(AreWordsSame(m_words1[k], m_words2[k]) &&
-							AreWordsSame(m_words1[k - 1], m_words2[k - 1]));
-						else
-							ok = !(AreWordsSame(m_words1[k], m_words2[k]));
-					}
-					if(ok)					{
 						MoveInWordsUp(m_words2, k, bw2);
 					}
 				}
-				bw1--;
-				bw2--;
-				continue;
+				continue; // TODO: Why does this affect release build code size?
 			}
 		}
 // I care about consistency and I think most apps will highlight the space
 //  after the word so that would be my preference.
 // to get this we need a thirt run, only look for inserts now!
-		int w1, w2;			// position found in array
-		bw1 = 0;			// start position in m_words1
-		bw2 = 0;			// start position in m_words2
-			do
+		int w1, w2; // position found in array
+		int bw1 = 0; // start position in m_words1
+		int bw2 = 0; // start position in m_words2
+		do
+		{
+			w1 = FindNextInsertInWords(m_words1, bw1);
+			w2 = FindNextInsertInWords(m_words2, bw2);
+			if (w1 == w2)
 			{
-				w1 = FindNextInsertInWords(m_words1, bw1);
-				w2 = FindNextInsertInWords(m_words2, bw2);
-				if (w1 == w2)
+				bw1++;
+				bw2++;
+			}
+			// word1 is first
+			else if (w1 >= 0 && (w1 < w2 || w2 == -1))
+			{
+				bw1 = FindNextNoInsertInWords(m_words1, w1);
+				if (bw1 >=0 && !AreWordsSame(m_words1[bw1], m_words2[bw1]))
 				{
-					bw1++;
-					bw2++;
+					// Move block to actual position
+					MoveInWordsDown(m_words1, bw1, w1);
 				}
-				// word1 is first
-				else if (w1 >= 0 && (w1 < w2 || w2 == -1))
+				bw1 = ++w1;
+				bw2 = bw1;
+			}
+			else if(w2 >= 0 && (w2 < w1 || w1 == -1))
+			{
+				bw2 = FindNextNoInsertInWords(m_words2,w2);
+				if (bw2 >=0 && !AreWordsSame(m_words1[bw2], m_words2[bw2]))
 				{
-					bw1 = FindNextNoInsertInWords(m_words1, w1);
-					
-					if (bw1 >=0 && !AreWordsSame(m_words1[bw1], m_words2[bw1]))
-					{
-						// Move block to actual position
-						MoveInWordsDown(m_words1, bw1, w1);
-					}
-					bw1 = ++w1;
-					bw2 = bw1;
+					// Move block to actual position
+					MoveInWordsDown(m_words2, bw2, w2);
 				}
-				else if(w2 >= 0 && (w2 < w1 || w1 == -1))
-				{
-					bw2 = FindNextNoInsertInWords(m_words2,w2);
-					if (bw2 >=0 && !AreWordsSame(m_words1[bw2], m_words2[bw2]))
-					{
-						// Move block to actual position
-						MoveInWordsDown(m_words2, bw2, w2);
-					}
-					bw1 = ++w2;
-					bw2 = bw1;
-				}		
-			} while (w1 >= 0 || w2 >= 0);
+				bw1 = ++w2;
+				bw2 = bw1;
+			}		
+		} while (w1 >= 0 || w2 >= 0);
 
 		// Remove empty records on both side
 #ifdef STRINGDIFF_LOGGING
@@ -559,8 +518,8 @@ void stringdiffs::BuildWordDiffList()
 
 			if (IsInsert(m_words1[i]) && AreWordsSame(m_words1[i], m_words2[i]))
 			{
-				RemoveItem(m_words1,i);
-				RemoveItem(m_words2,i);
+				m_words1.erase(m_words1.begin() + i);
+				m_words2.erase(m_words2.begin() + i);
 				continue;
 			}
 			i++;
@@ -573,14 +532,14 @@ void stringdiffs::BuildWordDiffList()
 		{
 			if (IsInsert(m_words1[i]) && IsInsert(m_words2[i + 1]))
 			{
-				RemoveItem(m_words1,i);
-				RemoveItem(m_words2,i + 1);
+				m_words1.erase(m_words1.begin() + i);
+				m_words2.erase(m_words2.begin() + i + 1);
 				continue;
 			}
 			if (IsInsert(m_words1[i + 1]) && IsInsert(m_words2[i]))
 			{
-				RemoveItem(m_words1, i + 1);
-				RemoveItem(m_words2, i);
+				m_words1.erase(m_words1.begin() + i + 1);
+				m_words2.erase(m_words2.begin() + i);
 				continue;
 			}
 			i++;
@@ -593,11 +552,11 @@ void stringdiffs::BuildWordDiffList()
 		{
 			if (AreWordsSame(m_words1[i], m_words2[i]))
 			{
-				RemoveItem(m_words1, i);
-				RemoveItem(m_words2, i);
+				m_words1.erase(m_words1.begin() + i);
+				m_words2.erase(m_words2.begin() + i);
 				continue;
 			}
-			i++;
+			++i;
 		}
 
 		// ignore all diff in whitespace
@@ -609,11 +568,11 @@ void stringdiffs::BuildWordDiffList()
 			{
 				if (IsSpace(m_words1[i]) && IsSpace(m_words2[i]))
 				{
-					RemoveItem(m_words1, i);
-					RemoveItem(m_words2, i);
+					m_words1.erase(m_words1.begin() + i);
+					m_words2.erase(m_words2.begin() + i);
 					continue;
 				}
-				i++;
+				++i;
 			}
 		}
 
@@ -623,13 +582,13 @@ void stringdiffs::BuildWordDiffList()
 		i = 0;
 		while ((int)m_words1.size() > i + 1)
 		{
-			if (IsInsert(m_words1[i]) && IsInsert(m_words1[i+1]))
+			if (IsInsert(m_words1[i]) && IsInsert(m_words1[i + 1]))
 			{
 				if ((m_words2[i].end +1 ) == (m_words2[i + 1].start))
 				{
 					m_words2[i].end = m_words2[i + 1].end;
-					RemoveItem(m_words1,i + 1);
-					RemoveItem(m_words2,i + 1);
+					m_words1.erase(m_words1.begin() + i + 1);
+					m_words2.erase(m_words2.begin() + i + 1);
 					continue;
 				}
 			}
@@ -639,13 +598,13 @@ void stringdiffs::BuildWordDiffList()
 		i = 0;
 		while ((int)m_words2.size() > i + 1)
 		{
-			if (IsInsert(m_words2[i]) && IsInsert(m_words2[i+1]))
+			if (IsInsert(m_words2[i]) && IsInsert(m_words2[i + 1]))
 			{
-				if ((m_words1[i].end +1 ) == (m_words1[i + 1].start))
+				if ((m_words1[i].end + 1) == (m_words1[i + 1].start))
 				{
 					m_words1[i].end = m_words1[i + 1].end;
-					RemoveItem(m_words1,i + 1);
-					RemoveItem(m_words2,i + 1);
+					m_words1.erase(m_words1.begin() + i + 1);
+					m_words2.erase(m_words2.begin() + i + 1);
 					continue;
 				}
 			}
@@ -658,7 +617,7 @@ void stringdiffs::BuildWordDiffList()
 		if (i >= 1)
 		{
 			if (IsInsert(m_words1[i]) &&
-				((m_words1[i].start == m_str1.length() - 1)|| (m_words1[i].start ==m_words1[i-1].end)))
+				((m_words1[i].start == m_str1.length() - 1) || (m_words1[i].start == m_words1[i - 1].end)))
 			{
 				m_words1[i].start = m_str1.length();
 				m_words1[i].end = m_words1[i].start - 1;
@@ -666,7 +625,7 @@ void stringdiffs::BuildWordDiffList()
 			else
 			{
 				if (IsInsert(m_words2[i]) &&
-				((m_words2[i].start == m_str2.length() - 1)|| (m_words2[i].start ==m_words2[i-1].end)))
+					((m_words2[i].start == m_str2.length() - 1) || (m_words2[i].start == m_words2[i - 1].end)))
 				{
 					m_words2[i].start = m_str2.length();
 					m_words2[i].end = m_words2[i].start - 1;
@@ -723,6 +682,7 @@ void stringdiffs::BuildWordDiffList()
 		}
 	}
 }
+
 /**
  * @brief Insert a new block in words)
  */
@@ -742,6 +702,7 @@ void stringdiffs::InsertInWords(vector<word> &words, int bw)
 	vector<word>::iterator iter = words.begin() + bw;
 	words.insert(iter, word(start, end, dlinsert, 0));
 }
+
 /**
  * @brief Find pre word in m_words2 (starting at bw2) that matches needword1 (in m_words1)
  */
@@ -762,6 +723,7 @@ int stringdiffs::FindPreMatchInWords(const vector<word> &words, const word & nee
 	}
 	return -1;
 }
+
 /**
  * @brief Find next word in words (starting at bw) that matches needword1 (in m_words1)
  */
@@ -784,24 +746,11 @@ int stringdiffs::FindNextMatchInWords(const vector<word> &words, const word & ne
 	}
 	return -1;
 }
-/**
- * @brief Find pre space in m_words (starting at bw)
- */
-int stringdiffs::FindPreSpaceInWords(const vector<word> &words, int bw) const
-{
-	while (bw >= 0)
-	{
-		if (IsSpace(words[bw]))
-			return bw;
-		--bw;
-	}
-	return -1;
-}
 
 /**
  * @brief Find next space in m_words (starting at bw)
  */
-int stringdiffs::FindNextSpaceInWords(const vector<word> &words, int bw) const
+int stringdiffs::FindNextSpaceInWords(const vector<word> &words, int bw)
 {
 	const int iSize = (int) words.size();
 	while (bw < iSize)
@@ -812,10 +761,11 @@ int stringdiffs::FindNextSpaceInWords(const vector<word> &words, int bw) const
 	}
 	return -1;
 }
+
 /**
  * @brief Find next pre noinsert in words (starting at bw)
  */
-int stringdiffs::FindPreNoInsertInWords(const vector<word> &words, int bw) const
+int stringdiffs::FindPreNoInsertInWords(const vector<word> &words, int bw)
 {
 	while (bw >= 0)
 	{
@@ -825,10 +775,11 @@ int stringdiffs::FindPreNoInsertInWords(const vector<word> &words, int bw) const
 	}
 	return -1;
 }
+
 /**
  * @brief Find next insert in m_words (starting at bw)
  */
-int stringdiffs::FindNextInsertInWords(const vector<word> &words, int bw) const
+int stringdiffs::FindNextInsertInWords(const vector<word> &words, int bw)
 {
 	const int iSize = (int) words.size();
 	while (bw < iSize)
@@ -839,10 +790,11 @@ int stringdiffs::FindNextInsertInWords(const vector<word> &words, int bw) const
 	}
 	return -1;
 }
+
 /**
  * @brief Find next noinsert in m_words (starting at bw)
  */
-int stringdiffs::FindNextNoInsertInWords(const vector<word> &words, int bw) const
+int stringdiffs::FindNextNoInsertInWords(const vector<word> &words, int bw)
 {
 	const int iSize = (int) words.size();
 	while (bw < iSize)
@@ -853,13 +805,14 @@ int stringdiffs::FindNextNoInsertInWords(const vector<word> &words, int bw) cons
 	}
 	return -1;
 }
+
 /**
  * @brief Move word to new position (starting at bw)
  */
-void stringdiffs::MoveInWordsUp(vector<word> &words, int source, int target) const
+void stringdiffs::MoveInWordsUp(vector<word> &words, int source, int target)
 {
-	word wd(words[source].start, words[source].end, words[source].bBreak, words[source].hash);
-	RemoveItem(words, source);
+	word wd = words[source];
+	words.erase(words.begin() + source);
 	vector<word>::iterator iter = words.begin() + target;
 	words.insert(iter, wd);
 	// Correct the start-end pointer
@@ -871,13 +824,14 @@ void stringdiffs::MoveInWordsUp(vector<word> &words, int source, int target) con
 		words[source].end = iend;	
 	}
 }
+
 /**
  * @brief Move word to new position (starting at bw)
  */
-void stringdiffs::MoveInWordsDown(vector<word> &words, int source, int target) const
+void stringdiffs::MoveInWordsDown(vector<word> &words, int source, int target)
 {
-	word wd(words[source].start, words[source].end, words[source].bBreak, words[source].hash);
-	RemoveItem(words, source);
+	word wd = words[source];
+	words.erase(words.begin() + source);
 	vector<word>::iterator iter = words.begin() + target;
 	words.insert(iter, wd);
 	// Correct the start-end pointer
@@ -890,27 +844,11 @@ void stringdiffs::MoveInWordsDown(vector<word> &words, int source, int target) c
 		words[target].end = iend;	
 	}
 }
-/**
- * @brief erase an item in words
- */
-bool stringdiffs::RemoveItem(vector<word> &words,int bw) const
-{
-	if ((int)words.size()== bw + 1)
-	{
-		words.pop_back();
-	}
-	else
-	{
-		vector<word>::iterator iter = words.begin() + bw;
-		words.erase(iter);
-	}
-	return true;
-}
 
 /**
  * @brief Break line into constituent words
  */
-void stringdiffs::BuildWordsArray(const String & str, vector<word> * words)
+void stringdiffs::BuildWordsArray(const String & str, vector<word> &words)
 {
 	int i=0, begin=0;
 
@@ -928,7 +866,7 @@ inspace:
 		int e = i - 1;
 
 		word wd(begin, e, dlspace, Hash(str, begin, e, 0));
-		words->push_back(wd);
+		words.push_back(wd);
 	}
 	if (i == str.length())
 		return;
@@ -947,7 +885,7 @@ inword:
 			int e = i-1;
 			
 			word wd(begin, e, dlword, Hash(str, begin, e, 0));
-			words->push_back(wd);
+			words.push_back(wd);
 		}
 		if (i == str.length())
 		{
@@ -963,7 +901,7 @@ inword:
 			// start a new word because we hit a non-whitespace word break (eg, a comma)
 			// but, we have to put each word break character into its own word
 			word wd(i, i, dlbreak, Hash(str, i, i, 0));
-			words->push_back(wd);
+			words.push_back(wd);
 			++i;
 			begin = i;
 			goto inword;
@@ -1002,7 +940,7 @@ void stringdiffs::PopulateDiffs()
 			assert(m_wdiffs[i].start[0] >= 0 || m_wdiffs[i].start[1] >= 0);
 
 			// Store the diff[i] in the caller list (m_pDiffs)
-			m_pDiffs->push_back(m_wdiffs[i]);
+			m_diffs.push_back(m_wdiffs[i]);
 		}
 	}
 }
@@ -1015,7 +953,7 @@ void stringdiffs::PopulateDiffs()
 /* Given a hash value and a new character, return a new hash value. */
 #define HASH(h, c) ((c) + ROL(h, 7))
 
-UINT stringdiffs::Hash(const String & str, int begin, int end, UINT h) const
+UINT stringdiffs::Hash(const String &str, int begin, int end, UINT h) const
 {
 	for (int i = begin; i <= end; ++i)
 	{
@@ -1036,7 +974,7 @@ UINT stringdiffs::Hash(const String & str, int begin, int end, UINT h) const
 /**
  * @brief Compare two words (by reference to original strings)
  */
-bool stringdiffs::AreWordsSame(const word & word1, const word & word2) const
+bool stringdiffs::AreWordsSame(const word &word1, const word &word2) const
 {
 	if (m_whitespace == WHITESPACE_IGNORE_ALL)
 		if (word1.hash == word2.hash)
@@ -1056,32 +994,32 @@ bool stringdiffs::AreWordsSame(const word & word1, const word & word2) const
 /**
  * @brief Is this block a word one?
  */
-bool stringdiffs::IsWord(const word & word1) const
+bool stringdiffs::IsWord(const word &word1)
 {
-	return (word1.bBreak == dlword);
+	return word1.kind == dlword;
 }
 
 /**
  * @brief Is this block an space or whitespace one?
  */
-bool stringdiffs::IsSpace(const word & word1) const
+bool stringdiffs::IsSpace(const word &word1)
 {
-	return (word1.bBreak == dlspace);
+	return word1.kind == dlspace;
 }
 /**
  * @brief Is this block a break?
  */
-bool stringdiffs::IsBreak(const word & word1) const
+bool stringdiffs::IsBreak(const word &word1)
 {
-	return (word1.bBreak == dlbreak || word1.bBreak == dlspace);
+	return word1.kind == dlbreak || word1.kind == dlspace;
 }
 
 /**
  * @brief Is this block an empty (insert) one?
  */
-bool stringdiffs::IsInsert(const word & word1) const
+bool stringdiffs::IsInsert(const word &word1)
 {
-	return (word1.bBreak == dlinsert);
+	return word1.kind == dlinsert;
 }
 
 /**
@@ -1219,8 +1157,8 @@ void sd_ComputeByteDiff(String & str1, String & str2,
 	{
 		begin1 = 0;
 		begin2 = 0;
-		end1 =len1 - 1;
-		end2 =len2 - 1;
+		end1 = len1 - 1;
+		end2 = len2 - 1;
 		return;
 	}
 	bool alldone = false;
@@ -1457,94 +1395,91 @@ void sd_ComputeByteDiff(String & str1, String & str2,
  * @param xwhite [in] This governs whether we handle whitespace specially
  *  (see WHITESPACE_COMPARE_ALL, WHITESPACE_IGNORE_CHANGE, WHITESPACE_IGNORE_ALL)
  */
-static void wordLevelToByteLevel(vector<wdiff> * pDiffs, const String& str1,
-		const String& str2, bool casitive, int xwhite)
+static void wordLevelToByteLevel(vector<wdiff> &diffs,
+	const String &str1, const String &str2, bool casitive, int xwhite)
 {
-	int s1 = 0,e1 = 0,s2 = 0,e2 = 0; 
-
-	for (int i = 0; i < (int)pDiffs->size(); i++)
+	for (stl_size_t i = 0; i < diffs.size(); i++)
 	{
-		wdiff *pDiff = &(*pDiffs)[i];
+		wdiff &diff = diffs[i];
 		bool bRepeat = true;
 
 		// Something to differ?
-		if (pDiff->start[0] > pDiff->end[0] || pDiff->start[1] > pDiff->end[1])
+		if (diff.start[0] > diff.end[0] || diff.start[1] > diff.end[1])
 			continue;
 #ifdef STRINGDIFF_LOGGING
 		DbgPrint("actual\n left=  %d,%d\n right=  %d,%d\n",
-			pDiff->start[0], pDiff->end[0],pDiff->start[1], pDiff->end[1]);
+			diff.start[0], diff.end[0], diff.start[1], diff.end[1]);
 #endif	
 
 		// Check for first and last difference in word
-		String str1_2 = str1.substr(pDiff->start[0], pDiff->end[0] - pDiff->start[0] + 1);
-		String str2_2 = str2.substr(pDiff->start[1], pDiff->end[1] - pDiff->start[1] + 1);
+		String str1_2 = str1.substr(diff.start[0], diff.end[0] - diff.start[0] + 1);
+		String str2_2 = str2.substr(diff.start[1], diff.end[1] - diff.start[1] + 1);
 		int begin1, begin2, end1, end2;
 		sd_ComputeByteDiff(str1_2, str2_2, casitive, xwhite, begin1, begin2, end1, end2, false);
 		if (begin1 == -1)
 		{
 			// no visible diff on side1
-			pDiff->end[0] = pDiff->start[0] - 1;
+			diff.end[0] = diff.start[0] - 1;
 			bRepeat = false;
 		}
 		else
 		{
 			if (end1 == -1)
 			{
-				pDiff->start[0] += begin1;
-				pDiff->end[0] = pDiff->start[0] + end1;
+				diff.start[0] += begin1;
+				diff.end[0] = diff.start[0] + end1;
 			}
 			else
 			{
-				pDiff->end[0] = pDiff->start[0] + end1;
-				pDiff->start[0] += begin1;
+				diff.end[0] = diff.start[0] + end1;
+				diff.start[0] += begin1;
 			}
 		}
 		if (begin2 == -1)
 		{
 			// no visible diff on side2
-			pDiff->end[1] = pDiff->start[1] - 1;
+			diff.end[1] = diff.start[1] - 1;
 			bRepeat = false;
 		}
 		else
 		{
 			if (end2 == -1)
 			{
-				pDiff->start[1] += begin2;
-				pDiff->end[1] = pDiff->start[1] + end2;
+				diff.start[1] += begin2;
+				diff.end[1] = diff.start[1] + end2;
 			}
 			else
 			{
-				pDiff->end[1] = pDiff->start[1] + end2;
-				pDiff->start[1] += begin2;
+				diff.end[1] = diff.start[1] + end2;
+				diff.start[1] += begin2;
 			}
 		}
 #ifdef STRINGDIFF_LOGGING
 		DbgPrint("changed\n left=  %d,%d\n right=  %d,%d\n",
-			pDiff->start[0], pDiff->end[0],pDiff->start[1], pDiff->end[1]);
+			diff.start[0], diff.end[0], diff.start[1], diff.end[1]);
 #endif	
 
 		// Nothing to display, remove item
-		if (pDiff->start[0] > pDiff->end[0] && pDiff->start[1] > pDiff->end[1])
+		if (diff.start[0] > diff.end[0] && diff.start[1] > diff.end[1])
 		{
-			vector<wdiff>::iterator iter = pDiffs->begin() + i;
-			pDiffs->erase(iter);
+			diffs.erase(diffs.begin() + i);
 			i--;
 			continue;
 		}
 		// Nothing more todo
-		if (((pDiff->end[0] - pDiff->start[0])< 3) ||
-			((pDiff->end[1] - pDiff->start[1])< 3))
+		if (((diff.end[0] - diff.start[0]) < 3) ||
+			((diff.end[1] - diff.start[1]) < 3))
 		{
 			continue;
 		}
 		// Now check if possiblity to get more details
 		// We have to check if there is again a synchronisation inside the pDiff
-		if (bRepeat && pDiff->start[0] < pDiff->end[0] && pDiff->start[1] < pDiff->end[1])
+		if (bRepeat && diff.start[0] < diff.end[0] && diff.start[1] < diff.end[1])
 		{
 			// define offset to zero
-			s1 = 0,e1 = 0,s2 = 0,e2 = 0; 
+			int s1 = 0, e1 = 0, s2 = 0, e2 = 0; 
 			// Try to synchron side1 from begin
-			bool bsynchron = sd_findsyn(pDiff, str1, str2, casitive, xwhite,
+			bool bsynchron = sd_findsyn(diff, str1, str2, casitive, xwhite,
 				begin1, begin2, end1, end2,
 				true, synbegin1, s1, e1, s2, e2);
 
@@ -1552,21 +1487,21 @@ static void wordLevelToByteLevel(vector<wdiff> * pDiffs, const String& str1,
 			{
 				// Try to synchron side2 from begin
 				s1 = 0;
-				bsynchron = sd_findsyn(pDiff, str1, str2, casitive, xwhite,
+				bsynchron = sd_findsyn(diff, str1, str2, casitive, xwhite,
 					begin1, begin2, end1, end2,
 					true, synbegin2, s1, e1, s2, e2);
 			}
 			if (bsynchron)
 			{
 				// Try to synchron side1 from end
-				bsynchron = sd_findsyn(pDiff, str1, str2, casitive, xwhite,
+				bsynchron = sd_findsyn(diff, str1, str2, casitive, xwhite,
 					begin1, begin2, end1, end2,
 					true, synend1, s1, e1, s2, e2);
 				if (!bsynchron)
 				{
 					// Try to synchron side1 from end
 					e1 = 0;
-					bsynchron = sd_findsyn(pDiff, str1, str2, casitive, xwhite,
+					bsynchron = sd_findsyn(diff, str1, str2, casitive, xwhite,
 						begin1, begin2, end1, end2,
 						true, synend2, s1, e1, s2, e2);
 				}
@@ -1584,31 +1519,31 @@ static void wordLevelToByteLevel(vector<wdiff> * pDiffs, const String& str1,
 				// Now split in two diff
 				// New behind actual diff
 				// wdf->start diff->start + offset + end + 1 (zerobased)
-				wdiff wdf(pDiff->start[0] + s1 + end1 + 1, pDiff->end[0],
-					pDiff->start[1] + s2 + end2 + 1, pDiff->end[1]);
+				wdiff wdf(diff.start[0] + s1 + end1 + 1, diff.end[0],
+					diff.start[1] + s2 + end2 + 1, diff.end[1]);
 #ifdef STRINGDIFF_LOGGING
 				DbgPrint("org\n left=  %d,%d\n right=  %d,%d\n",
-					pDiff->start[0], pDiff->end[0],pDiff->start[1], pDiff->end[1]);
+					diff.start[0], diff.end[0], diff.start[1], diff.end[1]);
 				DbgPrint("insert\n left=  %d,%d\n right=  %d,%d\n",
 					wdf.start[0], wdf.end[0], wdf.start[1], wdf.end[1]);
 #endif
 				// change end of actual diff
-				pDiff->end[0] = pDiff->start[0] + s1 + begin1 - 1;
-				pDiff->end[1] = pDiff->start[1] + s2 + begin2 - 1;
+				diff.end[0] = diff.start[0] + s1 + begin1 - 1;
+				diff.end[1] = diff.start[1] + s2 + begin2 - 1;
 #ifdef STRINGDIFF_LOGGING
 				DbgPrint("changed\n left=  %d,%d\n right=  %d,%d\n",
-					pDiff->start[0], pDiff->end[0],pDiff->start[1], pDiff->end[1]);
+					diff.start[0], diff.end[0], diff.start[1], diff.end[1]);
 #endif			
 				// visible sync on side1 and side2
 				// new in middle with diff
-				wdiff wdfm(pDiff->end[0]  + 1, wdf.start[0] - 1,
-					pDiff->end[1] + 1, wdf.start[1] - 1);
+				wdiff wdfm(diff.end[0]  + 1, wdf.start[0] - 1,
+					diff.end[1] + 1, wdf.start[1] - 1);
 #ifdef STRINGDIFF_LOGGING
 				DbgPrint("insert\n left=  %d,%d\n right=  %d,%d\n",
 					wdf.start[0], wdf.end[0], wdf.start[1], wdf.end[1]);
 #endif
-				pDiffs->insert(pDiffs->begin() + i + 1, wdf);
-				pDiffs->insert(pDiffs->begin() + i + 1, wdfm);
+				diffs.insert(diffs.begin() + i + 1, wdf);
+				diffs.insert(diffs.begin() + i + 1, wdfm);
 			}
 			else if ((begin1 >= 0) && (begin1 < end1))
 			{
@@ -1616,22 +1551,22 @@ static void wordLevelToByteLevel(vector<wdiff> * pDiffs, const String& str1,
 				// Visible sync on side1 and side2
 				// Now split in two diff
 				// New behind actual diff
-				wdiff wdf(pDiff->start[0] + s1 + e1 + end1, pDiff->end[0],
-					pDiff->start[1] + s2 + e2 , pDiff->end[1]);
+				wdiff wdf(diff.start[0] + s1 + e1 + end1, diff.end[0],
+					diff.start[1] + s2 + e2 , diff.end[1]);
 #ifdef STRINGDIFF_LOGGING
 				DbgPrint("org\n left=  %d,%d\n right=  %d,%d\n",
-					pDiff->start[0], pDiff->end[0],pDiff->start[1], pDiff->end[1]);
+					diff.start[0], diff.end[0],diff.start[1], diff.end[1]);
 				DbgPrint("insert\n left=  %d,%d\n right=  %d,%d\n",
 					wdf.start[0], wdf.end[0], wdf.start[1], wdf.end[1]);
 #endif
 				// change end of actual diff
-				pDiff->end[0] = pDiff->start[0] + s1 + begin1;
-				pDiff->end[1] = pDiff->start[1] + s2 + begin2;
+				diff.end[0] = diff.start[0] + s1 + begin1;
+				diff.end[1] = diff.start[1] + s2 + begin2;
 #ifdef STRINGDIFF_LOGGING
 				DbgPrint("changed\n left=  %d,%d\n right=  %d,%d\n",
-					pDiff->start[0], pDiff->end[0],pDiff->start[1], pDiff->end[1]);
+					diff.start[0], diff.end[0],diff.start[1], diff.end[1]);
 #endif	
-				pDiffs->insert(pDiffs->begin() + i + 1, wdf);
+				diffs.insert(diffs.begin() + i + 1, wdf);
 			}
 			else if ((begin2 >= 0) && (begin2 < end2))
 			{
@@ -1639,22 +1574,22 @@ static void wordLevelToByteLevel(vector<wdiff> * pDiffs, const String& str1,
 				// Visible sync on side1 and side2
 				// Now split in two diff
 				// New behind actual diff
-				wdiff wdf(pDiff->start[0] + s1 + e1, pDiff->end[0],
-					pDiff->start[1] + s2 + e2 + end2, pDiff->end[1]);
+				wdiff wdf(diff.start[0] + s1 + e1, diff.end[0],
+					diff.start[1] + s2 + e2 + end2, diff.end[1]);
 #ifdef STRINGDIFF_LOGGING
 				DbgPrint("org\n left=  %d,%d\n right=  %d,%d\n",
-					pDiff->start[0], pDiff->end[0],pDiff->start[1], pDiff->end[1]);
+					diff.start[0], diff.end[0],diff.start[1], diff.end[1]);
 				DbgPrint("insert\n left=  %d,%d\n right=  %d,%d\n",
 					wdf.start[0], wdf.end[0], wdf.start[1], wdf.end[1]);
 #endif	
 				// change end of actual diff
-				pDiff->end[0] = pDiff->start[0] + s1 + begin1;
-				pDiff->end[1] = pDiff->start[1] + s2 + begin2;
+				diff.end[0] = diff.start[0] + s1 + begin1;
+				diff.end[1] = diff.start[1] + s2 + begin2;
 #ifdef STRINGDIFF_LOGGING
 				DbgPrint("changed\n left=  %d,%d\n right=  %d,%d\n",
-					pDiff->start[0], pDiff->end[0],pDiff->start[1], pDiff->end[1]);
+					diff.start[0], diff.end[0],diff.start[1], diff.end[1]);
 #endif	
-				pDiffs->insert(pDiffs->begin() + i + 1, wdf);
+				diffs.insert(diffs.begin() + i + 1, wdf);
 			}
 		}
 	}
@@ -1676,100 +1611,57 @@ static void wordLevelToByteLevel(vector<wdiff> * pDiffs, const String& str1,
  * @param [in,out] e1 offset str1 end
  * @param [in,out] s2 offset str2 begin
  * @param [in,out] e2 offset str2 end
- *
- * Assumes whitespace is never leadbyte or trailbyte!
  */
-bool
-sd_findsyn(wdiff*  pDiff, const String & str1, const String & str2, 
-		   bool casitive, int xwhite, 
-		   int &begin1, int &begin2, int &end1, int &end2, bool equal, int func,
-		   int &s1,int &e1,int &s2,int &e2)
+bool sd_findsyn(const wdiff &diff,
+	const String &str1, const String &str2, bool casitive, int xwhite,
+	int &begin1, int &begin2, int &end1, int &end2, bool equal,
+	enum sd_findsyn_func func, int &s1, int &e1, int &s2, int &e2)
 {
-	String str1_2, str2_2;
-	int max1 = pDiff->end[0] - pDiff->start[0];
-	int max2 = pDiff->end[1] - pDiff->start[1];
-	while((s1 + e1) < max1 && (s2 + e2) < max2)
+	const int max1 = diff.end[0] - diff.start[0];
+	const int max2 = diff.end[1] - diff.start[1];
+	while ((s1 + e1) < max1 && (s2 + e2) < max2)
 	{
 		// Get substrings for both sides
-		str1_2 = str1.substr(pDiff->start[0] + s1,
-			pDiff->end[0] - e1 - (pDiff->start[0] + s1) + 1);
-		str2_2 = str2.substr(pDiff->start[1] + s2,
-			pDiff->end[1] - e2 - (pDiff->start[1] + s2) + 1);
+		String str1_2 = str1.substr(diff.start[0] + s1,
+			diff.end[0] - e1 - (diff.start[0] + s1) + 1);
+		String str2_2 = str2.substr(diff.start[1] + s2,
+			diff.end[1] - e2 - (diff.start[1] + s2) + 1);
 		sd_ComputeByteDiff(str1_2, str2_2, casitive, xwhite, begin1, begin2, end1, end2, equal);
 
-		if (func == synbegin1)
-        {
+		switch (func)
+		{
+		case synbegin1:
+			if ((begin1 != -1) && (begin2 != -1))
+				return true; // Found a synchronisation
+			++s1;
+			break;
+		case synbegin2:
+			if ((begin1 != -1) && (begin2 != -1))
+				return true; // Found a synchronisation
+			++s2;
+			break;
+		case synend1:
 			if ((begin1 == -1) || (begin2 == -1))
-			{
-				s1++;
-			}
-			else
-			{
-				// Found a synchronisation
-				return true;
-			}
-        }
-		else if (func == synbegin2)
-        {
+				return false; // Found no synchronisation
+			if ((end1 != -1) && (end2 != -1))
+				return true; // Found a synchronisation
+			++e1;
+			break;
+		case synend2:
 			if ((begin1 == -1) || (begin2 == -1))
-			{
-				s2++;
-			}
-			else
-			{
-				// Found a synchronisation
-				return true;
-			}
-        }
-		else if (func == synend1)
-        {
-			if ((begin1 == -1) || (begin2 == -1))
-			{
-				// Found no synchronisation
-				return false;
-			}
-			else
-			{
-				if ((end1 == -1) || (end2 == -1))
-				{
-					e1++;
-				}
-				else
-				{
-					// Found a synchronisation
-					return true;
-				}
-			}
-        }
-		else if (func == synend2)
-        {
-			if ((begin1 == -1) || (begin2 == -1))
-			{
-				// Found no synchronisation
-				return false;
-			}
-			else
-			{
-				if ((end1 == -1) || (end2 == -1))
-				{
-					e2++;
-				}
-				else
-				{
-					// Found a synchronisation
-					return true;
-				}
-			}
+				return false; // Found no synchronisation
+			if ((end1 != -1) && (end2 != -1))
+				return true; // Found a synchronisation
+			++e2;
 			if ((begin1 > -1) && (begin2 > -1) && (0 <= end1) && (0 <= end2))
-			{
-				// Found a synchronisation
-				return true;
-			}
+				return true; // Found a synchronisation
+			break;
         }
 	}
 	// No synchronisation found
 	return false;
 }
+
 /**
  * @brief Check if first side is identical.
  * @param [in] worddiffs Diffs from sd_ComputeWordDiffs.

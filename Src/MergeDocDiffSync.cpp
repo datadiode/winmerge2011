@@ -237,7 +237,7 @@ int CChildFrame::GetMatchCost(const String &sLine0, const String &sLine1)
 	const bool byteColoring = GetByteColoringOption();
 
 	stl::vector<wdiff> worddiffs;
-	sd_ComputeWordDiffs(sLine0, sLine1, casitive, xwhite, breakType, byteColoring, &worddiffs);
+	sd_ComputeWordDiffs(sLine0, sLine1, casitive, xwhite, breakType, byteColoring, worddiffs);
 
 	int nDiffLenSum = 0;
 	stl::vector<wdiff>::const_iterator it = worddiffs.begin();
