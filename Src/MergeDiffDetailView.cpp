@@ -33,7 +33,7 @@ using stl::vector;
  * @brief Constructor.
  */
 CMergeDiffDetailView::CMergeDiffDetailView(CChildFrame *pDocument, int nThisPane)
-: CCrystalTextView(sizeof *this)
+: CGhostTextView(sizeof *this)
 , m_pDocument(pDocument)
 , m_nThisPane(nThisPane)
 {
@@ -422,20 +422,19 @@ void CMergeDiffDetailView::RecalcHorzScrollBar(BOOL bPositionOnly)
 
 void CMergeDiffDetailView::PushCursors()
 {
-	// push lineBegin, lineEnd, and the cursor
+	CGhostTextView::PushCursors();
+	// push lineBegin and lineEnd
 	m_lineBeginPushed = m_lineBegin;
 	m_lineEndPushed = m_lineEnd;
-	m_ptCursorPosPushed = m_ptCursorPos;
-	// and top line positions
-	m_nTopSubLinePushed = m_nTopSubLine;
 }
 
 void CMergeDiffDetailView::PopCursors()
 {
+	CGhostTextView::PopCursors();
+	// pop lineBegin and lineEnd
 	m_lineBegin = m_lineBeginPushed;
 	m_lineEnd = m_lineEndPushed;
-
-	m_ptCursorPos = m_ptCursorPosPushed;
+	// clip the involved coordinates to their valid ranges
 	int nLineCount = GetLineCount();
 	if (m_lineBegin >= nLineCount)
 	{
@@ -453,16 +452,6 @@ void CMergeDiffDetailView::PopCursors()
 		if (m_ptCursorPos.x > nLineLength)
 			m_ptCursorPos.x = nLineLength;
 	}
-
-	// restore the scrolling position
-	m_nTopSubLine = m_nTopSubLinePushed;
-	int nSubLineCount = GetSubLineCount();
-	if (m_nTopSubLine >= nSubLineCount)
-		m_nTopSubLine = nSubLineCount - 1;
-	int nDummy;
-	GetLineBySubLine(m_nTopSubLine, m_nTopLine, nDummy);
-	RecalcVertScrollBar(TRUE);
-	// other positions are set to (0,0) during ResetView
 }
 
 /**

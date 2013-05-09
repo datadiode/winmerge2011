@@ -14,7 +14,7 @@
 
 /////////////////////////////////////////////////////////////////////////////
 // CMergeDiffDetailView view
-#include "edtlib.h"
+#include "GhostTextView.h"
 
 
 /**
@@ -27,7 +27,7 @@
  * to be sure that the top line and the cursor/selection pos remains in the
  * current diff.
  */
-class CMergeDiffDetailView : public CCrystalTextView
+class CMergeDiffDetailView : public CGhostTextView
 {
 public:
 	CMergeDiffDetailView(CChildFrame *, int);           // protected constructor used by dynamic creation
@@ -43,15 +43,10 @@ protected:
 	int m_lineEnd; 
 	/// height (in lines) of the view
 	int m_displayLength;
-
 	/// memorize first line of diff
 	int m_lineBeginPushed;
 	/// memorize last line of diff
 	int m_lineEndPushed;
-	/// memorize cursor position
-	POINT m_ptCursorPosPushed;
-	/// memorize top line positions
-	int m_nTopSubLinePushed;
 
 // Operations
 private:
