@@ -231,7 +231,7 @@ HTREEITEM CPreferencesDlg::GetSelector(HTREEITEM htiSel, HTREEITEM htiUnSel)
 		{
 			htiSel = htiChild != htiUnSel ? htiChild : NULL;
 		}
-		else if (m_tcPages->GetChildItem(htiUnSel) == htiSel)
+		else if (htiUnSel != NULL && m_tcPages->GetChildItem(htiUnSel) == htiSel)
 		{
 			htiSel = NULL;
 		}

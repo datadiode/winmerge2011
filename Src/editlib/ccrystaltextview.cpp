@@ -2194,7 +2194,7 @@ int CCrystalTextView::GetLineCount()
 	if (m_pTextBuffer == NULL)
 		return 1;                   //  Single empty line
 
-	int nLineCount = m_pTextBuffer->GetLineCount ();
+	int nLineCount = m_pTextBuffer->GetLineCount();
 	ASSERT(nLineCount > 0);
 	return nLineCount;
 }
@@ -2210,10 +2210,10 @@ int CCrystalTextView::GetSubLineCount()
 	// calculate number of sub lines
 	if (nLineCount <= 0)
 		return 0;
-	return CCrystalTextView::GetSubLineIndex( nLineCount - 1 ) + GetSubLines( nLineCount - 1 );
+	return CCrystalTextView::GetSubLineIndex(nLineCount - 1 ) + GetSubLines(nLineCount - 1);
 }
 
-int CCrystalTextView::GetSubLineIndex( int nLineIndex )
+int CCrystalTextView::GetSubLineIndex(int nLineIndex)
 {
 	// if we do not wrap words, subline index of this line is equal to its index
 	if (!m_bWordWrap)
