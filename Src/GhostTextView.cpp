@@ -146,8 +146,9 @@ void CGhostTextView::PopCursors()
 
 	// restore the scrolling position
 	m_nTopSubLine = m_nTopSubLinePushed;
-	if (m_nTopSubLine >= GetSubLineCount())
-		m_nTopSubLine = GetSubLineCount() - 1;
+	int nSubLineCount = GetSubLineCount();
+	if (m_nTopSubLine >= nSubLineCount)
+		m_nTopSubLine = nSubLineCount - 1;
 	int nDummy;
 	GetLineBySubLine(m_nTopSubLine, m_nTopLine, nDummy);
 	RecalcVertScrollBar(TRUE);
@@ -180,9 +181,6 @@ void CGhostTextView::PushCursors()
 	// and top line positions
 	m_nTopSubLinePushed = m_nTopSubLine;
 }
-
-
-
 
 int CGhostTextView::ComputeRealLine(int nApparentLine) const
 {
