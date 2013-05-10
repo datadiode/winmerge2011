@@ -132,17 +132,18 @@ void CChildFrame::OnWMGoto()
 			nParam = 0;
 		if (dlg.m_nGotoWhat == 0)
 		{
-			int nLineCount = m_ptBuf[dlg.m_nFile]->GetLineCount();
-			int nLastLine = m_ptBuf[dlg.m_nFile]->ComputeRealLine(nLineCount - 1);
+			int nLastLine = m_ptBuf[dlg.m_nFile]->GetLineCount() - 1;
+			nLastLine = m_ptBuf[dlg.m_nFile]->ComputeRealLine(nLastLine);
 			if (nParam > nLastLine)
 				nParam = nLastLine;
 			pMergeView->GotoLine(nParam, true, dlg.m_nFile);
 		}
 		else
 		{
-			if (nParam > m_diffList.GetSize())
-				nParam = m_diffList.GetSize();
-			pMergeView->SelectDiff(nParam, true, false);
+			int nLastDiff = m_diffList.GetSize() - 1;
+			if (nParam > nLastDiff)
+				nParam = nLastDiff;
+			pMergeView->SelectDiff(nParam);
 		}
 	}
 }
