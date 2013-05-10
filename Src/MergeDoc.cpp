@@ -1864,6 +1864,9 @@ OPENRESULTS_TYPE CChildFrame::OpenDocs(
 	FileLocation &filelocRight,
 	bool bROLeft, bool bRORight)
 {
+	// Activate yourself to have panes resized before auto-scrolling to 1st diff
+	ActivateFrame();
+
 	bool bIdentical = false;
 
 	// Filter out invalid codepages, or editor will display all blank
@@ -1900,24 +1903,13 @@ OPENRESULTS_TYPE CChildFrame::OpenDocs(
 	}
 
 	// Warn user if file load was lossy (bad encoding)
-	if (FileLoadResult::IsLossy(nLeftSuccess) || FileLoadResult::IsLossy(nRightSuccess))
+	// TODO: It would be nice to report how many lines were lossy
+	// we did calculate those numbers when we loaded the files, in the text stats
+	if (int idres = FileLoadResult::IsLossy(nLeftSuccess) &&
+		FileLoadResult::IsLossy(nRightSuccess) ? IDS_LOSSY_TRANSCODING_BOTH :
+		FileLoadResult::IsLossy(nLeftSuccess) ? IDS_LOSSY_TRANSCODING_LEFT :
+		FileLoadResult::IsLossy(nRightSuccess) ? IDS_LOSSY_TRANSCODING_RIGHT : 0)
 	{
-		// TODO: It would be nice to report how many lines were lossy
-		// we did calculate those numbers when we loaded the files, in the text stats
-
-		int idres=0;
-		if (FileLoadResult::IsLossy(nLeftSuccess) && FileLoadResult::IsLossy(nRightSuccess))
-		{
-			idres = IDS_LOSSY_TRANSCODING_BOTH;
-		}
-		else if (FileLoadResult::IsLossy(nLeftSuccess))
-		{
-			idres = IDS_LOSSY_TRANSCODING_LEFT;
-		}
-		else
-		{
-			idres = IDS_LOSSY_TRANSCODING_RIGHT;
-		}
 		LanguageSelect.MsgBox(idres, MB_ICONSTOP);
 	}
 
@@ -2049,7 +2041,7 @@ OPENRESULTS_TYPE CChildFrame::OpenDocs(
 			m_diffList.HasSignificantDiffs())
 		{
 			int nDiff = m_diffList.FirstSignificantDiff();
-			pLeft->SelectDiff(nDiff, true, false);
+			pLeft->SelectDiff(nDiff);
 		}
 
 		// Exit if files are identical should only work for the first
@@ -2070,7 +2062,6 @@ OPENRESULTS_TYPE CChildFrame::OpenDocs(
 	// Force repaint of location pane to update it in case we had some warning
 	// dialog visible and it got painted before files were loaded
 	m_wndLocationView.ForceRecalculate();
-	ActivateFrame();
 
 	return OPENRESULTS_SUCCESS;
 }
