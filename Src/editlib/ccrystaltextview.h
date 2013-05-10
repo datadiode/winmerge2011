@@ -358,7 +358,7 @@ protected:
     int GetMaxLineLength();
     int GetScreenLines();
     int GetScreenChars();
-    HFont *GetFont(bool bItalic = false, bool bBold = false);
+    HFont *GetFont(int nColorIndex = 0);
 
 	virtual void RecalcVertScrollBar(bool bPositionOnly = false);
 	virtual void RecalcHorzScrollBar(bool bPositionOnly = false);

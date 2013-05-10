@@ -905,7 +905,7 @@ void CCrystalTextView::DrawLineHelperImpl(
 					else
 						pdc->SetBkColor(crBkgnd);
 
-					pdc->SelectObject(GetFont(GetItalic(nColorIndex), GetBold(nColorIndex)));
+					pdc->SelectObject(GetFont(nColorIndex));
 					// we are sure to have less than 4095 characters because all the chars are visible
 					VERIFY(pdc->ExtTextOut(ptOrigin.x, ptOrigin.y, ETO_CLIPPED,
 						&rcClip, line.c_str() + ibegin, nCount, pnWidths));
@@ -1876,14 +1876,24 @@ void CCrystalTextView::SetTabSize(int nTabSize, bool bSeparateCombinedChars)
 	}
 }
 
-HFont *CCrystalTextView::GetFont(bool bItalic, bool bBold)
+HFont *CCrystalTextView::GetFont(int nColorIndex)
 {
 	int nIndex = 0;
-	if (bBold)
-		nIndex |= 1;
-	if (bItalic)
-		nIndex |= 2;
-
+	m_lfBaseFont.lfWeight = FW_NORMAL;
+	m_lfBaseFont.lfItalic = 0;
+	if (nColorIndex != COLORINDEX_NONE)
+	{
+		if (GetBold(nColorIndex))
+		{
+			nIndex |= 1;
+			m_lfBaseFont.lfWeight = FW_BOLD;
+		}
+		if (GetItalic(nColorIndex))
+		{
+			nIndex |= 2;
+			m_lfBaseFont.lfItalic = 1;
+		}
+	}
 	if (m_apFonts[nIndex] == NULL)
 	{
 		if (!m_lfBaseFont.lfHeight)
@@ -1895,8 +1905,6 @@ HFont *CCrystalTextView::GetFont(bool bItalic, bool bBold)
 				pDesktopWindow->ReleaseDC(pdc);
 			}
 		}
-		m_lfBaseFont.lfWeight = bBold ? FW_BOLD : FW_NORMAL;
-		m_lfBaseFont.lfItalic = bItalic;
 		m_apFonts[nIndex] = HFont::CreateIndirect(&m_lfBaseFont);
 		if (!m_apFonts[nIndex])
 		{

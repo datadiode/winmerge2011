@@ -86,7 +86,4 @@ private:
 	bool m_bolds[COLORINDEX_COUNT]; /**< Bold font enable/disable */
 } SyntaxColors;
 
-void SyntaxColors_Load(COLORREF * colors, int count);
-void SyntaxColors_Save(COLORREF * colors, int count);
-
 #endif // _SYNTAX_COLORS_H_

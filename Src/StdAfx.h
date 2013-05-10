@@ -7,8 +7,6 @@
  *
  * @brief Project-wide includes and declarations
  */
-// ID line follows -- this is updated by SVN
-// $Id$
 
 // On Win XP, with VS2008, do not use default WINVER 0x0600 because of 
 // some windows structure used in API (on VISTA they are longer)
