@@ -248,10 +248,10 @@ protected:
 
     POINT ClientToText(const POINT &);
     POINT TextToClient(const POINT &);
-    void InvalidateLines(int nLine1, int nLine2, BOOL bInvalidateMargin = FALSE);
+    void InvalidateLines(int nLine1, int nLine2);
     int CalculateActualOffset(int nLineIndex, int nCharIndex, BOOL bAccumulate = FALSE);
 
-    BOOL IsInsideSelection(const POINT &ptTextPos);
+    bool IsInsideSelection(const POINT &ptTextPos);
     void GetSelection(POINT &ptStart, POINT &ptEnd);
     void GetFullySelectedLines(int &firstLine, int &lastLine);
 
@@ -276,7 +276,7 @@ protected:
 	int GetSubLines(int nLineIndex);
 
 	virtual int GetEmptySubLines(int nLineIndex);
-	BOOL IsEmptySubLineIndex(int nSubLineIndex);
+	bool IsEmptySubLineIndex(int nSubLineIndex);
 
 	/**
 	Converts the given character position for the given line into a point.
@@ -358,14 +358,14 @@ protected:
     int GetMaxLineLength();
     int GetScreenLines();
     int GetScreenChars();
-    HFont *GetFont (BOOL bItalic = FALSE, BOOL bBold = FALSE);
+    HFont *GetFont(bool bItalic = false, bool bBold = false);
 
-	virtual void RecalcVertScrollBar(BOOL bPositionOnly = FALSE);
-	virtual void RecalcHorzScrollBar(BOOL bPositionOnly = FALSE);
+	virtual void RecalcVertScrollBar(bool bPositionOnly = false);
+	virtual void RecalcHorzScrollBar(bool bPositionOnly = false);
 
     //  Scrolling helpers
-    void ScrollToChar(int nNewOffsetChar, BOOL = FALSE, BOOL bTrackScrollBar = TRUE);
-    void ScrollToLine(int nNewTopLine, BOOL = FALSE, BOOL bTrackScrollBar = TRUE);
+    void ScrollToChar(int nNewOffsetChar);
+    void ScrollToLine(int nNewTopLine);
 
 	//BEGIN SW
 	/**
@@ -377,12 +377,13 @@ protected:
 	@param bTrackScrollBar TRUE to recalculate the scroll bar after scrolling,
 		else FALSE.
 	*/
-	virtual void ScrollToSubLine( int nNewTopSubLine, BOOL = FALSE, BOOL bTrackScrollBar = TRUE );
+	virtual void ScrollToSubLine(int nNewTopSubLine);
 	//END SW
 
-    //  Splitter support
-    virtual void UpdateSiblingScrollPos(BOOL bHorz) = 0;
-    virtual void OnUpdateSibling(CCrystalTextView * pUpdateSource, BOOL bHorz);
+	//  Splitter support
+	virtual void UpdateSiblingScrollPos(bool bHorz) = 0;
+
+	void OnUpdateSibling(CCrystalTextView *pUpdateSource, bool bHorz);
 
 	//BEGIN SW
 	/**
@@ -437,8 +438,8 @@ protected:
 
     virtual COLORREF GetColor(int nColorIndex);
     virtual void GetLineColors(int nLineIndex, COLORREF &crBkgnd, COLORREF &crText);
-    virtual BOOL GetItalic(int nColorIndex);
-    virtual BOOL GetBold(int nColorIndex);
+    virtual bool GetItalic(int nColorIndex);
+    virtual bool GetBold(int nColorIndex);
 
     void DrawLineHelper(HSurface *, POINT &ptOrigin, const RECT &rcClip,
         int nColorIndex, int nBgColorIndex, COLORREF crText, COLORREF crBkgnd,

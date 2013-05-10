@@ -445,7 +445,7 @@ void CMergeEditView::DrawScreenLine(
 /**
  * @brief Sync other pane position
  */
-void CMergeEditView::UpdateSiblingScrollPos(BOOL bHorz)
+void CMergeEditView::UpdateSiblingScrollPos(bool bHorz)
 {
 	LPCTSTR pcwAtom = MAKEINTATOM(GetClassAtom());
 	HWindow *pParent = GetParent();
@@ -472,46 +472,6 @@ void CMergeEditView::UpdateSiblingScrollPos(BOOL bHorz)
 }
 
 /**
- * @brief Update other panes
- */
-void CMergeEditView::OnUpdateSibling(CCrystalTextView * pUpdateSource, BOOL bHorz)
-{
-	if (pUpdateSource != this)
-	{
-		ASSERT (pUpdateSource != NULL);
-		CMergeEditView *pSrcView = static_cast<CMergeEditView*>(pUpdateSource);
-		if (!bHorz)  // changed this so bHorz works right
-		{
-			ASSERT (pSrcView->m_nTopSubLine >= 0);
-
-			// This ASSERT is wrong: panes have different files and
-			// different linecounts
-			// ASSERT (pSrcView->m_nTopLine < GetLineCount ());
-			if (pSrcView->m_nTopSubLine != m_nTopSubLine)
-			{
-				ScrollToSubLine (pSrcView->m_nTopSubLine, true, false);
-				UpdateCaret ();
-				RecalcVertScrollBar(true);
-			}
-		}
-		else
-		{
-			ASSERT (pSrcView->m_nOffsetChar >= 0);
-
-			// This ASSERT is wrong: panes have different files and
-			// different linelengths
-			// ASSERT (pSrcView->m_nOffsetChar < GetMaxLineLength ());
-			if (pSrcView->m_nOffsetChar != m_nOffsetChar)
-			{
-				ScrollToChar (pSrcView->m_nOffsetChar, true, false);
-				UpdateCaret ();
-				RecalcHorzScrollBar(true);
-			}
-		}
-	}
-}
-
-/**
  * @brief Selects diff by number and syncs other file
  * @param [in] nDiff Diff to select, must be >= 0
  * @param [in] bScroll Scroll diff to view
@@ -520,7 +480,7 @@ void CMergeEditView::OnUpdateSibling(CCrystalTextView * pUpdateSource, BOOL bHor
  * @sa CChildFrame::SetCurrentDiff()
  * @todo Parameter bSelectText is never used?
  */
-void CMergeEditView::SelectDiff(int nDiff, bool bScroll /*=true*/, bool bSelectText /*=true*/)
+void CMergeEditView::SelectDiff(int nDiff, bool bScroll)
 {
 	// Check that nDiff is valid
 	if (nDiff < 0)
@@ -531,7 +491,7 @@ void CMergeEditView::SelectDiff(int nDiff, bool bScroll /*=true*/, bool bSelectT
 
 	SelectNone();
 	m_pDocument->SetCurrentDiff(nDiff);
-	ShowDiff(bScroll, bSelectText);
+	ShowDiff(bScroll);
 	m_pDocument->UpdateAllViews(this);
 
 	// notify either side, as it will notify the other one
@@ -556,11 +516,10 @@ void CMergeEditView::OnCurdiff()
 	if (nDiff == -1)
 	{
 		// If cursor is inside diff, select that diff
-		POINT pos = GetCursorPos();
-		nDiff = m_pDocument->m_diffList.LineToDiff(pos.y);
+		nDiff = m_pDocument->m_diffList.LineToDiff(m_ptCursorPos.y);
 	}
 	if (nDiff != -1 && m_pDocument->m_diffList.IsDiffSignificant(nDiff))
-		SelectDiff(nDiff, true, false);
+		SelectDiff(nDiff);
 }
 
 /**
@@ -574,7 +533,7 @@ void CMergeEditView::OnFirstdiff()
 	if (m_pDocument->m_diffList.HasSignificantDiffs())
 	{
 		int nDiff = m_pDocument->m_diffList.FirstSignificantDiff();
-		SelectDiff(nDiff, true, false);
+		SelectDiff(nDiff);
 	}
 }
 
@@ -586,7 +545,7 @@ void CMergeEditView::OnLastdiff()
 	if (m_pDocument->m_diffList.HasSignificantDiffs())
 	{
 		int nDiff = m_pDocument->m_diffList.LastSignificantDiff();
-		SelectDiff(nDiff, true, false);
+		SelectDiff(nDiff);
 	}
 }
 
@@ -618,7 +577,7 @@ void CMergeEditView::OnNextdiff()
 		if (!IsDiffVisible(curDiff))
 		{
 			// Selected difference not visible, select next from cursor
-			int line = GetCursorPos().y;
+			int line = m_ptCursorPos.y;
 			// Make sure we aren't in the first line of the diff
 			++line;
 			if (!IsValidTextPosY(line))
@@ -637,18 +596,18 @@ void CMergeEditView::OnNextdiff()
 			nextDiff = curDiff;
 
 		// nextDiff is the next one if there is one, else it is the one we're on
-		SelectDiff(nextDiff, true, false);
+		SelectDiff(nextDiff);
 	}
 	else
 	{
 		// We don't have a selected difference,
 		// but cursor can be inside inactive diff
-		int line = GetCursorPos().y;
+		int line = m_ptCursorPos.y;
 		if (!IsValidTextPosY(line))
 			line = m_nTopLine;
 		curDiff = m_pDocument->m_diffList.NextSignificantDiffFromLine(line);
 		if (curDiff >= 0)
-			SelectDiff(curDiff, true, false);
+			SelectDiff(curDiff);
 	}
 }
 
@@ -680,7 +639,7 @@ void CMergeEditView::OnPrevdiff()
 		if (!IsDiffVisible(curDiff))
 		{
 			// Selected difference not visible, select previous from cursor
-			int line = GetCursorPos().y;
+			int line = m_ptCursorPos.y;
 			// Make sure we aren't in the last line of the diff
 			--line;
 			if (!IsValidTextPosY(line))
@@ -699,18 +658,18 @@ void CMergeEditView::OnPrevdiff()
 			prevDiff = curDiff;
 
 		// prevDiff is the preceding one if there is one, else it is the one we're on
-		SelectDiff(prevDiff, true, false);
+		SelectDiff(prevDiff);
 	}
 	else
 	{
 		// We don't have a selected difference,
 		// but cursor can be inside inactive diff
-		int line = GetCursorPos().y;
+		int line = m_ptCursorPos.y;
 		if (!IsValidTextPosY(line))
 			line = m_nTopLine;
 		curDiff = m_pDocument->m_diffList.PrevSignificantDiffFromLine(line);
 		if (curDiff >= 0)
-			SelectDiff(curDiff, true, false);
+			SelectDiff(curDiff);
 	}
 }
 
@@ -719,7 +678,7 @@ void CMergeEditView::OnPrevdiff()
  */
 void CMergeEditView::SelectNone()
 {
-	SetSelection (GetCursorPos(), GetCursorPos());
+	SetSelection(m_ptCursorPos, m_ptCursorPos);
 	UpdateCaret();
 }
 
@@ -753,10 +712,9 @@ bool CMergeEditView::IsLineInCurrentDiff(int nLine)
  */
 void CMergeEditView::OnLButtonDblClk()
 {
-	POINT pos = GetCursorPos();
-	int diff = m_pDocument->m_diffList.LineToDiff(pos.y);
+	int diff = m_pDocument->m_diffList.LineToDiff(m_ptCursorPos.y);
 	if (diff != -1 && m_pDocument->m_diffList.IsDiffSignificant(diff))
-		SelectDiff(diff, false, false);
+		SelectDiff(diff, false);
 }
 
 /**
@@ -771,8 +729,7 @@ void CMergeEditView::OnLButtonUp()
 	int nCurrentDiff = m_pDocument->GetCurrentDiff();
 	if (nCurrentDiff != -1)
 	{
-		POINT pos = GetCursorPos();
-		if (!IsLineInCurrentDiff(pos.y))
+		if (!IsLineInCurrentDiff(m_ptCursorPos.y))
 		{
 			m_pDocument->SetCurrentDiff(-1);
 			m_pDocument->UpdateAllViews(NULL);
@@ -862,7 +819,7 @@ void CMergeEditView::OnEditOperation(int nAction, LPCTSTR pszText)
  * @todo This shouldn't be called when no diff is selected, so
  * somebody could try to ASSERT(nDiff > -1)...
  */
-void CMergeEditView::ShowDiff(bool bScroll, bool bSelectText)
+void CMergeEditView::ShowDiff(bool bScroll)
 {
 	const int nDiff = m_pDocument->GetCurrentDiff();
 
@@ -909,15 +866,7 @@ void CMergeEditView::ShowDiff(bool bScroll, bool bSelectText)
 			pCurrentView->SetSelection(ptStart, ptStart);
 			pOtherView->SetSelection(ptStart, ptStart);
 		}
-
-		if (bSelectText)
-		{
-			ptEnd.x = GetLineLength(ptEnd.y);
-			SetSelection(ptStart, ptEnd);
-			UpdateCaret();
-		}
-		else
-			Invalidate();
+		Invalidate();
 	}
 }
 
@@ -927,7 +876,7 @@ void CMergeEditView::OnTimer(UINT_PTR nIDEvent)
 	if (nIDEvent == IDT_RESCAN)
 	{
 		KillTimer(IDT_RESCAN);
-		m_pDocument->RescanIfNeeded(RESCAN_TIMEOUT/1000);
+		m_pDocument->RescanIfNeeded(RESCAN_TIMEOUT / 1000);
 	}
 }
 
@@ -955,8 +904,7 @@ void CMergeEditView::OnUpdateCaret(bool bShowHide)
 	if (!m_bCursorHidden && !bShowHide)
 		m_bMergeUndo = false;
 
-	POINT cursorPos = GetCursorPos();
-	int nScreenLine = cursorPos.y;
+	int nScreenLine = m_ptCursorPos.y;
 	const int nRealLine = ComputeRealLine(nScreenLine);
 	TCHAR sLine[40];
 	int chars = -1;
@@ -975,9 +923,9 @@ void CMergeEditView::OnUpdateCaret(bool bShowHide)
 	{
 		// Regular lines display eg "Line 13 Characters: 25 EOL: CRLF"
 		wsprintf(sLine, _T("%d"), nRealLine + 1);
-		curChar = cursorPos.x + 1;
+		curChar = m_ptCursorPos.x + 1;
 		chars = GetLineLength(nScreenLine);
-		column = CalculateActualOffset(nScreenLine, cursorPos.x, true) + 1;
+		column = CalculateActualOffset(nScreenLine, m_ptCursorPos.x, true) + 1;
 		columns = CalculateActualOffset(nScreenLine, chars, true) + 1;
 		chars++;
 		if (COptionsMgr::Get(OPT_ALLOW_MIXED_EOL) ||
@@ -988,8 +936,7 @@ void CMergeEditView::OnUpdateCaret(bool bShowHide)
 	}
 	EDITMODE editMode = !QueryEditable() ? EDIT_MODE_READONLY :
 		GetOverwriteMode() ? EDIT_MODE_OVERWRITE : EDIT_MODE_INSERT;
-	SetLineInfoStatus(sLine, column, columns,
-		curChar, chars, sEol, editMode);
+	SetLineInfoStatus(sLine, column, columns, curChar, chars, sEol, editMode);
 
 	// Update Command UI
 	m_pDocument->UpdateClipboardCmdUI();
@@ -1178,25 +1125,23 @@ void CMergeEditView::RefreshOptions()
  * it is apparent line (including deleted lines)
  * @param [in] pane Pane index of goto target pane (0 = left, 1 = right).
  */
-void CMergeEditView::GotoLine(UINT nLine, bool bRealLine, int pane)
+void CMergeEditView::GotoLine(int nLine, bool bRealLine, int pane)
 {
 	CMergeEditView *pLeftView = m_pDocument->GetLeftView();
 	CMergeEditView *pRightView = m_pDocument->GetRightView();
-	int nRealLine = nLine;
-	int nApparentLine = nLine;
 
 	// Compute apparent (shown linenumber) line
 	if (bRealLine)
 	{
-		if (nRealLine > m_pDocument->m_ptBuf[pane]->GetLineCount() - 1)
-			nRealLine = m_pDocument->m_ptBuf[pane]->GetLineCount() - 1;
-		nApparentLine = m_pDocument->m_ptBuf[pane]->ComputeApparentLine(nRealLine);
+		int nLastLine = m_pDocument->m_ptBuf[pane]->GetLineCount() - 1;
+		if (nLine > nLastLine)
+			nLine = nLastLine;
+		nLine = m_pDocument->m_ptBuf[pane]->ComputeApparentLine(nLine);
 	}
 
-	POINT ptPos = { 0, nApparentLine };
+	POINT ptPos = { 0, nLine };
 	// Scroll line to center of view
-	int nScrollLine = GetSubLineIndex(nApparentLine);
-	nScrollLine -= GetScreenLines() / 2;
+	int nScrollLine = GetSubLineIndex(nLine) - GetScreenLines() / 2;
 	if (nScrollLine < 0)
 		nScrollLine = 0;
 	
@@ -1251,7 +1196,7 @@ void CMergeEditView::OnSize()
 	RecalcVertScrollBar();
 	RecalcHorzScrollBar();
 
-	UpdateSiblingScrollPos(FALSE);
+	UpdateSiblingScrollPos(false);
 
 	if (HStatusBar *const pBar = m_pStatusBar)
 	{
@@ -1272,7 +1217,7 @@ void CMergeEditView::OnSize()
 	}
 }
 
-void CMergeEditView::RecalcVertScrollBar(BOOL bPositionOnly)
+void CMergeEditView::RecalcVertScrollBar(bool bPositionOnly)
 {
 	CGhostTextView::RecalcVertScrollBar(bPositionOnly);
 	if (bPositionOnly)

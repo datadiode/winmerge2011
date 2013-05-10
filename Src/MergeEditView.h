@@ -138,22 +138,22 @@ public:
 	using CGhostTextView::GetSelection;
 	void RefreshOptions();
 	bool EnableRescan(bool bEnable);
-	void ShowDiff(bool bScroll, bool bSelectText);
+	void ShowDiff(bool bScroll);
 	virtual void OnEditOperation(int nAction, LPCTSTR pszText);
 	virtual void OnUpdateCaret(bool bMove = false);
 	void UpdateLineLengths();
 	bool IsLineInCurrentDiff(int nLine);
 	void SelectNone();
-	void SelectDiff(int nDiff, bool bScroll = true, bool bSelectText = true);
+	void SelectDiff(int nDiff, bool bScroll = true);
 	virtual CDiffTextBuffer *LocateTextBuffer();
 	void GetFullySelectedDiffs(int & firstDiff, int & lastDiff);
 	void UpdateResources();
-	virtual void RecalcVertScrollBar(BOOL bPositionOnly = FALSE);
-	virtual void UpdateSiblingScrollPos(BOOL bHorz);
+	virtual void RecalcVertScrollBar(bool bPositionOnly = false);
+	virtual void UpdateSiblingScrollPos(bool bHorz);
 	virtual int GetAdditionalTextBlocks(int nLineIndex, TEXTBLOCK *pBuf);
 	virtual COLORREF GetColor(int nColorIndex);
 	virtual void GetLineColors(int nLineIndex, COLORREF &crBkgnd, COLORREF &crText);
-	void GotoLine(UINT nLine, bool bRealLine, int pane);
+	void GotoLine(int nLine, bool bRealLine, int pane);
 	int GetTopLine() { return m_nTopLine; }
 	int GetTopSubLine() { return m_nTopSubLine; }
 	using CCrystalTextView::GetScreenLines;
@@ -176,7 +176,6 @@ protected:
 		COLORREF crText, COLORREF crBkgnd,
 		LPCTSTR pszChars,
 		int nOffset, int nCount, int &nActualOffset, int nLineIndex);
-	virtual void OnUpdateSibling(CCrystalTextView *pUpdateSource, BOOL bHorz);
 	bool IsDiffVisible(const DIFFRANGE& diff, int nLinesBelow = 0);
 
 	HMenu *ApplyPatch(IStream *, int);

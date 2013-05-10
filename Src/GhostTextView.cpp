@@ -65,8 +65,7 @@ void CGhostTextView::AttachToBuffer(CCrystalTextBuffer *pBuf /*= NULL*/ )
 	CCrystalEditViewEx::AttachToBuffer(pBuf);
 }
 
-void CGhostTextView::
-DetachFromBuffer ()
+void CGhostTextView::DetachFromBuffer()
 {
 	if (m_pGhostTextBuffer != NULL)
 		m_pGhostTextBuffer = NULL;
@@ -151,8 +150,8 @@ void CGhostTextView::PopCursors()
 		m_nTopSubLine = nSubLineCount - 1;
 	int nDummy;
 	GetLineBySubLine(m_nTopSubLine, m_nTopLine, nDummy);
-	RecalcVertScrollBar(TRUE);
-	RecalcHorzScrollBar(TRUE);
+	RecalcVertScrollBar(true);
+	RecalcHorzScrollBar(true);
 }
 
 void CGhostTextView::PushCursors()

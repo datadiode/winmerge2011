@@ -258,7 +258,7 @@ bool CMergeDiffDetailView::EnsureInDiff(POINT &pt)
 }
 
 /// virtual, ensure we remain in diff
-void CMergeDiffDetailView::ScrollToSubLine(int nNewTopLine, BOOL bNoSmoothScroll, BOOL bTrackScrollBar)
+void CMergeDiffDetailView::ScrollToSubLine(int nNewTopLine)
 {
 	if (nNewTopLine > m_lineEnd - m_displayLength)
 		nNewTopLine = m_lineEnd - m_displayLength;
@@ -276,14 +276,14 @@ void CMergeDiffDetailView::ScrollToSubLine(int nNewTopLine, BOOL bNoSmoothScroll
 	if (EnsureInDiff(ptSelStart) || EnsureInDiff(ptSelEnd))
 		SetSelection(ptSelStart, ptSelEnd);
 	
-	CCrystalTextView::ScrollToSubLine(nNewTopLine, bNoSmoothScroll, bTrackScrollBar);
+	CCrystalTextView::ScrollToSubLine(nNewTopLine);
 }
 
 /**
  * @brief Same purpose as the one as in MergeEditView.cpp
  * @note Nearly the same code also
  */
-void CMergeDiffDetailView::UpdateSiblingScrollPos(BOOL bHorz)
+void CMergeDiffDetailView::UpdateSiblingScrollPos(bool bHorz)
 {
 	HWindow *pSender = reinterpret_cast<HWindow *>(m_hWnd);
 	LPCTSTR pcwAtom = MAKEINTATOM(pSender->GetClassAtom());
@@ -316,54 +316,18 @@ void CMergeDiffDetailView::UpdateSiblingScrollPos(BOOL bHorz)
 	}
 }
 
-/**
- * @brief Same purpose as the one as in MergeDiffView.cpp
- * @note Code is the same except we cast to a pointer to a CMergeDiffDetailView
- */
-void CMergeDiffDetailView::OnUpdateSibling(CCrystalTextView *pUpdateSource, BOOL bHorz)
-{
-	if (pUpdateSource != this)
-	{
-		ASSERT(pUpdateSource != NULL);
-		// only modification from code in MergeEditView.cpp
-		CMergeDiffDetailView *pSrcView = static_cast<CMergeDiffDetailView*>(pUpdateSource);
-		if (!bHorz)  // changed this so bHorz works right
-		{
-			ASSERT(pSrcView->m_nTopLine >= 0);
-			if (pSrcView->m_nTopLine != m_nTopLine)
-			{
-				ScrollToLine(pSrcView->m_nTopLine, TRUE, FALSE);
-				UpdateCaret();
-				RecalcVertScrollBar(TRUE);
-			}
-		}
-		else
-		{
-			ASSERT(pSrcView->m_nOffsetChar >= 0);
-			if (pSrcView->m_nOffsetChar != m_nOffsetChar)
-			{
-				ScrollToChar(pSrcView->m_nOffsetChar, TRUE, FALSE);
-				UpdateCaret();
-				RecalcHorzScrollBar(TRUE);
-			}
-		}
-	}
-}
-
 /*
  * @brief Compute the max length of the lines inside the displayed diff
  */
 int CMergeDiffDetailView::GetDiffLineLength()
 {
 	int nMaxLineLength = 0;
-
 	// we can not use GetLineActualLength below nLineCount
 	// diff info (and lineBegin/lineEnd) are updated only during Rescan
 	// they may get invalid just after we delete some text
-	int validLineEnd = m_lineEnd;
-	if (m_lineEnd > GetLineCount())
-		validLineEnd = GetLineCount();
-
+	int validLineEnd = GetLineCount();
+	if (validLineEnd > m_lineEnd)
+		validLineEnd = m_lineEnd;
 	for (int i = m_lineBegin; i < validLineEnd; ++i)
 	{
 		int nActualLength = GetLineActualLength(i);
@@ -373,14 +337,13 @@ int CMergeDiffDetailView::GetDiffLineLength()
 	return nMaxLineLength;
 }
 
-
 /**
  * @brief Update the horizontal scrollbar
  *
  * @note The scrollbar width is the one needed for the largest view
  * @sa ccrystaltextview::RecalcHorzScrollBar()
  */
-void CMergeDiffDetailView::RecalcHorzScrollBar(BOOL bPositionOnly)
+void CMergeDiffDetailView::RecalcHorzScrollBar(bool bPositionOnly)
 {
 	// Again, we cannot use nPos because it's 16-bit
 	SCROLLINFO si;

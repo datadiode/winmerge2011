@@ -60,8 +60,8 @@ public:
 	void OnUpdateCaret(bool bMove);
 	void DocumentsLoaded();
 
-	virtual void UpdateSiblingScrollPos(BOOL bHorz);
-	virtual void RecalcHorzScrollBar(BOOL bPositionOnly = FALSE);
+	virtual void UpdateSiblingScrollPos(bool bHorz);
+	virtual void RecalcHorzScrollBar(bool bPositionOnly = false);
 
 	virtual void SetSelection(const POINT &ptStart, const POINT &ptEnd);
 
@@ -84,12 +84,11 @@ public:
 
 // Implementation
 protected:
-	virtual void ScrollToSubLine(int nNewTopLine, BOOL bNoSmoothScroll = FALSE, BOOL bTrackScrollBar = TRUE);
+	virtual void ScrollToSubLine(int nNewTopLine);
 	virtual ~CMergeDiffDetailView();
 	virtual int GetAdditionalTextBlocks(int nLineIndex, TEXTBLOCK *pBuf);
 	virtual COLORREF GetColor(int nColorIndex);
 	virtual void GetLineColors(int nLineIndex, COLORREF &crBkgnd, COLORREF &crText);
-	virtual void OnUpdateSibling(CCrystalTextView *pUpdateSource, BOOL bHorz);
 	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
 	void OnContextMenu(LPARAM);
 };
