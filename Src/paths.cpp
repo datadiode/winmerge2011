@@ -135,7 +135,7 @@ String paths_GetLongPath(LPCTSTR szPath)
 	TCHAR *p = PathSkipRoot(fullPath);
 	// Skip to \ position     d:\abcd or \\host\share\abcd
 	// indicated by ^           ^                    ^
-	if (p == NULL)
+	if (p == NULL || *p == _T('\0'))
 		return paths_DoMagic(sFull);
 
 	p[-1] = _T('\0');
@@ -191,7 +191,7 @@ bool paths_CreateIfNeeded(LPCTSTR szPath, bool bExcludeLeaf)
 	if (q <= p)
 		return false;
 
-	do
+	while (*q != _T('\0'))
 	{
 		q[-1] = _T('\\');
 		q = PathFindNextComponent(q);
@@ -201,7 +201,7 @@ bool paths_CreateIfNeeded(LPCTSTR szPath, bool bExcludeLeaf)
 			(FILE_ATTRIBUTE_NORMAL | FILE_ATTRIBUTE_DIRECTORY);
 		if (attr != FILE_ATTRIBUTE_DIRECTORY && !CreateDirectory(p, NULL))
 			return false;
-	} while (*q != _T('\0'));
+	}
 
 	return true;
 }
