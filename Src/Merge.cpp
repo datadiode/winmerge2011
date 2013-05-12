@@ -269,11 +269,6 @@ bool CMergeApp::InitInstance()
 		CRegKeyEx loadkey = SettingStore.GetAppRegistryKey();
 		IOptionDef::InitOptions(loadkey, NULL);
 
-		// Cleanup left over tempfiles from previous instances.
-		// Normally this should not neet to do anything - but if for some reason
-		// WinMerge did not delete temp files this makes sure they are removed.
-		CleanupWMtemp();
-
 		if (int logging = COptionsMgr::Get(OPT_LOGGING))
 		{
 			LogFile.EnableLogging(TRUE);
@@ -315,6 +310,11 @@ bool CMergeApp::InitInstance()
 					OException::ThrowSilent();
 			}
 		}
+
+		// Cleanup left over tempfiles from previous instances.
+		// Normally this should not neet to do anything - but if for some reason
+		// WinMerge did not delete temp files this makes sure they are removed.
+		CleanupWMtemp();
 
 		// Drag and Drop functionality needs OleInitialize
 		OException::Check(CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE));

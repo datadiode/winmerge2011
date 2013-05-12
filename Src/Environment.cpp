@@ -11,6 +11,7 @@
 #include "Environment.h"
 #include "Merge.h"
 #include "OptionsMgr.h"
+#include "Constants.h"
 
 /**
  * @brief Temp path.
@@ -19,7 +20,8 @@
 static String strTempPath;
 
 /** @brief Per-instance part of the temp path. */
-static const string_format strTempPathInstance(_T("WM_%lu"), GetCurrentProcessId());
+static const string_format strTempPathInstance(
+	_T("%s%lu"), TempFolderPrefix, GetCurrentProcessId());
 
 /** 
  * @brief Get folder for temporary files.
