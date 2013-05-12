@@ -17,6 +17,7 @@ IDR_DIRDOCTYPE MENU
         MENUITEM "&New\tCtrl+N", ID_FILE_NEW
         MENUITEM "&Open...\tCtrl+O", ID_FILE_OPEN
         MENUITEM "Op&en Conflict File...", ID_FILE_OPENCONFLICT
+        MENUITEM "Start Collec&tion...", ID_FILE_STARTCOLLECT
         MENUITEM SEPARATOR
         MENUITEM "Open Pro&ject...\tCtrl+J", ID_FILE_OPENPROJECT
         MENUITEM "Sa&ve Project...", ID_FILE_SAVEPROJECT
@@ -148,6 +149,7 @@ IDR_HEXDOCTYPE MENU
         MENUITEM "&New\tCtrl+N", ID_FILE_NEW
         MENUITEM "&Open...\tCtrl+O", ID_FILE_OPEN
         MENUITEM "Op&en Conflict File...", ID_FILE_OPENCONFLICT
+        MENUITEM "Start Collec&tion...", ID_FILE_STARTCOLLECT
         MENUITEM SEPARATOR
         MENUITEM "Open Pro&ject...\tCtrl+J", ID_FILE_OPENPROJECT
         MENUITEM "Sa&ve Project...", ID_FILE_SAVEPROJECT
@@ -265,6 +267,7 @@ IDR_MAINFRAME MENU
         MENUITEM "&New\tCtrl+N", ID_FILE_NEW
         MENUITEM "&Open...\tCtrl+O", ID_FILE_OPEN
         MENUITEM "Op&en Conflict File...", ID_FILE_OPENCONFLICT
+        MENUITEM "Start Collec&tion...", ID_FILE_STARTCOLLECT
         MENUITEM SEPARATOR
         MENUITEM "Open Pro&ject...\tCtrl+J", ID_FILE_OPENPROJECT
         MENUITEM "Sa&ve Project...", ID_FILE_SAVEPROJECT
@@ -337,6 +340,7 @@ IDR_MERGEDOCTYPE MENU
         MENUITEM "&New\tCtrl+N", ID_FILE_NEW
         MENUITEM "&Open...\tCtrl+O", ID_FILE_OPEN
         MENUITEM "Op&en Conflict File...", ID_FILE_OPENCONFLICT
+        MENUITEM "Start Collec&tion...", ID_FILE_STARTCOLLECT
         MENUITEM SEPARATOR
         MENUITEM "Open Pro&ject...\tCtrl+J", ID_FILE_OPENPROJECT
         MENUITEM "Sa&ve Project...", ID_FILE_SAVEPROJECT
@@ -1934,6 +1938,7 @@ STRINGTABLE
     ID_FILE_MERGINGMODE           "Switch between editing and merging modes"
     ID_FILE_ENCODING              "View and adjust file encoding properties\nFile encoding properties"
     ID_FILE_OPENCONFLICT          "Open and resolve conflict file"
+    ID_FILE_STARTCOLLECT          "Collect items from subsequent command line invocations to a folder compare window"
     ID_SELECTLINEDIFF             "Select difference area in the current line\nDifference in the Current Line"
     ID_EDIT_WMGOTO                "Go to line or difference\nGo to (Ctrl+G)"
     ID_OPTIONS                    "Set program options\nOptions"

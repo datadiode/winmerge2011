@@ -62,38 +62,19 @@ void CDirView::DoCopyRightToLeft()
 	// First we build a list of desired actions
 	const CDiffContext *ctxt = m_pFrame->GetDiffContext();
 	FileActionScript actionScript;
-	int selCount = 0;
 	int sel = -1;
-	String slFile, srFile;
 	while ((sel = GetNextItem(sel, LVNI_SELECTED)) != -1)
 	{
 		const DIFFITEM *di = GetDiffItem(sel);
 		if (di->isSideRightOrBoth())
 		{
-			GetItemFileNames(di, slFile, srFile);
+			FileActionItem act;
+			GetItemFileNames(di, act.dest, act.src);
 			
 			// We must check that paths still exists
-			if (!CheckPathsExist(srFile.c_str()))
+			if (!CheckPathsExist(act.src.c_str()))
 				return;
 
-			FileActionItem act;
-			String sDest(slFile);
-
-			if (m_pFrame->GetRecursive())
-			{
-				// If destination sides's relative path is empty it means we
-				// are copying unique items and need to get the real relative
-				// path from original side.
-				if (di->left.path.empty())
-				{
-					sDest = ctxt->GetLeftPath();
-					sDest = paths_ConcatPath(sDest, di->right.path);
-					sDest = paths_ConcatPath(sDest, di->right.filename);
-				}
-			}
-
-			act.src = srFile;
-			act.dest = sDest;
 			act.context = sel;
 			act.dirflag = di->isDirectory();
 			act.atype = FileAction::ACT_COPY;
@@ -102,10 +83,9 @@ void CDirView::DoCopyRightToLeft()
 			act.UIDestination = FileActionItem::UI_LEFT;
 			actionScript.AddActionItem(act);
 		}
-		++selCount;
 	}
 	// Now we prompt, and execute actions
-	ConfirmAndPerformActions(actionScript, selCount);
+	PerformActionList(actionScript);
 }
 
 /// Prompt & copy item from left to right, if legal
@@ -115,50 +95,30 @@ void CDirView::DoCopyLeftToRight()
 	// First we build a list of desired actions
 	const CDiffContext *ctxt = m_pFrame->GetDiffContext();
 	FileActionScript actionScript;
-	int selCount = 0;
 	int sel = -1;
-	String slFile, srFile;
 	while ((sel = GetNextItem(sel, LVNI_SELECTED)) != -1)
 	{
 		const DIFFITEM *di = GetDiffItem(sel);
 		if (di->isSideLeftOrBoth())
 		{
-			GetItemFileNames(di, slFile, srFile);
+			FileActionItem act;
+			GetItemFileNames(di, act.src, act.dest);
 
 			// We must first check that paths still exists
-			if (!CheckPathsExist(slFile.c_str()))
+			if (!CheckPathsExist(act.src.c_str()))
 				return;
 
-			FileActionItem act;
-			String sDest(srFile);
-
-			if (m_pFrame->GetRecursive())
-			{
-				// If destination sides's relative path is empty it means we
-				// are copying unique items and need to get the real relative
-				// path from original side.
-				if (di->right.path.empty())
-				{
-					sDest = ctxt->GetRightPath();
-					sDest = paths_ConcatPath(sDest, di->left.path);
-					sDest = paths_ConcatPath(sDest, di->left.filename);
-				}
-			}
-
-			act.src = slFile;
-			act.dest = sDest;
-			act.dirflag = di->isDirectory();
 			act.context = sel;
+			act.dirflag = di->isDirectory();
 			act.atype = FileAction::ACT_COPY;
 			act.UIResult = FileActionItem::UI_SYNC;
 			act.UIOrigin = FileActionItem::UI_LEFT;
 			act.UIDestination = FileActionItem::UI_RIGHT;
 			actionScript.AddActionItem(act);
 		}
-		++selCount;
 	}
 	// Now we prompt, and execute actions
-	ConfirmAndPerformActions(actionScript, selCount);
+	PerformActionList(actionScript);
 }
 
 /// Prompt & delete left, if legal
@@ -167,32 +127,29 @@ void CDirView::DoDelLeft()
 	WaitStatusCursor waitstatus(IDS_STATUS_DELETEFILES);
 	// First we build a list of desired actions
 	FileActionScript actionScript;
-	int selCount = 0;
 	int sel = -1;
-	String slFile, srFile;
+	const CDiffContext *ctxt = m_pFrame->GetDiffContext();
 	while ((sel = GetNextItem(sel, LVNI_SELECTED)) != -1)
 	{
 		const DIFFITEM *di = GetDiffItem(sel);
 		if (di->isDeletableOnLeft())
 		{
-			GetItemFileNames(di, slFile, srFile);
+			FileActionItem act;
+			act.src = ctxt->GetLeftFilepathAndName(di);
 
 			// We must check that path still exists
-			if (!CheckPathsExist(slFile.c_str()))
+			if (!CheckPathsExist(act.src.c_str()))
 				return;
 
-			FileActionItem act;
-			act.src = slFile;
-			act.dirflag = di->isDirectory();
 			act.context = sel;
+			act.dirflag = di->isDirectory();
 			act.atype = FileAction::ACT_DEL;
 			act.UIResult = FileActionItem::UI_DEL_LEFT;
 			actionScript.AddActionItem(act);
 		}
-		++selCount;
 	}
 	// Now we prompt, and execute actions
-	ConfirmAndPerformActions(actionScript, selCount);
+	PerformActionList(actionScript);
 }
 
 /// Prompt & delete right, if legal
@@ -200,33 +157,30 @@ void CDirView::DoDelRight()
 {
 	WaitStatusCursor waitstatus(IDS_STATUS_DELETEFILES);
 	// First we build a list of desired actions
+	const CDiffContext *ctxt = m_pFrame->GetDiffContext();
 	FileActionScript actionScript;
-	int selCount = 0;
 	int sel = -1;
-	String slFile, srFile;
 	while ((sel = GetNextItem(sel, LVNI_SELECTED)) != -1)
 	{
 		const DIFFITEM *di = GetDiffItem(sel);
 		if (di->isDeletableOnRight())
 		{
-			GetItemFileNames(di, slFile, srFile);
+			FileActionItem act;
+			act.src = ctxt->GetRightFilepathAndName(di);
 
 			// We must first check that path still exists
-			if (!CheckPathsExist(srFile.c_str()))
+			if (!CheckPathsExist(act.src.c_str()))
 				return;
 
-			FileActionItem act;
-			act.src = srFile;
-			act.dirflag = di->isDirectory();
 			act.context = sel;
+			act.dirflag = di->isDirectory();
 			act.atype = FileAction::ACT_DEL;
 			act.UIResult = FileActionItem::UI_DEL_RIGHT;
 			actionScript.AddActionItem(act);
 		}
-		++selCount;
 	}
 	// Now we prompt, and execute actions
-	ConfirmAndPerformActions(actionScript, selCount);
+	PerformActionList(actionScript);
 }
 
 /**
@@ -237,36 +191,31 @@ void CDirView::DoDelBoth()
 	WaitStatusCursor waitstatus(IDS_STATUS_DELETEFILES);
 	// First we build a list of desired actions
 	FileActionScript actionScript;
-	int selCount = 0;
 	int sel = -1;
-	String slFile, srFile;
 	while ((sel = GetNextItem(sel, LVNI_SELECTED)) != -1)
 	{
 		const DIFFITEM *di = GetDiffItem(sel);
 		if (di->isDeletableOnBoth())
 		{
-			GetItemFileNames(di, slFile, srFile);
+			FileActionItem act;
+			GetItemFileNames(di, act.dest, act.src);
 
 			// We must first check that paths still exists
-			if (!CheckPathsExist(srFile.c_str()) ||
-				!CheckPathsExist(slFile.c_str()))
+			if (!CheckPathsExist(act.src.c_str()) ||
+				!CheckPathsExist(act.dest.c_str()))
 			{
 				return;
 			}
 
-			FileActionItem act;
-			act.src = srFile;
-			act.dest = slFile;
-			act.dirflag = di->isDirectory();
 			act.context = sel;
+			act.dirflag = di->isDirectory();
 			act.atype = FileAction::ACT_DEL;
 			act.UIResult = FileActionItem::UI_DEL_BOTH;
 			actionScript.AddActionItem(act);
 		}
-		++selCount;
 	}
 	// Now we prompt, and execute actions
-	ConfirmAndPerformActions(actionScript, selCount);
+	PerformActionList(actionScript);
 }
 
 /**
@@ -281,7 +230,6 @@ void CDirView::DoDelAll()
 	WaitStatusCursor waitstatus(IDS_STATUS_DELETEFILES);
 	// First we build a list of desired actions
 	FileActionScript actionScript;
-	int selCount = 0;
 	int sel = -1;
 	String slFile, srFile;
 	const BOOL leftRO = m_pFrame->GetLeftReadOnly();
@@ -330,11 +278,10 @@ void CDirView::DoDelAll()
 			act.context = sel;
 			act.atype = FileAction::ACT_DEL;
 			actionScript.AddActionItem(act);
-			++selCount;
 		}
 	}
 	// Now we prompt, and execute actions
-	ConfirmAndPerformActions(actionScript, selCount);
+	PerformActionList(actionScript);
 }
 
 /**
@@ -351,7 +298,7 @@ void CDirView::DoCopyLeftTo()
 	WaitStatusCursor waitstatus(IDS_STATUS_COPYFILES);
 
 	FileActionScript actionScript;
-	int selCount = 0;
+	actionScript.m_destBase = m_lastCopyFolder + _T('\\');
 	int sel = -1;
 	String slFile, srFile;
 	while ((sel = GetNextItem(sel, LVNI_SELECTED)) != -1)
@@ -366,21 +313,13 @@ void CDirView::DoCopyLeftTo()
 				return;
 
 			FileActionItem act;
-			String sFullDest = m_lastCopyFolder + _T('\\');
-
-			actionScript.m_destBase = sFullDest;
-
-			if (m_pFrame->GetRecursive())
+			act.dest = actionScript.m_destBase;
+			if (!di->left.path.empty())
 			{
-				if (!di->left.path.empty())
-				{
-					sFullDest += di->left.path;
-					sFullDest += _T('\\');
-				}
+				act.dest += di->left.path;
+				act.dest += _T('\\');
 			}
-			sFullDest += di->left.filename;
-			act.dest = sFullDest;
-
+			act.dest += di->left.filename;
 			act.src = slFile;
 			act.dirflag = di->isDirectory();
 			act.context = sel;
@@ -388,11 +327,10 @@ void CDirView::DoCopyLeftTo()
 			act.UIResult = FileActionItem::UI_DONT_CARE;
 			act.UIOrigin = FileActionItem::UI_LEFT;
 			actionScript.AddActionItem(act);
-			++selCount;
 		}
 	}
 	// Now we prompt, and execute actions
-	ConfirmAndPerformActions(actionScript, selCount);
+	PerformActionList(actionScript);
 }
 
 /**
@@ -409,7 +347,7 @@ void CDirView::DoCopyRightTo()
 	WaitStatusCursor waitstatus(IDS_STATUS_COPYFILES);
 
 	FileActionScript actionScript;
-	int selCount = 0;
+	actionScript.m_destBase = m_lastCopyFolder + _T('\\');
 	int sel = -1;
 	String slFile, srFile;
 	while ((sel = GetNextItem(sel, LVNI_SELECTED)) != -1)
@@ -424,21 +362,13 @@ void CDirView::DoCopyRightTo()
 				return;
 
 			FileActionItem act;
-			String sFullDest = m_lastCopyFolder + _T('\\');
-
-			actionScript.m_destBase = sFullDest;
-
-			if (m_pFrame->GetRecursive())
+			act.dest = actionScript.m_destBase;
+			if (!di->right.path.empty())
 			{
-				if (!di->right.path.empty())
-				{
-					sFullDest += di->right.path;
-					sFullDest += _T('\\');
-				}
+				act.dest += di->right.path;
+				act.dest += _T('\\');
 			}
-			sFullDest += di->right.filename;
-			act.dest = sFullDest;
-
+			act.dest += di->right.filename;
 			act.src = srFile;
 			act.dirflag = di->isDirectory();
 			act.context = sel;
@@ -446,11 +376,10 @@ void CDirView::DoCopyRightTo()
 			act.UIResult = FileActionItem::UI_DONT_CARE;
 			act.UIOrigin = FileActionItem::UI_RIGHT;
 			actionScript.AddActionItem(act);
-			++selCount;
 		}
 	}
 	// Now we prompt, and execute actions
-	ConfirmAndPerformActions(actionScript, selCount);
+	PerformActionList(actionScript);
 }
 
 /**
@@ -467,7 +396,7 @@ void CDirView::DoMoveLeftTo()
 	WaitStatusCursor waitstatus(IDS_STATUS_MOVEFILES);
 
 	FileActionScript actionScript;
-	int selCount = 0;
+	actionScript.m_destBase = m_lastCopyFolder + _T('\\');
 	int sel = -1;
 	String slFile, srFile;
 	while ((sel = GetNextItem(sel, LVNI_SELECTED)) != -1)
@@ -482,19 +411,13 @@ void CDirView::DoMoveLeftTo()
 				return;
 
 			FileActionItem act;
-			String sFullDest = m_lastCopyFolder + _T('\\');
-			actionScript.m_destBase = sFullDest;
-			if (m_pFrame->GetRecursive())
+			act.dest = actionScript.m_destBase;
+			if (!di->left.path.empty())
 			{
-				if (!di->left.path.empty())
-				{
-					sFullDest += di->left.path;
-					sFullDest += _T('\\');
-				}
+				act.dest += di->left.path;
+				act.dest += _T('\\');
 			}
-			sFullDest += di->left.filename;
-			act.dest = sFullDest;
-
+			act.dest += di->left.filename;
 			act.src = slFile;
 			act.dirflag = di->isDirectory();
 			act.context = sel;
@@ -502,11 +425,10 @@ void CDirView::DoMoveLeftTo()
 			act.UIOrigin = FileActionItem::UI_LEFT;
 			act.UIResult = FileActionItem::UI_DEL_LEFT;
 			actionScript.AddActionItem(act);
-			++selCount;
 		}
 	}
 	// Now we prompt, and execute actions
-	ConfirmAndPerformActions(actionScript, selCount);
+	PerformActionList(actionScript);
 }
 
 /**
@@ -523,7 +445,7 @@ void CDirView::DoMoveRightTo()
 	WaitStatusCursor waitstatus(IDS_STATUS_MOVEFILES);
 
 	FileActionScript actionScript;
-	int selCount = 0;
+	actionScript.m_destBase = m_lastCopyFolder + _T('\\');
 	int sel = -1;
 	String slFile, srFile;
 	while ((sel = GetNextItem(sel, LVNI_SELECTED)) != -1)
@@ -538,19 +460,13 @@ void CDirView::DoMoveRightTo()
 				return;
 
 			FileActionItem act;
-			String sFullDest = m_lastCopyFolder + _T('\\');
-			actionScript.m_destBase = sFullDest;
-			if (m_pFrame->GetRecursive())
+			act.dest = actionScript.m_destBase;
+			if (!di->right.path.empty())
 			{
-				if (!di->right.path.empty())
-				{
-					sFullDest += di->right.path;
-					sFullDest += _T('\\');
-				}
+				act.dest += di->right.path;
+				act.dest += _T('\\');
 			}
-			sFullDest += di->right.filename;
-			act.dest = sFullDest;
-
+			act.dest += di->right.filename;
 			act.src = srFile;
 			act.dirflag = di->isDirectory();
 			act.context = sel;
@@ -558,32 +474,17 @@ void CDirView::DoMoveRightTo()
 			act.UIOrigin = FileActionItem::UI_RIGHT;
 			act.UIResult = FileActionItem::UI_DEL_RIGHT;
 			actionScript.AddActionItem(act);
-			++selCount;
 		}
 	}
 	// Now we prompt, and execute actions
-	ConfirmAndPerformActions(actionScript, selCount);
-}
-
-// Confirm with user, then perform the action list
-void CDirView::ConfirmAndPerformActions(FileActionScript &actionList, int selCount)
-{
-	if (selCount == 0) // Not sure it is possible to get right-click menu without
-		return;    // any selected items, but may as well be safe
-
-	ASSERT(actionList.GetActionItemCount() > 0); // Or else the update handler got it wrong
-
-	if (!ConfirmActionList(actionList, selCount))
-		return;
-
-	PerformActionList(actionList);
+	PerformActionList(actionScript);
 }
 
 /**
  * @brief Confirm actions with user as appropriate
  * (type, whether single or multiple).
  */
-bool CDirView::ConfirmActionList(FileActionScript &actionList, int selCount)
+bool CDirView::ConfirmActionList(FileActionScript &actionList)
 {
 	// TODO: We need better confirmation for file actions.
 	// Maybe we should show a list of files with actions done..
@@ -692,8 +593,14 @@ bool CDirView::ConfirmActionList(FileActionScript &actionList, int selCount)
  * @sa CMainFrame::SaveToVersionControl()
  * @sa CMainFrame::SyncFilesToVCS()
  */
-void CDirView::PerformActionList(FileActionScript & actionScript)
+void CDirView::PerformActionList(FileActionScript &actionScript)
 {
+	if (actionScript.GetActionItemCount() == 0)
+		return;
+
+	if (!ConfirmActionList(actionScript))
+		return;
+
 	// Reset suppressing VSS dialog for multiple files.
 	// Set in CMainFrame::SaveToVersionControl().
 	m_pFrame->m_pMDIFrame->m_CheckOutMulti = FALSE;
@@ -756,7 +663,7 @@ BOOL CDirView::IsItemOpenable(const DIFFITEM *di) const
 	if (di == NULL)
 		return FALSE;
 
-	if (m_bTreeMode && m_pFrame->GetRecursive())
+	if (m_bTreeMode && m_pFrame->GetRecursive() == 1)
 	{
 		if (di->isDirectory() || (di->isSideRightOnly() || di->isSideLeftOnly()))
 		{

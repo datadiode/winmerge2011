@@ -110,7 +110,7 @@ static void CleanupWMtempfolder(const stl::vector <int> &processIDs)
 	String filepattern(TempFolderPrefix);
 	filepattern += _T("*.*");
 	String pattern = paths_GetParentPath(env_GetTempPath());
-	pattern = paths_ConcatPath(pattern, filepattern.c_str());
+	pattern = paths_ConcatPath(pattern, filepattern);
 
 	WIN32_FIND_DATA ff;
 	HANDLE h = FindFirstFile(pattern.c_str(), &ff);
@@ -298,8 +298,19 @@ bool CMergeApp::InitInstance()
 				if (pWnd->IsIconic())
 					pWnd->ShowWindow(SW_RESTORE);
 				pWnd->GetLastActivePopup()->SetForegroundWindow();
+				COPYDATASTRUCT data;
+				if (DWORD cchData = GetCurrentDirectory(0, NULL))
+				{
+					data.dwData = 1;
+					data.cbData = cchData * sizeof(TCHAR);
+					data.lpData = _alloca(data.cbData);
+					GetCurrentDirectory(cchData, static_cast<LPTSTR>(data.lpData));
+					pWnd->SendMessage(WM_COPYDATA, NULL, reinterpret_cast<LPARAM>(&data));
+				}
 				LPTSTR cmdLine = GetCommandLine();
-				COPYDATASTRUCT data = { 0, (lstrlen(cmdLine) + 1) * sizeof(TCHAR), cmdLine};
+				data.dwData = 0;
+				data.cbData = (lstrlen(cmdLine) + 1) * sizeof(TCHAR);
+				data.lpData = cmdLine;
 				if (pWnd->SendMessage(WM_COPYDATA, NULL, reinterpret_cast<LPARAM>(&data)))
 					OException::ThrowSilent();
 			}

@@ -131,7 +131,7 @@ public:
 
 // Implementation types
 private:
-	typedef enum { SIDE_LEFT = 1, SIDE_RIGHT } SIDE_TYPE;
+	typedef enum { SIDE_LEFT, SIDE_RIGHT } SIDE_TYPE;
 	
 // Implementation in DirActions.cpp
 private:
@@ -154,8 +154,7 @@ private:
 	void DoOpenWith(SIDE_TYPE);
 	void DoOpenWithEditor(SIDE_TYPE, LPCTSTR = NULL);
 	void DoOpenWithFrhed(SIDE_TYPE);
-	void ConfirmAndPerformActions(FileActionScript &, int selCount);
-	bool ConfirmActionList(FileActionScript &, int selCount);
+	bool ConfirmActionList(FileActionScript &);
 	void PerformActionList(FileActionScript &);
 	void UpdateAfterFileScript(FileActionScript &);
 	int MarkSelectedForRescan();
@@ -257,7 +256,6 @@ protected:
 	UINT m_nHiddenItems; /**< Count of items we have hidden */
 	UINT m_nSpecialItems; /**< Count of special items */
 	bool m_bTreeMode; /**< TRUE if tree mode is on*/
-	bool m_bAllowRescan; /**< Is rescan allowed */
 	DirCompProgressDlg *m_pCmpProgressDlg;
 	clock_t m_compareStart; /**< Starting process time of the compare */
 	String m_lastCopyFolder; /**< Last Copy To -target folder. */

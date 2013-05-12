@@ -191,7 +191,7 @@ void CDirFrame::UpdateCmdUI<ID_VIEW_SHOWHIDDENITEMS>()
 template<>
 void CDirFrame::UpdateCmdUI<ID_REFRESH>()
 {
-	m_pMDIFrame->UpdateCmdUI<ID_REFRESH>(m_pDirView->m_bAllowRescan &&
+	m_pMDIFrame->UpdateCmdUI<ID_REFRESH>(m_nRecursive != 3 &&
 		waitStatusCursor.GetMsgId() != IDS_STATUS_RESCANNING ? MF_ENABLED : MF_GRAYED);
 }
 
@@ -670,18 +670,33 @@ bool CDirFrame::AddToCollection(FileLocation &filelocLeft, FileLocation &fileloc
 {
 	const String &lpath = m_pCtxt->GetLeftPath();
 	const String &rpath = m_pCtxt->GetRightPath();
-	LPCTSTR lname = EatPrefix(filelocLeft.filepath.c_str(), lpath.c_str());
 	LPCTSTR rname = EatPrefix(filelocRight.filepath.c_str(), rpath.c_str());
-	if (lname == NULL || rname == NULL)
+	if (rname == NULL)
 	{
 		stl::swap(filelocLeft, filelocRight);
-		lname = EatPrefix(filelocLeft.filepath.c_str(), lpath.c_str());
 		rname = EatPrefix(filelocRight.filepath.c_str(), rpath.c_str());
-		if (lname == NULL || rname == NULL)
+		if (rname == NULL)
 		{
-			stl::swap(filelocLeft, filelocRight);
 			return false;
 		}
+	}
+	LPCTSTR lname = EatPrefix(filelocLeft.filepath.c_str(), lpath.c_str());
+	if (lname == NULL)
+	{
+		// Don't add this item to the collection if the prefix is ambiguous.
+		lname = EatPrefix(filelocLeft.filepath.c_str(), rpath.c_str());
+		if (lname != NULL)
+			return false;
+		// Don't add this item to the collection if no temp folder is involved.
+		if (m_pTempPathContext == NULL)
+			return false;
+		// Copy the left file to the temp folder, assigning it the same name as
+		// given on the right side. Also mimic the respective folder structure.
+		lname = rname;
+		String filepath = paths_ConcatPath(m_pTempPathContext->m_strLeftRoot, lname);
+		paths_CreateIfNeeded(filepath.c_str(), true);
+		CopyFile(filelocLeft.filepath.c_str(), filepath.c_str(), TRUE);
+		filelocLeft.filepath = filepath;
 	}
 	int i = -1;
 	if (DIFFITEM *di = FindItemFromPaths(filelocLeft.filepath.c_str(), filelocRight.filepath.c_str()))

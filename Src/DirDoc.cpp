@@ -93,13 +93,13 @@ void CDirFrame::InitCompare(LPCTSTR pszLeft, LPCTSTR pszRight, int nRecursive, C
 
 void CDirFrame::InitMrgmanCompare()
 {
-	if (m_pDirView->m_bAllowRescan)
+	if (m_nRecursive == 0)
 	{
 		m_wndFilePathBar.SendDlgItemMessage(
 			IDC_STATIC_TITLE_LEFT, EM_SETLIMITTEXT, ID_MRGMAN_BASE);
 		m_wndFilePathBar.SendDlgItemMessage(
 			IDC_STATIC_TITLE_RIGHT, EM_SETLIMITTEXT, ID_MRGMAN_DESTINATION);
-		m_pDirView->m_bAllowRescan = false;
+		m_nRecursive = 3;
 	}
 	else
 	{

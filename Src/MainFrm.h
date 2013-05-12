@@ -237,6 +237,7 @@ protected:
 	void OnViewToolbar();
 	void OnViewTabBar();
 	void OnResizePanes();
+	void OnFileStartCollect();
 	void OnFileOpenProject();
 	void OnWindowCloseAll();
 	void OnSaveProject();
@@ -270,6 +271,8 @@ private:
 
 	String m_TitleMRU;
 	stl::vector<String> m_FilesMRU;
+
+	String m_lastCollectFolder;
 
 	HMenu *m_pScriptMenu;
 	String m_TitleScripts;

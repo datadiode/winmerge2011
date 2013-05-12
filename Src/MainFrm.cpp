@@ -18,13 +18,11 @@
 //    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //
 /////////////////////////////////////////////////////////////////////////////
-/** 
+/**
  * @file  MainFrm.cpp
  *
  * @brief Implementation of the CMainFrame class
  */
-// ID line follows -- this is updated by SVN
-// $Id$
 
 #include "StdAfx.h"
 #include "VSSHelper.h"
@@ -82,6 +80,7 @@ static DWORD dwOsVer = GetVersion();
  */
 const CMainFrame::MENUITEM_ICON CMainFrame::m_MenuIcons[] = {
 	{ ID_FILE_OPENCONFLICT,			IDB_FILE_OPENCONFLICT			},
+	{ ID_FILE_STARTCOLLECT,			IDB_FILE_STARTCOLLECT,			},
 	{ ID_EDIT_COPY,					IDB_EDIT_COPY,					},
 	{ ID_EDIT_CUT,					IDB_EDIT_CUT,					},
 	{ ID_EDIT_PASTE,				IDB_EDIT_PASTE,					},
@@ -2715,7 +2714,7 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 					if (pDocFrame)
 						pDocFrame->SendMessage(WM_CLOSE);
 					CDocFrame *const pActiveDocFrame = GetActiveDocFrame();
-					if (pActiveDocFrame != pDocFrame)
+					if (pActiveDocFrame != pDocFrame && m_pCollectingDirFrame == NULL)
 					{
 						PostMessage(WM_SYSCOMMAND,
 							pActiveDocFrame || COptionsMgr::Get(OPT_SINGLE_INSTANCE) ?
@@ -2843,6 +2842,31 @@ void CMainFrame::OnResizePanes()
 }
 
 /**
+ * @brief Start collecting items from subsequent command line invocations.
+ */
+void CMainFrame::OnFileStartCollect()
+{
+	// Select an existing folder for reference
+	if (!SelectFolder(m_hWnd, m_lastCollectFolder, 0))
+		return;
+	if (!paths_EndsWithSlash(m_lastCollectFolder.c_str()))
+		m_lastCollectFolder.push_back(_T('\\'));
+	if (CDirFrame *pDirDoc = GetDirDocToShow())
+	{
+		m_pCollectingDirFrame = pDirDoc;
+		pDirDoc->SetWindowText(m_lastCollectFolder.c_str());
+		CTempPathContext *pTempPathContext = new CTempPathContext;
+		String path = GetClearTempPath(pTempPathContext, _T("0"));
+		pTempPathContext->m_strLeftDisplayRoot.push_back(_T('*'));
+		pTempPathContext->m_strRightDisplayRoot = m_lastCollectFolder;
+		pDirDoc->InitCompare(path.c_str(), m_lastCollectFolder.c_str(), 3, pTempPathContext);
+		String empty;
+		pDirDoc->SetDescriptions(empty, empty);
+		pDirDoc->ActivateFrame();
+	}
+}
+
+/**
  * @brief Open project-file.
  */
 void CMainFrame::OnFileOpenProject()
@@ -2875,10 +2899,18 @@ LRESULT CMainFrame::OnWndMsg<WM_COPYDATA>(WPARAM, LPARAM lParam)
 	DWORD cchData = pcds->cbData / sizeof(TCHAR);
 	if (cchData == 0 || pchData[cchData - 1] != _T('\0'))
 		return FALSE;
-	// Allow calling thread to resume
-	ReplyMessage(TRUE);
-	// Process command line
-	ParseArgsAndDoOpen(pchData);
+	switch (pcds->dwData)
+	{
+	case 0:
+		// Allow calling thread to resume
+		ReplyMessage(TRUE);
+		// Process command line
+		ParseArgsAndDoOpen(pchData);
+		break;
+	case 1:
+		SetCurrentDirectory(pchData);
+		break;
+	}
 	return TRUE;
 }
 
@@ -3206,6 +3238,9 @@ LRESULT CMainFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 		break;
 	case ID_FILE_CLOSE:
 		OnFileClose();
+		break;
+	case ID_FILE_STARTCOLLECT:
+		OnFileStartCollect();
 		break;
 	case ID_FILE_OPENPROJECT:
 		OnFileOpenProject();
