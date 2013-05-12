@@ -384,12 +384,7 @@ bool CCrystalTextView::SetTextType(TextType enuType)
 
 bool CCrystalTextView::SetTextType(TextDefinition *def)
 {
-  if (def)
-    if (m_CurSourceDef != def)
-      return DoSetTextType (def);
-    else
-      return true;
-  return false;
+	return def != NULL && (m_CurSourceDef == def || DoSetTextType(def));
 }
 
 CCrystalTextView::CCrystalTextView(size_t ZeroInit)
@@ -400,16 +395,9 @@ CCrystalTextView::CCrystalTextView(size_t ZeroInit)
 	m_bAutoDelete = true;
 	ResetView();
 	SetTextType(SRC_PLAIN);
-
+	// font
 	_tcscpy(m_lfBaseFont.lfFaceName, _T("FixedSys"));
-	m_lfBaseFont.lfHeight = 0;
 	m_lfBaseFont.lfWeight = FW_NORMAL;
-	m_lfBaseFont.lfItalic = FALSE;
-	m_lfBaseFont.lfCharSet = DEFAULT_CHARSET;
-	m_lfBaseFont.lfOutPrecision = OUT_DEFAULT_PRECIS;
-	m_lfBaseFont.lfClipPrecision = CLIP_DEFAULT_PRECIS;
-	m_lfBaseFont.lfQuality = DEFAULT_QUALITY;
-	m_lfBaseFont.lfPitchAndFamily = DEFAULT_PITCH;
 }
 
 CCrystalTextView::~CCrystalTextView()
@@ -2153,41 +2141,41 @@ int CCrystalTextView::GetMaxLineLength()
 
 void CCrystalTextView::GoToLine(int nLine, bool bRelative)
 {
-  int nLines = m_pTextBuffer->GetLineCount () - 1;
-  POINT ptCursorPos = GetCursorPos ();
-  if (bRelative)
-    {
-      nLine += ptCursorPos.y;
-    }
-  if (nLine)
-    {
-      nLine--;
-    }
-  if (nLine > nLines)
-    {
-      nLine = nLines;
-    }
-  if (nLine >= 0)
-    {
-      int nChars = m_pTextBuffer->GetLineLength (nLine);
-      if (nChars)
-        {
-          nChars--;
-        }
-      if (ptCursorPos.x > nChars)
-        {
-          ptCursorPos.x = nChars;
-        }
-      if (ptCursorPos.x >= 0)
-        {
-          ptCursorPos.y = nLine;
-          ASSERT_VALIDTEXTPOS(ptCursorPos);
-          SetAnchor(ptCursorPos);
-          SetSelection(ptCursorPos, ptCursorPos);
-          SetCursorPos(ptCursorPos);
-          EnsureVisible(ptCursorPos);
-        }
-    }
+	int nLines = m_pTextBuffer->GetLineCount() - 1;
+	POINT ptCursorPos = GetCursorPos();
+	if (bRelative)
+	{
+		nLine += ptCursorPos.y;
+	}
+	if (nLine)
+	{
+		nLine--;
+	}
+	if (nLine > nLines)
+	{
+		nLine = nLines;
+	}
+	if (nLine >= 0)
+	{
+		int nChars = m_pTextBuffer->GetLineLength(nLine);
+		if (nChars)
+		{
+			nChars--;
+		}
+		if (ptCursorPos.x > nChars)
+		{
+			ptCursorPos.x = nChars;
+		}
+		if (ptCursorPos.x >= 0)
+		{
+			ptCursorPos.y = nLine;
+			ASSERT_VALIDTEXTPOS(ptCursorPos);
+			SetAnchor(ptCursorPos);
+			SetSelection(ptCursorPos, ptCursorPos);
+			SetCursorPos(ptCursorPos);
+			EnsureVisible(ptCursorPos);
+		}
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -3199,12 +3187,12 @@ void CCrystalTextView::SetFont(const LOGFONT &lf)
 	m_nCharWidth = -1;
 	m_nLineHeight = -1;
 	InvalidateScreenRect();
-	for (int I = 0; I < 4; I++)
+	for (int i = 0; i < 4; ++i)
 	{
-		if (m_apFonts[I] != NULL)
+		if (m_apFonts[i] != NULL)
 		{
-			m_apFonts[I]->DeleteObject();
-			m_apFonts[I] = NULL;
+			m_apFonts[i]->DeleteObject();
+			m_apFonts[i] = NULL;
 		}
 	}
 	if (m_hWnd)
@@ -3303,7 +3291,7 @@ HGLOBAL CCrystalTextView::PrepareDragData()
 
 	LPTSTR pszData = reinterpret_cast<LPTSTR>(::GlobalLock(hData));
 	memcpy(pszData, text.c_str(), cbData);
-	::GlobalUnlock (hData);
+	::GlobalUnlock(hData);
 
 	m_ptDraggedTextBegin = m_ptDrawSelStart;
 	m_ptDraggedTextEnd = m_ptDrawSelEnd;
@@ -3312,73 +3300,71 @@ HGLOBAL CCrystalTextView::PrepareDragData()
 
 static int FindStringHelper(LPCTSTR pszFindWhere, LPCTSTR pszFindWhat, DWORD dwFlags, int &nLen)
 {
-  if (dwFlags & FIND_REGEXP)
-    {
-      int pos;
-      const char *errormsg = NULL;
-      int erroroffset = 0;
-      const OString regexString = HString::Uni(pszFindWhat)->Oct(CP_UTF8);
-      pcre *regexp = pcre_compile(regexString.A,
-		  dwFlags & FIND_MATCH_CASE ?
+	if (dwFlags & FIND_REGEXP)
+	{
+		const char *errormsg = NULL;
+		int erroroffset = 0;
+		const OString regexString = HString::Uni(pszFindWhat)->Oct(CP_UTF8);
+		pcre *regexp = pcre_compile(regexString.A,
+			dwFlags & FIND_MATCH_CASE ?
 			PCRE_UTF8 | PCRE_BSR_ANYCRLF :
 			PCRE_UTF8 | PCRE_BSR_ANYCRLF | PCRE_CASELESS,
-		  &errormsg,
-          &erroroffset, NULL);
-      pcre_extra *pe = NULL;
-      if (regexp)
-        {
-          errormsg = NULL;
-          pe = pcre_study(regexp, 0, &errormsg);
-        }
+			&errormsg,
+			&erroroffset, NULL);
+		pcre_extra *pe = NULL;
+		if (regexp)
+		{
+			errormsg = NULL;
+			pe = pcre_study(regexp, 0, &errormsg);
+		}
 
-      int ovector[30];
-      const OString compString = HString::Uni(pszFindWhere)->Oct(CP_UTF8);
-      int result = pcre_exec(regexp, pe, compString.A, compString.ByteLen(),
-          0, 0, ovector, 30);
-      if (result >= 0)
-        {
-          pos = MultiByteToWideChar(CP_UTF8, 0, compString.A, ovector[0], 0, 0);
-          nLen = MultiByteToWideChar(CP_UTF8, 0, compString.A, ovector[1], 0, 0) - pos;
-        }
-      else
-        pos = -1;
+		int pos = -1;
+		int ovector[30];
+		const OString compString = HString::Uni(pszFindWhere)->Oct(CP_UTF8);
+		int result = pcre_exec(
+			regexp, pe, compString.A, compString.ByteLen(), 0, 0, ovector, 30);
+		if (result >= 0)
+		{
+			pos = MultiByteToWideChar(CP_UTF8, 0, compString.A, ovector[0], 0, 0);
+			nLen = MultiByteToWideChar(CP_UTF8, 0, compString.A, ovector[1], 0, 0) - pos;
+		}
 
-      pcre_free(regexp);
-      pcre_free(pe);
-      return pos;
-    }
-  else
-    {
-      ASSERT(pszFindWhere != NULL);
-      ASSERT(pszFindWhat != NULL);
-      int nCur = 0;
-      int nLength = static_cast<int>(_tcslen(pszFindWhat));
-      nLen = nLength;
-      for (;;)
-        {
-          LPCTSTR pszPos = _tcsstr(pszFindWhere, pszFindWhat);
-          if (pszPos == NULL)
-            return -1;
-          if ((dwFlags & FIND_WHOLE_WORD) == 0)
-            return nCur + static_cast<int>(pszPos - pszFindWhere);
-          if (pszPos > pszFindWhere && xisalnum(pszPos[-1]))
-            {
-              nCur += static_cast<int>(pszPos - pszFindWhere + 1);
-              pszFindWhere = pszPos + 1;
-              continue;
-            }
-          if (xisalnum(pszPos[nLength]))
-            {
-              nCur += static_cast<int>(pszPos - pszFindWhere + 1);
-              pszFindWhere = pszPos + 1;
-              continue;
-            }
-          return nCur + static_cast<int>(pszPos - pszFindWhere);
-        }
-    }
-  ASSERT(FALSE);               // Unreachable
+		pcre_free(regexp);
+		pcre_free(pe);
+		return pos;
+	}
+	else
+	{
+		ASSERT(pszFindWhere != NULL);
+		ASSERT(pszFindWhat != NULL);
+		int nCur = 0;
+		int nLength = static_cast<int>(_tcslen(pszFindWhat));
+		nLen = nLength;
+		for (;;)
+		{
+			LPCTSTR pszPos = _tcsstr(pszFindWhere, pszFindWhat);
+			if (pszPos == NULL)
+				return -1;
+			if ((dwFlags & FIND_WHOLE_WORD) == 0)
+				return nCur + static_cast<int>(pszPos - pszFindWhere);
+			if (pszPos > pszFindWhere && xisalnum(pszPos[-1]))
+			{
+				nCur += static_cast<int>(pszPos - pszFindWhere + 1);
+				pszFindWhere = pszPos + 1;
+				continue;
+			}
+			if (xisalnum(pszPos[nLength]))
+			{
+				nCur += static_cast<int>(pszPos - pszFindWhere + 1);
+				pszFindWhere = pszPos + 1;
+				continue;
+			}
+			return nCur + static_cast<int>(pszPos - pszFindWhere);
+		}
+	}
+	ASSERT(FALSE); // Unreachable
 
-  return -1;
+	return -1;
 }
 
 /** 
@@ -3389,54 +3375,54 @@ static int FindStringHelper(LPCTSTR pszFindWhere, LPCTSTR pszFindWhat, DWORD dwF
  *  selection, if FALSE cursor is positioned to right-end.
  */
 BOOL CCrystalTextView::HighlightText(
-	const POINT & ptStartPos, int nLength, BOOL bCursorToLeft)
+	const POINT &ptStartPos, int nLength, BOOL bCursorToLeft)
 {
-  ASSERT_VALIDTEXTPOS(ptStartPos);
-  POINT ptEndPos = ptStartPos;
-  int nCount = GetLineLength (ptEndPos.y) - ptEndPos.x;
-  if (nLength <= nCount)
-    {
-      ptEndPos.x += nLength;
-    }
-  else
-    {
-      while (nLength > nCount)
-        {
-          nLength -= nCount + 1;
-          nCount = GetLineLength (++ptEndPos.y);
-        }
-      ptEndPos.x = nLength;
-    }
-  ASSERT_VALIDTEXTPOS(m_ptCursorPos);  //  Probably 'nLength' is bigger than expected...
+	ASSERT_VALIDTEXTPOS(ptStartPos);
+	POINT ptEndPos = ptStartPos;
+	int nCount = GetLineLength (ptEndPos.y) - ptEndPos.x;
+	if (nLength <= nCount)
+	{
+		ptEndPos.x += nLength;
+	}
+	else
+	{
+		while (nLength > nCount)
+		{
+			nLength -= nCount + 1;
+			nCount = GetLineLength (++ptEndPos.y);
+		}
+		ptEndPos.x = nLength;
+	}
+	ASSERT_VALIDTEXTPOS(m_ptCursorPos);  //  Probably 'nLength' is bigger than expected...
 
-  m_ptCursorPos = bCursorToLeft ? ptStartPos : ptEndPos;
-  m_ptAnchor = m_ptCursorPos;
-  SetSelection(ptStartPos, ptEndPos);
-  UpdateCaret();
-  
-  // Scrolls found text to middle of screen if out-of-screen
-  int nScreenLines = GetScreenLines();
-  if (ptStartPos.y < m_nTopLine || ptEndPos.y > m_nTopLine + nScreenLines)
-    {
-      if (ptStartPos.y > nScreenLines / 2)
-        ScrollToLine(ptStartPos.y - nScreenLines / 2);
-      else
-        ScrollToLine(ptStartPos.y);
-      UpdateSiblingScrollPos(false);
-    }
-  EnsureVisible (ptStartPos, ptEndPos);
-  return TRUE;
+	m_ptCursorPos = bCursorToLeft ? ptStartPos : ptEndPos;
+	m_ptAnchor = m_ptCursorPos;
+	SetSelection(ptStartPos, ptEndPos);
+	UpdateCaret();
+
+	// Scrolls found text to middle of screen if out-of-screen
+	int nScreenLines = GetScreenLines();
+	if (ptStartPos.y < m_nTopLine || ptEndPos.y > m_nTopLine + nScreenLines)
+	{
+		if (ptStartPos.y > nScreenLines / 2)
+			ScrollToLine(ptStartPos.y - nScreenLines / 2);
+		else
+			ScrollToLine(ptStartPos.y);
+		UpdateSiblingScrollPos(false);
+	}
+	EnsureVisible(ptStartPos, ptEndPos);
+	return TRUE;
 }
 
 BOOL CCrystalTextView::FindText(
 	LPCTSTR pszText, const POINT & ptStartPos,
-	DWORD dwFlags, BOOL bWrapSearch, POINT * pptFoundPos)
+	DWORD dwFlags, BOOL bWrapSearch, POINT &ptFoundPos)
 {
 	int nLineCount = GetLineCount ();
 	const POINT ptBlockBegin = { 0, 0 };
 	const POINT ptBlockEnd = { GetLineLength(nLineCount - 1), nLineCount - 1 };
 	return FindTextInBlock(pszText, ptStartPos, ptBlockBegin, ptBlockEnd,
-		dwFlags, bWrapSearch, pptFoundPos);
+		dwFlags, bWrapSearch, ptFoundPos);
 }
 
 int HowManyStr(LPCTSTR s, LPCTSTR m)
@@ -3464,232 +3450,230 @@ int HowManyStr(LPCTSTR s, TCHAR c)
 }
 
 BOOL CCrystalTextView::FindTextInBlock(
-	LPCTSTR pszText, const POINT & ptStartPosition,
-	const POINT & ptBlockBegin, const POINT & ptBlockEnd,
-	DWORD dwFlags, BOOL bWrapSearch, POINT * pptFoundPos)
+	LPCTSTR pszText, const POINT &ptStartPosition,
+	const POINT &ptBlockBegin, const POINT &ptBlockEnd,
+	DWORD dwFlags, BOOL bWrapSearch, POINT &ptFoundPos)
 {
-  POINT ptCurrentPos = ptStartPosition;
+	POINT ptCurrentPos = ptStartPosition;
 
-  ASSERT(pszText != NULL && _tcslen (pszText) > 0);
-  ASSERT_VALIDTEXTPOS(ptCurrentPos);
-  ASSERT_VALIDTEXTPOS(ptBlockBegin);
-  ASSERT_VALIDTEXTPOS(ptBlockEnd);
-  ASSERT(ptBlockBegin.y < ptBlockEnd.y || ptBlockBegin.y == ptBlockEnd.y &&
-          ptBlockBegin.x <= ptBlockEnd.x);
-  if (ptBlockBegin == ptBlockEnd)
-    return FALSE;
-  WaitStatusCursor waitCursor;
-  if (ptCurrentPos.y < ptBlockBegin.y || ptCurrentPos.y == ptBlockBegin.y &&
-        ptCurrentPos.x < ptBlockBegin.x)
-    ptCurrentPos = ptBlockBegin;
+	ASSERT(pszText != NULL && _tcslen(pszText) > 0);
+	ASSERT_VALIDTEXTPOS(ptCurrentPos);
+	ASSERT_VALIDTEXTPOS(ptBlockBegin);
+	ASSERT_VALIDTEXTPOS(ptBlockEnd);
+	ASSERT(ptBlockBegin.y < ptBlockEnd.y || ptBlockBegin.y == ptBlockEnd.y &&
+			ptBlockBegin.x <= ptBlockEnd.x);
+	if (ptBlockBegin == ptBlockEnd)
+		return FALSE;
+	WaitStatusCursor waitCursor;
+	if (ptCurrentPos.y < ptBlockBegin.y || ptCurrentPos.y == ptBlockBegin.y &&
+			ptCurrentPos.x < ptBlockBegin.x)
+		ptCurrentPos = ptBlockBegin;
 
-  String what = pszText;
-  int nEolns;
-  if (dwFlags & FIND_REGEXP)
+	String what = pszText;
+	int nEolns;
+	if (dwFlags & FIND_REGEXP)
+	{
+		nEolns = HowManyStr(what.c_str(), _T("\\n"));
+	}
+	else
+	{
+		nEolns = 0;
+		if ((dwFlags & FIND_MATCH_CASE) == 0)
+			string_makeupper(what);
+	}
+	if (dwFlags & FIND_DIRECTION_UP)
     {
-      nEolns = HowManyStr(what.c_str(), _T("\\n"));
-    }
-  else
+		//  Let's check if we deal with whole text.
+		//  At this point, we cannot search *up* in selection
+		ASSERT(ptBlockBegin.x == 0 && ptBlockBegin.y == 0);
+		ASSERT(ptBlockEnd.x == GetLineLength (GetLineCount () - 1) &&
+			ptBlockEnd.y == GetLineCount () - 1);
+
+		//  Proceed as if we have whole text search.
+		for (;;)
+		{
+			while (ptCurrentPos.y >= 0)
+			{
+				int nLineLength;
+				String line;
+				if (dwFlags & FIND_REGEXP)
+				{
+					for (int i = 0; i <= nEolns && ptCurrentPos.y >= i; i++)
+					{
+						LPCTSTR pszChars = GetLineChars(ptCurrentPos.y - i);
+						if (i)
+						{
+							nLineLength = GetLineLength(ptCurrentPos.y - i);
+							ptCurrentPos.x = 0;
+							line = _T ('\n') + line;
+						}
+						else
+						{
+							nLineLength = ptCurrentPos.x != -1 ? ptCurrentPos.x : GetLineLength (ptCurrentPos.y - i);
+						}
+						if (nLineLength > 0)
+						{
+							line.insert(0, pszChars, nLineLength);
+						}
+					}
+					nLineLength = line.length();
+					if (ptCurrentPos.x == -1)
+					ptCurrentPos.x = 0;
+				}
+				else
+				{
+					nLineLength = GetLineLength(ptCurrentPos.y);
+					if (ptCurrentPos.x == -1)
+					{
+						ptCurrentPos.x = nLineLength;
+					}
+					else
+						if (ptCurrentPos.x >= nLineLength)
+							ptCurrentPos.x = nLineLength - 1;
+
+					LPCTSTR pszChars = GetLineChars(ptCurrentPos.y);
+					line.assign(pszChars, ptCurrentPos.x + 1);
+					if ((dwFlags & FIND_MATCH_CASE) == 0)
+					string_makeupper(line);
+				}
+
+				int nFoundPos = -1;
+				int nMatchLen = what.length();
+				int nPos;
+				while ((nPos = ::FindStringHelper(line.c_str(), what.c_str(), dwFlags, m_nLastFindWhatLen)) != -1)
+				{
+					nFoundPos = nFoundPos == -1 ? nPos : nFoundPos + nPos;
+					nFoundPos += nMatchLen;
+					line.erase(0, nMatchLen + nPos);
+				}
+
+				if (nFoundPos >= 0)	// Found text!
+				{
+					ptCurrentPos.x = nFoundPos - nMatchLen;
+					ptFoundPos = ptCurrentPos;
+					return TRUE;
+				}
+
+				ptCurrentPos.y--;
+				if( ptCurrentPos.y >= 0 )
+				ptCurrentPos.x = GetLineLength( ptCurrentPos.y );
+			}
+
+			//  Beginning of text reached
+			if (!bWrapSearch)
+				return FALSE;
+
+			//  Start again from the end of text
+			bWrapSearch = FALSE;
+			ptCurrentPos.x = 0;
+			ptCurrentPos.y = GetLineCount() - 1;
+		}
+	}
+	else
     {
-      nEolns = 0;
-      if ((dwFlags & FIND_MATCH_CASE) == 0)
-        string_makeupper(what);
-    }
-  if (dwFlags & FIND_DIRECTION_UP)
-    {
-      //  Let's check if we deal with whole text.
-      //  At this point, we cannot search *up* in selection
-      ASSERT(ptBlockBegin.x == 0 && ptBlockBegin.y == 0);
-      ASSERT(ptBlockEnd.x == GetLineLength (GetLineCount () - 1) &&
-              ptBlockEnd.y == GetLineCount () - 1);
+		for (;;)
+		{
+			while (ptCurrentPos.y <= ptBlockEnd.y)
+			{
+				int nLineLength, nLines;
+				String line;
+				if (dwFlags & FIND_REGEXP)
+				{
+					nLines = m_pTextBuffer->GetLineCount ();
+					for (int i = 0; i <= nEolns && ptCurrentPos.y + i < nLines; i++)
+					{
+						LPCTSTR pszChars = GetLineChars(ptCurrentPos.y + i);
+						nLineLength = GetLineLength(ptCurrentPos.y + i);
+						if (i)
+						{
+							line += _T ('\n');
+						}
+						else
+						{
+							pszChars += ptCurrentPos.x;
+							nLineLength -= ptCurrentPos.x;
+						}
+						if (nLineLength > 0)
+						{
+							line.append(pszChars, nLineLength);
+						}
+					}
+					nLineLength = line.length();
+				}
+				else
+				{
+					nLineLength = GetLineLength(ptCurrentPos.y) - ptCurrentPos.x;
+					if (nLineLength <= 0)
+					{
+						ptCurrentPos.x = 0;
+						ptCurrentPos.y++;
+						continue;
+					}
+					LPCTSTR pszChars = GetLineChars(ptCurrentPos.y);
+					pszChars += ptCurrentPos.x;
+					//  Prepare necessary part of line
+					line.assign(pszChars, nLineLength);
+					if ((dwFlags & FIND_MATCH_CASE) == 0)
+						string_makeupper(line);
+				}
 
-      //  Proceed as if we have whole text search.
-      for (;;)
-        {
-          while (ptCurrentPos.y >= 0)
-            {
-              int nLineLength;
-              String line;
-              if (dwFlags & FIND_REGEXP)
-                {
-                  for (int i = 0; i <= nEolns && ptCurrentPos.y >= i; i++)
-                    {
-                      LPCTSTR pszChars = GetLineChars(ptCurrentPos.y - i);
-                      if (i)
-                        {
-                          nLineLength = GetLineLength(ptCurrentPos.y - i);
-                          ptCurrentPos.x = 0;
-                          line = _T ('\n') + line;
-                        }
-                      else
-                        {
-                          nLineLength = ptCurrentPos.x != -1 ? ptCurrentPos.x : GetLineLength (ptCurrentPos.y - i);
-                        }
-                      if (nLineLength > 0)
-                        {
-                          line.insert(0, pszChars, nLineLength);
-                        }
-                    }
-                  nLineLength = line.length();
-                  if (ptCurrentPos.x == -1)
-                    ptCurrentPos.x = 0;
-                }
-              else
-                {
-                  nLineLength = GetLineLength(ptCurrentPos.y);
-                  if (ptCurrentPos.x == -1)
-                    {
-                      ptCurrentPos.x = nLineLength;
-                    }
-                  else
-                    if( ptCurrentPos.x >= nLineLength )
-                      ptCurrentPos.x = nLineLength - 1;
+				//  Perform search in the line
+				int nPos = ::FindStringHelper(line.c_str(), what.c_str(), dwFlags, m_nLastFindWhatLen);
+				if (nPos >= 0)
+				{
+					free(m_pszMatched);
+					m_pszMatched = _tcsdup(line.c_str());
+					if (nEolns)
+					{
+						String item(line.c_str(), nPos);
+						LPCTSTR current = _tcsrchr(item.c_str(), _T('\n'));
+						if (current)
+							current++;
+						else
+							current = item.c_str();
+						nEolns = HowManyStr(item.c_str(), _T('\n'));
+						if (nEolns)
+						{
+							ptCurrentPos.y += nEolns;
+							ptCurrentPos.x = nPos - static_cast<int>(current - item.c_str());
+						}
+						else
+						{
+							ptCurrentPos.x += nPos - static_cast<int>(current - item.c_str());
+						}
+						if (ptCurrentPos.x < 0)
+							ptCurrentPos.x = 0;
+					}
+					else
+					{
+						ptCurrentPos.x += nPos;
+					}
+				//  Check of the text found is outside the block.
+					if (ptCurrentPos.y == ptBlockEnd.y && ptCurrentPos.x >= ptBlockEnd.x)
+						break;
 
-                  LPCTSTR pszChars = GetLineChars(ptCurrentPos.y);
-                  line.assign(pszChars, ptCurrentPos.x + 1);
-                  if ((dwFlags & FIND_MATCH_CASE) == 0)
-                    string_makeupper(line);
-                }
+					ptFoundPos = ptCurrentPos;
+					return TRUE;
+				}
+				else
+				{
+					free(m_pszMatched);
+					m_pszMatched = NULL;
+				}
 
-              int nFoundPos = -1;
-              int nMatchLen = what.length();
-              int nPos;
-              while ((nPos = ::FindStringHelper(line.c_str(), what.c_str(), dwFlags, m_nLastFindWhatLen)) != -1)
-                {
-                  nFoundPos = nFoundPos == -1 ? nPos : nFoundPos + nPos;
-                  nFoundPos += nMatchLen;
-                  line.erase(0, nMatchLen + nPos);
-                }
+				//  Go further, text was not found
+				ptCurrentPos.x = 0;
+				ptCurrentPos.y++;
+			}
 
-              if( nFoundPos >= 0 )	// Found text!
-                {
-                  ptCurrentPos.x = nFoundPos - nMatchLen;
-                  *pptFoundPos = ptCurrentPos;
-                  return TRUE;
-                }
+			//  End of text reached
+			if (!bWrapSearch)
+				return FALSE;
 
-              ptCurrentPos.y--;
-              if( ptCurrentPos.y >= 0 )
-                ptCurrentPos.x = GetLineLength( ptCurrentPos.y );
-            }
-
-          //  Beginning of text reached
-          if (!bWrapSearch)
-            return FALSE;
-
-          //  Start again from the end of text
-          bWrapSearch = FALSE;
-          ptCurrentPos.x = 0;
-          ptCurrentPos.y = GetLineCount() - 1;
-        }
-    }
-  else
-    {
-      for (;;)
-        {
-          while (ptCurrentPos.y <= ptBlockEnd.y)
-            {
-              int nLineLength, nLines;
-              String line;
-              if (dwFlags & FIND_REGEXP)
-                {
-                  nLines = m_pTextBuffer->GetLineCount ();
-                  for (int i = 0; i <= nEolns && ptCurrentPos.y + i < nLines; i++)
-                    {
-                      LPCTSTR pszChars = GetLineChars(ptCurrentPos.y + i);
-                      nLineLength = GetLineLength(ptCurrentPos.y + i);
-                      if (i)
-                        {
-                          line += _T ('\n');
-                        }
-                      else
-                        {
-                          pszChars += ptCurrentPos.x;
-                          nLineLength -= ptCurrentPos.x;
-                        }
-                      if (nLineLength > 0)
-                        {
-                          line.append(pszChars, nLineLength);
-                        }
-                    }
-                  nLineLength = line.length();
-                }
-              else
-                {
-                  nLineLength = GetLineLength(ptCurrentPos.y) - ptCurrentPos.x;
-                  if (nLineLength <= 0)
-                    {
-                      ptCurrentPos.x = 0;
-                      ptCurrentPos.y++;
-                      continue;
-                    }
-                  LPCTSTR pszChars = GetLineChars(ptCurrentPos.y);
-                  pszChars += ptCurrentPos.x;
-                  //  Prepare necessary part of line
-                  line.assign(pszChars, nLineLength);
-                  if ((dwFlags & FIND_MATCH_CASE) == 0)
-                    string_makeupper(line);
-                }
-
-              //  Perform search in the line
-              int nPos = ::FindStringHelper(line.c_str(), what.c_str(), dwFlags, m_nLastFindWhatLen);
-              if (nPos >= 0)
-                {
-                  if (m_pszMatched)
-                    free(m_pszMatched);
-                  m_pszMatched = _tcsdup(line.c_str());
-                  if (nEolns)
-                    {
-                      String item(line.c_str(), nPos);
-                      LPCTSTR current = _tcsrchr(item.c_str(), _T('\n'));
-                      if (current)
-                        current++;
-                      else
-                        current = item.c_str();
-                      nEolns = HowManyStr(item.c_str(), _T('\n'));
-                      if (nEolns)
-                        {
-                          ptCurrentPos.y += nEolns;
-                          ptCurrentPos.x = nPos - static_cast<int>(current - item.c_str());
-                        }
-                      else
-                        {
-                          ptCurrentPos.x += nPos - static_cast<int>(current - item.c_str());
-                        }
-                      if (ptCurrentPos.x < 0)
-                        ptCurrentPos.x = 0;
-                    }
-                  else
-                    {
-                      ptCurrentPos.x += nPos;
-                    }
-                  //  Check of the text found is outside the block.
-                  if (ptCurrentPos.y == ptBlockEnd.y && ptCurrentPos.x >= ptBlockEnd.x)
-                    break;
-
-                  *pptFoundPos = ptCurrentPos;
-                  return TRUE;
-                }
-              else
-                {
-                  if (m_pszMatched)
-                    free(m_pszMatched);
-                  m_pszMatched = NULL;
-                }
-
-              //  Go further, text was not found
-              ptCurrentPos.x = 0;
-              ptCurrentPos.y++;
-            }
-
-          //  End of text reached
-          if (!bWrapSearch)
-            return FALSE;
-
-          //  Start from the beginning
-          bWrapSearch = FALSE;
-          ptCurrentPos = ptBlockBegin;
-        }
+			//  Start from the beginning
+			bWrapSearch = FALSE;
+			ptCurrentPos = ptBlockBegin;
+		}
     }
 
   ASSERT(FALSE);               // Unreachable
@@ -3760,62 +3744,48 @@ void CCrystalTextView::OnEditFind()
 
 void CCrystalTextView::OnEditRepeat()
 {
-  bool bEnable = m_bLastSearch;
-  // Show dialog if no last find text
-  if (m_strLastFindWhat.empty())
-    bEnable = false;
-  String sText;
-  if (bEnable)
-    sText = m_strLastFindWhat;
-  else
-    {
-      // If last find-text exists, cut it to first line
-      bEnable = !sText.empty();
-      if (bEnable)
-        {
-		  String::size_type pos = sText.find_first_of(_T("\r\n"));
-          if (pos != String::npos)
-            sText.resize(pos);
-        }
-    }
+	String sText;
 
-  // CTRL-F3 will find selected text..
-  bool bControlKey = (::GetAsyncKeyState(VK_CONTROL)& 0x8000) != 0;
-  // CTRL-SHIFT-F3 will find selected text, but opposite direction
-  bool bShiftKey = (::GetAsyncKeyState(VK_SHIFT)& 0x8000) != 0;
-  if (bControlKey && IsSelection())
-    {
-      bEnable = true;
-      POINT ptSelStart, ptSelEnd;
-      GetSelection (ptSelStart, ptSelEnd);
-      GetText (ptSelStart, ptSelEnd, sText);
-    }
-  if (bShiftKey)
-    m_dwLastSearchFlags |= FIND_DIRECTION_UP;
-  else
-    m_dwLastSearchFlags &= ~FIND_DIRECTION_UP;
-  if (bEnable)
-    {
-      POINT ptFoundPos;
-      //BEGIN SW
-      // for correct backward search we need some changes:
-      POINT ptSearchPos = m_ptCursorPos;
-      if (m_dwLastSearchFlags & FIND_DIRECTION_UP && IsSelection())
-        {
-          POINT ptDummy;
-          GetSelection( ptSearchPos, ptDummy );
-        }
+	// CTRL-F3 will find selected text
+	if (::GetAsyncKeyState(VK_CONTROL) < 0)
+	{
+		POINT ptSelStart, ptSelEnd;
+		GetSelection(ptSelStart, ptSelEnd);
+		GetText(ptSelStart, ptSelEnd, sText);
+	}
+	else if (m_bLastSearch)
+	{
+		sText = m_strLastFindWhat;
+	}
 
-      if (!FindText(sText.c_str(), ptSearchPos, m_dwLastSearchFlags,
-            (m_dwLastSearchFlags & FIND_NO_WRAP) == 0, &ptFoundPos))
-        {
-          LanguageSelect.Format(IDS_EDIT_TEXT_NOT_FOUND, sText.c_str()).MsgBox();
-          return;
-        }
-      HighlightText(ptFoundPos, m_nLastFindWhatLen, (m_dwLastSearchFlags & FIND_DIRECTION_UP) != 0);
-    }
-  else
-    OnEditFind(); // No previous find, open Find-dialog
+	// SHIFT-F3 will take the opposite direction
+	if (::GetAsyncKeyState(VK_SHIFT) < 0)
+		m_dwLastSearchFlags |= FIND_DIRECTION_UP;
+	else
+		m_dwLastSearchFlags &= ~FIND_DIRECTION_UP;
+
+	// Find the text as figured out above, or else open the Find dialog
+	if (!sText.empty())
+	{
+		POINT ptFoundPos, ptSearchPos;
+
+		if (m_dwLastSearchFlags & FIND_DIRECTION_UP)
+			GetSelection(ptSearchPos, ptFoundPos);
+		else
+			GetSelection(ptFoundPos, ptSearchPos);
+
+		if (!FindText(sText.c_str(), ptSearchPos, m_dwLastSearchFlags,
+			(m_dwLastSearchFlags & FIND_NO_WRAP) == 0, ptFoundPos))
+		{
+			LanguageSelect.Format(IDS_EDIT_TEXT_NOT_FOUND, sText.c_str()).MsgBox();
+			return;
+		}
+		HighlightText(ptFoundPos, m_nLastFindWhatLen, (m_dwLastSearchFlags & FIND_DIRECTION_UP) != 0);
+	}
+	else
+	{
+		OnEditFind(); // No previous find, open Find-dialog
+	}
 }
 
 /** 

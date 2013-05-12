@@ -144,7 +144,7 @@ void CFindTextDlg::OnOK()
 	}
 	m_pCbFindText->SaveState(_T("Files\\FindInFile"));
 	POINT ptTextPos;
-	if (!m_pBuddy->FindText(m_sText.c_str(), m_ptCurrentPos, dwSearchFlags, !m_bNoWrap, &ptTextPos))
+	if (!m_pBuddy->FindText(m_sText.c_str(), m_ptCurrentPos, dwSearchFlags, !m_bNoWrap, ptTextPos))
 	{
 		LanguageSelect.Format(
 			IDS_EDIT_TEXT_NOT_FOUND, m_sText.c_str()

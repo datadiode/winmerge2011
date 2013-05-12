@@ -729,10 +729,10 @@ public :
 
     //  Text search helpers
     BOOL FindText(LPCTSTR pszText, const POINT &ptStartPos,
-        DWORD dwFlags, BOOL bWrapSearch, POINT *pptFoundPos);
+        DWORD dwFlags, BOOL bWrapSearch, POINT &ptFoundPos);
     BOOL FindTextInBlock(LPCTSTR pszText, const POINT &ptStartPos,
         const POINT &ptBlockBegin, const POINT &ptBlockEnd,
-        DWORD dwFlags, BOOL bWrapSearch, POINT *pptFoundPos);
+        DWORD dwFlags, BOOL bWrapSearch, POINT &ptFoundPos);
     BOOL HighlightText(const POINT & ptStartPos, int nLength, BOOL bCursorToLeft = FALSE);
 
     // IME (input method editor)

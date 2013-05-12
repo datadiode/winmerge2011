@@ -205,12 +205,12 @@ BOOL CEditReplaceDlg::DoHighlightText(BOOL bNotifyIfNotFound)
 	{
 		// Searching selection only
 		bFound = m_pBuddy->FindTextInBlock(m_sText.c_str(), m_ptFoundAt,
-			m_ptBlockBegin, m_ptBlockEnd, dwSearchFlags, FALSE, &m_ptFoundAt);
+			m_ptBlockBegin, m_ptBlockEnd, dwSearchFlags, FALSE, m_ptFoundAt);
 	}
 	else
 	{
 		// Searching whole text, (no) wrap
-		bFound = m_pBuddy->FindText(m_sText.c_str(), m_ptFoundAt, dwSearchFlags, !m_bNoWrap, &m_ptFoundAt);
+		bFound = m_pBuddy->FindText(m_sText.c_str(), m_ptFoundAt, dwSearchFlags, !m_bNoWrap, m_ptFoundAt);
 	}
 
 	if (!bFound)
