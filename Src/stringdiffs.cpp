@@ -1094,9 +1094,8 @@ static LPCTSTR RetreatOverWhitespace(LPCTSTR pcurrent, LPCTSTR start)
  *
  * Assumes whitespace is never leadbyte or trailbyte!
  */
-void sd_ComputeByteDiff(String & str1, String & str2, 
-		   bool casitive, int xwhite, 
-		   int &begin1, int &begin2, int &end1, int &end2, bool equal)
+void sd_ComputeByteDiff(const String &str1, const String &str2, bool casitive,
+	int xwhite, int &begin1, int &begin2, int &end1, int &end2, bool equal)
 {
 	// Set to sane values
 	// Also this way can distinguish if we set begin1 to -1 for no diff in line
