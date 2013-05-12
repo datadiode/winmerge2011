@@ -32,7 +32,7 @@ static const string_format strTempPathInstance(_T("WM_%lu"), GetCurrentProcessId
 LPCTSTR env_GetTempPath()
 {
 	static LPCTSTR pszTempPath = NULL;
-	if (strTempPath.empty())
+	if (pszTempPath == NULL)
 	{
 		if (!COptionsMgr::Get(OPT_USE_SYSTEM_TEMP_PATH))
 		{
