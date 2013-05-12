@@ -508,9 +508,6 @@ void CMergeEditView::SelectDiff(int nDiff, bool bScroll)
  */
 void CMergeEditView::OnCurdiff()
 {
-	// If no diffs, nothing to select
-	if (!m_pDocument->m_diffList.HasSignificantDiffs())
-		return;
 	// GetCurrentDiff() returns -1 if no diff selected
 	int nDiff = m_pDocument->GetCurrentDiff();
 	if (nDiff == -1)
@@ -530,11 +527,9 @@ void CMergeEditView::OnCurdiff()
  */
 void CMergeEditView::OnFirstdiff()
 {
-	if (m_pDocument->m_diffList.HasSignificantDiffs())
-	{
-		int nDiff = m_pDocument->m_diffList.FirstSignificantDiff();
+	int nDiff = m_pDocument->m_diffList.FirstSignificantDiff();
+	if (nDiff != -1)
 		SelectDiff(nDiff);
-	}
 }
 
 /**
@@ -542,11 +537,9 @@ void CMergeEditView::OnFirstdiff()
  */
 void CMergeEditView::OnLastdiff()
 {
-	if (m_pDocument->m_diffList.HasSignificantDiffs())
-	{
-		int nDiff = m_pDocument->m_diffList.LastSignificantDiff();
+	int nDiff = m_pDocument->m_diffList.LastSignificantDiff();
+	if (nDiff != -1)
 		SelectDiff(nDiff);
-	}
 }
 
 /**

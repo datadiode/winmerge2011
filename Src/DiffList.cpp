@@ -229,17 +229,6 @@ int DiffList::LineToDiff(UINT nLine) const
 }
 
 /**
- * @brief Check if diff-list contains significant diffs.
- * @return TRUE if list has significant diffs, FALSE otherwise.
- */
-bool DiffList::HasSignificantDiffs() const
-{
-	if (m_firstSignificant == -1)
-		return false;
-	return true;
-}
-
-/**
  * @brief Return previous diff index from given line.
  * @param [in] nLine First line searched.
  * @return Index for next difference or -1 if no difference is found.

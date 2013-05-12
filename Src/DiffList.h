@@ -108,7 +108,6 @@ public:
 	bool SetDiff(int nDiff, const DIFFRANGE & di);
 	bool LineInDiff(UINT nLine, int nDiff) const;
 	int LineToDiff(UINT nLine) const;
-	bool HasSignificantDiffs() const;
 	int PrevSignificantDiffFromLine(UINT nLine) const;
 	int NextSignificantDiffFromLine(UINT nLine) const;
 	int FirstSignificantDiff() const;

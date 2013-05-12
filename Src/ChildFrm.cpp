@@ -1020,13 +1020,13 @@ void CChildFrame::UpdateCmdUI()
 	m_pMDIFrame->UpdateCmdUI<ID_FILE_LEFT_READONLY>(
 		enableReadOnly | (m_ptBuf[0]->GetReadOnly() ? MF_CHECKED : 0));
 	m_pMDIFrame->UpdateCmdUI<ID_ALL_LEFT>(
-		m_diffList.HasSignificantDiffs() &&
+		m_diffList.FirstSignificantDiff() != -1 &&
 		!m_ptBuf[0]->GetReadOnly() ? MF_ENABLED : MF_GRAYED);
 
 	m_pMDIFrame->UpdateCmdUI<ID_FILE_RIGHT_READONLY>(
 		enableReadOnly | (m_ptBuf[1]->GetReadOnly() ? MF_CHECKED : 0));
 	m_pMDIFrame->UpdateCmdUI<ID_ALL_RIGHT>(
-		m_diffList.HasSignificantDiffs() &&
+		m_diffList.FirstSignificantDiff() != -1 &&
 		!m_ptBuf[1]->GetReadOnly() ? MF_ENABLED : MF_GRAYED);
 
 	UpdateEditCmdUI();
