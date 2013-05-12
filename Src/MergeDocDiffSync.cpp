@@ -43,11 +43,13 @@ CChildFrame::DiffMap::DiffMap(CChildFrame *pDoc,
 	String sLine0, sLine1;
 	for (int j = 0 ; j < lines1 ; ++j)
 	{
-		tbuf1->GetLine(begin1 + j, sLine1);
+		const LineInfo &li1 = tbuf1->GetLineInfo(begin1 + j);
+		sLine1.assign(li1.GetLine(), li1.Length());
 		const int k = j * map.size();
 		for (int i = 0 ; i < lines0 ; ++i)
 		{
-			tbuf0->GetLine(begin0 + i, sLine0);
+			const LineInfo &li0 = tbuf0->GetLineInfo(begin0 + i);
+			sLine0.assign(li0.GetLine(), li0.Length());
 			cost[k + i] = pDoc->GetMatchCost(sLine0, sLine1);
 		}
 	}

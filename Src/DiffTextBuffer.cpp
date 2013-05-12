@@ -92,26 +92,6 @@ CDiffTextBuffer::~CDiffTextBuffer()
 	FreeAll();
 }
 
-/**
- * @brief Get a line from the buffer.
- * @param [in] nLineIndex Index of the line to get.
- * @param [out] strLine Returns line text in the index.
- */
-bool CDiffTextBuffer::GetLine(int nLineIndex, String &strLine) const
-{
-	int nLineLength = CCrystalTextBuffer::GetLineLength(nLineIndex);
-	if (nLineLength < 0)
-		return false;
-	else if (nLineLength == 0)
-		strLine.clear();
-	else
-	{
-		strLine.resize(nLineLength);
-		_tcsncpy(&strLine.front(), CCrystalTextBuffer::GetLineChars(nLineIndex), nLineLength);
-	}
-	return true;
-}
-
 UndoRecord &CDiffTextBuffer::AddUndoRecord(BOOL bInsert, const POINT &ptStartPos,
 		const POINT &ptEndPos, LPCTSTR pszText, int cchText,
 		int nLinesToValidate, int nActionType)

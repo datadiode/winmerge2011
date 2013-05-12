@@ -182,9 +182,6 @@ public:
 	bool IsMixedEOL() const { return m_bMixedEOL; }
 	void SetMixedEOL(bool bMixed) { m_bMixedEOL = bMixed; }
 
-	// If line has text (excluding eol), set strLine to text (excluding eol)
-	bool GetLine(int nLineIndex, String &strLine) const;
-
 	void prepareForRescan();
 	virtual void OnNotifyLineHasBeenEdited(int nLine);
 	bool IsSaveable() const;
