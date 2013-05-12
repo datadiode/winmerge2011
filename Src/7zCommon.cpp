@@ -360,6 +360,13 @@ Merge7z::Envelope *CDirView::DirItemEnumerator::Enum(Item &item)
 		ctxt->GetRightFilepath(di) :
 		ctxt->GetLeftFilepath(di));
 
+	if (PathFindExtension(envelope->Name.begin()) == envelope->Name.end())
+	{
+		String::size_type atat = envelope->Name.find(_T("@@"));
+		if (atat != String::npos)
+			envelope->Name.resize(atat);
+	}
+
 	UINT32 Recurse = item.Mask.Recurse;
 
 	if (m_nFlags & BalanceFolders)
