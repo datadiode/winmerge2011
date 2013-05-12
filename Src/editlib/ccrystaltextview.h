@@ -697,15 +697,15 @@ public:
     TextDefinition *m_CurSourceDef;
     static TextDefinition m_StaticSourceDefs[];
     static TextDefinition *m_SourceDefs;
-    virtual bool DoSetTextType(TextDefinition *);
+    virtual TextDefinition *DoSetTextType(TextDefinition *);
     static TextDefinition *GetTextType(LPCTSTR pszExt);
     static void ScanParserAssociations(LPTSTR);
     static void DumpParserAssociations(LPTSTR);
     static void FreeParserAssociations();
-    virtual bool SetTextType(LPCTSTR pszExt);
-    virtual bool SetTextType(TextType enuType);
-    virtual bool SetTextType(TextDefinition *);
-    virtual bool SetTextTypeByContent(LPCTSTR pszContent);
+    TextDefinition *SetTextType(LPCTSTR pszExt);
+    TextDefinition *SetTextType(TextType enuType);
+    TextDefinition *SetTextType(TextDefinition *);
+    TextDefinition *SetTextTypeByContent(LPCTSTR pszContent);
 
     // Operations
 public :

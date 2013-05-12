@@ -101,9 +101,8 @@ CCrystalEditView::~CCrystalEditView()
 {
 }
 
-bool CCrystalEditView::DoSetTextType(TextDefinition *def)
+CCrystalTextView::TextDefinition *CCrystalEditView::DoSetTextType(TextDefinition *def)
 {
-	m_CurSourceDef = def;
 	SetAutoIndent((def->flags & SRCOPT_AUTOINDENT) != 0);
 	return CCrystalTextView::DoSetTextType(def);
 }

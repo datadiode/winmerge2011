@@ -99,7 +99,7 @@ public:
 
     virtual void OnEditOperation(int nAction, LPCTSTR pszText);
 
-    virtual bool DoSetTextType(TextDefinition *def);
+    virtual TextDefinition *DoSetTextType(TextDefinition *def);
 
     // Implementation
 protected :
@@ -121,6 +121,6 @@ public:
     void OnEditCapitalize();
     void OnEditSentence();
 	void OnEditGotoLastChange();
-	void OnEditDeleteWord ();
-	void OnEditDeleteWordBack ();
+	void OnEditDeleteWord();
+	void OnEditDeleteWordBack();
   };

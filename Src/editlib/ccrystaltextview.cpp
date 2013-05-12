@@ -347,11 +347,11 @@ void CCrystalTextView::FreeParserAssociations()
 	}
 }
 
-bool CCrystalTextView::DoSetTextType(TextDefinition *def)
+CCrystalTextView::TextDefinition *CCrystalTextView::DoSetTextType(TextDefinition *def)
 {
 	m_CurSourceDef = def;
 	SetFlags(def->flags);
-	return true;
+	return def;
 }
 
 CCrystalTextView::TextDefinition *CCrystalTextView::GetTextType(LPCTSTR pszExt)
@@ -364,14 +364,14 @@ CCrystalTextView::TextDefinition *CCrystalTextView::GetTextType(LPCTSTR pszExt)
 	return NULL;
 }
 
-bool CCrystalTextView::SetTextType(LPCTSTR pszExt)
+CCrystalTextView::TextDefinition *CCrystalTextView::SetTextType(LPCTSTR pszExt)
 {
 	m_CurSourceDef = m_SourceDefs;
 	TextDefinition *def = GetTextType(pszExt);
 	return SetTextType(def);
 }
 
-bool CCrystalTextView::SetTextType(TextType enuType)
+CCrystalTextView::TextDefinition *CCrystalTextView::SetTextType(TextType enuType)
 {
 	m_CurSourceDef = m_SourceDefs;
 	TextDefinition *def = m_SourceDefs;
@@ -379,12 +379,14 @@ bool CCrystalTextView::SetTextType(TextType enuType)
 	{
 		return SetTextType(def);
 	} while (++def < m_SourceDefs + _countof(m_StaticSourceDefs));
-	return false;
+	return NULL;
 }
 
-bool CCrystalTextView::SetTextType(TextDefinition *def)
+CCrystalTextView::TextDefinition *CCrystalTextView::SetTextType(TextDefinition *def)
 {
-	return def != NULL && (m_CurSourceDef == def || DoSetTextType(def));
+	if (def != NULL && m_CurSourceDef != def)
+		def = DoSetTextType(def);
+	return def;
 }
 
 CCrystalTextView::CCrystalTextView(size_t ZeroInit)
@@ -4302,12 +4304,12 @@ void CCrystalTextView::EnsureVisible(POINT ptStart, POINT ptEnd)
 
 // Analyze the first line of file to detect its type
 // Mainly it works for xml files
-bool CCrystalTextView::SetTextTypeByContent(LPCTSTR pszContent)
+CCrystalTextView::TextDefinition *CCrystalTextView::SetTextTypeByContent(LPCTSTR pszContent)
 {
 	int nLen;
 	if (::FindStringHelper(pszContent, _T("^\\s*\\<\\?xml\\s+.+?\\?\\>\\s*$"), FIND_REGEXP, nLen) == 0)
 	{
 		return SetTextType(CCrystalTextView::SRC_XML);
 	}
-	return false;
+	return NULL;
 }

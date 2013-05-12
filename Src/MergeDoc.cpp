@@ -458,7 +458,7 @@ int CChildFrame::Rescan2(bool &bIdentical)
 		// (m_nDiffs) and trivial diffs (m_nTrivialDiffs)
 
 		// Identical files are also updated
-		if (!m_diffList.HasSignificantDiffs())
+		if (m_diffList.FirstSignificantDiff() == -1)
 			bIdentical = true;
 
 		// Now buffers data are valid
@@ -1864,9 +1864,6 @@ OPENRESULTS_TYPE CChildFrame::OpenDocs(
 	FileLocation &filelocRight,
 	bool bROLeft, bool bRORight)
 {
-	// Activate yourself to have panes resized before auto-scrolling to 1st diff
-	ActivateFrame();
-
 	bool bIdentical = false;
 
 	// Filter out invalid codepages, or editor will display all blank
@@ -1928,12 +1925,10 @@ OPENRESULTS_TYPE CChildFrame::OpenDocs(
 	// Set read-only etc. statuses.
 	// CRLF mode is volatile, so update it upon Rescan().
 	m_ptBuf[0]->SetReadOnly(bROLeft);
-	m_pView[0]->SetEncodingStatus(
-		filelocLeft.encoding.GetName().c_str());
+	m_pView[0]->SetEncodingStatus(filelocLeft.encoding.GetName().c_str());
 
 	m_ptBuf[1]->SetReadOnly(bRORight);
-	m_pView[1]->SetEncodingStatus(
-		filelocRight.encoding.GetName().c_str());
+	m_pView[1]->SetEncodingStatus(filelocRight.encoding.GetName().c_str());
 
 	// Check the EOL sensitivity option (do it before Rescan)
 	if (m_ptBuf[0]->GetCRLFMode() != m_ptBuf[1]->GetCRLFMode() &&
@@ -1952,103 +1947,7 @@ OPENRESULTS_TYPE CChildFrame::OpenDocs(
 	int nRescanResult = Rescan(bIdentical);
 
 	// Open filed if rescan succeed and files are not binaries
-	if (nRescanResult == RESCAN_OK)
-	{
-		// prepare the four views
-		CMergeEditView * pLeft = GetLeftView();
-		CMergeEditView * pRight = GetRightView();
-		CMergeDiffDetailView * pLeftDetail = GetLeftDetailView();
-		CMergeDiffDetailView * pRightDetail = GetRightDetailView();
-		
-		// set the document types
-		// Warning : it is the first thing to do (must be done before UpdateView,
-		// or any function that calls UpdateView, like SelectDiff)
-		// Note: If option enabled, and another side type is not recognized,
-		// we use recognized type for unrecognized side too.
-		String sextL, sextR;
-		if (m_pInfoUnpacker->textType.length())
-		{
-			sextL = sextR = m_pInfoUnpacker->textType;
-		}
-		else
-		{
-			sextL = GetFileExt(sLeftFile.c_str(), m_strDesc[0].c_str());
-			sextR = GetFileExt(sRightFile.c_str(), m_strDesc[1].c_str());
-		}
-		
-		BOOL syntaxHLEnabled = COptionsMgr::Get(OPT_SYNTAX_HIGHLIGHT);
-		BOOL bLeftTyped = FALSE;
-		BOOL bRightTyped = FALSE;
-		
-		if (syntaxHLEnabled)
-		{
-			bLeftTyped = pLeft->SetTextType(sextL.c_str());
-			pLeftDetail->SetTextType(sextL.c_str());
-			bRightTyped = pRight->SetTextType(sextR.c_str());
-			pRightDetail->SetTextType(sextR.c_str());
-		}
-
-		// If textypes of the files aren't recogzined by their extentions,
-		// try to recognize them using their first lines 
-		if (!bLeftTyped && !bRightTyped)
-		{
-			String sFirstLine;
-			m_ptBuf[0]->GetLine(0, sFirstLine);
-			bLeftTyped = pLeft->SetTextTypeByContent(sFirstLine.c_str());
-			m_ptBuf[1]->GetLine(0, sFirstLine);
-			bRightTyped = pRight->SetTextTypeByContent(sFirstLine.c_str());
-		}
-
-		// If other side didn't have recognized texttype, apply recognized
-		// type to unrecognized one. (comparing file.cpp and file.bak applies
-		// cpp file type to .bak file.
-		if (bLeftTyped != bRightTyped)
-		{
-			CCrystalTextView::TextDefinition *enuType;
-
-			if (bLeftTyped)
-			{
-				enuType = pLeft->GetTextType(sextL.c_str());
-				pRight->SetTextType(enuType);
-				pRightDetail->SetTextType(enuType);
-			}
-			else
-			{
-				enuType = pRight->GetTextType(sextR.c_str());
-				pLeft->SetTextType(enuType);
-				pLeftDetail->SetTextType(enuType);
-			}
-		}
-
-		pLeft->DocumentsLoaded();
-		pRight->DocumentsLoaded();
-		pLeftDetail->DocumentsLoaded();
-		pRightDetail->DocumentsLoaded();
-
-		// Inform user that files are identical
-		// Don't show message if new buffers created
-		if (bIdentical &&
-			((m_nBufferType[0] == BUFFER_NORMAL) ||
-			 (m_nBufferType[0] == BUFFER_NORMAL_NAMED) ||
-			 (m_nBufferType[1] == BUFFER_NORMAL) ||
-			 (m_nBufferType[1] == BUFFER_NORMAL_NAMED)))
-		{
-			ShowRescanError(nRescanResult, bIdentical);
-		}
-
-		// scroll to first diff
-		if (COptionsMgr::Get(OPT_SCROLL_TO_FIRST) &&
-			m_diffList.HasSignificantDiffs())
-		{
-			int nDiff = m_diffList.FirstSignificantDiff();
-			pLeft->SelectDiff(nDiff);
-		}
-
-		// Exit if files are identical should only work for the first
-		// comparison and must be disabled afterward.
-		m_pMDIFrame->m_bExitIfNoDiff = MergeCmdLineInfo::Disabled;
-	}
-	else
+	if (nRescanResult != RESCAN_OK)
 	{
 		// CChildFrame::Rescan fails if files do not exist on both sides 
 		// or the really arcane case that the temp files couldn't be created, 
@@ -2058,6 +1957,95 @@ OPENRESULTS_TYPE CChildFrame::OpenDocs(
 		DestroyFrame();
 		return OPENRESULTS_FAILED_MISC;
 	}
+
+	// prepare the four views
+	CMergeEditView *const pLeft = GetLeftView();
+	CMergeEditView *const pRight = GetRightView();
+	CMergeDiffDetailView *const pLeftDetail = GetLeftDetailView();
+	CMergeDiffDetailView *const pRightDetail = GetRightDetailView();
+	
+	// set the document types
+	// Warning : it is the first thing to do (must be done before UpdateView,
+	// or any function that calls UpdateView, like SelectDiff)
+	// Note: If option enabled, and another side type is not recognized,
+	// we use recognized type for unrecognized side too.
+	String sextL, sextR;
+	if (m_pInfoUnpacker->textType.length())
+	{
+		sextL = sextR = m_pInfoUnpacker->textType;
+	}
+	else
+	{
+		sextL = GetFileExt(sLeftFile.c_str(), m_strDesc[0].c_str());
+		sextR = GetFileExt(sRightFile.c_str(), m_strDesc[1].c_str());
+	}
+	
+	bool syntaxHLEnabled = COptionsMgr::Get(OPT_SYNTAX_HIGHLIGHT);
+	CCrystalTextView::TextDefinition *bLeftTyped = NULL;
+	CCrystalTextView::TextDefinition *bRightTyped = NULL;
+	
+	if (syntaxHLEnabled)
+	{
+		bLeftTyped = pLeft->SetTextType(sextL.c_str());
+		pLeftDetail->SetTextType(bLeftTyped);
+		bRightTyped = pRight->SetTextType(sextR.c_str());
+		pRightDetail->SetTextType(bRightTyped);
+	}
+
+	// If textypes of the files aren't recogzined by their extentions,
+	// try to recognize them using their first lines 
+	if (bLeftTyped == NULL && bRightTyped == NULL)
+	{
+		LPCTSTR sFirstLine = m_ptBuf[0]->GetLineChars(0);
+		bLeftTyped = pLeft->SetTextTypeByContent(sFirstLine);
+		sFirstLine = m_ptBuf[1]->GetLineChars(0);
+		bRightTyped = pRight->SetTextTypeByContent(sFirstLine);
+	}
+
+	// If other side didn't have recognized texttype, apply recognized
+	// type to unrecognized one. (comparing file.cpp and file.bak applies
+	// cpp file type to .bak file.
+	if (bRightTyped == NULL)
+	{
+		pRight->SetTextType(bLeftTyped);
+		pRightDetail->SetTextType(bLeftTyped);
+	}
+	if (bLeftTyped == NULL)
+	{
+		pLeft->SetTextType(bRightTyped);
+		pLeftDetail->SetTextType(bRightTyped);
+	}
+
+	pLeft->DocumentsLoaded();
+	pRight->DocumentsLoaded();
+	pLeftDetail->DocumentsLoaded();
+	pRightDetail->DocumentsLoaded();
+
+	// Activate yourself to have panes resized before auto-scrolling to 1st diff
+	ActivateFrame();
+
+	// Inform user that files are identical
+	// Don't show message if new buffers created
+	if (bIdentical &&
+		((m_nBufferType[0] == BUFFER_NORMAL) ||
+		 (m_nBufferType[0] == BUFFER_NORMAL_NAMED) ||
+		 (m_nBufferType[1] == BUFFER_NORMAL) ||
+		 (m_nBufferType[1] == BUFFER_NORMAL_NAMED)))
+	{
+		ShowRescanError(nRescanResult, bIdentical);
+	}
+
+	// scroll to first diff
+	if (COptionsMgr::Get(OPT_SCROLL_TO_FIRST))
+	{
+		int nDiff = m_diffList.FirstSignificantDiff();
+		if (nDiff != -1)
+			pLeft->SelectDiff(nDiff);
+	}
+
+	// Exit if files are identical should only work for the first
+	// comparison and must be disabled afterward.
+	m_pMDIFrame->m_bExitIfNoDiff = MergeCmdLineInfo::Disabled;
 
 	// Force repaint of location pane to update it in case we had some warning
 	// dialog visible and it got painted before files were loaded
