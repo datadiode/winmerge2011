@@ -125,8 +125,7 @@ bool DirCmpReport::GenerateReport(String &errStr)
 		}
 		if (!dlg.m_sReportFile.empty())
 		{
-			String path = paths_GetParentPath(dlg.m_sReportFile.c_str());
-			if (!paths_CreateIfNeeded(path.c_str()))
+			if (!paths_CreateIfNeeded(dlg.m_sReportFile.c_str(), true))
 			{
 				errStr = LanguageSelect.LoadString(IDS_FOLDER_NOTEXIST);
 				return false;

@@ -398,7 +398,7 @@ void FileFilterHelper::LoadAllFileFilters()
  */
 String FileFilterHelper::GetGlobalFilterPathWithCreate() const
 {
-	bool const exist = paths_EnsurePathExist(m_sGlobalFilterPath.c_str());
+	bool const exist = paths_CreateIfNeeded(m_sGlobalFilterPath.c_str());
 	return exist ? m_sGlobalFilterPath : String();
 }
 
@@ -407,6 +407,6 @@ String FileFilterHelper::GetGlobalFilterPathWithCreate() const
  */
 String FileFilterHelper::GetUserFilterPathWithCreate() const
 {
-	bool const exist = paths_EnsurePathExist(m_sUserSelFilterPath.c_str());
+	bool const exist = paths_CreateIfNeeded(m_sUserSelFilterPath.c_str());
 	return exist ? m_sUserSelFilterPath : String();
 }

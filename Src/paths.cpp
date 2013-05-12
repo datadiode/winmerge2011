@@ -118,62 +118,46 @@ String paths_GetLongPath(LPCTSTR szPath)
 	{
 		sFull = szPath;
 	}
-	TCHAR *fullPath = &sFull.front();
 
-	// We are done if this is not a short name.
-	if (_tcschr(fullPath, _T('~')) == NULL)
-		return paths_DoMagic(sFull);
+	LPCTSTR fullPath = sFull.c_str();
+
+	// From MSDN:
+	// On many file systems, a short file name contains a tilde (~) character.
+	// However, not all file systems follow this convention. Therefore, do not
+	// assume that you can skip calling GetLongPathName if the path does not
+	// contain a tilde (~) character.
 
 	// We have to do it the hard way because GetLongPathName is not
 	// available on Win9x and some WinNT 4
 
 	// The file/directory does not exist, use as much long name as we can
 	// and leave the invalid stuff at the end.
-	String sLong;
-	TCHAR *ptr = PathSkipRoot(fullPath);
-
+	TCHAR *p = PathSkipRoot(fullPath);
 	// Skip to \ position     d:\abcd or \\host\share\abcd
 	// indicated by ^           ^                    ^
-
-	if (!ptr)
+	if (p == NULL)
 		return paths_DoMagic(sFull);
 
-	ptr[-1] = _T('\0');
-	sLong += fullPath;
-
+	p[-1] = _T('\0');
+	String sLong = fullPath;
 	// now walk down each directory and do short to long name conversion
-	while (ptr)
+	do
 	{
-		TCHAR *end = _tcschr(ptr, _T('\\'));
-		// zero-terminate current component
-		// (if we're at end, its already zero-terminated)
-		if (end)
-			*end = 0;
-
-		String sTemp(sLong);
-		sTemp += _T('\\');
-		sTemp += ptr;
-
-		// advance to next component (or set ptr==0 to flag end)
-		ptr = (end ? end+1 : 0);
-
-		// (Couldn't get info for just the directory from CFindFile)
+		sLong.push_back(_T('\\'));
+		p[-1] = _T('\\');
+		TCHAR *q = PathFindNextComponent(p);
+		if (*q != _T('\0'))
+			q[-1] = _T('\0');
 		WIN32_FIND_DATA ffd;
-		HANDLE h = FindFirstFile(sTemp.c_str(), &ffd);
-		if (h == INVALID_HANDLE_VALUE)
+		HANDLE h = FindFirstFile(fullPath, &ffd);
+		if (h != INVALID_HANDLE_VALUE)
 		{
-			sLong = sTemp;
-			if (ptr)
-			{
-				sLong += _T('\\');
-				sLong += ptr;
-			}
-			return paths_DoMagic(sLong);
+			p = ffd.cFileName;
+			FindClose(h);
 		}
-		sLong += _T('\\');
-		sLong += ffd.cFileName;
-		FindClose(h);
-	}
+		sLong += p;
+		p = q;
+	} while (*p != _T('\0'));
 	return paths_DoMagic(sLong);
 }
 
@@ -181,52 +165,44 @@ String paths_GetLongPath(LPCTSTR szPath)
  * @brief Check if the path exist and create the folder if needed.
  * This function checks if path exists. If path does not yet exist
  * function creates needed folder structure.
- * @param [in] sPath Path to check/create.
+ * @param [in] szPath Path to check/create.
+ * @param [in] bExcludeLeaf Whether to exclude the path's last component.
  * @return true if path exists or if we successfully created it.
  */
-bool paths_CreateIfNeeded(LPCTSTR szPath)
+bool paths_CreateIfNeeded(LPCTSTR szPath, bool bExcludeLeaf)
 {
-	if (*szPath == '\0')
+	if (*szPath == _T('\0'))
 		return false;
 
-	if (PathFileExists(szPath))
-		return true;
+	String path = bExcludeLeaf ? paths_GetParentPath(szPath) : szPath;
 
-	String sFull = szPath;
+	LPCTSTR const p = path.c_str();
 
-	String sLong;
-	TCHAR *ptr = PathSkipRoot(&sFull.front());
+	DWORD attr = GetFileAttributes(p) &
+		(FILE_ATTRIBUTE_NORMAL | FILE_ATTRIBUTE_DIRECTORY);
+	if (attr != (FILE_ATTRIBUTE_NORMAL | FILE_ATTRIBUTE_DIRECTORY))
+		return attr == FILE_ATTRIBUTE_DIRECTORY;
+
+	LPTSTR q = PathSkipRoot(p);
 
 	// Skip to \ position     d:\abcd or \\host\share\abcd
 	// indicated by ^           ^                    ^
 
-	if (!ptr)
+	if (q <= p)
 		return false;
 
-	while (ptr)
+	do
 	{
-		TCHAR *end = _tcschr(ptr, '\\');
-		// zero-terminate current component
-		// (if we're at end, its already zero-terminated)
-		if (end)
-			*end = 0;
+		q[-1] = _T('\\');
+		q = PathFindNextComponent(q);
+		if (*q != _T('\0'))
+			q[-1] = _T('\0');
+		DWORD attr = GetFileAttributes(p) &
+			(FILE_ATTRIBUTE_NORMAL | FILE_ATTRIBUTE_DIRECTORY);
+		if (attr != FILE_ATTRIBUTE_DIRECTORY && !CreateDirectory(p, NULL))
+			return false;
+	} while (*q != _T('\0'));
 
-		// advance to next component (or set ptr==0 to flag end)
-		ptr = (end ? end+1 : 0);
-
-		if (!PathFileExists(sFull.c_str()))
-		{
-			// try to create directory, and then double-check its existence
-			if (!CreateDirectory(sFull.c_str(), 0) ||
-				!PathFileExists(sFull.c_str()))
-			{
-				return false;
-			}
-		}
-		// if not finished, restore directory string we're working in
-		if (ptr)
-			*end = '\\';
-	}
 	return true;
 }
 
@@ -323,7 +299,7 @@ String ExpandShortcut(LPCTSTR inFile)
  * @return Formatted path. If one of arguments is empty then returns
  * non-empty argument. If both argumets are empty empty string is returned.
  */
-String paths_ConcatPath(const String & path, const String & subpath)
+String paths_ConcatPath(const String &path, const String &subpath)
 {
 	if (path.empty())
 		return subpath;
@@ -344,24 +320,11 @@ String paths_ConcatPath(const String & path, const String & subpath)
  */
 String paths_GetParentPath(LPCTSTR path)
 {
-	size_t cb = (_tcslen(path) + 1) * sizeof(TCHAR);
-	TCHAR *parentPath = reinterpret_cast<TCHAR *>(memcpy(_alloca(cb), path, cb));
-	PathRemoveBackslash(parentPath);
-	PathRemoveFileSpec(parentPath);
-	return parentPath;
-}
-
-/**
- * @brief Checks if folder exists and creates it if needed.
- * This function checks if folder exists and creates it if not.
- * @param [in] sPath
- * @return Path if it exists or were created successfully. If
- * path points to file or folder failed to create returns empty
- * string.
- */
-bool paths_EnsurePathExist(LPCTSTR path)
-{
-	return paths_CreateIfNeeded(path) && paths_DoesPathExist(path) == IS_EXISTING_DIR;
+	LPCTSTR name = PathFindFileName(path);
+	if (LPCTSTR tail = PathSkipRoot(path))
+		if (name > tail)
+			--name;
+	return String(path, static_cast<String::size_type>(name - path));
 }
 
 /**

@@ -98,8 +98,7 @@ void CPatchTool::Run()
 		m_diffWrapper.bApplyLineFilters = m_dlgPatch.m_applyLineFilters != FALSE;;
 		m_diffWrapper.RefreshFilters();
 
-		String path = paths_GetParentPath(m_dlgPatch.m_fileResult.c_str());
-		if (!paths_CreateIfNeeded(path.c_str()))
+		if (!paths_CreateIfNeeded(m_dlgPatch.m_fileResult.c_str(), true))
 		{
 			LanguageSelect.MsgBox(IDS_FOLDER_NOTEXIST, MB_ICONSTOP);
 			return;
