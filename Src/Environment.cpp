@@ -13,15 +13,14 @@
 #include "OptionsMgr.h"
 #include "Constants.h"
 
+/** @brief Temp folder name prefix for WinMerge temp folders. */
+static const TCHAR TempFolderPrefix[] = _T("WinMerge_TEMP_%u");
+
 /**
  * @brief Temp path.
  * Static string used by paths_GetTempPath() for storing temp path.
  */
 static String strTempPath;
-
-/** @brief Per-instance part of the temp path. */
-static const string_format strTempPathInstance(
-	_T("%s%lu"), TempFolderPrefix, GetCurrentProcessId());
 
 /** 
  * @brief Get folder for temporary files.
@@ -47,8 +46,15 @@ LPCTSTR env_GetTempPath()
 		}
 		if (!strTempPath.empty())
 		{
-			strTempPath = paths_ConcatPath(strTempPath, strTempPathInstance);
 			strTempPath = paths_GetLongPath(strTempPath.c_str());
+			string_format strTempName(TempFolderPrefix, GetCurrentProcessId());
+			strTempPath = paths_ConcatPath(strTempPath, strTempName);
+			if (HANDLE hMutex = CreateMutex(NULL, FALSE, strTempName.c_str()))
+			{
+				// Wait for mutex owner to finish its temp folder cleanups.
+				// Keep mutex open to protect temp folder against deletion.
+				WaitForSingleObject(hMutex, INFINITE);
+			}
 			paths_CreateIfNeeded(strTempPath.c_str());
 		}
 		// Existing code that involves temporary paths cannot handle the magic prefix so far.

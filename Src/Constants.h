@@ -48,9 +48,6 @@ const TCHAR ExecutableFilename[] = _T("WinMerge.exe");
 /** @brief Executable Filename for Unicode build. */
 const TCHAR ExecutableFilenameU[] = _T("WinMergeU.exe");
 
-/** @brief Temp folder name prefix for WinMerge temp folders. */
-const TCHAR TempFolderPrefix[] = _T("WinMerge_TEMP_");
-
 /**
  * @brief Flags used when opening files
  */

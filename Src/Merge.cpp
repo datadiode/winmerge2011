@@ -30,7 +30,6 @@
 #include "stdafx.h"
 #include <new.h> // _set_new_handler
 #include <process.h> // _cexit
-#include <tlhelp32.h> 
 #include "Environment.h"
 #include "Common/SettingStore.h"
 #include "Common/WindowPlacement.h"
@@ -61,57 +60,26 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 /**
- * @brief Is WinMerge with given processID running?
- * @param [in] processIDs List of WinMerge processes.
- * @param [in] iPI ProcessID to check.
- * @return TRUE if processID was found from the list, FALSE otherwise.
+ * @brief Remove the temp folder.
+ * @param [in] path Folder to remove.
+ * @return TRUE if removal succeeds, FALSE if fails.
  */
-static bool WMrunning(const stl::vector<int> &processIDs, int iPI)
+static void ClearTempfolder(LPCTSTR path)
 {
-	stl::vector<int>::const_iterator iter = processIDs.begin();
-	while (iter != processIDs.end())
-	{
-		if (*iter == iPI)
-			return true;
-		iter++;
-	}
-	return false;
+	// SHFileOperation expects a ZZ terminated list of paths!
+	String paths(path, _tcslen(path) + 1);
+	SHFILEOPSTRUCT fileop = { 0, FO_DELETE, paths.c_str(), 0,
+		FOF_NOCONFIRMATION | FOF_SILENT | FOF_NOERRORUI, 0, 0, 0 };
+	SHFileOperation(&fileop);
 }
 
 /**
- * @brief Remove the temp folder.
- * @param [in] pathName Folder to remove.
- * @return TRUE if removal succeeds, FALSE if fails.
+ * @brief Remove orphaned temp folders.
  */
-static void ClearTempfolder(const String &pathName)
+static void CleanupWMtemp()
 {
-	// SHFileOperation expects a ZZ terminated list of paths!
-	const int pathSize = pathName.length() + 2;
-	TCHAR *path = new TCHAR[pathSize];
-	ZeroMemory(path, pathSize * sizeof(TCHAR));
-	_tcscpy(path, pathName.c_str());
-
-	SHFILEOPSTRUCT fileop = { 0, FO_DELETE, path, 0,
-		FOF_NOCONFIRMATION | FOF_SILENT | FOF_NOERRORUI, 0, 0, 0 };
-	SHFileOperation(&fileop);
-
-	delete [] path;
-}
-
-/** 
- * @brief Remove temp folders having process Ids in name.
- * This function removes temp folders whose name contains process ID from the
- * given list. These folders must have been earlier detected as unused.
- * @param [in] processIDs List of process IDs.
- * @return TRUE if all temp folders were deleted, FALSE otherwise.
- */
-static void CleanupWMtempfolder(const stl::vector <int> &processIDs)
-{
-	String filepattern(TempFolderPrefix);
-	filepattern += _T("*.*");
-	String pattern = paths_GetParentPath(env_GetTempPath());
-	pattern = paths_ConcatPath(pattern, filepattern);
-
+	String pattern = env_GetTempPath();
+	pattern.replace(pattern.rfind(_T('_')) + 1, String::npos, _T("*"));
 	WIN32_FIND_DATA ff;
 	HANDLE h = FindFirstFile(pattern.c_str(), &ff);
 	if (h == INVALID_HANDLE_VALUE)
@@ -120,51 +88,20 @@ static void CleanupWMtempfolder(const stl::vector <int> &processIDs)
 	{
 		if (ff.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 		{
-			// Remove leading "WM_" from filename to get the ProcessID
-			LPCTSTR tempfolderPID = ff.cFileName + _tcslen(TempFolderPrefix);
-			// Check if this instance of WM is still running
-			if (!WMrunning(processIDs, _ttoi(tempfolderPID)))
+			if (HANDLE hMutex = CreateMutex(NULL, TRUE, ff.cFileName))
 			{
-				String path = paths_ConcatPath(paths_GetParentPath(pattern.c_str()), ff.cFileName);
-				ClearTempfolder(path.c_str());
+				DWORD dwMutex = GetLastError();
+				if (dwMutex != ERROR_ALREADY_EXISTS)
+				{
+					String::size_type position = pattern.rfind(_T('\\')) + 1;
+					pattern.replace(position, String::npos, ff.cFileName);
+					ClearTempfolder(pattern.c_str());
+				}
+				CloseHandle(hMutex);
 			}
 		}
 	} while (FindNextFile(h, &ff));
 	FindClose(h);
-}
-
-/** 
- * @brief Cleanup tempfiles created by WinMerge.
- * This function finds temp folders which don't have WinMerge instance using
- * them anymore.
- */
-static void CleanupWMtemp()
-{
-	stl::vector<int> processIDs;
-
-	// Get the snapshot of the system
-	HANDLE hSnapShot;
-	hSnapShot = CreateToolhelp32Snapshot (TH32CS_SNAPALL, NULL);
-	PROCESSENTRY32 pEntry;
-	pEntry.dwSize = sizeof(pEntry);
-
-	// Get first process
-	BOOL hRes = Process32First (hSnapShot, &pEntry);
-
-	// Iterate through all processes to get
-	// the ProcessIDs of all running WM instances
-	while (hRes)
-	{
-		if ((_tcscmp(pEntry.szExeFile, ExecutableFilenameU) == 0) ||
-			(_tcscmp(pEntry.szExeFile, ExecutableFilename) == 0))
-		{
-			processIDs.push_back(pEntry.th32ProcessID);
-		}
-		hRes = Process32Next (hSnapShot, &pEntry);
-	}
-
-	// Now remove temp folders that are not used.
-	CleanupWMtempfolder(processIDs);
 }
 
 // WinMerge registry settings are stored under HKEY_CURRENT_USER/Software/Thingamahoochie
