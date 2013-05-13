@@ -433,7 +433,7 @@ void CMergeEditView::DrawScreenLine(
 		const LineInfo &li = m_pTextBuffer->GetLineInfo(nLineIndex);
 		if ((li.m_dwFlags & LF_GHOST) && (li.m_nSkippedLines != 0))
 		{
-			pdc->SelectObject(GetFont(TRUE));
+			pdc->SelectObject(GetFont(COLORINDEX_LAST));
 			pdc->DrawText(
 				FormatAmount<IDS_LINE_EXCLUDED, IDS_LINES_EXCLUDED>(li.m_nSkippedLines),
 				&frect,

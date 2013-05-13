@@ -1873,15 +1873,15 @@ HFont *CCrystalTextView::GetFont(int nColorIndex)
 	m_lfBaseFont.lfItalic = 0;
 	if (nColorIndex != COLORINDEX_NONE)
 	{
-		if (GetBold(nColorIndex))
-		{
-			nIndex |= 1;
-			m_lfBaseFont.lfWeight = FW_BOLD;
-		}
 		if (GetItalic(nColorIndex))
 		{
 			nIndex |= 2;
 			m_lfBaseFont.lfItalic = 1;
+		}
+		else if (GetBold(nColorIndex))
+		{
+			nIndex |= 1;
+			m_lfBaseFont.lfWeight = FW_BOLD;
 		}
 	}
 	if (m_apFonts[nIndex] == NULL)
@@ -2380,8 +2380,7 @@ bool CCrystalTextView::GetItalic(int nColorIndex)
 	// WINMERGE - since italic text has problems,
 	// lets disable it. E.g. "_" chars disappear and last
 	// char may be cropped.
-	return false;
-	// return nColorIndex == COLORINDEX_COMMENT;
+	return nColorIndex == COLORINDEX_LAST;
 }
 
 bool CCrystalTextView::GetBold(int nColorIndex)
