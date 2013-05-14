@@ -2902,8 +2902,6 @@ LRESULT CMainFrame::OnWndMsg<WM_COPYDATA>(WPARAM, LPARAM lParam)
 	switch (pcds->dwData)
 	{
 	case 0:
-		// Allow calling thread to resume
-		ReplyMessage(TRUE);
 		// Process command line
 		ParseArgsAndDoOpen(pchData);
 		break;
@@ -2970,6 +2968,15 @@ bool CMainFrame::ParseArgsAndDoOpen(const MergeCmdLineInfo &cmdInfo)
 				if (!m_pCollectingDirFrame ||
 					!m_pCollectingDirFrame->AddToCollection(filelocLeft, filelocRight))
 				{
+					// Allow calling thread to resume in case command line was
+					// received through WM_COPYDATA. This is to cope with file
+					// transforms which involve out-of-process COM servers.
+					// NB: Collect mode must be handled prior to ReplyMessage(),
+					// because it may need to copy temporary files provided by
+					// the caller to WinMerge's own temporary folder to prevent
+					// them from vanishing unexpectedly.
+					ReplyMessage(TRUE);
+
 					if (cmdInfo.m_Files.size() > 2)
 						m_strSaveAsPath = cmdInfo.m_Files[2].c_str();
 
