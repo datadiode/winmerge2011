@@ -321,9 +321,9 @@ String paths_ConcatPath(const String &path, const String &subpath)
 String paths_GetParentPath(LPCTSTR path)
 {
 	LPCTSTR name = PathFindFileName(path);
-	if (LPCTSTR tail = PathSkipRoot(path))
-		if (name > tail)
-			--name;
+	LPCTSTR tail = PathSkipRoot(path);
+	if (name > (tail ? tail : path))
+		--name;
 	return String(path, static_cast<String::size_type>(name - path));
 }
 
