@@ -680,6 +680,7 @@ void CLocationView::OnContextMenu(LPARAM lParam)
 	int bar = IsInsideBar(rc, pt);
 
 	// If cursor over bar, format string with linenumber, else disable item
+	UINT uFlags = MF_GRAYED;
 	if (bar != BAR_NONE)
 	{
 		// If outside bar area use left bar
@@ -687,10 +688,9 @@ void CLocationView::OnContextMenu(LPARAM lParam)
 			bar = BAR_LEFT;
 		nLine = GetLineFromYPos(pt.y, bar);
 		strNum = string_format(_T("%d"), nLine + 1); // Show linenumber not lineindex
+		uFlags = MF_ENABLED;
 	}
-	else
-		pSub->EnableMenuItem(ID_LOCBAR_GOTODIFF, MF_GRAYED);
-	pSub->ModifyMenu(ID_LOCBAR_GOTODIFF, MF_BYCOMMAND, ID_LOCBAR_GOTODIFF,
+	pSub->ModifyMenu(ID_LOCBAR_GOTODIFF, uFlags, ID_LOCBAR_GOTODIFF,
 		LanguageSelect.FormatMessage(ID_LOCBAR_GOTOLINE_FMT, strNum.c_str()));
 
 	// invoke context menu
