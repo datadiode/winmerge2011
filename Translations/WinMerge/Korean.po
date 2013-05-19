@@ -1234,8 +1234,8 @@ msgstr ""
 
 #: Merge.rc:647
 #, c-format
-msgid "G&oto Diff"
-msgstr "차이점으로 이동(&O)"
+msgid "G&oto Line %1"
+msgstr "%1 줄로 이동"
 
 #: Merge.rc:648
 #: Merge.rc:689
@@ -5446,80 +5446,70 @@ msgstr "커서가 있는 차이점으로 이동합니다."
 
 #: Merge.rc:2006
 #, c-format
-msgid "G&oto Diff %1 of %2"
-msgstr "차이점으로 이동합니다. (%1 / %2)"
-
-#: Merge.rc:2007
-#, c-format
-msgid "G&oto Line %1"
-msgstr "%1 줄로 이동"
-
-#: Merge.rc:2008
-#, c-format
 msgid "Disabled"
 msgstr "사용 안 함"
 
-#: Merge.rc:2009
+#: Merge.rc:2007
 #, c-format
 msgid "From file system"
 msgstr "파일 시스템 이용"
 
-#: Merge.rc:2010
+#: Merge.rc:2008
 #, c-format
 msgid "From MRU list"
 msgstr "최근 파일 목록(MRU) 사용"
 
-#: Merge.rc:2011
+#: Merge.rc:2009
 #, c-format
 msgid "Hide the toolbar"
 msgstr "도구 모음 숨기기"
 
-#: Merge.rc:2012
+#: Merge.rc:2010
 #, c-format
 msgid "Show small toolbar"
 msgstr "도구 모음 작게 표시"
 
-#: Merge.rc:2013
+#: Merge.rc:2011
 #, c-format
 msgid "Show big toolbar"
 msgstr "도구 모음 크게 표시"
 
-#: Merge.rc:2014
+#: Merge.rc:2012
 #, c-format
 msgid "Selection left"
 msgstr ""
 
-#: Merge.rc:2015
+#: Merge.rc:2013
 #, c-format
 msgid "Selection right"
 msgstr ""
 
-#: Merge.rc:2016
+#: Merge.rc:2014
 #, c-format
 msgid "Print..."
 msgstr ""
 
-#: Merge.rc:2017
+#: Merge.rc:2015
 #, c-format
 msgid "Page Setup..."
 msgstr ""
 
-#: Merge.rc:2018
+#: Merge.rc:2016
 #, c-format
 msgid "Page Zoom:"
 msgstr ""
 
-#: Merge.rc:2019
+#: Merge.rc:2017
 #, c-format
 msgid "Content Zoom:"
 msgstr ""
 
-#: Merge.rc:2020
+#: Merge.rc:2018
 #, c-format
 msgid "%d line excluded"
 msgstr ""
 
-#: Merge.rc:2021
+#: Merge.rc:2019
 #, c-format
 msgid "%d lines excluded"
 msgstr ""

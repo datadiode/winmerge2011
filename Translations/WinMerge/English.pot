@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WinMerge\n"
 "Report-Msgid-Bugs-To: http://bugs.winmerge.org/\n"
-"POT-Creation-Date: 2013-05-12 14:16+0000\n"
+"POT-Creation-Date: 2013-05-19 13:58+0000\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: English <winmerge-translate@lists.sourceforge.net>\n"
@@ -1229,7 +1229,7 @@ msgstr ""
 
 #: Merge.rc:647
 #, c-format
-msgid "G&oto Diff"
+msgid "G&oto Line %1"
 msgstr ""
 
 #: Merge.rc:648
@@ -4991,80 +4991,70 @@ msgstr ""
 
 #: Merge.rc:2006
 #, c-format
-msgid "G&oto Diff %1 of %2"
+msgid "Disabled"
 msgstr ""
 
 #: Merge.rc:2007
 #, c-format
-msgid "G&oto Line %1"
+msgid "From file system"
 msgstr ""
 
 #: Merge.rc:2008
 #, c-format
-msgid "Disabled"
+msgid "From MRU list"
 msgstr ""
 
 #: Merge.rc:2009
 #, c-format
-msgid "From file system"
+msgid "Hide the toolbar"
 msgstr ""
 
 #: Merge.rc:2010
 #, c-format
-msgid "From MRU list"
+msgid "Show small toolbar"
 msgstr ""
 
 #: Merge.rc:2011
 #, c-format
-msgid "Hide the toolbar"
+msgid "Show big toolbar"
 msgstr ""
 
 #: Merge.rc:2012
 #, c-format
-msgid "Show small toolbar"
+msgid "Selection left"
 msgstr ""
 
 #: Merge.rc:2013
 #, c-format
-msgid "Show big toolbar"
+msgid "Selection right"
 msgstr ""
 
 #: Merge.rc:2014
 #, c-format
-msgid "Selection left"
+msgid "Print..."
 msgstr ""
 
 #: Merge.rc:2015
 #, c-format
-msgid "Selection right"
+msgid "Page Setup..."
 msgstr ""
 
 #: Merge.rc:2016
 #, c-format
-msgid "Print..."
+msgid "Page Zoom:"
 msgstr ""
 
 #: Merge.rc:2017
 #, c-format
-msgid "Page Setup..."
+msgid "Content Zoom:"
 msgstr ""
 
 #: Merge.rc:2018
 #, c-format
-msgid "Page Zoom:"
-msgstr ""
-
-#: Merge.rc:2019
-#, c-format
-msgid "Content Zoom:"
-msgstr ""
-
-#: Merge.rc:2020
-#, c-format
 msgid "%d line excluded"
 msgstr ""
 
-#: Merge.rc:2021
+#: Merge.rc:2019
 #, c-format
 msgid "%d lines excluded"
 msgstr ""

@@ -644,7 +644,7 @@ IDR_POPUP_LOCATIONBAR MENU
 {
     POPUP "_POPUP_"
     {
-        MENUITEM "Merge.rc:647", ID_LOCBAR_GOTODIFF
+        MENUITEM "Merge.rc:647", ID_LOCBAR_GOTOLINE
         MENUITEM "Merge.rc:648", ID_EDIT_WMGOTO
         MENUITEM SEPARATOR
         MENUITEM "Merge.rc:650", ID_DISPLAY_MOVED_NONE
@@ -2002,23 +2002,21 @@ STRINGTABLE
     ID_DISPLAY_MOVED_NONE         "Merge.rc:2002"
     ID_DISPLAY_MOVED_ALL          "Merge.rc:2003"
     ID_DISPLAY_MOVED_FOLLOW_DIFF  "Merge.rc:2004"
-    ID_LOCBAR_GOTODIFF            "Merge.rc:2005"
-    ID_LOCBAR_GOTODIFF_FMT        "Merge.rc:2006"
-    ID_LOCBAR_GOTOLINE_FMT        "Merge.rc:2007"
-    IDS_AUTOCOMPLETE_DISABLED     "Merge.rc:2008"
-    IDS_AUTOCOMPLETE_FILE_SYS     "Merge.rc:2009"
-    IDS_AUTOCOMPLETE_MRU          "Merge.rc:2010"
-    ID_TOOLBAR_NONE               "Merge.rc:2011"
-    ID_TOOLBAR_SMALL              "Merge.rc:2012"
-    ID_TOOLBAR_BIG                "Merge.rc:2013"
-    IDS_SELECTION_LEFT            "Merge.rc:2014"
-    IDS_SELECTION_RIGHT           "Merge.rc:2015"
-    IDS_PRINT                     "Merge.rc:2016"
-    IDS_PAGE_SETUP                "Merge.rc:2017"
-    IDS_PAGE_ZOOM                 "Merge.rc:2018"
-    IDS_CONTENT_ZOOM              "Merge.rc:2019"
-    IDS_LINE_EXCLUDED             "Merge.rc:2020"
-    IDS_LINES_EXCLUDED            "Merge.rc:2021"
+    ID_LOCBAR_GOTOLINE            "Merge.rc:2005"
+    IDS_AUTOCOMPLETE_DISABLED     "Merge.rc:2006"
+    IDS_AUTOCOMPLETE_FILE_SYS     "Merge.rc:2007"
+    IDS_AUTOCOMPLETE_MRU          "Merge.rc:2008"
+    ID_TOOLBAR_NONE               "Merge.rc:2009"
+    ID_TOOLBAR_SMALL              "Merge.rc:2010"
+    ID_TOOLBAR_BIG                "Merge.rc:2011"
+    IDS_SELECTION_LEFT            "Merge.rc:2012"
+    IDS_SELECTION_RIGHT           "Merge.rc:2013"
+    IDS_PRINT                     "Merge.rc:2014"
+    IDS_PAGE_SETUP                "Merge.rc:2015"
+    IDS_PAGE_ZOOM                 "Merge.rc:2016"
+    IDS_CONTENT_ZOOM              "Merge.rc:2017"
+    IDS_LINE_EXCLUDED             "Merge.rc:2018"
+    IDS_LINES_EXCLUDED            "Merge.rc:2019"
 }
 
 

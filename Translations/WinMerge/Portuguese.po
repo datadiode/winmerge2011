@@ -1234,8 +1234,8 @@ msgstr "Versão de Destino"
 
 #: Merge.rc:647
 #, c-format
-msgid "G&oto Diff"
-msgstr "Ir para diferença"
+msgid "G&oto Line %1"
+msgstr "Ir para linha %1"
 
 #: Merge.rc:648
 #: Merge.rc:689
@@ -5004,80 +5004,70 @@ msgstr "Ir para a diferença sob o cursor"
 
 #: Merge.rc:2006
 #, c-format
-msgid "G&oto Diff %1 of %2"
-msgstr "Ir para diferença %1 de %2"
-
-#: Merge.rc:2007
-#, c-format
-msgid "G&oto Line %1"
-msgstr "Ir para linha %1"
-
-#: Merge.rc:2008
-#, c-format
 msgid "Disabled"
 msgstr "Desactivado"
 
-#: Merge.rc:2009
+#: Merge.rc:2007
 #, c-format
 msgid "From file system"
 msgstr "Do sistema de ficheiros"
 
-#: Merge.rc:2010
+#: Merge.rc:2008
 #, c-format
 msgid "From MRU list"
 msgstr "Da lista MRU"
 
-#: Merge.rc:2011
+#: Merge.rc:2009
 #, c-format
 msgid "Hide the toolbar"
 msgstr "Ocultar barra de ferramentas"
 
-#: Merge.rc:2012
+#: Merge.rc:2010
 #, c-format
 msgid "Show small toolbar"
 msgstr "Mostrar barra de ferramentas pequena"
 
-#: Merge.rc:2013
+#: Merge.rc:2011
 #, c-format
 msgid "Show big toolbar"
 msgstr "Mostrar barra de ferramentas grande"
 
-#: Merge.rc:2014
+#: Merge.rc:2012
 #, c-format
 msgid "Selection left"
 msgstr "Selecção esquerda"
 
-#: Merge.rc:2015
+#: Merge.rc:2013
 #, c-format
 msgid "Selection right"
 msgstr "Selecção direita"
 
-#: Merge.rc:2016
+#: Merge.rc:2014
 #, c-format
 msgid "Print..."
 msgstr "Imprimir..."
 
-#: Merge.rc:2017
+#: Merge.rc:2015
 #, c-format
 msgid "Page Setup..."
 msgstr "Configurar página..."
 
-#: Merge.rc:2018
+#: Merge.rc:2016
 #, c-format
 msgid "Page Zoom:"
 msgstr "Zoom da página..."
 
-#: Merge.rc:2019
+#: Merge.rc:2017
 #, c-format
 msgid "Content Zoom:"
 msgstr "Zoom do conteúdo..."
 
-#: Merge.rc:2020
+#: Merge.rc:2018
 #, c-format
 msgid "%d line excluded"
 msgstr "%d linha excluída"
 
-#: Merge.rc:2021
+#: Merge.rc:2019
 #, c-format
 msgid "%d lines excluded"
 msgstr "%d linhas excluídas"

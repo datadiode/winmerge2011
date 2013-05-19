@@ -1232,8 +1232,8 @@ msgstr ""
 
 #: Merge.rc:647
 #, c-format
-msgid "G&oto Diff"
-msgstr "Μετά&βαση σε Διαφορά"
+msgid "G&oto Line %1"
+msgstr "Μετά&βαση στη Γραμμή %1"
 
 #: Merge.rc:648
 #: Merge.rc:689
@@ -5460,80 +5460,70 @@ msgstr "Μετάβαση στη διαφορά όπου βρίσκεται ο δρομέας"
 
 #: Merge.rc:2006
 #, c-format
-msgid "G&oto Diff %1 of %2"
-msgstr "Μετάβαση στη &Διαφορά %1 από %2"
-
-#: Merge.rc:2007
-#, c-format
-msgid "G&oto Line %1"
-msgstr "Μετά&βαση στη Γραμμή %1"
-
-#: Merge.rc:2008
-#, c-format
 msgid "Disabled"
 msgstr "Απενεργοποιημένη"
 
-#: Merge.rc:2009
+#: Merge.rc:2007
 #, c-format
 msgid "From file system"
 msgstr "Από Αρχειοσύστημα"
 
-#: Merge.rc:2010
+#: Merge.rc:2008
 #, c-format
 msgid "From MRU list"
 msgstr "Από Κατάλογο προσφάτως χρησιμοποιηθέντων"
 
-#: Merge.rc:2011
+#: Merge.rc:2009
 #, c-format
 msgid "Hide the toolbar"
 msgstr "Απόκρυψη Γραμμής Εργαλείων"
 
-#: Merge.rc:2012
+#: Merge.rc:2010
 #, c-format
 msgid "Show small toolbar"
 msgstr "Εμφάνιση Μικρής Γραμμής Εργαλείων"
 
-#: Merge.rc:2013
+#: Merge.rc:2011
 #, c-format
 msgid "Show big toolbar"
 msgstr "Εμφάνιση Μεγάλης Γραμμής Εργαλείων"
 
-#: Merge.rc:2014
+#: Merge.rc:2012
 #, c-format
 msgid "Selection left"
 msgstr ""
 
-#: Merge.rc:2015
+#: Merge.rc:2013
 #, c-format
 msgid "Selection right"
 msgstr ""
 
-#: Merge.rc:2016
+#: Merge.rc:2014
 #, c-format
 msgid "Print..."
 msgstr ""
 
-#: Merge.rc:2017
+#: Merge.rc:2015
 #, c-format
 msgid "Page Setup..."
 msgstr ""
 
-#: Merge.rc:2018
+#: Merge.rc:2016
 #, c-format
 msgid "Page Zoom:"
 msgstr ""
 
-#: Merge.rc:2019
+#: Merge.rc:2017
 #, c-format
 msgid "Content Zoom:"
 msgstr ""
 
-#: Merge.rc:2020
+#: Merge.rc:2018
 #, c-format
 msgid "%d line excluded"
 msgstr ""
 
-#: Merge.rc:2021
+#: Merge.rc:2019
 #, c-format
 msgid "%d lines excluded"
 msgstr ""

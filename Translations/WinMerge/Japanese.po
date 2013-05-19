@@ -1232,8 +1232,8 @@ msgstr ""
 
 #: Merge.rc:647
 #, c-format
-msgid "G&oto Diff"
-msgstr "差異へ移動(&O)"
+msgid "G&oto Line %1"
+msgstr "行%1に移動(&O)"
 
 #: Merge.rc:648
 #: Merge.rc:689
@@ -5479,80 +5479,70 @@ msgstr "カーソル直下の差異へ移動します"
 
 #: Merge.rc:2006
 #, c-format
-msgid "G&oto Diff %1 of %2"
-msgstr "差異%1/%2に移動(&O)"
-
-#: Merge.rc:2007
-#, c-format
-msgid "G&oto Line %1"
-msgstr "行%1に移動(&O)"
-
-#: Merge.rc:2008
-#, c-format
 msgid "Disabled"
 msgstr "無効"
 
-#: Merge.rc:2009
+#: Merge.rc:2007
 #, c-format
 msgid "From file system"
 msgstr "ファイルシステム"
 
-#: Merge.rc:2010
+#: Merge.rc:2008
 #, c-format
 msgid "From MRU list"
 msgstr "最近使ったリスト"
 
-#: Merge.rc:2011
+#: Merge.rc:2009
 #, c-format
 msgid "Hide the toolbar"
 msgstr "ツールバーを非表示にします"
 
-#: Merge.rc:2012
+#: Merge.rc:2010
 #, c-format
 msgid "Show small toolbar"
 msgstr "小さいアイコンのツールバーを表示します"
 
-#: Merge.rc:2013
+#: Merge.rc:2011
 #, c-format
 msgid "Show big toolbar"
 msgstr "大きいアイコンのツールバーを表示します"
 
-#: Merge.rc:2014
+#: Merge.rc:2012
 #, c-format
 msgid "Selection left"
 msgstr "左側選択"
 
-#: Merge.rc:2015
+#: Merge.rc:2013
 #, c-format
 msgid "Selection right"
 msgstr "右側選択"
 
-#: Merge.rc:2016
+#: Merge.rc:2014
 #, c-format
 msgid "Print..."
 msgstr "印刷..."
 
-#: Merge.rc:2017
+#: Merge.rc:2015
 #, c-format
 msgid "Page Setup..."
 msgstr "ページ設定..."
 
-#: Merge.rc:2018
+#: Merge.rc:2016
 #, c-format
 msgid "Page Zoom:"
 msgstr "ページ拡大: "
 
-#: Merge.rc:2019
+#: Merge.rc:2017
 #, c-format
 msgid "Content Zoom:"
 msgstr "コンテンツ拡大"
 
-#: Merge.rc:2020
+#: Merge.rc:2018
 #, c-format
 msgid "%d line excluded"
 msgstr "%d 行が除外されました"
 
-#: Merge.rc:2021
+#: Merge.rc:2019
 #, c-format
 msgid "%d lines excluded"
 msgstr "%d 行が除外されました"
