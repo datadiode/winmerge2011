@@ -68,6 +68,8 @@ struct DrawItemStruct_WebLinkButton : DRAWITEMSTRUCT
 		}
 		RECT rcText = rcItem;
 		::DrawText(hDC, cText, cchText, &rcText, DT_LEFT | DT_CALCRECT);
+		::SetWindowPos(hwndItem, NULL, 0, 0, rcText.right, rcItem.bottom,
+			SWP_NOMOVE | SWP_NOZORDER | SWP_NOREDRAW);
 		switch (itemAction)
 		{
 		case ODA_DRAWENTIRE:
