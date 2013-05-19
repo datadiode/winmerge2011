@@ -80,9 +80,8 @@ CLocationView::CLocationView(CChildFrame *pMergeDoc)
 	: m_pMergeDoc(pMergeDoc)
 	, m_visibleTop(-1)
 	, m_visibleBottom(-1)
-//	MOVEDLINE_LIST m_movedLines; //*< List of moved block connecting lines */
 	, m_pSavedBackgroundBitmap(NULL)
-	, m_bRecalculateBlocks(TRUE) // calculate for the first time
+	, m_bRecalculateBlocks(true) // calculate for the first time
 	, m_displayMovedBlocks(COptionsMgr::Get(OPT_CONNECT_MOVED_BLOCKS))
 {
 }
@@ -196,7 +195,7 @@ void CLocationView::SetConnectMovedBlocks(int displayMovedBlocks)
  */
 void CLocationView::ForceRecalculate()
 {
-	m_bRecalculateBlocks = TRUE;
+	m_bRecalculateBlocks = true;
 	Invalidate();
 }
 
@@ -359,7 +358,7 @@ void CLocationView::CalculateBlocks()
 
 		nDiff = m_pMergeDoc->m_diffList.NextSignificantDiff(nDiff);
 	}
-	m_bRecalculateBlocks = FALSE;
+	m_bRecalculateBlocks = false;
 }
 
 /**
@@ -571,7 +570,7 @@ void CLocationView::OnDown(LPARAM lParam)
 {
 	POINT point;
 	POINTSTOPOINT(point, lParam);
-	GotoLocation(point, false);
+	GotoLocation(point);
 }
 
 /**
@@ -615,34 +614,20 @@ void CLocationView::OnDrag(LPARAM lParam)
  * cannot be used to scroll to ghost lines.
  *
  * @param [in] point Point to move to
- * @param [in] bRealLine TRUE if we want to scroll using real line num,
- * FALSE if view linenumbers are OK.
  * @return TRUE if succeeds, FALSE if point not inside bars.
  */
-bool CLocationView::GotoLocation(const POINT& point, bool bRealLine)
+bool CLocationView::GotoLocation(const POINT& point)
 {
 	RECT rc;
 	GetClientRect(&rc);
-
-	int line = -1;
 	int bar = IsInsideBar(rc, point);
-	if (bar == BAR_LEFT || bar == BAR_RIGHT)
-	{
-		line = GetLineFromYPos(point.y, bar, bRealLine);
-	}
-	else if (bar == BAR_YAREA)
-	{
-		// Outside bars, use left bar
-		bar = BAR_LEFT;
-		line = GetLineFromYPos(point.y, bar, FALSE);
-	}
-	else
+	if (bar == BAR_NONE)
 		return false;
-
-	m_pMergeDoc->GetLeftView()->GotoLine(line, bRealLine, bar);
-	if (bar == BAR_LEFT || bar == BAR_RIGHT)
-		m_pMergeDoc->GetView(bar)->SetFocus();
-
+	CMergeEditView *pView = bar == BAR_YAREA ?
+		m_pMergeDoc->GetActiveMergeView() : m_pMergeDoc->GetView(bar);
+	int line = GetLineFromYPos(point.y, pView);
+	pView->SetFocus();
+	pView->GotoLine(line);
 	return true;
 }
 
@@ -675,23 +660,32 @@ void CLocationView::OnContextMenu(LPARAM lParam)
 		ID_DISPLAY_MOVED_FOLLOW_DIFF,
 		ID_DISPLAY_MOVED_NONE + m_displayMovedBlocks);
 
-	String strNum;
 	int nLine = -1;
 	int bar = IsInsideBar(rc, pt);
-
+	CMergeEditView *pView = m_pMergeDoc->GetActiveMergeView();
+	TCHAR fmt[INFOTIPSIZE];
+	pSub->GetMenuString(ID_LOCBAR_GOTOLINE, fmt, _countof(fmt));
+	String str = fmt;
 	// If cursor over bar, format string with linenumber, else disable item
 	UINT uFlags = MF_GRAYED;
 	if (bar != BAR_NONE)
 	{
-		// If outside bar area use left bar
-		if (bar == BAR_YAREA)
-			bar = BAR_LEFT;
-		nLine = GetLineFromYPos(pt.y, bar);
-		strNum = string_format(_T("%d"), nLine + 1); // Show linenumber not lineindex
+		// If outside bar area use bar that corresponds to active view
+		if (bar != BAR_YAREA)
+			pView = m_pMergeDoc->GetView(bar);
+		CDiffTextBuffer *const pBuf = pView->LocateTextBuffer();
+		nLine = GetLineFromYPos(pt.y, pView);
+		// Get real line (exclude ghost lines)
+		nLine = pBuf->ComputeRealLine(nLine);
 		uFlags = MF_ENABLED;
+		string_replace(str, _T("%1"), NumToStr(nLine + 1, 10).c_str());
+		nLine = pBuf->ComputeApparentLine(nLine);
 	}
-	pSub->ModifyMenu(ID_LOCBAR_GOTODIFF, uFlags, ID_LOCBAR_GOTODIFF,
-		LanguageSelect.FormatMessage(ID_LOCBAR_GOTOLINE_FMT, strNum.c_str()));
+	else
+	{
+		string_replace(str, _T("%1"), _T(""));
+	}
+	pSub->ModifyMenu(ID_LOCBAR_GOTOLINE, uFlags, ID_LOCBAR_GOTOLINE, str.c_str());
 
 	// invoke context menu
 	// we don't want to use the main application handlers, so we use flags TPM_NONOTIFY | TPM_RETURNCMD
@@ -704,10 +698,9 @@ void CLocationView::OnContextMenu(LPARAM lParam)
 
 	switch (command)
 	{
-	case ID_LOCBAR_GOTODIFF:
-		m_pMergeDoc->GetLeftView()->GotoLine(nLine, true, bar);
-		if (bar == BAR_LEFT || bar == BAR_RIGHT)
-			m_pMergeDoc->GetView(bar)->SetFocus();
+	case ID_LOCBAR_GOTOLINE:
+		pView->SetFocus();
+		pView->GotoLine(nLine);
 		break;
 	case ID_EDIT_WMGOTO:
 		theApp.m_pMainWnd->PostMessage(WM_COMMAND, ID_EDIT_WMGOTO);
@@ -734,10 +727,8 @@ void CLocationView::OnContextMenu(LPARAM lParam)
  * @param [in] bRealLine TRUE if real line is returned, FALSE for view line
  * @return 0-based index of view/real line in file [0...lines-1]
  */
-int CLocationView::GetLineFromYPos(int nYCoord, int bar, BOOL bRealLine)
+int CLocationView::GetLineFromYPos(int nYCoord, CMergeEditView *pView)
 {
-	CMergeEditView *const pView = m_pMergeDoc->GetView(bar);
-
 	int nSubLineIndex = (int) (m_pixInLines * (nYCoord - Y_OFFSET));
 
 	// Keep sub-line index in range.
@@ -760,14 +751,7 @@ int CLocationView::GetLineFromYPos(int nYCoord, int bar, BOOL bRealLine)
 	{
 		nLine -= 1;
 	}
-
-	// We've got a view line now
-	if (bRealLine == FALSE)
-		return nLine;
-
-	// Get real line (exclude ghost lines)
-	const int nRealLine = m_pMergeDoc->m_ptBuf[bar]->ComputeRealLine(nLine);
-	return nRealLine;
+	return nLine;
 }
 
 /** 

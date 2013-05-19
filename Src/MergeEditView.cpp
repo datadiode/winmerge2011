@@ -1113,31 +1113,19 @@ void CMergeEditView::RefreshOptions()
 
 /** 
  * @brief Goto given line.
- * @param [in] nLine Destination linenumber
- * @param [in] bRealLine if TRUE linenumber is real line, otherwise
- * it is apparent line (including deleted lines)
- * @param [in] pane Pane index of goto target pane (0 = left, 1 = right).
+ * @param [in] nLine Apparent destination line number (including deleted lines)
  */
-void CMergeEditView::GotoLine(int nLine, bool bRealLine, int pane)
+void CMergeEditView::GotoLine(int nLine)
 {
-	CMergeEditView *pLeftView = m_pDocument->GetLeftView();
-	CMergeEditView *pRightView = m_pDocument->GetRightView();
-
-	// Compute apparent (shown linenumber) line
-	if (bRealLine)
-	{
-		int nLastLine = m_pDocument->m_ptBuf[pane]->GetLineCount() - 1;
-		if (nLine > nLastLine)
-			nLine = nLastLine;
-		nLine = m_pDocument->m_ptBuf[pane]->ComputeApparentLine(nLine);
-	}
+	CMergeEditView *const pLeftView = m_pDocument->GetLeftView();
+	CMergeEditView *const pRightView = m_pDocument->GetRightView();
 
 	POINT ptPos = { 0, nLine };
 	// Scroll line to center of view
 	int nScrollLine = GetSubLineIndex(nLine) - GetScreenLines() / 2;
 	if (nScrollLine < 0)
 		nScrollLine = 0;
-	
+
 	pLeftView->ScrollToSubLine(nScrollLine);
 	pRightView->ScrollToSubLine(nScrollLine);
 	pLeftView->SetCursorPos(ptPos);

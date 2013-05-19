@@ -859,9 +859,7 @@
 #define ID_DISPLAY_MOVED_NONE                   33088
 #define ID_DISPLAY_MOVED_ALL                    33089
 #define ID_DISPLAY_MOVED_FOLLOW_DIFF            33090
-#define ID_LOCBAR_GOTODIFF                      33091
-#define ID_LOCBAR_GOTODIFF_FMT                  33092
-#define ID_LOCBAR_GOTOLINE_FMT                  33093
+#define ID_LOCBAR_GOTOLINE                      33091
 #define ID_FILE_STARTCOLLECT                    33094
 #define ID_FILE_OPENPROJECT                     33095
 #define ID_VIEW_SHOWHIDDENITEMS                 33096

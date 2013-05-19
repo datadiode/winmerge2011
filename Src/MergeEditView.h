@@ -153,7 +153,7 @@ public:
 	virtual int GetAdditionalTextBlocks(int nLineIndex, TEXTBLOCK *pBuf);
 	virtual COLORREF GetColor(int nColorIndex);
 	virtual void GetLineColors(int nLineIndex, COLORREF &crBkgnd, COLORREF &crText);
-	void GotoLine(int nLine, bool bRealLine, int pane);
+	void GotoLine(int nLine);
 	int GetTopLine() { return m_nTopLine; }
 	int GetTopSubLine() { return m_nTopSubLine; }
 	using CCrystalTextView::GetScreenLines;

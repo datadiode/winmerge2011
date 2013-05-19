@@ -13,6 +13,8 @@
 #ifndef __LOCATIONVIEW_H__
 #define __LOCATIONVIEW_H__
 
+class CMergeEditView;
+
 /**
  * @brief Status for display moved block
  */
@@ -87,8 +89,8 @@ public:
 protected:
 	CChildFrame *const m_pMergeDoc;
 	void DrawRect(HSurface *, const RECT& r, COLORREF cr, BOOL bSelected = FALSE);
-	bool GotoLocation(const POINT& point, bool bRealLine = true);
-	int GetLineFromYPos(int nYCoord, int bar, BOOL bRealLine = TRUE);
+	bool GotoLocation(const POINT& point);
+	int GetLineFromYPos(int nYCoord, CMergeEditView *);
 	int IsInsideBar(const RECT& rc, const POINT& pt);
 	void DrawVisibleAreaRect(HSurface *, int nTopLine = -1, int nBottomLine = -1);
 	void DrawConnectLines(HSurface *);
@@ -110,7 +112,7 @@ private:
 	MOVEDLINE_LIST m_movedLines; //*< List of moved block connecting lines */
 	HBitmap *m_pSavedBackgroundBitmap; //*< Saved background */
 	stl::vector<DiffBlock> m_diffBlocks; //*< List of pre-calculated diff blocks.
-	BOOL m_bRecalculateBlocks; //*< Recalculate diff blocks in next repaint.
+	bool m_bRecalculateBlocks; //*< Recalculate diff blocks in next repaint.
 
 	// Generated message map functions
 protected:

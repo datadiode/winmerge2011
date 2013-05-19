@@ -132,11 +132,13 @@ void CChildFrame::OnWMGoto()
 			nParam = 0;
 		if (dlg.m_nGotoWhat == 0)
 		{
-			int nLastLine = m_ptBuf[dlg.m_nFile]->GetLineCount() - 1;
-			nLastLine = m_ptBuf[dlg.m_nFile]->ComputeRealLine(nLastLine);
+			CDiffTextBuffer *const pBuf = pMergeView->LocateTextBuffer();
+			int nLastLine = pBuf->GetLineCount() - 1;
+			nLastLine = pBuf->ComputeRealLine(nLastLine);
 			if (nParam > nLastLine)
 				nParam = nLastLine;
-			pMergeView->GotoLine(nParam, true, dlg.m_nFile);
+			nParam = pBuf->ComputeApparentLine(nParam);
+			pMergeView->GotoLine(nParam);
 		}
 		else
 		{
