@@ -531,7 +531,7 @@ void CDirView::ListContextMenu(POINT point)
 
 	HMenu *pScriptMenu = pMDIFrame->SetScriptMenu(m_pCompareAsScriptMenu, NULL);
 
-	if (nCmd >= IDC_SCRIPT_FIRST && nCmd <= IDC_SCRIPT_LAST)
+	if (nCmd >= ID_SCRIPT_FIRST && nCmd <= ID_SCRIPT_LAST)
 	{
 		if (pScriptMenu)
 		{

@@ -962,15 +962,15 @@ void CMergeEditView::OnContextMenu(LPARAM lParam)
 	HMenu *pScriptMenu = NULL;
 	if (QueryEditable())
 	{
-		pSub->AppendMenu(MF_STRING, IDC_SCRIPT_LAST, _T("PluginMonikers"));
+		pSub->AppendMenu(MF_STRING, ID_SCRIPT_LAST, _T("PluginMonikers"));
 		pScriptMenu = theApp.m_pMainWnd->SetScriptMenu(pSub, "EditorScripts.Menu");
 		if (pScriptMenu->GetMenuItemCount())
-			pSub->InsertMenu(IDC_SCRIPT_FIRST, MF_SEPARATOR);
+			pSub->InsertMenu(ID_SCRIPT_FIRST, MF_SEPARATOR);
 	}
 
 	int nCmd = pSub->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_RETURNCMD,
 		point.x, point.y, theApp.m_pMainWnd->m_pWnd);
-	if (nCmd >= IDC_SCRIPT_FIRST && nCmd <= IDC_SCRIPT_LAST) try
+	if (nCmd >= ID_SCRIPT_FIRST && nCmd <= ID_SCRIPT_LAST) try
 	{
 		TCHAR method[INFOTIPSIZE];
 		pScriptMenu->GetMenuString(nCmd, method, INFOTIPSIZE);

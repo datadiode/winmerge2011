@@ -1399,7 +1399,7 @@ bool CMainFrame::DoFileOpen(
 		attrLeft = dlg.m_attrLeft;
 		attrRight = dlg.m_attrRight;
 		// TODO: add codepage options to open dialog?
-		if (idCompareAs >= IDC_SCRIPT_FIRST && idCompareAs <= IDC_SCRIPT_LAST)
+		if (idCompareAs >= ID_SCRIPT_FIRST && idCompareAs <= ID_SCRIPT_LAST)
 			packingInfo.SetPlugin(dlg.m_sCompareAs.c_str());
 	}
 	else if (idCompareAs == ID_MERGE_COMPARE &&
@@ -3834,7 +3834,7 @@ HMenu *CMainFrame::SetScriptMenu(HMenu *pMenu, LPCSTR section)
 	{
 		(pMenu != m_pScriptMenu ? pMenu : m_pScriptMenu) = NULL;
 	}
-	else if (pMenu && pMenu->GetMenuStringA(IDC_SCRIPT_LAST, text, _countof(text)))
+	else if (pMenu && pMenu->GetMenuStringA(ID_SCRIPT_LAST, text, _countof(text)))
 	{
 		m_pScriptMenu = HMenu::CreatePopupMenu();
 		stl::string language;
@@ -3860,14 +3860,14 @@ HMenu *CMainFrame::SetScriptMenu(HMenu *pMenu, LPCSTR section)
 				if (GetPrivateProfileSectionA(section, buffer, _countof(buffer), path))
 				{
 					char *p = buffer;
-					unsigned id = IDC_SCRIPT_FIRST;
+					unsigned id = ID_SCRIPT_FIRST;
 					while (char *q = strchr(p, '='))
 					{
 						const size_t r = strlen(q);
 						*q++ = _T('\0');
-						if (id < IDC_SCRIPT_LAST)
+						if (id < ID_SCRIPT_LAST)
 						{
-							pMenu->InsertMenuW(IDC_SCRIPT_LAST, MF_STRING, id, OString(HString::Oct(p)->Uni(cp)).W);
+							pMenu->InsertMenuW(ID_SCRIPT_LAST, MF_STRING, id, OString(HString::Oct(p)->Uni(cp)).W);
 							m_pScriptMenu->AppendMenuW(MF_STRING, id, OString(HString::Oct(q)->Uni(cp)).W);
 							++id;
 						}
@@ -3878,7 +3878,7 @@ HMenu *CMainFrame::SetScriptMenu(HMenu *pMenu, LPCSTR section)
 			} while ((cchSupplementFolder > 0) && (cchSupplementFolder < MAX_PATH));
 			language.clear();
 		} while (bLocalized && m_pScriptMenu->GetMenuItemCount() == 0);
-		pMenu->DeleteMenu(IDC_SCRIPT_LAST);
+		pMenu->DeleteMenu(ID_SCRIPT_LAST);
 		pMenu = m_pScriptMenu;
 	}
 	return pMenu;
