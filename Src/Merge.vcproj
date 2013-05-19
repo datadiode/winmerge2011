@@ -38,7 +38,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="3"
+				Optimization="1"
 				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories=".;.\CompareEngines;.\Common;EASTL\include;.\editlib;.\diffutils;.\diffutils\lib;.\diffutils\src;..\Externals\expat\lib;..\Externals\expat\xmlwf;..\Externals\scew;..\Externals\pcre\Win32"
 				PreprocessorDefinitions="NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS=1;_CRT_SECURE_NO_DEPRECATE;_STATIC_CPPLIB;HAVE_STDLIB_H;STDC_HEADERS;HAVE_STRING_H=1;PR_FILE_NAME=\&quot;pr\&quot;;DIFF_PROGRAM=\&quot;diff\&quot;;REGEX_MALLOC;__MSC__;__NT__;USG=1;EDITPADC_CLASS=;UNICODE;PCRE_STATIC;USE_EASTL"
@@ -98,7 +98,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="3"
+				Optimization="1"
 				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories=".;.\CompareEngines;.\Common;EASTL\include;.\editlib;.\diffutils;.\diffutils\lib;.\diffutils\src;..\Externals\expat\lib;..\Externals\expat\xmlwf;..\Externals\scew;..\Externals\pcre\Win32"
 				PreprocessorDefinitions="NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS=1;_CRT_SECURE_NO_DEPRECATE;_STATIC_CPPLIB;HAVE_STDLIB_H;STDC_HEADERS;HAVE_STRING_H=1;PR_FILE_NAME=\&quot;pr\&quot;;DIFF_PROGRAM=\&quot;diff\&quot;;REGEX_MALLOC;__MSC__;__NT__;USG=1;EDITPADC_CLASS=;UNICODE;PCRE_STATIC;USE_EASTL"
@@ -266,7 +266,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="3"
+				Optimization="1"
 				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories=".;.\CompareEngines;.\Common;EASTL\include;.\editlib;.\diffutils;.\diffutils\lib;.\diffutils\src;..\Externals\expat\lib;..\Externals\expat\xmlwf;..\Externals\scew;..\Externals\pcre\Win32"
 				PreprocessorDefinitions="NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS=1;_CRT_SECURE_NO_DEPRECATE;_STATIC_CPPLIB;HAVE_STDLIB_H;STDC_HEADERS;HAVE_STRING_H=1;PR_FILE_NAME=\&quot;pr\&quot;;DIFF_PROGRAM=\&quot;diff\&quot;;REGEX_MALLOC;__MSC__;__NT__;USG=1;EDITPADC_CLASS=;UNICODE;PCRE_STATIC;USE_EASTL;_HAS_EXCEPTIONS=0"

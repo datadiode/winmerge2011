@@ -214,7 +214,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalOptions=" /Zm1000"
-				Optimization="3"
+				Optimization="1"
 				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories=".;..;"
 				PreprocessorDefinitions="WIN32,_WINDOWS,NDEBUG,HAVE_CONFIG_H,_CRT_SECURE_NO_DEPRECATE,CMAKE_INTDIR=\&quot;Release\&quot;,PCRE_STATIC"
@@ -292,7 +292,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalOptions=" /Zm1000"
-				Optimization="3"
+				Optimization="1"
 				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories=".;..;"
 				PreprocessorDefinitions="WIN32,_WINDOWS,NDEBUG,HAVE_CONFIG_H,_CRT_SECURE_NO_DEPRECATE,CMAKE_INTDIR=\&quot;Release\&quot;,PCRE_STATIC"
@@ -370,8 +370,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalOptions=" /Zm1000"
-				Optimization="3"
-				InlineFunctionExpansion="2"
+				Optimization="1"
 				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories=".;..;"
 				PreprocessorDefinitions="WIN32,_WINDOWS,NDEBUG,HAVE_CONFIG_H,_CRT_SECURE_NO_DEPRECATE,CMAKE_INTDIR=\&quot;Release\&quot;,PCRE_STATIC"
@@ -450,8 +449,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalOptions=" /Zm1000"
-				Optimization="3"
-				InlineFunctionExpansion="2"
+				Optimization="1"
 				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories=".;..;"
 				PreprocessorDefinitions="WIN32,_WINDOWS,NDEBUG,HAVE_CONFIG_H,_CRT_SECURE_NO_DEPRECATE,CMAKE_INTDIR=\&quot;Release\&quot;,PCRE_STATIC"
