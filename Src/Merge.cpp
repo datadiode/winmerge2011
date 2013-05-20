@@ -67,7 +67,7 @@ static char THIS_FILE[] = __FILE__;
 static void ClearTempfolder(LPCTSTR path)
 {
 	// SHFileOperation expects a ZZ terminated list of paths!
-	String paths(path, _tcslen(path) + 1);
+	String paths(path, static_cast<String::size_type>(_tcslen(path)) + 1);
 	SHFILEOPSTRUCT fileop = { 0, FO_DELETE, paths.c_str(), 0,
 		FOF_NOCONFIRMATION | FOF_SILENT | FOF_NOERRORUI, 0, 0, 0 };
 	SHFileOperation(&fileop);
