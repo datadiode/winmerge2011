@@ -257,11 +257,12 @@ bool CMergeApp::InitInstance()
 		OException::Check(CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE));
 		OException::Check(OleInitialize(NULL));
 
+		// Locate the supplement folder and read the Supplement.ini
 		InitializeSupplements();
-
+		// Load file filters from both program and supplement folder
+		globalFileFilter.LoadAllFileFilters();
 		// Read last used filter from registry
-		const String filterString = COptionsMgr::Get(OPT_FILEFILTER_CURRENT);
-		globalFileFilter.SetFilter(filterString);
+		globalFileFilter.SetFilter(COptionsMgr::Get(OPT_FILEFILTER_CURRENT));
 
 		// Initialize i18n (multiple language) support
 		LanguageSelect.InitializeLanguage();
@@ -355,58 +356,54 @@ int CMergeApp::DoMessageBox(LPCTSTR lpszPrompt, UINT nType, UINT nIDPrompt)
 void CMergeApp::InitializeSupplements()
 {
 	String supplementFolder = COptionsMgr::Get(OPT_SUPPLEMENT_FOLDER);
-	if (paths_CreateIfNeeded(paths_ConcatPath(supplementFolder, _T("Filters")).c_str()))
+	if (!globalFileFilter.SetUserFilterPath(supplementFolder))
 	{
-		SetEnvironmentVariable(_T("SupplementFolder"), supplementFolder.c_str());
-		String ini = paths_ConcatPath(supplementFolder, _T("Supplement.ini"));
-		TCHAR buffer[0x8000];
-		if (!GetPrivateProfileSection(_T("Environment"), buffer, _countof(buffer), ini.c_str()))
+		supplementFolder = COptionsMgr::GetDefault(OPT_SUPPLEMENT_FOLDER);
+		COptionsMgr::SaveOption(OPT_SUPPLEMENT_FOLDER, supplementFolder);
+		globalFileFilter.SetUserFilterPath(supplementFolder);
+	}
+	SetEnvironmentVariable(_T("SupplementFolder"), supplementFolder.c_str());
+	String ini = paths_ConcatPath(supplementFolder, _T("Supplement.ini"));
+	TCHAR buffer[0x8000];
+	if (!GetPrivateProfileSection(_T("Environment"), buffer, _countof(buffer), ini.c_str()))
+	{
+		static const TCHAR Environment[] =
+			_T("xdoc2txt=C:\\xdoc2txt\0")
+			_T("MediaInfo_CLI=C:\\MediaInfo_CLI\0");
+		if (WritePrivateProfileSection(_T("Environment"), Environment, ini.c_str()))
 		{
-			static const TCHAR Environment[] =
-				_T("xdoc2txt=C:\\xdoc2txt\0")
-				_T("MediaInfo_CLI=C:\\MediaInfo_CLI\0");
-			if (WritePrivateProfileSection(_T("Environment"), Environment, ini.c_str()))
-			{
-				memcpy(buffer, Environment, sizeof Environment);
-			}
+			memcpy(buffer, Environment, sizeof Environment);
 		}
-		TCHAR *p = buffer;
-		while (TCHAR *q = _tcschr(p, _T('=')))
+	}
+	TCHAR *p = buffer;
+	while (TCHAR *q = _tcschr(p, _T('=')))
+	{
+		const size_t r = _tcslen(q);
+		*q++ = _T('\0');
+		SetEnvironmentVariable(p, q);
+		p = q + r;
+	}
+	if (GetPrivateProfileSection(_T("Preload"), buffer, _countof(buffer), ini.c_str()))
+	{
+		LPTSTR pch = buffer;
+		while (const size_t cch = _tcslen(pch))
 		{
-			const size_t r = _tcslen(q);
-			*q++ = _T('\0');
-			SetEnvironmentVariable(p, q);
-			p = q + r;
+			String path = env_ExpandVariables(pch);
+			// Don't accept relative paths for security reasons.
+			if (!PathIsRelative(path.c_str()))
+				LoadLibrary(path.c_str());
+			pch += cch + 1;
 		}
-		if (GetPrivateProfileSection(_T("Preload"), buffer, _countof(buffer), ini.c_str()))
-		{
-			LPTSTR pch = buffer;
-			while (const size_t cch = _tcslen(pch))
-			{
-				String path = env_ExpandVariables(pch);
-				// Don't accept relative paths for security reasons.
-				if (!PathIsRelative(path.c_str()))
-					LoadLibrary(path.c_str());
-				pch += cch + 1;
-			}
-		}
-		if (GetPrivateProfileSection(_T("Parsers"), buffer, _countof(buffer), ini.c_str()))
-		{
-			CCrystalTextView::ScanParserAssociations(buffer);
-		}
-		else
-		{
-			CCrystalTextView::DumpParserAssociations(buffer);
-			WritePrivateProfileSection(_T("Parsers"), buffer, ini.c_str());
-		}
+	}
+	if (GetPrivateProfileSection(_T("Parsers"), buffer, _countof(buffer), ini.c_str()))
+	{
+		CCrystalTextView::ScanParserAssociations(buffer);
 	}
 	else
 	{
-		supplementFolder = env_GetMyDocuments();
-		COptionsMgr::SaveOption(OPT_SUPPLEMENT_FOLDER, supplementFolder);
+		CCrystalTextView::DumpParserAssociations(buffer);
+		WritePrivateProfileSection(_T("Parsers"), buffer, ini.c_str());
 	}
-	globalFileFilter.SetUserFilterPath(supplementFolder.c_str());
-	globalFileFilter.LoadAllFileFilters();
 }
 
 /**

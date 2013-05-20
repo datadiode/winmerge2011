@@ -96,14 +96,14 @@ public:
 	FileFilterHelper();
 	~FileFilterHelper();
 
-	String GetGlobalFilterPathWithCreate() const;
-	String GetUserFilterPathWithCreate() const;
+	const String &GetGlobalFilterPath() const { return m_sGlobalFilterPath; }
+	const String &GetUserFilterPath() const { return m_sUserSelFilterPath; }
 
 	void SetFileFilterPath(LPCTSTR szFileFilterPath);
-	const stl::vector<FileFilter *> &GetFileFilters(String & selected) const;
+	const stl::vector<FileFilter *> &GetFileFilters(String &selected) const;
 	String GetFileFilterName(LPCTSTR filterPath) const;
 	String GetFileFilterPath(LPCTSTR filterName) const;
-	void SetUserFilterPath(LPCTSTR filterPath);
+	bool SetUserFilterPath(const String &filterPath);
 
 	void ReloadUpdatedFilters();
 	void LoadAllFileFilters();

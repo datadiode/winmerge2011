@@ -134,9 +134,10 @@ String FileFilterHelper::GetFileFilterPath(LPCTSTR filterName) const
  * @brief Set User's filter folder.
  * @param [in] filterPath Location of User's filters.
  */
-void FileFilterHelper::SetUserFilterPath(LPCTSTR filterPath)
+bool FileFilterHelper::SetUserFilterPath(const String &filterPath)
 {
 	m_sUserSelFilterPath = paths_ConcatPath(filterPath, _T("Filters\\"));
+	return paths_CreateIfNeeded(m_sUserSelFilterPath.c_str());
 }
 
 /**
@@ -367,22 +368,4 @@ void FileFilterHelper::LoadAllFileFilters()
 	LoadFromDirectory(m_sGlobalFilterPath.c_str(), FileFilterExt);
 	// Path for user's private filters
 	LoadFromDirectory(m_sUserSelFilterPath.c_str(), FileFilterExt);
-}
-
-/**
- * @brief Return path to global filters (& create if needed), or empty if cannot create
- */
-String FileFilterHelper::GetGlobalFilterPathWithCreate() const
-{
-	bool const exist = paths_CreateIfNeeded(m_sGlobalFilterPath.c_str());
-	return exist ? m_sGlobalFilterPath : String();
-}
-
-/**
- * @brief Return path to user filters (& create if needed), or empty if cannot create
- */
-String FileFilterHelper::GetUserFilterPathWithCreate() const
-{
-	bool const exist = paths_CreateIfNeeded(m_sUserSelFilterPath.c_str());
-	return exist ? m_sUserSelFilterPath : String();
 }

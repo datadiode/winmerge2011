@@ -333,8 +333,8 @@ void FileFiltersDlg::OnBnClickedFilterfileTestButton()
  */
 void FileFiltersDlg::OnBnClickedFilterfileNewbutton()
 {
-	String path = globalFileFilter.GetGlobalFilterPathWithCreate();
-	String userPath = globalFileFilter.GetUserFilterPathWithCreate();
+	String path = globalFileFilter.GetGlobalFilterPath();
+	String userPath = globalFileFilter.GetUserFilterPath();
 
 	// Format path to template file
 	String templatePath = paths_ConcatPath(path, FILE_FILTER_TEMPLATE);
@@ -440,7 +440,7 @@ void FileFiltersDlg::UpdateFiltersList()
 void FileFiltersDlg::OnBnClickedFilterfileInstall()
 {
 	String path;
-	String userPath = globalFileFilter.GetUserFilterPathWithCreate();
+	String userPath = globalFileFilter.GetUserFilterPath();
 
 	if (SelectFile(m_hWnd, path, IDS_FILEFILTER_INSTALL, IDS_FILEFILTER_FILEMASK, TRUE))
 	{
