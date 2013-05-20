@@ -318,7 +318,7 @@ void FileFiltersDlg::OnBnClickedFilterfileTestButton()
 	FileFilterMgr *pMgr = globalFileFilter.GetManager();
 	if (FileFilter *pFileFilter = pMgr->GetFilterByPath(m_sFileFilterPath.c_str()))
 	{
-		CTestFilterDlg dlg(pFileFilter, pMgr);
+		CTestFilterDlg dlg(pFileFilter);
 		LanguageSelect.DoModal(dlg);
 	}
 }

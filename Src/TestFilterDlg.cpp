@@ -7,12 +7,10 @@
 // $Id$
 
 #include "StdAfx.h"
-#include "Merge.h"
 #include "LanguageSelect.h"
 #include "resource.h"
 #include "TestFilterDlg.h"
 #include "FileFilter.h"
-#include "FileFilterMgr.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -26,10 +24,9 @@ static char THIS_FILE[] = __FILE__;
  * @param [in] pFileFilter File filter to test.
  * @param [in] pFilterMgr File filter manager.
  */
-CTestFilterDlg::CTestFilterDlg(FileFilter *pFileFilter, FileFilterMgr *pFilterMgr)
+CTestFilterDlg::CTestFilterDlg(FileFilter *pFileFilter)
 : ODialog(IDD_TEST_FILTER)
 , m_pFileFilter(pFileFilter)
-, m_pFileFilterMgr(pFilterMgr)
 {
 }
 
