@@ -17,9 +17,6 @@
  *
  *  @brief Implementation of FileFilterMgr and supporting routines
  */ 
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "FileFilter.h"
 #include "pcre.h"
@@ -57,7 +54,6 @@ int FileFilterMgr::AddFilter(LPCTSTR szFilterFile)
  * @brief Load all filter files matching pattern from disk into internal filter set.
  * @param [in] dir Directory from where filters are loaded.
  * @param [in] szPattern Pattern for filters to load filters, for example "*.flt".
- * @param [in] szExt File-extension of filter files.
  */
 void FileFilterMgr::LoadFromDirectory(LPCTSTR dir, LPCTSTR szPattern)
 {

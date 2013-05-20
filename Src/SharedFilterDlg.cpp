@@ -77,20 +77,3 @@ void CSharedFilterDlg::OnOK()
 	COptionsMgr::SaveOption(OPT_FILEFILTER_SHARED, bShared != BST_UNCHECKED);
 	m_ChosenFolder = bShared ? m_SharedFolder : m_PrivateFolder;
 }
-
-/**
- * @brief Show user a selection dialog for shared/private filter creation.
- * @param [in] parent Parent window pointer.
- * @param [in] SharedFolder Folder for shared filters.
- * @param [in] PrivateFolder Folder for private filters.
- * @return Selected filter folder (shared or private).
- */
-String CSharedFilterDlg::PromptForNewFilter(LPCTSTR SharedFolder, LPCTSTR PrivateFolder)
-{
-	CSharedFilterDlg dlg;
-	dlg.m_SharedFolder = SharedFolder;
-	dlg.m_PrivateFolder = PrivateFolder;
-	if (LanguageSelect.DoModal(dlg) != IDOK)
-		return _T("");
-	return dlg.m_ChosenFolder;
-}

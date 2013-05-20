@@ -29,7 +29,6 @@
 #include "FileFiltersDlg.h"
 #include "coretools.h"
 #include "FileFilter.h"
-#include "FileFilterMgr.h"
 #include "paths.h"
 #include "SharedFilterDlg.h"
 #include "TestFilterDlg.h"
@@ -315,8 +314,7 @@ void FileFiltersDlg::OnBnClickedFilterfileTestButton()
 	// Ensure filter is up-to-date (user probably just edited it)
 	globalFileFilter.ReloadUpdatedFilters();
 
-	FileFilterMgr *pMgr = globalFileFilter.GetManager();
-	if (FileFilter *pFileFilter = pMgr->GetFilterByPath(m_sFileFilterPath.c_str()))
+	if (FileFilter *pFileFilter = globalFileFilter.GetFilterByPath(m_sFileFilterPath.c_str()))
 	{
 		CTestFilterDlg dlg(pFileFilter);
 		LanguageSelect.DoModal(dlg);
@@ -335,21 +333,11 @@ void FileFiltersDlg::OnBnClickedFilterfileTestButton()
  */
 void FileFiltersDlg::OnBnClickedFilterfileNewbutton()
 {
-	String globalPath = globalFileFilter.GetGlobalFilterPathWithCreate();
+	String path = globalFileFilter.GetGlobalFilterPathWithCreate();
 	String userPath = globalFileFilter.GetUserFilterPathWithCreate();
 
-	if (globalPath.empty() && userPath.empty())
-	{
-		LanguageSelect.MsgBox(IDS_FILEFILTER_NO_USERFOLDER, MB_ICONSTOP);
-		return;
-	}
-
 	// Format path to template file
-	String templatePath(globalPath);
-	if (templatePath[templatePath.length() - 1] != '\\')
-		templatePath += '\\';
-	templatePath += FILE_FILTER_TEMPLATE;
-
+	String templatePath = paths_ConcatPath(path, FILE_FILTER_TEMPLATE);
 	if (paths_DoesPathExist(templatePath.c_str()) != IS_EXISTING_FILE)
 	{
 		LanguageSelect.FormatMessage(
@@ -359,23 +347,22 @@ void FileFiltersDlg::OnBnClickedFilterfileNewbutton()
 		return;
 	}
 
-	String path = globalPath.empty() ? userPath : globalPath;
-
-	if (!globalPath.empty() && !userPath.empty())
+	if (!userPath.empty())
 	{
-		path = CSharedFilterDlg::PromptForNewFilter(globalPath.c_str(), userPath.c_str());
-		if (path.empty()) return;
+		CSharedFilterDlg dlg;
+		dlg.m_SharedFolder = path;
+		dlg.m_PrivateFolder = userPath;
+		if (LanguageSelect.DoModal(dlg) != IDOK)
+			return;
+		path = dlg.m_ChosenFolder;
 	}
 
 	if (!paths_EndsWithSlash(path.c_str()))
 		path.push_back(_T('\\'));
 	
-	if (SelectFile(m_hWnd, path, IDS_FILEFILTER_SAVENEW, IDS_FILEFILTER_FILEMASK, FALSE))
+	if (SelectFile(m_hWnd, path, IDS_FILEFILTER_SAVENEW,
+		IDS_FILEFILTER_FILEMASK, FALSE, FileFilterExt + 2))
 	{
-		// Fix file extension
-		LPCTSTR ext = PathFindExtension(path.c_str());
-		if (lstrcmpi(ext, FileFilterExt) != 0)
-			path += FileFilterExt;
 		// Open-dialog asks about overwriting, so we can overwrite filter file
 		// user has already allowed it.
 		if (!CopyFile(templatePath.c_str(), path.c_str(), FALSE))
@@ -384,8 +371,7 @@ void FileFiltersDlg::OnBnClickedFilterfileNewbutton()
 			return;
 		}
 		EditFileFilter(path.c_str());
-		FileFilterMgr *pMgr = globalFileFilter.GetManager();
-		int retval = pMgr->AddFilter(path.c_str());
+		int retval = globalFileFilter.AddFilter(path.c_str());
 		if (retval == FILTER_OK)
 		{
 			// Remove all from filterslist and re-add so we can update UI
@@ -412,8 +398,7 @@ void FileFiltersDlg::OnBnClickedFilterfileDelete()
 		{
 			if (DeleteFile(path.c_str()))
 			{
-				FileFilterMgr *pMgr = globalFileFilter.GetManager();
-				pMgr->RemoveFilter(path.c_str());
+				globalFileFilter.RemoveFilter(path.c_str());
 				UpdateFiltersList();
 			}
 			else
@@ -484,8 +469,7 @@ void FileFiltersDlg::OnBnClickedFilterfileInstall()
 		}
 		else
 		{
-			FileFilterMgr *pMgr = globalFileFilter.GetManager();
-			pMgr->AddFilter(userPath.c_str());
+			globalFileFilter.AddFilter(userPath.c_str());
 			UpdateFiltersList();
 		}
 	}

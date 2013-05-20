@@ -25,14 +25,15 @@
 #ifndef _FILEFILTERHELPER_H_
 #define _FILEFILTERHELPER_H_
 
-class FileFilterMgr;
+#include "FileFilterMgr.h"
+
 class FilterList;
 struct FileFilter;
 
 /**
  * @brief File extension of file filter files.
  */
-const TCHAR FileFilterExt[] = _T(".flt");
+const TCHAR FileFilterExt[] = _T("*.flt");
 
 /// Interface for testing files & directories for exclusion, as diff traverses file tree
 extern class IDiffFilter
@@ -87,7 +88,9 @@ public:
  * clients for querying if file is included to compare. Clients don't need
  * to care about compare methods etc details.
  */
-extern class FileFilterHelper : public IDiffFilter
+extern class FileFilterHelper
+	: public IDiffFilter
+	, public FileFilterMgr
 {
 public:
 	FileFilterHelper();
@@ -96,7 +99,6 @@ public:
 	String GetGlobalFilterPathWithCreate() const;
 	String GetUserFilterPathWithCreate() const;
 
-	FileFilterMgr * GetManager() const;
 	void SetFileFilterPath(LPCTSTR szFileFilterPath);
 	const stl::vector<FileFilter *> &GetFileFilters(String & selected) const;
 	String GetFileFilterName(LPCTSTR filterPath) const;
@@ -105,8 +107,6 @@ public:
 
 	void ReloadUpdatedFilters();
 	void LoadAllFileFilters();
-
-	void LoadFileFilterDirPattern(LPCTSTR dir, LPCTSTR szPattern);
 
 	void SetMask(LPCTSTR strMask);
 
@@ -126,9 +126,8 @@ protected:
 private:
 	FilterList *const m_pMaskFilter;       /*< Filter for filemasks (*.cpp) */
 	FileFilter *m_currentFilter;     /*< Currently selected filefilter */
-	FileFilterMgr *const m_fileFilterMgr;  /*< Associated FileFilterMgr */
 	String m_sMask;   /*< File mask (if defined) "*.cpp *.h" etc */
-	String m_sGlobalFilterPath;    /*< Path for shared filters */
+	const String m_sGlobalFilterPath;    /*< Path for shared filters */
 	String m_sUserSelFilterPath;     /*< Path for user's private filters */
 } globalFileFilter;
 

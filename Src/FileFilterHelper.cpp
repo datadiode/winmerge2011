@@ -14,7 +14,7 @@
 //    along with this program; if not, write to the Free Software
 //    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 /////////////////////////////////////////////////////////////////////////////
-/** 
+/**
  * @file  FileFilterHelper.cpp
  *
  * @brief Implementation file for FileFilterHelper class
@@ -25,7 +25,6 @@
 #include "StdAfx.h"
 #include "FilterList.h"
 #include "FileFilter.h"
-#include "FileFilterMgr.h"
 #include "FileFilterHelper.h"
 #include "Coretools.h"
 #include "paths.h"
@@ -35,31 +34,22 @@ using stl::vector;
 IDiffFilter transparentFileFilter;
 FileFilterHelper globalFileFilter;
 
-/** 
+/**
  * @brief Constructor, creates new filtermanager.
  */
 FileFilterHelper::FileFilterHelper()
 : m_pMaskFilter(new FilterList)
-, m_fileFilterMgr(new FileFilterMgr)
+, m_sGlobalFilterPath(GetModulePath() + _T("\\Filters"))
 , m_currentFilter(NULL)
 {
 }
 
-/** 
+/**
  * @brief Destructor, deletes filtermanager.
  */
 FileFilterHelper::~FileFilterHelper()
 {
-	delete m_fileFilterMgr;
 	delete m_pMaskFilter;
-}
-
-/** 
- * @brief Return filtermanager used.
- */
-FileFilterMgr * FileFilterHelper::GetManager() const
-{
-	return m_fileFilterMgr;
 }
 
 /**
@@ -74,7 +64,7 @@ void FileFilterHelper::SetFileFilterPath(LPCTSTR szFileFilterPath)
 	// Don't bother to lookup empty path
 	if (*szFileFilterPath)
 	{
-		m_currentFilter = m_fileFilterMgr->GetFilterByPath(szFileFilterPath);
+		m_currentFilter = GetFilterByPath(szFileFilterPath);
 	}
 	else
 	{
@@ -94,7 +84,7 @@ const stl::vector<FileFilter *> &FileFilterHelper::GetFileFilters(String & selec
 	{
 		selected = m_currentFilter->fullpath;
 	}
-	return m_fileFilterMgr->m_filters;
+	return m_filters;
 }
 
 /**
@@ -106,8 +96,8 @@ const stl::vector<FileFilter *> &FileFilterHelper::GetFileFilters(String & selec
 String FileFilterHelper::GetFileFilterName(LPCTSTR filterPath) const
 {
 	String name;
-	vector<FileFilter *>::const_iterator iter = m_fileFilterMgr->m_filters.begin();
-	while (iter != m_fileFilterMgr->m_filters.end())
+	vector<FileFilter *>::const_iterator iter = m_filters.begin();
+	while (iter != m_filters.end())
 	{
 		if ((*iter)->fullpath == filterPath)
 		{
@@ -119,7 +109,7 @@ String FileFilterHelper::GetFileFilterName(LPCTSTR filterPath) const
 	return name;
 }
 
-/** 
+/**
  * @brief Return path to filter with given name.
  * @param [in] filterName Name of filter.
  * @sa FileFilterHelper::GetFileFilterName()
@@ -127,8 +117,8 @@ String FileFilterHelper::GetFileFilterName(LPCTSTR filterPath) const
 String FileFilterHelper::GetFileFilterPath(LPCTSTR filterName) const
 {
 	String path;
-	vector<FileFilter *>::const_iterator iter = m_fileFilterMgr->m_filters.begin();
-	while (iter != m_fileFilterMgr->m_filters.end())
+	vector<FileFilter *>::const_iterator iter = m_filters.begin();
+	while (iter != m_filters.end())
 	{
 		if ((*iter)->name == filterName)
 		{
@@ -140,7 +130,7 @@ String FileFilterHelper::GetFileFilterPath(LPCTSTR filterName) const
 	return path;
 }
 
-/** 
+/**
  * @brief Set User's filter folder.
  * @param [in] filterPath Location of User's filters.
  */
@@ -149,7 +139,7 @@ void FileFilterHelper::SetUserFilterPath(LPCTSTR filterPath)
 	m_sUserSelFilterPath = paths_ConcatPath(filterPath, _T("Filters\\"));
 }
 
-/** 
+/**
  * @brief Set filemask for filtering.
  * @param [in] strMask Mask to set (e.g. *.cpp;*.h).
  */
@@ -238,17 +228,6 @@ int FileFilterHelper::collateDir(LPCTSTR p, LPCTSTR q)
 }
 
 /**
- * @brief Load in all filters in a folder.
- * @param [in] dir Folder from where to load filters.
- * @param [in] sPattern Wildcard defining files to add to map as filter files.
- *   It is filemask, for example, "*.flt"
- */
-void FileFilterHelper::LoadFileFilterDirPattern(LPCTSTR dir, LPCTSTR szPattern)
-{
-	m_fileFilterMgr->LoadFromDirectory(dir, szPattern);
-}
-
-/** 
  * @brief Convert user-given extension list to valid regular expression.
  * @param [in] Extension list/mask to convert to regular expression.
  * @return Regular expression that matches extension list.
@@ -300,7 +279,7 @@ String FileFilterHelper::ParseExtensions(const String &extensions) const
 	return strPattern;
 }
 
-/** 
+/**
  * @brief Returns active filter (or mask string)
  * @return The active filter.
  */
@@ -316,7 +295,7 @@ String FileFilterHelper::GetFilterNameOrMask() const
 	return sFilter;
 }
 
-/** 
+/**
  * @brief Set filter.
  *
  * Simple-to-use function to select filter. This function determines
@@ -345,7 +324,7 @@ void FileFilterHelper::SetFilter(const String &filter)
 	SetMask(flt.c_str());
 }
 
-/** 
+/**
  * @brief Reloads changed filter files
  *
  * Checks if filter file has been modified since it was last time
@@ -356,8 +335,8 @@ void FileFilterHelper::ReloadUpdatedFilters()
 {
 	DirItem fileInfo;
 
-	vector<FileFilter *>::const_iterator iter = m_fileFilterMgr->m_filters.begin();
-	while (iter != m_fileFilterMgr->m_filters.end())
+	vector<FileFilter *>::const_iterator iter = m_filters.begin();
+	while (iter != m_filters.end())
 	{
 		FileFilter *filter = *iter++;
 		String path = filter->fullpath;
@@ -366,7 +345,7 @@ void FileFilterHelper::ReloadUpdatedFilters()
 			fileInfo.size.int64 != filter->fileinfo.size.int64)
 		{
 			// Reload filter after changing it
-			if (FileFilter *relocatedFilter = m_fileFilterMgr->ReloadFilterFromDisk(filter))
+			if (FileFilter *relocatedFilter = ReloadFilterFromDisk(filter))
 			{
 				// If it was active filter we have to re-set it
 				if (m_currentFilter == filter)
@@ -383,14 +362,11 @@ void FileFilterHelper::ReloadUpdatedFilters()
 void FileFilterHelper::LoadAllFileFilters()
 {
 	// First delete existing filters
-	m_fileFilterMgr->DeleteAllFilters();
-
-	// Program application directory
-	m_sGlobalFilterPath = GetModulePath() + _T("\\Filters");
-	String pattern(_T("*"));
-	pattern += FileFilterExt;
-	LoadFileFilterDirPattern(m_sGlobalFilterPath.c_str(), pattern.c_str());
-	LoadFileFilterDirPattern(m_sUserSelFilterPath.c_str(), pattern.c_str());
+	DeleteAllFilters();
+	// Path for shared filters
+	LoadFromDirectory(m_sGlobalFilterPath.c_str(), FileFilterExt);
+	// Path for user's private filters
+	LoadFromDirectory(m_sUserSelFilterPath.c_str(), FileFilterExt);
 }
 
 /**
