@@ -5,10 +5,6 @@
  *
  * @date  Created: 2003-08-19
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-
 #include "StdAfx.h"
 #include "resource.h"
 #include "LanguageSelect.h"
@@ -60,10 +56,10 @@ static String ColFileNameGet(const CDiffContext *, const void *p) //sfilename
 	const DIFFITEM &di = *static_cast<const DIFFITEM*>(p);
 	return
 	(
-		di.left.filename.empty() ? di.right.filename :
-		di.right.filename.empty() ? di.left.filename :
-		di.left.filename == di.right.filename ? di.left.filename :
-		di.left.filename + _T("|") + di.right.filename
+		di.left.filename == di.right.filename ||
+		di.isSideLeftOnly() ? di.left.filename :
+		di.isSideRightOnly() ? di.right.filename :
+		di.left.filename + _T('|') + di.right.filename
 	);
 }
 
@@ -110,10 +106,10 @@ static String ColPathGet(const CDiffContext *, const void *p)
 	const DIFFITEM &di = *static_cast<const DIFFITEM*>(p);
 	return
 	(
-		di.left.path.empty() ? di.right.path :
-		di.right.path.empty() ? di.left.path :
-		di.left.path == di.right.path ? di.left.path :
-		di.left.path + _T("|") + di.right.path
+		di.left.path == di.right.path ||
+		di.isSideLeftOnly() ? di.left.path :
+		di.isSideRightOnly() ? di.right.path :
+		di.left.path + _T('|') + di.right.path
 	);
 }
 
