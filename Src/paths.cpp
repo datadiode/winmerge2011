@@ -328,6 +328,18 @@ String paths_GetParentPath(LPCTSTR path)
 }
 
 /**
+ * @brief Simple wrapper around WINAPI GetCurrentDirectory()
+ */
+CurrentDirectory::CurrentDirectory()
+{
+	if (DWORD cchDir = ::GetCurrentDirectory(0, NULL))
+	{
+		resize(cchDir - 1);
+		::GetCurrentDirectory(cchDir, &front());
+	}
+}
+
+/**
  * @brief paths_PathIsExe
  */
 bool paths_PathIsExe(LPCTSTR path)

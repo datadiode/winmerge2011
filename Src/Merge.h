@@ -70,8 +70,8 @@ public:
 
 	bool PreTranslateMessage(MSG *);
 
-	bool InitInstance();
-	int ExitInstance();
+	HRESULT InitInstance();
+	int ExitInstance(HRESULT);
 	int DoMessageBox(LPCTSTR lpszPrompt, UINT nType = MB_OK, UINT nIDPrompt = 0);
 
 	static void InitializeSupplements();

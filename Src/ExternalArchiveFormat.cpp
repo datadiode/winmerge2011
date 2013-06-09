@@ -53,20 +53,6 @@ static String SP2NBSP(LPCTSTR pszText, String::size_type nWidth = 120)
 	return strText;
 }
 
-/**
- * @brief Simple wrapper around WINAPI GetCurrentDirectory()
- */
-static String GetCurrentDirectory()
-{
-	String strDir;
-	if (DWORD cchDir = ::GetCurrentDirectory(0, NULL))
-	{
-		strDir.resize(cchDir - 1);
-		::GetCurrentDirectory(cchDir, &strDir.front());
-	}
-	return strDir;
-}
-
 CExternalArchiveFormat::Map CExternalArchiveFormat::m_map;
 
 /**
@@ -299,7 +285,7 @@ HRESULT CExternalArchiveFormat::DeCompressArchive(HWND, LPCTSTR path, LPCTSTR fo
 HRESULT CExternalArchiveFormat::CompressArchive(HWND, LPCTSTR path, Merge7z::DirItemEnumerator *etor)
 {
 	ShowConsoleWindow(m_nShowConsole);
-	String strRestoreDir = GetCurrentDirectory();
+	CurrentDirectory strRestoreDir;
 	int response = 0;
 	int nProcessed = 0;
 	String strDir;

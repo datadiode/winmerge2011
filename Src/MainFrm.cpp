@@ -27,6 +27,7 @@
 #include "StdAfx.h"
 #include "VSSHelper.h"
 #include "Merge.h"
+#include "../BuildTmp/Merge/midl/WinMerge_i.c"
 #define operator(args) args
 #include <htmlhelp.h>  // From HTMLHelp Workshop (incl. in Platform SDK)
 #include "Common/SettingStore.h"
@@ -73,7 +74,7 @@ using stl::vector;
 static char THIS_FILE[] = __FILE__;
 #endif
 
-static DWORD dwOsVer = GetVersion();
+static const DWORD dwOsVer = GetVersion();
 
 /**
  * @brief A table associating menuitem id, icon and menus to apply.
@@ -159,25 +160,6 @@ static int GetMenuBitmapExcessWidth()
  * @todo Preference for logging?
  */
 CMainFrame::CMainFrame(HWindow *pWnd, const MergeCmdLineInfo &cmdInfo)
-: m_pWndMDIClient(NULL)
-, m_hMenuDefault(NULL)
-, m_hAccelTable(NULL)
-, m_pCollectingDirFrame(NULL)
-, m_bFlashing(false)
-, m_bEscShutdown(false)
-, m_bClearCaseTool(false)
-, m_bExitIfNoDiff(MergeCmdLineInfo::Disabled)
-, m_bCheckinVCS(FALSE)
-, m_CheckOutMulti(FALSE)
-, m_bVssSuppressPathCheck(FALSE)
-, m_wndToolBar(NULL)
-, m_wndStatusBar(NULL)
-, m_wndTabBar(NULL)
-, m_pScriptMenu(NULL)
-, m_imlMenu(NULL)
-, m_imlToolbarEnabled(NULL)
-, m_imlToolbarDisabled(NULL)
-, m_sourceType(0)
 {
 	SubclassWindow(pWnd);
 
@@ -227,6 +209,10 @@ CMainFrame::CMainFrame(HWindow *pWnd, const MergeCmdLineInfo &cmdInfo)
 	// The main window has been initialized, so activate and update it.
 	InitialActivate(cmdInfo.m_nCmdShow);
 	UpdateWindow();
+
+	m_hrRegister = RegisterActiveObject(static_cast<IMergeApp *>(this),
+		IID_IMergeApp, ACTIVEOBJECT_STRONG, &m_dwRegister);
+
 	// Since this function actually opens paths for compare it must be
 	// called after initializing CMainFrame!
 	if (!ParseArgsAndDoOpen(cmdInfo))
@@ -237,6 +223,9 @@ CMainFrame::CMainFrame(HWindow *pWnd, const MergeCmdLineInfo &cmdInfo)
 
 CMainFrame::~CMainFrame()
 {
+	if (SUCCEEDED(m_hrRegister))
+		RevokeActiveObject(m_dwRegister, NULL);
+
 	// Stop handling status messages from CustomStatusCursors
 	WaitStatusCursor::SetCursor(NULL);
 
@@ -281,7 +270,6 @@ HRESULT CMainFrame::put_StatusText(BSTR bsStatusText)
 		string_format text(_T("%ls (%s)"), bsStatusText,
 			static_cast<LPCTSTR>(LanguageSelect.Format(IDS_ELAPSED_TIME, elapsed)));
 		pWnd->SetWindowText(text.c_str());
-		//pWndOwner->UpdateWindow();
 	}
 	if (::GetAsyncKeyState(VK_PAUSE) & 0x8001)
 	{
@@ -346,6 +334,29 @@ HRESULT CMainFrame::ShowHTMLDialog(BSTR url, VARIANT *arguments, BSTR features, 
 	else if (!EatPrefix(url, L"print_template:"))
 		return E_INVALIDARG;
 	return MSHTML->ShowHTMLDialogEx(m_hWnd, spMoniker, flags, arguments, features, ret);
+}
+
+/**
+ * @brief Receive command line from another instance.
+ *
+ * This function receives command line when only single-instance
+ * is allowed. New instance tried to start sends its command line
+ * to here so we can open paths it was meant to.
+ */
+HRESULT CMainFrame::ParseCmdLine(BSTR cmdline, BSTR directory)
+{
+	// Restore main window if minimized
+	if (IsIconic())
+		ShowWindow(SW_RESTORE);
+	// Move to foreground
+	GetLastActivePopup()->SetForegroundWindow();
+	// Set current directory if specified
+	if (SysStringLen(directory) != 0)
+		SetCurrentDirectory(directory);
+	// Process command line if specified
+	if (SysStringLen(cmdline) != 0)
+		ParseArgsAndDoOpen(cmdline);
+	return S_OK;
 }
 
 void CMainFrame::LoadFilesMRU()
@@ -1062,17 +1073,16 @@ static void FileLocationGuessEncodings(FileLocation &fileloc, bool bGuessEncodin
 /**
  * @brief Creates new MergeDoc instance and shows documents.
  * @param [in] pDirDoc Dir compare document to create a new Merge document for.
- * @param [in] ifilelocLeft Left side file location info.
- * @param [in] ifilelocRight Right side file location info.
+ * @param [in] filelocLeft Left side file location info.
+ * @param [in] filelocRight Right side file location info.
  * @param [in] dwLeftFlags Left side flags.
  * @param [in] dwRightFlags Right side flags.
  * @param [in] infoUnpacker Plugin info.
  * @return OPENRESULTS_TYPE for success/failure code.
  */
 void CMainFrame::ShowMergeDoc(CDirFrame *pDirDoc,
-	FileLocation & filelocLeft, FileLocation & filelocRight,
-	DWORD dwLeftFlags /*=0*/, DWORD dwRightFlags /*=0*/,
-	PackingInfo * infoUnpacker /*= NULL*/)
+	FileLocation &filelocLeft, FileLocation &filelocRight,
+	DWORD dwLeftFlags, DWORD dwRightFlags, PackingInfo *infoUnpacker)
 {
 	// detect codepage
 	bool bGuessEncoding = COptionsMgr::Get(OPT_CP_DETECT);
@@ -2703,7 +2713,7 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 			switch (pMsg->wParam)
 			{
 			case VK_ESCAPE:
-				if (m_bEscShutdown)
+				if (m_bEscShutdown && m_pCollectingDirFrame == NULL)
 				{
 					PostMessage(WM_SYSCOMMAND, SC_CLOSE);
 					return TRUE;
@@ -2883,35 +2893,6 @@ void CMainFrame::OnFileOpenProject()
 	LoadAndOpenProjectFile(sFilepath.c_str());
 }
 
-/**
- * @brief Receive command line from another instance.
- *
- * This function receives command line when only single-instance
- * is allowed. New instance tried to start sends its command line
- * to here so we can open paths it was meant to.
- */
-template<>
-LRESULT CMainFrame::OnWndMsg<WM_COPYDATA>(WPARAM, LPARAM lParam)
-{
-	COPYDATASTRUCT *const pcds = reinterpret_cast<COPYDATASTRUCT *>(lParam);
-	LPCTSTR pchData = reinterpret_cast<LPCTSTR>(pcds->lpData);
-	// Bail out if data isn't zero-terminated
-	DWORD cchData = pcds->cbData / sizeof(TCHAR);
-	if (cchData == 0 || pchData[cchData - 1] != _T('\0'))
-		return FALSE;
-	switch (pcds->dwData)
-	{
-	case 0:
-		// Process command line
-		ParseArgsAndDoOpen(pchData);
-		break;
-	case 1:
-		SetCurrentDirectory(pchData);
-		break;
-	}
-	return TRUE;
-}
-
 /** @brief Read command line arguments and open files for comparison.
  *
  * The name of the function is a legacy code from the time that this function
@@ -2968,15 +2949,6 @@ bool CMainFrame::ParseArgsAndDoOpen(const MergeCmdLineInfo &cmdInfo)
 				if (!m_pCollectingDirFrame ||
 					!m_pCollectingDirFrame->AddToCollection(filelocLeft, filelocRight))
 				{
-					// Allow calling thread to resume in case command line was
-					// received through WM_COPYDATA. This is to cope with file
-					// transforms which involve out-of-process COM servers.
-					// NB: Collect mode must be handled prior to ReplyMessage(),
-					// because it may need to copy temporary files provided by
-					// the caller to WinMerge's own temporary folder to prevent
-					// them from vanishing unexpectedly.
-					ReplyMessage(TRUE);
-
 					if (cmdInfo.m_Files.size() > 2)
 						m_strSaveAsPath = cmdInfo.m_Files[2].c_str();
 
@@ -3451,8 +3423,6 @@ LRESULT CMainFrame::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		if (WaitStatusCursor::SetCursor(this))
 			return TRUE;
 		break;
-	case WM_COPYDATA:
-		return OnWndMsg<WM_COPYDATA>(wParam, lParam);
 	case WM_TIMER:
 		OnWndMsg<WM_TIMER>(wParam, lParam);
 		break;
@@ -3709,11 +3679,11 @@ bool CMainFrame::DoOpenConflict(LPCTSTR conflictFile)
 	filelocLeft.description = LanguageSelect.LoadString(IDS_CONFLICT_THEIRS_FILE);
 	filelocRight.filepath = env_GetTempFileName(env_GetTempPath(), _T("confw_"));
 	filelocRight.description = LanguageSelect.LoadString(IDS_CONFLICT_MINE_FILE);
-	bool inners;
+	bool nestedConflicts;
 	if (ParseConflictFile(conflictFile,
 			filelocRight.filepath.c_str(),
 			filelocLeft.filepath.c_str(),
-			inners))
+			nestedConflicts))
 	{
 		// Open two parsed files to WinMerge, telling WinMerge to
 		// save over original file (given as third filename).

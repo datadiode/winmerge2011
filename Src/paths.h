@@ -31,6 +31,9 @@ BOOL paths_IsShortcut(LPCTSTR);
 String ExpandShortcut(LPCTSTR);
 String paths_ConcatPath(const String &, const String &);
 String paths_GetParentPath(LPCTSTR);
+
+struct CurrentDirectory: String { CurrentDirectory(); };
+
 bool paths_PathIsExe(LPCTSTR);
 void paths_CompactPath(HEdit *, String &);
 

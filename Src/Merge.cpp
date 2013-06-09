@@ -153,7 +153,7 @@ CMergeApp theApp;
  * @todo We could handle these failure situations more gratefully, i.e. show
  *  at least some error message to the user..
  */
-bool CMergeApp::InitInstance()
+HRESULT CMergeApp::InitInstance()
 {
 #ifndef SetDllDirectory
 #error #define WINVER 0x0502 to include the definition of SetDllDirectory
@@ -200,9 +200,13 @@ bool CMergeApp::InitInstance()
 	if (hMutex)
 		WaitForSingleObject(hMutex, INFINITE);
 
-	bool bContinue = false;
+	HRESULT hr = E_FAIL;
 	try
 	{
+		// Drag and Drop functionality needs OleInitialize
+		OException::Check(CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE));
+		OException::Check(OleInitialize(NULL));
+
 		CRegKeyEx loadkey = SettingStore.GetAppRegistryKey();
 		IOptionDef::InitOptions(loadkey, NULL);
 
@@ -224,73 +228,61 @@ bool CMergeApp::InitInstance()
 			!(cmdInfo.m_bClearCaseTool && cmdInfo.m_bEscShutdown) &&
 			(cmdInfo.m_bSingleInstance || COptionsMgr::Get(OPT_SINGLE_INSTANCE)))
 		{
-			// Activate previous instance and send commandline to it
-			if (HWindow *pWnd = HWindow::FindWindow(WinMergeWindowClass))
-			{
-				if (pWnd->IsIconic())
-					pWnd->ShowWindow(SW_RESTORE);
-				pWnd->GetLastActivePopup()->SetForegroundWindow();
-				COPYDATASTRUCT data;
-				if (DWORD cchData = GetCurrentDirectory(0, NULL))
-				{
-					data.dwData = 1;
-					data.cbData = cchData * sizeof(TCHAR);
-					data.lpData = _alloca(data.cbData);
-					GetCurrentDirectory(cchData, static_cast<LPTSTR>(data.lpData));
-					pWnd->SendMessage(WM_COPYDATA, NULL, reinterpret_cast<LPARAM>(&data));
-				}
-				LPTSTR cmdLine = GetCommandLine();
-				data.dwData = 0;
-				data.cbData = (lstrlen(cmdLine) + 1) * sizeof(TCHAR);
-				data.lpData = cmdLine;
-				if (pWnd->SendMessage(WM_COPYDATA, NULL, reinterpret_cast<LPARAM>(&data)))
-					OException::ThrowSilent();
-			}
+			// Send commandline to previous instance
+			CMyComPtr<IUnknown> spUnknown;
+			OException::Check(GetActiveObject(IID_IMergeApp, NULL, &spUnknown));
+			CMyComPtr<IDispatch> spDispatch;
+			OException::Check(spUnknown->QueryInterface(&spDispatch));
+			OException::Check(CoAllowSetForegroundWindow(spDispatch, NULL));
+			CMyDispId DispId;
+			OException::Check(DispId.Init(spDispatch, L"ParseCmdLine"));
+			OException::Check(DispId.Call(spDispatch, CMyDispParams<2>().Unnamed
+				[GetCommandLine()][CurrentDirectory().c_str()]));
+
+			hr = S_FALSE;
 		}
-
-		// Cleanup left over tempfiles from previous instances.
-		// Normally this should not neet to do anything - but if for some reason
-		// WinMerge did not delete temp files this makes sure they are removed.
-		CleanupWMtemp();
-
-		// Drag and Drop functionality needs OleInitialize
-		OException::Check(CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE));
-		OException::Check(OleInitialize(NULL));
-
-		// Locate the supplement folder and read the Supplement.ini
-		InitializeSupplements();
-		// Load file filters from both program and supplement folder
-		globalFileFilter.LoadAllFileFilters();
-		// Read last used filter from registry
-		globalFileFilter.SetFilter(COptionsMgr::Get(OPT_FILEFILTER_CURRENT));
-
-		// Initialize i18n (multiple language) support
-		LanguageSelect.InitializeLanguage();
-
-		// Register the main window class. 
-		const WNDCLASS wc =
+		else
 		{
-			CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS,
-			::DefWindowProc, 0, 0, NULL, NULL,
-			::LoadCursor(NULL, IDC_ARROW),
-			::GetSysColorBrush(COLOR_BTNFACE),
-			NULL, WinMergeWindowClass
-		};
-		::RegisterClass(&wc);
+			// Cleanup left over tempfiles from previous instances. Normally
+			// this should do nothing. But if for some reason WinMerge missed
+			// to delete temp files this makes sure they are removed.
+			CleanupWMtemp();
 
-		// create main MDI Frame window
-		HWindow *const pWndMainFrame = HWindow::CreateEx(
-			WS_EX_ACCEPTFILES, WinMergeWindowClass, _T("WinMerge"),
-			WS_OVERLAPPEDWINDOW,
-			CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-			NULL, NULL);
-		if (pWndMainFrame == NULL)
-			OException::Throw(GetLastError());
+			// Locate the supplement folder and read the Supplement.ini
+			InitializeSupplements();
+			// Load file filters from both program and supplement folder
+			globalFileFilter.LoadAllFileFilters();
+			// Read last used filter from registry
+			globalFileFilter.SetFilter(COptionsMgr::Get(OPT_FILEFILTER_CURRENT));
 
-		// subclass the window
-		new CMainFrame(pWndMainFrame, cmdInfo);
+			// Initialize i18n (multiple language) support
+			LanguageSelect.InitializeLanguage();
 
-		bContinue = true;
+			// Register the main window class. 
+			const WNDCLASS wc =
+			{
+				CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS,
+				::DefWindowProc, 0, 0, NULL, NULL,
+				::LoadCursor(NULL, IDC_ARROW),
+				::GetSysColorBrush(COLOR_BTNFACE),
+				NULL, WinMergeWindowClass
+			};
+			::RegisterClass(&wc);
+
+			// create main MDI Frame window
+			HWindow *const pWndMainFrame = HWindow::CreateEx(
+				WS_EX_ACCEPTFILES, WinMergeWindowClass, _T("WinMerge"),
+				WS_OVERLAPPEDWINDOW,
+				CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+				NULL, NULL);
+			if (pWndMainFrame == NULL)
+				OException::Throw(GetLastError());
+
+			// subclass the window
+			new CMainFrame(pWndMainFrame, cmdInfo);
+
+			hr = S_OK;
+		}
 	}
 	catch (OException *e)
 	{
@@ -301,7 +293,7 @@ bool CMergeApp::InitInstance()
 	if (hMutex)
 		ReleaseMutex(hMutex);
 
-	return bContinue;
+	return hr;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -313,17 +305,20 @@ bool CMergeApp::InitInstance()
  * good place to do cleanups.
  * @return Application's exit value (returned from WinMain()).
  */
-int CMergeApp::ExitInstance() 
+int CMergeApp::ExitInstance(HRESULT hr)
 {
-	// Deallocate custom parser associations
-	CCrystalTextView::FreeParserAssociations();
-	charsets_cleanup();
-	// Remove tempfolder
-	ClearTempfolder(env_GetTempPath());
+	if (hr == S_OK)
+	{
+		// Deallocate custom parser associations
+		CCrystalTextView::FreeParserAssociations();
+		charsets_cleanup();
+		// Remove tempfolder
+		ClearTempfolder(env_GetTempPath());
+	}
 	// Stay balanced
 	OleUninitialize();
 	CoUninitialize();
-	return 0;
+	return FAILED(hr);
 }
 
 int CMergeApp::DoMessageBox(LPCTSTR lpszPrompt, UINT nType, UINT nIDPrompt)
@@ -660,9 +655,9 @@ void LogErrorString(LPCTSTR sz)
 
 int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR lpCmdLine, int nCmdShow)
 {
-	int nExitCode = 1;
 	theApp.m_hInstance = hInstance;
-	if (theApp.InitInstance())
+	HRESULT hr = theApp.InitInstance();
+	if (hr == S_OK)
 	{
 		MSG msg;
 		while (GetMessage(&msg, NULL, 0, 0))
@@ -672,8 +667,8 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR lpCmdLine, int nCmdS
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
-		nExitCode = theApp.ExitInstance();
 	}
+	int nExitCode = theApp.ExitInstance(hr);
 #ifdef _DEBUG
 	_strdup("INTENTIONAL LEAK");
 	_cexit();

@@ -51,7 +51,8 @@ class CLanguageSelect;
  * @brief Frame class containing save-routines etc
  */
 class CMainFrame
-	: public OWindow
+	: public ZeroInit<CMainFrame>
+	, public OWindow
 	, public IStatusDisplay
 	, public CScriptable<IMergeApp>
 {
@@ -66,6 +67,7 @@ public:
 	STDMETHOD(get_StatusText)(BSTR *pbsStatusText);
 	STDMETHOD(get_Strings)(IDispatch **ppDispatch);
 	STDMETHOD(ShowHTMLDialog)(BSTR url, VARIANT *arguments, BSTR features, VARIANT *ret);
+	STDMETHOD(ParseCmdLine)(BSTR cmdline, BSTR directory);
 
 // Attributes
 public:
@@ -323,6 +325,8 @@ private:
 		BYTE NavigateBookmarks;
 		const BYTE *Lookup(UINT id) const;
 	} m_cmdState;
+	HRESULT m_hrRegister;
+	DWORD m_dwRegister;
 	UINT m_sourceType;
 };
 
