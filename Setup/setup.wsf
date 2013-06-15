@@ -395,6 +395,8 @@ Sub Apply
 			End If
 		End If
 	Next
+	' Write executable path to HKCU as well because TortoiseHg reads it from there
+	sh.RegWrite "HKCU\Software\Thingamahoochie\WinMerge\Executable", sProgFolder & "\WinMergeU.exe"
 	If maintenance.disabled Then
 		sh.RegWrite "HKCR\.WinMerge\", "WinMerge.Project.File"
 		sh.RegWrite "HKCR\WinMerge.Project.File\", "WinMerge Project File"
