@@ -84,12 +84,12 @@ String NTAPI GetClearTempPath(LPVOID pOwner, LPCTSTR pchExt)
 {
 	string_format strPath
 	(
-		pOwner ? _T("%s\\%p.7z%s") : _T("%s"),
+		pOwner ? _T("%s\\%p.7z%s\\") : _T("%s\\"),
 		env_GetTempPath(), pOwner, pchExt
 	);
 	// SHFileOperation expects a ZZ terminated list of paths!
-	String::size_type len = strPath.size();
-	strPath.resize(len + 1);
+	String::size_type backslash = strPath.size() - 1;
+	strPath[backslash] = _T('\0');
 	SHFILEOPSTRUCT fileop =
 	{
 		0, FO_DELETE, &strPath.front(), 0,
@@ -97,7 +97,7 @@ String NTAPI GetClearTempPath(LPVOID pOwner, LPCTSTR pchExt)
 		0, 0, 0
 	};
 	SHFileOperation(&fileop);
-	strPath.resize(len);
+	strPath[backslash] = _T('\\');
 	return strPath;
 }
 

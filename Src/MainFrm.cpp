@@ -345,6 +345,7 @@ HRESULT CMainFrame::ShowHTMLDialog(BSTR url, VARIANT *arguments, BSTR features, 
  */
 HRESULT CMainFrame::ParseCmdLine(BSTR cmdline, BSTR directory)
 {
+	CurrentDirectory strRestoreDir;
 	// Restore main window if minimized
 	if (IsIconic())
 		ShowWindow(SW_RESTORE);
@@ -356,6 +357,7 @@ HRESULT CMainFrame::ParseCmdLine(BSTR cmdline, BSTR directory)
 	// Process command line if specified
 	if (SysStringLen(cmdline) != 0)
 		ParseArgsAndDoOpen(cmdline);
+	SetCurrentDirectory(strRestoreDir.c_str());
 	return S_OK;
 }
 
@@ -1510,7 +1512,6 @@ bool CMainFrame::DoFileOpen(
 						}
 						SysFreeString(Assign(filelocLeft.filepath,
 							piHandler->GetDefaultName(m_hWnd, filelocLeft.filepath.c_str())));
-						filelocLeft.filepath.insert(0U, 1, _T('\\'));
 						filelocLeft.filepath.insert(0U, path);
 					} while (piHandler = ArchiveGuessFormat(filelocLeft.filepath.c_str()));
 					filelocLeft.filepath = path;
@@ -1529,7 +1530,6 @@ bool CMainFrame::DoFileOpen(
 							}
 							SysFreeString(Assign(filelocRight.filepath,
 								piHandler->GetDefaultName(m_hWnd, filelocRight.filepath.c_str())));
-							filelocRight.filepath.insert(0U, 1, _T('\\'));
 							filelocRight.filepath.insert(0U, path);
 						} while (piHandler = ArchiveGuessFormat(filelocRight.filepath.c_str()));
 						filelocRight.filepath = path;
@@ -1538,8 +1538,8 @@ bool CMainFrame::DoFileOpen(
 					{
 						// assume Perry style patch
 						filelocRight.filepath = path;
-						filelocLeft.filepath += _T("\\ORIGINAL\\");
-						filelocRight.filepath += _T("\\ALTERED\\");
+						filelocLeft.filepath += _T("ORIGINAL\\");
+						filelocRight.filepath += _T("ALTERED\\");
 						if (GetPairComparability(filelocLeft.filepath.c_str(), filelocRight.filepath.c_str()) != IS_EXISTING_DIR)
 						{
 							// not a Perry style patch: diff with itself...
@@ -1573,7 +1573,6 @@ bool CMainFrame::DoFileOpen(
 						}
 						SysFreeString(Assign(filelocLeft.filepath,
 							piHandler->GetDefaultName(m_hWnd, filelocLeft.filepath.c_str())));
-						filelocLeft.filepath.insert(0U, 1, _T('\\'));
 						filelocLeft.filepath.insert(0U, path);
 					} while (piHandler = ArchiveGuessFormat(filelocLeft.filepath.c_str()));
 					filelocLeft.filepath = path;
@@ -1599,7 +1598,6 @@ bool CMainFrame::DoFileOpen(
 						}
 						SysFreeString(Assign(filelocRight.filepath,
 							piHandler->GetDefaultName(m_hWnd, filelocRight.filepath.c_str())));
-						filelocRight.filepath.insert(0U, 1, _T('\\'));
 						filelocRight.filepath.insert(0U, path);
 					} while (piHandler = ArchiveGuessFormat(filelocRight.filepath.c_str()));
 					filelocRight.filepath = path;
