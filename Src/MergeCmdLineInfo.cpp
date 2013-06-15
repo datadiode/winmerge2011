@@ -112,8 +112,7 @@ LPCTSTR MergeCmdLineInfo::SetOption(LPCTSTR q, IOptionDef &opt, LPCTSTR value) c
 MergeCmdLineInfo::MergeCmdLineInfo(LPCTSTR q):
 	m_nCmdShow(SW_SHOWNORMAL),
 	m_sOptionChars(_T("/-")),
-	m_bClearCaseTool(false),
-	m_bEscShutdown(false),
+	m_invocationMode(InvocationModeNone),
 	m_bExitIfNoDiff(Disabled),
 	m_nRecursive(0),
 	m_bNonInteractive(false),
@@ -161,7 +160,7 @@ void MergeCmdLineInfo::ParseClearCaseCmdLine(LPCTSTR q, LPCTSTR basedesc)
 	String sBaseFile;  /**< Base file path. */
 	String sBaseDesc = basedesc;  /**< Base file description. */
 	String sOutFile;   /**< Out file path. */
-	m_bClearCaseTool = true;
+	m_invocationMode = InvocationModeCompareTool;
 	String param;
 	bool flag;
 	while ((q = EatParam(q, param, &flag)) != 0)
@@ -211,7 +210,7 @@ void MergeCmdLineInfo::ParseClearCaseCmdLine(LPCTSTR q, LPCTSTR basedesc)
 	}
 	if (!sOutFile.empty())
 	{
-		m_bEscShutdown = true;
+		m_invocationMode = InvocationModeMergeTool;
 		String path = paths_GetLongPath(sOutFile.c_str());
 		m_Files.push_back(path);
 	}
@@ -279,7 +278,7 @@ void MergeCmdLineInfo::ParseWinMergeCmdLine(LPCTSTR q)
 		else if (param == _T("e"))
 		{
 			// -e to allow closing with single esc press
-			m_bEscShutdown = true;
+			m_invocationMode = InvocationModeEscShutdown;
 		}
 		else if (param == _T("f"))
 		{
@@ -409,8 +408,4 @@ void MergeCmdLineInfo::ParseWinMergeCmdLine(LPCTSTR q)
 			m_Files[1] = paths_ConcatPath(m_Files[1], PathFindFileName(m_Files[0].c_str()));
 		}
 	}*/
-	if (m_bShowUsage)
-	{
-		m_bNonInteractive = false;
-	}
 }

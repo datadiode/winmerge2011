@@ -159,8 +159,7 @@ public:
 	String m_strSaveAsPath; /**< "3rd path" where output saved if given */
 	VSSHelper m_vssHelper; /**< Helper class for VSS integration */
 	bool m_bFlashing; /**< Window is flashing. */
-	bool m_bEscShutdown; /**< If commandline switch -e given ESC closes appliction */
-	bool m_bClearCaseTool; /**< WinMerge is executed as an external Rational ClearCase compare/merge tool. */
+	MergeCmdLineInfo::InvocationMode m_invocationMode;
 	MergeCmdLineInfo::ExitNoDiff m_bExitIfNoDiff; /**< Exit if files are identical? */
 
 	/**

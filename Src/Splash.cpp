@@ -122,7 +122,7 @@ LRESULT CSplashWnd::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_MDIACTIVATE:
 		// Don't surprise user by closing a wrong DocFrame.
-		theApp.m_pMainWnd->m_bClearCaseTool = false;
+		theApp.m_pMainWnd->m_invocationMode = MergeCmdLineInfo::InvocationModeNone;
 		fMaximized = FALSE;
 		if (OWindow::WindowProc(WM_MDIGETACTIVE, 0, (LPARAM)&fMaximized) == 0)
 			break;

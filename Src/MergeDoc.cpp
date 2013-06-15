@@ -2264,7 +2264,7 @@ void CChildFrame::OnFileEncoding()
 String CChildFrame::GetFileExt(LPCTSTR sFileName, LPCTSTR sDescription)
 {
 	String sExt = PathFindExtension(sFileName);
-	if (m_pMDIFrame->m_bClearCaseTool && sExt.empty())
+	if (sExt.empty())
 	{
 		if (LPCTSTR atat = _tcsstr(sFileName, _T("@@")))
 		{

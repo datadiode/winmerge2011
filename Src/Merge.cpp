@@ -221,11 +221,11 @@ HRESULT CMergeApp::InitInstance()
 
 		// Parse command-line arguments.
 		MergeCmdLineInfo cmdInfo = GetCommandLine();
-		// If cmdInfo.m_bClearCaseTool coincides with cmdInfo.m_bEscShutdown,
-		// then ClearCase waits for the process to produce an output file and
+		// If cmdInfo.m_invocationMode equals InvocationModeMergeTool, then
+		// ClearCase waits for the process to produce an output file and
 		// terminate, in which case single instance logic is not applicable.
 		if (dwMutex == ERROR_ALREADY_EXISTS &&
-			!(cmdInfo.m_bClearCaseTool && cmdInfo.m_bEscShutdown) &&
+			cmdInfo.m_invocationMode != MergeCmdLineInfo::InvocationModeMergeTool &&
 			(cmdInfo.m_bSingleInstance || COptionsMgr::Get(OPT_SINGLE_INSTANCE)))
 		{
 			// Send commandline to previous instance
@@ -233,7 +233,7 @@ HRESULT CMergeApp::InitInstance()
 			OException::Check(GetActiveObject(IID_IMergeApp, NULL, &spUnknown));
 			CMyComPtr<IDispatch> spDispatch;
 			OException::Check(spUnknown->QueryInterface(&spDispatch));
-			OException::Check(CoAllowSetForegroundWindow(spDispatch, NULL));
+			CoAllowSetForegroundWindow(spDispatch, NULL);
 			CMyDispId DispId;
 			OException::Check(DispId.Init(spDispatch, L"ParseCmdLine"));
 			OException::Check(DispId.Call(spDispatch, CMyDispParams<2>().Unnamed

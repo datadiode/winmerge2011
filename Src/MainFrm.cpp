@@ -2711,23 +2711,18 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 			switch (pMsg->wParam)
 			{
 			case VK_ESCAPE:
-				if (m_bEscShutdown && m_pCollectingDirFrame == NULL)
-				{
-					PostMessage(WM_SYSCOMMAND, SC_CLOSE);
-					return TRUE;
-				}
-				if (m_bClearCaseTool)
+				if (m_invocationMode != MergeCmdLineInfo::InvocationModeNone)
 				{
 					// Close DocFrame, then move MainFrame out of the way.
 					if (pDocFrame)
 						pDocFrame->SendMessage(WM_CLOSE);
 					CDocFrame *const pActiveDocFrame = GetActiveDocFrame();
-					if (pActiveDocFrame != pDocFrame && m_pCollectingDirFrame == NULL)
+					if (pActiveDocFrame != pDocFrame)
 					{
 						PostMessage(WM_SYSCOMMAND,
 							pActiveDocFrame || COptionsMgr::Get(OPT_SINGLE_INSTANCE) ?
 							SC_PREVWINDOW : SC_CLOSE);
-						m_bClearCaseTool = false;
+						m_invocationMode = MergeCmdLineInfo::InvocationModeNone;
 					}
 					return TRUE;
 				}
@@ -2902,7 +2897,14 @@ void CMainFrame::OnFileOpenProject()
  */
 bool CMainFrame::ParseArgsAndDoOpen(const MergeCmdLineInfo &cmdInfo)
 {
-	bool bCompared = true;
+	// Unless the user has requested to see WinMerge's usage open files for
+	// comparison.
+	if (cmdInfo.m_bShowUsage)
+	{
+		ShowHelp(CommandLineHelpLocation);
+		return true;
+	}
+
 	theApp.m_bNonInteractive = cmdInfo.m_bNonInteractive;
 
 	// Set the global file filter.
@@ -2913,81 +2915,72 @@ bool CMainFrame::ParseArgsAndDoOpen(const MergeCmdLineInfo &cmdInfo)
 	if (cmdInfo.m_nCodepage)
 		updateDefaultCodepage(2, cmdInfo.m_nCodepage);
 
-	// Unless the user has requested to see WinMerge's usage open files for
-	// comparison.
-	if (cmdInfo.m_bShowUsage)
+	bool bCompared = true;
+	// Set the required information we need from the command line:
+
+	m_invocationMode = cmdInfo.m_invocationMode;
+	m_bExitIfNoDiff = cmdInfo.m_bExitIfNoDiff;
+
+	m_strSaveAsPath.clear();
+
+	FileLocation filelocLeft, filelocRight;
+	filelocLeft.description = cmdInfo.m_sLeftDesc;
+	filelocRight.description = cmdInfo.m_sRightDesc;
+
+	if (cmdInfo.m_Files.size() == 0) // if there are no input args, we can check the display file dialog flag
 	{
-		ShowHelp(CommandLineHelpLocation);
+		if (COptionsMgr::Get(OPT_SHOW_SELECT_FILES_AT_STARTUP))
+			DoFileOpen(filelocLeft, filelocRight);
 	}
 	else
 	{
-		// Set the required information we need from the command line:
-
-		m_bClearCaseTool = cmdInfo.m_bClearCaseTool;
-		m_bExitIfNoDiff = cmdInfo.m_bExitIfNoDiff;
-		m_bEscShutdown = cmdInfo.m_bEscShutdown;
-
-		m_strSaveAsPath.clear();
-
-		FileLocation filelocLeft, filelocRight;
-		filelocLeft.description = cmdInfo.m_sLeftDesc;
-		filelocRight.description = cmdInfo.m_sRightDesc;
-
-		if (cmdInfo.m_Files.size() == 0) // if there are no input args, we can check the display file dialog flag
+		filelocLeft.filepath = cmdInfo.m_Files[0];
+		if (cmdInfo.m_Files.size() > 1)
 		{
-			if (COptionsMgr::Get(OPT_SHOW_SELECT_FILES_AT_STARTUP))
-				DoFileOpen(filelocLeft, filelocRight);
-		}
-		else
-		{
-			filelocLeft.filepath = cmdInfo.m_Files[0];
-			if (cmdInfo.m_Files.size() > 1)
+			filelocRight.filepath = cmdInfo.m_Files[1];
+			if (!m_pCollectingDirFrame ||
+				!m_pCollectingDirFrame->AddToCollection(filelocLeft, filelocRight))
 			{
-				filelocRight.filepath = cmdInfo.m_Files[1];
-				if (!m_pCollectingDirFrame ||
-					!m_pCollectingDirFrame->AddToCollection(filelocLeft, filelocRight))
-				{
-					if (cmdInfo.m_Files.size() > 2)
-						m_strSaveAsPath = cmdInfo.m_Files[2].c_str();
+				if (cmdInfo.m_Files.size() > 2)
+					m_strSaveAsPath = cmdInfo.m_Files[2].c_str();
 
-					// If content type was specified, set up things accordingly.
-					UINT idCompareAs = 0;
-					PackingInfo packingInfo;
-					if (cmdInfo.m_sContentType == _T("text"))
-						idCompareAs = ID_MERGE_COMPARE_TEXT;
-					else if (cmdInfo.m_sContentType == _T("binary"))
-						idCompareAs = ID_MERGE_COMPARE_HEX;
-					else if (cmdInfo.m_sContentType == _T("archive"))
-						idCompareAs = ID_MERGE_COMPARE_ZIP;
-					else if (cmdInfo.m_sContentType == _T("xml"))
-						packingInfo.SetXML();
-					else if (!cmdInfo.m_sContentType.empty())
-						packingInfo.SetPlugin(cmdInfo.m_sContentType.c_str());
-					else
-						idCompareAs = ID_MERGE_COMPARE;
+				// If content type was specified, set up things accordingly.
+				UINT idCompareAs = 0;
+				PackingInfo packingInfo;
+				if (cmdInfo.m_sContentType == _T("text"))
+					idCompareAs = ID_MERGE_COMPARE_TEXT;
+				else if (cmdInfo.m_sContentType == _T("binary"))
+					idCompareAs = ID_MERGE_COMPARE_HEX;
+				else if (cmdInfo.m_sContentType == _T("archive"))
+					idCompareAs = ID_MERGE_COMPARE_ZIP;
+				else if (cmdInfo.m_sContentType == _T("xml"))
+					packingInfo.SetXML();
+				else if (!cmdInfo.m_sContentType.empty())
+					packingInfo.SetPlugin(cmdInfo.m_sContentType.c_str());
+				else
+					idCompareAs = ID_MERGE_COMPARE;
 
-					bCompared = DoFileOpen(
-						packingInfo, idCompareAs,
-						filelocLeft, filelocRight,
-						cmdInfo.m_dwLeftFlags, cmdInfo.m_dwRightFlags,
-						cmdInfo.m_nRecursive);
-				}
-			}
-			else if (ProjectFile::IsProjectFile(filelocLeft.filepath.c_str()))
-			{
-				bCompared = LoadAndOpenProjectFile(filelocLeft.filepath.c_str());
-			}
-			else if (IsConflictFile(filelocLeft.filepath.c_str()))
-			{
-				bCompared = DoOpenConflict(filelocLeft.filepath.c_str());
-			}
-			else
-			{
 				bCompared = DoFileOpen(
+					packingInfo, idCompareAs,
 					filelocLeft, filelocRight,
 					cmdInfo.m_dwLeftFlags, cmdInfo.m_dwRightFlags,
 					cmdInfo.m_nRecursive);
 			}
+		}
+		else if (ProjectFile::IsProjectFile(filelocLeft.filepath.c_str()))
+		{
+			bCompared = LoadAndOpenProjectFile(filelocLeft.filepath.c_str());
+		}
+		else if (IsConflictFile(filelocLeft.filepath.c_str()))
+		{
+			bCompared = DoOpenConflict(filelocLeft.filepath.c_str());
+		}
+		else
+		{
+			bCompared = DoFileOpen(
+				filelocLeft, filelocRight,
+				cmdInfo.m_dwLeftFlags, cmdInfo.m_dwRightFlags,
+				cmdInfo.m_nRecursive);
 		}
 	}
 	return bCompared && !cmdInfo.m_bNonInteractive;
