@@ -1,3 +1,25 @@
+0.2011.003.247
+Changes since preceding release (not necessarily complete):
+• Folder compare: Failed to update item after edit when temp folder was involved
+• Single-instance logic: Communicate through COM rather than WM_COPYDATA
+• LocationView: Preserve active pane when user clicks outside bars
+• LocationView: Fix disabling of "Goto Line" context menu command
+• "Collect mode" adds items passed in through command line to existing DirView
+• Use a mutex to protect temp folder against deletion by other program instances
+• Allow to set up command line archive tools through ExternalArchiveFormat.ini
+• 7zCommon: Zip command from DirView context menu neglected files at root level
+• DirView: Enable "Compare As" context submenu also for the exceptional cases
+• UniFile.cpp: UniStdioFile::WriteBom() wrote UCS-2 BOMs regardless of m_bom
+• LineFiltersDlg: Fix test case match indication alignment & scrolling for Wine
+• LineFiltersDlg: Fix test case match indication when test case contains tabs
+• FolderCmp: Fix m_n(trivial)diffs when opting to not self-compare unique files
+• .mrgman compare: Filename extensions did not show up in DirView
+• ExcelExport: Make border style and color configurable through Supplement.ini
+• ExcelExport: Provide separate menu commands for including all/selected items
+• ExcelExport: Be aware of the configured list colors
+• DirCmpReport: Make HTML reports aware of the configured list colors
+• DirCmpReport: Indicate creation time of HTML reports as local time, not UTC
+
 0.2011.003.157
 Changes since preceding release (not necessarily complete):
 • Edit > Options > System: Have Supplement folder label appear and act as link

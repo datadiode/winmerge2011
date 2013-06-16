@@ -11,37 +11,72 @@ body
 }
 li
 {
-	padding: 1ex;
+	margin-bottom: 1em;
 }
 </style>
 </head>
 <body>
 
-<h2>WinMerge 0.2011.003.157 Release Notes</h2>
+<h2>WinMerge 0.2011.003.247 Release Notes</h2>
 This is a <b>beta</b> release of WinMerge&nbsp;2011.
-
-Significant new features since latest stable release include:
+<br>Significant new features since the preceding stable release include:
 <ul>
-<li>Line filters exist in a new flavor referred to as <i>early-applied</i> line filters:
-	<p><a href='https://bitbucket.org/jtuc/winmerge2011_help/downloads/WinMerge.chm'>WinMerge.chm</a> &rarr; <i>Using Filters</i> &rarr; <i>Using line filters</i> &rarr; <i>Early-applied line filter syntax</i>
-<li>The Open dialog's <i>Include Subfolders</i> option can be adjusted to ignore folder structure:
-	<p><a href='https://bitbucket.org/jtuc/winmerge2011_help/downloads/WinMerge.chm'>WinMerge.chm</a> &rarr; <i>Quick start</i> &rarr; <i>Selecting files and folders to compare</i> &rarr; <i>5.</i>
-<li>Editor scriptlets are back:
-	<p><a href='https://bitbucket.org/jtuc/winmerge2011_help/downloads/WinMerge.chm'>WinMerge.chm</a> &rarr; <i>Plugin scriptlets</i>
-<li>Folder compare supports customizable background colors to make differences more visible.
+<li><p>Line filters exist in a new flavor referred to as <i>early-applied</i> line filters:
+	<br><a href='https://bitbucket.org/jtuc/winmerge2011_help/downloads/WinMerge.chm'>WinMerge.chm</a> &rarr; <i>Using Filters</i> &rarr; <i>Using line filters</i> &rarr; <i>Early-applied line filter syntax</i>
+<li><p>The Open dialog's <i>Include Subfolders</i> option can be adjusted to ignore folder structure:
+	<br><a href='https://bitbucket.org/jtuc/winmerge2011_help/downloads/WinMerge.chm'>WinMerge.chm</a> &rarr; <i>Quick start</i> &rarr; <i>Selecting files and folders to compare</i> &rarr; <i>5.</i>
+<li><p>Editor scriptlets are back:
+	<br><a href='https://bitbucket.org/jtuc/winmerge2011_help/downloads/WinMerge.chm'>WinMerge.chm</a> &rarr; <i>Plugin scriptlets</i>
+<li><p>Folder compare supports customizable background colors to make differences more visible.
 	<br>This feature can be configured through <i>Edit</i> &rarr; <i>Options</i> &rarr; <i>Colors</i> &rarr; <i>List</i>.
-<li>The location bar remains responsive during drag-drop editing. This greatly eases drag-drop moving of text over long distances.
+<li><p>The location bar remains responsive during drag-drop editing. This greatly eases drag-drop moving of text over long distances.
 	<br>While in drag-drop mode, you can stop scrolling by holding down the <i>Shift</i> key.
-<li>ClearCase .mrgman files can be opened to a folder compare window, by dropping them onto the WinMerge main window.
+<li><p>Unicode processing has been revised to <i>support</i> surrogate pairs rather than being actively destructive on them.
+	A beneficial side effect of this enhancement is the option to choose between
+	having combining characters visually combine with their preceding ones, or
+	keeping them separate like WinMerge used to do due to its unawareness of the very concept.
+	<br>The option to <i>Separate combining characters</i> is accessible through <i>Edit</i> &rarr; <i>Options</i> &rarr; <i>Editor</i>.
+<li><p>Folder comparison resuts can be saved to an Excel spreadsheet.
+	<br>Besides the <i>Save to Excel spreadsheet</i> command, the Folder Compare window's <i>Tools</i>
+	menu includes commands for viewing and printing with Excel Viewer. These assume that you use
+	<a target='_blank' href='http://priede.bf.lu.lv/ftp/pub/RakstuDarbi/apskatei/Microsoft/xlviewer2003.exe'>Excel Viewer 2003</a>.
+	Newer versions don't seem to allow for direct printing through command line, and also lack options to adjust column widths and apply auto filters.
+	Be sure to also apply the updates located at
+	<a target='_blank' href='http://www.microsoft.com/download/details.aspx?id=16872'>Excel Viewer 2003 Service Pack 3 (SP3)</a> and
+	<a target='_blank' href='http://www.microsoft.com/download/details.aspx?id=4134'>Security Update for Microsoft Office Excel Viewer 2003 (KB973484)</a>.
+<li><p>Processing of archive formats which are unknown to 7-Zip can be delegated to external command line tools.
+	<br>An example is PowerBuilder library (.pbl) files.
+	A command line tool to handle them can be found <a target='_blank' href='http://sqlbatch.com/pd/'>here</a>.
+	<br>Read <a target='_blank' href='http://forums.winmerge.org/viewtopic.php?f=4&t=879'>here</a>
+	on how to set up an <i>ExternalArchiveFormat.ini</i> to enable on-the-fly extraction of .pbl file contents.
+<li><p><i>File</i> &rarr; <i>Start Collection</i> opens a folder compare window in <i>collect mode</i>.
+	WinMerge will prompt you for an existing <i>reference folder</i>
+	to represent the right-hand side of the folder compare session,
+	and create a temporary folder for the left-hand side.
+	<br>The reference folder will typically contain your working copy of
+	some source code which is maintained in a source control system.
+	Subsequent command line invocations will then add items to the existing
+	folder compare window, rather than opening them to new file compare windows,
+	provided they meet the condition of one of the specified files being located
+	inside the reference folder, and the other one being located outside of it.
+	The file that is located outside of the reference folder will be copied to
+	the temporary left-hand side folder, assigning it the same name as the file
+	located inside the reference folder, and creating subfolders as needed to
+	match the structure of the reference folder.
+	<br>The feature aims at supporting offline code reviews, for which you would
+	eventually store the collected items in an
+	<i>original&nbsp;vs.&nbsp;altered</i> archive (a.k.a. <i>Perry-style</i> patch),
+	using the context menu's <i>Zip</i>&nbsp;&rarr;&nbsp;<i>Differences</i> command.
+<li><p>ClearCase .mrgman files can be opened to a folder compare window, by dropping them onto the WinMerge main window.
 	<br>The header bars provide context menus to switch between base, source, and destination versions of the referenced files.
 </ul>
 <p>
 <a target='_blank' href='http://geekswithblogs.net/evjen/archive/2006/06/29/83567.aspx'>Bill Evjen's Blog</a> gives advice in case
 <a href='https://bitbucket.org/jtuc/winmerge2011_help/downloads/WinMerge.chm'>WinMerge.chm</a> fails to display content.
 <p>
-Click <a href='https://bitbucket.org/jtuc/winmerge2011/get/0.2011.003.157.zip'>here</a> to obtain the source code for this release.
+Click <a href='https://bitbucket.org/jtuc/winmerge2011/get/0.2011.003.247.zip'>here</a> to obtain the source code for this release.
 <p>
 Click <a href='https://bitbucket.org/jtuc/frhed/get/0.10902.2013.zip'>here</a> to obtain source code for Frhed binaries included in this release.
 <p>
-<i>Jochen Neubeck, April 2013</i>
+<i>Jochen Neubeck, June 2013</i>
 </body>
