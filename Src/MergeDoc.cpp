@@ -365,11 +365,18 @@ int CChildFrame::Rescan(bool &bIdentical, bool bForced)
 
 		if (fileChanged == FileRemoved)
 		{
-			LanguageSelect.FormatMessage(
-				IDS_FILE_DISAPPEARED, paths_UndoMagic(wcsdupa(path))
-			).MsgBox(MB_ICONWARNING);
-			if (!DoSaveAs(nSide))
-				return RESCAN_FILE_ERR;
+			// Silently ignore removal of files which were not opened for
+			// editing. This avoids annoying nag boxes when TortoiseHG or TFS
+			// invoke WinMerge to compare a temporarily retrieved source file
+			// against its working copy and the latter is being edited.
+			if (!m_ptBuf[nSide]->GetReadOnly())
+			{
+				LanguageSelect.FormatMessage(
+					IDS_FILE_DISAPPEARED, paths_UndoMagic(wcsdupa(path))
+				).MsgBox(MB_ICONWARNING);
+				if (!DoSaveAs(nSide))
+					return RESCAN_FILE_ERR;
+			}
 		}
 		else if (fileChanged == FileChanged)
 		{
