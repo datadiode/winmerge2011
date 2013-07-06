@@ -118,10 +118,12 @@ BOOL CVssPrompt::OnInitDialog()
 	CRegKeyEx reg;
 
 	// Open key containing VSS databases
-	LONG retval = reg.QueryRegMachine(_T("SOFTWARE\\Microsoft\\SourceSafe\\Databases"));
-	if (retval != ERROR_SUCCESS)
+	static const TCHAR key[] = _T("SOFTWARE\\Microsoft\\SourceSafe\\Databases");
+	if (reg.QueryRegMachine(key) != ERROR_SUCCESS &&
+		reg.QueryRegUser(key) != ERROR_SUCCESS)
 	{
 		LanguageSelect.MsgBox(IDS_VSS_NODATABASES, MB_ICONERROR);
+		EndDialog(IDCANCEL);
 		return FALSE;
 	}
 
@@ -131,8 +133,8 @@ BOOL CVssPrompt::OnInitDialog()
 		TCHAR cString[MAX_PATH];
 		DWORD cssize = MAX_PATH;
 		DWORD csize = MAX_PATH;
-		retval = RegEnumValue(reg, i, cName, &csize, NULL,
-			NULL, (LPBYTE)cString, &cssize);
+		LONG retval = RegEnumValue(reg, i, cName, &csize, NULL,
+			NULL, reinterpret_cast<BYTE *>(cString), &cssize);
 		if (retval != ERROR_SUCCESS && retval != ERROR_MORE_DATA)
 			break;
 		m_pCbDBCombo->InsertString(i, cString);
