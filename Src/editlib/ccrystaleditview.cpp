@@ -194,14 +194,14 @@ void CCrystalEditView::OnEditCut()
 {
 	if (!QueryEditable())
 		return;
-	if (!IsSelection())
+
+	HGLOBAL hData = PrepareDragData();
+	if (hData == NULL)
 		return;
+	PutToClipboard(hData);
 
 	POINT ptSelStart, ptSelEnd;
 	GetSelection(ptSelStart, ptSelEnd);
-	String text;
-	GetText(ptSelStart, ptSelEnd, text);
-	PutToClipboard(text);
 
 	POINT ptCursorPos = ptSelStart;
 	ASSERT_VALIDTEXTPOS(ptCursorPos);

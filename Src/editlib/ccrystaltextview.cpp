@@ -3277,12 +3277,11 @@ void CCrystalTextView::OnDropSource(DWORD de)
 HGLOBAL CCrystalTextView::PrepareDragData()
 {
 	PrepareSelBounds();
-	if (m_ptDrawSelStart == m_ptDrawSelEnd)
-		return NULL;
-
 	String text;
 	GetText(m_ptDrawSelStart, m_ptDrawSelEnd, text);
 	int cchText = text.size();
+	if (cchText == 0)
+		return NULL;
 	SIZE_T cbData = (cchText + 1) * sizeof(TCHAR);
 	HGLOBAL hData = ::GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, cbData);
 	if (hData == NULL)
