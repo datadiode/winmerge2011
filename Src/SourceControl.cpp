@@ -87,12 +87,10 @@ int CMainFrame::SaveToVersionControl(LPCTSTR pszSavePath)
 			}
 		}
 		break;
-	case VCS_VSS5: // CVisual SourceSafe 5.0+ (COM)
+	case VCS_VSS5:	// Visual SourceSafe 5.0+ (COM)
 		{
-			// prompt for user choice
+			// Prompt for user choice
 			CVssPrompt dlg;
-			CRegKeyEx reg;
-
 			dlg.m_strMessage = LanguageSelect.FormatMessage(IDS_SAVE_FMT, pszSavePath);
 			dlg.m_strProject = m_vssHelper.GetProjectBase();
 			dlg.m_strUser = m_strVssUser;          // BSP - Add VSS user name to dialog box
