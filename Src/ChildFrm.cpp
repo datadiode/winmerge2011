@@ -218,6 +218,12 @@ void CChildFrame::ReloadDocs()
 	UpdateAllViews(NULL);
 }
 
+void CChildFrame::AlignScrollPositions()
+{
+	m_pView[0]->UpdateSiblingScrollPos(false);
+	m_pView[1]->UpdateSiblingScrollPos(false);
+}
+
 BOOL CChildFrame::PreTranslateMessage(MSG *pMsg)
 {
 	if (CCrystalTextView *pTextView = GetActiveTextView())
@@ -320,10 +326,12 @@ LRESULT CChildFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 	case ID_VIEW_LINENUMBERS:
 		COptionsMgr::SaveOption(OPT_VIEW_LINENUMBERS, !COptionsMgr::Get(OPT_VIEW_LINENUMBERS));
 		RefreshOptions();
+		AlignScrollPositions();
 		break;
 	case ID_VIEW_FILEMARGIN:
 		COptionsMgr::SaveOption(OPT_VIEW_FILEMARGIN, !COptionsMgr::Get(OPT_VIEW_FILEMARGIN));
 		RefreshOptions();
+		AlignScrollPositions();
 		break;
 	case ID_VIEW_LINEDIFFS:
 		COptionsMgr::SaveOption(OPT_WORDDIFF_HIGHLIGHT, !COptionsMgr::Get(OPT_WORDDIFF_HIGHLIGHT));

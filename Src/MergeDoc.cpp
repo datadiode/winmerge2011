@@ -1221,16 +1221,15 @@ void CChildFrame::FlushAndRescan(bool bForced)
 
 	// because of ghostlines, m_nTopLine may differ just after Rescan
 	// scroll both views to the same top line
-	m_pView[0]->UpdateSiblingScrollPos(FALSE);
-	m_pView[1]->UpdateSiblingScrollPos(FALSE);
+	AlignScrollPositions();
 
 	// make sure we see the cursor from the curent view
 	if (nActiveViewIndexType == MERGEVIEW_LEFT || nActiveViewIndexType == MERGEVIEW_RIGHT)
 		m_pView[nActiveViewIndexType]->EnsureVisible(m_pView[nActiveViewIndexType]->GetCursorPos());
 
 	// scroll both diff views to the same top line
-	m_pDetailView[0]->UpdateSiblingScrollPos(FALSE);
-	m_pDetailView[1]->UpdateSiblingScrollPos(FALSE);
+	m_pDetailView[0]->UpdateSiblingScrollPos(false);
+	m_pDetailView[1]->UpdateSiblingScrollPos(false);
 
 	// Refresh display
 	UpdateAllViews(NULL);

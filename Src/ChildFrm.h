@@ -235,6 +235,7 @@ private:
 
 	void DoPrint();
 	void ReloadDocs();
+	void AlignScrollPositions();
 
 // Implementation
 public:
