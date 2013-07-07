@@ -891,6 +891,10 @@ namespace H2O
 		{
 			return reinterpret_cast<HBrush *>(::CreateSolidBrush(crColor));
 		}
+		static HBrush *CreateHatchBrush(int iHatch, COLORREF crColor)
+		{
+			return reinterpret_cast<HBrush *>(::CreateHatchBrush(iHatch, crColor));
+		}
 	};
 
 	template<class Super>
@@ -1038,6 +1042,10 @@ namespace H2O
 		BOOL PathCompactPath(LPTSTR path, UINT dx)
 		{
 			return ::PathCompactPath(m_hDC, path, dx);
+		}
+		BOOL SetBrushOrgEx(int x, int y, POINT *ppt)
+		{
+			return ::SetBrushOrgEx(m_hDC, x, y, ppt);
 		}
 		int FrameRect(const RECT *prc, HBrush *pbr)
 		{
