@@ -80,111 +80,111 @@ class EDITPADC_CLASS CCrystalTextView
 	, public OWindow
 	, public IDropSource
 	, public IDataObject
-  {
-    friend CCrystalParser;
+{
+	friend CCrystalParser;
 
 protected:
-    //  Search parameters
-    bool m_bLastSearch;
-    DWORD m_dwLastSearchFlags;
-    String m_strLastFindWhat;
-    bool m_bCursorHidden;
+	//  Search parameters
+	bool m_bLastSearch;
+	DWORD m_dwLastSearchFlags;
+	String m_strLastFindWhat;
+	bool m_bCursorHidden;
 
 private:
-    //  Line/character dimensions
-    int m_nLineHeight, m_nCharWidth;
-    void CalcLineCharDim();
+	//  Line/character dimensions
+	int m_nLineHeight, m_nCharWidth;
+	void CalcLineCharDim();
 
-    //  Text attributes
-    bool m_bViewTabs;
-    bool m_bViewEols;
-    bool m_bDistinguishEols;
-    bool m_bSelMargin;
-    bool m_bViewLineNumbers;
-    bool m_bSeparateCombinedChars;
-    DWORD m_dwFlags;
+	//  Text attributes
+	bool m_bViewTabs;
+	bool m_bViewEols;
+	bool m_bDistinguishEols;
+	bool m_bSelMargin;
+	bool m_bViewLineNumbers;
+	bool m_bSeparateCombinedChars;
+	DWORD m_dwFlags;
 
-    //  Amount of lines/characters that completely fits the client area
-    int m_nScreenLines, m_nScreenChars;
+	//  Amount of lines/characters that completely fits the client area
+	int m_nScreenLines, m_nScreenChars;
 
-    CSyntaxColors *m_pColors;
+	CSyntaxColors *m_pColors;
 
-    //BEGIN SW
-    /**
-    Contains for each line the number of sublines. If the line is not
-    wrapped, the value for this line is 1. The value of a line is invalid,
-    if it is -1.
+	//BEGIN SW
+	/**
+	Contains for each line the number of sublines. If the line is not
+	wrapped, the value for this line is 1. The value of a line is invalid,
+	if it is -1.
 
-    Must create pointer, because contructor uses AFX_ZERO_INIT_OBJECT to
-    initialize the member objects. This would destroy a CArray object.
-    */
+	Must create pointer, because contructor uses AFX_ZERO_INIT_OBJECT to
+	initialize the member objects. This would destroy a CArray object.
+	*/
 	stl::vector<int> m_panSubLines;
-    stl::vector<int> m_panSubLineIndexCache;
-    int m_nLastLineIndexCalculatedSubLineIndex;
-    //END SW
+	stl::vector<int> m_panSubLineIndexCache;
+	int m_nLastLineIndexCalculatedSubLineIndex;
+	//END SW
 
-    int m_nMaxLineLength;
-    int m_nIdealCharPos;
+	int m_nMaxLineLength;
+	int m_nIdealCharPos;
 
-    bool m_bFocused;
+	bool m_bFocused;
 protected:
-    POINT m_ptAnchor;
+	POINT m_ptAnchor;
 private:
-    LOGFONT m_lfBaseFont;
-    HFont *m_apFonts[4];
+	LOGFONT m_lfBaseFont;
+	HFont *m_apFonts[4];
 
-    //  Parsing stuff
+	//  Parsing stuff
 
-    /**  
-    This array must be initialized to (DWORD) - 1, code for invalid values (not yet computed).
-    We prefer to limit the recomputing delay to the moment when we need to read
-    a parseCookie value for drawing.
-    GetParseCookie must always be used to read the m_ParseCookies value of a line.
-    If the actual value is invalid code, GetParseCookie computes the value, 
-    stores it in m_ParseCookies, and returns the new valid value.
-    When we edit the text, the parse cookies value may change for the modified line
-    and all the lines below (As m_ParseCookies[line i] depends on m_ParseCookies[line (i-1)])
-    It would be a loss of time to recompute all these values after each action.
-    So we just set all these values to invalid code (DWORD) - 1.
-    */
-    stl::vector<DWORD> m_ParseCookies;
-    DWORD GetParseCookie(int nLineIndex);
+	/**  
+	This array must be initialized to (DWORD) - 1, code for invalid values (not yet computed).
+	We prefer to limit the recomputing delay to the moment when we need to read
+	a parseCookie value for drawing.
+	GetParseCookie must always be used to read the m_ParseCookies value of a line.
+	If the actual value is invalid code, GetParseCookie computes the value, 
+	stores it in m_ParseCookies, and returns the new valid value.
+	When we edit the text, the parse cookies value may change for the modified line
+	and all the lines below (As m_ParseCookies[line i] depends on m_ParseCookies[line (i-1)])
+	It would be a loss of time to recompute all these values after each action.
+	So we just set all these values to invalid code (DWORD) - 1.
+	*/
+	stl::vector<DWORD> m_ParseCookies;
+	DWORD GetParseCookie(int nLineIndex);
 
-    /**
-    Pre-calculated line lengths (in characters)
-    This array works as the parse cookie Array
-    and must be initialized to - 1, code for invalid values (not yet computed).
-    for the same reason.
-    */
-    stl::vector<int> m_pnActualLineLength;
+	/**
+	Pre-calculated line lengths (in characters)
+	This array works as the parse cookie Array
+	and must be initialized to - 1, code for invalid values (not yet computed).
+	for the same reason.
+	*/
+	stl::vector<int> m_pnActualLineLength;
 
 protected:
-    bool m_bPreparingToDrag;
-    bool m_bDraggingText;
-    bool m_bDragSelection, m_bWordSelection, m_bLineSelection;
-    UINT_PTR m_nDragSelTimer;
+	bool m_bPreparingToDrag;
+	bool m_bDraggingText;
+	bool m_bDragSelection, m_bWordSelection, m_bLineSelection;
+	UINT_PTR m_nDragSelTimer;
 
-    POINT m_ptDrawSelStart, m_ptDrawSelEnd;
+	POINT m_ptDrawSelStart, m_ptDrawSelEnd;
 
-    POINT m_ptCursorPos, m_ptCursorLast;
-    POINT m_ptSelStart, m_ptSelEnd;
-    void PrepareSelBounds();
+	POINT m_ptCursorPos, m_ptCursorLast;
+	POINT m_ptSelStart, m_ptSelEnd;
+	void PrepareSelBounds();
 
-    //  Helper functions
-    int ExpandChars(LPCTSTR pszChars, int nOffset, int nCount, String &line, int nActualOffset);
+	//  Helper functions
+	int ExpandChars(LPCTSTR pszChars, int nOffset, int nCount, String &line, int nActualOffset);
 
-    int ApproxActualOffset(int nLineIndex, int nOffset);
-    void AdjustTextPoint(POINT & point);
-    void DrawLineHelperImpl(HSurface *pdc, POINT & ptOrigin, const RECT & rcClip,
+	int ApproxActualOffset(int nLineIndex, int nOffset);
+	void AdjustTextPoint(POINT & point);
+	void DrawLineHelperImpl(HSurface *pdc, POINT & ptOrigin, const RECT & rcClip,
 		int nColorIndex, int nBgColorIndex, COLORREF crText, COLORREF crBkgnd,
 		LPCTSTR pszChars, int nOffset, int nCount, int &nActualOffset);
-    bool IsInsideSelBlock(POINT ptTextPos);
+	bool IsInsideSelBlock(POINT ptTextPos);
 
-    bool m_bBookmarkExist;        // More bookmarks
-    void ToggleBookmark(int nLine);
+	bool m_bBookmarkExist;        // More bookmarks
+	void ToggleBookmark(int nLine);
 
 public:
-    virtual void ResetView();
+	virtual void ResetView();
 
 	// IUnknown
 	STDMETHOD(QueryInterface)(REFIID, void **);
@@ -206,13 +206,13 @@ public:
 	
 	int GetLineCount();
 	virtual int ComputeRealLine(int nApparentLine) const;
-    virtual void OnUpdateCaret(bool bShowHide);
-    bool IsTextBufferInitialized() const;
-    LPCTSTR GetTextBufferEol(int nLine) const;
+	virtual void OnUpdateCaret(bool bShowHide);
+	bool IsTextBufferInitialized() const;
+	LPCTSTR GetTextBufferEol(int nLine) const;
 
-    CSyntaxColors *GetSyntaxColors() { return m_pColors; }
-    void SetColorContext(CSyntaxColors *pColors) { m_pColors = pColors; }
-    virtual void SetSelection(const POINT &ptStart, const POINT &ptEnd);
+	CSyntaxColors *GetSyntaxColors() { return m_pColors; }
+	void SetColorContext(CSyntaxColors *pColors) { m_pColors = pColors; }
+	virtual void SetSelection(const POINT &ptStart, const POINT &ptEnd);
 
 	bool IsSelection();
 	bool HasFocus() const { return m_bFocused; }
@@ -221,49 +221,53 @@ public:
 	bool HasBookmarks() const { return m_bBookmarkExist; }
 
 	void SelectAll();
-    void UpdateCaret(bool bShowHide = false);
-    void SetAnchor(const POINT &);
+	void UpdateCaret(bool bShowHide = false);
+	void SetAnchor(const POINT &);
+
+	static void InitSharedResources();
+	static void FreeSharedResources();
 
 protected:
-    POINT WordToRight(POINT pt);
-    POINT WordToLeft(POINT pt);
-    bool m_bOvrMode;
+	POINT WordToRight(POINT pt);
+	POINT WordToLeft(POINT pt);
+	bool m_bOvrMode;
 
-    HImageList *m_pIcons;
-    CCrystalTextBuffer *m_pTextBuffer;
-    POINT m_ptDraggedTextBegin, m_ptDraggedTextEnd;
-    int GetMarginWidth();
-    bool IsValidTextPos(const POINT &);
-    bool IsValidTextPosX(const POINT &);
-    bool IsValidTextPosY(int);
+	static HImageList *m_pIcons;
+	static HBrush *m_pHatchBrush;
+	CCrystalTextBuffer *m_pTextBuffer;
+	POINT m_ptDraggedTextBegin, m_ptDraggedTextEnd;
+	int GetMarginWidth();
+	bool IsValidTextPos(const POINT &);
+	bool IsValidTextPosX(const POINT &);
+	bool IsValidTextPosY(int);
 
-    bool m_bShowInactiveSelection;
-    //  [JRT]
-    bool m_bDisableDragAndDrop;
+	bool m_bShowInactiveSelection;
+	//  [JRT]
+	bool m_bDisableDragAndDrop;
 
-    //BEGIN SW
-    bool m_bWordWrap;
-    CCrystalParser *m_pParser;
-    //END SW
+	//BEGIN SW
+	bool m_bWordWrap;
+	CCrystalParser *m_pParser;
+	//END SW
 
-    POINT ClientToText(const POINT &);
-    POINT TextToClient(const POINT &);
-    void InvalidateLines(int nLine1, int nLine2);
-    int CalculateActualOffset(int nLineIndex, int nCharIndex, BOOL bAccumulate = FALSE);
+	POINT ClientToText(const POINT &);
+	POINT TextToClient(const POINT &);
+	void InvalidateLines(int nLine1, int nLine2);
+	int CalculateActualOffset(int nLineIndex, int nCharIndex, BOOL bAccumulate = FALSE);
 
-    bool IsInsideSelection(const POINT &ptTextPos);
-    void GetSelection(POINT &ptStart, POINT &ptEnd);
-    void GetFullySelectedLines(int &firstLine, int &lastLine);
+	bool IsInsideSelection(const POINT &ptTextPos);
+	void GetSelection(POINT &ptStart, POINT &ptEnd);
+	void GetFullySelectedLines(int &firstLine, int &lastLine);
 
-    int m_nTopLine, m_nOffsetChar;
-    //BEGIN SW
-    /**
-    The index of the subline that is the first visible line on the screen.
-    */
-    int m_nTopSubLine;
-    //END SW
+	int m_nTopLine, m_nOffsetChar;
+	//BEGIN SW
+	/**
+	The index of the subline that is the first visible line on the screen.
+	*/
+	int m_nTopSubLine;
+	//END SW
 
-    int GetLineHeight();
+	int GetLineHeight();
 	//BEGIN SW
 	/**
 	Returns the number of sublines the given line contains of.
@@ -354,18 +358,18 @@ protected:
 	*/
 	int SubLineHomeToCharPos( int nLineIndex, int nSubLineOffset );
 	//END SW
-    int GetCharWidth();
-    int GetMaxLineLength();
-    int GetScreenLines();
-    int GetScreenChars();
-    HFont *GetFont(int nColorIndex = 0);
+	int GetCharWidth();
+	int GetMaxLineLength();
+	int GetScreenLines();
+	int GetScreenChars();
+	HFont *GetFont(int nColorIndex = 0);
 
 	virtual void RecalcVertScrollBar(bool bPositionOnly = false);
 	virtual void RecalcHorzScrollBar(bool bPositionOnly = false);
 
-    //  Scrolling helpers
-    void ScrollToChar(int nNewOffsetChar);
-    void ScrollToLine(int nNewTopLine);
+	//  Scrolling helpers
+	void ScrollToChar(int nNewOffsetChar);
+	void ScrollToLine(int nNewTopLine);
 
 	//BEGIN SW
 	/**
@@ -404,21 +408,21 @@ protected:
 	*/
 	int GetSubLineIndex(int nLineIndex);
 
-    /**
-     * @brief Splits the given subline index into line and sub line of this line.
-     * @param [in] nSubLineIndex The zero based index of the subline to get info about
-     * @param [out] nLine Gets the line number the give subline is included in
-     * @param [out] nSubLine Get the subline of the given subline relative to nLine
-     */
-    void GetLineBySubLine(int nSubLineIndex, int &nLine, int &nSubLine);
+	/**
+	 * @brief Splits the given subline index into line and sub line of this line.
+	 * @param [in] nSubLineIndex The zero based index of the subline to get info about
+	 * @param [out] nLine Gets the line number the give subline is included in
+	 * @param [out] nSubLine Get the subline of the given subline relative to nLine
+	 */
+	void GetLineBySubLine(int nSubLineIndex, int &nLine, int &nSubLine);
 
 public:
-    int GetLineLength(int nLineIndex) const;
-    int GetFullLineLength(int nLineIndex) const;
+	int GetLineLength(int nLineIndex) const;
+	int GetFullLineLength(int nLineIndex) const;
 	int GetViewableLineLength(int nLineIndex) const;
-    int GetLineActualLength(int nLineIndex);
-    LPCTSTR GetLineChars(int nLineIndex) const;
-    DWORD GetLineFlags(int nLineIndex) const;
+	int GetLineActualLength(int nLineIndex);
+	LPCTSTR GetLineChars(int nLineIndex) const;
+	DWORD GetLineFlags(int nLineIndex) const;
 	void GetText(int nStartLine, int nStartChar, int nEndLine, int nEndChar, String &text);
 
 protected:
@@ -427,31 +431,30 @@ protected:
 		GetText(ptStart.y, ptStart.x, ptEnd.y, ptEnd.x, text);
 	}
 
-    //  Clipboard overridable
+	// Clipboard
 	void PutToClipboard(HGLOBAL);
-	void PutToClipboard(const String &);
 
-    //  Drag-n-drop overrideable
-    HGLOBAL PrepareDragData();
-    virtual DWORD GetDropEffect();
-    virtual void OnDropSource(DWORD de);
+	// Drag-n-drop
+	HGLOBAL PrepareDragData();
+	virtual DWORD GetDropEffect();
+	virtual void OnDropSource(DWORD de);
 
-    virtual COLORREF GetColor(int nColorIndex);
-    virtual void GetLineColors(int nLineIndex, COLORREF &crBkgnd, COLORREF &crText);
-    virtual bool GetItalic(int nColorIndex);
-    virtual bool GetBold(int nColorIndex);
+	virtual COLORREF GetColor(int nColorIndex);
+	virtual void GetLineColors(int nLineIndex, COLORREF &crBkgnd, COLORREF &crText);
+	virtual bool GetItalic(int nColorIndex);
+	virtual bool GetBold(int nColorIndex);
 
-    void DrawLineHelper(HSurface *, POINT &ptOrigin, const RECT &rcClip,
-        int nColorIndex, int nBgColorIndex, COLORREF crText, COLORREF crBkgnd,
-        LPCTSTR pszChars, int nOffset, int nCount, int &nActualOffset, POINT ptTextPos);
-    virtual void DrawSingleLine(HSurface *, const RECT &, int nLineIndex);
-    virtual void DrawMargin(HSurface *, const RECT &, int nLineIndex, int nLineNumber);
+	void DrawLineHelper(HSurface *, POINT &ptOrigin, const RECT &rcClip,
+		int nColorIndex, int nBgColorIndex, COLORREF crText, COLORREF crBkgnd,
+		LPCTSTR pszChars, int nOffset, int nCount, int &nActualOffset, POINT ptTextPos);
+	virtual void DrawSingleLine(HSurface *, const RECT &, int nLineIndex);
+	virtual void DrawMargin(HSurface *, const RECT &, int nLineIndex, int nLineNumber);
 
-    int GetCharWidthFromChar(LPCTSTR);
-    int GetCharWidthFromDisplayableChar(LPCTSTR);
+	int GetCharWidthFromChar(LPCTSTR);
+	int GetCharWidthFromDisplayableChar(LPCTSTR);
 
 	void AdjustCursorAfterMoveLeft();
-    void AdjustCursorAfterMoveRight();
+	void AdjustCursorAfterMoveRight();
 
 	//BEGIN SW
 	// word wrapping
@@ -481,7 +484,7 @@ protected:
 
 	@see WrapLineCached()
 	*/
-	void WrapLine(int nLineIndex, int nMaxLineWidth, int *anBreaks, int &nBreaks);
+	void WrapLine(int nLineIndex, int *anBreaks, int &nBreaks);
 
 	/**
 	Called to wrap the line with the given index into sublines.
@@ -511,7 +514,7 @@ protected:
 	@see WrapLine()
 	@see m_anSubLines
 	*/
-	void WrapLineCached(int nLineIndex, int nMaxLineWidth, int *anBreaks, int &nBreaks);
+	void WrapLineCached(int nLineIndex, int *anBreaks, int &nBreaks);
 
 	/**
 	Invalidates the cached data for the given lines.
@@ -530,18 +533,18 @@ protected:
 	void InvalidateScreenRect();
 	//END SW
 
-    //  Syntax coloring overrides
-    struct TEXTBLOCK
-      {
-        int m_nCharPos;
-        int m_nColorIndex;
+	//  Syntax coloring overrides
+	struct TEXTBLOCK
+	  {
+		int m_nCharPos;
+		int m_nColorIndex;
 		int m_nBgColorIndex;
-      };
+	  };
 
 	//BEGIN SW
 	// function to draw a single screen line
 	// (a wrapped line can consist of many screen lines
-	virtual void DrawScreenLine(HSurface *pdc, POINT &ptOrigin, const RECT &rcClip,
+	void DrawScreenLine(HSurface *pdc, POINT &ptOrigin, const RECT &rcClip,
 		TEXTBLOCK *pBuf, int nBlocks, int &nActualItem,
 		COLORREF crText, COLORREF crBkgnd,
 		LPCTSTR pszChars,
@@ -552,64 +555,64 @@ protected:
 	virtual int GetAdditionalTextBlocks (int nLineIndex, TEXTBLOCK *pBuf);
 
 public:
-    void GetHTMLLine(int nLineIndex, String &);
-    void GetHTMLStyles(String &);
-    void GetHTMLAttribute(int nColorIndex, int nBgColorIndex, COLORREF crText, COLORREF crBkgnd, String &);
+	void GetHTMLLine(int nLineIndex, String &);
+	void GetHTMLStyles(String &);
+	void GetHTMLAttribute(int nColorIndex, int nBgColorIndex, COLORREF crText, COLORREF crBkgnd, String &);
 
-    void GoToLine(int nLine, bool bRelative);
-    DWORD ParseLine(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-    DWORD ParseLinePlain(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-    DWORD ParseLineAsp(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-    DWORD ParseLineBasic(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-    DWORD ParseLineBatch(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-    DWORD ParseLineC(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-    DWORD ParseLineCSharp(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-    DWORD ParseLineCss(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-    DWORD ParseLineDcl(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-    DWORD ParseLineFortran(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-    DWORD ParseLineHtml(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-    DWORD ParseLineIni(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-    DWORD ParseLineInnoSetup(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-    DWORD ParseLineIS(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-    DWORD ParseLineJava(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-    DWORD ParseLineLisp(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-    DWORD ParseLineNsis(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-    DWORD ParseLinePascal(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-    DWORD ParseLinePerl(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-    DWORD ParseLinePhp(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-    DWORD ParseLinePo(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-    DWORD ParseLinePowerShell(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-    DWORD ParseLinePython(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-    DWORD ParseLineRexx(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-    DWORD ParseLineRsrc(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-    DWORD ParseLineRuby(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-    DWORD ParseLineSgml(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-    DWORD ParseLineSh(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-    DWORD ParseLineSiod(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-    DWORD ParseLineSql(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-    DWORD ParseLineTcl(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-    DWORD ParseLineTex(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-    DWORD ParseLineVerilog(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-    DWORD ParseLineXml(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+	void GoToLine(int nLine, bool bRelative);
+	DWORD ParseLine(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+	DWORD ParseLinePlain(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+	DWORD ParseLineAsp(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+	DWORD ParseLineBasic(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+	DWORD ParseLineBatch(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+	DWORD ParseLineC(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+	DWORD ParseLineCSharp(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+	DWORD ParseLineCss(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+	DWORD ParseLineDcl(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+	DWORD ParseLineFortran(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+	DWORD ParseLineHtml(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+	DWORD ParseLineIni(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+	DWORD ParseLineInnoSetup(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+	DWORD ParseLineIS(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+	DWORD ParseLineJava(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+	DWORD ParseLineLisp(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+	DWORD ParseLineNsis(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+	DWORD ParseLinePascal(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+	DWORD ParseLinePerl(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+	DWORD ParseLinePhp(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+	DWORD ParseLinePo(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+	DWORD ParseLinePowerShell(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+	DWORD ParseLinePython(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+	DWORD ParseLineRexx(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+	DWORD ParseLineRsrc(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+	DWORD ParseLineRuby(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+	DWORD ParseLineSgml(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+	DWORD ParseLineSh(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+	DWORD ParseLineSiod(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+	DWORD ParseLineSql(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+	DWORD ParseLineTcl(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+	DWORD ParseLineTex(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+	DWORD ParseLineVerilog(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+	DWORD ParseLineXml(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
 
-    // Attributes
+	// Attributes
 public:
-    bool GetViewTabs() const;
-    void SetViewTabs(bool);
-    void SetViewEols(bool bViewEols, bool bDistinguishEols);
-    int GetTabSize() const;
-    void SetTabSize(int nTabSize, bool bSeparateCombinedChars);
-    bool GetSelectionMargin() const;
-    void SetSelectionMargin(bool);
+	bool GetViewTabs() const;
+	void SetViewTabs(bool);
+	void SetViewEols(bool bViewEols, bool bDistinguishEols);
+	int GetTabSize() const;
+	void SetTabSize(int nTabSize, bool bSeparateCombinedChars);
+	bool GetSelectionMargin() const;
+	void SetSelectionMargin(bool);
 	bool GetViewLineNumbers() const;
 	void SetViewLineNumbers(bool);
-    void GetFont(LOGFONT &) const;
-    void SetFont(const LOGFONT &);
-    DWORD GetFlags();
-    void SetFlags(DWORD dwFlags);
-    //  [JRT]:
-    bool GetDisableDragAndDrop() const;
-    void SetDisableDragAndDrop(bool);
+	void GetFont(LOGFONT &) const;
+	void SetFont(const LOGFONT &);
+	DWORD GetFlags();
+	void SetFlags(DWORD dwFlags);
+	//  [JRT]:
+	bool GetDisableDragAndDrop() const;
+	void SetDisableDragAndDrop(bool);
 
 	//BEGIN SW
 	bool GetWordWrapping() const;
@@ -625,8 +628,8 @@ public:
 	CCrystalParser *SetParser( CCrystalParser *pParser );
 	//END SW
 
-    int m_nLastFindWhatLen;
-    LPTSTR m_pszMatched;
+	int m_nLastFindWhatLen;
+	LPTSTR m_pszMatched;
 
 	enum TextType
 	{
@@ -693,122 +696,122 @@ public:
 	static const DWORD SRCOPT_FNBRACE = 1024;
 	//static const DWORD SRCOPT_WORDWRAP = 2048;
 
-    //  Source type
-    TextDefinition *m_CurSourceDef;
-    static TextDefinition m_StaticSourceDefs[];
-    static TextDefinition *m_SourceDefs;
-    virtual TextDefinition *DoSetTextType(TextDefinition *);
-    static TextDefinition *GetTextType(LPCTSTR pszExt);
-    static void ScanParserAssociations(LPTSTR);
-    static void DumpParserAssociations(LPTSTR);
-    static void FreeParserAssociations();
-    TextDefinition *SetTextType(LPCTSTR pszExt);
-    TextDefinition *SetTextType(TextType enuType);
-    TextDefinition *SetTextType(TextDefinition *);
-    TextDefinition *SetTextTypeByContent(LPCTSTR pszContent);
+	//  Source type
+	TextDefinition *m_CurSourceDef;
+	static TextDefinition m_StaticSourceDefs[];
+	static TextDefinition *m_SourceDefs;
+	virtual TextDefinition *DoSetTextType(TextDefinition *);
+	static TextDefinition *GetTextType(LPCTSTR pszExt);
+	static void ScanParserAssociations(LPTSTR);
+	static void DumpParserAssociations(LPTSTR);
+	static void FreeParserAssociations();
+	TextDefinition *SetTextType(LPCTSTR pszExt);
+	TextDefinition *SetTextType(TextType enuType);
+	TextDefinition *SetTextType(TextDefinition *);
+	TextDefinition *SetTextTypeByContent(LPCTSTR pszContent);
 
-    // Operations
-public :
-    virtual void ReAttachToBuffer(CCrystalTextBuffer *pBuf = NULL);
-    virtual void AttachToBuffer(CCrystalTextBuffer *pBuf = NULL);
-    virtual void DetachFromBuffer();
+	// Operations
+public:
+	void ReAttachToBuffer(CCrystalTextBuffer *);
+	void AttachToBuffer(CCrystalTextBuffer *);
+	void DetachFromBuffer();
 
-    //  Buffer-view interaction, multiple views
-    virtual CCrystalTextBuffer *LocateTextBuffer() = 0;
-    virtual void UpdateView(CCrystalTextView *pSource, CUpdateContext *pContext, DWORD dwFlags, int nLineIndex = -1);
+	//  Buffer-view interaction, multiple views
+	CCrystalTextBuffer *GetTextBuffer() { return m_pTextBuffer; }
+	virtual void UpdateView(CCrystalTextView *pSource, CUpdateContext *pContext, DWORD dwFlags, int nLineIndex = -1);
 
-    //  Attributes
-    const POINT &GetCursorPos() const;
-    void SetCursorPos(const POINT &ptCursorPos);
-    void ShowCursor();
-    void HideCursor();
+	//  Attributes
+	const POINT &GetCursorPos() const;
+	void SetCursorPos(const POINT &ptCursorPos);
+	void ShowCursor();
+	void HideCursor();
 
-    //  Operations
-    void EnsureVisible(POINT pt);
-    void EnsureVisible(POINT ptStart, POINT ptEnd);
+	//  Operations
+	void EnsureVisible(POINT pt);
+	void EnsureVisible(POINT ptStart, POINT ptEnd);
 
-    //  Text search helpers
-    BOOL FindText(LPCTSTR pszText, const POINT &ptStartPos,
-        DWORD dwFlags, BOOL bWrapSearch, POINT &ptFoundPos);
-    BOOL FindTextInBlock(LPCTSTR pszText, const POINT &ptStartPos,
-        const POINT &ptBlockBegin, const POINT &ptBlockEnd,
-        DWORD dwFlags, BOOL bWrapSearch, POINT &ptFoundPos);
-    BOOL HighlightText(const POINT & ptStartPos, int nLength, BOOL bCursorToLeft = FALSE);
+	//  Text search helpers
+	BOOL FindText(LPCTSTR pszText, const POINT &ptStartPos,
+		DWORD dwFlags, BOOL bWrapSearch, POINT &ptFoundPos);
+	BOOL FindTextInBlock(LPCTSTR pszText, const POINT &ptStartPos,
+		const POINT &ptBlockBegin, const POINT &ptBlockEnd,
+		DWORD dwFlags, BOOL bWrapSearch, POINT &ptFoundPos);
+	BOOL HighlightText(const POINT & ptStartPos, int nLength, BOOL bCursorToLeft = FALSE);
 
-    // IME (input method editor)
-    void UpdateCompositionWindowPos();
-    void UpdateCompositionWindowFont();
+	// IME (input method editor)
+	void UpdateCompositionWindowPos();
+	void UpdateCompositionWindowFont();
 
-    //  Overridable: an opportunity for Auto-Indent, Smart-Indent etc.
-    virtual void OnEditOperation(int nAction, LPCTSTR pszText);
+	//  Overridable: an opportunity for Auto-Indent, Smart-Indent etc.
+	virtual void OnEditOperation(int nAction, LPCTSTR pszText);
 
 public:
-    CCrystalTextView(size_t);
-    ~CCrystalTextView();
+	CCrystalTextView(size_t);
+	~CCrystalTextView();
 #ifdef _DEBUG
-    void AssertValidTextPos(const POINT & pt);
+	void AssertValidTextPos(const POINT & pt);
 #endif
 	int GetScrollPos(UINT nBar, UINT nSBCode);
 
 	void OnDraw(HSurface *);
 
-    //  Keyboard handlers
-    void MoveLeft(BOOL bSelect);
-    void MoveRight(BOOL bSelect);
-    void MoveWordLeft(BOOL bSelect);
-    void MoveWordRight(BOOL bSelect);
-    void MoveUp(BOOL bSelect);
-    void MoveDown(BOOL bSelect);
-    void MoveHome(BOOL bSelect);
-    void MoveEnd(BOOL bSelect);
-    void MovePgUp(BOOL bSelect);
-    void MovePgDn(BOOL bSelect);
-    void MoveCtrlHome(BOOL bSelect);
-    void MoveCtrlEnd(BOOL bSelect);
-    void OnSize();
-    void OnVScroll(UINT nSBCode);
-    BOOL OnSetCursor(UINT nHitTest);
-    void OnLButtonDown(LPARAM);
-    void OnSetFocus();
-    void OnHScroll(UINT nSBCode);
-    void OnLButtonUp(LPARAM);
-    void OnMouseMove(LPARAM);
-    void OnTimer(UINT_PTR nIDEvent);
-    void OnKillFocus();
-    void OnLButtonDblClk(LPARAM);
-    void OnRButtonDown(LPARAM);
-    void OnEditCopy();
-    void OnEditFind();
-    void OnEditRepeat();
-    BOOL OnMouseWheel(WPARAM, LPARAM);
-    void OnPageUp();
-    void OnExtPageUp();
-    void OnPageDown();
-    void OnExtPageDown();
-    void OnToggleBookmark(UINT nCmdID);
-    void OnGoBookmark(UINT nCmdID);
-    void OnClearBookmarks();
+	//  Keyboard handlers
+	void MoveLeft(BOOL bSelect);
+	void MoveRight(BOOL bSelect);
+	void MoveWordLeft(BOOL bSelect);
+	void MoveWordRight(BOOL bSelect);
+	void MoveUp(BOOL bSelect);
+	void MoveDown(BOOL bSelect);
+	void MoveHome(BOOL bSelect);
+	void MoveEnd(BOOL bSelect);
+	void MovePgUp(BOOL bSelect);
+	void MovePgDn(BOOL bSelect);
+	void MoveCtrlHome(BOOL bSelect);
+	void MoveCtrlEnd(BOOL bSelect);
+	void OnSize();
+	void OnVScroll(UINT nSBCode);
+	BOOL OnSetCursor(UINT nHitTest);
+	void OnLButtonDown(LPARAM);
+	void OnSetFocus();
+	void OnHScroll(UINT nSBCode);
+	void OnLButtonUp(LPARAM);
+	void OnMouseMove(LPARAM);
+	void OnTimer(UINT_PTR nIDEvent);
+	void OnKillFocus();
+	void OnLButtonDblClk(LPARAM);
+	void OnRButtonDown(LPARAM);
+	void OnEditCopy();
+	void OnEditFind();
+	void OnEditRepeat();
+	BOOL OnMouseWheel(WPARAM, LPARAM);
+	void OnPageUp();
+	void OnExtPageUp();
+	void OnPageDown();
+	void OnExtPageDown();
+	void OnToggleBookmark(UINT nCmdID);
+	void OnGoBookmark(UINT nCmdID);
+	void OnClearBookmarks();
 
-    void OnToggleBookmark();     // More bookmarks
+	void OnToggleBookmark(); // More bookmarks
 
-    void OnClearAllBookmarks();
-    void OnNextBookmark();
-    void OnPrevBookmark();
+	void OnClearAllBookmarks();
+	void OnNextBookmark();
+	void OnPrevBookmark();
 
-    void ScrollUp();
-    void ScrollDown();
-    void ScrollLeft();
-    void ScrollRight();
+	void ScrollUp();
+	void ScrollDown();
+	void ScrollLeft();
+	void ScrollRight();
 
-    void OnMatchBrace();
-    BOOL CanMatchBrace();
+	void OnMatchBrace();
+	BOOL CanMatchBrace();
 
 	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
-    void OnDestroy();
-  };
+	void OnDestroy();
+};
 
 #ifdef _DEBUG
-#define ASSERT_VALIDTEXTPOS(pt)     AssertValidTextPos(pt);
+#define ASSERT_VALIDTEXTPOS(pt) AssertValidTextPos(pt);
 #else
 #define ASSERT_VALIDTEXTPOS(pt)
 #endif

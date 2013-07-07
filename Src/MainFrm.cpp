@@ -2066,7 +2066,7 @@ void CMainFrame::ApplyViewWhitespace()
 			CChildFrame *pSpecific = static_cast<CChildFrame *>(pAbstract);
 			if (CMergeEditView *pView = pSpecific->GetLeftView())
 			{
-				bool view_eols = opt_allow_mixed_eol || pView->LocateTextBuffer()->IsMixedEOL();
+				bool view_eols = opt_allow_mixed_eol || pView->GetTextBuffer()->IsMixedEOL();
 				pView->SetViewTabs(opt_view_whitespace);
 				pView->SetViewEols(opt_view_whitespace, view_eols);
 				if (CMergeDiffDetailView *pView = pSpecific->GetLeftDetailView())
@@ -2077,7 +2077,7 @@ void CMainFrame::ApplyViewWhitespace()
 			}
 			if (CMergeEditView *pView = pSpecific->GetRightView())
 			{
-				bool view_eols = opt_allow_mixed_eol || pView->LocateTextBuffer()->IsMixedEOL();
+				bool view_eols = opt_allow_mixed_eol || pView->GetTextBuffer()->IsMixedEOL();
 				pView->SetViewTabs(opt_view_whitespace);
 				pView->SetViewEols(opt_view_whitespace, view_eols);
 				if (CMergeDiffDetailView *pView = pSpecific->GetRightDetailView())

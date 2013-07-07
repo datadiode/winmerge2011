@@ -904,19 +904,3 @@ void CCrystalTextView::PutToClipboard(HGLOBAL hData)
 		::GlobalFree(hData);
 	}
 }
-
-void CCrystalTextView::PutToClipboard(const String &text)
-{
-	WaitStatusCursor wc;
-	LPCTSTR pszText = text.c_str();
-	SIZE_T cbData = (text.length() + 1) * sizeof(TCHAR);
-	if (HGLOBAL hData = ::GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, cbData))
-	{
-		::GlobalReAlloc(hData, cbData, 0);
-		ASSERT(::GlobalSize(hData) == cbData);
-		LPTSTR pszData = (LPTSTR)::GlobalLock(hData);
-		memcpy(pszData, pszText, cbData);
-		::GlobalUnlock(hData);
-		PutToClipboard(hData);
-	}
-}

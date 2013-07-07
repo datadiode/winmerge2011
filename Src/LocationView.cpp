@@ -673,7 +673,7 @@ void CLocationView::OnContextMenu(LPARAM lParam)
 		// If outside bar area use bar that corresponds to active view
 		if (bar != BAR_YAREA)
 			pView = m_pMergeDoc->GetView(bar);
-		CDiffTextBuffer *const pBuf = pView->LocateTextBuffer();
+		CDiffTextBuffer *const pBuf = pView->GetTextBuffer();
 		nLine = GetLineFromYPos(pt.y, pView);
 		// Get real line (exclude ghost lines)
 		nLine = pBuf->ComputeRealLine(nLine);

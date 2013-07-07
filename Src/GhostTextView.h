@@ -3,7 +3,6 @@
  *
  * @brief Declaration of CGhostTextView (subclasses CCrystalEditViewEx to handle ghost lines)
  */
-
 #ifndef __GHOSTTEXTVIEW_H__
 #define __GHOSTTEXTVIEW_H__
 
@@ -34,8 +33,6 @@ protected:
 	CGhostTextView(size_t);           // protected constructor used by dynamic creation
 
 private:
-	CGhostTextBuffer *m_pGhostTextBuffer;
-
 	/** 
 	 * @brief Real point structure to preserve a position during Rescan 
 	 * 
@@ -93,10 +90,6 @@ private:
 	//   m_ptDropPos : only used inside one function which does not change the buffer
 
 public:
-	virtual void ReAttachToBuffer(CCrystalTextBuffer * = NULL);
-	virtual void AttachToBuffer(CCrystalTextBuffer * = NULL);
-	virtual void DetachFromBuffer();
-
 	/** real cursor function to preserve cursor during Rescan */
 	void PopCursors();
 	/** real cursor function to preserve cursor during Rescan */
@@ -104,6 +97,9 @@ public:
 
 	int ComputeApparentLine(int nRealLine) const;
 	int ComputeRealLine(int nApparentLine) const;
+
+protected:
+	virtual void DrawSingleLine(HSurface *, const RECT &, int nLineIndex);
 	virtual void DrawMargin(HSurface *, const RECT &, int nLineIndex, int nLineNumber);
 };
 

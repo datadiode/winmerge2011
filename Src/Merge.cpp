@@ -257,6 +257,7 @@ HRESULT CMergeApp::InitInstance()
 
 			// Initialize i18n (multiple language) support
 			LanguageSelect.InitializeLanguage();
+			CCrystalTextView::InitSharedResources();
 
 			// Register the main window class. 
 			const WNDCLASS wc =
@@ -311,6 +312,7 @@ int CMergeApp::ExitInstance(HRESULT hr)
 	{
 		// Deallocate custom parser associations
 		CCrystalTextView::FreeParserAssociations();
+		CCrystalTextView::FreeSharedResources();
 		charsets_cleanup();
 		// Remove tempfolder
 		ClearTempfolder(env_GetTempPath());

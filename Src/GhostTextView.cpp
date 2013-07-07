@@ -24,10 +24,13 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-
 #include "stdafx.h"
+#include "Merge.h"
+#include "OptionsMgr.h"
+#include "LanguageSelect.h"
 #include "GhostTextView.h"
 #include "GhostTextBuffer.h"
+#include "SyntaxColors.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -43,39 +46,11 @@ CGhostTextView::CGhostTextView(size_t ZeroInit)
 {
 }
 
-void CGhostTextView::ReAttachToBuffer(CCrystalTextBuffer *pBuf /*= NULL*/ )
-{
-	if (pBuf == NULL)
-	{
-		pBuf = LocateTextBuffer();
-		// ...
-	}
-	m_pGhostTextBuffer = static_cast<CGhostTextBuffer*>(pBuf);
-	CCrystalEditViewEx::ReAttachToBuffer(pBuf);
-}
-
-void CGhostTextView::AttachToBuffer(CCrystalTextBuffer *pBuf /*= NULL*/ )
-{
-	if (pBuf == NULL)
-	{
-		pBuf = LocateTextBuffer();
-		// ...
-	}
-	m_pGhostTextBuffer = static_cast<CGhostTextBuffer*> (pBuf);
-	CCrystalEditViewEx::AttachToBuffer(pBuf);
-}
-
-void CGhostTextView::DetachFromBuffer()
-{
-	if (m_pGhostTextBuffer != NULL)
-		m_pGhostTextBuffer = NULL;
-	CCrystalEditViewEx::DetachFromBuffer();
-}
-
 void CGhostTextView::popPosition(SCursorPushed Ssrc, POINT & pt)
 {
 	pt.x = Ssrc.x;
-	pt.y = m_pGhostTextBuffer->ComputeApparentLine(Ssrc.y, Ssrc.nToFirstReal);
+	pt.y = static_cast<CGhostTextBuffer *>
+		(m_pTextBuffer)->ComputeApparentLine(Ssrc.y, Ssrc.nToFirstReal);
 	// if the cursor was in a trailing ghost line, and this disappeared,
 	// got at the end of the last line
 	if (pt.y >= GetLineCount())
@@ -88,7 +63,8 @@ void CGhostTextView::popPosition(SCursorPushed Ssrc, POINT & pt)
 void CGhostTextView::pushPosition(SCursorPushed & Sdest, POINT pt)
 {
 	Sdest.x = pt.x;
-	Sdest.y = m_pGhostTextBuffer->ComputeRealLineAndGhostAdjustment(pt.y, Sdest.nToFirstReal);
+	Sdest.y = static_cast<CGhostTextBuffer *>
+		(m_pTextBuffer)->ComputeRealLineAndGhostAdjustment(pt.y, Sdest.nToFirstReal);
 }
 
 void CGhostTextView::PopCursors()
@@ -141,7 +117,8 @@ void CGhostTextView::PopCursors()
 		popPosition(m_ptLastChangePushed, ptLastChange);
 		ASSERT_VALIDTEXTPOS(ptLastChange);
 	}
-	m_pGhostTextBuffer->RestoreLastChangePos(ptLastChange);
+	static_cast<CGhostTextBuffer *>
+		(m_pTextBuffer)->RestoreLastChangePos(ptLastChange);
 
 	// restore the scrolling position
 	m_nTopSubLine = m_nTopSubLinePushed;
@@ -175,7 +152,8 @@ void CGhostTextView::PushCursors()
 		pushPosition(m_ptSavedSelEndPushed, m_ptSavedSelEnd);
 	}
 
-	pushPosition(m_ptLastChangePushed, m_pGhostTextBuffer->GetLastChangePos());
+	pushPosition(m_ptLastChangePushed,
+		static_cast<CGhostTextBuffer *>(m_pTextBuffer)->GetLastChangePos());
 
 	// and top line positions
 	m_nTopSubLinePushed = m_nTopSubLine;
@@ -183,14 +161,16 @@ void CGhostTextView::PushCursors()
 
 int CGhostTextView::ComputeRealLine(int nApparentLine) const
 {
-	if (!m_pGhostTextBuffer)
+	if (!m_pTextBuffer)
 		return 0;
-	return m_pGhostTextBuffer->ComputeRealLine(nApparentLine);
+	return static_cast<CGhostTextBuffer *>
+		(m_pTextBuffer)->ComputeRealLine(nApparentLine);
 }
 
 int CGhostTextView::ComputeApparentLine(int nRealLine) const
 {
-	return m_pGhostTextBuffer->ComputeApparentLine(nRealLine);
+	return static_cast<CGhostTextBuffer *>
+		(m_pTextBuffer)->ComputeApparentLine(nRealLine);
 }
 
 /**
@@ -208,4 +188,32 @@ void CGhostTextView::DrawMargin(HSurface * pdc, const RECT & rect, int nLineInde
 	else
 		nRealLineNumber = ComputeRealLine(nLineIndex) + 1;
 	CCrystalTextView::DrawMargin(pdc, rect, nLineIndex, nRealLineNumber);
+}
+
+void CGhostTextView::DrawSingleLine(HSurface *pdc, const RECT &rc, int nLineIndex)
+{
+	CCrystalTextView::DrawSingleLine(pdc, rc, nLineIndex);
+	// If this is a placeholder for a sequence of excluded lines,
+	// indicate its length by drawing a label in italic letters.
+	const LineInfo &li = m_pTextBuffer->GetLineInfo(nLineIndex);
+	if (li.m_dwFlags & LF_GHOST)
+	{
+		const int nCharWidth = GetCharWidth();
+		const int nLineHeight = GetLineHeight();
+		if (li.m_nSkippedLines != 0)
+		{
+			pdc->SelectObject(GetFont(COLORINDEX_LAST));
+			pdc->DrawText(
+				FormatAmount<IDS_LINE_EXCLUDED, IDS_LINES_EXCLUDED>(li.m_nSkippedLines),
+				const_cast<RECT *>(&rc),
+				DT_CENTER | DT_VCENTER | DT_NOPREFIX | DT_SINGLELINE | DT_END_ELLIPSIS);
+		}
+		else if (COptionsMgr::Get(OPT_CROSS_HATCH_DELETED_LINES))
+		{
+			pdc->SetBrushOrgEx(
+				-(m_nOffsetChar * nCharWidth),
+				-(m_nTopSubLine * nLineHeight), NULL);
+			pdc->FillRect(&rc, m_pHatchBrush);
+		}
+	}
 }

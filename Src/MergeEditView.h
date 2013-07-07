@@ -145,7 +145,7 @@ public:
 	bool IsLineInCurrentDiff(int nLine);
 	void SelectNone();
 	void SelectDiff(int nDiff, bool bScroll = true);
-	virtual CDiffTextBuffer *LocateTextBuffer();
+	CDiffTextBuffer *GetTextBuffer() { return static_cast<CDiffTextBuffer *>(m_pTextBuffer); }
 	void GetFullySelectedDiffs(int & firstDiff, int & lastDiff);
 	void UpdateResources();
 	virtual void RecalcVertScrollBar(bool bPositionOnly = false);
@@ -171,11 +171,6 @@ public:
 // Implementation
 protected:
 	virtual ~CMergeEditView();
-	virtual void DrawScreenLine(HSurface *pdc, POINT &ptOrigin, const RECT &rcClip,
-		TEXTBLOCK *pBuf, int nBlocks, int &nActualItem,
-		COLORREF crText, COLORREF crBkgnd,
-		LPCTSTR pszChars,
-		int nOffset, int nCount, int &nActualOffset, int nLineIndex);
 	bool IsDiffVisible(const DIFFRANGE& diff, int nLinesBelow = 0);
 
 	HMenu *ApplyPatch(IStream *, int);

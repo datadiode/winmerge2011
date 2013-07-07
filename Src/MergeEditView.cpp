@@ -23,9 +23,6 @@
  *
  * @brief Implementation of the CMergeEditView class
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "Merge.h"
 #include "ChildFrm.h"
@@ -168,14 +165,6 @@ void CMergeEditView::OnNotity(LPARAM lParam)
 			}
 		}
 	}
-}
-
-/**
- * @brief Return text buffer for file in view
- */
-CDiffTextBuffer *CMergeEditView::LocateTextBuffer()
-{
-	return m_pDocument->m_ptBuf[m_nThisPane];
 }
 
 /**
@@ -407,37 +396,6 @@ void CMergeEditView::GetLineColors(int nLineIndex, COLORREF &crBkgnd, COLORREF &
 		{
 			// Syntax highlighting, get colors from CrystalEditor
 			CCrystalEditViewEx::GetLineColors(nLineIndex, crBkgnd, crText);
-		}
-	}
-}
-
-void CMergeEditView::DrawScreenLine(
-	HSurface *pdc, POINT &ptOrigin, const RECT &rcClip,
-	TEXTBLOCK *pBuf, int nBlocks, int &nActualItem,
-	COLORREF crText, COLORREF crBkgnd,
-	LPCTSTR pszChars, int nOffset, int nCount, int &nActualOffset, int nLineIndex)
-{
-	const int nLineHeight = GetLineHeight();
-	RECT frect = rcClip;
-	frect.top = ptOrigin.y;
-	frect.bottom = frect.top + nLineHeight;
-
-	CCrystalTextView::DrawScreenLine(pdc, ptOrigin, rcClip, pBuf, nBlocks,
-		nActualItem, crText, crBkgnd, pszChars, nOffset,
-		nCount, nActualOffset, nLineIndex);
-
-	if (nLineIndex != -1)
-	{
-		// If this is a placeholder for a sequence of excluded lines,
-		// indicate its length by drawing a label in italic letters.
-		const LineInfo &li = m_pTextBuffer->GetLineInfo(nLineIndex);
-		if ((li.m_dwFlags & LF_GHOST) && (li.m_nSkippedLines != 0))
-		{
-			pdc->SelectObject(GetFont(COLORINDEX_LAST));
-			pdc->DrawText(
-				FormatAmount<IDS_LINE_EXCLUDED, IDS_LINES_EXCLUDED>(li.m_nSkippedLines),
-				&frect,
-				DT_CENTER | DT_VCENTER | DT_NOPREFIX | DT_SINGLELINE | DT_END_ELLIPSIS);
 		}
 	}
 }
@@ -687,7 +645,7 @@ bool CMergeEditView::IsLineInCurrentDiff(int nLine)
 #ifdef _DEBUG
 	if (nLine < 0)
 		_RPTF1(_CRT_ERROR, "Linenumber is negative (%d)!", nLine);
-	int nLineCount = LocateTextBuffer()->GetLineCount();
+	int nLineCount = m_pTextBuffer->GetLineCount();
 	if (nLine >= nLineCount)
 		_RPTF2(_CRT_ERROR, "Linenumber > linecount (%d>%d)!", nLine, nLineCount);
 #endif
@@ -1109,9 +1067,11 @@ void CMergeEditView::RefreshOptions()
 	m_cachedColors.clrSelWordDiffDeleted = COptionsMgr::Get(OPT_CLR_SELECTED_WORDDIFF_DELETED);
 	m_cachedColors.clrWordDiffText = COptionsMgr::Get(OPT_CLR_WORDDIFF_TEXT);
 	m_cachedColors.clrSelWordDiffText = COptionsMgr::Get(OPT_CLR_SELECTED_WORDDIFF_TEXT);
+
+	OnSize();
 }
 
-/** 
+/**
  * @brief Goto given line.
  * @param [in] nLine Apparent destination line number (including deleted lines)
  */
@@ -1139,29 +1099,38 @@ void CMergeEditView::GotoLine(int nLine)
  */
 void CMergeEditView::OnEditCopyLineNumbers()
 {
-	POINT ptStart;
-	POINT ptEnd;
-	String strText;
-
-	GetSelection(ptStart, ptEnd);
-
-	// Get last selected line (having widest linenumber)
-	UINT line = m_pDocument->m_ptBuf[1]->ComputeRealLine(ptEnd.y);
-	TCHAR strNum[20];
-	int nNumWidth = _sntprintf(strNum, _countof(strNum), _T("%d"), line + 1);
-	
-	for (int i = ptStart.y; i <= ptEnd.y; i++)
+	if (!OpenClipboard())
+		return;
+	UniStdioFile file;
+	file.SetUnicoding(UCS2LE);
+	if (HGLOBAL hMem = file.CreateStreamOnHGlobal())
 	{
-		if (GetLineFlags(i) & LF_GHOST)
-			continue;
-		// We need to convert to real linenumbers
-		line = m_pDocument->m_ptBuf[m_nThisPane]->ComputeRealLine(i);
-		_sntprintf(strNum, _countof(strNum), _T("%*d: "), nNumWidth, line + 1);
-		strText += strNum;
-		if (LPCTSTR pszLine = GetLineChars(i))
-			strText += pszLine;
+		POINT ptStart;
+		POINT ptEnd;
+		GetSelection(ptStart, ptEnd);
+		// Get last selected line (having widest linenumber)
+		UINT line = m_pDocument->m_ptBuf[1]->ComputeRealLine(ptEnd.y);
+		TCHAR strNum[20];
+		int nNumWidth = _sntprintf(strNum, _countof(strNum), _T("%d"), line + 1);
+		for (int i = ptStart.y; i <= ptEnd.y; i++)
+		{
+			if (GetLineFlags(i) & LF_GHOST)
+				continue;
+			// We need to convert to real linenumbers
+			line = m_pDocument->m_ptBuf[m_nThisPane]->ComputeRealLine(i);
+			int cchNum = _sntprintf(strNum, _countof(strNum), _T("%*d: "), nNumWidth, line + 1);
+			file.WriteString(strNum, cchNum);
+			if (LPCTSTR pszLine = GetLineChars(i))
+			{
+				int cchLine = GetFullLineLength(i);
+				file.WriteString(pszLine, cchLine);
+			}
+		}
+		file.WriteString(_T(""), 1);
+		EmptyClipboard();
+		SetClipboardData(CF_UNICODETEXT, hMem);
 	}
-	PutToClipboard(strText);
+	CloseClipboard();
 }
 
 void CMergeEditView::OnSize() 
@@ -1215,20 +1184,20 @@ void CMergeEditView::RecalcVertScrollBar(bool bPositionOnly)
 /**
  * @brief returns the number of empty lines which are added for synchronizing the line in two panes.
  */
-int CMergeEditView::GetEmptySubLines( int nLineIndex )
+int CMergeEditView::GetEmptySubLines(int nLineIndex)
 {
 	int	nBreaks[2] = { 0, 0 };
 	if (CMergeEditView *pLeftView = m_pDocument->GetLeftView())
 	{
 		if (nLineIndex >= pLeftView->GetLineCount())
 			return 0;
-		pLeftView->WrapLineCached(nLineIndex, pLeftView->GetScreenChars(), NULL, nBreaks[0]);
+		pLeftView->WrapLineCached(nLineIndex, NULL, nBreaks[0]);
 	}
 	if (CMergeEditView *pRightView = m_pDocument->GetRightView())
 	{
 		if (nLineIndex >= pRightView->GetLineCount())
 			return 0;
-		pRightView->WrapLineCached(nLineIndex, pRightView->GetScreenChars(), NULL, nBreaks[1]);
+		pRightView->WrapLineCached(nLineIndex, NULL, nBreaks[1]);
 	}
 
 	if (nBreaks[m_nThisPane] < nBreaks[1 - m_nThisPane])
@@ -1470,7 +1439,7 @@ HMenu *CMergeEditView::ApplyPatch(IStream *pstm, int id)
 {
 	IStream_Reset(pstm);
 	HMenu *pMenu = id ? NULL : HMenu::CreatePopupMenu();
-	CDiffTextBuffer *const pTextBuffer = LocateTextBuffer();
+	CDiffTextBuffer *const pTextBuffer = GetTextBuffer();
 	StreamLineReader reader = pstm;
 	stl::string line;
 	OString text = NULL;

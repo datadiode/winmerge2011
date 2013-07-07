@@ -1,15 +1,9 @@
-//////////////////////////////////////////////////////////////////////
 /** 
  * @file  MergeDiffDetailView.cpp
  *
  * @brief Implementation file for CMergeDiffDetailView
  *
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "StdAfx.h"
 #include "Merge.h"
 #include "LanguageSelect.h"
@@ -36,6 +30,7 @@ CMergeDiffDetailView::CMergeDiffDetailView(CChildFrame *pDocument, int nThisPane
 : CGhostTextView(sizeof *this)
 , m_pDocument(pDocument)
 , m_nThisPane(nThisPane)
+, m_lineEnd(1)
 {
 }
 
@@ -59,15 +54,6 @@ LRESULT CMergeDiffDetailView::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam
 
 /////////////////////////////////////////////////////////////////////////////
 // CMergeDiffDetailView message handlers
-
-/**
- * @brief Get TextBuffer associated with view.
- * @return pointer to textbuffer associated with the view.
- */
-CCrystalTextBuffer *CMergeDiffDetailView::LocateTextBuffer()
-{
-	return m_pDocument->m_ptBuf[m_nThisPane];
-}
 
 /**
  * @brief Update any resources necessary after a GUI language change
@@ -104,11 +90,8 @@ void CMergeDiffDetailView::OnInitialUpdate()
 	SetFont(theApp.m_pMainWnd->m_lfDiff);
 }
 
-int CMergeDiffDetailView::GetAdditionalTextBlocks (int nLineIndex, TEXTBLOCK *pBuf)
+int CMergeDiffDetailView::GetAdditionalTextBlocks(int nLineIndex, TEXTBLOCK *pBuf)
 {
-	if (nLineIndex < m_lineBegin || nLineIndex >= m_lineEnd)
-		return 0;
-
 	DWORD dwLineFlags = GetLineFlags(nLineIndex);
 	if ((dwLineFlags & LF_DIFF) != LF_DIFF)
 		return 0; // No diff
@@ -148,6 +131,19 @@ int CMergeDiffDetailView::GetAdditionalTextBlocks (int nLineIndex, TEXTBLOCK *pB
 		pBuf->m_nBgColorIndex = COLORINDEX_NONE;
 	}
 	return nWordDiffs * 2 + 1;
+}
+
+void CMergeDiffDetailView::DrawSingleLine(HSurface *pdc, const RECT &rc, int nLineIndex)
+{
+	if (nLineIndex < m_lineBegin || nLineIndex >= m_lineEnd)
+	{
+		pdc->SetBkColor(GetColor(COLORINDEX_WHITESPACE));
+		pdc->ExtTextOut(0, 0, ETO_OPAQUE, &rc, NULL, 0);
+	}
+	else
+	{
+		CGhostTextView::DrawSingleLine(pdc, rc, nLineIndex);
+	}
 }
 
 COLORREF CMergeDiffDetailView::GetColor(int nColorIndex)

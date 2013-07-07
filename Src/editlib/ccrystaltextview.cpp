@@ -143,6 +143,21 @@ static int upperBound(const stl::vector<int> &v)
 	return v.size() - 1;
 }
 
+HImageList *CCrystalTextView::m_pIcons = NULL;
+HBrush *CCrystalTextView::m_pHatchBrush = NULL;
+
+void CCrystalTextView::InitSharedResources()
+{
+	m_pIcons = LanguageSelect.LoadImageList(IDR_MARGIN_ICONS, MARGIN_ICON_WIDTH, 0);
+	m_pHatchBrush = HBrush::CreateHatchBrush(HS_DIAGCROSS, 0);
+}
+
+void CCrystalTextView::FreeSharedResources()
+{
+	m_pHatchBrush->DeleteObject();
+	m_pIcons->Destroy();
+}
+
 int CCrystalTextView::GetScrollPos(UINT nBar, UINT nSBCode)
 {
 	SCROLLINFO si;
@@ -406,8 +421,6 @@ CCrystalTextView::~CCrystalTextView()
 {
 	ASSERT(m_pTextBuffer == NULL);   //  Must be correctly detached
 	free(m_pszMatched); // Allocated by _tcsdup()
-	if (m_pIcons)
-		m_pIcons->Destroy();
 }
 
 HRESULT CCrystalTextView::QueryInterface(REFIID iid, void **ppv)
@@ -1064,15 +1077,18 @@ int CCrystalTextView::GetAdditionalTextBlocks(int nLineIndex, TEXTBLOCK *pBuf)
 }
 
 //BEGIN SW
-void CCrystalTextView::WrapLine(int nLineIndex, int nMaxLineWidth, int *anBreaks, int &nBreaks)
+void CCrystalTextView::WrapLine(int nLineIndex, int *anBreaks, int &nBreaks)
 {
 	// There must be a parser attached to this view
 	if (m_pParser)
+	{
+		const int nMaxLineWidth = GetScreenChars();
 		m_pParser->WrapLine(nLineIndex, nMaxLineWidth, anBreaks, nBreaks);
+	}
 }
 
 
-void CCrystalTextView::WrapLineCached(int nLineIndex, int nMaxLineWidth, int *anBreaks, int &nBreaks)
+void CCrystalTextView::WrapLineCached(int nLineIndex, int *anBreaks, int &nBreaks)
 {
 	// If the word wrap is not active, there is no breaks in the line
 	if (!m_bWordWrap)
@@ -1090,7 +1106,7 @@ void CCrystalTextView::WrapLineCached(int nLineIndex, int nMaxLineWidth, int *an
 	{
 		// recompute line wrap
 		nBreaks = 0;
-		WrapLine(nLineIndex, nMaxLineWidth, anBreaks, nBreaks);
+		WrapLine(nLineIndex, anBreaks, nBreaks);
 		// cache data
 		ASSERT( nBreaks > -1 );
 		setAtGrow(m_panSubLines, nLineIndex, nBreaks + 1);
@@ -1265,18 +1281,10 @@ int CCrystalTextView::MergeTextBlocks(
 	return k;
 }
 
-void CCrystalTextView::DrawSingleLine(HSurface *pdc, const RECT & rc, int nLineIndex)
+void CCrystalTextView::DrawSingleLine(HSurface *pdc, const RECT &rc, int nLineIndex)
 {
 	const int nCharWidth = GetCharWidth();
-	ASSERT(nLineIndex >= -1 && nLineIndex < GetLineCount ());
-
-	if (nLineIndex == -1)
-	{
-		//  Draw line beyond the text
-		pdc->SetBkColor(GetColor(COLORINDEX_WHITESPACE));
-		pdc->ExtTextOut(0, 0, ETO_OPAQUE, &rc, NULL, 0);
-		return;
-	}
+	ASSERT(nLineIndex >= 0 && nLineIndex < GetLineCount());
 
 	//  Acquire the background color for the current line
 	COLORREF crBkgnd, crText;
@@ -1322,15 +1330,15 @@ void CCrystalTextView::DrawSingleLine(HSurface *pdc, const RECT & rc, int nLineI
 	anBreaks.resize(nLength + 2);
 	int nBreaks = 0;
 	anBreaks[0] = 0;
-	WrapLineCached(nLineIndex, GetScreenChars(), &anBreaks.front() + 1, nBreaks);
+	WrapLineCached(nLineIndex, &anBreaks.front() + 1, nBreaks);
 	anBreaks[++nBreaks] = nLength;
 
 	//  Draw the line text
 	POINT origin = { rc.left - m_nOffsetChar * nCharWidth, rc.top };
 	if (crBkgnd != CLR_NONE)
-		pdc->SetBkColor (crBkgnd);
+		pdc->SetBkColor(crBkgnd);
 	if (crText != CLR_NONE)
-		pdc->SetTextColor (crText);
+		pdc->SetTextColor(crText);
 
 	// Draw all the screen lines of the wrapped line
 	for (int i = 0 ; i < nBreaks ; ++i)
@@ -1628,18 +1636,14 @@ void CCrystalTextView::DrawMargin(HSurface * pdc, const RECT & rect, int nLineIn
 			LF_BOOKMARKS,
 			LF_INVALID_BREAKPOINT
 		};
-		for (int I = 0; I < sizeof (adwFlags) / sizeof (adwFlags[0]); I++)
+		for (int i = 0; i < _countof(adwFlags); ++i)
 		{
-			if ((dwLineFlags & adwFlags[I]) != 0)
+			if ((dwLineFlags & adwFlags[i]) != 0)
 			{
-				nImageIndex = I;
+				nImageIndex = i;
 				break;
 			}
 		}
-	}
-	if (m_pIcons == NULL)
-	{
-		m_pIcons = LanguageSelect.LoadImageList(IDR_MARGIN_ICONS, MARGIN_ICON_WIDTH, 0);
 	}
 	if (nImageIndex >= 0)
 	{
@@ -1652,7 +1656,7 @@ void CCrystalTextView::DrawMargin(HSurface * pdc, const RECT & rect, int nLineIn
 	if (nLineNumber > 0)
 	{
 		int nBreaks = 0;
-		WrapLineCached(nLineIndex, GetScreenChars(), NULL, nBreaks);
+		WrapLineCached(nLineIndex, NULL, nBreaks);
 		for (int i = 0; i < nBreaks; i++)
 		{
 			m_pIcons->Draw(ICON_INDEX_WRAPLINE, pdc->m_hDC,
@@ -1739,23 +1743,28 @@ void CCrystalTextView::OnDraw(HSurface *pdc)
 		if (nCurrentLine < nLineCount)
 		{
 			rcLine.bottom = rcLine.top + GetSubLines(nCurrentLine) * nLineHeight;
+			if (pdc->RectVisible(&rcLine))
+			{
+				rcLine.right = GetMarginWidth();
+				DrawMargin(pdc, rcLine, nCurrentLine, nCurrentLine + 1);
+				rcLine.left = rcLine.right;
+				rcLine.right = rcClient.right;
+				DrawSingleLine(pdc, rcLine, nCurrentLine);
+			}
+			++nCurrentLine;
 		}
 		else
 		{
 			// this is the last iteration
-			nCurrentLine = -1;
+			// Draw area beyond the text
 			rcLine.bottom = rcClient.bottom;
-		}
-		if (pdc->RectVisible(&rcLine))
-		{
-			rcLine.left = 0;
 			rcLine.right = GetMarginWidth();
-			DrawMargin(pdc, rcLine, nCurrentLine, nCurrentLine + 1);
+			DrawMargin(pdc, rcLine, -1, -1);
 			rcLine.left = rcLine.right;
 			rcLine.right = rcClient.right;
-			DrawSingleLine(pdc, rcLine, nCurrentLine);
+			pdc->SetBkColor(GetColor(COLORINDEX_WHITESPACE));
+			pdc->ExtTextOut(0, 0, ETO_OPAQUE, &rcLine, NULL, 0);
 		}
-		nCurrentLine++;
 		rcLine.top = rcLine.bottom;
 	}
 }
@@ -1774,11 +1783,6 @@ void CCrystalTextView::ResetView()
 	m_nIdealCharPos = -1;
 	m_ptAnchor.x = 0;
 	m_ptAnchor.y = 0;
-	if (m_pIcons)
-	{
-		m_pIcons->Destroy();
-		m_pIcons = NULL;
-	}
 	for (int I = 0; I < 4; I++)
 	{
 		if (m_apFonts[I] != NULL)
@@ -1936,7 +1940,7 @@ int CCrystalTextView::GetSubLines( int nLineIndex )
 		return 1;
 	// get a number of lines this wrapped lines contains
 	int nBreaks = 0;
-	WrapLineCached(nLineIndex, GetScreenChars(), NULL, nBreaks);
+	WrapLineCached(nLineIndex, NULL, nBreaks);
 	return GetEmptySubLines(nLineIndex) + nBreaks + 1;
 }
 
@@ -1970,7 +1974,7 @@ int CCrystalTextView::CharPosToPoint( int nLineIndex, int nCharPos, POINT &charP
 	int *anBreaks = new int[GetLineLength (nLineIndex)];
 	int nBreaks = 0;
 
-	WrapLineCached (nLineIndex, GetScreenChars(), anBreaks, nBreaks);
+	WrapLineCached(nLineIndex, anBreaks, nBreaks);
 
 	int i = nBreaks;
 	do
@@ -1990,14 +1994,13 @@ int CCrystalTextView::CursorPointToCharPos(int nLineIndex, const POINT &curPoint
 {
 	// calculate char pos out of point
 	const int nLength = GetLineLength(nLineIndex);
-	const int nScreenChars = GetScreenChars();
 	LPCTSTR szLine = GetLineChars(nLineIndex);
 
 	// wrap line
 	int *anBreaks = new int[nLength];
 	int nBreaks = 0;
 
-	WrapLineCached(nLineIndex, nScreenChars, anBreaks, nBreaks);
+	WrapLineCached(nLineIndex, anBreaks, nBreaks);
 
 	// find char pos that matches cursor position
 	int nXPos = 0;
@@ -2063,7 +2066,7 @@ int CCrystalTextView::SubLineEndToCharPos(int nLineIndex, int nSubLineOffset)
 	int *anBreaks = new int[nLength];
 	int nBreaks = 0;
 
-	WrapLineCached(nLineIndex, GetScreenChars(), anBreaks, nBreaks);
+	WrapLineCached(nLineIndex, anBreaks, nBreaks);
 
 	// if there is no break inside the line or the given subline is the last
 	// one in this line...
@@ -2099,7 +2102,7 @@ int CCrystalTextView::SubLineHomeToCharPos(int nLineIndex, int nSubLineOffset)
 	int *anBreaks = new int[nLength];
 	int nBreaks = 0;
 
-	WrapLineCached(nLineIndex, GetScreenChars(), anBreaks, nBreaks);
+	WrapLineCached(nLineIndex, anBreaks, nBreaks);
 
 	// if there is no break inside the line...
 	if (nBreaks == 0)
@@ -2317,11 +2320,7 @@ void CCrystalTextView::ReAttachToBuffer(CCrystalTextBuffer *pBuf)
 {
 	if (m_pTextBuffer)
 		m_pTextBuffer->RemoveView(this);
-	if (pBuf == NULL)
-	{
-		pBuf = LocateTextBuffer();
-		//  ...
-	}
+	ASSERT(pBuf != NULL);
 	m_pTextBuffer = pBuf;
 	if (m_pTextBuffer)
 		m_pTextBuffer->AddView(this);
@@ -2338,12 +2337,8 @@ void CCrystalTextView::ReAttachToBuffer(CCrystalTextBuffer *pBuf)
 void CCrystalTextView::AttachToBuffer(CCrystalTextBuffer *pBuf)
 {
 	if (m_pTextBuffer)
-		m_pTextBuffer->RemoveView (this);
-	if (pBuf == NULL)
-	{
-		pBuf = LocateTextBuffer();
-		//  ...
-	}
+		m_pTextBuffer->RemoveView(this);
+	ASSERT(pBuf != NULL);
 	m_pTextBuffer = pBuf;
 	if (m_pTextBuffer)
 		m_pTextBuffer->AddView (this);
@@ -2613,7 +2608,7 @@ POINT CCrystalTextView::ClientToText(const POINT &point)
 		nLength = GetLineLength( pt.y );
 		anBreaks = new int[nLength];
 		pszLine = GetLineChars(pt.y);
-		WrapLineCached( pt.y, GetScreenChars(), anBreaks, nBreaks );
+		WrapLineCached(pt.y, anBreaks, nBreaks);
 
 		if (nSubLineOffset > 0)
 			nOffsetChar = anBreaks[nSubLineOffset - 1];
@@ -2813,8 +2808,7 @@ int CCrystalTextView::CalculateActualOffset(int nLineIndex, int nCharIndex, BOOL
 	int *anBreaks = new int[nLength];
 	int nBreaks = 0;
 
-	/*if( nLength > GetScreenChars() )*/
-	WrapLineCached(nLineIndex, GetScreenChars(), anBreaks, nBreaks);
+	WrapLineCached(nLineIndex, anBreaks, nBreaks);
 
 	int nPreOffset = 0;
 	int nPreBreak = 0;
