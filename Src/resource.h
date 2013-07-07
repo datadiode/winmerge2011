@@ -351,6 +351,7 @@
 #define IDC_HEADER_FILTER_NAME                  1277
 #define IDC_LABEL_SUPPLEMENT_FOLDER             1278
 #define IDC_DEFAULT_STANDARD_COLORS             1281
+#define IDC_CROSS_HATCH_DELETED_LINES           1281
 #define IDC_CUSTOM_COLORS_GROUP                 1282
 #define IDC_LEFTONLY_COLOR_LABEL                1283
 #define IDC_WHITESPACE_COLOR_LABEL              1283

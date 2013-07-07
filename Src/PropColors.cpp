@@ -100,6 +100,9 @@ LRESULT PropMergeColors::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		case MAKEWPARAM(IDC_SEL_WORDDIFF_TEXT_COLOR, BN_CLICKED):
 			BrowseColor(IDC_SEL_WORDDIFF_TEXT_COLOR, m_clrSelWordDiffText);
 			break;
+		case MAKEWPARAM(IDC_CROSS_HATCH_DELETED_LINES, BN_CLICKED):
+			m_bCrossHatchDeletedLines = IsDlgButtonChecked(IDC_CROSS_HATCH_DELETED_LINES);
+			break;
 		}
 		break;
 	case WM_DRAWITEM:
@@ -115,11 +118,13 @@ LRESULT PropMergeColors::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 void PropMergeColors::ReadOptions()
 {
 	SerializeColors(READ_OPTIONS);
+	m_bCrossHatchDeletedLines = COptionsMgr::Get(OPT_CROSS_HATCH_DELETED_LINES);
 }
 
 void PropMergeColors::UpdateScreen()
 {
 	SerializeColors(INVALIDATE);
+	CheckDlgButton(IDC_CROSS_HATCH_DELETED_LINES, m_bCrossHatchDeletedLines);
 }
 
 /** 
@@ -129,6 +134,7 @@ void PropMergeColors::UpdateScreen()
 void PropMergeColors::WriteOptions()
 {
 	SerializeColors(WRITE_OPTIONS);
+	COptionsMgr::SaveOption(OPT_CROSS_HATCH_DELETED_LINES, m_bCrossHatchDeletedLines != FALSE);
 }
 
 void PropMergeColors::SerializeColors(OPERATION op)

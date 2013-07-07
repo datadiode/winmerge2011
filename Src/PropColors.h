@@ -43,6 +43,8 @@ private:
 	COLORREF	m_clrSelWordDiffDeleted;
 	COLORREF	m_clrSelWordDiffText;
 
+	BOOL m_bCrossHatchDeletedLines;
+
 // Implementation
 protected:
 
