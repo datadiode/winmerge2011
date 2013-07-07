@@ -82,7 +82,7 @@ void CChildFrame::OnEditUndo()
 			UpdateHeaderPath(tgt->m_nThisPane);
 			FlushAndRescan();
 			int nAction;
-			tgt->LocateTextBuffer()->GetRedoActionCode(nAction);
+			m_ptBuf[tgt->m_nThisPane]->GetRedoActionCode(nAction);
 			if (nAction == CE_ACTION_MERGE)
 				// select the diff so we may just merge it again
 				tgt->OnCurdiff();
@@ -132,7 +132,7 @@ void CChildFrame::OnWMGoto()
 			nParam = 0;
 		if (dlg.m_nGotoWhat == 0)
 		{
-			CDiffTextBuffer *const pBuf = pMergeView->LocateTextBuffer();
+			CDiffTextBuffer *const pBuf = m_ptBuf[pMergeView->m_nThisPane];
 			int nLastLine = pBuf->GetLineCount() - 1;
 			nLastLine = pBuf->ComputeRealLine(nLastLine);
 			if (nParam > nLastLine)
@@ -208,10 +208,10 @@ void CChildFrame::ReloadDocs()
 	if (!FileLoadResult::IsError(ReloadDoc(0)) &&
 		!FileLoadResult::IsError(ReloadDoc(1)))
 	{
-		m_pView[0]->ReAttachToBuffer();
-		m_pView[1]->ReAttachToBuffer();
-		m_pDetailView[0]->ReAttachToBuffer();
-		m_pDetailView[1]->ReAttachToBuffer();
+		m_pView[0]->ReAttachToBuffer(m_ptBuf[0]);
+		m_pView[1]->ReAttachToBuffer(m_ptBuf[1]);
+		m_pDetailView[0]->ReAttachToBuffer(m_ptBuf[0]);
+		m_pDetailView[1]->ReAttachToBuffer(m_ptBuf[1]);
 		bool bIdentical = false;
 		Rescan2(bIdentical);
 	}
@@ -1042,7 +1042,7 @@ void CChildFrame::UpdateCmdUI()
 	m_pMDIFrame->UpdateCmdUI<ID_EDIT_REPLACE>(enable);
 
 	// EOL style
-	CCrystalTextBuffer *const pTextBuffer = pMergeView->LocateTextBuffer();
+	CDiffTextBuffer *const pTextBuffer = m_ptBuf[pMergeView->m_nThisPane];
 	int nStyle = pTextBuffer->GetCRLFMode();
 	if (COptionsMgr::Get(OPT_ALLOW_MIXED_EOL) ||
 		IsMixedEOL(pMergeView->m_nThisPane))

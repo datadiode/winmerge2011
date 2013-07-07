@@ -469,10 +469,10 @@ int CChildFrame::Rescan2(bool &bIdentical)
 			bIdentical = true;
 
 		// Now buffers data are valid
-		m_pView[0]->ReAttachToBuffer();
-		m_pView[1]->ReAttachToBuffer();
-		m_pDetailView[0]->ReAttachToBuffer();
-		m_pDetailView[1]->ReAttachToBuffer();
+		m_pView[0]->ReAttachToBuffer(m_ptBuf[0]);
+		m_pView[1]->ReAttachToBuffer(m_ptBuf[1]);
+		m_pDetailView[0]->ReAttachToBuffer(m_ptBuf[0]);
+		m_pDetailView[1]->ReAttachToBuffer(m_ptBuf[1]);
 
 		m_bEditAfterRescan[0] = false;
 		m_bEditAfterRescan[1] = false;
@@ -1918,10 +1918,10 @@ OPENRESULTS_TYPE CChildFrame::OpenDocs(
 	}
 
 	// Now buffers data are valid
-	m_pView[0]->AttachToBuffer();
-	m_pView[1]->AttachToBuffer();
-	m_pDetailView[0]->AttachToBuffer();
-	m_pDetailView[1]->AttachToBuffer();
+	m_pView[0]->AttachToBuffer(m_ptBuf[0]);
+	m_pView[1]->AttachToBuffer(m_ptBuf[1]);
+	m_pDetailView[0]->AttachToBuffer(m_ptBuf[0]);
+	m_pDetailView[1]->AttachToBuffer(m_ptBuf[1]);
 
 	// Currently there is only one set of syntax colors, which all documents & views share
 	m_pView[0]->SetColorContext(&SyntaxColors);
