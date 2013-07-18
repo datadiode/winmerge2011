@@ -148,8 +148,8 @@ void stringdiffs::BuildWordDiffList()
 			// Found at same position, so go on with next word 
 			if (w1 == bw1)
 			{
-				bw1++;
-				bw2++;
+				++bw1;
+				++bw2;
 				continue;
 			}
 			int w2 = w1;
@@ -179,10 +179,7 @@ void stringdiffs::BuildWordDiffList()
 								m_words2[bw2].end = m_words2[bw2 + 2].end;
 								m_words2[bw1].hash = m_words1[bw1].hash;
 								// Now remove the detected blocks on side2.
-								m_words2.erase(m_words2.begin() + bw2 + 1, m_words2.begin() + bw2 + 2);
-								++bw1;
-								++bw2;
-								continue;
+								m_words2.erase(m_words2.begin() + bw2 + 1, m_words2.begin() + bw2 + 3);
 							}
 						}
 					}
@@ -198,16 +195,13 @@ void stringdiffs::BuildWordDiffList()
 								m_words1[bw1].end = m_words1[bw1 + 2].end;
 								m_words1[bw1].hash = m_words2[bw1].hash;
 								// Now remove the detected blocks on side2.
-								m_words1.erase(m_words1.begin() + bw1 + 1, m_words1.begin() + bw1 + 2);
-								++bw1;
-								++bw2;
-								continue;
+								m_words1.erase(m_words1.begin() + bw1 + 1, m_words1.begin() + bw1 + 3);
 							}
 						}
 					}
 					// Otherwise keep as diff
-					bw1++;
-					bw2++;
+					++bw1;
+					++bw2;
 					continue;
 				}
 				// Not found on one side, so check if we are synchron again on
