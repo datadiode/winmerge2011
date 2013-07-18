@@ -85,7 +85,7 @@ int CChildFrame::GetActiveMergeViewIndexType() const
 	return -1;
 }
 
-CCrystalTextView *CChildFrame::GetActiveTextView() const
+CGhostTextView *CChildFrame::GetActiveTextView() const
 {
 	if (GetLeftView()->HasFocus())
 		return GetLeftView();
@@ -1192,6 +1192,9 @@ void CChildFrame::SetCurrentDiff(int nDiff)
  */
 void CChildFrame::FlushAndRescan(bool bForced)
 {
+	if (m_idContextLines < ID_VIEW_CONTEXT_UNLIMITED)
+		return;
+
 	// Ignore suppressing when forced rescan
 	if (!bForced && !m_bEnableRescan)
 		return;
@@ -1225,14 +1228,14 @@ void CChildFrame::FlushAndRescan(bool bForced)
 
 	// make sure we see the cursor from the curent view
 	if (nActiveViewIndexType == MERGEVIEW_LEFT || nActiveViewIndexType == MERGEVIEW_RIGHT)
-		m_pView[nActiveViewIndexType]->EnsureVisible(m_pView[nActiveViewIndexType]->GetCursorPos());
+		m_pView[nActiveViewIndexType]->EnsureCursorVisible();
 
 	// scroll both diff views to the same top line
 	m_pDetailView[0]->UpdateSiblingScrollPos(false);
 	m_pDetailView[1]->UpdateSiblingScrollPos(false);
 
 	// Refresh display
-	UpdateAllViews(NULL);
+	UpdateAllViews();
 	UpdateCmdUI();
 
 	// Show possible error after updating screen
@@ -1930,9 +1933,11 @@ OPENRESULTS_TYPE CChildFrame::OpenDocs(
 
 	// Set read-only etc. statuses.
 	// CRLF mode is volatile, so update it upon Rescan().
+	m_bInitialReadOnly[0] = bROLeft;
 	m_ptBuf[0]->SetReadOnly(bROLeft);
 	m_pView[0]->SetEncodingStatus(filelocLeft.encoding.GetName().c_str());
 
+	m_bInitialReadOnly[1] = bRORight;
 	m_ptBuf[1]->SetReadOnly(bRORight);
 	m_pView[1]->SetEncodingStatus(filelocRight.encoding.GetName().c_str());
 
@@ -2254,7 +2259,7 @@ void CChildFrame::SwapFiles()
 		pMovedLines->SwapSides();
 	}
 
-	UpdateAllViews(NULL);
+	UpdateAllViews();
 }
 
 /**
@@ -2604,7 +2609,25 @@ HRESULT CChildFrame::PrepareHTML(long nLine, long nStop, IDispatch *pFrame, long
 	return S_OK;
 }
 
-void CChildFrame::UpdateAllViews(CCrystalTextView *pSender)
+HRESULT CChildFrame::WriteReport(BSTR bsPath)
+{
+	UniStdioFile file;
+	if (!file.Open(bsPath, _T("wt")))
+		return HRESULT_FROM_WIN32(GetLastError());
+	WriteReport(file);
+	return S_OK;
+}
+
+HRESULT CChildFrame::LimitContext(long nLines)
+{
+	if ((nLines < -1) || (nLines > 5))
+		return E_INVALIDARG;
+	SendMessage(WM_COMMAND, nLines >= 0 ?
+		ID_VIEW_CONTEXT_0 + nLines : ID_VIEW_CONTEXT_UNLIMITED);
+	return S_OK;
+}
+
+void CChildFrame::UpdateAllViews()
 {
 	m_pView[0]->Invalidate();
 	m_pView[1]->Invalidate();

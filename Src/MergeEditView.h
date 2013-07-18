@@ -108,6 +108,7 @@ public:
 	HStatusBar *m_pStatusBar;
 	void SetLineInfoStatus(LPCTSTR szLine, int nColumn, int nColumns,
 		int nChar, int nChars, LPCTSTR szEol, EDITMODE editMode);
+	void UpdateLineInfoStatus();
 	void SetEncodingStatus(LPCTSTR);
 	void SetCRLFModeStatus(enum CRLFSTYLE);
 // Attributes
@@ -140,7 +141,7 @@ public:
 	bool EnableRescan(bool bEnable);
 	void ShowDiff(bool bScroll);
 	virtual void OnEditOperation(int nAction, LPCTSTR pszText);
-	virtual void OnUpdateCaret(bool bMove = false);
+	virtual void OnUpdateCaret(bool bShowHide = false);
 	void UpdateLineLengths();
 	bool IsLineInCurrentDiff(int nLine);
 	void SelectNone();
@@ -195,7 +196,6 @@ public:
 	void OnConvertEolTo(UINT);
 	void OnEditCopyLineNumbers();
 	void OnViewMargin();
-	void OnChangeScheme(UINT);
 };
 
 /////////////////////////////////////////////////////////////////////////////

@@ -346,11 +346,6 @@ HRESULT CMainFrame::ShowHTMLDialog(BSTR url, VARIANT *arguments, BSTR features, 
 HRESULT CMainFrame::ParseCmdLine(BSTR cmdline, BSTR directory)
 {
 	CurrentDirectory strRestoreDir;
-	// Restore main window if minimized
-	if (IsIconic())
-		ShowWindow(SW_RESTORE);
-	// Move to foreground
-	GetLastActivePopup()->SetForegroundWindow();
 	// Set current directory if specified
 	if (SysStringLen(directory) != 0)
 		SetCurrentDirectory(directory);
@@ -1758,22 +1753,15 @@ void CMainFrame::UpdateMrgViewFont()
 		if (pAbstract->GetFrameType() == FRAME_FILE)
 		{
 			CChildFrame *pSpecific = static_cast<CChildFrame *>(pAbstract);
-			if (CMergeEditView *pView = pSpecific->GetLeftView())
+			int nSide = 0;
+			do
 			{
-				pView->SetFont(m_lfDiff);
-				if (CMergeDiffDetailView *pView = pSpecific->GetLeftDetailView())
-				{
+				if (CMergeEditView *pView = pSpecific->GetView(nSide))
 					pView->SetFont(m_lfDiff);
-				}
-			}
-			if (CMergeEditView *pView = pSpecific->GetRightView())
-			{
-				pView->SetFont(m_lfDiff);
-				if (CMergeDiffDetailView *pView = pSpecific->GetRightDetailView())
-				{
+				if (CMergeDiffDetailView *pView = pSpecific->GetDetailView(nSide))
 					pView->SetFont(m_lfDiff);
-				}
-			}
+			} while (nSide ^= 1);
+			pSpecific->AlignScrollPositions();
 		}
 	}
 }
@@ -2897,6 +2885,15 @@ void CMainFrame::OnFileOpenProject()
  */
 bool CMainFrame::ParseArgsAndDoOpen(const MergeCmdLineInfo &cmdInfo)
 {
+	if (cmdInfo.m_nCmdShow != SW_SHOWMINNOACTIVE)
+	{
+		// Restore main window if minimized
+		if (IsIconic())
+			ShowWindow(SW_RESTORE);
+		// Move to foreground
+		GetLastActivePopup()->SetForegroundWindow();
+	}
+
 	// Unless the user has requested to see WinMerge's usage open files for
 	// comparison.
 	if (cmdInfo.m_bShowUsage)
@@ -2965,6 +2962,23 @@ bool CMainFrame::ParseArgsAndDoOpen(const MergeCmdLineInfo &cmdInfo)
 					filelocLeft, filelocRight,
 					cmdInfo.m_dwLeftFlags, cmdInfo.m_dwRightFlags,
 					cmdInfo.m_nRecursive);
+
+				if (bCompared && !cmdInfo.m_sRunScript.empty())
+				{
+					CDocFrame *pAbstract = static_cast<CDocFrame *>(GetActiveDocFrame());
+					if (pAbstract->GetFrameType() == FRAME_FILE)
+					{
+						CMyVariant arguments = static_cast<CChildFrame *>(pAbstract);
+						CMyVariant ret;
+						ShowHTMLDialog(
+							const_cast<BSTR>(cmdInfo.m_sRunScript.c_str()),
+							&arguments,
+							NULL,
+							&ret);
+						if (SUCCEEDED(ret.ChangeType(VT_BOOL)) && V_BOOL(&ret) == VARIANT_FALSE)
+							PostMessage(WM_KEYDOWN, VK_ESCAPE);
+					}
+				}
 			}
 		}
 		else if (ProjectFile::IsProjectFile(filelocLeft.filepath.c_str()))

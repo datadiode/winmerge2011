@@ -450,7 +450,7 @@ void CMergeEditView::SelectDiff(int nDiff, bool bScroll)
 	SelectNone();
 	m_pDocument->SetCurrentDiff(nDiff);
 	ShowDiff(bScroll);
-	m_pDocument->UpdateAllViews(this);
+	m_pDocument->UpdateAllViews();
 
 	// notify either side, as it will notify the other one
 	m_pDocument->GetLeftDetailView()->OnDisplayDiff(nDiff);
@@ -683,7 +683,7 @@ void CMergeEditView::OnLButtonUp()
 		if (!IsLineInCurrentDiff(m_ptCursorPos.y))
 		{
 			m_pDocument->SetCurrentDiff(-1);
-			m_pDocument->UpdateAllViews(NULL);
+			m_pDocument->UpdateAllViews();
 		}
 	}
 }
@@ -852,9 +852,17 @@ void CMergeEditView::OnUpdateCaret(bool bShowHide)
 	if (!IsTextBufferInitialized())
 		return;
 
-	if (!m_bCursorHidden && !bShowHide)
+	if (bShowHide)
+		return;
+
+	if (!m_bCursorHidden)
 		m_bMergeUndo = false;
 
+	UpdateLineInfoStatus();
+}
+
+void CMergeEditView::UpdateLineInfoStatus()
+{
 	int nScreenLine = m_ptCursorPos.y;
 	const int nRealLine = ComputeRealLine(nScreenLine);
 	TCHAR sLine[40];
@@ -1135,19 +1143,6 @@ void CMergeEditView::OnEditCopyLineNumbers()
 
 void CMergeEditView::OnSize() 
 {
-	InvalidateScreenRect();
-	Invalidate();
-
-	// recalculate m_nTopSubLine
-	m_nTopSubLine = GetSubLineIndex(m_nTopLine);
-
-	UpdateCaret();
-	
-	RecalcVertScrollBar();
-	RecalcHorzScrollBar();
-
-	UpdateSiblingScrollPos(false);
-
 	if (HStatusBar *const pBar = m_pStatusBar)
 	{
 		RECT rect;
@@ -1269,23 +1264,7 @@ void CMergeEditView::DocumentsLoaded()
 {
 	RefreshOptions();
 	SetFont(theApp.m_pMainWnd->m_lfDiff);
-	OnUpdateCaret();
-}
-
-/**
-* @brief Change the editor's syntax highlighting scheme.
-* @param [in] nID Selected color scheme sub menu id.
-*/
-void CMergeEditView::OnChangeScheme(UINT nID)
-{
-	for (int nPane = 0; nPane < 2; nPane++) 
-	{
-		if (CMergeEditView *const pView = m_pDocument->GetView(nPane))
-		{
-			pView->SetTextType(CCrystalTextView::TextType(nID - ID_COLORSCHEME_FIRST));
-		}
-	}
-	m_pDocument->UpdateAllViews(NULL);
+	UpdateLineInfoStatus();
 }
 
 /**
@@ -1335,14 +1314,14 @@ void CMergeEditView::ZoomText(short amount)
 {
 	if (HSurface *pDC = GetDC())
 	{
+		const int nLogPixelsY = pDC->GetDeviceCaps(LOGPIXELSY);
+
 		LOGFONT lf;
 		GetFont(lf);
 
-		const int nLogPixelsY = pDC->GetDeviceCaps(LOGPIXELSY);
-
 		int nPointSize = -MulDiv(lf.lfHeight, 72, nLogPixelsY);
 
-		if ( amount == 0)
+		if (amount == 0)
 		{
 			nPointSize = -MulDiv(theApp.m_pMainWnd->m_lfDiff.lfHeight, 72, nLogPixelsY);
 		}
@@ -1355,11 +1334,18 @@ void CMergeEditView::ZoomText(short amount)
 
 		for (int nPane = 0; nPane < MERGE_VIEW_COUNT; nPane++) 
 		{
-			if (CMergeEditView *const pView = m_pDocument->GetView(nPane))
+			if (CCrystalTextView *const pView = m_pDocument->GetView(nPane))
+			{
+				pView->SetFont(lf);
+			}
+			if (CCrystalTextView *const pView = m_pDocument->GetDetailView(nPane))
 			{
 				pView->SetFont(lf);
 			}
 		}
+
+		EnsureCursorVisible();
+
 		ReleaseDC(pDC);
 	}
 }

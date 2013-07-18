@@ -921,9 +921,9 @@
 #define ID_VIEW_RESIZE_PANES                    33167
 #define ID_HELP_RELEASENOTES                    33168
 #define ID_VIEW_ZOOMIN                          33169
-#define ID_VIEW_ZOOMOUT                         33170
-#define ID_HELP_TRANSLATIONS                    33171
-#define ID_VIEW_ZOOMNORMAL                      33172
+#define ID_VIEW_ZOOMNORMAL                      33170
+#define ID_VIEW_ZOOMOUT                         33171
+#define ID_HELP_TRANSLATIONS                    33174
 #define IDS_IDLEMESSAGE                         33175
 #define IDS_SELECTION_LEFT                      33176
 #define IDS_SELECTION_RIGHT                     33177

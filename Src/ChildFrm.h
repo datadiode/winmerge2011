@@ -86,6 +86,7 @@ enum MERGEVIEW_INDEX_TYPE
 struct DiffFileInfo;
 class CMergeEditView;
 class CMergeDiffDetailView;
+class CGhostTextView;
 class CLocationView;
 class PackingInfo;
 class CDirFrame;
@@ -94,7 +95,8 @@ class CDirFrame;
  * @brief Frame class for file compare, handles panes, statusbar etc.
  */
 class CChildFrame
-	: public CDocFrame
+	: ZeroInit<CChildFrame>
+	, public CDocFrame
 	, public CScriptable<IMergeDoc>
 	, private CFloatFlags
 {
@@ -112,6 +114,8 @@ public:
 	STDMETHOD(GetMarginHTML)(long nSide, long nLine, BSTR *pbsHTML);
 	STDMETHOD(GetContentHTML)(long nSide, long nLine, BSTR *pbsHTML);
 	STDMETHOD(PrepareHTML)(long nLine, long nStop, IDispatch *pFrame, long *pnLine);
+	STDMETHOD(WriteReport)(BSTR bsPath);
+	STDMETHOD(LimitContext)(long nLines);
 
 	void UpdateResources();
 	void SetLastCompareResult(int nResult);
@@ -121,6 +125,7 @@ public:
 	void UpdateBookmarkUI();
 	void UpdateSourceTypeUI();
 	void UpdateMergeStatusUI();
+	void AlignScrollPositions();
 
 // Attributes
 
@@ -173,9 +178,9 @@ public:
 	stl::vector<FileTextStats> m_pFileTextStats;
 
 	int GetActiveMergeViewIndexType() const;
-	CCrystalTextView *GetActiveTextView() const;
+	CGhostTextView *GetActiveTextView() const;
 	CMergeEditView *GetActiveMergeView() const;
-	void UpdateAllViews(CCrystalTextView *pSender);
+	void UpdateAllViews();
 	void UpdateHeaderPath(int pane);
 	void UpdateHeaderActivity(int pane, bool bActivate);
 	void RefreshOptions();
@@ -235,7 +240,6 @@ private:
 
 	void DoPrint();
 	void ReloadDocs();
-	void AlignScrollPositions();
 
 // Implementation
 public:
@@ -264,21 +268,21 @@ private:
 
 	CDirFrame *m_pDirDoc;
 	CChildFrame *const m_pOpener;
+	bool m_bEditAfterRescan[2]; /**< Left/right doc edited after rescanning */
+	bool m_bInitialReadOnly[2]; /**< Left/right doc initial read-only state */
+	bool m_bMergingMode; /**< Merging or Edit mode */
+	bool m_bMixedEol; /**< Does this document have mixed EOL style? */
 	bool m_bEnableRescan; /**< Automatic rescan enabled/disabled */
 	FileTime m_LastRescan; /**< Time of last rescan (for delaying) */ 
 	CDiffWrapper m_diffWrapper;
 	/// information about the file packer/unpacker
 	const stl::auto_ptr<PackingInfo> m_pInfoUnpacker;
 	BUFFERTYPE m_nBufferType[2];
-	bool m_bMergingMode; /**< Merging or Edit mode */
-	bool m_bEditAfterRescan[2]; /**< Left/right doc edited after rescanning */
-	bool m_bMixedEol; /**< Does this document have mixed EOL style? */
 // friend access
 	friend class RescanSuppress;
 
 private:
-	void OnLeftReadOnly();
-	void OnRightReadOnly();
+	void OnReadOnly(int nSide);
 	void OnEditUndo();
 	void OnEditRedo();
 	void OnWMGoto();

@@ -74,6 +74,7 @@ public:
 
 	String m_sFileFilter; /**< File filter mask. */
 	String m_sContentType; /**< Content type. */
+	String m_sRunScript; /**< Run this script in the context of the document. */
 	String m_sOptionChars; /**< Set of accepted option indicators. */
 
 	stl::vector<String> m_Files; /**< Files (or directories) to compare. */

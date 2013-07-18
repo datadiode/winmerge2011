@@ -42,9 +42,6 @@ LRESULT CMergeDiffDetailView::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam
 {
 	switch (uMsg)
 	{
-	case WM_SIZE:
-		SetDisplayHeight(SHORT HIWORD(lParam));
-		break;
 	case WM_CONTEXTMENU:
 		OnContextMenu(lParam);
 		break;
@@ -63,15 +60,16 @@ void CMergeDiffDetailView::UpdateResources()
 }
 
 /**
- * @brief Set view's height.
- * @param [in] h new view height in pixels
+ * @brief Get view's height.
  */
-void CMergeDiffDetailView::SetDisplayHeight(int h) 
+int CMergeDiffDetailView::GetDisplayHeight() 
 {
+	RECT rc;
+	GetClientRect(&rc);
 	int lineHeight = GetLineHeight();
-	if (h >= lineHeight)
-		h -= lineHeight / 2;
-	m_displayLength = h / lineHeight;
+	if (rc.bottom >= lineHeight)
+		rc.bottom -= lineHeight / 2;
+	return rc.bottom / lineHeight;
 }
 
 /// virtual, ensure we remain in diff
@@ -256,8 +254,10 @@ bool CMergeDiffDetailView::EnsureInDiff(POINT &pt)
 /// virtual, ensure we remain in diff
 void CMergeDiffDetailView::ScrollToSubLine(int nNewTopLine)
 {
-	if (nNewTopLine > m_lineEnd - m_displayLength)
-		nNewTopLine = m_lineEnd - m_displayLength;
+	const int nMaxTopLine = m_lineEnd - GetDisplayHeight();
+
+	if (nNewTopLine > nMaxTopLine)
+		nNewTopLine = nMaxTopLine;
 	if (nNewTopLine < m_lineBegin)
 		nNewTopLine = m_lineBegin;
 
@@ -434,9 +434,10 @@ void CMergeDiffDetailView::OnContextMenu(LPARAM lParam)
 	pMenu->DestroyMenu();
 }
 
-void CMergeDiffDetailView::OnUpdateCaret(bool bMove)
+void CMergeDiffDetailView::OnUpdateCaret(bool bShowHide)
 {
-	CCrystalTextView::OnUpdateCaret(bMove);
+	if (bShowHide)
+		return;
 	m_pDocument->UpdateCmdUI();
 }
 

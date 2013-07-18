@@ -727,8 +727,8 @@ public:
 	void HideCursor();
 
 	//  Operations
-	void EnsureVisible(POINT pt);
-	void EnsureVisible(POINT ptStart, POINT ptEnd);
+	void EnsureCursorVisible();
+	void EnsureSelectionVisible();
 
 	//  Text search helpers
 	BOOL FindText(LPCTSTR pszText, const POINT &ptStartPos,

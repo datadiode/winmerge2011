@@ -215,13 +215,14 @@ void CChildFrame::ReloadDocs()
 		bool bIdentical = false;
 		Rescan2(bIdentical);
 	}
-	UpdateAllViews(NULL);
+	UpdateAllViews();
 }
 
 void CChildFrame::AlignScrollPositions()
 {
 	m_pView[0]->UpdateSiblingScrollPos(false);
 	m_pView[1]->UpdateSiblingScrollPos(false);
+	GetActiveMergeView()->EnsureCursorVisible();
 }
 
 BOOL CChildFrame::PreTranslateMessage(MSG *pMsg)
@@ -240,7 +241,7 @@ BOOL CChildFrame::PreTranslateMessage(MSG *pMsg)
 template<>
 LRESULT CChildFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 {
-	CCrystalTextView *const pTextView = GetActiveTextView();
+	CGhostTextView *const pTextView = GetActiveTextView();
 	CMergeEditView *const pActiveView = GetActiveMergeView();
 	switch (const UINT id = lParam ? static_cast<UINT>(wParam) : LOWORD(wParam))
 	{
@@ -282,10 +283,10 @@ LRESULT CChildFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 		OnToolsGenerateReport();
 		break;
 	case ID_FILE_LEFT_READONLY:
-		OnLeftReadOnly();
+		OnReadOnly(0);
 		break;
 	case ID_FILE_RIGHT_READONLY:
-		OnRightReadOnly();
+		OnReadOnly(1);
 		break;
 	case ID_FILE_MERGINGMODE:
 		SetMergingMode(!GetMergingMode());
@@ -341,26 +342,31 @@ LRESULT CChildFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 	case ID_VIEW_WORDWRAP:
 		COptionsMgr::SaveOption(OPT_WORDWRAP, !COptionsMgr::Get(OPT_WORDWRAP));
 		RefreshOptions();
-		UpdateAllViews(NULL);
-		if (pTextView)
-			pTextView->UpdateCaret(true);
+		AlignScrollPositions();
 		break;
-	case ID_VIEW_CONTEXT_0:
-	case ID_VIEW_CONTEXT_1:
-	case ID_VIEW_CONTEXT_2:
-	case ID_VIEW_CONTEXT_3:
-	case ID_VIEW_CONTEXT_4:
-	case ID_VIEW_CONTEXT_5:
-		// Editing does not work with limited context, so disable it.
-		m_ptBuf[0]->SetReadOnly();
-		GetLeftView()->OnUpdateCaret();
-		m_ptBuf[1]->SetReadOnly();
-		GetRightView()->OnUpdateCaret();
-		// fall through
-	case ID_VIEW_CONTEXT_UNLIMITED:
+
+		for (;;) // Establish a local context for breaking
+		{
+		case ID_VIEW_CONTEXT_0:
+		case ID_VIEW_CONTEXT_1:
+		case ID_VIEW_CONTEXT_2:
+		case ID_VIEW_CONTEXT_3:
+		case ID_VIEW_CONTEXT_4:
+		case ID_VIEW_CONTEXT_5:
+			// Editing does not work with limited context, so disable it.
+			m_ptBuf[0]->SetReadOnly();
+			m_ptBuf[1]->SetReadOnly();
+			break;
+		case ID_VIEW_CONTEXT_UNLIMITED:
+			m_ptBuf[0]->SetReadOnly(m_bInitialReadOnly[0]);
+			m_ptBuf[1]->SetReadOnly(m_bInitialReadOnly[1]);
+			break;
+		}
+		m_pView[0]->UpdateLineInfoStatus();
+		m_pView[1]->UpdateLineInfoStatus();
 		// Clear the detail views or else they will go out of sync.
-		GetLeftDetailView()->OnDisplayDiff(-1);
-		GetRightDetailView()->OnDisplayDiff(-1);
+		m_pDetailView[0]->OnDisplayDiff(-1);
+		m_pDetailView[1]->OnDisplayDiff(-1);
 		m_idContextLines = id;
 		ReloadDocs();
 		break;
@@ -371,52 +377,52 @@ LRESULT CChildFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 		pTextView->OnEditCopy();
 		break;
 	case ID_EDIT_CUT:
-		pActiveView->OnEditCut();
+		pTextView->OnEditCut();
 		break;
 	case ID_EDIT_PASTE:
-		pActiveView->OnEditPaste();
+		pTextView->OnEditPaste();
 		break;
 	case ID_EDIT_TAB:
-		pActiveView->OnEditTab();
+		pTextView->OnEditTab();
 		break;
 	case ID_EDIT_UNTAB:
-		pActiveView->OnEditUntab();
+		pTextView->OnEditUntab();
 		break;
 	case ID_EDIT_COPY_LINENUMBERS:
 		pActiveView->OnEditCopyLineNumbers();
 		break;
 	case ID_EDIT_DELETE:
-		pActiveView->OnEditDelete();
+		pTextView->OnEditDelete();
 		break;
 	case ID_EDIT_DELETE_BACK:
-		pActiveView->OnEditDeleteBack();
+		pTextView->OnEditDeleteBack();
 		break;
 	case ID_EDIT_REPLACE:
-		pActiveView->OnEditReplace();
+		pTextView->OnEditReplace();
 		break;
 	case ID_EDIT_LOWERCASE:
-		pActiveView->OnEditLowerCase();
+		pTextView->OnEditLowerCase();
 		break;
 	case ID_EDIT_UPPERCASE:
-		pActiveView->OnEditUpperCase();
+		pTextView->OnEditUpperCase();
 		break;
 	case ID_EDIT_SWAPCASE:
-		pActiveView->OnEditSwapCase();
+		pTextView->OnEditSwapCase();
 		break;
 	case ID_EDIT_CAPITALIZE:
-		pActiveView->OnEditCapitalize();
+		pTextView->OnEditCapitalize();
 		break;
 	case ID_EDIT_SENTENCE:
-		pActiveView->OnEditSentence();
+		pTextView->OnEditSentence();
 		break;
 	case ID_EDIT_GOTO_LAST_CHANGE:
-		pActiveView->OnEditGotoLastChange();
+		pTextView->OnEditGotoLastChange();
 		break;
 	case ID_EDIT_DELETE_WORD:
-		pActiveView->OnEditDeleteWord();
+		pTextView->OnEditDeleteWord();
 		break;
 	case ID_EDIT_DELETE_WORD_BACK:
-		pActiveView->OnEditDeleteWordBack();
+		pTextView->OnEditDeleteWordBack();
 		break;
 	case ID_EDIT_UNDO:
 		OnEditUndo();
@@ -604,13 +610,12 @@ LRESULT CChildFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 		SwapFiles();
 		break;
 	case ID_VIEW_ZOOMIN:
-		pActiveView->ZoomText(1);
-		break;
-	case ID_VIEW_ZOOMOUT:
-		pActiveView->ZoomText(-1);
-		break;
 	case ID_VIEW_ZOOMNORMAL:
-		pActiveView->ZoomText(0);
+	case ID_VIEW_ZOOMOUT:
+		C_ASSERT(ID_VIEW_ZOOMNORMAL - ID_VIEW_ZOOMIN == 1);
+		C_ASSERT(ID_VIEW_ZOOMNORMAL - ID_VIEW_ZOOMOUT == -1);
+		pActiveView->ZoomText(ID_VIEW_ZOOMNORMAL - id);
+		AlignScrollPositions();
 		break;
 	case ID_NEXT_PANE:
 	case ID_WINDOW_CHANGE_PANE:
@@ -636,7 +641,13 @@ LRESULT CChildFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 	default:
 		if (id >= ID_COLORSCHEME_FIRST && id <= ID_COLORSCHEME_LAST)
 		{
-			pActiveView->OnChangeScheme(id);
+			CCrystalTextView::TextType enuType = static_cast
+				<CCrystalTextView::TextType>(id - ID_COLORSCHEME_FIRST);
+			m_pView[0]->SetTextType(enuType);
+			m_pView[1]->SetTextType(enuType);
+			m_pDetailView[0]->SetTextType(enuType);
+			m_pDetailView[1]->SetTextType(enuType);
+			UpdateAllViews();
 			UpdateSourceTypeUI();
 			break;
 		}
@@ -725,8 +736,6 @@ CChildFrame::CChildFrame(CMainFrame *pMDIFrame, CChildFrame *pOpener)
 , m_bEnableRescan(true)
 , m_nCurDiff(-1)
 , m_idContextLines(ID_VIEW_CONTEXT_UNLIMITED)
-, m_pDirDoc(NULL)
-, m_bMixedEol(false)
 , m_pInfoUnpacker(new PackingInfo)
 , m_diffWrapper(&m_diffList)
 , m_strPath(2)
@@ -736,15 +745,19 @@ CChildFrame::CChildFrame(CMainFrame *pMDIFrame, CChildFrame *pOpener)
 , m_pFileTextStats(2)
 {
 	curUndo = undoTgt.begin();
-	m_pView[0] = NULL;
-	m_pView[1] = NULL;
-	m_pDetailView[0] = NULL;
-	m_pDetailView[1] = NULL;
-	m_nBufferType[0] = BUFFER_NORMAL;
-	m_nBufferType[1] = BUFFER_NORMAL;
+	ASSERT(m_pDirDoc == NULL);
+	ASSERT(m_bMixedEol == false);
+	ASSERT(m_pView[0] == NULL);
+	ASSERT(m_pView[1] == NULL);
+	ASSERT(m_pDetailView[0] == NULL);
+	ASSERT(m_pDetailView[1] == NULL);
+	ASSERT(m_nBufferType[0] == BUFFER_NORMAL);
+	ASSERT(m_nBufferType[1] == BUFFER_NORMAL);
 	m_bMergingMode = COptionsMgr::Get(OPT_MERGE_MODE);
-	m_bEditAfterRescan[0] = false;
-	m_bEditAfterRescan[1] = false;
+	ASSERT(m_bEditAfterRescan[0] == false);
+	ASSERT(m_bEditAfterRescan[1] == false);
+	ASSERT(m_bInitialReadOnly[0] == false);
+	ASSERT(m_bInitialReadOnly[1] == false);
 	m_ptBuf[0] = new CDiffTextBuffer(this, 0);
 	m_ptBuf[1] = new CDiffTextBuffer(this, 1);
 	m_diffWrapper.RefreshOptions();
@@ -1097,25 +1110,14 @@ void CChildFrame::UpdateMergeStatusUI()
 }
 
 /**
- * @brief Enable/disable left buffer read-only
+ * @brief Enable/disable buffer read-only
  */
-void CChildFrame::OnLeftReadOnly()
+void CChildFrame::OnReadOnly(int nSide)
 {
-	bool bReadOnly = !m_ptBuf[0]->GetReadOnly();
-	m_ptBuf[0]->SetReadOnly(bReadOnly);
-	GetLeftView()->OnUpdateCaret();
-	UpdateCmdUI();
-}
-
-/**
- * @brief Enable/disable right buffer read-only
- */
-void CChildFrame::OnRightReadOnly()
-{
-	bool bReadOnly = !m_ptBuf[1]->GetReadOnly();
-	m_ptBuf[1]->SetReadOnly(bReadOnly);
-	GetRightView()->OnUpdateCaret();
-	UpdateCmdUI();
+	bool bReadOnly = !m_ptBuf[nSide]->GetReadOnly();
+	m_bInitialReadOnly[nSide] = bReadOnly;
+	m_ptBuf[nSide]->SetReadOnly(bReadOnly);
+	m_pView[nSide]->UpdateLineInfoStatus();
 }
 
 /**

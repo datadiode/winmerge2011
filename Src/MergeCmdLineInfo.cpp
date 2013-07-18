@@ -290,6 +290,11 @@ void MergeCmdLineInfo::ParseWinMergeCmdLine(LPCTSTR q)
 			// -t "type" - builtin type specifier or file transform moniker
 			q = EatParam(q, m_sContentType);
 		}
+		else if (param == _T("run"))
+		{
+			// -run is followed by .wsf name
+			q = EatParam(q, m_sRunScript);
+		}
 		else if (param == _T("r"))
 		{
 			// -r to compare recursively
@@ -324,7 +329,7 @@ void MergeCmdLineInfo::ParseWinMergeCmdLine(LPCTSTR q)
 		else if (param == _T("minimize"))
 		{
 			// -minimize means minimize the main window.
-			m_nCmdShow = SW_MINIMIZE;
+			m_nCmdShow = SW_SHOWMINNOACTIVE;
 		}
 		else if (param == _T("maximize"))
 		{

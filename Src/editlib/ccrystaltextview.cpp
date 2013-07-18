@@ -1113,10 +1113,10 @@ void CCrystalTextView::WrapLineCached(int nLineIndex, int *anBreaks, int &nBreak
 	}
 }
 
-void CCrystalTextView::InvalidateLineCache( int nLineIndex1, int nLineIndex2 /*= -1*/ )
+void CCrystalTextView::InvalidateLineCache(int nLineIndex1, int nLineIndex2)
 {
 	// invalidate cached sub line index
-	InvalidateSubLineIndexCache( nLineIndex1 );
+	InvalidateSubLineIndexCache(nLineIndex1);
 	// invalidate cached sub line count
 	if (nLineIndex2 == -1)
 		nLineIndex2 = upperBound(m_panSubLines);
@@ -1283,79 +1283,82 @@ int CCrystalTextView::MergeTextBlocks(
 
 void CCrystalTextView::DrawSingleLine(HSurface *pdc, const RECT &rc, int nLineIndex)
 {
-	const int nCharWidth = GetCharWidth();
 	ASSERT(nLineIndex >= 0 && nLineIndex < GetLineCount());
 
 	//  Acquire the background color for the current line
 	COLORREF crBkgnd, crText;
 	GetLineColors(nLineIndex, crBkgnd, crText);
-
-	int nLength = GetViewableLineLength(nLineIndex);
-	LPCTSTR pszChars = GetLineChars(nLineIndex);
-
-	//  Parse the line
-	DWORD dwCookie = GetParseCookie (nLineIndex - 1);
-	TEXTBLOCK *pBuf = new TEXTBLOCK[(nLength+1) * 3]; // be aware of nLength == 0
-
-	int nBlocks = 0;
-	// insert at least one textblock of normal color at the beginning
-	pBuf[0].m_nCharPos = 0;
-	pBuf[0].m_nColorIndex = COLORINDEX_NORMALTEXT;
-	pBuf[0].m_nBgColorIndex = COLORINDEX_BKGND;
-	nBlocks++;
-
-	m_ParseCookies[nLineIndex] = ParseLine(dwCookie, nLineIndex, pBuf, nBlocks);
-	ASSERT(m_ParseCookies[nLineIndex] != - 1);
-
-	// Allocate table for max possible diff count:
-	// every char might be a diff (empty line has one char) and every diff
-	// needs three blocks plus one block at end (see called function)
-	TEXTBLOCK *pAddedBuf = new TEXTBLOCK[(nLength + 1) * 3 + 1];
-	int nAddedBlocks = GetAdditionalTextBlocks(nLineIndex, pAddedBuf);
-
-	TEXTBLOCK *pMergedBuf;
-	int nMergedBlocks = MergeTextBlocks(pBuf, nBlocks, pAddedBuf, nAddedBlocks, pMergedBuf);
-
-	delete[] pBuf;
-	delete[] pAddedBuf;
-
-	pBuf = pMergedBuf;
-	nBlocks = nMergedBlocks;
-
-	int nActualItem = 0;
-	int nActualOffset = 0;
-
-	// Wrap the line
-	stl::vector<int> anBreaks;
-	anBreaks.resize(nLength + 2);
-	int nBreaks = 0;
-	anBreaks[0] = 0;
-	WrapLineCached(nLineIndex, &anBreaks.front() + 1, nBreaks);
-	anBreaks[++nBreaks] = nLength;
-
-	//  Draw the line text
-	POINT origin = { rc.left - m_nOffsetChar * nCharWidth, rc.top };
 	if (crBkgnd != CLR_NONE)
 		pdc->SetBkColor(crBkgnd);
 	if (crText != CLR_NONE)
 		pdc->SetTextColor(crText);
 
-	// Draw all the screen lines of the wrapped line
-	for (int i = 0 ; i < nBreaks ; ++i)
+	int nEmptySubLines = 1;
+
+	if (LPCTSTR pszChars = GetLineChars(nLineIndex))
 	{
-		ASSERT(anBreaks[i] >= 0 && anBreaks[i] <= nLength);
-		DrawScreenLine(
-			pdc, origin, rc,
-			pBuf, nBlocks, nActualItem,
-			crText, crBkgnd,
-			pszChars, anBreaks[i], anBreaks[i + 1] - anBreaks[i],
-			nActualOffset, nLineIndex);
+		int nLength = GetViewableLineLength(nLineIndex);
+
+		//  Parse the line
+		DWORD dwCookie = GetParseCookie (nLineIndex - 1);
+		TEXTBLOCK *pBuf = new TEXTBLOCK[(nLength+1) * 3]; // be aware of nLength == 0
+
+		int nBlocks = 0;
+		// insert at least one textblock of normal color at the beginning
+		pBuf[0].m_nCharPos = 0;
+		pBuf[0].m_nColorIndex = COLORINDEX_NORMALTEXT;
+		pBuf[0].m_nBgColorIndex = COLORINDEX_BKGND;
+		nBlocks++;
+
+		m_ParseCookies[nLineIndex] = ParseLine(dwCookie, nLineIndex, pBuf, nBlocks);
+		ASSERT(m_ParseCookies[nLineIndex] != - 1);
+
+		// Allocate table for max possible diff count:
+		// every char might be a diff (empty line has one char) and every diff
+		// needs three blocks plus one block at end (see called function)
+		TEXTBLOCK *pAddedBuf = new TEXTBLOCK[(nLength + 1) * 3 + 1];
+		int nAddedBlocks = GetAdditionalTextBlocks(nLineIndex, pAddedBuf);
+
+		TEXTBLOCK *pMergedBuf;
+		int nMergedBlocks = MergeTextBlocks(pBuf, nBlocks, pAddedBuf, nAddedBlocks, pMergedBuf);
+
+		delete[] pBuf;
+		delete[] pAddedBuf;
+
+		pBuf = pMergedBuf;
+		nBlocks = nMergedBlocks;
+
+		int nActualItem = 0;
+		int nActualOffset = 0;
+
+		// Wrap the line
+		stl::vector<int> anBreaks;
+		anBreaks.resize(nLength + 2);
+		int nBreaks = 0;
+		anBreaks[0] = 0;
+		WrapLineCached(nLineIndex, &anBreaks.front() + 1, nBreaks);
+		anBreaks[++nBreaks] = nLength;
+
+		//  Draw the line text
+		const int nCharWidth = GetCharWidth();
+		POINT origin = { rc.left - m_nOffsetChar * nCharWidth, rc.top };
+
+		// Draw all the screen lines of the wrapped line
+		for (int i = 0 ; i < nBreaks ; ++i)
+		{
+			ASSERT(anBreaks[i] >= 0 && anBreaks[i] <= nLength);
+			DrawScreenLine(
+				pdc, origin, rc,
+				pBuf, nBlocks, nActualItem,
+				crText, crBkgnd,
+				pszChars, anBreaks[i], anBreaks[i + 1] - anBreaks[i],
+				nActualOffset, nLineIndex);
+		}
+
+		delete[] pBuf;
+		nEmptySubLines = GetEmptySubLines(nLineIndex);
 	}
-
-	delete[] pBuf;
-
 	// Draw empty sublines
-	int nEmptySubLines = GetEmptySubLines(nLineIndex);
 	if (nEmptySubLines > 0)
 	{
 		RECT frect = rc;
@@ -2178,7 +2181,7 @@ void CCrystalTextView::GoToLine(int nLine, bool bRelative)
 			SetAnchor(ptCursorPos);
 			SetSelection(ptCursorPos, ptCursorPos);
 			SetCursorPos(ptCursorPos);
-			EnsureVisible(ptCursorPos);
+			EnsureCursorVisible();
 		}
 	}
 }
@@ -2410,20 +2413,15 @@ void CCrystalTextView::OnDestroy()
 
 void CCrystalTextView::OnSize()
 {
-	// get char position of top left visible character with old cached word wrap
-	POINT topPos;
-	SubLineCursorPosToTextPos(0, m_nTopSubLine, topPos);
 	// we have to recompute the line wrapping
 	InvalidateScreenRect();
-	// compute new top sub line
-	POINT topSubLine;
-	CharPosToPoint(topPos.y, topPos.x, topSubLine);
-	m_nTopSubLine = GetSubLineIndex(topPos.y) + topSubLine.y;
-	ScrollToSubLine(m_nTopSubLine);
+	// recalculate m_nTopSubLine
+	m_nTopSubLine = GetSubLineIndex(m_nTopLine);
 	// set caret to right position
-	UpdateCaret();
+	UpdateCaret(true);
 	RecalcVertScrollBar();
 	RecalcHorzScrollBar();
+	UpdateSiblingScrollPos(false);
 }
 
 void CCrystalTextView::OnUpdateSibling(CCrystalTextView *pUpdateSource, bool bHorz)
@@ -2436,7 +2434,6 @@ void CCrystalTextView::OnUpdateSibling(CCrystalTextView *pUpdateSource, bool bHo
 			if (pUpdateSource->m_nTopSubLine != m_nTopSubLine)
 			{
 				ScrollToSubLine(pUpdateSource->m_nTopSubLine);
-				UpdateCaret();
 			}
 		}
 		else
@@ -2444,9 +2441,9 @@ void CCrystalTextView::OnUpdateSibling(CCrystalTextView *pUpdateSource, bool bHo
 			if (pUpdateSource->m_nOffsetChar != m_nOffsetChar)
 			{
 				ScrollToChar(pUpdateSource->m_nOffsetChar);
-				UpdateCaret();
 			}
 		}
+		UpdateCaret(true);
 	}
 }
 
@@ -2871,15 +2868,15 @@ int CCrystalTextView::ApproxActualOffset(int nLineIndex, int nOffset)
 	return nLength;
 }
 
-void CCrystalTextView::EnsureVisible(POINT pt)
+void CCrystalTextView::EnsureCursorVisible()
 {
 	//  Scroll vertically
 	int nSubLineCount = GetSubLineCount();
 	int nNewTopSubLine = m_nTopSubLine;
 	POINT subLinePos;
 
-	CharPosToPoint(pt.y, pt.x, subLinePos);
-	subLinePos.y += GetSubLineIndex(pt.y);
+	CharPosToPoint(m_ptCursorPos.y, m_ptCursorPos.x, subLinePos);
+	subLinePos.y += GetSubLineIndex(m_ptCursorPos.y);
 
 	if (subLinePos.y >= nNewTopSubLine + GetScreenLines())
 		nNewTopSubLine = subLinePos.y - GetScreenLines() + 1;
@@ -2916,7 +2913,7 @@ void CCrystalTextView::EnsureVisible(POINT pt)
 	// we do not need horizontally scrolling, if we wrap the words
 	if (m_bWordWrap)
 		return;
-	int nActualPos = CalculateActualOffset(pt.y, pt.x);
+	int nActualPos = CalculateActualOffset(m_ptCursorPos.y, m_ptCursorPos.x);
 	int nNewOffset = m_nOffsetChar;
 	const int nScreenChars = GetScreenChars();
   
@@ -2980,7 +2977,7 @@ void CCrystalTextView::UpdateView(CCrystalTextView *pSource, CUpdateContext *pCo
 		return;
 	}
 
-	int nLineCount = GetLineCount ();
+	int nLineCount = GetLineCount();
 	ASSERT(nLineCount > 0);
 	ASSERT(nLineIndex >= -1 && nLineIndex < nLineCount);
 	if ((dwFlags & UPDATE_SINGLELINE) != 0)
@@ -3181,7 +3178,6 @@ void CCrystalTextView::SetFont(const LOGFONT &lf)
 	m_lfBaseFont = lf;
 	m_nCharWidth = -1;
 	m_nLineHeight = -1;
-	InvalidateScreenRect();
 	for (int i = 0; i < 4; ++i)
 	{
 		if (m_apFonts[i] != NULL)
@@ -3190,13 +3186,8 @@ void CCrystalTextView::SetFont(const LOGFONT &lf)
 			m_apFonts[i] = NULL;
 		}
 	}
-	if (m_hWnd)
-	{
-		RecalcVertScrollBar();
-		RecalcHorzScrollBar();
-		UpdateCaret();
-		Invalidate();
-	}
+	OnSize();
+	Invalidate();
 }
 
 void CCrystalTextView::OnToggleBookmark(UINT nCmdID)
@@ -3229,7 +3220,7 @@ void CCrystalTextView::OnGoBookmark(UINT nCmdID)
 		SetSelection(pt, pt);
 		SetCursorPos(pt);
 		SetAnchor(pt);
-		EnsureVisible(pt);
+		EnsureCursorVisible();
 	}
 }
 
@@ -3404,7 +3395,7 @@ BOOL CCrystalTextView::HighlightText(
 			ScrollToLine(ptStartPos.y);
 		UpdateSiblingScrollPos(false);
 	}
-	EnsureVisible(ptStartPos, ptEndPos);
+	EnsureSelectionVisible();
 	return TRUE;
 }
 
@@ -3814,7 +3805,7 @@ void CCrystalTextView::OnNextBookmark()
 		SetSelection(pt, pt);
 		SetCursorPos(pt);
 		SetAnchor(pt);
-		EnsureVisible(pt);
+		EnsureCursorVisible();
 	}
 }
 
@@ -3828,7 +3819,7 @@ void CCrystalTextView::OnPrevBookmark()
 		SetSelection(pt, pt);
 		SetCursorPos(pt);
 		SetAnchor(pt);
-		EnsureVisible(pt);
+		EnsureCursorVisible();
 	}
 }
 
@@ -4053,7 +4044,7 @@ void CCrystalTextView::OnMatchBrace()
                               SetSelection(ptCursorPos, ptCursorPos);
                               SetCursorPos(ptCursorPos);
                               SetAnchor(ptCursorPos);
-                              EnsureVisible(ptCursorPos);
+                              EnsureCursorVisible();
                               return;
                             }
                         }
@@ -4120,7 +4111,7 @@ void CCrystalTextView::OnMatchBrace()
                               SetSelection(ptCursorPos, ptCursorPos);
                               SetCursorPos(ptCursorPos);
                               SetAnchor(ptCursorPos);
-                              EnsureVisible(ptCursorPos);
+                              EnsureCursorVisible();
                               return;
                             }
                         }
@@ -4188,110 +4179,109 @@ LPCTSTR CCrystalTextView::GetTextBufferEol(int nLine) const
 }
 
 // This function assumes selection is in one line
-void CCrystalTextView::EnsureVisible(POINT ptStart, POINT ptEnd)
+void CCrystalTextView::EnsureSelectionVisible()
 {
-  //  Scroll vertically
-  //BEGIN SW
-  int nSubLineCount = GetSubLineCount();
-  int nNewTopSubLine = m_nTopSubLine;
-  POINT subLinePos;
-  POINT subLinePosEnd;
+	//  Scroll vertically
+	//BEGIN SW
+	int nSubLineCount = GetSubLineCount();
+	int nNewTopSubLine = m_nTopSubLine;
+	POINT subLinePos;
+	POINT subLinePosEnd;
 
-  CharPosToPoint( ptStart.y, ptStart.x, subLinePos );
-  subLinePos.y += GetSubLineIndex( ptStart.y );
-  CharPosToPoint( ptEnd.y, ptEnd.x, subLinePosEnd );
-  subLinePosEnd.y += GetSubLineIndex( ptEnd.y );
+	CharPosToPoint(m_ptSelStart.y, m_ptSelStart.x, subLinePos);
+	subLinePos.y += GetSubLineIndex(m_ptSelStart.y);
+	CharPosToPoint(m_ptSelEnd.y, m_ptSelEnd.x, subLinePosEnd);
+	subLinePosEnd.y += GetSubLineIndex(m_ptSelEnd.y);
 
-  if( subLinePos.y >= nNewTopSubLine + GetScreenLines() )
-    nNewTopSubLine = subLinePos.y - GetScreenLines() + 1;
-  if( subLinePos.y < nNewTopSubLine )
-    nNewTopSubLine = subLinePos.y;
+	if (subLinePos.y >= nNewTopSubLine + GetScreenLines())
+		nNewTopSubLine = subLinePos.y - GetScreenLines() + 1;
+	if (subLinePos.y < nNewTopSubLine)
+		nNewTopSubLine = subLinePos.y;
 
-  if( nNewTopSubLine < 0 )
-    nNewTopSubLine = 0;
-  if( nNewTopSubLine >= nSubLineCount )
-    nNewTopSubLine = nSubLineCount - 1;
+	if (nNewTopSubLine < 0)
+		nNewTopSubLine = 0;
+	if (nNewTopSubLine >= nSubLineCount)
+		nNewTopSubLine = nSubLineCount - 1;
 
-  if (!m_bWordWrap)
-    {
-      // WINMERGE: This line fixes (cursor) slowdown after merges!
-      // I don't know exactly why, but propably we are setting
-      // m_nTopLine to zero in ResetView() and are not setting to
-      // valid value again. Maybe this is a good place to set it?
-      m_nTopLine = nNewTopSubLine;
-    }
-  else
-    {
-      int dummy;
-      GetLineBySubLine(nNewTopSubLine, m_nTopLine, dummy);
-    }
+	if (!m_bWordWrap)
+	{
+		// WINMERGE: This line fixes (cursor) slowdown after merges!
+		// I don't know exactly why, but propably we are setting
+		// m_nTopLine to zero in ResetView() and are not setting to
+		// valid value again. Maybe this is a good place to set it?
+		m_nTopLine = nNewTopSubLine;
+	}
+	else
+	{
+		int dummy;
+		GetLineBySubLine(nNewTopSubLine, m_nTopLine, dummy);
+	}
 
-  if( nNewTopSubLine != m_nTopSubLine )
-    {
-      ScrollToSubLine(nNewTopSubLine);
-      UpdateCaret();
-      UpdateSiblingScrollPos(false);
-    }
+	if (nNewTopSubLine != m_nTopSubLine)
+	{
+		ScrollToSubLine(nNewTopSubLine);
+		UpdateCaret();
+		UpdateSiblingScrollPos(false);
+	}
 
-  //  Scroll horizontally
-  //BEGIN SW
-  // we do not need horizontally scrolling, if we wrap the words
-  if( m_bWordWrap )
-    return;
-  //END SW
-  int nActualPos = CalculateActualOffset (ptStart.y, ptStart.x);
-  int nActualEndPos = CalculateActualOffset (ptEnd.y, ptEnd.x);
-  int nNewOffset = m_nOffsetChar;
-  const int nScreenChars = GetScreenChars ();
-  const int nBeginOffset = nActualPos - m_nOffsetChar;
-  const int nEndOffset = nActualEndPos - m_nOffsetChar;
-  const int nSelLen = nActualEndPos - nActualPos;
+	//  Scroll horizontally
+	//BEGIN SW
+	// we do not need horizontally scrolling, if we wrap the words
+	if (m_bWordWrap)
+		return;
+	//END SW
+	int nActualPos = CalculateActualOffset(m_ptSelStart.y, m_ptSelStart.x);
+	int nActualEndPos = CalculateActualOffset(m_ptSelEnd.y, m_ptSelEnd.x);
+	int nNewOffset = m_nOffsetChar;
+	const int nScreenChars = GetScreenChars();
+	const int nBeginOffset = nActualPos - m_nOffsetChar;
+	const int nEndOffset = nActualEndPos - m_nOffsetChar;
+	const int nSelLen = nActualEndPos - nActualPos;
 
-  // Selection fits to screen, scroll whole selection visible
-  if (nSelLen < nScreenChars)
-    {
-      // Begin of selection not visible 
-      if (nBeginOffset > nScreenChars)
-        {
-          // Scroll so that there is max 5 chars margin at end
-          if (nScreenChars - nSelLen > 5)
-            nNewOffset = nActualPos + 5 - nScreenChars + nSelLen;
-          else
-            nNewOffset = nActualPos - 5;
-        }
-      else if (nBeginOffset < 0)
-        {
-          // Scroll so that there is max 5 chars margin at begin
-          if (nScreenChars - nSelLen >= 5)
-            nNewOffset = nActualPos - 5;
-          else
-            nNewOffset = nActualPos - 5 - nScreenChars + nSelLen;
-        }
-      // End of selection not visible
-      else if (nEndOffset > nScreenChars ||
-          nEndOffset < 0)
-        {
-          nNewOffset = nActualPos - 5;
-        }
-     }
-  else // Selection does not fit screen so scroll to begin of selection
-    {
-      nNewOffset = nActualPos - 5;
-    }
+	// Selection fits to screen, scroll whole selection visible
+	if (nSelLen < nScreenChars)
+	{
+		// Begin of selection not visible 
+		if (nBeginOffset > nScreenChars)
+		{
+			// Scroll so that there is max 5 chars margin at end
+			if (nScreenChars - nSelLen > 5)
+				nNewOffset = nActualPos + 5 - nScreenChars + nSelLen;
+			else
+				nNewOffset = nActualPos - 5;
+		}
+		else if (nBeginOffset < 0)
+		{
+			// Scroll so that there is max 5 chars margin at begin
+			if (nScreenChars - nSelLen >= 5)
+				nNewOffset = nActualPos - 5;
+			else
+				nNewOffset = nActualPos - 5 - nScreenChars + nSelLen;
+		}
+		// End of selection not visible
+		else if (nEndOffset > nScreenChars || nEndOffset < 0)
+		{
+			nNewOffset = nActualPos - 5;
+		}
+	}
+	else // Selection does not fit screen so scroll to begin of selection
+	{
+		nNewOffset = nActualPos - 5;
+	}
 
-  // Horiz scroll limit to longest line + one screenwidth
-  const int nMaxLineLen = GetMaxLineLength ();
-  if (nNewOffset >= nMaxLineLen + nScreenChars)
-    nNewOffset = nMaxLineLen + nScreenChars - 1;
-  if (nNewOffset < 0)
-    nNewOffset = 0;
+	// Horiz scroll limit to longest line + one screenwidth
+	const int nMaxLineLen = GetMaxLineLength ();
+	if (nNewOffset >= nMaxLineLen + nScreenChars)
+		nNewOffset = nMaxLineLen + nScreenChars - 1;
+	if (nNewOffset < 0)
+		nNewOffset = 0;
 
-  if (m_nOffsetChar != nNewOffset)
-    {
-      ScrollToChar(nNewOffset);
-      UpdateCaret();
-      UpdateSiblingScrollPos(true);
-    }
+	if (m_nOffsetChar != nNewOffset)
+	{
+		ScrollToChar(nNewOffset);
+		UpdateCaret();
+		UpdateSiblingScrollPos(true);
+	}
 }
 
 // Analyze the first line of file to detect its type

@@ -41,8 +41,6 @@ protected:
 	int m_lineBegin;
 	/// last line of diff (last displayable line)
 	int m_lineEnd; 
-	/// height (in lines) of the view
-	int m_displayLength;
 	/// memorize first line of diff
 	int m_lineBeginPushed;
 	/// memorize last line of diff
@@ -50,14 +48,16 @@ protected:
 
 // Operations
 private:
+	int GetDisplayHeight();
 	int GetDiffLineLength();
 	bool EnsureInDiff(POINT &);
 
 public:
 	void UpdateResources();
-	void SetDisplayHeight(int);
-	void OnUpdateCaret(bool bMove);
+	void OnUpdateCaret(bool bShowHide);
 	void DocumentsLoaded();
+
+	virtual bool QueryEditable() { return false; }
 
 	virtual void UpdateSiblingScrollPos(bool bHorz);
 	virtual void RecalcHorzScrollBar(bool bPositionOnly = false);

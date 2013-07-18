@@ -69,6 +69,10 @@ interface IMergeDoc : IDispatch
 	HRESULT GetContentHTML([in] long nSide, [in] long nLine, [out, retval] BSTR *pbsHTML);
 	[id(6), helpstring("Prepares one page of HTML, starting at line nLine, and stopping before line nStop")]
 	HRESULT PrepareHTML([in] long nLine, [in] long nStop, [in] IDispatch *pFrame, [out, retval] long *pnLine);
+	[id(7), helpstring("Writes an HTML report to file bsPath")]
+	HRESULT WriteReport([in] BSTR bsPath);
+	[id(8), helpstring("Limits context to nLines lines")]
+	HRESULT LimitContext([in] long nLines);
 };
 
 [
