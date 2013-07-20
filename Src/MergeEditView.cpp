@@ -802,11 +802,9 @@ void CMergeEditView::ShowDiff(bool bScroll)
 				// scrolling is downwards, scroll the diff to as up in screen
 				// as possible. This usually brings next diff to the screen
 				// and we don't need to scroll into it.
-				int nLine = GetSubLineIndex(ptStart.y);
-				if (nLine > CONTEXT_LINES_ABOVE)
-				{
-					nLine -= CONTEXT_LINES_ABOVE;
-				}
+				int nLine = GetSubLineIndex(ptStart.y) - CONTEXT_LINES_ABOVE;
+				if (nLine < 0)
+					nLine = 0;
 				pCurrentView->ScrollToSubLine(nLine);
 				pOtherView->ScrollToSubLine(nLine);
 			}
