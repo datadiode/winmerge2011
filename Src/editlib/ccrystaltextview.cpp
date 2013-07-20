@@ -1725,7 +1725,7 @@ void CCrystalTextView::OnDraw(HSurface *pdc)
 
 	const int nLineCount = GetLineCount();
 	const int nLineHeight = GetLineHeight();
-	PrepareSelBounds ();
+	PrepareSelBounds();
 
 	// if the private arrays (m_ParseCookies and m_pnActualLineLength) 
 	// are defined, check they are in phase with the text buffer
@@ -2534,7 +2534,7 @@ void CCrystalTextView::OnHScroll(UINT nSBCode)
 	int nPos = GetScrollPos(SB_HORZ, nSBCode);
 	ScrollToChar(nPos);
 	// This is needed, but why ? OnVScroll don't need to call UpdateCaret
-	UpdateCaret();
+	UpdateCaret(true);
 	if (GetStyle() & WS_HSCROLL)
 		UpdateSiblingScrollPos(true);
 }
@@ -2878,9 +2878,9 @@ void CCrystalTextView::EnsureCursorVisible()
 	CharPosToPoint(m_ptCursorPos.y, m_ptCursorPos.x, subLinePos);
 	subLinePos.y += GetSubLineIndex(m_ptCursorPos.y);
 
-	if (subLinePos.y >= nNewTopSubLine + GetScreenLines())
+	if (nNewTopSubLine <= subLinePos.y - GetScreenLines())
 		nNewTopSubLine = subLinePos.y - GetScreenLines() + 1;
-	if (subLinePos.y < nNewTopSubLine)
+	if (nNewTopSubLine > subLinePos.y)
 		nNewTopSubLine = subLinePos.y;
 
 	if (nNewTopSubLine < 0)
@@ -2940,7 +2940,7 @@ void CCrystalTextView::EnsureCursorVisible()
 	if (m_nOffsetChar != nNewOffset)
 	{
 		ScrollToChar(nNewOffset);
-		UpdateCaret();
+		UpdateCaret(true);
 		UpdateSiblingScrollPos(true);
 	}
 }
@@ -4186,16 +4186,13 @@ void CCrystalTextView::EnsureSelectionVisible()
 	int nSubLineCount = GetSubLineCount();
 	int nNewTopSubLine = m_nTopSubLine;
 	POINT subLinePos;
-	POINT subLinePosEnd;
 
 	CharPosToPoint(m_ptSelStart.y, m_ptSelStart.x, subLinePos);
 	subLinePos.y += GetSubLineIndex(m_ptSelStart.y);
-	CharPosToPoint(m_ptSelEnd.y, m_ptSelEnd.x, subLinePosEnd);
-	subLinePosEnd.y += GetSubLineIndex(m_ptSelEnd.y);
 
-	if (subLinePos.y >= nNewTopSubLine + GetScreenLines())
+	if (nNewTopSubLine <= subLinePos.y - GetScreenLines())
 		nNewTopSubLine = subLinePos.y - GetScreenLines() + 1;
-	if (subLinePos.y < nNewTopSubLine)
+	if (nNewTopSubLine > subLinePos.y)
 		nNewTopSubLine = subLinePos.y;
 
 	if (nNewTopSubLine < 0)

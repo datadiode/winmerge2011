@@ -220,9 +220,10 @@ void CChildFrame::ReloadDocs()
 
 void CChildFrame::AlignScrollPositions()
 {
-	m_pView[0]->UpdateSiblingScrollPos(false);
-	m_pView[1]->UpdateSiblingScrollPos(false);
-	GetActiveMergeView()->EnsureCursorVisible();
+	CMergeEditView *const pActiveView = GetActiveMergeView();
+	pActiveView->UpdateSiblingScrollPos(false);
+	pActiveView->EnsureCursorVisible();
+	pActiveView->UpdateCaret(true);
 }
 
 BOOL CChildFrame::PreTranslateMessage(MSG *pMsg)

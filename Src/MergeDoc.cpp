@@ -1201,15 +1201,15 @@ void CChildFrame::FlushAndRescan(bool bForced)
 
 	WaitStatusCursor waitstatus(IDS_STATUS_RESCANNING);
 
-	int nActiveViewIndexType = GetActiveMergeViewIndexType();
+	CGhostTextView *const pActiveView = GetActiveTextView();
 
 	// store cursors and hide caret
 	m_pView[0]->PushCursors();
 	m_pView[1]->PushCursors();
 	m_pDetailView[0]->PushCursors();
 	m_pDetailView[1]->PushCursors();
-	if (nActiveViewIndexType == MERGEVIEW_LEFT || nActiveViewIndexType == MERGEVIEW_RIGHT)
-		m_pView[nActiveViewIndexType]->HideCursor();
+	if (pActiveView)
+		pActiveView->HideCursor();
 
 	bool bIdentical = false;
 	int nRescanResult = Rescan(bIdentical, bForced);
@@ -1219,20 +1219,12 @@ void CChildFrame::FlushAndRescan(bool bForced)
 	m_pView[1]->PopCursors();
 	m_pDetailView[0]->PopCursors();
 	m_pDetailView[1]->PopCursors();
-	if (nActiveViewIndexType == MERGEVIEW_LEFT || nActiveViewIndexType == MERGEVIEW_RIGHT)
-		m_pView[nActiveViewIndexType]->ShowCursor();
+	if (pActiveView)
+		pActiveView->ShowCursor();
 
 	// because of ghostlines, m_nTopLine may differ just after Rescan
 	// scroll both views to the same top line
 	AlignScrollPositions();
-
-	// make sure we see the cursor from the curent view
-	if (nActiveViewIndexType == MERGEVIEW_LEFT || nActiveViewIndexType == MERGEVIEW_RIGHT)
-		m_pView[nActiveViewIndexType]->EnsureCursorVisible();
-
-	// scroll both diff views to the same top line
-	m_pDetailView[0]->UpdateSiblingScrollPos(false);
-	m_pDetailView[1]->UpdateSiblingScrollPos(false);
 
 	// Refresh display
 	UpdateAllViews();
