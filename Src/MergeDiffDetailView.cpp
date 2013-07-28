@@ -30,7 +30,6 @@ CMergeDiffDetailView::CMergeDiffDetailView(CChildFrame *pDocument, int nThisPane
 : CGhostTextView(sizeof *this)
 , m_pDocument(pDocument)
 , m_nThisPane(nThisPane)
-, m_lineEnd(1)
 {
 }
 
