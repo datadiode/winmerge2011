@@ -1,3 +1,12 @@
+0.2011.003.311
+Changes since preceding release (not necessarily complete):
+• Support for wrapper scripts
+• Merge from https://bitbucket.org/sdottaka/winmerge-v2/commits/57264ee8cd53
+• EditLib: New option to cross-hatch deleted lines
+• EditLib: Fix misalignment of vertical scroll positions after font change etc.
+• EditLib: Fix border cases which allowed users to drag or copy empty text
+• MergeDoc: Silently ignore removal of files which were not opened for editing
+
 0.2011.003.247
 Changes since preceding release (not necessarily complete):
 • Folder compare: Failed to update item after edit when temp folder was involved
