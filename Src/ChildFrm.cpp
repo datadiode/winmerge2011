@@ -978,7 +978,7 @@ void CChildFrame::UpdateEditCmdUI()
 		MF_ENABLED : MF_GRAYED);
 }
 
-void CChildFrame::UpdateClipboardCmdUI()
+void CChildFrame::UpdateGeneralCmdUI()
 {
 	int firstDiff, lastDiff;
 	int currDiff = GetContextDiff(firstDiff, lastDiff);
@@ -989,11 +989,30 @@ void CChildFrame::UpdateClipboardCmdUI()
 		enable = MF_ENABLED;
 	}
 
-	// Merging
+	// Merging commands which are independent of caret position
+	m_pMDIFrame->UpdateCmdUI<ID_ALL_LEFT>(
+		m_diffList.FirstSignificantDiff() != -1 &&
+		!m_ptBuf[0]->GetReadOnly() ? MF_ENABLED : MF_GRAYED);
+	m_pMDIFrame->UpdateCmdUI<ID_ALL_RIGHT>(
+		m_diffList.FirstSignificantDiff() != -1 &&
+		!m_ptBuf[1]->GetReadOnly() ? MF_ENABLED : MF_GRAYED);
+
+	// Merging commands which are dependent of caret position
 	m_pMDIFrame->UpdateCmdUI<ID_L2R>(
 		!m_ptBuf[1]->GetReadOnly() ? enable : MF_GRAYED);
 	m_pMDIFrame->UpdateCmdUI<ID_R2L>(
 		!m_ptBuf[0]->GetReadOnly() ? enable : MF_GRAYED);
+
+	// Strictly disallow editing when operating in limited context mode, or on
+	// preprocessed content, so as to reduce risk of messing up original files.
+	enable = m_idContextLines != ID_VIEW_CONTEXT_UNLIMITED ||
+		m_pInfoUnpacker.get()->readOnly ? MF_GRAYED : 0;
+
+	m_pMDIFrame->UpdateCmdUI<ID_FILE_LEFT_READONLY>(
+		enable | (m_ptBuf[0]->GetReadOnly() ? MF_CHECKED : 0));
+
+	m_pMDIFrame->UpdateCmdUI<ID_FILE_RIGHT_READONLY>(
+		enable | (m_ptBuf[1]->GetReadOnly() ? MF_CHECKED : 0));
 
 	// Navigation
 	CMergeEditView *const pMergeView = GetActiveMergeView();
@@ -1027,40 +1046,9 @@ void CChildFrame::UpdateClipboardCmdUI()
 		pTextView && pTextView->QueryEditable() && IsClipboardFormatAvailable(CF_UNICODETEXT) ? MF_ENABLED : MF_GRAYED);
 	m_pMDIFrame->UpdateCmdUI<ID_TOOLS_COMPARE_SELECTION>(
 		m_pOpener == NULL && m_pView[0]->IsSelection() && m_pView[1]->IsSelection() ? MF_ENABLED : MF_GRAYED);
-}
-
-void CChildFrame::UpdateCmdUI()
-{
-	if (m_pMDIFrame->GetActiveDocFrame() != this)
-		return;
-
-	// Strictly disallow editing when operating in limited context mode, or on
-	// preprocessed content, so as to reduce risk of messing up original files.
-	BYTE enableReadOnly =
-		m_idContextLines != ID_VIEW_CONTEXT_UNLIMITED ||
-		m_pInfoUnpacker.get()->readOnly ?
-		MF_GRAYED : 0;
-
-	m_pMDIFrame->UpdateCmdUI<ID_FILE_LEFT_READONLY>(
-		enableReadOnly | (m_ptBuf[0]->GetReadOnly() ? MF_CHECKED : 0));
-	m_pMDIFrame->UpdateCmdUI<ID_ALL_LEFT>(
-		m_diffList.FirstSignificantDiff() != -1 &&
-		!m_ptBuf[0]->GetReadOnly() ? MF_ENABLED : MF_GRAYED);
-
-	m_pMDIFrame->UpdateCmdUI<ID_FILE_RIGHT_READONLY>(
-		enableReadOnly | (m_ptBuf[1]->GetReadOnly() ? MF_CHECKED : 0));
-	m_pMDIFrame->UpdateCmdUI<ID_ALL_RIGHT>(
-		m_diffList.FirstSignificantDiff() != -1 &&
-		!m_ptBuf[1]->GetReadOnly() ? MF_ENABLED : MF_GRAYED);
-
-	UpdateEditCmdUI();
-
-	// Clipboard
-	UpdateClipboardCmdUI();
 
 	// General editing
-	CMergeEditView *const pMergeView = GetActiveMergeView();
-	BYTE enable = pMergeView->QueryEditable() ? MF_ENABLED : MF_GRAYED;
+	enable = pMergeView->QueryEditable() ? MF_ENABLED : MF_GRAYED;
 	m_pMDIFrame->UpdateCmdUI<ID_EDIT_REPLACE>(enable);
 
 	// EOL style
@@ -1072,11 +1060,23 @@ void CChildFrame::UpdateCmdUI()
 		nStyle = CRLF_STYLE_AUTOMATIC;
 	}
 	m_pMDIFrame->UpdateCmdUI<ID_EOL_TO_DOS>(
-		nStyle == CRLF_STYLE_DOS ? MF_CHECKED : enable);
+		enable | (nStyle == CRLF_STYLE_DOS ? MF_CHECKED : 0));
 	m_pMDIFrame->UpdateCmdUI<ID_EOL_TO_UNIX>(
-		nStyle == CRLF_STYLE_UNIX ? MF_CHECKED : enable);
+		enable | (nStyle == CRLF_STYLE_UNIX ? MF_CHECKED : 0));
 	m_pMDIFrame->UpdateCmdUI<ID_EOL_TO_MAC>(
-		nStyle == CRLF_STYLE_MAC ? MF_CHECKED : enable);
+		enable | (nStyle == CRLF_STYLE_MAC ? MF_CHECKED : 0));
+}
+
+void CChildFrame::UpdateCmdUI()
+{
+	if (m_pMDIFrame->GetActiveDocFrame() != this)
+		return;
+
+	// Commands which are applicable only after editing
+	UpdateEditCmdUI();
+
+	// General
+	UpdateGeneralCmdUI();
 
 	// Bookmarks
 	UpdateBookmarkUI();

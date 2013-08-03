@@ -160,7 +160,9 @@ void CMergeEditView::OnNotity(LPARAM lParam)
 			switch (nm.mouse->dwItemSpec)
 			{
 			case PANE_RO:
-				OnEditSwitchOvrmode();
+				m_bOvrMode = !m_bOvrMode;
+				UpdateCaret(true);
+				UpdateLineInfoStatus();
 				break;
 			}
 		}
@@ -793,28 +795,27 @@ void CMergeEditView::ShowDiff(bool bScroll)
 		ptEnd.x = 0;
 		ptEnd.y = curDiff.dend0;
 
-		if (bScroll)
+		if (bScroll && !IsDiffVisible(curDiff, CONTEXT_LINES_BELOW))
 		{
-			if (!IsDiffVisible(curDiff, CONTEXT_LINES_BELOW))
-			{
-				// Difference is not visible, scroll it so that max amount of
-				// scrolling is done while keeping the diff in screen. So if
-				// scrolling is downwards, scroll the diff to as up in screen
-				// as possible. This usually brings next diff to the screen
-				// and we don't need to scroll into it.
-				int nLine = GetSubLineIndex(ptStart.y) - CONTEXT_LINES_ABOVE;
-				if (nLine < 0)
-					nLine = 0;
-				pCurrentView->ScrollToSubLine(nLine);
-				pOtherView->ScrollToSubLine(nLine);
-			}
-			pCurrentView->SetCursorPos(ptStart);
-			pOtherView->SetCursorPos(ptStart);
-			pCurrentView->SetAnchor(ptStart);
-			pOtherView->SetAnchor(ptStart);
-			pCurrentView->SetSelection(ptStart, ptStart);
-			pOtherView->SetSelection(ptStart, ptStart);
+			// Difference is not visible, scroll it so that max amount of
+			// scrolling is done while keeping the diff in screen. So if
+			// scrolling is downwards, scroll the diff to as up in screen
+			// as possible. This usually brings next diff to the screen
+			// and we don't need to scroll into it.
+			int nLine = GetSubLineIndex(ptStart.y) - CONTEXT_LINES_ABOVE;
+			if (nLine < 0)
+				nLine = 0;
+			pCurrentView->ScrollToSubLine(nLine);
+			pOtherView->ScrollToSubLine(nLine);
 		}
+
+		pCurrentView->SetCursorPos(ptStart);
+		pOtherView->SetCursorPos(ptStart);
+		pCurrentView->SetAnchor(ptStart);
+		pOtherView->SetAnchor(ptStart);
+		pCurrentView->SetSelection(ptStart, ptStart);
+		pOtherView->SetSelection(ptStart, ptStart);
+
 		Invalidate();
 	}
 }
@@ -896,7 +897,7 @@ void CMergeEditView::UpdateLineInfoStatus()
 	SetLineInfoStatus(sLine, column, columns, curChar, chars, sEol, editMode);
 
 	// Update Command UI
-	m_pDocument->UpdateClipboardCmdUI();
+	m_pDocument->UpdateGeneralCmdUI();
 }
 
 /**

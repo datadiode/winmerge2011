@@ -2626,4 +2626,6 @@ void CChildFrame::UpdateAllViews()
 	m_pDetailView[0]->Invalidate();
 	m_pDetailView[1]->Invalidate();
 	m_wndLocationView.ForceRecalculate();
+	m_pView[0]->UpdateLineInfoStatus();
+	m_pView[1]->UpdateLineInfoStatus();
 }

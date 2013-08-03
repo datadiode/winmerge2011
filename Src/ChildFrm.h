@@ -121,7 +121,7 @@ public:
 	void SetLastCompareResult(int nResult);
 	void UpdateCmdUI();
 	void UpdateEditCmdUI();
-	void UpdateClipboardCmdUI();
+	void UpdateGeneralCmdUI();
 	void UpdateBookmarkUI();
 	void UpdateSourceTypeUI();
 	void UpdateMergeStatusUI();
