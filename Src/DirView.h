@@ -241,7 +241,6 @@ protected:
 	int AddSpecialItems();
 	bool OpenOneItem(DIFFITEM *, String &path1, String &path2);
 	bool OpenTwoItems(DIFFITEM *, DIFFITEM *, String &path1, String &path2);
-	bool CreatePairFolder(LPCTSTR newFolder);
 
 // Implementation data
 protected:

@@ -889,63 +889,26 @@ int CDirView::GetSelectedItems(DIFFITEM **rgdi)
 }
 
 /**
- * @brief Creates a pairing folder for unique folder item.
- * This function creates a pairing folder for unique folder item in
- * folder compare. This way user can browse into unique folder's
- * contents and don't necessarily need to copy whole folder structure.
- * @param [in] newFolder New created folder (full folder path).
- * @return true if user agreed and folder was created.
- */
-bool CDirView::CreatePairFolder(LPCTSTR newFolder)
-{
-	int response = LanguageSelect.FormatMessage(
-		IDS_CREATE_PAIR_FOLDER, paths_UndoMagic(wcsdupa(newFolder))
-	).MsgBox(MB_YESNO | MB_ICONWARNING);
-	return response == IDYES && paths_CreateIfNeeded(newFolder);
-}
-
-/**
  * @brief Open one selected item.
- * @param [in] pos1 Item position.
- * @param [in,out] di1 Pointer to first diffitem.
- * @param [in,out] di2 Pointer to second diffitem.
+ * @param [in] Pointer to diffitem.
  * @param [out] path1 First path.
  * @param [out] path2 Second path.
- * @param [out] sel1 Item's selection index in listview.
- * @param [in,out] isDir Is item folder?
  * return false if there was error or item was completely processed.
  */
 bool CDirView::OpenOneItem(DIFFITEM *di, String &path1, String &path2)
 {
-	const CDiffContext *ctxt = m_pFrame->GetDiffContext();
+	const CDiffContext *const ctxt = m_pFrame->GetDiffContext();
 	GetItemFileNames(di, path1, path2);
 	const bool isDir = di->isDirectory();
-	if (isDir && di->isSideBoth())
+	if (isDir)
 	{
-		// Check both folders exist. If either folder is missing that means
-		// folder has been changed behind our back, so we just tell user to
-		// refresh the compare.
-		PATH_EXISTENCE path1Exists = paths_DoesPathExist(path1.c_str());
-		PATH_EXISTENCE path2Exists = paths_DoesPathExist(path2.c_str());
-		if (path1Exists != IS_EXISTING_DIR || path2Exists != IS_EXISTING_DIR)
-		{
-			String invalid = path1Exists == IS_EXISTING_DIR ? path1 : path2;
-			LanguageSelect.MsgBox(IDS_DIRCMP_NOTSYNC, invalid.c_str(), MB_ICONSTOP);
+		if (m_pFrame->GetRecursive())
 			return false;
-		}
 	}
 	else if (di->isSideLeftOnly())
 	{
-		// Open left-only item to editor if its not a folder or binary
-		if (isDir)
-		{
-			path2 = paths_ConcatPath(di->GetLeftFilepath(ctxt->GetRightPath()), di->left.filename);
-			if (CreatePairFolder(path2.c_str()))
-			{
-				return true;
-			}
-		}
-		else if (di->isBin())
+		// Open left-only file to appropriate editor
+		if (di->isBin())
 			DoOpenWithFrhed(SIDE_LEFT);
 		else
 			DoOpenWithEditor(SIDE_LEFT);
@@ -953,35 +916,23 @@ bool CDirView::OpenOneItem(DIFFITEM *di, String &path1, String &path2)
 	}
 	else if (di->isSideRightOnly())
 	{
-		// Open right-only item to editor if its not a folder or binary
-		if (isDir)
-		{
-			path1 = paths_ConcatPath(di->GetRightFilepath(ctxt->GetLeftPath()), di->right.filename);
-			if (CreatePairFolder(path1.c_str()))
-			{
-				return true;
-			}
-		}
-		else if (di->isBin())
+		// Open right-only file to appropriate editor
+		if (di->isBin())
 			DoOpenWithFrhed(SIDE_RIGHT);
 		else
 			DoOpenWithEditor(SIDE_RIGHT);
 		return false;
 	}
 	// Fall through and compare files (which may be archives)
-
 	return true;
 }
 
 /**
  * @brief Open two selected items.
- * @param [in] pos1 First item position.
- * @param [in] pos2 Second item position.
  * @param [in,out] di1 Pointer to first diffitem.
  * @param [in,out] di2 Pointer to second diffitem.
  * @param [out] path1 First path.
  * @param [out] path2 Second path.
- * @param [in,out] isDir Is item folder?
  * return false if there was error or item was completely processed.
  */
 bool CDirView::OpenTwoItems(DIFFITEM *di1, DIFFITEM *di2, String &path1, String &path2)
@@ -1028,6 +979,8 @@ void CDirView::OpenSelection(LPCTSTR szCompareAs, UINT idCompareAs)
 	// First, figure out what was selected (store into di[])
 	DIFFITEM *di[] = { NULL, NULL };
 	FileLocation filelocLeft, filelocRight;
+	DWORD leftFlags = 0;
+	DWORD rightFlags = 0;
 	switch (int selected = GetSelectedItems(di))
 	{
 	case 0:
@@ -1041,6 +994,10 @@ void CDirView::OpenSelection(LPCTSTR szCompareAs, UINT idCompareAs)
 			// Only one item selected, so perform diff on its sides
 			if (!OpenOneItem(di[1] = di[0], filelocLeft.filepath, filelocRight.filepath))
 				return;
+			if ((di[0]->diffcode & DIFFCODE::LEFT) == 0)
+				leftFlags |= FFILEOPEN_MISSING;
+			if ((di[0]->diffcode & DIFFCODE::RIGHT) == 0)
+				rightFlags |= FFILEOPEN_MISSING;
 			break;
 		case 2:
 			if (!OpenTwoItems(di[0], di[1], filelocLeft.filepath, filelocRight.filepath))
@@ -1057,14 +1014,13 @@ void CDirView::OpenSelection(LPCTSTR szCompareAs, UINT idCompareAs)
 			packingInfo.SetPlugin(szCompareAs);
 
 		// Open identical and different files
-		BOOL bLeftRO = m_pFrame->GetLeftReadOnly();
-		BOOL bRightRO = m_pFrame->GetRightReadOnly();
+		if (m_pFrame->GetLeftReadOnly())
+			leftFlags |= FFILEOPEN_READONLY;
+		if (m_pFrame->GetRightReadOnly())
+			rightFlags |= FFILEOPEN_READONLY;
 
 		filelocLeft.encoding = di[0]->left.encoding;
 		filelocRight.encoding = di[1]->right.encoding;
-
-		DWORD leftFlags = bLeftRO ? FFILEOPEN_READONLY : 0;
-		DWORD rightFlags = bRightRO ? FFILEOPEN_READONLY : 0;
 
 		theApp.m_pMainWnd->DoFileOpen(
 			packingInfo, idCompareAs,

@@ -1864,7 +1864,6 @@ STRINGTABLE
     IDS_SUGGEST_PRESERVEEOL       "The EOL are of different types (Windows/Unix/Mac) in the file '%1'.\n With the current options, they will be unified to the main type.\n Do you want to change the options and preserve the different EOL ?"
     IDS_INVALID_DIRECTORY         "The selected folder is invalid."
     IDS_CANNOT_OPEN_BINARYFILE    "Cannot open a binary file to editor."
-    IDS_CREATE_PAIR_FOLDER        "The folder exists only in other side and cannot be opened.\n\nDo you want to create a matching folder:\n%1\nto the other side and open these folders?"
     IDS_SUGGEST_IGNORECODEPAGE    "Different codepages found in left (cp%d) and right (cp%d) files. \nDisplaying each file in its codepage will give a better display but merging/copying will be dangerous.\nWould you like to treat both files as being in the default windows codepage (recommended)?"
     IDS_DIFFERENT_UNICODINGS      "Warning: Files use different encodings, left=%s and right=%s, and merging may lead to information loss."
     IDS_LOSSY_TRANSCODING_BOTH    "Information lost due to encoding errors: both files"
