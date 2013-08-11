@@ -29,7 +29,6 @@
 
 #include "stdafx.h"
 #include "Merge.h"
-#include "dllpstub.h"
 #include "ChildFrm.h"
 #include "DirFrame.h"
 #include "MainFrm.h"

@@ -1,5 +1,4 @@
 #include "StdAfx.h"
-#include "dllpstub.h"
 #include "paths.h"
 #include "Merge.h"
 #include "MainFrm.h"

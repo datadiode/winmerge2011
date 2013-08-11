@@ -1,6 +1,8 @@
 /* markdown.cpp: Pull-parse XML sources
  * Copyright (c) 2005 Jochen Tucht
  *
+ * Last change: 2013-08-11 by Jochen Neubeck
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
@@ -58,34 +60,10 @@
  *			www.stylusstudio.com/xmldev/200205/post61120.html (discussion)
  *
  *			There are lots of related articles on the web, though.
-
-Please mind 2. b) of the GNU LGPL terms, and log your changes below.
-
-DATE:		BY:					DESCRIPTION:
-==========	==================	================================================
-2005-01-15	Jochen Tucht		Created
-2005-02-26	Jochen Tucht		Load iconv.dll through DLLPSTUB
-2005-03-20	Jochen Tucht		Add IgnoreCase option for ASCII-7 tag/attr names.
-								Add HtmlUTags option to check for (potentially)
-								unbalanced HTML tags. Html option is combination
-								of the above. Using these options imposes
-								performance penalty, so avoid it if you can.
-								New flag CMarkdown::FileImage::Handle makes
-								CMarkdown::FileImage::FileImage() accept a
-								handle rather than a filename.
-2005-06-22	Jochen Tucht		New method CMarkdown::_HSTR::Entities().
-2005-07-29	Jochen Tucht		ByteOrder detection for 16/32 bit encodings
-2005-09-09	Jochen Tucht		Patch by Takashi Sawanaka fixes crash due to
-								reading beyond end of text with HtmlUTags option
-2005-12-04	Jochen Tucht		Fix UTF-8 signature detection
-								Strip bogus trailing slash in name of empty tag
-2008-08-27	Jochen Neubeck		Replace MFC CMap by STL std::map
-2011-08-15	Jochen Neubeck		Resolve() becomes Uni() and implies conversion
-								Entities() becomes a static member of CMarkdown
-*/
+ */
 #include "StdAfx.h"
 #include "markdown.h"
-#include "dllpstub.h"
+#include "Common/DllProxies.h"
 
 CMarkdown::Converter::Converter(const char *tocode, const char *fromcode)
 {

@@ -27,7 +27,9 @@ extern class CSettingStore
 public:
 	/// Initializes the instance by specifying the registry location which will point to the HKCR\Software\<CompanyName>\<ApplicationName> key as the settints store root key.
 	CSettingStore(LPCTSTR sCompanyName, LPCTSTR sApplicationName);
+	~CSettingStore();
 
+	BOOL MountExternalHive(LPCWSTR sHive, LPCWSTR sXPMountName);
 // Operations
 
 	/// Returns an integer option value (or a default value, if absent), identified by the section specifying the Registry key (use a backslash to separate subkeys) and the entry which defines the value name within that key, which must be of the appropriate type.
@@ -55,6 +57,10 @@ public:
 	HKEY GetSectionKey(LPCTSTR lpszSection, DWORD dwCreationDisposition = OPEN_ALWAYS) const;
 
 private:
+	/// Handle to external registry hive if mounted
+	HKEY m_hHive;
+	/// Mount name of external registry hive for Windows XP
+	String m_sXPMountName;
 	/// Company name in the registry key (under HKCU/Software).
 	String m_sCompanyName;
 	/// Application name in the registry (under the company key).

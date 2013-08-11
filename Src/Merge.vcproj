@@ -544,7 +544,7 @@
 				>
 			</File>
 			<File
-				RelativePath="dllpstub.cpp"
+				RelativePath="Common\DllProxies.cpp"
 				>
 			</File>
 			<File
@@ -1161,7 +1161,7 @@
 				>
 			</File>
 			<File
-				RelativePath="dllpstub.h"
+				RelativePath="Common\DllProxies.h"
 				>
 			</File>
 			<File
@@ -3234,6 +3234,10 @@
 						Name="setup"
 					/>
 				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\Setup\GenerateHTMLReport.wsf"
+				>
 			</File>
 			<File
 				RelativePath="..\setup\setup.wsf"

@@ -53,7 +53,7 @@
 #include "PatchTool.h"
 #include "ConfigLog.h"
 #include "7zCommon.h"
-#include "dllpstub.h"
+#include "Common/DllProxies.h"
 #include "FileFiltersDlg.h"
 #include "LanguageSelect.h"
 #include "codepage_detect.h"

@@ -26,9 +26,9 @@ Last change: 2013-04-27 by Jochen Neubeck
 #include "DirFrame.h"
 #include "MainFrm.h"
 #include "7zCommon.h"
-#include "dllpstub.h"
+#include "Common/DllProxies.h"
 #include "ExternalArchiveFormat.h"
-#include "common/version.h"
+#include "Common/version.h"
 #include <paths.h>
 #include "Environment.h"
 

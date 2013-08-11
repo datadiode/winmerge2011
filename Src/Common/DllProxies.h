@@ -42,7 +42,7 @@ template<class T> struct DllProxy::Instance
 	}
 };
 
-// ICONV dll interface
+// ICONV dll proxy
 struct ICONV
 {
 	HANDLE (*iconv_open)(const char *tocode, const char *fromcode);
@@ -60,7 +60,7 @@ struct ICONV
 
 extern DllProxy::Instance<struct ICONV> ICONV;
 
-// URLMON dll interface
+// URLMON dll proxy
 struct URLMON
 {
 	HRESULT(STDAPICALLTYPE*CreateURLMoniker)(IMoniker *, LPCWSTR, IMoniker **);
@@ -69,7 +69,7 @@ struct URLMON
 
 extern DllProxy::Instance<struct URLMON> URLMON;
 
-// MSHTML dll interface
+// MSHTML dll proxy
 struct MSHTML
 {
 	HRESULT(STDAPICALLTYPE*CreateHTMLPropertyPage)(IMoniker *, IPropertyPage **);
@@ -78,5 +78,14 @@ struct MSHTML
 };
 
 extern DllProxy::Instance<struct MSHTML> MSHTML;
+
+// ADVAPI32 dll proxy for Vista+
+struct ADVAPI32V6
+{
+	LONG(WINAPI*RegLoadAppKey)(LPCTSTR, PHKEY, REGSAM, DWORD, DWORD);
+	HMODULE H;
+};
+
+extern DllProxy::Instance<struct ADVAPI32V6> ADVAPI32V6;
 
 #endif

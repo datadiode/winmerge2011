@@ -21,10 +21,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-Last change: 2013-03-10 by Jochen Neubeck
+Last change: 2013-08-11 by Jochen Neubeck
 */
 #include "stdafx.h"
-#include "dllpstub.h"
+#include "DllProxies.h"
 
 /**
  * @brief Load a dll and import a number of functions.
@@ -123,5 +123,15 @@ DllProxy::Instance<struct MSHTML> MSHTML =
 	"MSHTML.DLL",
 	"CreateHTMLPropertyPage",
 	"ShowHTMLDialogEx",
+	(HMODULE)0
+};
+
+/**
+ * @brief ADVAPI32 dll proxy for Vista+
+ */
+DllProxy::Instance<struct ADVAPI32V6> ADVAPI32V6 =
+{
+	"ADVAPI32.DLL",
+	"RegLoadAppKey" DECORATE_AW,
 	(HMODULE)0
 };

@@ -10,12 +10,31 @@
 
 #include <StdAfx.h>
 #include "SettingStore.h"
+#include "DllProxies.h"
+#include "TokenHelper.h"
 
 CSettingStore::CSettingStore(LPCTSTR sCompanyName, LPCTSTR sApplicationName)
 {
+	m_hHive = HKEY_CURRENT_USER;
 	// Store
 	m_sCompanyName = sCompanyName;
 	m_sApplicationName = sApplicationName;
+}
+
+CSettingStore::~CSettingStore()
+{
+	if (m_hHive != HKEY_CURRENT_USER)
+		RegCloseKey(m_hHive);
+	if (!m_sXPMountName.empty())
+	{
+		CAdjustProcessToken<2> Token;
+		Token.Enable(SE_BACKUP_NAME);
+		Token.Enable(SE_RESTORE_NAME);
+		if (Token.Acquire())
+		{
+			RegUnLoadKey(HKEY_USERS, m_sXPMountName.c_str());
+		}
+	}
 }
 
 int CSettingStore::GetProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nDefault) const
@@ -173,6 +192,38 @@ BOOL CSettingStore::WriteProfileBinary(LPCTSTR lpszSection, LPCTSTR lpszEntry, L
 	return lResult == ERROR_SUCCESS;
 }
 
+BOOL CSettingStore::MountExternalHive(LPCTSTR sHive, LPCTSTR sXPMountName)
+{
+	HKEY hHive = NULL;
+	if (struct ADVAPI32V6 *ADVAPI32V6 = ::ADVAPI32V6)
+	{
+		ADVAPI32V6->RegLoadAppKey(sHive, &hHive, KEY_ALL_ACCESS, 0, 0);
+	}
+	else
+	{
+		CAdjustProcessToken<2> Token;
+		Token.Enable(SE_BACKUP_NAME);
+		Token.Enable(SE_RESTORE_NAME);
+		if (Token.Acquire())
+		{
+			m_sXPMountName = sXPMountName;
+			LONG lRet = RegOpenKeyEx(HKEY_USERS, m_sXPMountName.c_str(), 0, KEY_ALL_ACCESS, &hHive);
+			if (lRet != ERROR_SUCCESS)
+			{
+				lRet = RegLoadKey(HKEY_USERS, m_sXPMountName.c_str(), sHive);
+				if (lRet == ERROR_SUCCESS)
+				{
+					RegOpenKeyEx(HKEY_USERS, m_sXPMountName.c_str(), 0, KEY_ALL_ACCESS, &hHive);
+				}
+			}
+		}
+	}
+	if (hHive == NULL)
+		return FALSE;
+	m_hHive = hHive;
+	return TRUE;
+}
+
 // returns key for HKEY_CURRENT_USER\"Software"\RegistryKey\ProfileName
 // creating it if it doesn't exist
 // responsibility of the caller to call RegCloseKey() on the returned HKEY
@@ -184,17 +235,17 @@ HKEY CSettingStore::GetAppRegistryKey() const
 	HKEY hAppKey = NULL;
 	HKEY hSoftKey = NULL;
 	HKEY hCompanyKey = NULL;
-	if (RegOpenKeyEx(HKEY_CURRENT_USER, _T("software"), 0, KEY_WRITE|KEY_READ,
-		&hSoftKey) == ERROR_SUCCESS)
+	if (RegCreateKeyEx(m_hHive, _T("Software"), 0, REG_NONE,
+		REG_OPTION_NON_VOLATILE, KEY_WRITE|KEY_READ, NULL,
+		&hSoftKey, NULL) == ERROR_SUCCESS)
 	{
-		DWORD dw;
 		if (RegCreateKeyEx(hSoftKey, m_sCompanyName.c_str(), 0, REG_NONE,
 			REG_OPTION_NON_VOLATILE, KEY_WRITE|KEY_READ, NULL,
-			&hCompanyKey, &dw) == ERROR_SUCCESS)
+			&hCompanyKey, NULL) == ERROR_SUCCESS)
 		{
 			RegCreateKeyEx(hCompanyKey, m_sApplicationName.c_str(), 0, REG_NONE,
 				REG_OPTION_NON_VOLATILE, KEY_WRITE|KEY_READ, NULL,
-				&hAppKey, &dw);
+				&hAppKey, NULL);
 		}
 	}
 	if (hSoftKey != NULL)
@@ -221,10 +272,9 @@ HKEY CSettingStore::GetSectionKey(LPCTSTR lpszSection, DWORD dwCreationDispositi
 	if (dwCreationDisposition == CREATE_ALWAYS)
 		SHDeleteKey(hAppKey, lpszSection);
 
-	DWORD dw;
 	RegCreateKeyEx(hAppKey, lpszSection, 0, REG_NONE,
 		REG_OPTION_NON_VOLATILE, KEY_WRITE|KEY_READ, NULL,
-		&hSectionKey, &dw);
+		&hSectionKey, NULL);
 	RegCloseKey(hAppKey);
 	return hSectionKey;
 }

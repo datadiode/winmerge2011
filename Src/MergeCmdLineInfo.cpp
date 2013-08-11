@@ -32,6 +32,9 @@
 #include "StdAfx.h"
 #include "Constants.h"
 #include "Paths.h"
+#include "Environment.h"
+#include "Common/RegKey.h"
+#include "Common/SettingStore.h"
 #include "MergeCmdLineInfo.h"
 #include "OptionsDef.h"
 
@@ -325,6 +328,14 @@ void MergeCmdLineInfo::ParseWinMergeCmdLine(LPCTSTR q)
 			// -noprefs means do not load or remember options (preferences)
 			// Load all default settings, but don't save them in registry.
 			IOptionDef::InitOptions(NULL, NULL);
+		}
+		else if (param == _T("reghive"))
+		{
+			q = EatParam(q, param);
+			SettingStore.MountExternalHive(param.c_str(),
+				_T("{08CEC68E-416D-4fae-962D-16A8E838C6F5}"));
+			CRegKeyEx loadkey = SettingStore.GetAppRegistryKey();
+			IOptionDef::InitOptions(loadkey, NULL);
 		}
 		else if (param == _T("minimize"))
 		{
