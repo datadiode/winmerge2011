@@ -52,7 +52,7 @@ ExecuteParameters="install &platform;"
 <comment id='setup_bat'>
 set SevenZip=&SevenZip;
 del "WinMerge_&version;_&platform;.7z"
-"%SevenZip%\7z.exe" a "WinMerge_&version;_&platform;.7z" -r .\Build\WinMerge\&platform;\Release\* .\Build\WinMerge\Win32\Release\ShellExtensionU.dll .\Build\WinMerge\x64\Release\ShellExtensionX64.dll -x!*.lib -x!*.exp -x!*.pdb -x!*.sh
+"%SevenZip%\7z.exe" a "WinMerge_&version;_&platform;.7z" -r .\Build\WinMerge\&platform;\Release\* .\Build\WinMerge\Win32\Release\ShellExtensionU.dll .\Build\WinMerge\x64\Release\ShellExtensionX64.dll -x!*.lib -x!*.exp -x!*.pdb -x!*.sh -x!*.dat.log*
 copy /b "%SevenZip%\7zS.sfx" + Setup_&platform;.cfg + "WinMerge_&version;_&platform;.7z" "WinMerge_&version;_&platform;_change_7z_to_exe_if_you_want_a_setup.7z"
 </comment>
 <comment id='version_h'>
@@ -116,19 +116,24 @@ button
 #StFolder
 {
 	width: 0;
-	height: 1.8em;
-	vertical-align: middle;
+	padding-bottom: 2pt;
 }
 #EdFolder
 {
 	width: 100%;
 	margin-left: 1em;
-	margin-right: 26em;
+	margin-right: 36em;
 }
 #PbFolder
 {
 	position: absolute;
-	right: 12em;
+	right: 22em;
+}
+#media
+{
+	position: absolute;
+	right: 13em;
+	padding-bottom: 2pt;
 }
 #PbOK
 {
@@ -181,7 +186,7 @@ a.selected, a:active.selected
 }
 </style>
 <style id='maintenance'>
-#StFolder, #EdFolder, #PbFolder
+#StFolder, #EdFolder, #PbFolder, #media
 {
 	visibility: hidden;
 }
@@ -395,41 +400,44 @@ Sub Apply
 			End If
 		End If
 	Next
-	' Write executable path to HKCU as well because TortoiseHg reads it from there
-	sh.RegWrite "HKCU\Software\Thingamahoochie\WinMerge\Executable", sProgFolder & "\WinMergeU.exe"
-	If maintenance.disabled Then
-		sh.RegWrite "HKCR\.WinMerge\", "WinMerge.Project.File"
-		sh.RegWrite "HKCR\WinMerge.Project.File\", "WinMerge Project File"
-		sh.RegWrite "HKCR\WinMerge.Project.File\DefaultIcon\", """" & sProgFolder & "\WinMergeU.exe"",1"
-		sh.RegWrite "HKCR\WinMerge.Project.File\shell\edit\command\", """NOTEPAD.EXE"" ""%1"""
-		sh.RegWrite "HKCR\WinMerge.Project.File\shell\open\command\", """" & sProgFolder & "\WinMergeU.exe"" ""%1"""
-		sh.RegWrite "HKLM\Software\Thingamahoochie\WinMerge\Executable", sProgFolder & "\WinMergeU.exe"
-		' Do the ARP stuff
-		sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\DisplayIcon", sProgFolder & "\WinMergeU.exe"
-		sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\DisplayName", "WinMerge 2011"
-		sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\DisplayVersion", version
-		sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\InstallDate", TimeStampNow(8)
-		sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\InstallLocation", sProgFolder
-		sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\ModifyPath", "wscript.exe """ & sProgFolder & "\setup.wsf"""
-		sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\Publisher", "Jochen Neubeck"
-		sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\UninstallString", "wscript.exe /job:uninstall """ & sProgFolder & "\setup.wsf"""
-		If IsEmpty(sMoveFolder) Then
-			MsgBox "Setup completed successfully", vbInformation, document.title
-		ElseIf MsgBox("Setup completed successfully." & vbLf & vbLf &_
-				"The files from the previous installation have been moved to" & vbLf & vbLf &_
-				sMoveFolder & vbLf & vbLf &_
-				"Setup can try to delete this folder but would need to close" & vbLf &_
-				"and restart Windows Explorer. Do you want that to happen?" & vbLf & vbLf &_
-				"!!>    CAUTION:" & vbLf &_
-				"!!>    DO NOT CONFIRM THIS IF YOU HAVE MADE" & vbLf &_
-				"!!>    CHANGES TO THE PREVIOUS INSTALLATION" & vbLf &_
-				"!!>    AND WANT TO KEEP THEM FOR REFERENCE!",_
-				vbYesNo Or vbExclamation, document.title) = vbYes Then
-			sh.Run "wscript.exe /job:terminate_explorer """ & location.pathname & """", 1, True
-			On Error Resume Next
-			fso.DeleteFolder sMoveFolder
-			On Error GoTo 0
-			sh.Run explorer
+	If Not PortableMedia.checked Then
+		' Write executable path to HKCU as well because TortoiseHg reads it from there
+		sh.RegWrite "HKCU\Software\Thingamahoochie\WinMerge\Executable", sProgFolder & "\WinMergeU.exe"
+		If maintenance.disabled Then
+			fso.DeleteFile sProgFolder & "\WinMergeU.dat"
+			sh.RegWrite "HKCR\.WinMerge\", "WinMerge.Project.File"
+			sh.RegWrite "HKCR\WinMerge.Project.File\", "WinMerge Project File"
+			sh.RegWrite "HKCR\WinMerge.Project.File\DefaultIcon\", """" & sProgFolder & "\WinMergeU.exe"",1"
+			sh.RegWrite "HKCR\WinMerge.Project.File\shell\edit\command\", """NOTEPAD.EXE"" ""%1"""
+			sh.RegWrite "HKCR\WinMerge.Project.File\shell\open\command\", """" & sProgFolder & "\WinMergeU.exe"" ""%1"""
+			sh.RegWrite "HKLM\Software\Thingamahoochie\WinMerge\Executable", sProgFolder & "\WinMergeU.exe"
+			' Do the ARP stuff
+			sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\DisplayIcon", sProgFolder & "\WinMergeU.exe"
+			sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\DisplayName", "WinMerge 2011"
+			sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\DisplayVersion", version
+			sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\InstallDate", TimeStampNow(8)
+			sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\InstallLocation", sProgFolder
+			sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\ModifyPath", "wscript.exe """ & sProgFolder & "\setup.wsf"""
+			sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\Publisher", "Jochen Neubeck"
+			sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\UninstallString", "wscript.exe /job:uninstall """ & sProgFolder & "\setup.wsf"""
+			If IsEmpty(sMoveFolder) Then
+				MsgBox "Setup completed successfully", vbInformation, document.title
+			ElseIf MsgBox("Setup completed successfully." & vbLf & vbLf &_
+					"The files from the previous installation have been moved to" & vbLf & vbLf &_
+					sMoveFolder & vbLf & vbLf &_
+					"Setup can try to delete this folder but would need to close" & vbLf &_
+					"and restart Windows Explorer. Do you want that to happen?" & vbLf & vbLf &_
+					"!!>    CAUTION:" & vbLf &_
+					"!!>    DO NOT CONFIRM THIS IF YOU HAVE MADE" & vbLf &_
+					"!!>    CHANGES TO THE PREVIOUS INSTALLATION" & vbLf &_
+					"!!>    AND WANT TO KEEP THEM FOR REFERENCE!",_
+					vbYesNo Or vbExclamation, document.title) = vbYes Then
+				sh.Run "wscript.exe /job:terminate_explorer """ & location.pathname & """", 1, True
+				On Error Resume Next
+				fso.DeleteFolder sMoveFolder
+				On Error GoTo 0
+				sh.Run explorer
+			End If
 		End If
 	End If
 	close
@@ -502,6 +510,14 @@ Sub PbFolder_OnClick
 	Set folder = sha.BrowseForFolder(0, "Install into folder:", 0, 17)
 	If Not folder Is Nothing Then EdFolder.value = folder.Items.Item.path
 End Sub
+
+Sub PortableMedia_OnClick
+	Dim element
+	For Each element In shortcuts.getElementsByTagName("INPUT")
+		element.disabled = PortableMedia.checked
+	Next
+End Sub
+
 </script>
 </job>
 <body nowrap>
@@ -549,10 +565,13 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 <iframe id='readme' name='readme'></iframe>
 </div>
 <div id='south'>
-<label id='StFolder'>Install to folder:<br/></label><input id='EdFolder'/><span id='buttons'>
+<label id='StFolder'>Install to folder:</label><input id='EdFolder'/>
 <button id='PbFolder' accesskey='B'><u>B</u>rowse</button>
+<span id='media'>
+<input id='PortableMedia' type='checkbox'/><label for='PortableMedia'>Portable Media</label>
+</span>
 <button id='PbOK' accesskey='O'><u>O</u>K</button>
-<button id='PbCancel' accesskey='C'><u>C</u>ancel</button></span>
+<button id='PbCancel' accesskey='C'><u>C</u>ancel</button>
 </div>
 </body>
 <job id='terminate_explorer'>
