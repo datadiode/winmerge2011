@@ -194,13 +194,19 @@ BOOL CSettingStore::WriteProfileBinary(LPCTSTR lpszSection, LPCTSTR lpszEntry, L
 
 BOOL CSettingStore::MountExternalHive(LPCTSTR sHive, LPCTSTR sXPMountName)
 {
+	// Bail out if file does not exist or is read-only
+	if (GetFileAttributes(sHive) & FILE_ATTRIBUTE_READONLY)
+		return FALSE;
+
 	HKEY hHive = NULL;
 	if (struct ADVAPI32V6 *ADVAPI32V6 = ::ADVAPI32V6)
 	{
+		// Vista or later: Use RegLoadAppKey() (fails on read-only files)
 		ADVAPI32V6->RegLoadAppKey(sHive, &hHive, KEY_ALL_ACCESS, 0, 0);
 	}
 	else
 	{
+		// XP or earlier: Use RegLoadKey() (removes the read-only attribute)
 		CAdjustProcessToken<2> Token;
 		Token.Enable(SE_BACKUP_NAME);
 		Token.Enable(SE_RESTORE_NAME);

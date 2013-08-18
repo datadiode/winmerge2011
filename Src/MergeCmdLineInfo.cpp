@@ -25,10 +25,6 @@
  * @brief MergeCmdLineInfo class implementation.
  *
  */
-
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "Constants.h"
 #include "Paths.h"
@@ -254,6 +250,7 @@ void MergeCmdLineInfo::AddPath(const String &path)
 void MergeCmdLineInfo::ParseWinMergeCmdLine(LPCTSTR q)
 {
 	String param;
+	String reghive;
 	bool flag;
 
 	while ((q = EatParam(q, param, &flag)) != 0)
@@ -331,11 +328,7 @@ void MergeCmdLineInfo::ParseWinMergeCmdLine(LPCTSTR q)
 		}
 		else if (param == _T("reghive"))
 		{
-			q = EatParam(q, param);
-			SettingStore.MountExternalHive(param.c_str(),
-				_T("{08CEC68E-416D-4fae-962D-16A8E838C6F5}"));
-			CRegKeyEx loadkey = SettingStore.GetAppRegistryKey();
-			IOptionDef::InitOptions(loadkey, NULL);
+			q = EatParam(q, reghive);
 		}
 		else if (param == _T("minimize"))
 		{
@@ -391,9 +384,8 @@ void MergeCmdLineInfo::ParseWinMergeCmdLine(LPCTSTR q)
 		}
 		else if (param == _T("cp"))
 		{
-			String codepage;
-			q = EatParam(q, codepage);
-			m_nCodepage = _ttoi(codepage.c_str());
+			q = EatParam(q, param);
+			m_nCodepage = _ttoi(param.c_str());
 		}
 		else if (param == _T("ignorews"))
 		{
@@ -411,6 +403,19 @@ void MergeCmdLineInfo::ParseWinMergeCmdLine(LPCTSTR q)
 		{
 			q = SetOption(q, OPT_CMP_IGNORE_EOL);
 		}
+	}
+	if (reghive.empty())
+	{
+		TCHAR path[MAX_PATH];
+		GetModuleFileName(NULL, path, _countof(path));
+		PathRenameExtension(path, _T(".dat"));
+		reghive = path;
+	}
+	if (SettingStore.MountExternalHive(reghive.c_str(),
+		_T("{08CEC68E-416D-4fae-962D-16A8E838C6F5}")))
+	{
+		CRegKeyEx loadkey = SettingStore.GetAppRegistryKey();
+		IOptionDef::InitOptions(loadkey, NULL);
 	}
 	// If "compare file dir" make it "compare file dir\file".
 	// This feature has been dropped as it conflicts with archive vs. folder compare.
