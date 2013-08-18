@@ -24,16 +24,12 @@
  * @brief Implementation of splashscreen class
  *
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "stdafx.h"
 #include "Merge.h"
 #include "MainFrm.h"
 #include "LanguageSelect.h"
 #include "Splash.h"
-#include "common/ResourceStream.h"
-#include "common/version.h"
+#include "Common/version.h"
 
 #pragma comment(lib, "wininet.lib")
 
@@ -98,13 +94,22 @@ CSplashWnd::CSplashWnd(HWindow *pWndMain)
 	HListView::Create(WS_CHILD | WS_VISIBLE,
 		0, 0, ImageDimensions.cx, ImageDimensions.cy,
 		m_pWnd, SplashTimerID, NULL, WS_EX_NOPARENTNOTIFY);
-	CMyComPtr<IStream> pstm;
-	if (SUCCEEDED(ResourceStream::Create(NULL, MAKEINTRESOURCE(IDR_SPLASH), _T("IMAGE"), &pstm)))
+
+	if (HRSRC hRsrc = FindResource(NULL, MAKEINTRESOURCE(IDR_SPLASH), _T("IMAGE")))
 	{
-		STATSTG stat;
-		pstm->Stat(&stat, STATFLAG_NONAME);
-		OleLoadPicture(pstm, stat.cbSize.LowPart, FALSE, IID_IPicture, (void**)&m_spIPicture);
-	}
+		if (HGLOBAL hGlob = LoadResource(NULL, hRsrc))
+		{
+			if (BYTE *pbData = static_cast<BYTE *>(LockResource(hGlob)))
+			{
+				DWORD cbData = SizeofResource(NULL, hRsrc);
+				if (IStream *pstm = SHCreateMemStream(pbData, cbData))
+				{
+					OleLoadPicture(pstm, cbData, FALSE, IID_IPicture, (void**)&m_spIPicture);
+					pstm->Release();
+				}
+			}
+		}
+	}	
 }
 
 /** 

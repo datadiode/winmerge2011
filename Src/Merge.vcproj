@@ -824,10 +824,6 @@
 				>
 			</File>
 			<File
-				RelativePath="Common\ResourceStream.cpp"
-				>
-			</File>
-			<File
 				RelativePath="RunModal.cpp"
 				>
 			</File>
@@ -1466,10 +1462,6 @@
 			</File>
 			<File
 				RelativePath="resource.h"
-				>
-			</File>
-			<File
-				RelativePath="Common\ResourceStream.h"
 				>
 			</File>
 			<File
