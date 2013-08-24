@@ -3815,6 +3815,7 @@ HMenu *CMainFrame::SetScriptMenu(HMenu *pMenu, LPCSTR section)
 	}
 	else if (pMenu && pMenu->GetMenuStringA(ID_SCRIPT_LAST, text, _countof(text)))
 	{
+		unsigned id = ID_SCRIPT_FIRST;
 		m_pScriptMenu = HMenu::CreatePopupMenu();
 		stl::string language;
 		bool bLocalized = LanguageSelect.GetPoHeaderProperty("X-Poedit-Language", language);
@@ -3839,7 +3840,6 @@ HMenu *CMainFrame::SetScriptMenu(HMenu *pMenu, LPCSTR section)
 				if (GetPrivateProfileSectionA(section, buffer, _countof(buffer), path))
 				{
 					char *p = buffer;
-					unsigned id = ID_SCRIPT_FIRST;
 					while (char *q = strchr(p, '='))
 					{
 						const size_t r = strlen(q);
@@ -3853,7 +3853,7 @@ HMenu *CMainFrame::SetScriptMenu(HMenu *pMenu, LPCSTR section)
 						p = q + r;
 					}
 				}
-				cchSupplementFolder ^= ExpandEnvironmentStringsA("%SupplementFolder%", path, MAX_PATH);
+				cchSupplementFolder ^= GetEnvironmentVariableA("SupplementFolder", path, MAX_PATH);
 			} while ((cchSupplementFolder > 0) && (cchSupplementFolder < MAX_PATH));
 			language.clear();
 		} while (bLocalized && m_pScriptMenu->GetMenuItemCount() == 0);
