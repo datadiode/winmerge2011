@@ -52,7 +52,7 @@ ExecuteParameters="install &platform;"
 <comment id='setup_bat'>
 set SevenZip=&SevenZip;
 del "WinMerge_&version;_&platform;.7z"
-"%SevenZip%\7z.exe" a "WinMerge_&version;_&platform;.7z" -r .\Build\WinMerge\&platform;\Release\* .\Build\WinMerge\Win32\Release\ShellExtensionU.dll .\Build\WinMerge\x64\Release\ShellExtensionX64.dll -x!*.lib -x!*.exp -x!*.pdb -x!*.sh -x!*.dat.log*
+"%SevenZip%\7z.exe" a "WinMerge_&version;_&platform;.7z" -r .\Build\WinMerge\&platform;\Release\* .\Build\WinMerge\Win32\Release\ShellExtensionU.dll .\Build\WinMerge\x64\Release\ShellExtensionX64.dll .\Build\WinMerge\WinMergeU.dat -x!*.lib -x!*.exp -x!*.pdb -x!*.sh
 copy /b "%SevenZip%\7zS.sfx" + Setup_&platform;.cfg + "WinMerge_&version;_&platform;.7z" "WinMerge_&version;_&platform;_change_7z_to_exe_if_you_want_a_setup.7z"
 </comment>
 <comment id='version_h'>
@@ -391,16 +391,16 @@ Sub Apply
 	Else
 		sProgFolder = sThisFolder
 	End If
-	For Each element In shortcuts.getElementsByTagName("INPUT")
-		If element.defaultChecked Or maintenance.disabled Then
-			If element.checked Then
-				CreateLink element.id
-			Else
-				DeleteLink element.id
-			End If
-		End If
-	Next
 	If Not PortableMedia.checked Then
+		For Each element In shortcuts.getElementsByTagName("INPUT")
+			If element.defaultChecked Or maintenance.disabled Then
+				If element.checked Then
+					CreateLink element.id
+				Else
+					DeleteLink element.id
+				End If
+			End If
+		Next
 		' Write executable path to HKCU as well because TortoiseHg reads it from there
 		sh.RegWrite "HKCU\Software\Thingamahoochie\WinMerge\Executable", sProgFolder & "\WinMergeU.exe"
 		If maintenance.disabled Then
@@ -420,25 +420,25 @@ Sub Apply
 			sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\ModifyPath", "wscript.exe """ & sProgFolder & "\setup.wsf"""
 			sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\Publisher", "Jochen Neubeck"
 			sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\UninstallString", "wscript.exe /job:uninstall """ & sProgFolder & "\setup.wsf"""
-			If IsEmpty(sMoveFolder) Then
-				MsgBox "Setup completed successfully", vbInformation, document.title
-			ElseIf MsgBox("Setup completed successfully." & vbLf & vbLf &_
-					"The files from the previous installation have been moved to" & vbLf & vbLf &_
-					sMoveFolder & vbLf & vbLf &_
-					"Setup can try to delete this folder but would need to close" & vbLf &_
-					"and restart Windows Explorer. Do you want that to happen?" & vbLf & vbLf &_
-					"!!>    CAUTION:" & vbLf &_
-					"!!>    DO NOT CONFIRM THIS IF YOU HAVE MADE" & vbLf &_
-					"!!>    CHANGES TO THE PREVIOUS INSTALLATION" & vbLf &_
-					"!!>    AND WANT TO KEEP THEM FOR REFERENCE!",_
-					vbYesNo Or vbExclamation, document.title) = vbYes Then
-				sh.Run "wscript.exe /job:terminate_explorer """ & location.pathname & """", 1, True
-				On Error Resume Next
-				fso.DeleteFolder sMoveFolder
-				On Error GoTo 0
-				sh.Run explorer
-			End If
 		End If
+	End If
+	If IsEmpty(sMoveFolder) Then
+		MsgBox "Setup completed successfully", vbInformation, document.title
+	ElseIf MsgBox("Setup completed successfully." & vbLf & vbLf &_
+			"The files from the previous installation have been moved to" & vbLf & vbLf &_
+			sMoveFolder & vbLf & vbLf &_
+			"Setup can try to delete this folder but would need to close" & vbLf &_
+			"and restart Windows Explorer. Do you want that to happen?" & vbLf & vbLf &_
+			"!!>    CAUTION:" & vbLf &_
+			"!!>    DO NOT CONFIRM THIS IF YOU HAVE MADE" & vbLf &_
+			"!!>    CHANGES TO THE PREVIOUS INSTALLATION" & vbLf &_
+			"!!>    AND WANT TO KEEP THEM FOR REFERENCE!",_
+			vbYesNo Or vbExclamation, document.title) = vbYes Then
+		sh.Run "wscript.exe /job:terminate_explorer """ & location.pathname & """", 1, True
+		On Error Resume Next
+		fso.DeleteFolder sMoveFolder
+		On Error GoTo 0
+		sh.Run explorer
 	End If
 	close
 End Sub
