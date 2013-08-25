@@ -411,7 +411,11 @@ void MergeCmdLineInfo::ParseWinMergeCmdLine(LPCTSTR q)
 		PathRenameExtension(path, _T(".dat"));
 		// Automount WinMergeU.dat only if file exists and is not read-only
 		if ((GetFileAttributes(path) & FILE_ATTRIBUTE_READONLY) == 0)
+		{
 			reghive = path;
+			PathStripToRoot(path);
+			SetEnvironmentVariable(_T("PortableRoot"), path);
+		}
 	}
 	if (!reghive.empty() &&
 		SettingStore.MountExternalHive(reghive.c_str(),

@@ -353,6 +353,7 @@ int CMergeApp::DoMessageBox(LPCTSTR lpszPrompt, UINT nType, UINT nIDPrompt)
 void CMergeApp::InitializeSupplements()
 {
 	String supplementFolder = COptionsMgr::Get(OPT_SUPPLEMENT_FOLDER);
+	supplementFolder = env_ExpandVariables(supplementFolder.c_str());
 	if (!globalFileFilter.SetUserFilterPath(supplementFolder))
 	{
 		supplementFolder = COptionsMgr::GetDefault(OPT_SUPPLEMENT_FOLDER);
