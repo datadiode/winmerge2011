@@ -9,6 +9,9 @@ REM echo %0
 REM echo $(IntDir) = %1
 REM echo $(OutDir) = %2
 
+REM copy WinMerge.chm
+copy ..\..\WM2011_Help\Build\Manual\htmlhelp\WinMerge.chm %~2\Docs\
+
 REM Create English.pot and MergeLang.rc from Merge.rc
 cd ..\Translations\WinMerge
 cscript CreateMasterPotFile.vbs
@@ -17,11 +20,8 @@ REM Create MergeLang.dll from MergeLang.rc
 rc /fo%~1\MergeLang.res /i..\..\Src MergeLang.rc
 link /DLL /NOENTRY /MACHINE:IX86 /OUT:%~2\MergeLang.dll %~1\MergeLang.res
 
-REM Create an empty WinMergeU.dat
-copy /Y nul %~2\WinMergeU.dat
-REM Invoke WinMergeU.exe to make the WinMergeU.dat usable for everyone
-%~2\WinMergeU.exe /noninteractive
-
+REM Invoke WinMergeU.exe to create a WinMergeU.dat which is usable for everyone
+%~2\WinMergeU.exe /noninteractive /reghive "%~2\..\..\WinMergeU.dat"
 exit
 
 :usage
