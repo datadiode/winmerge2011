@@ -194,10 +194,6 @@ BOOL CSettingStore::WriteProfileBinary(LPCTSTR lpszSection, LPCTSTR lpszEntry, L
 
 BOOL CSettingStore::MountExternalHive(LPCTSTR sHive, LPCTSTR sXPMountName)
 {
-	// Bail out if file does not exist or is read-only
-	if (GetFileAttributes(sHive) & FILE_ATTRIBUTE_READONLY)
-		return FALSE;
-
 	HKEY hHive = NULL;
 	if (struct ADVAPI32V6 *ADVAPI32V6 = ::ADVAPI32V6)
 	{

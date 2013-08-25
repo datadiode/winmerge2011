@@ -409,9 +409,12 @@ void MergeCmdLineInfo::ParseWinMergeCmdLine(LPCTSTR q)
 		TCHAR path[MAX_PATH];
 		GetModuleFileName(NULL, path, _countof(path));
 		PathRenameExtension(path, _T(".dat"));
-		reghive = path;
+		// Automount WinMergeU.dat only if file exists and is not read-only
+		if ((GetFileAttributes(path) & FILE_ATTRIBUTE_READONLY) == 0)
+			reghive = path;
 	}
-	if (SettingStore.MountExternalHive(reghive.c_str(),
+	if (!reghive.empty() &&
+		SettingStore.MountExternalHive(reghive.c_str(),
 		_T("{08CEC68E-416D-4fae-962D-16A8E838C6F5}")))
 	{
 		CRegKeyEx loadkey = SettingStore.GetAppRegistryKey();
