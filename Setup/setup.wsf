@@ -388,6 +388,12 @@ Sub Apply
 	If maintenance.disabled Then
 		sProgFolder = EdFolder.value
 		If Not InstallFiles Then Exit Sub
+		' Preserve existing WinMergeU.dat from former installation if present
+		If Not IsEmpty(sMoveFolder) Then
+			On Error Resume Next
+			fso.CopyFile sMoveFolder & "\WinMergeU.dat", sProgFolder & "\WinMergeU.dat"
+			On Error GoTo 0
+		End If
 	Else
 		sProgFolder = sThisFolder
 	End If
