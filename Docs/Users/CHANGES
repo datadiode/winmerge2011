@@ -1,3 +1,13 @@
+2011.003.351
+Changes since preceding release (not necessarily complete):
+• Plugins added from %SupplementFolder%\PluginMonikers got wrong IDs
+• setup.wsf: Add option to install WinMerge to portable media
+• Automatically mount WinMergeU.dat reghive if present and writable
+• Add -reghive option to maintain registry settings in an external file
+• DirView: Header texts were lacking a \ when representing an archive subfolder
+• DirView: Don't require creation of pair folders when opening unique subfolders
+• MergeDoc: Some UI elements did not enable/update as expected
+
 0.2011.003.311
 Changes since preceding release (not necessarily complete):
 • Support for wrapper scripts

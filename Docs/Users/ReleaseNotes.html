@@ -14,19 +14,39 @@ li
 	margin-bottom: 1em;
 }
 </style>
+<script type='text/javascript'>
+function OnReadyStateChangeExternalDoc()
+{
+	var doc = window.event.srcElement;
+	if (doc.readyState == "interactive")
+	{
+		var elements = document.getElementsByName(doc.src);
+		for (var i = 0; i < elements.length; ++i)
+		{
+			elements[i].href = doc.src;
+			elements[i].onclick = function()
+			{
+				var sh = new ActiveXObject("wscript.shell");
+				sh.run(document.URL.replace(/(.*)(\/+)(.*[\/\\])(.*)/, "$3") + this.href);
+				return false;
+			}
+		}
+	}
+}
+</script>
 </head>
 <body>
 
-<h2>WinMerge 0.2011.003.311 Release Notes</h2>
-This is a <b>beta</b> release of WinMerge&nbsp;2011.
+<h2>WinMerge 2011.003.351 Release Notes</h2>
+This is a stable release of WinMerge&nbsp;2011.
 <br>Significant new features since the preceding stable release include:
 <ul>
 <li><p>Line filters exist in a new flavor referred to as <i>early-applied</i> line filters:
-	<br><a href='https://bitbucket.org/jtuc/winmerge2011_help/downloads/WinMerge.chm'>WinMerge.chm</a> &rarr; <i>Using Filters</i> &rarr; <i>Using line filters</i> &rarr; <i>Early-applied line filter syntax</i>
+	<br><a name='WinMerge.chm' href='https://bitbucket.org/jtuc/winmerge2011_help/downloads/WinMerge.chm'>WinMerge.chm</a> &rarr; <i>Using Filters</i> &rarr; <i>Using line filters</i> &rarr; <i>Early-applied line filter syntax</i>
 <li><p>The Open dialog's <i>Include Subfolders</i> option can be adjusted to ignore folder structure:
-	<br><a href='https://bitbucket.org/jtuc/winmerge2011_help/downloads/WinMerge.chm'>WinMerge.chm</a> &rarr; <i>Quick start</i> &rarr; <i>Selecting files and folders to compare</i> &rarr; <i>5.</i>
+	<br><a name='WinMerge.chm' href='https://bitbucket.org/jtuc/winmerge2011_help/downloads/WinMerge.chm'>WinMerge.chm</a> &rarr; <i>Quick start</i> &rarr; <i>Selecting files and folders to compare</i> &rarr; <i>5.</i>
 <li><p>Editor scriptlets are back:
-	<br><a href='https://bitbucket.org/jtuc/winmerge2011_help/downloads/WinMerge.chm'>WinMerge.chm</a> &rarr; <i>Plugin scriptlets</i>
+	<br><a name='WinMerge.chm' href='https://bitbucket.org/jtuc/winmerge2011_help/downloads/WinMerge.chm'>WinMerge.chm</a> &rarr; <i>Plugin scriptlets</i>
 <li><p>Folder compare supports customizable background colors to make differences more visible.
 	<br>This feature can be configured through <i>Edit</i> &rarr; <i>Options</i> &rarr; <i>Colors</i> &rarr; <i>List</i>.
 <li><p>The location bar remains responsive during drag-drop editing. This greatly eases drag-drop moving of text over long distances.
@@ -53,6 +73,9 @@ This is a <b>beta</b> release of WinMerge&nbsp;2011.
 <li><p><i>Wrapper scripts</i> can help automate tasks which would otherwise require user interaction.
 	<br>A first application of this new feature is <i>GenerateHTMLReport.wsf</i>, which you find in the WinMerge program folder.
 	<br>Invoking it without arguments provides usage information.
+<li><p>The setup now offers a <i>Portable media</i> option to install WinMerge in such way that it will not modify the registry of the system on which it is running.
+	<br>
+	<u>Note for Windows XP users:</u> This option is limited to a single instance of WinMerge running in an administrator account.
 <li><p><i>File</i> &rarr; <i>Start Collection</i> opens a folder compare window in <i>collect mode</i>.
 	WinMerge will prompt you for an existing <i>reference folder</i>
 	to represent the right-hand side of the folder compare session,
@@ -76,11 +99,12 @@ This is a <b>beta</b> release of WinMerge&nbsp;2011.
 </ul>
 <p>
 <a target='_blank' href='http://geekswithblogs.net/evjen/archive/2006/06/29/83567.aspx'>Bill Evjen's Blog</a> gives advice in case
-<a href='https://bitbucket.org/jtuc/winmerge2011_help/downloads/WinMerge.chm'>WinMerge.chm</a> fails to display content.
+<a name='WinMerge.chm' href='https://bitbucket.org/jtuc/winmerge2011_help/downloads/WinMerge.chm'>WinMerge.chm</a> fails to display content.
 <p>
-Click <a href='https://bitbucket.org/jtuc/winmerge2011/get/0.2011.003.311.zip'>here</a> to obtain the source code for this release.
+Click <a href='https://bitbucket.org/jtuc/winmerge2011/get/2011.003.351.zip'>here</a> to obtain the source code for this release.
 <p>
 Click <a href='https://bitbucket.org/jtuc/frhed/get/0.10902.2013.zip'>here</a> to obtain source code for Frhed binaries included in this release.
 <p>
-<i>Jochen Neubeck, July 2013</i>
+<i>Jochen Neubeck, August 2013</i>
+<xml src='WinMerge.chm' onreadystatechange='OnReadyStateChangeExternalDoc()'></xml>
 </body>
