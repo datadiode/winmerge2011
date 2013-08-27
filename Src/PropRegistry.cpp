@@ -26,6 +26,7 @@
 #include "OptionsPanel.h"
 #include "resource.h"
 #include "Constants.h"
+#include "Environment.h"
 #include "PropRegistry.h"
 #include "Common/RegKey.h"
 #include "Common/coretools.h"
@@ -81,6 +82,11 @@ BOOL PropRegistry::OnInitDialog()
 			PathAppend(path, WinMergeDocumentsFolder);
 			pCb->AddString(path);
 		}
+		if (GetEnvironmentVariable(_T("PortableRoot"), path, _countof(path)))
+		{
+			wsprintf(path, _T("%%PortableRoot%%ProgramData\\%s"), WinMergeDocumentsFolder);
+			pCb->AddString(path);
+		}
 	}
 	return TRUE;
 }
@@ -107,10 +113,16 @@ LRESULT PropRegistry::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			reinterpret_cast<HSuperComboBox *>(lParam)->AdjustDroppedWidth();
 			break;
 		case IDC_LABEL_SUPPLEMENT_FOLDER:
-			if ((UINT)ShellExecute(NULL, _T("open"), m_supplementFolder.c_str(), NULL, NULL, SW_SHOWNORMAL) > 32)
+			if ((UINT)ShellExecute(NULL, _T("open"),
+				env_ExpandVariables(m_supplementFolder.c_str()).c_str(),
+				NULL, NULL, SW_SHOWNORMAL) > 32)
+			{
 				MessageReflect_WebLinkButton<WM_COMMAND>(wParam, lParam);
+			}
 			else
+			{
 				MessageBeep(0); // unable to open folder
+			}
 			break;
 		}
 		break;
