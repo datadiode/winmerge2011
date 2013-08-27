@@ -289,12 +289,12 @@ CDirFrame::AllowUpwardDirectory(String &leftParent, String &rightParent)
 		}
 	}
 
-	// If regular parent folders exist, allow opening them
+	// Don't attempt to go above root
 	leftParent = paths_GetParentPath(left.c_str());
 	rightParent = paths_GetParentPath(right.c_str());
-	if (GetPairComparability(leftParent.c_str(), rightParent.c_str()) != IS_EXISTING_DIR)
-		return AllowUpwardDirectory::Never;
-	return AllowUpwardDirectory::ParentIsRegularPath;
+	if (PathSkipRoot(leftParent.c_str()) && PathSkipRoot(rightParent.c_str()))
+		return AllowUpwardDirectory::ParentIsRegularPath;
+	return AllowUpwardDirectory::Never;
 }
 
 /**

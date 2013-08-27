@@ -1380,12 +1380,12 @@ bool CMainFrame::DoFileOpen(
 	BOOL bRORight = (dwRightFlags & FFILEOPEN_READONLY) != 0;
 
 	// pop up dialog unless arguments exist (and are compatible)
-	DWORD attrLeft = GetFileAttributes(filelocLeft.filepath.c_str());
-	DWORD attrRight = GetFileAttributes(filelocRight.filepath.c_str());
-	if (dwLeftFlags & FFILEOPEN_MISSING)
-		attrLeft = attrRight;
-	if (dwRightFlags & FFILEOPEN_MISSING)
-		attrRight = attrLeft;
+	DWORD attrLeft = FILE_ATTRIBUTE_DIRECTORY;
+	DWORD attrRight = FILE_ATTRIBUTE_DIRECTORY;
+	if ((dwLeftFlags & FFILEOPEN_MISSING) == 0)
+		attrLeft = GetFileAttributes(filelocLeft.filepath.c_str());
+	if ((dwRightFlags & FFILEOPEN_MISSING) == 0)
+		attrRight = GetFileAttributes(filelocRight.filepath.c_str());
 	if (attrLeft == INVALID_FILE_ATTRIBUTES || attrRight == INVALID_FILE_ATTRIBUTES)
 	{
 		COpenDlg dlg;

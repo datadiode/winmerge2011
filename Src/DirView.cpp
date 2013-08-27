@@ -856,8 +856,10 @@ void CDirView::OpenParentDirectory()
 				rightPath.find_last_not_of(_T('\\')) + 1);
 			break;
 		}
+		// Either side could be missing
 		theApp.m_pMainWnd->DoFileOpen(filelocLeft, filelocRight,
-			FFILEOPEN_NOMRU, FFILEOPEN_NOMRU, m_pFrame->GetRecursive(), m_pFrame);
+			FFILEOPEN_NOMRU | FFILEOPEN_MISSING, FFILEOPEN_NOMRU | FFILEOPEN_MISSING,
+			m_pFrame->GetRecursive(), m_pFrame);
 		break;
 	case CDirFrame::AllowUpwardDirectory::No:
 		break;
