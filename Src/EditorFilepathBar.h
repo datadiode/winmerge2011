@@ -60,7 +60,8 @@ enum BUFFERTYPE
  * displays a tip for each path (as a tooltip). 
  */
 class CEditorFilePathBar
-	: public ODialog
+	: ZeroInit<CEditorFilePathBar>
+	, public ODialog
 	, public CFloatState
 	, public CSplitState
 {
@@ -75,6 +76,7 @@ public :
 	BOOL GetModify(int pane);
 	void SetModify(int pane, BOOL bDirty);
 	void SetActive(int pane, bool bActive);
+	bool HasFocus(int pane) const { return m_rgFocused[pane]; }
 	HEdit *GetControlRect(int pane, LPRECT);
 	const String &GetTitle(int pane);
 
@@ -89,6 +91,7 @@ private:
 	String m_sToolTipString;
 	stl::vector<String> m_rgOriginalText;
 	bool m_rgActive[2];
+	bool m_rgFocused[2];
 	HEdit *m_Edit[2]; /**< Edit controls. */
 };
 

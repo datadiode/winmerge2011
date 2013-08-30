@@ -74,9 +74,9 @@ static void SaveBuffForDiff(CDiffTextBuffer & buf, CDiffTextBuffer & buf2, DiffF
  */
 int CChildFrame::GetActiveMergeViewIndexType() const
 {
-	if (GetLeftView()->HasFocus())
+	if (GetLeftView()->HasFocus() || m_wndFilePathBar.HasFocus(0))
 		return MERGEVIEW_LEFT;
-	if (GetRightView()->HasFocus())
+	if (GetRightView()->HasFocus() || m_wndFilePathBar.HasFocus(1))
 		return MERGEVIEW_RIGHT;
 	if (GetLeftDetailView()->HasFocus())
 		return MERGEVIEW_LEFT_DETAIL;
@@ -87,9 +87,9 @@ int CChildFrame::GetActiveMergeViewIndexType() const
 
 CGhostTextView *CChildFrame::GetActiveTextView() const
 {
-	if (GetLeftView()->HasFocus())
+	if (GetLeftView()->HasFocus() || m_wndFilePathBar.HasFocus(0))
 		return GetLeftView();
-	if (GetRightView()->HasFocus())
+	if (GetRightView()->HasFocus() || m_wndFilePathBar.HasFocus(1))
 		return GetRightView();
 	if (GetLeftDetailView()->HasFocus())
 		return GetLeftDetailView();

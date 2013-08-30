@@ -116,10 +116,7 @@ CEditorFilePathBar::CEditorFilePathBar(
 	, CSplitState(SplitScript)
 	, ODialog(IDD_EDITOR_HEADERBAR)
 	, m_rgOriginalText(2)
-	, m_pToolTips(NULL)
 {
-	m_rgActive[0] = false;
-	m_rgActive[1] = false;
 }
 
 /**
@@ -446,9 +443,11 @@ LRESULT CEditorFilePathBar::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		switch (HIWORD(wParam))
 		{
 		case EN_SETFOCUS:
+			m_rgFocused[LOWORD(wParam) - IDC_STATIC_TITLE_LEFT] = true;
 			RegisterHotKey(m_hWnd, 1, 0, VK_APPS);
 			break;
 		case EN_KILLFOCUS:
+			m_rgFocused[LOWORD(wParam) - IDC_STATIC_TITLE_LEFT] = false;
 			UnregisterHotKey(m_hWnd, 1);
 			break;
 		}
