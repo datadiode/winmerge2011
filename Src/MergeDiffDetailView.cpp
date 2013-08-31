@@ -274,43 +274,6 @@ void CMergeDiffDetailView::ScrollToSubLine(int nNewTopLine)
 	CCrystalTextView::ScrollToSubLine(nNewTopLine);
 }
 
-/**
- * @brief Same purpose as the one as in MergeEditView.cpp
- * @note Nearly the same code also
- */
-void CMergeDiffDetailView::UpdateSiblingScrollPos(bool bHorz)
-{
-	HWindow *pSender = reinterpret_cast<HWindow *>(m_hWnd);
-	LPCTSTR pcwAtom = MAKEINTATOM(pSender->GetClassAtom());
-	HWindow *pParent = pSender->GetParent();
-	HWindow *pChild = NULL;
-	// limit the TopLine : must be smaller than GetLineCount for all the panels
-	int nNewTopLine = m_nTopLine;
-	while ((pChild = pParent->FindWindowEx(pChild, pcwAtom)) != NULL)
-	{
-		if (pChild == pSender)
-			continue;
-		CMergeDiffDetailView *pSiblingView = static_cast<CMergeDiffDetailView *>(FromHandle(pChild));
-		if (pSiblingView->GetLineCount() <= nNewTopLine)
-			nNewTopLine = pSiblingView->GetLineCount() - 1;
-
-	}
-	if (m_nTopLine != nNewTopLine) 
-	{
-		// only modification from code in MergeEditView.cpp
-		// Where are we now, are we still in a diff ? So set to no diff
-		nNewTopLine = m_lineBegin = m_lineEnd = 0;
-		ScrollToLine(nNewTopLine);
-	}
-	while ((pChild = pParent->FindWindowEx(pChild, pcwAtom)) != NULL)
-	{
-		if (pChild == pSender) // We don't need to update ourselves
-			continue;
-		CMergeDiffDetailView *pSiblingView = static_cast<CMergeDiffDetailView *>(FromHandle(pChild));
-		pSiblingView->OnUpdateSibling(this, bHorz);
-	}
-}
-
 /*
  * @brief Compute the max length of the lines inside the displayed diff
  */
@@ -374,8 +337,15 @@ void CMergeDiffDetailView::RecalcHorzScrollBar(bool bPositionOnly)
 		si.nPage = nScreenChars;
 		si.nPos = m_nOffsetChar;
 	}
-	if (GetStyle() & WS_HSCROLL)
-		SetScrollInfo(SB_HORZ, &si);
+	LPCTSTR pcwAtom = MAKEINTATOM(GetClassAtom());
+	HWindow *pParent = GetParent();
+	HWindow *pChild = NULL;
+	while ((pChild = pParent->FindWindowEx(pChild, pcwAtom)) != NULL)
+	{
+		CCrystalTextView *pSiblingView = static_cast<CCrystalTextView *>(FromHandle(pChild));
+		if (pSiblingView->GetStyle() & WS_HSCROLL)
+			pSiblingView->SetScrollInfo(SB_HORZ, &si);
+	}
 }
 
 void CMergeDiffDetailView::PushCursors()

@@ -385,9 +385,9 @@ protected:
 	//END SW
 
 	//  Splitter support
-	virtual void UpdateSiblingScrollPos(bool bHorz) = 0;
+	void UpdateSiblingScrollPos();
 
-	void OnUpdateSibling(CCrystalTextView *pUpdateSource, bool bHorz);
+	void OnUpdateSibling(const CCrystalTextView *pUpdateSource);
 
 	//BEGIN SW
 	/**

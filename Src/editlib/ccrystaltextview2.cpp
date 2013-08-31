@@ -371,7 +371,7 @@ void CCrystalTextView::MovePgUp(BOOL bSelect)
 	if (m_nTopSubLine != nNewTopSubLine)
 	{
 		ScrollToSubLine(nNewTopSubLine);
-		UpdateSiblingScrollPos(FALSE);
+		UpdateSiblingScrollPos();
 	}
 
 	// setting cursor
@@ -409,7 +409,7 @@ void CCrystalTextView::MovePgDn(BOOL bSelect)
 	if (m_nTopSubLine != nNewTopSubLine)
 	{
 		ScrollToSubLine(nNewTopSubLine);
-        UpdateSiblingScrollPos(FALSE);
+		UpdateSiblingScrollPos();
 	}
 
 	// setting cursor
@@ -464,7 +464,7 @@ void CCrystalTextView::ScrollUp()
 	if (m_nTopLine > 0)
 	{
 		ScrollToLine(m_nTopLine - 1);
-		UpdateSiblingScrollPos(FALSE);
+		UpdateSiblingScrollPos();
 	}
 }
 
@@ -473,7 +473,7 @@ void CCrystalTextView::ScrollDown()
 	if (m_nTopLine < GetLineCount() - 1)
 	{
 		ScrollToLine(m_nTopLine + 1);
-		UpdateSiblingScrollPos(FALSE);
+		UpdateSiblingScrollPos();
 	}
 }
 
@@ -482,8 +482,7 @@ void CCrystalTextView::ScrollLeft()
 	if (m_nOffsetChar > 0)
 	{
 		ScrollToChar(m_nOffsetChar - 1);
-		UpdateCaret();
-		UpdateSiblingScrollPos(TRUE);
+		UpdateSiblingScrollPos();
 	}
 }
 
@@ -492,8 +491,7 @@ void CCrystalTextView::ScrollRight()
 	if (m_nOffsetChar < GetMaxLineLength() - 1)
 	{
 		ScrollToChar(m_nOffsetChar + 1);
-		UpdateCaret();
-		UpdateSiblingScrollPos(TRUE);
+		UpdateSiblingScrollPos();
 	}
 }
 
@@ -776,7 +774,7 @@ void CCrystalTextView::OnTimer(UINT_PTR nIDEvent)
 		if (m_nTopLine != nNewTopLine)
 		{
 			ScrollToLine(nNewTopLine);
-			UpdateSiblingScrollPos (FALSE);
+			UpdateSiblingScrollPos();
 			bChanged = true;
 		}
 
@@ -796,8 +794,7 @@ void CCrystalTextView::OnTimer(UINT_PTR nIDEvent)
 		if (m_nOffsetChar != nNewOffsetChar)
 		{
 			ScrollToChar(nNewOffsetChar);
-			UpdateCaret();
-			UpdateSiblingScrollPos(TRUE);
+			UpdateSiblingScrollPos();
 			bChanged = true;
 		}
 

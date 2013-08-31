@@ -165,6 +165,7 @@ int CCrystalTextView::GetScrollPos(UINT nBar, UINT nSBCode)
 	si.fMask = SIF_PAGE | SIF_POS | SIF_RANGE | SIF_TRACKPOS;
 	GetScrollInfo(nBar, &si);
 	--si.nPage;
+	si.nMax -= si.nPage;
 	switch (nSBCode)
 	{
 	case SB_LEFT:             // Scroll to far left.
@@ -622,14 +623,11 @@ void CCrystalTextView::ScrollToSubLine(int nNewTopSubLine)
 	if (m_nTopSubLine != nNewTopSubLine)
 	{
 		// Limit scrolling so that we show one empty line at end of file
-		const int nScreenLines = GetScreenLines();
-		const int nLineCount = GetSubLineCount();
-		if (nNewTopSubLine > (nLineCount - nScreenLines))
-		{
-			nNewTopSubLine = nLineCount - nScreenLines;
-			if (nNewTopSubLine < 0)
-				nNewTopSubLine = 0;
-		}
+		const int nMaxTopSubLine = GetSubLineCount() - 1;
+		if (nNewTopSubLine > nMaxTopSubLine)
+			nNewTopSubLine = nMaxTopSubLine;
+		if (nNewTopSubLine < 0)
+			nNewTopSubLine = 0;
 
 		const int nScrollLines = m_nTopSubLine - nNewTopSubLine;
 		m_nTopSubLine = nNewTopSubLine;
@@ -2215,7 +2213,7 @@ int CCrystalTextView::GetSubLineCount()
 	// calculate number of sub lines
 	if (nLineCount <= 0)
 		return 0;
-	return CCrystalTextView::GetSubLineIndex(nLineCount - 1 ) + GetSubLines(nLineCount - 1);
+	return CCrystalTextView::GetSubLineIndex(nLineCount - 1) + GetSubLines(nLineCount - 1);
 }
 
 int CCrystalTextView::GetSubLineIndex(int nLineIndex)
@@ -2418,33 +2416,27 @@ void CCrystalTextView::OnSize()
 	// recalculate m_nTopSubLine
 	m_nTopSubLine = GetSubLineIndex(m_nTopLine);
 	// set caret to right position
-	UpdateCaret(true);
 	RecalcVertScrollBar();
 	RecalcHorzScrollBar();
-	UpdateSiblingScrollPos(false);
+	UpdateSiblingScrollPos();
 }
 
-void CCrystalTextView::OnUpdateSibling(CCrystalTextView *pUpdateSource, bool bHorz)
+void CCrystalTextView::OnUpdateSibling(const CCrystalTextView *pUpdateSource)
 {
-	if (pUpdateSource != this)
+	ASSERT(pUpdateSource != NULL);
+	bool bUpdateCaret = pUpdateSource == this;
+	if (pUpdateSource->m_nTopSubLine != m_nTopSubLine)
 	{
-		ASSERT(pUpdateSource != NULL);
-		if (!bHorz) // changed this so bHorz works right
-		{
-			if (pUpdateSource->m_nTopSubLine != m_nTopSubLine)
-			{
-				ScrollToSubLine(pUpdateSource->m_nTopSubLine);
-			}
-		}
-		else
-		{
-			if (pUpdateSource->m_nOffsetChar != m_nOffsetChar)
-			{
-				ScrollToChar(pUpdateSource->m_nOffsetChar);
-			}
-		}
-		UpdateCaret(true);
+		ScrollToSubLine(pUpdateSource->m_nTopSubLine);
+		bUpdateCaret = true;
 	}
+	if (pUpdateSource->m_nOffsetChar != m_nOffsetChar)
+	{
+		ScrollToChar(pUpdateSource->m_nOffsetChar);
+		bUpdateCaret = true;
+	}
+	if (bUpdateCaret)
+		UpdateCaret(true);
 }
 
 void CCrystalTextView::RecalcVertScrollBar(bool bPositionOnly)
@@ -2471,16 +2463,23 @@ void CCrystalTextView::RecalcVertScrollBar(bool bPositionOnly)
 		si.nPage = nScreenLines;
 		si.nPos = m_nTopSubLine;
 	}
-	if (GetStyle() & WS_VSCROLL)
-		SetScrollInfo(SB_VERT, &si);
+	LPCTSTR pcwAtom = MAKEINTATOM(GetClassAtom());
+	HWindow *pParent = GetParent();
+	HWindow *pChild = NULL;
+	while ((pChild = pParent->FindWindowEx(pChild, pcwAtom)) != NULL)
+	{
+		CCrystalTextView *pSiblingView = static_cast<CCrystalTextView *>(FromHandle(pChild));
+		if (pSiblingView->GetStyle() & WS_VSCROLL)
+			pSiblingView->SetScrollInfo(SB_VERT, &si);
+	}
 }
 
 void CCrystalTextView::OnVScroll(UINT nSBCode)
 {
 	int nPos = GetScrollPos(SB_VERT, nSBCode);
 	ScrollToSubLine(nPos);
-	if (GetStyle() & WS_VSCROLL)
-		UpdateSiblingScrollPos(false);
+	ASSERT(GetStyle() & WS_VSCROLL);
+	UpdateSiblingScrollPos();
 }
 
 void CCrystalTextView::RecalcHorzScrollBar(bool bPositionOnly)
@@ -2525,18 +2524,23 @@ void CCrystalTextView::RecalcHorzScrollBar(bool bPositionOnly)
 		si.nPage = nScreenChars;
 		si.nPos = m_nOffsetChar;
 	}
-	if (GetStyle() & WS_HSCROLL)
-		SetScrollInfo(SB_HORZ, &si);
+	LPCTSTR pcwAtom = MAKEINTATOM(GetClassAtom());
+	HWindow *pParent = GetParent();
+	HWindow *pChild = NULL;
+	while ((pChild = pParent->FindWindowEx(pChild, pcwAtom)) != NULL)
+	{
+		CCrystalTextView *pSiblingView = static_cast<CCrystalTextView *>(FromHandle(pChild));
+		if (pSiblingView->GetStyle() & WS_HSCROLL)
+			pSiblingView->SetScrollInfo(SB_HORZ, &si);
+	}
 }
 
 void CCrystalTextView::OnHScroll(UINT nSBCode)
 {
 	int nPos = GetScrollPos(SB_HORZ, nSBCode);
 	ScrollToChar(nPos);
-	// This is needed, but why ? OnVScroll don't need to call UpdateCaret
-	UpdateCaret(true);
-	if (GetStyle() & WS_HSCROLL)
-		UpdateSiblingScrollPos(true);
+	ASSERT(GetStyle() & WS_HSCROLL);
+	UpdateSiblingScrollPos();
 }
 
 BOOL CCrystalTextView::OnSetCursor(UINT nHitTest)
@@ -2902,12 +2906,7 @@ void CCrystalTextView::EnsureCursorVisible()
 		GetLineBySubLine(nNewTopSubLine, m_nTopLine, dummy);
 	}
 
-	if (nNewTopSubLine != m_nTopSubLine)
-	{
-		ScrollToSubLine(nNewTopSubLine);
-		UpdateCaret();
-		UpdateSiblingScrollPos(false);
-	}
+	ScrollToSubLine(nNewTopSubLine);
 
 	//  Scroll horizontally
 	// we do not need horizontally scrolling, if we wrap the words
@@ -2937,11 +2936,19 @@ void CCrystalTextView::EnsureCursorVisible()
 	if (nNewOffset < 0)
 		nNewOffset = 0;
 
-	if (m_nOffsetChar != nNewOffset)
+	ScrollToChar(nNewOffset);
+	UpdateSiblingScrollPos();
+}
+
+void CCrystalTextView::UpdateSiblingScrollPos()
+{
+	LPCTSTR pcwAtom = MAKEINTATOM(GetClassAtom());
+	HWindow *pParent = GetParent();
+	HWindow *pChild = NULL;
+	while ((pChild = pParent->FindWindowEx(pChild, pcwAtom)) != NULL)
 	{
-		ScrollToChar(nNewOffset);
-		UpdateCaret(true);
-		UpdateSiblingScrollPos(true);
+		CCrystalTextView *pSiblingView = static_cast<CCrystalTextView *>(FromHandle(pChild));
+		pSiblingView->OnUpdateSibling(this);
 	}
 }
 
@@ -3393,7 +3400,6 @@ BOOL CCrystalTextView::HighlightText(
 			ScrollToLine(ptStartPos.y - nScreenLines / 2);
 		else
 			ScrollToLine(ptStartPos.y);
-		UpdateSiblingScrollPos(false);
 	}
 	EnsureSelectionVisible();
 	return TRUE;
@@ -3939,13 +3945,13 @@ BOOL CCrystalTextView::OnMouseWheel(WPARAM wParam, LPARAM lParam)
 	POINTSTOPOINT(pt, lParam);
 	short zDelta = GET_WHEEL_DELTA_WPARAM(wParam);
 	int nNewTopSubLine = m_nTopSubLine - zDelta / 40;
-	int nMaxTopSubLine = GetSubLineCount() - GetScreenLines();
+	int nMaxTopSubLine = GetSubLineCount() - 1;
 	if (nNewTopSubLine > nMaxTopSubLine)
 		nNewTopSubLine = nMaxTopSubLine;
 	if (nNewTopSubLine < 0)
 		nNewTopSubLine = 0;
 	ScrollToSubLine(nNewTopSubLine);
-	UpdateSiblingScrollPos(false);
+	UpdateSiblingScrollPos();
 	return TRUE;
 }
 
@@ -4214,12 +4220,7 @@ void CCrystalTextView::EnsureSelectionVisible()
 		GetLineBySubLine(nNewTopSubLine, m_nTopLine, dummy);
 	}
 
-	if (nNewTopSubLine != m_nTopSubLine)
-	{
-		ScrollToSubLine(nNewTopSubLine);
-		UpdateCaret();
-		UpdateSiblingScrollPos(false);
-	}
+	ScrollToSubLine(nNewTopSubLine);
 
 	//  Scroll horizontally
 	//BEGIN SW
@@ -4273,12 +4274,9 @@ void CCrystalTextView::EnsureSelectionVisible()
 	if (nNewOffset < 0)
 		nNewOffset = 0;
 
-	if (m_nOffsetChar != nNewOffset)
-	{
-		ScrollToChar(nNewOffset);
-		UpdateCaret();
-		UpdateSiblingScrollPos(true);
-	}
+	ScrollToChar(nNewOffset);
+
+	UpdateSiblingScrollPos();
 }
 
 // Analyze the first line of file to detect its type

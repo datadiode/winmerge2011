@@ -403,35 +403,6 @@ void CMergeEditView::GetLineColors(int nLineIndex, COLORREF &crBkgnd, COLORREF &
 }
 
 /**
- * @brief Sync other pane position
- */
-void CMergeEditView::UpdateSiblingScrollPos(bool bHorz)
-{
-	LPCTSTR pcwAtom = MAKEINTATOM(GetClassAtom());
-	HWindow *pParent = GetParent();
-	HWindow *pChild = NULL;
-	// limit the TopLine : must be smaller than GetLineCount for all the panels
-	int newTopSubLine = m_nTopSubLine;
-	while ((pChild = pParent->FindWindowEx(pChild, pcwAtom)) != NULL)
-	{
-		if (pChild == m_pWnd)
-			continue;
-		CMergeEditView *pSiblingView = static_cast<CMergeEditView *>(FromHandle(pChild));
-		if (pSiblingView->GetSubLineCount() <= newTopSubLine)
-			newTopSubLine = pSiblingView->GetSubLineCount()-1;
-	}
-	if (m_nTopSubLine != newTopSubLine)
-		ScrollToSubLine(newTopSubLine);
-	while ((pChild = pParent->FindWindowEx(pChild, pcwAtom)) != NULL)
-	{
-		if (pChild == m_pWnd) // We don't need to update ourselves
-			continue;
-		CMergeEditView *pSiblingView = static_cast<CMergeEditView *>(FromHandle(pChild));
-		pSiblingView->OnUpdateSibling(this, bHorz);
-	}
-}
-
-/**
  * @brief Selects diff by number and syncs other file
  * @param [in] nDiff Diff to select, must be >= 0
  * @param [in] bScroll Scroll diff to view
