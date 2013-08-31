@@ -1319,8 +1319,9 @@ FONT 8, "MS Shell Dlg", 0, 0, 1
     AUTOCHECKBOX    "Ign&ore time differences less than 3 seconds", IDC_IGNORE_SMALLTIMEDIFF, 7, 39, 222, 10
     AUTOCHECKBOX    "&Self-compare unique files", IDC_COMPARE_SELFCOMPARE, 7, 50, 222, 10
     AUTOCHECKBOX    "&Include unique subfolders contents", IDC_COMPARE_WALKUNIQUES, 7, 61, 222, 10
-    LTEXT           "&Quick compare limit (MB):", IDC_STATIC, 7, 71, 200, 8, SS_LEFT
-    EDITTEXT        IDC_COMPARE_QUICKC_LIMIT, 7, 81, 50, 14, ES_AUTOHSCROLL, WS_EX_RTLREADING
+    AUTOCHECKBOX    "C&ache compare results of visited folders", IDC_COMPARE_CACHE_RESULTS, 7, 72, 222, 8
+    LTEXT           "&Quick compare limit (MB):", IDC_STATIC, 7, 82, 200, 8, SS_LEFT
+    EDITTEXT        IDC_COMPARE_QUICKC_LIMIT, 7, 92, 50, 14, ES_AUTOHSCROLL, WS_EX_RTLREADING
     PUSHBUTTON      "Defaults", IDC_COMPAREFOLDER_DEFAULTS, 160, 187, 70, 14
 }
 

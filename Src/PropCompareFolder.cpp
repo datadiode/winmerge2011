@@ -36,6 +36,7 @@ bool PropCompareFolder::UpdateData()
 	DDX_Check<op>(IDC_IGNORE_SMALLTIMEDIFF, m_bIgnoreSmallTimeDiff);
 	DDX_Check<op>(IDC_COMPARE_SELFCOMPARE, m_bSelfCompare);
 	DDX_Check<op>(IDC_COMPARE_WALKUNIQUES, m_bWalkUniques);
+	DDX_Check<op>(IDC_COMPARE_CACHE_RESULTS, m_bCacheResults);
 	DDX_Text<op>(IDC_COMPARE_QUICKC_LIMIT, m_nQuickCompareLimit);
 	return true;
 }
@@ -73,6 +74,7 @@ void PropCompareFolder::ReadOptions()
 	m_bIgnoreSmallTimeDiff = COptionsMgr::Get(OPT_IGNORE_SMALL_FILETIME);
 	m_bSelfCompare = COptionsMgr::Get(OPT_CMP_SELF_COMPARE);
 	m_bWalkUniques = COptionsMgr::Get(OPT_CMP_WALK_UNIQUES);
+	m_bCacheResults = COptionsMgr::Get(OPT_CMP_CACHE_RESULTS);
 	m_nQuickCompareLimit = COptionsMgr::Get(OPT_CMP_QUICK_LIMIT) / Mega;
 }
 
@@ -88,7 +90,7 @@ void PropCompareFolder::WriteOptions()
 	COptionsMgr::SaveOption(OPT_IGNORE_SMALL_FILETIME, m_bIgnoreSmallTimeDiff != FALSE);
 	COptionsMgr::SaveOption(OPT_CMP_SELF_COMPARE, m_bSelfCompare != FALSE);
 	COptionsMgr::SaveOption(OPT_CMP_WALK_UNIQUES, m_bWalkUniques != FALSE);
-
+	COptionsMgr::SaveOption(OPT_CMP_CACHE_RESULTS, m_bCacheResults != FALSE);
 	if (m_nQuickCompareLimit > 2000)
 		m_nQuickCompareLimit = 2000;
 	COptionsMgr::SaveOption(OPT_CMP_QUICK_LIMIT, m_nQuickCompareLimit * Mega);
@@ -124,6 +126,7 @@ void PropCompareFolder::OnDefaults()
 	m_bStopAfterFirst = COptionsMgr::GetDefault(OPT_CMP_STOP_AFTER_FIRST);
 	m_bSelfCompare = COptionsMgr::GetDefault(OPT_CMP_SELF_COMPARE);
 	m_bWalkUniques = COptionsMgr::GetDefault(OPT_CMP_WALK_UNIQUES);
+	m_bCacheResults = COptionsMgr::GetDefault(OPT_CMP_CACHE_RESULTS);
 	m_nQuickCompareLimit = COptionsMgr::GetDefault(OPT_CMP_QUICK_LIMIT) / Mega;
 	UpdateScreen();
 }

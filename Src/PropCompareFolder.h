@@ -36,6 +36,7 @@ public:
 	BOOL    m_bIgnoreSmallTimeDiff;
 	BOOL    m_bSelfCompare;
 	BOOL    m_bWalkUniques;
+	BOOL    m_bCacheResults;
 	UINT    m_nQuickCompareLimit;
 // Implementation
 protected:

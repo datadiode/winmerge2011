@@ -319,6 +319,8 @@ extern COptionDef
 <bool> OPT_CMP_SELF_COMPARE operator((_T("Settings/SelfCompare"), true));
 extern COptionDef
 <bool> OPT_CMP_WALK_UNIQUES operator((_T("Settings/WalkUniqueDirs"), true));
+extern COptionDef
+<bool> OPT_CMP_CACHE_RESULTS operator((_T("Settings/CacheResults"), true));
 
 // Multidoc enable/disable per document type
 extern COptionDef

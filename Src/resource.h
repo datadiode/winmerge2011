@@ -134,6 +134,7 @@
 #define IDC_TV_CLEARCASE_TYPEMGR_SETUP          1001
 #define IDC_LEFT_COMBO                          1002
 #define IDC_RIGHT_EDIT                          1002
+#define IDC_COMPARE_CACHE_RESULTS               1003
 #define IDC_RIGHT_BUTTON                        1003
 #define IDC_PROJECT_COMBO                       1004
 #define IDC_RIGHT_COMBO                         1004
