@@ -2251,6 +2251,7 @@ void CChildFrame::SwapFiles()
 		pMovedLines->SwapSides();
 	}
 
+	m_pDetailView[1]->RecalcHorzScrollBar();
 	UpdateAllViews();
 }
 
