@@ -61,6 +61,32 @@ bool CDirFrame::CanFrameClose()
 /////////////////////////////////////////////////////////////////////////////
 // CDirDoc commands
 
+bool CDirFrame::InitContext(LPCTSTR pszLeft, LPCTSTR pszRight, int nRecursive, DWORD dwContext)
+{
+	if (!COptionsMgr::Get(OPT_CMP_CACHE_RESULTS))
+		DeleteContext();
+
+	bool bNeedCompare = false;
+	m_pCtxt = NULL;
+	LIST_ENTRY *entry = &m_root;
+	while ((entry = entry->Flink) != &m_root)
+	{
+		CDiffContext *pCtxt = static_cast<CDiffContext *>(entry);
+		if (pCtxt->m_dwContext == dwContext && pCtxt->GetLeftPath() == pszLeft && pCtxt->GetRightPath() == pszRight)
+		{
+			m_pCtxt = pCtxt;
+			break;
+		}
+	}
+	if (m_pCtxt == NULL)
+	{
+		m_pCtxt = new CDiffContext(m_pCompareStats, m_pDirView->m_pWnd, pszLeft, pszRight, nRecursive, dwContext);
+		m_root.Append(m_pCtxt);
+		bNeedCompare = true;
+	}
+	return bNeedCompare;
+}
+
 /**
  * @brief Initialise directory compare for given paths.
  *
@@ -69,14 +95,12 @@ bool CDirFrame::CanFrameClose()
  * @param [in] paths Paths to compare
  * @param [in] nRecursive If != 0 subdirectories are included to compare.
  */
-void CDirFrame::InitCompare(LPCTSTR pszLeft, LPCTSTR pszRight, int nRecursive, CTempPathContext *pTempPathContext)
+bool CDirFrame::InitCompare(LPCTSTR pszLeft, LPCTSTR pszRight, int nRecursive, CTempPathContext *pTempPathContext)
 {
 	m_pDirView->DeleteAllItems();
 	// Anything that can go wrong here will yield an exception.
 	// Default implementation of operator new() never returns NULL.
-	delete m_pCtxt;
-	
-	m_pCtxt = new CDiffContext(m_pCompareStats, m_pDirView->m_pWnd, pszLeft, pszRight, nRecursive);
+	bool bNeedCompare = InitContext(pszLeft, pszRight, nRecursive, 0);
 
 	if (pTempPathContext)
 	{
@@ -89,6 +113,7 @@ void CDirFrame::InitCompare(LPCTSTR pszLeft, LPCTSTR pszRight, int nRecursive, C
 	}
 	
 	m_nRecursive = nRecursive;
+	return bNeedCompare;
 }
 
 void CDirFrame::InitMrgmanCompare()
@@ -104,8 +129,6 @@ void CDirFrame::InitMrgmanCompare()
 	else
 	{
 		m_pDirView->DeleteAllItems();
-		delete m_pCtxt;
-		m_pCtxt = NULL;
 	}
 
 	UINT idLeftContent = static_cast<UINT>(
@@ -137,21 +160,23 @@ void CDirFrame::InitMrgmanCompare()
 	{
 		root = rk.ReadString(_T("drive"), _T("?"));
 		root += _T(":\\");
+		root = paths_GetLongPath(root.c_str());
 	}
 
 	CMarkdown::File xml(mrgmanFile.c_str());
 	CMarkdown::EntityMap entities;
 	CMarkdown::Load(entities);
 
+	bool bNeedCompare = false;
 	if (xml.Move("cfl") && xml.Pull())
 	{
 		if (xml.Move("session") && xml.Pull())
 		{
 			OString view_root = CMarkdown(xml).Move("to-view").Pop().Move("view-root").GetInnerText()->Uni(entities);
 			root += view_root.W;
-			m_pCtxt = new CDiffContext(m_pCompareStats, m_pDirView->m_pWnd, root.c_str(), root.c_str(), 0);
+			bNeedCompare = InitContext(root.c_str(), root.c_str(), 0, MAKELONG(idLeftContent, idRightContent));
 			m_pCtxt->m_piFilterGlobal = &transparentFileFilter;
-			if (xml.Move("files") && xml.Pull())
+			if (bNeedCompare && xml.Move("files") && xml.Pull())
 			{
 				while (xml.Move("file") && xml.Pull())
 				{
@@ -224,8 +249,9 @@ void CDirFrame::InitMrgmanCompare()
 	if (m_pCtxt)
 		m_pDirView->Redisplay();
 
-	if (int nCompareSelected = m_pDirView->GetItemCount())
-		Rescan(nCompareSelected);
+	if (bNeedCompare)
+		if (int nCompareSelected = m_pDirView->GetItemCount())
+			Rescan(nCompareSelected);
 }
 
 /**
@@ -288,7 +314,6 @@ CDirFrame::AllowUpwardDirectory(String &leftParent, String &rightParent)
 			return AllowUpwardDirectory::No;
 		}
 	}
-
 	// Don't attempt to go above root
 	leftParent = paths_GetParentPath(left.c_str());
 	rightParent = paths_GetParentPath(right.c_str());

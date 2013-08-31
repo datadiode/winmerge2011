@@ -1621,7 +1621,7 @@ bool CMainFrame::DoFileOpen(
 		{
 			// Anything that can go wrong inside InitCompare() will yield an
 			// exception. There is no point in checking return value.
-			pDirDoc->InitCompare(
+			bool bNeedCompare = pDirDoc->InitCompare(
 				filelocLeft.filepath.c_str(), filelocRight.filepath.c_str(),
 				nRecursive, pTempPathContext);
 			LogFile.Write(CLogFile::LNOTICE, _T("Open dirs: Left: %s\n\tRight: %s."),
@@ -1631,8 +1631,10 @@ bool CMainFrame::DoFileOpen(
 			pDirDoc->SetRightReadOnly(bRORight);
 			pDirDoc->SetDescriptions(filelocLeft.description, filelocRight.description);
 			pDirDoc->ActivateFrame();
-
-			pDirDoc->Rescan();
+			if (bNeedCompare)
+				pDirDoc->Rescan();
+			else
+				pDirDoc->Redisplay();
 		}
 	}
 	else

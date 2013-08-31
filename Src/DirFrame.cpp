@@ -108,7 +108,7 @@ CDirFrame::CDirFrame(CMainFrame *pMDIFrame)
 
 CDirFrame::~CDirFrame()
 {
-	delete m_pCtxt;
+	DeleteContext();
 	delete m_pCompareStats;
 	// Inform all of our merge docs that we're closing
 	MergeDocPtrList::iterator ppMergeDoc = m_MergeDocs.begin();
@@ -133,6 +133,15 @@ CDirFrame::~CDirFrame()
 	if (m_pHandleSet->m_cRef == 1)
 	{
 		CDirView::ReleaseSharedResources();
+	}
+}
+
+void CDirFrame::DeleteContext()
+{
+	while ((m_pCtxt = static_cast<CDiffContext *>(m_root.IsSibling(m_root.Flink))) != NULL)
+	{
+		m_pCtxt->RemoveSelf();
+		delete m_pCtxt;
 	}
 }
 

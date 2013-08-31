@@ -98,7 +98,7 @@ public:
 
 // Implementation
 public:
-	void InitCompare(LPCTSTR pszLeft, LPCTSTR pszRight, int nRecursive, CTempPathContext *);
+	bool InitCompare(LPCTSTR pszLeft, LPCTSTR pszRight, int nRecursive, CTempPathContext *);
 	void InitMrgmanCompare();
 	void Rescan(int nCompareSelected = 0);
 	int GetRecursive() const { return m_nRecursive; }
@@ -136,9 +136,13 @@ public:
 	void SetItemViewFlag(UINT flag, UINT mask);
 	const CompareStats *GetCompareStats() const { return m_pCompareStats; };
 
-	// Implementation data
 private:
+	bool InitContext(LPCTSTR pszLeft, LPCTSTR pszRight, int nRecursive, DWORD dwContext);
+	void DeleteContext();
+
+	// Implementation data
 	CDiffContext *m_pCtxt; /**< Pointer to compare results-data */
+	ListEntry m_root;
 	CompareStats *const m_pCompareStats; /**< Compare statistics */
 	MergeDocPtrList m_MergeDocs; /**< List of file compares opened from this compare */
 	HexMergeDocPtrList m_HexMergeDocs; /**< List of hex file compares opened from this compare */

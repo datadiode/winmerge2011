@@ -178,7 +178,8 @@ CDiffContext::CDiffContext
 	HWindow *pWindow,
 	LPCTSTR pszLeft,
 	LPCTSTR pszRight,
-	int nRecursive
+	int nRecursive,
+	DWORD dwContext
 ) : m_piFilterGlobal(NULL),
 	m_nCompMethod(0),
 	m_nQuickCompareLimit(0),
@@ -188,6 +189,7 @@ CDiffContext::CDiffContext
 	m_pWindow(pWindow),
 	m_bStopAfterFirstDiff(false),
 	m_nRecursive(nRecursive),
+	m_dwContext(dwContext),
 	m_bWalkUniques(true),
 	m_bSelfCompare(true),
 	m_paths(2),

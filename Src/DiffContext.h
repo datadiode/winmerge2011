@@ -31,7 +31,9 @@ class CompareStats;
  *   (m_diffList).
  * - second threads compares items in the list.
  */
-class CDiffContext : public DiffItemList
+class CDiffContext
+	: public ListEntry
+	, public DiffItemList
 {
 public:
 	/** @brief Special values for difference counts. */
@@ -42,7 +44,7 @@ public:
 	};
 
 	CDiffContext(CompareStats *, HWindow *,
-		LPCTSTR pszLeft, LPCTSTR pszRight, int nRecursive);
+		LPCTSTR pszLeft, LPCTSTR pszRight, int nRecursive, DWORD dwContext);
 	~CDiffContext();
 
 	void UpdateVersion(DIFFITEM *, BOOL bLeft) const;
@@ -122,6 +124,8 @@ public:
 	 * The compare method used.
 	 */
 	int m_nCompMethod;
+
+	const DWORD m_dwContext; /**< Context code used with CLearCase mrgman files */
 
 	FolderCmp m_folderCmp;
 

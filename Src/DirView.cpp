@@ -354,6 +354,25 @@ void CDirView::Redisplay()
 	RedisplayChildren(NULL, 0, cnt, alldiffs);
 	SortColumnsAppropriately();
 	SetRedraw(TRUE);
+
+	if (DIFFITEM *di = m_pFrame->FindItemFromPaths(m_lastLeftPath.c_str(), m_lastRightPath.c_str()))
+	{
+		int i = GetItemIndex(di);
+		if (i != -1)
+		{
+			MoveFocus(i, i);
+		}
+	}
+	else if (COptionsMgr::Get(OPT_SCROLL_TO_FIRST))
+	{
+		OnFirstdiff();
+	}
+	else
+	{
+		MoveFocus(0, 0);
+	}
+	m_lastLeftPath.clear();
+	m_lastRightPath.clear();
 }
 
 /**
@@ -1301,24 +1320,6 @@ void CDirView::OnUpdateUIMessage()
 	if (GetItemCount() == 0)
 	{
 		Redisplay();
-		if (DIFFITEM *di = m_pFrame->FindItemFromPaths(m_lastLeftPath.c_str(), m_lastRightPath.c_str()))
-		{
-			int i = GetItemIndex(di);
-			if (i != -1)
-			{
-				MoveFocus(i, i);
-			}
-		}
-		else if (COptionsMgr::Get(OPT_SCROLL_TO_FIRST))
-		{
-			OnFirstdiff();
-		}
-		else
-		{
-			MoveFocus(0, 0);
-		}
-		m_lastLeftPath.clear();
-		m_lastRightPath.clear();
 	}
 	else
 	{
