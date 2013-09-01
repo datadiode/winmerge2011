@@ -407,7 +407,7 @@ void CMergeDiffDetailView::OnUpdateCaret(bool bShowHide)
 {
 	if (bShowHide)
 		return;
-	m_pDocument->UpdateCmdUI();
+	m_pDocument->UpdateGeneralCmdUI();
 }
 
 /**

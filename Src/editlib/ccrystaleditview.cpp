@@ -284,13 +284,7 @@ void CCrystalEditView::OnChar(WPARAM nChar)
 			{
 				POINT ptSelStart, ptSelEnd;
 				GetSelection(ptSelStart, ptSelEnd);
-
 				ptCursorPos = ptSelStart;
-				/*SetAnchor(ptCursorPos);
-				SetSelection(ptCursorPos, ptCursorPos);
-				SetCursorPos(ptCursorPos);
-				EnsureCursorVisible();*/
-
 				// [JRT]:
 				m_pTextBuffer->DeleteText(this, ptSelStart.y, ptSelStart.x, ptSelEnd.y, ptSelEnd.x, CE_ACTION_TYPING);
 			}
@@ -329,10 +323,6 @@ void CCrystalEditView::OnChar(WPARAM nChar)
 			if (ptSelStart != ptSelEnd)
 			{
 				ptCursorPos = ptSelStart;
-				/*SetAnchor(ptCursorPos);
-				SetSelection(ptCursorPos, ptCursorPos);
-				SetCursorPos(ptCursorPos);
-				EnsureCursorVisible();*/
 				// [JRT]:
 				m_pTextBuffer->DeleteText(this, ptSelStart.y, ptSelStart.x, ptSelEnd.y, ptSelEnd.x, CE_ACTION_TYPING);
 			}
