@@ -2454,7 +2454,6 @@ void CCrystalTextView::RecalcVertScrollBar(bool bPositionOnly)
 		si.nMin = 0;
 		si.nMax = GetSubLineCount() - 1;
 	}
-	si.nPos = m_nTopSubLine;
 	LPCTSTR pcwAtom = MAKEINTATOM(GetClassAtom());
 	HWindow *pParent = GetParent();
 	HWindow *pChild = NULL;
@@ -2462,7 +2461,10 @@ void CCrystalTextView::RecalcVertScrollBar(bool bPositionOnly)
 	{
 		CCrystalTextView *pSiblingView = static_cast<CCrystalTextView *>(FromHandle(pChild));
 		if (pSiblingView->GetStyle() & WS_VSCROLL)
+		{
+			si.nPos = pSiblingView->m_nTopSubLine;
 			pSiblingView->SetScrollInfo(SB_VERT, &si);
+		}
 	}
 }
 
@@ -3939,183 +3941,169 @@ int bracetype(TCHAR);
 
 void CCrystalTextView::OnMatchBrace()
 {
-  POINT ptCursorPos = GetCursorPos ();
-  int nLength = m_pTextBuffer->GetLineLength(ptCursorPos.y);
-  LPCTSTR pszText = m_pTextBuffer->GetLineChars(ptCursorPos.y), pszEnd = pszText + ptCursorPos.x;
-  bool bAfter = false;
-  int nType = 0;
-  if (ptCursorPos.x < nLength)
-    {
-      nType = bracetype(*pszEnd);
-      if (nType)
-        {
-          bAfter = false;
-        }
-      else if (!nType && ptCursorPos.x > 0)
-        {
-          nType = bracetype(pszEnd[-1]);
-          bAfter = true;
-        }
-    }
-  else if (ptCursorPos.x > 0)
-    {
-      nType = bracetype(pszEnd[-1]);
-      bAfter = true;
-    }
-  if (nType)
-    {
-      int nOther, nCount = 0, nComment = 0;
-      if (bAfter)
-        {
-          nOther = ((nType - 1) ^ 1) + 1;
-          if (nOther & 1)
-            pszEnd--;
-        }
-      else
-        {
-          nOther = ((nType - 1) ^ 1) + 1;
-          if (!(nOther & 1))
-            pszEnd++;
-        }
-      LPCTSTR pszOpenComment = m_CurSourceDef->opencomment;
-      LPCTSTR pszCloseComment = m_CurSourceDef->closecomment;
-      LPCTSTR pszCommentLine = m_CurSourceDef->commentline;
-      int nOpenComment = static_cast<int>(_tcslen(pszOpenComment));
-      int nCloseComment = static_cast<int>(_tcslen(pszCloseComment));
-      int nCommentLine = static_cast<int>(_tcslen(pszCommentLine));
-      if (nOther & 1)
-        {
-          for (;;)
-            {
-              while (--pszEnd >= pszText)
-                {
-                  LPCTSTR pszTest = pszEnd - nOpenComment + 1;
-                  if (pszTest >= pszText && !_tcsnicmp(pszTest, pszOpenComment, nOpenComment))
-                    {
-                      nComment--;
-                      pszEnd = pszTest;
-                      if (--pszEnd < pszText)
-                        {
-                          break;
-                        }
-                    }
-                  pszTest = pszEnd - nCloseComment + 1;
-                  if (pszTest >= pszText && !_tcsnicmp(pszTest, pszCloseComment, nCloseComment))
-                    {
-                      nComment++;
-                      pszEnd = pszTest;
-                      if (--pszEnd < pszText)
-                        {
-                          break;
-                        }
-                    }
-                  if (!nComment)
-                    {
-                      pszTest = pszEnd - nCommentLine + 1;
-                      if (pszTest >= pszText && !_tcsnicmp(pszTest, pszCommentLine, nCommentLine))
-                        {
-                          break;
-                        }
-                      if (bracetype(*pszEnd) == nType)
-                        {
-                          nCount++;
-                        }
-                      else if (bracetype(*pszEnd) == nOther)
-                        {
-                          if (!nCount--)
-                            {
-                              ptCursorPos.x = static_cast<int>(pszEnd - pszText);
-                              if (bAfter)
-                                ptCursorPos.x++;
-                              SetSelection(ptCursorPos, ptCursorPos);
-                              SetCursorPos(ptCursorPos);
-                              SetAnchor(ptCursorPos);
-                              EnsureCursorVisible();
-                              return;
-                            }
-                        }
-                    }
-                }
-              if (ptCursorPos.y)
-                {
-                  ptCursorPos.x = m_pTextBuffer->GetLineLength(--ptCursorPos.y);
-                  pszText = m_pTextBuffer->GetLineChars(ptCursorPos.y);
-                  pszEnd = pszText + ptCursorPos.x;
-                }
-              else
-                break;
-            }
-        }
-      else
-        {
-          LPCTSTR pszBegin = pszText;
-          pszText = pszEnd;
-          pszEnd = pszBegin + nLength;
-          int nLines = m_pTextBuffer->GetLineCount();
-          for (;;)
-            {
-              while (pszText < pszEnd)
-                {
-                  LPCTSTR pszTest = pszText + nCloseComment;
-                  if (pszTest <= pszEnd && !_tcsnicmp(pszText, pszCloseComment, nCloseComment))
-                    {
-                      nComment--;
-                      pszText = pszTest;
-                      if (pszText > pszEnd)
-                        {
-                          break;
-                        }
-                    }
-                  pszTest = pszText + nOpenComment;
-                  if (pszTest <= pszEnd && !_tcsnicmp(pszText, pszOpenComment, nOpenComment))
-                    {
-                      nComment++;
-                      pszText = pszTest;
-                      if (pszText > pszEnd)
-                        {
-                          break;
-                        }
-                    }
-                  if (!nComment)
-                    {
-                      pszTest = pszText + nCommentLine;
-                      if (pszTest <= pszEnd && !_tcsnicmp(pszText, pszCommentLine, nCommentLine))
-                        {
-                          break;
-                        }
-                      if (bracetype(*pszText) == nType)
-                        {
-                          nCount++;
-                        }
-                      else if (bracetype(*pszText) == nOther)
-                        {
-                          if (!nCount--)
-                            {
-                              ptCursorPos.x = static_cast<int>(pszText - pszBegin);
-                              if (bAfter)
-                                ptCursorPos.x++;
-                              SetSelection(ptCursorPos, ptCursorPos);
-                              SetCursorPos(ptCursorPos);
-                              SetAnchor(ptCursorPos);
-                              EnsureCursorVisible();
-                              return;
-                            }
-                        }
-                    }
-                  pszText++;
-                }
-              if (ptCursorPos.y < nLines)
-                {
-                  ptCursorPos.x = 0;
-                  nLength = m_pTextBuffer->GetLineLength(++ptCursorPos.y);
-                  pszBegin = pszText = m_pTextBuffer->GetLineChars(ptCursorPos.y);
-                  pszEnd = pszBegin + nLength;
-                }
-              else
-                break;
-            }
-        }
-    }
+	POINT ptCursorPos = GetCursorPos();
+	int nLength = m_pTextBuffer->GetLineLength(ptCursorPos.y);
+	LPCTSTR pszText = m_pTextBuffer->GetLineChars(ptCursorPos.y);
+	LPCTSTR pszEnd = pszText + ptCursorPos.x;
+	bool bAfter = false;
+	int nType = 0;
+	if (ptCursorPos.x < nLength)
+	{
+		nType = bracetype(*pszEnd);
+		if (nType)
+		{
+			bAfter = false;
+		}
+		else if (!nType && ptCursorPos.x > 0)
+		{
+			nType = bracetype(pszEnd[-1]);
+			bAfter = true;
+		}
+	}
+	else if (ptCursorPos.x > 0)
+	{
+		nType = bracetype(pszEnd[-1]);
+		bAfter = true;
+	}
+	if (nType)
+	{
+		int nOther = ((nType - 1) ^ 1) + 1;
+		if (bAfter)
+		{
+			if (nOther & 1)
+				--pszEnd;
+		}
+		else
+		{
+			if (!(nOther & 1))
+				++pszEnd;
+		}
+		int nCount = 0;
+		int nComment = 0;
+		LPCTSTR pszOpenComment = m_CurSourceDef->opencomment;
+		LPCTSTR pszCloseComment = m_CurSourceDef->closecomment;
+		LPCTSTR pszCommentLine = m_CurSourceDef->commentline;
+		int nOpenComment = static_cast<int>(_tcslen(pszOpenComment));
+		int nCloseComment = static_cast<int>(_tcslen(pszCloseComment));
+		int nCommentLine = static_cast<int>(_tcslen(pszCommentLine));
+		if (nOther & 1)
+		{
+			for (;;)
+			{
+				while (pszEnd > pszText)
+				{
+					LPCTSTR pszTest = pszEnd - nOpenComment;
+					--pszEnd;
+					if (pszTest >= pszText && !_tcsnicmp(pszTest, pszOpenComment, nOpenComment))
+					{
+						--nComment;
+						pszEnd = pszTest;
+						if (--pszEnd < pszText)
+							break;
+					}
+					pszTest = pszEnd - nCloseComment + 1;
+					if (pszTest >= pszText && !_tcsnicmp(pszTest, pszCloseComment, nCloseComment))
+					{
+						++nComment;
+						pszEnd = pszTest;
+						if (--pszEnd < pszText)
+							break;
+					}
+					if (!nComment)
+					{
+						pszTest = pszEnd - nCommentLine + 1;
+						if (pszTest >= pszText && !_tcsnicmp(pszTest, pszCommentLine, nCommentLine))
+							break;
+						if (bracetype(*pszEnd) == nType)
+						{
+							++nCount;
+						}
+						else if (bracetype(*pszEnd) == nOther)
+						{
+							if (!nCount)
+							{
+								ptCursorPos.x = static_cast<int>(pszEnd - pszText);
+								if (bAfter)
+									ptCursorPos.x++;
+								SetSelection(ptCursorPos, ptCursorPos);
+								SetCursorPos(ptCursorPos);
+								SetAnchor(ptCursorPos);
+								EnsureCursorVisible();
+								return;
+							}
+							--nCount;
+						}
+					}
+				}
+				if (ptCursorPos.y == 0)
+					break;
+				ptCursorPos.x = m_pTextBuffer->GetLineLength(--ptCursorPos.y);
+				pszText = m_pTextBuffer->GetLineChars(ptCursorPos.y);
+				pszEnd = pszText + ptCursorPos.x;
+			}
+		}
+		else
+		{
+			LPCTSTR pszBegin = pszText;
+			pszText = pszEnd;
+			pszEnd = pszBegin + nLength;
+			int nLines = m_pTextBuffer->GetLineCount();
+			for (;;)
+			{
+				while (pszText < pszEnd)
+				{
+					LPCTSTR pszTest = pszText + nCloseComment;
+					if (pszTest <= pszEnd && !_tcsnicmp(pszText, pszCloseComment, nCloseComment))
+					{
+						--nComment;
+						pszText = pszTest;
+						if (pszText > pszEnd)
+							break;
+					}
+					pszTest = pszText + nOpenComment;
+					if (pszTest <= pszEnd && !_tcsnicmp(pszText, pszOpenComment, nOpenComment))
+					{
+						++nComment;
+						pszText = pszTest;
+						if (pszText > pszEnd)
+							break;
+					}
+					if (!nComment)
+					{
+						pszTest = pszText + nCommentLine;
+						if (pszTest <= pszEnd && !_tcsnicmp(pszText, pszCommentLine, nCommentLine))
+							break;
+						if (bracetype(*pszText) == nType)
+						{
+							++nCount;
+						}
+						else if (bracetype(*pszText) == nOther)
+						{
+							if (!nCount)
+							{
+								ptCursorPos.x = static_cast<int>(pszText - pszBegin);
+								if (bAfter)
+									ptCursorPos.x++;
+								SetSelection(ptCursorPos, ptCursorPos);
+								SetCursorPos(ptCursorPos);
+								SetAnchor(ptCursorPos);
+								EnsureCursorVisible();
+								return;
+							}
+							--nCount;
+						}
+					}
+					++pszText;
+				}
+				if (ptCursorPos.y >= nLines)
+					break;
+				ptCursorPos.x = 0;
+				nLength = m_pTextBuffer->GetLineLength(++ptCursorPos.y);
+				pszBegin = pszText = m_pTextBuffer->GetLineChars(ptCursorPos.y);
+				pszEnd = pszBegin + nLength;
+			}
+		}
+	}
 }
 
 BOOL CCrystalTextView::CanMatchBrace()
