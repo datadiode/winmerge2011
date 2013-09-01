@@ -803,7 +803,7 @@ public:
 	void ScrollLeft();
 	void ScrollRight();
 
-	void OnMatchBrace();
+	void OnMatchBrace(BOOL bSelect);
 	BOOL CanMatchBrace();
 
 	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);

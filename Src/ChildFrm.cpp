@@ -565,6 +565,12 @@ LRESULT CChildFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 	case ID_EDIT_EXT_TEXT_END:
 		pTextView->MoveCtrlEnd(TRUE);
 		break;
+	case ID_EDIT_MATCHBRACE:
+		pTextView->OnMatchBrace(FALSE);
+		break;
+	case ID_EDIT_EXT_MATCHBRACE:
+		pTextView->OnMatchBrace(TRUE);
+		break;
 	case ID_EDIT_SCROLL_UP:
 		pTextView->ScrollUp();
 		break;
@@ -576,9 +582,6 @@ LRESULT CChildFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 		break;
 	case ID_EDIT_REPEAT:
 		pTextView->OnEditRepeat();
-		break;
-	case ID_EDIT_MATCHBRACE:
-		pTextView->OnMatchBrace();
 		break;
 	case ID_EDIT_SWITCH_OVRMODE:
 		pActiveView->OnEditSwitchOvrmode();

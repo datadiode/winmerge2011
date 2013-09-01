@@ -3939,9 +3939,10 @@ BOOL CCrystalTextView::OnMouseWheel(WPARAM wParam, LPARAM lParam)
 
 int bracetype(TCHAR);
 
-void CCrystalTextView::OnMatchBrace()
+void CCrystalTextView::OnMatchBrace(BOOL bSelect)
 {
 	POINT ptCursorPos = GetCursorPos();
+	POINT ptAnchor = ptCursorPos;
 	int nLength = m_pTextBuffer->GetLineLength(ptCursorPos.y);
 	LPCTSTR pszText = m_pTextBuffer->GetLineChars(ptCursorPos.y);
 	LPCTSTR pszEnd = pszText + ptCursorPos.x;
@@ -3980,12 +3981,12 @@ void CCrystalTextView::OnMatchBrace()
 		}
 		int nCount = 0;
 		int nComment = 0;
-		LPCTSTR pszOpenComment = m_CurSourceDef->opencomment;
-		LPCTSTR pszCloseComment = m_CurSourceDef->closecomment;
-		LPCTSTR pszCommentLine = m_CurSourceDef->commentline;
-		int nOpenComment = static_cast<int>(_tcslen(pszOpenComment));
-		int nCloseComment = static_cast<int>(_tcslen(pszCloseComment));
-		int nCommentLine = static_cast<int>(_tcslen(pszCommentLine));
+		const LPCTSTR pszOpenComment = m_CurSourceDef->opencomment;
+		const LPCTSTR pszCloseComment = m_CurSourceDef->closecomment;
+		const LPCTSTR pszCommentLine = m_CurSourceDef->commentline;
+		const int nOpenComment = static_cast<int>(_tcslen(pszOpenComment));
+		const int nCloseComment = static_cast<int>(_tcslen(pszCloseComment));
+		const int nCommentLine = static_cast<int>(_tcslen(pszCommentLine));
 		if (nOther & 1)
 		{
 			for (;;)
@@ -4023,11 +4024,13 @@ void CCrystalTextView::OnMatchBrace()
 							if (!nCount)
 							{
 								ptCursorPos.x = static_cast<int>(pszEnd - pszText);
-								if (bAfter)
-									ptCursorPos.x++;
-								SetSelection(ptCursorPos, ptCursorPos);
+								if (!bAfter)
+									++ptCursorPos.x;
+								if (!bSelect)
+									ptAnchor = ptCursorPos;
+								SetSelection(ptAnchor, ptCursorPos);
 								SetCursorPos(ptCursorPos);
-								SetAnchor(ptCursorPos);
+								SetAnchor(ptAnchor);
 								EnsureCursorVisible();
 								return;
 							}
@@ -4082,11 +4085,13 @@ void CCrystalTextView::OnMatchBrace()
 							if (!nCount)
 							{
 								ptCursorPos.x = static_cast<int>(pszText - pszBegin);
-								if (bAfter)
-									ptCursorPos.x++;
-								SetSelection(ptCursorPos, ptCursorPos);
+								if (!bAfter)
+									++ptCursorPos.x;
+								if (!bSelect)
+									ptAnchor = ptCursorPos;
+								SetSelection(ptAnchor, ptCursorPos);
 								SetCursorPos(ptCursorPos);
-								SetAnchor(ptCursorPos);
+								SetAnchor(ptAnchor);
 								EnsureCursorVisible();
 								return;
 							}
