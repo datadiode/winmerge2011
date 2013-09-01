@@ -2446,23 +2446,15 @@ void CCrystalTextView::RecalcVertScrollBar(bool bPositionOnly)
 	if (bPositionOnly)
 	{
 		si.fMask = SIF_POS;
-		si.nPos = m_nTopSubLine;
 	}
 	else
 	{
-		const int nScreenLines = GetScreenLines();
-		if (nScreenLines >= GetSubLineCount() && m_nTopSubLine > 0)
-		{
-			m_nTopLine = 0;
-			Invalidate();
-			UpdateCaret();
-		}
 		si.fMask = SIF_DISABLENOSCROLL | SIF_PAGE | SIF_POS | SIF_RANGE;
+		si.nPage = GetScreenLines();
 		si.nMin = 0;
 		si.nMax = GetSubLineCount() - 1;
-		si.nPage = nScreenLines;
-		si.nPos = m_nTopSubLine;
 	}
+	si.nPos = m_nTopSubLine;
 	LPCTSTR pcwAtom = MAKEINTATOM(GetClassAtom());
 	HWindow *pParent = GetParent();
 	HWindow *pChild = NULL;
@@ -2486,44 +2478,32 @@ void CCrystalTextView::RecalcHorzScrollBar(bool bPositionOnly)
 {
 	SCROLLINFO si;
 	si.cbSize = sizeof si;
-
-	const int nScreenChars = GetScreenChars();
-
 	if (m_bWordWrap)
 	{
-		if (m_nOffsetChar > nScreenChars)
+		if (m_nOffsetChar > 0)
 		{
 			m_nOffsetChar = 0;
 			UpdateCaret();
 		}
 		// Disable horizontal scroll bar
 		si.fMask = SIF_DISABLENOSCROLL | SIF_PAGE | SIF_POS | SIF_RANGE;
+		si.nPage = 0;
 		si.nMin = 0;
 		si.nMax = 0;
-		si.nPage = 0;
-		si.nPos = 0;
 	}
 	else if (bPositionOnly)
 	{
 		si.fMask = SIF_POS;
-		si.nPos = m_nOffsetChar;
 	}
 	else
 	{
-		const int nMaxLineLen = GetMaxLineLength();
-		if (nScreenChars >= nMaxLineLen && m_nOffsetChar > 0)
-		{
-			m_nOffsetChar = 0;
-			Invalidate();
-			UpdateCaret();
-		}
 		si.fMask = SIF_DISABLENOSCROLL | SIF_PAGE | SIF_POS | SIF_RANGE;
+		si.nPage = GetScreenChars();
 		si.nMin = 0;
 		// Horiz scroll limit to longest line + one screenwidth 
-		si.nMax = nMaxLineLen + nScreenChars;
-		si.nPage = nScreenChars;
-		si.nPos = m_nOffsetChar;
+		si.nMax = GetMaxLineLength() + si.nPage;
 	}
+	si.nPos = m_nOffsetChar;
 	LPCTSTR pcwAtom = MAKEINTATOM(GetClassAtom());
 	HWindow *pParent = GetParent();
 	HWindow *pChild = NULL;
