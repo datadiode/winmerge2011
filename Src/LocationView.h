@@ -87,11 +87,12 @@ public:
 	STDMETHOD(Drop)(IDataObject *pDataObj, DWORD grfKeyState, POINTL pt, DWORD *pdwEffect);
 
 protected:
+	enum LOCBAR_TYPE;
 	CChildFrame *const m_pMergeDoc;
 	void DrawRect(HSurface *, const RECT& r, COLORREF cr, BOOL bSelected = FALSE);
-	bool GotoLocation(const POINT& point);
+	void GotoLocation(const POINT &point);
 	int GetLineFromYPos(int nYCoord, CMergeEditView *);
-	int IsInsideBar(const RECT& rc, const POINT& pt);
+	LOCBAR_TYPE IsInsideBar(const RECT &rc, const POINT &pt);
 	void DrawVisibleAreaRect(HSurface *, int nTopLine = -1, int nBottomLine = -1);
 	void DrawConnectLines(HSurface *);
 	void DrawDiffMarker(HSurface *, int yCoord);

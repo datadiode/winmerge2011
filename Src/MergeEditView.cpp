@@ -1058,7 +1058,6 @@ void CMergeEditView::GotoLine(int nLine)
 	CMergeEditView *const pLeftView = m_pDocument->GetLeftView();
 	CMergeEditView *const pRightView = m_pDocument->GetRightView();
 
-	POINT ptPos = { 0, nLine };
 	// Scroll line to center of view
 	int nScrollLine = GetSubLineIndex(nLine) - GetScreenLines() / 2;
 	if (nScrollLine < 0)
@@ -1066,9 +1065,13 @@ void CMergeEditView::GotoLine(int nLine)
 
 	pLeftView->ScrollToSubLine(nScrollLine);
 	pRightView->ScrollToSubLine(nScrollLine);
+	POINT ptPos;
+	ptPos.x = 0;
+	ptPos.y = min(nLine, pLeftView->GetSubLineCount() - 1);
 	pLeftView->SetCursorPos(ptPos);
-	pRightView->SetCursorPos(ptPos);
 	pLeftView->SetAnchor(ptPos);
+	ptPos.y = min(nLine, pRightView->GetSubLineCount() - 1);
+	pRightView->SetCursorPos(ptPos);
 	pRightView->SetAnchor(ptPos);
 }
 
@@ -1132,18 +1135,14 @@ void CMergeEditView::OnSize()
 	}
 }
 
-void CMergeEditView::RecalcVertScrollBar(bool bPositionOnly)
+int CMergeEditView::RecalcVertScrollBar(bool bPositionOnly)
 {
-	CGhostTextView::RecalcVertScrollBar(bPositionOnly);
+	int nPos = CGhostTextView::RecalcVertScrollBar(bPositionOnly);
 	if (bPositionOnly)
-	{
-		m_pDocument->m_wndLocationView.UpdateVisiblePos(
-			m_nTopSubLine, m_nTopSubLine + GetScreenLines());
-	}
+		m_pDocument->m_wndLocationView.UpdateVisiblePos(nPos, nPos + GetScreenLines());
 	else
-	{
 		m_pDocument->m_wndLocationView.ForceRecalculate();
-	}
+	return nPos;
 }
 
 /**

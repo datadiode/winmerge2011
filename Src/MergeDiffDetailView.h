@@ -59,7 +59,7 @@ public:
 
 	virtual bool QueryEditable() { return false; }
 
-	virtual void RecalcHorzScrollBar(bool bPositionOnly = false);
+	virtual int RecalcHorzScrollBar(bool bPositionOnly = false);
 
 	virtual void SetSelection(const POINT &ptStart, const POINT &ptEnd);
 

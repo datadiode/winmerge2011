@@ -65,7 +65,7 @@ static const int INDICATOR_MIN_HEIGHT = 5;
 /** 
  * @brief Bars in location pane
  */
-enum LOCBAR_TYPE
+enum CLocationView::LOCBAR_TYPE
 {
 	BAR_NONE = -1,	/**< No bar in given coords */
 	BAR_LEFT,		/**< Left side bar in given coords */
@@ -231,8 +231,7 @@ void CLocationView::CalculateBars()
 	m_rightBar.left = 2 * m_leftBar.left + w;
 	m_rightBar.right = m_rightBar.left + w;
 	const double hTotal = rc.bottom - (2 * Y_OFFSET); // Height of draw area
-	const int nbLines = min(
-		pLeftView->GetSubLineCount(), pRightView->GetSubLineCount());
+	const int nbLines = max(pLeftView->GetSubLineCount(), pRightView->GetSubLineCount());
 
 	m_lineInPix = hTotal / nbLines;
 	m_pixInLines = nbLines / hTotal;
@@ -244,8 +243,8 @@ void CLocationView::CalculateBars()
 
 	m_leftBar.top = Y_OFFSET - 1;
 	m_rightBar.top = Y_OFFSET - 1;
-	m_leftBar.bottom = (LONG)(m_lineInPix * nbLines + Y_OFFSET + 1);
-	m_rightBar.bottom = m_leftBar.bottom;
+	m_leftBar.bottom = (LONG)(m_lineInPix * pLeftView->GetSubLineCount() + Y_OFFSET + 1);
+	m_rightBar.bottom = (LONG)(m_lineInPix * pRightView->GetSubLineCount() + Y_OFFSET + 1);
 }
 
 /**
@@ -616,19 +615,19 @@ void CLocationView::OnDrag(LPARAM lParam)
  * @param [in] point Point to move to
  * @return TRUE if succeeds, FALSE if point not inside bars.
  */
-bool CLocationView::GotoLocation(const POINT& point)
+void CLocationView::GotoLocation(const POINT &point)
 {
 	RECT rc;
 	GetClientRect(&rc);
 	int bar = IsInsideBar(rc, point);
-	if (bar == BAR_NONE)
-		return false;
-	CMergeEditView *pView = bar == BAR_YAREA ?
-		m_pMergeDoc->GetActiveMergeView() : m_pMergeDoc->GetView(bar);
-	int line = GetLineFromYPos(point.y, pView);
-	pView->SetFocus();
-	pView->GotoLine(line);
-	return true;
+	if (bar != BAR_NONE)
+	{
+		CMergeEditView *pView = bar == BAR_YAREA ?
+			m_pMergeDoc->GetActiveMergeView() : m_pMergeDoc->GetView(bar);
+		int line = GetLineFromYPos(point.y, pView);
+		pView->SetFocus();
+		pView->GotoLine(line);
+	}
 }
 
 /**
@@ -661,7 +660,7 @@ void CLocationView::OnContextMenu(LPARAM lParam)
 		ID_DISPLAY_MOVED_NONE + m_displayMovedBlocks);
 
 	int nLine = -1;
-	int bar = IsInsideBar(rc, pt);
+	LOCBAR_TYPE bar = IsInsideBar(rc, pt);
 	CMergeEditView *pView = m_pMergeDoc->GetActiveMergeView();
 	TCHAR fmt[INFOTIPSIZE];
 	pSub->GetMenuString(ID_LOCBAR_GOTOLINE, fmt, _countof(fmt));
@@ -760,20 +759,21 @@ int CLocationView::GetLineFromYPos(int nYCoord, CMergeEditView *pView)
  * @param pt [in] point we want to check, in client coordinates.
  * @return LOCBAR_TYPE area where point is.
  */
-int CLocationView::IsInsideBar(const RECT& rc, const POINT& pt)
+CLocationView::LOCBAR_TYPE CLocationView::IsInsideBar(const RECT &rc, const POINT &pt)
 {
-	int retVal = BAR_NONE;
-
-	if (PtInRect(&m_leftBar, pt))
-		retVal = BAR_LEFT;
-	else if (PtInRect(&m_rightBar, pt))
-		retVal = BAR_RIGHT;
-	else if (pt.x >= INDICATOR_MARGIN && pt.x < (rc.right - rc.left - INDICATOR_MARGIN) &&
-		pt.y > m_leftBar.top && pt.y <= m_leftBar.bottom)
+	LOCBAR_TYPE retVal = BAR_NONE;
+	if (pt.x >= INDICATOR_MARGIN &&
+		pt.x < rc.right - rc.left - INDICATOR_MARGIN &&
+		pt.y >= INDICATOR_MARGIN &&
+		pt.y < rc.bottom - rc.top - INDICATOR_MARGIN)
 	{
-		retVal = BAR_YAREA;
+		if (pt.x >= m_leftBar.left && pt.x < m_leftBar.right)
+			retVal = BAR_LEFT;
+		else if (pt.x >= m_rightBar.left && pt.x < m_rightBar.right)
+			retVal = BAR_RIGHT;
+		else
+			retVal = BAR_YAREA;
 	}
-
 	return retVal;
 }
 
@@ -788,19 +788,15 @@ void CLocationView::DrawVisibleAreaRect(HSurface *pClientDC, int nTopLine, int n
 {
 	CMergeEditView *const pLeftView = m_pMergeDoc->GetLeftView();
 	CMergeEditView *const pRightView = m_pMergeDoc->GetRightView();
+
 	if (nTopLine == -1)
-		nTopLine = pRightView->GetTopSubLine();
-	
+		nTopLine = max(pLeftView->GetTopSubLine(), pRightView->GetTopSubLine());
 	if (nBottomLine == -1)
-	{
-		const int nScreenLines = pRightView->GetScreenLines();
-		nBottomLine = nTopLine + nScreenLines;
-	}
+		nBottomLine = nTopLine + pRightView->GetScreenLines();
 
 	RECT rc;
 	GetClientRect(&rc);
-	const int nbLines = min(
-		pLeftView->GetSubLineCount(), pRightView->GetSubLineCount());
+	const int nbLines = max(pLeftView->GetSubLineCount(), pRightView->GetSubLineCount());
 
 	int nTopCoord = static_cast<int>(Y_OFFSET +
 			(static_cast<double>(nTopLine * m_lineInPix)));
@@ -818,7 +814,9 @@ void CLocationView::DrawVisibleAreaRect(HSurface *pClientDC, int nTopLine, int n
 		// If area is near top of file, add additional area to bottom
 		// of the bar and vice versa.
 		if (nTopCoord < Y_OFFSET + 20)
+		{
 			nBottomCoord += INDICATOR_MIN_HEIGHT - (nBottomCoord - nTopCoord);
+		}
 		else
 		{
 			// Make sure locationbox has min hight

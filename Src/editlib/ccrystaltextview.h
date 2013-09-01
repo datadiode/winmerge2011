@@ -364,8 +364,8 @@ protected:
 	int GetScreenChars();
 	HFont *GetFont(int nColorIndex = 0);
 
-	virtual void RecalcVertScrollBar(bool bPositionOnly = false);
-	virtual void RecalcHorzScrollBar(bool bPositionOnly = false);
+	virtual int RecalcVertScrollBar(bool bPositionOnly = false);
+	virtual int RecalcHorzScrollBar(bool bPositionOnly = false);
 
 	//  Scrolling helpers
 	void ScrollToChar(int nNewOffsetChar);

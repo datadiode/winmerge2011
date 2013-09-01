@@ -301,42 +301,30 @@ int CMergeDiffDetailView::GetDiffLineLength()
  * @note The scrollbar width is the one needed for the largest view
  * @sa ccrystaltextview::RecalcHorzScrollBar()
  */
-void CMergeDiffDetailView::RecalcHorzScrollBar(bool bPositionOnly)
+int CMergeDiffDetailView::RecalcHorzScrollBar(bool bPositionOnly)
 {
 	// Again, we cannot use nPos because it's 16-bit
 	SCROLLINFO si;
 	si.cbSize = sizeof si;
-
-	const int nScreenChars = GetScreenChars();
-
 	// note : this value differs from the value in CCrystalTextView::RecalcHorzScrollBar
 	int nMaxLineLen = 0;
 	if (CMergeDiffDetailView *pView = m_pDocument->GetRightDetailView())
 		nMaxLineLen = pView->GetDiffLineLength();
 	if (CMergeDiffDetailView *pView = m_pDocument->GetLeftDetailView())
 		nMaxLineLen = max(nMaxLineLen, pView->GetDiffLineLength());
-	
 	if (bPositionOnly)
 	{
 		si.fMask = SIF_POS;
-		si.nPos = m_nOffsetChar;
 	}
 	else
 	{
-		if (nScreenChars >= nMaxLineLen && m_nOffsetChar > 0)
-		{
-			m_nOffsetChar = 0;
-			Invalidate();
-			UpdateCaret();
-		}
 		si.fMask = SIF_DISABLENOSCROLL | SIF_PAGE | SIF_POS | SIF_RANGE;
+		si.nPage = GetScreenChars();
 		si.nMin = 0;
-		
 		// Horiz scroll limit to longest line + one screenwidth 
-		si.nMax = nMaxLineLen + nScreenChars;
-		si.nPage = nScreenChars;
-		si.nPos = m_nOffsetChar;
+		si.nMax = nMaxLineLen + si.nPage;
 	}
+	si.nPos = m_nOffsetChar;
 	LPCTSTR pcwAtom = MAKEINTATOM(GetClassAtom());
 	HWindow *pParent = GetParent();
 	HWindow *pChild = NULL;
@@ -346,6 +334,7 @@ void CMergeDiffDetailView::RecalcHorzScrollBar(bool bPositionOnly)
 		if (pSiblingView->GetStyle() & WS_HSCROLL)
 			pSiblingView->SetScrollInfo(SB_HORZ, &si);
 	}
+	return si.nPos;
 }
 
 void CMergeDiffDetailView::PushCursors()

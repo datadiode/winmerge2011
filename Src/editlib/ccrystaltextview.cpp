@@ -628,17 +628,18 @@ void CCrystalTextView::ScrollToSubLine(int nNewTopSubLine)
 			nNewTopSubLine = nMaxTopSubLine;
 		if (nNewTopSubLine < 0)
 			nNewTopSubLine = 0;
-
-		const int nScrollLines = m_nTopSubLine - nNewTopSubLine;
-		m_nTopSubLine = nNewTopSubLine;
-		// OnDraw() uses m_nTopLine to determine topline
-		int dummy;
-		GetLineBySubLine(m_nTopSubLine, m_nTopLine, dummy);
-		ScrollWindow(0, nScrollLines * GetLineHeight());
-		UpdateWindow();
-		RecalcVertScrollBar(true);
-		int nDummy;
-		GetLineBySubLine(m_nTopSubLine, m_nTopLine, nDummy);
+		if (const int nScrollLines = m_nTopSubLine - nNewTopSubLine)
+		{
+			m_nTopSubLine = nNewTopSubLine;
+			// OnDraw() uses m_nTopLine to determine topline
+			int dummy;
+			GetLineBySubLine(m_nTopSubLine, m_nTopLine, dummy);
+			ScrollWindow(0, nScrollLines * GetLineHeight());
+			UpdateWindow();
+			RecalcVertScrollBar(true);
+			int nDummy;
+			GetLineBySubLine(m_nTopSubLine, m_nTopLine, nDummy);
+		}
 	}
 }
 
@@ -2439,44 +2440,65 @@ void CCrystalTextView::OnUpdateSibling(const CCrystalTextView *pUpdateSource)
 		UpdateCaret(true);
 }
 
-void CCrystalTextView::RecalcVertScrollBar(bool bPositionOnly)
+int CCrystalTextView::RecalcVertScrollBar(bool bPositionOnly)
 {
 	SCROLLINFO si;
 	si.cbSize = sizeof si;
-	if (bPositionOnly)
-	{
-		si.fMask = SIF_POS;
-	}
-	else
-	{
-		si.fMask = SIF_DISABLENOSCROLL | SIF_PAGE | SIF_POS | SIF_RANGE;
-		si.nPage = GetScreenLines();
-		si.nMin = 0;
-		si.nMax = GetSubLineCount() - 1;
-	}
+	si.fMask = SIF_POS;
+	si.nPage = GetScreenLines();
+	si.nMin = 0;
+	si.nPos = 0;
+	si.nMax = 0;
 	LPCTSTR pcwAtom = MAKEINTATOM(GetClassAtom());
 	HWindow *pParent = GetParent();
 	HWindow *pChild = NULL;
 	while ((pChild = pParent->FindWindowEx(pChild, pcwAtom)) != NULL)
 	{
 		CCrystalTextView *pSiblingView = static_cast<CCrystalTextView *>(FromHandle(pChild));
-		if (pSiblingView->GetStyle() & WS_VSCROLL)
+		int nPos = pSiblingView->m_nTopSubLine;
+		if (si.nPos < nPos)
+			si.nPos = nPos;
+		if (!bPositionOnly)
 		{
-			si.nPos = pSiblingView->m_nTopSubLine;
-			pSiblingView->SetScrollInfo(SB_VERT, &si);
+			si.fMask = SIF_DISABLENOSCROLL | SIF_PAGE | SIF_POS | SIF_RANGE;
+			int nMax = pSiblingView->GetSubLineCount() - 1;
+			if (si.nMax < nMax)
+				si.nMax = nMax;
 		}
 	}
+	while ((pChild = pParent->FindWindowEx(pChild, pcwAtom)) != NULL)
+	{
+		CCrystalTextView *pSiblingView = static_cast<CCrystalTextView *>(FromHandle(pChild));
+		if (pSiblingView->GetStyle() & WS_VSCROLL)
+			pSiblingView->SetScrollInfo(SB_VERT, &si);
+	}
+	return si.nPos;
 }
 
 void CCrystalTextView::OnVScroll(UINT nSBCode)
 {
-	int nPos = GetScrollPos(SB_VERT, nSBCode);
-	ScrollToSubLine(nPos);
 	ASSERT(GetStyle() & WS_VSCROLL);
-	UpdateSiblingScrollPos();
+	int nPos = GetScrollPos(SB_VERT, nSBCode);
+	LPCTSTR pcwAtom = MAKEINTATOM(GetClassAtom());
+	HWindow *pParent = GetParent();
+	HWindow *pChild = NULL;
+	CCrystalTextView *pThis = this;
+	int nMaxSubLineCount = 0;
+	while ((pChild = pParent->FindWindowEx(pChild, pcwAtom)) != NULL)
+	{
+		CCrystalTextView *pSiblingView = static_cast<CCrystalTextView *>(FromHandle(pChild));
+		int nSubLineCount = pSiblingView->GetSubLineCount();
+		if (nMaxSubLineCount < nSubLineCount)
+		{
+			nMaxSubLineCount = nSubLineCount;
+			pThis = pSiblingView;
+		}
+	}
+	pThis->ScrollToSubLine(nPos);
+	pThis->UpdateSiblingScrollPos();
 }
 
-void CCrystalTextView::RecalcHorzScrollBar(bool bPositionOnly)
+int CCrystalTextView::RecalcHorzScrollBar(bool bPositionOnly)
 {
 	SCROLLINFO si;
 	si.cbSize = sizeof si;
@@ -2515,6 +2537,7 @@ void CCrystalTextView::RecalcHorzScrollBar(bool bPositionOnly)
 		if (pSiblingView->GetStyle() & WS_HSCROLL)
 			pSiblingView->SetScrollInfo(SB_HORZ, &si);
 	}
+	return si.nPos;
 }
 
 void CCrystalTextView::OnHScroll(UINT nSBCode)
