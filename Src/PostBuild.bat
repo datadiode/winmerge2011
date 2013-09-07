@@ -21,7 +21,7 @@ rc /fo%~1\MergeLang.res /i..\..\Src MergeLang.rc
 link /DLL /NOENTRY /MACHINE:IX86 /OUT:%~2\MergeLang.dll %~1\MergeLang.res
 
 REM Invoke WinMergeU.exe to create a WinMergeU.dat which is usable for everyone
-%~2\WinMergeU.exe /noninteractive /reghive "%~2\..\..\WinMergeU.dat"
+%~2\WinMergeU.exe /noninteractive /minimize /reghive "%~2\..\..\WinMergeU.dat"
 exit
 
 :usage
