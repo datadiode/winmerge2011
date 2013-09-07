@@ -401,11 +401,15 @@ void CCrystalTextView::MovePgDn(BOOL bSelect)
 {
 	//BEGIN SW
 	// scrolling windows
-	int nNewTopSubLine = m_nTopSubLine + GetScreenLines() - 1;
-	int nSubLineCount = GetSubLineCount();
+	const int nScreenLines = GetScreenLines();
+	const int nSubLineCount = GetSubLineCount();
+	int nNewTopSubLine = m_nTopSubLine + nScreenLines - 1;
 
-	if (nNewTopSubLine > nSubLineCount - 1)
-		nNewTopSubLine = nSubLineCount - 1;
+	if (nNewTopSubLine > nSubLineCount - nScreenLines)
+		nNewTopSubLine = nSubLineCount - nScreenLines;
+	if (nNewTopSubLine < m_nTopSubLine)
+		nNewTopSubLine = m_nTopSubLine;
+
 	if (m_nTopSubLine != nNewTopSubLine)
 	{
 		ScrollToSubLine(nNewTopSubLine);
@@ -416,12 +420,12 @@ void CCrystalTextView::MovePgDn(BOOL bSelect)
 	POINT subLinePos;
 	CharPosToPoint(m_ptCursorPos.y, m_ptCursorPos.x, subLinePos);
 
-	int nSubLine = GetSubLineIndex( m_ptCursorPos.y ) + subLinePos.y + GetScreenLines() - 1;
+	int nSubLine = GetSubLineIndex(m_ptCursorPos.y) + subLinePos.y + nScreenLines - 1;
 
-	if (nSubLine < nNewTopSubLine || nSubLine >= nNewTopSubLine + GetScreenLines())
-		nSubLine = nNewTopSubLine + GetScreenLines() - 1;
+	if (nSubLine < nNewTopSubLine || nSubLine >= nNewTopSubLine + nScreenLines)
+		nSubLine = nNewTopSubLine + nScreenLines - 1;
 
-	if (nSubLine > nSubLineCount - 1)
+	if (nSubLine >= nSubLineCount)
 		nSubLine = nSubLineCount - 1;
 
 	SubLineCursorPosToTextPos(m_nIdealCharPos, nSubLine, m_ptCursorPos);

@@ -3950,7 +3950,7 @@ BOOL CCrystalTextView::OnMouseWheel(WPARAM wParam, LPARAM lParam)
 	POINTSTOPOINT(pt, lParam);
 	short zDelta = GET_WHEEL_DELTA_WPARAM(wParam);
 	int nNewTopSubLine = m_nTopSubLine - zDelta / 40;
-	int nMaxTopSubLine = GetSubLineCount() - 1;
+	int nMaxTopSubLine = GetSubLineCount() - GetScreenLines();
 	if (nNewTopSubLine > nMaxTopSubLine)
 		nNewTopSubLine = nMaxTopSubLine;
 	if (nNewTopSubLine < 0)
