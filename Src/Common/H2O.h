@@ -1091,6 +1091,54 @@ namespace H2O
 		{
 			return ::GetClipBox(m_hDC, prc);
 		}
+		BOOL GetViewportExtEx(SIZE *size)
+		{
+			return ::GetViewportExtEx(m_hDC, size);
+		}
+		BOOL GetViewportOrgEx(POINT *point)
+		{
+			return ::GetViewportOrgEx(m_hDC, point);
+		}
+		BOOL GetWindowExtEx(SIZE *size)
+		{
+			return ::GetWindowExtEx(m_hDC, size);
+		}
+		BOOL GetWindowOrgEx(POINT *point)
+		{
+			return ::GetWindowOrgEx(m_hDC, point);
+		}
+		BOOL SetViewportExtEx(int x, int y, SIZE *size = NULL)
+		{
+			return ::SetViewportExtEx(m_hDC, x, y, size);
+		}
+		BOOL SetViewportOrgEx(int x, int y, POINT *point = NULL)
+		{
+			return ::SetViewportOrgEx(m_hDC, x, y, point);
+		}
+		BOOL SetWindowExtEx(int x, int y, SIZE *size = NULL)
+		{
+			return ::SetWindowExtEx(m_hDC, x, y, size);
+		}
+		BOOL SetWindowOrgEx(int x, int y, POINT *point = NULL)
+		{
+			return ::SetWindowOrgEx(m_hDC, x, y, point);
+		}
+		BOOL OffsetViewportOrgEx(int x, int y, POINT *point = NULL)
+		{
+			return ::OffsetViewportOrgEx(m_hDC, x, y, point);
+		}
+		BOOL OffsetWindowOrgEx(int x, int y, POINT *point = NULL)
+		{
+			return ::OffsetWindowOrgEx(m_hDC, x, y, point);
+		}
+		BOOL ScaleViewportExtEx(int xn, int xd, int yn, int yd, SIZE *size = NULL)
+		{
+			return ::ScaleViewportExtEx(m_hDC, xn, xd, yn, yd, size);
+		}
+		BOOL ScaleWindowExtEx(int xn, int xd, int yn, int yd, SIZE *size = NULL)
+		{
+			return ::ScaleWindowExtEx(m_hDC, xn, xd, yn, yd, size);
+		}
 		BOOL GetTextExtent(LPCTSTR pch, int cch, SIZE *size)
 		{
 			return ::GetTextExtentPoint32(m_hDC, pch, cch, size);
