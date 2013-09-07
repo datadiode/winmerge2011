@@ -149,7 +149,7 @@ void HSuperComboBox::AutoCompleteFromLB(int nIndexFrom)
 	
 	// look for the string that is prefixed by the typed text
 	int idx = FindString(nIndexFrom, s.c_str());
-	if (idx == CB_ERR && (idx = nIndexFrom) < 0)
+	if (idx == CB_ERR)
 		return;
 
 	// get the current selection
