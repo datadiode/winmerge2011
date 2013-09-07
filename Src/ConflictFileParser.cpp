@@ -69,7 +69,6 @@ bool IsConflictFile(LPCTSTR conflictFileName)
 		if (pos == 0)
 			startFound = true;
 	}
-	conflictFile.Close();
 
 	return startFound;
 }
@@ -264,9 +263,5 @@ bool ParseConflictFile(LPCTSTR conflictFileName,
 		}
 	} while (linesToRead);
 
-	// Close
-	newRevision.Close();
-	workingCopy.Close();
-	conflictFile.Close();
 	return bResult;
 }
