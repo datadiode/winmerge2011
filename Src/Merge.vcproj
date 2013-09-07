@@ -1317,10 +1317,6 @@
 				>
 			</File>
 			<File
-				RelativePath="Common\memdc.h"
-				>
-			</File>
-			<File
 				RelativePath="Merge.h"
 				>
 			</File>

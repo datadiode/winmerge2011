@@ -24,14 +24,14 @@ static char THIS_FILE[] = __FILE__;
  * @param rect [in] The rect to be copied
  * @return The bitmap object
  */
-HBitmap *CopyRectToBitmap(HSurface *pDC, const RECT & rc)
+HBitmap *CopyRectToBitmap(HSurface *pDC, int x, int y, int cx, int cy)
 {
 	HBitmap *pBitmap = NULL;
 	if (HSurface *pdcMem = pDC->CreateCompatibleDC())
 	{
-		pBitmap = pDC->CreateCompatibleBitmap(rc.right - rc.left, rc.bottom - rc.top);
+		pBitmap = pDC->CreateCompatibleBitmap(cx, cy);
 		HGdiObj *pOldBitmap = pdcMem->SelectObject(pBitmap);
-		pdcMem->BitBlt(0, 0, rc.right - rc.left, rc.bottom - rc.top, pDC, rc.left, rc.top, SRCCOPY);
+		pdcMem->BitBlt(0, 0, cx, cy, pDC, x, y, SRCCOPY);
 		pdcMem->SelectObject(pOldBitmap);
 		pdcMem->DeleteDC();
 	}

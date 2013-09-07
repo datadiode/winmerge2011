@@ -92,7 +92,7 @@ protected:
 	void DrawRect(HSurface *, const RECT& r, COLORREF cr, BOOL bSelected = FALSE);
 	void GotoLocation(const POINT &point);
 	int GetLineFromYPos(int nYCoord, CMergeEditView *);
-	LOCBAR_TYPE IsInsideBar(const RECT &rc, const POINT &pt);
+	LOCBAR_TYPE IsInsideBar(const POINT &pt);
 	void DrawVisibleAreaRect(HSurface *, int nTopLine = -1, int nBottomLine = -1);
 	void DrawConnectLines(HSurface *);
 	void DrawDiffMarker(HSurface *, int yCoord);
@@ -106,6 +106,7 @@ private:
 	int m_displayMovedBlocks; //*< Setting for displaying moved blocks */
 	double m_pixInLines; //*< How many pixels is one line in bars */
 	double m_lineInPix; //*< How many lines is one pixel?
+	SIZE m_size;
 	RECT m_leftBar; //*< Left-side file's bar.
 	RECT m_rightBar; //*< Right-side file's bar.
 	int m_visibleTop; //*< Top visible line for visible area indicator */

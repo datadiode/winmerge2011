@@ -36,7 +36,6 @@
 #include "MergeEditView.h"
 #include "LocationView.h"
 #include "Bitmap.h"
-#include "memdc.h"
 #include "SyntaxColors.h"
 
 #ifdef _DEBUG
@@ -144,6 +143,10 @@ LRESULT CLocationView::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
+	case WM_SIZE:
+		m_size.cx = SHORT LOWORD(lParam);
+		m_size.cy = SHORT HIWORD(lParam);
+		break;
 	case WM_CONTEXTMENU:
 		OnContextMenu(lParam);
 		break;
@@ -164,6 +167,11 @@ LRESULT CLocationView::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		PAINTSTRUCT ps;
 		if (HSurface *pdc = BeginPaint(&ps))
 		{
+			if (m_pSavedBackgroundBitmap)
+			{
+				m_pSavedBackgroundBitmap->DeleteObject();
+				m_pSavedBackgroundBitmap = NULL;
+			}
 			OnDraw(pdc);
 			EndPaint(&ps);
 		}
@@ -205,15 +213,144 @@ void CLocationView::ForceRecalculate()
  */
 void CLocationView::DrawBackground(HSurface *pDC)
 {
-	// Set brush to desired background color
-	HBrush *backBrush = HBrush::CreateSolidBrush(RGB(0xe8, 0xe8, 0xf4));
-	// Save old brush
-	HGdiObj *pOldBrush = pDC->SelectObject(backBrush);
+	CMergeEditView *const pLeftView = m_pMergeDoc->GetLeftView();
+	CMergeEditView *const pRightView = m_pMergeDoc->GetRightView();
+	CMergeEditView *const pView = pLeftView;
+	if (pLeftView == NULL || pRightView == NULL)
+	{
+		assert(false);
+		return;
+	}
+
 	RECT rect;
-	pDC->GetClipBox(&rect);     // Erase the area needed
-	pDC->PatBlt(rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, PATCOPY);
-	pDC->SelectObject(pOldBrush);
-	backBrush->DeleteObject();
+	pDC->GetClipBox(&rect); // Erase the area needed
+	pDC->SetBkColor(RGB(0xe8, 0xe8, 0xf4));
+	pDC->ExtTextOut(0, 0, ETO_OPAQUE, &rect, NULL, 0);
+
+	COLORREF cr0 = CLR_NONE; // Left side color
+	COLORREF cr1 = CLR_NONE; // Right side color
+	COLORREF crt = CLR_NONE; // Text color
+
+	m_movedLines.clear();
+
+	CalculateBars();
+
+	// Draw bar outlines
+	HGdiObj *oldPen = pDC->SelectStockObject(BLACK_PEN);
+	HBrush *brush = HBrush::CreateSolidBrush(pLeftView->GetColor(COLORINDEX_WHITESPACE));
+	HGdiObj *oldBrush = pDC->SelectObject(brush);
+	pDC->Rectangle(m_leftBar.left, m_leftBar.top, m_leftBar.right, m_leftBar.bottom);
+	pDC->Rectangle(m_rightBar.left, m_rightBar.top, m_rightBar.right, m_rightBar.bottom);
+	pDC->SelectObject(oldBrush);
+	pDC->SelectObject(oldPen);
+	brush->DeleteObject();
+	// Iterate the differences list and draw differences as colored blocks.
+
+	// Don't recalculate blocks if we earlier determined it is not needed
+	// This may save lots of processing
+	if (m_bRecalculateBlocks)
+		CalculateBlocks();
+
+	int nPrevEndY = -1;
+	const int nCurDiff = m_pMergeDoc->GetCurrentDiff();
+
+	// Protect against out of bound accesses after line deletions
+	const unsigned safe_line_count = min(pLeftView->GetLineCount(), pRightView->GetLineCount());
+
+	vector<DiffBlock>::const_iterator iter = m_diffBlocks.begin();
+	while (iter != m_diffBlocks.end() && iter->top_line < safe_line_count)
+	{
+		const bool bInsideDiff = nCurDiff == iter->diff_index;
+
+		if ((nPrevEndY != iter->bottom_coord) || bInsideDiff)
+		{
+			// Draw left side block
+			pLeftView->GetLineColors(iter->top_line, cr0, crt);
+			RECT r0 = { m_leftBar.left, iter->top_coord, m_leftBar.right, iter->bottom_coord };
+			DrawRect(pDC, r0, cr0, bInsideDiff);
+
+			// Draw right side block
+			pRightView->GetLineColors(iter->top_line, cr1, crt);
+			RECT r1 = { m_rightBar.left, iter->top_coord, m_rightBar.right, iter->bottom_coord };
+			DrawRect(pDC, r1, cr1, bInsideDiff);
+		}
+		nPrevEndY = iter->bottom_coord;
+
+		// Test if we draw a connector
+		BOOL bDisplayConnectorFromLeft = FALSE;
+		BOOL bDisplayConnectorFromRight = FALSE;
+
+		switch (m_displayMovedBlocks)
+		{
+		case DISPLAY_MOVED_FOLLOW_DIFF:
+			// display moved block only for current diff
+			if (!bInsideDiff)
+				break;
+			// two sides may be linked to a block somewhere else
+			bDisplayConnectorFromLeft = TRUE;
+			bDisplayConnectorFromRight = TRUE;
+			break;
+		case DISPLAY_MOVED_ALL:
+			// we display all moved blocks, so once direction is enough
+			bDisplayConnectorFromLeft = TRUE;
+			break;
+		default:
+			break;
+		}
+
+		if (bDisplayConnectorFromLeft)
+		{
+			int apparent0 = iter->top_line;
+			int apparent1 = m_pMergeDoc->RightLineInMovedBlock(apparent0);
+			const int nBlockHeight = iter->bottom_line - iter->top_line;
+			if (apparent1 != -1)
+			{
+				MovedLine line;
+				apparent0 = pView->GetSubLineIndex(apparent0);
+				apparent1 = pView->GetSubLineIndex(apparent1);
+				line.ptLeft.x = m_leftBar.right;
+				int leftUpper = (int) (apparent0 * m_lineInPix + Y_OFFSET);
+				int leftLower = (int) ((nBlockHeight + apparent0) * m_lineInPix + Y_OFFSET);
+				line.ptLeft.y = leftUpper + (leftLower - leftUpper) / 2;
+				line.ptRight.x = m_rightBar.left;
+				int rightUpper = (int) (apparent1 * m_lineInPix + Y_OFFSET);
+				int rightLower = (int) ((nBlockHeight + apparent1) * m_lineInPix + Y_OFFSET);
+				line.ptRight.y = rightUpper + (rightLower - rightUpper) / 2;
+				m_movedLines.push_back(line);
+			}
+		}
+
+		if (bDisplayConnectorFromRight)
+		{
+			int apparent1 = iter->top_line;
+			int apparent0 = m_pMergeDoc->LeftLineInMovedBlock(apparent1);
+			const int nBlockHeight = iter->bottom_line - iter->top_line;
+			if (apparent0 != -1)
+			{
+				MovedLine line;
+				apparent0 = pView->GetSubLineIndex(apparent0);
+				apparent1 = pView->GetSubLineIndex(apparent1);
+				line.ptLeft.x = m_leftBar.right;
+				int leftUpper = (int) (apparent0 * m_lineInPix + Y_OFFSET);
+				int leftLower = (int) ((nBlockHeight + apparent0) * m_lineInPix + Y_OFFSET);
+				line.ptLeft.y = leftUpper + (leftLower - leftUpper) / 2;
+				line.ptRight.x = m_rightBar.left;
+				int rightUpper = (int) (apparent1 * m_lineInPix + Y_OFFSET);
+				int rightLower = (int) ((nBlockHeight + apparent1) * m_lineInPix + Y_OFFSET);
+				line.ptRight.y = rightUpper + (rightLower - rightUpper) / 2;
+				m_movedLines.push_back(line);
+			}
+		}
+		++iter;
+	}
+
+	if (m_displayMovedBlocks != DISPLAY_MOVED_NONE)
+		DrawConnectLines(pDC);
+
+	// Since we have invalidated locationbar there is no previous
+	// arearect to remove
+	m_visibleTop = -1;
+	m_visibleBottom = -1;
 }
 
 /**
@@ -223,14 +360,12 @@ void CLocationView::CalculateBars()
 {
 	CMergeEditView *const pLeftView = m_pMergeDoc->GetLeftView();
 	CMergeEditView *const pRightView = m_pMergeDoc->GetRightView();
-	RECT rc;
-	GetClientRect(&rc);
-	const int w = rc.right / 4;
-	m_leftBar.left = (rc.right - 2 * w) / 3;
+	const int w = m_size.cx / 4;
+	m_leftBar.left = (m_size.cx - 2 * w) / 3;
 	m_leftBar.right = m_leftBar.left + w;
 	m_rightBar.left = 2 * m_leftBar.left + w;
 	m_rightBar.right = m_rightBar.left + w;
-	const double hTotal = rc.bottom - (2 * Y_OFFSET); // Height of draw area
+	const double hTotal = m_size.cy - (2 * Y_OFFSET); // Height of draw area
 	const int nbLines = max(pLeftView->GetSubLineCount(), pRightView->GetSubLineCount());
 
 	m_lineInPix = hTotal / nbLines;
@@ -390,149 +525,32 @@ void CLocationView::CalculateBlocksPixel(int nBlockStart, int nBlockEnd,
  */
 void CLocationView::OnDraw(HSurface *pdc)
 {
-	CMergeEditView *const pLeftView = m_pMergeDoc->GetLeftView();
-	CMergeEditView *const pRightView = m_pMergeDoc->GetRightView();
-	CMergeEditView *const pView = pLeftView;
-	if (pLeftView == NULL || pRightView == NULL)
-	{
-		assert(false);
-		return;
-	}
+	// http://www.catch22.net/tuts/flicker-free-drawing
 
-	RECT rc;
-	GetClientRect(&rc);
-	CMemDC dc(pdc, &rc);
-
-	COLORREF cr0 = CLR_NONE; // Left side color
-	COLORREF cr1 = CLR_NONE; // Right side color
-	COLORREF crt = CLR_NONE; // Text color
-
-	m_movedLines.clear();
-
-	CalculateBars();
-	DrawBackground(dc.m_pDC);
-
-	// Draw bar outlines
-	HGdiObj *oldObj = dc.SelectStockObject(BLACK_PEN);
-	HBrush *brush = HBrush::CreateSolidBrush(pLeftView->GetColor(COLORINDEX_WHITESPACE));
-	HGdiObj *oldBrush = dc.SelectObject(brush);
-	dc.Rectangle(m_leftBar.left, m_leftBar.top, m_leftBar.right, m_leftBar.bottom);
-	dc.Rectangle(m_rightBar.left, m_rightBar.top, m_rightBar.right, m_rightBar.bottom);
-	dc.SelectObject(oldBrush);
-	dc.SelectObject(oldObj);
-	brush->DeleteObject();
-	// Iterate the differences list and draw differences as colored blocks.
-
-	// Don't recalculate blocks if we earlier determined it is not needed
-	// This may save lots of processing
-	if (m_bRecalculateBlocks)
-		CalculateBlocks();
-
-	int nPrevEndY = -1;
-	const int nCurDiff = m_pMergeDoc->GetCurrentDiff();
-
-	// Protect against out of bound accesses after line deletions
-	const unsigned safe_line_count = min(pLeftView->GetLineCount(), pRightView->GetLineCount());
-
-	vector<DiffBlock>::const_iterator iter = m_diffBlocks.begin();
-	while (iter != m_diffBlocks.end() && iter->top_line < safe_line_count)
-	{
-		const bool bInsideDiff = nCurDiff == iter->diff_index;
-
-		if ((nPrevEndY != iter->bottom_coord) || bInsideDiff)
-		{
-			// Draw left side block
-			pLeftView->GetLineColors(iter->top_line, cr0, crt);
-			RECT r0 = { m_leftBar.left, iter->top_coord, m_leftBar.right, iter->bottom_coord };
-			DrawRect(dc.m_pDC, r0, cr0, bInsideDiff);
-
-			// Draw right side block
-			pRightView->GetLineColors(iter->top_line, cr1, crt);
-			RECT r1 = { m_rightBar.left, iter->top_coord, m_rightBar.right, iter->bottom_coord };
-			DrawRect(dc.m_pDC, r1, cr1, bInsideDiff);
-		}
-		nPrevEndY = iter->bottom_coord;
-
-		// Test if we draw a connector
-		BOOL bDisplayConnectorFromLeft = FALSE;
-		BOOL bDisplayConnectorFromRight = FALSE;
-
-		switch (m_displayMovedBlocks)
-		{
-		case DISPLAY_MOVED_FOLLOW_DIFF:
-			// display moved block only for current diff
-			if (!bInsideDiff)
-				break;
-			// two sides may be linked to a block somewhere else
-			bDisplayConnectorFromLeft = TRUE;
-			bDisplayConnectorFromRight = TRUE;
-			break;
-		case DISPLAY_MOVED_ALL:
-			// we display all moved blocks, so once direction is enough
-			bDisplayConnectorFromLeft = TRUE;
-			break;
-		default:
-			break;
-		}
-
-		if (bDisplayConnectorFromLeft)
-		{
-			int apparent0 = iter->top_line;
-			int apparent1 = m_pMergeDoc->RightLineInMovedBlock(apparent0);
-			const int nBlockHeight = iter->bottom_line - iter->top_line;
-			if (apparent1 != -1)
-			{
-				MovedLine line;
-				apparent0 = pView->GetSubLineIndex(apparent0);
-				apparent1 = pView->GetSubLineIndex(apparent1);
-				line.ptLeft.x = m_leftBar.right;
-				int leftUpper = (int) (apparent0 * m_lineInPix + Y_OFFSET);
-				int leftLower = (int) ((nBlockHeight + apparent0) * m_lineInPix + Y_OFFSET);
-				line.ptLeft.y = leftUpper + (leftLower - leftUpper) / 2;
-				line.ptRight.x = m_rightBar.left;
-				int rightUpper = (int) (apparent1 * m_lineInPix + Y_OFFSET);
-				int rightLower = (int) ((nBlockHeight + apparent1) * m_lineInPix + Y_OFFSET);
-				line.ptRight.y = rightUpper + (rightLower - rightUpper) / 2;
-				m_movedLines.push_back(line);
-			}
-		}
-
-		if (bDisplayConnectorFromRight)
-		{
-			int apparent1 = iter->top_line;
-			int apparent0 = m_pMergeDoc->LeftLineInMovedBlock(apparent1);
-			const int nBlockHeight = iter->bottom_line - iter->top_line;
-			if (apparent0 != -1)
-			{
-				MovedLine line;
-				apparent0 = pView->GetSubLineIndex(apparent0);
-				apparent1 = pView->GetSubLineIndex(apparent1);
-				line.ptLeft.x = m_leftBar.right;
-				int leftUpper = (int) (apparent0 * m_lineInPix + Y_OFFSET);
-				int leftLower = (int) ((nBlockHeight + apparent0) * m_lineInPix + Y_OFFSET);
-				line.ptLeft.y = leftUpper + (leftLower - leftUpper) / 2;
-				line.ptRight.x = m_rightBar.left;
-				int rightUpper = (int) (apparent1 * m_lineInPix + Y_OFFSET);
-				int rightLower = (int) ((nBlockHeight + apparent1) * m_lineInPix + Y_OFFSET);
-				line.ptRight.y = rightUpper + (rightLower - rightUpper) / 2;
-				m_movedLines.push_back(line);
-			}
-		}
-		++iter;
-	}
-
-	if (m_displayMovedBlocks != DISPLAY_MOVED_NONE)
-		DrawConnectLines(dc.m_pDC);
+	// Create an off-screen DC for double-buffering
+	HSurface *pdcMem = pdc->CreateCompatibleDC();
+	HBitmap *pBitmap = pdc->CreateCompatibleBitmap(m_size.cx, m_size.cy);
+	HGdiObj *pOldBitmap = pdcMem->SelectObject(pBitmap);
 
 	if (m_pSavedBackgroundBitmap)
-		m_pSavedBackgroundBitmap->DeleteObject();
-	m_pSavedBackgroundBitmap = CopyRectToBitmap(dc.m_pDC, rc);
+	{
+		DrawBitmap(pdcMem, 0, 0, m_pSavedBackgroundBitmap);
+	}
+	else
+	{
+		DrawBackground(pdcMem);
+		m_pSavedBackgroundBitmap = CopyRectToBitmap(pdcMem, 0, 0, m_size.cx, m_size.cy);
+	}
 
-	// Since we have invalidated locationbar there is no previous
-	// arearect to remove
-	m_visibleTop = -1;
-	m_visibleBottom = -1;
-	DrawVisibleAreaRect(dc.m_pDC);
+	DrawVisibleAreaRect(pdcMem);
+
+	// Transfer the off-screen DC to the screen
+	pdc->BitBlt(0, 0, m_size.cx, m_size.cy, pdcMem, 0, 0, SRCCOPY);
+
+	// Free-up the off-screen DC
+	pdcMem->SelectObject(pOldBitmap);
+	pBitmap->DeleteObject();
+	pdcMem->DeleteDC();
 }
 
 /** 
@@ -617,11 +635,11 @@ void CLocationView::OnDrag(LPARAM lParam)
  */
 void CLocationView::GotoLocation(const POINT &point)
 {
-	RECT rc;
-	GetClientRect(&rc);
-	int bar = IsInsideBar(rc, point);
+	LOCBAR_TYPE bar = IsInsideBar(point);
 	if (bar != BAR_NONE)
 	{
+		C_ASSERT(BAR_LEFT == 0);
+		C_ASSERT(BAR_RIGHT == 1);
 		CMergeEditView *pView = bar == BAR_YAREA ?
 			m_pMergeDoc->GetActiveMergeView() : m_pMergeDoc->GetView(bar);
 		int line = GetLineFromYPos(point.y, pView);
@@ -644,9 +662,7 @@ void CLocationView::OnContextMenu(LPARAM lParam)
 		ClientToScreen(&point);
 	}
 
-	RECT rc;
 	POINT pt = point;
-	GetClientRect(&rc);
 	ScreenToClient(&pt);
 
 	HMenu *const pMenu = LanguageSelect.LoadMenu(IDR_POPUP_LOCATIONBAR);
@@ -660,7 +676,7 @@ void CLocationView::OnContextMenu(LPARAM lParam)
 		ID_DISPLAY_MOVED_NONE + m_displayMovedBlocks);
 
 	int nLine = -1;
-	LOCBAR_TYPE bar = IsInsideBar(rc, pt);
+	LOCBAR_TYPE bar = IsInsideBar(pt);
 	CMergeEditView *pView = m_pMergeDoc->GetActiveMergeView();
 	TCHAR fmt[INFOTIPSIZE];
 	pSub->GetMenuString(ID_LOCBAR_GOTOLINE, fmt, _countof(fmt));
@@ -759,13 +775,13 @@ int CLocationView::GetLineFromYPos(int nYCoord, CMergeEditView *pView)
  * @param pt [in] point we want to check, in client coordinates.
  * @return LOCBAR_TYPE area where point is.
  */
-CLocationView::LOCBAR_TYPE CLocationView::IsInsideBar(const RECT &rc, const POINT &pt)
+CLocationView::LOCBAR_TYPE CLocationView::IsInsideBar(const POINT &pt)
 {
 	LOCBAR_TYPE retVal = BAR_NONE;
 	if (pt.x >= INDICATOR_MARGIN &&
-		pt.x < rc.right - rc.left - INDICATOR_MARGIN &&
+		pt.x < m_size.cx - INDICATOR_MARGIN &&
 		pt.y >= INDICATOR_MARGIN &&
-		pt.y < rc.bottom - rc.top - INDICATOR_MARGIN)
+		pt.y < m_size.cy - INDICATOR_MARGIN)
 	{
 		if (pt.x >= m_leftBar.left && pt.x < m_leftBar.right)
 			retVal = BAR_LEFT;
@@ -794,8 +810,6 @@ void CLocationView::DrawVisibleAreaRect(HSurface *pClientDC, int nTopLine, int n
 	if (nBottomLine == -1)
 		nBottomLine = nTopLine + pRightView->GetScreenLines();
 
-	RECT rc;
-	GetClientRect(&rc);
 	const int nbLines = max(pLeftView->GetSubLineCount(), pRightView->GetSubLineCount());
 
 	int nTopCoord = static_cast<int>(Y_OFFSET +
@@ -803,7 +817,7 @@ void CLocationView::DrawVisibleAreaRect(HSurface *pClientDC, int nTopLine, int n
 	int nBottomCoord = static_cast<int>(Y_OFFSET +
 			(static_cast<double>(nBottomLine * m_lineInPix)));
 	
-	double xbarBottom = min<double>(nbLines / m_pixInLines + Y_OFFSET, rc.bottom - Y_OFFSET);
+	double xbarBottom = min<double>(nbLines / m_pixInLines + Y_OFFSET, m_size.cy - Y_OFFSET);
 	int barBottom = (int)xbarBottom;
 	// Make sure bottom coord is in bar range
 	nBottomCoord = min(nBottomCoord, barBottom);
@@ -834,10 +848,10 @@ void CLocationView::DrawVisibleAreaRect(HSurface *pClientDC, int nTopLine, int n
 	m_visibleTop = nTopCoord;
 	m_visibleBottom = nBottomCoord;
 
-	RECT rcVisibleArea = { 2, m_visibleTop, rc.right - 2, m_visibleBottom };
-	HBitmap *pBitmap = CopyRectToBitmap(pClientDC, rcVisibleArea);
+	HBitmap *pBitmap = CopyRectToBitmap(pClientDC,
+		2, m_visibleTop, m_size.cx - 4, m_visibleBottom - m_visibleTop);
 	HBitmap *pDarkenedBitmap = GetDarkenedBitmap(pClientDC, pBitmap);
-	DrawBitmap(pClientDC, rcVisibleArea.left, rcVisibleArea.top, pDarkenedBitmap);
+	DrawBitmap(pClientDC, 2, m_visibleTop, pDarkenedBitmap);
 	pDarkenedBitmap->DeleteObject();
 	pBitmap->DeleteObject();
 }
@@ -860,15 +874,7 @@ void CLocationView::UpdateVisiblePos(int nTopLine, int nBottomLine)
 		{
 			if (HSurface *pdc = GetDC())
 			{
-				{
-					RECT rc;
-					GetClientRect(&rc);
-					CMemDC dc(pdc, &rc);
-					// Clear previous visible rect
-					DrawBitmap(dc.m_pDC, 0, 0, m_pSavedBackgroundBitmap);
-					// Draw new visible rect
-					DrawVisibleAreaRect(dc.m_pDC, nTopLine, nBottomLine);
-				}
+				OnDraw(pdc);
 				ReleaseDC(pdc);
 			}
 		}
@@ -880,7 +886,7 @@ void CLocationView::UpdateVisiblePos(int nTopLine, int nBottomLine)
  */
 void CLocationView::DrawConnectLines(HSurface *pClientDC)
 {
-	HGdiObj *oldObj = pClientDC->SelectStockObject(BLACK_PEN);
+	HGdiObj *oldPen = pClientDC->SelectStockObject(BLACK_PEN);
 
 	MOVEDLINE_LIST::iterator it = m_movedLines.begin();
 	while (it != m_movedLines.end())
@@ -890,7 +896,7 @@ void CLocationView::DrawConnectLines(HSurface *pClientDC)
 		pClientDC->LineTo(line.ptRight.x, line.ptRight.y);
 	}
 
-	pClientDC->SelectObject(oldObj);
+	pClientDC->SelectObject(oldPen);
 }
 
 /** 
@@ -912,7 +918,7 @@ void CLocationView::DrawDiffMarker(HSurface* pDC, int yCoord)
 	points[2].x = m_leftBar.left - DIFFMARKER_WIDTH - 1;
 	points[2].y = yCoord + DIFFMARKER_BOTTOM;
 
-	HGdiObj *oldObj = pDC->SelectStockObject(BLACK_PEN);
+	HGdiObj *oldPen = pDC->SelectStockObject(BLACK_PEN);
 	HBrush *brushBlue = HBrush::CreateSolidBrush(RGB(0x80, 0x80, 0xff));
 	HGdiObj *pOldBrush = pDC->SelectObject(brushBlue);
 
@@ -926,5 +932,5 @@ void CLocationView::DrawDiffMarker(HSurface* pDC, int yCoord)
 
 	pDC->SelectObject(pOldBrush);
 	brushBlue->DeleteObject();
-	pDC->SelectObject(oldObj);
+	pDC->SelectObject(oldPen);
 }
