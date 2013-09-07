@@ -282,7 +282,7 @@ void CDirView::ReloadColumns()
  */
 void CDirView::RedisplayChildren(DIFFITEM *di, int level, int &index, int &alldiffs)
 {
-	const CDiffContext *ctxt = m_pFrame->GetDiffContext();
+	const CDiffContext *const ctxt = m_pFrame->GetDiffContext();
 	di = ctxt->GetFirstChildDiff(di);
 	while (di != NULL)
 	{
@@ -357,6 +357,11 @@ void CDirView::Redisplay()
 
 	if (DIFFITEM *di = m_pFrame->FindItemFromPaths(m_lastLeftPath.c_str(), m_lastRightPath.c_str()))
 	{
+		if (COptionsMgr::Get(OPT_CMP_CACHE_RESULTS))
+		{
+			CDiffContext *const ctxt = m_pFrame->GetDiffContext();
+			ctxt->UpdateDiffItem(di);
+		}
 		int i = GetItemIndex(di);
 		if (i != -1)
 		{
@@ -600,7 +605,7 @@ void CDirView::HeaderContextMenu(POINT point)
  */
 HMENU CDirView::ListShellContextMenu(SIDE_TYPE side)
 {
-	const CDiffContext *ctxt = m_pFrame->GetDiffContext();
+	const CDiffContext *const ctxt = m_pFrame->GetDiffContext();
 
 	CMyComPtr<IShellFolder> pDesktop;
 	HRESULT hr = SHGetDesktopFolder(&pDesktop);
@@ -854,7 +859,7 @@ void CDirView::DeepExpandSubdir(int i)
  */
 void CDirView::OpenParentDirectory()
 {
-	const CDiffContext *ctxt = m_pFrame->GetDiffContext();
+	const CDiffContext *const ctxt = m_pFrame->GetDiffContext();
 	FileLocation filelocLeft, filelocRight;
 	switch (m_pFrame->AllowUpwardDirectory(filelocLeft.filepath, filelocRight.filepath))
 	{
@@ -1603,7 +1608,7 @@ void CDirView::OnCopyLeftPathnames()
 {
 	if (!OpenClipboard())
 		return;
-	const CDiffContext *ctxt = m_pFrame->GetDiffContext();
+	const CDiffContext *const ctxt = m_pFrame->GetDiffContext();
 	UniStdioFile file;
 	file.SetUnicoding(UCS2LE);
 	if (HGLOBAL hMem = file.CreateStreamOnHGlobal())
@@ -1637,7 +1642,7 @@ void CDirView::OnCopyRightPathnames()
 {
 	if (!OpenClipboard())
 		return;
-	const CDiffContext *ctxt = m_pFrame->GetDiffContext();
+	const CDiffContext *const ctxt = m_pFrame->GetDiffContext();
 	UniStdioFile file;
 	file.SetUnicoding(UCS2LE);
 	if (HGLOBAL hMem = file.CreateStreamOnHGlobal())
@@ -1671,7 +1676,7 @@ void CDirView::OnCopyBothPathnames()
 {
 	if (!OpenClipboard())
 		return;
-	const CDiffContext *ctxt = m_pFrame->GetDiffContext();
+	const CDiffContext *const ctxt = m_pFrame->GetDiffContext();
 	UniStdioFile file;
 	file.SetUnicoding(UCS2LE);
 	if (HGLOBAL hMem = file.CreateStreamOnHGlobal())
@@ -1978,7 +1983,7 @@ void CDirView::OnViewTreeMode()
  */
 void CDirView::OnViewExpandAllSubdirs()
 {
-	CDiffContext *ctxt = m_pFrame->GetDiffContext();
+	CDiffContext *const ctxt = m_pFrame->GetDiffContext();
 	DIFFITEM *di = ctxt->GetFirstChildDiff(NULL);
 	while (di)
 	{
@@ -1994,7 +1999,7 @@ void CDirView::OnViewExpandAllSubdirs()
  */
 void CDirView::OnViewCollapseAllSubdirs()
 {
-	CDiffContext *ctxt = m_pFrame->GetDiffContext();
+	CDiffContext *const ctxt = m_pFrame->GetDiffContext();
 	DIFFITEM *di = ctxt->GetFirstChildDiff(NULL);
 	while (di)
 	{
@@ -2139,7 +2144,7 @@ LRESULT CDirView::HandleMenuMessage(UINT message, WPARAM wParam, LPARAM lParam)
  */
 void CDirView::PrepareDragData(UniStdioFile &file)
 {
-	const CDiffContext *ctxt = m_pFrame->GetDiffContext();
+	const CDiffContext *const ctxt = m_pFrame->GetDiffContext();
 	int i = -1;
 	while ((i = GetNextItem(i, LVNI_SELECTED)) != -1)
 	{

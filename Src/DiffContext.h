@@ -129,6 +129,7 @@ public:
 
 	FolderCmp m_folderCmp;
 
+	bool UpdateDiffItem(DIFFITEM *);
 	void CompareDiffItem(DIFFITEM *);
 // creation and use, called on main thread
 	UINT CompareDirectories(bool bOnlyRequested);
@@ -161,7 +162,6 @@ private:
 		const DirItem *lent, const DirItem *rent, UINT code, DIFFITEM *parent);
 	void SetDiffItemStats(DIFFITEM *);
 	void StoreDiffData(const DIFFITEM *);
-	bool UpdateDiffItem(DIFFITEM *);
 	int DirScan_CompareItems(DIFFITEM *parent);
 	int DirScan_CompareRequestedItems(DIFFITEM *parent);
 
