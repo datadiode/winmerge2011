@@ -25,16 +25,13 @@
  */
 #include "StdAfx.h"
 #include "Merge.h"
-#include "ChildFrm.h"
+#include "MainFrm.h"
+#include "SyntaxColors.h"
 #include "LanguageSelect.h"
-#include "LocationView.h"
 #include "MergeEditView.h"
 #include "MergeDiffDetailView.h"
-#include "MainFrm.h"
 #include "Environment.h"
 #include "ConsoleWindow.h"
-#include "WMGotoDlg.h"
-#include "SyntaxColors.h"
 #include "Common/stream_util.h"
 
 #ifdef _DEBUG
@@ -76,9 +73,7 @@ CMergeEditView::CMergeEditView(
 	CChildFrame *pDocument,
 	int nThisPane,
 	size_t ZeroInit
-) : CGhostTextView(ZeroInit),
-	m_pDocument(pDocument),
-	m_nThisPane(nThisPane)
+) : CGhostTextView(pDocument, nThisPane, ZeroInit)
 {
 	SubclassWindow(pWnd);
 	RegisterDragDrop(m_hWnd, this);
@@ -1234,89 +1229,6 @@ void CMergeEditView::DocumentsLoaded()
 	RefreshOptions();
 	SetFont(theApp.m_pMainWnd->m_lfDiff);
 	UpdateLineInfoStatus();
-}
-
-/**
- * @brief Called when mouse's wheel is scrolled.
- */
-BOOL CMergeEditView::OnMouseWheel(WPARAM wParam, LPARAM lParam)
-{
-	POINT pt;
-	POINTSTOPOINT(pt, lParam);
-
-	WORD fwKeys = GET_KEYSTATE_WPARAM(wParam);
-	short zDelta = GET_WHEEL_DELTA_WPARAM(wParam);
-
-	if (fwKeys == MK_CONTROL)
-	{
-		ZoomText(zDelta < 0 ? -1 : 1);
-		return TRUE;
-	}
-	if (fwKeys == MK_SHIFT)
-	{
-		SCROLLINFO si;
-		si.cbSize = sizeof si;
-		si.fMask = SIF_PAGE | SIF_POS | SIF_RANGE;
-
-		VERIFY(GetScrollInfo(SB_HORZ, &si));
-		// new horz pos
-		si.nPos -= zDelta / 40;
-		if (si.nPos > si.nMax)
-			si.nPos = si.nMax;
-		if (si.nPos < si.nMin)
-			si.nPos = si.nMin;
-
-		SetScrollInfo(SB_HORZ, &si);
-		// for update
-		SendMessage(WM_HSCROLL, MAKEWPARAM(SB_THUMBPOSITION, si.nPos) , NULL );
-		return TRUE;
-	}
-	return FALSE;
-}
-
-/**
- * @brief Change font size (zoom) in views.
- * @param [in] amount Amount of change/zoom, negative number makes
- *  font smaller, positive number bigger and 0 reset the font size.
- */
-void CMergeEditView::ZoomText(short amount)
-{
-	if (HSurface *pDC = GetDC())
-	{
-		const int nLogPixelsY = pDC->GetDeviceCaps(LOGPIXELSY);
-
-		LOGFONT lf;
-		GetFont(lf);
-
-		int nPointSize = -MulDiv(lf.lfHeight, 72, nLogPixelsY);
-
-		if (amount == 0)
-		{
-			nPointSize = -MulDiv(theApp.m_pMainWnd->m_lfDiff.lfHeight, 72, nLogPixelsY);
-		}
-
-		nPointSize += amount;
-		if (nPointSize < 2)
-			nPointSize = 2;
-
-		lf.lfHeight = -MulDiv(nPointSize, nLogPixelsY, 72);
-
-		for (int nPane = 0; nPane < MERGE_VIEW_COUNT; nPane++) 
-		{
-			if (CCrystalTextView *const pView = m_pDocument->GetView(nPane))
-			{
-				pView->SetFont(lf);
-			}
-			if (CCrystalTextView *const pView = m_pDocument->GetDetailView(nPane))
-			{
-				pView->SetFont(lf);
-			}
-		}
-
-		EnsureCursorVisible();
-
-		ReleaseDC(pDC);
-	}
 }
 
 /// Visible representation of eol

@@ -26,11 +26,11 @@
 
 #include "stdafx.h"
 #include "Merge.h"
-#include "OptionsMgr.h"
-#include "LanguageSelect.h"
-#include "GhostTextView.h"
-#include "GhostTextBuffer.h"
+#include "MainFrm.h"
 #include "SyntaxColors.h"
+#include "LanguageSelect.h"
+#include "MergeEditView.h"
+#include "MergeDiffDetailView.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -41,8 +41,10 @@ static char THIS_FILE[] = __FILE__;
 /** 
  * @brief Constructor, initializes members.
  */
-CGhostTextView::CGhostTextView(size_t ZeroInit)
+CGhostTextView::CGhostTextView(CChildFrame *pDocument, int nThisPane, size_t ZeroInit)
 : CCrystalEditViewEx(ZeroInit)
+, m_pDocument(pDocument)
+, m_nThisPane(nThisPane)
 {
 }
 
@@ -216,4 +218,97 @@ void CGhostTextView::DrawSingleLine(HSurface *pdc, const RECT &rc, int nLineInde
 			pdc->FillRect(&rc, m_pHatchBrush);
 		}
 	}
+}
+
+/**
+ * @brief Change font size (zoom) in views.
+ * @param [in] amount Amount of change/zoom, negative number makes
+ *  font smaller, positive number bigger and 0 reset the font size.
+ */
+void CGhostTextView::ZoomText(short amount)
+{
+	if (HSurface *pDC = GetDC())
+	{
+		const int nLogPixelsY = pDC->GetDeviceCaps(LOGPIXELSY);
+
+		LOGFONT lf;
+		GetFont(lf);
+
+		int nPointSize = -MulDiv(lf.lfHeight, 72, nLogPixelsY);
+
+		if (amount == 0)
+		{
+			nPointSize = -MulDiv(theApp.m_pMainWnd->m_lfDiff.lfHeight, 72, nLogPixelsY);
+		}
+
+		nPointSize += amount;
+		if (nPointSize < 2)
+			nPointSize = 2;
+
+		lf.lfHeight = -MulDiv(nPointSize, nLogPixelsY, 72);
+
+		for (int nPane = 0; nPane < MERGE_VIEW_COUNT; nPane++) 
+		{
+			if (CCrystalTextView *const pView = m_pDocument->GetView(nPane))
+			{
+				pView->SetFont(lf);
+			}
+			if (CCrystalTextView *const pView = m_pDocument->GetDetailView(nPane))
+			{
+				pView->SetFont(lf);
+			}
+		}
+
+		EnsureCursorVisible();
+
+		ReleaseDC(pDC);
+	}
+}
+
+/**
+ * @brief Called when mouse's wheel is scrolled.
+ */
+BOOL CGhostTextView::OnMouseWheel(WPARAM wParam, LPARAM lParam)
+{
+	POINT pt;
+	POINTSTOPOINT(pt, lParam);
+
+	WORD fwKeys = GET_KEYSTATE_WPARAM(wParam);
+	short zDelta = GET_WHEEL_DELTA_WPARAM(wParam);
+
+	if (fwKeys == MK_CONTROL)
+	{
+		ZoomText(zDelta < 0 ? -1 : 1);
+		return TRUE;
+	}
+	if (fwKeys == MK_SHIFT)
+	{
+		LPCTSTR pcwAtom = MAKEINTATOM(GetClassAtom());
+		HWindow *pParent = GetParent();
+		HWindow *pChild = NULL;
+		while ((pChild = pParent->FindWindowEx(pChild, pcwAtom)) != NULL)
+		{
+			CGhostTextView *pSiblingView = static_cast<CGhostTextView *>(FromHandle(pChild));
+			if (pSiblingView->GetStyle() & WS_HSCROLL)
+			{
+				SCROLLINFO si;
+				si.cbSize = sizeof si;
+				si.fMask = SIF_PAGE | SIF_POS | SIF_RANGE;
+				VERIFY(pSiblingView->GetScrollInfo(SB_HORZ, &si));
+				--si.nPage;
+				si.nMax -= si.nPage;
+				// new horz pos
+				si.nPos -= zDelta / 40;
+				if (si.nPos > si.nMax)
+					si.nPos = si.nMax;
+				if (si.nPos < si.nMin)
+					si.nPos = si.nMin;
+				pSiblingView->ScrollToChar(si.nPos);
+				pSiblingView->UpdateSiblingScrollPos();
+				break;
+			}
+		}
+		return TRUE;
+	}
+	return FALSE;
 }

@@ -30,7 +30,7 @@ GetLineColors (in MergeEditView).
 class EDITPADC_CLASS CGhostTextView : public CCrystalEditViewEx
 {
 protected:
-	CGhostTextView(size_t);           // protected constructor used by dynamic creation
+	CGhostTextView(CChildFrame *, int, size_t);
 
 private:
 	/** 
@@ -89,6 +89,16 @@ private:
 	//   m_ptDrawSelStart, m_ptDrawSelEnd : built from m_ptSelStart and m_ptSelEnd
 	//   m_ptDropPos : only used inside one function which does not change the buffer
 
+// Attributes
+public:
+	/**
+	 * Index of pane this view is attached to.
+	 * This indicates the pane number the view is attached to. If we swap panes
+	 * then these indexes are changed.
+	 */
+	int m_nThisPane;
+	CChildFrame *const m_pDocument;
+
 public:
 	/** real cursor function to preserve cursor during Rescan */
 	void PopCursors();
@@ -98,9 +108,12 @@ public:
 	int ComputeApparentLine(int nRealLine) const;
 	int ComputeRealLine(int nApparentLine) const;
 
+	void ZoomText(short amount);
+
 protected:
 	virtual void DrawSingleLine(HSurface *, const RECT &, int nLineIndex);
 	virtual void DrawMargin(HSurface *, const RECT &, int nLineIndex, int nLineNumber);
+	BOOL OnMouseWheel(WPARAM, LPARAM);
 };
 
 #endif //__GHOSTTEXTVIEW_H__

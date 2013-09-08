@@ -111,16 +111,6 @@ public:
 	void UpdateLineInfoStatus();
 	void SetEncodingStatus(LPCTSTR);
 	void SetCRLFModeStatus(enum CRLFSTYLE);
-// Attributes
-public:
-	/**
-	 * Index of pane this view is attached to.
-	 * This indicates the pane number the view is attached to. If we swap panes
-	 * then these indexes are changed.
-	 */
-	int m_nThisPane;
-	CChildFrame *const m_pDocument;
-
 protected:
 	/**
 	 * Are automatic rescans enabled?
@@ -166,7 +156,6 @@ public:
 	void DocumentsLoaded();
 
 	bool IsDiffVisible(int nDiff);
-	void ZoomText(short amount);
 
 // Implementation
 protected:
@@ -181,7 +170,6 @@ protected:
 	void OnLButtonDblClk();
 	void OnLButtonUp();
 	void OnContextMenu(LPARAM);
-	BOOL OnMouseWheel(WPARAM, LPARAM);
 	void OnSize();
 	void OnTimer(UINT_PTR);
 

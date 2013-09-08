@@ -31,11 +31,6 @@ class CMergeDiffDetailView : public CGhostTextView
 {
 public:
 	CMergeDiffDetailView(CChildFrame *, int);           // protected constructor used by dynamic creation
-
-// Attributes
-public:
-	int m_nThisPane;
-	CChildFrame *const m_pDocument;
 protected:
 	/// first line of diff (first displayable line)
 	int m_lineBegin;

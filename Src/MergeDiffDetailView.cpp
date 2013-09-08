@@ -6,11 +6,10 @@
  */
 #include "StdAfx.h"
 #include "Merge.h"
+#include "MainFrm.h"
+#include "SyntaxColors.h"
 #include "LanguageSelect.h"
 #include "MergeDiffDetailView.h"
-#include "MainFrm.h"
-#include "ChildFrm.h"
-#include "SyntaxColors.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -27,9 +26,7 @@ using stl::vector;
  * @brief Constructor.
  */
 CMergeDiffDetailView::CMergeDiffDetailView(CChildFrame *pDocument, int nThisPane)
-: CGhostTextView(sizeof *this)
-, m_pDocument(pDocument)
-, m_nThisPane(nThisPane)
+: CGhostTextView(pDocument, nThisPane, sizeof *this)
 {
 }
 
@@ -41,6 +38,10 @@ LRESULT CMergeDiffDetailView::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam
 {
 	switch (uMsg)
 	{
+	case WM_MOUSEWHEEL:
+		if (OnMouseWheel(wParam, lParam))
+			return 0;
+		break;
 	case WM_CONTEXTMENU:
 		OnContextMenu(lParam);
 		break;
