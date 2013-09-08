@@ -253,9 +253,9 @@ void CCrystalTextView::MoveUp(BOOL bSelect)
 	/*ORIGINAL
 	if (m_ptCursorPos.y > 0)
 	*///END SW
-    {
-      if (m_nIdealCharPos == -1)
-        m_nIdealCharPos = CalculateActualOffset (m_ptCursorPos.y, m_ptCursorPos.x);
+	{
+		if (m_nIdealCharPos == -1)
+			m_nIdealCharPos = CalculateActualOffset(m_ptCursorPos.y, m_ptCursorPos.x);
 		//BEGIN SW
 		do {
 			nSubLine--;
@@ -265,9 +265,10 @@ void CCrystalTextView::MoveUp(BOOL bSelect)
 		m_ptCursorPos.y --;
 		m_ptCursorPos.x = ApproxActualOffset(m_ptCursorPos.y, m_nIdealCharPos);
 		*///END SW
-      if (m_ptCursorPos.x > GetLineLength(m_ptCursorPos.y))
-        m_ptCursorPos.x = GetLineLength(m_ptCursorPos.y);
-    }
+		const int nLineLength = GetLineLength(m_ptCursorPos.y);
+		if (m_ptCursorPos.x > nLineLength)
+			m_ptCursorPos.x = nLineLength;
+	}
 	AdjustCursorAfterMoveLeft();
 	if (!bSelect)
 		m_ptAnchor = m_ptCursorPos;
@@ -293,8 +294,8 @@ void CCrystalTextView::MoveDown(BOOL bSelect)
 	if (m_ptCursorPos.y < GetLineCount() - 1)
 	*/
 	{
-      if (m_nIdealCharPos == -1)
-        m_nIdealCharPos = CalculateActualOffset (m_ptCursorPos.y, m_ptCursorPos.x);
+		if (m_nIdealCharPos == -1)
+			m_nIdealCharPos = CalculateActualOffset(m_ptCursorPos.y, m_ptCursorPos.x);
 		//BEGIN SW
 		do {
 			nSubLine++;
@@ -304,9 +305,10 @@ void CCrystalTextView::MoveDown(BOOL bSelect)
 		m_ptCursorPos.y ++;
 		m_ptCursorPos.x = ApproxActualOffset(m_ptCursorPos.y, m_nIdealCharPos);
 		*///END SW
-      if (m_ptCursorPos.x > GetLineLength(m_ptCursorPos.y))
-        m_ptCursorPos.x = GetLineLength(m_ptCursorPos.y);
-    }
+		const int nLineLength = GetLineLength(m_ptCursorPos.y);
+		if (m_ptCursorPos.x > nLineLength)
+			m_ptCursorPos.x = nLineLength;
+	}
 	AdjustCursorAfterMoveLeft();
 	if (!bSelect)
 		m_ptAnchor = m_ptCursorPos;
@@ -364,8 +366,10 @@ void CCrystalTextView::MoveEnd(BOOL bSelect)
 
 void CCrystalTextView::MovePgUp(BOOL bSelect)
 {
+	const int nScreenLines = GetScreenLines();
+	const int nPage = nScreenLines > 1 ? nScreenLines - 1 : 1;
 	// scrolling windows
-	int nNewTopSubLine = m_nTopSubLine - GetScreenLines() + 1;
+	int nNewTopSubLine = m_nTopSubLine - nPage;
 	if (nNewTopSubLine < 0)
 		nNewTopSubLine = 0;
 	if (m_nTopSubLine != nNewTopSubLine)
@@ -378,9 +382,9 @@ void CCrystalTextView::MovePgUp(BOOL bSelect)
 	POINT subLinePos;
 	CharPosToPoint(m_ptCursorPos.y, m_ptCursorPos.x, subLinePos);
 
-	int nSubLine = GetSubLineIndex(m_ptCursorPos.y) + subLinePos.y - GetScreenLines() + 1;
+	int nSubLine = GetSubLineIndex(m_ptCursorPos.y) + subLinePos.y - nPage;
 
-	if (nSubLine < nNewTopSubLine || nSubLine >= nNewTopSubLine + GetScreenLines())
+	if (nSubLine < nNewTopSubLine || nSubLine >= nNewTopSubLine + nScreenLines)
 		nSubLine = nNewTopSubLine;
 
 	if (nSubLine < 0)
@@ -388,7 +392,7 @@ void CCrystalTextView::MovePgUp(BOOL bSelect)
 
 	SubLineCursorPosToTextPos(m_nIdealCharPos, nSubLine, m_ptCursorPos);
 
-	m_nIdealCharPos = CalculateActualOffset (m_ptCursorPos.y, m_ptCursorPos.x);
+	m_nIdealCharPos = CalculateActualOffset(m_ptCursorPos.y, m_ptCursorPos.x);
 	AdjustCursorAfterMoveLeft();
 	if (!bSelect)
 		m_ptAnchor = m_ptCursorPos;
@@ -402,8 +406,9 @@ void CCrystalTextView::MovePgDn(BOOL bSelect)
 	//BEGIN SW
 	// scrolling windows
 	const int nScreenLines = GetScreenLines();
+	const int nPage = nScreenLines > 1 ? nScreenLines - 1 : 1;
 	const int nSubLineCount = GetSubLineCount();
-	int nNewTopSubLine = m_nTopSubLine + nScreenLines - 1;
+	int nNewTopSubLine = m_nTopSubLine + nPage;
 
 	if (nNewTopSubLine > nSubLineCount - nScreenLines)
 		nNewTopSubLine = nSubLineCount - nScreenLines;
@@ -420,7 +425,7 @@ void CCrystalTextView::MovePgDn(BOOL bSelect)
 	POINT subLinePos;
 	CharPosToPoint(m_ptCursorPos.y, m_ptCursorPos.x, subLinePos);
 
-	int nSubLine = GetSubLineIndex(m_ptCursorPos.y) + subLinePos.y + nScreenLines - 1;
+	int nSubLine = GetSubLineIndex(m_ptCursorPos.y) + subLinePos.y + nPage;
 
 	if (nSubLine < nNewTopSubLine || nSubLine >= nNewTopSubLine + nScreenLines)
 		nSubLine = nNewTopSubLine + nScreenLines - 1;
@@ -430,7 +435,7 @@ void CCrystalTextView::MovePgDn(BOOL bSelect)
 
 	SubLineCursorPosToTextPos(m_nIdealCharPos, nSubLine, m_ptCursorPos);
 
-	m_nIdealCharPos = CalculateActualOffset (m_ptCursorPos.y, m_ptCursorPos.x);
+	m_nIdealCharPos = CalculateActualOffset(m_ptCursorPos.y, m_ptCursorPos.x);
 	AdjustCursorAfterMoveLeft();
 	if (!bSelect)
 		m_ptAnchor = m_ptCursorPos;
