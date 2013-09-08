@@ -876,11 +876,11 @@ void CChildFrame::CreateClient()
 
 	CMergeDiffDetailView *pLeftDetail = new CMergeDiffDetailView(this, 0);
 	pLeftDetail->SubclassWindow(HWindow::CreateEx(
-		WS_EX_CLIENTEDGE, WinMergeWindowClass, NULL, WS_CHILD | WS_VISIBLE,
+		WS_EX_CLIENTEDGE, WinMergeWindowClass, NULL, WS_CHILD | WS_VISIBLE | WS_VSCROLL,
 		0, 4, 100, cyClient, m_wndDiffViewBar.m_pWnd, 0x1000));
 	CMergeDiffDetailView *pRightDetail = new CMergeDiffDetailView(this, 1);
 	pRightDetail->SubclassWindow(HWindow::CreateEx(
-		WS_EX_CLIENTEDGE, WinMergeWindowClass, NULL, WS_CHILD | WS_VISIBLE | WS_HSCROLL,
+		WS_EX_CLIENTEDGE, WinMergeWindowClass, NULL, WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_HSCROLL,
 		0, cyClient + 8, 100, cyClient + cyScroll, m_wndDiffViewBar.m_pWnd, 0x1001));
 
 	// Merge frame has a header bar at top

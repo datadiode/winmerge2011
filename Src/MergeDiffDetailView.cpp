@@ -223,8 +223,9 @@ void CMergeDiffDetailView::OnDisplayDiff(int nDiff)
 
 	// scroll to the first line of the diff
 	ScrollToLine(m_lineBegin);
-	// update the width of the horizontal scrollbar
+	// update scroll ranges
 	RecalcHorzScrollBar();
+	RecalcVertScrollBar();
 }
 
 /**
@@ -333,6 +334,33 @@ int CMergeDiffDetailView::RecalcHorzScrollBar(bool bPositionOnly)
 		CCrystalTextView *pSiblingView = static_cast<CCrystalTextView *>(FromHandle(pChild));
 		if (pSiblingView->GetStyle() & WS_HSCROLL)
 			pSiblingView->SetScrollInfo(SB_HORZ, &si);
+	}
+	return si.nPos;
+}
+
+/**
+ * @brief Update the vertical scrollbar
+ *
+ * @sa ccrystaltextview::RecalcVertScrollBar()
+ */
+int CMergeDiffDetailView::RecalcVertScrollBar(bool bPositionOnly)
+{
+	SCROLLINFO si;
+	si.cbSize = sizeof si;
+	si.fMask = bPositionOnly ?
+		SIF_POS : SIF_DISABLENOSCROLL | SIF_PAGE | SIF_POS | SIF_RANGE;
+	si.nPage = GetDisplayHeight();
+	si.nMin = m_lineBegin;
+	si.nPos = m_nTopSubLine;
+	si.nMax = m_lineEnd - 1;
+	LPCTSTR pcwAtom = MAKEINTATOM(GetClassAtom());
+	HWindow *pParent = GetParent();
+	HWindow *pChild = NULL;
+	while ((pChild = pParent->FindWindowEx(pChild, pcwAtom)) != NULL)
+	{
+		CCrystalTextView *pSiblingView = static_cast<CCrystalTextView *>(FromHandle(pChild));
+		ASSERT(pSiblingView->GetStyle() & WS_VSCROLL);
+		pSiblingView->SetScrollInfo(SB_VERT, &si);
 	}
 	return si.nPos;
 }
