@@ -2406,7 +2406,7 @@ msgstr "&Eindeutige Unterordner-Inhalte einbeziehen"
 #: Merge.rc:1322
 #, c-format
 msgid "C&ache compare results of visited folders"
-msgstr ""
+msgstr "Vergleichsergebnisse besuchter Ordner z&wischenspeichern"
 
 #: Merge.rc:1323
 #, c-format
