@@ -1142,8 +1142,11 @@ void CCrystalTextView::InvalidateSubLineIndexCache(int nLineIndex)
  */
 void CCrystalTextView::InvalidateScreenRect()
 {
-	m_nScreenChars = -1;
-	m_nScreenLines = -1;
+	CalcLineCharDim();
+	RECT rect;
+	GetClientRect(&rect);
+	m_nScreenChars = (rect.right - rect.left - GetMarginWidth()) / GetCharWidth();
+	m_nScreenLines = (rect.bottom - rect.top) / GetLineHeight();
 	InvalidateLineCache(0, -1);
 }
 
@@ -1780,8 +1783,8 @@ void CCrystalTextView::ResetView()
 	m_nLineHeight = -1;
 	m_nCharWidth = -1;
 	m_nMaxLineLength = -1;
-	m_nScreenLines = -1;
-	m_nScreenChars = -1;
+	m_nScreenLines = INT_MIN;
+	m_nScreenChars = INT_MIN;
 	m_nIdealCharPos = -1;
 	m_ptAnchor.x = 0;
 	m_ptAnchor.y = 0;
@@ -1793,7 +1796,6 @@ void CCrystalTextView::ResetView()
 			m_apFonts[I] = NULL;
 		}
 	}
-	InvalidateLineCache(0, -1);
 	m_ParseCookies.clear();
 	m_pnActualLineLength.clear();
 	m_ptCursorPos.x = 0;
@@ -1806,7 +1808,10 @@ void CCrystalTextView::ResetView()
 	}
 	m_bDragSelection = false;
 	if (m_hWnd)
+	{
+		InvalidateScreenRect();
 		UpdateCaret();
+	}
 	m_bShowInactiveSelection = true; // FP: reverted because I like it
 }
 
@@ -1931,8 +1936,7 @@ void CCrystalTextView::CalcLineCharDim()
 
 int CCrystalTextView::GetLineHeight()
 {
-	if (m_nLineHeight == -1)
-		CalcLineCharDim();
+	ASSERT(m_nLineHeight != -1);
 	return m_nLineHeight;
 }
 
@@ -2363,12 +2367,7 @@ void CCrystalTextView::DetachFromBuffer()
 
 int CCrystalTextView::GetScreenLines()
 {
-	if (m_nScreenLines == -1)
-	{
-		RECT rect;
-		GetClientRect(&rect);
-		m_nScreenLines = (rect.bottom - rect.top) / GetLineHeight();
-	}
+	ASSERT(m_nScreenLines != INT_MIN);
 	return m_nScreenLines;
 }
 
@@ -2387,12 +2386,7 @@ bool CCrystalTextView::GetBold(int nColorIndex)
 
 int CCrystalTextView::GetScreenChars()
 {
-	if (m_nScreenChars == -1)
-	{
-		RECT rect;
-		GetClientRect(&rect);
-		m_nScreenChars = (rect.right - rect.left - GetMarginWidth()) / GetCharWidth();
-	}
+	ASSERT(m_nScreenChars != INT_MIN);
 	return m_nScreenChars;
 }
 
@@ -2466,6 +2460,13 @@ int CCrystalTextView::RecalcVertScrollBar(bool bPositionOnly)
 				si.nMax = nMax;
 		}
 	}
+	if (!bPositionOnly)
+	{
+		int nMaxTopSubLine = GetSubLineCount() - GetScreenLines();
+		if (m_nTopSubLine > nMaxTopSubLine)
+			ScrollToSubLine(nMaxTopSubLine);
+	}
+
 	while ((pChild = pParent->FindWindowEx(pChild, pcwAtom)) != NULL)
 	{
 		CCrystalTextView *pSiblingView = static_cast<CCrystalTextView *>(FromHandle(pChild));
@@ -2502,32 +2503,6 @@ int CCrystalTextView::RecalcHorzScrollBar(bool bPositionOnly)
 {
 	SCROLLINFO si;
 	si.cbSize = sizeof si;
-	if (m_bWordWrap)
-	{
-		if (m_nOffsetChar > 0)
-		{
-			m_nOffsetChar = 0;
-			UpdateCaret();
-		}
-		// Disable horizontal scroll bar
-		si.fMask = SIF_DISABLENOSCROLL | SIF_PAGE | SIF_POS | SIF_RANGE;
-		si.nPage = 0;
-		si.nMin = 0;
-		si.nMax = 0;
-	}
-	else if (bPositionOnly)
-	{
-		si.fMask = SIF_POS;
-	}
-	else
-	{
-		si.fMask = SIF_DISABLENOSCROLL | SIF_PAGE | SIF_POS | SIF_RANGE;
-		si.nPage = GetScreenChars();
-		si.nMin = 0;
-		// Horiz scroll limit to longest line + one screenwidth 
-		si.nMax = GetMaxLineLength() + si.nPage;
-	}
-	si.nPos = m_nOffsetChar;
 	LPCTSTR pcwAtom = MAKEINTATOM(GetClassAtom());
 	HWindow *pParent = GetParent();
 	HWindow *pChild = NULL;
@@ -2535,7 +2510,35 @@ int CCrystalTextView::RecalcHorzScrollBar(bool bPositionOnly)
 	{
 		CCrystalTextView *pSiblingView = static_cast<CCrystalTextView *>(FromHandle(pChild));
 		if (pSiblingView->GetStyle() & WS_HSCROLL)
+		{
+			if (pSiblingView->m_bWordWrap)
+			{
+				if (pSiblingView->m_nOffsetChar > 0)
+				{
+					pSiblingView->m_nOffsetChar = 0;
+					pSiblingView->UpdateCaret();
+				}
+				// Disable horizontal scroll bar
+				si.fMask = SIF_DISABLENOSCROLL | SIF_PAGE | SIF_POS | SIF_RANGE;
+				si.nPage = 0;
+				si.nMin = 0;
+				si.nMax = 0;
+			}
+			else if (bPositionOnly)
+			{
+				si.fMask = SIF_POS;
+			}
+			else
+			{
+				si.fMask = SIF_DISABLENOSCROLL | SIF_PAGE | SIF_POS | SIF_RANGE;
+				si.nPage = pSiblingView->GetScreenChars();
+				si.nMin = 0;
+				// Horiz scroll limit to longest line + one screenwidth 
+				si.nMax = pSiblingView->GetMaxLineLength() + si.nPage;
+			}
+			si.nPos = pSiblingView->m_nOffsetChar;
 			pSiblingView->SetScrollInfo(SB_HORZ, &si);
+		}
 	}
 	return si.nPos;
 }
@@ -2915,33 +2918,34 @@ void CCrystalTextView::EnsureCursorVisible()
 
 	//  Scroll horizontally
 	// we do not need horizontally scrolling, if we wrap the words
-	if (m_bWordWrap)
-		return;
-	int nActualPos = CalculateActualOffset(m_ptCursorPos.y, m_ptCursorPos.x);
-	int nNewOffset = m_nOffsetChar;
-	const int nScreenChars = GetScreenChars();
-  
-	// Keep 5 chars visible right to cursor
-	if (nActualPos > nNewOffset + nScreenChars - 5)
+	if (!m_bWordWrap)
 	{
-		// Add 10 chars width space after line
-		nNewOffset = nActualPos - nScreenChars + 10;
-	}
-	// Keep 5 chars visible left to cursor
-	if (nActualPos < nNewOffset + 5)
-	{
-		// Jump by 10 char steps, so user sees previous letters too
-		nNewOffset = nActualPos - 10;
-	}
+		int nActualPos = CalculateActualOffset(m_ptCursorPos.y, m_ptCursorPos.x);
+		int nNewOffset = m_nOffsetChar;
+		const int nScreenChars = GetScreenChars();
+	  
+		// Keep 5 chars visible right to cursor
+		if (nActualPos > nNewOffset + nScreenChars - 5)
+		{
+			// Add 10 chars width space after line
+			nNewOffset = nActualPos - nScreenChars + 10;
+		}
+		// Keep 5 chars visible left to cursor
+		if (nActualPos < nNewOffset + 5)
+		{
+			// Jump by 10 char steps, so user sees previous letters too
+			nNewOffset = nActualPos - 10;
+		}
 
-	// Horiz scroll limit to longest line + one screenwidth
-	const int nMaxLineLen = GetMaxLineLength();
-	if (nNewOffset >= nMaxLineLen + nScreenChars)
-		nNewOffset = nMaxLineLen + nScreenChars - 1;
-	if (nNewOffset < 0)
-		nNewOffset = 0;
+		// Horiz scroll limit to longest line + one screenwidth
+		const int nMaxLineLen = GetMaxLineLength();
+		if (nNewOffset >= nMaxLineLen + nScreenChars)
+			nNewOffset = nMaxLineLen + nScreenChars - 1;
+		if (nNewOffset < 0)
+			nNewOffset = 0;
 
-	ScrollToChar(nNewOffset);
+		ScrollToChar(nNewOffset);
+	}
 	UpdateSiblingScrollPos();
 }
 
@@ -3157,10 +3161,7 @@ void CCrystalTextView::SetSelectionMargin(bool bSelMargin)
 		m_bSelMargin = bSelMargin;
 		if (m_hWnd)
 		{
-			InvalidateScreenRect();
-			m_nTopSubLine = GetSubLineIndex(m_nTopLine);
-			RecalcHorzScrollBar();
-			UpdateCaret();
+			OnSize();
 		}
 	}
 }
@@ -3172,10 +3173,7 @@ void CCrystalTextView::SetViewLineNumbers(bool bViewLineNumbers)
 		m_bViewLineNumbers = bViewLineNumbers;
 		if (m_hWnd)
 		{
-			InvalidateScreenRect();
-			m_nTopSubLine = GetSubLineIndex(m_nTopLine);
-			RecalcHorzScrollBar();
-			UpdateCaret();
+			OnSize();
 		}
 	}
 }
@@ -4153,11 +4151,7 @@ void CCrystalTextView::SetWordWrapping(bool bWordWrap)
 	m_bWordWrap = bWordWrap;
 	if (m_hWnd)
 	{
-		InvalidateScreenRect();
-		Invalidate();
-		m_nTopSubLine = GetSubLineIndex(m_nTopLine);
-		RecalcVertScrollBar();
-		RecalcHorzScrollBar();
+		OnSize();
 	}
 }
 

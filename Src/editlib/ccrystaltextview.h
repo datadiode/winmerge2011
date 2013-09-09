@@ -104,9 +104,6 @@ private:
 	bool m_bSeparateCombinedChars;
 	DWORD m_dwFlags;
 
-	//  Amount of lines/characters that completely fits the client area
-	int m_nScreenLines, m_nScreenChars;
-
 	CSyntaxColors *m_pColors;
 
 	//BEGIN SW
@@ -258,6 +255,9 @@ protected:
 	bool IsInsideSelection(const POINT &ptTextPos);
 	void GetSelection(POINT &ptStart, POINT &ptEnd);
 	void GetFullySelectedLines(int &firstLine, int &lastLine);
+
+	//  Amount of lines/characters that completely fits the client area
+	int m_nScreenLines, m_nScreenChars;
 
 	int m_nTopLine, m_nOffsetChar;
 	//BEGIN SW

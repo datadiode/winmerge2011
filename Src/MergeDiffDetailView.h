@@ -43,7 +43,6 @@ protected:
 
 // Operations
 private:
-	int GetDisplayHeight();
 	int GetDiffLineLength();
 	bool EnsureInDiff(POINT &);
 
@@ -73,8 +72,6 @@ public:
 	 * @note : also scroll to the old top line
 	 */
 	void PopCursors();
-
-	virtual void OnInitialUpdate();
 
 // Implementation
 protected:

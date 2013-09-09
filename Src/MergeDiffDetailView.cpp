@@ -59,19 +59,6 @@ void CMergeDiffDetailView::UpdateResources()
 {
 }
 
-/**
- * @brief Get view's height.
- */
-int CMergeDiffDetailView::GetDisplayHeight() 
-{
-	RECT rc;
-	GetClientRect(&rc);
-	int lineHeight = GetLineHeight();
-	if (rc.bottom >= lineHeight)
-		rc.bottom -= lineHeight / 2;
-	return rc.bottom / lineHeight;
-}
-
 /// virtual, ensure we remain in diff
 void CMergeDiffDetailView::SetSelection(const POINT &ptStart, const POINT &ptEnd)
 {
@@ -81,11 +68,6 @@ void CMergeDiffDetailView::SetSelection(const POINT &ptStart, const POINT &ptEnd
 	EnsureInDiff(ptEndNew);
 	EnsureInDiff(m_ptCursorPos);
 	CCrystalTextView::SetSelection(ptStartNew, ptEndNew);
-}
-
-void CMergeDiffDetailView::OnInitialUpdate()
-{
-	SetFont(theApp.m_pMainWnd->m_lfDiff);
 }
 
 int CMergeDiffDetailView::GetAdditionalTextBlocks(int nLineIndex, TEXTBLOCK *pBuf)
@@ -255,7 +237,7 @@ bool CMergeDiffDetailView::EnsureInDiff(POINT &pt)
 /// virtual, ensure we remain in diff
 void CMergeDiffDetailView::ScrollToSubLine(int nNewTopLine)
 {
-	const int nMaxTopLine = m_lineEnd - GetDisplayHeight();
+	const int nMaxTopLine = m_lineEnd - GetScreenLines();
 
 	if (nNewTopLine > nMaxTopLine)
 		nNewTopLine = nMaxTopLine;
@@ -346,11 +328,23 @@ int CMergeDiffDetailView::RecalcHorzScrollBar(bool bPositionOnly)
  */
 int CMergeDiffDetailView::RecalcVertScrollBar(bool bPositionOnly)
 {
+	if (!bPositionOnly)
+	{
+		// Recompute m_nScreenLines from client area shrinked by 1/2 line height
+		RECT rc;
+		GetClientRect(&rc);
+		int lineHeight = GetLineHeight();
+		if (rc.bottom >= lineHeight)
+			rc.bottom -= lineHeight / 2;
+		m_nScreenLines = rc.bottom / lineHeight;
+		if (m_nTopSubLine > m_lineEnd - m_nScreenLines)
+			ScrollToSubLine(m_lineEnd - m_nScreenLines);
+	}
 	SCROLLINFO si;
 	si.cbSize = sizeof si;
 	si.fMask = bPositionOnly ?
 		SIF_POS : SIF_DISABLENOSCROLL | SIF_PAGE | SIF_POS | SIF_RANGE;
-	si.nPage = GetDisplayHeight();
+	si.nPage = GetScreenLines();
 	si.nMin = m_lineBegin;
 	si.nPos = m_nTopSubLine;
 	si.nMax = m_lineEnd - 1;
