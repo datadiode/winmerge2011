@@ -25,6 +25,7 @@
 #include "pcre.h"
 #include "DirItem.h"
 #include "RegExpItem.h"
+#include "Common/MyCom.h"
 
 /**
  * @brief One actual filter.
@@ -42,8 +43,9 @@ struct FileFilter
 {
 	bool default_include;	/**< If true, filter rules are inclusive by default */
 	String name;			/**< Filter name (shown in UI) */
-	String description;	/**< Filter description text */
+	String description;		/**< Filter description text */
 	String fullpath;		/**< Full path to filter file */
+	CMyComBSTR sql;			/**< SQL query for LogParser */
 	DirItem fileinfo;		/**< For tracking if file has been modified */
 	stl::vector<regexp_item> filefilters;		/**< List of rules for files */
 	stl::vector<regexp_item> dirfilters;		/**< List of rules for directories */

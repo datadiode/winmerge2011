@@ -175,7 +175,18 @@ FileFilter *FileFilterMgr::LoadFilterFile(LPCTSTR szFilepath)
 			sLine.resize(pos);
 		string_trim_ws(sLine);
 
-		if (LPCTSTR psz = EatPrefixTrim(sLine.c_str(), _T("name:")))
+		if (sLine.empty())
+			continue;
+
+		if (sLine.find(':') >= sLine.find(' '))
+		{
+			// If there is no colon at all,
+			// or a space earlier on the line,
+			// append the line to the SQL clause
+			pfilter->sql += sLine.c_str();
+			pfilter->sql += sEol.c_str();
+		}
+		else if (LPCTSTR psz = EatPrefixTrim(sLine.c_str(), _T("name:")))
 		{
 			// specifies display name
 			pfilter->name = psz;

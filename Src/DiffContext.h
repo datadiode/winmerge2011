@@ -18,6 +18,8 @@
 
 class IDiffFilter;
 class CompareStats;
+interface ILogQuery;
+interface ICOMFileSystemInputContext;
 
 /**
  * The folder compare context.
@@ -32,7 +34,8 @@ class CompareStats;
  * - second threads compares items in the list.
  */
 class CDiffContext
-	: public ListEntry
+	: ZeroInit<CDiffContext>
+	, public ListEntry
 	, public DiffItemList
 {
 public:
@@ -145,6 +148,8 @@ public:
 private:
 	stl::vector<String> m_paths; /**< (root) paths for this context */
 	HANDLE m_hSemaphore; /**< Semaphore for synchronizing threads. */
+	ILogQuery *m_piLogQuery;
+	ICOMFileSystemInputContext *m_piInputContext;
 	CompareStats *const m_pCompareStats; /**< Pointer to compare statistics */
 	HWindow *const m_pWindow; /**< Window getting status updates. */
 	bool m_bAborting; /**< Is compare aborting? */
@@ -164,6 +169,9 @@ private:
 	void StoreDiffData(const DIFFITEM *);
 	int DirScan_CompareItems(DIFFITEM *parent);
 	int DirScan_CompareRequestedItems(DIFFITEM *parent);
+
+	void InitCollect();
+	void TermCollect();
 
 	typedef stl::vector<DirItem> DirItemArray;
 

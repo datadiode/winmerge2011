@@ -1,0 +1,12 @@
+## This is a directory/file filter for WinMerge
+## Its purpose is to show how to use SQL in directory/file filters
+## The feature makes use of Microsoft Log Parser, which you can download from
+## http://www.microsoft.com/en-us/download/details.aspx?id=24659
+name: SQL File Filter Example
+desc: Shows how to use SQL in file filters
+
+WHERE
+	Attributes LIKE 'D%' ## Include all directories
+OR
+	## Include some kinds of picture files
+	TO_LOWERCASE(EXTRACT_EXTENSION(Name)) IN ('jpg';'bmp';'ico')

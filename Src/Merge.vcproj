@@ -996,6 +996,10 @@
 				>
 			</File>
 			<File
+				RelativePath="LogParser.idl"
+				>
+			</File>
+			<File
 				RelativePath="WMGotoDlg.cpp"
 				>
 			</File>
@@ -3145,6 +3149,10 @@
 			</File>
 			<File
 				RelativePath="..\Filters\SourceControl.flt"
+				>
+			</File>
+			<File
+				RelativePath="..\Filters\SQL_Filter_Example.flt"
 				>
 			</File>
 			<File

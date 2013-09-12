@@ -157,6 +157,11 @@ void FileFilterHelper::SetMask(LPCTSTR strMask)
 	m_pMaskFilter->AddRegExp(regExp.c_str());
 }
 
+BSTR FileFilterHelper::getSql()
+{
+	return m_currentFilter ? m_currentFilter->sql : NULL;
+}
+
 /**
  * @brief Check if any of filefilter rules match to filename.
  *

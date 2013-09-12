@@ -519,13 +519,9 @@ OException::OException(DWORD err, LPCTSTR fmt)
 	{
 		switch (HIWORD(err))
 		{
-		case 0x800A:
-			if (HMODULE dll = ::GetModuleHandle(_T("VBSCRIPT")))
-				if (::LoadString(dll, LOWORD(err), msg, _countof(msg)))
-					break;
-			if (HMODULE dll = ::GetModuleHandle(_T("JSCRIPT")))
-				if (::LoadString(dll, LOWORD(err), msg, _countof(msg)))
-					break;
+		case 0x8007: // LogParser error
+		case 0x800A: // VBScript or JScript error
+			err = DISP_E_EXCEPTION;
 			// fall through
 		default:
 			HMODULE WinInet = ::GetModuleHandle(_T("WININET"));

@@ -1,0 +1,1668 @@
+// Generated .IDL file (by the OLE/COM Object Viewer)
+// 
+// typelib filename: 1
+
+[
+  uuid(A7E75D86-41CD-4B6E-B4BD-CC2ED34B3FB0),
+  version(1.0),
+  helpstring("MS Utility 1.0 Type Library - LogParser Interfaces collection")
+]
+library MSUtil
+{
+    // TLib :     // TLib : OLE Automation : {00020430-0000-0000-C000-000000000046}
+    importlib("STDOLE2.TLB");
+
+    // Forward declare all types defined in this typelib
+    interface ILogQuery;
+    interface ILogRecordset;
+    interface ILogRecord;
+    interface ILogStringCollection;
+    interface ICOMIISW3CInputContext;
+    interface ICOMIISNCSAInputContext;
+    interface ICOMIISIISInputContext;
+    interface ICOMIISODBCInputContext;
+    interface ICOMIISBINInputContext;
+    interface ICOMIISIISMSIDInputContext;
+    interface ICOMHttpErrorInputContext;
+    interface ICOMEventLogInputContext;
+    interface ICOMURLScanLogInputContext;
+    interface ICOMTextLineInputContext;
+    interface ICOMTextWordInputContext;
+    interface ICOMFileSystemInputContext;
+    interface ICOMCSVInputContext;
+    interface ICOMW3CInputContext;
+    interface ICOMETWInputContext;
+    interface ICOMRegistryInputContext;
+    interface ICOMTSVInputContext;
+    interface ICOMADSInputContext;
+    interface ICOMNetMonInputContext;
+    interface ICOMXMLInputContext;
+    interface ICOMNativeOutputContext;
+    interface ICOMW3COutputContext;
+    interface ICOMIISOutputContext;
+    interface ICOMSQLOutputContext;
+    interface ICOMCSVOutputContext;
+    interface ICOMXMLOutputContext;
+    interface ICOMTemplateOutputContext;
+    interface ICOMDataGridOutputContext;
+    interface ICOMChartOutputContext;
+    interface ICOMSYSLOGOutputContext;
+    interface ICOMTSVOutputContext;
+
+    [
+      uuid(8CFEBA94-3FC2-45CA-B9A5-9EDACF704F66),
+      helpstring("LogQueryClass class")
+    ]
+    coclass LogQueryClass {
+        [default] interface ILogQuery;
+    };
+
+    [
+      odl,
+      uuid(3BDE06BC-89E4-42FD-BE64-832A5F33D7D3),
+      helpstring("Log Parser query"),
+      dual,
+      oleautomation
+    ]
+    interface ILogQuery : IDispatch {
+        [id(0x00000001), helpstring("Executes the SQL query, using the specified Input Format (if specified)")]
+        HRESULT Execute(
+                        [in] BSTR szQuery, 
+                        [in/*, optional, defaultvalue(NULL)*/] IUnknown* pObjectInputContext, 
+                        [out, retval] ILogRecordset** result);
+        [id(0x00000002), helpstring("Executes the SQL query, using the specified Input Format (if specified) and writing the result to the specified Output Format")]
+        HRESULT ExecuteBatch(
+                        [in] BSTR szQuery, 
+                        [in/*, optional, defaultvalue(NULL)*/] IUnknown* pObjectInputContext, 
+                        [in/*, optional, defaultvalue(NULL)*/] IUnknown* pObjectOutputContext, 
+                        [out, retval] VARIANT_BOOL* pbResult);
+        [id(0x60020002), propget, helpstring("Max parsing errors to continue on")]
+        HRESULT maxParseErrors([out, retval] int* maxParseErrors);
+        [id(0x60020002), propput, helpstring("Max parsing errors to continue on")]
+        HRESULT maxParseErrors([in] int maxParseErrors);
+        [id(0x60020004), propget, helpstring("Last error")]
+        HRESULT lastError([out, retval] int* lastError);
+        [id(0x60020005), propget, helpstring("Count of units processed during the last ExecuteBatch")]
+        HRESULT inputUnitsProcessed([out, retval] int* pnInputUnitsProcessed);
+        [id(0x60020006), propget, helpstring("Count of units output during the last ExecuteBatch")]
+        HRESULT outputUnitsProcessed([out, retval] int* pnOutputUnitsProcessed);
+        [id(0x60020007), propget, helpstring("Collection of last error messages")]
+        HRESULT errorMessages([out, retval] ILogStringCollection** ppILogStringCollection);
+        [id(0x60020008), propget, helpstring("Minor version")]
+        HRESULT versionMin([out, retval] int* pnversionMin);
+        [id(0x60020009), propget, helpstring("Major version")]
+        HRESULT versionMaj([out, retval] int* pnversionMaj);
+    };
+
+    [
+      odl,
+      uuid(C9452B1B-093C-4842-ABD1-F81410926874),
+      helpstring("Log Parser Recordset, composed of ILogRecord items"),
+      dual,
+      oleautomation
+    ]
+    interface ILogRecordset : IDispatch {
+        [id(0x00000001), helpstring("Advance to next record")]
+        HRESULT moveNext();
+        [id(0x00000002), helpstring("Return the current record")]
+        HRESULT getRecord([out, retval] ILogRecord** record);
+        [id(0x00000003), helpstring("Indicator of reached end of records")]
+        HRESULT atEnd([out, retval] VARIANT_BOOL* bAtEnd);
+        [id(0x00000004), helpstring("Free the resources associated with this Recordset")]
+        HRESULT close();
+        [id(0x00000005), helpstring("Return the total number of columns in each record")]
+        HRESULT getColumnCount([out, retval] int* nColumnCount);
+        [id(0x00000006), helpstring("Return the name of the column at the specified index")]
+        HRESULT getColumnName(
+                        [in] int index, 
+                        [out, retval] BSTR* columnName);
+        [id(0x00000007), helpstring("Return the type of the column at the specified index")]
+        HRESULT getColumnType(
+                        [in] int index, 
+                        [out, retval] int* columnType);
+        [id(0x60020007), propget, helpstring("Last error")]
+        HRESULT lastError([out, retval] int* lastError);
+        [id(0x60020008), propget, helpstring("Total number of input units processed so far")]
+        HRESULT inputUnitsProcessed([out, retval] int* pnInputUnitsProcessed);
+        [id(0x60020009), propget, helpstring("Collection of last execution error messages")]
+        HRESULT errorMessages([out, retval] ILogStringCollection** ppILogStringCollection);
+        [id(0x6002000a), propget, helpstring("Constant value for STRING column type")]
+        HRESULT STRING_TYPE([out, retval] int* stringType);
+        [id(0x6002000b), propget, helpstring("Constant value for REAL column type")]
+        HRESULT REAL_TYPE([out, retval] int* realType);
+        [id(0x6002000c), propget, helpstring("Constant value for INTEGER column type")]
+        HRESULT INTEGER_TYPE([out, retval] int* integerType);
+        [id(0x6002000d), propget, helpstring("Constant value for TIMESTAMP column type")]
+        HRESULT TIMESTAMP_TYPE([out, retval] int* timestampType);
+        [id(0x6002000e), propget, helpstring("Constant value for NULL column type")]
+        HRESULT NULL_TYPE([out, retval] int* nullType);
+    };
+
+    [
+      odl,
+      uuid(185FFF88-E24A-4984-9621-AA41BEAE8513),
+      helpstring("Log Parser result record, composed of fields"),
+      dual,
+      oleautomation
+    ]
+    interface ILogRecord : IDispatch {
+        [id(0x00000001), helpstring("Retrieves the value at the specified column")]
+        HRESULT getValue(
+                        [in] VARIANT nIndexOrName, 
+                        [out, retval] VARIANT* pVal);
+        [id(0x00000002), helpstring("Returns true if the specified column has a NULL value")]
+        HRESULT isNull(
+                        [in] VARIANT nIndexOrName, 
+                        [out, retval] VARIANT_BOOL* pbIsNull);
+        [id(0x00000003), helpstring("Returns the string representation of the whole record or of a single value")]
+        HRESULT toNativeString(
+                        [in] VARIANT separatorStringOrIndex, 
+                        [out, retval] BSTR* pString);
+        [id(0x00000004), helpstring("Retrieves the value at the specified column")]
+        HRESULT getValueEx(
+                        [in] VARIANT nIndexOrName, 
+                        [out, retval] VARIANT* pVal);
+    };
+
+    [
+      odl,
+      uuid(DA56E00E-E07C-4AB0-954E-0F901E9179A0),
+      helpstring("Log Parser String collection for Error messages and Locale names"),
+      dual,
+      oleautomation
+    ]
+    interface ILogStringCollection : IDispatch {
+        [id(0xfffffffc), propget, restricted]
+        HRESULT _NewEnum([out, retval] IEnumVARIANT** ppIEnumVARIANT);
+    };
+
+    [
+      uuid(6120A3D1-AD55-41F9-ADB0-7266E2623364),
+      helpstring("CCOMIISW3CInputContext class")
+    ]
+    coclass COMIISW3CInputContextClass {
+        [default] interface ICOMIISW3CInputContext;
+    };
+
+    [
+      odl,
+      uuid(CC00A85E-22A3-4E73-8FA8-088EE78B1DC5),
+      helpstring("IIS W3C Extended Input Format"),
+      dual,
+      oleautomation
+    ]
+    interface ICOMIISW3CInputContext : IDispatch {
+        [id(0x60020000), propget, helpstring("Alias for the iCodepage property")]
+        HRESULT codepage([out, retval] int* pncodepage);
+        [id(0x60020000), propput, helpstring("Alias for the iCodepage property")]
+        HRESULT codepage([in] int pncodepage);
+        [id(0x60020002), propget, helpstring("File codepage")]
+        HRESULT iCodepage([out, retval] int* pncodepage);
+        [id(0x60020002), propput, helpstring("File codepage")]
+        HRESULT iCodepage([in] int pncodepage);
+        [id(0x60020004), propget, helpstring("Max subdirectory recursion level")]
+        HRESULT recurse([out, retval] int* pnrecurse);
+        [id(0x60020004), propput, helpstring("Max subdirectory recursion level")]
+        HRESULT recurse([in] int pnrecurse);
+        [id(0x60020006), propget, helpstring("Alias for the dQuotes property")]
+        HRESULT useDoubleQuotes([out, retval] VARIANT_BOOL* pbuseDoubleQuotes);
+        [id(0x60020006), propput, helpstring("Alias for the dQuotes property")]
+        HRESULT useDoubleQuotes([in] VARIANT_BOOL pbuseDoubleQuotes);
+        [id(0x60020008), propget, helpstring("String values are double-quoted")]
+        HRESULT dQuotes([out, retval] VARIANT_BOOL* pbuseDoubleQuotes);
+        [id(0x60020008), propput, helpstring("String values are double-quoted")]
+        HRESULT dQuotes([in] VARIANT_BOOL pbuseDoubleQuotes);
+        [id(0x6002000a), propget, helpstring("Alias for the dirTime property")]
+        HRESULT useDirectiveDateTime([out, retval] VARIANT_BOOL* pbuseDirectiveDateTime);
+        [id(0x6002000a), propput, helpstring("Alias for the dirTime property")]
+        HRESULT useDirectiveDateTime([in] VARIANT_BOOL pbuseDirectiveDateTime);
+        [id(0x6002000c), propget, helpstring("Use the directive timestamp when date and time are not logged")]
+        HRESULT dirTime([out, retval] VARIANT_BOOL* pbuseDirectiveDateTime);
+        [id(0x6002000c), propput, helpstring("Use the directive timestamp when date and time are not logged")]
+        HRESULT dirTime([in] VARIANT_BOOL pbuseDirectiveDateTime);
+        [id(0x6002000e), propget, helpstring("Consolidate multiple logs")]
+        HRESULT consolidateLogs([out, retval] VARIANT_BOOL* pbconsolidateLogs);
+        [id(0x6002000e), propput, helpstring("Consolidate multiple logs")]
+        HRESULT consolidateLogs([in] VARIANT_BOOL pbconsolidateLogs);
+        [id(0x60020010), propget, helpstring("Checkpoint file")]
+        HRESULT iCheckpoint([out, retval] BSTR* psziCheckpoint);
+        [id(0x60020010), propput, helpstring("Checkpoint file")]
+        HRESULT iCheckpoint([in] BSTR psziCheckpoint);
+        [id(0x60020012), propget, helpstring("Minimum file last modified date")]
+        HRESULT minDateMod([out, retval] BSTR* pszminDateMod);
+        [id(0x60020012), propput, helpstring("Minimum file last modified date")]
+        HRESULT minDateMod([in] BSTR pszminDateMod);
+    };
+
+    [
+      uuid(C13EDD32-5280-4F40-B002-A21F05219371),
+      helpstring("CCOMIISNCSAInputContext class")
+    ]
+    coclass COMIISNCSAInputContextClass {
+        [default] interface ICOMIISNCSAInputContext;
+    };
+
+    [
+      odl,
+      uuid(C0B28DCB-F1D8-48A3-B4F4-FC28BEBA5EBA),
+      helpstring("IIS NCSA Common Input Format"),
+      dual,
+      oleautomation
+    ]
+    interface ICOMIISNCSAInputContext : IDispatch {
+        [id(0x60020000), propget, helpstring("Alias for the iCodepage property")]
+        HRESULT codepage([out, retval] int* pncodepage);
+        [id(0x60020000), propput, helpstring("Alias for the iCodepage property")]
+        HRESULT codepage([in] int pncodepage);
+        [id(0x60020002), propget, helpstring("File codepage")]
+        HRESULT iCodepage([out, retval] int* pncodepage);
+        [id(0x60020002), propput, helpstring("File codepage")]
+        HRESULT iCodepage([in] int pncodepage);
+        [id(0x60020004), propget, helpstring("Max subdirectory recursion level")]
+        HRESULT recurse([out, retval] int* pnrecurse);
+        [id(0x60020004), propput, helpstring("Max subdirectory recursion level")]
+        HRESULT recurse([in] int pnrecurse);
+        [id(0x60020006), propget, helpstring("Checkpoint file")]
+        HRESULT iCheckpoint([out, retval] BSTR* psziCheckpoint);
+        [id(0x60020006), propput, helpstring("Checkpoint file")]
+        HRESULT iCheckpoint([in] BSTR psziCheckpoint);
+        [id(0x60020008), propget, helpstring("Minimum file last modified date")]
+        HRESULT minDateMod([out, retval] BSTR* pszminDateMod);
+        [id(0x60020008), propput, helpstring("Minimum file last modified date")]
+        HRESULT minDateMod([in] BSTR pszminDateMod);
+    };
+
+    [
+      uuid(252A24E7-067F-4875-8510-7533F8B6915E),
+      helpstring("CCOMIISIISInputContext class")
+    ]
+    coclass COMIISIISInputContextClass {
+        [default] interface ICOMIISIISInputContext;
+    };
+
+    [
+      odl,
+      uuid(CB6A017F-69ED-48D2-8ED7-42B1BCB80844),
+      helpstring("Microsoft IIS Input Format"),
+      dual,
+      oleautomation
+    ]
+    interface ICOMIISIISInputContext : IDispatch {
+        [id(0x60020000), propget, helpstring("Alias for the iCodepage property")]
+        HRESULT codepage([out, retval] int* pncodepage);
+        [id(0x60020000), propput, helpstring("Alias for the iCodepage property")]
+        HRESULT codepage([in] int pncodepage);
+        [id(0x60020002), propget, helpstring("File codepage")]
+        HRESULT iCodepage([out, retval] int* pncodepage);
+        [id(0x60020002), propput, helpstring("File codepage")]
+        HRESULT iCodepage([in] int pncodepage);
+        [id(0x60020004), propget, helpstring("Max subdirectory recursion level")]
+        HRESULT recurse([out, retval] int* pnrecurse);
+        [id(0x60020004), propput, helpstring("Max subdirectory recursion level")]
+        HRESULT recurse([in] int pnrecurse);
+        [id(0x60020006), propget, helpstring("Original locale identifier")]
+        HRESULT locale([out, retval] BSTR* pszlocale);
+        [id(0x60020006), propput, helpstring("Original locale identifier")]
+        HRESULT locale([in] BSTR pszlocale);
+        [id(0x60020008), propget, helpstring("Checkpoint file")]
+        HRESULT iCheckpoint([out, retval] BSTR* psziCheckpoint);
+        [id(0x60020008), propput, helpstring("Checkpoint file")]
+        HRESULT iCheckpoint([in] BSTR psziCheckpoint);
+        [id(0x6002000a), propget, helpstring("Minimum file last modified date")]
+        HRESULT minDateMod([out, retval] BSTR* pszminDateMod);
+        [id(0x6002000a), propput, helpstring("Minimum file last modified date")]
+        HRESULT minDateMod([in] BSTR pszminDateMod);
+    };
+
+    [
+      uuid(B331653F-522E-4FBD-BEA2-D47ED26DA8CC),
+      helpstring("CCOMIISODBCInputContext class")
+    ]
+    coclass COMIISODBCInputContextClass {
+        [default] interface ICOMIISODBCInputContext;
+    };
+
+    [
+      odl,
+      uuid(ADE25553-5361-44BA-9270-31B08B4A8D6F),
+      helpstring("IIS ODBC Log Input Format"),
+      dual,
+      oleautomation
+    ]
+    interface ICOMIISODBCInputContext : IDispatch {
+    };
+
+    [
+      uuid(A5BFDB31-5D80-4496-AF9C-79549E2F7BEC),
+      helpstring("CCOMIISBINInputContext class")
+    ]
+    coclass COMIISBINInputContextClass {
+        [default] interface ICOMIISBINInputContext;
+    };
+
+    [
+      odl,
+      uuid(F0FF3746-6CA6-4AB6-AE64-79A26FA82950),
+      helpstring("IIS Binary Log Input Format"),
+      dual,
+      oleautomation
+    ]
+    interface ICOMIISBINInputContext : IDispatch {
+    };
+
+    [
+      uuid(4E1AD8B6-39B6-4802-90EF-B5D86774D815),
+      helpstring("CCOMIISIISMSIDInputContext class")
+    ]
+    coclass COMIISIISMSIDInputContextClass {
+        [default] interface ICOMIISIISMSIDInputContext;
+    };
+
+    [
+      odl,
+      uuid(55FCA9B8-56BB-479C-92C7-388011A6E45B),
+      helpstring("Microsoft IIS Input Format with MSID Filter"),
+      dual,
+      oleautomation
+    ]
+    interface ICOMIISIISMSIDInputContext : IDispatch {
+        [id(0x60020000), propget, helpstring("Alias for the iCodepage property")]
+        HRESULT codepage([out, retval] int* pncodepage);
+        [id(0x60020000), propput, helpstring("Alias for the iCodepage property")]
+        HRESULT codepage([in] int pncodepage);
+        [id(0x60020002), propget, helpstring("File codepage")]
+        HRESULT iCodepage([out, retval] int* pncodepage);
+        [id(0x60020002), propput, helpstring("File codepage")]
+        HRESULT iCodepage([in] int pncodepage);
+        [id(0x60020004), propget, helpstring("Max subdirectory recursion level")]
+        HRESULT recurse([out, retval] int* pnrecurse);
+        [id(0x60020004), propput, helpstring("Max subdirectory recursion level")]
+        HRESULT recurse([in] int pnrecurse);
+        [id(0x60020006), propget, helpstring("Original locale identifier")]
+        HRESULT locale([out, retval] BSTR* pszlocale);
+        [id(0x60020006), propput, helpstring("Original locale identifier")]
+        HRESULT locale([in] BSTR pszlocale);
+        [id(0x60020008), propget, helpstring("Property cLogFilt - deprecated")]
+        HRESULT cLogFilt([out, retval] VARIANT_BOOL* pbcLogFilt);
+        [id(0x60020008), propput, helpstring("Property cLogFilt - deprecated")]
+        HRESULT cLogFilt([in] VARIANT_BOOL pbcLogFilt);
+        [id(0x6002000a), propget, helpstring("Field mode")]
+        HRESULT fMode([out, retval] BSTR* pbszfieldMode);
+        [id(0x6002000a), propput, helpstring("Field mode")]
+        HRESULT fMode([in] BSTR pbszfieldMode);
+        [id(0x6002000c), propget, helpstring("Checkpoint file")]
+        HRESULT iCheckpoint([out, retval] BSTR* psziCheckpoint);
+        [id(0x6002000c), propput, helpstring("Checkpoint file")]
+        HRESULT iCheckpoint([in] BSTR psziCheckpoint);
+        [id(0x6002000e), propget, helpstring("Minimum file last modified date")]
+        HRESULT minDateMod([out, retval] BSTR* pszminDateMod);
+        [id(0x6002000e), propput, helpstring("Minimum file last modified date")]
+        HRESULT minDateMod([in] BSTR pszminDateMod);
+    };
+
+    [
+      uuid(F6751CB0-4CE6-4033-A489-5CC2D8C9D716),
+      helpstring("CCOMHttpErrorInputContext class")
+    ]
+    coclass COMHttpErrorInputContextClass {
+        [default] interface ICOMHttpErrorInputContext;
+    };
+
+    [
+      odl,
+      uuid(3A698D1E-D6AE-46B0-B9F5-FA1C6F9092F4),
+      helpstring("HttpError Log Input Format"),
+      dual,
+      oleautomation
+    ]
+    interface ICOMHttpErrorInputContext : IDispatch {
+        [id(0x60020000), propget, helpstring("Use the directive timestamp when date and time are not logged")]
+        HRESULT dirTime([out, retval] VARIANT_BOOL* pbuseDirectiveDateTime);
+        [id(0x60020000), propput, helpstring("Use the directive timestamp when date and time are not logged")]
+        HRESULT dirTime([in] VARIANT_BOOL pbuseDirectiveDateTime);
+        [id(0x60020002), propget, helpstring("Alias for the iCodepage property")]
+        HRESULT codepage([out, retval] int* pncodepage);
+        [id(0x60020002), propput, helpstring("Alias for the iCodepage property")]
+        HRESULT codepage([in] int pncodepage);
+        [id(0x60020004), propget, helpstring("File codepage")]
+        HRESULT iCodepage([out, retval] int* pncodepage);
+        [id(0x60020004), propput, helpstring("File codepage")]
+        HRESULT iCodepage([in] int pncodepage);
+        [id(0x60020006), propget, helpstring("Checkpoint file")]
+        HRESULT iCheckpoint([out, retval] BSTR* psziCheckpoint);
+        [id(0x60020006), propput, helpstring("Checkpoint file")]
+        HRESULT iCheckpoint([in] BSTR psziCheckpoint);
+        [id(0x60020008), propget, helpstring("Minimum file last modified date")]
+        HRESULT minDateMod([out, retval] BSTR* pszminDateMod);
+        [id(0x60020008), propput, helpstring("Minimum file last modified date")]
+        HRESULT minDateMod([in] BSTR pszminDateMod);
+    };
+
+    [
+      uuid(9BE3E5B2-BBC3-40BB-AAFE-C94DDA631D32),
+      helpstring("CCOMEventLogInputContext class")
+    ]
+    coclass COMEventLogInputContextClass {
+        [default] interface ICOMEventLogInputContext;
+    };
+
+    [
+      odl,
+      uuid(1D8AD32F-4DF0-41A7-AD76-8B3345EB1144),
+      helpstring("Event Log Input Format"),
+      dual,
+      oleautomation
+    ]
+    interface ICOMEventLogInputContext : IDispatch {
+        [id(0x60020000), propget, helpstring("Retrieve the full text message")]
+        HRESULT fullText([out, retval] VARIANT_BOOL* pbfullText);
+        [id(0x60020000), propput, helpstring("Retrieve the full text message")]
+        HRESULT fullText([in] VARIANT_BOOL pbfullText);
+        [id(0x60020002), propget, helpstring("Resolve SID values")]
+        HRESULT resolveSIDs([out, retval] VARIANT_BOOL* pbresolveSIDs);
+        [id(0x60020002), propput, helpstring("Resolve SID values")]
+        HRESULT resolveSIDs([in] VARIANT_BOOL pbresolveSIDs);
+        [id(0x60020004), propget, helpstring("Alias for the formatMsg property")]
+        HRESULT formatMessage([out, retval] VARIANT_BOOL* pbformatMessage);
+        [id(0x60020004), propput, helpstring("Alias for the formatMsg property")]
+        HRESULT formatMessage([in] VARIANT_BOOL pbformatMessage);
+        [id(0x60020006), propget, helpstring("Format message")]
+        HRESULT formatMsg([out, retval] VARIANT_BOOL* pbformatMessage);
+        [id(0x60020006), propput, helpstring("Format message")]
+        HRESULT formatMsg([in] VARIANT_BOOL pbformatMessage);
+        [id(0x60020008), propget, helpstring("Alias for the msgErrorMode property - deprecated")]
+        HRESULT ignoreMessageErrors([out, retval] VARIANT_BOOL* pbignoreMessageErrors);
+        [id(0x60020008), propput, helpstring("Alias for the msgErrorMode property - deprecated")]
+        HRESULT ignoreMessageErrors([in] VARIANT_BOOL pbignoreMessageErrors);
+        [id(0x6002000a), propget, helpstring("Behavior when event messages or event category names cannot be resolved")]
+        HRESULT msgErrorMode([out, retval] BSTR* pbszmsgErrorMode);
+        [id(0x6002000a), propput, helpstring("Behavior when event messages or event category names cannot be resolved")]
+        HRESULT msgErrorMode([in] BSTR pbszmsgErrorMode);
+        [id(0x6002000c), propget, helpstring("Return full event code")]
+        HRESULT fullEventCode([out, retval] VARIANT_BOOL* pbfullEventCode);
+        [id(0x6002000c), propput, helpstring("Return full event code")]
+        HRESULT fullEventCode([in] VARIANT_BOOL pbfullEventCode);
+        [id(0x6002000e), propget, helpstring("Read direction")]
+        HRESULT direction([out, retval] BSTR* pszDirection);
+        [id(0x6002000e), propput, helpstring("Read direction")]
+        HRESULT direction([in] BSTR pszDirection);
+        [id(0x60020010), propget, helpstring("Separator between values of the Strings field")]
+        HRESULT stringsSep([out, retval] BSTR* pszstringsSep);
+        [id(0x60020010), propput, helpstring("Separator between values of the Strings field")]
+        HRESULT stringsSep([in] BSTR pszstringsSep);
+        [id(0x60020012), propget, helpstring("Checkpoint file")]
+        HRESULT iCheckpoint([out, retval] BSTR* psziCheckpoint);
+        [id(0x60020012), propput, helpstring("Checkpoint file")]
+        HRESULT iCheckpoint([in] BSTR psziCheckpoint);
+        [id(0x60020014), propget, helpstring("Format of the binary Data field")]
+        HRESULT binaryFormat([out, retval] BSTR* pszbinaryFormat);
+        [id(0x60020014), propput, helpstring("Format of the binary Data field")]
+        HRESULT binaryFormat([in] BSTR pszbinaryFormat);
+    };
+
+    [
+      uuid(9A6E2BE0-96E4-4985-87AF-BDC668EA15A5),
+      helpstring("CCOMURLScanLogInputContext class")
+    ]
+    coclass COMURLScanLogInputContextClass {
+        [default] interface ICOMURLScanLogInputContext;
+    };
+
+    [
+      odl,
+      uuid(9EBC373B-4E35-455A-8611-8A9ECE6689F5),
+      helpstring("URLScan Log Input Format"),
+      dual,
+      oleautomation
+    ]
+    interface ICOMURLScanLogInputContext : IDispatch {
+        [id(0x60020000), propget, helpstring("Checkpoint file")]
+        HRESULT iCheckpoint([out, retval] BSTR* psziCheckpoint);
+        [id(0x60020000), propput, helpstring("Checkpoint file")]
+        HRESULT iCheckpoint([in] BSTR psziCheckpoint);
+    };
+
+    [
+      uuid(E17FE5B0-C2BC-4C97-8EBF-8EF2F763FCA8),
+      helpstring("CCOMTextLineInputContext class")
+    ]
+    coclass COMTextLineInputContextClass {
+        [default] interface ICOMTextLineInputContext;
+    };
+
+    [
+      odl,
+      uuid(AF3F77B5-028D-4DE3-BDE7-8D84C30573C0),
+      helpstring("Line-by-Line Text File"),
+      dual,
+      oleautomation
+    ]
+    interface ICOMTextLineInputContext : IDispatch {
+        [id(0x60020000), propget, helpstring("Alias for the iCodepage property")]
+        HRESULT codepage([out, retval] int* pncodepage);
+        [id(0x60020000), propput, helpstring("Alias for the iCodepage property")]
+        HRESULT codepage([in] int pncodepage);
+        [id(0x60020002), propget, helpstring("File codepage")]
+        HRESULT iCodepage([out, retval] int* pncodepage);
+        [id(0x60020002), propput, helpstring("File codepage")]
+        HRESULT iCodepage([in] int pncodepage);
+        [id(0x60020004), propget, helpstring("Max subdirectory recursion level")]
+        HRESULT recurse([out, retval] int* pnrecurse);
+        [id(0x60020004), propput, helpstring("Max subdirectory recursion level")]
+        HRESULT recurse([in] int pnrecurse);
+        [id(0x60020006), propget, helpstring("Split lines longer than maximum allowed")]
+        HRESULT splitLongLines([out, retval] VARIANT_BOOL* pbsplitLongLines);
+        [id(0x60020006), propput, helpstring("Split lines longer than maximum allowed")]
+        HRESULT splitLongLines([in] VARIANT_BOOL pbsplitLongLines);
+        [id(0x60020008), propget, helpstring("Checkpoint file")]
+        HRESULT iCheckpoint([out, retval] BSTR* psziCheckpoint);
+        [id(0x60020008), propput, helpstring("Checkpoint file")]
+        HRESULT iCheckpoint([in] BSTR psziCheckpoint);
+    };
+
+    [
+      uuid(0A402C88-0CEB-42C6-A15B-32AA45052706),
+      helpstring("CCOMTextWordInputContext class")
+    ]
+    coclass COMTextWordInputContextClass {
+        [default] interface ICOMTextWordInputContext;
+    };
+
+    [
+      odl,
+      uuid(BCE40C1E-DEE2-477A-B479-7E817D5446F3),
+      helpstring("Word-by-Word Text File"),
+      dual,
+      oleautomation
+    ]
+    interface ICOMTextWordInputContext : IDispatch {
+        [id(0x60020000), propget, helpstring("Alias for the iCodepage property")]
+        HRESULT codepage([out, retval] int* pncodepage);
+        [id(0x60020000), propput, helpstring("Alias for the iCodepage property")]
+        HRESULT codepage([in] int pncodepage);
+        [id(0x60020002), propget, helpstring("File codepage")]
+        HRESULT iCodepage([out, retval] int* pncodepage);
+        [id(0x60020002), propput, helpstring("File codepage")]
+        HRESULT iCodepage([in] int pncodepage);
+        [id(0x60020004), propget, helpstring("Max subdirectory recursion level")]
+        HRESULT recurse([out, retval] int* pnrecurse);
+        [id(0x60020004), propput, helpstring("Max subdirectory recursion level")]
+        HRESULT recurse([in] int pnrecurse);
+        [id(0x60020006), propget, helpstring("Checkpoint file")]
+        HRESULT iCheckpoint([out, retval] BSTR* psziCheckpoint);
+        [id(0x60020006), propput, helpstring("Checkpoint file")]
+        HRESULT iCheckpoint([in] BSTR psziCheckpoint);
+    };
+
+    [
+      uuid(BA8BAB06-715C-49F5-A94F-3E70B1CE38C6),
+      helpstring("CCOMFileSystemInputContext class")
+    ]
+    coclass COMFileSystemInputContextClass {
+        [default] interface ICOMFileSystemInputContext;
+    };
+
+    [
+      odl,
+      uuid(76DDDBC5-5DFF-4A2B-9E09-4E1C26C6A938),
+      helpstring("Files Information"),
+      dual,
+      oleautomation
+    ]
+    interface ICOMFileSystemInputContext : IDispatch {
+        [id(0x60020000), propget, helpstring("Max subdirectory recursion level")]
+        HRESULT recurse([out, retval] int* pnrecurse);
+        [id(0x60020000), propput, helpstring("Max subdirectory recursion level")]
+        HRESULT recurse([in] int pnrecurse);
+        [id(0x60020002), propget, helpstring("Preserve last access times for files")]
+        HRESULT preserveLastAccTime([out, retval] VARIANT_BOOL* pbpreserveLastAccTime);
+        [id(0x60020002), propput, helpstring("Preserve last access times for files")]
+        HRESULT preserveLastAccTime([in] VARIANT_BOOL pbpreserveLastAccTime);
+        [id(0x60020004), propget, helpstring("Use local time for timestamp fields")]
+        HRESULT useLocalTime([out, retval] VARIANT_BOOL* pbuseLocalTime);
+        [id(0x60020004), propput, helpstring("Use local time for timestamp fields")]
+        HRESULT useLocalTime([in] VARIANT_BOOL pbuseLocalTime);
+    };
+
+    [
+      uuid(4A1AAA95-FD08-449B-BD16-E87083D8F087),
+      helpstring("CCOMCSVInputContext class")
+    ]
+    coclass COMCSVInputContextClass {
+        [default] interface ICOMCSVInputContext;
+    };
+
+    [
+      odl,
+      uuid(80206B7F-6424-41FA-984C-7DBD92CE0C48),
+      helpstring("CSV Input Format"),
+      dual,
+      oleautomation
+    ]
+    interface ICOMCSVInputContext : IDispatch {
+        [id(0x60020000), propget, helpstring("File contains a header line declaring field names")]
+        HRESULT headerRow([out, retval] VARIANT_BOOL* pbheaderRow);
+        [id(0x60020000), propput, helpstring("File contains a header line declaring field names")]
+        HRESULT headerRow([in] VARIANT_BOOL pbheaderRow);
+        [id(0x60020002), propget, helpstring("Alias for the iHeaderFile property")]
+        HRESULT headerFile([out, retval] BSTR* pszheaderFile);
+        [id(0x60020002), propput, helpstring("Alias for the iHeaderFile property")]
+        HRESULT headerFile([in] BSTR pszheaderFile);
+        [id(0x60020004), propget, helpstring("File containing a separate header line declaring field names")]
+        HRESULT iHeaderFile([out, retval] BSTR* pszheaderFile);
+        [id(0x60020004), propput, helpstring("File containing a separate header line declaring field names")]
+        HRESULT iHeaderFile([in] BSTR pszheaderFile);
+        [id(0x60020006), propget, helpstring("Behavior with quoted fields")]
+        HRESULT iDQuotes([out, retval] BSTR* psziDQuotes);
+        [id(0x60020006), propput, helpstring("Behavior with quoted fields")]
+        HRESULT iDQuotes([in] BSTR psziDQuotes);
+        [id(0x60020008), propget, helpstring("Each line contains a fixed number of fields")]
+        HRESULT fixedFields([out, retval] VARIANT_BOOL* pbfixedFields);
+        [id(0x60020008), propput, helpstring("Each line contains a fixed number of fields")]
+        HRESULT fixedFields([in] VARIANT_BOOL pbfixedFields);
+        [id(0x6002000a), propget, helpstring("Number of fields in each line")]
+        HRESULT nFields([out, retval] int* pnnFields);
+        [id(0x6002000a), propput, helpstring("Number of fields in each line")]
+        HRESULT nFields([in] int pnnFields);
+        [id(0x6002000c), propget, helpstring("Alias for the dtLines property")]
+        HRESULT detectTypesLines([out, retval] int* pndetectTypesLines);
+        [id(0x6002000c), propput, helpstring("Alias for the dtLines property")]
+        HRESULT detectTypesLines([in] int pndetectTypesLines);
+        [id(0x6002000e), propget, helpstring("Number of lines to parse to detect field types")]
+        HRESULT dtLines([out, retval] int* pndetectTypesLines);
+        [id(0x6002000e), propput, helpstring("Number of lines to parse to detect field types")]
+        HRESULT dtLines([in] int pndetectTypesLines);
+        [id(0x60020010), propget, helpstring("Number of initial lines to skip")]
+        HRESULT nSkipLines([out, retval] int* pnSkipLines);
+        [id(0x60020010), propput, helpstring("Number of initial lines to skip")]
+        HRESULT nSkipLines([in] int pnSkipLines);
+        [id(0x60020012), propget, helpstring("Prefix of lines to exclude")]
+        HRESULT comment([out, retval] BSTR* pszComment);
+        [id(0x60020012), propput, helpstring("Prefix of lines to exclude")]
+        HRESULT comment([in] BSTR pszComment);
+        [id(0x60020014), propget, helpstring("Alias for the iCodepage property")]
+        HRESULT codepage([out, retval] int* pncodepage);
+        [id(0x60020014), propput, helpstring("Alias for the iCodepage property")]
+        HRESULT codepage([in] int pncodepage);
+        [id(0x60020016), propget, helpstring("File codepage")]
+        HRESULT iCodepage([out, retval] int* pncodepage);
+        [id(0x60020016), propput, helpstring("File codepage")]
+        HRESULT iCodepage([in] int pncodepage);
+        [id(0x60020018), propget, helpstring("Alias for the iTsFormat property")]
+        HRESULT timestampFormat([out, retval] BSTR* psztimestampFormat);
+        [id(0x60020018), propput, helpstring("Alias for the iTsFormat property")]
+        HRESULT timestampFormat([in] BSTR psztimestampFormat);
+        [id(0x6002001a), propget, helpstring("Format of TIMESTAMP fields")]
+        HRESULT iTsFormat([out, retval] BSTR* psztimestampFormat);
+        [id(0x6002001a), propput, helpstring("Format of TIMESTAMP fields")]
+        HRESULT iTsFormat([in] BSTR psztimestampFormat);
+        [id(0x6002001c), propget, helpstring("Checkpoint file")]
+        HRESULT iCheckpoint([out, retval] BSTR* psziCheckpoint);
+        [id(0x6002001c), propput, helpstring("Checkpoint file")]
+        HRESULT iCheckpoint([in] BSTR psziCheckpoint);
+    };
+
+    [
+      uuid(3ED0372B-4117-4CA3-A638-EF9BF3720248),
+      helpstring("CCOMW3CInputContext class")
+    ]
+    coclass COMW3CInputContextClass {
+        [default] interface ICOMW3CInputContext;
+    };
+
+    [
+      odl,
+      uuid(6642B90C-5D0B-4547-A67D-C844746E7C1C),
+      helpstring("W3C Input Format"),
+      dual,
+      oleautomation
+    ]
+    interface ICOMW3CInputContext : IDispatch {
+        [id(0x60020000), propget, helpstring("Alias for the iCodepage property")]
+        HRESULT codepage([out, retval] int* pncodepage);
+        [id(0x60020000), propput, helpstring("Alias for the iCodepage property")]
+        HRESULT codepage([in] int pncodepage);
+        [id(0x60020002), propget, helpstring("File codepage")]
+        HRESULT iCodepage([out, retval] int* pncodepage);
+        [id(0x60020002), propput, helpstring("File codepage")]
+        HRESULT iCodepage([in] int pncodepage);
+        [id(0x60020004), propget, helpstring("Alias for the dtLines property")]
+        HRESULT detectTypesLines([out, retval] int* pndetectTypesLines);
+        [id(0x60020004), propput, helpstring("Alias for the dtLines property")]
+        HRESULT detectTypesLines([in] int pndetectTypesLines);
+        [id(0x60020006), propget, helpstring("Number of lines to parse to detect field types")]
+        HRESULT dtLines([out, retval] int* pndetectTypesLines);
+        [id(0x60020006), propput, helpstring("Number of lines to parse to detect field types")]
+        HRESULT dtLines([in] int pndetectTypesLines);
+        [id(0x60020008), propget, helpstring("Alias for the dQuotes property")]
+        HRESULT doubleQuotedStrings([out, retval] VARIANT_BOOL* pbdoubleQuotedStrings);
+        [id(0x60020008), propput, helpstring("Alias for the dQuotes property")]
+        HRESULT doubleQuotedStrings([in] VARIANT_BOOL pbdoubleQuotedStrings);
+        [id(0x6002000a), propget, helpstring("String values are double-quoted")]
+        HRESULT dQuotes([out, retval] VARIANT_BOOL* pbdoubleQuotedStrings);
+        [id(0x6002000a), propput, helpstring("String values are double-quoted")]
+        HRESULT dQuotes([in] VARIANT_BOOL pbdoubleQuotedStrings);
+        [id(0x6002000c), propget, helpstring("Separator character between fields")]
+        HRESULT separator([out, retval] BSTR* pszseparator);
+        [id(0x6002000c), propput, helpstring("Separator character between fields")]
+        HRESULT separator([in] BSTR pszseparator);
+    };
+
+    [
+      uuid(3B942793-EEB0-41B8-BF12-4CD3EDDC9205),
+      helpstring("CCOMETWInputContext class")
+    ]
+    coclass COMETWInputContextClass {
+        [default] interface ICOMETWInputContext;
+    };
+
+    [
+      odl,
+      uuid(B53E5AF6-3D61-42B1-8F65-4F4F7368EC59),
+      helpstring("ETW Input Format"),
+      dual,
+      oleautomation
+    ]
+    interface ICOMETWInputContext : IDispatch {
+        [id(0x60020000), propget, helpstring("List of provider names or GUIDs")]
+        HRESULT providers([out, retval] BSTR* pszpf);
+        [id(0x60020000), propput, helpstring("List of provider names or GUIDs")]
+        HRESULT providers([in] BSTR pszpf);
+        [id(0x60020002), propget, helpstring("Number of events to parse from a log to detect providers")]
+        HRESULT dtEventsLog([out, retval] int* pndtEventsLog);
+        [id(0x60020002), propput, helpstring("Number of events to parse from a log to detect providers")]
+        HRESULT dtEventsLog([in] int pndtEventsLog);
+        [id(0x60020004), propget, helpstring("Number of events to parse from a live session to detect providers")]
+        HRESULT dtEventsLive([out, retval] int* pndtEventsLive);
+        [id(0x60020004), propput, helpstring("Number of events to parse from a live session to detect providers")]
+        HRESULT dtEventsLive([in] int pndtEventsLive);
+        [id(0x60020006), propget, helpstring("Number of milliseconds between live session flushes")]
+        HRESULT flushPeriod([out, retval] int* pnflushPeriod);
+        [id(0x60020006), propput, helpstring("Number of milliseconds between live session flushes")]
+        HRESULT flushPeriod([in] int pnflushPeriod);
+        [id(0x60020008), propget, helpstring("Ignore EventTrace events")]
+        HRESULT ignoreEventTrace([out, retval] VARIANT_BOOL* pbignoreEventTraceEvents);
+        [id(0x60020008), propput, helpstring("Ignore EventTrace events")]
+        HRESULT ignoreEventTrace([in] VARIANT_BOOL pbignoreEventTraceEvents);
+        [id(0x6002000a), propget, helpstring("Field mode")]
+        HRESULT fMode([out, retval] BSTR* pszfMode);
+        [id(0x6002000a), propput, helpstring("Field mode")]
+        HRESULT fMode([in] BSTR pszfMode);
+        [id(0x6002000c), propget, helpstring("Field separator in compact mode")]
+        HRESULT compactModeSep([out, retval] BSTR* pszcompactModeSep);
+        [id(0x6002000c), propput, helpstring("Field separator in compact mode")]
+        HRESULT compactModeSep([in] BSTR pszcompactModeSep);
+        [id(0x6002000e), propget, helpstring("Expand enumeration fields")]
+        HRESULT expandEnums([out, retval] VARIANT_BOOL* pbExpandEnums);
+        [id(0x6002000e), propput, helpstring("Expand enumeration fields")]
+        HRESULT expandEnums([in] VARIANT_BOOL pbExpandEnums);
+        [id(0x60020010), propget, helpstring("Ignore lost events")]
+        HRESULT ignoreLostEvents([out, retval] VARIANT_BOOL* pbignoreLostEvents);
+        [id(0x60020010), propput, helpstring("Ignore lost events")]
+        HRESULT ignoreLostEvents([in] VARIANT_BOOL pbignoreLostEvents);
+        [id(0x60020012), propget, helpstring("Name of computer with event schema information")]
+        HRESULT schemaServer([out, retval] BSTR* pszschemaServer);
+        [id(0x60020012), propput, helpstring("Name of computer with event schema information")]
+        HRESULT schemaServer([in] BSTR pszschemaServer);
+    };
+
+    [
+      uuid(C17BDE3A-CDBD-45E0-9BCF-FD286A344EE8),
+      helpstring("CCOMRegistryInputContext class")
+    ]
+    coclass COMRegistryInputContextClass {
+        [default] interface ICOMRegistryInputContext;
+    };
+
+    [
+      odl,
+      uuid(09631558-6E49-4D0D-927F-628BA883CB1D),
+      helpstring("Registry Information"),
+      dual,
+      oleautomation
+    ]
+    interface ICOMRegistryInputContext : IDispatch {
+        [id(0x60020000), propget, helpstring("Recurse level for subkeys")]
+        HRESULT recurse([out, retval] int* pnrecurse);
+        [id(0x60020000), propput, helpstring("Recurse level for subkeys")]
+        HRESULT recurse([in] int pnrecurse);
+        [id(0x60020002), propget, helpstring("MultiSZ values separator")]
+        HRESULT multiSZSep([out, retval] BSTR* pszmultiSZSep);
+        [id(0x60020002), propput, helpstring("MultiSZ values separator")]
+        HRESULT multiSZSep([in] BSTR pszmultiSZSep);
+        [id(0x60020004), propget, helpstring("Format of binary data")]
+        HRESULT binaryFormat([out, retval] BSTR* pszbinaryFormat);
+        [id(0x60020004), propput, helpstring("Format of binary data")]
+        HRESULT binaryFormat([in] BSTR pszbinaryFormat);
+    };
+
+    [
+      uuid(FFB760AB-4ACA-4070-99D5-194D9272B47D),
+      helpstring("CCOMTSVInputContext class")
+    ]
+    coclass COMTSVInputContextClass {
+        [default] interface ICOMTSVInputContext;
+    };
+
+    [
+      odl,
+      uuid(84C54BEB-D3C1-4E89-A868-F6F40B184D68),
+      helpstring("TSV Input Format"),
+      dual,
+      oleautomation
+    ]
+    interface ICOMTSVInputContext : IDispatch {
+        [id(0x60020000), propget, helpstring("Alias for the nSep property")]
+        HRESULT nSeparators([out, retval] int* pnSep);
+        [id(0x60020000), propput, helpstring("Alias for the nSep property")]
+        HRESULT nSeparators([in] int pnSep);
+        [id(0x60020002), propget, helpstring("Number of separators between fields")]
+        HRESULT nSep([out, retval] int* pnSep);
+        [id(0x60020002), propput, helpstring("Number of separators between fields")]
+        HRESULT nSep([in] int pnSep);
+        [id(0x60020004), propget, helpstring("Fixed number of separators")]
+        HRESULT fixedSep([out, retval] VARIANT_BOOL* pbfixedSep);
+        [id(0x60020004), propput, helpstring("Fixed number of separators")]
+        HRESULT fixedSep([in] VARIANT_BOOL pbfixedSep);
+        [id(0x60020006), propget, helpstring("Alias for the iCodepage property")]
+        HRESULT codepage([out, retval] int* pncodepage);
+        [id(0x60020006), propput, helpstring("Alias for the iCodepage property")]
+        HRESULT codepage([in] int pncodepage);
+        [id(0x60020008), propget, helpstring("File codepage")]
+        HRESULT iCodepage([out, retval] int* pncodepage);
+        [id(0x60020008), propput, helpstring("File codepage")]
+        HRESULT iCodepage([in] int pncodepage);
+        [id(0x6002000a), propget, helpstring("Alias for the dtLines property")]
+        HRESULT detectTypesLines([out, retval] int* pndetectTypesLines);
+        [id(0x6002000a), propput, helpstring("Alias for the dtLines property")]
+        HRESULT detectTypesLines([in] int pndetectTypesLines);
+        [id(0x6002000c), propget, helpstring("Number of lines to parse to detect field types")]
+        HRESULT dtLines([out, retval] int* pndetectTypesLines);
+        [id(0x6002000c), propput, helpstring("Number of lines to parse to detect field types")]
+        HRESULT dtLines([in] int pndetectTypesLines);
+        [id(0x6002000e), propget, helpstring("File contains a header line declaring field names")]
+        HRESULT headerRow([out, retval] VARIANT_BOOL* pbheaderRow);
+        [id(0x6002000e), propput, helpstring("File contains a header line declaring field names")]
+        HRESULT headerRow([in] VARIANT_BOOL pbheaderRow);
+        [id(0x60020010), propget, helpstring("Alias for the iHeaderFile property")]
+        HRESULT headerFile([out, retval] BSTR* pszheaderFile);
+        [id(0x60020010), propput, helpstring("Alias for the iHeaderFile property")]
+        HRESULT headerFile([in] BSTR pszheaderFile);
+        [id(0x60020012), propget, helpstring("File containing a separate header line declaring field names")]
+        HRESULT iHeaderFile([out, retval] BSTR* pszheaderFile);
+        [id(0x60020012), propput, helpstring("File containing a separate header line declaring field names")]
+        HRESULT iHeaderFile([in] BSTR pszheaderFile);
+        [id(0x60020014), propget, helpstring("Number of fields in each line")]
+        HRESULT nFields([out, retval] int* pnnFields);
+        [id(0x60020014), propput, helpstring("Number of fields in each line")]
+        HRESULT nFields([in] int pnnFields);
+        [id(0x60020016), propget, helpstring("Number of initial lines to skip")]
+        HRESULT nSkipLines([out, retval] int* pnSkipLines);
+        [id(0x60020016), propput, helpstring("Number of initial lines to skip")]
+        HRESULT nSkipLines([in] int pnSkipLines);
+        [id(0x60020018), propget, helpstring("Alias for the iSeparator property")]
+        HRESULT separator([out, retval] BSTR* pszseparator);
+        [id(0x60020018), propput, helpstring("Alias for the iSeparator property")]
+        HRESULT separator([in] BSTR pszseparator);
+        [id(0x6002001a), propget, helpstring("Field separator character")]
+        HRESULT iSeparator([out, retval] BSTR* pszseparator);
+        [id(0x6002001a), propput, helpstring("Field separator character")]
+        HRESULT iSeparator([in] BSTR pszseparator);
+        [id(0x6002001c), propget, helpstring("Prefixes of lines to include or exclude")]
+        HRESULT lineFilter([out, retval] BSTR* pszlineFilter);
+        [id(0x6002001c), propput, helpstring("Prefixes of lines to include or exclude")]
+        HRESULT lineFilter([in] BSTR pszlineFilter);
+        [id(0x6002001e), propget, helpstring("Alias for the iTsFormat property")]
+        HRESULT timestampFormat([out, retval] BSTR* psztimestampFormat);
+        [id(0x6002001e), propput, helpstring("Alias for the iTsFormat property")]
+        HRESULT timestampFormat([in] BSTR psztimestampFormat);
+        [id(0x60020020), propget, helpstring("Format of TIMESTAMP fields")]
+        HRESULT iTsFormat([out, retval] BSTR* psztimestampFormat);
+        [id(0x60020020), propput, helpstring("Format of TIMESTAMP fields")]
+        HRESULT iTsFormat([in] BSTR psztimestampFormat);
+        [id(0x60020022), propget, helpstring("Checkpoint file")]
+        HRESULT iCheckpoint([out, retval] BSTR* psziCheckpoint);
+        [id(0x60020022), propput, helpstring("Checkpoint file")]
+        HRESULT iCheckpoint([in] BSTR psziCheckpoint);
+    };
+
+    [
+      uuid(F2455538-58A0-45FF-B16C-5F5DBA8D811C),
+      helpstring("CCOMADSInputContext class")
+    ]
+    coclass COMADSInputContextClass {
+        [default] interface ICOMADSInputContext;
+    };
+
+    [
+      odl,
+      uuid(85B21BA3-4271-4B10-A837-B715FDF3B0A1),
+      helpstring("ADS Input Format"),
+      dual,
+      oleautomation
+    ]
+    interface ICOMADSInputContext : IDispatch {
+        [id(0x60020000), propget, helpstring("Object class name")]
+        HRESULT objClass([out, retval] BSTR* pszclass);
+        [id(0x60020000), propput, helpstring("Object class name")]
+        HRESULT objClass([in] BSTR pszclass);
+        [id(0x60020002), propget, helpstring("Username")]
+        HRESULT username([out, retval] BSTR* pszusername);
+        [id(0x60020002), propput, helpstring("Username")]
+        HRESULT username([in] BSTR pszusername);
+        [id(0x60020004), propget, helpstring("Password")]
+        HRESULT password([out, retval] BSTR* pszpassword);
+        [id(0x60020004), propput, helpstring("Password")]
+        HRESULT password([in] BSTR pszpassword);
+        [id(0x60020006), propget, helpstring("Max recursion level for subdirectories")]
+        HRESULT recurse([out, retval] int* pnrecurse);
+        [id(0x60020006), propput, helpstring("Max recursion level for subdirectories")]
+        HRESULT recurse([in] int pnrecurse);
+        [id(0x60020008), propget, helpstring("Separator for multi-valued properties")]
+        HRESULT multiValuedSep([out, retval] BSTR* pszmultiValuedSep);
+        [id(0x60020008), propput, helpstring("Separator for multi-valued properties")]
+        HRESULT multiValuedSep([in] BSTR pszmultiValuedSep);
+        [id(0x6002000a), propget, helpstring("Ignore Directory Service errors")]
+        HRESULT ignoreDSErrors([out, retval] VARIANT_BOOL* pbignoreDSErrors);
+        [id(0x6002000a), propput, helpstring("Ignore Directory Service errors")]
+        HRESULT ignoreDSErrors([in] VARIANT_BOOL pbignoreDSErrors);
+        [id(0x6002000c), propget, helpstring("Parse binary properties")]
+        HRESULT parseBinary([out, retval] VARIANT_BOOL* pbparseBinary);
+        [id(0x6002000c), propput, helpstring("Parse binary properties")]
+        HRESULT parseBinary([in] VARIANT_BOOL pbparseBinary);
+        [id(0x6002000e), propget, helpstring("Format for binary properties")]
+        HRESULT binaryFormat([out, retval] BSTR* pszbinaryFormat);
+        [id(0x6002000e), propput, helpstring("Format for binary properties")]
+        HRESULT binaryFormat([in] BSTR pszbinaryFormat);
+    };
+
+    [
+      uuid(0173E9B3-19C1-4A25-995B-4B19EBD68025),
+      helpstring("CCOMNetMonInputContext class")
+    ]
+    coclass COMNetMonInputContextClass {
+        [default] interface ICOMNetMonInputContext;
+    };
+
+    [
+      odl,
+      uuid(3837E95F-07DB-4D09-99CD-586B4E094208),
+      helpstring("NetMon Input Format"),
+      dual,
+      oleautomation
+    ]
+    interface ICOMNetMonInputContext : IDispatch {
+        [id(0x60020000), propget, helpstring("Field mode")]
+        HRESULT fMode([out, retval] BSTR* pszfMode);
+        [id(0x60020000), propput, helpstring("Field mode")]
+        HRESULT fMode([in] BSTR pszfMode);
+        [id(0x60020002), propget, helpstring("Format of binary data")]
+        HRESULT binaryFormat([out, retval] BSTR* pszbinaryFormat);
+        [id(0x60020002), propput, helpstring("Format of binary data")]
+        HRESULT binaryFormat([in] BSTR pszbinaryFormat);
+    };
+
+    [
+      uuid(0776E95A-34E3-4488-886E-094BA16BB6BD),
+      helpstring("CCOMXMLInputContext class")
+    ]
+    coclass COMXMLInputContextClass {
+        [default] interface ICOMXMLInputContext;
+    };
+
+    [
+      odl,
+      uuid(72B09A81-FB17-4187-B5F8-AD7E9592548E),
+      helpstring("XML Input Format"),
+      dual,
+      oleautomation
+    ]
+    interface ICOMXMLInputContext : IDispatch {
+        [id(0x60020000), propget, helpstring("XPath of nodes to be considered roots")]
+        HRESULT rootXPath([out, retval] BSTR* pszrootXPath);
+        [id(0x60020000), propput, helpstring("XPath of nodes to be considered roots")]
+        HRESULT rootXPath([in] BSTR pszrootXPath);
+        [id(0x60020002), propget, helpstring("Field mode")]
+        HRESULT fMode([out, retval] BSTR* pszfMode);
+        [id(0x60020002), propput, helpstring("Field mode")]
+        HRESULT fMode([in] BSTR pszfMode);
+        [id(0x60020004), propget, helpstring("Format of TIMESTAMP fields")]
+        HRESULT iTsFormat([out, retval] BSTR* psztimestampFormat);
+        [id(0x60020004), propput, helpstring("Format of TIMESTAMP fields")]
+        HRESULT iTsFormat([in] BSTR psztimestampFormat);
+        [id(0x60020006), propget, helpstring("Number of leaf nodes to parse to detect field types")]
+        HRESULT dtNodes([out, retval] int* pndtNodes);
+        [id(0x60020006), propput, helpstring("Number of leaf nodes to parse to detect field types")]
+        HRESULT dtNodes([in] int pndtNodes);
+        [id(0x60020008), propget, helpstring("Field name mode")]
+        HRESULT fNames([out, retval] BSTR* pszfNames);
+        [id(0x60020008), propput, helpstring("Field name mode")]
+        HRESULT fNames([in] BSTR pszfNames);
+    };
+
+    [
+      uuid(DEA6399C-EA9F-4864-BABB-0F6720A92CE1),
+      helpstring("CCOMNativeOutputContext class")
+    ]
+    coclass COMNativeOutputContextClass {
+        [default] interface ICOMNativeOutputContext;
+    };
+
+    [
+      odl,
+      uuid(1979F191-21AA-489D-BCDC-8CB6DC60AF42),
+      helpstring("Native Output Format"),
+      dual,
+      oleautomation
+    ]
+    interface ICOMNativeOutputContext : IDispatch {
+        [id(0x60020000), propget, helpstring("Alias for the headers property")]
+        HRESULT printHeaders([out, retval] VARIANT_BOOL* pbprintHeaders);
+        [id(0x60020000), propput, helpstring("Alias for the headers property")]
+        HRESULT printHeaders([in] VARIANT_BOOL pbprintHeaders);
+        [id(0x60020002), propget, helpstring("Print headers")]
+        HRESULT headers([out, retval] VARIANT_BOOL* pbprintHeaders);
+        [id(0x60020002), propput, helpstring("Print headers")]
+        HRESULT headers([in] VARIANT_BOOL pbprintHeaders);
+        [id(0x60020004), propget, helpstring("Alias for the rtp property")]
+        HRESULT rowsToPrint([out, retval] int* pnrowsToPrint);
+        [id(0x60020004), propput, helpstring("Alias for the rtp property")]
+        HRESULT rowsToPrint([in] int pnrowsToPrint);
+        [id(0x60020006), propget, helpstring("Number of rows to print in a batch")]
+        HRESULT rtp([out, retval] int* pnrowsToPrint);
+        [id(0x60020006), propput, helpstring("Number of rows to print in a batch")]
+        HRESULT rtp([in] int pnrowsToPrint);
+        [id(0x60020008), propget, helpstring("Alias for the spaceCol property")]
+        HRESULT columnSpacing([out, retval] VARIANT_BOOL* pbcolumnSpacing);
+        [id(0x60020008), propput, helpstring("Alias for the spaceCol property")]
+        HRESULT columnSpacing([in] VARIANT_BOOL pbcolumnSpacing);
+        [id(0x6002000a), propget, helpstring("Space columns")]
+        HRESULT spaceCol([out, retval] VARIANT_BOOL* pbcolumnSpacing);
+        [id(0x6002000a), propput, helpstring("Space columns")]
+        HRESULT spaceCol([in] VARIANT_BOOL pbcolumnSpacing);
+        [id(0x6002000c), propget, helpstring("Alias for the rAlign property")]
+        HRESULT rightAlignment([out, retval] VARIANT_BOOL* pbrightAlignment);
+        [id(0x6002000c), propput, helpstring("Alias for the rAlign property")]
+        HRESULT rightAlignment([in] VARIANT_BOOL pbrightAlignment);
+        [id(0x6002000e), propget, helpstring("Right-align columns")]
+        HRESULT rAlign([out, retval] VARIANT_BOOL* pbrightAlignment);
+        [id(0x6002000e), propput, helpstring("Right-align columns")]
+        HRESULT rAlign([in] VARIANT_BOOL pbrightAlignment);
+        [id(0x60020010), propget, helpstring("Alias for the colSep property")]
+        HRESULT separatorString([out, retval] BSTR* pszseparatorString);
+        [id(0x60020010), propput, helpstring("Alias for the colSep property")]
+        HRESULT separatorString([in] BSTR pszseparatorString);
+        [id(0x60020012), propget, helpstring("Column separator")]
+        HRESULT colSep([out, retval] BSTR* pszseparatorString);
+        [id(0x60020012), propput, helpstring("Column separator")]
+        HRESULT colSep([in] BSTR pszseparatorString);
+        [id(0x60020014), propget, helpstring("Direct mode")]
+        HRESULT direct([out, retval] VARIANT_BOOL* pbdirect);
+        [id(0x60020014), propput, helpstring("Direct mode")]
+        HRESULT direct([in] VARIANT_BOOL pbdirect);
+        [id(0x60020016), propget, helpstring("Alias for the oCodepage property")]
+        HRESULT codepage([out, retval] int* pncodepage);
+        [id(0x60020016), propput, helpstring("Alias for the oCodepage property")]
+        HRESULT codepage([in] int pncodepage);
+        [id(0x60020018), propget, helpstring("File codepage")]
+        HRESULT oCodepage([out, retval] int* pncodepage);
+        [id(0x60020018), propput, helpstring("File codepage")]
+        HRESULT oCodepage([in] int pncodepage);
+        [id(0x6002001a), propget, helpstring("File mode")]
+        HRESULT fileMode([out, retval] int* pnfilemode);
+        [id(0x6002001a), propput, helpstring("File mode")]
+        HRESULT fileMode([in] int pnfilemode);
+    };
+
+    [
+      uuid(DC691F49-FD32-4E17-8C5F-F7C31F46FDF5),
+      helpstring("CCOMW3COutputContext class")
+    ]
+    coclass COMW3COutputContextClass {
+        [default] interface ICOMW3COutputContext;
+    };
+
+    [
+      odl,
+      uuid(9F3A6096-C1A3-428D-BE12-EEA7CDB3627F),
+      helpstring("W3C Extended Log Output Format"),
+      dual,
+      oleautomation
+    ]
+    interface ICOMW3COutputContext : IDispatch {
+        [id(0x60020000), propget, helpstring("Alias for the rtp property")]
+        HRESULT rowsToPrint([out, retval] int* pnrowsToPrint);
+        [id(0x60020000), propput, helpstring("Alias for the rtp property")]
+        HRESULT rowsToPrint([in] int pnrowsToPrint);
+        [id(0x60020002), propget, helpstring("Number of rows to print in a batch")]
+        HRESULT rtp([out, retval] int* pnrowsToPrint);
+        [id(0x60020002), propput, helpstring("Number of rows to print in a batch")]
+        HRESULT rtp([in] int pnrowsToPrint);
+        [id(0x60020004), propget, helpstring("Alias for the oCodepage property")]
+        HRESULT codepage([out, retval] int* pncodepage);
+        [id(0x60020004), propput, helpstring("Alias for the oCodepage property")]
+        HRESULT codepage([in] int pncodepage);
+        [id(0x60020006), propget, helpstring("File codepage")]
+        HRESULT oCodepage([out, retval] int* pncodepage);
+        [id(0x60020006), propput, helpstring("File codepage")]
+        HRESULT oCodepage([in] int pncodepage);
+        [id(0x60020008), propget, helpstring("Alias for the oDQuotes property")]
+        HRESULT useDoubleQuotes([out, retval] VARIANT_BOOL* pbuseDoubleQuotes);
+        [id(0x60020008), propput, helpstring("Alias for the oDQuotes property")]
+        HRESULT useDoubleQuotes([in] VARIANT_BOOL pbuseDoubleQuotes);
+        [id(0x6002000a), propget, helpstring("Double-quote string values")]
+        HRESULT oDQuotes([out, retval] VARIANT_BOOL* pbuseDoubleQuotes);
+        [id(0x6002000a), propput, helpstring("Double-quote string values")]
+        HRESULT oDQuotes([in] VARIANT_BOOL pbuseDoubleQuotes);
+        [id(0x6002000c), propget, helpstring("Content of the date directive")]
+        HRESULT oDirTime([out, retval] BSTR* pszdirTime);
+        [id(0x6002000c), propput, helpstring("Content of the date directive")]
+        HRESULT oDirTime([in] BSTR pszdirTime);
+        [id(0x6002000e), propget, helpstring("Encode field delimiters")]
+        HRESULT encodeDelim([out, retval] VARIANT_BOOL* pbencodeDelim);
+        [id(0x6002000e), propput, helpstring("Encode field delimiters")]
+        HRESULT encodeDelim([in] VARIANT_BOOL pbencodeDelim);
+        [id(0x60020010), propget, helpstring("File mode")]
+        HRESULT fileMode([out, retval] int* pnfilemode);
+        [id(0x60020010), propput, helpstring("File mode")]
+        HRESULT fileMode([in] int pnfilemode);
+    };
+
+    [
+      uuid(88937009-2404-483D-B6A7-49AA184426B9),
+      helpstring("CCOMIISOutputContext class")
+    ]
+    coclass COMIISOutputContextClass {
+        [default] interface ICOMIISOutputContext;
+    };
+
+    [
+      odl,
+      uuid(7A5A3711-A707-4381-9C86-9ECADFB88975),
+      helpstring("IIS Log Output Format"),
+      dual,
+      oleautomation
+    ]
+    interface ICOMIISOutputContext : IDispatch {
+        [id(0x60020000), propget, helpstring("Alias for the rtp property")]
+        HRESULT rowsToPrint([out, retval] int* pnrowsToPrint);
+        [id(0x60020000), propput, helpstring("Alias for the rtp property")]
+        HRESULT rowsToPrint([in] int pnrowsToPrint);
+        [id(0x60020002), propget, helpstring("Number of rows to print in a batch")]
+        HRESULT rtp([out, retval] int* pnrowsToPrint);
+        [id(0x60020002), propput, helpstring("Number of rows to print in a batch")]
+        HRESULT rtp([in] int pnrowsToPrint);
+        [id(0x60020004), propget, helpstring("Alias for the oCodepage property")]
+        HRESULT codepage([out, retval] int* pncodepage);
+        [id(0x60020004), propput, helpstring("Alias for the oCodepage property")]
+        HRESULT codepage([in] int pncodepage);
+        [id(0x60020006), propget, helpstring("File codepage")]
+        HRESULT oCodepage([out, retval] int* pncodepage);
+        [id(0x60020006), propput, helpstring("File codepage")]
+        HRESULT oCodepage([in] int pncodepage);
+        [id(0x60020008), propget, helpstring("File mode")]
+        HRESULT fileMode([out, retval] int* pnfilemode);
+        [id(0x60020008), propput, helpstring("File mode")]
+        HRESULT fileMode([in] int pnfilemode);
+    };
+
+    [
+      uuid(0FFF4843-4EAD-447C-8AA4-2D3BF639F5FC),
+      helpstring("CCOMSQLOutputContext class")
+    ]
+    coclass COMSQLOutputContextClass {
+        [default] interface ICOMSQLOutputContext;
+    };
+
+    [
+      odl,
+      uuid(023D89CA-32BE-44DC-B442-478EC7478D62),
+      helpstring("SQL Output Format"),
+      dual,
+      oleautomation
+    ]
+    interface ICOMSQLOutputContext : IDispatch {
+        [id(0x60020000), propget, helpstring("Connection string")]
+        HRESULT oConnString([out, retval] BSTR* pszconnString);
+        [id(0x60020000), propput, helpstring("Connection string")]
+        HRESULT oConnString([in] BSTR pszconnString);
+        [id(0x60020002), propget, helpstring("Alias for the dsn property")]
+        HRESULT DSNname([out, retval] BSTR* pszDSNName);
+        [id(0x60020002), propput, helpstring("Alias for the dsn property")]
+        HRESULT DSNname([in] BSTR pszDSNName);
+        [id(0x60020004), propget, helpstring("DSN name")]
+        HRESULT dsn([out, retval] BSTR* pszDSNName);
+        [id(0x60020004), propput, helpstring("DSN name")]
+        HRESULT dsn([in] BSTR pszDSNName);
+        [id(0x60020006), propget, helpstring("Server name")]
+        HRESULT server([out, retval] BSTR* pszserver);
+        [id(0x60020006), propput, helpstring("Server name")]
+        HRESULT server([in] BSTR pszserver);
+        [id(0x60020008), propget, helpstring("ODBC driver")]
+        HRESULT driver([out, retval] BSTR* pszdriver);
+        [id(0x60020008), propput, helpstring("ODBC driver")]
+        HRESULT driver([in] BSTR pszdriver);
+        [id(0x6002000a), propget, helpstring("Database")]
+        HRESULT database([out, retval] BSTR* pszdatabase);
+        [id(0x6002000a), propput, helpstring("Database")]
+        HRESULT database([in] BSTR pszdatabase);
+        [id(0x6002000c), propget, helpstring("Username")]
+        HRESULT username([out, retval] BSTR* pszusername);
+        [id(0x6002000c), propput, helpstring("Username")]
+        HRESULT username([in] BSTR pszusername);
+        [id(0x6002000e), propget, helpstring("Password")]
+        HRESULT password([out, retval] BSTR* pszpassword);
+        [id(0x6002000e), propput, helpstring("Password")]
+        HRESULT password([in] BSTR pszpassword);
+        [id(0x60020010), propget, helpstring("Create SQL table if doesn't exist")]
+        HRESULT createTable([out, retval] VARIANT_BOOL* pbcreateTable);
+        [id(0x60020010), propput, helpstring("Create SQL table if doesn't exist")]
+        HRESULT createTable([in] VARIANT_BOOL pbcreateTable);
+        [id(0x60020012), propget, helpstring("Clear the SQL table before adding new data")]
+        HRESULT clearTable([out, retval] VARIANT_BOOL* pbclearTable);
+        [id(0x60020012), propput, helpstring("Clear the SQL table before adding new data")]
+        HRESULT clearTable([in] VARIANT_BOOL pbclearTable);
+        [id(0x60020014), propget, helpstring("Remove non-allowed characters from column names before creating the table")]
+        HRESULT fixColNames([out, retval] VARIANT_BOOL* pbFixColNames);
+        [id(0x60020014), propput, helpstring("Remove non-allowed characters from column names before creating the table")]
+        HRESULT fixColNames([in] VARIANT_BOOL pbFixColNames);
+        [id(0x60020016), propget, helpstring("Maximum size for string fields")]
+        HRESULT maxStrFieldLen([out, retval] int* pnmaxStrFieldLen);
+        [id(0x60020016), propput, helpstring("Maximum size for string fields")]
+        HRESULT maxStrFieldLen([in] int pnmaxStrFieldLen);
+        [id(0x60020018), propget, helpstring("Number of rows in a single transaction")]
+        HRESULT transactionRowCount([out, retval] int* pntransactionRowCount);
+        [id(0x60020018), propput, helpstring("Number of rows in a single transaction")]
+        HRESULT transactionRowCount([in] int pntransactionRowCount);
+        [id(0x6002001a), propget, helpstring("Ignore minor warnings")]
+        HRESULT ignoreMinWarns([out, retval] VARIANT_BOOL* pbignoreMinorWarns);
+        [id(0x6002001a), propput, helpstring("Ignore minor warnings")]
+        HRESULT ignoreMinWarns([in] VARIANT_BOOL pbignoreMinorWarns);
+        [id(0x6002001c), propget, helpstring("Ignore Identity columns")]
+        HRESULT ignoreIdCols([out, retval] VARIANT_BOOL* pbignoreIdCols);
+        [id(0x6002001c), propput, helpstring("Ignore Identity columns")]
+        HRESULT ignoreIdCols([in] VARIANT_BOOL pbignoreIdCols);
+    };
+
+    [
+      uuid(80C997CD-A676-4028-8860-BB5F2F8278F6),
+      helpstring("CCOMCSVOutputContext class")
+    ]
+    coclass COMCSVOutputContextClass {
+        [default] interface ICOMCSVOutputContext;
+    };
+
+    [
+      odl,
+      uuid(FB96582A-63D4-4564-A65A-26EB352734FA),
+      helpstring("CSV Output Format"),
+      dual,
+      oleautomation
+    ]
+    interface ICOMCSVOutputContext : IDispatch {
+        [id(0x60020000), propget, helpstring("Write headers")]
+        HRESULT headers([out, retval] VARIANT* pVaHeaders);
+        [id(0x60020000), propput, helpstring("Write headers")]
+        HRESULT headers([in] VARIANT pVaHeaders);
+        [id(0x60020002), propget, helpstring("Double-quote fields")]
+        HRESULT oDQuotes([out, retval] VARIANT* pVaoDQuotes);
+        [id(0x60020002), propput, helpstring("Double-quote fields")]
+        HRESULT oDQuotes([in] VARIANT pVaoDQuotes);
+        [id(0x60020004), propget, helpstring("Insert tabs after commas")]
+        HRESULT tabs([out, retval] VARIANT_BOOL* pbtabs);
+        [id(0x60020004), propput, helpstring("Insert tabs after commas")]
+        HRESULT tabs([in] VARIANT_BOOL pbtabs);
+        [id(0x60020006), propget, helpstring("Alias for the oTsFormat property")]
+        HRESULT timestampFormat([out, retval] BSTR* psztimestampFormat);
+        [id(0x60020006), propput, helpstring("Alias for the oTsFormat property")]
+        HRESULT timestampFormat([in] BSTR psztimestampFormat);
+        [id(0x60020008), propget, helpstring("Format of TIMESTAMP fields")]
+        HRESULT oTsFormat([out, retval] BSTR* psztimestampFormat);
+        [id(0x60020008), propput, helpstring("Format of TIMESTAMP fields")]
+        HRESULT oTsFormat([in] BSTR psztimestampFormat);
+        [id(0x6002000a), propget, helpstring("Alias for the oCodepage property")]
+        HRESULT codepage([out, retval] int* pncodepage);
+        [id(0x6002000a), propput, helpstring("Alias for the oCodepage property")]
+        HRESULT codepage([in] int pncodepage);
+        [id(0x6002000c), propget, helpstring("File codepage")]
+        HRESULT oCodepage([out, retval] int* pncodepage);
+        [id(0x6002000c), propput, helpstring("File codepage")]
+        HRESULT oCodepage([in] int pncodepage);
+        [id(0x6002000e), propget, helpstring("File mode")]
+        HRESULT fileMode([out, retval] int* pnfilemode);
+        [id(0x6002000e), propput, helpstring("File mode")]
+        HRESULT fileMode([in] int pnfilemode);
+    };
+
+    [
+      uuid(29467682-1CFC-46EA-B64D-EB31A56B321D),
+      helpstring("CCOMXMLOutputContext class")
+    ]
+    coclass COMXMLOutputContextClass {
+        [default] interface ICOMXMLOutputContext;
+    };
+
+    [
+      odl,
+      uuid(5481A119-1977-4190-B585-C62373A6A024),
+      helpstring("XML Output Format"),
+      dual,
+      oleautomation
+    ]
+    interface ICOMXMLOutputContext : IDispatch {
+        [id(0x60020000), propget, helpstring("XML structure")]
+        HRESULT structure([out, retval] int* pnstructure);
+        [id(0x60020000), propput, helpstring("XML structure")]
+        HRESULT structure([in] int pnstructure);
+        [id(0x60020002), propget, helpstring("Name of the root element")]
+        HRESULT rootName([out, retval] BSTR* pszrootName);
+        [id(0x60020002), propput, helpstring("Name of the root element")]
+        HRESULT rootName([in] BSTR pszrootName);
+        [id(0x60020004), propget, helpstring("Name of the row element")]
+        HRESULT rowName([out, retval] BSTR* pszrowName);
+        [id(0x60020004), propput, helpstring("Name of the row element")]
+        HRESULT rowName([in] BSTR pszrowName);
+        [id(0x60020006), propget, helpstring("Name of the field element")]
+        HRESULT fieldName([out, retval] BSTR* pszfieldName);
+        [id(0x60020006), propput, helpstring("Name of the field element")]
+        HRESULT fieldName([in] BSTR pszfieldName);
+        [id(0x60020008), propget, helpstring("Link to an XSL document")]
+        HRESULT xslLink([out, retval] BSTR* pszxslLink);
+        [id(0x60020008), propput, helpstring("Link to an XSL document")]
+        HRESULT xslLink([in] BSTR pszxslLink);
+        [id(0x6002000a), propget, helpstring("Schema type")]
+        HRESULT schemaType([out, retval] int* pnschemaType);
+        [id(0x6002000a), propput, helpstring("Schema type")]
+        HRESULT schemaType([in] int pnschemaType);
+        [id(0x6002000c), propget, helpstring("Compact formatting")]
+        HRESULT compact([out, retval] VARIANT_BOOL* pbcompact);
+        [id(0x6002000c), propput, helpstring("Compact formatting")]
+        HRESULT compact([in] VARIANT_BOOL pbcompact);
+        [id(0x6002000e), propget, helpstring("Do not generate empty elements")]
+        HRESULT noEmptyField([out, retval] VARIANT_BOOL* pbnoEmptyField);
+        [id(0x6002000e), propput, helpstring("Do not generate empty elements")]
+        HRESULT noEmptyField([in] VARIANT_BOOL pbnoEmptyField);
+        [id(0x60020010), propget, helpstring("Standalone document")]
+        HRESULT standAlone([out, retval] VARIANT_BOOL* pbstandAlone);
+        [id(0x60020010), propput, helpstring("Standalone document")]
+        HRESULT standAlone([in] VARIANT_BOOL pbstandAlone);
+        [id(0x60020012), propget, helpstring("File mode")]
+        HRESULT fileMode([out, retval] int* pnfilemode);
+        [id(0x60020012), propput, helpstring("File mode")]
+        HRESULT fileMode([in] int pnfilemode);
+        [id(0x60020014), propget, helpstring("Alias for the oCodepage property")]
+        HRESULT codepage([out, retval] int* pncodepage);
+        [id(0x60020014), propput, helpstring("Alias for the oCodepage property")]
+        HRESULT codepage([in] int pncodepage);
+        [id(0x60020016), propget, helpstring("File codepage")]
+        HRESULT oCodepage([out, retval] int* pncodepage);
+        [id(0x60020016), propput, helpstring("File codepage")]
+        HRESULT oCodepage([in] int pncodepage);
+    };
+
+    [
+      uuid(8235D6A5-AAFD-4D39-BFE8-EF1641AB9257),
+      helpstring("CCOMTemplateOutputContext class")
+    ]
+    coclass COMTemplateOutputContextClass {
+        [default] interface ICOMTemplateOutputContext;
+    };
+
+    [
+      odl,
+      uuid(2547428D-535E-4467-9C0C-77511E47BE0D),
+      helpstring("Template Output Format"),
+      dual,
+      oleautomation
+    ]
+    interface ICOMTemplateOutputContext : IDispatch {
+        [id(0x60020000), propget, helpstring("Template file")]
+        HRESULT tpl([out, retval] BSTR* psztpl);
+        [id(0x60020000), propput, helpstring("Template file")]
+        HRESULT tpl([in] BSTR psztpl);
+        [id(0x60020002), propget, helpstring("Template file header")]
+        HRESULT tplHeader([out, retval] BSTR* psztplHeader);
+        [id(0x60020002), propput, helpstring("Template file header")]
+        HRESULT tplHeader([in] BSTR psztplHeader);
+        [id(0x60020004), propget, helpstring("Template file footer")]
+        HRESULT tplFooter([out, retval] BSTR* psztplFooter);
+        [id(0x60020004), propput, helpstring("Template file footer")]
+        HRESULT tplFooter([in] BSTR psztplFooter);
+        [id(0x60020006), propget, helpstring("Do not generate an empty file")]
+        HRESULT noEmptyFile([out, retval] VARIANT_BOOL* pbnoEmptyFile);
+        [id(0x60020006), propput, helpstring("Do not generate an empty file")]
+        HRESULT noEmptyFile([in] VARIANT_BOOL pbnoEmptyFile);
+        [id(0x60020008), propget, helpstring("File mode")]
+        HRESULT fileMode([out, retval] int* pnfilemode);
+        [id(0x60020008), propput, helpstring("File mode")]
+        HRESULT fileMode([in] int pnfilemode);
+        [id(0x6002000a), propget, helpstring("Alias for the oCodepage property")]
+        HRESULT codepage([out, retval] int* pncodepage);
+        [id(0x6002000a), propput, helpstring("Alias for the oCodepage property")]
+        HRESULT codepage([in] int pncodepage);
+        [id(0x6002000c), propget, helpstring("File codepage")]
+        HRESULT oCodepage([out, retval] int* pncodepage);
+        [id(0x6002000c), propput, helpstring("File codepage")]
+        HRESULT oCodepage([in] int pncodepage);
+    };
+
+    [
+      uuid(8F054D20-354E-4A4D-92E4-10CDBA47D848),
+      helpstring("CCOMDataGridOutputContext class")
+    ]
+    coclass COMDataGridOutputContextClass {
+        [default] interface ICOMDataGridOutputContext;
+    };
+
+    [
+      odl,
+      uuid(2690326C-0A98-41A0-A53A-BE0D58F0E936),
+      helpstring("DataGrid Output Format"),
+      dual,
+      oleautomation
+    ]
+    interface ICOMDataGridOutputContext : IDispatch {
+        [id(0x60020000), propget, helpstring("Alias for the rtp property")]
+        HRESULT rowsToPrint([out, retval] int* pnrowsToPrint);
+        [id(0x60020000), propput, helpstring("Alias for the rtp property")]
+        HRESULT rowsToPrint([in] int pnrowsToPrint);
+        [id(0x60020002), propget, helpstring("Number of rows to print in a batch")]
+        HRESULT rtp([out, retval] int* pnrowsToPrint);
+        [id(0x60020002), propput, helpstring("Number of rows to print in a batch")]
+        HRESULT rtp([in] int pnrowsToPrint);
+        [id(0x60020004), propget, helpstring("Property AutoScroll")]
+        HRESULT autoScroll([out, retval] VARIANT_BOOL* pbautoScroll);
+        [id(0x60020004), propput, helpstring("Property AutoScroll")]
+        HRESULT autoScroll([in] VARIANT_BOOL pbautoScroll);
+    };
+
+    [
+      uuid(2C4C2DB5-61C5-4D45-A66F-2071EC069328),
+      helpstring("CCOMChartOutputContext class")
+    ]
+    coclass COMChartOutputContextClass {
+        [default] interface ICOMChartOutputContext;
+    };
+
+    [
+      odl,
+      uuid(C0D19115-1C4F-4A49-A02C-60BF913BEFF9),
+      helpstring("Chart Output Format"),
+      dual,
+      oleautomation
+    ]
+    interface ICOMChartOutputContext : IDispatch {
+        [id(0x60020000), propget, helpstring("Chart type")]
+        HRESULT chartType([out, retval] BSTR* psztype);
+        [id(0x60020000), propput, helpstring("Chart type")]
+        HRESULT chartType([in] BSTR psztype);
+        [id(0x60020002), propget, helpstring("Display categories")]
+        HRESULT categories([out, retval] BSTR* pszcategories);
+        [id(0x60020002), propput, helpstring("Display categories")]
+        HRESULT categories([in] BSTR pszcategories);
+        [id(0x60020004), propget, helpstring("Maximum number of category labels")]
+        HRESULT maxCategoryLabels([out, retval] int* pnmaxCategoryLabels);
+        [id(0x60020004), propput, helpstring("Maximum number of category labels")]
+        HRESULT maxCategoryLabels([in] int pnmaxCategoryLabels);
+        [id(0x60020006), propget, helpstring("Display legend")]
+        HRESULT legend([out, retval] BSTR* pszlegend);
+        [id(0x60020006), propput, helpstring("Display legend")]
+        HRESULT legend([in] BSTR pszlegend);
+        [id(0x60020008), propget, helpstring("Display value labels")]
+        HRESULT values([out, retval] BSTR* pszvalues);
+        [id(0x60020008), propput, helpstring("Display value labels")]
+        HRESULT values([in] BSTR pszvalues);
+        [id(0x6002000a), propget, helpstring("Image size")]
+        HRESULT groupSize([out, retval] BSTR* pszgroupSize);
+        [id(0x6002000a), propput, helpstring("Image size")]
+        HRESULT groupSize([in] BSTR pszgroupSize);
+        [id(0x6002000c), propget, helpstring("File type")]
+        HRESULT fileType([out, retval] BSTR* pszfileType);
+        [id(0x6002000c), propput, helpstring("File type")]
+        HRESULT fileType([in] BSTR pszfileType);
+        [id(0x6002000e), propget, helpstring("Configuration script")]
+        HRESULT config([out, retval] BSTR* pszconfig);
+        [id(0x6002000e), propput, helpstring("Configuration script")]
+        HRESULT config([in] BSTR pszconfig);
+        [id(0x60020010), propget, helpstring("Chart title")]
+        HRESULT chartTitle([out, retval] BSTR* pszchartTitle);
+        [id(0x60020010), propput, helpstring("Chart title")]
+        HRESULT chartTitle([in] BSTR pszchartTitle);
+        [id(0x60020012), propget, helpstring("Alias for the oTsFormat property")]
+        HRESULT timestampFormat([out, retval] BSTR* psztimestampFormat);
+        [id(0x60020012), propput, helpstring("Alias for the oTsFormat property")]
+        HRESULT timestampFormat([in] BSTR psztimestampFormat);
+        [id(0x60020014), propget, helpstring("Format of TIMESTAMP fields")]
+        HRESULT oTsFormat([out, retval] BSTR* psztimestampFormat);
+        [id(0x60020014), propput, helpstring("Format of TIMESTAMP fields")]
+        HRESULT oTsFormat([in] BSTR psztimestampFormat);
+        [id(0x60020016), propget, helpstring("View chart")]
+        HRESULT view([out, retval] VARIANT_BOOL* pbview);
+        [id(0x60020016), propput, helpstring("View chart")]
+        HRESULT view([in] VARIANT_BOOL pbview);
+    };
+
+    [
+      uuid(342148B3-7F11-4F39-A287-6829F83FABDA),
+      helpstring("CCOMSYSLOGOutputContext class")
+    ]
+    coclass COMSYSLOGOutputContextClass {
+        [default] interface ICOMSYSLOGOutputContext;
+    };
+
+    [
+      odl,
+      uuid(B0936B89-8035-42CE-A33C-9E2E22DEADD2),
+      helpstring("SYSLOG Output Format"),
+      dual,
+      oleautomation
+    ]
+    interface ICOMSYSLOGOutputContext : IDispatch {
+        [id(0x60020000), propget, helpstring("Configuration file")]
+        HRESULT conf([out, retval] BSTR* pszconf);
+        [id(0x60020000), propput, helpstring("Configuration file")]
+        HRESULT conf([in] BSTR pszconf);
+        [id(0x60020002), propget, helpstring("Severity field")]
+        HRESULT severity([out, retval] BSTR* pbszSeverity);
+        [id(0x60020002), propput, helpstring("Severity field")]
+        HRESULT severity([in] BSTR pbszSeverity);
+        [id(0x60020004), propget, helpstring("Facility field")]
+        HRESULT facility([out, retval] BSTR* pbszFacility);
+        [id(0x60020004), propput, helpstring("Facility field")]
+        HRESULT facility([in] BSTR pbszFacility);
+        [id(0x60020006), propget, helpstring("Alias for the oTsFormat property")]
+        HRESULT timestampFormat([out, retval] BSTR* psztimestampFormat);
+        [id(0x60020006), propput, helpstring("Alias for the oTsFormat property")]
+        HRESULT timestampFormat([in] BSTR psztimestampFormat);
+        [id(0x60020008), propget, helpstring("Format of TIMESTAMP fields")]
+        HRESULT oTsFormat([out, retval] BSTR* psztimestampFormat);
+        [id(0x60020008), propput, helpstring("Format of TIMESTAMP fields")]
+        HRESULT oTsFormat([in] BSTR psztimestampFormat);
+        [id(0x6002000a), propget, helpstring("HostName field")]
+        HRESULT hostName([out, retval] BSTR* pszhostName);
+        [id(0x6002000a), propput, helpstring("HostName field")]
+        HRESULT hostName([in] BSTR pszhostName);
+        [id(0x6002000c), propget, helpstring("ProcessName field")]
+        HRESULT processName([out, retval] BSTR* pszprocessName);
+        [id(0x6002000c), propput, helpstring("ProcessName field")]
+        HRESULT processName([in] BSTR pszprocessName);
+        [id(0x6002000e), propget, helpstring("Field separator")]
+        HRESULT separator([out, retval] BSTR* pszseparator);
+        [id(0x6002000e), propput, helpstring("Field separator")]
+        HRESULT separator([in] BSTR pszseparator);
+        [id(0x60020010), propget, helpstring("Max packet size")]
+        HRESULT maxPacketSize([out, retval] int* pnmaxPacketSize);
+        [id(0x60020010), propput, helpstring("Max packet size")]
+        HRESULT maxPacketSize([in] int pnmaxPacketSize);
+        [id(0x60020012), propget, helpstring("Protocol")]
+        HRESULT protocol([out, retval] BSTR* pszprotocol);
+        [id(0x60020012), propput, helpstring("Protocol")]
+        HRESULT protocol([in] BSTR pszprotocol);
+        [id(0x60020014), propget, helpstring("Source port")]
+        HRESULT sourcePort([out, retval] int* pnsourcePort);
+        [id(0x60020014), propput, helpstring("Source port")]
+        HRESULT sourcePort([in] int pnsourcePort);
+        [id(0x60020016), propget, helpstring("Ignore dispatch errors")]
+        HRESULT ignoreDspchErrs([out, retval] VARIANT_BOOL* pbignoreDspchErrs);
+        [id(0x60020016), propput, helpstring("Ignore dispatch errors")]
+        HRESULT ignoreDspchErrs([in] VARIANT_BOOL pbignoreDspchErrs);
+        [id(0x60020018), propget, helpstring("Discard oversized packets")]
+        HRESULT discardOversized([out, retval] VARIANT_BOOL* pbdiscardOversized);
+        [id(0x60020018), propput, helpstring("Discard oversized packets")]
+        HRESULT discardOversized([in] VARIANT_BOOL pbdiscardOversized);
+        [id(0x6002001a), propget, helpstring("Output codepage")]
+        HRESULT oCodepage([out, retval] int* pncodepage);
+        [id(0x6002001a), propput, helpstring("Output codepage")]
+        HRESULT oCodepage([in] int pncodepage);
+    };
+
+    [
+      uuid(38E8C317-D7A1-49EE-8437-8DFE91462B1E),
+      helpstring("CCOMTSVOutputContext class")
+    ]
+    coclass COMTSVOutputContextClass {
+        [default] interface ICOMTSVOutputContext;
+    };
+
+    [
+      odl,
+      uuid(8819BA1E-1931-4CCF-9F71-64547651AA54),
+      helpstring("TSV Output Format"),
+      dual,
+      oleautomation
+    ]
+    interface ICOMTSVOutputContext : IDispatch {
+        [id(0x60020000), propget, helpstring("Write headers")]
+        HRESULT headers([out, retval] VARIANT* pVaHeaders);
+        [id(0x60020000), propput, helpstring("Write headers")]
+        HRESULT headers([in] VARIANT pVaHeaders);
+        [id(0x60020002), propget, helpstring("Alias for the oSeparator property")]
+        HRESULT separator([out, retval] BSTR* pszseparator);
+        [id(0x60020002), propput, helpstring("Alias for the oSeparator property")]
+        HRESULT separator([in] BSTR pszseparator);
+        [id(0x60020004), propget, helpstring("Field separator")]
+        HRESULT oSeparator([out, retval] BSTR* pszseparator);
+        [id(0x60020004), propput, helpstring("Field separator")]
+        HRESULT oSeparator([in] BSTR pszseparator);
+        [id(0x60020006), propget, helpstring("Alias for the oTsFormat property")]
+        HRESULT timestampFormat([out, retval] BSTR* psztimestampFormat);
+        [id(0x60020006), propput, helpstring("Alias for the oTsFormat property")]
+        HRESULT timestampFormat([in] BSTR psztimestampFormat);
+        [id(0x60020008), propget, helpstring("Format of TIMESTAMP fields")]
+        HRESULT oTsFormat([out, retval] BSTR* psztimestampFormat);
+        [id(0x60020008), propput, helpstring("Format of TIMESTAMP fields")]
+        HRESULT oTsFormat([in] BSTR psztimestampFormat);
+        [id(0x6002000a), propget, helpstring("Alias for the oCodepage property")]
+        HRESULT codepage([out, retval] int* pncodepage);
+        [id(0x6002000a), propput, helpstring("Alias for the oCodepage property")]
+        HRESULT codepage([in] int pncodepage);
+        [id(0x6002000c), propget, helpstring("File codepage")]
+        HRESULT oCodepage([out, retval] int* pncodepage);
+        [id(0x6002000c), propput, helpstring("File codepage")]
+        HRESULT oCodepage([in] int pncodepage);
+        [id(0x6002000e), propget, helpstring("File mode")]
+        HRESULT fileMode([out, retval] int* pnfilemode);
+        [id(0x6002000e), propput, helpstring("File mode")]
+        HRESULT fileMode([in] int pnfilemode);
+    };
+};

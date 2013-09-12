@@ -29,6 +29,7 @@
 
 #include "StdAfx.h"
 #include <process.h>
+#include "FileFilterHelper.h"
 #include "DiffContext.h"
 #include "paths.h"
 #include "CompareStats.h"
@@ -180,14 +181,8 @@ CDiffContext::CDiffContext
 	LPCTSTR pszRight,
 	int nRecursive,
 	DWORD dwContext
-) : m_piFilterGlobal(NULL),
-	m_nCompMethod(0),
-	m_nQuickCompareLimit(0),
-	m_bGuessEncoding(false),
-	m_bIgnoreSmallTimeDiff(false),
-	m_pCompareStats(pCompareStats),
+) :	m_pCompareStats(pCompareStats),
 	m_pWindow(pWindow),
-	m_bStopAfterFirstDiff(false),
 	m_nRecursive(nRecursive),
 	m_dwContext(dwContext),
 	m_bWalkUniques(true),
@@ -196,9 +191,6 @@ CDiffContext::CDiffContext
 #pragma warning(disable:warning_this_used_in_base_member_initializer_list)
 	m_folderCmp(this),
 #pragma warning(default:warning_this_used_in_base_member_initializer_list)
-	m_bOnlyRequested(false),
-	m_hSemaphore(NULL),
-	m_bAborting(false),
 	m_options(NULL)
 {
 	m_paths[0] = paths_GetLongPath(pszLeft);
@@ -272,30 +264,41 @@ UINT CDiffContext::CompareDirectories(bool bOnlyRequested)
 void CDiffContext::DiffThreadCollect(LPVOID lpParam)
 {
 	CDiffContext *myStruct = reinterpret_cast<CDiffContext *>(lpParam);
+	try
+	{
+		myStruct->InitCollect();
 
-	ASSERT(!myStruct->m_bOnlyRequested);
+		ASSERT(!myStruct->m_bOnlyRequested);
 
-	int depth = myStruct->m_nRecursive ? -1 : 0;
+		int depth = myStruct->m_nRecursive ? -1 : 0;
 
-	String subdir; // blank to start at roots specified in diff context
+		String subdir; // blank to start at roots specified in diff context
 #ifdef _DEBUG
-	_CrtMemState memStateBefore;
-	_CrtMemState memStateAfter;
-	_CrtMemState memStateDiff;
-	_CrtMemCheckpoint(&memStateBefore);
+		_CrtMemState memStateBefore;
+		_CrtMemState memStateAfter;
+		_CrtMemState memStateDiff;
+		_CrtMemCheckpoint(&memStateBefore);
 #endif
 
-	// Build results list (except delaying file comparisons until below)
-	myStruct->DirScan_GetItems(subdir, false, subdir, false, depth, NULL);
+		// Build results list (except delaying file comparisons until below)
+		myStruct->DirScan_GetItems(subdir, false, subdir, false, depth, NULL);
 
 #ifdef _DEBUG
-	_CrtMemCheckpoint(&memStateAfter);
-	_CrtMemDifference(&memStateDiff, &memStateBefore, &memStateAfter);
-	_CrtMemDumpStatistics(&memStateDiff);
+		_CrtMemCheckpoint(&memStateAfter);
+		_CrtMemDifference(&memStateDiff, &memStateBefore, &memStateAfter);
+		_CrtMemDumpStatistics(&memStateDiff);
 #endif
+	}
+	catch (OException *e)
+	{
+		e->ReportError(NULL, MB_ICONSTOP | MB_TOPMOST);
+		delete e;
+	}
 
 	// ReleaseSemaphore() once again to signal that collect phase is ready
 	ReleaseSemaphore(myStruct->m_hSemaphore, 1, 0);
+
+	myStruct->TermCollect();
 }
 
 /**
