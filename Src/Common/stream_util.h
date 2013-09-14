@@ -20,7 +20,30 @@ public:
 	virtual ULONG STDMETHODCALLTYPE Release();
 };
 
-/** 
+/**
+ * @brief A sequential read stream.
+ */
+class SequentialReadStream : public SequentialStream
+{
+public:
+	virtual HRESULT STDMETHODCALLTYPE Write(const void *pv, ULONG cb, ULONG *pcbWritten);
+};
+
+/**
+ * @brief A stream that reads from an OS handle.
+ */
+class HandleReadStream : public SequentialReadStream
+{
+	HANDLE const handle;
+public:
+	HandleReadStream(HANDLE handle)
+		: handle(handle)
+	{
+	}
+	virtual HRESULT STDMETHODCALLTYPE Read(void *pv, ULONG cb, ULONG *pcbRead);
+};
+
+/**
  * @brief A sequential write stream.
  */
 class SequentialWriteStream : public SequentialStream
@@ -109,7 +132,7 @@ public:
 		: pstm(pstm), index(0), ahead(0)
 	{
 	}
-	size_t readLine(stl::string &);
+	stl::string::size_type readLine(stl::string &);
 };
 
 #endif // _STREAM_UTIL_H_

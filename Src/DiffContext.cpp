@@ -266,8 +266,6 @@ void CDiffContext::DiffThreadCollect(LPVOID lpParam)
 	CDiffContext *myStruct = reinterpret_cast<CDiffContext *>(lpParam);
 	try
 	{
-		myStruct->InitCollect();
-
 		ASSERT(!myStruct->m_bOnlyRequested);
 
 		int depth = myStruct->m_nRecursive ? -1 : 0;
@@ -297,8 +295,6 @@ void CDiffContext::DiffThreadCollect(LPVOID lpParam)
 
 	// ReleaseSemaphore() once again to signal that collect phase is ready
 	ReleaseSemaphore(myStruct->m_hSemaphore, 1, 0);
-
-	myStruct->TermCollect();
 }
 
 /**

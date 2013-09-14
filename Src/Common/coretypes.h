@@ -75,6 +75,17 @@ public:
 	{
 		return secondsSinceEpoch() - other.secondsSinceEpoch();
 	}
+	BOOL Parse(LPCSTR p)
+	{
+		SYSTEMTIME st;
+		int fields = sscanf(p, "%04hu-%02hu-%02hu %02hu:%02hu:%02hu",
+			&st.wYear, &st.wMonth, &st.wDay, &st.wHour, &st.wMinute, &st.wSecond);
+		if (fields != 6)
+			return FALSE;
+		st.wDayOfWeek = 0;
+		st.wMilliseconds = 0;
+		return SystemTimeToFileTime(&st, this);
+	}
 };
 
 class LogFont : public LOGFONT

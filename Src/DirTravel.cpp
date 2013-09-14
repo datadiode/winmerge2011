@@ -9,48 +9,12 @@
 
 #include "StdAfx.h"
 #include "paths.h"
+#include "Environment.h"
+#include "Common/stream_util.h"
 #include "DiffContext.h"
 #include "FileFilterHelper.h"
 #include "DirItem.h"
 #include "CompareStats.h"
-#include "../BuildTmp/Merge/midl/LogParser_h.h"
-#include "../BuildTmp/Merge/midl/LogParser_i.c"
-
-void CDiffContext::InitCollect()
-{
-	if (m_piFilterGlobal->getSql() == NULL)
-		return;
-
-	CoInitializeEx(NULL, COINIT_MULTITHREADED);
-
-	OException::Check(CoCreateInstance(
-		CLSID_LogQueryClass, NULL, CLSCTX_ALL,
-		IID_ILogQuery, (void **)&m_piLogQuery));
-	OException::Check(CoCreateInstance(
-		CLSID_COMFileSystemInputContextClass, NULL, CLSCTX_ALL,
-		IID_ICOMFileSystemInputContext, (void **)&m_piInputContext));
-
-	m_piInputContext->put_recurse(0);
-}
-
-void CDiffContext::TermCollect()
-{
-	if (m_piFilterGlobal->getSql() == NULL)
-		return;
-
-	if (m_piLogQuery)
-	{
-		m_piLogQuery->Release();
-		m_piLogQuery = NULL;
-	}
-	if (m_piInputContext)
-	{
-		m_piInputContext->Release();
-		m_piInputContext = NULL;
-	}
-
-	CoUninitialize();
-}
 
 /**
  * @brief Load arrays with all directories & files in specified dir
@@ -79,58 +43,101 @@ void CDiffContext::LoadAndSortFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArr
  */
 void CDiffContext::LoadFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *files) const
 {
-	if (m_piInputContext)
+	if (LPCTSTR filter = m_piFilterGlobal->getSql())
 	{
-		CMyComBSTR sql = L"SELECT Name, CreationTime, LastWriteTime, Attributes, Size FROM '";
-		sql += paths_ConcatPath(sDir, _T("*")).c_str();
-		sql += L"' ";
-		sql += m_piFilterGlobal->getSql();
-		CMyComPtr<ILogRecordset> spLogRecordset;
-		OException::Check(m_piLogQuery->Execute(sql, m_piInputContext, &spLogRecordset));
-		VARIANT_BOOL bAtEnd;
-		while (OException::Check(spLogRecordset->atEnd(&bAtEnd)), bAtEnd == VARIANT_FALSE)
+		String path = paths_ConcatPath(sDir, _T("*")).c_str();
+		String exe = env_ExpandVariables(_T("%LogParser%\\LogParser.exe"));
+		string_format cmd(
+			_T("\"%s\" \"SELECT Name, CreationTime, LastWriteTime, Attributes, Size FROM '%s' %s\" -i:FS -o:TSV -q -recurse:0 -oCodepage:65001"),
+			exe.c_str(), path.c_str(), filter);
+		STARTUPINFO si;
+		ZeroMemory(&si, sizeof si);
+		si.cb = sizeof si;
+		si.dwFlags = STARTF_USESTDHANDLES;
+		SECURITY_ATTRIBUTES sa = { sizeof sa, NULL, TRUE };
+		HANDLE hReadPipe = NULL;
+		if (!CreatePipe(&hReadPipe, &si.hStdOutput, &sa, 0))
 		{
-			CMyComPtr<ILogRecord> spLogRecord;
-			OException::Check(spLogRecordset->getRecord(&spLogRecord));
+			OException::Throw(GetLastError());
+		}
+		si.dwFlags = STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW;
+		PROCESS_INFORMATION pi;
+		if (!CreateProcess(NULL, const_cast<LPTSTR>(cmd.c_str()),
+			NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi))
+		{
+			CloseHandle(hReadPipe);
+			CloseHandle(si.hStdOutput);
+			exe += _T(":\n");
+			exe += OException(GetLastError()).msg;
+			OException::Throw(0, exe.c_str());
+		}
+		CloseHandle(si.hStdOutput);
+		HandleReadStream stream = hReadPipe;
+		StreamLineReader reader = &stream;
+		int state = 0;
+		stl::string head;
+		stl::string line;
+		while (stl::string::size_type size = reader.readLine(line))
+		{
+			switch (state)
+			{
+			case 0:
+				state = line == "Name\tCreationTime\tLastWriteTime\tAttributes\tSize\r\n" ? 1 : -1;
+				// fall through
+			case -1:
+				// TODO: LogParser error messages tend to be followed by some garbage (pipe issue?)
+				head += line;
+				continue;
+			}
 			DirItem ent;
 			ent.path = sDir;
-			CMyVariant var;
-			OException::Check(spLogRecord->getValueEx(var = 0L, &var));
-			ent.filename = V_BSTR(&var);
-			OException::Check(spLogRecord->getValueEx(var = 1L, &var));
-			reinterpret_cast<PROPVARIANT *>(&var)->uhVal.QuadPart -= 1992223368000000000UI64;
-			ent.ctime = reinterpret_cast<PROPVARIANT *>(&var)->filetime;
-			OException::Check(spLogRecord->getValueEx(var = 2L, &var));
-			reinterpret_cast<PROPVARIANT *>(&var)->uhVal.QuadPart -= 1992223368000000000UI64;
-			ent.mtime = reinterpret_cast<PROPVARIANT *>(&var)->filetime;
-			OException::Check(spLogRecord->getValueEx(var = 3L, &var));
-			UINT i = SysStringLen(V_BSTR(&var));
-			while (i)
+			FileTime ft;
+			const char *p = line.c_str();
+			if (const char *q = strchr(p, '\t'))
 			{
-				switch (V_BSTR(&var)[--i])
+				ent.filename = OString(HString::Oct(p, static_cast<UINT>(q - p))->Uni(CP_UTF8)).W;
+				p = q + 1;
+			}
+			if (const char *q = strchr(p, '\t'))
+			{
+				if (ft.Parse(p))
+					LocalFileTimeToFileTime(&ft, &ent.ctime);
+				p = q + 1;
+			}
+			if (const char *q = strchr(p, '\t'))
+			{
+				if (ft.Parse(p))
+					LocalFileTimeToFileTime(&ft, &ent.mtime);
+				p = q + 1;
+			}
+			if (const char *q = strchr(p, '\t'))
+			{
+				while (p < q)
 				{
-				case 'D':
-					ent.flags.attributes |= FILE_ATTRIBUTE_DIRECTORY;
-					break;
-				case 'R':
-					ent.flags.attributes |= FILE_ATTRIBUTE_READONLY;
-					break;
-				case 'A':
-					ent.flags.attributes |= FILE_ATTRIBUTE_ARCHIVE;
-					break;
-				case 'H':
-					ent.flags.attributes |= FILE_ATTRIBUTE_HIDDEN;
-					break;
-				case 'S':
-					ent.flags.attributes |= FILE_ATTRIBUTE_SYSTEM;
-					break;
+					switch (*p++)
+					{
+					case 'D':
+						ent.flags.attributes |= FILE_ATTRIBUTE_DIRECTORY;
+						break;
+					case 'R':
+						ent.flags.attributes |= FILE_ATTRIBUTE_READONLY;
+						break;
+					case 'A':
+						ent.flags.attributes |= FILE_ATTRIBUTE_ARCHIVE;
+						break;
+					case 'H':
+						ent.flags.attributes |= FILE_ATTRIBUTE_HIDDEN;
+						break;
+					case 'S':
+						ent.flags.attributes |= FILE_ATTRIBUTE_SYSTEM;
+						break;
+					}
 				}
+				p = q + 1;
 			}
 			if ((ent.flags.attributes & FILE_ATTRIBUTE_DIRECTORY) == 0)
 			{
-				// Ensure attributes to be nonzero for existing files
-				OException::Check(spLogRecord->getValueEx(var = 4L, &var));
-				ent.size = V_CY(&var);
+				ent.size.int64 = _atoi64(p);
 				ent.flags.attributes |= FILE_ATTRIBUTE_NORMAL;
 				files->push_back(ent);
 				// If recursing the flat way, increment total count of items
@@ -144,18 +151,24 @@ void CDiffContext::LoadFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *fil
 					// Allow user to abort scanning
 					if (ShouldAbort())
 						break;
-					String sDir = paths_ConcatPath(ent.path, ent.filename);
-					if (m_piFilterGlobal->includeDir(sDir.c_str()))
-						LoadFiles(sDir.c_str(), dirs, files);
+					path = paths_ConcatPath(ent.path, ent.filename);
+					if (m_piFilterGlobal->includeDir(path.c_str()))
+						LoadFiles(path.c_str(), dirs, files);
 				}
 				else
 				{
 					dirs->push_back(ent);
 				}
 			}
-
-			OException::Check(spLogRecordset->moveNext());
 		}
+		WaitForSingleObject(pi.hProcess, INFINITE);
+		DWORD dwExitCode = 0;
+		GetExitCodeProcess(pi.hProcess, &dwExitCode);
+		CloseHandle(pi.hThread);
+		CloseHandle(pi.hProcess);
+		CloseHandle(hReadPipe);
+		if (state < 0 && dwExitCode != ERROR_PATH_NOT_FOUND)
+			OException::Throw(0, UTF82W(head.c_str()));
 	}
 	else
 	{

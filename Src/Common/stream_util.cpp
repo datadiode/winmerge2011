@@ -24,6 +24,17 @@ ULONG STDMETHODCALLTYPE SequentialStream::Release()
 	return 1;
 }
 
+HRESULT STDMETHODCALLTYPE SequentialReadStream::Write(const void *, ULONG, ULONG *)
+{
+	return E_NOTIMPL;
+}
+
+HRESULT STDMETHODCALLTYPE HandleReadStream::Read(void *pv, ULONG cb, ULONG *pcbRead)
+{
+	return ReadFile(handle, pv, cb, pcbRead, NULL) ?
+		S_OK : HRESULT_FROM_WIN32(GetLastError());
+}
+
 HRESULT STDMETHODCALLTYPE SequentialWriteStream::Read(void *, ULONG, ULONG *)
 {
 	return E_NOTIMPL;
@@ -63,7 +74,7 @@ HRESULT STDMETHODCALLTYPE HtmWriteStream::Write(const void *pv, ULONG cb, ULONG 
 	return hr;
 }
 
-size_t StreamLineReader::readLine(stl::string &s)
+stl::string::size_type StreamLineReader::readLine(stl::string &s)
 {
 	s.resize(0);
 	do 
