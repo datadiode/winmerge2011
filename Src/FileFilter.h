@@ -41,17 +41,18 @@
  */
 struct FileFilter
 {
-	bool default_include;	/**< If true, filter rules are inclusive by default */
 	String name;			/**< Filter name (shown in UI) */
 	String description;		/**< Filter description text */
 	String fullpath;		/**< Full path to filter file */
 	CMyComBSTR sql;			/**< SQL query for LogParser */
 	DirItem fileinfo;		/**< For tracking if file has been modified */
-	stl::vector<regexp_item> filefilters;		/**< List of rules for files */
-	stl::vector<regexp_item> dirfilters;		/**< List of rules for directories */
-	stl::vector<regexp_item> fileprefilters;  /**< List of prefilter rules for files */
-	stl::vector<regexp_item> dirprefilters;	/**< List of prefilter rules for directories */
-	FileFilter() : default_include(true) { }
+	stl::vector<regexp_item> filefilters;		/**< List of inclusion rules for files */
+	stl::vector<regexp_item> dirfilters;		/**< List of inclusion rules for directories */
+	stl::vector<regexp_item> xfilefilters;		/**< List of exclusion rules for files */
+	stl::vector<regexp_item> xdirfilters;		/**< List of exclusion rules for directories */
+	stl::vector<regexp_item> fileprefilters;	/**< List of prefilter rules for files */
+	stl::vector<regexp_item> dirprefilters;		/**< List of prefilter rules for directories */
+	FileFilter() { }
 	~FileFilter();
 	// methods to actually use filter
 	bool TestFileNameAgainstFilter(LPCTSTR szFileName) const;

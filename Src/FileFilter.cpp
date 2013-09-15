@@ -76,9 +76,8 @@ bool FileFilter::TestAgainstRegList(const vector<regexp_item> &filterList, LPCTS
  */
 bool FileFilter::TestFileNameAgainstFilter(LPCTSTR szFileName) const
 {
-	if (TestAgainstRegList(filefilters, szFileName))
-		return !default_include;
-	return default_include;
+	return (filefilters.empty() || TestAgainstRegList(filefilters, szFileName))
+		&& (xfilefilters.empty() || !TestAgainstRegList(xfilefilters, szFileName));
 }
 
 /**
@@ -94,9 +93,8 @@ bool FileFilter::TestFileNameAgainstFilter(LPCTSTR szFileName) const
  */
 bool FileFilter::TestDirNameAgainstFilter(LPCTSTR szDirName) const
 {
-	if (TestAgainstRegList(dirfilters, szDirName))
-		return !default_include;
-	return default_include;
+	return (dirfilters.empty() || TestAgainstRegList(dirfilters, szDirName))
+		&& (xdirfilters.empty() || !TestAgainstRegList(xdirfilters, szDirName));
 }
 
 stl_size_t FileFilter::ApplyPrefilterRegExps(const vector<regexp_item> &filterList, char *dst, const char *src, stl_size_t len)

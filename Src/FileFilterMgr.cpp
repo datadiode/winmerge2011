@@ -157,6 +157,7 @@ FileFilter *FileFilterMgr::LoadFilterFile(LPCTSTR szFilepath)
 	String sLine, sEol;
 	bool lossy = false;
 	bool bLinesLeft = true;
+	bool default_include = false;
 	do
 	{
 		// Returns false when last line is read
@@ -201,19 +202,29 @@ FileFilter *FileFilterMgr::LoadFilterFile(LPCTSTR szFilepath)
 			// specifies default
 			String str = psz;
 			if (PathMatchSpec(psz, _T("0;no;exclude")))
-				pfilter->default_include = false;
+				default_include = false;
 			else if (PathMatchSpec(psz, _T("1;yes;include")))
-				pfilter->default_include = true;
+				default_include = true;
 		}
 		else if (LPCTSTR psz = EatPrefixTrim(sLine.c_str(), _T("f:")))
 		{
 			// file filter
-			AddFilterPattern(pfilter->filefilters, psz);
+			AddFilterPattern(default_include ? pfilter->xfilefilters : pfilter->filefilters, psz);
 		}
 		else if (LPCTSTR psz = EatPrefixTrim(sLine.c_str(), _T("d:")))
 		{
 			// directory filter
-			AddFilterPattern(pfilter->dirfilters, psz);
+			AddFilterPattern(default_include ? pfilter->xdirfilters : pfilter->dirfilters, psz);
+		}
+		else if (LPCTSTR psz = EatPrefixTrim(sLine.c_str(), _T("xf:")))
+		{
+			// file filter
+			AddFilterPattern(pfilter->xfilefilters, psz);
+		}
+		else if (LPCTSTR psz = EatPrefixTrim(sLine.c_str(), _T("xd:")))
+		{
+			// directory filter
+			AddFilterPattern(pfilter->xdirfilters, psz);
 		}
 		else if (LPCTSTR psz = EatPrefixTrim(sLine.c_str(), _T("equiv-f:")))
 		{
