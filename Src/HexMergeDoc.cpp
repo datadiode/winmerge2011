@@ -507,28 +507,11 @@ void CHexMergeFrame::OnAllLeft()
 }
 
 /**
- * @brief Called when user selects View/Zoom In from menu.
+ * @brief Called when user selects View/Zoom In|Out|Normal from menu.
  */
-void CHexMergeFrame::OnViewZoomIn()
+void CHexMergeFrame::OnViewZoom(int direction)
 {
-	m_pView[0]->ZoomText(1);
-	m_pView[1]->ZoomText(1);
-}
-
-/**
- * @brief Called when user selects View/Zoom Out from menu.
- */
-void CHexMergeFrame::OnViewZoomOut()
-{
-	m_pView[0]->ZoomText(-1);
-	m_pView[1]->ZoomText(-1);
-}
-
-/**
- * @brief Called when user selects View/Zoom Normal from menu.
- */
-void CHexMergeFrame::OnViewZoomNormal()
-{
-	m_pView[0]->ZoomText(0);
-	m_pView[1]->ZoomText(0);
+	m_pView[0]->ZoomText(direction);
+	m_pView[1]->ZoomText(direction);
+	RecalcBytesPerLine();
 }

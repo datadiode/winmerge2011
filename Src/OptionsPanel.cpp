@@ -59,3 +59,22 @@ void OptionsPanel::SerializeColor(OPERATION op, int id, COptionDef<COLORREF> &op
 		break;
 	}
 }
+
+UINT OptionsPanel::ValidateNumber(HEdit *edit, UINT uMin, UINT uMax)
+{
+	const int nIDDlgItem = edit->GetDlgCtrlID();
+	const UINT u = GetDlgItemInt(nIDDlgItem, NULL, FALSE);
+	const UINT v = u < uMin ? uMin : u > uMax ? uMax : u;
+	if (v != u)
+	{
+		if (edit->GetModify())
+			MessageBeep(0);
+		int sel = edit->GetSel();
+		SetDlgItemInt(nIDDlgItem, v, FALSE);
+		int len = edit->GetWindowTextLength();
+		if (sel != 0)
+			sel = len;
+		edit->SetSel(sel, len);
+	}
+	return v;
+}

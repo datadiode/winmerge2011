@@ -792,6 +792,10 @@
 				>
 			</File>
 			<File
+				RelativePath="PropHexEditor.cpp"
+				>
+			</File>
+			<File
 				RelativePath="PropListColors.cpp"
 				>
 			</File>
@@ -1422,6 +1426,10 @@
 			</File>
 			<File
 				RelativePath="PropGeneral.h"
+				>
+			</File>
+			<File
+				RelativePath="PropHexEditor.h"
 				>
 			</File>
 			<File

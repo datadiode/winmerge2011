@@ -127,7 +127,11 @@ BOOL CPreferencesDlg::OnInitDialog()
 		AddPage(&m_pageCompare, htiBranch);
 		AddPage(&m_pageCompareFolder, htiBranch);
 	}
-	AddPage(&m_pageEditor);
+	if (HTREEITEM htiBranch = AddBranch(IDS_OPTIONSPG_EDITOR))
+	{
+		AddPage(&m_pageEditor, htiBranch);
+		AddPage(&m_pageHexEditor, htiBranch);
+	}
 	if (HTREEITEM htiBranch = AddBranch(IDS_OPTIONSPG_COLORS))
 	{
 		AddPage(&m_pageMergeColors, htiBranch);
@@ -262,6 +266,7 @@ void CPreferencesDlg::ReadOptions()
 	ReadOptions(&m_pageCompare);
 	ReadOptions(&m_pageCompareFolder);
 	ReadOptions(&m_pageEditor);
+	ReadOptions(&m_pageHexEditor);
 	ReadOptions(&m_pageCodepage);
 	ReadOptions(&m_pageVss);
 	ReadOptions(&m_pageArchive);
@@ -280,6 +285,7 @@ void CPreferencesDlg::SaveOptions()
 	m_pageCompare.WriteOptions();
 	m_pageCompareFolder.WriteOptions();
 	m_pageEditor.WriteOptions();
+	m_pageHexEditor.WriteOptions();
 	m_pageMergeColors.WriteOptions();
 	m_pageTextColors.WriteOptions();
 	m_pageListColors.WriteOptions();

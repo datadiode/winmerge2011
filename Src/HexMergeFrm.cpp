@@ -92,6 +92,9 @@ CHexMergeFrame::~CHexMergeFrame()
 static void Customize(IHexEditorWindow::Settings *settings)
 {
 	settings->bSaveIni = FALSE;
+	settings->bAutoOffsetLen = FALSE;
+	settings->iMinOffsetLen = 8;
+	settings->iMaxOffsetLen = 8;
 	settings->iAutomaticBPL = FALSE;
 	settings->iBytesPerLine = 16;
 	settings->iFontSize = 8;
@@ -307,13 +310,13 @@ LRESULT CHexMergeFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 		OnAllRight();
 		break;
 	case ID_VIEW_ZOOMIN:
-		OnViewZoomIn();
+		OnViewZoom(1);
 		break;
 	case ID_VIEW_ZOOMOUT:
-		OnViewZoomOut();
+		OnViewZoom(-1);
 		break;
 	case ID_VIEW_ZOOMNORMAL:
-		OnViewZoomNormal();
+		OnViewZoom(0);
 		break;
 	case ID_FILE_SAVE:
 		OnFileSave();
@@ -349,6 +352,51 @@ LRESULT CHexMergeFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 		return FALSE;
 	}
 	return TRUE;
+}
+
+void CHexMergeFrame::RecalcBytesPerLine()
+{
+	RECT rect;
+	CHexMergeView *pNarrowestView = NULL;
+	int weight = INT_MAX;
+	int i;
+	for (i = 0; i < _countof(m_pView); ++i)
+	{
+		CHexMergeView *pView = m_pView[i];
+		if (pView == NULL)
+			return;
+		pView->GetClientRect(&rect);
+		if (weight > rect.right)
+		{
+			pNarrowestView = pView;
+			weight = rect.right;
+		}
+	}
+	for (i = 0; i < _countof(m_pView); ++i)
+	{
+		CHexMergeView *pView = m_pView[i];
+		if (pView == pNarrowestView)
+		{
+			IHexEditorWindow *pif = pView->GetInterface();
+			IHexEditorWindow::Settings *settings = pif->get_settings();
+			settings->iAutomaticBPL = COptionsMgr::Get(OPT_AUTOMATIC_BPL);
+			settings->iBytesPerLine = COptionsMgr::Get(OPT_BYTES_PER_LINE);
+			pif->resize_window();
+			settings->iAutomaticBPL = FALSE;
+			weight = settings->iBytesPerLine;
+		}
+	}
+	for (i = 0; i < _countof(m_pView); ++i)
+	{
+		CHexMergeView *pView = m_pView[i];
+		if (pView != pNarrowestView)
+		{
+			IHexEditorWindow *pif = pView->GetInterface();
+			IHexEditorWindow::Settings *settings = pif->get_settings();
+			settings->iBytesPerLine = weight;
+			pif->resize_window();
+		}
+	}
 }
 
 LRESULT CHexMergeFrame::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)

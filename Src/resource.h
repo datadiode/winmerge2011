@@ -50,6 +50,7 @@
 #define IDD_PROJFILES_PATHS                     233
 #define IDD_PROPPAGE_BACKUPS                    234
 #define IDD_CONFIRM_COPY                        235
+#define IDD_PROPPAGE_HEX_EDITOR                 236
 #define IDD_PROPPAGE_SHELL                      237
 #define IDD_PROPPAGE_COMPARE_FOLDER             238
 #define IDD_PROPPAGE_COLORS_LIST                239
@@ -157,6 +158,8 @@
 #define IDC_VER_SYS                             1018
 #define IDC_HILITE_CHECK                        1019
 #define IDC_IGNOREREGEXP                        1020
+#define IDC_BPL_EDIT                            1021
+#define IDC_BPL_AUTO                            1022
 #define IDC_DISABLE_SPLASH                      1023
 #define IDC_WHITESPACE                          1024
 #define IDC_WHITE_CHANGE                        1025
@@ -459,6 +462,7 @@
 #define IDS_MESSAGEBOX_DONT_DISPLAY_AGAIN       9015
 #define IDS_MESSAGEBOX_DONT_ASK_AGAIN           9016
 #define IDS_OPTIONSPG_COMPARE                   9042
+#define IDS_OPTIONSPG_EDITOR                    9043
 #define IDS_OPTIONSPG_COLORS                    9044
 #define IDS_TO                                  16000
 #define IDS_FROM_LEFT                           16001
@@ -469,7 +473,6 @@
 #define IDS_OPTIONS_TITLE                       16400
 #define IDS_MESSAGE_BOX_ARE_RESET               16401
 #define IDS_DIFF_OPEN_NO_SET_PROPS              16402
-#define IDS_OPTIONS_INVALID_TABSIZE             16404
 #define IDS_RESET_OPTIONS_WARNING               16405
 #define IDS_OPEN_TITLE                          16416
 #define IDS_PROGRAMFILES                        16417

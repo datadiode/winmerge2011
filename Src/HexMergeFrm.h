@@ -41,6 +41,7 @@ public:
 // Operations
 public:
 	virtual FRAMETYPE GetFrameType() const { return FRAME_BINARY; }
+	void RecalcBytesPerLine();
 	void UpdateResources();
 	void SetLastCompareResult(int nResult);
 	BOOL PreTranslateMessage(MSG *);
@@ -104,9 +105,7 @@ public:
 	void OnR2l();
 	void OnAllRight();
 	void OnAllLeft();
-	void OnViewZoomIn();
-	void OnViewZoomOut();
-	void OnViewZoomNormal();
+	void OnViewZoom(int direction);
 };
 
 /////////////////////////////////////////////////////////////////////////////

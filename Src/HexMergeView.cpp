@@ -116,8 +116,9 @@ LRESULT CHexMergeView::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_LBUTTONDOWN:
 		SetFocus();
 		break;
-	case WM_SIZE:
-		OnSize();
+	case WM_WINDOWPOSCHANGED:
+		if ((reinterpret_cast<WINDOWPOS *>(lParam)->flags & SWP_NOSIZE) == 0)
+			OnSize();
 		break;
 	case WM_ERASEBKGND:
 		OnEraseBkgnd();
@@ -200,6 +201,7 @@ void CHexMergeView::OnSize()
 		parts[0] = rect.right;
 		pBar->SetParts(3, parts);
 	}
+	m_pDocument->RecalcBytesPerLine();
 }
 
 void CHexMergeView::OnEraseBkgnd()

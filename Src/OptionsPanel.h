@@ -28,4 +28,5 @@ protected:
 	typedef enum { SET_DEFAULTS, WRITE_OPTIONS, READ_OPTIONS, INVALIDATE } OPERATION;
 	void BrowseColor(int id, COLORREF &currentColor);
 	void SerializeColor(OPERATION op, int id, COptionDef<COLORREF> &optionName, COLORREF &color);
+	UINT ValidateNumber(HEdit *edit, UINT uMin, UINT uMax);
 };

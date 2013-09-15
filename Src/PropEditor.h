@@ -4,8 +4,6 @@
  * @brief Declaration file for PropEditor propertyheet
  *
  */
-// ID line follows -- this is updated by SVN
-// $Id$
 
 /**
  * @brief Property page for editor options.
@@ -42,5 +40,4 @@ protected:
 			bool UpdateData();
 	virtual BOOL OnInitDialog();
 	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
-	void OnEnKillfocusTabEdit();
 };

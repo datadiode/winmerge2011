@@ -3,9 +3,6 @@
  *
  * @brief Implementation of PropEditor propertysheet
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "OptionsPanel.h"
 #include "resource.h"
@@ -23,7 +20,6 @@ static char THIS_FILE[] = __FILE__;
 
 /** 
  * @brief Constructor.
- * @param [in] optionsMgr Pointer to options manager for handling options.
  */
 PropEditor::PropEditor()
 : OptionsPanel(IDD_PROPPAGE_EDITOR, sizeof *this)
@@ -65,8 +61,8 @@ LRESULT PropEditor::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		case MAKEWPARAM(IDC_EDITOR_WORDLEVEL, BN_CLICKED):
 			UpdateScreen();
 			break;
-		case MAKEWPARAM(IDC_TAB_EDIT, EN_KILLFOCUS):
-			OnEnKillfocusTabEdit();
+		case MAKEWPARAM(IDC_TAB_EDIT, EN_CHANGE):
+			m_nTabSize = ValidateNumber(reinterpret_cast<HEdit *>(lParam), 1, MAX_TABSIZE);
 			break;
 		}
 		break;
@@ -96,11 +92,6 @@ void PropEditor::ReadOptions()
  */
 void PropEditor::WriteOptions()
 {
-	// Sanity check tabsize
-	if (m_nTabSize < 1)
-		m_nTabSize = 1;
-	if (m_nTabSize > MAX_TABSIZE)
-		m_nTabSize = MAX_TABSIZE;
 	COptionsMgr::SaveOption(OPT_TAB_SIZE, (int)m_nTabSize);
 	COptionsMgr::SaveOption(OPT_TAB_TYPE, (int)m_nTabType);
 	COptionsMgr::SaveOption(OPT_AUTOMATIC_RESCAN, m_bAutomaticRescan != FALSE);
@@ -120,8 +111,7 @@ BOOL PropEditor::OnInitDialog()
 {
 	if (HEdit *edit = static_cast<HEdit *>(GetDlgItem(IDC_TAB_EDIT)))
 	{
-		// Limit max text of tabsize to 2 chars
-		edit->SetLimitText(2);
+		edit->SetLimitText(sizeof _CRT_STRINGIZE(MAX_TABSIZE) - 1);
 	}
 
 	if (HComboBox *combo = static_cast<HComboBox *>(GetDlgItem(IDC_BREAK_TYPE)))
@@ -143,16 +133,4 @@ void PropEditor::UpdateScreen()
 	GetDlgItem(IDC_EDITOR_WORDLEVEL)->EnableWindow(m_bViewLineDifferences);
 	// Can only choose break type if line differences are enabled & we're breaking on words
 	GetDlgItem(IDC_BREAK_TYPE)->EnableWindow(m_bViewLineDifferences);
-}
-
-/** 
- * @brief Check tabsize value when control loses focus.
- */
-void PropEditor::OnEnKillfocusTabEdit()
-{
-	int value = GetDlgItemInt(IDC_TAB_EDIT);
-	if (value < 1 || value > MAX_TABSIZE)
-	{
-		LanguageSelect.MsgBox(IDS_OPTIONS_INVALID_TABSIZE, _T(_CRT_STRINGIZE(MAX_TABSIZE)), MB_ICONWARNING);
-	}
 }

@@ -175,6 +175,11 @@ extern COptionDef
 <bool> OPT_VIEW_FILEMARGIN operator((_T("Settings/ViewFileMargin"), false));
 
 extern COptionDef
+<bool> OPT_AUTOMATIC_BPL operator((_T("Settings/AutomaticBPL"), true));
+extern COptionDef
+<int> OPT_BYTES_PER_LINE operator((_T("Settings/BytesPerLine"), 16));
+
+extern COptionDef
 <String> OPT_EXT_EDITOR_CMD operator((_T("Settings/ExternalEditor"), CMergeApp::GetDefaultEditor()));
 extern COptionDef
 <bool> OPT_USE_RECYCLE_BIN operator((_T("Settings/UseRecycleBin"), true));
