@@ -32,6 +32,8 @@ FileFilter::~FileFilter()
 {
 	EmptyFilterList(filefilters);
 	EmptyFilterList(dirfilters);
+	EmptyFilterList(xfilefilters);
+	EmptyFilterList(xdirfilters);
 	EmptyFilterList(fileprefilters);
 	EmptyFilterList(dirprefilters);
 }
