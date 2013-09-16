@@ -157,9 +157,9 @@ void FileFilterHelper::SetMask(LPCTSTR strMask)
 	m_pMaskFilter->AddRegExp(regExp.c_str());
 }
 
-BSTR FileFilterHelper::getSql()
+BSTR FileFilterHelper::getSql(int side)
 {
-	return m_currentFilter ? m_currentFilter->sql : NULL;
+	return m_currentFilter ? m_currentFilter->getSql(side) : NULL;
 }
 
 /**
@@ -312,7 +312,7 @@ String FileFilterHelper::GetFilterNameOrMask() const
  * @note If function returns FALSE, you should ask filter set with
  * GetFilterNameOrMask().
  */
-void FileFilterHelper::SetFilter(const String &filter)
+FileFilter *FileFilterHelper::SetFilter(const String &filter)
 {
 	// Remove leading and trailing whitespace characters from the string.
 	String flt = filter;
@@ -323,11 +323,12 @@ void FileFilterHelper::SetFilter(const String &filter)
 		if (!flt.empty())
 		{
 			SetFileFilterPath(flt.c_str());
-			return;
+			return m_currentFilter;
 		}
 	}
 	SetFileFilterPath(_T(""));
 	SetMask(flt.c_str());
+	return NULL;
 }
 
 /**
@@ -346,17 +347,12 @@ void FileFilterHelper::ReloadUpdatedFilters()
 	{
 		FileFilter *filter = *iter++;
 		String path = filter->fullpath;
-		fileInfo.Update(path.c_str());
-		if (fileInfo.mtime != filter->fileinfo.mtime ||
-			fileInfo.size.int64 != filter->fileinfo.size.int64)
+		// Reload filter after changing it
+		if (FileFilter *relocatedFilter = ReloadFilterFromDisk(filter))
 		{
-			// Reload filter after changing it
-			if (FileFilter *relocatedFilter = ReloadFilterFromDisk(filter))
-			{
-				// If it was active filter we have to re-set it
-				if (m_currentFilter == filter)
-					m_currentFilter = relocatedFilter;
-			}
+			// If it was active filter we have to re-set it
+			if (m_currentFilter == filter)
+				m_currentFilter = relocatedFilter;
 		}
 	}
 }

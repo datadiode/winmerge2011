@@ -36,6 +36,7 @@
 #include "SettingStore.h"
 #include "LanguageSelect.h"
 #include "FileOrFolderSelect.h"
+#include "FileFilter.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -86,20 +87,35 @@ COpenDlg::COpenDlg()
 {
 	static const LONG FloatScript[] =
 	{
-		IDC_LEFT_COMBO,			BY<1000>::X2R,
-		IDC_RIGHT_COMBO,		BY<1000>::X2R,
-		IDC_EXT_COMBO,			BY<1000>::X2R,
-		IDC_COMPARE_AS_COMBO,	BY<1000>::X2R,
-		IDC_RECURS_CHECK,		BY<1000>::X2R,
-		IDC_FILES_DIRS_GROUP,	BY<1000>::X2R,
-		IDC_LEFT_BUTTON,		BY<1000>::X2L | BY<1000>::X2R,
-		IDC_RIGHT_BUTTON,		BY<1000>::X2L | BY<1000>::X2R,
-		IDC_OPEN_STATUS,		BY<1000>::X2R,
-		IDC_SELECT_FILTER,		BY<1000>::X2L | BY<1000>::X2R,
-		IDC_COMPARE_AS_CHECK,	BY<1000>::X2L | BY<1000>::X2R,
-		IDOK,					BY<1000>::X2L | BY<1000>::X2R,
-		IDCANCEL,				BY<1000>::X2L | BY<1000>::X2R,
-		ID_HELP,				BY<1000>::X2L | BY<1000>::X2R,
+		IDC_LEFT_COMBO,					BY<1000>::X2R,
+		IDC_RIGHT_COMBO,				BY<1000>::X2R,
+		IDC_EXT_COMBO,					BY<1000>::X2R,
+		IDC_COMPARE_AS_COMBO,			BY<1000>::X2R,
+		IDC_RECURS_CHECK,				BY<1000>::X2R,
+		IDC_FILES_DIRS_GROUP,			BY<1000>::X2R,
+		IDC_LEFT_BUTTON,				BY<1000>::X2L | BY<1000>::X2R,
+		IDC_RIGHT_BUTTON,				BY<1000>::X2L | BY<1000>::X2R,
+		IDC_OPEN_STATUS,				BY<1000>::X2R,
+		IDC_SELECT_FILTER,				BY<1000>::X2L | BY<1000>::X2R,
+		IDC_COMPARE_AS_CHECK,			BY<1000>::X2L | BY<1000>::X2R,
+		IDOK,							BY<1000>::X2L | BY<1000>::X2R,
+		IDCANCEL,						BY<1000>::X2L | BY<1000>::X2R,
+		ID_HELP,						BY<1000>::X2L | BY<1000>::X2R,
+		IDC_SQL_QUERY_PARAMS_GROUP,		BY<1000>::X2R,
+		IDC_SQL_QUERY_PARAMS_LEFT,		BY<500>::X2R,
+		IDC_SQL_QUERY_PARAMS_RIGHT,		BY<500>::X2L | BY<1000>::X2R,
+		IDC_SQL_QUERY_PARAM_1_LEFT,		BY<500>::X2R,
+		IDC_SQL_QUERY_PARAM_1_RIGHT,	BY<500>::X2L | BY<1000>::X2R,
+		IDC_SQL_QUERY_PARAM_2_LEFT,		BY<500>::X2R,
+		IDC_SQL_QUERY_PARAM_2_RIGHT,	BY<500>::X2L | BY<1000>::X2R,
+		IDC_SQL_QUERY_PARAM_3_LEFT,		BY<500>::X2R,
+		IDC_SQL_QUERY_PARAM_3_RIGHT,	BY<500>::X2L | BY<1000>::X2R,
+		IDC_SQL_QUERY_PARAM_4_LEFT,		BY<500>::X2R,
+		IDC_SQL_QUERY_PARAM_4_RIGHT,	BY<500>::X2L | BY<1000>::X2R,
+		IDC_SQL_QUERY_PARAM_5_LEFT,		BY<500>::X2R,
+		IDC_SQL_QUERY_PARAM_5_RIGHT,	BY<500>::X2L | BY<1000>::X2R,
+		IDC_SQL_QUERY_PARAM_6_LEFT,		BY<500>::X2R,
+		IDC_SQL_QUERY_PARAM_6_RIGHT,	BY<500>::X2L | BY<1000>::X2R,
 		0
 	};
 	CFloatState::FloatScript = FloatScript;
@@ -202,6 +218,9 @@ LRESULT COpenDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_DROPFILES:
 		OnDropFiles(reinterpret_cast<HDROP>(wParam));
 		break;
+	case WM_SHOWWINDOW:
+		OnSelchangeFilter();
+		break;
 	case WM_COMMAND:
 		switch (wParam)
 		{
@@ -238,16 +257,20 @@ LRESULT COpenDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			if (m_pCbExt->GetWindowTextLength() == 0)
 			{
 				int index = m_pCbExt->FindStringExact(-1, _T("*.*"));
-				if (index != CB_ERR)
-				{
-					m_pCbExt->SetCurSel(index);
-				}
-				else
+				m_pCbExt->SetCurSel(index);
+				if (index == CB_ERR)
 				{
 					m_pCbExt->SetWindowText(_T("*.*"));
 					m_pCbExt->SendDlgItemMessage(1001, EM_SETSEL, 0, 0xFFFF);
 				}
 			}
+			// fall through
+		case MAKEWPARAM(IDC_EXT_COMBO, CBN_SELCHANGE):
+			OnSelchangeFilter();
+			break;
+		case MAKEWPARAM(IDC_SQL_QUERY_PARAMS_LEFT, BN_CLICKED):
+		case MAKEWPARAM(IDC_SQL_QUERY_PARAMS_RIGHT, BN_CLICKED):
+			EnableParameterInput();
 			break;
 		case MAKEWPARAM(IDC_LEFT_COMBO, CBN_SELENDCANCEL):
 		case MAKEWPARAM(IDC_RIGHT_COMBO, CBN_SELENDCANCEL):
@@ -307,6 +330,10 @@ BOOL COpenDlg::OnInitDialog()
 {
 	OResizableDialog::OnInitDialog();
 	LanguageSelect.TranslateDialog(m_hWnd);
+
+	RECT rc;
+	GetWindowRect(&rc);
+	m_cyFull = rc.bottom - rc.top;
 
 	m_pPbOk = static_cast<HButton *>(GetDlgItem(IDOK));
 
@@ -474,7 +501,26 @@ void COpenDlg::OnOK()
 
 	KillTimer(IDT_CHECKFILES);
 
-	globalFileFilter.SetFilter(m_sFilter);
+	if (FileFilter *filter = globalFileFilter.SetFilter(m_sFilter))
+	{
+		int id = IDC_SQL_QUERY_PARAMS_GROUP;
+		filter->sqlopt[0] = IsDlgButtonChecked(IDC_SQL_QUERY_PARAMS_LEFT) != BST_UNCHECKED;
+		filter->sqlopt[1] = IsDlgButtonChecked(IDC_SQL_QUERY_PARAMS_RIGHT) != BST_UNCHECKED;
+		do
+		{
+			id += 10;
+			String name;
+			GetDlgItemText(id, name);
+			if (!name.empty())
+			{
+				if (filter->sqlopt[0])
+					GetDlgItemText(id + 1, filter->params[0][name]);
+				if (filter->sqlopt[1])
+					GetDlgItemText(id + 2, filter->params[1][name]);
+			}
+		} while (id < IDC_SQL_QUERY_PARAM_6_NAME);
+	}
+
 	m_sFilter = globalFileFilter.GetFilterNameOrMask();
 	COptionsMgr::SaveOption(OPT_FILEFILTER_CURRENT, m_sFilter);
 
@@ -637,7 +683,119 @@ void COpenDlg::OnSelectFilter()
 {
 	theApp.m_pMainWnd->SelectFilter();
 	String filterNameOrMask = globalFileFilter.GetFilterNameOrMask();
-	SetDlgItemText(IDC_EXT_COMBO, filterNameOrMask.c_str());
+	m_pCbExt->SetCurSel(-1);
+	m_pCbExt->SetWindowText(filterNameOrMask.c_str());
+	OnSelchangeFilter();
+}
+
+void COpenDlg::EnableParameterInput()
+{
+	int id = IDC_SQL_QUERY_PARAMS_GROUP;
+	UINT checked[] =
+	{
+		IsDlgButtonChecked(IDC_SQL_QUERY_PARAMS_LEFT),
+		IsDlgButtonChecked(IDC_SQL_QUERY_PARAMS_RIGHT),
+	};
+	do
+	{
+		id += 10;
+		int namelength = GetDlgItem(id)->GetWindowTextLength();
+		GetDlgItem(id + 1)->EnableWindow(checked[0] && namelength != 0);
+		GetDlgItem(id + 2)->EnableWindow(checked[1] && namelength != 0);
+	} while (id < IDC_SQL_QUERY_PARAM_6_NAME);
+}
+
+void COpenDlg::ExtractParameterNames(FileFilter *filter)
+{
+	int id = IDC_SQL_QUERY_PARAMS_GROUP;
+	bool sqlopt[] = { false, false };
+	if (filter != NULL)
+	{
+		sqlopt[0] = filter->sqlopt[0];
+		sqlopt[1] = filter->sqlopt[1];
+		LPCTSTR sql = filter->sql.c_str();
+		C_ASSERT(('"' & 0x3F) == '"');
+		C_ASSERT(('\'' & 0x3F) == '\'');
+		TCHAR quote = '\0';
+		int count = 0;
+		while (const TCHAR c = *sql)
+		{
+			if (quote <= _T('\0') && c == _T('%') && ++count <= 6)
+			{
+				LPCTSTR p = sql + 1;
+				if (LPCTSTR q = _tcschr(p, c))
+				{
+					String name(p, static_cast<String::size_type>(q - p));
+					id += 10;
+					SetDlgItemText(id, name.c_str());
+					if (!filter->params[0].empty())
+						SetDlgItemText(id + 1, filter->params[0][name].c_str());
+					if (!filter->params[1].empty())
+						SetDlgItemText(id + 2, filter->params[1][name].c_str());
+					sql = q;
+				}
+			}
+			if (c == '\\')
+				quote ^= 0x40;
+			else if ((c == '"' || c == '\'') && (quote == '\0' || quote == c))
+				quote ^= c;
+			else
+				quote &= 0x3F;
+			++sql;
+		}
+	}
+	while (id < IDC_SQL_QUERY_PARAM_6_NAME)
+	{
+		id += 10;
+		SetDlgItemText(id, NULL);
+	}
+	CheckDlgButton(IDC_SQL_QUERY_PARAMS_LEFT, sqlopt[0]);
+	CheckDlgButton(IDC_SQL_QUERY_PARAMS_RIGHT, sqlopt[1]);
+}
+
+void COpenDlg::OnSelchangeFilter()
+{
+	String selected;
+	const stl::vector<FileFilter *> &filters = globalFileFilter.GetFileFilters(selected);
+	if (m_pCbExt->GetLBText(m_pCbExt->GetCurSel(), selected) < 0)
+		m_pCbExt->GetWindowText(selected);
+	FileFilter *filter = NULL;
+	if (LPCTSTR name = EatPrefix(selected.c_str(), _T("[F] ")))
+	{
+		stl::vector<FileFilter *>::const_iterator it = filters.begin();
+		while (it != filters.end())
+		{
+			FileFilter *p = *it++;
+			if (p->name == name)
+			{
+				filter = p;
+				break;
+			}
+		}
+	}
+	ExtractParameterNames(filter);
+	EnableParameterInput();
+	RECT rc;
+	HWindow *const pGroup = GetDlgItem(IDC_SQL_QUERY_PARAMS_GROUP);
+	pGroup->GetWindowRect(&rc);
+	ScreenToClient(&rc);
+	int cyPart = rc.bottom - rc.top + rc.left;
+	RECT rcGrip;
+	GetClientRect(&rcGrip);
+	rcGrip.left = rcGrip.right - ::GetSystemMetrics(SM_CXVSCROLL);
+	rcGrip.top = rcGrip.bottom - ::GetSystemMetrics(SM_CYHSCROLL);
+	GetWindowRect(&rc);
+	CFloatState::cy = filter == NULL || filter->sql.empty() ? m_cyFull - cyPart : m_cyFull;
+	SetWindowPos(NULL, 0, 0, rc.right - rc.left, CFloatState::cy,
+		SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
+	GetClientRect(&rc);
+	rc.left = rc.right - ::GetSystemMetrics(SM_CXVSCROLL);
+	rc.top = rc.bottom - ::GetSystemMetrics(SM_CYHSCROLL);
+	if (!EqualRect(&rc, &rcGrip))
+	{
+		UnionRect(&rcGrip, &rcGrip, &rc);
+		InvalidateRect(&rcGrip);
+	}
 }
 
 /** 

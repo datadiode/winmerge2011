@@ -63,7 +63,7 @@ int CDiffContext::DirScan_GetItems(
 			sLeftDir = paths_ConcatPath(sLeftDir, leftsubdir);
 			leftsubprefix = leftsubdir + backslash;
 		}
-		LoadAndSortFiles(sLeftDir.c_str(), &leftDirs, &leftFiles);
+		LoadAndSortFiles(sLeftDir.c_str(), &leftDirs, &leftFiles, 0);
 	}
 	if (!bLeftUniq)
 	{
@@ -72,7 +72,7 @@ int CDiffContext::DirScan_GetItems(
 			sRightDir = paths_ConcatPath(sRightDir, rightsubdir);
 			rightsubprefix = rightsubdir + backslash;
 		}
-		LoadAndSortFiles(sRightDir.c_str(), &rightDirs, &rightFiles);
+		LoadAndSortFiles(sRightDir.c_str(), &rightDirs, &rightFiles, 1);
 	}
 
 	// Allow user to abort scanning

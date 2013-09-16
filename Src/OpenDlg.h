@@ -77,11 +77,15 @@ private:
 	const int m_nAutoComplete;
 	int m_nCompareAs;
 
+	int m_cyFull;
+
 // Implementation
 protected:
 	void UpdateButtonStates();
 	void SetStatus(UINT msgID);
 	void TrimPaths();
+	void EnableParameterInput();
+	void ExtractParameterNames(FileFilter *);
 
 	template<DDX_Operation>
 			bool UpdateData();
@@ -100,6 +104,7 @@ protected:
 	void OnEditEvent();
 	void OnTimer(UINT_PTR);
 	void OnSelectFilter();
+	void OnSelchangeFilter();
 	void OnActivate(UINT nState, HWND hWndOther, BOOL bMinimized);
 	void OnHelp();
 	void OnDropFiles(HDROP dropInfo);

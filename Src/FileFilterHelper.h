@@ -41,7 +41,7 @@ extern class IDiffFilter
 private:
 	const static bool casesensitive = false;
 public:
-	virtual BSTR getSql() { return NULL; }
+	virtual BSTR getSql(int side) { return NULL; }
 	virtual bool includeFile(LPCTSTR szFileName) { return true; }
 	virtual bool includeDir(LPCTSTR szDirName) { return true; }
 	virtual bool isCaseSensitive() { return casesensitive; }
@@ -113,10 +113,10 @@ public:
 
 	bool IsUsingMask() const { return m_currentFilter == NULL; }
 	String GetFilterNameOrMask() const;
-	void SetFilter(const String &filter);
+	FileFilter *SetFilter(const String &filter);
 
 	// Overrides
-	virtual BSTR getSql();
+	virtual BSTR getSql(int);
 	virtual bool includeFile(LPCTSTR);
 	virtual bool includeDir(LPCTSTR);
 	virtual int collateFile(LPCTSTR, LPCTSTR);

@@ -4,9 +4,6 @@
  * @brief Implementation file for Directory traversal functions.
  *
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "paths.h"
 #include "Environment.h"
@@ -19,9 +16,9 @@
 /**
  * @brief Load arrays with all directories & files in specified dir
  */
-void CDiffContext::LoadAndSortFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *files) const
+void CDiffContext::LoadAndSortFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *files, int side) const
 {
-	LoadFiles(sDir, dirs, files);
+	LoadFiles(sDir, dirs, files, side);
 	Sort(dirs);
 	Sort(files);
 	// If recursing the flat way, reset total count of items to 0
@@ -41,15 +38,16 @@ void CDiffContext::LoadAndSortFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArr
  * @param [in, out] dirs Array where subfolders are stored.
  * @param [in, out] files Array where files are stored.
  */
-void CDiffContext::LoadFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *files) const
+void CDiffContext::LoadFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *files, int side) const
 {
-	if (LPCTSTR filter = m_piFilterGlobal->getSql())
+	if (BSTR sql = m_piFilterGlobal->getSql(side))
 	{
+		CMyComBSTR filter(&sql);
 		String path = paths_ConcatPath(sDir, _T("*")).c_str();
 		String exe = env_ExpandVariables(_T("%LogParser%\\LogParser.exe"));
 		string_format cmd(
 			_T("\"%s\" \"SELECT Name, CreationTime, LastWriteTime, Attributes, Size FROM '%s' %s\" -i:FS -o:TSV -q -recurse:0 -oCodepage:65001"),
-			exe.c_str(), path.c_str(), filter);
+			exe.c_str(), path.c_str(), filter.m_str);
 		STARTUPINFO si;
 		ZeroMemory(&si, sizeof si);
 		si.cb = sizeof si;
@@ -85,7 +83,7 @@ void CDiffContext::LoadFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *fil
 				state = line == "Name\tCreationTime\tLastWriteTime\tAttributes\tSize\r\n" ? 1 : -1;
 				// fall through
 			case -1:
-				// TODO: LogParser error messages tend to be followed by some garbage (pipe issue?)
+				// TODO: Error messages tend to be followed by some garbage (pipe issue?)
 				head += line;
 				continue;
 			}
@@ -153,7 +151,7 @@ void CDiffContext::LoadFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *fil
 						break;
 					path = paths_ConcatPath(ent.path, ent.filename);
 					if (m_piFilterGlobal->includeDir(path.c_str()))
-						LoadFiles(path.c_str(), dirs, files);
+						LoadFiles(path.c_str(), dirs, files, side);
 				}
 				else
 				{
@@ -204,7 +202,7 @@ void CDiffContext::LoadFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *fil
 							break;
 						String sDir = paths_ConcatPath(ent.path, ent.filename);
 						if (m_piFilterGlobal->includeDir(sDir.c_str()))
-							LoadFiles(sDir.c_str(), dirs, files);
+							LoadFiles(sDir.c_str(), dirs, files, side);
 					}
 					else
 					{

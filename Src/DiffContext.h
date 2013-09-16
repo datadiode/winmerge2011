@@ -168,8 +168,8 @@ private:
 
 	typedef stl::vector<DirItem> DirItemArray;
 
-	void LoadAndSortFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *files) const;
-	void LoadFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *files) const;
+	void LoadAndSortFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *files, int side) const;
+	void LoadFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *files, int side) const;
 	void Sort(DirItemArray *dirs) const;
 };
 

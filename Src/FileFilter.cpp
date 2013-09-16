@@ -39,6 +39,58 @@ FileFilter::~FileFilter()
 }
 
 /**
+ * @brief Compose optional SQL clause from template and parameters.
+ */
+BSTR FileFilter::getSql(int side)
+{
+	if (!sqlopt[side])
+		return NULL;
+	BSTR dst = SysAllocString(sql.c_str());
+	LPCTSTR src = dst;
+	int count = 0;
+	C_ASSERT(('"' & 0x3F) == '"');
+	C_ASSERT(('\'' & 0x3F) == '\'');
+	TCHAR quote = '\0';
+	while (const TCHAR c = *src)
+	{
+		if (quote <= _T('\0') && c == _T('%') && ++count <= 6)
+		{
+			LPCTSTR p = src + 1;
+			if (LPCTSTR q = _tcschr(p, c))
+			{
+				String name(p, static_cast<String::size_type>(q - p));
+				const String &value = params[side][name].c_str();
+				const UINT i = static_cast<UINT>(p - dst);
+				const UINT j = static_cast<UINT>(q - dst);
+				const UINT n = SysStringLen(dst);
+				UINT k = value.length();
+				if (BSTR tmp = SysAllocStringLen(NULL, n - (j - i) + k))
+				{
+					memcpy(tmp, dst, i * sizeof *tmp);
+					memcpy(tmp + i, value.c_str(), k * sizeof *tmp);
+					k += i;
+					memcpy(tmp + k, q, (n - j) * sizeof *tmp);
+					tmp[i - 1] = tmp[k] = L'\'';
+					SysFreeString(dst);
+					dst = tmp;
+					p = dst + i;
+					q = dst + k;
+				}
+				src = q;
+			}
+		}
+		if (c == '\\')
+			quote ^= 0x40;
+		else if ((c == '"' || c == '\'') && (quote == '\0' || quote == c))
+			quote ^= c;
+		else
+			quote &= 0x3F;
+		++src;
+	}
+	return dst;
+}
+
+/**
  * @brief Test given string against given regexp list.
  *
  * @param [in] filterList List of regexps to test against.

@@ -296,6 +296,9 @@ FileFilter *FileFilterMgr::ReloadFilterFromDisk(FileFilter *pfilter)
 	{
 		if (FileFilter *const newfilter = LoadFilterFile(pfilter->fullpath.c_str()))
 		{
+			newfilter->sqlopt[0] = pfilter->sqlopt[0];
+			newfilter->sqlopt[1] = pfilter->sqlopt[1];
+			newfilter->params.swap(pfilter->params);
 			delete pfilter;
 			*iter = pfilter = newfilter;
 		}
