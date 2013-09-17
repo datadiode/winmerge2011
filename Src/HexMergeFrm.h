@@ -34,10 +34,13 @@ class CHexMergeView;
 /** 
  * @brief Frame class for file compare, handles panes, statusbar etc.
  */
-class CHexMergeFrame : public CDocFrame, private CFloatFlags
+class CHexMergeFrame
+	: ZeroInit<CHexMergeFrame>
+	, public CEditorFrame
+	, private CFloatFlags
 {
 public:
-	CHexMergeFrame(CMainFrame *);
+	CHexMergeFrame(CMainFrame *, CDirFrame * = NULL);
 // Operations
 public:
 	virtual FRAMETYPE GetFrameType() const { return FRAME_BINARY; }
@@ -55,20 +58,12 @@ private:
 	virtual ~CHexMergeFrame();
 	void CreateClient();
 	CHexMergeView *CreatePane(int);
-// Generated message map functions
 private:
 	static const LONG FloatScript[];
 	static const LONG SplitScript[];
 
-// Attributes
-public:
-	stl::vector<String> m_strPath; /**< Filepaths for this document */
-
-// Begin declaration of CHexMergeDoc
-
-	// Operations
 public:	
-	void SetMergeViews(CHexMergeView * pLeft, CHexMergeView * pRight);
+	void SetMergeViews(CHexMergeView *pLeft, CHexMergeView *pRight);
 
 	bool SaveModified();
 	void SetTitle();
@@ -77,8 +72,6 @@ public:
 public:
 	void UpdateDiffItem(CDirFrame *);
 	bool PromptAndSaveIfNeeded(bool bAllowCancel);
-	void SetDirDoc(CDirFrame *);
-	void DirDocClosing(CDirFrame *);
 	CHexMergeView *GetActiveView() const;
 	void UpdateHeaderPath(int pane);
 	void UpdateCmdUI();
@@ -90,9 +83,6 @@ private:
 // Implementation data
 public:
 	CHexMergeView *m_pView[MERGE_VIEW_COUNT]; /**< Pointer to left/right view */
-	CDirFrame *m_pDirDoc;
-	stl::vector<String> m_strDesc; /**< Left/right side description text */
-	BUFFERTYPE m_nBufferType[2];
 
 // Generated message map functions
 public:

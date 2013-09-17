@@ -30,6 +30,7 @@
 #include "scriptable.h"
 
 class CMainFrame;
+class CDirFrame;
 
 const TCHAR WinMergeWindowClass[] = _T("WinMergeWindowClassW");
 
@@ -120,7 +121,7 @@ public:
 		HMENU m_hMenuShared;
 		HACCEL m_hAccelShared;
 	} *const m_pHandleSet;
-	void ActivateFrame();
+	virtual void ActivateFrame();
 	void DestroyFrame();
 	virtual void SavePosition()
 	{
@@ -152,6 +153,32 @@ protected:
 private:
 	// Avoid DestroyWindow() in favor of DestroyFrame()
 	using OWindow::DestroyWindow;
+};
+
+class CEditorFrame : public CDocFrame
+{
+public:
+	CDirFrame *m_pDirDoc;
+	String m_sCompareAs;
+	stl::vector<String> m_strPath; /**< Filepaths for this document */
+	stl::vector<String> m_strDesc; /**< Left/right side description text */
+	BUFFERTYPE m_nBufferType[2];
+protected:
+	CEditorFrame(CMainFrame *pAppFrame, CDirFrame *pDirDoc, HandleSet *pHandleSet, const LONG *FloatScript, const LONG *SplitScript = NULL)
+		: CDocFrame(pAppFrame, pHandleSet, FloatScript, SplitScript)
+		, m_pDirDoc(pDirDoc)
+		, m_strPath(2)
+		, m_strDesc(2)
+	{
+		ASSERT(m_nBufferType[0] == BUFFER_NORMAL);
+		ASSERT(m_nBufferType[1] == BUFFER_NORMAL);
+	}
+public:
+	void DirDocClosing(CDirFrame *pDirDoc)
+	{
+		ASSERT(m_pDirDoc == pDirDoc);
+		m_pDirDoc = NULL;
+	}
 };
 
 class CSubFrame

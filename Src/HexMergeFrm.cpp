@@ -64,16 +64,11 @@ const LONG CHexMergeFrame::SplitScript[] =
 	0
 };
 
-CHexMergeFrame::CHexMergeFrame(CMainFrame *pMDIFrame)
-: CDocFrame(pMDIFrame, GetHandleSet<IDR_HEXDOCTYPE>(), FloatScript, SplitScript)
-, m_pDirDoc(NULL)
-, m_strPath(2)
-, m_strDesc(2)
+CHexMergeFrame::CHexMergeFrame(CMainFrame *pMDIFrame, CDirFrame *pDirDoc)
+: CEditorFrame(pMDIFrame, pDirDoc, GetHandleSet<IDR_HEXDOCTYPE>(), FloatScript, SplitScript)
 {
-	m_pView[0] = NULL;
-	m_pView[1] = NULL;
-	m_nBufferType[0] = BUFFER_NORMAL;
-	m_nBufferType[1] = BUFFER_NORMAL;
+	ASSERT(m_pView[0] == NULL);
+	ASSERT(m_pView[1] == NULL);
 	SubclassWindow(pMDIFrame->CreateChildHandle());
 	CreateClient();
 	RecalcLayout();

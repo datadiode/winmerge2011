@@ -607,9 +607,8 @@ bool CDirFrame::CloseMergeDocs()
  */
 CChildFrame *CDirFrame::GetMergeDocForDiff()
 {
-	CChildFrame *pMergeDoc = new CChildFrame(m_pMDIFrame);
+	CChildFrame *pMergeDoc = new CChildFrame(m_pMDIFrame, this);
 	AddMergeDoc(pMergeDoc);
-	pMergeDoc->SetDirDoc(this);
 	return pMergeDoc;
 }
 
@@ -621,9 +620,8 @@ CChildFrame *CDirFrame::GetMergeDocForDiff()
  */
 CHexMergeFrame *CDirFrame::GetHexMergeDocForDiff()
 {
-	CHexMergeFrame *pHexMergeDoc = new CHexMergeFrame(m_pMDIFrame);
+	CHexMergeFrame *pHexMergeDoc = new CHexMergeFrame(m_pMDIFrame, this);
 	AddMergeDoc(pHexMergeDoc);
-	pHexMergeDoc->SetDirDoc(this);
 	return pHexMergeDoc;
 }
 

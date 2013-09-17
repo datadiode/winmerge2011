@@ -1717,25 +1717,6 @@ void CChildFrame::SetMergeDetailViews(CMergeDiffDetailView * pLeft, CMergeDiffDe
 }
 
 /**
- * @brief DirDoc gives us its identity just after it creates us
- */
-void CChildFrame::SetDirDoc(CDirFrame *pDirDoc)
-{
-	ASSERT(pDirDoc && !m_pDirDoc);
-	m_pDirDoc = pDirDoc;
-}
-
-/**
- * @brief DirDoc is closing
- */
-void CChildFrame::DirDocClosing(CDirFrame *pDirDoc)
-{
-	ASSERT(m_pDirDoc == pDirDoc);
-	m_pDirDoc = NULL;
-	// TODO (Perry 2003-03-30): perhaps merge doc should close now ?
-}
-
-/**
  * @brief Loads file to buffer and shows load-errors
  * @param [in] sFileName File to open
  * @param [in] nBuffer Index (0-based) of buffer to load
@@ -2294,7 +2275,7 @@ void CChildFrame::OnToolsCompareSelection()
 	filelocLeft.description = LanguageSelect.LoadString(IDS_SELECTION_LEFT);
 	filelocRight.encoding = m_ptBuf[1]->getEncoding();
 	filelocRight.description = LanguageSelect.LoadString(IDS_SELECTION_RIGHT);
-	CChildFrame *const pMergeDoc = new CChildFrame(m_pMDIFrame, this);
+	CChildFrame *const pMergeDoc = new CChildFrame(m_pMDIFrame, NULL, this);
 	pMergeDoc->OpenDocs(filelocLeft, filelocRight, FALSE, FALSE);
 	int nSide = 0;
 	do

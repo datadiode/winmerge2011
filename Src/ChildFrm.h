@@ -96,14 +96,14 @@ class CDirFrame;
  */
 class CChildFrame
 	: ZeroInit<CChildFrame>
-	, public CDocFrame
+	, public CEditorFrame
 	, public CScriptable<IMergeDoc>
 	, private CFloatFlags
 {
 	class DiffMap;
 	friend DiffMap;
 public:
-	CChildFrame(CMainFrame *, CChildFrame *pOpener = NULL);
+	CChildFrame(CMainFrame *, CDirFrame * = NULL, CChildFrame *pOpener = NULL);
 
 	// IElementBehaviorFactory
 	STDMETHOD(FindBehavior)(BSTR, BSTR, IElementBehaviorSite *, IElementBehavior **);
@@ -173,8 +173,6 @@ public:
 
 	DiffList m_diffList;
 	UINT m_nTrivialDiffs; /**< Amount of trivial (ignored) diffs */
-	stl::vector<String> m_strPath; /**< Left/right path */
-	stl::vector<String> m_strDesc; /**< Left/right side description text */
 	stl::vector<FileTextStats> m_pFileTextStats;
 
 	int GetActiveMergeViewIndexType() const;
@@ -206,8 +204,6 @@ public:
 	void SetUnpacker(PackingInfo *);
 	void SetMergeViews(CMergeEditView * pLeft, CMergeEditView * pRight);
 	void SetMergeDetailViews(CMergeDiffDetailView * pLeft, CMergeDiffDetailView * pRight);
-	void SetDirDoc(CDirFrame *);
-	void DirDocClosing(CDirFrame *);
 	void SwapFiles();
 
 	CMergeEditView *GetLeftView() const { return m_pView[0]; }
@@ -216,8 +212,6 @@ public:
 	CMergeDiffDetailView *GetLeftDetailView() const { return m_pDetailView[0]; }
 	CMergeDiffDetailView *GetRightDetailView() const { return m_pDetailView[1]; }
 	CMergeDiffDetailView *GetDetailView(int pane) const { return m_pDetailView[pane]; }
-
-	CDirFrame *GetDirDoc() const { return m_pDirDoc; }
 
 	const FileTextEncoding & GetEncoding(int file) const
 			{ return m_ptBuf[file]->getEncoding(); }
@@ -266,7 +260,6 @@ private:
 	stl::vector<DiffFileInfo> m_pSaveFileInfo;
 	stl::vector<DiffFileInfo> m_pRescanFileInfo;
 
-	CDirFrame *m_pDirDoc;
 	CChildFrame *const m_pOpener;
 	bool m_bEditAfterRescan[2]; /**< Left/right doc edited after rescanning */
 	bool m_bInitialReadOnly[2]; /**< Left/right doc initial read-only state */
@@ -277,7 +270,6 @@ private:
 	CDiffWrapper m_diffWrapper;
 	/// information about the file packer/unpacker
 	const stl::auto_ptr<PackingInfo> m_pInfoUnpacker;
-	BUFFERTYPE m_nBufferType[2];
 // friend access
 	friend class RescanSuppress;
 

@@ -726,8 +726,8 @@ const LONG CChildFrame::FloatScriptDiffViewBar[] =
 /**
  * @brief Constructor.
  */
-CChildFrame::CChildFrame(CMainFrame *pMDIFrame, CChildFrame *pOpener)
-: CDocFrame(pMDIFrame, GetHandleSet<IDR_MERGEDOCTYPE>(), FloatScript, SplitScript)
+CChildFrame::CChildFrame(CMainFrame *pMDIFrame, CDirFrame *pDirDoc, CChildFrame *pOpener)
+: CEditorFrame(pMDIFrame, pDirDoc, GetHandleSet<IDR_MERGEDOCTYPE>(), FloatScript, SplitScript)
 , m_pOpener(pOpener)
 #pragma warning(disable:warning_this_used_in_base_member_initializer_list)
 , m_wndLocationView(this)
@@ -739,21 +739,16 @@ CChildFrame::CChildFrame(CMainFrame *pMDIFrame, CChildFrame *pOpener)
 , m_idContextLines(ID_VIEW_CONTEXT_UNLIMITED)
 , m_pInfoUnpacker(new PackingInfo)
 , m_diffWrapper(&m_diffList)
-, m_strPath(2)
-, m_strDesc(2)
 , m_pSaveFileInfo(2)
 , m_pRescanFileInfo(2)
 , m_pFileTextStats(2)
 {
 	curUndo = undoTgt.begin();
-	ASSERT(m_pDirDoc == NULL);
 	ASSERT(m_bMixedEol == false);
 	ASSERT(m_pView[0] == NULL);
 	ASSERT(m_pView[1] == NULL);
 	ASSERT(m_pDetailView[0] == NULL);
 	ASSERT(m_pDetailView[1] == NULL);
-	ASSERT(m_nBufferType[0] == BUFFER_NORMAL);
-	ASSERT(m_nBufferType[1] == BUFFER_NORMAL);
 	m_bMergingMode = COptionsMgr::Get(OPT_MERGE_MODE);
 	ASSERT(m_bEditAfterRescan[0] == false);
 	ASSERT(m_bEditAfterRescan[1] == false);

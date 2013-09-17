@@ -309,24 +309,6 @@ void CHexMergeFrame::OnFileSaveAsRight()
 }
 
 /**
- * @brief DirDoc gives us its identity just after it creates us
- */
-void CHexMergeFrame::SetDirDoc(CDirFrame *pDirDoc)
-{
-	ASSERT(pDirDoc && !m_pDirDoc);
-	m_pDirDoc = pDirDoc;
-}
-
-/**
- * @brief DirDoc is closing
- */
-void CHexMergeFrame::DirDocClosing(CDirFrame *pDirDoc)
-{
-	ASSERT(m_pDirDoc == pDirDoc);
-	m_pDirDoc = NULL;
-}
-
-/**
 * @brief Load one file
 */
 HRESULT CHexMergeFrame::LoadOneFile(int index, const FileLocation &fileinfo, BOOL readOnly)
