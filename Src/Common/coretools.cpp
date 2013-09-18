@@ -24,6 +24,82 @@ int linelen(const char *string)
 }
 
 /**
+ * @brief Convert C style \\nnn, \\r, \\n, \\t etc into their indicated characters.
+ * @param [in] codepage Codepage to use in conversion.
+ * @param [in,out] s String to convert.
+ */
+size_t unslash(unsigned codepage, char *string)
+{
+	char *p = string;
+	char *q = p;
+	char c;
+	do
+	{
+		char *r = q + 1;
+		switch (c = *q)
+		{
+		case '\\':
+			switch (c = *r++)
+			{
+			case 'a':
+				c = '\a';
+				break;
+			case 'b':
+				c = '\b';
+				break;
+			case 'f':
+				c = '\f';
+				break;
+			case 'n':
+				c = '\n';
+				break;
+			case 'r':
+				c = '\r';
+				break;
+			case 't':
+				c = '\t';
+				break;
+			case 'v':
+				c = '\v';
+				break;
+			case 'x':
+				*p = (char)strtol(r, &q, 16);
+				break;
+			default:
+				*p = (char)strtol(r - 1, &q, 8);
+				break;
+			}
+			if (q >= r)
+				break;
+			// fall through
+		default:
+			*p = c;
+			if ((*p & 0x80) && IsDBCSLeadByteEx(codepage, *p))
+				*++p = *r++;
+			q = r;
+		}
+		++p;
+	} while (c != '\0');
+	//s.resize(static_cast<stl::string::size_type>(p - 1 - &s.front()));
+	return p - 1 - string;
+}
+
+/**
+ * @brief Remove prefix from the text.
+ * @param [in] text Text to process.
+ * @param [in] prefix Prefix to remove.
+ * @return Text without the prefix.
+ */
+LPSTR NTAPI EatPrefix(LPCSTR text, LPCSTR prefix)
+{
+	size_t len = strlen(prefix);
+	if (len)
+		if (_memicmp(text, prefix, len) == 0)
+			return const_cast<LPSTR>(text + len);
+	return 0;
+}
+
+/**
  * @brief Eat prefix and return pointer to remaining text
  */
 LPCWSTR NTAPI EatPrefix(LPCWSTR text, LPCWSTR prefix)

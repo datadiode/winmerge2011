@@ -30,8 +30,6 @@ static char THIS_FILE[] = __FILE__;
 /** @brief Relative path to WinMerge executable for lang files. */
 static const TCHAR szRelativePath[] = _T("\\Languages\\");
 
-static char *EatPrefix(char *text, const char *prefix);
-static void unslash(unsigned codepage, stl::string &s);
 static HANDLE NTAPI FindFile(HANDLE h, LPCTSTR path, WIN32_FIND_DATA *fd);
 
 /**
@@ -515,82 +513,6 @@ CLanguageSelect::CLanguageSelect()
 	};
 	CFloatState::FloatScript = FloatScript;
 	SetThreadLocale(MAKELCID(m_wCurLanguage, SORT_DEFAULT));
-}
-
-/**
- * @brief Remove prefix from the string.
- * @param [in] text String from which to jump over prefix.
- * @param [in] prefix Prefix string to jump over.
- * @return String without the prefix.
- * @note Function returns pointer to original string,
- *  it does not allocate a new string.
- */
-static char *EatPrefix(char *text, const char *prefix)
-{
-	if (size_t len = strlen(prefix))
-		if (_memicmp(text, prefix, len) == 0)
-			return text + len;
-	return 0;
-}
-
-/**
- * @brief Convert C style \\nnn, \\r, \\n, \\t etc into their indicated characters.
- * @param [in] codepage Codepage to use in conversion.
- * @param [in,out] s String to convert.
- */
-static void unslash(unsigned codepage, stl::string &s)
-{
-	char *p = &s.front();
-	char *q = p;
-	char c;
-	do
-	{
-		char *r = q + 1;
-		switch (c = *q)
-		{
-		case '\\':
-			switch (c = *r++)
-			{
-			case 'a':
-				c = '\a';
-				break;
-			case 'b':
-				c = '\b';
-				break;
-			case 'f':
-				c = '\f';
-				break;
-			case 'n':
-				c = '\n';
-				break;
-			case 'r':
-				c = '\r';
-				break;
-			case 't':
-				c = '\t';
-				break;
-			case 'v':
-				c = '\v';
-				break;
-			case 'x':
-				*p = (char)strtol(r, &q, 16);
-				break;
-			default:
-				*p = (char)strtol(r - 1, &q, 8);
-				break;
-			}
-			if (q >= r)
-				break;
-			// fall through
-		default:
-			*p = c;
-			if ((*p & 0x80) && IsDBCSLeadByteEx(codepage, *p))
-				*++p = *r++;
-			q = r;
-		}
-		++p;
-	} while (c != '\0');
-	s.resize(static_cast<stl::string::size_type>(p - 1 - &s.front()));
 }
 
 /**

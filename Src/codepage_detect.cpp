@@ -36,25 +36,9 @@ static const char *f_wincp_prefixes[] =
 };
 
 /**
- * @brief Remove prefix from the text.
- * @param [in] text Text to process.
- * @param [in] prefix Prefix to remove.
- * @return Text without the prefix.
- */
-static const char *EatPrefix(const char *text, const char *prefix)
-{
-	size_t len = strlen(prefix);
-	if (len)
-		if (_memicmp(text, prefix, len) == 0)
-			return text + len;
-	return 0;
-}
-
-/**
  * @brief Try to to match codepage name from codepages module, & watch for f_wincp_prefixes aliases
  */
-static int
-FindEncodingIdFromNameOrAlias(const char *encodingName)
+static int FindEncodingIdFromNameOrAlias(const char *encodingName)
 {
 	// Try name as given
 	unsigned encodingId = GetEncodingIdFromName(encodingName);
@@ -80,6 +64,25 @@ FindEncodingIdFromNameOrAlias(const char *encodingName)
 	return encodingId;
 }
 
+static unsigned ReadCodepageFromContentType(char *pchKey)
+{
+	while (size_t cchKey = strcspn(pchKey += strspn(pchKey, "; \t\r\n"), ";="))
+	{
+		char *pchValue = pchKey + cchKey;
+		size_t cchValue = strcspn(pchValue += strspn(pchValue, "= \t\r\n"), "; \t\r\n");
+		if (cchKey >= 7 && _memicmp(pchKey, "charset", 7) == 0 && (cchKey == 7 || strchr(" \t\r\n", pchKey[7])))
+		{
+			pchValue[cchValue] = '\0';
+			// Is it an encoding name known to charsets module ?
+			if (unsigned encodingId = FindEncodingIdFromNameOrAlias(pchValue))
+				return GetEncodingCodePageFromId(encodingId);
+			return 0;
+		}
+		pchKey = pchValue + cchValue;
+	}
+	return 0;
+}
+
 /**
  * @brief Parser for HTML files to find encoding information
  */
@@ -94,23 +97,9 @@ static unsigned demoGuessEncoding_html(const char *src, stl_size_t len)
 		{
 			if (lstrcmpiA(CMarkdown::String(hstr).A, "content-type") == 0)
 			{
-				CMarkdown::String content = markdown.GetAttribute("content");
-				if (char *pchKey = content.A)
+				if (CMarkdown::HSTR hstr = markdown.GetAttribute("content"))
 				{
-					while (size_t cchKey = strcspn(pchKey += strspn(pchKey, "; \t\r\n"), ";="))
-					{
-						char *pchValue = pchKey + cchKey;
-						size_t cchValue = strcspn(pchValue += strspn(pchValue, "= \t\r\n"), "; \t\r\n");
-						if (cchKey >= 7 && _memicmp(pchKey, "charset", 7) == 0 && (cchKey == 7 || strchr(" \t\r\n", pchKey[7])))
-						{
-							pchValue[cchValue] = '\0';
-							// Is it an encoding name known to charsets module ?
-							if (unsigned encodingId = FindEncodingIdFromNameOrAlias(pchValue))
-								return GetEncodingCodePageFromId(encodingId);
-							return 0;
-						}
-						pchKey = pchValue + cchValue;
-					}
+					return ReadCodepageFromContentType(CMarkdown::String(hstr).A);
 				}
 			}
 		}
@@ -174,6 +163,40 @@ static unsigned demoGuessEncoding_rc(const char *src, stl_size_t len)
 }
 
 /**
+ * @brief Parser for po files to find encoding information
+ * @note sscanf() requires first argument to be zero-terminated so we must
+ * copy lines to temporary buffer.
+ */
+static unsigned demoGuessEncoding_po(const char *src, stl_size_t len)
+{
+	do
+	{
+		while (len && (*src == '\r' || *src == '\n'))
+		{
+			++src;
+			--len;
+		}
+		const char *base = src;
+		while (len && (*src != '\r' && *src != '\n'))
+		{
+			++src;
+			--len;
+		}
+		if (int len = static_cast<int>(src - base))
+		{
+			char line[80];
+			lstrcpynA(line, base, len < sizeof line ? len + 1 : sizeof line);
+			if (char *pchKey = EatPrefix(line, "\"Content-Type:"))
+			{
+				unslash(CP_ACP, pchKey);
+				return ReadCodepageFromContentType(pchKey);
+			}
+		}
+	} while (len);
+	return 0;
+}
+
+/**
  * @brief Try to deduce encoding for this file.
  * @param [in] ext File extension.
  * @param [in] src File contents (as a string).
@@ -196,6 +219,10 @@ unsigned GuessEncoding_from_bytes(LPCTSTR ext, LPCTSTR pastext, const char *src,
 	else if (EatPrefix(ext, _T(".xml")) == pastext || EatPrefix(ext, _T(".xsl")) == pastext)
 	{
 		cp = demoGuessEncoding_xml(src, len);
+	}
+	else if (EatPrefix(ext, _T(".po")) == pastext || EatPrefix(ext, _T(".pot")) == pastext)
+	{
+		cp = demoGuessEncoding_po(src, len);
 	}
 	return cp;
 }
