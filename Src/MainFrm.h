@@ -102,16 +102,18 @@ public:
 		DWORD dwRightFlags,
 		int nRecursive,
 		CDirFrame * = NULL);
-	void ShowMergeDoc(CDirFrame *,
+	CEditorFrame *ShowMergeDoc(CDirFrame *,
 		FileLocation & filelocLeft,
 		FileLocation & filelocRight,
 		DWORD dwLeftFlags = 0,
 		DWORD dwRightFlags = 0,
-		PackingInfo * infoUnpacker = NULL);
-	void ShowHexMergeDoc(CDirFrame *,
+		PackingInfo * infoUnpacker = NULL,
+		LPCTSTR sCompareAs = NULL);
+	CHexMergeFrame *ShowHexMergeDoc(CDirFrame *,
 		const FileLocation &,
 		const FileLocation &,
-		BOOL bLeftRO, BOOL bRightRO);
+		BOOL bLeftRO, BOOL bRightRO,
+		LPCTSTR sCompareAs);
 	void UpdateResources();
 	static bool CreateBackup(bool bFolder, LPCTSTR pszPath);
 	int HandleReadonlySave(String &strSavePath, int choice = 0);
@@ -267,6 +269,8 @@ private:
 	void LoadToolbarImages();
 	HMENU NewMenu(int ID);
 	CDocFrame *FindFrameOfType(FRAMETYPE);
+	CEditorFrame *ActivateOpenDoc(CDirFrame *, FileLocation &, FileLocation &, LPCTSTR, UINT, FRAMETYPE);
+
 	void LoadFilesMRU();
 	void SaveFilesMRU();
 

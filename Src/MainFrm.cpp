@@ -1077,9 +1077,9 @@ static void FileLocationGuessEncodings(FileLocation &fileloc, bool bGuessEncodin
  * @param [in] infoUnpacker Plugin info.
  * @return OPENRESULTS_TYPE for success/failure code.
  */
-void CMainFrame::ShowMergeDoc(CDirFrame *pDirDoc,
+CEditorFrame *CMainFrame::ShowMergeDoc(CDirFrame *pDirDoc,
 	FileLocation &filelocLeft, FileLocation &filelocRight,
-	DWORD dwLeftFlags, DWORD dwRightFlags, PackingInfo *infoUnpacker)
+	DWORD dwLeftFlags, DWORD dwRightFlags, PackingInfo *infoUnpacker, LPCTSTR sCompareAs)
 {
 	// detect codepage
 	bool bGuessEncoding = COptionsMgr::Get(OPT_CP_DETECT);
@@ -1102,45 +1102,59 @@ void CMainFrame::ShowMergeDoc(CDirFrame *pDirDoc,
 	if ((dwLeftFlags & FFILEOPEN_DETECTBIN) && filelocLeft.encoding.m_binary ||
 		(dwRightFlags & FFILEOPEN_DETECTBIN) && filelocRight.encoding.m_binary)
 	{
-		ShowHexMergeDoc(pDirDoc, filelocLeft, filelocRight, bLeftRO, bRightRO);
-		return;
+		if (CEditorFrame *pDoc = ActivateOpenDoc(pDirDoc,
+			filelocLeft, filelocRight, sCompareAs, ID_MERGE_COMPARE_HEX, FRAME_BINARY))
+		{
+			return pDoc;
+		}
+		return ShowHexMergeDoc(pDirDoc, filelocLeft, filelocRight, bLeftRO, bRightRO, sCompareAs);
 	}
 
-	CChildFrame *const pMergeDoc = GetMergeDocToShow(pDirDoc);
-
-	ASSERT(pMergeDoc);		// must ASSERT to get an answer to the question below ;-)
-	if (!pMergeDoc)
-		return; // when does this happen ?
-
-	// if an unpacker is selected, it must be used during LoadFromFile
-	// MergeDoc must memorize it for SaveToFile
-	// Warning : this unpacker may differ from the pDirDoc one
-	// (through menu : "Plugins"->"Open with unpacker")
-	pMergeDoc->SetUnpacker(infoUnpacker);
-	// Note that OpenDocs() takes care of closing compare window when needed.
-	OPENRESULTS_TYPE openResults = pMergeDoc->OpenDocs(filelocLeft, filelocRight,
-			bLeftRO, bRightRO);
-
-	if (openResults == OPENRESULTS_SUCCESS)
+	if (CEditorFrame *pDoc = ActivateOpenDoc(pDirDoc,
+		filelocLeft, filelocRight, sCompareAs, ID_MERGE_COMPARE_TEXT, FRAME_FILE))
 	{
-		if (dwLeftFlags & FFILEOPEN_MODIFIED)
+		return pDoc;
+	}
+	CChildFrame *const pMergeDoc = GetMergeDocToShow(pDirDoc);
+	if (pMergeDoc != NULL)
+	{
+		pMergeDoc->m_sCompareAs = sCompareAs;
+		// if an unpacker is selected, it must be used during LoadFromFile
+		// MergeDoc must memorize it for SaveToFile
+		// Warning : this unpacker may differ from the pDirDoc one
+		// (through menu : "Plugins"->"Open with unpacker")
+		pMergeDoc->SetUnpacker(infoUnpacker);
+		// Note that OpenDocs() takes care of closing compare window when needed.
+		OPENRESULTS_TYPE openResults = pMergeDoc->OpenDocs(filelocLeft, filelocRight, bLeftRO, bRightRO);
+
+		if (openResults == OPENRESULTS_SUCCESS)
 		{
-			pMergeDoc->m_ptBuf[0]->SetModified(true);
-			pMergeDoc->UpdateHeaderPath(0);
-		}
-		if (dwRightFlags & FFILEOPEN_MODIFIED)
-		{
-			pMergeDoc->m_ptBuf[1]->SetModified(true);
-			pMergeDoc->UpdateHeaderPath(1);
+			if (dwLeftFlags & FFILEOPEN_MODIFIED)
+			{
+				pMergeDoc->m_ptBuf[0]->SetModified(true);
+				pMergeDoc->UpdateHeaderPath(0);
+			}
+			if (dwRightFlags & FFILEOPEN_MODIFIED)
+			{
+				pMergeDoc->m_ptBuf[1]->SetModified(true);
+				pMergeDoc->UpdateHeaderPath(1);
+			}
 		}
 	}
+	return pMergeDoc;
 }
 
-void CMainFrame::ShowHexMergeDoc(CDirFrame *pDirDoc,
-	const FileLocation &left, const FileLocation &right, BOOL bLeftRO, BOOL bRightRO)
+CHexMergeFrame *CMainFrame::ShowHexMergeDoc(CDirFrame *pDirDoc,
+	const FileLocation &left, const FileLocation &right,
+	BOOL bLeftRO, BOOL bRightRO, LPCTSTR sCompareAs)
 {
-	if (CHexMergeFrame *pHexMergeDoc = GetHexMergeDocToShow(pDirDoc))
+	CHexMergeFrame *const pHexMergeDoc = GetHexMergeDocToShow(pDirDoc);
+	if (pHexMergeDoc != NULL)
+	{
 		pHexMergeDoc->OpenDocs(left, right, bLeftRO, bRightRO);
+		pHexMergeDoc->m_sCompareAs = sCompareAs;
+	}
+	return pHexMergeDoc;
 }
 
 void CMainFrame::RedisplayAllDirDocs()
@@ -1353,6 +1367,36 @@ bool CMainFrame::DoFileOpen(
 		filelocLeft, filelocRight, dwLeftFlags, dwRightFlags, nRecursive, pDirDoc);
 }
 
+CEditorFrame *CMainFrame::ActivateOpenDoc(
+	CDirFrame *pDirDoc,
+	FileLocation &filelocLeft,
+	FileLocation &filelocRight,
+	LPCTSTR sCompareAs,
+	UINT idCompareAs,
+	FRAMETYPE frametype)
+{
+	UINT idAtom = FindAtom(sCompareAs);
+	HWindow *pChild = NULL;
+	while ((pChild = m_pWndMDIClient->FindWindowEx(pChild, WinMergeWindowClass)) != NULL)
+	{
+		CDocFrame *pAbstract = static_cast<CDocFrame *>(CDocFrame::FromHandle(pChild));
+		if (pAbstract->GetFrameType() == frametype)
+		{
+			CEditorFrame *pSpecific = static_cast<CEditorFrame *>(pAbstract);
+			if (pSpecific->m_pDirDoc == pDirDoc && (
+					pSpecific->m_sCompareAs.empty() && idAtom == idCompareAs ||
+					pSpecific->m_sCompareAs == sCompareAs) &&
+				pSpecific->m_strPath[0] == filelocLeft.filepath &&
+				pSpecific->m_strPath[1] == filelocRight.filepath)
+			{
+				pSpecific->ActivateFrame();
+				return pSpecific;
+			}
+		}
+	}
+	return NULL;
+}
+
 /**
  * @brief Begin a diff: open dirdoc if it is directories, else open a mergedoc for editing.
  * @param [in] packingInfo Specifies file transform.
@@ -1442,10 +1486,17 @@ bool CMainFrame::DoFileOpen(
 	}
 
 	// If content type was specified, skip detection logic
+	String sCompareAs = packingInfo.pluginMoniker;
 	if (idCompareAs != ID_MERGE_COMPARE)
 	{
 		dwLeftFlags &= ~FFILEOPEN_DETECT;
 		dwRightFlags &= ~FFILEOPEN_DETECT;
+		if (sCompareAs.empty())
+		{
+			TCHAR moniker[MAX_PATH];
+			GetAtomName(idCompareAs, moniker, _countof(moniker));
+			sCompareAs = moniker;
+		}
 	}
 
 	// Save the MRU left and right files
@@ -1484,7 +1535,11 @@ bool CMainFrame::DoFileOpen(
 			break;
 		case ID_MERGE_COMPARE_HEX:
 			// Open files in binary editor
-			ShowHexMergeDoc(pDirDoc, filelocLeft, filelocRight, bROLeft, bRORight);
+			if (!ActivateOpenDoc(pDirDoc, filelocLeft, filelocRight,
+				sCompareAs.c_str(), ID_MERGE_COMPARE_HEX, FRAME_BINARY))
+			{
+				ShowHexMergeDoc(pDirDoc, filelocLeft, filelocRight, bROLeft, bRORight, sCompareAs.c_str());
+			}
 			return true;
 		}
 		try
@@ -1649,7 +1704,7 @@ bool CMainFrame::DoFileOpen(
 		}
 		LogFile.Write(CLogFile::LNOTICE, _T("Open files: Left: %s\n\tRight: %s."),
 			filelocLeft.filepath.c_str(), filelocRight.filepath.c_str());
-		ShowMergeDoc(pDirDoc, filelocLeft, filelocRight, dwLeftFlags, dwRightFlags, &packingInfo);
+		ShowMergeDoc(pDirDoc, filelocLeft, filelocRight, dwLeftFlags, dwRightFlags, &packingInfo, sCompareAs.c_str());
 	}
 	return true;
 }
@@ -2960,7 +3015,7 @@ bool CMainFrame::ParseArgsAndDoOpen(const MergeCmdLineInfo &cmdInfo)
 				else if (cmdInfo.m_sContentType == _T("archive"))
 					idCompareAs = ID_MERGE_COMPARE_ZIP;
 				else if (cmdInfo.m_sContentType == _T("xml"))
-					packingInfo.SetXML();
+					idCompareAs = ID_MERGE_COMPARE_XML;
 				else if (!cmdInfo.m_sContentType.empty())
 					packingInfo.SetPlugin(cmdInfo.m_sContentType.c_str());
 				else
