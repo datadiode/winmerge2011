@@ -219,7 +219,8 @@ LRESULT COpenDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		OnDropFiles(reinterpret_cast<HDROP>(wParam));
 		break;
 	case WM_SHOWWINDOW:
-		OnSelchangeFilter();
+		if (wParam)
+			UpdateButtonStates();
 		break;
 	case WM_COMMAND:
 		switch (wParam)
@@ -432,7 +433,6 @@ BOOL COpenDlg::OnInitDialog()
 	m_pCbLeft->InsertString(0, LPSTR_TEXTCALLBACK);
 	m_pCbRight->InsertString(0, LPSTR_TEXTCALLBACK);
 
-	UpdateButtonStates();
 	// Make the icons show up
 	EnsureCurSelPathCombo(m_pCbLeft);
 	EnsureCurSelPathCombo(m_pCbRight);
@@ -598,6 +598,8 @@ void COpenDlg::UpdateButtonStates()
 	m_pCbCompareAs->GetWindow(GW_HWNDPREV)->ShowWindow(nShowFilter); // asociated label
 	m_pTgCompareAs->ShowWindow(nShowFilter);
 
+	OnSelchangeFilter();
+
 	// Enable buttons as appropriate
 	if (COptionsMgr::Get(OPT_VERIFY_OPEN_PATHS))
 	{
@@ -709,8 +711,10 @@ void COpenDlg::ExtractParameterNames(FileFilter *filter)
 {
 	int id = IDC_SQL_QUERY_PARAMS_GROUP;
 	bool sqlopt[] = { false, false };
+	BOOL bEnable = FALSE;
 	if (filter != NULL)
 	{
+		bEnable = TRUE;
 		sqlopt[0] = filter->sqlopt[0];
 		sqlopt[1] = filter->sqlopt[1];
 		LPCTSTR sql = filter->sql.c_str();
@@ -749,7 +753,9 @@ void COpenDlg::ExtractParameterNames(FileFilter *filter)
 		id += 10;
 		SetDlgItemText(id, NULL);
 	}
+	GetDlgItem(IDC_SQL_QUERY_PARAMS_LEFT)->EnableWindow(bEnable);
 	CheckDlgButton(IDC_SQL_QUERY_PARAMS_LEFT, sqlopt[0]);
+	GetDlgItem(IDC_SQL_QUERY_PARAMS_RIGHT)->EnableWindow(bEnable);
 	CheckDlgButton(IDC_SQL_QUERY_PARAMS_RIGHT, sqlopt[1]);
 }
 
@@ -757,7 +763,9 @@ void COpenDlg::OnSelchangeFilter()
 {
 	String selected;
 	const stl::vector<FileFilter *> &filters = globalFileFilter.GetFileFilters(selected);
-	if (m_pCbExt->GetLBText(m_pCbExt->GetCurSel(), selected) < 0)
+	if ((m_pCbExt->GetStyle() & WS_VISIBLE) == 0)
+		selected.clear();
+	else if (m_pCbExt->GetLBText(m_pCbExt->GetCurSel(), selected) < 0)
 		m_pCbExt->GetWindowText(selected);
 	FileFilter *filter = NULL;
 	if (LPCTSTR name = EatPrefix(selected.c_str(), _T("[F] ")))
