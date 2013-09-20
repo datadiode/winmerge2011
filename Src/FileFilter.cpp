@@ -66,7 +66,12 @@ BSTR FileFilter::getSql(int side)
 				const UINT n = SysStringLen(dst);
 				TCHAR quote = _T('\'');
 				static const TCHAR TO_TIMESTAMP[] = _T("TO_TIMESTAMP");
-				if (i > _countof(TO_TIMESTAMP))
+				if (value.empty())
+				{
+					value = _T("NULL");
+					quote = _T(' ');
+				}
+				else if (i > _countof(TO_TIMESTAMP))
 				{
 					if (LPCTSTR q = EatPrefix(src - _countof(TO_TIMESTAMP), TO_TIMESTAMP))
 					{
