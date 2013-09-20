@@ -776,7 +776,7 @@ void COpenDlg::OnSelchangeFilter()
 			FileFilter *p = *it++;
 			if (p->name == name)
 			{
-				filter = p;
+				filter = globalFileFilter.ReloadFilter(p);
 				break;
 			}
 		}

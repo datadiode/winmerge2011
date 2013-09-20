@@ -332,28 +332,30 @@ FileFilter *FileFilterHelper::SetFilter(const String &filter)
 }
 
 /**
- * @brief Reloads changed filter files
- *
- * Checks if filter file has been modified since it was last time
- * loaded/reloaded. If file has been modified we reload it.
+ * @brief Reloads the specified filter file
  * @todo How to handle an error in reloading filter?
+ */
+FileFilter *FileFilterHelper::ReloadFilter(FileFilter *filter)
+{
+	// Reload filter after changing it
+	FileFilter *relocatedFilter = ReloadFilterFromDisk(filter);
+	// If it was active filter we have to re-set it
+	if (relocatedFilter != NULL && m_currentFilter == filter)
+	{
+		m_currentFilter = relocatedFilter;
+	}
+	return relocatedFilter;
+}
+
+/**
+ * @brief Reloads changed filter files
  */
 void FileFilterHelper::ReloadUpdatedFilters()
 {
-	DirItem fileInfo;
-
 	vector<FileFilter *>::const_iterator iter = m_filters.begin();
 	while (iter != m_filters.end())
 	{
-		FileFilter *filter = *iter++;
-		String path = filter->fullpath;
-		// Reload filter after changing it
-		if (FileFilter *relocatedFilter = ReloadFilterFromDisk(filter))
-		{
-			// If it was active filter we have to re-set it
-			if (m_currentFilter == filter)
-				m_currentFilter = relocatedFilter;
-		}
+		ReloadFilter(*iter++);
 	}
 }
 

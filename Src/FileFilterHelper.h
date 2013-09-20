@@ -106,6 +106,7 @@ public:
 	String GetFileFilterPath(LPCTSTR filterName) const;
 	bool SetUserFilterPath(const String &filterPath);
 
+	FileFilter *ReloadFilter(FileFilter *);
 	void ReloadUpdatedFilters();
 	void LoadAllFileFilters();
 
