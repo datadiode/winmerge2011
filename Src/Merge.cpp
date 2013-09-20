@@ -363,9 +363,15 @@ void CMergeApp::InitializeSupplements()
 	SetEnvironmentVariable(_T("SupplementFolder"), supplementFolder.c_str());
 	String ini = paths_ConcatPath(supplementFolder, _T("Supplement.ini"));
 	TCHAR buffer[0x8000];
+	if (!GetEnvironmentVariable(_T("ProgramFiles(x86)"), buffer, _countof(buffer)))
+	{
+		GetEnvironmentVariable(_T("ProgramFiles"), buffer, _countof(buffer));
+		SetEnvironmentVariable(_T("ProgramFiles(x86)"), buffer);
+	}
 	if (!GetPrivateProfileSection(_T("Environment"), buffer, _countof(buffer), ini.c_str()))
 	{
 		static const TCHAR Environment[] =
+			_T("LogParser=%ProgramFiles(x86)%\\Log Parser 2.2\0")
 			_T("xdoc2txt=C:\\xdoc2txt\0")
 			_T("MediaInfo_CLI=C:\\MediaInfo_CLI\0");
 		if (WritePrivateProfileSection(_T("Environment"), Environment, ini.c_str()))
@@ -378,7 +384,7 @@ void CMergeApp::InitializeSupplements()
 	{
 		const size_t r = _tcslen(q);
 		*q++ = _T('\0');
-		SetEnvironmentVariable(p, q);
+		SetEnvironmentVariable(p, env_ExpandVariables(q).c_str());
 		p = q + r;
 	}
 	if (GetPrivateProfileSection(_T("Preload"), buffer, _countof(buffer), ini.c_str()))
