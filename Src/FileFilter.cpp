@@ -22,6 +22,7 @@
 
 #include "StdAfx.h"
 #include "FileFilter.h"
+#include "Common/coretools.h"
 
 using stl::vector;
 
@@ -59,10 +60,33 @@ BSTR FileFilter::getSql(int side)
 			if (LPCTSTR q = _tcschr(p, c))
 			{
 				String name(p, static_cast<String::size_type>(q - p));
-				const String &value = params[side][name].c_str();
+				String value = params[side][name];
 				const UINT i = static_cast<UINT>(p - dst);
 				const UINT j = static_cast<UINT>(q - dst);
 				const UINT n = SysStringLen(dst);
+				TCHAR quote = _T('\'');
+				static const TCHAR TO_TIMESTAMP[] = _T("TO_TIMESTAMP");
+				if (i > _countof(TO_TIMESTAMP))
+				{
+					if (LPCTSTR q = EatPrefix(src - _countof(TO_TIMESTAMP), TO_TIMESTAMP))
+					{
+						if (*q == _T('('))
+						{
+							FileTime ft;
+							if (ft.Parse(value.c_str(), 0))
+							{
+								NumToStr str(ft.ticksSinceBC0001(), 10);
+								// LogParser wants seconds, so cut off fractional digits
+								String::size_type len = str.length();
+								if (len > 7)
+								{
+									value.assign(str.c_str(), len - 7);
+									quote = _T(' ');
+								}
+							}
+						}
+					}
+				}
 				UINT k = value.length();
 				if (BSTR tmp = SysAllocStringLen(NULL, n - (j - i) + k))
 				{
@@ -70,7 +94,7 @@ BSTR FileFilter::getSql(int side)
 					memcpy(tmp + i, value.c_str(), k * sizeof *tmp);
 					k += i;
 					memcpy(tmp + k, q, (n - j) * sizeof *tmp);
-					tmp[i - 1] = tmp[k] = L'\'';
+					tmp[i - 1] = tmp[k] = quote;
 					SysFreeString(dst);
 					dst = tmp;
 					p = dst + i;

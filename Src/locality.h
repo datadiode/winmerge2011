@@ -17,6 +17,10 @@ namespace locality
 	public:
 		LPTSTR c_str() { return out; }
 		operator String() { return out; }
+		String::size_type length()
+		{
+			return static_cast<String::size_type>(_tcslen(out));
+		}
 	protected:
 		TCHAR out[n];
 	};
@@ -32,15 +36,27 @@ namespace locality
 			TCHAR numbuff[24];
 			getLocaleStr(_ltot(n, numbuff, 10));
 		}
+		NumToLocaleStr(INT64 n, INT r)
+		{
+			_i64tot(n, out, r);
+		}
 		NumToLocaleStr(INT64 n)
 		{
 			TCHAR numbuff[24];
 			getLocaleStr(_i64tot(n, numbuff, 10));
 		}
+		NumToLocaleStr(UINT n, INT r)
+		{
+			_ultot(n, out, r);
+		}
 		NumToLocaleStr(UINT n)
 		{
 			TCHAR numbuff[24];
 			getLocaleStr(_ultot(n, numbuff, 10));
+		}
+		NumToLocaleStr(UINT64 n, INT r)
+		{
+			_ui64tot(n, out, r);
 		}
 		NumToLocaleStr(UINT64 n)
 		{

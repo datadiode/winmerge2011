@@ -75,6 +75,10 @@ public:
 	{
 		return secondsSinceEpoch() - other.secondsSinceEpoch();
 	}
+	UINT64 ticksSinceBC0001() const
+	{
+		return castTo<UINT64>() + 505227456000000000UI64;
+	}
 	BOOL Parse(LPCSTR p)
 	{
 		SYSTEMTIME st;
@@ -84,6 +88,16 @@ public:
 			return FALSE;
 		st.wDayOfWeek = 0;
 		st.wMilliseconds = 0;
+		return SystemTimeToFileTime(&st, this);
+	}
+	BOOL Parse(LPCOLESTR strIn, DWORD dwFlags)
+	{
+		DATE date;
+		if (FAILED(VarDateFromStr(strIn, LOCALE_USER_DEFAULT, dwFlags, &date)))
+			return FALSE;
+		SYSTEMTIME st;
+		if (!VariantTimeToSystemTime(date, &st))
+			return FALSE;
 		return SystemTimeToFileTime(&st, this);
 	}
 };
