@@ -48,13 +48,12 @@ BSTR FileFilter::getSql(int side)
 		return NULL;
 	BSTR dst = SysAllocString(sql.c_str());
 	LPCTSTR src = dst;
-	int count = 0;
 	C_ASSERT(('"' & 0x3F) == '"');
 	C_ASSERT(('\'' & 0x3F) == '\'');
 	TCHAR quote = '\0';
 	while (const TCHAR c = *src)
 	{
-		if (quote <= _T('\0') && c == _T('%') && ++count <= 6)
+		if (quote <= _T('\0') && c == _T('%'))
 		{
 			LPCTSTR p = src + 1;
 			if (LPCTSTR q = _tcschr(p, c))
