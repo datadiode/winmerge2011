@@ -7,6 +7,7 @@
 #include "StdAfx.h"
 #include "paths.h"
 #include "Environment.h"
+#include "Common/coretools.h"
 #include "Common/stream_util.h"
 #include "DiffContext.h"
 #include "FileFilterHelper.h"
@@ -42,12 +43,27 @@ void CDiffContext::LoadFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *fil
 {
 	if (BSTR sql = m_piFilterGlobal->getSql(side))
 	{
-		CMyComBSTR filter(&sql);
+		CMyComBSTR bstr(&sql);
+		LPTSTR filter = bstr.m_str + StrSpn(bstr.m_str, _T(" \t\r\n"));
+		LPTSTR filespec = NULL;
+		if (*filter == _T('\''))
+		{
+			if (LPTSTR end = StrChr(++filter, _T('\'')))
+			{
+				filespec = filter;
+				filter = end;
+				*filter++ = _T('\0');
+			}
+		}
+		else if (LPTSTR end = const_cast<LPTSTR>(EatPrefixTrim(filter, _T("NULL"))))
+		{
+			filter = end;
+		}
 		String path = paths_ConcatPath(sDir, _T("*")).c_str();
 		String exe = env_ExpandVariables(_T("%LogParser%\\LogParser.exe"));
 		string_format cmd(
 			_T("\"%s\" \"SELECT Name, CreationTime, LastWriteTime, Attributes, Size FROM '%s' %s\" -i:FS -o:TSV -q -recurse:0 -oCodepage:65001"),
-			exe.c_str(), path.c_str(), filter.m_str);
+			exe.c_str(), path.c_str(), filter);
 		STARTUPINFO si;
 		ZeroMemory(&si, sizeof si);
 		si.cb = sizeof si;
@@ -135,9 +151,12 @@ void CDiffContext::LoadFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *fil
 			}
 			if ((ent.flags.attributes & FILE_ATTRIBUTE_DIRECTORY) == 0)
 			{
-				ent.size.int64 = _atoi64(p);
-				ent.flags.attributes |= FILE_ATTRIBUTE_NORMAL;
-				files->push_back(ent);
+				if (filespec == NULL || PathMatchSpec(ent.filename.c_str(), filespec))
+				{
+					ent.size.int64 = _atoi64(p);
+					ent.flags.attributes |= FILE_ATTRIBUTE_NORMAL;
+					files->push_back(ent);
+				}
 				// If recursing the flat way, increment total count of items
 				if (m_nRecursive == 2)
 					m_pCompareStats->IncreaseTotalItems();
