@@ -721,21 +721,25 @@ void COpenDlg::ExtractParameterNames(FileFilter *filter)
 		C_ASSERT(('"' & 0x3F) == '"');
 		C_ASSERT(('\'' & 0x3F) == '\'');
 		TCHAR quote = '\0';
-		int count = 0;
+		stl::set<String> paramNames;
 		while (const TCHAR c = *sql)
 		{
-			if (quote <= _T('\0') && c == _T('%') && ++count <= 6)
+			if (quote <= _T('\0') && c == _T('%') && paramNames.size() < 6)
 			{
 				LPCTSTR p = sql + 1;
 				if (LPCTSTR q = _tcschr(p, c))
 				{
 					String name(p, static_cast<String::size_type>(q - p));
-					id += 10;
-					SetDlgItemText(id, name.c_str());
-					if (!filter->params[0].empty())
-						SetDlgItemText(id + 1, filter->params[0][name].c_str());
-					if (!filter->params[1].empty())
-						SetDlgItemText(id + 2, filter->params[1][name].c_str());
+					if (paramNames.find(name) == paramNames.end())
+					{
+						paramNames.insert(name);
+						id += 10;
+						SetDlgItemText(id, name.c_str());
+						if (!filter->params[0].empty())
+							SetDlgItemText(id + 1, filter->params[0][name].c_str());
+						if (!filter->params[1].empty())
+							SetDlgItemText(id + 2, filter->params[1][name].c_str());
+					}
 					sql = q;
 				}
 			}

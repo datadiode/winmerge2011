@@ -43,6 +43,7 @@
 #include <stl.h>
 #include stl(list)
 #include stl(map)
+#include stl(set)
 #include stl(vector)
 #include stl(string)
 #include stl(algorithm)
