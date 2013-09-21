@@ -57,7 +57,7 @@ static const TCHAR FilterHelpLocation[] = _T("::/htmlhelp/Filters.html");
 FileFiltersDlg::FileFiltersDlg()
 : ODialog(IDD_FILEFILTERS)
 , m_listFilters(NULL)
-, m_Filters(globalFileFilter.GetFileFilters(m_sFileFilterPath))
+, m_Filters(globalFileFilter.GetFileFilters())
 {
 	m_strCaption = LanguageSelect.LoadDialogCaption(m_idd);
 }
@@ -126,25 +126,6 @@ LRESULT FileFiltersDlg::OnNotify(NMHDR *pNMHDR)
 
 /////////////////////////////////////////////////////////////////////////////
 // CFiltersDlg message handlers
-
-/**
- * @brief Returns path (cont. filename) of selected filter
- * @return Full path to selected filter file.
- */
-LPCTSTR FileFiltersDlg::GetSelected()
-{
-	return m_sFileFilterPath.c_str();
-}
-
-/**
- * @brief Set path of selected filter.
- * @param [in] Path for selected filter.
- * @note Call this before actually showing the dialog.
- */
-void FileFiltersDlg::SetSelected(LPCTSTR selected)
-{
-	m_sFileFilterPath = selected;
-}
 
 /**
  * @brief Initialise listcontrol containing filters.
@@ -235,14 +216,10 @@ void FileFiltersDlg::OnApply()
  * always compare with latest saved filters.
  * @sa CMainFrame::OnToolsFilters()
  * @sa CDirFrame::Rescan()
- * @sa FileFilterHelper::ReloadUpdatedFilters()
  */
 void FileFiltersDlg::OnFiltersEditbtn()
 {
-	int sel =- 1;
-
-	sel = m_listFilters->GetNextItem(sel, LVNI_SELECTED);
-
+	int sel = m_listFilters->GetNextItem(-1, LVNI_SELECTED);
 	// Can't edit first "None"
 	if (sel > 0)
 	{
@@ -311,12 +288,12 @@ void FileFiltersDlg::OnBnClickedFilterfileTestButton()
 	
 	m_sFileFilterPath = m_listFilters->GetItemText(sel, 2);
 
-	// Ensure filter is up-to-date (user probably just edited it)
-	globalFileFilter.ReloadUpdatedFilters();
-
-	if (FileFilter *pFileFilter = globalFileFilter.GetFilterByPath(m_sFileFilterPath.c_str()))
+	if (FileFilter *filter = globalFileFilter.GetFilterByPath(m_sFileFilterPath.c_str()))
 	{
-		CTestFilterDlg dlg(pFileFilter);
+		// Ensure filter is up-to-date (user probably just edited it)
+		if (FileFilter *reloaded = globalFileFilter.ReloadFilter(filter))
+			filter = reloaded;
+		CTestFilterDlg dlg(filter);
 		LanguageSelect.DoModal(dlg);
 	}
 }

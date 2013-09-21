@@ -101,16 +101,14 @@ public:
 	const String &GetUserFilterPath() const { return m_sUserSelFilterPath; }
 
 	void SetFileFilterPath(LPCTSTR szFileFilterPath);
-	const stl::vector<FileFilter *> &GetFileFilters(String &selected) const;
-	String GetFileFilterName(LPCTSTR filterPath) const;
-	String GetFileFilterPath(LPCTSTR filterName) const;
+	const stl::vector<FileFilter *> &GetFileFilters() const { return m_filters; }
+	FileFilter *FindFilter(LPCTSTR filterName) const;
 	bool SetUserFilterPath(const String &filterPath);
 
 	FileFilter *ReloadFilter(FileFilter *);
-	void ReloadUpdatedFilters();
+	FileFilter *ReloadAllFilters();
+	FileFilter *ReloadCurrentFilter();
 	void LoadAllFileFilters();
-
-	void SetMask(LPCTSTR strMask);
 
 	bool IsUsingMask() const { return m_currentFilter == NULL; }
 	String GetFilterNameOrMask() const;
@@ -124,7 +122,7 @@ public:
 	virtual int collateDir(LPCTSTR, LPCTSTR);
 
 protected:
-	String ParseExtensions(const String &extensions) const;
+	void SetMask(LPCTSTR);
 
 private:
 	FilterList *const m_pMaskFilter;       /*< Filter for filemasks (*.cpp) */

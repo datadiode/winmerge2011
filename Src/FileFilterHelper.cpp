@@ -73,61 +73,23 @@ void FileFilterHelper::SetFileFilterPath(LPCTSTR szFileFilterPath)
 }
 
 /**
- * @brief Get list of filters currently available.
- *
- * @param [out] filters Filter list to receive found filters.
- * @param [out] selected Filepath of currently selected filter.
- */
-const stl::vector<FileFilter *> &FileFilterHelper::GetFileFilters(String & selected) const
-{
-	if (m_currentFilter)
-	{
-		selected = m_currentFilter->fullpath;
-	}
-	return m_filters;
-}
-
-/**
- * @brief Return name of filter in given file.
- * If no filter cannot be found, return empty string.
- * @param [in] filterPath Path to filterfile.
- * @sa FileFilterHelper::GetFileFilterPath()
- */
-String FileFilterHelper::GetFileFilterName(LPCTSTR filterPath) const
-{
-	String name;
-	vector<FileFilter *>::const_iterator iter = m_filters.begin();
-	while (iter != m_filters.end())
-	{
-		if ((*iter)->fullpath == filterPath)
-		{
-			name = (*iter)->name;
-			break;
-		}
-		++iter;
-	}
-	return name;
-}
-
-/**
  * @brief Return path to filter with given name.
  * @param [in] filterName Name of filter.
- * @sa FileFilterHelper::GetFileFilterName()
  */
-String FileFilterHelper::GetFileFilterPath(LPCTSTR filterName) const
+FileFilter *FileFilterHelper::FindFilter(LPCTSTR filterName) const
 {
-	String path;
+	FileFilter *filter = NULL;
 	vector<FileFilter *>::const_iterator iter = m_filters.begin();
 	while (iter != m_filters.end())
 	{
 		if ((*iter)->name == filterName)
 		{
-			path = (*iter)->fullpath;
+			filter = *iter;
 			break;
 		}
 		++iter;
 	}
-	return path;
+	return filter;
 }
 
 /**
@@ -144,15 +106,38 @@ bool FileFilterHelper::SetUserFilterPath(const String &filterPath)
  * @brief Set filemask for filtering.
  * @param [in] strMask Mask to set (e.g. *.cpp;*.h).
  */
-void FileFilterHelper::SetMask(LPCTSTR strMask)
+void FileFilterHelper::SetMask(LPCTSTR mask)
 {
-	if (m_currentFilter)
+	m_currentFilter = NULL;
+	m_sMask = mask;
+	// Convert user-given extension list to valid regular expression
+	String regExp;
+	static const TCHAR separators[] = _T(" ;|,:");
+	while (int lentoken = StrCSpn(mask += StrSpn(mask, separators), separators))
 	{
-		_RPTF0(_CRT_ERROR, "Filter mask tried to set when masks disabled!");
-		return;
+		regExp += &_T("|\\\\")[regExp.empty()]; // Omit the '|' if strPattern is still empty
+		do switch (TCHAR c = *mask++)
+		{
+		case '*':
+			regExp += _T(".*");
+			break;
+		case '?':
+			regExp += _T('.');
+			break;
+		case '.': case '^': case '$':
+		case '(': case '[': case '{':
+		case ')': case ']': case '}':
+		case '\\': 
+			// above cases need escaping
+			regExp += _T('\\');
+			// fall through
+		default:
+			regExp += c;
+			break;
+		} while (--lentoken);
+		regExp += _T('$');
 	}
-	m_sMask = strMask;
-	String regExp = ParseExtensions(strMask);
+	string_makelower(regExp);
 	m_pMaskFilter->RemoveAllFilters();
 	m_pMaskFilter->AddRegExp(regExp.c_str());
 }
@@ -234,71 +219,12 @@ int FileFilterHelper::collateDir(LPCTSTR p, LPCTSTR q)
 }
 
 /**
- * @brief Convert user-given extension list to valid regular expression.
- * @param [in] Extension list/mask to convert to regular expression.
- * @return Regular expression that matches extension list.
- */
-String FileFilterHelper::ParseExtensions(const String &extensions) const
-{
-	String strPattern;
-	String ext(extensions);
-	static const TCHAR pszSeps[] = _T(" ;|,:");
-
-	ext += _T(";"); // Add one separator char to end
-
-	String::size_type pos;
-	while ((pos = ext.find_first_of(pszSeps)) != String::npos)
-	{
-		String token = ext.substr(0, pos); // Get first extension
-		ext = ext.substr(pos + 1); // Remove extension + separator
-		
-		if (String::size_type lentoken = token.length())
-		{
-			strPattern += &_T("|\\\\")[strPattern.empty()]; // Omit the '|' if strPattern is still empty
-			for (String::size_type postoken = 0 ; postoken < lentoken ; ++postoken)
-			{
-				switch (TCHAR c = token[postoken])
-				{
-				case '*':
-					strPattern += _T(".*");
-					break;
-				case '?':
-					strPattern += _T('.');
-					break;
-				case '.': case '^': case '$':
-				case '(': case '[': case '{':
-				case ')': case ']': case '}':
-				case '\\': 
-					// above cases need escaping
-					strPattern += _T('\\');
-					// fall through
-				default:
-					strPattern += c;
-					break;
-				}
-			}
-			strPattern += _T('$');
-		}
-	}
-
-	string_makelower(strPattern);
-	return strPattern;
-}
-
-/**
  * @brief Returns active filter (or mask string)
  * @return The active filter.
  */
 String FileFilterHelper::GetFilterNameOrMask() const
 {
-	String sFilter;
-
-	if (m_currentFilter)
-		sFilter = _T("[F] ") + GetFileFilterName(m_currentFilter->fullpath.c_str());
-	else
-		sFilter = m_sMask;
-
-	return sFilter;
+	return m_currentFilter ? _T("[F] ") + m_currentFilter->name : m_sMask;
 }
 
 /**
@@ -319,16 +245,14 @@ FileFilter *FileFilterHelper::SetFilter(const String &filter)
 	string_trim_ws(flt);
 	if (LPCTSTR filterName = EatPrefix(flt.c_str(), _T("[F] ")))
 	{
-		flt = GetFileFilterPath(filterName);
-		if (!flt.empty())
-		{
-			SetFileFilterPath(flt.c_str());
-			return m_currentFilter;
-		}
+		m_currentFilter = FindFilter(filterName);
 	}
-	SetFileFilterPath(_T(""));
-	SetMask(flt.c_str());
-	return NULL;
+	else
+	{
+		m_currentFilter = NULL;
+		SetMask(flt.c_str());
+	}
+	return m_currentFilter;
 }
 
 /**
@@ -338,25 +262,38 @@ FileFilter *FileFilterHelper::SetFilter(const String &filter)
 FileFilter *FileFilterHelper::ReloadFilter(FileFilter *filter)
 {
 	// Reload filter after changing it
-	FileFilter *relocatedFilter = ReloadFilterFromDisk(filter);
+	FileFilter *reloaded = ReloadFilterFromDisk(filter);
 	// If it was active filter we have to re-set it
-	if (relocatedFilter != NULL && m_currentFilter == filter)
+	if (reloaded != NULL && m_currentFilter == filter)
 	{
-		m_currentFilter = relocatedFilter;
+		m_currentFilter = reloaded;
 	}
-	return relocatedFilter;
+	return reloaded;
 }
 
 /**
- * @brief Reloads changed filter files
+ * @brief Reloads all filter files
  */
-void FileFilterHelper::ReloadUpdatedFilters()
+FileFilter *FileFilterHelper::ReloadAllFilters()
 {
 	vector<FileFilter *>::const_iterator iter = m_filters.begin();
 	while (iter != m_filters.end())
 	{
 		ReloadFilter(*iter++);
 	}
+	return m_currentFilter;
+}
+
+/**
+ * @brief Reloads the current filter file
+ */
+FileFilter *FileFilterHelper::ReloadCurrentFilter()
+{
+	if (m_currentFilter)
+	{
+		ReloadFilter(m_currentFilter);
+	}
+	return m_currentFilter;
 }
 
 /**

@@ -382,7 +382,7 @@ void CDirFrame::Rescan(int nCompareSelected)
 	{
 		m_pCtxt->m_piFilterGlobal = &globalFileFilter;
 		// Make sure filters are up-to-date
-		globalFileFilter.ReloadUpdatedFilters();
+		globalFileFilter.ReloadCurrentFilter();
 		// Show active filter name in statusbar
 		SetFilterStatusDisplay(globalFileFilter.GetFilterNameOrMask().c_str());
 	}

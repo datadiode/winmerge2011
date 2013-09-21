@@ -54,6 +54,7 @@
 #include "ConfigLog.h"
 #include "7zCommon.h"
 #include "Common/DllProxies.h"
+#include "FileFilter.h"
 #include "FileFiltersDlg.h"
 #include "LanguageSelect.h"
 #include "codepage_detect.h"
@@ -2661,17 +2662,17 @@ void CMainFrame::OnToolsFilters()
 				pView->GetText(pt.y, 0, pt.y, cchTestCase, lineFiltersDlg.m_strTestCase);
 		}
 	}
-	// Make sure all filters are up-to-date
-	globalFileFilter.ReloadUpdatedFilters();
 
-	const BOOL lineFiltersEnabledOrig = COptionsMgr::Get(OPT_LINEFILTER_ENABLED);
-	lineFiltersDlg.m_bIgnoreRegExp = lineFiltersEnabledOrig;
+	lineFiltersDlg.m_bIgnoreRegExp = COptionsMgr::Get(OPT_LINEFILTER_ENABLED);
+
+	// Make sure all filters are up-to-date, and set the selected filter's path
+	if (FileFilter *filter = globalFileFilter.ReloadAllFilters())
+		fileFiltersDlg.m_sFileFilterPath = filter->fullpath;
 
 	if (sht.DoModal(NULL, GetLastActivePopup()->m_hWnd) == IDOK)
 	{
 		String strNone = LanguageSelect.LoadString(IDS_USERCHOICE_NONE);
-		String path = fileFiltersDlg.GetSelected();
-		if (path.find(strNone.c_str()) != String::npos)
+		if (fileFiltersDlg.m_sFileFilterPath.find(strNone.c_str()) != String::npos)
 		{
 			// Don't overwrite mask we already have
 			if (!globalFileFilter.IsUsingMask())
@@ -2683,12 +2684,11 @@ void CMainFrame::OnToolsFilters()
 		}
 		else
 		{
-			globalFileFilter.SetFileFilterPath(path.c_str());
+			globalFileFilter.SetFileFilterPath(fileFiltersDlg.m_sFileFilterPath.c_str());
 			String sFilter = globalFileFilter.GetFilterNameOrMask();
 			COptionsMgr::SaveOption(OPT_FILEFILTER_CURRENT, sFilter);
 		}
-		BOOL linefiltersEnabled = lineFiltersDlg.m_bIgnoreRegExp;
-		COptionsMgr::SaveOption(OPT_LINEFILTER_ENABLED, linefiltersEnabled != FALSE);
+		COptionsMgr::SaveOption(OPT_LINEFILTER_ENABLED, lineFiltersDlg.m_bIgnoreRegExp != FALSE);
 
 		// Save new filters before (possibly) rescanning
 		globalLineFilters.SaveFilters();

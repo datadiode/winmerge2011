@@ -765,25 +765,19 @@ void COpenDlg::ExtractParameterNames(FileFilter *filter)
 
 void COpenDlg::OnSelchangeFilter()
 {
+	const stl::vector<FileFilter *> &filters = globalFileFilter.GetFileFilters();
 	String selected;
-	const stl::vector<FileFilter *> &filters = globalFileFilter.GetFileFilters(selected);
-	if ((m_pCbExt->GetStyle() & WS_VISIBLE) == 0)
-		selected.clear();
-	else if (m_pCbExt->GetLBText(m_pCbExt->GetCurSel(), selected) < 0)
-		m_pCbExt->GetWindowText(selected);
-	FileFilter *filter = NULL;
-	if (LPCTSTR name = EatPrefix(selected.c_str(), _T("[F] ")))
+	if (m_pCbExt->GetStyle() & WS_VISIBLE)
 	{
-		stl::vector<FileFilter *>::const_iterator it = filters.begin();
-		while (it != filters.end())
-		{
-			FileFilter *p = *it++;
-			if (p->name == name)
-			{
-				filter = globalFileFilter.ReloadFilter(p);
-				break;
-			}
-		}
+		if (m_pCbExt->GetLBText(m_pCbExt->GetCurSel(), selected) < 0)
+			m_pCbExt->GetWindowText(selected);
+	}
+	FileFilter *filter = NULL;
+	if (LPCTSTR filterName = EatPrefix(selected.c_str(), _T("[F] ")))
+	{
+		filter = globalFileFilter.FindFilter(filterName);
+		if (filter != NULL)
+			filter = globalFileFilter.ReloadFilter(filter);
 	}
 	ExtractParameterNames(filter);
 	EnableParameterInput();

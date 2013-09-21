@@ -265,18 +265,7 @@ FileFilter *FileFilterMgr::GetFilterByPath(LPCTSTR szFilterPath) const
 			return *iter;
 		++iter;
 	}
-	return 0;
-}
-
-/**
- * @brief Return full path to filter.
- *
- * @param [in] pFilter Pointer to filter.
- * @return Full path of filter.
- */
-String FileFilterMgr::GetFullpath(FileFilter * pfilter) const
-{
-	return pfilter->fullpath;
+	return NULL;
 }
 
 /**

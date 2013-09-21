@@ -56,13 +56,11 @@ public:
 	// Reload an edited filter
 	FileFilter *ReloadFilterFromDisk(FileFilter *pfilter);
 	// Load a filter from a string
-	void LoadFilterString(LPCTSTR szFilterString);
 	int AddFilter(LPCTSTR szFilterFile);
 	void RemoveFilter(LPCTSTR szFilterFile);
 
 	// access to array of filters
-	FileFilter *GetFilterByPath(LPCTSTR szFilterName) const;
-	String GetFullpath(FileFilter *) const;
+	FileFilter *GetFilterByPath(LPCTSTR) const;
 
 	void DeleteAllFilters();
 

@@ -33,12 +33,10 @@ class FileFiltersDlg : public ODialog
 // Construction
 public:
 	FileFiltersDlg();   // standard constructor
-	LPCTSTR GetSelected();
-	void SetSelected(LPCTSTR selected);
 	String m_strCaption;
+	String m_sFileFilterPath;
 // Implementation data
 private:
-	String m_sFileFilterPath;
 	const stl::vector<FileFilter *> &m_Filters;
 
 	HListView *m_listFilters;
