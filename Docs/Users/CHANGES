@@ -1,12 +1,28 @@
-2011.003.351
+0.2011.003.391
 Changes since preceding release (not necessarily complete):
+• Introduce SQL-based directory/file filters
+• Allow directory/file filters to combine both inclusion and exclusion rules
+• FileFilters: Don't reload all filters when only current filter is of interest
+• Merge.cpp: Synthesize ProgramFiles(x86) environment variable when in 32-bit OS
+• codepage_detect.cpp: Detect codepages of .po files like done for .rc/html/xml
+• Avoid opening same files from same DirView in same way to more than one window
+• HexMergeView: Auto-adjust the number of bytes per line, yet let user freeze it
+• HSuperComboBox::AutoCompleteFromLB(): Don't disturb editing in middle of text
+• EditLib: Enable OnMatchBrace() to optionally select text between braces
+• EditLib: Fix OnMatchBrace() so it can safely travel across ghost lines
+• Folder compare: Add option to cache compare results of visited folders
+• MergeDoc: Make WM_MOUSEWHEEL+Ctrl/Shift in detail views work as in edit views
+• MergeDoc: Add vertical scrollbars to detail views
+• MergeDoc: Fix misbehaviours when one side has more lines than the other
+• MergeDoc: Attempting to Edit > Copy while header bar has focus caused a crash
+• MergeDoc: Some UI elements did not enable/update as expected
 • Plugins added from %SupplementFolder%\PluginMonikers got wrong IDs
 • setup.wsf: Add option to install WinMerge to portable media
 • Automatically mount WinMergeU.dat reghive if present and writable
 • Add -reghive option to maintain registry settings in an external file
 • DirView: Header texts were lacking a \ when representing an archive subfolder
+• DirView: Fix AllowUpwardDirectory() logic for the case of unique folders
 • DirView: Don't require creation of pair folders when opening unique subfolders
-• MergeDoc: Some UI elements did not enable/update as expected
 
 0.2011.003.311
 Changes since preceding release (not necessarily complete):

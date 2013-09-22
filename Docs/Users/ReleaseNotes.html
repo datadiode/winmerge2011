@@ -37,8 +37,8 @@ function OnReadyStateChangeExternalDoc()
 </head>
 <body>
 
-<h2>WinMerge 2011.003.351 Release Notes</h2>
-This is a stable release of WinMerge&nbsp;2011.
+<h2>WinMerge 0.2011.003.391 Release Notes</h2>
+This is a <b>beta</b> release of WinMerge&nbsp;2011.
 <br>Significant new features since the preceding stable release include:
 <ul>
 <li><p>Line filters exist in a new flavor referred to as <i>early-applied</i> line filters:
@@ -65,6 +65,12 @@ This is a stable release of WinMerge&nbsp;2011.
 	Be sure to also apply the updates located at
 	<a target='_blank' href='http://www.microsoft.com/download/details.aspx?id=16872'>Excel Viewer 2003 Service Pack 3 (SP3)</a> and
 	<a target='_blank' href='http://www.microsoft.com/download/details.aspx?id=4134'>Security Update for Microsoft Office Excel Viewer 2003 (KB973484)</a>.
+<li><p>File/directory filters have been enhanced to allow for combining both inclusion and exclusion rules.
+	<br>Omitting the <i>def:</i> in an .flt file makes <i>f:</i> and <i>d:</i>
+	operate as inclusion rules unless prefixed with <i>x</i>, in which case they operate as exclusion rules.
+<li><p>With <a target='_blank' href='http://www.microsoft.com/en-us/download/details.aspx?id=24659'>LogParser 2.2</a> installed,
+	you can enjoy more elaborate folder compare filter options by using SQL in your file/directory filters.
+	<br>An example is <i>SQL_Filter_Example.flt</i>, which is located in the <i>Filters</i> folder underneath the WinMerge program folder.
 <li><p>Processing of archive formats which are unknown to 7-Zip can be delegated to external command line tools.
 	<br>An example is PowerBuilder library (.pbl) files.
 	A command line tool to handle them can be found <a target='_blank' href='http://sqlbatch.com/pd/'>here</a>.
@@ -75,7 +81,7 @@ This is a stable release of WinMerge&nbsp;2011.
 	<br>Invoking it without arguments provides usage information.
 <li><p>The setup now offers a <i>Portable media</i> option to install WinMerge in such way that it will not modify the registry of the system on which it is running.
 	<br>
-	<u>Note for Windows XP users:</u> This option is limited to a single instance of WinMerge running in an administrator account.
+	<u>Known issue:</u> On Windows XP and other pre-Vista systems, this option can only be used from an administrator account.
 <li><p><i>File</i> &rarr; <i>Start Collection</i> opens a folder compare window in <i>collect mode</i>.
 	WinMerge will prompt you for an existing <i>reference folder</i>
 	to represent the right-hand side of the folder compare session,
@@ -101,10 +107,10 @@ This is a stable release of WinMerge&nbsp;2011.
 <a target='_blank' href='http://geekswithblogs.net/evjen/archive/2006/06/29/83567.aspx'>Bill Evjen's Blog</a> gives advice in case
 <a name='WinMerge.chm' href='https://bitbucket.org/jtuc/winmerge2011_help/downloads/WinMerge.chm'>WinMerge.chm</a> fails to display content.
 <p>
-Click <a href='https://bitbucket.org/jtuc/winmerge2011/get/2011.003.351.zip'>here</a> to obtain the source code for this release.
+Click <a href='https://bitbucket.org/jtuc/winmerge2011/get/0.2011.003.391.zip'>here</a> to obtain the source code for this release.
 <p>
 Click <a href='https://bitbucket.org/jtuc/frhed/get/0.10902.2013.zip'>here</a> to obtain source code for Frhed binaries included in this release.
 <p>
-<i>Jochen Neubeck, August 2013</i>
+<i>Jochen Neubeck, September 2013</i>
 <xml src='WinMerge.chm' onreadystatechange='OnReadyStateChangeExternalDoc()'></xml>
 </body>
