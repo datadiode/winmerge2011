@@ -44,21 +44,36 @@ void CDiffContext::LoadFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *fil
 	if (BSTR sql = m_piFilterGlobal->getSql(side))
 	{
 		CMyComBSTR bstr(&sql);
-		LPTSTR filter = bstr.m_str + StrSpn(bstr.m_str, _T(" \t\r\n"));
-		LPTSTR filespec = NULL;
-		if (*filter == _T('\''))
+		// Read the inclusion and exclusion wildcards which may precede the WHERE clause
+		int excluding = 0;
+		LPTSTR wildcards[2] = { NULL, NULL };
+		LPTSTR filter = bstr.m_str;
+		do switch (*(filter += StrSpn(filter, _T(" \t\r\n"))))
 		{
+		case _T('-'):
+			// Keep the loop running
+			++filter;
+			excluding = 0;
+			break;
+		case _T('\''):
+			// Read string literal
 			if (LPTSTR end = StrChr(++filter, _T('\'')))
 			{
-				filespec = filter;
+				if (filter != end)
+					wildcards[excluding] = filter;
 				filter = end;
 				*filter++ = _T('\0');
 			}
-		}
-		else if (LPTSTR end = const_cast<LPTSTR>(EatPrefixTrim(filter, _T("NULL"))))
-		{
-			filter = end;
-		}
+			break;
+		default:
+			// Expect NULL
+			if (LPTSTR end = const_cast<LPTSTR>(EatPrefix(filter, _T("NULL"))))
+			{
+				filter = end;
+			}
+			break;
+		} while (excluding ^= 1);
+		// Run LogParser.exe
 		String path = paths_ConcatPath(sDir, _T("*")).c_str();
 		String exe = env_ExpandVariables(_T("%LogParser%\\LogParser.exe"));
 		string_format cmd(
@@ -151,7 +166,8 @@ void CDiffContext::LoadFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *fil
 			}
 			if ((ent.flags.attributes & FILE_ATTRIBUTE_DIRECTORY) == 0)
 			{
-				if (filespec == NULL || PathMatchSpec(ent.filename.c_str(), filespec))
+				if ((wildcards[0] == NULL || PathMatchSpec(ent.filename.c_str(), wildcards[0])) &&
+					(wildcards[1] == NULL || !PathMatchSpec(ent.filename.c_str(), wildcards[1])))
 				{
 					ent.size.int64 = _atoi64(p);
 					ent.flags.attributes |= FILE_ATTRIBUTE_NORMAL;

@@ -5,7 +5,8 @@
 name: SQL File Filter Example
 desc: Shows how to use SQL in file filters
 
-%Wildcards% WHERE
+%InclusionWildcards% - %ExclusionWildcards%
+WHERE
 	Attributes LIKE 'D%' -- Include all directories
 OR	(LastWriteTime >= TO_TIMESTAMP(%MinTime%) OR %MinTime% IS NULL)
 AND (LastWriteTime <= TO_TIMESTAMP(%MaxTime%) OR %MaxTime% IS NULL)
