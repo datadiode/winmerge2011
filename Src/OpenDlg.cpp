@@ -508,9 +508,6 @@ void COpenDlg::OnOK()
 		return;
 	}
 
-	m_sLeftFile = paths_GetLongPath(m_sLeftFile.c_str());
-	m_sRightFile = paths_GetLongPath(m_sRightFile.c_str());
-
 	KillTimer(IDT_CHECKFILES);
 
 	if (FileFilter *filter = globalFileFilter.SetFilter(m_sFilter))
@@ -834,13 +831,14 @@ void COpenDlg::OnSelchangeFilter()
  */
 void COpenDlg::TrimPaths()
 {
-	string_trim_ws(m_sLeftFile);
-	string_trim_ws(m_sRightFile);
 	// If user has edited path by hand, expand environment variables
 	if (m_pCbLeft->GetEditControl()->GetModify())
 		m_sLeftFile = env_ExpandVariables(m_sLeftFile.c_str());
 	if (m_pCbRight->GetEditControl()->GetModify())
 		m_sRightFile = env_ExpandVariables(m_sRightFile.c_str());
+	// Get absolute paths with magic prefix
+	m_sLeftFile = paths_GetLongPath(m_sLeftFile.c_str());
+	m_sRightFile = paths_GetLongPath(m_sRightFile.c_str());
 }
 
 /** 

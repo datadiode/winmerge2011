@@ -109,7 +109,7 @@ String paths_GetLongPath(LPCTSTR szPath)
 	// Fully qualify/normalize name using GetFullPathName.
 
 	String sFull;
-	if (DWORD cch = GetFullPathName(szPath, 0, NULL, NULL))
+	if (DWORD cch = PathIsRelative(szPath) ? GetFullPathName(szPath, 0, NULL, NULL) : 0)
 	{
 		sFull.resize(cch - 1);
 		GetFullPathName(szPath, cch, &sFull.front(), NULL);
@@ -118,6 +118,7 @@ String paths_GetLongPath(LPCTSTR szPath)
 	{
 		sFull = szPath;
 	}
+	paths_DoMagic(sFull);
 
 	LPCTSTR fullPath = sFull.c_str();
 
@@ -158,7 +159,7 @@ String paths_GetLongPath(LPCTSTR szPath)
 		sLong += p;
 		p = q;
 	} while (*p != _T('\0'));
-	return paths_DoMagic(sLong);
+	return sLong;
 }
 
 /**

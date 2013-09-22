@@ -204,7 +204,7 @@ BOOL SelectFileOrFolder(HWND parent, String &path, const String &filter)
 
 	if (bRetVal)
 	{
-		path = ofn.lpstrFile;
+		path = paths_GetLongPath(ofn.lpstrFile);
 		if (!PathFileExists(path.c_str()))
 		{
 			// We have a valid folder name, but propably garbage as a filename.
