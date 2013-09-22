@@ -271,7 +271,19 @@ LRESULT COpenDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			break;
 		case MAKEWPARAM(IDC_SQL_QUERY_PARAMS_LEFT, BN_CLICKED):
 		case MAKEWPARAM(IDC_SQL_QUERY_PARAMS_RIGHT, BN_CLICKED):
-			EnableParameterInput();
+			if (int direction = EnableParameterInput())
+			{
+				// If only one side has anything filled in, copy to other side.
+				int id = IDC_SQL_QUERY_PARAMS_GROUP;
+				const int xor = direction > 0 ? 0 : 1 ^ 2;
+				do
+				{
+					id += 10;
+					String text;
+					GetDlgItemText(id + (1 ^ xor), text);
+					SetDlgItemText(id + (2 ^ xor), text.c_str());
+				} while (id < IDC_SQL_QUERY_PARAM_6_NAME);
+			}
 			break;
 		case MAKEWPARAM(IDC_LEFT_COMBO, CBN_SELENDCANCEL):
 		case MAKEWPARAM(IDC_RIGHT_COMBO, CBN_SELENDCANCEL):
@@ -690,7 +702,7 @@ void COpenDlg::OnSelectFilter()
 	OnSelchangeFilter();
 }
 
-void COpenDlg::EnableParameterInput()
+int COpenDlg::EnableParameterInput()
 {
 	int id = IDC_SQL_QUERY_PARAMS_GROUP;
 	UINT checked[] =
@@ -698,13 +710,25 @@ void COpenDlg::EnableParameterInput()
 		IsDlgButtonChecked(IDC_SQL_QUERY_PARAMS_LEFT),
 		IsDlgButtonChecked(IDC_SQL_QUERY_PARAMS_RIGHT),
 	};
+	int hastext[] = { 0, 0 };
 	do
 	{
 		id += 10;
 		int namelength = GetDlgItem(id)->GetWindowTextLength();
-		GetDlgItem(id + 1)->EnableWindow(checked[0] && namelength != 0);
-		GetDlgItem(id + 2)->EnableWindow(checked[1] && namelength != 0);
+		if (HWindow *pWnd = GetDlgItem(id + 1))
+		{
+			pWnd->EnableWindow(checked[0] && namelength != 0);
+			if (pWnd->GetWindowTextLength())
+				hastext[0] = 1;
+		}
+		if (HWindow *pWnd = GetDlgItem(id + 2))
+		{
+			pWnd->EnableWindow(checked[1] && namelength != 0);
+			if (pWnd->GetWindowTextLength())
+				hastext[1] = 1;
+		}
 	} while (id < IDC_SQL_QUERY_PARAM_6_NAME);
+	return checked[0] && checked[1] ? hastext[0] - hastext[1] : 0;
 }
 
 void COpenDlg::ExtractParameterNames(FileFilter *filter)

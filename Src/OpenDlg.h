@@ -84,7 +84,7 @@ protected:
 	void UpdateButtonStates();
 	void SetStatus(UINT msgID);
 	void TrimPaths();
-	void EnableParameterInput();
+	int EnableParameterInput();
 	void ExtractParameterNames(FileFilter *);
 
 	template<DDX_Operation>
