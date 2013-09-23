@@ -95,7 +95,8 @@ void paths_UndoMagic(String &path)
  */
 String paths_GetLongPath(LPCTSTR szPath)
 {
-	if (*szPath == _T('\0') || EatPrefix(szPath, paths_magic_prefix))
+	String::size_type len = static_cast<String::size_type>(_tcslen(szPath));
+	if (len == 0 || EatPrefix(szPath, paths_magic_prefix))
 		return szPath;
 
 	//                                         GetFullPathName  GetLongPathName
@@ -107,18 +108,20 @@ String paths_GetLongPath(LPCTSTR szPath)
 	// Fail when file/directory does not exist      No                Yes
 	//
 	// Fully qualify/normalize name using GetFullPathName.
-
-	String sFull;
-	if (DWORD cch = PathIsRelative(szPath) ? GetFullPathName(szPath, 0, NULL, NULL) : 0)
-	{
-		sFull.resize(cch - 1);
-		GetFullPathName(szPath, cch, &sFull.front(), NULL);
-	}
-	else
-	{
-		sFull = szPath;
-	}
+	
+	String sFull(szPath, len + 1);
+	sFull[len] = _T('?');
+	if (PathIsRelative(szPath))
+		sFull = paths_ConcatPath(CurrentDirectory(), sFull);
 	paths_DoMagic(sFull);
+	if (DWORD cch = GetFullPathName(sFull.c_str(), 0, NULL, NULL))
+	{
+		String sTmp;
+		sTmp.resize(cch - 1);
+		cch = GetFullPathName(sFull.c_str(), cch, &sTmp.front(), NULL);
+		sTmp.resize(cch ? cch - 1 : 0);
+		sTmp.swap(sFull);
+	}
 
 	LPCTSTR fullPath = sFull.c_str();
 
@@ -137,7 +140,7 @@ String paths_GetLongPath(LPCTSTR szPath)
 	// Skip to \ position     d:\abcd or \\host\share\abcd
 	// indicated by ^           ^                    ^
 	if (p == NULL || *p == _T('\0'))
-		return paths_DoMagic(sFull);
+		return sFull;
 
 	p[-1] = _T('\0');
 	String sLong = fullPath;
