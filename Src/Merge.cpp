@@ -79,7 +79,10 @@ static void ClearTempfolder(LPCTSTR path)
 static void CleanupWMtemp()
 {
 	String pattern = env_GetTempPath();
-	pattern.replace(pattern.rfind(_T('_')) + 1, String::npos, _T("*"));
+	const String::size_type underline = pattern.rfind(_T('_')) + 1;
+	if (underline == 0)
+		return;
+	pattern.replace(underline, String::npos, _T("*"));
 	WIN32_FIND_DATA ff;
 	HANDLE h = FindFirstFile(pattern.c_str(), &ff);
 	if (h == INVALID_HANDLE_VALUE)
