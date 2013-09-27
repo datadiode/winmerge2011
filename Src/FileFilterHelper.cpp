@@ -19,14 +19,10 @@
  *
  * @brief Implementation file for FileFilterHelper class
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "FilterList.h"
-#include "FileFilter.h"
 #include "FileFilterHelper.h"
-#include "Coretools.h"
+#include "coretools.h"
 #include "paths.h"
 
 using stl::vector;
@@ -38,9 +34,10 @@ FileFilterHelper globalFileFilter;
  * @brief Constructor, creates new filtermanager.
  */
 FileFilterHelper::FileFilterHelper()
-: m_pMaskFilter(new FilterList)
-, m_sGlobalFilterPath(GetModulePath() + _T("\\Filters"))
-, m_currentFilter(NULL)
+: m_sGlobalFilterPath(GetModulePath() + _T("\\Filters"))
+#pragma warning(disable:warning_this_used_in_base_member_initializer_list)
+, m_currentFilter(this)
+#pragma warning(default:warning_this_used_in_base_member_initializer_list)
 {
 }
 
@@ -49,7 +46,6 @@ FileFilterHelper::FileFilterHelper()
  */
 FileFilterHelper::~FileFilterHelper()
 {
-	delete m_pMaskFilter;
 }
 
 /**
@@ -68,7 +64,7 @@ void FileFilterHelper::SetFileFilterPath(LPCTSTR szFileFilterPath)
 	}
 	else
 	{
-		m_currentFilter = NULL;
+		m_currentFilter = this;
 	}
 }
 
@@ -76,18 +72,22 @@ void FileFilterHelper::SetFileFilterPath(LPCTSTR szFileFilterPath)
  * @brief Return path to filter with given name.
  * @param [in] filterName Name of filter.
  */
-FileFilter *FileFilterHelper::FindFilter(LPCTSTR filterName) const
+FileFilter *FileFilterHelper::FindFilter(LPCTSTR filterName)
 {
-	FileFilter *filter = NULL;
-	vector<FileFilter *>::const_iterator iter = m_filters.begin();
-	while (iter != m_filters.end())
+	FileFilter *filter = this;
+	filterName = EatPrefix(filterName, _T("[F] "));
+	if (filterName != NULL)
 	{
-		if ((*iter)->name == filterName)
+		vector<FileFilter *>::const_iterator iter = m_filters.begin();
+		while (iter != m_filters.end())
 		{
-			filter = *iter;
-			break;
+			if ((*iter)->name == filterName)
+			{
+				filter = *iter;
+				break;
+			}
+			++iter;
 		}
-		++iter;
 	}
 	return filter;
 }
@@ -103,19 +103,50 @@ bool FileFilterHelper::SetUserFilterPath(const String &filterPath)
 }
 
 /**
- * @brief Set filemask for filtering.
- * @param [in] strMask Mask to set (e.g. *.cpp;*.h).
+ * @brief Create rules from mask.
  */
-void FileFilterHelper::SetMask(LPCTSTR mask)
+bool FileFilterHelper::CreateFromMask()
 {
-	m_currentFilter = NULL;
-	m_sMask = mask;
+	LPCTSTR mask = name.c_str();
 	// Convert user-given extension list to valid regular expression
-	String regExp;
-	static const TCHAR separators[] = _T(" ;|,:");
+	static const TCHAR separators[] = _T(" ;|,");
 	while (int lentoken = StrCSpn(mask += StrSpn(mask, separators), separators))
 	{
-		regExp += &_T("|\\\\")[regExp.empty()]; // Omit the '|' if strPattern is still empty
+		String regExp;
+		stl::vector<regexp_item> *filters = NULL;
+		if (LPCTSTR pch = EatPrefixTrim(mask, _T("f:")))
+		{
+			lentoken -= static_cast<int>(pch - mask);
+			mask = pch;
+			filters = &filefilters;
+			regExp = _T("/^");
+		}
+		else if (LPCTSTR pch = EatPrefixTrim(mask, _T("d:")))
+		{
+			lentoken -= static_cast<int>(pch - mask);
+			mask = pch;
+			filters = &dirfilters;
+			regExp = _T("/\\\\");
+		}
+		else if (LPCTSTR pch = EatPrefixTrim(mask, _T("xf:")))
+		{
+			lentoken -= static_cast<int>(pch - mask);
+			mask = pch;
+			filters = &xfilefilters;
+			regExp = _T("/^");
+		}
+		else if (LPCTSTR pch = EatPrefixTrim(mask, _T("xd:")))
+		{
+			lentoken -= static_cast<int>(pch - mask);
+			mask = pch;
+			filters = &xdirfilters;
+			regExp = _T("/\\\\");
+		}
+		else
+		{
+			filters = &filefilters;
+			regExp = _T("/^");
+		}
 		do switch (TCHAR c = *mask++)
 		{
 		case '*':
@@ -135,16 +166,19 @@ void FileFilterHelper::SetMask(LPCTSTR mask)
 			regExp += c;
 			break;
 		} while (--lentoken);
-		regExp += _T('$');
+		regExp += _T("$/iu"); // PCRE_CASELESS | PCRE_UTF8
+		regexp_item item;
+		if (item.assign(regExp.c_str(), regExp.length()))
+		{
+			filters->push_back(item);
+		}
 	}
-	string_makelower(regExp);
-	m_pMaskFilter->RemoveAllFilters();
-	m_pMaskFilter->AddRegExp(regExp.c_str());
+	return true;
 }
 
 BSTR FileFilterHelper::getSql(int side)
 {
-	return m_currentFilter ? m_currentFilter->getSql(side) : NULL;
+	return m_currentFilter->getSql(side);
 }
 
 /**
@@ -155,24 +189,7 @@ BSTR FileFilterHelper::getSql(int side)
  */
 bool FileFilterHelper::includeFile(LPCTSTR szFileName)
 {
-	if (m_currentFilter == NULL)
-	{
-		// preprend a backslash if there is none
-		String strFileName = szFileName;
-		string_makelower(strFileName);
-		if (strFileName[0] != _T('\\'))
-			strFileName.insert(strFileName.begin(), _T('\\'));
-		// append a point if there is no extension
-		if (strFileName.find(_T('.')) == String::npos)
-			strFileName.push_back(_T('.'));
-
-		const OString name_utf = HString::Uni(strFileName.c_str())->Oct(CP_UTF8);
-		return m_pMaskFilter->Match(name_utf.ByteLen(), name_utf.A);
-	}
-	else
-	{
-		return m_currentFilter->TestFileNameAgainstFilter(szFileName);
-	}
+	return m_currentFilter->TestFileNameAgainstFilter(szFileName);
 }
 
 /**
@@ -183,19 +200,10 @@ bool FileFilterHelper::includeFile(LPCTSTR szFileName)
  */
 bool FileFilterHelper::includeDir(LPCTSTR szDirName)
 {
-	if (m_currentFilter == NULL)
-	{
-		// directories have no extension
-		return true; 
-	}
-	else
-	{
-		// Add a backslash
-		String strDirName(_T("\\"));
-		strDirName += szDirName;
-
-		return m_currentFilter->TestDirNameAgainstFilter(strDirName.c_str());
-	}
+	// Prepend a backslash
+	String strDirName(_T("\\"));
+	strDirName += szDirName;
+	return m_currentFilter->TestDirNameAgainstFilter(strDirName.c_str());
 }
 
 int FileFilterHelper::collateFile(LPCTSTR p, LPCTSTR q)
@@ -224,7 +232,7 @@ int FileFilterHelper::collateDir(LPCTSTR p, LPCTSTR q)
  */
 String FileFilterHelper::GetFilterNameOrMask() const
 {
-	return m_currentFilter ? _T("[F] ") + m_currentFilter->name : m_sMask;
+	return m_currentFilter != this ? _T("[F] ") + m_currentFilter->name : name;
 }
 
 /**
@@ -241,34 +249,9 @@ String FileFilterHelper::GetFilterNameOrMask() const
 FileFilter *FileFilterHelper::SetFilter(const String &filter)
 {
 	// Remove leading and trailing whitespace characters from the string.
-	String flt = filter;
-	string_trim_ws(flt);
-	if (LPCTSTR filterName = EatPrefix(flt.c_str(), _T("[F] ")))
-	{
-		m_currentFilter = FindFilter(filterName);
-	}
-	else
-	{
-		m_currentFilter = NULL;
-		SetMask(flt.c_str());
-	}
+	string_trim_ws(name = filter);
+	m_currentFilter = FindFilter(name.c_str());
 	return m_currentFilter;
-}
-
-/**
- * @brief Reloads the specified filter file
- * @todo How to handle an error in reloading filter?
- */
-FileFilter *FileFilterHelper::ReloadFilter(FileFilter *filter)
-{
-	// Reload filter after changing it
-	FileFilter *reloaded = ReloadFilterFromDisk(filter);
-	// If it was active filter we have to re-set it
-	if (reloaded != NULL && m_currentFilter == filter)
-	{
-		m_currentFilter = reloaded;
-	}
-	return reloaded;
 }
 
 /**
@@ -279,21 +262,17 @@ FileFilter *FileFilterHelper::ReloadAllFilters()
 	vector<FileFilter *>::const_iterator iter = m_filters.begin();
 	while (iter != m_filters.end())
 	{
-		ReloadFilter(*iter++);
+		(*iter++)->Load();
 	}
-	return m_currentFilter;
+	return m_currentFilter != this ? m_currentFilter : NULL;
 }
 
 /**
  * @brief Reloads the current filter file
  */
-FileFilter *FileFilterHelper::ReloadCurrentFilter()
+void FileFilterHelper::ReloadCurrentFilter()
 {
-	if (m_currentFilter)
-	{
-		ReloadFilter(m_currentFilter);
-	}
-	return m_currentFilter;
+	m_currentFilter->Load();
 }
 
 /**

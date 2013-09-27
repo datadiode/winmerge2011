@@ -23,13 +23,53 @@
 #include "StdAfx.h"
 #include "FileFilter.h"
 #include "Common/coretools.h"
+#include "UniFile.h"
 
 using stl::vector;
+
+/**
+ * @brief Add a single pattern (if nonempty & valid) to a pattern list.
+ *
+ * @param [in] filterList List where pattern is added.
+ * @param [in] str Temporary variable (ie, it may be altered)
+ */
+static void AddFilterPattern(vector<regexp_item> &filterList, LPCTSTR psz)
+{
+	const char *errormsg = NULL;
+	int erroroffset = 0;
+	const OString regexString = HString::Uni(psz)->Oct(CP_UTF8);
+	if (pcre *regexp = pcre_compile(regexString.A,
+			PCRE_CASELESS, &errormsg, &erroroffset, NULL))
+	{
+		regexp_item elem;
+		errormsg = NULL;
+		pcre_extra *pe = pcre_study(regexp, 0, &errormsg);
+		elem.pRegExp = regexp;
+		elem.pRegExpExtra = pe;
+		filterList.push_back(elem);
+	}
+}
+
+/**
+ * @brief Constructor
+ */
+FileFilter::FileFilter()
+	: params(2)
+{
+}
 
 /**
  * @brief Destructor, frees created filter lists.
  */
 FileFilter::~FileFilter()
+{
+	Clear();
+}
+
+/**
+ * @brief Free created filter lists.
+ */
+void FileFilter::Clear()
 {
 	EmptyFilterList(filefilters);
 	EmptyFilterList(dirfilters);
@@ -253,4 +293,121 @@ void FileFilter::EmptyFilterList(vector<regexp_item> &filterList)
 		elem.dispose();
 		filterList.pop_back();
 	}
+}
+
+/**
+ * @brief Parse a filter file, and return true if valid.
+ */
+bool FileFilter::Load()
+{
+	UniMemFile file;
+	if (!file.OpenReadOnly(fullpath.c_str()))
+		return false;
+
+	file.ReadBom(); // in case it is a Unicode file, let UniMemFile handle BOM
+
+	Clear();
+	sql.clear();
+
+	const bool bIsMask = CreateFromMask();
+
+	String sLine, sEol;
+	bool lossy = false;
+	bool bLinesLeft = true;
+	bool default_include = false;
+	do
+	{
+		// Returns false when last line is read
+		bLinesLeft = file.ReadString(sLine, sEol, &lossy);
+		static const TCHAR commentLeader[] = _T("##"); // Starts comment
+		// Ignore lines beginning with '##'
+		String::size_type pos = sLine.find(commentLeader);
+		if (pos != 0)
+		{
+			// Find possible comment-separator '<whitespace>##'
+			while (pos != String::npos && !_istspace(sLine[pos - 1]))
+				pos = sLine.find(commentLeader, pos + 1);
+		}
+		// Remove comment and whitespaces before it
+		if (pos != String::npos)
+			sLine.resize(pos);
+		string_trim_ws(sLine);
+
+		if (sLine.empty())
+			continue;
+
+		if (sLine.find(':') >= sLine.find(' '))
+		{
+			// If there is no colon at all,
+			// or a space earlier on the line,
+			// append the line to the SQL clause
+			sql += sLine;
+			sql += sEol;
+			continue;
+		}
+
+		// Assign remaining properties and rules only if not a .tmpl file
+		if (bIsMask)
+			continue;
+
+		if (LPCTSTR psz = EatPrefixTrim(sLine.c_str(), _T("name:")))
+		{
+			// specifies display name
+			name = psz;
+		}
+		else if (LPCTSTR psz = EatPrefixTrim(sLine.c_str(), _T("desc:")))
+		{
+			// specifies description
+			description = psz;
+		}
+		else if (LPCTSTR psz = EatPrefixTrim(sLine.c_str(), _T("def:")))
+		{
+			// specifies default
+			String str = psz;
+			if (PathMatchSpec(psz, _T("0;no;exclude")))
+				default_include = false;
+			else if (PathMatchSpec(psz, _T("1;yes;include")))
+				default_include = true;
+		}
+		else if (LPCTSTR psz = EatPrefixTrim(sLine.c_str(), _T("f:")))
+		{
+			// file filter
+			AddFilterPattern(default_include ? xfilefilters : filefilters, psz);
+		}
+		else if (LPCTSTR psz = EatPrefixTrim(sLine.c_str(), _T("d:")))
+		{
+			// directory filter
+			AddFilterPattern(default_include ? xdirfilters : dirfilters, psz);
+		}
+		else if (LPCTSTR psz = EatPrefixTrim(sLine.c_str(), _T("xf:")))
+		{
+			// file filter
+			AddFilterPattern(xfilefilters, psz);
+		}
+		else if (LPCTSTR psz = EatPrefixTrim(sLine.c_str(), _T("xd:")))
+		{
+			// directory filter
+			AddFilterPattern(xdirfilters, psz);
+		}
+		else if (LPCTSTR psz = EatPrefixTrim(sLine.c_str(), _T("equiv-f:")))
+		{
+			// file prefilter
+			regexp_item item;
+			if (item.assign(psz, static_cast<int>(_tcslen(psz))))
+			{
+				fileprefilters.push_back(item);
+			}
+		}
+		else if (LPCTSTR psz = EatPrefixTrim(sLine.c_str(), _T("equiv-d:")))
+		{
+			// directory prefilter
+			regexp_item item;
+			if (item.assign(psz, static_cast<int>(_tcslen(psz))))
+			{
+				dirprefilters.push_back(item);
+			}
+		}
+	} while (bLinesLeft);
+
+	return true;
 }

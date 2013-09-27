@@ -79,6 +79,8 @@ private:
 
 	int m_cyFull;
 
+	FileFilter *m_currentFilter;
+
 // Implementation
 protected:
 	void UpdateButtonStates();
@@ -105,7 +107,6 @@ protected:
 	void OnTimer(UINT_PTR);
 	void OnSelectFilter();
 	void OnSelchangeFilter();
-	void OnActivate(UINT nState, HWND hWndOther, BOOL bMinimized);
 	void OnHelp();
 	void OnDropFiles(HDROP dropInfo);
 };

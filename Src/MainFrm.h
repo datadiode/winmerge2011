@@ -122,7 +122,7 @@ public:
 	void UpdateIndicators();
 	void ApplyViewWhitespace();
 	void SetEOLMixed(bool bAllow);
-	void SelectFilter();
+	bool SelectFilter();
 	void ShowVSSError(HRESULT, LPCTSTR strItem);
 	void ShowHelp(LPCTSTR helpLocation = NULL);
 	void UpdateCodepageModule();
@@ -234,7 +234,6 @@ protected:
 	void OnToolsGeneratePatch();
 	void OnSaveConfigData();
 	void OnFileNew();
-	void OnToolsFilters();
 	void OnDebugLoadConfig();
 	void OnViewStatusBar();
 	void OnViewToolbar();

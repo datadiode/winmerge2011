@@ -28,7 +28,6 @@
 #include "MainFrm.h"
 #include "FileFiltersDlg.h"
 #include "coretools.h"
-#include "FileFilter.h"
 #include "paths.h"
 #include "SharedFilterDlg.h"
 #include "TestFilterDlg.h"
@@ -291,8 +290,7 @@ void FileFiltersDlg::OnBnClickedFilterfileTestButton()
 	if (FileFilter *filter = globalFileFilter.GetFilterByPath(m_sFileFilterPath.c_str()))
 	{
 		// Ensure filter is up-to-date (user probably just edited it)
-		if (FileFilter *reloaded = globalFileFilter.ReloadFilter(filter))
-			filter = reloaded;
+		filter->Load();
 		CTestFilterDlg dlg(filter);
 		LanguageSelect.DoModal(dlg);
 	}

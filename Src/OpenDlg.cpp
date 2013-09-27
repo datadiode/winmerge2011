@@ -36,7 +36,6 @@
 #include "SettingStore.h"
 #include "LanguageSelect.h"
 #include "FileOrFolderSelect.h"
-#include "FileFilter.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -82,7 +81,6 @@ static void EnsureCurSelPathCombo(HSuperComboBox *pCb)
  */
 COpenDlg::COpenDlg()
 	: OResizableDialog(IDD_OPEN)
-	, m_idCompareAs(0)
 	, m_nAutoComplete(COptionsMgr::Get(OPT_AUTO_COMPLETE_SOURCE))
 {
 	static const LONG FloatScript[] =
@@ -212,15 +210,16 @@ LRESULT COpenDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_TIMER:
 		OnTimer(wParam);
 		break;
-	case WM_ACTIVATE:
-		OnActivate(LOWORD(wParam), reinterpret_cast<HWND>(lParam), HIWORD(wParam));
-		break;
 	case WM_DROPFILES:
 		OnDropFiles(reinterpret_cast<HDROP>(wParam));
 		break;
+	case WM_ACTIVATE:
 	case WM_SHOWWINDOW:
-		if (wParam)
+		if (wParam != 0)
+		{
+			m_currentFilter = NULL;
 			UpdateButtonStates();
+		}
 		break;
 	case WM_COMMAND:
 		switch (wParam)
@@ -692,7 +691,8 @@ void COpenDlg::SetStatus(UINT msgID)
  */
 void COpenDlg::OnSelectFilter()
 {
-	theApp.m_pMainWnd->SelectFilter();
+	if (!theApp.m_pMainWnd->SelectFilter())
+		return;
 	String filterNameOrMask = globalFileFilter.GetFilterNameOrMask();
 	m_pCbExt->SetCurSel(-1);
 	m_pCbExt->SetWindowText(filterNameOrMask.c_str());
@@ -756,10 +756,10 @@ void COpenDlg::ExtractParameterNames(FileFilter *filter)
 						paramNames.insert(name);
 						id += 10;
 						SetDlgItemText(id, name.c_str());
-						if (!filter->params[0].empty())
-							SetDlgItemText(id + 1, filter->params[0][name].c_str());
-						if (!filter->params[1].empty())
-							SetDlgItemText(id + 2, filter->params[1][name].c_str());
+						SetDlgItemText(id + 1, !filter->params[0].empty() ?
+							filter->params[0][name].c_str() : NULL);
+						SetDlgItemText(id + 2, !filter->params[1].empty() ?
+							filter->params[1][name].c_str() : NULL);
 					}
 					sql = q;
 				}
@@ -786,19 +786,23 @@ void COpenDlg::ExtractParameterNames(FileFilter *filter)
 
 void COpenDlg::OnSelchangeFilter()
 {
-	const stl::vector<FileFilter *> &filters = globalFileFilter.GetFileFilters();
-	String selected;
+	FileFilter *filter = NULL;
 	if (m_pCbExt->GetStyle() & WS_VISIBLE)
 	{
+		String selected;
 		if (m_pCbExt->GetLBText(m_pCbExt->GetCurSel(), selected) < 0)
 			m_pCbExt->GetWindowText(selected);
+		else
+			m_currentFilter = NULL;
+		filter = globalFileFilter.FindFilter(selected.c_str());
 	}
-	FileFilter *filter = NULL;
-	if (LPCTSTR filterName = EatPrefix(selected.c_str(), _T("[F] ")))
+	if (m_currentFilter != filter)
 	{
-		filter = globalFileFilter.FindFilter(filterName);
-		if (filter != NULL)
-			filter = globalFileFilter.ReloadFilter(filter);
+		if (m_currentFilter == NULL)
+		{
+			filter->Load();
+		}
+		m_currentFilter = filter;
 	}
 	ExtractParameterNames(filter);
 	EnableParameterInput();
@@ -839,20 +843,6 @@ void COpenDlg::TrimPaths()
 	// Get absolute paths with magic prefix
 	m_sLeftFile = paths_GetLongPath(m_sLeftFile.c_str());
 	m_sRightFile = paths_GetLongPath(m_sRightFile.c_str());
-}
-
-/** 
- * @brief Update control states when dialog is activated.
- *
- * Update control states when user re-activates dialog. User might have
- * switched for other program to e.g. update files/folders and then
- * swiches back to WinMerge. Its nice to see WinMerge detects updated
- * files/folders.
- */
-void COpenDlg::OnActivate(UINT nState, HWND hWndOther, BOOL bMinimized)
-{
-	if (nState == WA_ACTIVE || nState == WA_CLICKACTIVE)
-		UpdateButtonStates();
 }
 
 /**

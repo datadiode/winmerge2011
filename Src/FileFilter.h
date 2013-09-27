@@ -54,16 +54,19 @@ struct FileFilter
 	stl::vector<regexp_item> xdirfilters;		/**< List of exclusion rules for directories */
 	stl::vector<regexp_item> fileprefilters;	/**< List of prefilter rules for files */
 	stl::vector<regexp_item> dirprefilters;		/**< List of prefilter rules for directories */
-	FileFilter()
-		: params(2)
-	{
-	}
+	FileFilter();
 	~FileFilter();
 	BSTR getSql(int side);
 	// methods to actually use filter
 	bool TestFileNameAgainstFilter(LPCTSTR szFileName) const;
 	bool TestDirNameAgainstFilter(LPCTSTR szDirName) const;
 	static stl_size_t ApplyPrefilterRegExps(const stl::vector<regexp_item> &, char *dst, const char *src, stl_size_t len);
+	bool Load();
+
+protected:
+	void Clear();
+	virtual bool CreateFromMask() { return false; }
+
 private:
 	static bool TestAgainstRegList(const stl::vector<regexp_item> &, LPCTSTR);
 	static void EmptyFilterList(stl::vector<regexp_item> &);

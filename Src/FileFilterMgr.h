@@ -23,7 +23,7 @@
 #ifndef FileFilterMgr_h_included
 #define FileFilterMgr_h_included
 
-struct FileFilter;
+#include "FileFilter.h"
 
 /**
  * @brief Return values for many filter functions.
@@ -53,8 +53,6 @@ public:
 	~FileFilterMgr();
 	// Reload filter array from specified directory (passed to CFileFind)
 	void LoadFromDirectory(LPCTSTR dir, LPCTSTR szPattern);
-	// Reload an edited filter
-	FileFilter *ReloadFilterFromDisk(FileFilter *pfilter);
 	// Load a filter from a string
 	int AddFilter(LPCTSTR szFilterFile);
 	void RemoveFilter(LPCTSTR szFilterFile);
@@ -62,13 +60,11 @@ public:
 	// access to array of filters
 	FileFilter *GetFilterByPath(LPCTSTR) const;
 
+	// Clear the list of known filters
 	void DeleteAllFilters();
 
-// Implementation methods
-protected:
-	// Clear the list of known filters
 	// Load a filter from a file (if syntax is valid)
-	FileFilter *LoadFilterFile(LPCTSTR szFilepath);
+	static FileFilter *LoadFilterFile(LPCTSTR szFilepath);
 
 // Implementation data
 public:

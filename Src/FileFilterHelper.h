@@ -27,9 +27,6 @@
 
 #include "FileFilterMgr.h"
 
-class FilterList;
-struct FileFilter;
-
 /**
  * @brief File extension of file filter files.
  */
@@ -92,6 +89,7 @@ public:
 extern class FileFilterHelper
 	: public IDiffFilter
 	, public FileFilterMgr
+	, private FileFilter
 {
 public:
 	FileFilterHelper();
@@ -102,15 +100,14 @@ public:
 
 	void SetFileFilterPath(LPCTSTR szFileFilterPath);
 	const stl::vector<FileFilter *> &GetFileFilters() const { return m_filters; }
-	FileFilter *FindFilter(LPCTSTR filterName) const;
+	FileFilter *FindFilter(LPCTSTR);
 	bool SetUserFilterPath(const String &filterPath);
 
-	FileFilter *ReloadFilter(FileFilter *);
 	FileFilter *ReloadAllFilters();
-	FileFilter *ReloadCurrentFilter();
+	void ReloadCurrentFilter();
 	void LoadAllFileFilters();
 
-	bool IsUsingMask() const { return m_currentFilter == NULL; }
+	bool IsUsingMask() const { return m_currentFilter == this; }
 	String GetFilterNameOrMask() const;
 	FileFilter *SetFilter(const String &filter);
 
@@ -122,12 +119,10 @@ public:
 	virtual int collateDir(LPCTSTR, LPCTSTR);
 
 protected:
-	void SetMask(LPCTSTR);
+	virtual bool CreateFromMask();
 
 private:
-	FilterList *const m_pMaskFilter;       /*< Filter for filemasks (*.cpp) */
 	FileFilter *m_currentFilter;     /*< Currently selected filefilter */
-	String m_sMask;   /*< File mask (if defined) "*.cpp *.h" etc */
 	const String m_sGlobalFilterPath;    /*< Path for shared filters */
 	String m_sUserSelFilterPath;     /*< Path for user's private filters */
 } globalFileFilter;

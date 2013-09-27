@@ -54,7 +54,6 @@
 #include "ConfigLog.h"
 #include "7zCommon.h"
 #include "Common/DllProxies.h"
-#include "FileFilter.h"
 #include "FileFiltersDlg.h"
 #include "LanguageSelect.h"
 #include "codepage_detect.h"
@@ -2631,7 +2630,7 @@ void CMainFrame::OnFileNew()
 /**
  * @brief Open Filters dialog
  */
-void CMainFrame::OnToolsFilters()
+bool CMainFrame::SelectFilter()
 {
 	OPropertySheet sht;
 	sht.m_caption = LanguageSelect.LoadString(IDS_FILTER_TITLE);
@@ -2673,75 +2672,68 @@ void CMainFrame::OnToolsFilters()
 	if (FileFilter *filter = globalFileFilter.ReloadAllFilters())
 		fileFiltersDlg.m_sFileFilterPath = filter->fullpath;
 
-	if (sht.DoModal(NULL, GetLastActivePopup()->m_hWnd) == IDOK)
+	if (sht.DoModal(NULL, GetLastActivePopup()->m_hWnd) != IDOK)
+		return false;
+
+	String strNone = LanguageSelect.LoadString(IDS_USERCHOICE_NONE);
+	if (fileFiltersDlg.m_sFileFilterPath.find(strNone.c_str()) != String::npos)
 	{
-		String strNone = LanguageSelect.LoadString(IDS_USERCHOICE_NONE);
-		if (fileFiltersDlg.m_sFileFilterPath.find(strNone.c_str()) != String::npos)
+		// Don't overwrite mask we already have
+		if (!globalFileFilter.IsUsingMask())
 		{
-			// Don't overwrite mask we already have
-			if (!globalFileFilter.IsUsingMask())
-			{
-				String sFilter(_T("*.*"));
-				globalFileFilter.SetFilter(sFilter);
-				COptionsMgr::SaveOption(OPT_FILEFILTER_CURRENT, sFilter);
-			}
-		}
-		else
-		{
-			globalFileFilter.SetFileFilterPath(fileFiltersDlg.m_sFileFilterPath.c_str());
-			String sFilter = globalFileFilter.GetFilterNameOrMask();
+			String sFilter(_T("*.*"));
+			globalFileFilter.SetFilter(sFilter);
 			COptionsMgr::SaveOption(OPT_FILEFILTER_CURRENT, sFilter);
 		}
-		COptionsMgr::SaveOption(OPT_LINEFILTER_ENABLED, lineFiltersDlg.m_bIgnoreRegExp != FALSE);
-
-		// Save new filters before (possibly) rescanning
-		globalLineFilters.SaveFilters();
-
-		// Check if compare documents need rescanning
-		int idRefreshFiles = IDNO;
-		int idRefreshFolders = IDNO;
-		if (lineFiltersDlg.m_bLineFiltersDirty)
-		{
-			idRefreshFiles = IDYES; // Start without asking
-			idRefreshFolders = 0; // Ask before starting
-		}
-		else if (origFilter != globalFileFilter.GetFilterNameOrMask())
-		{
-			idRefreshFolders = 0; // Ask before starting
-		}
-		HWindow *pChild = NULL;
-		while ((pChild = m_pWndMDIClient->FindWindowEx(pChild, WinMergeWindowClass)) != NULL)
-		{
-			CDocFrame *pDocFrame = static_cast<CDocFrame *>(CDocFrame::FromHandle(pChild));
-			switch (pDocFrame->GetFrameType())
-			{
-			case FRAME_FILE:
-				if (idRefreshFiles == IDYES)
-				{
-					static_cast<CChildFrame *>(pDocFrame)->RefreshOptions();
-					static_cast<CChildFrame *>(pDocFrame)->FlushAndRescan(TRUE);
-				}
-				break;
-			case FRAME_FOLDER:
-				if (idRefreshFolders == 0)
-					idRefreshFolders = LanguageSelect.MsgBox(IDS_FILTERCHANGED,
-						MB_ICONWARNING | MB_YESNO | MB_DONT_ASK_AGAIN);
-				if (idRefreshFolders == IDYES)
-					static_cast<CDirFrame *>(pDocFrame)->Rescan();
-				break;
-			}
-			// Avoid concurrent DirScan threads for now due to issues...
-			idRefreshFolders = IDNO;
-		}
 	}
-}
+	else
+	{
+		globalFileFilter.SetFileFilterPath(fileFiltersDlg.m_sFileFilterPath.c_str());
+		String sFilter = globalFileFilter.GetFilterNameOrMask();
+		COptionsMgr::SaveOption(OPT_FILEFILTER_CURRENT, sFilter);
+	}
+	COptionsMgr::SaveOption(OPT_LINEFILTER_ENABLED, lineFiltersDlg.m_bIgnoreRegExp != FALSE);
 
-/**
- * @brief Open Filters dialog.
- */
-void CMainFrame::SelectFilter()
-{
-	OnToolsFilters();
+	// Save new filters before (possibly) rescanning
+	globalLineFilters.SaveFilters();
+
+	// Check if compare documents need rescanning
+	int idRefreshFiles = IDNO;
+	int idRefreshFolders = IDNO;
+	if (lineFiltersDlg.m_bLineFiltersDirty)
+	{
+		idRefreshFiles = IDYES; // Start without asking
+		idRefreshFolders = 0; // Ask before starting
+	}
+	else if (origFilter != globalFileFilter.GetFilterNameOrMask())
+	{
+		idRefreshFolders = 0; // Ask before starting
+	}
+	HWindow *pChild = NULL;
+	while ((pChild = m_pWndMDIClient->FindWindowEx(pChild, WinMergeWindowClass)) != NULL)
+	{
+		CDocFrame *pDocFrame = static_cast<CDocFrame *>(CDocFrame::FromHandle(pChild));
+		switch (pDocFrame->GetFrameType())
+		{
+		case FRAME_FILE:
+			if (idRefreshFiles == IDYES)
+			{
+				static_cast<CChildFrame *>(pDocFrame)->RefreshOptions();
+				static_cast<CChildFrame *>(pDocFrame)->FlushAndRescan(TRUE);
+			}
+			break;
+		case FRAME_FOLDER:
+			if (idRefreshFolders == 0)
+				idRefreshFolders = LanguageSelect.MsgBox(IDS_FILTERCHANGED,
+					MB_ICONWARNING | MB_YESNO | MB_DONT_ASK_AGAIN);
+			if (idRefreshFolders == IDYES)
+				static_cast<CDirFrame *>(pDocFrame)->Rescan();
+			break;
+		}
+		// Avoid concurrent DirScan threads for now due to issues...
+		idRefreshFolders = IDNO;
+	}
+	return true;
 }
 
 /**
@@ -3354,7 +3346,7 @@ LRESULT CMainFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 		OnResizePanes();
 		break;
 	case ID_TOOLS_FILTERS:
-		OnToolsFilters();
+		SelectFilter();
 		break;
 	case ID_TOOLS_GENERATEPATCH:
 		OnToolsGeneratePatch();

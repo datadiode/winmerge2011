@@ -18,7 +18,6 @@
  *  @brief Implementation of FileFilterMgr and supporting routines
  */ 
 #include "StdAfx.h"
-#include "FileFilter.h"
 #include "pcre.h"
 #include "FileFilterMgr.h"
 #include "UniFile.h"
@@ -26,8 +25,6 @@
 #include "paths.h"
 
 using stl::vector;
-
-static void AddFilterPattern(vector<regexp_item> &filterList, LPCTSTR psz);
 
 /**
  * @brief Destructor, frees all filters.
@@ -111,29 +108,6 @@ void FileFilterMgr::DeleteAllFilters()
 }
 
 /**
- * @brief Add a single pattern (if nonempty & valid) to a pattern list.
- *
- * @param [in] filterList List where pattern is added.
- * @param [in] str Temporary variable (ie, it may be altered)
- */
-static void AddFilterPattern(vector<regexp_item> &filterList, LPCTSTR psz)
-{
-	const char *errormsg = NULL;
-	int erroroffset = 0;
-	const OString regexString = HString::Uni(psz)->Oct(CP_UTF8);
-	if (pcre *regexp = pcre_compile(regexString.A,
-			PCRE_CASELESS, &errormsg, &erroroffset, NULL))
-	{
-		regexp_item elem;
-		errormsg = NULL;
-		pcre_extra *pe = pcre_study(regexp, 0, &errormsg);
-		elem.pRegExp = regexp;
-		elem.pRegExpExtra = pe;
-		filterList.push_back(elem);
-	}
-}
-
-/**
  * @brief Parse a filter file, and add it to array if valid.
  *
  * @param [in] szFilePath Path (w/ filename) to file to load.
@@ -142,110 +116,14 @@ static void AddFilterPattern(vector<regexp_item> &filterList, LPCTSTR psz)
  */
 FileFilter *FileFilterMgr::LoadFilterFile(LPCTSTR szFilepath)
 {
-	UniMemFile file;
-	if (!file.OpenReadOnly(szFilepath))
-	{
-		return NULL;
-	}
-
-	file.ReadBom(); // in case it is a Unicode file, let UniMemFile handle BOM
-
 	FileFilter *pfilter = new FileFilter;
 	pfilter->fullpath = szFilepath;
 	pfilter->name = PathFindFileName(szFilepath); // Filename is the default name
-
-	String sLine, sEol;
-	bool lossy = false;
-	bool bLinesLeft = true;
-	bool default_include = false;
-	do
+	if (!pfilter->Load())
 	{
-		// Returns false when last line is read
-		bLinesLeft = file.ReadString(sLine, sEol, &lossy);
-		static const TCHAR commentLeader[] = _T("##"); // Starts comment
-		// Ignore lines beginning with '##'
-		String::size_type pos = sLine.find(commentLeader);
-		if (pos != 0)
-		{
-			// Find possible comment-separator '<whitespace>##'
-			while (pos != String::npos && !_istspace(sLine[pos - 1]))
-				pos = sLine.find(commentLeader, pos + 1);
-		}
-		// Remove comment and whitespaces before it
-		if (pos != String::npos)
-			sLine.resize(pos);
-		string_trim_ws(sLine);
-
-		if (sLine.empty())
-			continue;
-
-		if (sLine.find(':') >= sLine.find(' '))
-		{
-			// If there is no colon at all,
-			// or a space earlier on the line,
-			// append the line to the SQL clause
-			pfilter->sql += sLine.c_str();
-			pfilter->sql += sEol.c_str();
-		}
-		else if (LPCTSTR psz = EatPrefixTrim(sLine.c_str(), _T("name:")))
-		{
-			// specifies display name
-			pfilter->name = psz;
-		}
-		else if (LPCTSTR psz = EatPrefixTrim(sLine.c_str(), _T("desc:")))
-		{
-			// specifies description
-			pfilter->description = psz;
-		}
-		else if (LPCTSTR psz = EatPrefixTrim(sLine.c_str(), _T("def:")))
-		{
-			// specifies default
-			String str = psz;
-			if (PathMatchSpec(psz, _T("0;no;exclude")))
-				default_include = false;
-			else if (PathMatchSpec(psz, _T("1;yes;include")))
-				default_include = true;
-		}
-		else if (LPCTSTR psz = EatPrefixTrim(sLine.c_str(), _T("f:")))
-		{
-			// file filter
-			AddFilterPattern(default_include ? pfilter->xfilefilters : pfilter->filefilters, psz);
-		}
-		else if (LPCTSTR psz = EatPrefixTrim(sLine.c_str(), _T("d:")))
-		{
-			// directory filter
-			AddFilterPattern(default_include ? pfilter->xdirfilters : pfilter->dirfilters, psz);
-		}
-		else if (LPCTSTR psz = EatPrefixTrim(sLine.c_str(), _T("xf:")))
-		{
-			// file filter
-			AddFilterPattern(pfilter->xfilefilters, psz);
-		}
-		else if (LPCTSTR psz = EatPrefixTrim(sLine.c_str(), _T("xd:")))
-		{
-			// directory filter
-			AddFilterPattern(pfilter->xdirfilters, psz);
-		}
-		else if (LPCTSTR psz = EatPrefixTrim(sLine.c_str(), _T("equiv-f:")))
-		{
-			// file prefilter
-			regexp_item item;
-			if (item.assign(psz, static_cast<int>(_tcslen(psz))))
-			{
-				pfilter->fileprefilters.push_back(item);
-			}
-		}
-		else if (LPCTSTR psz = EatPrefixTrim(sLine.c_str(), _T("equiv-d:")))
-		{
-			// directory prefilter
-			regexp_item item;
-			if (item.assign(psz, static_cast<int>(_tcslen(psz))))
-			{
-				pfilter->dirprefilters.push_back(item);
-			}
-		}
-	} while (bLinesLeft);
-
+		delete pfilter;
+		pfilter = NULL;
+	}
 	return pfilter;
 }
 
@@ -266,31 +144,4 @@ FileFilter *FileFilterMgr::GetFilterByPath(LPCTSTR szFilterPath) const
 		++iter;
 	}
 	return NULL;
-}
-
-/**
- * @brief Reload filter from disk
- *
- * Reloads filter from disk. This is done by creating a new one
- * to substitute for old one.
- * @param [in] pFilter Pointer to filter to reload.
- * @return FILTER_OK when succeeds, one of FILTER_RETVALUE values on error.
- * @note Given filter (pfilter) is freed and must not be used anymore.
- */
-FileFilter *FileFilterMgr::ReloadFilterFromDisk(FileFilter *pfilter)
-{
-	vector<FileFilter *>::iterator iter = stl::find(
-		m_filters.begin(), m_filters.end(), pfilter);
-	if (iter != m_filters.end())
-	{
-		if (FileFilter *const newfilter = LoadFilterFile(pfilter->fullpath.c_str()))
-		{
-			newfilter->sqlopt[0] = pfilter->sqlopt[0];
-			newfilter->sqlopt[1] = pfilter->sqlopt[1];
-			newfilter->params.swap(pfilter->params);
-			delete pfilter;
-			*iter = pfilter = newfilter;
-		}
-	}
-	return pfilter;
 }
