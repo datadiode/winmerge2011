@@ -287,4 +287,12 @@ void FileFilterHelper::LoadAllFileFilters()
 	LoadFromDirectory(m_sGlobalFilterPath.c_str(), FileFilterExt);
 	// Path for user's private filters
 	LoadFromDirectory(m_sUserSelFilterPath.c_str(), FileFilterExt);
+	// Load the filter template, which may specify a default SQL filter
+	static const TCHAR tmpl[] = _T("FileFilter.tmpl");
+	fullpath = paths_ConcatPath(m_sUserSelFilterPath, tmpl);
+	if (!Load())
+	{
+		fullpath = paths_ConcatPath(m_sGlobalFilterPath, tmpl);
+		Load();
+	}
 }
