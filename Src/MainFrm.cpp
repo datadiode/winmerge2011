@@ -1119,7 +1119,8 @@ CEditorFrame *CMainFrame::ShowMergeDoc(CDirFrame *pDirDoc,
 	CChildFrame *const pMergeDoc = GetMergeDocToShow(pDirDoc);
 	if (pMergeDoc != NULL)
 	{
-		pMergeDoc->m_sCompareAs = sCompareAs;
+		if (sCompareAs != NULL)
+			pMergeDoc->m_sCompareAs = sCompareAs;
 		// if an unpacker is selected, it must be used during LoadFromFile
 		// MergeDoc must memorize it for SaveToFile
 		// Warning : this unpacker may differ from the pDirDoc one
@@ -1376,22 +1377,25 @@ CEditorFrame *CMainFrame::ActivateOpenDoc(
 	UINT idCompareAs,
 	FRAMETYPE frametype)
 {
-	UINT idAtom = FindAtom(sCompareAs);
-	HWindow *pChild = NULL;
-	while ((pChild = m_pWndMDIClient->FindWindowEx(pChild, WinMergeWindowClass)) != NULL)
+	if (pDirDoc != NULL)
 	{
-		CDocFrame *pAbstract = static_cast<CDocFrame *>(CDocFrame::FromHandle(pChild));
-		if (pAbstract->GetFrameType() == frametype)
+		UINT idAtom = FindAtom(sCompareAs);
+		HWindow *pChild = NULL;
+		while ((pChild = m_pWndMDIClient->FindWindowEx(pChild, WinMergeWindowClass)) != NULL)
 		{
-			CEditorFrame *pSpecific = static_cast<CEditorFrame *>(pAbstract);
-			if (pSpecific->m_pDirDoc == pDirDoc && (
-					pSpecific->m_sCompareAs.empty() && idAtom == idCompareAs ||
-					pSpecific->m_sCompareAs == sCompareAs) &&
-				pSpecific->m_strPath[0] == filelocLeft.filepath &&
-				pSpecific->m_strPath[1] == filelocRight.filepath)
+			CDocFrame *pAbstract = static_cast<CDocFrame *>(CDocFrame::FromHandle(pChild));
+			if (pAbstract->GetFrameType() == frametype)
 			{
-				pSpecific->ActivateFrame();
-				return pSpecific;
+				CEditorFrame *pSpecific = static_cast<CEditorFrame *>(pAbstract);
+				if (pSpecific->m_pDirDoc == pDirDoc && (
+						pSpecific->m_sCompareAs.empty() && idAtom == idCompareAs ||
+						pSpecific->m_sCompareAs == sCompareAs) &&
+					pSpecific->m_strPath[0] == filelocLeft.filepath &&
+					pSpecific->m_strPath[1] == filelocRight.filepath)
+				{
+					pSpecific->ActivateFrame();
+					return pSpecific;
+				}
 			}
 		}
 	}
