@@ -214,7 +214,6 @@ LRESULT COpenDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		OnDropFiles(reinterpret_cast<HDROP>(wParam));
 		break;
 	case WM_ACTIVATE:
-	case WM_SHOWWINDOW:
 		if (wParam != 0)
 		{
 			m_currentFilter = NULL;
@@ -494,6 +493,10 @@ void COpenDlg::OnOK()
 	UpdateData<Get>();
 	TrimPaths();
 
+	// Get absolute paths with magic prefix
+	m_sLeftFile = paths_GetLongPath(m_sLeftFile.c_str());
+	m_sRightFile = paths_GetLongPath(m_sRightFile.c_str());
+
 	// If left path is a project-file, load it
 	if (m_sRightFile.empty() && ProjectFile::IsProjectFile(m_sLeftFile.c_str()))
 		if (!ProjectFile::Read(m_sLeftFile.c_str()))
@@ -589,8 +592,9 @@ void COpenDlg::OnCancel()
 void COpenDlg::UpdateButtonStates()
 {
 	UpdateData<Get>(); // load member variables from screen
-	KillTimer(IDT_CHECKFILES);
 	TrimPaths();
+
+	KillTimer(IDT_CHECKFILES);
 
 	int nShowFilter = SW_HIDE;
 	if (paths_EndsWithSlash(m_sLeftFile.c_str()) ||
@@ -611,6 +615,10 @@ void COpenDlg::UpdateButtonStates()
 	// Enable buttons as appropriate
 	if (COptionsMgr::Get(OPT_VERIFY_OPEN_PATHS))
 	{
+		// Get absolute paths with magic prefix
+		m_sLeftFile = paths_GetLongPath(m_sLeftFile.c_str());
+		m_sRightFile = paths_GetLongPath(m_sRightFile.c_str());
+
 		const DWORD attrLeft = GetFileAttributes(m_sLeftFile.c_str());
 		const DWORD attrRight = GetFileAttributes(m_sRightFile.c_str());
 		// If "both paths are valid", or
@@ -840,9 +848,6 @@ void COpenDlg::TrimPaths()
 		m_sLeftFile = env_ExpandVariables(m_sLeftFile.c_str());
 	if (m_pCbRight->GetEditControl()->GetModify())
 		m_sRightFile = env_ExpandVariables(m_sRightFile.c_str());
-	// Get absolute paths with magic prefix
-	m_sLeftFile = paths_GetLongPath(m_sLeftFile.c_str());
-	m_sRightFile = paths_GetLongPath(m_sRightFile.c_str());
 }
 
 /**
