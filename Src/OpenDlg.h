@@ -87,7 +87,9 @@ protected:
 	void SetStatus(UINT msgID);
 	void TrimPaths();
 	int EnableParameterInput();
-	void ExtractParameterNames(FileFilter *);
+	void SetDlgEditText(int, LPCTSTR);
+	void InjectParameterValues();
+	void ExtractParameterValues();
 
 	template<DDX_Operation>
 			bool UpdateData();

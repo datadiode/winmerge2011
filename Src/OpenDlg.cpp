@@ -114,6 +114,8 @@ COpenDlg::COpenDlg()
 		IDC_SQL_QUERY_PARAM_5_RIGHT,	BY<500>::X2L | BY<1000>::X2R,
 		IDC_SQL_QUERY_PARAM_6_LEFT,		BY<500>::X2R,
 		IDC_SQL_QUERY_PARAM_6_RIGHT,	BY<500>::X2L | BY<1000>::X2R,
+		IDC_SQL_QUERY_FILTER_LEFT,		BY<500>::X2R,
+		IDC_SQL_QUERY_FILTER_RIGHT,		BY<500>::X2L | BY<1000>::X2R,
 		0
 	};
 	CFloatState::FloatScript = FloatScript;
@@ -219,6 +221,10 @@ LRESULT COpenDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			m_currentFilter = NULL;
 			UpdateButtonStates();
 		}
+		else
+		{
+			ExtractParameterValues();
+		}
 		break;
 	case WM_COMMAND:
 		switch (wParam)
@@ -281,6 +287,14 @@ LRESULT COpenDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 					GetDlgItemText(id + (1 ^ xor), text);
 					SetDlgItemText(id + (2 ^ xor), text.c_str());
 				} while (id < IDC_SQL_QUERY_PARAM_6_NAME);
+			}
+			if (IsDlgButtonChecked(wParam) == BST_INDETERMINATE)
+			{
+				ExtractParameterValues();
+				int side = static_cast<int>(wParam - IDC_SQL_QUERY_PARAMS_LEFT);
+				BSTR bstr = m_currentFilter->composeSql(side);
+				SetDlgItemText(IDC_SQL_QUERY_FILTER_LEFT + side, bstr);
+				SysFreeString(bstr);
 			}
 			break;
 		case MAKEWPARAM(IDC_LEFT_COMBO, CBN_SELENDCANCEL):
@@ -512,25 +526,8 @@ void COpenDlg::OnOK()
 
 	KillTimer(IDT_CHECKFILES);
 
-	if (FileFilter *filter = globalFileFilter.SetFilter(m_sFilter))
-	{
-		int id = IDC_SQL_QUERY_PARAMS_GROUP;
-		filter->sqlopt[0] = IsDlgButtonChecked(IDC_SQL_QUERY_PARAMS_LEFT) != BST_UNCHECKED;
-		filter->sqlopt[1] = IsDlgButtonChecked(IDC_SQL_QUERY_PARAMS_RIGHT) != BST_UNCHECKED;
-		do
-		{
-			id += 10;
-			String name;
-			GetDlgItemText(id, name);
-			if (!name.empty())
-			{
-				if (filter->sqlopt[0])
-					GetDlgItemText(id + 1, filter->params[0][name]);
-				if (filter->sqlopt[1])
-					GetDlgItemText(id + 2, filter->params[1][name]);
-			}
-		} while (id < IDC_SQL_QUERY_PARAM_6_NAME);
-	}
+	m_currentFilter = globalFileFilter.SetFilter(m_sFilter);
+	ExtractParameterValues();
 
 	m_sFilter = globalFileFilter.GetFilterNameOrMask();
 	COptionsMgr::SaveOption(OPT_FILEFILTER_CURRENT, m_sFilter);
@@ -722,31 +719,50 @@ int COpenDlg::EnableParameterInput()
 		int namelength = GetDlgItem(id)->GetWindowTextLength();
 		if (HWindow *pWnd = GetDlgItem(id + 1))
 		{
-			pWnd->EnableWindow(checked[0] && namelength != 0);
+			pWnd->ShowWindow(checked[0] != BST_INDETERMINATE);
+			pWnd->EnableWindow(checked[0] == BST_CHECKED && namelength != 0);
 			if (pWnd->GetWindowTextLength())
 				hastext[0] = 1;
 		}
 		if (HWindow *pWnd = GetDlgItem(id + 2))
 		{
-			pWnd->EnableWindow(checked[1] && namelength != 0);
+			pWnd->ShowWindow(checked[1] != BST_INDETERMINATE);
+			pWnd->EnableWindow(checked[1] == BST_CHECKED && namelength != 0);
 			if (pWnd->GetWindowTextLength())
 				hastext[1] = 1;
 		}
 	} while (id < IDC_SQL_QUERY_PARAM_6_NAME);
-	return checked[0] && checked[1] ? hastext[0] - hastext[1] : 0;
+	if (HWindow *pWnd = GetDlgItem(IDC_SQL_QUERY_FILTER_LEFT))
+		pWnd->ShowWindow(checked[0] == BST_INDETERMINATE);
+	if (HWindow *pWnd = GetDlgItem(IDC_SQL_QUERY_FILTER_RIGHT))
+		pWnd->ShowWindow(checked[1] == BST_INDETERMINATE);
+	return checked[0] == BST_CHECKED && checked[1] == BST_CHECKED ?
+		hastext[0] - hastext[1] : 0;
 }
 
-void COpenDlg::ExtractParameterNames(FileFilter *filter)
+void COpenDlg::SetDlgEditText(int id, LPCTSTR value)
+{
+	if (HEdit *const edit = static_cast<HEdit *>(GetDlgItem(id)))
+	{
+		int nStart, nEnd;
+		edit->GetSel(nStart, nEnd);
+		edit->SetWindowText(value);
+		edit->SetSel(nStart, nEnd);
+	}
+}
+
+void COpenDlg::InjectParameterValues()
 {
 	int id = IDC_SQL_QUERY_PARAMS_GROUP;
-	bool sqlopt[] = { false, false };
+	BYTE sqlopt[] = { BST_UNCHECKED, BST_UNCHECKED };
 	BOOL bEnable = FALSE;
-	if (filter != NULL)
+	if (m_currentFilter != NULL)
 	{
+		m_currentFilter->Load();
 		bEnable = TRUE;
-		sqlopt[0] = filter->sqlopt[0];
-		sqlopt[1] = filter->sqlopt[1];
-		LPCTSTR sql = filter->sql.c_str();
+		sqlopt[0] = m_currentFilter->sqlopt[0];
+		sqlopt[1] = m_currentFilter->sqlopt[1];
+		LPCTSTR sql = m_currentFilter->sql.c_str();
 		C_ASSERT(('"' & 0x3F) == '"');
 		C_ASSERT(('\'' & 0x3F) == '\'');
 		TCHAR quote = '\0';
@@ -764,10 +780,10 @@ void COpenDlg::ExtractParameterNames(FileFilter *filter)
 						paramNames.insert(name);
 						id += 10;
 						SetDlgItemText(id, name.c_str());
-						SetDlgItemText(id + 1, !filter->params[0].empty() ?
-							filter->params[0][name].c_str() : NULL);
-						SetDlgItemText(id + 2, !filter->params[1].empty() ?
-							filter->params[1][name].c_str() : NULL);
+						SetDlgEditText(id + 1, !m_currentFilter->params[0].empty() ?
+							m_currentFilter->params[0][name].c_str() : NULL);
+						SetDlgEditText(id + 2, !m_currentFilter->params[1].empty() ?
+							m_currentFilter->params[1][name].c_str() : NULL);
 					}
 					sql = q;
 				}
@@ -780,16 +796,43 @@ void COpenDlg::ExtractParameterNames(FileFilter *filter)
 				quote &= 0x3F;
 			++sql;
 		}
+		SetDlgEditText(IDC_SQL_QUERY_FILTER_LEFT, m_currentFilter->rawsql[0].c_str());
+		SetDlgEditText(IDC_SQL_QUERY_FILTER_RIGHT, m_currentFilter->rawsql[1].c_str());
 	}
 	while (id < IDC_SQL_QUERY_PARAM_6_NAME)
 	{
 		id += 10;
 		SetDlgItemText(id, NULL);
+		SetDlgItemText(id + 1, NULL);
+		SetDlgItemText(id + 2, NULL);
 	}
 	GetDlgItem(IDC_SQL_QUERY_PARAMS_LEFT)->EnableWindow(bEnable);
 	CheckDlgButton(IDC_SQL_QUERY_PARAMS_LEFT, sqlopt[0]);
 	GetDlgItem(IDC_SQL_QUERY_PARAMS_RIGHT)->EnableWindow(bEnable);
 	CheckDlgButton(IDC_SQL_QUERY_PARAMS_RIGHT, sqlopt[1]);
+}
+
+void COpenDlg::ExtractParameterValues()
+{
+	if (m_currentFilter != NULL)
+	{
+		int id = IDC_SQL_QUERY_PARAMS_GROUP;
+		m_currentFilter->sqlopt[0] = IsDlgButtonChecked(IDC_SQL_QUERY_PARAMS_LEFT);
+		m_currentFilter->sqlopt[1] = IsDlgButtonChecked(IDC_SQL_QUERY_PARAMS_RIGHT);
+		do
+		{
+			id += 10;
+			String name;
+			GetDlgItemText(id, name);
+			if (!name.empty())
+			{
+				GetDlgItemText(id + 1, m_currentFilter->params[0][name]);
+				GetDlgItemText(id + 2, m_currentFilter->params[1][name]);
+			}
+		} while (id < IDC_SQL_QUERY_PARAM_6_NAME);
+		GetDlgItemText(IDC_SQL_QUERY_FILTER_LEFT, m_currentFilter->rawsql[0]);
+		GetDlgItemText(IDC_SQL_QUERY_FILTER_RIGHT, m_currentFilter->rawsql[1]);
+	}
 }
 
 void COpenDlg::OnSelchangeFilter()
@@ -800,19 +843,13 @@ void COpenDlg::OnSelchangeFilter()
 		String selected;
 		if (m_pCbExt->GetLBText(m_pCbExt->GetCurSel(), selected) < 0)
 			m_pCbExt->GetWindowText(selected);
-		else
-			m_currentFilter = NULL;
 		filter = globalFileFilter.FindFilter(selected.c_str());
+		if (m_currentFilter == filter)
+			return;
+		ExtractParameterValues();
 	}
-	if (m_currentFilter != filter)
-	{
-		if (m_currentFilter == NULL)
-		{
-			filter->Load();
-		}
-		m_currentFilter = filter;
-	}
-	ExtractParameterNames(filter);
+	m_currentFilter = filter;
+	InjectParameterValues();
 	EnableParameterInput();
 	RECT rc;
 	HWindow *const pGroup = GetDlgItem(IDC_SQL_QUERY_PARAMS_GROUP);

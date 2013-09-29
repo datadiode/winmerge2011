@@ -449,6 +449,8 @@
 #define IDC_SQL_QUERY_PARAM_6_NAME              1460
 #define IDC_SQL_QUERY_PARAM_6_LEFT              1461
 #define IDC_SQL_QUERY_PARAM_6_RIGHT             1462
+#define IDC_SQL_QUERY_FILTER_LEFT               1491
+#define IDC_SQL_QUERY_FILTER_RIGHT              1492
 #define IDC_EDIT_WHOLE_WORD                     8603
 #define IDC_EDIT_MATCH_CASE                     8604
 #define IDC_EDIT_FINDTEXT                       8605

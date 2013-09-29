@@ -45,9 +45,10 @@ struct FileFilter
 	String name;			/**< Filter name (shown in UI) */
 	String description;		/**< Filter description text */
 	String fullpath;		/**< Full path to filter file */
-	String sql;				/**< SQL query for LogParser */
-	bool sqlopt[2];			/**< Which sides to apply it to */
+	String sql;				/**< SQL query template for LogParser */
+	BYTE sqlopt[2];			/**< Which sides to apply it to */
 	stl::vector<stl::map<String, String> > params;	/**< SQL query parameters */
+	stl::vector<String> rawsql;					/**< Raw SQL clause as provided by user */
 	stl::vector<regexp_item> filefilters;		/**< List of inclusion rules for files */
 	stl::vector<regexp_item> dirfilters;		/**< List of inclusion rules for directories */
 	stl::vector<regexp_item> xfilefilters;		/**< List of exclusion rules for files */
@@ -57,6 +58,7 @@ struct FileFilter
 	FileFilter();
 	~FileFilter();
 	BSTR getSql(int side);
+	BSTR composeSql(int side);
 	// methods to actually use filter
 	bool TestFileNameAgainstFilter(LPCTSTR szFileName) const;
 	bool TestDirNameAgainstFilter(LPCTSTR szDirName) const;

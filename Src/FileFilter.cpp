@@ -55,6 +55,7 @@ static void AddFilterPattern(vector<regexp_item> &filterList, LPCTSTR psz)
  */
 FileFilter::FileFilter()
 	: params(2)
+	, rawsql(2)
 {
 }
 
@@ -80,12 +81,28 @@ void FileFilter::Clear()
 }
 
 /**
- * @brief Compose optional SQL clause from template and parameters.
+ * @brief Get SQL clause.
  */
 BSTR FileFilter::getSql(int side)
 {
-	if (!sqlopt[side])
-		return NULL;
+	BSTR dst = NULL;
+	switch (sqlopt[side])
+	{
+	case BST_CHECKED:
+		dst = composeSql(side);
+		break;
+	case BST_INDETERMINATE:
+		dst = SysAllocString(rawsql[side].c_str());
+		break;
+	}
+	return dst;
+}
+
+/**
+ * @brief Compose SQL clause from template and parameters.
+ */
+BSTR FileFilter::composeSql(int side)
+{
 	BSTR dst = SysAllocString(sql.c_str());
 	LPCTSTR src = dst;
 	C_ASSERT(('"' & 0x3F) == '"');
