@@ -2,12 +2,10 @@
  *  @file   unicoder.cpp
  *  @author Perry Rapp, Creator, 2003-2006
  *  @date   Created: 2003-10
- *  @date   Edited:  2013-02-02 (Jochen Neubeck)
+ *  @date   Edited:  2013-10-03 (Jochen Neubeck)
  *
  *  @brief  Implementation of utility unicode conversion routines
  */
-// ID line follows -- this is updated by SVN
-// $Id$
 
 /* The MIT License
 Copyright (c) 2003 Perry Rapp
@@ -90,8 +88,6 @@ unsigned int get_unicode_char(unsigned char * ptr, UNICODESET codeset, int codep
  */
 bool maketstring(String &str, const char *lpd, int len, int codepage, bool *lossy)
 {
-	int defcodepage = getDefaultCodepage();
-
 	if (!len)
 	{
 		str.clear();
@@ -100,7 +96,7 @@ bool maketstring(String &str, const char *lpd, int len, int codepage, bool *loss
 
 	// 0 is a valid value (CP_ACP)!
 	if (codepage == -1)
-		codepage = defcodepage;
+		codepage = getDefaultCodepage();
 
 	// Convert input to Unicode, using specified codepage
 	// TCHAR is wchar_t, so convert into String (str)
