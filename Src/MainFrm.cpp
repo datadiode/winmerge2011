@@ -323,7 +323,7 @@ HRESULT CMainFrame::ShowHTMLDialog(BSTR url, VARIANT *arguments, BSTR features, 
 {
 	String moniker = url;
 	CMyComPtr<IMoniker> spMoniker;
-	HRESULT hr = URLMON->CreateURLMoniker(NULL, env_ResolveMoniker(moniker), &spMoniker);
+	HRESULT hr = CreateURLMonikerEx(NULL, env_ResolveMoniker(moniker), &spMoniker, URL_MK_UNIFORM);
 	if (FAILED(hr))
 		return hr;
 	DWORD flags = HTMLDLG_MODAL | HTMLDLG_VERIFY;

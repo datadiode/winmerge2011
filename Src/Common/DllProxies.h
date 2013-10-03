@@ -60,15 +60,6 @@ struct ICONV
 
 extern DllProxy::Instance<struct ICONV> ICONV;
 
-// URLMON dll proxy
-struct URLMON
-{
-	HRESULT(STDAPICALLTYPE*CreateURLMoniker)(IMoniker *, LPCWSTR, IMoniker **);
-	HMODULE H;
-};
-
-extern DllProxy::Instance<struct URLMON> URLMON;
-
 // MSHTML dll proxy
 struct MSHTML
 {

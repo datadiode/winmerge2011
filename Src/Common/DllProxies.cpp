@@ -106,16 +106,6 @@ DllProxy::Instance<struct ICONV> ICONV =
 };
 
 /**
- * @brief URLMON dll proxy
- */
-DllProxy::Instance<struct URLMON> URLMON =
-{
-	"URLMON.DLL",
-	"CreateURLMoniker",
-	(HMODULE)0
-};
-
-/**
  * @brief MSHTML dll proxy
  */
 DllProxy::Instance<struct MSHTML> MSHTML =
