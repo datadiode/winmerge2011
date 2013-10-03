@@ -24,8 +24,6 @@
  * @brief MergeCmdLineInfo class declaration.
  *
  */
-// ID line follows -- this is updated by SVN
-// $Id$
 
 #ifndef _MERGE_CMD_LINE_INFO_INCLUDED_
 #define _MERGE_CMD_LINE_INFO_INCLUDED_
@@ -64,7 +62,7 @@ public:
 	bool m_bNonInteractive; /**< Suppress user's notifications. */
 	bool m_bSingleInstance; /**< Allow only one instance of WinMerge executable. */
 	bool m_bShowUsage; /**< Show a brief reminder to command line arguments. */
-	int  m_nCodepage;  /**< Codepage. */
+	int m_nCodepage;  /**< Codepage. */
 
 	DWORD m_dwLeftFlags; /**< Left side file's behavior options. */
 	DWORD m_dwRightFlags; /**< Right side file's behavior options. */
@@ -81,9 +79,12 @@ public:
 
 private:
 
+	String m_sRegHive;
+
 	LPCTSTR EatParam(LPCTSTR, String &, bool *flag = 0) const;
 	LPCTSTR SetOption(LPCTSTR, IOptionDef &, LPCTSTR value = _T("1")) const;
 	void ParseClearCaseCmdLine(LPCTSTR, LPCTSTR basedesc);
+	void ParseWinMergeCmdLineInternal(LPCTSTR);
 	void ParseWinMergeCmdLine(LPCTSTR);
 	void AddPath(const String &path);
 

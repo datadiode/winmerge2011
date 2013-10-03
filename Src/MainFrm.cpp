@@ -326,13 +326,11 @@ HRESULT CMainFrame::ShowHTMLDialog(BSTR url, VARIANT *arguments, BSTR features, 
 	HRESULT hr = URLMON->CreateURLMoniker(NULL, env_ResolveMoniker(moniker), &spMoniker);
 	if (FAILED(hr))
 		return hr;
-	DWORD flags = HTMLDLG_MODAL | HTMLDLG_VERIFY | HTMLDLG_PRINT_TEMPLATE;
-	if (EatPrefix(url, L"modal:"))
-		flags = HTMLDLG_MODAL | HTMLDLG_VERIFY;
-	else if (EatPrefix(url, L"modeless:"))
+	DWORD flags = HTMLDLG_MODAL | HTMLDLG_VERIFY;
+	if (EatPrefix(url, L"modeless:"))
 		flags = HTMLDLG_MODELESS | HTMLDLG_VERIFY;
-	else if (!EatPrefix(url, L"print_template:"))
-		return E_INVALIDARG;
+	else if (EatPrefix(url, L"print_template:"))
+		flags = HTMLDLG_MODAL | HTMLDLG_VERIFY | HTMLDLG_PRINT_TEMPLATE;
 	return MSHTML->ShowHTMLDialogEx(m_hWnd, spMoniker, flags, arguments, features, ret);
 }
 
@@ -345,6 +343,7 @@ HRESULT CMainFrame::ShowHTMLDialog(BSTR url, VARIANT *arguments, BSTR features, 
  */
 HRESULT CMainFrame::ParseCmdLine(BSTR cmdline, BSTR directory)
 {
+	m_bRemotelyInvoked = true;
 	CurrentDirectory strRestoreDir;
 	// Set current directory if specified
 	if (SysStringLen(directory) != 0)
@@ -2736,6 +2735,18 @@ bool CMainFrame::SelectFilter()
 	return true;
 }
 
+bool CMainFrame::CloseDocFrame(CDocFrame *pDocFrame)
+{
+	// Close DocFrame, then move MainFrame out of the way.
+	pDocFrame->SendMessage(WM_CLOSE);
+	CDocFrame *const pActiveDocFrame = GetActiveDocFrame();
+	if (pActiveDocFrame == pDocFrame)
+		return false;
+	PostMessage(WM_SYSCOMMAND,
+		pActiveDocFrame || m_bRemotelyInvoked ? SC_PREVWINDOW : SC_CLOSE);
+	return true;
+}
+
 /**
  * @brief Closes application with ESC.
  *
@@ -2761,15 +2772,8 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 			case VK_ESCAPE:
 				if (m_invocationMode != MergeCmdLineInfo::InvocationModeNone)
 				{
-					// Close DocFrame, then move MainFrame out of the way.
-					if (pDocFrame)
-						pDocFrame->SendMessage(WM_CLOSE);
-					CDocFrame *const pActiveDocFrame = GetActiveDocFrame();
-					if (pActiveDocFrame != pDocFrame)
+					if (pDocFrame && CloseDocFrame(pDocFrame))
 					{
-						PostMessage(WM_SYSCOMMAND,
-							pActiveDocFrame || COptionsMgr::Get(OPT_SINGLE_INSTANCE) ?
-							SC_PREVWINDOW : SC_CLOSE);
 						m_invocationMode = MergeCmdLineInfo::InvocationModeNone;
 					}
 					return TRUE;
@@ -2986,8 +2990,24 @@ bool CMainFrame::ParseArgsAndDoOpen(const MergeCmdLineInfo &cmdInfo)
 
 	if (cmdInfo.m_Files.size() == 0) // if there are no input args, we can check the display file dialog flag
 	{
-		if (COptionsMgr::Get(OPT_SHOW_SELECT_FILES_AT_STARTUP))
+		if (!cmdInfo.m_sRunScript.empty())
+		{
+			// Running a .WinMerge script with no files should explain its usage.
+			CMyVariant ret;
+			ShowHTMLDialog(
+				const_cast<BSTR>(cmdInfo.m_sRunScript.c_str()),
+				&CMyVariant(this), NULL, &ret);
+			if (SUCCEEDED(ret.ChangeType(VT_BOOL)) && V_BOOL(&ret) == VARIANT_FALSE)
+			{
+				CDocFrame *const pActiveDocFrame = GetActiveDocFrame();
+				PostMessage(WM_SYSCOMMAND,
+					pActiveDocFrame || m_bRemotelyInvoked ? SC_PREVWINDOW : SC_CLOSE);
+			}
+		}
+		else if (COptionsMgr::Get(OPT_SHOW_SELECT_FILES_AT_STARTUP))
+		{
 			DoFileOpen(filelocLeft, filelocRight);
+		}
 	}
 	else
 	{
@@ -3022,23 +3042,6 @@ bool CMainFrame::ParseArgsAndDoOpen(const MergeCmdLineInfo &cmdInfo)
 					filelocLeft, filelocRight,
 					cmdInfo.m_dwLeftFlags, cmdInfo.m_dwRightFlags,
 					cmdInfo.m_nRecursive);
-
-				if (bCompared && !cmdInfo.m_sRunScript.empty())
-				{
-					CDocFrame *pAbstract = static_cast<CDocFrame *>(GetActiveDocFrame());
-					if (pAbstract->GetFrameType() == FRAME_FILE)
-					{
-						CMyVariant arguments = static_cast<CChildFrame *>(pAbstract);
-						CMyVariant ret;
-						ShowHTMLDialog(
-							const_cast<BSTR>(cmdInfo.m_sRunScript.c_str()),
-							&arguments,
-							NULL,
-							&ret);
-						if (SUCCEEDED(ret.ChangeType(VT_BOOL)) && V_BOOL(&ret) == VARIANT_FALSE)
-							PostMessage(WM_KEYDOWN, VK_ESCAPE);
-					}
-				}
 			}
 		}
 		else if (ProjectFile::IsProjectFile(filelocLeft.filepath.c_str()))
@@ -3055,6 +3058,22 @@ bool CMainFrame::ParseArgsAndDoOpen(const MergeCmdLineInfo &cmdInfo)
 				filelocLeft, filelocRight,
 				cmdInfo.m_dwLeftFlags, cmdInfo.m_dwRightFlags,
 				cmdInfo.m_nRecursive);
+		}
+		if (bCompared && !cmdInfo.m_sRunScript.empty())
+		{
+			CDocFrame *pDocFrame = static_cast<CDocFrame *>(GetActiveDocFrame());
+			if (pDocFrame->GetFrameType() == FRAME_FILE)
+			{
+				CMyVariant ret;
+				ShowHTMLDialog(
+					const_cast<BSTR>(cmdInfo.m_sRunScript.c_str()),
+					&CMyVariant(static_cast<CChildFrame *>(pDocFrame)),
+					NULL, &ret);
+				if (SUCCEEDED(ret.ChangeType(VT_BOOL)) && V_BOOL(&ret) == VARIANT_FALSE)
+				{
+					CloseDocFrame(pDocFrame);
+				}
+			}
 		}
 	}
 	return bCompared && !cmdInfo.m_bNonInteractive;

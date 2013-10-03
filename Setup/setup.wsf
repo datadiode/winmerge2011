@@ -415,7 +415,7 @@ Sub Apply
 			sh.RegWrite "HKCR\WinMerge.Project.File\", "WinMerge Project File"
 			sh.RegWrite "HKCR\WinMerge.Project.File\DefaultIcon\", """" & sProgFolder & "\WinMergeU.exe"",1"
 			sh.RegWrite "HKCR\WinMerge.Project.File\shell\edit\command\", """NOTEPAD.EXE"" ""%1"""
-			sh.RegWrite "HKCR\WinMerge.Project.File\shell\open\command\", """" & sProgFolder & "\WinMergeU.exe"" ""%1"""
+			sh.RegWrite "HKCR\WinMerge.Project.File\shell\open\command\", """" & sProgFolder & "\WinMergeU.exe"" /run ""%1"" %*"
 			sh.RegWrite "HKLM\Software\Thingamahoochie\WinMerge\Executable", sProgFolder & "\WinMergeU.exe"
 			' Do the ARP stuff
 			sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\DisplayIcon", sProgFolder & "\WinMergeU.exe"

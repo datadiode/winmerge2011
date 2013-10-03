@@ -160,7 +160,6 @@ protected:
 public:
 	String m_strSaveAsPath; /**< "3rd path" where output saved if given */
 	VSSHelper m_vssHelper; /**< Helper class for VSS integration */
-	bool m_bFlashing; /**< Window is flashing. */
 	MergeCmdLineInfo::InvocationMode m_invocationMode;
 	MergeCmdLineInfo::ExitNoDiff m_bExitIfNoDiff; /**< Exit if files are identical? */
 
@@ -258,6 +257,7 @@ private:
 	void RedisplayAllDirDocs();
 	void SaveWindowPlacement();
 	bool PrepareForClosing();
+	bool CloseDocFrame(CDocFrame *);
 	CChildFrame *GetMergeDocToShow(CDirFrame *);
 	CHexMergeFrame *GetHexMergeDocToShow(CDirFrame *);
 	CDirFrame *GetDirDocToShow();
@@ -277,6 +277,9 @@ private:
 	stl::vector<String> m_FilesMRU;
 
 	String m_lastCollectFolder;
+
+	bool m_bRemotelyInvoked; /**< Window was invoked through COM */
+	bool m_bFlashing; /**< Window is flashing. */
 
 	HMenu *m_pScriptMenu;
 	String m_TitleScripts;

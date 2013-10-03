@@ -33,8 +33,7 @@
 #include "Common/SettingStore.h"
 #include "MergeCmdLineInfo.h"
 #include "OptionsDef.h"
-
-// MergeCmdLineInfo
+#include "ProjectFile.h"
 
 /**
  * @brief Eat and digest a command line parameter.
@@ -66,7 +65,7 @@ LPCTSTR MergeCmdLineInfo::EatParam(LPCTSTR p, String &param, bool *flag) const
 		{
 			*flag = true;
 			++p;
-			if (LPCTSTR colon = StrRChr(p, q, _T(':')))
+			while (LPCTSTR colon = StrRChr(p, q, _T(':')))
 				q = colon;
 		}
 		else
@@ -243,14 +242,22 @@ void MergeCmdLineInfo::AddPath(const String &path)
 	m_Files.push_back(param);
 }
 
+static void CanonicalizeUrl(LPCTSTR s, String &d)
+{
+	DWORD len = 1;
+	CoInternetParseUrl(s, PARSE_ESCAPE, URL_ESCAPE_SEGMENT_ONLY, &d.front(), len, &len, 0);
+	d.resize(len - 1);
+	CoInternetParseUrl(s, PARSE_ESCAPE, URL_ESCAPE_SEGMENT_ONLY, &d.front(), len, &len, 0);
+	string_replace(d, _T(":"), _T("%3A"));
+}
+
 /**
  * @brief Parse native WinMerge command line.
- * @param [in] p Points into the command line.
+ * @param [in] q Points into the command line.
  */
-void MergeCmdLineInfo::ParseWinMergeCmdLine(LPCTSTR q)
+void MergeCmdLineInfo::ParseWinMergeCmdLineInternal(LPCTSTR q)
 {
 	String param;
-	String reghive;
 	bool flag;
 
 	while ((q = EatParam(q, param, &flag)) != 0)
@@ -294,6 +301,24 @@ void MergeCmdLineInfo::ParseWinMergeCmdLine(LPCTSTR q)
 		{
 			// -run is followed by .wsf name
 			q = EatParam(q, m_sRunScript);
+			ProjectFile project;
+			if (project.Read(m_sRunScript.c_str()))
+			{
+				m_sRunScript.clear();
+				AddPath(project.m_sLeftFile);
+				AddPath(project.m_sRightFile);
+				m_sFileFilter = project.m_sFilter;
+				m_sContentType = project.m_sCompareAs;
+				m_nRecursive = project.m_nRecursive;
+				if (project.m_bLeftPathReadOnly)
+					m_dwLeftFlags |= FFILEOPEN_READONLY;
+				if (project.m_bRightPathReadOnly)
+					m_dwRightFlags |= FFILEOPEN_READONLY;
+			}
+			else
+			{
+				ParseWinMergeCmdLineInternal(project.m_sOptions.c_str());
+			}
 		}
 		else if (param == _T("r"))
 		{
@@ -328,7 +353,7 @@ void MergeCmdLineInfo::ParseWinMergeCmdLine(LPCTSTR q)
 		}
 		else if (param == _T("reghive"))
 		{
-			q = EatParam(q, reghive);
+			q = EatParam(q, m_sRegHive);
 		}
 		else if (param == _T("minimize"))
 		{
@@ -403,8 +428,29 @@ void MergeCmdLineInfo::ParseWinMergeCmdLine(LPCTSTR q)
 		{
 			q = SetOption(q, OPT_CMP_IGNORE_EOL);
 		}
+		else if (!m_sRunScript.empty() && *q == _T(':'))
+		{
+			String s, d;
+			q = EatParam(q + 1, s);
+			CanonicalizeUrl(s.c_str(), d);
+			m_sRunScript += string_format(_T("%s%s=%%22%s%%22"),
+				m_sRunScript.find(_T('?')) == String::npos ? _T("?") : _T("%3A"),
+				param.c_str(), d.c_str());
+		}
 	}
-	if (reghive.empty())
+}
+
+void MergeCmdLineInfo::ParseWinMergeCmdLine(LPCTSTR q)
+{
+	ParseWinMergeCmdLineInternal(q);
+
+	// Ignore a /minimize if no files were specified on the command line.
+	if (m_Files.empty() && m_nCmdShow == SW_SHOWMINNOACTIVE)
+	{
+		m_nCmdShow = SW_SHOWNORMAL;
+	}
+
+	if (m_sRegHive.empty())
 	{
 		TCHAR path[MAX_PATH];
 		GetModuleFileName(NULL, path, _countof(path));
@@ -412,13 +458,13 @@ void MergeCmdLineInfo::ParseWinMergeCmdLine(LPCTSTR q)
 		// Automount WinMergeU.dat only if file exists and is not read-only
 		if ((GetFileAttributes(path) & FILE_ATTRIBUTE_READONLY) == 0)
 		{
-			reghive = path;
+			m_sRegHive = path;
 			PathStripToRoot(path);
 			SetEnvironmentVariable(_T("PortableRoot"), path);
 		}
 	}
-	if (!reghive.empty() &&
-		SettingStore.MountExternalHive(reghive.c_str(),
+	if (!m_sRegHive.empty() &&
+		SettingStore.MountExternalHive(m_sRegHive.c_str(),
 		_T("{08CEC68E-416D-4fae-962D-16A8E838C6F5}")))
 	{
 		CRegKeyEx loadkey = SettingStore.GetAppRegistryKey();
