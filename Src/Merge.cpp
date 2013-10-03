@@ -332,7 +332,7 @@ int CMergeApp::DoMessageBox(LPCTSTR lpszPrompt, UINT nType, UINT nIDPrompt)
 	if (m_bNonInteractive)
 		return IDCANCEL;
 
-	HWND owner = m_pMainWnd->GetLastActivePopup()->m_hWnd;
+	HWND owner = m_pMainWnd ? m_pMainWnd->GetLastActivePopup()->m_hWnd : NULL;
 
 	// Use our own message box implementation, which adds the
 	// do not show again checkbox, and implements it on subsequent calls

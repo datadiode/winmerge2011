@@ -754,7 +754,10 @@ void CMessageBoxDialog::DefineLayout()
 	// Calculate the window rect.
 	::AdjustWindowRect(&rcClient, GetStyle(), FALSE);
 	RECT rcParent;
-	GetParent()->GetWindowRect(&rcParent);
+	if (HWindow *pParent = GetParent())
+		pParent->GetWindowRect(&rcParent);
+	else
+		H2O::GetDesktopWorkArea(NULL, &rcParent);
 	// Move the window.
 	MoveWindow(
 		(rcParent.left + rcParent.right) / 2 - (rcClient.right - rcClient.left) / 2,
