@@ -560,13 +560,17 @@ CMarkdown::HSTR CMarkdown::GetTagName()
 	unsigned char c;
 	if (q < ahead && (p = ++q) < ahead)
 	{
-		if (*q == '!' && (*++q == '-' || *q == '['))
+		if (*q == '!' && ++q < ahead && (*q == '-' || *q == '['))
 		{
 			++q;
 		}
 		else
 		{
-			while (q < ahead && !isspace(c = *q) && c != '[' && c != '>' && c != '"' && c != '\'' && c != '=' && c != '/')
+			if (q == p && *q == '?')
+			{
+				++q;
+			}
+			while (q < ahead && !isspace(c = *q) && c != '[' && c != '>' && c != '"' && c != '\'' && c != '=' && c != '/' && c != '?')
 			{
 				++q;
 			}
