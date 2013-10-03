@@ -19,9 +19,6 @@
  *
  * @brief Implementation file for ProjectFile class.
  */
-// ID line follows -- this is updated by CVS
-// $Id$
-
 #include "stdafx.h"
 #include "markdown.h"
 #include "UniFile.h"
@@ -93,7 +90,7 @@ bool ProjectFile::Read(LPCTSTR path)
 		}
 		else
 		{
-			String sError = LanguageSelect.LoadString(IDS_UNK_ERROR_SAVING_PROJECT);
+			String sError = LanguageSelect.LoadString(IDS_UNK_ERROR_READING_PROJECT);
 			LanguageSelect.FormatMessage(
 				IDS_ERROR_FILEOPEN, path, sError.c_str()
 			).MsgBox(MB_ICONSTOP);
@@ -101,7 +98,7 @@ bool ProjectFile::Read(LPCTSTR path)
 	}
 	else
 	{
-		String sError = LanguageSelect.LoadString(IDS_UNK_ERROR_SAVING_PROJECT);
+		String sError = LanguageSelect.LoadString(IDS_UNK_ERROR_READING_PROJECT);
 		LanguageSelect.FormatMessage(
 			IDS_ERROR_FILEOPEN, path, sError.c_str()
 		).MsgBox(MB_ICONSTOP);
