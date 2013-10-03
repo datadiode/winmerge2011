@@ -3236,7 +3236,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\Setup\GenerateHTMLReport.wsf"
+				RelativePath="..\Setup\GenerateHTMLReport.WinMerge"
 				>
 			</File>
 			<File

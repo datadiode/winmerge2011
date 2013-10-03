@@ -1,0 +1,31 @@
+<?WinMergeScript options='/minimize'?>
+<head>
+<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/>
+<title>GenerateHTMLReport.WinMerge</title>
+</head>
+
+<script id='script' language='vbs'>
+Option Explicit
+
+If TypeName(dialogArguments) = "IMergeDoc" Then
+	Dim out, context
+	Execute Mid(location.search, 2)
+	If Not IsEmpty(context) Then
+		dialogArguments.LimitContext context
+	End If
+	dialogArguments.WriteReport out
+	close
+End If
+
+</script>
+<body>
+<pre>
+Usage:
+
+GenerateHTMLReport.WinMerge [options]
+	"&lt;path to left file&gt;"
+	"&lt;path to right file&gt;"
+	/out:"&lt;path to report file&gt;"
+	[/context:&lt;number of context lines&gt;]
+</pre>
+</body>
