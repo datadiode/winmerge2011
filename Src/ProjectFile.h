@@ -41,6 +41,7 @@ public:
 	static BOOL IsProjectFile(LPCTSTR);
 
 public:
+	String m_sOptions; /**< Obtained from <?WinMergeScript options='...' ?> */
 	String m_sLeftFile; /**< Left path */
 	String m_sRightFile; /**< Right path */
 	String m_sFilter; /**< Filter name or mask */

@@ -58,6 +58,22 @@ bool ProjectFile::Read(LPCTSTR path)
 	CMarkdown::File file = path;
 	CMarkdown::EntityMap em;
 	CMarkdown::Load(em);
+
+	if (HString *hstr = file.Move().GetTagName())
+	{
+		OString ostr = hstr;
+		if (strcmp(ostr.A, "?WinMergeScript") == 0)
+		{
+			if (HString *hstr = file.GetAttribute("options"))
+			{
+				OString ostr = hstr;
+				bool lossy;
+				ucr::maketstring(m_sOptions, ostr.A, ostr.ByteLen(), CP_UTF8, &lossy);
+			}
+			return false;
+		}
+	}
+
 	if (CMarkdown &project = CMarkdown(file).Move(Root_element_name).Pop())
 	{
 		if (CMarkdown &paths = CMarkdown(project).Move(Paths_element_name).Pop())
