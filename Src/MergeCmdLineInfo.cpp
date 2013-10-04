@@ -114,7 +114,7 @@ MergeCmdLineInfo::MergeCmdLineInfo(LPCTSTR q):
 	m_bExitIfNoDiff(Disabled),
 	m_nRecursive(0),
 	m_bNonInteractive(false),
-	m_bSingleInstance(false),
+	m_nSingleInstance(-1),
 	m_bShowUsage(false),
 	m_nCodepage(0),
 	m_dwLeftFlags(FFILEOPEN_DETECT),
@@ -209,6 +209,7 @@ void MergeCmdLineInfo::ParseClearCaseCmdLine(LPCTSTR q, LPCTSTR basedesc)
 	if (!sOutFile.empty())
 	{
 		m_invocationMode = InvocationModeMergeTool;
+		m_nSingleInstance = 0;
 		String path = paths_GetLongPath(sOutFile.c_str());
 		m_Files.push_back(path);
 	}
@@ -242,13 +243,21 @@ void MergeCmdLineInfo::AddPath(const String &path)
 	m_Files.push_back(param);
 }
 
-static void CanonicalizeUrl(LPCTSTR s, String &d)
+static const TCHAR WordListYesNo[]
+(
+	_T("0;no;false\0")
+	_T("1;yes;true\0")
+);
+
+static LPCTSTR FindInWordList(LPCTSTR p, LPCTSTR q)
 {
-	DWORD len = 1;
-	CoInternetParseUrl(s, PARSE_ESCAPE, URL_ESCAPE_SEGMENT_ONLY, &d.front(), len, &len, 0);
-	d.resize(len - 1);
-	CoInternetParseUrl(s, PARSE_ESCAPE, URL_ESCAPE_SEGMENT_ONLY, &d.front(), len, &len, 0);
-	string_replace(d, _T(":"), _T("%3A"));
+	while (int n = lstrlen(q))
+	{
+		if (PathMatchSpec(p, q))
+			return q;
+		q += n + 1;
+	}
+	return NULL;
 }
 
 /**
@@ -333,7 +342,18 @@ void MergeCmdLineInfo::ParseWinMergeCmdLineInternal(LPCTSTR q)
 		else if (param == _T("s"))
 		{
 			// -s to allow only one instance
-			m_bSingleInstance = true;
+			if (*q == ':')
+			{
+				q = EatParam(q, param);
+				if (LPCTSTR match = FindInWordList(param.c_str() + 1, WordListYesNo))
+				{
+					m_nSingleInstance = StrToInt(match);
+				}
+			}
+			else
+			{
+				m_nSingleInstance = 1;
+			}
 		}
 		else if (param == _T("option"))
 		{
@@ -430,12 +450,10 @@ void MergeCmdLineInfo::ParseWinMergeCmdLineInternal(LPCTSTR q)
 		}
 		else if (!m_sRunScript.empty() && *q == _T(':'))
 		{
-			String s, d;
+			String s;
 			q = EatParam(q + 1, s);
-			CanonicalizeUrl(s.c_str(), d);
-			m_sRunScript += string_format(_T("%s%s=%%22%s%%22"),
-				m_sRunScript.find(_T('?')) == String::npos ? _T("?") : _T("%3A"),
-				param.c_str(), d.c_str());
+			string_replace(s, _T(':'), _T('?'));
+			m_sRunScript += string_format(_T("?%s=\"%s\""), param.c_str(), s.c_str());
 		}
 	}
 }

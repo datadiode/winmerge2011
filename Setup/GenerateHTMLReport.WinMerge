@@ -1,4 +1,4 @@
-<?WinMergeScript options='/minimize'?>
+<?WinMergeScript options='/minimize /u /s:no'?>
 <head>
 <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/>
 <title>GenerateHTMLReport.WinMerge</title>
@@ -9,7 +9,7 @@ Option Explicit
 
 If TypeName(dialogArguments) = "IMergeDoc" Then
 	Dim out, context
-	Execute Mid(location.search, 2)
+	Execute Replace(location.search, "?", ":", 2)
 	If Not IsEmpty(context) Then
 		dialogArguments.LimitContext context
 	End If

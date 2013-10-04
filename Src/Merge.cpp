@@ -227,9 +227,8 @@ HRESULT CMergeApp::InitInstance()
 		// If cmdInfo.m_invocationMode equals InvocationModeMergeTool, then
 		// ClearCase waits for the process to produce an output file and
 		// terminate, in which case single instance logic is not applicable.
-		if (dwMutex == ERROR_ALREADY_EXISTS &&
-			cmdInfo.m_invocationMode != MergeCmdLineInfo::InvocationModeMergeTool &&
-			(cmdInfo.m_bSingleInstance || COptionsMgr::Get(OPT_SINGLE_INSTANCE)))
+		if (dwMutex == ERROR_ALREADY_EXISTS && cmdInfo.m_nSingleInstance != 0 &&
+			(cmdInfo.m_nSingleInstance == 1 || COptionsMgr::Get(OPT_SINGLE_INSTANCE)))
 		{
 			// Send commandline to previous instance
 			CMyComPtr<IUnknown> spUnknown;
