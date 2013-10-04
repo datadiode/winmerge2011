@@ -288,7 +288,7 @@ LRESULT COpenDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 					SetDlgItemText(id + (2 ^ xor), text.c_str());
 				} while (id < IDC_SQL_QUERY_PARAM_6_NAME);
 			}
-			if (IsDlgButtonChecked(wParam) == BST_INDETERMINATE)
+			if (IsDlgButtonChecked(LOWORD(wParam)) == BST_INDETERMINATE)
 			{
 				ExtractParameterValues();
 				int side = static_cast<int>(wParam - IDC_SQL_QUERY_PARAMS_LEFT);
