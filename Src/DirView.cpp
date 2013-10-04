@@ -2089,7 +2089,7 @@ bool CDirView::IsShellMenuCmdID(UINT id)
 
 void CDirView::HandleMenuSelect(WPARAM wParam, LPARAM lParam)
 {
-	if (HIWORD(wParam) & MF_POPUP)
+	if ((HIWORD(wParam) & MF_POPUP) && (lParam != 0))
 	{
 		HMENU hMenu = reinterpret_cast<HMENU>(lParam);
 		MENUITEMINFO mii;
