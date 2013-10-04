@@ -43,7 +43,7 @@ interface IMergeApp : IDispatch
 	[id(2), propget]
 	HRESULT Strings([out, retval] IDispatch **ppDispatch);
 	[id(3), helpstring("Invokes an HTML dialog")]
-	HRESULT ShowHTMLDialog([in] BSTR url, [in] VARIANT *arguments, [in] BSTR features, [out, retval] VARIANT *ret);
+	HRESULT ShowHTMLDialog([in] LPCOLESTR url, [in] VARIANT *arguments, [in] BSTR features, [out, retval] VARIANT *ret);
 	[id(4), helpstring("ParseCmdLine")]
 	HRESULT ParseCmdLine([in] BSTR cmdline, [in] BSTR directory);
 };
