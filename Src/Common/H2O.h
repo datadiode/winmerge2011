@@ -3020,6 +3020,8 @@ namespace H2O
 			LVITEM lvi;
 			lvi.iItem = iItem;
 			lvi.iSubItem = 0;
+			lvi.state = 0;		// Wine doesn't respect absence of LVIF_STATE
+			lvi.stateMask = 0;	//
 			lvi.pszText = const_cast<LPTSTR>(pszText);
 			lvi.mask = LVIF_TEXT;
 			return ListView_InsertItem(m_hWnd, &lvi);
@@ -3033,6 +3035,8 @@ namespace H2O
 			LVITEM lvi;
 			lvi.iItem = iItem;
 			lvi.iSubItem = 0;
+			lvi.state = 0;		// Wine doesn't respect absence of LVIF_STATE
+			lvi.stateMask = 0;	//
 			lvi.pszText = const_cast<LPTSTR>(pszText);
 			lvi.iImage = iImage;
 			lvi.mask = LVIF_TEXT | LVIF_IMAGE;
