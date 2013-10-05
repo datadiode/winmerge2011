@@ -31,3 +31,11 @@ f: \.bak$ 	## EXCLUDE Backup file made with WinMerge
 ## f: \.bpl$ ## Delphi Package Library
 
 ## d: \\subdir$ ## Filter for directory
+
+## Optional SQL filter
+WHERE
+	Attributes LIKE 'D%' -- Include all directories
+OR	(LastWriteTime >= TO_TIMESTAMP(%Minimum Time%) OR %Minimum Time% IS NULL)
+AND (LastWriteTime <= TO_TIMESTAMP(%Maximum Time%) OR %Maximum Time% IS NULL)
+AND (Size >= TO_INT(%Minimum Size%) OR %Minimum Size% IS NULL)
+AND (Size <= TO_INT(%Maximum Size%) OR %Maximum Size% IS NULL)
