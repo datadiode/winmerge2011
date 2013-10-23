@@ -9,6 +9,8 @@ namespace stl = eastl;
 // EASTL as currently used with WinMerge 2011 lacks an auto_ptr template.
 // Resort to the implementation published in 1999 by Nicolai M. Josuttis.
 #include "auto_ptr.h"
+// Another lacking of EASTL is the rotate() algorithm.
+#include "rotate.h"
 #else
 namespace std { }
 namespace stl = std;
