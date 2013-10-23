@@ -347,10 +347,7 @@ int CMergeApp::DoMessageBox(LPCTSTR lpszPrompt, UINT nType, UINT nIDPrompt)
 }
 
 /**
- * @brief Load any known file filters.
- *
- * This function loads filter files from paths we know contain them.
- * @note User's filter location may not be set yet.
+ * @brief Read various settings from Supplement.ini
  */
 void CMergeApp::InitializeSupplements()
 {
@@ -365,30 +362,60 @@ void CMergeApp::InitializeSupplements()
 	SetEnvironmentVariable(_T("SupplementFolder"), supplementFolder.c_str());
 	String ini = paths_ConcatPath(supplementFolder, _T("Supplement.ini"));
 	TCHAR buffer[0x8000];
+	// Synthesize ProgramFiles(x86) environment variable if running in 32-bit OS
 	if (!GetEnvironmentVariable(_T("ProgramFiles(x86)"), buffer, _countof(buffer)))
 	{
 		GetEnvironmentVariable(_T("ProgramFiles"), buffer, _countof(buffer));
 		SetEnvironmentVariable(_T("ProgramFiles(x86)"), buffer);
 	}
-	if (!GetPrivateProfileSection(_T("Environment"), buffer, _countof(buffer), ini.c_str()))
-	{
-		static const TCHAR Environment[] =
-			_T("LogParser=%ProgramFiles(x86)%\\Log Parser 2.2\0")
-			_T("xdoc2txt=C:\\xdoc2txt\0")
-			_T("MediaInfo_CLI=C:\\MediaInfo_CLI\0");
-		if (WritePrivateProfileSection(_T("Environment"), Environment, ini.c_str()))
-		{
-			memcpy(buffer, Environment, sizeof Environment);
-		}
-	}
+	// Default values for process-level environment variables
+	static const TCHAR defenv[] =
+		_T("LogParser=%ProgramFiles(x86)%\\Log Parser 2.2\0")
+		_T("xdoc2txt=C:\\xdoc2txt\0")
+		_T("MediaInfo_CLI=C:\\MediaInfo_CLI\0");
+	// First, remove any possibly conflicting variables from process environment
+	memcpy(buffer, defenv, sizeof defenv);
 	TCHAR *p = buffer;
 	while (TCHAR *q = _tcschr(p, _T('=')))
 	{
 		const size_t r = _tcslen(q);
 		*q++ = _T('\0');
-		SetEnvironmentVariable(p, env_ExpandVariables(q).c_str());
+		SetEnvironmentVariable(p, NULL);
 		p = q + r;
 	}
+	// Second, assign environment variables provided through Supplement.ini
+	// If no such exist, assign default values and write them to Supplement.ini
+	if (GetPrivateProfileSection(_T("Environment"),
+			buffer, _countof(buffer), ini.c_str()) ||
+		WritePrivateProfileSection(_T("Environment"),
+			static_cast<LPCTSTR>(memcpy(buffer, defenv, sizeof defenv)),
+			ini.c_str()))
+	{
+		p = buffer;
+		while (TCHAR *q = _tcschr(p, _T('=')))
+		{
+			const size_t r = _tcslen(q);
+			*q++ = _T('\0');
+			SetEnvironmentVariable(p, env_ExpandVariables(q).c_str());
+			p = q + r;
+		}
+		// Assign, and write to Supplement.ini, any variables which are missing
+		// from Supplement.ini, e.g. due to manual editing or a program update
+		memcpy(buffer, defenv, sizeof defenv);
+		p = buffer;
+		while (TCHAR *q = _tcschr(p, _T('=')))
+		{
+			const size_t r = _tcslen(q);
+			*q++ = _T('\0');
+			if (!GetEnvironmentVariable(p, NULL, 0))
+			{
+				SetEnvironmentVariable(p, env_ExpandVariables(q).c_str());
+				WritePrivateProfileString(_T("Environment"), p, q, ini.c_str());
+			}
+			p = q + r;
+		}
+	}
+	// Preload any DLLs listed in Supplement.ini's [Preload] section
 	if (GetPrivateProfileSection(_T("Preload"), buffer, _countof(buffer), ini.c_str()))
 	{
 		LPTSTR pch = buffer;
