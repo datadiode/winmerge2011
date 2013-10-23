@@ -140,7 +140,7 @@ LRESULT OWindow::MessageReflect_TopLevelWindow<WM_ACTIVATE>(WPARAM wParam, LPARA
 {
 	if (HWindow *pwndOther = reinterpret_cast<HWindow *>(lParam))
 	{
-		if (LOWORD(wParam) == WA_INACTIVE && pwndOther->GetParent()->m_hWnd == m_hWnd)
+		if (LOWORD(wParam) == WA_INACTIVE && pwndOther->GetParent()->m_hWnd == m_hWnd && !pwndOther->IsWindowVisible())
 		{
 			CenterWindow(pwndOther);
 			HICON icon = pwndOther->GetIcon(ICON_BIG);
