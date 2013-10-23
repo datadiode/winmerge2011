@@ -14,6 +14,7 @@
  * @brief Constructor, initializes critical section.
  */
 CompareStats::CompareStats()
+	: m_hEvent(CreateEvent(NULL, TRUE, FALSE, NULL))
 {
 	Reset();
 }
@@ -23,6 +24,7 @@ CompareStats::CompareStats()
  */
 CompareStats::~CompareStats()
 {
+	CloseHandle(m_hEvent);
 }
 
 /** 
@@ -68,6 +70,7 @@ void CompareStats::Reset()
 	m_nComparedItems = 0;
 	ZeroMemory(m_counts, sizeof m_counts);
 	m_pCurDiffItem = NULL;
+	Continue();
 }
 
 /**

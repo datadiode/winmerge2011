@@ -48,6 +48,8 @@ protected:
 private:
 	CDirFrame *const m_pDirDoc; /**< Pointer to dirdoc we are comparing */
 	CompareStatisticsDlg *const m_pStatsDlg;
+	String m_strPauseContinue;
+	int m_rotPauseContinue;
 };
 
 //{{AFX_INSERT_LOCATION}}

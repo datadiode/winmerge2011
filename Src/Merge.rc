@@ -749,36 +749,36 @@ FONT 8, "MS Shell Dlg", 0, 0, 1
     GROUPBOX        "Different", IDC_STATIC, 7, 15, 186, 37
     RTEXT           "Text:", IDC_STATIC, 11, 25, 56, 8, SS_RIGHT
     ICON            "", IDC_STAT_INOTEQUAL, 71, 23, 21, 20, SS_ICON
-    RTEXT           "Static", IDC_STAT_DIFFFILE, 86, 24, 38, 10, SS_RIGHT | SS_SUNKEN
+    RTEXT           "", IDC_STAT_DIFFFILE, 86, 24, 38, 10, SS_RIGHT | SS_SUNKEN
     RTEXT           "Binary:", IDC_STATIC, 11, 39, 56, 8, SS_RIGHT
     ICON            "", IDC_STAT_IDIFFBINFILE, 71, 36, 21, 20, SS_ICON
-    RTEXT           "Static", IDC_STAT_DIFFBINARY, 86, 37, 38, 10, SS_RIGHT | SS_SUNKEN
+    RTEXT           "", IDC_STAT_DIFFBINARY, 86, 37, 38, 10, SS_RIGHT | SS_SUNKEN
     GROUPBOX        "Unique", IDC_STATIC, 7, 55, 186, 37
     RTEXT           "Left:", IDC_STATIC, 11, 65, 56, 8, SS_RIGHT
     ICON            "", IDC_STAT_ILUNIQFOLDER, 132, 63, 21, 20, SS_ICON
-    RTEXT           "Static", IDC_STAT_LUNIQFOLDER, 146, 64, 38, 10, SS_RIGHT | SS_SUNKEN
+    RTEXT           "", IDC_STAT_LUNIQFOLDER, 146, 64, 38, 10, SS_RIGHT | SS_SUNKEN
     ICON            "", IDC_STAT_ILUNIQFILE, 71, 63, 21, 20, SS_ICON
-    RTEXT           "Static", IDC_STAT_LUNIQFILE, 86, 64, 38, 10, SS_RIGHT | SS_SUNKEN
+    RTEXT           "", IDC_STAT_LUNIQFILE, 86, 64, 38, 10, SS_RIGHT | SS_SUNKEN
     RTEXT           "Right:", IDC_STATIC, 11, 78, 56, 8, SS_RIGHT
     ICON            "", IDC_STAT_IRUNIQFOLDER, 132, 76, 21, 20, SS_ICON
-    RTEXT           "Static", IDC_STAT_RUNIQFOLDER, 146, 77, 38, 10, SS_RIGHT | SS_SUNKEN
+    RTEXT           "", IDC_STAT_RUNIQFOLDER, 146, 77, 38, 10, SS_RIGHT | SS_SUNKEN
     ICON            "", IDC_STAT_IRUNIQFILE, 71, 76, 21, 20, SS_ICON
-    RTEXT           "Static", IDC_STAT_RUNIQFILE, 86, 77, 38, 10, SS_RIGHT | SS_SUNKEN
+    RTEXT           "", IDC_STAT_RUNIQFILE, 86, 77, 38, 10, SS_RIGHT | SS_SUNKEN
     GROUPBOX        "Identical", IDC_STATIC, 7, 95, 186, 37
     ICON            "", IDC_STAT_IIDENTICFOLDER, 132, 103, 21, 20, SS_ICON
-    RTEXT           "Static", IDC_STAT_IDENTICFOLDER, 146, 104, 38, 10, SS_RIGHT | SS_SUNKEN
+    RTEXT           "", IDC_STAT_IDENTICFOLDER, 146, 104, 38, 10, SS_RIGHT | SS_SUNKEN
     RTEXT           "Text:", IDC_STATIC, 11, 105, 56, 8, SS_RIGHT
     ICON            "", IDC_STAT_IEQUALFILE, 71, 103, 21, 20, SS_ICON
-    RTEXT           "Static", IDC_STAT_IDENTICFILE, 86, 104, 38, 10, SS_RIGHT | SS_SUNKEN
+    RTEXT           "", IDC_STAT_IDENTICFILE, 86, 104, 38, 10, SS_RIGHT | SS_SUNKEN
     RTEXT           "Binary:", IDC_STATIC, 11, 118, 56, 8, SS_RIGHT
     ICON            "", IDC_STAT_IEQUALBINFILE, 71, 116, 21, 20, SS_ICON
-    RTEXT           "Static", IDC_STAT_IDENTICBINARY, 86, 117, 38, 10, SS_RIGHT | SS_SUNKEN
+    RTEXT           "", IDC_STAT_IDENTICBINARY, 86, 117, 38, 10, SS_RIGHT | SS_SUNKEN
     CONTROL         "", IDC_STATIC, WC_STATIC, SS_ETCHEDHORZ, 7, 136, 183, 1
     RTEXT           "Total:", IDC_STATIC, 11, 142, 56, 8, SS_RIGHT
     ICON            "", IDC_STAT_ITOTALFOLDERS, 132, 140, 21, 20, SS_ICON
-    RTEXT           "Static", IDC_STAT_TOTALFOLDER, 146, 141, 38, 10, SS_RIGHT | SS_SUNKEN
+    RTEXT           "", IDC_STAT_TOTALFOLDER, 146, 141, 38, 10, SS_RIGHT | SS_SUNKEN
     ICON            "", IDC_STAT_ITOTALFILES, 71, 140, 21, 20, SS_ICON
-    RTEXT           "Static", IDC_STAT_TOTALFILE, 86, 141, 38, 10, SS_RIGHT | SS_SUNKEN
+    RTEXT           "", IDC_STAT_TOTALFILE, 86, 141, 38, 10, SS_RIGHT | SS_SUNKEN
     DEFPUSHBUTTON   "Close", IDOK, 200, 140, 50, 14
 }
 
@@ -845,7 +845,8 @@ EXSTYLE WS_EX_TOOLWINDOW
 CAPTION " Folder Compare Progress"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
-    DEFPUSHBUTTON   "Stop", IDCANCEL, 166, 15, 83, 14
+    DEFPUSHBUTTON   "Stop", IDCANCEL, 166, 7, 83, 14
+    PUSHBUTTON      "Pause\tContinue\t", IDC_PAUSE_CONTINUE, 166, 23, 83, 14
     CONTROL         "", IDC_PROGRESSCOMPARE, PROGRESS_CLASS, WS_BORDER, 7, 68, 242, 9
     RTEXT           "0", IDC_ITEMSCOMPARED, 95, 29, 30, 8, SS_RIGHT
     RTEXT           "0", IDC_ITEMSTOTAL, 95, 19, 30, 8, SS_RIGHT
@@ -1636,8 +1637,6 @@ STRINGTABLE
     IDR_MERGEDOCTYPE              "\nFileCompare\n\n\n\nWinMerge.FileCompare\nWinMerge File Compare"
     IDR_DIRDOCTYPE                "\nFolderCompare\n\n\n\nWinMerge.FolderCompare\nWinMerge Folder Compare"
     IDC_MIXED_EOL                 "Preserve original EOL chars"
-    IDC_COMPARISON_STOP           "Stop"
-    IDC_COMPARISON_CLOSE          "Press any key"
     IDC_STATIC_TITLE_LEFT         "Right click on the path to copy"
     IDC_STATIC_TITLE_RIGHT        "Right click on the path to copy"
     IDS_SPLASH_DEVELOPERS         "Developers:\nDean Grimm, Christian List, Kimmo Varis, Jochen Tucht, Tim Gerundt, Takashi Sawanaki, Gal Hammer, Alexander Skinner"

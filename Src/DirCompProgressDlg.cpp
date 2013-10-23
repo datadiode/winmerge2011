@@ -3,9 +3,6 @@
  *
  * @brief Implementation file for Directory compare state dialog
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "Merge.h"
 #include "LanguageSelect.h"
@@ -36,6 +33,7 @@ DirCompProgressDlg::DirCompProgressDlg(CDirFrame *pDirDoc)
 : ODialog(IDD_DIRCOMP_PROGRESS)
 , m_pDirDoc(pDirDoc)
 , m_pStatsDlg(new CompareStatisticsDlg(pDirDoc->GetCompareStats()))
+, m_rotPauseContinue(0)
 {
 	LanguageSelect.Create(*this, theApp.m_pMainWnd->GetLastActivePopup()->m_hWnd);
 }
@@ -56,6 +54,24 @@ LRESULT DirCompProgressDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lPara
 		{
 		case IDCANCEL:
 			m_pDirDoc->AbortCurrentScan();
+			m_pDirDoc->GetCompareStats()->Continue();
+			break;
+		case IDC_PAUSE_CONTINUE:
+			switch (m_rotPauseContinue)
+			{
+			case 0:
+				m_pDirDoc->GetCompareStats()->Pause();
+				break;
+			case 1:
+				m_pDirDoc->GetCompareStats()->Continue();
+				break;
+			}
+			stl::rotate(m_strPauseContinue.begin(),
+				m_strPauseContinue.begin() + m_strPauseContinue.find('\t') + 1,
+				m_strPauseContinue.end());
+			SetDlgItemText(IDC_PAUSE_CONTINUE,
+				m_strPauseContinue.substr(0, m_strPauseContinue.find('\t')).c_str());
+			m_rotPauseContinue = (m_rotPauseContinue + 1) % 2;
 			break;
 		}
 		break;
@@ -64,6 +80,9 @@ LRESULT DirCompProgressDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lPara
 		break;
 	case WM_SETCURSOR:
 		return GetParent()->SendMessage(message, wParam, lParam);
+	case WM_CTLCOLORBTN:
+		reinterpret_cast<HSurface *>(wParam)->SetBkColor(RGB(255,0,0));
+		break;
 	}
 	return ODialog::WindowProc(message, wParam, lParam);
 }
@@ -100,6 +119,9 @@ BOOL DirCompProgressDlg::OnInitDialog()
 	SendDlgItemMessage(IDC_PROGRESSCOMPARE, PBM_SETPOS, 0);
 	SetDlgItemInt(IDC_ITEMSCOMPARED, 0);
 	SetDlgItemInt(IDC_ITEMSTOTAL, 0);
+
+	GetDlgItemText(IDC_PAUSE_CONTINUE, m_strPauseContinue);
+	SetDlgItemText(IDC_PAUSE_CONTINUE, m_strPauseContinue.substr(0, m_strPauseContinue.find('\t')).c_str());
 
 	SetTimer(IDT_UPDATE, UPDATE_INTERVAL);
 	return TRUE;

@@ -219,6 +219,7 @@ bool CDiffContext::ShouldAbort() const
 			::DispatchMessage(&msg);
 		}
 	}
+	m_pCompareStats->Wait();
 	return m_bAborting;
 }
 

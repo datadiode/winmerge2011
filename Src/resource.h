@@ -215,9 +215,11 @@
 #define IDC_EXT_EDITOR_PATH                     1092
 #define IDC_DIFF_SWAPFILES                      1093
 #define IDC_DIFF_OPENTOEDITOR                   1094
-#define IDC_COMPARISON_STOP                     1106
-#define IDC_COMPARISON_CLOSE                    1107
-#define IDC_DIFF_INCLCMDLINE                    1108
+#define IDC_DIFF_INCLCMDLINE                    1095
+#define IDC_PAUSE_CONTINUE                      1100
+#define IDC_PROGRESSCOMPARE                     1101
+#define IDC_ITEMSCOMPARED                       1102
+#define IDC_ITEMSTOTAL                          1103
 #define IDC_WMGOTO_FILELEFT                     1109
 #define IDC_WMGOTO_FILERIGHT                    1110
 #define IDC_WMGOTO_TOLINE                       1111
@@ -291,9 +293,6 @@
 #define IDC_SAVECLOSING_DISCARDALL              1188
 #define IDC_MULTIDOC_FILECMP                    1189
 #define IDC_MULTIDOC_DIRCMP                     1190
-#define IDC_PROGRESSCOMPARE                     1191
-#define IDC_ITEMSCOMPARED                       1192
-#define IDC_ITEMSTOTAL                          1193
 #define IDC_REPORT_STYLECOMBO                   1194
 #define IDC_REPORT_BROWSEFILE                   1195
 #define IDC_REPORT_FILE                         1196

@@ -134,7 +134,7 @@ public:
 	AllowUpwardDirectory::ReturnCode AllowUpwardDirectory(String &leftParent, String &rightParent);
 	void SetItemViewFlag(DIFFITEM *, UINT flag, UINT mask);
 	void SetItemViewFlag(UINT flag, UINT mask);
-	const CompareStats *GetCompareStats() const { return m_pCompareStats; };
+	CompareStats *GetCompareStats() const { return m_pCompareStats; };
 
 private:
 	bool InitContext(LPCTSTR pszLeft, LPCTSTR pszRight, int nRecursive, DWORD dwContext);

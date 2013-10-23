@@ -74,9 +74,26 @@ public:
 	String GetRightPath(CDiffContext *) const;
 	void Reset();
 	static RESULT GetColImage(const DIFFITEM *);
-
+	void Wait() const
+	{
+		// WaitForSingleObject() is expensive so avoid it if possible
+		if (paused)
+			WaitForSingleObject(m_hEvent, INFINITE);
+	}
+	void Pause()
+	{
+		paused = true;
+		ResetEvent(m_hEvent);
+	}
+	void Continue()
+	{
+		paused = false;
+		SetEvent(m_hEvent);
+	}
 private:
 
+	HANDLE m_hEvent;
+	bool paused;
 	long m_counts[N_DIFFIMG]; /**< Table storing result counts */
 	long m_nTotalItems; /**< Total items found to compare */
 	long m_nComparedItems; /**< Compared items so far */
