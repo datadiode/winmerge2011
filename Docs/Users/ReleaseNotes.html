@@ -37,13 +37,13 @@ function OnReadyStateChangeExternalDoc()
 </head>
 <body>
 
-<h2>WinMerge 0.2011.003.391 Release Notes</h2>
+<h2>WinMerge 0.2011.003.433 Release Notes</h2>
 This is a <b>beta</b> release of WinMerge&nbsp;2011.
 <br>Significant new features since the preceding stable release include:
 <ul>
 <li><p>Line filters exist in a new flavor referred to as <i>early-applied</i> line filters:
 	<br><a name='WinMerge.chm' href='https://bitbucket.org/jtuc/winmerge2011_help/downloads/WinMerge.chm'>WinMerge.chm</a> &rarr; <i>Using Filters</i> &rarr; <i>Using line filters</i> &rarr; <i>Early-applied line filter syntax</i>
-<li><p>The Open dialog's <i>Include Subfolders</i> option can be adjusted to ignore folder structure:
+<li><p>The <i>Open</i> dialog's <i>Include Subfolders</i> option can be adjusted to ignore folder structure:
 	<br><a name='WinMerge.chm' href='https://bitbucket.org/jtuc/winmerge2011_help/downloads/WinMerge.chm'>WinMerge.chm</a> &rarr; <i>Quick start</i> &rarr; <i>Selecting files and folders to compare</i> &rarr; <i>5.</i>
 <li><p>Editor scriptlets are back:
 	<br><a name='WinMerge.chm' href='https://bitbucket.org/jtuc/winmerge2011_help/downloads/WinMerge.chm'>WinMerge.chm</a> &rarr; <i>Plugin scriptlets</i>
@@ -57,7 +57,7 @@ This is a <b>beta</b> release of WinMerge&nbsp;2011.
 	keeping them separate like WinMerge used to do due to its unawareness of the very concept.
 	<br>The option to <i>Separate combining characters</i> is accessible through <i>Edit</i> &rarr; <i>Options</i> &rarr; <i>Editor</i>.
 <li><p><i>Edit</i> &rarr; <i>Options</i> &rarr; <i>Colors</i> now offers an option to <i>Cross-hatch deleted lines</i>.
-<li><p>Folder comparison resuts can be saved to an Excel spreadsheet.
+<li><p>Folder comparison results can be saved to an Excel spreadsheet.
 	<br>Besides the <i>Save to Excel spreadsheet</i> command, the Folder Compare window's <i>Tools</i>
 	menu includes commands for viewing and printing with Excel Viewer. These assume that you use
 	<a target='_blank' href='http://priede.bf.lu.lv/ftp/pub/RakstuDarbi/apskatei/Microsoft/xlviewer2003.exe'>Excel Viewer 2003</a>.
@@ -66,18 +66,24 @@ This is a <b>beta</b> release of WinMerge&nbsp;2011.
 	<a target='_blank' href='http://www.microsoft.com/download/details.aspx?id=16872'>Excel Viewer 2003 Service Pack 3 (SP3)</a> and
 	<a target='_blank' href='http://www.microsoft.com/download/details.aspx?id=4134'>Security Update for Microsoft Office Excel Viewer 2003 (KB973484)</a>.
 <li><p>File/directory filters have been enhanced to allow for combining both inclusion and exclusion rules.
-	<br>Omitting the <i>def:</i> in an .flt file makes <i>f:</i> and <i>d:</i>
+	<br>Omitting the <i>def:</i> label in an <i>.flt</i> file makes <i>f:</i> and <i>d:</i>
 	operate as inclusion rules unless prefixed with <i>x</i>, in which case they operate as exclusion rules.
+	<br>The <i>f:</i> and <i>d:</i> labels, again optionally prefixed with <i>x</i> to form an exclusion rule, can also be used with wildcard filters.
 <li><p>With <a target='_blank' href='http://www.microsoft.com/en-us/download/details.aspx?id=24659'>LogParser 2.2</a> installed,
 	you can enjoy more elaborate folder compare filter options by using SQL in your file/directory filters.
-	<br>An example is <i>SQL_Filter_Example.flt</i>, which is located in the <i>Filters</i> folder underneath the WinMerge program folder.
+	<br>All <i>.flt</i> files installed with WinMerge contain a default
+	SQL filter which you can enable at your option when filling in the <i>Open</i> dialog.
+	The default SQL filter allows you to specify minimum and maximum modification times and sizes.
+	All fields are checked with IS NULL so as to have only the filled in fields take effect.
+	SQL filters are enabled and filled in separately for each side.
+	The default SQL filter can also be combined with simple wildcard filtering, in which case WinMerge loads it from the <i>FileFilter.tmpl</i> file.
 <li><p>Processing of archive formats which are unknown to 7-Zip can be delegated to external command line tools.
-	<br>An example is PowerBuilder library (.pbl) files.
+	<br>An example is PowerBuilder library (<i>.pbl</i>) files.
 	A command line tool to handle them can be found <a target='_blank' href='http://sqlbatch.com/pd/'>here</a>.
 	<br>Read <a target='_blank' href='http://forums.winmerge.org/viewtopic.php?f=4&t=879'>here</a>
-	on how to set up an <i>ExternalArchiveFormat.ini</i> to enable on-the-fly extraction of .pbl file contents.
+	on how to set up an <i>ExternalArchiveFormat.ini</i> to enable on-the-fly extraction of <i>.pbl</i> file contents.
 <li><p><i>Wrapper scripts</i> can help automate tasks which would otherwise require user interaction.
-	<br>A first application of this new feature is <i>GenerateHTMLReport.wsf</i>, which you find in the WinMerge program folder.
+	<br>A first application of this new feature is <i>GenerateHTMLReport.WinMerge</i>, which you find in the WinMerge program folder.
 	<br>Invoking it without arguments provides usage information.
 <li><p>The setup now offers a <i>Portable media</i> option to install WinMerge in such way that it will not modify the registry of the system on which it is running.
 	<br>
@@ -107,10 +113,10 @@ This is a <b>beta</b> release of WinMerge&nbsp;2011.
 <a target='_blank' href='http://geekswithblogs.net/evjen/archive/2006/06/29/83567.aspx'>Bill Evjen's Blog</a> gives advice in case
 <a name='WinMerge.chm' href='https://bitbucket.org/jtuc/winmerge2011_help/downloads/WinMerge.chm'>WinMerge.chm</a> fails to display content.
 <p>
-Click <a href='https://bitbucket.org/jtuc/winmerge2011/get/0.2011.003.391.zip'>here</a> to obtain the source code for this release.
+Click <a href='https://bitbucket.org/jtuc/winmerge2011/get/0.2011.003.433.zip'>here</a> to obtain the source code for this release.
 <p>
 Click <a href='https://bitbucket.org/jtuc/frhed/get/0.10902.2013.zip'>here</a> to obtain source code for Frhed binaries included in this release.
 <p>
-<i>Jochen Neubeck, September 2013</i>
+<i>Jochen Neubeck, October 2013</i>
 <xml src='WinMerge.chm' onreadystatechange='OnReadyStateChangeExternalDoc()'></xml>
 </body>

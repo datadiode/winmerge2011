@@ -1,3 +1,16 @@
+0.2011.003.433
+Changes since preceding release (not necessarily complete):
+• Add Pause button as per http://sf.net/p/winmerge/feature-requests/1237
+• H2O2.cpp: Don't CenterWindow() owned popups upon activation if already visible
+• H2O.h: Work around an inaccuracy in Wine's implementation of LVM_INSERTITEM
+• CDirView::HandleMenuSelect() missed to check for "menu closed" condition
+• MergeCmdLineInfo.cpp: Allow for bypassing single instance logic with /s:no
+• Make wrapper script feature no longer rely on Windows Script Host
+• OpenDlg: Let user choose between template generated SQL and raw SQL input
+• OpenDlg: Let user combine wildcards with SQL filter found in FileFilter.tmpl
+• OpenDlg: Allow f:/d:/xf:/xd: prefixes as used in .flt files also for wildcards
+• Fix trailing whitespace part of http://sf.net/p/winmerge/feature-requests/1236
+
 0.2011.003.391
 Changes since preceding release (not necessarily complete):
 • Introduce SQL-based directory/file filters
