@@ -322,7 +322,7 @@ void stringdiffs::BuildWordDiffList()
 				}
 				else
 				{
-					end = m_words1[length1].end - 1;
+					end = m_words1[length1].end;
 				}
 				start = end + 1;
 				for (int l = 0; l < k; l++)
@@ -341,7 +341,7 @@ void stringdiffs::BuildWordDiffList()
 				}
 				else
 				{
-					end = m_words2[length2].end - 1;
+					end = m_words2[length2].end;
 				}
 				start = end + 1;
 				for (int l = 0; l < k; l++)
