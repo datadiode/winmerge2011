@@ -507,6 +507,9 @@ IDR_MERGEDOCTYPE MENU
         MENUITEM SEPARATOR
         MENUITEM "Copy &All to Right", ID_ALL_RIGHT
         MENUITEM "Cop&y All to Left", ID_ALL_LEFT
+        MENUITEM SEPARATOR
+        MENUITEM "&Synchronization Point", ID_SET_SYNCPOINT
+        MENUITEM "Clear Sync&hronization Points", ID_CLEAR_SYNCPOINTS
     }
     POPUP "&Tools"
     {

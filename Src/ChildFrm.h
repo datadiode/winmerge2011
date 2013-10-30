@@ -123,6 +123,7 @@ public:
 	void UpdateEditCmdUI();
 	void UpdateGeneralCmdUI();
 	void UpdateBookmarkUI();
+	void UpdateSyncPointUI();
 	void UpdateSourceTypeUI();
 	void UpdateMergeStatusUI();
 	void AlignScrollPositions();
@@ -170,6 +171,7 @@ public:
 // Attributes
 public:
 	CDiffTextBuffer *m_ptBuf[2]; /**< Left/Right side text buffer */
+	static const int m_nBuffers = 2; /**< Takashi's code is 3-way aware */
 
 	DiffList m_diffList;
 	UINT m_nTrivialDiffs; /**< Amount of trivial (ignored) diffs */
@@ -215,6 +217,12 @@ public:
 
 	const FileTextEncoding & GetEncoding(int file) const
 			{ return m_ptBuf[file]->getEncoding(); }
+
+	void SetSyncPoint();
+	void ClearSyncPoint();
+	void ClearSyncPoints();
+	bool HasSyncPoints() const { return m_bHasSyncPoints; }
+	bool IsCursorAtSyncPoint();
 
 	bool SaveModified();
 	void SetTitle();
@@ -266,6 +274,7 @@ private:
 	bool m_bMergingMode; /**< Merging or Edit mode */
 	bool m_bMixedEol; /**< Does this document have mixed EOL style? */
 	bool m_bEnableRescan; /**< Automatic rescan enabled/disabled */
+	bool m_bHasSyncPoints;
 	FileTime m_LastRescan; /**< Time of last rescan (for delaying) */ 
 	CDiffWrapper m_diffWrapper;
 	/// information about the file packer/unpacker

@@ -328,6 +328,8 @@ private:
 		BYTE CompareSelection;
 		BYTE ToggleBookmark;
 		BYTE NavigateBookmarks;
+		BYTE SetSyncPoint;
+		BYTE ClearSyncPoints;
 		const BYTE *Lookup(UINT id) const;
 	} m_cmdState;
 	HRESULT m_hrRegister;

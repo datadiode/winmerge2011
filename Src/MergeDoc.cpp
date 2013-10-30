@@ -24,9 +24,6 @@
  * @brief Implementation file for CMergeDoc
  *
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "markdown.h"
 #include "Merge.h"
@@ -64,8 +61,6 @@ using stl::swap;
 
 /** @brief Max len of path in caption. */
 static const UINT CAPTION_PATH_MAX = 50;
-
-static void SaveBuffForDiff(CDiffTextBuffer & buf, CDiffTextBuffer & buf2, DiffFileData &diffdata, int i);
 
 /**
  * @brief Determines currently active view.
@@ -298,14 +293,15 @@ void CChildFrame::SetUnpacker(PackingInfo * infoNewHandler)
  * (the plugins are optional, not the conversion)
  * @todo Show SaveToFile() errors?
  */
-static void SaveBuffForDiff(CDiffTextBuffer & buf, CDiffTextBuffer & buf2, DiffFileData &diffdata, int i)
+static void SaveBuffForDiff(CDiffTextBuffer &buf, bool bUnicode,
+	DiffFileData &diffdata, int i, int nStartLine = 0, int nLines = -1)
 {
 	int orig_codepage = buf.getCodepage();
 	UNICODESET orig_unicoding = buf.getUnicoding();
 
 	size_t alloc_extra = 0;
 	// If file was in Unicode
-	if ((orig_unicoding != NONE) || (buf2.getUnicoding() != NONE))
+	if (bUnicode)
 	{
 		// we subvert the buffer's memory of the original file encoding
 		buf.setUnicoding(UCS2LE);  // write as UCS-2LE (for preprocessing)
@@ -316,12 +312,12 @@ static void SaveBuffForDiff(CDiffTextBuffer & buf, CDiffTextBuffer & buf2, DiffF
 	// write buffer out to temporary file
 	String sError;
 	NulWriteStream nws;
-	buf.SaveToFile(NULL, &nws, sError);
+	buf.SaveToFile(NULL, &nws, sError, NULL, CRLF_STYLE_AUTOMATIC, nStartLine, nLines);
 	ULONG len = nws.GetSize();
 	if (void *buffer = diffdata.AllocBuffer(i, len, alloc_extra))
 	{
 		MemWriteStream mws(buffer, len);
-		buf.SaveToFile(NULL, &mws, sError);
+		buf.SaveToFile(NULL, &mws, sError, NULL, CRLF_STYLE_AUTOMATIC, nStartLine, nLines);
 	}
 
 	// restore memory of encoding of original file
@@ -400,8 +396,6 @@ int CChildFrame::Rescan2(bool &bIdentical)
 	GetSystemTimeAsFileTime(&m_LastRescan);
 
 	DiffFileData diffdata(getDefaultCodepage());
-	SaveBuffForDiff(*m_ptBuf[0], *m_ptBuf[1], diffdata, 0);
-	SaveBuffForDiff(*m_ptBuf[1], *m_ptBuf[0], diffdata, 1);
 
 	// Clear diff list
 	m_diffList.Clear();
@@ -410,13 +404,82 @@ int CChildFrame::Rescan2(bool &bIdentical)
 	if (MovedLines *pMovedLines = m_diffWrapper.GetMovedLines())
 		pMovedLines->Clear();
 
+	int nBuffer;
+
+	bool bUnicode = false;
+	for (nBuffer = 0; nBuffer < m_nBuffers; nBuffer++)
+		if (m_ptBuf[nBuffer]->getUnicoding() != NONE)
+			bUnicode = true;
+
 	// Set paths for diffing and run diff
 	m_diffWrapper.SetCompareFiles(m_strPath[0], m_strPath[1]);
-	m_diffWrapper.SetCodepage(m_ptBuf[0]->m_encoding.m_unicoding ?
-			CP_UTF8 : m_ptBuf[0]->m_encoding.m_codepage);
+	m_diffWrapper.SetCodepage(bUnicode ? CP_UTF8 : m_ptBuf[0]->m_encoding.m_codepage);
 
 	int nResult = RESCAN_FILE_ERR;
-	const bool diffSuccess = m_diffWrapper.RunFileDiff(diffdata);
+	bool diffSuccess = false;
+
+	if (!HasSyncPoints())
+	{
+		for (nBuffer = 0; nBuffer < m_nBuffers; nBuffer++)
+			SaveBuffForDiff(*m_ptBuf[nBuffer], bUnicode, diffdata, nBuffer);
+		diffSuccess = m_diffWrapper.RunFileDiff(diffdata);
+	}
+	else
+	{
+		int nSyncPoint[MERGE_VIEW_COUNT];
+		int nApparentStartLine[MERGE_VIEW_COUNT];
+		int nRealStartLine[MERGE_VIEW_COUNT];
+		for (nBuffer = 0; nBuffer < m_nBuffers; nBuffer++)
+		{
+			nSyncPoint[nBuffer] = -1;
+			nApparentStartLine[nBuffer] = 0;
+			nRealStartLine[nBuffer] = 0;
+		}
+		int nDiff = 0;
+		for (;;)
+		{
+			int nApparentLines[MERGE_VIEW_COUNT];
+			int nRealLines[MERGE_VIEW_COUNT];
+
+			bool bContinue = false;
+			for (nBuffer = 0; nBuffer < m_nBuffers; nBuffer++)
+			{
+				nApparentLines[nBuffer] = 0;
+				nRealLines[nBuffer] = 0;
+				const CDiffTextBuffer *const pBuf = m_ptBuf[nBuffer];
+				const int nLineCount = pBuf->GetLineCount();
+				if (nSyncPoint[nBuffer] < nLineCount)
+				{
+					do if (nSyncPoint[nBuffer] >= 0)
+					{
+						++nApparentLines[nBuffer];
+						if ((pBuf->GetLineFlags(nSyncPoint[nBuffer]) & LF_GHOST) == 0)
+							++nRealLines[nBuffer];
+					} while (++nSyncPoint[nBuffer] < nLineCount &&
+						(pBuf->GetLineFlags(nSyncPoint[nBuffer]) & LF_INVALID_BREAKPOINT) == 0);
+					bContinue = true;
+				}
+			}
+
+			if (!bContinue)
+				break;
+
+			for (nBuffer = 0; nBuffer < m_nBuffers; nBuffer++)
+			{
+				SaveBuffForDiff(*m_ptBuf[nBuffer], bUnicode, diffdata, nBuffer,
+					nApparentStartLine[nBuffer], nApparentLines[nBuffer]);
+			}
+
+			diffSuccess = m_diffWrapper.RunFileDiff(diffdata);
+			nDiff = m_diffList.FinishSyncPoint(nDiff, nRealStartLine);
+
+			for (nBuffer = 0; nBuffer < m_nBuffers; nBuffer++)
+			{
+				nApparentStartLine[nBuffer] += nApparentLines[nBuffer];
+				nRealStartLine[nBuffer] += nRealLines[nBuffer];
+			}
+		}
+	}
 	// set identical/diff result as recorded by diffutils
 	bIdentical = m_diffWrapper.m_status.bIdentical;
 	// Determine errors and binary file compares
@@ -2599,6 +2662,112 @@ HRESULT CChildFrame::LimitContext(long nLines)
 	SendMessage(WM_COMMAND, nLines >= 0 ?
 		ID_VIEW_CONTEXT_0 + nLines : ID_VIEW_CONTEXT_UNLIMITED);
 	return S_OK;
+}
+
+
+/**
+ * @brief Add or move synchronization point
+ */
+void CChildFrame::SetSyncPoint()
+{
+	int nBuffer;
+	int nMove = -1; // zero-based index of synchronization point to move
+	for (nBuffer = 0; nBuffer < m_nBuffers; nBuffer++)
+	{
+		int y = m_pView[nBuffer]->GetCursorPos().y;
+		int nLine = m_ptBuf[nBuffer]->ComputeApparentLine(m_ptBuf[nBuffer]->ComputeRealLine(y));
+		if (m_ptBuf[nBuffer]->GetLineFlags(nLine) & LF_INVALID_BREAKPOINT)
+		{
+			int nFound = -1;
+			do
+			{
+				++nMove;
+				nFound = m_ptBuf[nBuffer]->FindLineWithFlag(LF_INVALID_BREAKPOINT, nFound);
+			} while (nFound != -1 && nFound != nLine);
+			break;
+		}
+	}
+
+	for (nBuffer = 0; nBuffer < m_nBuffers; nBuffer++)
+	{
+		int y = m_pView[nBuffer]->GetCursorPos().y;
+		int nLine = m_ptBuf[nBuffer]->ComputeApparentLine(m_ptBuf[nBuffer]->ComputeRealLine(y));
+		if (nMove != -1 && (m_ptBuf[nBuffer]->GetLineFlags(nLine) & LF_INVALID_BREAKPOINT) == 0)
+		{
+			int nLoop = -1;
+			int nFound = -1;
+			do
+			{
+				++nLoop;
+				nFound = m_ptBuf[nBuffer]->FindLineWithFlag(LF_INVALID_BREAKPOINT, nFound);
+			} while (nFound != -1 && nLoop < nMove);
+			if (nFound != -1)
+			{
+				DWORD dwFlags = m_ptBuf[nBuffer]->GetLineFlags(nFound);
+				m_ptBuf[nBuffer]->SetLineFlags(nFound, dwFlags & ~LF_INVALID_BREAKPOINT);
+			}
+		}
+		m_ptBuf[nBuffer]->SetLineFlags(nLine, LF_INVALID_BREAKPOINT);
+	}
+
+	m_bHasSyncPoints = true;
+
+	for (int nBuffer = 0; nBuffer < m_nBuffers; ++nBuffer)
+		m_pView[nBuffer]->SetSelectionMargin(true);
+
+	FlushAndRescan(true);
+}
+
+bool CChildFrame::IsCursorAtSyncPoint()
+{
+	int nBuffer;
+	int nCount = 0;
+	for (nBuffer = 0; nBuffer < m_nBuffers; nBuffer++)
+	{
+		int y = m_pView[nBuffer]->GetCursorPos().y;
+		int nLine = m_ptBuf[nBuffer]->ComputeApparentLine(m_ptBuf[nBuffer]->ComputeRealLine(y));
+		if (m_ptBuf[nBuffer]->GetLineFlags(nLine) & LF_INVALID_BREAKPOINT)
+		{
+			++nCount;
+		}
+	}
+	return nCount == m_nBuffers;
+}
+
+/**
+ * @brief Clear the synchronization point at which the cursor is positioned
+ */
+void CChildFrame::ClearSyncPoint()
+{
+	m_bHasSyncPoints = false;
+	for (int nBuffer = 0; nBuffer < m_nBuffers; nBuffer++)
+	{
+		int y = m_pView[nBuffer]->GetCursorPos().y;
+		int nLine = m_ptBuf[nBuffer]->ComputeApparentLine(m_ptBuf[nBuffer]->ComputeRealLine(y));
+		DWORD dwFlags = m_ptBuf[nBuffer]->GetLineFlags(nLine);
+		m_ptBuf[nBuffer]->SetLineFlags(nLine, dwFlags & ~LF_INVALID_BREAKPOINT);
+		if (m_ptBuf[nBuffer]->FindLineWithFlag(LF_INVALID_BREAKPOINT) != -1)
+			m_bHasSyncPoints = true;
+	}
+	FlushAndRescan(true);
+}
+
+/**
+ * @brief Clear synchronization points
+ */
+void CChildFrame::ClearSyncPoints()
+{
+	m_bHasSyncPoints = false;
+	for (int nBuffer = 0; nBuffer < m_nBuffers; ++nBuffer)
+	{
+		int nLineCount = m_ptBuf[nBuffer]->GetLineCount();
+		for (int nLine = 0; nLine < nLineCount; ++nLine)
+		{
+			DWORD dwFlags = m_ptBuf[nBuffer]->GetLineFlags(nLine);
+			m_ptBuf[nBuffer]->SetLineFlags(nLine, dwFlags & ~LF_INVALID_BREAKPOINT);
+		}
+	}
+	FlushAndRescan(true);
 }
 
 void CChildFrame::UpdateAllViews()

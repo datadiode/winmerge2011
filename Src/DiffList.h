@@ -123,7 +123,7 @@ public:
 	void SwapSides();
 	void AddExtraLinesCounts(UINT &nLeftLines, UINT &nRightLines,
 		CDiffTextBuffer **ptBuf = NULL, UINT nContextLines = UINT_MAX);
-
+	int FinishSyncPoint(int nDiff, int nRealStartLine[]);
 	void swap(DiffList &);
 
 private:

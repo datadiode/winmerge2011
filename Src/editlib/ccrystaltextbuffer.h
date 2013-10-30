@@ -216,7 +216,7 @@ public:
 	{
 		return GetLineInfo(nLine).m_dwFlags;
 	}
-	int FindLineWithFlag(DWORD dwFlag) const;
+	int FindLineWithFlag(DWORD dwFlag, int nLine = -1) const;
 	void SetLineFlags(int nLine, DWORD dwFlags);
 	void GetText(int nStartLine, int nStartChar, int nEndLine, int nEndChar,
 			String &text, LPCTSTR pszCRLF = NULL) const;

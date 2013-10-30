@@ -348,13 +348,13 @@ const LineInfo &CCrystalTextBuffer::GetLineInfo(int nLine) const
 	return m_aLines[nLine];
 }
 
-int CCrystalTextBuffer::FindLineWithFlag(DWORD dwFlag) const
+int CCrystalTextBuffer::FindLineWithFlag(DWORD dwFlag, int nLine) const
 {
-	const stl_size_t nSize = m_aLines.size();
-	for (stl_size_t L = 0; L < nSize; L++)
+	const int nLineCount = m_aLines.size();
+	while (++nLine < nLineCount)
 	{
-		if ((m_aLines[L].m_dwFlags & dwFlag) != 0)
-			return static_cast<int>(L);
+		if ((m_aLines[nLine].m_dwFlags & dwFlag) != 0)
+			return nLine;
 	}
 	return -1;
 }

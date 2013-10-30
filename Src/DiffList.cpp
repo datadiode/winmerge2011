@@ -469,6 +469,20 @@ void DiffList::AddExtraLinesCounts(
 	rnRightLines += nRightLines;
 }
 
+int DiffList::FinishSyncPoint(int nDiff, int nRealStartLine[])
+{
+	const int nDiffCount = GetSize();
+	while (nDiff < nDiffCount)
+	{
+		DIFFRANGE &di = m_diffs[nDiff++].diffrange;
+		di.begin0 += nRealStartLine[0];
+		di.end0 += nRealStartLine[0];
+		di.begin1 += nRealStartLine[1];
+		di.end1 += nRealStartLine[1];
+	}
+	return nDiff;
+}
+
 void DiffList::swap(DiffList &other)
 {
 	stl::swap(m_firstSignificant, other.m_firstSignificant);

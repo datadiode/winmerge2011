@@ -368,6 +368,17 @@ LRESULT CChildFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 		m_idContextLines = id;
 		ReloadDocs();
 		break;
+	case ID_SET_SYNCPOINT:
+		if (IsCursorAtSyncPoint())
+			ClearSyncPoint();
+		else
+			SetSyncPoint();
+		UpdateSyncPointUI();
+		break;
+	case ID_CLEAR_SYNCPOINTS:
+		ClearSyncPoints();
+		UpdateSyncPointUI();
+		break;
 	case ID_EDIT_SELECT_ALL:
 		pTextView->SelectAll();
 		break;
@@ -1060,6 +1071,8 @@ void CChildFrame::UpdateGeneralCmdUI()
 		enable | (nStyle == CRLF_STYLE_UNIX ? MF_CHECKED : 0));
 	m_pMDIFrame->UpdateCmdUI<ID_EOL_TO_MAC>(
 		enable | (nStyle == CRLF_STYLE_MAC ? MF_CHECKED : 0));
+
+	UpdateSyncPointUI();
 }
 
 void CChildFrame::UpdateCmdUI()
@@ -1085,6 +1098,14 @@ void CChildFrame::UpdateBookmarkUI()
 		m_pMDIFrame->UpdateCmdUI<ID_EDIT_GOTO_NEXT_BOOKMARK>(
 			pTextView->HasBookmarks() ? MF_ENABLED : MF_GRAYED);
 	}
+}
+
+void CChildFrame::UpdateSyncPointUI()
+{
+	BYTE enable = !HasSyncPoints() ? MF_GRAYED :
+		IsCursorAtSyncPoint() ? MF_CHECKED : MF_UNCHECKED;
+	m_pMDIFrame->UpdateCmdUI<ID_CLEAR_SYNCPOINTS>(enable & MF_GRAYED);
+	m_pMDIFrame->UpdateCmdUI<ID_SET_SYNCPOINT>(enable & MF_CHECKED);
 }
 
 void CChildFrame::UpdateSourceTypeUI()

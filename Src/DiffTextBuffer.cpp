@@ -324,9 +324,13 @@ FileLoadResult::FILES_RESULT CDiffTextBuffer::LoadFromFile(LPCTSTR pszFileName,
  */
 int CDiffTextBuffer::SaveToFile(LPCTSTR pszFileName,
 		ISequentialStream *pTempStream, String & sError, PackingInfo * infoUnpacker /*= NULL*/,
-		CRLFSTYLE nCrlfStyle /*= CRLF_STYLE_AUTOMATIC*/)
+		CRLFSTYLE nCrlfStyle /*= CRLF_STYLE_AUTOMATIC*/,
+		int nStartLine /*= 0*/, int nLines /*= -1*/)
 {
 	ASSERT(m_bInit);
+
+	if (nLines == -1)
+		nLines = m_aLines.size() - nStartLine;
 
 	if ((!pszFileName || pszFileName[0] == _T('\0')) && !pTempStream)
 		return SAVE_FAILED;	// No filename, cannot save...
@@ -377,8 +381,8 @@ int CDiffTextBuffer::SaveToFile(LPCTSTR pszFileName,
 
 	// line loop : get each real line and write it in the file
 	LPCTSTR sEol = GetStringEol(nCrlfStyle);
-	const stl_size_t nLineCount = m_aLines.size();
-	for (stl_size_t line = 0 ; line < nLineCount ; ++line)
+	const stl_size_t nEndLine = nStartLine + nLines;
+	for (stl_size_t line = nStartLine; line < nEndLine ; ++line)
 	{
 		const LineInfo &li = GetLineInfo(line);
 		if (li.m_dwFlags & LF_GHOST)

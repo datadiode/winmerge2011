@@ -173,7 +173,8 @@ public:
 		PackingInfo *infoUnpacker, bool &readOnly, CRLFSTYLE nCrlfStyle,
 		const FileTextEncoding &encoding, String &sError);
 	int SaveToFile(LPCTSTR pszFileName, ISequentialStream *pTempStream, String &sError,
-		PackingInfo *infoUnpacker = NULL, CRLFSTYLE nCrlfStyle = CRLF_STYLE_AUTOMATIC);
+		PackingInfo *infoUnpacker = NULL, CRLFSTYLE nCrlfStyle = CRLF_STYLE_AUTOMATIC,
+		int nStartLine = 0, int nLines = -1);
 	UNICODESET getUnicoding() const { return m_encoding.m_unicoding; }
 	void setUnicoding(UNICODESET value) { m_encoding.m_unicoding = value; }
 	int getCodepage() const { return m_encoding.m_codepage; }

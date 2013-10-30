@@ -644,6 +644,18 @@ void CMainFrame::UpdateCmdUI<ID_EDIT_GOTO_NEXT_BOOKMARK>(BYTE uFlags)
 }
 
 template<>
+void CMainFrame::UpdateCmdUI<ID_SET_SYNCPOINT>(BYTE uFlags)
+{
+	m_cmdState.SetSyncPoint = uFlags;
+}
+
+template<>
+void CMainFrame::UpdateCmdUI<ID_CLEAR_SYNCPOINTS>(BYTE uFlags)
+{
+	m_cmdState.ClearSyncPoints = uFlags;
+}
+
+template<>
 LRESULT CMainFrame::OnWndMsg<WM_DRAWITEM>(WPARAM, LPARAM lParam)
 {
 	DRAWITEMSTRUCT *const lpdis = reinterpret_cast<DRAWITEMSTRUCT *>(lParam);
@@ -814,23 +826,10 @@ const BYTE *CMainFrame::CmdState::Lookup(UINT id) const
 	case ID_EDIT_GOTO_PREV_BOOKMARK:
 	case ID_EDIT_CLEAR_ALL_BOOKMARKS:
 		return &NavigateBookmarks;
-	// TODO: Remove this once MFC has gone.
-	/*case ID_FILE_OPEN_REGISTERED:
-	case ID_FILE_OPEN_WITHEDITOR:
-	case ID_FILE_OPEN_WITH:
-	case ID_FILE_SAVEAS_LEFT:
-	case ID_FILE_SAVEAS_RIGHT:
-	case ID_WINDOW_CHANGE_PANE:
-	case ID_VIEW_LANGUAGE:
-	case ID_APP_ABOUT:
-	case ID_EDIT_WMGOTO:
-	case ID_EDIT_COPY_LINENUMBERS:
-	case ID_FILE_NEW:
-	case ID_FILE_OPEN:
-	case ID_FILE_OPENPROJECT:
-	case ID_FILE_SAVEPROJECT:
-		static const BYTE enabled = 0;
-		return &enabled;*/
+	case ID_SET_SYNCPOINT:
+		return &SetSyncPoint;
+	case ID_CLEAR_SYNCPOINTS:
+		return &ClearSyncPoints;
 	}
 	return NULL;
 }
