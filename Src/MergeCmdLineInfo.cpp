@@ -462,12 +462,6 @@ void MergeCmdLineInfo::ParseWinMergeCmdLine(LPCTSTR q)
 {
 	ParseWinMergeCmdLineInternal(q);
 
-	// Ignore a /minimize if no files were specified on the command line.
-	if (m_Files.empty() && m_nCmdShow == SW_SHOWMINNOACTIVE)
-	{
-		m_nCmdShow = SW_SHOWNORMAL;
-	}
-
 	if (m_sRegHive.empty())
 	{
 		TCHAR path[MAX_PATH];
