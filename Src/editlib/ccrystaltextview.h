@@ -172,9 +172,10 @@ protected:
 
 	int ApproxActualOffset(int nLineIndex, int nOffset);
 	void AdjustTextPoint(POINT & point);
-	void DrawLineHelperImpl(HSurface *pdc, POINT & ptOrigin, const RECT & rcClip,
+	void DrawLineHelperImpl(HSurface *pdc, POINT &ptOrigin, const RECT &rcClip,
 		int nColorIndex, int nBgColorIndex, COLORREF crText, COLORREF crBkgnd,
-		LPCTSTR pszChars, int nOffset, int nCount, int &nActualOffset);
+		LPCTSTR pszChars, int nOffset, int nCount, int &nActualOffset,
+		int nBgColorIndexZeorWidthBlock, int cxZeorWidthBlock);
 	bool IsInsideSelBlock(POINT ptTextPos);
 
 	bool m_bBookmarkExist;        // More bookmarks
@@ -440,13 +441,14 @@ protected:
 	virtual void OnDropSource(DWORD de);
 
 	virtual COLORREF GetColor(int nColorIndex);
-	virtual void GetLineColors(int nLineIndex, COLORREF &crBkgnd, COLORREF &crText);
+	virtual void GetLineColors(int nLineIndex, COLORREF &crBkgnd, COLORREF &crText) = 0;
 	virtual bool GetItalic(int nColorIndex);
 	virtual bool GetBold(int nColorIndex);
 
 	void DrawLineHelper(HSurface *, POINT &ptOrigin, const RECT &rcClip,
 		int nColorIndex, int nBgColorIndex, COLORREF crText, COLORREF crBkgnd,
-		LPCTSTR pszChars, int nOffset, int nCount, int &nActualOffset, POINT ptTextPos);
+		LPCTSTR pszChars, int nOffset, int nCount, int &nActualOffset, POINT ptTextPos,
+		int nBgColorIndexZeorWidthBlock, int cxZeorWidthBlock);
 	virtual void DrawSingleLine(HSurface *, const RECT &, int nLineIndex);
 	virtual void DrawMargin(HSurface *, const RECT &, int nLineIndex, int nLineNumber);
 
@@ -552,7 +554,7 @@ protected:
 	//END SW
 
 	int MergeTextBlocks(TEXTBLOCK *pBuf1, int nBlocks1, TEXTBLOCK *pBuf2, int nBlocks2, TEXTBLOCK *&pBufMerged);
-	virtual int GetAdditionalTextBlocks (int nLineIndex, TEXTBLOCK *pBuf);
+	virtual int GetAdditionalTextBlocks(int nLineIndex, TEXTBLOCK *&pBuf);
 
 public:
 	void GetHTMLLine(int nLineIndex, String &);

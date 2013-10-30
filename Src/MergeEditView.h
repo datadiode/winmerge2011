@@ -140,7 +140,7 @@ public:
 	void GetFullySelectedDiffs(int & firstDiff, int & lastDiff);
 	void UpdateResources();
 	virtual int RecalcVertScrollBar(bool bPositionOnly = false);
-	virtual int GetAdditionalTextBlocks(int nLineIndex, TEXTBLOCK *pBuf);
+	virtual int GetAdditionalTextBlocks(int nLineIndex, TEXTBLOCK *&pBuf);
 	virtual COLORREF GetColor(int nColorIndex);
 	virtual void GetLineColors(int nLineIndex, COLORREF &crBkgnd, COLORREF &crText);
 	void GotoLine(int nLine);

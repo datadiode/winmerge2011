@@ -70,7 +70,7 @@ void CMergeDiffDetailView::SetSelection(const POINT &ptStart, const POINT &ptEnd
 	CCrystalTextView::SetSelection(ptStartNew, ptEndNew);
 }
 
-int CMergeDiffDetailView::GetAdditionalTextBlocks(int nLineIndex, TEXTBLOCK *pBuf)
+int CMergeDiffDetailView::GetAdditionalTextBlocks(int nLineIndex, TEXTBLOCK *&rpBuf)
 {
 	DWORD dwLineFlags = GetLineFlags(nLineIndex);
 	if ((dwLineFlags & LF_DIFF) != LF_DIFF)
@@ -89,8 +89,10 @@ int CMergeDiffDetailView::GetAdditionalTextBlocks(int nLineIndex, TEXTBLOCK *pBu
 		return 0;
 	}
 
-	int nWordDiffs = worddiffs.size();
+	const int nWordDiffs = worddiffs.size();
 
+	TEXTBLOCK *pBuf = new TEXTBLOCK[nWordDiffs * 2 + 1];
+	rpBuf = pBuf;
 	pBuf[0].m_nCharPos = 0;
 	pBuf[0].m_nColorIndex = COLORINDEX_NONE;
 	pBuf[0].m_nBgColorIndex = COLORINDEX_NONE;
@@ -169,8 +171,8 @@ void CMergeDiffDetailView::GetLineColors(int nLineIndex, COLORREF &crBkgnd, COLO
 		}
 		else
 		{
-			// Line not inside diff, get colors from CrystalEditor
-			CCrystalTextView::GetLineColors(nLineIndex, crBkgnd, crText);
+			crBkgnd = CLR_NONE;
+			crText = CLR_NONE;
 		}
 	}
 	if (nLineIndex < m_lineBegin || nLineIndex >= m_lineEnd)

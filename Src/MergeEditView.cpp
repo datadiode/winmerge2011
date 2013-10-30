@@ -228,7 +228,7 @@ void CMergeEditView::GetFullySelectedDiffs(int & firstDiff, int & lastDiff)
 	}
 }
 
-int CMergeEditView::GetAdditionalTextBlocks (int nLineIndex, TEXTBLOCK *pBuf)
+int CMergeEditView::GetAdditionalTextBlocks(int nLineIndex, TEXTBLOCK *&rpBuf)
 {
 	DWORD dwLineFlags = GetLineFlags(nLineIndex);
 	if ((dwLineFlags & LF_DIFF) != LF_DIFF)
@@ -250,6 +250,8 @@ int CMergeEditView::GetAdditionalTextBlocks (int nLineIndex, TEXTBLOCK *pBuf)
 	bool lineInCurrentDiff = IsLineInCurrentDiff(nLineIndex);
 	int nWordDiffs = worddiffs.size();
 
+	TEXTBLOCK *pBuf = new TEXTBLOCK[nWordDiffs * 2 + 1];
+	rpBuf = pBuf;
 	pBuf[0].m_nCharPos = 0;
 	pBuf[0].m_nColorIndex = COLORINDEX_NONE;
 	pBuf[0].m_nBgColorIndex = COLORINDEX_NONE;
@@ -391,8 +393,8 @@ void CMergeEditView::GetLineColors(int nLineIndex, COLORREF &crBkgnd, COLORREF &
 		}
 		else
 		{
-			// Syntax highlighting, get colors from CrystalEditor
-			CCrystalEditViewEx::GetLineColors(nLineIndex, crBkgnd, crText);
+			crBkgnd = CLR_NONE;
+			crText = CLR_NONE;
 		}
 	}
 }
@@ -1042,6 +1044,8 @@ void CMergeEditView::RefreshOptions()
 	m_cachedColors.clrSelWordDiffText = COptionsMgr::Get(OPT_CLR_SELECTED_WORDDIFF_TEXT);
 
 	OnSize();
+	CCrystalTextView::OnSize();
+	Invalidate();
 }
 
 /**

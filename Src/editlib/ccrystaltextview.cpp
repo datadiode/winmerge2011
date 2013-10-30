@@ -803,217 +803,243 @@ int CCrystalTextView::GetCharWidthFromDisplayableChar(LPCTSTR pch)
 void CCrystalTextView::DrawLineHelperImpl(
 	HSurface *pdc, POINT &ptOrigin, const RECT &rcClip,
 	int nColorIndex, int nBgColorIndex, COLORREF crText, COLORREF crBkgnd,
-	LPCTSTR pszChars, int nOffset, int nCount, int &nActualOffset)
+	LPCTSTR pszChars, int nOffset, int nCount, int &nActualOffset,
+	int nBgColorIndexZeorWidthBlock, int cxZeroWidthBlock)
 {
-	ASSERT(nCount >= 0);
-	if (nCount > 0)
+	ASSERT(nCount > 0);
+	String line;
+	nActualOffset += ExpandChars(pszChars, nOffset, nCount, line, nActualOffset);
+	const int nMaxEscapement = 2;
+	// TODO: When implementing fallback to %04X format, set nMaxEscapement to 4.
+	const LPCTSTR szLine = line.c_str();
+	const int nLength = line.length();
+	const int nCharWidth = GetCharWidth();
+	const int nCharWidthNarrowed = nCharWidth / 2;
+	const int nCharWidthWidened = nCharWidth * 2 - nCharWidthNarrowed;
+	const int nLineHeight = GetLineHeight();
+
+	// i the character index, from 0 to lineLen-1
+	int i = 0;
+
+	// Pass if the text begins after the right end of the clipping region
+	if (ptOrigin.x < rcClip.right)
 	{
-		String line;
-		nActualOffset += ExpandChars(pszChars, nOffset, nCount, line, nActualOffset);
-		const int nMaxEscapement = 2;
-		// TODO: When implementing fallback to %04X format, set nMaxEscapement to 4.
-		const LPCTSTR szLine = line.c_str();
-		const int nLength = line.length();
-		const int nCharWidth = GetCharWidth();
-		const int nCharWidthNarrowed = nCharWidth / 2;
-		const int nCharWidthWidened = nCharWidth * 2 - nCharWidthNarrowed;
-		const int nLineHeight = GetLineHeight();
+		// Because ExtTextOut is buggy when ptOrigin.x < - 4095 * charWidth
+		// or when nCount >= 4095
+		// and because this is not well documented,
+		// we decide to do the left & right clipping here
 
-		// i the character index, from 0 to lineLen-1
-		int i = 0;
-
-		// Pass if the text begins after the right end of the clipping region
-		if (ptOrigin.x < rcClip.right)
-		{
-			// Because ExtTextOut is buggy when ptOrigin.x < - 4095 * charWidth
-			// or when nCount >= 4095
-			// and because this is not well documented,
-			// we decide to do the left & right clipping here
-
-			// Update the position after the left clipped characters
-			// stop for i = first visible character, at least partly
-			const int clipLeft = rcClip.left - nCharWidth * nMaxEscapement;
-			for ( ; i < nLength; ++i)
-			{
-				int pnWidthsCurrent = szLine[i] < _T('\t') ?
-					nCharWidth : nCharWidth * GetCharWidthFromChar(szLine + i);
-				ptOrigin.x += pnWidthsCurrent;
-				if (ptOrigin.x >= clipLeft)
-				{
-					ptOrigin.x -= pnWidthsCurrent;
-					break;
-				}
-			}
-
-			if (i < nLength)
-			{
-				// We have to draw some characters
-				int ibegin = i;
-				int nSumWidth = 0;
-
-				// A raw estimate of the number of characters to display
-				// For wide characters, nCountFit may be overvalued
-				int nWidth = rcClip.right - ptOrigin.x;
-				int nCount = nLength - ibegin;
-				int nCountFit = nWidth / nCharWidth + 2/* wide char */;
-				if (nCount > nCountFit) {
-					nCount = nCountFit;
-				}
-
-				// Table of charwidths as CCrystalEditor thinks they are
-				// Seems that CrystalEditor's and ExtTextOut()'s charwidths aren't
-				// same with some fonts and text is drawn only partially
-				// if this table is not used.
-				int *pnWidths = new int[nCount + nMaxEscapement];
-				for ( ; i < nCount + ibegin ; i++)
-				{
-					TCHAR c = szLine[i];
-					if (c == _T('\1')) // %02X escape sequence leadin?
-					{
-						// Substitute a space narrowed to half the width of a character cell.
-						line[i] = _T(' ');
-						nSumWidth += pnWidths[i - ibegin] = nCharWidthNarrowed;
-						// 1st hex digit has normal width.
-						nSumWidth += pnWidths[++i - ibegin] = nCharWidth;
-						// 2nd hex digit is padded by half the width of a character cell.
-						nSumWidth += pnWidths[++i - ibegin] = nCharWidthWidened;
-					}
-					/*else if (c == _T('\2')) // %04X escape sequence leadin?
-					{
-						line[i] = _T(' ');
-						// Substitute a space narrowed to half the width of a character cell.
-						nSumWidth += pnWidths[i - ibegin] = nCharWidthNarrowed;
-						// 1st..3rd hex digit has normal width.
-						nSumWidth += pnWidths[++i - ibegin] = nCharWidth;
-						nSumWidth += pnWidths[++i - ibegin] = nCharWidth;
-						nSumWidth += pnWidths[++i - ibegin] = nCharWidth;
-						// 4th hex digit is padded by half the width of a character cell.
-						nSumWidth += pnWidths[++i - ibegin] = nCharWidthWidened;
-					}*/
-					else
-					{
-						nSumWidth += pnWidths[i - ibegin] = nCharWidth * GetCharWidthFromChar(szLine + i);
-					}
-				}
-
-				if (ptOrigin.x + nSumWidth > rcClip.left)
-				{
-					if (crText == CLR_NONE || nColorIndex & COLORINDEX_APPLYFORCE)
-						pdc->SetTextColor(GetColor(nColorIndex));
-					else
-						pdc->SetTextColor(crText);
-					if (crBkgnd == CLR_NONE || nBgColorIndex & COLORINDEX_APPLYFORCE)
-						pdc->SetBkColor(GetColor(nBgColorIndex));
-					else
-						pdc->SetBkColor(crBkgnd);
-
-					pdc->SelectObject(GetFont(nColorIndex));
-					// we are sure to have less than 4095 characters because all the chars are visible
-					VERIFY(pdc->ExtTextOut(ptOrigin.x, ptOrigin.y, ETO_CLIPPED,
-						&rcClip, line.c_str() + ibegin, nCount, pnWidths));
-					// Draw rounded rectangles around control characters
-					pdc->SaveDC();
-					pdc->IntersectClipRect(rcClip.left, rcClip.top, rcClip.right, rcClip.bottom);
-					HGdiObj *const pBrush = pdc->SelectStockObject(NULL_BRUSH);
-					HGdiObj *const pPen = pdc->SelectObject(HPen::Create(PS_SOLID, 1, pdc->GetTextColor()));
-					int x = ptOrigin.x;
-					for (int j = 0 ; j < nCount ; ++j)
-					{
-						// Assume narrowed space is converted escape sequence leadin.
-						if (line[ibegin + j] == _T(' ') && pnWidths[j] < nCharWidth)
-						{
-							int n = 1;
-							do { } while (pnWidths[j + n++] == nCharWidth);
-							pdc->RoundRect(x + 2, ptOrigin.y + 1,
-							x + n * nCharWidth - 2, ptOrigin.y + nLineHeight - 1,
-							nCharWidth / 2, nLineHeight / 2);
-						}
-						x += pnWidths[j];
-					}
-					VERIFY(pdc->SelectObject(pPen)->DeleteObject());
-					pdc->SelectObject(pBrush);
-					pdc->RestoreDC(-1);
-				}
-				delete [] pnWidths;
-				// Update the final position after the visible characters	              
-				ptOrigin.x += nSumWidth;
-			}
-		}
-		// Update the final position after the right clipped characters
+		// Update the position after the left clipped characters
+		// stop for i = first visible character, at least partly
+		const int clipLeft = rcClip.left - nCharWidth * nMaxEscapement;
 		for ( ; i < nLength; ++i)
 		{
-			ptOrigin.x += szLine[i] < _T('\t') ?
+			int pnWidthsCurrent = szLine[i] < _T('\t') ?
 				nCharWidth : nCharWidth * GetCharWidthFromChar(szLine + i);
+			ptOrigin.x += pnWidthsCurrent;
+			if (ptOrigin.x >= clipLeft)
+			{
+				ptOrigin.x -= pnWidthsCurrent;
+				break;
+			}
 		}
+
+		if (i < nLength)
+		{
+			// We have to draw some characters
+			int ibegin = i;
+			int nSumWidth = 0;
+
+			// A raw estimate of the number of characters to display
+			// For wide characters, nCountFit may be overvalued
+			int nWidth = rcClip.right - ptOrigin.x;
+			int nCount = nLength - ibegin;
+			int nCountFit = nWidth / nCharWidth + 2/* wide char */;
+			if (nCount > nCountFit) {
+				nCount = nCountFit;
+			}
+
+			// Table of charwidths as CCrystalEditor thinks they are
+			// Seems that CrystalEditor's and ExtTextOut()'s charwidths aren't
+			// same with some fonts and text is drawn only partially
+			// if this table is not used.
+			int *pnWidths = new int[nCount + nMaxEscapement];
+			for ( ; i < nCount + ibegin ; i++)
+			{
+				TCHAR c = szLine[i];
+				if (c == _T('\1')) // %02X escape sequence leadin?
+				{
+					// Substitute a space narrowed to half the width of a character cell.
+					line[i] = _T(' ');
+					nSumWidth += pnWidths[i - ibegin] = nCharWidthNarrowed;
+					// 1st hex digit has normal width.
+					nSumWidth += pnWidths[++i - ibegin] = nCharWidth;
+					// 2nd hex digit is padded by half the width of a character cell.
+					nSumWidth += pnWidths[++i - ibegin] = nCharWidthWidened;
+				}
+				/*else if (c == _T('\2')) // %04X escape sequence leadin?
+				{
+					line[i] = _T(' ');
+					// Substitute a space narrowed to half the width of a character cell.
+					nSumWidth += pnWidths[i - ibegin] = nCharWidthNarrowed;
+					// 1st..3rd hex digit has normal width.
+					nSumWidth += pnWidths[++i - ibegin] = nCharWidth;
+					nSumWidth += pnWidths[++i - ibegin] = nCharWidth;
+					nSumWidth += pnWidths[++i - ibegin] = nCharWidth;
+					// 4th hex digit is padded by half the width of a character cell.
+					nSumWidth += pnWidths[++i - ibegin] = nCharWidthWidened;
+				}*/
+				else
+				{
+					nSumWidth += pnWidths[i - ibegin] = nCharWidth * GetCharWidthFromChar(szLine + i);
+				}
+			}
+
+			if (ptOrigin.x + nSumWidth > rcClip.left)
+			{
+				if (crText == CLR_NONE || nColorIndex & COLORINDEX_APPLYFORCE)
+					pdc->SetTextColor(GetColor(nColorIndex));
+				else
+					pdc->SetTextColor(crText);
+				if (crBkgnd == CLR_NONE || nBgColorIndex & COLORINDEX_APPLYFORCE)
+					pdc->SetBkColor(GetColor(nBgColorIndex));
+				else
+					pdc->SetBkColor(crBkgnd);
+
+				pdc->SelectObject(GetFont(nColorIndex));
+				// we are sure to have less than 4095 characters because all the chars are visible
+				VERIFY(pdc->ExtTextOut(ptOrigin.x, ptOrigin.y, ETO_CLIPPED,
+					&rcClip, line.c_str() + ibegin, nCount, pnWidths));
+				if (cxZeroWidthBlock != 0 && PtInRect(&rcClip, ptOrigin))
+				{
+					pdc->SetBkColor(crBkgnd == CLR_NONE ||
+						nBgColorIndexZeorWidthBlock & COLORINDEX_APPLYFORCE ?
+						GetColor(nBgColorIndexZeorWidthBlock) : crBkgnd);
+					RECT rcClipZeroWidthBlock =
+					{
+						ptOrigin.x - 1, rcClip.top,
+						ptOrigin.x + 2, rcClip.bottom
+					};
+					if (rcClipZeroWidthBlock.left < rcClip.left)
+						rcClipZeroWidthBlock.left = rcClip.left;
+					if (rcClipZeroWidthBlock.right > rcClip.right)
+						rcClipZeroWidthBlock.right = rcClip.right;
+					VERIFY(pdc->ExtTextOut(ptOrigin.x, ptOrigin.y, ETO_CLIPPED,
+						&rcClipZeroWidthBlock, line.c_str() + ibegin, nCount, pnWidths));
+				}
+				// Draw rounded rectangles around control characters
+				pdc->SaveDC();
+				pdc->IntersectClipRect(rcClip.left, rcClip.top, rcClip.right, rcClip.bottom);
+				HGdiObj *const pBrush = pdc->SelectStockObject(NULL_BRUSH);
+				HGdiObj *const pPen = pdc->SelectObject(HPen::Create(PS_SOLID, 1, pdc->GetTextColor()));
+				int x = ptOrigin.x;
+				for (int j = 0 ; j < nCount ; ++j)
+				{
+					// Assume narrowed space is converted escape sequence leadin.
+					if (line[ibegin + j] == _T(' ') && pnWidths[j] < nCharWidth)
+					{
+						int n = 1;
+						do { } while (pnWidths[j + n++] == nCharWidth);
+						pdc->RoundRect(x + 2, ptOrigin.y + 1,
+						x + n * nCharWidth - 2, ptOrigin.y + nLineHeight - 1,
+						nCharWidth / 2, nLineHeight / 2);
+					}
+					x += pnWidths[j];
+				}
+				VERIFY(pdc->SelectObject(pPen)->DeleteObject());
+				pdc->SelectObject(pBrush);
+				pdc->RestoreDC(-1);
+			}
+			delete [] pnWidths;
+			// Update the final position after the visible characters	              
+			ptOrigin.x += nSumWidth;
+		}
+	}
+	// Update the final position after the right clipped characters
+	for ( ; i < nLength; ++i)
+	{
+		ptOrigin.x += szLine[i] < _T('\t') ?
+			nCharWidth : nCharWidth * GetCharWidthFromChar(szLine + i);
 	}
 }
 
 void CCrystalTextView::DrawLineHelper(
 	HSurface *pdc, POINT &ptOrigin, const RECT &rcClip,
 	int nColorIndex, int nBgColorIndex, COLORREF crText, COLORREF crBkgnd,
-	LPCTSTR pszChars, int nOffset, int nCount, int &nActualOffset, POINT ptTextPos)
+	LPCTSTR pszChars, int nOffset, int nCount, int &nActualOffset, POINT ptTextPos,
+	int nBgColorIndexZeorWidthBlock, int cxZeroWidthBlock)
 {
-	if (nCount > 0)
+	ASSERT(nCount > 0);
+	if (m_bFocused || m_bShowInactiveSelection)
 	{
-		if (m_bFocused || m_bShowInactiveSelection)
+		int nSelBegin = 0, nSelEnd = 0;
+		if (m_ptDrawSelStart.y > ptTextPos.y)
 		{
-			int nSelBegin = 0, nSelEnd = 0;
-			if (m_ptDrawSelStart.y > ptTextPos.y)
-			{
-				nSelBegin = nCount;
-			}
-			else if (m_ptDrawSelStart.y == ptTextPos.y)
-			{
-				nSelBegin = m_ptDrawSelStart.x - ptTextPos.x;
-				if (nSelBegin < 0)
-				nSelBegin = 0;
-				if (nSelBegin > nCount)
-				nSelBegin = nCount;
-			}
-			if (m_ptDrawSelEnd.y > ptTextPos.y)
-			{
+			nSelBegin = nCount;
+		}
+		else if (m_ptDrawSelStart.y == ptTextPos.y)
+		{
+			nSelBegin = m_ptDrawSelStart.x - ptTextPos.x;
+			if (nSelBegin < 0)
+			nSelBegin = 0;
+			if (nSelBegin > nCount)
+			nSelBegin = nCount;
+		}
+		if (m_ptDrawSelEnd.y > ptTextPos.y)
+		{
+			nSelEnd = nCount;
+		}
+		else if (m_ptDrawSelEnd.y == ptTextPos.y)
+		{
+			nSelEnd = m_ptDrawSelEnd.x - ptTextPos.x;
+			if (nSelEnd < 0)
+				nSelEnd = 0;
+			if (nSelEnd > nCount)
 				nSelEnd = nCount;
-			}
-			else if (m_ptDrawSelEnd.y == ptTextPos.y)
-			{
-				nSelEnd = m_ptDrawSelEnd.x - ptTextPos.x;
-				if (nSelEnd < 0)
-					nSelEnd = 0;
-				if (nSelEnd > nCount)
-					nSelEnd = nCount;
-			}
-
-			ASSERT(nSelBegin >= 0 && nSelBegin <= nCount);
-			ASSERT(nSelEnd >= 0 && nSelEnd <= nCount);
-			ASSERT(nSelBegin <= nSelEnd);
-
-			//  Draw part of the text before selection
-			if (nSelBegin > 0)
-			{
-				DrawLineHelperImpl(pdc, ptOrigin, rcClip, nColorIndex, nBgColorIndex, crText, crBkgnd, pszChars, nOffset, nSelBegin, nActualOffset);
-			}
-			if (nSelBegin < nSelEnd)
-			{
-				DrawLineHelperImpl(pdc, ptOrigin, rcClip,
-					nColorIndex & ~COLORINDEX_APPLYFORCE,
-					nBgColorIndex & ~COLORINDEX_APPLYFORCE, 
-					GetColor(COLORINDEX_SELTEXT),
-					GetColor(COLORINDEX_SELBKGND),
-					pszChars, nOffset + nSelBegin, nSelEnd - nSelBegin, nActualOffset);
-			}
-			if (nSelEnd < nCount)
-			{
-				DrawLineHelperImpl(pdc, ptOrigin, rcClip, nColorIndex, nBgColorIndex, crText, crBkgnd, pszChars, nOffset + nSelEnd, nCount - nSelEnd, nActualOffset);
-			}
 		}
-		else
+
+		ASSERT(nSelBegin >= 0 && nSelBegin <= nCount);
+		ASSERT(nSelEnd >= 0 && nSelEnd <= nCount);
+		ASSERT(nSelBegin <= nSelEnd);
+
+		//  Draw part of the text before selection
+		if (nSelBegin > 0)
 		{
-			DrawLineHelperImpl(pdc, ptOrigin, rcClip, nColorIndex, nBgColorIndex, crText, crBkgnd, pszChars, nOffset, nCount, nActualOffset);
+			DrawLineHelperImpl(pdc, ptOrigin, rcClip,
+				nColorIndex, nBgColorIndex, crText, crBkgnd,
+				pszChars, nOffset, nSelBegin, nActualOffset,
+				nBgColorIndexZeorWidthBlock, cxZeroWidthBlock);
+			cxZeroWidthBlock = 0;
 		}
+		if (nSelBegin < nSelEnd)
+		{
+			DrawLineHelperImpl(pdc, ptOrigin, rcClip,
+				nColorIndex & ~COLORINDEX_APPLYFORCE,
+				nBgColorIndex & ~COLORINDEX_APPLYFORCE, 
+				GetColor(COLORINDEX_SELTEXT),
+				GetColor(COLORINDEX_SELBKGND),
+				pszChars, nOffset + nSelBegin, nSelEnd - nSelBegin, nActualOffset,
+				nBgColorIndexZeorWidthBlock, 0);
+			cxZeroWidthBlock = 0;
+		}
+		if (nSelEnd < nCount)
+		{
+			DrawLineHelperImpl(pdc, ptOrigin, rcClip,
+				nColorIndex, nBgColorIndex, crText, crBkgnd,
+				pszChars, nOffset + nSelEnd, nCount - nSelEnd, nActualOffset,
+				nBgColorIndexZeorWidthBlock, cxZeroWidthBlock);
+		}
+	}
+	else
+	{
+		DrawLineHelperImpl(pdc, ptOrigin, rcClip,
+			nColorIndex, nBgColorIndex, crText, crBkgnd,
+			pszChars, nOffset, nCount, nActualOffset,
+			nBgColorIndexZeorWidthBlock, cxZeroWidthBlock);
 	}
 }
 
-void CCrystalTextView::GetLineColors(int nLineIndex, COLORREF &crBkgnd, COLORREF &crText)
+/*void CCrystalTextView::GetLineColors(int nLineIndex, COLORREF &crBkgnd, COLORREF &crText)
 {
 	DWORD dwLineFlags = GetLineFlags(nLineIndex);
 	crText = RGB(255, 255, 255);
@@ -1034,7 +1060,7 @@ void CCrystalTextView::GetLineColors(int nLineIndex, COLORREF &crBkgnd, COLORREF
 	}
 	crBkgnd = CLR_NONE;
 	crText = CLR_NONE;
-}
+}*/
 
 DWORD CCrystalTextView::GetParseCookie(int nLineIndex)
 {
@@ -1070,7 +1096,7 @@ DWORD CCrystalTextView::GetParseCookie(int nLineIndex)
 	return m_ParseCookies[nLineIndex];
 }
 
-int CCrystalTextView::GetAdditionalTextBlocks(int nLineIndex, TEXTBLOCK *pBuf)
+int CCrystalTextView::GetAdditionalTextBlocks(int nLineIndex, TEXTBLOCK *&pBuf)
 {
 	return 0;
 }
@@ -1161,6 +1187,9 @@ void CCrystalTextView::DrawScreenLine(
 	RECT frect = rcClip;
 	const int nLineLength = GetViewableLineLength(ptTextPos.y);
 	const int nLineHeight = GetLineHeight();
+	int nBgColorIndexZeorWidthBlock = COLORINDEX_NONE;
+	int cxZeroWidthBlock = 0;
+	static const int ZEROWIDTHBLOCK_WIDTH = 2;
 
 	frect.top = ptOrigin.y;
 	frect.bottom = frect.top + nLineHeight;
@@ -1178,23 +1207,39 @@ void CCrystalTextView::DrawScreenLine(
 		{
 			ASSERT(pBuf[nActualItem].m_nCharPos >= 0 && pBuf[nActualItem].m_nCharPos <= nLineLength);
 			ptTextPos.x = nOffset > pBuf[nActualItem].m_nCharPos ? nOffset : pBuf[nActualItem].m_nCharPos;
-			DrawLineHelper(pdc, ptOrigin, rcClip,
-				pBuf[nActualItem].m_nColorIndex, pBuf[nActualItem].m_nBgColorIndex,
-				crText, crBkgnd, pszChars, ptTextPos.x, 
-				pBuf[nActualItem + 1].m_nCharPos - ptTextPos.x, nActualOffset, ptTextPos);
+			if (int nCount = pBuf[nActualItem + 1].m_nCharPos - ptTextPos.x)
+			{
+				DrawLineHelper(pdc, ptOrigin, rcClip,
+					pBuf[nActualItem].m_nColorIndex, pBuf[nActualItem].m_nBgColorIndex,
+					crText, crBkgnd, pszChars, ptTextPos.x, 
+					nCount, nActualOffset, ptTextPos,
+					nBgColorIndexZeorWidthBlock, cxZeroWidthBlock);
+				nBgColorIndexZeorWidthBlock = 0;
+				cxZeroWidthBlock = 0;
+			}
+			else
+			{
+				if ((nBgColorIndexZeorWidthBlock & COLORINDEX_APPLYFORCE) == 0)
+					nBgColorIndexZeorWidthBlock = pBuf[nActualItem].m_nBgColorIndex;
+				cxZeroWidthBlock = nBgColorIndexZeorWidthBlock & COLORINDEX_APPLYFORCE ? ZEROWIDTHBLOCK_WIDTH : 0;
+			}
 			if (ptOrigin.x > rcClip.right)
 				break;
 			++nActualItem;
 		}
 		ASSERT(pBuf[nActualItem].m_nCharPos >= 0 &&
-		pBuf[nActualItem].m_nCharPos <= nLineLength);
+			pBuf[nActualItem].m_nCharPos <= nLineLength);
 		ptTextPos.x = pBuf[nActualItem].m_nCharPos;
 	}
-	DrawLineHelper(pdc, ptOrigin, rcClip,
-		pBuf[nActualItem].m_nColorIndex, pBuf[nActualItem].m_nBgColorIndex,
-		crText, crBkgnd, pszChars, ptTextPos.x,
-		nOffset + nCount - ptTextPos.x, nActualOffset, ptTextPos);
-
+	if (int nRemainingCount = nOffset + nCount - ptTextPos.x)
+	{
+		DrawLineHelper(pdc, ptOrigin, rcClip,
+			pBuf[nActualItem].m_nColorIndex, pBuf[nActualItem].m_nBgColorIndex,
+			crText, crBkgnd, pszChars, ptTextPos.x,
+			nRemainingCount, nActualOffset, ptTextPos,
+			nBgColorIndexZeorWidthBlock, cxZeroWidthBlock);
+		cxZeroWidthBlock = 0;
+	}
 	// Draw space on the right of the text
 
 	frect.left = ptOrigin.x;
@@ -1211,8 +1256,25 @@ void CCrystalTextView::DrawScreenLine(
 			RECT rc = { frect.left, frect.top, frect.left + nCharWidth, frect.bottom };
 			pdc->ExtTextOut(0, 0, ETO_OPAQUE, &rc, NULL, 0);
 			frect.left += nCharWidth;
+			cxZeroWidthBlock = 0;
 		}
 	}
+
+	if (cxZeroWidthBlock != 0)
+	{
+		pdc->SetBkColor(crBkgnd == CLR_NONE ||
+			nBgColorIndexZeorWidthBlock & COLORINDEX_APPLYFORCE ?
+			GetColor(nBgColorIndexZeorWidthBlock) : crBkgnd);
+		++cxZeroWidthBlock; // Align with ExtTextOut clipping behavior
+		RECT rcClipZeroWidthBlock =
+		{
+			ptOrigin.x, ptOrigin.y,
+			ptOrigin.x + cxZeroWidthBlock, ptOrigin.y + nLineHeight
+		};
+		VERIFY(pdc->ExtTextOut(0, 0, ETO_OPAQUE, &rcClipZeroWidthBlock, NULL, 0, NULL));
+		frect.left += cxZeroWidthBlock;
+	}
+
 	if (frect.left < rcClip.left)
 		frect.left = rcClip.left;
 
@@ -1315,10 +1377,7 @@ void CCrystalTextView::DrawSingleLine(HSurface *pdc, const RECT &rc, int nLineIn
 		m_ParseCookies[nLineIndex] = ParseLine(dwCookie, nLineIndex, pBuf, nBlocks);
 		ASSERT(m_ParseCookies[nLineIndex] != - 1);
 
-		// Allocate table for max possible diff count:
-		// every char might be a diff (empty line has one char) and every diff
-		// needs three blocks plus one block at end (see called function)
-		TEXTBLOCK *pAddedBuf = new TEXTBLOCK[(nLength + 1) * 3 + 1];
+		TEXTBLOCK *pAddedBuf = NULL;
 		int nAddedBlocks = GetAdditionalTextBlocks(nLineIndex, pAddedBuf);
 
 		TEXTBLOCK *pMergedBuf;
@@ -1513,11 +1572,7 @@ void CCrystalTextView::GetHTMLLine(int nLineIndex, String &strHTML)
 	m_ParseCookies[nLineIndex] = ParseLine(dwCookie, nLineIndex, pBuf, nBlocks);
 	ASSERT(m_ParseCookies[nLineIndex] != - 1);
 
-	////////
-	// Allocate table for max possible diff count:
-	// every char might be a diff (empty line has one char) and every diff
-	// needs three blocks plus one block at end (see called function)
-	TEXTBLOCK *pAddedBuf = new TEXTBLOCK[(nLength + 1) * 3 + 1];
+	TEXTBLOCK *pAddedBuf = NULL;
 	int nAddedBlocks = GetAdditionalTextBlocks(nLineIndex, pAddedBuf);
 
 	TEXTBLOCK *pMergedBuf;
