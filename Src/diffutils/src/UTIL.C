@@ -462,9 +462,9 @@ line_cmp (s1, len1, s2, len2)
 
 	  if (ignore_case_flag)
 	    {
-	      if (islower (c1))
+	      if (islower (c1) && (dbcs_codepage == 0 || CharPrevExA(dbcs_codepage, s1, t1, 0) == t1 - 1))
 		c1 = (unsigned char)toupper (c1);
-	      if (islower (c2))
+	      if (islower (c2) && (dbcs_codepage == 0 || CharPrevExA(dbcs_codepage, s2, t2, 0) == t2 - 1))
 		c2 = (unsigned char)toupper (c2);
 	    }
 

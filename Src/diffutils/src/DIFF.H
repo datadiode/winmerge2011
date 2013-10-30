@@ -107,6 +107,9 @@ EXTERN int      ignore_some_changes;
 /* Ignore differences in case of letters (-i).  */
 EXTERN int      ignore_case_flag;
 
+/* DBCS code page, or 0 if source is ASCII or an extension thereof.  */
+EXTERN int      dbcs_codepage;
+
 /* File labels for `-c' output headers (-L).  */
 EXTERN char *file_label[2];
 
