@@ -24,10 +24,10 @@ IDR_DIRDOCTYPE MENU
         MENUITEM SEPARATOR
         MENUITEM "Recent Projects", ID_FILE_MRU_FILE1, INACTIVE
         MENUITEM SEPARATOR
-        MENUITEM "L&eft Read-only", ID_FILE_LEFT_READONLY
-        MENUITEM "Ri&ght Read-only", ID_FILE_RIGHT_READONLY
+        MENUITEM "L&eft Read-only", ID_FILE_LEFT_READONLY, HELP
+        MENUITEM "Ri&ght Read-only", ID_FILE_RIGHT_READONLY, HELP
         MENUITEM SEPARATOR
-        MENUITEM "Collect &Mode\tF9", ID_FILE_COLLECTMODE
+        MENUITEM "Collect &Mode\tF9", ID_FILE_COLLECTMODE, HELP
         MENUITEM SEPARATOR
         MENUITEM "File En&coding", ID_FILE_ENCODING
         MENUITEM SEPARATOR
@@ -41,16 +41,16 @@ IDR_DIRDOCTYPE MENU
     }
     POPUP "&View"
     {
-        MENUITEM "Show &Identical Items", ID_OPTIONS_SHOWIDENTICAL
-        MENUITEM "Show &Different Items", ID_OPTIONS_SHOWDIFFERENT
-        MENUITEM "Show L&eft Unique Items", ID_OPTIONS_SHOWUNIQUELEFT
-        MENUITEM "Show Ri&ght Unique Items", ID_OPTIONS_SHOWUNIQUERIGHT
-        MENUITEM "Show S&kipped Items", ID_OPTIONS_SHOWSKIPPED
-        MENUITEM "S&how Binary Files", ID_OPTIONS_SHOWBINARIES
+        MENUITEM "Show &Identical Items", ID_OPTIONS_SHOWIDENTICAL, HELP
+        MENUITEM "Show &Different Items", ID_OPTIONS_SHOWDIFFERENT, HELP
+        MENUITEM "Show L&eft Unique Items", ID_OPTIONS_SHOWUNIQUELEFT, HELP
+        MENUITEM "Show Ri&ght Unique Items", ID_OPTIONS_SHOWUNIQUERIGHT, HELP
+        MENUITEM "Show S&kipped Items", ID_OPTIONS_SHOWSKIPPED, HELP
+        MENUITEM "S&how Binary Files", ID_OPTIONS_SHOWBINARIES, HELP
         MENUITEM SEPARATOR
         MENUITEM "Show Hidd&en Items", ID_VIEW_SHOWHIDDENITEMS
         MENUITEM SEPARATOR
-        MENUITEM "Tree &Mode", ID_VIEW_TREEMODE
+        MENUITEM "Tree &Mode", ID_VIEW_TREEMODE, HELP
         MENUITEM "E&xpand All Subfolders", ID_VIEW_EXPAND_ALLSUBDIRS
         MENUITEM "&Collapse All Subfolders", ID_VIEW_COLLAPSE_ALLSUBDIRS
         MENUITEM SEPARATOR
@@ -63,8 +63,8 @@ IDR_DIRDOCTYPE MENU
             MENUITEM "&Small", ID_TOOLBAR_SMALL
             MENUITEM "&Big", ID_TOOLBAR_BIG
         }
-        MENUITEM "&Status Bar", ID_VIEW_STATUS_BAR
-        MENUITEM "Ta&b Bar", ID_VIEW_TAB_BAR
+        MENUITEM "&Status Bar", ID_VIEW_STATUS_BAR, HELP
+        MENUITEM "Ta&b Bar", ID_VIEW_TAB_BAR, HELP
         MENUITEM "Comp&are Statistics", ID_VIEW_DIR_STATISTICS
         MENUITEM SEPARATOR
         MENUITEM "&Language...", ID_VIEW_LANGUAGE
@@ -192,7 +192,7 @@ IDR_HEXDOCTYPE MENU
             MENUITEM "&Normal\tCtrl+*", ID_VIEW_ZOOMNORMAL
         }
         MENUITEM SEPARATOR
-        MENUITEM "&Lock Panes", ID_VIEW_RESIZE_PANES
+        MENUITEM "&Lock Panes", ID_VIEW_RESIZE_PANES, HELP
         MENUITEM SEPARATOR
         POPUP "&Toolbar"
         {
@@ -200,8 +200,8 @@ IDR_HEXDOCTYPE MENU
             MENUITEM "&Small", ID_TOOLBAR_SMALL
             MENUITEM "&Big", ID_TOOLBAR_BIG
         }
-        MENUITEM "&Status Bar", ID_VIEW_STATUS_BAR
-        MENUITEM "Ta&b Bar", ID_VIEW_TAB_BAR
+        MENUITEM "&Status Bar", ID_VIEW_STATUS_BAR, HELP
+        MENUITEM "Ta&b Bar", ID_VIEW_TAB_BAR, HELP
         MENUITEM SEPARATOR
         MENUITEM "&Language...", ID_VIEW_LANGUAGE
     }
@@ -291,8 +291,8 @@ IDR_MAINFRAME MENU
             MENUITEM "&Small", ID_TOOLBAR_SMALL
             MENUITEM "&Big", ID_TOOLBAR_BIG
         }
-        MENUITEM "&Status Bar", ID_VIEW_STATUS_BAR
-        MENUITEM "Ta&b Bar", ID_VIEW_TAB_BAR
+        MENUITEM "&Status Bar", ID_VIEW_STATUS_BAR, HELP
+        MENUITEM "Ta&b Bar", ID_VIEW_TAB_BAR, HELP
         MENUITEM SEPARATOR
         MENUITEM "&Language...", ID_VIEW_LANGUAGE
     }
@@ -361,8 +361,8 @@ IDR_MERGEDOCTYPE MENU
         MENUITEM SEPARATOR
         MENUITEM "Print Previe&w", ID_FILE_PRINT_PREVIEW
         MENUITEM SEPARATOR
-        MENUITEM "L&eft Read-only", ID_FILE_LEFT_READONLY
-        MENUITEM "Ri&ght Read-only", ID_FILE_RIGHT_READONLY
+        MENUITEM "L&eft Read-only", ID_FILE_LEFT_READONLY, HELP
+        MENUITEM "Ri&ght Read-only", ID_FILE_RIGHT_READONLY, HELP
         MENUITEM SEPARATOR
         POPUP "&Convert Line Endings to"
         {
@@ -371,7 +371,7 @@ IDR_MERGEDOCTYPE MENU
             MENUITEM "&Mac (CR)", ID_EOL_TO_MAC
         }
         MENUITEM SEPARATOR
-        MENUITEM "&Merge Mode\tF9", ID_FILE_MERGINGMODE
+        MENUITEM "&Merge Mode\tF9", ID_FILE_MERGINGMODE, HELP
         MENUITEM SEPARATOR
         MENUITEM "&File Encoding...", ID_FILE_ENCODING
         MENUITEM SEPARATOR
@@ -466,12 +466,12 @@ IDR_MERGEDOCTYPE MENU
             MENUITEM "&5 Lines", ID_VIEW_CONTEXT_5
         }
         MENUITEM SEPARATOR
-        MENUITEM "&Lock Panes", ID_VIEW_RESIZE_PANES
-        MENUITEM "&View Whitespace", ID_VIEW_WHITESPACE
-        MENUITEM "Vie&w Line Differences", ID_VIEW_LINEDIFFS
-        MENUITEM "View Line &Numbers", ID_VIEW_LINENUMBERS
-        MENUITEM "View &Margins", ID_VIEW_FILEMARGIN
-        MENUITEM "W&rap Lines", ID_VIEW_WORDWRAP
+        MENUITEM "&Lock Panes", ID_VIEW_RESIZE_PANES, HELP
+        MENUITEM "&View Whitespace", ID_VIEW_WHITESPACE, HELP
+        MENUITEM "Vie&w Line Differences", ID_VIEW_LINEDIFFS, HELP
+        MENUITEM "View Line &Numbers", ID_VIEW_LINENUMBERS, HELP
+        MENUITEM "View &Margins", ID_VIEW_FILEMARGIN, HELP
+        MENUITEM "W&rap Lines", ID_VIEW_WORDWRAP, HELP
         MENUITEM SEPARATOR
         MENUITEM "Sw&ap Panes\tCtrl+U", ID_VIEW_SWAPPANES
         MENUITEM SEPARATOR
@@ -481,10 +481,10 @@ IDR_MERGEDOCTYPE MENU
             MENUITEM "&Small", ID_TOOLBAR_SMALL
             MENUITEM "&Big", ID_TOOLBAR_BIG
         }
-        MENUITEM "&Status Bar", ID_VIEW_STATUS_BAR
-        MENUITEM "Ta&b Bar", ID_VIEW_TAB_BAR
-        MENUITEM "Diff &Pane", ID_VIEW_DETAIL_BAR
-        MENUITEM "Lo&cation Pane", ID_VIEW_LOCATION_BAR
+        MENUITEM "&Status Bar", ID_VIEW_STATUS_BAR, HELP
+        MENUITEM "Ta&b Bar", ID_VIEW_TAB_BAR, HELP
+        MENUITEM "Diff &Pane", ID_VIEW_DETAIL_BAR, HELP
+        MENUITEM "Lo&cation Pane", ID_VIEW_LOCATION_BAR, HELP
         MENUITEM SEPARATOR
         MENUITEM "&Language...", ID_VIEW_LANGUAGE
         MENUITEM SEPARATOR
@@ -508,7 +508,7 @@ IDR_MERGEDOCTYPE MENU
         MENUITEM "Copy &All to Right", ID_ALL_RIGHT
         MENUITEM "Cop&y All to Left", ID_ALL_LEFT
         MENUITEM SEPARATOR
-        MENUITEM "&Synchronization Point", ID_SET_SYNCPOINT
+        MENUITEM "&Synchronization Point", ID_SET_SYNCPOINT, HELP
         MENUITEM "Clear Sync&hronization Points", ID_CLEAR_SYNCPOINTS
     }
     POPUP "&Tools"

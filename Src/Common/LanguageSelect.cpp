@@ -862,7 +862,7 @@ void CLanguageSelect::TranslateMenu(HMENU h) const
 		--i;
 		MENUITEMINFO mii;
 		mii.cbSize = sizeof mii;
-		mii.fMask = MIIM_STATE | MIIM_ID | MIIM_SUBMENU | MIIM_STRING;
+		mii.fMask = MIIM_STATE | MIIM_ID | MIIM_SUBMENU | MIIM_STRING | MIIM_FTYPE;
 		TCHAR text[80];
 		mii.dwTypeData = text;
 		mii.cch = _countof(text);
@@ -889,6 +889,11 @@ void CLanguageSelect::TranslateMenu(HMENU h) const
 		{
 			mii.fMask |= MIIM_STRING;
 			mii.dwTypeData = const_cast<LPTSTR>(s.c_str());
+		}
+		if (mii.fType & MFT_RIGHTJUSTIFY)
+		{
+			mii.fMask |= MIIM_BITMAP;
+			mii.dwItemData = ~1U;
 		}
 		::SetMenuItemInfo(h, i, TRUE, &mii);
 		fMask = MIIM_DATA;

@@ -673,7 +673,19 @@ LRESULT CMainFrame::OnWndMsg<WM_DRAWITEM>(WPARAM, LPARAM lParam)
 	UINT uStateMask = LOBYTE(LOWORD(dwOsVer)) < 6 ? ODS_GRAYED : ODS_SELECTED | ODS_GRAYED;
 	if ((lpdis->itemState & uStateMask) == uStateMask)
 		fStyle |= ILD_BLEND;
-	if (lpdis->itemData != ~0)
+	if (lpdis->itemData == ~1U)
+	{
+		DWORD dim = GetMenuCheckMarkDimensions();
+		RECT rc =
+		{
+			1,
+			lpdis->rcItem.top + 1 + (lpdis->rcItem.bottom - lpdis->rcItem.top - HIWORD(dim)) / 2,
+			rc.left + LOWORD(dim),
+			rc.top + HIWORD(dim)
+		};
+		DrawEdge(lpdis->hDC, &rc, EDGE_ETCHED, BF_RECT);
+	}
+	else if (lpdis->itemData != ~0U)
 	{
 		m_imlMenu->Draw(static_cast<int>(lpdis->itemData), lpdis->hDC,
 			lpdis->rcItem.left + GetMenuBitmapExcessWidth() - 16,
@@ -979,6 +991,13 @@ LRESULT CMainFrame::OnWndMsg<WM_INITMENUPOPUP>(WPARAM wParam, LPARAM lParam)
 			{
 				pMenu->EnableMenuItem(mii.wID, MF_DISABLED);
 			}
+			continue;
+		}
+		// Decorate the item for topmost MDI child window with a bullet rather than a check mark
+		if (mii.wID >= 0xFF00)
+		{
+			if (mii.fState & MF_CHECKED)
+				pMenu->CheckMenuRadioItem(mii.wID, mii.wID, mii.wID);
 			continue;
 		}
 		// Handle the CmdState driven cases
