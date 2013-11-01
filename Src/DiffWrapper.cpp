@@ -132,16 +132,7 @@ void CDiffWrapper::SetToDiffUtils()
 	else
 		length_varies = 0;
 
-	// http://msdn.microsoft.com/en-us/library/windows/desktop/dd318667
-	switch (m_codepage)
-	{
-	case 932: case 936: case 949: case 950: case 1361:
-		dbcs_codepage = m_codepage;
-		break;
-	default:
-		dbcs_codepage = 0;
-		break;
-	}
+	dbcs_codepage = isCodepageDBCS(m_codepage);
 
 	// We have no interest changing these values, hard-code them.
 	always_text_flag = 0; // diffutils needs to detect binary files

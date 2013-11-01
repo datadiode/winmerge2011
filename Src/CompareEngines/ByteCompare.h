@@ -32,8 +32,13 @@ public:
 	FileTextStats m_textStats[2];
 
 private:
+	template<class CodePoint>
+	BOOL IsDBCSLeadByteEx(int, CodePoint)
+	{
+		return FALSE;
+	}
 	template<class CodePoint, int CodeShift>
-	unsigned CompareFiles(stl_size_t x = 1, stl_size_t j = 0);
+	unsigned CompareFiles(FileLocation *, stl_size_t x = 1, stl_size_t j = 0);
 	const CDiffContext *const m_pCtxt;
 	HANDLE m_osfhandle[2];
 };

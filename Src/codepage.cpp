@@ -128,3 +128,14 @@ bool isCodepageInstalled(int codepage)
     // but its value will be 0 which means not installed nor supported
 	return (f_codepage_status[codepage] & CP_INSTALLED_FLAG) == CP_INSTALLED_FLAG;
 }
+
+int isCodepageDBCS(int codepage)
+{
+	// http://msdn.microsoft.com/en-us/library/windows/desktop/dd318667
+	switch (codepage)
+	{
+	case 932: case 936: case 949: case 950: case 1361:
+		return codepage;
+	}
+	return 0;
+}

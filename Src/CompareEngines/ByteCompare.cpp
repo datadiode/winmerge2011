@@ -13,6 +13,7 @@
 #include "DiffContext.h"
 #include "DIFF.H"
 #include "ByteCompare.h"
+#include <codepage.h>
 
 using namespace CompareEngines;
 
@@ -49,7 +50,7 @@ enum BLANKNESS_TYPE
 	EOF_0 = 0,
 	EOF_1 = 1,
 	NEITHER = 2,
-//	ZERO = 4,
+	LEADBYTE = 4,
 	BLANK = 8,
 	CR = 16,
 	LF = 32,
@@ -62,14 +63,25 @@ inline bool is_single_bit(unsigned mask)
 	return mask > (mask & mask - 1);
 }
 
+template<>
+BOOL ByteCompare::IsDBCSLeadByteEx<BYTE>(int codepage, BYTE byte)
+{
+	return ::IsDBCSLeadByteEx(codepage, byte);
+}
+
 template<class CodePoint, int CodeShift>
-unsigned ByteCompare::CompareFiles(const stl_size_t x, const stl_size_t j)
+unsigned ByteCompare::CompareFiles(FileLocation *location, const stl_size_t x, const stl_size_t j)
 {
 	char buff[2][CMPBUFF + PADDING];
 	stl_size_t bytes_ahead[2] = { 0, 0 };
 	stl_size_t read_ahead_size[2] = { CMPBUFF, CMPBUFF };
 	unsigned blankness_type[2] = { START, START };
 	unsigned blankness_type_prev[2];
+	int codepage[2] =
+	{
+		isCodepageDBCS(location[0].encoding.m_codepage),
+		isCodepageDBCS(location[1].encoding.m_codepage)
+	};
 	unsigned nocount[2] = { 0, 0 };
 	unsigned *count[2] = { NULL, NULL };
 	stl_size_t advancement[2];
@@ -153,6 +165,14 @@ unsigned ByteCompare::CompareFiles(const stl_size_t x, const stl_size_t j)
 					count[i] = &m_textStats[i].nlfs;
 					blankness_type_prev[i] = BLANK; // Simulate a preceding BLANK.
 					break;
+				default:
+					if (codepage[i] != 0 &&
+						(blankness_type_prev[i] & LEADBYTE) == 0 &&
+						IsDBCSLeadByteEx(codepage[i], c[i]))
+					{
+						blankness_type[i] = LEADBYTE;
+					}
+					break;
 				}
 			}
 		} while (m_osfhandle[i ^= x] != m_osfhandle[j]);
@@ -230,7 +250,10 @@ unsigned ByteCompare::CompareFiles(const stl_size_t x, const stl_size_t j)
 				continue;
 			}
 		}
-		if (c[0] == c[1] || bIgnoreCase && tolower(c[0]) == tolower(c[1]))
+		if (c[0] == c[1] ||
+			bIgnoreCase &&
+			((blankness_type_prev[0] | blankness_type_prev[1]) & LEADBYTE) == 0 &&
+			tolower(c[0]) == tolower(c[1]))
 			continue;
 		diffcode = DIFFCODE::DIFF;
 	}
@@ -270,19 +293,19 @@ unsigned ByteCompare::CompareFiles(FileLocation *location)
 	case CaseLabel<NONE, UTF8>::Value:
 	case CaseLabel<UTF8, NONE>::Value:
 	case CaseLabel<UTF8, UTF8>::Value:
-		code = CompareFiles<BYTE, 0>();
+		code = CompareFiles<BYTE, 0>(location);
 		break;
 	case CaseLabel<UCS2LE, UCS2LE>::Value:
-		code = CompareFiles<WCHAR, 0>();
+		code = CompareFiles<WCHAR, 0>(location);
 		break;
 	case CaseLabel<UCS2BE, UCS2BE>::Value:
-		code = CompareFiles<WCHAR, 8>();
+		code = CompareFiles<WCHAR, 8>(location);
 		break;
 	case CaseLabel<UCS4LE, UCS4LE>::Value:
-		code = CompareFiles<ULONG, 0>();
+		code = CompareFiles<ULONG, 0>(location);
 		break;
 	case CaseLabel<UCS4BE, UCS4BE>::Value:
-		code = CompareFiles<ULONG, 16>();
+		code = CompareFiles<ULONG, 16>(location);
 		break;
 	default:
 		stl_size_t i = 0;
@@ -292,19 +315,19 @@ unsigned ByteCompare::CompareFiles(FileLocation *location)
 			{
 			case NONE:
 			case UTF8:
-				code = CompareFiles<BYTE, 0>(0, i);
+				code = CompareFiles<BYTE, 0>(location, 0, i);
 				break;
 			case UCS2LE:
-				code = CompareFiles<WCHAR, 0>(0, i);
+				code = CompareFiles<WCHAR, 0>(location, 0, i);
 				break;
 			case UCS2BE:
-				code = CompareFiles<WCHAR, 8>(0, i);
+				code = CompareFiles<WCHAR, 8>(location, 0, i);
 				break;
 			case UCS4LE:
-				code = CompareFiles<ULONG, 0>(0, i);
+				code = CompareFiles<ULONG, 0>(location, 0, i);
 				break;
 			case UCS4BE:
-				code = CompareFiles<ULONG, 16>(0, i);
+				code = CompareFiles<ULONG, 16>(location, 0, i);
 				break;
 			}
 			if (code == DIFFCODE::CMPERR || code == DIFFCODE::CMPABORT)

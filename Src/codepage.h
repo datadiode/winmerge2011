@@ -11,5 +11,6 @@ void updateDefaultCodepage(int cpDefaultMode, int customCodepage);
 int getDefaultCodepage();
 
 bool isCodepageInstalled(int codepage);
+int isCodepageDBCS(int codepage);
 
 #endif //__CODEPAGE_H__
