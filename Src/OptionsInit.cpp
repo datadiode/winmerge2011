@@ -202,14 +202,14 @@ void IOptionDef::Parse(LPCTSTR value)
 	switch (type)
 	{
 	case VT_UI1:
-		*u.pByte = static_cast<BYTE>(_ttoi(value));
+		*u.pByte = static_cast<BYTE>(_ttol(value));
 		break;
 	case VT_I4:
 	case VT_UI4:
-		*u.pDWord = _ttoi(value);
+		*u.pDWord = _ttol(value);
 		break;
 	case VT_BOOL:
-		*u.pBool = _ttoi(value) != 0;
+		*u.pBool = _ttol(value) != 0;
 		break;
 	case VT_BSTR:
 		*u.pString = value;

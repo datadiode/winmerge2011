@@ -148,7 +148,7 @@ CExternalArchiveFormat::CExternalArchiveFormat(const Profile &profile, LPCTSTR f
 	{
 		if (int ival = PathParseIconLocation(tmp))
 			m_cchCmdMax = ival;
-		if (int ival = StrToInt(tmp))
+		if (int ival = _ttol(tmp))
 			m_nBulkSize = ival;
 	}
 	if (profile.GetProfileString(format, _T("LongPathPrefix"), tmp, _countof(tmp)))

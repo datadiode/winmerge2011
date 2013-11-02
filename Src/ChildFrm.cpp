@@ -126,7 +126,7 @@ void CChildFrame::OnWMGoto()
 		// Reassign pMergeView because user may have altered the target pane
 		pMergeView = GetView(dlg.m_nFile);
 		pMergeView->SetFocus();
-		nParam = _ttoi(dlg.m_strParam.c_str()) - 1;
+		nParam = _ttol(dlg.m_strParam.c_str()) - 1;
 		if (nParam < 0)
 			nParam = 0;
 		if (dlg.m_nGotoWhat == 0)

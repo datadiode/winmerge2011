@@ -347,7 +347,7 @@ void MergeCmdLineInfo::ParseWinMergeCmdLineInternal(LPCTSTR q)
 				q = EatParam(q, param);
 				if (LPCTSTR match = FindInWordList(param.c_str() + 1, WordListYesNo))
 				{
-					m_nSingleInstance = StrToInt(match);
+					m_nSingleInstance = _ttol(match);
 				}
 			}
 			else
@@ -430,7 +430,7 @@ void MergeCmdLineInfo::ParseWinMergeCmdLineInternal(LPCTSTR q)
 		else if (param == _T("cp"))
 		{
 			q = EatParam(q, param);
-			m_nCodepage = _ttoi(param.c_str());
+			m_nCodepage = _ttol(param.c_str());
 		}
 		else if (param == _T("ignorews"))
 		{
