@@ -21,9 +21,6 @@
 /** 
  * @file  codepage.cpp
  */
-// RCS ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "LanguageSelect.h" // for CLanguageSelect::GetLangId()
 #include "FileLocation.h"
@@ -84,8 +81,7 @@ int getDefaultCodepage()
  */
 static BOOL CALLBACK EnumInstalledCodePagesProc(LPTSTR lpCodePageString)
 {
-	int codepage = _ttol(lpCodePageString);
-	if (codepage)
+	if (int codepage = _ttol(lpCodePageString))
 	{
 		f_codepage_status[codepage] |= CP_INSTALLED_FLAG;
 	}
@@ -97,8 +93,7 @@ static BOOL CALLBACK EnumInstalledCodePagesProc(LPTSTR lpCodePageString)
  */
 static BOOL CALLBACK EnumSupportedCodePagesProc(LPTSTR lpCodePageString)
 {
-	int codepage = _ttol(lpCodePageString);
-	if (codepage)
+	if (int codepage = _ttol(lpCodePageString))
 	{
 		f_codepage_status[codepage] |= CP_SUPPORTED_FLAG;
 	}
@@ -124,18 +119,12 @@ static void initialize()
 bool isCodepageInstalled(int codepage)
 {
 	initialize();
-    // the following line will insert an extra element in the map if not already present
-    // but its value will be 0 which means not installed nor supported
-	return (f_codepage_status[codepage] & CP_INSTALLED_FLAG) == CP_INSTALLED_FLAG;
+	stl::map<int, int>::iterator it = f_codepage_status.find(codepage);
+	return it != f_codepage_status.end() && (it->second & CP_INSTALLED_FLAG) != 0;
 }
 
 int isCodepageDBCS(int codepage)
 {
-	// http://msdn.microsoft.com/en-us/library/windows/desktop/dd318667
-	switch (codepage)
-	{
-	case 932: case 936: case 949: case 950: case 1361:
-		return codepage;
-	}
-	return 0;
+	CPINFO cpinfo;
+	return GetCPInfo(codepage, &cpinfo) && cpinfo.LeadByte[0] != 0 ? codepage : 0;
 }
