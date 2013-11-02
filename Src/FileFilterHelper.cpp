@@ -155,7 +155,21 @@ bool FileFilterHelper::CreateFromMask()
 		case '?':
 			regExp += _T('.');
 			break;
-		case '.': case '^': case '$':
+		case '.':
+			if (lentoken == 1 || lentoken == 2 && *mask == '*')
+			{
+				if (regExp.back() == '*')
+				{
+					regExp.replace(regExp.length() - 2, 1, _T("[^.]"));
+				}
+				regExp += _T("\\.?");
+			}
+			else
+			{
+				regExp += _T("\\.");
+			}
+			break;
+		case '+': case '^': case '$':
 		case '(': case '[': case '{':
 		case ')': case ']': case '}':
 		case '\\': 
