@@ -105,9 +105,9 @@ void FilterList::AddRegExp(LPCTSTR regularExpression)
 	if (int len = static_cast<int>(_tcslen(regularExpression)))
 	{
 		regexp_item item;
-		if (const char *octets = item.assign(regularExpression, len))
+		if (item.assign(regularExpression, len))
 		{
-			if (octets[len] != '\0')
+			if (item.options & PCRE_UTF8)
 				m_utf8 = true;
 			m_list.push_back(item);
 		}
@@ -241,7 +241,10 @@ bool FilterList::Match(int stringlen, const char *string, int codepage)
 	ucr::buffer buf(0);
 	if (m_utf8 && codepage != CP_UTF8)
 	{
-		buf.resize(stringlen * 2);
+		// If a codepage exists which defines a single byte character that maps
+		// to a surrogate pair, transcoding to UTF-16 might grow the data size
+		// by a factor of 4.
+		buf.resize(stringlen * 4);
 		ucr::convert(NONE, codepage, (const unsigned char *)string, 
 				stringlen, UTF8, CP_UTF8, &buf);
 		string = (const char *)buf.ptr;
