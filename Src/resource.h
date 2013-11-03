@@ -336,11 +336,9 @@
 #define IDC_AFFECTS_RIGHT_BTN                   1244
 #define IDC_LOAD_FILES_LABEL                    1246
 #define IDC_LOAD_CODEPAGE_TEXTBOX               1247
-#define IDC_LOAD_CODEPAGE_BROWSE                1248
 #define IDC_LOAD_SAVE_SAME_CODEPAGE             1249
 #define IDC_SAVE_FILES_LABEL                    1250
 #define IDC_SAVE_CODEPAGE_TEXTBOX               1251
-#define IDC_SAVE_CODEPAGE_BROWSE                1252
 #define IDC_CODEPAGE_GROUP                      1253
 #define IDC_LEFT_FILES_LABEL                    1260
 #define IDC_RIGHT_FILES_LABEL                   1261

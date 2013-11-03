@@ -128,3 +128,9 @@ int isCodepageDBCS(int codepage)
 	CPINFO cpinfo;
 	return GetCPInfo(codepage, &cpinfo) && cpinfo.LeadByte[0] != 0 ? codepage : 0;
 }
+
+const stl::map<int, int> &codepage_status()
+{
+	initialize();
+	return f_codepage_status;
+}

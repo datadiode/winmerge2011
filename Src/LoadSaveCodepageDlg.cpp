@@ -12,6 +12,7 @@
 #include "MainFrm.h"
 #include "resource.h"
 #include "LoadSaveCodepageDlg.h"
+#include "codepage.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -38,9 +39,7 @@ CLoadSaveCodepageDlg::CLoadSaveCodepageDlg()
 		IDC_RIGHT_FILES_LABEL,		BY<1000>::X2R,
 		IDC_CODEPAGE_GROUP,			BY<1000>::X2R,
 		IDC_LOAD_CODEPAGE_TEXTBOX,	BY<1000>::X2R,
-		IDC_LOAD_CODEPAGE_BROWSE,	BY<1000>::X2L | BY<1000>::X2R,
 		IDC_SAVE_CODEPAGE_TEXTBOX,	BY<1000>::X2R,
-		IDC_SAVE_CODEPAGE_BROWSE,	BY<1000>::X2L | BY<1000>::X2R,
 		IDOK,						BY<1000>::X2L | BY<1000>::X2R,
 		IDCANCEL,					BY<1000>::X2L | BY<1000>::X2R,
 		0
@@ -105,9 +104,28 @@ BOOL CLoadSaveCodepageDlg::OnInitDialog()
 	UpdateData<Set>();
 	UpdateSaveGroup();
 
-	// TODO: Implement browse
-	GetDlgItem(IDC_LOAD_CODEPAGE_BROWSE)->EnableWindow(FALSE); // browse not yet implemented
-	GetDlgItem(IDC_SAVE_CODEPAGE_BROWSE)->EnableWindow(FALSE); // browse not yet implemented
+	HComboBox *pCbLoadCodepage = static_cast<HComboBox *>(GetDlgItem(IDC_LOAD_CODEPAGE_TEXTBOX));
+	HComboBox *pCbSaveCodepage = static_cast<HComboBox *>(GetDlgItem(IDC_SAVE_CODEPAGE_TEXTBOX));
+
+	const stl::map<int, int> &f_codepage_status = codepage_status();
+	stl::map<int, int>::const_iterator it = f_codepage_status.begin();
+	while (it != f_codepage_status.end())
+	{
+		CPINFOEX info;
+		int codepage = it->first;
+		if (GetCPInfoEx(codepage, 0, &info))
+		{
+			TCHAR desc[300];
+			wsprintf(desc, _T("%05d - %s"), codepage, info.CodePageName);
+			int index = pCbLoadCodepage->AddString(desc);
+			if (codepage == m_nLoadCodepage)
+				pCbLoadCodepage->SetCurSel(index);
+			index = pCbSaveCodepage->AddString(desc);
+			if (codepage == m_nSaveCodepage)
+				pCbSaveCodepage->SetCurSel(index);
+		}
+		++it;
+	}
 
 	return TRUE;
 }
@@ -139,7 +157,6 @@ void CLoadSaveCodepageDlg::UpdateSaveGroup()
 	GetDlgItem(IDC_LOAD_SAVE_SAME_CODEPAGE)->EnableWindow(m_bEnableSaveCodepage);
 	bool EnableSave = m_bEnableSaveCodepage && !m_bLoadSaveSameCodepage;
 	GetDlgItem(IDC_SAVE_CODEPAGE_TEXTBOX)->EnableWindow(EnableSave);
-	GetDlgItem(IDC_SAVE_CODEPAGE_BROWSE)->EnableWindow(EnableSave);
 }
 
 /**

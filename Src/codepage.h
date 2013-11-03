@@ -7,6 +7,8 @@
 #ifndef __CODEPAGE_H__
 #define __CODEPAGE_H__
 
+const stl::map<int, int> &codepage_status();
+
 void updateDefaultCodepage(int cpDefaultMode, int customCodepage);
 int getDefaultCodepage();
 
