@@ -170,6 +170,7 @@ public:
 
 // Attributes
 public:
+	CChildFrame *const m_pOpener;
 	CDiffTextBuffer *m_ptBuf[2]; /**< Left/Right side text buffer */
 	static const int m_nBuffers = 2; /**< Takashi's code is 3-way aware */
 
@@ -268,7 +269,6 @@ private:
 	stl::vector<DiffFileInfo> m_pSaveFileInfo;
 	stl::vector<DiffFileInfo> m_pRescanFileInfo;
 
-	CChildFrame *const m_pOpener;
 	bool m_bEditAfterRescan[2]; /**< Left/right doc edited after rescanning */
 	bool m_bInitialReadOnly[2]; /**< Left/right doc initial read-only state */
 	bool m_bMergingMode; /**< Merging or Edit mode */

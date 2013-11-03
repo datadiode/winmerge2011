@@ -2756,17 +2756,21 @@ bool CMainFrame::SelectFilter()
 bool CMainFrame::CloseDocFrame(CDocFrame *pDocFrame)
 {
 	// Close DocFrame, then move MainFrame out of the way.
-	CDirFrame *pDirFrame = NULL;
+	CDocFrame *pOpener = NULL;
 	switch (pDocFrame->GetFrameType())
 	{
 	case FRAME_FILE:
+		pOpener = static_cast<CChildFrame *>(pDocFrame)->m_pOpener;
+		if (pOpener != NULL)
+			break;
+		// fall through
 	case FRAME_BINARY:
-		pDirFrame = static_cast<CEditorFrame *>(pDocFrame)->m_pDirDoc;
+		pOpener = static_cast<CEditorFrame *>(pDocFrame)->m_pDirDoc;
 		break;
 	}
 	pDocFrame->SendMessage(WM_CLOSE);
 	CDocFrame *const pActiveDocFrame = GetActiveDocFrame();
-	if (pActiveDocFrame == pDocFrame || pDirFrame && pActiveDocFrame == pDirFrame)
+	if (pActiveDocFrame == pDocFrame || pOpener && pActiveDocFrame == pOpener)
 		return false;
 	PostMessage(WM_SYSCOMMAND,
 		pActiveDocFrame || m_bRemotelyInvoked ? SC_PREVWINDOW : SC_CLOSE);
