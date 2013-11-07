@@ -38,7 +38,7 @@
 class EDITPADC_CLASS CCrystalEditView
 	: public CCrystalTextView
 	, public IDropTarget
-  {
+{
 
 public:
     int m_nLastReplaceLen;
@@ -102,7 +102,7 @@ public:
     virtual TextDefinition *DoSetTextType(TextDefinition *def);
 
     // Implementation
-protected :
+protected:
     // Generated message map functions
     bool m_bMergeUndo;
 public:
@@ -123,4 +123,5 @@ public:
 	void OnEditGotoLastChange();
 	void OnEditDeleteWord();
 	void OnEditDeleteWordBack();
-  };
+	void OnEditRightToLeft();
+};

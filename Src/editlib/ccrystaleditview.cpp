@@ -1490,3 +1490,88 @@ void CCrystalEditView::OnEditDeleteWordBack()
 		MoveWordLeft(TRUE);
 	}
 }
+
+void CCrystalEditView::OnEditRightToLeft()
+{
+	POINT ptStart, ptEnd;
+	GetSelection(ptStart, ptEnd);
+	// The selection must not include line endings
+	if (ptStart.y != ptEnd.y)
+		return;
+	String text;
+	GetText(ptStart, ptEnd, text);
+	ptStart = TextToClient(ptStart);
+	ClientToScreen(&ptStart);
+	HEdit *const pEdit = HEdit::Create(WS_POPUP | WS_BORDER | ES_AUTOHSCROLL,
+		0, 0, 16000, 16000, NULL, 0, text.c_str(), WS_EX_TOOLWINDOW);
+	if (!QueryEditable())
+		pEdit->SetReadOnly(TRUE);
+	HFont *const pFont = GetFont();
+	pEdit->SetFont(pFont);
+	RECT rcInner;
+	pEdit->GetRect(&rcInner);
+	ptStart.x -= rcInner.left;
+	ptStart.y -= rcInner.top;
+	if (ptStart.x < 0)
+		ptStart.x = 0;
+	pEdit->SetFocus();
+	pEdit->SetSel(0, text.length());
+	BOOL bEffective = FALSE;
+	BOOL bModified = TRUE;
+	do
+	{
+		if (bModified)
+		{
+			pEdit->UpdateWindow();
+			pEdit->GetWindowText(text);
+			if (HSurface *const pDC = pEdit->GetDC())
+			{
+				pDC->SelectObject(pFont);
+				SIZE size = { 0, 0 };
+				if (pDC->GetTextExtent(text.c_str(), text.length(), &size))
+				{
+					size.cx += 2 * rcInner.left;
+					size.cy = GetLineHeight() + 2 * rcInner.top;
+					int limit = GetSystemMetrics(SM_CXSCREEN);
+					if (size.cx > limit)
+						size.cx = limit;
+					limit -= size.cx;
+					int left = ptStart.x;
+					if (left > limit)
+						left = limit;
+					pEdit->SetWindowPos(NULL,
+						left, ptStart.y, size.cx, size.cy, SWP_SHOWWINDOW);
+					int nStart, nEnd;
+					pEdit->GetSel(nStart, nEnd);
+					if (nEnd == pEdit->GetWindowTextLength())
+					{
+						pEdit->SetSel(0, 0);
+						pEdit->SetSel(nStart, nEnd);
+					}
+				}
+				pEdit->ReleaseDC(pDC);
+			}
+			pEdit->SetModify(FALSE);
+		}
+		MSG msg;
+		if (!GetMessage(&msg, NULL, 0, 0))
+			break;
+		if (msg.message == WM_KEYDOWN)
+		{
+			if (msg.wParam == VK_ESCAPE)
+				break;
+			if (msg.wParam == VK_RETURN)
+			{
+				if (bEffective)
+					ReplaceSelection(text.c_str(), text.length(), 0);
+				break;
+			}
+		}
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+		bModified = pEdit->GetModify();
+		if (bModified)
+			bEffective = TRUE;
+	} while (HWindow::GetFocus() == pEdit);
+	pEdit->DestroyWindow();
+}

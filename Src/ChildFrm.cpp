@@ -120,7 +120,7 @@ void CChildFrame::OnWMGoto()
 	dlg.m_nFile = pMergeView->m_nThisPane;
 	POINT pos = pMergeView->GetCursorPos();
 	int nParam = m_ptBuf[dlg.m_nFile]->ComputeRealLine(pos.y);
-	dlg.m_strParam = string_format(_T("%d"), nParam + 1);
+	dlg.m_strParam = NumToStr(nParam + 1, 10);
 	if (LanguageSelect.DoModal(dlg) == IDOK)
 	{
 		// Reassign pMergeView because user may have altered the target pane
@@ -450,6 +450,9 @@ LRESULT CChildFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 		break;
 	case ID_FILE_OPEN_WITH:
 		OnOpenFileWith();
+		break;
+	case ID_EDIT_RIGHT_TO_LEFT:
+		pTextView->OnEditRightToLeft();
 		break;
 	case ID_EDIT_TOGGLE_BOOKMARK:
 		pActiveView->OnToggleBookmark();

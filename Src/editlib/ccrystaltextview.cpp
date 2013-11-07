@@ -981,9 +981,9 @@ void CCrystalTextView::DrawLineHelper(
 		{
 			nSelBegin = m_ptDrawSelStart.x - ptTextPos.x;
 			if (nSelBegin < 0)
-			nSelBegin = 0;
+				nSelBegin = 0;
 			if (nSelBegin > nCount)
-			nSelBegin = nCount;
+				nSelBegin = nCount;
 		}
 		if (m_ptDrawSelEnd.y > ptTextPos.y)
 		{
@@ -2273,7 +2273,7 @@ int CCrystalTextView::GetSubLineCount()
 	// calculate number of sub lines
 	if (nLineCount <= 0)
 		return 0;
-	return CCrystalTextView::GetSubLineIndex(nLineCount - 1) + GetSubLines(nLineCount - 1);
+	return GetSubLineIndex(nLineCount - 1) + GetSubLines(nLineCount - 1);
 }
 
 int CCrystalTextView::GetSubLineIndex(int nLineIndex)
@@ -2752,45 +2752,35 @@ POINT CCrystalTextView::TextToClient(const POINT &point)
 {
 	ASSERT_VALIDTEXTPOS(point);
 	LPCTSTR pszLine = GetLineChars(point.y);
-
-	POINT pt;
 	//BEGIN SW
 	POINT charPoint;
 	int nSubLineStart = CharPosToPoint(point.y, point.x, charPoint);
 	charPoint.y += GetSubLineIndex(point.y);
-
 	// compute y-position
-	pt.y = (charPoint.y - m_nTopSubLine) * GetLineHeight();
-
-	// if pt.x is null, we know the result
-	if (charPoint.x == 0)
+	POINT pt = { 0, (charPoint.y - m_nTopSubLine) * GetLineHeight() };
+	if (charPoint.x != 0)
 	{
-		pt.x = GetMarginWidth();
-		return pt;
-	}
-
-	// we have to calculate x-position
-	int	nPreOffset = 0;
-	/*ORIGINAL
-	pt.y = (point.y - m_nTopLine) * GetLineHeight();
-	*/
-	//END SW
-	pt.x = 0;
-	int nTabSize = GetTabSize();
-	for (int nIndex = 0; nIndex < point.x; nIndex++)
-	{
-		//BEGIN SW
-		if (nIndex == nSubLineStart)
-			nPreOffset = pt.x;
+		// we have to calculate x-position
+		int	nPreOffset = 0;
+		/*ORIGINAL
+		pt.y = (point.y - m_nTopLine) * GetLineHeight();
+		*/
 		//END SW
-		pt.x += pszLine[nIndex] == _T('\t') ?
-			nTabSize - pt.x % nTabSize :
-			GetCharWidthFromDisplayableChar(pszLine + nIndex);
+		int nTabSize = GetTabSize();
+		for (int nIndex = 0; nIndex < point.x; nIndex++)
+		{
+			//BEGIN SW
+			if (nIndex == nSubLineStart)
+				nPreOffset = pt.x;
+			//END SW
+			pt.x += pszLine[nIndex] == _T('\t') ?
+				nTabSize - pt.x % nTabSize :
+				GetCharWidthFromDisplayableChar(pszLine + nIndex);
+		}
+		//BEGIN SW
+		pt.x -= nPreOffset;
+		//END SW
 	}
-	//BEGIN SW
-	pt.x -= nPreOffset;
-	//END SW
-
 	pt.x = (pt.x - m_nOffsetChar) * GetCharWidth() + GetMarginWidth();
 	return pt;
 }

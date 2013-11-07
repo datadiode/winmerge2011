@@ -903,6 +903,7 @@
 #define ID_EDIT_CLEAR_ALL_BOOKMARKS             33118
 #define ID_DEBUG_RESETOPTIONS                   33119
 #define ID_VIEW_FILEMARGIN                      33120
+#define ID_EDIT_RIGHT_TO_LEFT                   33121
 #define ID_COLORSCHEME_FIRST                    33122
 #define ID_COLORSCHEME_PLAIN                    33122 // = ID_COLORSCHEME_FIRST
 #define ID_COLORSCHEME_ASP                      33123
