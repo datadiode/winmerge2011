@@ -1516,6 +1516,8 @@ void CCrystalEditView::OnEditRightToLeft()
 		ptStart.x = 0;
 	pEdit->SetFocus();
 	pEdit->SetSel(0, text.length());
+	RECT rcDesktop;
+	H2O::GetDesktopWorkArea(m_hWnd, &rcDesktop);
 	BOOL bEffective = FALSE;
 	BOOL bModified = TRUE;
 	do
@@ -1527,27 +1529,31 @@ void CCrystalEditView::OnEditRightToLeft()
 			if (HSurface *const pDC = pEdit->GetDC())
 			{
 				pDC->SelectObject(pFont);
-				SIZE size = { 0, 0 };
-				if (pDC->GetTextExtent(text.c_str(), text.length(), &size))
+				DWORD dim = pDC->GetTabbedTextExtent(text.c_str(), text.length());
+				SIZE size = { LOWORD(dim) + 2 * rcInner.left, GetLineHeight() + 2 * rcInner.top };
+				int limit = rcDesktop.right - rcDesktop.left;
+				if (size.cx > limit)
+					size.cx = limit;
+				int left = ptStart.x;
+				if (left < rcDesktop.left)
+					left = rcDesktop.left;
+				limit = rcDesktop.right - size.cx;
+				if (left > limit)
+					left = limit;
+				pEdit->SetWindowPos(NULL, left, ptStart.y, size.cx, size.cy, SWP_SHOWWINDOW);
+				// Dynamic resizing interferes with the edit control's auto-scroll facility.
+				// Trick it into scrolling appropriately by moving the caret back and forth.
+				int nStart, nEnd;
+				pEdit->GetSel(nStart, nEnd);
+				if (nStart == nEnd)
 				{
-					size.cx += 2 * rcInner.left;
-					size.cy = GetLineHeight() + 2 * rcInner.top;
-					int limit = GetSystemMetrics(SM_CXSCREEN);
-					if (size.cx > limit)
-						size.cx = limit;
-					limit -= size.cx;
-					int left = ptStart.x;
-					if (left > limit)
-						left = limit;
-					pEdit->SetWindowPos(NULL,
-						left, ptStart.y, size.cx, size.cy, SWP_SHOWWINDOW);
-					int nStart, nEnd;
-					pEdit->GetSel(nStart, nEnd);
-					if (nEnd == pEdit->GetWindowTextLength())
-					{
-						pEdit->SetSel(0, 0);
-						pEdit->SetSel(nStart, nEnd);
-					}
+					nEnd = pEdit->GetWindowTextLength();
+					pEdit->SetRedraw(FALSE);
+					pEdit->SetSel(0, 0);
+					pEdit->SetSel(nEnd, nEnd);
+					pEdit->SetSel(nStart, nStart);
+					pEdit->SetRedraw(TRUE);
+					pEdit->Invalidate();
 				}
 				pEdit->ReleaseDC(pDC);
 			}
@@ -1568,7 +1574,14 @@ void CCrystalEditView::OnEditRightToLeft()
 			}
 		}
 		TranslateMessage(&msg);
-		DispatchMessage(&msg);
+		if (msg.message == WM_CHAR && msg.wParam == VK_TAB)
+		{
+			pEdit->ReplaceSel(reinterpret_cast<LPCTSTR>(&msg.wParam), TRUE);
+		}
+		else
+		{
+			DispatchMessage(&msg);
+		}
 		bModified = pEdit->GetModify();
 		if (bModified)
 			bEffective = TRUE;

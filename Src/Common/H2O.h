@@ -1143,6 +1143,10 @@ namespace H2O
 		{
 			return ::GetTextExtentPoint32(m_hDC, pch, cch, size);
 		}
+		DWORD GetTabbedTextExtent(LPCTSTR pch, int cch, int nTabStops = 0, const INT *rgTabStops = NULL)
+		{
+			return ::GetTabbedTextExtent(m_hDC, pch, cch, nTabStops, rgTabStops);
+		}
 		BOOL GetCharWidth(UINT firstChar, UINT lastChar, INT *buffer)
 		{
 			return ::GetCharWidth32(m_hDC, firstChar, lastChar, buffer);
