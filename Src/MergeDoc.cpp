@@ -2233,8 +2233,10 @@ void CChildFrame::SetEditedAfterRescan(int nBuffer)
  */
 void CChildFrame::SetTitle()
 {
-	string_format sTitle(_T("%s - %s"),
+	string_format sTitle(_T("%s%s - %s%s"),
+		&_T("\0* ")[m_ptBuf[0]->IsModified()],
 		!m_strDesc[0].empty() ? m_strDesc[0].c_str() : PathFindFileName(m_strPath[0].c_str()),
+		&_T("\0* ")[m_ptBuf[1]->IsModified()],
 		!m_strDesc[1].empty() ? m_strDesc[1].c_str() : PathFindFileName(m_strPath[1].c_str()));
 	SetWindowText(sTitle.c_str());
 }
