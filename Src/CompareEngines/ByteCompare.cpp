@@ -177,7 +177,7 @@ unsigned ByteCompare::CompareFiles(FileLocation *location, const stl_size_t x, c
 			}
 		} while (m_osfhandle[i ^= x] != m_osfhandle[j]);
 		int mask = blankness_type[0] | blankness_type[1];
-		if (mask != NEITHER)
+		if (mask & ~(NEITHER | LEADBYTE))
 		{
 			// Check for possible end-of-file conditions.
 			switch (mask)
