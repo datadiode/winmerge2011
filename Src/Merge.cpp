@@ -250,6 +250,7 @@ HRESULT CMergeApp::InitInstance()
 			// to delete temp files this makes sure they are removed.
 			CleanupWMtemp();
 
+			charsets_init();
 			// Locate the supplement folder and read the Supplement.ini
 			InitializeSupplements();
 			// Load file filters from both program and supplement folder
@@ -315,7 +316,7 @@ int CMergeApp::ExitInstance(HRESULT hr)
 		// Deallocate custom parser associations
 		CCrystalTextView::FreeParserAssociations();
 		CCrystalTextView::FreeSharedResources();
-		charsets_cleanup();
+		charsets_term();
 		// Remove tempfolder
 		ClearTempfolder(env_GetTempPath());
 	}

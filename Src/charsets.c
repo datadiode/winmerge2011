@@ -992,16 +992,6 @@ static int SortCompareByCodePage(const void *elem1, const void *elem2)
 static struct _charsetInfo const *FindByName(const char *name)
 {
 	struct _charsetInfo const *info = NULL;
-	if (index1 == NULL)
-	{
-		size_t i;
-		index1 = (struct _charsetInfo **)calloc(numCharsetInfo, sizeof(void *));
-		for (i = numCharsetInfo ; i-- ; )
-		{
-			index1[i] = charsetInfo + i;
-		}
-		qsort((void*)index1, numCharsetInfo, sizeof(void *), CompareByName);
-	}
 	if (index1 && name)
 	{
 		struct _charsetInfo const key = {0, name, 0, no};
@@ -1018,15 +1008,6 @@ static struct _charsetInfo const *FindByName(const char *name)
 static struct _charsetInfo const *FindById(unsigned id)
 {
 	size_t numIndex = charsetInfo[numCharsetInfo - 1].id + 1;
-	if (index2 == NULL)
-	{
-		size_t i;
-		index2 = (struct _charsetInfo **)calloc(numIndex, sizeof(void *));
-		for (i = numCharsetInfo ; i-- ; )
-		{
-			index2[charsetInfo[i].id] = charsetInfo + i;
-		}
-	}
 	return index2 && id < numIndex ? index2[id] : NULL;
 }
 
@@ -1034,16 +1015,6 @@ static struct _charsetInfo const *FindByCodePage(unsigned codepage)
 {
 	struct _charsetInfo const *info = NULL;
 	size_t numIndex = charsetInfo[numCharsetInfo - 1].id + 1;
-	if (index3 == NULL)
-	{
-		size_t i;
-		index3 = (struct _charsetInfo **)calloc(numIndex, sizeof(void *));
-		for (i = numCharsetInfo + 1 ; i-- ; )
-		{
-			index3[charsetInfo[i].id] = charsetInfo + i;
-		}
-		qsort((void*)index3, numIndex, sizeof(void *), SortCompareByCodePage);
-	}
 	if (index3 && codepage)
 	{
 		struct _charsetInfo const key = {0, 0, codepage, no};
@@ -1057,25 +1028,35 @@ static struct _charsetInfo const *FindByCodePage(unsigned codepage)
 	return info;
 }
 
-void charsets_cleanup(void)
+void charsets_init(void)
 {
-	if (index1)
+	size_t i;
+	const size_t numIndex = charsetInfo[numCharsetInfo - 1].id + 1;
+	index1 = (struct _charsetInfo **)calloc(numCharsetInfo, sizeof(void *));
+	for (i = numCharsetInfo ; i-- ; )
 	{
-		free((void *)index1);
-		index1 = NULL;
+		index1[i] = charsetInfo + i;
 	}
-	if (index2)
+	qsort((void *)index1, numCharsetInfo, sizeof(void *), CompareByName);
+	index2 = (struct _charsetInfo **)calloc(numIndex, sizeof(void *));
+	for (i = numCharsetInfo ; i-- ; )
 	{
-		free((void *)index2);
-		index2 = NULL;
+		index2[charsetInfo[i].id] = charsetInfo + i;
 	}
-	if (index3)
+	index3 = (struct _charsetInfo **)calloc(numIndex, sizeof(void *));
+	for (i = numCharsetInfo + 1 ; i-- ; )
 	{
-		free((void *)index3);
-		index3 = NULL;
+		index3[charsetInfo[i].id] = charsetInfo + i;
 	}
+	qsort((void *)index3, numIndex, sizeof(void *), SortCompareByCodePage);
 }
 
+void charsets_term(void)
+{
+	free((void *)index1);
+	free((void *)index2);
+	free((void *)index3);
+}
 
 unsigned GetEncodingIdFromName(const char *name)
 {
