@@ -74,6 +74,13 @@ public:
 	String GetRightPath(CDiffContext *) const;
 	void Reset();
 	static RESULT GetColImage(const DIFFITEM *);
+	bool MsgWait() const
+	{
+		// MsgWaitForMultipleObjects() is expensive so avoid it if possible
+		if (paused)
+			MsgWaitForMultipleObjects(1, &m_hEvent, FALSE, INFINITE, QS_ALLINPUT);
+		return paused;
+	}
 	void Wait() const
 	{
 		// WaitForSingleObject() is expensive so avoid it if possible

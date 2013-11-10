@@ -128,12 +128,10 @@ public:
 
 	const DWORD m_dwContext; /**< Context code used with CLearCase mrgman files */
 
-	FolderCmp m_folderCmp;
-
 	bool UpdateDiffItem(DIFFITEM *);
-	void CompareDiffItem(DIFFITEM *);
+	void CompareDiffItem(FolderCmp &, DIFFITEM *);
 // creation and use, called on main thread
-	UINT CompareDirectories(bool bOnlyRequested);
+	void CompareDirectories(bool bOnlyRequested);
 
 // runtime interface for main thread, called on main thread
 	bool IsBusy() const { return m_hSemaphore != NULL; }
@@ -148,6 +146,9 @@ private:
 	HANDLE m_hSemaphore; /**< Semaphore for synchronizing threads. */
 	CompareStats *const m_pCompareStats; /**< Pointer to compare statistics */
 	HWindow *const m_pWindow; /**< Window getting status updates. */
+	DIFFITEM *m_diCompareThread;
+	CRITICAL_SECTION m_csCompareThread;
+	LONG m_nCompareThreads;
 	bool m_bAborting; /**< Is compare aborting? */
 	bool m_bOnlyRequested; /**< Compare only requested items? */
 	const int m_nRecursive; /**< Do we include subfolders to compare? */
@@ -161,10 +162,10 @@ private:
 		int depth, DIFFITEM *parent);
 	DIFFITEM *AddToList(const String &sLeftDir, const String &sRightDir,
 		const DirItem *lent, const DirItem *rent, UINT code, DIFFITEM *parent);
-	void SetDiffItemStats(DIFFITEM *);
+	void SetDiffItemStats(const FolderCmp &, DIFFITEM *);
 	void StoreDiffData(const DIFFITEM *);
-	int DirScan_CompareItems(DIFFITEM *parent);
-	int DirScan_CompareRequestedItems(DIFFITEM *parent);
+	void DirScan_CompareItems();
+	void DirScan_CompareRequestedItems();
 
 	typedef stl::vector<DirItem> DirItemArray;
 
