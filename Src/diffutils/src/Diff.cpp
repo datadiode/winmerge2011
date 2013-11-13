@@ -45,11 +45,4 @@ static char THIS_FILE[] = __FILE__;
 #define GUTTER_WIDTH_MINIMUM 3
 #endif
 
-
-
-/* Nonzero for -r: if comparing two directories,
-   compare their common subdirectories recursively.  */
-
-int recursive;
-
 const char allocated_buffer_name[] = "<allocated_buffer>";

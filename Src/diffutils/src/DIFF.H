@@ -37,9 +37,9 @@ extern "C" {
 /* Variables for command line options */
 
 #ifndef GDIFF_MAIN
-#define EXTERN extern /*__declspec(thread)*/
+#define EXTERN extern THREAD_LOCAL
 #else
-#define EXTERN /*__declspec(thread)*/
+#define EXTERN THREAD_LOCAL
 #endif
 
 enum output_style {

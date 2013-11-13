@@ -43,11 +43,9 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-extern int recursive;
-
 static void CopyTextStats(const file_data *, FileTextStats *);
 
-CDiffWrapper *CDiffWrapper::m_pActiveInstance = NULL;
+THREAD_LOCAL CDiffWrapper *CDiffWrapper::m_pActiveInstance = NULL;
 
 PATCHOPTIONS::PATCHOPTIONS()
 	: outputStyle(OUTPUT_NORMAL)
@@ -138,7 +136,6 @@ void CDiffWrapper::SetToDiffUtils()
 	always_text_flag = 0; // diffutils needs to detect binary files
 	horizon_lines = 0;
 	heuristic = 1;
-	recursive = 0;
 }
 
 void CDiffWrapper::RefreshFilters()

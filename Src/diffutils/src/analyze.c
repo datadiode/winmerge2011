@@ -33,19 +33,18 @@ the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.  */
 #include "diff.h"
 #include "cmpbuf.h"
 
-int no_discards;
-int need_free_buffers=0;
+THREAD_LOCAL int no_discards;
 
-static int *xvec, *yvec;	/* Vectors being compared. */
-static int *fdiag;		/* Vector, indexed by diagonal, containing
+static THREAD_LOCAL int *xvec, *yvec;	/* Vectors being compared. */
+static THREAD_LOCAL int *fdiag;		/* Vector, indexed by diagonal, containing
 				   1 + the X coordinate of the point furthest
 				   along the given diagonal in the forward
 				   search of the edit matrix. */
-static int *bdiag;		/* Vector, indexed by diagonal, containing
+static THREAD_LOCAL int *bdiag;		/* Vector, indexed by diagonal, containing
 				   the X coordinate of the point furthest
 				   along the given diagonal in the backward
 				   search of the edit matrix. */
-static int too_expensive;	/* Edit scripts longer than this are too
+static THREAD_LOCAL int too_expensive;	/* Edit scripts longer than this are too
 				   expensive to compute.  */
 
 #define SNAKE_LIMIT 20	/* Snakes bigger than this are considered `big'.  */

@@ -14,3 +14,5 @@
 #define HAVE_STDLIB_H 1
 #define HAVE_STRING_H 1
 #define HAVE_TIME_H 1
+
+#define THREAD_LOCAL __declspec(thread)

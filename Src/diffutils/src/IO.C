@@ -51,21 +51,21 @@ struct equivclass
 };
 
 /* Hash-table: array of buckets, each being a chain of equivalence classes.  */
-static int *buckets;
+static THREAD_LOCAL int *buckets;
   
 /* Number of buckets in the hash table array. */
-static int nbuckets;
+static THREAD_LOCAL int nbuckets;
 
 /* Array in which the equivalence classes are allocated.
    The bucket-chains go through the elements in this array.
    The number of an equivalence class is its index in this array.  */
-static struct equivclass HUGE *equivs;
+static THREAD_LOCAL struct equivclass HUGE *equivs;
 
 /* Index of first free element in the array `equivs'.  */
-static int equivs_index;
+static THREAD_LOCAL int equivs_index;
 
 /* Number of elements allocated in the array `equivs'.  */
-static int equivs_alloc;
+static THREAD_LOCAL int equivs_alloc;
 
 static void find_and_hash_each_line PARAMS((struct file_data *));
 static void find_identical_ends PARAMS((struct file_data[]));

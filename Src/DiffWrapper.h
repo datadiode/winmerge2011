@@ -21,9 +21,6 @@
  *
  * @date  Created: 2003-08-22
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #ifndef _DIFFWRAPPER_H
 #define _DIFFWRAPPER_H
 
@@ -33,6 +30,7 @@
 #include "FilterCommentsManager.h"
 #include "FilterList.h"
 #include "LineFiltersList.h"
+#include "diffutils/config.h"
 
 class CDiffContext;
 struct DIFFRANGE;
@@ -178,7 +176,7 @@ public:
 		int LineNumberRight, int QtyLinesRight,
 		OP_TYPE Op, const TCHAR *FileNameExt);
 
-	static CDiffWrapper *m_pActiveInstance;
+	static THREAD_LOCAL CDiffWrapper *m_pActiveInstance;
 	DIFFSTATUS m_status; /**< Status of last compare */
 
 protected:
