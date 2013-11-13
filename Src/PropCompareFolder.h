@@ -38,6 +38,7 @@ public:
 	BOOL    m_bWalkUniques;
 	BOOL    m_bCacheResults;
 	UINT    m_nQuickCompareLimit;
+	int     m_nCompareThreads;
 // Implementation
 protected:
 	template<DDX_Operation>

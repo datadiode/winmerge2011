@@ -22,7 +22,7 @@
  *  @file DiffContext.cpp
  *
  *  @brief Implementation of CDiffContext
- */ 
+ */
 #include "StdAfx.h"
 #include <process.h>
 #include "FileFilterHelper.h"
@@ -31,6 +31,7 @@
 #include "CompareStats.h"
 #include "codepage_detect.h"
 #include "Common/version.h"
+#include "OptionsMgr.h"
 
 /**
  * @brief Force compare to be single-threaded.
@@ -42,7 +43,6 @@
  * this to 0. As Visual Studio seems to have real problems with debugging
  * these threads otherwise.
  */
-static LONG nCompareThreads = 3;
 
 String CDiffContext::GetLeftFilepathAndName(const DIFFITEM *di) const
 {
@@ -193,7 +193,6 @@ CDiffContext::CDiffContext
 {
 	m_paths[0] = paths_GetLongPath(pszLeft);
 	m_paths[1] = paths_GetLongPath(pszRight);
-	InitializeCriticalSection(&m_csCompareThread);
 }
 
 /**
@@ -201,7 +200,6 @@ CDiffContext::CDiffContext
  */
 CDiffContext::~CDiffContext()
 {
-	DeleteCriticalSection(&m_csCompareThread);
 	ASSERT(m_hSemaphore == NULL);
 }
 
@@ -210,7 +208,7 @@ CDiffContext::~CDiffContext()
  */
 bool CDiffContext::ShouldAbort() const
 {
-	if (nCompareThreads != 0)
+	if (m_nCompareThreads != 0)
 	{
 		m_pCompareStats->Wait();
 	}
@@ -238,11 +236,20 @@ void CDiffContext::CompareDirectories(bool bOnlyRequested)
 	m_bOnlyRequested = bOnlyRequested;
 
 	m_hSemaphore = CreateSemaphore(0, 0, LONG_MAX, 0);
+	InitializeCriticalSection(&m_csCompareThread);
 	m_diCompareThread = NULL;
 	
-	if (nCompareThreads == 0)
+	m_nCompareThreads = COptionsMgr::Get(OPT_CMP_COMPARE_THREADS);
+	if (m_nCompareThreads < 0)
 	{
-		m_nCompareThreads = 1;
+		SYSTEM_INFO sysinfo;
+		GetSystemInfo(&sysinfo);
+		m_nCompareThreads += sysinfo.dwNumberOfProcessors;
+		if (m_nCompareThreads < 0)
+			m_nCompareThreads = 0;
+	}
+	if (m_nCompareThreads == 0)
+	{
 		if (!m_bOnlyRequested)
 		{
 			DiffThreadCollect(this);
@@ -252,10 +259,9 @@ void CDiffContext::CompareDirectories(bool bOnlyRequested)
 	}
 	else
 	{
-		m_nCompareThreads = nCompareThreads;
 		if (!m_bOnlyRequested)
 			_beginthread(DiffThreadCollect, 0, this);
-		int nThreads = nCompareThreads;
+		int nThreads = m_nCompareThreads;
 		do
 		{
 			if (!_beginthread(DiffThreadCompare, 0, this))
@@ -305,7 +311,7 @@ void CDiffContext::DiffThreadCollect(LPVOID lpParam)
 	}
 
 	// ReleaseSemaphore() once again to signal that collect phase is ready
-	ReleaseSemaphore(myStruct->m_hSemaphore, nCompareThreads, 0);
+	ReleaseSemaphore(myStruct->m_hSemaphore, myStruct->m_nCompareThreads, 0);
 }
 
 /**
@@ -324,10 +330,11 @@ void CDiffContext::DiffThreadCompare(LPVOID lpParam)
 		myStruct->DirScan_CompareRequestedItems();
 	else
 		myStruct->DirScan_CompareItems();
-	if (InterlockedDecrement(&myStruct->m_nCompareThreads) == 0)
+	if (InterlockedDecrement(&myStruct->m_nCompareThreads) <= 0)
 	{
 		CloseHandle(myStruct->m_hSemaphore);
 		myStruct->m_hSemaphore = NULL;
+		DeleteCriticalSection(&myStruct->m_csCompareThread);
 		// Send message to UI to update
 		myStruct->m_pWindow->PostMessage(MSG_UI_UPDATE);
 	}

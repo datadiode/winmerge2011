@@ -400,9 +400,10 @@ void CDiffContext::CompareDiffItem(FolderCmp &fc, DIFFITEM *di)
 	if (di->isDirectory())
 	{
 		// 1. Test against filters
-		const UINT flag = m_piFilterGlobal->includeDir(
-			di->left.filename.c_str(), di->right.filename.c_str()
-		) ? DIFFCODE::INCLUDED : DIFFCODE::SKIPPED;
+		const UINT flag = !m_piFilterGlobal->includeDir(
+			di->left.filename.c_str(), di->right.filename.c_str()) ?
+			DIFFCODE::SKIPPED : m_nRecursive != 0 && di->isSideBoth() ?
+			DIFFCODE::INCLUDED | DIFFCODE::SAME : DIFFCODE::INCLUDED;
 		EnterCriticalSection(&m_csCompareThread);
 		di->diffcode |= flag;
 		LeaveCriticalSection(&m_csCompareThread);

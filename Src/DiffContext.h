@@ -129,7 +129,6 @@ public:
 	const DWORD m_dwContext; /**< Context code used with CLearCase mrgman files */
 
 	bool UpdateDiffItem(DIFFITEM *);
-	void CompareDiffItem(FolderCmp &, DIFFITEM *);
 // creation and use, called on main thread
 	void CompareDirectories(bool bOnlyRequested);
 
@@ -162,6 +161,7 @@ private:
 		int depth, DIFFITEM *parent);
 	DIFFITEM *AddToList(const String &sLeftDir, const String &sRightDir,
 		const DirItem *lent, const DirItem *rent, UINT code, DIFFITEM *parent);
+	void CompareDiffItem(FolderCmp &, DIFFITEM *);
 	void SetDiffItemStats(const FolderCmp &, DIFFITEM *);
 	void StoreDiffData(const DIFFITEM *);
 	void DirScan_CompareItems();

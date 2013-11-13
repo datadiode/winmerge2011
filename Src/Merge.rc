@@ -1345,8 +1345,10 @@ FONT 8, "MS Shell Dlg", 0, 0, 1
     AUTOCHECKBOX    "&Self-compare unique files", IDC_COMPARE_SELFCOMPARE, 7, 50, 222, 10
     AUTOCHECKBOX    "&Include unique subfolders contents", IDC_COMPARE_WALKUNIQUES, 7, 61, 222, 10
     AUTOCHECKBOX    "C&ache compare results of visited folders", IDC_COMPARE_CACHE_RESULTS, 7, 72, 222, 8
-    LTEXT           "&Quick compare limit (MB):", IDC_STATIC, 7, 82, 200, 8, SS_LEFT
-    EDITTEXT        IDC_COMPARE_QUICKC_LIMIT, 7, 92, 50, 14, ES_AUTOHSCROLL, WS_EX_RTLREADING
+    LTEXT           "&Quick compare limit (MB):", IDC_STATIC, 7, 85, 165, 8, SS_LEFT
+    EDITTEXT        IDC_COMPARE_QUICKC_LIMIT, 194, 83, 30, 14, ES_RIGHT | ES_NUMBER
+    LTEXT           "&Number of compare threads (a negative value implies addition of the number of available CPU cores):", IDC_STATIC, 7, 101, 165, 24, SS_LEFT
+    EDITTEXT        IDC_COMPARE_THREAD_COUNT, 194, 115, 30, 14, ES_RIGHT | ES_NUMBER
     PUSHBUTTON      "Defaults", IDC_COMPAREFOLDER_DEFAULTS, 160, 187, 70, 14
 }
 

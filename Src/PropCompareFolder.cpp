@@ -38,6 +38,7 @@ bool PropCompareFolder::UpdateData()
 	DDX_Check<op>(IDC_COMPARE_WALKUNIQUES, m_bWalkUniques);
 	DDX_Check<op>(IDC_COMPARE_CACHE_RESULTS, m_bCacheResults);
 	DDX_Text<op>(IDC_COMPARE_QUICKC_LIMIT, m_nQuickCompareLimit);
+	DDX_Text<op>(IDC_COMPARE_THREAD_COUNT, m_nCompareThreads);
 	return true;
 }
 
@@ -56,6 +57,31 @@ LRESULT PropCompareFolder::WindowProc(UINT message, WPARAM wParam, LPARAM lParam
 		case MAKEWPARAM(IDC_COMPAREMETHODCOMBO, CBN_SELCHANGE):
 			UpdateScreen();
 			break;
+		case MAKEWPARAM(IDC_COMPARE_QUICKC_LIMIT, EN_CHANGE):
+			m_nQuickCompareLimit = ValidateNumber(reinterpret_cast<HEdit *>(lParam), 0, 2000);
+			break;
+		case MAKEWPARAM(IDC_COMPARE_THREAD_COUNT, EN_CHANGE):
+			m_nCompareThreads = ValidateNumber(reinterpret_cast<HEdit *>(lParam), -31, 31);
+			break;
+		case MAKEWPARAM(IDC_COMPARE_THREAD_COUNT, EN_SETFOCUS):
+			RegisterHotKey(m_hWnd, MAKEWPARAM(LOWORD(wParam), VK_OEM_MINUS), 0, VK_OEM_MINUS);
+			break;
+		case MAKEWPARAM(IDC_COMPARE_THREAD_COUNT, EN_KILLFOCUS):
+			UnregisterHotKey(m_hWnd, MAKEWPARAM(LOWORD(wParam), VK_OEM_MINUS));
+			break;
+		}
+		break;
+	case WM_HOTKEY:
+		if (HIWORD(wParam) == VK_OEM_MINUS)
+		{
+			HEdit *pEdit = static_cast<HEdit *>(GetDlgItem(LOWORD(wParam)));
+			pEdit->ReplaceSel(_T(""));
+			int i = GetDlgItemInt(LOWORD(wParam));
+			if (i > 0)
+				SetDlgItemInt(LOWORD(wParam), -i);
+			else if (i == 0)
+				pEdit->SetWindowText(_T("-"));
+			pEdit->SetSel(1, 1);
 		}
 		break;
 	}
@@ -76,6 +102,7 @@ void PropCompareFolder::ReadOptions()
 	m_bWalkUniques = COptionsMgr::Get(OPT_CMP_WALK_UNIQUES);
 	m_bCacheResults = COptionsMgr::Get(OPT_CMP_CACHE_RESULTS);
 	m_nQuickCompareLimit = COptionsMgr::Get(OPT_CMP_QUICK_LIMIT) / Mega;
+	m_nCompareThreads = COptionsMgr::Get(OPT_CMP_COMPARE_THREADS);
 }
 
 /** 
@@ -91,9 +118,8 @@ void PropCompareFolder::WriteOptions()
 	COptionsMgr::SaveOption(OPT_CMP_SELF_COMPARE, m_bSelfCompare != FALSE);
 	COptionsMgr::SaveOption(OPT_CMP_WALK_UNIQUES, m_bWalkUniques != FALSE);
 	COptionsMgr::SaveOption(OPT_CMP_CACHE_RESULTS, m_bCacheResults != FALSE);
-	if (m_nQuickCompareLimit > 2000)
-		m_nQuickCompareLimit = 2000;
 	COptionsMgr::SaveOption(OPT_CMP_QUICK_LIMIT, m_nQuickCompareLimit * Mega);
+	COptionsMgr::SaveOption(OPT_CMP_COMPARE_THREADS, m_nCompareThreads);
 }
 
 /** 
@@ -128,6 +154,7 @@ void PropCompareFolder::OnDefaults()
 	m_bWalkUniques = COptionsMgr::GetDefault(OPT_CMP_WALK_UNIQUES);
 	m_bCacheResults = COptionsMgr::GetDefault(OPT_CMP_CACHE_RESULTS);
 	m_nQuickCompareLimit = COptionsMgr::GetDefault(OPT_CMP_QUICK_LIMIT) / Mega;
+	m_nCompareThreads = COptionsMgr::GetDefault(OPT_CMP_COMPARE_THREADS);
 	UpdateScreen();
 }
 

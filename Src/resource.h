@@ -230,6 +230,7 @@
 #define IDC_USE_RECYCLE_BIN                     1117
 #define IDC_COLORDEFAULTS_BTN                   1118
 #define IDC_COMPARE_DEFAULTS                    1119
+#define IDC_COMPARE_THREAD_COUNT                1120
 #define IDC_DIFF_DEFAULTS                       1122
 #define IDC_MOVED_BLOCKS                        1123
 #define IDC_RESET_ALL_MESSAGE_BOXES             1124
