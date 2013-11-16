@@ -246,7 +246,8 @@ int FileFilterHelper::collateDir(LPCTSTR p, LPCTSTR q)
  */
 String FileFilterHelper::GetFilterNameOrMask() const
 {
-	return m_currentFilter != this ? _T("[F] ") + m_currentFilter->name : name;
+	const FileFilter *const self = this;
+	return m_currentFilter != self ? _T("[F] ") + m_currentFilter->name : name;
 }
 
 /**

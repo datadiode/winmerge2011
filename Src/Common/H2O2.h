@@ -5,7 +5,7 @@
 // Both H2O and H2O2 share a common set of decorator templates.
 //
 // Copyright (c) 2005-2010  David Nash (as of Win32++ v7.0.2)
-// Copyright (c) 2011-2012  Jochen Neubeck
+// Copyright (c) 2011-2013  Jochen Neubeck
 //
 // Permission is hereby granted, free of charge, to
 // any person obtaining a copy of this software and
@@ -110,7 +110,7 @@ namespace H2O
 		void SubclassWindow(HWindow *pWnd)
 		{
 			m_pWnd = pWnd;
-			m_pfnSuper = SetWindowPtr(GWLP_WNDPROC, WndProc<GWLP_THIS>);
+			m_pfnSuper = SetWindowPtr<WNDPROC>(GWLP_WNDPROC, WndProc<GWLP_THIS>);
 			assert(m_pfnSuper != WndProc<GWLP_THIS>);
 			void *p = SetWindowPtr(GWLP_THIS, this);
 			assert(p == NULL);
@@ -149,9 +149,9 @@ namespace H2O
 			return lResult;
 		}
 		template<class T>
-		T *SetWindowPtr(int i, T *p) const
+		T SetWindowPtr(int i, T p) const
 		{
-			return reinterpret_cast<T *>(
+			return reinterpret_cast<T>(
 				::SetWindowLongPtr(m_hWnd, i, reinterpret_cast<LONG_PTR>(p)));
 		}
 	};
@@ -191,15 +191,16 @@ namespace H2O
 		{
 			return reinterpret_cast<ODialog *>(::GetWindowLongPtr(pWnd->m_hWnd, DWLP_USER));
 		}
+
+		// Dialog data exchange
+		enum DDX_Operation { Set, Get };
+
 	protected:
 		virtual BOOL OnInitDialog();
 		virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
 
 		BOOL IsUserInputCommand(WPARAM wParam);
 		void Update3StateCheckBoxLabel(UINT id);
-
-		// Dialog data exchange
-		enum DDX_Operation { Set, Get };
 
 		template<DDX_Operation>
 		bool DDX_Text(UINT id, String &);
@@ -349,10 +350,10 @@ namespace H2O
 		using SysString<Object>::W;
 		using SysString<Object>::T;
 		OString(HString *pStr = NULL) { m_pStr = pStr; }
-		~OString() { SysString::Free(); }
+		~OString() { SysString<Object>::Free(); }
 		void Free()
 		{
-			SysString::Free();
+			SysString<Object>::Free();
 			B = NULL;
 		}
 		void Append(LPCWSTR tail)
@@ -396,7 +397,8 @@ namespace H2O
 	class ZeroInit
 	{
 	protected:
-		ZeroInit(size_t cb = sizeof(Self)) { memset(static_cast<Self *>(this), 0, cb); }
+		ZeroInit(size_t cb) { memset(static_cast<Self *>(this), 0, cb); }
+		ZeroInit() { memset(static_cast<Self *>(this), 0, sizeof(Self)); }
 	};
 
 	// Utility functions

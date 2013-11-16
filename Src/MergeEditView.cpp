@@ -71,9 +71,8 @@ static UINT EOL_PANEL_WIDTH = 60;
 CMergeEditView::CMergeEditView(
 	HWindow *pWnd,
 	CChildFrame *pDocument,
-	int nThisPane,
-	size_t ZeroInit
-) : CGhostTextView(pDocument, nThisPane, ZeroInit)
+	int nThisPane
+) : CGhostTextView(pDocument, nThisPane, sizeof *this)
 {
 	SubclassWindow(pWnd);
 	RegisterDragDrop(m_hWnd, this);

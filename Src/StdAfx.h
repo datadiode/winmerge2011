@@ -18,6 +18,10 @@
 
 #define _CRT_NON_CONFORMING_SWPRINTFS
 
+#define _countof(array) (sizeof array / sizeof array[0])
+#define __CRT_STRINGIZE(value) #value
+#define _CRT_STRINGIZE(value) __CRT_STRINGIZE(value)
+
 // Define the warnings that may be disabled in some rare particular cases
 #define warning_this_used_in_base_member_initializer_list 4355
 #define warning_possible_loss_of_data_due_to_type_conversion 4244

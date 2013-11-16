@@ -406,7 +406,7 @@ CCrystalTextView::TextDefinition *CCrystalTextView::SetTextType(TextDefinition *
 }
 
 CCrystalTextView::CCrystalTextView(size_t ZeroInit)
-: ZeroInit(ZeroInit)
+: H2O::ZeroInit<CCrystalTextView>(ZeroInit)
 , m_bSelMargin(true)
 , m_nLastLineIndexCalculatedSubLineIndex(-1)
 {

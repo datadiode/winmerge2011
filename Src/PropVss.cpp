@@ -51,7 +51,7 @@ static const TCHAR HandlerPathWinMerge[] =
 
 namespace NClearCase
 {
-	enum EVerbs : DWORD
+	enum EVerbs //: DWORD
 	{
 		none,
 		compare = 1,

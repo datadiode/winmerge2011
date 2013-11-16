@@ -97,7 +97,7 @@ Maybe in the future...
 class CMergeEditView : public CGhostTextView
 {
 public:
-	CMergeEditView(HWindow *, CChildFrame *, int, size_t = sizeof(CMergeEditView));
+	CMergeEditView(HWindow *, CChildFrame *, int);
 
 	STDMETHOD(DragEnter)(IDataObject *pDataObj, DWORD grfKeyState, POINTL pt, DWORD *pdwEffect);
 	STDMETHOD(Drop)(IDataObject *pDataObj, DWORD grfKeyState, POINTL pt, DWORD *pdwEffect);

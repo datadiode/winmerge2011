@@ -74,7 +74,7 @@ class CScriptable
 	, public IElementBehaviorFactory
 {
 protected:
-	CScriptable(REFIID iid = __uuidof(ISuper)) : CMyDispatch(iid)
+	CScriptable(REFIID iid = __uuidof(ISuper)) : CMyDispatch<ISuper>(iid)
 	{
 	}
 public:

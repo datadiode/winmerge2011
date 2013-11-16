@@ -2,6 +2,8 @@
 // This is the right place to override settings from EASTL/internal/config.h
 #define EASTL_STD_ITERATOR_CATEGORY_ENABLED 0
 #define EASTL_EXCEPTIONS_ENABLED 0
+// Prevent #define WCHAR_MAX ((wchar_t)-1) from fooling EASTL
+#define EA_WCHAR_SIZE 2
 namespace eastl { }
 namespace stl = eastl;
 #define stl(x) <eastl/x.h>

@@ -12,7 +12,7 @@
  * @brief Constructor.
  */
 OptionsPanel::OptionsPanel(UINT nIDTemplate, size_t cb)
-: ZeroInit(cb)
+: ZeroInit<OptionsPanel>(cb)
 , ODialog(nIDTemplate)
 , m_nPageIndex(0)
 {

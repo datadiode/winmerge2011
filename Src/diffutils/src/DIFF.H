@@ -65,7 +65,7 @@ enum output_style {
    i.e. can handle a file that ends in a non-newline.  */
 #define ROBUST_OUTPUT_STYLE(S) ((S) != OUTPUT_ED && (S) != OUTPUT_FORWARD_ED)
 
-EXTERN enum output_style output_style;
+EXTERN int output_style;
 
 /* Nonzero if output cannot be generated for identical files.  */
 EXTERN int no_diff_means_no_output;

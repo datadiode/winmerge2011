@@ -8,6 +8,10 @@
 
 #define __INLINE_ISEQUAL_GUID // Avoid a reference to memcmp
 
+#define _countof(array) (sizeof array / sizeof array[0])
+#define __CRT_STRINGIZE(value) #value
+#define _CRT_STRINGIZE(value) __CRT_STRINGIZE(value)
+
 #include <windows.h>
 #include <shlwapi.h>
 #include <shlobj.h>

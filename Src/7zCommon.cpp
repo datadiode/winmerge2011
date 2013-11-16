@@ -132,17 +132,18 @@ DWORD NTAPI VersionOf7z()
  */
 Merge7z::Proxy Merge7z = { NULL };
 
+struct Merge7zDLL
+{
+	DLLGETVERSIONPROC DllGetVersion;
+	interface Merge7z *Merge7z;
+	HMODULE H;
+};
+
 /**
  * @brief Access dll functions through proxy.
  */
 interface Merge7z *Merge7z::Proxy::operator->()
 {
-	struct Merge7zDLL
-	{
-		DLLGETVERSIONPROC DllGetVersion;
-		interface Merge7z *Merge7z;
-		HMODULE H;
-	};
 	static DllProxy::Instance<struct Merge7zDLL> DLL =
 	{
 		"Merge7z\\Merge7z%u%02u"DECORATE_U".dll",

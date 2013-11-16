@@ -5,7 +5,7 @@
 // Both H2O and H2O2 share a common set of decorator templates.
 //
 // Copyright (c) 2005-2010  David Nash (as of Win32++ v7.0.2)
-// Copyright (c) 2011-2012  Jochen Neubeck
+// Copyright (c) 2011-2013  Jochen Neubeck
 //
 // Permission is hereby granted, free of charge, to
 // any person obtaining a copy of this software and
@@ -201,6 +201,13 @@ namespace H2O
 		{
 			assert(::IsWindow(m_hWnd));
 			return ::ScrollWindow(m_hWnd, dx, dy, prcArea, prcClip);
+		}
+		BOOL ScrollWindowEx(int dx, int dy,
+			const RECT *prcArea = NULL, const RECT *prcClip = NULL, 
+			HRGN hrgnUpdate = NULL, RECT *prcUpdate = NULL, UINT flags = 0)
+		{
+			assert(::IsWindow(m_hWnd));
+			return ::ScrollWindowEx(m_hWnd, dx, dy, prcArea, prcClip, hrgnUpdate, prcUpdate, flags);
 		}
 		BOOL CloseWindow()
 		{
