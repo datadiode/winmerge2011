@@ -1,643 +1,193 @@
-<?xml version="1.0" encoding="Windows-1252"?>
-<VisualStudioProject
-	ProjectType="Visual C++"
-	Version="9,00"
-	Name="pcre"
-	ProjectGUID="{F7E6A782-1C15-46E3-B645-922494B9F146}"
-	RootNamespace="pcre"
-	Keyword="Win32Proj"
-	TargetFrameworkVersion="131072"
-	>
-	<Platforms>
-		<Platform
-			Name="Win32"
-		/>
-		<Platform
-			Name="x64"
-		/>
-	</Platforms>
-	<ToolFiles>
-	</ToolFiles>
-	<Configurations>
-		<Configuration
-			Name="Debug|Win32"
-			OutputDirectory="$(IntDir)"
-			IntermediateDirectory="$(SolutionDir)BuildTmp\$(ProjectName)\$(PlatformName)\$(ConfigurationName)"
-			ConfigurationType="4"
-			UseOfMFC="0"
-			ATLMinimizesCRunTimeLibraryUsage="false"
-			CharacterSet="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-				PreprocessorDefinitions="WIN32,_WINDOWS,_DEBUG,HAVE_CONFIG_H,_CRT_SECURE_NO_DEPRECATE,CMAKE_INTDIR=\&quot;Debug\&quot;,pcre_EXPORTS"
-				MkTypLibCompatible="false"
-				TargetEnvironment="1"
-				GenerateStublessProxies="true"
-				TypeLibraryName="$(InputName).tlb"
-				OutputDirectory="$(IntDir)"
-				HeaderFileName="$(InputName).h"
-				DLLDataFileName=""
-				InterfaceIdentifierFileName="$(InputName)_i.c"
-				ProxyFileName="$(InputName)_p.c"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				AdditionalOptions=" /Zm1000"
-				Optimization="0"
-				InlineFunctionExpansion="0"
-				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories=".;..;"
-				PreprocessorDefinitions="WIN32,_WINDOWS,_DEBUG,HAVE_CONFIG_H,_CRT_SECURE_NO_DEPRECATE,CMAKE_INTDIR=\&quot;Debug\&quot;,PCRE_STATIC"
-				ExceptionHandling="0"
-				BasicRuntimeChecks="3"
-				RuntimeLibrary="1"
-				RuntimeTypeInfo="false"
-				WarningLevel="3"
-				DebugInformationFormat="3"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="WIN32,_WINDOWS,_DEBUG,HAVE_CONFIG_H,_CRT_SECURE_NO_DEPRECATE,CMAKE_INTDIR=\&quot;Debug\&quot;,pcre_EXPORTS"
-				AdditionalIncludeDirectories=".;..;"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLibrarianTool"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-		<Configuration
-			Name="Debug|x64"
-			OutputDirectory="$(IntDir)"
-			IntermediateDirectory="$(SolutionDir)BuildTmp\$(ProjectName)\$(PlatformName)\$(ConfigurationName)"
-			ConfigurationType="4"
-			UseOfMFC="0"
-			ATLMinimizesCRunTimeLibraryUsage="false"
-			CharacterSet="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-				PreprocessorDefinitions="WIN32,_WINDOWS,_DEBUG,HAVE_CONFIG_H,_CRT_SECURE_NO_DEPRECATE,CMAKE_INTDIR=\&quot;Debug\&quot;,pcre_EXPORTS"
-				MkTypLibCompatible="false"
-				TargetEnvironment="3"
-				GenerateStublessProxies="true"
-				TypeLibraryName="$(InputName).tlb"
-				OutputDirectory="$(IntDir)"
-				HeaderFileName="$(InputName).h"
-				DLLDataFileName=""
-				InterfaceIdentifierFileName="$(InputName)_i.c"
-				ProxyFileName="$(InputName)_p.c"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				AdditionalOptions=" /Zm1000"
-				Optimization="0"
-				InlineFunctionExpansion="0"
-				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories=".;..;"
-				PreprocessorDefinitions="WIN32,_WINDOWS,_DEBUG,HAVE_CONFIG_H,_CRT_SECURE_NO_DEPRECATE,CMAKE_INTDIR=\&quot;Debug\&quot;,PCRE_STATIC"
-				ExceptionHandling="0"
-				BasicRuntimeChecks="3"
-				RuntimeLibrary="1"
-				RuntimeTypeInfo="false"
-				WarningLevel="3"
-				DebugInformationFormat="3"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="WIN32,_WINDOWS,_DEBUG,HAVE_CONFIG_H,_CRT_SECURE_NO_DEPRECATE,CMAKE_INTDIR=\&quot;Debug\&quot;,pcre_EXPORTS"
-				AdditionalIncludeDirectories=".;..;"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLibrarianTool"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-		<Configuration
-			Name="Release|Win32"
-			OutputDirectory="$(IntDir)"
-			IntermediateDirectory="$(SolutionDir)BuildTmp\$(ProjectName)\$(PlatformName)\$(ConfigurationName)"
-			ConfigurationType="4"
-			UseOfMFC="0"
-			ATLMinimizesCRunTimeLibraryUsage="false"
-			CharacterSet="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-				PreprocessorDefinitions="WIN32,_WINDOWS,NDEBUG,HAVE_CONFIG_H,_CRT_SECURE_NO_DEPRECATE,CMAKE_INTDIR=\&quot;Release\&quot;,pcre_EXPORTS"
-				MkTypLibCompatible="false"
-				TargetEnvironment="1"
-				GenerateStublessProxies="true"
-				TypeLibraryName="$(InputName).tlb"
-				OutputDirectory="$(IntDir)"
-				HeaderFileName="$(InputName).h"
-				DLLDataFileName=""
-				InterfaceIdentifierFileName="$(InputName)_i.c"
-				ProxyFileName="$(InputName)_p.c"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				AdditionalOptions=" /Zm1000"
-				Optimization="1"
-				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories=".;..;"
-				PreprocessorDefinitions="WIN32,_WINDOWS,NDEBUG,HAVE_CONFIG_H,_CRT_SECURE_NO_DEPRECATE,CMAKE_INTDIR=\&quot;Release\&quot;,PCRE_STATIC"
-				StringPooling="true"
-				ExceptionHandling="0"
-				RuntimeLibrary="0"
-				EnableFunctionLevelLinking="true"
-				RuntimeTypeInfo="false"
-				WarningLevel="3"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="WIN32,_WINDOWS,NDEBUG,HAVE_CONFIG_H,_CRT_SECURE_NO_DEPRECATE,CMAKE_INTDIR=\&quot;Release\&quot;,pcre_EXPORTS"
-				AdditionalIncludeDirectories=".;..;"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLibrarianTool"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-		<Configuration
-			Name="Release|x64"
-			OutputDirectory="$(IntDir)"
-			IntermediateDirectory="$(SolutionDir)BuildTmp\$(ProjectName)\$(PlatformName)\$(ConfigurationName)"
-			ConfigurationType="4"
-			UseOfMFC="0"
-			ATLMinimizesCRunTimeLibraryUsage="false"
-			CharacterSet="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-				PreprocessorDefinitions="WIN32,_WINDOWS,NDEBUG,HAVE_CONFIG_H,_CRT_SECURE_NO_DEPRECATE,CMAKE_INTDIR=\&quot;Release\&quot;,pcre_EXPORTS"
-				MkTypLibCompatible="false"
-				TargetEnvironment="3"
-				GenerateStublessProxies="true"
-				TypeLibraryName="$(InputName).tlb"
-				OutputDirectory="$(IntDir)"
-				HeaderFileName="$(InputName).h"
-				DLLDataFileName=""
-				InterfaceIdentifierFileName="$(InputName)_i.c"
-				ProxyFileName="$(InputName)_p.c"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				AdditionalOptions=" /Zm1000"
-				Optimization="1"
-				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories=".;..;"
-				PreprocessorDefinitions="WIN32,_WINDOWS,NDEBUG,HAVE_CONFIG_H,_CRT_SECURE_NO_DEPRECATE,CMAKE_INTDIR=\&quot;Release\&quot;,PCRE_STATIC"
-				StringPooling="true"
-				ExceptionHandling="0"
-				RuntimeLibrary="0"
-				EnableFunctionLevelLinking="true"
-				RuntimeTypeInfo="false"
-				WarningLevel="3"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="WIN32,_WINDOWS,NDEBUG,HAVE_CONFIG_H,_CRT_SECURE_NO_DEPRECATE,CMAKE_INTDIR=\&quot;Release\&quot;,pcre_EXPORTS"
-				AdditionalIncludeDirectories=".;..;"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLibrarianTool"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-		<Configuration
-			Name="System32|Win32"
-			OutputDirectory="$(IntDir)"
-			IntermediateDirectory="$(SolutionDir)BuildTmp\$(ProjectName)\$(PlatformName)\$(ConfigurationName)"
-			ConfigurationType="4"
-			UseOfMFC="0"
-			ATLMinimizesCRunTimeLibraryUsage="false"
-			CharacterSet="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-				PreprocessorDefinitions="WIN32,_WINDOWS,NDEBUG,HAVE_CONFIG_H,_CRT_SECURE_NO_DEPRECATE,CMAKE_INTDIR=\&quot;Release\&quot;,pcre_EXPORTS"
-				MkTypLibCompatible="false"
-				TargetEnvironment="1"
-				GenerateStublessProxies="true"
-				TypeLibraryName="$(InputName).tlb"
-				OutputDirectory="$(IntDir)"
-				HeaderFileName="$(InputName).h"
-				DLLDataFileName=""
-				InterfaceIdentifierFileName="$(InputName)_i.c"
-				ProxyFileName="$(InputName)_p.c"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				AdditionalOptions=" /Zm1000"
-				Optimization="1"
-				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories=".;..;"
-				PreprocessorDefinitions="WIN32,_WINDOWS,NDEBUG,HAVE_CONFIG_H,_CRT_SECURE_NO_DEPRECATE,CMAKE_INTDIR=\&quot;Release\&quot;,PCRE_STATIC"
-				StringPooling="true"
-				ExceptionHandling="0"
-				RuntimeLibrary="2"
-				BufferSecurityCheck="false"
-				EnableFunctionLevelLinking="true"
-				RuntimeTypeInfo="false"
-				WarningLevel="3"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="WIN32,_WINDOWS,NDEBUG,HAVE_CONFIG_H,_CRT_SECURE_NO_DEPRECATE,CMAKE_INTDIR=\&quot;Release\&quot;,pcre_EXPORTS"
-				AdditionalIncludeDirectories=".;..;"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLibrarianTool"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-		<Configuration
-			Name="System32|x64"
-			OutputDirectory="$(IntDir)"
-			IntermediateDirectory="$(SolutionDir)BuildTmp\$(ProjectName)\$(PlatformName)\$(ConfigurationName)"
-			ConfigurationType="4"
-			UseOfMFC="0"
-			ATLMinimizesCRunTimeLibraryUsage="false"
-			CharacterSet="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-				PreprocessorDefinitions="WIN32,_WINDOWS,NDEBUG,HAVE_CONFIG_H,_CRT_SECURE_NO_DEPRECATE,CMAKE_INTDIR=\&quot;Release\&quot;,pcre_EXPORTS"
-				MkTypLibCompatible="false"
-				TargetEnvironment="3"
-				GenerateStublessProxies="true"
-				TypeLibraryName="$(InputName).tlb"
-				OutputDirectory="$(IntDir)"
-				HeaderFileName="$(InputName).h"
-				DLLDataFileName=""
-				InterfaceIdentifierFileName="$(InputName)_i.c"
-				ProxyFileName="$(InputName)_p.c"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				AdditionalOptions=" /Zm1000"
-				Optimization="1"
-				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories=".;..;"
-				PreprocessorDefinitions="WIN32,_WINDOWS,NDEBUG,HAVE_CONFIG_H,_CRT_SECURE_NO_DEPRECATE,CMAKE_INTDIR=\&quot;Release\&quot;,PCRE_STATIC"
-				StringPooling="true"
-				ExceptionHandling="0"
-				RuntimeLibrary="2"
-				BufferSecurityCheck="false"
-				EnableFunctionLevelLinking="true"
-				RuntimeTypeInfo="false"
-				WarningLevel="3"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="WIN32,_WINDOWS,NDEBUG,HAVE_CONFIG_H,_CRT_SECURE_NO_DEPRECATE,CMAKE_INTDIR=\&quot;Release\&quot;,pcre_EXPORTS"
-				AdditionalIncludeDirectories=".;..;"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLibrarianTool"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-	</Configurations>
-	<References>
-	</References>
-	<Files>
-		<Filter
-			Name="Source Files"
-			>
-			<File
-				RelativePath=".\pcre_chartables.c"
-				>
-			</File>
-			<File
-				RelativePath="..\pcre_compile.c"
-				>
-			</File>
-			<File
-				RelativePath="..\pcre_config.c"
-				>
-			</File>
-			<File
-				RelativePath="..\pcre_dfa_exec.c"
-				>
-			</File>
-			<File
-				RelativePath="..\pcre_exec.c"
-				>
-			</File>
-			<File
-				RelativePath="..\pcre_fullinfo.c"
-				>
-			</File>
-			<File
-				RelativePath="..\pcre_get.c"
-				>
-			</File>
-			<File
-				RelativePath="..\pcre_globals.c"
-				>
-			</File>
-			<File
-				RelativePath="..\pcre_info.c"
-				>
-			</File>
-			<File
-				RelativePath="..\pcre_maketables.c"
-				>
-			</File>
-			<File
-				RelativePath="..\pcre_newline.c"
-				>
-			</File>
-			<File
-				RelativePath="..\pcre_ord2utf8.c"
-				>
-			</File>
-			<File
-				RelativePath="..\pcre_refcount.c"
-				>
-			</File>
-			<File
-				RelativePath="..\pcre_study.c"
-				>
-			</File>
-			<File
-				RelativePath="..\pcre_tables.c"
-				>
-			</File>
-			<File
-				RelativePath="..\pcre_try_flipped.c"
-				>
-			</File>
-			<File
-				RelativePath="..\pcre_ucd.c"
-				>
-			</File>
-			<File
-				RelativePath="..\pcre_valid_utf8.c"
-				>
-			</File>
-			<File
-				RelativePath="..\pcre_version.c"
-				>
-			</File>
-			<File
-				RelativePath="..\pcre_xclass.c"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Header Files"
-			>
-			<File
-				RelativePath=".\config.h"
-				>
-			</File>
-			<File
-				RelativePath=".\pcre.h"
-				>
-			</File>
-		</Filter>
-		<File
-			RelativePath="..\CMakeLists.txt"
-			>
-			<FileConfiguration
-				Name="Debug|Win32"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-					Description=""
-					CommandLine=""
-					AdditionalDependencies=""
-					Outputs=""
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Debug|x64"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-					Description=""
-					CommandLine=""
-					AdditionalDependencies=""
-					Outputs=""
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release|Win32"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-					Description=""
-					CommandLine=""
-					AdditionalDependencies=""
-					Outputs=""
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release|x64"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-					Description=""
-					CommandLine=""
-					AdditionalDependencies=""
-					Outputs=""
-				/>
-			</FileConfiguration>
-		</File>
-	</Files>
+<?xml version="1.0"?>
+<VisualStudioProject Name="pcre"
+                     ProjectGUID="{F7E6A782-1C15-46E3-B645-922494B9F146}"
+                     ProjectType="Visual C++"
+                     Version="9,00">
+  <Platforms>
+    <Platform Name="Win32" />
+    <Platform Name="x64" />
+  </Platforms>
+  <Configurations>
+    <Configuration Name="Debug|Win32"
+                   CharacterSet="2"
+                   ConfigurationType="4"
+                   IntermediateDirectory="$(SolutionDir)BuildTmp\$(ProjectName)\$(PlatformName)\$(ConfigurationName)"
+                   OutputDirectory="$(IntDir)">
+      <Tool Name="VCCLCompilerTool"
+            AdditionalIncludeDirectories=".;..;"
+            AdditionalOptions=" /Zm1000"
+            BasicRuntimeChecks="3"
+            DebugInformationFormat="3"
+            EnableIntrinsicFunctions="true"
+            ErrorReporting="0"
+            ExceptionHandling="0"
+            InlineFunctionExpansion="0"
+            Optimization="0"
+            PreprocessorDefinitions="WIN32,_WINDOWS,_DEBUG,HAVE_CONFIG_H,_CRT_SECURE_NO_DEPRECATE,CMAKE_INTDIR=\&quot;Debug\&quot;,PCRE_STATIC"
+            RuntimeLibrary="1"
+            RuntimeTypeInfo="false"
+            UseUnicodeResponseFiles="false"
+            WarningLevel="3" />
+      <Tool Name="VCResourceCompilerTool"
+            AdditionalIncludeDirectories=".;..;"
+            PreprocessorDefinitions="WIN32,_WINDOWS,_DEBUG,HAVE_CONFIG_H,_CRT_SECURE_NO_DEPRECATE,CMAKE_INTDIR=\&quot;Debug\&quot;,pcre_EXPORTS" />
+      <Tool Name="VCLibrarianTool"
+            UseUnicodeResponseFiles="false" />
+    </Configuration>
+    <Configuration Name="Debug|x64"
+                   CharacterSet="2"
+                   ConfigurationType="4"
+                   IntermediateDirectory="$(SolutionDir)BuildTmp\$(ProjectName)\$(PlatformName)\$(ConfigurationName)"
+                   OutputDirectory="$(IntDir)">
+      <Tool Name="VCCLCompilerTool"
+            AdditionalIncludeDirectories=".;..;"
+            AdditionalOptions=" /Zm1000"
+            BasicRuntimeChecks="3"
+            DebugInformationFormat="3"
+            EnableIntrinsicFunctions="true"
+            ErrorReporting="0"
+            ExceptionHandling="0"
+            InlineFunctionExpansion="0"
+            Optimization="0"
+            PreprocessorDefinitions="WIN32,_WINDOWS,_DEBUG,HAVE_CONFIG_H,_CRT_SECURE_NO_DEPRECATE,CMAKE_INTDIR=\&quot;Debug\&quot;,PCRE_STATIC"
+            RuntimeLibrary="1"
+            RuntimeTypeInfo="false"
+            UseUnicodeResponseFiles="false"
+            WarningLevel="3" />
+      <Tool Name="VCResourceCompilerTool"
+            AdditionalIncludeDirectories=".;..;"
+            PreprocessorDefinitions="WIN32,_WINDOWS,_DEBUG,HAVE_CONFIG_H,_CRT_SECURE_NO_DEPRECATE,CMAKE_INTDIR=\&quot;Debug\&quot;,pcre_EXPORTS" />
+      <Tool Name="VCLibrarianTool"
+            UseUnicodeResponseFiles="false" />
+    </Configuration>
+    <Configuration Name="Release|Win32"
+                   CharacterSet="2"
+                   ConfigurationType="4"
+                   IntermediateDirectory="$(SolutionDir)BuildTmp\$(ProjectName)\$(PlatformName)\$(ConfigurationName)"
+                   OutputDirectory="$(IntDir)">
+      <Tool Name="VCCLCompilerTool"
+            AdditionalIncludeDirectories=".;..;"
+            AdditionalOptions=" /Zm1000"
+            EnableFunctionLevelLinking="true"
+            EnableIntrinsicFunctions="true"
+            ErrorReporting="0"
+            ExceptionHandling="0"
+            Optimization="1"
+            PreprocessorDefinitions="WIN32,_WINDOWS,NDEBUG,HAVE_CONFIG_H,_CRT_SECURE_NO_DEPRECATE,CMAKE_INTDIR=\&quot;Release\&quot;,PCRE_STATIC"
+            RuntimeLibrary="0"
+            RuntimeTypeInfo="false"
+            StringPooling="true"
+            UseUnicodeResponseFiles="false"
+            WarningLevel="3" />
+      <Tool Name="VCResourceCompilerTool"
+            AdditionalIncludeDirectories=".;..;"
+            PreprocessorDefinitions="WIN32,_WINDOWS,NDEBUG,HAVE_CONFIG_H,_CRT_SECURE_NO_DEPRECATE,CMAKE_INTDIR=\&quot;Release\&quot;,pcre_EXPORTS" />
+      <Tool Name="VCLibrarianTool"
+            UseUnicodeResponseFiles="false" />
+    </Configuration>
+    <Configuration Name="Release|x64"
+                   CharacterSet="2"
+                   ConfigurationType="4"
+                   IntermediateDirectory="$(SolutionDir)BuildTmp\$(ProjectName)\$(PlatformName)\$(ConfigurationName)"
+                   OutputDirectory="$(IntDir)">
+      <Tool Name="VCCLCompilerTool"
+            AdditionalIncludeDirectories=".;..;"
+            AdditionalOptions=" /Zm1000"
+            EnableFunctionLevelLinking="true"
+            EnableIntrinsicFunctions="true"
+            ErrorReporting="0"
+            ExceptionHandling="0"
+            Optimization="1"
+            PreprocessorDefinitions="WIN32,_WINDOWS,NDEBUG,HAVE_CONFIG_H,_CRT_SECURE_NO_DEPRECATE,CMAKE_INTDIR=\&quot;Release\&quot;,PCRE_STATIC"
+            RuntimeLibrary="0"
+            RuntimeTypeInfo="false"
+            StringPooling="true"
+            UseUnicodeResponseFiles="false"
+            WarningLevel="3" />
+      <Tool Name="VCResourceCompilerTool"
+            AdditionalIncludeDirectories=".;..;"
+            PreprocessorDefinitions="WIN32,_WINDOWS,NDEBUG,HAVE_CONFIG_H,_CRT_SECURE_NO_DEPRECATE,CMAKE_INTDIR=\&quot;Release\&quot;,pcre_EXPORTS" />
+      <Tool Name="VCLibrarianTool"
+            UseUnicodeResponseFiles="false" />
+    </Configuration>
+    <Configuration Name="System32|Win32"
+                   CharacterSet="2"
+                   ConfigurationType="4"
+                   IntermediateDirectory="$(SolutionDir)BuildTmp\$(ProjectName)\$(PlatformName)\$(ConfigurationName)"
+                   OutputDirectory="$(IntDir)">
+      <Tool Name="VCCLCompilerTool"
+            AdditionalIncludeDirectories=".;..;"
+            AdditionalOptions=" /Zm1000"
+            BufferSecurityCheck="false"
+            EnableFunctionLevelLinking="true"
+            EnableIntrinsicFunctions="true"
+            ExceptionHandling="0"
+            Optimization="1"
+            PreprocessorDefinitions="WIN32,_WINDOWS,NDEBUG,HAVE_CONFIG_H,_CRT_SECURE_NO_DEPRECATE,CMAKE_INTDIR=\&quot;Release\&quot;,PCRE_STATIC"
+            RuntimeLibrary="2"
+            RuntimeTypeInfo="false"
+            StringPooling="true"
+            UseUnicodeResponseFiles="false"
+            WarningLevel="3" />
+      <Tool Name="VCResourceCompilerTool"
+            AdditionalIncludeDirectories=".;..;"
+            PreprocessorDefinitions="WIN32,_WINDOWS,NDEBUG,HAVE_CONFIG_H,_CRT_SECURE_NO_DEPRECATE,CMAKE_INTDIR=\&quot;Release\&quot;,pcre_EXPORTS" />
+      <Tool Name="VCLibrarianTool"
+            UseUnicodeResponseFiles="false" />
+    </Configuration>
+    <Configuration Name="System32|x64"
+                   CharacterSet="2"
+                   ConfigurationType="4"
+                   IntermediateDirectory="$(SolutionDir)BuildTmp\$(ProjectName)\$(PlatformName)\$(ConfigurationName)"
+                   OutputDirectory="$(IntDir)">
+      <Tool Name="VCCLCompilerTool"
+            AdditionalIncludeDirectories=".;..;"
+            AdditionalOptions=" /Zm1000"
+            BufferSecurityCheck="false"
+            EnableFunctionLevelLinking="true"
+            EnableIntrinsicFunctions="true"
+            ExceptionHandling="0"
+            Optimization="1"
+            PreprocessorDefinitions="WIN32,_WINDOWS,NDEBUG,HAVE_CONFIG_H,_CRT_SECURE_NO_DEPRECATE,CMAKE_INTDIR=\&quot;Release\&quot;,PCRE_STATIC"
+            RuntimeLibrary="2"
+            RuntimeTypeInfo="false"
+            StringPooling="true"
+            UseUnicodeResponseFiles="false"
+            WarningLevel="3" />
+      <Tool Name="VCResourceCompilerTool"
+            AdditionalIncludeDirectories=".;..;"
+            PreprocessorDefinitions="WIN32,_WINDOWS,NDEBUG,HAVE_CONFIG_H,_CRT_SECURE_NO_DEPRECATE,CMAKE_INTDIR=\&quot;Release\&quot;,pcre_EXPORTS" />
+      <Tool Name="VCLibrarianTool"
+            UseUnicodeResponseFiles="false" />
+    </Configuration>
+  </Configurations>
+  <Files>
+    <Filter Name="Source Files">
+      <File RelativePath=".\pcre_chartables.c" />
+      <File RelativePath="..\pcre_compile.c" />
+      <File RelativePath="..\pcre_config.c" />
+      <File RelativePath="..\pcre_dfa_exec.c" />
+      <File RelativePath="..\pcre_exec.c" />
+      <File RelativePath="..\pcre_fullinfo.c" />
+      <File RelativePath="..\pcre_get.c" />
+      <File RelativePath="..\pcre_globals.c" />
+      <File RelativePath="..\pcre_info.c" />
+      <File RelativePath="..\pcre_maketables.c" />
+      <File RelativePath="..\pcre_newline.c" />
+      <File RelativePath="..\pcre_ord2utf8.c" />
+      <File RelativePath="..\pcre_refcount.c" />
+      <File RelativePath="..\pcre_study.c" />
+      <File RelativePath="..\pcre_tables.c" />
+      <File RelativePath="..\pcre_try_flipped.c" />
+      <File RelativePath="..\pcre_ucd.c" />
+      <File RelativePath="..\pcre_valid_utf8.c" />
+      <File RelativePath="..\pcre_version.c" />
+      <File RelativePath="..\pcre_xclass.c" />
+    </Filter>
+    <Filter Name="Header Files">
+      <File RelativePath=".\config.h" />
+      <File RelativePath=".\pcre.h" />
+    </Filter>
+    <File RelativePath="..\CMakeLists.txt" />
+  </Files>
 </VisualStudioProject>

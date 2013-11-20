@@ -1,0 +1,112 @@
+<!--
+This file is released under the MIT license.
+
+----- begin license block -----
+
+Copyright (c) 2013 Jochen Neubeck
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+----- end license block -----
+
+-->
+<head>
+<style>
+object { border: 3 outset; width: 100%; height: 4ex; font: bold 12pt sans-serif; }
+</style>
+</head>
+<body>
+<object name='DropTarget' classid='clsid:8E3867A3-8586-11D1-B16A-00C0F0283628'>
+<param name="OleDropMode" value="1">
+<param name="Style" value="1">
+<param name="SimpleText" value="Drop .vcproj files here for normalization">
+</object>
+<comment id='xslNormalizeVcproj'>
+<xsl:stylesheet version='1.0' xmlns:xsl='http://www.w3.org/1999/XSL/Transform'>
+	<xsl:output method='xml' encoding='UTF-8' indent='yes' />
+	<xsl:template match='node()|@*'>
+		<xsl:copy>
+			<xsl:apply-templates select='@*'>
+				<xsl:sort select='substring-before(concat("/", name(), "/Name/"), "/Name/")' />
+			</xsl:apply-templates>
+			<xsl:apply-templates select="node()"/>
+		</xsl:copy>
+	</xsl:template>
+	<xsl:template match='Configurations'>
+		<xsl:copy>
+			<xsl:apply-templates select='Configuration'>
+				<xsl:sort select='@Name'/>
+			</xsl:apply-templates>
+		</xsl:copy>
+	</xsl:template>
+	<xsl:template match='File'>
+		<xsl:copy>
+			<xsl:apply-templates select='@*'/>
+			<xsl:apply-templates select='FileConfiguration'>
+				<xsl:sort select='@Name'/>
+			</xsl:apply-templates>
+		</xsl:copy>
+	</xsl:template>
+	<xsl:template match='@RootNamespace|@Keyword|@TargetFrameworkVersion|@UseOfMFC|@UseOfATL|@ATLMinimizesCRunTimeLibraryUsage|@TreatWChar_tAsBuiltInType|*[not(*) and not(@*)]|Configuration/Tool[count(@*)=count(@Name)]'/>
+</xsl:stylesheet>
+</comment>
+<script type="text/vbs">
+Option Explicit
+
+Dim sh, fs
+Set sh = CreateObject("WScript.Shell")
+Set fs = CreateObject("Scripting.FileSystemObject")
+
+Sub Transcode(path)
+	Dim doc, tidy, xslt, xml
+	Set doc = CreateObject("Msxml2.DOMDocument.6.0")
+	Set xslt = CreateObject("Msxml2.DOMDocument.6.0")
+	If xslt.loadXML(xslNormalizeVcproj.text) And doc.load(path) Then
+		xml = doc.transformNode(xslt)
+		fs.CopyFile path, path & ".bak"
+		Set tidy = sh.Exec("""C:\Tools\tidy\tidy.exe"" -xml -indent --indent-attributes yes -wrap 9999 -output """ & path & """")
+		With New RegExp
+			.Pattern = "></[^>]+>"
+			.Global = True
+			xml = .Replace(xml, "/>")
+		End With
+		tidy.StdIn.Write xml
+	End If
+End Sub
+
+Sub DropTarget_OLEDragDrop(Data, Effect, Button, Shift, x, y)
+	Dim path, ext
+	If Data.GetFormat(15) Then
+		For Each path In Data.Files
+			ext = fs.GetExtensionName(path)
+			If LCase(ext) = "vcproj" Then
+				Transcode path
+			Else
+				MsgBox "Cannot handle files of type ." & ext
+			End If
+		Next
+	End If
+	DropTarget.Font.Underline = False
+End Sub
+
+Sub DropTarget_OLEDragOver(Data, Effect, Button, Shift, x, y, State)
+	DropTarget.Font.Underline = Data.GetFormat(15) And State <> 1
+End Sub
+</script>
+</body>
