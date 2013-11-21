@@ -14,4 +14,7 @@
 // Add manually edited resources here...
 #include "../Merge.rc"
 #include "../Merge2.rc"
+
+1 RT_MANIFEST "WinMergeU.exe.manifest"
+
 /////////////////////////////////////////////////////////////////////////////
