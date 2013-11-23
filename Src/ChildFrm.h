@@ -253,7 +253,7 @@ public:
 	void FlushAndRescan(bool bForced = false);
 	void SetCurrentDiff(int nDiff);
 	int GetCurrentDiff() { return m_nCurDiff; }
-	int GetContextDiff(int &firstDiff, int &lastDiff) const;
+	int GetContextDiff(int &firstDiff, int &lastDiff);
 	bool GetMergingMode() const;
 	void SetMergingMode(bool bMergingMode);
 	void SetDetectMovedBlocks(bool bDetectMovedBlocks);

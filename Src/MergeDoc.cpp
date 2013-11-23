@@ -116,7 +116,7 @@ CMergeEditView *CChildFrame::GetActiveMergeView() const
 	return m_pView[nActiveViewIndexType];
 }
 
-int CChildFrame::GetContextDiff(int &firstDiff, int &lastDiff) const
+int CChildFrame::GetContextDiff(int &firstDiff, int &lastDiff)
 {
 	firstDiff = -1;
 	lastDiff = -1;
@@ -142,24 +142,32 @@ int CChildFrame::GetContextDiff(int &firstDiff, int &lastDiff) const
 	if (lastLine < firstLine)
 		return nDiff;
 
-	firstDiff = m_diffList.NextSignificantDiffFromLine(firstLine);
-	lastDiff = m_diffList.PrevSignificantDiffFromLine(lastLine);
+	firstDiff = m_diffList.LineToDiff(firstLine);
+	if (firstDiff == -1)
+		firstDiff = m_diffList.NextSignificantDiffFromLine(firstLine);
+	lastDiff = m_diffList.LineToDiff(lastLine);
+	if (lastDiff == -1)
+		lastDiff = m_diffList.PrevSignificantDiffFromLine(lastLine);
+
 	if (firstDiff != -1 && lastDiff != -1)
 	{
-		DIFFRANGE di;
 		// Check that first selected line is first diff's first line or above it
-		VERIFY(m_diffList.GetDiff(firstDiff, di));
-		if ((int)di.dbegin0 < firstLine)
+		if (const DIFFRANGE *di = m_diffList.DiffRangeAt(firstDiff))
 		{
-			if (firstDiff < lastDiff)
-				++firstDiff;
+			if ((int)di->dbegin0 < firstLine)
+			{
+				if (firstDiff < lastDiff)
+					++firstDiff;
+			}
 		}
 		// Check that last selected line is last diff's last line or below it
-		VERIFY(m_diffList.GetDiff(lastDiff, di));
-		if ((int)di.dend0 > lastLine)
+		if (const DIFFRANGE *di = m_diffList.DiffRangeAt(lastDiff))
 		{
-			if (firstDiff < lastDiff)
-				--lastDiff;
+			if ((int)di->dend0 > lastLine)
+			{
+				if (firstDiff < lastDiff)
+					--lastDiff;
+			}
 		}
 		// Special case: one-line diff is not selected if cursor is in it
 		if (firstLine == lastLine)
@@ -1467,7 +1475,7 @@ void CChildFrame::PrimeTextBuffers()
 		m_idContextLines - ID_VIEW_CONTEXT_0 : UINT_MAX;
 	SetCurrentDiff(-1);
 	m_nTrivialDiffs = 0;
-	int nDiffCount = m_diffList.GetSize();
+	const int nDiffCount = m_diffList.GetSize();
 	// resize m_aLines once for each view
 	UINT lcount0new = m_ptBuf[0]->GetLineCount();
 	UINT lcount1new = m_ptBuf[1]->GetLineCount();
@@ -1490,34 +1498,32 @@ void CChildFrame::PrimeTextBuffers()
 	int nDiff = nDiffCount;
 	while (nDiff)
 	{
-		--nDiff;
-		DIFFRANGE curDiff;
-		VERIFY(m_diffList.GetDiff(nDiff, curDiff));
+		DIFFRANGE *curDiff = m_diffList.DiffRangeAt(--nDiff);
 		// move matched lines after curDiff
-		UINT nline0 = lcount0 - curDiff.end0 - 1; // #lines on left after current diff
-		UINT nline1 = lcount1 - curDiff.end1 - 1; // #lines on right after current diff
+		UINT nline0 = lcount0 - curDiff->end0 - 1; // #lines on left after current diff
+		UINT nline1 = lcount1 - curDiff->end1 - 1; // #lines on right after current diff
 		// Matched lines should really match...
 		// But matched lines after last diff may differ because of empty last line (see function's note)
 		if (nDiff < nDiffCount - 1)
 			ASSERT(nline0 == nline1);
 		// Move all lines after current diff down as far as needed
 		// for any ghost lines we're about to insert
-		m_ptBuf[0]->MoveLine(curDiff.end0 + 1, lcount0 - 1, lcount0new - nline0);
-		m_ptBuf[1]->MoveLine(curDiff.end1 + 1, lcount1 - 1, lcount1new - nline1);
+		m_ptBuf[0]->MoveLine(curDiff->end0 + 1, lcount0 - 1, lcount0new - nline0);
+		m_ptBuf[1]->MoveLine(curDiff->end1 + 1, lcount1 - 1, lcount1new - nline1);
 		lcount0 -= nline0;
 		lcount1 -= nline1;
 		lcount0new -= nline0;
 		lcount1new -= nline1;
 		// move unmatched lines and add ghost lines
-		nline0 = curDiff.end0 - curDiff.begin0 + 1; // #lines in diff on left
-		nline1 = curDiff.end1 - curDiff.begin1 + 1; // #lines in diff on right
+		nline0 = curDiff->end0 - curDiff->begin0 + 1; // #lines in diff on left
+		nline1 = curDiff->end1 - curDiff->begin1 + 1; // #lines in diff on right
 		lcount0 -= nline0;
 		lcount1 -= nline1;
 		UINT nline = max(nline0, nline1);
 		lcount0new -= nline;
 		lcount1new -= nline;
-		m_ptBuf[0]->MoveLine(curDiff.begin0, curDiff.end0, lcount0new);
-		m_ptBuf[1]->MoveLine(curDiff.begin1, curDiff.end1, lcount1new);
+		m_ptBuf[0]->MoveLine(curDiff->begin0, curDiff->end0, lcount0new);
+		m_ptBuf[1]->MoveLine(curDiff->begin1, curDiff->end1, lcount1new);
 		UINT i;
 		for (i = nline1 ; i < nline0 ; ++i)
 		{
@@ -1529,34 +1535,34 @@ void CChildFrame::PrimeTextBuffers()
 		}
 
 		// set dbegin, dend, blank, and line flags
-		curDiff.dbegin0 = lcount0new;
-		curDiff.dbegin1 = lcount1new;
+		curDiff->dbegin0 = lcount0new;
+		curDiff->dbegin1 = lcount1new;
 
-		switch (curDiff.op)
+		switch (curDiff->op)
 		{
 		case OP_LEFTONLY:
 			// set curdiff
 			// left side
-			curDiff.dend0 = lcount0new + nline0 - 1;
-			curDiff.blank0 = 0;
+			curDiff->dend0 = lcount0new + nline0 - 1;
+			curDiff->blank0 = 0;
 			// right side
-			curDiff.dend1 = lcount1new + nline0 - 1;
-			curDiff.blank1 = curDiff.dbegin1;
+			curDiff->dend1 = lcount1new + nline0 - 1;
+			curDiff->blank1 = curDiff->dbegin1;
 			// flag lines
-			for (i = curDiff.dbegin0 ; i <= curDiff.dend0; i++)
+			for (i = curDiff->dbegin0 ; i <= curDiff->dend0; i++)
 				m_ptBuf[0]->m_aLines[i].m_dwFlags |= LF_DIFF;
 			// blanks are already inserted (and flagged) to compensate for diff on other side
 			break;
 		case OP_RIGHTONLY:
 			// set curdiff
 			// left side
-			curDiff.dend0 = lcount0new + nline1 - 1;
-			curDiff.blank0 = curDiff.dbegin0;
+			curDiff->dend0 = lcount0new + nline1 - 1;
+			curDiff->blank0 = curDiff->dbegin0;
 			// right side
-			curDiff.dend1 = lcount1new + nline1 - 1;
-			curDiff.blank1 = 0;
+			curDiff->dend1 = lcount1new + nline1 - 1;
+			curDiff->blank1 = 0;
 			// flag lines
-			for (i = curDiff.dbegin1 ; i <= curDiff.dend1 ; i++)
+			for (i = curDiff->dbegin1 ; i <= curDiff->dend1 ; i++)
 				m_ptBuf[1]->m_aLines[i].m_dwFlags |= LF_DIFF;
 			// blanks are already inserted (and flagged) to compensate for diff on other side
 			break;
@@ -1566,28 +1572,28 @@ void CChildFrame::PrimeTextBuffers()
 		case OP_DIFF:
 			// set curdiff
 			// left side
-			curDiff.dend0 = lcount0new + nline - 1;
-			curDiff.blank0 = 0;
+			curDiff->dend0 = lcount0new + nline - 1;
+			curDiff->blank0 = 0;
 			// right side
-			curDiff.dend1 = lcount1new + nline - 1;
-			curDiff.blank1 = 0;
+			curDiff->dend1 = lcount1new + nline - 1;
+			curDiff->blank1 = 0;
 			if (nline0 > nline1)
 				// more lines on left, ghost lines on right side
-				curDiff.blank1 = curDiff.dend1 + 1 - (nline0 - nline1);
+				curDiff->blank1 = curDiff->dend1 + 1 - (nline0 - nline1);
 			else if (nline0 < nline1)
 				// more lines on right, ghost lines on left side
-				curDiff.blank0 = curDiff.dend0 + 1 - (nline1 - nline0);
+				curDiff->blank0 = curDiff->dend0 + 1 - (nline1 - nline0);
 			// flag lines
 			// left side
-			for (i = curDiff.dbegin0 ; i <= curDiff.dend0 ; ++i)
+			for (i = curDiff->dbegin0 ; i <= curDiff->dend0 ; ++i)
 			{
-				if (curDiff.blank0 == 0 || i < curDiff.blank0)
+				if (curDiff->blank0 == 0 || i < curDiff->blank0)
 				{
 					// set diff or trivial flag
-					DWORD dflag = curDiff.op == OP_DIFF ? LF_DIFF : LF_TRIVIAL;
+					DWORD dflag = curDiff->op == OP_DIFF ? LF_DIFF : LF_TRIVIAL;
 					m_ptBuf[0]->m_aLines[i].m_dwFlags |= dflag;
 				}
-				else if (curDiff.op == OP_TRIVIAL)
+				else if (curDiff->op == OP_TRIVIAL)
 				{
 					// ghost lines are already inserted (and flagged)
 					// ghost lines opposite to trivial lines are ghost and trivial
@@ -1595,15 +1601,15 @@ void CChildFrame::PrimeTextBuffers()
 				}
 			}
 			// right side
-			for (i = curDiff.dbegin1 ; i <= curDiff.dend1 ; ++i)
+			for (i = curDiff->dbegin1 ; i <= curDiff->dend1 ; ++i)
 			{
-				if (curDiff.blank1 == 0 || i < curDiff.blank1)
+				if (curDiff->blank1 == 0 || i < curDiff->blank1)
 				{
 					// set diff or trivial flag
-					DWORD dflag = curDiff.op == OP_DIFF ? LF_DIFF : LF_TRIVIAL;
+					DWORD dflag = curDiff->op == OP_DIFF ? LF_DIFF : LF_TRIVIAL;
 					m_ptBuf[1]->m_aLines[i].m_dwFlags |= dflag;
 				}
-				else if (curDiff.op == OP_TRIVIAL)
+				else if (curDiff->op == OP_TRIVIAL)
 				{
 					// ghost lines are already inserted (and flagged)
 					// ghost lines opposite to trivial lines are ghost and trivial
@@ -1612,7 +1618,6 @@ void CChildFrame::PrimeTextBuffers()
 			}
 			break;
 		}
-		VERIFY(m_diffList.SetDiff(nDiff, curDiff));
 	}
 
 	// Flag any remaining differences which were trivialized by prediffing,

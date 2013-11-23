@@ -104,8 +104,6 @@ public:
 	void AddDiff(const DIFFRANGE & di);
 	bool IsDiffSignificant(int nDiff) const;
 	int GetSignificantIndex(int nDiff) const;
-	bool GetDiff(int nDiff, DIFFRANGE & di) const;
-	bool SetDiff(int nDiff, const DIFFRANGE & di);
 	bool LineInDiff(UINT nLine, int nDiff) const;
 	int LineToDiff(UINT nLine) const;
 	int PrevSignificantDiffFromLine(UINT nLine) const;
@@ -114,10 +112,8 @@ public:
 	int NextSignificantDiff(int nDiff) const;
 	int PrevSignificantDiff(int nDiff) const;
 	int LastSignificantDiff() const;
-	const DIFFRANGE *FirstSignificantDiffRange() const;
-	const DIFFRANGE *LastSignificantDiffRange() const;
 
-	const DIFFRANGE *DiffRangeAt(int nDiff) const;
+	DIFFRANGE *DiffRangeAt(int nDiff);
 
 	void ConstructSignificantChain(); // must be called after diff list is entirely populated
 	void SwapSides();

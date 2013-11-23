@@ -82,8 +82,7 @@ int DiffList::GetSignificantDiffs() const
 
 	for (int i = 0; i < nDiffCount; i++)
 	{
-		const DIFFRANGE *dfi = DiffRangeAt(i);
-		if (dfi->op != OP_TRIVIAL)
+		if (m_diffs[i].diffrange.op != OP_TRIVIAL)
 		{
 			++nSignificants;
 		}
@@ -111,8 +110,7 @@ void DiffList::AddDiff(const DIFFRANGE & di)
  */
 bool DiffList::IsDiffSignificant(int nDiff) const
 {
-	const DIFFRANGE *dfi = DiffRangeAt(nDiff);
-	return dfi->op != OP_TRIVIAL;
+	return m_diffs[nDiff].diffrange.op != OP_TRIVIAL;
 }
 
 /**
@@ -128,8 +126,7 @@ int DiffList::GetSignificantIndex(int nDiff) const
 
 	for (int i = 0; i <= nDiff; i++)
 	{
-		const DIFFRANGE *dfi = DiffRangeAt(i);
-		if (dfi->op != OP_TRIVIAL)
+		if (m_diffs[i].diffrange.op != OP_TRIVIAL)
 		{
 			++significants;
 		}
@@ -138,31 +135,12 @@ int DiffList::GetSignificantIndex(int nDiff) const
 }
 
 /**
- * @brief Returns copy of DIFFRANGE from diff-list.
- * @param [in] nDiff Index of DIFFRANGE to return.
- * @param [out] di DIFFRANGE returned (empty if error)
- * @return TRUE if DIFFRANGE found from given index.
- */
-bool DiffList::GetDiff(int nDiff, DIFFRANGE & di) const
-{
-	const DIFFRANGE *dfi = DiffRangeAt(nDiff);
-	if (!dfi)
-	{
-		DIFFRANGE empty;
-		di = empty;
-		return false;
-	}
-	di = *dfi;
-	return true;
-}
-
-/**
  * @brief Return constant pointer to requested diff.
  * This function returns constant pointer to DIFFRANGE at given index.
  * @param [in] nDiff Index of DIFFRANGE to return.
  * @return Constant pointer to DIFFRANGE.
  */
-const DIFFRANGE *DiffList::DiffRangeAt(int nDiff) const
+DIFFRANGE *DiffList::DiffRangeAt(int nDiff)
 {
 	if (nDiff >= 0 && nDiff < GetSize())
 	{
@@ -176,23 +154,6 @@ const DIFFRANGE *DiffList::DiffRangeAt(int nDiff) const
 }
 
 /**
- * @brief Replaces diff in list in given index with given diff.
- * @param [in] nDiff Index (0-based) of diff to be replaced
- * @param [in] di Diff to put in list.
- * @return TRUE if index was valid and diff put to list.
- */
-bool DiffList::SetDiff(int nDiff, const DIFFRANGE & di)
-{
-	if (nDiff < GetSize())
-	{
-		m_diffs[nDiff].diffrange = di;
-		return true;
-	}
-	else
-		return false;
-}
-
-/**
  * @brief Checks if line is inside given diff
  * @param [in] nLine Linenumber to text buffer (not "real" number)
  * @param [in] nDiff Index to diff table
@@ -200,8 +161,8 @@ bool DiffList::SetDiff(int nDiff, const DIFFRANGE & di)
  */
 bool DiffList::LineInDiff(UINT nLine, int nDiff) const
 {
-	const DIFFRANGE *const dfi = DiffRangeAt(nDiff);
-	return nLine >= dfi->dbegin0 && nLine <= dfi->dend0;
+	const DIFFRANGE &dr = m_diffs[nDiff].diffrange;
+	return nLine >= dr.dbegin0 && nLine <= dr.dend0;
 }
 
 /**
@@ -217,10 +178,10 @@ int DiffList::LineToDiff(UINT nLine) const
 	while (left <= right)
 	{
 		int middle = (left + right) / 2;
-		const DIFFRANGE *const dfi = DiffRangeAt(middle);
-		if (nLine < dfi->dbegin0) // Line is before diff in file
+		const DIFFRANGE &dr = m_diffs[middle].diffrange;
+		if (nLine < dr.dbegin0) // Line is before diff in file
 			right = middle - 1;
-		else if (nLine > dfi->dend0) // Line is after diff in file
+		else if (nLine > dr.dend0) // Line is after diff in file
 			left = middle + 1;
 		else // Line is in diff
 			return middle;
@@ -237,11 +198,12 @@ int DiffList::PrevSignificantDiffFromLine(UINT nLine) const
 {
 	int nDiff = -1;
 	const int nDiffCount = GetSize();
-
-	for (int i = nDiffCount - 1; i >= 0 ; i--)
+	int i = nDiffCount;
+	while (i > 0)
 	{
-		const DIFFRANGE *dfi = DiffRangeAt(i);
-		if (dfi->op != OP_TRIVIAL && dfi->dend0 <= nLine)
+		--i;
+		const DIFFRANGE &dr = m_diffs[i].diffrange;
+		if (dr.op != OP_TRIVIAL && dr.dend0 < nLine)
 		{
 			nDiff = i;
 			break;
@@ -259,15 +221,16 @@ int DiffList::NextSignificantDiffFromLine(UINT nLine) const
 {
 	int nDiff = -1;
 	const int nDiffCount = GetSize();
-
-	for (int i = 0; i < nDiffCount; i++)
+	int i = 0;
+	while (i < nDiffCount)
 	{
-		const DIFFRANGE *dfi = DiffRangeAt(i);
-		if (dfi->op != OP_TRIVIAL && dfi->dbegin0 >= nLine)
+		const DIFFRANGE &dr = m_diffs[i].diffrange;
+		if (dr.op != OP_TRIVIAL && dr.dbegin0 > nLine)
 		{
 			nDiff = i;
 			break;
 		}
+		++i;
 	}
 	return nDiff;
 }
@@ -329,7 +292,7 @@ int DiffList::NextSignificantDiff(int nDiff) const
  */
 int DiffList::PrevSignificantDiff(int nDiff) const
 {
-	return (int)m_diffs[nDiff].prev;
+	return m_diffs[nDiff].prev;
 }
 
 /**
@@ -339,28 +302,6 @@ int DiffList::PrevSignificantDiff(int nDiff) const
 int DiffList::LastSignificantDiff() const
 {
 	return m_lastSignificant;
-}
-
-/**
- * @brief Return pointer to first significant diff.
- * @return Constant pointer to first significant difference.
- */
-const DIFFRANGE *DiffList::FirstSignificantDiffRange() const
-{
-	if (m_firstSignificant == -1)
-		return NULL;
-	return DiffRangeAt(m_firstSignificant);
-}
-
-/**
- * @brief Return pointer to last significant diff.
- * @return Constant pointer to last significant difference.
- */
-const DIFFRANGE *DiffList::LastSignificantDiffRange() const
-{
-	if (m_lastSignificant == -1)
-		return NULL;
-	return DiffRangeAt(m_lastSignificant);
 }
 
 /**

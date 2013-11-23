@@ -1034,12 +1034,14 @@ void CChildFrame::UpdateGeneralCmdUI()
 		currDiff != -1 && m_diffList.IsDiffSignificant(currDiff) ?
 		MF_ENABLED : MF_GRAYED);
 
-	const DIFFRANGE *dfi = m_diffList.FirstSignificantDiffRange();
-	m_pMDIFrame->UpdateCmdUI<ID_PREVDIFF>(
-		dfi && pos.y > (long)dfi->dend0 ? MF_ENABLED : MF_GRAYED);
-	dfi = m_diffList.LastSignificantDiffRange();
-	m_pMDIFrame->UpdateCmdUI<ID_NEXTDIFF>(
-		dfi && pos.y < (long)dfi->dbegin0 ? MF_ENABLED : MF_GRAYED);
+	currDiff = m_diffList.FirstSignificantDiff();
+	m_pMDIFrame->UpdateCmdUI<ID_PREVDIFF>(currDiff != -1 &&
+		pos.y > static_cast<long>(m_diffList.DiffRangeAt(currDiff)->dend0) ?
+		MF_ENABLED : MF_GRAYED);
+	currDiff = m_diffList.LastSignificantDiff();
+	m_pMDIFrame->UpdateCmdUI<ID_NEXTDIFF>(currDiff != -1 &&
+		pos.y < static_cast<long>(m_diffList.DiffRangeAt(currDiff)->dbegin0) ?
+		MF_ENABLED : MF_GRAYED);
 
 	// Enable select difference menuitem if current line is inside difference.
 	m_pMDIFrame->UpdateCmdUI<ID_SELECTLINEDIFF>(

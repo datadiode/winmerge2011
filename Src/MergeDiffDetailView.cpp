@@ -192,12 +192,10 @@ void CMergeDiffDetailView::OnDisplayDiff(int nDiff)
 	}
 	else
 	{
-		DIFFRANGE curDiff;
-		VERIFY(m_pDocument->m_diffList.GetDiff(nDiff, curDiff));
-
-		newlineBegin = curDiff.dbegin0;
+		const DIFFRANGE *curDiff = m_pDocument->m_diffList.DiffRangeAt(nDiff);
+		newlineBegin = curDiff->dbegin0;
 		ASSERT(newlineBegin >= 0);
-		newlineEnd = curDiff.dend0 + 1;
+		newlineEnd = curDiff->dend0 + 1;
 	}
 
 	if (newlineBegin == m_lineBegin && newlineEnd == m_lineEnd)

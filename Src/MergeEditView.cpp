@@ -431,10 +431,6 @@ void CMergeEditView::OnLastdiff()
  */
 void CMergeEditView::OnNextdiff()
 {
-	int cnt = m_pDocument->m_ptBuf[0]->GetLineCount();
-	if (cnt <= 0)
-		return;
-
 	// Returns -1 if no diff selected
 	int curDiff = m_pDocument->GetCurrentDiff();
 	if (curDiff != -1)
@@ -444,20 +440,12 @@ void CMergeEditView::OnNextdiff()
 		if (!IsDiffVisible(curDiff))
 		{
 			// Selected difference not visible, select next from cursor
-			int line = m_ptCursorPos.y;
-			// Make sure we aren't in the first line of the diff
-			++line;
-			if (!IsValidTextPosY(line))
-				line = m_nTopLine;
-			nextDiff = m_pDocument->m_diffList.NextSignificantDiffFromLine(line);
+			nextDiff = m_pDocument->m_diffList.NextSignificantDiffFromLine(m_ptCursorPos.y);
 		}
 		else
 		{
 			// Find out if there is a following significant diff
-			if (curDiff < m_pDocument->m_diffList.GetSize() - 1)
-			{
-				nextDiff = m_pDocument->m_diffList.NextSignificantDiff(curDiff);
-			}
+			nextDiff = m_pDocument->m_diffList.NextSignificantDiff(curDiff);
 		}
 		if (nextDiff == -1)
 			nextDiff = curDiff;
@@ -493,10 +481,6 @@ void CMergeEditView::OnNextdiff()
  */
 void CMergeEditView::OnPrevdiff()
 {
-	int cnt = m_pDocument->m_ptBuf[0]->GetLineCount();
-	if (cnt <= 0)
-		return;
-
 	// GetCurrentDiff() returns -1 if no diff selected
 	int curDiff = m_pDocument->GetCurrentDiff();
 	if (curDiff != -1)
@@ -506,24 +490,15 @@ void CMergeEditView::OnPrevdiff()
 		if (!IsDiffVisible(curDiff))
 		{
 			// Selected difference not visible, select previous from cursor
-			int line = m_ptCursorPos.y;
-			// Make sure we aren't in the last line of the diff
-			--line;
-			if (!IsValidTextPosY(line))
-				line = m_nTopLine;
-			prevDiff = m_pDocument->m_diffList.PrevSignificantDiffFromLine(line);
+			prevDiff = m_pDocument->m_diffList.PrevSignificantDiffFromLine(m_ptCursorPos.y);
 		}
 		else
 		{
 			// Find out if there is a preceding significant diff
-			if (curDiff > 0)
-			{
-				prevDiff = m_pDocument->m_diffList.PrevSignificantDiff(curDiff);
-			}
+			prevDiff = m_pDocument->m_diffList.PrevSignificantDiff(curDiff);
 		}
 		if (prevDiff == -1)
 			prevDiff = curDiff;
-
 		// prevDiff is the preceding one if there is one, else it is the one we're on
 		SelectDiff(prevDiff);
 	}
@@ -701,13 +676,12 @@ void CMergeEditView::ShowDiff(bool bScroll)
 	if (nDiff >= 0 && nDiff < m_pDocument->m_diffList.GetSize())
 	{
 		POINT ptStart, ptEnd;
-		DIFFRANGE curDiff;
-		m_pDocument->m_diffList.GetDiff(nDiff, curDiff);
+		const DIFFRANGE *curDiff = m_pDocument->m_diffList.DiffRangeAt(nDiff);
 
 		ptStart.x = 0;
-		ptStart.y = curDiff.dbegin0;
+		ptStart.y = curDiff->dbegin0;
 		ptEnd.x = 0;
-		ptEnd.y = curDiff.dend0;
+		ptEnd.y = curDiff->dend0;
 
 		if (bScroll && !IsDiffVisible(curDiff, CONTEXT_LINES_BELOW))
 		{
@@ -1136,9 +1110,8 @@ void CMergeEditView::InvalidateSubLineIndexCache(int nLineIndex)
 */
 bool CMergeEditView::IsDiffVisible(int nDiff)
 {
-	DIFFRANGE diff;
-	m_pDocument->m_diffList.GetDiff(nDiff, diff);
-	return IsDiffVisible(diff);
+	const DIFFRANGE *diff = m_pDocument->m_diffList.DiffRangeAt(nDiff);
+	return diff && IsDiffVisible(diff);
 }
 
 /**
@@ -1147,12 +1120,12 @@ bool CMergeEditView::IsDiffVisible(int nDiff)
  * @param [in] nLinesBelow Allow "minimizing" the number of visible lines.
  * @return TRUE if difference is visible, FALSE otherwise.
  */
-bool CMergeEditView::IsDiffVisible(const DIFFRANGE& diff, int nLinesBelow /*=0*/)
+bool CMergeEditView::IsDiffVisible(const DIFFRANGE *diff, int nLinesBelow /*=0*/)
 {
-	const int nDiffStart = GetSubLineIndex(diff.dbegin0);
-	const int nDiffEnd = GetSubLineIndex(diff.dend0);
+	const int nDiffStart = GetSubLineIndex(diff->dbegin0);
+	const int nDiffEnd = GetSubLineIndex(diff->dend0);
 	// Diff's height is last line - first line + last line's line count
-	const int nDiffHeight = nDiffEnd - nDiffStart + GetSubLines(diff.dend0) + 1;
+	const int nDiffHeight = nDiffEnd - nDiffStart + GetSubLines(diff->dend0) + 1;
 
 	// If diff first line outside current view - context OR
 	// if diff last line outside current view - context OR

@@ -159,7 +159,7 @@ public:
 // Implementation
 protected:
 	virtual ~CMergeEditView();
-	bool IsDiffVisible(const DIFFRANGE& diff, int nLinesBelow = 0);
+	bool IsDiffVisible(const DIFFRANGE *, int nLinesBelow = 0);
 
 	HMenu *ApplyPatch(IStream *, int);
 	void ApplyPatch(IStream *, const POINTL &);
