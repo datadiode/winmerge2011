@@ -174,59 +174,6 @@ void CMergeEditView::UpdateResources()
 	Invalidate();
 }
 
-/**
- * @brief Get diffs inside selection.
- * @param [out] firstDiff First diff inside selection
- * @param [out] lastDiff Last diff inside selection
- * @note -1 is returned in parameters if diffs cannot be determined
- * @todo This shouldn't be called when there is no diffs, so replace
- * first 'if' with ASSERT()?
- */
-void CMergeEditView::GetFullySelectedDiffs(int & firstDiff, int & lastDiff)
-{
-	firstDiff = -1;
-	lastDiff = -1;
-
-	const int nDiffs = m_pDocument->m_diffList.GetSignificantDiffs();
-	if (nDiffs == 0)
-		return;
-
-	int firstLine, lastLine;
-	GetFullySelectedLines(firstLine, lastLine);
-	if (lastLine < firstLine)
-		return;
-
-	firstDiff = m_pDocument->m_diffList.NextSignificantDiffFromLine(firstLine);
-	lastDiff = m_pDocument->m_diffList.PrevSignificantDiffFromLine(lastLine);
-	if (firstDiff != -1 && lastDiff != -1)
-	{
-		DIFFRANGE di;
-		
-		// Check that first selected line is first diff's first line or above it
-		VERIFY(m_pDocument->m_diffList.GetDiff(firstDiff, di));
-		if ((int)di.dbegin0 < firstLine)
-		{
-			if (firstDiff < lastDiff)
-				++firstDiff;
-		}
-
-		// Check that last selected line is last diff's last line or below it
-		VERIFY(m_pDocument->m_diffList.GetDiff(lastDiff, di));
-		if ((int)di.dend0 > lastLine)
-		{
-			if (firstDiff < lastDiff)
-				--lastDiff;
-		}
-
-		// Special case: one-line diff is not selected if cursor is in it
-		if (firstLine == lastLine)
-		{
-			firstDiff = -1;
-			lastDiff = -1;
-		}
-	}
-}
-
 int CMergeEditView::GetAdditionalTextBlocks(int nLineIndex, TEXTBLOCK *&rpBuf)
 {
 	DWORD dwLineFlags = GetLineFlags(nLineIndex);

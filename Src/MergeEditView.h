@@ -137,7 +137,6 @@ public:
 	void SelectNone();
 	void SelectDiff(int nDiff, bool bScroll = true);
 	CDiffTextBuffer *GetTextBuffer() { return static_cast<CDiffTextBuffer *>(m_pTextBuffer); }
-	void GetFullySelectedDiffs(int & firstDiff, int & lastDiff);
 	void UpdateResources();
 	virtual int RecalcVertScrollBar(bool bPositionOnly = false);
 	virtual int GetAdditionalTextBlocks(int nLineIndex, TEXTBLOCK *&pBuf);
