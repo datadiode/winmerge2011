@@ -39,7 +39,7 @@
             Culture="1033"
             PreprocessorDefinitions="_DEBUG" />
       <Tool Name="VCLinkerTool"
-            AdditionalDependencies="version.lib shlwapi.lib urlmon.lib imm32.lib HtmlHelp.lib comctl32.lib oleacc.lib"
+            AdditionalDependencies="version.lib shlwapi.lib urlmon.lib imm32.lib HtmlHelp.lib comctl32.lib oleacc.lib noarg.obj noenv.obj"
             AdditionalLibraryDirectories="$(IntDir)"
             GenerateDebugInformation="true"
             GenerateManifest="false"
@@ -120,7 +120,7 @@
             Culture="1033"
             PreprocessorDefinitions="NDEBUG" />
       <Tool Name="VCLinkerTool"
-            AdditionalDependencies="version.lib shlwapi.lib urlmon.lib imm32.lib HtmlHelp.lib comctl32.lib oleacc.lib"
+            AdditionalDependencies="version.lib shlwapi.lib urlmon.lib imm32.lib HtmlHelp.lib comctl32.lib oleacc.lib noarg.obj noenv.obj"
             AdditionalLibraryDirectories="$(IntDir)"
             AdditionalOptions="/verbose:lib"
             GenerateManifest="false"

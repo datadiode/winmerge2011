@@ -24,11 +24,6 @@
 //
 #include "StdAfx.h"
 
-#if _MSC_VER >= 1400
-#pragma comment(lib, "noarg.obj")
-#pragma comment(lib, "noenv.obj")
-#endif
-
 // Support EASTL as per <EASTL/allocator.h> line 194.
 void* operator new[](size_t size, const char* pName, int flags,
     unsigned debugFlags, const char* file, int line)
