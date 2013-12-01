@@ -115,7 +115,8 @@ void Format7zDLL::Interface::Inspector::Init(HWND hwndParent)
 	{
 		Complain(ERROR_OPEN_FAILED, path);
 	}
-	if COMPLAIN(archive->Open(file, 0, callback) != S_OK)
+	static const UInt64 maxCheckStartPosition = ULLONG_MAX;
+	if COMPLAIN(archive->Open(file, &maxCheckStartPosition, callback) != S_OK)
 	{
 		Complain(ERROR_CANT_ACCESS_FILE, path);
 	}
