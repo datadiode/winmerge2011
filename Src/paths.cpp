@@ -113,6 +113,11 @@ String paths_GetLongPath(LPCTSTR szPath)
 	sFull[len] = _T('?');
 	if (PathIsRelative(szPath))
 		sFull = paths_ConcatPath(CurrentDirectory(), sFull);
+	else if (!PathIsUNC(szPath) && PathGetDriveNumber(szPath) == -1)
+	{
+		CurrentDirectory sCurDir;
+		sFull.insert(0, sCurDir.c_str(), sCurDir.find(_T(':')) + 1);
+	}
 	paths_DoMagic(sFull);
 	if (DWORD cch = GetFullPathName(sFull.c_str(), 0, NULL, NULL))
 	{
