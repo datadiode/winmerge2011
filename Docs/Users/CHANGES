@@ -1,3 +1,21 @@
+0.2011.003.511
+Changes since preceding release (not necessarily complete):
+• paths.cpp: Fix paths_GetLongPath() for non-UNC paths lacking the drive letter
+• Merge7z: Fix inability to open NSIS installers
+• Create multiple compare threads to take advantage of multi-core machines
+• http://sf.net/p/winmerge/patches/2970/: Add asterisk (*) for unsaved files
+• EditLib: Have Alt+Insert create an in-place edit control to assist RTL editing
+• FilterList.cpp: Fix condition to trigger UTF-8 awareness / Fix buffer overrun
+• Fix border cases where WinMerge was unintentionally moving to background
+• Consistify behavior of Merge > Next Difference and Merge > Previous Difference
+• Make checkable menue items visually appear like checkboxes 
+• LoadSaveCodepageDlg: Adopt descriptive comboboxes from Takashi's fork
+• Adopt visual line difference deletion indicators from Takashi's fork
+• Adopt synchronization points UI from changeset 62013bce9c81 of Takashi's fork
+• ByteCompare: Prevent bogus character case conversions on DBCS trail bytes
+• DiffUtils: Prevent bogus character case conversions on DBCS trail bytes 
+• stringdiffs.cpp: Fix an off-by-1 bug in stringdiffs::BuildWordDiffList()
+
 0.2011.003.433
 Changes since preceding release (not necessarily complete):
 • Add Pause button as per http://sf.net/p/winmerge/feature-requests/1237
