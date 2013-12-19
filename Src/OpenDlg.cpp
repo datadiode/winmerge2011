@@ -657,6 +657,22 @@ void COpenDlg::OnSelchangePathCombo(HSuperComboBox *pCb)
  */
 void COpenDlg::OnEditchangePathCombo(HSuperComboBox *pCb)
 {
+	if (HEdit *const edit = pCb->GetEditControl())
+	{
+		const int len = edit->GetWindowTextLength();
+		if (edit->GetSel() == MAKELONG(len, len))
+		{
+			String text;
+			edit->GetWindowText(text);
+			// Remove any double quotes
+			text.erase(stl::remove(text.begin(), text.end(), _T('"')), text.end());
+			if (text.length() != len)
+			{
+				edit->SetSel(0, len);
+				edit->ReplaceSel(text.c_str());
+			}
+		}
+	}
 	if (m_nAutoComplete == AUTO_COMPLETE_RECENTLY_USED)
 		pCb->AutoCompleteFromLB(0);
 	if (!pCb->GetDroppedState())
