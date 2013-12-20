@@ -58,9 +58,9 @@ enum BLANKNESS_TYPE
 	START = 128
 };
 
-inline bool is_single_bit(unsigned mask)
+inline unsigned has_multiple_bits(unsigned mask)
 {
-	return mask > (mask & mask - 1);
+	return mask & mask - 1;
 }
 
 template<>
@@ -236,7 +236,7 @@ unsigned ByteCompare::CompareFiles(FileLocation *location, const stl_size_t x, c
 					break;
 				}
 			}
-			else if (!is_single_bit(mask & (CR | LF | CRLF)))
+			else if (has_multiple_bits(mask & (CR | LF | CRLF)))
 			{
 				// EOL on both sides, but different in style. Force bytes ahead
 				// to (un)equalness, depending on bIgnoreEOLDifference.
