@@ -171,7 +171,7 @@ bool CDiffTextBuffer::IsSaveable() const
  */
 FileLoadResult::FILES_RESULT CDiffTextBuffer::LoadFromFile(LPCTSTR pszFileName,
 		PackingInfo *infoUnpacker, bool &readOnly,
-		CRLFSTYLE nCrlfStyle, const FileTextEncoding &encoding, String &sError)
+		CRLFSTYLE nCrlfStyle, FileTextEncoding &encoding, String &sError)
 {
 	ASSERT(!m_bInit);
 	ASSERT(m_aLines.size() == 0);
@@ -193,7 +193,9 @@ FileLoadResult::FILES_RESULT CDiffTextBuffer::LoadFromFile(LPCTSTR pszFileName,
 			pufile->ReadBom();
 			// If the file is not unicode file, use the codepage we were given to
 			// interpret the 8-bit characters.
-			if (pufile->GetUnicoding() == NONE)
+			if (UNICODESET unicoding = pufile->GetUnicoding())
+				encoding.SetUnicoding(unicoding);
+			else
 				pufile->SetCodepage(encoding.m_codepage);
 			UINT lineno = 0;
 			String eol, preveol;

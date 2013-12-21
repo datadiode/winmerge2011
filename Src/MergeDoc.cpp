@@ -1793,7 +1793,7 @@ void CChildFrame::SetMergeDetailViews(CMergeDiffDetailView * pLeft, CMergeDiffDe
  * @return Tells if files were loaded successfully
  * @sa CChildFrame::OpenDocs()
  **/
-FileLoadResult::FILES_RESULT CChildFrame::LoadFile(int nBuffer, bool &readOnly, const FileLocation &fileinfo)
+FileLoadResult::FILES_RESULT CChildFrame::LoadFile(int nBuffer, bool &readOnly, FileLocation &fileinfo)
 {
 	CDiffTextBuffer *pBuf = m_ptBuf[nBuffer];
 	m_strPath[nBuffer] = fileinfo.filepath;
@@ -1871,7 +1871,7 @@ void CChildFrame::SanityCheckCodepage(FileLocation & fileinfo)
  * @return One of FileLoadResult values.
  */
 FileLoadResult::FILES_RESULT CChildFrame::LoadOneFile(
-	int index, bool &readOnly, const FileLocation &fileinfo)
+	int index, bool &readOnly, FileLocation &fileinfo)
 {
 	FileLoadResult::FILES_RESULT loadSuccess = FileLoadResult::FRESULT_ERROR;
 	if (!fileinfo.filepath.empty())

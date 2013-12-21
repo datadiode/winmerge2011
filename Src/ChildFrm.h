@@ -313,9 +313,9 @@ private:
 	static bool GetByteColoringOption();
 	static bool IsValidCodepageForMergeEditor(unsigned cp);
 	static void SanityCheckCodepage(FileLocation &fileinfo);
-	FileLoadResult::FILES_RESULT LoadOneFile(int index, bool &readOnly, const FileLocation &);
+	FileLoadResult::FILES_RESULT LoadOneFile(int index, bool &readOnly, FileLocation &);
 	FileLoadResult::FILES_RESULT ReloadDoc(int index);
-	FileLoadResult::FILES_RESULT LoadFile(int nBuffer, bool &readOnly, const FileLocation &);
+	FileLoadResult::FILES_RESULT LoadFile(int nBuffer, bool &readOnly, FileLocation &);
 };
 
 /////////////////////////////////////////////////////////////////////////////

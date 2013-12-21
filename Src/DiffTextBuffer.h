@@ -171,7 +171,7 @@ public:
 
 	FileLoadResult::FILES_RESULT LoadFromFile(LPCTSTR pszFileName,
 		PackingInfo *infoUnpacker, bool &readOnly, CRLFSTYLE nCrlfStyle,
-		const FileTextEncoding &encoding, String &sError);
+		FileTextEncoding &encoding, String &sError);
 	int SaveToFile(LPCTSTR pszFileName, ISequentialStream *pTempStream, String &sError,
 		PackingInfo *infoUnpacker = NULL, CRLFSTYLE nCrlfStyle = CRLF_STYLE_AUTOMATIC,
 		int nStartLine = 0, int nLines = -1);
