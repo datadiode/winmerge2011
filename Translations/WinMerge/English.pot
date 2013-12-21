@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WinMerge\n"
 "Report-Msgid-Bugs-To: http://bugs.winmerge.org/\n"
-"POT-Creation-Date: 2013-11-13 07:13+0000\n"
+"POT-Creation-Date: 2013-12-21 11:18+0000\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: English <winmerge-translate@lists.sourceforge.net>\n"
@@ -1018,7 +1018,7 @@ msgstr ""
 
 #: Merge.rc:511
 #, c-format
-msgid "&Synchronization Point"
+msgid "&Synchronization Point\tAlt+S"
 msgstr ""
 
 #: Merge.rc:512

@@ -1021,7 +1021,7 @@ msgstr "&c çÂ«—êÊ‘ „ò«‰ Ì«»Ì "
 
 #: Merge.rc:511
 #, c-format
-msgid "&Synchronization Point"
+msgid "&Synchronization Point\tAlt+S"
 msgstr ""
 
 #: Merge.rc:512

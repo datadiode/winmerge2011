@@ -1023,8 +1023,8 @@ msgstr "P&ositionsleiste"
 
 #: Merge.rc:511
 #, c-format
-msgid "&Synchronization Point"
-msgstr "&Synchronisationspunkt"
+msgid "&Synchronization Point\tAlt+S"
+msgstr "&Synchronisationspunkt\tAlt+S"
 
 #: Merge.rc:512
 #, c-format

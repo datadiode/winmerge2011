@@ -1024,7 +1024,7 @@ msgstr "Panel de &posición"
 
 #: Merge.rc:511
 #, c-format
-msgid "&Synchronization Point"
+msgid "&Synchronization Point\tAlt+S"
 msgstr ""
 
 #: Merge.rc:512
