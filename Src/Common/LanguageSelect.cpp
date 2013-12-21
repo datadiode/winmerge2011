@@ -8,7 +8,7 @@
 
 #include "StdAfx.h"
 #include "Merge.h"
-#include "version.h"
+#include "VersionData.h"
 #include "resource.h"
 #include "LanguageSelect.h"
 #include "MainFrm.h"
@@ -528,20 +528,28 @@ bool CLanguageSelect::LoadLanguageFile(LANGID wLangId)
 	if (m_hCurrentDll == 0)
 		m_hCurrentDll = LoadLibraryEx(_T("MergeLang.dll"), 0, LOAD_LIBRARY_AS_DATAFILE);
 	// Failure of LoadLibraryEx() will cause the MERGEPOT blob fail to load.
-	CVersionInfo viInstance;
 	DWORD instanceVerMS = 0;
 	DWORD instanceVerLS = 0;
-	viInstance.GetFixedFileVersion(instanceVerMS, instanceVerLS);
-	CVersionInfo viResource = m_hCurrentDll;
+	if (const VS_FIXEDFILEINFO *pVffInfo =
+		reinterpret_cast<const VS_FIXEDFILEINFO *>(CVersionData::Load()->Data()))
+	{
+		instanceVerMS = pVffInfo->dwFileVersionMS;
+		instanceVerLS = pVffInfo->dwFileVersionLS;
+	}
 	DWORD resourceVerMS = 0;
 	DWORD resourceVerLS = 0;
-	viResource.GetFixedFileVersion(resourceVerMS, resourceVerLS);
+	if (const VS_FIXEDFILEINFO *pVffInfo =
+		reinterpret_cast<const VS_FIXEDFILEINFO *>(CVersionData::Load(m_hCurrentDll)->Data()))
+	{
+		resourceVerMS = pVffInfo->dwFileVersionMS;
+		resourceVerLS = pVffInfo->dwFileVersionLS;
+	}
 	// There is no point in translating error messages about inoperational
 	// translation system, so go without string resources here.
 	if (instanceVerMS != resourceVerMS || instanceVerLS != resourceVerLS)
 	{
 		if (m_hWnd)
-			theApp.DoMessageBox(_T("MergeLang.dll version mismatch"), MB_ICONSTOP);
+			MessageBox(_T("MergeLang.dll version mismatch"), _T("WinMerge"), MB_ICONSTOP);
 		return false;
 	}
 	HRSRC mergepot = FindResource(m_hCurrentDll, _T("MERGEPOT"), RT_RCDATA);
