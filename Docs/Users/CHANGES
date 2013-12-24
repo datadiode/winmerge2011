@@ -1,3 +1,10 @@
+2011.003.523
+Changes since preceding release (not necessarily complete):
+• http://sf.net/p/winmerge/bugs/2159/: Wrong encoding shown in status bar
+• Merge from https://bitbucket.org/sdottaka/winmerge-v2/commits/c152e96dde89
+• LanguageSelect.cpp: Debug build failed to switch between languages
+• ByteCompare.cpp: CompareFiles() failed at ignoring EOL differences
+
 0.2011.003.511
 Changes since preceding release (not necessarily complete):
 • paths.cpp: Fix paths_GetLongPath() for non-UNC paths lacking the drive letter
