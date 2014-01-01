@@ -962,9 +962,8 @@ bool CChildFrame::TrySaveAs(String &strPath, int &nSaveResult, String & sError,
 			nBuffer == 0 ? IDS_SAVE_LEFT_AS : IDS_SAVE_RIGHT_AS,
 			NULL, FALSE))
 		{
-			CDiffTextBuffer *pBuffer = m_ptBuf[nBuffer];
-			nSaveResult = pBuffer->SaveToFile(strSavePath.c_str(), FALSE, sError,
-				pInfoTempUnpacker);
+			nSaveResult = m_ptBuf[nBuffer]->SaveToFile(
+				strSavePath.c_str(), NULL, sError, pInfoTempUnpacker);
 
 			if (nSaveResult == SAVE_DONE)
 			{
@@ -1082,33 +1081,26 @@ bool CChildFrame::DoSave(bool &bSaveSuccess, int nBuffer)
 	// the error code from the latest save operation, 
 	// or SAVE_DONE when the save succeeds
 	// TODO: Shall we return this code in addition to bSaveSuccess ?
-	int nSaveErrorCode = SAVE_DONE;
-	CDiffTextBuffer *pBuffer = m_ptBuf[nBuffer];
-
-	// Assume empty filename means Scratchpad (unnamed file)
-	// Todo: This is not needed? - buffer type check should be enough
-	if (strSavePath.empty())
-		nSaveErrorCode = SAVE_NO_FILENAME;
-
-	// Handle unnamed buffers
-	if (m_nBufferType[nBuffer] == BUFFER_UNNAMED)
-		nSaveErrorCode = SAVE_NO_FILENAME;
+	int nSaveResult = SAVE_NO_FILENAME;
 
 	String sError;
-	if (nSaveErrorCode == SAVE_DONE)
+	if (m_nBufferType[nBuffer] != BUFFER_UNNAMED)
+	{
 		// We have a filename, just try to save
-		nSaveErrorCode = pBuffer->SaveToFile(strSavePath.c_str(), FALSE, sError, &infoTempUnpacker);
+		nSaveResult = m_ptBuf[nBuffer]->SaveToFile(
+			strSavePath.c_str(), NULL, sError, &infoTempUnpacker);
+	}
 
-	if (nSaveErrorCode != SAVE_DONE)
+	if (nSaveResult != SAVE_DONE)
 	{
 		// Saving failed, user may save to another location if wants to
 		do
-			result = TrySaveAs(strSavePath, nSaveErrorCode, sError, nBuffer, &infoTempUnpacker);
+			result = TrySaveAs(strSavePath, nSaveResult, sError, nBuffer, &infoTempUnpacker);
 		while (!result);
 	}
 
 	// Saving succeeded with given/selected filename
-	if (nSaveErrorCode == SAVE_DONE)
+	if (nSaveResult == SAVE_DONE)
 	{
 		// Preserve file times if user wants to
 		if (COptionsMgr::Get(OPT_PRESERVE_FILETIMES))
@@ -1120,10 +1112,11 @@ bool CChildFrame::DoSave(bool &bSaveSuccess, int nBuffer)
 		m_strPath[nBuffer] = strSavePath;
 		m_pRescanFileInfo[nBuffer].Update(strSavePath.c_str());
 		UpdateHeaderPath(nBuffer);
+		m_pMDIFrame->m_strSaveAsPath.clear();
 		bSaveSuccess = true;
 		result = true;
 	}
-	else if (nSaveErrorCode == SAVE_CANCELLED)
+	else if (nSaveResult == SAVE_CANCELLED)
 	{
 		// User cancelled current operation, lets do what user wanted to do
 		result = false;
@@ -1165,16 +1158,16 @@ bool CChildFrame::DoSaveAs(int nBuffer)
 	// or SAVE_DONE when the save succeeds
 
 	// Use SAVE_NO_FILENAME to prevent asking about error
-	int nSaveErrorCode = SAVE_NO_FILENAME;
+	int nSaveResult = SAVE_NO_FILENAME;
 
 	// Loop until user succeeds saving or cancels
 	String sError;
 	do
-		result = TrySaveAs(strSavePath, nSaveErrorCode, sError, nBuffer, &infoTempUnpacker);
+		result = TrySaveAs(strSavePath, nSaveResult, sError, nBuffer, &infoTempUnpacker);
 	while (!result);
 
 	// Saving succeeded with given/selected filename
-	if (nSaveErrorCode == SAVE_DONE)
+	if (nSaveResult == SAVE_DONE)
 	{
 		m_pSaveFileInfo[nBuffer].Update(strSavePath.c_str());
 		m_strPath[nBuffer] = strSavePath;
@@ -1318,7 +1311,10 @@ void CChildFrame::OnFileSave()
 	bool bLChangedOriginal = false;
 	bool bRChangedOriginal = false;
 
-	if (m_ptBuf[0]->IsModified() && !m_ptBuf[0]->GetReadOnly())
+	const bool bROLeft = m_ptBuf[0]->GetReadOnly();
+	const bool bRORight = m_ptBuf[1]->GetReadOnly();
+
+	if (!m_pMDIFrame->m_strSaveAsPath.empty() && bRORight > bROLeft || m_ptBuf[0]->IsSaveable())
 	{
 		// (why we don't use return value of DoSave)
 		// DoSave will return TRUE if it wrote to something successfully
@@ -1326,7 +1322,7 @@ void CChildFrame::OnFileSave()
 		DoSave(bLChangedOriginal, 0);
 	}
 
-	if (m_ptBuf[1]->IsModified() && !m_ptBuf[1]->GetReadOnly())
+	if (!m_pMDIFrame->m_strSaveAsPath.empty() && bROLeft > bRORight || m_ptBuf[1]->IsSaveable())
 	{
 		// See comments above for left case
 		DoSave(bRChangedOriginal, 1);

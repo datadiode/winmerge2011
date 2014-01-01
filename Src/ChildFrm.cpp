@@ -974,8 +974,14 @@ void CChildFrame::SetLastCompareResult(int nResult)
 
 void CChildFrame::UpdateEditCmdUI()
 {
-	BYTE enableSaveLeft = m_ptBuf[0]->IsSaveable() ? MF_ENABLED : MF_GRAYED;
-	BYTE enableSaveRight = m_ptBuf[1]->IsSaveable() ? MF_ENABLED : MF_GRAYED;
+	const bool bROLeft = m_ptBuf[0]->GetReadOnly();
+	const bool bRORight = m_ptBuf[1]->GetReadOnly();
+	const BYTE enableSaveLeft =
+		!m_pMDIFrame->m_strSaveAsPath.empty() && bRORight > bROLeft ||
+		m_ptBuf[0]->IsSaveable() ? MF_ENABLED : MF_GRAYED;
+	const BYTE enableSaveRight =
+		!m_pMDIFrame->m_strSaveAsPath.empty() && bROLeft > bRORight ||
+		m_ptBuf[1]->IsSaveable() ? MF_ENABLED : MF_GRAYED;
 	m_pMDIFrame->UpdateCmdUI<ID_FILE_SAVE_LEFT>(enableSaveLeft);
 	m_pMDIFrame->UpdateCmdUI<ID_FILE_SAVE_RIGHT>(enableSaveRight);
 	m_pMDIFrame->UpdateCmdUI<ID_FILE_SAVE>(enableSaveLeft & enableSaveRight);
