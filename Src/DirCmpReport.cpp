@@ -4,10 +4,6 @@
  * @brief Implementation file for DirCmpReport
  *
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-//
-
 #include "StdAfx.h"
 #include "resource.h"
 #include "markdown.h"
@@ -351,7 +347,7 @@ void DirCmpReport::GenerateHTMLHeaderBodyPortion()
 		if (m_pList->GetColumn(currCol, &lvc))
 		{
 			WriteString(_T("<th>"));
-			WriteString(lvc.pszText);
+			WriteStringEntityAware(lvc.pszText);
 			WriteString(_T("</th>"));
 		}
 	}
