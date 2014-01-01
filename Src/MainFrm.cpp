@@ -2085,7 +2085,17 @@ void CMainFrame::addToMru(LPCTSTR szItem, LPCTSTR szRegSubKey, UINT nMaxItems)
 		if (n > nMaxItems)
 			n = nMaxItems;
 		TCHAR *const s = reinterpret_cast<TCHAR *>(_alloca(bufsize));
-		szItem = paths_UndoMagic(wcsdupa(szItem));
+		String strItem = szItem;
+		paths_UndoMagic(strItem);
+		if (strItem.length() >= MAX_PATH)
+		{
+			TCHAR buf[MAX_PATH];
+			if (DWORD len = GetShortPathName(szItem, buf, _countof(buf)))
+			{
+				strItem.assign(buf, len);
+				paths_UndoMagic(strItem);
+			}
+		}
 		UINT i = n;
 		// if item is already in MRU, exclude subsequent items from rotation
 		while (i != 0)
@@ -2096,7 +2106,7 @@ void CMainFrame::addToMru(LPCTSTR szItem, LPCTSTR szRegSubKey, UINT nMaxItems)
 			DWORD type = REG_NONE;
 			if (RegQueryValueEx(hKey, name, NULL, &type,
 				reinterpret_cast<BYTE *>(s), &cb) == ERROR_SUCCESS &&
-				_tcscmp(s, szItem) == 0)
+				strItem == s)
 			{
 				n = i;
 			}
@@ -2118,8 +2128,8 @@ void CMainFrame::addToMru(LPCTSTR szItem, LPCTSTR szRegSubKey, UINT nMaxItems)
 		}
 		// add most recent item
 		RegSetValueEx(hKey, _T("Item_0"), 0L, REG_SZ,
-			reinterpret_cast<const BYTE *>(szItem),
-			static_cast<DWORD>((_tcslen(szItem) + 1) * sizeof(TCHAR)));
+			reinterpret_cast<const BYTE *>(strItem.c_str()),
+			(strItem.length() + 1) * sizeof(TCHAR));
 	}
 }
 
@@ -3051,7 +3061,7 @@ bool CMainFrame::ParseArgsAndDoOpen(const MergeCmdLineInfo &cmdInfo)
 				!m_pCollectingDirFrame->AddToCollection(filelocLeft, filelocRight))
 			{
 				if (cmdInfo.m_Files.size() > 2)
-					m_strSaveAsPath = cmdInfo.m_Files[2].c_str();
+					m_strSaveAsPath = cmdInfo.m_Files[2];
 
 				// If content type was specified, set up things accordingly.
 				UINT idCompareAs = 0;
