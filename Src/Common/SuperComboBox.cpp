@@ -198,6 +198,8 @@ void HSuperComboBox::AdjustDroppedWidth()
 	int cxMax = 0;
 	int cchTextMax = 0;
 	const int nCount = GetCount();
+	const int cxExtra = GetSystemMetrics(SM_CXVSCROLL) + 2 * GetSystemMetrics(SM_CXBORDER);
+	const int cxAvail = GetSystemMetrics(SM_CXSCREEN) - cxExtra;
 	int nIndex;
 	for (nIndex = 0 ; nIndex < nCount ; ++nIndex)
 	{
@@ -217,13 +219,15 @@ void HSuperComboBox::AdjustDroppedWidth()
 				cxMax = size.cx;
 		}
 		ReleaseDC(pdc);
+		if (cxMax > cxAvail)
+			cxMax = cxAvail;
 	}
 	HWindow *pWndInner = this;
 	if (HWindow *pWnd = GetEditControl())
 		pWndInner = pWnd;
 	else if (HWindow *pWnd = GetDlgItem(1001))
 		pWndInner = pWnd;
-	POINT pt = { cxMax + GetSystemMetrics(SM_CXVSCROLL), 0};
+	POINT pt = { cxMax + cxExtra, 0};
 	pWndInner->MapWindowPoints(this, &pt, 1);
 	SetDroppedWidth(pt.x);
 	if (DefWndProcDropping == NULL)
