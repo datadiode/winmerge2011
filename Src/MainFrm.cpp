@@ -3922,12 +3922,12 @@ HMenu *CMainFrame::SetScriptMenu(HMenu *pMenu, LPCSTR section)
 		m_pScriptMenu = HMenu::CreatePopupMenu();
 		stl::string language;
 		bool bLocalized = LanguageSelect.GetPoHeaderProperty("X-Poedit-Language", language);
-		char path[MAX_PATH];
-		GetModuleFileNameA(NULL, path, MAX_PATH);
-		PathRemoveFileSpecA(path);
-		DWORD cchSupplementFolder = 0;
 		do
 		{
+			char path[MAX_PATH];
+			GetModuleFileNameA(NULL, path, MAX_PATH);
+			PathRemoveFileSpecA(path);
+			DWORD cchSupplementFolder = 0;
 			if (language.empty())
 			{
 				language = "English";
