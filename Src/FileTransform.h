@@ -51,6 +51,8 @@ public:
 	void SetXML();
 	void SetPlugin(LPCTSTR);
 public:
+	/// "3rd path" where output saved if given
+	String saveAsPath;
 	/// text type to override syntax highlighting
 	String textType;
 	/// plugin moniker

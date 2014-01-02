@@ -100,7 +100,7 @@ public:
 		FileLocation &filelocRight,
 		DWORD dwLeftFlags,
 		DWORD dwRightFlags,
-		int nRecursive,
+		int nRecursive = 0,
 		CDirFrame * = NULL);
 	CEditorFrame *ShowMergeDoc(CDirFrame *,
 		FileLocation & filelocLeft,
@@ -158,7 +158,6 @@ protected:
 
 // Public implementation data
 public:
-	String m_strSaveAsPath; /**< "3rd path" where output saved if given */
 	VSSHelper m_vssHelper; /**< Helper class for VSS integration */
 	MergeCmdLineInfo::InvocationMode m_invocationMode;
 	MergeCmdLineInfo::ExitNoDiff m_bExitIfNoDiff; /**< Exit if files are identical? */

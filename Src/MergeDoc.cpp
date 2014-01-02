@@ -1061,9 +1061,9 @@ bool CChildFrame::DoSave(bool &bSaveSuccess, int nBuffer)
 	bSaveSuccess = false;
 	
 	// Check third arg possibly given from command-line
-	if (!m_pMDIFrame->m_strSaveAsPath.empty())
+	if (!m_pInfoUnpacker->saveAsPath.empty())
 	{
-		strSavePath = m_pMDIFrame->m_strSaveAsPath;	
+		strSavePath = m_pInfoUnpacker->saveAsPath;
 		if (paths_DoesPathExist(strSavePath.c_str()) == IS_EXISTING_DIR)
 		{
 			// third arg was a directory, so get append the filename
@@ -1115,7 +1115,7 @@ bool CChildFrame::DoSave(bool &bSaveSuccess, int nBuffer)
 		m_strPath[nBuffer] = strSavePath;
 		m_pRescanFileInfo[nBuffer].Update(strSavePath.c_str());
 		UpdateHeaderPath(nBuffer);
-		m_pMDIFrame->m_strSaveAsPath.clear();
+		m_pInfoUnpacker->saveAsPath.clear();
 		bSaveSuccess = true;
 		result = true;
 	}
@@ -1317,7 +1317,7 @@ void CChildFrame::OnFileSave()
 	const bool bROLeft = m_ptBuf[0]->GetReadOnly();
 	const bool bRORight = m_ptBuf[1]->GetReadOnly();
 
-	if (!m_pMDIFrame->m_strSaveAsPath.empty() && bRORight > bROLeft || m_ptBuf[0]->IsSaveable())
+	if (!m_pInfoUnpacker->saveAsPath.empty() && bRORight > bROLeft || m_ptBuf[0]->IsSaveable())
 	{
 		// (why we don't use return value of DoSave)
 		// DoSave will return TRUE if it wrote to something successfully
@@ -1325,7 +1325,7 @@ void CChildFrame::OnFileSave()
 		DoSave(bLChangedOriginal, 0);
 	}
 
-	if (!m_pMDIFrame->m_strSaveAsPath.empty() && bROLeft > bRORight || m_ptBuf[1]->IsSaveable())
+	if (!m_pInfoUnpacker->saveAsPath.empty() && bROLeft > bRORight || m_ptBuf[1]->IsSaveable())
 	{
 		// See comments above for left case
 		DoSave(bRChangedOriginal, 1);

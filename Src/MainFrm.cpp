@@ -1143,21 +1143,7 @@ CEditorFrame *CMainFrame::ShowMergeDoc(CDirFrame *pDirDoc,
 		// (through menu : "Plugins"->"Open with unpacker")
 		pMergeDoc->SetUnpacker(infoUnpacker);
 		// Note that OpenDocs() takes care of closing compare window when needed.
-		OPENRESULTS_TYPE openResults = pMergeDoc->OpenDocs(filelocLeft, filelocRight, bLeftRO, bRightRO);
-
-		if (openResults == OPENRESULTS_SUCCESS)
-		{
-			if (dwLeftFlags & FFILEOPEN_MODIFIED)
-			{
-				pMergeDoc->m_ptBuf[0]->SetModified(true);
-				pMergeDoc->UpdateHeaderPath(0);
-			}
-			if (dwRightFlags & FFILEOPEN_MODIFIED)
-			{
-				pMergeDoc->m_ptBuf[1]->SetModified(true);
-				pMergeDoc->UpdateHeaderPath(1);
-			}
-		}
+		pMergeDoc->OpenDocs(filelocLeft, filelocRight, bLeftRO, bRightRO);
 	}
 	return pMergeDoc;
 }
@@ -3022,8 +3008,6 @@ bool CMainFrame::ParseArgsAndDoOpen(const MergeCmdLineInfo &cmdInfo)
 	m_invocationMode = cmdInfo.m_invocationMode;
 	m_bExitIfNoDiff = cmdInfo.m_bExitIfNoDiff;
 
-	m_strSaveAsPath.clear();
-
 	FileLocation filelocLeft, filelocRight;
 	filelocLeft.description = cmdInfo.m_sLeftDesc;
 	filelocRight.description = cmdInfo.m_sRightDesc;
@@ -3060,12 +3044,11 @@ bool CMainFrame::ParseArgsAndDoOpen(const MergeCmdLineInfo &cmdInfo)
 			if (!m_pCollectingDirFrame ||
 				!m_pCollectingDirFrame->AddToCollection(filelocLeft, filelocRight))
 			{
-				if (cmdInfo.m_Files.size() > 2)
-					m_strSaveAsPath = cmdInfo.m_Files[2];
-
 				// If content type was specified, set up things accordingly.
 				UINT idCompareAs = 0;
 				PackingInfo packingInfo;
+				if (cmdInfo.m_Files.size() > 2)
+					packingInfo.saveAsPath = cmdInfo.m_Files[2];
 				if (cmdInfo.m_sContentType == _T("text"))
 					idCompareAs = ID_MERGE_COMPARE_TEXT;
 				else if (cmdInfo.m_sContentType == _T("binary"))
@@ -3815,10 +3798,11 @@ bool CMainFrame::DoOpenConflict(LPCTSTR conflictFile)
 	{
 		// Open two parsed files to WinMerge, telling WinMerge to
 		// save over original file (given as third filename).
-		m_strSaveAsPath = conflictFile;
-		conflictCompared = DoFileOpen(filelocLeft, filelocRight,
-				FFILEOPEN_READONLY | FFILEOPEN_NOMRU,
-				FFILEOPEN_NOMRU | FFILEOPEN_MODIFIED);
+		PackingInfo packingInfo;
+		packingInfo.saveAsPath = conflictFile;
+		conflictCompared = DoFileOpen(
+			packingInfo, ID_MERGE_COMPARE, filelocLeft, filelocRight,
+			FFILEOPEN_READONLY | FFILEOPEN_NOMRU, FFILEOPEN_NOMRU);
 	}
 	else
 	{
