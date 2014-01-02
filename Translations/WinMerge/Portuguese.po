@@ -72,7 +72,7 @@ msgstr "Ab&rir ficheiro em conflito..."
 #: Merge.rc:343
 #, c-format
 msgid "Start Collec&tion..."
-msgstr ""
+msgstr "Iniciar Rec&olha..."
 
 #: Merge.rc:22
 #: Merge.rc:154
@@ -113,7 +113,7 @@ msgstr "Ler apenas lado &direito"
 #: Merge.rc:30
 #, c-format
 msgid "Collect &Mode\tF9"
-msgstr ""
+msgstr "&Modo de Recolha\tF9"
 
 #: Merge.rc:32
 #, c-format
@@ -1024,12 +1024,12 @@ msgstr "Janela de localização"
 #: Merge.rc:511
 #, c-format
 msgid "&Synchronization Point\tAlt+S"
-msgstr ""
+msgstr "&Ponto de Sincronização\tAlt+S"
 
 #: Merge.rc:512
 #, c-format
 msgid "Clear Sync&hronization Points"
-msgstr ""
+msgstr "Limpar Pontos de Sincronização"
 
 #: Merge.rc:519
 #, c-format
@@ -2329,7 +2329,7 @@ msgstr "Diferença na palavra seleccionada:"
 #: Merge.rc:1305
 #, c-format
 msgid "&Cross-hatch deleted lines"
-msgstr ""
+msgstr "Marcar com padrão cruzado as linhas eliminadas"
 
 #: Merge.rc:1314
 #: Merge.rc:1403
@@ -2436,7 +2436,7 @@ msgstr "Limite comparação rápida (MB):"
 #: Merge.rc:1350
 #, c-format
 msgid "&Number of compare threads (a negative value implies addition of the number of available CPU cores):"
-msgstr ""
+msgstr "&Número de threads de comparação (um valor negativo implica o acréscimo do número de núcleos de CPU disponíveis):"
 
 #: Merge.rc:1363
 #, c-format
@@ -2603,12 +2603,12 @@ msgstr "Binário"
 #: Merge.rc:1431
 #, c-format
 msgid "Number of bytes to display per line:"
-msgstr ""
+msgstr "Número de bytes a serem mostrados por linha:"
 
 #: Merge.rc:1433
 #, c-format
 msgid "Automatically adjust number of bytes per line (uncheck this if you want WinMerge to use your own choice for bytes per line)"
-msgstr ""
+msgstr "Ajustar automaticamente o número de bytes por linha (desmarcar esta opção se quiser que o WinMerge use a sua própria escolha de bytes por linha)"
 
 #: Merge.rc:1442
 #, c-format
@@ -3537,7 +3537,7 @@ msgstr "Item %1"
 #: Merge.rc:1735
 #, c-format
 msgid "Collect"
-msgstr ""
+msgstr "Recolha"
 
 #: Merge.rc:1736
 #, c-format
@@ -4715,7 +4715,7 @@ msgstr "Abrir e resolver o ficheiro em conflito"
 #: Merge.rc:1981
 #, c-format
 msgid "Collect items from subsequent command line invocations to a folder compare window"
-msgstr ""
+msgstr "Recolher itens de invocação subsequente de linha de comandos numa janela de comparação de pasta"
 
 #: Merge.rc:1982
 #, c-format
