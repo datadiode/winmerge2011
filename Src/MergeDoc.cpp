@@ -877,7 +877,10 @@ bool CChildFrame::ListCopy(int srcPane, int dstPane, int nDiff /* = -1*/,
 
 		String strLine;
 		int cd_dpastend = cd_dend + 1;
-		sbuf->GetText(cd_dbegin, 0, cd_dpastend, 0, strLine, pszCRLF);
+		sbuf->GetText(cd_dbegin, 0,
+			cd_dpastend < sbuf->GetLineCount() ? cd_dpastend : cd_dend,
+			cd_dpastend < sbuf->GetLineCount() ? 0 : sbuf->GetLineLength(cd_dend),
+			strLine, pszCRLF);
 		dbuf->DeleteText(dstView, cd_dbegin, 0,
 			cd_dpastend < dbuf->GetLineCount() ? cd_dpastend : cd_dend,
 			cd_dpastend < dbuf->GetLineCount() ? 0 : dbuf->GetLineLength(cd_dend),

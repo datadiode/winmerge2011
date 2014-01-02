@@ -377,10 +377,9 @@ void CCrystalTextBuffer::SetLineFlags(int nLine, DWORD dwFlags)
 void CCrystalTextBuffer::GetText(int nStartLine, int nStartChar,
 	int nEndLine, int nEndChar, String &text, LPCTSTR pszCRLF) const
 {
-	const int lines = GetLineCount();
-	ASSERT(nStartLine >= 0 && nStartLine < lines);
+	ASSERT(nStartLine >= 0 && nStartLine < GetLineCount());
 	ASSERT(nStartChar >= 0 && nStartChar <= GetLineLength(nStartLine));
-	ASSERT(nEndLine >= 0 && nEndLine < lines);
+	ASSERT(nEndLine >= 0 && nEndLine < GetLineCount());
 	ASSERT(nEndChar >= 0 && nEndChar <= GetFullLineLength(nEndLine));
 	ASSERT(nStartLine < nEndLine || nStartLine == nEndLine && nStartChar <= nEndChar);
 	// some edit functions (copy...) should do nothing when there is no selection.
