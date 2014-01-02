@@ -60,8 +60,16 @@ LPTSTR ShellFileOperations::AddPath(LPTSTR p, LPCTSTR path)
 {
 	_tcscpy(p, path);
 	LPCTSTR q = paths_UndoMagic(p);
-	size_t n = _tcslen(q) + 1;
-	memmove(p, q, n * sizeof(TCHAR));
+	size_t n = _tcslen(q);
+	if (n >= MAX_PATH)
+	{
+		if (DWORD k = GetShortPathName(path, p, MAX_PATH))
+		{
+			q = paths_UndoMagic(p);
+			n = k - (q - p);
+		}
+	}
+	memmove(p, q, ++n * sizeof(TCHAR));
 	*(p += n) = _T('\0');
 	return p;
 }
