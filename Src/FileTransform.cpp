@@ -21,6 +21,14 @@ public:
 		CMyDispId DispId;
 		DispId.Call(m_spFactoryDispatch,
 			CMyDispParams<1>().Unnamed[static_cast<IMergeApp *>(theApp.m_pMainWnd)], DISPATCH_PROPERTYPUTREF);
+		if (LPCTSTR query = StrChr(packingInfo->pluginMoniker.c_str(), _T('?')))
+		{
+			if (SUCCEEDED(DispId.Init(m_spFactoryDispatch, L"Arguments")))
+			{
+				OException::Check(DispId.Call(m_spFactoryDispatch,
+					CMyDispParams<1>().Unnamed[query + 1], DISPATCH_PROPERTYPUT));
+			}
+		}
 		if (SUCCEEDED(DispId.Init(m_spFactoryDispatch, L"ShowConsole")))
 		{
 			CMyVariant var;
