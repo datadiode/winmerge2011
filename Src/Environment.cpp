@@ -120,17 +120,20 @@ String env_ExpandVariables(LPCTSTR text)
 LPCTSTR env_ResolveMoniker(String &moniker)
 {
 	C_ASSERT(String::npos == -1);
+	moniker = env_ExpandVariables(moniker.c_str());
 	String::size_type i = moniker.find(_T(':'), 2) + 1;
-	if (moniker.c_str()[i] != _T('\\'))
+	String::size_type j = i;
+	while (j != 0)
 	{
-		moniker = env_ExpandVariables(moniker.c_str());
-	}
-	else if (moniker.c_str()[i + 1] != _T('\\'))
-	{
-		WCHAR path[MAX_PATH];
-		GetModuleFileName(NULL, path, _countof(path));
-		PathRemoveFileSpec(path);
-		moniker.insert(i, path);
+		if (moniker.c_str()[j] == _T('\\') &&
+			moniker.c_str()[j + 1] != _T('\\'))
+		{
+			WCHAR path[MAX_PATH];
+			GetModuleFileName(NULL, path, _countof(path));
+			PathRemoveFileSpec(path);
+			moniker.insert(j, path);
+		}
+		j = moniker.find(_T('"'), j) + 1;
 	}
 	return moniker.c_str() + i;
 }
