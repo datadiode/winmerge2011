@@ -25,7 +25,7 @@ STRINGTABLE
 BEGIN
     IDS_PROJNAME            "ShellExtension"
     IDS_CONTEXT_MENU        "WinMerge"
-    IDS_CONTEXT_HELP        "Abrr com WinMerge"
+    IDS_CONTEXT_HELP        "Abrir com o WinMerge"
     IDS_CONTEXT_HELP_MANYITEMS "Não seleccione mais de 2 itens"
     IDS_COMPARE             "Comparar"
     IDS_COMPARE_ELLIPSIS    "Comparar..."
