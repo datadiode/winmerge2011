@@ -251,28 +251,18 @@ void CDiffContext::LoadFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *fil
 }
 
 /**
- * @brief case-sensitive collate function for qsorting an array
+ * @brief compare function template for qsorting an array
  */
-static bool __cdecl cmpstring(const DirItem &elem1, const DirItem &elem2)
+template <int __cdecl collate(LPCTSTR, LPCTSTR)>
+static bool __cdecl compare(const DirItem &elem1, const DirItem &elem2)
 {
-	int cmp = _tcscoll(elem1.filename.c_str(), elem2.filename.c_str());
-	if (cmp == 0)
-		cmp = _tcscoll(elem1.path.c_str(), elem2.path.c_str());
-	return cmp < 0;
-}
-
-/**
- * @brief case-insensitive collate function for qsorting an array
- */
-static bool __cdecl cmpistring(const DirItem &elem1, const DirItem &elem2)
-{
-	if (int cmp = _tcsicoll(elem1.filename.c_str(), elem2.filename.c_str()))
+	if (int cmp = collate(elem1.filename.c_str(), elem2.filename.c_str()))
 		return cmp < 0;
 	if (elem1.size.int64 != elem2.size.int64)
 		return elem1.size.int64 < elem2.size.int64;
 	if (elem1.mtime != elem2.mtime)
 		return elem1.mtime < elem2.mtime;
-	return _tcsicoll(elem1.path.c_str(), elem2.path.c_str()) < 0;
+	return collate(elem1.path.c_str(), elem2.path.c_str()) < 0;
 }
 
 /**
@@ -281,5 +271,5 @@ static bool __cdecl cmpistring(const DirItem &elem1, const DirItem &elem2)
 void CDiffContext::Sort(DirItemArray *dirs) const
 {
 	stl::sort(dirs->begin(), dirs->end(),
-		m_piFilterGlobal->isCaseSensitive() ? cmpstring : cmpistring);
+		m_piFilterGlobal->isCaseSensitive() ? compare<_tcscoll> : compare<_tcsicoll>);
 }
