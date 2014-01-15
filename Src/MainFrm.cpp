@@ -2957,7 +2957,7 @@ void CMainFrame::OnFileOpenProject()
 	if (!SelectFile(m_hWnd, sFilepath, IDS_OPEN_TITLE, IDS_PROJECTFILES, TRUE))
 		return;
 	
-	String strProjectPath = paths_GetParentPath(sFilepath.c_str());
+	String strProjectPath(sFilepath.c_str(), sFilepath.rfind(_T('\\')) + 1);
 	// store this as the new project path
 	COptionsMgr::SaveOption(OPT_PROJECTS_PATH, strProjectPath);
 

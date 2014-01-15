@@ -182,9 +182,13 @@ String ProjectFilePathsDlg::AskProjectFileName(BOOL bOpen)
 		if (*PathFindExtension(strProjectFileName.c_str()) == _T('\0'))
 			strProjectFileName += _T(".WinMerge");
 		// get the path part from the filename
-		String strProjectPath = paths_GetParentPath(strProjectFileName.c_str());
+		String strProjectPath(strProjectFileName.c_str(), strProjectFileName.rfind(_T('\\')) + 1);
 		// store this as the new project path
 		COptionsMgr::SaveOption(OPT_PROJECTS_PATH, strProjectPath);
+	}
+	else
+	{
+		strProjectFileName.clear();
 	}
 	return strProjectFileName;
 }
