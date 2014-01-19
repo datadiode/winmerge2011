@@ -270,7 +270,7 @@ int CDiffContext::DirScan_GetItems(
  */
 void CDiffContext::DirScan_CompareItems()
 {
-	FolderCmp folderCmp(this);
+	FolderCmp folderCmp(this, InterlockedIncrement(&m_iCompareThread));
 	for (;;)
 	{
 		DIFFITEM *di;
@@ -305,7 +305,7 @@ void CDiffContext::DirScan_CompareItems()
 
 void CDiffContext::DirScan_CompareRequestedItems()
 {
-	FolderCmp folderCmp(this);
+	FolderCmp folderCmp(this, InterlockedIncrement(&m_iCompareThread));
 	for (;;)
 	{
 		DIFFITEM *di;
@@ -419,6 +419,7 @@ void CDiffContext::CompareDiffItem(FolderCmp &fc, DIFFITEM *di)
 			// 2. Compare two files
 			if (di->isSideBoth())
 			{
+				m_pCompareStats->BeginCompare(di, fc.m_iCompareThread);
 				// Really compare
 				di->diffcode |= fc.prepAndCompareTwoFiles(di);
 				SetDiffItemStats(fc, di);
@@ -429,10 +430,9 @@ void CDiffContext::CompareDiffItem(FolderCmp &fc, DIFFITEM *di)
 				m_nCompMethod != CMP_DATE_SIZE &&
 				m_nCompMethod != CMP_SIZE)
 			{
-				UINT diffCode = fc.prepAndCompareTwoFiles(di);
+				m_pCompareStats->BeginCompare(di, fc.m_iCompareThread);
 				// Add possible binary flag for unique items
-				if (diffCode & DIFFCODE::BIN)
-					di->diffcode |= DIFFCODE::BIN;
+				di->diffcode |= fc.prepAndCompareTwoFiles(di) & DIFFCODE::BIN;
 				SetDiffItemStats(fc, di);
 			}
 		}

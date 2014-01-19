@@ -3,10 +3,6 @@
  *
  *  @brief Declaration of class CompareStats
  */ 
-//
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #ifndef _COMPARESTATS_H_
 #define _COMPARESTATS_H_
 
@@ -55,6 +51,16 @@ public:
 
 	CompareStats();
 	~CompareStats();
+	void SetCompareThreadCount(LONG nCompareThreads)
+	{
+		m_rgThreadState.resize(nCompareThreads);
+	}
+	void BeginCompare(const DIFFITEM *di, LONG iCompareThread)
+	{
+		ThreadState &rThreadState = m_rgThreadState[iCompareThread];
+		rThreadState.m_nHitCount = 0;
+		rThreadState.m_pDiffItem = di;
+	}
 	void AddItem(const DIFFITEM *);
 	void IncreaseTotalItems()
 	{
@@ -70,8 +76,7 @@ public:
 	}
 	int GetCount(CompareStats::RESULT result) const;
 	int GetComparedItems() const { return m_nComparedItems; }
-	String GetLeftPath(CDiffContext *) const;
-	String GetRightPath(CDiffContext *) const;
+	const DIFFITEM *GetCurDiffItem();
 	void Reset();
 	static RESULT GetColImage(const DIFFITEM *);
 	bool MsgWait() const
@@ -98,13 +103,22 @@ public:
 		SetEvent(m_hEvent);
 	}
 private:
-
 	HANDLE m_hEvent;
 	bool paused;
 	long m_counts[N_DIFFIMG]; /**< Table storing result counts */
 	long m_nTotalItems; /**< Total items found to compare */
 	long m_nComparedItems; /**< Compared items so far */
-	const DIFFITEM *m_pCurDiffItem;
+	struct ThreadState
+	{
+		LONG m_nHitCount;
+		const DIFFITEM *m_pDiffItem;
+		ThreadState()
+			: m_nHitCount(0)
+			, m_pDiffItem(NULL)
+		{
+		}
+	};
+	stl::vector<ThreadState> m_rgThreadState;
 };
 
 #endif // _COMPARESTATS_H_

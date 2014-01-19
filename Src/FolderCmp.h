@@ -26,12 +26,13 @@ class PackingInfo;
 class FolderCmp
 {
 public:
-	FolderCmp(CDiffContext *);
+	FolderCmp(CDiffContext *, LONG iCompareThread = -1);
 	~FolderCmp();
 	UINT prepAndCompareTwoFiles(DIFFITEM *);
 
 	int m_ndiffs;
 	int m_ntrivialdiffs;
+	const LONG m_iCompareThread;
 
 	DiffFileData m_diffFileData;
 	

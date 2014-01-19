@@ -240,6 +240,7 @@ void CDiffContext::CompareDirectories(bool bOnlyRequested)
 	m_diCompareThread = NULL;
 	
 	m_nCompareThreads = COptionsMgr::Get(OPT_CMP_COMPARE_THREADS);
+	m_iCompareThread = -1;
 	if (m_nCompareThreads < 0)
 	{
 		SYSTEM_INFO sysinfo;
@@ -250,6 +251,7 @@ void CDiffContext::CompareDirectories(bool bOnlyRequested)
 	}
 	if (m_nCompareThreads == 0)
 	{
+		m_pCompareStats->SetCompareThreadCount(1);
 		if (!m_bOnlyRequested)
 		{
 			DiffThreadCollect(this);
@@ -259,6 +261,7 @@ void CDiffContext::CompareDirectories(bool bOnlyRequested)
 	}
 	else
 	{
+		m_pCompareStats->SetCompareThreadCount(m_nCompareThreads);
 		if (!m_bOnlyRequested)
 			_beginthread(DiffThreadCollect, 0, this);
 		int nThreads = m_nCompareThreads;

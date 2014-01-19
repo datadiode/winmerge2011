@@ -148,6 +148,7 @@ private:
 	DIFFITEM *m_diCompareThread;
 	CRITICAL_SECTION m_csCompareThread;
 	LONG m_nCompareThreads;
+	LONG m_iCompareThread;
 	bool m_bAborting; /**< Is compare aborting? */
 	bool m_bOnlyRequested; /**< Compare only requested items? */
 	const int m_nRecursive; /**< Do we include subfolders to compare? */

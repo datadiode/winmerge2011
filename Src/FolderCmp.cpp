@@ -3,9 +3,6 @@
  *
  * @brief Implementation file for FolderCmp
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "DiffUtils.h"
 #include "ByteCompare.h"
@@ -31,12 +28,13 @@ static void CopyTextStats(const file_data * inf, FileTextStats * myTextStats)
 	myTextStats->nzeros = inf->count_zeros;
 }
 
-FolderCmp::FolderCmp(CDiffContext *pCtxt)
+FolderCmp::FolderCmp(CDiffContext *pCtxt, LONG iCompareThread)
 : m_pDiffUtilsEngine(NULL)
 , m_pByteCompare(NULL)
 , m_pTimeSizeCompare(NULL)
 , m_ndiffs(CDiffContext::DIFFS_UNKNOWN)
 , m_ntrivialdiffs(CDiffContext::DIFFS_UNKNOWN)
+, m_iCompareThread(iCompareThread)
 , m_pCtx(pCtxt)
 , m_diffFileData(getDefaultCodepage())
 {
