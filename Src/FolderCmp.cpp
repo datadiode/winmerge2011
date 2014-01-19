@@ -42,19 +42,11 @@ FolderCmp::FolderCmp(CDiffContext *pCtxt)
 {
 }
 
-void FolderCmp::Reset()
-{
-	delete m_pDiffUtilsEngine;
-	m_pDiffUtilsEngine = NULL;
-	delete m_pByteCompare;
-	m_pByteCompare = NULL;
-	delete m_pTimeSizeCompare;
-	m_pTimeSizeCompare = NULL;
-}
-
 FolderCmp::~FolderCmp()
 {
-	Reset();
+	delete m_pDiffUtilsEngine;
+	delete m_pByteCompare;
+	delete m_pTimeSizeCompare;
 }
 
 /**

@@ -28,7 +28,6 @@ class FolderCmp
 public:
 	FolderCmp(CDiffContext *);
 	~FolderCmp();
-	void Reset();
 	UINT prepAndCompareTwoFiles(DIFFITEM *);
 
 	int m_ndiffs;
