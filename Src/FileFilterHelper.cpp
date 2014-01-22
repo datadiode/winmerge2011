@@ -110,34 +110,30 @@ bool FileFilterHelper::CreateFromMask()
 	LPCTSTR mask = name.c_str();
 	// Convert user-given extension list to valid regular expression
 	static const TCHAR separators[] = _T(" ;|,");
-	while (int lentoken = StrCSpn(mask += StrSpn(mask, separators), separators))
+	while (*(mask += StrSpn(mask, separators)))
 	{
 		String regExp;
 		stl::vector<regexp_item> *filters = NULL;
 		if (LPCTSTR pch = EatPrefixTrim(mask, _T("f:")))
 		{
-			lentoken -= static_cast<int>(pch - mask);
 			mask = pch;
 			filters = &filefilters;
 			regExp = _T("/^");
 		}
 		else if (LPCTSTR pch = EatPrefixTrim(mask, _T("d:")))
 		{
-			lentoken -= static_cast<int>(pch - mask);
 			mask = pch;
 			filters = &dirfilters;
 			regExp = _T("/\\\\");
 		}
 		else if (LPCTSTR pch = EatPrefixTrim(mask, _T("xf:")))
 		{
-			lentoken -= static_cast<int>(pch - mask);
 			mask = pch;
 			filters = &xfilefilters;
 			regExp = _T("/^");
 		}
 		else if (LPCTSTR pch = EatPrefixTrim(mask, _T("xd:")))
 		{
-			lentoken -= static_cast<int>(pch - mask);
 			mask = pch;
 			filters = &xdirfilters;
 			regExp = _T("/\\\\");
@@ -147,44 +143,47 @@ bool FileFilterHelper::CreateFromMask()
 			filters = &filefilters;
 			regExp = _T("/^");
 		}
-		do switch (TCHAR c = *mask++)
+		if (int lentoken = StrCSpn(mask, separators))
 		{
-		case '*':
-			regExp += _T(".*");
-			break;
-		case '?':
-			regExp += _T('.');
-			break;
-		case '.':
-			if (lentoken == 1 || lentoken == 2 && *mask == '*')
+			do switch (TCHAR c = *mask++)
 			{
-				if (regExp.back() == '*')
+			case '*':
+				regExp += _T(".*");
+				break;
+			case '?':
+				regExp += _T('.');
+				break;
+			case '.':
+				if (lentoken == 1 || lentoken == 2 && *mask == '*')
 				{
-					regExp.replace(regExp.length() - 2, 1, _T("[^.]"));
+					if (regExp.back() == '*')
+					{
+						regExp.replace(regExp.length() - 2, 1, _T("[^.]"));
+					}
+					regExp += _T("\\.?");
 				}
-				regExp += _T("\\.?");
-			}
-			else
+				else
+				{
+					regExp += _T("\\.");
+				}
+				break;
+			case '+': case '^': case '$':
+			case '(': case '[': case '{':
+			case ')': case ']': case '}':
+			case '\\': 
+				// above cases need escaping
+				regExp += _T('\\');
+				// fall through
+			default:
+				regExp += c;
+				break;
+			} while (--lentoken);
+			regExp += _T("$/iu"); // PCRE_CASELESS | PCRE_UTF8
+			regexp_item item;
+			if (item.assign(regExp.c_str(), regExp.length()))
 			{
-				regExp += _T("\\.");
+				filters->push_back(item);
 			}
-			break;
-		case '+': case '^': case '$':
-		case '(': case '[': case '{':
-		case ')': case ']': case '}':
-		case '\\': 
-			// above cases need escaping
-			regExp += _T('\\');
-			// fall through
-		default:
-			regExp += c;
-			break;
-		} while (--lentoken);
-		regExp += _T("$/iu"); // PCRE_CASELESS | PCRE_UTF8
-		regexp_item item;
-		if (item.assign(regExp.c_str(), regExp.length()))
-		{
-			filters->push_back(item);
 		}
 	}
 	return true;
