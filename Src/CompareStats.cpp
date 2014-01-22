@@ -52,12 +52,12 @@ int CompareStats::GetCount(CompareStats::RESULT result) const
 const DIFFITEM *CompareStats::GetCurDiffItem()
 {
 	LONG nHitCountMax = 0;
-	const DIFFITEM *cdi = NULL;
+	const DIFFITEM *cdi = m_rgThreadState.front().m_pDiffItem;
 	stl::vector<ThreadState>::iterator it = m_rgThreadState.begin();
 	while (it != m_rgThreadState.end())
 	{
 		const DIFFITEM *di = it->m_pDiffItem;
-		if ((di->diffcode & DIFFCODE::COMPAREFLAGS) == DIFFCODE::NOCMP)
+		if (di != NULL && (di->diffcode & DIFFCODE::COMPAREFLAGS) == DIFFCODE::NOCMP)
 		{
 			LONG nHitCount = InterlockedIncrement(&it->m_nHitCount);
 			if (nHitCountMax < nHitCount)
