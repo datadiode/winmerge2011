@@ -43,6 +43,8 @@ void ByteCompare::SetFileData(int items, file_data *data)
 	ASSERT(items == 2);
 	m_osfhandle[0] = reinterpret_cast<HANDLE>(_get_osfhandle(data[0].desc));
 	m_osfhandle[1] = reinterpret_cast<HANDLE>(_get_osfhandle(data[1].desc));
+	m_st_size[0] = data[0].stat.st_size;
+	m_st_size[1] = data[1].stat.st_size;
 }
 
 enum BLANKNESS_TYPE
@@ -239,7 +241,7 @@ unsigned ByteCompare::CompareFiles(FileLocation *location, const stl_size_t x, c
 			else if (has_multiple_bits(mask & (CR | LF | CRLF)))
 			{
 				// EOL on both sides, but different in style. Force bytes ahead
-				// to (un)equalness, depending on bIgnoreEOLDifference.
+				// to (un)equalness, depending on bIgnoreEol.
 				c[0] = true;
 				c[1] = bIgnoreEol;
 			}
@@ -277,11 +279,24 @@ unsigned ByteCompare::CompareFiles(FileLocation *location)
 	m_textStats[0].clear();
 	m_textStats[1].clear();
 
-	if (m_pCtxt->m_bStopAfterFirstDiff && (m_osfhandle[0] == m_osfhandle[1]))
+	if (m_pCtxt->m_bStopAfterFirstDiff)
 	{
-		m_textStats[0].nzeros = location[0].encoding.m_binary;
-		m_textStats[1].nzeros = location[1].encoding.m_binary;
-		return DIFFCODE::SAME | DIFFCODE::FILE | DIFFCODE::TEXTFLAGS;
+		if (m_osfhandle[0] == m_osfhandle[1])
+		{
+			m_textStats[0].nzeros = location[0].encoding.m_binary;
+			m_textStats[1].nzeros = location[1].encoding.m_binary;
+			return DIFFCODE::SAME | DIFFCODE::FILE | DIFFCODE::TEXTFLAGS;
+		}
+		// If file sizes differ and none of the ignore options are effective,
+		// then we know files are different without reading file contents.
+		if (m_st_size[0] != m_st_size[1] &&
+			nIgnoreWhitespace == WHITESPACE_COMPARE_ALL &&
+			!bIgnoreCase && !bIgnoreBlankLines && !bIgnoreEol)
+		{
+			m_textStats[0].nzeros = location[0].encoding.m_binary;
+			m_textStats[1].nzeros = location[1].encoding.m_binary;
+			return DIFFCODE::DIFF | DIFFCODE::FILE | DIFFCODE::TEXTFLAGS;
+		}
 	}
 
 	unsigned code = DIFFCODE::DIFF;

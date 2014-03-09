@@ -41,6 +41,7 @@ private:
 	unsigned CompareFiles(FileLocation *, stl_size_t x = 1, stl_size_t j = 0);
 	const CDiffContext *const m_pCtxt;
 	HANDLE m_osfhandle[2];
+	__int64 m_st_size[2];
 };
 
 } // namespace CompareEngines
