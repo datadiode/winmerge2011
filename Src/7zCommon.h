@@ -21,6 +21,8 @@ public:
 	String m_strRightDisplayRoot;
 	String m_strLeftRoot;
 	String m_strRightRoot;
+	String m_strLeftParent;
+	String m_strRightParent;
 	CTempPathContext *DeleteHead();
 };
 

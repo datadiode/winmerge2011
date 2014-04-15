@@ -98,8 +98,13 @@ bool CDirFrame::InitContext(LPCTSTR pszLeft, LPCTSTR pszRight, int nRecursive, D
 bool CDirFrame::InitCompare(LPCTSTR pszLeft, LPCTSTR pszRight, int nRecursive, CTempPathContext *pTempPathContext)
 {
 	m_pDirView->DeleteAllItems();
-	// Anything that can go wrong here will yield an exception.
-	// Default implementation of operator new() never returns NULL.
+
+	if (m_pCtxt && pTempPathContext)
+	{
+		pTempPathContext->m_strLeftParent = m_pCtxt->GetLeftPath();
+		pTempPathContext->m_strRightParent = m_pCtxt->GetRightPath();
+	}
+
 	bool bNeedCompare = InitContext(pszLeft, pszRight, nRecursive, 0);
 
 	if (pTempPathContext)
@@ -278,6 +283,13 @@ CDirFrame::AllowUpwardDirectory(String &leftParent, String &rightParent)
 	// If we have temp context it means we are comparing archives
 	if (m_pTempPathContext != NULL)
 	{
+		if (m_nRecursive) // recursive mode (including tree-mode)
+		{
+			leftParent = m_pTempPathContext->m_strLeftParent;
+			rightParent = m_pTempPathContext->m_strRightParent;
+			return AllowUpwardDirectory::ParentIsTempPath;
+		}
+
 		LPCTSTR lname = PathFindFileName(left.c_str());
 		LPCTSTR rname = PathFindFileName(right.c_str());
 		String::size_type cchLeftRoot = m_pTempPathContext->m_strLeftRoot.length();

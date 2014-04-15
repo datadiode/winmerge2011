@@ -729,7 +729,7 @@ void CDirView::DoDefaultAction(int sel)
 	if (sel >= 0)
 	{
 		const DIFFITEM *di = GetDiffItem(sel);
-		if (m_bTreeMode && m_pFrame->GetRecursive() == 1 && di->isDirectory())
+		if (m_bTreeMode && m_pFrame->GetRecursive() == 1 && di && di->isDirectory())
 		{
 			if (di->customFlags1 & ViewCustomFlags::EXPANDED)
 				CollapseSubdir(sel);

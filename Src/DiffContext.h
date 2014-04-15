@@ -3,11 +3,6 @@
  *
  *  @brief Declarations of CDiffContext and diff structures
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-#if !defined(AFX_DIFFCONTEXT_H__D3CC86BE_F11E_11D2_826C_00A024706EDC__INCLUDED_)
-#define AFX_DIFFCONTEXT_H__D3CC86BE_F11E_11D2_826C_00A024706EDC__INCLUDED_
 #pragma once
 
 #include "CompareOptions.h"
@@ -174,5 +169,3 @@ private:
 	void LoadFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *files, int side) const;
 	void Sort(DirItemArray *dirs) const;
 };
-
-#endif // !defined(AFX_DIFFCONTEXT_H__D3CC86BE_F11E_11D2_826C_00A024706EDC__INCLUDED_)
