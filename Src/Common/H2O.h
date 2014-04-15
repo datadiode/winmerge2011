@@ -335,6 +335,16 @@ namespace H2O
 			assert(::IsWindow(m_hWnd));
 			return ::SetForegroundWindow(m_hWnd);
 		}
+		BOOL ShowOwnedPopups(BOOL fShow)
+		{
+			assert(::IsWindow(m_hWnd));
+			return ::ShowOwnedPopups(m_hWnd, fShow);
+		}
+		BOOL OpenIcon()
+		{
+			assert(::IsWindow(m_hWnd));
+			return ::OpenIcon(m_hWnd);
+		}
 		BOOL GetWindowPlacement(WINDOWPLACEMENT *pwp)
 		{
 			assert(::IsWindow(m_hWnd));
