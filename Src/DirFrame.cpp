@@ -145,6 +145,24 @@ void CDirFrame::DeleteContext()
 	}
 }
 
+void CDirFrame::DeleteTempPathContext()
+{
+	// Delete the diff contexts belonging to the temp path context
+	LIST_ENTRY *p = &m_root;
+	while ((m_pCtxt = static_cast<CDiffContext *>(m_root.IsSibling(p = p->Flink))) != NULL)
+	{
+		if (m_pCtxt->GetLeftPath().find(m_pTempPathContext->m_strLeftRoot) == 0 &&
+			m_pCtxt->GetRightPath().find(m_pTempPathContext->m_strRightRoot) == 0)
+		{
+			p = p->Blink;
+			m_pCtxt->RemoveSelf();
+			delete m_pCtxt;
+		}
+	}
+	// Delete the temp path context
+	m_pTempPathContext = m_pTempPathContext->DeleteHead();
+}
+
 /**
  * @brief Update left-readonly menu item
  */

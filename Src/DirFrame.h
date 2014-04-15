@@ -135,6 +135,7 @@ public:
 	void SetItemViewFlag(DIFFITEM *, UINT flag, UINT mask);
 	void SetItemViewFlag(UINT flag, UINT mask);
 	CompareStats *GetCompareStats() const { return m_pCompareStats; };
+	void DeleteTempPathContext();
 
 private:
 	bool InitContext(LPCTSTR pszLeft, LPCTSTR pszRight, int nRecursive, DWORD dwContext);

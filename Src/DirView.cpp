@@ -868,7 +868,7 @@ void CDirView::OpenParentDirectory()
 		case CDirFrame::AllowUpwardDirectory::ParentIsTempPath:
 			m_lastLeftPath = m_pFrame->m_pTempPathContext->m_strLeftDisplayRoot;
 			m_lastRightPath = m_pFrame->m_pTempPathContext->m_strRightDisplayRoot;
-			m_pFrame->m_pTempPathContext = m_pFrame->m_pTempPathContext->DeleteHead();
+			m_pFrame->DeleteTempPathContext();
 			break;
 		case CDirFrame::AllowUpwardDirectory::ParentIsRegularPath:
 			// Below assignments exclude any trailing backslashes
