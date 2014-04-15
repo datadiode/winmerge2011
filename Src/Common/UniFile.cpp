@@ -532,7 +532,6 @@ bool UniMemFile::ReadString(String & line, String & eol, bool * lossy)
 		}
 		else if (ch == '\0')
 		{
-			doneline = true;
 			++m_txtstats.nzeros;
 		}
 		// always advance to next character
