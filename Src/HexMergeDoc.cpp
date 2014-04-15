@@ -344,9 +344,10 @@ HRESULT CHexMergeFrame::OpenDocs(
 		// An extra ResizeWindow() on the left view aligns scroll ranges, and
 		// also triggers initial diff coloring by invalidating the client area.
 		m_pView[0]->ResizeWindow();
+		ActivateFrame();
+		UpdateWindow();
 		if (COptionsMgr::Get(OPT_SCROLL_TO_FIRST))
 			SendMessage(WM_COMMAND, ID_FIRSTDIFF);
-		ActivateFrame();
 	}
 	else
 	{
