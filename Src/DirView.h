@@ -229,7 +229,7 @@ public:
 	void OnInitialUpdate();
 	LRESULT ReflectNotify(UNotify *);
 
-	static void AcquireSharedResources();
+	static HImageList *AcquireSharedResources();
 	static void ReleaseSharedResources();
 	static HFont *ReplaceFont(const LOGFONT *);
 

@@ -24,9 +24,6 @@
  * @brief Defines the class behaviors for the application.
  *
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "stdafx.h"
 #include <new.h> // _set_new_handler
 #include <process.h> // _cexit
@@ -541,6 +538,26 @@ LRESULT CDocFrame::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 				}
 			}
 		}
+		break;
+	case WM_SETICON:
+		if (HTabCtrl *pTc = m_pMDIFrame->GetTabBar())
+		{
+			int index = pTc->GetItemCount();
+			while (index)
+			{
+				--index;
+				TCITEM item;
+				item.mask = TCIF_PARAM;
+				pTc->GetItem(index, &item);
+				if (item.lParam == reinterpret_cast<LPARAM>(m_hWnd))
+				{
+					item.mask = TCIF_IMAGE;
+					item.iImage = static_cast<int>(wParam);
+					pTc->SetItem(index, &item);
+				}
+			}
+		}
+		wParam = TRUE;
 		break;
 	case WM_NCDESTROY:
 		return OWindow::WindowProc(uMsg, wParam, lParam);

@@ -95,12 +95,8 @@ CDirFrame::CDirFrame(CMainFrame *pMDIFrame)
 , m_nRecursive(0)
 , m_pTempPathContext(NULL)
 {
-	if (m_pHandleSet->m_cRef == 1)
-	{
-		CDirView::AcquireSharedResources();
-	}
 	SubclassWindow(pMDIFrame->CreateChildHandle());
-	SetIcon(LanguageSelect.LoadIcon(IDR_DIRDOCTYPE));
+	SetIcon(LanguageSelect.LoadIcon(IDR_DIRDOCTYPE), CompareStats::DIFFIMG_DIR);
 	CreateClient();
 	RecalcLayout();
 	m_bAutoDelete = true;
@@ -130,10 +126,6 @@ CDirFrame::~CDirFrame()
 		m_pTempPathContext = m_pTempPathContext->DeleteHead();
 	}
 	delete m_pDirView;
-	if (m_pHandleSet->m_cRef == 1)
-	{
-		CDirView::ReleaseSharedResources();
-	}
 }
 
 void CDirFrame::DeleteContext()

@@ -87,6 +87,7 @@ namespace H2O
 	class HBitmap;
 	class HSurface;
 	class HString;
+	class HImageList;
 
 	template<class Super>
 	class Window : public Super
@@ -2452,12 +2453,12 @@ namespace H2O
 			return ListView_GetHoverTime(m_hWnd);
 		}
 
-		HIMAGELIST GetImageList(int nImageType)
+		HImageList *GetImageList(int nImageType)
 		// Retrieves the handle to an image list used for drawing list-view items.
 		{
 			using ::SendMessage;
 			assert(::IsWindow(m_hWnd));
-			return ListView_GetImageList(m_hWnd, nImageType);
+			return reinterpret_cast<HImageList *>(ListView_GetImageList(m_hWnd, nImageType));
 		}
 
 		BOOL GetItem(LVITEM *Item)
@@ -2755,12 +2756,12 @@ namespace H2O
 			return ListView_SetIconSpacing(m_hWnd, cx, cy);
 		}
 
-		HIMAGELIST SetImageList(HIMAGELIST himl, int iImageListType)
+		HImageList *SetImageList(HImageList *iml, int iImageListType)
 		// Assigns an image list to a list-view control.
 		{
 			using ::SendMessage;
 			assert(::IsWindow(m_hWnd));
-			return ListView_SetImageList(m_hWnd, himl, iImageListType);
+			return reinterpret_cast<HImageList *>(ListView_SetImageList(m_hWnd, iml->m_hImageList, iImageListType));
 		}
 
 		BOOL SetItem(LVITEM *Item)
@@ -2919,12 +2920,12 @@ namespace H2O
 			return ListView_Arrange(m_hWnd, nCode);
 		}
 
-		HIMAGELIST CreateDragImage(int iItem, LPPOINT ppt)
+		HImageList *CreateDragImage(int iItem, LPPOINT ppt)
 		// Creates a drag image list for the specified item.
 		{
 			using ::SendMessage;
 			assert(::IsWindow(m_hWnd));
-			return ListView_CreateDragImage(m_hWnd, iItem, ppt);
+			return reinterpret_cast<HImageList *>(ListView_CreateDragImage(m_hWnd, iItem, ppt));
 		}
 
 		BOOL DeleteAllItems()
@@ -3161,12 +3162,12 @@ namespace H2O
 			return TreeView_GetFirstVisible(m_hWnd);
 		}
 
-		HIMAGELIST GetImageList(int iImageType)
+		HImageList *GetImageList(int iImageType)
 		// Retrieves the handle to the normal or state image list associated with a tree-view control.
 		{
 			using ::SendMessage;
 			assert(::IsWindow(m_hWnd));
-			return TreeView_GetImageList(m_hWnd, iImageType);
+			return reinterpret_cast<HImageList *>(TreeView_GetImageList(m_hWnd, iImageType));
 		}
 
 		UINT GetIndent()
@@ -3377,13 +3378,13 @@ namespace H2O
 			return TreeView_SetBkColor(m_hWnd, clrBk);
 		}
 
-		HIMAGELIST SetImageList(HIMAGELIST himl, int nType)
+		HImageList *SetImageList(HImageList *iml, int nType)
 		// Sets the normal or state image list for a tree-view control
 		// and redraws the control using the new images.
 		{
 			using ::SendMessage;
 			assert(::IsWindow(m_hWnd));
-			return TreeView_SetImageList(m_hWnd, himl, nType);
+			return reinterpret_cast<HImageList *>(TreeView_SetImageList(m_hWnd, iml->m_hImageList, nType));
 		}
 
 		void SetIndent(int indent)
@@ -3520,14 +3521,14 @@ namespace H2O
 
 		// Operations
 
-		HIMAGELIST CreateDragImage(HTREEITEM hItem)
+		HImageList *CreateDragImage(HTREEITEM hItem)
 		// Creates a dragging bitmap for the specified item in a tree-view control.
 		// It also creates an image list for the bitmap and adds the bitmap to the image list.
 		// An application can display the image when dragging the item by using the image list functions.
 		{
 			using ::SendMessage;
 			assert(::IsWindow(m_hWnd));
-			return TreeView_CreateDragImage(m_hWnd, hItem);
+			return reinterpret_cast<HImageList *>(TreeView_CreateDragImage(m_hWnd, hItem));
 		}
 
 		BOOL DeleteAllItems()
@@ -3817,18 +3818,18 @@ namespace H2O
 			return (UINT)::SendMessage(m_hWnd, TB_GETSTATE, (WPARAM)idButton, 0);
 		}
 
-		HIMAGELIST SetImageList(HIMAGELIST himlNew)
+		HImageList *SetImageList(HImageList *iml)
 		// Sets the image list that the toolbar will use to display buttons that are in their default state.
 		{
 			assert(::IsWindow(m_hWnd));
-			return (HIMAGELIST)::SendMessage(m_hWnd, TB_SETIMAGELIST, 0L, (LPARAM)himlNew);
+			return reinterpret_cast<HImageList *>(::SendMessage(m_hWnd, TB_SETIMAGELIST, 0L, reinterpret_cast<LPARAM>(iml)));
 		}
 
-		HIMAGELIST SetDisabledImageList(HIMAGELIST himlNew)
+		HImageList *SetDisabledImageList(HImageList *iml)
 		// Sets the image list that the toolbar control will use to display disabled buttons.
 		{
 			assert(::IsWindow(m_hWnd));
-			return (HIMAGELIST)::SendMessage(m_hWnd, TB_SETDISABLEDIMAGELIST, 0L, (LPARAM)himlNew);
+			return reinterpret_cast<HImageList *>(::SendMessage(m_hWnd, TB_SETDISABLEDIMAGELIST, 0L, reinterpret_cast<LPARAM>(iml)));
 		}
 
 		int GetButtonInfo(UINT id, TBBUTTONINFO *pButtonInfo)
@@ -4108,6 +4109,14 @@ namespace H2O
 			using ::SendMessage;
 			assert(::IsWindow(m_hWnd));
 			return TabCtrl_GetExtendedStyle(m_hWnd);
+		}
+
+		HImageList *SetImageList(HImageList *iml)
+		// Assigns an image list to a tab control.
+		{
+			using ::SendMessage;
+			assert(::IsWindow(m_hWnd));
+			return reinterpret_cast<HImageList *>(TabCtrl_SetImageList(m_hWnd, iml->m_hImageList));
 		}
 	};
 

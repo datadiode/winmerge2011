@@ -37,6 +37,7 @@
 #include "MergeDiffDetailView.h"
 #include "LocationView.h"
 #include "WMGotoDlg.h"
+#include "CompareStats.h"
 #include "Common/SettingStore.h"
 #include "Common/stream_util.h"
 #include "Common/coretools.h"
@@ -954,13 +955,14 @@ void CChildFrame::SavePosition()
 */
 void CChildFrame::SetLastCompareResult(int nResult)
 {
-	HICON hCurrent = GetIcon(FALSE);
+	HICON hCurrent = GetIcon();
 	HICON hReplace = LanguageSelect.LoadIcon(
 		nResult == 0 ? IDI_EQUALTEXTFILE : IDI_NOTEQUALTEXTFILE);
 
 	if (hCurrent != hReplace)
 	{
-		SetIcon(hReplace, TRUE);
+		SetIcon(hReplace, nResult == 0 ?
+			CompareStats::DIFFIMG_TEXTSAME : CompareStats::DIFFIMG_TEXTDIFF);
 		BOOL bMaximized;
 		m_pMDIFrame->GetActiveDocFrame(&bMaximized);
 		// When MDI maximized the window icon is drawn on the menu bar, so we

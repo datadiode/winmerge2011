@@ -182,12 +182,15 @@ CMainFrame::CMainFrame(HWindow *pWnd, const MergeCmdLineInfo &cmdInfo)
 
 	GetMrgViewFontProperties();
 	GetDirViewFontProperties();
-	
+
+	HImageList *imlCompareStats = CDirView::AcquireSharedResources();
+
 	CreateToobar();
 
 	m_wndTabBar = HTabCtrl::Create(
 		WS_CHILD | WS_VISIBLE | TCS_FOCUSNEVER | TCS_HOTTRACK | TCS_TOOLTIPS, 0, 0, 0, 0, m_pWnd, 0xC001);
 	m_wndTabBar->SetFont(static_cast<HFont *>(HGdiObj::GetStockObject(DEFAULT_GUI_FONT)));
+	m_wndTabBar->SetImageList(imlCompareStats);
 
 	if (!COptionsMgr::Get(OPT_SHOW_TABBAR))
 		m_wndTabBar->ShowWindow(SW_HIDE);
@@ -242,6 +245,8 @@ CMainFrame::~CMainFrame()
 		m_imlToolbarEnabled->Destroy();
 	if (m_imlToolbarDisabled)
 		m_imlToolbarDisabled->Destroy();
+
+	CDirView::ReleaseSharedResources();
 
 	theApp.m_pMainWnd = NULL;
 }
@@ -3642,8 +3647,8 @@ void CMainFrame::LoadToolbarImages()
 	}
 
 	m_wndToolBar->SetButtonSize(cxyButton, cxyButton);
-	m_wndToolBar->SetImageList(m_imlToolbarEnabled->m_hImageList);
-	m_wndToolBar->SetDisabledImageList(m_imlToolbarDisabled->m_hImageList);
+	m_wndToolBar->SetImageList(m_imlToolbarEnabled);
+	m_wndToolBar->SetDisabledImageList(m_imlToolbarDisabled);
 }
 
 /**

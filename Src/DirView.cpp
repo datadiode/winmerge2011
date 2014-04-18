@@ -140,7 +140,7 @@ LRESULT CDirView::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return OListView::WindowProc(uMsg, wParam, lParam);
 }
 
-void CDirView::AcquireSharedResources()
+HImageList *CDirView::AcquireSharedResources()
 {
 	// Load user-selected font
 	m_font = HFont::CreateIndirect(&theApp.m_pMainWnd->m_lfDir);
@@ -179,6 +179,7 @@ void CDirView::AcquireSharedResources()
 	} while (++i < CompareStats::N_DIFFIMG);
 	// Load the icons used for the list view (expanded/collapsed state icons)
 	m_imageState = LanguageSelect.LoadImageList(IDB_TREE_STATE, 16);
+	return m_imageList;
 }
 
 void CDirView::ReleaseSharedResources()
@@ -218,7 +219,7 @@ void CDirView::OnInitialUpdate()
 	if (HHeaderCtrl *pHeaderCtrl = GetHeaderCtrl())
 		m_ctlSortHeader.SubclassWindow(pHeaderCtrl);
 
-	SetImageList(m_imageList->m_hImageList, LVSIL_SMALL);
+	SetImageList(m_imageList, LVSIL_SMALL);
 
 	// Restore column orders as they had them last time they ran
 	LoadColumnOrders();
@@ -337,7 +338,7 @@ void CDirView::Redisplay()
 	m_nSpecialItems = 0;
 
 	SetImageList(m_bTreeMode && m_pFrame->GetRecursive() == 1 ?
-		m_imageState->m_hImageList : NULL, LVSIL_STATE);
+		m_imageState : NULL, LVSIL_STATE);
 
 	if (m_pFrame->GetRecursive() != 3)
 	{
