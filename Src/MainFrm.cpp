@@ -2980,13 +2980,16 @@ void CMainFrame::OnFileOpenProject()
  */
 bool CMainFrame::ParseArgsAndDoOpen(const MergeCmdLineInfo &cmdInfo)
 {
-	if (cmdInfo.m_nCmdShow != SW_SHOWMINNOACTIVE)
+	if (cmdInfo.m_nCmdShow != SW_SHOWMINNOACTIVE && GetForegroundWindow() != m_hWnd)
 	{
-		// Restore main window if minimized
-		if (IsIconic())
-			ShowWindow(SW_RESTORE);
 		// Move to foreground
-		GetLastActivePopup()->SetForegroundWindow();
+		ShowWindow(SW_MINIMIZE);
+		WINDOWPLACEMENT wp;
+		wp.length = sizeof wp;
+		GetWindowPlacement(&wp);
+		OpenIcon();
+		if (wp.flags & WPF_RESTORETOMAXIMIZED)
+			ShowWindow(SW_MAXIMIZE);
 	}
 
 	// Unless the user has requested to see WinMerge's usage open files for
