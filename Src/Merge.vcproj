@@ -1365,11 +1365,14 @@
       <File RelativePath="..\FileTransforms\LinesNumbered.wsc" />
       <File RelativePath="..\FileTransforms\LinesSorted.wsc" />
       <File RelativePath="..\FileTransforms\MediaInfo.wsc" />
+      <File RelativePath="..\FileTransforms\msxml.wsc" />
+      <File RelativePath="..\FileTransforms\msxml-sort.xslt" />
       <File RelativePath="..\FileTransforms\xdoc2txt.wsc" />
     </Filter>
     <Filter Name="Plugin Monikers">
       <File RelativePath="..\Translations\PluginMonikers\English.ini" />
       <File RelativePath="..\Translations\PluginMonikers\German.ini" />
+      <File RelativePath="..\Translations\PluginMonikers\Portuguese.ini" />
     </Filter>
     <Filter Name="Editor Scripts">
       <File RelativePath="..\EditorScripts\Basic.wsc.EditorScript" />

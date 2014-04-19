@@ -36,7 +36,7 @@
 			Name="FileTransforms"
 			CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\FileTransforms\$(InputFileName)&quot;"
 			Outputs="&quot;$(OutDir)\FileTransforms\$(InputFileName)&quot;"
-			FileExtensions="*.wsc"
+			FileExtensions="*.wsc;*.xslt"
 			>
 		</CustomBuildRule>
 		<CustomBuildRule
