@@ -369,6 +369,20 @@ LRESULT CChildFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 		m_idContextLines = id;
 		ReloadDocs();
 		break;
+	case ID_VIEW_DETAIL_BAR:
+		if (int value = OnViewSubFrame(OPT_SHOW_DIFFVIEWBAR))
+			m_wndDiffViewBar.m_uHitTestCode = value < 0 ? HTBOTTOM : HTTOP;
+		else
+			m_wndDiffViewBar.m_uHitTestCode = HTNOWHERE;
+		RecalcLayout();
+		break;
+	case ID_VIEW_LOCATION_BAR:
+		if (int value = OnViewSubFrame(OPT_SHOW_LOCATIONBAR))
+			m_wndLocationBar.m_uHitTestCode = value < 0 ? HTLEFT : HTRIGHT;
+		else
+			m_wndLocationBar.m_uHitTestCode = HTNOWHERE;
+		RecalcLayout();
+		break;
 	case ID_SET_SYNCPOINT:
 		if (IsCursorAtSyncPoint())
 			ClearSyncPoint();
@@ -746,8 +760,8 @@ CChildFrame::CChildFrame(CMainFrame *pMDIFrame, CDirFrame *pDirDoc, CChildFrame 
 , m_pOpener(pOpener)
 #pragma warning(disable:warning_this_used_in_base_member_initializer_list)
 , m_wndLocationView(this)
-, m_wndLocationBar(this, FloatScriptLocationBar, HTRIGHT)
-, m_wndDiffViewBar(this, FloatScriptDiffViewBar, HTTOP)
+, m_wndLocationBar(this, FloatScriptLocationBar)
+, m_wndDiffViewBar(this, FloatScriptDiffViewBar)
 #pragma warning(default:warning_this_used_in_base_member_initializer_list)
 , m_bEnableRescan(true)
 , m_nCurDiff(-1)
@@ -872,14 +886,14 @@ void CChildFrame::CreateClient()
 {
 	m_wndLocationBar.SubclassWindow(HWindow::CreateEx(
 		0, WinMergeWindowClass, NULL, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
-		0, 0, 24, 10, m_pWnd, ID_VIEW_LOCATION_BAR));
+		0, 0, 28, 10, m_pWnd, ID_VIEW_LOCATION_BAR));
 	m_wndLocationView.SubclassWindow(HWindow::CreateEx(
 		WS_EX_CLIENTEDGE, WinMergeWindowClass, NULL, WS_CHILD | WS_VISIBLE,
-		0, 0, 20, 10, m_wndLocationBar.m_pWnd, 152, NULL));
+		4, 0, 20, 10, m_wndLocationBar.m_pWnd, 152, NULL));
 
 	m_wndDiffViewBar.SubclassWindow(HWindow::CreateEx(
 		0, WinMergeWindowClass, NULL, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
-		0, 0, 100, 48, m_pWnd, ID_VIEW_DETAIL_BAR));
+		0, 0, 100, 52, m_pWnd, ID_VIEW_DETAIL_BAR));
 
 	const int cyScroll = GetSystemMetrics(SM_CYHSCROLL);
 	const int cyClient = (40 - cyScroll) / 2;
@@ -904,11 +918,11 @@ void CChildFrame::CreateClient()
 	// tell merge doc about these views
 	SetMergeDetailViews(pLeftDetail, pRightDetail);
 
-	if (!COptionsMgr::Get(OPT_SHOW_LOCATIONBAR))
-		m_wndLocationBar.ShowWindow(SW_HIDE);
+	if (int value = COptionsMgr::Get(OPT_SHOW_LOCATIONBAR))
+		m_wndLocationBar.m_uHitTestCode = value < 0 ? HTLEFT : HTRIGHT;
 
-	if (!COptionsMgr::Get(OPT_SHOW_DIFFVIEWBAR))
-		m_wndDiffViewBar.ShowWindow(SW_HIDE);
+	if (int value = COptionsMgr::Get(OPT_SHOW_DIFFVIEWBAR))
+		m_wndDiffViewBar.m_uHitTestCode = value < 0 ? HTBOTTOM : HTTOP;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1174,23 +1188,55 @@ void CChildFrame::RecalcLayout()
 {
 	RECT rectClient;
 	GetClientRect(&rectClient);
-	if (m_wndDiffViewBar.m_hWnd && (m_wndDiffViewBar.GetStyle() & WS_VISIBLE))
+	if (m_wndDiffViewBar.m_hWnd)
 	{
 		RECT rect;
 		m_wndDiffViewBar.GetWindowRect(&rect);
-		ScreenToClient(&rect);
-		rectClient.bottom -= rect.bottom -= rect.top;
-		m_wndDiffViewBar.MoveWindow(rect.left, rectClient.bottom,
-			rectClient.right - rectClient.left, rect.bottom);
+		const int cx = rectClient.right - rectClient.left;
+		const int cy = rect.bottom - rect.top;
+		switch (m_wndDiffViewBar.m_uHitTestCode)
+		{
+		case HTBOTTOM:
+			rectClient.top += cy - 4;
+			m_wndDiffViewBar.SetWindowPos(NULL,
+				rectClient.left, -4, cx, cy,
+				SWP_SHOWWINDOW | SWP_NOZORDER);
+			break;
+		case HTTOP:
+			rectClient.bottom -= cy - 4;
+			m_wndDiffViewBar.SetWindowPos(NULL,
+				rectClient.left, rectClient.bottom, cx, cy,
+				SWP_SHOWWINDOW | SWP_NOZORDER);
+			break;
+		default:
+			m_wndDiffViewBar.ShowWindow(SW_HIDE);
+			break;
+		}
 	}
-	if (m_wndLocationBar.m_hWnd && (m_wndLocationBar.GetStyle() & WS_VISIBLE))
+	if (m_wndLocationBar.m_hWnd)
 	{
 		RECT rect;
 		m_wndLocationBar.GetWindowRect(&rect);
-		ScreenToClient(&rect);
-		rectClient.left += rect.right -= rect.left;
-		m_wndLocationBar.MoveWindow(rect.left, rect.top,
-			rect.right, rectClient.bottom - rectClient.top);
+		const int cx = rect.right - rect.left;
+		const int cy = rectClient.bottom - rectClient.top;
+		switch (m_wndLocationBar.m_uHitTestCode)
+		{
+		case HTLEFT:
+			rectClient.right -= cx - 4;
+			m_wndLocationBar.SetWindowPos(NULL,
+				rectClient.right, rectClient.top, cx, cy,
+				SWP_SHOWWINDOW | SWP_NOZORDER);
+			break;
+		case HTRIGHT:
+			rectClient.left += cx - 4;
+			m_wndLocationBar.SetWindowPos(NULL,
+				-4, rectClient.top, cx, cy,
+				SWP_SHOWWINDOW | SWP_NOZORDER);
+			break;
+		default:
+			m_wndLocationBar.ShowWindow(SW_HIDE);
+			break;
+		}
 	}
 	if (m_wndFilePathBar.m_hWnd)
 	{

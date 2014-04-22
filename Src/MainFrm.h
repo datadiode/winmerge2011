@@ -23,10 +23,6 @@
  * @brief Declaration file for CMainFrame
  *
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-#include "OptionsMgr.h"
 #include "Constants.h"
 #include "VSSHelper.h"
 #include "MergeCmdLineInfo.h"

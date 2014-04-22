@@ -105,9 +105,9 @@ extern COptionDef
 extern COptionDef
 <bool> OPT_SHOW_TABBAR operator((_T("Settings/ShowTabbar"), true));
 extern COptionDef
-<bool> OPT_SHOW_LOCATIONBAR operator((_T("Settings/ShowLocationBar"), true));
+<int> OPT_SHOW_LOCATIONBAR operator((_T("Settings/ShowLocationBar"), 1));
 extern COptionDef
-<bool> OPT_SHOW_DIFFVIEWBAR operator((_T("Settings/ShowDiffViewBar"), true));
+<int> OPT_SHOW_DIFFVIEWBAR operator((_T("Settings/ShowDiffViewBar"), 1));
 
 extern COptionDef
 <int> OPT_TOOLBAR_SIZE operator((_T("Settings/ToolbarSize"), 0));

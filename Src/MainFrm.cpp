@@ -23,12 +23,11 @@
  *
  * @brief Implementation of the CMainFrame class
  */
-
 #include "StdAfx.h"
 #include "VSSHelper.h"
+#define operator(args) args
 #include "Merge.h"
 #include "../BuildTmp/Merge/midl/WinMerge_i.c"
-#define operator(args) args
 #include <htmlhelp.h>  // From HTMLHelp Workshop (incl. in Platform SDK)
 #include "Common/SettingStore.h"
 #include "Common/WindowPlacement.h"
@@ -881,14 +880,22 @@ static COptionDef<bool> *LookupOption(UINT id)
 		return &OPT_SHOW_TABBAR;
 	case ID_VIEW_STATUS_BAR:
 		return &OPT_SHOW_STATUSBAR;
-	case ID_VIEW_LOCATION_BAR:
-		return &OPT_SHOW_LOCATIONBAR;
-	case ID_VIEW_DETAIL_BAR:
-		return &OPT_SHOW_DIFFVIEWBAR;
 	case ID_VIEW_RESIZE_PANES:
 		return &OPT_RESIZE_PANES;
 	case ID_FILE_MERGINGMODE:
 		return &OPT_MERGE_MODE;
+	}
+	return NULL;
+}
+
+static COptionDef<int> *Lookup3StateOption(UINT id)
+{
+	switch (id)
+	{
+	case ID_VIEW_LOCATION_BAR:
+		return &OPT_SHOW_LOCATIONBAR;
+	case ID_VIEW_DETAIL_BAR:
+		return &OPT_SHOW_DIFFVIEWBAR;
 	}
 	return NULL;
 }
@@ -1012,6 +1019,11 @@ LRESULT CMainFrame::OnWndMsg<WM_INITMENUPOPUP>(WPARAM wParam, LPARAM lParam)
 		}
 		// Handle the option driven cases
 		else if (COptionDef<bool> *option = LookupOption(mii.wID))
+		{
+			mii.fState = COptionsMgr::Get(*option) ? MF_CHECKED : MF_UNCHECKED;
+		}
+		// Handle the 3-state option driven cases
+		else if (COptionDef<int> *option = Lookup3StateOption(mii.wID))
 		{
 			mii.fState = COptionsMgr::Get(*option) ? MF_CHECKED : MF_UNCHECKED;
 		}
@@ -3382,19 +3394,6 @@ LRESULT CMainFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 		break;
 	case ID_VIEW_STATUS_BAR:
 		OnViewStatusBar();
-		break;
-	case ID_VIEW_LOCATION_BAR:
-	case ID_VIEW_DETAIL_BAR:
-		if (CDocFrame *pDocFrame = GetActiveDocFrame())
-		{
-			if (HWindow *pBar = pDocFrame->GetDlgItem(id))
-			{
-				pBar->ShowWindow(pBar->IsWindowVisible() ? SW_HIDE : SW_SHOW);
-				pDocFrame->RecalcLayout();
-				if (COptionDef<bool> *opt = LookupOption(id))
-					COptionsMgr::SaveOption(*opt, pBar->IsWindowVisible() != FALSE);
-			}
-		}
 		break;
 	case ID_VIEW_RESIZE_PANES:
 		OnResizePanes();

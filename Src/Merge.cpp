@@ -668,6 +668,17 @@ void CDocFrame::EnableModeless(BOOL bEnable)
 	}
 }
 
+int CDocFrame::OnViewSubFrame(COptionDef<int> &opt)
+{
+	int value = COptionsMgr::Get(opt);
+	if (GetKeyState(VK_SHIFT) < 0)
+		value = value ? -value : -1;
+	else
+		value = value ? 0 : 1;
+	COptionsMgr::SaveOption(opt, value);
+	return value;
+}
+
 CSubFrame::CSubFrame(CDocFrame *pDocFrame, const LONG *FloatScript, UINT uHitTestCode)
 	: CFloatState(FloatScript)
 	, m_pDocFrame(pDocFrame)

@@ -23,9 +23,6 @@
  * @brief main header file for the MERGE application
  *
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "resource.h"       // main symbols
 #include "scriptable.h"
 
@@ -107,6 +104,15 @@ private:
 	LONG m_nActiveOperations; /**< Active operations count. */
 } theApp;
 
+#include "Common/RegKey.h"
+#include "DiffTextBuffer.h"
+#include "DiffWrapper.h"
+#include "DiffList.h"
+#include "stringdiffs.h"
+#include "DiffFileInfo.h"
+#include "FileFilterHelper.h"
+#include "FileTransform.h"
+#include "OptionsMgr.h"
 #include "EditorFilepathBar.h"
 
 class CDocFrame : public OWindow
@@ -142,6 +148,7 @@ protected:
 	CDocFrame(CMainFrame *, HandleSet *, const LONG *FloatScript, const LONG *SplitScript = NULL);
 	~CDocFrame();
 	void EnableModeless(BOOL bEnable);
+	static int OnViewSubFrame(COptionDef<int> &);
 	template<UINT id>
 	static HandleSet *GetHandleSet()
 	{
@@ -186,9 +193,9 @@ class CSubFrame
 	, public CFloatState
 {
 public:
-	CSubFrame(CDocFrame *pDocFrame, const LONG *FloatScript, UINT uHitTestCode);
+	CSubFrame(CDocFrame *pDocFrame, const LONG *FloatScript, UINT uHitTestCode = HTNOWHERE);
+	UINT m_uHitTestCode;
 protected:
-	UINT const m_uHitTestCode;
 	CDocFrame *const m_pDocFrame;
 	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
 };
@@ -204,12 +211,4 @@ public:
 	}
 };
 
-#include "Common/RegKey.h"
-#include "DiffTextBuffer.h"
-#include "DiffWrapper.h"
-#include "DiffList.h"
-#include "stringdiffs.h"
-#include "DiffFileInfo.h"
-#include "FileFilterHelper.h"
-#include "FileTransform.h"
 #include "ChildFrm.h"
