@@ -19,9 +19,6 @@
  *
  * @brief Declaration file for VSSHelper
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #ifndef _VSSHELPER_H_
 #define _VSSHELPER_H_
 
@@ -30,7 +27,7 @@
  */
 enum
 {
-	VCS_NONE = 0,
+	VCS_NONE,
 	VCS_VSS4,
 	VCS_VSS5,
 	VCS_CLEARCASE,

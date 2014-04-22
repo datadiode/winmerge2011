@@ -25,7 +25,7 @@ public:
 	/** @brief Backup file locations. */
 	enum BACKUP_FOLDER
 	{
-		FOLDER_ORIGINAL = 0,
+		FOLDER_ORIGINAL,
 		FOLDER_GLOBAL,
 	};
 

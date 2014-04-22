@@ -346,13 +346,9 @@ void FileFiltersDlg::OnBnClickedFilterfileNewbutton()
 			return;
 		}
 		EditFileFilter(path.c_str());
-		int retval = globalFileFilter.AddFilter(path.c_str());
-		if (retval == FILTER_OK)
-		{
-			// Remove all from filterslist and re-add so we can update UI
-			globalFileFilter.LoadAllFileFilters();
-			UpdateFiltersList();
-		}
+		// Remove all from filterslist and re-add so we can update UI
+		globalFileFilter.LoadAllFileFilters();
+		UpdateFiltersList();
 	}
 }
 
@@ -373,7 +369,8 @@ void FileFiltersDlg::OnBnClickedFilterfileDelete()
 		{
 			if (DeleteFile(path.c_str()))
 			{
-				globalFileFilter.RemoveFilter(path.c_str());
+				// Remove all from filterslist and re-add so we can update UI
+				globalFileFilter.LoadAllFileFilters();
 				UpdateFiltersList();
 			}
 			else
@@ -442,10 +439,8 @@ void FileFiltersDlg::OnBnClickedFilterfileInstall()
 				LanguageSelect.MsgBox(IDS_FILEFILTER_INSTALLFAIL, MB_ICONSTOP);
 			}
 		}
-		else
-		{
-			globalFileFilter.AddFilter(userPath.c_str());
-			UpdateFiltersList();
-		}
+		// Remove all from filterslist and re-add so we can update UI
+		globalFileFilter.LoadAllFileFilters();
+		UpdateFiltersList();
 	}
 }

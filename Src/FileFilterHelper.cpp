@@ -309,4 +309,5 @@ void FileFilterHelper::LoadAllFileFilters()
 		fullpath = paths_ConcatPath(m_sGlobalFilterPath, tmpl);
 		Load();
 	}
+	m_currentFilter = FindFilter(name.c_str());
 }

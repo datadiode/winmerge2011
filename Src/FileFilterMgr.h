@@ -26,16 +26,6 @@
 #include "FileFilter.h"
 
 /**
- * @brief Return values for many filter functions.
- */
-enum FILTER_RETVALUE
-{
-	FILTER_OK = 0,  /**< Success */
-	FILTER_ERROR_FILEACCESS,  /**< File could not be opened etc. */
-	FILTER_NOTFOUND, /**< Filter not found */
-};
-
-/**
  * @brief File filter manager for handling filefilters.
  *
  * The FileFilterMgr loads a collection of named file filters from disk,
@@ -53,9 +43,6 @@ public:
 	~FileFilterMgr();
 	// Reload filter array from specified directory (passed to CFileFind)
 	void LoadFromDirectory(LPCTSTR dir, LPCTSTR szPattern);
-	// Load a filter from a string
-	int AddFilter(LPCTSTR szFilterFile);
-	void RemoveFilter(LPCTSTR szFilterFile);
 
 	// access to array of filters
 	FileFilter *GetFilterByPath(LPCTSTR) const;

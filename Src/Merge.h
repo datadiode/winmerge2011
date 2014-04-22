@@ -47,8 +47,6 @@ enum FRAMETYPE
 	FRAME_BINARY, /**< Binary compare frame. */
 };
 
-enum { IDLE_TIMER = 9754 };
-
 /** 
  * @brief WinMerge application class
  */

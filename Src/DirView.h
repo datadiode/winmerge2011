@@ -61,7 +61,6 @@ struct ViewCustomFlags
 		// and each set of flags is in a different hex digit
 		// to make debugging easier
 		// These can always be packed down in the future
-		INVALID_CODE = 0,
 		VISIBILITY = 0x3, VISIBLE = 0x1, HIDDEN = 0x2, EXPANDED = 0x4
 	};
 };

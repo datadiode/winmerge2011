@@ -35,19 +35,6 @@ FileFilterMgr::~FileFilterMgr()
 }
 
 /**
- * @brief Loads filterfile from disk and adds it to filters.
- * @param [in] szFilterFile Filter file to load.
- * @return FILTER_OK if succeeded or one of FILTER_RETVALUE values on error.
- */
-int FileFilterMgr::AddFilter(LPCTSTR szFilterFile)
-{
-	int errorcode = FILTER_OK;
-	if (FileFilter *pFilter = LoadFilterFile(szFilterFile))
-		m_filters.push_back(pFilter);
-	return errorcode;
-}
-
-/**
  * @brief Load all filter files matching pattern from disk into internal filter set.
  * @param [in] dir Directory from where filters are loaded.
  * @param [in] szPattern Pattern for filters to load filters, for example "*.flt".
@@ -67,30 +54,10 @@ void FileFilterMgr::LoadFromDirectory(LPCTSTR dir, LPCTSTR szPattern)
 			if (!PathMatchSpec(ff.cFileName, szPattern))
 				continue;
 			String filterpath = paths_ConcatPath(dir, ff.cFileName);
-			AddFilter(filterpath.c_str());
+			if (FileFilter *pFilter = LoadFilterFile(filterpath.c_str()))
+				m_filters.push_back(pFilter);
 		} while (FindNextFile(h, &ff));
 		FindClose(h);
-	}
-}
-
-/**
- * @brief Removes filter from filterlist.
- *
- * @param [in] szFilterFile Filename of filter to remove.
- */
-void FileFilterMgr::RemoveFilter(LPCTSTR szFilterFile)
-{
-	// Note that m_filters.GetSize can change during loop
-	vector<FileFilter*>::iterator iter = m_filters.begin();
-	while (iter != m_filters.end())
-	{
-		if (_tcsicmp((*iter)->fullpath.c_str(), szFilterFile) == 0)
-		{
-			delete (*iter);
-			m_filters.erase(iter);
-			break;
-		}
-		++iter;
 	}
 }
 

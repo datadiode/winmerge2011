@@ -1904,11 +1904,10 @@ FileLoadResult::FILES_RESULT CChildFrame::LoadOneFile(
  * @param fileLocRight [in] File to open to right side (path & encoding info)
  * @param bROLeft [in] Is left file read-only
  * @param bRORight [in] Is right file read-only
- * @return Success/Failure/Binary (failure) per typedef enum OpenDocsResult_TYPE
  * @todo Options are still read from CMainFrame, this will change
  * @sa CMainFrame::ShowMergeDoc()
  */
-OPENRESULTS_TYPE CChildFrame::OpenDocs(
+void CChildFrame::OpenDocs(
 	FileLocation &filelocLeft,
 	FileLocation &filelocRight,
 	bool bROLeft, bool bRORight)
@@ -1945,7 +1944,7 @@ OPENRESULTS_TYPE CChildFrame::OpenDocs(
 	if (!FileLoadResult::IsOk(nLeftSuccess) || !FileLoadResult::IsOk(nRightSuccess))
 	{
 		DestroyFrame();
-		return OPENRESULTS_FAILED_MISC;
+		return;
 	}
 
 	// Warn user if file load was lossy (bad encoding)
@@ -2006,7 +2005,7 @@ OPENRESULTS_TYPE CChildFrame::OpenDocs(
 		// your temp directory, doing nothing is graceful enough for that).
 		ShowRescanError(nRescanResult, bIdentical);
 		DestroyFrame();
-		return OPENRESULTS_FAILED_MISC;
+		return;
 	}
 
 	// prepare the four views
@@ -2101,8 +2100,6 @@ OPENRESULTS_TYPE CChildFrame::OpenDocs(
 	// Force repaint of location pane to update it in case we had some warning
 	// dialog visible and it got painted before files were loaded
 	m_wndLocationView.ForceRecalculate();
-
-	return OPENRESULTS_SUCCESS;
 }
 
 /**

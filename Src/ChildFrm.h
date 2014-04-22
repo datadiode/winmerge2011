@@ -65,16 +65,6 @@ enum SAVERESULTS_TYPE
 	SAVE_CANCELLED, /**< Saving was cancelled */  
 };
 
-/**
- * @brief Result of trying to open file in MergeEditView display
- */
-enum OPENRESULTS_TYPE
-{
-	OPENRESULTS_SUCCESS,       /**< Open succeeded */
-	OPENRESULTS_FAILED_BINARY, /**< Open failed because one or both files were binary */
-	OPENRESULTS_FAILED_MISC    /**< Open failed for some other reason */
-};
-
 enum MERGEVIEW_INDEX_TYPE
 {
 	MERGEVIEW_LEFT = 0,         /**< Left MergeView */
@@ -185,7 +175,7 @@ public:
 	void UpdateHeaderPath(int pane);
 	void UpdateHeaderActivity(int pane, bool bActivate);
 	void RefreshOptions();
-	OPENRESULTS_TYPE OpenDocs(FileLocation &, FileLocation &, bool bROLeft, bool bRORight);
+	void OpenDocs(FileLocation &, FileLocation &, bool bROLeft, bool bRORight);
 	void RescanIfNeeded(float timeOutInSecond);
 	int Rescan(bool &bIdentical, bool bForced = false);
 	int Rescan2(bool &bIdentical);
