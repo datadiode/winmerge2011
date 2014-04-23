@@ -19,7 +19,6 @@
 #include "coretools.h"
 #include "DirColsDlg.h"
 #include "OptionsMgr.h"
-#include "CompareStats.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

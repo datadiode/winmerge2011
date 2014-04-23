@@ -84,10 +84,8 @@
  *
  * @brief Implementation of the CCrystalTextView class
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
+#include "resource.h"
 #include "LanguageSelect.h"
 #include <imm.h> /* IME */
 #include "editcmd.h"

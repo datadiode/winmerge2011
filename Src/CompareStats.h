@@ -49,6 +49,8 @@ public:
 		N_DIFFIMG
 	};
 
+	static const WORD m_rgIDI[N_DIFFIMG];
+
 	CompareStats();
 	~CompareStats();
 	void SetCompareThreadCount(LONG nCompareThreads)

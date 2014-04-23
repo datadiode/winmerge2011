@@ -26,6 +26,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "StdAfx.h"
+#include "resource.h"
 #include "LanguageSelect.h"
 #include "cfindtextdlg.h"
 #include "ccrystaltextview.h"

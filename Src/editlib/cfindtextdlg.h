@@ -28,17 +28,8 @@
  *
  *  @brief Declaration Find-dialog.
  */
-// RCS ID line follows -- this is updated by CVS
-// $Id$
-
-#if !defined(AFX_CFINDTEXTDLG_H__F59009E3_7B01_11D2_8C4F_0080ADB86836__INCLUDED_)
-#define AFX_CFINDTEXTDLG_H__F59009E3_7B01_11D2_8C4F_0080ADB86836__INCLUDED_
-
-#if _MSC_VER >= 1000
 #pragma once
-#endif // _MSC_VER >= 1000
 
-#include "resource.h"
 #include "SuperComboBox.h"
 
 class CCrystalTextView;
@@ -87,8 +78,3 @@ protected :
 	void OnCancel();
 	void OnRegExp();
 };
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Developer Studio will insert additional declarations immediately before the previous line.
-
-#endif // !defined(AFX_CFINDTEXTDLG_H__F59009E3_7B01_11D2_8C4F_0080ADB86836__INCLUDED_)

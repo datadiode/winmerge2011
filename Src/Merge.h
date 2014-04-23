@@ -103,6 +103,7 @@ private:
 } theApp;
 
 #include "Common/RegKey.h"
+#include "CompareStats.h"
 #include "DiffTextBuffer.h"
 #include "DiffWrapper.h"
 #include "DiffList.h"
@@ -146,6 +147,7 @@ protected:
 	CDocFrame(CMainFrame *, HandleSet *, const LONG *FloatScript, const LONG *SplitScript = NULL);
 	~CDocFrame();
 	void EnableModeless(BOOL bEnable);
+	void LoadIcon(CompareStats::RESULT);
 	static int OnViewSubFrame(COptionDef<int> &);
 	template<UINT id>
 	static HandleSet *GetHandleSet()

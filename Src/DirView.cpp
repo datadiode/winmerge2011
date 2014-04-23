@@ -150,32 +150,10 @@ HImageList *CDirView::AcquireSharedResources()
 	const int iconCX = 16;
 	const int iconCY = 16;
 	m_imageList = HImageList::Create(iconCX, iconCY, ILC_COLOR32 | ILC_MASK, CompareStats::N_DIFFIMG, 0);
-	static const WORD rgIDI[CompareStats::N_DIFFIMG] =
-	{
-		IDI_LFILE,
-		IDI_RFILE,
-		IDI_NOTEQUALFILE,
-		IDI_EQUALFILE,
-		IDI_EQUALBINARY,
-		IDI_BINARYDIFF,
-		IDI_LFOLDER,
-		IDI_RFOLDER,
-		IDI_FILESKIP,
-		IDI_FOLDERSKIP,
-		IDI_NOTEQUALFOLDER,
-		IDI_EQUALFOLDER,
-		IDI_FOLDER,
-		IDI_COMPARE_ERROR,
-		IDI_FOLDERUP,
-		IDI_FOLDERUP_DISABLE,
-		IDI_COMPARE_ABORTED,
-		IDI_NOTEQUALTEXTFILE,
-		IDI_EQUALTEXTFILE
-	};
 	int i = 0;
 	do
 	{
-		VERIFY(-1 != m_imageList->Add(LanguageSelect.LoadSmallIcon(rgIDI[i])));
+		VERIFY(-1 != m_imageList->Add(LanguageSelect.LoadSmallIcon(CompareStats::m_rgIDI[i])));
 	} while (++i < CompareStats::N_DIFFIMG);
 	// Load the icons used for the list view (expanded/collapsed state icons)
 	m_imageState = LanguageSelect.LoadImageList(IDB_TREE_STATE, 16);

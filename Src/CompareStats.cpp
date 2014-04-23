@@ -4,8 +4,32 @@
  * @brief Implementation of CompareStats class.
  */
 #include "StdAfx.h"
+#include "resource.h"
 #include "DiffContext.h"
 #include "CompareStats.h"
+
+const WORD CompareStats::m_rgIDI[N_DIFFIMG] =
+{
+	IDI_LFILE,
+	IDI_RFILE,
+	IDI_NOTEQUALFILE,
+	IDI_EQUALFILE,
+	IDI_EQUALBINARY,
+	IDI_BINARYDIFF,
+	IDI_LFOLDER,
+	IDI_RFOLDER,
+	IDI_FILESKIP,
+	IDI_FOLDERSKIP,
+	IDI_NOTEQUALFOLDER,
+	IDI_EQUALFOLDER,
+	IDI_FOLDER,
+	IDI_COMPARE_ERROR,
+	IDI_FOLDERUP,
+	IDI_FOLDERUP_DISABLE,
+	IDI_COMPARE_ABORTED,
+	IDI_NOTEQUALTEXTFILE,
+	IDI_EQUALTEXTFILE
+};
 
 /**
  * @brief Constructor, initializes critical section.

@@ -34,7 +34,6 @@
 #include "LanguageSelect.h"
 #include "HexMergeFrm.h"
 #include "HexMergeView.h"
-#include "CompareStats.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -215,23 +214,8 @@ void CHexMergeFrame::CreateClient()
  */
 void CHexMergeFrame::SetLastCompareResult(int nResult)
 {
-	HICON hCurrent = GetIcon();
-	HICON hReplace = LanguageSelect.LoadIcon(
-		nResult == 0 ? IDI_EQUALBINARY : IDI_BINARYDIFF);
-		
-	if (hCurrent != hReplace)
-	{
-		SetIcon(hReplace, nResult == 0 ?
-			CompareStats::DIFFIMG_BINSAME: CompareStats::DIFFIMG_BINDIFF);
-		BOOL bMaximized;
-		m_pMDIFrame->GetActiveDocFrame(&bMaximized);
-		// When MDI maximized the window icon is drawn on the menu bar, so we
-		// need to notify it that our icon has changed.
-		if (bMaximized)
-		{
-			m_pMDIFrame->DrawMenuBar();
-		}
-	}
+	LoadIcon(nResult == 0 ?
+		CompareStats::DIFFIMG_BINSAME: CompareStats::DIFFIMG_BINDIFF);
 }
 
 /**

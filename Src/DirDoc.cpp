@@ -34,7 +34,6 @@
 #include "LanguageSelect.h"
 #include "HexMergeFrm.h"
 #include "7zCommon.h"
-#include "CompareStats.h"
 #include "DirFrame.h"
 #include "DirView.h"
 #include "MainFrm.h"

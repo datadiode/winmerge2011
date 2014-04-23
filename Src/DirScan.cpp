@@ -6,7 +6,6 @@
 #include "StdAfx.h"
 #include "Merge.h"
 #include "LogFile.h"
-#include "CompareStats.h"
 #include "DiffContext.h"
 #include "codepage.h"
 #include "DirItem.h"

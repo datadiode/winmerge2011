@@ -32,7 +32,6 @@
 #include "MainFrm.h"
 #include "HexMergeFrm.h"
 #include "7zCommon.h"
-#include "CompareStats.h"
 #include "LanguageSelect.h"
 #include "DirFrame.h"
 #include "DirView.h"
@@ -96,7 +95,7 @@ CDirFrame::CDirFrame(CMainFrame *pMDIFrame)
 , m_pTempPathContext(NULL)
 {
 	SubclassWindow(pMDIFrame->CreateChildHandle());
-	SetIcon(LanguageSelect.LoadIcon(IDR_DIRDOCTYPE), CompareStats::DIFFIMG_DIR);
+	LoadIcon(CompareStats::DIFFIMG_DIR);
 	CreateClient();
 	RecalcLayout();
 	m_bAutoDelete = true;

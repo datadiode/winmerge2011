@@ -26,7 +26,6 @@
 #include "Merge.h"
 #include "LanguageSelect.h"
 #include "CompareStatisticsDlg.h"
-#include "CompareStats.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

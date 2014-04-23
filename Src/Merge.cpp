@@ -540,26 +540,6 @@ LRESULT CDocFrame::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			}
 		}
 		break;
-	case WM_SETICON:
-		if (HTabCtrl *pTc = m_pMDIFrame->GetTabBar())
-		{
-			int index = pTc->GetItemCount();
-			while (index)
-			{
-				--index;
-				TCITEM item;
-				item.mask = TCIF_PARAM;
-				pTc->GetItem(index, &item);
-				if (item.lParam == reinterpret_cast<LPARAM>(m_hWnd))
-				{
-					item.mask = TCIF_IMAGE;
-					item.iImage = static_cast<int>(wParam);
-					pTc->SetItem(index, &item);
-				}
-			}
-		}
-		wParam = TRUE;
-		break;
 	case WM_NCDESTROY:
 		return OWindow::WindowProc(uMsg, wParam, lParam);
 	case WM_SIZE:
@@ -665,6 +645,40 @@ void CDocFrame::EnableModeless(BOOL bEnable)
 	{
 		if (pChild != m_pWnd)
 			pChild->EnableWindow(bEnable);
+	}
+}
+
+void CDocFrame::LoadIcon(CompareStats::RESULT iImage)
+{
+	HICON hIcon = LanguageSelect.LoadIcon(CompareStats::m_rgIDI[iImage]);
+	if (GetIcon() != hIcon)
+	{
+		SetIcon(hIcon);
+		if (HTabCtrl *pTc = m_pMDIFrame->GetTabBar())
+		{
+			int index = pTc->GetItemCount();
+			while (index)
+			{
+				--index;
+				TCITEM item;
+				item.mask = TCIF_PARAM;
+				pTc->GetItem(index, &item);
+				if (item.lParam == reinterpret_cast<LPARAM>(m_hWnd))
+				{
+					item.mask = TCIF_IMAGE;
+					item.iImage = iImage;
+					pTc->SetItem(index, &item);
+				}
+			}
+		}
+		BOOL bMaximized;
+		m_pMDIFrame->GetActiveDocFrame(&bMaximized);
+		// When MDI maximized the window icon is drawn on the menu bar, so we
+		// need to notify it that our icon has changed.
+		if (bMaximized)
+		{
+			m_pMDIFrame->DrawMenuBar();
+		}
 	}
 }
 

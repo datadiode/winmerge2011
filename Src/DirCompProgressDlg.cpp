@@ -9,7 +9,6 @@
 #include "DirCompProgressDlg.h"
 #include "MainFrm.h"
 #include "DirFrame.h"
-#include "CompareStats.h"
 #include "CompareStatisticsDlg.h"
 #include "paths.h"
 
