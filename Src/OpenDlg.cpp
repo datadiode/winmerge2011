@@ -401,10 +401,24 @@ BOOL COpenDlg::OnInitDialog()
 			if (!m_pCompareAsScriptMenu->GetMenuString(id, moniker, _countof(moniker)))
 				GetAtomName(id, moniker, _countof(moniker));
 			if (m_sCompareAs == moniker)
+			{
 				m_pCbCompareAs->SetCurSel(j);
+				m_sCompareAs.clear(); // indicates that a match was found
+			}
 		}
 		theApp.m_pMainWnd->SetScriptMenu(pPopup, NULL);
 		pMenu->DestroyMenu();
+		// If the passed in "Compare As" option is invalid, yet insert it into
+		// the list as the selected one, but act as if none was selected. This
+		// gives the user a visual clue about the situation, and allows for an
+		// easy fix by unchecking the "By Default" option to avoid continuing
+		// interference with folder compare.
+		if (!m_sCompareAs.empty()) // no match was found
+		{
+			int j = m_pCbCompareAs->AddString(m_sCompareAs.c_str());
+			m_pCbCompareAs->SetItemData(j, ID_MERGE_COMPARE);
+			m_pCbCompareAs->SetCurSel(j);
+		}
 	}
 
 	if (DWORD_PTR dwpShellImageList = GetShellImageList())
