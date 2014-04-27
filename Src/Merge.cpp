@@ -370,7 +370,6 @@ void CMergeApp::InitializeSupplements()
 	static const TCHAR defenv[] =
 		_T("LogParser=%ProgramFiles(x86)%\\Log Parser 2.2\0")
 		_T("xdoc2txt=C:\\xdoc2txt\0")
-		_T("tidy=C:\\tidy\0")
 		_T("MediaInfo_CLI=C:\\MediaInfo_CLI\0");
 	// First, remove any possibly conflicting variables from process environment
 	memcpy(buffer, defenv, sizeof defenv);
