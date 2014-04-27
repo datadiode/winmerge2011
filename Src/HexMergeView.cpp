@@ -130,7 +130,10 @@ LRESULT CHexMergeView::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		if (GetModified())
 		{
 			if (!m_pDocument->m_wndFilePathBar.GetModify(m_nThisPane))
+			{
 				m_pDocument->m_wndFilePathBar.SetModify(m_nThisPane, TRUE);
+				m_pDocument->SetTitle();
+			}
 			m_pDocument->UpdateCmdUI();
 		}
 		break;
