@@ -76,6 +76,7 @@ private:
 	};
 	const int m_nAutoComplete;
 	int m_nCompareAs;
+	UINT m_fCompareAs;
 
 	int m_cyFull;
 

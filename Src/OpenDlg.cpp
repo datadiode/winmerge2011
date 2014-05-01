@@ -82,6 +82,7 @@ static void EnsureCurSelPathCombo(HSuperComboBox *pCb)
 COpenDlg::COpenDlg()
 	: OResizableDialog(IDD_OPEN)
 	, m_nAutoComplete(COptionsMgr::Get(OPT_AUTO_COMPLETE_SOURCE))
+	, m_fCompareAs(BST_CHECKED)
 {
 	static const LONG FloatScript[] =
 	{
@@ -240,6 +241,10 @@ LRESULT COpenDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			break;
 		case IDC_RECURS_CHECK:
 			Update3StateCheckBoxLabel(IDC_RECURS_CHECK);
+			break;
+		case IDC_COMPARE_AS_CHECK:
+			if (m_nCompareAs == m_pCbCompareAs->GetCurSel())
+				m_fCompareAs = m_pTgCompareAs->GetCheck();
 			break;
 		case MAKEWPARAM(IDC_LEFT_BUTTON, BN_CLICKED):
 			OnBrowseButton(IDC_LEFT_COMBO, IDC_RIGHT_COMBO);
@@ -571,7 +576,7 @@ void COpenDlg::OnOK()
 		UINT fCompareAs = m_pTgCompareAs->GetCheck();
 		if (m_nCompareAs != nCompareAs && fCompareAs)
 			key.WriteString(_T("CompareAs"), m_sCompareAs.c_str());
-		else if (m_nCompareAs == nCompareAs && !fCompareAs)
+		else if (!m_fCompareAs)
 			key.WriteString(_T("CompareAs"), _T(""));
 	}
 
