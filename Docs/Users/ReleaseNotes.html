@@ -36,96 +36,27 @@ function OnReadyStateChangeExternalDoc()
 </script>
 </head>
 <body>
-
-<h2>WinMerge 2011.003.523 Release Notes</h2>
+<h2>WinMerge 2011.004.185 Release Notes</h2>
 This is a stable release of WinMerge&nbsp;2011.
-<br>Significant new features since the preceding stable release include:
+<br>Besides fixing some bugs found in the previous release, it comes with three new features:
 <ul>
-<li><p>Line filters exist in a new flavor referred to as <i>early-applied</i> line filters:
-	<br><a name='WinMerge.chm' href='https://bitbucket.org/jtuc/winmerge2011_help/downloads/WinMerge.chm'>WinMerge.chm</a> &rarr; <i>Using Filters</i> &rarr; <i>Using line filters</i> &rarr; <i>Early-applied line filter syntax</i>
-<li><p>The <i>Open</i> dialog's <i>Include Subfolders</i> option can be adjusted to ignore folder structure:
-	<br><a name='WinMerge.chm' href='https://bitbucket.org/jtuc/winmerge2011_help/downloads/WinMerge.chm'>WinMerge.chm</a> &rarr; <i>Quick start</i> &rarr; <i>Selecting files and folders to compare</i> &rarr; <i>5.</i>
-<li><p>Editor scriptlets are back:
-	<br><a name='WinMerge.chm' href='https://bitbucket.org/jtuc/winmerge2011_help/downloads/WinMerge.chm'>WinMerge.chm</a> &rarr; <i>Plugin scriptlets</i>
-<li><p>Folder compare supports customizable background colors to make differences more visible.
-	<br>This feature can be configured through <i>Edit</i> &rarr; <i>Options</i> &rarr; <i>Colors</i> &rarr; <i>List</i>.
-<li><p>When comparing folders on machines with &gt; 2 CPU cores, WinMerge creates multiple compare threads to get the job done faster.
-	<br>The number of compare threads is usually one less than the number of available CPU cores.
-	<br>A different value can be configured through <i>Edit</i> &rarr; <i>Options</i> &rarr; <i>Compare</i> &rarr; <i>Folder</i> &rarr; <i>Number of compare threads</i>.
-<li><p>The location bar remains responsive during drag-drop editing. This greatly eases drag-drop moving of text over long distances.
-	<br>While in drag-drop mode, you can stop scrolling by holding down the <i>Shift</i> key.
-<li><p>File compare allows for setting synchronization points to help in situations where WinMerge fails to reasonably match portions of involved files.
-	<br>After clicking into the lines you want synchronized,
-	<i>Merge</i> &rarr; <i>Synchronization Point</i> will place a synchronization point at these lines.
-	<br>Repeat above steps to remove an existing synchronization point.
-	<br>Invoke <i>Merge</i> &rarr; <i>Clear Synchronization Points</i> to remove all synchronization points at once.
+<li><p>The tab bar shows icons alongside with window captions.
 	<br>This feature is adopted from <a target='_blank' href='https://bitbucket.org/sdottaka/winmerge-v2'>Takashi's fork</a>.
-<li><p>Unicode processing has been revised to <i>support</i> surrogate pairs rather than being actively destructive on them.
-	A beneficial side effect of this enhancement is the option to choose between
-	having combining characters visually combine with their preceding ones, or
-	keeping them separate like WinMerge used to do due to its unawareness of the very concept.
-	<br>The option to <i>Separate combining characters</i> is accessible through <i>Edit</i> &rarr; <i>Options</i> &rarr; <i>Editor</i>.
-<li><p><i>Edit</i> &rarr; <i>Options</i> &rarr; <i>Colors</i> now offers an option to <i>Cross-hatch deleted lines</i>.
-<li><p>Folder comparison results can be saved to an Excel spreadsheet.
-	<br>Besides the <i>Save to Excel spreadsheet</i> command, the Folder Compare window's <i>Tools</i>
-	menu includes commands for viewing and printing with Excel Viewer. These assume that you use
-	<a target='_blank' href='http://priede.bf.lu.lv/ftp/pub/RakstuDarbi/apskatei/Microsoft/xlviewer2003.exe'>Excel Viewer 2003</a>.
-	Newer versions don't seem to allow for direct printing through command line, and also lack options to adjust column widths and apply auto filters.
-	Be sure to also apply the updates located at
-	<a target='_blank' href='http://www.microsoft.com/download/details.aspx?id=16872'>Excel Viewer 2003 Service Pack 3 (SP3)</a> and
-	<a target='_blank' href='http://www.microsoft.com/download/details.aspx?id=4134'>Security Update for Microsoft Office Excel Viewer 2003 (KB973484)</a>.
-<li><p>File/directory filters have been enhanced to allow for combining both inclusion and exclusion rules.
-	<br>Omitting the <i>def:</i> label in an <i>.flt</i> file makes <i>f:</i> and <i>d:</i>
-	operate as inclusion rules unless prefixed with <i>x</i>, in which case they operate as exclusion rules.
-	<br>The <i>f:</i> and <i>d:</i> labels, again optionally prefixed with <i>x</i> to form an exclusion rule, can also be used with wildcard filters.
-<li><p>With <a target='_blank' href='http://www.microsoft.com/en-us/download/details.aspx?id=24659'>LogParser 2.2</a> installed,
-	you can enjoy more elaborate folder compare filter options by using SQL in your file/directory filters.
-	<br>All <i>.flt</i> files installed with WinMerge contain a default
-	SQL filter which you can enable at your option when filling in the <i>Open</i> dialog.
-	The default SQL filter allows you to specify minimum and maximum modification times and sizes.
-	All fields are checked with IS NULL so as to have only the filled in fields take effect.
-	SQL filters are enabled and filled in separately for each side.
-	The default SQL filter can also be combined with simple wildcard filtering, in which case WinMerge loads it from the <i>FileFilter.tmpl</i> file.
-<li><p>Processing of archive formats which are unknown to 7-Zip can be delegated to external command line tools.
-	<br>An example is PowerBuilder library (<i>.pbl</i>) files.
-	A command line tool to handle them can be found <a target='_blank' href='http://sqlbatch.com/pd/'>here</a>.
-	<br>Read <a target='_blank' href='http://forums.winmerge.org/viewtopic.php?f=4&t=879'>here</a>
-	on how to set up an <i>ExternalArchiveFormat.ini</i> to enable on-the-fly extraction of <i>.pbl</i> file contents.
-<li><p><i>Wrapper scripts</i> can help automate tasks which would otherwise require user interaction.
-	<br>A first application of this new feature is <i>GenerateHTMLReport.WinMerge</i>, which you find in the WinMerge program folder.
-	<br>Invoking it without arguments provides usage information.
-<li><p>The setup now offers a <i>Portable media</i> option to install WinMerge in such way that it will not modify the registry of the system on which it is running.
-	<br>
-	<u>Known issue:</u> On Windows XP and other pre-Vista systems, this option can only be used from an administrator account.
-<li><p><i>File</i> &rarr; <i>Start Collection</i> opens a folder compare window in <i>collect mode</i>.
-	WinMerge will prompt you for an existing <i>reference folder</i>
-	to represent the right-hand side of the folder compare session,
-	and create a temporary folder for the left-hand side.
-	<br>The reference folder will typically contain your working copy of
-	some source code which is maintained in a source control system.
-	Subsequent command line invocations will then add items to the existing
-	folder compare window, rather than opening them to new file compare windows,
-	provided they meet the condition of one of the specified files being located
-	inside the reference folder, and the other one being located outside of it.
-	The file that is located outside of the reference folder will be copied to
-	the temporary left-hand side folder, assigning it the same name as the file
-	located inside the reference folder, and creating subfolders as needed to
-	match the structure of the reference folder.
-	<br>The feature aims at supporting offline code reviews, for which you would
-	eventually store the collected items in an
-	<i>original&nbsp;vs.&nbsp;altered</i> archive (a.k.a. <i>Perry-style</i> patch),
-	using the context menu's <i>Zip</i>&nbsp;&rarr;&nbsp;<i>Differences</i> command.
-<li><p>ClearCase .mrgman files can be opened to a folder compare window, by dropping them onto the WinMerge main window.
-	<br>The header bars provide context menus to switch between base, source, and destination versions of the referenced files.
+<li><p>The <i>Diff Pane</i> and <i>Location Pane</i> show up on the opposite side when Shift is depressed while invoking the respective menu commands.
+	<br>This feature is tracked in <a href='https://bitbucket.org/jtuc/winmerge2011/issue/43/'>Issue #43</a>.
+<li><p>A file transform scriptlet was added to <i>Compare As</i> "XML Sorted".
+	<br>The scriptlet employs MSXML to apply an XSL transform, and pipes the output through <code>tidy.exe</code> for formatting.
+	<br>The included copy of <code>tidy.exe</code> is compiled from a
+	<a target='_blank' href='https://github.com/w3c/tidy-html5/archive/8a7b55da7f6bc751e7be880d19a17c1c458eeef8.zip'>snapshot</a>
+	of <a target='_blank' href='https://github.com/jay/tidy-html5/tree/j'>Jay Satiro's fork</a>.
+	<br>Jay has added long-missed options for less aggressive whitespace munging (<a target='_blank' href='https://github.com/w3c/tidy-html5/issues/117'>https://github.com/w3c/tidy-html5/issues/117</a>).
+	<br>This feature is tracked in <a href='https://bitbucket.org/jtuc/winmerge2011/issue/31/'>Issue #31</a>.
 </ul>
 <p>
-<a target='_blank' href='http://geekswithblogs.net/evjen/archive/2006/06/29/83567.aspx'>Bill Evjen's Blog</a> gives advice in case
-<a name='WinMerge.chm' href='https://bitbucket.org/jtuc/winmerge2011_help/downloads/WinMerge.chm'>WinMerge.chm</a> fails to display content.
-<p>
-Click <a href='https://bitbucket.org/jtuc/winmerge2011/get/2011.003.523.zip'>here</a> to obtain the source code for this release.
+Click <a href='https://bitbucket.org/jtuc/winmerge2011/get/2011.004.185.zip'>here</a> to obtain the source code for this release.
 <p>
 Click <a href='https://bitbucket.org/jtuc/frhed/get/0.10902.2013.zip'>here</a> to obtain source code for Frhed binaries included in this release.
 <p>
-<i>Jochen Neubeck, December 2013</i>
+<i>Jochen Neubeck, May 2014</i>
 <xml src='WinMerge.chm' onreadystatechange='OnReadyStateChangeExternalDoc()'></xml>
 </body>

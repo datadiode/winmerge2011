@@ -1,3 +1,29 @@
+2011.004.185
+Changes since preceding release (not necessarily complete):
+• OpenDlg: Changing "Compare As" cancelled the effect of unchecking "By Default"
+• HexMergeView: Add asterisk (*) for unsaved files like MergeEditView does
+• Ease recovery from removal of file transform scriptlet that was set as default
+• Issue #43 Show Diff/Location pane at opposite side when Shift is depressed
+• Issue #31 File transform to sort XML files
+• MainFrm.cpp: Try OpenIcon() to help out with SetForegroundWindow() issues
+• Have tab bar show icons alongside with window captions as per Takashi's idea
+• DirView: Don't keep cached compare results of closed archives in memory
+• HexMergeView: OPT_AUTOMATIC_BPL was interfering with OPT_SCROLL_TO_FIRST
+• DirView: Moving out of an archive could mess up things in recursive mode
+• UniFile.cpp: NUL chars in UTF-8 files erroneously treated as line terminators
+• FileFilterHelper: Whitespace after colon in filter string could cause crash
+• DirCompProgressDlg: Show paths of most time-consuming one among current items
+• Issue #40 Project folder opens in parent
+• FileTransform.cpp: Allow plugin monikers to include URL-style arguments
+• CMainFrame::SetScriptMenu() could disregard default PluginMonikers/English.ini
+• Prevent accidental applying of CMainFrame::m_strSaveAsPath to another document
+• ShellFileOperations.cpp: Shorten paths longer than 259 chars
+• http://sf.net/p/winmerge/bugs/2156/: Allow saving merge file that is correct
+• DirCmpReport.cpp: Fix conversion of localized column names in HTML reports
+• MainFrm.cpp: Shorten paths longer than 259 chars when adding them to MRU list
+• FileOrFolderSelect.cpp: Returned paths unintentionally included a magic prefix
+• SuperComboBox.cpp: The dropdown list could grow wider than the screen
+
 2011.003.523
 Changes since preceding release (not necessarily complete):
 • http://sf.net/p/winmerge/bugs/2159/: Wrong encoding shown in status bar
