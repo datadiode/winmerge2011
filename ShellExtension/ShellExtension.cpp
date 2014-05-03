@@ -141,3 +141,24 @@ STDAPI DllUnregisterServer()
 	}
 	return pModule->RegisterClassObject(FALSE);
 }
+
+/////////////////////////////////////////////////////////////////////////////
+// DllInstall - Allows for restarting explorer.exe with /i:Shell_TrayWnd
+
+STDAPI DllInstall(BOOL, LPCWSTR lpClassName)
+{
+	if (HWND hTrayWnd = FindWindow(lpClassName, NULL))
+	{
+		DWORD dwProcessId = 0;
+		if (GetWindowThreadProcessId(hTrayWnd, &dwProcessId))
+		{
+			if (HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, dwProcessId))
+			{
+				DebugActiveProcess(dwProcessId);
+				DebugBreakProcess(hProcess);
+				CloseHandle(hProcess);
+			}
+		}
+	}
+	return S_OK;
+}

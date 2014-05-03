@@ -579,14 +579,14 @@ HRESULT CWinMergeShell::RegisterClassObject(BOOL bRegister)
 
 HRESULT CWinMergeShell::QueryInterface(REFIID iid, void **ppv)
 {
-    static const QITAB rgqit[] = 
-    {   
-        QITABENT(CWinMergeShell, IClassFactory),
-        QITABENT(CWinMergeShell, IShellExtInit),
-        QITABENT(CWinMergeShell, IContextMenu),
-        { 0 }
-    };
-    return QISearch(this, rgqit, iid, ppv);
+	static const QITAB rgqit[] = 
+	{   
+		QITABENT(CWinMergeShell, IClassFactory),
+		QITABENT(CWinMergeShell, IShellExtInit),
+		QITABENT(CWinMergeShell, IContextMenu),
+		{ 0 }
+	};
+	return QISearch(this, rgqit, iid, ppv);
 }
 
 ULONG CWinMergeShell::AddRef()
