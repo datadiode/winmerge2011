@@ -142,6 +142,44 @@ STDAPI DllUnregisterServer()
 	return pModule->RegisterClassObject(FALSE);
 }
 
+static BOOL IsExplorer(HANDLE hProcess)
+{
+	DWORD dwModuleHandle = 0;
+	static const TCHAR szModuleName[] = _T("explorer.exe");
+	if (LPVOID pvRemote = VirtualAllocEx(hProcess, NULL, sizeof szModuleName, MEM_COMMIT, PAGE_READWRITE))
+	{
+		WriteProcessMemory(hProcess, pvRemote, szModuleName, sizeof szModuleName, NULL);
+		if (HANDLE hThread = CreateRemoteThread(hProcess, NULL, 0,
+			(LPTHREAD_START_ROUTINE)GetModuleHandle, pvRemote, 0, NULL))
+		{
+			WaitForSingleObject(hThread, INFINITE);
+			GetExitCodeThread(hThread, &dwModuleHandle);
+		}
+		VirtualFreeEx(hProcess, pvRemote, sizeof szModuleName, MEM_RELEASE);
+	}
+	return dwModuleHandle;
+}
+
+static BOOL CALLBACK EnumProcPostClose(HWND hWnd, LPARAM lParam)
+{
+	if (IsWindowVisible(hWnd) && reinterpret_cast<LPARAM>(hWnd) != lParam)
+	{
+		DWORD dwProcessId = 0;
+		if (GetWindowThreadProcessId(hWnd, &dwProcessId))
+		{
+			if (HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, dwProcessId))
+			{
+				if (IsExplorer(hProcess))
+				{
+					PostMessage(hWnd, WM_SYSCOMMAND, SC_CLOSE, 0);
+				}
+				CloseHandle(hProcess);
+			}
+		}
+	}
+	return TRUE;
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // DllInstall - Allows for restarting explorer.exe with /i:Shell_TrayWnd
 
@@ -149,6 +187,7 @@ STDAPI DllInstall(BOOL, LPCWSTR lpClassName)
 {
 	if (HWND hTrayWnd = FindWindow(lpClassName, NULL))
 	{
+		EnumWindows(EnumProcPostClose, reinterpret_cast<LPARAM>(hTrayWnd));
 		DWORD dwProcessId = 0;
 		if (GetWindowThreadProcessId(hTrayWnd, &dwProcessId))
 		{
