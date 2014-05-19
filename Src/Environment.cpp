@@ -120,6 +120,11 @@ String env_ExpandVariables(LPCTSTR text)
 LPCTSTR env_ResolveMoniker(String &moniker)
 {
 	C_ASSERT(String::npos == -1);
+	// Turn any apostrophes inside the query string into quotation marks.
+	if (String::size_type i = moniker.find(_T('?')) + 1)
+	{
+		stl::replace(moniker.begin() + i, moniker.end(), _T('\''), _T('"'));
+	}
 	moniker = env_ExpandVariables(moniker.c_str());
 	String::size_type i = moniker.find(_T(':'), 2) + 1;
 	String::size_type j = i;
