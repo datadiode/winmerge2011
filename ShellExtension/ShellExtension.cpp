@@ -171,7 +171,12 @@ static BOOL CALLBACK EnumProcPostClose(HWND hWnd, LPARAM lParam)
 			{
 				if (IsExplorer(hProcess))
 				{
-					PostMessage(hWnd, WM_SYSCOMMAND, SC_CLOSE, 0);
+					const UINT fuFlags = SMTO_ABORTIFHUNG | SMTO_NOTIMEOUTIFNOTHUNG;
+					DWORD_PTR dwResult = 0;
+					if (SendMessageTimeout(hWnd, WM_GETDLGCODE, 0, 0, fuFlags, 500, &dwResult) && dwResult == 0)
+					{
+						SendMessageTimeout(hWnd, WM_SYSCOMMAND, SC_CLOSE, 0, fuFlags, 500, &dwResult);
+					}
 				}
 				CloseHandle(hProcess);
 			}
@@ -187,14 +192,13 @@ STDAPI DllInstall(BOOL, LPCWSTR lpClassName)
 {
 	if (HWND hTrayWnd = FindWindow(lpClassName, NULL))
 	{
-		EnumWindows(EnumProcPostClose, reinterpret_cast<LPARAM>(hTrayWnd));
 		DWORD dwProcessId = 0;
 		if (GetWindowThreadProcessId(hTrayWnd, &dwProcessId))
 		{
+			EnumWindows(EnumProcPostClose, reinterpret_cast<LPARAM>(hTrayWnd));
 			if (HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, dwProcessId))
 			{
-				DebugActiveProcess(dwProcessId);
-				DebugBreakProcess(hProcess);
+				TerminateProcess(hProcess, 0);
 				CloseHandle(hProcess);
 			}
 		}
