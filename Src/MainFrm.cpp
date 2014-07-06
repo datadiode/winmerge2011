@@ -186,6 +186,9 @@ CMainFrame::CMainFrame(HWindow *pWnd, const MergeCmdLineInfo &cmdInfo)
 
 	CreateToobar();
 
+	m_wndCloseBox = HStatic::Create(
+		WS_CHILD | WS_DISABLED | SS_OWNERDRAW | SS_NOTIFY, 0, 0, 0, 0, m_pWnd, 0xC002);
+
 	m_wndTabBar = HTabCtrl::Create(
 		WS_CHILD | WS_VISIBLE | TCS_FOCUSNEVER | TCS_HOTTRACK | TCS_TOOLTIPS, 0, 0, 0, 0, m_pWnd, 0xC001);
 	m_wndTabBar->SetFont(static_cast<HFont *>(HGdiObj::GetStockObject(DEFAULT_GUI_FONT)));
@@ -663,6 +666,13 @@ template<>
 LRESULT CMainFrame::OnWndMsg<WM_DRAWITEM>(WPARAM, LPARAM lParam)
 {
 	DRAWITEMSTRUCT *const lpdis = reinterpret_cast<DRAWITEMSTRUCT *>(lParam);
+	if (lpdis->CtlType == ODT_STATIC && lpdis->CtlID == 0xC002)
+	{
+		UINT flags = (::GetWindowLong(lpdis->hwndItem, GWL_STYLE) & WS_DISABLED) ? 0 :
+			GetKeyState(VK_LBUTTON) < 0 ? DFCS_HOT | DFCS_PUSHED : DFCS_HOT;
+		DrawFrameControl(lpdis->hDC, &lpdis->rcItem, DFC_CAPTION, DFCS_CAPTIONCLOSE | DFCS_FLAT | flags);
+		return 0;
+	}
 	if (CDirView::IsShellMenuCmdID(lpdis->itemID) || CMergeEditView::IsShellMenuCmdID(lpdis->itemID))
 	{
 		CDocFrame *const pDocFrame = GetActiveDocFrame();
@@ -3494,6 +3504,27 @@ LRESULT CMainFrame::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		OnWndMsg<WM_ACTIVATE>(wParam, lParam);
 		break;
 	case WM_COMMAND:
+		if (wParam == MAKEWPARAM(0xC002, STN_CLICKED))
+		{
+			m_wndCloseBox->Invalidate();
+			while (GetKeyState(VK_LBUTTON) < 0)
+			{
+				MSG msg;
+				if (!GetMessage(&msg, NULL, 0, 0))
+					return 0;
+				DispatchMessage(&msg);
+			}
+			if ((m_wndCloseBox->GetStyle() & (WS_DISABLED | WS_VISIBLE)) == WS_VISIBLE)
+			{
+				int index = static_cast<int>(::GetWindowLongPtr(m_wndCloseBox->m_hWnd, GWLP_USERDATA));
+				TCITEM item;
+				item.mask = TCIF_PARAM;
+				if (m_wndTabBar->GetItem(index, &item))
+					reinterpret_cast<HWindow *>(item.lParam)->PostMessage(WM_CLOSE);
+			}
+			m_wndCloseBox->ShowWindow(SW_HIDE);
+			break;
+		}
 		if (CDocFrame *pDocFrame = GetActiveDocFrame())
 			if (LRESULT lResult = pDocFrame->SendMessage(WM_COMMAND, wParam, lParam))
 				return lResult;
@@ -3554,6 +3585,36 @@ LRESULT CMainFrame::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		PostQuitMessage(0);
 		break;
 	case WM_SETCURSOR:
+		if (wParam == reinterpret_cast<WPARAM>(m_wndTabBar))
+		{
+			TCHITTESTINFO hti;
+			GetCursorPos(&hti.pt);
+			m_wndTabBar->ScreenToClient(&hti.pt);
+			int iItem = GetKeyState(VK_LBUTTON) < 0 ?
+				::GetWindowLongPtr(m_wndCloseBox->m_hWnd, GWLP_USERDATA) : m_wndTabBar->HitTest(&hti);
+			if (iItem != -1)
+			{
+				RECT rect;
+				m_wndTabBar->GetItemRect(iItem, &rect);
+				rect.left = rect.right - 20;
+				rect.top += 1;
+				rect.right = rect.left + 16;
+				rect.bottom = rect.top + 16;
+				m_wndCloseBox->EnableWindow(PtInRect(&rect, hti.pt));
+				m_wndTabBar->MapWindowPoints(m_pWnd, (LPPOINT)&rect, 2);
+				m_wndCloseBox->SetWindowPos(NULL, rect.left, rect.top, 16, 16, SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_NOZORDER);
+			}
+			else
+			{
+				m_wndCloseBox->ShowWindow(SW_HIDE);
+			}
+			::SetWindowLongPtr(m_wndCloseBox->m_hWnd, GWLP_USERDATA, iItem);
+		}
+		else if (wParam != reinterpret_cast<WPARAM>(m_wndCloseBox))
+		{
+			m_wndCloseBox->ShowWindow(SW_HIDE);
+		}
+
 		if (WaitStatusCursor::SetCursor(this))
 			return TRUE;
 		break;
@@ -4004,6 +4065,7 @@ void CMainFrame::RecalcLayout()
 {
 	RECT rectClient;
 	GetClientRect(&rectClient);
+	m_wndCloseBox->ShowWindow(SW_HIDE);
 	if (m_wndToolBar && (m_wndToolBar->GetStyle() & WS_VISIBLE))
 	{
 		m_wndToolBar->MoveWindow(0, 0, 0, 0);

@@ -188,6 +188,7 @@ protected:
 	HStatusBar *m_wndStatusBar;
 	HToolBar *m_wndToolBar;
 	HTabCtrl *m_wndTabBar;
+	HStatic *m_wndCloseBox;
 
 	HImageList *m_imlMenu;
 	HImageList *m_imlToolbarEnabled; /**< Images for toolbar */
