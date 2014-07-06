@@ -443,7 +443,7 @@ void CMergeApp::InitializeSupplements()
  */
 String CMergeApp::GetDefaultEditor()
 {
-	return paths_ConcatPath(env_GetWindowsDirectory(), _T("NOTEPAD.EXE"));
+	return _T("%windir%\\system32\\notepad.exe");
 }
 
 /**

@@ -2516,7 +2516,7 @@ void CMainFrame::OpenFileToExternalEditor(LPCTSTR file, LPCTSTR editor)
 {
 	if (editor == NULL)
 		editor = COptionsMgr::Get(OPT_EXT_EDITOR_CMD).c_str();
-	string_format sCmd(_T("%s \"%s\""), editor, file);
+	string_format sCmd(_T("%s \"%s\""), env_ExpandVariables(editor).c_str(), file);
 	String sExecutable;
 	DecorateCmdLine(sCmd, sExecutable);
 	if (paths_PathIsExe(sExecutable.c_str()))
