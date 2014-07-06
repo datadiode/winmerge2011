@@ -79,6 +79,8 @@ const UINT CONTEXT_LINES_BELOW = 3;
 class CLocationView;
 class CChildFrame;
 struct DIFFRANGE;
+class CShellContextMenu;
+
 
 /**
 This class is the base class for WinMerge editor panels.
@@ -104,6 +106,10 @@ public:
 
 	CCrystalParser m_xParser; /**< Syntax parser used for syntax highlighting. */
 
+	static bool IsShellMenuCmdID(UINT);
+	void HandleMenuSelect(WPARAM wParam, LPARAM lParam);
+	LRESULT HandleMenuMessage(UINT message, WPARAM wParam, LPARAM lParam);
+
 	// Object that displays status line info for one side of a merge view
 	HStatusBar *m_pStatusBar;
 	void SetLineInfoStatus(LPCTSTR szLine, int nColumn, int nColumns,
@@ -119,6 +125,9 @@ protected:
 	 * certain time from previous rescan.
 	 */
 	bool m_bAutomaticRescan;
+
+	CShellContextMenu *const m_pShellContextMenu; /**< Shell context menu*/
+	HMENU m_hShellContextMenu;
 
 private:
 	COLORSETTINGS m_cachedColors; /**< Cached color settings */
@@ -157,6 +166,9 @@ public:
 	bool IsDiffVisible(int nDiff);
 
 // Implementation
+private:
+	HMENU ListShellContextMenu();
+
 protected:
 	virtual ~CMergeEditView();
 	bool IsDiffVisible(const DIFFRANGE *, int nLinesBelow = 0);

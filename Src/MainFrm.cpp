@@ -663,13 +663,17 @@ template<>
 LRESULT CMainFrame::OnWndMsg<WM_DRAWITEM>(WPARAM, LPARAM lParam)
 {
 	DRAWITEMSTRUCT *const lpdis = reinterpret_cast<DRAWITEMSTRUCT *>(lParam);
-	if (CDirView::IsShellMenuCmdID(lpdis->itemID))
+	if (CDirView::IsShellMenuCmdID(lpdis->itemID) || CMergeEditView::IsShellMenuCmdID(lpdis->itemID))
 	{
-		CDocFrame *pDocFrame = GetActiveDocFrame();
-		if (pDocFrame->GetFrameType() == FRAME_FOLDER)
+		CDocFrame *const pDocFrame = GetActiveDocFrame();
+		switch (pDocFrame->GetFrameType())
 		{
-			CDirView *pView = static_cast<CDirFrame *>(pDocFrame)->m_pDirView;
-			pView->HandleMenuMessage(WM_DRAWITEM, lpdis->itemID, lParam);
+		case FRAME_FOLDER:
+			static_cast<CDirFrame *>(pDocFrame)->m_pDirView->HandleMenuMessage(WM_DRAWITEM, lpdis->itemID, lParam);
+			break;
+		case FRAME_FILE:
+			static_cast<CChildFrame *>(pDocFrame)->GetActiveMergeView()->HandleMenuMessage(WM_DRAWITEM, lpdis->itemID, lParam);
+			break;
 		}
 		return 0;
 	}
@@ -703,13 +707,17 @@ template<>
 LRESULT CMainFrame::OnWndMsg<WM_MEASUREITEM>(WPARAM, LPARAM lParam)
 {
 	MEASUREITEMSTRUCT *const lpmis = reinterpret_cast<MEASUREITEMSTRUCT *>(lParam);
-	if (CDirView::IsShellMenuCmdID(lpmis->itemID))
+	if (CDirView::IsShellMenuCmdID(lpmis->itemID) || CMergeEditView::IsShellMenuCmdID(lpmis->itemID))
 	{
-		CDocFrame *pDocFrame = GetActiveDocFrame();
-		if (pDocFrame->GetFrameType() == FRAME_FOLDER)
+		CDocFrame *const pDocFrame = GetActiveDocFrame();
+		switch (pDocFrame->GetFrameType())
 		{
-			CDirView *pView = static_cast<CDirFrame *>(pDocFrame)->m_pDirView;
-			pView->HandleMenuMessage(WM_MEASUREITEM, lpmis->itemID, lParam);
+		case FRAME_FOLDER:
+			static_cast<CDirFrame *>(pDocFrame)->m_pDirView->HandleMenuMessage(WM_MEASUREITEM, lpmis->itemID, lParam);
+			break;
+		case FRAME_FILE:
+			static_cast<CChildFrame *>(pDocFrame)->GetActiveMergeView()->HandleMenuMessage(WM_MEASUREITEM, lpmis->itemID, lParam);
+			break;
 		}
 		return 0;
 	}
@@ -910,10 +918,14 @@ LRESULT CMainFrame::OnWndMsg<WM_INITMENUPOPUP>(WPARAM wParam, LPARAM lParam)
 		return 0;
 	HMenu *const pMenu = reinterpret_cast<HMenu *>(wParam);
 	CDocFrame *const pDocFrame = GetActiveDocFrame();
-	if (pDocFrame->GetFrameType() == FRAME_FOLDER)
+	switch (pDocFrame->GetFrameType())
 	{
-		CDirView *pView = static_cast<CDirFrame *>(pDocFrame)->m_pDirView;
-		pView->HandleMenuMessage(WM_INITMENUPOPUP, wParam, lParam);
+	case FRAME_FOLDER:
+		static_cast<CDirFrame *>(pDocFrame)->m_pDirView->HandleMenuMessage(WM_INITMENUPOPUP, wParam, lParam);
+		break;
+	case FRAME_FILE:
+		static_cast<CChildFrame *>(pDocFrame)->GetActiveMergeView()->HandleMenuMessage(WM_INITMENUPOPUP, wParam, lParam);
+		break;
 	}
 	MENUITEMINFO mii;
 	mii.cbSize = sizeof mii;
@@ -1050,11 +1062,15 @@ static HMenu *pCurrentMenu = NULL;
 template<>
 LRESULT CMainFrame::OnWndMsg<WM_MENUSELECT>(WPARAM wParam, LPARAM lParam)
 {
-	CDocFrame *pDocFrame = GetActiveDocFrame();
-	if (pDocFrame->GetFrameType() == FRAME_FOLDER)
+	CDocFrame *const pDocFrame = GetActiveDocFrame();
+	switch (pDocFrame->GetFrameType())
 	{
-		CDirView *pView = static_cast<CDirFrame *>(pDocFrame)->m_pDirView;
-		pView->HandleMenuSelect(wParam, lParam);
+	case FRAME_FOLDER:
+		static_cast<CDirFrame *>(pDocFrame)->m_pDirView->HandleMenuSelect(wParam, lParam);
+		break;
+	case FRAME_FILE:
+		static_cast<CChildFrame *>(pDocFrame)->GetActiveMergeView()->HandleMenuSelect(wParam, lParam);
+		break;
 	}
 	if (HIWORD(wParam) == 0xFFFF && lParam == 0)
 	{
@@ -1348,7 +1364,7 @@ void CMainFrame::OnOptions()
 		HWindow *pChild = NULL;
 		while ((pChild = m_pWndMDIClient->FindWindowEx(pChild, WinMergeWindowClass)) != NULL)
 		{
-			CDocFrame *pDocFrame = static_cast<CDocFrame *>(CDocFrame::FromHandle(pChild));
+			CDocFrame *const pDocFrame = static_cast<CDocFrame *>(CDocFrame::FromHandle(pChild));
 			switch (pDocFrame->GetFrameType())
 			{
 			case FRAME_FILE:
@@ -2742,7 +2758,7 @@ bool CMainFrame::SelectFilter()
 	HWindow *pChild = NULL;
 	while ((pChild = m_pWndMDIClient->FindWindowEx(pChild, WinMergeWindowClass)) != NULL)
 	{
-		CDocFrame *pDocFrame = static_cast<CDocFrame *>(CDocFrame::FromHandle(pChild));
+		CDocFrame *const pDocFrame = static_cast<CDocFrame *>(CDocFrame::FromHandle(pChild));
 		switch (pDocFrame->GetFrameType())
 		{
 		case FRAME_FILE:

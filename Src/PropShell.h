@@ -23,7 +23,8 @@ public:
 	BOOL m_bContextAdded;
 	BOOL m_bContextAdvanced;
 	BOOL m_bContextSubfolders;
-	BOOL m_bEnableShellContextMenu;
+	BOOL m_bEnableDirShellContextMenu;
+	BOOL m_bEnableMegeEditShellContextMenu;
 
 // Implementation
 protected:

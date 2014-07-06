@@ -1447,7 +1447,9 @@ FONT 8, "MS Shell Dlg", 0, 0, 1
     AUTOCHECKBOX    "E&nable advanced menu", IDC_EXPLORER_ADVANCED, 27, 28, 190, 10
     AUTOCHECKBOX    "In&clude subfolders by default", IDC_EXPLORER_SUBFOLDERS, 27, 38, 190, 10
     GROUPBOX        "Folder compare", IDC_STATIC, 7, 58, 221, 26
-    AUTOCHECKBOX    "Add &Shell menu to context menu", IDC_ENABLE_SHELL_CONTEXT_MENU, 19, 69, 200, 10
+    AUTOCHECKBOX    "Add &Shell menu to context menu", IDC_ENABLE_DIR_SHELL_CONTEXT_MENU, 19, 69, 200, 10
+    GROUPBOX        "File compare", IDC_STATIC, 7, 89, 221, 26
+    AUTOCHECKBOX    "Add S&hell menu to context menu", IDC_ENABLE_MERGEEDIT_SHELL_CONTEXT_MENU, 19, 100, 200, 10
 }
 
 
@@ -2060,6 +2062,7 @@ STRINGTABLE
     IDS_CONTENT_ZOOM              "Content Zoom:"
     IDS_LINE_EXCLUDED             "%d line excluded"
     IDS_LINES_EXCLUDED            "%d lines excluded"
+    IDS_SHELL_CONTEXT_MENU        "Shell menu"
 }
 
 

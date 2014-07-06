@@ -499,8 +499,7 @@ void CDirView::ListContextMenu(POINT point)
 	
 	pPopup->EnableMenuItem(ID_DIR_ITEM_RENAME, nTotal == 1 ? MF_ENABLED : MF_GRAYED);
 
-	bool bEnableShellContextMenu = COptionsMgr::Get(OPT_DIRVIEW_ENABLE_SHELL_CONTEXT_MENU);
-	if (bEnableShellContextMenu)
+	if (COptionsMgr::Get(OPT_DIRVIEW_ENABLE_SHELL_CONTEXT_MENU))
 	{
 		if (nOpenableOnLeft || nOpenableOnRight)
 		{

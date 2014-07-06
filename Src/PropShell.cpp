@@ -48,7 +48,8 @@ void PropShell::UpdateScreen()
 template<ODialog::DDX_Operation op>
 bool PropShell::UpdateData()
 {
-	DDX_Check<op>(IDC_ENABLE_SHELL_CONTEXT_MENU, m_bEnableShellContextMenu);
+	DDX_Check<op>(IDC_ENABLE_DIR_SHELL_CONTEXT_MENU, m_bEnableDirShellContextMenu);
+	DDX_Check<op>(IDC_ENABLE_MERGEEDIT_SHELL_CONTEXT_MENU, m_bEnableMegeEditShellContextMenu);
 	DDX_Check<op>(IDC_EXPLORER_CONTEXT, m_bContextAdded);
 	DDX_Check<op>(IDC_EXPLORER_ADVANCED, m_bContextAdvanced);
 	DDX_Check<op>(IDC_EXPLORER_SUBFOLDERS, m_bContextSubfolders);
@@ -79,7 +80,8 @@ LRESULT PropShell::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 void PropShell::ReadOptions()
 {
 	GetContextRegValues();
-	m_bEnableShellContextMenu = COptionsMgr::Get(OPT_DIRVIEW_ENABLE_SHELL_CONTEXT_MENU);
+	m_bEnableDirShellContextMenu = COptionsMgr::Get(OPT_DIRVIEW_ENABLE_SHELL_CONTEXT_MENU);
+	m_bEnableMegeEditShellContextMenu = COptionsMgr::Get(OPT_MERGEEDITVIEW_ENABLE_SHELL_CONTEXT_MENU);
 }
 
 /** 
@@ -87,7 +89,8 @@ void PropShell::ReadOptions()
  */
 void PropShell::WriteOptions()
 {
-	COptionsMgr::SaveOption(OPT_DIRVIEW_ENABLE_SHELL_CONTEXT_MENU, m_bEnableShellContextMenu != BST_UNCHECKED);
+	COptionsMgr::SaveOption(OPT_DIRVIEW_ENABLE_SHELL_CONTEXT_MENU, m_bEnableDirShellContextMenu != BST_UNCHECKED);
+	COptionsMgr::SaveOption(OPT_MERGEEDITVIEW_ENABLE_SHELL_CONTEXT_MENU, m_bEnableMegeEditShellContextMenu != BST_UNCHECKED);
 	SaveMergePath(); // saves context menu settings as well
 }
 

@@ -33,6 +33,10 @@
 #include "Environment.h"
 #include "ConsoleWindow.h"
 #include "Common/stream_util.h"
+#include "ShellContextMenu.h"
+#include "paths.h"
+#include "PidlContainer.h"
+
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -65,15 +69,20 @@ static UINT ENCODING_PANEL_WIDTH = 80;
 /** @brief EOL type status panel width */
 static UINT EOL_PANEL_WIDTH = 60;
 
+// The resource ID constants/limits for the Shell context menu
+static const UINT MergeViewCmdFirst	= 0x9000;
+static const UINT MergeViewCmdLast	= 0xAFFF;
+
+
+
 /////////////////////////////////////////////////////////////////////////////
 // CMergeEditView
 
-CMergeEditView::CMergeEditView(
-	HWindow *pWnd,
-	CChildFrame *pDocument,
-	int nThisPane
-) : CGhostTextView(pDocument, nThisPane, sizeof *this)
+CMergeEditView::CMergeEditView(HWindow *pWnd, CChildFrame *pDocument, int nThisPane)
+	: CGhostTextView(pDocument, nThisPane, sizeof *this)
+	, m_pShellContextMenu(new CShellContextMenu(MergeViewCmdFirst, MergeViewCmdLast))
 {
+	ASSERT(m_hShellContextMenu == NULL);
 	SubclassWindow(pWnd);
 	RegisterDragDrop(m_hWnd, this);
 	SetParser(&m_xParser);
@@ -81,6 +90,7 @@ CMergeEditView::CMergeEditView(
 
 CMergeEditView::~CMergeEditView()
 {
+	delete m_pShellContextMenu;
 }
 
 LRESULT CMergeEditView::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -821,6 +831,14 @@ void CMergeEditView::OnContextMenu(LPARAM lParam)
 			pSub->InsertMenu(ID_SCRIPT_FIRST, MF_SEPARATOR);
 	}
 
+	if (COptionsMgr::Get(OPT_MERGEEDITVIEW_ENABLE_SHELL_CONTEXT_MENU))
+	{
+		pSub->AppendMenu(MF_SEPARATOR, 0, NULL);
+		String s = LanguageSelect.LoadString(IDS_SHELL_CONTEXT_MENU);
+		m_hShellContextMenu = ::CreatePopupMenu();
+		pSub->AppendMenu(MF_POPUP, (UINT_PTR)m_hShellContextMenu, s.c_str());
+	}
+
 	int nCmd = pSub->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_RETURNCMD,
 		point.x, point.y, theApp.m_pMainWnd->m_pWnd);
 	if (nCmd >= ID_SCRIPT_FIRST && nCmd <= ID_SCRIPT_LAST) try
@@ -871,10 +889,11 @@ void CMergeEditView::OnContextMenu(LPARAM lParam)
 		e->ReportError(m_hWnd, MB_ICONSTOP);
 		delete e;
 	}
-	else
+	else if (!m_pShellContextMenu->InvokeCommand(nCmd, m_pDocument->m_hWnd))
 	{
 		m_pDocument->PostMessage(WM_COMMAND, nCmd);
 	}
+	m_hShellContextMenu = NULL;
 	if (pScriptMenu)
 	{
 		theApp.m_pMainWnd->SetScriptMenu(pSub, NULL);
@@ -1426,4 +1445,99 @@ HRESULT CMergeEditView::Drop(IDataObject *pDataObj, DWORD grfKeyState, POINTL pt
 		hr = CGhostTextView::Drop(pDataObj, grfKeyState, pt, pdwEffect);
 	}
 	return hr;
+}
+
+bool CMergeEditView::IsShellMenuCmdID(UINT id)
+{
+	return (id >= MergeViewCmdFirst) && (id <= MergeViewCmdLast);
+}
+
+void CMergeEditView::HandleMenuSelect(WPARAM wParam, LPARAM lParam)
+{
+	if ((HIWORD(wParam) & MF_POPUP) && (lParam != 0))
+	{
+		HMENU hMenu = reinterpret_cast<HMENU>(lParam);
+		MENUITEMINFO mii;
+		mii.cbSize = sizeof mii;
+		mii.fMask = MIIM_SUBMENU;
+		::GetMenuItemInfo(hMenu, LOWORD(wParam), TRUE, &mii);
+		HMENU hSubMenu = mii.hSubMenu;
+		if (hSubMenu == m_hShellContextMenu)
+		{
+			mii.hSubMenu = ListShellContextMenu();
+			m_hShellContextMenu = NULL;
+		}
+		if (hSubMenu != mii.hSubMenu)
+		{
+			::SetMenuItemInfo(hMenu, LOWORD(wParam), TRUE, &mii);
+			::DestroyMenu(hSubMenu);
+		}
+	}
+}
+
+/**
+ * @brief Handle messages related to correct menu working.
+ *
+ * We need to requery shell context menu each time we switch from context menu
+ * for one side to context menu for other side. Here we check whether we need to
+ * requery and call ShellContextMenuHandleMenuMessage.
+ */
+LRESULT CMergeEditView::HandleMenuMessage(UINT message, WPARAM wParam, LPARAM lParam)
+{
+	LRESULT res = 0;
+	m_pShellContextMenu->HandleMenuMessage(message, wParam, lParam, res);
+	return res;
+}
+
+/**
+ * @brief Gets Explorer's context menu for a group of selected files.
+ *
+ * @param [in] Side whether to get context menu for the files from the left or
+ *   right side.
+ * @retval The HMENU.
+ */
+HMENU CMergeEditView::ListShellContextMenu()
+{
+	String file = m_pDocument->m_strPath[this->m_nThisPane];
+	paths_UndoMagic(file);
+	LPCTSTR fileName = PathFindFileName(file.c_str());
+	
+	CMyComPtr<IShellFolder> pDesktop;
+	HRESULT hr = SHGetDesktopFolder(&pDesktop);
+	if (FAILED(hr))
+		return NULL;
+
+	String parentDir = paths_GetParentPath(file.c_str());
+	CMyComPtr<IShellFolder> pCurrFolder;
+	CPidlContainer pidls;
+
+	LPITEMIDLIST dirPidl;
+	paths_UndoMagic(parentDir);
+	hr = pDesktop->ParseDisplayName(NULL, NULL,
+		const_cast<LPOLESTR>(parentDir.c_str()), NULL, &dirPidl, NULL);
+	if (FAILED(hr))
+		return NULL;
+	hr = pDesktop->BindToObject(dirPidl, NULL,
+		IID_IShellFolder, reinterpret_cast<void**>(&pCurrFolder));
+	pidls.Free(dirPidl);
+	if (FAILED(hr))
+		return NULL;
+	LPITEMIDLIST pidl;
+	hr = pCurrFolder->ParseDisplayName(NULL, NULL,
+		const_cast<LPOLESTR>(fileName), NULL, &pidl, NULL);
+	if (FAILED(hr))
+		return NULL;
+	pidls.Add(pidl);
+
+	if (pCurrFolder == NULL)
+		return NULL;
+
+	CMyComPtr<IContextMenu> pContextMenu;
+	hr = pCurrFolder->GetUIObjectOf(NULL,
+		pidls.Size(), pidls.GetList(), IID_IContextMenu, 0,
+		reinterpret_cast<void**>(&pContextMenu));
+	if (FAILED(hr))
+		return NULL;
+
+	return m_pShellContextMenu->QueryShellContextMenu(pContextMenu);
 }

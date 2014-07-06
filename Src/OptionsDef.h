@@ -173,6 +173,8 @@ extern COptionDef
 <bool> OPT_VIEW_LINENUMBERS operator((_T("Settings/ViewLineNumbers"), false));
 extern COptionDef
 <bool> OPT_VIEW_FILEMARGIN operator((_T("Settings/ViewFileMargin"), false));
+extern COptionDef
+<bool> OPT_MERGEEDITVIEW_ENABLE_SHELL_CONTEXT_MENU operator((_T("Settings/MergeEditViewEnableShellContextMenu"), false));
 
 extern COptionDef
 <bool> OPT_AUTOMATIC_BPL operator((_T("Settings/AutomaticBPL"), true));

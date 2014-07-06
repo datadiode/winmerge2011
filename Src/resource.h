@@ -417,7 +417,7 @@
 #define IDC_TMPFOLDER_CUSTOM                    1339
 #define IDC_TMPFOLDER_BROWSE                    1340
 #define IDC_TMPFOLDER_NAME                      1341
-#define IDC_ENABLE_SHELL_CONTEXT_MENU           1343
+#define IDC_ENABLE_DIR_SHELL_CONTEXT_MENU       1343
 #define IDC_STARTUP_FOLDER_SELECT               1344
 #define IDC_BREAK_CHARS                         1345
 #define IDC_WORDDIFF_DELETED_COLOR              1346
@@ -462,6 +462,7 @@
 #define IDC_EDIT_SCOPE_SELECTION                8613
 #define IDC_EDIT_SCOPE_WHOLE_FILE               8614
 #define IDC_EDIT_SCOPE_DONT_WRAP                8615
+#define IDC_ENABLE_MERGEEDIT_SHELL_CONTEXT_MENU 8616
 #define ID_SCRIPT_FIRST                         8700
 #define ID_SCRIPT_LAST                          8749
 #define IDS_SPLASH_DEVELOPERS                   8976
@@ -963,3 +964,4 @@
 #define IDS_CONTENT_ZOOM                        40359
 #define IDS_LINE_EXCLUDED                       40360
 #define IDS_LINES_EXCLUDED                      40361
+#define IDS_SHELL_CONTEXT_MENU					40362
