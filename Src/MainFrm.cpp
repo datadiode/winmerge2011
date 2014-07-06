@@ -3942,7 +3942,7 @@ bool CMainFrame::LoadAndOpenProjectFile(LPCTSTR lpProject)
 
 	String sProject(lpProject); // !!! the erase() below may invalidate lpProject!
 	vector<String>::iterator it = find(m_FilesMRU.begin(), m_FilesMRU.end(), sProject);
-	if (it != m_FilesMRU.begin())
+	if (it == m_FilesMRU.end() || it != m_FilesMRU.begin())
 	{
 		if (it != m_FilesMRU.end())
 			m_FilesMRU.erase(it);
