@@ -339,11 +339,13 @@ BOOL PropVss::OnInitDialog()
 		VCS_VSS4,
 		VCS_VSS5,
 		VCS_CLEARCASE,
+		VCS_TFS,
 		*/
 		combo->AddString(LanguageSelect.LoadString(IDS_VCS_NONE).c_str());
 		combo->AddString(LanguageSelect.LoadString(IDS_VCS_VSS4).c_str());
 		combo->AddString(LanguageSelect.LoadString(IDS_VCS_VSS5).c_str());
 		combo->AddString(LanguageSelect.LoadString(IDS_VCS_CLEARCASE).c_str());
+		combo->AddString(LanguageSelect.LoadString(IDS_VCS_TFS).c_str());
 	}
 	m_pTvClearCaseTypeMgrSetup = static_cast<HTreeView *>(GetDlgItem(IDC_TV_CLEARCASE_TYPEMGR_SETUP));
 	m_pTvClearCaseTypeMgrSetup->SetStyle(m_pTvClearCaseTypeMgrSetup->GetStyle() | TVS_CHECKBOXES);
@@ -400,9 +402,12 @@ BOOL PropVss::OnInitDialog()
 void PropVss::UpdateScreen() 
 {
 	UpdateData<Set>();
-	String tempStr = LanguageSelect.LoadString(m_nVerSys == VCS_CLEARCASE ? IDS_CC_CMD : IDS_VSS_CMD);
+	String tempStr = LanguageSelect.LoadString(
+		m_nVerSys == VCS_CLEARCASE ? IDS_CC_CMD :
+		m_nVerSys == VCS_TFS ? IDS_TF_CMD :
+		IDS_VSS_CMD);
 	SetDlgItemText(IDC_VSS_L1, tempStr.c_str());
-	BOOL enable = m_nVerSys == VCS_VSS4 || m_nVerSys == VCS_CLEARCASE;
+	BOOL enable = m_nVerSys == VCS_VSS4 || m_nVerSys == VCS_CLEARCASE || m_nVerSys == VCS_TFS;
 	GetDlgItem(IDC_PATH_EDIT)->EnableWindow(enable);
 	GetDlgItem(IDC_VSS_L1)->EnableWindow(enable);
 	GetDlgItem(IDC_BROWSE_BUTTON)->EnableWindow(enable);

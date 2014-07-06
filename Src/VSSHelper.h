@@ -31,6 +31,7 @@ enum
 	VCS_VSS4,
 	VCS_VSS5,
 	VCS_CLEARCASE,
+	VCS_TFS,
 };
 
 /**

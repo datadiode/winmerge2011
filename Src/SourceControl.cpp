@@ -230,10 +230,26 @@ int CMainFrame::SaveToVersionControl(LPCTSTR pszSavePath)
 					return IDCANCEL;
 			}
 			// process versioning system specific action
-			WaitStatusCursor waitstatus;
+			WaitStatusCursor waitstatus(IDS_VSS_CHECKOUT_STATUS);
 			// checkout operation
 			string_replace(m_strCCComment, _T("\""), _T("\\\""));
 			string_format args(_T("checkout -c \"%s\" \"%s\""), m_strCCComment.c_str(), name.c_str());
+			String vssPath = COptionsMgr::Get(OPT_VSS_PATH);
+			if (DWORD code = RunIt(vssPath.c_str(), args.c_str(), path.c_str()))
+			{
+				LanguageSelect.MsgBox(code != STILL_ACTIVE ?
+					IDS_VSSERROR : IDS_VSS_RUN_ERROR, MB_ICONSTOP);
+				return IDCANCEL;
+			}
+		}
+		break;
+	case VCS_TFS:
+		{
+			// TODO: prompt for user choice?
+			// process versioning system specific action
+			WaitStatusCursor waitstatus(IDS_VSS_CHECKOUT_STATUS);
+			// checkout operation
+			string_format args(_T("edit \"%s\""), name.c_str());
 			String vssPath = COptionsMgr::Get(OPT_VSS_PATH);
 			if (DWORD code = RunIt(vssPath.c_str(), args.c_str(), path.c_str()))
 			{

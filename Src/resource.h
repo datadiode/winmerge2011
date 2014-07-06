@@ -522,6 +522,7 @@
 #define IDS_FILTERCHANGED                       16496
 #define IDS_CC_CMD                              16720
 #define IDS_VSS_CMD                             16721
+#define IDS_TF_CMD                              16722
 #define IDS_DIRECTORY_WINDOW_TITLE              16800
 #define IDS_FILE_COMPARISON_TITLE               16801
 #define IDS_EMPTY_LEFT_FILE                     16802
@@ -762,12 +763,13 @@
 #define IDS_REGEXP_PREMATURE_END                18494
 #define IDS_REGEXP_TOO_BIG                      18495
 #define IDS_REGEXP_UNMATCHED_RPAREN             18496
-#define IDS_VCS_NONE                            18497
-#define IDS_VCS_VSS4                            18498
-#define IDS_VCS_VSS5                            18499
-#define IDS_VCS_CLEARCASE                       18500
-#define IDS_BREAK_ON_WHITESPACE                 18501
-#define IDS_BREAK_ON_PUNCTUATION                18502
+#define IDS_BREAK_ON_WHITESPACE                 18497
+#define IDS_BREAK_ON_PUNCTUATION                18498
+#define IDS_VCS_NONE                            18500
+#define IDS_VCS_VSS4                            18501
+#define IDS_VCS_VSS5                            18502
+#define IDS_VCS_CLEARCASE                       18503
+#define IDS_VCS_TFS                             18504
 #define IDS_UNK_ERROR_READING_PROJECT           18510
 #define IDS_UNK_ERROR_SAVING_PROJECT            18511
 #define IDS_PROJFILEDLG_CAPTION                 18512
