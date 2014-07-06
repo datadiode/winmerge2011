@@ -168,6 +168,11 @@ void DirCmpReport::GenerateReport(REPORT_TYPE nReportType)
 		GenerateHeader();
 		GenerateContent();
 		break;
+	case REPORT_TYPE_SEMICOLONLIST:
+		m_sSeparator = _T(";");
+		GenerateHeader();
+		GenerateContent();
+		break;
 	case REPORT_TYPE_TABLIST:
 		m_sSeparator = _T("\t");
 		GenerateHeader();
@@ -204,7 +209,7 @@ void DirCmpReport::WriteString(HString *H, UINT codepage)
  */
 void DirCmpReport::WriteString(LPCTSTR pszText)
 {
-	WriteString(HString::Uni(pszText));
+	WriteString(HString::Uni(pszText), CP_UTF8);
 }
 
 /**
@@ -221,6 +226,8 @@ void DirCmpReport::WriteStringEntityAware(LPCTSTR pszText)
  */
 void DirCmpReport::GenerateHeader()
 {
+	static const BYTE bom[] = { 0xEF, 0xBB, 0xBF };
+	IStream_Write(m_pFile, bom, sizeof bom);
 	WriteString(m_sTitle.c_str());
 	WriteString(_T("\n"));
 	WriteString(GetCurrentTimeString().c_str());

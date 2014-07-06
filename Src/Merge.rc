@@ -1892,6 +1892,7 @@ STRINGTABLE
     IDS_COLDESC_BINARY            "Shows an asterisk (*) if the file is binary."
     IDS_DIRECTORY_REPORT_TITLE    "Compare %1 with %2"
     IDS_REPORT_COMMALIST          "Comma-separated list"
+    IDS_REPORT_SEMICOLONLIST      "Semicolon-separated list"
     IDS_REPORT_TABLIST            "Tab-separated list"
     IDS_REPORT_SIMPLEHTML         "Simple HTML"
     IDS_REPORT_SIMPLEXML          "Simple XML"

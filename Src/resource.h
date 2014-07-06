@@ -690,8 +690,9 @@
 #define IDS_COLDESC_BINARY                      17782
 #define IDS_COLDESC_LEOL_TYPE                   17783
 #define IDS_COLDESC_REOL_TYPE                   17784
-#define IDS_DIRECTORY_REPORT_TITLE              17792
-#define IDS_REPORT_COMMALIST                    17793
+#define IDS_DIRECTORY_REPORT_TITLE              17791
+#define IDS_REPORT_COMMALIST                    17792
+#define IDS_REPORT_SEMICOLONLIST                17793
 #define IDS_REPORT_TABLIST                      17794
 #define IDS_REPORT_SIMPLEHTML                   17795
 #define IDS_REPORT_SIMPLEXML                    17796
