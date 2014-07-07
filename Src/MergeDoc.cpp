@@ -1797,6 +1797,8 @@ FileLoadResult::FILES_RESULT CChildFrame::LoadFile(int nBuffer, bool &readOnly, 
 	CDiffTextBuffer *pBuf = m_ptBuf[nBuffer];
 	m_strPath[nBuffer] = fileinfo.filepath;
 
+	m_pInfoUnpacker->textType = GetFileExt(m_strPath[nBuffer].c_str(), m_strDesc[nBuffer].c_str());
+
 	String sOpenError;
 	FileLoadResult::FILES_RESULT retVal = pBuf->LoadFromFile(fileinfo.filepath.c_str(),
 		m_pInfoUnpacker.get(), readOnly, CRLF_STYLE_AUTOMATIC, fileinfo.encoding, sOpenError);
@@ -1938,7 +1940,9 @@ void CChildFrame::OpenDocs(
 
 	// Load files
 	FileLoadResult::FILES_RESULT nLeftSuccess = LoadOneFile(0, bROLeft, filelocLeft);
+	String sextL = m_pInfoUnpacker->textType;
 	FileLoadResult::FILES_RESULT nRightSuccess = LoadOneFile(1, bRORight, filelocRight);
+	String sextR = m_pInfoUnpacker->textType;
 
 	// Bail out if either side failed
 	if (!FileLoadResult::IsOk(nLeftSuccess) || !FileLoadResult::IsOk(nRightSuccess))
@@ -2019,16 +2023,6 @@ void CChildFrame::OpenDocs(
 	// or any function that calls UpdateView, like SelectDiff)
 	// Note: If option enabled, and another side type is not recognized,
 	// we use recognized type for unrecognized side too.
-	String sextL, sextR;
-	if (m_pInfoUnpacker->textType.length())
-	{
-		sextL = sextR = m_pInfoUnpacker->textType;
-	}
-	else
-	{
-		sextL = GetFileExt(sLeftFile.c_str(), m_strDesc[0].c_str());
-		sextR = GetFileExt(sRightFile.c_str(), m_strDesc[1].c_str());
-	}
 	
 	bool syntaxHLEnabled = COptionsMgr::Get(OPT_SYNTAX_HIGHLIGHT);
 	CCrystalTextView::TextDefinition *bLeftTyped = NULL;

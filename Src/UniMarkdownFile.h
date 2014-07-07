@@ -7,6 +7,7 @@
 // $Id$
 
 #include "Common/UniFile.h"
+#include "FileTransform.h"
 
 class CMarkdown;
 
@@ -19,6 +20,7 @@ public:
 	UniMarkdownFile();
 	static UniFile *CreateInstance(PackingInfo *packingInfo)
 	{
+		packingInfo->textType = _T("xml");
 		return new UniMarkdownFile;
 	}
 	virtual bool OpenReadOnly(LPCTSTR filename);

@@ -4,6 +4,7 @@
 	<method name='OpenTextFile'/>
 	<property name='ShowConsole'/>
 	<property name='ReadOnly'/>
+	<property name='TextType'/>
 	<property name='Arguments'/>
 </implements>
 
@@ -12,6 +13,7 @@ Option Explicit
 
 Const ShowConsole = 0
 Const ReadOnly = True
+Const TextType = "xml"
 
 Const MsxmlProgID = "Msxml2.DOMDocument.6.0"
 Const TidyCmdLine = """tidy.exe"" -xml --char-encoding raw -indent --indent-attributes yes --more-preformatted yes --tab-size 4 --indent-spaces 4 -wrap 0"

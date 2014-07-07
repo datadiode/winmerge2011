@@ -1,5 +1,6 @@
 #include "StdAfx.h"
 #include "paths.h"
+#include "Common/coretools.h"
 #include "Merge.h"
 #include "MainFrm.h"
 #include "Environment.h"
@@ -12,16 +13,15 @@
  */
 class UniPluginFile : public UniLocalFile
 {
-public:
-	UniPluginFile(PackingInfo *packingInfo)
+private:
+	UniPluginFile(PackingInfo *packingInfo, LPCTSTR moniker)
 	{
 		OException::Check(
-			CoGetObject(packingInfo->pluginMoniker.c_str(), NULL, IID_IDispatch,
-				reinterpret_cast<void **>(&m_spFactoryDispatch)));
+			CoGetObject(moniker, NULL, IID_IDispatch, reinterpret_cast<void **>(&m_spFactoryDispatch)));
 		CMyDispId DispId;
 		DispId.Call(m_spFactoryDispatch,
 			CMyDispParams<1>().Unnamed[static_cast<IMergeApp *>(theApp.m_pMainWnd)], DISPATCH_PROPERTYPUTREF);
-		if (LPCTSTR query = StrChr(packingInfo->pluginMoniker.c_str(), _T('?')))
+		if (LPCTSTR query = StrChr(moniker, _T('?')))
 		{
 			if (SUCCEEDED(DispId.Init(m_spFactoryDispatch, L"Arguments")))
 			{
@@ -50,6 +50,14 @@ public:
 			// Disallow editing by default
 			packingInfo->readOnly = true;
 		}
+		if (SUCCEEDED(DispId.Init(m_spFactoryDispatch, L"TextType")))
+		{
+			CMyVariant var;
+			OException::Check(DispId.Call(m_spFactoryDispatch,
+				CMyDispParams<0>().Unnamed, DISPATCH_PROPERTYGET, &var));
+			OException::Check(var.ChangeType(VT_BSTR));
+			packingInfo->textType = V_BSTR(&var);
+		}
 		if (SUCCEEDED(DispId.Init(m_spFactoryDispatch, L"Options")))
 		{
 			if (packingInfo->pluginOptions == NULL)
@@ -72,9 +80,25 @@ public:
 		OException::Check(
 			m_OpenTextFile.Init(m_spFactoryDispatch, L"OpenTextFile"));
 	}
+public:
 	static UniFile *CreateInstance(PackingInfo *packingInfo)
 	{
-		return new UniPluginFile(packingInfo);
+		String redirected;
+		LPCTSTR moniker = packingInfo->pluginMoniker.c_str();
+		if (LPCTSTR ini = EatPrefix(moniker, _T("mapping:")))
+		{
+			TCHAR buffer[1024];
+			DWORD len = GetPrivateProfileString(_T("mapping"),
+				packingInfo->textType.c_str(), NULL, buffer, _countof(buffer), ini);
+			if (len == 0)
+			{
+				return UniMemFile::CreateInstance(packingInfo);
+			}
+			redirected.assign(buffer, len);
+			env_ResolveMoniker(redirected);
+			moniker = redirected.c_str();
+		}
+		return new UniPluginFile(packingInfo, moniker);
 	}
 	virtual void ReadBom()
 	{
@@ -138,7 +162,6 @@ private:
 void PackingInfo::SetXML()
 {
 	pfnCreateUniFile = UniMarkdownFile::CreateInstance;
-	textType = _T("xml");
 	disallowMixedEOL = true;
 }
 
