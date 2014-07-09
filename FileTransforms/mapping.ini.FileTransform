@@ -1,0 +1,3 @@
+[mapping]
+vcproj = script:\FileTransforms\msxml.wsc?transform='\FileTransforms\msxml-sort.xslt'
+vcxproj = script:\FileTransforms\msxml.wsc?transform='\FileTransforms\msxml-sort.xslt'

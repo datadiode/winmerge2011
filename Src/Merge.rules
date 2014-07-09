@@ -26,24 +26,24 @@
 			>
 		</CustomBuildRule>
 		<CustomBuildRule
-			Name="PrintTemplates"
-			CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\PrintTemplates\$(InputFileName)&quot;"
-			Outputs="&quot;$(OutDir)\PrintTemplates\$(InputFileName)&quot;"
-			FileExtensions="*.html"
+			Name="PrintTemplate"
+			CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\PrintTemplates\$(InputName)&quot;"
+			Outputs="&quot;$(OutDir)\PrintTemplates\$(InputName)&quot;"
+			FileExtensions="*.PrintTemplate"
 			>
 		</CustomBuildRule>
 		<CustomBuildRule
-			Name="FileTransforms"
-			CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\FileTransforms\$(InputFileName)&quot;"
-			Outputs="&quot;$(OutDir)\FileTransforms\$(InputFileName)&quot;"
-			FileExtensions="*.wsc;*.xslt"
+			Name="FileTransform"
+			CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\FileTransforms\$(InputName)&quot;"
+			Outputs="&quot;$(OutDir)\FileTransforms\$(InputName)&quot;"
+			FileExtensions="*.FileTransform"
 			>
 		</CustomBuildRule>
 		<CustomBuildRule
-			Name="PluginMonikers"
-			CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\PluginMonikers\$(InputFileName)&quot;"
-			Outputs="&quot;$(OutDir)\PluginMonikers\$(InputFileName)&quot;"
-			FileExtensions="*.ini"
+			Name="PluginMoniker"
+			CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\PluginMonikers\$(InputName)&quot;"
+			Outputs="&quot;$(OutDir)\PluginMonikers\$(InputName)&quot;"
+			FileExtensions="*.PluginMoniker"
 			>
 		</CustomBuildRule>
 		<CustomBuildRule
