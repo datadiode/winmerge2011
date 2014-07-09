@@ -3591,7 +3591,8 @@ LRESULT CMainFrame::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			GetCursorPos(&hti.pt);
 			m_wndTabBar->ScreenToClient(&hti.pt);
 			int iItem = GetKeyState(VK_LBUTTON) < 0 ?
-				::GetWindowLongPtr(m_wndCloseBox->m_hWnd, GWLP_USERDATA) : m_wndTabBar->HitTest(&hti);
+				static_cast<int>(::GetWindowLongPtr(m_wndCloseBox->m_hWnd, GWLP_USERDATA)) :
+				m_wndTabBar->HitTest(&hti);
 			if (iItem != -1)
 			{
 				RECT rect;
