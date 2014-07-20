@@ -281,10 +281,26 @@ LRESULT CChildFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 		OnToolsGenerateReport();
 		break;
 	case ID_FILE_LEFT_READONLY:
-		OnReadOnly(0);
+		if (m_pInfoUnpacker->saveAsPath.empty())
+		{
+			OnReadOnly(0);
+		}
+		else
+		{
+			OnReadOnly(0, true);
+			OnReadOnly(1, false);
+		}
 		break;
 	case ID_FILE_RIGHT_READONLY:
-		OnReadOnly(1);
+		if (m_pInfoUnpacker->saveAsPath.empty())
+		{
+			OnReadOnly(1);
+		}
+		else
+		{
+			OnReadOnly(0, false);
+			OnReadOnly(1, true);
+		}
 		break;
 	case ID_FILE_MERGINGMODE:
 		SetMergingMode(!GetMergingMode());
@@ -1091,6 +1107,9 @@ void CChildFrame::UpdateCmdUI()
 	if (m_pMDIFrame->GetActiveDocFrame() != this)
 		return;
 
+	// ReadOnly
+	UpdateReadOnlyCmdUI();
+
 	// Commands which are applicable only after editing
 	UpdateEditCmdUI();
 
@@ -1100,6 +1119,25 @@ void CChildFrame::UpdateCmdUI()
 	// Bookmarks
 	UpdateBookmarkUI();
 	UpdateSourceTypeUI();
+}
+
+void CChildFrame::UpdateReadOnlyCmdUI()
+{
+	MENUITEMINFO mii;
+	mii.cbSize = sizeof mii;
+	mii.fMask = MIIM_FTYPE | MIIM_DATA;
+	if (m_pInfoUnpacker->saveAsPath.empty())
+	{
+		mii.fType = MFT_RIGHTJUSTIFY;
+		mii.dwItemData = reinterpret_cast<ULONG_PTR>(CMainFrame::DrawMenuCheckboxFrame);
+	}
+	else
+	{
+		mii.fType = MFT_RADIOCHECK;
+		mii.dwItemData = reinterpret_cast<ULONG_PTR>(CMainFrame::DrawMenuDefault);
+	}
+	m_pHandleSet->m_pMenuShared->SetMenuItemInfo(ID_FILE_LEFT_READONLY, FALSE, &mii);
+	m_pHandleSet->m_pMenuShared->SetMenuItemInfo(ID_FILE_RIGHT_READONLY, FALSE, &mii);
 }
 
 void CChildFrame::UpdateBookmarkUI()
@@ -1140,12 +1178,19 @@ void CChildFrame::UpdateMergeStatusUI()
 /**
  * @brief Enable/disable buffer read-only
  */
-void CChildFrame::OnReadOnly(int nSide)
+void CChildFrame::OnReadOnly(int nSide, bool bReadOnly)
 {
-	bool bReadOnly = !m_ptBuf[nSide]->GetReadOnly();
 	m_bInitialReadOnly[nSide] = bReadOnly;
 	m_ptBuf[nSide]->SetReadOnly(bReadOnly);
 	m_pView[nSide]->UpdateLineInfoStatus();
+}
+
+/**
+ * @brief Toggle buffer read-only
+ */
+void CChildFrame::OnReadOnly(int nSide)
+{
+	OnReadOnly(nSide, !m_ptBuf[nSide]->GetReadOnly());
 }
 
 /**

@@ -205,9 +205,9 @@ CMainFrame::CMainFrame(HWindow *pWnd, const MergeCmdLineInfo &cmdInfo)
 
 	InitCmdUI();
 
-	m_hMenuDefault = LanguageSelect.LoadMenu(IDR_MAINFRAME)->m_hMenu;
+	m_pMenuDefault = LanguageSelect.LoadMenu(IDR_MAINFRAME);
 	m_hAccelTable = LanguageSelect.LoadAccelerators(IDR_MAINFRAME);
-	::SetMenu(m_hWnd, m_hMenuDefault);
+	SetMenu(m_pMenuDefault);
 
 	m_pWndMDIClient = (new CSplashWnd(m_pWnd))->m_pWnd;
 
@@ -662,6 +662,23 @@ void CMainFrame::UpdateCmdUI<ID_CLEAR_SYNCPOINTS>(BYTE uFlags)
 	m_cmdState.ClearSyncPoints = uFlags;
 }
 
+void CMainFrame::DrawMenuDefault(DRAWITEMSTRUCT *)
+{
+}
+
+void CMainFrame::DrawMenuCheckboxFrame(DRAWITEMSTRUCT *lpdis)
+{
+	DWORD dim = GetMenuCheckMarkDimensions();
+	RECT rc =
+	{
+		1,
+		lpdis->rcItem.top + 1 + (lpdis->rcItem.bottom - lpdis->rcItem.top - HIWORD(dim)) / 2,
+		rc.left + LOWORD(dim),
+		rc.top + HIWORD(dim)
+	};
+	DrawEdge(lpdis->hDC, &rc, EDGE_ETCHED, BF_RECT);
+}
+
 template<>
 LRESULT CMainFrame::OnWndMsg<WM_DRAWITEM>(WPARAM, LPARAM lParam)
 {
@@ -687,25 +704,17 @@ LRESULT CMainFrame::OnWndMsg<WM_DRAWITEM>(WPARAM, LPARAM lParam)
 		}
 		return 0;
 	}
-	UINT fStyle = ILD_TRANSPARENT;
-	UINT uStateMask = LOBYTE(LOWORD(dwOsVer)) < 6 ? ODS_GRAYED : ODS_SELECTED | ODS_GRAYED;
-	if ((lpdis->itemState & uStateMask) == uStateMask)
-		fStyle |= ILD_BLEND;
-	if (lpdis->itemData == ~1U)
+	if (HIWORD(lpdis->itemData) != 0)
 	{
-		DWORD dim = GetMenuCheckMarkDimensions();
-		RECT rc =
-		{
-			1,
-			lpdis->rcItem.top + 1 + (lpdis->rcItem.bottom - lpdis->rcItem.top - HIWORD(dim)) / 2,
-			rc.left + LOWORD(dim),
-			rc.top + HIWORD(dim)
-		};
-		DrawEdge(lpdis->hDC, &rc, EDGE_ETCHED, BF_RECT);
+		reinterpret_cast<DrawMenuProc>(lpdis->itemData)(lpdis);
 	}
-	else if (lpdis->itemData != ~0U)
+	else
 	{
-		m_imlMenu->Draw(static_cast<int>(lpdis->itemData), lpdis->hDC,
+		UINT fStyle = ILD_TRANSPARENT;
+		UINT uStateMask = LOBYTE(LOWORD(dwOsVer)) < 6 ? ODS_GRAYED : ODS_SELECTED | ODS_GRAYED;
+		if ((lpdis->itemState & uStateMask) == uStateMask)
+			fStyle |= ILD_BLEND;
+		m_imlMenu->Draw(LOWORD(lpdis->itemData), lpdis->hDC,
 			lpdis->rcItem.left + GetMenuBitmapExcessWidth() - 16,
 			lpdis->rcItem.top + (lpdis->rcItem.bottom - lpdis->rcItem.top - 16) / 2,
 			fStyle);
@@ -741,7 +750,7 @@ LRESULT CMainFrame::OnWndMsg<WM_MEASUREITEM>(WPARAM, LPARAM lParam)
 	return 0;
 }
 
-void CMainFrame::SetBitmaps(HMENU hMenu)
+void CMainFrame::SetBitmaps(HMenu *pMenu)
 {
 	MENUITEMINFO mii;
 	mii.cbSize = sizeof mii;
@@ -753,7 +762,7 @@ void CMainFrame::SetBitmaps(HMENU hMenu)
 	while (i--)
 	{
 		mii.dwItemData = --j;
-		::SetMenuItemInfo(hMenu, m_MenuIcons[i].menuitemID, FALSE, &mii);
+		pMenu->SetMenuItemInfo(m_MenuIcons[i].menuitemID, FALSE, &mii);
 	}
 	i = m_wndToolBar->GetButtonCount();
 	while (i--)
@@ -765,15 +774,15 @@ void CMainFrame::SetBitmaps(HMENU hMenu)
 		if (buttonInfo.fsStyle & BTNS_SEP)
 			continue;
 		mii.dwItemData = buttonInfo.iImage;
-		::SetMenuItemInfo(hMenu, buttonInfo.idCommand, FALSE, &mii);
+		pMenu->SetMenuItemInfo(buttonInfo.idCommand, FALSE, &mii);
 	}
 
 	mii.fMask = MIIM_FTYPE;
 	mii.fType = MFT_RADIOCHECK;
 	mii.hbmpChecked = NULL;
-	::SetMenuItemInfo(hMenu, ID_EOL_TO_DOS, FALSE, &mii);
-	::SetMenuItemInfo(hMenu, ID_EOL_TO_UNIX, FALSE, &mii);
-	::SetMenuItemInfo(hMenu, ID_EOL_TO_MAC, FALSE, &mii);
+	pMenu->SetMenuItemInfo(ID_EOL_TO_DOS, FALSE, &mii);
+	pMenu->SetMenuItemInfo(ID_EOL_TO_UNIX, FALSE, &mii);
+	pMenu->SetMenuItemInfo(ID_EOL_TO_MAC, FALSE, &mii);
 }
 
 const BYTE *CMainFrame::CmdState::Lookup(UINT id) const
@@ -3977,19 +3986,19 @@ CDocFrame *CMainFrame::GetActiveDocFrame(BOOL *pfActive)
 	return static_cast<CDocFrame *>(CDocFrame::FromHandle(pWnd));
 }
 
-void CMainFrame::SetActiveMenu(HMENU hMenu)
+void CMainFrame::SetActiveMenu(HMenu *pMenu)
 {
-	if (::GetMenu(m_hWnd) == hMenu)
+	if (GetMenu() == pMenu)
 	{
 		m_pWndMDIClient->SendMessage(WM_MDIREFRESHMENU);
 	}
 	else
 	{
-		UINT n = GetMenuItemCount(hMenu);
-		HMENU hWindowMenu = GetSubMenu(hMenu, n - 2);
+		UINT n = pMenu->GetMenuItemCount();
+		HMenu *pWindowMenu = pMenu->GetSubMenu(n - 2);
 		m_pWndMDIClient->SendMessage(WM_MDISETMENU,
-			reinterpret_cast<WPARAM>(hMenu),
-			reinterpret_cast<LPARAM>(hWindowMenu));
+			reinterpret_cast<WPARAM>(pMenu),
+			reinterpret_cast<LPARAM>(pWindowMenu));
 	}
 	DrawMenuBar();
 }

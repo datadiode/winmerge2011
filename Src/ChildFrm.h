@@ -110,6 +110,7 @@ public:
 	void UpdateResources();
 	void SetLastCompareResult(int nResult);
 	void UpdateCmdUI();
+	void UpdateReadOnlyCmdUI();
 	void UpdateEditCmdUI();
 	void UpdateGeneralCmdUI();
 	void UpdateBookmarkUI();
@@ -273,6 +274,7 @@ private:
 	friend class RescanSuppress;
 
 private:
+	void OnReadOnly(int nSide, bool bReadOnly);
 	void OnReadOnly(int nSide);
 	void OnEditUndo();
 	void OnEditRedo();

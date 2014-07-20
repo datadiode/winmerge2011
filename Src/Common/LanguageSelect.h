@@ -124,7 +124,7 @@ private:
 	bool LoadLanguageFile(LANGID);
 	bool SetLanguage(LANGID);
 	void LoadAndDisplayLanguages();
-	void TranslateMenu(HMENU) const;
+	void TranslateMenu(HMenu *) const;
 
 	HListBox *m_ctlLangList;
 

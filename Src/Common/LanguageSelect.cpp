@@ -857,13 +857,13 @@ bool CLanguageSelect::TranslateString(LPCWSTR rc, stl::wstring &ws) const
 	return false;
 }
 
-void CLanguageSelect::TranslateMenu(HMENU h) const
+void CLanguageSelect::TranslateMenu(HMenu *pMenu) const
 {
 	bool DebugMenu = false;
 #ifdef _DEBUG
 	DebugMenu = true;
 #endif
-	int i = ::GetMenuItemCount(h);
+	int i = pMenu->GetMenuItemCount();
 	DWORD fMask = MIIM_BITMAP | MIIM_DATA;
 	while (i > 0)
 	{
@@ -874,24 +874,24 @@ void CLanguageSelect::TranslateMenu(HMENU h) const
 		TCHAR text[80];
 		mii.dwTypeData = text;
 		mii.cch = _countof(text);
-		::GetMenuItemInfo(h, i, TRUE, &mii);
-		if (mii.hSubMenu)
+		pMenu->GetMenuItemInfo(i, TRUE, &mii);
+		if (HMenu *pSubMenu = reinterpret_cast<HMenu *>(mii.hSubMenu))
 		{
 			// Conditionally remove debug menu.
 			// Finds debug menu by looking for a submenu which
 			// starts with item ID_DEBUG_LOADCONFIG.
-			if (!DebugMenu && ::GetMenuItemID(mii.hSubMenu, 0) == ID_DEBUG_LOADCONFIG)
+			if (!DebugMenu && pSubMenu->GetMenuItemID(0) == ID_DEBUG_LOADCONFIG)
 			{
-				::DeleteMenu(h, i, MF_BYPOSITION);
+				pMenu->DeleteMenu(i, MF_BYPOSITION);
 				continue;
 			}
-			TranslateMenu(mii.hSubMenu);
-			mii.wID = reinterpret_cast<UINT>(mii.hSubMenu);
+			TranslateMenu(pSubMenu);
+			mii.wID = reinterpret_cast<UINT>(pSubMenu);
 		}
 		// Prevent some menues which happen to lack a bitmap from rendering differently
 		mii.fMask = fMask;
 		mii.hbmpItem = HBMMENU_CALLBACK;
-		mii.dwItemData = ~0U;
+		mii.dwItemData = reinterpret_cast<ULONG_PTR>(CMainFrame::DrawMenuDefault);
 		String s;
 		if (TranslateString(text, s))
 		{
@@ -901,9 +901,9 @@ void CLanguageSelect::TranslateMenu(HMENU h) const
 		if (mii.fType & MFT_RIGHTJUSTIFY)
 		{
 			mii.fMask |= MIIM_BITMAP;
-			mii.dwItemData = ~1U;
+			mii.dwItemData = reinterpret_cast<ULONG_PTR>(CMainFrame::DrawMenuCheckboxFrame);
 		}
-		::SetMenuItemInfo(h, i, TRUE, &mii);
+		pMenu->SetMenuItemInfo(i, TRUE, &mii);
 		fMask = MIIM_DATA;
 	}
 }
@@ -970,10 +970,10 @@ stl::wstring CLanguageSelect::LoadDialogCaption(LPCTSTR lpDialogTemplateID) cons
 HMenu *CLanguageSelect::LoadMenu(UINT id) const
 {
 	HINSTANCE hinst = m_hCurrentDll ? m_hCurrentDll : GetModuleHandle(NULL);
-	HMENU hMenu = ::LoadMenu(hinst, MAKEINTRESOURCE(id));
-	TranslateMenu(hMenu);
-	theApp.m_pMainWnd->SetBitmaps(hMenu);
-	return reinterpret_cast<HMenu *>(hMenu);
+	HMenu *pMenu = HMenu::LoadMenu(hinst, MAKEINTRESOURCE(id));
+	TranslateMenu(pMenu);
+	theApp.m_pMainWnd->SetBitmaps(pMenu);
+	return pMenu;
 }
 
 HACCEL CLanguageSelect::LoadAccelerators(UINT id) const
@@ -1004,9 +1004,9 @@ HImageList *CLanguageSelect::LoadImageList(UINT id, int cx, int cGrow) const
 
 void CLanguageSelect::ReloadMenu()
 {
-	HMENU rghGarbageMenu[] = { theApp.m_pMainWnd->m_hMenuDefault, NULL, NULL, NULL };
+	HMenu *rgpGarbageMenu[] = { theApp.m_pMainWnd->m_pMenuDefault, NULL, NULL, NULL };
 
-	theApp.m_pMainWnd->m_hMenuDefault = LoadMenu(IDR_MAINFRAME)->m_hMenu;
+	theApp.m_pMainWnd->m_pMenuDefault = LoadMenu(IDR_MAINFRAME);
 	HWindow *const pWndMDIClient = theApp.m_pMainWnd->m_pWndMDIClient;
 	HWindow *pChild = NULL;
 	while ((pChild = pWndMDIClient->FindWindowEx(pChild, WinMergeWindowClass)) != NULL)
@@ -1014,25 +1014,25 @@ void CLanguageSelect::ReloadMenu()
 		CDocFrame *const pDocFrame = static_cast<CDocFrame *>(CDocFrame::FromHandle(pChild));
 		FRAMETYPE const frameType = pDocFrame->GetFrameType();
 		CDocFrame::HandleSet *const pHandleSet = pDocFrame->m_pHandleSet;
-		ASSERT(frameType > 0 && frameType < _countof(rghGarbageMenu));
-		if (frameType < _countof(rghGarbageMenu) && rghGarbageMenu[frameType] == NULL)
+		ASSERT(frameType > 0 && frameType < _countof(rgpGarbageMenu));
+		if (frameType < _countof(rgpGarbageMenu) && rgpGarbageMenu[frameType] == NULL)
 		{
-			rghGarbageMenu[frameType] = pHandleSet->m_hMenuShared;
-			pHandleSet->m_hMenuShared = LoadMenu(pHandleSet->m_id)->m_hMenu;
+			rgpGarbageMenu[frameType] = pHandleSet->m_pMenuShared;
+			pHandleSet->m_pMenuShared = LoadMenu(pHandleSet->m_id);
 		}
 	}
 	// Replace the active window
-	HMENU hNewMenu = theApp.m_pMainWnd->m_hMenuDefault;
+	HMenu *pNewMenu = theApp.m_pMainWnd->m_pMenuDefault;
 	if (CDocFrame *pDocFrame = theApp.m_pMainWnd->GetActiveDocFrame())
 	{
-		hNewMenu = pDocFrame->m_pHandleSet->m_hMenuShared;
+		pNewMenu = pDocFrame->m_pHandleSet->m_pMenuShared;
 	}
-	theApp.m_pMainWnd->SetActiveMenu(hNewMenu);
+	theApp.m_pMainWnd->SetActiveMenu(pNewMenu);
 	// Do away with the garbage
-	for (int i = 0 ; i < _countof(rghGarbageMenu) ; ++i)
+	for (int i = 0 ; i < _countof(rgpGarbageMenu) ; ++i)
 	{
-		if (HMENU hMenu = rghGarbageMenu[i])
-			::DestroyMenu(hMenu);
+		if (HMenu *pMenu = rgpGarbageMenu[i])
+			pMenu->DestroyMenu();
 	}
 }
 

@@ -504,11 +504,11 @@ LRESULT CDocFrame::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_MDIACTIVATE:
 		if (reinterpret_cast<HWND>(lParam) == m_hWnd)
 		{
-			m_pMDIFrame->SetActiveMenu(m_pHandleSet->m_hMenuShared);
+			m_pMDIFrame->SetActiveMenu(m_pHandleSet->m_pMenuShared);
 		}
 		else if (lParam == 0)
 		{
-			m_pMDIFrame->SetActiveMenu(m_pMDIFrame->m_hMenuDefault);
+			m_pMDIFrame->SetActiveMenu(m_pMDIFrame->m_pMenuDefault);
 			WINDOWPLACEMENT wp;
 			wp.length = sizeof wp;
 			GetWindowPlacement(&wp);
@@ -617,7 +617,7 @@ CDocFrame::CDocFrame(
 	if (InterlockedIncrement(&m_pHandleSet->m_cRef) == 1)
 	{
 		const UINT id = m_pHandleSet->m_id;
-		m_pHandleSet->m_hMenuShared = LanguageSelect.LoadMenu(id)->m_hMenu;
+		m_pHandleSet->m_pMenuShared = LanguageSelect.LoadMenu(id);
 		m_pHandleSet->m_hAccelShared = LanguageSelect.LoadAccelerators(id);
 	}
 }
@@ -630,8 +630,8 @@ CDocFrame::~CDocFrame()
 	}
 	if (InterlockedDecrement(&m_pHandleSet->m_cRef) == 0)
 	{
-		DestroyMenu(m_pHandleSet->m_hMenuShared);
-		m_pHandleSet->m_hMenuShared = NULL;
+		m_pHandleSet->m_pMenuShared->DestroyMenu();
+		m_pHandleSet->m_pMenuShared = NULL;
 		m_pHandleSet->m_hAccelShared = NULL;
 	}
 }

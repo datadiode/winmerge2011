@@ -123,7 +123,7 @@ public:
 	{
 		LONG m_cRef;
 		UINT m_id;
-		HMENU m_hMenuShared;
+		HMenu *m_pMenuShared;
 		HACCEL m_hAccelShared;
 	} *const m_pHandleSet;
 	virtual void ActivateFrame();

@@ -68,7 +68,7 @@ public:
 // Attributes
 public:
 	HWindow *m_pWndMDIClient;
-	HMENU m_hMenuDefault;
+	HMenu *m_pMenuDefault;
 	HACCEL m_hAccelTable;
 	LogFont m_lfDiff; /**< MergeView user-selected font */
 	LogFont m_lfDir; /**< DirView user-selected font */
@@ -81,7 +81,7 @@ public:
 	void UpdateSourceTypeUI(UINT sourceType) { m_sourceType = sourceType; }
 	void InitialActivate(int nCmdShow);
 	void EnableModeless(BOOL bEnable);
-	void SetBitmaps(HMENU);
+	void SetBitmaps(HMenu *);
 	bool DoFileOpen(
 		FileLocation &filelocLeft,
 		FileLocation &filelocRight,
@@ -130,7 +130,7 @@ public:
 	bool LoadAndOpenProjectFile(LPCTSTR);
 	HWindow *CreateChildHandle() const;
 	CDocFrame *GetActiveDocFrame(BOOL *pfActive = NULL);
-	void SetActiveMenu(HMENU);
+	void SetActiveMenu(HMenu *);
 
 	HMenu *SetScriptMenu(HMenu *, LPCSTR section);
 
@@ -142,6 +142,10 @@ public:
 
 	void RecalcLayout();
 	BOOL PreTranslateMessage(MSG *);
+
+	typedef void (CALLBACK *DrawMenuProc)(DRAWITEMSTRUCT *);
+	static void CALLBACK DrawMenuDefault(DRAWITEMSTRUCT *);
+	static void CALLBACK DrawMenuCheckboxFrame(DRAWITEMSTRUCT *);
 
 // Implementation methods
 protected:

@@ -5,7 +5,7 @@
 // Both H2O and H2O2 share a common set of decorator templates.
 //
 // Copyright (c) 2005-2010  David Nash (as of Win32++ v7.0.2)
-// Copyright (c) 2011-2013  Jochen Neubeck
+// Copyright (c) 2011-2014  Jochen Neubeck
 //
 // Permission is hereby granted, free of charge, to
 // any person obtaining a copy of this software and
@@ -459,6 +459,11 @@ namespace H2O
 			assert(::IsWindow(m_hWnd));
 			return ::IsIconic(m_hWnd);
 		}
+		BOOL IsZoomed()
+		{
+			assert(::IsWindow(m_hWnd));
+			return ::IsZoomed(m_hWnd);
+		}
 		BOOL IsChild(HWindow *pWnd)
 		{
 			assert(::IsWindow(m_hWnd));
@@ -589,10 +594,10 @@ namespace H2O
 			assert(::IsWindow(m_hWnd));
 			return reinterpret_cast<HMenu *>(::GetMenu(m_hWnd));
 		}
-		BOOL SetMenu(HMENU hMenu)
+		BOOL SetMenu(HMenu *pMenu)
 		{
 			assert(::IsWindow(m_hWnd));
-			return ::SetMenu(m_hWnd, hMenu);
+			return ::SetMenu(m_hWnd, pMenu->m_hMenu);
 		}
 		HMenu *GetSystemMenu(BOOL bRevert)
 		{
@@ -827,6 +832,14 @@ namespace H2O
 		static HMenu *CreatePopupMenu()
 		{
 			return reinterpret_cast<HMenu *>(::CreatePopupMenu());
+		}
+		static HMenu *LoadMenuA(HINSTANCE hInstance, LPCSTR lpMenuName)
+		{
+			return reinterpret_cast<HMenu *>(::LoadMenuA(hInstance, lpMenuName));
+		}
+		static HMenu *LoadMenuW(HINSTANCE hInstance, LPCWSTR lpMenuName)
+		{
+			return reinterpret_cast<HMenu *>(::LoadMenuW(hInstance, lpMenuName));
 		}
 	};
 
