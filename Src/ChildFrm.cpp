@@ -281,26 +281,10 @@ LRESULT CChildFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 		OnToolsGenerateReport();
 		break;
 	case ID_FILE_LEFT_READONLY:
-		if (m_pInfoUnpacker->saveAsPath.empty())
-		{
-			OnReadOnly(0);
-		}
-		else
-		{
-			OnReadOnly(0, true);
-			OnReadOnly(1, false);
-		}
+		OnReadOnly(0, 1);
 		break;
 	case ID_FILE_RIGHT_READONLY:
-		if (m_pInfoUnpacker->saveAsPath.empty())
-		{
-			OnReadOnly(1);
-		}
-		else
-		{
-			OnReadOnly(0, false);
-			OnReadOnly(1, true);
-		}
+		OnReadOnly(1, 0);
 		break;
 	case ID_FILE_MERGINGMODE:
 		SetMergingMode(!GetMergingMode());
@@ -1186,11 +1170,20 @@ void CChildFrame::OnReadOnly(int nSide, bool bReadOnly)
 }
 
 /**
- * @brief Toggle buffer read-only
+ * @brief Enable/disable buffer read-only
  */
-void CChildFrame::OnReadOnly(int nSide)
+void CChildFrame::OnReadOnly(int r, int w)
 {
-	OnReadOnly(nSide, !m_ptBuf[nSide]->GetReadOnly());
+	if (m_pInfoUnpacker->saveAsPath.empty())
+	{
+		OnReadOnly(r, !m_ptBuf[r]->GetReadOnly());
+	}
+	else
+	{
+		OnReadOnly(r, true);
+		OnReadOnly(w, false);
+		COptionsMgr::SaveOption(OPT_READ_ONLY, r);
+	}
 }
 
 /**

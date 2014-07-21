@@ -275,7 +275,7 @@ private:
 
 private:
 	void OnReadOnly(int nSide, bool bReadOnly);
-	void OnReadOnly(int nSide);
+	void OnReadOnly(int r, int w);
 	void OnEditUndo();
 	void OnEditRedo();
 	void OnWMGoto();

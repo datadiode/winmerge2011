@@ -32,7 +32,7 @@
 #include "Common/RegKey.h"
 #include "Common/SettingStore.h"
 #include "MergeCmdLineInfo.h"
-#include "OptionsDef.h"
+#include "OptionsMgr.h"
 #include "ProjectFile.h"
 
 /**
@@ -357,7 +357,7 @@ void MergeCmdLineInfo::ParseWinMergeCmdLineInternal(LPCTSTR q)
 		}
 		else if (param == _T("option"))
 		{
-			// -optchars to assign a custom set of option indicators
+			// -option to assign a custom set of option indicators
 			q = EatParam(q, m_sOptionChars);
 		}
 		else if (param == _T("noninteractive"))
@@ -399,6 +399,19 @@ void MergeCmdLineInfo::ParseWinMergeCmdLineInternal(LPCTSTR q)
 		{
 			// -wr to open right path as read-only
 			m_dwRightFlags |= FFILEOPEN_READONLY;
+		}
+		else if (param == _T("wp"))
+		{
+			// -wp to respect user's previous read-only setup when merging into 3rd file
+			switch (COptionsMgr::Get(OPT_READ_ONLY))
+			{
+			case 0:
+				m_dwLeftFlags |= FFILEOPEN_READONLY;
+				break;
+			case 1:
+				m_dwRightFlags |= FFILEOPEN_READONLY;
+				break;
+			}
 		}
 		else if (param == _T("ul"))
 		{

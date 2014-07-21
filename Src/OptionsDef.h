@@ -214,6 +214,9 @@ extern COptionDef
 <bool> OPT_CP_DETECT operator((_T("Settings/CodepageDetection"), false));
 
 extern COptionDef
+<int> OPT_READ_ONLY operator((_T("Settings/ReadOnly"), 0));
+
+extern COptionDef
 <String> OPT_PROJECTS_PATH operator((_T("Settings/ProjectsPath"), _T("")));
 extern COptionDef
 <bool> OPT_USE_SYSTEM_TEMP_PATH operator((_T("Settings/UseSystemTempPath"), true));
