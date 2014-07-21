@@ -27,9 +27,11 @@ Function OpenTextFile(path)
 	path = Replace(path, "\\?\", "")
 	Set doc = CreateObject(MsxmlProgID)
 	Set xslt = CreateObject(MsxmlProgID)
-	Set tidy = sh.Exec(TidyCmdLine)
 	If xslt.load(transform) And doc.load(path) Then
+		Set tidy = sh.Exec(TidyCmdLine)
 		tidy.StdIn.Write doc.transformNode(xslt)
+	Else
+		Set tidy = sh.Exec(TidyCmdLine & " --sort-attributes alpha """ & path & """")
 	End If
 	Set OpenTextFile = tidy.StdOut
 End Function
