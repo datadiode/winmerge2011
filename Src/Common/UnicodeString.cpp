@@ -20,33 +20,8 @@
  *
  * @brief String utilities.
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "UnicodeString.h"
-
-/**
- * @brief Convert a string to lower case string.
- * @param [in] str String to convert to lower case.
- */
-void string_makelower(String &str)
-{
-	String::size_type i;
-	for (i = 0; i < str.length(); i++)
-		str[i] = _totlower(str[i]);
-}
-
-/**
- * @brief Convert a string to lower case string.
- * @param [in] str String to convert to lower case.
- */
-void string_makeupper(String &str)
-{
-	String::size_type i;
-	for (i = 0; i < str.length(); i++)
-		str[i] = _totupper(str[i]);
-}
 
 /**
  * @brief Replace a string inside a string with another string.

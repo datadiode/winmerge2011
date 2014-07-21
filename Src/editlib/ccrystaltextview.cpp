@@ -3516,7 +3516,7 @@ BOOL CCrystalTextView::FindTextInBlock(
 	{
 		nEolns = 0;
 		if ((dwFlags & FIND_MATCH_CASE) == 0)
-			string_makeupper(what);
+			what.make_upper();
 	}
 	if (dwFlags & FIND_DIRECTION_UP)
     {
@@ -3571,7 +3571,7 @@ BOOL CCrystalTextView::FindTextInBlock(
 					LPCTSTR pszChars = GetLineChars(ptCurrentPos.y);
 					line.assign(pszChars, ptCurrentPos.x + 1);
 					if ((dwFlags & FIND_MATCH_CASE) == 0)
-					string_makeupper(line);
+						line.make_upper();
 				}
 
 				int nFoundPos = -1;
@@ -3651,7 +3651,7 @@ BOOL CCrystalTextView::FindTextInBlock(
 					//  Prepare necessary part of line
 					line.assign(pszChars, nLineLength);
 					if ((dwFlags & FIND_MATCH_CASE) == 0)
-						string_makeupper(line);
+						line.make_upper();
 				}
 
 				//  Perform search in the line

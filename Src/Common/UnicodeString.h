@@ -34,9 +34,6 @@ using stl::max;
 
 typedef std_tchar(string) String;
 
-void string_makelower(String &);
-void string_makeupper(String &);
-
 String::size_type string_replace(String &, LPCTSTR find, LPCTSTR replace);
 String::size_type string_replace(String &, TCHAR find, TCHAR replace);
 
