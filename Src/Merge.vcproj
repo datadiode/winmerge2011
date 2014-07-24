@@ -1365,7 +1365,6 @@
       <File RelativePath="..\FileTransforms\LinesNumbered.wsc.FileTransform" />
       <File RelativePath="..\FileTransforms\LinesSorted.wsc.FileTransform" />
       <File RelativePath="..\FileTransforms\MediaInfo.wsc.FileTransform" />
-      <File RelativePath="..\FileTransforms\mapping.ini.FileTransform" />
       <File RelativePath="..\FileTransforms\msxml.wsc.FileTransform" />
       <File RelativePath="..\FileTransforms\msxml-sort.xslt.FileTransform" />
       <File RelativePath="..\FileTransforms\xdoc2txt.wsc.FileTransform" />

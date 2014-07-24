@@ -426,6 +426,7 @@ void CMergeApp::InitializeSupplements()
 			pch += cch + 1;
 		}
 	}
+	// Create a [Parsers] section as per CCrystalTextView's default settings if not yet present
 	if (GetPrivateProfileSection(_T("Parsers"), buffer, _countof(buffer), ini.c_str()))
 	{
 		CCrystalTextView::ScanParserAssociations(buffer);
@@ -434,6 +435,14 @@ void CMergeApp::InitializeSupplements()
 	{
 		CCrystalTextView::DumpParserAssociations(buffer);
 		WritePrivateProfileSection(_T("Parsers"), buffer, ini.c_str());
+	}
+	// Create a [FileTransforms] section with some working defaults if not yet present
+	if (!GetPrivateProfileSection(_T("FileTransforms"), buffer, _countof(buffer), ini.c_str()))
+	{
+		static const TCHAR buffer[] =
+			_T("vcproj = script:\\FileTransforms\\msxml.wsc?transform='\\FileTransforms\\msxml-sort.xslt'\0")
+			_T("vcxproj = script:\\FileTransforms\\msxml.wsc?transform='\\FileTransforms\\msxml-sort.xslt'\0");
+		WritePrivateProfileSection(_T("FileTransforms"), buffer, ini.c_str());
 	}
 }
 

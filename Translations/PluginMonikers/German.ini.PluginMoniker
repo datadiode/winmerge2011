@@ -7,7 +7,7 @@ XDoc2Txt-Destillat = script:\FileTransforms\xdoc2txt.wsc
 Zeilen nummeriert = script:\FileTransforms\LinesNumbered.wsc
 Zeilen sortiert = script:\FileTransforms\LinesSorted.wsc
 XML sortiert = script:\FileTransforms\msxml.wsc?transform='\FileTransforms\msxml-sort.xslt'
-Aus Dateiendung ableiten = mapping:\FileTransforms\mapping.ini
+Aus Dateiendung ableiten = mapping:%SupplementFolder%\Supplement.ini?FileTransforms
 
 [EditorScripts.Menu]
 In Groﬂbuchstaben umwandeln = MakeUpper@script:\EditorScripts\Basic.wsc

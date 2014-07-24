@@ -7,7 +7,7 @@ XDoc2Txt Distillate = script:\FileTransforms\xdoc2txt.wsc
 Linhas Numeradas = script:\FileTransforms\LinesNumbered.wsc
 Linhas Ordenadas = script:\FileTransforms\LinesSorted.wsc
 XML Ordenado = script:\FileTransforms\msxml.wsc?transform='\FileTransforms\msxml-sort.xslt'
-Tell from filename extension = mapping:\FileTransforms\mapping.ini
+Tell from filename extension = mapping:%SupplementFolder%\Supplement.ini?FileTransforms
 
 [EditorScripts.Menu]
 Converter selecção para Maiúsculas = MakeUpper@script:\EditorScripts\Basic.wsc

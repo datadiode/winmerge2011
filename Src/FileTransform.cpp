@@ -87,8 +87,15 @@ public:
 		LPCTSTR moniker = packingInfo->pluginMoniker.c_str();
 		if (LPCTSTR ini = EatPrefix(moniker, _T("mapping:")))
 		{
+			LPCTSTR section = _T("mapping");
+			if (LPCTSTR query = StrChr(ini, _T('?')))
+			{
+				redirected.assign(ini, static_cast<String::size_type>(query - ini));
+				ini = redirected.c_str();
+				section = query + 1;
+			}
 			TCHAR buffer[1024];
-			DWORD len = GetPrivateProfileString(_T("mapping"),
+			DWORD len = GetPrivateProfileString(section,
 				packingInfo->textType.c_str(), NULL, buffer, _countof(buffer), ini);
 			if (len == 0)
 			{
