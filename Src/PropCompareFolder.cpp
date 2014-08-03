@@ -129,15 +129,15 @@ BOOL PropCompareFolder::OnInitDialog()
 {
 	if (HComboBox *combo = static_cast<HComboBox *>(GetDlgItem(IDC_COMPAREMETHODCOMBO)))
 	{
-		String item = LanguageSelect.LoadString(IDS_COMPMETHOD_FULL_CONTENTS);
+		String item = LanguageSelect.LoadString(ID_COMPMETHOD_FULL_CONTENTS);
 		combo->AddString(item.c_str());
-		item = LanguageSelect.LoadString(IDS_COMPMETHOD_QUICK_CONTENTS);
+		item = LanguageSelect.LoadString(ID_COMPMETHOD_QUICK_CONTENTS);
 		combo->AddString(item.c_str());
-		item = LanguageSelect.LoadString(IDS_COMPMETHOD_MODDATE);
+		item = LanguageSelect.LoadString(ID_COMPMETHOD_MODDATE);
 		combo->AddString(item.c_str());
-		item = LanguageSelect.LoadString(IDS_COMPMETHOD_DATESIZE);
+		item = LanguageSelect.LoadString(ID_COMPMETHOD_DATESIZE);
 		combo->AddString(item.c_str());
-		item = LanguageSelect.LoadString(IDS_COMPMETHOD_SIZE);
+		item = LanguageSelect.LoadString(ID_COMPMETHOD_SIZE);
 		combo->AddString(item.c_str());
 	}
 	return OptionsPanel::OnInitDialog();

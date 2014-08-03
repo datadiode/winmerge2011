@@ -116,6 +116,7 @@ public:
 	void SetStatus(UINT);
 	void SetStatus(LPCTSTR);
 	void UpdateIndicators();
+	void ApplyDiffOptions();
 	void ApplyViewWhitespace();
 	void SetEOLMixed(bool bAllow);
 	bool SelectFilter();
@@ -247,6 +248,11 @@ protected:
 	void OnToolbarSmall();
 	void OnToolbarBig();
 	void OnToolTipText(TOOLTIPTEXT *);
+	void OnDiffOptionsDropDown(NMTOOLBAR *);
+	void OnDiffIgnoreCase();
+	void OnDiffIgnoreEOL();
+	void OnDiffWhitespace(int);
+	void OnCompareMethod(int);
 	void OnHelpReleasenotes();
 	void OnHelpTranslations();
 	void OnFileOpenConflict();

@@ -685,8 +685,9 @@ LRESULT CMainFrame::OnWndMsg<WM_DRAWITEM>(WPARAM, LPARAM lParam)
 	DRAWITEMSTRUCT *const lpdis = reinterpret_cast<DRAWITEMSTRUCT *>(lParam);
 	if (lpdis->CtlType == ODT_STATIC && lpdis->CtlID == 0xC002)
 	{
-		UINT flags = (::GetWindowLong(lpdis->hwndItem, GWL_STYLE) & WS_DISABLED) ? 0 :
-			GetKeyState(VK_LBUTTON) < 0 ? DFCS_HOT | DFCS_PUSHED : DFCS_HOT;
+		DWORD dwStyle = ::GetWindowLong(lpdis->hwndItem, GWL_STYLE);
+		UINT flags = dwStyle & WS_DISABLED ? 0 :
+			dwStyle & SS_SUNKEN ? DFCS_HOT | DFCS_PUSHED : DFCS_HOT;
 		DrawFrameControl(lpdis->hDC, &lpdis->rcItem, DFC_CAPTION, DFCS_CAPTIONCLOSE | DFCS_FLAT | flags);
 		return 0;
 	}
@@ -2171,6 +2172,22 @@ void CMainFrame::addToMru(LPCTSTR szItem, LPCTSTR szRegSubKey, UINT nMaxItems)
 	}
 }
 
+void CMainFrame::ApplyDiffOptions() 
+{
+	HWindow *pChild = NULL;
+	while ((pChild = m_pWndMDIClient->FindWindowEx(pChild, WinMergeWindowClass)) != NULL)
+	{
+		CDocFrame *const pDocFrame = static_cast<CDocFrame *>(CDocFrame::FromHandle(pChild));
+		switch (pDocFrame->GetFrameType())
+		{
+		case FRAME_FILE:
+			static_cast<CChildFrame *>(pDocFrame)->RefreshOptions();
+			static_cast<CChildFrame *>(pDocFrame)->FlushAndRescan(TRUE);
+			break;
+		}
+	}
+}
+
 /**
  * @brief Apply tabs and eols settings to all merge documents
  */
@@ -3448,6 +3465,24 @@ LRESULT CMainFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 	case ID_OPTIONS:
 		OnOptions();
 		break;
+	case IDC_DIFF_IGNORECASE:
+		OnDiffIgnoreCase();
+		break;
+	case IDC_DIFF_IGNOREEOL:
+		OnDiffIgnoreEOL();
+		break;
+	case IDC_DIFF_WHITESPACE_COMPARE:
+	case IDC_DIFF_WHITESPACE_IGNORE:
+	case IDC_DIFF_WHITESPACE_IGNOREALL:
+		OnDiffWhitespace(id - IDC_DIFF_WHITESPACE_COMPARE);
+		break;
+	case ID_COMPMETHOD_FULL_CONTENTS:
+	case ID_COMPMETHOD_QUICK_CONTENTS:
+	case ID_COMPMETHOD_MODDATE:
+	case ID_COMPMETHOD_DATESIZE:
+	case ID_COMPMETHOD_SIZE:
+		OnCompareMethod(id - ID_COMPMETHOD_FULL_CONTENTS);
+		break;
 	case ID_OPTIONS_SHOWDIFFERENT:
 		OnOptionsShowDifferent();
 		break;
@@ -3515,6 +3550,7 @@ LRESULT CMainFrame::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_COMMAND:
 		if (wParam == MAKEWPARAM(0xC002, STN_CLICKED))
 		{
+			m_wndCloseBox->SetStyle(m_wndCloseBox->GetStyle() | SS_SUNKEN);
 			m_wndCloseBox->Invalidate();
 			while (GetKeyState(VK_LBUTTON) < 0)
 			{
@@ -3531,6 +3567,7 @@ LRESULT CMainFrame::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 				if (m_wndTabBar->GetItem(index, &item))
 					reinterpret_cast<HWindow *>(item.lParam)->PostMessage(WM_CLOSE);
 			}
+			m_wndCloseBox->SetStyle(m_wndCloseBox->GetStyle() & ~SS_SUNKEN);
 			m_wndCloseBox->ShowWindow(SW_HIDE);
 			break;
 		}
@@ -3557,6 +3594,9 @@ LRESULT CMainFrame::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 		case TTN_NEEDTEXT:
 			OnToolTipText(reinterpret_cast<TOOLTIPTEXT *>(lParam));
+			break;
+		case TBN_DROPDOWN:
+			OnDiffOptionsDropDown(reinterpret_cast<NMTOOLBAR *>(lParam));
 			break;
 		case TCN_SELCHANGE:
 			int index = m_wndTabBar->GetCurSel();
@@ -3599,7 +3639,7 @@ LRESULT CMainFrame::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			TCHITTESTINFO hti;
 			GetCursorPos(&hti.pt);
 			m_wndTabBar->ScreenToClient(&hti.pt);
-			int iItem = GetKeyState(VK_LBUTTON) < 0 ?
+			int iItem = m_wndCloseBox->GetStyle() & SS_SUNKEN ?
 				static_cast<int>(::GetWindowLongPtr(m_wndCloseBox->m_hWnd, GWLP_USERDATA)) :
 				m_wndTabBar->HitTest(&hti);
 			if (iItem != -1)
@@ -3653,6 +3693,8 @@ BOOL CMainFrame::CreateToobar()
 		WS_CHILD | WS_VISIBLE | TBSTYLE_TOOLTIPS,
 		0, 0, 0, 0, m_pWnd, 0xC000);
 
+	TBBUTTON *optionsButton = reinterpret_cast<TBBUTTON *>(ID_OPTIONS);
+
 	H2O::ToolBarButton buttons[] =
 	{
 		ID_FILE_NEW,
@@ -3677,7 +3719,7 @@ BOOL CMainFrame::CreateToobar()
 		ID_L2RNEXT,
 		ID_R2LNEXT,
 		0,
-		ID_OPTIONS,
+		optionsButton,
 		ID_TOOLS_FILTERS,
 		0,
 		ID_ALL_RIGHT,
@@ -3686,6 +3728,8 @@ BOOL CMainFrame::CreateToobar()
 		ID_REFRESH,
 		buttons // NB: This extra entry is there to complete initialization.
 	};
+
+	optionsButton->fsStyle = BTNS_DROPDOWN;
 
 	m_wndToolBar->ButtonStructSize();
 	m_wndToolBar->AddButtons(_countof(buttons) - 1, buttons);
@@ -3735,9 +3779,11 @@ void CMainFrame::LoadToolbarImages()
 		cxyButton = 40;
 	}
 
+	m_wndToolBar->SetExtendedStyle(0);
 	m_wndToolBar->SetButtonSize(cxyButton, cxyButton);
 	m_wndToolBar->SetImageList(m_imlToolbarEnabled);
 	m_wndToolBar->SetDisabledImageList(m_imlToolbarDisabled);
+	m_wndToolBar->SetExtendedStyle(TBSTYLE_EX_DRAWDDARROWS);
 }
 
 /**
@@ -3806,6 +3852,60 @@ void CMainFrame::OnToolTipText(TOOLTIPTEXT *pTTT)
 	// bring the tooltip window above other popup windows
 	::SetWindowPos(pTTT->hdr.hwndFrom, HWND_TOP, 0, 0, 0, 0,
 		SWP_NOACTIVATE | SWP_NOSIZE | SWP_NOMOVE | SWP_NOOWNERZORDER);
+}
+
+void CMainFrame::OnDiffOptionsDropDown(NMTOOLBAR *pToolBar)
+{
+	HMenu *const pMenu = LanguageSelect.LoadMenu(IDR_POPUP_DIFF_OPTIONS);
+	HMenu *const pPopup = pMenu->GetSubMenu(0);
+	pPopup->CheckMenuItem(IDC_DIFF_IGNORECASE, COptionsMgr::Get(OPT_CMP_IGNORE_CASE) ? MF_CHECKED : 0);
+	pPopup->CheckMenuItem(IDC_DIFF_IGNOREEOL, COptionsMgr::Get(OPT_CMP_IGNORE_EOL) ? MF_CHECKED : 0);
+	switch (const int id = COptionsMgr::Get(OPT_CMP_IGNORE_WHITESPACE) + IDC_DIFF_WHITESPACE_COMPARE)
+	{
+	case IDC_DIFF_WHITESPACE_COMPARE:
+	case IDC_DIFF_WHITESPACE_IGNORE:
+	case IDC_DIFF_WHITESPACE_IGNOREALL:
+		pPopup->CheckMenuRadioItem(id, id, id);
+		break;
+	}
+	switch (const int id = COptionsMgr::Get(OPT_CMP_METHOD) + ID_COMPMETHOD_FULL_CONTENTS)
+	{
+	case ID_COMPMETHOD_FULL_CONTENTS:
+	case ID_COMPMETHOD_QUICK_CONTENTS:
+	case ID_COMPMETHOD_MODDATE:
+	case ID_COMPMETHOD_DATESIZE:
+	case ID_COMPMETHOD_SIZE:
+		pPopup->CheckMenuRadioItem(id, id, id);
+		break;
+	}
+	POINT pt = { pToolBar->rcButton.left, pToolBar->rcButton.bottom };
+	ClientToScreen(&pt);
+	pPopup->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, pt.x, pt.y, m_pWnd);
+}
+
+void CMainFrame::OnDiffIgnoreCase()
+{
+	bool val = COptionsMgr::Get(OPT_CMP_IGNORE_CASE);
+	COptionsMgr::SaveOption(OPT_CMP_IGNORE_CASE, !val);
+	ApplyDiffOptions();
+}
+
+void CMainFrame::OnDiffIgnoreEOL()
+{
+	bool val = COptionsMgr::Get(OPT_CMP_IGNORE_EOL);
+	COptionsMgr::SaveOption(OPT_CMP_IGNORE_EOL, !val);
+	ApplyDiffOptions();
+}
+
+void CMainFrame::OnDiffWhitespace(int value)
+{
+	COptionsMgr::SaveOption(OPT_CMP_IGNORE_WHITESPACE, value);
+	ApplyDiffOptions();
+}
+
+void CMainFrame::OnCompareMethod(int value)
+{ 
+	COptionsMgr::SaveOption(OPT_CMP_METHOD, value);
 }
 
 /**

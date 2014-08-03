@@ -659,6 +659,32 @@ IDR_POPUP_LOCATIONBAR MENU
 
 
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+IDR_POPUP_DIFF_OPTIONS MENU
+{
+    POPUP "_POPUP_"
+    {
+        POPUP "W&hitespaces"
+        {
+            MENUITEM "Com&pare", IDC_DIFF_WHITESPACE_COMPARE
+            MENUITEM "I&gnore changes", IDC_DIFF_WHITESPACE_IGNORE
+            MENUITEM "Ig&nore all", IDC_DIFF_WHITESPACE_IGNOREALL
+        }
+        MENUITEM "Ignore c&ase", IDC_DIFF_IGNORECASE, HELP
+        MENUITEM "Igno&re carriage return differences (Windows/Unix/Mac)", IDC_DIFF_IGNOREEOL, HELP
+        POPUP "&Compare method:"
+        {
+            MENUITEM "Full Contents", ID_COMPMETHOD_FULL_CONTENTS
+            MENUITEM "Quick Contents", ID_COMPMETHOD_QUICK_CONTENTS
+            MENUITEM "Modified Date", ID_COMPMETHOD_MODDATE
+			MENUITEM "Modified Date and Size", ID_COMPMETHOD_DATESIZE
+			MENUITEM "Size", ID_COMPMETHOD_SIZE
+        }
+    }
+}
+
+
+
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 IDR_POPUP_MERGEDETAILVIEW MENU
 {
     POPUP "_POPUP_"
@@ -1315,12 +1341,12 @@ CAPTION "General"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
     GROUPBOX        "Whitespace", IDC_STATIC, 7, 7, 221, 50
-    AUTORADIOBUTTON "&Compare", IDC_WHITESPACE, 14, 19, 206, 10, WS_GROUP
-    AUTORADIOBUTTON "&Ignore change", IDC_WHITE_CHANGE, 14, 30, 206, 10
-    AUTORADIOBUTTON "I&gnore all", IDC_ALL_WHITE, 14, 41, 206, 10
-    AUTOCHECKBOX    "Ignore blan&k lines", IDC_IGNBLANKS_CHECK, 7, 60, 221, 10, WS_GROUP
-    AUTOCHECKBOX    "Ignore c&ase", IDC_IGNCASE_CHECK, 7, 70, 221, 10
-    AUTOCHECKBOX    "Igno&re carriage return differences (Windows/Unix/Mac)", IDC_EOL_SENSITIVE, 7, 80, 221, 10
+    AUTORADIOBUTTON "&Compare", IDC_DIFF_WHITESPACE_COMPARE, 14, 19, 206, 10, WS_GROUP
+    AUTORADIOBUTTON "&Ignore change", IDC_DIFF_WHITESPACE_IGNORE, 14, 30, 206, 10
+    AUTORADIOBUTTON "I&gnore all", IDC_DIFF_WHITESPACE_IGNOREALL, 14, 41, 206, 10
+    AUTOCHECKBOX    "Ignore blan&k lines", IDC_DIFF_IGNORE_BLANK_LINES, 7, 60, 221, 10, WS_GROUP
+    AUTOCHECKBOX    "Ignore c&ase", IDC_DIFF_IGNORECASE, 7, 70, 221, 10
+    AUTOCHECKBOX    "Igno&re carriage return differences (Windows/Unix/Mac)", IDC_DIFF_IGNOREEOL, 7, 80, 221, 10
     AUTOCHECKBOX    "E&nable moved block detection", IDC_MOVED_BLOCKS, 7, 90, 221, 10
     AUTOCHECKBOX    "&Match similar lines", IDC_MATCH_SIMILAR_LINES, 7, 100, 221, 10
     RTEXT           "C&ontext limit:", IDC_STATIC, 7, 112, 155, 8
@@ -1684,11 +1710,11 @@ STRINGTABLE
     IDS_HTML_REPORT_FILES         "HTML Files (*.htm,*.html)|*.htm;*.html|All Files (*.*)|*.*||"
     IDS_XML_REPORT_FILES          "XML Files (*.xml)|*.xml|All Files (*.*)|*.*||"
     IDS_XLS_REPORT_FILES          "XLS Files (*.xls)|*.xls|All Files (*.*)|*.*||"
-    IDS_COMPMETHOD_FULL_CONTENTS  "Full Contents"
-    IDS_COMPMETHOD_QUICK_CONTENTS "Quick Contents"
-    IDS_COMPMETHOD_MODDATE        "Modified Date"
-    IDS_COMPMETHOD_DATESIZE       "Modified Date and Size"
-    IDS_COMPMETHOD_SIZE           "Size"
+    ID_COMPMETHOD_FULL_CONTENTS   "Full Contents"
+    ID_COMPMETHOD_QUICK_CONTENTS  "Quick Contents"
+    ID_COMPMETHOD_MODDATE         "Modified Date"
+    ID_COMPMETHOD_DATESIZE        "Modified Date and Size"
+    ID_COMPMETHOD_SIZE            "Size"
     IDS_FILTERFILE_NAMETITLE      "Name"
     IDS_FILTERFILE_PATHTITLE      "Location"
     IDS_FILTER_TITLE              "Filters"

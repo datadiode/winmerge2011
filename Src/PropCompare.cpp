@@ -28,13 +28,13 @@ PropCompare::PropCompare()
 template<ODialog::DDX_Operation op>
 bool PropCompare::UpdateData()
 {
-	DDX_Check<op>(IDC_IGNCASE_CHECK, m_bIgnoreCase);
-	DDX_Check<op>(IDC_IGNBLANKS_CHECK, m_bIgnoreBlankLines);
+	DDX_Check<op>(IDC_DIFF_IGNORECASE, m_bIgnoreCase);
+	DDX_Check<op>(IDC_DIFF_IGNORE_BLANK_LINES, m_bIgnoreBlankLines);
 	DDX_Check<op>(IDC_FILTERCOMMENTS_CHECK, m_bFilterCommentsLines);
-	DDX_Check<op>(IDC_EOL_SENSITIVE, m_bIgnoreEol);
-	DDX_Check<op>(IDC_WHITESPACE, m_nIgnoreWhite, 0);
-	DDX_Check<op>(IDC_WHITE_CHANGE, m_nIgnoreWhite, 1);
-	DDX_Check<op>(IDC_ALL_WHITE, m_nIgnoreWhite, 2);
+	DDX_Check<op>(IDC_DIFF_IGNOREEOL, m_bIgnoreEol);
+	DDX_Check<op>(IDC_DIFF_WHITESPACE_COMPARE, m_nIgnoreWhite, 0);
+	DDX_Check<op>(IDC_DIFF_WHITESPACE_IGNORE, m_nIgnoreWhite, 1);
+	DDX_Check<op>(IDC_DIFF_WHITESPACE_IGNOREALL, m_nIgnoreWhite, 2);
 	DDX_Check<op>(IDC_MOVED_BLOCKS, m_bMovedBlocks);
 	DDX_Check<op>(IDC_MATCH_SIMILAR_LINES, m_bMatchSimilarLines);
 	DDX_Text<op>(IDC_MATCH_SIMILAR_LINES_MAX, m_nMatchSimilarLinesMax);

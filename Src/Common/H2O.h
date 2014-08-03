@@ -3831,6 +3831,18 @@ namespace H2O
 			return (UINT)::SendMessage(m_hWnd, TB_GETSTATE, (WPARAM)idButton, 0);
 		}
 
+		DWORD SetExtendedStyle(DWORD dw)
+		{
+			assert(::IsWindow(m_hWnd));
+			return static_cast<DWORD>(::SendMessage(m_hWnd, TB_SETEXTENDEDSTYLE, 0, dw));
+		}
+
+		DWORD GetExtendedStyle()
+		{
+			assert(::IsWindow(m_hWnd));
+			return static_cast<DWORD>(::SendMessage(m_hWnd, TB_GETEXTENDEDSTYLE, 0, 0));
+		}
+
 		HImageList *SetImageList(HImageList *iml)
 		// Sets the image list that the toolbar will use to display buttons that are in their default state.
 		{
@@ -4150,6 +4162,11 @@ namespace H2O
 		ToolBarButton(int id)
 		{
 			idCommand = id;
+		}
+		ToolBarButton(TBBUTTON *&id)
+		{
+			idCommand = reinterpret_cast<int>(id);
+			id = this;
 		}
 		ToolBarButton(ToolBarButton *p)
 		{
