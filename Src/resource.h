@@ -197,7 +197,6 @@
 #define IDC_DIFF_FILERESULT                     1066
 #define IDC_DIFF_STYLE                          1067
 #define IDC_DIFF_CONTEXT                        1068
-#define IDC_DIFF_CASESENSITIVE                  1069
 #define IDC_DIFF_WHITESPACE_COMPARE             1071
 #define IDC_DIFF_WHITESPACE_IGNORE              1072
 #define IDC_DIFF_WHITESPACE_IGNOREALL           1073

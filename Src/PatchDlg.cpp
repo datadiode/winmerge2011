@@ -19,9 +19,6 @@
  *
  * @brief Implementation of Patch creation dialog
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "Merge.h"
 #include "SettingStore.h"
@@ -54,7 +51,7 @@ CPatchDlg::CPatchDlg()
 template<ODialog::DDX_Operation op>
 bool CPatchDlg::UpdateData()
 {
-	DDX_Check<op>(IDC_DIFF_CASESENSITIVE, m_caseSensitive);
+	DDX_Check<op>(IDC_DIFF_IGNORECASE, m_ignoreCase);
 	DDX_Check<op>(IDC_DIFF_IGNORE_BLANK_LINES, m_ignoreBlankLines);
 	DDX_Check<op>(IDC_DIFF_APPLY_LINE_FILTERS, m_applyLineFilters);
 	DDX_Check<op>(IDC_DIFF_WHITESPACE_COMPARE, m_whitespaceCompare, WHITESPACE_COMPARE_ALL);
@@ -498,29 +495,31 @@ void CPatchDlg::UpdateSettings()
  */
 void CPatchDlg::LoadSettings()
 {
-	int patchStyle = SettingStore.GetProfileInt(_T("PatchCreator"), _T("PatchStyle"), 0);
-	if (patchStyle < OUTPUT_NORMAL || patchStyle > OUTPUT_UNIFIED)
-		patchStyle = OUTPUT_NORMAL;
-	m_outputStyle = (enum output_style) patchStyle;
-	
-	m_contextLines = SettingStore.GetProfileInt(_T("PatchCreator"), _T("ContextLines"), 0);
-	if (m_contextLines < 0 || m_contextLines > 50)
-		m_contextLines = 0;
-
-	m_caseSensitive = SettingStore.GetProfileInt(_T("PatchCreator"), _T("CaseSensitive"), TRUE);
-	m_ignoreBlankLines = SettingStore.GetProfileInt(_T("PatchCreator"), _T("IgnoreBlankLines"), FALSE);
-	m_applyLineFilters = SettingStore.GetProfileInt(_T("PatchCreator"), _T("ApplyLineFilters"), FALSE);
-	
-	m_whitespaceCompare = SettingStore.GetProfileInt(_T("PatchCreator"), _T("Whitespace"), WHITESPACE_COMPARE_ALL);
-	if (m_whitespaceCompare < WHITESPACE_COMPARE_ALL ||
-		m_whitespaceCompare > WHITESPACE_IGNORE_ALL)
+	if (CRegKeyEx key = SettingStore.GetSectionKey(_T("PatchCreator")))
 	{
-		m_whitespaceCompare = WHITESPACE_COMPARE_ALL;
-	}
-	
-	m_openToEditor = SettingStore.GetProfileInt(_T("PatchCreator"), _T("OpenToEditor"), FALSE);
-	m_includeCmdLine = SettingStore.GetProfileInt(_T("PatchCreator"), _T("IncludeCmdLine"), FALSE);
+		int patchStyle = key.ReadDword(_T("PatchStyle"), 0);
+		if (patchStyle < OUTPUT_NORMAL || patchStyle > OUTPUT_UNIFIED)
+			patchStyle = OUTPUT_NORMAL;
+		m_outputStyle = (enum output_style) patchStyle;
+		
+		m_contextLines = key.ReadDword(_T("ContextLines"), 0);
+		if (m_contextLines < 0 || m_contextLines > 50)
+			m_contextLines = 0;
 
+		m_ignoreCase = key.ReadDword(_T("IgnoreCase"), FALSE);
+		m_ignoreBlankLines = key.ReadDword(_T("IgnoreBlankLines"), FALSE);
+		m_applyLineFilters = key.ReadDword(_T("ApplyLineFilters"), FALSE);
+		
+		m_whitespaceCompare = key.ReadDword(_T("Whitespace"), WHITESPACE_COMPARE_ALL);
+		if (m_whitespaceCompare < WHITESPACE_COMPARE_ALL ||
+			m_whitespaceCompare > WHITESPACE_IGNORE_ALL)
+		{
+			m_whitespaceCompare = WHITESPACE_COMPARE_ALL;
+		}
+		
+		m_openToEditor = key.ReadDword(_T("OpenToEditor"), FALSE);
+		m_includeCmdLine = key.ReadDword(_T("IncludeCmdLine"), FALSE);
+	}
 	UpdateSettings();
 }
 
@@ -529,14 +528,17 @@ void CPatchDlg::LoadSettings()
  */
 void CPatchDlg::SaveSettings()
 {
-	SettingStore.WriteProfileInt(_T("PatchCreator"), _T("PatchStyle"), m_outputStyle);
-	SettingStore.WriteProfileInt(_T("PatchCreator"), _T("ContextLines"), m_contextLines);
-	SettingStore.WriteProfileInt(_T("PatchCreator"), _T("CaseSensitive"), m_caseSensitive);
-	SettingStore.WriteProfileInt(_T("PatchCreator"), _T("IgnoreBlankLines"), m_ignoreBlankLines);
-	SettingStore.WriteProfileInt(_T("PatchCreator"), _T("ApplyLineFilters"), m_applyLineFilters);
-	SettingStore.WriteProfileInt(_T("PatchCreator"), _T("Whitespace"), m_whitespaceCompare);
-	SettingStore.WriteProfileInt(_T("PatchCreator"), _T("OpenToEditor"), m_openToEditor);
-	SettingStore.WriteProfileInt(_T("PatchCreator"), _T("IncludeCmdLine"), m_includeCmdLine);
+	if (CRegKeyEx key = SettingStore.GetSectionKey(_T("PatchCreator")))
+	{
+		key.WriteDword(_T("PatchStyle"), m_outputStyle);
+		key.WriteDword(_T("ContextLines"), m_contextLines);
+		key.WriteDword(_T("IgnoreCase"), m_ignoreCase);
+		key.WriteDword(_T("IgnoreBlankLines"), m_ignoreBlankLines);
+		key.WriteDword(_T("ApplyLineFilters"), m_applyLineFilters);
+		key.WriteDword(_T("Whitespace"), m_whitespaceCompare);
+		key.WriteDword(_T("OpenToEditor"), m_openToEditor);
+		key.WriteDword(_T("IncludeCmdLine"), m_includeCmdLine);
+	}
 }
 
 /** 
@@ -546,7 +548,7 @@ void CPatchDlg::OnDefaultSettings()
 {
 	m_outputStyle = OUTPUT_UNIFIED;
 	m_contextLines = 5;
-	m_caseSensitive = TRUE;
+	m_ignoreCase = FALSE;
 	m_ignoreBlankLines = FALSE;
 	m_applyLineFilters = FALSE;
 	m_whitespaceCompare = WHITESPACE_COMPARE_ALL;

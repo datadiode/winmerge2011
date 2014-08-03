@@ -19,9 +19,6 @@
  *
  * @brief Code file routines
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "Merge.h"
 #include "MainFrm.h"
@@ -93,7 +90,7 @@ void CPatchTool::Run()
 		// Use this because non-sensitive setting can't write
 		// patch file EOLs correctly
 		m_diffWrapper.bIgnoreEol = false;
-		m_diffWrapper.bIgnoreCase = m_dlgPatch.m_caseSensitive == FALSE;
+		m_diffWrapper.bIgnoreCase = m_dlgPatch.m_ignoreCase != FALSE;
 		m_diffWrapper.bFilterCommentsLines = false;
 		m_diffWrapper.bApplyLineFilters = m_dlgPatch.m_applyLineFilters != FALSE;;
 		m_diffWrapper.RefreshFilters();

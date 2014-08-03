@@ -52,7 +52,7 @@ public:
 	void ClearItems();
 
 // Dialog Data
-	BOOL m_caseSensitive;
+	BOOL m_ignoreCase;
 	String	m_file1;
 	String	m_file2;
 	String	m_fileResult;
