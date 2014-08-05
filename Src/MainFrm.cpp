@@ -3675,9 +3675,6 @@ LRESULT CMainFrame::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		if (wParam != SIZE_MINIMIZED)
 			RecalcLayout();
 		return 0;
-	case WM_ERASEBKGND:
-		// Apply background brush only to DocFrames and SubFrames.
-		return TRUE;
 	case WM_NCDESTROY:
 		return OWindow::WindowProc(uMsg, wParam, lParam);
 	case WM_HELP:
@@ -3690,7 +3687,7 @@ LRESULT CMainFrame::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 BOOL CMainFrame::CreateToobar()
 {
 	m_wndToolBar = HToolBar::Create(
-		WS_CHILD | WS_VISIBLE | TBSTYLE_TOOLTIPS,
+		WS_CHILD | WS_VISIBLE | TBSTYLE_TOOLTIPS | TBSTYLE_FLAT,
 		0, 0, 0, 0, m_pWnd, 0xC000);
 
 	TBBUTTON *optionsButton = reinterpret_cast<TBBUTTON *>(ID_OPTIONS);

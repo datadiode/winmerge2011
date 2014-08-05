@@ -273,7 +273,7 @@ HRESULT CMergeApp::InitInstance()
 			// create main MDI Frame window
 			HWindow *const pWndMainFrame = HWindow::CreateEx(
 				WS_EX_ACCEPTFILES, WinMergeWindowClass, _T("WinMerge"),
-				WS_OVERLAPPEDWINDOW,
+				WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
 				CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
 				NULL, NULL);
 			if (pWndMainFrame == NULL)
