@@ -1,0 +1,1527 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{9e9e5ff3-21d5-4c69-96d3-32c46acb52f1}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{3ad377aa-8192-4ad8-a128-1bb5bc5fa427}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{07af1217-0e63-4cd6-967b-da669aff4dfd}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+    <Filter Include="EditLib">
+      <UniqueIdentifier>{d523fb5a-af07-4bfb-a14e-6137a6b88afb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DiffEngine">
+      <UniqueIdentifier>{83dd7db6-de23-4c8b-b921-238e717dfb0e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ChangeLogs">
+      <UniqueIdentifier>{5e1a359c-9962-48ee-8b88-8a1cf57ad8bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Compare Engines">
+      <UniqueIdentifier>{d792b9af-b948-44f7-9baa-104961372226}</UniqueIdentifier>
+      <Extensions>cpp;c;h</Extensions>
+    </Filter>
+    <Filter Include="Batch files">
+      <UniqueIdentifier>{ae968960-26e4-422b-91b6-18bcef0d95f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EASTL">
+      <UniqueIdentifier>{f9ddb295-bcef-4e70-a2ea-ea0787101d3a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Translation Files">
+      <UniqueIdentifier>{73f7093a-0a32-42bd-b209-147851da284a}</UniqueIdentifier>
+      <Extensions>po</Extensions>
+    </Filter>
+    <Filter Include="Filter Files">
+      <UniqueIdentifier>{96fb1d04-4309-4613-be2a-819b972ffb14}</UniqueIdentifier>
+      <Extensions>flt</Extensions>
+    </Filter>
+    <Filter Include="Setup Files">
+      <UniqueIdentifier>{cd276785-7264-46e1-9021-9155d2dc4687}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Doc Files">
+      <UniqueIdentifier>{c89bc9b8-0222-40b8-b52b-78e08237bcad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="system32">
+      <UniqueIdentifier>{02c15c13-7566-448b-8f29-77c06942eb80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Print Templates">
+      <UniqueIdentifier>{12bb3806-c8e5-4eec-94a9-0deeabd1c5ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="File Transforms">
+      <UniqueIdentifier>{eaea0894-20ea-418f-88b1-07bdb22e4bee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugin Monikers">
+      <UniqueIdentifier>{6917742c-1e45-4e31-bba1-8d4a2e783d76}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Editor Scripts">
+      <UniqueIdentifier>{2d85e455-2d5b-4690-95f1-3ff3effa2c3a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="7zCommon.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AboutDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\Bitmap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CCPrompt.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="charsets.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ChildFrm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="codepage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="codepage_detect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CompareStatisticsDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CompareStats.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigLog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfirmFolderCopyDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ConflictFileParser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ConsoleWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="convert_utf\ConvertUTF.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\coretools.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DiffContext.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DiffFileData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DiffFileInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DiffItem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DiffItemList.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DiffList.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DiffTextBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DiffWrapper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DirActions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DirCmpReport.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DirCmpReportDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DirColsDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DirCompProgressDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DirDoc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DirFrame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DirItem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DirScan.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DirTravel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DirView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DirViewColHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DirViewColItems.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\DllProxies.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorFilepathBar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Environment.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ExcelExport.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ExternalArchiveFormat.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FileActionScript.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FileFilter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FileFilterHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FileFilterMgr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FileFiltersDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FileOrFolderSelect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FileTextEncoding.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FileTransform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FileVersion.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FilterCommentsManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FilterList.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\FloatState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FolderCmp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GhostTextBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GhostTextView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\H2O2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HexMergeDoc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HexMergeFrm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HexMergeView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\LanguageSelect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LineFiltersDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LineFiltersList.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LoadSaveCodepageDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="locality.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LocationView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\LogFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MainFrm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="markdown.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Merge.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MergeCmdLineInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MergeDiffDetailView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MergeDoc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MergeDocDiffSync.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MergeDocEncoding.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MergeDocLineDiffs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MergeEditView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\MessageBoxDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MovedBlocks.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MovedLines.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OptionsInit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OptionsPanel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PatchDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PatchTool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="paths.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\PidlContainer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\PreferencesDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ProjectFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ProjectFilePathsDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PropArchive.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PropBackups.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PropCodepage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PropColors.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PropCompare.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PropCompareFolder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PropEditor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PropGeneral.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PropHexEditor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PropListColors.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PropRegistry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PropShell.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PropSyntaxColors.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PropTextColors.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PropVss.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RegExpItem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\RegKey.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RunModal.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SaveClosingDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\SettingStore.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SharedFilterDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\ShellContextMenu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\ShellFileOperations.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\SortHeaderCtrl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceControl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Splash.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\SplitState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StdAfx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\stream_util.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\string_util.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stringdiffs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\SuperComboBox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SyntaxColors.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TestFilterDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\unicoder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\UnicodeString.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\UniFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UniMarkdownFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\Utf8FileDetect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\version.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VSSHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VssPrompt.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WaitStatusCursor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\WindowPlacement.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WMGotoDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="editlib\asp.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
+    <ClCompile Include="editlib\basic.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
+    <ClCompile Include="editlib\batch.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
+    <ClCompile Include="editlib\ccrystaleditview.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
+    <ClCompile Include="editlib\ccrystaltextbuffer.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
+    <ClCompile Include="editlib\ccrystaltextview.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
+    <ClCompile Include="editlib\ccrystaltextview2.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
+    <ClCompile Include="editlib\ceditreplacedlg.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
+    <ClCompile Include="editlib\cfindtextdlg.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
+    <ClCompile Include="editlib\cplusplus.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
+    <ClCompile Include="editlib\crystaleditviewex.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
+    <ClCompile Include="editlib\crystalparser.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
+    <ClCompile Include="editlib\crystaltextblock.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
+    <ClCompile Include="editlib\csharp.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
+    <ClCompile Include="editlib\css.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
+    <ClCompile Include="editlib\dcl.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
+    <ClCompile Include="editlib\fortran.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
+    <ClCompile Include="editlib\html.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
+    <ClCompile Include="editlib\ini.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
+    <ClCompile Include="editlib\innosetup.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
+    <ClCompile Include="editlib\is.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
+    <ClCompile Include="editlib\java.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
+    <ClCompile Include="editlib\LineInfo.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
+    <ClCompile Include="editlib\lisp.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
+    <ClCompile Include="editlib\nsis.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
+    <ClCompile Include="editlib\pascal.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
+    <ClCompile Include="editlib\perl.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
+    <ClCompile Include="editlib\php.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
+    <ClCompile Include="editlib\po.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
+    <ClCompile Include="editlib\powershell.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
+    <ClCompile Include="editlib\python.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
+    <ClCompile Include="editlib\rexx.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
+    <ClCompile Include="editlib\rsrc.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
+    <ClCompile Include="editlib\ruby.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
+    <ClCompile Include="editlib\sgml.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
+    <ClCompile Include="editlib\sh.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
+    <ClCompile Include="editlib\siod.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
+    <ClCompile Include="editlib\sql.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
+    <ClCompile Include="editlib\tcl.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
+    <ClCompile Include="editlib\tex.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
+    <ClCompile Include="editlib\UndoRecord.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
+    <ClCompile Include="editlib\verilog.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
+    <ClCompile Include="editlib\wcwidth.c">
+      <Filter>EditLib</Filter>
+    </ClCompile>
+    <ClCompile Include="editlib\xml.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
+    <ClCompile Include="diffutils\src\analyze.c">
+      <Filter>DiffEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="diffutils\lib\CMPBUF.C">
+      <Filter>DiffEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="diffutils\src\CONTEXT.C">
+      <Filter>DiffEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="diffutils\src\Diff.cpp">
+      <Filter>DiffEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="diffutils\src\ED.C">
+      <Filter>DiffEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="diffutils\GnuVersion.c">
+      <Filter>DiffEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="diffutils\src\IFDEF.C">
+      <Filter>DiffEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="diffutils\src\IO.C">
+      <Filter>DiffEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="diffutils\src\NORMAL.C">
+      <Filter>DiffEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="diffutils\lib\REGEX.C">
+      <Filter>DiffEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="diffutils\src\SIDE.C">
+      <Filter>DiffEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="diffutils\src\UTIL.C">
+      <Filter>DiffEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="CompareEngines\ByteCompare.cpp">
+      <Filter>Compare Engines</Filter>
+    </ClCompile>
+    <ClCompile Include="CompareEngines\DiffUtils.cpp">
+      <Filter>Compare Engines</Filter>
+    </ClCompile>
+    <ClCompile Include="CompareEngines\TimeSizeCompare.cpp">
+      <Filter>Compare Engines</Filter>
+    </ClCompile>
+    <ClCompile Include="EASTL\src\allocator.cpp">
+      <Filter>EASTL</Filter>
+    </ClCompile>
+    <ClCompile Include="EASTL\src\assert.cpp">
+      <Filter>EASTL</Filter>
+    </ClCompile>
+    <ClCompile Include="EASTL\src\fixed_pool.cpp">
+      <Filter>EASTL</Filter>
+    </ClCompile>
+    <ClCompile Include="EASTL\src\hashtable.cpp">
+      <Filter>EASTL</Filter>
+    </ClCompile>
+    <ClCompile Include="EASTL\src\red_black_tree.cpp">
+      <Filter>EASTL</Filter>
+    </ClCompile>
+    <ClCompile Include="EASTL\src\string.cpp">
+      <Filter>EASTL</Filter>
+    </ClCompile>
+    <ClCompile Include="system32\system32.cpp">
+      <Filter>system32</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Common\WindowPlacement.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="7zCommon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AboutDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Bitmap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CCPrompt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="charsets.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ChildFrm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CmdLineParser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="codepage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="codepage_detect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CompareOptions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CompareStatisticsDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CompareStats.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ConfigLog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ConfirmFolderCopyDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ConflictFileParser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ConsoleWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Constants.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="convert_utf\ConvertUTF.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\coretools.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\coretypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DiffContext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DiffFileData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DiffFileInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DiffItem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DiffItemList.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DiffList.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DiffTextBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DiffWrapper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DirCmpReport.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DirCmpReportDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DirColsDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DirCompProgressDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DirFrame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DirItem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DirReportTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DirTravel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DirView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DirViewColItems.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\DllProxies.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dllver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorFilepathBar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Environment.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ExcelExport.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ExternalArchiveFormat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FileActionScript.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FileFilter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FileFilterHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FileFilterMgr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FileFiltersDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FileLocation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FileOrFolderSelect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FileTextEncoding.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FileTextStats.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FileTransform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FileVersion.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FilterCommentsManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FilterList.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\FloatState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FolderCmp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GhostTextBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GhostTextView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GhostUndorecord.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\H2O.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\H2O2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HexMergeFrm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HexMergeView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IntToIntMap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IOptionsPanel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\LanguageSelect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LineFiltersDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LineFiltersList.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ListEntry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LoadSaveCodepageDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="locality.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LocationView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\LogFile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MainFrm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="markdown.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Merge.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MergeCmdLineInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MergeDiffDetailView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MergeEditView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\MessageBoxDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MovedLines.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\MyCom.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\ntdll.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OptionsDef.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\OptionsMgr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OptionsPanel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PatchDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PatchTool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="paths.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\PidlContainer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\PreferencesDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ProjectFile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ProjectFilePathsDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PropArchive.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PropBackups.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PropCodepage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PropColors.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PropCompare.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PropCompareFolder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PropEditor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PropGeneral.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PropHexEditor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PropListColors.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PropRegistry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PropShell.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PropSyntaxColors.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PropTextColors.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PropVss.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RegExpItem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\RegKey.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RunModal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SaveClosingDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="scriptable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ScriptItem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\SettingStore.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SharedFilterDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\ShellContextMenu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\ShellFileOperations.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\SortHeaderCtrl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Splash.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\SplitState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StdAfx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\stream_util.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\string_util.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stringdiffs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stringdiffsi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\SuperComboBox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SyntaxColors.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TestFilterDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\unicoder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\UnicodeString.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\UniFile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UniMarkdownFile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Utf8FileDetect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\version.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ViewableWhitespace.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VSSHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VssPrompt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WaitStatusCursor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WMGotoDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="editlib\ccrystaleditview.h">
+      <Filter>EditLib</Filter>
+    </ClInclude>
+    <ClInclude Include="editlib\ccrystaltextbuffer.h">
+      <Filter>EditLib</Filter>
+    </ClInclude>
+    <ClInclude Include="editlib\ccrystaltextview.h">
+      <Filter>EditLib</Filter>
+    </ClInclude>
+    <ClInclude Include="editlib\ceditreplacedlg.h">
+      <Filter>EditLib</Filter>
+    </ClInclude>
+    <ClInclude Include="editlib\cfindtextdlg.h">
+      <Filter>EditLib</Filter>
+    </ClInclude>
+    <ClInclude Include="editlib\crystaleditviewex.h">
+      <Filter>EditLib</Filter>
+    </ClInclude>
+    <ClInclude Include="editlib\crystalparser.h">
+      <Filter>EditLib</Filter>
+    </ClInclude>
+    <ClInclude Include="editlib\crystaltextblock.h">
+      <Filter>EditLib</Filter>
+    </ClInclude>
+    <ClInclude Include="editlib\editcmd.h">
+      <Filter>EditLib</Filter>
+    </ClInclude>
+    <ClInclude Include="editlib\edtlib.h">
+      <Filter>EditLib</Filter>
+    </ClInclude>
+    <ClInclude Include="editlib\LineInfo.h">
+      <Filter>EditLib</Filter>
+    </ClInclude>
+    <ClInclude Include="editlib\UndoRecord.h">
+      <Filter>EditLib</Filter>
+    </ClInclude>
+    <ClInclude Include="editlib\wcwidth.h">
+      <Filter>EditLib</Filter>
+    </ClInclude>
+    <ClInclude Include="diffutils\lib\CMPBUF.H">
+      <Filter>DiffEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="diffutils\CONFIG.H">
+      <Filter>DiffEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="diffutils\src\DIFF.H">
+      <Filter>DiffEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="diffutils\lib\REGEX.H">
+      <Filter>DiffEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="diffutils\src\SYSTEM.H">
+      <Filter>DiffEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="CompareEngines\ByteCompare.h">
+      <Filter>Compare Engines</Filter>
+    </ClInclude>
+    <ClInclude Include="CompareEngines\DiffUtils.h">
+      <Filter>Compare Engines</Filter>
+    </ClInclude>
+    <ClInclude Include="CompareEngines\TimeSizeCompare.h">
+      <Filter>Compare Engines</Filter>
+    </ClInclude>
+    <ClInclude Include="system32\system32.h">
+      <Filter>system32</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Midl Include="WinMerge.idl">
+      <Filter>Source Files</Filter>
+    </Midl>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\binarydiff.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\both.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\equalbinary.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\equalfile.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\error.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\fileskip.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\folder.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\folderskip.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\folderup.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\folderup_disable.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\hand.cur">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\left.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\left_to_browse.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\left_to_right.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\lfile.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\lfolder.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Merge.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\MergeDir.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\MergeDoc.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\MergeProject.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\mg_cur.cur">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\move_left_to_browse.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\move_right_to_browse.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\notequalfile.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\rfile.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\rfolder.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\right.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\right_to_browse.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\right_to_left.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\sigma.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="CHANGELO">
+      <Filter>ChangeLogs</Filter>
+    </None>
+    <None Include="..\Docs\Users\ChangeLog.txt">
+      <Filter>ChangeLogs</Filter>
+    </None>
+    <None Include="..\Translations\WinMerge\BuildMergeLangDll.bat">
+      <Filter>Batch files</Filter>
+    </None>
+    <None Include="..\Translations\WinMerge\CreateMasterPotFile.vbs">
+      <Filter>Batch files</Filter>
+    </None>
+    <None Include="..\Translations\WinMerge\GetTranslationsStatus.vbs">
+      <Filter>Batch files</Filter>
+    </None>
+    <None Include="PostBuild.bat">
+      <Filter>Batch files</Filter>
+    </None>
+    <None Include="SetResourceVersions.bat">
+      <Filter>Batch files</Filter>
+    </None>
+    <None Include="..\Translations\WinMerge\UpdatePoFilesFromPotFile.vbs">
+      <Filter>Batch files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="res\Merge.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <po Include="..\Translations\WinMerge\basque.po">
+      <Filter>Translation Files</Filter>
+    </po>
+    <po Include="..\Translations\WinMerge\Brazilian.po">
+      <Filter>Translation Files</Filter>
+    </po>
+    <po Include="..\Translations\WinMerge\Bulgarian.po">
+      <Filter>Translation Files</Filter>
+    </po>
+    <po Include="..\Translations\WinMerge\Catalan.po">
+      <Filter>Translation Files</Filter>
+    </po>
+    <po Include="..\Translations\WinMerge\ChineseSimplified.po">
+      <Filter>Translation Files</Filter>
+    </po>
+    <po Include="..\Translations\WinMerge\ChineseTraditional.po">
+      <Filter>Translation Files</Filter>
+    </po>
+    <po Include="..\Translations\WinMerge\Croatian.po">
+      <Filter>Translation Files</Filter>
+    </po>
+    <po Include="..\Translations\WinMerge\Czech.po">
+      <Filter>Translation Files</Filter>
+    </po>
+    <po Include="..\Translations\WinMerge\Danish.po">
+      <Filter>Translation Files</Filter>
+    </po>
+    <po Include="..\Translations\WinMerge\Dutch.po">
+      <Filter>Translation Files</Filter>
+    </po>
+    <po Include="..\Translations\WinMerge\French.po">
+      <Filter>Translation Files</Filter>
+    </po>
+    <po Include="..\Translations\WinMerge\Galician.po">
+      <Filter>Translation Files</Filter>
+    </po>
+    <po Include="..\Translations\WinMerge\German.po">
+      <Filter>Translation Files</Filter>
+    </po>
+    <po Include="..\Translations\WinMerge\Greek.po">
+      <Filter>Translation Files</Filter>
+    </po>
+    <po Include="..\Translations\WinMerge\Hungarian.po">
+      <Filter>Translation Files</Filter>
+    </po>
+    <po Include="..\Translations\WinMerge\Italian.po">
+      <Filter>Translation Files</Filter>
+    </po>
+    <po Include="..\Translations\WinMerge\Japanese.po">
+      <Filter>Translation Files</Filter>
+    </po>
+    <po Include="..\Translations\WinMerge\Korean.po">
+      <Filter>Translation Files</Filter>
+    </po>
+    <po Include="..\Translations\WinMerge\Norwegian.po">
+      <Filter>Translation Files</Filter>
+    </po>
+    <po Include="..\Translations\WinMerge\Persian.po">
+      <Filter>Translation Files</Filter>
+    </po>
+    <po Include="..\Translations\WinMerge\Polish.po">
+      <Filter>Translation Files</Filter>
+    </po>
+    <po Include="..\Translations\WinMerge\Portuguese.po">
+      <Filter>Translation Files</Filter>
+    </po>
+    <po Include="..\Translations\WinMerge\Romanian.po">
+      <Filter>Translation Files</Filter>
+    </po>
+    <po Include="..\Translations\WinMerge\Russian.po">
+      <Filter>Translation Files</Filter>
+    </po>
+    <po Include="..\Translations\WinMerge\Serbian.po">
+      <Filter>Translation Files</Filter>
+    </po>
+    <po Include="..\Translations\WinMerge\Slovak.po">
+      <Filter>Translation Files</Filter>
+    </po>
+    <po Include="..\Translations\WinMerge\Slovenian.po">
+      <Filter>Translation Files</Filter>
+    </po>
+    <po Include="..\Translations\WinMerge\Spanish.po">
+      <Filter>Translation Files</Filter>
+    </po>
+    <po Include="..\Translations\WinMerge\Swedish.po">
+      <Filter>Translation Files</Filter>
+    </po>
+    <po Include="..\Translations\WinMerge\Turkish.po">
+      <Filter>Translation Files</Filter>
+    </po>
+    <po Include="..\Translations\WinMerge\Ukrainian.po">
+      <Filter>Translation Files</Filter>
+    </po>
+  </ItemGroup>
+  <ItemGroup>
+    <flt Include="..\Filters\ADAMulti.flt">
+      <Filter>Filter Files</Filter>
+    </flt>
+    <flt Include="..\Filters\ASPNET.flt">
+      <Filter>Filter Files</Filter>
+    </flt>
+    <flt Include="..\Filters\CSharp_loose.flt">
+      <Filter>Filter Files</Filter>
+    </flt>
+    <flt Include="..\Filters\Delphi.flt">
+      <Filter>Filter Files</Filter>
+    </flt>
+    <flt Include="..\Filters\FileFilter.tmpl">
+      <Filter>Filter Files</Filter>
+    </flt>
+    <flt Include="..\Filters\MASM.flt">
+      <Filter>Filter Files</Filter>
+    </flt>
+    <flt Include="..\Filters\Merge_GnuC_loose.flt">
+      <Filter>Filter Files</Filter>
+    </flt>
+    <flt Include="..\Filters\Merge_VB_loose.flt">
+      <Filter>Filter Files</Filter>
+    </flt>
+    <flt Include="..\Filters\Merge_VC_loose.flt">
+      <Filter>Filter Files</Filter>
+    </flt>
+    <flt Include="..\Filters\SourceControl.flt">
+      <Filter>Filter Files</Filter>
+    </flt>
+    <flt Include="..\Filters\Symbian.flt">
+      <Filter>Filter Files</Filter>
+    </flt>
+    <flt Include="..\Filters\XML_html.flt">
+      <Filter>Filter Files</Filter>
+    </flt>
+  </ItemGroup>
+  <ItemGroup>
+    <setup Include="..\Setup\GenerateHTMLReport.WinMerge">
+      <Filter>Setup Files</Filter>
+    </setup>
+    <setup Include="..\setup\setup.wsf">
+      <Filter>Setup Files</Filter>
+    </setup>
+    <setup Include="..\Docs\Users\Contributors.txt">
+      <Filter>Setup Files</Filter>
+    </setup>
+    <setup Include="..\Setup\CreateLaunchScript.sh">
+      <Filter>Setup Files</Filter>
+    </setup>
+  </ItemGroup>
+  <ItemGroup>
+    <imp Include="system32\system32.imp">
+      <Filter>system32</Filter>
+    </imp>
+    <imp Include="Common\ntdll.imp" />
+  </ItemGroup>
+  <ItemGroup>
+    <PrintTemplate Include="..\PrintTemplates\MergeDocPrintTemplate.html.PrintTemplate">
+      <Filter>Print Templates</Filter>
+    </PrintTemplate>
+  </ItemGroup>
+  <ItemGroup>
+    <FileTransform Include="..\FileTransforms\LinesNumbered.wsc.FileTransform">
+      <Filter>File Transforms</Filter>
+    </FileTransform>
+    <FileTransform Include="..\FileTransforms\LinesSorted.wsc.FileTransform">
+      <Filter>File Transforms</Filter>
+    </FileTransform>
+    <FileTransform Include="..\FileTransforms\MediaInfo.wsc.FileTransform">
+      <Filter>File Transforms</Filter>
+    </FileTransform>
+    <FileTransform Include="..\FileTransforms\msxml.wsc.FileTransform">
+      <Filter>File Transforms</Filter>
+    </FileTransform>
+    <FileTransform Include="..\FileTransforms\msxml-sort.xslt.FileTransform">
+      <Filter>File Transforms</Filter>
+    </FileTransform>
+    <FileTransform Include="..\FileTransforms\xdoc2txt.wsc.FileTransform">
+      <Filter>File Transforms</Filter>
+    </FileTransform>
+  </ItemGroup>
+  <ItemGroup>
+    <PluginMoniker Include="..\Translations\PluginMonikers\English.ini.PluginMoniker">
+      <Filter>Plugin Monikers</Filter>
+    </PluginMoniker>
+    <PluginMoniker Include="..\Translations\PluginMonikers\German.ini.PluginMoniker">
+      <Filter>Plugin Monikers</Filter>
+    </PluginMoniker>
+    <PluginMoniker Include="..\Translations\PluginMonikers\Portuguese.ini.PluginMoniker">
+      <Filter>Plugin Monikers</Filter>
+    </PluginMoniker>
+  </ItemGroup>
+  <ItemGroup>
+    <EditorScript Include="..\EditorScripts\Basic.wsc.EditorScript">
+      <Filter>Editor Scripts</Filter>
+    </EditorScript>
+    <EditorScript Include="..\EditorScripts\ExecFilterCommand.wsc.EditorScript">
+      <Filter>Editor Scripts</Filter>
+    </EditorScript>
+    <EditorScript Include="..\EditorScripts\SortLines.wsc.EditorScript">
+      <Filter>Editor Scripts</Filter>
+    </EditorScript>
+    <EditorScript Include="..\EditorScripts\Tabify.wsc.EditorScript">
+      <Filter>Editor Scripts</Filter>
+    </EditorScript>
+  </ItemGroup>
+  <ItemGroup>
+    <docs Include="..\Docs\Users\CHANGES">
+      <Filter>Doc Files</Filter>
+    </docs>
+    <docs Include="COPYING">
+      <Filter>Doc Files</Filter>
+    </docs>
+    <docs Include="..\Docs\Users\ReadMe.txt">
+      <Filter>Doc Files</Filter>
+    </docs>
+    <docs Include="..\Docs\Users\ReleaseNotes.html">
+      <Filter>Doc Files</Filter>
+    </docs>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="version.rh">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+  </ItemGroup>
+</Project>

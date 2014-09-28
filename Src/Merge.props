@@ -1,0 +1,138 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup
+    Condition="'$(impBeforeTargets)' == '' and '$(impAfterTargets)' == '' and '$(ConfigurationType)' != 'Makefile'">
+    <impBeforeTargets>Midl</impBeforeTargets>
+    <impAfterTargets>CustomBuild</impAfterTargets>
+  </PropertyGroup>
+  <PropertyGroup>
+    <impDependsOn
+      Condition="'$(ConfigurationType)' != 'Makefile'">_SelectedFiles;$(impDependsOn)</impDependsOn>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <imp>
+      <CommandLineTemplate>lib /MACHINE:$(TargetMachine) /DEF:"%(FullPath)" /OUT:"$(IntDir)%(Filename).lib"</CommandLineTemplate>
+      <Outputs>$(IntDir)%(Filename).lib</Outputs>
+    </imp>
+  </ItemDefinitionGroup>
+  <PropertyGroup
+    Condition="'$(poBeforeTargets)' == '' and '$(poAfterTargets)' == '' and '$(ConfigurationType)' != 'Makefile'">
+    <poBeforeTargets>Midl</poBeforeTargets>
+    <poAfterTargets>CustomBuild</poAfterTargets>
+  </PropertyGroup>
+  <PropertyGroup>
+    <poDependsOn
+      Condition="'$(ConfigurationType)' != 'Makefile'">_SelectedFiles;$(poDependsOn)</poDependsOn>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <po>
+      <CommandLineTemplate>copy "%(FullPath)" "$(OutDir)Languages\%(Filename)%(Extension)"</CommandLineTemplate>
+      <Outputs>$(OutDir)Languages\%(Filename)%(Extension)</Outputs>
+    </po>
+  </ItemDefinitionGroup>
+  <PropertyGroup
+    Condition="'$(fltBeforeTargets)' == '' and '$(fltAfterTargets)' == '' and '$(ConfigurationType)' != 'Makefile'">
+    <fltBeforeTargets>Midl</fltBeforeTargets>
+    <fltAfterTargets>CustomBuild</fltAfterTargets>
+  </PropertyGroup>
+  <PropertyGroup>
+    <fltDependsOn
+      Condition="'$(ConfigurationType)' != 'Makefile'">_SelectedFiles;$(fltDependsOn)</fltDependsOn>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <flt>
+      <CommandLineTemplate>copy "%(FullPath)" "$(OutDir)Filters\%(Filename)%(Extension)"</CommandLineTemplate>
+      <Outputs>$(OutDir)Filters\%(Filename)%(Extension)</Outputs>
+    </flt>
+  </ItemDefinitionGroup>
+  <PropertyGroup
+    Condition="'$(PrintTemplateBeforeTargets)' == '' and '$(PrintTemplateAfterTargets)' == '' and '$(ConfigurationType)' != 'Makefile'">
+    <PrintTemplateBeforeTargets>Midl</PrintTemplateBeforeTargets>
+    <PrintTemplateAfterTargets>CustomBuild</PrintTemplateAfterTargets>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PrintTemplateDependsOn
+      Condition="'$(ConfigurationType)' != 'Makefile'">_SelectedFiles;$(PrintTemplateDependsOn)</PrintTemplateDependsOn>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <PrintTemplate>
+      <CommandLineTemplate>copy "%(FullPath)" "$(OutDir)PrintTemplates\%(Filename)"</CommandLineTemplate>
+      <Outputs>$(OutDir)PrintTemplates\%(Filename)</Outputs>
+    </PrintTemplate>
+  </ItemDefinitionGroup>
+  <PropertyGroup
+    Condition="'$(FileTransformBeforeTargets)' == '' and '$(FileTransformAfterTargets)' == '' and '$(ConfigurationType)' != 'Makefile'">
+    <FileTransformBeforeTargets>Midl</FileTransformBeforeTargets>
+    <FileTransformAfterTargets>CustomBuild</FileTransformAfterTargets>
+  </PropertyGroup>
+  <PropertyGroup>
+    <FileTransformDependsOn
+      Condition="'$(ConfigurationType)' != 'Makefile'">_SelectedFiles;$(FileTransformDependsOn)</FileTransformDependsOn>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <FileTransform>
+      <CommandLineTemplate>copy "%(FullPath)" "$(OutDir)FileTransforms\%(Filename)"</CommandLineTemplate>
+      <Outputs>$(OutDir)FileTransforms\%(Filename)</Outputs>
+    </FileTransform>
+  </ItemDefinitionGroup>
+  <PropertyGroup
+    Condition="'$(PluginMonikerBeforeTargets)' == '' and '$(PluginMonikerAfterTargets)' == '' and '$(ConfigurationType)' != 'Makefile'">
+    <PluginMonikerBeforeTargets>Midl</PluginMonikerBeforeTargets>
+    <PluginMonikerAfterTargets>CustomBuild</PluginMonikerAfterTargets>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PluginMonikerDependsOn
+      Condition="'$(ConfigurationType)' != 'Makefile'">_SelectedFiles;$(PluginMonikerDependsOn)</PluginMonikerDependsOn>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <PluginMoniker>
+      <CommandLineTemplate>copy "%(FullPath)" "$(OutDir)PluginMonikers\%(Filename)"</CommandLineTemplate>
+      <Outputs>$(OutDir)PluginMonikers\%(Filename)</Outputs>
+    </PluginMoniker>
+  </ItemDefinitionGroup>
+  <PropertyGroup
+    Condition="'$(EditorScriptBeforeTargets)' == '' and '$(EditorScriptAfterTargets)' == '' and '$(ConfigurationType)' != 'Makefile'">
+    <EditorScriptBeforeTargets>Midl</EditorScriptBeforeTargets>
+    <EditorScriptAfterTargets>CustomBuild</EditorScriptAfterTargets>
+  </PropertyGroup>
+  <PropertyGroup>
+    <EditorScriptDependsOn
+      Condition="'$(ConfigurationType)' != 'Makefile'">_SelectedFiles;$(EditorScriptDependsOn)</EditorScriptDependsOn>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <EditorScript>
+      <CommandLineTemplate>copy "%(FullPath)" "$(OutDir)EditorScripts\%(Filename)"</CommandLineTemplate>
+      <Outputs>$(OutDir)EditorScripts\%(Filename)</Outputs>
+    </EditorScript>
+  </ItemDefinitionGroup>
+  <PropertyGroup
+    Condition="'$(docsBeforeTargets)' == '' and '$(docsAfterTargets)' == '' and '$(ConfigurationType)' != 'Makefile'">
+    <docsBeforeTargets>Midl</docsBeforeTargets>
+    <docsAfterTargets>CustomBuild</docsAfterTargets>
+  </PropertyGroup>
+  <PropertyGroup>
+    <docsDependsOn
+      Condition="'$(ConfigurationType)' != 'Makefile'">_SelectedFiles;$(docsDependsOn)</docsDependsOn>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <docs>
+      <CommandLineTemplate>copy "%(FullPath)" "$(OutDir)Docs\%(Filename)%(Extension)"</CommandLineTemplate>
+      <Outputs>$(OutDir)Docs\%(Filename)%(Extension)</Outputs>
+    </docs>
+  </ItemDefinitionGroup>
+  <PropertyGroup
+    Condition="'$(setupBeforeTargets)' == '' and '$(setupAfterTargets)' == '' and '$(ConfigurationType)' != 'Makefile'">
+    <setupBeforeTargets>Midl</setupBeforeTargets>
+    <setupAfterTargets>CustomBuild</setupAfterTargets>
+  </PropertyGroup>
+  <PropertyGroup>
+    <setupDependsOn
+      Condition="'$(ConfigurationType)' != 'Makefile'">_SelectedFiles;$(setupDependsOn)</setupDependsOn>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <setup>
+      <CommandLineTemplate>copy "%(FullPath)" "$(OutDir)%(Filename)%(Extension)"</CommandLineTemplate>
+      <Outputs>$(OutDir)%(Filename)%(Extension)</Outputs>
+    </setup>
+  </ItemDefinitionGroup>
+</Project>

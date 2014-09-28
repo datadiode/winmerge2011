@@ -1,0 +1,1106 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="System32|Win32">
+      <Configuration>System32</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="System32|x64">
+      <Configuration>System32</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{2A81DB64-C062-48AF-8D2E-23B68320142D}</ProjectGuid>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='System32|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>Windows7.1SDK</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v90</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v90</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='System32|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>Windows7.1SDK</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>Windows7.1SDK</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>Windows7.1SDK</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+    <Import Project="Merge.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='System32|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)vsprops\$(Platform).props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)vsprops\$(Platform).props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)vsprops\$(Platform).props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='System32|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)vsprops\$(Platform).props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)vsprops\$(Platform).props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)vsprops\$(Platform).props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)BuildTmp\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)Build\$(SolutionName)\$(Platform)\$(Configuration)\</OutDir>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</GenerateManifest>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkIncremental>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)BuildTmp\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)Build\$(SolutionName)\$(Platform)\$(Configuration)\</OutDir>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</GenerateManifest>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkIncremental>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)BuildTmp\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)Build\$(SolutionName)\$(Platform)\$(Configuration)\</OutDir>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</GenerateManifest>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)BuildTmp\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)Build\$(SolutionName)\$(Platform)\$(Configuration)\</OutDir>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</GenerateManifest>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">$(SolutionDir)BuildTmp\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">$(SolutionDir)Build\$(SolutionName)\$(Platform)\$(Configuration)\</OutDir>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">false</GenerateManifest>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">false</LinkIncremental>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='System32|x64'">$(Platform)\$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='System32|x64'">$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">WinMergeU</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">WinMergeU</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">WinMergeU</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">WinMergeU</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">WinMergeU</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='System32|x64'">WinMergeU</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Midl>
+      <OutputDirectory>$(IntDir)..\..\midl</OutputDirectory>
+      <TypeLibraryName>$(IntDir)..\midl\%(Filename).tlb</TypeLibraryName>
+    </Midl>
+    <ClCompile>
+      <AdditionalIncludeDirectories>.;.\CompareEngines;.\Common;EASTL\include;.\editlib;.\diffutils;.\diffutils\lib;.\diffutils\src;..\Externals\expat\lib;..\Externals\expat\xmlwf;..\Externals\scew;..\Externals\pcre\Win32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <ErrorReporting>None</ErrorReporting>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS=1;_CRT_SECURE_NO_DEPRECATE;_STATIC_CPPLIB;HAVE_STDLIB_H;STDC_HEADERS;HAVE_STRING_H=1;PR_FILE_NAME="pr";DIFF_PROGRAM="diff";REGEX_MALLOC;__MSC__;__NT__;USG=1;EDITPADC_CLASS=;UNICODE;PCRE_STATIC;USE_EASTL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <StringPooling>true</StringPooling>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+    </ClCompile>
+    <ResourceCompile>
+      <Culture>0x0409</Culture>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>version.lib;shlwapi.lib;urlmon.lib;imm32.lib;HtmlHelp.lib;comctl32.lib;oleacc.lib;noarg.obj;noenv.obj;pcre.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(IntDir);$(SolutionDir)BuildTmp\lib\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+    <PostBuildEvent>
+      <Command>PostBuild.bat "$(IntDir)" "$(OutDir)"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <OutputDirectory>$(IntDir)..\..\midl</OutputDirectory>
+      <TargetEnvironment>X64</TargetEnvironment>
+      <TypeLibraryName>$(IntDir)..\midl\%(Filename).tlb</TypeLibraryName>
+    </Midl>
+    <ClCompile>
+      <AdditionalIncludeDirectories>.;.\CompareEngines;.\Common;EASTL\include;.\editlib;.\diffutils;.\diffutils\lib;.\diffutils\src;..\Externals\expat\lib;..\Externals\expat\xmlwf;..\Externals\scew;..\Externals\pcre\Win32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <ErrorReporting>None</ErrorReporting>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS=1;_CRT_SECURE_NO_DEPRECATE;_STATIC_CPPLIB;HAVE_STDLIB_H;STDC_HEADERS;HAVE_STRING_H=1;PR_FILE_NAME="pr";DIFF_PROGRAM="diff";REGEX_MALLOC;__MSC__;__NT__;USG=1;EDITPADC_CLASS=;UNICODE;PCRE_STATIC;USE_EASTL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <StringPooling>true</StringPooling>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+    </ClCompile>
+    <ResourceCompile>
+      <Culture>0x0409</Culture>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>version.lib;shlwapi.lib;urlmon.lib;imm32.lib;HtmlHelp.lib;comctl32.lib;oleacc.lib;noarg.obj;noenv.obj;pcre.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(IntDir);$(SolutionDir)BuildTmp\lib\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+    <PostBuildEvent>
+      <Command>PostBuild.bat "$(IntDir)" "$(OutDir)"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Midl>
+      <OutputDirectory>$(IntDir)..\..\midl</OutputDirectory>
+      <TypeLibraryName>$(IntDir)..\midl\%(Filename).tlb</TypeLibraryName>
+    </Midl>
+    <ClCompile>
+      <AdditionalIncludeDirectories>.;.\CompareEngines;.\Common;EASTL\include;.\editlib;.\diffutils;.\diffutils\lib;.\diffutils\src;..\Externals\expat\lib;..\Externals\expat\xmlwf;..\Externals\scew;..\Externals\pcre\Win32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <ErrorReporting>None</ErrorReporting>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS=1;_CRT_SECURE_NO_DEPRECATE;_STATIC_CPPLIB;HAVE_STDLIB_H;STDC_HEADERS;HAVE_STRING_H=1;PR_FILE_NAME="pr";DIFF_PROGRAM="diff";REGEX_MALLOC;__MSC__;__NT__;USG=1;EDITPADC_CLASS=;UNICODE;PCRE_STATIC;USE_EASTL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <StringPooling>true</StringPooling>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+    </ClCompile>
+    <ResourceCompile>
+      <Culture>0x0409</Culture>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>version.lib;shlwapi.lib;urlmon.lib;imm32.lib;HtmlHelp.lib;comctl32.lib;oleacc.lib;noarg.obj;noenv.obj;pcre.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(IntDir);$(SolutionDir)BuildTmp\lib\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <SubSystem>Windows</SubSystem>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+    </Link>
+    <PostBuildEvent>
+      <Command>PostBuild.bat "$(IntDir)" "$(OutDir)"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <OutputDirectory>$(IntDir)..\..\midl</OutputDirectory>
+      <TargetEnvironment>X64</TargetEnvironment>
+      <TypeLibraryName>$(IntDir)..\midl\%(Filename).tlb</TypeLibraryName>
+    </Midl>
+    <ClCompile>
+      <AdditionalIncludeDirectories>.;.\CompareEngines;.\Common;EASTL\include;.\editlib;.\diffutils;.\diffutils\lib;.\diffutils\src;..\Externals\expat\lib;..\Externals\expat\xmlwf;..\Externals\scew;..\Externals\pcre\Win32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <ErrorReporting>None</ErrorReporting>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS=1;_CRT_SECURE_NO_DEPRECATE;_STATIC_CPPLIB;HAVE_STDLIB_H;STDC_HEADERS;HAVE_STRING_H=1;PR_FILE_NAME="pr";DIFF_PROGRAM="diff";REGEX_MALLOC;__MSC__;__NT__;USG=1;EDITPADC_CLASS=;UNICODE;PCRE_STATIC;USE_EASTL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <StringPooling>true</StringPooling>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+    </ClCompile>
+    <ResourceCompile>
+      <Culture>0x0409</Culture>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>version.lib;shlwapi.lib;urlmon.lib;imm32.lib;HtmlHelp.lib;comctl32.lib;oleacc.lib;noarg.obj;noenv.obj;pcre.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(IntDir);$(SolutionDir)BuildTmp\lib\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <SubSystem>Windows</SubSystem>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+    </Link>
+    <PostBuildEvent>
+      <Command>PostBuild.bat "$(IntDir)" "$(OutDir)"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">
+    <Midl>
+      <OutputDirectory>$(IntDir)..\..\midl</OutputDirectory>
+      <TypeLibraryName>$(IntDir)..\midl\%(Filename).tlb</TypeLibraryName>
+    </Midl>
+    <ClCompile>
+      <AdditionalIncludeDirectories>.;.\CompareEngines;.\Common;EASTL\include;.\editlib;.\diffutils;.\diffutils\lib;.\diffutils\src;..\Externals\expat\lib;..\Externals\expat\xmlwf;..\Externals\scew;..\Externals\pcre\Win32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS=1;_CRT_SECURE_NO_DEPRECATE;_STATIC_CPPLIB;HAVE_STDLIB_H;STDC_HEADERS;HAVE_STRING_H=1;PR_FILE_NAME="pr";DIFF_PROGRAM="diff";REGEX_MALLOC;__MSC__;__NT__;USG=1;EDITPADC_CLASS=;UNICODE;PCRE_STATIC;USE_EASTL;_HAS_EXCEPTIONS=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <StringPooling>true</StringPooling>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+    </ClCompile>
+    <ResourceCompile>
+      <Culture>0x0409</Culture>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>version.lib;shlwapi.lib;urlmon.lib;imm32.lib;HtmlHelp.lib;comctl32.lib;oleacc.lib;RunTmChk.lib;pcre.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(IntDir);$(SolutionDir)BuildTmp\lib\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>/SAFESEH:NO /IGNORE:4210 %(AdditionalOptions)</AdditionalOptions>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+    <PostBuildEvent>
+      <Command>PostBuild.bat "$(IntDir)" "$(OutDir)"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='System32|x64'">
+    <ClCompile />
+    <Link />
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="7zCommon.cpp" />
+    <ClCompile Include="AboutDlg.cpp" />
+    <ClCompile Include="Common\Bitmap.cpp" />
+    <ClCompile Include="CCPrompt.cpp" />
+    <ClCompile Include="charsets.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="ChildFrm.cpp" />
+    <ClCompile Include="codepage.cpp" />
+    <ClCompile Include="codepage_detect.cpp" />
+    <ClCompile Include="CompareStatisticsDlg.cpp" />
+    <ClCompile Include="CompareStats.cpp" />
+    <ClCompile Include="ConfigLog.cpp" />
+    <ClCompile Include="ConfirmFolderCopyDlg.cpp" />
+    <ClCompile Include="ConflictFileParser.cpp" />
+    <ClCompile Include="ConsoleWindow.cpp" />
+    <ClCompile Include="convert_utf\ConvertUTF.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Common\coretools.cpp" />
+    <ClCompile Include="DiffContext.cpp" />
+    <ClCompile Include="DiffFileData.cpp" />
+    <ClCompile Include="DiffFileInfo.cpp" />
+    <ClCompile Include="DiffItem.cpp" />
+    <ClCompile Include="DiffItemList.cpp" />
+    <ClCompile Include="DiffList.cpp" />
+    <ClCompile Include="DiffTextBuffer.cpp" />
+    <ClCompile Include="DiffWrapper.cpp" />
+    <ClCompile Include="DirActions.cpp" />
+    <ClCompile Include="DirCmpReport.cpp" />
+    <ClCompile Include="DirCmpReportDlg.cpp" />
+    <ClCompile Include="DirColsDlg.cpp" />
+    <ClCompile Include="DirCompProgressDlg.cpp" />
+    <ClCompile Include="DirDoc.cpp" />
+    <ClCompile Include="DirFrame.cpp" />
+    <ClCompile Include="DirItem.cpp" />
+    <ClCompile Include="DirScan.cpp" />
+    <ClCompile Include="DirTravel.cpp" />
+    <ClCompile Include="DirView.cpp" />
+    <ClCompile Include="DirViewColHandler.cpp" />
+    <ClCompile Include="DirViewColItems.cpp" />
+    <ClCompile Include="Common\DllProxies.cpp" />
+    <ClCompile Include="EditorFilepathBar.cpp" />
+    <ClCompile Include="Environment.cpp" />
+    <ClCompile Include="ExcelExport.cpp" />
+    <ClCompile Include="ExternalArchiveFormat.cpp" />
+    <ClCompile Include="FileActionScript.cpp" />
+    <ClCompile Include="FileFilter.cpp" />
+    <ClCompile Include="FileFilterHelper.cpp" />
+    <ClCompile Include="FileFilterMgr.cpp" />
+    <ClCompile Include="FileFiltersDlg.cpp" />
+    <ClCompile Include="FileOrFolderSelect.cpp" />
+    <ClCompile Include="FileTextEncoding.cpp" />
+    <ClCompile Include="FileTransform.cpp" />
+    <ClCompile Include="FileVersion.cpp" />
+    <ClCompile Include="FilterCommentsManager.cpp" />
+    <ClCompile Include="FilterList.cpp" />
+    <ClCompile Include="Common\FloatState.cpp" />
+    <ClCompile Include="FolderCmp.cpp" />
+    <ClCompile Include="GhostTextBuffer.cpp" />
+    <ClCompile Include="GhostTextView.cpp" />
+    <ClCompile Include="Common\H2O2.cpp" />
+    <ClCompile Include="HexMergeDoc.cpp" />
+    <ClCompile Include="HexMergeFrm.cpp" />
+    <ClCompile Include="HexMergeView.cpp" />
+    <ClCompile Include="Common\LanguageSelect.cpp" />
+    <ClCompile Include="LineFiltersDlg.cpp" />
+    <ClCompile Include="LineFiltersList.cpp" />
+    <ClCompile Include="LoadSaveCodepageDlg.cpp" />
+    <ClCompile Include="locality.cpp" />
+    <ClCompile Include="LocationView.cpp" />
+    <ClCompile Include="Common\LogFile.cpp" />
+    <ClCompile Include="MainFrm.cpp" />
+    <ClCompile Include="markdown.cpp" />
+    <ClCompile Include="Merge.cpp" />
+    <ClCompile Include="MergeCmdLineInfo.cpp" />
+    <ClCompile Include="MergeDiffDetailView.cpp" />
+    <ClCompile Include="MergeDoc.cpp" />
+    <ClCompile Include="MergeDocDiffSync.cpp" />
+    <ClCompile Include="MergeDocEncoding.cpp" />
+    <ClCompile Include="MergeDocLineDiffs.cpp" />
+    <ClCompile Include="MergeEditView.cpp" />
+    <ClCompile Include="Common\MessageBoxDialog.cpp" />
+    <ClCompile Include="MovedBlocks.cpp" />
+    <ClCompile Include="MovedLines.cpp" />
+    <ClCompile Include="OpenDlg.cpp" />
+    <ClCompile Include="OptionsInit.cpp" />
+    <ClCompile Include="OptionsPanel.cpp" />
+    <ClCompile Include="PatchDlg.cpp" />
+    <ClCompile Include="PatchTool.cpp" />
+    <ClCompile Include="paths.cpp" />
+    <ClCompile Include="Common\PidlContainer.cpp" />
+    <ClCompile Include="Common\PreferencesDlg.cpp" />
+    <ClCompile Include="ProjectFile.cpp" />
+    <ClCompile Include="ProjectFilePathsDlg.cpp" />
+    <ClCompile Include="PropArchive.cpp" />
+    <ClCompile Include="PropBackups.cpp" />
+    <ClCompile Include="PropCodepage.cpp" />
+    <ClCompile Include="PropColors.cpp" />
+    <ClCompile Include="PropCompare.cpp" />
+    <ClCompile Include="PropCompareFolder.cpp" />
+    <ClCompile Include="PropEditor.cpp" />
+    <ClCompile Include="PropGeneral.cpp" />
+    <ClCompile Include="PropHexEditor.cpp" />
+    <ClCompile Include="PropListColors.cpp" />
+    <ClCompile Include="PropRegistry.cpp" />
+    <ClCompile Include="PropShell.cpp" />
+    <ClCompile Include="PropSyntaxColors.cpp" />
+    <ClCompile Include="PropTextColors.cpp" />
+    <ClCompile Include="PropVss.cpp" />
+    <ClCompile Include="RegExpItem.cpp" />
+    <ClCompile Include="Common\RegKey.cpp" />
+    <ClCompile Include="RunModal.cpp" />
+    <ClCompile Include="SaveClosingDlg.cpp" />
+    <ClCompile Include="Common\SettingStore.cpp" />
+    <ClCompile Include="SharedFilterDlg.cpp" />
+    <ClCompile Include="Common\ShellContextMenu.cpp" />
+    <ClCompile Include="Common\ShellFileOperations.cpp" />
+    <ClCompile Include="Common\SortHeaderCtrl.cpp" />
+    <ClCompile Include="SourceControl.cpp" />
+    <ClCompile Include="Splash.cpp" />
+    <ClCompile Include="Common\SplitState.cpp" />
+    <ClCompile Include="StdAfx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Common\stream_util.cpp" />
+    <ClCompile Include="Common\string_util.cpp" />
+    <ClCompile Include="stringdiffs.cpp" />
+    <ClCompile Include="Common\SuperComboBox.cpp" />
+    <ClCompile Include="SyntaxColors.cpp" />
+    <ClCompile Include="TestFilterDlg.cpp" />
+    <ClCompile Include="Common\unicoder.cpp" />
+    <ClCompile Include="Common\UnicodeString.cpp" />
+    <ClCompile Include="Common\UniFile.cpp" />
+    <ClCompile Include="UniMarkdownFile.cpp" />
+    <ClCompile Include="Common\Utf8FileDetect.cpp" />
+    <ClCompile Include="Common\version.cpp" />
+    <ClCompile Include="VSSHelper.cpp" />
+    <ClCompile Include="VssPrompt.cpp" />
+    <ClCompile Include="WaitStatusCursor.cpp" />
+    <ClCompile Include="Common\WindowPlacement.cpp" />
+    <ClCompile Include="WMGotoDlg.cpp" />
+    <ClCompile Include="editlib\asp.cpp" />
+    <ClCompile Include="editlib\basic.cpp" />
+    <ClCompile Include="editlib\batch.cpp" />
+    <ClCompile Include="editlib\ccrystaleditview.cpp" />
+    <ClCompile Include="editlib\ccrystaltextbuffer.cpp" />
+    <ClCompile Include="editlib\ccrystaltextview.cpp" />
+    <ClCompile Include="editlib\ccrystaltextview2.cpp" />
+    <ClCompile Include="editlib\ceditreplacedlg.cpp" />
+    <ClCompile Include="editlib\cfindtextdlg.cpp" />
+    <ClCompile Include="editlib\cplusplus.cpp" />
+    <ClCompile Include="editlib\crystaleditviewex.cpp" />
+    <ClCompile Include="editlib\crystalparser.cpp" />
+    <ClCompile Include="editlib\crystaltextblock.cpp" />
+    <ClCompile Include="editlib\csharp.cpp" />
+    <ClCompile Include="editlib\css.cpp" />
+    <ClCompile Include="editlib\dcl.cpp" />
+    <ClCompile Include="editlib\fortran.cpp" />
+    <ClCompile Include="editlib\html.cpp" />
+    <ClCompile Include="editlib\ini.cpp" />
+    <ClCompile Include="editlib\innosetup.cpp" />
+    <ClCompile Include="editlib\is.cpp" />
+    <ClCompile Include="editlib\java.cpp" />
+    <ClCompile Include="editlib\LineInfo.cpp" />
+    <ClCompile Include="editlib\lisp.cpp" />
+    <ClCompile Include="editlib\nsis.cpp" />
+    <ClCompile Include="editlib\pascal.cpp" />
+    <ClCompile Include="editlib\perl.cpp" />
+    <ClCompile Include="editlib\php.cpp" />
+    <ClCompile Include="editlib\po.cpp" />
+    <ClCompile Include="editlib\powershell.cpp" />
+    <ClCompile Include="editlib\python.cpp" />
+    <ClCompile Include="editlib\rexx.cpp" />
+    <ClCompile Include="editlib\rsrc.cpp" />
+    <ClCompile Include="editlib\ruby.cpp" />
+    <ClCompile Include="editlib\sgml.cpp" />
+    <ClCompile Include="editlib\sh.cpp" />
+    <ClCompile Include="editlib\siod.cpp" />
+    <ClCompile Include="editlib\sql.cpp" />
+    <ClCompile Include="editlib\tcl.cpp" />
+    <ClCompile Include="editlib\tex.cpp" />
+    <ClCompile Include="editlib\UndoRecord.cpp" />
+    <ClCompile Include="editlib\verilog.cpp" />
+    <ClCompile Include="editlib\wcwidth.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="editlib\xml.cpp" />
+    <ClCompile Include="diffutils\src\analyze.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="diffutils\lib\CMPBUF.C">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="diffutils\src\CONTEXT.C">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="diffutils\src\Diff.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="diffutils\src\ED.C">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="diffutils\GnuVersion.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="diffutils\src\IFDEF.C">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="diffutils\src\IO.C">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="diffutils\src\NORMAL.C">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="diffutils\lib\REGEX.C">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="diffutils\src\SIDE.C">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="diffutils\src\UTIL.C">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="CompareEngines\ByteCompare.cpp" />
+    <ClCompile Include="CompareEngines\DiffUtils.cpp" />
+    <ClCompile Include="CompareEngines\TimeSizeCompare.cpp" />
+    <ClCompile Include="EASTL\src\allocator.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </PrecompiledHeader>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">true</ExcludedFromBuild>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="EASTL\src\assert.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="EASTL\src\fixed_pool.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </PrecompiledHeader>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">true</ExcludedFromBuild>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="EASTL\src\hashtable.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </PrecompiledHeader>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">true</ExcludedFromBuild>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="EASTL\src\red_black_tree.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="EASTL\src\string.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="system32\system32.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">$(VCInstallDir)crt\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Common\WindowPlacement.h" />
+    <ClInclude Include="7zCommon.h" />
+    <ClInclude Include="AboutDlg.h" />
+    <ClInclude Include="Common\Bitmap.h" />
+    <ClInclude Include="CCPrompt.h" />
+    <ClInclude Include="charsets.h" />
+    <ClInclude Include="ChildFrm.h" />
+    <ClInclude Include="CmdLineParser.h" />
+    <ClInclude Include="codepage.h" />
+    <ClInclude Include="codepage_detect.h" />
+    <ClInclude Include="CompareOptions.h" />
+    <ClInclude Include="CompareStatisticsDlg.h" />
+    <ClInclude Include="CompareStats.h" />
+    <ClInclude Include="ConfigLog.h" />
+    <ClInclude Include="ConfirmFolderCopyDlg.h" />
+    <ClInclude Include="ConflictFileParser.h" />
+    <ClInclude Include="ConsoleWindow.h" />
+    <ClInclude Include="Constants.h" />
+    <ClInclude Include="convert_utf\ConvertUTF.h" />
+    <ClInclude Include="Common\coretools.h" />
+    <ClInclude Include="Common\coretypes.h" />
+    <ClInclude Include="DiffContext.h" />
+    <ClInclude Include="DiffFileData.h" />
+    <ClInclude Include="DiffFileInfo.h" />
+    <ClInclude Include="DiffItem.h" />
+    <ClInclude Include="DiffItemList.h" />
+    <ClInclude Include="DiffList.h" />
+    <ClInclude Include="DiffTextBuffer.h" />
+    <ClInclude Include="DiffWrapper.h" />
+    <ClInclude Include="DirCmpReport.h" />
+    <ClInclude Include="DirCmpReportDlg.h" />
+    <ClInclude Include="DirColsDlg.h" />
+    <ClInclude Include="DirCompProgressDlg.h" />
+    <ClInclude Include="DirFrame.h" />
+    <ClInclude Include="DirItem.h" />
+    <ClInclude Include="DirReportTypes.h" />
+    <ClInclude Include="DirTravel.h" />
+    <ClInclude Include="DirView.h" />
+    <ClInclude Include="DirViewColItems.h" />
+    <ClInclude Include="Common\DllProxies.h" />
+    <ClInclude Include="dllver.h" />
+    <ClInclude Include="EditorFilepathBar.h" />
+    <ClInclude Include="Environment.h" />
+    <ClInclude Include="ExcelExport.h" />
+    <ClInclude Include="ExternalArchiveFormat.h" />
+    <ClInclude Include="FileActionScript.h" />
+    <ClInclude Include="FileFilter.h" />
+    <ClInclude Include="FileFilterHelper.h" />
+    <ClInclude Include="FileFilterMgr.h" />
+    <ClInclude Include="FileFiltersDlg.h" />
+    <ClInclude Include="FileLocation.h" />
+    <ClInclude Include="FileOrFolderSelect.h" />
+    <ClInclude Include="FileTextEncoding.h" />
+    <ClInclude Include="FileTextStats.h" />
+    <ClInclude Include="FileTransform.h" />
+    <ClInclude Include="FileVersion.h" />
+    <ClInclude Include="FilterCommentsManager.h" />
+    <ClInclude Include="FilterList.h" />
+    <ClInclude Include="Common\FloatState.h" />
+    <ClInclude Include="FolderCmp.h" />
+    <ClInclude Include="GhostTextBuffer.h" />
+    <ClInclude Include="GhostTextView.h" />
+    <ClInclude Include="GhostUndorecord.h" />
+    <ClInclude Include="Common\H2O.h" />
+    <ClInclude Include="Common\H2O2.h" />
+    <ClInclude Include="HexMergeFrm.h" />
+    <ClInclude Include="HexMergeView.h" />
+    <ClInclude Include="IntToIntMap.h" />
+    <ClInclude Include="IOptionsPanel.h" />
+    <ClInclude Include="Common\LanguageSelect.h" />
+    <ClInclude Include="LineFiltersDlg.h" />
+    <ClInclude Include="LineFiltersList.h" />
+    <ClInclude Include="ListEntry.h" />
+    <ClInclude Include="LoadSaveCodepageDlg.h" />
+    <ClInclude Include="locality.h" />
+    <ClInclude Include="LocationView.h" />
+    <ClInclude Include="Common\LogFile.h" />
+    <ClInclude Include="MainFrm.h" />
+    <ClInclude Include="markdown.h" />
+    <ClInclude Include="Merge.h" />
+    <ClInclude Include="MergeCmdLineInfo.h" />
+    <ClInclude Include="MergeDiffDetailView.h" />
+    <ClInclude Include="MergeEditView.h" />
+    <ClInclude Include="Common\MessageBoxDialog.h" />
+    <ClInclude Include="MovedLines.h" />
+    <ClInclude Include="Common\MyCom.h" />
+    <ClInclude Include="Common\ntdll.h" />
+    <ClInclude Include="OpenDlg.h" />
+    <ClInclude Include="OptionsDef.h" />
+    <ClInclude Include="Common\OptionsMgr.h" />
+    <ClInclude Include="OptionsPanel.h" />
+    <ClInclude Include="PatchDlg.h" />
+    <ClInclude Include="PatchTool.h" />
+    <ClInclude Include="paths.h" />
+    <ClInclude Include="Common\PidlContainer.h" />
+    <ClInclude Include="Common\PreferencesDlg.h" />
+    <ClInclude Include="ProjectFile.h" />
+    <ClInclude Include="ProjectFilePathsDlg.h" />
+    <ClInclude Include="PropArchive.h" />
+    <ClInclude Include="PropBackups.h" />
+    <ClInclude Include="PropCodepage.h" />
+    <ClInclude Include="PropColors.h" />
+    <ClInclude Include="PropCompare.h" />
+    <ClInclude Include="PropCompareFolder.h" />
+    <ClInclude Include="PropEditor.h" />
+    <ClInclude Include="PropGeneral.h" />
+    <ClInclude Include="PropHexEditor.h" />
+    <ClInclude Include="PropListColors.h" />
+    <ClInclude Include="PropRegistry.h" />
+    <ClInclude Include="PropShell.h" />
+    <ClInclude Include="PropSyntaxColors.h" />
+    <ClInclude Include="PropTextColors.h" />
+    <ClInclude Include="PropVss.h" />
+    <ClInclude Include="RegExpItem.h" />
+    <ClInclude Include="Common\RegKey.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="RunModal.h" />
+    <ClInclude Include="SaveClosingDlg.h" />
+    <ClInclude Include="scriptable.h" />
+    <ClInclude Include="ScriptItem.h" />
+    <ClInclude Include="Common\SettingStore.h" />
+    <ClInclude Include="SharedFilterDlg.h" />
+    <ClInclude Include="Common\ShellContextMenu.h" />
+    <ClInclude Include="Common\ShellFileOperations.h" />
+    <ClInclude Include="Common\SortHeaderCtrl.h" />
+    <ClInclude Include="Splash.h" />
+    <ClInclude Include="Common\SplitState.h" />
+    <ClInclude Include="StdAfx.h" />
+    <ClInclude Include="Common\stream_util.h" />
+    <ClInclude Include="Common\string_util.h" />
+    <ClInclude Include="stringdiffs.h" />
+    <ClInclude Include="stringdiffsi.h" />
+    <ClInclude Include="Common\SuperComboBox.h" />
+    <ClInclude Include="SyntaxColors.h" />
+    <ClInclude Include="TestFilterDlg.h" />
+    <ClInclude Include="Common\unicoder.h" />
+    <ClInclude Include="Common\UnicodeString.h" />
+    <ClInclude Include="Common\UniFile.h" />
+    <ClInclude Include="UniMarkdownFile.h" />
+    <ClInclude Include="Common\Utf8FileDetect.h" />
+    <ClInclude Include="Common\version.h" />
+    <ClInclude Include="ViewableWhitespace.h" />
+    <ClInclude Include="VSSHelper.h" />
+    <ClInclude Include="VssPrompt.h" />
+    <ClInclude Include="WaitStatusCursor.h" />
+    <ClInclude Include="WMGotoDlg.h" />
+    <ClInclude Include="editlib\ccrystaleditview.h" />
+    <ClInclude Include="editlib\ccrystaltextbuffer.h" />
+    <ClInclude Include="editlib\ccrystaltextview.h" />
+    <ClInclude Include="editlib\ceditreplacedlg.h" />
+    <ClInclude Include="editlib\cfindtextdlg.h" />
+    <ClInclude Include="editlib\crystaleditviewex.h" />
+    <ClInclude Include="editlib\crystalparser.h" />
+    <ClInclude Include="editlib\crystaltextblock.h" />
+    <ClInclude Include="editlib\editcmd.h" />
+    <ClInclude Include="editlib\edtlib.h" />
+    <ClInclude Include="editlib\LineInfo.h" />
+    <ClInclude Include="editlib\UndoRecord.h" />
+    <ClInclude Include="editlib\wcwidth.h" />
+    <ClInclude Include="diffutils\lib\CMPBUF.H" />
+    <ClInclude Include="diffutils\CONFIG.H" />
+    <ClInclude Include="diffutils\src\DIFF.H" />
+    <ClInclude Include="diffutils\lib\REGEX.H" />
+    <ClInclude Include="diffutils\src\SYSTEM.H" />
+    <ClInclude Include="CompareEngines\ByteCompare.h" />
+    <ClInclude Include="CompareEngines\DiffUtils.h" />
+    <ClInclude Include="CompareEngines\TimeSizeCompare.h" />
+    <ClInclude Include="system32\system32.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Midl Include="WinMerge.idl" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="version.rh">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\Setup\setup.wsf version "%(FullPath)" $(Platform)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)Setup_$(Platform).cfg;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Setup\setup.wsf version "%(FullPath)" $(Platform)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)Setup_$(Platform).cfg;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\Setup\setup.wsf version "%(FullPath)" $(Platform)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)Setup_$(Platform).cfg;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Setup\setup.wsf version "%(FullPath)" $(Platform)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)Setup_$(Platform).cfg;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">..\Setup\setup.wsf version "%(FullPath)" $(Platform)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">$(SolutionDir)Setup_$(Platform).cfg;%(Outputs)</Outputs>
+    </CustomBuild>
+    <None Include="res\binarydiff.ico" />
+    <None Include="res\both.bmp" />
+    <None Include="res\equalbinary.ico" />
+    <None Include="res\equalfile.ico" />
+    <None Include="res\error.ico" />
+    <None Include="res\fileskip.ico" />
+    <None Include="res\folder.ico" />
+    <None Include="res\folderskip.ico" />
+    <None Include="res\folderup.ico" />
+    <None Include="res\folderup_disable.ico" />
+    <None Include="res\hand.cur" />
+    <None Include="res\left.bmp" />
+    <None Include="res\left_to_browse.bmp" />
+    <None Include="res\left_to_right.bmp" />
+    <None Include="res\lfile.ico" />
+    <None Include="res\lfolder.ico" />
+    <None Include="res\Merge.ico" />
+    <None Include="res\MergeDir.ico" />
+    <None Include="res\MergeDoc.ico" />
+    <None Include="res\MergeProject.ico" />
+    <None Include="res\mg_cur.cur" />
+    <None Include="res\move_left_to_browse.bmp" />
+    <None Include="res\move_right_to_browse.bmp" />
+    <None Include="res\notequalfile.ico" />
+    <None Include="res\rfile.ico" />
+    <None Include="res\rfolder.ico" />
+    <None Include="res\right.bmp" />
+    <None Include="res\right_to_browse.bmp" />
+    <None Include="res\right_to_left.bmp" />
+    <None Include="res\sigma.ico" />
+    <None Include="CHANGELO" />
+    <None Include="..\Docs\Users\ChangeLog.txt" />
+    <None Include="..\Translations\WinMerge\BuildMergeLangDll.bat" />
+    <None Include="..\Translations\WinMerge\CreateMasterPotFile.vbs" />
+    <None Include="..\Translations\WinMerge\GetTranslationsStatus.vbs" />
+    <None Include="PostBuild.bat" />
+    <None Include="SetResourceVersions.bat" />
+    <None Include="..\Translations\WinMerge\UpdatePoFilesFromPotFile.vbs" />
+    <setup Include="..\Docs\Users\Contributors.txt" />
+    <setup Include="..\Setup\CreateLaunchScript.sh">
+      <FileType>Document</FileType>
+    </setup>
+    <docs Include="..\Docs\Users\CHANGES">
+      <FileType>Document</FileType>
+    </docs>
+    <docs Include="COPYING">
+      <FileType>Document</FileType>
+    </docs>
+    <docs Include="..\Docs\Users\ReadMe.txt" />
+    <docs Include="..\Docs\Users\ReleaseNotes.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="res\Merge.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <po Include="..\Translations\WinMerge\basque.po" />
+    <po Include="..\Translations\WinMerge\Brazilian.po" />
+    <po Include="..\Translations\WinMerge\Bulgarian.po" />
+    <po Include="..\Translations\WinMerge\Catalan.po" />
+    <po Include="..\Translations\WinMerge\ChineseSimplified.po" />
+    <po Include="..\Translations\WinMerge\ChineseTraditional.po" />
+    <po Include="..\Translations\WinMerge\Croatian.po" />
+    <po Include="..\Translations\WinMerge\Czech.po" />
+    <po Include="..\Translations\WinMerge\Danish.po" />
+    <po Include="..\Translations\WinMerge\Dutch.po" />
+    <po Include="..\Translations\WinMerge\French.po" />
+    <po Include="..\Translations\WinMerge\Galician.po" />
+    <po Include="..\Translations\WinMerge\German.po" />
+    <po Include="..\Translations\WinMerge\Greek.po" />
+    <po Include="..\Translations\WinMerge\Hungarian.po" />
+    <po Include="..\Translations\WinMerge\Italian.po" />
+    <po Include="..\Translations\WinMerge\Japanese.po" />
+    <po Include="..\Translations\WinMerge\Korean.po" />
+    <po Include="..\Translations\WinMerge\Norwegian.po" />
+    <po Include="..\Translations\WinMerge\Persian.po" />
+    <po Include="..\Translations\WinMerge\Polish.po" />
+    <po Include="..\Translations\WinMerge\Portuguese.po" />
+    <po Include="..\Translations\WinMerge\Romanian.po" />
+    <po Include="..\Translations\WinMerge\Russian.po" />
+    <po Include="..\Translations\WinMerge\Serbian.po" />
+    <po Include="..\Translations\WinMerge\Slovak.po" />
+    <po Include="..\Translations\WinMerge\Slovenian.po" />
+    <po Include="..\Translations\WinMerge\Spanish.po" />
+    <po Include="..\Translations\WinMerge\Swedish.po" />
+    <po Include="..\Translations\WinMerge\Turkish.po" />
+    <po Include="..\Translations\WinMerge\Ukrainian.po" />
+  </ItemGroup>
+  <ItemGroup>
+    <flt Include="..\Filters\ADAMulti.flt" />
+    <flt Include="..\Filters\ASPNET.flt" />
+    <flt Include="..\Filters\CSharp_loose.flt" />
+    <flt Include="..\Filters\Delphi.flt" />
+    <flt Include="..\Filters\FileFilter.tmpl" />
+    <flt Include="..\Filters\MASM.flt" />
+    <flt Include="..\Filters\Merge_GnuC_loose.flt" />
+    <flt Include="..\Filters\Merge_VB_loose.flt" />
+    <flt Include="..\Filters\Merge_VC_loose.flt" />
+    <flt Include="..\Filters\SourceControl.flt" />
+    <flt Include="..\Filters\Symbian.flt" />
+    <flt Include="..\Filters\XML_html.flt" />
+  </ItemGroup>
+  <ItemGroup>
+    <setup Include="..\Setup\GenerateHTMLReport.WinMerge" />
+    <setup Include="..\setup\setup.wsf" />
+  </ItemGroup>
+  <ItemGroup>
+    <imp Include="system32\system32.imp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </imp>
+    <imp Include="Common\ntdll.imp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </imp>
+  </ItemGroup>
+  <ItemGroup>
+    <PrintTemplate Include="..\PrintTemplates\MergeDocPrintTemplate.html.PrintTemplate" />
+  </ItemGroup>
+  <ItemGroup>
+    <FileTransform Include="..\FileTransforms\LinesNumbered.wsc.FileTransform" />
+    <FileTransform Include="..\FileTransforms\LinesSorted.wsc.FileTransform" />
+    <FileTransform Include="..\FileTransforms\MediaInfo.wsc.FileTransform" />
+    <FileTransform Include="..\FileTransforms\msxml.wsc.FileTransform" />
+    <FileTransform Include="..\FileTransforms\msxml-sort.xslt.FileTransform" />
+    <FileTransform Include="..\FileTransforms\xdoc2txt.wsc.FileTransform" />
+  </ItemGroup>
+  <ItemGroup>
+    <PluginMoniker Include="..\Translations\PluginMonikers\English.ini.PluginMoniker" />
+    <PluginMoniker Include="..\Translations\PluginMonikers\German.ini.PluginMoniker" />
+    <PluginMoniker Include="..\Translations\PluginMonikers\Portuguese.ini.PluginMoniker" />
+  </ItemGroup>
+  <ItemGroup>
+    <EditorScript Include="..\EditorScripts\Basic.wsc.EditorScript" />
+    <EditorScript Include="..\EditorScripts\ExecFilterCommand.wsc.EditorScript" />
+    <EditorScript Include="..\EditorScripts\SortLines.wsc.EditorScript" />
+    <EditorScript Include="..\EditorScripts\Tabify.wsc.EditorScript" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Externals\pcre\Win32\pcre.vcxproj">
+      <Project>{f7e6a782-1c15-46e3-b645-922494b9f146}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="Merge.targets" />
+  </ImportGroup>
+</Project>

@@ -1,4 +1,4 @@
-@echo off
+@echo on
 
 if not exist %1 rem: goto :usage
 if not exist %2 rem: goto :usage
@@ -20,8 +20,9 @@ REM Create MergeLang.dll from MergeLang.rc
 rc /fo%~1\MergeLang.res /i..\..\Src MergeLang.rc
 link /DLL /NOENTRY /MACHINE:IX86 /OUT:%~2\MergeLang.dll %~1\MergeLang.res
 
-REM Invoke WinMergeU.exe to create a WinMergeU.dat which is usable for everyone
-%~2\WinMergeU.exe /noninteractive /minimize /reghive "%~2\..\..\WinMergeU.dat"
+REM Create a WinMergeU.dat which is usable for everyone
+del "%~2\..\..\WinMergeU.dat"
+reg save HKEY_CLASSES_ROOT\.WinMerge "%~2\..\..\WinMergeU.dat"
 exit
 
 :usage
