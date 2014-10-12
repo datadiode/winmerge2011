@@ -1065,7 +1065,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 1
     RTEXT           "&Compare As:", IDC_STATIC, 13, 56, 65, 8, NOT WS_VISIBLE | SS_RIGHT
     COMBOBOX        IDC_COMPARE_AS_COMBO, 81, 54, 167, 150, NOT WS_VISIBLE | WS_TABSTOP | WS_VSCROLL | CBS_DROPDOWNLIST
     AUTOCHECKBOX    "By Default", IDC_COMPARE_AS_CHECK, 252, 56, 50, 10, WS_GROUP
-    AUTO3STATE      "&Include Subfolders\tInclude Subfolders but ignore folder structure", IDC_RECURS_CHECK, 81, 86, 225, 10, WS_GROUP | NOT WS_TABSTOP
+    AUTO3STATE      "&Include Subfolders\tInclude Subfolders but ignore folder structure", IDC_RECURS_CHECK, 81, 86, 225, 10, WS_GROUP
     LTEXT           "Status:", IDC_OPEN_STATUS, 15, 102, 284, 8, SS_LEFT
     GROUPBOX        "SQL Query Parameters", IDC_SQL_QUERY_PARAMS_GROUP, 7, 125, 302, 129, WS_GROUP, WS_EX_TRANSPARENT
     RTEXT           "", IDC_SQL_QUERY_PARAM_1_NAME, 13, 154, 65, 8, SS_RIGHT
