@@ -3044,9 +3044,9 @@ void CMainFrame::OnFileOpenProject()
  */
 bool CMainFrame::ParseArgsAndDoOpen(const MergeCmdLineInfo &cmdInfo)
 {
-	if (cmdInfo.m_nCmdShow != SW_SHOWMINNOACTIVE && GetForegroundWindow() != m_hWnd)
+	if (cmdInfo.m_nCmdShow != SW_SHOWMINNOACTIVE && !SetForegroundWindow())
 	{
-		// Move to foreground
+		// Force to foreground
 		ShowWindow(SW_MINIMIZE);
 		WINDOWPLACEMENT wp;
 		wp.length = sizeof wp;
