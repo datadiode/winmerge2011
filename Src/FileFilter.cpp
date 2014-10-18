@@ -386,6 +386,16 @@ bool FileFilter::Load()
 			else if (PathMatchSpec(psz, _T("1;yes;include")))
 				default_include = true;
 		}
+		else if (LPCTSTR psz = EatPrefixTrim(sLine.c_str(), _T("sqlopt-left:")))
+		{
+			// activates SQL clause on left side
+			sqlopt[0] = static_cast<BYTE>(_ttol(psz));
+		}
+		else if (LPCTSTR psz = EatPrefixTrim(sLine.c_str(), _T("sqlopt-right:")))
+		{
+			// activates SQL clause on right side
+			sqlopt[1] = static_cast<BYTE>(_ttol(psz));
+		}
 		else if (LPCTSTR psz = EatPrefixTrim(sLine.c_str(), _T("f:")))
 		{
 			// file filter

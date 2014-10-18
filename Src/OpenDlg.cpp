@@ -886,6 +886,16 @@ void COpenDlg::OnSelchangeFilter()
 	m_currentFilter = filter;
 	InjectParameterValues();
 	EnableParameterInput();
+	int side = 0;
+	do
+	{
+		if (IsDlgButtonChecked(IDC_SQL_QUERY_PARAMS_LEFT + side) == BST_INDETERMINATE)
+		{
+			BSTR bstr = m_currentFilter->composeSql(side);
+			SetDlgItemText(IDC_SQL_QUERY_FILTER_LEFT + side, bstr);
+			SysFreeString(bstr);
+		}
+	} while (side ^= 1);
 	RECT rc;
 	HWindow *const pGroup = GetDlgItem(IDC_SQL_QUERY_PARAMS_GROUP);
 	pGroup->GetWindowRect(&rc);
