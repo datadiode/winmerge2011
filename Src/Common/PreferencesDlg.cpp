@@ -7,9 +7,6 @@
  * (http://www.abstractspoon.com/) but is modified to use in
  * WinMerge.
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "resource.h"
 #include "SyntaxColors.h"
@@ -33,8 +30,6 @@ static const TCHAR OptionsHelpLocation[] = _T("::/htmlhelp/Configuration.html");
 
 /////////////////////////////////////////////////////////////////////////////
 // CPreferencesDlg dialog
-
-const TCHAR PATHDELIM = '>';
 
 CPreferencesDlg::CPreferencesDlg()
 : ODialog(IDD_PREFERENCES)
@@ -306,11 +301,11 @@ void CPreferencesDlg::SaveOptions()
  */
 void CPreferencesDlg::OnImportButton()
 {
-	String s;
-	if (SelectFile(m_hWnd, s, IDS_OPT_IMPORT_CAPTION, IDS_INIFILES, TRUE))
+	String path;
+	if (SelectFile(m_hWnd, path, IDS_OPT_IMPORT_CAPTION, IDS_INIFILES, TRUE))
 	{
-		if (IOptionDef::ImportOptions(s.c_str()) == ERROR_SUCCESS &&
-			SyntaxColors.ImportOptions(s.c_str()) == ERROR_SUCCESS)
+		if (IOptionDef::ImportOptions(path.c_str()) == ERROR_SUCCESS &&
+			SyntaxColors.ImportOptions(path.c_str()) == ERROR_SUCCESS)
 		{
 			ReadOptions();
 			LanguageSelect.MsgBox(IDS_OPT_IMPORT_DONE, MB_ICONINFORMATION);
@@ -327,20 +322,12 @@ void CPreferencesDlg::OnImportButton()
  */
 void CPreferencesDlg::OnExportButton()
 {
-	String settingsFile;
-	if (SelectFile(m_hWnd, settingsFile, NULL, IDS_OPT_EXPORT_CAPTION, IDS_INIFILES,
-		FALSE))
+	String path;
+	if (SelectFile(m_hWnd, path, IDS_OPT_EXPORT_CAPTION, IDS_INIFILES, FALSE, _T("ini")))
 	{
-		// Add settings file extension if it is missing
-		// So we allow 'filename.otherext' but add extension for 'filename'
-		String extension;
-		if (PathFindExtension(settingsFile.c_str())[0] == _T('\0'))
-			settingsFile += _T(".ini");
-
 		SaveOptions();
-
-		if (IOptionDef::ExportOptions(settingsFile.c_str()) == ERROR_SUCCESS &&
-			SyntaxColors.ExportOptions(settingsFile.c_str()) == ERROR_SUCCESS)
+		if (IOptionDef::ExportOptions(path.c_str()) == ERROR_SUCCESS &&
+			SyntaxColors.ExportOptions(path.c_str()) == ERROR_SUCCESS)
 		{
 			LanguageSelect.MsgBox(IDS_OPT_EXPORT_DONE, MB_ICONINFORMATION);
 		}
