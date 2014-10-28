@@ -1759,7 +1759,7 @@ bool CMainFrame::DoFileOpen(
 	{
 		if (!COptionsMgr::Get(OPT_MULTIDOC_MERGEDOCS))
 		{
-			if (!pDirDoc->CloseMergeDocs())
+			if (pDirDoc && !pDirDoc->CloseMergeDocs())
 				return false;
 		}
 		LogFile.Write(CLogFile::LNOTICE, _T("Open files: Left: %s\n\tRight: %s."),
