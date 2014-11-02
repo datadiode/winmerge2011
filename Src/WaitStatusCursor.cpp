@@ -20,9 +20,6 @@
  *
  *  @brief Implementation of the WaitStatusCursur class.
  */ 
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "Merge.h"
 

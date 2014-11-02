@@ -3,9 +3,6 @@
  *
  * @brief Implementation file for some source control-related functions.
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include <initguid.h>
 #include "ssauto.h"

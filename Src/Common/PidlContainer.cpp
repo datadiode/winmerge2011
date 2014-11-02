@@ -23,9 +23,6 @@
  *
  * @brief Main implementation file for CPidlContainer
  */
-// Revision ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "PidlContainer.h"
 

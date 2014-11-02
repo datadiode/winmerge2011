@@ -8,8 +8,6 @@
  *  @brief Implementation of Unicode enabled file classes.
  *  Classes include memory-mapped reader class and Stdio replacement class.
  */
-// ID line follows -- this is updated by SVN
-// $Id$
 
 /* The MIT License
 Copyright (c) 2003 Perry Rapp

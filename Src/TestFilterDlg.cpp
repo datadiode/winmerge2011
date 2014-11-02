@@ -3,9 +3,6 @@
  *
  * @brief Dialog for testing file filters
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "LanguageSelect.h"
 #include "resource.h"

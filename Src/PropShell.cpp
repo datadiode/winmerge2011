@@ -4,9 +4,6 @@
  * @brief Implementation file for Shell Options dialog.
  *
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "OptionsPanel.h"
 #include "resource.h"

@@ -3,9 +3,6 @@
  *
  * @brief Implementation of PropTextColors propertysheet
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "OptionsPanel.h"
 #include "resource.h"

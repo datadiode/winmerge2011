@@ -3,9 +3,6 @@
  *
  * @brief ISequentialStream implementations which may be of some utility.
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "stdafx.h"
 #include "stream_util.h"
 

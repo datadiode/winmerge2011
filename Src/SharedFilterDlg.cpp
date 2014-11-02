@@ -3,9 +3,6 @@
  *
  * @brief Dialog where user choose shared or private filter
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "Merge.h"
 #include "LanguageSelect.h"

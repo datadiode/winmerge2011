@@ -19,9 +19,6 @@
  *
  * @brief Implementation of the WMGotoDlg dialog.
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "Merge.h"
 #include "LanguageSelect.h"

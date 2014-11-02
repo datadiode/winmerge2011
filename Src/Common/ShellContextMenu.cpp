@@ -23,9 +23,6 @@
  *
  * @brief Main implementation file for CShellContextMenu
  */
-// Revision ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "ShellContextMenu.h"
 

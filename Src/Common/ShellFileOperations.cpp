@@ -19,9 +19,6 @@
  *
  * @brief Implementation of ShellFileOperations class.
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "paths.h"
 #include "ShellFileOperations.h"

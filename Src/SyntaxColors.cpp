@@ -3,9 +3,6 @@
  *
  * @brief Implementation for SyntaxColors class.
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "SettingStore.h"
 #include "Common/RegKey.h"
