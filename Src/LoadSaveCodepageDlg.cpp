@@ -3,9 +3,6 @@
  *
  * @brief Implementation of the dialog used to select codepages
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "stdafx.h"
 #include "Merge.h"
 #include "LanguageSelect.h"

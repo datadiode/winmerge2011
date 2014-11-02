@@ -3,9 +3,6 @@
  *
  * @brief Declaration file for path routines
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #ifndef paths_h_included
 #define paths_h_included
 

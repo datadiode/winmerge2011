@@ -770,7 +770,7 @@ int CCrystalTextView::GetCharWidthFromChar(LPCTSTR pch)
 		{
 			ch = '?';
 		}
-    }
+	}
 	/*if (ch >= UNI_SUR_MIN && ch <= UNI_SUR_MAX)
 		return 5;*/
 	// This assumes a fixed width font

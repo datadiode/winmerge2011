@@ -19,9 +19,6 @@
  *
  * @brief Declaration file for DiffList class
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #ifndef _DIFFLIST_H_
 #define _DIFFLIST_H_
 

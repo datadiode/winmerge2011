@@ -3,9 +3,6 @@
  *
  * @brief Path handling routines
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "paths.h"
 #include "Common/coretools.h"

@@ -4,9 +4,6 @@
  * @brief Implementation file for CDiffTextBuffer
  *
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "UniFile.h"
 #include "locality.h"
