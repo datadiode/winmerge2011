@@ -60,8 +60,8 @@ struct FileFilter
 	BSTR getSql(int side);
 	BSTR composeSql(int side);
 	// methods to actually use filter
-	bool TestFileNameAgainstFilter(LPCTSTR szFileName) const;
-	bool TestDirNameAgainstFilter(LPCTSTR szDirName) const;
+	bool TestFileNameAgainstFilter(LPCTSTR szPath, LPCTSTR szFileName) const;
+	bool TestDirNameAgainstFilter(LPCTSTR szPath, LPCTSTR szDirName) const;
 	static stl_size_t ApplyPrefilterRegExps(const stl::vector<regexp_item> &, char *dst, const char *src, stl_size_t len);
 	bool Load();
 
@@ -70,6 +70,6 @@ protected:
 	virtual bool CreateFromMask() { return false; }
 
 private:
-	static bool TestAgainstRegList(const stl::vector<regexp_item> &, LPCTSTR);
+	static int TestAgainstRegList(const stl::vector<regexp_item> &, LPCTSTR, LPCTSTR);
 	static void EmptyFilterList(stl::vector<regexp_item> &);
 };

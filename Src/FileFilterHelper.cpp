@@ -200,9 +200,9 @@ BSTR FileFilterHelper::getSql(int side)
  * @param [in] szFileName Filename to test.
  * @return TRUE unless we're suppressing this file by filter
  */
-bool FileFilterHelper::includeFile(LPCTSTR szFileName)
+bool FileFilterHelper::includeFile(LPCTSTR szPath, LPCTSTR szFileName)
 {
-	return m_currentFilter->TestFileNameAgainstFilter(szFileName);
+	return m_currentFilter->TestFileNameAgainstFilter(szPath, szFileName);
 }
 
 /**
@@ -211,12 +211,9 @@ bool FileFilterHelper::includeFile(LPCTSTR szFileName)
  * @param [in] szFileName Directoryname to test.
  * @return TRUE unless we're suppressing this directory by filter
  */
-bool FileFilterHelper::includeDir(LPCTSTR szDirName)
+bool FileFilterHelper::includeDir(LPCTSTR szPath, LPCTSTR szDirName)
 {
-	// Prepend a backslash
-	String strDirName(_T("\\"));
-	strDirName += szDirName;
-	return m_currentFilter->TestDirNameAgainstFilter(strDirName.c_str());
+	return m_currentFilter->TestDirNameAgainstFilter(szPath, szDirName);
 }
 
 int FileFilterHelper::collateFile(LPCTSTR p, LPCTSTR q)

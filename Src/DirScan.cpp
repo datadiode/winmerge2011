@@ -109,7 +109,7 @@ int CDiffContext::DirScan_GetItems(
 					// Recurse into unique subfolder and get all items in it
 					String leftnewsub = leftsubprefix + leftDirs[i].filename;
 					String rightnewsub = rightsubprefix + leftDirs[i].filename;
-					if (!m_piFilterGlobal->includeDir(leftnewsub.c_str(), _T("")))
+					if (!m_piFilterGlobal->includeDir(_T(""), leftnewsub.c_str(), _T(""), _T("")))
 					{
 						nDiffCode |= DIFFCODE::SKIPPED;
 						AddToList(leftsubdir, rightsubdir, &leftDirs[i], NULL, nDiffCode, parent);
@@ -140,7 +140,7 @@ int CDiffContext::DirScan_GetItems(
 					// Recurse into unique subfolder and get all items in it
 					String leftnewsub = leftsubprefix + rightDirs[j].filename;
 					String rightnewsub = rightsubprefix + rightDirs[j].filename;
-					if (!m_piFilterGlobal->includeDir(_T(""), rightnewsub.c_str()))
+					if (!m_piFilterGlobal->includeDir(_T(""), _T(""), _T(""), rightnewsub.c_str()))
 					{
 						nDiffCode |= DIFFCODE::SKIPPED;
 						AddToList(leftsubdir, rightsubdir, NULL, &rightDirs[j], nDiffCode, parent);
@@ -182,7 +182,7 @@ int CDiffContext::DirScan_GetItems(
 				String rightnewsub = rightsubprefix + rightDirs[j].filename;
 				// Test against filter so we don't include contents of filtered out directories
 				// Also this is only place we can test for both-sides directories in recursive compare
-				if (!m_piFilterGlobal->includeDir(leftnewsub.c_str(), rightnewsub.c_str()))
+				if (!m_piFilterGlobal->includeDir(_T(""), leftnewsub.c_str(), _T(""), rightnewsub.c_str()))
 				{
 					const UINT nDiffCode = DIFFCODE::BOTH | DIFFCODE::DIR | DIFFCODE::SKIPPED;
 					AddToList(leftsubdir, rightsubdir, &leftDirs[i], &rightDirs[j], nDiffCode, parent);
@@ -400,7 +400,8 @@ void CDiffContext::CompareDiffItem(FolderCmp &fc, DIFFITEM *di)
 	{
 		// 1. Test against filters
 		const UINT flag = !m_piFilterGlobal->includeDir(
-			di->left.filename.c_str(), di->right.filename.c_str()) ?
+			di->left.path.c_str(), di->left.filename.c_str(),
+			di->right.path.c_str(), di->right.filename.c_str()) ?
 			DIFFCODE::SKIPPED : m_nRecursive != 0 && di->isSideBoth() ?
 			DIFFCODE::INCLUDED | DIFFCODE::SAME : DIFFCODE::INCLUDED;
 		EnterCriticalSection(&m_csCompareThread);
@@ -412,7 +413,9 @@ void CDiffContext::CompareDiffItem(FolderCmp &fc, DIFFITEM *di)
 	else
 	{
 		// 1. Test against filters
-		if (m_piFilterGlobal->includeFile(di->left.filename.c_str(), di->right.filename.c_str()))
+		if (m_piFilterGlobal->includeFile(
+			di->left.path.c_str(), di->left.filename.c_str(),
+			di->right.path.c_str(), di->right.filename.c_str()))
 		{
 			di->diffcode |= DIFFCODE::INCLUDED;
 			// 2. Compare two files

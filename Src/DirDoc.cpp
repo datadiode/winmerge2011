@@ -24,10 +24,6 @@
  * @brief Implementation file for CDirDoc
  *
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-//
-
 #include "StdAfx.h"
 #include "Merge.h"
 #include "ChildFrm.h"
@@ -305,7 +301,7 @@ CDirFrame::AllowUpwardDirectory(String &leftParent, String &rightParent)
 			}
 			leftParent = m_pTempPathContext->m_strLeftDisplayRoot;
 			rightParent = m_pTempPathContext->m_strRightDisplayRoot;
-			if (!m_pCtxt->m_piFilterGlobal->includeFile(leftParent.c_str(), rightParent.c_str()))
+			if (!m_pCtxt->m_piFilterGlobal->includeFile(_T(""), leftParent.c_str(), _T(""), rightParent.c_str()))
 				return AllowUpwardDirectory::Never;
 			if (lstrcmpi(lname, _T("ORIGINAL\\")) == 0 && lstrcmpi(rname, _T("ALTERED\\")) == 0)
 			{

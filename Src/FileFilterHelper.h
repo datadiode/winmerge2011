@@ -39,8 +39,8 @@ private:
 	const static bool casesensitive = false;
 public:
 	virtual BSTR getSql(int side) { return NULL; }
-	virtual bool includeFile(LPCTSTR szFileName) { return true; }
-	virtual bool includeDir(LPCTSTR szDirName) { return true; }
+	virtual bool includeFile(LPCTSTR szPath, LPCTSTR szFileName) { return true; }
+	virtual bool includeDir(LPCTSTR szPath, LPCTSTR szDirName) { return true; }
 	virtual bool isCaseSensitive() { return casesensitive; }
 	// Compare (NLS aware) two filenames, potentially ignoring character case
 	virtual int collateFile(LPCTSTR szFileName1, LPCTSTR szFileName2)
@@ -52,20 +52,20 @@ public:
 	{
 		return (casesensitive ? _tcscoll : _tcsicoll)(szDirName1, szDirName2);
 	}
-	bool includeFile(LPCTSTR szFileName1, LPCTSTR szFileName2)
+	bool includeFile(LPCTSTR szPath1, LPCTSTR szFileName1, LPCTSTR szPath2, LPCTSTR szFileName2)
 	{
 		return
 		(
-			(szFileName1[0] == '\0' || includeFile(szFileName1))
-		&&	(szFileName2[0] == '\0' || includeFile(szFileName2))
+			(szFileName1[0] == '\0' || includeFile(szPath1, szFileName1))
+		&&	(szFileName2[0] == '\0' || includeFile(szPath2, szFileName2))
 		);
 	}
-	bool includeDir(LPCTSTR szDirName1, LPCTSTR szDirName2)
+	bool includeDir(LPCTSTR szPath1, LPCTSTR szDirName1, LPCTSTR szPath2, LPCTSTR szDirName2)
 	{
 		return
 		(
-			(szDirName1[0] == '\0' || includeDir(szDirName1))
-		&&	(szDirName2[0] == '\0' || includeDir(szDirName2))
+			(szDirName1[0] == '\0' || includeDir(szPath1, szDirName1))
+		&&	(szDirName2[0] == '\0' || includeDir(szPath2, szDirName2))
 		);
 	}
 } transparentFileFilter;
@@ -113,8 +113,8 @@ public:
 
 	// Overrides
 	virtual BSTR getSql(int);
-	virtual bool includeFile(LPCTSTR);
-	virtual bool includeDir(LPCTSTR);
+	virtual bool includeFile(LPCTSTR, LPCTSTR);
+	virtual bool includeDir(LPCTSTR, LPCTSTR);
 	virtual int collateFile(LPCTSTR, LPCTSTR);
 	virtual int collateDir(LPCTSTR, LPCTSTR);
 

@@ -16,6 +16,7 @@ struct regexp_item
 	int options;
 	bool global;
 	bool permutive;
+	bool backslash;
 
 	regexp_item()
 		: filterString(NULL)
@@ -26,6 +27,7 @@ struct regexp_item
 		, options(0)
 		, global(false)
 		, permutive(false)
+		, backslash(false)
 	{
 	}
 	const char *assign(LPCTSTR pch, int cch);

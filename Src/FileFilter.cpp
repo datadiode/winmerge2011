@@ -46,6 +46,7 @@ static void AddFilterPattern(vector<regexp_item> &filterList, LPCTSTR psz)
 		pcre_extra *pe = pcre_study(regexp, 0, &errormsg);
 		elem.pRegExp = regexp;
 		elem.pRegExpExtra = pe;
+		elem.backslash = strstr(regexString.A, "\\\\") != NULL;
 		filterList.push_back(elem);
 	}
 }
@@ -180,26 +181,68 @@ BSTR FileFilter::composeSql(int side)
  *
  * @param [in] filterList List of regexps to test against.
  * @param [in] szTest String to test against regexps.
- * @return TRUE if string passes
+ * @return >= 0 if string passes
  * @note Matching stops when first match is found.
  */
-bool FileFilter::TestAgainstRegList(const vector<regexp_item> &filterList, LPCTSTR szTest)
+int FileFilter::TestAgainstRegList(const vector<regexp_item> &filterList, LPCTSTR szPath, LPCTSTR szName)
 {
-	const OString compString = HString::Uni(szTest)->Oct(CP_UTF8);
+	ASSERT(!filterList.empty());
+	const char *pathString = NULL;
+	UINT pathLength = 0; 
+	const char *nameString = NULL;
+	UINT nameLength = 0;
+	const UINT lenName = static_cast<UINT>(_tcslen(szName));
+	OString compString = HString::Uni(NULL, lenName + 1);
+	if (LPWSTR pwc = compString.W)
+	{
+		*pwc++ = L'\\';
+		wmemcpy(pwc, szName, lenName);
+		compString.m_pStr = compString.m_pStr->Oct(CP_UTF8);
+		if (compString.m_pStr)
+		{
+			nameString = compString.A + 1;
+			nameLength = compString.ByteLen() - 1;
+		}
+	}
 	int result = -1;
 	vector<regexp_item>::const_iterator iter = filterList.begin();
-	while (iter != filterList.end())
+	do
 	{
-		pcre *regexp = iter->pRegExp;
-		pcre_extra *extra = iter->pRegExpExtra;
 		int ovector[30];
-		result = pcre_exec(regexp, extra, compString.A, compString.ByteLen(),
-			0, 0, ovector, 30);
-		if (result >= 0)
-			break;
-		++iter;
-	}
-	return result >= 0;
+		if (iter->backslash)
+		{
+			if (pathString == NULL)
+			{
+				if (const UINT lenPath = static_cast<UINT>(_tcslen(szPath)))
+				{
+					compString.Free();
+					compString.m_pStr = HString::Uni(NULL, lenPath + lenName + 2);
+					if (LPWSTR pwc = compString.W)
+					{
+						*pwc++ = L'\\';
+						wmemcpy(pwc, szPath, lenPath);
+						pwc += lenPath;
+						*pwc++ = L'\\';
+						wmemcpy(pwc, szName, lenName);
+						compString.m_pStr = compString.m_pStr->Oct(CP_UTF8);
+					}
+					else
+					{
+						nameLength = 0;
+					}
+				}
+				pathString = compString.A;
+				pathLength = compString.ByteLen();
+				nameString = pathString + pathLength - nameLength;
+			}
+			result = iter->execute(pathString, pathLength, 0, 0, ovector, _countof(ovector));
+		}
+		else
+		{
+			result = iter->execute(nameString, nameLength, 0, 0, ovector, _countof(ovector));
+		}
+	} while ((result < 0) && (++iter != filterList.end()));
+	return result;
 }
 
 /**
@@ -213,10 +256,10 @@ bool FileFilter::TestAgainstRegList(const vector<regexp_item> &filterList, LPCTS
  * @param [in] szFileName Filename to test
  * @return TRUE if file passes the filter
  */
-bool FileFilter::TestFileNameAgainstFilter(LPCTSTR szFileName) const
+bool FileFilter::TestFileNameAgainstFilter(LPCTSTR szPath, LPCTSTR szFileName) const
 {
-	return (filefilters.empty() || TestAgainstRegList(filefilters, szFileName))
-		&& (xfilefilters.empty() || !TestAgainstRegList(xfilefilters, szFileName));
+	return (filefilters.empty() || TestAgainstRegList(filefilters, szPath, szFileName) >= 0)
+		&& (xfilefilters.empty() || TestAgainstRegList(xfilefilters, szPath, szFileName) < 0);
 }
 
 /**
@@ -230,10 +273,10 @@ bool FileFilter::TestFileNameAgainstFilter(LPCTSTR szFileName) const
  * @param [in] szDirName Directory name to test
  * @return TRUE if directory name passes the filter
  */
-bool FileFilter::TestDirNameAgainstFilter(LPCTSTR szDirName) const
+bool FileFilter::TestDirNameAgainstFilter(LPCTSTR szPath, LPCTSTR szDirName) const
 {
-	return (dirfilters.empty() || TestAgainstRegList(dirfilters, szDirName))
-		&& (xdirfilters.empty() || !TestAgainstRegList(xdirfilters, szDirName));
+	return (dirfilters.empty() || TestAgainstRegList(dirfilters, szPath, szDirName) >= 0)
+		&& (xdirfilters.empty() || TestAgainstRegList(xdirfilters, szPath, szDirName) < 0);
 }
 
 stl_size_t FileFilter::ApplyPrefilterRegExps(const vector<regexp_item> &filterList, char *dst, const char *src, stl_size_t len)
