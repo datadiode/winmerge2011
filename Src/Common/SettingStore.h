@@ -59,6 +59,8 @@ public:
 private:
 	/// Handle to external registry hive if mounted
 	HKEY m_hHive;
+	/// Access permissions to request (either KEY_READ | KEY_WRITE or KEY_READ)
+	REGSAM m_regsam;
 	/// Mount name of external registry hive for Windows XP
 	String m_sXPMountName;
 	/// Company name in the registry key (under HKCU/Software).

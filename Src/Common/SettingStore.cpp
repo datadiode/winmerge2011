@@ -13,9 +13,25 @@
 #include "DllProxies.h"
 #include "TokenHelper.h"
 
+static BOOL IsProcessElevated()
+{
+	BOOL fRet = FALSE;
+	HANDLE hToken = NULL;
+	if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken))
+	{
+		TOKEN_ELEVATION Elevation;
+		DWORD cbSize = 0;
+		if (GetTokenInformation(hToken, TokenElevation, &Elevation, sizeof Elevation, &cbSize))
+			fRet = Elevation.TokenIsElevated;
+		CloseHandle(hToken);
+	}
+	return fRet;
+}
+
 CSettingStore::CSettingStore(LPCTSTR sCompanyName, LPCTSTR sApplicationName)
 {
 	m_hHive = HKEY_CURRENT_USER;
+	m_regsam = KEY_READ | KEY_WRITE;
 	// Store
 	m_sCompanyName = sCompanyName;
 	m_sApplicationName = sApplicationName;
@@ -198,7 +214,15 @@ BOOL CSettingStore::MountExternalHive(LPCTSTR sHive, LPCTSTR sXPMountName)
 	if (struct ADVAPI32V6 *ADVAPI32V6 = ::ADVAPI32V6)
 	{
 		// Vista or later: Use RegLoadAppKey() (fails on read-only files)
-		ADVAPI32V6->RegLoadAppKey(sHive, &hHive, KEY_ALL_ACCESS, 0, 0);
+		if (IsProcessElevated())
+		{
+			ADVAPI32V6->RegLoadAppKey(sHive, &hHive, KEY_ALL_ACCESS, 0, 0);
+		}
+		else if (ADVAPI32V6->RegLoadAppKey(sHive, &hHive, KEY_READ, 0, 0) == ERROR_SUCCESS)
+		{
+			// Don't try to gain KEY_WRITE access when doomed to fail
+			m_regsam = KEY_READ;
+		}
 	}
 	else
 	{
@@ -238,15 +262,15 @@ HKEY CSettingStore::GetAppRegistryKey() const
 	HKEY hSoftKey = NULL;
 	HKEY hCompanyKey = NULL;
 	if (RegCreateKeyEx(m_hHive, _T("Software"), 0, REG_NONE,
-		REG_OPTION_NON_VOLATILE, KEY_WRITE|KEY_READ, NULL,
+		REG_OPTION_NON_VOLATILE, m_regsam, NULL,
 		&hSoftKey, NULL) == ERROR_SUCCESS)
 	{
 		if (RegCreateKeyEx(hSoftKey, m_sCompanyName.c_str(), 0, REG_NONE,
-			REG_OPTION_NON_VOLATILE, KEY_WRITE|KEY_READ, NULL,
+			REG_OPTION_NON_VOLATILE, m_regsam, NULL,
 			&hCompanyKey, NULL) == ERROR_SUCCESS)
 		{
 			RegCreateKeyEx(hCompanyKey, m_sApplicationName.c_str(), 0, REG_NONE,
-				REG_OPTION_NON_VOLATILE, KEY_WRITE|KEY_READ, NULL,
+				REG_OPTION_NON_VOLATILE, m_regsam, NULL,
 				&hAppKey, NULL);
 		}
 	}
@@ -275,7 +299,7 @@ HKEY CSettingStore::GetSectionKey(LPCTSTR lpszSection, DWORD dwCreationDispositi
 		SHDeleteKey(hAppKey, lpszSection);
 
 	RegCreateKeyEx(hAppKey, lpszSection, 0, REG_NONE,
-		REG_OPTION_NON_VOLATILE, KEY_WRITE|KEY_READ, NULL,
+		REG_OPTION_NON_VOLATILE, m_regsam, NULL,
 		&hSectionKey, NULL);
 	RegCloseKey(hAppKey);
 	return hSectionKey;
