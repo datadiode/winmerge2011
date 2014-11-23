@@ -28,11 +28,14 @@ f: \.sbr$ ## VC source browser file (used to create bsc file)
 f: \.res$ ## VC compiled resources file (output of RC [resource compiler])
 f: \.suo$ ## VC options file (binary)
 f: \.ncb$ ## VC Intellisense file
+f: \.sdf$ ## VS Intellisense database (VS 2010 and later)
 f: \.opt$ ## VC project options file
 f: \.bak$ ## backup
 
+d: \\ipch$ ## VS Intellisense precompiled header directory
 d: \\cvs$ ## CVS control directory
-d: \\.svn$ ## Subversion control directory
+d: \\\.svn$ ## Subversion control directory
+d: \\\.hg$ ## Mercurial control directory
 
 ## Optional SQL filter
 WHERE

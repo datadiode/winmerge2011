@@ -26,6 +26,8 @@ f: \.a$     ## library file
 f: \.s$
 
 d: \\cvs$   ## cvs repository files
+d: \\\.svn$ ## Subversion control directory
+d: \\\.hg$  ## Mercurial control directory
 d: \\obj$   ## object file directory
 d: \\objs$  ## object file directory
 

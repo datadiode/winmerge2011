@@ -25,7 +25,8 @@ f: \.xfrm ## ??
 f: \.bak$ ## backup
 
 d: \\cvs$ ## CVS control directory
-d: \\.svn$ ## Subversion control directory
+d: \\\.svn$ ## Subversion control directory
+d: \\\.hg$ ## Mercurial control directory
 
 ## Optional SQL filter
 WHERE

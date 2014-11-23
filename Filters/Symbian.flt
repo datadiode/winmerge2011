@@ -34,7 +34,8 @@ f: \.bak$ ## backup
 f: \ABLD.bat$ ## Bat file
 
 d: \\cvs$ ## CVS control directory
-d: \\.svn$ ## Subversion control directory
+d: \\\.svn$ ## Subversion control directory
+d: \\\.hg$ ## Mercurial control directory
 
 ## Optional SQL filter
 WHERE
