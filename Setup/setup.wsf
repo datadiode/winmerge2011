@@ -200,14 +200,13 @@ Option Explicit
 Const PROCESSOR_ARCHITECTURE_IA64 = 6
 Const PROCESSOR_ARCHITECTURE_AMD64 = 9
 
-Dim sh, fso, sha, env, explorer, version, argv, executable
+Dim sh, fso, sha, env, version, argv, executable
 Dim sProgFolder, sThisFolder, sMoveFolder
 
 Set sh = CreateObject("WScript.Shell")
 Set fso = CreateObject("Scripting.FileSystemObject")
 Set sha = CreateObject("Shell.Application")
 Set env = sh.Environment("Process")
-explorer = sh.ExpandEnvironmentStrings("%WINDIR%\explorer.exe")
 
 On Error Resume Next
 executable = sh.RegRead("HKLM\Software\Thingamahoochie\WinMerge\Executable")
@@ -225,8 +224,7 @@ If TypeName(Me) = "Object" Then
 			DeleteLink "AllUsersPrograms"
 			DeleteLink "QuickLaunch"
 			DeleteLink "ContextMenu"
-			' Terminate Explorer
-			sh.Run "wscript.exe /job:terminate_explorer """ & WScript.ScriptFullName & """", 1, True
+			RestartExplorer
 			On Error Resume Next
 			sh.RegDelete "HKCR\.WinMerge\"
 			sh.RegDelete "HKCR\WinMerge.Project.File\DefaultIcon\"
@@ -239,10 +237,8 @@ If TypeName(Me) = "Object" Then
 			sh.RegDelete "HKLM\Software\Thingamahoochie\WinMerge\"
 			' Unregister with ARP
 			sh.RegDelete "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\"
-			fso.DeleteFolder sProgFolder
+			fso.DeleteFolder sProgFolder, True
 			On Error GoTo 0
-			' Restart Explorer
-			sh.Run explorer
 			MsgBox "Uninstall completed successfully", vbInformation Or vbSystemModal, WScript.ScriptName
 		End If
 	End If
@@ -296,6 +292,15 @@ Function LinkExists(ByVal sPath)
 		LinkExists = fso.FileExists(sPath)
 	End If
 End Function
+
+Sub RestartExplorer
+	Select Case sha.GetSystemInformation("ProcessorArchitecture")
+	Case PROCESSOR_ARCHITECTURE_IA64, PROCESSOR_ARCHITECTURE_AMD64
+		sh.Run """RegSvr32.exe"" /s /n /i:Shell_TrayWnd """ & sProgFolder & "\ShellExtensionX64.dll""", 1, True
+	Case Else
+		sh.Run """RegSvr32.exe"" /s /n /i:Shell_TrayWnd """ & sProgFolder & "\ShellExtensionU.dll""", 1, True
+	End Select
+End Sub
 
 Sub RegisterShellExtension(flags)
 	Dim verb
@@ -397,7 +402,9 @@ Sub Apply
 	Else
 		sProgFolder = sThisFolder
 	End If
-	If Not PortableMedia.checked Then
+	If PortableMedia.checked Then
+		fso.GetFile(sProgFolder & "\WinMergeU.dat").Attributes = 0
+	Else
 		For Each element In shortcuts.getElementsByTagName("INPUT")
 			If element.defaultChecked Or maintenance.disabled Then
 				If element.checked Then
@@ -410,7 +417,6 @@ Sub Apply
 		' Write executable path to HKCU as well because TortoiseHg reads it from there
 		sh.RegWrite "HKCU\Software\Thingamahoochie\WinMerge\Executable", sProgFolder & "\WinMergeU.exe"
 		If maintenance.disabled Then
-			fso.DeleteFile sProgFolder & "\WinMergeU.dat"
 			sh.RegWrite "HKCR\.WinMerge\", "WinMerge.Project.File"
 			sh.RegWrite "HKCR\WinMerge.Project.File\", "WinMerge Project File"
 			sh.RegWrite "HKCR\WinMerge.Project.File\DefaultIcon\", """" & sProgFolder & "\WinMergeU.exe"",1"
@@ -428,23 +434,24 @@ Sub Apply
 			sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\UninstallString", "wscript.exe /job:uninstall """ & sProgFolder & "\setup.wsf"""
 		End If
 	End If
-	If IsEmpty(sMoveFolder) Then
-		MsgBox "Setup completed successfully", vbInformation, document.title
-	ElseIf MsgBox("Setup completed successfully." & vbLf & vbLf &_
-			"The files from the previous installation have been moved to" & vbLf & vbLf &_
-			sMoveFolder & vbLf & vbLf &_
-			"Setup can try to delete this folder but would need to close" & vbLf &_
-			"and restart Windows Explorer. Do you want that to happen?" & vbLf & vbLf &_
-			"!!>    CAUTION:" & vbLf &_
-			"!!>    DO NOT CONFIRM THIS IF YOU HAVE MADE" & vbLf &_
-			"!!>    CHANGES TO THE PREVIOUS INSTALLATION" & vbLf &_
-			"!!>    AND WANT TO KEEP THEM FOR REFERENCE!",_
-			vbYesNo Or vbExclamation, document.title) = vbYes Then
-		sh.Run "wscript.exe /job:terminate_explorer """ & location.pathname & """", 1, True
-		On Error Resume Next
-		fso.DeleteFolder sMoveFolder
-		On Error GoTo 0
-		sh.Run explorer
+	If maintenance.disabled Then
+		If IsEmpty(sMoveFolder) Then
+			MsgBox "Setup completed successfully", vbInformation, document.title
+		ElseIf MsgBox("Setup completed successfully." & vbLf & vbLf &_
+				"The files from the previous installation have been moved to" & vbLf & vbLf &_
+				sMoveFolder & vbLf & vbLf &_
+				"Setup can try to delete this folder but would need to close" & vbLf &_
+				"and restart Windows Explorer. Do you want that to happen?" & vbLf & vbLf &_
+				"!!>    CAUTION:" & vbLf &_
+				"!!>    DO NOT CONFIRM THIS IF YOU HAVE MADE" & vbLf &_
+				"!!>    CHANGES TO THE PREVIOUS INSTALLATION" & vbLf &_
+				"!!>    AND WANT TO KEEP THEM FOR REFERENCE!",_
+				vbYesNo Or vbExclamation, document.title) = vbYes Then
+			RestartExplorer
+			On Error Resume Next
+			fso.DeleteFolder sMoveFolder, True
+			On Error GoTo 0
+		End If
 	End If
 	close
 End Sub
@@ -580,30 +587,4 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 <button id='PbCancel' accesskey='C'><u>C</u>ancel</button>
 </div>
 </body>
-<job id='terminate_explorer'>
-<script type='job' language='vbs'>
-Option Explicit
-
-Dim sh, sha
-Set sh = CreateObject("WScript.Shell")
-Set sha = CreateObject("Shell.Application")
-
-Function Windows_NT
-	On Error Resume Next
-	Windows_NT = Eval(sh.RegRead("HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\CurrentVersion"))
-	On Error GoTo 0
-End Function
-
-If Windows_NT >= 6.0 Then
-	sh.Run "taskkill.exe /f /im explorer.exe", 0, True
-Else
-	sh.Run "explorer.exe "":) This silly popup is for technical reasons..."""
-	WScript.Sleep 1000
-	sha.ShutdownWindows
-	WScript.Sleep 1000
-	sh.SendKeys "^+%({ESC})"
-	sh.Popup "Waiting 5 seconds for Explorer to terminate...", 5, WScript.ScriptName
-End If
-</script>
-</job>
 </package>
