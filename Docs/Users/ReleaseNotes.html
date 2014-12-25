@@ -36,27 +36,25 @@ function OnReadyStateChangeExternalDoc()
 </script>
 </head>
 <body>
-<h2>WinMerge 2011.004.185 Release Notes</h2>
+<h2>WinMerge 2011.004.525 Release Notes</h2>
 This is a stable release of WinMerge&nbsp;2011.
-<br>Besides fixing some bugs found in the previous release, it comes with three new features:
+<br>Besides fixing bugs, it includes the following functional enhancements:
 <ul>
-<li><p>The tab bar shows icons alongside with window captions.
-	<br>This feature is adopted from <a target='_blank' href='https://bitbucket.org/sdottaka/winmerge-v2'>Takashi's fork</a>.
-<li><p>The <i>Diff Pane</i> and <i>Location Pane</i> show up on the opposite side when Shift is depressed while invoking the respective menu commands.
-	<br>This feature is tracked in <a href='https://bitbucket.org/jtuc/winmerge2011/issue/43/'>Issue #43</a>.
-<li><p>A file transform scriptlet was added to <i>Compare As</i> "XML Sorted".
-	<br>The scriptlet employs MSXML to apply an XSL transform, and pipes the output through <code>tidy.exe</code> for formatting.
-	<br>The included copy of <code>tidy.exe</code> is compiled from a
-	<a target='_blank' href='https://github.com/w3c/tidy-html5/archive/8a7b55da7f6bc751e7be880d19a17c1c458eeef8.zip'>snapshot</a>
-	of <a target='_blank' href='https://github.com/jay/tidy-html5/tree/j'>Jay Satiro's fork</a>.
-	<br>Jay has added long-missed options for less aggressive whitespace munging (<a target='_blank' href='https://github.com/w3c/tidy-html5/issues/117'>https://github.com/w3c/tidy-html5/issues/117</a>).
-	<br>This feature is tracked in <a href='https://bitbucket.org/jtuc/winmerge2011/issue/31/'>Issue #31</a>.
+<li><p>The option to automatically check out read-only files from Visual SourceSafe or Rational ClearCase now also exists for Team Foundation Server.
+	<br>When the checkout fails, you have a new option to continue as if no version control system was selected, i.e. try to overwrite the file or save it elsewhere.
+<li><p>File filters have been enhanced as requested <a href='http://forums.winmerge.org/viewtopic.php?f=4&t=1074'>here</a>.
+<li><p>When choosing <i>Tell from filename extension</i> as the <i>Compare As</i> method, WinMerge selects the effective <i>Compare As</i> method based on the filename extension.
+	<br>Filename extensions are mapped to file transform monikers as per section <i>FileTransforms</i> of <i>Supplement.ini</i>, which you can edit to meet your particular requirements.
+<li><p>The option to include the windows shell context menu in the folder compare view's context menu now also exists for the textual file comparison view.
+	<br>This enhancement was contributed by <a href='https://bitbucket.org/magelu'>magelu</a> and is tracked <a href='https://bitbucket.org/jtuc/winmerge2011/issue/51/shell-context-menue-for-mergeeditview'>here</a>.
+	<br>Known issue: The binary file comparison view disregards this option. This may or may not change in future.
+<li><p>Folder compare report types now also include <i>Semicolon-separated list</i> to help cope with applications which prefer it that way.
 </ul>
 <p>
-Click <a href='https://bitbucket.org/jtuc/winmerge2011/get/2011.004.185.zip'>here</a> to obtain the source code for this release.
+Click <a href='https://bitbucket.org/jtuc/winmerge2011/get/2011.004.525.zip'>here</a> to obtain the source code for this release.
 <p>
 Click <a href='https://bitbucket.org/jtuc/frhed/get/0.10902.2013.zip'>here</a> to obtain source code for Frhed binaries included in this release.
 <p>
-<i>Jochen Neubeck, May 2014</i>
+<i>Jochen Neubeck, December 2014</i>
 <xml src='WinMerge.chm' onreadystatechange='OnReadyStateChangeExternalDoc()'></xml>
 </body>

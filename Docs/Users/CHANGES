@@ -1,3 +1,27 @@
+2011.004.525
+Changes since preceding release (not necessarily complete):
+• SettingStore: Fall back to read-only access to WinMergeU.dat when not elevated
+• Filters/*.flt: Minor updates and fixes
+• Filter by folder/file (http://forums.winmerge.org/viewtopic.php?f=4&t=1074)
+• Issue #62 Crash when en/disabling multiple compare windows for folders/files
+• PreferencesDlg.cpp: Fix improper parameters passed to SelectFile() (Issue #59)
+• FileFilter.cpp: Allow for auto-activating the SQL clause on either side
+• Issue #58 Include Subfolders not in tab order (Regression from 3bbe48d9e4c2)
+• SourceControl.cpp: Allow user to bypass the checkout step in case of error
+• Toolbar: Adopt Option icon's drop-down menu from Takashi's fork
+• PatchDlg: "Case sensitive" -> "Ignore case" (for consistency with Options UI)
+• Issue #44 Sort xml files doesn't work always (followup for Issue #31)
+• -wp option respects user's previous read-only setup when merging into 3rd file
+• Make Left/Right Read-only options mutexive when merging into 3rd file
+• Issue #52 Automatically choose Compare As method based on file extension
+• Issue #47 Better External Editor path default & handle environment variables
+• MainFrm.cpp: An empty "Recent Projects" menu never became populated 
+• Have tab bar show a hover close button as per Takashi's idea
+• Issue #51 Shell Context Menue for MergeEditView 
+• Offer "Semicolon-separated list" as additional folder compare report type
+• Issue #50 Always use UTF-8 for folder compare reports
+• TFS support: Allow for automatic checkout of r/o files before overwriting
+
 2011.004.185
 Changes since preceding release (not necessarily complete):
 • OpenDlg: Changing "Compare As" cancelled the effect of unchecking "By Default"
