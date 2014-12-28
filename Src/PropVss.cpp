@@ -246,6 +246,10 @@ LRESULT PropVss::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		if (LRESULT lResult = OnNotify(reinterpret_cast<UNotify *>(lParam)))
 			return lResult;
 		break;
+	case WM_DESTROY:
+		if (HImageList *iml = m_pTvClearCaseTypeMgrSetup->GetImageList(TVSIL_STATE))
+			iml->Destroy();
+		break;
 	}
 	return OptionsPanel::WindowProc(message, wParam, lParam);
 }
