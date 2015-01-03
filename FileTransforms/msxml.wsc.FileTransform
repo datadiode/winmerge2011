@@ -24,7 +24,6 @@ Set sh = CreateObject("WScript.Shell")
 Function OpenTextFile(path)
 	Dim doc, xslt, tidy, transform
 	Execute Arguments
-	path = Replace(path, "\\?\", "")
 	Set doc = CreateObject(MsxmlProgID)
 	Set xslt = CreateObject(MsxmlProgID)
 	If xslt.load(transform) And doc.load(path) Then
