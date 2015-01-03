@@ -243,7 +243,7 @@
     <Midl Include="atliface.idl" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\common\RegKey.cpp" />
+    <ClCompile Include="RegKey.cpp" />
     <ClCompile Include="ShellExtension.cpp" />
     <ClCompile Include="StdAfx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -260,7 +260,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\Common\MyCom.h" />
-    <ClInclude Include="..\src\common\RegKey.h" />
+    <ClInclude Include="RegKey.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="WinMergeShell.h" />

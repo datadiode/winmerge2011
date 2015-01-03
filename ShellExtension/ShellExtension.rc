@@ -1,6 +1,4 @@
-//WinMerge ShellExtension resource script
-//
-// $Id$
+// WinMerge ShellExtension resource script
 
 #include "resource.h"
 
