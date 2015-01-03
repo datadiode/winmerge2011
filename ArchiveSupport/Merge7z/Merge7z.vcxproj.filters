@@ -51,9 +51,6 @@
     <ClInclude Include="tools.h">
       <Filter>Quellcodedateien</Filter>
     </ClInclude>
-    <ClInclude Include="\7z920\CPP\7zip\UI\GUI\resource.h">
-      <Filter>Ressourcendateien</Filter>
-    </ClInclude>
     <ClInclude Include="\7z920\CPP\Windows\DLL.h">
       <Filter>Windows</Filter>
     </ClInclude>

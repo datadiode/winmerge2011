@@ -779,19 +779,10 @@
     <ClInclude Include="DirReportTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DirTravel.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="DirView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DirViewColItems.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Common\DllProxies.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="dllver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EditorFilepathBar.h">
@@ -1275,9 +1266,6 @@
     <None Include="CHANGELO">
       <Filter>ChangeLogs</Filter>
     </None>
-    <None Include="..\Docs\Users\ChangeLog.txt">
-      <Filter>ChangeLogs</Filter>
-    </None>
     <None Include="..\Translations\WinMerge\BuildMergeLangDll.bat">
       <Filter>Batch files</Filter>
     </None>
@@ -1288,9 +1276,6 @@
       <Filter>Batch files</Filter>
     </None>
     <None Include="PostBuild.bat">
-      <Filter>Batch files</Filter>
-    </None>
-    <None Include="SetResourceVersions.bat">
       <Filter>Batch files</Filter>
     </None>
     <None Include="..\Translations\WinMerge\UpdatePoFilesFromPotFile.vbs">

@@ -208,7 +208,6 @@
     <ClInclude Include="Merge7zCommon.h" />
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="tools.h" />
-    <ClInclude Include="\7z920\CPP\7zip\UI\GUI\resource.h" />
     <ClInclude Include="\7z920\CPP\Windows\DLL.h" />
     <ClInclude Include="\7z920\CPP\Windows\Error.h" />
     <ClInclude Include="\7z920\CPP\Windows\FileIO.h" />

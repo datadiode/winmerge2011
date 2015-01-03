@@ -805,11 +805,8 @@
     <ClInclude Include="DirFrame.h" />
     <ClInclude Include="DirItem.h" />
     <ClInclude Include="DirReportTypes.h" />
-    <ClInclude Include="DirTravel.h" />
     <ClInclude Include="DirView.h" />
-    <ClInclude Include="DirViewColItems.h" />
     <ClInclude Include="Common\DllProxies.h" />
-    <ClInclude Include="dllver.h" />
     <ClInclude Include="EditorFilepathBar.h" />
     <ClInclude Include="Environment.h" />
     <ClInclude Include="ExcelExport.h" />
@@ -985,12 +982,10 @@
     <None Include="res\right_to_left.bmp" />
     <None Include="res\sigma.ico" />
     <None Include="CHANGELO" />
-    <None Include="..\Docs\Users\ChangeLog.txt" />
     <None Include="..\Translations\WinMerge\BuildMergeLangDll.bat" />
     <None Include="..\Translations\WinMerge\CreateMasterPotFile.vbs" />
     <None Include="..\Translations\WinMerge\GetTranslationsStatus.vbs" />
     <None Include="PostBuild.bat" />
-    <None Include="SetResourceVersions.bat" />
     <None Include="..\Translations\WinMerge\UpdatePoFilesFromPotFile.vbs" />
     <setup Include="..\Docs\Users\Contributors.txt" />
     <setup Include="..\Setup\CreateLaunchScript.sh">
