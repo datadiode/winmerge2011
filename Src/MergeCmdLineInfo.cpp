@@ -371,9 +371,9 @@ void MergeCmdLineInfo::ParseWinMergeCmdLineInternal(LPCTSTR q)
 			// Load all default settings, but don't save them in registry.
 			IOptionDef::InitOptions(NULL, NULL);
 		}
-		else if (param == _T("reghive"))
+		else if (param == _T("config"))
 		{
-			q = EatParam(q, m_sRegHive);
+			q = EatParam(q, m_sConfigFileName);
 		}
 		else if (param == _T("minimize"))
 		{
@@ -475,22 +475,19 @@ void MergeCmdLineInfo::ParseWinMergeCmdLine(LPCTSTR q)
 {
 	ParseWinMergeCmdLineInternal(q);
 
-	if (m_sRegHive.empty())
+	if (m_sConfigFileName.empty())
 	{
 		TCHAR path[MAX_PATH];
 		GetModuleFileName(NULL, path, _countof(path));
-		PathRenameExtension(path, _T(".dat"));
-		// Automount WinMergeU.dat only if file exists and is not read-only
-		if ((GetFileAttributes(path) & FILE_ATTRIBUTE_READONLY) == 0)
+		PathRenameExtension(path, _T(".json"));
+		if (PathFileExists(path))
 		{
-			m_sRegHive = path;
+			m_sConfigFileName = path;
 			PathStripToRoot(path);
 			SetEnvironmentVariable(_T("PortableRoot"), path);
 		}
 	}
-	if (!m_sRegHive.empty() &&
-		SettingStore.MountExternalHive(m_sRegHive.c_str(),
-		_T("{08CEC68E-416D-4fae-962D-16A8E838C6F5}")))
+	if (!m_sConfigFileName.empty() && SettingStore.SetFileName(m_sConfigFileName.c_str()))
 	{
 		CRegKeyEx loadkey = SettingStore.GetAppRegistryKey();
 		IOptionDef::InitOptions(loadkey, NULL);

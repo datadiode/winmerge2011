@@ -3,16 +3,24 @@
  *
  * @brief Implementation of CRegKeyEx C++ wrapper class for reading Windows registry
  */
-// ID line follows -- this is updated by SVN
-// $Id$
 #include "StdAfx.h"
 #include "RegKey.h"
+#include "SettingStore.h"
+
+static const CSettingStore NullSettingStore(NULL, NULL);
+
+CRegKeyEx::CRegKeyEx()
+: m_hKey(NULL)
+, m_store(NullSettingStore)
+{
+}
 
 /**
  * @brief Default constructor.
  */
 CRegKeyEx::CRegKeyEx(HKEY hKey)
 : m_hKey(hKey)
+, m_store(SettingStore)
 {
 }
 
@@ -31,7 +39,7 @@ void CRegKeyEx::Close()
 {
 	if (m_hKey) 
 	{
-		RegCloseKey(m_hKey);
+		m_store.RegCloseKey(m_hKey);
 		m_hKey = NULL;
 	}
 }
@@ -57,8 +65,7 @@ LONG CRegKeyEx::Open(HKEY hKeyRoot, LPCTSTR pszPath)
 LONG CRegKeyEx::OpenWithAccess(HKEY hKeyRoot, LPCTSTR pszPath, REGSAM regsam)
 {
 	Close();
-	return RegCreateKeyEx(hKeyRoot, pszPath, 0, NULL,
-		REG_OPTION_NON_VOLATILE, regsam, NULL, &m_hKey, NULL);
+	return m_store.RegCreateKeyEx(hKeyRoot, pszPath, REG_OPTION_NON_VOLATILE, regsam, &m_hKey);
 }
 
 /**
@@ -104,7 +111,7 @@ LONG CRegKeyEx::WriteDword(LPCTSTR pszKey, DWORD dwVal) const
 {
 	assert(m_hKey);
 	assert(pszKey);
-	return RegSetValueEx(m_hKey, pszKey, 0L, REG_DWORD,
+	return m_store.RegSetValueEx(m_hKey, pszKey, REG_DWORD,
 		(const LPBYTE) &dwVal, sizeof(DWORD));
 }
 
@@ -120,7 +127,7 @@ LONG CRegKeyEx::WriteString(LPCTSTR pszKey, LPCTSTR pszData) const
 	assert(pszKey);
 	assert(pszData);
 
-	return RegSetValueEx(m_hKey, pszKey, 0L, REG_SZ,
+	return m_store.RegSetValueEx(m_hKey, pszKey, REG_SZ,
 		(const LPBYTE) pszData, (lstrlen(pszData) + 1) * sizeof(TCHAR));
 }
 
@@ -139,7 +146,7 @@ DWORD CRegKeyEx::ReadDword(LPCTSTR pszKey, DWORD defval) const
 	DWORD dwSize = sizeof (DWORD);
 
 	DWORD value;
-	LONG ret = RegQueryValueEx(m_hKey, pszKey, NULL, 
+	LONG ret = m_store.RegQueryValueEx(m_hKey, pszKey,
 		&dwType, (LPBYTE)&value, &dwSize);
 
 	if (ret != ERROR_SUCCESS || dwType != REG_DWORD)
@@ -160,13 +167,12 @@ LPCTSTR CRegKeyEx::ReadString(LPCTSTR pszKey, LPCTSTR defval, BLOB *blob) const
 	assert(m_hKey);
 	assert(pszKey);
 	DWORD dwType;
-	LONG ret = RegQueryValueEx(m_hKey, pszKey, NULL,
-		&dwType, blob->pBlobData, &blob->cbSize);
+	LONG ret = m_store.RegQueryValueEx(m_hKey, pszKey, &dwType, blob->pBlobData, &blob->cbSize);
 	return ret == ERROR_SUCCESS && dwType == REG_SZ ?
 		reinterpret_cast<TCHAR *>(blob->pBlobData) : defval;
 }
 
 LONG CRegKeyEx::DeleteValue(LPCTSTR pszKey) const
 {
-	return RegDeleteValue(m_hKey, pszKey);
+	return m_store.RegDeleteValue(m_hKey, pszKey);
 }

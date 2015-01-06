@@ -6,30 +6,17 @@
 // © JetBrains, Inc, 2005
 // Written by (H) Serge Baltic
 
-// Copyright © 2011 WinMerge Team
+// Copyright © 2011-2015 WinMerge Team
 
 #include <StdAfx.h>
 #include "SettingStore.h"
+#include "RegKey.h"
 #include "DllProxies.h"
-#include "TokenHelper.h"
-
-static BOOL IsProcessElevated()
-{
-	BOOL fRet = FALSE;
-	HANDLE hToken = NULL;
-	if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken))
-	{
-		TOKEN_ELEVATION Elevation;
-		DWORD cbSize = 0;
-		if (GetTokenInformation(hToken, TokenElevation, &Elevation, sizeof Elevation, &cbSize))
-			fRet = Elevation.TokenIsElevated;
-		CloseHandle(hToken);
-	}
-	return fRet;
-}
+#include <json/json.h>
 
 CSettingStore::CSettingStore(LPCTSTR sCompanyName, LPCTSTR sApplicationName)
 {
+	ASSERT(ThreadIntegrity);
 	m_hHive = HKEY_CURRENT_USER;
 	m_regsam = KEY_READ | KEY_WRITE;
 	// Store
@@ -39,214 +26,141 @@ CSettingStore::CSettingStore(LPCTSTR sCompanyName, LPCTSTR sApplicationName)
 
 CSettingStore::~CSettingStore()
 {
-	if (m_hHive != HKEY_CURRENT_USER)
-		RegCloseKey(m_hHive);
-	if (!m_sXPMountName.empty())
+	ASSERT(ThreadIntegrity);
+	if (m_regsam == 0)
 	{
-		CAdjustProcessToken<2> Token;
-		Token.Enable(SE_BACKUP_NAME);
-		Token.Enable(SE_RESTORE_NAME);
-		if (Token.Acquire())
+		Json::Value *const root = reinterpret_cast<Json::Value *>(m_hHive);
+		if (FILE *tf = _tfopen(m_sFileName.c_str(), _T("w")))
 		{
-			RegUnLoadKey(HKEY_USERS, m_sXPMountName.c_str());
+			try
+			{
+				Json::Writer writer(tf);
+				writer.write(*root);
+			}
+			catch (OException *e)
+			{
+				e->ReportError(NULL, MB_TASKMODAL | MB_ICONSTOP);
+				delete e;
+			}
+			fclose(tf);
 		}
+		delete root;
 	}
 }
 
 int CSettingStore::GetProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nDefault) const
 {
+	ASSERT(ThreadIntegrity);
 	ASSERT(lpszSection != NULL);
 	ASSERT(lpszEntry != NULL);
-
-	HKEY hSecKey = GetSectionKey(lpszSection);
-	if (hSecKey == NULL)
-		return nDefault;
-	DWORD dwValue;
-	DWORD dwType;
-	DWORD dwCount = sizeof(DWORD);
-	LONG lResult = RegQueryValueEx(hSecKey, lpszEntry, NULL, &dwType,
-		(LPBYTE)&dwValue, &dwCount);
-	RegCloseKey(hSecKey);
-	if (lResult == ERROR_SUCCESS)
+	if (HKEY hSecKey = GetSectionKey(lpszSection))
 	{
-		ASSERT(dwType == REG_DWORD);
-		ASSERT(dwCount == sizeof(dwValue));
-		return (UINT)dwValue;
+		DWORD dwType;
+		DWORD dwCount = sizeof(DWORD);
+		DWORD dwValue;
+		LONG lResult = RegQueryValueEx(hSecKey, lpszEntry, &dwType, (LPBYTE)&dwValue, &dwCount);
+		if (lResult == ERROR_SUCCESS && dwType == REG_DWORD && dwCount == sizeof(DWORD))
+			nDefault = dwValue;
+		RegCloseKey(hSecKey);
 	}
 	return nDefault;
 }
 
 String CSettingStore::GetProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPCTSTR lpszDefault) const
 {
+	ASSERT(ThreadIntegrity);
 	ASSERT(lpszSection != NULL);
 	ASSERT(lpszEntry != NULL);
-
-	HKEY hSecKey = GetSectionKey(lpszSection);
-	if (hSecKey == NULL)
-		return lpszDefault;
-	String strValue;
-	DWORD dwType, dwCount;
-	LONG lResult = RegQueryValueEx(hSecKey, lpszEntry, NULL, &dwType,
-		NULL, &dwCount);
-	if (lResult == ERROR_SUCCESS)
+	if (HKEY hSecKey = GetSectionKey(lpszSection))
 	{
-		ASSERT(dwType == REG_SZ);
-		String::size_type length = dwCount / sizeof(TCHAR);
-		strValue.resize(length);
-		lResult = RegQueryValueEx(hSecKey, lpszEntry, NULL, &dwType,
-			(LPBYTE)&strValue.front(), &dwCount);
-		if (length != 0 && strValue[--length] == _T('\0'))
-			strValue.resize(length);
-	}
-	RegCloseKey(hSecKey);
-	if (lResult == ERROR_SUCCESS)
-	{
-		ASSERT(dwType == REG_SZ);
-		return strValue;
+		DWORD dwType, dwCount;
+		LONG lResult = RegQueryValueEx(hSecKey, lpszEntry, &dwType, NULL, &dwCount);
+		if (lResult == ERROR_SUCCESS && dwType == REG_SZ && dwCount >= sizeof(TCHAR))
+		{
+			LPTSTR lpValue = static_cast<LPTSTR>(_alloca(dwCount));
+			lResult = RegQueryValueEx(hSecKey, lpszEntry, &dwType, reinterpret_cast<LPBYTE>(lpValue), &dwCount);
+			if (lResult == ERROR_SUCCESS && dwType == REG_SZ && dwCount >= sizeof(TCHAR) &&
+				lpValue[dwCount / sizeof(TCHAR) - 1] == _T('\0'))
+			{
+				lpszDefault = lpValue;
+			}
+		}
+		RegCloseKey(hSecKey);
 	}
 	return lpszDefault;
 }
 
-BOOL CSettingStore::GetProfileBinary(LPCTSTR lpszSection, LPCTSTR lpszEntry, BYTE** ppData, UINT* pBytes) const
-{
-	ASSERT(lpszSection != NULL);
-	ASSERT(lpszEntry != NULL);
-	ASSERT(ppData != NULL);
-	ASSERT(pBytes != NULL);
-	*ppData = NULL;
-	*pBytes = 0;
-
-	HKEY hSecKey = GetSectionKey(lpszSection);
-	if (hSecKey == NULL)
-		return FALSE;
-
-	DWORD dwType, dwCount;
-	LONG lResult = RegQueryValueEx(hSecKey, lpszEntry, NULL, &dwType,
-		NULL, &dwCount);
-	*pBytes = dwCount;
-	if (lResult == ERROR_SUCCESS)
-	{
-		ASSERT(dwType == REG_BINARY);
-		*ppData = new BYTE[*pBytes];
-		lResult = RegQueryValueEx(hSecKey, lpszEntry, NULL, &dwType,
-			*ppData, &dwCount);
-	}
-	RegCloseKey(hSecKey);
-	if (lResult == ERROR_SUCCESS)
-	{
-		ASSERT(dwType == REG_BINARY);
-		return TRUE;
-	}
-	else
-	{
-		delete [] *ppData;
-		*ppData = NULL;
-	}
-	return FALSE;
-
-}
-
 BOOL CSettingStore::WriteProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nValue) const
 {
+	ASSERT(ThreadIntegrity);
 	ASSERT(lpszSection != NULL);
 	ASSERT(lpszEntry != NULL);
-
-	HKEY hSecKey = GetSectionKey(lpszSection);
-	if (hSecKey == NULL)
-		return FALSE;
-	LONG lResult = RegSetValueEx(hSecKey, lpszEntry, NULL, REG_DWORD,
-		(LPBYTE)&nValue, sizeof(nValue));
-	RegCloseKey(hSecKey);
+	LONG lResult = ERROR_INVALID_PARAMETER;
+	if (HKEY hSecKey = GetSectionKey(lpszSection))
+	{
+		lResult = RegSetValueEx(hSecKey, lpszEntry, REG_DWORD, (LPBYTE)&nValue, sizeof nValue);
+		RegCloseKey(hSecKey);
+	}
 	return lResult == ERROR_SUCCESS;
 }
 
 BOOL CSettingStore::WriteProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPCTSTR lpszValue) const
 {
+	ASSERT(ThreadIntegrity);
 	ASSERT(lpszSection != NULL);
-
-	LONG lResult;
+	LONG lResult = ERROR_INVALID_PARAMETER;
 	if (lpszEntry == NULL) //delete whole section
 	{
-		HKEY hAppKey = GetAppRegistryKey();
-		if (hAppKey == NULL)
-			return FALSE;
-		lResult = ::RegDeleteKey(hAppKey, lpszSection);
-		RegCloseKey(hAppKey);
+		if (HKEY hAppKey = GetAppRegistryKey())
+		{
+			lResult = RegDeleteKey(hAppKey, lpszSection);
+			RegCloseKey(hAppKey);
+		}
 	}
-	else if (lpszValue == NULL)
+	else if (HKEY hSecKey = GetSectionKey(lpszSection))
 	{
-		HKEY hSecKey = GetSectionKey(lpszSection);
-		if (hSecKey == NULL)
-			return FALSE;
-		// necessary to cast away const below
-		lResult = ::RegDeleteValue(hSecKey, (LPTSTR)lpszEntry);
-		RegCloseKey(hSecKey);
-	}
-	else
-	{
-		HKEY hSecKey = GetSectionKey(lpszSection);
-		if (hSecKey == NULL)
-			return FALSE;
-		lResult = RegSetValueEx(hSecKey, lpszEntry, NULL, REG_SZ,
-			(LPBYTE)lpszValue, (lstrlen(lpszValue)+1)*sizeof(TCHAR));
+		if (lpszValue == NULL)
+		{
+			lResult = RegDeleteValue(hSecKey, lpszEntry);
+		}
+		else
+		{
+			lResult = RegSetValueEx(hSecKey, lpszEntry, REG_SZ,
+				reinterpret_cast<const BYTE *>(lpszValue),
+				(lstrlen(lpszValue) + 1) * sizeof(TCHAR));
+		}
 		RegCloseKey(hSecKey);
 	}
 	return lResult == ERROR_SUCCESS;
 }
 
-BOOL CSettingStore::WriteProfileBinary(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPBYTE pData, UINT nBytes) const
+BOOL CSettingStore::SetFileName(LPCTSTR sFileName)
 {
-	ASSERT(lpszSection != NULL);
-
-	LONG lResult;
-	HKEY hSecKey = GetSectionKey(lpszSection);
-	if (hSecKey == NULL)
-		return FALSE;
-	lResult = RegSetValueEx(hSecKey, lpszEntry, NULL, REG_BINARY,
-		pData, nBytes);
-	RegCloseKey(hSecKey);
-	return lResult == ERROR_SUCCESS;
-}
-
-BOOL CSettingStore::MountExternalHive(LPCTSTR sHive, LPCTSTR sXPMountName)
-{
-	HKEY hHive = NULL;
-	if (struct ADVAPI32V6 *ADVAPI32V6 = ::ADVAPI32V6)
+	ASSERT(ThreadIntegrity);
+	m_regsam = 0;
+	m_sFileName = sFileName;
+	Json::Value *const root = new Json::Value;
+	if (FILE *tf = _tfopen(m_sFileName.c_str(), _T("r")))
 	{
-		// Vista or later: Use RegLoadAppKey() (fails on read-only files)
-		if (IsProcessElevated())
+		try
 		{
-			ADVAPI32V6->RegLoadAppKey(sHive, &hHive, KEY_ALL_ACCESS, 0, 0);
-		}
-		else if (ADVAPI32V6->RegLoadAppKey(sHive, &hHive, KEY_READ, 0, 0) == ERROR_SUCCESS)
-		{
-			// Don't try to gain KEY_WRITE access when doomed to fail
-			m_regsam = KEY_READ;
-		}
-	}
-	else
-	{
-		// XP or earlier: Use RegLoadKey() (removes the read-only attribute)
-		CAdjustProcessToken<2> Token;
-		Token.Enable(SE_BACKUP_NAME);
-		Token.Enable(SE_RESTORE_NAME);
-		if (Token.Acquire())
-		{
-			m_sXPMountName = sXPMountName;
-			LONG lRet = RegOpenKeyEx(HKEY_USERS, m_sXPMountName.c_str(), 0, KEY_ALL_ACCESS, &hHive);
-			if (lRet != ERROR_SUCCESS)
+			Json::Reader reader(tf);
+			reader.parse(*root);
+			if (ftell(tf) != 0 && !reader.good())
 			{
-				lRet = RegLoadKey(HKEY_USERS, m_sXPMountName.c_str(), sHive);
-				if (lRet == ERROR_SUCCESS)
-				{
-					RegOpenKeyEx(HKEY_USERS, m_sXPMountName.c_str(), 0, KEY_ALL_ACCESS, &hHive);
-				}
+				// create copy of broken file for reference
+				CopyFile(m_sFileName.c_str(), (m_sFileName + _T(".bad")).c_str(), FALSE);
+				Json::ThrowJsonException(reader.getFormattedErrorMessages().c_str());
 			}
 		}
+		catch (OException *e)
+		{
+			e->ReportError(NULL, MB_TASKMODAL | MB_ICONSTOP);
+			delete e;
+		}
+		fclose(tf);
 	}
-	if (hHive == NULL)
-		return FALSE;
-	m_hHive = hHive;
+	m_hHive = reinterpret_cast<HKEY>(root);
 	return TRUE;
 }
 
@@ -255,30 +169,35 @@ BOOL CSettingStore::MountExternalHive(LPCTSTR sHive, LPCTSTR sXPMountName)
 // responsibility of the caller to call RegCloseKey() on the returned HKEY
 HKEY CSettingStore::GetAppRegistryKey() const
 {
-	ASSERT(!m_sCompanyName.empty());
-	ASSERT(!m_sApplicationName.empty());
+	ASSERT(ThreadIntegrity);
+	ASSERT(m_sCompanyName != NULL);
+	ASSERT(m_sApplicationName != NULL);
 
 	HKEY hAppKey = NULL;
-	HKEY hSoftKey = NULL;
-	HKEY hCompanyKey = NULL;
-	if (RegCreateKeyEx(m_hHive, _T("Software"), 0, REG_NONE,
-		REG_OPTION_NON_VOLATILE, m_regsam, NULL,
-		&hSoftKey, NULL) == ERROR_SUCCESS)
+	if (m_regsam != 0)
 	{
-		if (RegCreateKeyEx(hSoftKey, m_sCompanyName.c_str(), 0, REG_NONE,
+		HKEY hSoftKey = NULL;
+		if (::RegCreateKeyEx(m_hHive, _T("Software"), 0, REG_NONE,
 			REG_OPTION_NON_VOLATILE, m_regsam, NULL,
-			&hCompanyKey, NULL) == ERROR_SUCCESS)
+			&hSoftKey, NULL) == ERROR_SUCCESS)
 		{
-			RegCreateKeyEx(hCompanyKey, m_sApplicationName.c_str(), 0, REG_NONE,
+			HKEY hCompanyKey = NULL;
+			if (::RegCreateKeyEx(hSoftKey, m_sCompanyName, 0, REG_NONE,
 				REG_OPTION_NON_VOLATILE, m_regsam, NULL,
-				&hAppKey, NULL);
+				&hCompanyKey, NULL) == ERROR_SUCCESS)
+			{
+				::RegCreateKeyEx(hCompanyKey, m_sApplicationName, 0, REG_NONE,
+					REG_OPTION_NON_VOLATILE, m_regsam, NULL,
+					&hAppKey, NULL);
+				::RegCloseKey(hCompanyKey);
+			}
+			::RegCloseKey(hSoftKey);
 		}
 	}
-	if (hSoftKey != NULL)
-		RegCloseKey(hSoftKey);
-	if (hCompanyKey != NULL)
-		RegCloseKey(hCompanyKey);
-
+	else
+	{
+		hAppKey = m_hHive;
+	}
 	return hAppKey;
 }
 
@@ -288,19 +207,233 @@ HKEY CSettingStore::GetAppRegistryKey() const
 // responsibility of the caller to call RegCloseKey() on the returned HKEY
 HKEY CSettingStore::GetSectionKey(LPCTSTR lpszSection, DWORD dwCreationDisposition) const
 {
+	ASSERT(ThreadIntegrity);
 	ASSERT(lpszSection != NULL);
-
 	HKEY hSectionKey = NULL;
-	HKEY hAppKey = GetAppRegistryKey();
-	if (hAppKey == NULL)
-		return NULL;
-
-	if (dwCreationDisposition == CREATE_ALWAYS)
-		SHDeleteKey(hAppKey, lpszSection);
-
-	RegCreateKeyEx(hAppKey, lpszSection, 0, REG_NONE,
-		REG_OPTION_NON_VOLATILE, m_regsam, NULL,
-		&hSectionKey, NULL);
-	RegCloseKey(hAppKey);
+	if (HKEY hAppKey = GetAppRegistryKey())
+	{
+		if (dwCreationDisposition == CREATE_ALWAYS)
+			SHDeleteKey(hAppKey, lpszSection);
+		RegCreateKeyEx(hAppKey, lpszSection, REG_OPTION_NON_VOLATILE, m_regsam, &hSectionKey);
+		RegCloseKey(hAppKey);
+	}
 	return hSectionKey;
+}
+
+LONG CSettingStore::RegCreateKeyEx(HKEY hKey, LPCTSTR lpSubKey, DWORD dwOptions, REGSAM samDesired, PHKEY phkResult) const
+{
+	ASSERT(ThreadIntegrity);
+	LONG lResult = 0;
+	if (m_regsam != 0)
+		lResult = ::RegCreateKeyEx(hKey, lpSubKey, 0, NULL, dwOptions, samDesired, NULL, phkResult, NULL);
+	else if (Json::Value *node = reinterpret_cast<Json::Value *>(hKey))
+	{
+		OString key = HString::Uni(lpSubKey)->Oct(CP_UTF8);
+		if (phkResult != NULL)
+			*phkResult = reinterpret_cast<HKEY>(&(*node)[key.A]);
+		else
+			lResult = ERROR_INVALID_PARAMETER;
+	}
+	else
+	{
+		lResult = ERROR_INVALID_PARAMETER;
+	}
+	return lResult;
+}
+
+LONG CSettingStore::RegCloseKey(HKEY hKey) const
+{
+	ASSERT(ThreadIntegrity);
+	LONG lResult = 0;
+	if (m_regsam != 0)
+		lResult = ::RegCloseKey(hKey);
+	else if (hKey == NULL)
+		lResult = ERROR_INVALID_PARAMETER;
+	return lResult;
+}
+
+LONG CSettingStore::RegQueryValueEx(HKEY hKey, LPCTSTR lpValueName, LPDWORD lpType, LPBYTE lpData, LPDWORD lpcbData) const
+{
+	ASSERT(ThreadIntegrity);
+	LONG lResult = 0;
+	if (m_regsam != 0)
+		lResult = ::RegQueryValueEx(hKey, lpValueName, NULL, lpType, lpData, lpcbData);
+	else if (const Json::Value *const node = reinterpret_cast<const Json::Value *>(hKey))
+	{
+		OString key = HString::Uni(lpValueName)->Oct(CP_UTF8);
+		const Json::Value &value = (*node)[key.A];
+		if (value.isIntegral())
+		{
+			if (lpType != NULL)
+				*lpType = REG_DWORD;
+			if (lpcbData != NULL)
+			{
+				if (*lpcbData < sizeof(DWORD))
+					lResult = ERROR_MORE_DATA;
+				else if (lpData != NULL)
+					*reinterpret_cast<DWORD *>(lpData) = value.asUInt();
+				*lpcbData = sizeof(DWORD);
+			}
+			else if (lpData != NULL)
+			{
+				lResult = ERROR_INVALID_PARAMETER;
+			}
+		}
+		else if (value.isString())
+		{
+			if (lpType != NULL)
+				*lpType = REG_SZ;
+			if (lpcbData != NULL)
+			{
+				const char *str = value.asCString();
+				if (int len = MultiByteToWideChar(CP_UTF8, 0, str, -1, NULL, 0))
+				{
+					DWORD cbData = len * sizeof(WCHAR);
+					if (*lpcbData < cbData)
+						lResult = ERROR_MORE_DATA;
+					else if (lpData != NULL)
+						MultiByteToWideChar(CP_UTF8, 0, str, -1, reinterpret_cast<LPWSTR>(lpData), len);
+					*lpcbData = cbData;
+				}
+				else
+				{
+					lResult = GetLastError();
+				}
+			}
+			else if (lpData != NULL)
+			{
+				lResult = ERROR_INVALID_PARAMETER;
+			}
+		}
+		else
+		{
+			lResult = ERROR_FILE_NOT_FOUND;
+		}
+	}
+	else
+	{
+		lResult = ERROR_INVALID_PARAMETER;
+	}
+	return lResult;
+}
+
+LONG CSettingStore::RegSetValueEx(HKEY hKey, LPCTSTR lpValueName, DWORD dwType, CONST BYTE* lpData, DWORD cbData) const
+{
+	ASSERT(ThreadIntegrity);
+	LONG lResult = 0;
+	if (m_regsam != 0)
+		lResult = ::RegSetValueEx(hKey, lpValueName, 0, dwType, lpData, cbData);
+	else if (Json::Value *const node = reinterpret_cast<Json::Value *>(hKey))
+	{
+		OString key = HString::Uni(lpValueName)->Oct(CP_UTF8);
+		Json::Value &value = (*node)[key.A];
+		if (lpData != NULL)
+		{
+			switch (dwType)
+			{
+			case REG_DWORD:
+				value = static_cast<Json::Value::UInt>(*reinterpret_cast<const DWORD *>(lpData));
+				break;
+			case REG_SZ:
+				if (HString *pStr = HString::Oct(reinterpret_cast<LPCSTR>(lpData), cbData)->Oct(CP_UTF8))
+					value = OString(pStr).A;
+				break;
+			default:
+				lResult = ERROR_INVALID_PARAMETER;
+				break;
+			}
+		}
+		else if (cbData != 0)
+		{
+			lResult = ERROR_INVALID_PARAMETER;
+		}
+	}
+	else
+	{
+		lResult = ERROR_INVALID_PARAMETER;
+	}
+	return lResult;
+}
+
+LONG CSettingStore::SHDeleteKey(HKEY hKey, LPCTSTR pszSubKey) const
+{
+	ASSERT(ThreadIntegrity);
+	LONG lResult = 0;
+	if (m_regsam != 0)
+		lResult = ::SHDeleteKey(hKey, pszSubKey);
+	else if (Json::Value *const node = reinterpret_cast<Json::Value *>(hKey))
+	{
+		OString key = HString::Uni(pszSubKey)->Oct(CP_UTF8);
+		node->removeMember(key.A);
+	}
+	else
+	{
+		lResult = ERROR_INVALID_PARAMETER;
+	}
+	return lResult;
+}
+
+LONG CSettingStore::RegDeleteValue(HKEY hKey, LPCTSTR lpValueName) const
+{
+	ASSERT(ThreadIntegrity);
+	LONG lResult = 0;
+	if (m_regsam != 0)
+		lResult = ::RegDeleteValue(hKey, lpValueName);
+	else if (Json::Value *const node = reinterpret_cast<Json::Value *>(hKey))
+	{
+		OString key = HString::Uni(lpValueName)->Oct(CP_UTF8);
+		node->removeMember(key.A);
+	}
+	else
+	{
+		lResult = ERROR_INVALID_PARAMETER;
+	}
+	return lResult;
+}
+
+LONG CSettingStore::RegQueryInfoKey(HKEY hKey, LPDWORD lpcValues, LPDWORD lpcbMaxValueLen) const
+{
+	ASSERT(ThreadIntegrity);
+	LONG lResult = 0;
+	if (m_regsam != 0)
+		lResult = ::RegQueryInfoKey(hKey, NULL, NULL, NULL, NULL, NULL, NULL, lpcValues, NULL, lpcbMaxValueLen, NULL, NULL);
+	else if (const Json::Value *const node = reinterpret_cast<const Json::Value *>(hKey))
+	{
+		DWORD cValues = node->size();
+		DWORD cbMaxValueLen = 0;
+		if (const Json::Value::ObjectValues *const values = node->getObjectValues())
+		{
+			Json::Value::ObjectValues::const_iterator cur = values->begin();
+			Json::Value::ObjectValues::const_iterator end = values->end();
+			while (cur != end)
+			{
+				const Json::Value &value = cur->second;
+				DWORD cbData = 0;
+				if (value.isIntegral())
+				{
+					cbData = sizeof(DWORD);
+				}
+				else if (value.isString())
+				{
+					const char *str = value.asCString();
+					if (int len = MultiByteToWideChar(CP_UTF8, 0, str, -1, NULL, 0))
+					{
+						cbData = len * sizeof(WCHAR);
+					}
+				}
+				if (cbMaxValueLen < cbData)
+					cbMaxValueLen = cbData;
+				++cur;
+			}
+		}
+		if (lpcValues != NULL)
+			*lpcValues = cValues;
+		if (lpcbMaxValueLen != NULL)
+			*lpcbMaxValueLen = cbMaxValueLen;
+	}
+	else
+	{
+		lResult = ERROR_INVALID_PARAMETER;
+	}
+	return lResult;
 }

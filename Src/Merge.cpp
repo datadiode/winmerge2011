@@ -340,7 +340,7 @@ int CMergeApp::DoMessageBox(LPCTSTR lpszPrompt, UINT nType, UINT nIDPrompt)
 	// Display the message box dialog and return the result.
 	HKEY hKey = SettingStore.GetSectionKey(REGISTRY_SECTION_MESSAGEBOX);
 	int nResult = dlgMessage.DoModal(m_hInstance, owner, hKey);
-	::RegCloseKey(hKey);
+	SettingStore.RegCloseKey(hKey);
 	return nResult;
 }
 

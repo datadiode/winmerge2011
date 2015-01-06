@@ -44,6 +44,7 @@
 #include "resource.h"
 #include <windowsx.h> // for GET_X_LPARAM, GET_Y_LPARAM
 #include "LanguageSelect.h"
+#include "SettingStore.h"
 #include "MessageBoxDialog.h"
 
 #ifdef _DEBUG
@@ -138,7 +139,7 @@ int CMessageBoxDialog::DoModal(HINSTANCE hinst, HWND parent, HKEY hKey)
 		int nFormerResult = 0;
 		DWORD dwType = 0;
 		DWORD cbData = sizeof nFormerResult;
-		LONG ret = RegQueryValueEx(hKey, strRegistryKey, NULL, &dwType, (LPBYTE)&nFormerResult, &cbData);
+		LONG ret = SettingStore.RegQueryValueEx(hKey, strRegistryKey, &dwType, (LPBYTE)&nFormerResult, &cbData);
 		if ((ret == ERROR_SUCCESS) && (dwType == REG_DWORD) && (cbData == sizeof nFormerResult))
 		{
 			if (m_nStyle & MB_IGNORE_IF_SILENCED)
@@ -152,7 +153,7 @@ int CMessageBoxDialog::DoModal(HINSTANCE hinst, HWND parent, HKEY hKey)
 	if ((m_nStyle & (MB_DONT_DISPLAY_AGAIN | MB_DONT_ASK_AGAIN)) && m_bDontDisplayAgain)
 	{
 		// Store the result of the dialog in the registry.
-		RegSetValueEx(hKey, strRegistryKey, 0, REG_DWORD, (LPBYTE)&nResult, sizeof nResult);
+		SettingStore.RegSetValueEx(hKey, strRegistryKey, REG_DWORD, (LPBYTE)&nResult, sizeof nResult);
 	}
 	return nResult;
 }

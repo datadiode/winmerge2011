@@ -10,6 +10,20 @@
       Condition="'$(ConfigurationType)' != 'Makefile'">_SelectedFiles;$(impDependsOn)</impDependsOn>
   </PropertyGroup>
   <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>.;CompareEngines;Common;EASTL\include;jsoncpp\include;editlib;diffutils;diffutils\lib;diffutils\src;..\Externals\expat\lib;..\Externals\expat\xmlwf;..\Externals\scew;..\Externals\pcre\Win32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_WINDOWS;_CRT_SECURE_NO_WARNINGS=1;_CRT_SECURE_NO_DEPRECATE;_STATIC_CPPLIB;HAVE_STDLIB_H;STDC_HEADERS;HAVE_STRING_H=1;PR_FILE_NAME="pr";DIFF_PROGRAM="diff";REGEX_MALLOC;__MSC__;__NT__;USG=1;PCRE_STATIC;USE_EASTL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <ErrorReporting>None</ErrorReporting>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <StringPooling>true</StringPooling>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup>
     <imp>
       <CommandLineTemplate>lib /MACHINE:$(TargetMachine) /DEF:"%(FullPath)" /OUT:"$(IntDir)%(Filename).lib"</CommandLineTemplate>
       <Outputs>$(IntDir)%(Filename).lib</Outputs>

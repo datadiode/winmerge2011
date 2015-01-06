@@ -3,9 +3,6 @@
  *
  * @brief Options initialisation.
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "OptionsDef.h"
 #include "SettingStore.h"
@@ -46,7 +43,7 @@ static void SplitName(String strName, String &strPath, String &strValue)
  */
 void IOptionDef::LoadOption(HKEY key)
 {
-	CRegKeyEx section;
+	CRegKeyEx section = NULL;
 	String path, entry;
 	SplitName(name, path, entry);
 	section.OpenWithAccess(key, path.c_str(), KEY_READ);
@@ -79,7 +76,7 @@ void IOptionDef::LoadOption(HKEY key)
  */
 LSTATUS IOptionDef::SaveOption(HKEY key)
 {
-	CRegKeyEx section;
+	CRegKeyEx section = NULL;
 	String path, entry;
 	SplitName(name, path, entry);
 	LSTATUS error = section.OpenWithAccess(key, path.c_str(), KEY_WRITE);

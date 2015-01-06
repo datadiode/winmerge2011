@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "WindowPlacement.h"
+#include "SettingStore.h"
 
 bool CWindowPlacement::RegQuery(HKEY key, LPCTSTR subkey)
 {
@@ -8,7 +9,7 @@ bool CWindowPlacement::RegQuery(HKEY key, LPCTSTR subkey)
 	DWORD cb = sizeof sz - sizeof *sz;
 	*sz = _T(',');
 	DWORD type = REG_NONE;
-	RegQueryValueEx(key, subkey, NULL, &type, (LPBYTE)(sz + 1), &cb);
+	SettingStore.RegQueryValueEx(key, subkey, &type, (LPBYTE)(sz + 1), &cb);
 	if (type != REG_SZ)
 		return false;
 	UINT *p = reinterpret_cast<UINT *>(this + 1);
@@ -25,5 +26,5 @@ void CWindowPlacement::RegWrite(HKEY key, LPCTSTR subkey)
 	UINT *p = &showCmd;
 	while (p < reinterpret_cast<UINT *>(this + 1))
 		i += wsprintf(sz + i, _T(",%d"), *p++);
-	RegSetValueEx(key, subkey, 0, REG_SZ, (LPBYTE)(sz + 1), i * sizeof(TCHAR));
+	SettingStore.RegSetValueEx(key, subkey, REG_SZ, (LPBYTE)(sz + 1), i * sizeof(TCHAR));
 }

@@ -61,6 +61,9 @@
     <Filter Include="Editor Scripts">
       <UniqueIdentifier>{2d85e455-2d5b-4690-95f1-3ff3effa2c3a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="jsoncpp">
+      <UniqueIdentifier>{c2d1496e-6cb0-451f-a091-c5b78c410383}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="7zCommon.cpp">
@@ -669,6 +672,15 @@
     <ClCompile Include="system32\system32.cpp">
       <Filter>system32</Filter>
     </ClCompile>
+    <ClCompile Include="jsoncpp\src\lib_json\json_writer.cpp">
+      <Filter>jsoncpp</Filter>
+    </ClCompile>
+    <ClCompile Include="jsoncpp\src\lib_json\json_reader.cpp">
+      <Filter>jsoncpp</Filter>
+    </ClCompile>
+    <ClCompile Include="jsoncpp\src\lib_json\json_value.cpp">
+      <Filter>jsoncpp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\WindowPlacement.h">
@@ -1127,9 +1139,6 @@
     <ClInclude Include="editlib\editcmd.h">
       <Filter>EditLib</Filter>
     </ClInclude>
-    <ClInclude Include="editlib\edtlib.h">
-      <Filter>EditLib</Filter>
-    </ClInclude>
     <ClInclude Include="editlib\LineInfo.h">
       <Filter>EditLib</Filter>
     </ClInclude>
@@ -1165,6 +1174,30 @@
     </ClInclude>
     <ClInclude Include="system32\system32.h">
       <Filter>system32</Filter>
+    </ClInclude>
+    <ClInclude Include="jsoncpp\include\json\writer.h">
+      <Filter>jsoncpp</Filter>
+    </ClInclude>
+    <ClInclude Include="jsoncpp\include\json\forwards.h">
+      <Filter>jsoncpp</Filter>
+    </ClInclude>
+    <ClInclude Include="jsoncpp\include\json\json.h">
+      <Filter>jsoncpp</Filter>
+    </ClInclude>
+    <ClInclude Include="jsoncpp\include\json\reader.h">
+      <Filter>jsoncpp</Filter>
+    </ClInclude>
+    <ClInclude Include="jsoncpp\include\json\value.h">
+      <Filter>jsoncpp</Filter>
+    </ClInclude>
+    <ClInclude Include="jsoncpp\include\json\assertions.h">
+      <Filter>jsoncpp</Filter>
+    </ClInclude>
+    <ClInclude Include="jsoncpp\src\lib_json\json_tool.h">
+      <Filter>jsoncpp</Filter>
+    </ClInclude>
+    <ClInclude Include="jsoncpp\include\json\features.h">
+      <Filter>jsoncpp</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

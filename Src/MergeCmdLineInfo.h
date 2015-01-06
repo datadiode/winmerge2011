@@ -77,7 +77,7 @@ public:
 
 private:
 
-	String m_sRegHive;
+	String m_sConfigFileName; /**< Where to persist application settings when not using the registry. */
 
 	LPCTSTR EatParam(LPCTSTR, String &, bool *flag = 0) const;
 	LPCTSTR SetOption(LPCTSTR, IOptionDef &, LPCTSTR value = _T("1")) const;
@@ -87,5 +87,5 @@ private:
 	void AddPath(const String &path);
 
 	/** Operator= is not implemented. */
-	MergeCmdLineInfo& operator=(const MergeCmdLineInfo& rhs);
+	MergeCmdLineInfo& operator=(const MergeCmdLineInfo&);
 };

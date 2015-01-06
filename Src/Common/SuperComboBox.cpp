@@ -68,7 +68,7 @@ void HSuperComboBox::LoadState(LPCTSTR szRegSubKey, UINT nMaxItems)
 	{
 		DWORD n = 0;
 		DWORD bufsize = 0;
-		RegQueryInfoKey(hKey, NULL, NULL, NULL, NULL, NULL, NULL, &n, NULL, &bufsize, NULL, NULL);
+		SettingStore.RegQueryInfoKey(hKey, &n, &bufsize);
 		if (n > nMaxItems)
 			n = nMaxItems;
 		TCHAR *const s = reinterpret_cast<TCHAR *>(_alloca(bufsize));
@@ -78,7 +78,7 @@ void HSuperComboBox::LoadState(LPCTSTR szRegSubKey, UINT nMaxItems)
 			wsprintf(name, _T("Item_%d"), i);
 			DWORD cb = bufsize;
 			DWORD type = REG_NONE;
-			RegQueryValueEx(hKey, name, NULL, &type, reinterpret_cast<BYTE *>(s), &cb);
+			SettingStore.RegQueryValueEx(hKey, name, &type, reinterpret_cast<BYTE *>(s), &cb);
 			if (type == REG_SZ)
 			{
 				if (FindStringExact(-1, s) == -1 && s[0] != _T('\0'))
@@ -88,7 +88,7 @@ void HSuperComboBox::LoadState(LPCTSTR szRegSubKey, UINT nMaxItems)
 			}
 		}
 		SetCurSel(0);
-		RegCloseKey(hKey);
+		SettingStore.RegCloseKey(hKey);
 	}
 }
 
@@ -117,7 +117,7 @@ void HSuperComboBox::SaveState(LPCTSTR szRegSubKey, UINT nMaxItems)
 			{
 				TCHAR name[20];
 				wsprintf(name, _T("Item_%d"), j++);
-				RegSetValueEx(hKey, name, 0L, REG_SZ,
+				SettingStore.RegSetValueEx(hKey, name, REG_SZ,
 					reinterpret_cast<const BYTE *>(s.c_str()),
 					(s.length() + 1) * sizeof(TCHAR));
 				GetWindowText(strItem);
@@ -126,7 +126,7 @@ void HSuperComboBox::SaveState(LPCTSTR szRegSubKey, UINT nMaxItems)
 				break;
 			GetLBText(i++, s);
 		}
-		RegCloseKey(hKey);
+		SettingStore.RegCloseKey(hKey);
 	}
 }
 

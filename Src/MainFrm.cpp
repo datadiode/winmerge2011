@@ -366,24 +366,23 @@ void CMainFrame::LoadFilesMRU()
 {
 	if (HKEY hKey = SettingStore.GetSectionKey(_T("Recent File List")))
 	{
-		DWORD index = 0;
-		DWORD type;
-		TCHAR name[256];
-		BYTE data[1024];
-		DWORD cch, cb;
-		while (RegEnumValue(hKey, index,
-			name, &(cch = _countof(name)),
-			NULL, &type,
-			data, &(cb = sizeof data)) == ERROR_SUCCESS)
+		DWORD n = 0;
+		DWORD bufsize = 0;
+		SettingStore.RegQueryInfoKey(hKey, &n, &bufsize);
+		TCHAR *const s = reinterpret_cast<TCHAR *>(_alloca(bufsize));
+		for (DWORD i = 1 ; i <= n ; ++i)
 		{
+			TCHAR name[20];
+			wsprintf(name, _T("File%u"), i);
+			DWORD cb = bufsize;
+			DWORD type = REG_NONE;
+			SettingStore.RegQueryValueEx(hKey, name, &type, reinterpret_cast<BYTE *>(s), &cb);
 			if (type == REG_SZ)
 			{
-				String s = reinterpret_cast<LPTSTR>(data);
 				m_FilesMRU.push_back(s);
 			}
-			++index;
 		}
-		RegCloseKey(hKey);
+		SettingStore.RegCloseKey(hKey);
 	}
 }
 
@@ -397,11 +396,11 @@ void CMainFrame::SaveFilesMRU()
 			TCHAR name[20];
 			const String &value = m_FilesMRU[i];
 			wsprintf(name, _T("File%u"), ++i);
-			RegSetValueEx(hKey, name, 0, REG_SZ,
+			SettingStore.RegSetValueEx(hKey, name, REG_SZ,
 				reinterpret_cast<const BYTE *>(value.c_str()),
 				(value.length() + 1) * sizeof(TCHAR));
 		}
-		RegCloseKey(hKey);
+		SettingStore.RegCloseKey(hKey);
 	}
 }
 
@@ -2120,7 +2119,7 @@ void CMainFrame::addToMru(LPCTSTR szItem, LPCTSTR szRegSubKey, UINT nMaxItems)
 	{
 		DWORD n = 0;
 		DWORD bufsize = 0;
-		RegQueryInfoKey(hKey, NULL, NULL, NULL, NULL, NULL, NULL, &n, NULL, &bufsize, NULL, NULL);
+		SettingStore.RegQueryInfoKey(hKey, &n, &bufsize);
 		if (n > nMaxItems)
 			n = nMaxItems;
 		TCHAR *const s = reinterpret_cast<TCHAR *>(_alloca(bufsize));
@@ -2143,7 +2142,7 @@ void CMainFrame::addToMru(LPCTSTR szItem, LPCTSTR szRegSubKey, UINT nMaxItems)
 			wsprintf(name, _T("Item_%d"), --i);
 			DWORD cb = bufsize;
 			DWORD type = REG_NONE;
-			if (RegQueryValueEx(hKey, name, NULL, &type,
+			if (SettingStore.RegQueryValueEx(hKey, name, &type,
 				reinterpret_cast<BYTE *>(s), &cb) == ERROR_SUCCESS &&
 				strItem == s)
 			{
@@ -2151,22 +2150,22 @@ void CMainFrame::addToMru(LPCTSTR szItem, LPCTSTR szRegSubKey, UINT nMaxItems)
 			}
 		}
 		// move items down a step
-		for (i = n ; i != 0 ; --i)
+		for (i = n; i != 0; --i)
 		{
 			TCHAR name[20];
 			wsprintf(name, _T("Item_%d"), i - 1);
 			DWORD cb = bufsize;
 			DWORD type = REG_NONE;
-			if (RegQueryValueEx(hKey, name, NULL, &type,
+			if (SettingStore.RegQueryValueEx(hKey, name, &type,
 				reinterpret_cast<BYTE *>(s), &cb) == ERROR_SUCCESS)
 			{
 				wsprintf(name, _T("Item_%d"), i);
-				RegSetValueEx(hKey, name, 0L, REG_SZ,
+				SettingStore.RegSetValueEx(hKey, name, REG_SZ,
 					reinterpret_cast<const BYTE *>(s), cb);
 			}
 		}
 		// add most recent item
-		RegSetValueEx(hKey, _T("Item_0"), 0L, REG_SZ,
+		SettingStore.RegSetValueEx(hKey, _T("Item_0"), REG_SZ,
 			reinterpret_cast<const BYTE *>(strItem.c_str()),
 			(strItem.length() + 1) * sizeof(TCHAR));
 	}

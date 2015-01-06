@@ -3,18 +3,18 @@
  *
  * @brief Declaration of CRegKeyEx C++ wrapper class for reading Windows registry
  */
-// ID line follows -- this is updated by SVN
-// $Id$
+
+class CSettingStore;
 
 /**
  * @brief Class for reading/writing registry.
  */
 class CRegKeyEx
 {
-
 // Construction
 public:
-	CRegKeyEx(HKEY hKey = NULL);
+	CRegKeyEx();
+	CRegKeyEx(HKEY);
 	~CRegKeyEx();
 
 // Operations
@@ -51,5 +51,6 @@ public:
 	LONG DeleteValue(LPCTSTR pszKey) const;
 
 protected:
+	const CSettingStore &m_store;
 	HKEY m_hKey; /**< Open key (HKLM, HKCU, etc). */
 };
