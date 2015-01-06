@@ -109,13 +109,13 @@ int CMainFrame::SaveToVersionControl(LPCTSTR pszSavePath)
 				// process versioning system specific action
 				WaitStatusCursor waitstatus(IDS_VSS_CHECKOUT_STATUS);
 				m_vssHelper.SetProjectBase(dlg.m_strProject.c_str());
-				m_strVssUser = dlg.m_strUser.c_str();
-				m_strVssPassword = dlg.m_strPassword.c_str();
+				m_strVssUser = dlg.m_strUser;
+				m_strVssPassword = dlg.m_strPassword;
 				m_strVssDatabase = dlg.m_strSelectedDatabase;
 
 				SettingStore.WriteProfileString(_T("Settings"), _T("VssDatabase"), m_strVssDatabase.c_str());
 				SettingStore.WriteProfileString(_T("Settings"), _T("VssProject"), m_vssHelper.GetProjectBase().c_str());
-				SettingStore.WriteProfileString(_T("Settings"), _T("VssUser"), m_strVssUser);
+				SettingStore.WriteProfileString(_T("Settings"), _T("VssUser"), m_strVssUser.c_str());
 
 				HRESULT hr;
 				CMyComPtr<IVSSDatabase> vssdb;
@@ -133,8 +133,8 @@ int CMainFrame::SaveToVersionControl(LPCTSTR pszSavePath)
 				if (FAILED(hr = vssdb->Open(
 					CMyComBSTR(!m_strVssDatabase.empty() ?
 						(m_strVssDatabase + _T("\\srcsafe.ini")).c_str() : NULL),
-					m_strVssUser,
-					m_strVssPassword)))
+					CMyComBSTR(m_strVssUser.c_str()),
+					CMyComBSTR(m_strVssPassword.c_str()))))
 				{
 					ShowVSSError(hr, _T(""));
 				}

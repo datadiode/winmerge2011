@@ -168,8 +168,8 @@ public:
 	 */
 	/*@{*/ 
 protected:
-	CMyComBSTR m_strVssUser; /**< Visual Source Safe User ID */
-	CMyComBSTR m_strVssPassword; /**< Visual Source Safe Password */
+	String m_strVssUser; /**< Visual Source Safe User ID */
+	String m_strVssPassword; /**< Visual Source Safe Password */
 	String m_strVssDatabase; /**< Visual Source Safe database */
 	String m_strCCComment; /**< ClearCase comment */
 public:
