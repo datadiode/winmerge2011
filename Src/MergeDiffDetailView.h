@@ -1,21 +1,13 @@
-//////////////////////////////////////////////////////////////////////
 /** 
  * @file  MergeDiffDetailView.h
  *
  * @brief Declaration of CMergeDiffDetailView class
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-//
-//////////////////////////////////////////////////////////////////////
-#ifndef __MERGEDIFFDETAILVIEW_H__
-#define __MERGEDIFFDETAILVIEW_H__
-
+#pragma once
 
 /////////////////////////////////////////////////////////////////////////////
 // CMergeDiffDetailView view
 #include "GhostTextView.h"
-
 
 /**
  * @brief Class for Diff Pane View
@@ -84,11 +76,3 @@ protected:
 	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
 	void OnContextMenu(LPARAM);
 };
-
-/////////////////////////////////////////////////////////////////////////////
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
-
-
-#endif //__MERGEDIFFDETAILVIEW_H__

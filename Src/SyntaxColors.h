@@ -3,11 +3,7 @@
  *
  * @brief Declaration file for SyntaxColors class
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-#ifndef _SYNTAX_COLORS_H_
-#define _SYNTAX_COLORS_H_
+#pragma once
 
 /** 
  * @brief Indexes to color table
@@ -85,5 +81,3 @@ private:
 	COLORREF m_rgCustColors[16];
 	bool m_bolds[COLORINDEX_COUNT]; /**< Bold font enable/disable */
 } SyntaxColors;
-
-#endif // _SYNTAX_COLORS_H_

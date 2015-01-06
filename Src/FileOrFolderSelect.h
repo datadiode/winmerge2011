@@ -23,11 +23,7 @@
  *
  * @brief Declaration of the file and folder selection routines.
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-#ifndef _FILE_OR_FOLDER_SELECTION_H_
-#define _FILE_OR_FOLDER_SELECTION_H_
+#pragma once
 
 BOOL SelectFile(HWND parent, String &path,
 	UINT titleid = IDS_OPEN_TITLE, UINT filterid = IDS_ALLFILES,
@@ -36,5 +32,3 @@ BOOL SelectFile(HWND parent, String &path,
 BOOL SelectFolder(HWND parent, String &path, UINT titleid);
 
 BOOL SelectFileOrFolder(HWND parent, String &path, const String &filter);
-
-#endif

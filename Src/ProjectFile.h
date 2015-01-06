@@ -19,11 +19,7 @@
  *
  * @brief Declaration file ProjectFile class
  */
-// ID line follows -- this is updated by CVS
-// $Id$
-
-#ifndef _PROJECT_FILE_H_
-#define _PROJECT_FILE_H_
+#pragma once
 
 /**
  * @brief Class for handling project files.
@@ -50,5 +46,3 @@ public:
 	BOOL m_bLeftPathReadOnly; /**< Is left path opened as read-only */
 	BOOL m_bRightPathReadOnly; /**< Is right path opened as read-only */
 };
-
-#endif // #ifdef _PROJECT_FILE_H_

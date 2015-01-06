@@ -4,11 +4,7 @@
  * @brief Declaration file for CLogFile
  *
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-#ifndef _LOGFILE_H_
-#define _LOGFILE_H_
+#pragma once
 
 /**
  * @brief Class for writing log files.
@@ -98,6 +94,3 @@ private:
 	UINT      m_nDefaultLevel; /**< Default level for log messages */
 	UINT      m_nMaskLevel; /**< Level to mask messages written to log */
 } LogFile;
-
-
-#endif // _LOGFILE_H_

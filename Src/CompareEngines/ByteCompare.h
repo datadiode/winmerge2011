@@ -3,11 +3,7 @@
  *
  * @brief Declaration file for ByteCompare
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-#ifndef _BYTE_COMPARE_H_
-#define _BYTE_COMPARE_H_
+#pragma once
 
 #include "FileTextStats.h"
 
@@ -45,5 +41,3 @@ private:
 };
 
 } // namespace CompareEngines
-
-#endif // _BYTE_COMPARE_H_

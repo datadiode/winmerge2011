@@ -2,9 +2,7 @@
 // This file originates from 7-Zip 9.20, and is copyrighted and distributed by
 // Igor Pavlov under the terms of the GNU Lesser General Public License (LGPL).
 // It has been modified by WinMerge Team.
-
-#ifndef __MYCOM_H
-#define __MYCOM_H
+#pragma once
 
 #ifndef RINOK
 #define RINOK(x) { HRESULT __result_ = (x); if (__result_ != S_OK) return __result_; }
@@ -353,5 +351,3 @@ public:
 	CMyDispParams() { Unnamed.Make(rgvarg + cArgs + 1); }
 	~CMyDispParams() { Unnamed.Drop(); }
 };
-
-#endif

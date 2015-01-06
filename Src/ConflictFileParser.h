@@ -19,21 +19,15 @@
  *
  * @brief Declaration ConflictFileParser.
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 // Conflict file parsing method modified from original code got from:
 // TortoiseCVS - a Windows shell extension for easy version control
 // Copyright (C) 2000 - Francis Irving
 // <francis@flourish.org> - January 2001
 
-#ifndef _CONFLICT_FILE_PARSER_H_
-#define _CONFLICT_FILE_PARSER_H_
+#pragma once
 
 bool IsConflictFile(LPCTSTR conflictFileName);
 
 bool ParseConflictFile(LPCTSTR conflictFileName,
 		LPCTSTR workingCopyFileName, LPCTSTR newRevisionFileName,
 		bool &nestedConflicts);
-
-#endif // _CONFLICT_FILE_PARSER_H_

@@ -4,11 +4,7 @@
  * @brief Declaration for FileLocation class.
  *
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-#ifndef FileLocation_included
-#define FileLocation_included
+#pragma once
 
 #include "FileTextEncoding.h"
 
@@ -30,5 +26,3 @@ struct FileLocation
 	/*@}*/
 	FileTextEncoding encoding; /**< Encoding info for the file. */
 };
-
-#endif // FileLocation_included

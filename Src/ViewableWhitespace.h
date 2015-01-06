@@ -3,11 +3,7 @@
  *
  * @brief Repository of character tables used to display whitespace (when View/Whitespace enabled)
  */
-// RCS ID line follows -- this is updated by CVS
-// $Id$
-
-#ifndef ViewableWhitespace_included_h
-#define ViewableWhitespace_included_h
+#pragma once
 
 /**
  * @brief Structure containing characters for viewable whitespace chars.
@@ -28,5 +24,3 @@ struct ViewableWhitespaceChars
 	static const TCHAR c_lf		= L'\x00B6'; /**< Visible character for LF EOL chars. */
 	static const TCHAR c_eol	= L'\x00A4'; /**< Visible character for general EOL chars. */
 };
-
-#endif // ViewableWhitespace_included_h

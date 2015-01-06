@@ -3,14 +3,7 @@
  *
  *  @brief Declaration of CSortHeaderCtrl
  */ 
-// RCS ID line follows -- this is updated by CVS
-// $Id$
-//////////////////////////////////////////////////////////////////////
-
-
-#ifndef __SORTHEADERCTRL_H__
-#define __SORTHEADERCTRL_H__
-
+#pragma once
 
 /////////////////////////////////////////////////////////////////////////////
 // CSortHeaderCtrl
@@ -29,6 +22,3 @@ public:
 	void DrawItem(LPDRAWITEMSTRUCT);
 	int SetSortImage(int nCol, BOOL bAsc);
 };
-
-#endif
-// __SORTHEADERCTRL_H__

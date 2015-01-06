@@ -19,12 +19,6 @@
  *
  * @brief Declaration function detecting UTF-8 files.
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-#ifndef _UTF8FILEDETECT_H_
-#define _UTF8FILEDETECT_H_
+#pragma once
 
 bool CheckForInvalidUtf8(LPBYTE pBuffer, size_t size);
-
-#endif // _UTF8FILEDETECT_H_

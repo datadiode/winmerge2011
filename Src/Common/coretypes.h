@@ -1,5 +1,4 @@
-#ifndef CORETYPES_H
-#define CORETYPES_H
+#pragma once
 
 class FileTime : public FILETIME
 {
@@ -167,5 +166,3 @@ public:
 		return buf;
 	}
 };
-
-#endif

@@ -3,12 +3,6 @@
  *
  * @brief Declaration of the dialog used to select codepages
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-
-#if !defined(AFX_LOADSAVECODEPAGEDLG_H__B9A16700_6F1A_4DF1_8EB3_0A1D772DCE91__INCLUDED_)
-#define AFX_LOADSAVECODEPAGEDLG_H__B9A16700_6F1A_4DF1_8EB3_0A1D772DCE91__INCLUDED_
 #pragma once
 
 /////////////////////////////////////////////////////////////////////////////
@@ -49,8 +43,3 @@ protected:
 	void OnAffectsRightBtnClicked();
 	void OnOK();
 };
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
-
-#endif // !defined(AFX_LOADSAVECODEPAGEDLG_H__B9A16700_6F1A_4DF1_8EB3_0A1D772DCE91__INCLUDED_)

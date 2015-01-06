@@ -19,11 +19,7 @@
  *
  * @brief Declaration file for CVssPrompt
  */
-// RCS ID line follows -- this is updated by CVS
-// $Id$
-
-#if !defined(AFX_VSSPROMPT_H__F767E53B_90F4_11D1_BB11_00A024706EDC__INCLUDED_)
-#define AFX_VSSPROMPT_H__F767E53B_90F4_11D1_BB11_00A024706EDC__INCLUDED_
+#pragma once
 
 #include "SuperComboBox.h"
 
@@ -59,8 +55,3 @@ protected:
 
 	void OnOK();
 };
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Developer Studio will insert additional declarations immediately before the previous line.
-
-#endif // !defined(AFX_VSSPROMPT_H__F767E53B_90F4_11D1_BB11_00A024706EDC__INCLUDED_)

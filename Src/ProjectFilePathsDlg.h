@@ -3,11 +3,7 @@
  *
  * @brief Declaration file for ProjectFilePathsDlg dialog
  */
-// RCS ID line follows -- this is updated by CVS
-// $Id$
-
-#ifndef _PROJECTFILEPATHSDLG_H_
-#define _PROJECTFILEPATHSDLG_H_
+#pragma once
 
 #include "ProjectFile.h"
 
@@ -38,5 +34,3 @@ private:
 	void OnBnClickedProjOpen();
 	void OnBnClickedProjSave();
 };
-
-#endif // _PROJECTFILEPATHSDLG_H_

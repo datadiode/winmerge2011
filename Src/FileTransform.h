@@ -23,11 +23,7 @@
  *
  *  @brief Declaration of file transformations
  */ 
-// RCS ID line follows -- this is updated by CVS
-// $Id$
-
-#ifndef FileTransform_h
-#define FileTransform_h
+#pragma once
 
 #include "Common/UniFile.h"
 #include "Common/MyCom.h"
@@ -65,5 +61,3 @@ public:
 	bool disallowMixedEOL;
 	bool readOnly;
 };
-
-#endif // FileTransform_h

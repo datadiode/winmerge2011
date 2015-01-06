@@ -23,11 +23,7 @@
  * @brief Declaration file for CSplashWnd
  *
  */
-// RCS ID line follows -- this is updated by CVS
-// $Id$
-
-#ifndef _SPLASH_SCRN_
-#define _SPLASH_SCRN_
+#pragma once
 
 /**
  * @brief Splash screen class.
@@ -46,5 +42,3 @@ private:
 
 	CMyComPtr<IPicture> m_spIPicture;
 };
-
-#endif

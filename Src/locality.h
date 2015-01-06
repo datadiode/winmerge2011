@@ -3,11 +3,7 @@
  *
  * @brief Declaration of helper functions involving locale
  */
-// RCS ID line follows -- this is updated by CVS
-// $Id$
-
-#ifndef locality_h_included
-#define locality_h_included
+#pragma once
 
 namespace locality
 {
@@ -74,5 +70,3 @@ namespace locality
 };
 
 typedef locality::NumToLocaleStr NumToStr;
-
-#endif // locality_h_included

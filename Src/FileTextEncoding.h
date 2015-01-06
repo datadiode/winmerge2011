@@ -3,11 +3,7 @@
  *
  * @brief Declaration of FileTextEncoding structure
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-#ifndef FileTextEncoding_h_included
-#define FileTextEncoding_h_included
+#pragma once
 
 #include "unicoder.h"
 
@@ -30,6 +26,3 @@ struct FileTextEncoding
 
 	static int Collate(const FileTextEncoding & fte1, const FileTextEncoding & fte2);
 };
-
-
-#endif // FileTextEncoding_h_included

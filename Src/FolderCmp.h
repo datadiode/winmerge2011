@@ -3,11 +3,7 @@
  *
  * @brief Declaration file for FolderCmp
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-#ifndef _FOLDERCMP_H_
-#define _FOLDERCMP_H_
+#pragma once
 
 #include "DiffFileData.h"
 #include "DiffUtils.h"
@@ -44,6 +40,3 @@ private:
 	CompareEngines::ByteCompare *m_pByteCompare;
 	CompareEngines::TimeSizeCompare *m_pTimeSizeCompare;
 };
-
-
-#endif // _FOLDERCMP_H_

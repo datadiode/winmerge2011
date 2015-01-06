@@ -3,11 +3,7 @@
  *
  * @brief Declaration of CDiffTextBuffer class
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-#ifndef _DIFFTEXT_BUFFER_H_
-#define _DIFFTEXT_BUFFER_H_
+#pragma once
 
 #include "GhostTextBuffer.h"
 #include "FileTextEncoding.h"
@@ -187,5 +183,3 @@ public:
 	virtual void OnNotifyLineHasBeenEdited(int nLine);
 	bool IsSaveable() const;
 };
-
-#endif // _DIFFTEXT_BUFFER_H_

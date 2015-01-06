@@ -3,11 +3,7 @@
  *
  *  @brief Declaration of DIFFITEM
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-#ifndef _DIFF_ITEM_H_
-#define _DIFF_ITEM_H_
+#pragma once
 
 #include "ListEntry.h"
 #include "DiffFileInfo.h"
@@ -125,5 +121,3 @@ struct DIFFITEM : ListEntry
 	/** @brief Return whether the current item has children */
 	bool HasChildren() const { return !children.IsSolitary(); }
 };
-
-#endif // _DIFF_ITEM_H_

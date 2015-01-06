@@ -19,8 +19,7 @@
  *
  * @brief Declaration file for VSSHelper
  */
-#ifndef _VSSHELPER_H_
-#define _VSSHELPER_H_
+#pragma once
 
 /**
  * @brief Supported versioncontrol systems.
@@ -45,5 +44,3 @@ public:
 private:
 	String m_strVssProjectBase;
 };
-
-#endif // _VSSHELPER_H_

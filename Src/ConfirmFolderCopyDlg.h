@@ -19,11 +19,7 @@
  *
  * @brief Declaration file for ConfirmFolderCopyDlg dialog
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-#ifndef _CONFIRM_FOLDER_COPY_DLG_H_
-#define _CONFIRM_FOLDER_COPY_DLG_H_
+#pragma once
 
 /**
  * @brief Dialog for item copy confirmation.
@@ -45,5 +41,3 @@ protected:
 	virtual BOOL OnInitDialog();
 	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
 };
-
-#endif // _CONFIRM_FOLDER_COPY_DLG_H_

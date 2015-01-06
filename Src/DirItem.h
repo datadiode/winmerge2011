@@ -19,13 +19,9 @@
  *
  * @brief Declaration file for DirItem
  */
-// ID line follows -- this is updated by SVN
-// $Id$
+#pragma once
 
-#ifndef _DIR_ITEM_H_INCLUDED
-#define _DIR_ITEM_H_INCLUDED
-
-#include "common/coretypes.h"
+#include "Common/coretypes.h"
 
 /**
  * @brief Class for fileflags.
@@ -60,5 +56,3 @@ struct DirItem
 	BOOL ApplyFileTimeTo(LPCTSTR) const;
 	void ClearPartial();
 };
-
-#endif // _DIR_ITEM_H_INCLUDED

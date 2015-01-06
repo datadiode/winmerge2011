@@ -4,11 +4,7 @@
  * @brief WinMerge constants, URLs, paths etc.
  *
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-#ifndef _CONSTANTS_H_
-#define _CONSTANTS_H_
+#pragma once
 
 /** @brief URL for hyperlink in About-dialog. */
 const TCHAR WinMergeURL[] = _T("http://winmerge.org/");
@@ -63,5 +59,3 @@ enum
 	FFILEOPEN_DETECTZIP	= 0x0080, /**< Auto-detect archive files */
 	FFILEOPEN_DETECT	= FFILEOPEN_DETECTBIN | FFILEOPEN_DETECTZIP
 };
-
-#endif // _CONSTANTS_H_

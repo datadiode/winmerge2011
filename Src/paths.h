@@ -3,8 +3,7 @@
  *
  * @brief Declaration file for path routines
  */
-#ifndef paths_h_included
-#define paths_h_included
+#pragma once
 
 /**
  * @brief Possible values when checking for file/folder existence.
@@ -33,5 +32,3 @@ struct CurrentDirectory: String { CurrentDirectory(); };
 
 bool paths_PathIsExe(LPCTSTR);
 void paths_CompactPath(HEdit *, String &);
-
-#endif // paths_h_included

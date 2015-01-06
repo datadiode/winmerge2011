@@ -20,11 +20,7 @@
  * @brief Declaration file for CAboutDlg.
  *
  */
-// RCS ID line follows -- this is updated by CVS
-// $Id$
-
-#ifndef _ABOUTDLG_H_
-#define _ABOUTDLG_H_
+#pragma once
 
 /** 
  * @brief About-dialog class.
@@ -45,5 +41,3 @@ protected:
 	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
 	void OnBnClickedOpenContributors();
 };
-
-#endif // _ABOUTDLG_H_

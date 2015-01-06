@@ -3,11 +3,7 @@
  *
  * @brief Declaration file for Directory compare statusdialog class
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-#if !defined(AFX_DIRCOMPPROGRESSDLG_H__8F66C090_C232_429F_A4A2_18D43CCC6C38__INCLUDED_)
-#define AFX_DIRCOMPPROGRESSDLG_H__8F66C090_C232_429F_A4A2_18D43CCC6C38__INCLUDED_
+#pragma once
 
 #include "CompareStats.h"
 
@@ -51,8 +47,3 @@ private:
 	String m_strPauseContinue;
 	int m_rotPauseContinue;
 };
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
-
-#endif // !defined(AFX_DIRCOMPPROGRESSDLG_H__8F66C090_C232_429F_A4A2_18D43CCC6C38__INCLUDED_)

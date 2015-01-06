@@ -3,11 +3,7 @@
  *
  *  @brief Declaration of CVersionInfo class
  */ 
-// ID line follows -- this is updated by SVN
-// $Id$
-
-#ifndef VERSIONTOOLS_H
-#define VERSIONTOOLS_H
+#pragma once
 
 /**
  * @brief Class providing access to version information of a file.
@@ -47,11 +43,3 @@ protected:
 	String MakeVersionString(DWORD hi, DWORD lo) const;
 	WORD GetCodepageForLanguage(WORD wLanguage);
 };
-
-
-#endif
-
-/*******************************************************************************
-       END OF FILE
-*******************************************************************************/
-

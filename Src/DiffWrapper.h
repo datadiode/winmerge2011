@@ -21,8 +21,7 @@
  *
  * @date  Created: 2003-08-22
  */
-#ifndef _DIFFWRAPPER_H
-#define _DIFFWRAPPER_H
+#pragma once
 
 #include "FileLocation.h"
 #include "FileTextStats.h"
@@ -199,5 +198,3 @@ private:
 	DiffList *const m_pDiffList; /**< Pointer to external DiffList */
 	MovedLines *m_pMovedLines;
 };
-
-#endif // _DIFFWRAPPER_H

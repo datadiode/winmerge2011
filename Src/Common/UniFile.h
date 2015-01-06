@@ -6,11 +6,7 @@
  *
  *  @brief  Declaration of Unicode file classes.
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-#ifndef UniFile_h_included
-#define UniFile_h_included
+#pragma once
 
 #include "unicoder.h"
 
@@ -188,5 +184,3 @@ private:
 	ucr::buffer m_ucrbuff;
 	ISequentialStream *m_pstm;
 };
-
-#endif // UniFile_h_included

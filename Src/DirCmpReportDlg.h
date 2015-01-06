@@ -4,11 +4,7 @@
  * @brief Declaration file for DirCmpReport Dialog.
  *
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-#ifndef _DIRCMPREPORTDLG_H_
-#define _DIRCMPREPORTDLG_H_
+#pragma once
 
 #include "DirReportTypes.h"
 #include "SuperComboBox.h"
@@ -40,5 +36,3 @@ public:
 	REPORT_TYPE m_nReportType; /**< Report type integer */
 	BOOL m_bCopyToClipboard; /**< Do we copy report to clipboard? */
 };
-
-#endif // _DIRCMPREPORTDLG_H_

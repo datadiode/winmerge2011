@@ -3,11 +3,7 @@
  *
  * @brief Declaration file for FileVersion
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-#ifndef _FILE_VERSION_H_
-#define _FILE_VERSION_H_
+#pragma once
 
 /**
  * @brief A class that contains file version information.
@@ -23,5 +19,3 @@ public:
 	void Clear() { m_versionMS = m_versionLS = 0; }
 	String GetVersionString() const;
 };
-
-#endif // _FILE_VERSION_H_

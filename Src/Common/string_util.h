@@ -3,11 +3,7 @@
  *
  * @brief Char classification routines declarations.
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-#ifndef _STRING_UTIL_H_
-#define _STRING_UTIL_H_
+#pragma once
 
 int xisalnum(wint_t c);
 int xisspecial(wint_t c);
@@ -26,7 +22,7 @@ typedef TBYTE normch;
 /** @brief Return nonzero if input is outside ASCII or is underline. */
 inline int xisspecial(wint_t c)
 {
-  return normch(c) > (unsigned) _T('\x7f') || c == _T('_');
+	return normch(c) > (unsigned) _T('\x7f') || c == _T('_');
 }
 
 /**
@@ -35,7 +31,7 @@ inline int xisspecial(wint_t c)
  */
 inline int xisalpha(wint_t c)
 {
-  return _istalpha(normch(c)) || xisspecial(normch(c));
+	return _istalpha(normch(c)) || xisspecial(normch(c));
 }
 
 /**
@@ -44,7 +40,7 @@ inline int xisalpha(wint_t c)
  */
 inline int xisalnum(wint_t c)
 {
-  return _istalnum(normch(c)) || xisspecial(normch(c));
+	return _istalnum(normch(c)) || xisspecial(normch(c));
 }
 
 /**
@@ -53,7 +49,5 @@ inline int xisalnum(wint_t c)
  */
 inline int xisspace(wint_t c)
 {
-  return _istspace(normch(c));
+	return _istspace(normch(c));
 }
-
-#endif // _STRING_UTIL_H_

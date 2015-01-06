@@ -3,12 +3,7 @@
  *
  * @brief Declaration of DiffUtils class.
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-
-#ifndef _DIFF_UTILS_H_
-#define _DIFF_UTILS_H_
+#pragma once
 
 #include "DiffWrapper.h"
 
@@ -34,5 +29,3 @@ public:
 };
 
 } // namespace CompareEngines
-
-#endif // _DIFF_UTILS_H_

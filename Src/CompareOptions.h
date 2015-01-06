@@ -3,11 +3,7 @@
  *
  * @brief Compare options classes and types.
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-#ifndef CompareOptions_h_included
-#define CompareOptions_h_included
+#pragma once
 
 /**
  * @brief Whether to ignore whitespace (or to ignore changes in whitespace)
@@ -47,5 +43,3 @@ public:
 		memset(this, 0, sizeof *this);
 	}
 };
-
-#endif // CompareOptions_h_included

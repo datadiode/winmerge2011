@@ -1,5 +1,4 @@
-#ifndef DirReportTypes_h_included
-#define DirReportTypes_h_included
+#pragma once
 
 /**
  * @brief Report types in selection list.
@@ -12,6 +11,3 @@ typedef enum
 	REPORT_TYPE_SIMPLEHTML, /**< Simple html table */
 	REPORT_TYPE_SIMPLEXML, /**< Simple xml */
 } REPORT_TYPE;
-
-
-#endif // DirReportTypes_h_included

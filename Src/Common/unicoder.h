@@ -6,11 +6,7 @@
  *
  *  @brief  Declaration of utility unicode conversion routines
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-#ifndef unicoder_h_included
-#define unicoder_h_included
+#pragma once
 
 /** @brief Known Unicode encodings. */
 typedef enum
@@ -54,6 +50,3 @@ namespace ucr
 
 EXTERN_C UNICODESET DetermineEncoding(unsigned char *pBuffer, size_t size, unsigned *pBom);
 EXTERN_C int EqualCodepages(int cp1, int cp2);
-
-#endif // unicoder_h_included
-

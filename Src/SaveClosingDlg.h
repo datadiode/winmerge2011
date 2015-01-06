@@ -19,12 +19,7 @@
  *
  * @brief Declaration file for SaveClosingDlg dialog
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-
-#ifndef _SAVECLOSINGDLG_H_
-#define _SAVECLOSINGDLG_H_
+#pragma once
 
 /////////////////////////////////////////////////////////////////////////////
 // SaveClosingDlg dialog
@@ -68,5 +63,3 @@ protected:
 	void OnDiscardAll();
 	void OnOK();
 };
-
-#endif // _SAVECLOSINGDLG_H_
