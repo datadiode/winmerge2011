@@ -63,10 +63,6 @@
  *
  * @brief Implementation of the CCrystalEditView class
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-
 #include "StdAfx.h"
 #include <MyCom.h>
 #include "LanguageSelect.h"

@@ -3,9 +3,6 @@
  *
  * @brief Implementation of UndoRecord struct.
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "stdafx.h"
 #include "UndoRecord.h"
 

@@ -7,13 +7,10 @@
  *
  *  @brief Implementation of methods of CDirView that copy/move/delete files
  */
-// ID line follows -- this is updated by SVN
-// $Id$
 
 // It would be nice to make this independent of the UI (CDirView)
 // but it needs access to the list of selected items.
 // One idea would be to provide an iterator over them.
-//
 
 #include "stdafx.h"
 #include "Merge.h"

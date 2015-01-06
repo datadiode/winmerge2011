@@ -3,9 +3,6 @@
  *
  * @brief Implementation file for TimeSizeCompare
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "DiffItem.h"
 #include "DiffWrapper.h"

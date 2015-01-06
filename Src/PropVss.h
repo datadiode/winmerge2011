@@ -3,8 +3,6 @@
  *
  * @brief Declaration of VSS properties dialog.
  */
-// ID line follows -- this is updated by SVN
-// $Id$
 
 /** @brief Options property page covering Visual SourceSafe integration */
 class PropVss : public OptionsPanel

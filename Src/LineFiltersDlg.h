@@ -4,9 +4,6 @@
  * @brief Declaration file for Line Filter dialog
  *
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #pragma once
 
 class LineFiltersList;

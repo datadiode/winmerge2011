@@ -19,8 +19,6 @@
  *
  * @brief Declaration file PropRegistry
  */
-// ID line follows -- this is updated by SVN
-// $Id$
 
 /**
  * @brief Property page for system options; used in options property sheet.

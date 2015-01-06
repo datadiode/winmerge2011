@@ -3,8 +3,6 @@
  *
  * @brief Declaration of PropCodepage class
  */
-// ID line follows -- this is updated by SVN
-// $Id$
 
 class PropCodepage : public OptionsPanel
 {

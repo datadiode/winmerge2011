@@ -2,7 +2,6 @@
  * @file  PropHexEditor.h
  *
  * @brief Declaration file for PropHexEditor propertyheet
- *
  */
 
 /**

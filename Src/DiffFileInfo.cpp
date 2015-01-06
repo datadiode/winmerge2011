@@ -19,9 +19,6 @@
  *
  * @brief Implementation for DiffFileInfo routines
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "stdafx.h"
 #include "DirItem.h"
 #include "DiffFileInfo.h"

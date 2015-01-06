@@ -3,9 +3,6 @@
  *
  * @brief Implementation file for ByteCompare
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include <io.h>
 #include "FileLocation.h"

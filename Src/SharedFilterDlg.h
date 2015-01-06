@@ -6,9 +6,6 @@
  */
 #pragma once
 
-/////////////////////////////////////////////////////////////////////////////
-// CSharedFilterDlg dialog
-
 /**
  * @brief A dialog for selecting shared/private filter creation.
  * This dialog allows user to select if the new filter is a shared filter

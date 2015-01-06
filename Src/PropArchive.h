@@ -2,10 +2,7 @@
  * @file  PropArchive.h
  *
  * @brief Declaration file for PropArchive propertyheet
- *
  */
-// ID line follows -- this is updated by SVN
-// $Id$
 
 /** 
  * @brief Class for Archive Support options page.

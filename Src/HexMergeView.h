@@ -22,9 +22,6 @@
  *
  * @brief Declaration of CHexMergeDoc class
  */
-// RCS ID line follows -- this is updated by CVS
-// $Id$
-
 class IMergeEditStatus;
 class CHexMergeFrame;
 class IHexEditorWindow;
@@ -95,8 +92,3 @@ public:
 	void OnNextdiff();
 	void OnPrevdiff();
 };
-
-/////////////////////////////////////////////////////////////////////////////
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Developer Studio will insert additional declarations immediately before the previous line.

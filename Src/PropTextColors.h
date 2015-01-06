@@ -2,10 +2,7 @@
  * @file  PropTextColors.h
  *
  * @brief Declaration file for PropTextColors propertyheet
- *
  */
-// ID line follows -- this is updated by SVN
-// $Id$
 
 /** @brief Property page for colors options; used in options property sheet */
 class PropTextColors : public OptionsPanel

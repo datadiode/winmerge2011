@@ -23,9 +23,6 @@
  * @brief Declaration file for COpenDlg dialog
  *
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #pragma once
 
 /////////////////////////////////////////////////////////////////////////////

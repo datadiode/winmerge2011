@@ -29,9 +29,6 @@
  *
  */
 
-// ID line follows -- this is updated by SVN
-// $Id$
-
 class MergeCmdLineInfo;
 
 /**

@@ -23,9 +23,6 @@
  *
  * @brief Implementation file for CEditorFilepathBar class
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "Merge.h"
 #include "MainFrm.h"

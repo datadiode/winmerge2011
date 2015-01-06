@@ -23,9 +23,6 @@
  * @brief interface of the CHexMergeFrame class
  *
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #define HEKSEDIT_INTERFACE_VERSION 1
 #include "heksedit.h"
 
@@ -97,8 +94,3 @@ public:
 	void OnAllLeft();
 	void OnViewZoom(int direction);
 };
-
-/////////////////////////////////////////////////////////////////////////////
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Developer Studio will insert additional declarations immediately before the previous line.

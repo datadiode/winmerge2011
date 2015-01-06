@@ -2,10 +2,7 @@
  * @file  PropColors.h
  *
  * @brief Declaration file for PropMergeColors propertyheet
- *
  */
-// ID line follows -- this is updated by SVN
-// $Id$
 
 /** @brief Property page for colors options; used in options property sheet */
 class PropMergeColors : public OptionsPanel

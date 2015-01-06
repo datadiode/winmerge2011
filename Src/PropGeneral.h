@@ -3,8 +3,6 @@
  *
  * @brief Declaration of PropGeneral class
  */
-// ID line follows -- this is updated by SVN
-// $Id$
 
 /**
  * @brief Class for General options -propertypage.

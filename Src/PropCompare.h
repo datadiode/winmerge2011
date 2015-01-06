@@ -3,8 +3,6 @@
  *
  * @brief Declaration of PropCompare propertysheet
  */
-// ID line follows -- this is updated by SVN
-// $Id$
 
 /**
  * @brief Property page to set compare options for WinMerge.

@@ -2,10 +2,7 @@
  * @file  PropListColors.h
  *
  * @brief Declaration file for PropListColors propertyheet
- *
  */
-// ID line follows -- this is updated by SVN
-// $Id$
 
 /** @brief Property page for colors options; used in options property sheet */
 class PropListColors : public OptionsPanel

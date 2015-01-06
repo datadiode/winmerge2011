@@ -5,9 +5,6 @@
  *
  * @date  Created: 2003-08-22
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include <StdAfx.h>
 #include <io.h>
 #include "coretypes.h"

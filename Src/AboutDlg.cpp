@@ -20,9 +20,6 @@
  * @brief Implementation of the About-dialog.
  *
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "Constants.h"
 #include "Merge.h"

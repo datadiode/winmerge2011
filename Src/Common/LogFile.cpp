@@ -4,9 +4,6 @@
  * @brief Implementation file for CLogFile
  *
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "LogFile.h"
 #include "paths.h"

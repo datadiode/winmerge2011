@@ -19,9 +19,6 @@
  *
  * @brief Implementation for DirItem routines
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "coretools.h"
 #include "DirItem.h"

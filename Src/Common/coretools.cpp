@@ -4,9 +4,6 @@
  * @brief Common routines
  *
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "coretools.h"
 #include "paths.h"

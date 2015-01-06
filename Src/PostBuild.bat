@@ -3,7 +3,6 @@
 if not exist %1 rem: goto :usage
 if not exist %2 rem: goto :usage
 
-REM $Id$
 REM Enable echo lines below if you need to debug this script
 REM echo %0
 REM echo $(IntDir) = %1

@@ -29,9 +29,6 @@
  *
  *  @brief Implementation of Replace-dialog.
  */
-// RCS ID line follows -- this is updated by CVS
-// $Id$
-
 #include "StdAfx.h"
 #include "LanguageSelect.h"
 #include "Locality.h"

@@ -3,10 +3,6 @@
  *
  * @brief Implementation file for DiffUtils class.
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-
 #include "StdAfx.h"
 #include "DiffContext.h"
 #include "DIFF.H"

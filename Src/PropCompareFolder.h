@@ -3,11 +3,6 @@
  *
  * @brief Declaration of PropCompareFolder propertysheet
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-/////////////////////////////////////////////////////////////////////////////
-// PropCompareFolder dialog
 
 /**
  * @brief Property page to set folder compare options for WinMerge.
@@ -48,6 +43,3 @@ protected:
 	void OnDefaults();
 	void OnCbnSelchangeComparemethodcombo();
 };
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.

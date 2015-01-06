@@ -20,9 +20,6 @@
  * @brief Declaration file for ClearCase dialog.
  *
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #pragma once
 
 /**

@@ -3,8 +3,6 @@
  *
  * @brief Declaration of Shell options dialog class
  */
-// ID line follows -- this is updated by SVN
-// $Id$
 
 /**
  * @brief Class for Shell options -propertypage.

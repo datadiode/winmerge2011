@@ -7,9 +7,6 @@
  * (http://www.abstractspoon.com/) but is modified to use in
  * WinMerge.
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "OptionsPanel.h"
 #include "PropGeneral.h"
 #include "PropCompare.h"

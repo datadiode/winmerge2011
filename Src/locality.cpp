@@ -3,9 +3,6 @@
  *
  * @brief Implementation of helper functions involving locale
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 
 #ifdef _DEBUG

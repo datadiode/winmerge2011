@@ -3,8 +3,6 @@
   (c) 1998-2004 (W3C) MIT, ERCIM, Keio University
   See tidy.h for the copyright notice.
 
-  $Id$
-
 * Changes 2005-01-09 Jochen Tucht
   This file originates from the Tidy library (tidy.sourceforge.net).
   Dependencies on other parts of the library have been removed to make it

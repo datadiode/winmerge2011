@@ -3,9 +3,6 @@
  *
  *  @brief Implementation of DIFFITEM
  */ 
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "DiffItem.h"
 #include "paths.h"

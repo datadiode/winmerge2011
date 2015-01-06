@@ -2,10 +2,7 @@
  * @file  PropSyntaxColors.h
  *
  * @brief Declaration file for PropSyntaxColors propertyheet
- *
  */
-// ID line follows -- this is updated by SVN
-// $Id$
 
 class PropSyntaxColors : public OptionsPanel
 {

@@ -3,9 +3,6 @@
  *
  * @brief Implementation of FileTextEncoding structure
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "resource.h"
 #include "unicoder.h"

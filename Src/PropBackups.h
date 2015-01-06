@@ -2,10 +2,7 @@
  * @file  PropBackups.h
  *
  * @brief Declaration file for PropBackups propertyheet
- *
  */
-// ID line follows -- this is updated by SVN
-// $Id$
 
 /**
  * @brief A class for Backup file options page.

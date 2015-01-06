@@ -4,9 +4,6 @@
  * @brief Deducing codepage from file contents, when we can
  *
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "codepage_detect.h"
 #include "unicoder.h"

@@ -4,9 +4,6 @@
  * @brief Implementation file for Bitmap helper functions.
  *
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include <math.h>
 #include "Bitmap.h"

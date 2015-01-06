@@ -24,9 +24,6 @@
  * @brief Implementation file for CHexMergeDoc
  *
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "stdafx.h"
 #include "Merge.h"
 #include "MainFrm.h"
