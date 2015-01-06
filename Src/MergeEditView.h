@@ -21,13 +21,10 @@
  * @file  MergeEditView.h
  *
  * @brief Declaration file for CMergeEditView
- *
  */
-// ID line follows -- this is updated by SVN
-// $Id$
+#pragma once
 
-#if !defined(AFX_MERGEEDITVIEW_H__0CE31CFD_4BEE_4378_ADB4_B7C9F50A9F53__INCLUDED_)
-#define AFX_MERGEEDITVIEW_H__0CE31CFD_4BEE_4378_ADB4_B7C9F50A9F53__INCLUDED_
+#include "GhostTextView.h"
 
 /** 
  * @brief Color settings.
@@ -67,20 +64,13 @@ const UINT CONTEXT_LINES_ABOVE = 5;
  */
 const UINT CONTEXT_LINES_BELOW = 3;
 
-
-#define FLAG_RESCAN_WAITS_FOR_IDLE   1
-
-
 /////////////////////////////////////////////////////////////////////////////
 // CMergeEditView view
-#include "edtlib.h"
-#include "GhostTextView.h"
 
 class CLocationView;
 class CChildFrame;
 struct DIFFRANGE;
 class CShellContextMenu;
-
 
 /**
 This class is the base class for WinMerge editor panels.
@@ -195,10 +185,3 @@ public:
 	void OnEditCopyLineNumbers();
 	void OnViewMargin();
 };
-
-/////////////////////////////////////////////////////////////////////////////
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
-
-#endif // !defined(AFX_MERGEEDITVIEW_H__0CE31CFD_4BEE_4378_ADB4_B7C9F50A9F53__INCLUDED_)

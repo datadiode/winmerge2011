@@ -921,7 +921,6 @@
     <ClInclude Include="editlib\crystalparser.h" />
     <ClInclude Include="editlib\crystaltextblock.h" />
     <ClInclude Include="editlib\editcmd.h" />
-    <ClInclude Include="editlib\edtlib.h" />
     <ClInclude Include="editlib\LineInfo.h" />
     <ClInclude Include="editlib\UndoRecord.h" />
     <ClInclude Include="editlib\wcwidth.h" />
