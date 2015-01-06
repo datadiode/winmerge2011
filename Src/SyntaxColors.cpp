@@ -181,7 +181,6 @@ void CSyntaxColors::SaveToRegistry()
 {
 	if (CRegKeyEx key = SettingStore.GetSectionKey(DefColorsPath, CREATE_ALWAYS))
 	{
-		key.WriteDword(_T("Values"), COLORINDEX_COUNT);
 		for (UINT i = COLORINDEX_NONE; i < COLORINDEX_LAST; i++)
 		{
 			TCHAR name[40];
