@@ -3,9 +3,6 @@
  *
  * @brief Implementation file for FilterList.
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "FilterList.h"
 #include "LineFiltersList.h"
@@ -250,7 +247,7 @@ bool FilterList::Match(int stringlen, const char *string, int codepage)
 		string = (const char *)buf.ptr;
 		stringlen = buf.size;
 	}
-	stl::vector<regexp_item>::const_iterator iter = m_list.begin();
+	std::vector<regexp_item>::const_iterator iter = m_list.begin();
 	while (iter != m_list.end())
 	{
 		const regexp_item &item = *iter++;
@@ -264,7 +261,7 @@ bool FilterList::Match(int stringlen, const char *string, int codepage)
 
 BSTR FilterList::ApplyPredifferScripts(LPCTSTR filename, BSTR bstr)
 {
-	stl::vector<script_item>::iterator iter = m_predifferScripts.begin();
+	std::vector<script_item>::iterator iter = m_predifferScripts.begin();
 	VARIANT var;
 	V_VT(&var) = VT_BSTR;
 	V_BSTR(&var) = bstr;
@@ -299,7 +296,7 @@ int FilterList::ApplyPredifferRegExps(LPCTSTR filename, char *dst, const char *s
 
 void FilterList::ResetPrediffers(short side)
 {
-	stl::vector<script_item>::iterator iter = m_predifferScripts.begin();
+	std::vector<script_item>::iterator iter = m_predifferScripts.begin();
 	while (iter != m_predifferScripts.end())
 	{
 		script_item &script = *iter++;

@@ -22,12 +22,7 @@
  *
  *  @brief Declaration of class CDirView
  */
-//
-// ID line follows -- this is updated by SVN
-// $Id$
-
-#if !defined(AFX_DirView_H__16E7C721_351C_11D1_95CD_444553540000__INCLUDED_)
-#define AFX_DirView_H__16E7C721_351C_11D1_95CD_444553540000__INCLUDED_
+#pragma once
 
 /////////////////////////////////////////////////////////////////////////////
 // CDirView view
@@ -249,8 +244,8 @@ protected:
 	static HImageList *m_imageState;
 	int m_numcols;
 	int m_dispcols;
-	stl::vector<int> m_colorder; /**< colorder[logical#]=physical# */
-	stl::vector<int> m_invcolorder; /**< invcolorder[physical]=logical# */
+	std::vector<int> m_colorder; /**< colorder[logical#]=physical# */
+	std::vector<int> m_invcolorder; /**< invcolorder[physical]=logical# */
 	UINT m_nHiddenItems; /**< Count of items we have hidden */
 	UINT m_nSpecialItems; /**< Count of special items */
 	bool m_bTreeMode; /**< TRUE if tree mode is on*/
@@ -322,5 +317,3 @@ private:
 	void DeepExpandSubdir(int);
 	void PrepareDragData(UniStdioFile &);
 };
-
-#endif // !defined(AFX_DirView_H__16E7C721_351C_11D1_95CD_444553540000__INCLUDED_)

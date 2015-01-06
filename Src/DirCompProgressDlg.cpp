@@ -65,7 +65,7 @@ LRESULT DirCompProgressDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lPara
 				m_pDirDoc->GetCompareStats()->Continue();
 				break;
 			}
-			stl::rotate(m_strPauseContinue.begin(),
+			std::rotate(m_strPauseContinue.begin(),
 				m_strPauseContinue.begin() + m_strPauseContinue.find('\t') + 1,
 				m_strPauseContinue.end());
 			SetDlgItemText(IDC_PAUSE_CONTINUE,

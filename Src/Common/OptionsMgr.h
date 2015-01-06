@@ -4,9 +4,7 @@
  * @brief Option accessors to support existing OptionsMgr coding style
  *
  */
-
-#ifndef _OPTIONS_MGR_
-#define _OPTIONS_MGR_
+#pragma once
 
 #include "OptionsDef.h"
 
@@ -21,7 +19,7 @@ public:
 	template<class T>
 	static void Set(COptionDef<T> &opt, T value)
 	{
-		stl::swap(opt.curValue, value);
+		std::swap(opt.curValue, value);
 	}
 	template<class T>
 	static void Reset(COptionDef<T> &opt)
@@ -36,9 +34,7 @@ public:
 	template<class T>
 	static LSTATUS SaveOption(COptionDef<T> &opt, T value)
 	{
-		stl::swap(opt.curValue, value);
+		std::swap(opt.curValue, value);
 		return opt.SaveOption();
 	}
 };
-
-#endif // _OPTIONS_MGR_

@@ -65,7 +65,7 @@
 #include <MyCom.h>
 #include <mlang.h>
 
-using stl::vector;
+using std::vector;
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -2467,7 +2467,7 @@ LRESULT CMainFrame::OnWndMsg<WM_DROPFILES>(WPARAM wParam, LPARAM)
 	UINT fileCount = DragQueryFile(dropInfo, 0xFFFFFFFF, NULL, 0);
 	if (fileCount > 2)
 		fileCount = 2;
-	stl::vector<String> files(2);
+	std::vector<String> files(2);
 	UINT i;
 	// get all file names. but we'll only need the first one.
 	for (i = 0; i < fileCount; i++)
@@ -4111,7 +4111,7 @@ HMenu *CMainFrame::SetScriptMenu(HMenu *pMenu, LPCSTR section)
 	{
 		unsigned id = ID_SCRIPT_FIRST;
 		m_pScriptMenu = HMenu::CreatePopupMenu();
-		stl::string language;
+		std::string language;
 		bool bLocalized = LanguageSelect.GetPoHeaderProperty("X-Poedit-Language", language);
 		do
 		{

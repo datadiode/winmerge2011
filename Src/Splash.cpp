@@ -251,8 +251,8 @@ LRESULT CSplashWnd::OnCustomdraw(NMCUSTOMDRAW *pnm)
 	String text = LanguageSelect.LoadString(IDS_SPLASH_DEVELOPERS);
 	// Replace ", " with linefeed in developers list text to get
 	// developers listed a name per line in the about dialog
-	stl::string::size_type pos = stl::string::npos;
-	while ((pos = text.rfind(_T(", "), pos)) != stl::string::npos)
+	std::string::size_type pos = std::string::npos;
+	while ((pos = text.rfind(_T(", "), pos)) != std::string::npos)
 	{
 		text.replace(pos, 2, _T("\n"), 1);
 	}

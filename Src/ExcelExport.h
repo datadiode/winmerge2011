@@ -35,7 +35,7 @@ public:
 	String sFooter;
 	String sViewer;
 	int nShowViewer;
-	stl::string sSheetName;
+	std::string sSheetName;
 private:
 	struct BiffRecord;
 	HRESULT hr;

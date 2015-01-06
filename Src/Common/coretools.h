@@ -3,11 +3,7 @@
  *
  * @brief Declaration file for Coretools.cpp
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-#ifndef CORETOOLS_H
-#define CORETOOLS_H
+#pragma once
 
 /******** function protos ********/
 
@@ -20,12 +16,11 @@ String GetModulePath(HMODULE hModule = NULL);
 int linelen(const char *string);
 size_t unslash(unsigned codepage, char *string);
 
-inline void unslash(unsigned codepage, stl::string &s)
+inline void unslash(unsigned codepage, std::string &s)
 {
-	s.resize(static_cast<stl::string::size_type>(unslash(codepage, &s.front())));
+	s.resize(static_cast<std::string::size_type>(unslash(codepage, &s.front())));
 }
 
 DWORD NTAPI RunIt(LPCTSTR szExeFile, LPCTSTR szArgs, LPCTSTR szDir);
 
 void DecorateCmdLine(String &sDecoratedCmdLine, String &sExecutable);
-#endif

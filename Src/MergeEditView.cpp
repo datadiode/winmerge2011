@@ -44,7 +44,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-using stl::vector;
+using std::vector;
 
 /** @brief Timer ID for delayed rescan. */
 const UINT IDT_RESCAN = 2;
@@ -1250,7 +1250,7 @@ HMenu *CMergeEditView::ApplyPatch(IStream *pstm, int id)
 	HMenu *pMenu = id ? NULL : HMenu::CreatePopupMenu();
 	CDiffTextBuffer *const pTextBuffer = GetTextBuffer();
 	StreamLineReader reader = pstm;
-	stl::string line;
+	std::string line;
 	OString text = NULL;
 	unsigned pos1, len1, pos2, len2;
 	TRACE("#BOF#\n");
@@ -1258,13 +1258,13 @@ HMenu *CMergeEditView::ApplyPatch(IStream *pstm, int id)
 	{
 		if (line.find_first_not_of('-') == 3)
 		{
-			stl::replace(line.begin(), line.end(), '\t', ' ');
+			std::replace(line.begin(), line.end(), '\t', ' ');
 			text.Free();
 			text.Append(HString::Oct(line.c_str())->Uni(CP_UTF8)->Trim());
 		}
 		else if (line.find_first_not_of('+') == 3)
 		{
-			stl::replace(line.begin(), line.end(), '\t', ' ');
+			std::replace(line.begin(), line.end(), '\t', ' ');
 			text.Append(L"\t");
 			text.Append(HString::Oct(line.c_str())->Uni(CP_UTF8)->Trim());
 			if (pMenu)
@@ -1282,8 +1282,8 @@ HMenu *CMergeEditView::ApplyPatch(IStream *pstm, int id)
 			// operate in verify-only mode or in apply mode.
 			if (pMenu == NULL && id == 0)
 				pos1 = pos2;
-			stl::vector<CMyComBSTR> vec1(len1);
-			stl::vector<CMyComBSTR> vec2(len2);
+			std::vector<CMyComBSTR> vec1(len1);
+			std::vector<CMyComBSTR> vec2(len2);
 			len1 = len2 = 0;
 			while (len1 < vec1.size() || len2 < vec2.size())
 			{

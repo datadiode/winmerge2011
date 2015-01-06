@@ -23,11 +23,7 @@
  * @brief Declaration file for CDirFrame
  *
  */
-// RCS ID line follows -- this is updated by CVS
-// $Id$
-
-#if !defined(AFX_DIRFRAME_H__95565903_35C4_11D1_BAA7_00A024706EDC__INCLUDED_)
-#define AFX_DIRFRAME_H__95565903_35C4_11D1_BAA7_00A024706EDC__INCLUDED_
+#pragma once
 
 /////////////////////////////////////////////////////////////////////////////
 // CDirFrame frame
@@ -36,8 +32,8 @@
 
 class CDirView;
 class CHexMergeFrame;
-typedef stl::list<CChildFrame *> MergeDocPtrList;
-typedef stl::list<CHexMergeFrame *> HexMergeDocPtrList;
+typedef std::list<CChildFrame *> MergeDocPtrList;
+typedef std::list<CHexMergeFrame *> HexMergeDocPtrList;
 class CTempPathContext;
 struct FileActionItem;
 
@@ -151,10 +147,3 @@ private:
 	String m_strLeftDesc; /**< Left side desription text */
 	String m_strRightDesc; /**< Left side desription text */
 };
-
-/////////////////////////////////////////////////////////////////////////////
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Developer Studio will insert additional declarations immediately before the previous line.
-
-#endif // !defined(AFX_DIRFRAME_H__95565903_35C4_11D1_BAA7_00A024706EDC__INCLUDED_)

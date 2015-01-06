@@ -3,11 +3,7 @@
  *
  * @brief ISequentialStream implementations which may be of some utility.
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-#ifndef _STREAM_UTIL_H_
-#define _STREAM_UTIL_H_
+#pragma once
 
 /** 
  * @brief A sequential stream.
@@ -132,7 +128,5 @@ public:
 		: pstm(pstm), index(0), ahead(0)
 	{
 	}
-	stl::string::size_type readLine(stl::string &);
+	std::string::size_type readLine(std::string &);
 };
-
-#endif // _STREAM_UTIL_H_

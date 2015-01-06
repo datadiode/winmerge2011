@@ -434,7 +434,7 @@ void CPatchDlg::OnDiffSwapFiles()
 	m_pCbFile2->GetWindowText(m_file1);
 	m_pCbFile1->SetWindowText(m_file1.c_str());
 	m_pCbFile2->SetWindowText(m_file2.c_str());
-	stl::vector<PATCHFILES>::iterator iter = m_fileList.begin();
+	std::vector<PATCHFILES>::iterator iter = m_fileList.begin();
 	while (iter != m_fileList.end())
 	{
 		iter->swap_sides();

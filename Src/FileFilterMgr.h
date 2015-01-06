@@ -17,11 +17,7 @@
  *
  *  @brief Declaration file for FileFilterMgr
  */ 
-// ID line follows -- this is updated by SVN
-// $Id$
-
-#ifndef FileFilterMgr_h_included
-#define FileFilterMgr_h_included
+#pragma once
 
 #include "FileFilter.h"
 
@@ -55,7 +51,5 @@ public:
 
 // Implementation data
 public:
-	stl::vector<FileFilter *> m_filters; /*< List of filters loaded */
+	std::vector<FileFilter *> m_filters; /*< List of filters loaded */
 };
-
-#endif // FileFilterMgr_h_included

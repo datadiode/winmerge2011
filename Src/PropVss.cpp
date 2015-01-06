@@ -293,7 +293,7 @@ void PropVss::WriteOptions()
 				item.hItem = m_pTvClearCaseTypeMgrSetup->GetNextSiblingItem(item.hItem);
 			}
 			// Leave the whole bunch of rules not referring to WinMerge as is.
-			stl::string line;
+			std::string line;
 			StreamLineReader reader = src;
 			while (reader.readLine(line))
 			{
@@ -352,7 +352,7 @@ BOOL PropVss::OnInitDialog()
 	m_pTvClearCaseTypeMgrSetup->SetStyle(m_pTvClearCaseTypeMgrSetup->GetStyle() | TVS_CHECKBOXES);
 	if (NClearCase::CTypeMgrMapStream pstm = STGM_READ | STGM_SHARE_DENY_WRITE)
 	{
-		stl::string line;
+		std::string line;
 		StreamLineReader reader = pstm;
 		DWORD verbs = NClearCase::none;
 		while (reader.readLine(line))

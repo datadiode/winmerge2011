@@ -7,7 +7,7 @@
 #include "StdAfx.h"
 #include "MovedLines.h"
 
-using stl::map;
+using std::map;
 
 /**
  * @brief clear the lists of moved blocks.

@@ -19,9 +19,6 @@
  *
  * @brief Declaration file for File Filters dialog
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #pragma once
 
 /**
@@ -37,7 +34,7 @@ public:
 	String m_sFileFilterPath;
 // Implementation data
 private:
-	const stl::vector<FileFilter *> &m_Filters;
+	const std::vector<FileFilter *> &m_Filters;
 
 	HListView *m_listFilters;
 

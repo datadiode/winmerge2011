@@ -23,11 +23,7 @@
  * @brief interface of the CChildFrame class
  *
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-#if !defined(AFX_CHILDFRM_H__BBCD4F8E_34E4_11D1_BAA6_00A024706EDC__INCLUDED_)
-#define AFX_CHILDFRM_H__BBCD4F8E_34E4_11D1_BAA6_00A024706EDC__INCLUDED_
+#pragma once
 
 class UniStdioFile;
 
@@ -167,7 +163,7 @@ public:
 
 	DiffList m_diffList;
 	UINT m_nTrivialDiffs; /**< Amount of trivial (ignored) diffs */
-	stl::vector<FileTextStats> m_pFileTextStats;
+	std::vector<FileTextStats> m_pFileTextStats;
 
 	int GetActiveMergeViewIndexType() const;
 	CGhostTextView *GetActiveTextView() const;
@@ -223,7 +219,7 @@ public:
 public:
 	typedef enum { BYTEDIFF, WORDDIFF } DIFFLEVEL;
 	void Showlinediff(CCrystalTextView *, CMergeEditView *, DIFFLEVEL);
-	void GetWordDiffArray(int nLineIndex, stl::vector<wdiff> &worddiffs);
+	void GetWordDiffArray(int nLineIndex, std::vector<wdiff> &worddiffs);
 private:
 	void Computelinediff(CCrystalTextView *, CCrystalTextView *, int, RECT &, RECT &, DIFFLEVEL);
 // End MergeDocLineDiffs.cpp
@@ -239,8 +235,8 @@ private:
 public:
 	FileChange IsFileChangedOnDisk(LPCTSTR, DiffFileInfo &, const DiffFileInfo &);
 	bool PromptAndSaveIfNeeded(bool bAllowCancel);
-	stl::vector<CMergeEditView*> undoTgt;
-	stl::vector<CMergeEditView*>::iterator curUndo;
+	std::vector<CMergeEditView*> undoTgt;
+	std::vector<CMergeEditView*>::iterator curUndo;
 	void FlushAndRescan(bool bForced = false);
 	void SetCurrentDiff(int nDiff);
 	int GetCurrentDiff() { return m_nCurDiff; }
@@ -257,8 +253,8 @@ private:
 	CMergeEditView *m_pView[MERGE_VIEW_COUNT]; /**< Pointer to left/right view */
 	CMergeDiffDetailView *m_pDetailView[2];
 
-	stl::vector<DiffFileInfo> m_pSaveFileInfo;
-	stl::vector<DiffFileInfo> m_pRescanFileInfo;
+	std::vector<DiffFileInfo> m_pSaveFileInfo;
+	std::vector<DiffFileInfo> m_pRescanFileInfo;
 
 	bool m_bEditAfterRescan[2]; /**< Left/right doc edited after rescanning */
 	bool m_bInitialReadOnly[2]; /**< Left/right doc initial read-only state */
@@ -269,7 +265,7 @@ private:
 	FileTime m_LastRescan; /**< Time of last rescan (for delaying) */ 
 	CDiffWrapper m_diffWrapper;
 	/// information about the file packer/unpacker
-	const stl::auto_ptr<PackingInfo> m_pInfoUnpacker;
+	const std::auto_ptr<PackingInfo> m_pInfoUnpacker;
 // friend access
 	friend class RescanSuppress;
 
@@ -309,10 +305,3 @@ private:
 	FileLoadResult::FILES_RESULT ReloadDoc(int index);
 	FileLoadResult::FILES_RESULT LoadFile(int nBuffer, bool &readOnly, FileLocation &);
 };
-
-/////////////////////////////////////////////////////////////////////////////
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Developer Studio will insert additional declarations immediately before the previous line.
-
-#endif // !defined(AFX_CHILDFRM_H__BBCD4F8E_34E4_11D1_BAA6_00A024706EDC__INCLUDED_)

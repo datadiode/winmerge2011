@@ -10,7 +10,7 @@
 #include "CompareOptions.h"
 #include "stringdiffsi.h"
 
-using stl::vector;
+using std::vector;
 
 // Uncomment this to see stringdiff log messages
 // We don't use _DEBUG since stringdiff logging is verbose and slows down WinMerge

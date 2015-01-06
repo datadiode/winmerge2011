@@ -23,11 +23,7 @@
  * @brief Interface of the CEditorFilePathBar class.
  *
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-#ifndef __EDITORFILEPATHBAR_H__
-#define __EDITORFILEPATHBAR_H__
+#pragma once
 
 #include <Common/FloatState.h>
 #include <Common/SplitState.h>
@@ -89,11 +85,8 @@ protected:
 private:
 	HToolTips *m_pToolTips;
 	String m_sToolTipString;
-	stl::vector<String> m_rgOriginalText;
+	std::vector<String> m_rgOriginalText;
 	bool m_rgActive[2];
 	bool m_rgFocused[2];
 	HEdit *m_Edit[2]; /**< Edit controls. */
 };
-
-
-#endif //__EDITORFILEPATHBAR_H__

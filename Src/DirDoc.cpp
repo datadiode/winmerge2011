@@ -559,7 +559,7 @@ void CDirFrame::AddMergeDoc(CHexMergeFrame *pHexMergeDoc)
  */
 void CDirFrame::MergeDocClosing(CChildFrame *pMergeDoc)
 {
-	MergeDocPtrList::iterator pos = stl::find(
+	MergeDocPtrList::iterator pos = std::find(
 		m_MergeDocs.begin(), m_MergeDocs.end(), pMergeDoc);
 	if (pos != m_MergeDocs.end())
 		m_MergeDocs.erase(pos);
@@ -572,7 +572,7 @@ void CDirFrame::MergeDocClosing(CChildFrame *pMergeDoc)
  */
 void CDirFrame::MergeDocClosing(CHexMergeFrame *pHexMergeDoc)
 {
-	HexMergeDocPtrList::iterator pos = stl::find(
+	HexMergeDocPtrList::iterator pos = std::find(
 		m_HexMergeDocs.begin(), m_HexMergeDocs.end(), pHexMergeDoc);
 	if (pos != m_HexMergeDocs.end())
 		m_HexMergeDocs.erase(pos);

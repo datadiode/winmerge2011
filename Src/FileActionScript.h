@@ -19,11 +19,7 @@
  *
  * @brief Declaration file for FileActionScript and related classes
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-#ifndef _FILEACTIONSCRIPT_H_
-#define _FILEACTIONSCRIPT_H_
+#pragma once
 
 /** 
  * @brief FileAction presents one filesystem action we want to do.
@@ -142,7 +138,5 @@ public:
 	bool m_bMakeTargetItemWritable; /**< Whether to make copy/move target items writable */
 
 private:
-	stl::vector<FileActionItem> m_actions; /**< List of all actions for this script. */
+	std::vector<FileActionItem> m_actions; /**< List of all actions for this script. */
 };
-
-#endif // _FILEACTIONSCRIPT_H_

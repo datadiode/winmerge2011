@@ -29,11 +29,11 @@
  */
 void DIFFRANGE::swap_sides()
 {
-	stl::swap(begin0, begin1);
-	stl::swap(end0, end1);
-	stl::swap(dbegin0, dbegin1);
-	stl::swap(dend0, dend1);
-	stl::swap(blank0, blank1);
+	std::swap(begin0, begin1);
+	std::swap(end0, end1);
+	std::swap(dbegin0, dbegin1);
+	std::swap(dend0, dend1);
+	std::swap(blank0, blank1);
 }
 
 /**
@@ -307,8 +307,8 @@ int DiffList::LastSignificantDiff() const
  */
 void DiffList::SwapSides()
 {
-	stl::vector<DiffRangeInfo>::iterator iter = m_diffs.begin();
-	stl::vector<DiffRangeInfo>::const_iterator iterEnd = m_diffs.end();
+	std::vector<DiffRangeInfo>::iterator iter = m_diffs.begin();
+	std::vector<DiffRangeInfo>::const_iterator iterEnd = m_diffs.end();
 	while (iter != iterEnd)
 	{
 		iter->diffrange.swap_sides();
@@ -325,8 +325,8 @@ void DiffList::AddExtraLinesCounts(
 	UINT &rnLeftLines, UINT &rnRightLines,
 	CDiffTextBuffer **ptBuf, UINT nContextLines)
 {
-	stl::vector<DiffRangeInfo>::iterator iter = m_diffs.begin();
-	stl::vector<DiffRangeInfo>::iterator iterEnd = m_diffs.end();
+	std::vector<DiffRangeInfo>::iterator iter = m_diffs.begin();
+	std::vector<DiffRangeInfo>::iterator iterEnd = m_diffs.end();
 	UINT nLeftLines = 0;
 	UINT nRightLines = 0;
 	UINT end0 = 0;
@@ -424,7 +424,7 @@ int DiffList::FinishSyncPoint(int nDiff, int nRealStartLine[])
 
 void DiffList::swap(DiffList &other)
 {
-	stl::swap(m_firstSignificant, other.m_firstSignificant);
-	stl::swap(m_lastSignificant, other.m_lastSignificant);
+	std::swap(m_firstSignificant, other.m_firstSignificant);
+	std::swap(m_lastSignificant, other.m_lastSignificant);
 	m_diffs.swap(other.m_diffs);
 }

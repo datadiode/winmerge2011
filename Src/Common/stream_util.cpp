@@ -71,20 +71,20 @@ HRESULT STDMETHODCALLTYPE HtmWriteStream::Write(const void *pv, ULONG cb, ULONG 
 	return hr;
 }
 
-stl::string::size_type StreamLineReader::readLine(stl::string &s)
+std::string::size_type StreamLineReader::readLine(std::string &s)
 {
 	s.resize(0);
 	do 
 	{
-		stl::string::size_type n = s.size();
+		std::string::size_type n = s.size();
 		s.resize(n + ahead);
 		char *lower = &s[n];
 		if (char *upper = (char *)_memccpy(lower, chunk + index, '\n', ahead))
 		{
-			n = static_cast<stl::string::size_type>(upper - lower);
+			n = static_cast<std::string::size_type>(upper - lower);
 			index += n;
 			ahead -= n;
-			s.resize(static_cast<stl::string::size_type>(upper - s.c_str()));
+			s.resize(static_cast<std::string::size_type>(upper - s.c_str()));
 			break;
 		}
 		index = ahead = 0;

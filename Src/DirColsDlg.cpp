@@ -5,9 +5,6 @@
  *
  * @date  Created: 2003-08-19
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "merge.h"
 #include "LanguageSelect.h"
@@ -98,7 +95,7 @@ BOOL CDirColsDlg::OnInitDialog()
 	LoadLists();
 	m_listColumns->SetColumnWidth(0, LVSCW_AUTOSIZE_USEHEADER);
 	// Sort m_cols so that it is in logical column order
-	stl::sort(m_cols.begin(), m_cols.end(), &CompareColumnsByLogicalOrder);
+	std::sort(m_cols.begin(), m_cols.end(), &CompareColumnsByLogicalOrder);
 	return TRUE;
 }
 

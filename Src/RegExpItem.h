@@ -45,7 +45,7 @@ struct regexp_item
 		pcre_free(pRegExp);
 		pcre_free(pRegExpExtra);
 	}
-	static int process(const stl::vector<regexp_item> &,
+	static int process(const std::vector<regexp_item> &,
 		char *dst, const char *src, int len, LPCTSTR filename = NULL);
-	static bool indifferent(const stl::vector<regexp_item> &, LPCTSTR, LPCTSTR);
+	static bool indifferent(const std::vector<regexp_item> &, LPCTSTR, LPCTSTR);
 };

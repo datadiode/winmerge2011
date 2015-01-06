@@ -5,11 +5,7 @@
  *
  * @date  Created: 2003-08-22
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-#ifndef _DIFFFILEDATA_H_
-#define _DIFFFILEDATA_H_
+#pragma once
 
 // forward declarations needed by DiffFileData
 struct file_data;
@@ -34,15 +30,13 @@ struct DiffFileData
 // Data (public)
 	file_data *const m_inf;
 	bool m_used; // whether m_inf has real data
-	stl::vector<FileLocation> m_FileLocation;
-	stl::vector<FileTextStats> m_textStats;
+	std::vector<FileLocation> m_FileLocation;
+	std::vector<FileTextStats> m_textStats;
 
-	stl::vector<String> m_sDisplayFilepath;
+	std::vector<String> m_sDisplayFilepath;
 
 private:
 	bool DoOpenFiles();
 	DiffFileData(const DiffFileData &); // disallow copy construction
 	void operator=(const DiffFileData &); // disallow assignment
 };
-
-#endif // _DIFFFILEDATA_H_

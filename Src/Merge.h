@@ -167,8 +167,8 @@ class CEditorFrame : public CDocFrame
 public:
 	CDirFrame *m_pDirDoc;
 	String m_sCompareAs;
-	stl::vector<String> m_strPath; /**< Filepaths for this document */
-	stl::vector<String> m_strDesc; /**< Left/right side description text */
+	std::vector<String> m_strPath; /**< Filepaths for this document */
+	std::vector<String> m_strDesc; /**< Left/right side description text */
 	BUFFERTYPE m_nBufferType[2];
 protected:
 	CEditorFrame(CMainFrame *pAppFrame, CDirFrame *pDirDoc, HandleSet *pHandleSet, const LONG *FloatScript, const LONG *SplitScript = NULL)

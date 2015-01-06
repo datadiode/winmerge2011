@@ -19,9 +19,6 @@
  *
  * @brief CConfigLog implementation
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "Constants.h"
 #include "Common/version.h"
@@ -132,7 +129,7 @@ void CConfigLog::WriteItemYesNo(int indent, LPCTSTR key, bool *pvalue)
 	}
 	else
 	{
-		stl::map<String, String>::iterator it = m_settings.find(key);
+		std::map<String, String>::iterator it = m_settings.find(key);
 		if (it != m_settings.end())
 		{
 			if (it->second == _T("Yes"))
@@ -278,7 +275,7 @@ void CConfigLog::WriteItemWhitespace(int indent, LPCTSTR key, int *pvalue)
 	else
 	{
 		*pvalue = namemap[0].ival;
-		stl::map<String, String>::iterator it = m_settings.find(key);
+		std::map<String, String>::iterator it = m_settings.find(key);
 		if (it != m_settings.end())
 		{
 			for (int i = 0 ; i < _countof(namemap) ; ++i)

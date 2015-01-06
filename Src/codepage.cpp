@@ -37,7 +37,7 @@ static int f_nDefaultCodepage; // store the default codepage as specified by use
 
 // map number to bit code
 enum { CP_SUPPORTED_FLAG = 0x01, CP_INSTALLED_FLAG = 0x10 };
-static stl::map<int, int> f_codepage_status;
+static std::map<int, int> f_codepage_status;
 
 /**
  * @brief Update the appropriate default codepage
@@ -119,7 +119,7 @@ static void initialize()
 bool isCodepageInstalled(int codepage)
 {
 	initialize();
-	stl::map<int, int>::iterator it = f_codepage_status.find(codepage);
+	std::map<int, int>::iterator it = f_codepage_status.find(codepage);
 	return it != f_codepage_status.end() && (it->second & CP_INSTALLED_FLAG) != 0;
 }
 
@@ -129,7 +129,7 @@ int isCodepageDBCS(int codepage)
 	return GetCPInfo(codepage, &cpinfo) && cpinfo.LeadByte[0] != 0 ? codepage : 0;
 }
 
-const stl::map<int, int> &codepage_status()
+const std::map<int, int> &codepage_status()
 {
 	initialize();
 	return f_codepage_status;

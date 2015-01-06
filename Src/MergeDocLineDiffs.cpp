@@ -4,9 +4,6 @@
  * @brief Implementation file for word diff highlighting (F4) for merge edit & detail views
  *
  */
-// RCS ID line follows -- this is updated by CVS
-// $Id$
-
 #include "StdAfx.h"
 #include "Merge.h"
 #include "LanguageSelect.h"
@@ -20,7 +17,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-using stl::vector;
+using std::vector;
 
 /**
  * @brief Display the line/word difference highlight in edit view

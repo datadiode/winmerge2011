@@ -4,11 +4,7 @@
  * @brief Declaration file for DirCmpReport.
  *
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-#ifndef _DIRCMPREPORT_H_
-#define _DIRCMPREPORT_H_
+#pragma once
 
 #include "DirReportTypes.h"
 
@@ -57,11 +53,9 @@ protected:
 
 private:
 	CDirView *const m_pList; /**< Pointer to UI-list */
-	stl::vector<String> m_rootPaths; /**< Root paths, printed to report */
+	std::vector<String> m_rootPaths; /**< Root paths, printed to report */
 	String m_sTitle; /**< Report title, built from root paths */
 	int m_nColumns; /**< Columns in UI */
 	String m_sSeparator; /**< Column separator for report */
 	IStream *m_pFile; /**< File to write report to */
 };
-
-#endif // _DIRCMPREPORT_H_

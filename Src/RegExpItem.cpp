@@ -90,10 +90,10 @@ const char *regexp_item::assign(LPCTSTR pch, int cch)
 	return filterString->A;
 }
 
-int regexp_item::process(const stl::vector<regexp_item> &relist,
+int regexp_item::process(const std::vector<regexp_item> &relist,
 	char *dst, const char *src, int len, LPCTSTR filename)
 {
-	stl::vector<regexp_item>::const_iterator iter = relist.begin();
+	std::vector<regexp_item>::const_iterator iter = relist.begin();
 	while (iter != relist.end())
 	{
 		const regexp_item &filter = *iter++;
@@ -204,7 +204,7 @@ int regexp_item::process(const stl::vector<regexp_item> &relist,
 	return len;
 }
 
-bool regexp_item::indifferent(const stl::vector<regexp_item> &relist, LPCTSTR p, LPCTSTR q)
+bool regexp_item::indifferent(const std::vector<regexp_item> &relist, LPCTSTR p, LPCTSTR q)
 {
 	OString str1 = HString::Uni(p)->Oct(CP_UTF8);
 	OString str2 = HString::Uni(q)->Oct(CP_UTF8);

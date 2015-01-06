@@ -19,9 +19,7 @@
  *
  * @brief FilterCommentsManager class declaration.
  */
-
-#ifndef _FILTERCOMMENTSMANAGER_H_
-#define _FILTERCOMMENTSMANAGER_H_
+#pragma once
 
 enum OP_TYPE;
 struct file_data;
@@ -40,11 +38,11 @@ struct file_data;
 
 struct FilterCommentsSet
 {
-	stl::string StartMarker;
-	stl::string EndMarker;
-	stl::string InlineMarker;
+	std::string StartMarker;
+	std::string EndMarker;
+	std::string InlineMarker;
 	static const char quote_flag_ignore = '\x7F';
-	static const char *FindCommentMarker(const char *target, const stl::string &marker, char quote_flag = '\0');
+	static const char *FindCommentMarker(const char *target, const std::string &marker, char quote_flag = '\0');
 	OP_TYPE PostFilter(int StartPos, int QtyLinesInBlock, const file_data *inf) const;
 };
 
@@ -73,7 +71,5 @@ private:
 	FilterCommentsManager& operator=(const FilterCommentsManager&);//Don't allow assignment
 	//Use String instead of std::string, so as to allow UNICODE file extensions
 	FilterCommentsSet m_empty;
-	stl::map<String, FilterCommentsSet> m_FilterCommentsSetByFileType;
+	std::map<String, FilterCommentsSet> m_FilterCommentsSetByFileType;
 };
-
-#endif // _FILTERCOMMENTSMANAGER_H_

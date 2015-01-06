@@ -23,9 +23,6 @@
  *
  * @brief Main implementation file for CDirView
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "Constants.h"
 #include "Merge.h"
@@ -949,7 +946,7 @@ bool CDirView::OpenTwoItems(DIFFITEM *di1, DIFFITEM *di2, String &path1, String 
 	// Ensure that di1 is on left (swap if needed)
 	if (di1->isSideRightOnly() || (di1->isSideBoth() && di2->isSideLeftOnly()))
 	{
-		stl::swap(di1, di2);
+		std::swap(di1, di2);
 	}
 	// Fill in pathLeft & pathRight
 	String temp;

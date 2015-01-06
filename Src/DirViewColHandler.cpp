@@ -5,10 +5,6 @@
  *
  * @date  Created: 2003-08-19
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-
 #include "StdAfx.h"
 #include "resource.h"
 #include "LanguageSelect.h"
@@ -186,7 +182,7 @@ void CDirView::UpdateDiffItemStatus(UINT nIdx)
 	RedrawItems(nIdx, nIdx);
 }
 
-static stl::vector<String> rgDispinfoText(2); // used in function below
+static std::vector<String> rgDispinfoText(2); // used in function below
 
 /**
  * @brief Allocate a text buffer to assign to NMLVDISPINFO::item::pszText

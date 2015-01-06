@@ -57,7 +57,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-using stl::swap;
+using std::swap;
 
 /** @brief Max len of path in caption. */
 static const UINT CAPTION_PATH_MAX = 50;

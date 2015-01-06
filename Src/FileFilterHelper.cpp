@@ -25,7 +25,7 @@
 #include "coretools.h"
 #include "paths.h"
 
-using stl::vector;
+using std::vector;
 
 IDiffFilter transparentFileFilter;
 FileFilterHelper globalFileFilter;
@@ -113,7 +113,7 @@ bool FileFilterHelper::CreateFromMask()
 	while (*(mask += StrSpn(mask, separators)))
 	{
 		String regExp;
-		stl::vector<regexp_item> *filters = NULL;
+		std::vector<regexp_item> *filters = NULL;
 		if (LPCTSTR pch = EatPrefixTrim(mask, _T("f:")))
 		{
 			mask = pch;

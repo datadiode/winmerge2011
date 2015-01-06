@@ -3,8 +3,7 @@
  *
  *  @brief Declaration of class CompareStats
  */ 
-#ifndef _COMPARESTATS_H_
-#define _COMPARESTATS_H_
+#pragma once
 
 struct DIFFITEM;
 class CDiffContext;
@@ -120,7 +119,5 @@ private:
 		{
 		}
 	};
-	stl::vector<ThreadState> m_rgThreadState;
+	std::vector<ThreadState> m_rgThreadState;
 };
-
-#endif // _COMPARESTATS_H_

@@ -28,7 +28,6 @@
  *	a recipient may use your version of this file under either the MPL or
  *	the LGPL License.
  */
-
 #pragma once
 
 //////////////////////////////////////////////////////////////////////////////
@@ -121,7 +120,7 @@ private:
 		String	title;				// title of a dialog button.
 	} MSGBOXBTN;
 
-	stl::vector<MSGBOXBTN> m_aButtons;
+	std::vector<MSGBOXBTN> m_aButtons;
 									// List of all buttons in the dialog.
 	int			m_nDefaultButton;	// ID of the default button.
 

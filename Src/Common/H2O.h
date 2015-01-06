@@ -42,9 +42,9 @@ typedef struct _IMAGELIST { int unused; } IMAGELIST__;
 #include <tchar.h>
 
 #ifdef UNICODE
-#define std_tchar(type) stl::w##type
+#define std_tchar(type) std::w##type
 #else
-#define std_tchar(type) stl::type
+#define std_tchar(type) std::type
 #endif
 
 typedef std_tchar(string) String;

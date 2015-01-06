@@ -19,9 +19,6 @@
  *
  * @brief Implementation of FileActionScript and related classes
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "Merge.h"
 #include "LanguageSelect.h"
@@ -31,7 +28,7 @@
 #include "paths.h"
 #include "ConfirmFolderCopyDlg.h"
 
-using stl::vector;
+using std::vector;
 
 /**
  * @brief Standard constructor.

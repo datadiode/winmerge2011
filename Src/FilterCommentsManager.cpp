@@ -88,7 +88,7 @@ FilterCommentsManager::FilterCommentsManager()
 */
 const FilterCommentsSet &FilterCommentsManager::GetSetForFileType(const String& FileTypeName) const
 {
-	stl::map<String, FilterCommentsSet>::const_iterator pSet =
+	std::map<String, FilterCommentsSet>::const_iterator pSet =
 		m_FilterCommentsSetByFileType.find(FileTypeName);
 	return pSet != m_FilterCommentsSetByFileType.end() ? pSet->second : m_empty;
 }
@@ -101,7 +101,7 @@ const FilterCommentsSet &FilterCommentsManager::GetSetForFileType(const String& 
  *				apostrophes or quotation marks
  * @return Points to marker, or to EOL if no marker is present
  */
-const char *FilterCommentsSet::FindCommentMarker(const char *target, const stl::string &marker, char quote_flag)
+const char *FilterCommentsSet::FindCommentMarker(const char *target, const std::string &marker, char quote_flag)
 {
 	C_ASSERT(('"' & 0x3F) == '"');
 	C_ASSERT(('\'' & 0x3F) == '\'');
@@ -146,8 +146,8 @@ OP_TYPE FilterCommentsSet::PostFilter(int StartPos, int QtyLinesInBlock, const f
 	const char *upperOutsideInlineComment = linebuf[upperOutsideInlineCommentLine];
 	if (!InlineMarker.empty())
 	{
-		stl::swap(lowerOutsideInlineComment, upperOutsideInlineComment);
-		stl::swap(lowerOutsideInlineCommentLine, upperOutsideInlineCommentLine);
+		std::swap(lowerOutsideInlineComment, upperOutsideInlineComment);
+		std::swap(lowerOutsideInlineCommentLine, upperOutsideInlineCommentLine);
 		for (int i = StartPos ; i < EndPos ; ++i)
 		{
 			const char *lower = linebuf[i];

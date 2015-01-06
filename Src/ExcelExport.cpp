@@ -233,7 +233,7 @@ void CExcelExport::WriteWorkbook(HListView *pLv, int flags)
 {
 	HHeaderCtrl *const pHd = pLv->GetHeaderCtrl();
 	int const nCols = pHd->GetItemCount();
-	stl::vector<WORD> rgFormatIndex;
+	std::vector<WORD> rgFormatIndex;
 	rgFormatIndex.resize(nCols);
 	int cxChar = pLv->GetStringWidth(_T("0"));
 	TCHAR szText[INFOTIPSIZE];

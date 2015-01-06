@@ -28,9 +28,6 @@
  *
  * @brief Declaration file for CCrystalTextBuffer.
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #pragma once
 
 #include "LineInfo.h"
@@ -140,7 +137,7 @@ protected:
 	};
 
 	//  Lines of text
-	stl::vector<LineInfo> m_aLines; /**< Text lines. */
+	std::vector<LineInfo> m_aLines; /**< Text lines. */
 
 	//  Undo
 	virtual const UndoRecord &GetUndoRecord(stl_size_t i) const = 0;
@@ -156,7 +153,7 @@ protected:
 	//END SW
 
 	//  Connected views
-	stl::list<CCrystalTextView *> m_lpViews;
+	std::list<CCrystalTextView *> m_lpViews;
 
 	//  Helper methods
 	void InsertLine(LPCTSTR pszLine, int nLength, int nPosition = -1);

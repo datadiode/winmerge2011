@@ -163,7 +163,7 @@ HString *CMarkdown::_HSTR::Uni(const EntityMap &map, unsigned cp)
 	{
 		*q = '\0';
 		OLECHAR *key = p + 1;
-		stl::wstring value;
+		std::wstring value;
 		if (*key == '#')
 		{
 			int ordinal = '?';

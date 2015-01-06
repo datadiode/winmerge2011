@@ -19,11 +19,7 @@
  *
  * @brief Declaration file for patch creation dialog
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-#if !defined(AFX_PATCHDLG_H__AB3CE671_1328_11D7_B088_005004D9D386__INCLUDED_)
-#define AFX_PATCHDLG_H__AB3CE671_1328_11D7_B088_005004D9D386__INCLUDED_
+#pragma once
 
 #include "SuperComboBox.h"
 
@@ -75,7 +71,7 @@ public:
 // Implementation
 protected:
 
-	stl::vector<PATCHFILES> m_fileList; /**< Source files to create patch from */
+	std::vector<PATCHFILES> m_fileList; /**< Source files to create patch from */
 
 	void ChangeFile(LPCTSTR sFile, BOOL bLeft);
 	void UpdateSettings();
@@ -99,8 +95,3 @@ protected:
 	void OnDefaultSettings();
 
 };
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
-
-#endif // !defined(AFX_PATCHDLG_H__AB3CE671_1328_11D7_B088_005004D9D386__INCLUDED_)

@@ -19,11 +19,7 @@
  *
  * @brief Declaration file for PatchTool class
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-#ifndef _PATCHTOOL_H_
-#define _PATCHTOOL_H_
+#pragma once
 
 #include "PatchDlg.h"
 
@@ -42,8 +38,8 @@ struct PATCHFILES
 	// Swap sides
 	void swap_sides()
 	{
-		stl::swap(lfile, rfile);
-		stl::swap(pathLeft, pathRight);
+		std::swap(lfile, rfile);
+		std::swap(pathLeft, pathRight);
 	}
 	PATCHFILES() { }
 	PATCHFILES(const PATCHFILES &);
@@ -66,5 +62,3 @@ private:
 	CDiffWrapper m_diffWrapper; /**< DiffWrapper instance we use to create patch. */
 	CPatchDlg m_dlgPatch; /**< Dialog for selecting files and options. */
 };
-
-#endif	// _PATCHTOOL_H_

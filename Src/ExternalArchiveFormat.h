@@ -1,7 +1,7 @@
 class CExternalArchiveFormat : public Merge7z::Format
 {
 private:
-	typedef stl::map<String, stl::auto_ptr<CExternalArchiveFormat> > Map;
+	typedef std::map<String, std::auto_ptr<CExternalArchiveFormat> > Map;
 	static Map m_map;
 	static String GetShortPathName(LPCTSTR, DWORD = 0);
 	int SetPath(String &, LPCTSTR, LPCTSTR, DWORD = 0) const;

@@ -326,7 +326,7 @@ namespace H2O
 		PROPSHEETPAGE *AddPage(ODialog &page);
 		INT_PTR DoModal(HINSTANCE hinst, HWND parent);
 	private:
-		stl::vector<PROPSHEETPAGE> m_pages;
+		std::vector<PROPSHEETPAGE> m_pages;
 		static int CALLBACK PropSheetProc(HWND, UINT, LPARAM);
 		static LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 	};

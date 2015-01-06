@@ -3,8 +3,7 @@
  *
  * @brief Declaration file for CLanguageSelect dialog.
  */
-#ifndef _LANGUAGESELECT_H_
-#define _LANGUAGESELECT_H_
+#pragma once
 
 /////////////////////////////////////////////////////////////////////////////
 // CLanguageSelect dialog
@@ -40,15 +39,15 @@ public:
 	void ReloadMenu();
 	void TranslateDialog(HWND) const;
 	String LoadString(UINT) const;
-	stl::wstring LoadDialogCaption(LPCTSTR lpDialogTemplateID) const;
+	std::wstring LoadDialogCaption(LPCTSTR lpDialogTemplateID) const;
 	HMenu *LoadMenu(UINT) const;
 	HINSTANCE FindResourceHandle(LPCTSTR id, LPCTSTR type) const;
 	HACCEL LoadAccelerators(UINT) const;
 	HICON LoadIcon(UINT) const;
 	HICON LoadSmallIcon(UINT) const;
 	HImageList *LoadImageList(UINT, int cx, int cGrow = 0) const;
-	bool TranslateString(LPCSTR, stl::string &) const;
-	bool TranslateString(LPCWSTR, stl::wstring &) const;
+	bool TranslateString(LPCSTR, std::string &) const;
+	bool TranslateString(LPCWSTR, std::wstring &) const;
 	int DoModal(ODialog &, HWND parent = NULL) const;
 	HWND Create(ODialog &, HWND parent = NULL) const;
 
@@ -58,15 +57,15 @@ public:
 	int MsgBox(UINT, UINT = MB_OK) const;
 	int MsgBox(UINT, LPCTSTR, UINT = MB_OK) const;
 
-	bool GetPoHeaderProperty(const char *name, stl::string &value) const;
+	bool GetPoHeaderProperty(const char *name, std::string &value) const;
 // Implementation data
 private:
 	HINSTANCE m_hCurrentDll;
 	LANGID m_wCurLanguage;
-	stl::string m_poheader;
+	std::string m_poheader;
 	class strarray
 	{
-		stl::vector<LPCSTR> m_vec;
+		std::vector<LPCSTR> m_vec;
 	public:
 		strarray()
 		{
@@ -135,5 +134,3 @@ protected:
 	// Generated message map functions
 	void OnOK();
 } LanguageSelect;
-
-#endif // _LANGUAGESELECT_H_

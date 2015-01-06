@@ -4,11 +4,7 @@
  * @brief Declaration for UndoRecord structure.
  *
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-#ifndef _EDITOR_UNDO_RECORD_H_
-#define _EDITOR_UNDO_RECORD_H_
+#pragma once
 
 class UndoRecord
 {
@@ -16,7 +12,7 @@ public:
 	DWORD m_dwFlags;
 	POINT m_ptStartPos, m_ptEndPos;  //  Block of text participating
 	int m_nAction;            //  For information only: action type
-	stl::vector<DWORD> m_paSavedRevisonNumbers;
+	std::vector<DWORD> m_paSavedRevisonNumbers;
 
 private:
 	//  TCHAR   *m_pcText;
@@ -84,5 +80,3 @@ public:
 		return reinterpret_cast<UINT_PTR>(m_pszText) > 0xFFFF ? m_pszText->size : 1;
 	}
 };
-
-#endif // _EDITOR_UNDO_RECORD_H_

@@ -19,9 +19,6 @@
  *
  * @brief Moved block detection code.
  */
-// RCS ID line follows -- this is updated by CVS
-// $Id$
-
 #include "stdafx.h"
 #include "diff.h"
 
@@ -34,7 +31,7 @@ public:
 	bool isPresent(int val) const { m_map.find(val) != m_map.end(); }
 	int getSingle() const { return m_map.begin()->first; }
 private:
-	stl::map<int, int> m_map;
+	std::map<int, int> m_map;
 };
 
 /** 
@@ -55,7 +52,7 @@ class CodeToGroupMap
 	//CTypedPtrMap<CMapPtrToPtr, void*, EqGroup *>
 {
 public:
-	stl::map<int, EqGroup *> m_map;
+	std::map<int, EqGroup *> m_map;
 	/** @brief Add a line to the appropriate equivalency group */
 	void Add(int lineno, int eqcode, int nside)
 	{
@@ -74,13 +71,13 @@ public:
 	/** @brief Return the appropriate equivalency group */
 	EqGroup *find(int eqcode)
 	{
-		stl::map<int, EqGroup *>::const_iterator it = m_map.find(eqcode);
+		std::map<int, EqGroup *>::const_iterator it = m_map.find(eqcode);
 		return it != m_map.end() ? it->second : NULL;
 	}
 
 	~CodeToGroupMap()
 	{
-		stl::map<int, EqGroup *>::const_iterator pos = m_map.begin();
+		std::map<int, EqGroup *>::const_iterator pos = m_map.begin();
 		while (pos != m_map.end())
 			delete pos++->second;
 	}

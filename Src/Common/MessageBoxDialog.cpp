@@ -50,7 +50,7 @@
 #define new DEBUG_NEW
 #endif
 
-using stl::vector;
+using std::vector;
 
 //////////////////////////////////////////////////////////////////////////////
 // Layout values (in dialog units).

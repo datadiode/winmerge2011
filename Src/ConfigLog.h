@@ -19,11 +19,7 @@
  *
  * @brief Declaration file ConfigLog class
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-#ifndef _CONFIGLOG_H_
-#define _CONFIGLOG_H_
+#pragma once
 
 class CfgSettings;
 class UniStdioFile;
@@ -154,7 +150,5 @@ private:
 	UniStdioFile *const m_pfile;
 	bool m_writing;
 	// Collection of configuration settings found in config log (name/value map)
-	stl::map<String, String> m_settings;
+	std::map<String, String> m_settings;
 };
-
-#endif /* _CONFIGLOG_H_ */

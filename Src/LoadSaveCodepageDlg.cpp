@@ -104,8 +104,8 @@ BOOL CLoadSaveCodepageDlg::OnInitDialog()
 	HComboBox *pCbLoadCodepage = static_cast<HComboBox *>(GetDlgItem(IDC_LOAD_CODEPAGE_TEXTBOX));
 	HComboBox *pCbSaveCodepage = static_cast<HComboBox *>(GetDlgItem(IDC_SAVE_CODEPAGE_TEXTBOX));
 
-	const stl::map<int, int> &f_codepage_status = codepage_status();
-	stl::map<int, int>::const_iterator it = f_codepage_status.begin();
+	const std::map<int, int> &f_codepage_status = codepage_status();
+	std::map<int, int>::const_iterator it = f_codepage_status.begin();
 	while (it != f_codepage_status.end())
 	{
 		CPINFOEX info;

@@ -280,7 +280,7 @@ private:
 	void SaveFilesMRU();
 
 	String m_TitleMRU;
-	stl::vector<String> m_FilesMRU;
+	std::vector<String> m_FilesMRU;
 
 	String m_lastCollectFolder;
 
@@ -289,7 +289,7 @@ private:
 
 	HMenu *m_pScriptMenu;
 	String m_TitleScripts;
-	stl::vector<String> m_Scripts;
+	std::vector<String> m_Scripts;
 
 	class Strings : public CMyDispatch<IDispatch>
 	{

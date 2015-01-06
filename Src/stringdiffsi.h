@@ -4,11 +4,6 @@
  * @brief Declaration file for class stringdiffs
  *
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-#ifndef stringdiffsi_h_included
-#define stringdiffsi_h_included
 
 /**
  * @brief kind of diff blocks.
@@ -41,7 +36,7 @@ class stringdiffs
 public:
 	stringdiffs(const String &str1, const String &str2,
 		bool case_sensitive, int whitespace, int breakType,
-		stl::vector<wdiff> &diffs);
+		std::vector<wdiff> &diffs);
 
 	~stringdiffs();
 
@@ -63,16 +58,16 @@ private:
 // Implementation methods
 private:
 
-	void BuildWordsArray(const String &str, stl::vector<word> &words);
-	static void InsertInWords(stl::vector<word> &words, int bw);
-	int FindPreMatchInWords(const stl::vector<word> &words, const word &needword, int bw, int side) const;
-	int FindNextMatchInWords(const stl::vector<word> &words, const word &needword, int bw, int side) const;
-	static int FindNextSpaceInWords(const stl::vector<word> &words, int bw);
-	static int FindPreNoInsertInWords(const stl::vector<word> &words, int bw);
-	static int FindNextInsertInWords(const stl::vector<word> &words, int bw);
-	static int FindNextNoInsertInWords(const stl::vector<word> &words, int bw);
-	static void MoveInWordsUp(stl::vector<word> &words, int source, int target);
-	static void MoveInWordsDown(stl::vector<word> &words, int source, int target);
+	void BuildWordsArray(const String &str, std::vector<word> &words);
+	static void InsertInWords(std::vector<word> &words, int bw);
+	int FindPreMatchInWords(const std::vector<word> &words, const word &needword, int bw, int side) const;
+	int FindNextMatchInWords(const std::vector<word> &words, const word &needword, int bw, int side) const;
+	static int FindNextSpaceInWords(const std::vector<word> &words, int bw);
+	static int FindPreNoInsertInWords(const std::vector<word> &words, int bw);
+	static int FindNextInsertInWords(const std::vector<word> &words, int bw);
+	static int FindNextNoInsertInWords(const std::vector<word> &words, int bw);
+	static void MoveInWordsUp(std::vector<word> &words, int source, int target);
+	static void MoveInWordsDown(std::vector<word> &words, int source, int target);
 	UINT Hash(const String &str, int begin, int end, UINT h) const;
 	bool AreWordsSame(const word &word1, const word &word2) const;
 	static bool IsWord(const word &);
@@ -89,11 +84,8 @@ private:
 	int m_whitespace;
 	int m_breakType;
 	bool m_matchblock;
-	stl::vector<wdiff> &m_diffs;
-	stl::vector<word> m_words1;
-	stl::vector<word> m_words2;
-	stl::vector<wdiff> m_wdiffs;
+	std::vector<wdiff> &m_diffs;
+	std::vector<word> m_words1;
+	std::vector<word> m_words2;
+	std::vector<wdiff> m_wdiffs;
 };
-
-
-#endif // stringdiffsi_h_included

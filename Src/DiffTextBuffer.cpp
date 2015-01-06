@@ -16,7 +16,7 @@
 #include "FileTextEncoding.h"
 #include "DiffTextBuffer.h"
 
-using stl::vector;
+using std::vector;
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

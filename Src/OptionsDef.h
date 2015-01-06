@@ -3,11 +3,7 @@
  *
  * @brief Constants for option-names
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-#ifndef _OPTIONS_DEF_H_
-#define _OPTIONS_DEF_H_
+#pragma once
 
 #ifndef operator
 #define operator(args)
@@ -67,7 +63,7 @@ public:
 	COptionDef(LPCTSTR name, T value)
 		: IOptionDef(typeOf<T>(), name), defValue(value)
 	{
-		stl::swap(curValue, value);
+		std::swap(curValue, value);
 	}
 	void Reset()
 	{
@@ -374,5 +370,3 @@ extern COptionDef
 <LogFont> OPT_FONT_DIRCMP_LOGFONT operator((_T("Settings/FontDirCompare"), 0));
 
 #undef operator
-
-#endif // _OPTIONS_DEF_H_

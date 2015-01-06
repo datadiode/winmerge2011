@@ -3,11 +3,7 @@
  *
  * @brief Declaration file for FilterList.
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-#ifndef _FILTERLIST_H_
-#define _FILTERLIST_H_
+#pragma once
 
 #include "pcre.h"
 #include "Common/MyCom.h"
@@ -58,11 +54,8 @@ private:
 	BSTR ApplyPredifferScripts(LPCTSTR filename, BSTR bstr);
 	void ResetPrediffers(short side);
 
-	stl::vector<regexp_item> m_list;
-	stl::vector<regexp_item> m_predifferRegExps;
-	stl::vector<script_item> m_predifferScripts;
+	std::vector<regexp_item> m_list;
+	std::vector<regexp_item> m_predifferRegExps;
+	std::vector<script_item> m_predifferScripts;
 	bool m_utf8;
 };
-
-
-#endif // _FILTERLIST_H_

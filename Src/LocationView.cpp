@@ -18,17 +18,12 @@
 //    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //
 /////////////////////////////////////////////////////////////////////////////
-
 /** 
  * @file  LocationView.cpp
  *
  * @brief Implementation file for CLocationView
  *
  */
-
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "Merge.h"
 #include "LanguageSelect.h"
@@ -44,7 +39,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-using stl::vector;
+using std::vector;
 
 /** @brief Size of empty frame above and below bars (in pixels). */
 static const int Y_OFFSET = 5;

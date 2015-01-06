@@ -28,9 +28,6 @@
  *
  * @brief Declaration file for CCrystalTextView
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #pragma once
 
 #include "crystalparser.h"
@@ -115,8 +112,8 @@ private:
 	Must create pointer, because contructor uses AFX_ZERO_INIT_OBJECT to
 	initialize the member objects. This would destroy a CArray object.
 	*/
-	stl::vector<int> m_panSubLines;
-	stl::vector<int> m_panSubLineIndexCache;
+	std::vector<int> m_panSubLines;
+	std::vector<int> m_panSubLineIndexCache;
 	int m_nLastLineIndexCalculatedSubLineIndex;
 	//END SW
 
@@ -144,7 +141,7 @@ private:
 	It would be a loss of time to recompute all these values after each action.
 	So we just set all these values to invalid code (DWORD) - 1.
 	*/
-	stl::vector<DWORD> m_ParseCookies;
+	std::vector<DWORD> m_ParseCookies;
 	DWORD GetParseCookie(int nLineIndex);
 
 	/**
@@ -153,7 +150,7 @@ private:
 	and must be initialized to - 1, code for invalid values (not yet computed).
 	for the same reason.
 	*/
-	stl::vector<int> m_pnActualLineLength;
+	std::vector<int> m_pnActualLineLength;
 
 protected:
 	bool m_bPreparingToDrag;

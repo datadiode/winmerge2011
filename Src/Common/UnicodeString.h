@@ -21,16 +21,12 @@
  * @brief Unicode string based on std::wstring.
  *
  */
-// ID line follows -- this is updated by SVN
-// $Id$
+#pragma once
 
-#ifndef _UNICODE_STRING_
-#define _UNICODE_STRING_
+using std::min;
+using std::max;
 
-using stl::min;
-using stl::max;
-
-#define std_tchar(type) stl::w##type
+#define std_tchar(type) std::w##type
 
 typedef std_tchar(string) String;
 
@@ -50,5 +46,3 @@ public:
 };
 
 typedef string_format Fmt;
-
-#endif // _UNICODE_STRING_

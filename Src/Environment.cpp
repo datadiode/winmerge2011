@@ -3,9 +3,6 @@
  *
  * @brief Environment related routines.
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "paths.h"
 #include "Environment.h"
@@ -123,7 +120,7 @@ LPCTSTR env_ResolveMoniker(String &moniker)
 	// Turn any apostrophes inside the query string into quotation marks.
 	if (String::size_type i = moniker.find(_T('?')) + 1)
 	{
-		stl::replace(moniker.begin() + i, moniker.end(), _T('\''), _T('"'));
+		std::replace(moniker.begin() + i, moniker.end(), _T('\''), _T('"'));
 	}
 	moniker = env_ExpandVariables(moniker.c_str());
 	String::size_type i = moniker.find(_T(':'), 2) + 1;

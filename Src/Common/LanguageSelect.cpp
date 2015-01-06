@@ -3,9 +3,6 @@
  *
  * @brief Implements the Language Selection dialog class (which contains the language data)
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "Merge.h"
 #include "VersionData.h"
@@ -562,9 +559,9 @@ bool CLanguageSelect::LoadLanguageFile(LANGID wLangId)
 	size_t size = SizeofResource(m_hCurrentDll, mergepot);
 	const char *data = (const char *)LoadResource(m_hCurrentDll, mergepot);
 	char buf[1024];
-	stl::string *ps = 0;
-	stl::string msgid;
-	stl::vector<unsigned> lines;
+	std::string *ps = 0;
+	std::string msgid;
+	std::vector<unsigned> lines;
 	int unresolved = 0;
 	int mismatched = 0;
 	while (const char *eol = (const char *)memchr(data, '\n', size))
@@ -595,7 +592,7 @@ bool CLanguageSelect::LoadLanguageFile(LANGID wLangId)
 		{
 			char *p = strchr(buf, '"');
 			char *q = strrchr(buf, '"');
-			if (stl::string::size_type n = static_cast<stl::string::size_type>(q - p))
+			if (std::string::size_type n = static_cast<std::string::size_type>(q - p))
 			{
 				ps->append(p + 1, n - 1);
 			}
@@ -603,7 +600,7 @@ bool CLanguageSelect::LoadLanguageFile(LANGID wLangId)
 			{
 				ps = 0;
 				const char *text = msgid.c_str();
-				stl::vector<unsigned>::iterator pline = lines.begin();
+				std::vector<unsigned>::iterator pline = lines.begin();
 				while (pline < lines.end())
 				{
 					unsigned line = *pline++;
@@ -627,9 +624,9 @@ bool CLanguageSelect::LoadLanguageFile(LANGID wLangId)
 	ps = 0;
 	msgid.clear();
 	lines.clear();
-	stl::string format;
-	stl::string msgstr;
-	stl::string directive;
+	std::string format;
+	std::string msgstr;
+	std::string directive;
 	while (fgets(buf, sizeof buf, f))
 	{
 		if (char *p = EatPrefix(buf, "#:"))
@@ -664,7 +661,7 @@ bool CLanguageSelect::LoadLanguageFile(LANGID wLangId)
 		{
 			char *p = strchr(buf, '"');
 			char *q = strrchr(buf, '"');
-			if (stl::string::size_type n = static_cast<stl::string::size_type>(q - p))
+			if (std::string::size_type n = static_cast<std::string::size_type>(q - p))
 			{
 				ps->append(p + 1, n - 1);
 			}
@@ -680,7 +677,7 @@ bool CLanguageSelect::LoadLanguageFile(LANGID wLangId)
 					msgstr = msgid;
 				unslash(m_codepage, msgstr);
 				const char *text = msgstr.c_str();
-				stl::vector<unsigned>::iterator pline = lines.begin();
+				std::vector<unsigned>::iterator pline = lines.begin();
 				while (pline < lines.end())
 				{
 					unsigned line = *pline++;
@@ -761,7 +758,7 @@ bool CLanguageSelect::SetLanguage(LANGID wLangId)
 	return true;
 }
 
-bool CLanguageSelect::GetPoHeaderProperty(const char *name, stl::string &value) const
+bool CLanguageSelect::GetPoHeaderProperty(const char *name, std::string &value) const
 {
 	size_t len = strlen(name);
 	const char *p = m_poheader.c_str();
@@ -773,7 +770,7 @@ bool CLanguageSelect::GetPoHeaderProperty(const char *name, stl::string &value) 
 			p += strspn(p, " \t");
 			bool lossy = false;
 			len = strcspn(p, " \t\r\n");
-			value.assign(p, static_cast<stl::string::size_type>(len));
+			value.assign(p, static_cast<std::string::size_type>(len));
 			return true;
 		}
 		p = q + 1;
@@ -813,7 +810,7 @@ HINSTANCE CLanguageSelect::FindResourceHandle(LPCTSTR id, LPCTSTR type) const
 		m_hCurrentDll : GetModuleHandle(NULL);
 }
 
-bool CLanguageSelect::TranslateString(LPCSTR rc, stl::string &s) const
+bool CLanguageSelect::TranslateString(LPCSTR rc, std::string &s) const
 {
 	unsigned line = TransformIndex(rc);
 	s = m_strarray[line];
@@ -823,7 +820,7 @@ bool CLanguageSelect::TranslateString(LPCSTR rc, stl::string &s) const
 		// Attempt to convert to UI codepage
 		if (int len = s.length())
 		{
-			stl::wstring ws;
+			std::wstring ws;
 			ws.resize(len);
 			len = MultiByteToWideChar(m_codepage, 0, s.c_str(), -1, &ws.front(), len + 1);
 			if (len)
@@ -842,10 +839,10 @@ bool CLanguageSelect::TranslateString(LPCSTR rc, stl::string &s) const
 	return false;
 }
 
-bool CLanguageSelect::TranslateString(LPCWSTR rc, stl::wstring &ws) const
+bool CLanguageSelect::TranslateString(LPCWSTR rc, std::wstring &ws) const
 {
 	unsigned line = TransformIndex(rc);
-	const stl::string &s = m_strarray[line];
+	const std::string &s = m_strarray[line];
 	if (int len = s.length())
 	{
 		ws.resize(len);
@@ -937,9 +934,9 @@ String CLanguageSelect::LoadString(UINT id) const
 	return s;
 }
 
-stl::wstring CLanguageSelect::LoadDialogCaption(LPCTSTR lpDialogTemplateID) const
+std::wstring CLanguageSelect::LoadDialogCaption(LPCTSTR lpDialogTemplateID) const
 {
-	stl::wstring s;
+	std::wstring s;
 	if (HINSTANCE hInst = FindResourceHandle(lpDialogTemplateID, RT_DIALOG))
 	{
 		if (HRSRC hRsrc = FindResource(hInst, lpDialogTemplateID, RT_DIALOG))

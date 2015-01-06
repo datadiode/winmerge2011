@@ -5,7 +5,7 @@
 // Prevent #define WCHAR_MAX ((wchar_t)-1) from fooling EASTL
 #define EA_WCHAR_SIZE 2
 namespace eastl { }
-namespace stl = eastl;
+namespace std { using namespace eastl; }
 #define stl(x) <eastl/x.h>
 #define stl_size_t eastl_size_t
 // EASTL as currently used with WinMerge 2011 lacks an auto_ptr template.
@@ -14,8 +14,6 @@ namespace stl = eastl;
 // Another lacking of EASTL is the rotate() algorithm.
 #include "rotate.h"
 #else
-namespace std { }
-namespace stl = std;
 #define stl(x) <x>
 #define stl_size_t size_t
 #endif

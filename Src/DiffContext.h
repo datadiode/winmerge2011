@@ -136,7 +136,7 @@ public:
 	bool ShouldAbort() const;
 
 private:
-	stl::vector<String> m_paths; /**< (root) paths for this context */
+	std::vector<String> m_paths; /**< (root) paths for this context */
 	HANDLE m_hSemaphore; /**< Semaphore for synchronizing threads. */
 	CompareStats *const m_pCompareStats; /**< Pointer to compare statistics */
 	HWindow *const m_pWindow; /**< Window getting status updates. */
@@ -163,7 +163,7 @@ private:
 	void DirScan_CompareItems();
 	void DirScan_CompareRequestedItems();
 
-	typedef stl::vector<DirItem> DirItemArray;
+	typedef std::vector<DirItem> DirItemArray;
 
 	void LoadAndSortFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *files, int side) const;
 	void LoadFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *files, int side) const;

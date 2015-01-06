@@ -353,7 +353,7 @@ OPropertySheet::OPropertySheet()
 
 PROPSHEETPAGE *OPropertySheet::AddPage(ODialog &page)
 {
-	stl::vector<PROPSHEETPAGE>::size_type index = m_pages.size();
+	std::vector<PROPSHEETPAGE>::size_type index = m_pages.size();
 	m_pages.resize(index + 1);
 	PROPSHEETPAGE *psp = &m_pages.back();
 	ZeroMemory(psp, sizeof *psp);

@@ -3,11 +3,7 @@
  *
  * @brief Declaration file for LineFiltersList class
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-#ifndef _LINEFILTERS_LIST_H_
-#define _LINEFILTERS_LIST_H_
+#pragma once
 
 /**
  @brief Structure for one line filter.
@@ -38,7 +34,5 @@ public:
 	void swap(LineFiltersList &other) { m_items.swap(other.m_items); }
 
 private:
-	stl::vector<LineFilterItem> m_items; /**< List for linefilter items */
+	std::vector<LineFilterItem> m_items; /**< List for linefilter items */
 } globalLineFilters;
-
-#endif // _LINEFILTERS_LIST_H_

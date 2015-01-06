@@ -4,14 +4,7 @@
  *
  * @brief Declaration of CLocationView class
  */
-//
-//////////////////////////////////////////////////////////////////////
-
-// ID line follows -- this is updated by SVN
-// $Id$
-
-#ifndef __LOCATIONVIEW_H__
-#define __LOCATIONVIEW_H__
+#pragma once
 
 class CMergeEditView;
 
@@ -34,7 +27,7 @@ struct MovedLine
 	POINT ptRight;
 };
 
-typedef stl::list<MovedLine> MOVEDLINE_LIST;
+typedef std::list<MovedLine> MOVEDLINE_LIST;
 
 /**
  * @brief A struct mapping difference lines to pixels in location pane.
@@ -113,7 +106,7 @@ private:
 	int m_visibleBottom; //*< Bottom visible line for visible area indicator */
 	MOVEDLINE_LIST m_movedLines; //*< List of moved block connecting lines */
 	HBitmap *m_pSavedBackgroundBitmap; //*< Saved background */
-	stl::vector<DiffBlock> m_diffBlocks; //*< List of pre-calculated diff blocks.
+	std::vector<DiffBlock> m_diffBlocks; //*< List of pre-calculated diff blocks.
 	bool m_bRecalculateBlocks; //*< Recalculate diff blocks in next repaint.
 
 	// Generated message map functions
@@ -124,10 +117,3 @@ protected:
 	void OnContextMenu(LPARAM);
 	void OnDraw(HSurface *);
 };
-/////////////////////////////////////////////////////////////////////////////
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
-
-
-#endif //__LOCATIONVIEW_H__

@@ -23,9 +23,6 @@
  *
  * @brief Implementation of the COpenDlg class
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "paths.h"
 #include "Merge.h"
@@ -684,7 +681,7 @@ void COpenDlg::OnEditchangePathCombo(HSuperComboBox *pCb)
 			String text;
 			edit->GetWindowText(text);
 			// Remove any double quotes
-			text.erase(stl::remove(text.begin(), text.end(), _T('"')), text.end());
+			text.erase(std::remove(text.begin(), text.end(), _T('"')), text.end());
 			if (text.length() != len)
 			{
 				edit->SetSel(0, len);
@@ -801,7 +798,7 @@ void COpenDlg::InjectParameterValues()
 		C_ASSERT(('"' & 0x3F) == '"');
 		C_ASSERT(('\'' & 0x3F) == '\'');
 		TCHAR quote = '\0';
-		stl::set<String> paramNames;
+		std::set<String> paramNames;
 		while (const TCHAR c = *sql)
 		{
 			if (quote <= _T('\0') && c == _T('%') && paramNames.size() < 6)
@@ -961,7 +958,7 @@ void COpenDlg::OnDropFiles(HDROP dropInfo)
 	UINT fileCount = DragQueryFile(dropInfo, 0xFFFFFFFF, NULL, 0);
 	if (fileCount > 2)
 		fileCount = 2;
-	stl::vector<String> files(fileCount);
+	std::vector<String> files(fileCount);
 	UINT i;
 	// get all file names. but we'll only need the first one.
 	for (i = 0; i < fileCount; i++)

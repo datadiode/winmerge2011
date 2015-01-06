@@ -100,7 +100,7 @@
 #include "pcre.h"
 #include "wcwidth.h"
 
-using stl::vector;
+using std::vector;
 
 // Escaped character constants in range 0x80-0xFF are interpreted in current codepage
 // Using C locale gets us direct mapping to Unicode codepoints
@@ -126,7 +126,7 @@ const COLORREF SAVED_REVMARK_CLR = RGB(0x00, 0xFF, 0x00);
 
 #define ICON_INDEX_WRAPLINE         15
 
-static void setAtGrow(stl::vector<int> &v, stl_size_t index, int value)
+static void setAtGrow(std::vector<int> &v, stl_size_t index, int value)
 {
 	if (v.size() <= index)
 	{
@@ -136,7 +136,7 @@ static void setAtGrow(stl::vector<int> &v, stl_size_t index, int value)
 	v[index] = value;
 }
 
-static int upperBound(const stl::vector<int> &v)
+static int upperBound(const std::vector<int> &v)
 {
 	return v.size() - 1;
 }
@@ -1144,7 +1144,7 @@ void CCrystalTextView::InvalidateLineCache(int nLineIndex1, int nLineIndex2)
 	if (nLineIndex2 == -1)
 		nLineIndex2 = upperBound(m_panSubLines);
 	else if (nLineIndex1 > nLineIndex2)
-		stl::swap(nLineIndex1, nLineIndex2);
+		std::swap(nLineIndex1, nLineIndex2);
     if (nLineIndex2 > upperBound(m_panSubLines))
 		nLineIndex2 = upperBound(m_panSubLines);
 	for (int i = nLineIndex1; i <= nLineIndex2; i++)
@@ -1391,7 +1391,7 @@ void CCrystalTextView::DrawSingleLine(HSurface *pdc, const RECT &rc, int nLineIn
 		int nActualOffset = 0;
 
 		// Wrap the line
-		stl::vector<int> anBreaks;
+		std::vector<int> anBreaks;
 		anBreaks.resize(nLength + 2);
 		int nBreaks = 0;
 		anBreaks[0] = 0;

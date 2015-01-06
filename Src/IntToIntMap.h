@@ -3,11 +3,7 @@
  *
  * @brief Declaration of Map from int to int, with a couple new methods
  */
-// RCS ID line follows -- this is updated by CVS
-// $Id$
-
-#ifndef IntToIntMap_h_included
-#define IntToIntMap_h_included
+#pragma once
 
 /**
  * @brief An int->int map with helper methods for finding largest bin
@@ -15,7 +11,7 @@
 class IntToIntMap
 {
 private:
-	stl::map<int, int> m_map;
+	std::map<int, int> m_map;
 public:
 	void Increment(int key)
 	{
@@ -25,7 +21,7 @@ public:
 	{
 		int max = 0;
 		int maxKey = 0;
-		stl::map<int, int>::const_iterator pos = m_map.begin();
+		std::map<int, int>::const_iterator pos = m_map.begin();
 		while (pos != m_map.end())
 		{
 			if (pos->second > max)
@@ -38,6 +34,3 @@ public:
 		return maxKey;
 	}
 };
-
-
-#endif // IntToIntMap_h_included

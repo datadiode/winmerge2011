@@ -12,7 +12,7 @@ public:
 		size_t iconv(const char **inbuf, size_t *inbytesleft, char **outbuf, size_t *outbytesleft) const;
 		size_t Convert(const char *, size_t, char *, size_t) const;
 	};
-	typedef stl::map<stl::wstring, stl::wstring> EntityMap;
+	typedef std::map<std::wstring, std::wstring> EntityMap;
 	static void Load(EntityMap &);
 	void Load(EntityMap &, const Converter &);
 	class FileImage;

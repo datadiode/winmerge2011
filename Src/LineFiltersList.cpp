@@ -3,15 +3,12 @@
  *
  * @brief Implementation for LineFiltersList class.
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "SettingStore.h"
 #include "Common/RegKey.h"
 #include "LineFiltersList.h"
 
-using stl::vector;
+using std::vector;
 
 /** @brief Registry key for saving linefilters. */
 static const TCHAR FiltersRegPath[] =_T("LineFilters");

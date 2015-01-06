@@ -103,9 +103,9 @@ void CDiffContext::LoadFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *fil
 		HandleReadStream stream = hReadPipe;
 		StreamLineReader reader = &stream;
 		int state = 0;
-		stl::string head;
-		stl::string line;
-		while (stl::string::size_type size = reader.readLine(line))
+		std::string head;
+		std::string line;
+		while (std::string::size_type size = reader.readLine(line))
 		{
 			switch (state)
 			{
@@ -269,6 +269,6 @@ static bool __cdecl compare(const DirItem &elem1, const DirItem &elem2)
  */
 void CDiffContext::Sort(DirItemArray *dirs) const
 {
-	stl::sort(dirs->begin(), dirs->end(),
+	std::sort(dirs->begin(), dirs->end(),
 		m_piFilterGlobal->isCaseSensitive() ? compare<_tcscoll> : compare<_tcsicoll>);
 }

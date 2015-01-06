@@ -24,9 +24,6 @@
  * @brief Implementation file for CDirFrame
  *
  */
-// RCS ID line follows -- this is updated by CVS
-// $Id$
-
 #include "stdafx.h"
 #include "Merge.h"
 #include "MainFrm.h"
@@ -691,7 +688,7 @@ bool CDirFrame::AddToCollection(FileLocation &filelocLeft, FileLocation &fileloc
 	LPCTSTR rname = EatPrefix(filelocRight.filepath.c_str(), rpath.c_str());
 	if (rname == NULL)
 	{
-		stl::swap(filelocLeft, filelocRight);
+		std::swap(filelocLeft, filelocRight);
 		rname = EatPrefix(filelocRight.filepath.c_str(), rpath.c_str());
 		if (rname == NULL)
 		{

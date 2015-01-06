@@ -59,9 +59,6 @@
  *
  * @brief Code for CCrystalTextBuffer class
  */
-// line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "editcmd.h"
 #include "LineInfo.h"
@@ -77,7 +74,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-using stl::vector;
+using std::vector;
 
 #ifdef _DEBUG
 #define _ADVANCED_BUGCHECK  1
@@ -447,7 +444,7 @@ void CCrystalTextBuffer::AddView(CCrystalTextView * pView)
 
 void CCrystalTextBuffer::RemoveView(CCrystalTextView *pView)
 {
-	stl::list<CCrystalTextView *>::iterator pos = stl::find(m_lpViews.begin(), m_lpViews.end(), pView);
+	std::list<CCrystalTextView *>::iterator pos = std::find(m_lpViews.begin(), m_lpViews.end(), pView);
 	assert(pos != m_lpViews.end());
 	if (pos != m_lpViews.end())
 		m_lpViews.erase(pos);
@@ -459,7 +456,7 @@ CCrystalTextView::TextDefinition *CCrystalTextBuffer::RetypeViews(LPCTSTR lpszFi
 	if (*ext == _T('.'))
 		++ext;
 	CCrystalTextView::TextDefinition *def = CCrystalTextView::GetTextType(ext);
-	stl::list<CCrystalTextView *>::iterator pos = m_lpViews.begin();
+	std::list<CCrystalTextView *>::iterator pos = m_lpViews.begin();
 	while (pos != m_lpViews.end())
 	{
 		CCrystalTextView *const pView = *pos++;
@@ -470,7 +467,7 @@ CCrystalTextView::TextDefinition *CCrystalTextBuffer::RetypeViews(LPCTSTR lpszFi
 
 void CCrystalTextBuffer::UpdateViews(CCrystalTextView *pSource, CUpdateContext *pContext, DWORD dwUpdateFlags, int nLineIndex)
 {
-	stl::list<CCrystalTextView *>::iterator pos = m_lpViews.begin();
+	std::list<CCrystalTextView *>::iterator pos = m_lpViews.begin();
 	while (pos != m_lpViews.end())
 	{
 		CCrystalTextView *const pView = *pos++;

@@ -19,8 +19,7 @@
  *
  * @brief Declaration file for DiffList class
  */
-#ifndef _DIFFLIST_H_
-#define _DIFFLIST_H_
+#pragma once
 
 class CDiffTextBuffer;
 
@@ -120,9 +119,7 @@ public:
 	void swap(DiffList &);
 
 private:
-	stl::vector<DiffRangeInfo> m_diffs; /**< Difference list. */
+	std::vector<DiffRangeInfo> m_diffs; /**< Difference list. */
 	int m_firstSignificant; /**< Index of first significant diff in m_diffs */
 	int m_lastSignificant; /**< Index of last significant diff in m_diffs */
 };
-
-#endif // _DIFFLIST_H_

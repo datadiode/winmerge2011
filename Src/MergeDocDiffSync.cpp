@@ -4,9 +4,6 @@
  * @brief Code to layout diff blocks, to find matching lines, and insert ghost lines
  *
  */
-// RCS ID line follows -- this is updated by CVS
-// $Id$
-
 #include "StdAfx.h"
 #include "Merge.h"
 #include "OptionsMgr.h"
@@ -28,8 +25,8 @@ public:
 	DiffMap(CChildFrame *, int begin0, int begin1, int lines0, int lines1);
 	int operator[](int i) { return map[i]; }
 private:
-	stl::vector<int> map;
-	stl::vector<int> cost;
+	std::vector<int> map;
+	std::vector<int> cost;
 	void AdjustDiffBlock(int lo0, int hi0, const int lo1, const int hi1);
 };
 
@@ -238,11 +235,11 @@ int CChildFrame::GetMatchCost(const String &sLine0, const String &sLine1)
 	const int breakType = GetBreakType(); // whitespace only or include punctuation
 	const bool byteColoring = GetByteColoringOption();
 
-	stl::vector<wdiff> worddiffs;
+	std::vector<wdiff> worddiffs;
 	sd_ComputeWordDiffs(sLine0, sLine1, casitive, xwhite, breakType, byteColoring, worddiffs);
 
 	int nDiffLenSum = 0;
-	stl::vector<wdiff>::const_iterator it = worddiffs.begin();
+	std::vector<wdiff>::const_iterator it = worddiffs.begin();
 	while (it != worddiffs.end())
 	{
 		const wdiff &wd = *it++;

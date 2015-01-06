@@ -22,12 +22,7 @@
  *
  *	@brief Declaration of class CPidlContainer
  */ 
-//
-// ID line follows -- this is updated by SVN
-// $Id$
-
-#ifndef _PIDLCONTAINER_H_
-#define _PIDLCONTAINER_H_
+#pragma once
 
 #include <MyCom.h>
 
@@ -80,9 +75,7 @@ public:
 	void Free(LPITEMIDLIST pidl) const { if (m_pMalloc) m_pMalloc->Free(pidl); }
 
 private:
-	typedef stl::vector<LPITEMIDLIST> PidlContainer;
+	typedef std::vector<LPITEMIDLIST> PidlContainer;
 	PidlContainer m_container; /**< stores items */
 	CMyComPtr<IMalloc> m_pMalloc;
 };
-
-#endif // _PIDLCONTAINER_H_

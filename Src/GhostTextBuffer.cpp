@@ -23,9 +23,6 @@
  *
  * @brief Implementation of GhostTextBuffer class.
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "GhostTextBuffer.h"
 
@@ -39,7 +36,7 @@ static char THIS_FILE[] = __FILE__;
 #define _ADVANCED_BUGCHECK  1
 #endif
 
-using stl::vector;
+using std::vector;
 
 /**
  * @brief Constructor.

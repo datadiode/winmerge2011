@@ -24,9 +24,7 @@
  * @brief MergeCmdLineInfo class declaration.
  *
  */
-
-#ifndef _MERGE_CMD_LINE_INFO_INCLUDED_
-#define _MERGE_CMD_LINE_INFO_INCLUDED_
+#pragma once
 
 class IOptionDef;
 
@@ -75,7 +73,7 @@ public:
 	String m_sRunScript; /**< Run this script in the context of the document. */
 	String m_sOptionChars; /**< Set of accepted option indicators. */
 
-	stl::vector<String> m_Files; /**< Files (or directories) to compare. */
+	std::vector<String> m_Files; /**< Files (or directories) to compare. */
 
 private:
 
@@ -91,5 +89,3 @@ private:
 	/** Operator= is not implemented. */
 	MergeCmdLineInfo& operator=(const MergeCmdLineInfo& rhs);
 };
-
-#endif // _MERGE_CMD_LINE_INFO_INCLUDED_

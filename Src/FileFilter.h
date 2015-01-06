@@ -19,9 +19,6 @@
  *
  * @brief Declaration file for FileFilter
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "pcre.h"
 #include "DirItem.h"
 #include "RegExpItem.h"
@@ -47,14 +44,14 @@ struct FileFilter
 	String fullpath;		/**< Full path to filter file */
 	String sql;				/**< SQL query template for LogParser */
 	BYTE sqlopt[2];			/**< Which sides to apply it to */
-	stl::vector<stl::map<String, String> > params;	/**< SQL query parameters */
-	stl::vector<String> rawsql;					/**< Raw SQL clause as provided by user */
-	stl::vector<regexp_item> filefilters;		/**< List of inclusion rules for files */
-	stl::vector<regexp_item> dirfilters;		/**< List of inclusion rules for directories */
-	stl::vector<regexp_item> xfilefilters;		/**< List of exclusion rules for files */
-	stl::vector<regexp_item> xdirfilters;		/**< List of exclusion rules for directories */
-	stl::vector<regexp_item> fileprefilters;	/**< List of prefilter rules for files */
-	stl::vector<regexp_item> dirprefilters;		/**< List of prefilter rules for directories */
+	std::vector<std::map<String, String> > params;	/**< SQL query parameters */
+	std::vector<String> rawsql;					/**< Raw SQL clause as provided by user */
+	std::vector<regexp_item> filefilters;		/**< List of inclusion rules for files */
+	std::vector<regexp_item> dirfilters;		/**< List of inclusion rules for directories */
+	std::vector<regexp_item> xfilefilters;		/**< List of exclusion rules for files */
+	std::vector<regexp_item> xdirfilters;		/**< List of exclusion rules for directories */
+	std::vector<regexp_item> fileprefilters;	/**< List of prefilter rules for files */
+	std::vector<regexp_item> dirprefilters;		/**< List of prefilter rules for directories */
 	FileFilter();
 	~FileFilter();
 	BSTR getSql(int side);
@@ -62,7 +59,7 @@ struct FileFilter
 	// methods to actually use filter
 	bool TestFileNameAgainstFilter(LPCTSTR szPath, LPCTSTR szFileName) const;
 	bool TestDirNameAgainstFilter(LPCTSTR szPath, LPCTSTR szDirName) const;
-	static stl_size_t ApplyPrefilterRegExps(const stl::vector<regexp_item> &, char *dst, const char *src, stl_size_t len);
+	static stl_size_t ApplyPrefilterRegExps(const std::vector<regexp_item> &, char *dst, const char *src, stl_size_t len);
 	bool Load();
 
 protected:
@@ -70,6 +67,6 @@ protected:
 	virtual bool CreateFromMask() { return false; }
 
 private:
-	static int TestAgainstRegList(const stl::vector<regexp_item> &, LPCTSTR, LPCTSTR);
-	static void EmptyFilterList(stl::vector<regexp_item> &);
+	static int TestAgainstRegList(const std::vector<regexp_item> &, LPCTSTR, LPCTSTR);
+	static void EmptyFilterList(std::vector<regexp_item> &);
 };

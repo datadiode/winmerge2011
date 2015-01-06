@@ -57,12 +57,12 @@ private:
 			delete this;
 		}
 	};
-	stl::list<String> m_rgFolderPrefix;
-	stl::list<String>::iterator m_curFolderPrefix;
+	std::list<String> m_rgFolderPrefix;
+	std::list<String>::iterator m_curFolderPrefix;
 	String m_strFolderPrefix;
 	BOOL m_bRight;
-	stl::map<String, void *> m_rgImpliedFoldersLeft;
-	stl::map<String, void *> m_rgImpliedFoldersRight;
+	std::map<String, void *> m_rgImpliedFoldersLeft;
+	std::map<String, void *> m_rgImpliedFoldersRight;
 //	helper methods
 	const DIFFITEM *Next();
 	bool MultiStepCompressArchive(LPCTSTR);

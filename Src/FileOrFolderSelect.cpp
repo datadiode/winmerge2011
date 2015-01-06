@@ -23,9 +23,6 @@
  *
  * @brief Implementation of the file and folder selection routines.
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "resource.h"
 #include "LanguageSelect.h"
@@ -65,7 +62,7 @@ BOOL SelectFile(HWND parent, String &path,
 	String filters = LanguageSelect.LoadString(filterid);
 	// Convert extension mask from MFC style separators ('|')
 	//  to Win32 style separators ('\0')
-	stl::replace(filters.begin(), filters.end(), _T('|'), _T('\0'));
+	std::replace(filters.begin(), filters.end(), _T('|'), _T('\0'));
 	paths_UndoMagic(path);
 
 	OPENFILENAME ofn;
@@ -179,7 +176,7 @@ BOOL SelectFileOrFolder(HWND parent, String &path, const String &filter)
 	}
 	// Convert extension mask from MFC style separators ('|')
 	//  to Win32 style separators ('\0')
-	stl::replace(filters.begin(), filters.end(), _T('|'), _T('\0'));
+	std::replace(filters.begin(), filters.end(), _T('|'), _T('\0'));
 
 	String sSelectedFile = LanguageSelect.LoadString(IDS_DIRSEL_TAG);
 	// Set initial filename to folder selection tag

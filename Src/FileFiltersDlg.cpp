@@ -19,9 +19,6 @@
  *
  * @brief Implementation of FileFilters -dialog
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "Merge.h"
 #include "LanguageSelect.h"
@@ -33,7 +30,7 @@
 #include "TestFilterDlg.h"
 #include "FileOrFolderSelect.h"
 
-using stl::vector;
+using std::vector;
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

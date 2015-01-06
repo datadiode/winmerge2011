@@ -77,7 +77,7 @@ const DIFFITEM *CompareStats::GetCurDiffItem()
 {
 	LONG nHitCountMax = 0;
 	const DIFFITEM *cdi = m_rgThreadState.front().m_pDiffItem;
-	stl::vector<ThreadState>::iterator it = m_rgThreadState.begin();
+	std::vector<ThreadState>::iterator it = m_rgThreadState.begin();
 	while (it != m_rgThreadState.end())
 	{
 		const DIFFITEM *di = it->m_pDiffItem;

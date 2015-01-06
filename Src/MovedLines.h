@@ -3,9 +3,7 @@
  *
  * @brief Declaration of MovedLines class
  */
-
-#ifndef _MOVEDLINES_H_
-#define _MOVEDLINES_H_
+#pragma once
 
 /**
  * @brief Container class for moved lines/blocks.
@@ -32,8 +30,6 @@ protected:
 	int SecondSideInMovedBlock(unsigned int firstSideLine);
 
 private:
-	stl::map<int, int> m_moved0; /**< Moved lines map for first side */
-	stl::map<int, int> m_moved1; /**< Moved lines map for second side */
+	std::map<int, int> m_moved0; /**< Moved lines map for first side */
+	std::map<int, int> m_moved1; /**< Moved lines map for second side */
 };
-
-#endif // _MOVEDLINES_H_

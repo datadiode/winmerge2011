@@ -80,7 +80,7 @@ LPCTSTR MergeCmdLineInfo::EatParam(LPCTSTR p, String &param, bool *flag) const
 		CharLower(&param.front());
 	}
 	// Remove any double quotes
-	param.erase(stl::remove(param.begin(), param.end(), _T('"')), param.end());
+	param.erase(std::remove(param.begin(), param.end(), _T('"')), param.end());
 	return q;
 }
 

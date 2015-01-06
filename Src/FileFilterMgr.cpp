@@ -24,7 +24,7 @@
 #include "coretools.h"
 #include "paths.h"
 
-using stl::vector;
+using std::vector;
 
 /**
  * @brief Destructor, frees all filters.

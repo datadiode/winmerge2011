@@ -3,11 +3,7 @@
  *
  * @brief Declaration of CGhostTextBuffer (subclasses CCrystalTextBuffer to handle ghost lines)
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-#ifndef __GHOSTTEXTBUFFER_H__
-#define __GHOSTTEXTBUFFER_H__
+#pragma once
 
 #include "ccrystaltextbuffer.h"
 #include "GhostUndoRecord.h"
@@ -75,7 +71,7 @@ protected:
 	We share m_bUndoGroup, its utility is to check we opened the UndoBeginGroup.
 	We share m_nUndoBufSize which is the max buffer size.
 	*/
-	stl::vector<GhostUndoRecord> m_aUndoBuf;
+	std::vector<GhostUndoRecord> m_aUndoBuf;
 	virtual const UndoRecord &GetUndoRecord(stl_size_t i) const
 	{
 		return m_aUndoBuf[i];
@@ -102,7 +98,7 @@ private:
 		int nStartApparent; /**< Start line of apparent block. */
 		int nCount; /**< Lines in the block. */
 	};
-	stl::vector<RealityBlock> m_RealityBlocks; /**< Mapping of real and apparent lines. */
+	std::vector<RealityBlock> m_RealityBlocks; /**< Mapping of real and apparent lines. */
 
 	// Operations
 private:
@@ -170,7 +166,3 @@ private:
 protected:
 	virtual void OnNotifyLineHasBeenEdited(int nLine) = 0;
 };
-
-/////////////////////////////////////////////////////////////////////////////
-
-#endif //__GHOSTTEXTBUFFER_H__

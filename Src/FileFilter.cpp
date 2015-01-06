@@ -17,15 +17,12 @@
  *
  *  @brief Implementation of FileFilter.
  */ 
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "StdAfx.h"
 #include "FileFilter.h"
 #include "Common/coretools.h"
 #include "UniFile.h"
 
-using stl::vector;
+using std::vector;
 
 /**
  * @brief Add a single pattern (if nonempty & valid) to a pattern list.
@@ -281,7 +278,7 @@ bool FileFilter::TestDirNameAgainstFilter(LPCTSTR szPath, LPCTSTR szDirName) con
 
 stl_size_t FileFilter::ApplyPrefilterRegExps(const vector<regexp_item> &filterList, char *dst, const char *src, stl_size_t len)
 {
-	stl::vector<regexp_item>::const_iterator iter = filterList.begin();
+	std::vector<regexp_item>::const_iterator iter = filterList.begin();
 	while (iter != filterList.end())
 	{
 		const regexp_item &filter = *iter++;

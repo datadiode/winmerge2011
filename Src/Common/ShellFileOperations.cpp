@@ -26,8 +26,8 @@
 ShellFileOperations::ShellFileOperations(
 	HWND hwnd, UINT wFunc, FILEOP_FLAGS fFlags, size_t fromMax, size_t toMax)
 {
-	stl::auto_ptr<TCHAR, true> apFrom(fromMax ? new TCHAR[fromMax + 1] : NULL);
-	stl::auto_ptr<TCHAR, true> apTo(toMax ? new TCHAR[toMax + 1] : NULL);
+	std::auto_ptr<TCHAR, true> apFrom(fromMax ? new TCHAR[fromMax + 1] : NULL);
+	std::auto_ptr<TCHAR, true> apTo(toMax ? new TCHAR[toMax + 1] : NULL);
 	SHFILEOPSTRUCT::hwnd = H2O::GetTopLevelParent(hwnd);
 	SHFILEOPSTRUCT::wFunc = wFunc;
 	SHFILEOPSTRUCT::fFlags = fFlags;

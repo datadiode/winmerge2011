@@ -19,11 +19,7 @@
  *
  * @brief Declaration file for FileFilterHelper
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-#ifndef _FILEFILTERHELPER_H_
-#define _FILEFILTERHELPER_H_
+#pragma once
 
 #include "FileFilterMgr.h"
 
@@ -99,7 +95,7 @@ public:
 	const String &GetUserFilterPath() const { return m_sUserSelFilterPath; }
 
 	void SetFileFilterPath(LPCTSTR szFileFilterPath);
-	const stl::vector<FileFilter *> &GetFileFilters() const { return m_filters; }
+	const std::vector<FileFilter *> &GetFileFilters() const { return m_filters; }
 	FileFilter *FindFilter(LPCTSTR);
 	bool SetUserFilterPath(const String &filterPath);
 
@@ -126,5 +122,3 @@ private:
 	const String m_sGlobalFilterPath;    /*< Path for shared filters */
 	String m_sUserSelFilterPath;     /*< Path for user's private filters */
 } globalFileFilter;
-
-#endif // _FILEFILTERHELPER_H_

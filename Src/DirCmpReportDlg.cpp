@@ -4,16 +4,11 @@
  * @brief Implementation file for DirCmpReport dialog
  *
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-//
-
 #include "StdAfx.h"
 #include "Merge.h"
 #include "LanguageSelect.h"
 #include "Coretools.h"
 #include "DirCmpReportDlg.h"
-#include "DirReportTypes.h"
 #include "paths.h"
 #include "FileOrFolderSelect.h"
 #include "SettingStore.h"
@@ -177,7 +172,7 @@ void DirCmpReportDlg::OnSelchangeStyle()
 		{
 			sReportFile.resize(i);
 			String::size_type ext = sFilter.find(_T('.')) + 1;
-			String::size_type end = stl::min(sFilter.find(_T(';'), ext), sFilter.length());
+			String::size_type end = std::min(sFilter.find(_T(';'), ext), sFilter.length());
 			sReportFile.append(sFilter.c_str() + ext, end - ext);
 		}
 		m_pCbReportFile->SetWindowText(sReportFile.c_str());
