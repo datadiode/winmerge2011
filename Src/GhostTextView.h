@@ -3,8 +3,7 @@
  *
  * @brief Declaration of CGhostTextView (subclasses CCrystalEditViewEx to handle ghost lines)
  */
-#ifndef __GHOSTTEXTVIEW_H__
-#define __GHOSTTEXTVIEW_H__
+#pragma once
 
 #include "crystalEditViewex.h"
 
@@ -27,7 +26,7 @@ real lines is correct, as they are empty and have no EOL.
 WinMerge also paints the ghost lines in a custom color through virtualizing 
 GetLineColors (in MergeEditView).
 */
-class EDITPADC_CLASS CGhostTextView : public CCrystalEditViewEx
+class CGhostTextView : public CCrystalEditViewEx
 {
 protected:
 	CGhostTextView(CChildFrame *, int, size_t);
@@ -115,5 +114,3 @@ protected:
 	virtual void DrawMargin(HSurface *, const RECT &, int nLineIndex, int nLineNumber);
 	BOOL OnMouseWheel(WPARAM, LPARAM);
 };
-
-#endif //__GHOSTTEXTVIEW_H__

@@ -7,7 +7,7 @@
 #include "ccrystaleditview.h"
 #include "crystalparser.h"
 
-class EDITPADC_CLASS CCrystalEditViewEx : public CCrystalEditView
+class CCrystalEditViewEx : public CCrystalEditView
 {
 
 protected:

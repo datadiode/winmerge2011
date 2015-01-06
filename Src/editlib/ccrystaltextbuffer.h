@@ -92,7 +92,7 @@ enum
 /////////////////////////////////////////////////////////////////////////////
 // CUpdateContext class
 
-class EDITPADC_CLASS CUpdateContext
+class CUpdateContext
 {
 public:
 	virtual void RecalcPoint(POINT & ptPoint) = 0;
@@ -101,7 +101,7 @@ public:
 /////////////////////////////////////////////////////////////////////////////
 // CCrystalTextBuffer command target
 
-class EDITPADC_CLASS CCrystalTextBuffer
+class CCrystalTextBuffer
 {
 public:
 	DWORD m_dwCurrentRevisionNumber;
@@ -122,14 +122,14 @@ protected:
 		UNDO_BEGINGROUP = 0x0100
 	};
 
-	class EDITPADC_CLASS CInsertContext : public CUpdateContext
+	class CInsertContext : public CUpdateContext
 	{
 	public:
 		POINT m_ptStart, m_ptEnd;
 		virtual void RecalcPoint(POINT & ptPoint);
 	};
 
-	class EDITPADC_CLASS CDeleteContext : public CUpdateContext
+	class CDeleteContext : public CUpdateContext
 	{
 	public:
 		POINT m_ptStart, m_ptEnd;

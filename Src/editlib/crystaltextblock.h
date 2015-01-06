@@ -13,12 +13,7 @@
 //	- LEAVE THIS HEADER INTACT
 ////////////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_CRYSTALTEXTBLOCK_H__37ECF0C1_145F_11D3_929E_444553540000__INCLUDED_)
-#define AFX_CRYSTALTEXTBLOCK_H__37ECF0C1_145F_11D3_929E_444553540000__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 /**
 Objects of this class are passed to CCrystalParser::ParseLine() to get the
@@ -29,7 +24,7 @@ color changes sorted by position -- the Add()-Method will do this for you.
 
 @author Sven Wiegand
 */
-class EDITPADC_CLASS CCrystalTextBlock  
+class CCrystalTextBlock  
 {
 	friend class CCrystalTextView;
 	friend class CCrystalEditViewEx;
@@ -67,5 +62,3 @@ protected:
 	/** Index */
 	int &m_rnActualItems;
 };
-
-#endif // !defined(AFX_CRYSTALTEXTBLOCK_H__37ECF0C1_145F_11D3_929E_444553540000__INCLUDED_)

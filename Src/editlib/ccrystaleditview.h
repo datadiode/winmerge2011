@@ -35,7 +35,7 @@
 /////////////////////////////////////////////////////////////////////////////
 //  CCrystalEditView view
 
-class EDITPADC_CLASS CCrystalEditView
+class CCrystalEditView
 	: public CCrystalTextView
 	, public IDropTarget
 {

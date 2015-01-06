@@ -72,7 +72,7 @@ enum
  * not implement text editing. There are classes inherited from this
  * class which implement text editing.
  */
-class EDITPADC_CLASS CCrystalTextView
+class CCrystalTextView
 	: ZeroInit<CCrystalTextView>
 	, public OWindow
 	, public IDropSource

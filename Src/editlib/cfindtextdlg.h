@@ -37,7 +37,7 @@ class CCrystalTextView;
 /////////////////////////////////////////////////////////////////////////////
 // CFindTextDlg dialog
 
-class EDITPADC_CLASS CFindTextDlg
+class CFindTextDlg
 	: ZeroInit<CFindTextDlg>
 	, public ODialog
 {

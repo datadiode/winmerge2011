@@ -53,7 +53,7 @@ C_ASSERT(LF_WINMERGE_FLAGS == (LF_TRIVIAL | LF_MOVED | LF_DIFF | LF_SKIPPED | LF
  *  <li> insertGhostLine function 
  * </ul>
  */
-class EDITPADC_CLASS CGhostTextBuffer : public CCrystalTextBuffer
+class CGhostTextBuffer : public CCrystalTextBuffer
 {
 protected:
 	//  Nested class declarations
