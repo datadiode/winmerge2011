@@ -4,15 +4,7 @@
  * @brief Declaration for LineInfo class.
  *
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
-#ifndef _EDITOR_LINEINFO_H_
-#define _EDITOR_LINEINFO_H_
-
-//  Line allocation granularity
-#define     CHAR_ALIGN                  16
-#define     ALIGN_BUF_SIZE(size)        ((size) / CHAR_ALIGN) * CHAR_ALIGN + CHAR_ALIGN;
+#pragma once
 
 /**
  * @brief Line information.
@@ -62,5 +54,3 @@ private:
     int m_nLength; /**< Line length (without EOL bytes). */
     int m_nEolChars; /**< # of EOL bytes. */
 };
-
-#endif // _EDITOR_LINEINFO_H_

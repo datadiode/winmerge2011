@@ -3,11 +3,12 @@
  *
  * @brief Implementation of LineInfo class.
  */
-// ID line follows -- this is updated by SVN
-// $Id$
-
 #include "stdafx.h"
 #include "LineInfo.h"
+
+//  Line allocation granularity
+#define CHAR_ALIGN					16
+#define ALIGN_BUF_SIZE(size)		((size) / CHAR_ALIGN) * CHAR_ALIGN + CHAR_ALIGN;
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -123,8 +124,8 @@ bool LineInfo::ChangeEol(LPCTSTR lpEOL)
 	int nBufNeeded = m_nLength + nNewEolChars + 1;
 	if (nBufNeeded > m_nMax)
 	{
-		m_nMax = ALIGN_BUF_SIZE (nBufNeeded);
-		ASSERT (m_nMax >= nBufNeeded);
+		m_nMax = ALIGN_BUF_SIZE(nBufNeeded);
+		ASSERT(m_nMax >= nBufNeeded);
 		TCHAR *pcNewBuf = new TCHAR[m_nMax];
 		if (FullLength() > 0)
 			memcpy(pcNewBuf, m_pcLine, sizeof(TCHAR) * (FullLength() + 1));
