@@ -4,7 +4,7 @@
 // See file LICENSE for detail or copy at http://jsoncpp.sourceforge.net/LICENSE
 /**
  *  @file   json_reader.cpp
- *  @date   Edited:  2015-01-06 Jochen Neubeck
+ *  @date   Edited:  2015-01-07 Jochen Neubeck
  */
 #include <json/assertions.h>
 #include <json/reader.h>
@@ -63,8 +63,6 @@ bool Reader::parse(const char* beginDoc,
   end_ = endDoc;
   collectComments_ = features_ & allowComments ? collectComments : false;
   current_ = begin_;
-  lastValueEnd_ = 0;
-  lastValue_ = 0;
   std::string queuedComments;
   errors_.clear();
   skipCommentTokens(queuedComments);
@@ -73,7 +71,7 @@ bool Reader::parse(const char* beginDoc,
     queuedComments.resize(0);
   }
   bool successful = readValue(root);
-  skipCommentTokens(queuedComments);
+  skipCommentTokens(queuedComments, &root);
   if (!queuedComments.empty()) {
     root.setComment(queuedComments.c_str(), commentAfter);
     queuedComments.resize(0);
@@ -112,29 +110,21 @@ bool Reader::readValue(Value& currentValue) {
     addError("Syntax error: value, object or array expected.");
     return false;
   }
-  // Remember pointers for comment collection logic
-  lastValueEnd_ = current_;
-  lastValue_ = &currentValue;
   return successful;
 }
 
-bool Reader::skipCommentTokens(std::string& queuedComments) {
+bool Reader::skipCommentTokens(std::string& queuedComments, Value* lastValue) {
   bool found = false;
   queuedComments.resize(0);
   std::string inlineComments;
+  const char *lastValueEnd = current_;
   do {
     readToken();
     if (token_.type_ != tokenComment)
       break;
     found = true;
     if (collectComments_) {
-      CommentPlacement placement = commentBefore;
-      if (lastValueEnd_ && !containsNewLine(lastValueEnd_, token_.start_)) {
-        assert(lastValue_ != 0);
-        if (token_.start_[1] != '*' || !containsNewLine(token_.start_, token_.end_))
-          placement = commentAfterOnSameLine;
-      }
-      if (placement == commentAfterOnSameLine) {
+      if (lastValue && !containsNewLine(lastValueEnd, token_.end_)) {
         if (!inlineComments.empty())
           inlineComments.push_back(' ');
         inlineComments.append(token_.start_, token_.end_);
@@ -150,7 +140,7 @@ bool Reader::skipCommentTokens(std::string& queuedComments) {
     if (token_.type_ == tokenArraySeparator)
       addError("Misplaced comment");
     else if (!inlineComments.empty())
-      lastValue_->setComment(inlineComments.c_str(), commentAfterOnSameLine);
+      lastValue->setComment(inlineComments.c_str(), commentAfterOnSameLine);
   }
   return found;
 }
@@ -286,7 +276,7 @@ bool Reader::readObject(Value& currentValue) {
   Value* lastValue = 0;
   bool comment;
   do {
-    comment = skipCommentTokens(queuedComments);
+    comment = skipCommentTokens(queuedComments, lastValue);
     if (lastValue == 0 && token_.type_ == tokenObjectEnd)
       break; // empty object
     if (token_.type_ != tokenString) {
@@ -315,7 +305,7 @@ bool Reader::readObject(Value& currentValue) {
       return false;
     }
     lastValue = &value;
-    comment = skipCommentTokens(queuedComments);
+    comment = skipCommentTokens(queuedComments, lastValue);
   } while (token_.type_ == tokenArraySeparator);
   if (token_.type_ != tokenObjectEnd) {
     addError("Missing ',' or '}' in object declaration");
@@ -337,7 +327,7 @@ bool Reader::readArray(Value& currentValue) {
   Value* lastValue = 0;
   bool comment;
   do {
-    comment = skipCommentTokens(queuedComments);
+    comment = skipCommentTokens(queuedComments, lastValue);
     if (lastValue == 0 && token_.type_ == tokenArrayEnd)
       break; // empty array
     Value &value = currentValue[index++];
@@ -350,7 +340,7 @@ bool Reader::readArray(Value& currentValue) {
       return false;
     }
     lastValue = &value;
-    comment = skipCommentTokens(queuedComments);
+    comment = skipCommentTokens(queuedComments, lastValue);
   } while (token_.type_ == tokenArraySeparator);
   if (token_.type_ != tokenArrayEnd) {
     addError("Missing ',' or ']' in array declaration");

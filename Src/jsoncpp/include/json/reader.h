@@ -4,7 +4,7 @@
 // See file LICENSE for detail or copy at http://jsoncpp.sourceforge.net/LICENSE
 /**
  *  @file   reader.h
- *  @date   Edited:  2015-01-06 Jochen Neubeck
+ *  @date   Edited:  2015-01-07 Jochen Neubeck
  */
 #pragma once
 
@@ -138,7 +138,7 @@ private:
   Char getNextChar();
   void getLocationLineAndColumn(Location location, int& line, int& column) const;
   std::string getLocationLineAndColumn(Location location) const;
-  bool skipCommentTokens(std::string& queuedComments);
+  bool skipCommentTokens(std::string& queuedComments, Value* lastValue = 0);
 
   Errors errors_;
   FILE* const file_;
@@ -146,8 +146,6 @@ private:
   Location begin_;
   Location end_;
   Location current_;
-  Location lastValueEnd_;
-  Value* lastValue_;
   Features features_;
   bool collectComments_;
 };
