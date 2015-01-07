@@ -179,7 +179,7 @@ void CSyntaxColors::SetBold(UINT index, bool bold)
  */
 void CSyntaxColors::SaveToRegistry()
 {
-	if (CRegKeyEx key = SettingStore.GetSectionKey(DefColorsPath, CREATE_ALWAYS))
+	if (CRegKeyEx key = SettingStore.GetSectionKey(DefColorsPath, 2 * COLORINDEX_LAST))
 	{
 		for (UINT i = COLORINDEX_NONE; i < COLORINDEX_LAST; i++)
 		{
@@ -191,16 +191,13 @@ void CSyntaxColors::SaveToRegistry()
 		}
 	}
 	// Save the custom colors
-	if (CRegKeyEx key = SettingStore.GetSectionKey(CustomColors, CREATE_ALWAYS))
+	if (CRegKeyEx key = SettingStore.GetSectionKey(CustomColors, _countof(m_rgCustColors)))
 	{
 		for (UINT i = 0; i < _countof(m_rgCustColors); i++)
 		{
 			TCHAR name[40];
 			_itot(i, name, 10);
-			if (m_rgCustColors[i] == RGB(255, 255, 255))
-				key.DeleteValue(name);
-			else 
-				key.WriteDword(name, m_rgCustColors[i]);
+			key.WriteDword(name, m_rgCustColors[i]);
 		}
 	}
 }

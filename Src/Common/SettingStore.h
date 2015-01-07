@@ -48,7 +48,7 @@ public:
 	HKEY GetAppRegistryKey() const;
 
 	/// Returns the registry key to the section where the application settings are stored, which must be explicitly closed by the caller.
-	HKEY GetSectionKey(LPCTSTR lpszSection, DWORD dwCreationDisposition = OPEN_ALWAYS) const;
+	HKEY GetSectionKey(LPCTSTR lpszSection, DWORD dwCount = 0xFFFFFFFF) const;
 
 	LONG RegCreateKeyEx(HKEY, LPCTSTR, DWORD, REGSAM, PHKEY) const;
 	LONG RegCloseKey(HKEY) const;
@@ -56,12 +56,14 @@ public:
 	LONG RegSetValueEx(HKEY, LPCTSTR, DWORD, CONST BYTE *, DWORD) const;
 	LONG SHDeleteKey(HKEY, LPCTSTR) const;
 	LONG RegDeleteValue(HKEY, LPCTSTR) const;
-	LONG RegQueryInfoKey(HKEY, LPDWORD, LPDWORD) const;
+	LONG RegQueryInfoKey(HKEY, LPDWORD, LPDWORD = NULL) const;
 private:
 	/// Handle to external registry hive if mounted
 	HKEY m_hHive;
 	/// Access permissions to request (either KEY_READ | KEY_WRITE or KEY_READ)
-	REGSAM m_regsam;
+	REGSAM m_regsam;;
+	/// Whether any settings were changed after loading
+	mutable bool m_bDirty;
 	/// Filename for portable media setup
 	String m_sFileName;
 	/// Company name in the registry key (under HKCU/Software).

@@ -22,8 +22,10 @@ void LineFiltersList::LoadFilters()
 {
 	if (CRegKeyEx key = SettingStore.GetSectionKey(FiltersRegPath))
 	{
-		UINT count = key.ReadDword(_T("Values"), 0);
-		for (UINT i = 0; i < count; i++)
+		DWORD count = 0;
+		SettingStore.RegQueryInfoKey(key, &count);
+		count /= 2;
+		for (DWORD i = 0; i < count; i++)
 		{
 			TCHAR valuename[40];
 			wsprintf(valuename, _T("Filter%02u"), i);
@@ -77,11 +79,10 @@ bool LineFiltersList::Compare(LineFiltersList &list)
  */
 void LineFiltersList::SaveFilters()
 {
-	if (CRegKeyEx key = SettingStore.GetSectionKey(FiltersRegPath, CREATE_ALWAYS))
+	DWORD count = m_items.size();
+	if (CRegKeyEx key = SettingStore.GetSectionKey(FiltersRegPath, 2 * count))
 	{
-		UINT count = m_items.size();
-		key.WriteDword(_T("Values"), count);
-		for (UINT i = 0; i < count; i++)
+		for (DWORD i = 0; i < count; i++)
 		{
 			const LineFilterItem &item = m_items[i];
 			TCHAR valuename[40];

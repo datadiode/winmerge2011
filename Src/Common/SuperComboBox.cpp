@@ -103,16 +103,23 @@ void HSuperComboBox::LoadState(LPCTSTR szRegSubKey, UINT nMaxItems)
  */
 void HSuperComboBox::SaveState(LPCTSTR szRegSubKey, UINT nMaxItems)
 {
-	if (HKEY hKey = SettingStore.GetSectionKey(szRegSubKey, CREATE_ALWAYS))
+	String s;
+	GetWindowText(s);
+	string_trim_ws(s); // TODO: Is this really appropriate?
+	DWORD n = GetCount();
+	if (nMaxItems > n)
 	{
-		String strItem, s;
-		GetWindowText(s);
-		UINT i = 0;
-		UINT j = 0;
-		UINT n = GetCount();
+		nMaxItems = n;
+		if (FindStringExact(-1, s.c_str()) == -1)
+			++nMaxItems;
+	}
+	if (HKEY hKey = SettingStore.GetSectionKey(szRegSubKey, nMaxItems))
+	{
+		String strItem;
+		DWORD i = 0;
+		DWORD j = 0;
 		for (;;)
 		{
-			string_trim_ws(s);
 			if (s != strItem)
 			{
 				TCHAR name[20];
@@ -125,6 +132,7 @@ void HSuperComboBox::SaveState(LPCTSTR szRegSubKey, UINT nMaxItems)
 			if (i >= n || j >= nMaxItems)
 				break;
 			GetLBText(i++, s);
+			string_trim_ws(s); // TODO: Is this really appropriate?
 		}
 		SettingStore.RegCloseKey(hKey);
 	}

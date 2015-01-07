@@ -19,6 +19,7 @@ CSettingStore::CSettingStore(LPCTSTR sCompanyName, LPCTSTR sApplicationName)
 	ASSERT(ThreadIntegrity);
 	m_hHive = HKEY_CURRENT_USER;
 	m_regsam = KEY_READ | KEY_WRITE;
+	m_bDirty = false;
 	// Store
 	m_sCompanyName = sCompanyName;
 	m_sApplicationName = sApplicationName;
@@ -27,7 +28,7 @@ CSettingStore::CSettingStore(LPCTSTR sCompanyName, LPCTSTR sApplicationName)
 CSettingStore::~CSettingStore()
 {
 	ASSERT(ThreadIntegrity);
-	if (m_regsam == 0)
+	if (m_regsam == 0 && m_bDirty)
 	{
 		Json::Value *const root = reinterpret_cast<Json::Value *>(m_hHive);
 		if (FILE *tf = _tfopen(m_sFileName.c_str(), _T("w")))
@@ -205,16 +206,25 @@ HKEY CSettingStore::GetAppRegistryKey() const
 //      HKEY_CURRENT_USER\"Software"\RegistryKey\AppName\lpszSection
 // creating it if it doesn't exist.
 // responsibility of the caller to call RegCloseKey() on the returned HKEY
-HKEY CSettingStore::GetSectionKey(LPCTSTR lpszSection, DWORD dwCreationDisposition) const
+HKEY CSettingStore::GetSectionKey(LPCTSTR lpszSection, DWORD dwCount) const
 {
 	ASSERT(ThreadIntegrity);
 	ASSERT(lpszSection != NULL);
 	HKEY hSectionKey = NULL;
 	if (HKEY hAppKey = GetAppRegistryKey())
 	{
-		if (dwCreationDisposition == CREATE_ALWAYS)
+		while (RegCreateKeyEx(hAppKey, lpszSection, REG_OPTION_NON_VOLATILE,
+			m_regsam, &hSectionKey) == ERROR_SUCCESS && dwCount != 0xFFFFFFFF)
+		{
+			DWORD dwFound = 0;
+			RegQueryInfoKey(hSectionKey, &dwFound);
+			if (dwCount == dwFound)
+				break;
+			dwCount = 0xFFFFFFFF; // no further iteration
+			RegCloseKey(hSectionKey);
+			hSectionKey = NULL;
 			SHDeleteKey(hAppKey, lpszSection);
-		RegCreateKeyEx(hAppKey, lpszSection, REG_OPTION_NON_VOLATILE, m_regsam, &hSectionKey);
+		}
 		RegCloseKey(hAppKey);
 	}
 	return hSectionKey;
@@ -327,20 +337,29 @@ LONG CSettingStore::RegSetValueEx(HKEY hKey, LPCTSTR lpValueName, DWORD dwType, 
 	{
 		OString key = HString::Uni(lpValueName)->Oct(CP_UTF8);
 		Json::Value &value = (*node)[key.A];
+		Json::Value newValue;
 		if (lpData != NULL)
 		{
 			switch (dwType)
 			{
 			case REG_DWORD:
-				value = static_cast<Json::Value::UInt>(*reinterpret_cast<const DWORD *>(lpData));
+				// Prevent compare() from unintentionally indicating a difference
+				if (value.isUInt())
+					value = value.asUInt();
+				newValue = static_cast<Json::Value::UInt>(*reinterpret_cast<const DWORD *>(lpData));
 				break;
 			case REG_SZ:
 				if (HString *pStr = HString::Oct(reinterpret_cast<LPCSTR>(lpData), cbData)->Oct(CP_UTF8))
-					value = OString(pStr).A;
+					newValue = OString(pStr).A;
 				break;
 			default:
 				lResult = ERROR_INVALID_PARAMETER;
 				break;
+			}
+			if (value.compare(newValue) != 0)
+			{
+				value.swap(newValue);
+				m_bDirty = true;
 			}
 		}
 		else if (cbData != 0)
@@ -365,6 +384,7 @@ LONG CSettingStore::SHDeleteKey(HKEY hKey, LPCTSTR pszSubKey) const
 	{
 		OString key = HString::Uni(pszSubKey)->Oct(CP_UTF8);
 		node->removeMember(key.A);
+		m_bDirty = true;
 	}
 	else
 	{

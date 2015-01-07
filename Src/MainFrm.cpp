@@ -388,10 +388,11 @@ void CMainFrame::LoadFilesMRU()
 
 void CMainFrame::SaveFilesMRU()
 {
-	if (HKEY hKey = SettingStore.GetSectionKey(_T("Recent File List"), CREATE_ALWAYS))
+	DWORD n = m_FilesMRU.size();
+	if (HKEY hKey = SettingStore.GetSectionKey(_T("Recent File List"), n))
 	{
-		stl_size_t i = 0;
-		while (i < m_FilesMRU.size())
+		DWORD i = 0;
+		while (i < n)
 		{
 			TCHAR name[20];
 			const String &value = m_FilesMRU[i];
