@@ -78,7 +78,7 @@ const char* valueToString(double value, char* buffer) {
   // concepts of reals and integers.
   const char *ret = buffer;
   if (isfinite(value)) {
-    int len = sprintf(buffer, "%.16g", value);
+    int len = sprintf(buffer, "%.17g", value);
     assert(len >= 0);
     // assume "C" locale for now
     // fixNumericLocale(buffer, buffer + len);
