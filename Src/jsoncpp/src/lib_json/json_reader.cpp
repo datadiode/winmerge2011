@@ -360,7 +360,7 @@ bool Reader::decodeNumber(Value& currentValue) {
   bool isNegative = *current == '-';
   if (isNegative)
     ++current;
-  Value::UInt value = 0;
+  Value::LargestUInt value = 0;
   bool isSigned = true;
   bool isUnsigned = true;
   while (current < token_.end_) {
@@ -370,11 +370,11 @@ bool Reader::decodeNumber(Value& currentValue) {
       isUnsigned = false;
       break;
     }
-    Value::UInt val = value;
-    Value::UInt delta = Value::UInt(c - '0');
+    Value::LargestUInt val = value;
+    Value::LargestUInt delta = Value::LargestUInt(c - '0');
     for (int i = 0; i < 10; ++i) {
       value += delta;
-      if (Value::Int(value) < Value::Int(delta))
+      if (Value::LargestInt(value) < Value::LargestInt(delta))
         isSigned = false;
       if (value < delta)
         isUnsigned = false;
