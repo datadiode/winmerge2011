@@ -4,7 +4,7 @@
 // See file LICENSE for detail or copy at http://jsoncpp.sourceforge.net/LICENSE
 /**
  *  @file   json_reader.cpp
- *  @date   Edited:  2015-01-07 Jochen Neubeck
+ *  @date   Edited:  2015-01-08 Jochen Neubeck
  */
 #include <json/assertions.h>
 #include <json/reader.h>
@@ -295,7 +295,7 @@ bool Reader::readObject(Value& currentValue) {
     }
     if (skipCommentTokens(misplacedComments))
       addError("Misplaced comment");
-    Value &value = currentValue[name];
+    Value& value = currentValue[name];
     if (!queuedComments.empty()) {
       value.setComment(queuedComments.c_str(), commentBefore);
       queuedComments.resize(0);
@@ -330,7 +330,7 @@ bool Reader::readArray(Value& currentValue) {
     comment = skipCommentTokens(queuedComments, lastValue);
     if (lastValue == 0 && token_.type_ == tokenArrayEnd)
       break; // empty array
-    Value &value = currentValue[index++];
+    Value& value = currentValue[index++];
     if (!queuedComments.empty()) {
       value.setComment(queuedComments.c_str(), commentBefore);
       queuedComments.resize(0);
@@ -374,15 +374,15 @@ bool Reader::decodeNumber(Value& currentValue) {
     Value::LargestUInt delta = Value::LargestUInt(c - '0');
     for (int i = 0; i < 10; ++i) {
       value += delta;
-      if (Value::LargestInt(value) < Value::LargestInt(delta))
+      if (-Value::LargestInt(value) > -Value::LargestInt(delta))
         isSigned = false;
       if (value < delta)
         isUnsigned = false;
       delta = val;
     }
   }
-  if (isSigned)
-    currentValue = isNegative ? -Value::Int(value) : Value::Int(value);
+  if (isSigned && (isNegative || Value::LargestInt(value) >= 0))
+    currentValue = isNegative ? -Value::LargestInt(value) : Value::LargestInt(value);
   else if (isUnsigned && !isNegative)
     currentValue = value;
   else {
