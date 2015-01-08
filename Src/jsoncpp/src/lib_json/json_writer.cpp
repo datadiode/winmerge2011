@@ -102,26 +102,23 @@ std::string valueToQuotedString(const char* value) {
   result.push_back('"');
   while (char c = *value++) {
     switch (c) {
-    case '\"':
-      result += "\\\"";
-      break;
+    case '"':
     case '\\':
-      result += "\\\\";
       break;
     case '\b':
-      result += "\\b";
+      c = 'b';
       break;
     case '\f':
-      result += "\\f";
+      c = 'f';
       break;
     case '\n':
-      result += "\\n";
+      c = 'n';
       break;
     case '\r':
-      result += "\\r";
+      c = 'r';
       break;
     case '\t':
-      result += "\\t";
+      c = 't';
       break;
     // case '/':
     // Even though \/ is considered a legal escape in JSON, a bare
@@ -139,8 +136,10 @@ std::string valueToQuotedString(const char* value) {
       } else {
         result.push_back(c);
       }
-      break;
+      continue;
     }
+    result.push_back('\\');
+    result.push_back(c);
   }
   result.push_back('"');
   return result;
@@ -257,8 +256,8 @@ void Writer::writeWithIndent(const char* text) {
 void Writer::indent() { indentString_ += indentation_; }
 
 void Writer::unindent() {
-  if (indentString_.size() >= indentation_.size())
-    indentString_.resize(indentString_.size() - indentation_.size());
+  assert(indentString_.size() >= indentation_.size());
+  indentString_.resize(indentString_.size() - indentation_.size());
 }
 
 void Writer::writeComment(const char* q) {
