@@ -103,9 +103,18 @@ bool Reader::readValue(Value& currentValue) {
   case tokenFalse:
     currentValue = false;
     break;
-  case tokenNull:
-    currentValue = Value();
-    break;
+  case tokenArraySeparator:
+  case tokenObjectEnd:
+  case tokenArrayEnd:
+    if (features_ & allowDroppedNullPlaceholders) {
+      // "Un-read" the current token and mark the current value as a null
+      // token.
+      --current_;
+    case tokenNull:
+      currentValue = Value();
+      break;
+    }
+    // fall through
   default:
     addError("Syntax error: value, object or array expected.");
     return false;
