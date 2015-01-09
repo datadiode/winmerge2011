@@ -282,12 +282,17 @@ bool Reader::readObject(Value& currentValue) {
     comment = skipCommentTokens(queuedComments, lastValue);
     if (lastValue == 0 && token_.type_ == tokenObjectEnd)
       break; // empty object
-    if (token_.type_ != tokenString) {
+    if (token_.type_ == tokenString) {
+      if (!decodeString(name))
+        return false;
+    } else if (token_.type_ == tokenNumber &&
+        (features_ & allowNumericKeys) != 0) {
+      Value numberName;
+      if (!decodeNumber(numberName))
+        return false;
+      name = numberName.asString();
+    } else {
       addError("Missing '}' or object member name");
-      return false;
-    }
-    if (!decodeString(name)) {
-      // error already set
       return false;
     }
     if (skipCommentTokens(misplacedComments))
