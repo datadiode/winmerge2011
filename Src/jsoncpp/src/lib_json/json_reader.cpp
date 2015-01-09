@@ -80,8 +80,19 @@ bool Reader::parse(const char* beginDoc,
     root.setComment(queuedComments.c_str(), commentAfter);
     queuedComments.resize(0);
   }
-  if (token_.type_ != tokenEndOfStream) {
+  if (token_.type_ != tokenEndOfStream)
     addError("Parsing ended before end of input");
+  if (features_.strictRoot_) {
+    if (!root.isArray() && !root.isObject()) {
+      // Set error location to start of doc, ideally should be first token found
+      // in doc
+      token_.type_ = tokenError;
+      token_.start_ = beginDoc;
+      token_.end_ = endDoc;
+      addError(
+          "A valid JSON document must be either an array or an object value.");
+      return false;
+    }
   }
   return successful;
 }
