@@ -18,14 +18,20 @@ namespace Json {
  */
 enum Features {
   /// indicates whether comments are allowed.
-  allowComments = 1,
+  allowComments                 = 1 << 0,
+  /// indicates whether root must be either an array or an object value.
+  strictRoot                    = 1 << 1,
+  /// indicates whether dropped null placeholders are allowed.
+  allowDroppedNullPlaceholders  = 1 << 2,
+  /// \c true if numeric object key are allowed. Default: \c false.
+  allowNumericKeys              = 1 << 3,
   /** \brief A configuration that allows all features and assumes all strings
    * are UTF-8.
    * - C & C++ comments are allowed
    * - Root object can be any JSON value
    * - Assumes Value strings are encoded in UTF-8
    */
-  allFeatures = allowComments,
+  allFeatures = allowComments | allowDroppedNullPlaceholders | allowNumericKeys,
   /** \brief A configuration that is strictly compatible with the JSON
    * specification.
    * - Comments are forbidden.
