@@ -59,9 +59,13 @@ bool Reader::parse(const char* beginDoc,
                    const char* endDoc,
                    Value& root,
                    bool collectComments) {
+  if (!features_.allowComments_) {
+    collectComments = false;
+  }
+
   begin_ = beginDoc;
   end_ = endDoc;
-  collectComments_ = features_ & allowComments ? collectComments : false;
+  collectComments_ = collectComments;
   current_ = begin_;
   std::string queuedComments;
   errors_.clear();
@@ -106,15 +110,15 @@ bool Reader::readValue(Value& currentValue) {
   case tokenArraySeparator:
   case tokenObjectEnd:
   case tokenArrayEnd:
-    if (features_ & allowDroppedNullPlaceholders) {
+    if (features_.allowDroppedNullPlaceholders_) {
       // "Un-read" the current token and mark the current value as a null
       // token.
-      --current_;
+      current_--;
     case tokenNull:
       currentValue = Value();
       break;
     }
-    // fall through
+  // Else, fall through...
   default:
     addError("Syntax error: value, object or array expected.");
     return false;
@@ -144,7 +148,7 @@ bool Reader::skipCommentTokens(std::string& queuedComments, Value* lastValue) {
         queuedComments.append(token_.start_, token_.end_);
       }
     }
-  } while (features_ & allowComments);
+  } while (features_.allowComments_);
   return found;
 }
 
@@ -285,8 +289,7 @@ bool Reader::readObject(Value& currentValue) {
     if (token_.type_ == tokenString) {
       if (!decodeString(name))
         return false;
-    } else if (token_.type_ == tokenNumber &&
-        (features_ & allowNumericKeys) != 0) {
+    } else if (token_.type_ == tokenNumber && features_.allowNumericKeys_) {
       Value numberName;
       if (!decodeNumber(numberName))
         return false;

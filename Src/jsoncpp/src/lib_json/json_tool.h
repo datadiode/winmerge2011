@@ -79,26 +79,24 @@ static inline void fixNumericLocale(char* begin, char* end) {
 
 template
 <
-	typename type,
-	type c0 = 0, type c1 = 0, type c2 = 0, type c3 = 0, type c4 = 0,
-	type c5 = 0, type c6 = 0, type c7 = 0, type c8 = 0, type c9 = 0
+  typename type,
+  type c0 = 0, type c1 = 0, type c2 = 0, type c3 = 0, type c4 = 0,
+  type c5 = 0, type c6 = 0, type c7 = 0, type c8 = 0, type c9 = 0
 >
-class setof
-{
+class setof {
 public:
-	static bool contains(type c)
-	{
-		return c0 && c == c0
-			|| c1 && c == c1
-			|| c2 && c == c2
-			|| c3 && c == c3
-			|| c4 && c == c4
-			|| c5 && c == c5
-			|| c6 && c == c6
-			|| c7 && c == c7
-			|| c8 && c == c8
-			|| c9 && c == c9;
-	}
+  static bool contains(type c) {
+    return c0 && c == c0
+        || c1 && c == c1
+        || c2 && c == c2
+        || c3 && c == c3
+        || c4 && c == c4
+        || c5 && c == c5
+        || c6 && c == c6
+        || c7 && c == c7
+        || c8 && c == c8
+        || c9 && c == c9;
+  }
 };
 
 } // namespace Json {

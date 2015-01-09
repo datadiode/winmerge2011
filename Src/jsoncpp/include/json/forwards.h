@@ -56,6 +56,12 @@ struct pod {
   }
 };
 
+template<int mask>
+struct bitmask {
+  int flags;
+  operator int() const { return flags & mask; }
+};
+
 typedef int Int;
 typedef int LargestInt;
 typedef unsigned int UInt;

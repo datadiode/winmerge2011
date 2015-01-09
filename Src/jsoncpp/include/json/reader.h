@@ -25,7 +25,7 @@ public:
   /** \brief Constructs a Reader allowing the specified feature set
    * for parsing.
    */
-  Reader(FILE* , Features = allFeatures);
+  Reader(FILE*, Features = Features::allFeatures);
 
   /** \brief Read a Value from a <a HREF="http://www.json.org">JSON</a>
    * document.
@@ -36,7 +36,8 @@ public:
    * back during
    *                        serialization, \c false to discard comments.
    *                        This parameter is ignored if
-   * Features::allowComments is \c disabled.
+   * Features::allowComments_
+   *                        is \c false.
    * \return \c true if the document was successfully parsed, \c false if an
    * error occurred.
    */
