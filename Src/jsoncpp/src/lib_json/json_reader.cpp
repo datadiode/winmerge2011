@@ -116,18 +116,19 @@ bool Reader::readValue(Value& currentValue) {
 bool Reader::skipCommentTokens(std::string& queuedComments, Value* lastValue) {
   bool found = false;
   queuedComments.resize(0);
-  std::string inlineComments;
-  const char *lastValueEnd = current_;
+  const char *origin = current_;
   do {
     readToken();
     if (token_.type_ != tokenComment)
       break;
     found = true;
     if (collectComments_) {
-      if (lastValue && !containsNewLine(lastValueEnd, token_.end_)) {
+      if (lastValue && !containsNewLine(origin, token_.end_)) {
+        std::string inlineComments = lastValue->getComment(commentAfterOnSameLine);
         if (!inlineComments.empty())
           inlineComments.push_back(' ');
         inlineComments.append(token_.start_, token_.end_);
+        lastValue->setComment(inlineComments.c_str(), commentAfterOnSameLine);
       } else {
         if (!queuedComments.empty())
           queuedComments.push_back('\n');
@@ -135,13 +136,6 @@ bool Reader::skipCommentTokens(std::string& queuedComments, Value* lastValue) {
       }
     }
   } while (features_ & allowComments);
-  if (found) {
-    // disallow comment before tokenArraySeparator
-    if (token_.type_ == tokenArraySeparator)
-      addError("Misplaced comment");
-    else if (!inlineComments.empty())
-      lastValue->setComment(inlineComments.c_str(), commentAfterOnSameLine);
-  }
   return found;
 }
 
