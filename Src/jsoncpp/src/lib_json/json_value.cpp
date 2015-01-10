@@ -144,9 +144,40 @@ Value::CZString& Value::CZString::operator=(CZString other) {
   return *this;
 }
 
+static int natcmp(const char *p, const char *q) {
+  char a, b;
+  do {
+    int i = 0, j = 0;
+    // advance indexes on either side beyond first non-digit
+    do a = p[i++]; while (a >= '0' && a <= '9');
+    do b = q[j++]; while (b >= '0' && b <= '9');
+    if (i != 1 || j != 1) {
+      // at least one side is numeric
+      if (i == 1) {
+        // only right side is numeric
+        j = 1;
+        b = '0';
+      } else if (j == 1) {
+        // only left side is numeric
+        i = 1;
+        a = '0';
+      } else if (int c = i - j) {
+        // number of digits differs between sides
+        return c;
+      } else if (int c = memcmp(p, q, j - 1)) {
+        // sequence of digits differs between sides
+        return c;
+      }
+    }
+    p += i;
+    q += j;
+  } while (a && a == b);
+  return a - b;
+}
+
 bool Value::CZString::operator<(const CZString& other) const {
   if (cstr_)
-    return strcmp(cstr_, other.cstr_) < 0;
+    return natcmp(cstr_, other.cstr_) < 0;
   return index_ < other.index_;
 }
 
