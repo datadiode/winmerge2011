@@ -4,7 +4,7 @@
 // See file LICENSE for detail or copy at http://jsoncpp.sourceforge.net/LICENSE
 /**
  *  @file   json_writer.cpp
- *  @date   Edited:  2015-01-06 Jochen Neubeck
+ *  @date   Edited:  2015-01-11 Jochen Neubeck
  */
 #include <json/writer.h>
 #include "json_tool.h"
@@ -157,6 +157,8 @@ void Writer::write(const Value& root) {
   indentString_.resize(0);
   write("\xEF\xBB\xBF");
   writeCommentBefore(root);
+  if (root.size() == 0)
+    writeIndent();
   writeValue(root);
   writeCommentAfter(root);
   writeIndent();
@@ -199,7 +201,8 @@ void Writer::writeArrayValue(const Value& value) {
     for (;;) {
       const Value &childValue = value[index];
       writeCommentBefore(childValue);
-      writeIndent();
+      if (childValue.size() == 0)
+        writeIndent();
       writeValue(childValue);
       if (++index == size) {
         writeCommentAfter(childValue);
