@@ -93,7 +93,7 @@ static String ColExtGet(const CDiffContext *, const void *p) //sfilename
 			}
 		}
 	}
-	return String(ext, static_cast<String::size_type>(pastext - ext));
+	return String(ext, pastext);
 }
 
 /**

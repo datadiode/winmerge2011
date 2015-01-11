@@ -330,7 +330,7 @@ String paths_GetParentPath(LPCTSTR path)
 	LPCTSTR tail = PathSkipRoot(path);
 	if (name > (tail ? tail : path))
 		--name;
-	return String(path, static_cast<String::size_type>(name - path));
+	return String(path, name);
 }
 
 /**
