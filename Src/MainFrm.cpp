@@ -1795,7 +1795,7 @@ bool CMainFrame::CreateBackup(bool bFolder, LPCTSTR pszPath)
 
 	LPCTSTR pszFileName = PathFindFileName(pszPath);
 	LPCTSTR pszExt = PathFindExtension(pszFileName);
-	String filename(pszFileName, static_cast<String::size_type>(pszExt - pszFileName));
+	String filename(pszFileName, pszExt);
 	String ext = pszExt;
 
 	// Determine backup folder
@@ -1817,9 +1817,7 @@ bool CMainFrame::CreateBackup(bool bFolder, LPCTSTR pszPath)
 
 	if (COptionsMgr::Get(OPT_BACKUP_ADD_BAK))
 	{
-		// Don't add dot if there is no existing extension
-		if (ext.size() > 0)
-			ext.push_back(_T('.'));
+		ext.push_back(_T('.'));
 		ext += BACKUP_FILE_EXT;
 	}
 
