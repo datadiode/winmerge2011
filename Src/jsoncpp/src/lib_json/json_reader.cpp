@@ -267,12 +267,24 @@ Reader::TokenType Reader::readCppStyleComment() {
 }
 
 Reader::TokenType Reader::readNumber() {
-  typedef setof<char, '.', 'e', 'E', '+', '-'> whitelist;
-  while (current_ != end_) {
-    char c = *current_;
-    if (!(c >= '0' && c <= '9') && !whitelist::contains(c))
-      break;
-    ++current_;
+  const char *p = current_;
+  char c = '0'; // stopgap for already consumed character
+  // integral part
+  while (c >= '0' && c <= '9')
+    c = (current_ = p) < end_ ? *p++ : 0;
+  // fractional part
+  if (c == '.') {
+    c = (current_ = p) < end_ ? *p++ : 0;
+    while (c >= '0' && c <= '9')
+      c = (current_ = p) < end_ ? *p++ : 0;
+  }
+  // exponential part
+  if (c == 'e' || c == 'E') {
+    c = (current_ = p) < end_ ? *p++ : 0;
+    if (c == '+' || c == '-')
+      c = (current_ = p) < end_ ? *p++ : 0;
+    while (c >= '0' && c <= '9')
+      c = (current_ = p) < end_ ? *p++ : 0;
   }
   return tokenNumber;
 }
