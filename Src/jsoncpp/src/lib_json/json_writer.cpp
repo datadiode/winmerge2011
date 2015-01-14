@@ -157,8 +157,7 @@ void Writer::write(const Value& root) {
   indentString_.resize(0);
   write("\xEF\xBB\xBF");
   writeCommentBefore(root);
-  if (root.size() == 0)
-    writeIndent();
+  writeIndent();
   writeValue(root);
   writeCommentAfter(root);
   writeIndent();
@@ -195,14 +194,13 @@ void Writer::writeValue(const Value& value) {
 
 void Writer::writeArrayValue(const Value& value) {
   if (unsigned size = value.size()) {
-    writeWithIndent("[");
+    write("[");
     indent();
     unsigned index = 0;
     for (;;) {
       const Value &childValue = value[index];
       writeCommentBefore(childValue);
-      if (childValue.size() == 0)
-        writeIndent();
+      writeIndent();
       writeValue(childValue);
       if (++index == size) {
         writeCommentAfter(childValue);
@@ -212,7 +210,8 @@ void Writer::writeArrayValue(const Value& value) {
       writeCommentAfter(childValue);
     }
     unindent();
-    writeWithIndent("]");
+    writeIndent();
+    write("]");
   } else {
     write("[]");
   }
@@ -222,12 +221,13 @@ void Writer::writeObjectValue(const Value& value) {
   const Value::ObjectValues *const values = value.getObjectValues();
   Value::ObjectValues::const_iterator it = values->begin();
   if (it != values->end()) {
-    writeWithIndent("{");
+    write("{");
     indent();
     for (;;) {
       const Value &childValue = it->second;
       writeCommentBefore(childValue);
-      writeWithIndent(valueToQuotedString(it->first.c_str()).c_str());
+      writeIndent();
+      write(valueToQuotedString(it->first.c_str()).c_str());
       write(" : ");
       writeValue(childValue);
       if (++it == values->end()) {
@@ -238,7 +238,8 @@ void Writer::writeObjectValue(const Value& value) {
       writeCommentAfter(childValue);
     }
     unindent();
-    writeWithIndent("}");
+    writeIndent();
+    write("}");
   } else {
     write("{}");
   }
@@ -249,11 +250,6 @@ void Writer::writeIndent() {
     indentString_ = "\n";
   else
     write(indentString_.c_str());
-}
-
-void Writer::writeWithIndent(const char* text) {
-  writeIndent();
-  write(text);
 }
 
 void Writer::indent() { indentString_ += indentation_; }
@@ -275,9 +271,10 @@ void Writer::writeComment(const char* q) {
         do {
           c = *++q;
         } while (c != '\0' && c != '\r' && c != '\n');
-      } while (block && (q[-1] != '/' || q[-2] != '*'));
+      } while (block && c != '\0' && (q[-1] != '/' || q[-2] != '*'));
     }
-    writeWithIndent(std::string(p, q).c_str());
+    writeIndent();
+    write(std::string(p, q).c_str());
   }
 }
 
