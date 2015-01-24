@@ -58,7 +58,6 @@ private:
   void writeArrayValue(const Value&);
   void writeObjectValue(const Value&);
   void writeIndent();
-  void writeWithIndent(const char*);
   void indent();
   void unindent();
   void writeComment(const char*);

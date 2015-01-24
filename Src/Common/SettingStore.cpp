@@ -28,22 +28,25 @@ CSettingStore::CSettingStore(LPCTSTR sCompanyName, LPCTSTR sApplicationName)
 CSettingStore::~CSettingStore()
 {
 	ASSERT(ThreadIntegrity);
-	if (m_regsam == 0 && m_bDirty)
+	if (m_regsam == 0)
 	{
 		Json::Value *const root = reinterpret_cast<Json::Value *>(m_hHive);
-		if (FILE *tf = _tfopen(m_sFileName.c_str(), _T("w")))
+		if (m_bDirty)
 		{
-			try
+			if (FILE *tf = _tfopen(m_sFileName.c_str(), _T("w")))
 			{
-				Json::Writer writer(tf);
-				writer.write(*root);
+				try
+				{
+					Json::Writer writer(tf);
+					writer.write(*root);
+				}
+				catch (OException *e)
+				{
+					e->ReportError(NULL, MB_TASKMODAL | MB_ICONSTOP);
+					delete e;
+				}
+				fclose(tf);
 			}
-			catch (OException *e)
-			{
-				e->ReportError(NULL, MB_TASKMODAL | MB_ICONSTOP);
-				delete e;
-			}
-			fclose(tf);
 		}
 		delete root;
 	}
@@ -358,7 +361,7 @@ LONG CSettingStore::RegSetValueEx(HKEY hKey, LPCTSTR lpValueName, DWORD dwType, 
 			}
 			if (value.compare(newValue) != 0)
 			{
-				value.swap(newValue);
+				value.swapPayload(newValue);
 				m_bDirty = true;
 			}
 		}
@@ -383,8 +386,8 @@ LONG CSettingStore::SHDeleteKey(HKEY hKey, LPCTSTR pszSubKey) const
 	else if (Json::Value *const node = reinterpret_cast<Json::Value *>(hKey))
 	{
 		OString key = HString::Uni(pszSubKey)->Oct(CP_UTF8);
-		node->removeMember(key.A);
-		m_bDirty = true;
+		if (node->removeMember(key.A, 0))
+			m_bDirty = true;
 	}
 	else
 	{
@@ -402,7 +405,8 @@ LONG CSettingStore::RegDeleteValue(HKEY hKey, LPCTSTR lpValueName) const
 	else if (Json::Value *const node = reinterpret_cast<Json::Value *>(hKey))
 	{
 		OString key = HString::Uni(lpValueName)->Oct(CP_UTF8);
-		node->removeMember(key.A);
+		if (node->removeMember(key.A, 0))
+			m_bDirty = true;
 	}
 	else
 	{

@@ -340,8 +340,12 @@ Value& Value::operator=(Value other) {
   return *this;
 }
 
-void Value::swap(Value& other) {
+void Value::swapPayload(Value& other) {
   pod<offsetof(Value, comments_)>::swap(this, &other);
+}
+
+void Value::swap(Value& other) {
+  pod<sizeof(Value)>::swap(this, &other);
 }
 
 ValueType Value::type() const { return type_; }
@@ -764,18 +768,41 @@ Value Value::get(const std::string& key, const Value& defaultValue) const {
   return get(key.c_str(), defaultValue);
 }
 
-Value Value::removeMember(const char* key) {
-  JSON_ASSERT_MESSAGE(type_ == nullValue || type_ == objectValue,
-                      "in Json::Value::removeMember(): requires objectValue");
-  if (type_ == nullValue)
-    return null;
+bool Value::removeMember(const char* key, Value* removed) {
+  if (type_ != objectValue) {
+    return false;
+  }
   CZString actualKey(key, CZString::noDuplication);
   ObjectValues::iterator it = value_.map_->find(actualKey);
   if (it == value_.map_->end())
-    return null;
-  Value old(it->second);
+    return false;
+  if (removed)
+    *removed = it->second;
   value_.map_->erase(it);
-  return old;
+  return true;
+}
+
+bool Value::removeIndex(ArrayIndex index, Value* removed) {
+  if (type_ != arrayValue) {
+    return false;
+  }
+  CZString key(index);
+  ObjectValues::iterator it = value_.map_->find(key);
+  if (it == value_.map_->end()) {
+    return false;
+  }
+  *removed = it->second;
+  ArrayIndex oldSize = size();
+  // shift left all items left, into the place of the "removed"
+  for (ArrayIndex i = index; i < (oldSize - 1); ++i){
+    CZString key(i);
+    (*value_.map_)[key] = (*this)[i + 1];
+  }
+  // erase the last one ("leftover")
+  CZString keyLast(oldSize - 1);
+  ObjectValues::iterator itLast = value_.map_->find(keyLast);
+  value_.map_->erase(itLast);
+  return true;
 }
 
 bool Value::isMember(const char* key) const {

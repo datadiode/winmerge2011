@@ -156,25 +156,26 @@ Json::Value obj_value(Json::objectValue); // {}
   Value(const char* beginValue, const char* endValue);
   Value(const std::string& value);
   Value(bool value);
+  /// Deep copy.
   Value(const Value& other);
   ~Value();
 
+  // Deep copy, then swap(other).
   Value& operator=(Value other);
-  /// Swap values.
-  /// \note Currently, comments are intentionally not swapped, for
-  /// both logic and efficiency.
+  /// Swap everything.
   void swap(Value& other);
+  /// Swap values but leave comments and source offsets in place.
+  void swapPayload(Value& other);
 
   ValueType type() const;
 
+  /// Compare payload only, not comments etc.
   bool operator<(const Value& other) const;
   bool operator<=(const Value& other) const;
   bool operator>=(const Value& other) const;
   bool operator>(const Value& other) const;
-
   bool operator==(const Value& other) const;
   bool operator!=(const Value& other) const;
-
   int compare(const Value& other) const;
 
   const char* asCString() const;
@@ -264,13 +265,19 @@ Json::Value obj_value(Json::objectValue); // {}
   Value get(const char* key, const Value& defaultValue) const;
   /// Return the member named key if it exist, defaultValue otherwise.
   Value get(const std::string& key, const Value& defaultValue) const;
-  /// \brief Remove and return the named member.
-  ///
-  /// Do nothing if it did not exist.
-  /// \return the removed Value, or null.
-  /// \pre type() is objectValue or nullValue
-  /// \post type() is unchanged
-  Value removeMember(const char* key);
+  /** \brief Remove the named map member.
+
+      Update 'removed' iff removed.
+      \return true iff removed (no exceptions)
+  */
+  bool removeMember(const char* key, Value* removed);
+  /** \brief Remove the indexed array element.
+
+      O(n) expensive operations.
+      Update 'removed' iff removed.
+      \return true iff removed (no exceptions)
+  */
+  bool removeIndex(ArrayIndex i, Value* removed);
 
   /// Return true if the object has a member named key.
   bool isMember(const char* key) const;
@@ -308,3 +315,7 @@ private:
 };
 
 } // namespace Json
+
+/// Specialize std::swap() for Json::Value. 
+template<>
+inline void eastl::swap(Json::Value& a, Json::Value& b) { a.swap(b); }
