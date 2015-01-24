@@ -22,18 +22,34 @@ static char THIS_FILE[] = __FILE__;
 #define CONTEXT_F_ADVANCED 0x02
 #define CONTEXT_F_SUBFOLDERS 0x04
 
+/// Registry path to WinMerge
+static const TCHAR f_RegDir[] = _T("Software\\Thingamahoochie\\WinMerge");
+
 // registry values
 static const TCHAR f_RegValueEnabled[] = _T("ContextMenuEnabled");
 
+static BOOL OwnsShellExtension()
+{
+	TCHAR exe[MAX_PATH];
+	GetModuleFileName(NULL, exe, _countof(exe));
+	TCHAR dll[MAX_PATH];
+	static const TCHAR subkey[] = _T("CLSID\\{4E716236-AA30-4C65-B225-D68BBA81E9C2}\\InprocServer32");
+	return SHRegGetPath(HKEY_CLASSES_ROOT, subkey, NULL, dll, 0) == ERROR_SUCCESS
+		&& exe + PathCommonPrefix(exe, dll, NULL) + 1 == PathFindFileName(exe);
+}
+
 PropShell::PropShell() 
 : OptionsPanel(IDD_PROPPAGE_SHELL, sizeof *this)
+, m_bOwnsShellExtension(OwnsShellExtension())
 {
 }
 
 void PropShell::UpdateScreen()
 {
-	GetDlgItem(IDC_EXPLORER_ADVANCED)->EnableWindow(m_bContextAdded);
-	GetDlgItem(IDC_EXPLORER_SUBFOLDERS)->EnableWindow(m_bContextAdded);
+	GetDlgItem(IDC_EXPLORER_CONTEXT)->EnableWindow(m_bOwnsShellExtension);
+	BOOL bEnable = m_bOwnsShellExtension && m_bContextAdded;
+	GetDlgItem(IDC_EXPLORER_ADVANCED)->EnableWindow(bEnable);
+	GetDlgItem(IDC_EXPLORER_SUBFOLDERS)->EnableWindow(bEnable);
 	if (!m_bContextAdded)
 	{
 		m_bContextAdvanced = FALSE;
@@ -94,7 +110,8 @@ void PropShell::WriteOptions()
 /// Get registry values for ShellExtension
 void PropShell::GetContextRegValues()
 {
-	if (CRegKeyEx reg = SettingStore.GetAppRegistryKey())
+	CRegKeyEx reg;
+	if (reg.Open(HKEY_CURRENT_USER, f_RegDir) == ERROR_SUCCESS)
 	{
 		// Read bitmask for shell extension settings
 		DWORD dwContextEnabled = reg.ReadDword(f_RegValueEnabled, 0);
@@ -113,7 +130,8 @@ void PropShell::GetContextRegValues()
 /// Saves given path to registry for ShellExtension, and Context Menu settings
 void PropShell::SaveMergePath()
 {
-	if (CRegKeyEx reg = SettingStore.GetAppRegistryKey())
+	CRegKeyEx reg;
+	if (reg.Open(HKEY_CURRENT_USER, f_RegDir) == ERROR_SUCCESS)
 	{
 		// Determine bitmask for shell extension
 		DWORD dwContextEnabled = reg.ReadDword(f_RegValueEnabled, 0);

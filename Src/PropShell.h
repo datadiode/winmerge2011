@@ -26,6 +26,8 @@ public:
 
 // Implementation
 protected:
+	const BOOL m_bOwnsShellExtension;
+
 	template<DDX_Operation>
 			bool UpdateData();
 	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
