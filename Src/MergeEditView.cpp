@@ -1380,10 +1380,7 @@ HRESULT CMergeEditView::DragEnter(IDataObject *pDataObj, DWORD grfKeyState, POIN
 	if ((hr = CMyFormatEtc(CF_HDROP).QueryGetData(pDataObj)) == S_OK ||
 		(hr = CMyFormatEtc(CFSTR_FILEDESCRIPTORA).QueryGetData(pDataObj)) == S_OK)
 	{
-		POINT ptClient = { pt.x, pt.y };
-		ScreenToClient(&ptClient);
-		ShowDropIndicator(ptClient);
-		*pdwEffect = DROPEFFECT_COPY;
+		DragOver(grfKeyState, pt, pdwEffect);
 	}
 	else
 	{

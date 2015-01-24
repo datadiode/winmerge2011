@@ -633,11 +633,7 @@ HRESULT CCrystalEditView::DragEnter(IDataObject *pDataObj, DWORD grfKeyState, PO
 	HRESULT hr = CMyFormatEtc(CF_UNICODETEXT).QueryGetData(pDataObj);
 	if (hr == S_OK)
 	{
-		POINT ptClient = { pt.x, pt.y };
-		ScreenToClient(&ptClient);
-		ShowDropIndicator(ptClient);
-		if (*pdwEffect != DROPEFFECT_COPY)
-			*pdwEffect = grfKeyState & MK_CONTROL ? DROPEFFECT_COPY : DROPEFFECT_MOVE;
+		DragOver(grfKeyState, pt, pdwEffect);
 	}
 	else
 	{
@@ -662,8 +658,8 @@ HRESULT CCrystalEditView::DragOver(DWORD grfKeyState, POINTL pt, DWORD *pdwEffec
 		if ((grfKeyState & MK_SHIFT) == 0)
 			DoDragScroll(ptClient);
 		ShowDropIndicator(ptClient);
-		if (*pdwEffect != DROPEFFECT_COPY)
-			*pdwEffect = grfKeyState & MK_CONTROL ? DROPEFFECT_COPY : DROPEFFECT_MOVE;
+		if ((*pdwEffect & ~DROPEFFECT_LINK) != DROPEFFECT_COPY)
+			*pdwEffect = (grfKeyState & MK_CONTROL ? DROPEFFECT_COPY : DROPEFFECT_MOVE) | (*pdwEffect & DROPEFFECT_LINK);
 	}
 	else
 	{
