@@ -129,7 +129,6 @@ private:
   TokenType readString();
   TokenType readNumber();
   bool readValue(Value&);
-  void nullifyValue(Value&);
   bool readObject(Value&);
   bool readArray(Value&);
   bool decodeNumber(Value&);

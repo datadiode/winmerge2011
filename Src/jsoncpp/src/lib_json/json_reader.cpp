@@ -113,9 +113,13 @@ bool Reader::readValue(Value& currentValue) {
   case tokenFalse:
     Value(false).swapPayload(currentValue);
     break;
-  case tokenNull:
-    Value().swapPayload(currentValue);
-    break;
+  case tokenArraySeparator:
+    if (features_.allowDroppedNullPlaceholders_) {
+    case tokenNull:
+      Value().swapPayload(currentValue);
+      break;
+    }
+    // fall through
   default:
     successful = false;
     addError("Syntax error: value, object or array expected.");
@@ -124,11 +128,13 @@ bool Reader::readValue(Value& currentValue) {
   return successful;
 }
 
-void Reader::nullifyValue(Value& currentValue) {
-  Value().swapPayload(currentValue);
-}
-
 bool Reader::skipCommentTokens(std::string& queuedComments, Value* lastValue) {
+  // deal with comment before comma but not on same line as lastValue
+  if (lastValue && !queuedComments.empty()) {
+    lastValue->setComment(queuedComments.c_str(), commentAfter);
+    queuedComments.resize(0);
+    lastValue = 0; // don't put comment after comma on same line as lastValue
+  }
   bool found = false;
   do {
     if (readToken())
@@ -296,16 +302,10 @@ Reader::TokenType Reader::readString() {
 bool Reader::readObject(Value& currentValue) {
   std::string name;
   Value(objectValue).swapPayload(currentValue);
-  std::string queuedComments, misplacedComments;
+  std::string queuedComments;
   Value* lastValue = 0;
   bool comment;
   do {
-    // deal with comment before comma but not on same line as lastValue
-    if (lastValue && !queuedComments.empty()) {
-      lastValue->setComment(queuedComments.c_str(), commentAfter);
-      queuedComments.resize(0);
-      lastValue = 0; // don't put comment after comma on same line as lastValue
-    }
     comment = skipCommentTokens(queuedComments, lastValue);
     if (token_.type_ == tokenObjectEnd)
       if (lastValue == 0 || features_.allowDroppedNullPlaceholders_)
@@ -334,16 +334,12 @@ bool Reader::readObject(Value& currentValue) {
       queuedComments.resize(0);
     }
     lastValue = &value;
-    // if a tokenArraySeparator follows, assume a dropped null placeholder
-    if (token_.type_ == tokenArraySeparator) {
-      nullifyValue(value);
-      continue; 
-    }
     if (!readValue(value)) {
       // error already set
       return false;
     }
-    comment = skipCommentTokens(queuedComments, lastValue);
+    comment = token_.type_ != tokenArraySeparator &&
+              skipCommentTokens(queuedComments, lastValue);
   } while (token_.type_ == tokenArraySeparator);
   if (token_.type_ != tokenObjectEnd) {
     addError("Missing ',' or '}' in object declaration");
@@ -370,12 +366,6 @@ bool Reader::readArray(Value& currentValue) {
   Value* lastValue = 0;
   bool comment;
   do {
-    // deal with comment before comma but not on same line as lastValue
-    if (lastValue && !queuedComments.empty()) {
-      lastValue->setComment(queuedComments.c_str(), commentAfter);
-      queuedComments.resize(0);
-      lastValue = 0; // don't put comment after comma on same line as lastValue
-    }
     comment = skipCommentTokens(queuedComments, lastValue);
     if (token_.type_ == tokenArrayEnd)
       if (lastValue == 0 || features_.allowDroppedNullPlaceholders_)
@@ -386,16 +376,12 @@ bool Reader::readArray(Value& currentValue) {
       queuedComments.resize(0);
     }
     lastValue = &value;
-    // if a tokenArraySeparator follows, assume a dropped null placeholder
-    if (token_.type_ == tokenArraySeparator) {
-      nullifyValue(value);
-      continue; 
-    }
     if (!readValue(value)) {
       // error already set
       return false;
     }
-    comment = skipCommentTokens(queuedComments, lastValue);
+    comment = token_.type_ != tokenArraySeparator &&
+              skipCommentTokens(queuedComments, lastValue);
   } while (token_.type_ == tokenArraySeparator);
   if (token_.type_ != tokenArrayEnd) {
     addError("Missing ',' or ']' in array declaration");
