@@ -32,7 +32,6 @@ protected:
 			bool UpdateData();
 	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
 
-	void GetContextRegValues();
-
-	void SaveMergePath();
+	void ReadContextRegValues();
+	void SaveContextRegValues();
 };

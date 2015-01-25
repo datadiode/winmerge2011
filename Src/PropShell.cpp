@@ -92,7 +92,8 @@ LRESULT PropShell::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
  */
 void PropShell::ReadOptions()
 {
-	GetContextRegValues();
+	if (m_bOwnsShellExtension)
+		ReadContextRegValues();
 	m_bEnableDirShellContextMenu = COptionsMgr::Get(OPT_DIRVIEW_ENABLE_SHELL_CONTEXT_MENU);
 	m_bEnableMegeEditShellContextMenu = COptionsMgr::Get(OPT_MERGEEDITVIEW_ENABLE_SHELL_CONTEXT_MENU);
 }
@@ -104,11 +105,12 @@ void PropShell::WriteOptions()
 {
 	COptionsMgr::SaveOption(OPT_DIRVIEW_ENABLE_SHELL_CONTEXT_MENU, m_bEnableDirShellContextMenu != BST_UNCHECKED);
 	COptionsMgr::SaveOption(OPT_MERGEEDITVIEW_ENABLE_SHELL_CONTEXT_MENU, m_bEnableMegeEditShellContextMenu != BST_UNCHECKED);
-	SaveMergePath(); // saves context menu settings as well
+	if (m_bOwnsShellExtension)
+		SaveContextRegValues();
 }
 
 /// Get registry values for ShellExtension
-void PropShell::GetContextRegValues()
+void PropShell::ReadContextRegValues()
 {
 	CRegKeyEx reg;
 	if (reg.Open(HKEY_CURRENT_USER, f_RegDir) == ERROR_SUCCESS)
@@ -127,8 +129,8 @@ void PropShell::GetContextRegValues()
 	}
 }
 
-/// Saves given path to registry for ShellExtension, and Context Menu settings
-void PropShell::SaveMergePath()
+/// Saves Context Menu settings
+void PropShell::SaveContextRegValues()
 {
 	CRegKeyEx reg;
 	if (reg.Open(HKEY_CURRENT_USER, f_RegDir) == ERROR_SUCCESS)
