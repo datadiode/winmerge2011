@@ -147,6 +147,8 @@ MergeCmdLineInfo::MergeCmdLineInfo(LPCTSTR q):
 	{
 		ParseWinMergeCmdLine(q);
 	}
+	if (m_sContentType.empty())
+		m_sContentType = SettingStore.GetProfileString(_T("Settings"), _T("CompareAs"), _T(""));
 }
 
 /**
@@ -475,7 +477,7 @@ void MergeCmdLineInfo::ParseWinMergeCmdLine(LPCTSTR q)
 {
 	ParseWinMergeCmdLineInternal(q);
 
-	if (m_sConfigFileName.empty())
+	if (m_sConfigFileName.empty() && !SettingStore.IsFile())
 	{
 		TCHAR path[MAX_PATH];
 		GetModuleFileName(NULL, path, _countof(path));
