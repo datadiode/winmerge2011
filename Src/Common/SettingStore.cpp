@@ -28,28 +28,7 @@ CSettingStore::CSettingStore(LPCTSTR sCompanyName, LPCTSTR sApplicationName)
 CSettingStore::~CSettingStore()
 {
 	ASSERT(ThreadIntegrity);
-	if (m_regsam == 0)
-	{
-		Json::Value *const root = reinterpret_cast<Json::Value *>(m_hHive);
-		if (m_bDirty)
-		{
-			if (FILE *tf = _tfopen(m_sFileName.c_str(), _T("w")))
-			{
-				try
-				{
-					Json::Writer writer(tf);
-					writer.write(*root);
-				}
-				catch (OException *e)
-				{
-					e->ReportError(NULL, MB_TASKMODAL | MB_ICONSTOP);
-					delete e;
-				}
-				fclose(tf);
-			}
-		}
-		delete root;
-	}
+	Close();
 }
 
 int CSettingStore::GetProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nDefault) const
@@ -138,9 +117,39 @@ BOOL CSettingStore::WriteProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, L
 	return lResult == ERROR_SUCCESS;
 }
 
+void CSettingStore::Close()
+{
+	ASSERT(ThreadIntegrity);
+	if (m_regsam == 0)
+	{
+		Json::Value *const root = reinterpret_cast<Json::Value *>(m_hHive);
+		if (m_bDirty)
+		{
+			if (FILE *tf = _tfopen(m_sFileName.c_str(), _T("w")))
+			{
+				try
+				{
+					Json::Writer writer(tf);
+					writer.write(*root);
+				}
+				catch (OException *e)
+				{
+					e->ReportError(NULL, MB_TASKMODAL | MB_ICONSTOP);
+					delete e;
+				}
+				fclose(tf);
+			}
+			m_bDirty = false;
+		}
+		delete root;
+		m_hHive = NULL;
+	}
+}
+
 BOOL CSettingStore::SetFileName(LPCTSTR sFileName)
 {
 	ASSERT(ThreadIntegrity);
+	Close();
 	m_regsam = 0;
 	m_sFileName = sFileName;
 	Json::Value *const root = new Json::Value;

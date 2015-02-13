@@ -30,6 +30,7 @@ public:
 	~CSettingStore();
 
 	BOOL SetFileName(LPCTSTR sFileName);
+	BOOL IsFile() { return m_regsam == 0; }
 // Operations
 
 	/// Returns an integer option value (or a default value, if absent), identified by the section specifying the Registry key (use a backslash to separate subkeys) and the entry which defines the value name within that key, which must be of the appropriate type.
@@ -57,11 +58,13 @@ public:
 	LONG SHDeleteKey(HKEY, LPCTSTR) const;
 	LONG RegDeleteValue(HKEY, LPCTSTR) const;
 	LONG RegQueryInfoKey(HKEY, LPDWORD, LPDWORD = NULL) const;
+
 private:
+	void Close();
 	/// Handle to external registry hive if mounted
 	HKEY m_hHive;
 	/// Access permissions to request (either KEY_READ | KEY_WRITE or KEY_READ)
-	REGSAM m_regsam;;
+	REGSAM m_regsam;
 	/// Whether any settings were changed after loading
 	mutable bool m_bDirty;
 	/// Filename for portable media setup
