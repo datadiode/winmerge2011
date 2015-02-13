@@ -281,10 +281,13 @@ LONG CSettingStore::RegQueryValueEx(HKEY hKey, LPCTSTR lpValueName, LPDWORD lpTy
 				*lpType = REG_DWORD;
 			if (lpcbData != NULL)
 			{
-				if (*lpcbData < sizeof(DWORD))
-					lResult = ERROR_MORE_DATA;
-				else if (lpData != NULL)
-					*reinterpret_cast<DWORD *>(lpData) = value.asUInt();
+				if (lpData != NULL)
+				{
+					if (*lpcbData < sizeof(DWORD))
+						lResult = ERROR_MORE_DATA;
+					else
+						*reinterpret_cast<DWORD *>(lpData) = value.asUInt();
+				}
 				*lpcbData = sizeof(DWORD);
 			}
 			else if (lpData != NULL)
@@ -302,10 +305,13 @@ LONG CSettingStore::RegQueryValueEx(HKEY hKey, LPCTSTR lpValueName, LPDWORD lpTy
 				if (int len = MultiByteToWideChar(CP_UTF8, 0, str, -1, NULL, 0))
 				{
 					DWORD cbData = len * sizeof(WCHAR);
-					if (*lpcbData < cbData)
-						lResult = ERROR_MORE_DATA;
-					else if (lpData != NULL)
-						MultiByteToWideChar(CP_UTF8, 0, str, -1, reinterpret_cast<LPWSTR>(lpData), len);
+					if (lpData != NULL)
+					{
+						if (*lpcbData < cbData)
+							lResult = ERROR_MORE_DATA;
+						else 
+							MultiByteToWideChar(CP_UTF8, 0, str, -1, reinterpret_cast<LPWSTR>(lpData), len);
+					}
 					*lpcbData = cbData;
 				}
 				else
