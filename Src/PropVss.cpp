@@ -89,7 +89,11 @@ namespace NClearCase
 	public:
 		CTypeMgrMapStream(DWORD grfMode)
 		{
+#ifdef _WIN64
+			static const TCHAR key[] = _T("SOFTWARE\\Wow6432Node\\Atria\\ClearCase\\CurrentVersion");
+#else
 			static const TCHAR key[] = _T("SOFTWARE\\Atria\\ClearCase\\CurrentVersion");
+#endif
 			static const TCHAR value[] = _T("ProductHome");
 			if (SHRegGetPath(HKEY_LOCAL_MACHINE, key, value, path, 0) == ERROR_SUCCESS)
 			{
