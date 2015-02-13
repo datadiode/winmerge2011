@@ -321,9 +321,8 @@ void PropVss::WriteOptions()
  */
 void PropVss::OnBrowseButton()
 {
-	String s;
-	if (SelectFile(m_hWnd, s))
-		SetDlgItemText(IDC_PATH_EDIT, s.c_str());
+	if (SelectFile(m_hWnd, m_strPath))
+		UpdateData<Set>();
 }
 
 /**
