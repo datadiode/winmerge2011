@@ -19,10 +19,6 @@ REM Create MergeLang.dll from MergeLang.rc
 rc /fo%~1\MergeLang.res /i..\..\Src MergeLang.rc
 link /DLL /NOENTRY /MACHINE:IX86 /OUT:%~2\MergeLang.dll %~1\MergeLang.res
 
-REM Create a WinMergeU.dat which is usable for everyone
-del /f "%~2\..\..\WinMergeU.dat"
-reg save HKCR\{08CEC68E-416D-4fae-962D-16A8E838C6F5} "%~2\..\..\WinMergeU.dat"
-attrib +r "%~2\..\..\WinMergeU.dat"
 exit
 
 :usage
