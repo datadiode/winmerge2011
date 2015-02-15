@@ -29,9 +29,13 @@ public:
 	CSettingStore(LPCTSTR sCompanyName, LPCTSTR sApplicationName);
 	~CSettingStore();
 
-	BOOL SetFileName(LPCTSTR sFileName);
-	BOOL IsFile() { return m_regsam == 0; }
 // Operations
+
+	/// Sets config file name
+	bool SetFileName(String = String());
+
+	/// Gets config file name
+	const String &GetFileName() const { return m_sFileName; }
 
 	/// Returns an integer option value (or a default value, if absent), identified by the section specifying the Registry key (use a backslash to separate subkeys) and the entry which defines the value name within that key, which must be of the appropriate type.
 	int GetProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nDefault) const;

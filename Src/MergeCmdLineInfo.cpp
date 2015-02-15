@@ -29,7 +29,6 @@
 #include "Constants.h"
 #include "Paths.h"
 #include "Environment.h"
-#include "Common/RegKey.h"
 #include "Common/SettingStore.h"
 #include "MergeCmdLineInfo.h"
 #include "OptionsMgr.h"
@@ -149,6 +148,7 @@ MergeCmdLineInfo::MergeCmdLineInfo(LPCTSTR q):
 	}
 	if (m_sContentType.empty())
 		m_sContentType = SettingStore.GetProfileString(_T("Settings"), _T("CompareAs"), _T(""));
+	SettingStore.SetFileName(m_sConfigFileName);
 }
 
 /**
@@ -266,7 +266,7 @@ static LPCTSTR FindInWordList(LPCTSTR p, LPCTSTR q)
  * @brief Parse native WinMerge command line.
  * @param [in] q Points into the command line.
  */
-void MergeCmdLineInfo::ParseWinMergeCmdLineInternal(LPCTSTR q)
+void MergeCmdLineInfo::ParseWinMergeCmdLine(LPCTSTR q)
 {
 	String param;
 	bool flag;
@@ -320,6 +320,7 @@ void MergeCmdLineInfo::ParseWinMergeCmdLineInternal(LPCTSTR q)
 				AddPath(project.m_sRightFile);
 				m_sFileFilter = project.m_sFilter;
 				m_sContentType = project.m_sCompareAs;
+				m_sConfigFileName = project.m_sConfig;
 				m_nRecursive = project.m_nRecursive;
 				if (project.m_bLeftPathReadOnly)
 					m_dwLeftFlags |= FFILEOPEN_READONLY;
@@ -328,7 +329,7 @@ void MergeCmdLineInfo::ParseWinMergeCmdLineInternal(LPCTSTR q)
 			}
 			else
 			{
-				ParseWinMergeCmdLineInternal(project.m_sOptions.c_str());
+				ParseWinMergeCmdLine(project.m_sOptions.c_str());
 			}
 		}
 		else if (param == _T("r"))
@@ -471,39 +472,4 @@ void MergeCmdLineInfo::ParseWinMergeCmdLineInternal(LPCTSTR q)
 			m_sRunScript += string_format(_T("?%s=\"%s\""), param.c_str(), s.c_str());
 		}
 	}
-}
-
-void MergeCmdLineInfo::ParseWinMergeCmdLine(LPCTSTR q)
-{
-	ParseWinMergeCmdLineInternal(q);
-
-	if (m_sConfigFileName.empty() && !SettingStore.IsFile())
-	{
-		TCHAR path[MAX_PATH];
-		GetModuleFileName(NULL, path, _countof(path));
-		PathRenameExtension(path, _T(".json"));
-		if (PathFileExists(path))
-		{
-			m_sConfigFileName = path;
-			PathStripToRoot(path);
-			SetEnvironmentVariable(_T("PortableRoot"), path);
-		}
-	}
-	if (!m_sConfigFileName.empty() && SettingStore.SetFileName(m_sConfigFileName.c_str()))
-	{
-		CRegKeyEx loadkey = SettingStore.GetAppRegistryKey();
-		IOptionDef::InitOptions(loadkey, NULL);
-	}
-	// If "compare file dir" make it "compare file dir\file".
-	// This feature has been dropped as it conflicts with archive vs. folder compare.
-	/*if (m_Files.size() >= 2)
-	{
-		PATH_EXISTENCE p1 = paths_DoesPathExist(m_Files[0].c_str());
-		PATH_EXISTENCE p2 = paths_DoesPathExist(m_Files[1].c_str());
-
-		if ((p1 == IS_EXISTING_FILE) && (p2 == IS_EXISTING_DIR))
-		{
-			m_Files[1] = paths_ConcatPath(m_Files[1], PathFindFileName(m_Files[0].c_str()));
-		}
-	}*/
 }

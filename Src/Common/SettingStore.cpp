@@ -139,42 +139,64 @@ void CSettingStore::Close()
 				}
 				fclose(tf);
 			}
-			m_bDirty = false;
 		}
 		delete root;
-		m_hHive = NULL;
 	}
+	m_bDirty = false;
+	m_hHive = NULL;
 }
 
-BOOL CSettingStore::SetFileName(LPCTSTR sFileName)
+bool CSettingStore::SetFileName(String sFileName)
 {
 	ASSERT(ThreadIntegrity);
-	Close();
-	m_regsam = 0;
-	m_sFileName = sFileName;
-	Json::Value *const root = new Json::Value;
-	if (FILE *tf = _tfopen(m_sFileName.c_str(), _T("r")))
+	if (sFileName.empty())
 	{
-		try
+		TCHAR path[MAX_PATH];
+		GetModuleFileName(NULL, path, _countof(path));
+		PathRenameExtension(path, _T(".json"));
+		if (m_sFileName == path || PathFileExists(path))
 		{
-			Json::Reader reader(tf);
-			reader.parse(*root);
-			if (ftell(tf) != 0 && !reader.good())
-			{
-				// create copy of broken file for reference
-				CopyFile(m_sFileName.c_str(), (m_sFileName + _T(".bad")).c_str(), FALSE);
-				Json::ThrowJsonException(reader.getFormattedErrorMessages().c_str());
-			}
+			sFileName = path;
+			PathStripToRoot(path);
+			SetEnvironmentVariable(_T("PortableRoot"), path);
 		}
-		catch (OException *e)
-		{
-			e->ReportError(NULL, MB_TASKMODAL | MB_ICONSTOP);
-			delete e;
-		}
-		fclose(tf);
 	}
-	m_hHive = reinterpret_cast<HKEY>(root);
-	return TRUE;
+	if (m_sFileName == sFileName)
+		return false;
+	Close();
+	m_sFileName.swap(sFileName);
+	if (m_sFileName.empty())
+	{
+		m_regsam = KEY_READ | KEY_WRITE;
+		m_hHive = HKEY_CURRENT_USER;
+	}
+	else
+	{
+		m_regsam = 0;
+		Json::Value *const root = new Json::Value;
+		if (FILE *tf = _tfopen(m_sFileName.c_str(), _T("r")))
+		{
+			try
+			{
+				Json::Reader reader(tf);
+				reader.parse(*root);
+				if (ftell(tf) != 0 && !reader.good())
+				{
+					// create copy of broken file for reference
+					CopyFile(m_sFileName.c_str(), (m_sFileName + _T(".bad")).c_str(), FALSE);
+					Json::ThrowJsonException(reader.getFormattedErrorMessages().c_str());
+				}
+			}
+			catch (OException *e)
+			{
+				e->ReportError(NULL, MB_TASKMODAL | MB_ICONSTOP);
+				delete e;
+			}
+			fclose(tf);
+		}
+		m_hHive = reinterpret_cast<HKEY>(root);
+	}
+	return true;
 }
 
 // returns key for HKEY_CURRENT_USER\"Software"\RegistryKey\ProfileName
