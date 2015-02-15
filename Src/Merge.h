@@ -118,6 +118,7 @@ class CDocFrame : public OWindow
 {
 public:
 	CMainFrame *const m_pMDIFrame;
+	String const m_sConfigFile;
 	CEditorFilePathBar m_wndFilePathBar;
 	struct HandleSet
 	{

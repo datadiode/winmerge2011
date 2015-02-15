@@ -605,6 +605,7 @@ CDocFrame::CDocFrame(
 	const LONG *FloatScript,
 	const LONG *SplitScript
 ) : m_pMDIFrame(pMDIFrame),
+	m_sConfigFile(SettingStore.GetFileName()),
 	m_wndFilePathBar(FloatScript, SplitScript),
 	m_pHandleSet(pHandleSet),
 	m_pWndLastFocus(NULL)
