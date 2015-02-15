@@ -52,7 +52,7 @@ ExecuteParameters="install &platform;"
 <comment id='setup_bat'>
 set SevenZip=&SevenZip;
 del "WinMerge_&version;_&platform;.7z"
-"%SevenZip%\7z.exe" a "WinMerge_&version;_&platform;.7z" -r .\Build\WinMerge\&platform;\Release\* .\Build\WinMerge\Win32\Release\ShellExtensionU.dll .\Build\WinMerge\x64\Release\ShellExtensionX64.dll .\Build\WinMerge\WinMergeU.dat -x!*.lib -x!*.exp -x!*.pdb -x!*.sh
+"%SevenZip%\7z.exe" a "WinMerge_&version;_&platform;.7z" -r .\Build\WinMerge\&platform;\Release\* .\Build\WinMerge\Win32\Release\ShellExtensionU.dll .\Build\WinMerge\x64\Release\ShellExtensionX64.dll -x!*.lib -x!*.exp -x!*.pdb -x!*.sh
 copy /b "%SevenZip%\7zS.sfx" + Setup_&platform;.cfg + "WinMerge_&version;_&platform;.7z" "WinMerge_&version;_&platform;_change_7z_to_exe_if_you_want_a_setup.7z"
 </comment>
 <comment id='version_h'>
@@ -401,17 +401,17 @@ Sub Apply
 	If maintenance.disabled Then
 		sProgFolder = EdFolder.value
 		If Not InstallFiles Then Exit Sub
-		' Preserve existing WinMergeU.dat from former installation if present
+		' Preserve existing WinMergeU.json from former installation if present
 		If Not IsEmpty(sMoveFolder) Then
 			On Error Resume Next
-			fso.CopyFile sMoveFolder & "\WinMergeU.dat", sProgFolder & "\WinMergeU.dat"
+			fso.CopyFile sMoveFolder & "\WinMergeU.json", sProgFolder & "\WinMergeU.json"
 			On Error GoTo 0
 		End If
 	Else
 		sProgFolder = sThisFolder
 	End If
 	If PortableMedia.checked Then
-		fso.GetFile(sProgFolder & "\WinMergeU.dat").Attributes = 0
+		fso.CreateTextFile sProgFolder & "\WinMergeU.json"
 	Else
 		For Each element In shortcuts.getElementsByTagName("INPUT")
 			If element.defaultChecked Or maintenance.disabled Then
