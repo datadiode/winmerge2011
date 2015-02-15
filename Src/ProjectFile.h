@@ -42,6 +42,7 @@ public:
 	String m_sRightFile; /**< Right path */
 	String m_sFilter; /**< Filter name or mask */
 	String m_sCompareAs; /**< How to compare */
+	String m_sConfig; /**< Location of private config file */
 	int m_nRecursive; /**< Are subfolders included (recursive scan) */
 	BOOL m_bLeftPathReadOnly; /**< Is left path opened as read-only */
 	BOOL m_bRightPathReadOnly; /**< Is right path opened as read-only */

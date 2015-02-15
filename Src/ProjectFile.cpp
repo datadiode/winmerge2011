@@ -102,6 +102,9 @@ bool ProjectFile::Read(LPCTSTR path)
 			{
 				m_bRightPathReadOnly = atoi(OString(node.GetInnerText()).A) != 0;
 			}
+			string_format sConfig(_T("%s.json"), path);
+			if (PathFileExists(sConfig.c_str()))
+				m_sConfig.swap(sConfig);
 			loaded = true;
 		}
 		else
