@@ -1151,6 +1151,8 @@ void CChildFrame::UpdateSourceTypeUI()
  */
 void CChildFrame::UpdateMergeStatusUI()
 {
+	if (m_pMDIFrame->GetActiveDocFrame() != this)
+		return;
 	const bool bMergingMode = GetMergingMode();
 	m_pMDIFrame->GetStatusBar()->SetPartText(1, bMergingMode ?
 		LanguageSelect.LoadString(IDS_MERGEMODE_MERGING).c_str() : NULL);
@@ -1198,6 +1200,8 @@ void CChildFrame::UpdateResources()
 	UpdateHeaderPath(1);
 	GetLeftView()->UpdateResources();
 	GetRightView()->UpdateResources();
+	UpdateMergeStatusUI();
+	OnUpdateStatusNum();
 }
 
 /**
