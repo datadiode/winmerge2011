@@ -140,7 +140,8 @@ public:
 	static void OpenFileToExternalEditor(LPCTSTR file, LPCTSTR editor = NULL);
 	void OpenFileWith(LPCTSTR file) const;
 	bool ParseArgsAndDoOpen(const MergeCmdLineInfo &);
-
+	void InitOptions();
+	void UpdateDocFrameSettings(const CDocFrame *);
 	void RecalcLayout();
 	BOOL PreTranslateMessage(MSG *);
 

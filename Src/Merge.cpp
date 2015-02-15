@@ -196,8 +196,14 @@ HRESULT CMergeApp::InitInstance()
 		OException::Check(CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE));
 		OException::Check(OleInitialize(NULL));
 
-		CRegKeyEx loadkey = SettingStore.GetAppRegistryKey();
-		IOptionDef::InitOptions(loadkey, NULL);
+		// Parse command-line arguments.
+		MergeCmdLineInfo cmdInfo = GetCommandLine();
+
+		if (HKEY loadkey = SettingStore.GetAppRegistryKey())
+		{
+			IOptionDef::InitOptions(loadkey, NULL);
+			SettingStore.RegCloseKey(loadkey);
+		}
 
 		if (int logging = COptionsMgr::Get(OPT_LOGGING))
 		{
@@ -208,8 +214,6 @@ HRESULT CMergeApp::InitInstance()
 			LogFile.SetMaskLevel(logging); // See CLogFile for possible levels.
 		}
 
-		// Parse command-line arguments.
-		MergeCmdLineInfo cmdInfo = GetCommandLine();
 		// If cmdInfo.m_invocationMode equals InvocationModeMergeTool, then
 		// ClearCase waits for the process to produce an output file and
 		// terminate, in which case single instance logic is not applicable.
@@ -239,13 +243,7 @@ HRESULT CMergeApp::InitInstance()
 			charsets_init();
 			// Locate the supplement folder and read the Supplement.ini
 			InitializeSupplements();
-			// Load file filters from both program and supplement folder
-			globalFileFilter.LoadAllFileFilters();
-			// Read last used filter from registry
-			globalFileFilter.SetFilter(COptionsMgr::Get(OPT_FILEFILTER_CURRENT));
 
-			// Initialize i18n (multiple language) support
-			LanguageSelect.InitializeLanguage();
 			CCrystalTextView::InitSharedResources();
 
 			// Register the main window class. 
@@ -503,6 +501,7 @@ LRESULT CDocFrame::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		if (reinterpret_cast<HWND>(lParam) == m_hWnd)
 		{
 			m_pMDIFrame->SetActiveMenu(m_pHandleSet->m_pMenuShared);
+			m_pMDIFrame->UpdateDocFrameSettings(this);
 		}
 		else if (lParam == 0)
 		{
@@ -511,6 +510,7 @@ LRESULT CDocFrame::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			wp.length = sizeof wp;
 			GetWindowPlacement(&wp);
 			SettingStore.WriteProfileInt(_T("Settings"), _T("ActiveFrameMax"), wp.showCmd == SW_MAXIMIZE);
+			m_pMDIFrame->UpdateDocFrameSettings(NULL);
 		}
 		break;
 	case WM_SETFOCUS:

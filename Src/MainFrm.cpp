@@ -162,25 +162,12 @@ CMainFrame::CMainFrame(HWindow *pWnd, const MergeCmdLineInfo &cmdInfo)
 {
 	SubclassWindow(pWnd);
 
-	SyntaxColors.LoadFromRegistry();
-
 	theApp.m_pMainWnd = this;
 
-	UpdateCodepageModule();
-
-	InitializeSourceControlMembers();
-
-	globalLineFilters.LoadFilters();
-
-	LoadFilesMRU();
-
-	sd_SetBreakChars(COptionsMgr::Get(OPT_BREAK_SEPARATORS).c_str());
+	InitOptions();
 
 	if (HICON hMergeIcon = LanguageSelect.LoadIcon(IDR_MAINFRAME))
 		SetIcon(hMergeIcon, TRUE);
-
-	GetMrgViewFontProperties();
-	GetDirViewFontProperties();
 
 	HImageList *imlCompareStats = CDirView::AcquireSharedResources();
 
@@ -220,8 +207,14 @@ CMainFrame::CMainFrame(HWindow *pWnd, const MergeCmdLineInfo &cmdInfo)
 
 	// Since this function actually opens paths for compare it must be
 	// called after initializing CMainFrame!
-	if (!ParseArgsAndDoOpen(cmdInfo))
+	if (ParseArgsAndDoOpen(cmdInfo))
+	{
+		LoadFilesMRU();
+	}
+	else
+	{
 		PostMessage(WM_CLOSE);
+	}
 
 	m_bAutoDelete = true;
 }
@@ -1117,8 +1110,10 @@ LRESULT CMainFrame::OnWndMsg<WM_MENUSELECT>(WPARAM wParam, LPARAM lParam)
 
 void CMainFrame::OnFileOpen() 
 {
+	UpdateDocFrameSettings(NULL);
 	FileLocation filelocLeft, filelocRight;
 	DoFileOpen(filelocLeft, filelocRight);
+	UpdateDocFrameSettings(GetActiveDocFrame());
 }
 
 void CMainFrame::OnFileClose()
@@ -1220,6 +1215,8 @@ void CMainFrame::RedisplayAllDirDocs()
 	while ((pChild = m_pWndMDIClient->FindWindowEx(pChild, WinMergeWindowClass)) != NULL)
 	{
 		CDocFrame *pDocFrame = static_cast<CDocFrame *>(CDocFrame::FromHandle(pChild));
+		if (pDocFrame->m_sConfigFile != SettingStore.GetFileName())
+			continue;
 		if (pDocFrame->GetFrameType() == FRAME_FOLDER)
 			static_cast<CDirFrame *>(pDocFrame)->Redisplay();
 	}
@@ -1385,6 +1382,8 @@ void CMainFrame::OnOptions()
 		while ((pChild = m_pWndMDIClient->FindWindowEx(pChild, WinMergeWindowClass)) != NULL)
 		{
 			CDocFrame *const pDocFrame = static_cast<CDocFrame *>(CDocFrame::FromHandle(pChild));
+			if (pDocFrame->m_sConfigFile != SettingStore.GetFileName())
+				continue;
 			switch (pDocFrame->GetFrameType())
 			{
 			case FRAME_FILE:
@@ -2176,6 +2175,8 @@ void CMainFrame::ApplyDiffOptions()
 	while ((pChild = m_pWndMDIClient->FindWindowEx(pChild, WinMergeWindowClass)) != NULL)
 	{
 		CDocFrame *const pDocFrame = static_cast<CDocFrame *>(CDocFrame::FromHandle(pChild));
+		if (pDocFrame->m_sConfigFile != SettingStore.GetFileName())
+			continue;
 		switch (pDocFrame->GetFrameType())
 		{
 		case FRAME_FILE:
@@ -2197,6 +2198,8 @@ void CMainFrame::ApplyViewWhitespace()
 	while ((pChild = m_pWndMDIClient->FindWindowEx(pChild, WinMergeWindowClass)) != NULL)
 	{
 		CDocFrame *pAbstract = static_cast<CDocFrame *>(CDocFrame::FromHandle(pChild));
+		if (pAbstract->m_sConfigFile != SettingStore.GetFileName())
+			continue;
 		if (pAbstract->GetFrameType() == FRAME_FILE)
 		{
 			CChildFrame *pSpecific = static_cast<CChildFrame *>(pAbstract);
@@ -2239,6 +2242,8 @@ CDocFrame *CMainFrame::FindFrameOfType(FRAMETYPE frameType)
 	while ((pChild = m_pWndMDIClient->FindWindowEx(pChild, WinMergeWindowClass)) != NULL)
 	{
 		CDocFrame *pDocFrame = static_cast<CDocFrame *>(CDocFrame::FromHandle(pChild));
+		if (pDocFrame->m_sConfigFile != SettingStore.GetFileName())
+			continue;
 		if (pDocFrame->GetFrameType() == frameType)
 			return pDocFrame;
 	}
@@ -2511,6 +2516,7 @@ LRESULT CMainFrame::OnWndMsg<WM_DROPFILES>(WPARAM wParam, LPARAM)
 		if (ProjectFile::IsProjectFile(files[0].c_str()))
 		{
 			LoadAndOpenProjectFile(files[0].c_str());
+			UpdateDocFrameSettings(GetActiveDocFrame());
 			return 0;
 		}
 		if (PathMatchSpec(files[0].c_str(), _T("*.mrgman")))
@@ -2699,12 +2705,14 @@ void CMainFrame::OnFileNew()
 	if (IsComparing())
 		return;
 
+	UpdateDocFrameSettings(NULL);
 	// Load emptyfile descriptors and open empty docs
 	// Use default codepage
 	FileLocation filelocLeft, filelocRight; // empty, unspecified (so default) encoding
 	filelocLeft.description = LanguageSelect.LoadString(IDS_EMPTY_LEFT_FILE);
 	filelocRight.description = LanguageSelect.LoadString(IDS_EMPTY_RIGHT_FILE);
 	ShowMergeDoc(NULL, filelocLeft, filelocRight);
+	UpdateDocFrameSettings(GetActiveDocFrame());
 }
 
 /**
@@ -2790,9 +2798,13 @@ bool CMainFrame::SelectFilter()
 		idRefreshFolders = 0; // Ask before starting
 	}
 	HWindow *pChild = NULL;
+	// First files then folders or else wait cursor might not go away due to
+	// interleaved calls to WaitStatusCursor::Begin() & WaitStatusCursor::End()
 	while ((pChild = m_pWndMDIClient->FindWindowEx(pChild, WinMergeWindowClass)) != NULL)
 	{
 		CDocFrame *const pDocFrame = static_cast<CDocFrame *>(CDocFrame::FromHandle(pChild));
+		if (pDocFrame->m_sConfigFile != SettingStore.GetFileName())
+			continue;
 		switch (pDocFrame->GetFrameType())
 		{
 		case FRAME_FILE:
@@ -2802,6 +2814,15 @@ bool CMainFrame::SelectFilter()
 				static_cast<CChildFrame *>(pDocFrame)->FlushAndRescan(TRUE);
 			}
 			break;
+		}
+	}
+	while ((pChild = m_pWndMDIClient->FindWindowEx(pChild, WinMergeWindowClass)) != NULL)
+	{
+		CDocFrame *const pDocFrame = static_cast<CDocFrame *>(CDocFrame::FromHandle(pChild));
+		if (pDocFrame->m_sConfigFile != SettingStore.GetFileName())
+			continue;
+		switch (pDocFrame->GetFrameType())
+		{
 		case FRAME_FOLDER:
 			if (idRefreshFolders == 0)
 				idRefreshFolders = LanguageSelect.MsgBox(IDS_FILTERCHANGED,
@@ -3023,12 +3044,14 @@ void CMainFrame::OnFileOpenProject()
 	String sFilepath = COptionsMgr::Get(OPT_PROJECTS_PATH);
 	if (!SelectFile(m_hWnd, sFilepath, IDS_OPEN_TITLE, IDS_PROJECTFILES, TRUE))
 		return;
-	
+
+	UpdateDocFrameSettings(NULL);
 	String strProjectPath(sFilepath.c_str(), sFilepath.rfind(_T('\\')) + 1);
 	// store this as the new project path
 	COptionsMgr::SaveOption(OPT_PROJECTS_PATH, strProjectPath);
 
 	LoadAndOpenProjectFile(sFilepath.c_str());
+	UpdateDocFrameSettings(GetActiveDocFrame());
 }
 
 /** @brief Read command line arguments and open files for comparison.
@@ -3173,6 +3196,7 @@ bool CMainFrame::ParseArgsAndDoOpen(const MergeCmdLineInfo &cmdInfo)
 			}
 		}
 	}
+	UpdateDocFrameSettings(GetActiveDocFrame());
 	return bCompared && !cmdInfo.m_bNonInteractive;
 }
 
@@ -3389,6 +3413,7 @@ LRESULT CMainFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 	case ID_FILE_MRU_FILE15:
 	case ID_FILE_MRU_FILE16:
 		LoadAndOpenProjectFile(m_FilesMRU[id - ID_FILE_MRU_FILE1].c_str());
+		UpdateDocFrameSettings(GetActiveDocFrame());
 		break;
 	case ID_FILE_NEW:
 		OnFileNew();
@@ -4013,10 +4038,23 @@ bool CMainFrame::LoadAndOpenProjectFile(LPCTSTR lpProject)
 	if (!project.Read(lpProject))
 		return false;
 
-	if (!project.m_sFilter.empty())
+	String sProject(lpProject); // !!! the erase() below may invalidate lpProject!
+	vector<String>::iterator it = find(m_FilesMRU.begin(), m_FilesMRU.end(), sProject);
+	if (it == m_FilesMRU.end() || it != m_FilesMRU.begin())
 	{
-		globalFileFilter.SetFilter(project.m_sFilter);
+		if (it != m_FilesMRU.end())
+			m_FilesMRU.erase(it);
+		m_FilesMRU.insert(m_FilesMRU.begin(), sProject);
+		if (m_FilesMRU.size() > FILES_MRU_CAPACITY)
+			m_FilesMRU.resize(FILES_MRU_CAPACITY);
+		SaveFilesMRU();
 	}
+
+	if (SettingStore.SetFileName(project.m_sConfig))
+		InitOptions();
+
+	if (!project.m_sFilter.empty())
+		globalFileFilter.SetFilter(project.m_sFilter);
 
 	int nRecursive = project.m_nRecursive;
 
@@ -4042,20 +4080,7 @@ bool CMainFrame::LoadAndOpenProjectFile(LPCTSTR lpProject)
 
 	SettingStore.WriteProfileInt(_T("Settings"), _T("Recurse"), nRecursive);
 
-	bool rtn = DoFileOpen(filelocLeft, filelocRight, dwLeftFlags, dwRightFlags, nRecursive);
-
-	String sProject(lpProject); // !!! the erase() below may invalidate lpProject!
-	vector<String>::iterator it = find(m_FilesMRU.begin(), m_FilesMRU.end(), sProject);
-	if (it == m_FilesMRU.end() || it != m_FilesMRU.begin())
-	{
-		if (it != m_FilesMRU.end())
-			m_FilesMRU.erase(it);
-		m_FilesMRU.insert(m_FilesMRU.begin(), sProject);
-		if (m_FilesMRU.size() > FILES_MRU_CAPACITY)
-			m_FilesMRU.resize(FILES_MRU_CAPACITY);
-		SaveFilesMRU();
-	}
-	return rtn;
+	return DoFileOpen(filelocLeft, filelocRight, dwLeftFlags, dwRightFlags, nRecursive);
 }
 
 void CMainFrame::DoOpenMrgman(LPCTSTR mrgmanFile)
@@ -4078,6 +4103,61 @@ CDocFrame *CMainFrame::GetActiveDocFrame(BOOL *pfActive)
 	HWindow *pWnd = (HWindow *)m_pWndMDIClient->SendMessage(
 		WM_MDIGETACTIVE, 0, reinterpret_cast<LPARAM>(pfActive));
 	return static_cast<CDocFrame *>(CDocFrame::FromHandle(pWnd));
+}
+
+void CMainFrame::InitOptions()
+{
+	if (m_pWndMDIClient)
+	{
+		CRegKeyEx loadkey = SettingStore.GetAppRegistryKey();
+		IOptionDef::InitOptions(loadkey, NULL);
+	}
+
+	// Initialize i18n (multiple language) support
+	WORD langID = LanguageSelect.GetLangId();
+	LanguageSelect.InitializeLanguage();
+
+	globalLineFilters.LoadFilters();
+
+	// Set new filterpath
+	String filterPath = COptionsMgr::Get(OPT_SUPPLEMENT_FOLDER);
+	globalFileFilter.SetUserFilterPath(filterPath.c_str());
+
+	// Load file filters from both program and supplement folder
+	globalFileFilter.LoadAllFileFilters();
+	// Read last used filter from registry
+	globalFileFilter.SetFilter(COptionsMgr::Get(OPT_FILEFILTER_CURRENT));
+
+	SyntaxColors.LoadFromRegistry();
+
+	UpdateCodepageModule();
+
+	InitializeSourceControlMembers();
+
+	sd_SetBreakChars(COptionsMgr::Get(OPT_BREAK_SEPARATORS).c_str());
+
+	if (m_pWndMDIClient)
+	{
+		if (langID != LanguageSelect.GetLangId())
+		{
+			LanguageSelect.UpdateResources();
+			SetFocus(); // Seems pointless but fixes command UI enabling
+		}
+
+		ApplyViewWhitespace();
+
+		GetDirViewFontProperties();
+		UpdateDirViewFont();
+
+		GetMrgViewFontProperties();
+		UpdateMrgViewFont();
+	}
+}
+
+void CMainFrame::UpdateDocFrameSettings(const CDocFrame *pDocFrame)
+{
+	if (SettingStore.SetFileName(pDocFrame ? pDocFrame->m_sConfigFile : String()))
+		InitOptions();
 }
 
 void CMainFrame::SetActiveMenu(HMenu *pMenu)
