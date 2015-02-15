@@ -704,9 +704,6 @@
     <ClInclude Include="ChildFrm.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CmdLineParser.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="codepage.h">
       <Filter>Header Files</Filter>
     </ClInclude>

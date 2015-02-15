@@ -750,7 +750,6 @@
     <ClInclude Include="CCPrompt.h" />
     <ClInclude Include="charsets.h" />
     <ClInclude Include="ChildFrm.h" />
-    <ClInclude Include="CmdLineParser.h" />
     <ClInclude Include="codepage.h" />
     <ClInclude Include="codepage_detect.h" />
     <ClInclude Include="CompareOptions.h" />
