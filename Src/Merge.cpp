@@ -29,23 +29,12 @@
 #include <process.h> // _cexit
 #include "Environment.h"
 #include "Common/SettingStore.h"
-#include "Common/WindowPlacement.h"
 #include "Merge.h"
-#include "HexMergeFrm.h"
-#include "HexMergeView.h"
 #include "MainFrm.h"
-#include "ChildFrm.h"
-#include "DirFrame.h"
-#include "DirView.h"
-#include "Splash.h"
 #include "LogFile.h"
 #include "coretools.h"
 #include "paths.h"
-#include "ProjectFile.h"
-#include "MergeEditView.h"
 #include "LanguageSelect.h"
-#include "ConflictFileParser.h"
-#include "codepage.h"
 
 // For shutdown cleanup
 #include "charsets.h"
