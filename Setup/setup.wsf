@@ -316,6 +316,14 @@ Sub RegisterShellExtension(flags)
 	sha.ShellExecute "RegSvr32.exe", flags & """" & sProgFolder & "\ShellExtensionU.dll""", "", verb
 End Sub
 
+Sub WriteExecutablePath(root)
+	sh.RegWrite root & "\Software\Thingamahoochie\WinMerge\Executable", sProgFolder & "\WinMergeU.exe"
+	Select Case sha.GetSystemInformation("ProcessorArchitecture")
+	Case PROCESSOR_ARCHITECTURE_IA64, PROCESSOR_ARCHITECTURE_AMD64
+		sh.RegWrite root & "\Software\Wow6432Node\Thingamahoochie\WinMerge\Executable", sProgFolder & "\WinMergeU.exe"
+	End Select
+End Sub
+
 Sub CreateLink(ByVal sPath)
 	If sPath = "ContextMenu" Then
 		RegisterShellExtension "/s "
@@ -415,14 +423,14 @@ Sub Apply
 			End If
 		Next
 		' Write executable path to HKCU as well because TortoiseHg reads it from there
-		sh.RegWrite "HKCU\Software\Thingamahoochie\WinMerge\Executable", sProgFolder & "\WinMergeU.exe"
+		WriteExecutablePath "HKCU"
 		If maintenance.disabled Then
 			sh.RegWrite "HKCR\.WinMerge\", "WinMerge.Project.File"
 			sh.RegWrite "HKCR\WinMerge.Project.File\", "WinMerge Project File"
 			sh.RegWrite "HKCR\WinMerge.Project.File\DefaultIcon\", """" & sProgFolder & "\WinMergeU.exe"",1"
 			sh.RegWrite "HKCR\WinMerge.Project.File\shell\edit\command\", """NOTEPAD.EXE"" ""%1"""
 			sh.RegWrite "HKCR\WinMerge.Project.File\shell\open\command\", """" & sProgFolder & "\WinMergeU.exe"" /run ""%1"" %*"
-			sh.RegWrite "HKLM\Software\Thingamahoochie\WinMerge\Executable", sProgFolder & "\WinMergeU.exe"
+			WriteExecutablePath "HKLM"
 			' Do the ARP stuff
 			sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\DisplayIcon", sProgFolder & "\WinMergeU.exe"
 			sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\DisplayName", "WinMerge 2011"
