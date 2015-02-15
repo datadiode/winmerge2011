@@ -4136,6 +4136,9 @@ void CMainFrame::InitOptions()
 
 	sd_SetBreakChars(COptionsMgr::Get(OPT_BREAK_SEPARATORS).c_str());
 
+	GetDirViewFontProperties();
+	GetMrgViewFontProperties();
+
 	if (m_pWndMDIClient)
 	{
 		if (langID != LanguageSelect.GetLangId())
@@ -4146,10 +4149,7 @@ void CMainFrame::InitOptions()
 
 		ApplyViewWhitespace();
 
-		GetDirViewFontProperties();
 		UpdateDirViewFont();
-
-		GetMrgViewFontProperties();
 		UpdateMrgViewFont();
 	}
 }
