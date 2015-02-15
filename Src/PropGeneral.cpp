@@ -143,7 +143,7 @@ void PropGeneral::OnResetAllMessageBoxes()
 {
 	// Delete the message box results stored in the registry.
 	HKEY hAppKey = SettingStore.GetAppRegistryKey();
-	::RegDeleteKey(hAppKey, REGISTRY_SECTION_MESSAGEBOX);
-	::RegCloseKey(hAppKey);
+	SettingStore.SHDeleteKey(hAppKey, REGISTRY_SECTION_MESSAGEBOX);
+	SettingStore.RegCloseKey(hAppKey);
 	LanguageSelect.MsgBox(IDS_MESSAGE_BOX_ARE_RESET, MB_ICONINFORMATION);
 }
