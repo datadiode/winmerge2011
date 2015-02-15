@@ -36,7 +36,7 @@ public:
 	CLanguageSelect();
 	WORD GetLangId() const { return m_wCurLanguage; };
 	void InitializeLanguage();
-	void ReloadMenu();
+	void UpdateResources();
 	void TranslateDialog(HWND) const;
 	String LoadString(UINT) const;
 	std::wstring LoadDialogCaption(LPCTSTR lpDialogTemplateID) const;

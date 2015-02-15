@@ -999,7 +999,7 @@ HImageList *CLanguageSelect::LoadImageList(UINT id, int cx, int cGrow) const
 		cx, cGrow, RGB(255, 0, 255), IMAGE_BITMAP, LR_CREATEDIBSECTION);
 }
 
-void CLanguageSelect::ReloadMenu()
+void CLanguageSelect::UpdateResources()
 {
 	HMenu *rgpGarbageMenu[] = { theApp.m_pMainWnd->m_pMenuDefault, NULL, NULL, NULL };
 
@@ -1031,6 +1031,7 @@ void CLanguageSelect::ReloadMenu()
 		if (HMenu *pMenu = rgpGarbageMenu[i])
 			pMenu->DestroyMenu();
 	}
+	theApp.m_pMainWnd->UpdateResources();
 }
 
 int CLanguageSelect::DoModal(ODialog &dlg, HWND parent) const
@@ -1113,7 +1114,7 @@ void CLanguageSelect::OnOK()
 			COptionsMgr::SaveOption(OPT_SELECTED_LANGUAGE, (int)lang);
 		theApp.m_pMainWnd->UpdateCodepageModule();
 		// Update the current menu
-		ReloadMenu();
+		UpdateResources();
 	}
 	EndDialog(IDOK);
 }

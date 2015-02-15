@@ -3418,8 +3418,7 @@ LRESULT CMainFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 		ShowHelp();
 		break;
 	case ID_VIEW_LANGUAGE:
-		if (LanguageSelect.DoModal(LanguageSelect) == IDOK)
-			UpdateResources();
+		LanguageSelect.DoModal(LanguageSelect);
 		break;
 	case ID_VIEW_SELECTFONT:
 		OnViewSelectfont();
