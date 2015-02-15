@@ -25,9 +25,8 @@ public:
 
 	void AddFilter(LPCTSTR filter, int usage);
 	stl_size_t GetCount() const { return m_items.size(); }
-	void Empty() { m_items.clear(); }
 	LineFilterItem &GetAt(stl_size_t i) { return m_items[i]; }
-	bool Compare(LineFiltersList &);
+	bool Compare(const LineFiltersList &) const;
 
 	void LoadFilters();
 	void SaveFilters();

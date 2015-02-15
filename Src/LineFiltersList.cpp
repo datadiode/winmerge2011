@@ -20,6 +20,7 @@ LineFiltersList globalLineFilters;
  */
 void LineFiltersList::LoadFilters()
 {
+	m_items.clear();
 	if (CRegKeyEx key = SettingStore.GetSectionKey(FiltersRegPath))
 	{
 		DWORD count = 0;
@@ -55,15 +56,16 @@ void LineFiltersList::AddFilter(LPCTSTR filter, int usage)
  * @param [in] list List to compare.
  * @return true if lists are identical, false otherwise.
  */
-bool LineFiltersList::Compare(LineFiltersList &list)
+bool LineFiltersList::Compare(const LineFiltersList &list) const
 {
-	if (list.GetCount() != GetCount())
+	stl_size_t n = m_items.size();
+	if (list.m_items.size() != n)
 		return false;
 
-	for (stl_size_t i = 0; i < GetCount(); i++)
+	for (stl_size_t i = 0; i < n; ++i)
 	{
-		LineFilterItem &item1 = list.GetAt(i);
-		LineFilterItem &item2 = GetAt(i);
+		const LineFilterItem &item1 = list.m_items[i];
+		const LineFilterItem &item2 = m_items[i];
 
 		if (item1.usage != item2.usage)
 			return false;
