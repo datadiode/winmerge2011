@@ -1797,7 +1797,7 @@ FileLoadResult::FILES_RESULT CChildFrame::LoadFile(int nBuffer, bool &readOnly, 
 	CDiffTextBuffer *pBuf = m_ptBuf[nBuffer];
 	m_strPath[nBuffer] = fileinfo.filepath;
 
-	m_pInfoUnpacker->textType = GetFileExt(m_strPath[nBuffer].c_str(), m_strDesc[nBuffer].c_str());
+	m_pInfoUnpacker->textType = CMainFrame::GetFileExt(m_strPath[nBuffer].c_str(), m_strDesc[nBuffer].c_str());
 
 	String sOpenError;
 	FileLoadResult::FILES_RESULT retVal = pBuf->LoadFromFile(fileinfo.filepath.c_str(),
@@ -2302,30 +2302,6 @@ void CChildFrame::SwapFiles()
 void CChildFrame::OnFileEncoding()
 {
 	DoFileEncodingDialog();
-}
-
-// Return file extension either from file name or file description (if WinMerge is used as an
-// external Rational ClearCase tool.
-String CChildFrame::GetFileExt(LPCTSTR sFileName, LPCTSTR sDescription)
-{
-	String sExt = PathFindExtension(sFileName);
-	if (sExt.empty())
-	{
-		if (LPCTSTR atat = _tcsstr(sFileName, _T("@@")))
-		{
-			sExt = PathFindExtension(String(sFileName, static_cast<String::size_type>(atat - sFileName)).c_str());
-		}
-		// If no extension found in repository file name.
-		if (sExt.empty())
-		{
-			if (LPCTSTR atat = _tcsstr(sDescription, _T("@@")))
-			{
-				sExt = PathFindExtension(String(sDescription, static_cast<String::size_type>(atat - sDescription)).c_str());
-			}
-		}
-	}
-	sExt.erase(0, sExt.rfind('.') + 1);
-	return sExt;
 }
 
 void CChildFrame::OnToolsCompareSelection()

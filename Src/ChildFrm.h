@@ -296,7 +296,6 @@ private:
 	void AdjustDiffBlocks();
 	int GetMatchCost(const String &sLine0, const String &sLine1);
 	void FlagMovedLines(MovedLines *, CDiffTextBuffer *, CDiffTextBuffer *);
-	String GetFileExt(LPCTSTR sFileName, LPCTSTR sDescription);
 	static int GetBreakType();
 	static bool GetByteColoringOption();
 	static bool IsValidCodepageForMergeEditor(unsigned cp);

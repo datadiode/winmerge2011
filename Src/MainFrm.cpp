@@ -1456,6 +1456,30 @@ CEditorFrame *CMainFrame::ActivateOpenDoc(
 	return NULL;
 }
 
+// Return file extension either from file name or file description (if WinMerge is used as an
+// external Rational ClearCase tool.
+String CMainFrame::GetFileExt(LPCTSTR sFileName, LPCTSTR sDescription)
+{
+	String sExt = PathFindExtension(sFileName);
+	if (sExt.empty())
+	{
+		if (LPCTSTR atat = _tcsstr(sFileName, _T("@@")))
+		{
+			sExt = PathFindExtension(String(sFileName, static_cast<String::size_type>(atat - sFileName)).c_str());
+		}
+		// If no extension found in repository file name.
+		if (sExt.empty())
+		{
+			if (LPCTSTR atat = _tcsstr(sDescription, _T("@@")))
+			{
+				sExt = PathFindExtension(String(sDescription, static_cast<String::size_type>(atat - sDescription)).c_str());
+			}
+		}
+	}
+	sExt.erase(0, sExt.rfind('.') + 1);
+	return sExt;
+}
+
 /**
  * @brief Begin a diff: open dirdoc if it is directories, else open a mergedoc for editing.
  * @param [in] packingInfo Specifies file transform.
