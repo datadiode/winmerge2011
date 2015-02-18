@@ -10,8 +10,6 @@
 
 #include "unicoder.h"
 
-class PackingInfo;
-
 /**
  * @brief Interface to file classes in this module
  */
@@ -107,7 +105,6 @@ class UniMemFile : public UniLocalFile
 	friend class UniMarkdownFile;
 public:
 	UniMemFile();
-	static UniFile *CreateInstance(PackingInfo *) { return new UniMemFile; }
 	virtual ~UniMemFile() { Close(); }
 
 	virtual bool OpenReadOnly(LPCTSTR filename);

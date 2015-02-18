@@ -59,7 +59,6 @@ public:
 	HButton			*m_pTgCompareAs;
 	HMenu			*m_pCompareAsScriptMenu;
 	bool m_bOverwriteRecursive;  /**< If TRUE overwrite last used value of recursive */
-	UINT m_idCompareAs;
 	DWORD m_attrLeft;
 	DWORD m_attrRight;
 

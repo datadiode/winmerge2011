@@ -1536,22 +1536,17 @@ bool CMainFrame::DoFileOpen(
 		nRecursive = dlg.m_nRecursive;
 		bROLeft = dlg.m_bLeftPathReadOnly;
 		bRORight = dlg.m_bRightPathReadOnly;
-		idCompareAs = dlg.m_idCompareAs;
 		attrLeft = dlg.m_attrLeft;
 		attrRight = dlg.m_attrRight;
 		// TODO: add codepage options to open dialog?
-		if (idCompareAs >= ID_SCRIPT_FIRST && idCompareAs <= ID_SCRIPT_LAST)
-			packingInfo.SetPlugin(dlg.m_sCompareAs.c_str());
+		packingInfo.pluginMoniker = dlg.m_sCompareAs;
 	}
 	else if (idCompareAs == ID_MERGE_COMPARE &&
+		packingInfo.pluginMoniker.empty() &&
 		((attrLeft | attrRight) & FILE_ATTRIBUTE_DIRECTORY) == 0)
 	{
 		// No specific idCompareAs passed as argument, and no directory involved
-		String sCompareAs = SettingStore.GetProfileString(_T("Settings"), _T("CompareAs"));
-		if (sCompareAs.find(_T('#')) == 0)
-			idCompareAs = FindAtom(sCompareAs.c_str());
-		else if (!sCompareAs.empty())
-			packingInfo.SetPlugin(sCompareAs.c_str());
+		packingInfo.pluginMoniker = SettingStore.GetProfileString(_T("Settings"), _T("CompareAs"));
 	}
 
 	// For directories, add trailing '\' if missing, and skip detection logic
@@ -1568,18 +1563,58 @@ bool CMainFrame::DoFileOpen(
 		dwRightFlags &= ~FFILEOPEN_DETECT;
 	}
 
-	// If content type was specified, skip detection logic
-	String sCompareAs = packingInfo.pluginMoniker;
+	env_ResolveMoniker(packingInfo.pluginMoniker);
+	if (LPCTSTR ini = EatPrefix(packingInfo.pluginMoniker.c_str(), _T("mapping:")))
+	{
+		// Evaluate mapping of file types to plugin monikers
+		String redirected;
+		LPCTSTR section = _T("mapping");
+		if (LPCTSTR query = StrChr(ini, _T('?')))
+		{
+			redirected.assign(ini, static_cast<String::size_type>(query - ini));
+			ini = redirected.c_str();
+			section = query + 1;
+		}
+		TCHAR buffer[1024];
+		String s1 = GetFileExt(filelocLeft.filepath.c_str(), filelocLeft.description.c_str());
+		String s2 = GetFileExt(filelocRight.filepath.c_str(), filelocRight.description.c_str());
+		s1.assign(buffer, GetPrivateProfileString(section, s1.c_str(), NULL, buffer, _countof(buffer), ini));
+		s2.assign(buffer, GetPrivateProfileString(section, s2.c_str(), NULL, buffer, _countof(buffer), ini));
+		if (s1 == s2)
+			packingInfo.pluginMoniker = s1;
+		else
+			packingInfo.pluginMoniker.clear();
+		env_ResolveMoniker(packingInfo.pluginMoniker);
+	}
+
+	if (!packingInfo.pluginMoniker.empty())
+	{
+		if (packingInfo.pluginMoniker == _T("text"))
+			idCompareAs = ID_MERGE_COMPARE_TEXT;
+		else if (packingInfo.pluginMoniker == _T("binary"))
+			idCompareAs = ID_MERGE_COMPARE_HEX;
+		else if (packingInfo.pluginMoniker == _T("archive"))
+			idCompareAs = ID_MERGE_COMPARE_ZIP;
+		else if (packingInfo.pluginMoniker == _T("xml"))
+			idCompareAs = ID_MERGE_COMPARE_XML;
+		else if (packingInfo.pluginMoniker.find(_T('#')) == 0)
+			idCompareAs = FindAtom(packingInfo.pluginMoniker.c_str());
+		else
+			packingInfo.method = PackingInfo::Plugin;
+	}
+
 	if (idCompareAs != ID_MERGE_COMPARE)
+	{
+		TCHAR moniker[MAX_PATH];
+		GetAtomName(idCompareAs, moniker, _countof(moniker));
+		packingInfo.pluginMoniker = moniker;
+	}
+
+	// If content type was specified, skip detection logic
+	if (!packingInfo.pluginMoniker.empty())
 	{
 		dwLeftFlags &= ~FFILEOPEN_DETECT;
 		dwRightFlags &= ~FFILEOPEN_DETECT;
-		if (sCompareAs.empty())
-		{
-			TCHAR moniker[MAX_PATH];
-			GetAtomName(idCompareAs, moniker, _countof(moniker));
-			sCompareAs = moniker;
-		}
 	}
 
 	// Save the MRU left and right files
@@ -1610,7 +1645,7 @@ bool CMainFrame::DoFileOpen(
 		case ID_MERGE_COMPARE_TEXT:
 			break;
 		case ID_MERGE_COMPARE_XML:
-			packingInfo.SetXML();
+			packingInfo.method = PackingInfo::XML;
 			break;
 		case ID_MERGE_COMPARE_ZIP:
 			dwLeftFlags |= FFILEOPEN_DETECTZIP;
@@ -1619,9 +1654,9 @@ bool CMainFrame::DoFileOpen(
 		case ID_MERGE_COMPARE_HEX:
 			// Open files in binary editor
 			if (!ActivateOpenDoc(pDirDoc, filelocLeft, filelocRight,
-				sCompareAs.c_str(), ID_MERGE_COMPARE_HEX, FRAME_BINARY))
+				packingInfo.pluginMoniker.c_str(), ID_MERGE_COMPARE_HEX, FRAME_BINARY))
 			{
-				ShowHexMergeDoc(pDirDoc, filelocLeft, filelocRight, bROLeft, bRORight, sCompareAs.c_str());
+				ShowHexMergeDoc(pDirDoc, filelocLeft, filelocRight, bROLeft, bRORight, packingInfo.pluginMoniker.c_str());
 			}
 			return true;
 		}
@@ -1787,7 +1822,7 @@ bool CMainFrame::DoFileOpen(
 		}
 		LogFile.Write(CLogFile::LNOTICE, _T("Open files: Left: %s\n\tRight: %s."),
 			filelocLeft.filepath.c_str(), filelocRight.filepath.c_str());
-		ShowMergeDoc(pDirDoc, filelocLeft, filelocRight, dwLeftFlags, dwRightFlags, &packingInfo, sCompareAs.c_str());
+		ShowMergeDoc(pDirDoc, filelocLeft, filelocRight, dwLeftFlags, dwRightFlags, &packingInfo, packingInfo.pluginMoniker.c_str());
 	}
 	return true;
 }
@@ -3161,26 +3196,12 @@ bool CMainFrame::ParseArgsAndDoOpen(const MergeCmdLineInfo &cmdInfo)
 			if (!m_pCollectingDirFrame ||
 				!m_pCollectingDirFrame->AddToCollection(filelocLeft, filelocRight))
 			{
-				// If content type was specified, set up things accordingly.
-				UINT idCompareAs = 0;
 				PackingInfo packingInfo;
 				if (cmdInfo.m_Files.size() > 2)
 					packingInfo.saveAsPath = cmdInfo.m_Files[2];
-				if (cmdInfo.m_sContentType == _T("text"))
-					idCompareAs = ID_MERGE_COMPARE_TEXT;
-				else if (cmdInfo.m_sContentType == _T("binary"))
-					idCompareAs = ID_MERGE_COMPARE_HEX;
-				else if (cmdInfo.m_sContentType == _T("archive"))
-					idCompareAs = ID_MERGE_COMPARE_ZIP;
-				else if (cmdInfo.m_sContentType == _T("xml"))
-					idCompareAs = ID_MERGE_COMPARE_XML;
-				else if (!cmdInfo.m_sContentType.empty())
-					packingInfo.SetPlugin(cmdInfo.m_sContentType.c_str());
-				else
-					idCompareAs = ID_MERGE_COMPARE;
-
+				packingInfo.pluginMoniker = cmdInfo.m_sContentType;
 				bCompared = DoFileOpen(
-					packingInfo, idCompareAs,
+					packingInfo, ID_MERGE_COMPARE,
 					filelocLeft, filelocRight,
 					cmdInfo.m_dwLeftFlags, cmdInfo.m_dwRightFlags,
 					cmdInfo.m_nRecursive);

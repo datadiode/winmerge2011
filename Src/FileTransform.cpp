@@ -1,9 +1,6 @@
 #include "StdAfx.h"
-#include "paths.h"
-#include "Common/coretools.h"
 #include "Merge.h"
 #include "MainFrm.h"
-#include "Environment.h"
 #include "ConsoleWindow.h"
 #include "FileTransform.h"
 #include "UniMarkdownFile.h"
@@ -13,9 +10,10 @@
  */
 class UniPluginFile : public UniLocalFile
 {
-private:
-	UniPluginFile(PackingInfo *packingInfo, LPCTSTR moniker)
+public:
+	UniPluginFile(PackingInfo *packingInfo)
 	{
+		LPCTSTR moniker = packingInfo->pluginMoniker.c_str();
 		OException::Check(
 			CoGetObject(moniker, NULL, IID_IDispatch, reinterpret_cast<void **>(&m_spFactoryDispatch)));
 		CMyDispId DispId;
@@ -80,33 +78,6 @@ private:
 		OException::Check(
 			m_OpenTextFile.Init(m_spFactoryDispatch, L"OpenTextFile"));
 	}
-public:
-	static UniFile *CreateInstance(PackingInfo *packingInfo)
-	{
-		String redirected;
-		LPCTSTR moniker = packingInfo->pluginMoniker.c_str();
-		if (LPCTSTR ini = EatPrefix(moniker, _T("mapping:")))
-		{
-			LPCTSTR section = _T("mapping");
-			if (LPCTSTR query = StrChr(ini, _T('?')))
-			{
-				redirected.assign(ini, static_cast<String::size_type>(query - ini));
-				ini = redirected.c_str();
-				section = query + 1;
-			}
-			TCHAR buffer[1024];
-			DWORD len = GetPrivateProfileString(section,
-				packingInfo->textType.c_str(), NULL, buffer, _countof(buffer), ini);
-			if (len == 0)
-			{
-				return UniMemFile::CreateInstance(packingInfo);
-			}
-			redirected.assign(buffer, len);
-			env_ResolveMoniker(redirected);
-			moniker = redirected.c_str();
-		}
-		return new UniPluginFile(packingInfo, moniker);
-	}
 	virtual void ReadBom()
 	{
 	}
@@ -166,15 +137,20 @@ private:
 	CMyDispId m_AtEndOfStream;
 };
 
-void PackingInfo::SetXML()
+UniFile *PackingInfo::Default(PackingInfo *)
 {
-	pfnCreateUniFile = UniMarkdownFile::CreateInstance;
-	disallowMixedEOL = true;
+	return new UniMemFile;
 }
 
-void PackingInfo::SetPlugin(LPCTSTR text)
+UniFile *PackingInfo::XML(PackingInfo *packingInfo)
 {
-	pfnCreateUniFile = UniPluginFile::CreateInstance;
-	env_ResolveMoniker(pluginMoniker = text);
-	disallowMixedEOL = true;
+	packingInfo->textType = _T("xml");
+	packingInfo->disallowMixedEOL = true;
+	return new UniMarkdownFile;
+}
+
+UniFile *PackingInfo::Plugin(PackingInfo *packingInfo)
+{
+	packingInfo->disallowMixedEOL = true;
+	return new UniPluginFile(packingInfo);
 }

@@ -372,7 +372,6 @@ BOOL COpenDlg::OnInitDialog()
 	m_pTgCompareAs = static_cast<HButton *>(GetDlgItem(IDC_COMPARE_AS_CHECK));
 
 	m_pCbCompareAs->AddString(_T(""));
-	m_pCbCompareAs->SetItemData(0, ID_MERGE_COMPARE);
 
 	m_pCbLeft->LoadState(_T("Files\\Left"));
 	m_pCbRight->LoadState(_T("Files\\Right"));
@@ -418,7 +417,6 @@ BOOL COpenDlg::OnInitDialog()
 		if (!m_sCompareAs.empty()) // no match was found
 		{
 			int j = m_pCbCompareAs->AddString(m_sCompareAs.c_str());
-			m_pCbCompareAs->SetItemData(j, ID_MERGE_COMPARE);
 			m_pCbCompareAs->SetCurSel(j);
 		}
 	}
@@ -551,17 +549,13 @@ void COpenDlg::OnOK()
 	// Caller saves MRU left and right files, so don't save them here.
 	m_pCbExt->SaveState(_T("Files\\Ext"));
 
-	if ((m_attrLeft ^ m_attrRight) & FILE_ATTRIBUTE_DIRECTORY)
-	{
-		m_idCompareAs = ID_MERGE_COMPARE;
-	}
-	else
+	if (((m_attrLeft ^ m_attrRight) & FILE_ATTRIBUTE_DIRECTORY) == 0)
 	{
 		int i = m_pCbCompareAs->GetCurSel();
-		m_idCompareAs = m_pCbCompareAs->GetItemData(i);
+		UINT idCompareAs = m_pCbCompareAs->GetItemData(i);
 		TCHAR moniker[MAX_PATH];
-		if (!m_pCompareAsScriptMenu->GetMenuString(m_idCompareAs, moniker, _countof(moniker)))
-			GetAtomName(m_idCompareAs, moniker, _countof(moniker));
+		if (!m_pCompareAsScriptMenu->GetMenuString(idCompareAs, moniker, _countof(moniker)))
+			GetAtomName(idCompareAs, moniker, _countof(moniker));
 		m_sCompareAs = moniker;
 	}
 

@@ -536,7 +536,7 @@ void CDirView::ListContextMenu(POINT point)
 		{
 			TCHAR szCompareAs[MAX_PATH];
 			pScriptMenu->GetMenuString(nCmd, szCompareAs, _countof(szCompareAs));
-			OpenSelection(szCompareAs, 0);
+			OpenSelection(szCompareAs, ID_MERGE_COMPARE);
 		}
 	}
 	else if (nCmd)
@@ -1012,7 +1012,7 @@ void CDirView::OpenSelection(LPCTSTR szCompareAs, UINT idCompareAs)
 		PackingInfo packingInfo;
 
 		if (szCompareAs)
-			packingInfo.SetPlugin(szCompareAs);
+			packingInfo.pluginMoniker = szCompareAs;
 
 		// Open identical and different files
 		if (m_pFrame->GetLeftReadOnly())

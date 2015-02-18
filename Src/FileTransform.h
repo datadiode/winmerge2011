@@ -39,14 +39,16 @@ class PackingInfo
 {
 public:
 	PackingInfo()
-	: pfnCreateUniFile(UniMemFile::CreateInstance)
+	: method(Default)
 	, disallowMixedEOL(false)
 	, readOnly(false)
 	{
 	}
-	void SetXML();
-	void SetPlugin(LPCTSTR);
-public:
+
+	static UniFile *Default(PackingInfo *);
+	static UniFile *XML(PackingInfo *);
+	static UniFile *Plugin(PackingInfo *);
+
 	/// "3rd path" where output saved if given
 	String saveAsPath;
 	/// text type to override syntax highlighting
@@ -57,7 +59,7 @@ public:
 	CMyComPtr<IDispatch> pluginOptionsOwner;
 	CMyComPtr<IDispatch> pluginOptions;
 	/// custom UniFile
-	UniFile *(*pfnCreateUniFile)(PackingInfo *);
+	UniFile *(*method)(PackingInfo *);
 	bool disallowMixedEOL;
 	bool readOnly;
 };

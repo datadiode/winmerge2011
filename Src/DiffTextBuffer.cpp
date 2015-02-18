@@ -179,7 +179,7 @@ FileLoadResult::FILES_RESULT CDiffTextBuffer::LoadFromFile(LPCTSTR pszFileName,
 
 	try
 	{
-		pufile = infoUnpacker->pfnCreateUniFile(infoUnpacker);
+		pufile = infoUnpacker->method(infoUnpacker);
 		if (infoUnpacker->readOnly)
 			readOnly = TRUE;
 		// Now we only use the UniFile interface

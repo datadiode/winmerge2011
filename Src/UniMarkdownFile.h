@@ -4,7 +4,6 @@
  *  @brief Declaration of UniMarkdownFile class.
  */
 #include "Common/UniFile.h"
-#include "FileTransform.h"
 
 class CMarkdown;
 
@@ -15,11 +14,6 @@ class UniMarkdownFile : public UniMemFile
 {
 public:
 	UniMarkdownFile();
-	static UniFile *CreateInstance(PackingInfo *packingInfo)
-	{
-		packingInfo->textType = _T("xml");
-		return new UniMarkdownFile;
-	}
 	virtual bool OpenReadOnly(LPCTSTR filename);
 	virtual void Close();
 	virtual bool ReadString(String &line, String &eol, bool *lossy);
