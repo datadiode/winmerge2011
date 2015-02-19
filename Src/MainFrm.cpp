@@ -3151,8 +3151,11 @@ bool CMainFrame::ParseArgsAndDoOpen(const MergeCmdLineInfo &cmdInfo)
 		InitOptions();
 
 	// Set the global file filter.
-	if (!cmdInfo.m_sFileFilter.empty())
-		globalFileFilter.SetFilter(cmdInfo.m_sFileFilter.c_str());
+	if (!cmdInfo.m_sFileFilter.empty() &&
+		(cmdInfo.m_sConfigFileName.empty() || OPT_FILEFILTER_CURRENT.IsDefault()))
+	{
+		globalFileFilter.SetFilter(cmdInfo.m_sFileFilter);
+	}
 
 	// Set codepage.
 	if (cmdInfo.m_nCodepage)
@@ -4102,8 +4105,11 @@ bool CMainFrame::LoadAndOpenProjectFile(LPCTSTR lpProject)
 	if (SettingStore.SetFileName(project.m_sConfig))
 		InitOptions();
 
-	if (!project.m_sFilter.empty())
+	if (!project.m_sFilter.empty() &&
+		(project.m_sConfig.empty() || OPT_FILEFILTER_CURRENT.IsDefault()))
+	{
 		globalFileFilter.SetFilter(project.m_sFilter);
+	}
 
 	int nRecursive = project.m_nRecursive;
 
