@@ -199,6 +199,7 @@ HRESULT CMergeApp::InitInstance()
 		// Parse command-line arguments.
 		MergeCmdLineInfo cmdInfo = GetCommandLine();
 
+		SettingStore.SetFileName(cmdInfo.m_sConfigFileName);
 		if (HKEY loadkey = SettingStore.GetAppRegistryKey())
 		{
 			IOptionDef::InitOptions(loadkey, NULL);

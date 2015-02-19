@@ -146,9 +146,6 @@ MergeCmdLineInfo::MergeCmdLineInfo(LPCTSTR q):
 	{
 		ParseWinMergeCmdLine(q);
 	}
-	if (m_sContentType.empty())
-		m_sContentType = SettingStore.GetProfileString(_T("Settings"), _T("CompareAs"), _T(""));
-	SettingStore.SetFileName(m_sConfigFileName);
 }
 
 /**

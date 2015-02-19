@@ -3146,6 +3146,10 @@ bool CMainFrame::ParseArgsAndDoOpen(const MergeCmdLineInfo &cmdInfo)
 
 	theApp.m_bNonInteractive = cmdInfo.m_bNonInteractive;
 
+	// May need to InitOptions() again when receiving command line through IPC.
+	if (SettingStore.SetFileName(cmdInfo.m_sConfigFileName))
+		InitOptions();
+
 	// Set the global file filter.
 	if (!cmdInfo.m_sFileFilter.empty())
 		globalFileFilter.SetFilter(cmdInfo.m_sFileFilter.c_str());

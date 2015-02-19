@@ -72,12 +72,11 @@ public:
 	String m_sContentType; /**< Content type. */
 	String m_sRunScript; /**< Run this script in the context of the document. */
 	String m_sOptionChars; /**< Set of accepted option indicators. */
+	String m_sConfigFileName; /**< Where to persist application settings when not using the registry. */
 
 	std::vector<String> m_Files; /**< Files (or directories) to compare. */
 
 private:
-
-	String m_sConfigFileName; /**< Where to persist application settings when not using the registry. */
 
 	LPCTSTR EatParam(LPCTSTR, String &, bool *flag = 0) const;
 	LPCTSTR SetOption(LPCTSTR, IOptionDef &, LPCTSTR value = _T("1")) const;
