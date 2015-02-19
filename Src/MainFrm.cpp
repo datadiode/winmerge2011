@@ -2347,7 +2347,7 @@ CChildFrame *CMainFrame::GetMergeDocToShow(CDirFrame *pDirDoc)
 		{
 			CChildFrame *pDoc = static_cast<CChildFrame *>(pFrame);
 			if (pDoc->SaveModified())
-				pFrame->SendMessage(WM_CLOSE);
+				pFrame->PostMessage(WM_CLOSE);
 		}
 	}
 	// Create a new merge doc
@@ -2376,7 +2376,7 @@ CHexMergeFrame *CMainFrame::GetHexMergeDocToShow(CDirFrame *pDirDoc)
 		{
 			CHexMergeFrame *pDoc = static_cast<CHexMergeFrame *>(pFrame);
 			if (pDoc->SaveModified())
-				pFrame->SendMessage(WM_CLOSE);
+				pFrame->PostMessage(WM_CLOSE);
 		}
 	}
 	// Create a new merge doc
@@ -2393,7 +2393,7 @@ CDirFrame *CMainFrame::GetDirDocToShow()
 			CDirFrame *pDoc = static_cast<CDirFrame *>(pFrame);
 			if (!pDoc->CloseMergeDocs())
 				return NULL;
-			pFrame->SendMessage(WM_CLOSE);
+			pFrame->PostMessage(WM_CLOSE);
 		}
 	}
 	return new CDirFrame(this);
