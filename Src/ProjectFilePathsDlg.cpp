@@ -6,6 +6,7 @@
 #include "stdafx.h"
 #include "Merge.h"
 #include "LanguageSelect.h"
+#include "Common/SettingStore.h"
 #include "MainFrm.h"
 #include "paths.h"
 #include "ProjectFile.h"
@@ -91,6 +92,11 @@ BOOL ProjectFilePathsDlg::OnInitDialog()
 	LanguageSelect.TranslateDialog(m_hWnd);
 	UpdateData<Set>();
 	Update3StateCheckBoxLabel(IDC_PROJ_INC_SUBFOLDERS);
+
+	const String &fileName = SettingStore.GetFileName();
+	CheckDlgButton(IDC_PROJ_CREATE_SPECIFIC_CONFIG_FILE,
+		PathMatchSpec(fileName.c_str(), _T("*.WinMerge.json")) ? BST_CHECKED : BST_UNCHECKED);
+
 	return FALSE;
 }
 
@@ -141,6 +147,11 @@ void ProjectFilePathsDlg::OnBnClickedProjOpen()
 		return;
 
 	UpdateData<Set>();
+
+	fileName.append(_T(".json"));
+	CheckDlgButton(IDC_PROJ_CREATE_SPECIFIC_CONFIG_FILE,
+		PathFileExists(fileName.c_str()) ? BST_CHECKED : BST_UNCHECKED);
+
 	LanguageSelect.MsgBox(IDS_PROJFILE_LOAD_SUCCESS, MB_ICONINFORMATION);
 }
 
@@ -161,6 +172,21 @@ void ProjectFilePathsDlg::OnBnClickedProjSave()
 
 	if (!ProjectFile::Save(fileName.c_str()))
 		return;
+
+	fileName.append(_T(".json"));
+	if (IsDlgButtonChecked(IDC_PROJ_CREATE_SPECIFIC_CONFIG_FILE))
+	{
+		// Just create an empty file if none exists yet.
+		HANDLE h = CreateFile(fileName.c_str(),
+			FILE_GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
+			0, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, 0);
+		if (h != INVALID_HANDLE_VALUE)
+			CloseHandle(h);
+	}
+	else
+	{
+		DeleteFile(fileName.c_str());
+	}
 
 	LanguageSelect.MsgBox(IDS_PROJFILE_SAVE_SUCCESS, MB_ICONINFORMATION);
 }

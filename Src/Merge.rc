@@ -1117,7 +1117,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 1
 
 
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
-IDD_PROJFILES_PATHS DIALOGEX 0, 0, 322, 124
+IDD_PROJFILES_PATHS DIALOGEX 0, 0, 322, 135
 STYLE DS_CENTER | DS_SHELLFONT | WS_CAPTION | WS_POPUP | WS_SYSMENU
 CAPTION "Paths"
 FONT 8, "MS Shell Dlg", 0, 0, 1
@@ -1133,9 +1133,10 @@ FONT 8, "MS Shell Dlg", 0, 0, 1
     RTEXT           "&Filter:", IDC_STATIC, 7, 74, 40, 8, SS_RIGHT
     EDITTEXT        IDC_PROJ_FILTER_EDIT, 50, 72, 210, 14, ES_AUTOHSCROLL
     PUSHBUTTON      "Select...", IDC_PROJ_FILTER_SELECT, 265, 72, 50, 14
-    AUTO3STATE      "&Include Subfolders\tInclude Subfolders but ignore folder structure", IDC_PROJ_INC_SUBFOLDERS, 50, 90, 225, 10, NOT WS_TABSTOP
-    PUSHBUTTON      "Open...", IDC_PROJ_OPEN, 211, 103, 50, 14
-    PUSHBUTTON      "Save...", IDC_PROJ_SAVE, 265, 103, 50, 14
+    AUTO3STATE      "&Include Subfolders\tInclude Subfolders but ignore folder structure", IDC_PROJ_INC_SUBFOLDERS, 50, 90, 225, 10
+    AUTOCHECKBOX    "&Create project specific configuration file", IDC_PROJ_CREATE_SPECIFIC_CONFIG_FILE, 50, 102, 225, 10
+    PUSHBUTTON      "Open...", IDC_PROJ_OPEN, 211, 114, 50, 14
+    PUSHBUTTON      "Save...", IDC_PROJ_SAVE, 265, 114, 50, 14
 }
 
 

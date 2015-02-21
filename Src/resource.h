@@ -377,6 +377,7 @@
 #define IDC_PROJ_SAVE                           1300
 #define IDC_PROJ_OPEN                           1301
 #define IDC_PROJ_LFILE_EDIT                     1302
+#define IDC_PROJ_CREATE_SPECIFIC_CONFIG_FILE    1303
 #define IDC_SUPPLEMENT_FOLDER_BROWSE            1303
 #define IDC_SUPPLEMENT_FOLDER                   1304
 #define IDC_FILTERCOMMENTS_CHECK                1305
