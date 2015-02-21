@@ -3373,8 +3373,12 @@ void CMainFrame::OnSaveProject()
 	sht.m_caption = LanguageSelect.LoadString(IDS_PROJFILEDLG_CAPTION);
 	sht.m_psh.dwFlags |= PSH_NOAPPLYNOW; // Hide 'Apply' button since we don't need it
 	ProjectFilePathsDlg pathsDlg;
-	sht.AddPage(pathsDlg)->pszTitle = pathsDlg.m_strCaption.c_str();
-
+	if (PROPSHEETPAGE *psp = sht.AddPage(pathsDlg))
+	{
+		psp->dwFlags = PSP_USETITLE;
+		psp->hInstance = LanguageSelect.FindResourceHandle(pathsDlg.m_idd, RT_DIALOG);
+		psp->pszTitle = pathsDlg.m_strCaption.c_str();
+	}
 	if (CDocFrame *pFrame = GetActiveDocFrame())
 	{
 		FRAMETYPE frame = pFrame->GetFrameType();
