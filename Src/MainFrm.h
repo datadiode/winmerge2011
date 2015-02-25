@@ -28,8 +28,6 @@
 #include "MergeCmdLineInfo.h"
 #include "../BuildTmp/Merge/midl/WinMerge_h.h"
 
-enum { WM_NONINTERACTIVE = 888 }; // timer value
-
 class CDiffView;
 class CDirView;
 class CDirFrame;

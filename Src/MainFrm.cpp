@@ -3301,11 +3301,6 @@ LRESULT CMainFrame::OnWndMsg<WM_TIMER>(WPARAM wParam, LPARAM)
 {
 	switch (wParam)
 	{
-	case WM_NONINTERACTIVE:
-		KillTimer(WM_NONINTERACTIVE);
-		PostMessage(WM_CLOSE);
-		break;
-	
 	case ID_TIMER_FLASH:
 		// This timer keeps running until window is activated
 		// See OnActivate()
