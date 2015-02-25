@@ -65,6 +65,7 @@ public:
 	static String GetDefaultSupplementFolder();
 
 	bool PreTranslateMessage(MSG *);
+	static BOOL WINAPI ConsoleCtrlHandler(DWORD);
 
 	HRESULT InitInstance();
 	int ExitInstance(HRESULT);

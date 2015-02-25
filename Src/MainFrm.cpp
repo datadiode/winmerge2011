@@ -62,6 +62,7 @@
 #include "ProjectFilePathsDlg.h"
 #include "FileOrFolderSelect.h"
 #include "OpenDlg.h"
+#include "ConsoleWindow.h"
 #include <MyCom.h>
 #include <mlang.h>
 
@@ -3758,6 +3759,9 @@ LRESULT CMainFrame::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_HELP:
 		ShowHelp();
 		return 0;
+	case WM_APP_ConsoleCtrlHandler:
+		KillConsoleWindow();
+		break;
 	}
 	return ::DefFrameProc(m_hWnd, m_pWndMDIClient->m_hWnd, uMsg, wParam, lParam);
 }

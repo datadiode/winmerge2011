@@ -469,6 +469,12 @@ bool CMergeApp::PreTranslateMessage(MSG *pMsg)
 	return m_pMainWnd && m_pMainWnd->PreTranslateMessage(pMsg);
 }
 
+BOOL CMergeApp::ConsoleCtrlHandler(DWORD CtrlType)
+{
+	theApp.m_pMainWnd->PostMessage(CMainFrame::WM_APP_ConsoleCtrlHandler, CtrlType);
+	return TRUE;
+}
+
 LRESULT CDocFrame::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)

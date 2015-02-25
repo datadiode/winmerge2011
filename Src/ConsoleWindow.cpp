@@ -1,5 +1,5 @@
 #include "StdAfx.h"
-#include "Common/RegKey.h"
+#include "Merge.h"
 #include "Common/SettingStore.h"
 #include "Common/WindowPlacement.h"
 
@@ -33,22 +33,6 @@ static HWND NTAPI AllocConsoleHidden(LPCTSTR lpTitle)
 	return hWnd;
 }
 
-static BOOL WINAPI ConsoleCtrlHandler(DWORD CtrlType)
-{
-	if (HWND hWnd = GetConsoleWindow())
-	{
-		CWindowPlacement wp;
-		if (GetWindowPlacement(hWnd, &wp))
-		{
-			CRegKeyEx rk = SettingStore.GetSectionKey(_T("Settings"));
-			wp.RegWrite(rk, _T("ConsoleWindowPlacement"));
-		}
-		FreeConsole();
-		PostMessage(hWnd, WM_CLOSE, 0, 0);
-	}
-	return TRUE;
-}
-
 void NTAPI ShowConsoleWindow(int showCmd)
 {
 	if (HWND hWnd = GetConsoleWindow())
@@ -58,7 +42,7 @@ void NTAPI ShowConsoleWindow(int showCmd)
 	else if (HWND hWnd = AllocConsoleHidden(_T("WinMerge")))
 	{
 		SetConsoleOutputCP(GetACP());
-		SetConsoleCtrlHandler(::ConsoleCtrlHandler, TRUE);
+		SetConsoleCtrlHandler(CMergeApp::ConsoleCtrlHandler, TRUE);
 		if (HMENU hMenu = GetSystemMenu(hWnd, FALSE))
 		{
 			DeleteMenu(hMenu, SC_CLOSE, MF_BYCOMMAND);
@@ -74,5 +58,20 @@ void NTAPI ShowConsoleWindow(int showCmd)
 		{
 			ShowWindow(hWnd, showCmd);
 		}
+	}
+}
+
+void NTAPI KillConsoleWindow()
+{
+	if (HWND hWnd = GetConsoleWindow())
+	{
+		CWindowPlacement wp;
+		if (GetWindowPlacement(hWnd, &wp))
+		{
+			CRegKeyEx rk = SettingStore.GetSectionKey(_T("Settings"));
+			wp.RegWrite(rk, _T("ConsoleWindowPlacement"));
+		}
+		FreeConsole();
+		PostMessage(hWnd, WM_CLOSE, 0, 0);
 	}
 }

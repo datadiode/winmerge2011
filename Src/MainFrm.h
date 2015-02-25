@@ -54,6 +54,9 @@ class CMainFrame
 {
 	friend CLanguageSelect;
 public:
+
+	static const UINT WM_APP_ConsoleCtrlHandler = WM_APP + 1;
+
 	CMainFrame(HWindow *, const MergeCmdLineInfo &);
 
 	// IElementBehaviorFactory
