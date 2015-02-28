@@ -8,6 +8,7 @@
 #include "paths.h"
 #include "Environment.h"
 #include "Common/coretools.h"
+#include "Common/defer.h"
 #include "Common/stream_util.h"
 #include "DiffContext.h"
 #include "FileFilterHelper.h"
@@ -41,13 +42,12 @@ void CDiffContext::LoadAndSortFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArr
  */
 void CDiffContext::LoadFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *files, int side) const
 {
-	if (BSTR sql = m_piFilterGlobal->getSql(side))
+	if (LPTSTR filter = m_piFilterGlobal->getSql(side))
 	{
-		CMyComBSTR bstr(&sql);
+		defer::SysFreeString<1> SysFreeString = { filter };
 		// Read the inclusion and exclusion wildcards which may precede the WHERE clause
 		int excluding = 0;
 		LPTSTR wildcards[2] = { NULL, NULL };
-		LPTSTR filter = bstr.m_str;
 		do switch (*(filter += StrSpn(filter, _T(" \t\r\n"))))
 		{
 		case _T('-'):
@@ -74,32 +74,19 @@ void CDiffContext::LoadFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *fil
 			break;
 		} while (excluding ^= 1);
 		// Run LogParser.exe
-		String exe = env_ExpandVariables(_T("%LogParser%\\LogParser.exe"));
-		string_format cmd(
+		String tool = env_ExpandVariables(_T("%LogParser%\\LogParser.exe"));
+		string_format args(
 			_T("\"%s\" \"SELECT Name, CreationTime, LastWriteTime, Attributes, Size FROM '%s' %s\" -i:FS -o:TSV -q -recurse:0 -oCodepage:65001"),
-			exe.c_str(), paths_ConcatPath(sDir, _T("*")).c_str(), filter);
-		STARTUPINFO si;
-		ZeroMemory(&si, sizeof si);
-		si.cb = sizeof si;
-		si.dwFlags = STARTF_USESTDHANDLES;
-		SECURITY_ATTRIBUTES sa = { sizeof sa, NULL, TRUE };
-		HANDLE hReadPipe = NULL;
-		if (!CreatePipe(&hReadPipe, &si.hStdOutput, &sa, 0))
+			tool.c_str(), paths_ConcatPath(sDir, _T("*")).c_str(), filter);
+		HANDLE hReadPipe;
+		HANDLE hProcess = RunIt(tool.c_str(), args.c_str(), NULL, &hReadPipe, SW_HIDE);
+		if (hProcess == NULL)
 		{
-			OException::Throw(GetLastError());
+			tool += _T(":\n");
+			tool += OException(GetLastError()).msg;
+			OException::Throw(0, tool.c_str());
 		}
-		si.dwFlags = STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW;
-		PROCESS_INFORMATION pi;
-		if (!CreateProcess(NULL, const_cast<LPTSTR>(cmd.c_str()),
-			NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi))
-		{
-			CloseHandle(hReadPipe);
-			CloseHandle(si.hStdOutput);
-			exe += _T(":\n");
-			exe += OException(GetLastError()).msg;
-			OException::Throw(0, exe.c_str());
-		}
-		CloseHandle(si.hStdOutput);
+		defer::CloseHandle<2> CloseHandle = { hProcess, hReadPipe };
 		HandleReadStream stream = hReadPipe;
 		StreamLineReader reader = &stream;
 		int state = 0;
@@ -193,12 +180,9 @@ void CDiffContext::LoadFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *fil
 				}
 			}
 		}
-		WaitForSingleObject(pi.hProcess, INFINITE);
+		WaitForSingleObject(hProcess, INFINITE);
 		DWORD dwExitCode = 0;
-		GetExitCodeProcess(pi.hProcess, &dwExitCode);
-		CloseHandle(pi.hThread);
-		CloseHandle(pi.hProcess);
-		CloseHandle(hReadPipe);
+		GetExitCodeProcess(hProcess, &dwExitCode);
 		if (state < 0 && dwExitCode != ERROR_PATH_NOT_FOUND)
 			OException::Throw(0, UTF82W(head.c_str()));
 	}
@@ -208,6 +192,7 @@ void CDiffContext::LoadFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *fil
 		HANDLE h = FindFirstFile(paths_ConcatPath(sDir, _T("*.*")).c_str(), &ff);
 		if (h != INVALID_HANDLE_VALUE)
 		{
+			defer::FindClose<1> FindClose = { h };
 			do
 			{
 				DirItem ent;
@@ -244,7 +229,6 @@ void CDiffContext::LoadFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *fil
 					}
 				}
 			} while (FindNextFile(h, &ff));
-			FindClose(h);
 		}
 	}
 }
