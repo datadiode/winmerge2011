@@ -21,6 +21,7 @@ inline void unslash(unsigned codepage, std::string &s)
 	s.resize(static_cast<std::string::size_type>(unslash(codepage, &s.front())));
 }
 
-DWORD NTAPI RunIt(LPCTSTR szExeFile, LPCTSTR szArgs, LPCTSTR szDir);
+HANDLE NTAPI RunIt(LPCTSTR szExeFile, LPCTSTR szArgs, LPCTSTR szDir, HANDLE *phReadPipe, WORD wShowWindow = SW_MINIMIZE);
+DWORD NTAPI RunIt(LPCTSTR szExeFile, LPCTSTR szArgs, LPCTSTR szDir, WORD wShowWindow = SW_MINIMIZE);
 
 void DecorateCmdLine(String &sDecoratedCmdLine, String &sExecutable);

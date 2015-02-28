@@ -34,7 +34,7 @@
 #include "AboutDlg.h"
 #include "MainFrm.h"
 #include "Splash.h"
-#include "DirFrame.h"		// Include type information
+#include "DirFrame.h"
 #include "ChildFrm.h"
 #include "HexMergeFrm.h"
 #include "DirView.h"
@@ -44,7 +44,9 @@
 #include "SyntaxColors.h"
 #include "LineFiltersList.h"
 #include "ConflictFileParser.h"
-#include "coretools.h"
+#include "Common/coretools.h"
+#include "Common/defer.h"
+#include "Common/stream_util.h"
 #include "LineFiltersDlg.h"
 #include "LogFile.h"
 #include "paths.h"
@@ -63,7 +65,6 @@
 #include "FileOrFolderSelect.h"
 #include "OpenDlg.h"
 #include "ConsoleWindow.h"
-#include <MyCom.h>
 #include <mlang.h>
 
 using std::vector;
@@ -3329,32 +3330,48 @@ void CMainFrame::OnWindowCloseAll()
 	} while (pDocFrameToClose);
 }
 
+int CMainFrame::RunTool(LPCTSTR tool, LPCTSTR args, LPCTSTR path, UINT id, UINT type)
+{
+	DWORD code = STILL_ACTIVE;
+	String prompt;
+	HANDLE hReadPipe;
+	if (HANDLE hProcess = RunIt(tool, args, path, &hReadPipe))
+	{
+		defer::CloseHandle<2> CloseHandle = { hProcess, hReadPipe };
+		prompt = LanguageSelect.LoadString(id) + _T("\n\n");
+		HandleReadStream stream = hReadPipe;
+		StreamLineReader reader = &stream;
+		std::string line;
+		while (std::string::size_type size = reader.readLine(line))
+		{
+			prompt += string_format(_T("%hs"), line.c_str());
+		}
+		WaitForSingleObject(hProcess, INFINITE);
+		GetExitCodeProcess(hProcess, &code);
+	}
+	else
+	{
+		prompt = LanguageSelect.LoadString(IDS_VSS_RUN_ERROR);
+		type = MB_ICONSTOP;
+	}
+	return code != 0 ? theApp.DoMessageBox(prompt.c_str(), type) : 0;
+}
+
 /**
  * @brief Checkin in file into ClearCase.
  */ 
 void CMainFrame::CheckinToClearCase(LPCTSTR strDestinationPath)
 {
-	String spath = paths_GetParentPath(strDestinationPath);
-	String sname = PathFindFileName(strDestinationPath);
+	String path = paths_GetParentPath(strDestinationPath);
+	String name = PathFindFileName(strDestinationPath);
 	// checkin operation
-	String args = string_format(_T("checkin -nc \"%s\""), sname.c_str());
-	String vssPath = COptionsMgr::Get(OPT_VSS_PATH);
-	if (DWORD code = RunIt(vssPath.c_str(), args.c_str(), NULL))
+	const String &tool = COptionsMgr::Get(OPT_VSS_PATH);
+	string_format args(_T("\"%s\" checkin -nc \"%s\""), tool.c_str(), name.c_str());
+	if (RunTool(tool.c_str(), args.c_str(), path.c_str(), IDS_VSS_CHECKINERROR, MB_ICONWARNING | MB_YESNO) == IDYES)
 	{
-		if (code == STILL_ACTIVE)
-		{
-			LanguageSelect.MsgBox(IDS_VSS_RUN_ERROR, MB_ICONSTOP);
-		}
-		else if (LanguageSelect.MsgBox(IDS_VSS_CHECKINERROR, MB_ICONWARNING | MB_YESNO) == IDYES)
-		{
-			// undo checkout operation
-			args = string_format(_T("uncheckout -rm \"%s\""), sname.c_str());
-			if (DWORD code = RunIt(vssPath.c_str(), args.c_str(), NULL))
-			{
-				LanguageSelect.MsgBox(code != STILL_ACTIVE ?
-					IDS_VSS_UNCOERROR : IDS_VSS_RUN_ERROR, MB_ICONSTOP);
-			}
-		}
+		// undo checkout operation
+		string_format args(_T("\"%s\" uncheckout -rm \"%s\""), tool.c_str(), name.c_str());
+		RunTool(tool.c_str(), args.c_str(), path.c_str(), IDS_VSS_UNCOERROR, MB_ICONSTOP);
 	}
 }
 

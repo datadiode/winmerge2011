@@ -10,17 +10,15 @@
 #include "MainFrm.h"
 #include "SettingStore.h"
 #include "LanguageSelect.h"
-#include "coretools.h"
 #include "paths.h"
 #include "VssPrompt.h"
 #include "CCPrompt.h"
-#include <MyCom.h>
 
 void CMainFrame::InitializeSourceControlMembers()
 {
 	m_vssHelper.SetProjectBase(SettingStore.GetProfileString(_T("Settings"), _T("VssProject")));
-	m_strVssUser = SettingStore.GetProfileString(_T("Settings"), _T("VssUser")).c_str();
-	m_strVssDatabase = SettingStore.GetProfileString(_T("Settings"), _T("VssDatabase")).c_str();
+	m_strVssUser = SettingStore.GetProfileString(_T("Settings"), _T("VssUser"));
+	m_strVssDatabase = SettingStore.GetProfileString(_T("Settings"), _T("VssDatabase"));
 
 	String vssPath = COptionsMgr::Get(OPT_VSS_PATH);
 	if (vssPath.empty())
@@ -36,11 +34,11 @@ void CMainFrame::InitializeSourceControlMembers()
 }
 
 /**
-* @brief Saves file to selected version control system
-* @param strSavePath Path where to save including filename
-* @return Tells if caller can continue (no errors happened)
-* @sa CheckSavePath()
-*/
+ * @brief Saves file to selected version control system
+ * @param strSavePath Path where to save including filename
+ * @return Tells if caller can continue (no errors happened)
+ * @sa CheckSavePath()
+ */
 int CMainFrame::SaveToVersionControl(LPCTSTR pszSavePath)
 {
 	pszSavePath = paths_UndoMagic(wcsdupa(pszSavePath));
@@ -78,13 +76,10 @@ int CMainFrame::SaveToVersionControl(LPCTSTR pszSavePath)
 				WaitStatusCursor waitstatus(IDS_VSS_CHECKOUT_STATUS);
 				m_vssHelper.SetProjectBase(dlg.m_strProject.c_str());
 				SettingStore.WriteProfileString(_T("Settings"), _T("VssProject"), m_vssHelper.GetProjectBase().c_str());
-				string_format args(_T("checkout \"%s/%s\""), m_vssHelper.GetProjectBase().c_str(), name.c_str());
-				String vssPath = COptionsMgr::Get(OPT_VSS_PATH);
-				if (DWORD code = RunIt(vssPath.c_str(), args.c_str(), path.c_str()))
-				{
-					choice = LanguageSelect.MsgBox(code != STILL_ACTIVE ?
-						IDS_VSSERROR : IDS_VSS_RUN_ERROR, MB_CANCELTRYCONTINUE | MB_ICONSTOP);
-				}
+				const String &tool = COptionsMgr::Get(OPT_VSS_PATH);
+				string_format args(_T("\"%s\" checkout \"%s/%s\""), tool.c_str(), m_vssHelper.GetProjectBase().c_str(), name.c_str());
+				if (int id = RunTool(tool.c_str(), args.c_str(), path.c_str(), IDS_VSSERROR, MB_CANCELTRYCONTINUE | MB_ICONSTOP))
+					choice = id;
 			}
 			break;
 		case VCS_VSS5:	// Visual SourceSafe 5.0+ (COM)
@@ -233,13 +228,10 @@ int CMainFrame::SaveToVersionControl(LPCTSTR pszSavePath)
 				WaitStatusCursor waitstatus(IDS_VSS_CHECKOUT_STATUS);
 				// checkout operation
 				string_replace(m_strCCComment, _T("\""), _T("\\\""));
-				string_format args(_T("checkout -c \"%s\" \"%s\""), m_strCCComment.c_str(), name.c_str());
-				String vssPath = COptionsMgr::Get(OPT_VSS_PATH);
-				if (DWORD code = RunIt(vssPath.c_str(), args.c_str(), path.c_str()))
-				{
-					choice = LanguageSelect.MsgBox(code != STILL_ACTIVE ?
-						IDS_VSSERROR : IDS_VSS_RUN_ERROR, MB_CANCELTRYCONTINUE | MB_ICONSTOP);
-				}
+				const String &tool = COptionsMgr::Get(OPT_VSS_PATH);
+				string_format args(_T("\"%s\" checkout -c \"%s\" \"%s\""), tool.c_str(), m_strCCComment.c_str(), name.c_str());
+				if (int id = RunTool(tool.c_str(), args.c_str(), path.c_str(), IDS_VSSERROR, MB_CANCELTRYCONTINUE | MB_ICONSTOP))
+					choice = id;
 			}
 			break;
 		case VCS_TFS:
@@ -248,13 +240,10 @@ int CMainFrame::SaveToVersionControl(LPCTSTR pszSavePath)
 				// process versioning system specific action
 				WaitStatusCursor waitstatus(IDS_VSS_CHECKOUT_STATUS);
 				// checkout operation
-				string_format args(_T("edit \"%s\""), name.c_str());
-				String vssPath = COptionsMgr::Get(OPT_VSS_PATH);
-				if (DWORD code = RunIt(vssPath.c_str(), args.c_str(), path.c_str()))
-				{
-					choice = LanguageSelect.MsgBox(code != STILL_ACTIVE ?
-						IDS_VSSERROR : IDS_VSS_RUN_ERROR, MB_CANCELTRYCONTINUE | MB_ICONSTOP);
-				}
+				const String &tool = COptionsMgr::Get(OPT_VSS_PATH);
+				string_format args(_T("\"%s\" edit \"%s\""), tool.c_str(), name.c_str());
+				if (int id = RunTool(tool.c_str(), args.c_str(), path.c_str(), IDS_VSSERROR, MB_CANCELTRYCONTINUE | MB_ICONSTOP))
+					choice = id;
 			}
 			break;
 		}

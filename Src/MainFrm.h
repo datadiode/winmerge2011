@@ -125,6 +125,7 @@ public:
 	void ShowVSSError(HRESULT, LPCTSTR strItem);
 	void ShowHelp(LPCTSTR helpLocation = NULL);
 	void UpdateCodepageModule();
+	static int RunTool(LPCTSTR tool, LPCTSTR args, LPCTSTR path, UINT id, UINT type);
 	void CheckinToClearCase(LPCTSTR strDestinationPath);
 	void StartFlashing();
 	bool AskCloseConfirmation();

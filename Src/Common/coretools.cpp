@@ -114,24 +114,48 @@ LPCWSTR NTAPI EatPrefixTrim(LPCWSTR text, LPCWSTR prefix)
 	return text ? text + StrSpn(text, _T(" \t\r\n")) : NULL;
 }
 
-DWORD NTAPI RunIt(LPCTSTR szExeFile, LPCTSTR szArgs, LPCTSTR szDir)
+HANDLE NTAPI RunIt(LPCTSTR szExeFile, LPCTSTR szArgs, LPCTSTR szDir, HANDLE *phReadPipe, WORD wShowWindow)
 {
 	STARTUPINFO si;
 	ZeroMemory(&si, sizeof si);
-	PROCESS_INFORMATION pi;
 	si.cb = sizeof si;
 	si.dwFlags = STARTF_USESHOWWINDOW;
-	si.wShowWindow = SW_MINIMIZE;
-	TCHAR args[4096];
-	_sntprintf(args, _countof(args), _T("\"%s\" %s"), szExeFile, szArgs);
-	DWORD code = STILL_ACTIVE;
-	if (CreateProcess(szExeFile, args, NULL, NULL, FALSE,
-			CREATE_NEW_CONSOLE, NULL, szDir, &si, &pi))
+	si.wShowWindow = wShowWindow;
+	BOOL bInheritHandles = FALSE;
+	if (phReadPipe != NULL)
+	{
+		SECURITY_ATTRIBUTES sa = { sizeof sa, NULL, TRUE };
+		if (!CreatePipe(phReadPipe, &si.hStdOutput, &sa, 0))
+			return NULL;
+		si.dwFlags = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
+		si.hStdError = si.hStdOutput;
+		bInheritHandles = TRUE;
+	}
+	PROCESS_INFORMATION pi;
+	if (CreateProcess(szExeFile, const_cast<LPTSTR>(szArgs), NULL, NULL,
+			bInheritHandles, CREATE_NEW_CONSOLE, NULL, szDir, &si, &pi))
 	{
 		CloseHandle(pi.hThread);
-		WaitForSingleObject(pi.hProcess, INFINITE);
-		GetExitCodeProcess(pi.hProcess, &code);
-		CloseHandle(pi.hProcess);
+	}
+	else
+	{
+		pi.hProcess = NULL;
+		if (phReadPipe != NULL)
+			CloseHandle(*phReadPipe);
+	}
+	if (phReadPipe != NULL)
+		CloseHandle(si.hStdOutput);
+	return pi.hProcess;
+}
+
+DWORD NTAPI RunIt(LPCTSTR szExeFile, LPCTSTR szArgs, LPCTSTR szDir, WORD wShowWindow)
+{
+	DWORD code = STILL_ACTIVE;
+	if (HANDLE hProcess = RunIt(szExeFile, szArgs, szDir, NULL, wShowWindow))
+	{
+		WaitForSingleObject(hProcess, INFINITE);
+		GetExitCodeProcess(hProcess, &code);
+		CloseHandle(hProcess);
 	}
 	return code;
 }
