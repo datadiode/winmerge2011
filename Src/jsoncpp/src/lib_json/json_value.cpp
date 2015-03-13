@@ -120,8 +120,7 @@ void Value::CommentInfo::setComment(const char *text) {
 Value::CZString::CZString(ArrayIndex index) : cstr_(0), index_(index) {}
 
 Value::CZString::CZString(const char* cstr, DuplicationPolicy allocate)
-  : cstr_(allocate == duplicate ? duplicateStringValue(cstr) : cstr)
-  , index_(allocate) {}
+  : cstr_(cstr), index_(allocate) { assert(allocate != duplicate); }
 
 Value::CZString::CZString(const CZString& other)
   : cstr_(other.cstr_ != 0 && other.index_ != noDuplication ?
