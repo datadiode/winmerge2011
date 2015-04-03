@@ -302,6 +302,6 @@ void FilterList::ResetPrediffers(short side)
 		script_item &script = *iter++;
 		if (FAILED(script.item->hr))
 			continue;
-		script.item->hr = script.Reset.Call(script.object, CMyDispParams<1>().Unnamed[side]);
+		script.item->hr = script.Reset.Call(script.object, CMyDispParams<1>().Unnamed(side));
 	}
 }

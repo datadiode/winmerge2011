@@ -18,13 +18,13 @@ public:
 			CoGetObject(moniker, NULL, IID_IDispatch, reinterpret_cast<void **>(&m_spFactoryDispatch)));
 		CMyDispId DispId;
 		DispId.Call(m_spFactoryDispatch,
-			CMyDispParams<1>().Unnamed[static_cast<IMergeApp *>(theApp.m_pMainWnd)], DISPATCH_PROPERTYPUTREF);
+			CMyDispParams<1>().Unnamed(static_cast<IMergeApp *>(theApp.m_pMainWnd)), DISPATCH_PROPERTYPUTREF);
 		if (LPCTSTR query = StrChr(moniker, _T('?')))
 		{
 			if (SUCCEEDED(DispId.Init(m_spFactoryDispatch, L"Arguments")))
 			{
 				OException::Check(DispId.Call(m_spFactoryDispatch,
-					CMyDispParams<1>().Unnamed[query + 1], DISPATCH_PROPERTYPUT));
+					CMyDispParams<1>().Unnamed(query + 1), DISPATCH_PROPERTYPUT));
 			}
 		}
 		if (SUCCEEDED(DispId.Init(m_spFactoryDispatch, L"ShowConsole")))
@@ -71,7 +71,7 @@ public:
 			else
 			{
 				OException::Check(DispId.Call(m_spFactoryDispatch,
-					CMyDispParams<1>().Unnamed[packingInfo->pluginOptions],
+					CMyDispParams<1>().Unnamed(packingInfo->pluginOptions),
 					DISPATCH_PROPERTYPUTREF));
 			}
 		}
@@ -117,7 +117,7 @@ public:
 		CMyVariant var;
 		OException::Check(
 			m_OpenTextFile.Call(m_spFactoryDispatch,
-				CMyDispParams<1>().Unnamed[filename], DISPATCH_METHOD, &var));
+				CMyDispParams<1>().Unnamed(filename), DISPATCH_METHOD, &var));
 		OException::Check(var.ChangeType(VT_DISPATCH));
 		m_spStreamDispatch = V_DISPATCH(&var);
 		if (m_spStreamDispatch == NULL)

@@ -328,9 +328,15 @@ public:
 		}
 	}
 	template<class T>
-	CMyDispParamsUnnamed &operator[](const T &value)
+	CMyDispParamsUnnamed &operator()(const T &value)
 	{
 		static_cast<CMyVariant *>(--rgvarg)->CMyVariant::CMyVariant(value);
+		++cArgs;
+		return *this;
+	}
+	CMyDispParamsUnnamed &operator()(LPCOLESTR value, UINT len)
+	{
+		static_cast<CMyVariant *>(--rgvarg)->CMyVariant::CMyVariant(value, len);
 		++cArgs;
 		return *this;
 	}

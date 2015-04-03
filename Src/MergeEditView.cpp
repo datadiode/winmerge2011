@@ -876,7 +876,7 @@ void CMergeEditView::OnContextMenu(LPARAM lParam)
 		}
 		CMyVariant var;
 		OException::Check(DispId.Call(spDispatch,
-			CMyDispParams<1>().Unnamed[text.c_str()], DISPATCH_METHOD, &var));
+			CMyDispParams<1>().Unnamed(text.c_str()), DISPATCH_METHOD, &var));
 		if (V_VT(&var) != VT_EMPTY)
 		{
 			OException::Check(var.ChangeType(VT_BSTR));

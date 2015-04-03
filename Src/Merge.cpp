@@ -233,7 +233,7 @@ HRESULT CMergeApp::InitInstance()
 			CMyDispId DispId;
 			OException::Check(DispId.Init(spDispatch, L"ParseCmdLine"));
 			OException::Check(DispId.Call(spDispatch, CMyDispParams<2>().Unnamed
-				[GetCommandLine()][CurrentDirectory().c_str()]));
+				(GetCommandLine())(CurrentDirectory().c_str())));
 
 			hr = S_FALSE;
 		}
