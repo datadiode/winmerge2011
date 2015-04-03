@@ -4,7 +4,7 @@
  * @brief Options initialisation.
  */
 #include "StdAfx.h"
-#include "OptionsDef.h"
+#include "OptionsMgr.h"
 #include "SettingStore.h"
 #include "Common/RegKey.h"
 

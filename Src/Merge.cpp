@@ -39,6 +39,9 @@
 // For shutdown cleanup
 #include "charsets.h"
 
+#define operator(args) args
+#include "OptionsDef.h"
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE

@@ -25,7 +25,6 @@
  */
 #include "StdAfx.h"
 #include "VSSHelper.h"
-#define operator(args) args
 #include "Merge.h"
 #include "../BuildTmp/Merge/midl/WinMerge_i.c"
 #include <htmlhelp.h>  // From HTMLHelp Workshop (incl. in Platform SDK)
