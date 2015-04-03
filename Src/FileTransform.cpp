@@ -96,7 +96,7 @@ public:
 		OException::Check(m_ReadLine.Call(m_spStreamDispatch,
 			CMyDispParams<0>().Unnamed, DISPATCH_METHOD, &var));
 		OException::Check(var.ChangeType(VT_BSTR));
-		line = V_BSTR(&var);
+		line.assign(V_BSTR(&var), SysStringLen(V_BSTR(&var)));
 		eol = _T("\r\n");
 		return true;
 	}
