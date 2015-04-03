@@ -77,9 +77,8 @@ public:
 		}
 		OException::Check(
 			m_OpenTextFile.Init(m_spFactoryDispatch, L"OpenTextFile"));
-	}
-	virtual void ReadBom()
-	{
+		if (SUCCEEDED(m_CreateTextFile.Init(m_spFactoryDispatch, L"CreateTextFile")))
+			packingInfo->canWrite = true;
 	}
 	virtual bool ReadString(String &line, String &eol, bool *lossy)
 	{
@@ -100,9 +99,11 @@ public:
 		eol = _T("\r\n");
 		return true;
 	}
-	virtual bool WriteString(LPCTSTR, stl_size_t)
+	virtual bool WriteString(LPCTSTR line, stl_size_t length)
 	{
-		return false;
+		OException::Check(m_Write.Call(m_spStreamDispatch,
+			CMyDispParams<1>().Unnamed(line, length), DISPATCH_METHOD));
+		return true;
 	}
 	virtual void Close()
 	{
@@ -128,12 +129,28 @@ public:
 			m_AtEndOfStream.Init(m_spStreamDispatch, L"AtEndOfStream"));
 		return true;
 	}
+	virtual bool OpenCreate(LPCTSTR filename)
+	{
+		CMyVariant var;
+		OException::Check(
+			m_CreateTextFile.Call(m_spFactoryDispatch,
+			CMyDispParams<1>().Unnamed(filename), DISPATCH_METHOD, &var));
+		OException::Check(var.ChangeType(VT_DISPATCH));
+		m_spStreamDispatch = V_DISPATCH(&var);
+		if (m_spStreamDispatch == NULL)
+			return false;
+		OException::Check(
+			m_Write.Init(m_spStreamDispatch, L"Write"));
+		return true;
+	}
 
 private:
 	CMyComPtr<IDispatch> m_spFactoryDispatch;
 	CMyDispId m_OpenTextFile;
+	CMyDispId m_CreateTextFile;
 	CMyComPtr<IDispatch> m_spStreamDispatch;
 	CMyDispId m_ReadLine;
+	CMyDispId m_Write;
 	CMyDispId m_AtEndOfStream;
 };
 

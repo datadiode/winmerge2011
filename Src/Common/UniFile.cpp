@@ -642,22 +642,6 @@ bool UniStdioFile::DoOpen(LPCTSTR filename, LPCTSTR mode)
 	return m_fp != 0;
 }
 
-/**
- * @brief Check for Unicode BOM (byte order mark) at start of file
- *
- * @note This code only checks for UCS-2LE, UCS-2BE, and UTF-8 BOMs (no UCS-4).
- */
-void UniStdioFile::ReadBom()
-{
-	ASSERT(0); // unimplemented -- currently cannot read from a UniStdioFile!
-}
-
-bool UniStdioFile::ReadString(String & line, String & eol, bool * lossy)
-{
-	ASSERT(0); // unimplemented
-	return false;
-}
-
 /** @brief Write BOM (byte order mark) if Unicode file */
 void UniStdioFile::WriteBom()
 {

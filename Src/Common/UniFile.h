@@ -51,10 +51,13 @@ public:
 	virtual ~UniFile() { }
 
 	virtual bool OpenReadOnly(LPCTSTR filename) = 0;
+	virtual bool OpenCreate(LPCTSTR filename) = 0;
 	virtual void Close() = 0;
 	virtual bool IsOpen() const = 0;
 	virtual void ReadBom() = 0;
+	virtual void WriteBom() = 0;
 	virtual bool ReadString(String &line, String &eol, bool *lossy) = 0;
+	virtual bool WriteString(LPCTSTR, stl_size_t) = 0;
 
 	const UniError &GetLastUniError() const { return m_lastError; }
 	const txtstats &GetTxtStats() const { return m_txtstats; }
@@ -88,6 +91,19 @@ class UniLocalFile : public UniFile
 public:
 	UniLocalFile();
 
+	virtual void ReadBom() { }
+	virtual bool ReadString(String & line, String & eol, bool * lossy)
+	{
+		ASSERT(0); // unimplemented
+		return false;
+	}
+	virtual void WriteBom() { }
+	virtual bool WriteString(LPCTSTR, stl_size_t)
+	{
+		ASSERT(0); // unimplemented
+		return false;
+	}
+
 protected:
 	void Clear();
 
@@ -108,6 +124,7 @@ public:
 	virtual ~UniMemFile() { Close(); }
 
 	virtual bool OpenReadOnly(LPCTSTR filename);
+	virtual bool OpenCreate(LPCTSTR filename) { return false; }
 	virtual void Close();
 	virtual bool IsOpen() const;
 	virtual void ReadBom();
@@ -145,23 +162,19 @@ public:
 	HGLOBAL CreateStreamOnHGlobal();
 
 	bool Open(LPCTSTR filename, LPCTSTR mode);
-	bool OpenCreate(LPCTSTR filename);
 	bool OpenCreateUtf8(LPCTSTR filename);
 
 	virtual bool OpenReadOnly(LPCTSTR filename);
+	virtual bool OpenCreate(LPCTSTR filename);
 	virtual void Close();
 	virtual bool IsOpen() const;
-	virtual void ReadBom();
+	virtual void WriteBom();
+	virtual bool WriteString(LPCTSTR line, String::size_type length);
 
-	void WriteBom();
-	bool WriteString(LPCTSTR line, String::size_type length);
 	bool WriteString(const String &line)
 	{
 		return WriteString(line.c_str(), line.length());
 	}
-
-protected:
-	virtual bool ReadString(String & line, String & eol, bool * lossy);
 
 // Implementation methods
 protected:

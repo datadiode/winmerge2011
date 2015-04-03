@@ -42,6 +42,7 @@ public:
 	: method(Default)
 	, disallowMixedEOL(false)
 	, readOnly(false)
+	, canWrite(false)
 	{
 	}
 
@@ -62,4 +63,5 @@ public:
 	UniFile *(*method)(PackingInfo *);
 	bool disallowMixedEOL;
 	bool readOnly;
+	bool canWrite;
 };
