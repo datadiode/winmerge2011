@@ -338,78 +338,83 @@ int CDiffTextBuffer::SaveToFile(LPCTSTR pszFileName,
 		!COptionsMgr::Get(OPT_ALLOW_MIXED_EOL) ||
 		infoUnpacker && infoUnpacker->disallowMixedEOL)
 	{
-			// get the default nCrlfStyle of the CDiffTextBuffer
+		// get the default nCrlfStyle of the CDiffTextBuffer
 		nCrlfStyle = GetCRLFMode();
 		ASSERT(nCrlfStyle >= 0 && nCrlfStyle <= 3);
 	}
 
-	UniStdioFile file;
+	UniFile *pufile = NULL;
 
 	String sIntermediateFilename; // used when !pTempStream
 
-	if (pTempStream)
+	int nRetVal = SAVE_DONE;
+	try
 	{
-		file.Attach(pTempStream);
-		// DiffUtils want it octet-encoded without BOM
-		file.SetUnicoding(m_encoding.m_unicoding ? UTF8 : NONE);
-		file.SetCodepage(m_encoding.m_codepage);
-	}
-	else
-	{
-		file.SetBom(m_encoding.m_bom);
-		file.SetUnicoding(m_encoding.m_unicoding);
-		file.SetCodepage(m_encoding.m_codepage);
-		sIntermediateFilename = env_GetTempFileName(env_GetTempPath(), _T("MRG_"));
-		if (sIntermediateFilename.empty())
-			return SAVE_FAILED;  //Nothing to do if even tempfile name fails
-		if (!file.OpenCreate(sIntermediateFilename.c_str()))
-		{	
-			UniFile::UniError uniErr = file.GetLastUniError();
-			if (uniErr.HasError())
-			{
-				sError = uniErr.GetError();
-				LogFile.Write(LogFile.LERROR,
-					_T("Opening file %s failed: %s"),
-					sIntermediateFilename.c_str(), sError.c_str());
-			}
-			return SAVE_FAILED;
+		if (pTempStream)
+		{
+			UniStdioFile *pstdiofile = new UniStdioFile;
+			pstdiofile->Attach(pTempStream);
+			pufile = pstdiofile;
+			// DiffUtils want it octet-encoded without BOM
+			pufile->SetUnicoding(UTF8);
+		}
+		else
+		{
+			sIntermediateFilename = env_GetTempFileName(env_GetTempPath(), _T("MRG_"));
+			if (sIntermediateFilename.empty())
+				OException::Throw(); // can't help if even tempfile name fails
+			if (infoUnpacker->canWrite)
+				pufile = infoUnpacker->method(infoUnpacker);
+			else
+				pufile = new UniStdioFile;
+			pufile->SetBom(m_encoding.m_bom);
+			pufile->SetUnicoding(m_encoding.m_unicoding);
+			pufile->SetCodepage(m_encoding.m_codepage);
+			if (!pufile->OpenCreate(sIntermediateFilename.c_str()))
+				OException::Throw();
+			pufile->WriteBom();
+		}
+
+		// line loop : get each real line and write it in the file
+		LPCTSTR sEol = GetStringEol(nCrlfStyle);
+		const stl_size_t nEndLine = nStartLine + nLines;
+		for (stl_size_t line = nStartLine; line < nEndLine ; ++line)
+		{
+			const LineInfo &li = GetLineInfo(line);
+			if (li.m_dwFlags & LF_GHOST)
+				continue;
+
+			// write the characters of the line (excluding EOL)
+			pufile->WriteString(li.GetLine(), li.Length());
+
+			LPCTSTR sOriginalEol = li.GetEol();
+			// last real line is never EOL terminated
+			if (sOriginalEol == NULL)
+				break;
+
+			// normal real line : append an EOL
+			// either the EOL of the line (when preserve original EOL chars is on)
+			// or the default EOL for this file
+			if (nCrlfStyle == CRLF_STYLE_AUTOMATIC || nCrlfStyle == CRLF_STYLE_MIXED)
+				sEol = sOriginalEol;
+			pufile->WriteString(sEol, static_cast<String::size_type>(_tcslen(sEol)));
 		}
 	}
-
-	file.WriteBom();
-
-	// line loop : get each real line and write it in the file
-	LPCTSTR sEol = GetStringEol(nCrlfStyle);
-	const stl_size_t nEndLine = nStartLine + nLines;
-	for (stl_size_t line = nStartLine; line < nEndLine ; ++line)
+	catch (OException *e)
 	{
-		const LineInfo &li = GetLineInfo(line);
-		if (li.m_dwFlags & LF_GHOST)
-			continue;
-
-		// write the characters of the line (excluding EOL)
-		file.WriteString(li.GetLine(), li.Length());
-
-		LPCTSTR sOriginalEol = li.GetEol();
-		// last real line is never EOL terminated
-		if (sOriginalEol == NULL)
-			break;
-
-		// normal real line : append an EOL
-		// either the EOL of the line (when preserve original EOL chars is on)
-		// or the default EOL for this file
-		if (nCrlfStyle == CRLF_STYLE_AUTOMATIC || nCrlfStyle == CRLF_STYLE_MIXED)
-			sEol = sOriginalEol;
-		file.WriteString(sEol, static_cast<String::size_type>(_tcslen(sEol)));
+		nRetVal = SAVE_FAILED;
+		sError = e->msg;
+		delete e;
 	}
+
+	delete pufile;
 
 	// If we are saving temp files, we are done
-	if (pTempStream)
+	if (pTempStream || nRetVal == SAVE_FAILED)
 	{
-		return SAVE_DONE;
+		return nRetVal;
 	}
 
-	file.Close();
 	// Write tempfile over original file
 	if (!::CopyFile(sIntermediateFilename.c_str(), pszFileName, FALSE))
 	{
