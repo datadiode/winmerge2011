@@ -939,8 +939,8 @@ void CCrystalTextView::DrawLineHelperImpl(
 						int n = 1;
 						do { } while (pnWidths[j + n++] == nCharWidth);
 						pdc->RoundRect(x + 2, ptOrigin.y + 1,
-						x + n * nCharWidth - 2, ptOrigin.y + nLineHeight - 1,
-						nCharWidth / 2, nLineHeight / 2);
+							x + n * nCharWidth - 2, ptOrigin.y + nLineHeight - 1,
+							nCharWidth / 2, nLineHeight / 2);
 					}
 					x += pnWidths[j];
 				}
