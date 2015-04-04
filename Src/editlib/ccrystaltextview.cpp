@@ -807,6 +807,9 @@ void CCrystalTextView::DrawLineHelperImpl(
 	ASSERT(nCount > 0);
 	String line;
 	nActualOffset += ExpandChars(pszChars, nOffset, nCount, line, nActualOffset);
+	// When not separating combined characters, assume at most 5 characters per
+	// combination, and go with the risk of visual glitches when proved wrong.
+	const int nMaxCombinings = m_bSeparateCombinedChars ? 1 : 5;
 	const int nMaxEscapement = 2;
 	// TODO: When implementing fallback to %04X format, set nMaxEscapement to 4.
 	const LPCTSTR szLine = line.c_str();
@@ -845,53 +848,56 @@ void CCrystalTextView::DrawLineHelperImpl(
 		if (i < nLength)
 		{
 			// We have to draw some characters
-			int ibegin = i;
+			int iBegin = i;
 			int nSumWidth = 0;
 
 			// A raw estimate of the number of characters to display
-			// For wide characters, nCountFit may be overvalued
+			// For wide characters, nCountFit may be overvalued.
+			// The + 2 is supposedly meant to account for partially displayed
+			// characters both to the left and right side of the visible area.
 			int nWidth = rcClip.right - ptOrigin.x;
-			int nCount = nLength - ibegin;
-			int nCountFit = nWidth / nCharWidth + 2/* wide char */;
-			if (nCount > nCountFit) {
+			int nCount = nLength - iBegin;
+			int nCountFit = nMaxCombinings * (nWidth / nCharWidth + 2);
+			if (nCount > nCountFit)
 				nCount = nCountFit;
-			}
 
 			// Table of charwidths as CCrystalEditor thinks they are
 			// Seems that CrystalEditor's and ExtTextOut()'s charwidths aren't
 			// same with some fonts and text is drawn only partially
 			// if this table is not used.
 			int *pnWidths = new int[nCount + nMaxEscapement];
-			for ( ; i < nCount + ibegin ; i++)
+			while (i < iBegin + nCount && nSumWidth <= nWidth)
 			{
 				TCHAR c = szLine[i];
 				if (c == _T('\1')) // %02X escape sequence leadin?
 				{
 					// Substitute a space narrowed to half the width of a character cell.
 					line[i] = _T(' ');
-					nSumWidth += pnWidths[i - ibegin] = nCharWidthNarrowed;
+					nSumWidth += pnWidths[i - iBegin] = nCharWidthNarrowed;
 					// 1st hex digit has normal width.
-					nSumWidth += pnWidths[++i - ibegin] = nCharWidth;
+					nSumWidth += pnWidths[++i - iBegin] = nCharWidth;
 					// 2nd hex digit is padded by half the width of a character cell.
-					nSumWidth += pnWidths[++i - ibegin] = nCharWidthWidened;
+					nSumWidth += pnWidths[++i - iBegin] = nCharWidthWidened;
 				}
 				/*else if (c == _T('\2')) // %04X escape sequence leadin?
 				{
 					line[i] = _T(' ');
 					// Substitute a space narrowed to half the width of a character cell.
-					nSumWidth += pnWidths[i - ibegin] = nCharWidthNarrowed;
+					nSumWidth += pnWidths[i - iBegin] = nCharWidthNarrowed;
 					// 1st..3rd hex digit has normal width.
-					nSumWidth += pnWidths[++i - ibegin] = nCharWidth;
-					nSumWidth += pnWidths[++i - ibegin] = nCharWidth;
-					nSumWidth += pnWidths[++i - ibegin] = nCharWidth;
+					nSumWidth += pnWidths[++i - iBegin] = nCharWidth;
+					nSumWidth += pnWidths[++i - iBegin] = nCharWidth;
+					nSumWidth += pnWidths[++i - iBegin] = nCharWidth;
 					// 4th hex digit is padded by half the width of a character cell.
-					nSumWidth += pnWidths[++i - ibegin] = nCharWidthWidened;
+					nSumWidth += pnWidths[++i - iBegin] = nCharWidthWidened;
 				}*/
 				else
 				{
-					nSumWidth += pnWidths[i - ibegin] = nCharWidth * GetCharWidthFromChar(szLine + i);
+					nSumWidth += pnWidths[i - iBegin] = nCharWidth * GetCharWidthFromChar(szLine + i);
 				}
+				++i;
 			}
+			nCount = i - iBegin;
 
 			if (ptOrigin.x + nSumWidth > rcClip.left)
 			{
@@ -907,7 +913,7 @@ void CCrystalTextView::DrawLineHelperImpl(
 				pdc->SelectObject(GetFont(nColorIndex));
 				// we are sure to have less than 4095 characters because all the chars are visible
 				VERIFY(pdc->ExtTextOut(ptOrigin.x, ptOrigin.y, ETO_CLIPPED,
-					&rcClip, line.c_str() + ibegin, nCount, pnWidths));
+					&rcClip, line.c_str() + iBegin, nCount, pnWidths));
 				if (cxZeroWidthBlock != 0 && PtInRect(&rcClip, ptOrigin))
 				{
 					pdc->SetBkColor(crBkgnd == CLR_NONE ||
@@ -923,7 +929,7 @@ void CCrystalTextView::DrawLineHelperImpl(
 					if (rcClipZeroWidthBlock.right > rcClip.right)
 						rcClipZeroWidthBlock.right = rcClip.right;
 					VERIFY(pdc->ExtTextOut(ptOrigin.x, ptOrigin.y, ETO_CLIPPED,
-						&rcClipZeroWidthBlock, line.c_str() + ibegin, nCount, pnWidths));
+						&rcClipZeroWidthBlock, line.c_str() + iBegin, nCount, pnWidths));
 				}
 				// Draw rounded rectangles around control characters
 				pdc->SaveDC();
@@ -934,7 +940,7 @@ void CCrystalTextView::DrawLineHelperImpl(
 				for (int j = 0 ; j < nCount ; ++j)
 				{
 					// Assume narrowed space is converted escape sequence leadin.
-					if (line[ibegin + j] == _T(' ') && pnWidths[j] < nCharWidth)
+					if (line[iBegin + j] == _T(' ') && pnWidths[j] < nCharWidth)
 					{
 						int n = 1;
 						do { } while (pnWidths[j + n++] == nCharWidth);
