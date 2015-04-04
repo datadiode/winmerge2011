@@ -1196,6 +1196,9 @@
     <ClInclude Include="jsoncpp\include\json\features.h">
       <Filter>jsoncpp</Filter>
     </ClInclude>
+    <ClInclude Include="Common\defer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Midl Include="WinMerge.idl">
@@ -1492,6 +1495,9 @@
       <Filter>File Transforms</Filter>
     </FileTransform>
     <FileTransform Include="..\FileTransforms\xdoc2txt.wsc.FileTransform">
+      <Filter>File Transforms</Filter>
+    </FileTransform>
+    <FileTransform Include="..\FileTransforms\gedcom.wsc.FileTransform">
       <Filter>File Transforms</Filter>
     </FileTransform>
   </ItemGroup>

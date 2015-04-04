@@ -743,6 +743,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Common\defer.h" />
     <ClInclude Include="Common\WindowPlacement.h" />
     <ClInclude Include="7zCommon.h" />
     <ClInclude Include="AboutDlg.h" />
@@ -1050,6 +1051,7 @@
     <PrintTemplate Include="..\PrintTemplates\MergeDocPrintTemplate.html.PrintTemplate" />
   </ItemGroup>
   <ItemGroup>
+    <FileTransform Include="..\FileTransforms\gedcom.wsc.FileTransform" />
     <FileTransform Include="..\FileTransforms\LinesNumbered.wsc.FileTransform" />
     <FileTransform Include="..\FileTransforms\LinesSorted.wsc.FileTransform" />
     <FileTransform Include="..\FileTransforms\MediaInfo.wsc.FileTransform" />
