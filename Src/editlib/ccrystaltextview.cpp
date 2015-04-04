@@ -3342,13 +3342,32 @@ HGLOBAL CCrystalTextView::PrepareDragData()
 	return hData;
 }
 
-static int FindStringHelper(LPCTSTR pszFindWhere, LPCTSTR pszFindWhat, DWORD dwFlags, int &nLen)
+static const TCHAR *MemSearch(const TCHAR *p, size_t pLen, const TCHAR *q, size_t qLen)
+{
+	if (qLen > pLen)
+		return NULL;
+	const TCHAR *pEnd = p + pLen - qLen;
+	const TCHAR *qEnd = q + qLen;
+	do
+	{
+		const TCHAR *u = p;
+		const TCHAR *v = q;
+		do
+		{
+			if (v == qEnd)
+				return p;
+		} while (*u++ == *v++);
+	} while (++p <= pEnd);
+	return NULL;
+}
+
+static int FindStringHelper(LPCTSTR pchFindWhere, int cchFindWhere, LPCTSTR pchFindWhat, DWORD dwFlags, int &nLen)
 {
 	if (dwFlags & FIND_REGEXP)
 	{
 		const char *errormsg = NULL;
 		int erroroffset = 0;
-		const OString regexString = HString::Uni(pszFindWhat)->Oct(CP_UTF8);
+		const OString regexString = HString::Uni(pchFindWhat)->Oct(CP_UTF8);
 		pcre *regexp = pcre_compile(regexString.A,
 			dwFlags & FIND_MATCH_CASE ?
 			PCRE_UTF8 | PCRE_BSR_ANYCRLF :
@@ -3364,7 +3383,7 @@ static int FindStringHelper(LPCTSTR pszFindWhere, LPCTSTR pszFindWhat, DWORD dwF
 
 		int pos = -1;
 		int ovector[30];
-		const OString compString = HString::Uni(pszFindWhere)->Oct(CP_UTF8);
+		const OString compString = HString::Uni(pchFindWhere, cchFindWhere)->Oct(CP_UTF8);
 		int result = pcre_exec(
 			regexp, pe, compString.A, compString.ByteLen(), 0, 0, ovector, 30);
 		if (result >= 0)
@@ -3379,36 +3398,24 @@ static int FindStringHelper(LPCTSTR pszFindWhere, LPCTSTR pszFindWhat, DWORD dwF
 	}
 	else
 	{
-		ASSERT(pszFindWhere != NULL);
-		ASSERT(pszFindWhat != NULL);
+		ASSERT(pchFindWhere != NULL);
+		ASSERT(pchFindWhat != NULL);
 		int nCur = 0;
-		int nLength = static_cast<int>(_tcslen(pszFindWhat));
-		nLen = nLength;
-		for (;;)
+		const int cchFindWhat = static_cast<int>(_tcslen(pchFindWhat));
+		nLen = cchFindWhat;
+		while (LPCTSTR pchPos = MemSearch(pchFindWhere, cchFindWhere, pchFindWhat, cchFindWhat))
 		{
-			LPCTSTR pszPos = _tcsstr(pszFindWhere, pszFindWhat);
-			if (pszPos == NULL)
-				return -1;
+			nCur += static_cast<int>(pchPos - pchFindWhere);
 			if ((dwFlags & FIND_WHOLE_WORD) == 0)
-				return nCur + static_cast<int>(pszPos - pszFindWhere);
-			if (pszPos > pszFindWhere && xisalnum(pszPos[-1]))
-			{
-				nCur += static_cast<int>(pszPos - pszFindWhere + 1);
-				pszFindWhere = pszPos + 1;
-				continue;
-			}
-			if (xisalnum(pszPos[nLength]))
-			{
-				nCur += static_cast<int>(pszPos - pszFindWhere + 1);
-				pszFindWhere = pszPos + 1;
-				continue;
-			}
-			return nCur + static_cast<int>(pszPos - pszFindWhere);
+				return nCur;
+			if (!(nCur > 0 && xisalnum(pchPos[-1]) || xisalnum(pchPos[cchFindWhat])))
+				return nCur;
+			++nCur;
+			pchFindWhere = pchPos + 1;
 		}
+		return -1;
 	}
 	ASSERT(FALSE); // Unreachable
-
-	return -1;
 }
 
 /** 
@@ -3583,7 +3590,7 @@ BOOL CCrystalTextView::FindTextInBlock(
 				int nFoundPos = -1;
 				int nMatchLen = what.length();
 				int nPos;
-				while ((nPos = ::FindStringHelper(line.c_str(), what.c_str(), dwFlags, m_nLastFindWhatLen)) != -1)
+				while ((nPos = ::FindStringHelper(line.c_str(), line.length(), what.c_str(), dwFlags, m_nLastFindWhatLen)) != -1)
 				{
 					nFoundPos = nFoundPos == -1 ? nPos : nFoundPos + nPos;
 					nFoundPos += nMatchLen;
@@ -3661,7 +3668,7 @@ BOOL CCrystalTextView::FindTextInBlock(
 				}
 
 				//  Perform search in the line
-				int nPos = ::FindStringHelper(line.c_str(), what.c_str(), dwFlags, m_nLastFindWhatLen);
+				int nPos = ::FindStringHelper(line.c_str(), line.length(), what.c_str(), dwFlags, m_nLastFindWhatLen);
 				if (nPos >= 0)
 				{
 					free(m_pszMatched);
@@ -4323,7 +4330,8 @@ void CCrystalTextView::EnsureSelectionVisible()
 CCrystalTextView::TextDefinition *CCrystalTextView::SetTextTypeByContent(LPCTSTR pszContent)
 {
 	int nLen;
-	if (::FindStringHelper(pszContent, _T("^\\s*\\<\\?xml\\s+.+?\\?\\>\\s*$"), FIND_REGEXP, nLen) == 0)
+	if (::FindStringHelper(pszContent, _tcslen(pszContent),
+		_T("^\\s*\\<\\?xml\\s+.+?\\?\\>\\s*$"), FIND_REGEXP, nLen) == 0)
 	{
 		return SetTextType(CCrystalTextView::SRC_XML);
 	}
