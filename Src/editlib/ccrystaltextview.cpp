@@ -748,7 +748,7 @@ int CCrystalTextView::ExpandChars(LPCTSTR pszChars, int nOffset, int nCount, Str
 /**
  * @brief Return width of specified character
  */
-int CCrystalTextView::GetCharWidthFromChar(LPCTSTR pch)
+int CCrystalTextView::GetCharWidthFromChar(LPCTSTR pch) const
 {
 	UINT ch = *pch;
 	if (ch >= _T('\x00') && ch <= _T('\x1F') && ch != _T('\t') && ch != _T('\r') && ch != _T('\n'))
@@ -786,7 +786,7 @@ int CCrystalTextView::GetCharWidthFromChar(LPCTSTR pch)
  *
  * Differs from GetCharWidthFromChar when viewable whitespace is involved
  */
-int CCrystalTextView::GetCharWidthFromDisplayableChar(LPCTSTR pch)
+int CCrystalTextView::GetCharWidthFromDisplayableChar(LPCTSTR pch) const
 {
 	if (*pch == _T(' ') && m_bViewTabs)
 		pch = &ViewableWhitespaceChars::c_space;

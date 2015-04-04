@@ -449,8 +449,8 @@ protected:
 	virtual void DrawSingleLine(HSurface *, const RECT &, int nLineIndex);
 	virtual void DrawMargin(HSurface *, const RECT &, int nLineIndex, int nLineNumber);
 
-	int GetCharWidthFromChar(LPCTSTR);
-	int GetCharWidthFromDisplayableChar(LPCTSTR);
+	int GetCharWidthFromChar(LPCTSTR) const;
+	int GetCharWidthFromDisplayableChar(LPCTSTR) const;
 
 	void AdjustCursorAfterMoveLeft();
 	void AdjustCursorAfterMoveRight();
