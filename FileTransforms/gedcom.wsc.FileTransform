@@ -1,0 +1,1590 @@
+<!--
+This file is released under the MIT license.
+
+----- begin license block -----
+
+Copyright (c) 2015 Jochen Neubeck
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+----- end license block -----
+
+-->
+<scriptlet>
+
+<implements type='automation'>
+	<method name='OpenTextFile'/>
+	<method name='CreateTextFile'/>
+	<property name='ShowConsole'/>
+	<property name='ReadOnly'/>
+</implements>
+
+<script language='vbs'>
+Option Explicit
+
+Const ShowConsole = 0
+Const ReadOnly = False
+
+Dim fso
+Set fso = CreateObject("Scripting.FileSystemObject")
+
+Function DecodeANSEL(line)
+	Dim s, c, i, n, x
+	i = 1
+	n = Len(line)
+	line = line & vbCrLf
+	While i <= n
+		x = False
+		c = Asc(Mid(line, i, 1))
+		i = i + 1
+		Select Case c
+		Case &hA1
+			c = &h0141
+		Case &hA2
+			c = &h00D8
+		Case &hA3
+			c = &h0110
+		Case &hA4
+			c = &h00DE
+		Case &hA5
+			c = &h00C6
+		Case &hA6
+			c = &h0152
+		Case &hA7
+			c = &h02B9
+		Case &hA8
+			c = &h00B7
+		Case &hA9
+			c = &h266D
+		Case &hAA
+			c = &h00AE
+		Case &hAB
+			c = &h00B1
+		Case &hAC
+			c = &h01A0
+		Case &hAD
+			c = &h01AF
+		Case &hAE
+			c = &h02BC
+		Case &hB0
+			c = &h02BB
+		Case &hB1
+			c = &h0142
+		Case &hB2
+			c = &h00F8
+		Case &hB3
+			c = &h0111
+		Case &hB4
+			c = &h00FE
+		Case &hB5
+			c = &h00E6
+		Case &hB6
+			c = &h0153
+		Case &hB7
+			c = &h02BA
+		Case &hB8
+			c = &h0131
+		Case &hB9
+			c = &h00A3
+		Case &hBA
+			c = &h00F0
+		Case &hBC
+			c = &h01A1
+		Case &hBD
+			c = &h01B0
+		Case &hC0
+			c = &h00B0
+		Case &hC1
+			c = &h2113
+		Case &hC2
+			c = &h2117
+		Case &hC3
+			c = &h00A9
+		Case &hC4
+			c = &h266F
+		Case &hC5
+			c = &h00BF
+		Case &hC6
+			c = &h00A1
+		Case &hCF
+			c = &h00DF
+		Case &hE0
+			c = Asc(Mid(line, i, 1))
+			i = i + 1
+			Select Case c
+			Case &h41
+				c = &h1EA2
+			Case &h45
+				c = &h1EBA
+			Case &h49
+				c = &h1EC8
+			Case &h4F
+				c = &h1ECE
+			Case &h55
+				c = &h1EE6
+			Case &h59
+				c = &h1EF6
+			Case &h61
+				c = &h1EA3
+			Case &h65
+				c = &h1EBB
+			Case &h69
+				c = &h1EC9
+			Case &h6F
+				c = &h1ECF
+			Case &h75
+				c = &h1EE7
+			Case &h79
+				c = &h1EF7
+			Case &hE3
+				c = Asc(Mid(line, i, 1))
+				i = i + 1
+				Select Case c
+				Case &h41
+					c = &h1EA8
+				Case &h45
+					c = &h1EC2
+				Case &h4F
+					c = &h1ED4
+				Case &h61
+					c = &h1EA9
+				Case &h65
+					c = &h1EC3
+				Case &h6F
+					c = &h1ED5
+				Case &h41
+					c = &h1EB2
+				Case &h61
+					c = &h1EB3
+				Case Else
+					c = &h0309
+					i = i - 2
+					x = True
+				End Select
+			Case Else
+				c = &h0309
+				i = i - 1
+				x = True
+			End Select
+		Case &hE1
+			c = Asc(Mid(line, i, 1))
+			i = i + 1
+			Select Case c
+			Case &h41
+				c = &h00C0
+			Case &h45
+				c = &h00C8
+			Case &h49
+				c = &h00CC
+			Case &h4F
+				c = &h00D2
+			Case &h55
+				c = &h00D9
+			Case &h57
+				c = &h1E80
+			Case &h59
+				c = &h1EF2
+			Case &h61
+				c = &h00E0
+			Case &h65
+				c = &h00E8
+			Case &h69
+				c = &h00EC
+			Case &h6F
+				c = &h00F2
+			Case &h75
+				c = &h00F9
+			Case &h77
+				c = &h1E81
+			Case &h79
+				c = &h1EF3
+			Case &hE3
+				c = Asc(Mid(line, i, 1))
+				i = i + 1
+				Select Case c
+				Case &h41
+					c = &h1EA6
+				Case &h45
+					c = &h1EC0
+				Case &h4F
+					c = &h1ED2
+				Case &h61
+					c = &h1EA7
+				Case &h65
+					c = &h1EC1
+				Case &h6F
+					c = &h1ED3
+				Case &h45
+					c = &h1E14
+				Case &h4F
+					c = &h1E50
+				Case &h65
+					c = &h1E15
+				Case &h6F
+					c = &h1E51
+				Case &h41
+					c = &h1EB0
+				Case &h61
+					c = &h1EB1
+				Case &h55
+					c = &h01DB
+				Case &h75
+					c = &h01DC
+				Case Else
+					c = &h0300
+					i = i - 2
+					x = True
+				End Select
+			Case Else
+				c = &h0300
+				i = i - 1
+				x = True
+			End Select
+		Case &hE2
+			c = Asc(Mid(line, i, 1))
+			i = i + 1
+			Select Case c
+			Case &h41
+				c = &h00C1
+			Case &h43
+				c = &h0106
+			Case &h45
+				c = &h00C9
+			Case &h47
+				c = &h01F4
+			Case &h49
+				c = &h00CD
+			Case &h4B
+				c = &h1E30
+			Case &h4C
+				c = &h0139
+			Case &h4D
+				c = &h1E3E
+			Case &h4E
+				c = &h0143
+			Case &h4F
+				c = &h00D3
+			Case &h50
+				c = &h1E54
+			Case &h52
+				c = &h0154
+			Case &h53
+				c = &h015A
+			Case &h55
+				c = &h00DA
+			Case &h57
+				c = &h1E82
+			Case &h59
+				c = &h00DD
+			Case &h5A
+				c = &h0179
+			Case &h61
+				c = &h00E1
+			Case &h63
+				c = &h0107
+			Case &h65
+				c = &h00E9
+			Case &h67
+				c = &h01F5
+			Case &h69
+				c = &h00ED
+			Case &h6B
+				c = &h1E31
+			Case &h6C
+				c = &h013A
+			Case &h6D
+				c = &h1E3F
+			Case &h6E
+				c = &h0144
+			Case &h6F
+				c = &h00F3
+			Case &h70
+				c = &h1E55
+			Case &h72
+				c = &h0155
+			Case &h73
+				c = &h015B
+			Case &h75
+				c = &h00FA
+			Case &h77
+				c = &h1E83
+			Case &h79
+				c = &h00FD
+			Case &h7A
+				c = &h017A
+			Case &hA5
+				c = &h01FC
+			Case &hB5
+				c = &h01FD
+			Case &hE3
+				c = Asc(Mid(line, i, 1))
+				i = i + 1
+				Select Case c
+				Case &h41
+					c = &h1EA4
+				Case &h45
+					c = &h1EBE
+				Case &h4F
+					c = &h1ED0
+				Case &h61
+					c = &h1EA5
+				Case &h65
+					c = &h1EBF
+				Case &h6F
+					c = &h1ED1
+				Case &h4F
+					c = &h1E4C
+				Case &h55
+					c = &h1E78
+				Case &h6F
+					c = &h1E4D
+				Case &h75
+					c = &h1E79
+				Case &h45
+					c = &h1E16
+				Case &h4F
+					c = &h1E52
+				Case &h65
+					c = &h1E17
+				Case &h6F
+					c = &h1E53
+				Case &h41
+					c = &h1EAE
+				Case &h61
+					c = &h1EAF
+				Case &h53
+					c = &h1E64
+				Case &h73
+					c = &h1E65
+				Case &h49
+					c = &h1E2E
+				Case &h55
+					c = &h01D7
+				Case &h69
+					c = &h1E2F
+				Case &h75
+					c = &h01D8
+				Case &h41
+					c = &h01FA
+				Case &h61
+					c = &h01FB
+				Case &h43
+					c = &h1E08
+				Case &h63
+					c = &h1E09
+				Case Else
+					c = &h0301
+					i = i - 2
+					x = True
+				End Select
+			Case Else
+				c = &h0301
+				i = i - 1
+				x = True
+			End Select
+		Case &hE3
+			c = Asc(Mid(line, i, 1))
+			i = i + 1
+			Select Case c
+			Case &h41
+				c = &h00C2
+			Case &h43
+				c = &h0108
+			Case &h45
+				c = &h00CA
+			Case &h47
+				c = &h011C
+			Case &h48
+				c = &h0124
+			Case &h49
+				c = &h00CE
+			Case &h4A
+				c = &h0134
+			Case &h4F
+				c = &h00D4
+			Case &h53
+				c = &h015C
+			Case &h55
+				c = &h00DB
+			Case &h57
+				c = &h0174
+			Case &h59
+				c = &h0176
+			Case &h5A
+				c = &h1E90
+			Case &h61
+				c = &h00E2
+			Case &h63
+				c = &h0109
+			Case &h65
+				c = &h00EA
+			Case &h67
+				c = &h011D
+			Case &h68
+				c = &h0125
+			Case &h69
+				c = &h00EE
+			Case &h6A
+				c = &h0135
+			Case &h6F
+				c = &h00F4
+			Case &h73
+				c = &h015D
+			Case &h75
+				c = &h00FB
+			Case &h77
+				c = &h0175
+			Case &h79
+				c = &h0177
+			Case &h7A
+				c = &h1E91
+			Case &hE0
+				c = Asc(Mid(line, i, 1))
+				i = i + 1
+				Select Case c
+				Case &h41
+					c = &h1EA8
+				Case &h45
+					c = &h1EC2
+				Case &h4F
+					c = &h1ED4
+				Case &h61
+					c = &h1EA9
+				Case &h65
+					c = &h1EC3
+				Case &h6F
+					c = &h1ED5
+				Case &h41
+					c = &h1EA6
+				Case &h45
+					c = &h1EC0
+				Case &h4F
+					c = &h1ED2
+				Case &h61
+					c = &h1EA7
+				Case &h65
+					c = &h1EC1
+				Case &h6F
+					c = &h1ED3
+				Case &h41
+					c = &h1EA4
+				Case &h45
+					c = &h1EBE
+				Case &h4F
+					c = &h1ED0
+				Case &h61
+					c = &h1EA5
+				Case &h65
+					c = &h1EBF
+				Case &h6F
+					c = &h1ED1
+				Case &h41
+					c = &h1EAA
+				Case &h45
+					c = &h1EC4
+				Case &h4F
+					c = &h1ED6
+				Case &h61
+					c = &h1EAB
+				Case &h65
+					c = &h1EC5
+				Case &h6F
+					c = &h1ED7
+				Case &h41
+					c = &h1EAC
+				Case &h45
+					c = &h1EC6
+				Case &h4F
+					c = &h1ED8
+				Case &h61
+					c = &h1EAD
+				Case &h65
+					c = &h1EC7
+				Case &h6F
+					c = &h1ED9
+				Case Else
+					c = &h0302
+					i = i - 2
+					x = True
+				End Select
+			Case Else
+				c = &h0302
+				i = i - 1
+				x = True
+			End Select
+		Case &hE4
+			c = Asc(Mid(line, i, 1))
+			i = i + 1
+			Select Case c
+			Case &h41
+				c = &h00C3
+			Case &h45
+				c = &h1EBC
+			Case &h49
+				c = &h0128
+			Case &h4E
+				c = &h00D1
+			Case &h4F
+				c = &h00D5
+			Case &h55
+				c = &h0168
+			Case &h56
+				c = &h1E7C
+			Case &h59
+				c = &h1EF8
+			Case &h61
+				c = &h00E3
+			Case &h65
+				c = &h1EBD
+			Case &h69
+				c = &h0129
+			Case &h6E
+				c = &h00F1
+			Case &h6F
+				c = &h00F5
+			Case &h75
+				c = &h0169
+			Case &h76
+				c = &h1E7D
+			Case &h79
+				c = &h1EF9
+			Case &hE2
+				c = Asc(Mid(line, i, 1))
+				i = i + 1
+				Select Case c
+				Case &h4F
+					c = &h1E4C
+				Case &h55
+					c = &h1E78
+				Case &h6F
+					c = &h1E4D
+				Case &h75
+					c = &h1E79
+				Case &h41
+					c = &h1EAA
+				Case &h45
+					c = &h1EC4
+				Case &h4F
+					c = &h1ED6
+				Case &h61
+					c = &h1EAB
+				Case &h65
+					c = &h1EC5
+				Case &h6F
+					c = &h1ED7
+				Case &h41
+					c = &h1EB4
+				Case &h61
+					c = &h1EB5
+				Case &h4F
+					c = &h1E4E
+				Case &h6F
+					c = &h1E4F
+				Case Else
+					c = &h0303
+					i = i - 2
+					x = True
+				End Select
+			Case Else
+				c = &h0303
+				i = i - 1
+				x = True
+			End Select
+		Case &hE5
+			c = Asc(Mid(line, i, 1))
+			i = i + 1
+			Select Case c
+			Case &h41
+				c = &h0100
+			Case &h45
+				c = &h0112
+			Case &h47
+				c = &h1E20
+			Case &h49
+				c = &h012A
+			Case &h4F
+				c = &h014C
+			Case &h55
+				c = &h016A
+			Case &h61
+				c = &h0101
+			Case &h65
+				c = &h0113
+			Case &h67
+				c = &h1E21
+			Case &h69
+				c = &h012B
+			Case &h6F
+				c = &h014D
+			Case &h75
+				c = &h016B
+			Case &hA5
+				c = &h01E2
+			Case &hB5
+				c = &h01E3
+			Case &hE1
+				c = Asc(Mid(line, i, 1))
+				i = i + 1
+				Select Case c
+				Case &h45
+					c = &h1E14
+				Case &h4F
+					c = &h1E50
+				Case &h65
+					c = &h1E15
+				Case &h6F
+					c = &h1E51
+				Case &h45
+					c = &h1E16
+				Case &h4F
+					c = &h1E52
+				Case &h65
+					c = &h1E17
+				Case &h6F
+					c = &h1E53
+				Case &h41
+					c = &h01E0
+				Case &h61
+					c = &h01E1
+				Case &h41
+					c = &h01DE
+				Case &h55
+					c = &h1E7A
+				Case &h61
+					c = &h01DF
+				Case &h75
+					c = &h1E7B
+				Case &h4F
+					c = &h01EC
+				Case &h6F
+					c = &h01ED
+				Case &h4C
+					c = &h1E38
+				Case &h52
+					c = &h1E5C
+				Case &h6C
+					c = &h1E39
+				Case &h72
+					c = &h1E5D
+				Case Else
+					c = &h0304
+					i = i - 2
+					x = True
+				End Select
+			Case Else
+				c = &h0304
+				i = i - 1
+				x = True
+			End Select
+		Case &hE6
+			c = Asc(Mid(line, i, 1))
+			i = i + 1
+			Select Case c
+			Case &h41
+				c = &h0102
+			Case &h45
+				c = &h0114
+			Case &h47
+				c = &h011E
+			Case &h49
+				c = &h012C
+			Case &h4F
+				c = &h014E
+			Case &h55
+				c = &h016C
+			Case &h61
+				c = &h0103
+			Case &h65
+				c = &h0115
+			Case &h67
+				c = &h011F
+			Case &h69
+				c = &h012D
+			Case &h6F
+				c = &h014F
+			Case &h75
+				c = &h016D
+			Case &hE0
+				c = Asc(Mid(line, i, 1))
+				i = i + 1
+				Select Case c
+				Case &h41
+					c = &h1EB2
+				Case &h61
+					c = &h1EB3
+				Case &h41
+					c = &h1EB0
+				Case &h61
+					c = &h1EB1
+				Case &h41
+					c = &h1EAE
+				Case &h61
+					c = &h1EAF
+				Case &h41
+					c = &h1EB4
+				Case &h61
+					c = &h1EB5
+				Case &h45
+					c = &h1E1C
+				Case &h65
+					c = &h1E1D
+				Case &h41
+					c = &h1EB6
+				Case &h61
+					c = &h1EB7
+				Case Else
+					c = &h0306
+					i = i - 2
+					x = True
+				End Select
+			Case Else
+				c = &h0306
+				i = i - 1
+				x = True
+			End Select
+		Case &hE7
+			c = Asc(Mid(line, i, 1))
+			i = i + 1
+			Select Case c
+			Case &h42
+				c = &h1E02
+			Case &h43
+				c = &h010A
+			Case &h44
+				c = &h1E0A
+			Case &h45
+				c = &h0116
+			Case &h46
+				c = &h1E1E
+			Case &h47
+				c = &h0120
+			Case &h48
+				c = &h1E22
+			Case &h49
+				c = &h0130
+			Case &h4D
+				c = &h1E40
+			Case &h4E
+				c = &h1E44
+			Case &h50
+				c = &h1E56
+			Case &h52
+				c = &h1E58
+			Case &h53
+				c = &h1E60
+			Case &h54
+				c = &h1E6A
+			Case &h57
+				c = &h1E86
+			Case &h58
+				c = &h1E8A
+			Case &h59
+				c = &h1E8E
+			Case &h5A
+				c = &h017B
+			Case &h62
+				c = &h1E03
+			Case &h63
+				c = &h010B
+			Case &h64
+				c = &h1E0B
+			Case &h65
+				c = &h0117
+			Case &h66
+				c = &h1E1F
+			Case &h67
+				c = &h0121
+			Case &h68
+				c = &h1E23
+			Case &h6D
+				c = &h1E41
+			Case &h6E
+				c = &h1E45
+			Case &h70
+				c = &h1E57
+			Case &h72
+				c = &h1E59
+			Case &h73
+				c = &h1E61
+			Case &h74
+				c = &h1E6B
+			Case &h77
+				c = &h1E87
+			Case &h78
+				c = &h1E8B
+			Case &h79
+				c = &h1E8F
+			Case &h7A
+				c = &h017C
+			Case &hE2
+				c = Asc(Mid(line, i, 1))
+				i = i + 1
+				Select Case c
+				Case &h53
+					c = &h1E64
+				Case &h73
+					c = &h1E65
+				Case &h41
+					c = &h01E0
+				Case &h61
+					c = &h01E1
+				Case &h53
+					c = &h1E66
+				Case &h73
+					c = &h1E67
+				Case &h53
+					c = &h1E68
+				Case &h73
+					c = &h1E69
+				Case Else
+					c = &h0307
+					i = i - 2
+					x = True
+				End Select
+			Case Else
+				c = &h0307
+				i = i - 1
+				x = True
+			End Select
+		Case &hE8
+			c = Asc(Mid(line, i, 1))
+			i = i + 1
+			Select Case c
+			Case &h41
+				c = &h00C4
+			Case &h45
+				c = &h00CB
+			Case &h48
+				c = &h1E26
+			Case &h49
+				c = &h00CF
+			Case &h4F
+				c = &h00D6
+			Case &h55
+				c = &h00DC
+			Case &h57
+				c = &h1E84
+			Case &h58
+				c = &h1E8C
+			Case &h59
+				c = &h0178
+			Case &h61
+				c = &h00E4
+			Case &h65
+				c = &h00EB
+			Case &h68
+				c = &h1E27
+			Case &h69
+				c = &h00EF
+			Case &h6F
+				c = &h00F6
+			Case &h74
+				c = &h1E97
+			Case &h75
+				c = &h00FC
+			Case &h77
+				c = &h1E85
+			Case &h78
+				c = &h1E8D
+			Case &h79
+				c = &h00FF
+			Case &hE1
+				c = Asc(Mid(line, i, 1))
+				i = i + 1
+				Select Case c
+				Case &h55
+					c = &h01DB
+				Case &h75
+					c = &h01DC
+				Case &h49
+					c = &h1E2E
+				Case &h55
+					c = &h01D7
+				Case &h69
+					c = &h1E2F
+				Case &h75
+					c = &h01D8
+				Case &h4F
+					c = &h1E4E
+				Case &h6F
+					c = &h1E4F
+				Case &h41
+					c = &h01DE
+				Case &h55
+					c = &h1E7A
+				Case &h61
+					c = &h01DF
+				Case &h75
+					c = &h1E7B
+				Case &h55
+					c = &h01D9
+				Case &h75
+					c = &h01DA
+				Case Else
+					c = &h0308
+					i = i - 2
+					x = True
+				End Select
+			Case Else
+				c = &h0308
+				i = i - 1
+				x = True
+			End Select
+		Case &hE9
+			c = Asc(Mid(line, i, 1))
+			i = i + 1
+			Select Case c
+			Case &h41
+				c = &h01CD
+			Case &h43
+				c = &h010C
+			Case &h44
+				c = &h010E
+			Case &h45
+				c = &h011A
+			Case &h47
+				c = &h01E6
+			Case &h49
+				c = &h01CF
+			Case &h4B
+				c = &h01E8
+			Case &h4C
+				c = &h013D
+			Case &h4E
+				c = &h0147
+			Case &h4F
+				c = &h01D1
+			Case &h52
+				c = &h0158
+			Case &h53
+				c = &h0160
+			Case &h54
+				c = &h0164
+			Case &h55
+				c = &h01D3
+			Case &h5A
+				c = &h017D
+			Case &h61
+				c = &h01CE
+			Case &h63
+				c = &h010D
+			Case &h64
+				c = &h010F
+			Case &h65
+				c = &h011B
+			Case &h67
+				c = &h01E7
+			Case &h69
+				c = &h01D0
+			Case &h6A
+				c = &h01F0
+			Case &h6B
+				c = &h01E9
+			Case &h6C
+				c = &h013E
+			Case &h6E
+				c = &h0148
+			Case &h6F
+				c = &h01D2
+			Case &h72
+				c = &h0159
+			Case &h73
+				c = &h0161
+			Case &h74
+				c = &h0165
+			Case &h75
+				c = &h01D4
+			Case &h7A
+				c = &h017E
+			Case &hE7
+				c = Asc(Mid(line, i, 1))
+				i = i + 1
+				Select Case c
+				Case &h53
+					c = &h1E66
+				Case &h73
+					c = &h1E67
+				Case &h55
+					c = &h01D9
+				Case &h75
+					c = &h01DA
+				Case Else
+					c = &h030C
+					i = i - 2
+					x = True
+				End Select
+			Case Else
+				c = &h030C
+				i = i - 1
+				x = True
+			End Select
+		Case &hEA
+			c = Asc(Mid(line, i, 1))
+			i = i + 1
+			Select Case c
+			Case &h41
+				c = &h00C5
+			Case &h55
+				c = &h016E
+			Case &h61
+				c = &h00E5
+			Case &h75
+				c = &h016F
+			Case &h77
+				c = &h1E98
+			Case &h79
+				c = &h1E99
+			Case &hE2
+				c = Asc(Mid(line, i, 1))
+				i = i + 1
+				Select Case c
+				Case &h41
+					c = &h01FA
+				Case &h61
+					c = &h01FB
+				Case Else
+					c = &h030A
+					i = i - 2
+					x = True
+				End Select
+			Case Else
+				c = &h030A
+				i = i - 1
+				x = True
+			End Select
+		Case &hEB
+			c = &hFE20
+			x = True
+		Case &hEC
+			c = &hFE21
+			x = True
+		Case &hED
+			c = &h0315
+			x = True
+		Case &hEE
+			c = Asc(Mid(line, i, 1))
+			i = i + 1
+			Select Case c
+			Case &h4F
+				c = &h0150
+			Case &h55
+				c = &h0170
+			Case &h6F
+				c = &h0151
+			Case &h75
+				c = &h0171
+			Case Else
+				c = &h030B
+				i = i - 1
+				x = True
+			End Select
+		Case &hEF
+			c = &h0310
+			x = True
+		Case &hF0
+			c = Asc(Mid(line, i, 1))
+			i = i + 1
+			Select Case c
+			Case &h43
+				c = &h00C7
+			Case &h44
+				c = &h1E10
+			Case &h47
+				c = &h0122
+			Case &h48
+				c = &h1E28
+			Case &h4B
+				c = &h0136
+			Case &h4C
+				c = &h013B
+			Case &h4E
+				c = &h0145
+			Case &h52
+				c = &h0156
+			Case &h53
+				c = &h015E
+			Case &h54
+				c = &h0162
+			Case &h63
+				c = &h00E7
+			Case &h64
+				c = &h1E11
+			Case &h67
+				c = &h0123
+			Case &h68
+				c = &h1E29
+			Case &h6B
+				c = &h0137
+			Case &h6C
+				c = &h013C
+			Case &h6E
+				c = &h0146
+			Case &h72
+				c = &h0157
+			Case &h73
+				c = &h015F
+			Case &h74
+				c = &h0163
+			Case &hE2
+				c = Asc(Mid(line, i, 1))
+				i = i + 1
+				Select Case c
+				Case &h43
+					c = &h1E08
+				Case &h63
+					c = &h1E09
+				Case &h45
+					c = &h1E1C
+				Case &h65
+					c = &h1E1D
+				Case Else
+					c = &h0327
+					i = i - 2
+					x = True
+				End Select
+			Case Else
+				c = &h0327
+				i = i - 1
+				x = True
+			End Select
+		Case &hF1
+			c = Asc(Mid(line, i, 1))
+			i = i + 1
+			Select Case c
+			Case &h41
+				c = &h0104
+			Case &h45
+				c = &h0118
+			Case &h49
+				c = &h012E
+			Case &h4F
+				c = &h01EA
+			Case &h55
+				c = &h0172
+			Case &h61
+				c = &h0105
+			Case &h65
+				c = &h0119
+			Case &h69
+				c = &h012F
+			Case &h6F
+				c = &h01EB
+			Case &h75
+				c = &h0173
+			Case &hE5
+				c = Asc(Mid(line, i, 1))
+				i = i + 1
+				Select Case c
+				Case &h4F
+					c = &h01EC
+				Case &h6F
+					c = &h01ED
+				Case Else
+					c = &h0328
+					i = i - 2
+					x = True
+				End Select
+			Case Else
+				c = &h0328
+				i = i - 1
+				x = True
+			End Select
+		Case &hF2
+			c = Asc(Mid(line, i, 1))
+			i = i + 1
+			Select Case c
+			Case &h41
+				c = &h1EA0
+			Case &h42
+				c = &h1E04
+			Case &h44
+				c = &h1E0C
+			Case &h45
+				c = &h1EB8
+			Case &h48
+				c = &h1E24
+			Case &h49
+				c = &h1ECA
+			Case &h4B
+				c = &h1E32
+			Case &h4C
+				c = &h1E36
+			Case &h4D
+				c = &h1E42
+			Case &h4E
+				c = &h1E46
+			Case &h4F
+				c = &h1ECC
+			Case &h52
+				c = &h1E5A
+			Case &h53
+				c = &h1E62
+			Case &h54
+				c = &h1E6C
+			Case &h55
+				c = &h1EE4
+			Case &h56
+				c = &h1E7E
+			Case &h57
+				c = &h1E88
+			Case &h59
+				c = &h1EF4
+			Case &h5A
+				c = &h1E92
+			Case &h61
+				c = &h1EA1
+			Case &h62
+				c = &h1E05
+			Case &h64
+				c = &h1E0D
+			Case &h65
+				c = &h1EB9
+			Case &h68
+				c = &h1E25
+			Case &h69
+				c = &h1ECB
+			Case &h6B
+				c = &h1E33
+			Case &h6C
+				c = &h1E37
+			Case &h6D
+				c = &h1E43
+			Case &h6E
+				c = &h1E47
+			Case &h6F
+				c = &h1ECD
+			Case &h72
+				c = &h1E5B
+			Case &h73
+				c = &h1E63
+			Case &h74
+				c = &h1E6D
+			Case &h75
+				c = &h1EE5
+			Case &h76
+				c = &h1E7F
+			Case &h77
+				c = &h1E89
+			Case &h79
+				c = &h1EF5
+			Case &h7A
+				c = &h1E93
+			Case &hE3
+				c = Asc(Mid(line, i, 1))
+				i = i + 1
+				Select Case c
+				Case &h41
+					c = &h1EAC
+				Case &h45
+					c = &h1EC6
+				Case &h4F
+					c = &h1ED8
+				Case &h61
+					c = &h1EAD
+				Case &h65
+					c = &h1EC7
+				Case &h6F
+					c = &h1ED9
+				Case &h4C
+					c = &h1E38
+				Case &h52
+					c = &h1E5C
+				Case &h6C
+					c = &h1E39
+				Case &h72
+					c = &h1E5D
+				Case &h41
+					c = &h1EB6
+				Case &h61
+					c = &h1EB7
+				Case &h53
+					c = &h1E68
+				Case &h73
+					c = &h1E69
+				Case Else
+					c = &h0323
+					i = i - 2
+					x = True
+				End Select
+			Case Else
+				c = &h0323
+				i = i - 1
+				x = True
+			End Select
+		Case &hF3
+			c = Asc(Mid(line, i, 1))
+			i = i + 1
+			Select Case c
+			Case &h55
+				c = &h1E72
+			Case &h75
+				c = &h1E73
+			Case Else
+				c = &h0324
+				i = i - 1
+				x = True
+			End Select
+		Case &hF4
+			c = Asc(Mid(line, i, 1))
+			i = i + 1
+			Select Case c
+			Case &h41
+				c = &h1E00
+			Case &h61
+				c = &h1E01
+			Case Else
+				c = &h0325
+				i = i - 1
+				x = True
+			End Select
+		Case &hF5
+			c = &h0333
+			x = True
+		Case &hF6
+			c = Asc(Mid(line, i, 1))
+			i = i + 1
+			Select Case c
+			Case &h42
+				c = &h1E06
+			Case &h44
+				c = &h1E0E
+			Case &h4B
+				c = &h1E34
+			Case &h4C
+				c = &h1E3A
+			Case &h4E
+				c = &h1E48
+			Case &h52
+				c = &h1E5E
+			Case &h54
+				c = &h1E6E
+			Case &h5A
+				c = &h1E94
+			Case &h62
+				c = &h1E07
+			Case &h64
+				c = &h1E0F
+			Case &h68
+				c = &h1E96
+			Case &h6B
+				c = &h1E35
+			Case &h6C
+				c = &h1E3B
+			Case &h6E
+				c = &h1E49
+			Case &h72
+				c = &h1E5F
+			Case &h74
+				c = &h1E6F
+			Case &h7A
+				c = &h1E95
+			Case Else
+				c = &h0332
+				i = i - 1
+				x = True
+			End Select
+		Case &hF7
+			c = &h0326
+			x = True
+		Case &hF8
+			c = &h031C
+			x = True
+		Case &hF9
+			c = Asc(Mid(line, i, 1))
+			i = i + 1
+			Select Case c
+			Case &h48
+				c = &h1E2A
+			Case &h68
+				c = &h1E2B
+			Case Else
+				c = &h032E
+				i = i - 1
+				x = True
+			End Select
+		Case &hFA
+			c = &hFE22
+			x = True
+		Case &hFB
+			c = &hFE23
+			x = True
+		Case &hFE
+			c = &h0313
+			x = True
+		End Select
+		' TODO: What if there are several combining characters in sequence?
+		If x Then
+			s = s & Mid(line, i, 1)
+			i = i + 1
+		End If
+		s = s & ChrW(c)
+	WEnd
+	DecodeANSEL = s
+End Function
+
+Function DecodeUTF8(line)
+	Dim c, i, n, u, x, s
+	i = 1
+	n = Len(line)
+	While i <= n
+		c = Asc(Mid(line, i, 1))
+		i = i + 1
+		If c <= &h7F& Then
+			u = c
+			x = 0
+		ElseIf c <= &hBF& Then
+			u = &hFFFD&
+			x = 0
+		ElseIf c <= &hDF& Then
+            u = c And &h1F&
+			x = 1
+		ElseIf c <= &hEF& Then
+            u = c And &h0F&
+            x = 2
+		ElseIf c <= &hF7& Then
+            u = c And &h07&
+            x = 3
+		Else
+			u = &hFFFD&
+			x = 0
+		End If
+		While x <> 0
+			u = u * &h40&
+			c = Asc(Mid(line, i, 1))
+			i = i + 1
+			u = u + (c And &h3F&)
+			x = x - 1
+		WEnd
+		If u >= &hD800& And u <= &hDFFF& Or u > &h10FFFF& Then
+			u = &hFFFD&
+		End If
+        If u <= &hFFFF& Then
+			s = s & ChrW(u)
+		Else
+			u = u - &h10000&
+			s = s & ChrW((u \ &h400&) + &hD800&) & ChrW((u And &h3FF&) + &hDC00&)
+		End If
+	WEnd
+	DecodeUTF8 = s
+End Function
+
+Function EncodeUTF8(line)
+	Dim c, i, n, u, s
+	i = 1
+	n = Len(line)
+	s = ""
+	u = 0
+	While i <= n
+		c = AscW(Mid(line, i, 1)) And &hFFFF&
+		i = i + 1
+		If c >= &hD800& And c <= &hDBFF& Then
+			If u <> 0 Then Err.Raise vbObjectError, "EncodeUTF8", "Misplaced UTF-16 surrogate"
+			u = c
+		ElseIf c >= &hDC00& And c <= &hDFFF& Then
+			If u = 0 Then Err.Raise vbObjectError, "EncodeUTF8", "Misplaced UTF-16 surrogate"
+			c = (c And &h3FF& Or ((u And &h3FF&) * &h400&)) + &h10000&
+			u = 0
+		End If
+		If u = 0 Then
+			If c < &h80& Then
+				s = s & Chr(c)
+			ElseIf c < &h800& Then
+				s = s & Chr(c \ &h40& Or &hC0&) & Chr(c And &h3F& Or &h80&)
+			ElseIf c < &h10000& Then
+				s = s & Chr(c \ &h1000& Or &hE0&) & Chr(c \ &h40& And &h3F& Or &h80&) & Chr(c And &h3F& Or &h80&)
+			Else
+				s = s & Chr(c \ &h40000& Or &hF0&) & Chr(c \ &h1000 And &h3F& Or &h80&) & Chr(c \ &h40& And &h3F& Or &h80&) & Chr(c And &h3F& Or &h80&) 
+			End If
+		End If
+	WEnd
+	If u <> 0 Then Err.Raise vbObjectError, "EncodeUTF8", "Misplaced UTF-16 surrogate"
+	EncodeUTF8 = s
+End Function
+
+Function CollapseSpace(line)
+	' Could use a RegExp object instead
+	CollapseSpace = Replace(Replace(Join(Split(line), vbCrLf), vbLf & vbCr, ""), vbCrLf, " ")
+End Function
+
+Class Reader
+
+	Public TextStream
+	Private Context(), Decode
+
+	Function ReadLine
+		Dim line, index
+		line = TextStream.ReadLine
+		If IsEmpty(Decode) Then
+			If Left(line, 3) = Chr(&hEF) & Chr(&hBB) & Chr(&hBF) Then
+				line = Mid(line, 4)
+				Set Decode = GetRef("DecodeUTF8")
+			Else
+				Set Decode = Nothing
+			End If
+		End If
+		line = Trim(Replace(line, vbTab, " "))
+		If line <> "" Then
+			index = CInt(Left(line, InStr(line, " ")))
+			ReDim Preserve Context(index)
+			If Decode Is Nothing Then
+				Context(index) = line
+				If index = 1 Then
+					Select Case CollapseSpace(line)
+					Case "1 CHAR UTF-8"
+						Set Decode = GetRef("DecodeUTF8")
+					Case "1 CHAR ANSEL"
+						Set Decode = GetRef("DecodeANSEL")
+					End Select
+				End If
+			Else
+				Context(index) = Decode(line)
+			End If
+			ReadLine = Join(Context, vbNullChar)
+		End If
+	End Function
+
+	Property Get AtEndOfStream
+		AtEndOfStream = TextStream.AtEndOfStream
+	End Property
+
+End Class
+
+Function OpenTextFile(path)
+	Set OpenTextFile = New Reader
+	Set OpenTextFile.TextStream = fso.OpenTextFile(path, 1, False, 0)
+End Function
+
+Class Writer
+
+	Public TextStream
+
+	Function Write(line)
+		TextStream.Write EncodeUTF8(Mid(line, InStrRev(line, vbNullChar) + 1))
+	End Function
+
+End Class
+
+Function CreateTextFile(path)
+	Set CreateTextFile = New Writer
+	Set CreateTextFile.TextStream = fso.CreateTextFile(path)
+	CreateTextFile.TextStream.Write Chr(&hEF) & Chr(&hBB) & Chr(&hBF)
+End Function
+
+</script>
+</scriptlet>

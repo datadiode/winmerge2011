@@ -4,6 +4,7 @@ CodePage = 1252
 [CompareAs.Menu]
 MediaInfo = script:\FileTransforms\MediaInfo.wsc
 XDoc2Txt Distillate = script:\FileTransforms\xdoc2txt.wsc
+GEDCOM = script:\FileTransforms\gedcom.wsc
 Linhas Numeradas = script:\FileTransforms\LinesNumbered.wsc
 Linhas Ordenadas = script:\FileTransforms\LinesSorted.wsc
 XML Ordenado = script:\FileTransforms\msxml.wsc?transform='\FileTransforms\msxml-sort.xslt'
