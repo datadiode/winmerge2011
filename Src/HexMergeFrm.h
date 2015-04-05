@@ -67,7 +67,7 @@ public:
 
 // Implementation
 public:
-	void UpdateDiffItem(CDirFrame *);
+	int UpdateDiffItem(CDirFrame *);
 	bool PromptAndSaveIfNeeded(bool bAllowCancel);
 	CHexMergeView *GetActiveView() const;
 	void UpdateHeaderPath(int pane);
@@ -83,6 +83,7 @@ public:
 
 // Generated message map functions
 public:
+	void OnRefresh();
 	void OnFileSave();
 	void OnFileSaveLeft();
 	void OnFileSaveRight();

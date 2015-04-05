@@ -105,7 +105,7 @@ CHexMergeView *CHexMergeFrame::GetActiveView() const
 /**
  * @brief Update associated diff item
  */
-void CHexMergeFrame::UpdateDiffItem(CDirFrame *pDirDoc)
+int CHexMergeFrame::UpdateDiffItem(CDirFrame *pDirDoc)
 {
 	// If directory compare has results
 	if (pDirDoc)
@@ -121,8 +121,10 @@ void CHexMergeFrame::UpdateDiffItem(CDirFrame *pDirDoc)
 	void *bufferLeft = m_pView[0]->GetBuffer(lengthLeft);
 	int lengthRight = m_pView[1]->GetLength();
 	void *bufferRight = m_pView[1]->GetBuffer(lengthRight);
-	SetLastCompareResult(lengthLeft != lengthRight ||
-		bufferLeft && bufferRight && memcmp(bufferLeft, bufferRight, lengthLeft));
+	int nResult = lengthLeft != lengthRight ||
+		bufferLeft && bufferRight && memcmp(bufferLeft, bufferRight, lengthLeft);
+	SetLastCompareResult(nResult);
+	return nResult;
 }
 
 /**
@@ -219,6 +221,12 @@ bool CHexMergeFrame::PromptAndSaveIfNeeded(bool bAllowCancel)
 bool CHexMergeFrame::SaveModified()
 {
 	return PromptAndSaveIfNeeded(true);
+}
+
+void CHexMergeFrame::OnRefresh()
+{
+	if (UpdateDiffItem(NULL) == 0)
+		AlertFilesIdentical();
 }
 
 /**
@@ -337,13 +345,15 @@ HRESULT CHexMergeFrame::OpenDocs(
 	if (SUCCEEDED(hr = LoadOneFile(0, filelocLeft, bROLeft)) &&
 		SUCCEEDED(hr = LoadOneFile(1, filelocRight, bRORight)))
 	{
-		UpdateDiffItem(0);
+		int nResult = UpdateDiffItem(NULL);
 		// An extra ResizeWindow() on the left view aligns scroll ranges, and
 		// also triggers initial diff coloring by invalidating the client area.
 		m_pView[0]->ResizeWindow();
 		ActivateFrame();
 		UpdateWindow();
-		if (COptionsMgr::Get(OPT_SCROLL_TO_FIRST))
+		if (nResult == 0)
+			AlertFilesIdentical();
+		else if (COptionsMgr::Get(OPT_SCROLL_TO_FIRST))
 			SendMessage(WM_COMMAND, ID_FIRSTDIFF);
 	}
 	else

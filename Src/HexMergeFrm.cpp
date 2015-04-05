@@ -287,6 +287,9 @@ LRESULT CHexMergeFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 	case ID_ALL_RIGHT:
 		OnAllRight();
 		break;
+	case ID_REFRESH:
+		OnRefresh();
+		break;
 	case ID_VIEW_ZOOMIN:
 		OnViewZoom(1);
 		break;
