@@ -639,7 +639,12 @@ bool UniStdioFile::DoOpen(LPCTSTR filename, LPCTSTR mode)
 	m_statusFetched = -1;
 	m_lastError.ClearError();
 	m_fp = _tfopen(filename, mode);
-	return m_fp != 0;
+	if (m_fp == 0)
+	{
+		LastErrorCustom(_tcserror(errno));
+		return false;
+	}
+	return true;
 }
 
 /** @brief Write BOM (byte order mark) if Unicode file */
@@ -711,5 +716,10 @@ HRESULT STDMETHODCALLTYPE UniStdioFile::Write(const void *pv, ULONG cb, ULONG *p
 	m_filesize.int64 += cb;
 	if (pcbWritten)
 		*pcbWritten = cb;
-	return ferror(m_fp) == 0 ? S_OK : E_FAIL;
+	if (int e = ferror(m_fp))
+	{
+		LastErrorCustom(_tcserror(e));
+		return E_FAIL;
+	}
+	return S_OK;
 }
