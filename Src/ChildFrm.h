@@ -202,9 +202,6 @@ public:
 	CMergeDiffDetailView *GetRightDetailView() const { return m_pDetailView[1]; }
 	CMergeDiffDetailView *GetDetailView(int pane) const { return m_pDetailView[pane]; }
 
-	const FileTextEncoding & GetEncoding(int file) const
-			{ return m_ptBuf[file]->getEncoding(); }
-
 	void SetSyncPoint();
 	void ClearSyncPoint();
 	void ClearSyncPoints();
