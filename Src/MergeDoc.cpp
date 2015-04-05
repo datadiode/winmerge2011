@@ -620,63 +620,20 @@ void CChildFrame::FlagMovedLines(MovedLines *pMovedLines,
 void CChildFrame::ShowRescanError(int nRescanResult, BOOL bIdentical)
 {
 	// Rescan was suppressed, there is no sensible status
-	if (nRescanResult == RESCAN_SUPPRESSED)
-		return;
-
-	String s;
-
-	if (nRescanResult == RESCAN_FILE_ERR)
+	switch (nRescanResult)
 	{
-		s = LanguageSelect.LoadString(IDS_FILEERROR);
-		LogErrorString(s.c_str());
-		theApp.DoMessageBox(s.c_str(), MB_ICONSTOP);
+	case RESCAN_SUPPRESSED:
+		return;
+	case RESCAN_FILE_ERR:
+		LanguageSelect.MsgBox(IDS_FILEERROR, MB_ICONSTOP);
+		return;
+	case RESCAN_TEMP_ERR:
+		LanguageSelect.MsgBox(IDS_TEMP_FILEERROR, MB_ICONSTOP);
 		return;
 	}
-
-	if (nRescanResult == RESCAN_TEMP_ERR)
-	{
-		s = LanguageSelect.LoadString(IDS_TEMP_FILEERROR);
-		LogErrorString(s.c_str());
-		theApp.DoMessageBox(s.c_str(), MB_ICONSTOP);
-		return;
-	}
-
 	// Files are not binaries, but they are identical
 	if (bIdentical)
-	{
-		if (!m_strPath[0].empty() && !m_strPath[1].empty() && m_strPath[0] == m_strPath[1])
-		{
-			// compare file to itself, a custom message so user may hide the message in this case only
-			LanguageSelect.MsgBox(IDS_FILE_TO_ITSELF, MB_ICONINFORMATION | MB_DONT_DISPLAY_AGAIN);
-		}
-		else
-		{
-			UINT nFlags = MB_ICONINFORMATION | MB_DONT_DISPLAY_AGAIN;
-
-			if (m_pMDIFrame->m_bExitIfNoDiff == MergeCmdLineInfo::Exit)
-			{
-				// Show the "files are identical" for basic "exit no diff" flag
-				// If user don't want to see the message one uses the quiet version
-				// of the "exit no diff".
-				nFlags &= ~MB_DONT_DISPLAY_AGAIN;
-			}
-
-			if (m_pMDIFrame->m_bExitIfNoDiff != MergeCmdLineInfo::ExitQuiet)
-				LanguageSelect.MsgBox(IDS_FILESSAME, nFlags);
-
-			// Exit application if files are identical.
-			if (m_pMDIFrame->m_bExitIfNoDiff == MergeCmdLineInfo::Exit ||
-				m_pMDIFrame->m_bExitIfNoDiff == MergeCmdLineInfo::ExitQuiet)
-			{
-				m_pMDIFrame->PostMessage(WM_CLOSE);
-			}
-		}
-	}
-}
-
-bool CChildFrame::Undo()
-{
-	return false;
+		AlertFilesIdentical();
 }
 
 /**

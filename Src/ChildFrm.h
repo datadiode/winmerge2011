@@ -178,7 +178,6 @@ public:
 	int Rescan2(bool &bIdentical);
 	void ShowRescanError(int nRescanResult, BOOL bIdentical);
 	void AddUndoAction(UINT nBegin, UINT nEnd, UINT nDiff, int nBlanks, BOOL bInsert, CMergeEditView *pList);
-	bool Undo();
 	void CopyAllList(int srcPane, int dstPane);
 	void CopyMultipleList(int srcPane, int dstPane, int firstDiff, int lastDiff);
 	bool SanityCheckDiff(const DIFFRANGE *) const;
