@@ -182,6 +182,7 @@ protected:
 		ASSERT(m_nBufferType[0] == BUFFER_NORMAL);
 		ASSERT(m_nBufferType[1] == BUFFER_NORMAL);
 	}
+	void AlertFilesIdentical() const;
 public:
 	void DirDocClosing(CDirFrame *pDirDoc)
 	{
