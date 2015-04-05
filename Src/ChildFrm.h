@@ -173,7 +173,7 @@ public:
 	void UpdateHeaderActivity(int pane, bool bActivate);
 	void RefreshOptions();
 	void OpenDocs(FileLocation &, FileLocation &, bool bROLeft, bool bRORight);
-	void RescanIfNeeded(float timeOutInSecond);
+	void RescanIfNeeded(DWORD timeout);
 	int Rescan(bool &bIdentical, bool bForced = false);
 	int Rescan2(bool &bIdentical);
 	void ShowRescanError(int nRescanResult, BOOL bIdentical);

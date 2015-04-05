@@ -724,7 +724,7 @@ void CMergeEditView::OnTimer(UINT_PTR nIDEvent)
 	if (nIDEvent == IDT_RESCAN)
 	{
 		KillTimer(IDT_RESCAN);
-		m_pDocument->RescanIfNeeded(RESCAN_TIMEOUT / 1000);
+		m_pDocument->RescanIfNeeded(RESCAN_TIMEOUT);
 	}
 }
 

@@ -1749,13 +1749,13 @@ bool CChildFrame::PromptAndSaveIfNeeded(bool bAllowCancel)
 }
 
 /** Rescan only if we did not Rescan during the last timeOutInSecond seconds*/
-void CChildFrame::RescanIfNeeded(float timeOutInSecond)
+void CChildFrame::RescanIfNeeded(DWORD timeout)
 {
 	// if we did not rescan during the request timeOut, Rescan
 	// else we did Rescan after the request, so do nothing
 	FileTime now;
 	GetSystemTimeAsFileTime(&now);
-	if ((now.castTo<UINT64>() - m_LastRescan.castTo<UINT64>()) >= timeOutInSecond * FileTime::TicksPerSecond)
+	if ((now.castTo<UINT64>() - m_LastRescan.castTo<UINT64>()) >= timeout * (FileTime::TicksPerSecond / 1000))
 		// (laoran 08-01-2003) maybe should be FlushAndRescan(TRUE) ??
 		FlushAndRescan();
 }
