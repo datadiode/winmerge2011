@@ -231,7 +231,7 @@ void CChildFrame::Computelinediff(CCrystalTextView *pView1, CCrystalTextView *pV
  * This is used by algorithm for line diff coloring
  * (Line diff coloring is distinct from the selection highlight code)
  */
-void CChildFrame::GetWordDiffArray(int nLineIndex, vector<wdiff> &worddiffs)
+void CChildFrame::GetWordDiffArray(int nLineIndex, vector<wdiff> &worddiffs) const
 {
 	if (nLineIndex >= m_pView[0]->GetLineCount())
 		return;
