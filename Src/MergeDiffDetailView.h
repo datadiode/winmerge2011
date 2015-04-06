@@ -22,7 +22,7 @@
 class CMergeDiffDetailView : public CGhostTextView
 {
 public:
-	CMergeDiffDetailView(CChildFrame *, int);           // protected constructor used by dynamic creation
+	CMergeDiffDetailView(HWindow *, CChildFrame *, int);
 protected:
 	/// first line of diff (first displayable line)
 	int m_lineBegin;

@@ -191,8 +191,6 @@ public:
 	void SetEditedAfterRescan(int nBuffer);
 
 	void SetUnpacker(PackingInfo *);
-	void SetMergeViews(CMergeEditView * pLeft, CMergeEditView * pRight);
-	void SetMergeDetailViews(CMergeDiffDetailView * pLeft, CMergeDiffDetailView * pRight);
 	void SwapFiles();
 
 	CMergeEditView *GetLeftView() const { return m_pView[0]; }

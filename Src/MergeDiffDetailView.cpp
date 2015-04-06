@@ -25,9 +25,10 @@ using std::vector;
 /**
  * @brief Constructor.
  */
-CMergeDiffDetailView::CMergeDiffDetailView(CChildFrame *pDocument, int nThisPane)
+CMergeDiffDetailView::CMergeDiffDetailView(HWindow *pWnd, CChildFrame *pDocument, int nThisPane)
 : CGhostTextView(pDocument, nThisPane, sizeof *this)
 {
+	SubclassWindow(pWnd);
 }
 
 CMergeDiffDetailView::~CMergeDiffDetailView()

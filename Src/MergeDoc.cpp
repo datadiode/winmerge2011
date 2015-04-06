@@ -1681,29 +1681,6 @@ void CChildFrame::RescanIfNeeded(DWORD timeout)
 }
 
 /**
- * @brief We have two child views (left & right), so we keep pointers directly
- * at them (the MFC view list doesn't have them both)
- */
-void CChildFrame::SetMergeViews(CMergeEditView * pLeft, CMergeEditView * pRight)
-{
-	ASSERT(pLeft && !m_pView[0]);
-	m_pView[0] = pLeft;
-	ASSERT(pRight && !m_pView[1]);
-	m_pView[1] = pRight;
-}
-
-/**
- * @brief Someone is giving us pointers to our detail views
- */
-void CChildFrame::SetMergeDetailViews(CMergeDiffDetailView * pLeft, CMergeDiffDetailView * pRight)
-{
-	ASSERT(pLeft && !m_pDetailView[0]);
-	m_pDetailView[0] = pLeft;
-	ASSERT(pRight && !m_pDetailView[1]);
-	m_pDetailView[1] = pRight;
-}
-
-/**
  * @brief Loads file to buffer and shows load-errors
  * @param [in] sFileName File to open
  * @param [in] nBuffer Index (0-based) of buffer to load

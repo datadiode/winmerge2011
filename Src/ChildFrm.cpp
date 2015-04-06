@@ -893,25 +893,18 @@ void CChildFrame::CreateClient()
 	const int cyScroll = GetSystemMetrics(SM_CYHSCROLL);
 	const int cyClient = (40 - cyScroll) / 2;
 
-	CMergeDiffDetailView *pLeftDetail = new CMergeDiffDetailView(this, 0);
-	pLeftDetail->SubclassWindow(HWindow::CreateEx(
+	m_pDetailView[0] = new CMergeDiffDetailView(HWindow::CreateEx(
 		WS_EX_CLIENTEDGE, WinMergeWindowClass, NULL, WS_CHILD | WS_VISIBLE | WS_VSCROLL,
-		0, 4, 100, cyClient, m_wndDiffViewBar.m_pWnd, 0x1000));
-	CMergeDiffDetailView *pRightDetail = new CMergeDiffDetailView(this, 1);
-	pRightDetail->SubclassWindow(HWindow::CreateEx(
+		0, 4, 100, cyClient, m_wndDiffViewBar.m_pWnd, 0x1000), this, 0);
+	m_pDetailView[1] = new CMergeDiffDetailView(HWindow::CreateEx(
 		WS_EX_CLIENTEDGE, WinMergeWindowClass, NULL, WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_HSCROLL,
-		0, cyClient + 8, 100, cyClient + cyScroll, m_wndDiffViewBar.m_pWnd, 0x1001));
+		0, cyClient + 8, 100, cyClient + cyScroll, m_wndDiffViewBar.m_pWnd, 0x1001), this, 1);
 
 	// Merge frame has a header bar at top
 	m_wndFilePathBar.Create(m_hWnd);
 
-	CMergeEditView *pLeft = CreatePane(0);
-	CMergeEditView *pRight = CreatePane(1);
-	// tell merge doc about these views
-	SetMergeViews(pLeft, pRight);
-
-	// tell merge doc about these views
-	SetMergeDetailViews(pLeftDetail, pRightDetail);
+	m_pView[0] = CreatePane(0);
+	m_pView[1] = CreatePane(1);
 
 	if (int value = COptionsMgr::Get(OPT_SHOW_LOCATIONBAR))
 		m_wndLocationBar.m_uHitTestCode = value < 0 ? HTLEFT : HTRIGHT;
