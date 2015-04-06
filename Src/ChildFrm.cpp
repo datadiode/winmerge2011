@@ -1132,7 +1132,7 @@ void CChildFrame::UpdateSyncPointUI()
 
 void CChildFrame::UpdateSourceTypeUI()
 {
-	if (CCrystalTextView *pTextView = GetActiveTextView())
+	if (CCrystalTextView *pTextView = GetActiveMergeView())
 	{
 		m_pMDIFrame->UpdateSourceTypeUI(pTextView->m_CurSourceDef->type);
 	}
