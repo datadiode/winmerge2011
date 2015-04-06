@@ -34,7 +34,8 @@
 #include "Environment.h"
 #include "DiffContext.h"	// FILE_SAME
 #include "MovedLines.h"
-#include "coretools.h"
+#include "Common/coretools.h"
+#include "Common/defer.h"
 #include "MergeEditView.h"
 #include "MergeDiffDetailView.h"
 #include "LocationView.h"
@@ -354,7 +355,7 @@ int CChildFrame::Rescan(bool &bIdentical, bool bForced)
 
 	if (!bForced)
 	{
-		if (!m_bEnableRescan)
+		if (m_bLockRescan)
 			return RESCAN_SUPPRESSED;
 	}
 
@@ -637,37 +638,6 @@ void CChildFrame::ShowRescanError(int nRescanResult, BOOL bIdentical)
 }
 
 /**
- * @brief An instance of RescanSuppress prevents rescan during its lifetime
- * (or until its Clear method is called, which ends its effect).
- */
-class RescanSuppress
-{
-public:
-	RescanSuppress(CChildFrame & doc) : m_doc(doc)
-	{
-		m_bSuppress = true;
-		m_bPrev = doc.m_bEnableRescan;
-		m_doc.m_bEnableRescan = false;
-	}
-	void Clear() 
-	{
-		if (m_bSuppress)
-		{
-			m_bSuppress = false;
-			m_doc.m_bEnableRescan = m_bPrev;
-		}
-	}
-	~RescanSuppress()
-	{
-		Clear();
-	}
-private:
-	CChildFrame & m_doc;
-	bool m_bPrev;
-	bool m_bSuppress;
-};
-
-/**
  * @brief Copy all diffs from one side to side.
  * @param [in] srcPane Source side from which diff is copied
  * @param [in] dstPane Destination side
@@ -702,28 +672,23 @@ void CChildFrame::CopyMultipleList(int srcPane, int dstPane, int firstDiff, int 
 	if (firstDiff > lastDiff)
 		return;
 	
-	RescanSuppress suppressRescan(*this);
-
 	// Note we don't care about m_nDiffs count to become zero,
 	// because we don't rescan() so it does not change
 
 	bool bGroupWithPrevious = false;
-	if (!ListCopy(srcPane, dstPane, lastDiff, bGroupWithPrevious))
-		return; // sync failure
-
 	// copy from bottom up is more efficient
-	for (int i = lastDiff - 1; i >= firstDiff; --i)
+	for (int i = lastDiff; i >= firstDiff; --i)
 	{
 		if (m_diffList.IsDiffSignificant(i))
 		{
-			// Group merge with previous (merge undo data to one action)
-			bGroupWithPrevious = true;
+			defer::Decrement<BYTE> Decrement = { &++m_bLockRescan };
 			if (!ListCopy(srcPane, dstPane, i, bGroupWithPrevious))
 				return; // sync failure
+			// Group merge with previous (merge undo data to one action)
+			bGroupWithPrevious = true;
 		}
 	}
 
-	suppressRescan.Clear(); // done suppress Rescan
 	FlushAndRescan();
 }
 
@@ -785,15 +750,14 @@ bool CChildFrame::SanityCheckDiff(const DIFFRANGE *pdr) const
 bool CChildFrame::ListCopy(int srcPane, int dstPane, int nDiff /* = -1*/,
 		bool bGroupWithPrevious /*= false*/)
 {
-	// suppress Rescan during this method
-	// (Not only do we not want to rescan a lot of times, but
-	// it will wreck the line status array to rescan as we merge)
-	RescanSuppress suppressRescan(*this);
-
 	int firstDiff, lastDiff;
 	// If diff-number not given, determine it from active view
 	if (nDiff != -1 || (nDiff = GetContextDiff(firstDiff, lastDiff)) != -1)
 	{
+		// suppress Rescan during this method
+		// (Not only do we not want to rescan a lot of times, but
+		// it will wreck the line status array to rescan as we merge)
+		defer::Decrement<BYTE> Decrement = { &++m_bLockRescan };
 		const DIFFRANGE *const pcd = m_diffList.DiffRangeAt(nDiff);
 		CDiffTextBuffer *const sbuf = m_ptBuf[srcPane];
 		CDiffTextBuffer *const dbuf = m_ptBuf[dstPane];
@@ -855,7 +819,6 @@ bool CChildFrame::ListCopy(int srcPane, int dstPane, int nDiff /* = -1*/,
 		sbuf->SetModified(bSrcWasMod);
 	}
 
-	suppressRescan.Clear(); // done suppress Rescan
 	FlushAndRescan();
 	return true;
 }
@@ -1220,7 +1183,7 @@ void CChildFrame::FlushAndRescan(bool bForced)
 		return;
 
 	// Ignore suppressing when forced rescan
-	if (!bForced && !m_bEnableRescan)
+	if (!bForced && m_bLockRescan)
 		return;
 
 	WaitStatusCursor waitstatus(IDS_STATUS_RESCANNING);

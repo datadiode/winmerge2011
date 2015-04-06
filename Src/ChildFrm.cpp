@@ -759,7 +759,6 @@ CChildFrame::CChildFrame(CMainFrame *pMDIFrame, CDirFrame *pDirDoc, CChildFrame 
 , m_wndLocationBar(this, FloatScriptLocationBar)
 , m_wndDiffViewBar(this, FloatScriptDiffViewBar)
 #pragma warning(default:warning_this_used_in_base_member_initializer_list)
-, m_bEnableRescan(true)
 , m_nCurDiff(-1)
 , m_idContextLines(ID_VIEW_CONTEXT_UNLIMITED)
 , m_pInfoUnpacker(new PackingInfo)

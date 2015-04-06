@@ -69,4 +69,18 @@ namespace defer
 			} while (i != 0);
 		}
 	};
+
+	template<typename t, unsigned n = 1>
+	struct Decrement
+	{
+		t *m_rg[n];
+		~Decrement()
+		{
+			unsigned i = n;
+			do
+			{
+				--*m_rg[--i];
+			} while (i != 0);
+		}
+	};
 };

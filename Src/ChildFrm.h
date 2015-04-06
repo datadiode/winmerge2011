@@ -256,14 +256,12 @@ private:
 	bool m_bInitialReadOnly[2]; /**< Left/right doc initial read-only state */
 	bool m_bMergingMode; /**< Merging or Edit mode */
 	bool m_bMixedEol; /**< Does this document have mixed EOL style? */
-	bool m_bEnableRescan; /**< Automatic rescan enabled/disabled */
+	BYTE m_bLockRescan; /**< Automatic rescan enabled/disabled */
 	bool m_bHasSyncPoints;
 	FileTime m_LastRescan; /**< Time of last rescan (for delaying) */ 
 	CDiffWrapper m_diffWrapper;
 	/// information about the file packer/unpacker
 	const std::auto_ptr<PackingInfo> m_pInfoUnpacker;
-// friend access
-	friend class RescanSuppress;
 
 private:
 	void OnReadOnly(int nSide, bool bReadOnly);
