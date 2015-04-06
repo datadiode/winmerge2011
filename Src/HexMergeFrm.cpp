@@ -181,12 +181,12 @@ void CHexMergeFrame::CreateClient()
 	// Merge frame has a header bar at top
 	m_wndFilePathBar.Create(m_hWnd);
 
-	CHexMergeView *pLeft = CreatePane(0);
-	CHexMergeView *pRight = CreatePane(1);
+	m_pView[0] = CreatePane(0);
+	m_pView[1] = CreatePane(1);
 
 	// get the IHexEditorWindow interfaces
-	IHexEditorWindow *pifLeft = pLeft->GetInterface();
-	IHexEditorWindow *pifRight = pRight->GetInterface();
+	IHexEditorWindow *pifLeft = m_pView[0]->GetInterface();
+	IHexEditorWindow *pifRight = m_pView[1]->GetInterface();
 
 	if (pifLeft == NULL || pifLeft->get_interface_version() < HEKSEDIT_INTERFACE_VERSION)
 	{
@@ -200,9 +200,6 @@ void CHexMergeFrame::CreateClient()
 	// adjust a few settings and colors
 	Customize(pifLeft);
 	Customize(pifRight);
-
-	// tell merge doc about these views
-	SetMergeViews(pLeft, pRight);
 }
 
 /**

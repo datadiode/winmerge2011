@@ -38,51 +38,30 @@ class CHexMergeFrame
 {
 public:
 	CHexMergeFrame(CMainFrame *, CDirFrame * = NULL);
-// Operations
-public:
-	virtual FRAMETYPE GetFrameType() const { return FRAME_BINARY; }
 	void RecalcBytesPerLine();
 	void UpdateResources();
-	void SetLastCompareResult(int nResult);
 	BOOL PreTranslateMessage(MSG *);
-
-protected:
-	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
-	template<UINT>
-	LRESULT OnWndMsg(WPARAM, LPARAM);
-// Implementation
-private:
-	virtual ~CHexMergeFrame();
-	void CreateClient();
-	CHexMergeView *CreatePane(int);
-private:
-	static const LONG FloatScript[];
-	static const LONG SplitScript[];
-
-public:	
-	void SetMergeViews(CHexMergeView *pLeft, CHexMergeView *pRight);
-
+	void UpdateCmdUI();
+	HRESULT OpenDocs(const FileLocation &, const FileLocation &, BOOL bROLeft, BOOL bRORight);
 	bool SaveModified();
 	void SetTitle();
 
-// Implementation
-public:
+private:
+	virtual ~CHexMergeFrame();
+	virtual FRAMETYPE GetFrameType() const { return FRAME_BINARY; }
+	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
+	template<UINT>
+	LRESULT OnWndMsg(WPARAM, LPARAM);
+	void CreateClient();
+	CHexMergeView *CreatePane(int);
+	void SetLastCompareResult(int nResult);
 	int UpdateDiffItem(CDirFrame *);
 	bool PromptAndSaveIfNeeded(bool bAllowCancel);
 	CHexMergeView *GetActiveView() const;
 	void UpdateHeaderPath(int pane);
-	void UpdateCmdUI();
-	HRESULT OpenDocs(const FileLocation &, const FileLocation &, BOOL bROLeft, BOOL bRORight);
-private:
 	static void CopySel(CHexMergeView *pViewSrc, CHexMergeView *pViewDst);
 	static void CopyAll(CHexMergeView *pViewSrc, CHexMergeView *pViewDst);
 	HRESULT LoadOneFile(int index, const FileLocation &fileinfo, BOOL readOnly);
-// Implementation data
-public:
-	CHexMergeView *m_pView[MERGE_VIEW_COUNT]; /**< Pointer to left/right view */
-
-// Generated message map functions
-public:
 	void OnRefresh();
 	void OnFileSave();
 	void OnFileSaveLeft();
@@ -94,4 +73,9 @@ public:
 	void OnAllRight();
 	void OnAllLeft();
 	void OnViewZoom(int direction);
+
+// Implementation data
+	static const LONG FloatScript[];
+	static const LONG SplitScript[];
+	CHexMergeView *m_pView[MERGE_VIEW_COUNT]; /**< Pointer to left/right view */
 };

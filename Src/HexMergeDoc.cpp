@@ -405,18 +405,6 @@ void CHexMergeFrame::SetTitle()
 }
 
 /**
- * @brief We have two child views (left & right), so we keep pointers directly
- * at them (the MFC view list doesn't have them both)
- */
-void CHexMergeFrame::SetMergeViews(CHexMergeView * pLeft, CHexMergeView * pRight)
-{
-	ASSERT(pLeft && !m_pView[0]);
-	m_pView[0] = pLeft;
-	ASSERT(pRight && !m_pView[1]);
-	m_pView[1] = pRight;
-}
-
-/**
  * @brief Copy selected bytes from source view to destination view
  * @note Grows destination buffer as appropriate
  */
