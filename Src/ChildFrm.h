@@ -104,7 +104,6 @@ public:
 	STDMETHOD(LimitContext)(long nLines);
 
 	void UpdateResources();
-	void SetLastCompareResult(int nResult);
 	void UpdateCmdUI();
 	void UpdateReadOnlyCmdUI();
 	void UpdateEditCmdUI();
@@ -115,35 +114,70 @@ public:
 	void UpdateMergeStatusUI();
 	void AlignScrollPositions();
 
-// Attributes
+	bool PromptAndSaveIfNeeded(bool bAllowCancel);
+	void FlushAndRescan(bool bForced = false);
+	void RescanIfNeeded(DWORD timeout);
+	void SetCurrentDiff(int nDiff);
+	int GetCurrentDiff() { return m_nCurDiff; }
+	int GetContextDiff(int &firstDiff, int &lastDiff);
+	bool GetMergingMode() const;
+	void SetMergingMode(bool bMergingMode);
+	void SetDetectMovedBlocks(bool bDetectMovedBlocks);
+	bool IsMixedEOL(int nBuffer) const;
+	void ActivateFrame();
+	virtual void RecalcLayout();
+	virtual BOOL PreTranslateMessage(MSG *);
 
+	int GetActiveMergeViewIndexType() const;
+	CGhostTextView *GetActiveTextView() const;
+	CMergeEditView *GetActiveMergeView() const;
+	void UpdateAllViews();
+	void UpdateHeaderPath(int pane);
+	void UpdateHeaderActivity(int pane, bool bActivate);
+	void RefreshOptions();
+	void OpenDocs(FileLocation &, FileLocation &, bool bROLeft, bool bRORight);
+	int RightLineInMovedBlock(int leftLine);
+	int LeftLineInMovedBlock(int rightLine);
+	void SetEditedAfterRescan(int nBuffer);
+
+	void SetUnpacker(PackingInfo *);
+
+	CMergeEditView *GetLeftView() const { return m_pView[0]; }
+	CMergeEditView *GetRightView() const { return m_pView[1]; }
+	CMergeEditView *GetView(int pane) const { return m_pView[pane]; }
+	CMergeDiffDetailView *GetLeftDetailView() const { return m_pDetailView[0]; }
+	CMergeDiffDetailView *GetRightDetailView() const { return m_pDetailView[1]; }
+	CMergeDiffDetailView *GetDetailView(int pane) const { return m_pDetailView[pane]; }
+
+	void GetWordDiffArray(int nLineIndex, std::vector<wdiff> &worddiffs) const;
+
+	bool SaveModified();
+	void SetTitle();
+
+// Attributes
 	CSubFrame m_wndLocationBar;
 	CSubFrame m_wndDiffViewBar;
 	CLocationView m_wndLocationView;
 
 	UINT m_idContextLines;
 
-// Overrides
-public:
-	virtual FRAMETYPE GetFrameType() const { return FRAME_FILE; }
-	void ActivateFrame();
-	virtual void RecalcLayout();
-	virtual BOOL PreTranslateMessage(MSG *);
+	CChildFrame *const m_pOpener;
+	CDiffTextBuffer *m_ptBuf[MERGE_VIEW_COUNT]; /**< Left/Right side text buffer */
 
-// Implementation
+	DiffList m_diffList;
+	UINT m_nTrivialDiffs; /**< Amount of trivial (ignored) diffs */
+	std::vector<FileTextStats> m_pFileTextStats;
+	std::vector<CMergeEditView*> undoTgt;
+	std::vector<CMergeEditView*>::iterator curUndo;
+
 private:
 	void SavePosition();
+	void SetLastCompareResult(int nResult);
 	CMergeEditView *CreatePane(int iPane);
 	void CreateClient();
 	virtual ~CChildFrame();
-
-private:
-	static const LONG FloatScript[];
-	static const LONG SplitScript[];
-	static const LONG FloatScriptLocationBar[];
-	static const LONG FloatScriptDiffViewBar[];
+	virtual FRAMETYPE GetFrameType() const { return FRAME_FILE; }
 	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
-
 	template<UINT>
 	LRESULT OnWndMsg(WPARAM, LPARAM);
 
@@ -154,25 +188,11 @@ private:
 		FileRemoved,
 	} IsFileChangedOnDisk(LPCTSTR, DiffFileInfo &, const DiffFileInfo &);
 
-// Attributes
-public:
-	CChildFrame *const m_pOpener;
-	CDiffTextBuffer *m_ptBuf[2]; /**< Left/Right side text buffer */
-	static const int m_nBuffers = 2; /**< Takashi's code is 3-way aware */
+	bool TrySaveAs(String &strPath, int &nLastErrorCode, String &sError,
+		int nBuffer, PackingInfo *pInfoTempUnpacker);
+	bool DoSave(bool &bSaveSuccess, int nBuffer);
+	bool DoSaveAs(int nBuffer);
 
-	DiffList m_diffList;
-	UINT m_nTrivialDiffs; /**< Amount of trivial (ignored) diffs */
-	std::vector<FileTextStats> m_pFileTextStats;
-
-	int GetActiveMergeViewIndexType() const;
-	CGhostTextView *GetActiveTextView() const;
-	CMergeEditView *GetActiveMergeView() const;
-	void UpdateAllViews();
-	void UpdateHeaderPath(int pane);
-	void UpdateHeaderActivity(int pane, bool bActivate);
-	void RefreshOptions();
-	void OpenDocs(FileLocation &, FileLocation &, bool bROLeft, bool bRORight);
-	void RescanIfNeeded(DWORD timeout);
 	int Rescan(bool &bIdentical, bool bForced = false);
 	int Rescan2(bool &bIdentical);
 	void ShowRescanError(int nRescanResult, BOOL bIdentical);
@@ -181,39 +201,10 @@ public:
 	void CopyMultipleList(int srcPane, int dstPane, int firstDiff, int lastDiff);
 	bool SanityCheckDiff(const DIFFRANGE *) const;
 	bool ListCopy(int srcPane, int dstPane, int nDiff = -1, bool bGroupWithPrevious = false);
-	bool TrySaveAs(String &strPath, int &nLastErrorCode, String & sError,
-		int nBuffer, PackingInfo * pInfoTempUnpacker);
-	bool DoSave(bool &bSaveSuccess, int nBuffer);
-	bool DoSaveAs(int nBuffer);
-	int RightLineInMovedBlock(int leftLine);
-	int LeftLineInMovedBlock(int rightLine);
-	void SetEditedAfterRescan(int nBuffer);
-
-	void SetUnpacker(PackingInfo *);
-	void SwapFiles();
-
-	CMergeEditView *GetLeftView() const { return m_pView[0]; }
-	CMergeEditView *GetRightView() const { return m_pView[1]; }
-	CMergeEditView *GetView(int pane) const { return m_pView[pane]; }
-	CMergeDiffDetailView *GetLeftDetailView() const { return m_pDetailView[0]; }
-	CMergeDiffDetailView *GetRightDetailView() const { return m_pDetailView[1]; }
-	CMergeDiffDetailView *GetDetailView(int pane) const { return m_pDetailView[pane]; }
-
-	void SetSyncPoint();
-	void ClearSyncPoint();
-	void ClearSyncPoints();
-	bool HasSyncPoints() const { return m_bHasSyncPoints; }
-	bool IsCursorAtSyncPoint();
-
-	bool SaveModified();
-	void SetTitle();
 
 // Implementation in MergeDocLineDiffs.cpp
-public:
 	typedef enum { BYTEDIFF, WORDDIFF } DIFFLEVEL;
 	void Showlinediff(CCrystalTextView *, CMergeEditView *, DIFFLEVEL);
-	void GetWordDiffArray(int nLineIndex, std::vector<wdiff> &worddiffs) const;
-private:
 	void Computelinediff(CCrystalTextView *, CCrystalTextView *, int, RECT &, RECT &, DIFFLEVEL);
 // End MergeDocLineDiffs.cpp
 
@@ -223,43 +214,13 @@ private:
 
 	void DoPrint();
 	void ReloadDocs();
+	void SwapFiles();
+	void SetSyncPoint();
+	void ClearSyncPoint();
+	void ClearSyncPoints();
+	bool HasSyncPoints() const { return m_bHasSyncPoints; }
+	bool IsCursorAtSyncPoint();
 
-// Implementation
-public:
-	bool PromptAndSaveIfNeeded(bool bAllowCancel);
-	std::vector<CMergeEditView*> undoTgt;
-	std::vector<CMergeEditView*>::iterator curUndo;
-	void FlushAndRescan(bool bForced = false);
-	void SetCurrentDiff(int nDiff);
-	int GetCurrentDiff() { return m_nCurDiff; }
-	int GetContextDiff(int &firstDiff, int &lastDiff);
-	bool GetMergingMode() const;
-	void SetMergingMode(bool bMergingMode);
-	void SetDetectMovedBlocks(bool bDetectMovedBlocks);
-	bool IsMixedEOL(int nBuffer) const;
-
-private:
-// Implementation data
-
-	int m_nCurDiff; /**< Selected diff, 0-based index, -1 if no diff selected */
-	CMergeEditView *m_pView[MERGE_VIEW_COUNT]; /**< Pointer to left/right view */
-	CMergeDiffDetailView *m_pDetailView[2];
-
-	std::vector<DiffFileInfo> m_pSaveFileInfo;
-	std::vector<DiffFileInfo> m_pRescanFileInfo;
-
-	bool m_bEditAfterRescan[2]; /**< Left/right doc edited after rescanning */
-	bool m_bInitialReadOnly[2]; /**< Left/right doc initial read-only state */
-	bool m_bMergingMode; /**< Merging or Edit mode */
-	bool m_bMixedEol; /**< Does this document have mixed EOL style? */
-	BYTE m_bLockRescan; /**< Automatic rescan enabled/disabled */
-	bool m_bHasSyncPoints;
-	FileTime m_LastRescan; /**< Time of last rescan (for delaying) */ 
-	CDiffWrapper m_diffWrapper;
-	/// information about the file packer/unpacker
-	const std::auto_ptr<PackingInfo> m_pInfoUnpacker;
-
-private:
 	void OnReadOnly(int nSide, bool bReadOnly);
 	void OnReadOnly(int r, int w);
 	void OnEditUndo();
@@ -293,4 +254,29 @@ private:
 	FileLoadResult::FILES_RESULT LoadOneFile(int index, bool &readOnly, FileLocation &);
 	FileLoadResult::FILES_RESULT ReloadDoc(int index);
 	FileLoadResult::FILES_RESULT LoadFile(int nBuffer, bool &readOnly, FileLocation &);
+
+// Implementation data
+	static const int m_nBuffers = MERGE_VIEW_COUNT; /**< Takashi's code is 3-way aware */
+	int m_nCurDiff; /**< Selected diff, 0-based index, -1 if no diff selected */
+	CMergeEditView *m_pView[MERGE_VIEW_COUNT]; /**< Pointer to left/right view */
+	CMergeDiffDetailView *m_pDetailView[MERGE_VIEW_COUNT];
+
+	std::vector<DiffFileInfo> m_pSaveFileInfo;
+	std::vector<DiffFileInfo> m_pRescanFileInfo;
+
+	bool m_bEditAfterRescan[MERGE_VIEW_COUNT]; /**< Left/right doc edited after rescanning */
+	bool m_bInitialReadOnly[MERGE_VIEW_COUNT]; /**< Left/right doc initial read-only state */
+	bool m_bMergingMode; /**< Merging or Edit mode */
+	bool m_bMixedEol; /**< Does this document have mixed EOL style? */
+	BYTE m_bLockRescan; /**< Automatic rescan enabled/disabled */
+	bool m_bHasSyncPoints;
+	FileTime m_LastRescan; /**< Time of last rescan (for delaying) */ 
+	CDiffWrapper m_diffWrapper;
+	/// information about the file packer/unpacker
+	const std::auto_ptr<PackingInfo> m_pInfoUnpacker;
+
+	static const LONG FloatScript[];
+	static const LONG SplitScript[];
+	static const LONG FloatScriptLocationBar[];
+	static const LONG FloatScriptDiffViewBar[];
 };
