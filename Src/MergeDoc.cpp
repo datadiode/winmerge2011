@@ -1876,41 +1876,13 @@ void CChildFrame::OpenDocs(
 	m_ptBuf[1]->SetReadOnly(bRORight);
 	m_pView[1]->SetEncodingStatus(filelocRight.encoding.GetName().c_str());
 
-	// Check the EOL sensitivity option (do it before Rescan)
-	if (m_ptBuf[0]->GetCRLFMode() != m_ptBuf[1]->GetCRLFMode() &&
-		!COptionsMgr::Get(OPT_ALLOW_MIXED_EOL) && !m_diffWrapper.bIgnoreEol)
-	{
-		// Options and files not are not compatible :
-		// Sensitive to EOL on, allow mixing EOL off, and files have a different EOL style.
-		// All lines will differ, that is not very interesting and probably not wanted.
-		// Propose to turn off the option 'sensitive to EOL'
-		if (LanguageSelect.MsgBox(IDS_SUGGEST_IGNOREEOL, MB_YESNO | MB_ICONWARNING | MB_DONT_ASK_AGAIN | MB_IGNORE_IF_SILENCED) == IDYES)
-		{
-			m_diffWrapper.bIgnoreEol = true;
-		}
-	}
-
-	int nRescanResult = Rescan(bIdentical);
-
-	// Open filed if rescan succeed and files are not binaries
-	if (nRescanResult != RESCAN_OK)
-	{
-		// CChildFrame::Rescan fails if files do not exist on both sides 
-		// or the really arcane case that the temp files couldn't be created, 
-		// which is too obscure to bother reporting if you can't write to 
-		// your temp directory, doing nothing is graceful enough for that).
-		ShowRescanError(nRescanResult, bIdentical);
-		DestroyFrame();
-		return;
-	}
-
 	// prepare the four views
 	CMergeEditView *const pLeft = GetLeftView();
 	CMergeEditView *const pRight = GetRightView();
 	CMergeDiffDetailView *const pLeftDetail = GetLeftDetailView();
 	CMergeDiffDetailView *const pRightDetail = GetRightDetailView();
 	
-	// set the document types
+	// set the document types (do it before Rescan)
 	// Warning : it is the first thing to do (must be done before UpdateView,
 	// or any function that calls UpdateView, like SelectDiff)
 	// Note: If option enabled, and another side type is not recognized,
@@ -1950,6 +1922,34 @@ void CChildFrame::OpenDocs(
 	{
 		pLeft->SetTextType(bRightTyped);
 		pLeftDetail->SetTextType(bRightTyped);
+	}
+
+	// Check the EOL sensitivity option (do it before Rescan)
+	if (m_ptBuf[0]->GetCRLFMode() != m_ptBuf[1]->GetCRLFMode() &&
+		!COptionsMgr::Get(OPT_ALLOW_MIXED_EOL) && !m_diffWrapper.bIgnoreEol)
+	{
+		// Options and files not are not compatible :
+		// Sensitive to EOL on, allow mixing EOL off, and files have a different EOL style.
+		// All lines will differ, that is not very interesting and probably not wanted.
+		// Propose to turn off the option 'sensitive to EOL'
+		if (LanguageSelect.MsgBox(IDS_SUGGEST_IGNOREEOL, MB_YESNO | MB_ICONWARNING | MB_DONT_ASK_AGAIN | MB_IGNORE_IF_SILENCED) == IDYES)
+		{
+			m_diffWrapper.bIgnoreEol = true;
+		}
+	}
+
+	int nRescanResult = Rescan(bIdentical);
+
+	// Open filed if rescan succeed and files are not binaries
+	if (nRescanResult != RESCAN_OK)
+	{
+		// CChildFrame::Rescan fails if files do not exist on both sides 
+		// or the really arcane case that the temp files couldn't be created, 
+		// which is too obscure to bother reporting if you can't write to 
+		// your temp directory, doing nothing is graceful enough for that).
+		ShowRescanError(nRescanResult, bIdentical);
+		DestroyFrame();
+		return;
 	}
 
 	pLeft->DocumentsLoaded();
