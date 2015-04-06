@@ -147,13 +147,12 @@ private:
 	template<UINT>
 	LRESULT OnWndMsg(WPARAM, LPARAM);
 
-public:
-	enum FileChange
+	static enum FileChange
 	{
 		FileNoChange,
 		FileChanged,
 		FileRemoved,
-	};
+	} IsFileChangedOnDisk(LPCTSTR, DiffFileInfo &, const DiffFileInfo &);
 
 // Attributes
 public:
@@ -227,7 +226,6 @@ private:
 
 // Implementation
 public:
-	FileChange IsFileChangedOnDisk(LPCTSTR, DiffFileInfo &, const DiffFileInfo &);
 	bool PromptAndSaveIfNeeded(bool bAllowCancel);
 	std::vector<CMergeEditView*> undoTgt;
 	std::vector<CMergeEditView*>::iterator curUndo;
