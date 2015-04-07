@@ -2033,6 +2033,8 @@ void CChildFrame::RefreshOptions()
 	// Refresh view options
 	m_pView[0]->RefreshOptions();
 	m_pView[1]->RefreshOptions();
+	m_pDetailView[0]->RefreshOptions();
+	m_pDetailView[1]->RefreshOptions();
 }
 
 /**

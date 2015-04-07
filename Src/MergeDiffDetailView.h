@@ -39,7 +39,7 @@ private:
 	bool EnsureInDiff(POINT &);
 
 public:
-	void UpdateResources();
+	void RefreshOptions();
 	void OnUpdateCaret(bool bShowHide);
 	void DocumentsLoaded();
 

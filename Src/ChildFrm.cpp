@@ -1190,8 +1190,8 @@ void CChildFrame::UpdateResources()
 	}
 	UpdateHeaderPath(0);
 	UpdateHeaderPath(1);
-	GetLeftView()->UpdateResources();
-	GetRightView()->UpdateResources();
+	m_pView[0]->UpdateResources();
+	m_pView[1]->UpdateResources();
 	UpdateMergeStatusUI();
 	OnUpdateStatusNum();
 }

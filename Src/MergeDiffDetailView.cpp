@@ -54,10 +54,16 @@ LRESULT CMergeDiffDetailView::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam
 // CMergeDiffDetailView message handlers
 
 /**
- * @brief Update any resources necessary after a GUI language change
+ * @brief Reload options.
  */
-void CMergeDiffDetailView::UpdateResources()
+void CMergeDiffDetailView::RefreshOptions()
 {
+	SetTabSize(COptionsMgr::Get(OPT_TAB_SIZE),
+		COptionsMgr::Get(OPT_SEPARATE_COMBINING_CHARS));
+	SetViewTabs(COptionsMgr::Get(OPT_VIEW_WHITESPACE));
+	bool bMixedEOL = COptionsMgr::Get(OPT_ALLOW_MIXED_EOL) ||
+		m_pDocument->IsMixedEOL(m_nThisPane);
+	SetViewEols(COptionsMgr::Get(OPT_VIEW_WHITESPACE), bMixedEOL);
 }
 
 /// virtual, ensure we remain in diff
@@ -430,12 +436,7 @@ void CMergeDiffDetailView::OnUpdateCaret(bool bShowHide)
  */
 void CMergeDiffDetailView::DocumentsLoaded()
 {
-	SetTabSize(COptionsMgr::Get(OPT_TAB_SIZE),
-		COptionsMgr::Get(OPT_SEPARATE_COMBINING_CHARS));
-	SetViewTabs(COptionsMgr::Get(OPT_VIEW_WHITESPACE));
-	bool bMixedEOL = COptionsMgr::Get(OPT_ALLOW_MIXED_EOL) ||
-		m_pDocument->IsMixedEOL(m_nThisPane);
-	SetViewEols(COptionsMgr::Get(OPT_VIEW_WHITESPACE), bMixedEOL);
+	RefreshOptions();
 	SetWordWrapping(FALSE);
 	SetFont(theApp.m_pMainWnd->m_lfDiff);
 }
