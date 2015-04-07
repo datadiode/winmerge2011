@@ -45,7 +45,7 @@ Dim fso
 Set fso = CreateObject("Scripting.FileSystemObject")
 
 Function DecodeANSEL(line)
-	Dim s, c, i, n, x
+	Dim s, c, d, i, n, x
 	i = 1
 	n = Len(line)
 	line = line & vbCrLf
@@ -1428,12 +1428,13 @@ Function DecodeANSEL(line)
 			c = &h0313
 			x = True
 		End Select
-		' TODO: What if there are several combining characters in sequence?
 		If x Then
-			s = s & Mid(line, i, 1)
-			i = i + 1
+			' TODO: Ordering of combining characters may be an issue here.
+			d = d & ChrW(c)
+		Else
+			s = s & ChrW(c) & d
+			d = ""
 		End If
-		s = s & ChrW(c)
 	WEnd
 	DecodeANSEL = s
 End Function
@@ -1519,7 +1520,7 @@ End Function
 
 Function CollapseSpace(line)
 	' Could use a RegExp object instead
-	CollapseSpace = Replace(Replace(Join(Split(line), vbCrLf), vbLf & vbCr, ""), vbCrLf, " ")
+	CollapseSpace = Replace(Replace(Replace(line, " ", vbCrLf), vbLf & vbCr, ""), vbCrLf, " ")
 End Function
 
 Class Reader
