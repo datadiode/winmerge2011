@@ -115,6 +115,10 @@ protected:
 	 * certain time from previous rescan.
 	 */
 	bool m_bAutomaticRescan;
+	/**
+	 * Is highlighting of word differences enabled?
+	 */
+	bool m_bWordDiffHighlight;
 
 	CShellContextMenu *const m_pShellContextMenu; /**< Shell context menu*/
 	HMENU m_hShellContextMenu;
@@ -128,6 +132,7 @@ public:
 	using CGhostTextView::GetSelection;
 	void RefreshOptions();
 	bool EnableRescan(bool bEnable);
+	bool GetWordDiffHighlight() const;
 	void ShowDiff(bool bScroll);
 	virtual void OnEditOperation(int nAction, LPCTSTR pszText);
 	virtual void OnUpdateCaret(bool bShowHide = false);

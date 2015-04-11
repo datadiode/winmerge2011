@@ -190,7 +190,7 @@ int CMergeEditView::GetAdditionalTextBlocks(int nLineIndex, TEXTBLOCK *&rpBuf)
 	if ((dwLineFlags & LF_DIFF) != LF_DIFF)
 		return 0;
 
-	if (!COptionsMgr::Get(OPT_WORDDIFF_HIGHLIGHT))
+	if (!m_bWordDiffHighlight)
 		return 0;
 
 	int nLineLength = GetLineLength(nLineIndex);
@@ -739,6 +739,14 @@ bool CMergeEditView::EnableRescan(bool bEnable)
 }
 
 /**
+ * @brief Is highlighting of word differences enabled?
+ */
+bool CMergeEditView::GetWordDiffHighlight() const
+{
+	return m_bWordDiffHighlight;
+}
+
+/**
  * @brief Update statusbar info, Override from CCrystalTextView
  * @note we tab-expand column, but we don't tab-expand char count,
  * since we want to show how many chars there are and tab is just one
@@ -941,6 +949,8 @@ void CMergeEditView::RefreshOptions()
 { 
 	// Enable/disable automatic rescan (rescanning after edit)
 	m_bAutomaticRescan = COptionsMgr::Get(OPT_AUTOMATIC_RESCAN);
+	// Enable/disable highlighting of word differences
+	m_bWordDiffHighlight = COptionsMgr::Get(OPT_WORDDIFF_HIGHLIGHT);
 	// Set tab type (tabs/spaces)
 	m_pTextBuffer->SetInsertTabs(COptionsMgr::Get(OPT_TAB_TYPE) == 0);
 	SetSelectionMargin(COptionsMgr::Get(OPT_VIEW_FILEMARGIN));
