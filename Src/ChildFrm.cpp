@@ -1077,6 +1077,10 @@ void CChildFrame::UpdateGeneralCmdUI()
 	m_pMDIFrame->UpdateCmdUI<ID_EOL_TO_MAC>(
 		enable | (nStyle == CRLF_STYLE_MAC ? MF_CHECKED : 0));
 
+	// Bookmarks
+	UpdateBookmarkUI();
+
+	// Synchronization points
 	UpdateSyncPointUI();
 }
 
@@ -1094,8 +1098,7 @@ void CChildFrame::UpdateCmdUI()
 	// General
 	UpdateGeneralCmdUI();
 
-	// Bookmarks
-	UpdateBookmarkUI();
+	// Syntax highlight
 	UpdateSourceTypeUI();
 }
 
