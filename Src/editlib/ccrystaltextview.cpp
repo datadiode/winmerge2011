@@ -1918,6 +1918,11 @@ int CCrystalTextView::GetTabSize() const
 	return m_pTextBuffer ? m_pTextBuffer->GetTabSize() : 4;
 }
 
+bool CCrystalTextView::GetSeparateCombinedChars() const
+{
+	return m_bSeparateCombinedChars;
+}
+
 void CCrystalTextView::SetTabSize(int nTabSize, bool bSeparateCombinedChars)
 {
 	ASSERT(nTabSize >= 0 && nTabSize <= 64);

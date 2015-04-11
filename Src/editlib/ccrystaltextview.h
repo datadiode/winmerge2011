@@ -600,6 +600,7 @@ public:
 	void SetViewTabs(bool);
 	void SetViewEols(bool bViewEols, bool bDistinguishEols);
 	int GetTabSize() const;
+	bool GetSeparateCombinedChars() const;
 	void SetTabSize(int nTabSize, bool bSeparateCombinedChars);
 	bool GetSelectionMargin() const;
 	void SetSelectionMargin(bool);
