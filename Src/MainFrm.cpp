@@ -633,6 +633,36 @@ void CMainFrame::UpdateCmdUI<ID_TOOLS_COMPARE_SELECTION>(BYTE uFlags)
 }
 
 template<>
+void CMainFrame::UpdateCmdUI<ID_VIEW_LINENUMBERS>(BYTE uFlags)
+{
+	m_cmdState.ViewLineNumbers = uFlags;
+}
+
+template<>
+void CMainFrame::UpdateCmdUI<ID_VIEW_FILEMARGIN>(BYTE uFlags)
+{
+	m_cmdState.SelectionMargin = uFlags;
+}
+
+template<>
+void CMainFrame::UpdateCmdUI<ID_VIEW_WORDWRAP>(BYTE uFlags)
+{
+	m_cmdState.WordWrapping = uFlags;
+}
+
+template<>
+void CMainFrame::UpdateCmdUI<ID_VIEW_LINEDIFFS>(BYTE uFlags)
+{
+	m_cmdState.WordDiffHighlight = uFlags;
+}
+
+template<>
+void CMainFrame::UpdateCmdUI<ID_VIEW_SEPARATE_COMBINING_CHARS>(BYTE uFlags)
+{
+	m_cmdState.SeparateCombinedChars = uFlags;
+}
+
+template<>
 void CMainFrame::UpdateCmdUI<ID_EDIT_TOGGLE_BOOKMARK>(BYTE uFlags)
 {
 	m_cmdState.ToggleBookmark = uFlags;
@@ -856,6 +886,16 @@ const BYTE *CMainFrame::CmdState::Lookup(UINT id) const
 		return &GenerateReport;
 	case ID_FILE_COLLECTMODE:
 		return &CollectMode;
+	case ID_VIEW_LINENUMBERS:
+		return &ViewLineNumbers;
+	case ID_VIEW_FILEMARGIN:
+		return &SelectionMargin;
+	case ID_VIEW_WORDWRAP:
+		return &WordWrapping;
+	case ID_VIEW_LINEDIFFS:
+		return &WordDiffHighlight;
+	case ID_VIEW_SEPARATE_COMBINING_CHARS:
+		return &SeparateCombinedChars;
 	case ID_TOOLS_COMPARE_SELECTION:
 		return &CompareSelection;
 	case ID_EDIT_TOGGLE_BOOKMARK:
@@ -888,16 +928,6 @@ static COptionDef<bool> *LookupOption(UINT id)
 		return &OPT_SHOW_BINARIES;
 	case ID_OPTIONS_SHOWSKIPPED:
 		return &OPT_SHOW_SKIPPED;
-	case ID_VIEW_LINEDIFFS:
-		return &OPT_WORDDIFF_HIGHLIGHT;
-	case ID_VIEW_LINENUMBERS:
-		return &OPT_VIEW_LINENUMBERS;
-	case ID_VIEW_FILEMARGIN:
-		return &OPT_VIEW_FILEMARGIN;
-	case ID_VIEW_WORDWRAP:
-		return &OPT_WORDWRAP;
-	case ID_VIEW_SEPARATE_COMBINING_CHARS:
-		return &OPT_SEPARATE_COMBINING_CHARS;
 	case ID_VIEW_WHITESPACE:
 		return &OPT_VIEW_WHITESPACE;
 	case ID_VIEW_TAB_BAR:

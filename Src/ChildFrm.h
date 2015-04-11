@@ -175,6 +175,8 @@ private:
 	void SetLastCompareResult(int nResult);
 	CMergeEditView *CreatePane(int iPane);
 	void CreateClient();
+	template<UINT>
+	void UpdateSingleCmdUI();
 	virtual ~CChildFrame();
 	virtual FRAMETYPE GetFrameType() const { return FRAME_FILE; }
 	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);

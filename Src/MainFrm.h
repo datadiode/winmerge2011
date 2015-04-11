@@ -335,6 +335,11 @@ private:
 		BYTE EolToMac;
 		BYTE GenerateReport;
 		BYTE CollectMode;
+		BYTE ViewLineNumbers;
+		BYTE SelectionMargin;
+		BYTE WordWrapping;
+		BYTE WordDiffHighlight;
+		BYTE SeparateCombinedChars;
 		BYTE CompareSelection;
 		BYTE ToggleBookmark;
 		BYTE NavigateBookmarks;

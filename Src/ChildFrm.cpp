@@ -155,7 +155,7 @@ void CChildFrame::OnWMGoto()
  */
 void CChildFrame::OnOpenFile()
 {
-	CMergeEditView *const pMergeView = GetActiveMergeView();
+	const CMergeEditView *const pMergeView = GetActiveMergeView();
 	LPCTSTR file = m_strPath[pMergeView->m_nThisPane].c_str();
 	if (file[0] == _T('\0'))
 		return;
@@ -171,7 +171,7 @@ void CChildFrame::OnOpenFile()
  */
 void CChildFrame::OnOpenFileWith()
 {
-	CMergeEditView *const pMergeView = GetActiveMergeView();
+	const CMergeEditView *const pMergeView = GetActiveMergeView();
 	LPCTSTR file = m_strPath[pMergeView->m_nThisPane].c_str();
 	if (file[0] != _T('\0'))
 		m_pMDIFrame->OpenFileWith(file);
@@ -182,7 +182,7 @@ void CChildFrame::OnOpenFileWith()
  */
 void CChildFrame::OnOpenFileWithEditor()
 {
-	CMergeEditView *const pMergeView = GetActiveMergeView();
+	const CMergeEditView *const pMergeView = GetActiveMergeView();
 	LPCTSTR file = m_strPath[pMergeView->m_nThisPane].c_str();
 	if (file[0] != _T('\0'))
 		m_pMDIFrame->OpenFileToExternalEditor(file);
@@ -231,6 +231,46 @@ BOOL CChildFrame::PreTranslateMessage(MSG *pMsg)
 		}
 	}
 	return FALSE;
+}
+
+template<>
+void CChildFrame::UpdateSingleCmdUI<ID_VIEW_LINENUMBERS>()
+{
+	m_pMDIFrame->UpdateCmdUI<ID_VIEW_LINENUMBERS>(
+		m_pView[0] == NULL ? MF_GRAYED :
+		m_pView[0]->GetViewLineNumbers() ? MF_CHECKED : 0);
+}
+
+template<>
+void CChildFrame::UpdateSingleCmdUI<ID_VIEW_FILEMARGIN>()
+{
+	m_pMDIFrame->UpdateCmdUI<ID_VIEW_FILEMARGIN>(
+		m_pView[0] == NULL ? MF_GRAYED :
+		m_pView[0]->GetSelectionMargin() ? MF_CHECKED : 0);
+}
+
+template<>
+void CChildFrame::UpdateSingleCmdUI<ID_VIEW_LINEDIFFS>()
+{
+	m_pMDIFrame->UpdateCmdUI<ID_VIEW_LINEDIFFS>(
+		m_pView[0] == NULL ? MF_GRAYED :
+		m_pView[0]->GetWordDiffHighlight() ? MF_CHECKED : 0);
+}
+
+template<>
+void CChildFrame::UpdateSingleCmdUI<ID_VIEW_WORDWRAP>()
+{
+	m_pMDIFrame->UpdateCmdUI<ID_VIEW_WORDWRAP>(
+		m_pView[0] == NULL ? MF_GRAYED :
+		m_pView[0]->GetWordWrapping() ? MF_CHECKED : 0);
+}
+
+template<>
+void CChildFrame::UpdateSingleCmdUI<ID_VIEW_SEPARATE_COMBINING_CHARS>()
+{
+	m_pMDIFrame->UpdateCmdUI<ID_VIEW_SEPARATE_COMBINING_CHARS>(
+		m_pView[0] == NULL ? MF_GRAYED :
+		m_pView[0]->GetSeparateCombinedChars() ? MF_CHECKED : 0);
 }
 
 template<>
@@ -320,29 +360,34 @@ LRESULT CChildFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	case ID_VIEW_LINENUMBERS:
-		COptionsMgr::SaveOption(OPT_VIEW_LINENUMBERS, !COptionsMgr::Get(OPT_VIEW_LINENUMBERS));
+		COptionsMgr::SaveOption(OPT_VIEW_LINENUMBERS, !m_pView[0]->GetViewLineNumbers());
 		RefreshOptions();
 		AlignScrollPositions();
+		UpdateSingleCmdUI<ID_VIEW_LINENUMBERS>();
 		break;
 	case ID_VIEW_FILEMARGIN:
-		COptionsMgr::SaveOption(OPT_VIEW_FILEMARGIN, !COptionsMgr::Get(OPT_VIEW_FILEMARGIN));
+		COptionsMgr::SaveOption(OPT_VIEW_FILEMARGIN, !m_pView[0]->GetSelectionMargin());
 		RefreshOptions();
 		AlignScrollPositions();
+		UpdateSingleCmdUI<ID_VIEW_FILEMARGIN>();
 		break;
 	case ID_VIEW_LINEDIFFS:
-		COptionsMgr::SaveOption(OPT_WORDDIFF_HIGHLIGHT, !COptionsMgr::Get(OPT_WORDDIFF_HIGHLIGHT));
+		COptionsMgr::SaveOption(OPT_WORDDIFF_HIGHLIGHT, !m_pView[0]->GetWordDiffHighlight());
 		RefreshOptions();
 		FlushAndRescan(true);
+		UpdateSingleCmdUI<ID_VIEW_LINEDIFFS>();
 		break;
 	case ID_VIEW_WORDWRAP:
-		COptionsMgr::SaveOption(OPT_WORDWRAP, !COptionsMgr::Get(OPT_WORDWRAP));
+		COptionsMgr::SaveOption(OPT_WORDWRAP, !m_pView[0]->GetWordWrapping());
 		RefreshOptions();
 		AlignScrollPositions();
+		UpdateSingleCmdUI<ID_VIEW_WORDWRAP>();
 		break;
 	case ID_VIEW_SEPARATE_COMBINING_CHARS:
-		COptionsMgr::SaveOption(OPT_SEPARATE_COMBINING_CHARS, !COptionsMgr::Get(OPT_SEPARATE_COMBINING_CHARS));
+		COptionsMgr::SaveOption(OPT_SEPARATE_COMBINING_CHARS, !m_pView[0]->GetSeparateCombinedChars());
 		RefreshOptions();
 		AlignScrollPositions();
+		UpdateSingleCmdUI<ID_VIEW_SEPARATE_COMBINING_CHARS>();
 		break;
 
 		for (;;) // Establish a local context for breaking
@@ -1100,6 +1145,12 @@ void CChildFrame::UpdateCmdUI()
 
 	// Syntax highlight
 	UpdateSourceTypeUI();
+
+	UpdateSingleCmdUI<ID_VIEW_LINENUMBERS>();
+	UpdateSingleCmdUI<ID_VIEW_FILEMARGIN>();
+	UpdateSingleCmdUI<ID_VIEW_LINEDIFFS>();
+	UpdateSingleCmdUI<ID_VIEW_WORDWRAP>();
+	UpdateSingleCmdUI<ID_VIEW_SEPARATE_COMBINING_CHARS>();
 }
 
 void CChildFrame::UpdateReadOnlyCmdUI()
