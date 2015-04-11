@@ -38,7 +38,6 @@ bool PropEditor::UpdateData()
 	DDX_Text<op>(IDC_TAB_EDIT, m_nTabSize);
 	DDX_Check<op>(IDC_AUTOMRESCAN_CHECK, m_bAutomaticRescan);
 	DDX_Check<op>(IDC_MIXED_EOL, m_bAllowMixedEol);
-	DDX_Check<op>(IDC_SEPARATE_COMBINING_CHARS, m_bSeparateCombiningChars);
 	DDX_Check<op>(IDC_VIEW_LINE_DIFFERENCES, m_bViewLineDifferences);
 	DDX_Check<op>(IDC_EDITOR_CHARLEVEL, m_bBreakOnWords, 0);
 	DDX_Check<op>(IDC_EDITOR_WORDLEVEL, m_bBreakOnWords, 1);
@@ -80,7 +79,6 @@ void PropEditor::ReadOptions()
 	m_bAutomaticRescan = COptionsMgr::Get(OPT_AUTOMATIC_RESCAN);
 	m_bHiliteSyntax = COptionsMgr::Get(OPT_SYNTAX_HIGHLIGHT);
 	m_bAllowMixedEol = COptionsMgr::Get(OPT_ALLOW_MIXED_EOL);
-	m_bSeparateCombiningChars = COptionsMgr::Get(OPT_SEPARATE_COMBINING_CHARS);
 	m_bViewLineDifferences = COptionsMgr::Get(OPT_WORDDIFF_HIGHLIGHT);
 	m_bBreakOnWords = COptionsMgr::Get(OPT_BREAK_ON_WORDS);
 	m_nBreakType = COptionsMgr::Get(OPT_BREAK_TYPE);
@@ -92,11 +90,10 @@ void PropEditor::ReadOptions()
  */
 void PropEditor::WriteOptions()
 {
-	COptionsMgr::SaveOption(OPT_TAB_SIZE, (int)m_nTabSize);
-	COptionsMgr::SaveOption(OPT_TAB_TYPE, (int)m_nTabType);
+	COptionsMgr::SaveOption(OPT_TAB_SIZE, m_nTabSize);
+	COptionsMgr::SaveOption(OPT_TAB_TYPE, m_nTabType);
 	COptionsMgr::SaveOption(OPT_AUTOMATIC_RESCAN, m_bAutomaticRescan != FALSE);
 	COptionsMgr::SaveOption(OPT_ALLOW_MIXED_EOL, m_bAllowMixedEol != FALSE);
-	COptionsMgr::SaveOption(OPT_SEPARATE_COMBINING_CHARS, m_bSeparateCombiningChars != FALSE);
 	COptionsMgr::SaveOption(OPT_SYNTAX_HIGHLIGHT, m_bHiliteSyntax != FALSE);
 	COptionsMgr::SaveOption(OPT_WORDDIFF_HIGHLIGHT, m_bViewLineDifferences != FALSE);
 	COptionsMgr::SaveOption(OPT_BREAK_ON_WORDS, m_bBreakOnWords != FALSE);

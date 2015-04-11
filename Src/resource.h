@@ -132,7 +132,6 @@
 #define IDC_FLDCONFIRM_MAKE_WRITABLE            1001
 #define IDC_LEFT_BUTTON                         1001
 #define IDC_LFILTER_EDIT                        1001
-#define IDC_SEPARATE_COMBINING_CHARS            1001
 #define IDC_TV_CLEARCASE_TYPEMGR_SETUP          1001
 #define IDC_LEFT_COMBO                          1002
 #define IDC_RIGHT_EDIT                          1002
@@ -827,6 +826,7 @@
 #define ID_VIEW_TREEMODE                        32827
 #define ID_VIEW_EXPAND_ALLSUBDIRS               32828
 #define ID_VIEW_COLLAPSE_ALLSUBDIRS             32829
+#define ID_VIEW_SEPARATE_COMBINING_CHARS        32830
 #define ID_PREVDIFF                             32832
 #define ID_NEXTDIFF                             32833
 #define ID_FIRSTDIFF                            32834

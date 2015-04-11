@@ -23,11 +23,10 @@ public:
 
 // Dialog Data
 	BOOL    m_bHiliteSyntax;
-	int	    m_nTabType;
-	UINT    m_nTabSize;
+	int     m_nTabType;
+	int     m_nTabSize;
 	BOOL    m_bAutomaticRescan;
 	BOOL    m_bAllowMixedEol;
-	BOOL    m_bSeparateCombiningChars;
 	BOOL    m_bViewLineDifferences;
 	BOOL    m_bBreakOnWords;
 	int     m_nBreakType;

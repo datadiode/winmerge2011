@@ -896,6 +896,8 @@ static COptionDef<bool> *LookupOption(UINT id)
 		return &OPT_VIEW_FILEMARGIN;
 	case ID_VIEW_WORDWRAP:
 		return &OPT_WORDWRAP;
+	case ID_VIEW_SEPARATE_COMBINING_CHARS:
+		return &OPT_SEPARATE_COMBINING_CHARS;
 	case ID_VIEW_WHITESPACE:
 		return &OPT_VIEW_WHITESPACE;
 	case ID_VIEW_TAB_BAR:

@@ -339,6 +339,11 @@ LRESULT CChildFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 		RefreshOptions();
 		AlignScrollPositions();
 		break;
+	case ID_VIEW_SEPARATE_COMBINING_CHARS:
+		COptionsMgr::SaveOption(OPT_SEPARATE_COMBINING_CHARS, !COptionsMgr::Get(OPT_SEPARATE_COMBINING_CHARS));
+		RefreshOptions();
+		AlignScrollPositions();
+		break;
 
 		for (;;) // Establish a local context for breaking
 		{
