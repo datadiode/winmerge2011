@@ -182,6 +182,7 @@ bool FileFilterHelper::CreateFromMask()
 			regexp_item item;
 			if (item.assign(regExp.c_str(), regExp.length()))
 			{
+				item.backslash = regExp.find(_T("\\\\")) != String::npos;
 				filters->push_back(item);
 			}
 		}
