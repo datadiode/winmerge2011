@@ -41,9 +41,10 @@ class CEditReplaceDlg
 {
 private:
 	CCrystalEditView *const m_pBuddy;
-	BOOL m_bFound;
+	int m_nCaptures;
 	POINT m_ptFoundAt;
-	BOOL DoHighlightText(BOOL bNotifyIfNotFound);
+	CCrystalTextView::Captures m_captures;
+	int DoHighlightText(BOOL bNotifyIfNotFound);
 	void UpdateControls();
 
 	// Construction
@@ -67,13 +68,14 @@ public:
 	HSuperComboBox *m_pCbFindText;
 	HSuperComboBox *m_pCbReplText;
 
-  protected:
+protected:
 	template<DDX_Operation>
 			bool UpdateData();
 	virtual BOOL OnInitDialog();
 	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
 
 	void UpdateRegExp();
+	void ReplaceSelection();
 
 	// Generated message map functions
 	void OnChangeEditText();

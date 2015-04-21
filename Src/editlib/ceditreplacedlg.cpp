@@ -33,8 +33,8 @@
 #include "LanguageSelect.h"
 #include "Locality.h"
 #include "resource.h"
-#include "ceditreplacedlg.h"
 #include "ccrystaleditview.h"
+#include "ceditreplacedlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -50,6 +50,7 @@ CEditReplaceDlg::CEditReplaceDlg(CCrystalEditView * pBuddy)
 	: ODialog(IDD_EDIT_REPLACE)
 	, m_pBuddy(pBuddy)
 	, m_nScope(-1)
+	, m_nCaptures(-1)
 	, m_bEnableScopeSelection(true)
 	, m_bConfirmed(false)
 {
@@ -178,12 +179,12 @@ BOOL CEditReplaceDlg::OnInitDialog()
 
 	UpdateControls();
 	GetDlgItem(IDC_EDIT_SCOPE_SELECTION)->EnableWindow(m_bEnableScopeSelection);
-	m_bFound = FALSE;
+	m_nCaptures = -1;
 
 	return TRUE;
 }
 
-BOOL CEditReplaceDlg::DoHighlightText(BOOL bNotifyIfNotFound)
+int CEditReplaceDlg::DoHighlightText(BOOL bNotifyIfNotFound)
 {
 	DWORD dwSearchFlags = 0;
 	if (m_bMatchCase)
@@ -197,30 +198,30 @@ BOOL CEditReplaceDlg::DoHighlightText(BOOL bNotifyIfNotFound)
 			m_ptFoundAt.x = 0;
 	}
 
-	BOOL bFound;
+	int nCaptures;
 	if (m_nScope == 0)
 	{
 		// Searching selection only
-		bFound = m_pBuddy->FindTextInBlock(m_sText.c_str(), m_ptFoundAt,
-			m_ptBlockBegin, m_ptBlockEnd, dwSearchFlags, FALSE, m_ptFoundAt);
+		nCaptures = m_pBuddy->FindTextInBlock(m_sText.c_str(), m_ptFoundAt,
+			m_ptBlockBegin, m_ptBlockEnd, dwSearchFlags, FALSE, m_ptFoundAt, m_captures);
 	}
 	else
 	{
 		// Searching whole text, (no) wrap
-		bFound = m_pBuddy->FindText(m_sText.c_str(), m_ptFoundAt, dwSearchFlags, !m_bNoWrap, m_ptFoundAt);
+		nCaptures = m_pBuddy->FindText(m_sText.c_str(), m_ptFoundAt, dwSearchFlags, !m_bNoWrap, m_ptFoundAt, m_captures);
 	}
 
-	if (!bFound)
+	if (nCaptures < 0)
 	{
 		if (bNotifyIfNotFound) 
 			LanguageSelect.Format(IDS_EDIT_TEXT_NOT_FOUND, m_sText.c_str()).MsgBox(MB_ICONINFORMATION);
 		if (m_nScope == 0)
 			m_ptCurrentPos = m_ptBlockBegin;
-		return FALSE;
+		return -1;
 	}
 
 	m_pBuddy->HighlightText(m_ptFoundAt, m_pBuddy->m_nLastFindWhatLen);
-	return TRUE;
+	return nCaptures;
 }
 
 void CEditReplaceDlg::OnEditSkip()
@@ -229,11 +230,11 @@ void CEditReplaceDlg::OnEditSkip()
 	m_pCbFindText->SaveState(_T("Files\\ReplaceInFile"));
 	m_pCbReplText->SaveState(_T("Files\\ReplaceWithInFile"));
 	m_bConfirmed = true;
-	if (!m_bFound)
+	if (m_nCaptures < 0)
 	{
 		m_ptFoundAt = m_ptCurrentPos;
-		m_bFound = DoHighlightText(TRUE);
-		SetDefID(m_bFound ? IDC_EDIT_REPLACE : IDC_EDIT_SKIP);
+		m_nCaptures = DoHighlightText(TRUE);
+		SetDefID(m_nCaptures >= 0 ? IDC_EDIT_REPLACE : IDC_EDIT_SKIP);
 		return;
 	}
 	if (m_pBuddy->m_nLastFindWhatLen)
@@ -247,11 +248,82 @@ void CEditReplaceDlg::OnEditSkip()
 	}
 	else
 	{
-		m_bFound = FALSE;
+		m_nCaptures = -1;
 		return;
 	}
-	m_bFound = DoHighlightText(TRUE);
-	SetDefID(m_bFound ? IDC_EDIT_REPLACE : IDC_EDIT_SKIP);
+	m_nCaptures = DoHighlightText(TRUE);
+	SetDefID(m_nCaptures >= 0 ? IDC_EDIT_REPLACE : IDC_EDIT_SKIP);
+}
+
+void CEditReplaceDlg::ReplaceSelection()
+{
+	LPCTSTR p = m_sNewText.c_str();
+	int n = m_sNewText.size();
+	String s;
+	if (m_bRegExp)
+	{
+		String t;
+		while (LPCTSTR q = _tcschr(p, '\\'))
+		{
+			s.append(p, q);
+			switch (TCHAR c = *++q)
+			{
+			case '0': case '1': case '2': case '3': case '4':
+			case '5': case '6': case '7': case '8': case '9':
+				int i;
+				i = c - '0';
+				if (i < m_nCaptures)
+				{
+					if (t.empty())
+					{
+						POINT ptStart, ptEnd;
+						m_pBuddy->GetSelection(ptStart, ptEnd);
+						m_pBuddy->GetText(ptStart, ptEnd, t);
+					}
+					i *= 2; 
+					s.append(t.c_str() + m_captures[i] - m_captures[0],
+						t.c_str() + m_captures[i + 1] - m_captures[0]);
+				}
+				++q;
+				break;
+
+				for (;;)
+				{
+				case 'a':
+					c = '\a';
+					break;
+				case 'b':
+					c = '\b';
+					break;
+				case 'f':
+					c = '\f';
+					break;
+				case 'n':
+					c = '\n';
+					break;
+				case 'r':
+					c = '\r';
+					break;
+				case 't':
+					c = '\t';
+					break;
+				case 'v':
+					c = '\v';
+					break;
+				}
+				// fall through
+			default:
+				s.push_back(c);
+				++q;
+				break;
+			}
+			p = q;
+		}
+		s.append(p);
+		p = s.c_str();
+		n = s.length();
+	}
+	m_pBuddy->ReplaceSelection(p, n);
 }
 
 void CEditReplaceDlg::OnEditReplace()
@@ -260,23 +332,16 @@ void CEditReplaceDlg::OnEditReplace()
 	m_pCbFindText->SaveState(_T("Files\\ReplaceInFile"));
 	m_pCbReplText->SaveState(_T("Files\\ReplaceWithInFile"));
 	m_bConfirmed = true;
-	if (!m_bFound)
+	if (m_nCaptures < 0)
 	{
 		m_ptFoundAt = m_ptCurrentPos;
-		m_bFound = DoHighlightText(TRUE);
-		SetDefID(m_bFound ? IDC_EDIT_REPLACE : IDC_EDIT_SKIP);
+		m_nCaptures = DoHighlightText(TRUE);
+		SetDefID(m_nCaptures >= 0 ? IDC_EDIT_REPLACE : IDC_EDIT_SKIP);
 		return;
 	}
-	DWORD dwSearchFlags = 0;
-	if (m_bMatchCase)
-		dwSearchFlags |= FIND_MATCH_CASE;
-	if (m_bWholeWord)
-		dwSearchFlags |= FIND_WHOLE_WORD;
-	if (m_bRegExp)
-		dwSearchFlags |= FIND_REGEXP;
 
 	//  We have highlighted text
-	m_pBuddy->ReplaceSelection(m_sNewText.c_str(), m_sNewText.size(), dwSearchFlags);
+	ReplaceSelection();
 
 	//  Manually recalculate points
 	if (m_bEnableScopeSelection)
@@ -295,19 +360,19 @@ void CEditReplaceDlg::OnEditReplace()
 	if (m_pBuddy->m_nLastFindWhatLen)
 	{
 		m_ptFoundAt.x += m_pBuddy->m_nLastReplaceLen;
-		m_ptFoundAt = m_pBuddy->GetCursorPos ();
+		m_ptFoundAt = m_pBuddy->GetCursorPos();
 	}
-	else if (m_ptFoundAt.y + 1 < m_pBuddy->GetLineCount ())
+	else if (m_ptFoundAt.y + 1 < m_pBuddy->GetLineCount())
 	{
 		m_ptFoundAt.x = 0;
 		m_ptFoundAt.y++;
 	}
 	else
 	{
-		m_bFound = FALSE;
+		m_nCaptures = -1;
 		return;
 	}
-	m_bFound = DoHighlightText(TRUE);
+	m_nCaptures = DoHighlightText(TRUE);
 }
 
 void CEditReplaceDlg::OnEditReplaceAll()
@@ -321,27 +386,19 @@ void CEditReplaceDlg::OnEditReplaceAll()
 	BOOL bWrapped = FALSE;
 	WaitStatusCursor waitCursor;
 
-	if (!m_bFound)
+	if (m_nCaptures < 0)
 	{
 		m_ptFoundAt = m_ptCurrentPos;
-		m_bFound = DoHighlightText(FALSE);
+		m_nCaptures = DoHighlightText(FALSE);
 	}
 
 	POINT m_ptFirstFound = m_ptFoundAt;
 
-	while (m_bFound)
+	while (m_nCaptures >= 0)
 	{
-		DWORD dwSearchFlags = 0;
-		if (m_bMatchCase)
-			dwSearchFlags |= FIND_MATCH_CASE;
-		if (m_bWholeWord)
-			dwSearchFlags |= FIND_WHOLE_WORD;
-		if (m_bRegExp)
-			dwSearchFlags |= FIND_REGEXP;
-
 		//  We have highlighted text
 		m_pBuddy->m_nLastReplaceLen = 0;
-		m_pBuddy->ReplaceSelection(m_sNewText.c_str(), m_sNewText.size(), dwSearchFlags);
+		ReplaceSelection();
 		nNumReplaced++;
 
 		//  Manually recalculate points
@@ -394,12 +451,12 @@ void CEditReplaceDlg::OnEditReplaceAll()
 		}
 		else
 		{
-			m_bFound = FALSE;
+			m_nCaptures = -1;
 			break;
 		}
 
 		// find the next instance
-		m_bFound = DoHighlightText(FALSE);
+		m_nCaptures = DoHighlightText(FALSE);
 
 		// detect if we just wrapped at end of file
 		if (m_ptFoundAt.y < m_ptCurrentReplacedEnd.y ||

@@ -80,6 +80,9 @@ class CCrystalTextView
 {
 	friend CCrystalParser;
 
+public:
+	typedef int Captures[30];
+
 protected:
 	//  Search parameters
 	bool m_bLastSearch;
@@ -121,6 +124,12 @@ private:
 	int m_nIdealCharPos;
 
 	bool m_bFocused;
+
+	static int FindStringHelper(
+		LPCTSTR pchFindWhere, int cchFindWhere,
+		LPCTSTR pchFindWhat, DWORD dwFlags,
+		Captures &ovector);
+
 protected:
 	POINT m_ptAnchor;
 private:
@@ -251,7 +260,6 @@ protected:
 	int CalculateActualOffset(int nLineIndex, int nCharIndex, BOOL bAccumulate = FALSE);
 
 	bool IsInsideSelection(const POINT &ptTextPos);
-	void GetSelection(POINT &ptStart, POINT &ptEnd);
 	void GetFullySelectedLines(int &firstLine, int &lastLine);
 
 	//  Amount of lines/characters that completely fits the client area
@@ -342,7 +350,7 @@ protected:
 	@return Character position that matches the end of the given subline, relative
 		to the given line.
 	*/
-	int SubLineEndToCharPos( int nLineIndex, int nSubLineOffset );
+	int SubLineEndToCharPos(int nLineIndex, int nSubLineOffset);
 
 	/**
 	Returns the character position relative to the given line, that matches
@@ -354,7 +362,7 @@ protected:
 	@return Character position that matches the start of the given subline, relative
 		to the given line.
 	*/
-	int SubLineHomeToCharPos( int nLineIndex, int nSubLineOffset );
+	int SubLineHomeToCharPos(int nLineIndex, int nSubLineOffset);
 	//END SW
 	int GetCharWidth();
 	int GetMaxLineLength();
@@ -421,13 +429,13 @@ public:
 	int GetLineActualLength(int nLineIndex);
 	LPCTSTR GetLineChars(int nLineIndex) const;
 	DWORD GetLineFlags(int nLineIndex) const;
+	void GetSelection(POINT &ptStart, POINT &ptEnd);
 	void GetText(int nStartLine, int nStartChar, int nEndLine, int nEndChar, String &text);
-
-protected:
 	void GetText(const POINT &ptStart, const POINT &ptEnd, String &text)
 	{
 		GetText(ptStart.y, ptStart.x, ptEnd.y, ptEnd.x, text);
 	}
+protected:
 
 	// Clipboard
 	void PutToClipboard(HGLOBAL);
@@ -534,11 +542,11 @@ protected:
 
 	//  Syntax coloring overrides
 	struct TEXTBLOCK
-	  {
+	{
 		int m_nCharPos;
 		int m_nColorIndex;
 		int m_nBgColorIndex;
-	  };
+	};
 
 	//BEGIN SW
 	// function to draw a single screen line
@@ -625,11 +633,10 @@ public:
 
 	@return Pointer to parser used before or NULL, if no parser has been used before.
 	*/
-	CCrystalParser *SetParser( CCrystalParser *pParser );
+	CCrystalParser *SetParser(CCrystalParser *pParser);
 	//END SW
 
 	int m_nLastFindWhatLen;
-	LPTSTR m_pszMatched;
 
 	enum TextType
 	{
@@ -731,11 +738,13 @@ public:
 	void EnsureSelectionVisible();
 
 	//  Text search helpers
-	BOOL FindText(LPCTSTR pszText, const POINT &ptStartPos,
-		DWORD dwFlags, BOOL bWrapSearch, POINT &ptFoundPos);
-	BOOL FindTextInBlock(LPCTSTR pszText, const POINT &ptStartPos,
+	int FindText(LPCTSTR pszText, const POINT &ptStartPos,
+		DWORD dwFlags, BOOL bWrapSearch, POINT &ptFoundPos,
+		Captures &captures);
+	int FindTextInBlock(LPCTSTR pszText, const POINT &ptStartPos,
 		const POINT &ptBlockBegin, const POINT &ptBlockEnd,
-		DWORD dwFlags, BOOL bWrapSearch, POINT &ptFoundPos);
+		DWORD dwFlags, BOOL bWrapSearch, POINT &ptFoundPos,
+		Captures &captures);
 	BOOL HighlightText(const POINT & ptStartPos, int nLength, BOOL bCursorToLeft = FALSE);
 
 	// IME (input method editor)

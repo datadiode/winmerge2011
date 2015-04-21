@@ -922,9 +922,9 @@ void CCrystalEditView::OnEditReplace()
  * - FIND_REGEXP: use the regular expression.
  * @return TRUE if succeeded.
  */
-void CCrystalEditView::ReplaceSelection(LPCTSTR pszNewText, int cchNewText, DWORD dwFlags)
+void CCrystalEditView::ReplaceSelection(LPCTSTR pszNewText, int cchNewText)
 {
-	if (!cchNewText)
+	if (cchNewText == 0)
 	{
 		DeleteCurrentSelection();
 		return;
@@ -1561,7 +1561,7 @@ void CCrystalEditView::OnEditRightToLeft()
 			if (msg.wParam == VK_RETURN)
 			{
 				if (bEffective)
-					ReplaceSelection(text.c_str(), text.length(), 0);
+					ReplaceSelection(text.c_str(), text.length());
 				break;
 			}
 		}

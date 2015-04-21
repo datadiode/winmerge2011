@@ -419,7 +419,6 @@ CCrystalTextView::CCrystalTextView(size_t ZeroInit)
 CCrystalTextView::~CCrystalTextView()
 {
 	ASSERT(m_pTextBuffer == NULL);   //  Must be correctly detached
-	free(m_pszMatched); // Allocated by _tcsdup()
 }
 
 HRESULT CCrystalTextView::QueryInterface(REFIID iid, void **ppv)
@@ -513,14 +512,14 @@ HRESULT CCrystalTextView::EnumDAdvise(LPENUMSTATDATA*)
 /////////////////////////////////////////////////////////////////////////////
 // CCrystalTextView drawing
 
-void CCrystalTextView::GetSelection(POINT & ptStart, POINT & ptEnd)
+void CCrystalTextView::GetSelection(POINT &ptStart, POINT &ptEnd)
 {
 	PrepareSelBounds();
 	ptStart = m_ptDrawSelStart;
 	ptEnd = m_ptDrawSelEnd;
 }
 
-void CCrystalTextView::GetFullySelectedLines(int & firstLine, int & lastLine)
+void CCrystalTextView::GetFullySelectedLines(int &firstLine, int &lastLine)
 {
 	POINT ptStart;
 	POINT ptEnd;
@@ -3366,7 +3365,10 @@ static const TCHAR *MemSearch(const TCHAR *p, size_t pLen, const TCHAR *q, size_
 	return NULL;
 }
 
-static int FindStringHelper(LPCTSTR pchFindWhere, int cchFindWhere, LPCTSTR pchFindWhat, DWORD dwFlags, int &nLen)
+int CCrystalTextView::FindStringHelper(
+	LPCTSTR pchFindWhere, int cchFindWhere,
+	LPCTSTR pchFindWhat, DWORD dwFlags,
+	Captures &ovector)
 {
 	if (dwFlags & FIND_REGEXP)
 	{
@@ -3386,36 +3388,43 @@ static int FindStringHelper(LPCTSTR pchFindWhere, int cchFindWhere, LPCTSTR pchF
 			pe = pcre_study(regexp, 0, &errormsg);
 		}
 
-		int pos = -1;
-		int ovector[30];
 		const OString compString = HString::Uni(pchFindWhere, cchFindWhere)->Oct(CP_UTF8);
 		int result = pcre_exec(
-			regexp, pe, compString.A, compString.ByteLen(), 0, 0, ovector, 30);
+			regexp, pe, compString.A, compString.ByteLen(), 0, 0, ovector, _countof(ovector));
+
 		if (result >= 0)
 		{
-			pos = MultiByteToWideChar(CP_UTF8, 0, compString.A, ovector[0], 0, 0);
-			nLen = MultiByteToWideChar(CP_UTF8, 0, compString.A, ovector[1], 0, 0) - pos;
+			// Convert UTF-8 offsets to WCHAR offsets
+			int i = 2 * std::max(result, 1);
+			do
+			{
+				--i;
+				ovector[i] = MultiByteToWideChar(CP_UTF8, 0, compString.A, ovector[i], 0, 0);
+			} while(i != 0);
 		}
 
 		pcre_free(regexp);
 		pcre_free(pe);
-		return pos;
+		return result;
 	}
 	else
 	{
 		ASSERT(pchFindWhere != NULL);
 		ASSERT(pchFindWhat != NULL);
-		int nCur = 0;
 		const int cchFindWhat = static_cast<int>(_tcslen(pchFindWhat));
-		nLen = cchFindWhat;
+		ovector[0] = 0;
+		ovector[1] = cchFindWhat;
 		while (LPCTSTR pchPos = MemSearch(pchFindWhere, cchFindWhere, pchFindWhat, cchFindWhat))
 		{
-			nCur += static_cast<int>(pchPos - pchFindWhere);
+			int nLen = static_cast<int>(pchPos - pchFindWhere);
+			ovector[0] += nLen;
+			ovector[1] += nLen;
 			if ((dwFlags & FIND_WHOLE_WORD) == 0)
-				return nCur;
-			if (!(nCur > 0 && xisalnum(pchPos[-1]) || xisalnum(pchPos[cchFindWhat])))
-				return nCur;
-			++nCur;
+				return 0;
+			if (!(nLen > 0 && xisalnum(pchPos[-1]) || xisalnum(pchPos[cchFindWhat])))
+				return 0;
+			++ovector[0];
+			++ovector[1];
 			pchFindWhere = pchPos + 1;
 		}
 		return -1;
@@ -3435,7 +3444,7 @@ BOOL CCrystalTextView::HighlightText(
 {
 	ASSERT_VALIDTEXTPOS(ptStartPos);
 	POINT ptEndPos = ptStartPos;
-	int nCount = GetLineLength (ptEndPos.y) - ptEndPos.x;
+	int nCount = GetLineLength(ptEndPos.y) - ptEndPos.x;
 	if (nLength <= nCount)
 	{
 		ptEndPos.x += nLength;
@@ -3445,7 +3454,7 @@ BOOL CCrystalTextView::HighlightText(
 		while (nLength > nCount)
 		{
 			nLength -= nCount + 1;
-			nCount = GetLineLength (++ptEndPos.y);
+			nCount = GetLineLength(++ptEndPos.y);
 		}
 		ptEndPos.x = nLength;
 	}
@@ -3469,15 +3478,16 @@ BOOL CCrystalTextView::HighlightText(
 	return TRUE;
 }
 
-BOOL CCrystalTextView::FindText(
+int CCrystalTextView::FindText(
 	LPCTSTR pszText, const POINT & ptStartPos,
-	DWORD dwFlags, BOOL bWrapSearch, POINT &ptFoundPos)
+	DWORD dwFlags, BOOL bWrapSearch, POINT &ptFoundPos,
+	Captures &captures)
 {
-	int nLineCount = GetLineCount ();
+	int nLineCount = GetLineCount();
 	const POINT ptBlockBegin = { 0, 0 };
 	const POINT ptBlockEnd = { GetLineLength(nLineCount - 1), nLineCount - 1 };
 	return FindTextInBlock(pszText, ptStartPos, ptBlockBegin, ptBlockEnd,
-		dwFlags, bWrapSearch, ptFoundPos);
+		dwFlags, bWrapSearch, ptFoundPos, captures);
 }
 
 int HowManyStr(LPCTSTR s, LPCTSTR m)
@@ -3504,21 +3514,22 @@ int HowManyStr(LPCTSTR s, TCHAR c)
 	return n;
 }
 
-BOOL CCrystalTextView::FindTextInBlock(
+int CCrystalTextView::FindTextInBlock(
 	LPCTSTR pszText, const POINT &ptStartPosition,
 	const POINT &ptBlockBegin, const POINT &ptBlockEnd,
-	DWORD dwFlags, BOOL bWrapSearch, POINT &ptFoundPos)
+	DWORD dwFlags, BOOL bWrapSearch, POINT &ptFoundPos,
+	Captures &captures)
 {
 	POINT ptCurrentPos = ptStartPosition;
 
-	ASSERT(pszText != NULL && _tcslen(pszText) > 0);
+	ASSERT(pszText != NULL && *pszText != _T('\0'));
 	ASSERT_VALIDTEXTPOS(ptCurrentPos);
 	ASSERT_VALIDTEXTPOS(ptBlockBegin);
 	ASSERT_VALIDTEXTPOS(ptBlockEnd);
 	ASSERT(ptBlockBegin.y < ptBlockEnd.y || ptBlockBegin.y == ptBlockEnd.y &&
 			ptBlockBegin.x <= ptBlockEnd.x);
 	if (ptBlockBegin == ptBlockEnd)
-		return FALSE;
+		return -1;
 	WaitStatusCursor waitCursor;
 	if (ptCurrentPos.y < ptBlockBegin.y || ptCurrentPos.y == ptBlockBegin.y &&
 			ptCurrentPos.x < ptBlockBegin.x)
@@ -3537,14 +3548,14 @@ BOOL CCrystalTextView::FindTextInBlock(
 			what.make_upper();
 	}
 	if (dwFlags & FIND_DIRECTION_UP)
-    {
-		//  Let's check if we deal with whole text.
-		//  At this point, we cannot search *up* in selection
+	{
+		// Let's check if we deal with whole text.
+		// At this point, we cannot search *up* in selection
 		ASSERT(ptBlockBegin.x == 0 && ptBlockBegin.y == 0);
-		ASSERT(ptBlockEnd.x == GetLineLength (GetLineCount () - 1) &&
-			ptBlockEnd.y == GetLineCount () - 1);
+		ASSERT(ptBlockEnd.x == GetLineLength (GetLineCount() - 1) &&
+			ptBlockEnd.y == GetLineCount() - 1);
 
-		//  Proceed as if we have whole text search.
+		// Proceed as if we have whole text search.
 		for (;;)
 		{
 			while (ptCurrentPos.y >= 0)
@@ -3560,31 +3571,26 @@ BOOL CCrystalTextView::FindTextInBlock(
 						{
 							nLineLength = GetLineLength(ptCurrentPos.y - i);
 							ptCurrentPos.x = 0;
-							line = _T ('\n') + line;
+							line = _T('\n') + line;
 						}
 						else
 						{
-							nLineLength = ptCurrentPos.x != -1 ? ptCurrentPos.x : GetLineLength (ptCurrentPos.y - i);
+							nLineLength = ptCurrentPos.x != -1 ? ptCurrentPos.x : GetLineLength(ptCurrentPos.y - i);
 						}
 						if (nLineLength > 0)
-						{
 							line.insert(0, pszChars, nLineLength);
-						}
 					}
 					nLineLength = line.length();
 					if (ptCurrentPos.x == -1)
-					ptCurrentPos.x = 0;
+						ptCurrentPos.x = 0;
 				}
 				else
 				{
 					nLineLength = GetLineLength(ptCurrentPos.y);
 					if (ptCurrentPos.x == -1)
-					{
 						ptCurrentPos.x = nLineLength;
-					}
-					else
-						if (ptCurrentPos.x >= nLineLength)
-							ptCurrentPos.x = nLineLength - 1;
+					else if (ptCurrentPos.x >= nLineLength)
+						ptCurrentPos.x = nLineLength - 1;
 
 					LPCTSTR pszChars = GetLineChars(ptCurrentPos.y);
 					line.assign(pszChars, ptCurrentPos.x + 1);
@@ -3594,9 +3600,12 @@ BOOL CCrystalTextView::FindTextInBlock(
 
 				int nFoundPos = -1;
 				int nMatchLen = what.length();
-				int nPos;
-				while ((nPos = ::FindStringHelper(line.c_str(), line.length(), what.c_str(), dwFlags, m_nLastFindWhatLen)) != -1)
+				int nCaptures, nTmp;
+				while ((nTmp = FindStringHelper(line.c_str(), line.length(), what.c_str(), dwFlags, captures)) >= 0)
 				{
+					nCaptures = nTmp;
+					int nPos = captures[0];
+					m_nLastFindWhatLen = captures[1] - captures[0];
 					nFoundPos = nFoundPos == -1 ? nPos : nFoundPos + nPos;
 					nFoundPos += nMatchLen;
 					line.erase(0, nMatchLen + nPos);
@@ -3606,42 +3615,41 @@ BOOL CCrystalTextView::FindTextInBlock(
 				{
 					ptCurrentPos.x = nFoundPos - nMatchLen;
 					ptFoundPos = ptCurrentPos;
-					return TRUE;
+					return nCaptures;
 				}
 
 				ptCurrentPos.y--;
-				if( ptCurrentPos.y >= 0 )
-				ptCurrentPos.x = GetLineLength( ptCurrentPos.y );
+				if (ptCurrentPos.y >= 0)
+					ptCurrentPos.x = GetLineLength(ptCurrentPos.y);
 			}
 
-			//  Beginning of text reached
+			// Beginning of text reached
 			if (!bWrapSearch)
-				return FALSE;
+				return -1;
 
-			//  Start again from the end of text
+			// Start again from the end of text
 			bWrapSearch = FALSE;
-			ptCurrentPos.x = 0;
 			ptCurrentPos.y = GetLineCount() - 1;
+			ptCurrentPos.x = ptCurrentPos.y >= 0 ? GetLineLength(ptCurrentPos.y) : 0;
 		}
 	}
 	else
-    {
+	{
 		for (;;)
 		{
 			while (ptCurrentPos.y <= ptBlockEnd.y)
 			{
-				int nLineLength, nLines;
 				String line;
 				if (dwFlags & FIND_REGEXP)
 				{
-					nLines = m_pTextBuffer->GetLineCount ();
+					const int nLines = m_pTextBuffer->GetLineCount();
 					for (int i = 0; i <= nEolns && ptCurrentPos.y + i < nLines; i++)
 					{
 						LPCTSTR pszChars = GetLineChars(ptCurrentPos.y + i);
-						nLineLength = GetLineLength(ptCurrentPos.y + i);
+						int nLineLength = GetLineLength(ptCurrentPos.y + i);
 						if (i)
 						{
-							line += _T ('\n');
+							line += _T('\n');
 						}
 						else
 						{
@@ -3649,15 +3657,12 @@ BOOL CCrystalTextView::FindTextInBlock(
 							nLineLength -= ptCurrentPos.x;
 						}
 						if (nLineLength > 0)
-						{
 							line.append(pszChars, nLineLength);
-						}
 					}
-					nLineLength = line.length();
 				}
 				else
 				{
-					nLineLength = GetLineLength(ptCurrentPos.y) - ptCurrentPos.x;
+					int nLineLength = GetLineLength(ptCurrentPos.y) - ptCurrentPos.x;
 					if (nLineLength <= 0)
 					{
 						ptCurrentPos.x = 0;
@@ -3666,18 +3671,18 @@ BOOL CCrystalTextView::FindTextInBlock(
 					}
 					LPCTSTR pszChars = GetLineChars(ptCurrentPos.y);
 					pszChars += ptCurrentPos.x;
-					//  Prepare necessary part of line
+					// Prepare necessary part of line
 					line.assign(pszChars, nLineLength);
 					if ((dwFlags & FIND_MATCH_CASE) == 0)
 						line.make_upper();
 				}
 
-				//  Perform search in the line
-				int nPos = ::FindStringHelper(line.c_str(), line.length(), what.c_str(), dwFlags, m_nLastFindWhatLen);
-				if (nPos >= 0)
+				// Perform search in the line
+				int nCaptures = FindStringHelper(line.c_str(), line.length(), what.c_str(), dwFlags, captures);
+				if (nCaptures >= 0)
 				{
-					free(m_pszMatched);
-					m_pszMatched = _tcsdup(line.c_str());
+					int nPos = captures[0];
+					m_nLastFindWhatLen = captures[1] - captures[0];
 					if (nEolns)
 					{
 						String item(line.c_str(), nPos);
@@ -3703,19 +3708,13 @@ BOOL CCrystalTextView::FindTextInBlock(
 					{
 						ptCurrentPos.x += nPos;
 					}
-				//  Check of the text found is outside the block.
+					// Check of the text found is outside the block.
 					if (ptCurrentPos.y == ptBlockEnd.y && ptCurrentPos.x >= ptBlockEnd.x)
 						break;
 
 					ptFoundPos = ptCurrentPos;
-					return TRUE;
+					return nCaptures;
 				}
-				else
-				{
-					free(m_pszMatched);
-					m_pszMatched = NULL;
-				}
-
 				//  Go further, text was not found
 				ptCurrentPos.x = 0;
 				ptCurrentPos.y++;
@@ -3723,17 +3722,17 @@ BOOL CCrystalTextView::FindTextInBlock(
 
 			//  End of text reached
 			if (!bWrapSearch)
-				return FALSE;
+				return -1;
 
 			//  Start from the beginning
 			bWrapSearch = FALSE;
 			ptCurrentPos = ptBlockBegin;
 		}
-    }
+	}
 
-  ASSERT(FALSE);               // Unreachable
+	ASSERT(FALSE); // Unreachable
 
-  return FALSE;
+	return -1;
 }
 
 void CCrystalTextView::OnEditFind()
@@ -3770,7 +3769,7 @@ void CCrystalTextView::OnEditFind()
 			GetText(ptStart, ptEnd, dlg.m_sText);
 	}
 
-	//  Execute Find dialog
+	// Execute Find dialog
 	dlg.m_ptCurrentPos = m_ptCursorPos;   //  Search from cursor position
 
 	// m_bShowInactiveSelection = TRUE; // FP: removed because I like it
@@ -3792,7 +3791,7 @@ void CCrystalTextView::OnEditFind()
 			m_dwLastSearchFlags |= FIND_DIRECTION_UP;
 		if (dlg.m_bNoWrap)
 			m_dwLastSearchFlags |= FIND_NO_WRAP;
-		//  Save search parameters to registry
+		// Save search parameters to registry
 		SettingStore.WriteProfileInt(_T("Editor"), _T("FindFlags"), m_dwLastSearchFlags);
 	}
 }
@@ -3829,8 +3828,9 @@ void CCrystalTextView::OnEditRepeat()
 		else
 			GetSelection(ptFoundPos, ptSearchPos);
 
-		if (!FindText(sText.c_str(), ptSearchPos, m_dwLastSearchFlags,
-			(m_dwLastSearchFlags & FIND_NO_WRAP) == 0, ptFoundPos))
+		Captures captures;
+		if (FindText(sText.c_str(), ptSearchPos, m_dwLastSearchFlags,
+			(m_dwLastSearchFlags & FIND_NO_WRAP) == 0, ptFoundPos, captures) < 0)
 		{
 			LanguageSelect.Format(IDS_EDIT_TEXT_NOT_FOUND, sText.c_str()).MsgBox();
 			return;
@@ -4334,9 +4334,9 @@ void CCrystalTextView::EnsureSelectionVisible()
 // Mainly it works for xml files
 CCrystalTextView::TextDefinition *CCrystalTextView::SetTextTypeByContent(LPCTSTR pszContent)
 {
-	int nLen;
-	if (::FindStringHelper(pszContent, _tcslen(pszContent),
-		_T("^\\s*\\<\\?xml\\s+.+?\\?\\>\\s*$"), FIND_REGEXP, nLen) == 0)
+	Captures captures;
+	if (FindStringHelper(pszContent, _tcslen(pszContent),
+		_T("^\\s*\\<\\?xml\\s+.+?\\?\\>\\s*$"), FIND_REGEXP, captures) >= 0)
 	{
 		return SetTextType(CCrystalTextView::SRC_XML);
 	}

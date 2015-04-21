@@ -938,7 +938,7 @@ bool CChildFrame::DoSave(bool &bSaveSuccess, int nBuffer)
 		const int nEndChar = pView->GetLineLength(nEndLine);
 		String text;
 		pView->GetText(0, 0, nEndLine, nEndChar, text);
-		m_pOpener->m_pView[nBuffer]->ReplaceSelection(text.c_str(), text.length(), 0);
+		m_pOpener->m_pView[nBuffer]->ReplaceSelection(text.c_str(), text.length());
 		CDiffTextBuffer *const pBuf = m_ptBuf[nBuffer];
 		pBuf->m_nSyncPosition = pBuf->m_nUndoPosition;
 		pBuf->SetModified(false);

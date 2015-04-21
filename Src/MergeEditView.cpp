@@ -889,7 +889,7 @@ void CMergeEditView::OnContextMenu(LPARAM lParam)
 		{
 			OException::Check(var.ChangeType(VT_BSTR));
 			BSTR bstr = V_BSTR(&var);
-			ReplaceSelection(bstr, SysStringLen(bstr), 0);
+			ReplaceSelection(bstr, SysStringLen(bstr));
 		}
 	}
 	catch (OException *e)
