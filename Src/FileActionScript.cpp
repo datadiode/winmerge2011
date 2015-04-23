@@ -133,7 +133,25 @@ FileActionItem FileActionScript::RemoveTailActionItem()
 	return item;
 }
 
-bool FileActionScript::Run(HWND hwnd, FILEOP_FLAGS flags)
+static bool CreateCaret(HListView *pLv, int index)
+{
+	if (!pLv->EnsureVisible(index, FALSE))
+		return false;
+	RECT rc;
+	if (!pLv->GetItemRect(index, &rc, LVIR_ICON))
+		return false;
+	if (!pLv->CreateCaret(NULL, rc.right - rc.left, rc.bottom - rc.top))
+		return false;
+	SetCaretPos(rc.left, rc.top);
+	pLv->ShowCaret();
+	MSG msg;
+	while (::PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
+		if (msg.message == WM_PAINT)
+			::DispatchMessage(&msg);
+	return true;
+}
+
+bool FileActionScript::Run(HListView *pLv, FILEOP_FLAGS flags)
 {
 	// Now process files/directories that got added to list
 	vector<FileActionItem>::const_iterator iter;
@@ -148,13 +166,13 @@ bool FileActionScript::Run(HWND hwnd, FILEOP_FLAGS flags)
 			cchDestination[iter->atype] += len + 1;
 	}
 
-	ShellFileOperations CopyOperations(hwnd, FO_COPY,
+	ShellFileOperations CopyOperations(pLv->m_hWnd, FO_COPY,
 		flags | FOF_MULTIDESTFILES | FOF_NOCONFIRMMKDIR | FOF_NOCONFIRMATION,
 		cchSource[FileAction::ACT_COPY], cchDestination[FileAction::ACT_COPY]);
-	ShellFileOperations MoveOperations(hwnd, FO_MOVE,
+	ShellFileOperations MoveOperations(pLv->m_hWnd, FO_MOVE,
 		flags | FOF_MULTIDESTFILES,
 		cchSource[FileAction::ACT_MOVE], cchDestination[FileAction::ACT_MOVE]);
-	ShellFileOperations DelOperations(hwnd, FO_DELETE,
+	ShellFileOperations DelOperations(pLv->m_hWnd, FO_DELETE,
 		flags,
 		cchSource[FileAction::ACT_DEL] + cchDestination[FileAction::ACT_DEL], 0);
 
@@ -176,8 +194,10 @@ bool FileActionScript::Run(HWND hwnd, FILEOP_FLAGS flags)
 				if (COptionsMgr::Get(OPT_VCS_SYSTEM) != VCS_NONE)
 				{
 					ASSERT(choice != 0); // or else expect a side effect on iter->dest
+					CreateCaret(pLv, iter->context);
 					choice = theApp.m_pMainWnd->HandleReadonlySave(
 						const_cast<String &>(iter->dest), choice);
+					DestroyCaret();
 					if (choice == IDCANCEL)
 						break;
 					if (choice == IDNO) // Skip this item

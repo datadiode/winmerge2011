@@ -115,7 +115,7 @@ public:
 		int origin, int destination,
 		LPCTSTR src, LPCTSTR dest, bool destIsSide);
 
-	bool Run(HWND, FILEOP_FLAGS);
+	bool Run(HListView *, FILEOP_FLAGS);
 
 	// Manipulate the FileActionList
 	int GetActionItemCount() const { return m_actions.size(); }

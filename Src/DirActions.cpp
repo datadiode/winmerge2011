@@ -607,7 +607,7 @@ void CDirView::PerformActionList(FileActionScript &actionScript)
 	try
 	{
 		const FILEOP_FLAGS operFlags = COptionsMgr::Get(OPT_USE_RECYCLE_BIN) ? FOF_ALLOWUNDO : 0;
-		if (actionScript.Run(m_hWnd, operFlags))
+		if (actionScript.Run(static_cast<HListView *>(m_pWnd), operFlags))
 			UpdateAfterFileScript(actionScript);
 	}
 	catch (OException *e)
