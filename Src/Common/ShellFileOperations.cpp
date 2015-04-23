@@ -44,7 +44,7 @@ ShellFileOperations::~ShellFileOperations()
 bool ShellFileOperations::Run()
 {
 	bool succeeded = true;
-	if (pFrom != NULL)
+	if (pFrom > SHFILEOPSTRUCT::pFrom)
 	{
 		EnableWindow(hwnd, FALSE);
 		succeeded = SHFileOperation(this) == 0 && !fAnyOperationsAborted;
