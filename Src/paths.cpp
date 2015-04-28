@@ -46,6 +46,16 @@ PATH_EXISTENCE paths_DoesPathExist(LPCTSTR szPath)
 		return IS_EXISTING_FILE;
 }
 
+/**
+ * @brief paths_IsReadonlyFile
+ */
+DWORD paths_IsReadonlyFile(LPCTSTR path)
+{
+	const DWORD attr = GetFileAttributes(path);
+	const DWORD mask = FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_DIRECTORY;
+	return (attr & mask) == FILE_ATTRIBUTE_READONLY ? attr : 0;
+}
+
 static const String &paths_DoMagic(String &path)
 {
 	// As for now no magic prefix on UNC paths!

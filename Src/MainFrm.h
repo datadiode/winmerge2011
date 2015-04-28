@@ -114,7 +114,7 @@ public:
 	void UpdateResources();
 	static bool CreateBackup(bool bFolder, LPCTSTR pszPath);
 	static String GetFileExt(LPCTSTR sFileName, LPCTSTR sDescription);
-	int HandleReadonlySave(String &strSavePath, int choice = 0);
+	int HandleReadonlySave(DWORD attr, String &strSavePath, int choice = 0);
 	void SetStatus(UINT);
 	void SetStatus(LPCTSTR);
 	void UpdateIndicators();

@@ -302,9 +302,9 @@ HRESULT CHexMergeView::SaveFile(LPCTSTR path)
 	}
 	// Ask user what to do about FILE_ATTRIBUTE_READONLY
 	String strPath = path;
-	if (theApp.m_pMainWnd->HandleReadonlySave(strPath) == IDCANCEL)
-		return S_OK;
-	path = strPath.c_str();
+	if (DWORD attr = paths_IsReadonlyFile(strPath.c_str()))
+		if (theApp.m_pMainWnd->HandleReadonlySave(attr, strPath) == IDCANCEL)
+			return S_OK;
 	// Take a chance to create a backup
 	if (!theApp.m_pMainWnd->CreateBackup(false, path))
 		return S_OK;
@@ -327,7 +327,7 @@ HRESULT CHexMergeView::SaveFile(LPCTSTR path)
 	CloseHandle(h);
 	if (hr != S_OK)
 		return hr;
-	hr = SE(CopyFile(sIntermediateFilename.c_str(), path, FALSE));
+	hr = SE(CopyFile(sIntermediateFilename.c_str(), strPath.c_str(), FALSE));
 	if (hr != S_OK)
 		return hr;
 	m_mtime = mtime;

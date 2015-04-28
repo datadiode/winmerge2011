@@ -1325,12 +1325,12 @@ void CMainFrame::OnHelpGnulicense()
 }
 
 /**
- * @brief Checks if path (file/folder) is read-only and asks overwriting it.
+ * @brief Called when path is read-only to decide how to proceed.
  *
+ * @param attr [in] File attributes
  * @param strSavePath [in,out] Path where to save (file or folder)
- * @param bMultiFile [in] Single file or multiple files/folder
- * @param bApplyToAll [in,out] Apply last user selection for all items?
- * @return Users selection:
+ * @param choice [in] Previous choice taken by the user
+ * @return Choice taken by the user:
  * - IDOK: Item was not readonly, no actions
  * - IDYES/IDYESTOALL: Overwrite readonly item
  * - IDNO: User selected new filename (single file) or user wants to skip
@@ -1338,12 +1338,8 @@ void CMainFrame::OnHelpGnulicense()
  * @sa CMainFrame::SyncFileToVCS()
  * @sa CChildFrame::DoSave()
  */
-int CMainFrame::HandleReadonlySave(String &strSavePath, int choice)
+int CMainFrame::HandleReadonlySave(DWORD attr, String &strSavePath, int choice)
 {
-	DWORD attr = GetFileAttributes(strSavePath.c_str());
-	if ((attr & (FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_DIRECTORY)) != FILE_ATTRIBUTE_READONLY)
-		return IDOK;
-
 	// Version control system used?
 	// Checkout file from VCS and modify, don't ask about overwriting
 	// RO files etc.

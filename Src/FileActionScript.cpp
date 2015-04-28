@@ -193,15 +193,18 @@ bool FileActionScript::Run(HListView *pLv, FILEOP_FLAGS flags)
 				// has been modified.
 				if (COptionsMgr::Get(OPT_VCS_SYSTEM) != VCS_NONE)
 				{
-					ASSERT(choice != 0); // or else expect a side effect on iter->dest
-					CreateCaret(pLv, iter->context);
-					choice = theApp.m_pMainWnd->HandleReadonlySave(
-						const_cast<String &>(iter->dest), choice);
-					DestroyCaret();
-					if (choice == IDCANCEL)
-						break;
-					if (choice == IDNO) // Skip this item
-						continue; // NB: This also advances the iterator!
+					if (DWORD attr = paths_IsReadonlyFile(iter->dest.c_str()))
+					{
+						ASSERT(choice != 0); // or else expect a side effect on iter->dest
+						CreateCaret(pLv, iter->context);
+						choice = theApp.m_pMainWnd->HandleReadonlySave(
+							attr, const_cast<String &>(iter->dest), choice);
+						DestroyCaret();
+						if (choice == IDCANCEL)
+							break;
+						if (choice == IDNO) // Skip this item
+							continue; // NB: This also advances the iterator!
+					}
 				}
 				if (!theApp.m_pMainWnd->CreateBackup(true, iter->dest.c_str()))
 				{

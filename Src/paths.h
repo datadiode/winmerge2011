@@ -18,6 +18,7 @@ typedef enum
 
 bool paths_EndsWithSlash(LPCTSTR);
 PATH_EXISTENCE paths_DoesPathExist(LPCTSTR);
+DWORD paths_IsReadonlyFile(LPCTSTR);
 LPCTSTR paths_UndoMagic(LPTSTR);
 void paths_UndoMagic(String &);
 String paths_GetLongPath(LPCTSTR);

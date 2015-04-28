@@ -987,8 +987,9 @@ bool CChildFrame::DoSave(bool &bSaveSuccess, int nBuffer)
 		}
 	}
 
-	if (m_pMDIFrame->HandleReadonlySave(strSavePath) == IDCANCEL)
-		return false;
+	if (DWORD attr = paths_IsReadonlyFile(strSavePath.c_str()))
+		if (m_pMDIFrame->HandleReadonlySave(attr, strSavePath) == IDCANCEL)
+			return false;
 
 	if (!m_pMDIFrame->CreateBackup(false, strSavePath.c_str()))
 		return false;
