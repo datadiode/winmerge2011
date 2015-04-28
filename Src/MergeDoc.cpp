@@ -1904,10 +1904,10 @@ void CChildFrame::OpenDocs(
 	// try to recognize them using their first lines 
 	if (bLeftTyped == NULL && bRightTyped == NULL)
 	{
-		LPCTSTR sFirstLine = m_ptBuf[0]->GetLineChars(0);
-		bLeftTyped = pLeft->SetTextTypeByContent(sFirstLine);
-		sFirstLine = m_ptBuf[1]->GetLineChars(0);
-		bRightTyped = pRight->SetTextTypeByContent(sFirstLine);
+		if (LPCTSTR sFirstLine = m_ptBuf[0]->GetLineChars(0))
+			bLeftTyped = pLeft->SetTextTypeByContent(sFirstLine);
+		if (LPCTSTR sFirstLine = m_ptBuf[1]->GetLineChars(0))
+			bRightTyped = pRight->SetTextTypeByContent(sFirstLine);
 	}
 
 	// If other side didn't have recognized texttype, apply recognized
