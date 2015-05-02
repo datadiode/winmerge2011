@@ -3366,7 +3366,7 @@ static const TCHAR *MemSearch(const TCHAR *p, size_t pLen, const TCHAR *q, size_
 }
 
 int CCrystalTextView::FindStringHelper(
-	LPCTSTR pchFindWhere, int cchFindWhere,
+	LPCTSTR pchFindWhere, UINT cchFindWhere,
 	LPCTSTR pchFindWhat, DWORD dwFlags,
 	Captures &ovector)
 {
@@ -4335,7 +4335,7 @@ void CCrystalTextView::EnsureSelectionVisible()
 CCrystalTextView::TextDefinition *CCrystalTextView::SetTextTypeByContent(LPCTSTR pszContent)
 {
 	Captures captures;
-	if (FindStringHelper(pszContent, _tcslen(pszContent),
+	if (FindStringHelper(pszContent, static_cast<UINT>(_tcslen(pszContent)),
 		_T("^\\s*\\<\\?xml\\s+.+?\\?\\>\\s*$"), FIND_REGEXP, captures) >= 0)
 	{
 		return SetTextType(CCrystalTextView::SRC_XML);

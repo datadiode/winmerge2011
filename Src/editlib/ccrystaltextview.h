@@ -126,7 +126,7 @@ private:
 	bool m_bFocused;
 
 	static int FindStringHelper(
-		LPCTSTR pchFindWhere, int cchFindWhere,
+		LPCTSTR pchFindWhere, UINT cchFindWhere,
 		LPCTSTR pchFindWhat, DWORD dwFlags,
 		Captures &ovector);
 
