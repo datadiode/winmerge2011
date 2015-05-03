@@ -1,3 +1,39 @@
+0.2011.005.187
+Changes since preceding release (not necessarily complete):
+• Fix an imagelist leak caused by neglecting the truth about TVS_CHECKBOXES
+• msxml.wsc.FileTransform: No need to strip the \\?\ prefix (Issue #44)
+• CMainFrame: Fix crash when invoking CVssPrompt dialog
+• Remove /reghive option in favor of new /config option using JSON-like files
+• MainFrm.cpp: Backup filename was lacking a '.' when original filename had none
+• EditLib: Preserve DROPEFFECT_LINK when processing IDropTarget events
+• MergeCmdLine: Default Compare As selection neglected files passed on cmdline
+• PropVss: Path to external tool not saved when selected through Browse button
+• PropVss: 64-bit build failed to read ClearCase registry settings
+• ChildFrm.cpp: CChildFrame::UpdateResources() missed to update status texts
+• Allow for per-project JSON config files
+• setup.wsf: Mirror path to 64-bit WinMergeU.exe under \Software\Wow6432Node
+• ProjectFilePathsDlg: Add option to create project specific configuration file
+• MainFrm.cpp: ProjectFilePathsDlg did not localize correctly
+• Capture output from versioning system CLIs to deliver better error messages
+• FileTransform.cpp: Have UniPluginFile::ReadString() tolerate embedded NULLs
+• UniPluginFile: Add methods for saving back files
+• DiffTextBuffer: Use optional scriptlet-provided methods when saving back files
+• EditLib: Fix occasional incomplete drawing of lines with combining characters
+• File transform scriptlet to produce more meaningful results for GEDCOM files
+• EditLib: Have FindStringHelper() tolerate embedded NULLs
+• UniStdioFile: Set m_lastError upon failure of _tfopen() or fwrite()
+• Issue #61 Implement Identical Files message box for binary file compare view
+• CChildFrame::CopyMultipleList(): Disregarded OP_TRIVIAL for bottommost diff
+• CChildFrame::OpenDocs(): Set the document types _before_ Rescan()
+• CChildFrame::RefreshOptions(): Missed to tell detail views to RefreshOptions()
+• EditLib: Move "Separate combining characters" option to View menu
+• CChildFrame: Must call UpdateBookmarkUI() when focus moves between panes
+• Fix inaccurate update of menu items reflecting several per-document settings
+• Issue #79 Folder ignore broken due to regression from 765 (9fa8d1be8903)
+• Issue #70 Regexp search & replace with c-style escapes and submatch references
+• FileActionScript::Run(): Give some visual feedback while doing bulk checkouts
+• ShellFileOperations: Don't call SHFileOperation() when no AddSource() happened
+
 2011.004.525
 Changes since preceding release (not necessarily complete):
 • SettingStore: Fall back to read-only access to WinMergeU.dat when not elevated
