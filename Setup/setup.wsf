@@ -36,7 +36,7 @@ End If
 <meta http-equiv='Content-Type' content='text/html; charset=ISO-8859-1'/>
 <hta:application
 	id='app'
-	version='XXXXX.2011.003.154'
+	version='XXXXX.2011.005.187'
 	applicationName='WinMerge &amp;version; Setup'
 	scroll='no'
 	singleInstance='yes'
@@ -52,7 +52,7 @@ ExecuteParameters="install &platform;"
 <comment id='setup_bat'>
 set SevenZip=&SevenZip;
 del "WinMerge_&version;_&platform;.7z"
-"%SevenZip%\7z.exe" a "WinMerge_&version;_&platform;.7z" -r .\Build\WinMerge\&platform;\Release\* .\Build\WinMerge\Win32\Release\ShellExtensionU.dll .\Build\WinMerge\x64\Release\ShellExtensionX64.dll -x!*.lib -x!*.exp -x!*.pdb -x!*.sh
+"%SevenZip%\7z.exe" a "WinMerge_&version;_&platform;.7z" -r .\Build\WinMerge\&platform;\Release\* .\Build\WinMerge\Win32\Release\ShellExtensionU.dll .\Build\WinMerge\x64\Release\ShellExtensionX64.dll -x!*.lib -x!*.exp -x!*.pdb -x!*.sh -x!*.json
 copy /b "%SevenZip%\7zS.sfx" + Setup_&platform;.cfg + "WinMerge_&version;_&platform;.7z" "WinMerge_&version;_&platform;_change_7z_to_exe_if_you_want_a_setup.7z"
 </comment>
 <comment id='version_h'>

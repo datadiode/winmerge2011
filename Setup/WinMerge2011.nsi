@@ -22,7 +22,7 @@
 
 ;    3. This notice may not be removed or altered from any source distribution.
 
-!define version "0.2011.003.131"
+!define version "0.2011.005.187"
 !define srcdir "..\Build\WinMerge\Win32\Release"
 !define setup "..\Build\WinMerge\Win32\WinMerge_${version}_wine_setup.exe"
 
@@ -105,7 +105,7 @@ Section "Main Application (GNU GPLv2)"
 	; package all files, recursively, preserving attributes
 	; assume files are in the correct places
 
-	File /a /r /x *.lib /x *.exp /x *.pdb /x *.wsf "${srcdir}\*.*"
+	File /a /r /x *.lib /x *.exp /x *.pdb /x *.wsf /x *.json /x *.log /x *.bak "${srcdir}\*.*"
 
 	RegDLL "$INSTDIR\ShellExtensionU.dll"
 
