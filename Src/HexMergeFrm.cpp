@@ -389,6 +389,7 @@ LRESULT CHexMergeFrame::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		if (wParam)
 		{
 			m_pMDIFrame->InitCmdUI();
+			m_pMDIFrame->UpdateCmdUI<ID_REFRESH>(MF_ENABLED);
 			m_pMDIFrame->UpdateCmdUI<ID_NEXTDIFF>(MF_ENABLED);
 			m_pMDIFrame->UpdateCmdUI<ID_PREVDIFF>(MF_ENABLED);
 			m_pMDIFrame->UpdateCmdUI<ID_EDIT_CUT>(MF_ENABLED);

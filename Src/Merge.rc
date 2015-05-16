@@ -204,6 +204,8 @@ IDR_HEXDOCTYPE MENU
         MENUITEM "Ta&b Bar", ID_VIEW_TAB_BAR, HELP
         MENUITEM SEPARATOR
         MENUITEM "&Language...", ID_VIEW_LANGUAGE
+        MENUITEM SEPARATOR
+        MENUITEM "Refresh\tF5", ID_REFRESH
     }
     POPUP "&Merge"
     {
