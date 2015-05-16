@@ -69,7 +69,7 @@ IDR_DIRDOCTYPE MENU
         MENUITEM SEPARATOR
         MENUITEM "&Language...", ID_VIEW_LANGUAGE
         MENUITEM SEPARATOR
-        MENUITEM "Refre&sh\tF5", ID_REFRESH
+        MENUITEM "Refresh\tF5", ID_REFRESH
         MENUITEM "&Refresh Selected\tCtrl+F5", ID_DIR_RESCAN
     }
     POPUP "&Merge"
@@ -489,7 +489,7 @@ IDR_MERGEDOCTYPE MENU
         MENUITEM SEPARATOR
         MENUITEM "&Language...", ID_VIEW_LANGUAGE
         MENUITEM SEPARATOR
-        MENUITEM "Refre&sh\tF5", ID_REFRESH
+        MENUITEM "Refresh\tF5", ID_REFRESH
     }
     POPUP "&Merge"
     {

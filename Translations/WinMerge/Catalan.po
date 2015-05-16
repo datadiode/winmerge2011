@@ -285,7 +285,7 @@ msgstr "Idio&ma..."
 #: Merge.rc:72
 #: Merge.rc:492
 #, c-format
-msgid "Refre&sh\tF5"
+msgid "Refresh\tF5"
 msgstr "Actualit&za\tF5"
 
 #: Merge.rc:73

@@ -282,7 +282,7 @@ msgstr ""
 #: Merge.rc:72
 #: Merge.rc:492
 #, c-format
-msgid "Refre&sh\tF5"
+msgid "Refresh\tF5"
 msgstr ""
 
 #: Merge.rc:73
