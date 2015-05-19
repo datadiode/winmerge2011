@@ -2629,12 +2629,32 @@ LRESULT CMainFrame::OnWndMsg<WM_DROPFILES>(WPARAM wParam, LPARAM)
 /**
  * @brief Open given file to external editor specified in options.
  * @param [in] file Full path to file to open.
+ * @param [in] editor Path or command line template for the applicable editor.
+ * @param [in] line Zero-based line number to navigate to.
+ * @param [in] column Zero-based column number to navigate to.
  */
-void CMainFrame::OpenFileToExternalEditor(LPCTSTR file, LPCTSTR editor)
+void CMainFrame::OpenFileToExternalEditor(LPCTSTR file, LPCTSTR editor, int line, int column)
 {
 	if (editor == NULL)
 		editor = COptionsMgr::Get(OPT_EXT_EDITOR_CMD).c_str();
-	string_format sCmd(_T("%s \"%s\""), env_ExpandVariables(editor).c_str(), file);
+	String sCmd;
+	if (*editor == _T('"'))
+	{
+		sCmd = editor;
+		// fill in placeholders for paths with and without magic prefix
+		string_replace(sCmd, _T("<wpath>"), file);
+		string_replace(sCmd, _T("<path>"), paths_UndoMagic(wcsdupa(file)));
+		// fill in placeholders for 1-based line and column number
+		string_replace(sCmd, _T("<line>"), NumToStr(line + 1, 10).c_str());
+		string_replace(sCmd, _T("<column>"), NumToStr(column + 1, 10).c_str());
+		// fill in placeholders for 0-based line and column number
+		string_replace(sCmd, _T("<line0>"), NumToStr(line, 10).c_str());
+		string_replace(sCmd, _T("<column0>"), NumToStr(column, 10).c_str());
+	}
+	else
+	{
+		sCmd.append_sprintf(_T("%s \"%s\""), env_ExpandVariables(editor).c_str(), file);
+	}
 	String sExecutable;
 	DecorateCmdLine(sCmd, sExecutable);
 	if (paths_PathIsExe(sExecutable.c_str()))

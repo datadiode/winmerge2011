@@ -178,8 +178,14 @@ void PropRegistry::UpdateScreen()
 /// Open file browse dialog to locate editor
 void PropRegistry::OnBrowseEditor()
 {
-	if (SelectFile(m_hWnd, m_strEditorPath, IDS_OPEN_TITLE, IDS_PROGRAMFILES, TRUE))
+	String sCmd = m_strEditorPath;
+	String sExecutable;
+	DecorateCmdLine(sCmd, sExecutable);
+	if (SelectFile(m_hWnd, sExecutable, IDS_OPEN_TITLE, IDS_PROGRAMFILES, TRUE))
+	{
+		sExecutable.swap(m_strEditorPath);
 		UpdateData<Set>();
+	}
 }
 
 /// Open Folder selection dialog for user to select filter folder.

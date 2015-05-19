@@ -140,7 +140,7 @@ public:
 
 	BYTE QueryCmdState(UINT id) const;
 
-	static void OpenFileToExternalEditor(LPCTSTR file, LPCTSTR editor = NULL);
+	static void OpenFileToExternalEditor(LPCTSTR file, LPCTSTR editor = NULL, int line = 0, int column = 0);
 	void OpenFileWith(LPCTSTR file) const;
 	bool ParseArgsAndDoOpen(const MergeCmdLineInfo &);
 	void InitOptions();

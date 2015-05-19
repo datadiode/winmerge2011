@@ -197,11 +197,15 @@ void DecorateCmdLine(String &sCmdLine, String &sExecutable)
 	{
 		sExecutable = sCmdLine.substr(0U, pos);
 		string_trim_ws(sExecutable);
-		sCmdLine.insert(sExecutable.length(), 1U, _T('"'));
-		sCmdLine.insert(0U, 1U, _T('"'));
+		if (sExecutable.front() != _T('"'))
+		{
+			sCmdLine.insert(sExecutable.length(), 1U, _T('"'));
+			sCmdLine.insert(0U, 1U, _T('"'));
+		}
 	}
 	else
 	{
 		sExecutable = sCmdLine;
 	}
+	sExecutable.erase(std::remove(sExecutable.begin(), sExecutable.end(), _T('"')), sExecutable.end());
 }
