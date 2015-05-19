@@ -374,6 +374,12 @@ LRESULT CDirFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 	case ID_DIR_OPEN_RIGHT_WITHEDITOR:
 		m_pDirView->DoOpenWithEditor(CDirView::SIDE_RIGHT);
 		break;
+	case ID_DIR_OPEN_LEFT_FOLDER:
+		m_pDirView->DoOpenFolder(CDirView::SIDE_LEFT);
+		break;
+	case ID_DIR_OPEN_RIGHT_FOLDER:
+		m_pDirView->DoOpenFolder(CDirView::SIDE_RIGHT);
+		break;
 	case ID_L2R:
 	case ID_DIR_COPY_LEFT_TO_RIGHT:
 		m_pDirView->DoCopyLeftToRight();

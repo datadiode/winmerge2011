@@ -2696,6 +2696,13 @@ void CMainFrame::OpenFileWith(LPCTSTR file) const
 	}
 }
 
+void CMainFrame::OpenFolder(LPCTSTR file) const
+{
+	file = paths_UndoMagic(wcsdupa(file));
+	string_format args(_T("/select,\"%s\""), file);
+	ShellExecute(m_hWnd, _T("open"), _T("explorer.exe"), args.c_str(), NULL, SW_SHOWNORMAL);
+}
+
 typedef enum { ToConfigLog, FromConfigLog } ConfigLogDirection;
 
 /**

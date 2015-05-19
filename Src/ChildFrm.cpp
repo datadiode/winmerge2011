@@ -37,6 +37,7 @@
 #include "Common/SettingStore.h"
 #include "Common/stream_util.h"
 #include "Common/coretools.h"
+#include "paths.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -159,6 +160,7 @@ void CChildFrame::OnOpenFile()
 	LPCTSTR file = m_strPath[pMergeView->m_nThisPane].c_str();
 	if (file[0] == _T('\0'))
 		return;
+	file = paths_UndoMagic(wcsdupa(file));
 	int rtn = (int)ShellExecute(NULL, _T("edit"), file, 0, 0, SW_SHOWNORMAL);
 	if (rtn == SE_ERR_NOASSOC)
 		rtn = (int)ShellExecute(NULL, _T("open"), file, 0, 0, SW_SHOWNORMAL);
@@ -185,7 +187,22 @@ void CChildFrame::OnOpenFileWithEditor()
 	const CMergeEditView *const pMergeView = GetActiveMergeView();
 	LPCTSTR file = m_strPath[pMergeView->m_nThisPane].c_str();
 	if (file[0] != _T('\0'))
-		m_pMDIFrame->OpenFileToExternalEditor(file);
+	{
+		POINT pos = pMergeView->GetCursorPos();
+		pos.y = m_ptBuf[pMergeView->m_nThisPane]->ComputeRealLine(pos.y);
+		m_pMDIFrame->OpenFileToExternalEditor(file, NULL, pos.y, pos.x);
+	}
+}
+
+/**
+ * @brief Open the folder containing the active file 
+ */
+void CChildFrame::OnOpenFolder()
+{
+	const CMergeEditView *const pMergeView = GetActiveMergeView();
+	LPCTSTR file = m_strPath[pMergeView->m_nThisPane].c_str();
+	if (file[0] != _T('\0'))
+		m_pMDIFrame->OpenFolder(file);
 }
 
 void CChildFrame::DoPrint()
@@ -511,6 +528,9 @@ LRESULT CChildFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 		break;
 	case ID_FILE_OPEN_WITH:
 		OnOpenFileWith();
+		break;
+	case ID_FILE_OPEN_FOLDER:
+		OnOpenFolder();
 		break;
 	case ID_EDIT_RIGHT_TO_LEFT:
 		pTextView->OnEditRightToLeft();

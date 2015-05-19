@@ -148,6 +148,7 @@ private:
 	void DoOpenWith(SIDE_TYPE);
 	void DoOpenWithEditor(SIDE_TYPE, LPCTSTR = NULL);
 	void DoOpenWithFrhed(SIDE_TYPE);
+	void DoOpenFolder(SIDE_TYPE);
 	bool ConfirmActionList(FileActionScript &);
 	void PerformActionList(FileActionScript &);
 	void UpdateAfterFileScript(FileActionScript &);

@@ -602,12 +602,14 @@
 #define IDS_CONFIRM_MULTIPLE_MOVE               17643
 #define IDS_CONFIRM_COPY_CAPTION                17644
 #define IDS_CONFIRM_MOVE_CAPTION                17645
-#define ID_DIR_OPEN_LEFT                        17648
-#define ID_DIR_OPEN_LEFT_WITHEDITOR             17649
-#define ID_DIR_OPEN_LEFT_WITH                   17650
-#define ID_DIR_OPEN_RIGHT                       17651
-#define ID_DIR_OPEN_RIGHT_WITHEDITOR            17652
-#define ID_DIR_OPEN_RIGHT_WITH                  17653
+#define ID_DIR_OPEN_LEFT                        17646
+#define ID_DIR_OPEN_LEFT_WITHEDITOR             17647
+#define ID_DIR_OPEN_LEFT_WITH                   17648
+#define ID_DIR_OPEN_LEFT_FOLDER                 17649
+#define ID_DIR_OPEN_RIGHT                       17650
+#define ID_DIR_OPEN_RIGHT_WITHEDITOR            17651
+#define ID_DIR_OPEN_RIGHT_WITH                  17652
+#define ID_DIR_OPEN_RIGHT_FOLDER                17653
 #define ID_DIR_COPY_FILENAMES                   17655
 #define ID_DIR_COPY_PATHNAMES_LEFT              17656
 #define ID_DIR_COPY_PATHNAMES_RIGHT             17657
@@ -860,6 +862,7 @@
 #define ID_FILE_OPEN_REGISTERED                 32944
 #define ID_FILE_OPEN_WITHEDITOR                 32945
 #define ID_FILE_OPEN_WITH                       32946
+#define ID_FILE_OPEN_FOLDER                     32947
 
 #define ID_VIEW_CONTEXT_0                       32950
 #define ID_VIEW_CONTEXT_1                       32951

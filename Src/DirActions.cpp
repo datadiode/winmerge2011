@@ -787,6 +787,14 @@ void CDirView::DoOpenWithFrhed(SIDE_TYPE stype)
 	DoOpenWithEditor(stype, editor.c_str());
 }
 
+/// Open with dialog for file on selected side
+void CDirView::DoOpenFolder(SIDE_TYPE stype)
+{
+	String file = GetSelectedFileName(stype);
+	if (!file.empty())
+		m_pFrame->m_pMDIFrame->OpenFolder(file.c_str());
+}
+
 /**
  * @brief Mark selected items as needing for rescan.
  * @return Count of items to rescan.

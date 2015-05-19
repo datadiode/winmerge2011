@@ -593,12 +593,16 @@ IDR_POPUP_DIRVIEW MENU
             MENUITEM "with &Registered Application", ID_DIR_OPEN_LEFT
             MENUITEM "with &External Editor", ID_DIR_OPEN_LEFT_WITHEDITOR
             MENUITEM "&with...", ID_DIR_OPEN_LEFT_WITH
+            MENUITEM SEPARATOR
+            MENUITEM "Containing &Folder", ID_DIR_OPEN_LEFT_FOLDER
         }
         POPUP "O&pen Right"
         {
             MENUITEM "with &Registered Application", ID_DIR_OPEN_RIGHT
             MENUITEM "with &External Editor", ID_DIR_OPEN_RIGHT_WITHEDITOR
             MENUITEM "&with...", ID_DIR_OPEN_RIGHT_WITH
+            MENUITEM SEPARATOR
+            MENUITEM "Containing &Folder", ID_DIR_OPEN_RIGHT_FOLDER
         }
         MENUITEM SEPARATOR
         POPUP "Cop&y Pathnames"
@@ -725,6 +729,8 @@ IDR_POPUP_MERGEVIEW MENU
             MENUITEM "with &Registered Application", ID_FILE_OPEN_REGISTERED
             MENUITEM "with &External Editor", ID_FILE_OPEN_WITHEDITOR
             MENUITEM "&with...", ID_FILE_OPEN_WITH
+            MENUITEM SEPARATOR
+            MENUITEM "Containing &Folder", ID_FILE_OPEN_FOLDER
         }
     }
 }

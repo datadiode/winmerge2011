@@ -231,6 +231,7 @@ private:
 	void OnOpenFile();
 	void OnOpenFileWith();
 	void OnOpenFileWithEditor();
+	void OnOpenFolder();
 	bool OnL2r();
 	bool OnR2l();
 	void OnAllLeft();
