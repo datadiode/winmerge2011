@@ -2665,6 +2665,7 @@ void CMainFrame::OpenFileWith(LPCTSTR file) const
 		typedef void (CALLBACK*EntryPoint)(HWND, HINSTANCE, char *, int);
 		if (FARPROC fp = GetProcAddress(hinst, "OpenAs_RunDLL"))
 		{
+			file = paths_UndoMagic(wcsdupa(file));
 			if (HString *cmd = HString::Uni(file)->Oct())
 			{
 				reinterpret_cast<EntryPoint>(fp)(m_hWnd, hinst, cmd->A, SW_SHOWNORMAL);
