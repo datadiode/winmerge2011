@@ -754,6 +754,7 @@ void CDirView::DoOpen(SIDE_TYPE stype)
 	String file = GetSelectedFileName(stype);
 	if (file.empty())
 		return;
+	paths_UndoMagic(file);
 	int rtn = (int)ShellExecute(NULL, _T("edit"), file.c_str(), 0, 0, SW_SHOWNORMAL);
 	if (rtn != SE_ERR_NOASSOC)
 		return;
