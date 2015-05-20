@@ -1360,7 +1360,7 @@ void CCrystalTextView::DrawSingleLine(HSurface *pdc, const RECT &rc, int nLineIn
 	if (crText != CLR_NONE)
 		pdc->SetTextColor(crText);
 
-	int nEmptySubLines = 1;
+	int nEmptySubLines = 0;
 
 	if (LPCTSTR pszChars = GetLineChars(nLineIndex))
 	{
@@ -1422,6 +1422,11 @@ void CCrystalTextView::DrawSingleLine(HSurface *pdc, const RECT &rc, int nLineIn
 		delete[] pBuf;
 		nEmptySubLines = GetEmptySubLines(nLineIndex);
 	}
+	else if (nLineIndex == GetLineCount() - 1)
+	{
+		nEmptySubLines = 1;
+	}
+
 	// Draw empty sublines
 	if (nEmptySubLines > 0)
 	{
