@@ -4278,60 +4278,58 @@ void CCrystalTextView::EnsureSelectionVisible()
 
 	ScrollToSubLine(nNewTopSubLine);
 
-	//  Scroll horizontally
-	//BEGIN SW
-	// we do not need horizontally scrolling, if we wrap the words
-	if (m_bWordWrap)
-		return;
-	//END SW
-	int nActualPos = CalculateActualOffset(m_ptSelStart.y, m_ptSelStart.x);
-	int nActualEndPos = CalculateActualOffset(m_ptSelEnd.y, m_ptSelEnd.x);
-	int nNewOffset = m_nOffsetChar;
-	const int nScreenChars = GetScreenChars();
-	const int nBeginOffset = nActualPos - m_nOffsetChar;
-	const int nEndOffset = nActualEndPos - m_nOffsetChar;
-	const int nSelLen = nActualEndPos - nActualPos;
-
-	// Selection fits to screen, scroll whole selection visible
-	if (nSelLen < nScreenChars)
+	// Scroll horizontally unless we wrap the words
+	if (!m_bWordWrap)
 	{
-		// Begin of selection not visible 
-		if (nBeginOffset > nScreenChars)
+		const int nActualPos = CalculateActualOffset(m_ptSelStart.y, m_ptSelStart.x);
+		const int nActualEndPos = CalculateActualOffset(m_ptSelEnd.y, m_ptSelEnd.x);
+		const int nScreenChars = GetScreenChars();
+		const int nBeginOffset = nActualPos - m_nOffsetChar;
+		const int nEndOffset = nActualEndPos - m_nOffsetChar;
+		const int nSelLen = nActualEndPos - nActualPos;
+
+		int nNewOffset = m_nOffsetChar;
+
+		// Selection fits to screen, scroll whole selection visible
+		if (nSelLen < nScreenChars)
 		{
-			// Scroll so that there is max 5 chars margin at end
-			if (nScreenChars - nSelLen > 5)
-				nNewOffset = nActualPos + 5 - nScreenChars + nSelLen;
-			else
+			// Begin of selection not visible 
+			if (nBeginOffset > nScreenChars)
+			{
+				// Scroll so that there is max 5 chars margin at end
+				if (nScreenChars - nSelLen > 5)
+					nNewOffset = nActualPos + 5 - nScreenChars + nSelLen;
+				else
+					nNewOffset = nActualPos - 5;
+			}
+			else if (nBeginOffset < 0)
+			{
+				// Scroll so that there is max 5 chars margin at begin
+				if (nScreenChars - nSelLen >= 5)
+					nNewOffset = nActualPos - 5;
+				else
+					nNewOffset = nActualPos - 5 - nScreenChars + nSelLen;
+			}
+			// End of selection not visible
+			else if (nEndOffset > nScreenChars || nEndOffset < 0)
+			{
 				nNewOffset = nActualPos - 5;
+			}
 		}
-		else if (nBeginOffset < 0)
-		{
-			// Scroll so that there is max 5 chars margin at begin
-			if (nScreenChars - nSelLen >= 5)
-				nNewOffset = nActualPos - 5;
-			else
-				nNewOffset = nActualPos - 5 - nScreenChars + nSelLen;
-		}
-		// End of selection not visible
-		else if (nEndOffset > nScreenChars || nEndOffset < 0)
+		else // Selection does not fit screen so scroll to begin of selection
 		{
 			nNewOffset = nActualPos - 5;
 		}
+
+		// Horiz scroll limit to longest line + one screenwidth
+		const int nMaxLineLen = GetMaxLineLength();
+		if (nNewOffset >= nMaxLineLen + nScreenChars)
+			nNewOffset = nMaxLineLen + nScreenChars - 1;
+		if (nNewOffset < 0)
+			nNewOffset = 0;
+
+		ScrollToChar(nNewOffset);
 	}
-	else // Selection does not fit screen so scroll to begin of selection
-	{
-		nNewOffset = nActualPos - 5;
-	}
-
-	// Horiz scroll limit to longest line + one screenwidth
-	const int nMaxLineLen = GetMaxLineLength ();
-	if (nNewOffset >= nMaxLineLen + nScreenChars)
-		nNewOffset = nMaxLineLen + nScreenChars - 1;
-	if (nNewOffset < 0)
-		nNewOffset = 0;
-
-	ScrollToChar(nNewOffset);
-
 	UpdateSiblingScrollPos();
 }
 
