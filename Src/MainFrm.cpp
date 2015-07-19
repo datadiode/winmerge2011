@@ -2599,7 +2599,7 @@ LRESULT CMainFrame::OnWndMsg<WM_DROPFILES>(WPARAM wParam, LPARAM)
 		files[0].c_str(), files[1].c_str());
 
 	// Check if they dropped a project file
-	if (fileCount == 1)
+	if (fileCount == 1 && !PathIsDirectory(files[0].c_str()))
 	{
 		if (ProjectFile::IsProjectFile(files[0].c_str()))
 		{
