@@ -164,6 +164,20 @@ bool PropVss::UpdateData()
 	return true;
 }
 
+COptionDef<String> *PropVss::GetPathOption()
+{
+	switch (m_nVerSys)
+	{
+	case VCS_VSS4:
+		return &OPT_VSS_PATH;
+	case VCS_CLEARCASE:
+		return &OPT_CLEARTOOL_PATH;
+	case VCS_TFS:
+		return &OPT_TFS_PATH;
+	}
+	return NULL;
+}
+
 DWORD PropVss::GetClearCaseVerbs()
 {
 	DWORD verbs = NClearCase::none;
@@ -264,7 +278,8 @@ LRESULT PropVss::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 void PropVss::ReadOptions()
 {
 	m_nVerSys = COptionsMgr::Get(OPT_VCS_SYSTEM);
-	m_strPath = COptionsMgr::Get(OPT_VSS_PATH);
+	if (COptionDef<String> *pOpt = GetPathOption())
+		m_strPath = COptionsMgr::Get(*pOpt);
 }
 
 /** 
@@ -273,7 +288,8 @@ void PropVss::ReadOptions()
 void PropVss::WriteOptions()
 {
 	COptionsMgr::SaveOption(OPT_VCS_SYSTEM, m_nVerSys);
-	COptionsMgr::SaveOption(OPT_VSS_PATH, m_strPath);
+	if (COptionDef<String> *pOpt = GetPathOption())
+		COptionsMgr::SaveOption(*pOpt, m_strPath);
 	if (m_bClearCaseTypeMgrSetupModified)
 	{
 		NClearCase::CTypeMgrMapStream src(STGM_READ | STGM_SHARE_DENY_WRITE);
@@ -405,14 +421,20 @@ BOOL PropVss::OnInitDialog()
  */
 void PropVss::UpdateScreen() 
 {
-	UpdateData<Set>();
 	String tempStr = LanguageSelect.LoadString(
 		m_nVerSys == VCS_CLEARCASE ? IDS_CC_CMD :
 		m_nVerSys == VCS_TFS ? IDS_TF_CMD :
 		IDS_VSS_CMD);
 	SetDlgItemText(IDC_VSS_L1, tempStr.c_str());
-	BOOL enable = m_nVerSys == VCS_VSS4 || m_nVerSys == VCS_CLEARCASE || m_nVerSys == VCS_TFS;
+	BOOL enable = FALSE;
+	m_strPath.clear();
+	if (COptionDef<String> *pOpt = GetPathOption())
+	{
+		enable = TRUE;
+		m_strPath = COptionsMgr::Get(*pOpt);
+	}
 	GetDlgItem(IDC_PATH_EDIT)->EnableWindow(enable);
 	GetDlgItem(IDC_VSS_L1)->EnableWindow(enable);
 	GetDlgItem(IDC_BROWSE_BUTTON)->EnableWindow(enable);
+	UpdateData<Set>();
 }

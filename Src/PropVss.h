@@ -26,9 +26,10 @@ protected:
 	template<DDX_Operation>
 			bool UpdateData();
 
+	COptionDef<String> *GetPathOption();
 	DWORD GetClearCaseVerbs();
 	void SetClearCaseVerbs(DWORD);
-			
+
 	virtual BOOL OnInitDialog();
 	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
 	LRESULT OnNotify(UNotify *);

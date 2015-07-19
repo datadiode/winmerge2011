@@ -284,6 +284,10 @@ extern COptionDef
 <int> OPT_VCS_SYSTEM operator((_T("Settings/VersionSystem"), VCS_NONE));
 extern COptionDef
 <String> OPT_VSS_PATH operator((_T("Settings/VssPath"), _T("")));
+extern COptionDef
+<String> OPT_CLEARTOOL_PATH operator((_T("Settings/ClearToolPath"), _T("")));
+extern COptionDef
+<String> OPT_TFS_PATH operator((_T("Settings/TfsPath"), _T("")));
 
 // Archive support
 extern COptionDef

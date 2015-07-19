@@ -228,7 +228,7 @@ int CMainFrame::SaveToVersionControl(LPCTSTR pszSavePath)
 				WaitStatusCursor waitstatus(IDS_VSS_CHECKOUT_STATUS);
 				// checkout operation
 				string_replace(m_strCCComment, _T("\""), _T("\\\""));
-				const String &tool = COptionsMgr::Get(OPT_VSS_PATH);
+				const String &tool = COptionsMgr::Get(OPT_CLEARTOOL_PATH);
 				string_format args(_T("\"%s\" checkout -c \"%s\" \"%s\""), tool.c_str(), m_strCCComment.c_str(), name.c_str());
 				if (int id = RunTool(tool.c_str(), args.c_str(), path.c_str(), IDS_VSSERROR, MB_CANCELTRYCONTINUE | MB_ICONSTOP))
 					choice = id;
@@ -240,7 +240,7 @@ int CMainFrame::SaveToVersionControl(LPCTSTR pszSavePath)
 				// process versioning system specific action
 				WaitStatusCursor waitstatus(IDS_VSS_CHECKOUT_STATUS);
 				// checkout operation
-				const String &tool = COptionsMgr::Get(OPT_VSS_PATH);
+				const String &tool = COptionsMgr::Get(OPT_TFS_PATH);
 				string_format args(_T("\"%s\" edit \"%s\""), tool.c_str(), name.c_str());
 				if (int id = RunTool(tool.c_str(), args.c_str(), path.c_str(), IDS_VSSERROR, MB_CANCELTRYCONTINUE | MB_ICONSTOP))
 					choice = id;
