@@ -133,6 +133,7 @@
 #define IDC_LEFT_BUTTON                         1001
 #define IDC_LFILTER_EDIT                        1001
 #define IDC_TV_CLEARCASE_TYPEMGR_SETUP          1001
+#define IDC_FLDCONFIRM_IGNORE_FOLDER_STRUCTURE  1002
 #define IDC_LEFT_COMBO                          1002
 #define IDC_RIGHT_EDIT                          1002
 #define IDC_COMPARE_CACHE_RESULTS               1003

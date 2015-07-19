@@ -36,7 +36,9 @@ static char THIS_FILE[] = __FILE__;
 
 ConfirmFolderCopyDlg::ConfirmFolderCopyDlg()
 : OResizableDialog(IDD_CONFIRM_COPY)
+, m_bEnableIgnoreFolderStructure(FALSE)
 , m_bMakeTargetItemWritable(FALSE)
+, m_bIgnoreFolderStructure(FALSE)
 {
 	// configure how individual controls adjust when dialog resizes
 	static const LONG FloatScript[] =
@@ -75,9 +77,12 @@ BOOL ConfirmFolderCopyDlg::OnInitDialog()
 	SetDlgItemText(IDC_FLDCONFIRM_FROM_PATH, m_fromPath.c_str());
 	SetDlgItemText(IDC_FLDCONFIRM_TO_PATH, m_toPath.c_str());
 	SetDlgItemText(IDC_FLDCONFIRM_QUERY, m_question.c_str());
+	GetDlgItem(IDC_FLDCONFIRM_IGNORE_FOLDER_STRUCTURE)->EnableWindow(m_bEnableIgnoreFolderStructure);
+
 	m_bMakeTargetItemWritable = SettingStore.GetProfileInt(
 		_T("Settings"), _T("DirViewMakeTargetItemWritable"), 0);
 	CheckDlgButton(IDC_FLDCONFIRM_MAKE_WRITABLE, m_bMakeTargetItemWritable);
+	CheckDlgButton(IDC_FLDCONFIRM_IGNORE_FOLDER_STRUCTURE, m_bIgnoreFolderStructure);
 
 	return TRUE;
 }
@@ -93,6 +98,8 @@ LRESULT ConfirmFolderCopyDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lPa
 			m_bMakeTargetItemWritable = IsDlgButtonChecked(IDC_FLDCONFIRM_MAKE_WRITABLE);
 			SettingStore.WriteProfileInt(_T("Settings"),
 				_T("DirViewMakeTargetItemWritable"), m_bMakeTargetItemWritable);
+			m_bIgnoreFolderStructure = IsDlgButtonChecked(IDC_FLDCONFIRM_IGNORE_FOLDER_STRUCTURE);
+			// fall through
 		case IDNO:
 		case IDCANCEL:
 			EndDialog(wParam);

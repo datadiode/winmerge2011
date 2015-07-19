@@ -35,7 +35,9 @@ public:
 	String m_toText;
 	String m_toPath;
 	String m_caption;
+	BOOL m_bEnableIgnoreFolderStructure;
 	BOOL m_bMakeTargetItemWritable;
+	BOOL m_bIgnoreFolderStructure;
 
 protected:
 	virtual BOOL OnInitDialog();

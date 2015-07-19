@@ -323,6 +323,7 @@ void CDirView::DoCopyLeftTo()
 			act.atype = FileAction::ACT_COPY;
 			act.UIResult = FileActionItem::UI_DONT_CARE;
 			act.UIOrigin = FileActionItem::UI_LEFT;
+			act.UIDestination = FileActionItem::UI_LEFT;
 			actionScript.AddActionItem(act);
 		}
 	}
@@ -372,6 +373,7 @@ void CDirView::DoCopyRightTo()
 			act.atype = FileAction::ACT_COPY;
 			act.UIResult = FileActionItem::UI_DONT_CARE;
 			act.UIOrigin = FileActionItem::UI_RIGHT;
+			act.UIDestination = FileActionItem::UI_RIGHT;
 			actionScript.AddActionItem(act);
 		}
 	}
@@ -420,6 +422,7 @@ void CDirView::DoMoveLeftTo()
 			act.context = sel;
 			act.atype = FileAction::ACT_MOVE;
 			act.UIOrigin = FileActionItem::UI_LEFT;
+			act.UIDestination = FileActionItem::UI_LEFT;
 			act.UIResult = FileActionItem::UI_DEL_LEFT;
 			actionScript.AddActionItem(act);
 		}
@@ -469,6 +472,7 @@ void CDirView::DoMoveRightTo()
 			act.context = sel;
 			act.atype = FileAction::ACT_MOVE;
 			act.UIOrigin = FileActionItem::UI_RIGHT;
+			act.UIDestination = FileActionItem::UI_RIGHT;
 			act.UIResult = FileActionItem::UI_DEL_RIGHT;
 			actionScript.AddActionItem(act);
 		}
@@ -488,20 +492,15 @@ bool CDirView::ConfirmActionList(FileActionScript &actionList)
 	const CDiffContext *ctxt = m_pFrame->GetDiffContext();
 	FileActionItem item = actionList.GetHeadActionItem();
 
-	bool bDestIsSide = true;
-
 	// special handling for the single item case, because it is probably the most common,
 	// and we can give the user exact details easily for it
 	switch (item.atype)
 	{
 	case FileAction::ACT_COPY:
-		if (item.UIResult == FileActionItem::UI_DONT_CARE)
-			bDestIsSide = false;
-
 		if (actionList.GetActionItemCount() == 1)
 		{
 			if (!actionList.ConfirmCopy(item.UIOrigin, item.UIDestination,
-				item.src.c_str(), item.dest.c_str(), bDestIsSide))
+				item.src.c_str(), item.dest.c_str()))
 			{
 				return false;
 			}
@@ -516,7 +515,7 @@ bool CDirView::ConfirmActionList(FileActionScript &actionList)
 			else
 				src = ctxt->GetRightPath();
 
-			if (bDestIsSide)
+			if (item.UIOrigin != item.UIDestination)
 			{
 				if (item.UIDestination == FileActionItem::UI_LEFT)
 					dst = ctxt->GetLeftPath();
@@ -531,8 +530,7 @@ bool CDirView::ConfirmActionList(FileActionScript &actionList)
 					dst = item.dest;
 			}
 
-			if (!actionList.ConfirmCopy(item.UIOrigin, item.UIDestination,
-				src.c_str(), dst.c_str(), bDestIsSide))
+			if (!actionList.ConfirmCopy(item.UIOrigin, item.UIDestination, src.c_str(), dst.c_str()))
 			{
 				return false;
 			}
@@ -543,11 +541,9 @@ bool CDirView::ConfirmActionList(FileActionScript &actionList)
 		break;
 
 	case FileAction::ACT_MOVE:
-		bDestIsSide = false;
 		if (actionList.GetActionItemCount() == 1)
 		{
-			if (!actionList.ConfirmMove(item.UIOrigin, item.UIDestination,
-				item.src.c_str(), item.dest.c_str(), bDestIsSide))
+			if (!actionList.ConfirmMove(item.UIOrigin, item.UIDestination, item.src.c_str(), item.dest.c_str()))
 			{
 				return false;
 			}
@@ -567,8 +563,7 @@ bool CDirView::ConfirmActionList(FileActionScript &actionList)
 			else
 				dst = item.dest;
 
-			if (!actionList.ConfirmMove(item.UIOrigin, item.UIDestination,
-				src.c_str(), dst.c_str(), bDestIsSide))
+			if (!actionList.ConfirmMove(item.UIOrigin, item.UIDestination, src.c_str(), dst.c_str()))
 			{
 				return false;
 			}

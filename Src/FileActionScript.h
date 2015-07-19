@@ -104,16 +104,16 @@ public:
 
 	bool ConfirmCopy(
 		int origin, int destination,
-		LPCTSTR src, LPCTSTR dest, bool destIsSide);
+		LPCTSTR src, LPCTSTR dest);
 
 	bool ConfirmMove(
 		int origin, int destination,
-		LPCTSTR src, LPCTSTR dest, bool destIsSide);
+		LPCTSTR src, LPCTSTR dest);
 
 	bool ConfirmDialog(
 		UINT caption, UINT question,
 		int origin, int destination,
-		LPCTSTR src, LPCTSTR dest, bool destIsSide);
+		LPCTSTR src, LPCTSTR dest);
 
 	bool Run(HListView *, FILEOP_FLAGS);
 
@@ -136,6 +136,7 @@ public:
 
 	String m_destBase; /**< Base destination path for some operations */
 	bool m_bMakeTargetItemWritable; /**< Whether to make copy/move target items writable */
+	bool m_bIgnoreFolderStructure; /**< Whether to ignore the folder structure */
 
 private:
 	std::vector<FileActionItem> m_actions; /**< List of all actions for this script. */

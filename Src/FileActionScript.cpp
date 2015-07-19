@@ -35,6 +35,7 @@ using std::vector;
  */
 FileActionScript::FileActionScript()
 : m_bMakeTargetItemWritable(false)
+, m_bIgnoreFolderStructure(false)
 {
 }
 
@@ -58,11 +59,11 @@ FileActionScript::~FileActionScript()
  * @return TRUE if copy should proceed, FALSE if aborted.
  */
 bool FileActionScript::ConfirmCopy(
-	int origin, int destination, LPCTSTR src, LPCTSTR dest, bool destIsSide)
+	int origin, int destination, LPCTSTR src, LPCTSTR dest)
 {
 	bool ret = ConfirmDialog(IDS_CONFIRM_COPY_CAPTION,
 		GetActionItemCount() == 1 ? IDS_CONFIRM_SINGLE_COPY : IDS_CONFIRM_MULTIPLE_COPY,
-		origin, destination, src, dest, destIsSide);
+		origin, destination, src, dest);
 	return ret;
 }
 
@@ -79,11 +80,11 @@ bool FileActionScript::ConfirmCopy(
  * @return TRUE if copy should proceed, FALSE if aborted.
  */
 bool FileActionScript::ConfirmMove(
-	int origin, int destination, LPCTSTR src, LPCTSTR dest, bool destIsSide)
+	int origin, int destination, LPCTSTR src, LPCTSTR dest)
 {
 	bool ret = ConfirmDialog(IDS_CONFIRM_MOVE_CAPTION,
 		GetActionItemCount() == 1 ? IDS_CONFIRM_SINGLE_MOVE : IDS_CONFIRM_MULTIPLE_MOVE,
-		origin, destination, src, dest, destIsSide);
+		origin, destination, src, dest);
 	return ret;
 }
 
@@ -100,14 +101,15 @@ bool FileActionScript::ConfirmMove(
  */
 bool FileActionScript::ConfirmDialog(
 	UINT caption, UINT question,
-	int origin, int destination, LPCTSTR src, LPCTSTR dest, bool destIsSide)
+	int origin, int destination, LPCTSTR src, LPCTSTR dest)
 {
 	ConfirmFolderCopyDlg dlg;
 	dlg.m_caption = LanguageSelect.LoadString(caption);
 	dlg.m_question = LanguageSelect.Format(question, GetActionItemCount());
 	dlg.m_fromText = LanguageSelect.LoadString(
 		origin == FileActionItem::UI_LEFT ? IDS_FROM_LEFT : IDS_FROM_RIGHT);
-	dlg.m_toText = LanguageSelect.LoadString(!destIsSide ? IDS_TO :
+	dlg.m_bEnableIgnoreFolderStructure = origin == destination;
+	dlg.m_toText = LanguageSelect.LoadString(origin == destination ? IDS_TO :
 		destination == FileActionItem::UI_LEFT ? IDS_TO_LEFT : IDS_TO_RIGHT);
 
 	dlg.m_fromPath = src;
@@ -119,6 +121,7 @@ bool FileActionScript::ConfirmDialog(
 
 	bool ret = LanguageSelect.DoModal(dlg) == IDYES;
 	m_bMakeTargetItemWritable = dlg.m_bMakeTargetItemWritable != FALSE;
+	m_bIgnoreFolderStructure = dlg.m_bIgnoreFolderStructure != FALSE;
 	return ret;
 }
 
@@ -166,15 +169,35 @@ bool FileActionScript::Run(HListView *pLv, FILEOP_FLAGS flags)
 			cchDestination[iter->atype] += len + 1;
 	}
 
-	ShellFileOperations CopyOperations(pLv->m_hWnd, FO_COPY,
-		flags | FOF_MULTIDESTFILES | FOF_NOCONFIRMMKDIR | FOF_NOCONFIRMATION,
-		cchSource[FileAction::ACT_COPY], cchDestination[FileAction::ACT_COPY]);
-	ShellFileOperations MoveOperations(pLv->m_hWnd, FO_MOVE,
-		flags | FOF_MULTIDESTFILES,
-		cchSource[FileAction::ACT_MOVE], cchDestination[FileAction::ACT_MOVE]);
 	ShellFileOperations DelOperations(pLv->m_hWnd, FO_DELETE,
 		flags,
 		cchSource[FileAction::ACT_DEL] + cchDestination[FileAction::ACT_DEL], 0);
+
+	if (m_bIgnoreFolderStructure)
+	{
+		String::size_type len = m_destBase.length() + 1;
+		cchDestination[FileAction::ACT_COPY] = len;
+		cchDestination[FileAction::ACT_MOVE] = len;
+	}
+	else
+	{
+		flags |= FOF_MULTIDESTFILES;
+	}
+
+	ShellFileOperations CopyOperations(pLv->m_hWnd, FO_COPY,
+		flags | FOF_NOCONFIRMMKDIR | FOF_NOCONFIRMATION,
+		cchSource[FileAction::ACT_COPY], cchDestination[FileAction::ACT_COPY]);
+
+	ShellFileOperations MoveOperations(pLv->m_hWnd, FO_MOVE,
+		flags,
+		cchSource[FileAction::ACT_MOVE], cchDestination[FileAction::ACT_MOVE]);
+
+	if (m_bIgnoreFolderStructure)
+	{
+		LPCTSTR destination = m_destBase.c_str();
+		CopyOperations.AddDestination(destination);
+		MoveOperations.AddDestination(destination);
+	}
 
 	int choice = IDYES;
 	for (iter = m_actions.begin() ; iter != m_actions.end() ; ++iter)
@@ -213,12 +236,14 @@ bool FileActionScript::Run(HListView *pLv, FILEOP_FLAGS flags)
 				}
 			}
 			CopyOperations.AddSource(iter->src.c_str());
-			CopyOperations.AddDestination(iter->dest.c_str());
+			if (!m_bIgnoreFolderStructure)
+				CopyOperations.AddDestination(iter->dest.c_str());
 		}
 		else if (iter->atype == FileAction::ACT_MOVE)
 		{
 			MoveOperations.AddSource(iter->src.c_str());
-			MoveOperations.AddDestination(iter->dest.c_str());
+			if (!m_bIgnoreFolderStructure)
+				MoveOperations.AddDestination(iter->dest.c_str());
 		}
 		else if (iter->atype == FileAction::ACT_DEL)
 		{
