@@ -145,6 +145,7 @@ bool FileFilterHelper::CreateFromMask()
 		}
 		if (int lentoken = StrCSpn(mask, separators))
 		{
+			LPCTSTR endtoken = NULL;
 			do switch (TCHAR c = *mask++)
 			{
 			case '*':
@@ -152,6 +153,12 @@ bool FileFilterHelper::CreateFromMask()
 				break;
 			case '?':
 				regExp += _T('.');
+				break;
+			case '\"':
+				if (endtoken == NULL && (endtoken = StrChr(mask, c)) != NULL)
+				{
+					lentoken = static_cast<int>(endtoken - mask) + 2;
+				}
 				break;
 			case '.':
 				if (lentoken == 1 || lentoken == 2 && *mask == '*')
