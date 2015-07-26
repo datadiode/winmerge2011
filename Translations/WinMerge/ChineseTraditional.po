@@ -1480,12 +1480,12 @@ msgstr "備註"
 #: Merge.rc:773
 #: Merge.rc:1586
 #, c-format
-msgid "Apply to all items"
+msgid "&Apply to all items"
 msgstr "套用到所有項目"
 
 #: Merge.rc:774
 #, c-format
-msgid "CheckIn after checkout"
+msgid "&CheckIn after checkout"
 msgstr "送回改過檔後就取出之"
 
 #: Merge.rc:782

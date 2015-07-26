@@ -770,8 +770,8 @@ FONT 8, "MS Shell Dlg", 0, 0, 1
     PUSHBUTTON      "Save As...", IDC_SAVE_AS, 129, 115, 70, 14, NOT WS_VISIBLE
     EDITTEXT        IDC_COMMENTS, 18, 21, 243, 56, WS_HSCROLL | WS_VSCROLL | ES_AUTOHSCROLL | ES_AUTOVSCROLL | ES_MULTILINE | ES_WANTRETURN
     LTEXT           "Comments", IDC_STATIC, 18, 7, 243, 10, SS_LEFT
-    AUTOCHECKBOX    "Apply to all items", IDC_MULTI_CHECKOUT, 17, 83, 243, 8
-    AUTOCHECKBOX    "CheckIn after checkout", IDC_CHECKIN, 17, 93, 243, 8
+    AUTOCHECKBOX    "&Apply to all items", IDC_MULTI_CHECKOUT, 17, 83, 243, 8
+    AUTOCHECKBOX    "&CheckIn after checkout", IDC_CHECKIN, 17, 93, 243, 8
 }
 
 
@@ -1583,7 +1583,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 1
     EDITTEXT        IDC_USER, 62, 96, 63, 14, ES_AUTOHSCROLL
     RTEXT           "Password:", IDC_STATIC, 132, 99, 55, 8, SS_RIGHT
     EDITTEXT        IDC_PASSWORD, 190, 96, 60, 14, ES_AUTOHSCROLL | ES_PASSWORD
-    AUTOCHECKBOX    "Apply to all items", IDC_MULTI_CHECKOUT, 7, 125, 235, 8
+    AUTOCHECKBOX    "&Apply to all items", IDC_MULTI_CHECKOUT, 7, 125, 235, 8
     DEFPUSHBUTTON   "Check Out", IDOK, 41, 145, 70, 14
     PUSHBUTTON      "Save As...", IDC_SAVE_AS, 115, 145, 70, 14
     PUSHBUTTON      "Cancel", IDCANCEL, 190, 145, 60, 14

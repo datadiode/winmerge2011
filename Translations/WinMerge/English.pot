@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WinMerge\n"
 "Report-Msgid-Bugs-To: http://bugs.winmerge.org/\n"
-"POT-Creation-Date: 2015-07-19 14:25+0000\n"
+"POT-Creation-Date: 2015-07-26 11:53+0000\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: English <winmerge-translate@lists.sourceforge.net>\n"
@@ -1472,12 +1472,12 @@ msgstr ""
 #: Merge.rc:773
 #: Merge.rc:1586
 #, c-format
-msgid "Apply to all items"
+msgid "&Apply to all items"
 msgstr ""
 
 #: Merge.rc:774
 #, c-format
-msgid "CheckIn after checkout"
+msgid "&CheckIn after checkout"
 msgstr ""
 
 #: Merge.rc:782

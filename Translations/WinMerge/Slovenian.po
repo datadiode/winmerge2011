@@ -1476,12 +1476,12 @@ msgstr "Komentarji"
 #: Merge.rc:773
 #: Merge.rc:1586
 #, c-format
-msgid "Apply to all items"
+msgid "&Apply to all items"
 msgstr "Uporabi na vseh predmetih"
 
 #: Merge.rc:774
 #, c-format
-msgid "CheckIn after checkout"
+msgid "&CheckIn after checkout"
 msgstr "CheckIn po CheckOut-u"
 
 #: Merge.rc:782

@@ -1476,12 +1476,12 @@ msgstr "备注"
 #: Merge.rc:773
 #: Merge.rc:1586
 #, c-format
-msgid "Apply to all items"
+msgid "&Apply to all items"
 msgstr "应用于所有项目"
 
 #: Merge.rc:774
 #, c-format
-msgid "CheckIn after checkout"
+msgid "&CheckIn after checkout"
 msgstr "签出后立即签入"
 
 #: Merge.rc:782

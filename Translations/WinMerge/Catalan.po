@@ -1475,12 +1475,12 @@ msgstr "Comentaris"
 #: Merge.rc:773
 #: Merge.rc:1586
 #, c-format
-msgid "Apply to all items"
+msgid "&Apply to all items"
 msgstr "Aplica a &tots els elements"
 
 #: Merge.rc:774
 #, c-format
-msgid "CheckIn after checkout"
+msgid "&CheckIn after checkout"
 msgstr "Reintegra (check-in) després d'extreure (check-out)"
 
 #: Merge.rc:782
