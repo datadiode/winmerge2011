@@ -1086,22 +1086,22 @@ msgstr "K&opiera"
 #: Merge.rc:572
 #, c-format
 msgid "&Left to Right (%1 of %2)"
-msgstr ""
+msgstr "Vänster till höger (%1 av %2)"
 
 #: Merge.rc:573
 #, c-format
 msgid "L&eft to... (%1 of %2)"
-msgstr ""
+msgstr "Vänster till... (%1 av %2)"
 
 #: Merge.rc:574
 #, c-format
 msgid "&Right to Left (%1 of %2)"
-msgstr ""
+msgstr "Höger till vänster (%1 av %2)"
 
 #: Merge.rc:575
 #, c-format
 msgid "R&ight to... (%1 of %2)"
-msgstr ""
+msgstr "Höger till... (%1 av %2)"
 
 #: Merge.rc:577
 #, c-format
@@ -1111,12 +1111,12 @@ msgstr "&Flytta"
 #: Merge.rc:579
 #, c-format
 msgid "&Left to... (%1 of %2)"
-msgstr ""
+msgstr "Vänster till... (%1 av %2)"
 
 #: Merge.rc:580
 #, c-format
 msgid "&Right to... (%1 of %2)"
-msgstr ""
+msgstr "Höger till... (%1 av %2)"
 
 #: Merge.rc:582
 #, c-format
