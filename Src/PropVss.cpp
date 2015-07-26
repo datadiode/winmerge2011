@@ -32,6 +32,7 @@
 #include "PropVss.h"
 #include "Common/MyCom.h"
 #include "Common/stream_util.h"
+#include "Common/VersionData.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -46,8 +47,21 @@ static const TCHAR HandlerPathWinMerge[] =
 	// Rather more appropriately, point ClearCase to a proper registry entry:
 	_T("HKLM\\Software\\Thingamahoochie\\WinMerge\\Executable");
 
+#ifdef _WIN64
+#	define REG_SOFTWARE_NODE _T("SOFTWARE\\Wow6432Node\\")
+#else
+#	define REG_SOFTWARE_NODE _T("SOFTWARE\\")
+#endif
+
 namespace NClearCase
 {
+	LSTATUS GetProductHome(LPTSTR path)
+	{
+		static const TCHAR key[] = REG_SOFTWARE_NODE _T("Atria\\ClearCase\\CurrentVersion");
+		static const TCHAR value[] = _T("ProductHome");
+		return SHRegGetPath(HKEY_LOCAL_MACHINE, key, value, path, 0);
+	}
+
 	enum EVerbs //: DWORD
 	{
 		none,
@@ -89,13 +103,7 @@ namespace NClearCase
 	public:
 		CTypeMgrMapStream(DWORD grfMode)
 		{
-#ifdef _WIN64
-			static const TCHAR key[] = _T("SOFTWARE\\Wow6432Node\\Atria\\ClearCase\\CurrentVersion");
-#else
-			static const TCHAR key[] = _T("SOFTWARE\\Atria\\ClearCase\\CurrentVersion");
-#endif
-			static const TCHAR value[] = _T("ProductHome");
-			if (SHRegGetPath(HKEY_LOCAL_MACHINE, key, value, path, 0) == ERROR_SUCCESS)
+			if (GetProductHome(path) == ERROR_SUCCESS)
 			{
 				PathAppend(path, _T("lib\\mgrs\\map"));
 				if (grfMode & STGM_CREATE)
@@ -166,13 +174,58 @@ bool PropVss::UpdateData()
 
 COptionDef<String> *PropVss::GetPathOption()
 {
+	TCHAR path[MAX_PATH];
 	switch (m_nVerSys)
 	{
 	case VCS_VSS4:
+		if (COptionsMgr::Get(OPT_VSS_PATH).empty())
+		{
+			static const TCHAR key[] = REG_SOFTWARE_NODE _T("Microsoft\\SourceSafe");
+			static const TCHAR value[] = _T("SCCServerPath");
+			if (SHRegGetPath(HKEY_LOCAL_MACHINE, key, value, path, 0) == ERROR_SUCCESS)
+			{
+				PathAppend(path, _T("Ss.exe"));
+				COptionsMgr::Set(OPT_VSS_PATH, String(path));
+			}
+		}
 		return &OPT_VSS_PATH;
 	case VCS_CLEARCASE:
+		if (COptionsMgr::Get(OPT_CLEARTOOL_PATH).empty())
+		{
+			if (NClearCase::GetProductHome(path) == ERROR_SUCCESS)
+			{
+				PathAppend(path, _T("bin\\cleartool.exe"));
+				COptionsMgr::Set(OPT_CLEARTOOL_PATH, String(path));
+			}
+		}
 		return &OPT_CLEARTOOL_PATH;
 	case VCS_TFS:
+		if (COptionsMgr::Get(OPT_TFS_PATH).empty())
+		{
+			static const TCHAR key[] = _T("CLSID\\{DEF52C03-E6D8-4b47-BD08-DF416EF3E950}\\InprocServer32");
+			if (SHRegGetPath(HKEY_CLASSES_ROOT, key, NULL, path, 0) == ERROR_SUCCESS)
+			{
+				PathRemoveFileSpec(path);
+				PathAppend(path, _T("TFPT.EXE"));
+				if (HMODULE hModule = LoadLibraryEx(path, 0, LOAD_LIBRARY_AS_DATAFILE))
+				{
+					if (const VS_FIXEDFILEINFO *pVffInfo =
+						reinterpret_cast<const VS_FIXEDFILEINFO *>(CVersionData::Load(hModule)->Data()))
+					{
+						TCHAR varname[24];
+						wsprintf(varname, _T("VS%u0COMNTOOLS"), HIWORD(pVffInfo->dwFileVersionMS));
+						if (GetEnvironmentVariable(varname, path, _countof(path)))
+						{
+							PathRemoveBackslash(path);
+							PathRemoveFileSpec(path);
+							PathAppend(path, _T("IDE\\TF.exe"));
+							COptionsMgr::Set(OPT_TFS_PATH, String(path));
+						}
+					}
+					FreeLibrary(hModule);
+				}
+			}
+		}
 		return &OPT_TFS_PATH;
 	}
 	return NULL;
@@ -289,7 +342,10 @@ void PropVss::WriteOptions()
 {
 	COptionsMgr::SaveOption(OPT_VCS_SYSTEM, m_nVerSys);
 	if (COptionDef<String> *pOpt = GetPathOption())
-		COptionsMgr::SaveOption(*pOpt, m_strPath);
+		COptionsMgr::Set(*pOpt, m_strPath);
+	// If path is left empty, let 2nd GetPathOption() try to figure it out otherwise.
+	if (COptionDef<String> *pOpt = GetPathOption())
+		pOpt->SaveOption();
 	if (m_bClearCaseTypeMgrSetupModified)
 	{
 		NClearCase::CTypeMgrMapStream src(STGM_READ | STGM_SHARE_DENY_WRITE);

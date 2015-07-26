@@ -19,18 +19,6 @@ void CMainFrame::InitializeSourceControlMembers()
 	m_vssHelper.SetProjectBase(SettingStore.GetProfileString(_T("Settings"), _T("VssProject")));
 	m_strVssUser = SettingStore.GetProfileString(_T("Settings"), _T("VssUser"));
 	m_strVssDatabase = SettingStore.GetProfileString(_T("Settings"), _T("VssDatabase"));
-
-	String vssPath = COptionsMgr::Get(OPT_VSS_PATH);
-	if (vssPath.empty())
-	{
-		CRegKeyEx reg;
-		if (reg.QueryRegMachine(_T("SOFTWARE\\Microsoft\\SourceSafe")) == ERROR_SUCCESS)
-		{
-			vssPath = reg.ReadString(_T("SCCServerPath"), _T(""));
-			vssPath = paths_GetParentPath(vssPath.c_str()) + _T("\\Ss.exe");
-			COptionsMgr::SaveOption(OPT_VSS_PATH, vssPath);
-		}
-	}
 }
 
 /**
