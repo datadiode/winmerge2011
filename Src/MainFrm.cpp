@@ -3412,15 +3412,34 @@ int CMainFrame::RunTool(LPCTSTR tool, LPCTSTR args, LPCTSTR path, UINT id, UINT 
 	return code != 0 ? theApp.DoMessageBox(prompt.c_str(), type) : 0;
 }
 
+bool CMainFrame::CreateCaret(HListView *pLv, int index)
+{
+	if (!pLv->EnsureVisible(index, FALSE))
+		return false;
+	RECT rc;
+	if (!pLv->GetItemRect(index, &rc, LVIR_ICON))
+		return false;
+	if (!pLv->CreateCaret(NULL, rc.right - rc.left, rc.bottom - rc.top))
+		return false;
+	SetCaretPos(rc.left, rc.top);
+	pLv->ShowCaret();
+	MSG msg;
+	while (::PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
+		if (msg.message == WM_PAINT)
+			::DispatchMessage(&msg);
+	return true;
+}
+
 /**
  * @brief Checkin in file into ClearCase.
  */ 
 void CMainFrame::CheckinToClearCase(LPCTSTR strDestinationPath)
 {
+	strDestinationPath = paths_UndoMagic(wcsdupa(strDestinationPath));
 	String path = paths_GetParentPath(strDestinationPath);
 	String name = PathFindFileName(strDestinationPath);
 	// checkin operation
-	const String &tool = COptionsMgr::Get(OPT_VSS_PATH);
+	const String &tool = COptionsMgr::Get(OPT_CLEARTOOL_PATH);
 	string_format args(_T("\"%s\" checkin -nc \"%s\""), tool.c_str(), name.c_str());
 	if (RunTool(tool.c_str(), args.c_str(), path.c_str(), IDS_VSS_CHECKINERROR, MB_ICONWARNING | MB_YESNO) == IDYES)
 	{

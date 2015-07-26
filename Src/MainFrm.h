@@ -126,6 +126,7 @@ public:
 	void ShowHelp(LPCTSTR helpLocation = NULL);
 	void UpdateCodepageModule();
 	static int RunTool(LPCTSTR tool, LPCTSTR args, LPCTSTR path, UINT id, UINT type);
+	static bool CreateCaret(HListView *pLv, int index);
 	void CheckinToClearCase(LPCTSTR strDestinationPath);
 	void StartFlashing();
 	bool AskCloseConfirmation();

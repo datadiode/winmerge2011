@@ -136,24 +136,6 @@ FileActionItem FileActionScript::RemoveTailActionItem()
 	return item;
 }
 
-static bool CreateCaret(HListView *pLv, int index)
-{
-	if (!pLv->EnsureVisible(index, FALSE))
-		return false;
-	RECT rc;
-	if (!pLv->GetItemRect(index, &rc, LVIR_ICON))
-		return false;
-	if (!pLv->CreateCaret(NULL, rc.right - rc.left, rc.bottom - rc.top))
-		return false;
-	SetCaretPos(rc.left, rc.top);
-	pLv->ShowCaret();
-	MSG msg;
-	while (::PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
-		if (msg.message == WM_PAINT)
-			::DispatchMessage(&msg);
-	return true;
-}
-
 bool FileActionScript::Run(HListView *pLv, FILEOP_FLAGS flags)
 {
 	// Now process files/directories that got added to list
@@ -219,7 +201,7 @@ bool FileActionScript::Run(HListView *pLv, FILEOP_FLAGS flags)
 					if (DWORD attr = paths_IsReadonlyFile(iter->dest.c_str()))
 					{
 						ASSERT(choice != 0); // or else expect a side effect on iter->dest
-						CreateCaret(pLv, iter->context);
+						CMainFrame::CreateCaret(pLv, iter->context);
 						choice = theApp.m_pMainWnd->HandleReadonlySave(
 							attr, const_cast<String &>(iter->dest), choice);
 						DestroyCaret();

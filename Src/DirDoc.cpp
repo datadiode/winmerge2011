@@ -815,8 +815,12 @@ void CDirFrame::UpdateDiffAfterOperation(const FileActionItem & act, bool bMakeT
 	{
 	case FileActionItem::UI_SYNC:
 		// Synchronized items may need VCS operations
-		if (m_pMDIFrame->m_bCheckinVCS)
+		if (m_pMDIFrame->m_bCheckinVCS && di->isSideBoth())
+		{
+			CMainFrame::CreateCaret(static_cast<HListView *>(m_pDirView->m_pWnd), act.context);
 			m_pMDIFrame->CheckinToClearCase(act.dest.c_str());
+			DestroyCaret();
+		}
 		di->diffcode &= ~(DIFFCODE::SIDEFLAGS | DIFFCODE::COMPAREFLAGS);
 		if (act.dirflag)
 			di->diffcode |= DIFFCODE::BOTH | DIFFCODE::NOCMP;
