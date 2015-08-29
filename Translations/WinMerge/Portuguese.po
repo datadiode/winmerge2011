@@ -14,7 +14,7 @@ msgstr ""
 "Project-Id-Version: WinMerge\n"
 "Report-Msgid-Bugs-To: http://bugs.winmerge.org/\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2012-01-23 12:00\n"
+"PO-Revision-Date: 2015-07-27 12:00\n"
 "Last-Translator: David Cunha\n"
 "Language-Team: Portuguese <winmerge-translate@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
@@ -1010,7 +1010,7 @@ msgstr "Ajuste de linha"
 #: Merge.rc:477
 #, c-format
 msgid "Separate combining characters\tCtrl+M"
-msgstr ""
+msgstr "Combinação de caracteres separados\tCtrl+M"
 
 #: Merge.rc:479
 #, c-format
@@ -1183,7 +1183,7 @@ msgstr "com..."
 #: Merge.rc:733
 #, c-format
 msgid "Containing &Folder"
-msgstr ""
+msgstr "Que contém &Pasta"
 
 #: Merge.rc:599
 #, c-format
@@ -1573,7 +1573,7 @@ msgstr "Tornar &gravável"
 #: Merge.rc:838
 #, c-format
 msgid "&Ignore folder structure"
-msgstr ""
+msgstr "&Ignorar estrutura da pasta"
 
 #: Merge.rc:839
 #, c-format
@@ -1651,7 +1651,7 @@ msgstr "Parar"
 #: Merge.rc:888
 #, c-format
 msgid "Pause\tContinue\t"
-msgstr ""
+msgstr "Pausa\tContinuar\t"
 
 #: Merge.rc:892
 #, c-format
@@ -2063,7 +2063,7 @@ msgstr "Só de leitura"
 #: Merge.rc:1147
 #, c-format
 msgid "&Create project specific configuration file"
-msgstr ""
+msgstr "&Criar ficheiro específico da configuração do projecto"
 
 #: Merge.rc:1148
 #, c-format
@@ -5152,5 +5152,4 @@ msgstr "%d linhas excluídas"
 #: Merge.rc:2101
 #, c-format
 msgid "Shell menu"
-msgstr ""
-
+msgstr "Menu Shell"
