@@ -44,8 +44,7 @@ int DiffUtils::diffutils_compare_files(file_data *data)
 	m_ndiffs = 0;
 	m_ntrivialdiffs = 0;
 
-	const bool bPostFilter = bFilterCommentsLines || bIgnoreBlankLines || bIgnoreCase;
-	if (script && (FilterList::HasRegExps() || bPostFilter))
+	if (script && (FilterList::HasRegExps() || bFilterCommentsLines))
 	{
 		struct change *next = script;
 		String asLwrCaseExt = A2T(data[0].name);
@@ -82,7 +81,7 @@ int DiffUtils::diffutils_compare_files(file_data *data)
 				int QtyLinesLeft = trans_b0 - trans_a0;
 				int QtyLinesRight = trans_b1 - trans_a1;
 
-				if (bPostFilter && (deletes || inserts))
+				if (bFilterCommentsLines && (deletes || inserts))
 				{
 					OP_TYPE op = PostFilter(
 						thisob->line0, QtyLinesLeft + 1,

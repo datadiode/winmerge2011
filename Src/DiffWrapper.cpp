@@ -210,21 +210,21 @@ static void ReplaceSpaces(std::string &str, const char *rep)
 }
 
 /**
-@brief The main entry for post filtering.  Performs post-filtering, by setting comment blocks to trivial
-@param [in]  LineNumberLeft		- First line number to read from left file
-@param [in]  QtyLinesLeft		- Number of lines in the block for left file
-@param [in]  LineNumberRight		- First line number to read from right file
-@param [in]  QtyLinesRight		- Number of lines in the block for right file
-@param [in,out]  Op				- This variable is set to trivial if block should be ignored.
-@param [in]  filtercommentsset	- Comment marker set used to indicate comment blocks.
-@param [in]  FileNameExt			- The file name extension.  Needs to be lower case string ("cpp", "java", "c")
-*/
+ * @brief The main entry for post filtering.  Performs post-filtering, by setting comment blocks to trivial
+ * @param [in] LineNumberLeft	- First line number to read from left file
+ * @param [in] QtyLinesLeft		- Number of lines in the block for left file
+ * @param [in] LineNumberRight	- First line number to read from right file
+ * @param [in] QtyLinesRight	- Number of lines in the block for right file
+ * @param [in] Op				- OP_TYPE of the block as determined by caller
+ * @param [in] FileNameExt		- The file name extension.  Needs to be lower case string ("cpp", "java", "c")
+ * @return Revised OP_TYPE of the block, with OP_TRIVIAL indicating that the block should be ignored
+ */
 OP_TYPE CDiffWrapper::PostFilter(int LineNumberLeft, int QtyLinesLeft,
 	int LineNumberRight, int QtyLinesRight, OP_TYPE Op, const TCHAR *FileNameExt)
 {
 	ASSERT(Op != OP_TRIVIAL);
 	
-	//First we need to get lowercase file name extension
+	//First of all get the comment marker set used to indicate comment blocks
 	FilterCommentsSet filtercommentsset = GetSetForFileType(FileNameExt);
 	if (filtercommentsset.StartMarker.empty() && 
 		filtercommentsset.EndMarker.empty() &&
