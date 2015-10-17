@@ -1062,6 +1062,9 @@ LRESULT CMainFrame::OnWndMsg<WM_INITMENUPOPUP>(WPARAM wParam, LPARAM lParam)
 				pMenu->EnableMenuItem(mii.wID, MF_DISABLED);
 			}
 			continue;
+		case ID_USE_DESKTOP_SPECIFIC_SETTINGS:
+			pMenu->CheckMenuItem(mii.wID, SettingStore.IsUsingDesktopSpecificSettings() ? MF_CHECKED : MF_UNCHECKED);
+			continue;
 		}
 		// Decorate the item for topmost MDI child window with a bullet rather than a check mark
 		if (mii.wID >= 0xFF00)
@@ -2806,6 +2809,15 @@ void CMainFrame::OnSaveConfigData()
 }
 
 /**
+ * @brief Start or stop using desktop specific settings
+ */
+void CMainFrame::OnUseDesktopSpecificSettings()
+{
+	if (SettingStore.UseDesktopSpecificSettings(!SettingStore.IsUsingDesktopSpecificSettings()))
+		InitOptions();
+}
+
+/**
  * @brief Open two new empty docs, 'Scratchpads'
  * 
  * Allows user to open two empty docs, to paste text to
@@ -3695,6 +3707,9 @@ LRESULT CMainFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 		break;
 	case ID_HELP_GETCONFIG:
 		OnSaveConfigData();
+		break;
+	case ID_USE_DESKTOP_SPECIFIC_SETTINGS:
+		OnUseDesktopSpecificSettings();
 		break;
 	case ID_APP_EXIT:
 		SendMessage(WM_CLOSE);

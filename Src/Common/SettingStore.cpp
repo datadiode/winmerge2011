@@ -14,12 +14,39 @@
 #include "DllProxies.h"
 #include <json/json.h>
 
+class StoreName : public String
+{
+public:
+	StoreName(LPCTSTR fmt, LPCTSTR name, bool desktop_specific = true)
+	{
+		TCHAR desktop[MAX_PATH];
+		TCHAR path[MAX_PATH];
+		if (name == NULL)
+		{
+			GetModuleFileName(NULL, path, _countof(path));
+			PathRemoveExtension(path);
+			name = path;
+		}
+		if (desktop_specific)
+		{
+			HDESK handle = GetThreadDesktop(GetCurrentThreadId());
+			GetUserObjectInformation(handle, UOI_NAME, desktop, sizeof desktop, NULL);
+		}
+		else
+		{
+			fmt += 3;
+		}
+		append_sprintf(fmt, name, desktop);
+	}
+};
+
 CSettingStore::CSettingStore(LPCTSTR sCompanyName, LPCTSTR sApplicationName)
 {
 	ASSERT(ThreadIntegrity);
 	m_hHive = HKEY_CURRENT_USER;
 	m_regsam = KEY_READ | KEY_WRITE;
 	m_bDirty = false;
+	m_bUseDesktopSpecificSettings = false;
 	// Store
 	m_sCompanyName = sCompanyName;
 	m_sApplicationName = sApplicationName;
@@ -151,14 +178,32 @@ bool CSettingStore::SetFileName(String sFileName)
 	ASSERT(ThreadIntegrity);
 	if (sFileName.empty())
 	{
-		TCHAR path[MAX_PATH];
-		GetModuleFileName(NULL, path, _countof(path));
-		PathRenameExtension(path, _T(".json"));
-		if (m_sFileName == path || PathFileExists(path))
+		StoreName(_T("%s@%s.json"), NULL, m_bUseDesktopSpecificSettings).swap(sFileName);
+		if (m_sFileName != sFileName)
 		{
-			sFileName = path;
-			PathStripToRoot(path);
-			SetEnvironmentVariable(_T("PortableRoot"), path);
+			StoreName sAlternateFileName(_T("%s@%s.json"), NULL);
+			DWORD dwFileAttributes = GetFileAttributes(sFileName.c_str());
+			DWORD dwAlternateFileAttributes = m_bUseDesktopSpecificSettings ?
+				dwFileAttributes : GetFileAttributes(sAlternateFileName.c_str());
+			if (dwFileAttributes & dwAlternateFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+			{
+				sFileName.clear();
+				CSettingStore clone(m_sCompanyName, m_sApplicationName);
+				clone.m_bUseDesktopSpecificSettings = true;
+				if (CRegKeyEx key = clone.GetAppRegistryKey(true))
+					if (key.ReadDword(NULL, 0) != 0)
+						m_bUseDesktopSpecificSettings = true;
+			}
+			else
+			{
+				if ((dwAlternateFileAttributes & (FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_DIRECTORY)) == 0)
+				{
+					sAlternateFileName.swap(sFileName);
+					m_bUseDesktopSpecificSettings = true;
+				}
+				PathStripToRoot(&sAlternateFileName.front());
+				SetEnvironmentVariable(_T("PortableRoot"), sAlternateFileName.c_str());
+			}
 		}
 	}
 	if (m_sFileName == sFileName)
@@ -199,10 +244,46 @@ bool CSettingStore::SetFileName(String sFileName)
 	return true;
 }
 
+bool CSettingStore::UseDesktopSpecificSettings(bool bUseDesktopSpecificSettings)
+{
+	if (m_bUseDesktopSpecificSettings == bUseDesktopSpecificSettings)
+		return false;
+	String sFileName;
+	if (m_regsam != 0)
+	{
+		if (m_bUseDesktopSpecificSettings)
+			if (CRegKeyEx key = GetAppRegistryKey())
+				key.WriteDword(NULL, 0);
+		m_bUseDesktopSpecificSettings = bUseDesktopSpecificSettings;
+		if (m_bUseDesktopSpecificSettings)
+			if (CRegKeyEx key = GetAppRegistryKey())
+				key.WriteDword(NULL, 1);
+	}
+	else
+	{
+		m_bUseDesktopSpecificSettings = bUseDesktopSpecificSettings;
+		StoreName(_T("%s@%s.json"), NULL, m_bUseDesktopSpecificSettings).swap(sFileName);
+		if (m_bUseDesktopSpecificSettings)
+		{
+			DWORD attr = GetFileAttributes(sFileName.c_str());
+			if (attr != INVALID_FILE_ATTRIBUTES)
+				SetFileAttributes(sFileName.c_str(), attr & ~FILE_ATTRIBUTE_HIDDEN);
+		}
+	}
+	if (SetFileName(sFileName) && m_regsam == 0 && !m_bUseDesktopSpecificSettings)
+	{
+		StoreName(_T("%s@%s.json"), NULL).swap(sFileName);
+		DWORD attr = GetFileAttributes(sFileName.c_str());
+		if (attr != INVALID_FILE_ATTRIBUTES)
+			SetFileAttributes(sFileName.c_str(), attr | FILE_ATTRIBUTE_HIDDEN);
+	}
+	return true;
+}
+
 // returns key for HKEY_CURRENT_USER\"Software"\RegistryKey\ProfileName
 // creating it if it doesn't exist
 // responsibility of the caller to call RegCloseKey() on the returned HKEY
-HKEY CSettingStore::GetAppRegistryKey() const
+HKEY CSettingStore::GetAppRegistryKey(bool bNoCreate) const
 {
 	ASSERT(ThreadIntegrity);
 	ASSERT(m_sCompanyName != NULL);
@@ -221,9 +302,17 @@ HKEY CSettingStore::GetAppRegistryKey() const
 				REG_OPTION_NON_VOLATILE, m_regsam, NULL,
 				&hCompanyKey, NULL) == ERROR_SUCCESS)
 			{
-				::RegCreateKeyEx(hCompanyKey, m_sApplicationName, 0, REG_NONE,
-					REG_OPTION_NON_VOLATILE, m_regsam, NULL,
-					&hAppKey, NULL);
+				StoreName sStoreName(_T("%s@%s"), m_sApplicationName, m_bUseDesktopSpecificSettings);
+				if (bNoCreate)
+				{
+					::RegOpenKeyEx(hCompanyKey, sStoreName.c_str(), 0, m_regsam, &hAppKey);
+				}
+				else
+				{
+					::RegCreateKeyEx(hCompanyKey, sStoreName.c_str(), 0, REG_NONE,
+						REG_OPTION_NON_VOLATILE, m_regsam, NULL,
+						&hAppKey, NULL);
+				}
 				::RegCloseKey(hCompanyKey);
 			}
 			::RegCloseKey(hSoftKey);

@@ -801,6 +801,7 @@
 #define ID_EOL_TO_MAC                           32776
 #define ID_FILE_MERGINGMODE                     32777
 #define ID_FILE_COLLECTMODE                     32778
+#define ID_USE_DESKTOP_SPECIFIC_SETTINGS        32779
 #define ID_SET_SYNCPOINT                        32781
 #define ID_CLEAR_SYNCPOINTS                     32782
 #define ID_SELECTLINEDIFF                       32784

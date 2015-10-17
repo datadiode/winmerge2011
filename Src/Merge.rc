@@ -276,6 +276,8 @@ IDR_MAINFRAME MENU
         MENUITEM SEPARATOR
         MENUITEM "Recent Projects", ID_FILE_MRU_FILE1, INACTIVE
         MENUITEM SEPARATOR
+        MENUITEM "Use &desktop specific settings", ID_USE_DESKTOP_SPECIFIC_SETTINGS
+        MENUITEM SEPARATOR
         MENUITEM "E&xit", ID_APP_EXIT
     }
     POPUP "&Edit"

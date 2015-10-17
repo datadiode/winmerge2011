@@ -37,6 +37,12 @@ public:
 	/// Gets config file name
 	const String &GetFileName() const { return m_sFileName; }
 
+	/// Start or stop using desktop specific settings
+	bool UseDesktopSpecificSettings(bool);
+
+	/// Whether the application is using desktop specific settings
+	bool IsUsingDesktopSpecificSettings() const { return m_bUseDesktopSpecificSettings; }
+
 	/// Returns an integer option value (or a default value, if absent), identified by the section specifying the Registry key (use a backslash to separate subkeys) and the entry which defines the value name within that key, which must be of the appropriate type.
 	int GetProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nDefault) const;
 
@@ -50,7 +56,7 @@ public:
 	BOOL WriteProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPCTSTR lpszValue) const;
 
 	/// Returns the application's Registry Key as a WinAPI entity, which must be explicitly closed by the caller.
-	HKEY GetAppRegistryKey() const;
+	HKEY GetAppRegistryKey(bool bNoCreate = false) const;
 
 	/// Returns the registry key to the section where the application settings are stored, which must be explicitly closed by the caller.
 	HKEY GetSectionKey(LPCTSTR lpszSection, DWORD dwCount = 0xFFFFFFFF) const;
@@ -71,6 +77,8 @@ private:
 	REGSAM m_regsam;
 	/// Whether any settings were changed after loading
 	mutable bool m_bDirty;
+	/// Whether the application is using desktop specific settings
+	bool m_bUseDesktopSpecificSettings;
 	/// Filename for portable media setup
 	String m_sFileName;
 	/// Company name in the registry key (under HKCU/Software).

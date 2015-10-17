@@ -239,6 +239,7 @@ protected:
 	void OnViewWhitespace();
 	void OnToolsGeneratePatch();
 	void OnSaveConfigData();
+	void OnUseDesktopSpecificSettings();
 	void OnFileNew();
 	void OnDebugLoadConfig();
 	void OnViewStatusBar();
