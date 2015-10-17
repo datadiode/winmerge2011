@@ -110,7 +110,6 @@ LONG CRegKeyEx::QueryRegUser(LPCTSTR key)
 LONG CRegKeyEx::WriteDword(LPCTSTR pszKey, DWORD dwVal) const
 {
 	assert(m_hKey);
-	assert(pszKey);
 	return m_store.RegSetValueEx(m_hKey, pszKey, REG_DWORD,
 		(const LPBYTE) &dwVal, sizeof(DWORD));
 }
@@ -124,7 +123,6 @@ LONG CRegKeyEx::WriteDword(LPCTSTR pszKey, DWORD dwVal) const
 LONG CRegKeyEx::WriteString(LPCTSTR pszKey, LPCTSTR pszData) const
 {
 	assert(m_hKey);
-	assert(pszKey);
 	assert(pszData);
 
 	return m_store.RegSetValueEx(m_hKey, pszKey, REG_SZ,
@@ -140,7 +138,6 @@ LONG CRegKeyEx::WriteString(LPCTSTR pszKey, LPCTSTR pszData) const
 DWORD CRegKeyEx::ReadDword(LPCTSTR pszKey, DWORD defval) const
 {
 	assert(m_hKey);
-	assert(pszKey);
 
 	DWORD dwType;
 	DWORD dwSize = sizeof (DWORD);
@@ -165,7 +162,6 @@ DWORD CRegKeyEx::ReadDword(LPCTSTR pszKey, DWORD defval) const
 LPCTSTR CRegKeyEx::ReadString(LPCTSTR pszKey, LPCTSTR defval, BLOB *blob) const
 {
 	assert(m_hKey);
-	assert(pszKey);
 	DWORD dwType;
 	LONG ret = m_store.RegQueryValueEx(m_hKey, pszKey, &dwType, blob->pBlobData, &blob->cbSize);
 	return ret == ERROR_SUCCESS && dwType == REG_SZ ?
