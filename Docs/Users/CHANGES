@@ -1,3 +1,24 @@
+0.2011.005.427
+Changes since preceding release (not necessarily complete):
+• Add an option to maintain settings in a desktop specific location
+• Issue #93 Folder compare was filtering comments as side effect of other option
+• Portuguese (pt-PT) translation update by David Cunha
+• Translations/WinMerge/*.po: Restore some translations which got lost long ago
+• PropVss.cpp: Try to locate command line tools from traces found in registry
+• Fix issues around CMainFrame::CheckinToClearCase()
+• Add accelerators for options "Apply to all items" and "CheckIn after checkout"
+• Separate the "Settings/*Path" setting for different version control systems
+• MainFrm.cpp: Don't attempt to open a single drag-dropped folder as a file
+• OpenDlg: Allow filter masks with spaces by enclosing them in quotation marks
+• Add option for Copy/Move > Left/Right to... to Ignore folder structure
+• Edit > Find in conjunction with View > Wrap Lines missed to sync panes
+• Issue #82 Removed wrapped line not rendered correctly w/o cross-hatch option
+• Add context menu commands to Open > Containing Folder where applicable
+• Allow for passing line and column to external editor
+• Call ShellExecute() with long path prefix removed due to observed issues
+• Call OpenAs_RunDLL() with long path prefix removed due to observed issues
+• Fix &View > Refre&sh (F5) vs. &View > &Status Bar confusion in favor of F5
+
 0.2011.005.187
 Changes since preceding release (not necessarily complete):
 • Fix an imagelist leak caused by neglecting the truth about TVS_CHECKBOXES

@@ -36,7 +36,7 @@ End If
 <meta http-equiv='Content-Type' content='text/html; charset=ISO-8859-1'/>
 <hta:application
 	id='app'
-	version='XXXXX.2011.005.187'
+	version='XXXXX.2011.005.427'
 	applicationName='WinMerge &amp;version; Setup'
 	scroll='no'
 	singleInstance='yes'
@@ -549,7 +549,7 @@ End Sub
 <td>
 <textarea readonly>
 Copyright &#169; 1996-2011 Dean Grimm / Thingamahoochie Software
-Copyright &#169; 2002-2014 WinMerge Team
+Copyright &#169; 2002-2015 WinMerge Team
 
 WinMerge 2011 is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
 

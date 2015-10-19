@@ -36,9 +36,10 @@ function OnReadyStateChangeExternalDoc()
 </script>
 </head>
 <body>
-<h2>WinMerge 0.2011.005.187 Release Notes</h2>
+<h2>WinMerge 0.2011.005.427 Release Notes</h2>
 This is a beta release of WinMerge&nbsp;2011.
-<br>Besides fixing bugs, it includes the following functional enhancements:
+<br>Besides fixing bugs, it includes the following functional enhancements as
+compared to the latest stable release:
 <ul>
 <li><p>File transform scriptlets can provide custom logic for writing back
 	edited files. They do so by implementing method <code>CreateTextFile</code>,
@@ -55,6 +56,8 @@ This is a beta release of WinMerge&nbsp;2011.
 <li><p>Find &amp; Replace with regular expressions allows replacement strings to
 	contain submatch references \0 through \9 (where \0 refers to the complete
 	match), as well as C-style control character escapes.
+	<br>As a side effect, this enhancement solves
+	<a target='_blank' href='https://bitbucket.org/jtuc/winmerge2011/issues/70'>Issue #70</a>.
 <li><p>Option <i>/config</i> points WinMerge to a JSON configuration file which
 	it will use instead of the system registry to maintain most of its settings.
 	<br>Settings for the WinMerge shell extension are an exception in that they
@@ -72,12 +75,28 @@ This is a beta release of WinMerge&nbsp;2011.
 	The configuration file is created in the same folder as the project file.
 	The name of the configuration file is formed by appending extension
 	<i>.json</i> to the name of the project file.
+<li><p>Menu command <i>File &rarr; Use desktop specific settings</i> allows you
+	to maintain settings in a desktop specific location.
+	<br>The core motivation for this option was to ease working with TFS and
+	ClearCase at the same time, by doing ClearCase stuff on a separate desktop.
+	<br>The feature is designed to work with
+	<a target='_blank' href='https://technet.microsoft.com/en-us/sysinternals/cc817881'>Sysinternals Desktops v2.0</a>.
+	<br>It may or may not work with other tools which create (the illusion of) additional desktops.
+	<br>In particular, there is some uncertainty whether it works with the <i>Virtual Desktops</i> feature built into Windows&nbsp;10.
+<li><p>Context menu commands <i>Open &rarr; Containing Folder</i> are
+	provided where applicable, essentially following the suggestion from
+	<a target='_blank' href='https://bitbucket.org/jtuc/winmerge2011/issues/54'>Issue #54</a>.
+<li><p>When prompted to confirm a <i>Copy/Move &rarr; Left/Right to...</i>
+	operation, you have the option to <i>Ignore folder structure</i>.
+<li><p>The <i>Open</i> dialog allows you to specify filter masks with spaces
+	by enclosing them in quotation marks, as per 
+	<a target='_blank' href='http://forums.winmerge.org/viewtopic.php?f=4&t=1142'>this suggestion</a>.
 </ul>
 <p>
-Click <a href='https://bitbucket.org/jtuc/winmerge2011/get/0.2011.005.187.zip'>here</a> to obtain the source code for this release.
+Click <a href='https://bitbucket.org/jtuc/winmerge2011/get/0.2011.005.427.zip'>here</a> to obtain the source code for this release.
 <p>
 Click <a href='https://bitbucket.org/jtuc/frhed/get/0.10902.2013.zip'>here</a> to obtain source code for Frhed binaries included in this release.
 <p>
-<i>Jochen Neubeck, May 2015</i>
+<i>Jochen Neubeck, October 2015</i>
 <xml src='WinMerge.chm' onreadystatechange='OnReadyStateChangeExternalDoc()'></xml>
 </body>
