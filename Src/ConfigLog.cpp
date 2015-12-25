@@ -22,6 +22,7 @@
 #include "StdAfx.h"
 #include "Constants.h"
 #include "Common/version.h"
+#include "Common/RegKey.h"
 #include "UniFile.h"
 #include "DiffWrapper.h"
 #include "ConfigLog.h"
@@ -453,233 +454,19 @@ bool CConfigLog::DoFile(bool writing, String &sError)
 }
 
 /** 
- * @brief Extract any helpful product details from version info
- */
-static String GetProductFromOsvi(const OSVERSIONINFOEX & osvi)
-{
-	String sProduct;
-	switch (osvi.wProductType)
-	{
-	// Test for the workstation type.
-	case VER_NT_WORKSTATION:
-		if (osvi.dwMajorVersion == 4)
-			sProduct += _T("Workstation 4.0 ");
-		else if( osvi.wSuiteMask & VER_SUITE_PERSONAL )
-			sProduct += _T("Home Edition ");
-		else
-			sProduct += _T("Professional ");
-		break;
-	// Test for the server type.
-	case VER_NT_SERVER:
-		if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 2)
-		{
-			if (osvi.wSuiteMask & VER_SUITE_DATACENTER)
-				sProduct += _T("Datacenter Edition ");
-			else if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE)
-				sProduct += _T("Enterprise Edition ");
-			else if (osvi.wSuiteMask == VER_SUITE_BLADE)
-				sProduct += _T("Web Edition ");
-			else
-				sProduct += _T("Standard Edition ");
-		}
-		else if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 0)
-		{
-			if (osvi.wSuiteMask & VER_SUITE_DATACENTER)
-				sProduct += _T("Datacenter Server ");
-			else if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE)
-				sProduct += _T("Advanced Server ");
-			else
-				sProduct += _T("Server ");
-		}
-		else // Windows NT 4.0
-		{
-			if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE)
-				sProduct += _T("Server 4.0, Enterprise Edition ");
-			else
-				sProduct += _T("Server 4.0 ");
-		}
-		break;
-	}
-	return sProduct;
-}
-
-/** 
- * @brief Extract any helpful product details from registry (for WinNT)
- */
-static String GetNtProductFromRegistry(const OSVERSIONINFOEX & osvi)
-{
-	String sProduct;
-
-	TCHAR szProductType[64];
-
-	HKEY hKey = NULL;
-	LONG lRet = RegOpenKeyEx(HKEY_LOCAL_MACHINE,
-		_T("SYSTEM\\CurrentControlSet\\Control\\ProductOptions"),
-		0, KEY_QUERY_VALUE, &hKey);
-
-	if (lRet == ERROR_SUCCESS)
-	{
-		DWORD dwBufLen = _countof(szProductType);
-		lRet = RegQueryValueEx(hKey, _T("ProductType"), NULL, NULL,
-			(LPBYTE) szProductType, &dwBufLen);
-		RegCloseKey(hKey);
-	}
-
-	if (lRet != ERROR_SUCCESS)
-		sProduct = _T("?ProductType? ");
-	else if (_tcsicmp(_T("WINNT"), szProductType) == 0)
-		sProduct = _T("Workstation ");
-	else if (_tcsicmp(_T("LANMANNT"), szProductType) == 0)
-		sProduct = _T("Server ");
-	else if (_tcsicmp(_T("SERVERNT"), szProductType) == 0)
-		sProduct = _T("Advanced Server ");
-
-	string_format ver(_T("%d.%d "), osvi.dwMajorVersion, osvi.dwMinorVersion);
-	sProduct += ver;
-	return sProduct;
-}
-
-/** 
  * @brief Parse Windows version data to string.
- * See info about how to determine Windows versions from URL:
- * http://msdn.microsoft.com/en-us/library/ms724833(VS.85).aspx
  * @return String describing Windows version.
  */
-String CConfigLog::GetWindowsVer()
+string_format CConfigLog::GetWindowsVer() const
 {
-	OSVERSIONINFOEX osvi;
-	String sVersion;
-
-	// Try calling GetVersionEx using the OSVERSIONINFOEX structure.
-	// If that fails, try using the OSVERSIONINFO structure.
-	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
-	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
-	if (!GetVersionEx((OSVERSIONINFO *)&osvi))
+	CRegKeyEx key;
+	if (ERROR_SUCCESS == key.QueryRegMachine(_T("Software\\Microsoft\\Windows NT\\CurrentVersion")))
 	{
-		osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-		if (!GetVersionEx((OSVERSIONINFO *)&osvi))
-			return _T("");
+		return string_format(_T("%s (BuildLab: %s)"),
+			key.ReadString(_T("ProductName"), _T("Unknown OS")),
+			key.ReadString(_T("BuildLab"), _T("Unknown")));
 	}
-
-	switch (osvi.dwPlatformId)
-	{
-	// Test for the Windows NT product family.
-	case VER_PLATFORM_WIN32_NT:
-
-		// Test for the specific product family.
-		if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 2)
-			sVersion = _T("Microsoft Windows Server 2003 family, ");
-		else if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 1)
-			sVersion = _T("Microsoft Windows XP ");
-		else if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 0)
-			sVersion = _T("Microsoft Windows 2000 ");
-		else if (osvi.dwMajorVersion <= 4)
-			sVersion = _T("Microsoft Windows NT ");
-		else if (osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 0)
-		{
-			if (osvi.wProductType == VER_NT_WORKSTATION)
-				sVersion = _T("Microsoft Windows Vista ");
-			else
-				sVersion = _T("Microsoft Windows Server 2008 ");
-		}
-		else if (osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 1)
-		{
-			if (osvi.wProductType == VER_NT_WORKSTATION)
-				sVersion = _T("Microsoft Windows 7 ");
-			else
-				sVersion = _T("Microsoft Windows Server 2008 R2 ");
-		}
-		else if (osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 2)
-		{
-			if (osvi.wProductType == VER_NT_WORKSTATION)
-				sVersion = _T("Microsoft Windows 8 ");
-			else
-				sVersion = _T("Microsoft Windows Server 2012 ");
-		}
-		else
-			sVersion = string_format(_T("[? WindowsNT %d.%d] "), 
-				osvi.dwMajorVersion, osvi.dwMinorVersion);
-
-		if (osvi.dwOSVersionInfoSize == sizeof(OSVERSIONINFOEX))
-		{
-			// Test for specific product on Windows NT 4.0 SP6 and later.
-			String sProduct = GetProductFromOsvi(osvi);
-			sVersion += sProduct;
-		}
-		else
-		{
-			// Test for specific product on Windows NT 4.0 SP5 and earlier
-			String sProduct = GetNtProductFromRegistry(osvi);
-			sVersion += sProduct;
-		}
-
-		// Display service pack (if any) and build number.
-		if (osvi.dwMajorVersion == 4 &&
-			_tcsicmp(osvi.szCSDVersion, _T("Service Pack 6")) == 0)
-		{
-			HKEY hKey = NULL;
-			// Test for SP6 versus SP6a.
-			LONG lRet = RegOpenKeyEx(HKEY_LOCAL_MACHINE,
-				_T("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Hotfix\\Q246009"),
-				0, KEY_QUERY_VALUE, &hKey);
-			String ver;
-			if (lRet == ERROR_SUCCESS)
-			{
-				ver = string_format(_T("Service Pack 6a (Build %d)"), osvi.dwBuildNumber & 0xFFFF);
-				RegCloseKey(hKey);
-			}
-			else // Windows NT 4.0 prior to SP6a
-			{
-				ver = string_format(_T("%s (Build %d)"),
-					osvi.szCSDVersion,
-					osvi.dwBuildNumber & 0xFFFF);
-			}
-			sVersion += ver;
-		}
-		else // Windows NT 3.51 and earlier or Windows 2000 and later
-		{
-			String ver = string_format(_T("%s (Build %d)"),
-				osvi.szCSDVersion,
-				osvi.dwBuildNumber & 0xFFFF);
-			sVersion += ver;
-		}
-		break;
-
-	// Test for the Windows 95 product family.
-	case VER_PLATFORM_WIN32_WINDOWS:
-
-		if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 0)
-		{
-			sVersion = _T("Microsoft Windows 95 ");
-			if ( osvi.szCSDVersion[1] == 'C' || osvi.szCSDVersion[1] == 'B' )
-				sVersion += _T("OSR2 " );
-		}
-		else if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 10)
-		{
-			sVersion = _T("Microsoft Windows 98 ");
-			if ( osvi.szCSDVersion[1] == 'A' )
-				sVersion += _T("SE " );
-		}
-		else if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 90)
-		{
-			sVersion = _T("Microsoft Windows Millennium Edition");
-		}
-		else
-		{
-			sVersion = string_format(_T("[? Windows9x %d.%d] "), 
-				osvi.dwMajorVersion, osvi.dwMinorVersion);
-		}
-		break;
-
-	case VER_PLATFORM_WIN32s:
-		sVersion = _T("Microsoft Win32s\r\n");
-		break;
-
-	default:
-		sVersion = string_format(_T(" [? Windows? %d.%d] "),
-			osvi.dwMajorVersion, osvi.dwMinorVersion);
-	}
-	return sVersion;
+	return _T("Unknown OS");
 }
 
 bool CConfigLog::WriteLogFile(String &sError)

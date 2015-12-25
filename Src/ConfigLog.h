@@ -122,7 +122,7 @@ protected:
 private:
 	bool DoFile(bool writing, String &sError);
 	void WritePluginsInLogFile(LPCWSTR transformationEvent);
-	String GetWindowsVer();
+	string_format GetWindowsVer() const;
 	void FileWriteString(LPCTSTR lpsz);
 	template<class any>
 	void FileWriteString(any fmt, ...)
