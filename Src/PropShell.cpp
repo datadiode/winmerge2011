@@ -21,6 +21,7 @@ static char THIS_FILE[] = __FILE__;
 #define CONTEXT_F_ENABLED 0x01
 #define CONTEXT_F_ADVANCED 0x02
 #define CONTEXT_F_SUBFOLDERS 0x04
+#define CONTEXT_F_FLATTENED 0x08
 
 /// Registry path to WinMerge
 static const TCHAR f_RegDir[] = _T("Software\\Thingamahoochie\\WinMerge");
@@ -52,9 +53,16 @@ void PropShell::UpdateScreen()
 	GetDlgItem(IDC_EXPLORER_SUBFOLDERS)->EnableWindow(bEnable);
 	if (!m_bContextAdded)
 	{
-		m_bContextAdvanced = FALSE;
-		m_bContextSubfolders = FALSE;
+		m_bContextAdvanced = BST_UNCHECKED;
+		m_bContextSubfolders = BST_UNCHECKED;
+		m_bContextFlattened = BST_UNCHECKED;
 	}
+	if (m_bContextSubfolders != BST_CHECKED)
+	{
+		m_bContextFlattened = BST_UNCHECKED;
+		bEnable = FALSE;
+	}
+	GetDlgItem(IDC_EXPLORER_IGNORE_FOLDER_STRUCTURE)->EnableWindow(bEnable);
 	UpdateData<Set>();
 }
 
@@ -66,6 +74,7 @@ bool PropShell::UpdateData()
 	DDX_Check<op>(IDC_EXPLORER_CONTEXT, m_bContextAdded);
 	DDX_Check<op>(IDC_EXPLORER_ADVANCED, m_bContextAdvanced);
 	DDX_Check<op>(IDC_EXPLORER_SUBFOLDERS, m_bContextSubfolders);
+	DDX_Check<op>(IDC_EXPLORER_IGNORE_FOLDER_STRUCTURE, m_bContextFlattened);
 	return true;
 }
 
@@ -79,6 +88,7 @@ LRESULT PropShell::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		switch (wParam)
 		{
 		case MAKEWPARAM(IDC_EXPLORER_CONTEXT, BN_CLICKED):
+		case MAKEWPARAM(IDC_EXPLORER_SUBFOLDERS, BN_CLICKED):
 			UpdateScreen();
 			break;
 		}
@@ -119,13 +129,23 @@ void PropShell::ReadContextRegValues()
 		DWORD dwContextEnabled = reg.ReadDword(f_RegValueEnabled, 0);
 
 		if (dwContextEnabled & CONTEXT_F_ENABLED)
-			m_bContextAdded = TRUE;
+			m_bContextAdded = BST_CHECKED;
 
 		if (dwContextEnabled & CONTEXT_F_ADVANCED)
-			m_bContextAdvanced = TRUE;
+			m_bContextAdvanced = BST_CHECKED;
 
-		if (dwContextEnabled & CONTEXT_F_SUBFOLDERS)
-			m_bContextSubfolders = TRUE;
+		switch (dwContextEnabled & (CONTEXT_F_SUBFOLDERS | CONTEXT_F_FLATTENED))
+		{
+		case CONTEXT_F_FLATTENED:
+			m_bContextSubfolders = BST_INDETERMINATE;
+			break;
+		case CONTEXT_F_SUBFOLDERS | CONTEXT_F_FLATTENED:
+			m_bContextFlattened = BST_CHECKED;
+		case CONTEXT_F_SUBFOLDERS:
+			m_bContextSubfolders = BST_CHECKED;
+			break;
+		}
+		//m_bContextSubfolders = (dwContextEnabled & 3 * CONTEXT_F_SUBFOLDERS) / CONTEXT_F_SUBFOLDERS;
 	}
 }
 
@@ -137,21 +157,19 @@ void PropShell::SaveContextRegValues()
 	{
 		// Determine bitmask for shell extension
 		DWORD dwContextEnabled = reg.ReadDword(f_RegValueEnabled, 0);
+		dwContextEnabled &= ~(CONTEXT_F_ENABLED | CONTEXT_F_ADVANCED | CONTEXT_F_SUBFOLDERS | CONTEXT_F_FLATTENED);
+
 		if (m_bContextAdded)
 			dwContextEnabled |= CONTEXT_F_ENABLED;
-		else
-			dwContextEnabled &= ~CONTEXT_F_ENABLED;
 
 		if (m_bContextAdvanced)
 			dwContextEnabled |= CONTEXT_F_ADVANCED;
-		else
-			dwContextEnabled &= ~CONTEXT_F_ADVANCED;
 
-		if (m_bContextSubfolders)
+		if (m_bContextSubfolders == BST_CHECKED)
 			dwContextEnabled |= CONTEXT_F_SUBFOLDERS;
-		else
-			dwContextEnabled &= ~CONTEXT_F_SUBFOLDERS;
-
+		if (m_bContextFlattened == BST_CHECKED || m_bContextSubfolders == BST_INDETERMINATE)
+			dwContextEnabled |= CONTEXT_F_FLATTENED;
+			
 		reg.WriteDword(f_RegValueEnabled, dwContextEnabled);
 	}
 }

@@ -336,8 +336,13 @@ void MergeCmdLineInfo::ParseWinMergeCmdLine(LPCTSTR q)
 		}
 		else if (param == _T("r2"))
 		{
-			// -r to compare recursively
+			// -r2 to compare recursively but ignore folder structure
 			m_nRecursive = 2;
+		}
+		else if (param == _T("rp"))
+		{
+			// -rp to follow options as previously adjusted in Open dialog
+			m_nRecursive = SettingStore.GetProfileInt(_T("Settings"), _T("Recurse"), 0);
 		}
 		else if (param == _T("s"))
 		{

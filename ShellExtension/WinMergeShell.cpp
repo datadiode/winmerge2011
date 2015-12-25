@@ -45,6 +45,7 @@ enum ExtensionFlags
 	EXT_ENABLED = 0x01, /**< ShellExtension enabled/disabled. */
 	EXT_ADVANCED = 0x02, /**< Advanced menuitems enabled/disabled. */
 	EXT_SUBFOLDERS = 0x04, /**< Subfolders included by default? */
+	EXT_FLATTENED = 0x08, /**< Ignore folder structure? */
 };
 
 /// Max. filecount to select
@@ -534,13 +535,28 @@ CMyComBSTR CWinMergeShell::GetHelpText(UINT_PTR idCmd)
 
 /// Format commandline used to start WinMerge
 CMyComBSTR CWinMergeShell::FormatCmdLine(LPCTSTR winmergePath,
-		LPCTSTR path1, LPCTSTR path2, DWORD dwAlter)
+		LPCTSTR path1, LPCTSTR path2, DWORD flags)
 {
 	CMyComBSTR strCommandline = winmergePath;
 
-	// Check if user wants subfolders
-	if ((m_dwContextMenuEnabled ^ dwAlter) & EXT_SUBFOLDERS)
-		strCommandline += _T(" /r");
+	// Merge in flags from registry
+	flags ^= m_dwContextMenuEnabled;
+	// Consider EXT_FLATTENED only when working with flags as found in registry
+	if (flags != m_dwContextMenuEnabled)
+		flags &= ~EXT_FLATTENED;
+		
+	switch (flags & (EXT_SUBFOLDERS | EXT_FLATTENED))
+	{
+	case EXT_SUBFOLDERS:
+		strCommandline += _T(" /r"); // Recurse
+		break;
+	case EXT_SUBFOLDERS | EXT_FLATTENED:
+		strCommandline += _T(" /r2"); // Recurse but ignore folder structure
+		break;
+	case EXT_FLATTENED: // Follow options as previously adjusted in Open dialog
+		strCommandline += _T(" /rp");
+		break;
+	}
 
 	strCommandline += _T(" \"");
 	strCommandline += path1;

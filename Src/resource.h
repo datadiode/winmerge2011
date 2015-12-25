@@ -221,6 +221,7 @@
 #define IDC_WMGOTO_TOLINE                       1111
 #define IDC_WMGOTO_TODIFF                       1112
 #define IDC_WMGOTO_PARAM                        1113
+#define IDC_EXPLORER_IGNORE_FOLDER_STRUCTURE    1114
 #define IDC_OPEN_CONTRIBUTORS                   1115
 #define IDC_COMPAREMETHODCOMBO                  1116
 #define IDC_USE_RECYCLE_BIN                     1117
