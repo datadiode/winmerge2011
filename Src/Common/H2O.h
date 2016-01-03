@@ -5,7 +5,7 @@
 // Both H2O and H2O2 share a common set of decorator templates.
 //
 // Copyright (c) 2005-2010  David Nash (as of Win32++ v7.0.2)
-// Copyright (c) 2011-2014  Jochen Neubeck
+// Copyright (c) 2011-2016  Jochen Neubeck
 //
 // Permission is hereby granted, free of charge, to
 // any person obtaining a copy of this software and
@@ -1069,6 +1069,10 @@ namespace H2O
 		int DrawText(const String &s, RECT *prc, UINT format)
 		{
 			return ::DrawText(m_hDC, s.c_str(), s.length(), prc, format);
+		}
+		BOOL DrawFocusRect(const RECT *prc)
+		{
+			return ::DrawFocusRect(m_hDC, prc);
 		}
 		BOOL PathCompactPath(LPTSTR path, UINT dx)
 		{
