@@ -5,7 +5,7 @@
 // Both H2O and H2O2 share a common set of decorator templates.
 //
 // Copyright (c) 2005-2010  David Nash (as of Win32++ v7.0.2)
-// Copyright (c) 2011-2013  Jochen Neubeck
+// Copyright (c) 2011-2016  Jochen Neubeck
 //
 // Permission is hereby granted, free of charge, to
 // any person obtaining a copy of this software and
@@ -79,6 +79,25 @@ namespace H2O
 		int ReportError(HWND, UINT = MB_ICONSTOP) const;
 		OException(DWORD, LPCTSTR = NULL);
 		void operator delete(void *) { }
+		template
+		<
+			class T,
+			DWORD(T::*MemberThreadProc)()
+		>
+		static DWORD WINAPI ThreadProc(LPVOID pv)
+		{
+			DWORD ret = 0xFFFFFFFF;
+			try
+			{
+				ret = (static_cast<T *>(pv)->*MemberThreadProc)();
+			}
+			catch (OException *e)
+			{
+				e->ReportError(NULL, MB_ICONSTOP | MB_TOPMOST);
+				delete e;
+			}
+			return ret;
+		}
 	};
 
 	class OWindow : public Window<Object>
