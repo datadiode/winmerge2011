@@ -132,8 +132,9 @@ CHexMergeView *CHexMergeFrame::CreatePane(int iPane)
 		rect.right += GetSystemMetrics(SM_CXVSCROLL);
 	}
 
+	const LPCTSTR className = CHexMergeView::RegisterClass();
 	CHexMergeView *pView = new CHexMergeView(this, iPane);
-	pView->Subclass(HWindow::CreateEx(WS_EX_CLIENTEDGE, CHexMergeView::RegisterClass(), NULL,
+	pView->Subclass(HWindow::CreateEx(WS_EX_CLIENTEDGE, className, NULL,
 		WS_CHILD | WS_VISIBLE | WS_HSCROLL | WS_TABSTOP | additionalStyles & WS_VSCROLL,
 		rect.left, rect.bottom, rect.right - rect.left, 0,
 		m_wndFilePathBar.m_pWnd, 0x1000 + iPane));
