@@ -84,7 +84,7 @@ void CDiffContext::LoadFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *fil
 		{
 			tool += _T(":\n");
 			tool += OException(GetLastError()).msg;
-			OException::Throw(0, tool.c_str());
+			OException::Throw(tool.c_str());
 		}
 		defer::CloseHandle<2> CloseHandle = { hProcess, hReadPipe };
 		HandleReadStream stream = hReadPipe;
@@ -184,7 +184,7 @@ void CDiffContext::LoadFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *fil
 		DWORD dwExitCode = 0;
 		GetExitCodeProcess(hProcess, &dwExitCode);
 		if (state < 0 && dwExitCode != ERROR_PATH_NOT_FOUND)
-			OException::Throw(0, UTF82W(head.c_str()));
+			OException::Throw(UTF82W(head.c_str()));
 	}
 	else
 	{

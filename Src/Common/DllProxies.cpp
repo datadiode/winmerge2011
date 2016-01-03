@@ -67,7 +67,7 @@ LPVOID DllProxy::EnsureLoad()
 	{
 		TCHAR buf[1024];
 		FormatMessage(buf);
-		OException::Throw(0, buf);
+		OException::Throw(buf);
 	}
 	return this + 1;
 }

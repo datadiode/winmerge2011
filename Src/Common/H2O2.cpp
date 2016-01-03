@@ -1,7 +1,7 @@
 // H2O2.cpp
 //
 // Copyright (c) 2005-2010  David Nash (as of Win32++ v7.0.2)
-// Copyright (c) 2011-2012  Jochen Neubeck
+// Copyright (c) 2011-2016  Jochen Neubeck
 //
 // Permission is hereby granted, free of charge, to
 // any person obtaining a copy of this software and
@@ -503,61 +503,63 @@ int OException::ReportError(HWND hwnd, UINT type) const
 	return msg ? ::MessageBox(hwnd, msg, NULL, type) : 0;
 }
 
+OException::OException(LPCTSTR str)
+{
+	lstrcpyn(msg, str, _countof(msg));
+}
+
 OException::OException(DWORD err, LPCTSTR fmt)
 {
 	static const DWORD WinInetFlags =
 		FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_FROM_HMODULE;
 	static const DWORD DefaultFlags =
 		FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS;
-	if (fmt == NULL)
-		fmt = _T("Error 0x%08lX = %ld");
-	if (err == 0)
+	switch (HIWORD(err))
 	{
-		lstrcpyn(msg, fmt, _countof(msg));
-	}
-	else
-	{
-		switch (HIWORD(err))
+	case 0x8007: // LogParser error
+	case 0x800A: // VBScript or JScript error
+		err = DISP_E_EXCEPTION;
+		// fall through
+	default:
+		HMODULE WinInet = ::GetModuleHandle(_T("WININET"));
+		if (DWORD len = ::FormatMessage(
+			WinInet ? WinInetFlags : DefaultFlags, WinInet,
+			err, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+			msg, _countof(msg), NULL))
 		{
-		case 0x8007: // LogParser error
-		case 0x800A: // VBScript or JScript error
-			err = DISP_E_EXCEPTION;
-			// fall through
-		default:
-			HMODULE WinInet = ::GetModuleHandle(_T("WININET"));
-			if (DWORD len = ::FormatMessage(
-				WinInet ? WinInetFlags : DefaultFlags, WinInet,
-				err, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-				msg, _countof(msg), NULL))
+			if (err == DISP_E_EXCEPTION)
 			{
-				if (err == DISP_E_EXCEPTION)
+				IErrorInfo *perrinfo;
+				if (SUCCEEDED(GetErrorInfo(0, &perrinfo)) && perrinfo)
 				{
-					IErrorInfo *perrinfo;
-					if (SUCCEEDED(GetErrorInfo(0, &perrinfo)) && perrinfo)
+					BSTR bstr;
+					if (SUCCEEDED(perrinfo->GetSource(&bstr)) && bstr)
 					{
-						BSTR bstr;
-						if (SUCCEEDED(perrinfo->GetSource(&bstr)) && bstr)
-						{
-							len += wnsprintf(msg + len,
-								_countof(msg) - len, _T("\n%ls - "), bstr);
-							SysFreeString(bstr);
-						}
-						if (SUCCEEDED(perrinfo->GetDescription(&bstr)) && bstr)
-						{
-							len += wnsprintf(msg + len,
-								_countof(msg) - len, _T("%ls"), bstr);
-							SysFreeString(bstr);
-						}
-						perrinfo->Release();
+						len += wnsprintf(msg + len,
+							_countof(msg) - len, _T("\n%ls - "), bstr);
+						SysFreeString(bstr);
 					}
+					if (SUCCEEDED(perrinfo->GetDescription(&bstr)) && bstr)
+					{
+						len += wnsprintf(msg + len,
+							_countof(msg) - len, _T("%ls"), bstr);
+						SysFreeString(bstr);
+					}
+					perrinfo->Release();
 				}
 			}
-			else
-			{
-				wnsprintf(msg, _countof(msg), fmt, err, err);
-			}
+		}
+		else
+		{
+			wnsprintf(msg, _countof(msg), fmt ? fmt : _T("Error 0x%08lX = %ld"), err, err);
 		}
 	}
+}
+
+void OException::Throw(LPCTSTR str)
+{
+	OException e(str);
+	throw &e;
 }
 
 void OException::Throw(DWORD err, LPCTSTR fmt)

@@ -72,11 +72,13 @@ namespace H2O
 		// called from the catch block even if it is a nop.
 		void *operator new(size_t);
 	public:
+		static void Throw(LPCTSTR);
 		static void Throw(DWORD = DISP_E_EXCEPTION, LPCTSTR = NULL);
 		static void ThrowSilent();
 		static void Check(HRESULT);
 		TCHAR msg[1024];
 		int ReportError(HWND, UINT = MB_ICONSTOP) const;
+		OException(LPCTSTR);
 		OException(DWORD, LPCTSTR = NULL);
 		void operator delete(void *) { }
 		template
