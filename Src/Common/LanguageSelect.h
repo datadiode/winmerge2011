@@ -53,6 +53,7 @@ public:
 
 	LocalString FormatMessage(UINT, ...) const;
 	LocalString Format(UINT, ...) const;
+	LocalString FormatStrings(UINT, UINT, ...) const;
 
 	int MsgBox(UINT, UINT = MB_OK) const;
 	int MsgBox(UINT, LPCTSTR, UINT = MB_OK) const;

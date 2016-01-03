@@ -1052,10 +1052,11 @@ LocalString CLanguageSelect::FormatMessage(UINT id, ...) const
 {
 	va_list args;
 	va_start(args, id);
-	const String fmt = LoadString(LOWORD(id));
-	HLOCAL handle;
-	const DWORD flags = HIWORD(id) |
+	DWORD const flags = HIWORD(id) |
 		FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_STRING;
+	id = LOWORD(id);
+	String const fmt = LoadString(id);
+	HLOCAL handle;
 	if (!::FormatMessage(flags, fmt.c_str(), 0, 0, (LPTSTR)&handle, 0, &args))
 		handle = NULL;
 	va_end(args);
@@ -1066,11 +1067,68 @@ LocalString CLanguageSelect::Format(UINT id, ...) const
 {
 	va_list args;
 	va_start(args, id);
-	const String fmt = LoadString(id);
+	String const fmt = LoadString(id);
 	int length = _vsctprintf(fmt.c_str(), args) + 1;
 	HLOCAL handle = LocalAlloc(LMEM_FIXED, length * sizeof(TCHAR));
 	if (handle)
 		_vsntprintf(reinterpret_cast<LPTSTR>(handle), length, fmt.c_str(), args);
+	va_end(args);
+	return LocalString(handle, id);
+}
+
+LocalString CLanguageSelect::FormatStrings(UINT id, UINT n, ...) const
+{
+	va_list args;
+	va_start(args, n);
+	String const fmt = LoadString(id);
+	size_t length = 0;
+	LPCTSTR p = fmt.c_str();
+	while (LPCTSTR q = _tcschr(p, _T('%')))
+	{
+		length += q - p;
+		if (*++q == '%')
+		{
+			++length;
+			p = q + 1;
+		}
+		else if (UINT i = _tcstol(q, const_cast<LPTSTR *>(&p), 10))
+		{
+			if (--i < n)
+			{
+				q = reinterpret_cast<LPCTSTR *>(args)[i];
+				length += _tcslen(q);
+			}
+		}
+	}
+	length += _tcslen(p) + 1;
+	HLOCAL handle = LocalAlloc(LMEM_FIXED, length * sizeof(TCHAR));
+	if (LPTSTR string = reinterpret_cast<LPTSTR>(handle))
+	{
+		p = fmt.c_str();
+		while (LPCTSTR q = _tcschr(p, _T('%')))
+		{
+			length = q - p;
+			memcpy(string, p, length * sizeof(TCHAR));
+			string += length;
+			if (*++q == '%')
+			{
+				*string++ = _T('%');
+				p = q + 1;
+			}
+			else if (UINT i = _tcstol(q, const_cast<LPTSTR *>(&p), 10))
+			{
+				if (--i < n)
+				{
+					q = reinterpret_cast<LPCTSTR *>(args)[i];
+					length = _tcslen(q);
+					memcpy(string, q, length * sizeof(TCHAR));
+					string += length;
+				}
+			}
+		}
+		length = _tcslen(p) + 1;
+		memcpy(string, p, length * sizeof(TCHAR));
+	}
 	va_end(args);
 	return LocalString(handle, id);
 }
