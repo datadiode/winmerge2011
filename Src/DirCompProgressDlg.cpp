@@ -140,27 +140,25 @@ void DirCompProgressDlg::OnTimer(UINT_PTR nIDEvent)
 		{
 			SetDlgItemInt(IDC_ITEMSTOTAL, totalItems);
 			SendDlgItemMessage(IDC_PROGRESSCOMPARE, PBM_SETRANGE32, 0, totalItems);
-			if (const int comparedItems = pCompareStats->GetComparedItems())
+			const int comparedItems = pCompareStats->GetComparedItems();
+			CDiffContext *ctxt = m_pDirDoc->GetDiffContext();
+			SetDlgItemInt(IDC_ITEMSCOMPARED, comparedItems);
+			SendDlgItemMessage(IDC_PROGRESSCOMPARE, PBM_SETPOS, comparedItems);
+			if (const DIFFITEM *di = pCompareStats->GetCurDiffItem())
 			{
-				CDiffContext *ctxt = m_pDirDoc->GetDiffContext();
-				SetDlgItemInt(IDC_ITEMSCOMPARED, comparedItems);
-				SendDlgItemMessage(IDC_PROGRESSCOMPARE, PBM_SETPOS, comparedItems);
-				if (const DIFFITEM *di = pCompareStats->GetCurDiffItem())
+				if (HEdit *pEdit = static_cast<HEdit *>(GetDlgItem(IDC_LEFT_EDIT)))
 				{
-					if (HEdit *pEdit = static_cast<HEdit *>(GetDlgItem(IDC_LEFT_EDIT)))
-					{
-						String path = ctxt->GetLeftFilepathAndName(di);
-						paths_UndoMagic(path);
-						paths_CompactPath(pEdit, path);
-						pEdit->SetWindowText(path.c_str());
-					}
-					if (HEdit *pEdit = static_cast<HEdit *>(GetDlgItem(IDC_RIGHT_EDIT)))
-					{
-						String path = ctxt->GetRightFilepathAndName(di);
-						paths_UndoMagic(path);
-						paths_CompactPath(pEdit, path);
-						pEdit->SetWindowText(path.c_str());
-					}
+					String path = ctxt->GetLeftFilepathAndName(di);
+					paths_UndoMagic(path);
+					paths_CompactPath(pEdit, path);
+					pEdit->SetWindowText(path.c_str());
+				}
+				if (HEdit *pEdit = static_cast<HEdit *>(GetDlgItem(IDC_RIGHT_EDIT)))
+				{
+					String path = ctxt->GetRightFilepathAndName(di);
+					paths_UndoMagic(path);
+					paths_CompactPath(pEdit, path);
+					pEdit->SetWindowText(path.c_str());
 				}
 			}
 			m_pStatsDlg->Update();
