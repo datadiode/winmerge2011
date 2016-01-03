@@ -31,46 +31,35 @@
 #pragma once
 
 //////////////////////////////////////////////////////////////////////////////
-// Message box style definitions (mostly taken from WinUser.h).
+// Additional message box style definitions.
 
-#ifndef MB_CANCELTRYCONTINUE
-#define MB_CANCELTRYCONTINUE		0x00000006L	// Standard for Win 5.x.
-#endif
+#define MB_CONTINUEABORT			0x00000007L
+#define MB_SKIPSKIPALLCANCEL		0x00000008L
+#define MB_IGNOREIGNOREALLCANCEL	0x00000009L
 
-#define MB_CONTINUEABORT			0x00000007L	// Additional style.
-#define MB_SKIPSKIPALLCANCEL		0x00000008L	// Additional style.
-#define MB_IGNOREIGNOREALLCANCEL	0x00000009L	// Additional style.
+#define MB_HIGHLIGHT_ARGUMENTS		0x00800000L
 
-#define MB_DONT_DISPLAY_AGAIN		0x01000000L	// Additional style.
-#define MB_DONT_ASK_AGAIN			0x02000000L	// Additional style.
-#define MB_YES_TO_ALL				0x04000000L	// Additional style.
-#define MB_NO_TO_ALL				0x08000000L	// Additional style.
+#define MB_DONT_DISPLAY_AGAIN		0x01000000L
+#define MB_DONT_ASK_AGAIN			0x02000000L
+#define MB_YES_TO_ALL				0x04000000L
+#define MB_NO_TO_ALL				0x08000000L
 
-#define MB_DEFAULT_CHECKED			0x10000000L // Additional style.
-#define MB_RIGHT_ALIGN				0x20000000L	// Additional style.
-#define MB_NO_SOUND					0x40000000L	// Additional style.
-#define MB_IGNORE_IF_SILENCED		0x80000000L // Additional style.
+#define MB_DEFAULT_CHECKED			0x10000000L
+#define MB_RIGHT_ALIGN				0x20000000L
+#define MB_NO_SOUND					0x40000000L
+#define MB_IGNORE_IF_SILENCED		0x80000000L
 
-#define MB_DEFBUTTON5				0x00000400L	// Additional style.
-#define MB_DEFBUTTON6				0x00000500L	// Additional style.
+#define MB_DEFBUTTON(X) ((MB_DEFMASK & -MB_DEFMASK) * ((X) - 1))
 
 //////////////////////////////////////////////////////////////////////////////
-// Dialog element IDs.
+// Additional dialog element IDs.
 
-#ifndef IDTRYAGAIN
-#define IDTRYAGAIN					10			// Standard for Win 5.x.
-#endif
-
-#ifndef IDCONTINUE
-#define IDCONTINUE					11			// Standard for Win 5.x.
-#endif
-
-#define IDYESTOALL					14			// Additional element.
-#define IDNOTOALL					15			// Additional element.
-#define IDSKIP						16			// Additional element.
-#define IDSKIPALL					17			// Additional element.
-#define IDIGNOREALL					18			// Additional element.
-#define IDCHECKBOX					19			// Additional element.
+#define IDYESTOALL					14
+#define IDNOTOALL					15
+#define IDSKIP						16
+#define IDSKIPALL					17
+#define IDIGNOREALL					18
+#define IDCHECKBOX					19
 
 //////////////////////////////////////////////////////////////////////////////
 // Name of the registry section for storing the message box results.
@@ -83,30 +72,24 @@
 class CMessageBoxDialog : public ODialog
 {
 public:
-	// Constructor of the class for direct providing of the message strings.
-	CMessageBoxDialog(LPCTSTR strMessage,
-		LPCTSTR strTitle = NULL, UINT nStyle = MB_OK, UINT nHelp = 0);
+	// Constructor.
+	CMessageBoxDialog(LPCTSTR, UINT nStyle = MB_OK, UINT nHelp = 0);
 	// Method for setting a timeout.
 	void SetTimeout(UINT nSeconds, BOOL bDisabled = FALSE);
 	// Method for displaying the dialog.
-	int DoModal(HINSTANCE hInst, HWND hwndParent, HKEY hKey);
-	// Method for initializing the dialog.
-	virtual BOOL OnInitDialog();
-	// Method for handling command messages.
-	virtual BOOL OnCommand(WPARAM, LPARAM);
+	int DoModal(HINSTANCE, HWND, HKEY);
+	// Method for adding a button.
+	void AddButton(UINT nID, UINT nTitle);
 
 protected:
-	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
-	void OnTimer(UINT_PTR nIDEvent);
+	virtual BOOL OnInitDialog();
+	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
+	void OnTimer(UINT_PTR);
 
 private:
-	//////////////////////////////////////////////////////////////////////////
-	// Private member variables of this dialog.
-
 	String		m_strMessage;		// Message to be displayed.
-	String		m_strTitle;			// Title to be used.
-	UINT		m_nStyle;			// Style of the message box.
-	UINT		m_nHelp;			// Help context of the message box.
+	UINT const	m_nStyle;			// Style of the message box.
+	UINT const	m_nHelp;			// Help context of the message box.
 
 	HICON		m_hIcon;			// Icon to be displayed in the dialog.
 
@@ -126,9 +109,17 @@ private:
 
 	POINT		DialogUnitToPixel[41];
 
+	class Edit : public OEdit
+	{
+	public:
+		int m_nLineHeight;
+		std::vector<int> m_aStripes;
+		void Subclass(HEdit *);
+	private:
+		virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
+	} m_edit;
+
 private:
-	// Method for adding a button to the list of buttons.
-	void AddButton(UINT nID, UINT nTitle);
 	// Method for parsing the given style.
 	void ParseStyle();
 	// Method for creating the icon control.

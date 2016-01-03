@@ -327,7 +327,7 @@ int CMergeApp::DoMessageBox(LPCTSTR lpszPrompt, UINT nType, UINT nIDPrompt)
 	// (if caller set the style)
 
 	// Create the message box dialog.
-	CMessageBoxDialog dlgMessage(lpszPrompt, _T("WinMerge"), nType, nIDPrompt);
+	CMessageBoxDialog dlgMessage(lpszPrompt, nType, nIDPrompt);
 	// Display the message box dialog and return the result.
 	HKEY hKey = SettingStore.GetSectionKey(REGISTRY_SECTION_MESSAGEBOX);
 	int nResult = dlgMessage.DoModal(m_hInstance, owner, hKey);
