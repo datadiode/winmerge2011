@@ -64,9 +64,9 @@ public:
 	void UpdateVisiblePos(int nTopLine, int nBottomLine);
 	void ForceRecalculate();
 
-	void SubclassWindow(HWindow *pWnd)
+	void Subclass(HWindow *pWnd)
 	{
-		OWindow::SubclassWindow(pWnd);
+		OWindow::Subclass(pWnd);
 		RegisterDragDrop(m_hWnd, this);
 	}
 

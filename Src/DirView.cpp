@@ -192,7 +192,7 @@ void CDirView::OnInitialUpdate()
 	UpdateFont();
 	// Replace standard header with sort header
 	if (HHeaderCtrl *pHeaderCtrl = GetHeaderCtrl())
-		m_ctlSortHeader.SubclassWindow(pHeaderCtrl);
+		m_ctlSortHeader.Subclass(pHeaderCtrl);
 
 	SetImageList(m_imageList, LVSIL_SMALL);
 

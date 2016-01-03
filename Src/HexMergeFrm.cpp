@@ -66,7 +66,7 @@ CHexMergeFrame::CHexMergeFrame(CMainFrame *pMDIFrame, CDirFrame *pDirDoc)
 {
 	ASSERT(m_pView[0] == NULL);
 	ASSERT(m_pView[1] == NULL);
-	SubclassWindow(pMDIFrame->CreateChildHandle());
+	Subclass(pMDIFrame->CreateChildHandle());
 	CreateClient();
 	RecalcLayout();
 	m_bAutoDelete = true;
@@ -133,7 +133,7 @@ CHexMergeView *CHexMergeFrame::CreatePane(int iPane)
 	}
 
 	CHexMergeView *pView = new CHexMergeView(this, iPane);
-	pView->SubclassWindow(HWindow::CreateEx(WS_EX_CLIENTEDGE, CHexMergeView::RegisterClass(), NULL,
+	pView->Subclass(HWindow::CreateEx(WS_EX_CLIENTEDGE, CHexMergeView::RegisterClass(), NULL,
 		WS_CHILD | WS_VISIBLE | WS_HSCROLL | WS_TABSTOP | additionalStyles & WS_VSCROLL,
 		rect.left, rect.bottom, rect.right - rect.left, 0,
 		m_wndFilePathBar.m_pWnd, 0x1000 + iPane));

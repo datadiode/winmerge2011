@@ -82,7 +82,7 @@ CSplashWnd::CSplashWnd(HWindow *pWndMain)
 {
 	CLIENTCREATESTRUCT ccs = { NULL, 0xFF00 };
 
-	SubclassWindow(HWindow::CreateEx(WS_EX_CLIENTEDGE, _T("mdiclient"), NULL,
+	Subclass(HWindow::CreateEx(WS_EX_CLIENTEDGE, _T("mdiclient"), NULL,
 		WS_VISIBLE | WS_CHILD | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | MDIS_ALLCHILDSTYLES,
 		0, 0, 0, 0, pWndMain, 0x1000, NULL, &ccs));
 

@@ -43,9 +43,9 @@ public:
 public:
 	CHexMergeView(CHexMergeFrame *, int);
 	static LPCTSTR RegisterClass();
-	void SubclassWindow(HWindow *pWnd)
+	void Subclass(HWindow *pWnd)
 	{
-		OWindow::SubclassWindow<0>(pWnd);
+		OWindow::Subclass<0>(pWnd);
 		m_pif = reinterpret_cast<IHexEditorWindow *>(::GetWindowLongPtr(pWnd->m_hWnd, GWLP_USERDATA));
 		m_style = GetStyle();
 	}

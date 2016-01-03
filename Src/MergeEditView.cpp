@@ -83,7 +83,7 @@ CMergeEditView::CMergeEditView(HWindow *pWnd, CChildFrame *pDocument, int nThisP
 	, m_pShellContextMenu(new CShellContextMenu(MergeViewCmdFirst, MergeViewCmdLast))
 {
 	ASSERT(m_hShellContextMenu == NULL);
-	SubclassWindow(pWnd);
+	Subclass(pWnd);
 	RegisterDragDrop(m_hWnd, this);
 	SetParser(&m_xParser);
 }

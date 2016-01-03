@@ -161,7 +161,7 @@ static int GetMenuBitmapExcessWidth()
  */
 CMainFrame::CMainFrame(HWindow *pWnd, const MergeCmdLineInfo &cmdInfo)
 {
-	SubclassWindow(pWnd);
+	Subclass(pWnd);
 
 	theApp.m_pMainWnd = this;
 

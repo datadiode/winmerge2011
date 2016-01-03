@@ -28,7 +28,7 @@ using std::vector;
 CMergeDiffDetailView::CMergeDiffDetailView(HWindow *pWnd, CChildFrame *pDocument, int nThisPane)
 : CGhostTextView(pDocument, nThisPane, sizeof *this)
 {
-	SubclassWindow(pWnd);
+	Subclass(pWnd);
 }
 
 CMergeDiffDetailView::~CMergeDiffDetailView()

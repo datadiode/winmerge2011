@@ -91,7 +91,7 @@ CDirFrame::CDirFrame(CMainFrame *pMDIFrame)
 , m_nRecursive(0)
 , m_pTempPathContext(NULL)
 {
-	SubclassWindow(pMDIFrame->CreateChildHandle());
+	Subclass(pMDIFrame->CreateChildHandle());
 	LoadIcon(CompareStats::DIFFIMG_DIR);
 	CreateClient();
 	RecalcLayout();
@@ -595,7 +595,7 @@ void CDirFrame::CreateClient()
 		LVS_REPORT | LVS_SHOWSELALWAYS | LVS_EDITLABELS | LVS_SHAREIMAGELISTS,
 		0, rect.bottom, rect.right, rect.top - rect.bottom, m_pWnd, 0x1000);
 	pLv->SetParent(m_wndFilePathBar.m_pWnd);
-	m_pDirView->SubclassWindow(pLv);
+	m_pDirView->Subclass(pLv);
 	m_pDirView->OnInitialUpdate();
 	// Align appearance of file path edit controls with statusbar.
 	HFont *pFont = m_wndStatusBar->GetFont();

@@ -113,13 +113,13 @@ namespace H2O
 		{
 			m_hWnd = hWnd;
 		}
-		void SubclassWindow(HWindow *pWnd)
+		void Subclass(HWindow *pWnd)
 		{
-			SubclassWindow<GWLP_USERDATA>(pWnd);
+			Subclass<GWLP_USERDATA>(pWnd);
 		}
 		void SubclassDlgItem(int id, OWindow &item)
 		{
-			item.SubclassWindow(GetDlgItem(id));
+			item.Subclass(GetDlgItem(id));
 		}
 		static OWindow *FromHandle(HWindow *pWnd)
 		{
@@ -128,7 +128,7 @@ namespace H2O
 		virtual ~OWindow();
 	protected:
 		template<UINT GWLP_THIS>
-		void SubclassWindow(HWindow *pWnd)
+		void Subclass(HWindow *pWnd)
 		{
 			m_pWnd = pWnd;
 			m_pfnSuper = SetWindowPtr<WNDPROC>(GWLP_WNDPROC, WndProc<GWLP_THIS>);

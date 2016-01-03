@@ -851,7 +851,7 @@ CChildFrame::CChildFrame(CMainFrame *pMDIFrame, CDirFrame *pDirDoc, CChildFrame 
 	m_ptBuf[0] = new CDiffTextBuffer(this, 0);
 	m_ptBuf[1] = new CDiffTextBuffer(this, 1);
 	m_diffWrapper.RefreshOptions();
-	SubclassWindow(pMDIFrame->CreateChildHandle());
+	Subclass(pMDIFrame->CreateChildHandle());
 	CreateClient();
 	RecalcLayout();
 	if (m_pOpener)
@@ -949,14 +949,14 @@ CMergeEditView *CChildFrame::CreatePane(int iPane)
 */
 void CChildFrame::CreateClient()
 {
-	m_wndLocationBar.SubclassWindow(HWindow::CreateEx(
+	m_wndLocationBar.Subclass(HWindow::CreateEx(
 		0, WinMergeWindowClass, NULL, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
 		0, 0, 28, 10, m_pWnd, ID_VIEW_LOCATION_BAR));
-	m_wndLocationView.SubclassWindow(HWindow::CreateEx(
+	m_wndLocationView.Subclass(HWindow::CreateEx(
 		WS_EX_CLIENTEDGE, WinMergeWindowClass, NULL, WS_CHILD | WS_VISIBLE,
 		4, 0, 20, 10, m_wndLocationBar.m_pWnd, 152, NULL));
 
-	m_wndDiffViewBar.SubclassWindow(HWindow::CreateEx(
+	m_wndDiffViewBar.Subclass(HWindow::CreateEx(
 		0, WinMergeWindowClass, NULL, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
 		0, 0, 100, 52, m_pWnd, ID_VIEW_DETAIL_BAR));
 
