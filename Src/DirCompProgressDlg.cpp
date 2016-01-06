@@ -149,16 +149,12 @@ void DirCompProgressDlg::OnTimer(UINT_PTR nIDEvent)
 				if (HEdit *pEdit = static_cast<HEdit *>(GetDlgItem(IDC_LEFT_EDIT)))
 				{
 					String path = ctxt->GetLeftFilepathAndName(di);
-					paths_UndoMagic(path);
-					paths_CompactPath(pEdit, path);
-					pEdit->SetWindowText(path.c_str());
+					pEdit->SetWindowText(paths_CompactPath(pEdit, path));
 				}
 				if (HEdit *pEdit = static_cast<HEdit *>(GetDlgItem(IDC_RIGHT_EDIT)))
 				{
 					String path = ctxt->GetRightFilepathAndName(di);
-					paths_UndoMagic(path);
-					paths_CompactPath(pEdit, path);
-					pEdit->SetWindowText(path.c_str());
+					pEdit->SetWindowText(paths_CompactPath(pEdit, path));
 				}
 			}
 			m_pStatsDlg->Update();

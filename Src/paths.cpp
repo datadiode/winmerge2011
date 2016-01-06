@@ -66,7 +66,7 @@ static const String &paths_DoMagic(String &path)
 	return path;
 }
 
-LPCTSTR paths_UndoMagic(LPTSTR path)
+LPTSTR paths_UndoMagic(LPTSTR path)
 {
 	size_t i = 0;
 	if (LPCTSTR p = EatPrefix(path, paths_magic_prefix))
@@ -378,23 +378,28 @@ static LPTSTR paths_SkipRootForCompactPath(LPCTSTR path)
 /**
  * @brief paths_CompactPath
  */
-void paths_CompactPath(HEdit *pEdit, String &path)
+LPCTSTR paths_CompactPath(HEdit *pEdit, String &path, TCHAR marker)
 {
-	// cope with modification indicator
-	const String::size_type offset = path.find_first_not_of(_T("* "));
-	if (offset == String::npos)
-		return;
+	// leave empty paths as is
+	if (path.empty())
+		return path.c_str();
+	// be sure to meet PathCompactPath()'s buffer size requirement
+	path.reserve(MAX_PATH + _countof(paths_magic_uncfix));
+	// skip any magic prefix
+	LPTSTR prefix = const_cast<LPTSTR>(path.c_str());
+	LPTSTR buffer = paths_UndoMagic(prefix);
 	// we want to keep the first and the last path component, and in between,
 	// as much characters as possible from the right
 	// PathCompactPath keeps, in between, as much characters as possible from the left
 	// so we reverse everything between the first and the last component before calling PathCompactPath
-	if (LPTSTR pathWithoutRoot = paths_SkipRootForCompactPath(path.c_str() + offset))
-		_tcsrev(pathWithoutRoot);
-
-	// resize to at least MAX_PATH characters
-	if (path.size() < MAX_PATH)
-		path.resize(MAX_PATH);
-
+	LPTSTR const pathWithoutRoot = paths_SkipRootForCompactPath(buffer);
+	_tcsrev(pathWithoutRoot);
+	// if told so, and skipped prefix allows for recycling, prepend a marker
+	if (marker != _T('\0') && (buffer - prefix) >= 2)
+	{
+		*--buffer = _T(' ');
+		*--buffer = marker;
+	}
 	// get a device context object
 	if (HSurface *pDC = pEdit->GetDC())
 	{
@@ -402,17 +407,16 @@ void paths_CompactPath(HEdit *pEdit, String &path)
 		pEdit->GetRect(&rect);
 		// and use the correct font
 		HGdiObj *pFontOld = pDC->SelectObject(pEdit->GetFont());
-		pDC->PathCompactPath(&path.front() + offset, rect.right - rect.left);
+		pDC->PathCompactPath(buffer, rect.right - rect.left);
 		// set old font back
 		pDC->SelectObject(pFontOld);
 		pEdit->ReleaseDC(pDC);
 	}
-
-	// downsize to reflect the actual length
-	path.resize(static_cast<String::size_type>(_tcslen(path.c_str())));
-
 	// we reverse back everything between the first and the last component
 	// it works OK as "..." reversed = "..." again
-	if (LPTSTR pathWithoutRoot = paths_SkipRootForCompactPath(path.c_str() + offset))
-		_tcsrev(pathWithoutRoot);
+	_tcsrev(pathWithoutRoot);
+	// downsize to reflect the actual length
+	path.erase(static_cast<String::size_type>(_tcslen(path.c_str())));
+	// return what's left in buffer but beware of a possible string reallocation
+	return path.c_str() + (buffer - prefix);
 }

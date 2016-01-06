@@ -19,7 +19,7 @@ typedef enum
 bool paths_EndsWithSlash(LPCTSTR);
 PATH_EXISTENCE paths_DoesPathExist(LPCTSTR);
 DWORD paths_IsReadonlyFile(LPCTSTR);
-LPCTSTR paths_UndoMagic(LPTSTR);
+LPTSTR paths_UndoMagic(LPTSTR);
 void paths_UndoMagic(String &);
 String paths_GetLongPath(LPCTSTR);
 bool paths_CreateIfNeeded(LPCTSTR, bool bExcludeLeaf = false);
@@ -32,4 +32,4 @@ String paths_GetParentPath(LPCTSTR);
 struct CurrentDirectory: String { CurrentDirectory(); };
 
 bool paths_PathIsExe(LPCTSTR);
-void paths_CompactPath(HEdit *, String &);
+LPCTSTR paths_CompactPath(HEdit *, String &, TCHAR marker = _T('\0'));

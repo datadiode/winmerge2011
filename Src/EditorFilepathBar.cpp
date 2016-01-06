@@ -44,27 +44,26 @@ static char THIS_FILE[] = __FILE__;
  *
  * @param [in] pDC Pointer to draw context.
  * @param [in] maxWidth Maximum width of the string in the GUI.
- * @param [in,out] sFilepath:
+ * @param [in,out] path:
  * - in: string to format
  * - out: formatted string
- * @return Number of lines path is splitted to.
  */
-static void FormatFilePathForDisplayWidth(HSurface *pDC, int maxWidth, String & sFilepath)
+static void FormatFilePathForDisplayWidth(HSurface *pDC, int maxWidth, String &path)
 {
+	paths_UndoMagic(path);
 	int iBegin = 0;
-	while (1)
+	for (;;)
 	{
 		String line;
-
 		// find the next truncation point
 		int iEndMin = 0;
-		int iEndMax = sFilepath.size() - iBegin + 1;
-		while(1)
+		int iEndMax = path.size() - iBegin + 1;
+		for (;;)
 		{
 			int iEnd = (iEndMin + iEndMax) / 2;
 			if (iEnd == iEndMin)
 				break;
-			line = sFilepath.substr(iBegin, iEnd);
+			line = path.substr(iBegin, iEnd);
 			SIZE ext;
 			if (pDC->GetTextExtent(line.c_str(), line.size(), &ext))
 			{
@@ -74,33 +73,30 @@ static void FormatFilePathForDisplayWidth(HSurface *pDC, int maxWidth, String & 
 					iEndMin = iEnd;
 			}
 		};
-		ASSERT(iEndMax == iEndMin+1);
+		ASSERT(iEndMax == iEndMin + 1);
 
 		// here iEndMin is the last character displayed in maxWidth
 
 		// exit the loop if we can display the remaining characters with no truncation
-		if (iBegin + iEndMin == sFilepath.size())
+		if (iBegin + iEndMin == path.size())
 			break;
 
 		// truncate the text to the previous "\" if possible
-		line = sFilepath.substr(iBegin, iEndMin);
+		line = path.substr(iBegin, iEndMin);
 		int lastSlash = line.rfind(_T('\\'));
 		if (lastSlash >= 0)
 			iEndMin = lastSlash + 1;
 
-		sFilepath.insert(iBegin + iEndMin, _T("\n"));
+		path.insert(iBegin + iEndMin, 1, _T('\n'));
 		iBegin += iEndMin + 2;
 	}
 }
 
-static void RefreshDisplayText(HEdit *pEdit, LPCTSTR szOriginalText)
+static void RefreshDisplayText(HEdit *pEdit, String line)
 {
-	String line = szOriginalText;
-	const BOOL bModify = pEdit->GetModify();
-	if (bModify && (pEdit->GetStyle() & ES_READONLY) != 0)
-		line.insert(0, _T("* "));
-	paths_CompactPath(pEdit, line);
-	pEdit->SetWindowText(line.c_str());
+	BOOL const bModify = pEdit->GetModify();
+	pEdit->SetWindowText(paths_CompactPath(pEdit, line,
+		bModify && (pEdit->GetStyle() & ES_READONLY) != 0 ? _T('*') : _T('\0')));
 	pEdit->SetModify(bModify);
 }
 
@@ -225,8 +221,7 @@ void CEditorFilePathBar::SetText(int pane, LPCTSTR lpszString, BOOL bDirty, BUFF
 		m_Edit[pane]->SetReadOnly(FALSE);
 		bDirty = TRUE;
 	}
-	// Hide magic prefix from users
-	paths_UndoMagic(m_rgOriginalText[pane] = lpszString);
+	m_rgOriginalText[pane] = lpszString;
 	SetModify(pane, bDirty);
 }
 
@@ -249,7 +244,7 @@ BOOL CEditorFilePathBar::GetModify(int pane)
 void CEditorFilePathBar::SetModify(int pane, BOOL bDirty)
 {
 	m_Edit[pane]->SetModify(bDirty);
-	RefreshDisplayText(m_Edit[pane], m_rgOriginalText[pane].c_str());
+	RefreshDisplayText(m_Edit[pane], m_rgOriginalText[pane]);
 }
 
 /** 
@@ -322,7 +317,7 @@ void CEditorFilePathBar::OnContextMenu(POINT point)
 	default:
 		return;
 	}
-	const String &sOriginalText = m_rgOriginalText[pane];
+
 	HMenu *const pMenu = LanguageSelect.LoadMenu(IDR_POPUP_EDITOR_HEADERBAR);
 
 	HMenu *pSub = NULL;
@@ -335,9 +330,13 @@ void CEditorFilePathBar::OnContextMenu(POINT point)
 			break;
 	}
 
-	if (paths_EndsWithSlash(sOriginalText.c_str()))
+	String title = GetTitle(pane);
+	LPCTSTR path = paths_UndoMagic(const_cast<LPTSTR>(title.c_str()));
+	if (paths_EndsWithSlash(path))
+	{
 		// no filename, we have to disable the unwanted menu entry
 		pSub->EnableMenuItem(ID_EDITOR_COPY_FILENAME, MF_GRAYED);
+	}
 
 	// invoke context menu
 	// we don't want to use the main application handlers, so we
@@ -348,37 +347,31 @@ void CEditorFilePathBar::OnContextMenu(POINT point)
 
 	pMenu->DestroyMenu();
 
-	// compute the beginning of the text to copy (in OriginalText)
-	int iBegin = 0;
 	switch (command)
 	{
-	case 0:
-		break;
 	case ID_EDITOR_COPY_FILENAME:
-		iBegin = sOriginalText.rfind(_T('\\')) + 1;
-		break;
+		path = PathFindFileName(path);
+		// fall through
 	case ID_EDITOR_COPY_PATH:
-		// pass the heading "*" for modified files
-		iBegin = sOriginalText[0] == _T('*') ? 2 : 0;
+		if (OpenClipboard())
+		{
+			UniStdioFile file;
+			file.SetUnicoding(UCS2LE);
+			if (HGLOBAL hMem = file.CreateStreamOnHGlobal())
+			{
+				file.WriteString(path, wcslen(path) + 1);
+				EmptyClipboard();
+				SetClipboardData(CF_UNICODETEXT, hMem);
+			}
+			CloseClipboard();
+		}
+	case 0:
+		// fall through
 		break;
 	default:
 		m_Edit[pane]->SetLimitText(command);
 		GetParent()->PostMessage(WM_COMMAND, m_Edit[pane]->GetDlgCtrlID());
-		return;
-	}
-	if (OpenClipboard())
-	{
-		UniStdioFile file;
-		file.SetUnicoding(UCS2LE);
-		if (HGLOBAL hMem = file.CreateStreamOnHGlobal())
-		{
-			int iEnd = sOriginalText.size();
-			file.WriteString(sOriginalText.c_str() + iBegin, iEnd - iBegin);
-			file.WriteString(_T(""), 1);
-			EmptyClipboard();
-			SetClipboardData(CF_UNICODETEXT, hMem);
-		}
-		CloseClipboard();
+		break;
 	}
 }
 
@@ -389,8 +382,8 @@ LRESULT CEditorFilePathBar::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_WINDOWPOSCHANGING:
 		if (CFloatState::Float(reinterpret_cast<WINDOWPOS *>(lParam)))
 		{
-			RefreshDisplayText(m_Edit[0], m_rgOriginalText[0].c_str());
-			RefreshDisplayText(m_Edit[1], m_rgOriginalText[1].c_str());
+			RefreshDisplayText(m_Edit[0], m_rgOriginalText[0]);
+			RefreshDisplayText(m_Edit[1], m_rgOriginalText[1]);
 		}
 		break;
 	case WM_LBUTTONDOWN:
@@ -399,8 +392,8 @@ LRESULT CEditorFilePathBar::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		if (!COptionsMgr::Get(OPT_RESIZE_PANES) &&
 			CSplitState::Split(m_hWnd) == 2)
 		{
-			RefreshDisplayText(m_Edit[0], m_rgOriginalText[0].c_str());
-			RefreshDisplayText(m_Edit[1], m_rgOriginalText[1].c_str());
+			RefreshDisplayText(m_Edit[0], m_rgOriginalText[0]);
+			RefreshDisplayText(m_Edit[1], m_rgOriginalText[1]);
 		}
 		break;
 	case WM_NOTIFY:
