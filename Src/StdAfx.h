@@ -98,6 +98,11 @@ using H2O::OListView;
 using H2O::OString;
 using H2O::ZeroInit;
 
+// A version of _beginthreadex() with a WINAPI like signature
+typedef HANDLE(__cdecl*fnBeginThreadEx)(LPSECURITY_ATTRIBUTES,
+	UINT, LPTHREAD_START_ROUTINE, LPVOID, DWORD, LPDWORD);
+#define BeginThreadEx ((fnBeginThreadEx)_beginthreadex)
+
 // Global variable to hold the wine version.
 extern const char *const wine_version;
 

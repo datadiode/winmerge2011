@@ -254,21 +254,36 @@ void CDiffContext::CompareDirectories(bool bOnlyRequested)
 		m_pCompareStats->SetCompareThreadCount(1);
 		if (!m_bOnlyRequested)
 		{
-			DiffThreadCollect(this);
+			DiffThreadCollect();
 			ReleaseSemaphore(m_hSemaphore, 1, 0);
 		}
-		DiffThreadCompare(this);
+		DiffThreadCompare();
 	}
 	else
 	{
 		m_pCompareStats->SetCompareThreadCount(m_nCompareThreads);
 		if (!m_bOnlyRequested)
-			_beginthread(DiffThreadCollect, 0, this);
+		{
+			if (HANDLE const hThread = BeginThreadEx(NULL, 0,
+				OException::ThreadProc<CDiffContext, &CDiffContext::DiffThreadCollect>,
+				this, 0, NULL))
+			{
+				CloseHandle(hThread);
+			}
+		}
 		int nThreads = m_nCompareThreads;
 		do
 		{
-			if (!_beginthread(DiffThreadCompare, 0, this))
+			if (HANDLE const hThread = BeginThreadEx(NULL, 0,
+				OException::ThreadProc<CDiffContext, &CDiffContext::DiffThreadCompare>,
+				this, 0, NULL))
+			{
+				CloseHandle(hThread);
+			}
+			else
+			{
 				InterlockedDecrement(&m_nCompareThreads);
+			}
 		} while (--nThreads != 0);
 	}
 }
@@ -281,14 +296,13 @@ void CDiffContext::CompareDirectories(bool bOnlyRequested)
  * @param [in] lpParam Pointer to parameter structure.
  * @return Thread's return value.
  */
-void CDiffContext::DiffThreadCollect(LPVOID lpParam)
+DWORD CDiffContext::DiffThreadCollect()
 {
-	CDiffContext *myStruct = reinterpret_cast<CDiffContext *>(lpParam);
 	try
 	{
-		ASSERT(!myStruct->m_bOnlyRequested);
+		ASSERT(!m_bOnlyRequested);
 
-		int depth = myStruct->m_nRecursive ? -1 : 0;
+		int depth = m_nRecursive ? -1 : 0;
 
 		String subdir; // blank to start at roots specified in diff context
 #ifdef _DEBUG
@@ -299,7 +313,7 @@ void CDiffContext::DiffThreadCollect(LPVOID lpParam)
 #endif
 
 		// Build results list (except delaying file comparisons until below)
-		myStruct->DirScan_GetItems(subdir, false, subdir, false, depth, NULL);
+		DirScan_GetItems(subdir, false, subdir, false, depth, NULL);
 
 #ifdef _DEBUG
 		_CrtMemCheckpoint(&memStateAfter);
@@ -314,7 +328,8 @@ void CDiffContext::DiffThreadCollect(LPVOID lpParam)
 	}
 
 	// ReleaseSemaphore() once again to signal that collect phase is ready
-	ReleaseSemaphore(myStruct->m_hSemaphore, myStruct->m_nCompareThreads, 0);
+	ReleaseSemaphore(m_hSemaphore, m_nCompareThreads, 0);
+	return 0;
 }
 
 /**
@@ -324,22 +339,22 @@ void CDiffContext::DiffThreadCollect(LPVOID lpParam)
  * sends message to UI so UI can update itself.
  * @param [in] lpParam Pointer to parameter structure.
  */
-void CDiffContext::DiffThreadCompare(LPVOID lpParam)
+DWORD CDiffContext::DiffThreadCompare()
 {
 	CoInitializeEx(NULL, COINIT_MULTITHREADED);
-	CDiffContext *const myStruct = reinterpret_cast<CDiffContext *>(lpParam);
 	// Now do all pending file comparisons
-	if (myStruct->m_bOnlyRequested)
-		myStruct->DirScan_CompareRequestedItems();
+	if (m_bOnlyRequested)
+		DirScan_CompareRequestedItems();
 	else
-		myStruct->DirScan_CompareItems();
-	if (InterlockedDecrement(&myStruct->m_nCompareThreads) <= 0)
+		DirScan_CompareItems();
+	if (InterlockedDecrement(&m_nCompareThreads) <= 0)
 	{
-		CloseHandle(myStruct->m_hSemaphore);
-		myStruct->m_hSemaphore = NULL;
-		DeleteCriticalSection(&myStruct->m_csCompareThread);
+		CloseHandle(m_hSemaphore);
+		m_hSemaphore = NULL;
+		DeleteCriticalSection(&m_csCompareThread);
 		// Send message to UI to update
-		myStruct->m_pWindow->PostMessage(MSG_UI_UPDATE);
+		m_pWindow->PostMessage(MSG_UI_UPDATE);
 	}
 	CoUninitialize();
+	return 0;
 }

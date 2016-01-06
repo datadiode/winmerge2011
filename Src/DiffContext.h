@@ -149,8 +149,8 @@ private:
 	const int m_nRecursive; /**< Do we include subfolders to compare? */
 	const String empty;
 // Thread functions
-	static void __cdecl DiffThreadCollect(LPVOID);
-	static void __cdecl DiffThreadCompare(LPVOID);
+	DWORD DiffThreadCollect();
+	DWORD DiffThreadCompare();
 	int DirScan_GetItems(
 		const String &leftsubdir, bool bLeftUniq,
 		const String &rightsubdir, bool bRightUniq,
