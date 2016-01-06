@@ -4332,8 +4332,14 @@ void CMainFrame::SetActiveMenu(HMenu *pMenu)
 	}
 	else
 	{
-		UINT n = pMenu->GetMenuItemCount();
-		HMenu *pWindowMenu = pMenu->GetSubMenu(n - 2);
+		HMenu *pWindowMenu = NULL;
+		UINT count = pMenu->GetMenuItemCount();
+		UINT state;
+		do
+		{
+			pWindowMenu = count != 0 ? pMenu->GetSubMenu(--count) : NULL;
+			state = pWindowMenu ? pWindowMenu->GetMenuState(ID_WINDOW_CASCADE) : 0xFFFFFFFF;
+		} while (state == 0xFFFFFFFF && count != 0);
 		m_pWndMDIClient->SendMessage(WM_MDISETMENU,
 			reinterpret_cast<WPARAM>(pMenu),
 			reinterpret_cast<LPARAM>(pWindowMenu));
