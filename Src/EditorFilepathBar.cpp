@@ -359,7 +359,7 @@ void CEditorFilePathBar::OnContextMenu(POINT point)
 			file.SetUnicoding(UCS2LE);
 			if (HGLOBAL hMem = file.CreateStreamOnHGlobal())
 			{
-				file.WriteString(path, wcslen(path) + 1);
+				file.WriteString(path, static_cast<String::size_type>(_tcslen(path)) + 1);
 				EmptyClipboard();
 				SetClipboardData(CF_UNICODETEXT, hMem);
 			}
