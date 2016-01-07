@@ -1,7 +1,3 @@
-// stdafx.h : include file for standard system include files,
-//  or project specific include files that are used frequently, but
-//      are changed infrequently
-//
 /**
  * @file  Src/StdAfx.h
  *
@@ -169,6 +165,14 @@ void LogErrorString(any fmt, ...)
 
 #define strdupa(s) strcpy((char *)_alloca(strlen(s) + 1), s)
 #define wcsdupa(s) wcscpy((wchar_t *)_alloca((wcslen(s) + 1) * sizeof(wchar_t)), s)
+
+// Below definition of VA_NUM_ARGS() follows shogun-toolbox's parameters.hpp,
+// which is BSD 3-clause licensed, and Copyright (c) 2012-2013 Sergey Lisitsyn.
+
+// pure magic, for the brave souls
+#define VA_NUM_ARGS(...) VA_NUM_ARGS_IMPL_((__VA_ARGS__,5,4,3,2,1))
+#define VA_NUM_ARGS_IMPL_(tuple) VA_NUM_ARGS_IMPL tuple
+#define VA_NUM_ARGS_IMPL(_1,_2,_3,_4,_5,N,...) N
 
 /** @brief include for the custom dialog boxes, with do not ask/display again */
 #include "MessageBoxDialog.h"
