@@ -1076,7 +1076,7 @@ LocalString CLanguageSelect::Format(UINT id, ...) const
 	return LocalString(handle, id);
 }
 
-LocalString CLanguageSelect::FormatStrings(UINT id, UINT n, ...) const
+LocalString (CLanguageSelect::FormatStrings)(UINT id, UINT n, ...) const
 {
 	va_list args;
 	va_start(args, n);

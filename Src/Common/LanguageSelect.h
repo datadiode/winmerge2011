@@ -135,3 +135,5 @@ protected:
 	// Generated message map functions
 	void OnOK();
 } LanguageSelect;
+
+#define FormatStrings(fmt, ...) FormatStrings(fmt, VA_NUM_ARGS(__VA_ARGS__), __VA_ARGS__)
