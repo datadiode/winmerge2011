@@ -312,7 +312,7 @@ void FileFiltersDlg::OnBnClickedFilterfileNewbutton()
 	String templatePath = paths_ConcatPath(path, FILE_FILTER_TEMPLATE);
 	if (paths_DoesPathExist(templatePath.c_str()) != IS_EXISTING_FILE)
 	{
-		LanguageSelect.FormatMessage(
+		LanguageSelect.FormatStrings(
 			IDS_FILEFILTER_TMPL_MISSING,
 			FILE_FILTER_TEMPLATE, templatePath.c_str()
 		).MsgBox(MB_ICONERROR);
@@ -359,7 +359,7 @@ void FileFiltersDlg::OnBnClickedFilterfileDelete()
 	if (sel > 0)
 	{
 		String path = m_listFilters->GetItemText(sel, 2);
-		int response = LanguageSelect.FormatMessage(
+		int response = LanguageSelect.FormatStrings(
 			IDS_CONFIRM_DELETE_SINGLE, path.c_str()
 		).MsgBox(MB_ICONWARNING | MB_YESNO);
 		if (response == IDYES)

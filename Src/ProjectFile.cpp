@@ -110,7 +110,7 @@ bool ProjectFile::Read(LPCTSTR path)
 		else
 		{
 			String sError = LanguageSelect.LoadString(IDS_UNK_ERROR_READING_PROJECT);
-			LanguageSelect.FormatMessage(
+			LanguageSelect.FormatStrings(
 				IDS_ERROR_FILEOPEN, path, sError.c_str()
 			).MsgBox(MB_ICONSTOP);
 		}
@@ -118,7 +118,7 @@ bool ProjectFile::Read(LPCTSTR path)
 	else
 	{
 		String sError = LanguageSelect.LoadString(IDS_UNK_ERROR_READING_PROJECT);
-		LanguageSelect.FormatMessage(
+		LanguageSelect.FormatStrings(
 			IDS_ERROR_FILEOPEN, path, sError.c_str()
 		).MsgBox(MB_ICONSTOP);
 	}
@@ -178,7 +178,7 @@ bool ProjectFile::Save(LPCTSTR path)
 		String sError = err.apiname.empty() ? err.desc : GetSysError(err.syserrnum);
 		if (sError.empty())
 			sError = LanguageSelect.LoadString(IDS_UNK_ERROR_SAVING_PROJECT);
-		LanguageSelect.FormatMessage(
+		LanguageSelect.FormatStrings(
 			IDS_ERROR_FILEOPEN, path, sError.c_str()
 		).MsgBox(MB_ICONSTOP);
 		return false;

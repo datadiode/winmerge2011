@@ -1354,7 +1354,7 @@ int CMainFrame::HandleReadonlySave(DWORD attr, String &strSavePath, int choice)
 	if (choice == 0)
 	{
 		// Single file
-		choice = LanguageSelect.FormatMessage(
+		choice = LanguageSelect.FormatStrings(
 			IDS_SAVEREADONLY_FMT, pszDisplayPath
 		).MsgBox(MB_YESNOCANCEL | MB_ICONWARNING | MB_DEFBUTTON2 | MB_DONT_ASK_AGAIN);
 		if (choice == IDNO && !SelectFile(m_hWnd, strSavePath, IDS_SAVE_AS_TITLE, NULL, FALSE))
@@ -1363,7 +1363,7 @@ int CMainFrame::HandleReadonlySave(DWORD attr, String &strSavePath, int choice)
 	else if (choice != IDYESTOALL) // Don't ask again
 	{
 		// Multiple files or folder
-		choice = LanguageSelect.FormatMessage(
+		choice = LanguageSelect.FormatStrings(
 			IDS_SAVEREADONLY_MULTI, pszDisplayPath
 		).MsgBox(MB_YESNOCANCEL | MB_ICONWARNING | MB_DEFBUTTON3 | MB_DONT_ASK_AGAIN | MB_YES_TO_ALL);
 	}
@@ -2670,14 +2670,14 @@ void CMainFrame::OpenFileToExternalEditor(LPCTSTR file, LPCTSTR editor, int line
 				NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi))
 		{
 			// Error invoking external editor
-			LanguageSelect.FormatMessage(IDS_ERROR_EXECUTE_FILE, sExecutable.c_str()).MsgBox(MB_ICONSTOP);
+			LanguageSelect.FormatStrings(IDS_ERROR_EXECUTE_FILE, sExecutable.c_str()).MsgBox(MB_ICONSTOP);
 		}
 	}
 	else
 	{
 		// Don't know how to invoke external editor (it doesn't end with
 		// an obvious executable extension)
-		LanguageSelect.FormatMessage(IDS_UNKNOWN_EXECUTE_FILE, sExecutable.c_str()).MsgBox(MB_ICONSTOP);
+		LanguageSelect.FormatStrings(IDS_UNKNOWN_EXECUTE_FILE, sExecutable.c_str()).MsgBox(MB_ICONSTOP);
 	}
 }
 
@@ -2802,7 +2802,7 @@ void CMainFrame::OnSaveConfigData()
 	}
 	else
 	{
-		LanguageSelect.FormatMessage(
+		LanguageSelect.FormatStrings(
 			IDS_ERROR_FILEOPEN, sFileName.c_str(), sError.c_str()
 		).MsgBox(MB_ICONSTOP);
 	}
@@ -4135,7 +4135,7 @@ void CMainFrame::OnFileOpenConflict()
 		}
 		else
 		{
-			LanguageSelect.FormatMessage(
+			LanguageSelect.FormatStrings(
 				IDS_NOT_CONFLICT_FILE, conflictFile.c_str()
 			).MsgBox(MB_ICONSTOP);
 		}

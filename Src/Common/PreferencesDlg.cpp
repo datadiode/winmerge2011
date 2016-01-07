@@ -217,7 +217,7 @@ void CPreferencesDlg::OnSelchangedPages(NMTREEVIEW *pNM)
 		m_nPageIndex = pPage->m_nPageIndex;
 		// update caption
 		String sPath = GetItemPath(htiSel);
-		SetWindowText(LanguageSelect.FormatMessage(IDS_OPTIONS_TITLE, sPath.c_str()));
+		SetWindowText(LanguageSelect.FormatStrings(IDS_OPTIONS_TITLE, sPath.c_str()));
 		m_tcPages->SetFocus();
 	}
 }

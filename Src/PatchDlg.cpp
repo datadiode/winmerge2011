@@ -244,7 +244,7 @@ BOOL CPatchDlg::OnInitDialog()
 	}
 	else if (count > 1)	// Multiple files added, show number of files
 	{
-		String msg = LanguageSelect.FormatMessage(
+		String msg = LanguageSelect.FormatStrings(
 			IDS_DIFF_SELECTEDFILES, NumToStr(count).c_str());
 		m_file1 = msg;
 		m_file2 = msg;

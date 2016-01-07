@@ -1849,7 +1849,7 @@ LRESULT CDirView::ReflectEndLabelEdit(NMLVDISPINFO *pdi)
 void CDirView::OnUpdateStatusNum()
 {
 	int items = GetSelectedCount();
-	m_pFrame->SetStatus(LanguageSelect.FormatMessage(
+	m_pFrame->SetStatus(LanguageSelect.FormatStrings(
 		items == 1 ? IDS_STATUS_SELITEM1 : IDS_STATUS_SELITEMS,
 		NumToStr(items, 10).c_str()));
 
@@ -1910,7 +1910,7 @@ void CDirView::OnUpdateStatusNum()
 	{
 		// No item has focus
 		// "Items: %1"
-		s = LanguageSelect.FormatMessage(
+		s = LanguageSelect.FormatStrings(
 			IDS_DIRVIEW_STATUS_FMT_NOFOCUS,
 			NumToStr(items, 10).c_str());
 	}
@@ -1924,7 +1924,7 @@ void CDirView::OnUpdateStatusNum()
 			focusItem -= m_nSpecialItems;
 			items -= m_nSpecialItems;
 			// "Item %1 of %2"
-			s = LanguageSelect.FormatMessage(
+			s = LanguageSelect.FormatStrings(
 				IDS_DIRVIEW_STATUS_FMT_FOCUS,
 				NumToStr(focusItem + 1, 10).c_str(),
 				NumToStr(items, 10).c_str());

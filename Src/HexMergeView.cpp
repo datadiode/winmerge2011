@@ -294,7 +294,7 @@ HRESULT CHexMergeView::SaveFile(LPCTSTR path)
 	// Warn user in case file has been changed by someone else
 	if (IsFileChangedOnDisk(path))
 	{
-		int response = LanguageSelect.FormatMessage(
+		int response = LanguageSelect.FormatStrings(
 			IDS_FILECHANGED_ONDISK, paths_UndoMagic(wcsdupa(path))
 		).MsgBox(MB_ICONWARNING | MB_YESNO);
 		if (response == IDNO)

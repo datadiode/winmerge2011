@@ -338,7 +338,7 @@ HRESULT CExternalArchiveFormat::CompressArchive(HWND, LPCTSTR path, Merge7z::Dir
 			}
 			else
 			{
-				response = LanguageSelect.FormatMessage(IDS_CANT_STORE_1_AS_2,
+				response = LanguageSelect.FormatStrings(IDS_CANT_STORE_1_AS_2,
 					SP2NBSP(etorItem.FullPath).c_str(), SP2NBSP(etorItem.Name).c_str()
 				).MsgBox(MB_ICONSTOP | MB_OKCANCEL);
 			}

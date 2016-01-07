@@ -144,14 +144,14 @@ static String ColStatusGet(const CDiffContext *pCtxt, const void *p)
 		String path = di.GetLeftFilepath(pCtxt->GetLeftPath());
 		paths_UndoMagic(path);
 		return static_cast<LPCTSTR>(
-			LanguageSelect.FormatMessage(IDS_LEFT_ONLY_IN_FMT, path.c_str()));
+			LanguageSelect.FormatStrings(IDS_LEFT_ONLY_IN_FMT, path.c_str()));
 	}
 	if (di.isSideRightOnly())
 	{
 		String path = di.GetRightFilepath(pCtxt->GetRightPath());
 		paths_UndoMagic(path);
 		return static_cast<LPCTSTR>(
-			LanguageSelect.FormatMessage(IDS_RIGHT_ONLY_IN_FMT, path.c_str()));
+			LanguageSelect.FormatStrings(IDS_RIGHT_ONLY_IN_FMT, path.c_str()));
 	}
 	if (di.isResultSame())
 	{

@@ -126,7 +126,7 @@ void CPatchTool::Run()
 			}
 			if (m_diffWrapper.m_status.bPatchFileFailed)
 			{
-				LanguageSelect.FormatMessage(
+				LanguageSelect.FormatStrings(
 					IDS_FILEWRITE_ERROR, m_dlgPatch.m_fileResult.c_str()
 				).MsgBox(MB_ICONSTOP);
 				break;

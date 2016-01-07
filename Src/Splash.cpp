@@ -236,7 +236,7 @@ LRESULT CSplashWnd::OnCustomdraw(NMCUSTOMDRAW *pnm)
 
 	HGdiObj *oldfont = pdc->SelectObject(font);
 	String sVersion = version.GetProductVersion();
-	String s = LanguageSelect.FormatMessage(IDS_VERSION_FMT, sVersion.c_str());
+	String s = LanguageSelect.FormatStrings(IDS_VERSION_FMT, sVersion.c_str());
 	pdc->SetBkMode(TRANSPARENT);
 	RECT area = VersionTextArea;
 	pdc->DrawText(s.c_str(), -1, &area, VersionTextStyle);

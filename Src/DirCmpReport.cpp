@@ -149,7 +149,7 @@ bool DirCmpReport::GenerateReport(String &errStr)
  */
 void DirCmpReport::GenerateReport(REPORT_TYPE nReportType)
 {
-	m_sTitle = LanguageSelect.FormatMessage(IDS_DIRECTORY_REPORT_TITLE,
+	m_sTitle = LanguageSelect.FormatStrings(IDS_DIRECTORY_REPORT_TITLE,
 		m_rootPaths[0].c_str(), m_rootPaths[1].c_str());
 	switch (nReportType)
 	{

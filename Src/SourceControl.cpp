@@ -46,7 +46,7 @@ int CMainFrame::SaveToVersionControl(LPCTSTR pszSavePath)
 			{
 				// Prompt for user choice
 				CVssPrompt dlg;
-				dlg.m_strMessage = LanguageSelect.FormatMessage(IDS_SAVE_FMT, pszSavePath);
+				dlg.m_strMessage = LanguageSelect.FormatStrings(IDS_SAVE_FMT, pszSavePath);
 				dlg.m_strProject = m_vssHelper.GetProjectBase();
 				dlg.m_strUser = m_strVssUser;          // BSP - Add VSS user name to dialog box
 				dlg.m_strPassword = m_strVssPassword;
@@ -74,7 +74,7 @@ int CMainFrame::SaveToVersionControl(LPCTSTR pszSavePath)
 			{
 				// Prompt for user choice
 				CVssPrompt dlg;
-				dlg.m_strMessage = LanguageSelect.FormatMessage(IDS_SAVE_FMT, pszSavePath);
+				dlg.m_strMessage = LanguageSelect.FormatStrings(IDS_SAVE_FMT, pszSavePath);
 				dlg.m_strProject = m_vssHelper.GetProjectBase();
 				dlg.m_strUser = m_strVssUser;          // BSP - Add VSS user name to dialog box
 				dlg.m_strPassword = m_strVssPassword;

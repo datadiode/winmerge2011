@@ -478,7 +478,7 @@ void CEditReplaceDlg::OnEditReplaceAll()
 		}
 	}
 	// Let user know how many strings were replaced
-	LanguageSelect.FormatMessage(
+	LanguageSelect.FormatStrings(
 		IDS_NUM_REPLACED, NumToStr(nNumReplaced).c_str()
 	).MsgBox(MB_ICONINFORMATION|MB_DONT_DISPLAY_AGAIN);
 }

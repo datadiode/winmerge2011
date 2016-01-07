@@ -371,7 +371,7 @@ int CChildFrame::Rescan(bool &bIdentical, bool bForced)
 			// against its working copy and the latter is being edited.
 			if (!m_ptBuf[nSide]->GetReadOnly())
 			{
-				LanguageSelect.FormatMessage(
+				LanguageSelect.FormatStrings(
 					IDS_FILE_DISAPPEARED, paths_UndoMagic(wcsdupa(path))
 				).MsgBox(MB_ICONWARNING);
 				if (!DoSaveAs(nSide))
@@ -380,7 +380,7 @@ int CChildFrame::Rescan(bool &bIdentical, bool bForced)
 		}
 		else if (fileChanged == FileChanged)
 		{
-			int response = LanguageSelect.FormatMessage(
+			int response = LanguageSelect.FormatStrings(
 				IDS_FILECHANGED_RESCAN, paths_UndoMagic(wcsdupa(path))
 			).MsgBox(MB_YESNO | MB_ICONWARNING);
 			if (response == IDYES)
@@ -868,7 +868,7 @@ bool CChildFrame::TrySaveAs(String &strPath, int &nSaveResult, String & sError,
 	// So don't ask about saving in that case.
 	if (nSaveResult != SAVE_NO_FILENAME)
 	{
-		response = LanguageSelect.FormatMessage(IDS_FILESAVE_FAILED,
+		response = LanguageSelect.FormatStrings(IDS_FILESAVE_FAILED,
 			paths_UndoMagic(wcsdupa(strPath.c_str())), sError.c_str()
 		).MsgBox(MB_OKCANCEL | MB_ICONWARNING);
 	}
@@ -958,7 +958,7 @@ bool CChildFrame::DoSave(bool &bSaveSuccess, int nBuffer)
 	FileChange fileChanged = IsFileChangedOnDisk(szPath, fileInfo, m_pSaveFileInfo[nBuffer]);
 	if (fileChanged == FileChanged)
 	{
-		int response = LanguageSelect.FormatMessage(
+		int response = LanguageSelect.FormatStrings(
 			IDS_FILECHANGED_ONDISK, paths_UndoMagic(wcsdupa(szPath))
 		).MsgBox(MB_ICONWARNING | MB_YESNO);
 		if (response == IDNO)
@@ -1714,7 +1714,7 @@ FileLoadResult::FILES_RESULT CChildFrame::LoadFile(int nBuffer, bool &readOnly, 
 	if (FileLoadResult::IsError(retVal))
 	{
 		// Error from Unifile/system
-		LanguageSelect.FormatMessage(
+		LanguageSelect.FormatStrings(
 			sOpenError.empty() ? IDS_ERROR_FILE_NOT_FOUND : IDS_ERROR_FILEOPEN,
 			paths_UndoMagic(wcsdupa(fileinfo.filepath.c_str())),
 			sOpenError.c_str()
