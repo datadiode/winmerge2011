@@ -256,7 +256,7 @@ extern COptionDef
 extern COptionDef
 <int> OPT_CMP_COMPARE_THREADS operator((_T("Settings/CompareThreads"), -1));
 extern COptionDef
-<bool> OPT_CMP_SELF_COMPARE operator((_T("Settings/SelfCompare"), true));
+<bool> OPT_CMP_SELF_COMPARE operator((_T("Settings/SelfCompare"), false));
 extern COptionDef
 <bool> OPT_CMP_WALK_UNIQUES operator((_T("Settings/WalkUniqueDirs"), true));
 extern COptionDef
