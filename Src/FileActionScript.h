@@ -99,7 +99,7 @@ struct FileActionItem : public FileAction
 class FileActionScript
 {
 public:
-	FileActionScript();
+	FileActionScript(LPCTSTR destBase = NULL);
 	~FileActionScript();
 
 	bool ConfirmCopy(
@@ -134,7 +134,7 @@ public:
 	 */
 	FileActionItem GetHeadActionItem() const { return m_actions[0]; }
 
-	String m_destBase; /**< Base destination path for some operations */
+	String const m_destBase; /**< Base destination path for some operations */
 	bool m_bMakeTargetItemWritable; /**< Whether to make copy/move target items writable */
 	bool m_bIgnoreFolderStructure; /**< Whether to ignore the folder structure */
 

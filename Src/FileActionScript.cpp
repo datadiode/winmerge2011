@@ -33,9 +33,10 @@ using std::vector;
 /**
  * @brief Standard constructor.
  */
-FileActionScript::FileActionScript()
+FileActionScript::FileActionScript(LPCTSTR destBase)
 : m_bMakeTargetItemWritable(false)
 , m_bIgnoreFolderStructure(false)
+, m_destBase(destBase ? paths_GetLongPath(destBase) + _T('\\') : String())
 {
 }
 

@@ -294,8 +294,7 @@ void CDirView::DoCopyLeftTo()
 
 	WaitStatusCursor waitstatus(IDS_STATUS_COPYFILES);
 
-	FileActionScript actionScript;
-	actionScript.m_destBase = m_lastCopyFolder + _T('\\');
+	FileActionScript actionScript(m_lastCopyFolder.c_str());
 	int sel = -1;
 	String slFile, srFile;
 	while ((sel = GetNextItem(sel, LVNI_SELECTED)) != -1)
@@ -344,8 +343,7 @@ void CDirView::DoCopyRightTo()
 
 	WaitStatusCursor waitstatus(IDS_STATUS_COPYFILES);
 
-	FileActionScript actionScript;
-	actionScript.m_destBase = m_lastCopyFolder + _T('\\');
+	FileActionScript actionScript(m_lastCopyFolder.c_str());
 	int sel = -1;
 	String slFile, srFile;
 	while ((sel = GetNextItem(sel, LVNI_SELECTED)) != -1)
@@ -394,8 +392,7 @@ void CDirView::DoMoveLeftTo()
 
 	WaitStatusCursor waitstatus(IDS_STATUS_MOVEFILES);
 
-	FileActionScript actionScript;
-	actionScript.m_destBase = m_lastCopyFolder + _T('\\');
+	FileActionScript actionScript(m_lastCopyFolder.c_str());
 	int sel = -1;
 	String slFile, srFile;
 	while ((sel = GetNextItem(sel, LVNI_SELECTED)) != -1)
@@ -444,8 +441,7 @@ void CDirView::DoMoveRightTo()
 
 	WaitStatusCursor waitstatus(IDS_STATUS_MOVEFILES);
 
-	FileActionScript actionScript;
-	actionScript.m_destBase = m_lastCopyFolder + _T('\\');
+	FileActionScript actionScript(m_lastCopyFolder.c_str());
 	int sel = -1;
 	String slFile, srFile;
 	while ((sel = GetNextItem(sel, LVNI_SELECTED)) != -1)
