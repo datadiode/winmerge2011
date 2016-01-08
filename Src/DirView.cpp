@@ -749,6 +749,27 @@ void CDirView::DeleteChildren(const DIFFITEM *dip, int i)
 }
 
 /**
+ * @brief Detach item and all its children but leave ListView lines in place
+ */
+void CDirView::DetachItem(int i)
+{
+	if (const DIFFITEM *dip = GetDiffItem(i))
+	{
+		SetItemData(i, 0);
+		if (dip->HasChildren())
+		{
+			i = GetItemCount();
+			while (i > m_nSpecialItems)
+			{
+				const DIFFITEM *di = GetDiffItem(--i);
+				if (di && di->IsAncestor(dip))
+					SetItemData(i, 0);
+			}
+		}
+	}
+}
+
+/**
  * @brief Collapse subfolder
  * @param [in] i Folder item index in listview.
  */

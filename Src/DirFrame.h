@@ -107,7 +107,7 @@ public:
 	void AddMergeDoc(CHexMergeFrame *);
 	void MergeDocClosing(CChildFrame *);
 	void MergeDocClosing(CHexMergeFrame *);
-	void UpdateDiffAfterOperation(const FileActionItem &, bool bMakeTargetItemWritable);
+	bool UpdateDiffAfterOperation(const FileActionItem &, bool bMakeTargetItemWritable);
 	void UpdateHeaderPath(BOOL bLeft);
 	void AbortCurrentScan();
 	void SetDescriptions(const String &strLeftDesc, const String &strRightDesc);

@@ -800,14 +800,17 @@ void CDirFrame::ApplyRightDisplayRoot(String &sText)
  * @brief Update results for FileActionItem.
  * This functions is called to update DIFFITEM after FileActionItem.
  * @param [in] act Action that was done.
- * @param [in] pos List position for DIFFITEM affected.
+ * @param [in] bMakeTargetItemWritable Whether to make target item writable.
+ * @return Whether any detachments occurred.
  */
-void CDirFrame::UpdateDiffAfterOperation(const FileActionItem & act, bool bMakeTargetItemWritable)
+bool CDirFrame::UpdateDiffAfterOperation(const FileActionItem &act, bool bMakeTargetItemWritable)
 {
 	DIFFITEM *di = m_pDirView->GetDiffItem(act.context);
-	ASSERT(di != NULL);
+	if (di == NULL)
+		return false;
 	bool bUpdateLeft = false;
 	bool bUpdateRight = false;
+	bool bDetachments = false;
 	// Use FileActionItem types for simplicity for now.
 	// Better would be to use FileAction contained, since it is not
 	// UI dependent.
@@ -843,9 +846,9 @@ void CDirFrame::UpdateDiffAfterOperation(const FileActionItem & act, bool bMakeT
 	case FileActionItem::UI_DEL_LEFT:
 		if (di->isSideLeftOnly())
 		{
-			m_pDirView->CollapseSubdir(act.context);
+			m_pDirView->DetachItem(act.context);
 			m_pCtxt->RemoveDiff(di);
-			m_pDirView->DeleteItem(act.context);
+			bDetachments = true;
 		}
 		else
 		{
@@ -858,9 +861,9 @@ void CDirFrame::UpdateDiffAfterOperation(const FileActionItem & act, bool bMakeT
 	case FileActionItem::UI_DEL_RIGHT:
 		if (di->isSideRightOnly())
 		{
-			m_pDirView->CollapseSubdir(act.context);
+			m_pDirView->DetachItem(act.context);
 			m_pCtxt->RemoveDiff(di);
-			m_pDirView->DeleteItem(act.context);
+			bDetachments = true;
 		}
 		else
 		{
@@ -871,9 +874,9 @@ void CDirFrame::UpdateDiffAfterOperation(const FileActionItem & act, bool bMakeT
 		break;
 
 	case FileActionItem::UI_DEL_BOTH:
-		m_pDirView->CollapseSubdir(act.context);
+		m_pDirView->DetachItem(act.context);
 		m_pCtxt->RemoveDiff(di);
-		m_pDirView->DeleteItem(act.context);
+		bDetachments = true;
 		break;
 	}
 	if (bUpdateLeft || bUpdateRight)
@@ -881,6 +884,7 @@ void CDirFrame::UpdateDiffAfterOperation(const FileActionItem & act, bool bMakeT
 		m_pCtxt->UpdateStatusFromDisk(di, bUpdateLeft, bUpdateRight, bMakeTargetItemWritable);
 		m_pDirView->UpdateDiffItemStatus(act.context);
 	}
+	return bDetachments;
 }
 
 /**

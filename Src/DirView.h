@@ -247,8 +247,8 @@ protected:
 	int m_dispcols;
 	std::vector<int> m_colorder; /**< colorder[logical#]=physical# */
 	std::vector<int> m_invcolorder; /**< invcolorder[physical]=logical# */
-	UINT m_nHiddenItems; /**< Count of items we have hidden */
-	UINT m_nSpecialItems; /**< Count of special items */
+	int m_nHiddenItems; /**< Count of items we have hidden */
+	int m_nSpecialItems; /**< Count of special items */
 	bool m_bTreeMode; /**< TRUE if tree mode is on*/
 	DirCompProgressDlg *m_pCmpProgressDlg;
 	clock_t m_compareStart; /**< Starting process time of the compare */
@@ -313,6 +313,7 @@ private:
 	void ReloadColumns();
 	void ResetColumnWidths();
 	void DeleteChildren(const DIFFITEM *, int);
+	void DetachItem(int);
 	int CollapseSubdir(int);
 	int ExpandSubdir(int);
 	void DeepExpandSubdir(int);

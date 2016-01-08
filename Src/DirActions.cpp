@@ -621,6 +621,7 @@ void CDirView::PerformActionList(FileActionScript &actionScript)
  */
 void CDirView::UpdateAfterFileScript(FileActionScript &actionList)
 {
+	bool bDetachments = false;
 	int curSel = GetNextItem(-1, LVNI_SELECTED);
 	while (actionList.GetActionItemCount() > 0)
 	{
@@ -628,17 +629,27 @@ void CDirView::UpdateAfterFileScript(FileActionScript &actionList)
 		// doesn't invalidate our item indexes.
 		FileActionItem act = actionList.RemoveTailActionItem();
 		// Update item
-		m_pFrame->UpdateDiffAfterOperation(act, actionList.m_bMakeTargetItemWritable);
+		if (m_pFrame->UpdateDiffAfterOperation(act, actionList.m_bMakeTargetItemWritable))
+			bDetachments = true;
 	}
-	
-	// Make sure selection is at sensible place if all selected items
-	// were removed.
-	UINT selected = GetSelectedCount();
-	if (selected == 0)
+
+	// Remove any detached items from the view
+	if (bDetachments)
 	{
-		if (curSel > 0)
-			--curSel;
-		MoveFocus(0, curSel);
+		int i = GetItemCount();
+		SetRedraw(FALSE);
+		while (i > m_nSpecialItems)
+		{
+			if (GetItemData(--i) == 0)
+			{
+				if (i <= curSel)
+					--curSel;
+				DeleteItem(i);
+			}
+		}
+		if (++curSel < GetItemCount() || --curSel >= 0)
+			MoveFocus(0, curSel);
+		SetRedraw(TRUE);
 	}
 }
 
