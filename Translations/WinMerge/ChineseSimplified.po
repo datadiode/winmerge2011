@@ -3809,8 +3809,8 @@ msgstr "保存更改到 %1？"
 
 #: Merge.rc:1792
 #, c-format
-msgid "%1 is marked read-only. Would you like to override the read-only file ? (No to save as new filename.)"
-msgstr "%1 标记为只读。您希望覆盖只读文件吗？选“否”可以用其它文件名保存。"
+msgid "%1\nis marked read-only. Would you like to override the read-only file? (No to save as new filename.)"
+msgstr "%1\n标记为只读。您希望覆盖只读文件吗？选“否”可以用其它文件名保存。"
 
 #: Merge.rc:1793
 #, c-format
@@ -3840,14 +3840,14 @@ msgstr ""
 msgid ""
 "Saving file failed.\n"
 "%1\n"
-"%2\n"
+"%2\r"
 "Do you want to:\n"
 "\t-use a different filename (Press Ok)\n"
 "\t-abort the current operation (Press Cancel)?"
 msgstr ""
 "保存文件失败。\n"
 "%1\n"
-"%2\n"
+"%2\r"
 "请选择:\n"
 "\t-用其它文件名保存(点击“确定”)\n"
 "\t-中止当前操作(点击“取消”)"

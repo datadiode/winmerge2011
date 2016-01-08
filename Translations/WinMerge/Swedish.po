@@ -3854,8 +3854,8 @@ msgstr "Spara ändringar i %1?"
 
 #: Merge.rc:1792
 #, c-format
-msgid "%1 is marked read-only. Would you like to override the read-only file ? (No to save as new filename.)"
-msgstr "%1 är skrivskyddad. Vill du skriva över filen (välj Nej för att spara filen med ett annat namn)?"
+msgid "%1\nis marked read-only. Would you like to override the read-only file? (No to save as new filename.)"
+msgstr "%1\när skrivskyddad. Vill du skriva över filen (välj Nej för att spara filen med ett annat namn)?"
 
 #: Merge.rc:1793
 #, c-format
@@ -3885,14 +3885,14 @@ msgstr ""
 msgid ""
 "Saving file failed.\n"
 "%1\n"
-"%2\n"
+"%2\r"
 "Do you want to:\n"
 "\t-use a different filename (Press Ok)\n"
 "\t-abort the current operation (Press Cancel)?"
 msgstr ""
 "Det gick inte att spara filen.\n"
 "%1\n"
-"%2\n"
+"%2\r"
 "Vill du:\n"
 "\t-använda ett annat filnamn (Tryck Ok)\n"
 "\t-avbryta sparande av fil (Tryck Avbryt)?"

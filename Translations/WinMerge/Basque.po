@@ -3846,8 +3846,8 @@ msgstr "Gorde aldaketak %1-ri?"
 
 #: Merge.rc:1792
 #, c-format
-msgid "%1 is marked read-only. Would you like to override the read-only file ? (No to save as new filename.)"
-msgstr "%1 markatuta dago irrakurtzeko-bakarrik bezala. Nahi duzu ezabatzea irakurtzeko-bakarrik agiria? (Ez gordetzeko agirizen berri bezala.)"
+msgid "%1\nis marked read-only. Would you like to override the read-only file? (No to save as new filename.)"
+msgstr "%1\nmarkatuta dago irrakurtzeko-bakarrik bezala. Nahi duzu ezabatzea irakurtzeko-bakarrik agiria? (Ez gordetzeko agirizen berri bezala.)"
 
 #: Merge.rc:1793
 #, c-format
@@ -3877,14 +3877,14 @@ msgstr ""
 msgid ""
 "Saving file failed.\n"
 "%1\n"
-"%2\n"
+"%2\r"
 "Do you want to:\n"
 "\t-use a different filename (Press Ok)\n"
 "\t-abort the current operation (Press Cancel)?"
 msgstr ""
 "Agiri gordetze hutsegitea.\n"
 "%1\n"
-"%2\n"
+"%2\r"
 "Nahi duzu:\n"
 "\t-agirizen ezberdin bat erabiltzea (Sakatu Ongi)\n"
 "\t-uneko eragiketa uztea (Sakatu Ezeztatu)?"

@@ -3857,8 +3857,8 @@ msgstr "%1 Ýçindeki Deðiþiklikler Kaydedilsin mi? "
 
 #: Merge.rc:1792
 #, c-format
-msgid "%1 is marked read-only. Would you like to override the read-only file ? (No to save as new filename.)"
-msgstr "%1 Salt Okunur Olarak Ýþaretli. Üzerine Yazmak Ýster misiniz ? (Ýstemezseniz, Yeni Bir Ýsimle Farklý Kaydedebilirsiniz.)"
+msgid "%1\nis marked read-only. Would you like to override the read-only file? (No to save as new filename.)"
+msgstr "%1\nSalt Okunur Olarak Ýþaretli. Üzerine Yazmak Ýster misiniz? (Ýstemezseniz, Yeni Bir Ýsimle Farklý Kaydedebilirsiniz.)"
 
 #: Merge.rc:1793
 #, c-format
@@ -3888,14 +3888,14 @@ msgstr ""
 msgid ""
 "Saving file failed.\n"
 "%1\n"
-"%2\n"
+"%2\r"
 "Do you want to:\n"
 "\t-use a different filename (Press Ok)\n"
 "\t-abort the current operation (Press Cancel)?"
 msgstr ""
 "Dosya Kaydetme Baþarýsýz Oldu.\n"
 "%1\n"
-"%2\n"
+"%2\r"
 "Ne Yapmak Ýstersiniz:\n"
 "\t-Farklý Bir Ýsim Kullan (Tamam'a Bas)\n"
 "\t-Ýþlem Ýptal Edilsin mi? (Evetse Ýptal'e Bas)"

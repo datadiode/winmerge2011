@@ -3855,8 +3855,8 @@ msgstr "Wijzigingen opslaan in %1?"
 
 #: Merge.rc:1792
 #, c-format
-msgid "%1 is marked read-only. Would you like to override the read-only file ? (No to save as new filename.)"
-msgstr "%1 is gemarkeerd als alleen lezen. Wilt u dit alleen-lezen bestand overschrijven? (Niet opslaan onder nieuwe naam.)"
+msgid "%1\nis marked read-only. Would you like to override the read-only file? (No to save as new filename.)"
+msgstr "%1\nis gemarkeerd als alleen lezen. Wilt u dit alleen-lezen bestand overschrijven? (Niet opslaan onder nieuwe naam.)"
 
 #: Merge.rc:1793
 #, c-format
@@ -3886,14 +3886,14 @@ msgstr ""
 msgid ""
 "Saving file failed.\n"
 "%1\n"
-"%2\n"
+"%2\r"
 "Do you want to:\n"
 "\t-use a different filename (Press Ok)\n"
 "\t-abort the current operation (Press Cancel)?"
 msgstr ""
 "Het opslaan van het bestand is mislukt.\n"
 "%1\n"
-"%2\n"
+"%2\r"
 "Wilt u het bestand onder een andere naam opslaan?"
 
 #: Merge.rc:1797

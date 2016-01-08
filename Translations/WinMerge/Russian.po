@@ -3853,8 +3853,8 @@ msgstr "Сохранить изменения в %1?"
 
 #: Merge.rc:1792
 #, c-format
-msgid "%1 is marked read-only. Would you like to override the read-only file ? (No to save as new filename.)"
-msgstr "%1 помечен как только для чтения. Согласны ли вы заменить этот файл ? (Нет позволяет задать новое имя файла)"
+msgid "%1\nis marked read-only. Would you like to override the read-only file? (No to save as new filename.)"
+msgstr "%1\nпомечен как только для чтения. Согласны ли вы заменить этот файл? (Нет позволяет задать новое имя файла)"
 
 #: Merge.rc:1793
 #, c-format
@@ -3884,14 +3884,14 @@ msgstr ""
 msgid ""
 "Saving file failed.\n"
 "%1\n"
-"%2\n"
+"%2\r"
 "Do you want to:\n"
 "\t-use a different filename (Press Ok)\n"
 "\t-abort the current operation (Press Cancel)?"
 msgstr ""
 "Файл не сохранен.\n"
 "%1\n"
-"%2\n"
+"%2\r"
 "Хотите ли:\n"
 "\t-использовать другое имя файла (Нажмите Ok)\n"
 "\t-отменить текущую операцию (Нажмите Отмена)?"

@@ -3855,8 +3855,8 @@ msgstr "Zapisaæ zmiany w %1?"
 
 #: Merge.rc:1792
 #, c-format
-msgid "%1 is marked read-only. Would you like to override the read-only file ? (No to save as new filename.)"
-msgstr "%1 tylko do odczytu. Czy chcesz zachowaæ plik pod inn¹ nazw¹?"
+msgid "%1\nis marked read-only. Would you like to override the read-only file? (No to save as new filename.)"
+msgstr "%1\ntylko do odczytu. Czy chcesz zachowaæ plik pod inn¹ nazw¹?"
 
 #: Merge.rc:1793
 #, c-format
@@ -3886,14 +3886,14 @@ msgstr ""
 msgid ""
 "Saving file failed.\n"
 "%1\n"
-"%2\n"
+"%2\r"
 "Do you want to:\n"
 "\t-use a different filename (Press Ok)\n"
 "\t-abort the current operation (Press Cancel)?"
 msgstr ""
 "Zapis pliku nieudany.\n"
 "%1\n"
-"%2\n"
+"%2\r"
 "Czy chcesz:\n"
 "\t-u¿yæ innej nazwy pliku (wybierz Ok)\n"
 "\t-anulowaæ operacjê (wybierz Anuluj)?"

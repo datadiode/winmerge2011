@@ -3854,8 +3854,8 @@ msgstr ""
 
 #: Merge.rc:1792
 #, c-format
-msgid "%1 is marked read-only. Would you like to override the read-only file ? (No to save as new filename.)"
-msgstr "%1は読み取り専用ファイルです。 読み取り専用ファイルを上書きしますか? (新しいファイル名では保存しません。)"
+msgid "%1\nis marked read-only. Would you like to override the read-only file? (No to save as new filename.)"
+msgstr "%1\nは読み取り専用ファイルです。 読み取り専用ファイルを上書きしますか? (新しいファイル名では保存しません。)"
 
 #: Merge.rc:1793
 #, c-format
@@ -3885,14 +3885,14 @@ msgstr ""
 msgid ""
 "Saving file failed.\n"
 "%1\n"
-"%2\n"
+"%2\r"
 "Do you want to:\n"
 "\t-use a different filename (Press Ok)\n"
 "\t-abort the current operation (Press Cancel)?"
 msgstr ""
 "ファイルの保存に失敗しました。\n"
 "%1\n"
-"%2\n"
+"%2\r"
 "別名で保存する場合はOkを、\n"
 "中止する場合は、キャンセルを押してください"
 

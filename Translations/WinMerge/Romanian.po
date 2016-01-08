@@ -3852,8 +3852,8 @@ msgstr "Salveazã schimbãrile în %1?"
 
 #: Merge.rc:1792
 #, fuzzy, c-format
-msgid "%1 is marked read-only. Would you like to override the read-only file ? (No to save as new filename.)"
-msgstr "%1 este marcat ca numai-citire. Doriþi suprascrierea fiºierului numai-citire? (Apãsaþi nu ca sã forþaþi redenumirea.)"
+msgid "%1\nis marked read-only. Would you like to override the read-only file? (No to save as new filename.)"
+msgstr "%1\neste marcat ca numai-citire. Doriþi suprascrierea fiºierului numai-citire? (Apãsaþi nu ca sã forþaþi redenumirea.)"
 
 #: Merge.rc:1793
 #, fuzzy, c-format
@@ -3883,14 +3883,14 @@ msgstr ""
 msgid ""
 "Saving file failed.\n"
 "%1\n"
-"%2\n"
+"%2\r"
 "Do you want to:\n"
 "\t-use a different filename (Press Ok)\n"
 "\t-abort the current operation (Press Cancel)?"
 msgstr ""
 "Salvarea fiºierului a eºuat.\n"
 "%1\n"
-"%2\n"
+"%2\r"
 "Doriþi sã:\n"
 "\t- folosiþi un alt nume de fiºier (apãsaþi Ok)\n"
 "\t- renunþaþi la operaþia curentã (apãsaþi Renunþã)?"

@@ -3854,8 +3854,8 @@ msgstr "Запиши промените на %1?"
 
 #: Merge.rc:1792
 #, c-format
-msgid "%1 is marked read-only. Would you like to override the read-only file ? (No to save as new filename.)"
-msgstr "%1 е само за четене. Да запиша ли файла? (Не, ще го запиша с ново име.)"
+msgid "%1\nis marked read-only. Would you like to override the read-only file? (No to save as new filename.)"
+msgstr "%1\nе само за четене. Да запиша ли файла? (Не, ще го запиша с ново име.)"
 
 #: Merge.rc:1793
 #, c-format
@@ -3885,14 +3885,14 @@ msgstr ""
 msgid ""
 "Saving file failed.\n"
 "%1\n"
-"%2\n"
+"%2\r"
 "Do you want to:\n"
 "\t-use a different filename (Press Ok)\n"
 "\t-abort the current operation (Press Cancel)?"
 msgstr ""
 "Грешка при записването на файла.\n"
 "%1\n"
-"%2\n"
+"%2\r"
 "Искате ли да:\n"
 "\t-използвате различно име (натиснете Ok)\n"
 "\t-отмените текущата операция (натиснете Отмени)?"

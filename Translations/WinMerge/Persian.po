@@ -3850,8 +3850,8 @@ msgstr " ÂíÇ ÊÛííÑÇÊ ÏÑ %1 ĞÎíÑå ÔæÏ¿"
 
 #: Merge.rc:1792
 #, c-format
-msgid "%1 is marked read-only. Would you like to override the read-only file ? (No to save as new filename.)"
-msgstr "ÑæäÏå  %1 ÈÕæÑÊ İŞØ ÎæÇäÏäí ÚáÇãÊ ÒÏå ÔÏå ÇÓÊ. ÂíÇ ãÇíá åÓÊíÏ   ÑæäÏå İŞØ ÎæÇäÏäí   ÈÇØá ÑÏÏ¿ - ÈÇ äÇã ÌÏíÏ ĞÎíÑå äÑÏÏ "
+msgid "%1\nis marked read-only. Would you like to override the read-only file? (No to save as new filename.)"
+msgstr "ÑæäÏå \n%1\n ÈÕæÑÊ İŞØ ÎæÇäÏäí ÚáÇãÊ ÒÏå ÔÏå ÇÓÊ. ÂíÇ ãÇíá åÓÊíÏ   ÑæäÏå İŞØ ÎæÇäÏäí   ÈÇØá ÑÏÏ¿ - ÈÇ äÇã ÌÏíÏ ĞÎíÑå äÑÏÏ "
 
 #: Merge.rc:1793
 #, c-format
@@ -3881,14 +3881,14 @@ msgstr ""
 msgid ""
 "Saving file failed.\n"
 "%1\n"
-"%2\n"
+"%2\r"
 "Do you want to:\n"
 "\t-use a different filename (Press Ok)\n"
 "\t-abort the current operation (Press Cancel)?"
 msgstr ""
 " ĞÎíÑå ÑæäÏå äÇãæİŞ ÈæÏ \n"
 "%1\n"
-"%2\n"
+"%2\r"
 " ÂíÇ ãí ÎæÇåíÏ ˜å : \n"
 "\t- í˜ äÇã ÑæäÏå ãÊİÇæÊ ÇÓÊİÇÏå ˜äíÏ - ÊÇííÏ ÑÇ ÈİÔÇÑíÏ \n"
 "\t- Úãá ÌÇÑí áÛæ ÔæÏ - áÛæ ÑÇ ÈİÔÇÑíÏ ¿"

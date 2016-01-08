@@ -3834,8 +3834,8 @@ msgstr "Uloi zmeny do %1?"
 
 #: Merge.rc:1792
 #, c-format
-msgid "%1 is marked read-only. Would you like to override the read-only file ? (No to save as new filename.)"
-msgstr "%1 je oznaèenı len na èítanie. Chcete aj tak prepísa súbor len na èítanie? (Stlaète Nie ak ho chcete zapísa po novım názvom.)"
+msgid "%1\nis marked read-only. Would you like to override the read-only file? (No to save as new filename.)"
+msgstr "%1\nje oznaèenı len na èítanie. Chcete aj tak prepísa súbor len na èítanie? (Stlaète Nie ak ho chcete zapísa po novım názvom.)"
 
 #: Merge.rc:1793
 #, c-format
@@ -3865,14 +3865,14 @@ msgstr ""
 msgid ""
 "Saving file failed.\n"
 "%1\n"
-"%2\n"
+"%2\r"
 "Do you want to:\n"
 "\t-use a different filename (Press Ok)\n"
 "\t-abort the current operation (Press Cancel)?"
 msgstr ""
 "Nepodarilo sa uloi súbor.\n"
 "%1\n"
-"%2\n"
+"%2\r"
 "eláte si:\n"
 "\t-poui inı názov súbory (Stlaète Ok)\n"
 "\t-zruši prebiehajúcu operáciu (Stlaète Zruši)?"

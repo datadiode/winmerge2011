@@ -3853,8 +3853,8 @@ msgstr "Gem ændringer til %1?"
 
 #: Merge.rc:1792
 #, c-format
-msgid "%1 is marked read-only. Would you like to override the read-only file ? (No to save as new filename.)"
-msgstr "%1 er markeret som skrivebeskyttet. Vil du ignorerer skrivebeskyttelsen? (Nej for at gemme til et andet filnavn.)"
+msgid "%1\nis marked read-only. Would you like to override the read-only file? (No to save as new filename.)"
+msgstr "%1\ner markeret som skrivebeskyttet. Vil du ignorerer skrivebeskyttelsen? (Nej for at gemme til et andet filnavn.)"
 
 #: Merge.rc:1793
 #, c-format
@@ -3884,14 +3884,14 @@ msgstr ""
 msgid ""
 "Saving file failed.\n"
 "%1\n"
-"%2\n"
+"%2\r"
 "Do you want to:\n"
 "\t-use a different filename (Press Ok)\n"
 "\t-abort the current operation (Press Cancel)?"
 msgstr ""
 "Gem fil fejlede.\n"
 "%1\n"
-"%2\n"
+"%2\r"
 "Vil du:\n"
 "\t-bruge et andet filenavn (Tryk Ok)\n"
 "\t-afbryd aktuel operation (Tryk Annuller)?"

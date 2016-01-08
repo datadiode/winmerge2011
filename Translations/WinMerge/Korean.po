@@ -3852,8 +3852,8 @@ msgstr "%1 의 변경된 부분을 저장할까요?"
 
 #: Merge.rc:1792
 #, c-format
-msgid "%1 is marked read-only. Would you like to override the read-only file ? (No to save as new filename.)"
-msgstr "%1 (은)는 읽기 전용 파일입니다. 덮어 쓸까요? (다른 이름으로 저장하려면 아니오를 선택하세요.)"
+msgid "%1\nis marked read-only. Would you like to override the read-only file? (No to save as new filename.)"
+msgstr "%1\n(은)는 읽기 전용 파일입니다. 덮어 쓸까요? (다른 이름으로 저장하려면 아니오를 선택하세요.)"
 
 #: Merge.rc:1793
 #, c-format
@@ -3883,14 +3883,14 @@ msgstr ""
 msgid ""
 "Saving file failed.\n"
 "%1\n"
-"%2\n"
+"%2\r"
 "Do you want to:\n"
 "\t-use a different filename (Press Ok)\n"
 "\t-abort the current operation (Press Cancel)?"
 msgstr ""
 "파일 저장을 할 수 없습니다.\n"
 "%1\n"
-"%2\n"
+"%2\r"
 "\t- 다른 이름으로 저장(확인)\n"
 "\t- 저장 취소(취소)?"
 

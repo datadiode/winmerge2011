@@ -3854,8 +3854,8 @@ msgstr "Pohraniti izmjene %1?"
 
 #: Merge.rc:1792
 #, c-format
-msgid "%1 is marked read-only. Would you like to override the read-only file ? (No to save as new filename.)"
-msgstr "%1 je oznaèena smo za èitanje. Natpisati zaštiæenu datoteku? (Stisnite 'Ne', za pohranu pod novim nazivom.)"
+msgid "%1\nis marked read-only. Would you like to override the read-only file? (No to save as new filename.)"
+msgstr "%1\nje oznaèena smo za èitanje. Natpisati zaštiæenu datoteku? (Stisnite 'Ne', za pohranu pod novim nazivom.)"
 
 #: Merge.rc:1793
 #, c-format
@@ -3885,14 +3885,14 @@ msgstr ""
 msgid ""
 "Saving file failed.\n"
 "%1\n"
-"%2\n"
+"%2\r"
 "Do you want to:\n"
 "\t-use a different filename (Press Ok)\n"
 "\t-abort the current operation (Press Cancel)?"
 msgstr ""
 "Pohrana nije uspjela.\n"
 "%1\n"
-"%2\n"
+"%2\r"
 ":\n"
 "\t- Pritisnite 'U redu' za pohranu pod drugim nazivom\n"
 "\t- ili pritisnite 'Odustajem' za prekid postupka."

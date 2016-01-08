@@ -3784,8 +3784,8 @@ msgstr "Mentsem a változtatásokat %1 néven?"
 
 #: Merge.rc:1792
 #, c-format
-msgid "%1 is marked read-only. Would you like to override the read-only file ? (No to save as new filename.)"
-msgstr "Ez a fájl: %1 csak olvasható. Szeretnéd ezt megváltoztatni? (Kattints a Nem gombra a fájl új néven való mentéséhez.)"
+msgid "%1\nis marked read-only. Would you like to override the read-only file? (No to save as new filename.)"
+msgstr "Ez a fájl:\n%1\ncsak olvasható. Szeretnéd ezt megváltoztatni? (Kattints a Nem gombra a fájl új néven való mentéséhez.)"
 
 #: Merge.rc:1793
 #, c-format
@@ -3815,14 +3815,14 @@ msgstr ""
 msgid ""
 "Saving file failed.\n"
 "%1\n"
-"%2\n"
+"%2\r"
 "Do you want to:\n"
 "\t-use a different filename (Press Ok)\n"
 "\t-abort the current operation (Press Cancel)?"
 msgstr ""
 "A fájl mentése sikertelen volt.\n"
 "%1\n"
-"%2\n"
+"%2\r"
 "A lehetõségek:\n"
 "\t-másik fájlnév választása (Ok)\n"
 "\t-a jelenlegi folyamat megszakítása (Mégsem)?"

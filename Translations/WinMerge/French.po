@@ -3853,8 +3853,8 @@ msgstr "Enregistrer les changements de %1 ?"
 
 #: Merge.rc:1792
 #, c-format
-msgid "%1 is marked read-only. Would you like to override the read-only file ? (No to save as new filename.)"
-msgstr "%1 est en lecture seule. Voulez-vous outrepasser ? (Choisissez Non pour enregistrer avec un nouveau nom.)"
+msgid "%1\nis marked read-only. Would you like to override the read-only file? (No to save as new filename.)"
+msgstr "%1\nest en lecture seule. Voulez-vous outrepasser ? (Choisissez Non pour enregistrer avec un nouveau nom.)"
 
 #: Merge.rc:1793
 #, c-format
@@ -3884,14 +3884,14 @@ msgstr ""
 msgid ""
 "Saving file failed.\n"
 "%1\n"
-"%2\n"
+"%2\r"
 "Do you want to:\n"
 "\t-use a different filename (Press Ok)\n"
 "\t-abort the current operation (Press Cancel)?"
 msgstr ""
 "Erreur lors de l'enregistrement.\n"
 "%1\n"
-"%2\n"
+"%2\r"
 "Voulez-vous:\n"
 "\t-utiliser un nom autre nom de fichier (Ok)\n"
 "\t-avorter l'opération en cours (Annuler)?"
