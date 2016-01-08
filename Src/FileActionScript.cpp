@@ -188,7 +188,8 @@ bool FileActionScript::Run(HListView *pLv, FILEOP_FLAGS flags)
 		{
 			if (iter->dirflag)
 			{
-				paths_CreateIfNeeded(iter->dest.c_str());
+				if (!m_bIgnoreFolderStructure)
+					paths_CreateIfNeeded(iter->dest.c_str());
 			}
 			else
 			{
