@@ -681,6 +681,9 @@
     <ClCompile Include="jsoncpp\src\lib_json\json_value.cpp">
       <Filter>jsoncpp</Filter>
     </ClCompile>
+    <ClCompile Include="Common\FileOperationsDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\WindowPlacement.h">
@@ -1197,6 +1200,9 @@
       <Filter>jsoncpp</Filter>
     </ClInclude>
     <ClInclude Include="Common\defer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\FileOperationsDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

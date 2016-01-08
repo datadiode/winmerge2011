@@ -45,6 +45,7 @@ template<ODialog::DDX_Operation op>
 bool PropRegistry::UpdateData()
 {
 	DDX_Text<op>(IDC_EXT_EDITOR_PATH, m_strEditorPath);
+	DDX_Check<op>(IDC_USE_SHELL_FILE_OPERATIONS, m_bUseShellFileOperations);
 	DDX_Check<op>(IDC_USE_RECYCLE_BIN, m_bUseRecycleBin);
 	DDX_Text<op>(IDC_SUPPLEMENT_FOLDER, m_supplementFolder);
 	DDX_Check<op>(IDC_TMPFOLDER_CUSTOM, m_tempFolderType, 0);
@@ -97,6 +98,9 @@ LRESULT PropRegistry::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			UpdateData<Get>();
 		switch (wParam)
 		{
+		case MAKEWPARAM(IDC_USE_SHELL_FILE_OPERATIONS, BN_CLICKED):
+			UpdateScreen();
+			break;
 		case MAKEWPARAM(IDC_EXT_EDITOR_BROWSE, BN_CLICKED):
 			OnBrowseEditor();
 			break;
@@ -147,6 +151,7 @@ LRESULT PropRegistry::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 void PropRegistry::ReadOptions()
 {
 	m_strEditorPath = COptionsMgr::Get(OPT_EXT_EDITOR_CMD);
+	m_bUseShellFileOperations = COptionsMgr::Get(OPT_USE_SHELL_FILE_OPERATIONS);
 	m_bUseRecycleBin = COptionsMgr::Get(OPT_USE_RECYCLE_BIN);
 	m_supplementFolder = COptionsMgr::Get(OPT_SUPPLEMENT_FOLDER);
 	m_tempFolderType = COptionsMgr::Get(OPT_USE_SYSTEM_TEMP_PATH);
@@ -158,6 +163,7 @@ void PropRegistry::ReadOptions()
  */
 void PropRegistry::WriteOptions()
 {
+	COptionsMgr::SaveOption(OPT_USE_SHELL_FILE_OPERATIONS, m_bUseShellFileOperations != FALSE);
 	COptionsMgr::SaveOption(OPT_USE_RECYCLE_BIN, m_bUseRecycleBin != FALSE);
 	string_trim_ws(m_strEditorPath);
 	if (m_strEditorPath.empty())
@@ -172,6 +178,7 @@ void PropRegistry::WriteOptions()
 
 void PropRegistry::UpdateScreen()
 {
+	GetDlgItem(IDC_USE_RECYCLE_BIN)->EnableWindow(m_bUseShellFileOperations);
 	UpdateData<Set>();
 }
 

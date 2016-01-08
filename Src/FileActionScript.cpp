@@ -137,8 +137,13 @@ FileActionItem FileActionScript::RemoveTailActionItem()
 	return item;
 }
 
-bool FileActionScript::Run(HListView *pLv, FILEOP_FLAGS flags)
+bool FileActionScript::Run(HListView *pLv, DWORD flags)
 {
+	if (!COptionsMgr::Get(OPT_USE_SHELL_FILE_OPERATIONS))
+	{
+		flags |= ShellFileOperations::UseLowLevelFunctions;
+	}
+
 	// Now process files/directories that got added to list
 	vector<FileActionItem>::const_iterator iter;
 	DWORD cchSource[FileAction::ACT_TYPE] = { 0, 0, 0 };

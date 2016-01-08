@@ -31,7 +31,9 @@ class ShellFileOperations
 	, public SHFILEOPSTRUCT
 {
 public:
-	ShellFileOperations(HWND, UINT, FILEOP_FLAGS, size_t fromMax, size_t toMax);
+	static const DWORD UseLowLevelFunctions = 0x10000;
+
+	ShellFileOperations(HWND, UINT, DWORD, size_t fromMax, size_t toMax);
 	~ShellFileOperations();
 
 	bool Run();
@@ -46,8 +48,8 @@ public:
 	}
 
 private:
-	static LPTSTR AddPath(LPTSTR p, LPCTSTR path);
-
+	LPTSTR AddPath(LPTSTR, LPCTSTR);
+	DWORD const dwFlags;
 	TCHAR *pFrom;
 	TCHAR *pTo;
 };

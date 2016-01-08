@@ -20,6 +20,7 @@
 #define IDD_ABOUTBOX                            200
 #define IDD_PROP_VSS                            201
 #define IDD_OPEN                                202
+#define IDD_FILE_OPERATIONS                     203
 #define IDD_VSS                                 204
 #define IDD_PROPPAGE_GENERAL                    205
 #define IDD_CLEARCASE                           206
@@ -212,6 +213,10 @@
 #define IDC_DIFF_SWAPFILES                      1093
 #define IDC_DIFF_OPENTOEDITOR                   1094
 #define IDC_DIFF_INCLCMDLINE                    1095
+#define IDC_PROGRESS                            1096
+#define IDC_PROGRESS_FILE                       1097
+#define IDC_EDIT_SRC_LOCATION                   1098
+#define IDC_EDIT_DST_LOCATION                   1099
 #define IDC_PAUSE_CONTINUE                      1100
 #define IDC_PROGRESSCOMPARE                     1101
 #define IDC_ITEMSCOMPARED                       1102
@@ -228,6 +233,7 @@
 #define IDC_COLORDEFAULTS_BTN                   1118
 #define IDC_COMPARE_DEFAULTS                    1119
 #define IDC_COMPARE_THREAD_COUNT                1120
+#define IDC_USE_SHELL_FILE_OPERATIONS           1121
 #define IDC_DIFF_DEFAULTS                       1122
 #define IDC_MOVED_BLOCKS                        1123
 #define IDC_RESET_ALL_MESSAGE_BOXES             1124
@@ -560,9 +566,17 @@
 #define IDS_OPEN_MISMATCH                       17207
 #define IDS_ERROR_FILE_NOT_FOUND                17216
 #define IDS_ERROR_FILE_NOT_UNPACKED             17217
+#define IDS_ERROR_FILEMOVE                      17218
+#define IDS_ERROR_FILECOPY                      17219
+#define IDS_ERROR_FILEDELETE                    17220
 #define IDS_ERROR_FILEOPEN                      17221
 #define IDS_ERROR_CONF_RESOLVE                  17222
 #define IDS_NOT_CONFLICT_FILE                   17223
+#define IDS_TRASH_FILE                          17224
+#define IDS_TRASH_FILE_ATTENTIVE                17225
+#define IDS_TRASH_FOLDER                        17226
+#define IDS_TRASH_FOLDER_ATTENTIVE              17227
+#define IDS_TRASH_SELECTED_ITEMS                17228
 #define IDS_SAVE_AS_TITLE                       17232
 #define IDS_SAVE_FMT                            17233
 #define IDS_SAVEREADONLY_FMT                    17234

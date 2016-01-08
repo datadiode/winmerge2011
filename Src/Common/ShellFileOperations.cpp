@@ -20,17 +20,20 @@
  * @brief Implementation of ShellFileOperations class.
  */
 #include "StdAfx.h"
+#include "resource.h"
 #include "paths.h"
 #include "ShellFileOperations.h"
+#include "LanguageSelect.h"
+#include "FileOperationsDlg.h"
 
-ShellFileOperations::ShellFileOperations(
-	HWND hwnd, UINT wFunc, FILEOP_FLAGS fFlags, size_t fromMax, size_t toMax)
+ShellFileOperations::ShellFileOperations(HWND hwnd, UINT wFunc,
+	DWORD dwFlags, size_t fromMax, size_t toMax) : dwFlags(dwFlags)
 {
 	std::auto_ptr<TCHAR, true> apFrom(fromMax ? new TCHAR[fromMax + 1] : NULL);
 	std::auto_ptr<TCHAR, true> apTo(toMax ? new TCHAR[toMax + 1] : NULL);
 	SHFILEOPSTRUCT::hwnd = H2O::GetTopLevelParent(hwnd);
 	SHFILEOPSTRUCT::wFunc = wFunc;
-	SHFILEOPSTRUCT::fFlags = fFlags;
+	SHFILEOPSTRUCT::fFlags = LOWORD(dwFlags);
 	SHFILEOPSTRUCT::pFrom = pFrom = apFrom.release();
 	SHFILEOPSTRUCT::pTo = pTo = apTo.release();
 }
@@ -43,29 +46,32 @@ ShellFileOperations::~ShellFileOperations()
 
 bool ShellFileOperations::Run()
 {
-	bool succeeded = true;
+	int result = 0;
 	if (pFrom > SHFILEOPSTRUCT::pFrom)
 	{
-		EnableWindow(hwnd, FALSE);
-		succeeded = SHFileOperation(this) == 0 && !fAnyOperationsAborted;
-		EnableWindow(hwnd, TRUE);
-	}
-	return succeeded;
-}
-
-LPTSTR ShellFileOperations::AddPath(LPTSTR p, LPCTSTR path)
-{
-	_tcscpy(p, path);
-	LPCTSTR q = paths_UndoMagic(p);
-	size_t n = _tcslen(q);
-	if (n >= MAX_PATH)
-	{
-		if (DWORD k = GetShortPathName(path, p, MAX_PATH))
+		if (dwFlags & UseLowLevelFunctions)
 		{
-			q = paths_UndoMagic(p);
-			n = k - (q - p);
+			FileOperationsDlg dlg(*this);
+			result = LanguageSelect.DoModal(dlg, hwnd);
+		}
+		else
+		{
+			EnableWindow(hwnd, FALSE);
+			result = SHFileOperation(this);
+			EnableWindow(hwnd, TRUE);
 		}
 	}
+	return result == 0 && !fAnyOperationsAborted;
+}
+
+LPTSTR ShellFileOperations::AddPath(LPTSTR p, LPCTSTR q)
+{
+	if (!(dwFlags & UseLowLevelFunctions))
+	{
+		_tcscpy(p, q);
+		q = paths_UndoMagic(p);
+	}
+	size_t n = _tcslen(q);
 	memmove(p, q, ++n * sizeof(TCHAR));
 	*(p += n) = _T('\0');
 	return p;

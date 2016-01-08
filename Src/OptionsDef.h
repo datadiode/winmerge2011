@@ -112,6 +112,8 @@ extern COptionDef
 extern COptionDef
 <String> OPT_EXT_EDITOR_CMD operator((_T("Settings/ExternalEditor"), CMergeApp::GetDefaultEditor()));
 extern COptionDef
+<bool> OPT_USE_SHELL_FILE_OPERATIONS operator((_T("Settings/UseShellFileOperations"), true));
+extern COptionDef
 <bool> OPT_USE_RECYCLE_BIN operator((_T("Settings/UseRecycleBin"), true));
 extern COptionDef
 <bool> OPT_SINGLE_INSTANCE operator((_T("Settings/SingleInstance"), false));

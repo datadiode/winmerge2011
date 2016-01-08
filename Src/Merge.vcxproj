@@ -332,6 +332,7 @@
     <ClCompile Include="FileFilterHelper.cpp" />
     <ClCompile Include="FileFilterMgr.cpp" />
     <ClCompile Include="FileFiltersDlg.cpp" />
+    <ClCompile Include="Common\FileOperationsDlg.cpp" />
     <ClCompile Include="FileOrFolderSelect.cpp" />
     <ClCompile Include="FileTextEncoding.cpp" />
     <ClCompile Include="FileTransform.cpp" />
@@ -791,6 +792,7 @@
     <ClInclude Include="FileFilterMgr.h" />
     <ClInclude Include="FileFiltersDlg.h" />
     <ClInclude Include="FileLocation.h" />
+    <ClInclude Include="Common\FileOperationsDlg.h" />
     <ClInclude Include="FileOrFolderSelect.h" />
     <ClInclude Include="FileTextEncoding.h" />
     <ClInclude Include="FileTextStats.h" />

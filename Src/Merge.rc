@@ -137,6 +137,7 @@ IDR_DIRDOCTYPE MENU
         MENUITEM "&GNU General Public License", ID_HELP_GNULICENSE
         MENUITEM "&About WinMerge...", ID_APP_ABOUT
     }
+    MENUITEM SEPARATOR
 }
 
 
@@ -257,6 +258,7 @@ IDR_HEXDOCTYPE MENU
         MENUITEM "&GNU General Public License", ID_HELP_GNULICENSE
         MENUITEM "&About WinMerge...", ID_APP_ABOUT
     }
+    MENUITEM SEPARATOR
 }
 
 
@@ -332,6 +334,7 @@ IDR_MAINFRAME MENU
         MENUITEM "&GNU General Public License", ID_HELP_GNULICENSE
         MENUITEM "&About WinMerge...", ID_APP_ABOUT
     }
+    MENUITEM SEPARATOR
 }
 
 
@@ -550,6 +553,7 @@ IDR_MERGEDOCTYPE MENU
         MENUITEM "&GNU General Public License", ID_HELP_GNULICENSE
         MENUITEM "&About WinMerge...", ID_APP_ABOUT
     }
+    MENUITEM SEPARATOR
 }
 
 
@@ -954,6 +958,22 @@ FONT 8, "MS Shell Dlg", 0, 0, 1
     EDITTEXT        IDC_STATIC_TITLE_LEFT, 0, 0, 10, 16, NOT WS_BORDER | NOT WS_TABSTOP | ES_AUTOHSCROLL | ES_READONLY, WS_EX_CLIENTEDGE
     EDITTEXT        IDC_STATIC_TITLE_RIGHT, 12, 0, 10, 16, NOT WS_BORDER | NOT WS_TABSTOP | ES_AUTOHSCROLL | ES_READONLY, WS_EX_CLIENTEDGE
 }
+
+
+
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+IDD_FILE_OPERATIONS DIALOGEX 0, 0, 217, 103
+STYLE DS_CENTER | DS_MODALFRAME | DS_SHELLFONT | WS_CAPTION | WS_POPUP | WS_SYSMENU
+FONT 8, "MS Shell Dlg", 0, 0, 1
+BEGIN
+    LTEXT           "", IDC_MESSAGE, 7, 7, 203, 10
+    CONTROL         "", IDC_PROGRESS, PROGRESS_CLASS, WS_BORDER, 7, 20, 203, 10
+    EDITTEXT        IDC_EDIT_SRC_LOCATION, 7, 34, 203, 12, NOT WS_TABSTOP | ES_MULTILINE | ES_READONLY
+    EDITTEXT        IDC_EDIT_DST_LOCATION, 7, 48, 203, 12, NOT WS_TABSTOP | ES_MULTILINE | ES_READONLY
+    CONTROL         "", IDC_PROGRESS_FILE, PROGRESS_CLASS, WS_BORDER, 7, 65, 203, 10
+    DEFPUSHBUTTON   "Pause\tContinue\t", IDC_PAUSE_CONTINUE, 45, 82, 60, 14, WS_GROUP
+    PUSHBUTTON      "Cancel", IDCANCEL, 112, 82, 60, 14
+END
 
 
 
@@ -1500,18 +1520,19 @@ STYLE DS_CONTROL | DS_SHELLFONT | WS_CAPTION | WS_CHILDWINDOW
 CAPTION "System"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
-    AUTOCHECKBOX    "&Send deleted files to Recycle Bin", IDC_USE_RECYCLE_BIN, 7, 7, 222, 10
-    LTEXT           "&External editor:", IDC_STATIC, 7, 23, 222, 8, SS_LEFT
-    EDITTEXT        IDC_EXT_EDITOR_PATH, 7, 33, 167, 14, ES_AUTOHSCROLL
-    PUSHBUTTON      "&Browse...", IDC_EXT_EDITOR_BROWSE, 179, 33, 50, 14
-    CONTROL         "Supple&ment folder:", IDC_LABEL_SUPPLEMENT_FOLDER, WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW, 7, 51, 222, 10
-    COMBOBOX        IDC_SUPPLEMENT_FOLDER, 7, 61, 167, 150, WS_TABSTOP | WS_VSCROLL | CBS_DROPDOWN | CBS_AUTOHSCROLL
-    PUSHBUTTON      "B&rowse...", IDC_SUPPLEMENT_FOLDER_BROWSE, 179, 61, 50, 14
-    GROUPBOX        "Temporary files folder", IDC_STATIC, 7, 80, 221, 56
-    AUTORADIOBUTTON "S&ystem's temp folder", IDC_TMPFOLDER_SYSTEM, 17, 92, 199, 10, WS_GROUP
-    AUTORADIOBUTTON "C&ustom folder:", IDC_TMPFOLDER_CUSTOM, 17, 102, 199, 10
-    EDITTEXT        IDC_TMPFOLDER_NAME, 27, 114, 138, 14, WS_GROUP | ES_AUTOHSCROLL
-    PUSHBUTTON      "Br&owse...", IDC_TMPFOLDER_BROWSE, 170, 114, 50, 14
+    AUTOCHECKBOX    "Use S&hell file operations", IDC_USE_SHELL_FILE_OPERATIONS, 7, 7, 222, 10
+    AUTOCHECKBOX    "&Send deleted files to Recycle Bin", IDC_USE_RECYCLE_BIN, 7, 17, 222, 10
+    LTEXT           "&External editor:", IDC_STATIC, 7, 33, 222, 8, SS_LEFT
+    EDITTEXT        IDC_EXT_EDITOR_PATH, 7, 43, 167, 14, ES_AUTOHSCROLL
+    PUSHBUTTON      "&Browse...", IDC_EXT_EDITOR_BROWSE, 179, 43, 50, 14
+    CONTROL         "Supple&ment folder:", IDC_LABEL_SUPPLEMENT_FOLDER, WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW, 7, 61, 222, 10
+    COMBOBOX        IDC_SUPPLEMENT_FOLDER, 7, 71, 167, 150, WS_TABSTOP | WS_VSCROLL | CBS_DROPDOWN | CBS_AUTOHSCROLL
+    PUSHBUTTON      "B&rowse...", IDC_SUPPLEMENT_FOLDER_BROWSE, 179, 71, 50, 14
+    GROUPBOX        "Temporary files folder", IDC_STATIC, 7, 90, 221, 56
+    AUTORADIOBUTTON "S&ystem's temp folder", IDC_TMPFOLDER_SYSTEM, 17, 102, 199, 10, WS_GROUP
+    AUTORADIOBUTTON "C&ustom folder:", IDC_TMPFOLDER_CUSTOM, 17, 112, 199, 10
+    EDITTEXT        IDC_TMPFOLDER_NAME, 27, 124, 138, 14, WS_GROUP | ES_AUTOHSCROLL
+    PUSHBUTTON      "Br&owse...", IDC_TMPFOLDER_BROWSE, 170, 124, 50, 14
 }
 
 
@@ -1785,9 +1806,17 @@ STRINGTABLE
     IDS_OPEN_MISMATCH             "Cannot compare file and folder!"
     IDS_ERROR_FILE_NOT_FOUND      "File not found: %1"
     IDS_ERROR_FILE_NOT_UNPACKED   "File not unpacked: %1"
+    IDS_ERROR_FILEMOVE            "Cannot move file\n%1\nto\n%2\n\n%3"
+    IDS_ERROR_FILECOPY            "Cannot copy file\n%1\nto\n%2\n\n%3"
+    IDS_ERROR_FILEDELETE          "Cannot delete file\n%1\n\n%3"
     IDS_ERROR_FILEOPEN            "Cannot open file\n%1\n\n%2"
     IDS_ERROR_CONF_RESOLVE        "Failed to parse conflict file."
     IDS_NOT_CONFLICT_FILE         "The file\n%1\nis not a conflict file."
+    IDS_TRASH_FILE                "The target path\n%2\nrefers to an already existing file.\n\nAre you ready to lose this file?"
+    IDS_TRASH_FILE_ATTENTIVE      "The target path\n%2\nrefers to an already existing read-only or hidden file.\n\nAre you ready to lose this file despite its protective attributes?"
+    IDS_TRASH_FOLDER              "The target path\n%2\nrefers to an already existing empty folder.\n\nAre you ready to lose this folder?"
+    IDS_TRASH_FOLDER_ATTENTIVE    "The target path\n%2\nrefers to an already existing nonempty folder.\n\nAre you ready to lose this folder and all its contents?"
+    IDS_TRASH_SELECTED_ITEMS      "Click Continue only if you are sure that you want to irreversibly delete the selected items, including the contents of involved folders!"
     IDS_SAVE_AS_TITLE             "Save As"
     IDS_SAVE_FMT                  "Save changes to %1?"
     IDS_SAVEREADONLY_FMT          "%1\nis marked read-only. Would you like to override the read-only file? (No to save as new filename.)"

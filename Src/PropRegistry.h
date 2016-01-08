@@ -39,6 +39,7 @@ public:
 	virtual void UpdateScreen();
 
 	String	m_strEditorPath;
+	BOOL	m_bUseShellFileOperations;
 	BOOL	m_bUseRecycleBin;
 	String	m_supplementFolder;
 	int		m_tempFolderType;
