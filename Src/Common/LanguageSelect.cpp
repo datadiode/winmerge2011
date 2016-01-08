@@ -1157,6 +1157,14 @@ int CLanguageSelect::MsgBox(UINT id, LPCTSTR arg, UINT type) const
 
 int LocalString::MsgBox(UINT type)
 {
+	// Replace any CRs which are not followed by LFs with such
+	LPTSTR p = reinterpret_cast<LPTSTR>(handle);
+	while (p)
+	{
+		LPTSTR q = p = _tcschr(p, _T('\r'));
+		if (p && *++p != _T('\n'))
+			*q = _T('\n');
+	}
 	return theApp.DoMessageBox(*this, type, id);
 }
 
