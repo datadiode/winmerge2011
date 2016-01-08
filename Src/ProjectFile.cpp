@@ -112,7 +112,7 @@ bool ProjectFile::Read(LPCTSTR path)
 			String sError = LanguageSelect.LoadString(IDS_UNK_ERROR_READING_PROJECT);
 			LanguageSelect.FormatStrings(
 				IDS_ERROR_FILEOPEN, path, sError.c_str()
-			).MsgBox(MB_ICONSTOP);
+			).MsgBox(MB_HIGHLIGHT_ARGUMENTS | MB_ICONSTOP);
 		}
 	}
 	else
@@ -120,7 +120,7 @@ bool ProjectFile::Read(LPCTSTR path)
 		String sError = LanguageSelect.LoadString(IDS_UNK_ERROR_READING_PROJECT);
 		LanguageSelect.FormatStrings(
 			IDS_ERROR_FILEOPEN, path, sError.c_str()
-		).MsgBox(MB_ICONSTOP);
+		).MsgBox(MB_HIGHLIGHT_ARGUMENTS | MB_ICONSTOP);
 	}
 	return loaded;
 }
@@ -180,7 +180,7 @@ bool ProjectFile::Save(LPCTSTR path)
 			sError = LanguageSelect.LoadString(IDS_UNK_ERROR_SAVING_PROJECT);
 		LanguageSelect.FormatStrings(
 			IDS_ERROR_FILEOPEN, path, sError.c_str()
-		).MsgBox(MB_ICONSTOP);
+		).MsgBox(MB_HIGHLIGHT_ARGUMENTS | MB_ICONSTOP);
 		return false;
 	}
 	return true;

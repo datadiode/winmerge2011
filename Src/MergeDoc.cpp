@@ -373,7 +373,7 @@ int CChildFrame::Rescan(bool &bIdentical, bool bForced)
 			{
 				LanguageSelect.FormatStrings(
 					IDS_FILE_DISAPPEARED, paths_UndoMagic(wcsdupa(path))
-				).MsgBox(MB_ICONWARNING);
+				).MsgBox(MB_HIGHLIGHT_ARGUMENTS | MB_ICONWARNING);
 				if (!DoSaveAs(nSide))
 					return RESCAN_FILE_ERR;
 			}
@@ -382,7 +382,7 @@ int CChildFrame::Rescan(bool &bIdentical, bool bForced)
 		{
 			int response = LanguageSelect.FormatStrings(
 				IDS_FILECHANGED_RESCAN, paths_UndoMagic(wcsdupa(path))
-			).MsgBox(MB_YESNO | MB_ICONWARNING);
+			).MsgBox(MB_YESNO | MB_HIGHLIGHT_ARGUMENTS | MB_ICONWARNING);
 			if (response == IDYES)
 			{
 				FileLoadResult::FILES_RESULT result = ReloadDoc(nSide);
@@ -870,7 +870,7 @@ bool CChildFrame::TrySaveAs(String &strPath, int &nSaveResult, String & sError,
 	{
 		response = LanguageSelect.FormatStrings(IDS_FILESAVE_FAILED,
 			paths_UndoMagic(wcsdupa(strPath.c_str())), sError.c_str()
-		).MsgBox(MB_OKCANCEL | MB_ICONWARNING);
+		).MsgBox(MB_OKCANCEL | MB_HIGHLIGHT_ARGUMENTS | MB_ICONWARNING);
 	}
 
 	switch (response)
@@ -960,7 +960,7 @@ bool CChildFrame::DoSave(bool &bSaveSuccess, int nBuffer)
 	{
 		int response = LanguageSelect.FormatStrings(
 			IDS_FILECHANGED_ONDISK, paths_UndoMagic(wcsdupa(szPath))
-		).MsgBox(MB_ICONWARNING | MB_YESNO);
+		).MsgBox(MB_HIGHLIGHT_ARGUMENTS | MB_ICONWARNING | MB_YESNO);
 		if (response == IDNO)
 		{
 			bSaveSuccess = false;
@@ -1718,7 +1718,7 @@ FileLoadResult::FILES_RESULT CChildFrame::LoadFile(int nBuffer, bool &readOnly, 
 			sOpenError.empty() ? IDS_ERROR_FILE_NOT_FOUND : IDS_ERROR_FILEOPEN,
 			paths_UndoMagic(wcsdupa(fileinfo.filepath.c_str())),
 			sOpenError.c_str()
-		).MsgBox(MB_ICONSTOP);
+		).MsgBox(MB_HIGHLIGHT_ARGUMENTS | MB_ICONSTOP);
 	}
 	return retVal;
 }

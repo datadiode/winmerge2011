@@ -339,7 +339,7 @@ void FileFiltersDlg::OnBnClickedFilterfileNewbutton()
 		// user has already allowed it.
 		if (!CopyFile(templatePath.c_str(), path.c_str(), FALSE))
 		{
-			LanguageSelect.MsgBox(IDS_FILEFILTER_TMPL_COPY, templatePath.c_str(), MB_ICONERROR);
+			LanguageSelect.MsgBox(IDS_FILEFILTER_TMPL_COPY, templatePath.c_str(), MB_HIGHLIGHT_ARGUMENTS | MB_ICONERROR);
 			return;
 		}
 		EditFileFilter(path.c_str());
@@ -372,7 +372,7 @@ void FileFiltersDlg::OnBnClickedFilterfileDelete()
 			}
 			else
 			{
-				LanguageSelect.MsgBox(IDS_FILEFILTER_DELETE_FAIL, path.c_str(), MB_ICONSTOP);
+				LanguageSelect.MsgBox(IDS_FILEFILTER_DELETE_FAIL, path.c_str(), MB_HIGHLIGHT_ARGUMENTS | MB_ICONSTOP);
 			}
 		}
 	}

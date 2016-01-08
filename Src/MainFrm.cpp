@@ -1356,7 +1356,7 @@ int CMainFrame::HandleReadonlySave(DWORD attr, String &strSavePath, int choice)
 		// Single file
 		choice = LanguageSelect.FormatStrings(
 			IDS_SAVEREADONLY_FMT, pszDisplayPath
-		).MsgBox(MB_YESNOCANCEL | MB_ICONWARNING | MB_DEFBUTTON2 | MB_DONT_ASK_AGAIN);
+		).MsgBox(MB_YESNOCANCEL | MB_HIGHLIGHT_ARGUMENTS | MB_ICONWARNING | MB_DEFBUTTON2 | MB_DONT_ASK_AGAIN);
 		if (choice == IDNO && !SelectFile(m_hWnd, strSavePath, IDS_SAVE_AS_TITLE, NULL, FALSE))
 			choice = IDCANCEL;
 	}
@@ -1365,7 +1365,7 @@ int CMainFrame::HandleReadonlySave(DWORD attr, String &strSavePath, int choice)
 		// Multiple files or folder
 		choice = LanguageSelect.FormatStrings(
 			IDS_SAVEREADONLY_MULTI, pszDisplayPath
-		).MsgBox(MB_YESNOCANCEL | MB_ICONWARNING | MB_DEFBUTTON3 | MB_DONT_ASK_AGAIN | MB_YES_TO_ALL);
+		).MsgBox(MB_YESNOCANCEL | MB_HIGHLIGHT_ARGUMENTS | MB_ICONWARNING | MB_DEFBUTTON3 | MB_DONT_ASK_AGAIN | MB_YES_TO_ALL);
 	}
 	if (choice == IDYES || choice == IDYESTOALL)
 	{
@@ -1929,7 +1929,7 @@ bool CMainFrame::CreateBackup(bool bFolder, LPCTSTR pszPath)
 	{
 		int response = LanguageSelect.MsgBox(IDS_BACKUP_FAILED_PROMPT,
 			paths_UndoMagic(wcsdupa(pszPath)),
-			MB_YESNO | MB_ICONWARNING | MB_DONT_ASK_AGAIN);
+			MB_YESNO | MB_HIGHLIGHT_ARGUMENTS | MB_ICONWARNING | MB_DONT_ASK_AGAIN);
 		if (response != IDYES)
 			return false;
 	}
@@ -2804,7 +2804,7 @@ void CMainFrame::OnSaveConfigData()
 	{
 		LanguageSelect.FormatStrings(
 			IDS_ERROR_FILEOPEN, sFileName.c_str(), sError.c_str()
-		).MsgBox(MB_ICONSTOP);
+		).MsgBox(MB_HIGHLIGHT_ARGUMENTS | MB_ICONSTOP);
 	}
 }
 
@@ -4137,7 +4137,7 @@ void CMainFrame::OnFileOpenConflict()
 		{
 			LanguageSelect.FormatStrings(
 				IDS_NOT_CONFLICT_FILE, conflictFile.c_str()
-			).MsgBox(MB_ICONSTOP);
+			).MsgBox(MB_HIGHLIGHT_ARGUMENTS | MB_ICONSTOP);
 		}
 	}
 }

@@ -296,7 +296,7 @@ HRESULT CHexMergeView::SaveFile(LPCTSTR path)
 	{
 		int response = LanguageSelect.FormatStrings(
 			IDS_FILECHANGED_ONDISK, paths_UndoMagic(wcsdupa(path))
-		).MsgBox(MB_ICONWARNING | MB_YESNO);
+		).MsgBox(MB_HIGHLIGHT_ARGUMENTS | MB_ICONWARNING | MB_YESNO);
 		if (response == IDNO)
 			return S_OK;
 	}
