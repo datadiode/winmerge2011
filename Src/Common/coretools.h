@@ -12,6 +12,7 @@ LPCWSTR NTAPI EatPrefix(LPCWSTR text, LPCWSTR prefix);
 LPCWSTR NTAPI EatPrefixTrim(LPCWSTR text, LPCWSTR prefix);
 
 String GetModulePath(HMODULE hModule = NULL);
+DWORD_PTR GetShellImageList();
 
 int linelen(const char *string);
 size_t unslash(unsigned codepage, char *string);

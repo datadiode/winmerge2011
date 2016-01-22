@@ -27,10 +27,10 @@
 #include "paths.h"
 #include "Merge.h"
 #include "OpenDlg.h"
-#include "coretools.h"
+#include "Common/coretools.h"
+#include "Common/SettingStore.h"
 #include "Environment.h"
 #include "MainFrm.h"
-#include "SettingStore.h"
 #include "LanguageSelect.h"
 #include "FileOrFolderSelect.h"
 
@@ -49,14 +49,6 @@ static const TCHAR OpenDlgHelpLocation[] = _T("::/htmlhelp/Open_paths.html");
 
 /////////////////////////////////////////////////////////////////////////////
 // COpenDlg dialog
-
-static DWORD_PTR GetShellImageList()
-{
-	SHFILEINFO sfi;
-	static DWORD_PTR dwpShellImageList = SHGetFileInfo(
-		_T(""), 0,	&sfi, sizeof sfi, SHGFI_SMALLICON | SHGFI_SYSICONINDEX);
-	return dwpShellImageList;
-}
 
 static void EnsureCurSelPathCombo(HSuperComboBox *pCb)
 {

@@ -173,6 +173,14 @@ String GetModulePath(HMODULE hModule /* = NULL*/)
 	return paths_GetParentPath(temp);
 }
 
+DWORD_PTR GetShellImageList()
+{
+	SHFILEINFO sfi;
+	static DWORD_PTR dwpShellImageList = SHGetFileInfo(
+		_T(""), 0, &sfi, sizeof sfi, SHGFI_SMALLICON | SHGFI_SYSICONINDEX);
+	return dwpShellImageList;
+}
+
 /**
  * @brief Decorates commandline for giving to CreateProcess() or
  * ShellExecute().
