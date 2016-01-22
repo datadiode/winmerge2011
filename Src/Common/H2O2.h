@@ -81,6 +81,7 @@ namespace H2O
 		OException(LPCTSTR);
 		OException(DWORD, LPCTSTR = NULL);
 		void operator delete(void *) { }
+		// ThreadProc template
 		template
 		<
 			class T,
@@ -100,6 +101,40 @@ namespace H2O
 			}
 			return ret;
 		}
+		// WndProc template for subclassing dialog items through an owner-provided method
+		template
+		<
+			class T,
+			int id
+		>
+		static WNDPROC &SuperWndProc()
+		{
+			static WNDPROC SuperWndProc = NULL;
+			return SuperWndProc;
+		}
+		template
+		<
+			class T,
+			int id,
+			int offset,
+			LRESULT(T::*MemberWndProc)(WNDPROC, HWND, UINT, WPARAM, LPARAM)
+		>
+		static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+		{
+			LRESULT lResult = 0;
+			try
+			{
+				T *const pThis = reinterpret_cast<T *>(::GetWindowLongPtr(hWnd, GWLP_USERDATA) - offset);
+				lResult = (pThis->*MemberWndProc)(
+					SuperWndProc<T, id>(), hWnd, uMsg, wParam, lParam);
+			}
+			catch (OException *e)
+			{
+				e->ReportError(NULL, MB_ICONSTOP | MB_TOPMOST);
+				delete e;
+			}
+			return lResult;
+		}
 	};
 
 	class OWindow : public Window<Object>
@@ -113,13 +148,47 @@ namespace H2O
 		{
 			m_hWnd = hWnd;
 		}
-		void Subclass(HWindow *pWnd)
+		HWindow *Subclass(HWindow *pWnd)
 		{
-			Subclass<GWLP_USERDATA>(pWnd);
+			return Subclass<GWLP_USERDATA>(pWnd);
 		}
-		void SubclassDlgItem(int id, OWindow &item)
+		// Subclass a dialog item through a dedicated OWindow
+		HWindow *SubclassDlgItem(int id, OWindow &item)
 		{
-			item.Subclass(GetDlgItem(id));
+			return item.Subclass(GetDlgItem(id));
+		}
+		// Subclass a dialog item through an owner-provided method
+		template
+		<
+			class T,
+			UINT id,
+			LRESULT(T::*MemberWndProc)(WNDPROC, HWND, UINT, WPARAM, LPARAM)
+		>
+		HWindow *SubclassDlgItem()
+		{
+			HWindow *const pWnd = GetDlgItem(id);
+			::SetWindowLongPtr(pWnd->m_hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
+			WNDPROC pfnSubclass = OException::WndProc<ExplorerDlg, id, 0, MemberWndProc>;
+			OException::SuperWndProc<T, id>() = reinterpret_cast<WNDPROC>(
+				::SetWindowLongPtr(pWnd->m_hWnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(pfnSubclass)));
+			return pWnd;
+		}
+		// Subclass a dialog item through both a dedicated OWindow and an owner-provided method
+		template
+		<
+			class T,
+			UINT id,
+			int offset,
+			LRESULT(T::*MemberWndProc)(WNDPROC, HWND, UINT, WPARAM, LPARAM)
+		>
+		HWindow *SubclassDlgItem(OWindow &item)
+		{
+			HWindow *const pWnd = SubclassDlgItem(id, item);
+			assert(::GetWindowLongPtr(pWnd->m_hWnd, GWLP_USERDATA) == reinterpret_cast<LONG_PTR>(this) + offset);
+			WNDPROC pfnSubclass = OException::WndProc<ExplorerDlg, id, offset, MemberWndProc>;
+			OException::SuperWndProc<T, id>() = reinterpret_cast<WNDPROC>(
+				::SetWindowLongPtr(pWnd->m_hWnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(pfnSubclass)));
+			return pWnd;
 		}
 		static OWindow *FromHandle(HWindow *pWnd)
 		{
@@ -128,13 +197,14 @@ namespace H2O
 		virtual ~OWindow();
 	protected:
 		template<UINT GWLP_THIS>
-		void Subclass(HWindow *pWnd)
+		HWindow *Subclass(HWindow *pWnd)
 		{
 			m_pWnd = pWnd;
 			m_pfnSuper = SetWindowPtr<WNDPROC>(GWLP_WNDPROC, WndProc<GWLP_THIS>);
 			assert(m_pfnSuper != WndProc<GWLP_THIS>);
 			void *p = SetWindowPtr(GWLP_THIS, this);
 			assert(p == NULL);
+			return pWnd;
 		}
 		template<UINT GWLP_THIS>
 		static OWindow *FromHandle(HWindow *pWnd)
@@ -412,6 +482,7 @@ namespace H2O
 	typedef Button<OWindow> OButton;
 	typedef HeaderCtrl<OWindow> OHeaderCtrl;
 	typedef ListView<OWindow> OListView;
+	typedef TreeView<OWindow> OTreeView;
 	typedef StatusBar<OWindow> OStatusBar;
 
 	template<class Self>
