@@ -1856,6 +1856,11 @@ bool CMainFrame::DoFileOpen(
 			filelocLeft.filepath.c_str(), filelocRight.filepath.c_str());
 		ShowMergeDoc(pDirDoc, filelocLeft, filelocRight, dwLeftFlags, dwRightFlags, &packingInfo, packingInfo.pluginMoniker.c_str());
 	}
+
+	// Exit if files are identical should only work for the first
+	// comparison and must be disabled afterward.
+	m_bExitIfNoDiff = MergeCmdLineInfo::Disabled;
+
 	return true;
 }
 

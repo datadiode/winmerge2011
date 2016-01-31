@@ -1980,10 +1980,6 @@ void CChildFrame::OpenDocs(
 			pLeft->SelectDiff(nDiff);
 	}
 
-	// Exit if files are identical should only work for the first
-	// comparison and must be disabled afterward.
-	m_pMDIFrame->m_bExitIfNoDiff = MergeCmdLineInfo::Disabled;
-
 	// Force repaint of location pane to update it in case we had some warning
 	// dialog visible and it got painted before files were loaded
 	m_wndLocationView.ForceRecalculate();
