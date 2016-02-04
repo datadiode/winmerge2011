@@ -200,7 +200,6 @@ void CGhostTextView::DrawSingleLine(HSurface *pdc, const RECT &rc, int nLineInde
 	const LineInfo &li = m_pTextBuffer->GetLineInfo(nLineIndex);
 	if (li.m_dwFlags & LF_GHOST)
 	{
-		pdc->ExtTextOut(0, 0, ETO_OPAQUE, &rc, NULL, 0);
 		const int nCharWidth = GetCharWidth();
 		const int nLineHeight = GetLineHeight();
 		if (li.m_nSkippedLines != 0)

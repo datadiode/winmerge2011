@@ -1360,8 +1360,6 @@ void CCrystalTextView::DrawSingleLine(HSurface *pdc, const RECT &rc, int nLineIn
 	if (crText != CLR_NONE)
 		pdc->SetTextColor(crText);
 
-	int nEmptySubLines = 0;
-
 	if (LPCTSTR pszChars = GetLineChars(nLineIndex))
 	{
 		int nLength = GetViewableLineLength(nLineIndex);
@@ -1420,20 +1418,19 @@ void CCrystalTextView::DrawSingleLine(HSurface *pdc, const RECT &rc, int nLineIn
 		}
 
 		delete[] pBuf;
-		nEmptySubLines = GetEmptySubLines(nLineIndex);
+		// Draw empty sublines
+		if (int nEmptySubLines = GetEmptySubLines(nLineIndex))
+		{
+			RECT frect = rc;
+			frect.top = frect.bottom - nEmptySubLines * GetLineHeight();
+			pdc->SetBkColor(crBkgnd == CLR_NONE ? GetColor(COLORINDEX_WHITESPACE) : crBkgnd);
+			pdc->ExtTextOut(0, 0, ETO_OPAQUE, &frect, NULL, 0);
+		}
 	}
-	else if (nLineIndex == GetLineCount() - 1)
+	else
 	{
-		nEmptySubLines = 1;
-	}
-
-	// Draw empty sublines
-	if (nEmptySubLines > 0)
-	{
-		RECT frect = rc;
-		frect.top = frect.bottom - nEmptySubLines * GetLineHeight();
 		pdc->SetBkColor(crBkgnd == CLR_NONE ? GetColor(COLORINDEX_WHITESPACE) : crBkgnd);
-		pdc->ExtTextOut(0, 0, ETO_OPAQUE, &frect, NULL, 0);
+		pdc->ExtTextOut(0, 0, ETO_OPAQUE, &rc, NULL, 0);
 	}
 }
 
