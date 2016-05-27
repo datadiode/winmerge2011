@@ -31,6 +31,7 @@ interface Merge7z
 			Local7z = 2,
 			GuessFormatBySignature = 4,
 			GuessFormatByExtension = 8,
+			ShowPassword = 16,
 			Default = sizeof(TCHAR) == sizeof(WCHAR) ? Unicode : 0
 		};
 	};

@@ -4,7 +4,7 @@
 #include "7zip/Archive/IArchive.h"
 #include "Common/StringConvert.h"
 #include "Windows/PropVariant.h"
-#include "Windows/PropVariantConversions.h"
+#include "Windows/PropVariantConv.h"
 #include "Windows/FileDir.h"
 #include "Windows/FileFind.h"
 

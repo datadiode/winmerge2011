@@ -136,7 +136,7 @@ HRESULT Format7zDLL::Interface::Inspector::Extract(HWND hwndParent, LPCTSTR fold
 	{
 		if (*folder)
 		{
-			if COMPLAIN(!NFile::NDirectory::CreateComplexDirectory(folder))
+			if COMPLAIN(!NFile::NDir::CreateComplexDir(folder))
 			{
 				Complain(ERROR_CANNOT_MAKE, folder);
 			}
@@ -146,7 +146,7 @@ HRESULT Format7zDLL::Interface::Inspector::Extract(HWND hwndParent, LPCTSTR fold
 
 		extractCallbackSpec2->Init();
 
-		extractCallbackSpec2->OverwriteMode = NExtract::NOverwriteMode::kWithoutPrompt;
+		extractCallbackSpec2->OverwriteMode = NExtract::NOverwriteMode::kOverwrite;
 		extractCallbackSpec2->PasswordIsDefined = passwordIsDefined;
 		extractCallbackSpec2->Password = password;
 
@@ -155,9 +155,11 @@ HRESULT Format7zDLL::Interface::Inspector::Extract(HWND hwndParent, LPCTSTR fold
 		extractCallbackSpec->InitForMulti
 		(
 			false,
-			NExtract::NPathMode::kFullPathnames,
-			NExtract::NOverwriteMode::kWithoutPrompt
+			NExtract::NPathMode::kFullPaths,
+			NExtract::NOverwriteMode::kOverwrite
 		);
+
+		CExtractNtOptions ntOptions;
 		CArc arc;
 		arc.Archive = archive;
 		arc.Path = GetUnicodeString(path);
@@ -166,14 +168,14 @@ HRESULT Format7zDLL::Interface::Inspector::Extract(HWND hwndParent, LPCTSTR fold
 		arc.SubfileIndex = 0;
 		extractCallbackSpec->Init
 		(
+			ntOptions,
 			NULL,
 			&arc,
 			extractCallbackSpec2,
 			false,											//stdOutMode
 			false,											//testMode
-			false,											//crcMode
 			GetUnicodeString(folder),
-			UStringVector(),
+			UStringVector(), false,
 			(UInt64)(Int64)-1
 		);
 
@@ -300,7 +302,7 @@ HRESULT Format7zDLL::Interface::Updater::Commit(HWND hwndParent)
 
 		operationChain.Reserve(dirItems.Items.Size());
 		//
-		int i;
+		unsigned i;
 		for (i = 0 ; i < dirItems.Items.Size() ; i++)
 		{
 			pair2.DirIndex = i;
