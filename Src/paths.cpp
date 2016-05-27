@@ -382,7 +382,8 @@ LPCTSTR paths_CompactPath(HEdit *pEdit, String &path, TCHAR marker)
 	if (path.empty())
 		return path.c_str();
 	// be sure to meet PathCompactPath()'s buffer size requirement
-	path.resize(std::min(MAX_PATH + _countof(paths_magic_uncfix), path.size() + 3));
+	String::size_type const min_size = MAX_PATH + _countof(paths_magic_uncfix);
+	path.resize(std::min(min_size, path.size() + 3));
 	// skip any magic prefix
 	LPTSTR prefix = const_cast<LPTSTR>(path.c_str());
 	LPTSTR buffer = paths_UndoMagic(prefix);
