@@ -180,10 +180,7 @@ static String ColTimeGet(const CDiffContext *, const void *p)
 {
 	using locality::TimeString;
 	const FileTime &r = *static_cast<const FileTime *>(p);
-	FILETIME ft;
-	SYSTEMTIME st;
-	return r != 0 && FileTimeToLocalFileTime(&r, &ft) &&
-		FileTimeToSystemTime(&ft, &st) ? TimeString(st) : String();
+	return r != 0 ? TimeString(r, TimeString::LTime) : String();
 }
 
 /**

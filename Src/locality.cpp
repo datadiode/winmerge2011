@@ -36,17 +36,37 @@ void NumToLocaleStr::getLocaleStr(LPCTSTR str)
 }
 
 /**
- * @brief Convert FILETIME to string to show in the GUI.
+ * @brief Convert SYSTEMTIME or FILETIME to string to show in the GUI.
  */
-TimeString::TimeString(const SYSTEMTIME &sysTime)
+void TimeString::Format(const SYSTEMTIME &sysTime)
 {
 	if (int len = ::GetDateFormat(LOCALE_USER_DEFAULT, 0, &sysTime, NULL, out, 60))
 	{
-		out[len - 1] = _T(' ');
-		::GetTimeFormat(LOCALE_USER_DEFAULT, 0, &sysTime, NULL, out + len, 60);
+		if (::GetTimeFormat(LOCALE_USER_DEFAULT, 0, &sysTime, NULL, out + len, 60))
+		{
+			out[len - 1] = _T(' ');
+		}
 	}
 	else
 	{
 		out[0] = _T('\0');
 	}
+}
+
+void TimeString::FormatAsUTime(const FILETIME &ft)
+{
+	SYSTEMTIME st;
+	if (FileTimeToSystemTime(&ft, &st))
+		Format(st);
+	else
+		out[0] = _T('\0');
+}
+
+void TimeString::FormatAsLTime(const FILETIME &ft)
+{
+	FILETIME lt;
+	if (FileTimeToLocalFileTime(&ft, &lt))
+		FormatAsUTime(lt);
+	else
+		out[0] = _T('\0');
 }

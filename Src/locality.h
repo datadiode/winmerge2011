@@ -64,8 +64,15 @@ namespace locality
 	};
 	class TimeString : public string<128>
 	{
+		void Format(const SYSTEMTIME &);
+		void FormatAsUTime(const FILETIME &);
+		void FormatAsLTime(const FILETIME &);
 	public:
-		TimeString(const SYSTEMTIME &);
+		enum UTime { UTime };
+		enum LTime { LTime };
+		TimeString(const SYSTEMTIME &st) { Format(st); } 
+		TimeString(const FILETIME &ft, enum UTime) { FormatAsUTime(ft); } 
+		TimeString(const FILETIME &ft, enum LTime) { FormatAsLTime(ft); } 
 	};
 };
 
