@@ -56,14 +56,12 @@ DWORD paths_IsReadonlyFile(LPCTSTR path)
 	return (attr & mask) == FILE_ATTRIBUTE_READONLY ? attr : 0;
 }
 
-static const String &paths_DoMagic(String &path)
+void paths_DoMagic(String &path)
 {
-	// As for now no magic prefix on UNC paths!
 	if (PathIsUNC(path.c_str()))
 		path.insert(2, paths_magic_uncfix);
 	else
 		path.insert(0, paths_magic_prefix);
-	return path;
 }
 
 LPTSTR paths_UndoMagic(LPTSTR path)
