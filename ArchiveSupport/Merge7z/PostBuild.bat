@@ -3,7 +3,7 @@
 if not exist %1 rem: goto :usage
 if not exist %2 rem: goto :usage
 
-set SevenZip=\7z1602bin
+set SevenZip=\7z1604bin
 "%SevenZip%\7z.exe" e -so %~1 _7z.dll > %~2\7z.dll
 copy "%SevenZip%\History.txt" %~2
 copy "%SevenZip%\License.txt" %~2

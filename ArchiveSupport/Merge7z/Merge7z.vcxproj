@@ -80,15 +80,15 @@
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)BuildTmp\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</GenerateManifest>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Merge7z1602U</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Merge7z1602U</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Merge7z1602U</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Merge7z1602U</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Merge7z1604U</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Merge7z1604U</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Merge7z1604U</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Merge7z1604U</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>\7z1602\CPP;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>\7z1604\CPP;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -109,13 +109,13 @@
       </DataExecutionPrevention>
     </Link>
     <PostBuildEvent>
-      <Command>PostBuild.bat "\7z1602\7z1602.msi" "$(OutDir)"</Command>
+      <Command>PostBuild.bat "\7z1604\7z1604.msi" "$(OutDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>\7z1602\CPP;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>\7z1604\CPP;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -136,14 +136,14 @@
       </DataExecutionPrevention>
     </Link>
     <PostBuildEvent>
-      <Command>PostBuild.bat "\7z1602\7z1602-x64.msi" "$(OutDir)"</Command>
+      <Command>PostBuild.bat "\7z1604\7z1604-x64.msi" "$(OutDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <Optimization>MinSpace</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>\7z1602\CPP;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>\7z1604\CPP;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -166,14 +166,14 @@
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <PostBuildEvent>
-      <Command>PostBuild.bat "\7z1602\7z1602.msi" "$(OutDir)"</Command>
+      <Command>PostBuild.bat "\7z1604\7z1604.msi" "$(OutDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <Optimization>MinSpace</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>\7z1602\CPP;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>\7z1604\CPP;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -195,12 +195,12 @@
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <PostBuildEvent>
-      <Command>PostBuild.bat "\7z1602\7z1602-x64.msi" "$(OutDir)"</Command>
+      <Command>PostBuild.bat "\7z1604\7z1604-x64.msi" "$(OutDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="Merge7z.def" />
-    <None Include="\7z1602\CPP\7zip\Ui\Gui\FM.ico" />
+    <None Include="\7z1604\CPP\7zip\Ui\Gui\FM.ico" />
     <None Include="revision.txt" />
   </ItemGroup>
   <ItemGroup>
@@ -208,62 +208,62 @@
     <ClInclude Include="Merge7zCommon.h" />
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="tools.h" />
-    <ClInclude Include="\7z1602\CPP\Windows\DLL.h" />
-    <ClInclude Include="\7z1602\CPP\Windows\ErrorMsg.h" />
-    <ClInclude Include="\7z1602\CPP\Windows\FileIO.h" />
-    <ClInclude Include="\7z1602\Cpp\Windows\Control\ListView.h" />
-    <ClInclude Include="\7z1602\CPP\Windows\PropVariant.h" />
-    <ClInclude Include="\7z1602\CPP\Windows\PropVariantConv.h" />
-    <ClInclude Include="\7z1602\CPP\Windows\ResourceString.h" />
-    <ClInclude Include="\7z1602\CPP\Windows\Synchronization.h" />
-    <ClInclude Include="\7z1602\CPP\Common\IntToString.h" />
-    <ClInclude Include="\7z1602\CPP\Common\Lang.h" />
-    <ClInclude Include="\7z1602\CPP\Common\MyString.h" />
-    <ClInclude Include="\7z1602\Cpp\7zip\Archive\Common\OutStreamWithCRC.h" />
-    <ClInclude Include="\7z1602\CPP\Common\StringConvert.h" />
-    <ClInclude Include="\7z1602\CPP\Common\StringToInt.h" />
-    <ClInclude Include="\7z1602\CPP\Common\TextConfig.h" />
-    <ClInclude Include="\7z1602\CPP\Common\UTFConvert.h" />
-    <ClInclude Include="\7z1602\CPP\7zip\UI\Common\ArchiveExtractCallback.h" />
-    <ClInclude Include="\7z1602\CPP\7zip\UI\Common\ArchiveOpenCallback.h" />
-    <ClInclude Include="\7z1602\CPP\7zip\UI\Common\DefaultName.h" />
-    <ClInclude Include="\7z1602\CPP\Windows\Control\Dialog.h" />
-    <ClInclude Include="\7z1602\Cpp\7zip\Ui\Common\EnumDirItems.h" />
-    <ClInclude Include="\7z1602\CPP\7zip\UI\FileManager\ExtractCallback.h" />
-    <ClInclude Include="\7z1602\CPP\7zip\Common\FileStreams.h" />
-    <ClInclude Include="\7z1602\CPP\7zip\Common\UniqBlocks.h" />
-    <ClInclude Include="\7z1602\CPP\7zip\UI\FileManager\FormatUtils.h" />
-    <ClInclude Include="\7z1602\CPP\7zip\UI\FileManager\LangUtils.h" />
-    <ClInclude Include="\7z1602\Cpp\7zip\Ui\Common\LoadCodecs.h" />
-    <ClInclude Include="\7z1602\CPP\7zip\UI\FileManager\MessagesDialog.h" />
-    <ClInclude Include="\7z1602\CPP\7zip\UI\Common\OpenArchive.h" />
-    <ClInclude Include="\7z1602\CPP\7zip\UI\FileManager\OpenCallback.h" />
-    <ClInclude Include="\7z1602\CPP\7zip\UI\FileManager\OverwriteDialog.h" />
-    <ClInclude Include="\7z1602\CPP\7zip\UI\FileManager\PasswordDialog.h" />
-    <ClInclude Include="\7z1602\CPP\7zip\UI\FileManager\ProgramLocation.h" />
-    <ClInclude Include="\7z1602\CPP\7zip\UI\FileManager\PropertyName.h" />
-    <ClInclude Include="\7z1602\CPP\7zip\Common\ProgressUtils.h" />
-    <ClInclude Include="\7z1602\CPP\7zip\Common\StreamUtils.h" />
-    <ClInclude Include="\7z1602\CPP\7zip\Compress\CopyCoder.h" />
-    <ClInclude Include="\7z1602\CPP\7zip\UI\Common\UpdateCallback.h" />
-    <ClInclude Include="\7z1602\CPP\7zip\UI\GUI\UpdateCallbackGUI.h" />
-    <ClInclude Include="\7z1602\CPP\7zip\UI\GUI\UpdateCallbackGUI2.h" />
-    <ClInclude Include="\7z1602\CPP\Windows\Window.h" />
-    <ClInclude Include="\7z1602\CPP\7zip\UI\Common\ExtractingFilePath.h" />
-    <ClInclude Include="\7z1602\CPP\7zip\UI\Common\PropIDUTils.h" />
-    <ClInclude Include="\7z1602\CPP\7zip\UI\Common\SetProperties.h" />
-    <ClInclude Include="\7z1602\CPP\Windows\FileDir.h" />
-    <ClInclude Include="\7z1602\CPP\Windows\FileFind.h" />
-    <ClInclude Include="\7z1602\CPP\Windows\FileName.h" />
-    <ClInclude Include="\7z1602\CPP\7zip\Common\FilePathAutoRename.h" />
-    <ClInclude Include="\7z1602\CPP\7zip\Common\LimitedStreams.h" />
-    <ClInclude Include="\7z1602\CPP\7zip\Common\StreamObjects.h" />
-    <ClInclude Include="\7z1602\CPP\Common\MyVector.h" />
-    <ClInclude Include="\7z1602\CPP\Common\Wildcard.h" />
-    <ClInclude Include="\7z1602\C\7zCrc.h" />
-    <ClInclude Include="\7z1602\C\Alloc.h" />
-    <ClInclude Include="\7z1602\C\CpuArch.h" />
-    <ClInclude Include="\7z1602\C\Threads.h" />
+    <ClInclude Include="\7z1604\CPP\Windows\DLL.h" />
+    <ClInclude Include="\7z1604\CPP\Windows\ErrorMsg.h" />
+    <ClInclude Include="\7z1604\CPP\Windows\FileIO.h" />
+    <ClInclude Include="\7z1604\Cpp\Windows\Control\ListView.h" />
+    <ClInclude Include="\7z1604\CPP\Windows\PropVariant.h" />
+    <ClInclude Include="\7z1604\CPP\Windows\PropVariantConv.h" />
+    <ClInclude Include="\7z1604\CPP\Windows\ResourceString.h" />
+    <ClInclude Include="\7z1604\CPP\Windows\Synchronization.h" />
+    <ClInclude Include="\7z1604\CPP\Common\IntToString.h" />
+    <ClInclude Include="\7z1604\CPP\Common\Lang.h" />
+    <ClInclude Include="\7z1604\CPP\Common\MyString.h" />
+    <ClInclude Include="\7z1604\Cpp\7zip\Archive\Common\OutStreamWithCRC.h" />
+    <ClInclude Include="\7z1604\CPP\Common\StringConvert.h" />
+    <ClInclude Include="\7z1604\CPP\Common\StringToInt.h" />
+    <ClInclude Include="\7z1604\CPP\Common\TextConfig.h" />
+    <ClInclude Include="\7z1604\CPP\Common\UTFConvert.h" />
+    <ClInclude Include="\7z1604\CPP\7zip\UI\Common\ArchiveExtractCallback.h" />
+    <ClInclude Include="\7z1604\CPP\7zip\UI\Common\ArchiveOpenCallback.h" />
+    <ClInclude Include="\7z1604\CPP\7zip\UI\Common\DefaultName.h" />
+    <ClInclude Include="\7z1604\CPP\Windows\Control\Dialog.h" />
+    <ClInclude Include="\7z1604\Cpp\7zip\Ui\Common\EnumDirItems.h" />
+    <ClInclude Include="\7z1604\CPP\7zip\UI\FileManager\ExtractCallback.h" />
+    <ClInclude Include="\7z1604\CPP\7zip\Common\FileStreams.h" />
+    <ClInclude Include="\7z1604\CPP\7zip\Common\UniqBlocks.h" />
+    <ClInclude Include="\7z1604\CPP\7zip\UI\FileManager\FormatUtils.h" />
+    <ClInclude Include="\7z1604\CPP\7zip\UI\FileManager\LangUtils.h" />
+    <ClInclude Include="\7z1604\Cpp\7zip\Ui\Common\LoadCodecs.h" />
+    <ClInclude Include="\7z1604\CPP\7zip\UI\FileManager\MessagesDialog.h" />
+    <ClInclude Include="\7z1604\CPP\7zip\UI\Common\OpenArchive.h" />
+    <ClInclude Include="\7z1604\CPP\7zip\UI\FileManager\OpenCallback.h" />
+    <ClInclude Include="\7z1604\CPP\7zip\UI\FileManager\OverwriteDialog.h" />
+    <ClInclude Include="\7z1604\CPP\7zip\UI\FileManager\PasswordDialog.h" />
+    <ClInclude Include="\7z1604\CPP\7zip\UI\FileManager\ProgramLocation.h" />
+    <ClInclude Include="\7z1604\CPP\7zip\UI\FileManager\PropertyName.h" />
+    <ClInclude Include="\7z1604\CPP\7zip\Common\ProgressUtils.h" />
+    <ClInclude Include="\7z1604\CPP\7zip\Common\StreamUtils.h" />
+    <ClInclude Include="\7z1604\CPP\7zip\Compress\CopyCoder.h" />
+    <ClInclude Include="\7z1604\CPP\7zip\UI\Common\UpdateCallback.h" />
+    <ClInclude Include="\7z1604\CPP\7zip\UI\GUI\UpdateCallbackGUI.h" />
+    <ClInclude Include="\7z1604\CPP\7zip\UI\GUI\UpdateCallbackGUI2.h" />
+    <ClInclude Include="\7z1604\CPP\Windows\Window.h" />
+    <ClInclude Include="\7z1604\CPP\7zip\UI\Common\ExtractingFilePath.h" />
+    <ClInclude Include="\7z1604\CPP\7zip\UI\Common\PropIDUTils.h" />
+    <ClInclude Include="\7z1604\CPP\7zip\UI\Common\SetProperties.h" />
+    <ClInclude Include="\7z1604\CPP\Windows\FileDir.h" />
+    <ClInclude Include="\7z1604\CPP\Windows\FileFind.h" />
+    <ClInclude Include="\7z1604\CPP\Windows\FileName.h" />
+    <ClInclude Include="\7z1604\CPP\7zip\Common\FilePathAutoRename.h" />
+    <ClInclude Include="\7z1604\CPP\7zip\Common\LimitedStreams.h" />
+    <ClInclude Include="\7z1604\CPP\7zip\Common\StreamObjects.h" />
+    <ClInclude Include="\7z1604\CPP\Common\MyVector.h" />
+    <ClInclude Include="\7z1604\CPP\Common\Wildcard.h" />
+    <ClInclude Include="\7z1604\C\7zCrc.h" />
+    <ClInclude Include="\7z1604\C\Alloc.h" />
+    <ClInclude Include="\7z1604\C\CpuArch.h" />
+    <ClInclude Include="\7z1604\C\Threads.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Merge7z907.cpp" />
@@ -275,62 +275,62 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="tools.cpp" />
-    <ClCompile Include="\7z1602\CPP\Windows\DLL.cpp" />
-    <ClCompile Include="\7z1602\CPP\Windows\ErrorMsg.cpp" />
-    <ClCompile Include="\7z1602\CPP\Windows\FileIO.cpp" />
-    <ClCompile Include="\7z1602\CPP\Windows\FileLink.cpp" />
-    <ClCompile Include="\7z1602\Cpp\Windows\Control\ListView.cpp" />
-    <ClCompile Include="\7z1602\CPP\Windows\PropVariant.cpp" />
-    <ClCompile Include="\7z1602\CPP\Windows\PropVariantConv.cpp" />
-    <ClCompile Include="\7z1602\CPP\Windows\ResourceString.cpp" />
-    <ClCompile Include="\7z1602\CPP\Windows\Synchronization.cpp" />
-    <ClCompile Include="\7z1602\CPP\Common\IntToString.cpp" />
-    <ClCompile Include="\7z1602\CPP\Common\Lang.cpp" />
-    <ClCompile Include="\7z1602\CPP\Common\MyString.cpp" />
-    <ClCompile Include="\7z1602\Cpp\7zip\Archive\Common\OutStreamWithCRC.cpp" />
-    <ClCompile Include="\7z1602\CPP\Common\StringConvert.cpp" />
-    <ClCompile Include="\7z1602\CPP\Common\StringToInt.cpp" />
-    <ClCompile Include="\7z1602\CPP\Common\TextConfig.cpp" />
-    <ClCompile Include="\7z1602\CPP\Common\UTFConvert.cpp" />
-    <ClCompile Include="\7z1602\CPP\7zip\Ui\Common\ArchiveExtractCallback.cpp" />
-    <ClCompile Include="\7z1602\CPP\7zip\UI\Common\ArchiveOpenCallback.cpp" />
-    <ClCompile Include="\7z1602\CPP\7zip\UI\Common\DefaultName.cpp" />
-    <ClCompile Include="\7z1602\CPP\Windows\Control\Dialog.cpp" />
-    <ClCompile Include="\7z1602\Cpp\7zip\Ui\Common\EnumDirItems.cpp" />
-    <ClCompile Include="\7z1602\CPP\7zip\UI\FileManager\ExtractCallback.cpp" />
-    <ClCompile Include="\7z1602\CPP\7zip\Common\FileStreams.cpp" />
-    <ClCompile Include="\7z1602\CPP\7zip\Common\UniqBlocks.cpp" />
-    <ClCompile Include="\7z1602\CPP\7zip\UI\FileManager\FormatUtils.cpp" />
-    <ClCompile Include="\7z1602\CPP\7zip\UI\FileManager\LangUtils.cpp" />
-    <ClCompile Include="\7z1602\Cpp\7zip\Ui\Common\LoadCodecs.cpp" />
-    <ClCompile Include="\7z1602\CPP\7zip\UI\FileManager\MessagesDialog.cpp" />
-    <ClCompile Include="\7z1602\CPP\7zip\UI\Common\OpenArchive.cpp" />
-    <ClCompile Include="\7z1602\CPP\7zip\UI\FileManager\OpenCallback.cpp" />
-    <ClCompile Include="\7z1602\CPP\7zip\UI\FileManager\OverwriteDialog.cpp" />
-    <ClCompile Include="\7z1602\CPP\7zip\UI\FileManager\PasswordDialog.cpp" />
-    <ClCompile Include="\7z1602\CPP\7zip\UI\FileManager\ProgramLocation.cpp" />
-    <ClCompile Include="\7z1602\CPP\7zip\UI\FileManager\ProgressDialog2.cpp" />
-    <ClCompile Include="\7z1602\CPP\7zip\UI\FileManager\PropertyName.cpp" />
-    <ClCompile Include="\7z1602\CPP\7zip\Common\ProgressUtils.cpp" />
-    <ClCompile Include="\7z1602\CPP\7zip\Common\PropId.cpp" />
-    <ClCompile Include="\7z1602\CPP\7zip\Common\StreamUtils.cpp" />
-    <ClCompile Include="\7z1602\CPP\7zip\Compress\CopyCoder.cpp" />
-    <ClCompile Include="\7z1602\CPP\7zip\UI\Common\UpdateCallback.cpp" />
-    <ClCompile Include="\7z1602\CPP\7zip\UI\GUI\UpdateCallbackGUI.cpp" />
-    <ClCompile Include="\7z1602\CPP\7zip\UI\GUI\UpdateCallbackGUI2.cpp" />
-    <ClCompile Include="\7z1602\CPP\Windows\Window.cpp" />
-    <ClCompile Include="\7z1602\CPP\7zip\Ui\Common\ExtractingFilePath.cpp" />
-    <ClCompile Include="\7z1602\CPP\7zip\UI\Common\PropIDUTils.cpp" />
-    <ClCompile Include="\7z1602\CPP\7zip\UI\Common\SetProperties.cpp" />
-    <ClCompile Include="\7z1602\CPP\Windows\FileDir.cpp" />
-    <ClCompile Include="\7z1602\CPP\Windows\FileFind.cpp" />
-    <ClCompile Include="\7z1602\CPP\Windows\FileName.cpp" />
-    <ClCompile Include="\7z1602\CPP\7zip\Common\FilePathAutoRename.cpp" />
-    <ClCompile Include="\7z1602\CPP\7zip\Common\LimitedStreams.cpp" />
-    <ClCompile Include="\7z1602\CPP\7zip\Common\StreamObjects.cpp" />
-    <ClCompile Include="\7z1602\CPP\Common\MyVector.cpp" />
-    <ClCompile Include="\7z1602\CPP\Common\Wildcard.cpp" />
-    <ClCompile Include="\7z1602\C\7zCrc.c">
+    <ClCompile Include="\7z1604\CPP\Windows\DLL.cpp" />
+    <ClCompile Include="\7z1604\CPP\Windows\ErrorMsg.cpp" />
+    <ClCompile Include="\7z1604\CPP\Windows\FileIO.cpp" />
+    <ClCompile Include="\7z1604\CPP\Windows\FileLink.cpp" />
+    <ClCompile Include="\7z1604\Cpp\Windows\Control\ListView.cpp" />
+    <ClCompile Include="\7z1604\CPP\Windows\PropVariant.cpp" />
+    <ClCompile Include="\7z1604\CPP\Windows\PropVariantConv.cpp" />
+    <ClCompile Include="\7z1604\CPP\Windows\ResourceString.cpp" />
+    <ClCompile Include="\7z1604\CPP\Windows\Synchronization.cpp" />
+    <ClCompile Include="\7z1604\CPP\Common\IntToString.cpp" />
+    <ClCompile Include="\7z1604\CPP\Common\Lang.cpp" />
+    <ClCompile Include="\7z1604\CPP\Common\MyString.cpp" />
+    <ClCompile Include="\7z1604\Cpp\7zip\Archive\Common\OutStreamWithCRC.cpp" />
+    <ClCompile Include="\7z1604\CPP\Common\StringConvert.cpp" />
+    <ClCompile Include="\7z1604\CPP\Common\StringToInt.cpp" />
+    <ClCompile Include="\7z1604\CPP\Common\TextConfig.cpp" />
+    <ClCompile Include="\7z1604\CPP\Common\UTFConvert.cpp" />
+    <ClCompile Include="\7z1604\CPP\7zip\Ui\Common\ArchiveExtractCallback.cpp" />
+    <ClCompile Include="\7z1604\CPP\7zip\UI\Common\ArchiveOpenCallback.cpp" />
+    <ClCompile Include="\7z1604\CPP\7zip\UI\Common\DefaultName.cpp" />
+    <ClCompile Include="\7z1604\CPP\Windows\Control\Dialog.cpp" />
+    <ClCompile Include="\7z1604\Cpp\7zip\Ui\Common\EnumDirItems.cpp" />
+    <ClCompile Include="\7z1604\CPP\7zip\UI\FileManager\ExtractCallback.cpp" />
+    <ClCompile Include="\7z1604\CPP\7zip\Common\FileStreams.cpp" />
+    <ClCompile Include="\7z1604\CPP\7zip\Common\UniqBlocks.cpp" />
+    <ClCompile Include="\7z1604\CPP\7zip\UI\FileManager\FormatUtils.cpp" />
+    <ClCompile Include="\7z1604\CPP\7zip\UI\FileManager\LangUtils.cpp" />
+    <ClCompile Include="\7z1604\Cpp\7zip\Ui\Common\LoadCodecs.cpp" />
+    <ClCompile Include="\7z1604\CPP\7zip\UI\FileManager\MessagesDialog.cpp" />
+    <ClCompile Include="\7z1604\CPP\7zip\UI\Common\OpenArchive.cpp" />
+    <ClCompile Include="\7z1604\CPP\7zip\UI\FileManager\OpenCallback.cpp" />
+    <ClCompile Include="\7z1604\CPP\7zip\UI\FileManager\OverwriteDialog.cpp" />
+    <ClCompile Include="\7z1604\CPP\7zip\UI\FileManager\PasswordDialog.cpp" />
+    <ClCompile Include="\7z1604\CPP\7zip\UI\FileManager\ProgramLocation.cpp" />
+    <ClCompile Include="\7z1604\CPP\7zip\UI\FileManager\ProgressDialog2.cpp" />
+    <ClCompile Include="\7z1604\CPP\7zip\UI\FileManager\PropertyName.cpp" />
+    <ClCompile Include="\7z1604\CPP\7zip\Common\ProgressUtils.cpp" />
+    <ClCompile Include="\7z1604\CPP\7zip\Common\PropId.cpp" />
+    <ClCompile Include="\7z1604\CPP\7zip\Common\StreamUtils.cpp" />
+    <ClCompile Include="\7z1604\CPP\7zip\Compress\CopyCoder.cpp" />
+    <ClCompile Include="\7z1604\CPP\7zip\UI\Common\UpdateCallback.cpp" />
+    <ClCompile Include="\7z1604\CPP\7zip\UI\GUI\UpdateCallbackGUI.cpp" />
+    <ClCompile Include="\7z1604\CPP\7zip\UI\GUI\UpdateCallbackGUI2.cpp" />
+    <ClCompile Include="\7z1604\CPP\Windows\Window.cpp" />
+    <ClCompile Include="\7z1604\CPP\7zip\Ui\Common\ExtractingFilePath.cpp" />
+    <ClCompile Include="\7z1604\CPP\7zip\UI\Common\PropIDUTils.cpp" />
+    <ClCompile Include="\7z1604\CPP\7zip\UI\Common\SetProperties.cpp" />
+    <ClCompile Include="\7z1604\CPP\Windows\FileDir.cpp" />
+    <ClCompile Include="\7z1604\CPP\Windows\FileFind.cpp" />
+    <ClCompile Include="\7z1604\CPP\Windows\FileName.cpp" />
+    <ClCompile Include="\7z1604\CPP\7zip\Common\FilePathAutoRename.cpp" />
+    <ClCompile Include="\7z1604\CPP\7zip\Common\LimitedStreams.cpp" />
+    <ClCompile Include="\7z1604\CPP\7zip\Common\StreamObjects.cpp" />
+    <ClCompile Include="\7z1604\CPP\Common\MyVector.cpp" />
+    <ClCompile Include="\7z1604\CPP\Common\Wildcard.cpp" />
+    <ClCompile Include="\7z1604\C\7zCrc.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -340,7 +340,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="\7z1602\C\7zCrcOpt.c">
+    <ClCompile Include="\7z1604\C\7zCrcOpt.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -350,7 +350,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="\7z1602\C\Alloc.c">
+    <ClCompile Include="\7z1604\C\Alloc.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -360,7 +360,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="\7z1602\C\CpuArch.c">
+    <ClCompile Include="\7z1604\C\CpuArch.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -370,7 +370,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="\7z1602\C\Threads.c">
+    <ClCompile Include="\7z1604\C\Threads.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -382,10 +382,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="\7z1602\CPP\7zip\Ui\Gui\resource.rc" />
+    <ResourceCompile Include="\7z1604\CPP\7zip\Ui\Gui\resource.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Manifest Include="\7z1602\CPP\7zip\Ui\Gui\7zG.exe.manifest" />
+    <Manifest Include="\7z1604\CPP\7zip\Ui\Gui\7zG.exe.manifest" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
