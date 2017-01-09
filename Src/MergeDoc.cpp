@@ -2298,8 +2298,8 @@ void CChildFrame::WriteReport(UniStdioFile &file)
 		_T("<tbody>\n"),
 		nFontSize,
 		styles.c_str(),
-		OString(CMarkdown::Entitify(m_wndFilePathBar.GetTitle(0).c_str())).W,
-		OString(CMarkdown::Entitify(m_wndFilePathBar.GetTitle(1).c_str())).W);
+		paths_UndoMagic(OString(CMarkdown::Entitify(m_wndFilePathBar.GetTitle(0).c_str())).W),
+		paths_UndoMagic(OString(CMarkdown::Entitify(m_wndFilePathBar.GetTitle(1).c_str())).W));
 	file.WriteString(header);
 	// write the body of the report
 	int nLineCount[2] = { m_ptBuf[0]->GetLineCount(), m_ptBuf[1]->GetLineCount() };
@@ -2353,7 +2353,8 @@ HRESULT CChildFrame::GetFilePath(long nSide, BSTR *pbsPath)
 {
 	if (nSide < 0 || nSide > 1)
 		return E_INVALIDARG;
-	if (!SysReAllocString(pbsPath, m_wndFilePathBar.GetTitle(nSide).c_str()))
+	LPTSTR path = paths_UndoMagic(wcsdupa(m_wndFilePathBar.GetTitle(nSide).c_str()));
+	if (!SysReAllocString(pbsPath, path))
 		return E_OUTOFMEMORY;
 	return S_OK;
 }
