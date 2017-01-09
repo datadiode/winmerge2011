@@ -257,6 +257,14 @@ HRESULT CMainFrame::FindBehavior(BSTR bstrBehavior, BSTR bstrBehaviorUrl, IEleme
 			return S_OK;
 		}
 	}
+	if (EatPrefix(bstrBehaviorUrl, L"{"))
+	{
+		CLSID uuid;
+		if (SUCCEEDED(CLSIDFromString(bstrBehaviorUrl, &uuid)))
+		{
+			return CoCreateInstance(uuid, NULL, CLSCTX_INPROC, IID_IElementBehavior, (void **)ppBehavior);
+		}
+	}
 	return E_INVALIDARG;
 }
 
