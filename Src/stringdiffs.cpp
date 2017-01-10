@@ -43,15 +43,22 @@ void sd_ComputeWordDiffs(const String & str1, const String & str2,
 	bool case_sensitive, int whitespace, int breakType, bool byte_level,
 	vector<wdiff> &diffs)
 {
-	stringdiffs sdiffs(str1, str2, case_sensitive, whitespace, breakType, diffs);
-	// Hash all words in both lines and then compare them word by word
-	// storing differences into m_wdiffs
-	sdiffs.BuildWordDiffList();
-	// Now copy m_wdiffs into caller-supplied m_pDiffs (coalescing adjacents if possible)
-	sdiffs.PopulateDiffs();
-	// Adjust the range of the word diff down to byte (char) level.
-	if (byte_level)
-		wordLevelToByteLevel(diffs, str1, str2, case_sensitive, whitespace);
+	if (!str1.empty() && str2.empty())
+		diffs.push_back(wdiff(0, static_cast<int>(str1.length()), 0, 0));
+	else if (str1.empty() && !str2.empty())
+		diffs.push_back(wdiff(0, 0, 0, static_cast<int>(str2.length())));
+	else
+	{
+		stringdiffs sdiffs(str1, str2, case_sensitive, whitespace, breakType, diffs);
+		// Hash all words in both lines and then compare them word by word
+		// storing differences into m_wdiffs
+		sdiffs.BuildWordDiffList();
+		// Now copy m_wdiffs into caller-supplied m_pDiffs (coalescing adjacents if possible)
+		sdiffs.PopulateDiffs();
+		// Adjust the range of the word diff down to byte (char) level.
+		if (byte_level)
+			wordLevelToByteLevel(diffs, str1, str2, case_sensitive, whitespace);
+	}
 }
 
 /**
