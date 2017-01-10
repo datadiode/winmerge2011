@@ -65,6 +65,7 @@ public:
 	STDMETHOD(get_Strings)(IDispatch **ppDispatch);
 	STDMETHOD(ShowHTMLDialog)(LPCOLESTR url, VARIANT *arguments, BSTR features, VARIANT *ret);
 	STDMETHOD(ParseCmdLine)(BSTR cmdline, BSTR directory);
+	STDMETHOD(StayModal)();
 
 // Attributes
 public:

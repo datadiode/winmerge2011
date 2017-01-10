@@ -280,17 +280,15 @@ HRESULT CMainFrame::put_StatusText(BSTR bsStatusText)
 			static_cast<LPCTSTR>(LanguageSelect.Format(IDS_ELAPSED_TIME, elapsed)));
 		pWnd->SetWindowText(text.c_str());
 	}
-	if (::GetAsyncKeyState(VK_PAUSE) & 0x8001)
+	// Trigger abortion only if window is in foreground, or processing of
+	// outstanding messages takes the effect of moving it to foreground.
+	MSG msg;
+	while (::PeekMessage(&msg, pWndOwner->m_hWnd, 0, 0, PM_REMOVE))
 	{
-		// Trigger abortion only if window is in foreground, or processing of
-		// outstanding messages takes the effect of moving it to foreground.
-		while (pWndOwner != HWindow::GetForegroundWindow())
-		{
-			MSG msg;
-			if (!::PeekMessage(&msg, pWndOwner->m_hWnd, 0, 0, PM_REMOVE))
-				return S_OK;
-			::DispatchMessage(&msg);
-		}
+		::DispatchMessage(&msg);
+	}
+	if ((::GetAsyncKeyState(VK_PAUSE) & 0x8001) && (pWndOwner == HWindow::GetForegroundWindow()))
+	{
 		return E_ABORT;
 	}
 	return S_OK;
@@ -340,7 +338,10 @@ HRESULT CMainFrame::ShowHTMLDialog(LPCOLESTR url, VARIANT *arguments, BSTR featu
 		flags = HTMLDLG_MODELESS | HTMLDLG_VERIFY;
 	else if (EatPrefix(url, L"print_template:"))
 		flags = HTMLDLG_MODAL | HTMLDLG_VERIFY | HTMLDLG_PRINT_TEMPLATE;
-	return MSHTML->ShowHTMLDialogEx(m_hWnd, spMoniker, flags, arguments, features, ret);
+	hr = MSHTML->ShowHTMLDialogEx(m_hWnd, spMoniker, flags, arguments, features, ret);
+	// Compensate for StayModal()
+	EnableWindow(TRUE);
+	return hr;
 }
 
 /**
@@ -361,6 +362,13 @@ HRESULT CMainFrame::ParseCmdLine(BSTR cmdline, BSTR directory)
 	if (SysStringLen(cmdline) != 0)
 		ParseArgsAndDoOpen(cmdline);
 	SetCurrentDirectory(strRestoreDir.c_str());
+	return S_OK;
+}
+
+HRESULT CMainFrame::StayModal()
+{
+	// Prevent interference from user actions during print
+	EnableWindow(FALSE);
 	return S_OK;
 }
 
@@ -3875,6 +3883,11 @@ LRESULT CMainFrame::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		return 0;
 	case WM_APP_ConsoleCtrlHandler:
 		KillConsoleWindow();
+		break;
+	case WM_ENABLE:
+		// Play as nice as possible with the StayModal() thing
+		if (wParam != FALSE)
+			SetForegroundWindow();
 		break;
 	}
 	return ::DefFrameProc(m_hWnd, m_pWndMDIClient->m_hWnd, uMsg, wParam, lParam);

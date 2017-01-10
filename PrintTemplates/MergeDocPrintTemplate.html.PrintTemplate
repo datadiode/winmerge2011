@@ -29,7 +29,6 @@ SOFTWARE.
 <!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN' 'http://www.w3.org/TR/html4/loose.dtd'>
 <HTML XMLNS:IE>
 <HEAD>
-<?IMPORT namespace='ie' implementation='#default'?>
 <META http-equiv='MSThemeCompatible' content='yes'>
 <STYLE type='text/css'>
 BODY
@@ -49,7 +48,7 @@ SELECT
 	margin-left: 0.5ex;
 	margin-right: 0.5ex;
 }
-TABLE, IFRAME
+IFRAME
 {
 	width: 100%;
 	height: 100%;
@@ -84,9 +83,14 @@ TABLE, IFRAME
 {
 	width: 100%;
 	height: 100%;
-	overflow: auto;
+	overflow-x: auto;
+	overflow-y: scroll;
 	background: teal;
-	padding: 4;
+}
+#container
+{
+	zoom: 100%;
+	margin: 4;
 }
 </STYLE>
 
@@ -162,6 +166,8 @@ function Navigate(direction)
 
 	var body = cf.document.body;
 	var table = body.children[0];
+	
+	table.runtimeStyle.zoom = ContentZoom.options(ContentZoom.selectedIndex).innerHTML;
 
 	with (table.rows[0])
 	{
@@ -230,10 +236,14 @@ function OnLoadBody()
 	PageZoom.previousSibling.nodeValue = script.Strings.PAGE_ZOOM;
 	ContentZoom.previousSibling.nodeValue = script.Strings.CONTENT_ZOOM;
 
+	// Attach and initialize the TemplatePrinter behavior
+	tp.addBehavior("{3050f6b3-98b5-11cf-bb82-00aa00bdce0b}", dialogArguments);
 	tp.orientation = "landscape";
 	tp.currentPageAvail = true;
 	tp.selectionEnabled = false;
 
+	// Attach and initialize the HeaderFooter behavior
+	hf.addBehavior("{3050f6cd-98b5-11cf-bb82-00aa00bdce0b}", dialogArguments);
 	hf.textHead = "&w&b&p";
 	hf.textFoot = "&u&b&d";
 	hf.url = "";
@@ -247,7 +257,11 @@ function OnLoadBody()
 
 function DoPrint()
 {
+	// https://answers.microsoft.com/en-us/ie/forum/ie9-windows_7/ie9-stops-showing-print-preview-after-printing/b3a539d4-7a43-4e16-b0b1-c806628c57cf
+	// In IE9+ they changed the behavior of startDoc() in that it destroys the print preview dialog, while still leaving the DHTML window object intact.
+	// Therefore, close() the window when finished to fix the situation.
 	tp.startDoc("WinMergePrintDoc");
+	script.StayModal(); // prevents interference from user actions
 	if (tp.currentPage)
 	{
 		tp.printPage(devicerect);
@@ -258,33 +272,29 @@ function DoPrint()
 		while (Navigate(direction))
 		{
 			tp.printPage(devicerect);
-			direction = 1;
+			direction = -1;
 		}
 	}
 	tp.stopDoc();
+	window.close(); // as explained above
 }
 
 function OnChangePageZoom()
 {
-	container.style.zoom = PageZoom.options(PageZoom.selectedIndex).innerHTML;
-}
-
-function OnChangeContentZoom()
-{
-	var zoom = ContentZoom.options(ContentZoom.selectedIndex).innerHTML;
-	cf.frameElement.runtimeStyle.zoom = zoom;
-	Navigate(0);
+	container.runtimeStyle.zoom = PageZoom.options(PageZoom.selectedIndex).innerHTML;
 }
 
 function OnClickPageSetup()
 {
 	var orientation = tp.orientation;
 	// Work around landscape option being disabled if not selected by default.
+	tp.orientation = "landscape";
 	tp.header = hf.textHead;
 	tp.footer = hf.textFoot;
-	tp.orientation = "landscape";
 	if (tp.showPageSetupDialog())
 	{
+		hf.textHead = tp.header;
+		hf.textFoot = tp.footer;
 		Navigate(0);
 	}
 	else
@@ -297,9 +307,9 @@ function OnClickPrint()
 {
 	tp.pageFrom = 1;
 	tp.pageTo = hf.pageTotal;
-    if (tp.showPrintDialog())
+	if (tp.showPrintDialog())
 	{
-        DoPrint();
+		DoPrint();
 	}
 }
 
@@ -335,7 +345,7 @@ document.onkeydown = function()
 		window.event.returnValue = false;
 		break;
 	case 34:
-		NextPage(1);
+		NextPage();
 		window.event.returnValue = false;
 		break;
 	case 36:
@@ -377,7 +387,7 @@ document.onkeydown = function()
 			<OPTION>200%</OPTION>
 		</SELECT>
 		Content Zoom:
-		<SELECT id='ContentZoom' onchange='OnChangeContentZoom()'>
+		<SELECT id='ContentZoom' onchange='FirstPage()'>
 			<OPTION>10%</OPTION>
 			<OPTION>20%</OPTION>
 			<OPTION>30%</OPTION>
@@ -400,17 +410,13 @@ document.onkeydown = function()
 		<BUTTON onclick='window.close()' style='position: absolute; right: 0;'>&times;</BUTTON>
 	</DIV>
 	<DIV id='workspace'>
-		<TABLE cellspacing='0' cellpadding='0'>
-			<TR>
-				<TD id='container' align='center' valign='middle'>
-					<IE:DEVICERECT id='devicerect' media='print'>
-						<DIV id='header'></DIV>
-						<IFRAME disabled id='cf' frameborder='0' src='about:blank'></IFRAME>
-						<DIV id='footer'></DIV>
-					</IE:DEVICERECT>
-				</TD>
-			</TR>
-		</TABLE>
+		<DIV id='container'>
+			<IE:DEVICERECT id='devicerect' media='print'>
+				<DIV id='header'></DIV>
+				<IFRAME disabled id='cf' frameborder='0' src='about:blank'></IFRAME>
+				<DIV id='footer'></DIV>
+			</IE:DEVICERECT>
+		</DIV>
 	</DIV>
 </BODY>
 </HTML>

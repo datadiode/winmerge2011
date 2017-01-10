@@ -46,6 +46,8 @@ interface IMergeApp : IDispatch
 	HRESULT ShowHTMLDialog([in] LPCOLESTR url, [in] VARIANT *arguments, [in] BSTR features, [out, retval] VARIANT *ret);
 	[id(4), helpstring("ParseCmdLine")]
 	HRESULT ParseCmdLine([in] BSTR cmdline, [in] BSTR directory);
+	[id(5), helpstring("StayModal")]
+	HRESULT StayModal();
 };
 
 [
