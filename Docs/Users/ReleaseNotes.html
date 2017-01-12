@@ -36,7 +36,7 @@ function OnReadyStateChangeExternalDoc()
 </script>
 </head>
 <body>
-<h2>WinMerge 0.2011.005.427 Release Notes</h2>
+<h2>WinMerge 0.2011.007.025 Release Notes</h2>
 This is a beta release of WinMerge&nbsp;2011.
 <br>Besides fixing bugs, it includes the following functional enhancements as
 compared to the latest stable release:
@@ -82,7 +82,7 @@ compared to the latest stable release:
 	<br>The feature is designed to work with
 	<a target='_blank' href='https://technet.microsoft.com/en-us/sysinternals/cc817881'>Sysinternals Desktops v2.0</a>.
 	<br>It may or may not work with other tools which create (the illusion of) additional desktops.
-	<br>In particular, there is some uncertainty whether it works with the <i>Virtual Desktops</i> feature built into Windows&nbsp;10.
+	<br>In particular, it does not work with the <i>Virtual Desktops</i> feature built into Windows&nbsp;10.
 <li><p>Context menu commands <i>Open &rarr; Containing Folder</i> are
 	provided where applicable, essentially following the suggestion from
 	<a target='_blank' href='https://bitbucket.org/jtuc/winmerge2011/issues/54'>Issue #54</a>.
@@ -91,12 +91,16 @@ compared to the latest stable release:
 <li><p>The <i>Open</i> dialog allows you to specify filter masks with spaces
 	by enclosing them in quotation marks, as per 
 	<a target='_blank' href='http://forums.winmerge.org/viewtopic.php?f=4&t=1142'>this suggestion</a>.
+<li><p>Disabling the new system option <i>Use Shell file operations</i> allows the
+	Folder Compare window to perform file operations on files with long paths.
+	<br>Note, however, that this option comes at the price of losing the option to
+	<i>Send deleted files to Recycle Bin</i>.
 </ul>
 <p>
-Click <a href='https://bitbucket.org/jtuc/winmerge2011/get/0.2011.005.427.zip'>here</a> to obtain the source code for this release.
+Click <a href='https://bitbucket.org/jtuc/winmerge2011/get/0.2011.007.025.zip'>here</a> to obtain the source code for this release.
 <p>
 Click <a href='https://bitbucket.org/jtuc/frhed/get/0.10902.2013.zip'>here</a> to obtain source code for Frhed binaries included in this release.
 <p>
-<i>Jochen Neubeck, October 2015</i>
+<i>Jochen Neubeck, January 2017</i>
 <xml src='WinMerge.chm' onreadystatechange='OnReadyStateChangeExternalDoc()'></xml>
 </body>

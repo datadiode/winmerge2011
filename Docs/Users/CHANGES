@@ -1,3 +1,26 @@
+0.2011.007.025
+Changes since preceding release (not necessarily complete):
+• Issue #81 Highlight contents of added lines as in-line changes
+• Make print preview compatible with IE9+ (very outdated technology indeed)
+• MainFrm.cpp: Provide access to registered binary behaviors through CLSIDs
+• MergeDoc.cpp: Don't have long path prefixes show up in reports and printouts
+• ArchiveSupport: Upgrade to 7-Zip 16.04
+• paths.cpp: Beware that PathCompactPath() may occasionally grow a path
+• EditLib: Fix rendering of empty line at EOF when followed by ghost lines
+• Issue #102 The /x command line option misbehaves when used with folder compare
+• H2O2: Allow for subclassing dialog items through an owner-provided method
+• Support long paths for copy/move/delete by not using Shell file operations
+• DirView: Fix crash on deleting a unique nonempty folder in flat recursive view
+• Copy/Move to... was creating bogus folders when ignoring folder structure
+• Issue #96 Disable SelfCompare by default - wastes time for arguable benefit
+• CMainFrame::SetActiveMenu(): Allow window menu to not be in 2nd last position
+• DirCompProgressDlg: Filename fields did not update while awaiting first result
+• MessageBoxDialog: Make lengthy text scrollable / Support highlighted arguments
+• HexMergeFrm.cpp: A memory leak could occur when hekseditU.dll was not in place
+• Provide CLanguageSelect::FormatStrings() to defeat FormatMessage()'s 32K limit
+• ConfigLog: Win10's GetVersionEx() lies so rather read OS version from registry
+• New options to tweak shell extension behavior w/r/t recursive folder compare
+
 0.2011.005.427
 Changes since preceding release (not necessarily complete):
 • Add an option to maintain settings in a desktop specific location
