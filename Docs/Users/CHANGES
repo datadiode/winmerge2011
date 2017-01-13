@@ -1,5 +1,6 @@
 0.2011.007.025
 Changes since preceding release (not necessarily complete):
+• File transform scriptlet to format source code using Artistic Style (astyle)
 • Issue #81 Highlight contents of added lines as in-line changes
 • Make print preview compatible with IE9+ (very outdated technology indeed)
 • MainFrm.cpp: Provide access to registered binary behaviors through CLSIDs

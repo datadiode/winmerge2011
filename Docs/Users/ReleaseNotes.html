@@ -53,6 +53,11 @@ compared to the latest stable release:
 	UTF-8 input, and writes UTF-8 output, using the Scripting.FileSystemObject,
 	despite of its TextStream interface not exactly being designed to support
 	anything but ANSI or UTF-16 encoding.
+<li><p>File transform scriptlet <i>astyle.wsc</i> can be used to run several types of source code files
+	through <a target='_blank' href='http://astyle.sourceforge.net/'>Artistic Style</a>.
+	<br>It takes effect when you choose to <i>Compare As &rarr; Astyle Formatted Source Code</i>.
+	<br>The <i>FileTransforms</i> folder also contains an associated options file <i>astyle.opt</i>,
+	which you may want to edit to tweak various aspects of source code formatting to your needs.
 <li><p>Find &amp; Replace with regular expressions allows replacement strings to
 	contain submatch references \0 through \9 (where \0 refers to the complete
 	match), as well as C-style control character escapes.
