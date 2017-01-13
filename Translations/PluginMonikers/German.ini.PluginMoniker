@@ -8,6 +8,7 @@ GEDCOM = script:\FileTransforms\gedcom.wsc
 Zeilen nummeriert = script:\FileTransforms\LinesNumbered.wsc
 Zeilen sortiert = script:\FileTransforms\LinesSorted.wsc
 XML sortiert = script:\FileTransforms\msxml.wsc?transform='\FileTransforms\msxml-sort.xslt'
+Astyle-formatierter Quellcode = script:\FileTransforms\astyle.wsc?optfile='\FileTransforms\astyle.opt'
 Aus Dateiendung ableiten = mapping:%SupplementFolder%\Supplement.ini?FileTransforms
 
 [EditorScripts.Menu]

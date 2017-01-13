@@ -1,0 +1,37 @@
+<scriptlet>
+
+<implements type='automation'>
+	<method name='OpenTextFile'/>
+	<property name='ShowConsole'/>
+	<property name='ReadOnly'/>
+	<property name='Arguments'/>
+</implements>
+
+<script language='vbs'>
+Option Explicit
+
+Const ShowConsole = 0
+Const ReadOnly = False
+
+Dim sh, fs
+Set sh = CreateObject("WScript.Shell")
+Set fs = CreateObject("Scripting.FileSystemObject")
+
+Function OpenTextFile(path)
+	Dim astyle, options, optfile
+	Execute Arguments
+	Select Case LCase(fs.GetExtensionName(path))
+	Case "cs"
+		options = options & " --mode=cs"
+	Case "java"
+		options = options & " --mode=java"
+	End Select
+	If Not IsEmpty(optfile) Then
+		options = options & " --options=""" & optfile & """"
+	End If
+	Set astyle = sh.Exec("""astyle.exe""" & options)
+	astyle.StdIn.Write fs.OpenTextFile(path).ReadAll
+	Set OpenTextFile = astyle.StdOut
+End Function
+</script>
+</scriptlet>

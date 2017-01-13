@@ -1485,6 +1485,15 @@
     </PrintTemplate>
   </ItemGroup>
   <ItemGroup>
+    <FileTransform Include="..\FileTransforms\astyle.opt.FileTransform">
+      <Filter>File Transforms</Filter>
+    </FileTransform>
+    <FileTransform Include="..\FileTransforms\astyle.wsc.FileTransform">
+      <Filter>File Transforms</Filter>
+    </FileTransform>
+    <FileTransform Include="..\FileTransforms\gedcom.wsc.FileTransform">
+      <Filter>File Transforms</Filter>
+    </FileTransform>
     <FileTransform Include="..\FileTransforms\LinesNumbered.wsc.FileTransform">
       <Filter>File Transforms</Filter>
     </FileTransform>
@@ -1501,9 +1510,6 @@
       <Filter>File Transforms</Filter>
     </FileTransform>
     <FileTransform Include="..\FileTransforms\xdoc2txt.wsc.FileTransform">
-      <Filter>File Transforms</Filter>
-    </FileTransform>
-    <FileTransform Include="..\FileTransforms\gedcom.wsc.FileTransform">
       <Filter>File Transforms</Filter>
     </FileTransform>
   </ItemGroup>

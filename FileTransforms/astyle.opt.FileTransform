@@ -1,0 +1,5 @@
+--style=allman
+--pad-oper
+--unpad-paren
+--align-pointer=name
+--align-reference=name

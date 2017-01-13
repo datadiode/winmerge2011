@@ -8,6 +8,7 @@ GEDCOM = script:\FileTransforms\gedcom.wsc
 Lines Numbered = script:\FileTransforms\LinesNumbered.wsc
 Lines Sorted = script:\FileTransforms\LinesSorted.wsc
 XML Sorted = script:\FileTransforms\msxml.wsc?transform='\FileTransforms\msxml-sort.xslt'
+Astyle Formatted Source Code = script:\FileTransforms\astyle.wsc?optfile='\FileTransforms\astyle.opt'
 Tell from filename extension = mapping:%SupplementFolder%\Supplement.ini?FileTransforms
 
 [EditorScripts.Menu]

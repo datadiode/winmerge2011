@@ -1053,6 +1053,8 @@
     <PrintTemplate Include="..\PrintTemplates\MergeDocPrintTemplate.html.PrintTemplate" />
   </ItemGroup>
   <ItemGroup>
+    <FileTransform Include="..\FileTransforms\astyle.opt.FileTransform" />
+    <FileTransform Include="..\FileTransforms\astyle.wsc.FileTransform" />
     <FileTransform Include="..\FileTransforms\gedcom.wsc.FileTransform" />
     <FileTransform Include="..\FileTransforms\LinesNumbered.wsc.FileTransform" />
     <FileTransform Include="..\FileTransforms\LinesSorted.wsc.FileTransform" />
