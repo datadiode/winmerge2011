@@ -139,13 +139,10 @@ void CChildFrame::Computelinediff(CCrystalTextView *pView1, CCrystalTextView *pV
 	vector<wdiff> worddiffs;
 	int breakType = GetBreakType();
 	sd_ComputeWordDiffs(str1, str2, casitive, xwhite, breakType, difflvl == BYTEDIFF, worddiffs);
-	//Add a diff in case of EOL difference
-	if (!m_diffWrapper.bIgnoreEol)
+	// Add a diff in case of EOL difference
+	if (!m_diffWrapper.bIgnoreEol && IsLineMixedEOL(line))
 	{
-		if (_tcscmp(pView1->GetTextBufferEol(line), pView2->GetTextBufferEol(line)))
-		{
-			worddiffs.push_back(wdiff(width1, width1, width2, width2));
-		}
+		worddiffs.push_back(wdiff(width1, width1, width2, width2));
 	}
 	if (worddiffs.empty())
 	{
@@ -251,12 +248,16 @@ void CChildFrame::GetWordDiffArray(int nLineIndex, vector<wdiff> &worddiffs) con
 
 	// Make the call to stringdiffs, which does all the hard & tedious computations
 	sd_ComputeWordDiffs(str1, str2, casitive, xwhite, breakType, byteColoring, worddiffs);
-	//Add a diff in case of EOL difference
-	if (!m_diffWrapper.bIgnoreEol)
+	// Add a diff in case of EOL difference
+	if (!m_diffWrapper.bIgnoreEol && IsLineMixedEOL(nLineIndex))
 	{
-		if (_tcscmp(m_pView[0]->GetTextBufferEol(nLineIndex), m_pView[1]->GetTextBufferEol(nLineIndex)))
-		{
-			worddiffs.push_back(wdiff(i1, i1, i2, i2));
-		}
+		worddiffs.push_back(wdiff(i1, i1, i2, i2));
 	}
+}
+
+bool CChildFrame::IsLineMixedEOL(int nLineIndex) const
+{
+	LPCTSTR p = m_pView[0]->GetTextBufferEol(nLineIndex);
+	LPCTSTR q = m_pView[1]->GetTextBufferEol(nLineIndex);
+	return *p != _T('\0') && *q != _T('\0') && _tcscmp(p, q) != 0;
 }

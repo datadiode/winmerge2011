@@ -208,6 +208,7 @@ private:
 	typedef enum { BYTEDIFF, WORDDIFF } DIFFLEVEL;
 	void Showlinediff(CCrystalTextView *, CMergeEditView *, DIFFLEVEL);
 	void Computelinediff(CCrystalTextView *, CCrystalTextView *, int, RECT &, RECT &, DIFFLEVEL);
+	bool IsLineMixedEOL(int nLineIndex) const;
 // End MergeDocLineDiffs.cpp
 
 // Implementation in MergeDocEncoding.cpp
