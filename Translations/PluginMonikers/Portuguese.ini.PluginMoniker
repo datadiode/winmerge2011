@@ -8,8 +8,8 @@ GEDCOM = script:\FileTransforms\gedcom.wsc
 Linhas Numeradas = script:\FileTransforms\LinesNumbered.wsc
 Linhas Ordenadas = script:\FileTransforms\LinesSorted.wsc
 XML Ordenado = script:\FileTransforms\msxml.wsc?transform='\FileTransforms\msxml-sort.xslt'
-Astyle Formatted Source Code = script:\FileTransforms\astyle.wsc?optfile='\FileTransforms\astyle.opt'
-Tell from filename extension = mapping:%SupplementFolder%\Supplement.ini?FileTransforms
+Astyle Código Fonte Formatado = script:\FileTransforms\astyle.wsc?optfile='\FileTransforms\astyle.opt'
+Diga a partir da extensão do ficheiro = mapping:%SupplementFolder%\Supplement.ini?FileTransforms
 
 [EditorScripts.Menu]
 Converter selecção para Maiúsculas = MakeUpper@script:\EditorScripts\Basic.wsc
@@ -19,5 +19,5 @@ Inserir Data = InsertDate@script:\EditorScripts\Basic.wsc
 Inserir Hora = InsertTime@script:\EditorScripts\Basic.wsc
 Ordenar Linhas: Crescente = SortLinesAscending@script:\EditorScripts\SortLines.wsc
 Ordenar Linhas: Decrescente = SortLinesDescending@script:\EditorScripts\SortLines.wsc
-Tabular Selecção = Tabify@script:\EditorScripts\Tabify.wsc
-Destabular Selecção = Untabify@script:\EditorScripts\Tabify.wsc
+Inserir Tabulação = Tabify@script:\EditorScripts\Tabify.wsc
+Remover Tabulação = Untabify@script:\EditorScripts\Tabify.wsc
