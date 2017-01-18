@@ -3,7 +3,7 @@
 #
 # Translators:
 # * Nelson Simão
-# Updated 2012-01-23
+# Updated 2017-01-16
 # * David Cunha
 #
 # ID line follows -- this is updated by SVN
@@ -14,7 +14,7 @@ msgstr ""
 "Project-Id-Version: WinMerge\n"
 "Report-Msgid-Bugs-To: http://bugs.winmerge.org/\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2015-07-27 12:00\n"
+"PO-Revision-Date: 2017-01-16 12:00\n"
 "Last-Translator: David Cunha\n"
 "Language-Team: Portuguese <winmerge-translate@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
@@ -685,7 +685,7 @@ msgstr "C&opiar tudo para a esquerda"
 #: Merge.rc:281
 #, c-format
 msgid "Use &desktop specific settings"
-msgstr ""
+msgstr "Usar configurações específicas do ambiente de trabalho"
 
 #: Merge.rc:369
 #, c-format
@@ -2015,7 +2015,7 @@ msgstr "Estado:"
 #: Merge.rc:1103
 #, c-format
 msgid "SQL Query Parameters"
-msgstr ""
+msgstr "Parâmetros do SQL Query"
 
 #: Merge.rc:1110
 #, c-format
@@ -2698,12 +2698,12 @@ msgstr "Adicionar &Shell ao menu de contexto"
 #: Merge.rc:1511
 #, c-format
 msgid "File compare"
-msgstr ""
+msgstr "Comparação de ficheiros"
 
 #: Merge.rc:1512
 #, c-format
 msgid "Add S&hell menu to context menu"
-msgstr ""
+msgstr "Adicionar menu Shell ao menu de contexto"
 
 #: Merge.rc:1520
 #, c-format
@@ -2713,7 +2713,7 @@ msgstr "Sistema"
 #: Merge.rc:1523
 #, c-format
 msgid "Use S&hell file operations"
-msgstr ""
+msgstr "Usar operações de ficheiro do shell"
 
 #: Merge.rc:1524
 #, c-format
@@ -3146,12 +3146,12 @@ msgstr "Redimensionar painéis automaticamente\nBloquear painéis"
 #: Merge.rc:1703
 #, c-format
 msgid "\nFileCompare\n\n\n\nWinMerge.FileCompare\nWinMerge File Compare"
-msgstr ""
+msgstr "\nFileCompare\n\n\n\nWinMerge.FileCompare\nComparação de Ficheiros do WinMerge"
 
 #: Merge.rc:1704
 #, c-format
 msgid "\nFolderCompare\n\n\n\nWinMerge.FolderCompare\nWinMerge Folder Compare"
-msgstr ""
+msgstr "\nFolderCompare\n\n\n\nWinMerge.FolderCompare\nComparação de Pastas do WinMerge"
 
 #: Merge.rc:1705
 #, c-format
@@ -3437,7 +3437,7 @@ msgstr "&Caminho para o SS.EXE:"
 #: Merge.rc:1770
 #, c-format
 msgid "&Path to TF.EXE:"
-msgstr ""
+msgstr "Caminho para o TF.EXE:"
 
 #: Merge.rc:1771
 #, c-format
@@ -3632,22 +3632,22 @@ msgstr "Ficheiro não extraído: %1"
 #: Merge.rc:1809
 #, c-format
 msgid "Cannot move file\n%1\nto\n%2\n\n%3"
-msgstr ""
+msgstr "Impossível mover o ficheiro\n%1\nto\n%2\n\n%3"
 
 #: Merge.rc:1810
 #, c-format
 msgid "Cannot copy file\n%1\nto\n%2\n\n%3"
-msgstr ""
+msgstr "Impossível copiar o ficheiro\n%1\nto\n%2\n\n%3"
 
 #: Merge.rc:1811
 #, c-format
 msgid "Cannot delete file\n%1\n\n%3"
-msgstr ""
+msgstr "Impossível eliminar o ficheiro\n%1\n\n%3"
 
 #: Merge.rc:1812
 #, c-format
 msgid "Cannot open file\n%1\n\n%2"
-msgstr "Impossível abrir ficheiro\n%1\n\n%2"
+msgstr "Impossível abrir o ficheiro\n%1\n\n%2"
 
 #: Merge.rc:1813
 #, c-format
@@ -3662,27 +3662,27 @@ msgstr "O ficheiro\n%1\nnão é um ficheiro em conflito."
 #: Merge.rc:1815
 #, c-format
 msgid "The target path\n%2\nrefers to an already existing file.\n\nAre you ready to lose this file?"
-msgstr ""
+msgstr "O caminho de destino\n%2\refere-se a um ficheiro já existente.\n\nConfirma a perda desse ficheiro?"
 
 #: Merge.rc:1816
 #, c-format
 msgid "The target path\n%2\nrefers to an already existing read-only or hidden file.\n\nAre you ready to lose this file despite its protective attributes?"
-msgstr ""
+msgstr "O caminho de destino\n%2\refere-se a um ficheiro, só de leitura ou oculto, já existente.\n\nConfirma a perda desse ficheiro apesar de seus atributos de proteção?"
 
 #: Merge.rc:1817
 #, c-format
 msgid "The target path\n%2\nrefers to an already existing empty folder.\n\nAre you ready to lose this folder?"
-msgstr ""
+msgstr "O caminho de destino\n%2\refere-se a uma pasta vazia já existente.\n\nConfirma a perda dessa pasta?"
 
 #: Merge.rc:1818
 #, c-format
 msgid "The target path\n%2\nrefers to an already existing nonempty folder.\n\nAre you ready to lose this folder and all its contents?"
-msgstr ""
+msgstr "O caminho de destino\n%2\refere-se a uma pasta não vazia já existente.\n\nConfirma a perda dessa pasta e todo o seu conteúdo?"
 
 #: Merge.rc:1819
 #, c-format
 msgid "Click Continue only if you are sure that you want to irreversibly delete the selected items, including the contents of involved folders!"
-msgstr ""
+msgstr "Clique em Continuar apenas se tiver a certeza de que deseja excluir irreversivelmente os itens seleccionados, incluindo o conteúdo das pastas envolvidas!"
 
 #: Merge.rc:1820
 #, c-format
@@ -3697,7 +3697,7 @@ msgstr "Guardar alterações em %1?"
 #: Merge.rc:1822
 #, c-format
 msgid "%1\nis marked read-only. Would you like to override the read-only file? (No to save as new filename.)"
-msgstr "%1\né apenas de leitura. Deseja substituir o ficheiro apenas de leitra? (Não, para guardar com novo nome.)"
+msgstr "%1\né só de leitura. Deseja substituir o ficheiro só de leitura? (Não, para guardar com novo nome.)"
 
 #: Merge.rc:1823
 #, c-format
@@ -4000,7 +4000,7 @@ msgstr "Formato de arquivo desconhecido"
 #: Merge.rc:1886
 #, c-format
 msgid "%1:\n\nCan't store as \"%2\""
-msgstr ""
+msgstr "%1:\n\nNão é possível armazenar como \"%2\""
 
 #: Merge.rc:1887
 #, c-format
@@ -4375,12 +4375,12 @@ msgstr "Lista separada por vírgulas"
 #: Merge.rc:1966
 #, c-format
 msgid "Semicolon-separated list"
-msgstr ""
+msgstr "Lista separada por ponto e vírgula"
 
 #: Merge.rc:1967
 #, c-format
 msgid "Tab-separated list"
-msgstr "Lista separada por tabulações"
+msgstr "Lista separada por tabulação"
 
 #: Merge.rc:1968
 #, c-format
