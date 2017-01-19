@@ -927,9 +927,17 @@ String CLanguageSelect::LoadString(UINT id) const
 	{
 		HINSTANCE hinst = m_hCurrentDll ? m_hCurrentDll : GetModuleHandle(NULL);
 		TCHAR text[1024];
-		::LoadString(hinst, id, text, _countof(text));
-		if (!TranslateString(text, s))
-			s = text;
+		if (::LoadString(hinst, id, text, _countof(text)))
+		{
+			if (!TranslateString(text, s))
+				s = text;
+		}
+		else
+		{
+			// Fail silently in case some window happens to capture mouse input,
+			// to cope with menu items going without status bar texts.
+			ASSERT(::GetCapture() != NULL);
+		}
 	}
 	return s;
 }
