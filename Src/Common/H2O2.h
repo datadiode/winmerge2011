@@ -167,6 +167,7 @@ namespace H2O
 		HWindow *SubclassDlgItem()
 		{
 			HWindow *const pWnd = GetDlgItem(id);
+			assert(pWnd != NULL);
 			::SetWindowLongPtr(pWnd->m_hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 			WNDPROC pfnSubclass = OException::WndProc<ExplorerDlg, id, 0, MemberWndProc>;
 			OException::SuperWndProc<T, id>() = reinterpret_cast<WNDPROC>(
