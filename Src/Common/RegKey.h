@@ -46,6 +46,18 @@ public:
 		}
 	};
 	typedef Blob<MAX_PATH * sizeof(TCHAR)> MaxPath;
+	struct StringRef : BLOB
+	{
+		StringRef(LPTSTR val, UINT len)
+		{
+			cbSize = len * sizeof *val;
+			pBlobData = reinterpret_cast<BYTE *>(val);
+		}
+		operator BLOB *()
+		{
+			return this;
+		}
+	};
 	LPCTSTR ReadString(LPCTSTR pszKey, LPCTSTR defval, BLOB * = MaxPath()) const;
 
 	LONG DeleteValue(LPCTSTR pszKey) const;
