@@ -150,7 +150,7 @@ BOOL CFloatState::Float(WINDOWPOS *pParam)
 						wp.rcNormalPosition.top = wp.ptMinPosition.y + MulDiv(cyPull, rect.top, 250);
 						wp.rcNormalPosition.bottom = wp.ptMaxPosition.y + MulDiv(cyPull, rect.bottom, 250);
 					}
-					if (!::EqualRect(&rcNormalPosition, &wp.rcNormalPosition))
+					if (wp.flags || !::EqualRect(&rcNormalPosition, &wp.rcNormalPosition))
 					{
 						pParam->flags |= SWP_NOCOPYBITS;
 						if ((::GetWindowLong(hwndInner, GWL_STYLE) & WS_VISIBLE) == 0)
