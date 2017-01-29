@@ -1249,18 +1249,11 @@ namespace H2O
 			return (int)::SendMessage(m_hWnd, LB_GETHORIZONTALEXTENT,	0, 0);
 		}
 
-		DWORD GetItemData(int nIndex)
+		DWORD_PTR GetItemData(int nIndex)
 		// Returns the value associated with the specified item.
 		{
 			assert(::IsWindow(m_hWnd));
-			return (DWORD)::SendMessage(m_hWnd, LB_GETITEMDATA, nIndex, 0);
-		}
-
-		void* GetItemDataPtr(int nIndex)
-		// Returns the value associated with the specified item.
-		{
-			assert(::IsWindow(m_hWnd));
-			return (LPVOID)::SendMessage(m_hWnd, LB_GETITEMDATA, nIndex, 0);
+			return (DWORD_PTR)::SendMessage(m_hWnd, LB_GETITEMDATA, nIndex, 0);
 		}
 
 		int GetItemHeight(int nIndex)
@@ -1327,18 +1320,11 @@ namespace H2O
 			::SendMessage(m_hWnd, LB_SETHORIZONTALEXTENT, cxExtent, 0);
 		}
 
-		int SetItemData(int nIndex, DWORD dwItemData)
+		int SetItemData(int nIndex, DWORD_PTR dwItemData)
 		// Associates a value with a list box item.
 		{
 			assert(::IsWindow(m_hWnd));
 			return (int)::SendMessage(m_hWnd, LB_SETITEMDATA, nIndex, (LPARAM)dwItemData);
-		}
-
-		int SetItemDataPtr(int nIndex, void* pData)
-		// Associates a value with a list box item.
-		{
-			assert(::IsWindow(m_hWnd));
-			return SetItemData(nIndex, (DWORD)pData);
 		}
 
 		int SetItemHeight(int nIndex, UINT cyItemHeight)
@@ -1649,11 +1635,11 @@ namespace H2O
 			return (int)::SendMessage(m_hWnd, CB_GETHORIZONTALEXTENT, 0, 0);
 		}
 
-		DWORD GetItemData(int nIndex)
+		DWORD_PTR GetItemData(int nIndex)
 		// Retrieves the application-supplied value associated with the specified item in the combo box.
 		{
 			assert(::IsWindow(m_hWnd));
-			return (DWORD)::SendMessage(m_hWnd, CB_GETITEMDATA, (WPARAM)nIndex, 0);
+			return (DWORD_PTR)::SendMessage(m_hWnd, CB_GETITEMDATA, (WPARAM)nIndex, 0);
 		}
 
 		int GetItemHeight(int nIndex)
@@ -1773,7 +1759,7 @@ namespace H2O
 			::SendMessage(m_hWnd, CB_SETHORIZONTALEXTENT, (WPARAM)nExtent, 0);
 		}
 
-		int SetItemData(int nIndex, DWORD dwItemData)
+		int SetItemData(int nIndex, DWORD_PTR dwItemData)
 		// Sets the value associated with the specified item in the combo box.
 		{
 			assert(::IsWindow(m_hWnd));
