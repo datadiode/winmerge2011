@@ -40,7 +40,7 @@ public:
 	void TranslateDialog(HWND) const;
 	String LoadString(UINT) const;
 	std::wstring LoadDialogCaption(LPCTSTR lpDialogTemplateID) const;
-	HMenu *LoadMenu(UINT) const;
+	HMenu *LoadMenu(UINT, bool modeless = false) const;
 	HINSTANCE FindResourceHandle(LPCTSTR id, LPCTSTR type) const;
 	HACCEL LoadAccelerators(UINT) const;
 	HICON LoadIcon(UINT) const;

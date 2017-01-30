@@ -972,10 +972,17 @@ std::wstring CLanguageSelect::LoadDialogCaption(LPCTSTR lpDialogTemplateID) cons
 	return s;
 }
 
-HMenu *CLanguageSelect::LoadMenu(UINT id) const
+HMenu *CLanguageSelect::LoadMenu(UINT id, bool modeless) const
 {
 	HINSTANCE hinst = m_hCurrentDll ? m_hCurrentDll : GetModuleHandle(NULL);
 	HMenu *pMenu = HMenu::LoadMenu(hinst, MAKEINTRESOURCE(id));
+	// For modeless (i.e. non-popup) menues, add a disabled ownerdraw null item
+	// to receive the HBMMENU_CALLBACK which TranslateMenu() assigns to the very
+	// last menu item to yield the desired old-school visual appearance.
+	// In response to WM_MEASUREITEM, the excess item is assigned a width of 0
+	// to ensure that it will not render nor take any space.
+	if (modeless)
+		pMenu->AppendMenu(MF_OWNERDRAW | MF_DISABLED);
 	TranslateMenu(pMenu);
 	theApp.m_pMainWnd->SetBitmaps(pMenu);
 	return pMenu;

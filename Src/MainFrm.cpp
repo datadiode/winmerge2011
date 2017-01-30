@@ -178,7 +178,7 @@ CMainFrame::CMainFrame(HWindow *pWnd, const MergeCmdLineInfo &cmdInfo)
 		WS_CHILD | WS_DISABLED | SS_OWNERDRAW | SS_NOTIFY, 0, 0, 0, 0, m_pWnd, 0xC002);
 
 	m_wndTabBar = HTabCtrl::Create(
-		WS_CHILD | WS_VISIBLE | TCS_FOCUSNEVER | TCS_HOTTRACK | TCS_TOOLTIPS, 0, 0, 0, 0, m_pWnd, 0xC001);
+		WS_CHILD | WS_VISIBLE | TCS_FOCUSNEVER | TCS_HOTTRACK, 0, 0, 0, 0, m_pWnd, 0xC001);
 	m_wndTabBar->SetFont(static_cast<HFont *>(HGdiObj::GetStockObject(DEFAULT_GUI_FONT)));
 	m_wndTabBar->SetImageList(imlCompareStats);
 
@@ -193,7 +193,7 @@ CMainFrame::CMainFrame(HWindow *pWnd, const MergeCmdLineInfo &cmdInfo)
 
 	InitCmdUI();
 
-	m_pMenuDefault = LanguageSelect.LoadMenu(IDR_MAINFRAME);
+	m_pMenuDefault = LanguageSelect.LoadMenu(IDR_MAINFRAME, true);
 	m_hAccelTable = LanguageSelect.LoadAccelerators(IDR_MAINFRAME);
 	SetMenu(m_pMenuDefault);
 
@@ -767,6 +767,8 @@ template<>
 LRESULT CMainFrame::OnWndMsg<WM_MEASUREITEM>(WPARAM, LPARAM lParam)
 {
 	MEASUREITEMSTRUCT *const lpmis = reinterpret_cast<MEASUREITEMSTRUCT *>(lParam);
+	if (lpmis->itemID == 0) // Excess item added by CLanguageSelect::LoadMenu()?
+		return 0;
 	if (CDirView::IsShellMenuCmdID(lpmis->itemID) || CMergeEditView::IsShellMenuCmdID(lpmis->itemID))
 	{
 		CDocFrame *const pDocFrame = GetActiveDocFrame();

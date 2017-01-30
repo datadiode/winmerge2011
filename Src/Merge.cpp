@@ -626,7 +626,7 @@ CDocFrame::CDocFrame(
 	if (InterlockedIncrement(&m_pHandleSet->m_cRef) == 1)
 	{
 		const UINT id = m_pHandleSet->m_id;
-		m_pHandleSet->m_pMenuShared = LanguageSelect.LoadMenu(id);
+		m_pHandleSet->m_pMenuShared = LanguageSelect.LoadMenu(id, true);
 		m_pHandleSet->m_hAccelShared = LanguageSelect.LoadAccelerators(id);
 	}
 }
