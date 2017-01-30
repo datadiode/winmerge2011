@@ -19,7 +19,7 @@ Set fs = CreateObject("Scripting.FileSystemObject")
 
 Function OpenTextFile(path)
 	Dim astyle, options, optfile
-	Execute Arguments
+	If Not IsEmpty(Arguments) Then Execute Arguments
 	Select Case LCase(fs.GetExtensionName(path))
 	Case "cs"
 		options = options & " --mode=cs"
@@ -30,7 +30,11 @@ Function OpenTextFile(path)
 		options = options & " --options=""" & optfile & """"
 	End If
 	Set astyle = sh.Exec("""astyle.exe""" & options)
-	astyle.StdIn.Write fs.OpenTextFile(path).ReadAll
+	With fs.OpenTextFile(path)
+		While Not .AtEndOfStream
+			astyle.StdIn.WriteLine .ReadLine
+		WEnd
+	End With
 	Set OpenTextFile = astyle.StdOut
 End Function
 </script>
