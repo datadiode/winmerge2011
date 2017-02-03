@@ -145,7 +145,6 @@ void PropShell::ReadContextRegValues()
 			m_bContextSubfolders = BST_CHECKED;
 			break;
 		}
-		//m_bContextSubfolders = (dwContextEnabled & 3 * CONTEXT_F_SUBFOLDERS) / CONTEXT_F_SUBFOLDERS;
 	}
 }
 

@@ -58,6 +58,8 @@ protected:
 	PropShell m_pageShell;
 	PropCompareFolder m_pageCompareFolder;
 
+	static String m_pathMRU;
+
 // Implementation
 protected:
 	void OnOK();
@@ -70,8 +72,6 @@ protected:
 	void OnExportButton();
 	void OnSelchangingPages(NMTREEVIEW *);
 	void OnSelchangedPages(NMTREEVIEW *);
-
-protected:
 	HTREEITEM AddBranch(UINT, HTREEITEM = TVI_ROOT);
 	HTREEITEM AddPage(OptionsPanel *, HTREEITEM = TVI_ROOT);
 	HTREEITEM GetSelector(HTREEITEM, HTREEITEM);

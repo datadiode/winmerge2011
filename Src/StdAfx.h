@@ -91,6 +91,7 @@ using H2O::OEdit;
 using H2O::OButton;
 using H2O::OHeaderCtrl;
 using H2O::OListView;
+using H2O::OTreeView;
 using H2O::OString;
 using H2O::ZeroInit;
 

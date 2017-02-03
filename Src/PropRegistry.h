@@ -41,6 +41,7 @@ public:
 	String	m_strEditorPath;
 	BOOL	m_bUseShellFileOperations;
 	BOOL	m_bUseRecycleBin;
+	BOOL	m_bUseShellFileBrowseDialogs;
 	String	m_supplementFolder;
 	int		m_tempFolderType;
 	String	m_tempFolder;

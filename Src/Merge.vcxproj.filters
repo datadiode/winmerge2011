@@ -684,6 +684,9 @@
     <ClCompile Include="Common\FileOperationsDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ExplorerDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\WindowPlacement.h">
@@ -1203,6 +1206,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Common\FileOperationsDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ExplorerDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\PidlManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

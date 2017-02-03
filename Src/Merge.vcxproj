@@ -326,6 +326,7 @@
     <ClCompile Include="EditorFilepathBar.cpp" />
     <ClCompile Include="Environment.cpp" />
     <ClCompile Include="ExcelExport.cpp" />
+    <ClCompile Include="ExplorerDlg.cpp" />
     <ClCompile Include="ExternalArchiveFormat.cpp" />
     <ClCompile Include="FileActionScript.cpp" />
     <ClCompile Include="FileFilter.cpp" />
@@ -745,6 +746,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\defer.h" />
+    <ClInclude Include="Common\PidlManager.h" />
     <ClInclude Include="Common\WindowPlacement.h" />
     <ClInclude Include="7zCommon.h" />
     <ClInclude Include="AboutDlg.h" />
@@ -785,6 +787,7 @@
     <ClInclude Include="EditorFilepathBar.h" />
     <ClInclude Include="Environment.h" />
     <ClInclude Include="ExcelExport.h" />
+    <ClInclude Include="ExplorerDlg.h" />
     <ClInclude Include="ExternalArchiveFormat.h" />
     <ClInclude Include="FileActionScript.h" />
     <ClInclude Include="FileFilter.h" />

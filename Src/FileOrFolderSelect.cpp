@@ -28,10 +28,34 @@
 #include "LanguageSelect.h"
 #include "Environment.h"
 #include "FileOrFolderSelect.h"
+#include "ExplorerDlg.h"
 #include "coretools.h"
 #include "paths.h"
+#include "OptionsMgr.h"
 
 static int CALLBACK BrowseCallbackProc(HWND, UINT, LPARAM, LPARAM);
+
+static LPCWSTR SetDefExt(String &path, LPCWSTR filter)
+{
+	LPCWSTR defext = NULL;
+	String::size_type n = path.rfind(L'\\') + 1;
+	String::size_type d = path.find(L'.', n);
+	while (*filter)
+	{
+		filter += lstrlenW(filter) + 1;
+		if (LPCWSTR p = EatPrefix(filter, L"*."))
+		{
+			if (d == String::npos || lstrcmpiW(p, path.c_str() + d + 1) == 0)
+			{
+				defext = p;
+				path.resize(n);
+				break;
+			}
+		}
+		filter += lstrlenW(filter) + 1;
+	}
+	return defext;
+}
 
 /**
  * @brief Helper function for selecting folder or file.
@@ -50,26 +74,50 @@ static int CALLBACK BrowseCallbackProc(HWND, UINT, LPARAM, LPARAM);
  * @param [in] defaultExtension Extension to append if user doesn't provide one
  */
 BOOL SelectFile(HWND parent, String &path,
-	UINT titleid, UINT filterid, BOOL is_open, LPCTSTR defaultExtension)
+	UINT titleid, UINT filterid, BOOL is_open, LPCTSTR flters)
 {
 	ASSERT(parent != NULL);
+
+	ExplorerDlg dlg(IDD_BROWSE_FOR_FILE);
+	dlg.m_title = LanguageSelect.LoadString(titleid);
+
+	if (filterid)
+	{
+		dlg.m_filters = LanguageSelect.LoadString(filterid);
+	}
+	else if (flters)
+	{
+		dlg.m_filters = flters;
+	}
+
+	// Convert extension mask from MFC style separators ('|')
+	//  to Win32 style separators ('\0')
+	std::replace(dlg.m_filters.begin(), dlg.m_filters.end(), _T('|'), _T('\0'));
+
+	if (flters)
+		dlg.m_defext = SetDefExt(path, dlg.m_filters.c_str());
+
+	if (!COptionsMgr::Get(OPT_USE_SHELL_FILE_BROOWSE_DIALOGS))
+	{
+		dlg.m_path = path;
+		dlg.m_bWarnIfExists = !is_open;
+		if (LanguageSelect.DoModal(dlg, parent) != IDOK)
+			return FALSE;
+		path = dlg.m_path;
+		return TRUE;
+	}
 
 	// This will tell common file dialog what to show
 	// and also this will hold its return value
 	TCHAR sSelectedFile[MAX_PATH];
 
-	String title = LanguageSelect.LoadString(titleid);
-	String filters = LanguageSelect.LoadString(filterid);
-	// Convert extension mask from MFC style separators ('|')
-	//  to Win32 style separators ('\0')
-	std::replace(filters.begin(), filters.end(), _T('|'), _T('\0'));
 	paths_UndoMagic(path);
 
 	OPENFILENAME ofn;
 	memset(&ofn, 0, OPENFILENAME_SIZE_VERSION_400);
 	ofn.lStructSize = OPENFILENAME_SIZE_VERSION_400;
 	ofn.hwndOwner = parent;
-	ofn.lpstrFilter = filters.c_str();
+	ofn.lpstrFilter = dlg.m_filters.c_str();
 	ofn.nFilterIndex = 1;
 	if (paths_EndsWithSlash(path.c_str()))
 	{
@@ -82,8 +130,8 @@ BOOL SelectFile(HWND parent, String &path,
 	}
 	ofn.lpstrFile = sSelectedFile;
 	ofn.nMaxFile = MAX_PATH;
-	ofn.lpstrTitle = title.c_str();
-	ofn.lpstrDefExt = defaultExtension;
+	ofn.lpstrTitle = dlg.m_title.c_str();
+	ofn.lpstrDefExt = dlg.m_defext;
 	ofn.Flags = OFN_OVERWRITEPROMPT | OFN_HIDEREADONLY | OFN_PATHMUSTEXIST;
 
 	const BOOL bRetVal = (is_open ? GetOpenFileName : GetSaveFileName)(&ofn);
@@ -107,8 +155,20 @@ BOOL SelectFolder(HWND parent, String &path, UINT titleid)
 {
 	ASSERT(parent != NULL);
 
+	ExplorerDlg dlg(IDD_BROWSE_FOR_FOLDER);
+	dlg.m_title = LanguageSelect.LoadString(titleid);
+
+	if (!COptionsMgr::Get(OPT_USE_SHELL_FILE_BROOWSE_DIALOGS))
+	{
+		dlg.m_filename = _T(".");
+		dlg.m_path = paths_ConcatPath(path, dlg.m_filename);
+		if (LanguageSelect.DoModal(dlg, parent) != IDOK)
+			return FALSE;
+		path = paths_GetParentPath(dlg.m_path.c_str());
+		return TRUE;
+	}
+
 	BOOL bRet = FALSE;
-	String title = LanguageSelect.LoadString(titleid);
 
 	TCHAR szPath[MAX_PATH];
 
@@ -116,7 +176,7 @@ BOOL SelectFolder(HWND parent, String &path, UINT titleid)
 	bi.hwndOwner = parent;
 	bi.pidlRoot = NULL;  // Start from desktop folder
 	bi.pszDisplayName = szPath;
-	bi.lpszTitle = title.c_str();
+	bi.lpszTitle = dlg.m_title.c_str();
 	bi.ulFlags = BIF_RETURNONLYFSDIRS | BIF_USENEWUI | BIF_VALIDATE;
 	bi.lpfn = BrowseCallbackProc;
 	bi.lParam = reinterpret_cast<LPARAM>(path.c_str());
@@ -166,17 +226,28 @@ BOOL SelectFileOrFolder(HWND parent, String &path, const String &filter)
 {
 	ASSERT(parent != NULL);
 
-	String title = LanguageSelect.LoadString(IDS_OPEN_TITLE);
-	String filters = LanguageSelect.LoadString(IDS_ALLFILES);
-	string_replace(filters, _T("||"), _T("|"));
+	ExplorerDlg dlg(IDD_BROWSE_FOR_FILE);
+	dlg.m_title = LanguageSelect.LoadString(IDS_OPEN_TITLE);
+	dlg.m_filters = LanguageSelect.LoadString(IDS_ALLFILES);
+	string_replace(dlg.m_filters, _T("||"), _T("|"));
 	if (String::size_type len = filter.size())
 	{
-		filters.append(filter.c_str(), len + 1);
-		filters.append(filter.c_str(), len + 1);
+		dlg.m_filters.append(filter.c_str(), len + 1);
+		dlg.m_filters.append(filter.c_str(), len + 1);
 	}
 	// Convert extension mask from MFC style separators ('|')
 	//  to Win32 style separators ('\0')
-	std::replace(filters.begin(), filters.end(), _T('|'), _T('\0'));
+	std::replace(dlg.m_filters.begin(), dlg.m_filters.end(), _T('|'), _T('\0'));
+
+	if (!COptionsMgr::Get(OPT_USE_SHELL_FILE_BROOWSE_DIALOGS))
+	{
+		dlg.m_path = path;
+		dlg.m_bEnableFolderSelect = true;
+		if (LanguageSelect.DoModal(dlg, parent) != IDOK)
+			return FALSE;
+		path = dlg.m_path;
+		return TRUE;
+	}
 
 	String sSelectedFile = LanguageSelect.LoadString(IDS_DIRSEL_TAG);
 	// Set initial filename to folder selection tag
@@ -187,12 +258,12 @@ BOOL SelectFileOrFolder(HWND parent, String &path, const String &filter)
 	memset(&ofn, 0, OPENFILENAME_SIZE_VERSION_400);
 	ofn.lStructSize = OPENFILENAME_SIZE_VERSION_400;
 	ofn.hwndOwner = parent;
-	ofn.lpstrFilter = filters.c_str();
+	ofn.lpstrFilter = dlg.m_filters.c_str();
 	ofn.nFilterIndex = 1;
 	ofn.lpstrFile = &sSelectedFile.front();
 	ofn.nMaxFile = MAX_PATH;
 	ofn.lpstrInitialDir = path.c_str();
-	ofn.lpstrTitle = title.c_str();
+	ofn.lpstrTitle = dlg.m_title.c_str();
 	ofn.Flags = OFN_HIDEREADONLY | OFN_PATHMUSTEXIST | OFN_NOTESTFILECREATE;
 
 	BOOL bRetVal = GetOpenFileName(&ofn);

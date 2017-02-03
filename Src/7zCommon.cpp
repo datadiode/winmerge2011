@@ -19,10 +19,12 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 Last change: 2013-04-27 by Jochen Neubeck
 */
 #include "StdAfx.h"
+#include "resource.h"
 #include "Merge.h"
 #include "SettingStore.h"
 #include "LanguageSelect.h"
-#include "resource.h"
+#include "Environment.h"
+#include "FileOrFolderSelect.h"
 #include "DirFrame.h"
 #include "MainFrm.h"
 #include "7zCommon.h"
@@ -30,7 +32,6 @@ Last change: 2013-04-27 by Jochen Neubeck
 #include "ExternalArchiveFormat.h"
 #include "Common/version.h"
 #include <paths.h>
-#include "Environment.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -219,6 +220,8 @@ SingleItemEnumerator::SingleItemEnumerator(LPCTSTR path, LPCTSTR FullPath, LPCTS
 , Name(Name)
 {
 }
+
+String CDirView::DirItemEnumerator::m_pathMRU;
 
 /**
  * @brief Construct a CDirView::DirItemEnumerator.
@@ -472,39 +475,12 @@ void CDirView::DirItemEnumerator::CompressArchive(LPCTSTR path)
 	if (path == NULL)
 	{
 		// No path given, so prompt for path!
-		static const TCHAR _T_Merge7z[] = _T("Merge7z");
-		static const TCHAR _T_FilterIndex[] = _T("FilterIndex");
 		String strFilter = CExternalArchiveFormat::GetOpenFileFilterString();
 		strFilter.insert(0, CDirView::SuggestArchiveExtensions());
-		string_replace(strFilter, _T('|'), _T('\0'));
-		OPENFILENAME ofn;
-		ZeroMemory(&ofn, OPENFILENAME_SIZE_VERSION_400);
-		ofn.lStructSize = OPENFILENAME_SIZE_VERSION_400;
-		ofn.hwndOwner = theApp.m_pMainWnd->GetLastActivePopup()->m_hWnd;
-		ofn.lpstrFilter = strFilter.c_str();
-		ofn.Flags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_NOREADONLYRETURN;
-		static TCHAR buffer[MAX_PATH];
-		ofn.lpstrFile = buffer;
-		ofn.nMaxFile = _countof(buffer);
-		ofn.nFilterIndex = SettingStore.GetProfileInt(_T_Merge7z, _T_FilterIndex, 1);
-		// Use extension from current filter as default extension:
-		if (int i = ofn.nFilterIndex)
+		HWND const hwndOwner = theApp.m_pMainWnd->GetLastActivePopup()->m_hWnd;
+		if (SelectFile(hwndOwner, m_pathMRU, 0, 0, FALSE, strFilter.c_str()))
 		{
-			ofn.lpstrDefExt = ofn.lpstrFilter;
-			while (*ofn.lpstrDefExt && --i)
-			{
-				ofn.lpstrDefExt += lstrlen(ofn.lpstrDefExt) + 1;
-				ofn.lpstrDefExt += lstrlen(ofn.lpstrDefExt) + 1;
-			}
-			if (*ofn.lpstrDefExt)
-			{
-				ofn.lpstrDefExt += lstrlen(ofn.lpstrDefExt) + 3;
-			}
-		}
-		if (GetSaveFileName(&ofn))
-		{
-			path = ofn.lpstrFile;
-			SettingStore.WriteProfileInt(_T_Merge7z, _T_FilterIndex, ofn.nFilterIndex);
+			path = m_pathMRU.c_str();
 		}
 	}
 	if (path && !MultiStepCompressArchive(path))

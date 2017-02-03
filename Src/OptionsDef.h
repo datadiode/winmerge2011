@@ -114,6 +114,8 @@ extern COptionDef
 extern COptionDef
 <bool> OPT_USE_SHELL_FILE_OPERATIONS operator((_T("Settings/UseShellFileOperations"), true));
 extern COptionDef
+<bool> OPT_USE_SHELL_FILE_BROOWSE_DIALOGS operator((_T("Settings/UseShellFileBrowseDialogs"), true));
+extern COptionDef
 <bool> OPT_USE_RECYCLE_BIN operator((_T("Settings/UseRecycleBin"), true));
 extern COptionDef
 <bool> OPT_SINGLE_INSTANCE operator((_T("Settings/SingleInstance"), false));

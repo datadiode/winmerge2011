@@ -31,6 +31,8 @@ static const TCHAR OptionsHelpLocation[] = _T("::/htmlhelp/Configuration.html");
 /////////////////////////////////////////////////////////////////////////////
 // CPreferencesDlg dialog
 
+String CPreferencesDlg::m_pathMRU;
+
 CPreferencesDlg::CPreferencesDlg()
 : ODialog(IDD_PREFERENCES)
 , m_nPageCount(0)
@@ -301,11 +303,10 @@ void CPreferencesDlg::SaveOptions()
  */
 void CPreferencesDlg::OnImportButton()
 {
-	String path;
-	if (SelectFile(m_hWnd, path, IDS_OPT_IMPORT_CAPTION, IDS_INIFILES, TRUE))
+	if (SelectFile(m_hWnd, m_pathMRU, IDS_OPT_IMPORT_CAPTION, IDS_INIFILES, TRUE))
 	{
-		if (IOptionDef::ImportOptions(path.c_str()) == ERROR_SUCCESS &&
-			SyntaxColors.ImportOptions(path.c_str()) == ERROR_SUCCESS)
+		if (IOptionDef::ImportOptions(m_pathMRU.c_str()) == ERROR_SUCCESS &&
+			SyntaxColors.ImportOptions(m_pathMRU.c_str()) == ERROR_SUCCESS)
 		{
 			ReadOptions();
 			LanguageSelect.MsgBox(IDS_OPT_IMPORT_DONE, MB_ICONINFORMATION);
@@ -322,12 +323,11 @@ void CPreferencesDlg::OnImportButton()
  */
 void CPreferencesDlg::OnExportButton()
 {
-	String path;
-	if (SelectFile(m_hWnd, path, IDS_OPT_EXPORT_CAPTION, IDS_INIFILES, FALSE, _T("ini")))
+	if (SelectFile(m_hWnd, m_pathMRU, IDS_OPT_EXPORT_CAPTION, IDS_INIFILES, FALSE, _T("ini")))
 	{
 		SaveOptions();
-		if (IOptionDef::ExportOptions(path.c_str()) == ERROR_SUCCESS &&
-			SyntaxColors.ExportOptions(path.c_str()) == ERROR_SUCCESS)
+		if (IOptionDef::ExportOptions(m_pathMRU.c_str()) == ERROR_SUCCESS &&
+			SyntaxColors.ExportOptions(m_pathMRU.c_str()) == ERROR_SUCCESS)
 		{
 			LanguageSelect.MsgBox(IDS_OPT_EXPORT_DONE, MB_ICONINFORMATION);
 		}

@@ -56,6 +56,8 @@
 #define IDD_PROPPAGE_SHELL                      237
 #define IDD_PROPPAGE_COMPARE_FOLDER             238
 #define IDD_PROPPAGE_COLORS_LIST                239
+#define IDD_BROWSE_FOR_FILE                     240
+#define IDD_BROWSE_FOR_FOLDER                   241
 #define IDR_SPLASH                              308
 #define IDB_WINMERGE                            309
 #define IDB_OLDSPLASH                           310
@@ -237,6 +239,7 @@
 #define IDC_DIFF_DEFAULTS                       1122
 #define IDC_MOVED_BLOCKS                        1123
 #define IDC_RESET_ALL_MESSAGE_BOXES             1124
+#define IDC_USE_SHELL_FILE_BROWSE_DIALOGS       1125
 #define IDC_COLDLG_DEFAULTS                     1126
 #define IDC_OPEN_STATUS                         1128
 #define IDC_FILTERFILE_EDITBTN                  1129
@@ -430,6 +433,16 @@
 #define IDC_COMPARE_WALKUNIQUES                 1349
 #define IDC_COMPARE_QUICKC_LIMIT                1350
 #define IDC_MATCH_SIMILAR_LINES_MAX             1351
+#define IDC_TREE_FOLDER                         1352
+#define IDC_LIST_FILE                           1353
+#define IDC_BUTTON_NEW_FOLDER                   1354
+#define IDC_STATIC_FILTER                       1355
+#define IDC_COMBO_FILTER                        1356
+#define IDC_STATIC_FILENAME                     1357
+#define IDC_EDIT_FILENAME                       1358
+#define IDC_TAB_FILTER                          1359
+#define IDC_TOGGLE_HIDDEN                       1360
+#define IDC_TOGGLE_SYSTEM                       1361
 #define IDC_SQL_QUERY_PARAMS_GROUP              1400
 #define IDC_SQL_QUERY_PARAMS_LEFT               1401
 #define IDC_SQL_QUERY_PARAMS_RIGHT              1402
@@ -635,6 +648,7 @@
 #define IDS_UNKNOWN_ARCHIVE_FORMAT              17664
 #define IDS_CANT_STORE_1_AS_2                   17665
 #define IDS_EXITCODE                            17666
+#define IDS_BROWSE_FOR_FILE_SEL_LIMIT           17667
 #define IDS_COLHDR_FILENAME                     17696
 #define IDS_COLHDR_DIR                          17697
 #define IDS_COLHDR_RESULT                       17698
@@ -660,6 +674,11 @@
 #define IDS_COLHDR_BINARY                       17718
 #define IDS_COLHDR_LEOL_TYPE                    17719
 #define IDS_COLHDR_REOL_TYPE                    17720
+#define IDS_COLHDR_TIMEC                        17721
+#define IDS_COLHDR_TIMEA                        17722
+#define IDS_COLHDR_TIMEM                        17723
+#define IDS_COLHDR_ATTRIBUTES                   17724
+#define IDS_COLHDR_SIZE                         17725
 #define IDS_CANT_COMPARE_FILES                  17728
 #define IDS_FILE_SKIPPED                        17729
 #define IDS_DIR_SKIPPED                         17730
