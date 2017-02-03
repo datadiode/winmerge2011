@@ -912,7 +912,7 @@ void CCrystalTextView::DrawLineHelperImpl(
 				pdc->SelectObject(GetFont(nColorIndex));
 				// we are sure to have less than 4095 characters because all the chars are visible
 				VERIFY(pdc->ExtTextOut(ptOrigin.x, ptOrigin.y, ETO_CLIPPED,
-					&rcClip, line.c_str() + iBegin, nCount, pnWidths));
+					&rcClip, szLine + iBegin, nCount, pnWidths));
 				if (cxZeroWidthBlock != 0 && PtInRect(&rcClip, ptOrigin))
 				{
 					pdc->SetBkColor(crBkgnd == CLR_NONE ||
@@ -921,14 +921,14 @@ void CCrystalTextView::DrawLineHelperImpl(
 					RECT rcClipZeroWidthBlock =
 					{
 						ptOrigin.x - 1, rcClip.top,
-						ptOrigin.x + 2, rcClip.bottom
+						ptOrigin.x + cxZeroWidthBlock, rcClip.bottom
 					};
 					if (rcClipZeroWidthBlock.left < rcClip.left)
 						rcClipZeroWidthBlock.left = rcClip.left;
 					if (rcClipZeroWidthBlock.right > rcClip.right)
 						rcClipZeroWidthBlock.right = rcClip.right;
 					VERIFY(pdc->ExtTextOut(ptOrigin.x, ptOrigin.y, ETO_CLIPPED,
-						&rcClipZeroWidthBlock, line.c_str() + iBegin, nCount, pnWidths));
+						&rcClipZeroWidthBlock, szLine + iBegin, nCount, pnWidths));
 				}
 				// Draw rounded rectangles around control characters
 				pdc->SaveDC();

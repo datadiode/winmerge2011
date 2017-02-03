@@ -25,5 +25,3 @@ void sd_SetBreakChars(const TCHAR *breakChars);
 void sd_ComputeWordDiffs(const String &str1, const String &str2,
 		bool case_sensitive, int whitespace, int breakType, bool byte_level,
 		std::vector<wdiff> &diffs);
-bool IsSide0Empty(const std::vector<wdiff> &worddiffs, int nLineLengt);
-bool IsSide1Empty(const std::vector<wdiff> &worddiffs, int nLineLengt);

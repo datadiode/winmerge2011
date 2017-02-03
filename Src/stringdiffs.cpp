@@ -1661,26 +1661,3 @@ bool sd_findsyn(const wdiff &diff,
 	// No synchronisation found
 	return false;
 }
-
-/**
- * @brief Check if first side is identical.
- * @param [in] worddiffs Diffs from sd_ComputeWordDiffs.
- * @param [in] nLineLength Length of the string.
- * @return true if first side is identical.
- */
-bool IsSide0Empty(const vector<wdiff> &worddiffs, int nLineLength)
-{
-	return (worddiffs[0].end[0] == -1 && worddiffs[0].start[1] == 0 &&
-			worddiffs[0].end[1] + 1 == nLineLength);
-}
-/**
- * @brief Check if second side is identical.
- * @param [in] worddiffs Diffs from sd_ComputeWordDiffs.
- * @param [in] nLineLength Length of the string.
- * @return true if second side is identical.
- */
-bool IsSide1Empty(const vector<wdiff> &worddiffs, int nLineLength)
-{
-	return (worddiffs[0].end[1] == -1  && worddiffs[0].start[0] == 0 &&
-			worddiffs[0].end[0] + 1 == nLineLength);
-}

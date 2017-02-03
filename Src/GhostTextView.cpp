@@ -209,14 +209,11 @@ int CGhostTextView::GetAdditionalTextBlocks(int nLineIndex, TEXTBLOCK *&rpBuf)
 	std::vector<wdiff> worddiffs;
 	m_pDocument->GetWordDiffArray(nLineIndex, worddiffs);
 
-	if (nLineLength == 0 || worddiffs.size() == 0 || // Both sides are empty
-		IsSide0Empty(worddiffs, nLineLength) || IsSide1Empty(worddiffs, nLineLength))
-	{
+	int const nWordDiffs = static_cast<int>(worddiffs.size());
+	if (nWordDiffs == 0)
 		return 0;
-	}
 
 	bool const lineInCurrentDiff = IsLineInCurrentDiff(nLineIndex);
-	int const nWordDiffs = static_cast<int>(worddiffs.size());
 
 	TEXTBLOCK *pBuf = new TEXTBLOCK[nWordDiffs * 2 + 1];
 	rpBuf = pBuf;
