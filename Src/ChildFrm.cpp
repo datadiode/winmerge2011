@@ -270,8 +270,7 @@ template<>
 void CChildFrame::UpdateSingleCmdUI<ID_VIEW_LINEDIFFS>()
 {
 	m_pMDIFrame->UpdateCmdUI<ID_VIEW_LINEDIFFS>(
-		m_pView[0] == NULL ? MF_GRAYED :
-		m_pView[0]->GetWordDiffHighlight() ? MF_CHECKED : 0);
+		COptionsMgr::Get(OPT_WORDDIFF_HIGHLIGHT) ? MF_CHECKED : 0);
 }
 
 template<>
@@ -389,7 +388,7 @@ LRESULT CChildFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 		UpdateSingleCmdUI<ID_VIEW_FILEMARGIN>();
 		break;
 	case ID_VIEW_LINEDIFFS:
-		COptionsMgr::SaveOption(OPT_WORDDIFF_HIGHLIGHT, !m_pView[0]->GetWordDiffHighlight());
+		COptionsMgr::SaveOption(OPT_WORDDIFF_HIGHLIGHT, !COptionsMgr::Get(OPT_WORDDIFF_HIGHLIGHT));
 		RefreshOptions();
 		FlushAndRescan(true);
 		UpdateSingleCmdUI<ID_VIEW_LINEDIFFS>();

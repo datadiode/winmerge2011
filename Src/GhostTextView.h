@@ -109,7 +109,11 @@ public:
 
 	void ZoomText(short amount);
 
+	virtual COLORREF GetColor(int nColorIndex);
+
 protected:
+	virtual bool IsLineInCurrentDiff(int) = 0;
+	virtual int GetAdditionalTextBlocks(int nLineIndex, TEXTBLOCK *&pBuf);
 	virtual void DrawSingleLine(HSurface *, const RECT &, int nLineIndex);
 	virtual void DrawMargin(HSurface *, const RECT &, int nLineIndex, int nLineNumber);
 	BOOL OnMouseWheel(WPARAM, LPARAM);

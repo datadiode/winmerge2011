@@ -77,51 +77,6 @@ void CMergeDiffDetailView::SetSelection(const POINT &ptStart, const POINT &ptEnd
 	CCrystalTextView::SetSelection(ptStartNew, ptEndNew);
 }
 
-int CMergeDiffDetailView::GetAdditionalTextBlocks(int nLineIndex, TEXTBLOCK *&rpBuf)
-{
-	DWORD dwLineFlags = GetLineFlags(nLineIndex);
-	if ((dwLineFlags & LF_DIFF) != LF_DIFF)
-		return 0; // No diff
-
-	if (!COptionsMgr::Get(OPT_WORDDIFF_HIGHLIGHT))
-		return 0; // No coloring
-
-	int nLineLength = GetLineLength(nLineIndex);
-	vector<wdiff> worddiffs;
-	m_pDocument->GetWordDiffArray(nLineIndex, worddiffs);
-
-	if (nLineLength == 0 || worddiffs.size() == 0 || // Both sides are empty
-		IsSide0Empty(worddiffs, nLineLength) || IsSide1Empty(worddiffs, nLineLength))
-	{
-		return 0;
-	}
-
-	const int nWordDiffs = worddiffs.size();
-
-	TEXTBLOCK *pBuf = new TEXTBLOCK[nWordDiffs * 2 + 1];
-	rpBuf = pBuf;
-	pBuf[0].m_nCharPos = 0;
-	pBuf[0].m_nColorIndex = COLORINDEX_NONE;
-	pBuf[0].m_nBgColorIndex = COLORINDEX_NONE;
-	for (int i = 0; i < nWordDiffs; i++)
-	{
-		const wdiff &wd = worddiffs[i];
-		++pBuf;
-		pBuf->m_nCharPos = wd.start[m_nThisPane];
-		pBuf->m_nColorIndex = COLORINDEX_HIGHLIGHTTEXT1 | COLORINDEX_APPLYFORCE;
-		if (wd.start[0] == wd.end[0] + 1 || wd.start[1] == wd.end[1] + 1)
-			// Case on one side char/words are inserted or deleted 
-			pBuf->m_nBgColorIndex = COLORINDEX_HIGHLIGHTBKGND3 | COLORINDEX_APPLYFORCE;
-		else
-			pBuf->m_nBgColorIndex = COLORINDEX_HIGHLIGHTBKGND2 | COLORINDEX_APPLYFORCE;
-		++pBuf;
-		pBuf->m_nCharPos = wd.end[m_nThisPane] + 1;
-		pBuf->m_nColorIndex = COLORINDEX_NONE;
-		pBuf->m_nBgColorIndex = COLORINDEX_NONE;
-	}
-	return nWordDiffs * 2 + 1;
-}
-
 void CMergeDiffDetailView::DrawSingleLine(HSurface *pdc, const RECT &rc, int nLineIndex)
 {
 	if (nLineIndex < m_lineBegin || nLineIndex >= m_lineEnd)
@@ -132,25 +87,6 @@ void CMergeDiffDetailView::DrawSingleLine(HSurface *pdc, const RECT &rc, int nLi
 	else
 	{
 		CGhostTextView::DrawSingleLine(pdc, rc, nLineIndex);
-	}
-}
-
-COLORREF CMergeDiffDetailView::GetColor(int nColorIndex)
-{
-	switch (nColorIndex & ~COLORINDEX_APPLYFORCE)
-	{
-	case COLORINDEX_HIGHLIGHTBKGND1:
-		return COptionsMgr::Get(OPT_CLR_SELECTED_WORDDIFF);
-	case COLORINDEX_HIGHLIGHTTEXT1:
-		return COptionsMgr::Get(OPT_CLR_SELECTED_WORDDIFF_TEXT);
-	case COLORINDEX_HIGHLIGHTBKGND2:
-		return COptionsMgr::Get(OPT_CLR_WORDDIFF);
-	case COLORINDEX_HIGHLIGHTTEXT2:
-		return COptionsMgr::Get(OPT_CLR_WORDDIFF_TEXT);
-	case COLORINDEX_HIGHLIGHTBKGND3:
-		return COptionsMgr::Get(OPT_CLR_WORDDIFF_DELETED);
-	default:
-		return CCrystalTextView::GetColor(nColorIndex);
 	}
 }
 

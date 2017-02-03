@@ -175,6 +175,85 @@ int CGhostTextView::ComputeApparentLine(int nRealLine) const
 		(m_pTextBuffer)->ComputeApparentLine(nRealLine);
 }
 
+COLORREF CGhostTextView::GetColor(int nColorIndex)
+{
+	switch (nColorIndex & ~COLORINDEX_APPLYFORCE)
+	{
+	case COLORINDEX_HIGHLIGHTBKGND1:
+		return COptionsMgr::Get(OPT_CLR_SELECTED_WORDDIFF);
+	case COLORINDEX_HIGHLIGHTTEXT1:
+		return COptionsMgr::Get(OPT_CLR_SELECTED_WORDDIFF_TEXT);
+	case COLORINDEX_HIGHLIGHTBKGND2:
+		return COptionsMgr::Get(OPT_CLR_WORDDIFF);
+	case COLORINDEX_HIGHLIGHTTEXT2:
+		return COptionsMgr::Get(OPT_CLR_WORDDIFF_TEXT);
+	case COLORINDEX_HIGHLIGHTBKGND3:
+		return COptionsMgr::Get(OPT_CLR_WORDDIFF_DELETED);
+	case COLORINDEX_HIGHLIGHTBKGND4:
+		return COptionsMgr::Get(OPT_CLR_SELECTED_WORDDIFF_DELETED);
+	default:
+		return CCrystalTextView::GetColor(nColorIndex);
+	}
+}
+
+int CGhostTextView::GetAdditionalTextBlocks(int nLineIndex, TEXTBLOCK *&rpBuf)
+{
+	DWORD const dwLineFlags = GetLineFlags(nLineIndex);
+	if ((dwLineFlags & LF_DIFF) != LF_DIFF)
+		return 0;
+
+	if (!COptionsMgr::Get(OPT_WORDDIFF_HIGHLIGHT))
+		return 0;
+
+	int const nLineLength = GetLineLength(nLineIndex);
+	std::vector<wdiff> worddiffs;
+	m_pDocument->GetWordDiffArray(nLineIndex, worddiffs);
+
+	if (nLineLength == 0 || worddiffs.size() == 0 || // Both sides are empty
+		IsSide0Empty(worddiffs, nLineLength) || IsSide1Empty(worddiffs, nLineLength))
+	{
+		return 0;
+	}
+
+	bool const lineInCurrentDiff = IsLineInCurrentDiff(nLineIndex);
+	int const nWordDiffs = static_cast<int>(worddiffs.size());
+
+	TEXTBLOCK *pBuf = new TEXTBLOCK[nWordDiffs * 2 + 1];
+	rpBuf = pBuf;
+	pBuf[0].m_nCharPos = 0;
+	pBuf[0].m_nColorIndex = COLORINDEX_NONE;
+	pBuf[0].m_nBgColorIndex = COLORINDEX_NONE;
+	for (int i = 0; i < nWordDiffs; i++)
+	{
+		const wdiff &wd = worddiffs[i];
+		++pBuf;
+		pBuf->m_nCharPos = wd.start[m_nThisPane];
+		if (lineInCurrentDiff)
+		{
+			pBuf->m_nColorIndex = COLORINDEX_HIGHLIGHTTEXT1 | COLORINDEX_APPLYFORCE;
+			if (wd.start[0] == wd.end[0] + 1 || wd.start[1] == wd.end[1] + 1)
+				pBuf->m_nBgColorIndex = COLORINDEX_HIGHLIGHTBKGND4 | COLORINDEX_APPLYFORCE;
+			else
+				pBuf->m_nBgColorIndex = COLORINDEX_HIGHLIGHTBKGND1 | COLORINDEX_APPLYFORCE;
+		}
+		else
+		{
+			pBuf->m_nColorIndex = COLORINDEX_HIGHLIGHTTEXT2 | COLORINDEX_APPLYFORCE;
+			if (wd.start[0] == wd.end[0] + 1 || wd.start[1] == wd.end[1] + 1)
+				// Case on one side char/words are inserted or deleted 
+				pBuf->m_nBgColorIndex = COLORINDEX_HIGHLIGHTBKGND3 | COLORINDEX_APPLYFORCE;
+			else
+				pBuf->m_nBgColorIndex = COLORINDEX_HIGHLIGHTBKGND2 | COLORINDEX_APPLYFORCE;
+		}
+		++pBuf;
+		pBuf->m_nCharPos = wd.end[m_nThisPane] < nLineLength ? wd.end[m_nThisPane] + 1 : nLineLength;
+		pBuf->m_nColorIndex = COLORINDEX_NONE;
+		pBuf->m_nBgColorIndex = COLORINDEX_NONE;
+	}
+
+	return nWordDiffs * 2 + 1;
+}
+
 /**
  * @brief Draw selection margin. 
  * @param [in] pdc         Pointer to draw context.

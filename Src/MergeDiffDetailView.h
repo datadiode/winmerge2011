@@ -44,6 +44,7 @@ public:
 	void DocumentsLoaded();
 
 	virtual bool QueryEditable() { return false; }
+	virtual bool IsLineInCurrentDiff(int) { return false; }
 
 	virtual int RecalcHorzScrollBar(bool bPositionOnly = false);
 	virtual int RecalcVertScrollBar(bool bPositionOnly = false);
@@ -69,9 +70,7 @@ public:
 protected:
 	virtual void ScrollToSubLine(int nNewTopLine);
 	virtual ~CMergeDiffDetailView();
-	virtual int GetAdditionalTextBlocks(int nLineIndex, TEXTBLOCK *&pBuf);
 	virtual void DrawSingleLine(HSurface *, const RECT &, int nLineIndex);
-	virtual COLORREF GetColor(int nColorIndex);
 	virtual void GetLineColors(int nLineIndex, COLORREF &crBkgnd, COLORREF &crText);
 	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
 	void OnContextMenu(LPARAM);

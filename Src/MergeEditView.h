@@ -27,34 +27,6 @@
 #include "GhostTextView.h"
 
 /** 
- * @brief Color settings.
- */
-struct COLORSETTINGS
-{
-	COLORREF	clrDiff;			/**< Difference color */
-	COLORREF	clrSelDiff;			/**< Selected difference color */
-	COLORREF	clrDiffDeleted;		/**< Difference deleted color */
-	COLORREF	clrSelDiffDeleted;	/**< Selected difference deleted color */
-	COLORREF	clrDiffText;		/**< Difference text color */
-	COLORREF	clrSelDiffText;		/**< Selected difference text color */
-	COLORREF	clrTrivial;			/**< Ignored difference color */
-	COLORREF	clrTrivialDeleted;	/**< Ignored difference deleted color */
-	COLORREF	clrTrivialText;		/**< Ignored difference text color */
-	COLORREF	clrMoved;			/**< Moved block color */
-	COLORREF	clrMovedDeleted;	/**< Moved block deleted color */
-	COLORREF	clrMovedText;		/**< Moved block text color */
-	COLORREF	clrSelMoved;		/**< Selected moved block color */
-	COLORREF	clrSelMovedDeleted;	/**< Selected moved block deleted color */
-	COLORREF	clrSelMovedText;	/**< Selected moved block text color */
-	COLORREF	clrWordDiff;		/**< Word difference color */
-	COLORREF	clrWordDiffDeleted;	/**< Word differenceDeleted color */
-	COLORREF	clrWordDiffText;	/**< Word difference text color */
-	COLORREF	clrSelWordDiff;		/**< Selected word difference color */
-	COLORREF	clrSelWordDiffDeleted;	/**< Selected word difference deleted color */
-	COLORREF	clrSelWordDiffText;	/**< Selected word difference text color */
-};
-
-/** 
  * @brief Non-diff lines shown above diff when scrolling to it
  */
 const UINT CONTEXT_LINES_ABOVE = 5;
@@ -89,97 +61,48 @@ Maybe in the future...
 class CMergeEditView : public CGhostTextView
 {
 public:
+	CCrystalParser m_xParser; /**< Syntax parser used for syntax highlighting. */
+	// Object that displays status line info for one side of a merge view
+	HStatusBar *m_pStatusBar;
+
+protected:
+	CShellContextMenu *const m_pShellContextMenu; /**< Shell context menu*/
+	HMENU m_hShellContextMenu;
+
+public:
 	CMergeEditView(HWindow *, CChildFrame *, int);
 
+	// IDropTarget
 	STDMETHOD(DragEnter)(IDataObject *pDataObj, DWORD grfKeyState, POINTL pt, DWORD *pdwEffect);
 	STDMETHOD(Drop)(IDataObject *pDataObj, DWORD grfKeyState, POINTL pt, DWORD *pdwEffect);
-
-	CCrystalParser m_xParser; /**< Syntax parser used for syntax highlighting. */
 
 	static bool IsShellMenuCmdID(UINT);
 	void HandleMenuSelect(WPARAM wParam, LPARAM lParam);
 	LRESULT HandleMenuMessage(UINT message, WPARAM wParam, LPARAM lParam);
-
-	// Object that displays status line info for one side of a merge view
-	HStatusBar *m_pStatusBar;
 	void SetLineInfoStatus(LPCTSTR szLine, int nColumn, int nColumns,
 		int nChar, int nChars, LPCTSTR szEol, EDITMODE editMode);
 	void UpdateLineInfoStatus();
 	void SetEncodingStatus(LPCTSTR);
 	void SetCRLFModeStatus(enum CRLFSTYLE);
-protected:
-	/**
-	 * Are automatic rescans enabled?
-	 * If automatic rescans are enabled then we rescan files after edit
-	 * events, unless timer suppresses rescan. We suppress rescans within
-	 * certain time from previous rescan.
-	 */
-	bool m_bAutomaticRescan;
-	/**
-	 * Is highlighting of word differences enabled?
-	 */
-	bool m_bWordDiffHighlight;
-
-	CShellContextMenu *const m_pShellContextMenu; /**< Shell context menu*/
-	HMENU m_hShellContextMenu;
-
-private:
-	COLORSETTINGS m_cachedColors; /**< Cached color settings */
-
-// Operations
-public:
-	using CGhostTextView::GetFullySelectedLines;
-	using CGhostTextView::GetSelection;
 	void RefreshOptions();
-	bool EnableRescan(bool bEnable);
-	bool GetWordDiffHighlight() const;
 	void ShowDiff(bool bScroll);
 	virtual void OnEditOperation(int nAction, LPCTSTR pszText);
 	virtual void OnUpdateCaret(bool bShowHide = false);
 	void UpdateLineLengths();
-	bool IsLineInCurrentDiff(int nLine);
+	virtual bool IsLineInCurrentDiff(int);
 	void SelectNone();
 	void SelectDiff(int nDiff, bool bScroll = true);
 	CDiffTextBuffer *GetTextBuffer() { return static_cast<CDiffTextBuffer *>(m_pTextBuffer); }
 	void UpdateResources();
 	virtual int RecalcVertScrollBar(bool bPositionOnly = false);
-	virtual int GetAdditionalTextBlocks(int nLineIndex, TEXTBLOCK *&pBuf);
-	virtual COLORREF GetColor(int nColorIndex);
 	virtual void GetLineColors(int nLineIndex, COLORREF &crBkgnd, COLORREF &crText);
 	void GotoLine(int nLine);
-	int GetTopLine() { return m_nTopLine; }
-	int GetTopSubLine() { return m_nTopSubLine; }
-	using CCrystalTextView::GetScreenLines;
-	using CCrystalTextView::GetSubLines;
-	using CCrystalTextView::GetSubLineCount;
-	using CCrystalTextView::GetSubLineIndex;
-	using CCrystalTextView::GetLineBySubLine;
-	virtual int GetEmptySubLines( int nLineIndex );
-	virtual void InvalidateSubLineIndexCache( int nLineIndex );
+	int GetTopLine() const { return m_nTopLine; }
+	int GetTopSubLine() const { return m_nTopSubLine; }
+	virtual int GetEmptySubLines(int nLineIndex);
+	virtual void InvalidateSubLineIndexCache(int nLineIndex);
 	void DocumentsLoaded();
 
-	bool IsDiffVisible(int nDiff);
-
-// Implementation
-private:
-	HMENU ListShellContextMenu();
-
-protected:
-	virtual ~CMergeEditView();
-	bool IsDiffVisible(const DIFFRANGE *, int nLinesBelow = 0);
-
-	HMenu *ApplyPatch(IStream *, int);
-	void ApplyPatch(IStream *, const POINTL &);
-
-	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
-	void OnNotity(LPARAM);
-	void OnLButtonDblClk();
-	void OnLButtonUp();
-	void OnContextMenu(LPARAM);
-	void OnSize();
-	void OnTimer(UINT_PTR);
-
-public:
 	void OnCurdiff();
 	void OnFirstdiff();
 	void OnLastdiff();
@@ -189,4 +112,27 @@ public:
 	void OnConvertEolTo(UINT);
 	void OnEditCopyLineNumbers();
 	void OnViewMargin();
+
+	using CGhostTextView::GetFullySelectedLines;
+	using CGhostTextView::GetSelection;
+	using CCrystalTextView::GetScreenLines;
+	using CCrystalTextView::GetSubLines;
+	using CCrystalTextView::GetSubLineCount;
+	using CCrystalTextView::GetSubLineIndex;
+	using CCrystalTextView::GetLineBySubLine;
+
+protected:
+	virtual ~CMergeEditView();
+	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
+	virtual bool IsDiffVisible(int nDiff);
+	bool IsDiffVisible(const DIFFRANGE *, int nLinesBelow = 0);
+	HMENU ListShellContextMenu();
+	HMenu *ApplyPatch(IStream *, int);
+	void ApplyPatch(IStream *, const POINTL &);
+	void OnNotity(LPARAM);
+	void OnLButtonDblClk();
+	void OnLButtonUp();
+	void OnContextMenu(LPARAM);
+	void OnSize();
+	void OnTimer(UINT_PTR);
 };

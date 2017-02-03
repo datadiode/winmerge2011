@@ -184,89 +184,6 @@ void CMergeEditView::UpdateResources()
 	Invalidate();
 }
 
-int CMergeEditView::GetAdditionalTextBlocks(int nLineIndex, TEXTBLOCK *&rpBuf)
-{
-	DWORD dwLineFlags = GetLineFlags(nLineIndex);
-	if ((dwLineFlags & LF_DIFF) != LF_DIFF)
-		return 0;
-
-	if (!m_bWordDiffHighlight)
-		return 0;
-
-	int nLineLength = GetLineLength(nLineIndex);
-	vector<wdiff> worddiffs;
-	m_pDocument->GetWordDiffArray(nLineIndex, worddiffs);
-
-	if (nLineLength == 0 || worddiffs.size() == 0 || // Both sides are empty
-		IsSide0Empty(worddiffs, nLineLength) || IsSide1Empty(worddiffs, nLineLength))
-	{
-		return 0;
-	}
-
-	bool lineInCurrentDiff = IsLineInCurrentDiff(nLineIndex);
-	int nWordDiffs = worddiffs.size();
-
-	TEXTBLOCK *pBuf = new TEXTBLOCK[nWordDiffs * 2 + 1];
-	rpBuf = pBuf;
-	pBuf[0].m_nCharPos = 0;
-	pBuf[0].m_nColorIndex = COLORINDEX_NONE;
-	pBuf[0].m_nBgColorIndex = COLORINDEX_NONE;
-	for (int i = 0; i < nWordDiffs; i++)
-	{
-		pBuf[1 + i * 2].m_nCharPos = worddiffs[i].start[m_nThisPane];
-		pBuf[2 + i * 2].m_nCharPos = worddiffs[i].end[m_nThisPane] + 1;
-		if (lineInCurrentDiff)
-		{
-			pBuf[1 + i * 2].m_nColorIndex = COLORINDEX_HIGHLIGHTTEXT1 | COLORINDEX_APPLYFORCE;
-			if (worddiffs[i].start[0] == worddiffs[i].end[0] + 1 ||
-				worddiffs[i].start[1] == worddiffs[i].end[1] + 1)
-				pBuf[1 + i * 2].m_nBgColorIndex = COLORINDEX_HIGHLIGHTBKGND4 | COLORINDEX_APPLYFORCE;
-			else
-				pBuf[1 + i * 2].m_nBgColorIndex = COLORINDEX_HIGHLIGHTBKGND1 | COLORINDEX_APPLYFORCE;
-		}
-		else
-		{
-			pBuf[1 + i * 2].m_nColorIndex = COLORINDEX_HIGHLIGHTTEXT2 | COLORINDEX_APPLYFORCE;
-			if (worddiffs[i].start[0] == worddiffs[i].end[0] + 1 ||
-				worddiffs[i].start[1] == worddiffs[i].end[1] + 1)
-			{
-				// Case on one side char/words are inserted or deleted 
-				pBuf[1 + i * 2].m_nBgColorIndex = COLORINDEX_HIGHLIGHTBKGND3 | COLORINDEX_APPLYFORCE;
-			}
-			else
-			{
-				pBuf[1 + i * 2].m_nBgColorIndex = COLORINDEX_HIGHLIGHTBKGND2 | COLORINDEX_APPLYFORCE;
-			}
-		}
-		pBuf[2 + i * 2].m_nColorIndex = COLORINDEX_NONE;
-		pBuf[2 + i * 2].m_nBgColorIndex = COLORINDEX_NONE;
-	}
-
-	return nWordDiffs * 2 + 1;
-}
-
-COLORREF CMergeEditView::GetColor(int nColorIndex)
-{
-	switch (nColorIndex & ~COLORINDEX_APPLYFORCE)
-	{
-	case COLORINDEX_HIGHLIGHTBKGND1:
-		return m_cachedColors.clrSelWordDiff;
-	case COLORINDEX_HIGHLIGHTTEXT1:
-		return m_cachedColors.clrSelWordDiffText;
-	case COLORINDEX_HIGHLIGHTBKGND2:
-		return m_cachedColors.clrWordDiff;
-	case COLORINDEX_HIGHLIGHTTEXT2:
-		return m_cachedColors.clrWordDiffText;
-	case COLORINDEX_HIGHLIGHTBKGND3:
-		return m_cachedColors.clrWordDiffDeleted;
-	case COLORINDEX_HIGHLIGHTBKGND4:
-		return m_cachedColors.clrSelWordDiffDeleted;
-
-	default:
-		return CCrystalTextView::GetColor(nColorIndex);
-	}
-}
-
 /**
  * @brief Determine text and background color for line
  * @param [in] nLineIndex Index of line in view (NOT line in file)
@@ -281,7 +198,7 @@ void CMergeEditView::GetLineColors(int nLineIndex, COLORREF &crBkgnd, COLORREF &
 	// Line inside diff
 	if (dwLineFlags & LF_WINMERGE_FLAGS)
 	{
-		crText = m_cachedColors.clrDiffText;
+		crText = COptionsMgr::Get(OPT_CLR_DIFF_TEXT);
 		bool lineInCurrentDiff = IsLineInCurrentDiff(nLineIndex);
 
 		if (dwLineFlags & LF_DIFF)
@@ -291,15 +208,15 @@ void CMergeEditView::GetLineColors(int nLineIndex, COLORREF &crBkgnd, COLORREF &
 				if (dwLineFlags & LF_MOVED)
 				{
 					if (dwLineFlags & LF_GHOST)
-						crBkgnd = m_cachedColors.clrSelMovedDeleted;
+						crBkgnd = COptionsMgr::Get(OPT_CLR_SELECTED_MOVEDBLOCK_DELETED);
 					else
-						crBkgnd = m_cachedColors.clrSelMoved;
-					crText = m_cachedColors.clrSelMovedText;
+						crBkgnd = COptionsMgr::Get(OPT_CLR_SELECTED_MOVEDBLOCK);
+					crText = COptionsMgr::Get(OPT_CLR_SELECTED_MOVEDBLOCK_TEXT);
 				}
 				else
 				{
-					crBkgnd = m_cachedColors.clrSelDiff;
-					crText = m_cachedColors.clrSelDiffText;
+					crBkgnd = COptionsMgr::Get(OPT_CLR_SELECTED_DIFF);
+					crText = COptionsMgr::Get(OPT_CLR_SELECTED_DIFF_TEXT);
 				}
 			
 			}
@@ -308,15 +225,15 @@ void CMergeEditView::GetLineColors(int nLineIndex, COLORREF &crBkgnd, COLORREF &
 				if (dwLineFlags & LF_MOVED)
 				{
 					if (dwLineFlags & LF_GHOST)
-						crBkgnd = m_cachedColors.clrMovedDeleted;
+						crBkgnd = COptionsMgr::Get(OPT_CLR_MOVEDBLOCK_DELETED);
 					else
-						crBkgnd = m_cachedColors.clrMoved;
-					crText = m_cachedColors.clrMovedText;
+						crBkgnd = COptionsMgr::Get(OPT_CLR_MOVEDBLOCK);
+					crText = COptionsMgr::Get(OPT_CLR_MOVEDBLOCK_TEXT);
 				}
 				else
 				{
-					crBkgnd = m_cachedColors.clrDiff;
-					crText = m_cachedColors.clrDiffText;
+					crBkgnd = COptionsMgr::Get(OPT_CLR_DIFF);
+					crText = COptionsMgr::Get(OPT_CLR_DIFF_TEXT);
 				}
 			}
 		}
@@ -325,17 +242,17 @@ void CMergeEditView::GetLineColors(int nLineIndex, COLORREF &crBkgnd, COLORREF &
 			// trivial diff can not be selected
 			if (dwLineFlags & LF_GHOST)
 				// ghost lines in trivial diff has their own color
-				crBkgnd = m_cachedColors.clrTrivialDeleted;
+				crBkgnd = COptionsMgr::Get(OPT_CLR_TRIVIAL_DIFF_DELETED);
 			else
-				crBkgnd = m_cachedColors.clrTrivial;
-			crText = m_cachedColors.clrTrivialText;
+				crBkgnd = COptionsMgr::Get(OPT_CLR_TRIVIAL_DIFF);
+			crText = COptionsMgr::Get(OPT_CLR_TRIVIAL_DIFF_TEXT);
 		}
 		else if (dwLineFlags & LF_GHOST)
 		{
 			if (lineInCurrentDiff)
-				crBkgnd = m_cachedColors.clrSelDiffDeleted;
+				crBkgnd = COptionsMgr::Get(OPT_CLR_SELECTED_DIFF_DELETED);
 			else
-				crBkgnd = m_cachedColors.clrDiffDeleted;
+				crBkgnd = COptionsMgr::Get(OPT_CLR_DIFF_DELETED);
 		}
 	}
 	else
@@ -627,7 +544,7 @@ void CMergeEditView::OnEditOperation(int nAction, LPCTSTR pszText)
 	m_pDocument->UpdateEditCmdUI();
 
 	// If automatic rescan enabled, rescan after edit events
-	if (m_bAutomaticRescan)
+	if (COptionsMgr::Get(OPT_AUTOMATIC_RESCAN))
 	{
 		// keep document up to date
 		// (Re)start timer to rescan only when user edits text
@@ -726,24 +643,6 @@ void CMergeEditView::OnTimer(UINT_PTR nIDEvent)
 		KillTimer(IDT_RESCAN);
 		m_pDocument->RescanIfNeeded(RESCAN_TIMEOUT);
 	}
-}
-
-/**
- * @brief Enable/Disable automatic rescanning
- */
-bool CMergeEditView::EnableRescan(bool bEnable)
-{
-	bool bOldValue = m_bAutomaticRescan;
-	m_bAutomaticRescan = bEnable;
-	return bOldValue;
-}
-
-/**
- * @brief Is highlighting of word differences enabled?
- */
-bool CMergeEditView::GetWordDiffHighlight() const
-{
-	return m_bWordDiffHighlight;
 }
 
 /**
@@ -947,10 +846,6 @@ void CMergeEditView::OnConvertEolTo(UINT nID)
  */
 void CMergeEditView::RefreshOptions()
 { 
-	// Enable/disable automatic rescan (rescanning after edit)
-	m_bAutomaticRescan = COptionsMgr::Get(OPT_AUTOMATIC_RESCAN);
-	// Enable/disable highlighting of word differences
-	m_bWordDiffHighlight = COptionsMgr::Get(OPT_WORDDIFF_HIGHLIGHT);
 	// Set tab type (tabs/spaces)
 	m_pTextBuffer->SetInsertTabs(COptionsMgr::Get(OPT_TAB_TYPE) == 0);
 	SetSelectionMargin(COptionsMgr::Get(OPT_VIEW_FILEMARGIN));
@@ -969,28 +864,6 @@ void CMergeEditView::RefreshOptions()
 	const bool mixedEOLs = COptionsMgr::Get(OPT_ALLOW_MIXED_EOL) ||
 		m_pDocument->IsMixedEOL(m_nThisPane);
 	SetViewEols(COptionsMgr::Get(OPT_VIEW_WHITESPACE), mixedEOLs);
-
-	m_cachedColors.clrDiff = COptionsMgr::Get(OPT_CLR_DIFF);
-	m_cachedColors.clrSelDiff = COptionsMgr::Get(OPT_CLR_SELECTED_DIFF);
-	m_cachedColors.clrDiffDeleted = COptionsMgr::Get(OPT_CLR_DIFF_DELETED);
-	m_cachedColors.clrSelDiffDeleted = COptionsMgr::Get(OPT_CLR_SELECTED_DIFF_DELETED);
-	m_cachedColors.clrDiffText = COptionsMgr::Get(OPT_CLR_DIFF_TEXT);
-	m_cachedColors.clrSelDiffText = COptionsMgr::Get(OPT_CLR_SELECTED_DIFF_TEXT);
-	m_cachedColors.clrTrivial = COptionsMgr::Get(OPT_CLR_TRIVIAL_DIFF);
-	m_cachedColors.clrTrivialDeleted = COptionsMgr::Get(OPT_CLR_TRIVIAL_DIFF_DELETED);
-	m_cachedColors.clrTrivialText = COptionsMgr::Get(OPT_CLR_TRIVIAL_DIFF_TEXT);
-	m_cachedColors.clrMoved = COptionsMgr::Get(OPT_CLR_MOVEDBLOCK);
-	m_cachedColors.clrMovedDeleted = COptionsMgr::Get(OPT_CLR_MOVEDBLOCK_DELETED);
-	m_cachedColors.clrMovedText = COptionsMgr::Get(OPT_CLR_MOVEDBLOCK_TEXT);
-	m_cachedColors.clrSelMoved = COptionsMgr::Get(OPT_CLR_SELECTED_MOVEDBLOCK);
-	m_cachedColors.clrSelMovedDeleted = COptionsMgr::Get(OPT_CLR_SELECTED_MOVEDBLOCK_DELETED);
-	m_cachedColors.clrSelMovedText = COptionsMgr::Get(OPT_CLR_SELECTED_MOVEDBLOCK_TEXT);
-	m_cachedColors.clrWordDiff = COptionsMgr::Get(OPT_CLR_WORDDIFF);
-	m_cachedColors.clrWordDiffDeleted = COptionsMgr::Get(OPT_CLR_WORDDIFF_DELETED);
-	m_cachedColors.clrSelWordDiff = COptionsMgr::Get(OPT_CLR_SELECTED_WORDDIFF);
-	m_cachedColors.clrSelWordDiffDeleted = COptionsMgr::Get(OPT_CLR_SELECTED_WORDDIFF_DELETED);
-	m_cachedColors.clrWordDiffText = COptionsMgr::Get(OPT_CLR_WORDDIFF_TEXT);
-	m_cachedColors.clrSelWordDiffText = COptionsMgr::Get(OPT_CLR_SELECTED_WORDDIFF_TEXT);
 
 	OnSize();
 	CCrystalTextView::OnSize();
