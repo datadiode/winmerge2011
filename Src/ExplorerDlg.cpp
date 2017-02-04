@@ -216,6 +216,16 @@ LRESULT ExplorerDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	return OResizableDialog::WindowProc(message, wParam, lParam);
 }
 
+void ExplorerDlg::ScanExtraLayoutInfo(LPCTSTR pch)
+{
+	CSplitState::Scan(m_hWnd, pch);
+}
+
+void ExplorerDlg::DumpExtraLayoutInfo(LPTSTR pch)
+{
+	CSplitState::Dump(m_hWnd, pch);
+}
+
 LRESULT ExplorerDlg::WndProcFilter(WNDPROC pfnSuper, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)

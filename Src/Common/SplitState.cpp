@@ -25,6 +25,7 @@ SOFTWARE.
 DATE:		BY:					DESCRIPTION:
 ==========	==================	================================================
 2006-02-19	Jochen Tucht		Created
+2006-02-26	Jochen Tucht		Scan() & Dump() to help persist layout
 2006-10-24	Jochen Neubeck		DeferWindowPos(), allow > 1 controls in 2nd pane
 */
 #include "StdAfx.h"
@@ -33,7 +34,7 @@ DATE:		BY:					DESCRIPTION:
 BOOL CSplitState::Split(HWND hwndOuter)
 {
 	int bKeepCursor = 0;
-	if (const LONG *pScript = SplitScript)
+	if (LONG const *pScript = SplitScript)
 	{
 		HDWP hdwp = ::BeginDeferWindowPos(2);
 		static POINT pntTrack;
@@ -65,7 +66,7 @@ BOOL CSplitState::Split(HWND hwndOuter)
 				pntTrack = pntCursor;
 			}
 		}
-		const LONG *pMetric = pScript;
+		LONG const *pMetric = pScript;
 		while (!bKeepCursor && *pScript)
 		{
 			while (!(*pMetric & LONG_MIN))
@@ -183,4 +184,122 @@ BOOL CSplitState::Split(HWND hwndOuter)
 		pntTrack = pntCursor;
 	}
 	return bKeepCursor;
+}
+
+BOOL CSplitState::Scan(HWND hwndOuter, LPCTSTR pch) const
+{
+	if (LONG const *pScript = SplitScript)
+	{
+		while (*pScript)
+		{
+			if (*pch == ':')
+				++pch;
+			LONG const *pMetric = pScript;
+			while (!(*pMetric & LONG_MIN))
+				++pMetric;
+
+			LPTSTR pchAhead;
+			bool bad = false;
+			long cxyTotalCurrent = 0;
+			long cxyTotalDesired = 0;
+			RECT rctPane[2];
+			::GetWindowRect(::GetDlgItem(hwndOuter, pScript[0]), &rctPane[0]);
+			::GetWindowRect(::GetDlgItem(hwndOuter, pScript[1]), &rctPane[1]);
+			if (_tcstol(pch, &pchAhead, 10) == *pScript)
+			{
+				pch = pchAhead;
+				LONG const *ps = pScript;
+				LONG const *pm = pMetric;
+				while (*pchAhead == '|')
+				{
+					long cxy = _tcstol(pchAhead + 1, &pchAhead, 10);
+					if (cxy < ~*pm)
+					{
+						bad = true;
+					}
+					cxyTotalDesired += cxy;
+					HWND hwndInner = ::GetDlgItem(hwndOuter, *ps);
+					RECT rct;
+					::GetWindowRect(hwndInner, &rct);
+					if (rctPane[1].top > rctPane[0].bottom)
+					{
+						rct.left = rct.top;
+						rct.right = rct.bottom;
+					}
+					cxyTotalCurrent += rct.right - rct.left;
+					++ps;
+					if (pm[1] & LONG_MIN)
+						++pm;
+				}
+			}
+			if (!bad && cxyTotalDesired == cxyTotalCurrent)
+			{
+				_tcstol(pch, &pchAhead, 10);
+				long cxyMove = 0;
+				while (*pchAhead == '|')
+				{
+					long cxyDesired = _tcstol(pchAhead + 1, &pchAhead, 10);
+					HWND hwndInner = ::GetDlgItem(hwndOuter, *pScript);
+					RECT rct;
+					::GetWindowRect(hwndInner, &rct);
+					::MapWindowPoints(0, hwndOuter, (LPPOINT)&rct, 2);
+					long cxyCurrent;
+					if (rctPane[1].top > rctPane[0].bottom)
+					{
+						cxyCurrent = rct.bottom - rct.top;
+						rct.top += cxyMove;
+						rct.bottom = rct.top + cxyDesired;
+					}
+					else
+					{
+						cxyCurrent = rct.right - rct.left;
+						rct.left += cxyMove;
+						rct.right = rct.left + cxyDesired;
+					}
+					::MoveWindow(hwndInner, rct.left, rct.top, rct.right - rct.left, rct.bottom - rct.top, TRUE);
+					cxyMove += cxyDesired - cxyCurrent;
+					++pScript;
+				}
+			}
+			pScript = pMetric;
+			while (*pScript & LONG_MIN)
+				++pScript;
+			pch = pchAhead;
+		}
+	}
+	return TRUE;
+}
+
+int CSplitState::Dump(HWND hwndOuter, LPTSTR pch) const
+{
+	int cch = 0;
+	if (LONG const *pScript = SplitScript)
+	{
+		while (*pScript)
+		{
+			cch += wsprintf(pch + cch, _T(":%d"), static_cast<int>(*pScript));
+
+			RECT rctPane[2];
+			::GetWindowRect(::GetDlgItem(hwndOuter, pScript[0]), &rctPane[0]);
+			::GetWindowRect(::GetDlgItem(hwndOuter, pScript[1]), &rctPane[1]);
+
+			while (!(*pScript & LONG_MIN))
+			{
+				HWND hwndInner = ::GetDlgItem(hwndOuter, *pScript);
+				RECT rct;
+				::GetWindowRect(hwndInner, &rct);
+				if (rctPane[1].top > rctPane[0].bottom)
+				{
+					rct.left = rct.top;
+					rct.right = rct.bottom;
+				}
+				cch += wsprintf(pch + cch, _T("|%d"), rct.right - rct.left);
+				++pScript;
+			}
+
+			while (*pScript & LONG_MIN)
+				++pScript;
+		}
+	}
+	return cch;
 }

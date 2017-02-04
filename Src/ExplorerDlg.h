@@ -63,7 +63,8 @@ private:
 
 	virtual BOOL OnInitDialog();
 	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
-
+	virtual void ScanExtraLayoutInfo(LPCTSTR);
+	virtual void DumpExtraLayoutInfo(LPTSTR);
 	LRESULT WndProcFilter(WNDPROC, HWND, UINT, WPARAM, LPARAM);
 	LRESULT OnSelchanged(NMTREEVIEW *);
 	LRESULT OnItemExpanding(NMTREEVIEW *);

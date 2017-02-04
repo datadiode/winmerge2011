@@ -30,12 +30,12 @@ class CFloatState : public CFloatFlags
 {
 public:
 	//Construction
-	CFloatState(const LONG *FloatScript = 0): FloatScript(FloatScript) { }
+	CFloatState(LONG const *FloatScript = 0): FloatScript(FloatScript) { }
 	//Data
 	int cx;
 	int cy;
 	DWORD flags;
-	const LONG *FloatScript;
+	LONG const *FloatScript;
 	//Methods
 	void Clear();
 	BOOL Float(WINDOWPOS *);

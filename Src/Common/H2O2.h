@@ -431,6 +431,8 @@ namespace H2O
 	protected:
 		virtual BOOL OnInitDialog();
 		virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
+		virtual void ScanExtraLayoutInfo(LPCTSTR) { }
+		virtual void DumpExtraLayoutInfo(LPTSTR) { }
 	};
 
 	class OString : public SysString<Object>

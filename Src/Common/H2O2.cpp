@@ -30,6 +30,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "StdAfx.h"
+#include "RegKey.h"
 #include "SettingStore.h"
 
 using namespace H2O;
@@ -322,8 +323,18 @@ BOOL OResizableDialog::OnInitDialog()
 	CFloatState::Clear();
 	TCHAR entry[8];
 	GetAtomName(reinterpret_cast<ATOM>(m_idd), entry, _countof(entry));
-	DWORD dim = SettingStore.GetProfileInt(_T("ScreenLayout"), entry, 0);
-	SetWindowPos(NULL, 0, 0, LOWORD(dim), HIWORD(dim), SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
+	if (CRegKeyEx rk = SettingStore.GetSectionKey(_T("ScreenLayout")))
+	{
+		TCHAR value[1024];
+		if (LPTSTR pch = const_cast<LPTSTR>(rk.ReadString(entry, NULL, CRegKeyEx::StringRef(value, _countof(value)))))
+		{
+			int const cx = _tcstol(pch, &pch, 10);
+			*pch = _T('0');
+			int const cy = _tcstol(pch, &pch, 10);
+			SetWindowPos(NULL, 0, 0, cx, cy, SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
+			ScanExtraLayoutInfo(pch);
+		}
+	}
 	return TRUE;
 }
 
@@ -335,9 +346,16 @@ LRESULT OResizableDialog::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_DESTROY:
 		GetAtomName(reinterpret_cast<ATOM>(m_idd), entry, _countof(entry));
-		GetWindowRect(&rect);
-		DWORD dim = MAKELONG(rect.right - rect.left, rect.bottom - rect.top);
-		SettingStore.WriteProfileInt(_T("ScreenLayout"), entry, dim);
+		if (CRegKeyEx rk = SettingStore.GetSectionKey(_T("ScreenLayout")))
+		{
+			GetWindowRect(&rect);
+			int const cx = rect.right - rect.left;
+			int const cy = rect.bottom - rect.top;
+			TCHAR value[1024];
+			int cch = wsprintf(value, _T("%dx%d"), cx, cy);
+			DumpExtraLayoutInfo(value + cch);
+			rk.WriteString(entry, value);
+		}
 		break;
 	}
 	return CFloatState::CallWindowProc(::DefDlgProc, m_hWnd, uMsg, wParam, lParam);
@@ -510,9 +528,9 @@ OException::OException(LPCTSTR str)
 
 OException::OException(DWORD err, LPCTSTR fmt)
 {
-	static const DWORD WinInetFlags =
+	static DWORD const WinInetFlags =
 		FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_FROM_HMODULE;
-	static const DWORD DefaultFlags =
+	static DWORD const DefaultFlags =
 		FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS;
 	switch (HIWORD(err))
 	{
@@ -521,8 +539,8 @@ OException::OException(DWORD err, LPCTSTR fmt)
 		err = DISP_E_EXCEPTION;
 		// fall through
 	default:
-		HMODULE WinInet = ::GetModuleHandle(_T("WININET"));
-		if (DWORD len = ::FormatMessage(
+		HMODULE const WinInet = ::GetModuleHandle(_T("WININET"));
+		if (DWORD const len = ::FormatMessage(
 			WinInet ? WinInetFlags : DefaultFlags, WinInet,
 			err, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
 			msg, _countof(msg), NULL))
@@ -535,14 +553,12 @@ OException::OException(DWORD err, LPCTSTR fmt)
 					BSTR bstr;
 					if (SUCCEEDED(perrinfo->GetSource(&bstr)) && bstr)
 					{
-						len += wnsprintf(msg + len,
-							_countof(msg) - len, _T("\n%ls - "), bstr);
+						wnsprintf(msg + len, _countof(msg) - len, _T("\n%ls - "), bstr);
 						SysFreeString(bstr);
 					}
 					if (SUCCEEDED(perrinfo->GetDescription(&bstr)) && bstr)
 					{
-						len += wnsprintf(msg + len,
-							_countof(msg) - len, _T("%ls"), bstr);
+						wnsprintf(msg + len, _countof(msg) - len, _T("%ls"), bstr);
 						SysFreeString(bstr);
 					}
 					perrinfo->Release();

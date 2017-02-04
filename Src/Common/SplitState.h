@@ -1,10 +1,12 @@
 class CSplitState
 {
-public:
+protected:
 	//Construction
-	CSplitState(const LONG *SplitScript = 0): SplitScript(SplitScript) { }
+	CSplitState(LONG const *SplitScript = 0): SplitScript(SplitScript) { }
 	//Data
-	const LONG *SplitScript;
+	LONG const *SplitScript;
 	//Methods
 	BOOL Split(HWND);
+	BOOL Scan(HWND, LPCTSTR) const;
+	int Dump(HWND, LPTSTR) const;
 };

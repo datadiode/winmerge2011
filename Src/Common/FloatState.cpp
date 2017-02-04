@@ -27,7 +27,7 @@ Last change: 2013-03-09 by Jochen Neubeck
 #include "StdAfx.h"
 #include "FloatState.h"
 
-static void NTAPI WineAwareSetWindowPlacement(HWND hwnd, const WINDOWPLACEMENT *pwp)
+static void NTAPI WineAwareSetWindowPlacement(HWND hwnd, WINDOWPLACEMENT const *pwp)
 {
 	if (wine_version)
 	{
@@ -85,7 +85,7 @@ BOOL CFloatState::Float(WINDOWPOS *pParam)
 	BOOL Float = (wpflags & SWP_FRAMECHANGED) && !(wpflags & SWP_NOSIZE) || !(wpflags & (SWP_NOSIZE | SWP_NOCOPYBITS));
 	if (Float && FloatScript)
 	{
-		const LONG *pScript = FloatScript;
+		LONG const *pScript = FloatScript;
 		WINDOWPLACEMENT wp;
 		wp.length = sizeof wp;
 		HWND hwndOuter = pParam->hwnd;
@@ -255,8 +255,8 @@ UINT CFloatState::AdjustHit(UINT uHitTest)
 {
 	if (uHitTest >= HTSIZEFIRST && uHitTest <= HTSIZELAST)
 	{
-		const UINT XLOCK = 0x20;
-		const UINT YLOCK = 0x40;
+		UINT const XLOCK = 0x20;
+		UINT const YLOCK = 0x40;
 		UINT uSwitch = uHitTest;
 		if ((flags & 0x00FF00FF) == 0)
 			uSwitch |= XLOCK;
