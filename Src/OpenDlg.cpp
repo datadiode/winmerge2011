@@ -544,7 +544,7 @@ void COpenDlg::OnOK()
 	if (((m_attrLeft ^ m_attrRight) & FILE_ATTRIBUTE_DIRECTORY) == 0)
 	{
 		int i = m_pCbCompareAs->GetCurSel();
-		UINT idCompareAs = m_pCbCompareAs->GetItemData(i);
+		UINT idCompareAs = static_cast<UINT>(m_pCbCompareAs->GetItemData(i));
 		TCHAR moniker[MAX_PATH];
 		if (!m_pCompareAsScriptMenu->GetMenuString(idCompareAs, moniker, _countof(moniker)))
 			GetAtomName(idCompareAs, moniker, _countof(moniker));
