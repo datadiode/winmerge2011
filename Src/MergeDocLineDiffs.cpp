@@ -142,7 +142,7 @@ void CChildFrame::Computelinediff(CCrystalTextView *pView1, CCrystalTextView *pV
 	// Add a diff in case of EOL difference
 	if (!m_diffWrapper.bIgnoreEol && IsLineMixedEOL(line))
 	{
-		worddiffs.push_back(wdiff(width1, width1, width2, width2));
+		worddiffs.push_back(wdiff(width1, width1 - 1, width2, width2 - 1));
 	}
 	if (worddiffs.empty())
 	{
@@ -251,7 +251,7 @@ void CChildFrame::GetWordDiffArray(int nLineIndex, vector<wdiff> &worddiffs) con
 	// Add a diff in case of EOL difference
 	if (!m_diffWrapper.bIgnoreEol && IsLineMixedEOL(nLineIndex))
 	{
-		worddiffs.push_back(wdiff(i1, i1, i2, i2));
+		worddiffs.push_back(wdiff(i1, i1 - 1, i2, i2 - 1));
 	}
 }
 

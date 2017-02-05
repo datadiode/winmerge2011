@@ -44,9 +44,9 @@ void sd_ComputeWordDiffs(const String & str1, const String & str2,
 	vector<wdiff> &diffs)
 {
 	if (!str1.empty() && str2.empty())
-		diffs.push_back(wdiff(0, static_cast<int>(str1.length()), 0, 0));
+		diffs.push_back(wdiff(0, static_cast<int>(str1.length()) - 1, 0, -1));
 	else if (str1.empty() && !str2.empty())
-		diffs.push_back(wdiff(0, 0, 0, static_cast<int>(str2.length())));
+		diffs.push_back(wdiff(0, -1, 0, static_cast<int>(str2.length()) - 1));
 	else
 	{
 		stringdiffs sdiffs(str1, str2, case_sensitive, whitespace, breakType, diffs);

@@ -242,7 +242,7 @@ int CGhostTextView::GetAdditionalTextBlocks(int nLineIndex, TEXTBLOCK *&rpBuf)
 				pBuf->m_nBgColorIndex = COLORINDEX_HIGHLIGHTBKGND2 | COLORINDEX_APPLYFORCE;
 		}
 		++pBuf;
-		pBuf->m_nCharPos = wd.end[m_nThisPane] < nLineLength ? wd.end[m_nThisPane] + 1 : nLineLength;
+		pBuf->m_nCharPos = wd.end[m_nThisPane] + 1;
 		pBuf->m_nColorIndex = COLORINDEX_NONE;
 		pBuf->m_nBgColorIndex = COLORINDEX_NONE;
 	}
