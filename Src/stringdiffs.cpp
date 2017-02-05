@@ -1419,7 +1419,7 @@ static void wordLevelToByteLevel(vector<wdiff> &diffs,
 		if (begin1 == -1)
 		{
 			// no visible diff on side1
-			diff.end[0] = diff.start[0] - 1;
+			diff.start[0] = diff.end[0] + 1;
 			bRepeat = false;
 		}
 		else
@@ -1438,7 +1438,7 @@ static void wordLevelToByteLevel(vector<wdiff> &diffs,
 		if (begin2 == -1)
 		{
 			// no visible diff on side2
-			diff.end[1] = diff.start[1] - 1;
+			diff.start[1] = diff.end[1] + 1;
 			bRepeat = false;
 		}
 		else
