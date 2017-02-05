@@ -326,11 +326,10 @@ BOOL OResizableDialog::OnInitDialog()
 	if (CRegKeyEx rk = SettingStore.GetSectionKey(_T("ScreenLayout")))
 	{
 		TCHAR value[1024];
-		if (LPTSTR pch = const_cast<LPTSTR>(rk.ReadString(entry, NULL, CRegKeyEx::StringRef(value, _countof(value)))))
+		if (LPCTSTR pch = rk.ReadString(entry, NULL, CRegKeyEx::StringRef(value, _countof(value))))
 		{
-			int const cx = _tcstol(pch, &pch, 10);
-			*pch = _T('0');
-			int const cy = _tcstol(pch, &pch, 10);
+			int const cx = _tcstol(pch, const_cast<LPTSTR *>(&pch), 10);
+			int const cy = _tcstol(&pch[*pch == 'x'], const_cast<LPTSTR *>(&pch), 10);
 			SetWindowPos(NULL, 0, 0, cx, cy, SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
 			CSplitState::Scan(m_hWnd, pch);
 		}
