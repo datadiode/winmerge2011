@@ -105,7 +105,6 @@ static void AttributesToText(DWORD attr, LPWSTR text)
 
 ExplorerDlg::ExplorerDlg(UINT idd)
 	: OResizableDialog(idd)
-	, CSplitState(SplitScript)
 	, m_bHasListView(m_idd == MAKEINTRESOURCE(IDD_BROWSE_FOR_FILE))
 	, m_bEnableFolderSelect(m_idd == MAKEINTRESOURCE(IDD_BROWSE_FOR_FOLDER))
 {
@@ -214,16 +213,6 @@ LRESULT ExplorerDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 	}
 	return OResizableDialog::WindowProc(message, wParam, lParam);
-}
-
-void ExplorerDlg::ScanExtraLayoutInfo(LPCTSTR pch)
-{
-	CSplitState::Scan(m_hWnd, pch);
-}
-
-void ExplorerDlg::DumpExtraLayoutInfo(LPTSTR pch)
-{
-	CSplitState::Dump(m_hWnd, pch);
 }
 
 LRESULT ExplorerDlg::WndProcFilter(WNDPROC pfnSuper, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

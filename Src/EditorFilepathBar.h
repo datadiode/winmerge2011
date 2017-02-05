@@ -25,9 +25,6 @@
  */
 #pragma once
 
-#include <Common/FloatState.h>
-#include <Common/SplitState.h>
-
 /**
  * @brief Types for buffer. Buffer's type defines behavior
  * of buffer when saving etc.

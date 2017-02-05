@@ -36,6 +36,7 @@
 #pragma once
 
 #include "FloatState.h"
+#include "SplitState.h"
 
 namespace H2O
 {
@@ -423,16 +424,16 @@ namespace H2O
 		static LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 	};
 
-	class OResizableDialog : public ODialog, protected CFloatState
+	class OResizableDialog
+		: public ODialog
+		, protected CFloatState
+		, protected CSplitState
 	{
-	public:
+	protected:
 		OResizableDialog(LPCTSTR idd): ODialog(idd) { }
 		OResizableDialog(UINT idd): ODialog(MAKEINTRESOURCE(idd)) { }
-	protected:
 		virtual BOOL OnInitDialog();
 		virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
-		virtual void ScanExtraLayoutInfo(LPCTSTR) { }
-		virtual void DumpExtraLayoutInfo(LPTSTR) { }
 	};
 
 	class OString : public SysString<Object>

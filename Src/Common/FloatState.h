@@ -2,7 +2,7 @@
 
 class CFloatFlags
 {
-public:
+protected:
 	enum
 	{
 		L2L = 0x00010000,
@@ -28,14 +28,14 @@ public:
 
 class CFloatState : public CFloatFlags
 {
-public:
+protected:
 	//Construction
 	CFloatState(LONG const *FloatScript = 0): FloatScript(FloatScript) { }
 	//Data
+	LONG const *FloatScript;
 	int cx;
 	int cy;
 	DWORD flags;
-	LONG const *FloatScript;
 	//Methods
 	void Clear();
 	BOOL Float(WINDOWPOS *);

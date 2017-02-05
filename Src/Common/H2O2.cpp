@@ -332,7 +332,7 @@ BOOL OResizableDialog::OnInitDialog()
 			*pch = _T('0');
 			int const cy = _tcstol(pch, &pch, 10);
 			SetWindowPos(NULL, 0, 0, cx, cy, SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
-			ScanExtraLayoutInfo(pch);
+			CSplitState::Scan(m_hWnd, pch);
 		}
 	}
 	return TRUE;
@@ -353,7 +353,7 @@ LRESULT OResizableDialog::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			int const cy = rect.bottom - rect.top;
 			TCHAR value[1024];
 			int cch = wsprintf(value, _T("%dx%d"), cx, cy);
-			DumpExtraLayoutInfo(value + cch);
+			CSplitState::Dump(m_hWnd, value + cch);
 			rk.WriteString(entry, value);
 		}
 		break;
