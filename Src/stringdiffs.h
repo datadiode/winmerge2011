@@ -24,8 +24,8 @@ struct wdiff
 	}
 };
 
-void sd_SetBreakChars(const TCHAR *breakChars);
+void sd_SetBreakChars(LPCTSTR breakChars);
 
-void sd_ComputeWordDiffs(const String &str1, const String &str2,
+void sd_ComputeWordDiffs(String const &str1, String const &str2,
 		bool case_sensitive, int whitespace, int breakType, bool byte_level,
 		std::vector<wdiff> &diffs);

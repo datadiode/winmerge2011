@@ -6,45 +6,40 @@
  */
 
 /**
- * @brief kind of diff blocks.
- */
-enum sd_kind
-{
-	dlword,
-	dlspace,
-	dlbreak, 
-	dlinsert,
-};
-/**
- * @brief kind of synchronaction
- */
-enum sd_findsyn_func
-{
-	synbegin1,
-	synbegin2,
-	synend1, 
-	synend2 
-};
-
-struct wdiff;
-
-/**
  * @brief Class to hold together data needed to implement sd_ComputeWordDiffs
  */
 class stringdiffs
 {
 public:
-	stringdiffs(const String &str1, const String &str2,
+	stringdiffs(String const &str1, String const &str2,
 		bool case_sensitive, int whitespace, int breakType,
-		std::vector<wdiff> &diffs);
+		bool byte_level, std::vector<wdiff> &);
 
 	~stringdiffs();
 
-	void BuildWordDiffList();
-	void PopulateDiffs();
-
 // Implementation types
 private:
+	/**
+	 * @brief kind of diff blocks.
+	 */
+	enum sd_kind
+	{
+		dlword,
+		dlspace,
+		dlbreak, 
+		dlinsert,
+	};
+	/**
+	 * @brief kind of synchronaction
+	 */
+	enum sd_findsyn_func
+	{
+		synbegin1,
+		synbegin2,
+		synend1, 
+		synend2 
+	};
+
 	struct word
 	{
 		int start; // index of first character of word in original string
@@ -57,24 +52,30 @@ private:
 
 // Implementation methods
 private:
-
-	void BuildWordsArray(const String &str, std::vector<word> &words);
+	void ResizeWordArraysToSameLength();
+	void BuildWordsArray(String const &str, std::vector<word> &words);
 	static void InsertInWords(std::vector<word> &words, int bw);
-	int FindPreMatchInWords(const std::vector<word> &words, const word &needword, int bw, int side) const;
-	int FindNextMatchInWords(const std::vector<word> &words, const word &needword, int bw, int side) const;
-	static int FindNextSpaceInWords(const std::vector<word> &words, int bw);
-	static int FindPreNoInsertInWords(const std::vector<word> &words, int bw);
-	static int FindNextInsertInWords(const std::vector<word> &words, int bw);
-	static int FindNextNoInsertInWords(const std::vector<word> &words, int bw);
+	int FindPreMatchInWords(std::vector<word> const &words, word const &needword, int bw, int side) const;
+	int FindNextMatchInWords(std::vector<word> const &words, word const &needword, int bw, int side) const;
+	static int FindNextSpaceInWords(std::vector<word> const &words, int bw);
+	static int FindPreNoInsertInWords(std::vector<word> const &words, int bw);
+	static int FindNextInsertInWords(std::vector<word> const &words, int bw);
+	static int FindNextNoInsertInWords(std::vector<word> const &words, int bw);
 	static void MoveInWordsUp(std::vector<word> &words, int source, int target);
 	static void MoveInWordsDown(std::vector<word> &words, int source, int target);
-	UINT Hash(const String &str, int begin, int end, UINT h) const;
-	bool AreWordsSame(const word &word1, const word &word2) const;
-	static bool IsWord(const word &);
-	static bool IsSpace(const word &);
-	static bool IsBreak(const word &);
-	static bool IsInsert(const word &);
+	UINT Hash(String const &str, int begin, int end, UINT h) const;
+	bool AreWordsSame(word const &word1, word const &word2) const;
+	static bool IsWord(word const &);
+	static bool IsSpace(word const &);
+	static bool IsBreak(word const &);
+	static bool IsInsert(word const &);
 	bool caseMatch(TCHAR ch1, TCHAR ch2) const;
+	void wordLevelToByteLevel() const;
+	void ComputeByteDiff(wdiff const &,
+		int &begin1, int &begin2, int &end1, int &end2, bool equal) const;
+	bool findsyn(wdiff const &,
+		int &begin1, int &begin2, int &end1, int &end2, bool equal,
+		sd_findsyn_func func, int &s1, int &e1, int &s2, int &e2) const;
 
 // Implementation data
 private:
@@ -87,5 +88,4 @@ private:
 	std::vector<wdiff> &m_diffs;
 	std::vector<word> m_words1;
 	std::vector<word> m_words2;
-	std::vector<wdiff> m_wdiffs;
 };
