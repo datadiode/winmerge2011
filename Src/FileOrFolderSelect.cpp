@@ -74,7 +74,7 @@ static LPCWSTR SetDefExt(String &path, LPCWSTR filter)
  * @param [in] defaultExtension Extension to append if user doesn't provide one
  */
 BOOL SelectFile(HWND parent, String &path,
-	UINT titleid, UINT filterid, BOOL is_open, LPCTSTR flters)
+	UINT titleid, UINT filterid, BOOL is_open, LPCTSTR filters)
 {
 	ASSERT(parent != NULL);
 
@@ -85,16 +85,16 @@ BOOL SelectFile(HWND parent, String &path,
 	{
 		dlg.m_filters = LanguageSelect.LoadString(filterid);
 	}
-	else if (flters)
+	else if (filters)
 	{
-		dlg.m_filters = flters;
+		dlg.m_filters = filters;
 	}
 
 	// Convert extension mask from MFC style separators ('|')
 	//  to Win32 style separators ('\0')
 	std::replace(dlg.m_filters.begin(), dlg.m_filters.end(), _T('|'), _T('\0'));
 
-	if (flters)
+	if (filters)
 		dlg.m_defext = SetDefExt(path, dlg.m_filters.c_str());
 
 	if (!COptionsMgr::Get(OPT_USE_SHELL_FILE_BROOWSE_DIALOGS))
