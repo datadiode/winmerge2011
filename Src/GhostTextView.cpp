@@ -222,13 +222,13 @@ int CGhostTextView::GetAdditionalTextBlocks(int nLineIndex, TEXTBLOCK *&rpBuf)
 	pBuf[0].m_nBgColorIndex = COLORINDEX_NONE;
 	for (int i = 0; i < nWordDiffs; i++)
 	{
-		const wdiff &wd = worddiffs[i];
+		wdiff const &wd = worddiffs[i];
 		++pBuf;
 		pBuf->m_nCharPos = wd.start[m_nThisPane];
 		if (lineInCurrentDiff)
 		{
 			pBuf->m_nColorIndex = COLORINDEX_HIGHLIGHTTEXT1 | COLORINDEX_APPLYFORCE;
-			if (wd.start[0] == wd.end[0] + 1 || wd.start[1] == wd.end[1] + 1)
+			if (wd.IsInsert()) // Are char/words inserted/deleted on one side?
 				pBuf->m_nBgColorIndex = COLORINDEX_HIGHLIGHTBKGND4 | COLORINDEX_APPLYFORCE;
 			else
 				pBuf->m_nBgColorIndex = COLORINDEX_HIGHLIGHTBKGND1 | COLORINDEX_APPLYFORCE;
@@ -236,8 +236,7 @@ int CGhostTextView::GetAdditionalTextBlocks(int nLineIndex, TEXTBLOCK *&rpBuf)
 		else
 		{
 			pBuf->m_nColorIndex = COLORINDEX_HIGHLIGHTTEXT2 | COLORINDEX_APPLYFORCE;
-			if (wd.start[0] == wd.end[0] + 1 || wd.start[1] == wd.end[1] + 1)
-				// Case on one side char/words are inserted or deleted 
+			if (wd.IsInsert()) // Are char/words inserted/deleted on one side?
 				pBuf->m_nBgColorIndex = COLORINDEX_HIGHLIGHTBKGND3 | COLORINDEX_APPLYFORCE;
 			else
 				pBuf->m_nBgColorIndex = COLORINDEX_HIGHLIGHTBKGND2 | COLORINDEX_APPLYFORCE;

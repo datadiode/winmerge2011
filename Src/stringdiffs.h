@@ -18,6 +18,10 @@ struct wdiff
 		end[0] = e1;
 		end[1] = e2;
 	}
+	bool IsInsert() const
+	{
+		return start[0] > end[0] || start[1] > end[1];
+	}
 };
 
 void sd_SetBreakChars(const TCHAR *breakChars);
