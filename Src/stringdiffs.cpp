@@ -595,23 +595,25 @@ stringdiffs::stringdiffs(String const &str1, String const &str2,
 		i++;
 	}
 
-#ifdef _DEBUG
-	// Verify that the former logic to combine adjacent diffs would not have
-	// taken effect, to get an idea how much it deserves restoring.
-	for (i = 0; i < m_diffs.size(); ++i)
-	{
-		if (i + 1 < m_diffs.size())
-		{
-			assert(m_diffs[i].end[0] != m_diffs[i + 1].start[0]
-				|| m_diffs[i].end[1] != m_diffs[i + 1].start[1]);
-		}
-		assert(m_diffs[i].start[0] >= 0 || m_diffs[i].start[1] >= 0);
-	}
-#endif
-
-	// Adjust the range of the word diff down to byte (char) level.
+	// Adjust the range of the word diff down to byte (char) level
 	if (byte_level)
 		wordLevelToByteLevel();
+
+	// Combine adjacent diffs
+	if (String::size_type j = m_diffs.size())
+	{
+		while (String::size_type i = --j)
+		{
+			--i;
+			if (m_diffs[i].end[0] + 1 == m_diffs[j].start[0] &&
+				m_diffs[i].end[1] + 1 == m_diffs[j].start[1])
+			{
+				m_diffs[i].end[0] = m_diffs[j].end[0];
+				m_diffs[i].end[1] = m_diffs[j].end[1];
+				m_diffs.erase(m_diffs.begin() + j);
+			}
+		}
+	}
 }
 
 /**
@@ -1438,7 +1440,7 @@ void stringdiffs::wordLevelToByteLevel() const
 #endif			
 				// visible sync on side1 and side2
 				// new in middle with diff
-				wdiff wdfm(diff.end[0]  + 1, wdf.start[0] - 1,
+				wdiff wdfm(diff.end[0] + 1, wdf.start[0] - 1,
 					diff.end[1] + 1, wdf.start[1] - 1);
 #ifdef STRINGDIFF_LOGGING
 				DbgPrint("insert\n left=  %d,%d\n right=  %d,%d\n",
