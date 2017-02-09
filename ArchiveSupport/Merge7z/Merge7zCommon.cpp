@@ -51,6 +51,8 @@ DATE:		BY:					DESCRIPTION:
 2008-08-03	Jochen Neubeck		Add LZMA format (introduced with 7z458 beta)
 2010-04-24	Jochen Neubeck		New formats introduced with 7z459 beta:
 								XAR, MUB, HFS, DMG, ELF (not sure if they work)
+2017-02-09	Jochen Neubeck		Cope with TFS temporary file name decorations
+								when extracting e.g. .tar.gz or .tar.bz2 files.
 */
 
 #include "stdafx.h"
@@ -347,6 +349,13 @@ void Format7zDLL::Interface::GetDefaultName(HWND hwndParent, UString &ustrDefaul
 	int slash = ustrDefaultName.ReverseFind(L'\\');
 	if (dot > slash)
 	{
+		// Remove a possible TFS temporary file name decoration
+		int semicolon = ustrDefaultName.ReverseFind(L';');
+		if (semicolon > slash && semicolon < dot)
+		{
+			ustrDefaultName.Delete(semicolon, dot - semicolon);
+			dot = semicolon;
+		}
 		LPCWSTR pchExtension = ustrDefaultName;
 		pchExtension += dot + 1;
 		static OLECHAR const wBlank[] = L" ";
@@ -388,7 +397,6 @@ BSTR Format7zDLL::Interface::GetDefaultName(HWND hwndParent, LPCTSTR path)
 
 BSTR Format7zDLL::Interface::Inspector::GetDefaultName()
 {
-	//UString ustrDefaultName = GetUnicodeString(path);
 	return SysAllocString(ustrDefaultName);
 }
 

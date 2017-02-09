@@ -66,3 +66,4 @@ VERSION(2,2)
 //								Support 7z465, 7z907, 7z909-7z913
 "*"//2013-02-17	Jochen Neubeck	From now on maintained as part of WinMerge 2011
 "*"//2013-12-01	Jochen Neubeck	Fix inability to open NSIS installers
+"*"//2017-02-09	Jochen Neubeck	Cope with TFS temporary file name decorations
