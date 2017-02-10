@@ -696,9 +696,7 @@ LRESULT CChildFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 		pActiveView->OnPrevdiff();
 		break;
 	case ID_SELECTLINEDIFF:
-		Showlinediff(pTextView, pActiveView,
-			COptionsMgr::Get(OPT_BREAK_ON_WORDS) ?
-			WORDDIFF : BYTEDIFF);
+		Showlinediff(pTextView, pActiveView);
 		break;
 	case ID_VIEW_SWAPPANES:
 		// Swap the two panes

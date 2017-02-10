@@ -333,7 +333,7 @@
 #define IDC_STAT_ITOTALFOLDERS                  1227
 #define IDC_STAT_ITOTALFILES                    1228
 #define IDC_EDITOR_CHARLEVEL                    1229
-#define IDC_EDITOR_WORDLEVEL                    1230
+#define IDC_BREAK_CHARS_LABEL                   1230
 #define IDC_COMPARE                             1231
 #define IDC_XCOMPARE                            1232
 #define IDC_MERGE                               1233

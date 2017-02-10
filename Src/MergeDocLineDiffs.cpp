@@ -46,7 +46,7 @@ static void HighlightDiffRect(CCrystalTextView * pView, const RECT &rc)
 /**
  * @brief Highlight difference in current line (left & right panes)
  */
-void CChildFrame::Showlinediff(CCrystalTextView *pTextView, CMergeEditView *pActiveView, DIFFLEVEL difflvl)
+void CChildFrame::Showlinediff(CCrystalTextView *pTextView, CMergeEditView *pActiveView)
 {
 	CCrystalTextView *pView[] = { m_pView[0], m_pView[1] };
 	// If focus is owned by a detail view, then operate on detail views
@@ -56,7 +56,7 @@ void CChildFrame::Showlinediff(CCrystalTextView *pTextView, CMergeEditView *pAct
 		pView[1] = m_pDetailView[1];
 	}
 	RECT rc1, rc2;
-	Computelinediff(pView[0], pView[1], pTextView->GetCursorPos().y, rc1, rc2, difflvl);
+	Computelinediff(pView[0], pView[1], pTextView->GetCursorPos().y, rc1, rc2);
 
 	if (rc1.top == -1 && rc2.top == -1)
 	{
@@ -106,7 +106,7 @@ static void ComputeHighlightRects(const vector<wdiff> & worddiffs, int whichdiff
 /**
  * @brief Returns rectangles to highlight in both views (to show differences in line specified)
  */
-void CChildFrame::Computelinediff(CCrystalTextView *pView1, CCrystalTextView *pView2, int line, RECT &rc1, RECT &rc2, DIFFLEVEL difflvl)
+void CChildFrame::Computelinediff(CCrystalTextView *pView1, CCrystalTextView *pView2, int nLineIndex, RECT &rc1, RECT &rc2)
 {
 	// Local statics are used so we can cycle through diffs in one line
 	// We store previous state, both to find next state, and to verify
@@ -117,33 +117,16 @@ void CChildFrame::Computelinediff(CCrystalTextView *pView1, CCrystalTextView *pV
 	static int whichdiff = -2; // last diff highlighted (-2==none, -1=whole line)
 
 	// Only remember place in cycle if same line and same view
-	if (lastView != pView1 || lastLine != line)
+	if (lastView != pView1 || lastLine != nLineIndex)
 	{
 		lastView = pView1;
-		lastLine = line;
+		lastLine = nLineIndex;
 		whichdiff = -2; // reset to not in cycle
 	}
 
-	// We truncate diffs to remain inside line (ie, to not flag eol characters)
-	const int width1 = m_pView[0]->GetLineLength(line);
-	const int width2 = m_pView[1]->GetLineLength(line);
-
-	String str1(m_pView[0]->GetLineChars(line), width1);
-	String str2(m_pView[1]->GetLineChars(line), width2);
-
-	// Options that affect comparison
-	bool casitive = !m_diffWrapper.bIgnoreCase;
-	int xwhite = m_diffWrapper.nIgnoreWhitespace;
-
-	// Make the call to stringdiffs, which does all the hard & tedious computations
 	vector<wdiff> worddiffs;
-	int breakType = GetBreakType();
-	sd_ComputeWordDiffs(str1, str2, casitive, xwhite, breakType, difflvl == BYTEDIFF, worddiffs);
-	// Add a diff in case of EOL difference
-	if (!m_diffWrapper.bIgnoreEol && IsLineMixedEOL(line))
-	{
-		worddiffs.push_back(wdiff(width1, width1 - 1, width2, width2 - 1));
-	}
+	GetWordDiffArray(nLineIndex, worddiffs);
+
 	if (worddiffs.empty())
 	{
 		// signal to caller that there was no diff
@@ -151,6 +134,9 @@ void CChildFrame::Computelinediff(CCrystalTextView *pView1, CCrystalTextView *pV
 		rc2.top = -1;
 		return;
 	}
+
+	int const width1 = m_pView[0]->GetLineLength(nLineIndex);
+	int const width2 = m_pView[1]->GetLineLength(nLineIndex);
 
 	// Are we continuing a cycle from the same place ?
 	if (whichdiff >= (int)worddiffs.size())
@@ -165,7 +151,7 @@ void CChildFrame::Computelinediff(CCrystalTextView *pView1, CCrystalTextView *pV
 	{
 		// Recompute previous highlight rectangle
 		RECT rc1x, rc2x;
-		ComputeHighlightRects(worddiffs, whichdiff, line, width1, width2, rc1x, rc2x);
+		ComputeHighlightRects(worddiffs, whichdiff, nLineIndex, width1, width2, rc1x, rc2x);
 		if (rc1x != lastRc1 || rc2x != lastRc2)
 		{
 			// Something has changed, reset cycle
@@ -206,8 +192,8 @@ void CChildFrame::Computelinediff(CCrystalTextView *pView1, CCrystalTextView *pV
 					break; // found both
 			} while (it != worddiffs.begin());
 		}
-		SetLineHighlightRect(begin1, end1, line, width1, rc1);
-		SetLineHighlightRect(begin2, end2, line, width2, rc2);
+		SetLineHighlightRect(begin1, end1, nLineIndex, width1, rc1);
+		SetLineHighlightRect(begin2, end2, nLineIndex, width2, rc2);
 		whichdiff = -1;
 	}
 	else
@@ -217,7 +203,7 @@ void CChildFrame::Computelinediff(CCrystalTextView *pView1, CCrystalTextView *pV
 		ASSERT(whichdiff < static_cast<int>(worddiffs.size()));
 
 		// highlight one particular diff
-		ComputeHighlightRects(worddiffs, whichdiff, line, width1, width2, rc1, rc2);
+		ComputeHighlightRects(worddiffs, whichdiff, nLineIndex, width1, width2, rc1, rc2);
 		lastRc1 = rc1;
 		lastRc2 = rc2;
 	}
@@ -235,16 +221,17 @@ void CChildFrame::GetWordDiffArray(int nLineIndex, vector<wdiff> &worddiffs) con
 	if (nLineIndex >= m_pView[1]->GetLineCount())
 		return;
 
-	int i1 = m_pView[0]->GetLineLength(nLineIndex);
-	int i2 = m_pView[1]->GetLineLength(nLineIndex);
+	// We truncate diffs to remain inside line (ie, to not flag eol characters)
+	int const i1 = m_pView[0]->GetLineLength(nLineIndex);
+	int const i2 = m_pView[1]->GetLineLength(nLineIndex);
 	String str1(m_pView[0]->GetLineChars(nLineIndex), i1);
 	String str2(m_pView[1]->GetLineChars(nLineIndex), i2);
 
 	// Options that affect comparison
-	const bool casitive = !m_diffWrapper.bIgnoreCase;
-	const int xwhite = m_diffWrapper.nIgnoreWhitespace;
-	const int breakType = GetBreakType(); // whitespace only or include punctuation
-	const bool byteColoring = GetByteColoringOption();
+	bool const casitive = !m_diffWrapper.bIgnoreCase;
+	int const xwhite = m_diffWrapper.nIgnoreWhitespace;
+	int const breakType = COptionsMgr::Get(OPT_BREAK_TYPE);
+	bool const byteColoring = COptionsMgr::Get(OPT_CHAR_LEVEL);
 
 	// Make the call to stringdiffs, which does all the hard & tedious computations
 	sd_ComputeWordDiffs(str1, str2, casitive, xwhite, breakType, byteColoring, worddiffs);

@@ -2127,19 +2127,6 @@ void CChildFrame::SetTitle()
 	SetWindowText(sTitle.c_str());
 }
 
-// Return current word breaking break type setting (whitespace only or include punctuation)
-int CChildFrame::GetBreakType()
-{
-	return COptionsMgr::Get(OPT_BREAK_TYPE);
-}
-
-// Return true to do line diff colors at the byte level (false to do them at word level)
-bool CChildFrame::GetByteColoringOption()
-{
-	// color at byte level if 'break_on_words' option not set
-	return !COptionsMgr::Get(OPT_BREAK_ON_WORDS);
-}
-
 /// Swap files and update views
 void CChildFrame::SwapFiles()
 {

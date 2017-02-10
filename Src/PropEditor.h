@@ -28,7 +28,7 @@ public:
 	BOOL    m_bAutomaticRescan;
 	BOOL    m_bAllowMixedEol;
 	BOOL    m_bViewLineDifferences;
-	BOOL    m_bBreakOnWords;
+	BOOL    m_bCharLevel;
 	int     m_nBreakType;
 	String m_breakChars;
 

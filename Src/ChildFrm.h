@@ -205,9 +205,8 @@ private:
 	bool ListCopy(int srcPane, int dstPane, int nDiff = -1, bool bGroupWithPrevious = false);
 
 // Implementation in MergeDocLineDiffs.cpp
-	typedef enum { BYTEDIFF, WORDDIFF } DIFFLEVEL;
-	void Showlinediff(CCrystalTextView *, CMergeEditView *, DIFFLEVEL);
-	void Computelinediff(CCrystalTextView *, CCrystalTextView *, int, RECT &, RECT &, DIFFLEVEL);
+	void Showlinediff(CCrystalTextView *, CMergeEditView *);
+	void Computelinediff(CCrystalTextView *, CCrystalTextView *, int, RECT &, RECT &);
 	bool IsLineMixedEOL(int nLineIndex) const;
 // End MergeDocLineDiffs.cpp
 
@@ -251,8 +250,6 @@ private:
 	void AdjustDiffBlocks();
 	int GetMatchCost(const String &sLine0, const String &sLine1);
 	void FlagMovedLines(MovedLines *, CDiffTextBuffer *, CDiffTextBuffer *);
-	static int GetBreakType();
-	static bool GetByteColoringOption();
 	static bool IsValidCodepageForMergeEditor(unsigned cp);
 	static void SanityCheckCodepage(FileLocation &fileinfo);
 	FileLoadResult::FILES_RESULT LoadOneFile(int index, bool &readOnly, FileLocation &);

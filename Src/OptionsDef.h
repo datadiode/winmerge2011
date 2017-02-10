@@ -57,7 +57,7 @@ extern COptionDef
 extern COptionDef
 <bool> OPT_WORDDIFF_HIGHLIGHT operator((_T("Settings/HiliteWordDiff"), true));
 extern COptionDef
-<bool> OPT_BREAK_ON_WORDS operator((_T("Settings/BreakOnWords"), true));
+<bool> OPT_CHAR_LEVEL operator((_T("Settings/CharLevel"), false));
 extern COptionDef
 <int> OPT_BREAK_TYPE operator((_T("Settings/BreakType"), 0));
 extern COptionDef
