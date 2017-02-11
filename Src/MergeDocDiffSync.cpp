@@ -35,19 +35,16 @@ CChildFrame::DiffMap::DiffMap(CChildFrame *pDoc,
 ) :	map(lines0, BAD_MAP_ENTRY), cost(lines0 * lines1)
 {
 	// Map & lo & hi numbers are all relative to begin0 & begin1
-	CDiffTextBuffer *tbuf0 = pDoc->m_ptBuf[0];
-	CDiffTextBuffer *tbuf1 = pDoc->m_ptBuf[1];
-	String sLine0, sLine1;
+	CDiffTextBuffer *const tbuf0 = pDoc->m_ptBuf[0];
+	CDiffTextBuffer *const tbuf1 = pDoc->m_ptBuf[1];
 	for (int j = 0 ; j < lines1 ; ++j)
 	{
-		const LineInfo &li1 = tbuf1->GetLineInfo(begin1 + j);
-		sLine1.assign(li1.GetLine(), li1.Length());
-		const int k = j * map.size();
+		LineInfo const &li1 = tbuf1->GetLineInfo(begin1 + j);
+		int const k = j * map.size();
 		for (int i = 0 ; i < lines0 ; ++i)
 		{
-			const LineInfo &li0 = tbuf0->GetLineInfo(begin0 + i);
-			sLine0.assign(li0.GetLine(), li0.Length());
-			cost[k + i] = pDoc->GetMatchCost(sLine0, sLine1);
+			LineInfo const &li0 = tbuf0->GetLineInfo(begin0 + i);
+			cost[k + i] = pDoc->GetMatchCost(li0, li1);
 		}
 	}
 	AdjustDiffBlock(0, lines0 - 1, 0, lines1 - 1);
@@ -224,10 +221,12 @@ void CChildFrame::AdjustDiffBlocks()
 /**
  * @brief Return cost of making strings equal
  *
- * The cost of making them equal is the measure of their dissimilarity
- * which is their Levenshtein distance.
+ * The cost of making them equal is the measure of their dissimilarity,
+ * which at an early stage of implementation was represented by their
+ * Levenshtein distance, but now is represented by the summed up lengths
+ * of the word diffs produced by sd_ComputeWordDiffs().
  */
-int CChildFrame::GetMatchCost(const String &sLine0, const String &sLine1)
+int CChildFrame::GetMatchCost(LineInfo const &li0, LineInfo const &li1)
 {
 	// Options that affect comparison
 	bool const casitive = !m_diffWrapper.bIgnoreCase;
@@ -235,17 +234,20 @@ int CChildFrame::GetMatchCost(const String &sLine0, const String &sLine1)
 	int const breakType = COptionsMgr::Get(OPT_BREAK_TYPE); // whitespace only or include punctuation
 	bool const byteColoring = COptionsMgr::Get(OPT_CHAR_LEVEL);
 
-	std::vector<wdiff> worddiffs;
-	sd_ComputeWordDiffs(sLine0, sLine1, casitive, xwhite, breakType, byteColoring, worddiffs);
+	int const len1 = li0.Length();
+	LPCTSTR const str1 = li0.GetLine();
+	int const len2 = li1.Length();
+	LPCTSTR const str2 = li1.GetLine();
 
-	int nDiffLenSum = 0;
+	std::vector<wdiff> worddiffs;
+	sd_ComputeWordDiffs(str1, len1, str2, len2, casitive, xwhite, breakType, byteColoring, worddiffs);
+
+	int cost = 0;
 	std::vector<wdiff>::const_iterator it = worddiffs.begin();
 	while (it != worddiffs.end())
 	{
-		const wdiff &wd = *it++;
-		int nDiffLen0 = wd.end[0] - wd.start[0] + 1;
-		int nDiffLen1 = wd.end[1] - wd.start[1] + 1;
-		nDiffLenSum += max(nDiffLen0, nDiffLen1);
+		wdiff const &wd = *it++;
+		cost += max(wd.end[0] - wd.start[0], wd.end[1] - wd.start[1]) + 1;
 	}
-	return nDiffLenSum;
+	return cost;
 }

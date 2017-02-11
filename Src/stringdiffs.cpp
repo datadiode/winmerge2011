@@ -32,26 +32,28 @@ void sd_SetBreakChars(LPCTSTR breakChars)
 /**
  * @brief Construct our worker object and tell it to do the work
  */
-void sd_ComputeWordDiffs(String const &str1, String const &str2,
+void sd_ComputeWordDiffs(LPCTSTR str1, int len1, LPCTSTR str2, int len2,
 	bool case_sensitive, int whitespace, int breakType, bool byte_level,
 	vector<wdiff> &diffs)
 {
-	if (!str1.empty() && str2.empty())
-		diffs.push_back(wdiff(0, static_cast<int>(str1.length()) - 1, 0, -1));
-	else if (str1.empty() && !str2.empty())
-		diffs.push_back(wdiff(0, -1, 0, static_cast<int>(str2.length()) - 1));
+	if (len1 != 0 && len2 == 0)
+		diffs.push_back(wdiff(0, len1 - 1, 0, -1));
+	else if (len1 == 0 && len2 != 0)
+		diffs.push_back(wdiff(0, -1, 0, len2 - 1));
 	else
-		stringdiffs(str1, str2, case_sensitive, whitespace, breakType, byte_level, diffs);
+		stringdiffs(str1, len1, str2, len2, case_sensitive, whitespace, breakType, byte_level, diffs);
 }
 
 /**
  * @brief stringdiffs constructor simply loads all members from arguments
  */
-stringdiffs::stringdiffs(String const &str1, String const &str2,
+stringdiffs::stringdiffs(LPCTSTR str1, int len1, LPCTSTR str2, int len2,
 	bool case_sensitive, int whitespace, int breakType, bool byte_level,
 	vector<wdiff> &diffs)
 : m_str1(str1)
+, m_len1(len1)
 , m_str2(str2)
+, m_len2(len2)
 , m_case_sensitive(case_sensitive)
 , m_whitespace(whitespace)
 , m_breakType(breakType)
@@ -61,8 +63,8 @@ stringdiffs::stringdiffs(String const &str1, String const &str2,
 	// Hash all words in both lines and then compare them word by word
 	// storing differences into m_wdiffs
 
-	BuildWordsArray(m_str1, m_words1);
-	BuildWordsArray(m_str2, m_words2);
+	BuildWordsArray(m_str1, m_len1, m_words1);
+	BuildWordsArray(m_str2, m_len2, m_words2);
 
 	// If we have to ignore all whitespace change,
 	// just remove leading and ending if one is there
@@ -531,17 +533,17 @@ stringdiffs::stringdiffs(String const &str1, String const &str2,
 	if (i > 1)
 	{
 		if (IsInsert(m_words1[i - 1]) &&
-			((m_words1[i - 1].start == m_str1.length() - 1) || (m_words1[i - 1].start == m_words1[i - 2].end)))
+			((m_words1[i - 1].start == m_len1 - 1) || (m_words1[i - 1].start == m_words1[i - 2].end)))
 		{
-			m_words1[i - 1].start = m_str1.length();
+			m_words1[i - 1].start = m_len1;
 			m_words1[i - 1].end = m_words1[i - 1].start - 1;
 		}
 		else
 		{
 			if (IsInsert(m_words2[i - 1]) &&
-				((m_words2[i - 1].start == m_str2.length() - 1) || (m_words2[i - 1].start == m_words2[i - 2].end)))
+				((m_words2[i - 1].start == m_len2 - 1) || (m_words2[i - 1].start == m_words2[i - 2].end)))
 			{
-				m_words2[i - 1].start = m_str2.length();
+				m_words2[i - 1].start = m_len2;
 				m_words2[i - 1].end = m_words2[i - 1].start - 1;
 			}
 		}
@@ -549,11 +551,10 @@ stringdiffs::stringdiffs(String const &str1, String const &str2,
 	// Final run create diff
 #ifdef STRINGDIFF_LOGGING
 	DbgPrint("final run create diff\n");
-	DbgPrint("left=  %d,   right=  %d\n",
-		m_str1.length(), m_str2.length());
+	DbgPrint("left=  %d,   right=  %d\n", m_len1, m_len2);
 #endif
 	// Be aware, do not create more wdiffs as shortest line has chars!
-	String::size_type imaxcount = min(m_str1.length(), m_str2.length());
+	String::size_type imaxcount = min(m_len1, m_len2);
 	i = 0;
 	String::size_type const iSize1 = m_words1.size();
 	String::size_type const iSize2 = m_words2.size();
@@ -811,13 +812,13 @@ void stringdiffs::MoveInWordsDown(vector<word> &words, int source, int target)
 /**
  * @brief Break line into constituent words
  */
-void stringdiffs::BuildWordsArray(String const &str, vector<word> &words)
+void stringdiffs::BuildWordsArray(LPCTSTR str, int len, vector<word> &words)
 {
 	int i = 0, begin = 0;
 
 	// state when we are looking for next word
 inspace:
-	if (xisspace(str[i])) 
+	if (i < len && xisspace(str[i]))
 	{
 		++i;
 		goto inspace;
@@ -831,7 +832,7 @@ inspace:
 		word wd(begin, e, dlspace, Hash(str, begin, e, 0));
 		words.push_back(wd);
 	}
-	if (i == str.length())
+	if (i == len)
 		return;
 	begin = i;
 	goto inword;
@@ -839,18 +840,18 @@ inspace:
 	// state when we are inside a word
 inword:
 	int atspace = 0;
-	if (i == str.length() || ((atspace = xisspace(str[i])) != 0) || isWordBreak(m_breakType, str[i]))
+	if (i == len || ((atspace = xisspace(str[i])) != 0) || isWordBreak(m_breakType, str[i]))
 	{
-		if (begin<i)
+		if (begin < i)
 		{
 			// just finished a word
 			// e is first non-word character (space or at end)
-			int e = i-1;
-			
+			int e = i - 1;
+
 			word wd(begin, e, dlword, Hash(str, begin, e, 0));
 			words.push_back(wd);
 		}
-		if (i == str.length())
+		if (i == len)
 		{
 			return;
 		}
@@ -882,7 +883,7 @@ inword:
 /* Given a hash value and a new character, return a new hash value. */
 #define HASH(h, c) ((c) + ROL(h, 7))
 
-UINT stringdiffs::Hash(String const &str, int begin, int end, UINT h) const
+UINT stringdiffs::Hash(LPCTSTR str, int begin, int end, UINT h) const
 {
 	for (int i = begin; i <= end; ++i)
 	{
@@ -910,12 +911,16 @@ bool stringdiffs::AreWordsSame(word const &word1, word const &word2) const
 			return true;
 	if (word1.hash != word2.hash)
 		return false;
-	if (word1.length() != word2.length())
+	int i = word1.end - word1.start;
+	if (i != word2.end - word2.start)
 		return false;
-	for (int i = 0; i < word1.length(); ++i)
+	LPCTSTR const pbeg1 = m_str1 + word1.start;
+	LPCTSTR const pbeg2 = m_str2 + word2.start;
+	while (i >= 0)
 	{
-		if (!caseMatch(m_str1[word1.start + i], m_str2[word2.start + i]))
+		if (!caseMatch(pbeg1[i], pbeg2[i]))
 			return false;
+		--i;
 	}
 	return true;
 }
@@ -1045,8 +1050,8 @@ void stringdiffs::ComputeByteDiff(wdiff const &diff,
 		return;
 	}
 
-	LPCTSTR const pbeg1 = m_str1.c_str() + diff.start[0];
-	LPCTSTR const pbeg2 = m_str2.c_str() + diff.start[1];
+	LPCTSTR const pbeg1 = m_str1 + diff.start[0];
+	LPCTSTR const pbeg2 = m_str2 + diff.start[1];
 
 	// cursors from front, which we advance to beginning of difference
 	LPCTSTR py1 = pbeg1;

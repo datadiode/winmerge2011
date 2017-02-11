@@ -222,10 +222,10 @@ void CChildFrame::GetWordDiffArray(int nLineIndex, vector<wdiff> &worddiffs) con
 		return;
 
 	// We truncate diffs to remain inside line (ie, to not flag eol characters)
-	int const i1 = m_pView[0]->GetLineLength(nLineIndex);
-	int const i2 = m_pView[1]->GetLineLength(nLineIndex);
-	String str1(m_pView[0]->GetLineChars(nLineIndex), i1);
-	String str2(m_pView[1]->GetLineChars(nLineIndex), i2);
+	int const len1 = m_pView[0]->GetLineLength(nLineIndex);
+	LPCTSTR const str1 = m_pView[0]->GetLineChars(nLineIndex);
+	int const len2 = m_pView[1]->GetLineLength(nLineIndex);
+	LPCTSTR const str2 = m_pView[1]->GetLineChars(nLineIndex);
 
 	// Options that affect comparison
 	bool const casitive = !m_diffWrapper.bIgnoreCase;
@@ -234,11 +234,11 @@ void CChildFrame::GetWordDiffArray(int nLineIndex, vector<wdiff> &worddiffs) con
 	bool const byteColoring = COptionsMgr::Get(OPT_CHAR_LEVEL);
 
 	// Make the call to stringdiffs, which does all the hard & tedious computations
-	sd_ComputeWordDiffs(str1, str2, casitive, xwhite, breakType, byteColoring, worddiffs);
+	sd_ComputeWordDiffs(str1, len1, str2, len2, casitive, xwhite, breakType, byteColoring, worddiffs);
 	// Add a diff in case of EOL difference
 	if (!m_diffWrapper.bIgnoreEol && IsLineMixedEOL(nLineIndex))
 	{
-		worddiffs.push_back(wdiff(i1, i1 - 1, i2, i2 - 1));
+		worddiffs.push_back(wdiff(len1, len1 - 1, len2, len2 - 1));
 	}
 }
 

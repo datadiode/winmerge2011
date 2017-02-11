@@ -248,7 +248,7 @@ private:
 	void WriteReport(UniStdioFile &);
 	void PrimeTextBuffers();
 	void AdjustDiffBlocks();
-	int GetMatchCost(const String &sLine0, const String &sLine1);
+	int GetMatchCost(LineInfo const &, LineInfo const &);
 	void FlagMovedLines(MovedLines *, CDiffTextBuffer *, CDiffTextBuffer *);
 	static bool IsValidCodepageForMergeEditor(unsigned cp);
 	static void SanityCheckCodepage(FileLocation &fileinfo);
