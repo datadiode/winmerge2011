@@ -22,43 +22,28 @@ using std::vector;
 /**
  * @brief Display the line/word difference highlight in edit view
  */
-static void HighlightDiffRect(CCrystalTextView * pView, const RECT &rc)
+static void HighlightDiffRect(CCrystalTextView *pView, int line, int start, int end)
 {
-	if (rc.top == -1)
-	{
-		// Should we remove existing selection ?
-	}
-	else
-	{
-		// select the area
-		// with anchor at left and caret at right
-		// this seems to be conventional behavior in Windows editors
-		POINT ptTopLeft = { rc.left, rc.top };
-		POINT ptBottomRight = { rc.right, rc.bottom };
-		pView->SetSelection(ptTopLeft, ptBottomRight);
-		pView->SetCursorPos(ptBottomRight);
-		pView->SetAnchor(ptTopLeft);
-		// try to ensure that selected area is visible
-		pView->EnsureSelectionVisible();
-	}
+	// select the area
+	// with anchor at left and caret at right
+	// this seems to be conventional behavior in Windows editors
+	POINT ptTopLeft = { start, line };
+	POINT ptBottomRight = { end, line };
+	pView->SetSelection(ptTopLeft, ptBottomRight);
+	pView->SetCursorPos(ptBottomRight);
+	pView->SetAnchor(ptTopLeft);
+	// try to ensure that selected area is visible
+	pView->EnsureSelectionVisible();
 }
 
 /**
  * @brief Highlight difference in current line (left & right panes)
  */
-void CChildFrame::Showlinediff(CCrystalTextView *pTextView, CMergeEditView *pActiveView)
+void CChildFrame::Showlinediff(CGhostTextView *pTextView, CMergeEditView *pActiveView, bool reverse)
 {
-	CCrystalTextView *pView[] = { m_pView[0], m_pView[1] };
-	// If focus is owned by a detail view, then operate on detail views
-	if (pTextView != pActiveView)
-	{
-		pView[0] = m_pDetailView[0];
-		pView[1] = m_pDetailView[1];
-	}
-	RECT rc1, rc2;
-	Computelinediff(pView[0], pView[1], pTextView->GetCursorPos().y, rc1, rc2);
-
-	if (rc1.top == -1 && rc2.top == -1)
+	wdiff wd;
+	int line = Computelinediff(pTextView, wd, reverse);
+	if (line == -1)
 	{
 		String caption = LanguageSelect.LoadString(IDS_LINEDIFF_NODIFF_CAPTION);
 		String msg = LanguageSelect.LoadString(IDS_LINEDIFF_NODIFF);
@@ -67,104 +52,78 @@ void CChildFrame::Showlinediff(CCrystalTextView *pTextView, CMergeEditView *pAct
 	}
 
 	// Actually display selection areas on screen in both edit panels
-	HighlightDiffRect(pView[0], rc1);
-	HighlightDiffRect(pView[1], rc2);
-}
-
-/**
- * @brief Set highlight rectangle for a given difference (begin->end in line)
- */
-static void SetLineHighlightRect(int begin, int end, int line, RECT &rc)
-{
-	rc.left = begin;
-	rc.right = end;
-	rc.top = rc.bottom = line;
-}
-
-/**
- * @brief Construct the highlight rectangles for diff # whichdiff
- */
-static void ComputeHighlightRects(const vector<wdiff> & worddiffs, int whichdiff, int line, RECT &rc1, RECT &rc2)
-{
-	ASSERT(whichdiff >= 0 && whichdiff < static_cast<int>(worddiffs.size()));
-	const wdiff &diff = worddiffs[whichdiff];
-	SetLineHighlightRect(diff.start[0], diff.end[0], line, rc1);
-	SetLineHighlightRect(diff.start[1], diff.end[1], line, rc2);
-}
-
-/**
- * @brief Returns rectangles to highlight in both views (to show differences in line specified)
- */
-void CChildFrame::Computelinediff(CCrystalTextView *pView1, CCrystalTextView *pView2, int nLineIndex, RECT &rc1, RECT &rc2)
-{
-	// Local statics are used so we can cycle through diffs in one line
-	// We store previous state, both to find next state, and to verify
-	// that nothing has changed (else, we reset the cycle)
-	static CCrystalTextView *lastView = NULL;
-	static int lastLine = -1;
-	static RECT lastRc1, lastRc2;
-	static int whichdiff = -2; // last diff highlighted (-2==none, -1=whole line)
-
-	// Only remember place in cycle if same line and same view
-	if (lastView != pView1 || lastLine != nLineIndex)
+	CCrystalTextView *pView[] = { m_pView[0], m_pView[1] };
+	// If focus is owned by a detail view, then operate on detail views
+	if (pTextView != pActiveView)
 	{
-		lastView = pView1;
-		lastLine = nLineIndex;
-		whichdiff = -2; // reset to not in cycle
+		pView[0] = m_pDetailView[0];
+		pView[1] = m_pDetailView[1];
 	}
+	HighlightDiffRect(pView[0], line, wd.start[0], wd.end[0]);
+	HighlightDiffRect(pView[1], line, wd.start[1], wd.end[1]);
+}
+
+/**
+ * @brief Find words to highlight in both views (to show differences in current line)
+ */
+int CChildFrame::Computelinediff(CGhostTextView *pView, wdiff &wd, bool reverse)
+{
+	POINT const ptCursor = pView->GetCursorPos();
+	POINT ptStart, ptEnd;
+	pView->GetSelection(ptStart, ptEnd);
+
+	// If selection spans multiple lines, collapse towards cursor position
+	if (ptStart.y != ptEnd.y)
+		(ptCursor.y != ptStart.y ? ptStart : ptEnd) = ptCursor;
 
 	vector<wdiff> worddiffs;
-	GetWordDiffArray(nLineIndex, worddiffs);
+	GetWordDiffArray(ptCursor.y, worddiffs);
 
 	if (worddiffs.empty())
+		return -1; // Signal to caller that there was no diff
+
+	wdiff const &f = worddiffs.front();
+	wdiff const &b = worddiffs.back();
+
+	int whichdiff = -2;
+	int const ind = pView->m_nThisPane;
+	if (ptStart.x == f.start[ind] && ptEnd.x == b.end[ind])
 	{
-		// signal to caller that there was no diff
-		rc1.top = -1;
-		rc2.top = -1;
-		return;
+		// Highlight either first or last diff
+		whichdiff = reverse ? static_cast<int>(worddiffs.size()) - 1 : 0;
 	}
-
-	// Are we continuing a cycle from the same place ?
-	if (whichdiff >= (int)worddiffs.size())
-		whichdiff = -2; // Clearly not continuing the same cycle, reset to not in cycle
-	
-	// After last diff, reset to get full line again
-	if (whichdiff == worddiffs.size() - 1)
-		whichdiff = -2;
-
-	// Check if current line has changed enough to reset cycle
-	if (whichdiff >= 0)
+	else if (reverse)
 	{
-		// Recompute previous highlight rectangle
-		RECT rc1x, rc2x;
-		ComputeHighlightRects(worddiffs, whichdiff, nLineIndex, rc1x, rc2x);
-		if (rc1x != lastRc1 || rc2x != lastRc2)
-		{
-			// Something has changed, reset cycle
-			whichdiff = -2;
-		}
+		// Highlight previous diff
+		vector<wdiff>::const_reverse_iterator const found = std::find_if(
+			worddiffs.rbegin(), worddiffs.rend(), wdiff::prev_to(ind, ptStart.x));
+		if (found != worddiffs.rend())
+			whichdiff = static_cast<int>(found.base() - worddiffs.begin()) - 1;
+	}
+	else
+	{
+		// Highlight next diff
+		vector<wdiff>::const_iterator const found = std::find_if(
+			worddiffs.begin(), worddiffs.end(), wdiff::next_to(ind, ptEnd.x));
+		if (found != worddiffs.end())
+			whichdiff = static_cast<int>(found - worddiffs.begin());
 	}
 
 	if (whichdiff == -2)
 	{
 		// Highlight text between start of first and end of last diff
-		wdiff const &f = worddiffs.front();
-		wdiff const &b = worddiffs.back();
-		SetLineHighlightRect(f.start[0], b.end[0], nLineIndex, rc1);
-		SetLineHighlightRect(f.start[1], b.end[1], nLineIndex, rc2);
-		whichdiff = -1;
+		wd.start[0] = f.start[0];
+		wd.start[1] = f.start[1];
+		wd.end[0] = b.end[0];
+		wd.end[1] = b.end[1];
 	}
 	else
 	{
-		// Advance to next diff (and earlier we checked for running off the end)
-		++whichdiff;
-		ASSERT(whichdiff < static_cast<int>(worddiffs.size()));
-
 		// Highlight one particular diff
-		ComputeHighlightRects(worddiffs, whichdiff, nLineIndex, rc1, rc2);
-		lastRc1 = rc1;
-		lastRc2 = rc2;
+		wd = worddiffs[whichdiff];
 	}
+
+	return ptCursor.y;
 }
 
 /**

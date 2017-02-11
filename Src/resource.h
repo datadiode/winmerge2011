@@ -838,7 +838,8 @@
 #define ID_USE_DESKTOP_SPECIFIC_SETTINGS        32779
 #define ID_SET_SYNCPOINT                        32781
 #define ID_CLEAR_SYNCPOINTS                     32782
-#define ID_SELECTLINEDIFF                       32784
+#define ID_SELECT_NEXT_LINEDIFF                 32783
+#define ID_SELECT_PREV_LINEDIFF                 32784
 #define ID_EDIT_WMGOTO                          32785
 #define ID_OPTIONS                              32786
 #define ID_REFRESH                              32787

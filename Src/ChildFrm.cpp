@@ -695,8 +695,11 @@ LRESULT CChildFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 	case ID_PREVDIFF:
 		pActiveView->OnPrevdiff();
 		break;
-	case ID_SELECTLINEDIFF:
-		Showlinediff(pTextView, pActiveView);
+	case ID_SELECT_NEXT_LINEDIFF:
+		Showlinediff(pTextView, pActiveView, false);
+		break;
+	case ID_SELECT_PREV_LINEDIFF:
+		Showlinediff(pTextView, pActiveView, true);
 		break;
 	case ID_VIEW_SWAPPANES:
 		// Swap the two panes
@@ -1106,7 +1109,7 @@ void CChildFrame::UpdateGeneralCmdUI()
 		MF_ENABLED : MF_GRAYED);
 
 	// Enable select difference menuitem if current line is inside difference.
-	m_pMDIFrame->UpdateCmdUI<ID_SELECTLINEDIFF>(
+	m_pMDIFrame->UpdateCmdUI<ID_SELECT_NEXT_LINEDIFF>(
 		pMergeView->GetLineFlags(pos.y) & LF_DIFF ? MF_ENABLED : MF_GRAYED);
 
 	// Clipboard

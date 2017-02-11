@@ -389,7 +389,7 @@ IDR_MERGEDOCTYPE MENU
         MENUITEM "&Copy\tCtrl+C", ID_EDIT_COPY
         MENUITEM "&Paste\tCtrl+V", ID_EDIT_PASTE
         MENUITEM SEPARATOR
-        MENUITEM "Select Line &Difference\tF4", ID_SELECTLINEDIFF
+        MENUITEM "Select Line &Difference\tF4", ID_SELECT_NEXT_LINEDIFF
         MENUITEM "Select &All\tCtrl+A", ID_EDIT_SELECT_ALL
         MENUITEM SEPARATOR
         MENUITEM "F&ind...\tCtrl+F", ID_EDIT_FIND
@@ -708,7 +708,7 @@ IDR_POPUP_MERGEVIEW MENU
         MENUITEM "C&opy to Right", ID_L2R
         MENUITEM "Cop&y to Left", ID_R2L
         MENUITEM SEPARATOR
-        MENUITEM "&Select Line Difference", ID_SELECTLINEDIFF
+        MENUITEM "&Select Line Difference", ID_SELECT_NEXT_LINEDIFF
         MENUITEM SEPARATOR
         MENUITEM "&Undo", ID_EDIT_UNDO
         MENUITEM "&Redo", ID_EDIT_REDO
@@ -2035,7 +2035,7 @@ STRINGTABLE
     ID_FILE_ENCODING              "View and adjust file encoding properties\nFile encoding properties"
     ID_FILE_OPENCONFLICT          "Open and resolve conflict file"
     ID_FILE_STARTCOLLECT          "Collect items from subsequent command line invocations to a folder compare window"
-    ID_SELECTLINEDIFF             "Select difference area in the current line\nDifference in the Current Line"
+    ID_SELECT_NEXT_LINEDIFF       "Select difference area in the current line\nDifference in the Current Line"
     ID_EDIT_WMGOTO                "Go to line or difference\nGo to (Ctrl+G)"
     ID_OPTIONS                    "Set program options\nOptions"
     ID_REFRESH                    "Refresh display\nRefresh (F5)"
@@ -2161,7 +2161,8 @@ IDR_MAINFRAME ACCELERATORS
     VK_F7,         ID_PREVDIFF, VIRTKEY
     VK_END,        ID_LASTDIFF, VIRTKEY, ALT
     VK_F2,         ID_DIR_ITEM_RENAME, VIRTKEY
-    VK_F4,         ID_SELECTLINEDIFF, VIRTKEY
+    VK_F4,         ID_SELECT_NEXT_LINEDIFF, VIRTKEY
+    VK_F4,         ID_SELECT_PREV_LINEDIFF, VIRTKEY, SHIFT
     VK_F5,         ID_REFRESH, VIRTKEY
     VK_F5,         ID_DIR_RESCAN, VIRTKEY, CONTROL
     VK_F6,         ID_NEXT_PANE, VIRTKEY

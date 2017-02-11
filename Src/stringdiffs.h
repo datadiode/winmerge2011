@@ -22,6 +22,23 @@ struct wdiff
 	{
 		return start[0] == end[0] || start[1] == end[1];
 	}
+	// Predicates for use with find_if()
+	class next_to
+	{
+		int const ind;
+		int const pos;
+	public:
+		next_to(int ind, int pos): ind(ind), pos(pos) { }
+		bool operator()(wdiff const &wd) const { return wd.end[ind] > pos; }
+	};
+	class prev_to
+	{
+		int const ind;
+		int const pos;
+	public:
+		prev_to(int ind, int pos): ind(ind), pos(pos) { }
+		bool operator()(wdiff const &wd) const { return wd.start[ind] < pos; }
+	};
 };
 
 void sd_SetBreakChars(LPCTSTR breakChars);

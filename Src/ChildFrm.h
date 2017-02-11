@@ -205,8 +205,8 @@ private:
 	bool ListCopy(int srcPane, int dstPane, int nDiff = -1, bool bGroupWithPrevious = false);
 
 // Implementation in MergeDocLineDiffs.cpp
-	void Showlinediff(CCrystalTextView *, CMergeEditView *);
-	void Computelinediff(CCrystalTextView *, CCrystalTextView *, int, RECT &, RECT &);
+	void Showlinediff(CGhostTextView *, CMergeEditView *, bool);
+	int Computelinediff(CGhostTextView *, wdiff &, bool);
 	bool IsLineMixedEOL(int nLineIndex) const;
 // End MergeDocLineDiffs.cpp
 

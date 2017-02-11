@@ -433,7 +433,7 @@ void CMainFrame::InitCmdUI()
 	m_wndToolBar->EnableButton(ID_FIRSTDIFF, FALSE);
 	m_wndToolBar->EnableButton(ID_LASTDIFF, FALSE);
 	m_wndToolBar->EnableButton(ID_CURDIFF, FALSE);
-	m_wndToolBar->EnableButton(ID_SELECTLINEDIFF, FALSE);
+	m_wndToolBar->EnableButton(ID_SELECT_NEXT_LINEDIFF, FALSE);
 	// Clear the merge mode indicator in the main status pane
 	m_wndStatusBar->SetPartText(1, NULL);
 	// Clear the item count in the main status pane
@@ -582,10 +582,10 @@ void CMainFrame::UpdateCmdUI<ID_EDIT_REPLACE>(BYTE uFlags)
 }
 
 template<>
-void CMainFrame::UpdateCmdUI<ID_SELECTLINEDIFF>(BYTE uFlags)
+void CMainFrame::UpdateCmdUI<ID_SELECT_NEXT_LINEDIFF>(BYTE uFlags)
 {
 	m_cmdState.SelectLineDiff = uFlags;
-	m_wndToolBar->EnableButton(ID_SELECTLINEDIFF, !(uFlags & MF_GRAYED));
+	m_wndToolBar->EnableButton(ID_SELECT_NEXT_LINEDIFF, !(uFlags & MF_GRAYED));
 }
 
 template<>
@@ -3912,7 +3912,7 @@ BOOL CMainFrame::CreateToobar()
 		ID_EDIT_UNDO,
 		ID_EDIT_REDO,
 		0,
-		ID_SELECTLINEDIFF,
+		ID_SELECT_NEXT_LINEDIFF,
 		0,
 		ID_NEXTDIFF,
 		ID_PREVDIFF,
