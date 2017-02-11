@@ -74,33 +74,22 @@ void CChildFrame::Showlinediff(CCrystalTextView *pTextView, CMergeEditView *pAct
 /**
  * @brief Set highlight rectangle for a given difference (begin->end in line)
  */
-static void SetLineHighlightRect(int begin, int end, int line, int width, RECT &rc)
+static void SetLineHighlightRect(int begin, int end, int line, RECT &rc)
 {
-	if (begin == -1)
-	{
-		begin = end = 0;
-	}
-	else
-	{
-		++end; // MergeDoc needs to point past end
-	}
-	// Chop off any reference to eol characters
-	// TODO: Are we dropping the last non-eol character,
-	// because MergeDoc points past the end ?
-	rc.left = begin <= width ? begin : width;
-	rc.right = end <= width ? end : width;
+	rc.left = begin;
+	rc.right = end;
 	rc.top = rc.bottom = line;
 }
 
 /**
  * @brief Construct the highlight rectangles for diff # whichdiff
  */
-static void ComputeHighlightRects(const vector<wdiff> & worddiffs, int whichdiff, int line, int width1, int width2, RECT &rc1, RECT &rc2)
+static void ComputeHighlightRects(const vector<wdiff> & worddiffs, int whichdiff, int line, RECT &rc1, RECT &rc2)
 {
 	ASSERT(whichdiff >= 0 && whichdiff < static_cast<int>(worddiffs.size()));
 	const wdiff &diff = worddiffs[whichdiff];
-	SetLineHighlightRect(diff.start[0], diff.end[0], line, width1, rc1);
-	SetLineHighlightRect(diff.start[1], diff.end[1], line, width2, rc2);
+	SetLineHighlightRect(diff.start[0], diff.end[0], line, rc1);
+	SetLineHighlightRect(diff.start[1], diff.end[1], line, rc2);
 }
 
 /**
@@ -135,9 +124,6 @@ void CChildFrame::Computelinediff(CCrystalTextView *pView1, CCrystalTextView *pV
 		return;
 	}
 
-	int const width1 = m_pView[0]->GetLineLength(nLineIndex);
-	int const width2 = m_pView[1]->GetLineLength(nLineIndex);
-
 	// Are we continuing a cycle from the same place ?
 	if (whichdiff >= (int)worddiffs.size())
 		whichdiff = -2; // Clearly not continuing the same cycle, reset to not in cycle
@@ -151,7 +137,7 @@ void CChildFrame::Computelinediff(CCrystalTextView *pView1, CCrystalTextView *pV
 	{
 		// Recompute previous highlight rectangle
 		RECT rc1x, rc2x;
-		ComputeHighlightRects(worddiffs, whichdiff, nLineIndex, width1, width2, rc1x, rc2x);
+		ComputeHighlightRects(worddiffs, whichdiff, nLineIndex, rc1x, rc2x);
 		if (rc1x != lastRc1 || rc2x != lastRc2)
 		{
 			// Something has changed, reset cycle
@@ -161,39 +147,11 @@ void CChildFrame::Computelinediff(CCrystalTextView *pView1, CCrystalTextView *pV
 
 	if (whichdiff == -2)
 	{
-		int begin1 = -1, end1 = -1, begin2 = -1, end2 = -1;
-		// Find starting locations for both sides
-		// Have to look for first valid starting location for each side
-		vector<wdiff>::const_iterator it = worddiffs.begin();
-		while (it != worddiffs.end())
-		{
-			//const wdiff * diff = *it;
-			if (begin1 == -1 && it->start[0] != -1)
-				begin1 = it->start[0];
-			if (begin2 == -1 && it->start[1] != -1)
-				begin2 = it->start[1];
-			if (begin1 != -1 && begin2 != -1)
-				break; // found both
-			++it;
-		}
-		// Find ending locations for both sides
-		// Have to look for last valid starting location for each side
-		if (worddiffs.size() > 1)
-		{
-			vector<wdiff>::const_iterator it = worddiffs.end();
-			do
-			{
-				--it;
-				if (end1 == -1 && it->end[0] != -1)
-					end1 = it->end[0];
-				if (end2 == -1 && it->end[1] != -1)
-					end2 = it->end[1];
-				if (end1 != -1 && end2 != -1)
-					break; // found both
-			} while (it != worddiffs.begin());
-		}
-		SetLineHighlightRect(begin1, end1, nLineIndex, width1, rc1);
-		SetLineHighlightRect(begin2, end2, nLineIndex, width2, rc2);
+		// Highlight text between start of first and end of last diff
+		wdiff const &f = worddiffs.front();
+		wdiff const &b = worddiffs.back();
+		SetLineHighlightRect(f.start[0], b.end[0], nLineIndex, rc1);
+		SetLineHighlightRect(f.start[1], b.end[1], nLineIndex, rc2);
 		whichdiff = -1;
 	}
 	else
@@ -202,8 +160,8 @@ void CChildFrame::Computelinediff(CCrystalTextView *pView1, CCrystalTextView *pV
 		++whichdiff;
 		ASSERT(whichdiff < static_cast<int>(worddiffs.size()));
 
-		// highlight one particular diff
-		ComputeHighlightRects(worddiffs, whichdiff, nLineIndex, width1, width2, rc1, rc2);
+		// Highlight one particular diff
+		ComputeHighlightRects(worddiffs, whichdiff, nLineIndex, rc1, rc2);
 		lastRc1 = rc1;
 		lastRc2 = rc2;
 	}
@@ -238,7 +196,7 @@ void CChildFrame::GetWordDiffArray(int nLineIndex, vector<wdiff> &worddiffs) con
 	// Add a diff in case of EOL difference
 	if (!m_diffWrapper.bIgnoreEol && IsLineMixedEOL(nLineIndex))
 	{
-		worddiffs.push_back(wdiff(len1, len1 - 1, len2, len2 - 1));
+		worddiffs.push_back(wdiff(len1, len1, len2, len2));
 	}
 }
 

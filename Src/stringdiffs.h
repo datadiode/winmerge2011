@@ -20,7 +20,7 @@ struct wdiff
 	}
 	bool IsInsert() const
 	{
-		return start[0] > end[0] || start[1] > end[1];
+		return start[0] == end[0] || start[1] == end[1];
 	}
 };
 

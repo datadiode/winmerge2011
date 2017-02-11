@@ -37,9 +37,9 @@ void sd_ComputeWordDiffs(LPCTSTR str1, int len1, LPCTSTR str2, int len2,
 	vector<wdiff> &diffs)
 {
 	if (len1 != 0 && len2 == 0)
-		diffs.push_back(wdiff(0, len1 - 1, 0, -1));
+		diffs.push_back(wdiff(0, len1, 0, 0));
 	else if (len1 == 0 && len2 != 0)
-		diffs.push_back(wdiff(0, -1, 0, len2 - 1));
+		diffs.push_back(wdiff(0, 0, 0, len2));
 	else
 		stringdiffs(str1, len1, str2, len2, case_sensitive, whitespace, breakType, byte_level, diffs);
 }
@@ -234,10 +234,9 @@ stringdiffs::stringdiffs(LPCTSTR str1, int len1, LPCTSTR str2, int len2,
 				for (int l = 0; l < k; l++)
 				{
 					// Remember last start end
-					int const end = bw1 ? m_words1[bw1 - 1].end : -1;
-					int const start = end + 1;
+					int const end = bw1 ? m_words1[bw1 - 1].end : 0;
 					vector<word>::iterator iter = m_words1.begin() + bw1;
-					m_words1.insert(iter, word(start, end, dlinsert, 0));
+					m_words1.insert(iter, word(end, end, dlinsert, 0));
 				}
 				bw1 += k + 1;
 				bw2 += k + 1; // Next record
@@ -250,10 +249,9 @@ stringdiffs::stringdiffs(LPCTSTR str1, int len1, LPCTSTR str2, int len2,
 				for (int l = 0; l < k; l++)
 				{
 					// Remember last start end
-					int const end = bw2 ? m_words2[bw2 - 1].end : -1;
-					int const start = end + 1;
+					int const end = bw2 ? m_words2[bw2 - 1].end : 0;
 					vector<word>::iterator iter = m_words2.begin() + bw2;
-					m_words2.insert(iter, word(start, end, dlinsert, 0));
+					m_words2.insert(iter, word(end, end, dlinsert, 0));
 				}
 				bw1 += k + 1;
 				bw2 += k + 1; // Next record
@@ -429,7 +427,7 @@ stringdiffs::stringdiffs(LPCTSTR str1, int len1, LPCTSTR str2, int len2,
 	{
 #ifdef STRINGDIFF_LOGGING
 		DbgPrint("left=%d, op=%d, right=%d, op=%d\n",
-			m_words1[i].hash, m_words1[i].bBreak, m_words2[i].hash, m_words2[i].bBreak);
+			m_words1[i].hash, m_words1[i].kind, m_words2[i].hash, m_words2[i].kind);
 #endif
 
 		if (IsInsert(m_words1[i]) && AreWordsSame(m_words1[i], m_words2[i]))
@@ -492,15 +490,14 @@ stringdiffs::stringdiffs(LPCTSTR str1, int len1, LPCTSTR str2, int len2,
 		}
 	}
 
-	// Now lets connect inserts to one if same words 
-	// are also words at a block
-	// doit for word1
+	// Now lets connect inserts to one if same words are also words at a block
+	// Doit for word1
 	i = 0;
 	while (m_words1.size() > i + 1)
 	{
 		if (IsInsert(m_words1[i]) && IsInsert(m_words1[i + 1]))
 		{
-			if ((m_words2[i].end +1 ) == (m_words2[i + 1].start))
+			if ((m_words2[i].end) == (m_words2[i + 1].start))
 			{
 				m_words2[i].end = m_words2[i + 1].end;
 				m_words1.erase(m_words1.begin() + i + 1);
@@ -516,7 +513,7 @@ stringdiffs::stringdiffs(LPCTSTR str1, int len1, LPCTSTR str2, int len2,
 	{
 		if (IsInsert(m_words2[i - 1]) && IsInsert(m_words2[i]))
 		{
-			if ((m_words1[i - 1].end + 1) == (m_words1[i].start))
+			if ((m_words1[i - 1].end) == (m_words1[i].start))
 			{
 				m_words1[i - 1].end = m_words1[i].end;
 				m_words1.erase(m_words1.begin() + i);
@@ -526,32 +523,10 @@ stringdiffs::stringdiffs(LPCTSTR str1, int len1, LPCTSTR str2, int len2,
 		}
 		i++;
 	}
-	// Check last insert to be at string.length
-	// protect to put last insert behind string for editor, otherwise
-	// it shows last char double
-	i = m_words1.size();
-	if (i > 1)
-	{
-		if (IsInsert(m_words1[i - 1]) &&
-			((m_words1[i - 1].start == m_len1 - 1) || (m_words1[i - 1].start == m_words1[i - 2].end)))
-		{
-			m_words1[i - 1].start = m_len1;
-			m_words1[i - 1].end = m_words1[i - 1].start - 1;
-		}
-		else
-		{
-			if (IsInsert(m_words2[i - 1]) &&
-				((m_words2[i - 1].start == m_len2 - 1) || (m_words2[i - 1].start == m_words2[i - 2].end)))
-			{
-				m_words2[i - 1].start = m_len2;
-				m_words2[i - 1].end = m_words2[i - 1].start - 1;
-			}
-		}
-	}
 	// Final run create diff
 #ifdef STRINGDIFF_LOGGING
 	DbgPrint("final run create diff\n");
-	DbgPrint("left=  %d,   right=  %d\n", m_len1, m_len2);
+	DbgPrint("left = %d, right = %d\n", m_len1, m_len2);
 #endif
 	// Be aware, do not create more wdiffs as shortest line has chars!
 	String::size_type imaxcount = min(m_len1, m_len2);
@@ -566,30 +541,21 @@ stringdiffs::stringdiffs(LPCTSTR str1, int len1, LPCTSTR str2, int len2,
 			int e1 =  m_words1[i].end;
 			int s2 =  m_words2[i].start;
 			int e2 =  m_words2[i].end;
-
 #ifdef STRINGDIFF_LOGGING
-			int len1 = e1 - s1 + 1;
-			int len2 = e2 - s2 + 1;
 			String str1;
 			String str2;
 			if (!IsInsert(m_words1[i]))
 			{
-				if (len1 < 50)
-					str1 = m_str1.substr(s1 ,e1 - s1 + 1);
-				else
-					str1 = m_str1.substr(s1, 50);
+				str1.assign(m_str1 + s1, min(e1 - s1, 50));
 			}
 			if (!IsInsert(m_words2[i]))
 			{
-				if (len2 < 50)
-					str2 = m_str2.substr(s2, e2- s2 + 1);
-				else
-					str2 = m_str2.substr(s2, 50);
+				str2.assign(m_str2 + s2, min(e2 - s2, 50));
 			}
-			DbgPrint("left=  %ls,   %d,%d\n, right=  %ls,   %d,%d\n",
+			DbgPrint("left = %ls, %d,%d\nright = %ls, %d,%d\n",
 				str1.c_str(), s1, e1, str2.c_str(), s2, e2);
-			DbgPrint("left=%d , op=%d, right=%d, op=%d\n",
-				m_words1[i].hash, m_words1[i].bBreak, m_words2[i].hash, m_words2[i].bBreak);
+			DbgPrint("left=%d, op=%d, right=%d, op=%d\n",
+				m_words1[i].hash, m_words1[i].kind, m_words2[i].hash, m_words2[i].kind);
 #endif
 			m_diffs.push_back(wdiff(s1, e1, s2, e2));
 		}
@@ -606,8 +572,8 @@ stringdiffs::stringdiffs(LPCTSTR str1, int len1, LPCTSTR str2, int len2,
 		while (String::size_type i = --j)
 		{
 			--i;
-			if (m_diffs[i].end[0] + 1 == m_diffs[j].start[0] &&
-				m_diffs[i].end[1] + 1 == m_diffs[j].start[1])
+			if (m_diffs[i].end[0] == m_diffs[j].start[0] &&
+				m_diffs[i].end[1] == m_diffs[j].start[1])
 			{
 				m_diffs[i].end[0] = m_diffs[j].end[0];
 				m_diffs[i].end[1] = m_diffs[j].end[1];
@@ -634,16 +600,14 @@ void stringdiffs::ResizeWordArraysToSameLength()
 	if (length1 < length2)
 	{
 		// Remember last start end
-		int const end = length1 ? m_words1[length1 - 1].end : -1;
-		int const start = end + 1;
-		m_words1.resize(length2, word(start, end, dlinsert, 0));
+		int const end = length1 ? m_words1[length1 - 1].end : 0;
+		m_words1.resize(length2, word(end, end, dlinsert, 0));
 	}
 	else if (length2 < length1)
 	{
 		// Remember last start end
-		int const end = length2 ? m_words2[length2 - 1].end : -1;
-		int const start = end + 1;
-		m_words2.resize(length1, word(start, end, dlinsert, 0));
+		int const end = length2 ? m_words2[length2 - 1].end : 0;
+		m_words2.resize(length1, word(end, end, dlinsert, 0));
 	}
 }
 
@@ -653,18 +617,9 @@ void stringdiffs::ResizeWordArraysToSameLength()
 void stringdiffs::InsertInWords(vector<word> &words, int bw)
 {
 	// Remember last start end
-	int end, start;
-	if (bw)
-	{
-		end = words[bw - 1].end;
-	}
-	else
-	{
-		end = -1;
-	}
-	start = end + 1;
+	int const end = bw ? words[bw - 1].end : 0;
 	vector<word>::iterator iter = words.begin() + bw;
-	words.insert(iter, word(start, end, dlinsert, 0));
+	words.insert(iter, word(end, end, dlinsert, 0));
 }
 
 /**
@@ -781,11 +736,10 @@ void stringdiffs::MoveInWordsUp(vector<word> &words, int source, int target)
 	words.insert(words.begin() + target, wd);
 	// Correct the start-end pointer
 	int const start = words[target].start;
-	int const end = start - 1;
 	while (source < target)
 	{
 		words[source].start = start;
-		words[source].end = end;
+		words[source].end = start;
 		++source;
 	}
 }
@@ -799,12 +753,11 @@ void stringdiffs::MoveInWordsDown(vector<word> &words, int source, int target)
 	words.erase(words.begin() + source);
 	words.insert(words.begin() + target, wd);
 	// Correct the start-end pointer
-	int const start = words[target].end + 1;
-	int const end = start - 1;
+	int const end = words[target].end;
 	while (target < source)
 	{
 		++target;
-		words[target].start = start;
+		words[target].start = end;
 		words[target].end = end;
 	}
 }
@@ -826,10 +779,8 @@ inspace:
 	if (begin < i)
 	{
 		// just finished a word
-		// e is first word character (space or at end)
-		int e = i - 1;
-
-		word wd(begin, e, dlspace, Hash(str, begin, e, 0));
+		// i - 1 is first word character (space or at end)
+		word wd(begin, i, dlspace, Hash(str, begin, i, 0));
 		words.push_back(wd);
 	}
 	if (i == len)
@@ -845,10 +796,8 @@ inword:
 		if (begin < i)
 		{
 			// just finished a word
-			// e is first non-word character (space or at end)
-			int e = i - 1;
-
-			word wd(begin, e, dlword, Hash(str, begin, e, 0));
+			// i - 1 is first non-word character (space or at end)
+			word wd(begin, i, dlword, Hash(str, begin, i, 0));
 			words.push_back(wd);
 		}
 		if (i == len)
@@ -864,10 +813,10 @@ inword:
 		{
 			// start a new word because we hit a non-whitespace word break (eg, a comma)
 			// but, we have to put each word break character into its own word
-			word wd(i, i, dlbreak, Hash(str, i, i, 0));
+			begin = i + 1;
+			word wd(i, begin, dlbreak, Hash(str, i, begin, 0));
 			words.push_back(wd);
-			++i;
-			begin = i;
+			i = begin;
 			goto inword;
 		}
 	}
@@ -885,7 +834,7 @@ inword:
 
 UINT stringdiffs::Hash(LPCTSTR str, int begin, int end, UINT h) const
 {
-	for (int i = begin; i <= end; ++i)
+	for (int i = begin; i < end; ++i)
 	{
 		UINT ch = (UINT)str[i];
 		if (m_case_sensitive)
@@ -916,11 +865,11 @@ bool stringdiffs::AreWordsSame(word const &word1, word const &word2) const
 		return false;
 	LPCTSTR const pbeg1 = m_str1 + word1.start;
 	LPCTSTR const pbeg2 = m_str2 + word2.start;
-	while (i >= 0)
+	while (i != 0)
 	{
+		--i;
 		if (!caseMatch(pbeg1[i], pbeg2[i]))
 			return false;
-		--i;
 	}
 	return true;
 }
@@ -1035,8 +984,8 @@ void stringdiffs::ComputeByteDiff(wdiff const &diff,
 	// Also this way can distinguish if we set begin1 to -1 for no diff in line
 	begin1 = end1 = begin2 = end2 = 0;
 
-	int const max1 = diff.end[0] - diff.start[0];
-	int const max2 = diff.end[1] - diff.start[1];
+	int const max1 = diff.end[0] - diff.start[0] - 1;
+	int const max2 = diff.end[1] - diff.start[1] - 1;
 
 	if (max1 == -1 || max2 == -1)
 	{
@@ -1323,10 +1272,10 @@ void stringdiffs::wordLevelToByteLevel() const
 		wdiff &diff = m_diffs[i];
 		bool bRepeat = true;
 		// Something to differ?
-		if (diff.start[0] > diff.end[0] || diff.start[1] > diff.end[1])
+		if (diff.IsInsert())
 			continue;
 #ifdef STRINGDIFF_LOGGING
-		DbgPrint("actual\n left=  %d,%d\n right=  %d,%d\n",
+		DbgPrint("actual\n left = %d,%d\n right = %d,%d\n",
 			diff.start[0], diff.end[0], diff.start[1], diff.end[1]);
 #endif	
 		// Check for first and last difference in word
@@ -1335,55 +1284,56 @@ void stringdiffs::wordLevelToByteLevel() const
 		if (begin1 == -1)
 		{
 			// no visible diff on side1
-			diff.start[0] = diff.end[0] + 1;
+			diff.start[0] = diff.end[0];
 			bRepeat = false;
 		}
 		else if (end1 == -1)
 		{
 			diff.start[0] += begin1;
-			diff.end[0] = diff.start[0] + end1;
+			diff.end[0] = diff.start[0];
 		}
 		else
 		{
-			diff.end[0] = diff.start[0] + end1;
+			diff.end[0] = diff.start[0] + end1 + 1;
 			diff.start[0] += begin1;
 		}
 		if (begin2 == -1)
 		{
 			// no visible diff on side2
-			diff.start[1] = diff.end[1] + 1;
+			diff.start[1] = diff.end[1];
 			bRepeat = false;
 		}
 		else if (end2 == -1)
 		{
 			diff.start[1] += begin2;
-			diff.end[1] = diff.start[1] + end2;
+			diff.end[1] = diff.start[1];
 		}
 		else
 		{
-			diff.end[1] = diff.start[1] + end2;
+			diff.end[1] = diff.start[1] + end2 + 1;
 			diff.start[1] += begin2;
 		}
 #ifdef STRINGDIFF_LOGGING
-		DbgPrint("changed\n left=  %d,%d\n right=  %d,%d\n",
+		DbgPrint("changed\n left = %d,%d\n right = %d,%d\n",
 			diff.start[0], diff.end[0], diff.start[1], diff.end[1]);
 #endif	
 		// Nothing to display, remove item
-		if (diff.start[0] > diff.end[0] && diff.start[1] > diff.end[1])
+		if (diff.start[0] == diff.end[0] && diff.start[1] == diff.end[1])
 		{
 			m_diffs.erase(m_diffs.begin() + i);
 			i--;
 			continue;
 		}
+		int const len1 = diff.end[0] - diff.start[0];
+		int const len2 = diff.end[1] - diff.start[1];
 		// Nothing more todo
-		if (((diff.end[0] - diff.start[0]) < 3) ||
-			((diff.end[1] - diff.start[1]) < 3))
+		if (len1 <= 3 || len2 <= 3)
 		{
 			continue;
 		}
 		// Now check if possiblity to get more details
 		// We have to check if there is again a synchronisation inside the pDiff
-		if (bRepeat && diff.start[0] < diff.end[0] && diff.start[1] < diff.end[1])
+		if (bRepeat && len1 > 1 && len2 > 1)
 		{
 			// define offset to zero
 			int s1 = 0, e1 = 0, s2 = 0, e2 = 0; 
@@ -1431,24 +1381,24 @@ void stringdiffs::wordLevelToByteLevel() const
 				wdiff wdf(diff.start[0] + s1 + end1 + 1, diff.end[0],
 					diff.start[1] + s2 + end2 + 1, diff.end[1]);
 #ifdef STRINGDIFF_LOGGING
-				DbgPrint("org\n left=  %d,%d\n right=  %d,%d\n",
+				DbgPrint("org\n left = %d,%d\n right = %d,%d\n",
 					diff.start[0], diff.end[0], diff.start[1], diff.end[1]);
-				DbgPrint("insert\n left=  %d,%d\n right=  %d,%d\n",
+				DbgPrint("insert\n left = %d,%d\n right = %d,%d\n",
 					wdf.start[0], wdf.end[0], wdf.start[1], wdf.end[1]);
 #endif
 				// change end of actual diff
-				diff.end[0] = diff.start[0] + s1 + begin1 - 1;
-				diff.end[1] = diff.start[1] + s2 + begin2 - 1;
+				diff.end[0] = diff.start[0] + s1 + begin1;
+				diff.end[1] = diff.start[1] + s2 + begin2;
 #ifdef STRINGDIFF_LOGGING
-				DbgPrint("changed\n left=  %d,%d\n right=  %d,%d\n",
+				DbgPrint("changed\n left = %d,%d\n right = %d,%d\n",
 					diff.start[0], diff.end[0], diff.start[1], diff.end[1]);
 #endif			
 				// visible sync on side1 and side2
 				// new in middle with diff
-				wdiff wdfm(diff.end[0] + 1, wdf.start[0] - 1,
-					diff.end[1] + 1, wdf.start[1] - 1);
+				wdiff wdfm(diff.end[0], wdf.start[0],
+					diff.end[1], wdf.start[1]);
 #ifdef STRINGDIFF_LOGGING
-				DbgPrint("insert\n left=  %d,%d\n right=  %d,%d\n",
+				DbgPrint("insert\n left = %d,%d\n right = %d,%d\n",
 					wdf.start[0], wdf.end[0], wdf.start[1], wdf.end[1]);
 #endif
 				m_diffs.insert(m_diffs.begin() + i + 1, wdf);
@@ -1463,16 +1413,16 @@ void stringdiffs::wordLevelToByteLevel() const
 				wdiff wdf(diff.start[0] + s1 + e1 + end1, diff.end[0],
 					diff.start[1] + s2 + e2 , diff.end[1]);
 #ifdef STRINGDIFF_LOGGING
-				DbgPrint("org\n left=  %d,%d\n right=  %d,%d\n",
+				DbgPrint("org\n left = %d,%d\n right = %d,%d\n",
 					diff.start[0], diff.end[0],diff.start[1], diff.end[1]);
-				DbgPrint("insert\n left=  %d,%d\n right=  %d,%d\n",
+				DbgPrint("insert\n left = %d,%d\n right = %d,%d\n",
 					wdf.start[0], wdf.end[0], wdf.start[1], wdf.end[1]);
 #endif
 				// change end of actual diff
-				diff.end[0] = diff.start[0] + s1 + begin1;
-				diff.end[1] = diff.start[1] + s2 + begin2;
+				diff.end[0] = diff.start[0] + s1 + begin1 + 1;
+				diff.end[1] = diff.start[1] + s2 + begin2 + 1;
 #ifdef STRINGDIFF_LOGGING
-				DbgPrint("changed\n left=  %d,%d\n right=  %d,%d\n",
+				DbgPrint("changed\n left = %d,%d\n right = %d,%d\n",
 					diff.start[0], diff.end[0],diff.start[1], diff.end[1]);
 #endif	
 				m_diffs.insert(m_diffs.begin() + i + 1, wdf);
@@ -1486,16 +1436,16 @@ void stringdiffs::wordLevelToByteLevel() const
 				wdiff wdf(diff.start[0] + s1 + e1, diff.end[0],
 					diff.start[1] + s2 + e2 + end2, diff.end[1]);
 #ifdef STRINGDIFF_LOGGING
-				DbgPrint("org\n left=  %d,%d\n right=  %d,%d\n",
+				DbgPrint("org\n left = %d,%d\n right = %d,%d\n",
 					diff.start[0], diff.end[0],diff.start[1], diff.end[1]);
-				DbgPrint("insert\n left=  %d,%d\n right=  %d,%d\n",
+				DbgPrint("insert\n left = %d,%d\n right = %d,%d\n",
 					wdf.start[0], wdf.end[0], wdf.start[1], wdf.end[1]);
 #endif	
 				// change end of actual diff
 				diff.end[0] = diff.start[0] + s1 + begin1;
 				diff.end[1] = diff.start[1] + s2 + begin2;
 #ifdef STRINGDIFF_LOGGING
-				DbgPrint("changed\n left=  %d,%d\n right=  %d,%d\n",
+				DbgPrint("changed\n left = %d,%d\n right = %d,%d\n",
 					diff.start[0], diff.end[0],diff.start[1], diff.end[1]);
 #endif	
 				m_diffs.insert(m_diffs.begin() + i + 1, wdf);
@@ -1522,8 +1472,8 @@ bool stringdiffs::findsyn(wdiff const &diff,
 	int &begin1, int &begin2, int &end1, int &end2, bool equal,
 	enum sd_findsyn_func func, int &s1, int &e1, int &s2, int &e2) const
 {
-	int const max1 = diff.end[0] - diff.start[0];
-	int const max2 = diff.end[1] - diff.start[1];
+	int const max1 = diff.end[0] - diff.start[0] - 1;
+	int const max2 = diff.end[1] - diff.start[1] - 1;
 	while ((s1 + e1) < max1 && (s2 + e2) < max2)
 	{
 		// Get substrings for both sides

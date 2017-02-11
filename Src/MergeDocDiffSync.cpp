@@ -247,7 +247,7 @@ int CChildFrame::GetMatchCost(LineInfo const &li0, LineInfo const &li1)
 	while (it != worddiffs.end())
 	{
 		wdiff const &wd = *it++;
-		cost += max(wd.end[0] - wd.start[0], wd.end[1] - wd.start[1]) + 1;
+		cost += max(wd.end[0] - wd.start[0], wd.end[1] - wd.start[1]);
 	}
 	return cost;
 }
