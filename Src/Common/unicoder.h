@@ -38,7 +38,7 @@ namespace ucr
 	};
 
 	unsigned int get_unicode_char(unsigned char * ptr, UNICODESET unicoding, int codepage = 0);
-	bool maketstring(String &str, const char *lpd, int len, int codepage, bool *lossy);
+	void maketstring(String &str, const char *lpd, int len, int codepage, bool *lossy);
 	unsigned int byteToUnicode(unsigned char ch, unsigned int codepage);
 
 	// generic function to do all conversions

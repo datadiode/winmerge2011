@@ -81,17 +81,13 @@ unsigned int get_unicode_char(unsigned char * ptr, UNICODESET codeset, int codep
  * @param [in] len Length of the original byte array.
  * @param [in] codepage Codepage used.
  * @param [out] lossy Was conversion lossy?
- * @return true if conversion succeeds, false otherwise.
- * @todo This doesn't inform the caller whether translation was lossy
- *  In fact, this doesn't even know. Probably going to have to make
- *  two passes, the first with MB_ERR_INVALID_CHARS. Ugh. :(
  */
-bool maketstring(String &str, const char *lpd, int len, int codepage, bool *lossy)
+void maketstring(String &str, const char *lpd, int len, int codepage, bool *lossy)
 {
 	if (!len)
 	{
 		str.clear();
-		return true;
+		return;
 	}
 
 	// 0 is a valid value (CP_ACP)!
@@ -101,7 +97,7 @@ bool maketstring(String &str, const char *lpd, int len, int codepage, bool *loss
 	// Convert input to Unicode, using specified codepage
 	// TCHAR is wchar_t, so convert into String (str)
 	DWORD flags = MB_ERR_INVALID_CHARS;
-	int wlen = len * 2 + 6;
+	int const wlen = len * 2 + 6;
 
 	str.resize(wlen);
 
@@ -126,13 +122,18 @@ bool maketstring(String &str, const char *lpd, int len, int codepage, bool *loss
 				--n;
 			}
 			str.resize(n);
-			return true;
+			return;
 		}
-		*lossy = true;
+		DWORD const error = GetLastError();
+		if (error != ERROR_INVALID_FLAGS)
+		{
+			*lossy = true;
+			if (error != ERROR_NO_UNICODE_TRANSLATION)
+				flags = 0; // causes loop termination
+		}
 		flags ^= MB_ERR_INVALID_CHARS;
-	} while (flags == 0 && GetLastError() == ERROR_NO_UNICODE_TRANSLATION);
+	} while (flags == 0);
 	str = _T('?');
-	return true;
 }
 
 /**

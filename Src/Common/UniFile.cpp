@@ -357,7 +357,7 @@ static void Append(String &strBuffer, LPCTSTR pchTail,
  * @param [out] lossy TRUE if there were lossy encoding.
  * @return true if there is more lines to read, false when last line is read.
  */
-bool UniMemFile::ReadString(String & line, String & eol, bool * lossy)
+bool UniMemFile::ReadString(String &line, String &eol, bool *lossy)
 {
 	line.clear();
 	eol.clear();
@@ -429,13 +429,9 @@ bool UniMemFile::ReadString(String & line, String & eol, bool * lossy)
 				++m_txtstats.nzeros;
 			}
 		}
-		bool success = ucr::maketstring(line, (LPCSTR)m_current,
+		ucr::maketstring(line, reinterpret_cast<LPCSTR>(m_current),
 			static_cast<int>(eolptr - m_current), m_codepage, lossy);
-		if (!success)
-		{
-			return false;
-		}
-		if (lossy && *lossy)
+		if (*lossy)
 			++m_txtstats.nlosses;
 		if (!eof)
 		{
