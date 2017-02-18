@@ -1110,7 +1110,7 @@
     Name="setup"
     DisplayName="" />
   <FileExtension
-    Name="*.wsf;*.WinMerge"
+    Name="*.wsf;*.WinMerge;*.dll"
     ContentType="setup" />
   <ContentType
     Name="setup"

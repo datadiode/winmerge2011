@@ -78,9 +78,6 @@
     <ClCompile Include="CCPrompt.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="charsets.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ChildFrm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -702,9 +699,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CCPrompt.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="charsets.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ChildFrm.h">
@@ -1479,6 +1473,9 @@
       <Filter>Setup Files</Filter>
     </setup>
     <setup Include="..\Setup\CreateLaunchScript.sh">
+      <Filter>Setup Files</Filter>
+    </setup>
+    <setup Include="..\Setup\character-sets.dll">
       <Filter>Setup Files</Filter>
     </setup>
   </ItemGroup>

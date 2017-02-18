@@ -37,7 +37,7 @@
 #include "LanguageSelect.h"
 
 // For shutdown cleanup
-#include "charsets.h"
+#include "codepage_detect.h"
 
 #define operator(args) args
 #include "OptionsDef.h"
@@ -244,7 +244,7 @@ HRESULT CMergeApp::InitInstance()
 			// to delete temp files this makes sure they are removed.
 			CleanupWMtemp();
 
-			charsets_init();
+			hCharsets = LoadLibraryEx(_T("character-sets.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE);
 			// Locate the supplement folder and read the Supplement.ini
 			InitializeSupplements();
 
@@ -304,7 +304,6 @@ int CMergeApp::ExitInstance(HRESULT hr)
 		// Deallocate custom parser associations
 		CCrystalTextView::FreeParserAssociations();
 		CCrystalTextView::FreeSharedResources();
-		charsets_term();
 		// Remove tempfolder
 		ClearTempfolder(env_GetTempPath());
 	}

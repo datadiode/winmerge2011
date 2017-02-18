@@ -267,18 +267,6 @@
     <ClCompile Include="AboutDlg.cpp" />
     <ClCompile Include="Common\Bitmap.cpp" />
     <ClCompile Include="CCPrompt.cpp" />
-    <ClCompile Include="charsets.c">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">
-      </PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="ChildFrm.cpp" />
     <ClCompile Include="codepage.cpp" />
     <ClCompile Include="codepage_detect.cpp" />
@@ -752,7 +740,6 @@
     <ClInclude Include="AboutDlg.h" />
     <ClInclude Include="Common\Bitmap.h" />
     <ClInclude Include="CCPrompt.h" />
-    <ClInclude Include="charsets.h" />
     <ClInclude Include="ChildFrm.h" />
     <ClInclude Include="codepage.h" />
     <ClInclude Include="codepage_detect.h" />
@@ -974,6 +961,7 @@
     <None Include="PostBuild.bat" />
     <None Include="..\Translations\WinMerge\UpdatePoFilesFromPotFile.vbs" />
     <setup Include="..\Docs\Users\Contributors.txt" />
+    <setup Include="..\Setup\character-sets.dll" />
     <setup Include="..\Setup\CreateLaunchScript.sh">
       <FileType>Document</FileType>
     </setup>

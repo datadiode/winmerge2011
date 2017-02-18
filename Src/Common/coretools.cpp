@@ -25,7 +25,7 @@ int linelen(const char *string)
  * @param [in] codepage Codepage to use in conversion.
  * @param [in,out] s String to convert.
  */
-size_t unslash(unsigned codepage, char *string)
+unsigned Unslash(unsigned codepage, char *string)
 {
 	char *p = string;
 	char *q = p;
@@ -77,8 +77,31 @@ size_t unslash(unsigned codepage, char *string)
 		}
 		++p;
 	} while (c != '\0');
-	//s.resize(static_cast<stl::string::size_type>(p - 1 - &s.front()));
-	return p - 1 - string;
+	return static_cast<unsigned>(p - 1 - string);
+}
+
+unsigned RemoveLeadingZeros(char *string)
+{
+	char *p = string;
+	char *q = p;
+	char c = '?';
+	char d = '\0';
+	do
+	{
+		if (*q == '0' && (c < '0' || c > '9'))
+		{
+			d = *q++;
+			continue;
+		}
+		c = *q++;
+		if (d != '\0' && (c < '0' || c > '9'))
+		{
+			*p++ = d;
+		}
+		*p++ = c;
+		d = '\0';
+	} while (c != '\0');
+	return static_cast<unsigned>(p - 1 - string);
 }
 
 /**

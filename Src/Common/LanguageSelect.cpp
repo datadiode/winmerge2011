@@ -667,7 +667,7 @@ bool CLanguageSelect::LoadLanguageFile(LANGID wLangId)
 			}
 			else if (msgid.empty() && !msgstr.empty())
 			{
-				unslash(CP_ACP, msgstr);
+				Unslash(CP_ACP, msgstr);
 				m_poheader.swap(msgstr);
 			}
 			else
@@ -675,7 +675,7 @@ bool CLanguageSelect::LoadLanguageFile(LANGID wLangId)
 				ps = 0;
 				if (msgstr.empty())
 					msgstr = msgid;
-				unslash(m_codepage, msgstr);
+				Unslash(m_codepage, msgstr);
 				const char *text = msgstr.c_str();
 				std::vector<unsigned>::iterator pline = lines.begin();
 				while (pline < lines.end())

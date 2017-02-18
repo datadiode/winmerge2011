@@ -8,7 +8,7 @@
 #include "codepage_detect.h"
 #include "unicoder.h"
 #include "codepage.h"
-#include "charsets.h"
+#include "EncodingInfo.h"
 #include "markdown.h"
 #include "FileTextEncoding.h"
 #include "Utf8FileDetect.h"
@@ -20,34 +20,34 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
+extern HINSTANCE hCharsets = NULL;
+
 /** @brief Buffer size used in this file. */
 static const int BufSize = 4 * 1024;
 
 /**
- * @brief Prefixes to handle when searching for codepage names
- * NB: prefixes ending in '-' must go first!
- */
-static const char *f_wincp_prefixes[] =
-{
-	"WINDOWS-", "WINDOWS", "CP-", "CP", "MSDOS-", "MSDOS"
-};
-
-/**
  * @brief Try to to match codepage name from codepages module, & watch for f_wincp_prefixes aliases
  */
-static int FindEncodingIdFromNameOrAlias(const char *encodingName)
+static EncodingInfo const *LookupEncoding(char *name)
 {
-	// Try name as given
-	unsigned encodingId = GetEncodingIdFromName(encodingName);
-	if (encodingId == 0)
+	// Try name as given, except for disregarding character case & leading zeros
+	std::replace(name, name + RemoveLeadingZeros(CharLowerA(name)), '_', '-');
+	EncodingInfo const *ei = EncodingInfo::From<IMAGE_NT_HEADERS32>(hCharsets, name);
+	if (ei == NULL)
 	{
+		// Prefixes to handle when searching for codepage names
+		// NB: prefixes ending in '-' must go first!
+		static const char *const prefixes[] =
+		{
+			"WINDOWS-", "WINDOWS", "CP-", "CP", "MSDOS-", "MSDOS"
+		};
 		// Handle purely numeric values (codepages)
 		char *ahead = 0;
-		unsigned codepage = strtol(encodingName, &ahead, 10);
+		unsigned codepage = strtol(name, &ahead, 10);
 		int i = 0;
-		while (*ahead != '\0' && i < _countof(f_wincp_prefixes))
+		while (*ahead != '\0' && i < _countof(prefixes))
 		{
-			if (const char *remainder = EatPrefix(encodingName, f_wincp_prefixes[i]))
+			if (const char *remainder = EatPrefix(name, prefixes[i]))
 			{
 				codepage = strtol(remainder, &ahead, 10);
 			}
@@ -55,10 +55,10 @@ static int FindEncodingIdFromNameOrAlias(const char *encodingName)
 		}
 		if (*ahead == '\0')
 		{
-			encodingId = GetEncodingIdFromCodePage(codepage);
+			ei = EncodingInfo::From(codepage);
 		}
 	}
-	return encodingId;
+	return ei;
 }
 
 static unsigned ReadCodepageFromContentType(char *pchKey)
@@ -71,8 +71,8 @@ static unsigned ReadCodepageFromContentType(char *pchKey)
 		{
 			pchValue[cchValue] = '\0';
 			// Is it an encoding name known to charsets module ?
-			if (unsigned encodingId = FindEncodingIdFromNameOrAlias(pchValue))
-				return GetEncodingCodePageFromId(encodingId);
+			if (EncodingInfo const *encodinginfo = LookupEncoding(pchValue))
+				return encodinginfo->GetCodePage();
 			return 0;
 		}
 		pchKey = pchValue + cchValue;
@@ -103,8 +103,8 @@ static unsigned demoGuessEncoding_html(const char *src, stl_size_t len)
 		else if (CMarkdown::HSTR hstr = markdown.GetAttribute("charset"))
 		{
 			// HTML5 encoding specifier
-			if (unsigned encodingId = FindEncodingIdFromNameOrAlias(CMarkdown::String(hstr).A))
-				return GetEncodingCodePageFromId(encodingId);
+			if (EncodingInfo const *encodinginfo = LookupEncoding(CMarkdown::String(hstr).A))
+				return encodinginfo->GetCodePage();
 		}
 	}
 	return 0;
@@ -122,11 +122,8 @@ static unsigned demoGuessEncoding_xml(const char *src, stl_size_t len)
 		if (encoding.A)
 		{
 			// Is it an encoding name we can find in charsets module ?
-			unsigned encodingId = FindEncodingIdFromNameOrAlias(encoding.A);
-			if (encodingId)
-			{
-				return GetEncodingCodePageFromId(encodingId);
-			}
+			if (EncodingInfo const *encodinginfo = LookupEncoding(encoding.A))
+				return encodinginfo->GetCodePage();
 		}
 	}
 	return 0;
@@ -185,7 +182,7 @@ static unsigned demoGuessEncoding_po(const char *src, stl_size_t len)
 			lstrcpynA(line, base, len < sizeof line ? len + 1 : sizeof line);
 			if (char *pchKey = EatPrefix(line, "\"Content-Type:"))
 			{
-				unslash(CP_ACP, pchKey);
+				Unslash(CP_ACP, pchKey);
 				return ReadCodepageFromContentType(pchKey);
 			}
 		}

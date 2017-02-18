@@ -5,6 +5,8 @@
  */
 #pragma once
 
+extern HINSTANCE hCharsets;
+
 struct FileTextEncoding;
 
 void GuessCodepageEncoding(LPCTSTR filepath, FileTextEncoding *encoding, bool bGuessEncoding, HANDLE osfhandle = NULL);
