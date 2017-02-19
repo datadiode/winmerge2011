@@ -83,7 +83,7 @@ private:
 			{
 				--i;
 				LPCSTR text = m_vec[i];
-				if (HIWORD(text))
+				if (!IS_INTRESOURCE(text))
 					free(const_cast<LPSTR>(text));
 			}
 			m_vec.resize(1, "");
@@ -97,11 +97,11 @@ private:
 			else
 			{
 				LPCSTR text = m_vec[i];
-				if (HIWORD(text))
+				if (!IS_INTRESOURCE(text))
 					free(const_cast<LPSTR>(text));
 			}
 			LPCSTR link = text;
-			if (HIWORD(text))
+			if (!IS_INTRESOURCE(text))
 			{
 				text = _strdup(text);
 				link = reinterpret_cast<LPCSTR>(i);
@@ -112,7 +112,7 @@ private:
 		LPCSTR operator[](stl_size_t i) const
 		{
 			LPCSTR text = m_vec[i < m_vec.size() ? i : 0];
-			if (HIWORD(text) == 0)
+			if (IS_INTRESOURCE(text))
 				text = m_vec[LOWORD(text)];
 			return text;
 		}

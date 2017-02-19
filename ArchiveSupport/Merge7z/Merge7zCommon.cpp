@@ -913,7 +913,7 @@ static CSysString g_LangPath;
 LPCTSTR Merge7z::LoadLang(LPCTSTR langFile)
 {
 	TCHAR langFileGuess[8];
-	if (HIWORD(langFile) == 0)
+	if (IS_INTRESOURCE(langFile))
 	{
 		langFileGuess[0] = '\0';
 		if (int cchLng = GetLocaleInfo(LCID(langFile), LOCALE_SISO639LANGNAME, langFileGuess, 4))

@@ -745,7 +745,7 @@ LRESULT CMainFrame::OnWndMsg<WM_DRAWITEM>(WPARAM, LPARAM lParam)
 		}
 		return 0;
 	}
-	if (HIWORD(lpdis->itemData) != 0)
+	if (!IS_INTRESOURCE(lpdis->itemData))
 	{
 		reinterpret_cast<DrawMenuProc>(lpdis->itemData)(lpdis);
 	}
