@@ -44,7 +44,6 @@
 #include "FileTransform.h"
 #include "UniFile.h"
 #include "SaveClosingDlg.h"
-#include "codepage.h"
 #include "paths.h"
 #include "SyntaxColors.h"
 #include "ProjectFile.h"
@@ -399,7 +398,7 @@ int CChildFrame::Rescan2(bool &bIdentical)
 {
 	GetSystemTimeAsFileTime(&m_LastRescan);
 
-	DiffFileData diffdata(getDefaultCodepage());
+	DiffFileData diffdata(FileTextEncoding::GetDefaultCodepage());
 
 	// Clear diff list
 	m_diffList.Clear();
@@ -1724,21 +1723,6 @@ FileLoadResult::FILES_RESULT CChildFrame::LoadFile(int nBuffer, bool &readOnly, 
 }
 
 /**
- * @brief Check if specified codepage number is valid for WinMerge Editor.
- * @param [in] cp Codepage number to check.
- * @return true if codepage is valid, false otherwise.
- */
-bool CChildFrame::IsValidCodepageForMergeEditor(unsigned cp)
-{
-	if (!cp) // 0 is our signal value for invalid
-		return false;
-	// Codepage must be actually installed on system
-	// for us to be able to use it
-	// We accept whatever codepages that codepage module says are installed
-	return isCodepageInstalled(cp);
-}
-
-/**
  * @brief Sanity check file's specified codepage.
  * This function checks if file's specified codepage is valid for WinMerge
  * editor and if not resets the codepage to default.
@@ -1746,13 +1730,20 @@ bool CChildFrame::IsValidCodepageForMergeEditor(unsigned cp)
  */
 void CChildFrame::SanityCheckCodepage(FileLocation & fileinfo)
 {
-	if (fileinfo.encoding.m_unicoding == NONE
-		&& !IsValidCodepageForMergeEditor(fileinfo.encoding.m_codepage))
+	// MSDN says that a code page is considered valid only if it is installed.
+	// Alright so far, but check if IsValidCodePage() will otherwise do the job.
+	ASSERT(!IsValidCodePage(CP_ACP));	// because 0 is to indicate invalidity
+	ASSERT(!IsValidCodePage(1200));		// UCS2-LE
+	ASSERT(!IsValidCodePage(1201));		// UCS2-BE
+	ASSERT(!IsValidCodePage(51932));	// good for MLang but not for NLS
+	ASSERT(IsValidCodePage(20932));		// usable in place of 51932
+	ASSERT(IsValidCodePage(CP_UTF8));	// well, ok
+
+	if (fileinfo.encoding.m_unicoding == NONE &&
+		!IsValidCodePage(fileinfo.encoding.m_codepage))
 	{
-		int cp = getDefaultCodepage();
-		if (!IsValidCodepageForMergeEditor(cp))
-			cp = CP_ACP;
-		fileinfo.encoding.SetCodepage(cp);
+		int const cp = FileTextEncoding::GetDefaultCodepage();
+		fileinfo.encoding.SetCodepage(IsValidCodePage(cp) ? cp : CP_ACP);
 	}
 }
 

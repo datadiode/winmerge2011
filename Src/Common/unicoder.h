@@ -49,4 +49,3 @@ namespace ucr
 #endif
 
 EXTERN_C UNICODESET DetermineEncoding(unsigned char *pBuffer, size_t size, unsigned *pBom);
-EXTERN_C int EqualCodepages(int cp1, int cp2);

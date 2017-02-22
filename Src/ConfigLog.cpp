@@ -27,7 +27,6 @@
 #include "DiffWrapper.h"
 #include "ConfigLog.h"
 #include "paths.h"
-#include "codepage.h"
 #include "7zCommon.h"
 #include "SettingStore.h"
 #include "Environment.h"
@@ -446,7 +445,7 @@ bool CConfigLog::DoFile(bool writing, String &sError)
 
 // Codepage settings
 	WriteItemYesNo(1, _T("Detect codepage automatically for RC and HTML files"), &m_cpSettings.bDetectCodepage);
-	WriteItem(1, _T("unicoder codepage"), getDefaultCodepage());
+	WriteItem(1, _T("unicoder codepage"), FileTextEncoding::GetDefaultCodepage());
 
 	CloseFile();
 

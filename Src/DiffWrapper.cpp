@@ -32,7 +32,6 @@
 #include "FileTextStats.h"
 #include "FolderCmp.h"
 #include "Environment.h"
-#include "codepage.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -127,7 +126,7 @@ void CDiffWrapper::SetToDiffUtils()
 	else
 		length_varies = 0;
 
-	dbcs_codepage = isCodepageDBCS(m_codepage);
+	dbcs_codepage = FileTextEncoding::IsCodepageDBCS(m_codepage);
 
 	// We have no interest changing these values, hard-code them.
 	always_text_flag = 0; // diffutils needs to detect binary files
@@ -475,7 +474,7 @@ bool CDiffWrapper::RunFileDiff(DiffFileData &diffdata)
  */
 bool CDiffWrapper::RunFileDiff()
 {
-	DiffFileData diffdata(getDefaultCodepage());
+	DiffFileData diffdata(FileTextEncoding::GetDefaultCodepage());
 	diffdata.SetDisplayFilepaths(m_s1File.c_str(), m_s2File.c_str()); // store true names for diff utils patch file
 	if (!diffdata.OpenFiles(m_s1File.c_str(), m_s2File.c_str()))
 		return false;

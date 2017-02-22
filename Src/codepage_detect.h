@@ -7,7 +7,7 @@
 
 extern HINSTANCE hCharsets;
 
-struct FileTextEncoding;
+class FileTextEncoding;
 
 void GuessCodepageEncoding(LPCTSTR filepath, FileTextEncoding *encoding, bool bGuessEncoding, HANDLE osfhandle = NULL);
 

@@ -81,9 +81,6 @@
     <ClCompile Include="ChildFrm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="codepage.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="codepage_detect.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -704,9 +701,6 @@
     <ClInclude Include="ChildFrm.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="codepage.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="codepage_detect.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1206,6 +1200,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Common\PidlManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EncodingInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -7,7 +7,6 @@
 #include "StdAfx.h"
 #include "codepage_detect.h"
 #include "unicoder.h"
-#include "codepage.h"
 #include "EncodingInfo.h"
 #include "markdown.h"
 #include "FileTextEncoding.h"
@@ -233,7 +232,7 @@ void GuessCodepageEncoding(LPCTSTR filepath, FileTextEncoding *encoding, bool bG
 		osfhandle ? reinterpret_cast<LPCTSTR>(osfhandle) : filepath,
 		BufSize,
 		osfhandle ? CMarkdown::FileImage::Handle : 0);
-	encoding->SetCodepage(getDefaultCodepage());
+	encoding->SetCodepage(FileTextEncoding::GetDefaultCodepage());
 	encoding->m_bom = false;
 	encoding->m_guessed = false;
 	encoding->m_binary = false;

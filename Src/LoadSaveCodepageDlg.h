@@ -12,14 +12,8 @@ class CLoadSaveCodepageDlg : public OResizableDialog
 {
 public:
 // Construction
-	CLoadSaveCodepageDlg();   // standard constructor
-
-// Implementation methods
-private:
-	void UpdateSaveGroup();
-
-// Implementation data
-public:
+	CLoadSaveCodepageDlg();
+	~CLoadSaveCodepageDlg();
 
 // Dialog Data
 	BOOL    m_bAffectsLeft;
@@ -32,6 +26,11 @@ public:
 	int m_nSaveCodepage;
 	bool m_bEnableSaveCodepage;
 
+private:
+	static CLoadSaveCodepageDlg *m_pThis;
+	HComboBox *m_pCbLoadCodepage;
+	HComboBox *m_pCbSaveCodepage;
+
 // Implementation
 protected:
 	template<DDX_Operation>
@@ -42,4 +41,8 @@ protected:
 	void OnAffectsLeftBtnClicked();
 	void OnAffectsRightBtnClicked();
 	void OnOK();
+
+private:
+	void UpdateSaveGroup();
+	static BOOL CALLBACK EnumCodePagesProc(LPTSTR);
 };

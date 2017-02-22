@@ -4,7 +4,6 @@
  * @brief Implementation of FileTextEncoding structure
  */
 #include "StdAfx.h"
-#include "resource.h"
 #include "unicoder.h"
 #include "FileTextEncoding.h"
 #include "LanguageSelect.h"
@@ -14,6 +13,8 @@
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
+
+int FileTextEncoding::m_defaultCodepage = 0;
 
 FileTextEncoding::FileTextEncoding()
 {
@@ -80,7 +81,7 @@ String FileTextEncoding::GetName() const
 	return str;
 }
 
-int FileTextEncoding::Collate(const FileTextEncoding & fte1, const FileTextEncoding & fte2)
+int FileTextEncoding::Collate(FileTextEncoding const &fte1, FileTextEncoding const &fte2)
 {
 	if (fte1.m_unicoding > fte2.m_unicoding)
 		return 1;
@@ -95,4 +96,46 @@ int FileTextEncoding::Collate(const FileTextEncoding & fte1, const FileTextEncod
 	if (fte1.m_codepage < fte2.m_codepage)
 		return -1;
 	return 0;
+}
+
+/**
+ * @brief Update the appropriate default codepage
+ */
+void FileTextEncoding::UpdateDefaultCodepage(int cpDefaultMode, int customCodepage)
+{
+	LANGID wLangId;
+	switch (cpDefaultMode)
+	{
+	case 0:
+		break;
+	case 1:
+		TCHAR buff[32];
+		wLangId = LanguageSelect.GetLangId();
+		if (!GetLocaleInfo(wLangId, LOCALE_IDEFAULTANSICODEPAGE, buff, _countof(buff)))
+			break;
+		m_defaultCodepage = _ttol(buff);
+		return;
+	case 2:
+		m_defaultCodepage = customCodepage;
+		return;
+	default:
+		// no other valid option
+		ASSERT(FALSE);
+		break;
+	}
+	m_defaultCodepage = GetACP();
+}
+
+/**
+ * @brief Get appropriate default codepage 
+ */
+int FileTextEncoding::GetDefaultCodepage()
+{
+	return m_defaultCodepage;
+}
+
+int FileTextEncoding::IsCodepageDBCS(int codepage)
+{
+	CPINFO cpinfo;
+	return GetCPInfo(codepage, &cpinfo) && cpinfo.LeadByte[0] != 0 ? codepage : 0;
 }

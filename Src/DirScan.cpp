@@ -7,7 +7,6 @@
 #include "Merge.h"
 #include "LogFile.h"
 #include "DiffContext.h"
-#include "codepage.h"
 #include "DirItem.h"
 #include "paths.h"
 #include "Common/coretools.h"

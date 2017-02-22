@@ -10,7 +10,6 @@
 #include "DiffContext.h"
 #include "DIFF.H"
 #include "ByteCompare.h"
-#include <codepage.h>
 
 using namespace CompareEngines;
 
@@ -78,8 +77,8 @@ unsigned ByteCompare::CompareFiles(FileLocation *location, const stl_size_t x, c
 	unsigned blankness_type_prev[2];
 	int codepage[2] =
 	{
-		isCodepageDBCS(location[0].encoding.m_codepage),
-		isCodepageDBCS(location[1].encoding.m_codepage)
+		FileTextEncoding::IsCodepageDBCS(location[0].encoding.m_codepage),
+		FileTextEncoding::IsCodepageDBCS(location[1].encoding.m_codepage)
 	};
 	unsigned nocount[2] = { 0, 0 };
 	unsigned *count[2] = { NULL, NULL };

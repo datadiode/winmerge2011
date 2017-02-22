@@ -268,7 +268,6 @@
     <ClCompile Include="Common\Bitmap.cpp" />
     <ClCompile Include="CCPrompt.cpp" />
     <ClCompile Include="ChildFrm.cpp" />
-    <ClCompile Include="codepage.cpp" />
     <ClCompile Include="codepage_detect.cpp" />
     <ClCompile Include="CompareStatisticsDlg.cpp" />
     <ClCompile Include="CompareStats.cpp" />
@@ -741,7 +740,6 @@
     <ClInclude Include="Common\Bitmap.h" />
     <ClInclude Include="CCPrompt.h" />
     <ClInclude Include="ChildFrm.h" />
-    <ClInclude Include="codepage.h" />
     <ClInclude Include="codepage_detect.h" />
     <ClInclude Include="CompareOptions.h" />
     <ClInclude Include="CompareStatisticsDlg.h" />
@@ -772,6 +770,7 @@
     <ClInclude Include="DirView.h" />
     <ClInclude Include="Common\DllProxies.h" />
     <ClInclude Include="EditorFilepathBar.h" />
+    <ClInclude Include="EncodingInfo.h" />
     <ClInclude Include="Environment.h" />
     <ClInclude Include="ExcelExport.h" />
     <ClInclude Include="ExplorerDlg.h" />

@@ -250,7 +250,6 @@ private:
 	void AdjustDiffBlocks();
 	int GetMatchCost(LineInfo const &, LineInfo const &);
 	void FlagMovedLines(MovedLines *, CDiffTextBuffer *, CDiffTextBuffer *);
-	static bool IsValidCodepageForMergeEditor(unsigned cp);
 	static void SanityCheckCodepage(FileLocation &fileinfo);
 	FileLoadResult::FILES_RESULT LoadOneFile(int index, bool &readOnly, FileLocation &);
 	FileLoadResult::FILES_RESULT ReloadDoc(int index);

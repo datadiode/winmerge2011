@@ -31,7 +31,7 @@ THE SOFTWARE.
 #include "StdAfx.h"
 #include "UniFile.h"
 #include "unicoder.h"
-#include "codepage.h"
+#include "FileTextEncoding.h"
 #include "paths.h" // paths_GetLongPath()
 
 namespace convert_utf
@@ -123,7 +123,7 @@ void UniLocalFile::Clear()
 	m_filesize.int64 = 0;
 	m_unicoding = NONE;
 	m_charsize = 1;
-	m_codepage = getDefaultCodepage();
+	m_codepage = FileTextEncoding::GetDefaultCodepage();
 	m_txtstats.clear();
 	m_bom = false;
 }

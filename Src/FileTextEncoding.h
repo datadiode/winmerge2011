@@ -10,8 +10,9 @@
 /**
  * @brief Text encoding (eg, UTF-8, or CP-1252)
  */
-struct FileTextEncoding
+class FileTextEncoding
 {
+public:
 	int m_codepage; /**< 8bit codepage, if applicable, -1 is unknown or N/A */
 	UNICODESET m_unicoding; /**< Unicode encoding. */
 	bool m_bom; /**< Unicode byte marker */
@@ -24,5 +25,12 @@ struct FileTextEncoding
 	void SetUnicoding(UNICODESET unicoding);
 	String GetName() const;
 
-	static int Collate(const FileTextEncoding & fte1, const FileTextEncoding & fte2);
+	static int Collate(FileTextEncoding const &, FileTextEncoding const &);
+
+	static void UpdateDefaultCodepage(int cpDefaultMode, int customCodepage);
+	static int GetDefaultCodepage();
+	static int IsCodepageDBCS(int codepage);
+
+private:
+	static int m_defaultCodepage; // store the default codepage as specified by user in options
 };

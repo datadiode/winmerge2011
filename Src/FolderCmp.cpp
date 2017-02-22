@@ -15,7 +15,6 @@
 #include "FolderCmp.h"
 #include "codepage_detect.h"
 #include "TimeSizeCompare.h"
-#include "codepage.h"
 
 /**
  * @brief Copy text stat results from diffutils back into the FileTextStats structure
@@ -36,7 +35,7 @@ FolderCmp::FolderCmp(CDiffContext *pCtxt, LONG iCompareThread)
 , m_ntrivialdiffs(CDiffContext::DIFFS_UNKNOWN)
 , m_iCompareThread(iCompareThread)
 , m_pCtx(pCtxt)
-, m_diffFileData(getDefaultCodepage())
+, m_diffFileData(FileTextEncoding::GetDefaultCodepage())
 {
 }
 

@@ -16,7 +16,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 #include "StdAfx.h"
 #include "unicoder.h"
-#include "codepage.h"
+#include "FileTextEncoding.h"
 #include "Utf8FileDetect.h"
 
 #ifdef _DEBUG
@@ -92,7 +92,7 @@ void maketstring(String &str, const char *lpd, int len, int codepage, bool *loss
 
 	// 0 is a valid value (CP_ACP)!
 	if (codepage == -1)
-		codepage = getDefaultCodepage();
+		codepage = FileTextEncoding::GetDefaultCodepage();
 
 	// Convert input to Unicode, using specified codepage
 	// TCHAR is wchar_t, so convert into String (str)
@@ -178,7 +178,7 @@ void buffer::resize(unsigned int newSize)
  */
 void convert(UNICODESET unicoding1, int codepage1, const unsigned char * src, int srcbytes, UNICODESET unicoding2, int codepage2, buffer * dest, BOOL *loss)
 {
-	if (unicoding1 == unicoding2 && (unicoding1 || EqualCodepages(codepage1, codepage2)))
+	if (unicoding1 == unicoding2 && (unicoding1 || (codepage1 == codepage2)))
 	{
 		// simple byte copy
 		dest->resize(srcbytes);
@@ -316,32 +316,4 @@ UNICODESET DetermineEncoding(unsigned char *pBuffer, size_t size, unsigned *pBom
 	}
 	*pBom = 0;
 	return CheckForInvalidUtf8(pBuffer, bufSize) ? NONE : UTF8;
-}
-
-/**
- * @brief Change any special codepage constants into real codepage numbers
- */
-static int NormalizeCodepage(int cp)
-{
-	if (cp == CP_THREAD_ACP) // should only happen on Win2000+
-	{
-		TCHAR buff[32];
-		if (GetLocaleInfo(GetThreadLocale(), LOCALE_IDEFAULTANSICODEPAGE, buff, sizeof(buff) / sizeof(buff[0])))
-			cp = _ttol(buff);
-		else
-			// a valid codepage is better than no codepage
-			cp = GetACP();
-	}
-	if (cp == CP_ACP) cp = GetACP();
-	if (cp == CP_OEMCP) cp = GetOEMCP();
-	return cp;
-}
-
-/**
- * @brief Compare two codepages for equality
- */
-BOOL EqualCodepages(int cp1, int cp2)
-{
-	return (cp1 == cp2)
-			|| (NormalizeCodepage(cp1) == NormalizeCodepage(cp2));
 }

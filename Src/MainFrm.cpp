@@ -57,7 +57,6 @@
 #include "FileFiltersDlg.h"
 #include "LanguageSelect.h"
 #include "codepage_detect.h"
-#include "codepage.h"
 #include "ProjectFile.h"
 #include "PreferencesDlg.h"
 #include "ProjectFilePathsDlg.h"
@@ -3251,7 +3250,7 @@ bool CMainFrame::ParseArgsAndDoOpen(const MergeCmdLineInfo &cmdInfo)
 
 	// Set codepage.
 	if (cmdInfo.m_nCodepage)
-		updateDefaultCodepage(2, cmdInfo.m_nCodepage);
+		FileTextEncoding::UpdateDefaultCodepage(2, cmdInfo.m_nCodepage);
 
 	bool bCompared = true;
 	// Set the required information we need from the command line:
@@ -3378,9 +3377,8 @@ void CMainFrame::OnDebugLoadConfig()
  */
 void CMainFrame::UpdateCodepageModule()
 {
-	// Get current codepage settings from the options module
-	// and push them into the codepage module
-	updateDefaultCodepage(COptionsMgr::Get(OPT_CP_DEFAULT_MODE), COptionsMgr::Get(OPT_CP_DEFAULT_CUSTOM));
+	// Get current codepage settings from the options module and push them into the codepage module
+	FileTextEncoding::UpdateDefaultCodepage(COptionsMgr::Get(OPT_CP_DEFAULT_MODE), COptionsMgr::Get(OPT_CP_DEFAULT_CUSTOM));
 }
 
 /**

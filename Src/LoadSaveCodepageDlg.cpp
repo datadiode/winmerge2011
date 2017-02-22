@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  LoadSaveCodepageDlg.cpp
  *
  * @brief Implementation of the dialog used to select codepages
@@ -9,7 +9,7 @@
 #include "MainFrm.h"
 #include "resource.h"
 #include "LoadSaveCodepageDlg.h"
-#include "codepage.h"
+#include "Common/SuperComboBox.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -20,6 +20,8 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // CLoadSaveCodepageDlg dialog
 
+CLoadSaveCodepageDlg *CLoadSaveCodepageDlg::m_pThis = NULL;
+
 CLoadSaveCodepageDlg::CLoadSaveCodepageDlg()
 : OResizableDialog(IDD_LOAD_SAVE_CODEPAGE)
 , m_bAffectsLeft(TRUE)
@@ -28,6 +30,8 @@ CLoadSaveCodepageDlg::CLoadSaveCodepageDlg()
 , m_nLoadCodepage(-1)
 , m_nSaveCodepage(-1)
 , m_bEnableSaveCodepage(false)
+, m_pCbLoadCodepage(NULL)
+, m_pCbSaveCodepage(NULL)
 {
 	static const LONG FloatScript[] =
 	{
@@ -42,6 +46,12 @@ CLoadSaveCodepageDlg::CLoadSaveCodepageDlg()
 		0
 	};
 	CFloatState::FloatScript = FloatScript;
+	m_pThis = this;
+}
+
+CLoadSaveCodepageDlg::~CLoadSaveCodepageDlg()
+{
+	m_pThis = NULL;
 }
 
 template<ODialog::DDX_Operation op>
@@ -77,6 +87,10 @@ LRESULT CLoadSaveCodepageDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lPa
 		case MAKEWPARAM(IDC_LOAD_SAVE_SAME_CODEPAGE, BN_CLICKED):
 			UpdateSaveGroup();
 			break;
+		case MAKEWPARAM(IDC_LOAD_CODEPAGE_TEXTBOX, CBN_DROPDOWN):
+		case MAKEWPARAM(IDC_SAVE_CODEPAGE_TEXTBOX, CBN_DROPDOWN):
+			reinterpret_cast<HSuperComboBox *>(lParam)->AdjustDroppedWidth();
+			break;
 		}
 		break;
 	}
@@ -101,28 +115,10 @@ BOOL CLoadSaveCodepageDlg::OnInitDialog()
 	UpdateData<Set>();
 	UpdateSaveGroup();
 
-	HComboBox *pCbLoadCodepage = static_cast<HComboBox *>(GetDlgItem(IDC_LOAD_CODEPAGE_TEXTBOX));
-	HComboBox *pCbSaveCodepage = static_cast<HComboBox *>(GetDlgItem(IDC_SAVE_CODEPAGE_TEXTBOX));
+	m_pCbLoadCodepage = static_cast<HComboBox *>(GetDlgItem(IDC_LOAD_CODEPAGE_TEXTBOX));
+	m_pCbSaveCodepage = static_cast<HComboBox *>(GetDlgItem(IDC_SAVE_CODEPAGE_TEXTBOX));
 
-	const std::map<int, int> &f_codepage_status = codepage_status();
-	std::map<int, int>::const_iterator it = f_codepage_status.begin();
-	while (it != f_codepage_status.end())
-	{
-		CPINFOEX info;
-		int codepage = it->first;
-		if (GetCPInfoEx(codepage, 0, &info))
-		{
-			TCHAR desc[300];
-			wsprintf(desc, _T("%05d - %s"), codepage, info.CodePageName);
-			int index = pCbLoadCodepage->AddString(desc);
-			if (codepage == m_nLoadCodepage)
-				pCbLoadCodepage->SetCurSel(index);
-			index = pCbSaveCodepage->AddString(desc);
-			if (codepage == m_nSaveCodepage)
-				pCbSaveCodepage->SetCurSel(index);
-		}
-		++it;
-	}
+	EnumSystemCodePages(EnumCodePagesProc, CP_INSTALLED);
 
 	return TRUE;
 }
@@ -165,4 +161,41 @@ void CLoadSaveCodepageDlg::OnOK()
 	if (m_bLoadSaveSameCodepage)
 		m_nSaveCodepage = m_nLoadCodepage;
 	EndDialog(IDOK);
+}
+
+/**
+ * @brief Callback for use with EnumSystemCodePages()
+ */
+BOOL CLoadSaveCodepageDlg::EnumCodePagesProc(LPTSTR lpCodePageString)
+{
+	if (UINT const codepage = _tcstol(lpCodePageString, &lpCodePageString, 10))
+	{
+		CPINFOEX info;
+		if (GetCPInfoEx(codepage, 0, &info))
+		{
+			int lower = 0;
+			int upper = m_pThis->m_pCbLoadCodepage->GetCount();
+			while (lower < upper)
+			{
+				int const match = (upper + lower) >> 1;
+				UINT const cmp = static_cast<UINT>(m_pThis->m_pCbLoadCodepage->GetItemData(match));
+				if (cmp >= info.CodePage)
+					upper = match;
+				if (cmp <= info.CodePage)
+					lower = match + 1;
+			}
+			// Cosmetic: Remove excess spaces between numeric identifier and what follows it
+			if (_tcstol(info.CodePageName, &lpCodePageString, 10) && *lpCodePageString == _T(' '))
+				StrTrim(lpCodePageString + 1, _T(" "));
+			int index = m_pThis->m_pCbLoadCodepage->InsertString(lower, info.CodePageName);
+			m_pThis->m_pCbLoadCodepage->SetItemData(index, info.CodePage);
+			if (codepage == m_pThis->m_nLoadCodepage)
+				m_pThis->m_pCbLoadCodepage->SetCurSel(index);
+			index = m_pThis->m_pCbSaveCodepage->InsertString(lower, info.CodePageName);
+			m_pThis->m_pCbSaveCodepage->SetItemData(index, info.CodePage);
+			if (codepage == m_pThis->m_nSaveCodepage)
+				m_pThis->m_pCbSaveCodepage->SetCurSel(index);
+		}
+	}
+	return TRUE; // continue enumeration
 }
