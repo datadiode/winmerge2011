@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  PropHexEditor.cpp
  *
  * @brief Implementation of PropHexEditor propertysheet
@@ -18,7 +18,7 @@ static char THIS_FILE[] = __FILE__;
 /** @brief Maximum number of bytes per line. */
 #define MAX_BPL 16384
 
-/** 
+/**
  * @brief Constructor.
  */
 PropHexEditor::PropHexEditor()
@@ -26,7 +26,7 @@ PropHexEditor::PropHexEditor()
 {
 }
 
-/** 
+/**
  * @brief Function handling dialog data exchange between GUI and variables.
  */
 template<ODialog::DDX_Operation op>
@@ -55,7 +55,7 @@ LRESULT PropHexEditor::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	return OptionsPanel::WindowProc(message, wParam, lParam);
 }
 
-/** 
+/**
  * @brief Reads options values from storage to UI.
  */
 void PropHexEditor::ReadOptions()
@@ -64,7 +64,7 @@ void PropHexEditor::ReadOptions()
 	m_bAutomaticBPL = COptionsMgr::Get(OPT_AUTOMATIC_BPL);
 }
 
-/** 
+/**
  * @brief Writes options values from UI to storage.
  */
 void PropHexEditor::WriteOptions()
@@ -73,7 +73,7 @@ void PropHexEditor::WriteOptions()
 	COptionsMgr::SaveOption(OPT_AUTOMATIC_BPL, m_bAutomaticBPL != FALSE);
 }
 
-/** 
+/**
  * @brief Called before propertysheet is drawn.
  */
 BOOL PropHexEditor::OnInitDialog()
@@ -85,10 +85,8 @@ BOOL PropHexEditor::OnInitDialog()
 	return OptionsPanel::OnInitDialog();
 }
 
-/** 
- * @brief Update availability of line difference controls.
- */
 void PropHexEditor::UpdateScreen()
 {
+	// Write data to controls
 	UpdateData<Set>();
 }
