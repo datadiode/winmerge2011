@@ -97,6 +97,8 @@ BOOL SelectFile(HWND parent, String &path,
 	if (filters)
 		dlg.m_defext = SetDefExt(path, dlg.m_filters.c_str());
 
+	paths_UndoMagic(path);
+
 	if (!COptionsMgr::Get(OPT_USE_SHELL_FILE_BROOWSE_DIALOGS))
 	{
 		dlg.m_path = path;
@@ -110,8 +112,6 @@ BOOL SelectFile(HWND parent, String &path,
 	// This will tell common file dialog what to show
 	// and also this will hold its return value
 	TCHAR sSelectedFile[MAX_PATH];
-
-	paths_UndoMagic(path);
 
 	OPENFILENAME ofn;
 	memset(&ofn, 0, OPENFILENAME_SIZE_VERSION_400);
