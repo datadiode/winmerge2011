@@ -173,7 +173,6 @@ public:
 	{
 	private:
 		const CDirView *const pView;
-		const CDiffContext *const pCtxt;
 		const int sortCol;
 		const bool bSortAscending;
 	public:
@@ -193,8 +192,8 @@ private:
 	void ClearColumnOrders();
 	void ResetColumnOrdering();
 	void MoveColumn(int psrc, int pdest);
-	String ColGetTextToDisplay(const CDiffContext *pCtxt, int col, const DIFFITEM *di);
-	int ColSort(const CDiffContext *pCtxt, int col, const DIFFITEM *ldi, const DIFFITEM *rdi) const;
+	String ColGetTextToDisplay(int col, const DIFFITEM *di);
+	int ColSort(int col, const DIFFITEM *ldi, const DIFFITEM *rdi) const;
 // End DirViewCols.cpp
 
 // Implementation in DirViewColItems.cpp
@@ -247,6 +246,9 @@ protected:
 	int m_dispcols;
 	std::vector<int> m_colorder; /**< colorder[logical#]=physical# */
 	std::vector<int> m_invcolorder; /**< invcolorder[physical]=logical# */
+	static TCHAR const m_szAsterisk[];
+	int m_cxPadding;
+	int m_cxAsterisk;
 	int m_nHiddenItems; /**< Count of items we have hidden */
 	int m_nSpecialItems; /**< Count of special items */
 	bool m_bTreeMode; /**< TRUE if tree mode is on*/

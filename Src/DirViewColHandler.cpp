@@ -34,8 +34,9 @@ static char THIS_FILE[] = __FILE__;
  * @param [in] di Difference data.
  * @return Text for the specified column.
  */
-String CDirView::ColGetTextToDisplay(const CDiffContext *pCtxt, int col, const DIFFITEM *di)
+String CDirView::ColGetTextToDisplay(int col, const DIFFITEM *di)
 {
+	CDiffContext const *const pCtxt = m_pFrame->GetDiffContext();
 	// Custom properties have custom get functions
 	const DirColInfo &colInfo = f_cols[col];
 	return (*colInfo.getfnc)(pCtxt, reinterpret_cast<const char *>(di) + colInfo.offset);
@@ -51,8 +52,9 @@ String CDirView::ColGetTextToDisplay(const CDiffContext *pCtxt, int col, const D
  * @param [in] rdi Right difference item data.
  * @return Order of items.
  */
-int CDirView::ColSort(const CDiffContext *pCtxt, int col, const DIFFITEM *ldi, const DIFFITEM *rdi) const
+int CDirView::ColSort(int col, const DIFFITEM *ldi, const DIFFITEM *rdi) const
 {
+	CDiffContext const *const pCtxt = m_pFrame->GetDiffContext();
 	// Custom properties have custom sort functions
 	const DirColInfo &colInfo = f_cols[col];
 	const size_t offset = colInfo.offset;
@@ -135,7 +137,6 @@ void CDirView::UpdateColumns(UINT lvcf)
 
 CDirView::CompareState::CompareState(const CDirView *pView, int sortCol, bool bSortAscending)
 : pView(pView)
-, pCtxt(pView->m_pFrame->GetDiffContext())
 , sortCol(sortCol)
 , bSortAscending(bSortAscending)
 {
@@ -154,7 +155,7 @@ int CALLBACK CDirView::CompareState::CompareFunc(LPARAM lParam1, LPARAM lParam2,
 	const DIFFITEM *ldi = reinterpret_cast<DIFFITEM *>(lParam1);
 	const DIFFITEM *rdi = reinterpret_cast<DIFFITEM *>(lParam2);
 	// compare 'left' and 'right' parameters as appropriate
-	int retVal = pThis->pView->ColSort(pThis->pCtxt, pThis->sortCol, ldi, rdi);
+	int retVal = pThis->pView->ColSort(pThis->sortCol, ldi, rdi);
 	// return compare result, considering sort direction
 	return pThis->bSortAscending ? retVal : -retVal;
 }
@@ -207,9 +208,9 @@ static LPTSTR NTAPI AllocDispinfoText(String &s)
  */
 void CDirView::ReflectGetdispinfo(NMLVDISPINFO *pParam)
 {
-	const int nIdx = pParam->item.iItem;
-	const int i = ColPhysToLog(pParam->item.iSubItem);
-	const WORD idName = f_cols[i].idName;
+	int const nIdx = pParam->item.iItem;
+	int const i = ColPhysToLog(pParam->item.iSubItem);
+	WORD const idName = f_cols[i].idName;
 	DIFFITEM *di = GetDiffItem(nIdx);
 	if (di == NULL)
 	{
@@ -219,18 +220,14 @@ void CDirView::ReflectGetdispinfo(NMLVDISPINFO *pParam)
 		}
 		return;
 	}
-	const CDiffContext *ctxt = m_pFrame->GetDiffContext();
 	if (pParam->item.mask & LVIF_TEXT)
 	{
-		String s = ColGetTextToDisplay(ctxt, i, di);
+		String s = ColGetTextToDisplay(i, di);
 		// Add '*' to newer time field
-		if (di->left.mtime != 0 || di->right.mtime != 0)
+		if ((idName == IDS_COLHDR_LTIMEM && di->left.mtime > di->right.mtime) ||
+			(idName == IDS_COLHDR_RTIMEM && di->left.mtime < di->right.mtime))
 		{
-			if ((idName == IDS_COLHDR_LTIMEM && di->left.mtime > di->right.mtime) ||
-				(idName == IDS_COLHDR_RTIMEM && di->left.mtime < di->right.mtime))
-			{
-				s.insert(0, _T("* "));
-			}
+			s.insert(0, m_szAsterisk);
 		}
 		pParam->item.pszText = AllocDispinfoText(s);
 	}

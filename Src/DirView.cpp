@@ -45,6 +45,7 @@
 #include "PidlContainer.h"
 #include "ExcelExport.h"
 #include "FileOrFolderSelect.h"
+#include "locality.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -71,11 +72,14 @@ static const UINT RightCmdLast	= 0xCFFF;
 HFont *CDirView::m_font = NULL;
 HImageList *CDirView::m_imageList = NULL;
 HImageList *CDirView::m_imageState = NULL;
+TCHAR const CDirView::m_szAsterisk[] = _T("* ");
 
 CDirView::CDirView(CDirFrame *pFrame)
 	: m_numcols(-1)
 	, m_dispcols(-1)
 	, m_pFrame(pFrame)
+	, m_cxPadding(6)
+	, m_cxAsterisk(0)
 	, m_nHiddenItems(0)
 	, m_nSpecialItems(0)
 	, m_pCmpProgressDlg(NULL)
@@ -184,6 +188,7 @@ void CDirView::UpdateFont()
 	{
 		SetFont(NULL);
 	}
+	m_cxAsterisk = GetStringWidth(m_szAsterisk);
 }
 
 void CDirView::OnInitialUpdate()
@@ -192,7 +197,10 @@ void CDirView::OnInitialUpdate()
 	UpdateFont();
 	// Replace standard header with sort header
 	if (HHeaderCtrl *pHeaderCtrl = GetHeaderCtrl())
+	{
 		m_ctlSortHeader.Subclass(pHeaderCtrl);
+		m_cxPadding = pHeaderCtrl->GetBitmapMargin();
+	}
 
 	SetImageList(m_imageList, LVSIL_SMALL);
 
@@ -1378,6 +1386,18 @@ LRESULT CDirView::ReflectNotify(UNotify *pNM)
 		// User just finished dragging a column header
 		MoveColumn(pNM->HEADER.iItem, pNM->HEADER.pitem->iOrder);
 		return 1;
+	case HDN_DIVIDERDBLCLICK:
+		switch (f_cols[ColPhysToLog(pNM->HEADER.iItem)].idName)
+		{
+		case IDS_COLHDR_LTIMEM:
+		case IDS_COLHDR_RTIMEM:
+			static SYSTEMTIME const st = { 7000, 10, 0, 30, 20, 40, 50, 600 };
+			locality::TimeString s(st);
+			int const cx = 2 * m_cxPadding + m_cxAsterisk + GetStringWidth(s.c_str());
+			SetColumnWidth(pNM->HEADER.iItem, cx);
+			return 1;
+		}
+		break;
 	case HDN_BEGINDRAG:
 		// User is starting to drag a column header
 		// save column widths before user reorders them
@@ -1812,6 +1832,30 @@ LRESULT CDirView::ReflectCustomDraw(NMLVCUSTOMDRAW *pNM)
 				// otherwise suspicious
 				pNM->clrTextBk = COptionsMgr::Get(OPT_LIST_SUSPICIOUS_BKGD_COLOR);
 				break;
+			}
+			switch (f_cols[ColPhysToLog(pNM->iSubItem)].idName)
+			{
+			case IDS_COLHDR_LTIMEM:
+			case IDS_COLHDR_RTIMEM:
+				bool const hasfocus = pNM->nmcd.hdr.hwndFrom == ::GetFocus();
+				bool const selected = GetItemState(static_cast<int>(pNM->nmcd.dwItemSpec), LVIS_SELECTED) != 0;
+				::SetBkColor(pNM->nmcd.hdc,
+					selected ? ::GetSysColor(hasfocus ? COLOR_HIGHLIGHT : COLOR_BTNFACE) :
+					pNM->clrTextBk == CLR_DEFAULT ? GetBkColor() : pNM->clrTextBk);
+				::SetTextColor(pNM->nmcd.hdc,
+					selected ? ::GetSysColor(hasfocus ? COLOR_HIGHLIGHTTEXT : COLOR_BTNTEXT) :
+					pNM->clrText == CLR_DEFAULT ? GetTextColor() : pNM->clrText);
+				// Erase the cell's background
+				::ExtTextOut(pNM->nmcd.hdc, pNM->nmcd.rc.left, pNM->nmcd.rc.top, ETO_OPAQUE, &pNM->nmcd.rc, NULL, 0, NULL);
+				// Draw the cell's text
+				TCHAR text[80];
+				GetItemText(static_cast<int>(pNM->nmcd.dwItemSpec), pNM->iSubItem, text, _countof(text));
+				RECT rc = pNM->nmcd.rc;
+				rc.left += m_cxPadding;
+				if (*text != *m_szAsterisk)
+					rc.left += m_cxAsterisk;
+				::DrawText(pNM->nmcd.hdc, text, -1, &rc, DT_SINGLELINE | DT_VCENTER | DT_END_ELLIPSIS | DT_NOPREFIX);
+				return CDRF_SKIPDEFAULT;
 			}
 		}
 		break;
