@@ -2318,6 +2318,18 @@ namespace H2O
 			assert(::IsWindow(m_hWnd));
 			return Header_SetItem(m_hWnd, i, phdi);
 		}
+		int GetBitmapMargin()
+		{
+			using ::SendMessage;
+			assert(::IsWindow(m_hWnd));
+			return Header_GetBitmapMargin(m_hWnd);
+		}
+		int SetBitmapMargin(int iWidth)
+		{
+			using ::SendMessage;
+			assert(::IsWindow(m_hWnd));
+			return Header_SetBitmapMargin(m_hWnd, iWidthh);
+		}
 	};
 
 	class HHeaderCtrl : public HeaderCtrl<HWindow>
