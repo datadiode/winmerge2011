@@ -29,12 +29,8 @@ Function OpenTextFile(path)
 	If Not IsEmpty(optfile) Then
 		options = options & " --options=""" & optfile & """"
 	End If
+	options = options & " --stdin=""" & path & """"
 	Set astyle = sh.Exec("""astyle.exe""" & options)
-	With fs.OpenTextFile(path)
-		While Not .AtEndOfStream
-			astyle.StdIn.WriteLine .ReadLine
-		WEnd
-	End With
 	Set OpenTextFile = astyle.StdOut
 End Function
 </script>
