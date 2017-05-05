@@ -122,6 +122,8 @@ CMessageBoxDialog::CMessageBoxDialog(LPCTSTR strMessage, UINT nStyle, UINT nHelp
 		}
 		p = q;
 	}
+	// Prevent edit control from wrapping at ":\\" (for DT_CALCRECT consistency)
+	string_replace(m_strMessage, L'\\', L'/');
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -587,19 +589,24 @@ LPARAM CMessageBoxDialog::CreateMessageControl(HSurface *pdc, int nXPosition, in
 	while (p)
 	{
 		LPCTSTR q = _tcschr(p, _T('\n'));
-		int n = static_cast<int>(q ? ++q - p : _tcslen(p));
-		RECT linerect = { 0, 0, cx, 0 };
-		int h = pdc->DrawText(p, n, &linerect, flags);
-		if (rect.right < linerect.right)
-			rect.right = linerect.right;
-		rect.bottom += h;
+		if (int n = static_cast<int>(q ? ++q - p : _tcslen(p)))
+		{
+			RECT linerect = { 0, 0, cx, 0 };
+			// Wine's DrawText() gets a bit confused at CR/LF
+			if (wine_version && q)
+				n -= 2;
+			int h = pdc->DrawText(p, n, &linerect, flags);
+			if (rect.right < linerect.right)
+				rect.right = linerect.right;
+			rect.bottom += h;
+			m_edit.m_aStripes.push_back(
+				*f == _T('%') &&
+				_tcstol(f + 1, const_cast<LPTSTR *>(&f), 10) &&
+				*f == _T('\n') ? -h : h);
+			if (LPCTSTR g = _tcschr(f, _T('\n')))
+				f = g + 1;
+		}
 		p = q;
-		m_edit.m_aStripes.push_back(
-			*f == _T('%') &&
-			_tcstol(f + 1, const_cast<LPTSTR *>(&f), 10) &&
-			*f == _T('\n') ? -h : h);
-		if (LPCTSTR g = _tcschr(f, _T('\n')))
-			f = g + 1;
 	}
 	if (rect.bottom > cy)
 	{
@@ -614,6 +621,12 @@ LPARAM CMessageBoxDialog::CreateMessageControl(HSurface *pdc, int nXPosition, in
 	m_edit.Subclass(HEdit::Create(style,
 		nXPosition, nYPosition, rect.right, rect.bottom, m_pWnd, 0,
 		m_strMessage.c_str(), m_nStyle & MB_RTLREADING ? WS_EX_RTLREADING : 0));
+	RECT editrect;
+	// Compensate for any margins around the control's formatting rectangle
+	m_edit.GetRect(&editrect);
+	rect.right += rect.right - (editrect.right - editrect.left);
+	rect.bottom += rect.bottom - (editrect.bottom - editrect.top);
+	m_edit.SetWindowPos(NULL, 0, 0, rect.right, rect.bottom, SWP_NOMOVE | SWP_NOZORDER);
 	return MAKELPARAM(rect.right, rect.bottom);
 }
 
