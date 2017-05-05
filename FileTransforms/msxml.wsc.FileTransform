@@ -16,7 +16,7 @@ Const ReadOnly = True
 Const TextType = "xml"
 
 Const MsxmlProgID = "Msxml2.DOMDocument.6.0"
-Const TidyCmdLine = """tidy.exe"" -xml --char-encoding raw -indent --indent-attributes yes --more-preformatted yes --tab-size 4 --indent-spaces 4 -wrap 0"
+Const TidyCmdLine = """tidy.exe"" -xml --char-encoding raw -indent --indent-attributes yes --tab-size 4 --indent-spaces 4 -wrap 0"
 
 Dim sh
 Set sh = CreateObject("WScript.Shell")
