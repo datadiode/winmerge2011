@@ -103,7 +103,7 @@ template<>
 LRESULT OWindow::MessageReflect_WebLinkButton<WM_DRAWITEM>(WPARAM, LPARAM lParam)
 {
 	reinterpret_cast<DrawItemStruct_WebLinkButton *>(lParam)->DrawItem();
-	return 0;
+	return TRUE;
 }
 
 template<>
@@ -133,7 +133,7 @@ LRESULT OWindow::MessageReflect_ColorButton<WM_DRAWITEM>(WPARAM, LPARAM lParam)
 	COLORREF crTmp = SetBkColor(pdis->hDC, cr);
 	ExtTextOut(pdis->hDC, 0, 0, ETO_OPAQUE, &pdis->rcItem, 0, 0, 0);
 	SetBkColor(pdis->hDC, crTmp);
-	return 0;
+	return TRUE;
 }
 
 template<>

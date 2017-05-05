@@ -19,6 +19,6 @@ protected:
 	BOOL	m_bSortAsc;
 // Operations
 public:
-	void DrawItem(LPDRAWITEMSTRUCT);
+	LRESULT DrawItem(LPDRAWITEMSTRUCT);
 	int SetSortImage(int nCol, BOOL bAsc);
 };

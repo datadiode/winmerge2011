@@ -135,7 +135,7 @@ LRESULT CDirView::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		return 0;
 	case WM_DRAWITEM:
 		if (reinterpret_cast<DRAWITEMSTRUCT *>(lParam)->CtlType == ODT_HEADER)
-			m_ctlSortHeader.DrawItem(reinterpret_cast<DRAWITEMSTRUCT *>(lParam));
+			return m_ctlSortHeader.DrawItem(reinterpret_cast<DRAWITEMSTRUCT *>(lParam));
 		return 0;
 	}
 	return OListView::WindowProc(uMsg, wParam, lParam);

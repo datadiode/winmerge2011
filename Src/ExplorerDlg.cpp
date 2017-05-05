@@ -227,6 +227,10 @@ LRESULT ExplorerDlg::WndProcFilter(WNDPROC pfnSuper, HWND hWnd, UINT uMsg, WPARA
 			return 0;
 		}
 		break;
+	case WM_DRAWITEM:
+		if (reinterpret_cast<DRAWITEMSTRUCT *>(lParam)->CtlType == ODT_HEADER)
+			return m_ctlSortHeader.DrawItem(reinterpret_cast<DRAWITEMSTRUCT *>(lParam));
+		return 0;
 	}
 	return ::CallWindowProc(pfnSuper, hWnd, uMsg, wParam, lParam);
 }

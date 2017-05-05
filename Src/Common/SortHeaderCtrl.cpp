@@ -47,7 +47,7 @@ int CSortHeaderCtrl::SetSortImage(int nCol, BOOL bAsc)
 	return nPrevCol;
 }
 
-void CSortHeaderCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
+LRESULT CSortHeaderCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 {
 	HSurface *pdc = reinterpret_cast<HSurface *>(lpDrawItemStruct->hDC);
 	// Get the column rect
@@ -126,4 +126,5 @@ void CSortHeaderCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 
 	// Restore dc
 	pdc->RestoreDC(nSavedDC);
+	return TRUE;
 }
