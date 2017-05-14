@@ -4,6 +4,7 @@
 	<method name='OpenTextFile'/>
 	<property name='ShowConsole'/>
 	<property name='ReadOnly'/>
+	<property name='Encoding'/>
 </implements>
 
 <script language='vbs'>
@@ -11,12 +12,13 @@ Option Explicit
 
 Const ShowConsole = 0
 Const ReadOnly = True
+Const Encoding = "UTF-8"
 
 Dim sh
 Set sh = CreateObject("WScript.Shell")
 
 Function OpenTextFile(path)
-	Set OpenTextFile = sh.Exec("%xdoc2txt%\xdoc2txt.exe """ & path & """").StdOut
+	Set OpenTextFile = sh.Exec("""%xdoc2txt%\xdoc2txt.exe"" -8 """ & path & """").StdOut
 End Function
 </script>
 </scriptlet>
