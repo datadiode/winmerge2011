@@ -4,6 +4,7 @@
 #include "ConsoleWindow.h"
 #include "FileTransform.h"
 #include "UniMarkdownFile.h"
+#include "codepage_detect.h"
 
 /**
  * @brief Plugin file reader class.
@@ -34,6 +35,22 @@ public:
 				CMyDispParams<0>().Unnamed, DISPATCH_PROPERTYGET, &var));
 			OException::Check(var.ChangeType(VT_UI2));
 			ShowConsoleWindow(V_UI2(&var));
+		}
+		if (SUCCEEDED(DispId.Init(m_spFactoryDispatch, L"Encoding")))
+		{
+			CMyVariant var;
+			OException::Check(DispId.Call(m_spFactoryDispatch,
+				CMyDispParams<0>().Unnamed, DISPATCH_PROPERTYGET, &var));
+			OException::Check(var.ChangeType(VT_BSTR));
+			V_BSTR(&var) = reinterpret_cast<HString *>(V_BSTR(&var))->Oct(CP_UTF8)->B;
+			if (char *const name = reinterpret_cast<char *>(V_BSTR(&var)))
+			{
+				if (EncodingInfo const *encodinginfo = LookupEncoding(name))
+				{
+					m_unicoding = NEITHER;
+					m_codepage = encodinginfo->GetCodePage();
+				}
+			}
 		}
 		if (SUCCEEDED(DispId.Init(m_spFactoryDispatch, L"ReadOnly")))
 		{
@@ -95,7 +112,27 @@ public:
 		OException::Check(m_ReadLine.Call(m_spStreamDispatch,
 			CMyDispParams<0>().Unnamed, DISPATCH_METHOD, &var));
 		OException::Check(var.ChangeType(VT_BSTR));
-		line.assign(V_BSTR(&var), SysStringLen(V_BSTR(&var)));
+		// Convert BSTR to String
+		if (m_unicoding == NEITHER)
+		{
+			V_BSTR(&var) = reinterpret_cast<HString *>(V_BSTR(&var))->Oct()->B;
+			UINT const len = SysStringByteLen(V_BSTR(&var));
+			ucr::maketstring(line, reinterpret_cast<char *>(V_BSTR(&var)), len, m_codepage, lossy);
+		}
+		else
+		{
+			line.assign(V_BSTR(&var), SysStringLen(V_BSTR(&var)));
+		}
+		// Don't let EOL chars exist in the midst of lines and cause crashes
+		String::iterator p = line.begin();
+		String::iterator const q = line.end();
+		if ((p = std::remove_if(p, q, LineInfo::IsEol)) != q)
+		{
+			line.erase(p, q);
+			*lossy = true;
+		}
+		if (*lossy)
+			++m_txtstats.nlosses;
 		eol = _T("\r\n");
 		return true;
 	}

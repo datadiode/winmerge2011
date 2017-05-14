@@ -190,10 +190,22 @@ FileLoadResult::FILES_RESULT CDiffTextBuffer::LoadFromFile(LPCTSTR pszFileName,
 			pufile->ReadBom();
 			// If the file is not unicode file, use the codepage we were given to
 			// interpret the 8-bit characters.
-			if (UNICODESET unicoding = pufile->GetUnicoding())
-				encoding.SetUnicoding(unicoding);
-			else
+			encoding.m_unicoding = pufile->GetUnicoding();
+			switch (encoding.m_unicoding)
+			{
+			case NONE:
 				pufile->SetCodepage(encoding.m_codepage);
+				break;
+			case NEITHER:
+				encoding.m_codepage = pufile->GetCodepage();
+				break;
+			case UTF8:
+				encoding.m_codepage = CP_UTF8;
+				break;
+			default:
+				encoding.m_codepage = CP_ACP;
+				break;
+			}
 			UINT lineno = 0;
 			String eol, preveol;
 			String sline;

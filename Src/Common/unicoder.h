@@ -17,6 +17,7 @@ typedef enum
 	UTF8,      /**< UTF-8. */
 	UCS4LE,    /**< UTF-32 little endian */
 	UCS4BE,    /**< UTF-32 big-endian */
+	NEITHER    /**< No idea. Go tell from codepage. */
 } UNICODESET;
 
 #ifdef __cplusplus
