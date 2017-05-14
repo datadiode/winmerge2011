@@ -586,28 +586,30 @@ LPARAM CMessageBoxDialog::CreateMessageControl(HSurface *pdc, int nXPosition, in
 
 	LPCTSTR f = fmt.c_str();
 	LPCTSTR p = m_strMessage.c_str();
-	while (p)
+	do
 	{
-		LPCTSTR q = _tcschr(p, _T('\n'));
-		if (int n = static_cast<int>(q ? ++q - p : _tcslen(p)))
+		// Wine's DrawText() gets a bit confused at CR/LF, so exclude it from n
+		LPCTSTR q = _tcschr(p, _T('\r'));
+		int n = static_cast<int>(q ? q - p : _tcslen(p));
+		RECT linerect = { 0, 0, cx, 0 };
+		int h = pdc->DrawText(p, n, &linerect, flags);
+		if (h <= m_edit.m_nLineHeight)
 		{
-			RECT linerect = { 0, 0, cx, 0 };
-			// Wine's DrawText() gets a bit confused at CR/LF
-			if (wine_version && q)
-				n -= 2;
-			int h = pdc->DrawText(p, n, &linerect, flags);
-			if (rect.right < linerect.right)
-				rect.right = linerect.right;
-			rect.bottom += h;
-			m_edit.m_aStripes.push_back(
-				*f == _T('%') &&
-				_tcstol(f + 1, const_cast<LPTSTR *>(&f), 10) &&
-				*f == _T('\n') ? -h : h);
-			if (LPCTSTR g = _tcschr(f, _T('\n')))
-				f = g + 1;
+			pdc->GetTextExtent(p, n, reinterpret_cast<SIZE *>(&linerect.right));
+			h = m_edit.m_nLineHeight;
 		}
-		p = q;
-	}
+		if (rect.right < linerect.right)
+			rect.right = linerect.right;
+		rect.bottom += h;
+		m_edit.m_aStripes.push_back(
+			*f == _T('%') &&
+			_tcstol(f + 1, const_cast<LPTSTR *>(&f), 10) &&
+			*f == _T('\n') ? -h : h);
+		if (LPCTSTR g = _tcschr(f, _T('\n')))
+			f = g + 1;
+		p += n;
+	} while (*p++ == '\r' && *p++ == '\n' && *p);
+	// Prevent the control from growing too high
 	if (rect.bottom > cy)
 	{
 		rect.bottom = cy;
