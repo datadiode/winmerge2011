@@ -7,7 +7,6 @@
 #include "StdAfx.h"
 #include "codepage_detect.h"
 #include "unicoder.h"
-#include "EncodingInfo.h"
 #include "markdown.h"
 #include "FileTextEncoding.h"
 #include "Utf8FileDetect.h"
@@ -27,7 +26,7 @@ static const int BufSize = 4 * 1024;
 /**
  * @brief Try to to match codepage name from codepages module, & watch for f_wincp_prefixes aliases
  */
-static EncodingInfo const *LookupEncoding(char *name)
+EncodingInfo const *LookupEncoding(char *name)
 {
 	// Try name as given, except for disregarding character case & leading zeros
 	std::replace(name, name + RemoveLeadingZeros(CharLowerA(name)), '_', '-');

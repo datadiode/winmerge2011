@@ -5,7 +5,11 @@
  */
 #pragma once
 
+#include "EncodingInfo.h"
+
 extern HINSTANCE hCharsets;
+
+EncodingInfo const *LookupEncoding(char *name);
 
 class FileTextEncoding;
 
