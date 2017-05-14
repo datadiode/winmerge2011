@@ -43,7 +43,7 @@ void ByteCompare::SetFileData(int items, file_data *data)
 	m_st_size[1] = data[1].stat.st_size;
 }
 
-enum BLANKNESS_TYPE
+enum ByteCompare::BLANKNESS_TYPE
 {
 	EOF_0 = 0,
 	EOF_1 = 1,

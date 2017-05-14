@@ -28,6 +28,7 @@ public:
 	FileTextStats m_textStats[2];
 
 private:
+	enum BLANKNESS_TYPE;
 	template<class CodePoint>
 	BOOL IsDBCSLeadByteEx(int, CodePoint)
 	{
