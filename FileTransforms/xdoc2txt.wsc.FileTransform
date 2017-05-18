@@ -18,7 +18,7 @@ Dim sh
 Set sh = CreateObject("WScript.Shell")
 
 Function OpenTextFile(path)
-	Set OpenTextFile = sh.Exec("""%xdoc2txt%\xdoc2txt.exe"" -8 """ & path & """").StdOut
+	Set OpenTextFile = sh.Exec("""xdoc2txt\xdoc2txt.exe"" -8 """ & path & """").StdOut
 End Function
 </script>
 </scriptlet>
