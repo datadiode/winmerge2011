@@ -341,11 +341,13 @@ void stringdiffs::onp(vector<char> &edscript)
 
 	int const M = static_cast<int>(line1.words.size());
 	int const N = static_cast<int>(line2.words.size());
-	
-	vector<int> fp_owner(M + 1 + N, -1);
-	vector<vector<char> > es_owner(M + 1 + N);
-	int *const fp = fp_owner.data() + M;
-	vector<char> *const es = es_owner.data() + M;
+	int const K = M + 1; // Rebasement of fp/es vectors
+	int const L = M + 3 + N; // Length of fp/es vectors
+
+	vector<int> fp_owner(L, -1);
+	vector<vector<char> > es_owner(L);
+	int *const fp = fp_owner.data() + K;
+	vector<char> *const es = es_owner.data() + K;
 
 	int const DELTA = N - M;
 	int p = 0;
@@ -354,6 +356,7 @@ void stringdiffs::onp(vector<char> &edscript)
 		int k;
 		for (k = -p; k < DELTA; ++k)
 		{
+			assert(K + k - 1 >= 0 && K + k + 1 < L);
 			int const z = fp[k + 1];
 			int const y = max(fp[k - 1] + 1, z);
 			fp[k] = snake(k, y, line1, line2);
@@ -370,6 +373,7 @@ void stringdiffs::onp(vector<char> &edscript)
 		}
 		for (k = DELTA + p; k >= DELTA; --k)
 		{
+			assert(K + k - 1 >= 0 && K + k + 1 < L);
 			int const z = fp[k + 1];
 			int const y = max(fp[k - 1] + 1, z);
 			fp[k] = snake(k, y, line1, line2);
