@@ -216,7 +216,6 @@
     <Link>
       <AdditionalDependencies>version.lib;shlwapi.lib;urlmon.lib;imm32.lib;HtmlHelp.lib;comctl32.lib;oleacc.lib;noarg.obj;noenv.obj;pcre.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(IntDir);$(SolutionDir)BuildTmp\lib\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <GenerateDebugInformation>false</GenerateDebugInformation>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <SubSystem>Windows</SubSystem>
     </Link>
