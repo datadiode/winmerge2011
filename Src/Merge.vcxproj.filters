@@ -1463,7 +1463,7 @@
     <setup Include="..\Setup\GenerateHTMLReport.WinMerge">
       <Filter>Setup Files</Filter>
     </setup>
-    <setup Include="..\setup\setup.wsf">
+    <setup Include="..\setup\setup.hta">
       <Filter>Setup Files</Filter>
     </setup>
     <setup Include="..\Docs\Users\Contributors.txt">

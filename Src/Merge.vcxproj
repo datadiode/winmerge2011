@@ -907,15 +907,15 @@
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="version.rh">
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\Setup\setup.wsf version "%(FullPath)" $(Platform)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\Setup\setup.hta "hidden:version" "%(FullPath)" "$(Platform)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)Setup_$(Platform).cfg;%(Outputs)</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Setup\setup.wsf version "%(FullPath)" $(Platform)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Setup\setup.hta "hidden:version" "%(FullPath)" "$(Platform)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)Setup_$(Platform).cfg;%(Outputs)</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\Setup\setup.wsf version "%(FullPath)" $(Platform)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\Setup\setup.hta "hidden:version" "%(FullPath)" "$(Platform)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)Setup_$(Platform).cfg;%(Outputs)</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Setup\setup.wsf version "%(FullPath)" $(Platform)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Setup\setup.hta "hidden:version" "%(FullPath)" "$(Platform)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)Setup_$(Platform).cfg;%(Outputs)</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">..\Setup\setup.wsf version "%(FullPath)" $(Platform)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">..\Setup\setup.hta "hidden:version" "%(FullPath)" "$(Platform)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">$(SolutionDir)Setup_$(Platform).cfg;%(Outputs)</Outputs>
     </CustomBuild>
     <None Include="res\binarydiff.ico" />
@@ -1020,7 +1020,7 @@
   </ItemGroup>
   <ItemGroup>
     <setup Include="..\Setup\GenerateHTMLReport.WinMerge" />
-    <setup Include="..\setup\setup.wsf" />
+    <setup Include="..\setup\setup.hta" />
   </ItemGroup>
   <ItemGroup>
     <imp Include="system32\system32.imp">

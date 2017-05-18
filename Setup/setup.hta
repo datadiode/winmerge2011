@@ -1,42 +1,8 @@
-<package>
-<job>
-<script type='job' language='vbs'>
-Option Explicit
-
-Dim cmd, arg, sh, senv, penv
-
-cmd = "mshta.exe """ & WScript.ScriptFullName & """ "
-For Each arg In WScript.arguments
-	cmd = cmd & "|" & arg
-Next
-
-Set sh = CreateObject("WScript.Shell")
-Set senv = sh.Environment("System")
-Set penv = sh.Environment("Process")
-
-If senv("PROCESSOR_ARCHITECTURE") <> penv("PROCESSOR_ARCHITECTURE") Then
-	On Error Resume Next
-	sh.Run "%SystemRoot%\Sysnative\" & cmd, 1, True
-	If err.Number <> 0 Then
-		If vbYes = MsgBox(_
-			"Error accessing the Sysnative folder." & vbLf &_
-			"Browse for a hotfix that may fix the issue?",_
-			vbYesNo Or vbExclamation, WScript.ScriptName)_
-		Then
-			sh.Run "http://support.microsoft.com/kb/942589/en-us"
-		End If
-	End If
-	On Error GoTo 0
-Else
-	sh.Run "%SystemRoot%\System32\" & cmd, 1, True
-End If
-</script>
-</job>
 <head>
 <meta http-equiv='Content-Type' content='text/html; charset=ISO-8859-1'/>
 <hta:application
 	id='app'
-	version='XXXXX.2011.005.427'
+	version='XXXXX.2011.007.205'
 	applicationName='WinMerge &amp;version; Setup'
 	scroll='no'
 	singleInstance='yes'
@@ -45,15 +11,17 @@ End If
 ;!@Install@!UTF-8!
 Title="WinMerge &version; [&platform;]"
 BeginPrompt="Do you want to install WinMerge &version;?"
-ExecuteFile="setup.wsf"
-ExecuteParameters="install &platform;"
+RunProgram="%%P:\"%SystemRoot%\\system32\\mshta.exe\" \"%%T\\setup.hta\" \"install\" \"&platform;\""
 ;!@InstallEnd@!
 </comment>
 <comment id='setup_bat'>
+call "%VS100COMNTOOLS%vsvars32.bat"
 set SevenZip=&SevenZip;
 del "WinMerge_&version;_&platform;.7z"
-"%SevenZip%\7z.exe" a "WinMerge_&version;_&platform;.7z" -r .\Build\WinMerge\&platform;\Release\* .\Build\WinMerge\Win32\Release\ShellExtensionU.dll .\Build\WinMerge\x64\Release\ShellExtensionX64.dll -x!*.lib -x!*.exp -x!*.pdb -x!*.sh -x!*.json
-copy /b "%SevenZip%\7zS.sfx" + Setup_&platform;.cfg + "WinMerge_&version;_&platform;.7z" "WinMerge_&version;_&platform;_change_7z_to_exe_if_you_want_a_setup.7z"
+"%SevenZip%7z.exe" a "WinMerge_&version;_&platform;.7z" -r .\Build\WinMerge\&platform;\Release\* .\Build\WinMerge\Win32\Release\ShellExtensionU.dll .\Build\WinMerge\x64\Release\ShellExtensionX64.dll -x!*.lib -x!*.exp -x!*.pdb -x!*.json -x!*.zip -x!*.bak -x!xdoc2txt\xdoc2txt.*
+copy /b "Setup\7zsd_LZMA2.sfx" "WinMerge_&version;_&platform;_change_7z_to_exe_if_you_want_a_setup.7z"
+mt.exe -manifest "Setup\7zsd.sfx.manifest" -outputresource:"WinMerge_&version;_&platform;_change_7z_to_exe_if_you_want_a_setup.7z";1
+copy /b "WinMerge_&version;_&platform;_change_7z_to_exe_if_you_want_a_setup.7z" + Setup_&platform;.cfg + "WinMerge_&version;_&platform;.7z" "WinMerge_&version;_&platform;_change_7z_to_exe_if_you_want_a_setup.7z"
 </comment>
 <comment id='version_h'>
 #define MAJOR &major;
@@ -62,6 +30,15 @@ copy /b "%SevenZip%\7zS.sfx" + Setup_&platform;.cfg + "WinMerge_&version;_&platf
 #define PRIVATE_BUILD ""
 #define COMMENTS ""
 </comment>
+<comment id='xdoc2txt_prompt'>
+WinMerge comes with a file transform scriptlet for piping office-type files through xdoc2txt.exe.
+Due to lack of a redistribution license, xdoc2txt.exe cannot legally be included in the WinMerge distribution.
+However, Setup can assist you in downloading the xdoc2txt distribution package from the official download location,
+and after successful sha256 verification, extract the relevant file(s) to their expected location(s).
+
+Do you want that to happen?
+</comment>
+
 <style>
 body
 {
@@ -192,13 +169,172 @@ a.selected, a:active.selected
 }
 </style>
 </head>
+<script type='text/javascript'>
+/*
+ * A JavaScript implementation of the Secure Hash Algorithm, SHA-256, as defined
+ * in FIPS 180-2
+ * Version 2.2 Copyright Angel Marin, Paul Johnston 2000 - 2009.
+ * Other contributors: Greg Holt, Andrew Kepert, Ydnar, Lostinet
+ * Distributed under the BSD License
+ * See http://pajhome.org.uk/crypt/md5 for details.
+ * Also http://anmar.eu.org/projects/jssha2/
+ *
+ * This is a modified version to support the specific task at hand.
+ */
 
-<job id='uninstall'>
-<script language='vbs'>
+/*
+ * This is the function to call from VBScript.
+ * It takes a byte array argument and returns a hex encoded string.
+ */
+function hex_sha256(s) { return rstr2hex(rstr_sha256(new VBArray(s).toArray())); }
+
+/*
+ * Calculate the sha256 of a raw string
+ */
+function rstr_sha256(s)
+{
+  return binb2rstr(binb_sha256(rstr2binb(s), s.length * 8));
+}
+
+/*
+ * Convert a raw string to a hex string
+ */
+function rstr2hex(input)
+{
+  var output = "";
+  for(var i = 0; i < input.length; i++)
+    output += "0".concat(input.charCodeAt(i).toString(16)).slice(-2);
+  return output.toUpperCase();
+}
+
+/*
+ * Convert a raw string to an array of big-endian words
+ * Characters >255 have their high-byte silently ignored.
+ */
+function rstr2binb(input)
+{
+  var output = Array(input.length >> 2);
+  for(var i = 0; i < output.length; i++)
+    output[i] = 0;
+  for(var i = 0; i < input.length * 8; i += 8)
+    output[i>>5] |= (input[i / 8] & 0xFF) << (24 - i % 32);
+  return output;
+}
+
+/*
+ * Convert an array of big-endian words to a string
+ */
+function binb2rstr(input)
+{
+  var output = "";
+  for(var i = 0; i < input.length * 32; i += 8)
+    output += String.fromCharCode((input[i>>5] >>> (24 - i % 32)) & 0xFF);
+  return output;
+}
+
+/*
+ * Main sha256 function, with its support functions
+ */
+function sha256_S (X, n) {return ( X >>> n ) | (X << (32 - n));}
+function sha256_R (X, n) {return ( X >>> n );}
+function sha256_Ch(x, y, z) {return ((x & y) ^ ((~x) & z));}
+function sha256_Maj(x, y, z) {return ((x & y) ^ (x & z) ^ (y & z));}
+function sha256_Sigma0256(x) {return (sha256_S(x, 2) ^ sha256_S(x, 13) ^ sha256_S(x, 22));}
+function sha256_Sigma1256(x) {return (sha256_S(x, 6) ^ sha256_S(x, 11) ^ sha256_S(x, 25));}
+function sha256_Gamma0256(x) {return (sha256_S(x, 7) ^ sha256_S(x, 18) ^ sha256_R(x, 3));}
+function sha256_Gamma1256(x) {return (sha256_S(x, 17) ^ sha256_S(x, 19) ^ sha256_R(x, 10));}
+function sha256_Sigma0512(x) {return (sha256_S(x, 28) ^ sha256_S(x, 34) ^ sha256_S(x, 39));}
+function sha256_Sigma1512(x) {return (sha256_S(x, 14) ^ sha256_S(x, 18) ^ sha256_S(x, 41));}
+function sha256_Gamma0512(x) {return (sha256_S(x, 1)  ^ sha256_S(x, 8) ^ sha256_R(x, 7));}
+function sha256_Gamma1512(x) {return (sha256_S(x, 19) ^ sha256_S(x, 61) ^ sha256_R(x, 6));}
+
+var sha256_K = new Array
+(
+  1116352408, 1899447441, -1245643825, -373957723, 961987163, 1508970993,
+  -1841331548, -1424204075, -670586216, 310598401, 607225278, 1426881987,
+  1925078388, -2132889090, -1680079193, -1046744716, -459576895, -272742522,
+  264347078, 604807628, 770255983, 1249150122, 1555081692, 1996064986,
+  -1740746414, -1473132947, -1341970488, -1084653625, -958395405, -710438585,
+  113926993, 338241895, 666307205, 773529912, 1294757372, 1396182291,
+  1695183700, 1986661051, -2117940946, -1838011259, -1564481375, -1474664885,
+  -1035236496, -949202525, -778901479, -694614492, -200395387, 275423344,
+  430227734, 506948616, 659060556, 883997877, 958139571, 1322822218,
+  1537002063, 1747873779, 1955562222, 2024104815, -2067236844, -1933114872,
+  -1866530822, -1538233109, -1090935817, -965641998
+);
+
+function binb_sha256(m, l)
+{
+  var HASH = new Array(1779033703, -1150833019, 1013904242, -1521486534,
+                       1359893119, -1694144372, 528734635, 1541459225);
+  var W = new Array(64);
+  var a, b, c, d, e, f, g, h;
+  var i, j, T1, T2;
+
+  /* append padding */
+  m[l >> 5] |= 0x80 << (24 - l % 32);
+  m[((l + 64 >> 9) << 4) + 15] = l;
+
+  for(i = 0; i < m.length; i += 16)
+  {
+    a = HASH[0];
+    b = HASH[1];
+    c = HASH[2];
+    d = HASH[3];
+    e = HASH[4];
+    f = HASH[5];
+    g = HASH[6];
+    h = HASH[7];
+
+    for(j = 0; j < 64; j++)
+    {
+      if (j < 16) W[j] = m[j + i];
+      else W[j] = safe_add(safe_add(safe_add(sha256_Gamma1256(W[j - 2]), W[j - 7]),
+                                            sha256_Gamma0256(W[j - 15])), W[j - 16]);
+
+      T1 = safe_add(safe_add(safe_add(safe_add(h, sha256_Sigma1256(e)), sha256_Ch(e, f, g)),
+                                                          sha256_K[j]), W[j]);
+      T2 = safe_add(sha256_Sigma0256(a), sha256_Maj(a, b, c));
+      h = g;
+      g = f;
+      f = e;
+      e = safe_add(d, T1);
+      d = c;
+      c = b;
+      b = a;
+      a = safe_add(T1, T2);
+    }
+
+    HASH[0] = safe_add(a, HASH[0]);
+    HASH[1] = safe_add(b, HASH[1]);
+    HASH[2] = safe_add(c, HASH[2]);
+    HASH[3] = safe_add(d, HASH[3]);
+    HASH[4] = safe_add(e, HASH[4]);
+    HASH[5] = safe_add(f, HASH[5]);
+    HASH[6] = safe_add(g, HASH[6]);
+    HASH[7] = safe_add(h, HASH[7]);
+  }
+  return HASH;
+}
+
+function safe_add (x, y)
+{
+  var lsw = (x & 0xFFFF) + (y & 0xFFFF);
+  var msw = (x >> 16) + (y >> 16) + (lsw >> 16);
+  return (msw << 16) | (lsw & 0xFFFF);
+}
+</script>
+<script type='text/vbs'>
 Option Explicit
 
 Const PROCESSOR_ARCHITECTURE_IA64 = 6
 Const PROCESSOR_ARCHITECTURE_AMD64 = 9
+
+Const adTypeBinary = 1
+Const adSaveCreateOverWrite = 2
+
+Const xdoc2txt_source = "http://ebstudio.info/download/KWICFinder/xd2tx2161.zip"
+Const xdoc2txt_digest = "B8CE64177EBD63EC3EBE5CA8CD3740E69F295B33A97FF84CDD47735E01077DC3"
 
 Dim sh, fso, sha, env, version, argv, executable
 Dim sProgFolder, sThisFolder, sMoveFolder
@@ -212,10 +348,10 @@ On Error Resume Next
 executable = sh.RegRead("HKLM\Software\Thingamahoochie\WinMerge\Executable")
 On Error GoTo 0
 
-If TypeName(Me) = "Object" Then
-	sProgFolder = fso.GetParentFolderName(WScript.ScriptFullName)
-	If MsgBox("Are you sure you want to uninstall WinMerge 2011 from folder" & vbLf & sProgFolder & "?", vbYesNo Or vbExclamation, WScript.ScriptName) = vbYes Then
-		If TerminateWinMerge(WScript.ScriptName) Then
+Sub Job_Uninstall
+	sProgFolder = fso.GetParentFolderName(app.icon)
+	If MsgBox("Are you sure you want to uninstall WinMerge 2011 from folder" & vbLf & sProgFolder & "?", vbYesNo Or vbExclamation, document.title) = vbYes Then
+		If TerminateWinMerge(document.title) Then
 			DeleteLink "Desktop"
 			DeleteLink "AllUsersDesktop"
 			DeleteLink "StartMenu"
@@ -239,11 +375,11 @@ If TypeName(Me) = "Object" Then
 			sh.RegDelete "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\"
 			fso.DeleteFolder sProgFolder, True
 			On Error GoTo 0
-			MsgBox "Uninstall completed successfully", vbInformation Or vbSystemModal, WScript.ScriptName
+			MsgBox "Uninstall completed successfully", vbInformation Or vbSystemModal, document.title
 		End If
 	End If
-	WScript.Quit
-End If
+	close
+End Sub
 
 version = app.version
 version = Replace(version, "XXXXX.", "0.")
@@ -251,8 +387,19 @@ version = Replace(version, "BUILD.", "")
 document.title = Replace(app.applicationName, "&version;", version)
 
 window.onload = GetRef("Job_Default")
-argv = Split(app.commandLine, "|")
-If UBound(argv) > 0 Then window.onload = GetRef("Job_" & argv(1))
+argv = Eval("Array(" & Replace(Trim(app.commandLine), """ ", """,") & ")")
+
+If UBound(argv) > 0 Then
+	Dim opt
+	For Each opt In Split(argv(1), ":")
+		Select Case LCase(opt)
+		Case "hidden"
+			moveTo 0, -16000
+		Case Else
+			window.onload = GetRef("Job_" & opt)
+		End Select
+	Next
+End If
 
 Function TerminateWinMerge(ScriptName)
 	TerminateWinMerge = True
@@ -346,7 +493,7 @@ Sub DeleteLink(ByVal sPath)
 	Else
 		sPath = BuildLinkName(sPath)
 		On Error Resume Next
-		fso.DeleteFile sPath
+		fso.DeleteFile sPath, True
 		On Error GoTo 0
 	End If
 End Sub
@@ -368,6 +515,10 @@ Sub Job_Install
 	End If
 	Job_Default
 End Sub
+
+Function FormatText(s)
+	FormatText = Trim(Replace(Replace(s, vbCrLf & vbCrLf, vbLf & vbLf), vbCrLf, " "))
+End Function
 
 Function TimeStampNow(length)
 	Dim clock
@@ -394,11 +545,79 @@ Sub PbOK_OnClick
 	setTimeout "Apply", 0, "VBS"
 End Sub
 
+Function DownloadFile(url)
+	Dim req, stm
+	Set req = CreateObject("MSXML2.XMLHTTP.3.0")
+	req.open "GET", url, False
+	req.send
+	Set stm = Nothing
+	If req.status = 200 Then
+		Set stm = CreateObject("ADODB.Stream")
+		stm.Type = adTypeBinary
+		stm.Open
+		stm.Write req.responseBody
+		stm.Position = 0
+	End If
+	Set DownloadFile = stm
+End Function
+
+Function DownloadAndSave3rdPartyFile(source, digest, destination)
+	Dim stm, sha256
+	Set stm = DownloadFile(source)
+	If stm Is Nothing Then
+		MsgBox "3rd party distribution package download failed." & vbLf & vbLf &_
+			"URL: " & xdoc2txt_source & vbLf & vbLf &_
+			"Operation canceled.",_
+			vbExclamation, document.title
+		Exit Function
+	End If
+	sha256 = hex_sha256(stm.Read)
+	If sha256 <> digest Then
+		MsgBox "3rd party distribution package sha256 verification failed." & vbLf & vbLf &_
+			"URL: " & xdoc2txt_source & vbLf & vbLf &_
+			"Acquired hash:" & vbLf & sha256 & vbLf & vbLf &_
+			"Expected hash:" & vbLf & digest & vbLf & vbLf &_
+			"Operation canceled.",_
+			vbExclamation, document.title
+		Exit Function
+	End If
+	stm.SaveToFile destination, adSaveCreateOverWrite
+	DownloadAndSave3rdPartyFile = True
+End Function
+
+Function Download3rdPartyFiles
+	If MsgBox(FormatText(xdoc2txt_prompt.text), vbYesNo Or vbQuestion, document.title) = vbYes Then
+		If Not DownloadAndSave3rdPartyFile(xdoc2txt_source, xdoc2txt_digest, sThisFolder & "\xdoc2txt.zip") Then Exit Function
+	Else
+		On Error Resume Next
+		fso.DeleteFile sThisFolder & "\xdoc2txt.zip", True
+		On Error Goto 0
+	End If
+	Download3rdPartyFiles = True
+End Function
+
+Function Install3rdPartyFiles
+	If fso.FileExists(sThisFolder & "\xdoc2txt.zip") Then
+		On Error Resume Next
+		fso.CreateFolder sThisFolder & "\xdoc2txt"
+		On Error Goto 0
+		sha.NameSpace(sThisFolder & "\xdoc2txt").CopyHere(sha.NameSpace(sThisFolder & "\xdoc2txt.zip\command").Items)
+		fso.DeleteFile sThisFolder & "\xdoc2txt.zip", True
+	Else
+		On Error Resume Next
+		fso.DeleteFolder sThisFolder & "\xdoc2txt", True
+		On Error Goto 0
+	End If
+	Install3rdPartyFiles = True
+End Function
+
 Sub Apply
-	Dim element
+	Dim element, sSetupCmdLine
 	document.body.style.cursor = "arrow"
 	sThisFolder = fso.GetParentFolderName(app.icon)
 	If maintenance.disabled Then
+		If Not Download3rdPartyFiles Then Exit Sub
+		If Not Install3rdPartyFiles Then Exit Sub
 		sProgFolder = EdFolder.value
 		If Not InstallFiles Then Exit Sub
 		' Preserve existing WinMergeU.json from former installation if present
@@ -432,14 +651,15 @@ Sub Apply
 			sh.RegWrite "HKCR\WinMerge.Project.File\shell\open\command\", """" & sProgFolder & "\WinMergeU.exe"" /run ""%1"" %*"
 			WriteExecutablePath "HKLM"
 			' Do the ARP stuff
+			sSetupCmdLine = sh.ExpandEnvironmentStrings("""%SystemRoot%\system32\mshta.exe"" """ & sProgFolder & "\setup.hta""")
 			sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\DisplayIcon", sProgFolder & "\WinMergeU.exe"
 			sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\DisplayName", "WinMerge 2011"
 			sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\DisplayVersion", version
 			sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\InstallDate", TimeStampNow(8)
 			sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\InstallLocation", sProgFolder
-			sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\ModifyPath", "wscript.exe """ & sProgFolder & "\setup.wsf"""
+			sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\ModifyPath", sSetupCmdLine
 			sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\Publisher", "Jochen Neubeck"
-			sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\UninstallString", "wscript.exe /job:uninstall """ & sProgFolder & "\setup.wsf"""
+			sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\UninstallString", sSetupCmdLine & " ""hidden:uninstall"""
 		End If
 	End If
 	If maintenance.disabled Then
@@ -540,7 +760,6 @@ Sub PortableMedia_OnClick
 End Sub
 
 </script>
-</job>
 <body nowrap>
 <div id='north'>
 <table id='license'>
@@ -549,7 +768,7 @@ End Sub
 <td>
 <textarea readonly>
 Copyright &#169; 1996-2011 Dean Grimm / Thingamahoochie Software
-Copyright &#169; 2002-2015 WinMerge Team
+Copyright &#169; 2002-2017 WinMerge Team
 
 WinMerge 2011 is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
 
@@ -561,20 +780,20 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 <table id='shortcuts'>
 <caption>Create shortcuts in the following places:</caption>
 <tr>
-<td><input id='Desktop' type='checkbox' onchange='Me.defaultChecked=True'/><label for='Desktop'>Desktop</label></td>
-<td><input id='AllUsersDesktop' type='checkbox' onchange='Me.defaultChecked=True'/><label for='AllUsersDesktop'>All Users Desktop</label></td>
+<td><input id='Desktop' type='checkbox' onchange='vbs:Me.defaultChecked=True'/><label for='Desktop'>Desktop</label></td>
+<td><input id='AllUsersDesktop' type='checkbox' onchange='vbs:Me.defaultChecked=True'/><label for='AllUsersDesktop'>All Users Desktop</label></td>
 </tr>
 <tr>
-<td><input id='StartMenu' type='checkbox' onchange='Me.defaultChecked=True'/><label for='StartMenu'>Start Menu</label></td>
-<td><input id='AllUsersStartMenu' type='checkbox' onchange='Me.defaultChecked=True'/><label for='AllUsersStartMenu'>All Users Start Menu</label></td>
+<td><input id='StartMenu' type='checkbox' onchange='vbs:Me.defaultChecked=True'/><label for='StartMenu'>Start Menu</label></td>
+<td><input id='AllUsersStartMenu' type='checkbox' onchange='vbs:Me.defaultChecked=True'/><label for='AllUsersStartMenu'>All Users Start Menu</label></td>
 </tr>
 <tr>
-<td><input id='Programs' type='checkbox' onchange='Me.defaultChecked=True'/><label for='Programs'>Programs</label></td>
-<td><input id='AllUsersPrograms' type='checkbox' onchange='Me.defaultChecked=True'/><label for='AllUsersPrograms'>All Users Programs</label></td>
+<td><input id='Programs' type='checkbox' onchange='vbs:Me.defaultChecked=True'/><label for='Programs'>Programs</label></td>
+<td><input id='AllUsersPrograms' type='checkbox' onchange='vbs:Me.defaultChecked=True'/><label for='AllUsersPrograms'>All Users Programs</label></td>
 </tr>
 <tr>
-<td><input id='QuickLaunch' type='checkbox' onchange='Me.defaultChecked=True'/><label for='QuickLaunch'>Quick Launch</label></td>
-<td><input id='ContextMenu' type='checkbox' onchange='Me.defaultChecked=True'/><label for='ContextMenu'>Shell Context Menu</label></td>
+<td><input id='QuickLaunch' type='checkbox' onchange='vbs:Me.defaultChecked=True'/><label for='QuickLaunch'>Quick Launch</label></td>
+<td><input id='ContextMenu' type='checkbox' onchange='vbs:Me.defaultChecked=True'/><label for='ContextMenu'>Shell Context Menu</label></td>
 </tr>
 </table>
 </div>
@@ -595,4 +814,3 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 <button id='PbCancel' accesskey='C'><u>C</u>ancel</button>
 </div>
 </body>
-</package>
