@@ -956,9 +956,6 @@
     <None Include="..\Translations\WinMerge\UpdatePoFilesFromPotFile.vbs" />
     <setup Include="..\Docs\Users\Contributors.txt" />
     <setup Include="..\Setup\character-sets.dll" />
-    <setup Include="..\Setup\CreateLaunchScript.sh">
-      <FileType>Document</FileType>
-    </setup>
     <docs Include="..\Docs\Users\CHANGES">
       <FileType>Document</FileType>
     </docs>

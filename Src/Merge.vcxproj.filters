@@ -1469,9 +1469,6 @@
     <setup Include="..\Docs\Users\Contributors.txt">
       <Filter>Setup Files</Filter>
     </setup>
-    <setup Include="..\Setup\CreateLaunchScript.sh">
-      <Filter>Setup Files</Filter>
-    </setup>
     <setup Include="..\Setup\character-sets.dll">
       <Filter>Setup Files</Filter>
     </setup>

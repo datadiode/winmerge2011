@@ -22,7 +22,7 @@
 
 ;    3. This notice may not be removed or altered from any source distribution.
 
-!define version "0.2011.005.187"
+!define version "0.2011.007.205"
 !define srcdir "..\Build\WinMerge\Win32\Release"
 !define setup "..\Build\WinMerge\Win32\WinMerge_${version}_wine_setup.exe"
 
@@ -105,23 +105,20 @@ Section "Main Application (GNU GPLv2)"
 	; package all files, recursively, preserving attributes
 	; assume files are in the correct places
 
-	File /a /r /x *.lib /x *.exp /x *.pdb /x *.wsf /x *.json /x *.log /x *.bak "${srcdir}\*.*"
+	File /a /r /x *.lib /x *.exp /x *.pdb /x *.hta /x *.json /x *.log /x *.bak /x xdoc2txt "${srcdir}\*.*"
 
 	RegDLL "$INSTDIR\ShellExtensionU.dll"
 
 	WriteUninstaller "${uninstaller}"
 
-	; create a WinMerge launch script in /usr/local/bin
-	IfFileExists "$SYSDIR\winecfg.exe" 0 EndWaitCreateLaunchScript
+SectionEnd
 
-		Exec '/usr/bin/xterm -e sh ./CreateLaunchScript.sh "$INSTDIR\WinMergeU.exe"'
-
-		WaitCreateLaunchScript:
-			Sleep 1000
-		IfFileExists "$INSTDIR\CreateLaunchScript.sh" WaitCreateLaunchScript
-
-	EndWaitCreateLaunchScript:
-
+Section "Launch script creation script (usage: sudo sh guess_what_goes_here.exe.sh)"
+	FileOpen $0 "$EXEPATH.sh" w
+	FileWrite $0 'echo "#!/bin/sh" > /usr/local/bin/WinMerge$\n'
+	FileWrite $0 'echo "wine \"$INSTDIR\WinMergeU.exe\" \$${WINMERGE_OPTIONS} \$$* 2> /dev/null" >> /usr/local/bin/WinMerge$\n'
+	FileWrite $0 'chmod +x /usr/local/bin/WinMerge$\n'
+	FileClose $0
 SectionEnd
 
 ; download and install Windows Script 5.6
