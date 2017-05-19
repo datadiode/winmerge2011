@@ -221,8 +221,6 @@ SingleItemEnumerator::SingleItemEnumerator(LPCTSTR path, LPCTSTR FullPath, LPCTS
 {
 }
 
-String CDirView::DirItemEnumerator::m_pathMRU;
-
 /**
  * @brief Construct a CDirView::DirItemEnumerator.
  *
@@ -478,9 +476,11 @@ void CDirView::DirItemEnumerator::CompressArchive(LPCTSTR path)
 		String strFilter = CExternalArchiveFormat::GetOpenFileFilterString();
 		strFilter.insert(0, CDirView::SuggestArchiveExtensions());
 		HWND const hwndOwner = theApp.m_pMainWnd->GetLastActivePopup()->m_hWnd;
-		if (SelectFile(hwndOwner, m_pathMRU, 0, 0, FALSE, strFilter.c_str()))
+		String strMRU = COptionsMgr::Get(OPT_ARCHIVE_MRU);
+		if (SelectFile(hwndOwner, strMRU, 0, 0, FALSE, strFilter.c_str()))
 		{
-			path = m_pathMRU.c_str();
+			COptionsMgr::SaveOption(OPT_ARCHIVE_MRU, strMRU);
+			path = COptionsMgr::Get(OPT_ARCHIVE_MRU).c_str();
 		}
 	}
 	if (path && !MultiStepCompressArchive(path))

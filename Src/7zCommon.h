@@ -63,7 +63,6 @@ private:
 	BOOL m_bRight;
 	std::map<String, void *> m_rgImpliedFoldersLeft;
 	std::map<String, void *> m_rgImpliedFoldersRight;
-	static String m_pathMRU;
 //	helper methods
 	const DIFFITEM *Next();
 	bool MultiStepCompressArchive(LPCTSTR);

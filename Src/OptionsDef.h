@@ -298,6 +298,8 @@ extern COptionDef
 <bool> OPT_ARCHIVE_ENABLE operator((_T("Merge7z/Enable"), true));
 extern COptionDef
 <bool> OPT_ARCHIVE_PROBETYPE operator((_T("Merge7z/ProbeSignature"), false));
+extern COptionDef
+<String> OPT_ARCHIVE_MRU operator((_T("Merge7z/MRU"), _T("")));
 
 // Startup options
 extern COptionDef
