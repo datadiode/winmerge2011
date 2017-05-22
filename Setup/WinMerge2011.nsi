@@ -28,7 +28,7 @@
 
 !define script56 "$%ProgramFiles%\Windows Script 5.6"
 !define script56url "ftp://ftp.bestzvit.com.ua/ARM_ZS/Redist/SCR56EN.EXE"
-!define script56hash "1dc13b2a9929b4648d679af0c3f37fe7"
+!define script56hash "96853264cc3de19d1e4f4cf45e219bfd7180d3edf50989bc65e08eb4ce699ca1"
 ; possible fallback(s):
 ; "ftp://24-129-233-75.eastlink.ca/array1/SKC/Support/WindowsScript/scripten.exe"
 
@@ -131,8 +131,8 @@ Section "Windows Script 5.6 (separate EULA)"
 			InetLoad::load /POPUP "Windows Script 5.6" "${script56url}" "${script56}\setup.exe"
 		EndDownloadScript56:
 
-		; verify the MD5 hash of the file
-		md5dll::GetMD5File "${script56}\setup.exe"
+		; verify the SHA2 hash of the file
+		Crypto::HashFile "SHA2" "${script56}\setup.exe"
 		Pop $0
 		StrCmp $0 ${script56hash} +2
 		Abort "${script56}\setup.exe is corrupt"
