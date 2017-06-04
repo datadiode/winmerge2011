@@ -309,8 +309,7 @@ UINT CDirView::DirItemEnumerator::Open()
  */
 const DIFFITEM *CDirView::DirItemEnumerator::Next()
 {
-	enum {nMask = LVNI_FOCUSED|LVNI_SELECTED|LVNI_CUT|LVNI_DROPHILITED};
-	while ((m_nIndex = m_pView->GetNextItem(m_nIndex, m_nFlags & nMask)) == -1)
+	while ((m_nIndex = m_pView->GetNextItem(m_nIndex, m_nFlags & LVNI_STATEMASK)) == -1)
 	{
 		m_strFolderPrefix = *m_curFolderPrefix++;
 		m_bRight = TRUE;
@@ -337,6 +336,12 @@ Merge7z::Envelope *CDirView::DirItemEnumerator::Enum(Item &item)
 	CDirFrame *pDoc = m_pView->m_pFrame;
 	const CDiffContext *ctxt = pDoc->GetDiffContext();
 	const DIFFITEM *di = Next();
+
+	// Processing of expanded items occurs on child level, so exclude the parent
+	if (di->customFlags1 & ViewCustomFlags::EXPANDED)
+	{
+		return 0;
+	}
 
 	if ((m_nFlags & DiffsOnly) && !m_pView->IsItemNavigableDiff(di))
 	{
