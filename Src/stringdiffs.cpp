@@ -356,35 +356,45 @@ void stringdiffs::onp(vector<char> &edscript)
 		int k;
 		for (k = -p; k < DELTA; ++k)
 		{
+			// select among candidate scripts
 			assert(K + k - 1 >= 0 && K + k + 1 < L);
 			int const z = fp[k + 1];
 			int const y = max(fp[k - 1] + 1, z);
+			int const x = y > z ? k - 1 : k + 1;
 			fp[k] = snake(k, y, line1, line2);
-			es[k] = y > z ? es[k - 1] : es[k + 1];
-			if (int const n = static_cast<int>(es[k].size()))
+			es[k] = es[x];
+			if (fp[x] != -1)
 			{
+				// selected a candidate script to combine with
+				int const n = static_cast<int>(es[k].size());
 				es[k].resize(n + 1 + fp[k] - y, '=');
 				es[k][n] = y > z ? '+' : '-';
 			}
 			else
 			{
+				// no candidate script yet so start a new one
 				es[k].resize(fp[k] - y, '=');
 			}
 		}
 		for (k = DELTA + p; k >= DELTA; --k)
 		{
+			// select among candidate scripts
 			assert(K + k - 1 >= 0 && K + k + 1 < L);
 			int const z = fp[k + 1];
 			int const y = max(fp[k - 1] + 1, z);
+			int const x = y > z ? k - 1 : k + 1;
 			fp[k] = snake(k, y, line1, line2);
-			es[k] = y > z ? es[k - 1] : es[k + 1];
-			if (int const n = static_cast<int>(es[k].size()))
+			es[k] = es[x];
+			if (fp[x] != -1)
 			{
+				// selected a candidate script to combine with
+				int const n = static_cast<int>(es[k].size());
 				es[k].resize(n + 1 + fp[k] - y, '=');
 				es[k][n] = y > z ? '+' : '-';
 			}
 			else
 			{
+				// no candidate script yet so start a new one
 				es[k].resize(fp[k] - y, '=');
 			}
 		}
