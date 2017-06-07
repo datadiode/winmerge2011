@@ -400,21 +400,21 @@ msgstr "生成报告(&R)..."
 #: Merge.rc:99
 #, c-format
 msgid "Save to &Excel spreadsheet"
-msgstr ""
+msgstr "保存到 Excel 表格(&E)"
 
 #: Merge.rc:101
 #: Merge.rc:106
 #: Merge.rc:111
 #, c-format
 msgid "&All"
-msgstr ""
+msgstr "所有(&A)"
 
 #: Merge.rc:102
 #: Merge.rc:107
 #: Merge.rc:112
 #, c-format
 msgid "&Selected"
-msgstr ""
+msgstr "选中的(&S)"
 
 #: Merge.rc:104
 #, c-format
@@ -1034,17 +1034,17 @@ msgstr "位置窗格(&C)"
 #: Merge.rc:515
 #, c-format
 msgid "&Synchronization Point\tAlt+S"
-msgstr ""
+msgstr "设置同步滚动位置"
 
 #: Merge.rc:516
 #, c-format
 msgid "Clear Sync&hronization Points"
-msgstr ""
+msgstr "清除同步滚动位置"
 
 #: Merge.rc:523
 #, c-format
 msgid "Compare &Selection..."
-msgstr ""
+msgstr "比较选中的部分(&S)"
 
 #: Merge.rc:560
 #: Merge.rc:1027
@@ -1123,27 +1123,27 @@ msgstr "文件大小"
 #: Merge.rc:585
 #, c-format
 msgid "Co&mpare"
-msgstr ""
+msgstr "比较(&M)"
 
 #: Merge.rc:586
 #, c-format
 msgid "Compare &As"
-msgstr ""
+msgstr "根据类型比较(&A)"
 
 #: Merge.rc:588
 #, c-format
 msgid "&Text"
-msgstr ""
+msgstr "文本(&T)"
 
 #: Merge.rc:589
 #, c-format
 msgid "&Archive"
-msgstr ""
+msgstr "压缩档(&A)"
 
 #: Merge.rc:590
 #, c-format
 msgid "&Binary"
-msgstr ""
+msgstr "二进制文件(&B)"
 
 #: Merge.rc:591
 #, c-format
@@ -1223,7 +1223,7 @@ msgstr "两侧(&B)(%1个 共%2个)"
 #: Merge.rc:613
 #, c-format
 msgid "Re&name"
-msgstr "改名(&N)"
+msgstr "重命名(&N)"
 
 #: Merge.rc:614
 #, c-format
@@ -1455,18 +1455,18 @@ msgstr ""
 #: Merge.rc:782
 #, c-format
 msgid "&New folder"
-msgstr ""
+msgstr "新文件夹(&N)"
 
 #: Merge.rc:766
 #, c-format
 msgid "Filena&me:"
-msgstr ""
+msgstr "文件名(&M)"
 
 #: Merge.rc:768
 #: Merge.rc:783
 #, c-format
 msgid "&OK"
-msgstr ""
+msgstr "好的(&O)"
 
 #: Merge.rc:769
 #: Merge.rc:784
@@ -1490,7 +1490,7 @@ msgstr "Rational ClearCase"
 #: Merge.rc:794
 #, c-format
 msgid "CheckOut"
-msgstr "调试"
+msgstr "签出"
 
 #: Merge.rc:795
 #: Merge.rc:881
@@ -1622,7 +1622,7 @@ msgstr ""
 #: Merge.rc:1494
 #, c-format
 msgid "&Ignore folder structure"
-msgstr ""
+msgstr "忽略文件夹结构(&I)"
 
 #: Merge.rc:863
 #, c-format
@@ -2297,7 +2297,7 @@ msgstr "背景"
 #: Merge.rc:1267
 #, c-format
 msgid "Syntax"
-msgstr ""
+msgstr "语法高亮"
 
 #: Merge.rc:1270
 #, c-format
@@ -2684,12 +2684,12 @@ msgstr "二进制"
 #: Merge.rc:1478
 #, c-format
 msgid "Number of bytes to display per line:"
-msgstr ""
+msgstr "每行显示的字节数:"
 
 #: Merge.rc:1480
 #, c-format
 msgid "Automatically adjust number of bytes per line (uncheck this if you want WinMerge to use your own choice for bytes per line)"
-msgstr ""
+msgstr "自动调整每行显示的字节数(如果您希望 WinMerge 使用自定义的字节数请取消此项勾选)"
 
 #: Merge.rc:1487
 #, c-format
@@ -2704,7 +2704,7 @@ msgstr ""
 #: Merge.rc:1491
 #, c-format
 msgid "&Add to context menu"
-msgstr ""
+msgstr "添加到上下文菜单(&A)"
 
 #: Merge.rc:1492
 #, c-format
@@ -2719,7 +2719,7 @@ msgstr "默认包含子文件夹(&C)"
 #: Merge.rc:1495
 #, c-format
 msgid "Folder compare"
-msgstr ""
+msgstr "文件夹对比"
 
 #: Merge.rc:1496
 #, c-format
@@ -2729,7 +2729,7 @@ msgstr ""
 #: Merge.rc:1497
 #, c-format
 msgid "File compare"
-msgstr ""
+msgstr "文件对比"
 
 #: Merge.rc:1498
 #, c-format
@@ -3248,7 +3248,7 @@ msgid ""
 "Undo (Ctrl+Z)"
 msgstr ""
 "撤销上次的动作\n"
-"撤销"
+"撤销 (Ctrl+Z)"
 
 #: Merge.rc:1677
 #, c-format
@@ -3257,7 +3257,7 @@ msgid ""
 "Redo (Ctrl+Y)"
 msgstr ""
 "重复之前未完成的动作\n"
-"重复"
+"重复 (Ctrl+Y)"
 
 #: Merge.rc:1678
 #, c-format
@@ -3601,7 +3601,7 @@ msgstr "正则表达式"
 #: Merge.rc:1745
 #, c-format
 msgid "Filters were updated. Refresh current folder compare?"
-msgstr ""
+msgstr "过滤器已更新. 刷新当前文件夹对比?"
 
 #: Merge.rc:1747
 #, c-format
@@ -3696,12 +3696,12 @@ msgstr "创建报告..."
 #: Merge.rc:1765
 #, c-format
 msgid "Undoing the last operation..."
-msgstr ""
+msgstr "正在撤销上次操作..."
 
 #: Merge.rc:1766
 #, c-format
 msgid "Redoing the previous operation..."
-msgstr ""
+msgstr "正在恢复上次操作..."
 
 #: Merge.rc:1767
 #, c-format
@@ -3806,17 +3806,17 @@ msgstr "文件未解包: %1"
 #: Merge.rc:1787
 #, c-format
 msgid "Cannot move file\n%1\nto\n%2\n\n%3"
-msgstr ""
+msgstr "无法移动文件\n%1\n到\n%2\n\n%3"
 
 #: Merge.rc:1788
 #, c-format
 msgid "Cannot copy file\n%1\nto\n%2\n\n%3"
-msgstr ""
+msgstr "无法复制文件\n%1\n到\n%2\n\n%3"
 
 #: Merge.rc:1789
 #, c-format
 msgid "Cannot delete file\n%1\n\n%3"
-msgstr ""
+msgstr "无法删除文件\n%1\n\n%3"
 
 #: Merge.rc:1790
 #, c-format
@@ -4163,17 +4163,17 @@ msgstr ""
 #: Merge.rc:1845
 #, c-format
 msgid "Are you sure you want to move:"
-msgstr ""
+msgstr "您是否确定想要移动:"
 
 #: Merge.rc:1846
 #, c-format
 msgid "Are you sure you want to move %d items:"
-msgstr ""
+msgstr "您是否确定想要移动 %d 个项目:"
 
 #: Merge.rc:1848
 #, c-format
 msgid "Confirm Move"
-msgstr ""
+msgstr "确认移动"
 
 #: Merge.rc:1849
 #, c-format
@@ -4303,12 +4303,12 @@ msgstr "文件名称"
 #: Merge.rc:1874
 #, c-format
 msgid "Date"
-msgstr ""
+msgstr "日期"
 
 #: Merge.rc:1875
 #, c-format
 msgid "Attributes"
-msgstr ""
+msgstr "属性"
 
 #: Merge.rc:1878
 #, c-format
@@ -4453,17 +4453,17 @@ msgstr "二进制文件完全相同"
 #: Merge.rc:1909
 #, c-format
 msgid "Binary files are different"
-msgstr "二进制文件不同"
+msgstr "二进制文件存在差异"
 
 #: Merge.rc:1910
 #, c-format
 msgid "Files are different"
-msgstr "文件不同"
+msgstr "文件存在差异"
 
 #: Merge.rc:1911
 #, c-format
 msgid "Folders are different"
-msgstr ""
+msgstr "文件夹存在差异"
 
 #: Merge.rc:1912
 #, c-format
@@ -4483,12 +4483,12 @@ msgstr "错误"
 #: Merge.rc:1916
 #, c-format
 msgid "Text files are identical"
-msgstr ""
+msgstr "文本文件完全相同"
 
 #: Merge.rc:1917
 #, c-format
 msgid "Text files are different"
-msgstr ""
+msgstr "文本文件存在差异"
 
 #: Merge.rc:1918
 #, c-format
@@ -5560,7 +5560,7 @@ msgstr ""
 #: Merge.rc:2110
 #, c-format
 msgid "Print..."
-msgstr ""
+msgstr "打印..."
 
 #: Merge.rc:2111
 #, c-format
