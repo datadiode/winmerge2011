@@ -30,24 +30,40 @@
 
 #include "WinMergeShell.h"
 #include "RegKey.h"
+#include "findhta.h"
+
+#include <TlHelp32.h>
+
+#ifdef _WIN64
+#define BITNESS_INFO L"[64-bit]"
+#else
+#define BITNESS_INFO L"[32-bit]"
+#endif
 
 DEFINE_GUID(CLSID_WinMergeShell,0x4E716236,0xAA30,0x4C65,0xB2,0x25,0xD6,0x8B,0xBA,0x81,0xE9,0xC2);
 
 static CWinMergeShell *pModule = NULL;
+
+static WCHAR const ModuleAtom[] = L"ModuleAtom:4e716236-aa30-4c65-b225-d68bba81e9c2";
 
 /////////////////////////////////////////////////////////////////////////////
 // DLL Entry Point
 
 extern "C" BOOL WINAPI _DllMainCRTStartup(HINSTANCE hInstance, DWORD dwReason, LPVOID)
 {
-	if (dwReason == DLL_PROCESS_ATTACH)
+	switch (dwReason)
 	{
+	case DLL_PROCESS_ATTACH:
+		// Refuse to load into th process of the setup routine
+		if (GetModuleHandleW(L"mshta.exe") && StrStrIW(GetCommandLineW(), ModuleAtom))
+			return FALSE;
+		AddAtomW(ModuleAtom);
 		pModule = new CWinMergeShell(hInstance);
 		DisableThreadLibraryCalls(hInstance);
-	}
-	else if (dwReason == DLL_PROCESS_DETACH)
-	{
+		break;
+	case DLL_PROCESS_DETACH:
 		delete pModule;
+		break;
 	}
 	return TRUE;
 }
@@ -75,38 +91,6 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID* ppv)
 
 STDAPI DllRegisterServer()
 {
-	// If we're on NT 4.0, add ourselves to the list of approved shell extensions.
-
-	// Note that you should *NEVER* use the overload of CRegKey::SetValue with
-	// 4 parameters.  It lets you set a value in one call, without having to
-	// call CRegKey::Open() first.  However, that version of SetValue() has a
-	// bug in that it requests KEY_ALL_ACCESS to the key.  That will fail if the
-	// user is not an administrator.  (The code should request KEY_WRITE, which
-	// is all that's necessary.)
-
-	// Read also:
-	// http://msdn.microsoft.com/library/default.asp?url=/library/en-us/shellcc/
-	// platform/shell/programmersguide/shell_int/shell_int_extending/
-	// extensionhandlers/shell_ext.asp
-
-	// Special code for Windows NT 4.0 only
-	if ((GetVersion() & 0x8000FFFFUL) == 4)
-	{
-		CRegKeyEx reg;
-		LONG lRet;
-
-		lRet = reg.Open(HKEY_LOCAL_MACHINE,
-			_T("Software\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved"));
-
-		if (ERROR_SUCCESS != lRet)
-			return E_ACCESSDENIED;
-
-		lRet = reg.WriteString(_T("WinMerge_Shell Extension"),
-			_T("{4E716236-AA30-4C65-B225-D68BBA81E9C2}"));
-
-		if (ERROR_SUCCESS != lRet)
-			return E_ACCESSDENIED;
-	}
 	return pModule->RegisterClassObject(TRUE);
 }
 
@@ -115,88 +99,103 @@ STDAPI DllRegisterServer()
 
 STDAPI DllUnregisterServer()
 {
-	// If we're on NT 4.0, remove ourselves from the list of approved shell extensions.
-	// Note that if we get an error along the way, I don't bail out since I want
-	// to do the normal ATL unregistration stuff too.
-
-	// Special code for Windows NT 4.0 only
-	if ((GetVersion() & 0x8000FFFFUL) == 4)
-	{
-		CRegKeyEx reg;
-		LONG lRet;
-
-		lRet = reg.OpenWithAccess(HKEY_LOCAL_MACHINE,
-			_T("Software\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved"),
-			KEY_SET_VALUE);
-
-		if (ERROR_SUCCESS == lRet)
-		{
-			lRet = reg.DeleteValue(_T("{4E716236-AA30-4C65-B225-D68BBA81E9C2}"));
-		}
-	}
 	return pModule->RegisterClassObject(FALSE);
 }
 
-static BOOL IsExplorer(HANDLE hProcess)
+template<typename P>
+class DllImport
 {
-	DWORD dwModuleHandle = 0;
-	static const TCHAR szModuleName[] = _T("explorer.exe");
-	if (LPVOID pvRemote = VirtualAllocEx(hProcess, NULL, sizeof szModuleName, MEM_COMMIT, PAGE_READWRITE))
-	{
-		WriteProcessMemory(hProcess, pvRemote, szModuleName, sizeof szModuleName, NULL);
-		if (HANDLE hThread = CreateRemoteThread(hProcess, NULL, 0,
-			(LPTHREAD_START_ROUTINE)GetModuleHandle, pvRemote, 0, NULL))
-		{
-			WaitForSingleObject(hThread, INFINITE);
-			GetExitCodeThread(hThread, &dwModuleHandle);
-		}
-		VirtualFreeEx(hProcess, pvRemote, sizeof szModuleName, MEM_RELEASE);
-	}
-	return dwModuleHandle;
-}
+	FARPROC const p;
+public:
+	DllImport(HMODULE module, LPCSTR name): p(GetProcAddress(module, name)) { }
+	P operator *() const { return reinterpret_cast<P>(p); }
+};
 
-static BOOL CALLBACK EnumProcPostClose(HWND hWnd, LPARAM lParam)
+static BOOL KillHostingProcesses(HWND hWnd)
 {
-	if (IsWindowVisible(hWnd) && reinterpret_cast<LPARAM>(hWnd) != lParam)
+    HMODULE const kernel32 = GetModuleHandleW(L"kernel32");
+	DllImport<BOOL (APIENTRY *)(HANDLE, PBOOL)> const IsWow64Process(kernel32, "IsWow64Process");
+
+	HANDLE const hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+	if (hProcessSnap == INVALID_HANDLE_VALUE)
+		return FALSE;
+
+	int choice = 0;
+
+	PROCESSENTRY32 pe32;
+	pe32.dwSize = sizeof pe32;
+	if (Process32First(hProcessSnap, &pe32)) do
 	{
-		DWORD dwProcessId = 0;
-		if (GetWindowThreadProcessId(hWnd, &dwProcessId))
+		if (pe32.th32ProcessID == GetCurrentProcessId())
+			continue;
+		if (HANDLE const hProcess = OpenProcess(
+			PROCESS_ALL_ACCESS, FALSE, pe32.th32ProcessID))
 		{
-			if (HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, dwProcessId))
+			int veto = 0;
+			if (*IsWow64Process)
 			{
-				if (IsExplorer(hProcess))
+				BOOL bIsWow46Process;
+				if (!(*IsWow64Process)(hProcess, &bIsWow46Process))
+					veto |= 2; // veto due to unclear situation
+				else if (bIsWow46Process)
+					veto ^= 1; // mutually canceling veto due to bitness mismatch
+				if (!(*IsWow64Process)(GetCurrentProcess(), &bIsWow46Process))
+					veto |= 2; // veto due to unclear situation
+				else if (bIsWow46Process)
+					veto ^= 1; // mutually canceling veto due to bitness mismatch
+			}
+			if (veto == 0)
+			{
+				DWORD dwExitCode = 0;
+				if (LPVOID const pVirtual = VirtualAllocEx(
+					hProcess, NULL, sizeof ModuleAtom, MEM_COMMIT, PAGE_READWRITE))
 				{
-					const UINT fuFlags = SMTO_ABORTIFHUNG | SMTO_NOTIMEOUTIFNOTHUNG;
-					DWORD_PTR dwResult = 0;
-					if (SendMessageTimeout(hWnd, WM_GETDLGCODE, 0, 0, fuFlags, 500, &dwResult) && dwResult == 0)
+					if (WriteProcessMemory(
+						hProcess, pVirtual, ModuleAtom, sizeof ModuleAtom, NULL))
 					{
-						SendMessageTimeout(hWnd, WM_SYSCOMMAND, SC_CLOSE, 0, fuFlags, 500, &dwResult);
+						if (HANDLE const hThread = CreateRemoteThread(
+							hProcess, NULL, 0,
+							reinterpret_cast<LPTHREAD_START_ROUTINE>(FindAtomW),
+							pVirtual, 0, NULL))
+						{
+							WaitForSingleObject(hThread, INFINITE);
+							GetExitCodeThread(hThread, &dwExitCode);
+							CloseHandle(hThread);
+						}
+					}
+					VirtualFreeEx(hProcess, pVirtual, 0, MEM_RELEASE);
+				}
+				if (dwExitCode != 0)
+				{
+					WCHAR msg[1024];
+					wsprintfW(msg,
+						L"The WinMerge shell extension is used by the following process:"
+						L"\n\n%s\n\n"
+						L"Do you want to terminate this process?",
+						pe32.szExeFile);
+					choice = MessageBoxW(hWnd, msg,
+						L"ShellExtension " BITNESS_INFO,
+						MB_ICONWARNING | MB_YESNOCANCEL);
+					if (choice == IDYES)
+					{
+						TerminateProcess(hProcess, dwExitCode);
+						WaitForSingleObject(hProcess, 5000);
 					}
 				}
-				CloseHandle(hProcess);
 			}
+			CloseHandle(hProcess);
 		}
-	}
+	} while (choice != IDCANCEL && Process32Next(hProcessSnap, &pe32));
+
+	CloseHandle(hProcessSnap);
 	return TRUE;
 }
 
 /////////////////////////////////////////////////////////////////////////////
 // DllInstall - Allows for restarting explorer.exe with /i:Shell_TrayWnd
 
-STDAPI DllInstall(BOOL, LPCWSTR lpClassName)
+STDAPI DllInstall(BOOL, LPCWSTR lpCmdLine)
 {
-	if (HWND hTrayWnd = FindWindow(lpClassName, NULL))
-	{
-		DWORD dwProcessId = 0;
-		if (GetWindowThreadProcessId(hTrayWnd, &dwProcessId))
-		{
-			EnumWindows(EnumProcPostClose, reinterpret_cast<LPARAM>(hTrayWnd));
-			if (HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, dwProcessId))
-			{
-				TerminateProcess(hProcess, 0);
-				CloseHandle(hProcess);
-			}
-		}
-	}
+	KillHostingProcesses(FindHTA(lpCmdLine));
 	return S_OK;
 }

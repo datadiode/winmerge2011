@@ -11,7 +11,7 @@
 ;!@Install@!UTF-8!
 Title="WinMerge &version; [&platform;]"
 BeginPrompt="Do you want to install WinMerge &version;?"
-RunProgram="%%P:\"%SystemRoot%\\system32\\mshta.exe\" \"%%T\\setup.hta\" \"install\" \"&platform;\""
+RunProgram="%%P:\"%SystemRoot%\\system32\\mshta.exe\" \"%%T\\setup.hta\" \"install\" \"&platform;\" \"ModuleAtom:4e716236-aa30-4c65-b225-d68bba81e9c2\""
 ;!@InstallEnd@!
 </comment>
 <comment id='setup_bat'>
@@ -344,6 +344,8 @@ Set fso = CreateObject("Scripting.FileSystemObject")
 Set sha = CreateObject("Shell.Application")
 Set env = sh.Environment("Process")
 
+window.name = "4e716236-aa30-4c65-b225-d68bba81e9c2" & "-" & fso.GetTempName
+
 On Error Resume Next
 executable = sh.RegRead("HKLM\Software\Thingamahoochie\WinMerge\Executable")
 On Error GoTo 0
@@ -360,7 +362,7 @@ Sub Job_Uninstall
 			DeleteLink "AllUsersPrograms"
 			DeleteLink "QuickLaunch"
 			DeleteLink "ContextMenu"
-			RestartExplorer
+			KillShellExtensionHosts
 			On Error Resume Next
 			sh.RegDelete "HKCR\.WinMerge\"
 			sh.RegDelete "HKCR\WinMerge.Project.File\DefaultIcon\"
@@ -440,13 +442,12 @@ Function LinkExists(ByVal sPath)
 	End If
 End Function
 
-Sub RestartExplorer
+Sub KillShellExtensionHosts
 	Select Case sha.GetSystemInformation("ProcessorArchitecture")
 	Case PROCESSOR_ARCHITECTURE_IA64, PROCESSOR_ARCHITECTURE_AMD64
-		sh.Run """RegSvr32.exe"" /s /n /i:Shell_TrayWnd """ & sProgFolder & "\ShellExtensionX64.dll""", 1, True
-	Case Else
-		sh.Run """RegSvr32.exe"" /s /n /i:Shell_TrayWnd """ & sProgFolder & "\ShellExtensionU.dll""", 1, True
+		sh.Run """RegSvr32.exe"" /s /n /i:" & window.name & " """ & sProgFolder & "\ShellExtensionX64.dll""", 1, True
 	End Select
+	sh.Run """RegSvr32.exe"" /s /n /i:" & window.name & " """ & sProgFolder & "\ShellExtensionU.dll""", 1, True
 End Sub
 
 Sub RegisterShellExtension(flags)
@@ -668,14 +669,16 @@ Sub Apply
 		ElseIf MsgBox("Setup completed successfully." & vbLf & vbLf &_
 				"The files from the previous installation have been moved to" & vbLf & vbLf &_
 				sMoveFolder & vbLf & vbLf &_
-				"Setup can try to delete this folder but would need to close" & vbLf &_
-				"and restart Windows Explorer. Do you want that to happen?" & vbLf & vbLf &_
+				"Setup can try to delete this folder but may need to close" & vbLf &_
+				"Windows Explorer and/or other applications, each of which" & vbLf &_
+				"will trigger an extra confirmation prompt." & vbLf & vbLf &_
+				"Do you want that to happen?" & vbLf & vbLf &_
 				"!!>    CAUTION:" & vbLf &_
 				"!!>    DO NOT CONFIRM THIS IF YOU HAVE MADE" & vbLf &_
 				"!!>    CHANGES TO THE PREVIOUS INSTALLATION" & vbLf &_
 				"!!>    AND WANT TO KEEP THEM FOR REFERENCE!",_
 				vbYesNo Or vbExclamation, document.title) = vbYes Then
-			RestartExplorer
+			KillShellExtensionHosts
 			On Error Resume Next
 			fso.DeleteFolder sMoveFolder, True
 			On Error GoTo 0
