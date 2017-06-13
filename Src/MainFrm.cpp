@@ -3215,7 +3215,7 @@ void CMainFrame::OnFileOpenProject()
  */
 bool CMainFrame::ParseArgsAndDoOpen(const MergeCmdLineInfo &cmdInfo)
 {
-	if (cmdInfo.m_nCmdShow != SW_SHOWMINNOACTIVE && !SetForegroundWindow())
+	if (cmdInfo.m_nCmdShow != SW_SHOWMINNOACTIVE && (IsIconic() || !SetForegroundWindow()))
 	{
 		// Force to foreground
 		ShowWindow(SW_MINIMIZE);
