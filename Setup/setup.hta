@@ -660,7 +660,7 @@ Sub Apply
 			sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\InstallLocation", sProgFolder
 			sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\ModifyPath", sSetupCmdLine
 			sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\Publisher", "Jochen Neubeck"
-			sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\UninstallString", sSetupCmdLine & " ""hidden:uninstall"""
+			sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\UninstallString", sSetupCmdLine & " ""hidden:uninstall"" ""ModuleAtom:4e716236-aa30-4c65-b225-d68bba81e9c2"""
 		End If
 	End If
 	If maintenance.disabled Then
