@@ -40,16 +40,12 @@ for %%$ in (
 	set $=
 )
 
-REM Copy MSVCRT redistributables for xdoc2txt.exe, from either VS2010 or VS2012,
-REM and in case of the latter, rename DLLs to make them usable for xdoc2txt.exe.
-if not exist "%~2xdoc2txt" md "%~2xdoc2txt"
-set $=%VS100COMNTOOLS%..\..\VC\redist\x86\;%VS110COMNTOOLS%..\..\VC\redist\x86\
+REM Copy Frhed
+set $=..\..\Frhed\Build\FRHED\%3\UnicodeRelease
 for %%$ in (
-	Microsoft.VC100.CRT
-	Microsoft.VC110.CRT
+	.
 ) do if not "%%~$$:$" == "" (
-	xcopy /y "%%~$$:$\msvcr1?0.dll" "%~2xdoc2txt\msvcr100.*"
-	xcopy /y "%%~$$:$\msvcp1?0.dll" "%~2xdoc2txt\msvcp100.*"
+	xcopy /ys "%%~$$:$" "%~2Frhed\"
 	set $=
 )
 
