@@ -204,11 +204,14 @@ int regexp_item::process(const std::vector<regexp_item> &relist,
 	return len;
 }
 
-bool regexp_item::indifferent(const std::vector<regexp_item> &relist, LPCTSTR p, LPCTSTR q)
+int regexp_item::collate(const std::vector<regexp_item> &relist, LPCTSTR p, LPCTSTR q)
 {
 	OString str1 = HString::Uni(p)->Oct(CP_UTF8);
 	OString str2 = HString::Uni(q)->Oct(CP_UTF8);
 	size_t len1 = regexp_item::process(relist, str1.A, str1.A, str1.ByteLen());
 	size_t len2 = regexp_item::process(relist, str2.A, str2.A, str2.ByteLen());
-	return (len1 == len2) && (_memicmp(str1.A, str2.A, len1) == 0);
+	if (str1.A == NULL || str2.A == NULL)
+		return static_cast<int>(len1 - len2);
+	str1.A[len1] = str2.A[len2] = '\0';
+	return _stricoll(str1.A, str2.A);
 }

@@ -47,5 +47,5 @@ struct regexp_item
 	}
 	static int process(const std::vector<regexp_item> &,
 		char *dst, const char *src, int len, LPCTSTR filename = NULL);
-	static bool indifferent(const std::vector<regexp_item> &, LPCTSTR, LPCTSTR);
+	static int collate(const std::vector<regexp_item> &, LPCTSTR, LPCTSTR);
 };

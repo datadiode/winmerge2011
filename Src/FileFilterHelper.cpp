@@ -226,21 +226,15 @@ bool FileFilterHelper::includeDir(LPCTSTR szPath, LPCTSTR szDirName)
 
 int FileFilterHelper::collateFile(LPCTSTR p, LPCTSTR q)
 {
-	if (m_currentFilter && !m_currentFilter->fileprefilters.empty() &&
-		regexp_item::indifferent(m_currentFilter->fileprefilters, p, q))
-	{
-		return 0;
-	}
+	if (m_currentFilter && !m_currentFilter->fileprefilters.empty())
+		return regexp_item::collate(m_currentFilter->fileprefilters, p, q);
 	return IDiffFilter::collateFile(p, q);
 }
 
 int FileFilterHelper::collateDir(LPCTSTR p, LPCTSTR q)
 {
-	if (m_currentFilter && !m_currentFilter->dirprefilters.empty() &&
-		regexp_item::indifferent(m_currentFilter->dirprefilters, p, q))
-	{
-		return 0;
-	}
+	if (m_currentFilter && !m_currentFilter->dirprefilters.empty())
+		return regexp_item::collate(m_currentFilter->dirprefilters, p, q);
 	return IDiffFilter::collateDir(p, q);
 }
 

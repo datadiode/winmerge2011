@@ -21,8 +21,8 @@
 void CDiffContext::LoadAndSortFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *files, int side) const
 {
 	LoadFiles(sDir, dirs, files, side);
-	Sort(dirs);
-	Sort(files);
+	Sort(dirs, &IDiffFilter::collateDir);
+	Sort(files, &IDiffFilter::collateFile);
 	// If recursing the flat way, reset total count of items to 0
 	if (m_nRecursive == 2)
 		m_pCompareStats->SetTotalItems(0);
@@ -234,25 +234,34 @@ void CDiffContext::LoadFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *fil
 }
 
 /**
- * @brief compare function template for qsorting an array
+ * @brief Compare functor for qsorting an array
  */
-template <int __cdecl collate(LPCTSTR, LPCTSTR)>
-static bool __cdecl compare(const DirItem &elem1, const DirItem &elem2)
+class DiffFilterCollate
 {
-	if (int cmp = collate(elem1.filename.c_str(), elem2.filename.c_str()))
-		return cmp < 0;
-	if (elem1.size.int64 != elem2.size.int64)
-		return elem1.size.int64 < elem2.size.int64;
-	if (elem1.mtime != elem2.mtime)
-		return elem1.mtime < elem2.mtime;
-	return collate(elem1.path.c_str(), elem2.path.c_str()) < 0;
-}
+	IDiffFilter *const m_piDiffFilter;
+	int (IDiffFilter::*const m_pfnCollate)(LPCTSTR, LPCTSTR);
+public:
+	DiffFilterCollate(IDiffFilter *piDiffFilter, int (IDiffFilter::*pfnCollate)(LPCTSTR, LPCTSTR))
+		: m_piDiffFilter(piDiffFilter)
+		, m_pfnCollate(pfnCollate)
+	{
+	}
+	bool operator()(DirItem const &elem1, DirItem const &elem2)
+	{
+		if (int cmp = (m_piDiffFilter->*m_pfnCollate)(elem1.filename.c_str(), elem2.filename.c_str()))
+			return cmp < 0;
+		if (elem1.size.int64 != elem2.size.int64)
+			return elem1.size.int64 < elem2.size.int64;
+		if (elem1.mtime != elem2.mtime)
+			return elem1.mtime < elem2.mtime;
+		return (m_piDiffFilter->*m_pfnCollate)(elem1.path.c_str(), elem2.path.c_str()) < 0;
+	}
+};
 
 /**
  * @brief sort specified array
  */
-void CDiffContext::Sort(DirItemArray *dirs) const
+void CDiffContext::Sort(DirItemArray *dirs, int (IDiffFilter::*pfnCollate)(LPCTSTR, LPCTSTR)) const
 {
-	std::sort(dirs->begin(), dirs->end(),
-		m_piFilterGlobal->isCaseSensitive() ? compare<_tcscoll> : compare<_tcsicoll>);
+	std::sort(dirs->begin(), dirs->end(), DiffFilterCollate(m_piFilterGlobal, pfnCollate));
 }
