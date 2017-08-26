@@ -1,11 +1,11 @@
 // H2O.h
 //
-// H2O makes OS handles apear like pointers to C++ objects.
+// H2O makes OS handles appear like pointers to C++ objects.
 // H2O2 implements traditional OS handle wrapper classes.
 // Both H2O and H2O2 share a common set of decorator templates.
 //
 // Copyright (c) 2005-2010  David Nash (as of Win32++ v7.0.2)
-// Copyright (c) 2011-2016  Jochen Neubeck
+// Copyright (c) 2011-2017  Jochen Neubeck
 //
 // Permission is hereby granted, free of charge, to
 // any person obtaining a copy of this software and
@@ -220,10 +220,20 @@ namespace H2O
 			assert(::IsWindow(m_hWnd));
 			return ::DestroyWindow(m_hWnd);
 		}
-		BOOL IsDialogMessage(MSG *pMsg)
+		BOOL EndDialog(INT_PTR nResult)
 		{
 			assert(::IsWindow(m_hWnd));
-			return ::IsDialogMessage(m_hWnd, pMsg);
+			return ::EndDialog(m_hWnd, nResult);
+		}
+		BOOL IsDialogMessageA(MSG *pMsg)
+		{
+			assert(::IsWindow(m_hWnd));
+			return ::IsDialogMessageA(m_hWnd, pMsg);
+		}
+		BOOL IsDialogMessageW(MSG *pMsg)
+		{
+			assert(::IsWindow(m_hWnd));
+			return ::IsDialogMessageW(m_hWnd, pMsg);
 		}
 		BOOL OpenClipboard()
 		{
@@ -266,10 +276,15 @@ namespace H2O
 			assert(pwp->cbSize == sizeof *pfwi);
 			return ::FlashWindowEx(m_hWnd, pfwi);
 		}
-		HWindow *FindWindowEx(HWindow *pwndChildAfter, LPCTSTR lpszClass, LPCTSTR lpszWindow = NULL)
+		HWindow *FindWindowExA(HWindow *pwndChildAfter, LPCSTR lpszClass, LPCSTR lpszWindow = NULL)
 		{
 			assert(::IsWindow(m_hWnd));
-			return reinterpret_cast<HWindow *>(::FindWindowEx(m_hWnd, pwndChildAfter->m_hWnd, lpszClass, lpszWindow));
+			return reinterpret_cast<HWindow *>(::FindWindowExA(m_hWnd, pwndChildAfter->m_hWnd, lpszClass, lpszWindow));
+		}
+		HWindow *FindWindowExW(HWindow *pwndChildAfter, LPCWSTR lpszClass, LPCWSTR lpszWindow = NULL)
+		{
+			assert(::IsWindow(m_hWnd));
+			return reinterpret_cast<HWindow *>(::FindWindowExW(m_hWnd, pwndChildAfter->m_hWnd, lpszClass, lpszWindow));
 		}
 		HWindow *ChildWindowFromPoint(POINT pt)
 		{
@@ -484,20 +499,35 @@ namespace H2O
 			assert(::IsWindow(m_hWnd));
 			return ::ShowScrollBar(m_hWnd, wBar, bShow);
 		}
-		LRESULT SendMessage(UINT uMsg, WPARAM wParam = 0, LPARAM lParam = 0)
+		LRESULT SendMessageA(UINT uMsg, WPARAM wParam = 0, LPARAM lParam = 0)
 		{
 			assert(::IsWindow(m_hWnd));
-			return ::SendMessage(m_hWnd, uMsg, wParam, lParam);
+			return ::SendMessageA(m_hWnd, uMsg, wParam, lParam);
 		}
-		BOOL PostMessage(UINT uMsg, WPARAM wParam = 0, LPARAM lParam = 0)
+		LRESULT SendMessageW(UINT uMsg, WPARAM wParam = 0, LPARAM lParam = 0)
 		{
 			assert(::IsWindow(m_hWnd));
-			return ::PostMessage(m_hWnd, uMsg, wParam, lParam);
+			return ::SendMessageW(m_hWnd, uMsg, wParam, lParam);
 		}
-		LRESULT SendDlgItemMessage(int id, UINT uMsg, WPARAM wParam = 0, LPARAM lParam = 0)
+		BOOL PostMessageA(UINT uMsg, WPARAM wParam = 0, LPARAM lParam = 0)
 		{
 			assert(::IsWindow(m_hWnd));
-			return ::SendDlgItemMessage(m_hWnd, id, uMsg, wParam, lParam);
+			return ::PostMessageA(m_hWnd, uMsg, wParam, lParam);
+		}
+		BOOL PostMessageW(UINT uMsg, WPARAM wParam = 0, LPARAM lParam = 0)
+		{
+			assert(::IsWindow(m_hWnd));
+			return ::PostMessageW(m_hWnd, uMsg, wParam, lParam);
+		}
+		LRESULT SendDlgItemMessageA(int id, UINT uMsg, WPARAM wParam = 0, LPARAM lParam = 0)
+		{
+			assert(::IsWindow(m_hWnd));
+			return ::SendDlgItemMessageA(m_hWnd, id, uMsg, wParam, lParam);
+		}
+		LRESULT SendDlgItemMessageW(int id, UINT uMsg, WPARAM wParam = 0, LPARAM lParam = 0)
+		{
+			assert(::IsWindow(m_hWnd));
+			return ::SendDlgItemMessageW(m_hWnd, id, uMsg, wParam, lParam);
 		}
 		HWindow *GetDlgItem(int nIDDlgItem)
 		{
@@ -519,10 +549,15 @@ namespace H2O
 			assert(::IsWindow(m_hWnd));
 			return ::IsDlgButtonChecked(m_hWnd, nIDButton);
 		}
-		int GetWindowTextLength()
+		int GetWindowTextLengthA()
 		{
 			assert(::IsWindow(m_hWnd));
-			return ::GetWindowTextLength(m_hWnd);
+			return ::GetWindowTextLengthA(m_hWnd);
+		}
+		int GetWindowTextLengthW()
+		{
+			assert(::IsWindow(m_hWnd));
+			return ::GetWindowTextLengthW(m_hWnd);
 		}
 		UINT GetWindowTextA(LPSTR lpString, int nMaxCount)
 		{
@@ -534,12 +569,19 @@ namespace H2O
 			assert(::IsWindow(m_hWnd));
 			return ::GetWindowTextW(m_hWnd, lpString, nMaxCount);
 		}
-		UINT GetWindowText(String &s)
+		UINT GetWindowTextA(std::string &s)
 		{
 			assert(::IsWindow(m_hWnd));
-			int size = ::GetWindowTextLength(m_hWnd);
+			int size = ::GetWindowTextLengthA(m_hWnd);
 			s.resize(size);
-			return ::GetWindowText(m_hWnd, &s.front(), size + 1);
+			return ::GetWindowTextA(m_hWnd, &s.front(), size + 1);
+		}
+		UINT GetWindowTextW(std::wstring &s)
+		{
+			assert(::IsWindow(m_hWnd));
+			int size = ::GetWindowTextLengthW(m_hWnd);
+			s.resize(size);
+			return ::GetWindowTextW(m_hWnd, &s.front(), size + 1);
 		}
 		UINT GetDlgItemTextA(int nIDDlgItem, LPSTR lpString, int nMaxCount)
 		{
@@ -551,13 +593,21 @@ namespace H2O
 			assert(::IsWindow(m_hWnd));
 			return ::GetDlgItemTextW(m_hWnd, nIDDlgItem, lpString, nMaxCount);
 		}
-		UINT GetDlgItemText(int id, String &s)
+		UINT GetDlgItemTextA(int id, std::string &s)
 		{
 			assert(::IsWindow(m_hWnd));
-			String::size_type size = static_cast<String::size_type>(
-				SendDlgItemMessage(id, WM_GETTEXTLENGTH, 0, 0));
+			int size = static_cast<int>(
+				SendDlgItemMessageA(id, WM_GETTEXTLENGTH, 0, 0));
 			s.resize(size);
-			return GetDlgItemText(id, &s.front(), size + 1);
+			return GetDlgItemTextA(id, &s.front(), size + 1);
+		}
+		UINT GetDlgItemTextW(int id, std::wstring &s)
+		{
+			assert(::IsWindow(m_hWnd));
+			int size = static_cast<int>(
+				SendDlgItemMessageW(id, WM_GETTEXTLENGTH, 0, 0));
+			s.resize(size);
+			return GetDlgItemTextW(id, &s.front(), size + 1);
 		}
 		void SetWindowTextA(LPCSTR lpString)
 		{
@@ -651,11 +701,20 @@ namespace H2O
 	public:
 		using Window<Handle>::m_hWnd;
 		static HWindow *CreateEx(DWORD exStyle,
-			LPCTSTR className, LPCTSTR windowName, DWORD style,
+			LPCSTR className, LPCSTR windowName, DWORD style,
 			int x, int y, int cx, int cy, HWindow *parent, UINT id,
 			HINSTANCE hinst = NULL, void *param = NULL)
 		{
-			HWND hWnd = ::CreateWindowEx(exStyle, className, windowName, style,
+			HWND hWnd = ::CreateWindowExA(exStyle, className, windowName, style,
+				x, y, cx, cy, parent->m_hWnd, reinterpret_cast<HMENU>(id), hinst, param);
+			return reinterpret_cast<HWindow *>(hWnd);
+		}
+		static HWindow *CreateEx(DWORD exStyle,
+			LPCWSTR className, LPCWSTR windowName, DWORD style,
+			int x, int y, int cx, int cy, HWindow *parent, UINT id,
+			HINSTANCE hinst = NULL, void *param = NULL)
+		{
+			HWND hWnd = ::CreateWindowExW(exStyle, className, windowName, style,
 				x, y, cx, cy, parent->m_hWnd, reinterpret_cast<HMENU>(id), hinst, param);
 			return reinterpret_cast<HWindow *>(hWnd);
 		}
@@ -683,9 +742,17 @@ namespace H2O
 		{
 			return reinterpret_cast<HWindow *>(::GetCapture());
 		}
-		static HWindow *FindWindow(LPCTSTR lpszClass, LPCTSTR lpszWindow = NULL)
+		static HWindow *FindWindowA(LPCSTR lpszClass, LPCSTR lpszWindow = NULL)
 		{
-			return reinterpret_cast<HWindow *>(::FindWindow(lpszClass, lpszWindow));
+			return reinterpret_cast<HWindow *>(::FindWindowA(lpszClass, lpszWindow));
+		}
+		static HWindow *FindWindowW(LPCWSTR lpszClass, LPCWSTR lpszWindow = NULL)
+		{
+			return reinterpret_cast<HWindow *>(::FindWindowW(lpszClass, lpszWindow));
+		}
+		static HWindow *WindowFromPoint(POINT pt)
+		{
+			return reinterpret_cast<HWindow *>(::WindowFromPoint(pt));
 		}
 	};
 
@@ -712,6 +779,11 @@ namespace H2O
 		{
 			assert(::IsMenu(m_hMenu));
 			return ::TrackPopupMenu(m_hMenu, nFlags, x, y, NULL, pWnd->m_hWnd, lpRect);
+		}
+		BOOL TrackPopupMenuEx(UINT nFlags, int x, int y, HWindow *pWnd, TPMPARAMS *pParams = NULL)
+		{
+			assert(::IsMenu(m_hMenu));
+			return ::TrackPopupMenuEx(m_hMenu, nFlags, x, y, pWnd->m_hWnd, pParams);
 		}
 		BOOL GetMenuInfo(LPMENUINFO pmi)
 		{
@@ -743,20 +815,35 @@ namespace H2O
 			assert(::IsMenu(m_hMenu));
 			return ::InsertMenuItem(m_hMenu, id, byPos, pmii);
 		}
-		BOOL AppendMenu(UINT flags, UINT_PTR id = 0, LPCTSTR text = NULL)
+		BOOL AppendMenuA(UINT flags, UINT_PTR id = 0, LPCSTR text = NULL)
 		{
 			assert(::IsMenu(m_hMenu));
-			return ::AppendMenu(m_hMenu, flags, id, text);
+			return ::AppendMenuA(m_hMenu, flags, id, text);
 		}
-		BOOL ModifyMenu(UINT index, UINT flags, UINT_PTR id = 0, LPCTSTR text = NULL)
+		BOOL AppendMenuW(UINT flags, UINT_PTR id = 0, LPCWSTR text = NULL)
 		{
 			assert(::IsMenu(m_hMenu));
-			return ::ModifyMenu(m_hMenu, index, flags, id, text);
+			return ::AppendMenuW(m_hMenu, flags, id, text);
 		}
-		BOOL InsertMenu(UINT index, UINT flags, UINT_PTR id = 0, LPCTSTR text = NULL)
+		BOOL ModifyMenuA(UINT index, UINT flags, UINT_PTR id = 0, LPCSTR text = NULL)
 		{
 			assert(::IsMenu(m_hMenu));
-			return ::InsertMenu(m_hMenu, index, flags, id, text);
+			return ::ModifyMenuA(m_hMenu, index, flags, id, text);
+		}
+		BOOL ModifyMenuW(UINT index, UINT flags, UINT_PTR id = 0, LPCWSTR text = NULL)
+		{
+			assert(::IsMenu(m_hMenu));
+			return ::ModifyMenuW(m_hMenu, index, flags, id, text);
+		}
+		BOOL InsertMenuA(UINT index, UINT flags, UINT_PTR id = 0, LPCSTR text = NULL)
+		{
+			assert(::IsMenu(m_hMenu));
+			return ::InsertMenuA(m_hMenu, index, flags, id, text);
+		}
+		BOOL InsertMenuW(UINT index, UINT flags, UINT_PTR id = 0, LPCWSTR text = NULL)
+		{
+			assert(::IsMenu(m_hMenu));
+			return ::InsertMenuW(m_hMenu, index, flags, id, text);
 		}
 		BOOL SetMenuItemBitmaps(UINT id, UINT flags, HBITMAP hbmUnchecked, HBITMAP hbmChecked)
 		{
@@ -875,16 +962,30 @@ namespace H2O
 		static HFont *Create(
 			int cHeight, int cWidth, int cEscapement, int cOrientation, int cWeight,
 			DWORD bItalic, DWORD bUnderline, DWORD bStrikeOut, DWORD iCharSet, DWORD iOutPrecision,
-			DWORD iClipPrecision, DWORD iQuality, DWORD iPitchAndFamily, LPCTSTR pszFaceName)
+			DWORD iClipPrecision, DWORD iQuality, DWORD iPitchAndFamily, LPCSTR pszFaceName)
 		{
-			return reinterpret_cast<HFont *>(CreateFont(
+			return reinterpret_cast<HFont *>(CreateFontA(
 				cHeight, cWidth, cEscapement, cOrientation, cWeight,
 				bItalic, bUnderline, bStrikeOut, iCharSet, iOutPrecision,
 				iClipPrecision, iQuality, iPitchAndFamily, pszFaceName));
 		}
-		static HFont *CreateIndirect(const LOGFONT *plf)
+		static HFont *Create(
+			int cHeight, int cWidth, int cEscapement, int cOrientation, int cWeight,
+			DWORD bItalic, DWORD bUnderline, DWORD bStrikeOut, DWORD iCharSet, DWORD iOutPrecision,
+			DWORD iClipPrecision, DWORD iQuality, DWORD iPitchAndFamily, LPCWSTR pszFaceName)
 		{
-			return reinterpret_cast<HFont *>(::CreateFontIndirect(plf));
+			return reinterpret_cast<HFont *>(CreateFontW(
+				cHeight, cWidth, cEscapement, cOrientation, cWeight,
+				bItalic, bUnderline, bStrikeOut, iCharSet, iOutPrecision,
+				iClipPrecision, iQuality, iPitchAndFamily, pszFaceName));
+		}
+		static HFont *CreateIndirect(const LOGFONTA *plf)
+		{
+			return reinterpret_cast<HFont *>(::CreateFontIndirectA(plf));
+		}
+		static HFont *CreateIndirect(const LOGFONTW *plf)
+		{
+			return reinterpret_cast<HFont *>(::CreateFontIndirectW(plf));
 		}
 	};
 
@@ -991,9 +1092,13 @@ namespace H2O
 	public:
 		using ImageList<Handle>::m_hImageList;
 		// Creation
-		static HImageList *LoadImage(HINSTANCE hinst, LPCTSTR name, int cx, int grow, COLORREF mask, UINT type, UINT flags)
+		static HImageList *LoadImage(HINSTANCE hinst, LPCSTR name, int cx, int grow, COLORREF mask, UINT type, UINT flags)
 		{
-			return reinterpret_cast<HImageList *>(::ImageList_LoadImage(hinst, name, cx, grow, mask, type, flags));
+			return reinterpret_cast<HImageList *>(::ImageList_LoadImageA(hinst, name, cx, grow, mask, type, flags));
+		}
+		static HImageList *LoadImage(HINSTANCE hinst, LPCWSTR name, int cx, int grow, COLORREF mask, UINT type, UINT flags)
+		{
+			return reinterpret_cast<HImageList *>(::ImageList_LoadImageW(hinst, name, cx, grow, mask, type, flags));
 		}
 		static HImageList *Create(int cx, int cy, UINT flags, int cInitial, int cGrow)
 		{
@@ -1049,14 +1154,23 @@ namespace H2O
 		{
 			return ::SetTextAlign(m_hDC, mode);
 		}
-		BOOL TextOut(int x, int y, LPCTSTR pch, int cch)
+		BOOL TextOutA(int x, int y, LPCSTR pch, int cch)
 		{
-			return ::TextOut(m_hDC, x, y, pch, cch);
+			return ::TextOutA(m_hDC, x, y, pch, cch);
 		}
-		BOOL ExtTextOut(int x, int y, UINT options, const RECT *prc,
-			LPCTSTR pch, int cch, const INT *pdx = NULL)
+		BOOL TextOutW(int x, int y, LPCWSTR pch, int cch)
 		{
-			return ::ExtTextOut(m_hDC, x, y, options, prc, pch, cch, pdx);
+			return ::TextOutW(m_hDC, x, y, pch, cch);
+		}
+		BOOL ExtTextOutA(int x, int y, UINT options, const RECT *prc,
+			LPCSTR pch, int cch, const INT *pdx = NULL)
+		{
+			return ::ExtTextOutA(m_hDC, x, y, options, prc, pch, cch, pdx);
+		}
+		BOOL ExtTextOutW(int x, int y, UINT options, const RECT *prc,
+			LPCWSTR pch, int cch, const INT *pdx = NULL)
+		{
+			return ::ExtTextOutW(m_hDC, x, y, options, prc, pch, cch, pdx);
 		}
 		int DrawTextA(LPCSTR pch, int cch, RECT *prc, UINT format)
 		{
@@ -1090,6 +1204,10 @@ namespace H2O
 		{
 			return ::FillRect(m_hDC, prc, pbr->m_hBrush);
 		}
+		BOOL InvertRect(const RECT *prc)
+		{
+			return ::InvertRect(m_hDC, prc);
+		}
 		BOOL MoveTo(int x, int y, POINT *ppt = NULL)
 		{
 			return ::MoveToEx(m_hDC, x, y, ppt);
@@ -1113,6 +1231,10 @@ namespace H2O
 		BOOL Polygon(const POINT *ppt, int count)
 		{
 			return ::Polygon(m_hDC, ppt, count);
+		}
+		BOOL Polyline(const POINT *ppt, int count)
+		{
+			return ::Polyline(m_hDC, ppt, count);
 		}
 		BOOL BitBlt(int nXDest, int nYDest, int nWidth, int nHeight, HSurface *pdcSrc, int nXSrc, int nYSrc, DWORD dwRop)
 		{
@@ -1174,21 +1296,57 @@ namespace H2O
 		{
 			return ::ScaleWindowExtEx(m_hDC, xn, xd, yn, yd, size);
 		}
-		BOOL GetTextExtent(LPCTSTR pch, int cch, SIZE *size)
+		BOOL GetTextExtent(LPCSTR pch, int cch, SIZE *size)
 		{
-			return ::GetTextExtentPoint32(m_hDC, pch, cch, size);
+			return ::GetTextExtentPoint32A(m_hDC, pch, cch, size);
 		}
-		DWORD GetTabbedTextExtent(LPCTSTR pch, int cch, int nTabStops = 0, const INT *rgTabStops = NULL)
+		BOOL GetTextExtent(LPCWSTR pch, int cch, SIZE *size)
 		{
-			return ::GetTabbedTextExtent(m_hDC, pch, cch, nTabStops, rgTabStops);
+			return ::GetTextExtentPoint32W(m_hDC, pch, cch, size);
+		}
+		DWORD GetTabbedTextExtentA(LPCSTR pch, int cch, int nTabStops = 0, const INT *rgTabStops = NULL)
+		{
+			return ::GetTabbedTextExtentA(m_hDC, pch, cch, nTabStops, rgTabStops);
+		}
+		DWORD GetTabbedTextExtentW(LPCWSTR pch, int cch, int nTabStops = 0, const INT *rgTabStops = NULL)
+		{
+			return ::GetTabbedTextExtentW(m_hDC, pch, cch, nTabStops, rgTabStops);
+		}
+		BOOL GetTextExtentExPointA(LPCSTR pch, int cch, int maxExtent, LPINT fit, LPINT dx, SIZE *size)
+		{
+			return ::GetTextExtentExPointA(m_hDC, pch, cch, maxExtent, fit, dx, size);
+		}
+		BOOL GetTextExtentExPointW(LPCWSTR pch, int cch, int maxExtent, LPINT fit, LPINT dx, SIZE *size)
+		{
+			return ::GetTextExtentExPointW(m_hDC, pch, cch, maxExtent, fit, dx, size);
 		}
 		BOOL GetCharWidth(UINT firstChar, UINT lastChar, INT *buffer)
 		{
 			return ::GetCharWidth32(m_hDC, firstChar, lastChar, buffer);
 		}
-		BOOL GetTextMetrics(TEXTMETRIC *ptm)
+		BOOL GetTextMetricsA(TEXTMETRICA *ptm)
 		{
-			return ::GetTextMetrics(m_hDC, ptm);
+			return ::GetTextMetricsA(m_hDC, ptm);
+		}
+		BOOL GetTextMetricsW(TEXTMETRICW *ptm)
+		{
+			return ::GetTextMetricsW(m_hDC, ptm);
+		}
+		UINT GetOutlineTextMetricsA(UINT cjCopy, OUTLINETEXTMETRICA *potm)
+		{
+			return ::GetOutlineTextMetricsA(m_hDC, cjCopy, potm);
+		}
+		UINT GetOutlineTextMetricsW(UINT cjCopy, OUTLINETEXTMETRICW *potm)
+		{
+			return ::GetOutlineTextMetricsW(m_hDC, cjCopy, potm);
+		}
+		int GetTextFaceA(int c, LPSTR name)
+		{
+			return ::GetTextFaceA(m_hDC, c, name);
+		}
+		int GetTextFaceW(int c, LPWSTR name)
+		{
+			return ::GetTextFaceW(m_hDC, c, name);
 		}
 		int IntersectClipRect(int left, int top, int right, int bottom)
 		{
@@ -1218,6 +1376,10 @@ namespace H2O
 		{
 			return ::DeleteDC(m_hDC);
 		}
+		int ReleaseDC(HWND hWnd)
+		{
+			return ::ReleaseDC(hWnd, m_hDC);
+		}
 	};
 
 	class HSurface : public Surface<Handle>
@@ -1225,9 +1387,13 @@ namespace H2O
 	public:
 		using Surface<Handle>::m_hDC;
 		// Creation
-		static HSurface *CreateDC(LPCTSTR driver, LPCTSTR device = NULL, const DEVMODE *devmode = NULL)
+		static HSurface *CreateDCA(LPCSTR driver, LPCSTR device = NULL, const DEVMODEA *devmode = NULL)
 		{
-			return reinterpret_cast<HSurface *>(::CreateDC(driver, device, NULL, devmode));
+			return reinterpret_cast<HSurface *>(::CreateDCA(driver, device, NULL, devmode));
+		}
+		static HSurface *CreateDCW(LPCWSTR driver, LPCWSTR device = NULL, const DEVMODEW *devmode = NULL)
+		{
+			return reinterpret_cast<HSurface *>(::CreateDCW(driver, device, NULL, devmode));
 		}
 	};
 
@@ -1297,6 +1463,13 @@ namespace H2O
 		{
 			assert(::IsWindow(m_hWnd));
 			return (int)::SendMessage(m_hWnd, LB_GETTEXTLEN, nIndex, 0);
+		}
+
+		int GetText(int nIndex, String &s)
+		{
+			int size = GetTextLen(nIndex);
+			s.resize(size);
+			return GetText(nIndex, &s.front());
 		}
 
 		int GetTopIndex()
@@ -1663,6 +1836,18 @@ namespace H2O
 			return (int)::SendMessage(m_hWnd, CB_GETLBTEXTLEN, (WPARAM)nIndex, 0);
 		}
 
+		int GetLBText(int nIndex, String &s)
+		{
+			int ret = GetLBTextLen(nIndex);
+			if (ret != CB_ERR)
+			{
+				s.resize(ret);
+				ret = GetLBText(nIndex, &s.front());
+				s.resize(ret);
+			}
+			return ret;
+		}
+
 		LCID GetLocale()
 		// Retrieves the current locale of the combo box.
 		{
@@ -1792,18 +1977,6 @@ namespace H2O
 		{
 			assert(::IsWindow(m_hWnd));
 			::SendMessage(m_hWnd, CB_SHOWDROPDOWN, (WPARAM)bShow, 0);
-		}
-
-		int GetLBText(int i, String &s)
-		{
-			int ret = GetLBTextLen(i);
-			if (ret != CB_ERR)
-			{
-				s.resize(ret);
-				ret = GetLBText(i, &s.front());
-				s.resize(ret);
-			}
-			return ret;
 		}
 	};
 
@@ -3845,6 +4018,13 @@ namespace H2O
 			return static_cast<DWORD>(::SendMessage(m_hWnd, TB_GETEXTENDEDSTYLE, 0, 0));
 		}
 
+		BOOL SetButtonState(int idButton, UINT uState)
+		// Set the state of an individual button
+		{
+			assert(::IsWindow(m_hWnd));
+			return (BOOL)::SendMessage(m_hWnd, TB_SETSTATE, (WPARAM)idButton, MAKELPARAM(uState, 0));
+		}
+
 		HImageList *SetImageList(HImageList *iml)
 		// Sets the image list that the toolbar will use to display buttons that are in their default state.
 		{
@@ -3913,6 +4093,12 @@ namespace H2O
 		{
 			assert(::IsWindow(m_hWnd));
 			return (BOOL)::SendMessage(m_hWnd, SB_GETRECT, (WPARAM)iPart, (LPARAM)prc);
+		}
+
+		int GetPartTextLength(int iPart)
+		{
+			assert(::IsWindow(m_hWnd));
+			return LOWORD(::SendMessage(m_hWnd, SB_GETTEXTLENGTH, iPart, 0L));
 		}
 
 		String GetPartText(int iPart)
