@@ -241,7 +241,7 @@ void HSuperComboBox::AdjustDroppedWidth()
 	if (DefWndProcDropping == NULL)
 	{
 		DefWndProcDropping = reinterpret_cast<WNDPROC>(
-			SetWindowLongPtr(m_hWnd, GWLP_WNDPROC,
+			SetWindowLongPtr(GWLP_WNDPROC,
 			reinterpret_cast<LONG_PTR>(WndProcDropping)));
 	}
 }

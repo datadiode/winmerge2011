@@ -98,6 +98,16 @@ namespace H2O
 			assert(::IsWindow(m_hWnd));
 			return ::GetClassWord(m_hWnd, GCW_ATOM);
 		}
+		ULONG_PTR GetClassLongPtrA(int nIndex)
+		{
+			assert(::IsWindow(m_hWnd));
+			return ::GetClassLongPtrA(m_hWnd, nIndex);
+		}
+		ULONG_PTR GetClassLongPtrW(int nIndex)
+		{
+			assert(::IsWindow(m_hWnd));
+			return ::GetClassLongPtrW(m_hWnd, nIndex);
+		}
 		int GetClassNameA(LPSTR lpClassName, int nMaxCount)
 		{
 			assert(::IsWindow(m_hWnd));
@@ -107,6 +117,26 @@ namespace H2O
 		{
 			assert(::IsWindow(m_hWnd));
 			return ::GetClassNameW(m_hWnd, lpClassName, nMaxCount);
+		}
+		LONG_PTR GetWindowLongPtrA(int nIndex)
+		{
+			assert(::IsWindow(m_hWnd));
+			return ::GetWindowLongPtrA(m_hWnd, nIndex);
+		}
+		LONG_PTR GetWindowLongPtrW(int nIndex)
+		{
+			assert(::IsWindow(m_hWnd));
+			return ::GetWindowLongPtrW(m_hWnd, nIndex);
+		}
+		LONG_PTR SetWindowLongPtrA(int nIndex, LONG_PTR dwNewLong)
+		{
+			assert(::IsWindow(m_hWnd));
+			return ::SetWindowLongPtrA(m_hWnd, nIndex, dwNewLong);
+		}
+		LONG_PTR SetWindowLongPtrW(int nIndex, LONG_PTR dwNewLong)
+		{
+			assert(::IsWindow(m_hWnd));
+			return ::SetWindowLongPtrW(m_hWnd, nIndex, dwNewLong);
 		}
 		DWORD GetStyle()
 		{

@@ -200,9 +200,9 @@ INT_PTR ODialog::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	if (uMsg == WM_INITDIALOG)
 	{
 		lParam = reinterpret_cast<PROPSHEETPAGE *>(lParam)->lParam;
-		SetWindowLongPtr(hWnd, DWLP_USER, lParam);
-		SetWindowLongPtr(hWnd, DWLP_DLGPROC, NULL);
-		SetWindowLongPtr(hWnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(WndProc));
+		::SetWindowLongPtr(hWnd, DWLP_USER, lParam);
+		::SetWindowLongPtr(hWnd, DWLP_DLGPROC, NULL);
+		::SetWindowLongPtr(hWnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(WndProc));
 		ODialog *pThis = reinterpret_cast<ODialog *>(lParam);
 		const_cast<HWND &>(pThis->m_hWnd) = hWnd;
 		return pThis->OnInitDialog();
