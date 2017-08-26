@@ -54,8 +54,11 @@ extern "C" BOOL WINAPI _DllMainCRTStartup(HINSTANCE hInstance, DWORD dwReason, L
 	switch (dwReason)
 	{
 	case DLL_PROCESS_ATTACH:
-		// Refuse to load into th process of the setup routine
+		// Refuse to load into the process of the setup routine
 		if (GetModuleHandleW(L"mshta.exe") && StrStrIW(GetCommandLineW(), ModuleAtom))
+			return FALSE;
+		// Refuse to load into ShellExperienceHost.exe to work around Windows 10
+		if (GetModuleHandleW(L"ShellExperienceHost.exe"))
 			return FALSE;
 		AddAtomW(ModuleAtom);
 		pModule = new CWinMergeShell(hInstance);
@@ -158,14 +161,17 @@ static BOOL KillHostingProcesses(HWND hWnd)
 							reinterpret_cast<LPTHREAD_START_ROUTINE>(FindAtomW),
 							pVirtual, 0, NULL))
 						{
-							WaitForSingleObject(hThread, INFINITE);
+							// Have suspended processes time out after a moderate delay
+							WaitForSingleObject(hThread, 100);
 							GetExitCodeThread(hThread, &dwExitCode);
+							if (dwExitCode == STILL_ACTIVE)
+								TerminateThread(hThread, 0);
 							CloseHandle(hThread);
 						}
 					}
 					VirtualFreeEx(hProcess, pVirtual, 0, MEM_RELEASE);
 				}
-				if (dwExitCode != 0)
+				if (dwExitCode >= 0xC000)
 				{
 					WCHAR msg[1024];
 					wsprintfW(msg,
