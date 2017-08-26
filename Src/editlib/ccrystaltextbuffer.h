@@ -106,7 +106,7 @@ class CCrystalTextBuffer
 public:
 	DWORD m_dwCurrentRevisionNumber;
 	DWORD m_dwRevisionNumberOnSave;
-	bool IsTextBufferInitialized () const { return m_bInit; }
+	bool IsTextBufferInitialized() const { return m_bInit; }
 
 protected:
 	bool m_bInit;
@@ -180,7 +180,7 @@ public:
 	void FreeAll();
 
 	//  'Dirty' flag
-	virtual void SetModified(bool bModified = true);
+	void SetModified(bool bModified = true) { m_bModified = bModified; }
 	bool IsModified() const { return m_bModified; }
 
 	//  Connect/disconnect views

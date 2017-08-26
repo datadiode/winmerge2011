@@ -183,7 +183,7 @@ void CCrystalEditView::OnEditPaste()
 		GlobalUnlock(hData);
 	}
 	CloseClipboard();
-	m_pTextBuffer->SetModified(true);
+	m_pTextBuffer->SetModified();
 }
 
 void CCrystalEditView::OnEditCut()
@@ -207,7 +207,7 @@ void CCrystalEditView::OnEditCut()
 	EnsureCursorVisible();
 
 	m_pTextBuffer->DeleteText(this, ptSelStart.y, ptSelStart.x, ptSelEnd.y, ptSelEnd.x, CE_ACTION_CUT);  // [JRT]
-	m_pTextBuffer->SetModified(true);
+	m_pTextBuffer->SetModified();
 }
 
 void CCrystalEditView::OnEditDelete()

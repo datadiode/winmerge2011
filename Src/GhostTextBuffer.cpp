@@ -69,8 +69,7 @@ void CGhostTextBuffer::FreeAll()
  */
 BOOL CGhostTextBuffer::InternalInsertGhostLine(CCrystalTextView *pSource, int nLine)
 {
-	ASSERT(m_bInit);             //  Text buffer not yet initialized.
-	//  You must call InitNew() or LoadFromFile() first!
+	ASSERT(m_bInit); // Missed to call InitNew() or LoadFromFile() first?
 
 	ASSERT(nLine >= 0 && nLine <= GetLineCount());
 	if (m_bReadOnly)
@@ -86,8 +85,7 @@ BOOL CGhostTextBuffer::InternalInsertGhostLine(CCrystalTextView *pSource, int nL
 	if (pSource != NULL)
 		UpdateViews (pSource, &context, UPDATE_HORZRANGE | UPDATE_VERTRANGE, nLine);
 
-	if (!m_bModified)
-		SetModified(true);
+	SetModified();
 
 	OnNotifyLineHasBeenEdited(nLine);
 	return TRUE;
@@ -103,8 +101,8 @@ BOOL CGhostTextBuffer::InternalInsertGhostLine(CCrystalTextView *pSource, int nL
  */
 BOOL CGhostTextBuffer::InternalDeleteGhostLine(CCrystalTextView *pSource, int nLine, int nCount)
 {
-	ASSERT(m_bInit);             //  Text buffer not yet initialized.
-	//  You must call InitNew() or LoadFromFile() first!
+	ASSERT(m_bInit); // Missed to call InitNew() or LoadFromFile() first?
+
 	ASSERT(nLine >= 0 && nLine <= GetLineCount());
 
 	if (m_bReadOnly)
@@ -144,8 +142,7 @@ BOOL CGhostTextBuffer::InternalDeleteGhostLine(CCrystalTextView *pSource, int nL
 		}
 	}
 
-	if (!m_bModified)
-		SetModified(true);
+	SetModified();
 
 	return TRUE;
 }
@@ -185,7 +182,7 @@ bool CGhostTextBuffer::Undo(CCrystalTextView *pSource, POINT &ptCursorPos)
 			if (apparent_ptEndPos.y >= GetLineCount() || (GetLineFlags(apparent_ptEndPos.y) & LF_GHOST) == 0)
 			{
 				// if we don't find it, we insert it
-				InsertGhostLine (pSource, apparent_ptEndPos.y);
+				InsertGhostLine(pSource, apparent_ptEndPos.y);
 			}
 
 		if (dwFlags & UNDO_INSERT)
@@ -320,10 +317,7 @@ bool CGhostTextBuffer::Undo(CCrystalTextView *pSource, POINT &ptCursorPos)
 			m_aLines[apparent_ptStartPos.y + i].m_dwRevisionNumber = ur.m_paSavedRevisonNumbers[i];
 
 	} while ((dwFlags & UNDO_BEGINGROUP) == 0);
-	if (m_bModified && m_nSyncPosition == m_nUndoPosition)
-		SetModified(false);
-	if (!m_bModified && m_nSyncPosition != m_nUndoPosition)
-		SetModified(true);
+	SetModified(m_nSyncPosition != m_nUndoPosition);
 	if ((dwFlags & UNDO_BEGINGROUP) != 0)
 		return true;
 	// If the Undo failed, clear the entire Undo/Redo stack
@@ -391,11 +385,7 @@ bool CGhostTextBuffer::Redo(CCrystalTextView *pSource, POINT &ptCursorPos)
 		if ((m_aUndoBuf[m_nUndoPosition].m_dwFlags & UNDO_BEGINGROUP) != 0)
 			break;
 	}
-
-	if (m_bModified && m_nSyncPosition == m_nUndoPosition)
-		SetModified(false);
-	if (!m_bModified && m_nSyncPosition != m_nUndoPosition)
-		SetModified(true);
+	SetModified(m_nSyncPosition != m_nUndoPosition);
 	return true;
 }
 
@@ -405,18 +395,19 @@ UndoRecord &CGhostTextBuffer::AddUndoRecord(BOOL bInsert, const POINT &ptStartPo
 		const POINT &ptEndPos, LPCTSTR pszText, int cchText,
 		int nRealLinesChanged, int nActionType)
 {
-	//  Forgot to call BeginUndoGroup()?
+	// Forgot to call BeginUndoGroup()?
 	ASSERT(m_bUndoGroup);
 	ASSERT(m_aUndoBuf.size () == 0 || (m_aUndoBuf[0].m_dwFlags & UNDO_BEGINGROUP) != 0);
 
-	//  Strip unnecessary undo records (edit after undo wipes all potential redo records)
-	size_t nBufSize = m_aUndoBuf.size();
-	if (m_nUndoPosition < nBufSize)
+	// Strip unnecessary undo records (edit after undo wipes all potential redo records)
+	if (m_nUndoPosition < m_aUndoBuf.size())
 	{
 		m_aUndoBuf.resize(m_nUndoPosition);
+		if (m_nSyncPosition > m_nUndoPosition)
+			m_nSyncPosition = m_aUndoBuf.npos;
 	}
 
-	//  Add new record
+	// Add new record
 	GhostUndoRecord ur;
 	ur.m_dwFlags = bInsert ? UNDO_INSERT : 0;
 	ur.m_nAction = nActionType;
@@ -445,8 +436,8 @@ UndoRecord &CGhostTextBuffer::AddUndoRecord(BOOL bInsert, const POINT &ptStartPo
 		else
 			m_aUndoBuf.reserve(m_aUndoBuf.size() + 1024);
 	}
-	m_aUndoBuf.push_back (ur);
-	m_nUndoPosition = (int) m_aUndoBuf.size ();
+	m_aUndoBuf.push_back(ur);
+	m_nUndoPosition = m_aUndoBuf.size();
 	return m_aUndoBuf.back();
 }
 

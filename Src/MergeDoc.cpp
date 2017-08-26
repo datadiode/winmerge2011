@@ -939,7 +939,6 @@ bool CChildFrame::DoSave(bool &bSaveSuccess, int nBuffer)
 		pView->GetText(0, 0, nEndLine, nEndChar, text);
 		m_pOpener->m_pView[nBuffer]->ReplaceSelection(text.c_str(), text.length());
 		CDiffTextBuffer *const pBuf = m_ptBuf[nBuffer];
-		pBuf->m_nSyncPosition = pBuf->m_nUndoPosition;
 		pBuf->SetModified(false);
 		// remember revision number on save
 		pBuf->m_dwRevisionNumberOnSave = pBuf->m_dwCurrentRevisionNumber;

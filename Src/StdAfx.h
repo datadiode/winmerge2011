@@ -47,6 +47,7 @@
 #include stl(vector)
 #include stl(string)
 #include stl(algorithm)
+#include stl(functional)
 #include stl(sort)
 
 // H2O headers

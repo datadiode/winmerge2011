@@ -443,7 +443,7 @@ int CDiffTextBuffer::SaveToFile(LPCTSTR pszFileName,
 	}
 	// Updating original file implies that we must clear the "modified" flag,
 	// which implies that there is no need for an extra bClearModifiedFlag.
-	SetModified(FALSE);
+	SetModified(false);
 	m_nSyncPosition = m_nUndoPosition;
 	// remember revision number on save
 	m_dwRevisionNumberOnSave = m_dwCurrentRevisionNumber;

@@ -236,14 +236,7 @@ void CCrystalTextBuffer::MoveLine(int line1, int line2, int newline1)
 void CCrystalTextBuffer::FreeAll()
 {
 	// Free text
-	vector<LineInfo>::iterator iter = m_aLines.begin();
-	vector<LineInfo>::iterator end = m_aLines.end();
-	while (iter != end)
-	{
-		iter->Clear();
-		++iter;
-	}
-	//m_aUndoBuf.clear();
+	std::for_each(m_aLines.begin(), m_aLines.end(), std::mem_fun_ref(&LineInfo::Clear));
 	m_aLines.clear();
 	m_bInit = false;
 	//BEGIN SW
@@ -277,15 +270,13 @@ BOOL CCrystalTextBuffer::InitNew(CRLFSTYLE nCrlfStyle)
 
 bool CCrystalTextBuffer::GetReadOnly() const
 {
-	ASSERT(m_bInit);        //  Text buffer not yet initialized.
-	//  You must call InitNew() or LoadFromFile() first!
+	ASSERT(m_bInit); // Missed to call InitNew() or LoadFromFile() first?
 	return m_bReadOnly;
 }
 
 void CCrystalTextBuffer::SetReadOnly(bool bReadOnly)
 {
-	ASSERT(m_bInit);             //  Text buffer not yet initialized.
-	//  You must call InitNew() or LoadFromFile() first!
+	ASSERT(m_bInit); // Missed to call InitNew() or LoadFromFile() first?
 	m_bReadOnly = bReadOnly;
 }
 
@@ -319,7 +310,7 @@ bool CCrystalTextBuffer::applyEOLMode()
 	}
 
 	if (bChanged)
-		SetModified(true);
+		SetModified();
 
 	return bChanged;
 }
@@ -327,7 +318,7 @@ bool CCrystalTextBuffer::applyEOLMode()
 // get pointer to any trailing eol characters (pointer to empty string if none)
 LPCTSTR CCrystalTextBuffer::GetLineEol(int nLine) const
 {
-	ASSERT(m_bInit);             //  Text buffer not yet initialized.
+	ASSERT(m_bInit); // Missed to call InitNew() or LoadFromFile() first?
 	if (LPCTSTR eol = m_aLines[nLine].GetEol())
 		return eol;
 	return _T("");
@@ -340,8 +331,7 @@ bool CCrystalTextBuffer::ChangeLineEol(int nLine, LPCTSTR lpEOL)
 
 const LineInfo &CCrystalTextBuffer::GetLineInfo(int nLine) const
 {
-	ASSERT(m_bInit);             //  Text buffer not yet initialized.
-	//  You must call InitNew() or LoadFromFile() first!
+	ASSERT(m_bInit); // Missed to call InitNew() or LoadFromFile() first?
 	return m_aLines[nLine];
 }
 
@@ -358,8 +348,7 @@ int CCrystalTextBuffer::FindLineWithFlag(DWORD dwFlag, int nLine) const
 
 void CCrystalTextBuffer::SetLineFlags(int nLine, DWORD dwFlags)
 {
-	//  You must call InitNew() or LoadFromFile() first!
-	ASSERT(m_bInit);             //  Text buffer not yet initialized.
+	ASSERT(m_bInit); // Missed to call InitNew() or LoadFromFile() first?
 	ASSERT(nLine != -1);
 	if (m_aLines[nLine].m_dwFlags != dwFlags)
 	{
@@ -486,68 +475,60 @@ void CCrystalTextBuffer::UpdateViews(CCrystalTextView *pSource, CUpdateContext *
  * @note Line numbers are apparent (screen) line numbers, not real
  * line numbers in the file.
  */
-void CCrystalTextBuffer::InternalDeleteText(
-	CCrystalTextView *pSource,
-	int nStartLine, int nStartChar,
-	int nEndLine, int nEndChar)
+void CCrystalTextBuffer::InternalDeleteText(CCrystalTextView *pSource,
+	int nStartLine, int nStartChar, int nEndLine, int nEndChar)
 {
-  ASSERT(m_bInit);             //  Text buffer not yet initialized.
-  //  You must call InitNew() or LoadFromFile() first!
+	ASSERT(m_bInit); // Missed to call InitNew() or LoadFromFile() first?
 
-  ASSERT(nStartLine >= 0 && nStartLine < GetLineCount());
-  ASSERT(nStartChar >= 0 && nStartChar <= m_aLines[nStartLine].Length());
-  ASSERT(nEndLine >= 0 && nEndLine < GetLineCount());
-  ASSERT(nEndChar >= 0 && nEndChar <= m_aLines[nEndLine].Length());
-  ASSERT(nStartLine < nEndLine || nStartLine == nEndLine && nStartChar <= nEndChar);
-  // some edit functions (delete...) should do nothing when there is no selection.
-  // assert to be sure to catch these 'do nothing' cases.
-  ASSERT(nStartLine != nEndLine || nStartChar != nEndChar);
-  ASSERT(!m_bReadOnly);
+	ASSERT(nStartLine >= 0 && nStartLine < GetLineCount());
+	ASSERT(nStartChar >= 0 && nStartChar <= m_aLines[nStartLine].Length());
+	ASSERT(nEndLine >= 0 && nEndLine < GetLineCount());
+	ASSERT(nEndChar >= 0 && nEndChar <= m_aLines[nEndLine].Length());
+	ASSERT(nStartLine < nEndLine || nStartLine == nEndLine && nStartChar <= nEndChar);
+	// some edit functions (delete...) should do nothing when there is no selection.
+	// assert to be sure to catch these 'do nothing' cases.
+	ASSERT(nStartLine != nEndLine || nStartChar != nEndChar);
+	ASSERT(!m_bReadOnly);
 
-  CDeleteContext context;
-  context.m_ptStart.y = nStartLine;
-  context.m_ptStart.x = nStartChar;
-  context.m_ptEnd.y = nEndLine;
-  context.m_ptEnd.x = nEndChar;
-  if (nStartLine == nEndLine)
-    {
-      // delete part of one line
-      m_aLines[nStartLine].Delete(nStartChar, nEndChar);
+	CDeleteContext context;
+	context.m_ptStart.y = nStartLine;
+	context.m_ptStart.x = nStartChar;
+	context.m_ptEnd.y = nEndLine;
+	context.m_ptEnd.x = nEndChar;
+	if (nStartLine == nEndLine)
+	{
+		// delete part of one line
+		m_aLines[nStartLine].Delete(nStartChar, nEndChar);
 
-      if (pSource!=NULL)
-        UpdateViews (pSource, &context, UPDATE_SINGLELINE | UPDATE_HORZRANGE, nStartLine);
-    }
-  else
-    {
-      // delete multiple lines
-      const int nRestCount = m_aLines[nEndLine].FullLength() - nEndChar;
-      String sTail(m_aLines[nEndLine].GetLine(nEndChar), nRestCount);
+		if (pSource)
+			UpdateViews(pSource, &context, UPDATE_SINGLELINE | UPDATE_HORZRANGE, nStartLine);
+	}
+	else
+	{
+		// delete multiple lines
+		const int nRestCount = m_aLines[nEndLine].FullLength() - nEndChar;
+		String sTail(m_aLines[nEndLine].GetLine(nEndChar), nRestCount);
 
-      const int nDelCount = nEndLine - nStartLine;
-      for (int L = nStartLine + 1; L <= nEndLine; L++)
-        m_aLines[L].Clear();
-      vector<LineInfo>::iterator iterBegin = m_aLines.begin() + nStartLine + 1;
-      vector<LineInfo>::iterator iterEnd = iterBegin + nDelCount;
-      m_aLines.erase(iterBegin, iterEnd);
+		vector<LineInfo>::iterator iterBegin = m_aLines.begin() + nStartLine + 1;
+		vector<LineInfo>::iterator iterEnd = m_aLines.begin() + nEndLine + 1;
+		std::for_each(iterBegin, iterEnd, std::mem_fun_ref(&LineInfo::Clear));
+		m_aLines.erase(iterBegin, iterEnd);
 
-      //  nEndLine is no more valid
-      m_aLines[nStartLine].DeleteEnd(nStartChar);
-      if (nRestCount > 0)
-        {
-          AppendLine (nStartLine, sTail.c_str(), sTail.length());
-        }
+		//  nEndLine is no more valid
+		m_aLines[nStartLine].DeleteEnd(nStartChar);
+		if (nRestCount > 0)
+		{
+			AppendLine(nStartLine, sTail.c_str(), sTail.length());
+		}
+		if (pSource)
+			UpdateViews(pSource, &context, UPDATE_HORZRANGE | UPDATE_VERTRANGE, nStartLine);
+	}
 
-      if (pSource!=NULL)
-        UpdateViews (pSource, &context, UPDATE_HORZRANGE | UPDATE_VERTRANGE, nStartLine);
-    }
-
-  if (!m_bModified)
-    SetModified(true);
-  //BEGIN SW
-  // remember current cursor position as last editing position
-  m_ptLastChange = context.m_ptStart;
-  //END SW
-
+	SetModified();
+	//BEGIN SW
+	// remember current cursor position as last editing position
+	m_ptLastChange = context.m_ptStart;
+	//END SW
 }
 
 // Remove the last [bytes] characters from specified line, and return them
@@ -587,133 +568,129 @@ String CCrystalTextBuffer::StripTail(int i, int bytes)
 POINT CCrystalTextBuffer::InternalInsertText(CCrystalTextView *pSource,
 	int nLine, int nPos, LPCTSTR pszText, int cchText)
 {
-  ASSERT(m_bInit);             //  Text buffer not yet initialized.
-  //  You must call InitNew() or LoadFromFile() first!
+	ASSERT(m_bInit); // Missed to call InitNew() or LoadFromFile() first?
 
-  ASSERT(nLine >= 0 && nLine < GetLineCount());
-  ASSERT(nPos >= 0 && nPos <= m_aLines[nLine].Length());
-  ASSERT(!m_bReadOnly);
+	ASSERT(nLine >= 0 && nLine < GetLineCount());
+	ASSERT(nPos >= 0 && nPos <= m_aLines[nLine].Length());
+	ASSERT(!m_bReadOnly);
 
-  CInsertContext context;
-  context.m_ptStart.x = nPos;
-  context.m_ptStart.y = nLine;
-  int nEndLine = 0;
-  int nEndChar = 0;
+	CInsertContext context;
+	context.m_ptStart.x = nPos;
+	context.m_ptStart.y = nLine;
+	int nEndLine = 0;
+	int nEndChar = 0;
 
-  int nRestCount = GetFullLineLength(nLine) - nPos;
-  String sTail;
-  if (nRestCount > 0)
-    {
-      // remove end of line (we'll put it back on afterwards)
-      sTail = StripTail(nLine, nRestCount);
-    }
-
-
-  int nInsertedLines = 0;
-  int nCurrentLine = nLine;
-  int nTextPos;
-  for (;;)
-    {
-      int haseol = 0;
-      nTextPos = 0;
-      // advance to end of line
-      while (nTextPos < cchText && !LineInfo::IsEol(pszText[nTextPos]))
-        nTextPos++;
-      // advance after EOL of line
-      if (nTextPos < cchText)
-        {
-          haseol = 1;
-          LPCTSTR eol = &pszText[nTextPos];
-          nTextPos++;
-          if (nTextPos < cchText && LineInfo::IsDosEol(eol))
-            nTextPos++;
-        }
-
-      // The first line of the new text is appended to the start line
-      // All succeeding lines are inserted
-      if (nCurrentLine == nLine)
-        {
-          AppendLine (nLine, pszText, nTextPos);
-        }
-      else
-        {
-          InsertLine (pszText, nTextPos, nCurrentLine);
-          nInsertedLines ++;
-        }
+	int nRestCount = GetFullLineLength(nLine) - nPos;
+	String sTail;
+	if (nRestCount > 0)
+	{
+		// remove end of line (we'll put it back on afterwards)
+		sTail = StripTail(nLine, nRestCount);
+	}
 
 
-      if (nTextPos == cchText)
-        {
-          // we just finished our insert
-          // now we have to reattach the tail
-          if (haseol)
-            {
-              nEndLine = nCurrentLine+1;
-              nEndChar = 0;
-            }
-          else
-            {
-              nEndLine = nCurrentLine;
-              nEndChar = GetLineLength(nEndLine);
-            }
-          if (!sTail.empty())
-            {
-              if (haseol)
-              {
-                InsertLine(sTail.c_str(), sTail.length(), nEndLine);
-                nInsertedLines ++;
-              }
-              else
-                AppendLine(nEndLine, sTail.c_str(), nRestCount);
-            }
-          if (nEndLine == GetLineCount())
-            {
-              // We left cursor after last screen line
-              // which is an illegal cursor position
-              // so manufacture a new trailing line
-              InsertLine(_T(""), 0);
-              nInsertedLines ++;
-            }
-          break;
-        }
+	int nInsertedLines = 0;
+	int nCurrentLine = nLine;
+	int nTextPos;
+	for (;;)
+	{
+		int haseol = 0;
+		nTextPos = 0;
+		// advance to end of line
+		while (nTextPos < cchText && !LineInfo::IsEol(pszText[nTextPos]))
+			nTextPos++;
+		// advance after EOL of line
+		if (nTextPos < cchText)
+		{
+			haseol = 1;
+			LPCTSTR eol = &pszText[nTextPos];
+			nTextPos++;
+			if (nTextPos < cchText && LineInfo::IsDosEol(eol))
+				nTextPos++;
+		}
 
-      ++nCurrentLine;
-      pszText += nTextPos;
-      cchText -= nTextPos;
-    }
+		// The first line of the new text is appended to the start line
+		// All succeeding lines are inserted
+		if (nCurrentLine == nLine)
+		{
+			AppendLine(nLine, pszText, nTextPos);
+		}
+		else
+		{
+			InsertLine(pszText, nTextPos, nCurrentLine);
+			nInsertedLines++;
+		}
 
-  // Compute the context : all positions after context.m_ptBegin are
-  // shifted accordingly to (context.m_ptEnd - context.m_ptBegin)
-  // The begin point is the insertion point.
-  // The end point is more tedious : if we insert in a ghost line, we reuse it, 
-  // so we insert fewer lines than the number of lines in the text buffer
-  if (nEndLine - nLine != nInsertedLines)
-    {
-      context.m_ptEnd.y = nLine + nInsertedLines;
-      context.m_ptEnd.x = GetFullLineLength(context.m_ptEnd.y);
-    }
-  else
-    {
-      context.m_ptEnd.x = nEndChar;
-      context.m_ptEnd.y = nEndLine;
-    }
+		if (nTextPos == cchText)
+		{
+			// we just finished our insert
+			// now we have to reattach the tail
+			if (haseol)
+			{
+				nEndLine = nCurrentLine + 1;
+				nEndChar = 0;
+			}
+			else
+			{
+				nEndLine = nCurrentLine;
+				nEndChar = GetLineLength(nEndLine);
+			}
+			if (!sTail.empty())
+			{
+				if (haseol)
+				{
+					InsertLine(sTail.c_str(), sTail.length(), nEndLine);
+					nInsertedLines++;
+				}
+				else
+					AppendLine(nEndLine, sTail.c_str(), nRestCount);
+			}
+			if (nEndLine == GetLineCount())
+			{
+				// We left cursor after last screen line
+				// which is an illegal cursor position
+				// so manufacture a new trailing line
+				InsertLine(_T(""), 0);
+				nInsertedLines++;
+			}
+			break;
+		}
 
+		++nCurrentLine;
+		pszText += nTextPos;
+		cchText -= nTextPos;
+	}
 
-  if (pSource!=NULL)
-    {
-      if (nInsertedLines > 0)
-        UpdateViews (pSource, &context, UPDATE_HORZRANGE | UPDATE_VERTRANGE, nLine);
-      else
-        UpdateViews (pSource, &context, UPDATE_SINGLELINE | UPDATE_HORZRANGE, nLine);
-    }
+	// Compute the context : all positions after context.m_ptBegin are
+	// shifted accordingly to (context.m_ptEnd - context.m_ptBegin)
+	// The begin point is the insertion point.
+	// The end point is more tedious : if we insert in a ghost line, we reuse it, 
+	// so we insert fewer lines than the number of lines in the text buffer
+	if (nEndLine - nLine != nInsertedLines)
+	{
+		context.m_ptEnd.y = nLine + nInsertedLines;
+		context.m_ptEnd.x = GetFullLineLength(context.m_ptEnd.y);
+	}
+	else
+	{
+		context.m_ptEnd.x = nEndChar;
+		context.m_ptEnd.y = nEndLine;
+	}
 
-  if (!m_bModified)
-    SetModified(true);
+	if (pSource)
+	{
+		if (nInsertedLines > 0)
+			UpdateViews(pSource, &context, UPDATE_HORZRANGE | UPDATE_VERTRANGE, nLine);
+		else
+			UpdateViews(pSource, &context, UPDATE_SINGLELINE | UPDATE_HORZRANGE, nLine);
+	}
 
-  // remember current cursor position as last editing position
-  m_ptLastChange.x = nEndChar;
-  m_ptLastChange.y = nEndLine;
-  return m_ptLastChange;
+	SetModified();
+
+	// remember current cursor position as last editing position
+	m_ptLastChange.x = nEndChar;
+	m_ptLastChange.y = nEndLine;
+	return m_ptLastChange;
 }
 
 bool CCrystalTextBuffer::CanUndo() const
@@ -772,7 +749,7 @@ stl_size_t CCrystalTextBuffer::GetRedoActionCode(int & nAction, stl_size_t pos) 
 	//  Get description
 	nAction = GetUndoRecord(pos).m_nAction;
 	//  Advance to next undo group
-	size_t n = GetUndoRecordCount();
+	stl_size_t n = GetUndoRecordCount();
 	if (n > 1)
 	{
 		do
@@ -804,11 +781,6 @@ LPCTSTR CCrystalTextBuffer::GetStringEol(CRLFSTYLE nCRLFMode)
 LPCTSTR CCrystalTextBuffer::GetDefaultEol() const
 {
 	return GetStringEol(m_nCRLFMode);
-}
-
-void CCrystalTextBuffer::SetModified(bool bModified)
-{
-	m_bModified = bModified;
 }
 
 void CCrystalTextBuffer::BeginUndoGroup(BOOL bMergeWithPrevious)
