@@ -173,6 +173,9 @@ IDR_HEXDOCTYPE MENU
     }
     POPUP "&Edit"
     {
+        MENUITEM "&Undo\tCtrl+Z", ID_EDIT_UNDO
+        MENUITEM "&Redo\tCtrl+Y", ID_EDIT_REDO
+        MENUITEM SEPARATOR
         MENUITEM "Cu&t\tCtrl+X", ID_EDIT_CUT
         MENUITEM "&Copy\tCtrl+C", ID_EDIT_COPY
         MENUITEM "&Paste\tCtrl+V", ID_EDIT_PASTE

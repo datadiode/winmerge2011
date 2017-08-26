@@ -177,7 +177,7 @@ bool CHexMergeFrame::PromptAndSaveIfNeeded(bool bAllowCancel)
 			}
 			else
 			{
-				m_pView[0]->SetModified(FALSE);
+				m_pView[0]->SetSavepoint();
 			}
 		}
 		if (bRModified)
@@ -196,7 +196,7 @@ bool CHexMergeFrame::PromptAndSaveIfNeeded(bool bAllowCancel)
 			}
 			else
 			{
-				m_pView[1]->SetModified(FALSE);
+				m_pView[1]->SetSavepoint();
 			}
 		}
 	}
@@ -410,24 +410,17 @@ void CHexMergeFrame::SetTitle()
  */
 void CHexMergeFrame::CopySel(CHexMergeView *pViewSrc, CHexMergeView *pViewDst)
 {
-	const IHexEditorWindow::Status *pStatSrc = pViewSrc->GetStatus();
-	int i = min(pStatSrc->iStartOfSelection, pStatSrc->iEndOfSelection);
-	int j = max(pStatSrc->iStartOfSelection, pStatSrc->iEndOfSelection);
-	int u = pViewSrc->GetLength();
-	int v = pViewDst->GetLength();
-	if (pStatSrc->bSelected && i <= v)
+	IHexEditorWindow::Status const *const pStatSrc = pViewSrc->GetStatus();
+	int const i = min(pStatSrc->iStartOfSelection, pStatSrc->iEndOfSelection);
+	int const j = max(pStatSrc->iStartOfSelection, pStatSrc->iEndOfSelection);
+	if (pStatSrc->bSelected)
 	{
-		if (v <= j)
-			v = j + 1;
-		BYTE *p = pViewSrc->GetBuffer(u);
-		BYTE *q = pViewDst->GetBuffer(v);
-		memcpy(q + i, p + i, j - i + 1);
+		pViewDst->GetInterface()->copy_sel_from(pViewSrc->GetInterface());
 		HWND hwndFocus = ::GetFocus();
 		if (hwndFocus != pViewSrc->m_hWnd)
 			pViewDst->RepaintRange(i, j);
 		if (hwndFocus != pViewDst->m_hWnd)
 			pViewSrc->RepaintRange(i, j);
-		pViewDst->SetModified(TRUE);
 	}
 }
 
@@ -437,20 +430,14 @@ void CHexMergeFrame::CopySel(CHexMergeView *pViewSrc, CHexMergeView *pViewDst)
  */
 void CHexMergeFrame::CopyAll(CHexMergeView *pViewSrc, CHexMergeView *pViewDst)
 {
-	if (int i = pViewSrc->GetLength())
+	if (int const i = pViewSrc->GetLength())
 	{
-		int j = pViewDst->GetLength();
-		BYTE *p = pViewSrc->GetBuffer(i);
-		BYTE *q = pViewDst->GetBuffer(max(i, j));
-		if (q == 0)
-			OException::Throw(ERROR_OUTOFMEMORY);
-		memcpy(q, p, i);
+		pViewDst->GetInterface()->copy_all_from(pViewSrc->GetInterface());
 		HWND hwndFocus = ::GetFocus();
 		if (hwndFocus != pViewSrc->m_hWnd)
 			pViewDst->RepaintRange(0, i);
 		if (hwndFocus != pViewDst->m_hWnd)
 			pViewSrc->RepaintRange(0, i);
-		pViewDst->SetModified(TRUE);
 	}
 }
 

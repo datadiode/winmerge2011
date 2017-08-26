@@ -1,37 +1,35 @@
-/////////////////////////////////////////////////////////////////////////////
-//    License (GPLv2+):
-//    This program is free software; you can redistribute it and/or modify
-//    it under the terms of the GNU General Public License as published by
-//    the Free Software Foundation; either version 2 of the License, or
-//    (at your option) any later version.
-//
-//    This program is distributed in the hope that it will be useful, but
-//    WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//    General Public License for more details.
-//
-//    You should have received a copy of the GNU General Public License
-//    along with this program; if not, write to the Free Software
-//    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-/////////////////////////////////////////////////////////////////////////////
+/*
+Frhed - Free hex editor
+Copyright (C) 2000 Raihan Kibria
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License, version 2, as published by
+the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; see the file COPYING.  If not, write to the Free
+Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA.
+
+Last change: 2017-06-18 by Jochen Neubeck
+*/
 /** 
  * @file  heksedit.h
  *
  * @brief Interface definition for the hekseditor window.
  *
  */
-// ID line follows -- this is updated by SVN
-// $Id: heksedit.h 492 2009-04-11 15:17:02Z jtuc $
-
 #ifndef _HEKSEDIT_H_
 #define _HEKSEDIT_H_
 
 #ifndef HEKSEDIT_INTERFACE_VERSION
-#define HEKSEDIT_INTERFACE_VERSION 1
-#endif
-
-#ifndef READONLY
-#define READONLY const
+#define HEKSEDIT_INTERFACE_VERSION 2
+#define const(x) x
 #endif
 
 /**
@@ -58,18 +56,19 @@ public:
 		COLORREF iDiffBkColorValue, iDiffTextColorValue, iSelDiffBkColorValue, iSelDiffTextColorValue;
 	};
 
+	/** @brief Frhed settings. */
 	struct Settings
 	{
-		int iBytesPerLine;
-		int iAutomaticBPL;
-		BYTE_ENDIAN iBinaryMode;
-		int bReadOnly;
-		int bSaveIni;
+		int iBytesPerLine; /**< How many bytes in one line in hex view. */
+		int iAutomaticBPL; /**< Add max amount of bytes that fit to view. */
+		BYTE_ENDIAN iBinaryMode; /**< Binary mode, little/big endian. */
+		int bReadOnly; /**< Is editor in read-only mode? */
+		int bSaveIni; /**< Save INI file when required. */
 		int iFontSize;
-		int iCharacterSet;
-		int iMinOffsetLen;
-		int iMaxOffsetLen;
-		int bAutoOffsetLen;
+		int iCharacterSet; /**< Use OEM or ANSI character set? */
+		int iMinOffsetLen; /**< Minimum numbers used in offset. */
+		int iMaxOffsetLen; /**< Maximum numbers used in offset. */
+		int bAutoOffsetLen; /**< Determine offset length automatically. */
 		int bCenterCaret;
 		int iFontZoom;
 	};
@@ -77,17 +76,19 @@ public:
 	struct Status
 	{
 		int iFileChanged;
-		READONLY int iEnteringMode;
-		READONLY int iCurByte;
-		READONLY int iCurNibble;
-		READONLY int iVscrollMax;
-		READONLY int iVscrollPos;
-		READONLY int iHscrollMax;
-		READONLY int iHscrollPos;
-		READONLY int bSelected;
-		READONLY int iStartOfSelection;
-		READONLY int iEndOfSelection;
+		int const(iEnteringMode);
+		int const(iCurByte);
+		int const(iCurNibble);
+		int const(iVscrollMax);
+		int const(iVscrollPos);
+		int const(iHscrollMax);
+		int const(iHscrollPos);
+		int const(bSelected);
+		int const(iStartOfSelection);
+		int const(iEndOfSelection);
 	};
+
+	struct SharedUndoRecords;
 
 	virtual unsigned STDMETHODCALLTYPE get_interface_version() = 0;
 	virtual unsigned char *STDMETHODCALLTYPE get_buffer(int) = 0;
@@ -114,8 +115,20 @@ public:
 	virtual BOOL STDMETHODCALLTYPE load_lang(LANGID langid, LPCWSTR langdir = NULL) = 0;
 	virtual void STDMETHODCALLTYPE CMD_zoom(int) = 0;
 	virtual void STDMETHODCALLTYPE CMD_select_all() = 0;
+#if HEKSEDIT_INTERFACE_VERSION < 2
+private:
+#endif
+	virtual void STDMETHODCALLTYPE copy_sel_from(IHexEditorWindow *) = 0;
+	virtual void STDMETHODCALLTYPE copy_all_from(IHexEditorWindow *) = 0;
+	virtual void STDMETHODCALLTYPE CMD_edit_undo() = 0;
+	virtual void STDMETHODCALLTYPE CMD_edit_redo() = 0;
+	virtual BOOL STDMETHODCALLTYPE can_undo() const = 0;
+	virtual BOOL STDMETHODCALLTYPE can_redo() const = 0;
+	virtual void STDMETHODCALLTYPE set_savepoint() = 0;
+	virtual void STDMETHODCALLTYPE clear_undorecords() = 0;
+	virtual SharedUndoRecords *STDMETHODCALLTYPE share_undorecords(SharedUndoRecords *) = 0;
 };
 
-#undef READONLY
+#undef const
 
 #endif // _HEKSEDIT_H_

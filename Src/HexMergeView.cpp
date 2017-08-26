@@ -332,7 +332,7 @@ HRESULT CHexMergeView::SaveFile(LPCTSTR path)
 		return hr;
 	m_mtime = mtime;
 	m_size = length;
-	SetModified(FALSE);
+	SetSavepoint();
 	hr = SE(DeleteFile(sIntermediateFilename.c_str()));
 	if (hr != S_OK)
 	{
@@ -361,9 +361,9 @@ BOOL CHexMergeView::GetModified()
 /**
  * @brief Set modified flag
  */
-void CHexMergeView::SetModified(BOOL bModified)
+void CHexMergeView::SetSavepoint()
 {
-	m_pif->get_status()->iFileChanged = bModified;
+	m_pif->set_savepoint();
 }
 
 /**
@@ -452,6 +452,14 @@ void CHexMergeView::OnEditPaste()
 }
 
 /**
+ * @brief Clear selected content
+ */
+void CHexMergeView::OnEditClear()
+{
+	m_pif->CMD_edit_clear();
+}
+
+/**
  * @brief Select entire content
  */
 void CHexMergeView::OnEditSelectAll()
@@ -459,12 +467,14 @@ void CHexMergeView::OnEditSelectAll()
 	m_pif->CMD_select_all();
 }
 
-/**
- * @brief Clear selected content
- */
-void CHexMergeView::OnEditClear()
+void CHexMergeView::OnEditUndo()
 {
-	m_pif->CMD_edit_clear();
+	m_pif->CMD_edit_undo();
+}
+
+void CHexMergeView::OnEditRedo()
+{
+	m_pif->CMD_edit_redo();
 }
 
 /**

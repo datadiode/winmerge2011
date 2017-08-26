@@ -57,7 +57,7 @@ public:
 	BYTE *GetBuffer(int);
 	int GetLength();
 	BOOL GetModified();
-	void SetModified(BOOL);
+	void SetSavepoint();
 	BOOL GetReadOnly();
 	void SetReadOnly(BOOL);
 	void ResizeWindow();
@@ -87,6 +87,8 @@ public:
 	void OnEditPaste();
 	void OnEditClear();
 	void OnEditSelectAll();
+	void OnEditUndo();
+	void OnEditRedo();
 	void OnFirstdiff();
 	void OnLastdiff();
 	void OnNextdiff();

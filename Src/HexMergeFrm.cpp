@@ -197,6 +197,7 @@ void CHexMergeFrame::CreateClient()
 	// tell the heksedit controls about each other
 	pifLeft->set_sibling(pifRight);
 	pifRight->set_sibling(pifLeft);
+	pifRight->share_undorecords(pifLeft->share_undorecords(NULL));
 
 	// adjust a few settings and colors
 	Customize(pifLeft);
@@ -220,6 +221,17 @@ void CHexMergeFrame::UpdateResources()
 {
 }
 
+void CHexMergeFrame::UpdateEditCmdUI()
+{
+	IHexEditorWindow *pif = GetActiveView()->GetInterface();
+	m_pMDIFrame->UpdateCmdUI<ID_EDIT_UNDO>(
+		pif->can_undo() ?
+		MF_ENABLED : MF_GRAYED);
+	m_pMDIFrame->UpdateCmdUI<ID_EDIT_REDO>(
+		pif->can_redo() ?
+		MF_ENABLED : MF_GRAYED);
+}
+
 void CHexMergeFrame::UpdateCmdUI()
 {
 	if (m_pMDIFrame->GetActiveDocFrame() != this)
@@ -229,6 +241,7 @@ void CHexMergeFrame::UpdateCmdUI()
 	m_pMDIFrame->UpdateCmdUI<ID_FILE_SAVE_LEFT>(enableSaveLeft);
 	m_pMDIFrame->UpdateCmdUI<ID_FILE_SAVE_RIGHT>(enableSaveRight);
 	m_pMDIFrame->UpdateCmdUI<ID_FILE_SAVE>(enableSaveLeft & enableSaveRight);
+	UpdateEditCmdUI();
 }
 
 template<>
@@ -272,6 +285,16 @@ LRESULT CHexMergeFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 		break;
 	case ID_EDIT_SELECT_ALL:
 		pActiveView->OnEditSelectAll();
+		break;
+	case ID_EDIT_UNDO:
+		pActiveView->OnEditUndo();
+		UpdateHeaderPath(GetActiveView()->m_nThisPane);
+		UpdateCmdUI();
+		break;
+	case ID_EDIT_REDO:
+		pActiveView->OnEditRedo();
+		UpdateHeaderPath(GetActiveView()->m_nThisPane);
+		UpdateCmdUI();
 		break;
 	case ID_L2R:
 		OnL2r();

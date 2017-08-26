@@ -18,12 +18,12 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 /** 
- * @file  ChildFrm.h
+ * @file  HexMergeFrm.h
  *
  * @brief interface of the CHexMergeFrame class
  *
  */
-#define HEKSEDIT_INTERFACE_VERSION 1
+#define HEKSEDIT_INTERFACE_VERSION 2
 #include "heksedit.h"
 
 class CHexMergeView;
@@ -41,6 +41,7 @@ public:
 	void RecalcBytesPerLine();
 	void UpdateResources();
 	BOOL PreTranslateMessage(MSG *);
+	void UpdateEditCmdUI();
 	void UpdateCmdUI();
 	HRESULT OpenDocs(const FileLocation &, const FileLocation &, BOOL bROLeft, BOOL bRORight);
 	bool SaveModified();
