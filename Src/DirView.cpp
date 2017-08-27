@@ -1480,11 +1480,11 @@ void CDirView::OnToolsSaveToXLS(LPCTSTR verb, int flags)
 		String ini = paths_ConcatPath(tmp, _T("Supplement.ini"));
 		exp.ApplyProfile(_T("ExcelExport"), ini.c_str(), true);
 		// Resolve placeholders in header/footer strings
-		tmp = m_pFrame->m_wndFilePathBar.GetTitle(0);
+		paths_UndoMagic(tmp = m_pFrame->m_wndFilePathBar.GetTitle(0));
 		string_replace(tmp, _T("&"), _T("&&"));
 		string_replace(exp.sHeader, _T("<left>"), tmp.c_str());
 		string_replace(exp.sFooter, _T("<left>"), tmp.c_str());
-		tmp = m_pFrame->m_wndFilePathBar.GetTitle(1);
+		paths_UndoMagic(tmp = m_pFrame->m_wndFilePathBar.GetTitle(1));
 		string_replace(tmp, _T("&"), _T("&&"));
 		string_replace(exp.sHeader, _T("<right>"), tmp.c_str());
 		string_replace(exp.sFooter, _T("<right>"), tmp.c_str());
