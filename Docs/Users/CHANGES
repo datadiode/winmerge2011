@@ -1,3 +1,37 @@
+0.2011.007.347
+Changes since preceding release (not necessarily complete):
+• DirView.cpp: Hide long path prefixes from Excel print headers/footers
+• HexMergeView: Support Undo/Redo (adopted from Takashi's fork)
+• EditLib: Edit/Save/Undo/Edit/Undo/Redo was leaving Save command disabled	
+• Issue #130 equiv-{f|d} file filter rules were neglecting sort order
+• {WinMergeU.exe|7zsd.sfx}.manifest: Declare DPI awareness
+• Restore application window when receiving command line through IPC (#126)
+• DirView: Prevent multiple inclusion of files in zip when in tree mode (#125)
+• WinMerge2011.nsi: Move to SHA-256 for verifying 3rd party downloads
+• 7zCommon.cpp: Remember path to most recently created archive across sessions	
+• WinMerge2011.nsi: Rework Wine launch script creation to support current Wine
+• Setup: Let .sfx from 7z SFX Builder fix .hta bitness / Assist with xdoc2txt
+• xdoc2txt.wsc: Assume xdoc2txt.exe to reside below WinMerge program folder
+• SourceControl.flt: Add rule to exclude .git folder (#123)
+• xdoc2txt.wsc: Opt for UTF-8 and set "Encoding" property accordingly
+• FileTransform.cpp: Add "Encoding" property and associated transcoding logic
+• msxml.wsc: HTML Tidy 5.4.0 has no --more-preformatted option, so get rid of it
+• MessageBoxDialog.cpp: Fix some layout glitches
+• WM_DRAWITEM handlers were returning 0 while MSDN says they should return TRUE
+• astyle.wsc: Save some overhead by using Artistic Style 3.0's --stdin option
+• DirView: Cleanup Date column alignment (inspired by Takashi's fork)
+• unicoder.cpp: maketstring() failed with codepages 50220+, 57002+, 65000, 42
+• Adopt character-sets.dll from PlainTextViewer project
+• stringdiffs: Adopt LCS algorithm from Takashi's fork
+• Allow to navigate through line diffs both forward (F4) and backward (Shift+F4)
+• PropEditor: Make line diff options more consistent with implemented semantics
+• Merge7zCommon.cpp: Cope with TFS temporary file name decorations
+• stringdiffs.cpp: wordLevelToByteLevel() was messing up deletion indicators
+• ExplorerDlg: Remember splitter position in registry
+• Offer long path aware replacements for Shell file/folder browse dialogs
+• Fix visual glitches involved in enforcement of old-school menu appearance
+• MergeDocLineDiffs.cpp: Ghost lines were causing bogus EOL diffs on other side
+
 0.2011.007.025
 Changes since preceding release (not necessarily complete):
 • File transform scriptlet to format source code using Artistic Style (astyle)
