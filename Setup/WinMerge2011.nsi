@@ -22,13 +22,13 @@
 
 ;    3. This notice may not be removed or altered from any source distribution.
 
-!define version "0.2011.007.205"
+!define version "0.2011.007.347"
 !define srcdir "..\Build\WinMerge\Win32\Release"
 !define setup "..\Build\WinMerge\Win32\WinMerge_${version}_wine_setup.exe"
 
 !define script56 "$%ProgramFiles%\Windows Script 5.6"
-!define script56url "ftp://ftp.bestzvit.com.ua/ARM_ZS/Redist/SCR56EN.EXE"
-!define script56hash "96853264cc3de19d1e4f4cf45e219bfd7180d3edf50989bc65e08eb4ce699ca1"
+!define script56url "http://informax.serveftp.com/files/progtools/wsh56-scr56en.exe"
+!define script56hash "f356ee7b0ea496ec3725b340e2aab03847beb504928a6608e6ec0b5bd8fb1f3c"
 ; possible fallback(s):
 ; "ftp://24-129-233-75.eastlink.ca/array1/SKC/Support/WindowsScript/scripten.exe"
 
@@ -105,7 +105,7 @@ Section "Main Application (GNU GPLv2)"
 	; package all files, recursively, preserving attributes
 	; assume files are in the correct places
 
-	File /a /r /x *.lib /x *.exp /x *.pdb /x *.hta /x *.json /x *.log /x *.bak /x xdoc2txt "${srcdir}\*.*"
+	File /a /r /x *.lib /x *.exp /x *.pdb /x *.hta /x *.json /x *.log /x *.bak /x *.zip /x xdoc2txt "${srcdir}\*.*"
 
 	RegDLL "$INSTDIR\ShellExtensionU.dll"
 
