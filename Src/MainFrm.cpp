@@ -3311,7 +3311,7 @@ bool CMainFrame::ParseArgsAndDoOpen(const MergeCmdLineInfo &cmdInfo)
 		}
 		else if (IsConflictFile(filelocLeft.filepath.c_str()))
 		{
-			bCompared = DoOpenConflict(filelocLeft.filepath.c_str());
+			bCompared = DoOpenConflict(filelocLeft.filepath.c_str(), &cmdInfo);
 		}
 		else
 		{
@@ -4152,11 +4152,12 @@ void CMainFrame::OnHelpTranslations()
  */
 void CMainFrame::OnFileOpenConflict()
 {
-	String conflictFile;
+	String conflictFile = COptionsMgr::Get(OPT_CONFLICT_MRU);
 	if (SelectFile(m_hWnd, conflictFile))
 	{
 		if (IsConflictFile(conflictFile.c_str()))
 		{
+			COptionsMgr::SaveOption(OPT_CONFLICT_MRU, conflictFile);
 			DoOpenConflict(conflictFile.c_str());
 		}
 		else
@@ -4181,7 +4182,7 @@ void CMainFrame::OnFileOpenConflict()
  * @param [in] conflictFile Full path to conflict file to open.
  * @return true if conflict file was opened for resolving.
  */
-bool CMainFrame::DoOpenConflict(LPCTSTR conflictFile)
+bool CMainFrame::DoOpenConflict(LPCTSTR conflictFile, const MergeCmdLineInfo *cmdInfo)
 {
 	bool conflictCompared = false;
 	// Parse conflict file into two temp files created in auto-deleted folder.
@@ -4190,6 +4191,11 @@ bool CMainFrame::DoOpenConflict(LPCTSTR conflictFile)
 	filelocLeft.description = LanguageSelect.LoadString(IDS_CONFLICT_THEIRS_FILE);
 	filelocRight.filepath = env_GetTempFileName(env_GetTempPath(), _T("confw_"));
 	filelocRight.description = LanguageSelect.LoadString(IDS_CONFLICT_MINE_FILE);
+	if (cmdInfo)
+	{
+		filelocLeft.description = cmdInfo->m_sLeftDesc;
+		filelocRight.description = cmdInfo->m_sRightDesc;
+	}
 	bool nestedConflicts;
 	if (ParseConflictFile(conflictFile,
 			filelocRight.filepath.c_str(),

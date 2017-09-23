@@ -132,7 +132,7 @@ public:
 	void StartFlashing();
 	bool AskCloseConfirmation();
 	void DoOpenMrgman(LPCTSTR);
-	bool DoOpenConflict(LPCTSTR);
+	bool DoOpenConflict(LPCTSTR, const MergeCmdLineInfo * = NULL);
 	bool LoadAndOpenProjectFile(LPCTSTR);
 	HWindow *CreateChildHandle() const;
 	CDocFrame *GetActiveDocFrame(BOOL *pfActive = NULL);
