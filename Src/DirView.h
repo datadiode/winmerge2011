@@ -233,8 +233,8 @@ protected:
 	int GetFirstDifferentItem();
 	int GetLastDifferentItem();
 	int AddSpecialItems();
-	bool OpenOneItem(DIFFITEM *, String &path1, String &path2);
-	bool OpenTwoItems(DIFFITEM *, DIFFITEM *, String &path1, String &path2);
+	bool OpenOneItem(const DIFFITEM *, String &path1, String &path2);
+	bool OpenTwoItems(const DIFFITEM *, const DIFFITEM *, String &path1, String &path2);
 
 // Implementation data
 protected:
@@ -303,7 +303,7 @@ protected:
 	void DoDefaultAction(int sel);
 private:
 	void OpenSelection(LPCTSTR szCompareAs, UINT idCompareAs);
-	int GetSelectedItems(DIFFITEM **);
+	int GetSelectedItems(const DIFFITEM **);
 	void OpenParentDirectory();
 	bool IsItemNavigableDiff(const DIFFITEM *) const;
 	void MoveFocus(int, int);

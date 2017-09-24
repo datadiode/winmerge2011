@@ -856,7 +856,7 @@ void CDirView::FormatEncodingDialogDisplays(CLoadSaveCodepageDlg &dlg)
 	int i = -1;
 	while ((i = GetNextItem(i, LVNI_SELECTED)) != -1)
 	{
-		const DIFFITEM *di = GetDiffItem(i);
+		const DIFFITEM *const di = GetDiffItem(i);
 		if (di == NULL) // Invalid value, this must be special item
 			continue;
 		if (di->isDirectory())
@@ -908,7 +908,7 @@ void CDirView::DoFileEncodingDialog()
 	int i = -1;
 	while ((i = GetNextItem(i, LVNI_SELECTED)) != -1)
 	{
-		DIFFITEM *di = GetDiffItem(i);
+		DIFFITEM *const di = GetDiffItem(i);
 		if (di == NULL) // Invalid value, this must be special item
 			continue;
 		if (di->isDirectory())

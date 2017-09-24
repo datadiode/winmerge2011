@@ -427,7 +427,7 @@ void CDirView::ListContextMenu(POINT point)
 	int i = -1;
 	while ((i = GetNextItem(i, LVNI_SELECTED)) != -1)
 	{
-		const DIFFITEM *di = GetDiffItem(i);
+		const DIFFITEM *const di = GetDiffItem(i);
 		if (di == NULL) // Invalid value, this must be special item
 			break;
 
@@ -602,7 +602,7 @@ HMENU CDirView::ListShellContextMenu(SIDE_TYPE side)
 	int i = -1;
 	while ((i = GetNextItem(i, LVNI_SELECTED)) != -1)
 	{
-		const DIFFITEM *di = GetDiffItem(i);
+		const DIFFITEM *const di = GetDiffItem(i);
 		if (di == NULL) // Invalid value, this must be special item
 			continue;
 		String currentDir = (side == SIDE_LEFT) ?
@@ -902,13 +902,13 @@ void CDirView::OpenParentDirectory()
  *
  * Returns false if 0 or more than 2 items selecte
  */
-int CDirView::GetSelectedItems(DIFFITEM **rgdi)
+int CDirView::GetSelectedItems(const DIFFITEM **rgdi)
 {
 	int i = -1;
 	int j = 0;
 	while ((i = GetNextItem(i, LVNI_SELECTED)) != -1)
 	{
-		DIFFITEM *di = GetDiffItem(i);
+		const DIFFITEM *const di = GetDiffItem(i);
 		if (di == NULL)
 			return -i; // minus index of special item
 		if (j < 2)
@@ -925,7 +925,7 @@ int CDirView::GetSelectedItems(DIFFITEM **rgdi)
  * @param [out] path2 Second path.
  * return false if there was error or item was completely processed.
  */
-bool CDirView::OpenOneItem(DIFFITEM *di, String &path1, String &path2)
+bool CDirView::OpenOneItem(const DIFFITEM *di, String &path1, String &path2)
 {
 	const CDiffContext *const ctxt = m_pFrame->GetDiffContext();
 	GetItemFileNames(di, path1, path2);
@@ -965,7 +965,7 @@ bool CDirView::OpenOneItem(DIFFITEM *di, String &path1, String &path2)
  * @param [out] path2 Second path.
  * return false if there was error or item was completely processed.
  */
-bool CDirView::OpenTwoItems(DIFFITEM *di1, DIFFITEM *di2, String &path1, String &path2)
+bool CDirView::OpenTwoItems(const DIFFITEM *di1, const DIFFITEM *di2, String &path1, String &path2)
 {
 	// Check for binary & side compatibility & file/dir compatibility
 	if (!AreItemsOpenable(di1, di2))
@@ -1007,7 +1007,7 @@ void CDirView::OpenSelection(LPCTSTR szCompareAs, UINT idCompareAs)
 {
 	WaitStatusCursor waitstatus(IDS_STATUS_OPENING_SELECTION);
 	// First, figure out what was selected (store into di[])
-	DIFFITEM *di[] = { NULL, NULL };
+	const DIFFITEM *di[] = { NULL, NULL };
 	FileLocation filelocLeft, filelocRight;
 	DWORD leftFlags = 0;
 	DWORD rightFlags = 0;
@@ -1929,7 +1929,7 @@ void CDirView::OnUpdateStatusNum()
 
 	pMDIFrame->UpdateCmdUI<ID_FILE_ENCODING>(items != 0 ? 0 : MF_GRAYED);
 
-	DIFFITEM *di[] = { NULL, NULL };
+	const DIFFITEM *di[] = { NULL, NULL };
 	items = GetSelectedItems(di);
 	pMDIFrame->UpdateCmdUI<ID_MERGE_COMPARE>
 	(
@@ -2188,43 +2188,23 @@ void CDirView::PrepareDragData(UniStdioFile &file)
 	int i = -1;
 	while ((i = GetNextItem(i, LVNI_SELECTED)) != -1)
 	{
-		const DIFFITEM *diffitem = GetDiffItem(i);
-		// check for special items (e.g not "..")
-		if (diffitem->diffcode == 0)
-		{
+		const DIFFITEM *const di = GetDiffItem(i);
+		if (di == NULL) // Invalid value, this must be special item
 			continue;
-		}
-
-		if (diffitem->isSideLeftOnly())
+		if (di->isSideLeftOrBoth())
 		{
-			String path = ctxt->GetLeftFilepathAndName(diffitem);
+			String path = ctxt->GetLeftFilepathAndName(di);
 			paths_UndoMagic(path);
 			file.WriteString(path);
+			file.WriteString(_T("\n"), 1); // end of file path
 		}
-		else if (diffitem->isSideRightOnly())
+		if (di->isSideRightOrBoth())
 		{
-			String path = ctxt->GetRightFilepathAndName(diffitem);
+			String path = ctxt->GetRightFilepathAndName(di);
 			paths_UndoMagic(path);
 			file.WriteString(path);
+			file.WriteString(_T("\n"), 1); // end of file path
 		}
-		else if (diffitem->isSideBoth())
-		{
-			// when both files equal, there is no difference between what file to drag 
-			// so we put file from the left panel
-			String path = ctxt->GetLeftFilepathAndName(diffitem);
-			paths_UndoMagic(path);
-			file.WriteString(path);
-
-			// if both files are different then we also put file from the right panel 
-			if (diffitem->isResultDiff())
-			{
-				file.WriteString(_T("\n"), 1); // end of left file path
-				String path = ctxt->GetRightFilepathAndName(diffitem);
-				paths_UndoMagic(path);
-				file.WriteString(path);
-			}
-		}
-		file.WriteString(_T("\n"), 1); // end of file path
 	}
 	file.WriteString(_T(""), 1); // include terminating zero
 }
