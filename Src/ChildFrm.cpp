@@ -1236,7 +1236,9 @@ void CChildFrame::OnReadOnly(int nSide, bool bReadOnly)
 {
 	m_bInitialReadOnly[nSide] = bReadOnly;
 	m_ptBuf[nSide]->SetReadOnly(bReadOnly);
+	m_ptBuf[nSide]->SetModified(!bReadOnly && m_ptBuf[nSide]->IsUnsaved());
 	m_pView[nSide]->UpdateLineInfoStatus();
+	UpdateHeaderPath(nSide);
 }
 
 /**

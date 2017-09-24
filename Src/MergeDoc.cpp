@@ -1867,6 +1867,16 @@ void CChildFrame::OpenDocs(
 	m_ptBuf[1]->SetReadOnly(bRORight);
 	m_pView[1]->SetEncodingStatus(filelocRight.encoding.GetName().c_str());
 
+	if (!m_pInfoUnpacker->saveAsPath.empty() && bROLeft != bRORight)
+	{
+		m_ptBuf[0]->SetModified(bRORight);
+		m_ptBuf[1]->SetModified(bROLeft);
+		m_ptBuf[0]->SetUnsaved();
+		m_ptBuf[1]->SetUnsaved();
+		UpdateHeaderPath(0);
+		UpdateHeaderPath(1);
+	}
+
 	// prepare the four views
 	CMergeEditView *const pLeft = GetLeftView();
 	CMergeEditView *const pRight = GetRightView();

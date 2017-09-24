@@ -183,6 +183,10 @@ public:
 	void SetModified(bool bModified = true) { m_bModified = bModified; }
 	bool IsModified() const { return m_bModified; }
 
+	//  'Unsaved' indicator
+	void SetUnsaved() { m_nSyncPosition = std::vector<UndoRecord>::npos; }
+	bool IsUnsaved() const { return m_nSyncPosition != m_nUndoPosition; }
+
 	//  Connect/disconnect views
 	void AddView (CCrystalTextView * pView);
 	void RemoveView (CCrystalTextView * pView);
