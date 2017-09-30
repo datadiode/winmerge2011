@@ -435,6 +435,14 @@ bool CDirFrame::IsShowable(const DIFFITEM *di) const
 			// users see files appearing/disappearing without clear logic.		
 			if (COptionsMgr::Get(OPT_TREE_MODE))
 			{
+				// Need to stay visible due to presence of identical child items?
+				if (di->containsIdentical() && COptionsMgr::Get(OPT_SHOW_IDENTICAL))
+					return true;
+				// Need to stay visible due to presence of unique child items?
+				if (di->containsLeftOnly() && COptionsMgr::Get(OPT_SHOW_UNIQUE_LEFT))
+					return true;
+				if (di->containsRightOnly() && COptionsMgr::Get(OPT_SHOW_UNIQUE_RIGHT))
+					return true;
 				// result filters
 				if (di->isResultSame() && !COptionsMgr::Get(OPT_SHOW_IDENTICAL))
 					return false;

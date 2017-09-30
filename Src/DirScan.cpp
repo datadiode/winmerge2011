@@ -285,15 +285,37 @@ void CDiffContext::DirScan_CompareItems()
 
 		CompareDiffItem(folderCmp, di);
 
-		if (!di->isResultFiltered() && (di->isResultDiff() || !di->isSideBoth()))
+		if (!di->isResultFiltered())
 		{
+			UINT mask = 0;
+			UINT flag = 0;
+			if (di->isResultSame())
+			{
+				mask = DIFFCODE::CONTAINSIDENTICAL;
+				flag = DIFFCODE::CONTAINSIDENTICAL;
+			}
+			else if (di->isSideLeftOnly())
+			{
+				mask = DIFFCODE::CONTAINSLEFTONLY | DIFFCODE::COMPAREFLAGS;
+				flag = DIFFCODE::CONTAINSLEFTONLY | DIFFCODE::DIFF;
+			}
+			else if (di->isSideRightOnly())
+			{
+				mask = DIFFCODE::CONTAINSRIGHTONLY | DIFFCODE::COMPAREFLAGS;
+				flag = DIFFCODE::CONTAINSRIGHTONLY | DIFFCODE::DIFF;
+			}
+			else if (di->isResultDiff())
+			{
+				mask = DIFFCODE::COMPAREFLAGS;
+				flag = DIFFCODE::DIFF;
+			}
 			while (DIFFITEM *parent = di->parent)
 			{
-				if (!parent->isSideBoth() || parent->isResultDiff())
+				UINT const code = parent->diffcode;
+				if ((code & DIFFCODE::SIDEFLAGS) != DIFFCODE::BOTH || (code & mask) == flag)
 					break;
 				EnterCriticalSection(&m_csCompareThread);
-				parent->diffcode &= ~DIFFCODE::COMPAREFLAGS;
-				parent->diffcode |= DIFFCODE::DIFF;
+				parent->diffcode = code & ~mask | flag;
 				LeaveCriticalSection(&m_csCompareThread);
 				di = parent;
 			}
@@ -329,15 +351,37 @@ void CDiffContext::DirScan_CompareRequestedItems()
 				CompareDiffItem(folderCmp, di);
 		}
 
-		if (!di->isResultFiltered() && (di->isResultDiff() || !di->isSideBoth()))
+		if (!di->isResultFiltered())
 		{
+			UINT mask = 0;
+			UINT flag = 0;
+			if (di->isResultSame())
+			{
+				mask = DIFFCODE::CONTAINSIDENTICAL;
+				flag = DIFFCODE::CONTAINSIDENTICAL;
+			}
+			else if (di->isSideLeftOnly())
+			{
+				mask = DIFFCODE::CONTAINSLEFTONLY | DIFFCODE::COMPAREFLAGS;
+				flag = DIFFCODE::CONTAINSLEFTONLY | DIFFCODE::DIFF;
+			}
+			else if (di->isSideRightOnly())
+			{
+				mask = DIFFCODE::CONTAINSRIGHTONLY | DIFFCODE::COMPAREFLAGS;
+				flag = DIFFCODE::CONTAINSRIGHTONLY | DIFFCODE::DIFF;
+			}
+			else if (di->isResultDiff())
+			{
+				mask = DIFFCODE::COMPAREFLAGS;
+				flag = DIFFCODE::DIFF;
+			}
 			while (DIFFITEM *parent = di->parent)
 			{
-				if (!parent->isSideBoth() || parent->isResultDiff())
+				UINT const code = parent->diffcode;
+				if ((code & DIFFCODE::SIDEFLAGS) != DIFFCODE::BOTH || (code & mask) == flag)
 					break;
 				EnterCriticalSection(&m_csCompareThread);
-				parent->diffcode &= ~DIFFCODE::COMPAREFLAGS;
-				parent->diffcode |= DIFFCODE::DIFF;
+				parent->diffcode = code & ~mask | flag;
 				LeaveCriticalSection(&m_csCompareThread);
 				di = parent;
 			}

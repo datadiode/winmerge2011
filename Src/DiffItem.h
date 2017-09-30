@@ -42,6 +42,7 @@ struct DIFFCODE
 		COMPAREFLAGS=0x7000, NOCMP=0x0000, SAME=0x1000, DIFF=0x2000, CMPERR=0x3000, CMPABORT=0x4000,
 		FILTERFLAGS=0x30000, INCLUDED=0x10000, SKIPPED=0x20000,
 		SCANFLAGS=0x100000, NEEDSCAN=0x100000,
+		CONTAINSIDENTICAL=0x200000, CONTAINSLEFTONLY=0x400000, CONTAINSRIGHTONLY=0x800000
 	};
 };
 
@@ -74,6 +75,11 @@ struct DIFFITEM : ListEntry
 
 	// file/directory
 	bool isDirectory() const { return (diffcode & DIFFCODE::TYPEFLAGS) == DIFFCODE::DIR; }
+	// presence of identical child items
+	bool containsIdentical() const { return (diffcode & DIFFCODE::CONTAINSIDENTICAL) != 0; }
+	// presence of unique child items
+	bool containsLeftOnly() const { return (diffcode & DIFFCODE::CONTAINSLEFTONLY) != 0; }
+	bool containsRightOnly() const { return (diffcode & DIFFCODE::CONTAINSRIGHTONLY) != 0; }
 	// left/right
 	bool isSideLeftOnly() const { return (diffcode & DIFFCODE::SIDEFLAGS) == DIFFCODE::LEFT; }
 	bool isSideLeftOrBoth() const { return (diffcode & DIFFCODE::LEFT) != 0; }
