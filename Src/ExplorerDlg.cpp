@@ -31,11 +31,6 @@
 #include "ExplorerDlg.h"
 #include "SuperComboBox.h"
 
-static COLORREF const COLOUR_NORMAL		= RGB(0, 0, 0);
-static COLORREF const COLOUR_HIDDEN		= RGB(127, 127, 127);
-static COLORREF const COLOUR_SYSTEM		= RGB(127, 127, 127);
-static COLORREF const COLOUR_COMPRESS	= RGB(0, 0, 255);
-
 enum
 {
 	FILE_NAME_INDEX,
@@ -101,6 +96,16 @@ static void AttributesToText(DWORD attr, LPWSTR text)
 	if (attr & FILE_ATTRIBUTE_COMPRESSED)
 		*text++ = L'C';
 	*text = L'\0';
+}
+
+static COLORREF AttributesToTextColor(DWORD attr)
+{
+	// Order is important
+	if (attr & (FILE_ATTRIBUTE_ENCRYPTED | FILE_ATTRIBUTE_COMPRESSED))
+		return GetSysColor(COLOR_HOTLIGHT);
+	if (attr & (FILE_ATTRIBUTE_SYSTEM | FILE_ATTRIBUTE_HIDDEN))
+		return GetSysColor(COLOR_GRAYTEXT);
+	return GetSysColor(COLOR_WINDOWTEXT);
 }
 
 ExplorerDlg::ExplorerDlg(UINT idd)
@@ -551,22 +556,9 @@ LRESULT ExplorerDlg::OnCustomDraw(NMTVCUSTOMDRAW *pCD)
         return CDRF_NOTIFYITEMDRAW;
 
 	case CDDS_ITEMPREPAINT:
-        // Order is important
 		if ((pCD->nmcd.lItemlParam & ~0xFFFF) == 0 && pCD->nmcd.uItemState == 0)
 		{
-			pCD->clrText = COLOUR_NORMAL;
-			if (pCD->nmcd.lItemlParam & FILE_ATTRIBUTE_HIDDEN)
-			{
-				pCD->clrText = COLOUR_HIDDEN;
-			}
-			if (pCD->nmcd.lItemlParam & FILE_ATTRIBUTE_SYSTEM)
-			{
-				pCD->clrText = COLOUR_SYSTEM;
-			}
-			if (pCD->nmcd.lItemlParam & FILE_ATTRIBUTE_COMPRESSED)
-			{
-				pCD->clrText = COLOUR_COMPRESS;
-			}
+			pCD->clrText = AttributesToTextColor(static_cast<DWORD>(pCD->nmcd.lItemlParam));
 		}
         break;
     }
@@ -1259,19 +1251,7 @@ LRESULT ExplorerDlg::OnCustomDraw(NMLVCUSTOMDRAW *pCD)
 		return CDRF_NOTIFYITEMDRAW;
 
 	case CDDS_ITEMPREPAINT:
-		pCD->clrText = COLOUR_NORMAL;
-		if (pfd->dwFileAttributes & FILE_ATTRIBUTE_HIDDEN)
-		{
-			pCD->clrText = COLOUR_HIDDEN;
-		}
-		if (pfd->dwFileAttributes & FILE_ATTRIBUTE_SYSTEM)
-		{
-			pCD->clrText = COLOUR_SYSTEM;
-		}
-		if (pfd->dwFileAttributes & FILE_ATTRIBUTE_COMPRESSED)
-		{
-			pCD->clrText = COLOUR_COMPRESS;
-		}
+		pCD->clrText = AttributesToTextColor(pfd->dwFileAttributes);
 		break;
 	}
 	return CDRF_DODEFAULT;

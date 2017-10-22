@@ -277,7 +277,9 @@ LRESULT CMessageBoxDialog::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_CTLCOLORSTATIC:
 		if (reinterpret_cast<HWND>(lParam) == m_edit.m_hWnd)
 		{
-			reinterpret_cast<HSurface *>(wParam)->SetBkMode(TRANSPARENT);
+			HSurface *const pDC = reinterpret_cast<HSurface *>(wParam);
+			pDC->SetTextColor(GetSysColor(COLOR_WINDOWTEXT));
+			pDC->SetBkMode(TRANSPARENT);
 			return reinterpret_cast<LRESULT>(GetStockObject(NULL_BRUSH));
 		}
 		break;
