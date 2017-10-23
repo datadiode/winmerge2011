@@ -1814,6 +1814,8 @@ LRESULT CDirView::ReflectCustomDraw(NMLVCUSTOMDRAW *pNM)
 	case CDDS_ITEMPREPAINT | CDDS_SUBITEM:
 		if (DIFFITEM *di = reinterpret_cast<DIFFITEM *>(pNM->nmcd.lItemlParam))
 		{
+			COLORREF const clrText = ::GetSysColor(COLOR_WINDOWTEXT);
+			COLORREF const clrTextBk = ::GetSysColor(COLOR_WINDOW);
 			switch (di->diffcode & (DIFFCODE::SIDEFLAGS | DIFFCODE::COMPAREFLAGS))
 			{
 			case DIFFCODE::BOTH | DIFFCODE::NOCMP:
@@ -1822,15 +1824,27 @@ LRESULT CDirView::ReflectCustomDraw(NMLVCUSTOMDRAW *pNM)
 				break;
 			case DIFFCODE::LEFT:
 				// left-only
-				pNM->clrTextBk = COptionsMgr::Get(OPT_LIST_LEFTONLY_BKGD_COLOR);
+				(
+					SquareColorDistance(COptionsMgr::Get(OPT_LIST_LEFTONLY_BKGD_COLOR), clrText) <
+					SquareColorDistance(COptionsMgr::Get(OPT_LIST_LEFTONLY_BKGD_COLOR), clrTextBk) ?
+					pNM->clrText : pNM->clrTextBk
+				) = COptionsMgr::Get(OPT_LIST_LEFTONLY_BKGD_COLOR);
 				break;
 			case DIFFCODE::RIGHT:
 				// right-only
-				pNM->clrTextBk = COptionsMgr::Get(OPT_LIST_RIGHTONLY_BKGD_COLOR);
+				(
+					SquareColorDistance(COptionsMgr::Get(OPT_LIST_RIGHTONLY_BKGD_COLOR), clrText) <
+					SquareColorDistance(COptionsMgr::Get(OPT_LIST_RIGHTONLY_BKGD_COLOR), clrTextBk) ?
+					pNM->clrText : pNM->clrTextBk
+				) = COptionsMgr::Get(OPT_LIST_RIGHTONLY_BKGD_COLOR);
 				break;
 			default:
 				// otherwise suspicious
-				pNM->clrTextBk = COptionsMgr::Get(OPT_LIST_SUSPICIOUS_BKGD_COLOR);
+				(
+					SquareColorDistance(COptionsMgr::Get(OPT_LIST_SUSPICIOUS_BKGD_COLOR), clrText) <
+					SquareColorDistance(COptionsMgr::Get(OPT_LIST_SUSPICIOUS_BKGD_COLOR), clrTextBk) ?
+					pNM->clrText : pNM->clrTextBk
+				) = COptionsMgr::Get(OPT_LIST_SUSPICIOUS_BKGD_COLOR);
 				break;
 			}
 			switch (f_cols[ColPhysToLog(pNM->iSubItem)].idName)
@@ -1841,10 +1855,10 @@ LRESULT CDirView::ReflectCustomDraw(NMLVCUSTOMDRAW *pNM)
 				bool const selected = GetItemState(static_cast<int>(pNM->nmcd.dwItemSpec), LVIS_SELECTED) != 0;
 				::SetBkColor(pNM->nmcd.hdc,
 					selected ? ::GetSysColor(hasfocus ? COLOR_HIGHLIGHT : COLOR_BTNFACE) :
-					pNM->clrTextBk == CLR_DEFAULT ? GetBkColor() : pNM->clrTextBk);
+					pNM->clrTextBk == CLR_DEFAULT ? clrTextBk : pNM->clrTextBk);
 				::SetTextColor(pNM->nmcd.hdc,
 					selected ? ::GetSysColor(hasfocus ? COLOR_HIGHLIGHTTEXT : COLOR_BTNTEXT) :
-					pNM->clrText == CLR_DEFAULT ? GetTextColor() : pNM->clrText);
+					pNM->clrText == CLR_DEFAULT ? clrText : pNM->clrText);
 				// Erase the cell's background
 				::ExtTextOut(pNM->nmcd.hdc, pNM->nmcd.rc.left, pNM->nmcd.rc.top, ETO_OPAQUE, &pNM->nmcd.rc, NULL, 0, NULL);
 				// Draw the cell's text

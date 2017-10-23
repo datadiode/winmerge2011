@@ -30,6 +30,8 @@ DWORD NTAPI RunIt(LPCTSTR szExeFile, LPCTSTR szArgs, LPCTSTR szDir, WORD wShowWi
 
 void DecorateCmdLine(String &sDecoratedCmdLine, String &sExecutable);
 
+long SquareColorDistance(COLORREF a, COLORREF b);
+
 template<typename IMAGE_NT_HEADERS>
 LPVOID GetProcAddress(HMODULE hModule, LPCSTR lpProcName)
 {

@@ -240,3 +240,14 @@ void DecorateCmdLine(String &sCmdLine, String &sExecutable)
 	}
 	sExecutable.erase(std::remove(sExecutable.begin(), sExecutable.end(), _T('"')), sExecutable.end());
 }
+
+/**
+ * @brief Compute the Euclidean square distance between two colors
+ */
+long SquareColorDistance(COLORREF a, COLORREF b)
+{
+	long const dr = static_cast<long>(GetRValue(a)) - static_cast<long>(GetRValue(b));
+	long const dg = static_cast<long>(GetGValue(a)) - static_cast<long>(GetGValue(b));
+	long const db = static_cast<long>(GetBValue(a)) - static_cast<long>(GetBValue(b));
+	return dr * dr + dg * dg + db * db;
+}
