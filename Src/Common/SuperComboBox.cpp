@@ -71,7 +71,7 @@ void HSuperComboBox::LoadState(LPCTSTR szRegSubKey, UINT nMaxItems)
 		SettingStore.RegQueryInfoKey(hKey, &n, &bufsize);
 		if (n > nMaxItems)
 			n = nMaxItems;
-		TCHAR *const s = reinterpret_cast<TCHAR *>(_alloca(bufsize));
+		TCHAR *const s = static_cast<TCHAR *>(_alloca(bufsize));
 		for (DWORD i = 0 ; i < n ; ++i)
 		{
 			TCHAR name[20];

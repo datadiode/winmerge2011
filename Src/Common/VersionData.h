@@ -38,12 +38,12 @@ public:
 		}
 		return 0;
 	}
-	const CVersionData *Find(LPCWSTR szKey) const
+	const CVersionData *Find(LPCWSTR lpszKey) const
 	{
 		const CVersionData *p = First();
 		while (p < Next())
 		{
-			if (szKey == 0 || StrCmpW(szKey, p->szKey) == 0)
+			if (lpszKey == 0 || lstrcmpiW(lpszKey, p->szKey) == 0)
 				return p;
 			p = p->Next();
 		}
@@ -51,7 +51,9 @@ public:
 	}
 	static const CVersionData *Load(HMODULE hModule = 0, LPCTSTR lpszRes = MAKEINTRESOURCE(VS_VERSION_INFO))
 	{
-		HRSRC hRes = FindResource(hModule, lpszRes, RT_VERSION);
-		return (const CVersionData *)LoadResource(hModule, hRes);
+		if (HRSRC const hFindRes = FindResource(hModule, lpszRes, RT_VERSION))
+			if (HGLOBAL const hLoadRes = LoadResource(hModule, hFindRes))
+				return static_cast<const CVersionData *>(LockResource(hLoadRes));
+		return 0;
 	}
 };

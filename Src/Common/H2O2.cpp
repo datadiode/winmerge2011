@@ -67,7 +67,7 @@ struct DrawItemStruct_WebLinkButton : DRAWITEMSTRUCT
 		{
 			clrText = ::GetSysColor(COLOR_GRAYTEXT);
 			if (GetRValue(clrText) == GetGValue(clrText) && GetRValue(clrText) == GetBValue(clrText))
-				clrText = RGB(128,0,128);
+				clrText &= RGB(255,0,255);
 		}
 		RECT rcText = rcItem;
 		::DrawText(hDC, cText, cchText, &rcText, DT_LEFT | DT_CALCRECT);

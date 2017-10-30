@@ -154,7 +154,7 @@ String CVersionInfo::MakeVersionString(DWORD hi, DWORD lo) const
  * This function returns version number given as a number in version info.
  * @return Product's version number as string.
  */
-String CVersionInfo::GetFixedProductVersion()
+String CVersionInfo::GetFixedProductVersion() const
 {
 	return MakeVersionString(dwProductVersionMS, dwProductVersionLS);
 }
@@ -164,7 +164,7 @@ String CVersionInfo::GetFixedProductVersion()
  * This function returns version number given as a number in version info.
  * @return File's version number as string.
  */
-String CVersionInfo::GetFixedFileVersion()
+String CVersionInfo::GetFixedFileVersion() const
 {
 	return MakeVersionString(dwFileVersionMS, dwFileVersionLS);
 }
@@ -176,7 +176,7 @@ String CVersionInfo::GetFixedFileVersion()
  * @param [out] versionLS Low DWORD for version number.
  * @return TRUE if version info was found, FALSE otherwise.
  */
-BOOL CVersionInfo::GetFixedFileVersion(DWORD &versionMS, DWORD &versionLS)
+BOOL CVersionInfo::GetFixedFileVersion(DWORD &versionMS, DWORD &versionLS) const
 {
 	if (m_pVffInfo)
 	{
@@ -252,7 +252,7 @@ String CVersionInfo::QueryValue(LPCTSTR id) const
 		_T("\\StringFileInfo\\%08lx\\%s"),
 		MAKELONG(m_wCodepage, m_wLanguage), id);
 	return VerQueryValue(m_pVffInfo, selector, &pv, &len) && (len > 0) ?
-		String(reinterpret_cast<LPCTSTR>(pv), len - 1) : String();
+		String(static_cast<LPCTSTR>(pv), len - 1) : String();
 }
 
 /** 

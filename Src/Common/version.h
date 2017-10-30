@@ -33,9 +33,9 @@ public:
 	String GetComments() const;
 	String GetSpecialBuild() const;
 	String GetPrivateBuild() const;
-	String GetFixedProductVersion();
-	String GetFixedFileVersion();
-	BOOL GetFixedFileVersion(DWORD &versionMS, DWORD &versionLS);
+	String GetFixedProductVersion() const;
+	String GetFixedFileVersion() const;
+	BOOL GetFixedFileVersion(DWORD &versionMS, DWORD &versionLS) const;
 
 protected:
 	void GetVersionInfo(LPCTSTR szFileName);
