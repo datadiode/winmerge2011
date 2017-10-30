@@ -143,13 +143,16 @@ static unsigned demoGuessEncoding_rc(const char *src, stl_size_t len)
 			++src;
 			--len;
 		}
-		const char *base = src;
+		const char *const base = src;
 		while (len && (*src != '\r' && *src != '\n'))
 		{
 			++src;
 			--len;
 		}
-		lstrcpynA(line, base, len < sizeof line ? len + 1 : sizeof line);
+		stl_size_t const limit = sizeof line - 1;
+		stl_size_t const count = std::min(len, limit);
+		memcpy(line, base, count);
+		line[count] = '\0';
 	} while (len && sscanf(line, "#pragma code_page(%d)", &cp) != 1);
 	return cp;
 }
