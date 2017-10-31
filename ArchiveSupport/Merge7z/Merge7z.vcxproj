@@ -103,9 +103,6 @@
       <AdditionalDependencies>shlwapi.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>Merge7z.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <DataExecutionPrevention>
-      </DataExecutionPrevention>
     </Link>
     <PostBuildEvent>
       <Command>PostBuild.bat "\7z1604\7z1604.msi" "$(OutDir)"</Command>
@@ -129,9 +126,6 @@
       <AdditionalDependencies>shlwapi.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>Merge7z.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <DataExecutionPrevention>
-      </DataExecutionPrevention>
     </Link>
     <PostBuildEvent>
       <Command>PostBuild.bat "\7z1604\7z1604-x64.msi" "$(OutDir)"</Command>
@@ -156,9 +150,6 @@
     <Link>
       <AdditionalDependencies>shlwapi.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>Merge7z.def</ModuleDefinitionFile>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <DataExecutionPrevention>
-      </DataExecutionPrevention>
     </Link>
     <PostBuildEvent>
       <Command>PostBuild.bat "\7z1604\7z1604.msi" "$(OutDir)"</Command>
@@ -183,9 +174,6 @@
     <Link>
       <AdditionalDependencies>shlwapi.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>Merge7z.def</ModuleDefinitionFile>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <DataExecutionPrevention>
-      </DataExecutionPrevention>
     </Link>
     <PostBuildEvent>
       <Command>PostBuild.bat "\7z1604\7z1604-x64.msi" "$(OutDir)"</Command>

@@ -106,14 +106,11 @@
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>shlwapi.lib;oleacc.lib;RunTmChk.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <DataExecutionPrevention>
-      </DataExecutionPrevention>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
       <ImportLibrary>
       </ImportLibrary>
       <ModuleDefinitionFile>ShellExtension.def</ModuleDefinitionFile>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
@@ -144,14 +141,11 @@
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>shlwapi.lib;oleacc.lib;RunTmChk.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <DataExecutionPrevention>
-      </DataExecutionPrevention>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
       <ImportLibrary>
       </ImportLibrary>
       <ModuleDefinitionFile>ShellExtension.def</ModuleDefinitionFile>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
@@ -184,13 +178,10 @@
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>shlwapi.lib;oleacc.lib;RunTmChk.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <DataExecutionPrevention>
-      </DataExecutionPrevention>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
       <ImportLibrary>
       </ImportLibrary>
       <ModuleDefinitionFile>ShellExtension.def</ModuleDefinitionFile>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
@@ -224,13 +215,10 @@
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>shlwapi.lib;oleacc.lib;RunTmChk.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <DataExecutionPrevention>
-      </DataExecutionPrevention>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
       <ImportLibrary>
       </ImportLibrary>
       <ModuleDefinitionFile>ShellExtension.def</ModuleDefinitionFile>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
