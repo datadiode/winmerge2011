@@ -1,3 +1,11 @@
+0.2011.007.444
+• DirView.cpp: Take some effort to auto-adapt to dark background themes
+• Fix some high contrast mode issues (#137)
+• Don't hide folders containing items which themselves qualify for showing (#11)
+• Adapt fix for https://bitbucket.org/sdottaka/winmerge-v2/issues/77
+• Issue #134 Opening a conflict file doesn't get marked as dirty
+• Issue #135 Command line parameter /dr doesn't work with conflict file
+
 0.2011.007.347
 Changes since preceding release (not necessarily complete):
 • DirView.cpp: Hide long path prefixes from Excel print headers/footers
