@@ -7,6 +7,7 @@ XDoc2Txt Distillate = script:\FileTransforms\xdoc2txt.wsc
 GEDCOM = script:\FileTransforms\gedcom.wsc
 Linhas Numeradas = script:\FileTransforms\LinesNumbered.wsc
 Linhas Ordenadas = script:\FileTransforms\LinesSorted.wsc
+JSON = script:\FileTransforms\jq.wsc
 XML Ordenado = script:\FileTransforms\msxml.wsc?transform='\FileTransforms\msxml-sort.xslt'
 Astyle Código Fonte Formatado = script:\FileTransforms\astyle.wsc?optfile='\FileTransforms\astyle.opt'
 Diga a partir da extensão do ficheiro = mapping:%SupplementFolder%\Supplement.ini?FileTransforms

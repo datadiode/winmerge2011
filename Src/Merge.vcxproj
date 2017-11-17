@@ -1034,6 +1034,7 @@
     <FileTransform Include="..\FileTransforms\astyle.opt.FileTransform" />
     <FileTransform Include="..\FileTransforms\astyle.wsc.FileTransform" />
     <FileTransform Include="..\FileTransforms\gedcom.wsc.FileTransform" />
+    <FileTransform Include="..\FileTransforms\jq.wsc.FileTransform" />
     <FileTransform Include="..\FileTransforms\LinesNumbered.wsc.FileTransform" />
     <FileTransform Include="..\FileTransforms\LinesSorted.wsc.FileTransform" />
     <FileTransform Include="..\FileTransforms\MediaInfo.wsc.FileTransform" />

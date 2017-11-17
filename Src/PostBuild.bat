@@ -9,9 +9,11 @@ REM echo $(IntDir) = %1
 REM echo $(OutDir) = %2
 REM echo $(PlatformName) = %3
 
-goto :PlatformName:%3
+goto :PlatformName$%3
 
-:PlatformName:Win32
+:PlatformName$Win32
+
+REM Copy tidy
 set $=..\3rdparty\tidy\build32\MinSizeRel\
 for %%$ in (
 	tidy.exe
@@ -19,9 +21,23 @@ for %%$ in (
 	xcopy /y "%%~$$:$" "%~2"
 	set $=
 )
-goto :PlatformName:
 
-:PlatformName:x64
+REM Copy jq
+set $=..\3rdparty\jq\
+for %%$ in (
+	.
+) do if not "%%~$$:$" == "" (
+	xcopy /yt "%%~$$:$" "%~2jq\"
+	copy /y "COPYING" "%~2jq\"
+	echo copy /y "%$%jq-win32.exe" "%~2jq\jq.exe"
+	copy /y "%$%jq-win32.exe" "%~2jq\jq.exe"
+	set $=
+)
+goto :PlatformName$
+
+:PlatformName$x64
+
+REM Copy tidy
 set $=..\3rdparty\tidy\build64\MinSizeRel\
 for %%$ in (
 	tidy.exe
@@ -29,9 +45,21 @@ for %%$ in (
 	xcopy /y "%%~$$:$" "%~2"
 	set $=
 )
-goto :PlatformName:
 
-:PlatformName:
+REM Copy jq
+set $=..\3rdparty\jq\
+for %%$ in (
+	.
+) do if not "%%~$$:$" == "" (
+	xcopy /yt "%%~$$:$" "%~2jq\"
+	copy /y "COPYING" "%~2jq\"
+	echo copy /y "%$%jq-win64.exe" "%~2jq\jq.exe"
+	copy /y "%$%jq-win64.exe" "%~2jq\jq.exe"
+	set $=
+)
+goto :PlatformName$
+
+:PlatformName$
 set $=..\3rdparty\AStyle\build\cb-bcc32c\bin\;..\3rdparty\AStyle\build\cb-mingw\bin\
 for %%$ in (
 	AStyle.exe

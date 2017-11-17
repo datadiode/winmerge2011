@@ -1512,6 +1512,9 @@
     <FileTransform Include="..\FileTransforms\xdoc2txt.wsc.FileTransform">
       <Filter>File Transforms</Filter>
     </FileTransform>
+    <FileTransform Include="..\FileTransforms\jq.wsc.FileTransform">
+      <Filter>File Transforms</Filter>
+    </FileTransform>
   </ItemGroup>
   <ItemGroup>
     <PluginMoniker Include="..\Translations\PluginMonikers\English.ini.PluginMoniker">

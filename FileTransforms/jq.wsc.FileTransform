@@ -1,0 +1,30 @@
+<scriptlet>
+
+<implements type='automation'>
+	<method name='OpenTextFile'/>
+	<property name='ShowConsole'/>
+	<property name='ReadOnly'/>
+	<property name='Encoding'/>
+</implements>
+
+<script language='vbs'>
+Option Explicit
+
+Const ShowConsole = 0
+Const ReadOnly = True
+Const Encoding = "UTF-8"
+
+Dim sh
+Set sh = CreateObject("WScript.Shell")
+
+Function OpenTextFile(path)
+	Dim ex
+	Set ex = sh.Exec("""jq\jq.exe"" . """ & path & """")
+	If ex.StdOut.AtEndOfStream Then
+		Set OpenTextFile = ex.StdErr
+	Else
+		Set OpenTextFile = ex.StdOut
+	End If
+End Function
+</script>
+</scriptlet>
