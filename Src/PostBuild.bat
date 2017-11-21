@@ -28,8 +28,7 @@ for %%$ in (
 	.
 ) do if not "%%~$$:$" == "" (
 	xcopy /yt "%%~$$:$" "%~2jq\"
-	copy /y "COPYING" "%~2jq\"
-	echo copy /y "%$%jq-win32.exe" "%~2jq\jq.exe"
+	copy /y "%$%COPYING" "%~2jq\"
 	copy /y "%$%jq-win32.exe" "%~2jq\jq.exe"
 	set $=
 )
@@ -52,8 +51,7 @@ for %%$ in (
 	.
 ) do if not "%%~$$:$" == "" (
 	xcopy /yt "%%~$$:$" "%~2jq\"
-	copy /y "COPYING" "%~2jq\"
-	echo copy /y "%$%jq-win64.exe" "%~2jq\jq.exe"
+	copy /y "%$%COPYING" "%~2jq\"
 	copy /y "%$%jq-win64.exe" "%~2jq\jq.exe"
 	set $=
 )
