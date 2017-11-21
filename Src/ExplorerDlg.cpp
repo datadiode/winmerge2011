@@ -1434,11 +1434,13 @@ void ExplorerDlg::OnOK()
 		// remove quotation marks
 		m_filename.erase(std::remove(m_filename.begin(), m_filename.end(), L'"'), m_filename.end());
 		m_path.append(m_filename);
-		String::size_type d = m_path.find(L'.', m_path.rfind(L'\\') + 1);
+		String::size_type const n = m_path.rfind(L'\\') + 1;
+		String::size_type const d = m_path.find(L'.', n);
 		if (d + 1 == m_path.length())
 		{
-			// remove the trailing dot
-			m_path.resize(d);
+			// remove the trailing dot, unless that would leave a trailing backslash
+			if (d != n)
+				m_path.resize(d);
 		}
 		else if (d == String::npos && m_defext && *m_defext != L'*')
 		{
