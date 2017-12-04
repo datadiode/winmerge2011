@@ -20,5 +20,7 @@ Insert Date = InsertDate@script:\EditorScripts\Basic.wsc
 Insert Time = InsertTime@script:\EditorScripts\Basic.wsc
 Sort Lines Ascending = SortLinesAscending@script:\EditorScripts\SortLines.wsc
 Sort Lines Descending = SortLinesDescending@script:\EditorScripts\SortLines.wsc
+Sort Lines Ascending Ignoring Character Case = SortLinesAscendingNoCase@script:\EditorScripts\SortLines.wsc
+Sort Lines Descending Ignoring Character Case = SortLinesDescendingNoCase@script:\EditorScripts\SortLines.wsc
 Tabify Selection = Tabify@script:\EditorScripts\Tabify.wsc
 Untabify Selection = Untabify@script:\EditorScripts\Tabify.wsc

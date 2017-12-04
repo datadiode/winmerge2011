@@ -20,5 +20,7 @@ Inserir Data = InsertDate@script:\EditorScripts\Basic.wsc
 Inserir Hora = InsertTime@script:\EditorScripts\Basic.wsc
 Ordenar Linhas: Crescente = SortLinesAscending@script:\EditorScripts\SortLines.wsc
 Ordenar Linhas: Decrescente = SortLinesDescending@script:\EditorScripts\SortLines.wsc
+Sort Lines Ascending Ignoring Character Case = SortLinesAscendingNoCase@script:\EditorScripts\SortLines.wsc
+Sort Lines Descending Ignoring Character Case = SortLinesDescendingNoCase@script:\EditorScripts\SortLines.wsc
 Inserir Tabulação = Tabify@script:\EditorScripts\Tabify.wsc
 Remover Tabulação = Untabify@script:\EditorScripts\Tabify.wsc

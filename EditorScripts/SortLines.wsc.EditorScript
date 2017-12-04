@@ -3,6 +3,8 @@
 <implements type="Automation">
 	<method name="SortLinesAscending"/>
 	<method name="SortLinesDescending"/>
+	<method name="SortLinesAscendingNoCase"/>
+	<method name="SortLinesDescendingNoCase"/>
 </implements>
 
 <script language="JScript">
@@ -33,6 +35,34 @@ function SortLinesDescending(Text) {
 		tail = "";
 	}
 	lines.sort(function(a, b) { return a < b ? 1 : -1; });
+	return lines.join(eol) + tail;
+}
+
+function SortLinesAscendingNoCase(Text) {
+	var eol = Text.match(/\r\n|\r|\n/);
+	var lines = Text.split(eol);
+	var tail = lines.pop();
+	if (tail.length == 0) {
+		tail = eol;
+	} else {
+		lines.push(tail);
+		tail = "";
+	}
+	lines.sort(function(a, b) { return a.toLowerCase().localeCompare(b.toLowerCase()); });
+	return lines.join(eol) + tail;
+}
+
+function SortLinesDescendingNoCase(Text) {
+	var eol = Text.match(/\r\n|\r|\n/);
+	var lines = Text.split(eol);
+	var tail = lines.pop();
+	if (tail.length == 0) {
+		tail = eol;
+	} else {
+		lines.push(tail);
+		tail = "";
+	}
+	lines.sort(function(a, b) { return b.toLowerCase().localeCompare(a.toLowerCase()); });
 	return lines.join(eol) + tail;
 }
 

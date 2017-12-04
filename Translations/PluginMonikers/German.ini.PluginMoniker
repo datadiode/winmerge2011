@@ -20,5 +20,7 @@ Datum einfügen = InsertDate@script:\EditorScripts\Basic.wsc
 Uhrzeit einfügen = InsertTime@script:\EditorScripts\Basic.wsc
 Zeilen aufsteigend sortieren = SortLinesAscending@script:\EditorScripts\SortLines.wsc
 Zeilen absteigend sortieren = SortLinesDescending@script:\EditorScripts\SortLines.wsc
+Zeilen aufsteigend sortieren ungeachtet Groß-/Kleinschreibung = SortLinesAscendingNoCase@script:\EditorScripts\SortLines.wsc
+Zeilen absteigend sortieren ungeachtet Groß-/Kleinschreibung = SortLinesDescendingNoCase@script:\EditorScripts\SortLines.wsc
 Ausgewählte Zeilen mit Tabstopps versehen = Tabify@script:\EditorScripts\Tabify.wsc
 Tabstopps aus ausgewählten Zeilen entfernen = Untabify@script:\EditorScripts\Tabify.wsc
