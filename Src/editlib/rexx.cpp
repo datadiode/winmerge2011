@@ -16,32 +16,52 @@
 
 #include "StdAfx.h"
 #include "ccrystaltextview.h"
-#include "ccrystaltextbuffer.h"
 #include "SyntaxColors.h"
 #include "string_util.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
 #endif
 
-//  C++ keywords (MSVC5.0 + POET5.0)
-static LPTSTR s_apszRexxKeywordList[] =
+using CommonKeywords::IsNumeric;
+
+static BOOL IsRexxKeyword(LPCTSTR pszChars, int nLength)
+{
+  static LPCTSTR const s_apszRexxKeywordList[] =
   {
     _T ("ADDRESS"),
     _T ("ARG"),
+    _T ("BY"),
     _T ("CALL"),
+    _T ("DIGITS"),
     _T ("DO"),
     _T ("DROP"),
+    _T ("ELSE"),
+    _T ("END"),
+    _T ("END"),
+    _T ("ENGINEERING"),
+    _T ("ERROR"),
     _T ("EXIT"),
+    _T ("EXPOSE"),
+    _T ("FAILURE"),
+    _T ("FOR"),
+    _T ("FOREVER"),
+    _T ("FORM"),
+    _T ("FUZZ"),
+    _T ("HALT"),
     _T ("IF"),
     _T ("INTERPRET"),
     _T ("ITERATE"),
     _T ("LEAVE"),
+    _T ("NAME"),
     _T ("NOP"),
+    _T ("NOTREADY"),
+    _T ("NOVALUE"),
     _T ("NUMERIC"),
+    _T ("OFF"),
+    _T ("ON"),
     _T ("OPTIONS"),
+    _T ("OTHERWISE"),
     _T ("PARSE"),
     _T ("PROCEDURE"),
     _T ("PULL"),
@@ -49,109 +69,43 @@ static LPTSTR s_apszRexxKeywordList[] =
     _T ("QUEUE"),
     _T ("RETURN"),
     _T ("SAY"),
+    _T ("SCIENTIFIC"),
     _T ("SELECT"),
-    _T ("OTHERWISE"),
     _T ("SIGNAL"),
-    _T ("TRACE"),
-    _T ("END"),
-    _T ("WHEN"),
-    _T ("ELSE"),
-    _T ("WITH"),
-    _T ("TO"),
-    _T ("BY"),
-    _T ("ON"),
-    _T ("END"),
-    _T ("FOR"),
-    _T ("OFF"),
-    _T ("VAR"),
-    _T ("THEN"),
-    _T ("HALT"),
-    _T ("NAME"),
-    _T ("FORM"),
-    _T ("FUZZ"),
-    _T ("VALUE"),
-    _T ("WHILE"),
-    _T ("UNTIL"),
-    _T ("ERROR"),
-    _T ("UPPER"),
-    _T ("WITH"),
-    _T ("EXPOSE"),
-    _T ("DIGITS"),
-    _T ("FOREVER"),
-    _T ("FAILURE"),
-    _T ("VERSION"),
-    _T ("NOVALUE"),
     _T ("SOURCE"),
     _T ("SYNTAX"),
-    _T ("NOTREADY"),
-    _T ("SCIENTIFIC"),
-    _T ("ENGINEERING"),
-    NULL
+    _T ("THEN"),
+    _T ("TO"),
+    _T ("TRACE"),
+    _T ("UNTIL"),
+    _T ("UPPER"),
+    _T ("VALUE"),
+    _T ("VAR"),
+    _T ("VERSION"),
+    _T ("WHEN"),
+    _T ("WHILE"),
+    _T ("WITH"),
+    _T ("WITH"),
   };
+  return xiskeyword<_tcsnicmp>(pszChars, nLength, s_apszRexxKeywordList);
+}
 
-static LPTSTR s_apszUser1KeywordList[] =
+static BOOL IsUser1Keyword(LPCTSTR pszChars, int nLength)
+{
+  static LPCTSTR const s_apszUser1KeywordList[] =
   {
-    _T ("METHOD"),
-    _T ("CLASS"),
-    _T ("NULL"),
-    _T ("LOOP"),
+    _T ("BOOLEAN"),
     _T ("CATCH"),
-    _T ("RETURNS"),
+    _T ("CHAR"),
+    _T ("CLASS"),
     _T ("EXTENDS"),
     _T ("IMPLEMENTS"),
-    _T ("CHAR"),
-    _T ("BOOLEAN"),
-    NULL
+    _T ("LOOP"),
+    _T ("METHOD"),
+    _T ("NULL"),
+    _T ("RETURNS"),
   };
-
-static BOOL
-IsXKeyword (LPTSTR apszKeywords[], LPCTSTR pszChars, int nLength)
-{
-  for (int L = 0; apszKeywords[L] != NULL; L++)
-    {
-      if (_tcsnicmp (apszKeywords[L], pszChars, nLength) == 0
-            && apszKeywords[L][nLength] == 0)
-        return TRUE;
-    }
-  return FALSE;
-}
-
-static BOOL
-IsRexxKeyword (LPCTSTR pszChars, int nLength)
-{
-  return IsXKeyword (s_apszRexxKeywordList, pszChars, nLength);
-}
-
-static BOOL
-IsUser1Keyword (LPCTSTR pszChars, int nLength)
-{
-  return IsXKeyword (s_apszUser1KeywordList, pszChars, nLength);
-}
-
-static BOOL
-IsRexxNumber (LPCTSTR pszChars, int nLength)
-{
-  if (nLength > 2 && pszChars[0] == '0' && pszChars[1] == 'x')
-    {
-      for (int I = 2; I < nLength; I++)
-        {
-          if (_istdigit (pszChars[I]) || (pszChars[I] >= 'A' && pszChars[I] <= 'F') ||
-                (pszChars[I] >= 'a' && pszChars[I] <= 'f'))
-            continue;
-          return FALSE;
-        }
-      return TRUE;
-    }
-  if (!_istdigit (pszChars[0]))
-    return FALSE;
-  for (int I = 1; I < nLength; I++)
-    {
-      if (!_istdigit (pszChars[I]) && pszChars[I] != '+' &&
-            pszChars[I] != '-' && pszChars[I] != '.' && pszChars[I] != 'e' &&
-            pszChars[I] != 'E')
-        return FALSE;
-    }
-  return TRUE;
+  return xiskeyword<_tcsnicmp>(pszChars, nLength, s_apszUser1KeywordList);
 }
 
 #define DEFINE_BLOCK(pos, colorindex)   \
@@ -177,7 +131,7 @@ DWORD CCrystalTextView::ParseLineRexx(DWORD dwCookie, int nLineIndex, TEXTBLOCK 
   if (nLength == 0)
     return dwCookie & COOKIE_EXT_COMMENT;
 
-  LPCTSTR pszChars = GetLineChars(nLineIndex);
+  const LPCTSTR pszChars = GetLineChars(nLineIndex);
   BOOL bFirstChar = (dwCookie & ~COOKIE_EXT_COMMENT) == 0;
   BOOL bRedefineBlock = TRUE;
   BOOL bWasCommentStart = FALSE;
@@ -194,21 +148,21 @@ DWORD CCrystalTextView::ParseLineRexx(DWORD dwCookie, int nLineIndex, TEXTBLOCK 
             nPos = nPrevI;
           if (dwCookie & (COOKIE_COMMENT | COOKIE_EXT_COMMENT))
             {
-              DEFINE_BLOCK (nPos, COLORINDEX_COMMENT);
+              DEFINE_BLOCK(nPos, COLORINDEX_COMMENT);
             }
           else if (dwCookie & (COOKIE_CHAR | COOKIE_STRING))
             {
-              DEFINE_BLOCK (nPos, COLORINDEX_STRING);
+              DEFINE_BLOCK(nPos, COLORINDEX_STRING);
             }
           else
             {
               if (xisalnum(pszChars[nPos]) || pszChars[nPos] == '.' && nPos > 0 && (!xisalpha(pszChars[nPos - 1]) && !xisalpha(pszChars[nPos + 1])))
                 {
-                  DEFINE_BLOCK (nPos, COLORINDEX_NORMALTEXT);
+                  DEFINE_BLOCK(nPos, COLORINDEX_NORMALTEXT);
                 }
               else
                 {
-                  DEFINE_BLOCK (nPos, COLORINDEX_OPERATOR);
+                  DEFINE_BLOCK(nPos, COLORINDEX_OPERATOR);
                   bRedefineBlock = TRUE;
                   bDecIndex = TRUE;
                   goto out;
@@ -226,7 +180,7 @@ out:
 
       if (dwCookie & COOKIE_COMMENT)
         {
-          DEFINE_BLOCK (I, COLORINDEX_COMMENT);
+          DEFINE_BLOCK(I, COLORINDEX_COMMENT);
           dwCookie |= COOKIE_COMMENT;
           break;
         }
@@ -268,7 +222,7 @@ out:
 
       if (I > 0 && pszChars[I] == '/' && pszChars[nPrevI] == '/')
         {
-          DEFINE_BLOCK (nPrevI, COLORINDEX_COMMENT);
+          DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
           dwCookie |= COOKIE_COMMENT;
           break;
         }
@@ -276,7 +230,7 @@ out:
       //  Normal text
       if (pszChars[I] == '"')
         {
-          DEFINE_BLOCK (I, COLORINDEX_STRING);
+          DEFINE_BLOCK(I, COLORINDEX_STRING);
           dwCookie |= COOKIE_STRING;
           continue;
         }
@@ -285,14 +239,14 @@ out:
           // if (I + 1 < nLength && pszChars[I + 1] == '\'' || I + 2 < nLength && pszChars[I + 1] != '\\' && pszChars[I + 2] == '\'' || I + 3 < nLength && pszChars[I + 1] == '\\' && pszChars[I + 3] == '\'')
           if (!I || !xisalnum(pszChars[nPrevI]))
             {
-              DEFINE_BLOCK (I, COLORINDEX_STRING);
+              DEFINE_BLOCK(I, COLORINDEX_STRING);
               dwCookie |= COOKIE_CHAR;
               continue;
             }
         }
       if (I > 0 && pszChars[I] == '*' && pszChars[nPrevI] == '/')
         {
-          DEFINE_BLOCK (nPrevI, COLORINDEX_COMMENT);
+          DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
           dwCookie |= COOKIE_EXT_COMMENT;
           bWasCommentStart = TRUE;
           continue;
@@ -302,7 +256,7 @@ out:
 
       if (bFirstChar)
         {
-          if (!xisspace (pszChars[I]))
+          if (!xisspace(pszChars[I]))
             bFirstChar = FALSE;
         }
 
@@ -319,17 +273,17 @@ out:
         {
           if (nIdentBegin >= 0)
             {
-              if (IsRexxKeyword (pszChars + nIdentBegin, I - nIdentBegin))
+              if (IsRexxKeyword(pszChars + nIdentBegin, I - nIdentBegin))
                 {
-                  DEFINE_BLOCK (nIdentBegin, COLORINDEX_KEYWORD);
+                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
                 }
-              else if (IsUser1Keyword (pszChars + nIdentBegin, I - nIdentBegin))
+              else if (IsUser1Keyword(pszChars + nIdentBegin, I - nIdentBegin))
                 {
-                  DEFINE_BLOCK (nIdentBegin, COLORINDEX_USER1);
+                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER1);
                 }
-              else if (IsRexxNumber (pszChars + nIdentBegin, I - nIdentBegin))
+              else if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
                 {
-                  DEFINE_BLOCK (nIdentBegin, COLORINDEX_NUMBER);
+                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
                 }
               else
                 {
@@ -337,7 +291,7 @@ out:
 
                   for (int j = I; j < nLength; j++)
                     {
-                      if (!xisspace (pszChars[j]))
+                      if (!xisspace(pszChars[j]))
                         {
                           if (pszChars[j] == '(')
                             {
@@ -348,7 +302,7 @@ out:
                     }
                   if (bFunction)
                     {
-                      DEFINE_BLOCK (nIdentBegin, COLORINDEX_FUNCNAME);
+                      DEFINE_BLOCK(nIdentBegin, COLORINDEX_FUNCNAME);
                     }
                 }
               bRedefineBlock = TRUE;
@@ -360,17 +314,17 @@ out:
 
   if (nIdentBegin >= 0)
     {
-      if (IsRexxKeyword (pszChars + nIdentBegin, I - nIdentBegin))
+      if (IsRexxKeyword(pszChars + nIdentBegin, I - nIdentBegin))
         {
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_KEYWORD);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
         }
-      else if (IsUser1Keyword (pszChars + nIdentBegin, I - nIdentBegin))
+      else if (IsUser1Keyword(pszChars + nIdentBegin, I - nIdentBegin))
         {
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_USER1);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER1);
         }
-      else if (IsRexxNumber (pszChars + nIdentBegin, I - nIdentBegin))
+      else if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
         {
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_NUMBER);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
         }
       else
         {
@@ -378,7 +332,7 @@ out:
 
           for (int j = I; j < nLength; j++)
             {
-              if (!xisspace (pszChars[j]))
+              if (!xisspace(pszChars[j]))
                 {
                   if (pszChars[j] == '(')
                     {
@@ -389,7 +343,7 @@ out:
             }
           if (bFunction)
             {
-              DEFINE_BLOCK (nIdentBegin, COLORINDEX_FUNCNAME);
+              DEFINE_BLOCK(nIdentBegin, COLORINDEX_FUNCNAME);
             }
         }
     }

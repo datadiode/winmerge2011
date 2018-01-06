@@ -301,6 +301,9 @@
     <ClCompile Include="DirViewColHandler.cpp" />
     <ClCompile Include="DirViewColItems.cpp" />
     <ClCompile Include="Common\DllProxies.cpp" />
+    <ClCompile Include="editlib\go.cpp" />
+    <ClCompile Include="editlib\rust.cpp" />
+    <ClCompile Include="editlib\vhdl.cpp" />
     <ClCompile Include="EditorFilepathBar.cpp" />
     <ClCompile Include="Environment.cpp" />
     <ClCompile Include="ExcelExport.cpp" />

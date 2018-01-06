@@ -21,12 +21,14 @@
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
 #endif
 
-//  C++ keywords (MSVC5.0 + POET5.0)
-static LPTSTR s_apszSgmlKeywordList[] =
+using CommonKeywords::IsNumeric;
+using HtmlKeywords::IsUser2Keyword;
+
+static BOOL IsSgmlKeyword(LPCTSTR pszChars, int nLength)
+{
+  static LPCTSTR const s_apszSgmlKeywordList[] =
   {
     _T ("ABSTRACT"),
     _T ("ARTICLE"),
@@ -46,12 +48,12 @@ static LPTSTR s_apszSgmlKeywordList[] =
     _T ("ENUMLIST"),
     _T ("EXAMPLE"),
     _T ("FOOTNOTE"),
-    _T ("FTPSITE"),
     _T ("FTPPATH"),
+    _T ("FTPSITE"),
     _T ("HEADING"),
     _T ("HTMLURL"),
-    _T ("HTTPSITE"),
     _T ("HTTPPATH"),
+    _T ("HTTPSITE"),
     _T ("IT"),
     _T ("ITEM"),
     _T ("ITEMIZE"),
@@ -83,177 +85,20 @@ static LPTSTR s_apszSgmlKeywordList[] =
     _T ("VAR"),
     _T ("VERB"),
     _T ("VERSION"),
-    NULL
   };
+  return xiskeyword<_tcsnicmp>(pszChars, nLength, s_apszSgmlKeywordList);
+}
 
-static LPTSTR s_apszUser1KeywordList[] =
+static BOOL IsUser1Keyword(LPCTSTR pszChars, int nLength)
+{
+  static LPCTSTR const s_apszUser1KeywordList[] =
   {
     _T ("COMPACT"),
     _T ("ID"),
     _T ("NAME"),
     _T ("SECTION"),
-    NULL
   };
-
-static LPTSTR s_apszUser2KeywordList[] =
-  {
-    _T ("nbsp"),
-    _T ("quot"),
-    _T ("amp"),
-    _T ("lt"),
-    _T ("gt"),
-    _T ("copy"),
-    _T ("reg"),
-    _T ("acute"),
-    _T ("laquo"),
-    _T ("raquo"),
-    _T ("iexcl"),
-    _T ("iquest"),
-    _T ("Agrave"),
-    _T ("agrave"),
-    _T ("Aacute"),
-    _T ("aacute"),
-    _T ("Acirc"),
-    _T ("acirc"),
-    _T ("Atilde"),
-    _T ("atilde"),
-    _T ("Auml"),
-    _T ("auml"),
-    _T ("Aring"),
-    _T ("aring"),
-    _T ("AElig"),
-    _T ("aelig"),
-    _T ("Ccedil"),
-    _T ("ccedil"),
-    _T ("ETH"),
-    _T ("eth"),
-    _T ("Egrave"),
-    _T ("egrave"),
-    _T ("Eacute"),
-    _T ("eacute"),
-    _T ("Ecirc"),
-    _T ("ecirc"),
-    _T ("Euml"),
-    _T ("euml"),
-    _T ("Igrave"),
-    _T ("igrave"),
-    _T ("Iacute"),
-    _T ("iacute"),
-    _T ("Icirc"),
-    _T ("icirc"),
-    _T ("Iuml"),
-    _T ("iuml"),
-    _T ("Ntilde"),
-    _T ("ntilde"),
-    _T ("Ograve"),
-    _T ("ograve"),
-    _T ("Oacute"),
-    _T ("oacute"),
-    _T ("Ocirc"),
-    _T ("ocirc"),
-    _T ("Otilde"),
-    _T ("otilde"),
-    _T ("Ouml"),
-    _T ("ouml"),
-    _T ("Oslash"),
-    _T ("oslash"),
-    _T ("Ugrave"),
-    _T ("ugrave"),
-    _T ("Uacute"),
-    _T ("uacute"),
-    _T ("Ucirc"),
-    _T ("ucirc"),
-    _T ("Uuml"),
-    _T ("uuml"),
-    _T ("Yacute"),
-    _T ("yacute"),
-    _T ("yuml"),
-    _T ("THORN"),
-    _T ("thorn"),
-    _T ("szlig"),
-    _T ("sect"),
-    _T ("para"),
-    _T ("micro"),
-    _T ("brvbar"),
-    _T ("plusmn"),
-    _T ("middot"),
-    _T ("uml"),
-    _T ("cedil"),
-    _T ("ordf"),
-    _T ("ordm"),
-    _T ("not"),
-    _T ("shy"),
-    _T ("macr"),
-    _T ("deg"),
-    _T ("sup1"),
-    _T ("sup2"),
-    _T ("sup3"),
-    _T ("frac14"),
-    _T ("frac12"),
-    _T ("frac34"),
-    _T ("times"),
-    _T ("divide"),
-    _T ("cent"),
-    _T ("pound"),
-    _T ("curren"),
-    _T ("yen"),
-    NULL
-  };
-
-static BOOL
-IsXKeyword (LPTSTR apszKeywords[], LPCTSTR pszChars, int nLength)
-{
-  for (int L = 0; apszKeywords[L] != NULL; L++)
-    {
-      if (_tcsnicmp (apszKeywords[L], pszChars, nLength) == 0
-            && apszKeywords[L][nLength] == 0)
-        return TRUE;
-    }
-  return FALSE;
-}
-
-static BOOL
-IsSgmlKeyword (LPCTSTR pszChars, int nLength)
-{
-  return IsXKeyword (s_apszSgmlKeywordList, pszChars, nLength);
-}
-
-static BOOL
-IsUser1Keyword (LPCTSTR pszChars, int nLength)
-{
-  return IsXKeyword (s_apszUser1KeywordList, pszChars, nLength);
-}
-
-static BOOL
-IsUser2Keyword (LPCTSTR pszChars, int nLength)
-{
-  return IsXKeyword (s_apszUser2KeywordList, pszChars, nLength);
-}
-
-static BOOL
-IsSgmlNumber (LPCTSTR pszChars, int nLength)
-{
-  if (nLength > 2 && pszChars[0] == '0' && pszChars[1] == 'x')
-    {
-      for (int I = 2; I < nLength; I++)
-        {
-          if (_istdigit (pszChars[I]) || (pszChars[I] >= 'A' && pszChars[I] <= 'F') ||
-                (pszChars[I] >= 'a' && pszChars[I] <= 'f'))
-            continue;
-          return FALSE;
-        }
-      return TRUE;
-    }
-  if (!_istdigit (pszChars[0]))
-    return FALSE;
-  for (int I = 1; I < nLength; I++)
-    {
-      if (!_istdigit (pszChars[I]) && pszChars[I] != '+' &&
-            pszChars[I] != '-' && pszChars[I] != '.' && pszChars[I] != 'e' &&
-            pszChars[I] != 'E')
-        return FALSE;
-    }
-  return TRUE;
+  return xiskeyword<_tcsnicmp>(pszChars, nLength, s_apszUser1KeywordList);
 }
 
 #define DEFINE_BLOCK(pos, colorindex)   \
@@ -281,7 +126,7 @@ DWORD CCrystalTextView::ParseLineSgml(DWORD dwCookie, int nLineIndex, TEXTBLOCK 
   if (nLength == 0)
     return dwCookie & COOKIE_EXT_COMMENT;
 
-  LPCTSTR pszChars = GetLineChars(nLineIndex);
+  const LPCTSTR pszChars = GetLineChars(nLineIndex);
   BOOL bFirstChar = (dwCookie & ~COOKIE_EXT_COMMENT) == 0;
   BOOL bRedefineBlock = TRUE;
   BOOL bDecIndex = FALSE;
@@ -297,25 +142,25 @@ DWORD CCrystalTextView::ParseLineSgml(DWORD dwCookie, int nLineIndex, TEXTBLOCK 
             nPos = nPrevI;
           if (dwCookie & (COOKIE_COMMENT | COOKIE_EXT_COMMENT))
             {
-              DEFINE_BLOCK (nPos, COLORINDEX_COMMENT);
+              DEFINE_BLOCK(nPos, COLORINDEX_COMMENT);
             }
           else if (dwCookie & (COOKIE_CHAR | COOKIE_STRING))
             {
-              DEFINE_BLOCK (nPos, COLORINDEX_STRING);
+              DEFINE_BLOCK(nPos, COLORINDEX_STRING);
             }
           else if (dwCookie & COOKIE_PREPROCESSOR)
             {
-              DEFINE_BLOCK (nPos, COLORINDEX_PREPROCESSOR);
+              DEFINE_BLOCK(nPos, COLORINDEX_PREPROCESSOR);
             }
           else
             {
               if (xisalnum(pszChars[nPos]) || pszChars[nPos] == '.')
                 {
-                  DEFINE_BLOCK (nPos, COLORINDEX_NORMALTEXT);
+                  DEFINE_BLOCK(nPos, COLORINDEX_NORMALTEXT);
                 }
               else
                 {
-                  DEFINE_BLOCK (nPos, COLORINDEX_OPERATOR);
+                  DEFINE_BLOCK(nPos, COLORINDEX_OPERATOR);
                   bRedefineBlock = TRUE;
                   bDecIndex = TRUE;
                   goto out;
@@ -333,7 +178,7 @@ out:
 
       if (dwCookie & COOKIE_COMMENT)
         {
-          DEFINE_BLOCK (I, COLORINDEX_COMMENT);
+          DEFINE_BLOCK(I, COLORINDEX_COMMENT);
           dwCookie |= COOKIE_COMMENT;
           break;
         }
@@ -385,7 +230,7 @@ out:
       //  Normal text
       if (pszChars[I] == '"')
         {
-          DEFINE_BLOCK (I, COLORINDEX_STRING);
+          DEFINE_BLOCK(I, COLORINDEX_STRING);
           dwCookie |= COOKIE_STRING;
           continue;
         }
@@ -394,14 +239,14 @@ out:
           // if (I + 1 < nLength && pszChars[I + 1] == '\'' || I + 2 < nLength && pszChars[I + 1] != '\\' && pszChars[I + 2] == '\'' || I + 3 < nLength && pszChars[I + 1] == '\\' && pszChars[I + 3] == '\'')
           if (!I || !xisalnum(pszChars[nPrevI]))
             {
-              DEFINE_BLOCK (I, COLORINDEX_STRING);
+              DEFINE_BLOCK(I, COLORINDEX_STRING);
               dwCookie |= COOKIE_CHAR;
               continue;
             }
         }
       if (!(dwCookie & COOKIE_EXT_USER1) && I < nLength - 3 && pszChars[I] == '<' && pszChars[I + 1] == '!' && pszChars[I + 2] == '-' && pszChars[I + 3] == '-')
         {
-          DEFINE_BLOCK (I, COLORINDEX_COMMENT);
+          DEFINE_BLOCK(I, COLORINDEX_COMMENT);
           I += 3;
           dwCookie |= COOKIE_EXT_COMMENT;
           dwCookie &= ~COOKIE_PREPROCESSOR;
@@ -410,7 +255,7 @@ out:
 
       if (bFirstChar)
         {
-          if (!xisspace (pszChars[I]))
+          if (!xisspace(pszChars[I]))
             bFirstChar = FALSE;
         }
 
@@ -429,17 +274,17 @@ out:
             {
               if (dwCookie & COOKIE_PREPROCESSOR)
                 {
-                  if (IsSgmlKeyword (pszChars + nIdentBegin, I - nIdentBegin))
+                  if (IsSgmlKeyword(pszChars + nIdentBegin, I - nIdentBegin))
                     {
-                      DEFINE_BLOCK (nIdentBegin, COLORINDEX_KEYWORD);
+                      DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
                     }
-                  else if (IsUser1Keyword (pszChars + nIdentBegin, I - nIdentBegin))
+                  else if (IsUser1Keyword(pszChars + nIdentBegin, I - nIdentBegin))
                     {
-                      DEFINE_BLOCK (nIdentBegin, COLORINDEX_USER1);
+                      DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER1);
                     }
-                  else if (IsSgmlNumber (pszChars + nIdentBegin, I - nIdentBegin))
+                  else if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
                     {
-                      DEFINE_BLOCK (nIdentBegin, COLORINDEX_NUMBER);
+                      DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
                     }
                   else
                     {
@@ -448,18 +293,18 @@ out:
                 }
               else if (dwCookie & COOKIE_USER1)
                 {
-                  if (IsUser2Keyword (pszChars + nIdentBegin, I - nIdentBegin))
+                  if (IsUser2Keyword(pszChars + nIdentBegin, I - nIdentBegin))
                     {
-                      DEFINE_BLOCK (nIdentBegin, COLORINDEX_USER2);
+                      DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER2);
                     }
                   else
                     {
                       goto next;
                     }
                 }
-              else if (IsSgmlNumber (pszChars + nIdentBegin, I - nIdentBegin))
+              else if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
                 {
-                  DEFINE_BLOCK (nIdentBegin, COLORINDEX_NUMBER);
+                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
                 }
               else
                 {
@@ -474,7 +319,7 @@ next:
           //  Preprocessor start: < or bracket
           if (!(dwCookie & COOKIE_EXT_USER1) && pszChars[I] == '<' && !(I < nLength - 3 && pszChars[I + 1] == '!' && pszChars[I + 2] == '-' && pszChars[I + 3] == '-') || pszChars[I] == '{')
             {
-              DEFINE_BLOCK (I + 1, COLORINDEX_PREPROCESSOR);
+              DEFINE_BLOCK(I + 1, COLORINDEX_PREPROCESSOR);
               dwCookie |= COOKIE_PREPROCESSOR;
               nIdentBegin = -1;
               continue;
@@ -515,27 +360,27 @@ next:
 
   if (nIdentBegin >= 0 && (dwCookie & COOKIE_PREPROCESSOR))
     {
-      if (IsSgmlKeyword (pszChars + nIdentBegin, I - nIdentBegin))
+      if (IsSgmlKeyword(pszChars + nIdentBegin, I - nIdentBegin))
         {
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_KEYWORD);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
         }
-      else if (IsUser1Keyword (pszChars + nIdentBegin, I - nIdentBegin))
+      else if (IsUser1Keyword(pszChars + nIdentBegin, I - nIdentBegin))
         {
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_USER1);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER1);
         }
-      else if (IsUser2Keyword (pszChars + nIdentBegin, I - nIdentBegin))
+      else if (IsUser2Keyword(pszChars + nIdentBegin, I - nIdentBegin))
         {
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_USER2);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER2);
         }
-      else if (IsSgmlNumber (pszChars + nIdentBegin, I - nIdentBegin))
+      else if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
         {
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_NUMBER);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
         }
     }
   //  Preprocessor start: < or {
   if (!(dwCookie & COOKIE_EXT_USER1) && pszChars[I] == '<' && !(I < nLength - 3 && pszChars[I + 1] == '!' && pszChars[I + 2] == '-' && pszChars[I + 3] == '-') || pszChars[I] == '{')
     {
-      DEFINE_BLOCK (I + 1, COLORINDEX_PREPROCESSOR);
+      DEFINE_BLOCK(I + 1, COLORINDEX_PREPROCESSOR);
       dwCookie |= COOKIE_PREPROCESSOR;
       nIdentBegin = -1;
       goto end;

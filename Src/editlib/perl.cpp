@@ -16,49 +16,28 @@
 
 #include "StdAfx.h"
 #include "ccrystaltextview.h"
-#include "ccrystaltextbuffer.h"
 #include "SyntaxColors.h"
 #include "string_util.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
 #endif
 
-//  C++ keywords (MSVC5.0 + POET5.0)
-static LPTSTR s_apszPerlKeywordList[] =
+using CommonKeywords::IsNumeric;
+
+static BOOL IsPerlKeyword(LPCTSTR pszChars, int nLength)
+{
+  static LPCTSTR const s_apszPerlKeywordList[] =
   {
-    _T ("q"),
-    _T ("qq"),
-    _T ("qw"),
-    _T ("qx"),
-    _T ("m"),
-    _T ("s"),
-    _T ("y"),
-    _T ("tr"),
-    _T ("if"),
-    _T ("sub"),
-    _T ("return"),
-    _T ("while"),
-    _T ("for"),
-    _T ("elsif"),
-    _T ("foreach"),
-    _T ("else"),
-    _T ("unless"),
-    _T ("eq"),
-    _T ("not"),
-    _T ("and"),
-    _T ("or"),
-    _T ("ne"),
-    _T ("until"),
     _T ("abs"),
     _T ("accept"),
     _T ("alarm"),
+    _T ("and"),
     _T ("atan2"),
     _T ("bind"),
     _T ("binmode"),
     _T ("bless"),
+    _T ("bootstrap"),
     _T ("caller"),
     _T ("chdir"),
     _T ("chmod"),
@@ -70,6 +49,7 @@ static LPTSTR s_apszPerlKeywordList[] =
     _T ("close"),
     _T ("closedir"),
     _T ("connect"),
+    _T ("continue"),
     _T ("cos"),
     _T ("crypt"),
     _T ("dbmclose"),
@@ -80,7 +60,16 @@ static LPTSTR s_apszPerlKeywordList[] =
     _T ("do"),
     _T ("dump"),
     _T ("each"),
+    _T ("else"),
+    _T ("elsif"),
+    _T ("endgrent"),
+    _T ("endhostent"),
+    _T ("endnetent"),
+    _T ("endprotoent"),
+    _T ("endpwent"),
+    _T ("endservent"),
     _T ("eof"),
+    _T ("eq"),
     _T ("eval"),
     _T ("exec"),
     _T ("exists"),
@@ -89,44 +78,35 @@ static LPTSTR s_apszPerlKeywordList[] =
     _T ("fcntl"),
     _T ("fileno"),
     _T ("flock"),
+    _T ("for"),
+    _T ("foreach"),
     _T ("fork"),
     _T ("formline"),
     _T ("getc"),
+    _T ("getgrent"),
+    _T ("getgrgid"),
+    _T ("getgrnam"),
+    _T ("getgrname"),
+    _T ("gethostbyaddr"),
+    _T ("gethostbyname"),
+    _T ("gethostent"),
     _T ("getlogin"),
+    _T ("getnetbyaddr"),
+    _T ("getnetbyname"),
+    _T ("getnetent"),
     _T ("getpeername"),
     _T ("getpgrp"),
     _T ("getppid"),
     _T ("getpriority"),
-    _T ("getpwnam"),
-    _T ("getgrname"),
-    _T ("gethostbyname"),
-    _T ("getnetbyname"),
     _T ("getprotobyname"),
-    _T ("getpwuid"),
-    _T ("getgrgid"),
-    _T ("getservbyname"),
-    _T ("gethostbyaddr"),
-    _T ("getnetbyaddr"),
     _T ("getprotobynumber"),
-    _T ("getservbyport"),
-    _T ("getpwent"),
-    _T ("getgrent"),
-    _T ("gethostent"),
-    _T ("getnetent"),
     _T ("getprotoent"),
+    _T ("getpwent"),
+    _T ("getpwnam"),
+    _T ("getpwuid"),
+    _T ("getservbyname"),
+    _T ("getservbyport"),
     _T ("getservent"),
-    _T ("setpwent"),
-    _T ("setgrent"),
-    _T ("sethostent"),
-    _T ("setnetent"),
-    _T ("setprotoent"),
-    _T ("setservent"),
-    _T ("endpwent"),
-    _T ("endgrent"),
-    _T ("endhostent"),
-    _T ("endnetent"),
-    _T ("endprotoent"),
-    _T ("endservent"),
     _T ("getsockname"),
     _T ("getsockopt"),
     _T ("glob"),
@@ -134,6 +114,7 @@ static LPTSTR s_apszPerlKeywordList[] =
     _T ("goto"),
     _T ("grep"),
     _T ("hex"),
+    _T ("if"),
     _T ("import"),
     _T ("index"),
     _T ("int"),
@@ -151,27 +132,36 @@ static LPTSTR s_apszPerlKeywordList[] =
     _T ("localtime"),
     _T ("log"),
     _T ("lstat"),
+    _T ("m"),
     _T ("map"),
     _T ("mkdir"),
     _T ("msgctl"),
     _T ("msgget"),
-    _T ("msgsnd"),
     _T ("msgrcv"),
+    _T ("msgsnd"),
     _T ("my"),
+    _T ("ne"),
     _T ("next"),
     _T ("no"),
+    _T ("not"),
     _T ("oct"),
     _T ("open"),
     _T ("opendir"),
+    _T ("or"),
     _T ("ord"),
     _T ("pack"),
+    _T ("package"),
     _T ("pipe"),
     _T ("pop"),
     _T ("pos"),
     _T ("print"),
     _T ("printf"),
     _T ("push"),
+    _T ("q"),
+    _T ("qq"),
     _T ("quotemeta"),
+    _T ("qw"),
+    _T ("qx"),
     _T ("rand"),
     _T ("read"),
     _T ("readdir"),
@@ -183,10 +173,12 @@ static LPTSTR s_apszPerlKeywordList[] =
     _T ("require"),
     _T ("reset"),
     _T ("return"),
+    _T ("return"),
     _T ("reverse"),
     _T ("rewinddir"),
     _T ("rindex"),
     _T ("rmdir"),
+    _T ("s"),
     _T ("scalar"),
     _T ("seek"),
     _T ("seekdir"),
@@ -195,12 +187,18 @@ static LPTSTR s_apszPerlKeywordList[] =
     _T ("semget"),
     _T ("semop"),
     _T ("send"),
+    _T ("setgrent"),
+    _T ("sethostent"),
+    _T ("setnetent"),
     _T ("setpgrp"),
     _T ("setpriority"),
+    _T ("setprotoent"),
+    _T ("setpwent"),
+    _T ("setservent"),
     _T ("setsockopt"),
+    _T ("sgmget"),
     _T ("shift"),
     _T ("shmctl"),
-    _T ("sgmget"),
     _T ("shmread"),
     _T ("shmwrite"),
     _T ("shutdown"),
@@ -216,26 +214,31 @@ static LPTSTR s_apszPerlKeywordList[] =
     _T ("srand"),
     _T ("stat"),
     _T ("study"),
+    _T ("sub"),
     _T ("substr"),
     _T ("symlink"),
     _T ("syscall"),
     _T ("sysread"),
     _T ("system"),
     _T ("syswrite"),
+    _T ("tan"),
     _T ("tell"),
     _T ("telldir"),
     _T ("tie"),
     _T ("time"),
     _T ("times"),
+    _T ("tr"),
     _T ("truncate"),
     _T ("uc"),
     _T ("ucfirst"),
     _T ("umask"),
     _T ("undef"),
+    _T ("unless"),
     _T ("unlink"),
     _T ("unpack"),
-    _T ("untie"),
     _T ("unshift"),
+    _T ("untie"),
+    _T ("until"),
     _T ("use"),
     _T ("utime"),
     _T ("values"),
@@ -244,58 +247,12 @@ static LPTSTR s_apszPerlKeywordList[] =
     _T ("waitpid"),
     _T ("wantarray"),
     _T ("warn"),
+    _T ("while"),
     _T ("write"),
     _T ("x"),
-    _T ("continue"),
-    _T ("package"),
-    _T ("bootstrap"),
-    _T ("getgrnam"),
-    _T ("tan"),
-    NULL
+    _T ("y"),
   };
-
-static BOOL
-IsXKeyword (LPTSTR apszKeywords[], LPCTSTR pszChars, int nLength)
-{
-  for (int L = 0; apszKeywords[L] != NULL; L++)
-    {
-      if (_tcsnicmp (apszKeywords[L], pszChars, nLength) == 0
-            && apszKeywords[L][nLength] == 0)
-        return TRUE;
-    }
-  return FALSE;
-}
-
-static BOOL
-IsPerlKeyword (LPCTSTR pszChars, int nLength)
-{
-  return IsXKeyword (s_apszPerlKeywordList, pszChars, nLength);
-}
-
-static BOOL
-IsPerlNumber (LPCTSTR pszChars, int nLength)
-{
-  if (nLength > 2 && pszChars[0] == '0' && pszChars[1] == 'x')
-    {
-      for (int I = 2; I < nLength; I++)
-        {
-          if (_istdigit (pszChars[I]) || (pszChars[I] >= 'A' && pszChars[I] <= 'F') ||
-                (pszChars[I] >= 'a' && pszChars[I] <= 'f'))
-            continue;
-          return FALSE;
-        }
-      return TRUE;
-    }
-  if (!_istdigit (pszChars[0]))
-    return FALSE;
-  for (int I = 1; I < nLength; I++)
-    {
-      if (!_istdigit (pszChars[I]) && pszChars[I] != '+' &&
-            pszChars[I] != '-' && pszChars[I] != '.' && pszChars[I] != 'e' &&
-            pszChars[I] != 'E')
-        return FALSE;
-    }
-  return TRUE;
+  return xiskeyword<_tcsnicmp>(pszChars, nLength, s_apszPerlKeywordList);
 }
 
 #define DEFINE_BLOCK(pos, colorindex)   \
@@ -321,7 +278,7 @@ DWORD CCrystalTextView::ParseLinePerl(DWORD dwCookie, int nLineIndex, TEXTBLOCK 
   if (nLength == 0)
     return dwCookie & COOKIE_EXT_COMMENT;
 
-  LPCTSTR pszChars = GetLineChars(nLineIndex);
+  const LPCTSTR pszChars = GetLineChars(nLineIndex);
   BOOL bFirstChar = (dwCookie & ~COOKIE_EXT_COMMENT) == 0;
   BOOL bRedefineBlock = TRUE;
   BOOL bDecIndex = FALSE;
@@ -337,21 +294,21 @@ DWORD CCrystalTextView::ParseLinePerl(DWORD dwCookie, int nLineIndex, TEXTBLOCK 
             nPos = nPrevI;
           if (dwCookie & (COOKIE_COMMENT | COOKIE_EXT_COMMENT))
             {
-              DEFINE_BLOCK (nPos, COLORINDEX_COMMENT);
+              DEFINE_BLOCK(nPos, COLORINDEX_COMMENT);
             }
           else if (dwCookie & (COOKIE_CHAR | COOKIE_STRING))
             {
-              DEFINE_BLOCK (nPos, COLORINDEX_STRING);
+              DEFINE_BLOCK(nPos, COLORINDEX_STRING);
             }
           else
             {
               if (xisalnum(pszChars[nPos]) || pszChars[nPos] == '.' && nPos > 0 && (!xisalpha(pszChars[nPos - 1]) && !xisalpha(pszChars[nPos + 1])))
                 {
-                  DEFINE_BLOCK (nPos, COLORINDEX_NORMALTEXT);
+                  DEFINE_BLOCK(nPos, COLORINDEX_NORMALTEXT);
                 }
               else
                 {
-                  DEFINE_BLOCK (nPos, COLORINDEX_OPERATOR);
+                  DEFINE_BLOCK(nPos, COLORINDEX_OPERATOR);
                   bRedefineBlock = TRUE;
                   bDecIndex = TRUE;
                   goto out;
@@ -369,7 +326,7 @@ out:
 
       if (dwCookie & COOKIE_COMMENT)
         {
-          DEFINE_BLOCK (I, COLORINDEX_COMMENT);
+          DEFINE_BLOCK(I, COLORINDEX_COMMENT);
           dwCookie |= COOKIE_COMMENT;
           break;
         }
@@ -398,7 +355,7 @@ out:
 
       if (pszChars[I] == '#')
         {
-          DEFINE_BLOCK (I, COLORINDEX_COMMENT);
+          DEFINE_BLOCK(I, COLORINDEX_COMMENT);
           dwCookie |= COOKIE_COMMENT;
           break;
         }
@@ -406,7 +363,7 @@ out:
       //  Normal text
       if (pszChars[I] == '"')
         {
-          DEFINE_BLOCK (I, COLORINDEX_STRING);
+          DEFINE_BLOCK(I, COLORINDEX_STRING);
           dwCookie |= COOKIE_STRING;
           continue;
         }
@@ -415,7 +372,7 @@ out:
           // if (I + 1 < nLength && pszChars[I + 1] == '\'' || I + 2 < nLength && pszChars[I + 1] != '\\' && pszChars[I + 2] == '\'' || I + 3 < nLength && pszChars[I + 1] == '\\' && pszChars[I + 3] == '\'')
           if (!I || !xisalnum(pszChars[nPrevI]))
             {
-              DEFINE_BLOCK (I, COLORINDEX_STRING);
+              DEFINE_BLOCK(I, COLORINDEX_STRING);
               dwCookie |= COOKIE_CHAR;
               continue;
             }
@@ -423,7 +380,7 @@ out:
 
       if (bFirstChar)
         {
-          if (!xisspace (pszChars[I]))
+          if (!xisspace(pszChars[I]))
             bFirstChar = FALSE;
         }
 
@@ -440,13 +397,13 @@ out:
         {
           if (nIdentBegin >= 0)
             {
-              if (IsPerlKeyword (pszChars + nIdentBegin, I - nIdentBegin))
+              if (IsPerlKeyword(pszChars + nIdentBegin, I - nIdentBegin))
                 {
-                  DEFINE_BLOCK (nIdentBegin, COLORINDEX_KEYWORD);
+                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
                 }
-              else if (IsPerlNumber (pszChars + nIdentBegin, I - nIdentBegin))
+              else if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
                 {
-                  DEFINE_BLOCK (nIdentBegin, COLORINDEX_NUMBER);
+                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
                 }
               else
                 {
@@ -454,7 +411,7 @@ out:
 
                   for (int j = I; j < nLength; j++)
                     {
-                      if (!xisspace (pszChars[j]))
+                      if (!xisspace(pszChars[j]))
                         {
                           if (pszChars[j] == '(')
                             {
@@ -465,7 +422,7 @@ out:
                     }
                   if (bFunction)
                     {
-                      DEFINE_BLOCK (nIdentBegin, COLORINDEX_FUNCNAME);
+                      DEFINE_BLOCK(nIdentBegin, COLORINDEX_FUNCNAME);
                     }
                 }
               bRedefineBlock = TRUE;
@@ -477,13 +434,13 @@ out:
 
   if (nIdentBegin >= 0)
     {
-      if (IsPerlKeyword (pszChars + nIdentBegin, I - nIdentBegin))
+      if (IsPerlKeyword(pszChars + nIdentBegin, I - nIdentBegin))
         {
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_KEYWORD);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
         }
-      else if (IsPerlNumber (pszChars + nIdentBegin, I - nIdentBegin))
+      else if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
         {
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_NUMBER);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
         }
       else
         {
@@ -491,7 +448,7 @@ out:
 
           for (int j = I; j < nLength; j++)
             {
-              if (!xisspace (pszChars[j]))
+              if (!xisspace(pszChars[j]))
                 {
                   if (pszChars[j] == '(')
                     {
@@ -502,7 +459,7 @@ out:
             }
           if (bFunction)
             {
-              DEFINE_BLOCK (nIdentBegin, COLORINDEX_FUNCNAME);
+              DEFINE_BLOCK(nIdentBegin, COLORINDEX_FUNCNAME);
             }
         }
     }

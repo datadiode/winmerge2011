@@ -16,18 +16,19 @@
 
 #include "StdAfx.h"
 #include "ccrystaltextview.h"
-#include "ccrystaltextbuffer.h"
 #include "SyntaxColors.h"
 #include "string_util.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
 #endif
 
+using CommonKeywords::IsNumeric;
+
 // Ruby reserved words.
-static LPTSTR s_apszRubyKeywordList[] =
+static BOOL IsRubyKeyword(LPCTSTR pszChars, int nLength)
+{
+  static LPCTSTR const s_apszRubyKeywordList[] =
   {
     _T ("BEGIN"),
     _T ("END"),
@@ -77,90 +78,44 @@ static LPTSTR s_apszRubyKeywordList[] =
     _T ("when"),
     _T ("while"),
     _T ("yield"),
-    NULL
   };
+  return xiskeyword<_tcsncmp>(pszChars, nLength, s_apszRubyKeywordList);
+}
 
 // Ruby constants (preprocessor color).
-static LPTSTR s_apszRubyConstantsList[] =
+static BOOL IsRubyConstant(LPCTSTR pszChars, int nLength)
+{
+  static LPCTSTR const s_apszRubyConstantsList[] =
   {
-    _T ("$defout"),
-    _T ("$deferr"),
-    _T ("$stderr"),
-    _T ("$stdin"),
-    _T ("$stdout"),
     _T ("$DEBUG"),
     _T ("$FILENAME"),
     _T ("$LOAD_PATH"),
     _T ("$SAFE"),
     _T ("$VERBOSE"),
-    _T ("__FILE__"),
-    _T ("__LINE__"),
+    _T ("$deferr"),
+    _T ("$defout"),
+    _T ("$stderr"),
+    _T ("$stdin"),
+    _T ("$stdout"),
     _T ("ARGF"),
     _T ("ARGV"),
-    _T ("ENV"),
     _T ("DATA"),
+    _T ("ENV"),
     _T ("FALSE"),
     _T ("NIL"),
     _T ("RUBY_PLATFORM"),
     _T ("RUBY_RELEASE_DATE"),
     _T ("RUBY_VERSION"),
+    _T ("SCRIPT_LINES__"),
     _T ("STDERR"),
     _T ("STDIN"),
     _T ("STDOUT"),
-    _T ("SCRIPT_LINES__"),
     _T ("TOPLEVEL_BINDING"),
     _T ("TRUE"),
-    NULL
+    _T ("__FILE__"),
+    _T ("__LINE__"),
   };
-
-static BOOL
-IsXKeyword (LPTSTR apszKeywords[], LPCTSTR pszChars, int nLength)
-{
-  for (int L = 0; apszKeywords[L] != NULL; L++)
-    {
-      if (_tcsnicmp (apszKeywords[L], pszChars, nLength) == 0
-            && apszKeywords[L][nLength] == 0)
-        return TRUE;
-    }
-  return FALSE;
-}
-
-static BOOL
-IsRubyKeyword (LPCTSTR pszChars, int nLength)
-{
-  return IsXKeyword (s_apszRubyKeywordList, pszChars, nLength);
-}
-
-static BOOL
-IsRubyConstant (LPCTSTR pszChars, int nLength)
-{
-  return IsXKeyword (s_apszRubyConstantsList, pszChars, nLength);
-}
-
-static BOOL
-IsRubyNumber (LPCTSTR pszChars, int nLength)
-{
-  if (nLength > 2 && pszChars[0] == '0' && pszChars[1] == 'x')
-    {
-      for (int I = 2; I < nLength; I++)
-        {
-          if (_istdigit (pszChars[I]) || (pszChars[I] >= 'A' && pszChars[I] <= 'F') ||
-                (pszChars[I] >= 'a' && pszChars[I] <= 'f'))
-            continue;
-          return FALSE;
-        }
-      return TRUE;
-    }
-  if (!_istdigit (pszChars[0]))
-    return FALSE;
-  for (int I = 1; I < nLength; I++)
-    {
-      if (!_istdigit (pszChars[I]) && pszChars[I] != '+' &&
-            pszChars[I] != '-' && pszChars[I] != '.' && pszChars[I] != 'e' &&
-            pszChars[I] != 'E')
-        return FALSE;
-    }
-  return TRUE;
+  return xiskeyword<_tcsncmp>(pszChars, nLength, s_apszRubyConstantsList);
 }
 
 #define DEFINE_BLOCK(pos, colorindex)   \
@@ -183,11 +138,11 @@ if (pBuf != NULL)\
 
 DWORD CCrystalTextView::ParseLineRuby(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems)
 {
-  int nLength = GetLineLength(nLineIndex);
+  const int nLength = GetLineLength(nLineIndex);
   if (nLength == 0)
     return dwCookie & COOKIE_EXT_COMMENT;
 
-  LPCTSTR pszChars = GetLineChars(nLineIndex);
+  const LPCTSTR pszChars = GetLineChars(nLineIndex);
   BOOL bFirstChar = (dwCookie & ~COOKIE_EXT_COMMENT) == 0;
   BOOL bRedefineBlock = TRUE;
   BOOL bDecIndex = FALSE;
@@ -203,25 +158,25 @@ DWORD CCrystalTextView::ParseLineRuby(DWORD dwCookie, int nLineIndex, TEXTBLOCK 
             nPos = nPrevI;
           if (dwCookie & (COOKIE_COMMENT | COOKIE_EXT_COMMENT))
             {
-              DEFINE_BLOCK (nPos, COLORINDEX_COMMENT);
+              DEFINE_BLOCK(nPos, COLORINDEX_COMMENT);
             }
           else if (dwCookie & (COOKIE_CHAR | COOKIE_STRING))
             {
-              DEFINE_BLOCK (nPos, COLORINDEX_STRING);
+              DEFINE_BLOCK(nPos, COLORINDEX_STRING);
             }
           else if (dwCookie & COOKIE_VARIABLE)
             {
-              DEFINE_BLOCK (nPos, COLORINDEX_USER1);
+              DEFINE_BLOCK(nPos, COLORINDEX_USER1);
             }
           else
             {
               if (xisalnum(pszChars[nPos]) || pszChars[nPos] == '.' && nPos > 0 && (!xisalpha(pszChars[nPos - 1]) && !xisalpha(pszChars[nPos + 1])))
                 {
-                  DEFINE_BLOCK (nPos, COLORINDEX_NORMALTEXT);
+                  DEFINE_BLOCK(nPos, COLORINDEX_NORMALTEXT);
                 }
               else
                 {
-                  DEFINE_BLOCK (nPos, COLORINDEX_OPERATOR);
+                  DEFINE_BLOCK(nPos, COLORINDEX_OPERATOR);
                   bRedefineBlock = TRUE;
                   bDecIndex = TRUE;
                   goto out;
@@ -239,7 +194,7 @@ out:
 
       if (dwCookie & COOKIE_COMMENT)
         {
-          DEFINE_BLOCK (I, COLORINDEX_COMMENT);
+          DEFINE_BLOCK(I, COLORINDEX_COMMENT);
           dwCookie |= COOKIE_COMMENT;
           break;
         }
@@ -268,7 +223,7 @@ out:
 
       if (pszChars[I] == '#')
         {
-          DEFINE_BLOCK (I, COLORINDEX_COMMENT);
+          DEFINE_BLOCK(I, COLORINDEX_COMMENT);
           dwCookie |= COOKIE_COMMENT;
           break;
         }
@@ -276,7 +231,7 @@ out:
       //  Normal text
       if (pszChars[I] == '"')
         {
-          DEFINE_BLOCK (I, COLORINDEX_STRING);
+          DEFINE_BLOCK(I, COLORINDEX_STRING);
           dwCookie |= COOKIE_STRING;
           continue;
         }
@@ -285,7 +240,7 @@ out:
         {
           if (!I || !xisalnum(pszChars[nPrevI]))
             {
-              DEFINE_BLOCK (I, COLORINDEX_STRING);
+              DEFINE_BLOCK(I, COLORINDEX_STRING);
               dwCookie |= COOKIE_CHAR;
               continue;
             }
@@ -294,7 +249,7 @@ out:
 	  // Variable begins
       if (pszChars[I] == '$' || pszChars[I] == '@')
         {
-		  DEFINE_BLOCK (I, COLORINDEX_USER1);
+		  DEFINE_BLOCK(I, COLORINDEX_USER1);
           dwCookie |= COOKIE_VARIABLE;
           continue;
         }
@@ -313,7 +268,7 @@ out:
 
       if (bFirstChar)
         {
-          if (!xisspace (pszChars[I]))
+          if (!xisspace(pszChars[I]))
             bFirstChar = FALSE;
         }
 
@@ -330,17 +285,17 @@ out:
         {
           if (nIdentBegin >= 0)
             {
-              if (IsRubyKeyword (pszChars + nIdentBegin, I - nIdentBegin))
+              if (IsRubyKeyword(pszChars + nIdentBegin, I - nIdentBegin))
                 {
-                  DEFINE_BLOCK (nIdentBegin, COLORINDEX_KEYWORD);
+                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
                 }
               else if (IsRubyConstant (pszChars + nIdentBegin, I - nIdentBegin))
                 {
-                  DEFINE_BLOCK (nIdentBegin, COLORINDEX_PREPROCESSOR);
+                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_PREPROCESSOR);
                 }
-              else if (IsRubyNumber (pszChars + nIdentBegin, I - nIdentBegin))
+              else if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
                 {
-                  DEFINE_BLOCK (nIdentBegin, COLORINDEX_NUMBER);
+                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
                 }
               else
                 {
@@ -348,7 +303,7 @@ out:
 
                   for (int j = I; j < nLength; j++)
                     {
-                      if (!xisspace (pszChars[j]))
+                      if (!xisspace(pszChars[j]))
                         {
                           if (pszChars[j] == '(')
                             {
@@ -359,7 +314,7 @@ out:
                     }
                   if (bFunction)
                     {
-                      DEFINE_BLOCK (nIdentBegin, COLORINDEX_FUNCNAME);
+                      DEFINE_BLOCK(nIdentBegin, COLORINDEX_FUNCNAME);
                     }
                 }
               bRedefineBlock = TRUE;
@@ -371,17 +326,17 @@ out:
 
   if (nIdentBegin >= 0)
     {
-      if (IsRubyKeyword (pszChars + nIdentBegin, I - nIdentBegin))
+      if (IsRubyKeyword(pszChars + nIdentBegin, I - nIdentBegin))
         {
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_KEYWORD);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
         }
       else if (IsRubyConstant (pszChars + nIdentBegin, I - nIdentBegin))
         {
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_PREPROCESSOR);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_PREPROCESSOR);
         }
-      else if (IsRubyNumber (pszChars + nIdentBegin, I - nIdentBegin))
+      else if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
         {
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_NUMBER);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
         }
       else
         {
@@ -389,7 +344,7 @@ out:
 
           for (int j = I; j < nLength; j++)
             {
-              if (!xisspace (pszChars[j]))
+              if (!xisspace(pszChars[j]))
                 {
                   if (pszChars[j] == '(')
                     {
@@ -400,7 +355,7 @@ out:
             }
           if (bFunction)
             {
-              DEFINE_BLOCK (nIdentBegin, COLORINDEX_FUNCNAME);
+              DEFINE_BLOCK(nIdentBegin, COLORINDEX_FUNCNAME);
             }
         }
     }

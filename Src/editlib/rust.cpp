@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////
-//  File:    rsrc.cpp
-//  Version: 1.1.0.4
-//  Updated: 19-Jul-1998
+//  File:       rust.cpp
+//  Version:    1.0.0.0
+//  Created:    23-Jul-2017
 //
-//  Copyright:  Ferdinand Prantl, portions by Stcherbatchenko Andrei
-//  E-mail:     prantl@ff.cuni.cz
+//  Copyright:  Stcherbatchenko Andrei, portions by Takashi Sawanaka
+//  E-mail:     sdottaka@users.sourceforge.net
 //
-//  Windows resources syntax highlighing definition
+//  Rust syntax highlighing definition
 //
 //  You are free to use or modify this code to the following restrictions:
 //  - Acknowledge me somewhere in your about box, simple "Parts of code by.."
@@ -25,149 +25,89 @@
 
 using CommonKeywords::IsNumeric;
 
-static BOOL IsRsrcKeyword(LPCTSTR pszChars, int nLength)
+// Rust keywords
+static BOOL IsRustKeyword(LPCTSTR pszChars, int nLength)
 {
-  static LPCTSTR const s_apszRsrcKeywordList[] =
+  static LPCTSTR const s_apszRustKeywordList[] =
   {
-    _T ("ACCELERATORS"),
-    _T ("ALT"),
-    _T ("ASCII"),
-    _T ("AUTO3STATE"),
-    _T ("AUTOCHECKBOX"),
-    _T ("AUTORADIOBUTTON"),
-    _T ("BEDIT"),
-    _T ("BEGIN"),
-    _T ("BITMAP"),
-    _T ("BLOCK"),
-    _T ("BUTTON"),
-    _T ("CAPTION"),
-    _T ("CHARACTERISTICS"),
-    _T ("CHECKBOX"),
-    _T ("CHECKED"),
-    _T ("CLASS"),
-    _T ("COMBOBOX"),
-    _T ("CONTROL"),
-    _T ("CTEXT"),
-    _T ("CURSOR"),
-    _T ("DEFPUSHBUTTON"),
-    _T ("DIALOG"),
-    _T ("DIALOGEX"),
-    _T ("DISCARDABLE"),
-    _T ("EDIT"),
-    _T ("EDITTEXT"),
-    _T ("END"),
-    _T ("EXSTYLE"),
-    _T ("FILEFLAGS"),
-    _T ("FILEFLAGSMASK"),
-    _T ("FILEOS"),
-    _T ("FILESUBTYPE"),
-    _T ("FILETYPE"),
-    _T ("FILEVERSION"),
-    _T ("FIXED"),
-    _T ("FONT"),
-    _T ("GRAYED"),
-    _T ("GROUPBOX"),
-    _T ("HEDIT"),
-    _T ("HELP"),
-    _T ("ICON"),
-    _T ("IEDIT"),
-    _T ("IMPURE"),
-    _T ("INACTIVE"),
-    _T ("LANGUAGE"),
-    _T ("LISTBOX"),
-    _T ("LOADONCALL"),
-    _T ("LTEXT"),
-    _T ("MENU"),
-    _T ("MENUBARBREAK"),
-    _T ("MENUBREAK"),
-    _T ("MENUEX"),
-    _T ("MENUITEM"),
-    _T ("MESSAGETABLE"),
-    _T ("MOVEABLE"),
-    _T ("NOINVERT"),
-    _T ("NONSHARED"),
-    _T ("POPUP"),
-    _T ("PRELOAD"),
-    _T ("PRODUCTVERSION"),
-    _T ("PURE"),
-    _T ("PUSHBOX"),
-    _T ("PUSHBUTTON"),
-    _T ("RADIOBUTTON"),
-    _T ("RCDATA"),
-    _T ("RTEXT"),
-    _T ("SCROLLBAR"),
-    _T ("SEPARATOR"),
-    _T ("SHARED"),
-    _T ("SHIFT"),
-    _T ("STATE3"),
-    _T ("STATIC"),
-    _T ("STRINGTABLE"),
-    _T ("STYLE"),
-    _T ("TEXTINCLUDE"),
-    _T ("USERBUTTON"),
-    _T ("VALUE"),
-    _T ("VERSION"),
-    _T ("VERSIONINFO"),
-    _T ("VIRTKEY"),
+    _T ("Self"),
+    _T ("abstract"),
+    _T ("alignof"),
+    _T ("as"),
+    _T ("become"),
+    _T ("box"),
+    _T ("break"),
+    _T ("const"),
+    _T ("continue"),
+    _T ("crate"),
+    _T ("do"),
+    _T ("else"),
+    _T ("enum"),
+    _T ("extern"),
+    _T ("false"),
+    _T ("final"),
+    _T ("fn"),
+    _T ("for"),
+    _T ("if"),
+    _T ("impl"),
+    _T ("in"),
+    _T ("let"),
+    _T ("loop"),
+    _T ("macro"),
+    _T ("match"),
+    _T ("mod"),
+    _T ("move"),
+    _T ("mut"),
+    _T ("offsetof"),
+    _T ("override"),
+    _T ("priv"),
+    _T ("proc"),
+    _T ("pub"),
+    _T ("pure"),
+    _T ("ref"),
+    _T ("return"),
+    _T ("self"),
+    _T ("sizeof"),
+    _T ("static"),
+    _T ("struct"),
+    _T ("super"),
+    _T ("trait"),
+    _T ("true"),
+    _T ("type"),
+    _T ("typeof"),
+    _T ("unsafe"),
+    _T ("unsized"),
+    _T ("use"),
+    _T ("virtual"),
+    _T ("where"),
+    _T ("while"),
+    _T ("yield"),
   };
-  return xiskeyword<_tcsnicmp>(pszChars, nLength, s_apszRsrcKeywordList);
+  return xiskeyword<_tcsnicmp>(pszChars, nLength, s_apszRustKeywordList);
 }
 
 static BOOL IsUser1Keyword(LPCTSTR pszChars, int nLength)
 {
   static LPCTSTR const s_apszUser1KeywordList[] =
   {
-    _T ("VK_BACK"),
-    _T ("VK_CANCEL"),
-    _T ("VK_CAPITAL"),
-    _T ("VK_CLEAR"),
-    _T ("VK_CONTROL"),
-    _T ("VK_DELETE"),
-    _T ("VK_DOWN"),
-    _T ("VK_END"),
-    _T ("VK_ESCAPE"),
-    _T ("VK_F1"),
-    _T ("VK_F10"),
-    _T ("VK_F11"),
-    _T ("VK_F12"),
-    _T ("VK_F13"),
-    _T ("VK_F14"),
-    _T ("VK_F15"),
-    _T ("VK_F16"),
-    _T ("VK_F17"),
-    _T ("VK_F18"),
-    _T ("VK_F19"),
-    _T ("VK_F2"),
-    _T ("VK_F20"),
-    _T ("VK_F21"),
-    _T ("VK_F22"),
-    _T ("VK_F23"),
-    _T ("VK_F24"),
-    _T ("VK_F3"),
-    _T ("VK_F4"),
-    _T ("VK_F5"),
-    _T ("VK_F6"),
-    _T ("VK_F7"),
-    _T ("VK_F8"),
-    _T ("VK_F9"),
-    _T ("VK_HELP"),
-    _T ("VK_HOME"),
-    _T ("VK_INSERT"),
-    _T ("VK_LBUTTON"),
-    _T ("VK_LEFT"),
-    _T ("VK_MBUTTON"),
-    _T ("VK_MENU"),
-    _T ("VK_NEXT"),
-    _T ("VK_PAUSE"),
-    _T ("VK_PRIOR"),
-    _T ("VK_RBUTTON"),
-    _T ("VK_RETURN"),
-    _T ("VK_RIGHT"),
-    _T ("VK_SELECT"),
-    _T ("VK_SHIFT"),
-    _T ("VK_SPACE"),
-    _T ("VK_TAB"),
-    _T ("VK_UP"),
+    _T ("String"),
+    _T ("binary32"),
+    _T ("binary64"),
+    _T ("bool"),
+    _T ("char"),
+    _T ("f32"),
+    _T ("f64"),
+    _T ("i16"),
+    _T ("i32"),
+    _T ("i64"),
+    _T ("i8"),
+    _T ("isize"),
+    _T ("str"),
+    _T ("u16"),
+    _T ("u32"),
+    _T ("u64"),
+    _T ("u8"),
+    _T ("usize"),
   };
   return xiskeyword<_tcsnicmp>(pszChars, nLength, s_apszUser1KeywordList);
 }
@@ -184,22 +124,26 @@ if (pBuf != NULL)\
   }
 
 #define COOKIE_COMMENT          0x0001
-#define COOKIE_PREPROCESSOR     0x0002
 #define COOKIE_EXT_COMMENT      0x0004
 #define COOKIE_STRING           0x0008
-#define COOKIE_CHAR             0x0010
+#define COOKIE_RAWSTRING        0x0020
+#define COOKIE_GET_EXT_COMMENT_DEPTH(cookie) (((cookie) & 0x0F00) >> 8)
+#define COOKIE_SET_EXT_COMMENT_DEPTH(cookie, depth) (cookie) = (((cookie) & 0xF0FF) | ((depth) << 8))
+#define COOKIE_GET_RAWSTRING_NUMBER_COUNT(cookie) (((cookie) & 0xF000) >> 12)
+#define COOKIE_SET_RAWSTRING_NUMBER_COUNT(cookie, count) (cookie) = (((cookie) & 0x0FFF) | ((count) << 12))
 
-DWORD CCrystalTextView::ParseLineRsrc(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems)
+DWORD CCrystalTextView::ParseLineRust(DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActualItems)
 {
   const int nLength = GetLineLength(nLineIndex);
   if (nLength == 0)
-    return dwCookie & COOKIE_EXT_COMMENT;
+    return dwCookie & (COOKIE_EXT_COMMENT | COOKIE_RAWSTRING | COOKIE_STRING | 0xFF00);
 
   const LPCTSTR pszChars = GetLineChars(nLineIndex);
-  BOOL bFirstChar = (dwCookie & ~COOKIE_EXT_COMMENT) == 0;
-  BOOL bRedefineBlock = TRUE;
-  BOOL bWasCommentStart = FALSE;
-  BOOL bDecIndex = FALSE;
+  LPCTSTR pszRawStringBegin = NULL;
+  LPCTSTR pszCommentBegin = NULL;
+  LPCTSTR pszCommentEnd = NULL;
+  bool bRedefineBlock = true;
+  bool bDecIndex = false;
   int nIdentBegin = -1;
   int nPrevI = -1;
   int I;
@@ -214,13 +158,9 @@ DWORD CCrystalTextView::ParseLineRsrc(DWORD dwCookie, int nLineIndex, TEXTBLOCK 
             {
               DEFINE_BLOCK(nPos, COLORINDEX_COMMENT);
             }
-          else if (dwCookie & (COOKIE_CHAR | COOKIE_STRING))
+          else if (dwCookie & (COOKIE_STRING | COOKIE_RAWSTRING))
             {
               DEFINE_BLOCK(nPos, COLORINDEX_STRING);
-            }
-          else if (dwCookie & COOKIE_PREPROCESSOR)
-            {
-              DEFINE_BLOCK(nPos, COLORINDEX_PREPROCESSOR);
             }
           else
             {
@@ -231,19 +171,19 @@ DWORD CCrystalTextView::ParseLineRsrc(DWORD dwCookie, int nLineIndex, TEXTBLOCK 
               else
                 {
                   DEFINE_BLOCK(nPos, COLORINDEX_OPERATOR);
-                  bRedefineBlock = TRUE;
-                  bDecIndex = TRUE;
+                  bRedefineBlock = true;
+                  bDecIndex = true;
                   goto out;
                 }
             }
-          bRedefineBlock = FALSE;
-          bDecIndex = FALSE;
+          bRedefineBlock = false;
+          bDecIndex = false;
         }
 out:
 
       // Can be bigger than length if there is binary data
       // See bug #1474782 Crash when comparing SQL with with binary data
-      if (I >= nLength)
+      if (I >= nLength || pszChars[I] == 0)
         break;
 
       if (dwCookie & COOKIE_COMMENT)
@@ -259,18 +199,24 @@ out:
           if (pszChars[I] == '"' && (I == 0 || I == 1 && pszChars[nPrevI] != '\\' || I >= 2 && (pszChars[nPrevI] != '\\' || pszChars[nPrevI] == '\\' && pszChars[nPrevI - 1] == '\\')))
             {
               dwCookie &= ~COOKIE_STRING;
-              bRedefineBlock = TRUE;
+              bRedefineBlock = true;
             }
           continue;
         }
 
-      //  Char constant '..'
-      if (dwCookie & COOKIE_CHAR)
+      //  Raw string constant r"...." ,  r#"..."# , r##"..."##
+      if (dwCookie & COOKIE_RAWSTRING)
         {
-          if (pszChars[I] == '\'' && (I == 0 || pszChars[nPrevI] != '\\'))
+          const int nNumberCount = COOKIE_GET_RAWSTRING_NUMBER_COUNT(dwCookie);
+          if (I >= nNumberCount && pszChars[I - nNumberCount] == '"')
             {
-              dwCookie &= ~COOKIE_CHAR;
-              bRedefineBlock = TRUE;
+              if ((pszRawStringBegin < pszChars + I - nNumberCount) && 
+                  (std::count(pszChars + I - nNumberCount + 1, pszChars + I + 1, '#') == nNumberCount))
+                {
+                  dwCookie &= ~COOKIE_RAWSTRING;
+                  bRedefineBlock = true;
+                  pszRawStringBegin = NULL;
+                }
             }
           continue;
         }
@@ -278,13 +224,25 @@ out:
       //  Extended comment /*....*/
       if (dwCookie & COOKIE_EXT_COMMENT)
         {
-          // if (I > 0 && pszChars[I] == '/' && pszChars[nPrevI] == '*')
-          if ((I > 1 && pszChars[I] == '/' && pszChars[nPrevI] == '*' /*&& pszChars[nPrevI - 1] != '/'*/ && !bWasCommentStart) || (I == 1 && pszChars[I] == '/' && pszChars[nPrevI] == '*'))
+          const int depth = COOKIE_GET_EXT_COMMENT_DEPTH(dwCookie);
+          if ((pszCommentEnd < pszChars + I) && (I > 0 && pszChars[I] == '*' && pszChars[nPrevI] == '/'))
             {
-              dwCookie &= ~COOKIE_EXT_COMMENT;
-              bRedefineBlock = TRUE;
+              COOKIE_SET_EXT_COMMENT_DEPTH(dwCookie, depth + 1);
+              pszCommentBegin = pszChars + I + 1;
             }
-          bWasCommentStart = FALSE;
+          else if ((pszCommentBegin < pszChars + I) && (I > 0 && pszChars[I] == '/' && pszChars[nPrevI] == '*'))
+            {
+              if (depth == 0)
+                {
+                  dwCookie &= ~COOKIE_EXT_COMMENT;
+                  bRedefineBlock = true;
+                }
+              else
+                {
+                  COOKIE_SET_EXT_COMMENT_DEPTH(dwCookie, depth - 1);
+                }
+              pszCommentEnd = pszChars + I + 1;
+            }
           continue;
         }
 
@@ -295,17 +253,6 @@ out:
           break;
         }
 
-      //  Preprocessor directive #....
-      if (dwCookie & COOKIE_PREPROCESSOR)
-        {
-          if (I > 0 && pszChars[I] == '*' && pszChars[nPrevI] == '/')
-            {
-              DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
-              dwCookie |= COOKIE_EXT_COMMENT;
-            }
-          continue;
-        }
-
       //  Normal text
       if (pszChars[I] == '"')
         {
@@ -313,36 +260,29 @@ out:
           dwCookie |= COOKIE_STRING;
           continue;
         }
-      if (pszChars[I] == '\'')
+
+      //  Raw string
+      if ((pszChars[I] == 'r' && I + 1 < nLength && (pszChars[I + 1] == '"' || pszChars[I + 1] == '#')) ||
+          (pszChars[I] == 'b' && I + 2 < nLength && pszChars[I + 1] == 'r' && (pszChars[I + 2] == '"' || pszChars[I + 2] == '#')))
         {
-          // if (I + 1 < nLength && pszChars[I + 1] == '\'' || I + 2 < nLength && pszChars[I + 1] != '\\' && pszChars[I + 2] == '\'' || I + 3 < nLength && pszChars[I + 1] == '\\' && pszChars[I + 3] == '\'')
-          if (!I || !xisalnum(pszChars[nPrevI]))
+          const int nprefix = (pszChars[I] == 'r' ? 1 : 2);
+          const TCHAR *p = pszChars + I + nprefix;
+          while (p < pszChars + nLength && *p == '#') ++p;
+          if (p != pszChars + nLength && *p == '"')
             {
               DEFINE_BLOCK(I, COLORINDEX_STRING);
-              dwCookie |= COOKIE_CHAR;
+              dwCookie |= COOKIE_RAWSTRING;
+              COOKIE_SET_RAWSTRING_NUMBER_COUNT(dwCookie, static_cast<int>(p - (pszChars + I + nprefix)));
+              pszRawStringBegin = p + 1;
               continue;
             }
         }
-      if (I > 0 && pszChars[I] == '*' && pszChars[nPrevI] == '/')
+      if ((pszCommentEnd < pszChars + I) && (I > 0 && pszChars[I] == '*' && pszChars[nPrevI] == '/'))
         {
           DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
           dwCookie |= COOKIE_EXT_COMMENT;
-          bWasCommentStart = TRUE;
+          pszCommentBegin = pszChars + I + 1;
           continue;
-        }
-
-      bWasCommentStart = FALSE;
-
-      if (bFirstChar)
-        {
-          if (pszChars[I] == '#')
-            {
-              DEFINE_BLOCK(I, COLORINDEX_PREPROCESSOR);
-              dwCookie |= COOKIE_PREPROCESSOR;
-              continue;
-            }
-          if (!xisspace(pszChars[I]))
-            bFirstChar = FALSE;
         }
 
       if (pBuf == NULL)
@@ -358,7 +298,7 @@ out:
         {
           if (nIdentBegin >= 0)
             {
-              if (IsRsrcKeyword(pszChars + nIdentBegin, I - nIdentBegin))
+              if (IsRustKeyword(pszChars + nIdentBegin, I - nIdentBegin))
                 {
                   DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
                 }
@@ -372,15 +312,15 @@ out:
                 }
               else
                 {
-                  bool bFunction = FALSE;
+                  bool bFunction = false;
 
                   for (int j = I; j < nLength; j++)
                     {
-                      if (!xisspace(pszChars[j]))
+                      if (!xisspace(pszChars[j]) && pszChars[j] != '!')
                         {
                           if (pszChars[j] == '(')
                             {
-                              bFunction = TRUE;
+                              bFunction = true;
                             }
                           break;
                         }
@@ -390,8 +330,8 @@ out:
                       DEFINE_BLOCK(nIdentBegin, COLORINDEX_FUNCNAME);
                     }
                 }
-              bRedefineBlock = TRUE;
-              bDecIndex = TRUE;
+              bRedefineBlock = true;
+              bDecIndex = true;
               nIdentBegin = -1;
             }
         }
@@ -399,7 +339,7 @@ out:
 
   if (nIdentBegin >= 0)
     {
-      if (IsRsrcKeyword(pszChars + nIdentBegin, I - nIdentBegin))
+      if (IsRustKeyword(pszChars + nIdentBegin, I - nIdentBegin))
         {
           DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
         }
@@ -413,15 +353,15 @@ out:
         }
       else
         {
-          bool bFunction = FALSE;
+          bool bFunction = false;
 
           for (int j = I; j < nLength; j++)
             {
-              if (!xisspace(pszChars[j]))
+              if (!xisspace(pszChars[j]) && pszChars[j] != '!')
                 {
                   if (pszChars[j] == '(')
                     {
-                      bFunction = TRUE;
+                      bFunction = true;
                     }
                   break;
                 }
@@ -433,7 +373,6 @@ out:
         }
     }
 
-  if (pszChars[nLength - 1] != '\\')
-    dwCookie &= COOKIE_EXT_COMMENT;
+  dwCookie &= COOKIE_EXT_COMMENT | COOKIE_RAWSTRING | COOKIE_STRING | 0xFF00;
   return dwCookie;
 }

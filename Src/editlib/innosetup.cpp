@@ -16,71 +16,19 @@
 
 #include "StdAfx.h"
 #include "ccrystaltextview.h"
-#include "ccrystaltextbuffer.h"
 #include "SyntaxColors.h"
 #include "string_util.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
 #endif
 
-//  C++ keywords (MSVC5.0 + POET5.0)
-static LPTSTR s_apszInnoSetupKeywordList[] =
+using CommonKeywords::IsNumeric;
+
+static BOOL IsInnoSetupKeyword(LPCTSTR pszChars, int nLength)
+{
+  static LPCTSTR const s_apszInnoSetupKeywordList[] =
   {
-    _T ("program"),
-    _T ("const"),
-    _T ("type"),
-    _T ("var"),
-    _T ("begin"),
-    _T ("end"),
-    _T ("array"),
-    _T ("set"),
-    _T ("record"),
-    _T ("string"),
-    _T ("if"),
-    _T ("then"),
-    _T ("else"),
-    _T ("while"),
-    _T ("for"),
-    _T ("to"),
-    _T ("downto"),
-    _T ("do"),
-    _T ("with"),
-    _T ("repeat"),
-    _T ("until"),
-    _T ("case"),
-    _T ("of"),
-    _T ("goto"),
-    _T ("exit"),
-    _T ("label"),
-    _T ("procedure"),
-    _T ("function"),
-    _T ("nil"),
-    _T ("file"),
-    _T ("and"),
-    _T ("or"),
-    _T ("not"),
-    _T ("xor"),
-    _T ("div"),
-    _T ("mod"),
-    _T ("unit"),
-    _T ("uses"),
-    _T ("implementation"),
-    _T ("interface"),
-    _T ("external"),
-    _T ("asm"),
-    _T ("inline"),
-    _T ("object"),
-    _T ("constructor"),
-    _T ("destructor"),
-    _T ("virtual"),
-    _T ("far"),
-    _T ("assembler"),
-    _T ("near"),
-    _T ("inherited"),
-    //Inno Setup...
     _T ("AdminPrivilegesRequired"),
     _T ("AfterInstall"),
     _T ("AllowCancelDuringInstall"),
@@ -92,6 +40,7 @@ static LPTSTR s_apszInnoSetupKeywordList[] =
     _T ("AlwaysShowDirOnReadyPage"),
     _T ("AlwaysShowGroupOnReadyPage"),
     _T ("AlwaysUsePersonalGroup"),
+    _T ("and"),
     _T ("AppComments"),
     _T ("AppContact"),
     _T ("AppCopyright"),
@@ -108,12 +57,17 @@ static LPTSTR s_apszInnoSetupKeywordList[] =
     _T ("AppUpdatesURL"),
     _T ("AppVerName"),
     _T ("AppVersion"),
+    _T ("array"),
+    _T ("asm"),
+    _T ("assembler"),
     _T ("Attribs"),
     _T ("BackColor"),
     _T ("BackColor2"),
     _T ("BackColorDirection"),
     _T ("BackSolid"),
     _T ("BeforeInstall"),
+    _T ("begin"),
+    _T ("case"),
     _T ("ChangesAssociations"),
     _T ("ChangesEnvironment"),
     _T ("Check"),
@@ -121,6 +75,8 @@ static LPTSTR s_apszInnoSetupKeywordList[] =
     _T ("Comment"),
     _T ("Components"),
     _T ("Compression"),
+    _T ("const"),
+    _T ("constructor"),
     _T ("CopyMode"),
     _T ("CreateAppDir"),
     _T ("CreateUninstallRegKey"),
@@ -132,6 +88,7 @@ static LPTSTR s_apszInnoSetupKeywordList[] =
     _T ("Description"),
     _T ("DestDir"),
     _T ("DestName"),
+    _T ("destructor"),
     _T ("DirExistsWarning"),
     _T ("DisableDirPage"),
     _T ("DisableFinishedPage"),
@@ -143,43 +100,73 @@ static LPTSTR s_apszInnoSetupKeywordList[] =
     _T ("DiskSliceSize"),
     _T ("DiskSpaceMBLabel"),
     _T ("DiskSpanning"),
+    _T ("div"),
+    _T ("do"),
     _T ("DontMergeDuplicateFiles"),
+    _T ("downto"),
+    _T ("else"),
     _T ("EnableDirDoesntExistWarning"),
     _T ("Encryption"),
+    _T ("end"),
     _T ("Excludes"),
+    _T ("exit"),
+    _T ("external"),
     _T ("ExtraDiskSpaceRequired"),
+    _T ("far"),
+    _T ("file"),
     _T ("Filename"),
     _T ("Flags"),
     _T ("FlatComponentsList"),
     _T ("FontInstall"),
+    _T ("for"),
+    _T ("function"),
+    _T ("goto"),
     _T ("GroupDescription"),
     _T ("HotKey"),
     _T ("IconFilename"),
     _T ("IconIndex"),
+    _T ("if"),
+    _T ("implementation"),
     _T ("InfoAfterFile"),
     _T ("InfoBeforeFile"),
+    _T ("inherited"),
+    _T ("inline"),
+    _T ("interface"),
     _T ("InternalCompressLevel"),
     _T ("Key"),
+    _T ("label"),
     _T ("LanguageDetectionMethod"),
     _T ("Languages"),
     _T ("LicenseFile"),
     _T ("MergeDuplicateFiles"),
     _T ("MessagesFile"),
     _T ("MinVersion"),
+    _T ("mod"),
     _T ("Name"),
+    _T ("near"),
+    _T ("nil"),
+    _T ("not"),
+    _T ("object"),
+    _T ("of"),
     _T ("OnlyBelowVersion"),
+    _T ("or"),
     _T ("OutputBaseFilename"),
-    _T ("OutputManifestFile"),
     _T ("OutputDir"),
+    _T ("OutputManifestFile"),
     _T ("Parameters"),
     _T ("Password"),
     _T ("Permissions"),
     _T ("PrivilegesRequired"),
+    _T ("procedure"),
+    _T ("program"),
+    _T ("record"),
+    _T ("repeat"),
     _T ("ReserveBytes"),
     _T ("RestartIfNeededByRun"),
     _T ("Root"),
     _T ("RunOnceId"),
     _T ("Section"),
+    _T ("set"),
     _T ("SetupIconFile"),
     _T ("ShowComponentSizes"),
     _T ("ShowLanguageDialog"),
@@ -189,14 +176,19 @@ static LPTSTR s_apszInnoSetupKeywordList[] =
     _T ("Source"),
     _T ("SourceDir"),
     _T ("StatusMsg"),
+    _T ("string"),
     _T ("Subkey"),
     _T ("Tasks"),
+    _T ("then"),
     _T ("TimeStampRounding"),
     _T ("TimeStampsInUTC"),
+    _T ("to"),
     _T ("TouchDate"),
     _T ("TouchTime"),
+    _T ("type"),
     _T ("Type"),
     _T ("Types"),
+    _T ("Uninstallable"),
     _T ("UninstallDisplayIcon"),
     _T ("UninstallDisplayName"),
     _T ("UninstallFilesDir"),
@@ -204,26 +196,32 @@ static LPTSTR s_apszInnoSetupKeywordList[] =
     _T ("UninstallLogMode"),
     _T ("UninstallRestartComputer"),
     _T ("UninstallStyle"),
-    _T ("Uninstallable"),
+    _T ("unit"),
+    _T ("until"),
     _T ("UpdateUninstallLogAppName"),
     _T ("UsePreviousAppDir"),
     _T ("UsePreviousGroup"),
-    _T ("UsePreviousTasks"),
     _T ("UsePreviousSetupType"),
+    _T ("UsePreviousTasks"),
     _T ("UsePreviousUserInfo"),
     _T ("UserInfoPage"),
+    _T ("uses"),
     _T ("UseSetupLdr"),
     _T ("ValueData"),
     _T ("ValueName"),
     _T ("ValueType"),
-    _T ("VersionInfoVersion"),
+    _T ("var"),
     _T ("VersionInfoCompany"),
     _T ("VersionInfoDescription"),
     _T ("VersionInfoTextVersion"),
+    _T ("VersionInfoVersion"),
+    _T ("virtual"),
+    _T ("while"),
     _T ("WindowResizable"),
     _T ("WindowShowCaption"),
     _T ("WindowStartMaximized"),
     _T ("WindowVisible"),
+    _T ("with"),
     _T ("WizardImageBackColor"),
     _T ("WizardImageFile"),
     _T ("WizardImageStretch"),
@@ -231,16 +229,15 @@ static LPTSTR s_apszInnoSetupKeywordList[] =
     _T ("WizardSmallImageFile"),
     _T ("WizardStyle"),
     _T ("WorkingDir"),
-    NULL
+    _T ("xor"),
   };
+  return xiskeyword<_tcsnicmp>(pszChars, nLength, s_apszInnoSetupKeywordList);
+}
 
-static LPTSTR s_apszUser1KeywordList[] =
+static BOOL IsUser1Keyword(LPCTSTR pszChars, int nLength)
+{
+  static LPCTSTR const s_apszUser1KeywordList[] =
   {
-    _T ("HKCC"),
-    _T ("HKCR"),
-    _T ("HKCU"),
-    _T ("HKLM"),
-    _T ("HKU"),
     _T ("alwaysoverwrite"),
     _T ("alwaysskipifsameorolder"),
     _T ("append"),
@@ -256,10 +253,10 @@ static LPTSTR s_apszUser1KeywordList[] =
     _T ("deletekey"),
     _T ("deletevalue"),
     _T ("dirifempty"),
+    _T ("disablenouninstallwarning"),
     _T ("dontcloseonexit"),
     _T ("dontcopy"),
     _T ("dontcreatekey"),
-    _T ("disablenouninstallwarning"),
     _T ("dword"),
     _T ("exclusive"),
     _T ("expandsz"),
@@ -268,6 +265,11 @@ static LPTSTR s_apszUser1KeywordList[] =
     _T ("filesandordirs"),
     _T ("fixed"),
     _T ("fontisnttruetype"),
+    _T ("HKCC"),
+    _T ("HKCR"),
+    _T ("HKCU"),
+    _T ("HKLM"),
+    _T ("HKU"),
     _T ("ignoreversion"),
     _T ("iscustom"),
     _T ("isreadme"),
@@ -296,10 +298,10 @@ static LPTSTR s_apszUser1KeywordList[] =
     _T ("sharedfile"),
     _T ("shellexec"),
     _T ("showcheckbox"),
-    _T ("skipifnotsilent"),
-    _T ("skipifsilent"),
     _T ("silent"),
     _T ("skipifdoesntexist"),
+    _T ("skipifnotsilent"),
+    _T ("skipifsilent"),
     _T ("skipifsourcedoesntexist"),
     _T ("sortfilesbyextension"),
     _T ("unchecked"),
@@ -315,57 +317,8 @@ static LPTSTR s_apszUser1KeywordList[] =
     _T ("useapppaths"),
     _T ("verysilent"),
     _T ("waituntilidle"),
-    NULL
   };
-
-static BOOL
-IsXKeyword (LPTSTR apszKeywords[], LPCTSTR pszChars, int nLength)
-{
-  for (int L = 0; apszKeywords[L] != NULL; L++)
-    {
-      if (_tcsnicmp (apszKeywords[L], pszChars, nLength) == 0
-            && apszKeywords[L][nLength] == 0)
-        return TRUE;
-    }
-  return FALSE;
-}
-
-static BOOL
-IsInnoSetupKeyword (LPCTSTR pszChars, int nLength)
-{
-  return IsXKeyword (s_apszInnoSetupKeywordList, pszChars, nLength);
-}
-
-static BOOL
-IsUser1Keyword (LPCTSTR pszChars, int nLength)
-{
-  return IsXKeyword (s_apszUser1KeywordList, pszChars, nLength);
-}
-
-static BOOL
-IsInnoSetupNumber (LPCTSTR pszChars, int nLength)
-{
-  if (nLength > 2 && pszChars[0] == '0' && pszChars[1] == 'x')
-    {
-      for (int I = 2; I < nLength; I++)
-        {
-          if (_istdigit (pszChars[I]) || (pszChars[I] >= 'A' && pszChars[I] <= 'F') ||
-                (pszChars[I] >= 'a' && pszChars[I] <= 'f'))
-            continue;
-          return FALSE;
-        }
-      return TRUE;
-    }
-  if (!_istdigit (pszChars[0]))
-    return FALSE;
-  for (int I = 1; I < nLength; I++)
-    {
-      if (!_istdigit (pszChars[I]) && pszChars[I] != '+' &&
-            pszChars[I] != '-' && pszChars[I] != '.' && pszChars[I] != 'e' &&
-            pszChars[I] != 'E')
-        return FALSE;
-    }
-  return TRUE;
+  return xiskeyword<_tcsnicmp>(pszChars, nLength, s_apszUser1KeywordList);
 }
 
 #define DEFINE_BLOCK(pos, colorindex)   \
@@ -393,7 +346,7 @@ DWORD CCrystalTextView::ParseLineInnoSetup(DWORD dwCookie, int nLineIndex, TEXTB
   if (nLength == 0)
     return dwCookie & (COOKIE_EXT_COMMENT | COOKIE_EXT_COMMENT2);
 
-  LPCTSTR pszChars = GetLineChars(nLineIndex);
+  const LPCTSTR pszChars = GetLineChars(nLineIndex);
   BOOL bFirstChar = (dwCookie & ~COOKIE_EXT_COMMENT) == 0;
   BOOL bRedefineBlock = TRUE;
   BOOL bDecIndex = FALSE;
@@ -409,29 +362,29 @@ DWORD CCrystalTextView::ParseLineInnoSetup(DWORD dwCookie, int nLineIndex, TEXTB
             nPos = nPrevI;
           if (dwCookie & (COOKIE_COMMENT | COOKIE_EXT_COMMENT | COOKIE_EXT_COMMENT2))
             {
-              DEFINE_BLOCK (nPos, COLORINDEX_COMMENT);
+              DEFINE_BLOCK(nPos, COLORINDEX_COMMENT);
             }
           else if (dwCookie & (COOKIE_CHAR | COOKIE_STRING))
             {
-              DEFINE_BLOCK (nPos, COLORINDEX_STRING);
+              DEFINE_BLOCK(nPos, COLORINDEX_STRING);
             }
           else if (dwCookie & COOKIE_PREPROCESSOR)
             {
-              DEFINE_BLOCK (nPos, COLORINDEX_PREPROCESSOR);
+              DEFINE_BLOCK(nPos, COLORINDEX_PREPROCESSOR);
             }
           else if (dwCookie & COOKIE_SECTION)
             {
-              DEFINE_BLOCK (nPos, COLORINDEX_FUNCNAME);
+              DEFINE_BLOCK(nPos, COLORINDEX_FUNCNAME);
             }
           else
             {
               if (xisalnum(pszChars[nPos]) || pszChars[nPos] == '.' && nPos > 0 && (!xisalpha(pszChars[nPos - 1]) && !xisalpha(pszChars[nPos + 1])))
                 {
-                  DEFINE_BLOCK (nPos, COLORINDEX_NORMALTEXT);
+                  DEFINE_BLOCK(nPos, COLORINDEX_NORMALTEXT);
                 }
               else
                 {
-                  DEFINE_BLOCK (nPos, COLORINDEX_OPERATOR);
+                  DEFINE_BLOCK(nPos, COLORINDEX_OPERATOR);
                   bRedefineBlock = TRUE;
                   bDecIndex = TRUE;
                   goto out;
@@ -449,7 +402,7 @@ out:
 
       if (dwCookie & COOKIE_COMMENT)
         {
-          DEFINE_BLOCK (I, COLORINDEX_COMMENT);
+          DEFINE_BLOCK(I, COLORINDEX_COMMENT);
           dwCookie |= COOKIE_COMMENT;
           break;
         }
@@ -501,7 +454,7 @@ out:
 
       if (I > 0 && pszChars[I] == '/' && pszChars[nPrevI] == '/')
         {
-          DEFINE_BLOCK (nPrevI, COLORINDEX_COMMENT);
+          DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
           dwCookie |= COOKIE_COMMENT;
           break;
         }
@@ -520,7 +473,7 @@ out:
       //  Normal text
       if (pszChars[I] == '"')
         {
-          DEFINE_BLOCK (I, COLORINDEX_STRING);
+          DEFINE_BLOCK(I, COLORINDEX_STRING);
           dwCookie |= COOKIE_STRING;
           continue;
         }
@@ -529,21 +482,21 @@ out:
           // if (I + 1 < nLength && pszChars[I + 1] == '\'' || I + 2 < nLength && pszChars[I + 1] != '\\' && pszChars[I + 2] == '\'' || I + 3 < nLength && pszChars[I + 1] == '\\' && pszChars[I + 3] == '\'')
           if (!I || !xisalnum(pszChars[nPrevI]))
             {
-              DEFINE_BLOCK (I, COLORINDEX_STRING);
+              DEFINE_BLOCK(I, COLORINDEX_STRING);
               dwCookie |= COOKIE_CHAR;
               continue;
             }
         }
       if (I > 0 && pszChars[I] == '*' && pszChars[nPrevI] == '(')
         {
-          DEFINE_BLOCK (nPrevI, COLORINDEX_COMMENT);
+          DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
           dwCookie |= COOKIE_EXT_COMMENT;
           continue;
         }
 
       if (pszChars[I] == '{')
         {
-          DEFINE_BLOCK (I, COLORINDEX_COMMENT);
+          DEFINE_BLOCK(I, COLORINDEX_COMMENT);
           dwCookie |= COOKIE_EXT_COMMENT2;
           continue;
         }
@@ -552,23 +505,23 @@ out:
         {
           if (pszChars[I] == ';')
             {
-              DEFINE_BLOCK (I, COLORINDEX_COMMENT);
+              DEFINE_BLOCK(I, COLORINDEX_COMMENT);
               dwCookie |= COOKIE_COMMENT;
               continue;
             }
           if (pszChars[I] == '#')
             {
-              DEFINE_BLOCK (I, COLORINDEX_PREPROCESSOR);
+              DEFINE_BLOCK(I, COLORINDEX_PREPROCESSOR);
               dwCookie |= COOKIE_PREPROCESSOR;
               continue;
             }
           if (pszChars[I] == '[')
             {
-              DEFINE_BLOCK (I, COLORINDEX_FUNCNAME);
+              DEFINE_BLOCK(I, COLORINDEX_FUNCNAME);
               dwCookie |= COOKIE_SECTION;
               continue;
             }
-          if (!xisspace (pszChars[I]))
+          if (!xisspace(pszChars[I]))
             bFirstChar = FALSE;
         }
 
@@ -585,17 +538,17 @@ out:
         {
           if (nIdentBegin >= 0)
             {
-              if (IsInnoSetupKeyword (pszChars + nIdentBegin, I - nIdentBegin))
+              if (IsInnoSetupKeyword(pszChars + nIdentBegin, I - nIdentBegin))
                 {
-                  DEFINE_BLOCK (nIdentBegin, COLORINDEX_KEYWORD);
+                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
                 }
-              else if (IsUser1Keyword (pszChars + nIdentBegin, I - nIdentBegin))
+              else if (IsUser1Keyword(pszChars + nIdentBegin, I - nIdentBegin))
                 {
-                  DEFINE_BLOCK (nIdentBegin, COLORINDEX_USER1);
+                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER1);
                 }
-              else if (IsInnoSetupNumber (pszChars + nIdentBegin, I - nIdentBegin))
+              else if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
                 {
-                  DEFINE_BLOCK (nIdentBegin, COLORINDEX_NUMBER);
+                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
                 }
               else
                 {
@@ -603,7 +556,7 @@ out:
 
                   for (int j = I; j < nLength; j++)
                     {
-                      if (!xisspace (pszChars[j]))
+                      if (!xisspace(pszChars[j]))
                         {
                           if (pszChars[j] == '(')
                             {
@@ -614,7 +567,7 @@ out:
                     }
                   if (bFunction)
                     {
-                      DEFINE_BLOCK (nIdentBegin, COLORINDEX_FUNCNAME);
+                      DEFINE_BLOCK(nIdentBegin, COLORINDEX_FUNCNAME);
                     }
                 }
               bRedefineBlock = TRUE;
@@ -626,17 +579,17 @@ out:
 
   if (nIdentBegin >= 0)
     {
-      if (IsInnoSetupKeyword (pszChars + nIdentBegin, I - nIdentBegin))
+      if (IsInnoSetupKeyword(pszChars + nIdentBegin, I - nIdentBegin))
         {
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_KEYWORD);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
         }
-      else if (IsUser1Keyword (pszChars + nIdentBegin, I - nIdentBegin))
+      else if (IsUser1Keyword(pszChars + nIdentBegin, I - nIdentBegin))
         {
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_USER1);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER1);
         }
-      else if (IsInnoSetupNumber (pszChars + nIdentBegin, I - nIdentBegin))
+      else if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
         {
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_NUMBER);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
         }
       else
         {
@@ -644,7 +597,7 @@ out:
 
           for (int j = I; j < nLength; j++)
             {
-              if (!xisspace (pszChars[j]))
+              if (!xisspace(pszChars[j]))
                 {
                   if (pszChars[j] == '(')
                     {
@@ -655,7 +608,7 @@ out:
             }
           if (bFunction)
             {
-              DEFINE_BLOCK (nIdentBegin, COLORINDEX_FUNCNAME);
+              DEFINE_BLOCK(nIdentBegin, COLORINDEX_FUNCNAME);
             }
         }
     }

@@ -68,15 +68,12 @@
 #include "LanguageSelect.h"
 #include "editcmd.h"
 #include "ccrystaleditview.h"
-#include "ccrystaltextbuffer.h"
 #include "ceditreplacedlg.h"
 #include "SettingStore.h"
 #include "string_util.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
 #endif
 
 static const unsigned int MAX_TAB_LEN = 64;  // Same as in CrystalViewText.cpp
@@ -533,10 +530,10 @@ void CCrystalEditView::OnEditUntab()
 		//  Shift selection to left
 		for (int i = nStartLine ; i <= nEndLine ; ++i)
         {
-			int nLength = GetLineLength(i);
+			const int nLength = GetLineLength(i);
 			if (nLength > 0)
 			{
-				LPCTSTR pszChars = GetLineChars(i);
+				const LPCTSTR pszChars = GetLineChars(i);
 				int nPos = 0, nOffset = 0;
 				while (nPos < nLength)
 				{
@@ -1060,7 +1057,7 @@ void CCrystalEditView::OnEditOperation(int nAction, LPCTSTR pszText)
 					}
 					else
 					{
-						int nTabSize = GetTabSize (),
+						int nTabSize = GetTabSize(),
 						nDelta = nTabSize - nPos % nTabSize;
 						if (!nDelta)
 						{
@@ -1079,16 +1076,16 @@ void CCrystalEditView::OnEditOperation(int nAction, LPCTSTR pszText)
 				{
 					if (m_pTextBuffer->GetInsertTabs())
 					{
-						pszInsertStr = (TCHAR *) _alloca (sizeof (TCHAR) * (nPos + 2));
-						_tcsncpy (pszInsertStr, pszLineChars, nPos);
+						pszInsertStr = static_cast<TCHAR *>(_alloca(sizeof(TCHAR) * (nPos + 2)));
+						_tcsncpy(pszInsertStr, pszLineChars, nPos);
 						pszInsertStr[nPos++] = _T('\t');
 					}
 					else
 					{
-						int nTabSize = GetTabSize ();
+						int nTabSize = GetTabSize();
 						int nChars = nTabSize - nPos % nTabSize;
-						pszInsertStr = (TCHAR *) _alloca (sizeof (TCHAR) * (nPos + nChars + 1));
-						_tcsncpy (pszInsertStr, pszLineChars, nPos);
+						pszInsertStr = static_cast<TCHAR *>(_alloca(sizeof(TCHAR) * (nPos + nChars + 1)));
+						_tcsncpy(pszInsertStr, pszLineChars, nPos);
 						while (nChars--)
 						{
 							pszInsertStr[nPos++] = _T(' ');
@@ -1097,14 +1094,14 @@ void CCrystalEditView::OnEditOperation(int nAction, LPCTSTR pszText)
 				}
 				else
 				{
-					pszInsertStr = (TCHAR *) _alloca (sizeof (TCHAR) * (nPos + 1));
-					_tcsncpy (pszInsertStr, pszLineChars, nPos);
+					pszInsertStr = static_cast<TCHAR *>(_alloca(sizeof(TCHAR) * (nPos + 1)));
+					_tcsncpy(pszInsertStr, pszLineChars, nPos);
 				}
 				pszInsertStr[nPos] = 0;
 
 				// m_pTextBuffer->BeginUndoGroup ();
 				POINT pt = m_pTextBuffer->InsertText(NULL, ptCursorPos.y, ptCursorPos.x,
-						pszInsertStr, nPos, CE_ACTION_AUTOINDENT);
+					pszInsertStr, nPos, CE_ACTION_AUTOINDENT);
 				SetCursorPos(pt);
 				SetSelection(pt, pt);
 				SetAnchor(pt);
@@ -1119,14 +1116,14 @@ void CCrystalEditView::OnEditOperation(int nAction, LPCTSTR pszText)
 				{
 					if (m_pTextBuffer->GetInsertTabs())
 					{
-						pszInsertStr = (TCHAR *) _alloca (sizeof (TCHAR) * 2);
+						pszInsertStr = static_cast<TCHAR *>(_alloca(sizeof(TCHAR) * 2));
 						pszInsertStr[nPos++] = _T('\t');
 					}
 					else
 					{
-						int nTabSize = GetTabSize ();
+						int nTabSize = GetTabSize();
 						int nChars = nTabSize - nPos % nTabSize;
-						pszInsertStr = (TCHAR *) _alloca (sizeof (TCHAR) * (nChars + 1));
+						pszInsertStr = static_cast<TCHAR *>(_alloca(sizeof(TCHAR) * (nChars + 1)));
 						while (nChars--)
 						{
 							pszInsertStr[nPos++] = _T(' ');
@@ -1172,36 +1169,36 @@ void CCrystalEditView::OnEditOperation(int nAction, LPCTSTR pszText)
 			POINT ptCursorPos = GetCursorPos ();
 
 			//  Take indentation from the previos line
-			int nLength = m_pTextBuffer->GetLineLength (ptCursorPos.y);
-			LPCTSTR pszLineChars = m_pTextBuffer->GetLineChars (ptCursorPos.y );
+			const int nLength = m_pTextBuffer->GetLineLength(ptCursorPos.y);
+			const LPCTSTR pszLineChars = m_pTextBuffer->GetLineChars(ptCursorPos.y );
 			int nPos = 0;
-			while (nPos < nLength && xisspace (pszLineChars[nPos]))
+			while (nPos < nLength && xisspace(pszLineChars[nPos]))
 				nPos++;
 			if (nPos == nLength - 1)
 			{
 				TCHAR *pszInsertStr;
 				if (m_pTextBuffer->GetInsertTabs())
 				{
-				  pszInsertStr = (TCHAR *) _alloca (sizeof (TCHAR) * 2);
-				  *pszInsertStr = _T('\t');
-				  nPos = 1;
+					pszInsertStr = static_cast<TCHAR *>(_alloca(sizeof(TCHAR) * 2));
+					*pszInsertStr = _T('\t');
+					nPos = 1;
 				}
 				else
 				{
-				  int nTabSize = GetTabSize ();
-				  int nChars = nTabSize - nPos % nTabSize;
-				  pszInsertStr = (TCHAR *) _alloca (sizeof (TCHAR) * (nChars + 1));
-				  nPos = 0;
-				  while (nChars--)
+					int nTabSize = GetTabSize();
+					int nChars = nTabSize - nPos % nTabSize;
+					pszInsertStr = static_cast<TCHAR *>(_alloca(sizeof(TCHAR) * (nChars + 1)));
+					nPos = 0;
+					while (nChars--)
 					{
-					  pszInsertStr[nPos++] = _T(' ');
+						pszInsertStr[nPos++] = _T(' ');
 					}
 				}
 				pszInsertStr[nPos] = 0;
 
 				// m_pTextBuffer->BeginUndoGroup ();
 				POINT pt = m_pTextBuffer->InsertText(NULL, ptCursorPos.y, ptCursorPos.x - 1,
-										 pszInsertStr, nPos, CE_ACTION_AUTOINDENT);
+					pszInsertStr, nPos, CE_ACTION_AUTOINDENT);
 				++pt.x;
 				SetCursorPos(pt);
 				SetSelection(pt, pt);
@@ -1216,11 +1213,11 @@ void CCrystalEditView::OnEditOperation(int nAction, LPCTSTR pszText)
 			POINT ptCursorPos = GetCursorPos();
 
 			//  Take indentation from the previos line
-			int nLength = m_pTextBuffer->GetLineLength (ptCursorPos.y);
-			LPCTSTR pszLineChars = m_pTextBuffer->GetLineChars (ptCursorPos.y );
+			const int nLength = m_pTextBuffer->GetLineLength(ptCursorPos.y);
+			const LPCTSTR pszLineChars = m_pTextBuffer->GetLineChars(ptCursorPos.y );
 			int nPos = 0;
-			while (nPos < nLength && xisspace (pszLineChars[nPos]))
-			nPos++;
+			while (nPos < nLength && xisspace(pszLineChars[nPos]))
+				nPos++;
 			if (ptCursorPos.y > 0 && nPos && nPos == nLength - 1)
 			{
 				if (pszLineChars[nPos - 1] == _T('\t'))
@@ -1229,7 +1226,7 @@ void CCrystalEditView::OnEditOperation(int nAction, LPCTSTR pszText)
 				}
 				else
 				{
-					int nTabSize = GetTabSize ();
+					int nTabSize = GetTabSize();
 					nPos = nTabSize - (ptCursorPos.x - 1) % nTabSize;
 					if (!nPos)
 					{
@@ -1242,7 +1239,7 @@ void CCrystalEditView::OnEditOperation(int nAction, LPCTSTR pszText)
 				}
 				// m_pTextBuffer->BeginUndoGroup ();
 				m_pTextBuffer->DeleteText(NULL, ptCursorPos.y, ptCursorPos.x - nPos - 1,
-				ptCursorPos.y, ptCursorPos.x - 1, CE_ACTION_AUTOINDENT);
+					ptCursorPos.y, ptCursorPos.x - 1, CE_ACTION_AUTOINDENT);
 				ptCursorPos.x -= nPos;
 				SetCursorPos(ptCursorPos);
 				SetSelection(ptCursorPos, ptCursorPos);

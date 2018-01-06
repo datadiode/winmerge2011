@@ -13,6 +13,12 @@ namespace std { using namespace eastl; }
 #include "auto_ptr.h"
 // Another lacking of EASTL is the rotate() algorithm.
 #include "rotate.h"
+// std::begin() and std::end() as available in C++11.
+namespace eastl
+{
+	template <typename T, size_t N> T *begin(T (&r)[N]) { return r; }
+	template <typename T, size_t N> T *end(T (&r)[N]) { return r + _countof(r); }
+}
 #else
 #define stl(x) <x>
 #define stl_size_t size_t

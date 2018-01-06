@@ -21,12 +21,13 @@
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
 #endif
 
-//  C++ keywords (MSVC5.0 + POET5.0)
-static LPTSTR s_apszSiodKeywordList[] =
+using CommonKeywords::IsNumeric;
+
+static BOOL IsSiodKeyword(LPCTSTR pszChars, int nLength)
+{
+  static LPCTSTR const s_apszSiodKeywordList[] =
   {
     _T("abs"),
     _T("alarm"),
@@ -74,34 +75,37 @@ static LPTSTR s_apszSiodKeywordList[] =
     _T("list"),
     _T("load"),
     _T("max"),
-    _T("min"),
     _T("member"),
     _T("memq"),
     _T("memv"),
+    _T("min"),
     _T("nil"),
     _T("not"),
     _T("null?"),
-    _T("number?"),
     _T("number->string"),
+    _T("number?"),
     _T("or"),
     _T("pair?"),
     _T("quit"),
     _T("quote"),
+    _T("read"),
+    _T("reverse"),
     _T("set!"),
     _T("set-car!"),
     _T("set-cdr!"),
     _T("string->number"),
+    _T("string-append"),
     _T("string-length"),
     _T("string?"),
-    _T("string-append"),
     _T("substring"),
     _T("symbol?"),
-    _T("read"),
-    _T("reverse"),
-    NULL
   };
+  return xiskeyword<_tcsnicmp>(pszChars, nLength, s_apszSiodKeywordList);
+}
 
-static LPTSTR s_apszUser1KeywordList[] =
+static BOOL IsUser1Keyword(LPCTSTR pszChars, int nLength)
+{
+  static LPCTSTR const s_apszUser1KeywordList[] =
   {
     _T("acos"),
     _T("asin"),
@@ -110,12 +114,15 @@ static LPTSTR s_apszUser1KeywordList[] =
     _T("exp"),
     _T("log"),
     _T("sin"),
-    _T("tan"),
     _T("sqrt"),
-    NULL
+    _T("tan"),
   };
+  return xiskeyword<_tcsnicmp>(pszChars, nLength, s_apszUser1KeywordList);
+}
 
-static LPTSTR s_apszUser2KeywordList[] =
+static BOOL IsUser2Keyword(LPCTSTR pszChars, int nLength)
+{
+  static LPCTSTR const s_apszUser2KeywordList[] =
   {
     _T("%%%memref"),
     _T("%%closure"),
@@ -131,9 +138,6 @@ static LPTSTR s_apszUser2KeywordList[] =
     _T("*plists*"),
     _T("*throw"),
     _T("*traced*"),
-    _T("F_GETLK"),
-    _T("F_SETLK"),
-    _T("F_SETLKW"),
     _T("access-problem?"),
     _T("allocate-heap"),
     _T("apropos"),
@@ -171,6 +175,9 @@ static LPTSTR s_apszUser2KeywordList[] =
     _T("eof-val"),
     _T("errobj"),
     _T("error"),
+    _T("F_GETLK"),
+    _T("F_SETLK"),
+    _T("F_SETLKW"),
     _T("fast-load"),
     _T("fast-print"),
     _T("fast-read"),
@@ -320,63 +327,8 @@ static LPTSTR s_apszUser2KeywordList[] =
     _T("wait"),
     _T("while"),
     _T("writes"),
-    NULL
   };
-
-static BOOL
-IsXKeyword (LPTSTR apszKeywords[], LPCTSTR pszChars, int nLength)
-{
-  for (int L = 0; apszKeywords[L] != NULL; L++)
-    {
-      if (_tcsnicmp (apszKeywords[L], pszChars, nLength) == 0
-            && apszKeywords[L][nLength] == 0)
-        return TRUE;
-    }
-  return FALSE;
-}
-
-static BOOL
-IsSiodKeyword (LPCTSTR pszChars, int nLength)
-{
-  return IsXKeyword (s_apszSiodKeywordList, pszChars, nLength);
-}
-
-static BOOL
-IsUser1Keyword (LPCTSTR pszChars, int nLength)
-{
-  return IsXKeyword (s_apszUser1KeywordList, pszChars, nLength);
-}
-
-static BOOL
-IsUser2Keyword (LPCTSTR pszChars, int nLength)
-{
-  return IsXKeyword (s_apszUser2KeywordList, pszChars, nLength);
-}
-
-static BOOL
-IsSiodNumber (LPCTSTR pszChars, int nLength)
-{
-  if (nLength > 2 && pszChars[0] == '0' && pszChars[1] == 'x')
-    {
-      for (int I = 2; I < nLength; I++)
-        {
-          if (_istdigit (pszChars[I]) || (pszChars[I] >= 'A' && pszChars[I] <= 'F') ||
-                (pszChars[I] >= 'a' && pszChars[I] <= 'f'))
-            continue;
-          return FALSE;
-        }
-      return TRUE;
-    }
-  if (!_istdigit (pszChars[0]))
-    return FALSE;
-  for (int I = 1; I < nLength; I++)
-    {
-      if (!_istdigit (pszChars[I]) && pszChars[I] != '+' &&
-            pszChars[I] != '-' && pszChars[I] != '.' && pszChars[I] != 'e' &&
-            pszChars[I] != 'E')
-        return FALSE;
-    }
-  return TRUE;
+  return xiskeyword<_tcsnicmp>(pszChars, nLength, s_apszUser2KeywordList);
 }
 
 #define DEFINE_BLOCK(pos, colorindex)   \
@@ -402,7 +354,7 @@ DWORD CCrystalTextView::ParseLineSiod(DWORD dwCookie, int nLineIndex, TEXTBLOCK 
   if (nLength == 0)
     return dwCookie & COOKIE_EXT_COMMENT;
 
-  LPCTSTR pszChars = GetLineChars(nLineIndex);
+  const LPCTSTR pszChars = GetLineChars(nLineIndex);
   BOOL bFirstChar = (dwCookie & ~COOKIE_EXT_COMMENT) == 0;
   BOOL bRedefineBlock = TRUE;
   BOOL bWasCommentStart = FALSE;
@@ -421,21 +373,21 @@ DWORD CCrystalTextView::ParseLineSiod(DWORD dwCookie, int nLineIndex, TEXTBLOCK 
             nPos = nPrevI;
           if (dwCookie & (COOKIE_COMMENT | COOKIE_EXT_COMMENT))
             {
-              DEFINE_BLOCK (nPos, COLORINDEX_COMMENT);
+              DEFINE_BLOCK(nPos, COLORINDEX_COMMENT);
             }
           else if (dwCookie & (COOKIE_CHAR | COOKIE_STRING))
             {
-              DEFINE_BLOCK (nPos, COLORINDEX_STRING);
+              DEFINE_BLOCK(nPos, COLORINDEX_STRING);
             }
           else
             {
               if (xisalnum(pszChars[nPos]) || pszChars[nPos] == '.')
                 {
-                  DEFINE_BLOCK (nPos, COLORINDEX_NORMALTEXT);
+                  DEFINE_BLOCK(nPos, COLORINDEX_NORMALTEXT);
                 }
               else
                 {
-                  DEFINE_BLOCK (nPos, COLORINDEX_OPERATOR);
+                  DEFINE_BLOCK(nPos, COLORINDEX_OPERATOR);
                   bRedefineBlock = TRUE;
                   bDecIndex = TRUE;
                   goto out;
@@ -453,7 +405,7 @@ out:
 
       if (dwCookie & COOKIE_COMMENT)
         {
-          DEFINE_BLOCK (I, COLORINDEX_COMMENT);
+          DEFINE_BLOCK(I, COLORINDEX_COMMENT);
           dwCookie |= COOKIE_COMMENT;
           break;
         }
@@ -495,7 +447,7 @@ out:
 
       if (I > 0 && pszChars[I] != '|' && pszChars[nPrevI] == ';')
         {
-          DEFINE_BLOCK (I, COLORINDEX_COMMENT);
+          DEFINE_BLOCK(I, COLORINDEX_COMMENT);
           dwCookie |= COOKIE_COMMENT;
           break;
         }
@@ -503,7 +455,7 @@ out:
       //  Normal text
       if (pszChars[I] == '"')
         {
-          DEFINE_BLOCK (I, COLORINDEX_STRING);
+          DEFINE_BLOCK(I, COLORINDEX_STRING);
           dwCookie |= COOKIE_STRING;
           continue;
         }
@@ -512,14 +464,14 @@ out:
           // if (I + 1 < nLength && pszChars[I + 1] == '\'' || I + 2 < nLength && pszChars[I + 1] != '\\' && pszChars[I + 2] == '\'' || I + 3 < nLength && pszChars[I + 1] == '\\' && pszChars[I + 3] == '\'')
           if (!I || !xisalnum(pszChars[nPrevI]))
             {
-              DEFINE_BLOCK (I, COLORINDEX_STRING);
+              DEFINE_BLOCK(I, COLORINDEX_STRING);
               dwCookie |= COOKIE_CHAR;
               continue;
             }
         }
       if (I > 0 && pszChars[I] == '|' && pszChars[nPrevI] == ';')
         {
-          DEFINE_BLOCK (nPrevI, COLORINDEX_COMMENT);
+          DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
           dwCookie |= COOKIE_EXT_COMMENT;
           bWasCommentStart = TRUE;
           continue;
@@ -529,7 +481,7 @@ out:
 
       if (bFirstChar)
         {
-          if (!xisspace (pszChars[I]))
+          if (!xisspace(pszChars[I]))
             bFirstChar = FALSE;
         }
 
@@ -546,25 +498,25 @@ out:
         {
           if (nIdentBegin >= 0)
             {
-              if (IsSiodKeyword (pszChars + nIdentBegin, I - nIdentBegin))
+              if (IsSiodKeyword(pszChars + nIdentBegin, I - nIdentBegin))
                 {
                   if (!_tcsnicmp (_T ("defun"), pszChars + nIdentBegin, 5))
                     {
                       bDefun = TRUE;
                     }
-                  DEFINE_BLOCK (nIdentBegin, COLORINDEX_KEYWORD);
+                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
                 }
-              else if (IsUser1Keyword (pszChars + nIdentBegin, I - nIdentBegin))
+              else if (IsUser1Keyword(pszChars + nIdentBegin, I - nIdentBegin))
                 {
-                  DEFINE_BLOCK (nIdentBegin, COLORINDEX_USER1);
+                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER1);
                 }
-              else if (IsUser2Keyword (pszChars + nIdentBegin, I - nIdentBegin))
+              else if (IsUser2Keyword(pszChars + nIdentBegin, I - nIdentBegin))
                 {
-                  DEFINE_BLOCK (nIdentBegin, COLORINDEX_USER2);
+                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER2);
                 }
-              else if (IsSiodNumber (pszChars + nIdentBegin, I - nIdentBegin))
+              else if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
                 {
-                  DEFINE_BLOCK (nIdentBegin, COLORINDEX_NUMBER);
+                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
                 }
               else
                 {
@@ -574,7 +526,7 @@ out:
                     {
                       for (int j = nIdentBegin; --j >= 0;)
                         {
-                          if (!xisspace (pszChars[j]))
+                          if (!xisspace(pszChars[j]))
                             {
                               if (pszChars[j] == '(')
                                 {
@@ -588,7 +540,7 @@ out:
                     {
                       for (int j = I; j >= 0; j--)
                         {
-                          if (!xisspace (pszChars[j]))
+                          if (!xisspace(pszChars[j]))
                             {
                               if (pszChars[j] == '(')
                                 {
@@ -600,7 +552,7 @@ out:
                     }
                   if (bFunction)
                     {
-                      DEFINE_BLOCK (nIdentBegin, COLORINDEX_FUNCNAME);
+                      DEFINE_BLOCK(nIdentBegin, COLORINDEX_FUNCNAME);
                     }
                 }
               bRedefineBlock = TRUE;
@@ -612,25 +564,25 @@ out:
 
   if (nIdentBegin >= 0)
     {
-      if (IsSiodKeyword (pszChars + nIdentBegin, I - nIdentBegin))
+      if (IsSiodKeyword(pszChars + nIdentBegin, I - nIdentBegin))
         {
           if (!_tcsnicmp (_T ("defun"), pszChars + nIdentBegin, 5))
             {
               bDefun = TRUE;
             }
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_KEYWORD);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
         }
-      else if (IsUser1Keyword (pszChars + nIdentBegin, I - nIdentBegin))
+      else if (IsUser1Keyword(pszChars + nIdentBegin, I - nIdentBegin))
         {
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_USER1);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER1);
         }
-      else if (IsUser2Keyword (pszChars + nIdentBegin, I - nIdentBegin))
+      else if (IsUser2Keyword(pszChars + nIdentBegin, I - nIdentBegin))
         {
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_USER2);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER2);
         }
-      else if (IsSiodNumber (pszChars + nIdentBegin, I - nIdentBegin))
+      else if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
         {
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_NUMBER);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
         }
       else
         {
@@ -640,7 +592,7 @@ out:
             {
               for (int j = nIdentBegin; --j >= 0;)
                 {
-                  if (!xisspace (pszChars[j]))
+                  if (!xisspace(pszChars[j]))
                     {
                       if (pszChars[j] == '(')
                         {
@@ -654,7 +606,7 @@ out:
             {
               for (int j = I; j >= 0; j--)
                 {
-                  if (!xisspace (pszChars[j]))
+                  if (!xisspace(pszChars[j]))
                     {
                       if (pszChars[j] == '(')
                         {
@@ -666,7 +618,7 @@ out:
             }
           if (bFunction)
             {
-              DEFINE_BLOCK (nIdentBegin, COLORINDEX_FUNCNAME);
+              DEFINE_BLOCK(nIdentBegin, COLORINDEX_FUNCNAME);
             }
         }
     }

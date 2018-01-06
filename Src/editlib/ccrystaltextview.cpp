@@ -88,8 +88,6 @@
 #include "resource.h"
 #include "LanguageSelect.h"
 #include <imm.h> /* IME */
-#include "editcmd.h"
-#include "ccrystaltextview.h"
 #include "ccrystaltextbuffer.h"
 #include "cfindtextdlg.h"
 #include "coretools.h"
@@ -108,8 +106,6 @@ using std::vector;
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
 #endif
 
 /** @brief Width of revision marks. */
@@ -282,6 +278,7 @@ CCrystalTextView::TextDefinition CCrystalTextView::m_StaticSourceDefs[] =
 	SRC_CSS, _T ("CSS"), _T ("css"), &ParseLineCss, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T ("/*"), _T ("*/"), _T (""),
 	SRC_DCL, _T ("DCL"), _T ("dcl;dcc"), &ParseLineDcl, SRCOPT_AUTOINDENT|SRCOPT_BRACEGNU, /*2,*/ _T ("/*"), _T ("*/"), _T ("//"),
 	SRC_FORTRAN, _T ("Fortran"), _T ("f;f90;f9p;fpp;for;f77"), &ParseLineFortran, SRCOPT_INSERTTABS|SRCOPT_AUTOINDENT, /*8,*/ _T (""), _T (""), _T ("!"),
+	SRC_GO, _T ("Go"), _T ("go"), &ParseLineGo, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T ("/*"), _T ("*/"), _T ("//"),
 	SRC_HTML, _T ("HTML"), _T ("html;htm;shtml;ihtml;ssi;stm;stml;jsp"), &ParseLineHtml, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T ("<!--"), _T ("-->"), _T (""),
 	SRC_INI, _T ("INI"), _T ("ini;reg;vbp;isl"), &ParseLineIni, SRCOPT_AUTOINDENT|SRCOPT_BRACEGNU|SRCOPT_EOLNUNIX, /*2,*/ _T (""), _T (""), _T (";"),
 	SRC_INNOSETUP, _T ("InnoSetup"), _T ("iss"), &ParseLineInnoSetup, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T ("{"), _T ("}"), _T (";"),
@@ -298,6 +295,7 @@ CCrystalTextView::TextDefinition CCrystalTextView::m_StaticSourceDefs[] =
 	SRC_REXX, _T ("REXX"), _T ("rex;rexx"), &ParseLineRexx, SRCOPT_AUTOINDENT, /*4,*/ _T ("/*"), _T ("*/"), _T ("//"),
 	SRC_RSRC, _T ("Resources"), _T ("rc;dlg;r16;r32;rc2"), &ParseLineRsrc, SRCOPT_AUTOINDENT, /*4,*/ _T ("/*"), _T ("*/"), _T ("//"),
 	SRC_RUBY, _T ("Ruby"), _T ("rb;rbw;rake;gemspec"), &ParseLineRuby, SRCOPT_AUTOINDENT|SRCOPT_EOLNUNIX, /*4,*/ _T (""), _T (""), _T ("#"),
+	SRC_RUST, _T ("Rust"), _T ("rs"), &ParseLineRust, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T ("/*"), _T ("*/"), _T ("//"),
 	SRC_SGML, _T ("Sgml"), _T ("sgml"), &ParseLineSgml, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T ("<!--"), _T ("-->"), _T (""),
 	SRC_SH, _T ("Shell"), _T ("sh;conf"), &ParseLineSh, SRCOPT_INSERTTABS|SRCOPT_AUTOINDENT|SRCOPT_EOLNUNIX, /*4,*/ _T (""), _T (""), _T ("#"),
 	SRC_SIOD, _T ("SIOD"), _T ("scm"), &ParseLineSiod, SRCOPT_AUTOINDENT|SRCOPT_BRACEGNU, /*2,*/ _T (";|"), _T ("|;"), _T (";"),
@@ -305,6 +303,7 @@ CCrystalTextView::TextDefinition CCrystalTextView::m_StaticSourceDefs[] =
 	SRC_TCL, _T ("TCL"), _T ("tcl"), &ParseLineTcl, SRCOPT_AUTOINDENT|SRCOPT_BRACEGNU|SRCOPT_EOLNUNIX, /*2,*/ _T (""), _T (""), _T ("#"),
 	SRC_TEX, _T ("TEX"), _T ("tex;sty;clo;ltx;fd;dtx"), &ParseLineTex, SRCOPT_AUTOINDENT, /*4,*/ _T (""), _T (""), _T ("%"),
 	SRC_VERILOG, _T ("Verilog"), _T ("v;vh"), &ParseLineVerilog, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T ("/*"), _T ("*/"), _T ("//"),
+	SRC_VHDL, _T ("VHDL"), _T ("vhd;vhdl;vho"), &ParseLineVhdl, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T (""), _T (""), _T ("--"),
 	SRC_XML, _T ("XML"), _T ("xml"), &ParseLineXml, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T ("<!--"), _T ("-->"), _T ("")
 }, *CCrystalTextView::m_SourceDefs = m_StaticSourceDefs;
 
@@ -563,7 +562,7 @@ int CCrystalTextView::GetLineActualLength(int nLineIndex)
 
 	//  Actual line length is not determined yet, let's calculate a little
 	int nActualLength = 0;
-	int nLength = GetLineLength(nLineIndex);
+	const int nLength = GetLineLength(nLineIndex);
 	if (nLength > 0)
     {
 		LPCTSTR pszChars = GetLineChars(nLineIndex);
@@ -2169,7 +2168,7 @@ int CCrystalTextView::SubLineHomeToCharPos(int nLineIndex, int nSubLineOffset)
 		return 0;
 
 	// wrap line
-	int nLength = GetLineLength(nLineIndex);
+	const int nLength = GetLineLength(nLineIndex);
 	int *anBreaks = new int[nLength];
 	int nBreaks = 0;
 
@@ -2915,7 +2914,7 @@ int CCrystalTextView::ApproxActualOffset(int nLineIndex, int nOffset)
 {
 	if (nOffset == 0)
 		return 0;
-	int nLength = GetLineLength(nLineIndex);
+	const int nLength = GetLineLength(nLineIndex);
 	LPCTSTR pszChars = GetLineChars(nLineIndex);
 	int nCurrentOffset = 0;
 	int nTabSize = GetTabSize();

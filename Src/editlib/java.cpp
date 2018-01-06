@@ -16,114 +16,71 @@
 
 #include "StdAfx.h"
 #include "ccrystaltextview.h"
-#include "ccrystaltextbuffer.h"
 #include "SyntaxColors.h"
 #include "string_util.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
 #endif
 
-//  C++ keywords (MSVC5.0 + POET5.0)
-static LPTSTR s_apszJavaKeywordList[] =
+using CommonKeywords::IsNumeric;
+
+static BOOL IsJavaKeyword(LPCTSTR pszChars, int nLength)
+{
+  static LPCTSTR const s_apszJavaKeywordList[] =
   {
     _T ("abstract"),
-    _T ("default"),
-    _T ("goto"),
-    _T ("null"),
-    _T ("synchronized"),
     _T ("boolean"),
-    _T ("do"),
-    _T ("if"),
-    _T ("package"),
-    _T ("this"),
     _T ("break"),
-    _T ("double"),
-    _T ("implements"),
-    _T ("private"),
-    _T ("threadsafe"),
     _T ("byte"),
-    _T ("else"),
-    _T ("import"),
-    _T ("protected"),
-    _T ("throw"),
     _T ("byvalue"),
-    _T ("extends"),
-    _T ("instanceof"),
-    _T ("public"),
-    _T ("transient"),
     _T ("case"),
-    _T ("false"),
-    _T ("int"),
-    _T ("return"),
-    _T ("true"),
     _T ("catch"),
-    _T ("final"),
-    _T ("interface"),
-    _T ("short"),
-    _T ("try"),
     _T ("char"),
-    _T ("finally"),
-    _T ("long"),
-    _T ("static"),
-    _T ("void"),
     _T ("class"),
-    _T ("float"),
-    _T ("native"),
-    _T ("super"),
-    _T ("while"),
     _T ("const"),
-    _T ("for"),
-    _T ("new"),
-    _T ("switch"),
     _T ("continue"),
-    NULL
+    _T ("default"),
+    _T ("do"),
+    _T ("double"),
+    _T ("else"),
+    _T ("extends"),
+    _T ("false"),
+    _T ("final"),
+    _T ("finally"),
+    _T ("float"),
+    _T ("for"),
+    _T ("goto"),
+    _T ("if"),
+    _T ("implements"),
+    _T ("import"),
+    _T ("instanceof"),
+    _T ("int"),
+    _T ("interface"),
+    _T ("long"),
+    _T ("native"),
+    _T ("new"),
+    _T ("null"),
+    _T ("package"),
+    _T ("private"),
+    _T ("protected"),
+    _T ("public"),
+    _T ("return"),
+    _T ("short"),
+    _T ("static"),
+    _T ("super"),
+    _T ("switch"),
+    _T ("synchronized"),
+    _T ("this"),
+    _T ("threadsafe"),
+    _T ("throw"),
+    _T ("transient"),
+    _T ("true"),
+    _T ("try"),
+    _T ("void"),
+    _T ("while"),
   };
-
-static BOOL
-IsXKeyword (LPTSTR apszKeywords[], LPCTSTR pszChars, int nLength)
-{
-  for (int L = 0; apszKeywords[L] != NULL; L++)
-    {
-      if (_tcsncmp (apszKeywords[L], pszChars, nLength) == 0
-            && apszKeywords[L][nLength] == 0)
-        return TRUE;
-    }
-  return FALSE;
-}
-
-static BOOL
-IsJavaKeyword (LPCTSTR pszChars, int nLength)
-{
-  return IsXKeyword (s_apszJavaKeywordList, pszChars, nLength);
-}
-
-static BOOL
-IsJavaNumber (LPCTSTR pszChars, int nLength)
-{
-  if (nLength > 2 && pszChars[0] == '0' && pszChars[1] == 'x')
-    {
-      for (int I = 2; I < nLength; I++)
-        {
-          if (_istdigit (pszChars[I]) || (pszChars[I] >= 'A' && pszChars[I] <= 'F') ||
-                (pszChars[I] >= 'a' && pszChars[I] <= 'f'))
-            continue;
-          return FALSE;
-        }
-      return TRUE;
-    }
-  if (!_istdigit (pszChars[0]))
-    return FALSE;
-  for (int I = 1; I < nLength; I++)
-    {
-      if (!_istdigit (pszChars[I]) && pszChars[I] != '+' &&
-            pszChars[I] != '-' && pszChars[I] != '.' && pszChars[I] != 'e' &&
-            pszChars[I] != 'E')
-        return FALSE;
-    }
-  return TRUE;
+  return xiskeyword<_tcsncmp>(pszChars, nLength, s_apszJavaKeywordList);
 }
 
 #define DEFINE_BLOCK(pos, colorindex)   \
@@ -149,7 +106,7 @@ DWORD CCrystalTextView::ParseLineJava(DWORD dwCookie, int nLineIndex, TEXTBLOCK 
   if (nLength == 0)
     return dwCookie & COOKIE_EXT_COMMENT;
 
-  LPCTSTR pszChars = GetLineChars(nLineIndex);
+  const LPCTSTR pszChars = GetLineChars(nLineIndex);
   BOOL bFirstChar = (dwCookie & ~COOKIE_EXT_COMMENT) == 0;
   BOOL bRedefineBlock = TRUE;
   BOOL bWasCommentStart = FALSE;
@@ -166,25 +123,25 @@ DWORD CCrystalTextView::ParseLineJava(DWORD dwCookie, int nLineIndex, TEXTBLOCK 
             nPos = nPrevI;
           if (dwCookie & (COOKIE_COMMENT | COOKIE_EXT_COMMENT))
             {
-              DEFINE_BLOCK (nPos, COLORINDEX_COMMENT);
+              DEFINE_BLOCK(nPos, COLORINDEX_COMMENT);
             }
           else if (dwCookie & (COOKIE_CHAR | COOKIE_STRING))
             {
-              DEFINE_BLOCK (nPos, COLORINDEX_STRING);
+              DEFINE_BLOCK(nPos, COLORINDEX_STRING);
             }
           else if (dwCookie & COOKIE_PREPROCESSOR)
             {
-              DEFINE_BLOCK (nPos, COLORINDEX_PREPROCESSOR);
+              DEFINE_BLOCK(nPos, COLORINDEX_PREPROCESSOR);
             }
           else
             {
               if (xisalnum(pszChars[nPos]) || pszChars[nPos] == '.' && nPos > 0 && (!xisalpha(pszChars[nPos - 1]) && !xisalpha(pszChars[nPos + 1])))
                 {
-                  DEFINE_BLOCK (nPos, COLORINDEX_NORMALTEXT);
+                  DEFINE_BLOCK(nPos, COLORINDEX_NORMALTEXT);
                 }
               else
                 {
-                  DEFINE_BLOCK (nPos, COLORINDEX_OPERATOR);
+                  DEFINE_BLOCK(nPos, COLORINDEX_OPERATOR);
                   bRedefineBlock = TRUE;
                   bDecIndex = TRUE;
                   goto out;
@@ -202,7 +159,7 @@ out:
 
       if (dwCookie & COOKIE_COMMENT)
         {
-          DEFINE_BLOCK (I, COLORINDEX_COMMENT);
+          DEFINE_BLOCK(I, COLORINDEX_COMMENT);
           dwCookie |= COOKIE_COMMENT;
           break;
         }
@@ -244,7 +201,7 @@ out:
 
       if (I > 0 && pszChars[I] == '/' && pszChars[nPrevI] == '/')
         {
-          DEFINE_BLOCK (nPrevI, COLORINDEX_COMMENT);
+          DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
           dwCookie |= COOKIE_COMMENT;
           break;
         }
@@ -254,7 +211,7 @@ out:
         {
           if (I > 0 && pszChars[I] == '*' && pszChars[nPrevI] == '/')
             {
-              DEFINE_BLOCK (nPrevI, COLORINDEX_COMMENT);
+              DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
               dwCookie |= COOKIE_EXT_COMMENT;
             }
           continue;
@@ -263,7 +220,7 @@ out:
       //  Normal text
       if (pszChars[I] == '"')
         {
-          DEFINE_BLOCK (I, COLORINDEX_STRING);
+          DEFINE_BLOCK(I, COLORINDEX_STRING);
           dwCookie |= COOKIE_STRING;
           continue;
         }
@@ -272,14 +229,14 @@ out:
           // if (I + 1 < nLength && pszChars[I + 1] == '\'' || I + 2 < nLength && pszChars[I + 1] != '\\' && pszChars[I + 2] == '\'' || I + 3 < nLength && pszChars[I + 1] == '\\' && pszChars[I + 3] == '\'')
           if (!I || !xisalnum(pszChars[nPrevI]))
             {
-              DEFINE_BLOCK (I, COLORINDEX_STRING);
+              DEFINE_BLOCK(I, COLORINDEX_STRING);
               dwCookie |= COOKIE_CHAR;
               continue;
             }
         }
       if (I > 0 && pszChars[I] == '*' && pszChars[nPrevI] == '/')
         {
-          DEFINE_BLOCK (nPrevI, COLORINDEX_COMMENT);
+          DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
           dwCookie |= COOKIE_EXT_COMMENT;
           bWasCommentStart = TRUE;
           continue;
@@ -291,11 +248,11 @@ out:
         {
           if (pszChars[I] == '#')
             {
-              DEFINE_BLOCK (I, COLORINDEX_PREPROCESSOR);
+              DEFINE_BLOCK(I, COLORINDEX_PREPROCESSOR);
               dwCookie |= COOKIE_PREPROCESSOR;
               continue;
             }
-          if (!xisspace (pszChars[I]))
+          if (!xisspace(pszChars[I]))
             bFirstChar = FALSE;
         }
 
@@ -312,13 +269,13 @@ out:
         {
           if (nIdentBegin >= 0)
             {
-              if (IsJavaKeyword (pszChars + nIdentBegin, I - nIdentBegin))
+              if (IsJavaKeyword(pszChars + nIdentBegin, I - nIdentBegin))
                 {
-                  DEFINE_BLOCK (nIdentBegin, COLORINDEX_KEYWORD);
+                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
                 }
-              else if (IsJavaNumber (pszChars + nIdentBegin, I - nIdentBegin))
+              else if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
                 {
-                  DEFINE_BLOCK (nIdentBegin, COLORINDEX_NUMBER);
+                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
                 }
               else
                 {
@@ -326,7 +283,7 @@ out:
 
                   for (int j = I; j < nLength; j++)
                     {
-                      if (!xisspace (pszChars[j]))
+                      if (!xisspace(pszChars[j]))
                         {
                           if (pszChars[j] == '(')
                             {
@@ -337,7 +294,7 @@ out:
                     }
                   if (bFunction)
                     {
-                      DEFINE_BLOCK (nIdentBegin, COLORINDEX_FUNCNAME);
+                      DEFINE_BLOCK(nIdentBegin, COLORINDEX_FUNCNAME);
                     }
                 }
               bRedefineBlock = TRUE;
@@ -349,13 +306,13 @@ out:
 
   if (nIdentBegin >= 0)
     {
-      if (IsJavaKeyword (pszChars + nIdentBegin, I - nIdentBegin))
+      if (IsJavaKeyword(pszChars + nIdentBegin, I - nIdentBegin))
         {
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_KEYWORD);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
         }
-      else if (IsJavaNumber (pszChars + nIdentBegin, I - nIdentBegin))
+      else if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
         {
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_NUMBER);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
         }
       else
         {
@@ -363,7 +320,7 @@ out:
 
           for (int j = I; j < nLength; j++)
             {
-              if (!xisspace (pszChars[j]))
+              if (!xisspace(pszChars[j]))
                 {
                   if (pszChars[j] == '(')
                     {
@@ -374,7 +331,7 @@ out:
             }
           if (bFunction)
             {
-              DEFINE_BLOCK (nIdentBegin, COLORINDEX_FUNCNAME);
+              DEFINE_BLOCK(nIdentBegin, COLORINDEX_FUNCNAME);
             }
         }
     }

@@ -16,18 +16,17 @@
 
 #include "StdAfx.h"
 #include "ccrystaltextview.h"
-#include "ccrystaltextbuffer.h"
 #include "SyntaxColors.h"
 #include "string_util.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
 #endif
 
-//  Verilog keywords
-static LPTSTR s_apszVerilogKeywordList[] =
+// Verilog keywords
+static BOOL IsVerilogKeyword(LPCTSTR pszChars, int nLength)
+{
+  static LPCTSTR const s_apszVerilogKeywordList[] =
   {
     _T ("always"),
     _T ("and"),
@@ -152,11 +151,14 @@ static LPTSTR s_apszVerilogKeywordList[] =
     _T ("wor"),
     _T ("xnor"),
     _T ("xor"),
-    NULL
   };
+  return xiskeyword<_tcsncmp>(pszChars, nLength, s_apszVerilogKeywordList);
+}
 
-//  Verilog functions
-static LPTSTR s_apszVerilogFunctionList[] =
+// Verilog functions
+static BOOL IsVerilogFunction(LPCTSTR pszChars, int nLength)
+{
+  static LPCTSTR const s_apszVerilogFunctionList[] =
   {
     _T ("$async$and$array"),
     _T ("$async$and$plane"),
@@ -304,35 +306,11 @@ static LPTSTR s_apszVerilogFunctionList[] =
     _T ("$writeb"),
     _T ("$writeh"),
     _T ("$writeo"),
-    NULL
   };
-
-static BOOL
-IsXKeyword (LPTSTR apszKeywords[], LPCTSTR pszChars, int nLength)
-{
-  for (int L = 0; apszKeywords[L] != NULL; L++)
-    {
-      if (_tcsncmp (apszKeywords[L], pszChars, nLength) == 0
-            && apszKeywords[L][nLength] == 0)
-        return TRUE;
-    }
-  return FALSE;
+  return xiskeyword<_tcsncmp>(pszChars, nLength, s_apszVerilogFunctionList);
 }
 
-static BOOL
-IsVerilogKeyword (LPCTSTR pszChars, int nLength)
-{
-  return IsXKeyword (s_apszVerilogKeywordList, pszChars, nLength);
-}
-
-static BOOL
-IsVerilogFunction (LPCTSTR pszChars, int nLength)
-{
-  return IsXKeyword (s_apszVerilogFunctionList, pszChars, nLength);
-}
-
-static BOOL
-IsVerilogNumber (LPCTSTR pszChars, int nLength)
+static BOOL IsVerilogNumber(LPCTSTR pszChars, int nLength)
 {
   if (!_istdigit (pszChars[0]))
     return FALSE;
@@ -371,7 +349,7 @@ DWORD CCrystalTextView::ParseLineVerilog(DWORD dwCookie, int nLineIndex, TEXTBLO
   if (nLength == 0)
     return dwCookie & COOKIE_EXT_COMMENT;
 
-  LPCTSTR pszChars = GetLineChars(nLineIndex);
+  const LPCTSTR pszChars = GetLineChars(nLineIndex);
   BOOL bFirstChar = (dwCookie & ~COOKIE_EXT_COMMENT) == 0;
   BOOL bRedefineBlock = TRUE;
   BOOL bWasCommentStart = FALSE;
@@ -388,25 +366,25 @@ DWORD CCrystalTextView::ParseLineVerilog(DWORD dwCookie, int nLineIndex, TEXTBLO
             nPos = nPrevI;
           if (dwCookie & (COOKIE_COMMENT | COOKIE_EXT_COMMENT))
             {
-              DEFINE_BLOCK (nPos, COLORINDEX_COMMENT);
+              DEFINE_BLOCK(nPos, COLORINDEX_COMMENT);
             }
           else if (dwCookie & (COOKIE_CHAR | COOKIE_STRING))
             {
-              DEFINE_BLOCK (nPos, COLORINDEX_STRING);
+              DEFINE_BLOCK(nPos, COLORINDEX_STRING);
             }
           else if (dwCookie & COOKIE_PREPROCESSOR)
             {
-              DEFINE_BLOCK (nPos, COLORINDEX_PREPROCESSOR);
+              DEFINE_BLOCK(nPos, COLORINDEX_PREPROCESSOR);
             }
           else
             {
               if (xisalnum(pszChars[nPos]) || pszChars[nPos] == '$' || (pszChars[nPos] == '\'' && nPos > 0 && (xisalpha(pszChars[nPos + 1]))))
                 {
-                  DEFINE_BLOCK (nPos, COLORINDEX_NORMALTEXT);
+                  DEFINE_BLOCK(nPos, COLORINDEX_NORMALTEXT);
                 }
               else
                 {
-                  DEFINE_BLOCK (nPos, COLORINDEX_OPERATOR);
+                  DEFINE_BLOCK(nPos, COLORINDEX_OPERATOR);
                   bRedefineBlock = TRUE;
                   bDecIndex = TRUE;
                   goto out;
@@ -424,7 +402,7 @@ out:
 
       if (dwCookie & COOKIE_COMMENT)
         {
-          DEFINE_BLOCK (I, COLORINDEX_COMMENT);
+          DEFINE_BLOCK(I, COLORINDEX_COMMENT);
           dwCookie |= COOKIE_COMMENT;
           break;
         }
@@ -455,7 +433,7 @@ out:
       // Line comment //...
       if (I > 0 && pszChars[I] == '/' && pszChars[nPrevI] == '/')
         {
-          DEFINE_BLOCK (nPrevI, COLORINDEX_COMMENT);
+          DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
           dwCookie |= COOKIE_COMMENT;
           break;
         }
@@ -465,7 +443,7 @@ out:
         {
           if (I > 0 && pszChars[I] == '*' && pszChars[nPrevI] == '/')
             {
-              DEFINE_BLOCK (nPrevI, COLORINDEX_COMMENT);
+              DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
               dwCookie |= COOKIE_EXT_COMMENT;
             }
           continue;
@@ -474,13 +452,13 @@ out:
       //  Normal text
       if (pszChars[I] == '"')
         {
-          DEFINE_BLOCK (I, COLORINDEX_STRING);
+          DEFINE_BLOCK(I, COLORINDEX_STRING);
           dwCookie |= COOKIE_STRING;
           continue;
         }
       if (I > 0 && pszChars[I] == '*' && pszChars[nPrevI] == '/')
         {
-          DEFINE_BLOCK (nPrevI, COLORINDEX_COMMENT);
+          DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
           dwCookie |= COOKIE_EXT_COMMENT;
           bWasCommentStart = TRUE;
           continue;
@@ -492,11 +470,11 @@ out:
         {
           if (pszChars[I] == '`')
             {
-              DEFINE_BLOCK (I, COLORINDEX_PREPROCESSOR);
+              DEFINE_BLOCK(I, COLORINDEX_PREPROCESSOR);
               dwCookie |= COOKIE_PREPROCESSOR;
               continue;
             }
-          if (!xisspace (pszChars[I]))
+          if (!xisspace(pszChars[I]))
             bFirstChar = FALSE;
         }
 
@@ -513,17 +491,17 @@ out:
         {
           if (nIdentBegin >= 0)
             {
-              if (IsVerilogKeyword (pszChars + nIdentBegin, I - nIdentBegin))
+              if (IsVerilogKeyword(pszChars + nIdentBegin, I - nIdentBegin))
                 {
-                  DEFINE_BLOCK (nIdentBegin, COLORINDEX_KEYWORD);
+                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
                 }
               else if (IsVerilogFunction (pszChars + nIdentBegin, I - nIdentBegin))
                 {
-                  DEFINE_BLOCK (nIdentBegin, COLORINDEX_USER1);
+                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER1);
                 }
               else if (IsVerilogNumber (pszChars + nIdentBegin, I - nIdentBegin))
                 {
-                  DEFINE_BLOCK (nIdentBegin, COLORINDEX_NUMBER);
+                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
                 }
               bRedefineBlock = TRUE;
               bDecIndex = TRUE;
@@ -534,17 +512,17 @@ out:
 
   if (nIdentBegin >= 0)
     {
-      if (IsVerilogKeyword (pszChars + nIdentBegin, I - nIdentBegin))
+      if (IsVerilogKeyword(pszChars + nIdentBegin, I - nIdentBegin))
         {
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_KEYWORD);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
         }
       else if (IsVerilogFunction (pszChars + nIdentBegin, I - nIdentBegin))
         {
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_FUNCNAME);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_FUNCNAME);
         }
       else if (IsVerilogNumber (pszChars + nIdentBegin, I - nIdentBegin))
         {
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_NUMBER);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
         }
     }
 

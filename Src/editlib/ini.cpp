@@ -17,41 +17,14 @@
 
 #include "StdAfx.h"
 #include "ccrystaltextview.h"
-#include "ccrystaltextbuffer.h"
 #include "SyntaxColors.h"
 #include "string_util.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
 #endif
 
-static BOOL
-IsIniNumber (LPCTSTR pszChars, int nLength)
-{
-  if (nLength > 2 && pszChars[0] == '0' && pszChars[1] == 'x')
-    {
-      for (int I = 2; I < nLength; I++)
-        {
-          if (_istdigit (pszChars[I]) || (pszChars[I] >= 'A' && pszChars[I] <= 'F') ||
-                (pszChars[I] >= 'a' && pszChars[I] <= 'f'))
-            continue;
-          return FALSE;
-        }
-      return TRUE;
-    }
-  if (!_istdigit (pszChars[0]))
-    return FALSE;
-  for (int I = 1; I < nLength; I++)
-    {
-      if (!_istdigit (pszChars[I]) && pszChars[I] != '+' &&
-            pszChars[I] != '-' && pszChars[I] != '.' && pszChars[I] != 'e' &&
-            pszChars[I] != 'E')
-        return FALSE;
-    }
-  return TRUE;
-}
+using CommonKeywords::IsNumeric;
 
 #define DEFINE_BLOCK(pos, colorindex)   \
 ASSERT((pos) >= 0 && (pos) <= nLength);\
@@ -78,7 +51,7 @@ DWORD CCrystalTextView::ParseLineIni(DWORD dwCookie, int nLineIndex, TEXTBLOCK *
   if (nLength == 0)
     return dwCookie & COOKIE_EXT_COMMENT;
 
-  LPCTSTR pszChars = GetLineChars(nLineIndex);
+  const LPCTSTR pszChars = GetLineChars(nLineIndex);
   BOOL bFirstChar = (dwCookie & ~COOKIE_EXT_COMMENT) == 0;
   BOOL bRedefineBlock = TRUE;
   BOOL bDecIndex = FALSE;
@@ -94,29 +67,29 @@ DWORD CCrystalTextView::ParseLineIni(DWORD dwCookie, int nLineIndex, TEXTBLOCK *
             nPos = nPrevI;
           if (dwCookie & (COOKIE_COMMENT | COOKIE_EXT_COMMENT))
             {
-              DEFINE_BLOCK (nPos, COLORINDEX_COMMENT);
+              DEFINE_BLOCK(nPos, COLORINDEX_COMMENT);
             }
           else if (dwCookie & (COOKIE_CHAR | COOKIE_STRING))
             {
-              DEFINE_BLOCK (nPos, COLORINDEX_STRING);
+              DEFINE_BLOCK(nPos, COLORINDEX_STRING);
             }
           else if (dwCookie & COOKIE_SECTION)
             {
-              DEFINE_BLOCK (nPos, COLORINDEX_FUNCNAME);
+              DEFINE_BLOCK(nPos, COLORINDEX_FUNCNAME);
             }
           else if (dwCookie & COOKIE_KEY)
             {
-              DEFINE_BLOCK (nPos, COLORINDEX_KEYWORD);
+              DEFINE_BLOCK(nPos, COLORINDEX_KEYWORD);
             }
           else
             {
               if (xisalnum(pszChars[nPos]) || pszChars[nPos] == '.' && nPos > 0 && (!xisalpha(pszChars[nPos - 1]) && !xisalpha(pszChars[nPos + 1])))
                 {
-                  DEFINE_BLOCK (nPos, COLORINDEX_NORMALTEXT);
+                  DEFINE_BLOCK(nPos, COLORINDEX_NORMALTEXT);
                 }
               else
                 {
-                  DEFINE_BLOCK (nPos, COLORINDEX_OPERATOR);
+                  DEFINE_BLOCK(nPos, COLORINDEX_OPERATOR);
                   bRedefineBlock = TRUE;
                   bDecIndex = TRUE;
                   goto out;
@@ -134,7 +107,7 @@ out:
 
       if (dwCookie & COOKIE_COMMENT)
         {
-          DEFINE_BLOCK (I, COLORINDEX_COMMENT);
+          DEFINE_BLOCK(I, COLORINDEX_COMMENT);
           dwCookie |= COOKIE_COMMENT;
           break;
         }
@@ -186,7 +159,7 @@ out:
       //  Normal text
       if (pszChars[I] == '"')
         {
-          DEFINE_BLOCK (I, COLORINDEX_STRING);
+          DEFINE_BLOCK(I, COLORINDEX_STRING);
           dwCookie |= COOKIE_STRING;
           continue;
         }
@@ -195,7 +168,7 @@ out:
           // if (I + 1 < nLength && pszChars[I + 1] == '\'' || I + 2 < nLength && pszChars[I + 1] != '\\' && pszChars[I + 2] == '\'' || I + 3 < nLength && pszChars[I + 1] == '\\' && pszChars[I + 3] == '\'')
           if (!I || !xisalnum(pszChars[nPrevI]))
             {
-              DEFINE_BLOCK (I, COLORINDEX_STRING);
+              DEFINE_BLOCK(I, COLORINDEX_STRING);
               dwCookie |= COOKIE_CHAR;
               continue;
             }
@@ -205,22 +178,22 @@ out:
         {
           if (pszChars[I] == ';') // Comment
             {
-              DEFINE_BLOCK (I, COLORINDEX_COMMENT);
+              DEFINE_BLOCK(I, COLORINDEX_COMMENT);
               dwCookie |= COOKIE_COMMENT;
               break;
             }
           else if (pszChars[I] == '[') // Section header [...]
             {
-              DEFINE_BLOCK (I, COLORINDEX_FUNCNAME);
+              DEFINE_BLOCK(I, COLORINDEX_FUNCNAME);
               dwCookie |= COOKIE_SECTION;
               continue;
             }
           else // Key
             {
-              DEFINE_BLOCK (I, COLORINDEX_KEYWORD);
+              DEFINE_BLOCK(I, COLORINDEX_KEYWORD);
               dwCookie |= COOKIE_KEY;
             }
-          if (!xisspace (pszChars[I]))
+          if (!xisspace(pszChars[I]))
             bFirstChar = FALSE;
         }
 
@@ -237,9 +210,9 @@ out:
         {
           if (nIdentBegin >= 0)
             {
-              if (IsIniNumber (pszChars + nIdentBegin, I - nIdentBegin))
+              if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
                 {
-                  DEFINE_BLOCK (nIdentBegin, COLORINDEX_NUMBER);
+                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
                 }
               bRedefineBlock = TRUE;
               bDecIndex = TRUE;
@@ -250,9 +223,9 @@ out:
 
   if (nIdentBegin >= 0)
     {
-      if (IsIniNumber (pszChars + nIdentBegin, I - nIdentBegin))
+      if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
         {
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_NUMBER);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
         }
     }
 

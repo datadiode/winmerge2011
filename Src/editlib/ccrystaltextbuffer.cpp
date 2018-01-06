@@ -60,18 +60,12 @@
  * @brief Code for CCrystalTextBuffer class
  */
 #include "StdAfx.h"
-#include "editcmd.h"
-#include "LineInfo.h"
-#include "UndoRecord.h"
 #include "ccrystaltextbuffer.h"
-#include "ccrystaltextview.h"
 #include "coretools.h"
 #include <mbctype.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
 #endif
 
 using std::vector;

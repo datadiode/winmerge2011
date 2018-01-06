@@ -27,19 +27,36 @@
 
 #include "StdAfx.h"
 #include "ccrystaltextview.h"
-#include "ccrystaltextbuffer.h"
 #include "SyntaxColors.h"
 #include "string_util.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
 #endif
 
+using CommonKeywords::IsNumeric;
+
 //  InstallShield keywords (IS3.0)
-static LPTSTR s_apszISKeywordList[] =
+
+static BOOL IsISKeyword(LPCTSTR pszChars, int nLength)
+{
+  static LPCTSTR const s_apszISKeywordList[] =
   {
+    _T ("BOOL"),
+    _T ("BYREF"),
+    _T ("CHAR"),
+    _T ("HIWORD"),
+    _T ("HWND"),
+    _T ("INT"),
+    _T ("LIST"),
+    _T ("LONG"),
+    _T ("LOWORD"),
+    _T ("NUMBER"),
+    _T ("POINTER"),
+    _T ("QUAD"),
+    _T ("RGB"),
+    _T ("SHORT"),
+    _T ("STRING"),
     _T ("begin"),
     _T ("call"),
     _T ("case"),
@@ -69,25 +86,13 @@ static LPTSTR s_apszISKeywordList[] =
     _T ("until"),
     _T ("void"),
     _T ("while"),
-    _T ("BOOL"),
-    _T ("BYREF"),
-    _T ("CHAR"),
-    _T ("HIWORD"),
-    _T ("HWND"),
-    _T ("INT"),
-    _T ("LIST"),
-    _T ("LONG"),
-    _T ("LOWORD"),
-    _T ("NUMBER"),
-    _T ("POINTER"),
-    _T ("QUAD"),
-    _T ("RGB"),
-    _T ("SHORT"),
-    _T ("STRING"),
-    NULL
   };
+  return xiskeyword<_tcsncmp>(pszChars, nLength, s_apszISKeywordList);
+}
 
-static LPTSTR s_apszUser1KeywordList[] =
+static BOOL IsUser1Keyword(LPCTSTR pszChars, int nLength)
+{
+  static LPCTSTR const s_apszUser1KeywordList[] =
   {
     _T ("AFTER"),
     _T ("APPEND"),
@@ -119,10 +124,13 @@ static LPTSTR s_apszUser1KeywordList[] =
     _T ("SET"),
     _T ("TRUE"),
     _T ("YES"),
-    NULL
   };
+  return xiskeyword<_tcsncmp>(pszChars, nLength, s_apszUser1KeywordList);
+}
 
-static LPTSTR s_apszUser2KeywordList[] =
+static BOOL IsUser2Keyword(LPCTSTR pszChars, int nLength)
+{
+  static LPCTSTR const s_apszUser2KeywordList[] =
   {
     _T ("CMDLINE"),
     _T ("ERRORFILENAME"),
@@ -139,8 +147,9 @@ static LPTSTR s_apszUser2KeywordList[] =
     _T ("WINDISK"),
     _T ("WINSYSDIR"),
     _T ("WINSYSDISK"),
-    NULL
   };
+  return xiskeyword<_tcsncmp>(pszChars, nLength, s_apszUser2KeywordList);
+}
 
 /* built-in functions
     _T ("AddFolderIcon"),
@@ -417,62 +426,6 @@ static LPTSTR s_apszUser2KeywordList[] =
     _T ("XCopyFile"),
 */
 
-static BOOL
-IsXKeyword (LPTSTR apszKeywords[], LPCTSTR pszChars, int nLength)
-{
-  for (int L = 0; apszKeywords[L] != NULL; L++)
-    {
-      if (_tcsncmp (apszKeywords[L], pszChars, nLength) == 0
-            && apszKeywords[L][nLength] == 0)
-        return TRUE;
-    }
-  return FALSE;
-}
-
-static BOOL
-IsISKeyword (LPCTSTR pszChars, int nLength)
-{
-  return IsXKeyword (s_apszISKeywordList, pszChars, nLength);
-}
-
-static BOOL
-IsUser1Keyword (LPCTSTR pszChars, int nLength)
-{
-  return IsXKeyword (s_apszUser1KeywordList, pszChars, nLength);
-}
-
-static BOOL
-IsUser2Keyword (LPCTSTR pszChars, int nLength)
-{
-  return IsXKeyword (s_apszUser2KeywordList, pszChars, nLength);
-}
-
-static BOOL
-IsISNumber (LPCTSTR pszChars, int nLength)
-{
-  if (nLength > 2 && pszChars[0] == '0' && pszChars[1] == 'x')
-    {
-      for (int I = 2; I < nLength; I++)
-        {
-          if (_istdigit (pszChars[I]) || (pszChars[I] >= 'A' && pszChars[I] <= 'F') ||
-                (pszChars[I] >= 'a' && pszChars[I] <= 'f'))
-            continue;
-          return FALSE;
-        }
-      return TRUE;
-    }
-  if (!_istdigit (pszChars[0]))
-    return FALSE;
-  for (int I = 1; I < nLength; I++)
-    {
-      if (!_istdigit (pszChars[I]) && pszChars[I] != '+' &&
-            pszChars[I] != '-' && pszChars[I] != '.' && pszChars[I] != 'e' &&
-            pszChars[I] != 'E')
-        return FALSE;
-    }
-  return TRUE;
-}
-
 #define DEFINE_BLOCK(pos, colorindex)   \
 ASSERT((pos) >= 0 && (pos) <= nLength);\
 if (pBuf != NULL)\
@@ -496,7 +449,7 @@ DWORD CCrystalTextView::ParseLineIS(DWORD dwCookie, int nLineIndex, TEXTBLOCK *p
   if (nLength == 0)
     return dwCookie & COOKIE_EXT_COMMENT;
 
-  LPCTSTR pszChars = GetLineChars(nLineIndex);
+  const LPCTSTR pszChars = GetLineChars(nLineIndex);
   BOOL bFirstChar = (dwCookie & ~COOKIE_EXT_COMMENT) == 0;
   BOOL bRedefineBlock = TRUE;
   BOOL bWasCommentStart = FALSE;
@@ -513,25 +466,25 @@ DWORD CCrystalTextView::ParseLineIS(DWORD dwCookie, int nLineIndex, TEXTBLOCK *p
             nPos = nPrevI;
           if (dwCookie & (COOKIE_COMMENT | COOKIE_EXT_COMMENT))
             {
-              DEFINE_BLOCK (nPos, COLORINDEX_COMMENT);
+              DEFINE_BLOCK(nPos, COLORINDEX_COMMENT);
             }
           else if (dwCookie & (COOKIE_CHAR | COOKIE_STRING))
             {
-              DEFINE_BLOCK (nPos, COLORINDEX_STRING);
+              DEFINE_BLOCK(nPos, COLORINDEX_STRING);
             }
           else if (dwCookie & COOKIE_PREPROCESSOR)
             {
-              DEFINE_BLOCK (nPos, COLORINDEX_PREPROCESSOR);
+              DEFINE_BLOCK(nPos, COLORINDEX_PREPROCESSOR);
             }
           else
             {
               if (xisalnum(pszChars[nPos]) || pszChars[nPos] == '.' && nPos > 0 && (!xisalpha(pszChars[nPos - 1]) && !xisalpha(pszChars[nPos + 1])))
                 {
-                  DEFINE_BLOCK (nPos, COLORINDEX_NORMALTEXT);
+                  DEFINE_BLOCK(nPos, COLORINDEX_NORMALTEXT);
                 }
               else
                 {
-                  DEFINE_BLOCK (nPos, COLORINDEX_OPERATOR);
+                  DEFINE_BLOCK(nPos, COLORINDEX_OPERATOR);
                   bRedefineBlock = TRUE;
                   bDecIndex = TRUE;
                   goto out;
@@ -549,7 +502,7 @@ out:
 
       if (dwCookie & COOKIE_COMMENT)
         {
-          DEFINE_BLOCK (I, COLORINDEX_COMMENT);
+          DEFINE_BLOCK(I, COLORINDEX_COMMENT);
           dwCookie |= COOKIE_COMMENT;
           break;
         }
@@ -591,7 +544,7 @@ out:
 
       if (I > 0 && pszChars[I] == '/' && pszChars[nPrevI] == '/')
         {
-          DEFINE_BLOCK (nPrevI, COLORINDEX_COMMENT);
+          DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
           dwCookie |= COOKIE_COMMENT;
           break;
         }
@@ -601,7 +554,7 @@ out:
         {
           if (I > 0 && pszChars[I] == '*' && pszChars[nPrevI] == '/')
             {
-              DEFINE_BLOCK (nPrevI, COLORINDEX_COMMENT);
+              DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
               dwCookie |= COOKIE_EXT_COMMENT;
             }
           continue;
@@ -610,7 +563,7 @@ out:
       //  Normal text
       if (pszChars[I] == '"')
         {
-          DEFINE_BLOCK (I, COLORINDEX_STRING);
+          DEFINE_BLOCK(I, COLORINDEX_STRING);
           dwCookie |= COOKIE_STRING;
           continue;
         }
@@ -619,14 +572,14 @@ out:
           // if (I + 1 < nLength && pszChars[I + 1] == '\'' || I + 2 < nLength && pszChars[I + 1] != '\\' && pszChars[I + 2] == '\'' || I + 3 < nLength && pszChars[I + 1] == '\\' && pszChars[I + 3] == '\'')
           if (!I || !xisalnum(pszChars[nPrevI]))
             {
-              DEFINE_BLOCK (I, COLORINDEX_STRING);
+              DEFINE_BLOCK(I, COLORINDEX_STRING);
               dwCookie |= COOKIE_CHAR;
               continue;
             }
         }
       if (I > 0 && pszChars[I] == '*' && pszChars[nPrevI] == '/')
         {
-          DEFINE_BLOCK (nPrevI, COLORINDEX_COMMENT);
+          DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
           dwCookie |= COOKIE_EXT_COMMENT;
           bWasCommentStart = TRUE;
           continue;
@@ -638,11 +591,11 @@ out:
         {
           if (pszChars[I] == '#')
             {
-              DEFINE_BLOCK (I, COLORINDEX_PREPROCESSOR);
+              DEFINE_BLOCK(I, COLORINDEX_PREPROCESSOR);
               dwCookie |= COOKIE_PREPROCESSOR;
               continue;
             }
-          if (!xisspace (pszChars[I]))
+          if (!xisspace(pszChars[I]))
             bFirstChar = FALSE;
         }
 
@@ -659,21 +612,21 @@ out:
         {
           if (nIdentBegin >= 0)
             {
-              if (IsISKeyword (pszChars + nIdentBegin, I - nIdentBegin))
+              if (IsISKeyword(pszChars + nIdentBegin, I - nIdentBegin))
                 {
-                  DEFINE_BLOCK (nIdentBegin, COLORINDEX_KEYWORD);
+                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
                 }
-              else if (IsUser1Keyword (pszChars + nIdentBegin, I - nIdentBegin))
+              else if (IsUser1Keyword(pszChars + nIdentBegin, I - nIdentBegin))
                 {
-                  DEFINE_BLOCK (nIdentBegin, COLORINDEX_USER1);
+                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER1);
                 }
-              else if (IsUser2Keyword (pszChars + nIdentBegin, I - nIdentBegin))
+              else if (IsUser2Keyword(pszChars + nIdentBegin, I - nIdentBegin))
                 {
-                  DEFINE_BLOCK (nIdentBegin, COLORINDEX_USER2);
+                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER2);
                 }
-              else if (IsISNumber (pszChars + nIdentBegin, I - nIdentBegin))
+              else if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
                 {
-                  DEFINE_BLOCK (nIdentBegin, COLORINDEX_NUMBER);
+                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
                 }
               else
                 {
@@ -681,7 +634,7 @@ out:
 
                   for (int j = I; j < nLength; j++)
                     {
-                      if (!xisspace (pszChars[j]))
+                      if (!xisspace(pszChars[j]))
                         {
                           if (pszChars[j] == '(')
                             {
@@ -692,7 +645,7 @@ out:
                     }
                   if (bFunction)
                     {
-                      DEFINE_BLOCK (nIdentBegin, COLORINDEX_FUNCNAME);
+                      DEFINE_BLOCK(nIdentBegin, COLORINDEX_FUNCNAME);
                     }
                 }
               bRedefineBlock = TRUE;
@@ -704,21 +657,21 @@ out:
 
   if (nIdentBegin >= 0)
     {
-      if (IsISKeyword (pszChars + nIdentBegin, I - nIdentBegin))
+      if (IsISKeyword(pszChars + nIdentBegin, I - nIdentBegin))
         {
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_KEYWORD);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
         }
-      else if (IsUser1Keyword (pszChars + nIdentBegin, I - nIdentBegin))
+      else if (IsUser1Keyword(pszChars + nIdentBegin, I - nIdentBegin))
         {
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_USER1);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER1);
         }
-      else if (IsUser2Keyword (pszChars + nIdentBegin, I - nIdentBegin))
+      else if (IsUser2Keyword(pszChars + nIdentBegin, I - nIdentBegin))
         {
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_USER2);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER2);
         }
-      else if (IsISNumber (pszChars + nIdentBegin, I - nIdentBegin))
+      else if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
         {
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_NUMBER);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
         }
       else
         {
@@ -726,7 +679,7 @@ out:
 
           for (int j = I; j < nLength; j++)
             {
-              if (!xisspace (pszChars[j]))
+              if (!xisspace(pszChars[j]))
                 {
                   if (pszChars[j] == '(')
                     {
@@ -737,7 +690,7 @@ out:
             }
           if (bFunction)
             {
-              DEFINE_BLOCK (nIdentBegin, COLORINDEX_FUNCNAME);
+              DEFINE_BLOCK(nIdentBegin, COLORINDEX_FUNCNAME);
             }
         }
     }

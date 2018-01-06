@@ -681,6 +681,15 @@
     <ClCompile Include="ExplorerDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="editlib\go.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
+    <ClCompile Include="editlib\rust.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
+    <ClCompile Include="editlib\vhdl.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\WindowPlacement.h">

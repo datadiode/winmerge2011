@@ -21,12 +21,13 @@
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
 #endif
 
-//  C++ keywords (MSVC5.0 + POET5.0)
-static LPTSTR s_apszLispKeywordList[] =
+using CommonKeywords::IsNumeric;
+
+static BOOL IsLispKeyword(LPCTSTR pszChars, int nLength)
+{
+  static LPCTSTR const s_apszLispKeywordList[] =
   {
     _T ("abs"),
     _T ("acad_colordlg"),
@@ -43,16 +44,16 @@ static LPTSTR s_apszLispKeywordList[] =
     _T ("angtos"),
     _T ("append"),
     _T ("apply"),
+    _T ("arx"),
     _T ("arxload"),
     _T ("arxunload"),
-    _T ("arx"),
     _T ("ascii"),
     _T ("assoc"),
     _T ("atan"),
     _T ("atof"),
     _T ("atoi"),
-    _T ("atoms-family"),
     _T ("atom"),
+    _T ("atoms-family"),
     _T ("autoarxload"),
     _T ("autoload"),
     _T ("autoxload"),
@@ -114,20 +115,20 @@ static LPTSTR s_apszLispKeywordList[] =
     _T ("entnext"),
     _T ("entsel"),
     _T ("entupd"),
-    _T ("equal"),
     _T ("eq"),
+    _T ("equal"),
     _T ("eval"),
     _T ("exit"),
+    _T ("exp"),
     _T ("expand"),
     _T ("expt"),
-    _T ("exp"),
     _T ("fill_image"),
     _T ("findfile"),
     _T ("fix"),
     _T ("float"),
     _T ("foreach"),
-    _T ("gcd"),
     _T ("gc"),
+    _T ("gcd"),
     _T ("get_attr"),
     _T ("get_tile"),
     _T ("getangle"),
@@ -150,29 +151,29 @@ static LPTSTR s_apszLispKeywordList[] =
     _T ("grtext"),
     _T ("grvecs"),
     _T ("handent"),
-    _T ("if"),
     _T ("help"),
+    _T ("if"),
     _T ("initget"),
     _T ("inters"),
     _T ("itoa"),
     _T ("lambda"),
     _T ("last"),
     _T ("length"),
-    _T ("listp"),
     _T ("list"),
-    _T ("load_dialog"),
+    _T ("listp"),
     _T ("load"),
+    _T ("load_dialog"),
+    _T ("log"),
     _T ("logand"),
     _T ("logior"),
-    _T ("log"),
     _T ("lsh"),
     _T ("mapcar"),
     _T ("max"),
-    _T ("member"),
     _T ("mem"),
+    _T ("member"),
     _T ("menucmd"),
-    _T ("minusp"),
     _T ("min"),
+    _T ("minusp"),
     _T ("mode_tile"),
     _T ("namedobjdict"),
     _T ("nentsel"),
@@ -193,21 +194,21 @@ static LPTSTR s_apszLispKeywordList[] =
     _T ("prompt"),
     _T ("quit"),
     _T ("quote"),
+    _T ("read"),
     _T ("read-char"),
     _T ("read-line"),
-    _T ("read"),
     _T ("redraw"),
     _T ("regapp"),
     _T ("rem"),
     _T ("repeat"),
     _T ("reverse"),
     _T ("rtos"),
+    _T ("set"),
+    _T ("set_tile"),
     _T ("setcfg"),
     _T ("setfunhelp"),
     _T ("setq"),
     _T ("setvar"),
-    _T ("set_tile"),
-    _T ("set"),
     _T ("sin"),
     _T ("slide_image"),
     _T ("snvalid"),
@@ -218,15 +219,15 @@ static LPTSTR s_apszLispKeywordList[] =
     _T ("sslength"),
     _T ("ssmemb"),
     _T ("ssname"),
-    _T ("startapp"),
     _T ("start_dialog"),
     _T ("start_image"),
     _T ("start_list"),
+    _T ("startapp"),
     _T ("strcase"),
     _T ("strcat"),
     _T ("strlen"),
-    _T ("substr"),
     _T ("subst"),
+    _T ("substr"),
     _T ("tablet"),
     _T ("tblnext"),
     _T ("tblobjname"),
@@ -254,51 +255,8 @@ static LPTSTR s_apszLispKeywordList[] =
     _T ("xload"),
     _T ("xunload"),
     _T ("zerop"),
-    NULL
   };
-
-static BOOL
-IsXKeyword (LPTSTR apszKeywords[], LPCTSTR pszChars, int nLength)
-{
-  for (int L = 0; apszKeywords[L] != NULL; L++)
-    {
-      if (_tcsncmp (apszKeywords[L], pszChars, nLength) == 0
-            && apszKeywords[L][nLength] == 0)
-        return TRUE;
-    }
-  return FALSE;
-}
-
-static BOOL
-IsLispKeyword (LPCTSTR pszChars, int nLength)
-{
-  return IsXKeyword (s_apszLispKeywordList, pszChars, nLength);
-}
-
-static BOOL
-IsLispNumber (LPCTSTR pszChars, int nLength)
-{
-  if (nLength > 2 && pszChars[0] == '0' && pszChars[1] == 'x')
-    {
-      for (int I = 2; I < nLength; I++)
-        {
-          if (_istdigit (pszChars[I]) || (pszChars[I] >= 'A' && pszChars[I] <= 'F') ||
-                (pszChars[I] >= 'a' && pszChars[I] <= 'f'))
-            continue;
-          return FALSE;
-        }
-      return TRUE;
-    }
-  if (!_istdigit (pszChars[0]))
-    return FALSE;
-  for (int I = 1; I < nLength; I++)
-    {
-      if (!_istdigit (pszChars[I]) && pszChars[I] != '+' &&
-            pszChars[I] != '-' && pszChars[I] != '.' && pszChars[I] != 'e' &&
-            pszChars[I] != 'E')
-        return FALSE;
-    }
-  return TRUE;
+  return xiskeyword<_tcsncmp>(pszChars, nLength, s_apszLispKeywordList);
 }
 
 #define DEFINE_BLOCK(pos, colorindex)   \
@@ -324,7 +282,7 @@ DWORD CCrystalTextView::ParseLineLisp(DWORD dwCookie, int nLineIndex, TEXTBLOCK 
   if (nLength == 0)
     return dwCookie & COOKIE_EXT_COMMENT;
 
-  LPCTSTR pszChars = GetLineChars(nLineIndex);
+  const LPCTSTR pszChars = GetLineChars(nLineIndex);
   BOOL bFirstChar = (dwCookie & ~COOKIE_EXT_COMMENT) == 0;
   BOOL bRedefineBlock = TRUE;
   BOOL bWasCommentStart = FALSE;
@@ -343,21 +301,21 @@ DWORD CCrystalTextView::ParseLineLisp(DWORD dwCookie, int nLineIndex, TEXTBLOCK 
             nPos = nPrevI;
           if (dwCookie & (COOKIE_COMMENT | COOKIE_EXT_COMMENT))
             {
-              DEFINE_BLOCK (nPos, COLORINDEX_COMMENT);
+              DEFINE_BLOCK(nPos, COLORINDEX_COMMENT);
             }
           else if (dwCookie & (COOKIE_CHAR | COOKIE_STRING))
             {
-              DEFINE_BLOCK (nPos, COLORINDEX_STRING);
+              DEFINE_BLOCK(nPos, COLORINDEX_STRING);
             }
           else
             {
               if (xisalnum(pszChars[nPos]) || pszChars[nPos] == '.')
                 {
-                  DEFINE_BLOCK (nPos, COLORINDEX_NORMALTEXT);
+                  DEFINE_BLOCK(nPos, COLORINDEX_NORMALTEXT);
                 }
               else
                 {
-                  DEFINE_BLOCK (nPos, COLORINDEX_OPERATOR);
+                  DEFINE_BLOCK(nPos, COLORINDEX_OPERATOR);
                   bRedefineBlock = TRUE;
                   bDecIndex = TRUE;
                   goto out;
@@ -375,7 +333,7 @@ out:
 
       if (dwCookie & COOKIE_COMMENT)
         {
-          DEFINE_BLOCK (I, COLORINDEX_COMMENT);
+          DEFINE_BLOCK(I, COLORINDEX_COMMENT);
           dwCookie |= COOKIE_COMMENT;
           break;
         }
@@ -417,7 +375,7 @@ out:
 
       if (I > 0 && pszChars[I] != '|' && pszChars[nPrevI] == ';')
         {
-          DEFINE_BLOCK (I - 1, COLORINDEX_COMMENT);
+          DEFINE_BLOCK(I - 1, COLORINDEX_COMMENT);
           dwCookie |= COOKIE_COMMENT;
           break;
         }
@@ -425,7 +383,7 @@ out:
       //  Normal text
       if (pszChars[I] == '"')
         {
-          DEFINE_BLOCK (I, COLORINDEX_STRING);
+          DEFINE_BLOCK(I, COLORINDEX_STRING);
           dwCookie |= COOKIE_STRING;
           continue;
         }
@@ -434,14 +392,14 @@ out:
           // if (I + 1 < nLength && pszChars[I + 1] == '\'' || I + 2 < nLength && pszChars[I + 1] != '\\' && pszChars[I + 2] == '\'' || I + 3 < nLength && pszChars[I + 1] == '\\' && pszChars[I + 3] == '\'')
           if (!I || !xisalnum(pszChars[nPrevI]))
             {
-              DEFINE_BLOCK (I, COLORINDEX_STRING);
+              DEFINE_BLOCK(I, COLORINDEX_STRING);
               dwCookie |= COOKIE_CHAR;
               continue;
             }
         }
       if (I > 0 && pszChars[I] == '|' && pszChars[nPrevI] == ';')
         {
-          DEFINE_BLOCK (I - 1, COLORINDEX_COMMENT);
+          DEFINE_BLOCK(I - 1, COLORINDEX_COMMENT);
           dwCookie |= COOKIE_EXT_COMMENT;
           bWasCommentStart = TRUE;
           continue;
@@ -451,7 +409,7 @@ out:
 
       if (bFirstChar)
         {
-          if (!xisspace (pszChars[I]))
+          if (!xisspace(pszChars[I]))
             bFirstChar = FALSE;
         }
 
@@ -468,17 +426,17 @@ out:
         {
           if (nIdentBegin >= 0)
             {
-              if (IsLispKeyword (pszChars + nIdentBegin, I - nIdentBegin))
+              if (IsLispKeyword(pszChars + nIdentBegin, I - nIdentBegin))
                 {
                   if (!_tcsnicmp (_T ("defun"), pszChars + nIdentBegin, 5))
                     {
                       bDefun = TRUE;
                     }
-                  DEFINE_BLOCK (nIdentBegin, COLORINDEX_KEYWORD);
+                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
                 }
-              else if (IsLispNumber (pszChars + nIdentBegin, I - nIdentBegin))
+              else if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
                 {
-                  DEFINE_BLOCK (nIdentBegin, COLORINDEX_NUMBER);
+                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
                 }
               else
                 {
@@ -488,7 +446,7 @@ out:
                     {
                       for (int j = nIdentBegin; --j >= 0;)
                         {
-                          if (!xisspace (pszChars[j]))
+                          if (!xisspace(pszChars[j]))
                             {
                               if (pszChars[j] == '(')
                                 {
@@ -502,7 +460,7 @@ out:
                     {
                       for (int j = I; j >= 0; j--)
                         {
-                          if (!xisspace (pszChars[j]))
+                          if (!xisspace(pszChars[j]))
                             {
                               if (pszChars[j] == '(')
                                 {
@@ -514,7 +472,7 @@ out:
                     }
                   if (bFunction)
                     {
-                      DEFINE_BLOCK (nIdentBegin, COLORINDEX_FUNCNAME);
+                      DEFINE_BLOCK(nIdentBegin, COLORINDEX_FUNCNAME);
                     }
                 }
               bRedefineBlock = TRUE;
@@ -526,17 +484,17 @@ out:
 
   if (nIdentBegin >= 0)
     {
-      if (IsLispKeyword (pszChars + nIdentBegin, I - nIdentBegin))
+      if (IsLispKeyword(pszChars + nIdentBegin, I - nIdentBegin))
         {
           if (!_tcsnicmp (_T ("defun"), pszChars + nIdentBegin, 5))
             {
               bDefun = TRUE;
             }
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_KEYWORD);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
         }
-      else if (IsLispNumber (pszChars + nIdentBegin, I - nIdentBegin))
+      else if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
         {
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_NUMBER);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
         }
       else
         {
@@ -546,7 +504,7 @@ out:
             {
               for (int j = nIdentBegin; --j >= 0;)
                 {
-                  if (!xisspace (pszChars[j]))
+                  if (!xisspace(pszChars[j]))
                     {
                       if (pszChars[j] == '(')
                         {
@@ -560,7 +518,7 @@ out:
             {
               for (int j = I; j >= 0; j--)
                 {
-                  if (!xisspace (pszChars[j]))
+                  if (!xisspace(pszChars[j]))
                     {
                       if (pszChars[j] == '(')
                         {
@@ -572,7 +530,7 @@ out:
             }
           if (bFunction)
             {
-              DEFINE_BLOCK (nIdentBegin, COLORINDEX_FUNCNAME);
+              DEFINE_BLOCK(nIdentBegin, COLORINDEX_FUNCNAME);
             }
         }
     }

@@ -21,12 +21,11 @@
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
 #endif
 
-//  C++ keywords (MSVC5.0 + POET5.0)
-static LPTSTR s_apszDclKeywordList[] =
+static BOOL IsDclKeyword(LPCTSTR pszChars, int nLength)
+{
+  static LPCTSTR const s_apszDclKeywordList[] =
   {
     _T ("boxed_column"),
     _T ("boxed_radio_column"),
@@ -45,36 +44,42 @@ static LPTSTR s_apszDclKeywordList[] =
     _T ("row"),
     _T ("slider"),
     _T ("spacer"),
-    _T ("text_part"),
     _T ("text"),
+    _T ("text_part"),
     _T ("toggle"),
-    NULL
   };
+  return xiskeyword<_tcsncmp>(pszChars, nLength, s_apszDclKeywordList);
+}
 
-static LPTSTR s_apszUser1KeywordList[] =
+static BOOL IsUser1Keyword(LPCTSTR pszChars, int nLength)
+{
+  static LPCTSTR const s_apszUser1KeywordList[] =
   {
-    _T ("spacer_0"),
-    _T ("spacer_1"),
+    _T ("cancel_button"),
     _T ("default_button"),
-    _T ("retirement_button"),
-    _T ("ok_cancel_help_errtile"),
-    _T ("ok_cancel_help_info"),
+    _T ("errtile"),
+    _T ("help_button"),
+    _T ("image_button"),
+    _T ("info_button"),
+    _T ("ok_button"),
     _T ("ok_cancel"),
     _T ("ok_cancel_err"),
     _T ("ok_cancel_help"),
+    _T ("ok_cancel_help_errtile"),
+    _T ("ok_cancel_help_info"),
     _T ("ok_only"),
-    _T ("ok_button"),
-    _T ("cancel_button"),
-    _T ("help_button"),
-    _T ("info_button"),
-    _T ("errtile"),
-    _T ("image_button"),
     _T ("radio_column"),
     _T ("radio_row"),
-    NULL
+    _T ("retirement_button"),
+    _T ("spacer_0"),
+    _T ("spacer_1"),
   };
+  return xiskeyword<_tcsncmp>(pszChars, nLength, s_apszUser1KeywordList);
+}
 
-static LPTSTR s_apszUser2KeywordList[] =
+static BOOL IsUser2Keyword(LPCTSTR pszChars, int nLength)
+{
+  static LPCTSTR const s_apszUser2KeywordList[] =
   {
     _T ("action"),
     _T ("alignment"),
@@ -107,41 +112,11 @@ static LPTSTR s_apszUser2KeywordList[] =
     _T ("tabs"),
     _T ("value"),
     _T ("width"),
-    NULL
   };
-
-static BOOL
-IsXKeyword (LPTSTR apszKeywords[], LPCTSTR pszChars, int nLength)
-{
-  for (int L = 0; apszKeywords[L] != NULL; L++)
-    {
-      if (_tcsncmp (apszKeywords[L], pszChars, nLength) == 0
-            && apszKeywords[L][nLength] == 0)
-        return TRUE;
-    }
-  return FALSE;
+  return xiskeyword<_tcsncmp>(pszChars, nLength, s_apszUser2KeywordList);
 }
 
-static BOOL
-IsDclKeyword (LPCTSTR pszChars, int nLength)
-{
-  return IsXKeyword (s_apszDclKeywordList, pszChars, nLength);
-}
-
-static BOOL
-IsUser1Keyword (LPCTSTR pszChars, int nLength)
-{
-  return IsXKeyword (s_apszUser1KeywordList, pszChars, nLength);
-}
-
-static BOOL
-IsUser2Keyword (LPCTSTR pszChars, int nLength)
-{
-  return IsXKeyword (s_apszUser2KeywordList, pszChars, nLength);
-}
-
-static BOOL
-IsDclNumber (LPCTSTR pszChars, int nLength)
+static BOOL IsDclNumber(LPCTSTR pszChars, int nLength)
 {
   if (nLength > 2 && pszChars[0] == '0' && pszChars[1] == 'x')
     {
@@ -189,7 +164,7 @@ DWORD CCrystalTextView::ParseLineDcl(DWORD dwCookie, int nLineIndex, TEXTBLOCK *
   if (nLength == 0)
     return dwCookie & COOKIE_EXT_COMMENT;
 
-  LPCTSTR pszChars = GetLineChars(nLineIndex);
+  const LPCTSTR pszChars = GetLineChars(nLineIndex);
   BOOL bFirstChar = (dwCookie & ~COOKIE_EXT_COMMENT) == 0;
   BOOL bRedefineBlock = TRUE;
   BOOL bWasCommentStart = FALSE;
@@ -206,21 +181,21 @@ DWORD CCrystalTextView::ParseLineDcl(DWORD dwCookie, int nLineIndex, TEXTBLOCK *
             nPos = nPrevI;
           if (dwCookie & (COOKIE_COMMENT | COOKIE_EXT_COMMENT))
             {
-              DEFINE_BLOCK (nPos, COLORINDEX_COMMENT);
+              DEFINE_BLOCK(nPos, COLORINDEX_COMMENT);
             }
           else if (dwCookie & (COOKIE_CHAR | COOKIE_STRING))
             {
-              DEFINE_BLOCK (nPos, COLORINDEX_STRING);
+              DEFINE_BLOCK(nPos, COLORINDEX_STRING);
             }
           else
             {
               if (xisalnum(pszChars[nPos]) || pszChars[nPos] == '.')
                 {
-                  DEFINE_BLOCK (nPos, COLORINDEX_NORMALTEXT);
+                  DEFINE_BLOCK(nPos, COLORINDEX_NORMALTEXT);
                 }
               else
                 {
-                  DEFINE_BLOCK (nPos, COLORINDEX_OPERATOR);
+                  DEFINE_BLOCK(nPos, COLORINDEX_OPERATOR);
                   bRedefineBlock = TRUE;
                   bDecIndex = TRUE;
                   goto out;
@@ -238,7 +213,7 @@ out:
 
       if (dwCookie & COOKIE_COMMENT)
         {
-          DEFINE_BLOCK (I, COLORINDEX_COMMENT);
+          DEFINE_BLOCK(I, COLORINDEX_COMMENT);
           dwCookie |= COOKIE_COMMENT;
           break;
         }
@@ -280,7 +255,7 @@ out:
 
       if (I > 0 && pszChars[I] == '/' && pszChars[nPrevI] == '/')
         {
-          DEFINE_BLOCK (nPrevI, COLORINDEX_COMMENT);
+          DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
           dwCookie |= COOKIE_COMMENT;
           break;
         }
@@ -288,7 +263,7 @@ out:
       //  Normal text
       if (pszChars[I] == '"')
         {
-          DEFINE_BLOCK (I, COLORINDEX_STRING);
+          DEFINE_BLOCK(I, COLORINDEX_STRING);
           dwCookie |= COOKIE_STRING;
           continue;
         }
@@ -297,14 +272,14 @@ out:
           // if (I + 1 < nLength && pszChars[I + 1] == '\'' || I + 2 < nLength && pszChars[I + 1] != '\\' && pszChars[I + 2] == '\'' || I + 3 < nLength && pszChars[I + 1] == '\\' && pszChars[I + 3] == '\'')
           if (!I || !xisalnum(pszChars[nPrevI]))
             {
-              DEFINE_BLOCK (I, COLORINDEX_STRING);
+              DEFINE_BLOCK(I, COLORINDEX_STRING);
               dwCookie |= COOKIE_CHAR;
               continue;
             }
         }
       if (I > 0 && pszChars[I] == '*' && pszChars[nPrevI] == '/')
         {
-          DEFINE_BLOCK (nPrevI, COLORINDEX_COMMENT);
+          DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
           dwCookie |= COOKIE_EXT_COMMENT;
           bWasCommentStart = TRUE;
           continue;
@@ -314,7 +289,7 @@ out:
 
       if (bFirstChar)
         {
-          if (!xisspace (pszChars[I]))
+          if (!xisspace(pszChars[I]))
             bFirstChar = FALSE;
         }
 
@@ -331,21 +306,21 @@ out:
         {
           if (nIdentBegin >= 0)
             {
-              if (IsDclKeyword (pszChars + nIdentBegin, I - nIdentBegin))
+              if (IsDclKeyword(pszChars + nIdentBegin, I - nIdentBegin))
                 {
-                  DEFINE_BLOCK (nIdentBegin, COLORINDEX_KEYWORD);
+                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
                 }
-              else if (IsUser1Keyword (pszChars + nIdentBegin, I - nIdentBegin))
+              else if (IsUser1Keyword(pszChars + nIdentBegin, I - nIdentBegin))
                 {
-                  DEFINE_BLOCK (nIdentBegin, COLORINDEX_USER1);
+                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER1);
                 }
-              else if (IsUser2Keyword (pszChars + nIdentBegin, I - nIdentBegin))
+              else if (IsUser2Keyword(pszChars + nIdentBegin, I - nIdentBegin))
                 {
-                  DEFINE_BLOCK (nIdentBegin, COLORINDEX_USER2);
+                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER2);
                 }
               else if (IsDclNumber (pszChars + nIdentBegin, I - nIdentBegin))
                 {
-                  DEFINE_BLOCK (nIdentBegin, COLORINDEX_NUMBER);
+                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
                 }
               else
                 {
@@ -353,7 +328,7 @@ out:
 
                   for (int j = I; j < nLength; j++)
                     {
-                      if (!xisspace (pszChars[j]))
+                      if (!xisspace(pszChars[j]))
                         {
                           if (pszChars[j] == '{' || pszChars[j] == ':')
                             {
@@ -366,7 +341,7 @@ out:
                     {
                       for (int j = nIdentBegin; --j >= 0;)
                         {
-                          if (!xisspace (pszChars[j]))
+                          if (!xisspace(pszChars[j]))
                             {
                               if (pszChars[j] == ':')
                                 {
@@ -378,7 +353,7 @@ out:
                     }
                   if (bFunction)
                     {
-                      DEFINE_BLOCK (nIdentBegin, COLORINDEX_FUNCNAME);
+                      DEFINE_BLOCK(nIdentBegin, COLORINDEX_FUNCNAME);
                     }
                 }
               bRedefineBlock = TRUE;
@@ -390,21 +365,21 @@ out:
 
   if (nIdentBegin >= 0)
     {
-      if (IsDclKeyword (pszChars + nIdentBegin, I - nIdentBegin))
+      if (IsDclKeyword(pszChars + nIdentBegin, I - nIdentBegin))
         {
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_KEYWORD);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
         }
-      else if (IsUser1Keyword (pszChars + nIdentBegin, I - nIdentBegin))
+      else if (IsUser1Keyword(pszChars + nIdentBegin, I - nIdentBegin))
         {
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_USER1);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER1);
         }
-      else if (IsUser2Keyword (pszChars + nIdentBegin, I - nIdentBegin))
+      else if (IsUser2Keyword(pszChars + nIdentBegin, I - nIdentBegin))
         {
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_USER2);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER2);
         }
       else if (IsDclNumber (pszChars + nIdentBegin, I - nIdentBegin))
         {
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_NUMBER);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
         }
       else
         {
@@ -412,7 +387,7 @@ out:
 
           for (int j = I; j < nLength; j++)
             {
-              if (!xisspace (pszChars[j]))
+              if (!xisspace(pszChars[j]))
                 {
                   if (pszChars[j] == '{' || pszChars[j] == ':')
                     {
@@ -425,7 +400,7 @@ out:
             {
               for (int j = nIdentBegin; --j >= 0;)
                 {
-                  if (!xisspace (pszChars[j]))
+                  if (!xisspace(pszChars[j]))
                     {
                       if (pszChars[j] == ':')
                         {
@@ -437,7 +412,7 @@ out:
             }
           if (bFunction)
             {
-              DEFINE_BLOCK (nIdentBegin, COLORINDEX_FUNCNAME);
+              DEFINE_BLOCK(nIdentBegin, COLORINDEX_FUNCNAME);
             }
         }
     }

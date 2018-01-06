@@ -16,17 +16,16 @@
 
 #include "StdAfx.h"
 #include "ccrystaltextview.h"
-#include "ccrystaltextbuffer.h"
 #include "SyntaxColors.h"
 #include "string_util.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
 #endif
 
-static LPTSTR s_apszCss1KeywordList[] =
+static BOOL IsCss1Keyword(LPCTSTR pszChars, int nLength)
+{
+  static LPCTSTR const s_apszCss1KeywordList[] =
   {
     // CSS 1
     _T ("background"),
@@ -82,10 +81,13 @@ static LPTSTR s_apszCss1KeywordList[] =
     _T ("white-space"),
     _T ("width"),
     _T ("word-spacing"),
-    NULL
   };
+  return xiskeyword<_tcsnicmp>(pszChars, nLength, s_apszCss1KeywordList);
+}
 
-static LPTSTR s_apszCss2KeywordList[] =
+static BOOL IsCss2Keyword(LPCTSTR pszChars, int nLength)
+{
+  static LPCTSTR const s_apszCss2KeywordList[] =
   {
     // CSS 2
     _T ("ascent"),
@@ -177,31 +179,8 @@ static LPTSTR s_apszCss2KeywordList[] =
     _T ("widths"),
     _T ("x-height"),
     _T ("z-index"),
-    NULL
   };
-
-static BOOL
-IsXKeyword (LPTSTR apszKeywords[], LPCTSTR pszChars, int nLength)
-{
-  for (int L = 0; apszKeywords[L] != NULL; L++)
-    {
-      if (_tcsnicmp (apszKeywords[L], pszChars, nLength) == 0
-            && apszKeywords[L][nLength] == 0)
-        return TRUE;
-    }
-  return FALSE;
-}
-
-static BOOL
-IsCss1Keyword (LPCTSTR pszChars, int nLength)
-{
-  return IsXKeyword (s_apszCss1KeywordList, pszChars, nLength);
-}
-
-static BOOL
-IsCss2Keyword (LPCTSTR pszChars, int nLength)
-{
-  return IsXKeyword (s_apszCss2KeywordList, pszChars, nLength);
+  return xiskeyword<_tcsnicmp>(pszChars, nLength, s_apszCss2KeywordList);
 }
 
 #define DEFINE_BLOCK(pos, colorindex)   \
@@ -229,7 +208,7 @@ DWORD CCrystalTextView::ParseLineCss(DWORD dwCookie, int nLineIndex, TEXTBLOCK *
   if (nLength == 0)
     return dwCookie & (COOKIE_EXT_COMMENT|COOKIE_EXT_DEFINITION|COOKIE_EXT_VALUE);
 
-  LPCTSTR pszChars = GetLineChars(nLineIndex);
+  const LPCTSTR pszChars = GetLineChars(nLineIndex);
   BOOL bFirstChar = (dwCookie & ~(COOKIE_EXT_COMMENT|COOKIE_EXT_DEFINITION|COOKIE_EXT_VALUE)) == 0;
   BOOL bRedefineBlock = TRUE;
   BOOL bWasCommentStart = FALSE;
@@ -246,7 +225,7 @@ DWORD CCrystalTextView::ParseLineCss(DWORD dwCookie, int nLineIndex, TEXTBLOCK *
             nPos = nPrevI;
           if (dwCookie & COOKIE_EXT_COMMENT)
             {
-              DEFINE_BLOCK (nPos, COLORINDEX_COMMENT);
+              DEFINE_BLOCK(nPos, COLORINDEX_COMMENT);
             }
           else
             {
@@ -254,16 +233,16 @@ DWORD CCrystalTextView::ParseLineCss(DWORD dwCookie, int nLineIndex, TEXTBLOCK *
                 {
                   if (dwCookie & COOKIE_EXT_VALUE)
                     {
-                      DEFINE_BLOCK (nPos, COLORINDEX_STRING);
+                      DEFINE_BLOCK(nPos, COLORINDEX_STRING);
                     }
                   else
                     {
-                      DEFINE_BLOCK (nPos, COLORINDEX_NORMALTEXT);
+                      DEFINE_BLOCK(nPos, COLORINDEX_NORMALTEXT);
                     }
                 }
               else
                 {
-                  DEFINE_BLOCK (nPos, COLORINDEX_OPERATOR);
+                  DEFINE_BLOCK(nPos, COLORINDEX_OPERATOR);
                   bRedefineBlock = TRUE;
                   bDecIndex = TRUE;
                   goto out;
@@ -316,7 +295,7 @@ out:
         }
       if (I > 0 && pszChars[I] == '*' && pszChars[nPrevI] == '/')
         {
-          DEFINE_BLOCK (nPrevI, COLORINDEX_COMMENT);
+          DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
           dwCookie |= COOKIE_EXT_COMMENT;
           bWasCommentStart = TRUE;
           continue;
@@ -326,7 +305,7 @@ out:
 
       if (bFirstChar)
         {
-          if (!xisspace (pszChars[I]))
+          if (!xisspace(pszChars[I]))
             bFirstChar = FALSE;
         }
 
@@ -345,13 +324,13 @@ out:
             {
               if (dwCookie & COOKIE_EXT_VALUE)
                 {
-                  if (IsCss1Keyword (pszChars + nIdentBegin, I - nIdentBegin))
+                  if (IsCss1Keyword(pszChars + nIdentBegin, I - nIdentBegin))
                     {
-                      DEFINE_BLOCK (nIdentBegin, COLORINDEX_USER1);
+                      DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER1);
                     }
-                  else if (IsCss2Keyword (pszChars + nIdentBegin, I - nIdentBegin))
+                  else if (IsCss2Keyword(pszChars + nIdentBegin, I - nIdentBegin))
                     {
-                      DEFINE_BLOCK (nIdentBegin, COLORINDEX_USER2);
+                      DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER2);
                     }
                   else
                     {
@@ -369,13 +348,13 @@ next:
 
   if ((nIdentBegin >= 0) && (dwCookie & COOKIE_EXT_VALUE))
     {
-      if (IsCss1Keyword (pszChars + nIdentBegin, I - nIdentBegin))
+      if (IsCss1Keyword(pszChars + nIdentBegin, I - nIdentBegin))
         {
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_USER1);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER1);
         }
-      else if (IsCss2Keyword (pszChars + nIdentBegin, I - nIdentBegin))
+      else if (IsCss2Keyword(pszChars + nIdentBegin, I - nIdentBegin))
         {
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_USER2);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER2);
         }
     }
 

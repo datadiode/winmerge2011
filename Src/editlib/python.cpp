@@ -16,18 +16,19 @@
 
 #include "StdAfx.h"
 #include "ccrystaltextview.h"
-#include "ccrystaltextbuffer.h"
 #include "SyntaxColors.h"
 #include "string_util.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
 #endif
 
+using CommonKeywords::IsNumeric;
+
 //  Python 2.6 keywords
-static LPTSTR s_apszPythonKeywordList[] =
+static BOOL IsPythonKeyword(LPCTSTR pszChars, int nLength)
+{
+  static LPCTSTR const s_apszPythonKeywordList[] =
   {
     _T ("and"),
     _T ("as"),
@@ -60,37 +61,18 @@ static LPTSTR s_apszPythonKeywordList[] =
     _T ("while"),
     _T ("whith"),
     _T ("yield"),
-    NULL
   };
+  return xiskeyword<_tcsncmp>(pszChars, nLength, s_apszPythonKeywordList);
+}
 
-static LPTSTR s_apszUser1KeywordList[] =
+static BOOL IsUser1Keyword(LPCTSTR pszChars, int nLength)
+{
+  static LPCTSTR const s_apszUser1KeywordList[] =
   {
-    _T ("argv"),
-    _T ("builtin_module_names"),
-    _T ("Ellipsis"),
-    _T ("exc_type"),
-    _T ("exc_value"),
-    _T ("exc_traceback"),
-    _T ("exit"),
-    _T ("exitfunc"),
-    _T ("False"),
-    _T ("last_type"),
-    _T ("last_value"),
-    _T ("last_traceback"),
-    _T ("modules"),
-    _T ("None"),
-    _T ("NotImplemented"),
-    _T ("path"),
-    _T ("ps1"),
-    _T ("ps2"),
-    _T ("settrace"),
-    _T ("setprofile"),
-    _T ("stdin"),
-    _T ("stdout"),
-    _T ("stderr"),
-    _T ("tracebacklimit"),
     _T ("AttributeError"),
     _T ("EOFError"),
+    _T ("Ellipsis"),
+    _T ("False"),
     _T ("IOError"),
     _T ("ImportError"),
     _T ("IndexError"),
@@ -98,6 +80,8 @@ static LPTSTR s_apszUser1KeywordList[] =
     _T ("KeyboardInterrupt"),
     _T ("MemoryError"),
     _T ("NameError"),
+    _T ("None"),
+    _T ("NotImplemented"),
     _T ("OverflowError"),
     _T ("RuntimeError"),
     _T ("SyntaxError"),
@@ -108,121 +92,89 @@ static LPTSTR s_apszUser1KeywordList[] =
     _T ("ValueError"),
     _T ("ZeroDivisionError"),
     _T ("__debug__"),
-    NULL
+    _T ("argv"),
+    _T ("builtin_module_names"),
+    _T ("exc_traceback"),
+    _T ("exc_type"),
+    _T ("exc_value"),
+    _T ("exit"),
+    _T ("exitfunc"),
+    _T ("last_traceback"),
+    _T ("last_type"),
+    _T ("last_value"),
+    _T ("modules"),
+    _T ("path"),
+    _T ("ps1"),
+    _T ("ps2"),
+    _T ("setprofile"),
+    _T ("settrace"),
+    _T ("stderr"),
+    _T ("stdin"),
+    _T ("stdout"),
+    _T ("tracebacklimit"),
   };
+  return xiskeyword<_tcsncmp>(pszChars, nLength, s_apszUser1KeywordList);
+}
 
-static LPTSTR s_apszUser2KeywordList[] =
+static BOOL IsUser2Keyword(LPCTSTR pszChars, int nLength)
+{
+  static LPCTSTR const s_apszUser2KeywordList[] =
   {
-    _T ("id"),
-    _T ("__init__"),
-    _T ("__del__"),
-    _T ("__repr__"),
-    _T ("__str__"),
-    _T ("__cmp__"),
-    _T ("__hash__"),
-    _T ("__dict__"),
-    _T ("__methods__"),
-    _T ("__members__"),
-    _T ("__class__"),
-    _T ("__bases__"),
-    _T ("__add__"),
-    _T ("__mul__"),
-    _T ("__mod__"),
-    _T ("__sub__"),
-    _T ("__div__"),
-    _T ("divmod"),
-    _T ("__divmod__"),
-    _T ("pow"),
-    _T ("__pow__"),
-    _T ("__and__"),
-    _T ("__xor__"),
-    _T ("__or__"),
-    _T ("__lshift__"),
-    _T ("__rshift__"),
-    _T ("nonzero"),
-    _T ("__nonzero__"),
-    _T ("coerce"),
-    _T ("__coerce__"),
-    _T ("__neg__"),
-    _T ("__pos__"),
-    _T ("abs"),
     _T ("__abs__"),
-    _T ("__invert__"),
-    _T ("int"),
-    _T ("__int__"),
-    _T ("float"),
+    _T ("__add__"),
+    _T ("__and__"),
+    _T ("__bases__"),
+    _T ("__class__"),
+    _T ("__cmp__"),
+    _T ("__coerce__"),
+    _T ("__del__"),
+    _T ("__dict__"),
+    _T ("__div__"),
+    _T ("__divmod__"),
     _T ("__float__"),
-    _T ("long"),
-    _T ("__long__"),
-    _T ("float"),
     _T ("__float__"),
-    _T ("oct"),
-    _T ("__oct__"),
-    _T ("hex"),
+    _T ("__getitem__"),
+    _T ("__hash__"),
     _T ("__hex__"),
+    _T ("__init__"),
+    _T ("__int__"),
+    _T ("__invert__"),
+    _T ("__len__"),
+    _T ("__long__"),
+    _T ("__lshift__"),
+    _T ("__members__"),
+    _T ("__methods__"),
+    _T ("__mod__"),
+    _T ("__mul__"),
+    _T ("__neg__"),
+    _T ("__nonzero__"),
+    _T ("__oct__"),
+    _T ("__or__"),
+    _T ("__pos__"),
+    _T ("__pow__"),
+    _T ("__repr__"),
+    _T ("__rshift__"),
+    _T ("__str__"),
+    _T ("__sub__"),
+    _T ("__xor__"),
+    _T ("abs"),
+    _T ("coerce"),
+    _T ("divmod"),
+    _T ("float"),
+    _T ("float"),
+    _T ("hex"),
+    _T ("id"),
+    _T ("int"),
+    _T ("len"),
+    _T ("long"),
+    _T ("nonzero"),
+    _T ("oct"),
+    _T ("pow"),
     _T ("range"),
     _T ("round"),
     _T ("xrange"),
-    _T ("len"),
-    _T ("__len__"),
-    _T ("__getitem__"),
-    NULL
   };
-
-static BOOL
-IsXKeyword (LPTSTR apszKeywords[], LPCTSTR pszChars, int nLength)
-{
-  for (int L = 0; apszKeywords[L] != NULL; L++)
-    {
-      if (_tcsncmp (apszKeywords[L], pszChars, nLength) == 0
-            && apszKeywords[L][nLength] == 0)
-        return TRUE;
-    }
-  return FALSE;
-}
-
-static BOOL
-IsPythonKeyword (LPCTSTR pszChars, int nLength)
-{
-  return IsXKeyword (s_apszPythonKeywordList, pszChars, nLength);
-}
-
-static BOOL
-IsUser1Keyword (LPCTSTR pszChars, int nLength)
-{
-  return IsXKeyword (s_apszUser1KeywordList, pszChars, nLength);
-}
-
-static BOOL
-IsUser2Keyword (LPCTSTR pszChars, int nLength)
-{
-  return IsXKeyword (s_apszUser2KeywordList, pszChars, nLength);
-}
-
-static BOOL
-IsPythonNumber (LPCTSTR pszChars, int nLength)
-{
-  if (nLength > 2 && pszChars[0] == '0' && pszChars[1] == 'x')
-    {
-      for (int I = 2; I < nLength; I++)
-        {
-          if (_istdigit (pszChars[I]) || (pszChars[I] >= 'A' && pszChars[I] <= 'F') ||
-                (pszChars[I] >= 'a' && pszChars[I] <= 'f'))
-            continue;
-          return FALSE;
-        }
-      return TRUE;
-    }
-  if (!_istdigit (pszChars[0]))
-    return FALSE;
-  for (int I = 1; I < nLength; I++)
-    {
-      if (!_istdigit (pszChars[I]) && pszChars[I] != '+' &&
-            pszChars[I] != '-' && pszChars[I] != '.' && pszChars[I] != 'e' &&
-            pszChars[I] != 'E')
-        return FALSE;
-    }
-  return TRUE;
+  return xiskeyword<_tcsncmp>(pszChars, nLength, s_apszUser2KeywordList);
 }
 
 #define DEFINE_BLOCK(pos, colorindex)   \
@@ -248,7 +200,7 @@ DWORD CCrystalTextView::ParseLinePython(DWORD dwCookie, int nLineIndex, TEXTBLOC
   if (nLength == 0)
     return dwCookie & COOKIE_EXT_COMMENT;
 
-  LPCTSTR pszChars = GetLineChars(nLineIndex);
+  const LPCTSTR pszChars = GetLineChars(nLineIndex);
   BOOL bFirstChar = (dwCookie & ~COOKIE_EXT_COMMENT) == 0;
   BOOL bRedefineBlock = TRUE;
   BOOL bDecIndex = FALSE;
@@ -264,21 +216,21 @@ DWORD CCrystalTextView::ParseLinePython(DWORD dwCookie, int nLineIndex, TEXTBLOC
             nPos = nPrevI;
           if (dwCookie & (COOKIE_COMMENT | COOKIE_EXT_COMMENT))
             {
-              DEFINE_BLOCK (nPos, COLORINDEX_COMMENT);
+              DEFINE_BLOCK(nPos, COLORINDEX_COMMENT);
             }
           else if (dwCookie & (COOKIE_CHAR | COOKIE_STRING))
             {
-              DEFINE_BLOCK (nPos, COLORINDEX_STRING);
+              DEFINE_BLOCK(nPos, COLORINDEX_STRING);
             }
           else
             {
               if (xisalnum(pszChars[nPos]) || pszChars[nPos] == '.' && nPos > 0 && (!xisalpha(pszChars[nPos - 1]) && !xisalpha(pszChars[nPos + 1])))
                 {
-                  DEFINE_BLOCK (nPos, COLORINDEX_NORMALTEXT);
+                  DEFINE_BLOCK(nPos, COLORINDEX_NORMALTEXT);
                 }
               else
                 {
-                  DEFINE_BLOCK (nPos, COLORINDEX_OPERATOR);
+                  DEFINE_BLOCK(nPos, COLORINDEX_OPERATOR);
                   bRedefineBlock = TRUE;
                   bDecIndex = TRUE;
                   goto out;
@@ -296,7 +248,7 @@ out:
 
       if (dwCookie & COOKIE_COMMENT)
         {
-          DEFINE_BLOCK (I, COLORINDEX_COMMENT);
+          DEFINE_BLOCK(I, COLORINDEX_COMMENT);
           dwCookie |= COOKIE_COMMENT;
           break;
         }
@@ -325,7 +277,7 @@ out:
 
       if (pszChars[I] == '#')
         {
-          DEFINE_BLOCK (I, COLORINDEX_COMMENT);
+          DEFINE_BLOCK(I, COLORINDEX_COMMENT);
           dwCookie |= COOKIE_COMMENT;
           break;
         }
@@ -333,7 +285,7 @@ out:
       //  Normal text
       if (pszChars[I] == '"')
         {
-          DEFINE_BLOCK (I, COLORINDEX_STRING);
+          DEFINE_BLOCK(I, COLORINDEX_STRING);
           dwCookie |= COOKIE_STRING;
           continue;
         }
@@ -342,7 +294,7 @@ out:
           // if (I + 1 < nLength && pszChars[I + 1] == '\'' || I + 2 < nLength && pszChars[I + 1] != '\\' && pszChars[I + 2] == '\'' || I + 3 < nLength && pszChars[I + 1] == '\\' && pszChars[I + 3] == '\'')
           if (!I || !xisalnum(pszChars[nPrevI]))
             {
-              DEFINE_BLOCK (I, COLORINDEX_STRING);
+              DEFINE_BLOCK(I, COLORINDEX_STRING);
               dwCookie |= COOKIE_CHAR;
               continue;
             }
@@ -350,7 +302,7 @@ out:
 
       if (bFirstChar)
         {
-          if (!xisspace (pszChars[I]))
+          if (!xisspace(pszChars[I]))
             bFirstChar = FALSE;
         }
 
@@ -367,21 +319,21 @@ out:
         {
           if (nIdentBegin >= 0)
             {
-              if (IsPythonKeyword (pszChars + nIdentBegin, I - nIdentBegin))
+              if (IsPythonKeyword(pszChars + nIdentBegin, I - nIdentBegin))
                 {
-                  DEFINE_BLOCK (nIdentBegin, COLORINDEX_KEYWORD);
+                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
                 }
-              else if (IsUser1Keyword (pszChars + nIdentBegin, I - nIdentBegin))
+              else if (IsUser1Keyword(pszChars + nIdentBegin, I - nIdentBegin))
                 {
-                  DEFINE_BLOCK (nIdentBegin, COLORINDEX_USER1);
+                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER1);
                 }
-              else if (IsUser2Keyword (pszChars + nIdentBegin, I - nIdentBegin))
+              else if (IsUser2Keyword(pszChars + nIdentBegin, I - nIdentBegin))
                 {
-                  DEFINE_BLOCK (nIdentBegin, COLORINDEX_USER2);
+                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER2);
                 }
-              else if (IsPythonNumber (pszChars + nIdentBegin, I - nIdentBegin))
+              else if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
                 {
-                  DEFINE_BLOCK (nIdentBegin, COLORINDEX_NUMBER);
+                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
                 }
               else
                 {
@@ -389,7 +341,7 @@ out:
 
                   for (int j = I; j < nLength; j++)
                     {
-                      if (!xisspace (pszChars[j]))
+                      if (!xisspace(pszChars[j]))
                         {
                           if (pszChars[j] == '(')
                             {
@@ -400,7 +352,7 @@ out:
                     }
                   if (bFunction)
                     {
-                      DEFINE_BLOCK (nIdentBegin, COLORINDEX_FUNCNAME);
+                      DEFINE_BLOCK(nIdentBegin, COLORINDEX_FUNCNAME);
                     }
                 }
               bRedefineBlock = TRUE;
@@ -412,21 +364,21 @@ out:
 
   if (nIdentBegin >= 0)
     {
-      if (IsPythonKeyword (pszChars + nIdentBegin, I - nIdentBegin))
+      if (IsPythonKeyword(pszChars + nIdentBegin, I - nIdentBegin))
         {
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_KEYWORD);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
         }
-      else if (IsUser1Keyword (pszChars + nIdentBegin, I - nIdentBegin))
+      else if (IsUser1Keyword(pszChars + nIdentBegin, I - nIdentBegin))
         {
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_USER1);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER1);
         }
-      else if (IsUser2Keyword (pszChars + nIdentBegin, I - nIdentBegin))
+      else if (IsUser2Keyword(pszChars + nIdentBegin, I - nIdentBegin))
         {
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_USER2);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER2);
         }
-      else if (IsPythonNumber (pszChars + nIdentBegin, I - nIdentBegin))
+      else if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
         {
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_NUMBER);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
         }
       else
         {
@@ -434,7 +386,7 @@ out:
 
           for (int j = I; j < nLength; j++)
             {
-              if (!xisspace (pszChars[j]))
+              if (!xisspace(pszChars[j]))
                 {
                   if (pszChars[j] == '(')
                     {
@@ -445,7 +397,7 @@ out:
             }
           if (bFunction)
             {
-              DEFINE_BLOCK (nIdentBegin, COLORINDEX_FUNCNAME);
+              DEFINE_BLOCK(nIdentBegin, COLORINDEX_FUNCNAME);
             }
         }
     }

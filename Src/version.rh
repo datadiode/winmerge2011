@@ -1,6 +1,6 @@
 
 #define MAJOR 2011
-#define MINOR 003
-#define BUILD 381
+#define MINOR 008
+#define XXXXX 017
 #define PRIVATE_BUILD ""
 #define COMMENTS ""

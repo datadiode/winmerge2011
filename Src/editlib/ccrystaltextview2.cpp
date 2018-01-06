@@ -42,15 +42,11 @@
  * @brief More functions for CCrystalTextView class.
  */
 #include "StdAfx.h"
-#include "editcmd.h"
-#include "ccrystaltextview.h"
 #include "ccrystaltextbuffer.h"
 #include "string_util.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
 #endif
 
 #define CRYSTAL_TIMER_DRAGSEL   1001
@@ -67,8 +63,8 @@ void CCrystalTextView::AdjustCursorAfterMoveLeft()
 
 void CCrystalTextView::AdjustCursorAfterMoveRight()
 {
-	int nLength = GetLineLength(m_ptCursorPos.y);
-	LPCTSTR pszChars = GetLineChars(m_ptCursorPos.y);
+	const int nLength = GetLineLength(m_ptCursorPos.y);
+	const LPCTSTR pszChars = GetLineChars(m_ptCursorPos.y);
 	while (m_ptCursorPos.x < nLength && GetCharWidthFromChar(pszChars + m_ptCursorPos.x) == 0)
 		++m_ptCursorPos.x;
 }
@@ -201,14 +197,14 @@ void CCrystalTextView::MoveWordRight(BOOL bSelect)
 		m_ptCursorPos.x = 0;
 	}
 
-	int nLength = GetLineLength(m_ptCursorPos.y);
+	const int nLength = GetLineLength(m_ptCursorPos.y);
 	if (m_ptCursorPos.x == nLength)
 	{
 		MoveRight(bSelect);
 		return;
 	}
 
-	LPCTSTR pszChars = GetLineChars(m_ptCursorPos.y);
+	const LPCTSTR pszChars = GetLineChars(m_ptCursorPos.y);
 	int nPos = m_ptCursorPos.x;
 	if (xisalnum(pszChars[nPos]))
 	{
@@ -316,8 +312,8 @@ void CCrystalTextView::MoveDown(BOOL bSelect)
 
 void CCrystalTextView::MoveHome(BOOL bSelect)
 {
-	int nLength = GetLineLength(m_ptCursorPos.y);
-	LPCTSTR pszChars = GetLineChars(m_ptCursorPos.y);
+	const int nLength = GetLineLength(m_ptCursorPos.y);
+	const LPCTSTR pszChars = GetLineChars(m_ptCursorPos.y);
 	//BEGIN SW
 	POINT pos;
 	CharPosToPoint( m_ptCursorPos.y, m_ptCursorPos.x, pos );
@@ -326,7 +322,7 @@ void CCrystalTextView::MoveHome(BOOL bSelect)
 	/*ORIGINAL
 	int nHomePos = 0;
 	*///END SW
-	while (nHomePos < nLength && xisspace (pszChars[nHomePos]))
+	while (nHomePos < nLength && xisspace(pszChars[nHomePos]))
 		nHomePos++;
 	if (nHomePos == nLength || m_ptCursorPos.x == nHomePos)
 		//BEGIN SW
@@ -504,8 +500,8 @@ void CCrystalTextView::ScrollRight()
 POINT CCrystalTextView::WordToRight(POINT pt)
 {
 	ASSERT_VALIDTEXTPOS(pt);
-	int nLength = GetLineLength(pt.y);
-	LPCTSTR pszChars = GetLineChars(pt.y);
+	const int nLength = GetLineLength(pt.y);
+	const LPCTSTR pszChars = GetLineChars(pt.y);
 	while (pt.x < nLength && xisalnum(pszChars[pt.x]))
 	{
 		++pt.x;

@@ -27,250 +27,214 @@
 
 #include "StdAfx.h"
 #include "ccrystaltextview.h"
-#include "ccrystaltextbuffer.h"
 #include "SyntaxColors.h"
 #include "string_util.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
 #endif
 
-//  C++ keywords (MSVC5.0 + POET5.0)
-static LPTSTR s_apszCppKeywordList[] =
+using CommonKeywords::IsNumeric;
+
+// C++ keywords (MSVC5.0 + POET5.0)
+static BOOL IsCppKeyword(LPCTSTR pszChars, int nLength)
+{
+  static LPCTSTR const s_apszCppKeywordList[] =
   {
-    _T ("_asm"),
     _T ("__asm"),
-    _T ("_far16"),
-    _T ("__far16"),
-    _T ("enum"),
-    _T ("__multiple_inheritance"),
-    _T ("template"),
-    _T ("auto"),
-    _T ("__except"),
-    _T ("__single_inheritance"),
-    _T ("this"),
     _T ("__based"),
-    _T ("explicit"),
-    _T ("__virtual_inheritance"),
-    _T ("thread"),
-    _T ("bool"),
-    _T ("extern"),
-    _T ("mutable"),
-    _T ("throw"),
-    _T ("break"),
-    _T ("false"),
-    _T ("naked"),
-    _T ("true"),
-    _T ("case"),
-    _T ("_fastcall"),
-    _T ("__fastcall"),
-    _T ("namespace"),
-    _T ("try"),
-    _T ("catch"),
-    _T ("__finally"),
-    _T ("new"),
-    _T ("__try"),
     _T ("__cdecl"),
-    _T ("__pascal"),
-    _T ("_cdecl"),
-    _T ("_pascal"),
-    _T ("float"),
-    _T ("operator"),
-    _T ("typedef"),
-    _T ("char"),
-    _T ("for"),
-    _T ("private"),
-    _T ("typeid"),
-    _T ("class"),
-    _T ("friend"),
-    _T ("protected"),
-    _T ("typename"),
-    _T ("const"),
-    _T ("goto"),
-    _T ("public"),
-    _T ("union"),
-    _T ("const_cast"),
-    _T ("if"),
-    _T ("register"),
-    _T ("unsigned"),
-    _T ("continue"),
-    _T ("inline"),
-    _T ("reinterpret_cast"),
-    _T ("using"),
     _T ("__declspec"),
-    _T ("__inline"),
-    _T ("return"),
-    _T ("uuid"),
-    _T ("default"),
-    _T ("int"),
-    _T ("short"),
-    _T ("__uuidof"),
-    _T ("delete"),
-    _T ("__int8"),
-    _T ("signed"),
-    _T ("virtual"),
-    _T ("_export"),
+    _T ("__except"),
     _T ("__export"),
-    _T ("dllexport"),
+    _T ("__far16"),
+    _T ("__fastcall"),
+    _T ("__finally"),
+    _T ("__inline"),
     _T ("__int16"),
-    _T ("sizeof"),
-    _T ("void"),
-    _T ("dllimport"),
     _T ("__int32"),
-    _T ("static"),
-    _T ("volatile"),
-    _T ("do"),
     _T ("__int64"),
-    _T ("static_cast"),
-    _T ("wmain"),
-    _T ("double"),
+    _T ("__int8"),
     _T ("__leave"),
-    _T ("_stdcall"),
+    _T ("__multiple_inheritance"),
+    _T ("__pascal"),
+    _T ("__single_inheritance"),
     _T ("__stdcall"),
-    _T ("_syscall"),
     _T ("__syscall"),
-    _T ("while"),
-    _T ("dynamic_cast"),
-    _T ("long"),
-    _T ("struct"),
-    _T ("xalloc"),
-    _T ("else"),
-    _T ("main"),
-    _T ("switch"),
-    _T ("interface"),
-    //  Added by a.s.
-    _T ("persistent"),
+    _T ("__try"),
+    _T ("__uuidof"),
+    _T ("__virtual_inheritance"),
+    _T ("_asm"),
+    _T ("_cdecl"),
+    _T ("_export"),
+    _T ("_far16"),
+    _T ("_fastcall"),
+    _T ("_pascal"),
     _T ("_persistent"),
-    _T ("transient"),
-    _T ("depend"),
-    _T ("ondemand"),
-    _T ("transient"),
+    _T ("_stdcall"),
+    _T ("_syscall"),
+    _T ("alignas"),
+    _T ("alignof"),
+    _T ("auto"),
+    _T ("bool"),
+    _T ("break"),
+    _T ("case"),
+    _T ("catch"),
+    _T ("char16_t"),
+    _T ("char32_t"),
+    _T ("char"),
+    _T ("class"),
+    _T ("const"),
+    _T ("const_cast"),
+    _T ("constexpr"),
+    _T ("continue"),
+    _T ("decltype"),
     _T ("cset"),
-    _T ("useindex"),
+    _T ("default"),
+    _T ("delete"),
+    _T ("depend"),
+    _T ("dllexport"),
+    _T ("dllimport"),
+    _T ("do"),
+    _T ("double"),
+    _T ("dynamic_cast"),
+    _T ("else"),
+    _T ("enum"),
+    _T ("explicit"),
+    _T ("extern"),
+    _T ("false"),
+    _T ("float"),
+    _T ("for"),
+    _T ("friend"),
+    _T ("goto"),
+    _T ("if"),
     _T ("indexdef"),
-    NULL
+    _T ("inline"),
+    _T ("int"),
+    _T ("interface"),
+    _T ("long"),
+    _T ("main"),
+    _T ("mutable"),
+    _T ("naked"),
+    _T ("namespace"),
+    _T ("new"),
+    _T ("noexcept"),
+    _T ("nullptr"),
+    _T ("ondemand"),
+    _T ("operator"),
+    _T ("persistent"),
+    _T ("private"),
+    _T ("protected"),
+    _T ("public"),
+    _T ("register"),
+    _T ("reinterpret_cast"),
+    _T ("return"),
+    _T ("short"),
+    _T ("signed"),
+    _T ("sizeof"),
+    _T ("static"),
+    _T ("static_assert"),
+    _T ("static_cast"),
+    _T ("struct"),
+    _T ("switch"),
+    _T ("template"),
+    _T ("this"),
+    _T ("thread"),
+    _T ("thread_local"),
+    _T ("throw"),
+    _T ("transient"),
+    _T ("transient"),
+    _T ("true"),
+    _T ("try"),
+    _T ("typedef"),
+    _T ("typeid"),
+    _T ("typename"),
+    _T ("union"),
+    _T ("unsigned"),
+    _T ("useindex"),
+    _T ("using"),
+    _T ("uuid"),
+    _T ("virtual"),
+    _T ("void"),
+    _T ("volatile"),
+    _T ("while"),
+    _T ("wmain"),
+    _T ("xalloc"),
   };
+  return xiskeyword<_tcsncmp>(pszChars, nLength, s_apszCppKeywordList);
+}
 
-static LPTSTR s_apszUser1KeywordList[] =
+static BOOL IsUser1Keyword(LPCTSTR pszChars, int nLength)
+{
+  static LPCTSTR const s_apszUser1KeywordList[] =
   {
-    _T ("LPTSTR"),
-    _T ("LPCTSTR"),
-    _T ("LPWSTR"),
-    _T ("LPCWSTR"),
-    _T ("LPTSTR"),
-    _T ("LPCTSTR"),
-    _T ("CHAR"),
-    _T ("WCHAR"),
-    _T ("TCHAR"),
-    _T ("BYTE"),
-	_T ("PBYTE"),
-	_T ("LPBYTE"),
     _T ("BOOL"),
-	_T ("PBOOL"),
-	_T ("LPBOOL"),
-	_T ("VOID"),
-	_T ("LPVOID"),
-	_T ("LONG"),
-	_T ("LPLONG"),
-    _T ("TRUE"),
-    _T ("FALSE"),
-    _T ("INT"),
-	_T ("PINT"),
-	_T ("LPINT"),
-    _T ("UINT"),
-	_T ("PUINT"),
-    _T ("WORD"),
-	_T ("PWORD"),
-	_T ("LPWORD"),
+    _T ("BSTR"),
+    _T ("BYTE"),
+    _T ("CHAR"),
+    _T ("COLORREF"),
     _T ("DWORD"),
-	_T ("PDWORD"),
-	_T ("LPDWORD"),
-    _T ("WPARAM"),
+    _T ("DWORD32"),
+    _T ("FALSE"),
+    _T ("HANDLE"),
+    _T ("INT"),
+    _T ("INT16"),
+    _T ("INT32"),
+    _T ("INT64"),
+    _T ("INT8"),
+    _T ("LONG"),
     _T ("LPARAM"),
+    _T ("LPBOOL"),
+    _T ("LPBYTE"),
+    _T ("LPCSTR"),
+    _T ("LPCTSTR"),
+    _T ("LPCTSTR"),
+    _T ("LPCWSTR"),
+    _T ("LPDWORD"),
+    _T ("LPINT"),
+    _T ("LPLONG"),
+    _T ("LPRECT"),
+    _T ("LPSTR"),
+    _T ("LPTSTR"),
+    _T ("LPTSTR"),
+    _T ("LPVOID"),
+    _T ("LPVOID"),
+    _T ("LPWORD"),
+    _T ("LPWSTR"),
     _T ("LRESULT"),
-	_T ("BSTR"),
-	_T ("COLORREF"),
-	_T ("LPCSTR"),
-	_T ("LPSTR"),
-	_T ("LPVOID"),
-	_T ("LRESULT"),
-	_T ("WNDPROC"),
-	_T ("POSITION"),
-	_T ("LPRECT"),
-	_T ("HANDLE"),
-	_T ("INT8"),
-	_T ("PINT8"),
-	_T ("INT16"),
-	_T ("PINT16"),
-	_T ("INT32"),
-	_T ("PINT32"),
-	_T ("INT64"),
-	_T ("PINT64"),
-	_T ("UINT8"),
-	_T ("PUINT8"),
-	_T ("UINT16"),
-	_T ("PUINT16"),
-	_T ("UINT32"),
-	_T ("PUINT32"),
-	_T ("UINT64"),
-	_T ("PUINT64"),
-	_T ("ULONG32"),
-	_T ("PULONG32"),
-	_T ("DWORD32"),
-	_T ("PDWORD32"),
-    NULL
+    _T ("LRESULT"),
+    _T ("PBOOL"),
+    _T ("PBYTE"),
+    _T ("PDWORD"),
+    _T ("PDWORD32"),
+    _T ("PINT"),
+    _T ("PINT16"),
+    _T ("PINT32"),
+    _T ("PINT64"),
+    _T ("PINT8"),
+    _T ("POSITION"),
+    _T ("PUINT"),
+    _T ("PUINT16"),
+    _T ("PUINT32"),
+    _T ("PUINT64"),
+    _T ("PUINT8"),
+    _T ("PULONG32"),
+    _T ("PWORD"),
+    _T ("TCHAR"),
+    _T ("TRUE"),
+    _T ("UINT"),
+    _T ("UINT16"),
+    _T ("UINT32"),
+    _T ("UINT64"),
+    _T ("UINT8"),
+    _T ("ULONG32"),
+    _T ("VOID"),
+    _T ("WCHAR"),
+    _T ("WNDPROC"),
+    _T ("WORD"),
+    _T ("WPARAM"),
   };
-
-static BOOL
-IsXKeyword (LPTSTR apszKeywords[], LPCTSTR pszChars, int nLength)
-{
-  for (int L = 0; apszKeywords[L] != NULL; L++)
-    {
-      if (_tcsncmp (apszKeywords[L], pszChars, nLength) == 0
-            && apszKeywords[L][nLength] == 0)
-        return TRUE;
-    }
-  return FALSE;
-}
-
-static BOOL
-IsCppKeyword (LPCTSTR pszChars, int nLength)
-{
-  return IsXKeyword (s_apszCppKeywordList, pszChars, nLength);
-}
-
-static BOOL
-IsUser1Keyword (LPCTSTR pszChars, int nLength)
-{
-  return IsXKeyword (s_apszUser1KeywordList, pszChars, nLength);
-}
-
-static BOOL
-IsCppNumber (LPCTSTR pszChars, int nLength)
-{
-  if (nLength > 2 && pszChars[0] == '0' && pszChars[1] == 'x')
-    {
-      for (int I = 2; I < nLength; I++)
-        {
-          if (_istdigit (pszChars[I]) || (pszChars[I] >= 'A' && pszChars[I] <= 'F') ||
-                (pszChars[I] >= 'a' && pszChars[I] <= 'f'))
-            continue;
-          return FALSE;
-        }
-      return TRUE;
-    }
-  if (!_istdigit (pszChars[0]))
-    return FALSE;
-  for (int I = 1; I < nLength; I++)
-    {
-      if (!_istdigit (pszChars[I]) && pszChars[I] != '+' &&
-            pszChars[I] != '-' && pszChars[I] != '.' && pszChars[I] != 'e' &&
-            pszChars[I] != 'E')
-        return FALSE;
-    }
-  return TRUE;
+  return xiskeyword<_tcsncmp>(pszChars, nLength, s_apszUser1KeywordList);
 }
 
 #define DEFINE_BLOCK(pos, colorindex)   \
@@ -296,7 +260,7 @@ DWORD CCrystalTextView::ParseLineC(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pB
   if (nLength == 0)
     return dwCookie & COOKIE_EXT_COMMENT;
 
-  LPCTSTR pszChars = GetLineChars(nLineIndex);
+  const LPCTSTR pszChars = GetLineChars(nLineIndex);
   BOOL bFirstChar = (dwCookie & ~COOKIE_EXT_COMMENT) == 0;
   BOOL bRedefineBlock = TRUE;
   BOOL bWasCommentStart = FALSE;
@@ -313,25 +277,25 @@ DWORD CCrystalTextView::ParseLineC(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pB
             nPos = nPrevI;
           if (dwCookie & (COOKIE_COMMENT | COOKIE_EXT_COMMENT))
             {
-              DEFINE_BLOCK (nPos, COLORINDEX_COMMENT);
+              DEFINE_BLOCK(nPos, COLORINDEX_COMMENT);
             }
           else if (dwCookie & (COOKIE_CHAR | COOKIE_STRING))
             {
-              DEFINE_BLOCK (nPos, COLORINDEX_STRING);
+              DEFINE_BLOCK(nPos, COLORINDEX_STRING);
             }
           else if (dwCookie & COOKIE_PREPROCESSOR)
             {
-              DEFINE_BLOCK (nPos, COLORINDEX_PREPROCESSOR);
+              DEFINE_BLOCK(nPos, COLORINDEX_PREPROCESSOR);
             }
           else
             {
               if (xisalnum(pszChars[nPos]) || pszChars[nPos] == '.' && nPos > 0 && (!xisalpha(pszChars[nPos - 1]) && !xisalpha(pszChars[nPos + 1])))
                 {
-                  DEFINE_BLOCK (nPos, COLORINDEX_NORMALTEXT);
+                  DEFINE_BLOCK(nPos, COLORINDEX_NORMALTEXT);
                 }
               else
                 {
-                  DEFINE_BLOCK (nPos, COLORINDEX_OPERATOR);
+                  DEFINE_BLOCK(nPos, COLORINDEX_OPERATOR);
                   bRedefineBlock = TRUE;
                   bDecIndex = TRUE;
                   goto out;
@@ -349,7 +313,7 @@ out:
 
       if (dwCookie & COOKIE_COMMENT)
         {
-          DEFINE_BLOCK (I, COLORINDEX_COMMENT);
+          DEFINE_BLOCK(I, COLORINDEX_COMMENT);
           dwCookie |= COOKIE_COMMENT;
           break;
         }
@@ -391,7 +355,7 @@ out:
 
       if (I > 0 && pszChars[I] == '/' && pszChars[nPrevI] == '/')
         {
-          DEFINE_BLOCK (nPrevI, COLORINDEX_COMMENT);
+          DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
           dwCookie |= COOKIE_COMMENT;
           break;
         }
@@ -401,7 +365,7 @@ out:
         {
           if (I > 0 && pszChars[I] == '*' && pszChars[nPrevI] == '/')
             {
-              DEFINE_BLOCK (nPrevI, COLORINDEX_COMMENT);
+              DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
               dwCookie |= COOKIE_EXT_COMMENT;
             }
           continue;
@@ -410,7 +374,7 @@ out:
       //  Normal text
       if (pszChars[I] == '"')
         {
-          DEFINE_BLOCK (I, COLORINDEX_STRING);
+          DEFINE_BLOCK(I, COLORINDEX_STRING);
           dwCookie |= COOKIE_STRING;
           continue;
         }
@@ -419,14 +383,14 @@ out:
           // if (I + 1 < nLength && pszChars[I + 1] == '\'' || I + 2 < nLength && pszChars[I + 1] != '\\' && pszChars[I + 2] == '\'' || I + 3 < nLength && pszChars[I + 1] == '\\' && pszChars[I + 3] == '\'')
           if (!I || !xisalnum(pszChars[nPrevI]))
             {
-              DEFINE_BLOCK (I, COLORINDEX_STRING);
+              DEFINE_BLOCK(I, COLORINDEX_STRING);
               dwCookie |= COOKIE_CHAR;
               continue;
             }
         }
       if (I > 0 && pszChars[I] == '*' && pszChars[nPrevI] == '/')
         {
-          DEFINE_BLOCK (nPrevI, COLORINDEX_COMMENT);
+          DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
           dwCookie |= COOKIE_EXT_COMMENT;
           bWasCommentStart = TRUE;
           continue;
@@ -438,11 +402,11 @@ out:
         {
           if (pszChars[I] == '#')
             {
-              DEFINE_BLOCK (I, COLORINDEX_PREPROCESSOR);
+              DEFINE_BLOCK(I, COLORINDEX_PREPROCESSOR);
               dwCookie |= COOKIE_PREPROCESSOR;
               continue;
             }
-          if (!xisspace (pszChars[I]))
+          if (!xisspace(pszChars[I]))
             bFirstChar = FALSE;
         }
 
@@ -459,17 +423,17 @@ out:
         {
           if (nIdentBegin >= 0)
             {
-              if (IsCppKeyword (pszChars + nIdentBegin, I - nIdentBegin))
+              if (IsCppKeyword(pszChars + nIdentBegin, I - nIdentBegin))
                 {
-                  DEFINE_BLOCK (nIdentBegin, COLORINDEX_KEYWORD);
+                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
                 }
-              else if (IsUser1Keyword (pszChars + nIdentBegin, I - nIdentBegin))
+              else if (IsUser1Keyword(pszChars + nIdentBegin, I - nIdentBegin))
                 {
-                  DEFINE_BLOCK (nIdentBegin, COLORINDEX_USER1);
+                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER1);
                 }
-              else if (IsCppNumber (pszChars + nIdentBegin, I - nIdentBegin))
+              else if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
                 {
-                  DEFINE_BLOCK (nIdentBegin, COLORINDEX_NUMBER);
+                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
                 }
               else
                 {
@@ -477,7 +441,7 @@ out:
 
                   for (int j = I; j < nLength; j++)
                     {
-                      if (!xisspace (pszChars[j]))
+                      if (!xisspace(pszChars[j]))
                         {
                           if (pszChars[j] == '(')
                             {
@@ -488,7 +452,7 @@ out:
                     }
                   if (bFunction)
                     {
-                      DEFINE_BLOCK (nIdentBegin, COLORINDEX_FUNCNAME);
+                      DEFINE_BLOCK(nIdentBegin, COLORINDEX_FUNCNAME);
                     }
                 }
               bRedefineBlock = TRUE;
@@ -500,17 +464,17 @@ out:
 
   if (nIdentBegin >= 0)
     {
-      if (IsCppKeyword (pszChars + nIdentBegin, I - nIdentBegin))
+      if (IsCppKeyword(pszChars + nIdentBegin, I - nIdentBegin))
         {
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_KEYWORD);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
         }
-      else if (IsUser1Keyword (pszChars + nIdentBegin, I - nIdentBegin))
+      else if (IsUser1Keyword(pszChars + nIdentBegin, I - nIdentBegin))
         {
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_USER1);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER1);
         }
-      else if (IsCppNumber (pszChars + nIdentBegin, I - nIdentBegin))
+      else if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
         {
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_NUMBER);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
         }
       else
         {
@@ -518,7 +482,7 @@ out:
 
           for (int j = I; j < nLength; j++)
             {
-              if (!xisspace (pszChars[j]))
+              if (!xisspace(pszChars[j]))
                 {
                   if (pszChars[j] == '(')
                     {
@@ -529,7 +493,7 @@ out:
             }
           if (bFunction)
             {
-              DEFINE_BLOCK (nIdentBegin, COLORINDEX_FUNCNAME);
+              DEFINE_BLOCK(nIdentBegin, COLORINDEX_FUNCNAME);
             }
         }
     }

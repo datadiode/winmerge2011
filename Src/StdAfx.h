@@ -14,7 +14,6 @@
 
 #define _CRT_NON_CONFORMING_SWPRINTFS
 
-#define _countof(array) (sizeof array / sizeof array[0])
 #define __CRT_STRINGIZE(value) #value
 #define _CRT_STRINGIZE(value) __CRT_STRINGIZE(value)
 
@@ -112,7 +111,7 @@ extern const char *const wine_version;
 #endif
 
 #ifndef DEBUG_NEW
-#	define DEBUG_NEW new(_NORMAL_BLOCK, THIS_FILE, __LINE__)
+#	define DEBUG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
 #endif
 
 #ifdef _DEBUG

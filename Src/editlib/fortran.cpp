@@ -16,19 +16,22 @@
 
 #include "StdAfx.h"
 #include "ccrystaltextview.h"
-#include "ccrystaltextbuffer.h"
 #include "SyntaxColors.h"
 #include "string_util.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
 #endif
 
-//  C++ keywords (MSVC5.0 + POET5.0)
-static LPTSTR s_apszFortranKeywordList[] =
+using CommonKeywords::IsNumeric;
+
+static BOOL IsFortranKeyword(LPCTSTR pszChars, int nLength)
+{
+  static LPCTSTR const s_apszFortranKeywordList[] =
   {
+    _T (".and."),
+    _T (".not."),
+    _T (".or."),
     _T ("abs"),
     _T ("achar"),
     _T ("acos"),
@@ -40,7 +43,6 @@ static LPTSTR s_apszFortranKeywordList[] =
     _T ("allocatable"),
     _T ("allocate"),
     _T ("allocated"),
-    _T (".and."),
     _T ("anint"),
     _T ("any"),
     _T ("asin"),
@@ -54,9 +56,6 @@ static LPTSTR s_apszFortranKeywordList[] =
     _T ("blockdata"),
     _T ("btest"),
     _T ("call"),
-    _T ("random_number"),
-    _T ("random_seed"),
-    _T ("system_clock"),
     _T ("call"),
     _T ("case"),
     _T ("ceiling"),
@@ -167,13 +166,11 @@ static LPTSTR s_apszFortranKeywordList[] =
     _T ("nearest"),
     _T ("nint"),
     _T ("none"),
-    _T (".not."),
     _T ("nullify"),
     _T ("only"),
     _T ("open"),
     _T ("operator"),
     _T ("optional"),
-    _T (".or."),
     _T ("out"),
     _T ("pack"),
     _T ("parameter"),
@@ -187,6 +184,8 @@ static LPTSTR s_apszFortranKeywordList[] =
     _T ("program"),
     _T ("public"),
     _T ("radix"),
+    _T ("random_number"),
+    _T ("random_seed"),
     _T ("rangereal"),
     _T ("read"),
     _T ("real"),
@@ -217,6 +216,7 @@ static LPTSTR s_apszFortranKeywordList[] =
     _T ("stop"),
     _T ("subroutine"),
     _T ("sum"),
+    _T ("system_clock"),
     _T ("tan"),
     _T ("tanh"),
     _T ("target"),
@@ -234,51 +234,8 @@ static LPTSTR s_apszFortranKeywordList[] =
     _T ("where"),
     _T ("while"),
     _T ("write"),
-    NULL
   };
-
-static BOOL
-IsXKeyword (LPTSTR apszKeywords[], LPCTSTR pszChars, int nLength)
-{
-  for (int L = 0; apszKeywords[L] != NULL; L++)
-    {
-      if (_tcsnicmp (apszKeywords[L], pszChars, nLength) == 0
-            && apszKeywords[L][nLength] == 0)
-        return TRUE;
-    }
-  return FALSE;
-}
-
-static BOOL
-IsFortranKeyword (LPCTSTR pszChars, int nLength)
-{
-  return IsXKeyword (s_apszFortranKeywordList, pszChars, nLength);
-}
-
-static BOOL
-IsFortranNumber (LPCTSTR pszChars, int nLength)
-{
-  if (nLength > 2 && pszChars[0] == '0' && pszChars[1] == 'x')
-    {
-      for (int I = 2; I < nLength; I++)
-        {
-          if (_istdigit (pszChars[I]) || (pszChars[I] >= 'A' && pszChars[I] <= 'F') ||
-                (pszChars[I] >= 'a' && pszChars[I] <= 'f'))
-            continue;
-          return FALSE;
-        }
-      return TRUE;
-    }
-  if (!_istdigit (pszChars[0]))
-    return FALSE;
-  for (int I = 1; I < nLength; I++)
-    {
-      if (!_istdigit (pszChars[I]) && pszChars[I] != '+' &&
-            pszChars[I] != '-' && pszChars[I] != '.' && pszChars[I] != 'e' &&
-            pszChars[I] != 'E')
-        return FALSE;
-    }
-  return TRUE;
+  return xiskeyword<_tcsnicmp>(pszChars, nLength, s_apszFortranKeywordList);
 }
 
 #define DEFINE_BLOCK(pos, colorindex)   \
@@ -304,7 +261,7 @@ DWORD CCrystalTextView::ParseLineFortran(DWORD dwCookie, int nLineIndex, TEXTBLO
   if (nLength == 0)
     return dwCookie & COOKIE_EXT_COMMENT;
 
-  LPCTSTR pszChars = GetLineChars(nLineIndex);
+  const LPCTSTR pszChars = GetLineChars(nLineIndex);
   BOOL bFirstChar = (dwCookie & ~COOKIE_EXT_COMMENT) == 0;
   BOOL bRedefineBlock = TRUE;
   BOOL bDecIndex = FALSE;
@@ -320,21 +277,21 @@ DWORD CCrystalTextView::ParseLineFortran(DWORD dwCookie, int nLineIndex, TEXTBLO
             nPos = nPrevI;
           if (dwCookie & (COOKIE_COMMENT | COOKIE_EXT_COMMENT))
             {
-              DEFINE_BLOCK (nPos, COLORINDEX_COMMENT);
+              DEFINE_BLOCK(nPos, COLORINDEX_COMMENT);
             }
           else if (dwCookie & (COOKIE_CHAR | COOKIE_STRING))
             {
-              DEFINE_BLOCK (nPos, COLORINDEX_STRING);
+              DEFINE_BLOCK(nPos, COLORINDEX_STRING);
             }
           else
             {
               if (xisalnum(pszChars[nPos]) || pszChars[nPos] == '.' && nPos > 0 && (!xisalpha(pszChars[nPos - 1]) && !xisalpha(pszChars[nPos + 1])))
                 {
-                  DEFINE_BLOCK (nPos, COLORINDEX_NORMALTEXT);
+                  DEFINE_BLOCK(nPos, COLORINDEX_NORMALTEXT);
                 }
               else
                 {
-                  DEFINE_BLOCK (nPos, COLORINDEX_OPERATOR);
+                  DEFINE_BLOCK(nPos, COLORINDEX_OPERATOR);
                   bRedefineBlock = TRUE;
                   bDecIndex = TRUE;
                   goto out;
@@ -352,7 +309,7 @@ out:
 
       if (dwCookie & COOKIE_COMMENT)
         {
-          DEFINE_BLOCK (I, COLORINDEX_COMMENT);
+          DEFINE_BLOCK(I, COLORINDEX_COMMENT);
           dwCookie |= COOKIE_COMMENT;
           break;
         }
@@ -381,7 +338,7 @@ out:
 
       if (pszChars[I] == '!' || !I && (pszChars[I] == 'C' || pszChars[I] == 'c'))
         {
-          DEFINE_BLOCK (I, COLORINDEX_COMMENT);
+          DEFINE_BLOCK(I, COLORINDEX_COMMENT);
           dwCookie |= COOKIE_COMMENT;
           break;
         }
@@ -389,7 +346,7 @@ out:
       //  Normal text
       if (pszChars[I] == '"')
         {
-          DEFINE_BLOCK (I, COLORINDEX_STRING);
+          DEFINE_BLOCK(I, COLORINDEX_STRING);
           dwCookie |= COOKIE_STRING;
           continue;
         }
@@ -398,7 +355,7 @@ out:
           // if (I + 1 < nLength && pszChars[I + 1] == '\'' || I + 2 < nLength && pszChars[I + 1] != '\\' && pszChars[I + 2] == '\'' || I + 3 < nLength && pszChars[I + 1] == '\\' && pszChars[I + 3] == '\'')
           if (!I || !xisalnum(pszChars[nPrevI]))
             {
-              DEFINE_BLOCK (I, COLORINDEX_STRING);
+              DEFINE_BLOCK(I, COLORINDEX_STRING);
               dwCookie |= COOKIE_CHAR;
               continue;
             }
@@ -406,7 +363,7 @@ out:
 
       if (bFirstChar)
         {
-          if (!xisspace (pszChars[I]))
+          if (!xisspace(pszChars[I]))
             bFirstChar = FALSE;
         }
 
@@ -423,13 +380,13 @@ out:
         {
           if (nIdentBegin >= 0)
             {
-              if (IsFortranKeyword (pszChars + nIdentBegin, I - nIdentBegin))
+              if (IsFortranKeyword(pszChars + nIdentBegin, I - nIdentBegin))
                 {
-                  DEFINE_BLOCK (nIdentBegin, COLORINDEX_KEYWORD);
+                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
                 }
-              else if (IsFortranNumber (pszChars + nIdentBegin, I - nIdentBegin))
+              else if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
                 {
-                  DEFINE_BLOCK (nIdentBegin, COLORINDEX_NUMBER);
+                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
                 }
               bRedefineBlock = TRUE;
               bDecIndex = TRUE;
@@ -440,13 +397,13 @@ out:
 
   if (nIdentBegin >= 0)
     {
-      if (IsFortranKeyword (pszChars + nIdentBegin, I - nIdentBegin))
+      if (IsFortranKeyword(pszChars + nIdentBegin, I - nIdentBegin))
         {
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_KEYWORD);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
         }
-      else if (IsFortranNumber (pszChars + nIdentBegin, I - nIdentBegin))
+      else if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
         {
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_NUMBER);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
         }
     }
 

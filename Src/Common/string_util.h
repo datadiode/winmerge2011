@@ -51,3 +51,38 @@ inline int xisspace(wint_t c)
 {
 	return _istspace(normch(c));
 }
+
+template<int (*compare)(LPCTSTR, LPCTSTR, size_t)>
+BOOL xiskeyword(LPCTSTR key, UINT len, LPCTSTR const *lower, LPCTSTR const *upper)
+{
+	while (lower < upper)
+	{
+		LPCTSTR const *match = lower + ((upper - lower) >> 1);
+		int cmp = compare(*match, key, len);
+		if (cmp == 0)
+			cmp = static_cast<TBYTE>((*match)[len]);
+		if (cmp >= 0)
+			upper = match;
+		if (cmp <= 0)
+			lower = match + 1;
+	}
+	return static_cast<BOOL>(lower - upper);
+}
+
+template<int (*compare)(LPCTSTR, LPCTSTR, size_t), typename T, size_t N>
+BOOL xiskeyword(LPCTSTR key, UINT len, T (&r)[N])
+{
+	return xiskeyword<compare>(key, len, std::begin(r), std::end(r));
+}
+
+namespace CommonKeywords
+{
+	BOOL IsNumeric(LPCTSTR pszChars, int nLength);
+};
+
+namespace HtmlKeywords
+{
+	BOOL IsHtmlKeyword(LPCTSTR pszChars, int nLength);
+	BOOL IsUser1Keyword(LPCTSTR pszChars, int nLength);
+	BOOL IsUser2Keyword(LPCTSTR pszChars, int nLength);
+};

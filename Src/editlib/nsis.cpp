@@ -27,18 +27,18 @@
 
 #include "StdAfx.h"
 #include "ccrystaltextview.h"
-#include "ccrystaltextbuffer.h"
 #include "SyntaxColors.h"
 #include "string_util.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
 #endif
 
-//  C++ keywords (MSVC5.0 + POET5.0)
-static LPTSTR s_apszNsisKeywordList[] =
+using CommonKeywords::IsNumeric;
+
+static BOOL IsNsisKeyword(LPCTSTR pszChars, int nLength)
+{
+  static LPCTSTR const s_apszNsisKeywordList[] =
   {
     _T ("Abort"),
     _T ("AddBrandingImage"),
@@ -51,6 +51,7 @@ static LPTSTR s_apszNsisKeywordList[] =
     _T ("BGGradient"),
     _T ("BrandingText"),
     _T ("BringToFront"),
+    _T ("CRCCheck"),
     _T ("Call"),
     _T ("CallInstDLL"),
     _T ("Caption"),
@@ -63,7 +64,6 @@ static LPTSTR s_apszNsisKeywordList[] =
     _T ("CompletedText"),
     _T ("ComponentText"),
     _T ("CopyFiles"),
-    _T ("CRCCheck"),
     _T ("CreateDirectory"),
     _T ("CreateFont"),
     _T ("CreateShortCut"),
@@ -80,8 +80,8 @@ static LPTSTR s_apszNsisKeywordList[] =
     _T ("DirVar"),
     _T ("DirVerify"),
     _T ("DisabledBitmap"),
-    _T ("EnabledBitmap"),
     _T ("EnableWindow"),
+    _T ("EnabledBitmap"),
     _T ("EnumRegKey"),
     _T ("EnumRegValue"),
     _T ("Exch"),
@@ -109,9 +109,9 @@ static LPTSTR s_apszNsisKeywordList[] =
     _T ("FunctionEnd"),
     _T ("GetCurInstType"),
     _T ("GetCurrentAddress"),
-    _T ("GetDlgItem"),
     _T ("GetDLLVersion"),
     _T ("GetDLLVersionLocal"),
+    _T ("GetDlgItem"),
     _T ("GetErrorLevel"),
     _T ("GetFileTime"),
     _T ("GetFileTimeLocal"),
@@ -139,16 +139,16 @@ static LPTSTR s_apszNsisKeywordList[] =
     _T ("IfRebootFlag"),
     _T ("IfSilent"),
     _T ("InitPluginsDir"),
-    _T ("InstallButtonText"),
-    _T ("InstallColors"),
-    _T ("InstallDir"),
-    _T ("InstallDirRegKey"),
-    _T ("InstallNetscapePlugin"),
     _T ("InstNSPlug"),
     _T ("InstProgressFlags"),
     _T ("InstType"),
     _T ("InstTypeGetText"),
     _T ("InstTypeSetText"),
+    _T ("InstallButtonText"),
+    _T ("InstallColors"),
+    _T ("InstallDir"),
+    _T ("InstallDirRegKey"),
+    _T ("InstallNetscapePlugin"),
     _T ("IntCmp"),
     _T ("IntCmpU"),
     _T ("IntFmt"),
@@ -164,9 +164,9 @@ static LPTSTR s_apszNsisKeywordList[] =
     _T ("LicenseText"),
     _T ("LoadLanguageFile"),
     _T ("LockWindow"),
-    _T ("LogicLib"),
     _T ("LogSet"),
     _T ("LogText"),
+    _T ("LogicLib"),
     _T ("MessageBox"),
     _T ("MiscButtonText"),
     _T ("Name"),
@@ -179,6 +179,7 @@ static LPTSTR s_apszNsisKeywordList[] =
     _T ("Pop"),
     _T ("Push"),
     _T ("Quit"),
+    _T ("RMDir"),
     _T ("ReadEnvStr"),
     _T ("ReadINIStr"),
     _T ("ReadRegDWORD"),
@@ -188,7 +189,6 @@ static LPTSTR s_apszNsisKeywordList[] =
     _T ("Rename"),
     _T ("ReserveFile"),
     _T ("Return"),
-    _T ("RMDir"),
     _T ("SearchPath"),
     _T ("Section"),
     _T ("SectionDivider"),
@@ -244,18 +244,18 @@ static LPTSTR s_apszNsisKeywordList[] =
     _T ("SubSection"),
     _T ("SubSectionEnd"),
     _T ("TrimNewlines"),
+    _T ("UnRegDLL"),
+    _T ("UninstPage"),
     _T ("UninstallButtonText"),
     _T ("UninstallCaption"),
     _T ("UninstallExeName"),
     _T ("UninstallIcon"),
     _T ("UninstallSubCaption"),
     _T ("UninstallText"),
-    _T ("UninstPage"),
-    _T ("UnRegDLL"),
     _T ("UpgradeDLL"),
-    _T ("Var"),
     _T ("VIAddVersionKey"),
     _T ("VIProductVersion"),
+    _T ("Var"),
     _T ("WindowIcon"),
     _T ("WriteINIStr"),
     _T ("WriteRegBin"),
@@ -264,10 +264,13 @@ static LPTSTR s_apszNsisKeywordList[] =
     _T ("WriteRegStr"),
     _T ("WriteUninstaller"),
     _T ("XPStyle"),
-    NULL
   };
+  return xiskeyword<_tcsncmp>(pszChars, nLength, s_apszNsisKeywordList);
+}
 
-static LPTSTR s_apszUser1KeywordList[] =
+static BOOL IsUser1Keyword(LPCTSTR pszChars, int nLength)
+{
+  static LPCTSTR const s_apszUser1KeywordList[] =
   {
 /*
     _T ("$0"),
@@ -328,16 +331,7 @@ static LPTSTR s_apszUser1KeywordList[] =
     _T ("$VIDEOS"),
     _T ("$WINDIR"),
 */
-    _T ("alwaysoff"),
     _T ("ARCHIVE"),
-    _T ("auto"),
-    _T ("both"),
-    _T ("bottom"),
-    _T ("bzip2"),
-    _T ("components"),
-    _T ("custom"),
-    _T ("directory"),
-    _T ("false"),
     _T ("FILE_ATTRIBUTE_ARCHIVE"),
     _T ("FILE_ATTRIBUTE_HIDDEN"),
     _T ("FILE_ATTRIBUTE_NORMAL"),
@@ -345,9 +339,7 @@ static LPTSTR s_apszUser1KeywordList[] =
     _T ("FILE_ATTRIBUTE_READONLY"),
     _T ("FILE_ATTRIBUTE_SYSTEM"),
     _T ("FILE_ATTRIBUTE_TEMPORARY"),
-    _T ("force"),
     _T ("HIDDEN"),
-    _T ("hide"),
     _T ("HKCC"),
     _T ("HKCR"),
     _T ("HKCU"),
@@ -369,16 +361,6 @@ static LPTSTR s_apszUser1KeywordList[] =
     _T ("IDOK"),
     _T ("IDRETRY"),
     _T ("IDYES"),
-    _T ("ifdiff"),
-    _T ("ifnewer"),
-    _T ("instfiles"),
-    _T ("lastused"),
-    _T ("leave"),
-    _T ("left"),
-    _T ("license"),
-    _T ("listonly"),
-    _T ("lzma"),
-    _T ("manual"),
     _T ("MB_ABORTRETRYIGNORE"),
     _T ("MB_DEFBUTTON1"),
     _T ("MB_DEFBUTTON2"),
@@ -399,82 +381,54 @@ static LPTSTR s_apszUser1KeywordList[] =
     _T ("MB_YESNO"),
     _T ("MB_YESNO"),
     _T ("MB_YESNOCANCEL"),
-    _T ("nevershow"),
-    _T ("none"),
-    _T ("normal"),
     _T ("NORMAL"),
-    _T ("off"),
     _T ("OFFLINE"),
-    _T ("on"),
     _T ("READONLY"),
-    _T ("right"),
     _T ("RO"),
-    _T ("show"),
-    _T ("silent"),
-    _T ("silentlog"),
     _T ("SW_HIDE"),
     _T ("SW_SHOWMAXIMIZED"),
     _T ("SW_SHOWMINIMIZED"),
     _T ("SW_SHOWNORMAL"),
     _T ("SYSTEM"),
     _T ("TEMPORARY"),
+    _T ("alwaysoff"),
+    _T ("auto"),
+    _T ("both"),
+    _T ("bottom"),
+    _T ("bzip2"),
+    _T ("components"),
+    _T ("custom"),
+    _T ("directory"),
+    _T ("false"),
+    _T ("force"),
+    _T ("hide"),
+    _T ("ifdiff"),
+    _T ("ifnewer"),
+    _T ("instfiles"),
+    _T ("lastused"),
+    _T ("leave"),
+    _T ("left"),
+    _T ("license"),
+    _T ("listonly"),
+    _T ("lzma"),
+    _T ("manual"),
+    _T ("nevershow"),
+    _T ("none"),
+    _T ("normal"),
+    _T ("off"),
+    _T ("on"),
+    _T ("right"),
+    _T ("show"),
+    _T ("silent"),
+    _T ("silentlog"),
     _T ("textonly"),
     _T ("top"),
     _T ("true"),
     _T ("try"),
     _T ("uninstConfirm"),
     _T ("zlib"),
-    NULL
   };
-
-static BOOL
-IsXKeyword (LPTSTR apszKeywords[], LPCTSTR pszChars, int nLength)
-{
-  for (int L = 0; apszKeywords[L] != NULL; L++)
-    {
-      if (_tcsncmp (apszKeywords[L], pszChars, nLength) == 0
-            && apszKeywords[L][nLength] == 0)
-        return TRUE;
-    }
-  return FALSE;
-}
-
-static BOOL
-IsNsisKeyword (LPCTSTR pszChars, int nLength)
-{
-  return IsXKeyword (s_apszNsisKeywordList, pszChars, nLength);
-}
-
-static BOOL
-IsUser1Keyword (LPCTSTR pszChars, int nLength)
-{
-  return IsXKeyword (s_apszUser1KeywordList, pszChars, nLength);
-}
-
-static BOOL
-IsNsisNumber (LPCTSTR pszChars, int nLength)
-{
-  if (nLength > 2 && pszChars[0] == '0' && pszChars[1] == 'x')
-    {
-      for (int I = 2; I < nLength; I++)
-        {
-          if (_istdigit (pszChars[I]) || (pszChars[I] >= 'A' && pszChars[I] <= 'F') ||
-                (pszChars[I] >= 'a' && pszChars[I] <= 'f'))
-            continue;
-          return FALSE;
-        }
-      return TRUE;
-    }
-  if (!_istdigit (pszChars[0]))
-    return FALSE;
-  for (int I = 1; I < nLength; I++)
-    {
-      if (!_istdigit (pszChars[I]) && pszChars[I] != '+' &&
-            pszChars[I] != '-' && pszChars[I] != '.' && pszChars[I] != 'e' &&
-            pszChars[I] != 'E')
-        return FALSE;
-    }
-  return TRUE;
+  return xiskeyword<_tcsncmp>(pszChars, nLength, s_apszUser1KeywordList);
 }
 
 #define DEFINE_BLOCK(pos, colorindex)   \
@@ -500,7 +454,7 @@ DWORD CCrystalTextView::ParseLineNsis(DWORD dwCookie, int nLineIndex, TEXTBLOCK 
   if (nLength == 0)
     return dwCookie & COOKIE_EXT_COMMENT;
 
-  LPCTSTR pszChars = GetLineChars(nLineIndex);
+  const LPCTSTR pszChars = GetLineChars(nLineIndex);
   BOOL bFirstChar = (dwCookie & ~COOKIE_EXT_COMMENT) == 0;
   BOOL bRedefineBlock = TRUE;
   BOOL bWasCommentStart = FALSE;
@@ -517,25 +471,25 @@ DWORD CCrystalTextView::ParseLineNsis(DWORD dwCookie, int nLineIndex, TEXTBLOCK 
             nPos = nPrevI;
           if (dwCookie & (COOKIE_COMMENT | COOKIE_EXT_COMMENT))
             {
-              DEFINE_BLOCK (nPos, COLORINDEX_COMMENT);
+              DEFINE_BLOCK(nPos, COLORINDEX_COMMENT);
             }
           else if (dwCookie & (COOKIE_CHAR | COOKIE_STRING))
             {
-              DEFINE_BLOCK (nPos, COLORINDEX_STRING);
+              DEFINE_BLOCK(nPos, COLORINDEX_STRING);
             }
           else if (dwCookie & COOKIE_PREPROCESSOR)
             {
-              DEFINE_BLOCK (nPos, COLORINDEX_PREPROCESSOR);
+              DEFINE_BLOCK(nPos, COLORINDEX_PREPROCESSOR);
             }
           else
             {
               if (xisalnum(pszChars[nPos]) || pszChars[nPos] == '.' && nPos > 0 && (!xisalpha(pszChars[nPos - 1]) && !xisalpha(pszChars[nPos + 1])))
                 {
-                  DEFINE_BLOCK (nPos, COLORINDEX_NORMALTEXT);
+                  DEFINE_BLOCK(nPos, COLORINDEX_NORMALTEXT);
                 }
               else
                 {
-                  DEFINE_BLOCK (nPos, COLORINDEX_OPERATOR);
+                  DEFINE_BLOCK(nPos, COLORINDEX_OPERATOR);
                   bRedefineBlock = TRUE;
                   bDecIndex = TRUE;
                   goto out;
@@ -553,7 +507,7 @@ out:
 
       if (dwCookie & COOKIE_COMMENT)
         {
-          DEFINE_BLOCK (I, COLORINDEX_COMMENT);
+          DEFINE_BLOCK(I, COLORINDEX_COMMENT);
           dwCookie |= COOKIE_COMMENT;
           break;
         }
@@ -596,7 +550,7 @@ out:
       //if (I > 0 && pszChars[I] == '/' && pszChars[nPrevI] == '/')
       if (I > 0 && pszChars[nPrevI] == ';')
         {
-          DEFINE_BLOCK (nPrevI, COLORINDEX_COMMENT);
+          DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
           dwCookie |= COOKIE_COMMENT;
           break;
         }
@@ -606,7 +560,7 @@ out:
         {
           if (I > 0 && pszChars[I] == '*' && pszChars[nPrevI] == '/')
             {
-              DEFINE_BLOCK (nPrevI, COLORINDEX_COMMENT);
+              DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
               dwCookie |= COOKIE_EXT_COMMENT;
             }
           continue;
@@ -615,7 +569,7 @@ out:
       //  Normal text
       if (pszChars[I] == '"')
         {
-          DEFINE_BLOCK (I, COLORINDEX_STRING);
+          DEFINE_BLOCK(I, COLORINDEX_STRING);
           dwCookie |= COOKIE_STRING;
           continue;
         }
@@ -624,14 +578,14 @@ out:
           // if (I + 1 < nLength && pszChars[I + 1] == '\'' || I + 2 < nLength && pszChars[I + 1] != '\\' && pszChars[I + 2] == '\'' || I + 3 < nLength && pszChars[I + 1] == '\\' && pszChars[I + 3] == '\'')
           if (!I || !xisalnum(pszChars[nPrevI]))
             {
-              DEFINE_BLOCK (I, COLORINDEX_STRING);
+              DEFINE_BLOCK(I, COLORINDEX_STRING);
               dwCookie |= COOKIE_CHAR;
               continue;
             }
         }
       if (I > 0 && pszChars[I] == '*' && pszChars[nPrevI] == '/')
         {
-          DEFINE_BLOCK (nPrevI, COLORINDEX_COMMENT);
+          DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
           dwCookie |= COOKIE_EXT_COMMENT;
           bWasCommentStart = TRUE;
           continue;
@@ -643,11 +597,11 @@ out:
         {
           if (pszChars[I] == '!')
             {
-              DEFINE_BLOCK (I, COLORINDEX_PREPROCESSOR);
+              DEFINE_BLOCK(I, COLORINDEX_PREPROCESSOR);
               dwCookie |= COOKIE_PREPROCESSOR;
               continue;
             }
-          if (!xisspace (pszChars[I]))
+          if (!xisspace(pszChars[I]))
             bFirstChar = FALSE;
         }
 
@@ -664,17 +618,17 @@ out:
         {
           if (nIdentBegin >= 0)
             {
-              if (IsNsisKeyword (pszChars + nIdentBegin, I - nIdentBegin))
+              if (IsNsisKeyword(pszChars + nIdentBegin, I - nIdentBegin))
                 {
-                  DEFINE_BLOCK (nIdentBegin, COLORINDEX_KEYWORD);
+                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
                 }
-              else if (IsUser1Keyword (pszChars + nIdentBegin, I - nIdentBegin))
+              else if (IsUser1Keyword(pszChars + nIdentBegin, I - nIdentBegin))
                 {
-                  DEFINE_BLOCK (nIdentBegin, COLORINDEX_USER1);
+                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER1);
                 }
-              else if (IsNsisNumber (pszChars + nIdentBegin, I - nIdentBegin))
+              else if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
                 {
-                  DEFINE_BLOCK (nIdentBegin, COLORINDEX_NUMBER);
+                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
                 }
               else
                 {
@@ -682,7 +636,7 @@ out:
 
                   for (int j = I; j < nLength; j++)
                     {
-                      if (!xisspace (pszChars[j]))
+                      if (!xisspace(pszChars[j]))
                         {
                           if (pszChars[j] == '(')
                             {
@@ -693,7 +647,7 @@ out:
                     }
                   if (bFunction)
                     {
-                      DEFINE_BLOCK (nIdentBegin, COLORINDEX_FUNCNAME);
+                      DEFINE_BLOCK(nIdentBegin, COLORINDEX_FUNCNAME);
                     }
                 }
               bRedefineBlock = TRUE;
@@ -705,17 +659,17 @@ out:
 
   if (nIdentBegin >= 0)
     {
-      if (IsNsisKeyword (pszChars + nIdentBegin, I - nIdentBegin))
+      if (IsNsisKeyword(pszChars + nIdentBegin, I - nIdentBegin))
         {
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_KEYWORD);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
         }
-      else if (IsUser1Keyword (pszChars + nIdentBegin, I - nIdentBegin))
+      else if (IsUser1Keyword(pszChars + nIdentBegin, I - nIdentBegin))
         {
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_USER1);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER1);
         }
-      else if (IsNsisNumber (pszChars + nIdentBegin, I - nIdentBegin))
+      else if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
         {
-          DEFINE_BLOCK (nIdentBegin, COLORINDEX_NUMBER);
+          DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
         }
       else
         {
@@ -723,7 +677,7 @@ out:
 
           for (int j = I; j < nLength; j++)
             {
-              if (!xisspace (pszChars[j]))
+              if (!xisspace(pszChars[j]))
                 {
                   if (pszChars[j] == '(')
                     {
@@ -734,7 +688,7 @@ out:
             }
           if (bFunction)
             {
-              DEFINE_BLOCK (nIdentBegin, COLORINDEX_FUNCNAME);
+              DEFINE_BLOCK(nIdentBegin, COLORINDEX_FUNCNAME);
             }
         }
     }

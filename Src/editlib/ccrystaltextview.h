@@ -577,6 +577,7 @@ public:
 	DWORD ParseLineCss(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
 	DWORD ParseLineDcl(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
 	DWORD ParseLineFortran(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+	DWORD ParseLineGo(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
 	DWORD ParseLineHtml(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
 	DWORD ParseLineIni(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
 	DWORD ParseLineInnoSetup(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
@@ -593,6 +594,7 @@ public:
 	DWORD ParseLineRexx(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
 	DWORD ParseLineRsrc(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
 	DWORD ParseLineRuby(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+	DWORD ParseLineRust(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
 	DWORD ParseLineSgml(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
 	DWORD ParseLineSh(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
 	DWORD ParseLineSiod(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
@@ -600,8 +602,8 @@ public:
 	DWORD ParseLineTcl(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
 	DWORD ParseLineTex(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
 	DWORD ParseLineVerilog(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+	DWORD ParseLineVhdl(DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActualItems);
 	DWORD ParseLineXml(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-
 	// Attributes
 public:
 	bool GetViewTabs() const;
@@ -649,6 +651,7 @@ public:
 		SRC_CSS,
 		SRC_DCL,
 		SRC_FORTRAN,
+		SRC_GO,
 		SRC_HTML,
 		SRC_INI,
 		SRC_INNOSETUP,
@@ -665,6 +668,7 @@ public:
 		SRC_REXX,
 		SRC_RSRC,
 		SRC_RUBY,
+		SRC_RUST,
 		SRC_SGML,
 		SRC_SH,
 		SRC_SIOD,
@@ -672,6 +676,7 @@ public:
 		SRC_TCL,
 		SRC_TEX,
 		SRC_VERILOG,
+		SRC_VHDL,
 		SRC_XML
 	};
 
