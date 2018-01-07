@@ -28,8 +28,6 @@ Last change: 2013-04-27 by Jochen Neubeck
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
 #endif
 
 #include "ExternalArchiveFormat.h"

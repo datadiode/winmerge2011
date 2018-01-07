@@ -37,7 +37,7 @@
 #endif
 
 #ifndef DEBUG_NEW
-#	define DEBUG_NEW new(_NORMAL_BLOCK, THIS_FILE, __LINE__)
+#	define DEBUG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
 #endif
 
 #ifdef _DEBUG

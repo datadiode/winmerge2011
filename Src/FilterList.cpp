@@ -14,8 +14,6 @@
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
 #endif
 
 extern "C" size_t apply_prediffer(struct file_data *current, short side, char *buf, size_t len)
