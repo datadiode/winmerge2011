@@ -80,16 +80,16 @@ static BOOL IsCppKeyword(LPCTSTR pszChars, int nLength)
     _T ("break"),
     _T ("case"),
     _T ("catch"),
+    _T ("char"),
     _T ("char16_t"),
     _T ("char32_t"),
-    _T ("char"),
     _T ("class"),
     _T ("const"),
     _T ("const_cast"),
     _T ("constexpr"),
     _T ("continue"),
-    _T ("decltype"),
     _T ("cset"),
+    _T ("decltype"),
     _T ("default"),
     _T ("delete"),
     _T ("depend"),
@@ -501,4 +501,28 @@ out:
   if (pszChars[nLength - 1] != '\\')
     dwCookie &= COOKIE_EXT_COMMENT;
   return dwCookie;
+}
+
+TESTCASE
+{
+	int count = 0;
+	BOOL (*pfnIsKeyword)(LPCTSTR, int) = NULL;
+	FILE *file = fopen(__FILE__, "r");
+	assert(file);
+	TCHAR text[1024];
+	while (_fgetts(text, _countof(text), file))
+	{
+		TCHAR c, *p, *q;
+		if (pfnIsKeyword && (p = _tcschr(text, '"')) != NULL && (q = _tcschr(++p, '"')) != NULL)
+			assert(pfnIsKeyword(p, static_cast<int>(q - p)));
+		else if (_stscanf(text, _T(" static BOOL IsCppKeyword %c"), &c) == 1 && c == '(')
+			pfnIsKeyword = IsCppKeyword;
+		else if (_stscanf(text, _T(" static BOOL IsUser1Keyword %c"), &c) == 1 && c == '(')
+			pfnIsKeyword = IsUser1Keyword;
+		else if (pfnIsKeyword && _stscanf(text, _T(" } %c"), &c) == 1 && (c == ';' ? ++count : 0))
+			pfnIsKeyword = NULL;
+	}
+	fclose(file);
+	assert(count == 2);
+	return count;
 }

@@ -33,8 +33,6 @@ static BOOL IsPhpKeyword(LPCTSTR pszChars, int nLength)
 {
   static LPCTSTR const s_apszPhpKeywordList[] =
   {
-    _T ("exception"),
-    _T ("php_user_filter"),
     _T ("array"),
     _T ("as"),
     _T ("break"),
@@ -58,6 +56,7 @@ static BOOL IsPhpKeyword(LPCTSTR pszChars, int nLength)
     _T ("endswitch"),
     _T ("endwhile"),
     _T ("eval"),
+    _T ("exception"),
     _T ("exit"),
     _T ("extends"),
     _T ("for"),
@@ -71,6 +70,7 @@ static BOOL IsPhpKeyword(LPCTSTR pszChars, int nLength)
     _T ("list"),
     _T ("new"),
     _T ("old_function"),
+    _T ("php_user_filter"),
     _T ("print"),
     _T ("require"),
     _T ("require_once"),
@@ -578,4 +578,30 @@ next:
 
   dwCookie &= (COOKIE_EXT_COMMENT | COOKIE_STRING | COOKIE_PREPROCESSOR | COOKIE_EXT_USER1);
   return dwCookie;
+}
+
+TESTCASE
+{
+	int count = 0;
+	BOOL (*pfnIsKeyword)(LPCTSTR, int) = NULL;
+	FILE *file = fopen(__FILE__, "r");
+	assert(file);
+	TCHAR text[1024];
+	while (_fgetts(text, _countof(text), file))
+	{
+		TCHAR c, *p, *q;
+		if (pfnIsKeyword && (p = _tcschr(text, '"')) != NULL && (q = _tcschr(++p, '"')) != NULL)
+			assert(pfnIsKeyword(p, static_cast<int>(q - p)));
+		else if (_stscanf(text, _T(" static BOOL IsPhpKeyword %c"), &c) == 1 && c == '(')
+			pfnIsKeyword = IsPhpKeyword;
+		else if (_stscanf(text, _T(" static BOOL IsPhp1Keyword %c"), &c) == 1 && c == '(')
+			pfnIsKeyword = IsPhp1Keyword;
+		else if (_stscanf(text, _T(" static BOOL IsPhp2Keyword %c"), &c) == 1 && c == '(')
+			pfnIsKeyword = IsPhp2Keyword;
+		else if (pfnIsKeyword && _stscanf(text, _T(" } %c"), &c) == 1 && (c == ';' ? ++count : 0))
+			pfnIsKeyword = NULL;
+	}
+	fclose(file);
+	assert(count == 3);
+	return count;
 }

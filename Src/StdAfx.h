@@ -106,20 +106,36 @@ extern const char *const wine_version;
 #ifdef _DEBUG
 #	include "common/ntdll.h"
 #	define TRACE DbgPrint
+#	define ASSERT(condition) assert(condition)
+#	define VERIFY(condition) ASSERT(condition)
 #else
 #	define TRACE __noop
+#	define ASSERT(condition) __noop()
+#	define VERIFY(condition) (condition) ? __noop() : __noop()
 #endif
 
 #ifndef DEBUG_NEW
 #	define DEBUG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
 #endif
 
+// Below token pasting macros have been adopted from
+// https://github.com/alexforencich/templates/blob/master/xmega.cpp/usart.h,
+// which is MIT licensed, and Copyright (c) 2011 Alex Forencich.
+
+#define TOKEN_PASTE2_INT(x, y) x ## y
+#define TOKEN_PASTE2(x, y) TOKEN_PASTE2_INT(x, y)
+#define TOKEN_PASTE3_INT(x, y, z) x ## y ## z
+#define TOKEN_PASTE3(x, y, z) TOKEN_PASTE3_INT(x, y, z)
+
+#define UNIQUENAME(x) TOKEN_PASTE2(x, __LINE__)
+
 #ifdef _DEBUG
-#	define ASSERT(condition) assert(condition)
-#	define VERIFY(condition) ASSERT(condition)
+#define TESTCASE \
+	static int UNIQUENAME(TestMethod)(); \
+	static int UNIQUENAME(TestResult) = UNIQUENAME(TestMethod)(); \
+	static int UNIQUENAME(TestMethod)()
 #else
-#	define ASSERT(condition) __noop()
-#	define VERIFY(condition) (condition) ? __noop() : __noop()
+#define TESTCASE inline int UNIQUENAME(TestMethod)()
 #endif
 
 #define A2W(A) OString(HString::Oct(A)->Uni()).W

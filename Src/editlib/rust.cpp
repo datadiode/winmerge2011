@@ -83,7 +83,7 @@ static BOOL IsRustKeyword(LPCTSTR pszChars, int nLength)
     _T ("while"),
     _T ("yield"),
   };
-  return xiskeyword<_tcsnicmp>(pszChars, nLength, s_apszRustKeywordList);
+  return xiskeyword<_tcsncmp>(pszChars, nLength, s_apszRustKeywordList);
 }
 
 static BOOL IsUser1Keyword(LPCTSTR pszChars, int nLength)
@@ -109,7 +109,7 @@ static BOOL IsUser1Keyword(LPCTSTR pszChars, int nLength)
     _T ("u8"),
     _T ("usize"),
   };
-  return xiskeyword<_tcsnicmp>(pszChars, nLength, s_apszUser1KeywordList);
+  return xiskeyword<_tcsncmp>(pszChars, nLength, s_apszUser1KeywordList);
 }
 
 #define DEFINE_BLOCK(pos, colorindex)   \
@@ -183,7 +183,7 @@ out:
 
       // Can be bigger than length if there is binary data
       // See bug #1474782 Crash when comparing SQL with with binary data
-      if (I >= nLength || pszChars[I] == 0)
+      if (I >= nLength)
         break;
 
       if (dwCookie & COOKIE_COMMENT)
@@ -375,4 +375,28 @@ out:
 
   dwCookie &= COOKIE_EXT_COMMENT | COOKIE_RAWSTRING | COOKIE_STRING | 0xFF00;
   return dwCookie;
+}
+
+TESTCASE
+{
+	int count = 0;
+	BOOL (*pfnIsKeyword)(LPCTSTR, int) = NULL;
+	FILE *file = fopen(__FILE__, "r");
+	assert(file);
+	TCHAR text[1024];
+	while (_fgetts(text, _countof(text), file))
+	{
+		TCHAR c, *p, *q;
+		if (pfnIsKeyword && (p = _tcschr(text, '"')) != NULL && (q = _tcschr(++p, '"')) != NULL)
+			assert(pfnIsKeyword(p, static_cast<int>(q - p)));
+		else if (_stscanf(text, _T(" static BOOL IsRustKeyword %c"), &c) == 1 && c == '(')
+			pfnIsKeyword = IsRustKeyword;
+		else if (_stscanf(text, _T(" static BOOL IsUser1Keyword %c"), &c) == 1 && c == '(')
+			pfnIsKeyword = IsUser1Keyword;
+		else if (pfnIsKeyword && _stscanf(text, _T(" } %c"), &c) == 1 && (c == ';' ? ++count : 0))
+			pfnIsKeyword = NULL;
+	}
+	fclose(file);
+	assert(count == 2);
+	return count;
 }

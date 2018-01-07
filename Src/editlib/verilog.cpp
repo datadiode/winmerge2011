@@ -312,18 +312,7 @@ static BOOL IsVerilogFunction(LPCTSTR pszChars, int nLength)
 
 static BOOL IsVerilogNumber(LPCTSTR pszChars, int nLength)
 {
-  if (!_istdigit (pszChars[0]))
-    return FALSE;
-  for (int I = 1; I < nLength; I++)
-    {
-      if (_istdigit (pszChars[I]) || pszChars[I] == '.' || pszChars[I] == '\'' || 
-            pszChars[I] == 'h' || (pszChars[I] >= 'A' && pszChars[I] <= 'F') ||
-            (pszChars[I] >= 'a' && pszChars[I] <= 'f') || pszChars[I] == '_' ||
-			pszChars[I] == 'x' || pszChars[I] == 'Z')
-        continue;
-      return FALSE;
-    }
-  return TRUE;
+  return _istdigit(pszChars[0]);
 }
 
 #define DEFINE_BLOCK(pos, colorindex)   \
@@ -495,11 +484,11 @@ out:
                 {
                   DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
                 }
-              else if (IsVerilogFunction (pszChars + nIdentBegin, I - nIdentBegin))
+              else if (IsVerilogFunction(pszChars + nIdentBegin, I - nIdentBegin))
                 {
                   DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER1);
                 }
-              else if (IsVerilogNumber (pszChars + nIdentBegin, I - nIdentBegin))
+              else if (IsVerilogNumber(pszChars + nIdentBegin, I - nIdentBegin))
                 {
                   DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
                 }
@@ -528,4 +517,28 @@ out:
 
   dwCookie &= COOKIE_EXT_COMMENT;
   return dwCookie;
+}
+
+TESTCASE
+{
+	int count = 0;
+	BOOL (*pfnIsKeyword)(LPCTSTR, int) = NULL;
+	FILE *file = fopen(__FILE__, "r");
+	assert(file);
+	TCHAR text[1024];
+	while (_fgetts(text, _countof(text), file))
+	{
+		TCHAR c, *p, *q;
+		if (pfnIsKeyword && (p = _tcschr(text, '"')) != NULL && (q = _tcschr(++p, '"')) != NULL)
+			assert(pfnIsKeyword(p, static_cast<int>(q - p)));
+		else if (_stscanf(text, _T(" static BOOL IsVerilogKeyword %c"), &c) == 1 && c == '(')
+			pfnIsKeyword = IsVerilogKeyword;
+		else if (_stscanf(text, _T(" static BOOL IsVerilogFunction %c"), &c) == 1 && c == '(')
+			pfnIsKeyword = IsVerilogFunction;
+		else if (pfnIsKeyword && _stscanf(text, _T(" } %c"), &c) == 1 && (c == ';' ? ++count : 0))
+			pfnIsKeyword = NULL;
+	}
+	fclose(file);
+	assert(count == 2);
+	return count;
 }

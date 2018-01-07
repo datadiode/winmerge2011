@@ -36,8 +36,7 @@
 
 using CommonKeywords::IsNumeric;
 
-//  InstallShield keywords (IS3.0)
-
+// InstallShield keywords (IS3.0)
 static BOOL IsISKeyword(LPCTSTR pszChars, int nLength)
 {
   static LPCTSTR const s_apszISKeywordList[] =
@@ -698,4 +697,30 @@ out:
   if (pszChars[nLength - 1] != '\\')
     dwCookie &= COOKIE_EXT_COMMENT;
   return dwCookie;
+}
+
+TESTCASE
+{
+	int count = 0;
+	BOOL (*pfnIsKeyword)(LPCTSTR, int) = NULL;
+	FILE *file = fopen(__FILE__, "r");
+	assert(file);
+	TCHAR text[1024];
+	while (_fgetts(text, _countof(text), file))
+	{
+		TCHAR c, *p, *q;
+		if (pfnIsKeyword && (p = _tcschr(text, '"')) != NULL && (q = _tcschr(++p, '"')) != NULL)
+			assert(pfnIsKeyword(p, static_cast<int>(q - p)));
+		else if (_stscanf(text, _T(" static BOOL IsISKeyword %c"), &c) == 1 && c == '(')
+			pfnIsKeyword = IsISKeyword;
+		else if (_stscanf(text, _T(" static BOOL IsUser1Keyword %c"), &c) == 1 && c == '(')
+			pfnIsKeyword = IsUser1Keyword;
+		else if (_stscanf(text, _T(" static BOOL IsUser2Keyword %c"), &c) == 1 && c == '(')
+			pfnIsKeyword = IsUser2Keyword;
+		else if (pfnIsKeyword && _stscanf(text, _T(" } %c"), &c) == 1 && (c == ';' ? ++count : 0))
+			pfnIsKeyword = NULL;
+	}
+	fclose(file);
+	assert(count == 3);
+	return count;
 }

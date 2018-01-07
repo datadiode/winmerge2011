@@ -41,7 +41,6 @@ static BOOL IsVhdlKeyword(LPCTSTR pszChars, int nLength)
     _T ("begin"),
     _T ("block"),
     _T ("body"),
-    _T ("true"),
     _T ("buffer"),
     _T ("bus"),
     _T ("case"),
@@ -102,6 +101,7 @@ static BOOL IsVhdlKeyword(LPCTSTR pszChars, int nLength)
     _T ("to"),
     _T ("transport"),
     _T ("true"),
+    _T ("true"),
     _T ("type"),
     _T ("units"),
     _T ("until"),
@@ -116,50 +116,55 @@ static BOOL IsVhdlKeyword(LPCTSTR pszChars, int nLength)
   return xiskeyword<_tcsnicmp>(pszChars, nLength, s_apszVhdlKeywordList);
 }
 
-static BOOL IsVhdlAttribute(LPCTSTR pszChars, int nLength, int *nAttributeBegin)
+static BOOL IsVhdlAttribute(LPCTSTR pszChars, int nLength)
 {
   static LPCTSTR const s_apszVhdlAttributeList[] =
   {
-    _T ("'active"),
-    _T ("'ascending"),
-    _T ("'base"),
-    _T ("'delayed"),
-    _T ("'driving"),
-    _T ("'driving_value"),
-    _T ("'event"),
-    _T ("'high"),
-    _T ("'image"),
-    _T ("'instance_name"),
-    _T ("'last_active"),
-    _T ("'last_event"),
-    _T ("'last_value"),
-    _T ("'left"),
-    _T ("'leftof"),
-    _T ("'length"),
-    _T ("'low"),
-    _T ("'path_name"),
-    _T ("'pos"),
-    _T ("'pred"),
-    _T ("'quiet"),
-    _T ("'range"),
-    _T ("'reverse_range"),
-    _T ("'right"),
-    _T ("'rightof"),
-    _T ("'simple_name"),
-    _T ("'stable"),
-    _T ("'succ"),
-    _T ("'transaction"),
-    _T ("'val"),
-    _T ("'value")
+    _T ("active"),
+    _T ("ascending"),
+    _T ("base"),
+    _T ("delayed"),
+    _T ("driving"),
+    _T ("driving_value"),
+    _T ("event"),
+    _T ("high"),
+    _T ("image"),
+    _T ("instance_name"),
+    _T ("last_active"),
+    _T ("last_event"),
+    _T ("last_value"),
+    _T ("left"),
+    _T ("leftof"),
+    _T ("length"),
+    _T ("low"),
+    _T ("path_name"),
+    _T ("pos"),
+    _T ("pred"),
+    _T ("quiet"),
+    _T ("range"),
+    _T ("reverse_range"),
+    _T ("right"),
+    _T ("rightof"),
+    _T ("simple_name"),
+    _T ("stable"),
+    _T ("succ"),
+    _T ("transaction"),
+    _T ("val"),
+    _T ("value")
   };
+  return xiskeyword<_tcsnicmp>(pszChars, nLength, s_apszVhdlAttributeList);
+}
+
+static BOOL IsVhdlAttributeEx(LPCTSTR pszChars, int nLength, int *nAttributeBegin)
+{
   for (int I = 0; I < nLength; I++)
     {
       if (pszChars[I] == '\'')
         {
-          *nAttributeBegin = I;
-          return xiskeyword<_tcsnicmp>(&pszChars[I], nLength - I, s_apszVhdlAttributeList);
+          *nAttributeBegin = I++;
+          return IsVhdlAttribute(pszChars + I, nLength - I);
         }
-   }
+    }
   return FALSE;
 }
 
@@ -456,19 +461,19 @@ out:
                 {
                   DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
                 }
-              else if (IsVhdlAttribute (pszChars + nIdentBegin, I - nIdentBegin, &nAttributeBegin))
+              else if (IsVhdlAttributeEx(pszChars + nIdentBegin, I - nIdentBegin, &nAttributeBegin))
                 {
                   DEFINE_BLOCK(nIdentBegin + nAttributeBegin, COLORINDEX_FUNCNAME);
                 }
-              else if (IsVhdlType (pszChars + nIdentBegin, I - nIdentBegin))
+              else if (IsVhdlType(pszChars + nIdentBegin, I - nIdentBegin))
                 {
                   DEFINE_BLOCK(nIdentBegin, COLORINDEX_PREPROCESSOR);
                 }
-              else if (IsVhdlFunction (pszChars + nIdentBegin, I - nIdentBegin))
+              else if (IsVhdlFunction(pszChars + nIdentBegin, I - nIdentBegin))
                 {
                   DEFINE_BLOCK(nIdentBegin, COLORINDEX_FUNCNAME);
                 }
-              else if (IsVhdlChar (pszChars + nIdentBegin, I - nIdentBegin))
+              else if (IsVhdlChar(pszChars + nIdentBegin, I - nIdentBegin))
                 {
                   DEFINE_BLOCK(nIdentBegin, COLORINDEX_STRING);
                 }
@@ -494,7 +499,7 @@ out:
         {
           DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
         }
-      else if (IsVhdlAttribute(pszChars + nIdentBegin, I - nIdentBegin, &nAttributeBegin))
+      else if (IsVhdlAttributeEx(pszChars + nIdentBegin, I - nIdentBegin, &nAttributeBegin))
         {
           DEFINE_BLOCK(nIdentBegin + nAttributeBegin, COLORINDEX_FUNCNAME);
         }
@@ -514,4 +519,32 @@ out:
 
   dwCookie &= COOKIE_EXT_COMMENT;
   return dwCookie;
+}
+
+TESTCASE
+{
+	int count = 0;
+	BOOL (*pfnIsKeyword)(LPCTSTR, int) = NULL;
+	FILE *file = fopen(__FILE__, "r");
+	assert(file);
+	TCHAR text[1024];
+	while (_fgetts(text, _countof(text), file))
+	{
+		TCHAR c, *p, *q;
+		if (pfnIsKeyword && (p = _tcschr(text, '"')) != NULL && (q = _tcschr(++p, '"')) != NULL)
+			assert(pfnIsKeyword(p, static_cast<int>(q - p)));
+		else if (_stscanf(text, _T(" static BOOL IsVhdlKeyword %c"), &c) == 1 && c == '(')
+			pfnIsKeyword = IsVhdlKeyword;
+		else if (_stscanf(text, _T(" static BOOL IsVhdlAttribute%c"), &c) == 1 && c == '(')
+			pfnIsKeyword = IsVhdlAttribute;
+		else if (_stscanf(text, _T(" static BOOL IsVhdlType%c"), &c) == 1 && c == '(')
+			pfnIsKeyword = IsVhdlType;
+		else if (_stscanf(text, _T(" static BOOL IsVhdlFunction %c"), &c) == 1 && c == '(')
+			pfnIsKeyword = IsVhdlFunction;
+		else if (pfnIsKeyword && _stscanf(text, _T(" } %c"), &c) == 1 && (c == ';' ? ++count : 0))
+			pfnIsKeyword = NULL;
+	}
+	fclose(file);
+	assert(count == 4);
+	return count;
 }

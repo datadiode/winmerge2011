@@ -23,11 +23,11 @@
 #define new DEBUG_NEW
 #endif
 
+// CSS 1
 static BOOL IsCss1Keyword(LPCTSTR pszChars, int nLength)
 {
   static LPCTSTR const s_apszCss1KeywordList[] =
   {
-    // CSS 1
     _T ("background"),
     _T ("background-attachment"),
     _T ("background-color"),
@@ -85,11 +85,11 @@ static BOOL IsCss1Keyword(LPCTSTR pszChars, int nLength)
   return xiskeyword<_tcsnicmp>(pszChars, nLength, s_apszCss1KeywordList);
 }
 
+// CSS 2
 static BOOL IsCss2Keyword(LPCTSTR pszChars, int nLength)
 {
   static LPCTSTR const s_apszCss2KeywordList[] =
   {
-    // CSS 2
     _T ("ascent"),
     _T ("azimuth"),
     _T ("baseline"),
@@ -360,4 +360,28 @@ next:
 
   dwCookie &= (COOKIE_EXT_COMMENT|COOKIE_EXT_DEFINITION|COOKIE_EXT_VALUE);
   return dwCookie;
+}
+
+TESTCASE
+{
+	int count = 0;
+	BOOL (*pfnIsKeyword)(LPCTSTR, int) = NULL;
+	FILE *file = fopen(__FILE__, "r");
+	assert(file);
+	TCHAR text[1024];
+	while (_fgetts(text, _countof(text), file))
+	{
+		TCHAR c, *p, *q;
+		if (pfnIsKeyword && (p = _tcschr(text, '"')) != NULL && (q = _tcschr(++p, '"')) != NULL)
+			assert(pfnIsKeyword(p, static_cast<int>(q - p)));
+		else if (_stscanf(text, _T(" static BOOL IsCss1Keyword %c"), &c) == 1 && c == '(')
+			pfnIsKeyword = IsCss1Keyword;
+		else if (_stscanf(text, _T(" static BOOL IsCss2Keyword %c"), &c) == 1 && c == '(')
+			pfnIsKeyword = IsCss2Keyword;
+		else if (pfnIsKeyword && _stscanf(text, _T(" } %c"), &c) == 1 && (c == ';' ? ++count : 0))
+			pfnIsKeyword = NULL;
+	}
+	fclose(file);
+	assert(count == 2);
+	return count;
 }

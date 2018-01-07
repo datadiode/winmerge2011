@@ -25,9 +25,9 @@
 
 using CommonKeywords::IsNumeric;
 
+// Go keywords
 static BOOL IsGoKeyword(LPCTSTR pszChars, int nLength)
 {
-  //  Go keywords
   static LPCTSTR const s_apszGoKeywordList[] =
   {
     _T ("break"),
@@ -174,7 +174,7 @@ out:
 
       // Can be bigger than length if there is binary data
       // See bug #1474782 Crash when comparing SQL with with binary data
-      if (I >= nLength || pszChars[I] == 0)
+      if (I >= nLength)
         break;
 
       if (dwCookie & COOKIE_COMMENT)
@@ -357,4 +357,28 @@ out:
 
   dwCookie &= COOKIE_EXT_COMMENT | COOKIE_RAWSTRING;
   return dwCookie;
+}
+
+TESTCASE
+{
+	int count = 0;
+	BOOL (*pfnIsKeyword)(LPCTSTR, int) = NULL;
+	FILE *file = fopen(__FILE__, "r");
+	assert(file);
+	TCHAR text[1024];
+	while (_fgetts(text, _countof(text), file))
+	{
+		TCHAR c, *p, *q;
+		if (pfnIsKeyword && (p = _tcschr(text, '"')) != NULL && (q = _tcschr(++p, '"')) != NULL)
+			assert(pfnIsKeyword(p, static_cast<int>(q - p)));
+		else if (_stscanf(text, _T(" static BOOL IsGoKeyword %c"), &c) == 1 && c == '(')
+			pfnIsKeyword = IsGoKeyword;
+		else if (_stscanf(text, _T(" static BOOL IsUser1Keyword %c"), &c) == 1 && c == '(')
+			pfnIsKeyword = IsUser1Keyword;
+		else if (pfnIsKeyword && _stscanf(text, _T(" } %c"), &c) == 1 && (c == ';' ? ++count : 0))
+			pfnIsKeyword = NULL;
+	}
+	fclose(file);
+	assert(count == 2);
+	return count;
 }

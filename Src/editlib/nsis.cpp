@@ -272,65 +272,6 @@ static BOOL IsUser1Keyword(LPCTSTR pszChars, int nLength)
 {
   static LPCTSTR const s_apszUser1KeywordList[] =
   {
-/*
-    _T ("$0"),
-    _T ("$1"),
-    _T ("$2"),
-    _T ("$3"),
-    _T ("$4"),
-    _T ("$5"),
-    _T ("$6"),
-    _T ("$7"),
-    _T ("$8"),
-    _T ("$9"),
-    _T ("$ADMINTOOLS"),
-    _T ("$APPDATA"),
-    _T ("$CDBURN_AREA"),
-    _T ("$CMDLINE"),
-    _T ("$COMMONFILES"),
-    _T ("$COOKIES"),
-    _T ("$DESKTOP"),
-    _T ("$DOCUMENTS"),
-    _T ("$EXEDIR"),
-    _T ("$FAVORITES"),
-    _T ("$FONTS"),
-    _T ("$HISTORY"),
-    _T ("$HWNDPARENT"),
-    _T ("$INSTDIR"),
-    _T ("$INTERNET_CACHE"),
-    _T ("$LANGUAGE"),
-    _T ("$MUSIC"),
-    _T ("$NETHOOD"),
-    _T ("$OUTDIR"),
-    _T ("$PICTURES"),
-    _T ("$PLUGINSDIR"),
-    _T ("$PRINTHOOD"),
-    _T ("$PROFILE"),
-    _T ("$PROGRAMFILES"),
-    _T ("$QUICKLAUNCH"),
-    _T ("$R0"),
-    _T ("$R1"),
-    _T ("$R2"),
-    _T ("$R3"),
-    _T ("$R4"),
-    _T ("$R5"),
-    _T ("$R6"),
-    _T ("$R7"),
-    _T ("$R8"),
-    _T ("$R9"),
-    _T ("$RECENT"),
-    _T ("$RESOURCES"),
-    _T ("$RESOURCES_LOCALIZED"),
-    _T ("$SENDTO"),
-    _T ("$SMPROGRAMS"),
-    _T ("$SMSTARTUP"),
-    _T ("$STARTMENU"),
-    _T ("$SYSDIR"),
-    _T ("$TEMP"),
-    _T ("$TEMPLATES"),
-    _T ("$VIDEOS"),
-    _T ("$WINDIR"),
-*/
     _T ("ARCHIVE"),
     _T ("FILE_ATTRIBUTE_ARCHIVE"),
     _T ("FILE_ATTRIBUTE_HIDDEN"),
@@ -696,4 +637,28 @@ out:
   if (pszChars[nLength - 1] != '\\')
     dwCookie &= COOKIE_EXT_COMMENT;
   return dwCookie;
+}
+
+TESTCASE
+{
+	int count = 0;
+	BOOL (*pfnIsKeyword)(LPCTSTR, int) = NULL;
+	FILE *file = fopen(__FILE__, "r");
+	assert(file);
+	TCHAR text[1024];
+	while (_fgetts(text, _countof(text), file))
+	{
+		TCHAR c, *p, *q;
+		if (pfnIsKeyword && (p = _tcschr(text, '"')) != NULL && (q = _tcschr(++p, '"')) != NULL)
+			assert(pfnIsKeyword(p, static_cast<int>(q - p)));
+		else if (_stscanf(text, _T(" static BOOL IsNsisKeyword %c"), &c) == 1 && c == '(')
+			pfnIsKeyword = IsNsisKeyword;
+		else if (_stscanf(text, _T(" static BOOL IsUser1Keyword %c"), &c) == 1 && c == '(')
+			pfnIsKeyword = IsUser1Keyword;
+		else if (pfnIsKeyword && _stscanf(text, _T(" } %c"), &c) == 1 && (c == ';' ? ++count : 0))
+			pfnIsKeyword = NULL;
+	}
+	fclose(file);
+	assert(count == 2);
+	return count;
 }

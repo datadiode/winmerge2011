@@ -23,6 +23,8 @@
 #define new DEBUG_NEW
 #endif
 
+using CommonKeywords::IsNumeric;
+
 static BOOL IsBatKeyword(LPCTSTR pszChars, int nLength)
 {
   static LPCTSTR const s_apszBatKeywordList[] =
@@ -664,31 +666,6 @@ static BOOL IsUser2Keyword(LPCTSTR pszChars, int nLength)
   return xiskeyword<_tcsnicmp>(pszChars, nLength, s_apszUser2KeywordList);
 }
 
-static BOOL IsBatNumber(LPCTSTR pszChars, int nLength)
-{
-  if (nLength > 2 && pszChars[0] == '0' && pszChars[1] == 'x')
-    {
-      for (int I = 2; I < nLength; I++)
-        {
-          if (_istdigit (pszChars[I]) || (pszChars[I] >= 'A' && pszChars[I] <= 'F') ||
-                (pszChars[I] >= 'a' && pszChars[I] <= 'f'))
-            continue;
-          return FALSE;
-        }
-      return TRUE;
-    }
-  if (!_istdigit (pszChars[0]))
-    return FALSE;
-  for (int I = 1; I < nLength; I++)
-    {
-      if (!_istdigit (pszChars[I]) && pszChars[I] != '+' &&
-            pszChars[I] != '-' && pszChars[I] != '.' && pszChars[I] != 'e' &&
-            pszChars[I] != 'E')
-        return FALSE;
-    }
-  return TRUE;
-}
-
 #define DEFINE_BLOCK(pos, colorindex)   \
 ASSERT((pos) >= 0 && (pos) <= nLength);\
 if (pBuf != NULL)\
@@ -896,7 +873,7 @@ out:
                     {
                       DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER2);
                     }
-              else if (IsBatNumber (pszChars + nIdentBegin, I - nIdentBegin))
+              else if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
                 {
                   DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
                 }
@@ -932,7 +909,7 @@ out:
         {
           DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER2);
         }
-      else if (IsBatNumber (pszChars + nIdentBegin, I - nIdentBegin))
+      else if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
         {
           DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
         }
@@ -940,4 +917,30 @@ out:
 
   dwCookie &= COOKIE_EXT_COMMENT;
   return dwCookie;
+}
+
+TESTCASE
+{
+	int count = 0;
+	BOOL (*pfnIsKeyword)(LPCTSTR, int) = NULL;
+	FILE *file = fopen(__FILE__, "r");
+	assert(file);
+	TCHAR text[1024];
+	while (_fgetts(text, _countof(text), file))
+	{
+		TCHAR c, *p, *q;
+		if (pfnIsKeyword && (p = _tcschr(text, '"')) != NULL && (q = _tcschr(++p, '"')) != NULL)
+			assert(pfnIsKeyword(p, static_cast<int>(q - p)));
+		else if (_stscanf(text, _T(" static BOOL IsBatKeyword %c"), &c) == 1 && c == '(')
+			pfnIsKeyword = IsBatKeyword;
+		else if (_stscanf(text, _T(" static BOOL IsUser1Keyword %c"), &c) == 1 && c == '(')
+			pfnIsKeyword = IsUser1Keyword;
+		else if (_stscanf(text, _T(" static BOOL IsUser2Keyword %c"), &c) == 1 && c == '(')
+			pfnIsKeyword = IsUser2Keyword;
+		else if (pfnIsKeyword && _stscanf(text, _T(" } %c"), &c) == 1 && (c == ';' ? ++count : 0))
+			pfnIsKeyword = NULL;
+	}
+	fclose(file);
+	assert(count == 3);
+	return count;
 }
