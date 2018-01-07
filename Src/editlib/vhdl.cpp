@@ -101,7 +101,6 @@ static BOOL IsVhdlKeyword(LPCTSTR pszChars, int nLength)
     _T ("to"),
     _T ("transport"),
     _T ("true"),
-    _T ("true"),
     _T ("type"),
     _T ("units"),
     _T ("until"),
