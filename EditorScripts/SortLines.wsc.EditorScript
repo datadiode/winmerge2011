@@ -48,7 +48,7 @@ function SortLinesAscendingNoCase(Text) {
 		lines.push(tail);
 		tail = "";
 	}
-	lines.sort(function(a, b) { return a.toLowerCase().localeCompare(b.toLowerCase()); });
+	lines.sort(function(a, b) { return a.toLowerCase() > b.toLowerCase() ? 1 : -1; });
 	return lines.join(eol) + tail;
 }
 
@@ -62,7 +62,7 @@ function SortLinesDescendingNoCase(Text) {
 		lines.push(tail);
 		tail = "";
 	}
-	lines.sort(function(a, b) { return b.toLowerCase().localeCompare(a.toLowerCase()); });
+	lines.sort(function(a, b) { return a.toLowerCase() < b.toLowerCase() ? 1 : -1; });
 	return lines.join(eol) + tail;
 }
 
