@@ -1,5 +1,6 @@
 <head>
 <meta http-equiv='Content-Type' content='text/html; charset=ISO-8859-1'/>
+<meta http-equiv='MSThemeCompatible' CONTENT='yes'>
 <hta:application
 	id='app'
 	version='XXXXX.2011.007.347'
@@ -7,21 +8,34 @@
 	scroll='no'
 	singleInstance='yes'
 	icon='WinMergeU.exe'/>
-<comment id='setup_cfg'>7z%BC%AF%27%1C
+<comment id='setup_cfg'>
 ;!@Install@!UTF-8!
 Title="WinMerge &version; [&platform;]"
 BeginPrompt="Do you want to install WinMerge &version;?"
-RunProgram="%%P:\"%SystemRoot%\\system32\\mshta.exe\" \"%%T\\setup.hta\" \"install\" \"&platform;\" \"ModuleAtom:4e716236-aa30-4c65-b225-d68bba81e9c2\""
+InstallPath="%%T\\Install"
+RunProgram="%%P:\"%SystemRoot%\\system32\\mshta.exe\" \"%%T\\Install\\setup.hta\" \"install\" \"x64\" \"ModuleAtom:4e716236-aa30-4c65-b225-d68bba81e9c2\""
 ;!@InstallEnd@!
 </comment>
 <comment id='setup_bat'>
 call "%VS100COMNTOOLS%vsvars32.bat"
 set SevenZip=&SevenZip;
 del "WinMerge_&version;_&platform;.7z"
-"%SevenZip%7z.exe" a "WinMerge_&version;_&platform;.7z" -m0=LZMA2 -m1=Deflate -r .\Build\WinMerge\&platform;\Release\* .\Setup\Support .\Build\WinMerge\Win32\Release\ShellExtensionU.dll .\Build\WinMerge\x64\Release\ShellExtensionX64.dll -x!*.lib -x!*.exp -x!*.pdb -x!*.json -x!*.zip -x!*.bak -x!xdoc2txt
-copy /b "Setup\7zsd_Deflate.sfx" "WinMerge_&version;_&platform;_change_7z_to_exe_if_you_want_a_setup.7z"
-mt.exe -manifest "Setup\7zsd.sfx.manifest" -outputresource:"WinMerge_&version;_&platform;_change_7z_to_exe_if_you_want_a_setup.7z";1
-copy /b "WinMerge_&version;_&platform;_change_7z_to_exe_if_you_want_a_setup.7z" + Setup_&platform;.cfg + "WinMerge_&version;_&platform;.7z" "WinMerge_&version;_&platform;_change_7z_to_exe_if_you_want_a_setup.7z"
+"%SevenZip%7z.exe" a "WinMerge_&version;_&platform;.7z" ^
+-m0=LZMA2 -m1=Deflate ^
+-r .\Build\WinMerge\&platform;\Release\* .\Build\WinMerge\Win32\Release\ShellExtensionU.dll .\Build\WinMerge\x64\Release\ShellExtensionX64.dll ^
+-x!*.lib -x!*.exp -x!*.pdb -x!*.json -x!*.zip -x!*.bak -x!xdoc2txt
+"Setup\7zsd_Deflate.exe" ^
+/sfxcreate "WinMerge_&version;_&platform;_change_7z_to_exe_if_you_want_a_setup.7z" ^
+/config "Setup_&platform;.cfg" ^
+/adjunct "Setup\Support\Downloader.exe" ^
+/adjunct "Setup\Support\Unzipper.exe" ^
+/manifest "Setup\7zsd.sfx.manifest" ^
+/Version "&version;" ^
+/CompanyName "Jochen Neubeck" ^
+/ProductName "WinMerge 2011 Setup" ^
+/FileDescription "WinMerge 2011 Setup" ^
+/LegalCopyright "The contained software is copyright by various people and subject to different licenses" ^
+"WinMerge_&version;_&platform;.7z"
 </comment>
 <comment id='version_h'>
 #define MAJOR &major;
@@ -191,7 +205,7 @@ Const vcredist_x86_v100_url = "http://download.microsoft.com/download/C/6/D/C6D0
 Const vcredist_x86_v100_sha = "66b797b3b4f99488f53c2b676610dfe9868984c779536891a8d8f73ee214bc4b"
 
 Dim sh, fso, sha, env, version, argv, executable
-Dim sProgFolder, sThisFolder, sMoveFolder
+Dim sProgFolder, sThisFolder, sTempFolder, sMoveFolder
 
 Set sh = CreateObject("WScript.Shell")
 Set fso = CreateObject("Scripting.FileSystemObject")
@@ -401,10 +415,6 @@ Function InstallFiles
 	End If
 	fso.CreateFolder sProgFolder
 	fso.CopyFolder sThisFolder, sProgFolder
-	' Delete setup support files
-	On Error Resume Next
-	fso.DeleteFolder sProgFolder & "\Support", True
-	On Error Goto 0
 	InstallFiles = True
 End Function
 
@@ -416,7 +426,7 @@ End Sub
 
 Sub DownloadAndSave3rdPartyFile(choice, prompt, url, sha, name)
 	Dim cmd, dst
-	dst = sThisFolder & "\" & name
+	dst = sTempFolder & "\" & name
 	If choice <> vbCancel Then
 		choice = MsgBox(FormatText(prompt), vbYesNoCancel Or vbQuestion, document.title)
 	End If
@@ -426,7 +436,7 @@ Sub DownloadAndSave3rdPartyFile(choice, prompt, url, sha, name)
 		On Error Goto 0
 		Exit Sub
 	End If
-	cmd = FormatStrings(Array("""%1\Support\Downloader.exe"" /passive:0 /timeout:30000 /bubble /hta:%2 /sha256:%3 ""%4"" ""%5""", sThisFolder, window.name, sha, url, dst))
+	cmd = FormatStrings(Array("""%1\Downloader.exe"" /passive:0 /timeout:30000 /bubble /hta:%2 /sha256:%3 ""%4"" ""%5""", sTempFolder, window.name, sha, url, dst))
 	If sh.Run(cmd, 1, True) <> 0 Then
 		On Error Resume Next
 		fso.DeleteFile dst, True
@@ -450,16 +460,11 @@ Function Download3rdPartyFiles
 End Function
 
 Function Install3rdPartyFiles
-	If fso.FileExists(sThisFolder & "\xdoc2txt.zip") Then
-		On Error Resume Next
-		fso.CreateFolder sThisFolder & "\xdoc2txt"
-		On Error Goto 0
-		sha.NameSpace(sThisFolder & "\xdoc2txt").CopyHere(sha.NameSpace(sThisFolder & "\xdoc2txt.zip\command").Items)
-		fso.DeleteFile sThisFolder & "\xdoc2txt.zip", True
+	If fso.FileExists(sTempFolder & "\xdoc2txt.zip") Then
+		sh.Run FormatStrings(Array("""%1\Unzipper.exe"" ""%1\xdoc2txt.zip"" /o ""%2\xdoc2txt"" /i ""\command:*""", sTempFolder, sThisFolder)), 0, True
 	End If
-	If fso.FileExists(sThisFolder & "\vcredist_x86_v100.exe") Then
-		sh.Run FormatStrings(Array("""%1\vcredist_x86_v100.exe"" /passive", sThisFolder)), 0, True
-		fso.DeleteFile sThisFolder & "\vcredist_x86_v100.exe", True
+	If fso.FileExists(sTempFolder & "\vcredist_x86_v100.exe") Then
+		sh.Run FormatStrings(Array("""%1\vcredist_x86_v100.exe"" /passive", sTempFolder)), 0, True
 	End If
 	Install3rdPartyFiles = True
 End Function
@@ -469,6 +474,7 @@ Sub Apply
 	document.body.style.cursor = "arrow"
 	sThisFolder = fso.GetParentFolderName(app.icon)
 	If maintenance.disabled Then
+		sTempFolder = fso.GetParentFolderName(sThisFolder)
 		If Not Download3rdPartyFiles Then Exit Sub
 		If Not Install3rdPartyFiles Then Exit Sub
 		sProgFolder = EdFolder.value
@@ -623,7 +629,7 @@ End Sub
 <td>
 <textarea readonly>
 Copyright &#169; 1996-2011 Dean Grimm / Thingamahoochie Software
-Copyright &#169; 2002-2017 WinMerge Team
+Copyright &#169; 2002-2018 WinMerge Team
 
 WinMerge 2011 is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
 
