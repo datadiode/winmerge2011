@@ -22,7 +22,7 @@
 #define CONTEXT_F_FLATTENED 0x08
 
 /// Registry path to WinMerge
-static const TCHAR f_RegDir[] = _T("Software\\Thingamahoochie\\WinMerge");
+static const TCHAR f_RegDir[] = _T("Software\\Thingamahoochie\\WinMurge");
 
 // registry values
 static const TCHAR f_RegValueEnabled[] = _T("ContextMenuEnabled");

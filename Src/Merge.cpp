@@ -96,7 +96,9 @@ static void CleanupWMtemp()
 
 // WinMerge registry settings are stored under HKEY_CURRENT_USER/Software/Thingamahoochie
 // This is the name of the company of the original author (Dean Grimm)
-CSettingStore SettingStore(_T("Thingamahoochie"), _T("WinMerge"));
+// In registry, WinMerge 2011 identifies itself as WinMurge to avoid conflicts
+// with the prior art product, which is being continued based on Takashi's fork.
+CSettingStore SettingStore(_T("Thingamahoochie"), _T("WinMurge"));
 
 CLanguageSelect LanguageSelect;
 

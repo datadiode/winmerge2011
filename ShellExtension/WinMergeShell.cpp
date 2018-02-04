@@ -18,11 +18,11 @@
 // to Windows Shell programming by Michael Dunn.
 //
 // This extension needs two registry values to be defined:
-//  HKEY_CURRENT_USER\Software\Thingamahoochie\WinMerge\ContextMenuEnabled
+//  HKEY_CURRENT_USER\Software\Thingamahoochie\WinMurge\ContextMenuEnabled
 //   defines if context menu is shown (extension enabled) and if
 //   we show simple or advanced menu
 //
-//  HKEY_CURRENT_USER\Software\Thingamahoochie\WinMerge\FirstSelection
+//  HKEY_CURRENT_USER\Software\Thingamahoochie\WinMurge\FirstSelection
 //   is used to store path for first selection in advanced mode
 /////////////////////////////////////////////////////////////////////////////
 /**
@@ -51,7 +51,7 @@ enum ExtensionFlags
 /// Max. filecount to select
 static const UINT MaxFileCount = 2;
 /// Registry path to WinMerge
-#define REGDIR _T("Software\\Thingamahoochie\\WinMerge")
+#define REGDIR _T("Software\\Thingamahoochie\\WinMurge")
 static const TCHAR f_RegDir[] = REGDIR;
 static const TCHAR f_RegLocaleDir[] = REGDIR _T("\\Locale");
 
