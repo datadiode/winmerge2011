@@ -281,7 +281,7 @@ extern COptionDef
 extern COptionDef
 <String> OPT_SUPPLEMENT_FOLDER operator((_T("Settings/SupplementFolder"), CMergeApp::GetDefaultSupplementFolder()));
 extern COptionDef
-<bool> OPT_FILEFILTER_SHARED operator((_T("Settings/Filters/Shared"), false));
+<bool> OPT_FILEFILTER_SHARED operator((_T("Settings/FileFilterShared"), false));
 
 // Version control
 extern COptionDef
