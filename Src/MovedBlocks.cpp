@@ -14,7 +14,7 @@
 //    along with this program; if not, write to the Free Software
 //    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 /////////////////////////////////////////////////////////////////////////////
-/** 
+/**
  * @file  MovedBlocks.cpp
  *
  * @brief Moved block detection code.
@@ -22,65 +22,33 @@
 #include "stdafx.h"
 #include "diff.h"
 
-class IntSet
-{
-public:
-	void Add(int val) { m_map[val] = 1; }
-	void Remove(int val) { m_map.erase(val); }
-	int count() const { return m_map.size(); }
-	bool isPresent(int val) const { m_map.find(val) != m_map.end(); }
-	int getSingle() const { return m_map.begin()->first; }
-private:
-	std::map<int, int> m_map;
-};
-
-/** 
+/**
  * @brief  Set of equivalent lines
  * This uses diffutils line numbers, which are counted from the prefix
  */
-struct EqGroup
-{
-	IntSet m_lines0; // equivalent lines on side#0
-	IntSet m_lines1; // equivalent lines on side#1
-
-	bool isPerfectMatch() const { return m_lines0.count()==1 && m_lines1.count()==1; }
-};
-
-
-/** @brief  Maps equivalency code to equivalency group */
-class CodeToGroupMap
-	//CTypedPtrMap<CMapPtrToPtr, void*, EqGroup *>
+class EqGroup
 {
 public:
-	std::map<int, EqGroup *> m_map;
-	/** @brief Add a line to the appropriate equivalency group */
-	void Add(int lineno, int eqcode, int nside)
+	int m_balance;
+	int m_cookie0;
+	int m_cookie1;
+	EqGroup()
+		: m_balance(0)
+		, m_cookie0(0)
+		, m_cookie1(0)
 	{
-		EqGroup *pgroup = find(eqcode);
-		if (pgroup == NULL)
-		{
-			pgroup = new EqGroup;
-			m_map[eqcode] = pgroup;
-		}
-		if (nside)
-			pgroup->m_lines1.Add(lineno);
-		else
-			pgroup->m_lines0.Add(lineno);
 	}
-
-	/** @brief Return the appropriate equivalency group */
-	EqGroup *find(int eqcode)
+	void deleted(int lineno)
 	{
-		std::map<int, EqGroup *>::const_iterator it = m_map.find(eqcode);
-		return it != m_map.end() ? it->second : NULL;
+		m_cookie0 = m_cookie0 == 0 || m_cookie0 == lineno ? lineno + 1 : -1;
+		--m_balance;
 	}
-
-	~CodeToGroupMap()
+	void inserted(int lineno)
 	{
-		std::map<int, EqGroup *>::const_iterator pos = m_map.begin();
-		while (pos != m_map.end())
-			delete pos++->second;
+		m_cookie1 = m_cookie1 == 0 || m_cookie1 == lineno ? lineno + 1 : -1;
+		++m_balance;
 	}
+	bool isPerfectMatch() const { return m_balance == 0 && m_cookie0 > 0 && m_cookie1 > 0; }
 };
 
 /*
@@ -93,259 +61,201 @@ public:
  match0 set by scan from line1 to inserted
 
 */
-extern "C" void moved_block_analysis(struct change ** pscript, struct file_data fd[])
+extern "C" void moved_block_analysis(struct change *script, struct file_data fd[])
 {
 	// Hash all altered lines
-	CodeToGroupMap map;
+	std::map<int, EqGroup> map;
 
-	struct change * script = *pscript;
-	struct change *p,*e;
-	for (e = script; e; e = p)
+	struct change *e;
+	for (e = script; e; e = e->link)
 	{
-		p = e->link;
-		int i=0;
-		for (i=e->line0; i-(e->line0) < (e->deleted); ++i)
-			map.Add(i, fd[0].equivs[i], 0);
-		for (i=e->line1; i-(e->line1) < (e->inserted); ++i)
-			map.Add(i, fd[1].equivs[i], 1);
+		int k;
+		for (k = e->line0; k - e->line0 < e->deleted; ++k)
+			map[fd[0].equivs[k]].deleted(k);
+		for (k = e->line1; k - e->line1 < e->inserted; ++k)
+			map[fd[1].equivs[k]].inserted(k);
 	}
-
 
 	// Scan through diff blocks, finding moved sections from left side
 	// and splitting them out
 	// That is, we actually fragment diff blocks as we find moved sections
-	for (e = script; e; e = p)
+	for (e = script; e; e = e->link)
 	{
 		// scan down block for a match
-		p = e->link;
-		EqGroup * pgroup = 0;
-		int i=0;
-		for (i=e->line0; i-(e->line0) < (e->deleted); ++i)
+		for (int k = e->line0; k - e->line0 < e->deleted; ++k)
 		{
-			EqGroup * tempgroup = map.find(fd[0].equivs[i]);
-			if (tempgroup->isPerfectMatch())
+			EqGroup &group = map[fd[0].equivs[k]];
+			if (group.isPerfectMatch())
 			{
-				pgroup = tempgroup;
+				// found a match
+				int i = group.m_cookie0;
+				int j = group.m_cookie1;
+				// Ok, now our moved block precedes the line i, j
+				// extend moved block downward as far as possible
+				int i2 = i;
+				int j2 = j;
+				while (i2 - e->line0 < e->deleted && fd[0].equivs[i2] == fd[1].equivs[j2])
+				{
+					++i2;
+					++j2;
+				}
+				// extend moved block upward as far as possible
+				int i1;
+				int j1;
+				do
+				{
+					i1 = i--;
+					j1 = j--;
+				} while (i >= e->line0 && fd[0].equivs[i] == fd[1].equivs[j]);
+				// Ok, now our moved block is i1->i2, j1->j2
+
+				ASSERT(i2 - i1 > 0);
+				ASSERT(i2 - i1 == j2 - j1);
+
+				if (int const prefix = i1 - e->line0)
+				{
+					// break e (current change) into two pieces
+					// first part is the prefix, before the moved part
+					// that stays in e
+					// second part is the moved part & anything after it
+					// that goes in newob
+					// leave the right side (e->inserted) on e
+					// so no right side on newob
+					// newob will be the moved part only, later after we split off any suffix from it
+					struct change *const newob = static_cast<struct change *>(xmalloc(sizeof(struct change)));
+					memset(newob, 0, sizeof *newob);
+
+					newob->line0 = i1;
+					newob->line1 = e->line1 + e->inserted;
+					newob->inserted = 0;
+					newob->deleted = e->deleted - prefix;
+					newob->link = e->link;
+					newob->match0 = -1;
+					newob->match1 = -1;
+
+					e->deleted = prefix;
+					e->link = newob;
+
+					// now make e point to the moved part (& any suffix)
+					e = newob;
+				}
+				// now e points to a moved diff chunk with no prefix, but maybe a suffix
+
+				e->match1 = j1;
+
+				if (int const suffix = e->deleted - (i2 - e->line0))
+				{
+					// break off any suffix from e
+					// newob will be the suffix, and will get all the right side
+					struct change *const newob = static_cast<struct change *>(xmalloc(sizeof(struct change)));
+					memset(newob, 0, sizeof *newob);
+
+					newob->line0 = i2;
+					newob->line1 = e->line1;
+					newob->inserted = e->inserted;
+					newob->deleted = suffix;
+					newob->link = e->link;
+					newob->match0 = -1;
+					newob->match1 = -1;
+
+					e->inserted = 0;
+					e->deleted -= suffix;
+					e->link = newob;
+				}
 				break;
 			}
-		}
-
-		// if no match, go to next diff block
-		if (!pgroup)
-			continue;
-
-		// found a match
-		int j = pgroup->m_lines1.getSingle();
-		// Ok, now our moved block is the single line i,j
-
-		// extend moved block upward as far as possible
-		int i1 = i-1;
-		int j1 = j-1;
-		for ( ; i1>=e->line0; --i1, --j1)
-		{
-			EqGroup * pgroup0 = map.find(fd[0].equivs[i1]);
-			EqGroup * pgroup1 = map.find(fd[1].equivs[j1]);
-			if (pgroup0 != pgroup1)
-				break;
-			pgroup0->m_lines0.Remove(i1);
-			pgroup1->m_lines1.Remove(j1);
-		}
-		++i1;
-		++j1;
-		// Ok, now our moved block is i1->i, j1->j
-
-		// extend moved block downward as far as possible
-		int i2 = i+1;
-		int j2 = j+1;
-		for ( ; i2-(e->line0) < (e->deleted); ++i2,++j2)
-		{
-			EqGroup * pgroup0 = map.find(fd[0].equivs[i2]);
-			EqGroup * pgroup1 = map.find(fd[1].equivs[j2]);
-			if (pgroup0 != pgroup1)
-				break;
-			pgroup0->m_lines0.Remove(i2);
-			pgroup1->m_lines1.Remove(j2);
-		}
-		--i2;
-		--j2;
-		// Ok, now our moved block is i1->i2,j1->j2
-
-		ASSERT(i2-i1 >= 0);
-		ASSERT(i2-i1 == j2-j1);
-
-		int prefix = i1 - (e->line0);
-		if (prefix)
-		{
-			// break e (current change) into two pieces
-			// first part is the prefix, before the moved part
-			// that stays in e
-			// second part is the moved part & anything after it
-			// that goes in newob
-			// leave the right side (e->inserted) on e
-			// so no right side on newob
-			// newob will be the moved part only, later after we split off any suffix from it
-			struct change *newob = (struct change *) xmalloc (sizeof (struct change));
-			memset(newob, 0, sizeof(*newob));
-
-			newob->line0 = i1;
-			newob->line1 = e->line1 + e->inserted;
-			newob->inserted = 0;
-			newob->deleted = e->deleted - prefix;
-			newob->link = e->link;
-			newob->match0 = -1;
-			newob->match1 = -1;
-
-			e->deleted = prefix;
-			e->link = newob;
-
-			// now make e point to the moved part (& any suffix)
-			e = newob;
-		}
-		// now e points to a moved diff chunk with no prefix, but maybe a suffix
-
-		e->match1 = j1;
-
-		int suffix = (e->deleted) - (i2-(e->line0)) - 1;
-		if (suffix)
-		{
-			// break off any suffix from e
-			// newob will be the suffix, and will get all the right side
-			struct change *newob = (struct change *) xmalloc (sizeof (struct change));
-			memset(newob, 0, sizeof(*newob));
-
-			newob->line0 = i2+1;
-			newob->line1 = e->line1;
-			newob->inserted = e->inserted;
-			newob->deleted = suffix;
-			newob->link = e->link;
-			newob->match0 = -1;
-			newob->match1 = -1;
-
-			e->inserted = 0;
-			e->deleted -= suffix;
-			e->link = newob;
-
-			p = newob; // next block to scan
 		}
 	}
 
 	// Scan through diff blocks, finding moved sections from right side
 	// and splitting them out
 	// That is, we actually fragment diff blocks as we find moved sections
-	for (e = script; e; e = p)
+	for (e = script; e; e = e->link)
 	{
 		// scan down block for a match
-		p = e->link;
-		EqGroup * pgroup = 0;
-		int j=0;
-		for (j=e->line1; j-(e->line1) < (e->inserted); ++j)
+		for (int k = e->line1; k - e->line1 < e->inserted; ++k)
 		{
-			EqGroup * tempgroup = map.find(fd[1].equivs[j]);
-			if (tempgroup->isPerfectMatch())
+			EqGroup &group = map[fd[1].equivs[k]];
+			if (group.isPerfectMatch())
 			{
-				pgroup = tempgroup;
+				// found a match
+				int i = group.m_cookie0;
+				int j = group.m_cookie1;
+				// Ok, now our moved block precedes the line i, j
+				// extend moved block downward as far as possible
+				int i2 = i;
+				int j2 = j;
+				while (j2 - e->line1 < e->inserted && fd[0].equivs[i2] == fd[1].equivs[j2])
+				{
+					++i2;
+					++j2;
+				}
+				// extend moved block upward as far as possible
+				int i1;
+				int j1;
+				do
+				{
+					i1 = i--;
+					j1 = j--;
+				} while (j >= e->line1 && fd[0].equivs[i] == fd[1].equivs[j]);
+				// Ok, now our moved block is i1->i2, j1->j2
+
+				ASSERT(i2 - i1 > 0);
+				ASSERT(i2 - i1 == j2 - j1);
+
+				if (int const prefix = j1 - e->line1)
+				{
+					// break e (current change) into two pieces
+					// first part is the prefix, before the moved part
+					// that stays in e
+					// second part is the moved part & anything after it
+					// that goes in newob
+					// leave the left side (e->deleted) on e
+					// so no right side on newob
+					// newob will be the moved part only, later after we split off any suffix from it
+					struct change *const newob = static_cast<struct change *>(xmalloc(sizeof(struct change)));
+					memset(newob, 0, sizeof *newob);
+
+					newob->line0 = e->line0 + e->deleted;
+					newob->line1 = j1;
+					newob->inserted = e->inserted - prefix;
+					newob->deleted = 0;
+					newob->link = e->link;
+					newob->match0 = -1;
+					newob->match1 = -1;
+
+					e->inserted = prefix;
+					e->link = newob;
+
+					// now make e point to the moved part (& any suffix)
+					e = newob;
+				}
+				// now e points to a moved diff chunk with no prefix, but maybe a suffix
+
+				e->match0 = i1;
+
+				if (int const suffix = e->inserted - (j2 - e->line1))
+				{
+					// break off any suffix from e
+					// newob will be the suffix, and will get all the left side
+					struct change *const newob = static_cast<struct change *>(xmalloc(sizeof(struct change)));
+					memset(newob, 0, sizeof *newob);
+
+					newob->line0 = e->line0;
+					newob->line1 = j2;
+					newob->inserted = suffix;
+					newob->deleted = e->deleted;
+					newob->link = e->link;
+					newob->match0 = -1;
+					newob->match1 = e->match1;
+
+					e->inserted -= suffix;
+					e->deleted = 0;
+					e->match1 = -1;
+					e->link = newob;
+				}
 				break;
 			}
 		}
-
-		// if no match, go to next diff block
-		if (!pgroup)
-			continue;
-
-		// found a match
-		int i = pgroup->m_lines0.getSingle();
-		// Ok, now our moved block is the single line i,j
-
-		// extend moved block upward as far as possible
-		int i1 = i-1;
-		int j1 = j-1;
-		for ( ; j1>=e->line1; --i1, --j1)
-		{
-			EqGroup * pgroup0 = map.find(fd[0].equivs[i1]);
-			EqGroup * pgroup1 = map.find(fd[1].equivs[j1]);
-			if (pgroup0 != pgroup1)
-				break;
-			pgroup0->m_lines0.Remove(i1);
-			pgroup1->m_lines1.Remove(j1);
-		}
-		++i1;
-		++j1;
-		// Ok, now our moved block is i1->i, j1->j
-
-		// extend moved block downward as far as possible
-		int i2 = i+1;
-		int j2 = j+1;
-		for ( ; j2-(e->line1) < (e->inserted); ++i2,++j2)
-		{
-			EqGroup * pgroup0 = map.find(fd[0].equivs[i2]);
-			EqGroup * pgroup1 = map.find(fd[1].equivs[j2]);
-			if (pgroup0 != pgroup1)
-				break;
-			pgroup0->m_lines0.Remove(i2);
-			pgroup1->m_lines1.Remove(j2);
-		}
-		--i2;
-		--j2;
-		// Ok, now our moved block is i1->i2,j1->j2
-
-		ASSERT(i2-i1 >= 0);
-		ASSERT(i2-i1 == j2-j1);
-
-		int prefix = j1 - (e->line1);
-		if (prefix)
-		{
-			// break e (current change) into two pieces
-			// first part is the prefix, before the moved part
-			// that stays in e
-			// second part is the moved part & anything after it
-			// that goes in newob
-			// leave the left side (e->deleted) on e
-			// so no right side on newob
-			// newob will be the moved part only, later after we split off any suffix from it
-			struct change *newob = (struct change *) xmalloc (sizeof (struct change));
-			memset(newob, 0, sizeof(*newob));
-
-			newob->line0 = e->line0 + e->deleted;
-			newob->line1 = j1;
-			newob->inserted = e->inserted - prefix;
-			newob->deleted = 0;
-			newob->link = e->link;
-			newob->match0 = -1;
-			newob->match1 = -1;
-
-			e->inserted = prefix;
-			e->link = newob;
-
-			// now make e point to the moved part (& any suffix)
-			e = newob;
-		}
-		// now e points to a moved diff chunk with no prefix, but maybe a suffix
-
-		e->match0 = i1;
-
-		int suffix = (e->inserted) - (j2-(e->line1)) - 1;
-		if (suffix)
-		{
-			// break off any suffix from e
-			// newob will be the suffix, and will get all the left side
-			struct change *newob = (struct change *) xmalloc (sizeof (struct change));
-			memset(newob, 0, sizeof(*newob));
-
-			newob->line0 = e->line0;
-			newob->line1 = j2+1;
-			newob->inserted = suffix;
-			newob->deleted = e->deleted;
-			newob->link = e->link;
-			newob->match0 = -1;
-			newob->match1 = e->match1;
-
-			e->inserted -= suffix;
-			e->deleted = 0;
-			e->match1 = -1;
-			e->link = newob;
-
-			p = newob; // next block to scan
-		}
 	}
-
 }

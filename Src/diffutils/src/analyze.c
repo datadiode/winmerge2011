@@ -1012,8 +1012,8 @@ struct change * diff_2_files (struct file_data filevec[], int depth, int * bin_s
 		/* WinMerge moved block support */
 		if (moved_blocks_flag)
 		{
-			void moved_block_analysis(struct change ** pscript, struct file_data fd[]);
-			moved_block_analysis(&script, filevec);
+			void moved_block_analysis(struct change *script, struct file_data fd[]);
+			moved_block_analysis(script, filevec);
 		}
 		
 		if (no_details_flag)
