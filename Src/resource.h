@@ -130,6 +130,7 @@
 #define IDI_NOTEQUALFOLDER                      519
 #define IDI_EQUALTEXTFILE                       520
 #define IDI_NOTEQUALTEXTFILE                    521
+#define IDI_QUESTION_MARK                       522
 #define IDC_LEFT_EDIT                           1000
 #define IDC_COMPARE_SELFCOMPARE                 1001
 #define IDC_FLDCONFIRM_MAKE_WRITABLE            1001

@@ -43,7 +43,9 @@ IDI_FILEFILTER          ICON                    "res/FileFilter.ico"
 IDI_LINEFILTER          ICON                    "res/LineFilter.ico"
 IDI_EQUALTEXTFILE       ICON                    "res/equaltextfile.ico"
 IDI_NOTEQUALTEXTFILE    ICON                    "res/notequaltextfile.ico"
-
+// Below icon originates from http://whytehouse.com/usa/icons/HelpBlue.zip,
+// which is subject to the terms given in http://whytehouse.com/usa/faq.asp.
+IDI_QUESTION_MARK       ICON                    "res/questionmark.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //

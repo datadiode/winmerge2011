@@ -28,7 +28,8 @@ const WORD CompareStats::m_rgIDI[N_DIFFIMG] =
 	IDI_FOLDERUP_DISABLE,
 	IDI_COMPARE_ABORTED,
 	IDI_NOTEQUALTEXTFILE,
-	IDI_EQUALTEXTFILE
+	IDI_EQUALTEXTFILE,
+	IDI_QUESTION_MARK,
 };
 
 /**
@@ -145,5 +146,5 @@ CompareStats::RESULT CompareStats::GetColImage(const DIFFITEM *di)
 			return DIFFIMG_BINDIFF;
 		return DIFFIMG_DIFF;
 	}
-	return di->isDirectory() ? DIFFIMG_DIR : DIFFIMG_ABORT;
+	return di->isDirectory() ? DIFFIMG_DIR : DIFFIMG_UNKNOWN;
 }
