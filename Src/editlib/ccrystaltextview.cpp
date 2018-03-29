@@ -1649,7 +1649,7 @@ void CCrystalTextView::DrawMargin(HSurface * pdc, const RECT & rect, int nLineIn
 		HGdiObj *pOldFont = pdc->SelectObject(GetFont());
 		COLORREF clrOldColor = pdc->SetTextColor(GetColor(COLORINDEX_NORMALTEXT));
 		UINT uiOldAlign = pdc->SetTextAlign(TA_RIGHT);
-		pdc->TextOut(rect.right - 4, rect.top, szNumbers, lstrlen(szNumbers));
+		pdc->TextOut(rect.right - 4, rect.top, szNumbers, static_cast<int>(_tcslen(szNumbers)));
 		pdc->SetTextAlign(uiOldAlign);
 		pdc->SelectObject(pOldFont);
 		pdc->SetTextColor(clrOldColor);
