@@ -809,10 +809,13 @@ int CDirView::MarkSelectedForRescan()
 		// Don't try to rescan special items
 		if (di == NULL)
 			continue;
-
-		di->diffcode &= ~(DIFFCODE::TEXTFLAGS | DIFFCODE::SIDEFLAGS | DIFFCODE::COMPAREFLAGS | DIFFCODE::SCANFLAGS);
-		di->diffcode |= DIFFCODE::NEEDSCAN;
-		++items;
+		DIFFITEM const *const root = di;
+		do
+		{
+			di->diffcode &= DIFFCODE::TYPEFLAGS | DIFFCODE::FILTERFLAGS;
+			di->diffcode |= DIFFCODE::NEEDSCAN;
+			++items;
+		} while ((di = root->DeepGetNextItem(di)) != root);
 	}
 	return items;
 }

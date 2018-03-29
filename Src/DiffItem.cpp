@@ -65,3 +65,20 @@ bool DIFFITEM::IsAncestor(const DIFFITEM *pdi) const
 	}
 	return false;
 }
+
+/** @brief Iterate descendant items */
+DIFFITEM *DIFFITEM::DeepGetNextItem(DIFFITEM *p) const
+{
+	DIFFITEM *q = static_cast<DIFFITEM *>(p->children.Flink);
+	if (q != &p->children)
+		return q;
+	while (p != this)
+	{
+		q = p->parent;
+		p = static_cast<DIFFITEM *>(p->Flink);
+		if (p != &q->children)
+			break;
+		p = q;
+	}
+	return p;
+}

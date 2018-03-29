@@ -283,40 +283,53 @@ void CDiffContext::DirScan_CompareItems()
 
 		CompareDiffItem(folderCmp, di);
 
-		if (!di->isResultFiltered())
+		if (di->isResultFiltered())
+			continue;
+
+		UINT mask = 0;
+		UINT flag = 0;
+		switch (di->diffcode & (DIFFCODE::SIDEFLAGS | DIFFCODE::COMPAREFLAGS))
 		{
-			UINT mask = 0;
-			UINT flag = 0;
-			if (di->isResultSame())
+		case DIFFCODE::BOTH | DIFFCODE::SAME:
+			mask = DIFFCODE::CONTAINSIDENTICAL | DIFFCODE::COMPAREFLAGS;
+			flag = DIFFCODE::CONTAINSIDENTICAL | DIFFCODE::SAME;
+			break;
+		case DIFFCODE::LEFT:
+			mask = DIFFCODE::CONTAINSLEFTONLY | DIFFCODE::COMPAREFLAGS;
+			flag = DIFFCODE::CONTAINSLEFTONLY | DIFFCODE::DIFF;
+			break;
+		case DIFFCODE::RIGHT:
+			mask = DIFFCODE::CONTAINSRIGHTONLY | DIFFCODE::COMPAREFLAGS;
+			flag = DIFFCODE::CONTAINSRIGHTONLY | DIFFCODE::DIFF;
+			break;
+		case DIFFCODE::BOTH | DIFFCODE::DIFF:
+			mask = DIFFCODE::COMPAREFLAGS;
+			flag = DIFFCODE::DIFF;
+			break;
+		case DIFFCODE::BOTH | DIFFCODE::CMPERR:
+			mask = DIFFCODE::COMPAREFLAGS;
+			flag = DIFFCODE::CMPERR;
+			break;
+		case DIFFCODE::BOTH | DIFFCODE::CMPABORT:
+			mask = DIFFCODE::COMPAREFLAGS;
+			flag = DIFFCODE::CMPABORT;
+			break;
+		}
+		while (DIFFITEM *parent = di->parent)
+		{
+			EnterCriticalSection(&m_csCompareThread);
+			UINT code = parent->diffcode;
+			if ((code & DIFFCODE::COMPAREFLAGS) > (flag & DIFFCODE::COMPAREFLAGS))
 			{
-				mask = DIFFCODE::CONTAINSIDENTICAL;
-				flag = DIFFCODE::CONTAINSIDENTICAL;
+				mask &= ~DIFFCODE::COMPAREFLAGS;
+				flag &= ~DIFFCODE::COMPAREFLAGS;
 			}
-			else if (di->isSideLeftOnly())
-			{
-				mask = DIFFCODE::CONTAINSLEFTONLY | DIFFCODE::COMPAREFLAGS;
-				flag = DIFFCODE::CONTAINSLEFTONLY | DIFFCODE::DIFF;
-			}
-			else if (di->isSideRightOnly())
-			{
-				mask = DIFFCODE::CONTAINSRIGHTONLY | DIFFCODE::COMPAREFLAGS;
-				flag = DIFFCODE::CONTAINSRIGHTONLY | DIFFCODE::DIFF;
-			}
-			else if (di->isResultDiff())
-			{
-				mask = DIFFCODE::COMPAREFLAGS;
-				flag = DIFFCODE::DIFF;
-			}
-			while (DIFFITEM *parent = di->parent)
-			{
-				UINT const code = parent->diffcode;
-				if ((code & DIFFCODE::SIDEFLAGS) != DIFFCODE::BOTH || (code & mask) == flag)
-					break;
-				EnterCriticalSection(&m_csCompareThread);
-				parent->diffcode = code & ~mask | flag;
-				LeaveCriticalSection(&m_csCompareThread);
-				di = parent;
-			}
+			code ^= code & ~mask | flag;
+			parent->diffcode ^= code;
+			LeaveCriticalSection(&m_csCompareThread);
+			if (code == 0)
+				break;
+			di = parent;
 		}
 	}
 }
@@ -337,52 +350,64 @@ void CDiffContext::DirScan_CompareRequestedItems()
 		if (di == NULL || ShouldAbort())
 			break;
 
-		if (di->isScanNeeded())
-		{
-			bool bExists;
-			EnterCriticalSection(&m_csCompareThread);
-			// Clear rescan-request flag (not set by all codepaths)
-			di->diffcode &= ~DIFFCODE::NEEDSCAN;
-			bExists = UpdateDiffItem(di);
-			LeaveCriticalSection(&m_csCompareThread);
-			if (bExists)
-				CompareDiffItem(folderCmp, di);
-		}
+		if (!di->isScanNeeded())
+			continue;
 
-		if (!di->isResultFiltered())
+		EnterCriticalSection(&m_csCompareThread);
+		// Clear rescan-request flag (not set by all codepaths)
+		di->diffcode &= ~DIFFCODE::NEEDSCAN;
+		bool bExists = UpdateDiffItem(di);
+		LeaveCriticalSection(&m_csCompareThread);
+		if (bExists)
+			CompareDiffItem(folderCmp, di);
+
+		if (di->isResultFiltered())
+			continue;
+
+		UINT mask = 0;
+		UINT flag = 0;
+		switch (di->diffcode & (DIFFCODE::SIDEFLAGS | DIFFCODE::COMPAREFLAGS))
 		{
-			UINT mask = 0;
-			UINT flag = 0;
-			if (di->isResultSame())
+		case DIFFCODE::BOTH | DIFFCODE::SAME:
+			mask = DIFFCODE::CONTAINSIDENTICAL | DIFFCODE::COMPAREFLAGS;
+			flag = DIFFCODE::CONTAINSIDENTICAL | DIFFCODE::SAME;
+			break;
+		case DIFFCODE::LEFT:
+			mask = DIFFCODE::CONTAINSLEFTONLY | DIFFCODE::COMPAREFLAGS;
+			flag = DIFFCODE::CONTAINSLEFTONLY | DIFFCODE::DIFF;
+			break;
+		case DIFFCODE::RIGHT:
+			mask = DIFFCODE::CONTAINSRIGHTONLY | DIFFCODE::COMPAREFLAGS;
+			flag = DIFFCODE::CONTAINSRIGHTONLY | DIFFCODE::DIFF;
+			break;
+		case DIFFCODE::BOTH | DIFFCODE::DIFF:
+			mask = DIFFCODE::COMPAREFLAGS;
+			flag = DIFFCODE::DIFF;
+			break;
+		case DIFFCODE::BOTH | DIFFCODE::CMPERR:
+			mask = DIFFCODE::COMPAREFLAGS;
+			flag = DIFFCODE::CMPERR;
+			break;
+		case DIFFCODE::BOTH | DIFFCODE::CMPABORT:
+			mask = DIFFCODE::COMPAREFLAGS;
+			flag = DIFFCODE::CMPABORT;
+			break;
+		}
+		while (DIFFITEM *parent = di->parent)
+		{
+			EnterCriticalSection(&m_csCompareThread);
+			UINT code = parent->diffcode;
+			if ((code & DIFFCODE::COMPAREFLAGS) > (flag & DIFFCODE::COMPAREFLAGS))
 			{
-				mask = DIFFCODE::CONTAINSIDENTICAL;
-				flag = DIFFCODE::CONTAINSIDENTICAL;
+				mask &= ~DIFFCODE::COMPAREFLAGS;
+				flag &= ~DIFFCODE::COMPAREFLAGS;
 			}
-			else if (di->isSideLeftOnly())
-			{
-				mask = DIFFCODE::CONTAINSLEFTONLY | DIFFCODE::COMPAREFLAGS;
-				flag = DIFFCODE::CONTAINSLEFTONLY | DIFFCODE::DIFF;
-			}
-			else if (di->isSideRightOnly())
-			{
-				mask = DIFFCODE::CONTAINSRIGHTONLY | DIFFCODE::COMPAREFLAGS;
-				flag = DIFFCODE::CONTAINSRIGHTONLY | DIFFCODE::DIFF;
-			}
-			else if (di->isResultDiff())
-			{
-				mask = DIFFCODE::COMPAREFLAGS;
-				flag = DIFFCODE::DIFF;
-			}
-			while (DIFFITEM *parent = di->parent)
-			{
-				UINT const code = parent->diffcode;
-				if ((code & DIFFCODE::SIDEFLAGS) != DIFFCODE::BOTH || (code & mask) == flag)
-					break;
-				EnterCriticalSection(&m_csCompareThread);
-				parent->diffcode = code & ~mask | flag;
-				LeaveCriticalSection(&m_csCompareThread);
-				di = parent;
-			}
+			code ^= code & ~mask | flag;
+			parent->diffcode ^= code;
+			LeaveCriticalSection(&m_csCompareThread);
+			if (code == 0)
+				break;
+			di = parent;
 		}
 	}
 }
@@ -440,13 +465,19 @@ void CDiffContext::CompareDiffItem(FolderCmp &fc, DIFFITEM *di)
 	if (di->isDirectory())
 	{
 		// 1. Test against filters
-		const UINT flag = !m_piFilterGlobal->includeDir(
+		const UINT flag = m_piFilterGlobal->includeDir(
 			di->left.path.c_str(), di->left.filename.c_str(),
 			di->right.path.c_str(), di->right.filename.c_str()) ?
-			DIFFCODE::SKIPPED : m_nRecursive != 0 && di->isSideBoth() ?
-			DIFFCODE::INCLUDED | DIFFCODE::SAME : DIFFCODE::INCLUDED;
+			DIFFCODE::INCLUDED : DIFFCODE::SKIPPED;
 		EnterCriticalSection(&m_csCompareThread);
 		di->diffcode |= flag;
+		// Beware race conditions. Set DIFFCODE::SAME only if not yet assigned
+		// otherwise according to a file difference detected by anothet thread.
+		if ((m_nRecursive != 0) &&
+			(di->diffcode & DIFFCODE::COMPAREFLAGS | DIFFCODE::SIDEFLAGS) == (DIFFCODE::NOCMP | DIFFCODE::BOTH))
+		{
+			di->diffcode |= DIFFCODE::SAME;
+		}
 		LeaveCriticalSection(&m_csCompareThread);
 		// We don't actually 'compare' directories, just add non-ignored
 		// directories to list.

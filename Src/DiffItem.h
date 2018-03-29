@@ -123,7 +123,8 @@ struct DIFFITEM : ListEntry
 	String GetLeftFilepath(const String &sLeftRoot) const;
 	String GetRightFilepath(const String &sRightRoot) const;
 	int GetDepth() const;
-	bool IsAncestor(const DIFFITEM *pdi) const;
+	bool IsAncestor(const DIFFITEM *) const;
+	DIFFITEM *DeepGetNextItem(DIFFITEM *) const;
 	/** @brief Return whether the current item has children */
 	bool HasChildren() const { return !children.IsSolitary(); }
 };
