@@ -474,7 +474,7 @@ void CDiffContext::CompareDiffItem(FolderCmp &fc, DIFFITEM *di)
 		// Beware race conditions. Set DIFFCODE::SAME only if not yet assigned
 		// otherwise according to a file difference detected by anothet thread.
 		if ((m_nRecursive != 0) &&
-			(di->diffcode & DIFFCODE::COMPAREFLAGS | DIFFCODE::SIDEFLAGS) == (DIFFCODE::NOCMP | DIFFCODE::BOTH))
+			(di->diffcode & (DIFFCODE::COMPAREFLAGS | DIFFCODE::SIDEFLAGS)) == (DIFFCODE::NOCMP | DIFFCODE::BOTH))
 		{
 			di->diffcode |= DIFFCODE::SAME;
 		}
