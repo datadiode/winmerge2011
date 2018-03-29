@@ -1,7 +1,7 @@
 // H2O2.cpp
 //
 // Copyright (c) 2005-2010  David Nash (as of Win32++ v7.0.2)
-// Copyright (c) 2011-2016  Jochen Neubeck
+// Copyright (c) 2011-2018  Jochen Neubeck
 //
 // Permission is hereby granted, free of charge, to
 // any person obtaining a copy of this software and
@@ -34,6 +34,99 @@
 #include "SettingStore.h"
 
 using namespace H2O;
+
+#define DEFAULT_DPI 96
+
+static int GetScalingDPI()
+{
+	int dpi = 0;
+	if (HDC hdc = GetDC(NULL))
+	{
+		dpi = GetDeviceCaps(hdc, LOGPIXELSX); // assuming square pixels
+		ReleaseDC(NULL, hdc);
+	}
+	return std::max(dpi, DEFAULT_DPI);
+}
+
+static LPDLGTEMPLATE ScaleDialogTemplate(HINSTANCE hInstance, LPCTSTR lpTemplateName)
+{
+	union UDlgTemplate
+	{
+		struct
+		{
+			DWORD style;
+			DWORD exStyle;
+			WORD cDlgItems;
+			short x;
+			short y;
+			short cx;
+			short cy;
+			WCHAR raw[1];
+		} dlg;
+		struct
+		{
+			WORD dlgVer;
+			WORD signature;
+			DWORD helpID;
+			DWORD exStyle;
+			DWORD style;
+			WORD cDlgItems;
+			short x;
+			short y;
+			short cx;
+			short cy;
+			WCHAR raw[1];
+		} dlgEx;
+	} *pTemplate = NULL;
+	int const dpi = GetScalingDPI();
+	// Celebrate the Arrow Antipattern ;)
+	if (dpi != DEFAULT_DPI)
+	{
+		if (HRSRC hFindRes = FindResource(hInstance, lpTemplateName, RT_DIALOG))
+		{
+			if (HGLOBAL hLoadRes = LoadResource(hInstance, hFindRes))
+			{
+				if (DWORD dwSizeRes = SizeofResource(hInstance, hFindRes))
+				{
+					if (LPVOID q = LockResource(hLoadRes))
+					{
+						if (LPVOID p = GlobalAlloc(GPTR, dwSizeRes))
+						{
+							memcpy(p, q, dwSizeRes);
+							pTemplate = static_cast<UDlgTemplate *>(p);
+							LPWSTR raw = NULL;
+							if (pTemplate->dlgEx.signature == 0xFFFF)
+							{
+								if (pTemplate->dlgEx.style & DS_SHELLFONT)
+								{
+									raw = pTemplate->dlgEx.raw;
+								}
+							}
+							else
+							{
+								if (pTemplate->dlg.style & DS_SHELLFONT)
+								{
+									raw = pTemplate->dlg.raw;
+								}
+							}
+							if (raw)
+							{
+								// Skip menu name string or ordinal
+								raw += *raw == 0xFFFF ? 2 : wcslen(raw) + 1;
+								// Skip class name string or ordinal
+								raw += *raw == 0xFFFF ? 2 : wcslen(raw) + 1;
+								// Skip caption string
+								raw += wcslen(raw) + 1;
+								*raw = MulDiv(*raw, dpi, DEFAULT_DPI);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return reinterpret_cast<LPDLGTEMPLATE>(pTemplate);
+}
 
 LRESULT OWindow::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -243,14 +336,34 @@ INT_PTR ODialog::DoModal(HINSTANCE hinst, HWND parent)
 {
 	PROPSHEETPAGE psp;
 	psp.lParam = reinterpret_cast<LPARAM>(this);
-	return DialogBoxParam(hinst, m_idd, parent, DlgProc, reinterpret_cast<LPARAM>(&psp));
+	INT_PTR result;
+	if (LPDLGTEMPLATE pTemplate = ScaleDialogTemplate(hinst, m_idd))
+	{
+		result = DialogBoxIndirectParam(hinst, pTemplate, parent, DlgProc, reinterpret_cast<LPARAM>(&psp));
+		GlobalFree(pTemplate);
+	}
+	else
+	{
+		result = DialogBoxParam(hinst, m_idd, parent, DlgProc, reinterpret_cast<LPARAM>(&psp));
+	}
+	return result;
 }
 
 HWND ODialog::Create(HINSTANCE hinst, HWND parent)
 {
 	PROPSHEETPAGE psp;
 	psp.lParam = reinterpret_cast<LPARAM>(this);
-	return CreateDialogParam(hinst, m_idd, parent, DlgProc, reinterpret_cast<LPARAM>(&psp));
+	HWND hwnd;
+	if (LPDLGTEMPLATE pTemplate = ScaleDialogTemplate(hinst, m_idd))
+	{
+		hwnd = CreateDialogIndirectParam(hinst, pTemplate, parent, DlgProc, reinterpret_cast<LPARAM>(&psp));
+		GlobalFree(pTemplate);
+	}
+	else
+	{
+		hwnd = CreateDialogParam(hinst, m_idd, parent, DlgProc, reinterpret_cast<LPARAM>(&psp));
+	}
+	return hwnd;
 }
 
 BOOL ODialog::IsUserInputCommand(WPARAM wParam)
@@ -390,7 +503,28 @@ INT_PTR OPropertySheet::DoModal(HINSTANCE hinst, HWND parent)
 	m_psh.hInstance = hinst;
 	m_psh.hwndParent = parent;
 	m_psh.pszCaption = m_caption.c_str();
-	return ::PropertySheet(&m_psh);
+	INT_PTR result;
+	UINT i = 0;
+	while (i < m_psh.nPages)
+	{
+		PROPSHEETPAGE *psp = const_cast<PROPSHEETPAGE *>(&m_psh.ppsp[i++]);
+		if (LPDLGTEMPLATE pTemplate = ScaleDialogTemplate(m_psh.hInstance, psp->pszTemplate))
+		{
+			psp->dwFlags |= PSP_DLGINDIRECT;
+			psp->pResource = pTemplate;
+		}
+	}
+	result = PropertySheet(&m_psh);
+	while (i > 0)
+	{
+		PROPSHEETPAGE *psp = const_cast<PROPSHEETPAGE *>(&m_psh.ppsp[--i]);
+		if (psp->dwFlags & PSP_DLGINDIRECT)
+		{
+			GlobalFree(const_cast<LPDLGTEMPLATE>(psp->pResource));
+			psp->pResource = NULL;
+		}
+	}
+	return result;
 }
 
 int CALLBACK OPropertySheet::PropSheetProc(HWND hWnd, UINT uMsg, LPARAM lParam)
