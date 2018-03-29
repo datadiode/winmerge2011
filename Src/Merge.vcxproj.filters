@@ -1329,6 +1329,9 @@
     <None Include="..\Translations\WinMerge\UpdatePoFilesFromPotFile.vbs">
       <Filter>Batch files</Filter>
     </None>
+    <None Include="res\questionmark.ico">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="res\Merge.rc">

@@ -906,16 +906,8 @@
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="version.rh">
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\Setup\setup.hta "hidden:version" "%(FullPath)" "$(Platform)"</Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)Setup_$(Platform).cfg;%(Outputs)</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\Setup\setup.hta "hidden:version" "%(FullPath)" "$(Platform)"</Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)Setup_$(Platform).cfg;%(Outputs)</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\Setup\setup.hta "hidden:version" "%(FullPath)" "$(Platform)"</Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)Setup_$(Platform).cfg;%(Outputs)</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\Setup\setup.hta "hidden:version" "%(FullPath)" "$(Platform)"</Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)Setup_$(Platform).cfg;%(Outputs)</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">..\Setup\setup.hta "hidden:version" "%(FullPath)" "$(Platform)"</Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">$(SolutionDir)Setup_$(Platform).cfg;%(Outputs)</Outputs>
+      <Command>"$(SystemRoot)\system32\mshta.exe" "$(SolutionDir)Setup\setup.hta" "hidden:version" "%(FullPath)" "$(Platform)"</Command>
+      <Outputs>$(SolutionDir)Setup_$(Platform).bat;%(Outputs)</Outputs>
     </CustomBuild>
     <None Include="res\binarydiff.ico" />
     <None Include="res\both.bmp" />
@@ -941,6 +933,7 @@
     <None Include="res\move_left_to_browse.bmp" />
     <None Include="res\move_right_to_browse.bmp" />
     <None Include="res\notequalfile.ico" />
+    <None Include="res\questionmark.ico" />
     <None Include="res\rfile.ico" />
     <None Include="res\rfolder.ico" />
     <None Include="res\right.bmp" />
