@@ -18,7 +18,7 @@
 #include "paths.h"
 #include "OptionsMgr.h"
 
-UINT CF_HTML = RegisterClipboardFormat(_T("HTML Format"));
+UINT const CF_HTML = RegisterClipboardFormat(_T("HTML Format"));
 
 /**
  * @brief Return current time as string.
@@ -42,7 +42,8 @@ static DWORD MakeHtmlColor(COLORREF cr)
  * @brief Constructor.
  */
 DirCmpReport::DirCmpReport(CDirView *pList)
-	: m_pList(pList), m_pFile(NULL), m_sSeparator(_T(",")), m_rootPaths(2)
+	: m_pList(pList), m_pFile(NULL), m_pFileW(NULL)
+	, m_sSeparator(_T(",")), m_rootPaths(2)
 {
 	CDirFrame *const pDoc = pList->m_pFrame;
 	const CDiffContext *ctxt = pDoc->GetDiffContext();
@@ -65,6 +66,7 @@ bool DirCmpReport::GenerateReport(String &errStr)
 {
 	assert(m_pList != NULL);
 	assert(m_pFile == NULL);
+	assert(m_pFileW == NULL);
 	bool bRet = false;
 
 	DirCmpReportDlg dlg;
@@ -78,13 +80,26 @@ bool DirCmpReport::GenerateReport(String &errStr)
 			if (!EmptyClipboard())
 				return false;
 			CreateStreamOnHGlobal(NULL, FALSE, &m_pFile);
+			CreateStreamOnHGlobal(NULL, FALSE, &m_pFileW);
 			GenerateReport(dlg.m_nReportType);
 			IStream_Write(m_pFile, "", sizeof ""); // write terminating zero
-			HGLOBAL hGlobal = NULL;
-			GetHGlobalFromStream(m_pFile, &hGlobal);
-			SetClipboardData(CF_TEXT, hGlobal);
-			m_pFile->Release();
-			m_pFile = NULL;
+			IStream_Write(m_pFileW, L"", sizeof L""); // write terminating zero
+			if (m_pFile)
+			{
+				HGLOBAL hGlobal = NULL;
+				GetHGlobalFromStream(m_pFile, &hGlobal);
+				SetClipboardData(CF_TEXT, hGlobal);
+				m_pFile->Release();
+				m_pFile = NULL;
+			}
+			if (m_pFileW)
+			{
+				HGLOBAL hGlobal = NULL;
+				GetHGlobalFromStream(m_pFileW, &hGlobal);
+				SetClipboardData(CF_UNICODETEXT, hGlobal);
+				m_pFileW->Release();
+				m_pFileW = NULL;
+			}
 			// If report type is HTML, render CF_HTML format as well
 			if (dlg.m_nReportType == REPORT_TYPE_SIMPLEHTML)
 			{
@@ -187,20 +202,39 @@ void DirCmpReport::GenerateReport(REPORT_TYPE nReportType)
  */
 void DirCmpReport::WriteString(HString *H, UINT codepage)
 {
-	const OString strOctets = H->Oct(codepage);
-	LPCSTR pchOctets = strOctets.A;
-	UINT cchAhead = strOctets.ByteLen();
-	while (LPCSTR pchAhead = (LPCSTR)memchr(pchOctets, '\n', cchAhead))
+	if (m_pFile)
 	{
-		ULONG cchLine = static_cast<ULONG>(pchAhead - pchOctets);
-		IStream_Write(m_pFile, pchOctets, cchLine);
-		static const char eol[] = { '\r', '\n' };
-		IStream_Write(m_pFile, eol, sizeof eol);
-		++cchLine;
-		pchOctets += cchLine;
-		cchAhead -= cchLine;
+		const OString strOctets = H->Oct(codepage);
+		LPCSTR pchLine = strOctets.A;
+		UINT cchAhead = strOctets.ByteLen();
+		while (LPCSTR pchAhead = (LPCSTR)memchr(pchLine, '\n', cchAhead))
+		{
+			ULONG cchLine = static_cast<ULONG>(pchAhead - pchLine);
+			IStream_Write(m_pFile, pchLine, cchLine);
+			static const char eol[] = { '\r', '\n' };
+			IStream_Write(m_pFile, eol, sizeof eol);
+			++cchLine;
+			pchLine += cchLine;
+			cchAhead -= cchLine;
+		}
+		IStream_Write(m_pFile, pchLine, cchAhead);
 	}
-	IStream_Write(m_pFile, pchOctets, cchAhead);
+	if (m_pFileW)
+	{
+		LPCWSTR pchLine = H->W;
+		UINT cchAhead = H->Len();
+		while (LPCWSTR pchAhead = wmemchr(pchLine, L'\n', cchAhead))
+		{
+			ULONG cchLine = static_cast<ULONG>(pchAhead - pchLine);
+			IStream_Write(m_pFileW, pchLine, cchLine * sizeof *pchLine);
+			static const WCHAR eol[] = { L'\r', L'\n' };
+			IStream_Write(m_pFileW, eol, sizeof eol);
+			++cchLine;
+			pchLine += cchLine;
+			cchAhead -= cchLine;
+		}
+		IStream_Write(m_pFileW, pchLine, cchAhead * sizeof *pchLine);
+	}
 }
 
 /**

@@ -57,5 +57,6 @@ private:
 	String m_sTitle; /**< Report title, built from root paths */
 	int m_nColumns; /**< Columns in UI */
 	String m_sSeparator; /**< Column separator for report */
-	IStream *m_pFile; /**< File to write report to */
+	IStream *m_pFile; /**< UTF-8 encoded output stream */
+	IStream *m_pFileW; /**< UTF-16 encoded output stream */
 };
