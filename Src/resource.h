@@ -59,9 +59,11 @@
 #define IDD_BROWSE_FOR_FILE                     240
 #define IDD_BROWSE_FOR_FOLDER                   241
 #define IDR_SPLASH                              308
-#define IDB_WINMERGE                            309
-#define IDB_OLDSPLASH                           310
 #define IDB_TOOLBAR_ENABLED                     311
+#define IDB_TOOLBAR_ENABLED32                   312
+#define IDB_TOOLBAR_DISABLED                    313
+#define IDB_TOOLBAR_DISABLED32                  314
+#define IDB_WINMERGE                            315
 #define IDB_EDIT_COPY                           316
 #define IDB_EDIT_CUT                            317
 #define IDB_EDIT_PASTE                          318
@@ -90,7 +92,6 @@
 #define IDB_EDIT_GOTO_NEXT_BOOKMARK             343
 #define IDB_EDIT_GOTO_PREV_BOOKMARK             344
 #define IDB_EDIT_CLEAR_ALL_BOOKMARKS            345
-#define IDB_TOOLBAR_DISABLED                    346
 #define IDB_LEFT                                347
 #define IDB_RIGHT                               348
 #define IDB_BOTH                                349
@@ -100,8 +101,6 @@
 #define IDB_RIGHT_TO_BROWSE                     353
 #define IDB_MOVE_LEFT_TO_BROWSE                 354
 #define IDB_MOVE_RIGHT_TO_BROWSE                355
-#define IDB_TOOLBAR_DISABLED32                  356
-#define IDB_TOOLBAR_ENABLED32                   357
 #define IDB_VIEW_ZOOMIN                         358
 #define IDB_VIEW_ZOOMOUT                        359
 #define IDB_TREE_STATE                          360

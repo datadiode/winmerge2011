@@ -60,8 +60,6 @@ IDR_SPLASH              IMAGE                   "res/splash.jpg"
 // Bitmap
 //
 
-IDB_TOOLBAR_ENABLED     BITMAP                  "res/ToolbarEnabled.bmp"
-IDB_TOOLBAR_DISABLED    BITMAP                  "res/ToolbarDisabled.bmp"
 IDB_EDIT_COPY           BITMAP                  "res/copy.bmp"
 IDB_EDIT_CUT            BITMAP                  "res/cut.bmp"
 IDB_EDIT_PASTE          BITMAP                  "res/paste.bmp"
@@ -98,15 +96,20 @@ IDB_LEFT_TO_BROWSE      BITMAP                  "res/left_to_browse.bmp"
 IDB_RIGHT_TO_BROWSE     BITMAP                  "res/right_to_browse.bmp"
 IDB_MOVE_LEFT_TO_BROWSE BITMAP                  "res/move_left_to_browse.bmp"
 IDB_MOVE_RIGHT_TO_BROWSE BITMAP                 "res/move_right_to_browse.bmp"
-IDB_TOOLBAR_DISABLED32  BITMAP                  "res/ToolbarDisabled32.bmp"
-IDB_TOOLBAR_ENABLED32   BITMAP                  "res/ToolbarEnabled32.bmp"
 IDB_VIEW_ZOOMIN         BITMAP                  "res/zoom_in.bmp"
 IDB_VIEW_ZOOMOUT        BITMAP                  "res/zoom_out.bmp"
 IDB_TREE_STATE          BITMAP                  "res/treestate.bmp"
 IDB_FILE_OPENCONFLICT   BITMAP                  "res/open_conflict.bmp"
 IDB_FILE_STARTCOLLECT   BITMAP                  "res/start_collect.bmp"
-
 IDB_MERGE_COMPARE       BITMAP                  "res/compare.bmp"
+// The Toolbar bitmap includes http://pngimages.net/filter-png-image-19,
+// which pngimages.net advertises as follows: Royalty free Filter png image,
+// Filter png stock image, you can use this image for your projects like Web
+// Design & UI, Print Design and Presentation Design.
+IDB_TOOLBAR_ENABLED     BITMAP                  "res/ToolbarEnabled.bmp"
+IDB_TOOLBAR_ENABLED32   BITMAP                  "res/ToolbarEnabled32.bmp"
+IDB_TOOLBAR_DISABLED    BITMAP                  "res/ToolbarDisabled.bmp"
+IDB_TOOLBAR_DISABLED32  BITMAP                  "res/ToolbarDisabled32.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
