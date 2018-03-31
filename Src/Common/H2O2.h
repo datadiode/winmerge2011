@@ -456,7 +456,7 @@ namespace H2O
 			UINT len = Len();
 			if (SysReAllocStringLen(&B, NULL, len + lstrlenW(tail)))
 			{
-				lstrcpyW(W + len, tail);
+				StrCpyW(W + len, tail);
 			}
 		}
 		void Append(HString *pStr)

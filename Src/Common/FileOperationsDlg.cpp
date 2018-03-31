@@ -53,7 +53,7 @@ static LPWSTR AppendNameToPath(LPWSTR path, LPCWSTR name)
 		path[++pathlen] = L'\0';
 		int namelen = lstrlenW(name);
 		if (pathlen + namelen <= SHRT_MAX)
-			last = lstrcpyW(path + pathlen, name);
+			last = StrCpyW(path + pathlen, name);
 	}
 	return last;
 }
@@ -405,7 +405,7 @@ LPWSTR FileOperationsDlg::AssignPath(BSTR &p, LPCWSTR q)
 	if (!SysReAllocStringLen(&p, NULL, SHRT_MAX))
 		OException::Throw(ERROR_OUTOFMEMORY);
 	if (p != q)
-		lstrcpynW(p, q, SHRT_MAX + 1);
+		StrCpyNW(p, q, SHRT_MAX + 1);
 	return p;
 }
 

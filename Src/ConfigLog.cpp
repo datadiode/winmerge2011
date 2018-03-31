@@ -242,7 +242,7 @@ void CConfigLog::WriteVersionOf(int indent, LPTSTR path)
 	{
 		do
 		{
-			lstrcpy(name, ff.cFileName);
+			_tcscpy(name, ff.cFileName);
 			WriteVersionOf1(indent, path);
 		} while (FindNextFile(h, &ff));
 		FindClose(h);
@@ -380,7 +380,7 @@ bool CConfigLog::DoFile(bool writing, String &sError)
 	TCHAR path[MAX_PATH];
 	GetModuleFileName(0, path, _countof(path));
 	LPTSTR pattern = PathFindFileName(path);
-	lstrcpy(pattern, _T("Merge7z\\*.dll"));
+	_tcscpy(pattern, _T("Merge7z\\*.dll"));
 	WriteVersionOf(1, path);
 
 // WinMerge settings

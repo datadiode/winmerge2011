@@ -260,7 +260,7 @@ HRESULT CWinMergeShell::QueryContextMenu(HMENU hmenu, UINT uMenuIndex,
 
 /// Gets string shown explorer's status bar when menuitem selected
 HRESULT CWinMergeShell::GetCommandString(UINT_PTR idCmd, UINT uFlags,
-		UINT* pwReserved, LPSTR pszName, UINT  cchMax)
+		UINT* pwReserved, LPSTR pszName, UINT cchMax)
 {
 	SetWinMergeLocale();
 
@@ -285,7 +285,7 @@ HRESULT CWinMergeShell::GetCommandString(UINT_PTR idCmd, UINT uFlags,
 		if (uFlags & GCS_UNICODE)
 			// We need to cast pszName to a Unicode string, and then use the
 			// Unicode string copy API.
-			lstrcpynW((LPWSTR) pszName, strHelp, cchMax);
+			StrCpyNW(reinterpret_cast<LPWSTR>(pszName), strHelp, cchMax);
 		else
 			// Use the ANSI string copy API to return the help string.
 			wnsprintfA(pszName, cchMax, "%ls", strHelp.m_str);

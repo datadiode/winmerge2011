@@ -29,6 +29,8 @@
 #include <shlwapi.h>
 #include <wininet.h>
 
+#include <lstrsafe.h>
+
 // MSHTML headers
 #include <mshtml.h>
 //#include <iextag.h>

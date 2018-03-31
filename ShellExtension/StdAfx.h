@@ -14,6 +14,8 @@
 #include <shlguid.h>
 
 #include <tchar.h>
+#include <lstrsafe.h>
+
 #include <MyCom.h>
 
 #ifdef _DEBUG

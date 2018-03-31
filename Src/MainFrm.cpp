@@ -2062,7 +2062,7 @@ void CMainFrame::GetMrgViewFontProperties()
 		m_lfDiff.lfClipPrecision = CLIP_STROKE_PRECIS;
 		m_lfDiff.lfQuality = DRAFT_QUALITY;
 		m_lfDiff.lfPitchAndFamily = FF_MODERN | FIXED_PITCH;
-		lstrcpy(m_lfDiff.lfFaceName, _T("Courier New"));
+		lstrcpyn(m_lfDiff.lfFaceName, _T("Courier New"), LF_FACESIZE);
 		// Adjust defaults according to MLANG
 		MIMECPINFO cpi;
 		ZeroMemory(&cpi, sizeof cpi);
