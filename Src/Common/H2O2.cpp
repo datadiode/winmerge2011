@@ -48,7 +48,7 @@ static int GetScalingDPI()
 	return std::max(dpi, DEFAULT_DPI);
 }
 
-static LPDLGTEMPLATE ScaleDialogTemplate(HINSTANCE hInstance, LPCTSTR lpTemplateName)
+static LPDLGTEMPLATE ScaleDialogTemplate(LPVOID p, int dpi)
 {
 	union UDlgTemplate
 	{
@@ -77,7 +77,38 @@ static LPDLGTEMPLATE ScaleDialogTemplate(HINSTANCE hInstance, LPCTSTR lpTemplate
 			short cy;
 			WCHAR raw[1];
 		} dlgEx;
-	} *pTemplate = NULL;
+	} *const pTemplate = static_cast<UDlgTemplate *>(p);
+	LPWSTR raw = NULL;
+	if (pTemplate->dlgEx.signature == 0xFFFF)
+	{
+		if (pTemplate->dlgEx.style & DS_SHELLFONT)
+		{
+			raw = pTemplate->dlgEx.raw;
+		}
+	}
+	else
+	{
+		if (pTemplate->dlg.style & DS_SHELLFONT)
+		{
+			raw = pTemplate->dlg.raw;
+		}
+	}
+	if (raw)
+	{
+		// Skip menu name string or ordinal
+		raw += *raw == 0xFFFF ? 2 : wcslen(raw) + 1;
+		// Skip class name string or ordinal
+		raw += *raw == 0xFFFF ? 2 : wcslen(raw) + 1;
+		// Skip caption string
+		raw += wcslen(raw) + 1;
+		*raw = MulDiv(*raw, dpi, DEFAULT_DPI);
+	}
+	return static_cast<LPDLGTEMPLATE>(p);
+}
+
+static LPDLGTEMPLATE ScaleDialogTemplate(HINSTANCE hInstance, LPCTSTR lpTemplateName)
+{
+	LPDLGTEMPLATE pTemplate = NULL;
 	int const dpi = GetScalingDPI();
 	// Celebrate the Arrow Antipattern ;)
 	if (dpi != DEFAULT_DPI)
@@ -93,39 +124,14 @@ static LPDLGTEMPLATE ScaleDialogTemplate(HINSTANCE hInstance, LPCTSTR lpTemplate
 						if (LPVOID p = GlobalAlloc(GPTR, dwSizeRes))
 						{
 							memcpy(p, q, dwSizeRes);
-							pTemplate = static_cast<UDlgTemplate *>(p);
-							LPWSTR raw = NULL;
-							if (pTemplate->dlgEx.signature == 0xFFFF)
-							{
-								if (pTemplate->dlgEx.style & DS_SHELLFONT)
-								{
-									raw = pTemplate->dlgEx.raw;
-								}
-							}
-							else
-							{
-								if (pTemplate->dlg.style & DS_SHELLFONT)
-								{
-									raw = pTemplate->dlg.raw;
-								}
-							}
-							if (raw)
-							{
-								// Skip menu name string or ordinal
-								raw += *raw == 0xFFFF ? 2 : wcslen(raw) + 1;
-								// Skip class name string or ordinal
-								raw += *raw == 0xFFFF ? 2 : wcslen(raw) + 1;
-								// Skip caption string
-								raw += wcslen(raw) + 1;
-								*raw = MulDiv(*raw, dpi, DEFAULT_DPI);
-							}
+							pTemplate = ScaleDialogTemplate(p, dpi);
 						}
 					}
 				}
 			}
 		}
 	}
-	return reinterpret_cast<LPDLGTEMPLATE>(pTemplate);
+	return pTemplate;
 }
 
 LRESULT OWindow::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
@@ -531,6 +537,9 @@ int CALLBACK OPropertySheet::PropSheetProc(HWND hWnd, UINT uMsg, LPARAM lParam)
 {
 	switch (uMsg)
 	{
+	case PSCB_PRECREATE:
+		ScaleDialogTemplate(reinterpret_cast<LPVOID>(lParam), GetScalingDPI());
+		break;
 	case PSCB_INITIALIZED:
 		SetWindowLongPtr(hWnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(WndProc));
 		break;
