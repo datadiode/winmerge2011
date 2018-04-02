@@ -34,9 +34,9 @@ public:
 	void operator delete(void *) { }
 	HRESULT RegisterClassObject(BOOL);
 	ULONG GetLockCount() { return m_cRef; }
+	HINSTANCE const m_hInstance;
 
 protected:
-	HINSTANCE const m_hInstance;
 	LONG m_cRef;
 	LCID m_lcid;
 	CMyComBSTR m_strPaths[2]; /**< Paths for selected items */

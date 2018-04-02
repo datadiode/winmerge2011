@@ -60,6 +60,18 @@ extern "C" BOOL WINAPI _DllMainCRTStartup(HINSTANCE hInstance, DWORD dwReason, L
 		// Refuse to load into ShellExperienceHost.exe to work around Windows 10
 		if (GetModuleHandleW(L"ShellExperienceHost.exe"))
 			return FALSE;
+		if (GlobalFindAtomW(ModuleAtom))
+		{
+			TCHAR exe[MAX_PATH];
+			GetModuleFileNameW(NULL, exe, _countof(exe));
+			TCHAR dll[MAX_PATH];
+			// hInstance = GetModuleHandle(L"kernel32"); // for testing
+			GetModuleFileNameW(hInstance, dll, _countof(dll));
+			if (int prefix = PathCommonPrefixW(exe, dll, NULL))
+				if (dll[prefix] == L'\\' && PathIsFileSpecW(dll + prefix + 1))
+					AddAtomW(ModuleAtom);
+			return FALSE;
+		}
 		AddAtomW(ModuleAtom);
 		pModule = new CWinMergeShell(hInstance);
 		DisableThreadLibraryCalls(hInstance);
@@ -121,7 +133,12 @@ static BOOL KillHostingProcesses(HWND hWnd)
 
 	HANDLE const hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 	if (hProcessSnap == INVALID_HANDLE_VALUE)
-		return FALSE;
+		return S_FALSE;
+
+	ATOM const globalAtom = GlobalAddAtomW(ModuleAtom);
+
+	WCHAR path[MAX_PATH];
+	GetModuleFileName(pModule->m_hInstance, path, _countof(path));
 
 	int choice = 0;
 
@@ -151,8 +168,24 @@ static BOOL KillHostingProcesses(HWND hWnd)
 			{
 				DWORD dwExitCode = 0;
 				if (LPVOID const pVirtual = VirtualAllocEx(
-					hProcess, NULL, sizeof ModuleAtom, MEM_COMMIT, PAGE_READWRITE))
+					hProcess, NULL, 1024, MEM_COMMIT, PAGE_READWRITE))
 				{
+					if (WriteProcessMemory(
+						hProcess, pVirtual, path, sizeof path, NULL))
+					{
+						if (HANDLE const hThread = CreateRemoteThread(
+							hProcess, NULL, 0,
+							reinterpret_cast<LPTHREAD_START_ROUTINE>(LoadLibraryW),
+							pVirtual, 0, NULL))
+						{
+							// Have suspended processes time out after a moderate delay
+							WaitForSingleObject(hThread, 100);
+							GetExitCodeThread(hThread, &dwExitCode);
+							if (dwExitCode == STILL_ACTIVE)
+								TerminateThread(hThread, 0);
+							CloseHandle(hThread);
+						}
+					}
 					if (WriteProcessMemory(
 						hProcess, pVirtual, ModuleAtom, sizeof ModuleAtom, NULL))
 					{
@@ -175,7 +208,7 @@ static BOOL KillHostingProcesses(HWND hWnd)
 				{
 					WCHAR msg[1024];
 					wsprintfW(msg,
-						L"The WinMerge shell extension is used by the following process:"
+						L"The following process belongs to or uses part of WinMerge:"
 						L"\n\n%s\n\n"
 						L"Do you want to terminate this process?",
 						pe32.szExeFile);
@@ -193,8 +226,9 @@ static BOOL KillHostingProcesses(HWND hWnd)
 		}
 	} while (choice != IDCANCEL && Process32Next(hProcessSnap, &pe32));
 
+	GlobalDeleteAtom(globalAtom);
 	CloseHandle(hProcessSnap);
-	return TRUE;
+	return choice == IDCANCEL ? E_ABORT : S_OK;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -202,6 +236,5 @@ static BOOL KillHostingProcesses(HWND hWnd)
 
 STDAPI DllInstall(BOOL, LPCWSTR lpCmdLine)
 {
-	KillHostingProcesses(FindHTA(lpCmdLine));
-	return S_OK;
+	return KillHostingProcesses(FindHTA(lpCmdLine));
 }
