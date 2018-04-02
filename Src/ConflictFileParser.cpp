@@ -50,11 +50,8 @@ bool IsConflictFile(LPCTSTR conflictFileName)
 	UniMemFile conflictFile;
 	bool startFound = false;
 
-	// open input file
-	VERIFY(conflictFile.OpenReadOnly(conflictFileName));
-
 	// Search for a conflict marker
-	bool linesToRead = true;
+	bool linesToRead = conflictFile.OpenReadOnly(conflictFileName);
 	while (linesToRead && !startFound)
 	{
 		String line;
