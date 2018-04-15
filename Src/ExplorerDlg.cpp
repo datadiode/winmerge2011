@@ -1460,6 +1460,8 @@ void ExplorerDlg::OnOK()
 					NULL, m_path.c_str()).MsgBox(MB_YESNO | MB_HIGHLIGHT_ARGUMENTS | MB_ICONWARNING | MB_DEFBUTTON2);
 				if (choice != IDYES)
 					return;
+				if (dwAttributes & ProtectiveFileAttributes)
+					SetFileAttributesW(m_path.c_str(), FILE_ATTRIBUTE_NORMAL);
 			}
 		}
 	}

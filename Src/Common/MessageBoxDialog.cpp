@@ -597,7 +597,8 @@ LPARAM CMessageBoxDialog::CreateMessageControl(HSurface *pdc, int nXPosition, in
 		int h = pdc->DrawText(p, n, &linerect, flags);
 		if (h <= m_edit.m_nLineHeight)
 		{
-			pdc->GetTextExtent(p, n, reinterpret_cast<SIZE *>(&linerect.right));
+			linerect.right = 0;
+			pdc->DrawText(p, n, &linerect, flags & ~DT_WORDBREAK);
 			h = m_edit.m_nLineHeight;
 		}
 		if (rect.right < linerect.right)
