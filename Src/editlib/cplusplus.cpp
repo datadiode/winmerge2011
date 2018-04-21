@@ -263,7 +263,7 @@ DWORD CCrystalTextView::ParseLineC(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pB
   const LPCTSTR pszChars = GetLineChars(nLineIndex);
   BOOL bFirstChar = (dwCookie & ~COOKIE_EXT_COMMENT) == 0;
   BOOL bRedefineBlock = TRUE;
-  BOOL bWasCommentStart = FALSE;
+  enum { False, Start, End } bWasComment = False;
   BOOL bDecIndex = FALSE;
   int nIdentBegin = -1;
   int nPrevI = -1;
@@ -279,13 +279,13 @@ DWORD CCrystalTextView::ParseLineC(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pB
             {
               DEFINE_BLOCK(nPos, COLORINDEX_COMMENT);
             }
-          else if (dwCookie & (COOKIE_CHAR | COOKIE_STRING))
-            {
-              DEFINE_BLOCK(nPos, COLORINDEX_STRING);
-            }
           else if (dwCookie & COOKIE_PREPROCESSOR)
             {
               DEFINE_BLOCK(nPos, COLORINDEX_PREPROCESSOR);
+            }
+          else if (dwCookie & (COOKIE_CHAR | COOKIE_STRING))
+            {
+              DEFINE_BLOCK(nPos, COLORINDEX_STRING);
             }
           else
             {
@@ -343,60 +343,55 @@ out:
       //  Extended comment /*....*/
       if (dwCookie & COOKIE_EXT_COMMENT)
         {
-          // if (I > 0 && pszChars[I] == '/' && pszChars[nPrevI] == '*')
-          if ((I > 1 && pszChars[I] == '/' && pszChars[nPrevI] == '*' /*&& pszChars[nPrevI - 1] != '/'*/ && !bWasCommentStart) || (I == 1 && pszChars[I] == '/' && pszChars[nPrevI] == '*'))
+          if (I > 0 && pszChars[I] == '/' && pszChars[nPrevI] == '*' && bWasComment != Start)
             {
               dwCookie &= ~COOKIE_EXT_COMMENT;
               bRedefineBlock = TRUE;
+              bWasComment = End;
             }
-          bWasCommentStart = FALSE;
+          else
+            {
+              bWasComment = False;
+            }
           continue;
         }
 
-      if (I > 0 && pszChars[I] == '/' && pszChars[nPrevI] == '/')
+      if (I > 0 && pszChars[I] == '/' && pszChars[nPrevI] == '/' && bWasComment != End)
         {
           DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
           dwCookie |= COOKIE_COMMENT;
           break;
         }
 
-      //  Preprocessor directive #....
-      if (dwCookie & COOKIE_PREPROCESSOR)
-        {
-          if (I > 0 && pszChars[I] == '*' && pszChars[nPrevI] == '/')
-            {
-              DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
-              dwCookie |= COOKIE_EXT_COMMENT;
-            }
-          continue;
-        }
-
       //  Normal text
       if (pszChars[I] == '"')
         {
-          DEFINE_BLOCK(I, COLORINDEX_STRING);
+          DEFINE_BLOCK(I, dwCookie & COOKIE_PREPROCESSOR ? COLORINDEX_PREPROCESSOR : COLORINDEX_STRING);
           dwCookie |= COOKIE_STRING;
           continue;
         }
       if (pszChars[I] == '\'')
         {
-          // if (I + 1 < nLength && pszChars[I + 1] == '\'' || I + 2 < nLength && pszChars[I + 1] != '\\' && pszChars[I + 2] == '\'' || I + 3 < nLength && pszChars[I + 1] == '\\' && pszChars[I + 3] == '\'')
-          if (!I || !xisalnum(pszChars[nPrevI]))
+          if (I == 0 || !xisxdigit(pszChars[nPrevI]))
             {
-              DEFINE_BLOCK(I, COLORINDEX_STRING);
+              DEFINE_BLOCK(I, dwCookie & COOKIE_PREPROCESSOR ? COLORINDEX_PREPROCESSOR : COLORINDEX_STRING);
               dwCookie |= COOKIE_CHAR;
               continue;
             }
         }
-      if (I > 0 && pszChars[I] == '*' && pszChars[nPrevI] == '/')
+      if (I > 0 && pszChars[I] == '*' && pszChars[nPrevI] == '/' && bWasComment != End)
         {
           DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
           dwCookie |= COOKIE_EXT_COMMENT;
-          bWasCommentStart = TRUE;
+          bWasComment = Start;
           continue;
         }
 
-      bWasCommentStart = FALSE;
+      bWasComment = False;
+
+      //  Preprocessor directive #....
+      if (dwCookie & COOKIE_PREPROCESSOR)
+        continue;
 
       if (bFirstChar)
         {

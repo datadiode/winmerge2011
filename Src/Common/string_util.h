@@ -44,6 +44,15 @@ inline int xisalnum(wint_t c)
 }
 
 /**
+ * @brief Return non-zero if input is a hex digit.
+ * Also converts any negative inputs to negative char equivalents (see normch).
+ */
+inline int xisxdigit(wint_t c)
+{
+	return _istxdigit(normch(c));
+}
+
+/**
  * @brief Return non-zero if input character is a space.
  * Also converts any negative inputs to negative char equivalents (see normch).
  */
