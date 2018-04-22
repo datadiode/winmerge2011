@@ -263,16 +263,16 @@ DWORD CCrystalTextView::ParseLineC(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pB
 	LPCTSTR const pszChars = GetLineChars(nLineIndex);
 	BOOL bFirstChar = (dwCookie & ~COOKIE_EXT_COMMENT) == 0;
 	BOOL bRedefineBlock = TRUE;
-	enum { False, Start, End } bWasComment = False;
 	BOOL bDecIndex = FALSE;
+	enum { False, Start, End } bWasComment = False;
 	int nIdentBegin = -1;
-	int nPrevI = -1;
-	int I;
-	for (I = 0; I <= nLength; nPrevI = I++)
+	int I = -1;
+	do
 	{
+		int const nPrevI = I++;
 		if (bRedefineBlock)
 		{
-			int nPos = bDecIndex ? nPrevI : I;
+			int const nPos = bDecIndex ? nPrevI : I;
 			bRedefineBlock = FALSE;
 			bDecIndex = FALSE;
 			if (dwCookie & (COOKIE_COMMENT | COOKIE_EXT_COMMENT))
@@ -298,7 +298,6 @@ DWORD CCrystalTextView::ParseLineC(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pB
 				bDecIndex = TRUE;
 			}
 		}
-
 		// Can be bigger than length if there is binary data
 		// See bug #1474782 Crash when comparing SQL with with binary data
 		if (I < nLength)
@@ -394,11 +393,11 @@ DWORD CCrystalTextView::ParseLineC(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pB
 					continue;
 				}
 				if (!xisspace(pszChars[I]))
-				bFirstChar = FALSE;
+					bFirstChar = FALSE;
 			}
 
 			if (pBuf == NULL)
-				continue; //  We don't need to extract keywords,
+				continue; // No need to extract keywords, so skip rest of loop
 
 			if (xisalnum(pszChars[I]) || pszChars[I] == '.' && I > 0 && (!xisalpha(pszChars[nPrevI]) && !xisalpha(pszChars[I + 1])))
 			{
@@ -444,7 +443,7 @@ DWORD CCrystalTextView::ParseLineC(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pB
 			bDecIndex = TRUE;
 			nIdentBegin = -1;
 		}
-	}
+	} while (I < nLength);
 
 	if (pszChars[nLength - 1] != '\\')
 		dwCookie &= COOKIE_EXT_COMMENT;
