@@ -40,7 +40,7 @@
  * @brief Constructor, initializes members.
  */
 CGhostTextView::CGhostTextView(CChildFrame *pDocument, int nThisPane, size_t ZeroInit)
-: CCrystalEditViewEx(ZeroInit)
+: CCrystalEditView(ZeroInit)
 , m_pDocument(pDocument)
 , m_nThisPane(nThisPane)
 {
@@ -194,14 +194,14 @@ COLORREF CGhostTextView::GetColor(int nColorIndex)
 	}
 }
 
-int CGhostTextView::GetAdditionalTextBlocks(int nLineIndex, TEXTBLOCK *&rpBuf)
+void CGhostTextView::GetAdditionalTextBlocks(int nLineIndex, TextBlock::Array &rpBuf)
 {
 	DWORD const dwLineFlags = GetLineFlags(nLineIndex);
 	if ((dwLineFlags & LF_DIFF) != LF_DIFF)
-		return 0;
+		return;
 
 	if (!COptionsMgr::Get(OPT_WORDDIFF_HIGHLIGHT))
-		return 0;
+		return;
 
 	int const nLineLength = GetLineLength(nLineIndex);
 	std::vector<wdiff> worddiffs;
@@ -209,12 +209,12 @@ int CGhostTextView::GetAdditionalTextBlocks(int nLineIndex, TEXTBLOCK *&rpBuf)
 
 	int const nWordDiffs = static_cast<int>(worddiffs.size());
 	if (nWordDiffs == 0)
-		return 0;
+		return;
 
 	bool const lineInCurrentDiff = IsLineInCurrentDiff(nLineIndex);
 
-	TEXTBLOCK *pBuf = new TEXTBLOCK[nWordDiffs * 2 + 1];
-	rpBuf = pBuf;
+	TextBlock *pBuf = new TextBlock[nWordDiffs * 2 + 1];
+	TextBlock::Array(pBuf).swap(rpBuf);
 	pBuf[0].m_nCharPos = 0;
 	pBuf[0].m_nColorIndex = COLORINDEX_NONE;
 	pBuf[0].m_nBgColorIndex = COLORINDEX_NONE;
@@ -244,8 +244,7 @@ int CGhostTextView::GetAdditionalTextBlocks(int nLineIndex, TEXTBLOCK *&rpBuf)
 		pBuf->m_nColorIndex = COLORINDEX_NONE;
 		pBuf->m_nBgColorIndex = COLORINDEX_NONE;
 	}
-
-	return nWordDiffs * 2 + 1;
+	rpBuf.m_nActualItems = nWordDiffs * 2 + 1;
 }
 
 /**

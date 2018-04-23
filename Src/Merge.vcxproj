@@ -438,9 +438,6 @@
     <ClCompile Include="editlib\ceditreplacedlg.cpp" />
     <ClCompile Include="editlib\cfindtextdlg.cpp" />
     <ClCompile Include="editlib\cplusplus.cpp" />
-    <ClCompile Include="editlib\crystaleditviewex.cpp" />
-    <ClCompile Include="editlib\crystalparser.cpp" />
-    <ClCompile Include="editlib\crystaltextblock.cpp" />
     <ClCompile Include="editlib\csharp.cpp" />
     <ClCompile Include="editlib\css.cpp" />
     <ClCompile Include="editlib\dcl.cpp" />
@@ -884,9 +881,6 @@
     <ClInclude Include="editlib\ccrystaltextview.h" />
     <ClInclude Include="editlib\ceditreplacedlg.h" />
     <ClInclude Include="editlib\cfindtextdlg.h" />
-    <ClInclude Include="editlib\crystaleditviewex.h" />
-    <ClInclude Include="editlib\crystalparser.h" />
-    <ClInclude Include="editlib\crystaltextblock.h" />
     <ClInclude Include="editlib\editcmd.h" />
     <ClInclude Include="editlib\LineInfo.h" />
     <ClInclude Include="editlib\UndoRecord.h" />

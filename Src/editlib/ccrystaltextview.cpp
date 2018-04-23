@@ -1083,14 +1083,14 @@ DWORD CCrystalTextView::GetParseCookie(int nLineIndex)
 		L--;
 	L++;
 
-	int nBlocks;
+	TextBlock::Array rBlocks = NULL;
 	while (L <= nLineIndex)
 	{
 		DWORD dwCookie = 0;
 		if (L > 0)
 			dwCookie = m_ParseCookies[L - 1];
 		ASSERT(dwCookie != - 1);
-		m_ParseCookies[L] = ParseLine(dwCookie, L, NULL, nBlocks);
+		m_ParseCookies[L] = ParseLine(dwCookie, L, rBlocks);
 		ASSERT(m_ParseCookies[L] != - 1);
 		L++;
 	}
@@ -1098,22 +1098,66 @@ DWORD CCrystalTextView::GetParseCookie(int nLineIndex)
 	return m_ParseCookies[nLineIndex];
 }
 
-int CCrystalTextView::GetAdditionalTextBlocks(int nLineIndex, TEXTBLOCK *&pBuf)
+void CCrystalTextView::GetAdditionalTextBlocks(int nLineIndex, TextBlock::Array &rBlocks)
 {
-	return 0;
 }
 
 //BEGIN SW
 void CCrystalTextView::WrapLine(int nLineIndex, int *anBreaks, int &nBreaks)
 {
-	// There must be a parser attached to this view
-	if (m_pParser)
+	int const nMaxLineWidth = GetScreenChars();
+	int const nLineLength = GetLineLength(nLineIndex);
+	int const nTabWidth = GetTabSize();
+	int nLineCharCount = 0;
+	int nCharCount = 0;
+	LPCTSTR	szLine = GetLineChars(nLineIndex);
+	int nLastBreakPos = 0;
+	int nLastCharBreakPos = 0;
+	BOOL bBreakable = FALSE;
+
+	for (int i = 0; i < nLineLength; ++i)
 	{
-		const int nMaxLineWidth = GetScreenChars();
-		m_pParser->WrapLine(nLineIndex, nMaxLineWidth, anBreaks, nBreaks);
+		// remember position of whitespace for wrap
+		if (bBreakable)
+		{
+			nLastBreakPos = i;
+			nLastCharBreakPos = nCharCount;
+			bBreakable = FALSE;
+		}
+
+		// increment char counter (evtl. expand tab)
+		int nIncrement = szLine[i] == _T('\t') ?
+			nTabWidth - nCharCount % nTabWidth :
+			GetCharWidthFromChar(szLine + i);
+		nLineCharCount += nIncrement;
+		nCharCount += nIncrement;
+
+		// remember whitespace
+		WORD wCharType;
+		GetStringTypeW(CT_CTYPE3, &szLine[i], 1, &wCharType);
+		if (szLine[i] == _T('\t') || szLine[i] == _T(' ') || (wCharType & (C3_IDEOGRAPH | C3_HIRAGANA | C3_KATAKANA)))
+			bBreakable = TRUE;
+
+		// wrap line
+		if (nLineCharCount >= nMaxLineWidth)
+		{
+			// if no wrap position found, but line is to wide, 
+			// wrap at current position
+			if( nLastBreakPos == 0 )
+			{
+				nLastBreakPos = i;
+				nLastCharBreakPos = nCharCount;
+			}
+			if( anBreaks )
+				anBreaks[nBreaks++] = nLastBreakPos;
+			else
+				nBreaks++;
+
+			nLineCharCount = nCharCount - nLastCharBreakPos;
+			nLastBreakPos = 0;
+		}
 	}
 }
-
 
 void CCrystalTextView::WrapLineCached(int nLineIndex, int *anBreaks, int &nBreaks)
 {
@@ -1180,7 +1224,7 @@ void CCrystalTextView::InvalidateScreenRect()
 
 void CCrystalTextView::DrawScreenLine(
 	HSurface *pdc, POINT &ptOrigin, const RECT &rcClip,
-	TEXTBLOCK *pBuf, int nBlocks, int &nActualItem, 
+	TextBlock::Array &pBuf, int &nActualItem, 
 	COLORREF crText, COLORREF crBkgnd,
 	LPCTSTR pszChars, int nOffset, int nCount, int &nActualOffset, int nLineIndex)
 {
@@ -1196,15 +1240,15 @@ void CCrystalTextView::DrawScreenLine(
 	frect.top = ptOrigin.y;
 	frect.bottom = frect.top + nLineHeight;
 
-	ASSERT(nActualItem < nBlocks);
+	ASSERT(nActualItem < pBuf.m_nActualItems);
 
-	if (nBlocks > 0 && nActualItem < nBlocks - 1 &&
+	if (pBuf.m_nActualItems > 0 && nActualItem < pBuf.m_nActualItems - 1 &&
 		pBuf[nActualItem + 1].m_nCharPos >= nOffset && 
 		pBuf[nActualItem + 1].m_nCharPos <= nOffset + nCount)
 	{
 		ASSERT(pBuf[nActualItem].m_nCharPos >= 0 &&
 			pBuf[nActualItem].m_nCharPos <= nLineLength);
-		while (nActualItem < nBlocks - 1 &&
+		while (nActualItem < pBuf.m_nActualItems - 1 &&
 			pBuf[nActualItem + 1].m_nCharPos <= nOffset + nCount)
 		{
 			ASSERT(pBuf[nActualItem].m_nCharPos >= 0 && pBuf[nActualItem].m_nCharPos <= nLineLength);
@@ -1290,12 +1334,11 @@ void CCrystalTextView::DrawScreenLine(
 	ptOrigin.y += nLineHeight;
 }
 
-int CCrystalTextView::MergeTextBlocks(
-	TEXTBLOCK *pBuf1, int nBlocks1,
-	TEXTBLOCK *pBuf2, int nBlocks2,
-	TEXTBLOCK *&pMergedBuf)
+void CCrystalTextView::MergeTextBlocks(TextBlock::Array &pBuf1, TextBlock::Array &pBuf2)
 {
-	pMergedBuf = new TEXTBLOCK[nBlocks1 + nBlocks2];
+	int const nBlocks1 = pBuf1.m_nActualItems;
+	int const nBlocks2 = pBuf2.m_nActualItems;
+	TextBlock::Array pMergedBuf = new TextBlock[nBlocks1 + nBlocks2];
 	int i = 0, j = 0, k = 0;
 	while (i < nBlocks1 || j < nBlocks2)
 	{
@@ -1344,7 +1387,8 @@ int CCrystalTextView::MergeTextBlocks(
 		}
 		k++;
 	}
-	return k;
+	pMergedBuf.m_nActualItems = k;
+	pMergedBuf.swap(pBuf1);
 }
 
 void CCrystalTextView::DrawSingleLine(HSurface *pdc, const RECT &rc, int nLineIndex)
@@ -1365,29 +1409,20 @@ void CCrystalTextView::DrawSingleLine(HSurface *pdc, const RECT &rc, int nLineIn
 
 		//  Parse the line
 		DWORD dwCookie = GetParseCookie (nLineIndex - 1);
-		TEXTBLOCK *pBuf = new TEXTBLOCK[(nLength+1) * 3]; // be aware of nLength == 0
+		TextBlock::Array pBuf = new TextBlock[(nLength + 1) * 3]; // be aware of nLength == 0
 
-		int nBlocks = 0;
 		// insert at least one textblock of normal color at the beginning
 		pBuf[0].m_nCharPos = 0;
 		pBuf[0].m_nColorIndex = COLORINDEX_NORMALTEXT;
 		pBuf[0].m_nBgColorIndex = COLORINDEX_BKGND;
-		nBlocks++;
+		++pBuf.m_nActualItems;
 
-		m_ParseCookies[nLineIndex] = ParseLine(dwCookie, nLineIndex, pBuf, nBlocks);
-		ASSERT(m_ParseCookies[nLineIndex] != - 1);
+		m_ParseCookies[nLineIndex] = ParseLine(dwCookie, nLineIndex, pBuf);
+		ASSERT(m_ParseCookies[nLineIndex] != -1);
 
-		TEXTBLOCK *pAddedBuf = NULL;
-		int nAddedBlocks = GetAdditionalTextBlocks(nLineIndex, pAddedBuf);
-
-		TEXTBLOCK *pMergedBuf;
-		int nMergedBlocks = MergeTextBlocks(pBuf, nBlocks, pAddedBuf, nAddedBlocks, pMergedBuf);
-
-		delete[] pBuf;
-		delete[] pAddedBuf;
-
-		pBuf = pMergedBuf;
-		nBlocks = nMergedBlocks;
+		TextBlock::Array pAddedBuf = NULL;
+		GetAdditionalTextBlocks(nLineIndex, pAddedBuf);
+		MergeTextBlocks(pBuf, pAddedBuf);
 
 		int nActualItem = 0;
 		int nActualOffset = 0;
@@ -1410,13 +1445,12 @@ void CCrystalTextView::DrawSingleLine(HSurface *pdc, const RECT &rc, int nLineIn
 			ASSERT(anBreaks[i] >= 0 && anBreaks[i] <= nLength);
 			DrawScreenLine(
 				pdc, origin, rc,
-				pBuf, nBlocks, nActualItem,
+				pBuf, nActualItem,
 				crText, crBkgnd,
 				pszChars, anBreaks[i], anBreaks[i + 1] - anBreaks[i],
 				nActualOffset, nLineIndex);
 		}
 
-		delete[] pBuf;
 		// Draw empty sublines
 		if (int nEmptySubLines = GetEmptySubLines(nLineIndex))
 		{
@@ -1566,27 +1600,19 @@ void CCrystalTextView::GetHTMLLine(int nLineIndex, String &strHTML)
 
 	// Parse the line
 	DWORD dwCookie = GetParseCookie(nLineIndex - 1);
-	TEXTBLOCK *pBuf = new TEXTBLOCK[(nLength + 1) * 3]; // be aware of nLength == 0
-	int nBlocks = 0;
+	TextBlock::Array pBuf = new TextBlock[(nLength + 1) * 3]; // be aware of nLength == 0
 	// insert at least one textblock of normal color at the beginning
 	pBuf[0].m_nCharPos = 0;
 	pBuf[0].m_nColorIndex = COLORINDEX_NORMALTEXT;
 	pBuf[0].m_nBgColorIndex = COLORINDEX_BKGND;
-	nBlocks++;
-	m_ParseCookies[nLineIndex] = ParseLine(dwCookie, nLineIndex, pBuf, nBlocks);
+	++pBuf.m_nActualItems;
+	m_ParseCookies[nLineIndex] = ParseLine(dwCookie, nLineIndex, pBuf);
 	ASSERT(m_ParseCookies[nLineIndex] != - 1);
 
-	TEXTBLOCK *pAddedBuf = NULL;
-	int nAddedBlocks = GetAdditionalTextBlocks(nLineIndex, pAddedBuf);
+	TextBlock::Array pAddedBuf = NULL;
+	GetAdditionalTextBlocks(nLineIndex, pAddedBuf);
+	MergeTextBlocks(pBuf, pAddedBuf);
 
-	TEXTBLOCK *pMergedBuf;
-	int nMergedBlocks = MergeTextBlocks(pBuf, nBlocks, pAddedBuf, nAddedBlocks, pMergedBuf);
-
-	delete[] pBuf;
-	delete[] pAddedBuf;
-
-	pBuf = pMergedBuf;
-	nBlocks = nMergedBlocks;
 	///////
 
 	String strExpanded;
@@ -1597,10 +1623,10 @@ void CCrystalTextView::GetHTMLLine(int nLineIndex, String &strHTML)
 	strHTML += _T("<code>");
 
 	int i = 0;
-	while (i < nBlocks)
+	while (i < pBuf.m_nActualItems)
 	{
 		int j = i + 1;
-		int nBlockLength = (j < nBlocks ? pBuf[j].m_nCharPos : nLength) - pBuf[i].m_nCharPos;
+		int nBlockLength = (j < pBuf.m_nActualItems ? pBuf[j].m_nCharPos : nLength) - pBuf[i].m_nCharPos;
 		nActualOffset += ExpandChars(pszChars, pBuf[i].m_nCharPos, nBlockLength, strExpanded, nActualOffset);
 		if (!strExpanded.empty())
 		{
@@ -1614,8 +1640,6 @@ void CCrystalTextView::GetHTMLLine(int nLineIndex, String &strHTML)
 	}
 
 	strHTML += _T("</code>");
-
-	delete[] pBuf;
 }
 
 COLORREF CCrystalTextView::GetColor(int nColorIndex)
@@ -2850,14 +2874,14 @@ void CCrystalTextView::OnSetFocus()
 	UpdateCaret();
 }
 
-DWORD CCrystalTextView::ParseLinePlain(DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActualItems)
+DWORD CCrystalTextView::ParseLinePlain(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf)
 {
 	return 0;
 }
 
-DWORD CCrystalTextView::ParseLine(DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActualItems)
+DWORD CCrystalTextView::ParseLine(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf)
 {
-	return (this->*(m_CurSourceDef->ParseLineX))(dwCookie, nLineIndex, pBuf, nActualItems);
+	return (this->*(m_CurSourceDef->ParseLineX))(dwCookie, nLineIndex, pBuf);
 }
 
 int CCrystalTextView::CalculateActualOffset(int nLineIndex, int nCharIndex, BOOL bAccumulate)
@@ -4215,15 +4239,6 @@ void CCrystalTextView::SetWordWrapping(bool bWordWrap)
 	{
 		OnSize();
 	}
-}
-
-CCrystalParser *CCrystalTextView::SetParser(CCrystalParser *pParser)
-{
-	CCrystalParser *pOldParser = m_pParser;
-	m_pParser = pParser;
-	if (pParser)
-		pParser->m_pTextView = this;
-	return pOldParser;
 }
 
 bool CCrystalTextView::IsTextBufferInitialized() const

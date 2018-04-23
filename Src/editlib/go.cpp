@@ -106,18 +106,7 @@ static BOOL IsUser1Keyword(LPCTSTR pszChars, int nLength)
 	return xiskeyword<_tcsncmp>(pszChars, nLength, s_apszUser1KeywordList);
 }
 
-#define DEFINE_BLOCK(pos, colorindex) \
-	ASSERT((pos) >= 0 && (pos) <= nLength); \
-	if (pBuf != NULL) \
-	{ \
-		if (nActualItems == 0 || pBuf[nActualItems - 1].m_nCharPos <= (pos)) \
-		{ \
-			pBuf[nActualItems].m_nCharPos = (pos); \
-			pBuf[nActualItems].m_nColorIndex = (colorindex); \
-			pBuf[nActualItems].m_nBgColorIndex = COLORINDEX_BKGND; \
-			++nActualItems; \
-		} \
-	}
+#define DEFINE_BLOCK pBuf.DefineBlock
 
 #define COOKIE_COMMENT          0x0001
 #define COOKIE_EXT_COMMENT      0x0004
@@ -125,7 +114,7 @@ static BOOL IsUser1Keyword(LPCTSTR pszChars, int nLength)
 #define COOKIE_CHAR             0x0010
 #define COOKIE_RAWSTRING        0x0020
 
-DWORD CCrystalTextView::ParseLineGo(DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActualItems)
+DWORD CCrystalTextView::ParseLineGo(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf)
 {
 	int const nLength = GetLineLength(nLineIndex);
 	if (nLength == 0)

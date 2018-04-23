@@ -82,7 +82,6 @@ CMergeEditView::CMergeEditView(HWindow *pWnd, CChildFrame *pDocument, int nThisP
 	ASSERT(m_hShellContextMenu == NULL);
 	Subclass(pWnd);
 	RegisterDragDrop(m_hWnd, this);
-	SetParser(&m_xParser);
 }
 
 CMergeEditView::~CMergeEditView()
@@ -143,7 +142,7 @@ LRESULT CMergeEditView::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	}
-	return CCrystalEditViewEx::WindowProc(uMsg, wParam, lParam);
+	return CCrystalEditView::WindowProc(uMsg, wParam, lParam);
 }
 
 void CMergeEditView::OnNotity(LPARAM lParam)
@@ -531,7 +530,7 @@ void CMergeEditView::OnEditOperation(int nAction, LPCTSTR pszText)
 	m_pDocument->SetEditedAfterRescan(m_nThisPane);
 
 	// perform original function
-	CCrystalEditViewEx::OnEditOperation(nAction, pszText);
+	CCrystalEditView::OnEditOperation(nAction, pszText);
 
 	// augment with additional operations
 

@@ -61,7 +61,6 @@ Maybe in the future...
 class CMergeEditView : public CGhostTextView
 {
 public:
-	CCrystalParser m_xParser; /**< Syntax parser used for syntax highlighting. */
 	// Object that displays status line info for one side of a merge view
 	HStatusBar *m_pStatusBar;
 

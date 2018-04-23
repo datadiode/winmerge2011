@@ -498,15 +498,6 @@
     <ClCompile Include="editlib\cplusplus.cpp">
       <Filter>EditLib</Filter>
     </ClCompile>
-    <ClCompile Include="editlib\crystaleditviewex.cpp">
-      <Filter>EditLib</Filter>
-    </ClCompile>
-    <ClCompile Include="editlib\crystalparser.cpp">
-      <Filter>EditLib</Filter>
-    </ClCompile>
-    <ClCompile Include="editlib\crystaltextblock.cpp">
-      <Filter>EditLib</Filter>
-    </ClCompile>
     <ClCompile Include="editlib\csharp.cpp">
       <Filter>EditLib</Filter>
     </ClCompile>
@@ -1125,15 +1116,6 @@
       <Filter>EditLib</Filter>
     </ClInclude>
     <ClInclude Include="editlib\cfindtextdlg.h">
-      <Filter>EditLib</Filter>
-    </ClInclude>
-    <ClInclude Include="editlib\crystaleditviewex.h">
-      <Filter>EditLib</Filter>
-    </ClInclude>
-    <ClInclude Include="editlib\crystalparser.h">
-      <Filter>EditLib</Filter>
-    </ClInclude>
-    <ClInclude Include="editlib\crystaltextblock.h">
       <Filter>EditLib</Filter>
     </ClInclude>
     <ClInclude Include="editlib\editcmd.h">

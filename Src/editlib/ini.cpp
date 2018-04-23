@@ -26,16 +26,7 @@
 
 using CommonKeywords::IsNumeric;
 
-#define DEFINE_BLOCK(pos, colorindex)   \
-ASSERT((pos) >= 0 && (pos) <= nLength);\
-if (pBuf != NULL)\
-  {\
-    if (nActualItems == 0 || pBuf[nActualItems - 1].m_nCharPos <= (pos)){\
-        pBuf[nActualItems].m_nCharPos = (pos);\
-        pBuf[nActualItems].m_nColorIndex = (colorindex);\
-        pBuf[nActualItems].m_nBgColorIndex = COLORINDEX_BKGND;\
-        nActualItems ++;}\
-  }
+#define DEFINE_BLOCK pBuf.DefineBlock
 
 #define COOKIE_COMMENT          0x0001
 #define COOKIE_PREPROCESSOR     0x0002
@@ -45,7 +36,7 @@ if (pBuf != NULL)\
 #define COOKIE_SECTION          0x0020
 #define COOKIE_KEY              0x0040
 
-DWORD CCrystalTextView::ParseLineIni(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems)
+DWORD CCrystalTextView::ParseLineIni(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf)
 {
   const int nLength = GetLineLength(nLineIndex);
   if (nLength == 0)

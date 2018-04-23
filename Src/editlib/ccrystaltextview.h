@@ -30,7 +30,7 @@
  */
 #pragma once
 
-#include "crystalparser.h"
+#include "SyntaxColors.h"
 
 ////////////////////////////////////////////////////////////////////////////
 // Forward class declarations
@@ -38,7 +38,6 @@
 class CCrystalTextBuffer;
 class CUpdateContext;
 struct ViewableWhitespaceChars;
-class CSyntaxColors;
 
 ////////////////////////////////////////////////////////////////////////////
 // CCrystalTextView class declaration
@@ -78,8 +77,6 @@ class CCrystalTextView
 	, public IDropSource
 	, public IDataObject
 {
-	friend CCrystalParser;
-
 public:
 	typedef int Captures[30];
 
@@ -251,7 +248,6 @@ protected:
 
 	//BEGIN SW
 	bool m_bWordWrap;
-	CCrystalParser *m_pParser;
 	//END SW
 
 	POINT ClientToText(const POINT &);
@@ -541,25 +537,56 @@ protected:
 	//END SW
 
 	//  Syntax coloring overrides
-	struct TEXTBLOCK
+	class TextBlock
 	{
+	private:
+		~TextBlock() { } // prevents deletion from outside TextBlock::Array
+	public:
 		int m_nCharPos;
 		int m_nColorIndex;
 		int m_nBgColorIndex;
+		class Array
+		{
+		private:
+			TextBlock *m_pBuf;
+		public:
+			int m_nActualItems;
+			Array(TextBlock *pBuf) : m_pBuf(pBuf), m_nActualItems(0) { }
+			~Array() { delete[] m_pBuf; }
+			operator TextBlock *() { return m_pBuf; }
+			void swap(Array &other)
+			{
+				std::swap(m_pBuf, other.m_pBuf);
+				std::swap(m_nActualItems, other.m_nActualItems);
+			}
+			__forceinline void DefineBlock(int pos, int colorindex)
+			{
+				if (m_pBuf != NULL)
+				{
+					if (m_nActualItems == 0 || m_pBuf[m_nActualItems - 1].m_nCharPos <= pos)
+					{
+						m_pBuf[m_nActualItems].m_nCharPos = pos;
+						m_pBuf[m_nActualItems].m_nColorIndex = colorindex;
+						m_pBuf[m_nActualItems].m_nBgColorIndex = COLORINDEX_BKGND;
+						++m_nActualItems;
+					}
+				}
+			}
+		};
 	};
 
 	//BEGIN SW
 	// function to draw a single screen line
 	// (a wrapped line can consist of many screen lines
 	void DrawScreenLine(HSurface *pdc, POINT &ptOrigin, const RECT &rcClip,
-		TEXTBLOCK *pBuf, int nBlocks, int &nActualItem,
+		TextBlock::Array &pBuf, int &nActualItem,
 		COLORREF crText, COLORREF crBkgnd,
 		LPCTSTR pszChars,
 		int nOffset, int nCount, int &nActualOffset, int nLineIndex);
 	//END SW
 
-	int MergeTextBlocks(TEXTBLOCK *pBuf1, int nBlocks1, TEXTBLOCK *pBuf2, int nBlocks2, TEXTBLOCK *&pBufMerged);
-	virtual int GetAdditionalTextBlocks(int nLineIndex, TEXTBLOCK *&pBuf);
+	void MergeTextBlocks(TextBlock::Array &pBuf1, TextBlock::Array &pBuf2);
+	virtual void GetAdditionalTextBlocks(int nLineIndex, TextBlock::Array &pBuf);
 
 public:
 	void GetHTMLLine(int nLineIndex, String &);
@@ -567,43 +594,43 @@ public:
 	void GetHTMLAttribute(int nColorIndex, int nBgColorIndex, COLORREF crText, COLORREF crBkgnd, String &);
 
 	void GoToLine(int nLine, bool bRelative);
-	DWORD ParseLine(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-	DWORD ParseLinePlain(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-	DWORD ParseLineAsp(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-	DWORD ParseLineBasic(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-	DWORD ParseLineBatch(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-	DWORD ParseLineC(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-	DWORD ParseLineCSharp(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-	DWORD ParseLineCss(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-	DWORD ParseLineDcl(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-	DWORD ParseLineFortran(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-	DWORD ParseLineGo(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-	DWORD ParseLineHtml(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-	DWORD ParseLineIni(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-	DWORD ParseLineInnoSetup(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-	DWORD ParseLineIS(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-	DWORD ParseLineJava(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-	DWORD ParseLineLisp(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-	DWORD ParseLineNsis(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-	DWORD ParseLinePascal(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-	DWORD ParseLinePerl(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-	DWORD ParseLinePhp(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-	DWORD ParseLinePo(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-	DWORD ParseLinePowerShell(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-	DWORD ParseLinePython(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-	DWORD ParseLineRexx(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-	DWORD ParseLineRsrc(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-	DWORD ParseLineRuby(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-	DWORD ParseLineRust(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-	DWORD ParseLineSgml(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-	DWORD ParseLineSh(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-	DWORD ParseLineSiod(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-	DWORD ParseLineSql(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-	DWORD ParseLineTcl(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-	DWORD ParseLineTex(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-	DWORD ParseLineVerilog(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
-	DWORD ParseLineVhdl(DWORD dwCookie, int nLineIndex, TEXTBLOCK * pBuf, int &nActualItems);
-	DWORD ParseLineXml(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+	DWORD ParseLine(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf);
+	DWORD ParseLinePlain(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf);
+	DWORD ParseLineAsp(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf);
+	DWORD ParseLineBasic(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf);
+	DWORD ParseLineBatch(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf);
+	DWORD ParseLineC(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf);
+	DWORD ParseLineCSharp(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf);
+	DWORD ParseLineCss(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf);
+	DWORD ParseLineDcl(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf);
+	DWORD ParseLineFortran(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf);
+	DWORD ParseLineGo(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf);
+	DWORD ParseLineHtml(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf);
+	DWORD ParseLineIni(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf);
+	DWORD ParseLineInnoSetup(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf);
+	DWORD ParseLineIS(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf);
+	DWORD ParseLineJava(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf);
+	DWORD ParseLineLisp(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf);
+	DWORD ParseLineNsis(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf);
+	DWORD ParseLinePascal(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf);
+	DWORD ParseLinePerl(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf);
+	DWORD ParseLinePhp(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf);
+	DWORD ParseLinePo(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf);
+	DWORD ParseLinePowerShell(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf);
+	DWORD ParseLinePython(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf);
+	DWORD ParseLineRexx(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf);
+	DWORD ParseLineRsrc(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf);
+	DWORD ParseLineRuby(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf);
+	DWORD ParseLineRust(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf);
+	DWORD ParseLineSgml(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf);
+	DWORD ParseLineSh(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf);
+	DWORD ParseLineSiod(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf);
+	DWORD ParseLineSql(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf);
+	DWORD ParseLineTcl(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf);
+	DWORD ParseLineTex(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf);
+	DWORD ParseLineVerilog(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf);
+	DWORD ParseLineVhdl(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf);
+	DWORD ParseLineXml(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf);
 	// Attributes
 public:
 	bool GetViewTabs() const;
@@ -628,14 +655,6 @@ public:
 	bool GetWordWrapping() const;
 	void SetWordWrapping(bool);
 
-	/**
-	Sets the Parser to use to parse the file.
-
-	@param pParser Pointer to parser to use. Set to NULL to use no parser.
-
-	@return Pointer to parser used before or NULL, if no parser has been used before.
-	*/
-	CCrystalParser *SetParser(CCrystalParser *pParser);
 	//END SW
 
 	int m_nLastFindWhatLen;
@@ -688,7 +707,7 @@ public:
 		TextType type;
 		LPCTSTR name;
 		LPCTSTR exts;
-		DWORD (CCrystalTextView::*ParseLineX)(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems);
+		DWORD (CCrystalTextView::*ParseLineX)(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf);
 		DWORD flags;
 		LPCTSTR opencomment;
 		LPCTSTR closecomment;

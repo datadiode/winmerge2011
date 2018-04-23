@@ -315,16 +315,7 @@ static BOOL IsVerilogNumber(LPCTSTR pszChars, int nLength)
   return _istdigit(pszChars[0]);
 }
 
-#define DEFINE_BLOCK(pos, colorindex)   \
-ASSERT((pos) >= 0 && (pos) <= nLength);\
-if (pBuf != NULL)\
-  {\
-    if (nActualItems == 0 || pBuf[nActualItems - 1].m_nCharPos <= (pos)){\
-        pBuf[nActualItems].m_nCharPos = (pos);\
-        pBuf[nActualItems].m_nColorIndex = (colorindex);\
-        pBuf[nActualItems].m_nBgColorIndex = COLORINDEX_BKGND;\
-        nActualItems ++;}\
-  }
+#define DEFINE_BLOCK pBuf.DefineBlock
 
 #define COOKIE_COMMENT          0x0001
 #define COOKIE_PREPROCESSOR     0x0002
@@ -332,7 +323,7 @@ if (pBuf != NULL)\
 #define COOKIE_STRING           0x0008
 #define COOKIE_CHAR             0x0010
 
-DWORD CCrystalTextView::ParseLineVerilog(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, int &nActualItems)
+DWORD CCrystalTextView::ParseLineVerilog(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf)
 {
   const int nLength = GetLineLength(nLineIndex);
   if (nLength == 0)
