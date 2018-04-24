@@ -143,7 +143,6 @@ static BOOL IsCppKeyword(LPCTSTR pszChars, int nLength)
 		_T("thread_local"),
 		_T("throw"),
 		_T("transient"),
-		_T("transient"),
 		_T("true"),
 		_T("try"),
 		_T("typedef"),
@@ -449,14 +448,14 @@ TESTCASE
 	while (_fgetts(text, _countof(text), file))
 	{
 		TCHAR c, *p, *q;
-		if (pfnIsKeyword && (p = _tcschr(text, '"')) != NULL && (q = _tcschr(++p, '"')) != NULL)
-			assert(pfnIsKeyword(p, static_cast<int>(q - p)));
+		if ((p = _tcschr(text, '"')) != NULL && (q = _tcschr(++p, '"')) != NULL)
+			VerifyKeyword<_tcsncmp>(pfnIsKeyword, p, static_cast<int>(q - p));
 		else if (_stscanf(text, _T(" static BOOL IsCppKeyword %c"), &c) == 1 && c == '(')
 			pfnIsKeyword = IsCppKeyword;
 		else if (_stscanf(text, _T(" static BOOL IsUser1Keyword %c"), &c) == 1 && c == '(')
 			pfnIsKeyword = IsUser1Keyword;
 		else if (pfnIsKeyword && _stscanf(text, _T(" } %c"), &c) == 1 && (c == ';' ? ++count : 0))
-			pfnIsKeyword = NULL;
+			VerifyKeyword<_tcsncmp>(pfnIsKeyword = NULL, NULL, 0);
 	}
 	fclose(file);
 	assert(count == 2);

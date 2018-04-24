@@ -5,12 +5,6 @@
  */
 #pragma once
 
-int xisalnum(wint_t c);
-int xisspecial(wint_t c);
-int xisalpha(wint_t c);
-int xisalnum(wint_t c);
-int xisspace(wint_t c);
-
 // Convert any negative inputs to negative char equivalents
 // This is aimed at correcting any chars mistakenly 
 // sign-extended to negative ints.
@@ -59,6 +53,21 @@ inline int xisxdigit(wint_t c)
 inline int xisspace(wint_t c)
 {
 	return _istspace(normch(c));
+}
+
+/**
+ * @brief Unit test helper.
+ */
+template<int (*compare)(LPCTSTR, LPCTSTR, size_t)>
+void VerifyKeyword(BOOL (*pfnIsKeyword)(LPCTSTR, int), LPCTSTR key, int len)
+{
+	static TCHAR match[100] = _T("");
+	// Is the same keyword listed twice?
+	assert(compare(match, key, len) != 0 || match[len] != _T('\0'));
+	memcpy(match, key, len * sizeof(TCHAR));
+	match[len] = _T('\0');
+	// Is there an issue with keyword detection?
+	assert(pfnIsKeyword == NULL || pfnIsKeyword(key, len));
 }
 
 template<int (*compare)(LPCTSTR, LPCTSTR, size_t)>
