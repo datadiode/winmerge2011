@@ -27,45 +27,45 @@ using CommonKeywords::IsNumeric;
 
 static BOOL IsSqlKeyword(LPCTSTR pszChars, int nLength)
 {
-  static LPCTSTR const s_apszSqlKeywordList[] =
-  {
-    _T ("all"),
-    _T ("and"),
-    _T ("by"),
-    _T ("distinct"),
-    _T ("from"),
-    _T ("group"),
-    _T ("in"),
-    _T ("insert"),
-    _T ("into"),
-    _T ("join"),
-    _T ("not"),
-    _T ("or"),
-    _T ("order"),
-    _T ("select"),
-    _T ("union"),
-    _T ("update"),
-    _T ("where"),
-  };
-  return xiskeyword<_tcsnicmp>(pszChars, nLength, s_apszSqlKeywordList);
+	static LPCTSTR const s_apszSqlKeywordList[] =
+	{
+		_T("all"),
+		_T("and"),
+		_T("by"),
+		_T("distinct"),
+		_T("from"),
+		_T("group"),
+		_T("in"),
+		_T("insert"),
+		_T("into"),
+		_T("join"),
+		_T("not"),
+		_T("or"),
+		_T("order"),
+		_T("select"),
+		_T("union"),
+		_T("update"),
+		_T("where"),
+	};
+	return xiskeyword<_tcsnicmp>(pszChars, nLength, s_apszSqlKeywordList);
 }
 
 static BOOL IsUser1Keyword(LPCTSTR pszChars, int nLength)
 {
-  static LPCTSTR const s_apszUser1KeywordList[] =
-  {
-    _T ("BYTE"),
-    _T ("CHAR"),
-    _T ("DATE"),
-    _T ("DOUBLE"),
-    _T ("INTEGER"),
-    _T ("MEMO"),
-    _T ("REAL"),
-    _T ("TIME"),
-    _T ("VARCHAR"),
-    _T ("WORD"),
-  };
-  return xiskeyword<_tcsnicmp>(pszChars, nLength, s_apszUser1KeywordList);
+	static LPCTSTR const s_apszUser1KeywordList[] =
+	{
+		_T("BYTE"),
+		_T("CHAR"),
+		_T("DATE"),
+		_T("DOUBLE"),
+		_T("INTEGER"),
+		_T("MEMO"),
+		_T("REAL"),
+		_T("TIME"),
+		_T("VARCHAR"),
+		_T("WORD"),
+	};
+	return xiskeyword<_tcsnicmp>(pszChars, nLength, s_apszUser1KeywordList);
 }
 
 #define DEFINE_BLOCK pBuf.DefineBlock
@@ -76,232 +76,174 @@ static BOOL IsUser1Keyword(LPCTSTR pszChars, int nLength)
 #define COOKIE_STRING           0x0008
 #define COOKIE_CHAR             0x0010
 
+/**
+ * Some SQL implementations support nested comments, but they aren't standard.
+ * @see https://cloud.google.com/bigquery/docs/reference/standard-sql/lexical
+ */
 DWORD CCrystalTextView::ParseLineSql(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf)
 {
-  const int nLength = GetLineLength(nLineIndex);
-  if (nLength == 0)
-    return dwCookie & COOKIE_EXT_COMMENT;
+	int const nLength = GetLineLength(nLineIndex);
+	if (nLength == 0)
+		return dwCookie & COOKIE_EXT_COMMENT;
 
-  const LPCTSTR pszChars = GetLineChars(nLineIndex);
-  BOOL bFirstChar = (dwCookie & ~COOKIE_EXT_COMMENT) == 0;
-  BOOL bRedefineBlock = TRUE;
-  BOOL bWasCommentStart = FALSE;
-  BOOL bDecIndex = FALSE;
-  int nIdentBegin = -1;
-  int nPrevI = -1;
-  int I;
-  for (I = 0; I <= nLength; nPrevI = I++)
-    {
-      if (bRedefineBlock)
-        {
-          int nPos = I;
-          if (bDecIndex)
-            nPos = nPrevI;
-          if (dwCookie & (COOKIE_COMMENT | COOKIE_EXT_COMMENT))
-            {
-              DEFINE_BLOCK(nPos, COLORINDEX_COMMENT);
-            }
-          else if (dwCookie & (COOKIE_CHAR | COOKIE_STRING))
-            {
-              DEFINE_BLOCK(nPos, COLORINDEX_STRING);
-            }
-          else
-            {
-              if (xisalnum(pszChars[nPos]) || pszChars[nPos] == '.' && nPos > 0 && (!xisalpha(pszChars[nPos - 1]) && !xisalpha(pszChars[nPos + 1])))
-                {
-                  DEFINE_BLOCK(nPos, COLORINDEX_NORMALTEXT);
-                }
-              else
-                {
-                  DEFINE_BLOCK(nPos, COLORINDEX_OPERATOR);
-                  bRedefineBlock = TRUE;
-                  bDecIndex = TRUE;
-                  goto out;
-                }
-            }
-          bRedefineBlock = FALSE;
-          bDecIndex = FALSE;
-        }
-out:
+	LPCTSTR const pszChars = GetLineChars(nLineIndex);
+	BOOL bRedefineBlock = TRUE;
+	BOOL bWasCommentStart = FALSE;
+	BOOL bDecIndex = FALSE;
+	int nIdentBegin = -1;
+	int I = -1;
+	do
+	{
+		int const nPrevI = I++;
+		if (bRedefineBlock)
+		{
+			int const nPos = bDecIndex ? nPrevI : I;
+			bRedefineBlock = FALSE;
+			bDecIndex = FALSE;
+			if (dwCookie & (COOKIE_COMMENT | COOKIE_EXT_COMMENT))
+			{
+				DEFINE_BLOCK(nPos, COLORINDEX_COMMENT);
+			}
+			else if (dwCookie & (COOKIE_CHAR | COOKIE_STRING))
+			{
+				DEFINE_BLOCK(nPos, COLORINDEX_STRING);
+			}
+			else if (xisalnum(pszChars[nPos]) || pszChars[nPos] == '.' && nPos > 0 && (!xisalpha(pszChars[nPos - 1]) && !xisalpha(pszChars[nPos + 1])))
+			{
+				DEFINE_BLOCK(nPos, COLORINDEX_NORMALTEXT);
+			}
+			else
+			{
+				DEFINE_BLOCK(nPos, COLORINDEX_OPERATOR);
+				bRedefineBlock = TRUE;
+				bDecIndex = TRUE;
+			}
+		}
+		// Can be bigger than length if there is binary data
+		// See bug #1474782 Crash when comparing SQL with with binary data
+		if (I < nLength)
+		{
+			if (dwCookie & COOKIE_COMMENT)
+			{
+				DEFINE_BLOCK(I, COLORINDEX_COMMENT);
+				dwCookie |= COOKIE_COMMENT;
+				break;
+			}
 
-      // Can be bigger than length if there is binary data
-      // See bug #1474782 Crash when comparing SQL with with binary data
-      if (I >= nLength)
-        break;
+			//  String constant "...."
+			if (dwCookie & COOKIE_STRING)
+			{
+				if (pszChars[I] == '"' && (I == 0 || I == 1 && pszChars[nPrevI] != '\\' || I >= 2 && (pszChars[nPrevI] != '\\' || pszChars[nPrevI] == '\\' && pszChars[nPrevI - 1] == '\\')))
+				{
+					dwCookie &= ~COOKIE_STRING;
+					bRedefineBlock = TRUE;
+				}
+				continue;
+			}
 
-      if (dwCookie & COOKIE_COMMENT)
-        {
-          DEFINE_BLOCK(I, COLORINDEX_COMMENT);
-          dwCookie |= COOKIE_COMMENT;
-          break;
-        }
+			//  Char constant '..'
+			if (dwCookie & COOKIE_CHAR)
+			{
+				if (pszChars[I] == '\'' && (I == 0 || I == 1 && pszChars[nPrevI] != '\\' || I >= 2 && (pszChars[nPrevI] != '\\' || pszChars[nPrevI] == '\\' && pszChars[nPrevI - 1] == '\\')))
+				{
+					dwCookie &= ~COOKIE_CHAR;
+					bRedefineBlock = TRUE;
+				}
+				continue;
+			}
 
-      //  String constant "...."
-      if (dwCookie & COOKIE_STRING)
-        {
-          if (pszChars[I] == '"' && (I == 0 || I == 1 && pszChars[nPrevI] != '\\' || I >= 2 && (pszChars[nPrevI] != '\\' || pszChars[nPrevI] == '\\' && pszChars[nPrevI - 1] == '\\')))
-            {
-              dwCookie &= ~COOKIE_STRING;
-              bRedefineBlock = TRUE;
-            }
-          continue;
-        }
+			//  Extended comment /*....*/
+			if (dwCookie & COOKIE_EXT_COMMENT)
+			{
+				if (I > 0 && pszChars[I] == '/' && pszChars[nPrevI] == '*' && !bWasCommentStart)
+				{
+					dwCookie &= ~COOKIE_EXT_COMMENT;
+					bRedefineBlock = TRUE;
+				}
+				bWasCommentStart = FALSE;
+				continue;
+			}
 
-      //  Char constant '..'
-      if (dwCookie & COOKIE_CHAR)
-        {
-          if (pszChars[I] == '\'' && (I == 0 || I == 1 && pszChars[nPrevI] != '\\' || I >= 2 && (pszChars[nPrevI] != '\\' || pszChars[nPrevI] == '\\' && pszChars[nPrevI - 1] == '\\')))
-            {
-              dwCookie &= ~COOKIE_CHAR;
-              bRedefineBlock = TRUE;
-            }
-          continue;
-        }
+			if (I > 0 && pszChars[I] == '-' && pszChars[nPrevI] == '-')
+			{
+				DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
+				dwCookie |= COOKIE_COMMENT;
+				break;
+			}
 
-      //  Extended comment /*....*/
-      if (dwCookie & COOKIE_EXT_COMMENT)
-        {
-          // if (I > 0 && pszChars[I] == '/' && pszChars[nPrevI] == '*')
-          if ((I > 1 && pszChars[I] == '/' && pszChars[nPrevI] == '*' /*&& pszChars[nPrevI - 1] != '/'*/ && !bWasCommentStart) || (I == 1 && pszChars[I] == '/' && pszChars[nPrevI] == '*'))
-            {
-              dwCookie &= ~COOKIE_EXT_COMMENT;
-              bRedefineBlock = TRUE;
-            }
-          bWasCommentStart = FALSE;
-          continue;
-        }
+			//  Normal text
+			if (pszChars[I] == '"')
+			{
+				DEFINE_BLOCK(I, COLORINDEX_STRING);
+				dwCookie |= COOKIE_STRING;
+				continue;
+			}
+			if (pszChars[I] == '\'')
+			{
+				if (I == 0 || !xisxdigit(pszChars[nPrevI]))
+				{
+					DEFINE_BLOCK(I, COLORINDEX_STRING);
+					dwCookie |= COOKIE_CHAR;
+					continue;
+				}
+			}
+			if (I > 0 && pszChars[I] == '*' && pszChars[nPrevI] == '/')
+			{
+				DEFINE_BLOCK(I - 1, COLORINDEX_COMMENT);
+				dwCookie |= COOKIE_EXT_COMMENT;
+				bWasCommentStart = TRUE;
+				continue;
+			}
 
-      if (I > 0 && pszChars[I] == '/' && pszChars[nPrevI] == '/')
-        {
-          DEFINE_BLOCK(I - 1, COLORINDEX_COMMENT);
-          dwCookie |= COOKIE_COMMENT;
-          break;
-        }
+			bWasCommentStart = FALSE;
 
-      //  Normal text
-      if (pszChars[I] == '"')
-        {
-          DEFINE_BLOCK(I, COLORINDEX_STRING);
-          dwCookie |= COOKIE_STRING;
-          continue;
-        }
-      if (pszChars[I] == '\'')
-        {
-          // if (I + 1 < nLength && pszChars[I + 1] == '\'' || I + 2 < nLength && pszChars[I + 1] != '\\' && pszChars[I + 2] == '\'' || I + 3 < nLength && pszChars[I + 1] == '\\' && pszChars[I + 3] == '\'')
-          if (!I || !xisalnum(pszChars[nPrevI]))
-            {
-              DEFINE_BLOCK(I, COLORINDEX_STRING);
-              dwCookie |= COOKIE_CHAR;
-              continue;
-            }
-        }
-      if (I > 0 && pszChars[I] == '*' && pszChars[nPrevI] == '/')
-        {
-          DEFINE_BLOCK(I - 1, COLORINDEX_COMMENT);
-          dwCookie |= COOKIE_EXT_COMMENT;
-          bWasCommentStart = TRUE;
-          continue;
-        }
+			if (pBuf == NULL)
+				continue; // No need to extract keywords, so skip rest of loop
 
-      bWasCommentStart = FALSE;
+			if (xisalnum(pszChars[I]) || pszChars[I] == '.' && I > 0 && (!xisalpha(pszChars[nPrevI]) && !xisalpha(pszChars[I + 1])))
+			{
+				if (nIdentBegin == -1)
+					nIdentBegin = I;
+				continue;
+			}
+		}
+		if (nIdentBegin >= 0)
+		{
+			if (IsSqlKeyword(pszChars + nIdentBegin, I - nIdentBegin))
+			{
+				DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
+			}
+			else if (IsUser1Keyword(pszChars + nIdentBegin, I - nIdentBegin))
+			{
+				DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER1);
+			}
+			else if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
+			{
+				DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
+			}
+			else
+			{
+				for (int j = I; j < nLength; j++)
+				{
+					if (!xisspace(pszChars[j]))
+					{
+						if (pszChars[j] == '(')
+						{
+							DEFINE_BLOCK(nIdentBegin, COLORINDEX_FUNCNAME);
+						}
+						break;
+					}
+				}
+			}
+			bRedefineBlock = TRUE;
+			bDecIndex = TRUE;
+			nIdentBegin = -1;
+		}
+	} while (I < nLength);
 
-      if (bFirstChar)
-        {
-          if (!xisspace(pszChars[I]))
-            bFirstChar = FALSE;
-        }
-
-      if (pBuf == NULL)
-        continue;               //  We don't need to extract keywords,
-      //  for faster parsing skip the rest of loop
-
-      if (xisalnum(pszChars[I]) || pszChars[I] == '.' && I > 0 && (!xisalpha(pszChars[nPrevI]) && !xisalpha(pszChars[I + 1])))
-        {
-          if (nIdentBegin == -1)
-            nIdentBegin = I;
-        }
-      else
-        {
-          if (nIdentBegin >= 0)
-            {
-              if (IsSqlKeyword(pszChars + nIdentBegin, I - nIdentBegin))
-                {
-                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
-                }
-              else if (IsUser1Keyword(pszChars + nIdentBegin, I - nIdentBegin))
-                {
-                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER1);
-                }
-              else if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
-                {
-                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
-                }
-              else
-                {
-                  bool bFunction = FALSE;
-
-                  for (int j = I; j < nLength; j++)
-                    {
-                      if (!xisspace(pszChars[j]))
-                        {
-                          if (pszChars[j] == '(')
-                            {
-                              bFunction = TRUE;
-                            }
-                          break;
-                        }
-                    }
-                  if (bFunction)
-                    {
-                      DEFINE_BLOCK(nIdentBegin, COLORINDEX_FUNCNAME);
-                    }
-                }
-              bRedefineBlock = TRUE;
-              bDecIndex = TRUE;
-              nIdentBegin = -1;
-            }
-        }
-    }
-
-  if (nIdentBegin >= 0)
-    {
-      if (IsSqlKeyword(pszChars + nIdentBegin, I - nIdentBegin))
-        {
-          DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
-        }
-      else if (IsUser1Keyword(pszChars + nIdentBegin, I - nIdentBegin))
-        {
-          DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER1);
-        }
-      else if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
-        {
-          DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
-        }
-      else
-        {
-          bool bFunction = FALSE;
-
-          for (int j = I; j < nLength; j++)
-            {
-              if (!xisspace(pszChars[j]))
-                {
-                  if (pszChars[j] == '(')
-                    {
-                      bFunction = TRUE;
-                    }
-                  break;
-                }
-            }
-          if (bFunction)
-            {
-              DEFINE_BLOCK(nIdentBegin, COLORINDEX_FUNCNAME);
-            }
-        }
-    }
-
-  if (pszChars[nLength - 1] != '\\')
-    dwCookie &= COOKIE_EXT_COMMENT;
-  return dwCookie;
+	if (pszChars[nLength - 1] != '\\')
+		dwCookie &= COOKIE_EXT_COMMENT;
+	return dwCookie;
 }
 
 TESTCASE
@@ -315,13 +257,13 @@ TESTCASE
 	{
 		TCHAR c, *p, *q;
 		if (pfnIsKeyword && (p = _tcschr(text, '"')) != NULL && (q = _tcschr(++p, '"')) != NULL)
-			assert(pfnIsKeyword(p, static_cast<int>(q - p)));
+			VerifyKeyword<_tcsnicmp>(pfnIsKeyword, p, static_cast<int>(q - p));
 		else if (_stscanf(text, _T(" static BOOL IsSqlKeyword %c"), &c) == 1 && c == '(')
 			pfnIsKeyword = IsSqlKeyword;
 		else if (_stscanf(text, _T(" static BOOL IsUser1Keyword %c"), &c) == 1 && c == '(')
 			pfnIsKeyword = IsUser1Keyword;
 		else if (pfnIsKeyword && _stscanf(text, _T(" } %c"), &c) == 1 && (c == ';' ? ++count : 0))
-			pfnIsKeyword = NULL;
+			VerifyKeyword<_tcsnicmp>(pfnIsKeyword = NULL, NULL, 0);
 	}
 	fclose(file);
 	assert(count == 2);
