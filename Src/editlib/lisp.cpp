@@ -381,7 +381,7 @@ DWORD CCrystalTextView::ParseLineLisp(DWORD dwCookie, int nLineIndex, TextBlock:
 			}
 			if (I > 0 && pszChars[I] == '|' && pszChars[nPrevI] == ';' && bWasComment != End)
 			{
-				DEFINE_BLOCK(I - 1, COLORINDEX_COMMENT);
+				DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
 				dwCookie |= COOKIE_EXT_COMMENT;
 				bWasComment = Start;
 				continue;
@@ -403,7 +403,7 @@ DWORD CCrystalTextView::ParseLineLisp(DWORD dwCookie, int nLineIndex, TextBlock:
 		{
 			if (IsLispKeyword(pszChars + nIdentBegin, I - nIdentBegin))
 			{
-				if (!_tcsnicmp (_T("defun"), pszChars + nIdentBegin, 5))
+				if (!_tcsncmp(_T("defun"), pszChars + nIdentBegin, 5))
 				{
 					bDefun = TRUE;
 				}
@@ -470,11 +470,11 @@ TESTCASE
 	{
 		TCHAR c, *p, *q;
 		if (pfnIsKeyword && (p = _tcschr(text, '"')) != NULL && (q = _tcschr(++p, '"')) != NULL)
-			assert(pfnIsKeyword(p, static_cast<int>(q - p)));
+			VerifyKeyword<_tcsncmp>(pfnIsKeyword, p, static_cast<int>(q - p));
 		else if (_stscanf(text, _T(" static BOOL IsLispKeyword %c"), &c) == 1 && c == '(')
 			pfnIsKeyword = IsLispKeyword;
 		else if (pfnIsKeyword && _stscanf(text, _T(" } %c"), &c) == 1 && (c == ';' ? ++count : 0))
-			pfnIsKeyword = NULL;
+			VerifyKeyword<_tcsncmp>(pfnIsKeyword = NULL, NULL, 0);
 	}
 	fclose(file);
 	assert(count == 1);
