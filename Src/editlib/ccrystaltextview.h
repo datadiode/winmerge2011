@@ -586,7 +586,7 @@ protected:
 	//END SW
 
 	void MergeTextBlocks(TextBlock::Array &pBuf1, TextBlock::Array &pBuf2);
-	virtual void GetAdditionalTextBlocks(int nLineIndex, TextBlock::Array &pBuf);
+	virtual void GetAdditionalTextBlocks(int nLineIndex, TextBlock::Array &pBuf) = 0;
 
 public:
 	void GetHTMLLine(int nLineIndex, String &);

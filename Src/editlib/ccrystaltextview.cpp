@@ -296,7 +296,7 @@ CCrystalTextView::TextDefinition CCrystalTextView::m_StaticSourceDefs[] =
 	SRC_RSRC, _T ("Resources"), _T ("rc;dlg;r16;r32;rc2"), &ParseLineRsrc, SRCOPT_AUTOINDENT, /*4,*/ _T ("/*"), _T ("*/"), _T ("//"),
 	SRC_RUBY, _T ("Ruby"), _T ("rb;rbw;rake;gemspec"), &ParseLineRuby, SRCOPT_AUTOINDENT|SRCOPT_EOLNUNIX, /*4,*/ _T (""), _T (""), _T ("#"),
 	SRC_RUST, _T ("Rust"), _T ("rs"), &ParseLineRust, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T ("/*"), _T ("*/"), _T ("//"),
-	SRC_SGML, _T ("Sgml"), _T ("sgml"), &ParseLineSgml, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T ("<!--"), _T ("-->"), _T (""),
+	SRC_SGML, _T ("Sgml"), _T ("sgm;sgml"), &ParseLineSgml, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T ("<!--"), _T ("-->"), _T (""),
 	SRC_SH, _T ("Shell"), _T ("sh;conf"), &ParseLineSh, SRCOPT_INSERTTABS|SRCOPT_AUTOINDENT|SRCOPT_EOLNUNIX, /*4,*/ _T (""), _T (""), _T ("#"),
 	SRC_SIOD, _T ("SIOD"), _T ("scm"), &ParseLineSiod, SRCOPT_AUTOINDENT|SRCOPT_BRACEGNU, /*2,*/ _T (";|"), _T ("|;"), _T (";"),
 	SRC_SQL, _T ("SQL"), _T ("sql"), &ParseLineSql, SRCOPT_AUTOINDENT, /*4,*/ _T ("/*"), _T ("*/"), _T ("//"),
@@ -1098,10 +1098,6 @@ DWORD CCrystalTextView::GetParseCookie(int nLineIndex)
 	return m_ParseCookies[nLineIndex];
 }
 
-void CCrystalTextView::GetAdditionalTextBlocks(int nLineIndex, TextBlock::Array &rBlocks)
-{
-}
-
 //BEGIN SW
 void CCrystalTextView::WrapLine(int nLineIndex, int *anBreaks, int &nBreaks)
 {
@@ -1389,6 +1385,7 @@ void CCrystalTextView::MergeTextBlocks(TextBlock::Array &pBuf1, TextBlock::Array
 	}
 	pMergedBuf.m_nActualItems = k;
 	pMergedBuf.swap(pBuf1);
+	TextBlock::Array(NULL).swap(pBuf2); // micro-optimize memory footprint
 }
 
 void CCrystalTextView::DrawSingleLine(HSurface *pdc, const RECT &rc, int nLineIndex)
