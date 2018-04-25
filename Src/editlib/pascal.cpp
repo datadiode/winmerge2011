@@ -28,88 +28,87 @@ using CommonKeywords::IsNumeric;
 // Pascal keywords
 static BOOL IsPascalKeyword(LPCTSTR pszChars, int nLength)
 {
-  static LPCTSTR const s_apszPascalKeywordList[] =
-  {
-    _T ("Abstract"),
-    _T ("and"),
-    _T ("array"),
-    _T ("As"),
-    _T ("asm"),
-    _T ("assembler"),
-    _T ("begin"),
-    _T ("case"),
-    _T ("Class"),
-    _T ("const"),
-    _T ("constructor"),
-    _T ("Default"),
-    _T ("destructor"),
-    _T ("div"),
-    _T ("do"),
-    _T ("downto"),
-    _T ("Dynamic"),
-    _T ("else"),
-    _T ("end"),
-    _T ("Except"),
-    _T ("exit"),
-    _T ("Export"),
-    _T ("external"),
-    _T ("far"),
-    _T ("file"),
-    _T ("Finally"),
-    _T ("for"),
-    _T ("function"),
-    _T ("goto"),
-    _T ("if"),
-    _T ("implementation"),
-    _T ("In"),
-    _T ("Index"),
-    _T ("inherited"),
-    _T ("inline"),
-    _T ("interface"),
-    _T ("Is"),
-    _T ("label"),
-    _T ("mod"),
-    _T ("near"),
-    _T ("nil"),
-    _T ("not"),
-    _T ("object"),
-    _T ("of"),
-    _T ("On"),
-    _T ("or"),
-    _T ("Out"),
-    _T ("Overload"),
-    _T ("Override"),
-    _T ("Packed"),
-    _T ("Private"),
-    _T ("procedure"),
-    _T ("program"),
-    _T ("Property"),
-    _T ("Protected"),
-    _T ("Public"),
-    _T ("Published"),
-    _T ("Raise"),
-    _T ("record"),
-    _T ("repeat"),
-    _T ("set"),
-    _T ("Shl"),
-    _T ("Shr"),
-    _T ("string"),
-    _T ("then"),
-    _T ("ThreadVar"),
-    _T ("to"),
-    _T ("Try"),
-    _T ("type"),
-    _T ("unit"),
-    _T ("until"),
-    _T ("uses"),
-    _T ("var"),
-    _T ("virtual"),
-    _T ("Virtual"),
-    _T ("while"),
-    _T ("with"),
-    _T ("xor"),
-  };
-  return xiskeyword<_tcsnicmp>(pszChars, nLength, s_apszPascalKeywordList);
+	static LPCTSTR const s_apszPascalKeywordList[] =
+	{
+		_T("Abstract"),
+		_T("and"),
+		_T("array"),
+		_T("As"),
+		_T("asm"),
+		_T("assembler"),
+		_T("begin"),
+		_T("case"),
+		_T("Class"),
+		_T("const"),
+		_T("constructor"),
+		_T("Default"),
+		_T("destructor"),
+		_T("div"),
+		_T("do"),
+		_T("downto"),
+		_T("Dynamic"),
+		_T("else"),
+		_T("end"),
+		_T("Except"),
+		_T("exit"),
+		_T("Export"),
+		_T("external"),
+		_T("far"),
+		_T("file"),
+		_T("Finally"),
+		_T("for"),
+		_T("function"),
+		_T("goto"),
+		_T("if"),
+		_T("implementation"),
+		_T("In"),
+		_T("Index"),
+		_T("inherited"),
+		_T("inline"),
+		_T("interface"),
+		_T("Is"),
+		_T("label"),
+		_T("mod"),
+		_T("near"),
+		_T("nil"),
+		_T("not"),
+		_T("object"),
+		_T("of"),
+		_T("On"),
+		_T("or"),
+		_T("Out"),
+		_T("Overload"),
+		_T("Override"),
+		_T("Packed"),
+		_T("Private"),
+		_T("procedure"),
+		_T("program"),
+		_T("Property"),
+		_T("Protected"),
+		_T("Public"),
+		_T("Published"),
+		_T("Raise"),
+		_T("record"),
+		_T("repeat"),
+		_T("set"),
+		_T("Shl"),
+		_T("Shr"),
+		_T("string"),
+		_T("then"),
+		_T("ThreadVar"),
+		_T("to"),
+		_T("Try"),
+		_T("type"),
+		_T("unit"),
+		_T("until"),
+		_T("uses"),
+		_T("var"),
+		_T("virtual"),
+		_T("while"),
+		_T("with"),
+		_T("xor"),
+	};
+	return xiskeyword<_tcsnicmp>(pszChars, nLength, s_apszPascalKeywordList);
 }
 
 #define DEFINE_BLOCK pBuf.DefineBlock
@@ -123,235 +122,178 @@ static BOOL IsPascalKeyword(LPCTSTR pszChars, int nLength)
 
 DWORD CCrystalTextView::ParseLinePascal(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf)
 {
-  const int nLength = GetLineLength(nLineIndex);
-  if (nLength == 0)
-    return dwCookie & (COOKIE_EXT_COMMENT | COOKIE_EXT_COMMENT2);
+	int const nLength = GetLineLength(nLineIndex);
+	if (nLength == 0)
+		return dwCookie & (COOKIE_EXT_COMMENT | COOKIE_EXT_COMMENT2);
 
-  const LPCTSTR pszChars = GetLineChars(nLineIndex);
-  BOOL bFirstChar = (dwCookie & ~COOKIE_EXT_COMMENT) == 0;
-  BOOL bRedefineBlock = TRUE;
-  BOOL bDecIndex = FALSE;
-  int nIdentBegin = -1;
-  int nPrevI = -1;
-  int I;
-  for (I = 0; I <= nLength; nPrevI = I++)
-    {
-      if (bRedefineBlock)
-        {
-          int nPos = I;
-          if (bDecIndex)
-            nPos = nPrevI;
-          if (dwCookie & (COOKIE_COMMENT | COOKIE_EXT_COMMENT | COOKIE_EXT_COMMENT2))
-            {
-              DEFINE_BLOCK(nPos, COLORINDEX_COMMENT);
-            }
-          else if (dwCookie & (COOKIE_CHAR | COOKIE_STRING))
-            {
-              DEFINE_BLOCK(nPos, COLORINDEX_STRING);
-            }
-          else
-            {
-              if (xisalnum(pszChars[nPos]) || pszChars[nPos] == '.' && nPos > 0 && (!xisalpha(pszChars[nPos - 1]) && !xisalpha(pszChars[nPos + 1])))
-                {
-                  DEFINE_BLOCK(nPos, COLORINDEX_NORMALTEXT);
-                }
-              else
-                {
-                  DEFINE_BLOCK(nPos, COLORINDEX_OPERATOR);
-                  bRedefineBlock = TRUE;
-                  bDecIndex = TRUE;
-                  goto out;
-                }
-            }
-          bRedefineBlock = FALSE;
-          bDecIndex = FALSE;
-        }
-out:
+	LPCTSTR const pszChars = GetLineChars(nLineIndex);
+	BOOL bRedefineBlock = TRUE;
+	BOOL bDecIndex = FALSE;
+	int nIdentBegin = -1;
+	int I = -1;
+	do
+	{
+		int const nPrevI = I++;
+		if (bRedefineBlock)
+		{
+			int const nPos = bDecIndex ? nPrevI : I;
+			bRedefineBlock = FALSE;
+			bDecIndex = FALSE;
+			if (dwCookie & (COOKIE_COMMENT | COOKIE_EXT_COMMENT | COOKIE_EXT_COMMENT2))
+			{
+				DEFINE_BLOCK(nPos, COLORINDEX_COMMENT);
+			}
+			else if (dwCookie & (COOKIE_CHAR | COOKIE_STRING))
+			{
+				DEFINE_BLOCK(nPos, COLORINDEX_STRING);
+			}
+			else if (xisalnum(pszChars[nPos]) || pszChars[nPos] == '.' && nPos > 0 && (!xisalpha(pszChars[nPos - 1]) && !xisalpha(pszChars[nPos + 1])))
+			{
+				DEFINE_BLOCK(nPos, COLORINDEX_NORMALTEXT);
+			}
+			else
+			{
+				DEFINE_BLOCK(nPos, COLORINDEX_OPERATOR);
+				bRedefineBlock = TRUE;
+				bDecIndex = TRUE;
+			}
+		}
+		// Can be bigger than length if there is binary data
+		// See bug #1474782 Crash when comparing SQL with with binary data
+		if (I < nLength)
+		{
+			if (dwCookie & COOKIE_COMMENT)
+			{
+				DEFINE_BLOCK(I, COLORINDEX_COMMENT);
+				dwCookie |= COOKIE_COMMENT;
+				break;
+			}
 
-      // Can be bigger than length if there is binary data
-      // See bug #1474782 Crash when comparing SQL with with binary data
-      if (I >= nLength)
-        break;
+			//  String constant "...."
+			if (dwCookie & COOKIE_STRING)
+			{
+				if (pszChars[I] == '"' && (I == 0 || I == 1 && pszChars[nPrevI] != '\\' || I >= 2 && (pszChars[nPrevI] != '\\' || pszChars[nPrevI] == '\\' && pszChars[nPrevI - 1] == '\\')))
+				{
+					dwCookie &= ~COOKIE_STRING;
+					bRedefineBlock = TRUE;
+				}
+				continue;
+			}
 
-      if (dwCookie & COOKIE_COMMENT)
-        {
-          DEFINE_BLOCK(I, COLORINDEX_COMMENT);
-          dwCookie |= COOKIE_COMMENT;
-          break;
-        }
+			//  Char constant '..'
+			if (dwCookie & COOKIE_CHAR)
+			{
+				if (pszChars[I] == '\'' && (I == 0 || I == 1 && pszChars[nPrevI] != '\\' || I >= 2 && (pszChars[nPrevI] != '\\' || pszChars[nPrevI] == '\\' && pszChars[nPrevI - 1] == '\\')))
+				{
+					dwCookie &= ~COOKIE_CHAR;
+					bRedefineBlock = TRUE;
+				}
+				continue;
+			}
 
-      //  String constant "...."
-      if (dwCookie & COOKIE_STRING)
-        {
-          if (pszChars[I] == '"' && (I == 0 || I == 1 && pszChars[nPrevI] != '\\' || I >= 2 && (pszChars[nPrevI] != '\\' || pszChars[nPrevI] == '\\' && pszChars[nPrevI - 1] == '\\')))
-            {
-              dwCookie &= ~COOKIE_STRING;
-              bRedefineBlock = TRUE;
-            }
-          continue;
-        }
+			//  Extended comment /*....*/
+			if (dwCookie & COOKIE_EXT_COMMENT)
+			{
+				// if (I > 0 && pszChars[I] == ')' && pszChars[nPrevI] == '*')
+				if ((I > 1 && pszChars[I] == ')' && pszChars[nPrevI] == '*' && pszChars[nPrevI - 1] != '(') || (I == 1 && pszChars[I] == ')' && pszChars[nPrevI] == '*'))
+				{
+					dwCookie &= ~COOKIE_EXT_COMMENT;
+					bRedefineBlock = TRUE;
+				}
+				continue;
+			}
 
-      //  Char constant '..'
-      if (dwCookie & COOKIE_CHAR)
-        {
-          if (pszChars[I] == '\'' && (I == 0 || I == 1 && pszChars[nPrevI] != '\\' || I >= 2 && (pszChars[nPrevI] != '\\' || pszChars[nPrevI] == '\\' && pszChars[nPrevI - 1] == '\\')))
-            {
-              dwCookie &= ~COOKIE_CHAR;
-              bRedefineBlock = TRUE;
-            }
-          continue;
-        }
+			//  Extended comment {....}
+			if (dwCookie & COOKIE_EXT_COMMENT2)
+			{
+				if (pszChars[I] == '}')
+				{
+					dwCookie &= ~COOKIE_EXT_COMMENT2;
+					bRedefineBlock = TRUE;
+				}
+				continue;
+			}
 
-      //  Extended comment /*....*/
-      if (dwCookie & COOKIE_EXT_COMMENT)
-        {
-          // if (I > 0 && pszChars[I] == ')' && pszChars[nPrevI] == '*')
-          if ((I > 1 && pszChars[I] == ')' && pszChars[nPrevI] == '*' && pszChars[nPrevI - 1] != '(') || (I == 1 && pszChars[I] == ')' && pszChars[nPrevI] == '*'))
-            {
-              dwCookie &= ~COOKIE_EXT_COMMENT;
-              bRedefineBlock = TRUE;
-            }
-          continue;
-        }
+			if (I > 0 && pszChars[I] == '/' && pszChars[nPrevI] == '/')
+			{
+				DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
+				dwCookie |= COOKIE_COMMENT;
+				break;
+			}
 
-      //  Extended comment {....}
-      if (dwCookie & COOKIE_EXT_COMMENT2)
-        {
-          if (pszChars[I] == '}')
-            {
-              dwCookie &= ~COOKIE_EXT_COMMENT2;
-              bRedefineBlock = TRUE;
-            }
-          continue;
-        }
+			//  Normal text
+			if (pszChars[I] == '"')
+			{
+				DEFINE_BLOCK(I, COLORINDEX_STRING);
+				dwCookie |= COOKIE_STRING;
+				continue;
+			}
+			if (pszChars[I] == '\'')
+			{
+				if (I == 0 || !xisxdigit(pszChars[nPrevI]))
+				{
+					DEFINE_BLOCK(I, COLORINDEX_STRING);
+					dwCookie |= COOKIE_CHAR;
+					continue;
+				}
+			}
+			if (I > 0 && pszChars[I] == '*' && pszChars[nPrevI] == '(')
+			{
+				DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
+				dwCookie |= COOKIE_EXT_COMMENT;
+				continue;
+			}
 
-      if (I > 0 && pszChars[I] == '/' && pszChars[nPrevI] == '/')
-        {
-          DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
-          dwCookie |= COOKIE_COMMENT;
-          break;
-        }
+			if (pszChars[I] == '{')
+			{
+				DEFINE_BLOCK(I, COLORINDEX_COMMENT);
+				dwCookie |= COOKIE_EXT_COMMENT2;
+				continue;
+			}
 
-      //  Normal text
-      if (pszChars[I] == '"')
-        {
-          DEFINE_BLOCK(I, COLORINDEX_STRING);
-          dwCookie |= COOKIE_STRING;
-          continue;
-        }
-      if (pszChars[I] == '\'')
-        {
-          // if (I + 1 < nLength && pszChars[I + 1] == '\'' || I + 2 < nLength && pszChars[I + 1] != '\\' && pszChars[I + 2] == '\'' || I + 3 < nLength && pszChars[I + 1] == '\\' && pszChars[I + 3] == '\'')
-          if (!I || !xisalnum(pszChars[nPrevI]))
-            {
-              DEFINE_BLOCK(I, COLORINDEX_STRING);
-              dwCookie |= COOKIE_CHAR;
-              continue;
-            }
-        }
-      if (I > 0 && pszChars[I] == '*' && pszChars[nPrevI] == '(')
-        {
-          DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
-          dwCookie |= COOKIE_EXT_COMMENT;
-          continue;
-        }
+			if (pBuf == NULL)
+				continue; // No need to extract keywords, so skip rest of loop
 
-      if (pszChars[I] == '{')
-        {
-          DEFINE_BLOCK(I, COLORINDEX_COMMENT);
-          dwCookie |= COOKIE_EXT_COMMENT2;
-          continue;
-        }
+			if (xisalnum(pszChars[I]) || pszChars[I] == '.' && I > 0 && (!xisalpha(pszChars[nPrevI]) && !xisalpha(pszChars[I + 1])))
+			{
+				if (nIdentBegin == -1)
+					nIdentBegin = I;
+				continue;
+			}
+		}
+		if (nIdentBegin >= 0)
+		{
+			if (IsPascalKeyword(pszChars + nIdentBegin, I - nIdentBegin))
+			{
+				DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
+			}
+			else if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
+			{
+				DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
+			}
+			else
+			{
+				for (int j = I; j < nLength; j++)
+				{
+					if (!xisspace(pszChars[j]))
+					{
+						if (pszChars[j] == '(')
+						{
+							DEFINE_BLOCK(nIdentBegin, COLORINDEX_FUNCNAME);
+						}
+						break;
+					}
+				}
+			}
+			bRedefineBlock = TRUE;
+			bDecIndex = TRUE;
+			nIdentBegin = -1;
+		}
+	} while (I < nLength);
 
-      if (bFirstChar)
-        {
-          if (!xisspace(pszChars[I]))
-            bFirstChar = FALSE;
-        }
-
-      if (pBuf == NULL)
-        continue;               //  We don't need to extract keywords,
-      //  for faster parsing skip the rest of loop
-
-      if (xisalnum(pszChars[I]) || pszChars[I] == '.' && I > 0 && (!xisalpha(pszChars[nPrevI]) && !xisalpha(pszChars[I + 1])))
-        {
-          if (nIdentBegin == -1)
-            nIdentBegin = I;
-        }
-      else
-        {
-          if (nIdentBegin >= 0)
-            {
-              if (IsPascalKeyword(pszChars + nIdentBegin, I - nIdentBegin))
-                {
-                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
-                }
-              else if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
-                {
-                  DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
-                }
-              else
-                {
-                  bool bFunction = FALSE;
-
-                  for (int j = I; j < nLength; j++)
-                    {
-                      if (!xisspace(pszChars[j]))
-                        {
-                          if (pszChars[j] == '(')
-                            {
-                              bFunction = TRUE;
-                            }
-                          break;
-                        }
-                    }
-                  if (bFunction)
-                    {
-                      DEFINE_BLOCK(nIdentBegin, COLORINDEX_FUNCNAME);
-                    }
-                }
-              bRedefineBlock = TRUE;
-              bDecIndex = TRUE;
-              nIdentBegin = -1;
-            }
-        }
-    }
-
-  if (nIdentBegin >= 0)
-    {
-      if (IsPascalKeyword(pszChars + nIdentBegin, I - nIdentBegin))
-        {
-          DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
-        }
-      else if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
-        {
-          DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
-        }
-      else
-        {
-          bool bFunction = FALSE;
-
-          for (int j = I; j < nLength; j++)
-            {
-              if (!xisspace(pszChars[j]))
-                {
-                  if (pszChars[j] == '(')
-                    {
-                      bFunction = TRUE;
-                    }
-                  break;
-                }
-            }
-          if (bFunction)
-            {
-              DEFINE_BLOCK(nIdentBegin, COLORINDEX_FUNCNAME);
-            }
-        }
-    }
-
-  if (pszChars[nLength - 1] != '\\')
-    dwCookie &= (COOKIE_EXT_COMMENT | COOKIE_EXT_COMMENT2);
-  return dwCookie;
+	if (pszChars[nLength - 1] != '\\')
+		dwCookie &= (COOKIE_EXT_COMMENT | COOKIE_EXT_COMMENT2);
+	return dwCookie;
 }
 
 TESTCASE
@@ -365,11 +307,11 @@ TESTCASE
 	{
 		TCHAR c, *p, *q;
 		if (pfnIsKeyword && (p = _tcschr(text, '"')) != NULL && (q = _tcschr(++p, '"')) != NULL)
-			assert(pfnIsKeyword(p, static_cast<int>(q - p)));
+			VerifyKeyword<_tcsnicmp>(pfnIsKeyword, p, static_cast<int>(q - p));
 		else if (_stscanf(text, _T(" static BOOL IsPascalKeyword %c"), &c) == 1 && c == '(')
 			pfnIsKeyword = IsPascalKeyword;
 		else if (pfnIsKeyword && _stscanf(text, _T(" } %c"), &c) == 1 && (c == ';' ? ++count : 0))
-			pfnIsKeyword = NULL;
+			VerifyKeyword<_tcsnicmp>(pfnIsKeyword = NULL, NULL, 0);
 	}
 	fclose(file);
 	assert(count == 1);
