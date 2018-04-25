@@ -335,6 +335,7 @@ DWORD CCrystalTextView::ParseLineC(DWORD dwCookie, int nLineIndex, TextBlock::Ar
 				continue;
 			}
 
+			// Line comment //...
 			if (I > 0 && pszChars[I] == '/' && pszChars[nPrevI] == '/' && bWasComment != End)
 			{
 				DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
@@ -448,7 +449,7 @@ TESTCASE
 	while (_fgetts(text, _countof(text), file))
 	{
 		TCHAR c, *p, *q;
-		if ((p = _tcschr(text, '"')) != NULL && (q = _tcschr(++p, '"')) != NULL)
+		if (pfnIsKeyword && (p = _tcschr(text, '"')) != NULL && (q = _tcschr(++p, '"')) != NULL)
 			VerifyKeyword<_tcsncmp>(pfnIsKeyword, p, static_cast<int>(q - p));
 		else if (_stscanf(text, _T(" static BOOL IsCppKeyword %c"), &c) == 1 && c == '(')
 			pfnIsKeyword = IsCppKeyword;

@@ -310,7 +310,7 @@ TESTCASE
 	while (_fgetts(text, _countof(text), file))
 	{
 		TCHAR c, *p, *q;
-		if ((p = _tcschr(text, '"')) != NULL && (q = _tcschr(++p, '"')) != NULL)
+		if (pfnIsKeyword && (p = _tcschr(text, '"')) != NULL && (q = _tcschr(++p, '"')) != NULL)
 			VerifyKeyword<_tcsncmp>(pfnIsKeyword, p, static_cast<int>(q - p));
 		else if (_stscanf(text, _T(" static BOOL IsGoKeyword %c"), &c) == 1 && c == '(')
 			pfnIsKeyword = IsGoKeyword;
