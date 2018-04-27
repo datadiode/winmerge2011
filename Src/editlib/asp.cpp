@@ -213,7 +213,7 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, int nLineIndex, TextBlock::
 {
 	int const nLength = GetLineLength(nLineIndex);
 	if (nLength == 0)
-		return dwCookie & (COOKIE_EXT_COMMENT | COOKIE_EXT_USER1 | COOKIE_EXT_USER1_GLOBAL);
+		return dwCookie & (COOKIE_EXT_COMMENT | COOKIE_EXT_USER1 | COOKIE_EXT_USER1_GLOBAL | COOKIE_SCRIPT);
 
 	LPCTSTR const pszChars = GetLineChars(nLineIndex);
 	BOOL bRedefineBlock = TRUE;
@@ -241,7 +241,7 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, int nLineIndex, TextBlock::
 		{
 			if (I > 0 && pszChars[I] == '>' && (!(dwCookie & COOKIE_SCRIPT) || pszChars[nPrevI] == '?' || pszChars[nPrevI] == '%'))
 			{
-				dwCookie &= ~COOKIE_EXT_USER1;
+				dwCookie &= ~(COOKIE_EXT_USER1 | COOKIE_SCRIPT);
 				nIdentBegin = -1;
 				bRedefineBlock = TRUE;
 				bDecIndex = TRUE;
@@ -256,7 +256,6 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, int nLineIndex, TextBlock::
 			{
 				DEFINE_BLOCK(I, COLORINDEX_OPERATOR);
 				bRedefineBlock = TRUE;
-				dwCookie &= ~COOKIE_PREPROCESSOR;
 				if (dwCookie & COOKIE_SCRIPT)
 				{
 					dwCookie = dwCookie & ~COOKIE_EXT_USER1 | dwScriptTagCookie;
@@ -265,6 +264,7 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, int nLineIndex, TextBlock::
 				{
 					bDecIndex = TRUE;
 				}
+				dwCookie &= ~(COOKIE_PREPROCESSOR | COOKIE_SCRIPT);
 				nIdentBegin = -1;
 				goto start;
 			}
@@ -590,7 +590,7 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, int nLineIndex, TextBlock::
 		}
 	} while (I < nLength);
 
-	dwCookie &= (COOKIE_EXT_COMMENT | COOKIE_STRING | COOKIE_PREPROCESSOR | COOKIE_EXT_USER1 | COOKIE_EXT_USER1_GLOBAL);
+	dwCookie &= (COOKIE_EXT_COMMENT | COOKIE_STRING | COOKIE_PREPROCESSOR | COOKIE_EXT_USER1 | COOKIE_EXT_USER1_GLOBAL | COOKIE_SCRIPT);
 	return dwCookie;
 }
 
