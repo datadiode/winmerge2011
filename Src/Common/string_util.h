@@ -93,6 +93,12 @@ BOOL xiskeyword(LPCTSTR key, UINT len, T (&r)[N])
 	return xiskeyword<compare>(key, len, std::begin(r), std::end(r));
 }
 
+template<int (*compare)(LPCTSTR, LPCTSTR, size_t), size_t N>
+BOOL xisequal(LPCTSTR key, size_t len, TCHAR const (&r)[N])
+{
+	return len == N - 1 && compare(key, r, len) == 0;
+}
+
 namespace CommonKeywords
 {
 	BOOL IsNumeric(LPCTSTR pszChars, int nLength);

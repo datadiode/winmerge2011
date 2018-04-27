@@ -195,17 +195,31 @@ static BOOL IsAspKeyword(LPCTSTR pszChars, int nLength)
 #define COOKIE_STRING           0x0008
 #define COOKIE_CHAR             0x0010
 #define COOKIE_USER1            0x0020
-#define COOKIE_EXT_USER1        0x0040
+#define COOKIE_SCRIPT           0x0080
+#define COOKIE_EXT_USER1        0x0F00
+#define COOKIE_EXT_USER1_VB     0x0100
+#define COOKIE_EXT_USER1_GLOBAL 0xF000
+
+C_ASSERT(COOKIE_EXT_USER1_GLOBAL == COOKIE_EXT_USER1 << 4);
+
+static DWORD ScriptCookie(LPCTSTR lang)
+{
+	if (_tcsnicmp(lang, _T("VB"), 2) == 0)
+		return COOKIE_EXT_USER1_VB;
+	return COOKIE_EXT_USER1;
+}
 
 DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf)
 {
 	int const nLength = GetLineLength(nLineIndex);
 	if (nLength == 0)
-		return dwCookie & (COOKIE_EXT_COMMENT|COOKIE_EXT_USER1);
+		return dwCookie & (COOKIE_EXT_COMMENT | COOKIE_EXT_USER1 | COOKIE_EXT_USER1_GLOBAL);
 
 	LPCTSTR const pszChars = GetLineChars(nLineIndex);
 	BOOL bRedefineBlock = TRUE;
 	BOOL bDecIndex = FALSE;
+	enum { False, Start, End } bWasComment = False;
+	DWORD dwScriptTagCookie = std::max<DWORD>(dwCookie & (COOKIE_EXT_USER1 << 4), (COOKIE_EXT_USER1_VB << 4)) >> 4;
 	int nIdentBegin = -1;
 	int I = -1;
 	int nPrevI;
@@ -225,7 +239,7 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, int nLineIndex, TextBlock::
 		//  User1 end: ?>
 		if (dwCookie & COOKIE_EXT_USER1)
 		{
-			if (I > 0 && pszChars[I] == '>' && (pszChars[nPrevI] == '?' || pszChars[nPrevI] == '%'))
+			if (I > 0 && pszChars[I] == '>' && (!(dwCookie & COOKIE_SCRIPT) || pszChars[nPrevI] == '?' || pszChars[nPrevI] == '%'))
 			{
 				dwCookie &= ~COOKIE_EXT_USER1;
 				nIdentBegin = -1;
@@ -240,10 +254,18 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, int nLineIndex, TextBlock::
 		{
 			if (pszChars[I] == '>')
 			{
-				dwCookie &= ~COOKIE_PREPROCESSOR;
-				nIdentBegin = -1;
+				DEFINE_BLOCK(I, COLORINDEX_OPERATOR);
 				bRedefineBlock = TRUE;
-				bDecIndex = TRUE;
+				dwCookie &= ~COOKIE_PREPROCESSOR;
+				if (dwCookie & COOKIE_SCRIPT)
+				{
+					dwCookie = dwCookie & ~COOKIE_EXT_USER1 | dwScriptTagCookie;
+				}
+				else
+				{
+					bDecIndex = TRUE;
+				}
+				nIdentBegin = -1;
 				goto start;
 			}
 		}
@@ -319,8 +341,8 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, int nLineIndex, TextBlock::
 			//  String constant "...."
 			if (dwCookie & COOKIE_STRING)
 			{
-				// Quotation marks in COOKIE_EXT_USER1 context escape themselves
-				if (pszChars[I] == '"' && ((dwCookie & COOKIE_EXT_USER1) || I == 0 || I == 1 && pszChars[nPrevI] != '\\' || I >= 2 && (pszChars[nPrevI] != '\\' || pszChars[nPrevI] == '\\' && pszChars[nPrevI - 1] == '\\')))
+				// Quotation marks in COOKIE_EXT_USER1_VB context escape themselves
+				if (pszChars[I] == '"' && ((dwCookie & (COOKIE_EXT_USER1 | COOKIE_SCRIPT)) == COOKIE_EXT_USER1_VB || I == 0 || I == 1 && pszChars[nPrevI] != '\\' || I >= 2 && (pszChars[nPrevI] != '\\' || pszChars[nPrevI] == '\\' && pszChars[nPrevI - 1] == '\\')))
 				{
 					dwCookie &= ~COOKIE_STRING;
 					bRedefineBlock = TRUE;
@@ -342,18 +364,39 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, int nLineIndex, TextBlock::
 			//  Extended comment <!--....-->
 			if (dwCookie & COOKIE_EXT_COMMENT)
 			{
-				if (!(dwCookie & COOKIE_EXT_USER1))
+				switch (dwCookie & COOKIE_EXT_USER1)
 				{
+				case COOKIE_EXT_USER1:
+					if (I > 0 && pszChars[I] == '/' && pszChars[nPrevI] == '*' && bWasComment != Start)
+					{
+						dwCookie &= ~COOKIE_EXT_COMMENT;
+						bRedefineBlock = TRUE;
+						bWasComment = End;
+					}
+					else
+					{
+						bWasComment = False;
+					}
+					break;
+				case 0:
 					if (I > 1 && pszChars[I] == '>' && pszChars[nPrevI] == '-' && pszChars[nPrevI - 1] == '-')
 					{
 						dwCookie &= ~COOKIE_EXT_COMMENT;
 						bRedefineBlock = TRUE;
 					}
+					break;
 				}
 				goto start;
 			}
 
-			if ((dwCookie & COOKIE_EXT_USER1) && pszChars[I] == '\'')
+			if ((dwCookie & COOKIE_EXT_USER1) == COOKIE_EXT_USER1 && I > 0 && pszChars[I] == '/' && pszChars[nPrevI] == '/' && bWasComment != End)
+			{
+				DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
+				dwCookie |= COOKIE_COMMENT;
+				break;
+			}
+
+			if ((dwCookie & (COOKIE_EXT_USER1 | COOKIE_SCRIPT)) == COOKIE_EXT_USER1_VB && pszChars[I] == '\'')
 			{
 				DEFINE_BLOCK(I, COLORINDEX_COMMENT);
 				dwCookie |= COOKIE_COMMENT;
@@ -365,7 +408,16 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, int nLineIndex, TextBlock::
 			{
 				if (I > 0 && pszChars[I] == '>' && (pszChars[nPrevI] == '?' || pszChars[nPrevI] == '%'))
 				{
+					dwCookie &= ~(COOKIE_EXT_USER1 | COOKIE_SCRIPT);
+					bRedefineBlock = TRUE;
+					goto start;
+				}
+				if (I > 0 && pszChars[nPrevI] == '<' && xisequal<_tcsnicmp>(pszChars + I, 8, _T("/script>")))
+				{
+					DEFINE_BLOCK(nPrevI, COLORINDEX_OPERATOR);
+					DEFINE_BLOCK(I, COLORINDEX_PREPROCESSOR);
 					dwCookie &= ~COOKIE_EXT_USER1;
+					dwCookie |= COOKIE_PREPROCESSOR;
 					bRedefineBlock = TRUE;
 					goto start;
 				}
@@ -389,9 +441,20 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, int nLineIndex, TextBlock::
 				}
 			}
 
-			if (!(dwCookie & COOKIE_EXT_USER1))
+			switch (dwCookie & COOKIE_EXT_USER1)
 			{
-				if (!(dwCookie & COOKIE_EXT_USER1) && I < nLength - 3 && pszChars[I] == '<' && pszChars[I + 1] == '!' && pszChars[I + 2] == '-' && pszChars[I + 3] == '-')
+			case COOKIE_EXT_USER1:
+				if (I > 0 && pszChars[I] == '*' && pszChars[nPrevI] == '/')
+				{
+					DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
+					dwCookie |= COOKIE_EXT_COMMENT;
+					bWasComment = Start;
+					goto start;
+				}
+				bWasComment = False;
+				break;
+			case 0:
+				if (I < nLength - 3 && pszChars[I] == '<' && pszChars[I + 1] == '!' && pszChars[I + 2] == '-' && pszChars[I + 3] == '-')
 				{
 					DEFINE_BLOCK(I, COLORINDEX_COMMENT);
 					I += 3;
@@ -399,19 +462,22 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, int nLineIndex, TextBlock::
 					dwCookie &= ~COOKIE_PREPROCESSOR;
 					goto start;
 				}
+				break;
 			}
 
 			//  User1 start: <?
 			if (pszChars[I] == '<' && I < nLength - 1 && (pszChars[I + 1] == '?' || pszChars[I + 1] == '%'))
 			{
 				DEFINE_BLOCK(I, COLORINDEX_NORMALTEXT);
-				dwCookie |= COOKIE_EXT_USER1;
+				dwCookie &= ~COOKIE_EXT_USER1;
+				if (I < nLength - 2 && pszChars[I + 2] == '@')
+				{
+					dwCookie |= std::max<DWORD>(dwCookie & (COOKIE_EXT_USER1 << 4), COOKIE_EXT_USER1_VB << 4) | COOKIE_SCRIPT;
+				}
+				dwCookie |= std::max<DWORD>(dwCookie & (COOKIE_EXT_USER1 << 4), COOKIE_EXT_USER1_VB << 4) >> 4;
 				nIdentBegin = -1;
 				goto start;
 			}
-
-			if (pBuf == NULL)
-				goto start; // No need to extract keywords, so skip rest of loop
 
 			if (xisalnum(pszChars[I]) || pszChars[I] == '.')
 			{
@@ -422,28 +488,73 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, int nLineIndex, TextBlock::
 		}
 		if (nIdentBegin >= 0)
 		{
+			LPCTSTR const pchIdent = pszChars + nIdentBegin;
+			int const cchIdent = I - nIdentBegin;
 			if (dwCookie & COOKIE_PREPROCESSOR)
 			{
-				if (IsHtmlKeyword(pszChars + nIdentBegin, I - nIdentBegin) && (pszChars[nIdentBegin - 1] == _T ('<') || pszChars[nIdentBegin - 1] == _T ('/')))
+				if (pchIdent[-1] == '<' || pchIdent[-1] == '/')
 				{
-					DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
+					if (xisequal<_tcsnicmp>(pchIdent, cchIdent, _T("script")))
+					{
+						if (pchIdent[-1] == '<')
+							dwCookie |= COOKIE_SCRIPT;
+						else
+							dwCookie &= ~COOKIE_SCRIPT;
+						dwScriptTagCookie = std::max<DWORD>(dwCookie & (COOKIE_EXT_USER1 << 4), (COOKIE_EXT_USER1_VB << 4)) >> 4;
+					}
+					if (pBuf == NULL)
+					{
+						continue; // No need to extract keywords, so skip rest of loop
+					}
+					if (IsHtmlKeyword(pchIdent, cchIdent))
+					{
+						DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
+					}
 				}
-				else if (IsUser1Keyword(pszChars + nIdentBegin, I - nIdentBegin))
+				else if (pBuf == NULL)
 				{
+					continue; // No need to extract keywords, so skip rest of loop
+				}
+				else if (IsUser1Keyword(pchIdent, cchIdent))
+				{
+					if (dwCookie & COOKIE_SCRIPT)
+					{
+						TCHAR lang[32];
+						if (xisequal<_tcsnicmp>(pchIdent, cchIdent, _T("type")) ?
+							_stscanf(pchIdent + cchIdent, _T("%31[^a-zA-Z]%31[a-zA-Z]/%31[a-zA-Z]"), lang, lang, lang) == 3 :
+							xisequal<_tcsnicmp>(pchIdent, cchIdent, _T("language")) &&
+							_stscanf(pchIdent + cchIdent, _T("%31[^a-zA-Z]%31[a-zA-Z]"), lang, lang) == 2)
+						{
+							dwScriptTagCookie = ScriptCookie(lang);
+						}
+					}
 					DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER1);
 				}
-				else if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
+				else if (IsNumeric(pchIdent, cchIdent))
 				{
 					DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
 				}
 			}
 			else if (dwCookie & COOKIE_EXT_USER1)
 			{
-				if (IsAspKeyword(pszChars + nIdentBegin, I - nIdentBegin))
+				if (dwCookie & COOKIE_SCRIPT)
+				{
+					TCHAR lang[32];
+					if (xisequal<_tcsnicmp>(pchIdent, cchIdent, _T("language")) &&
+						_stscanf(pchIdent + cchIdent, _T("%31[^a-zA-Z]%31[a-zA-Z]"), lang, lang) == 2)
+					{
+						dwCookie = dwCookie & ~(COOKIE_EXT_USER1 << 4) | (ScriptCookie(lang) << 4);
+					}
+				}
+				else if (pBuf == NULL)
+				{
+					continue; // No need to extract keywords, so skip rest of loop
+				}
+				else if (IsAspKeyword(pchIdent, cchIdent))
 				{
 					DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
 				}
-				else if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
+				else if (IsNumeric(pchIdent, cchIdent))
 				{
 					DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
 				}
@@ -462,9 +573,13 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, int nLineIndex, TextBlock::
 					}
 				}
 			}
+			else if (pBuf == NULL)
+			{
+				continue; // No need to extract keywords, so skip rest of loop
+			}
 			else if (dwCookie & COOKIE_USER1)
 			{
-				if (IsUser2Keyword(pszChars + nIdentBegin, I - nIdentBegin))
+				if (IsUser2Keyword(pchIdent, cchIdent))
 				{
 					DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER2);
 				}
@@ -475,7 +590,7 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, int nLineIndex, TextBlock::
 		}
 	} while (I < nLength);
 
-	dwCookie &= (COOKIE_EXT_COMMENT | COOKIE_STRING | COOKIE_PREPROCESSOR | COOKIE_EXT_USER1);
+	dwCookie &= (COOKIE_EXT_COMMENT | COOKIE_STRING | COOKIE_PREPROCESSOR | COOKIE_EXT_USER1 | COOKIE_EXT_USER1_GLOBAL);
 	return dwCookie;
 }
 
