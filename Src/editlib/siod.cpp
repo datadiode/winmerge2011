@@ -335,15 +335,15 @@ static BOOL IsUser2Keyword(LPCTSTR pszChars, int nLength)
 
 #define COOKIE_COMMENT          0x0001
 #define COOKIE_PREPROCESSOR     0x0002
-#define COOKIE_EXT_COMMENT      0x0004
+#define COOKIE_CHAR             0x0004
 #define COOKIE_STRING           0x0008
-#define COOKIE_CHAR             0x0010
+#define COOKIE_EXT_COMMENT      0xFF00
 
 DWORD CCrystalTextView::ParseLineSiod(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf)
 {
 	int const nLength = GetLineLength(nLineIndex);
 	if (nLength == 0)
-		return dwCookie & COOKIE_EXT_COMMENT;
+		return dwCookie & (COOKIE_EXT_COMMENT | COOKIE_STRING);
 
 	LPCTSTR const pszChars = GetLineChars(nLineIndex);
 	BOOL bRedefineBlock = TRUE;
@@ -412,12 +412,20 @@ DWORD CCrystalTextView::ParseLineSiod(DWORD dwCookie, int nLineIndex, TextBlock:
 				continue;
 			}
 
-			//  Extended comment /*....*/
+			if (I > 0 && pszChars[I] == '|' && pszChars[nPrevI] == '#' && bWasComment != End)
+			{
+				DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
+				dwCookie = dwCookie & ~COOKIE_EXT_COMMENT | dwCookie - COOKIE_EXT_COMMENT & COOKIE_EXT_COMMENT;
+				bWasComment = Start;
+				continue;
+			}
+
+			//  Extended comment #|....|#
 			if (dwCookie & COOKIE_EXT_COMMENT)
 			{
-				if (I > 0 && pszChars[I] == ';' && pszChars[nPrevI] == '|' && bWasComment != Start)
+				if (I > 0 && pszChars[I] == '#' && pszChars[nPrevI] == '|' && bWasComment != Start)
 				{
-					dwCookie &= ~COOKIE_EXT_COMMENT;
+					dwCookie = dwCookie & ~COOKIE_EXT_COMMENT | dwCookie + COOKIE_EXT_COMMENT & COOKIE_EXT_COMMENT;
 					bRedefineBlock = TRUE;
 					bWasComment = End;
 				}
@@ -427,8 +435,9 @@ DWORD CCrystalTextView::ParseLineSiod(DWORD dwCookie, int nLineIndex, TextBlock:
 				}
 				continue;
 			}
+			bWasComment = False;
 
-			if (I > 0 && pszChars[I] != '|' && pszChars[nPrevI] == ';' && bWasComment != End)
+			if (I > 0 && pszChars[nPrevI] == ';')
 			{
 				DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
 				dwCookie |= COOKIE_COMMENT;
@@ -451,15 +460,6 @@ DWORD CCrystalTextView::ParseLineSiod(DWORD dwCookie, int nLineIndex, TextBlock:
 					continue;
 				}
 			}
-			if (I > 0 && pszChars[I] == '|' && pszChars[nPrevI] == ';' && bWasComment != End)
-			{
-				DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
-				dwCookie |= COOKIE_EXT_COMMENT;
-				bWasComment = Start;
-				continue;
-			}
-
-			bWasComment = False;
 
 			if (pBuf == NULL)
 				continue; // No need to extract keywords, so skip rest of loop
@@ -535,7 +535,7 @@ DWORD CCrystalTextView::ParseLineSiod(DWORD dwCookie, int nLineIndex, TextBlock:
 		}
 	} while (I < nLength);
 
-	dwCookie &= COOKIE_EXT_COMMENT;
+	dwCookie &= (COOKIE_EXT_COMMENT | COOKIE_STRING);
 	return dwCookie;
 }
 
