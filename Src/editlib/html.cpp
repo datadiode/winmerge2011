@@ -239,7 +239,7 @@ DWORD CCrystalTextView::ParseLineHtml(DWORD dwCookie, int nLineIndex, TextBlock:
 			}
 
 			if (pBuf == NULL)
-				goto start; // No need to extract keywords, so skip rest of loop
+				continue; // No need to extract keywords, so skip rest of loop
 
 			if (xisalnum(pszChars[I]) || pszChars[I] == '.')
 			{

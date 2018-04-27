@@ -384,7 +384,7 @@ DWORD CCrystalTextView::ParseLinePhp(DWORD dwCookie, int nLineIndex, TextBlock::
 			}
 
 			if (pBuf == NULL)
-				goto start;
+				continue; // No need to extract keywords, so skip rest of loop
 
 			if (xisalnum(pszChars[I]) || pszChars[I] == '.')
 			{
