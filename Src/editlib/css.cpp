@@ -193,18 +193,15 @@ static BOOL IsCss2Keyword(LPCTSTR pszChars, int nLength)
 #define COOKIE_EXT_DEFINITION   0x0020
 #define COOKIE_EXT_VALUE        0x0040
 
-DWORD CCrystalTextView::ParseLineCss(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf)
+DWORD CCrystalTextView::ParseLineCss(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
 {
-	int const nLength = GetLineLength(nLineIndex);
 	if (nLength == 0)
 		return dwCookie & (COOKIE_EXT_COMMENT|COOKIE_EXT_DEFINITION|COOKIE_EXT_VALUE);
 
-	LPCTSTR const pszChars = GetLineChars(nLineIndex);
 	BOOL bRedefineBlock = TRUE;
 	BOOL bWasCommentStart = FALSE;
 	BOOL bDecIndex = FALSE;
 	int nIdentBegin = -1;
-	int I = -1;
 	do
 	{
 		int const nPrevI = I++;

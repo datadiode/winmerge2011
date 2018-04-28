@@ -422,13 +422,13 @@ CCrystalTextView::~CCrystalTextView()
 
 HRESULT CCrystalTextView::QueryInterface(REFIID iid, void **ppv)
 {
-    static const QITAB rgqit[] = 
-    {   
-        QITABENT(CCrystalTextView, IDropSource),
-        QITABENT(CCrystalTextView, IDataObject),
-        { 0 }
-    };
-    return QISearch(this, rgqit, iid, ppv);
+	static const QITAB rgqit[] = 
+	{
+		QITABENT(CCrystalTextView, IDropSource),
+		QITABENT(CCrystalTextView, IDataObject),
+		{ 0 }
+	};
+	return QISearch(this, rgqit, iid, ppv);
 }
 
 ULONG CCrystalTextView::AddRef()
@@ -564,7 +564,7 @@ int CCrystalTextView::GetLineActualLength(int nLineIndex)
 	int nActualLength = 0;
 	const int nLength = GetLineLength(nLineIndex);
 	if (nLength > 0)
-    {
+	{
 		LPCTSTR pszChars = GetLineChars(nLineIndex);
 		const int nTabSize = GetTabSize();
 		int i;
@@ -953,7 +953,7 @@ void CCrystalTextView::DrawLineHelperImpl(
 				pdc->RestoreDC(-1);
 			}
 			delete [] pnWidths;
-			// Update the final position after the visible characters	              
+			// Update the final position after the visible characters
 			ptOrigin.x += nSumWidth;
 		}
 	}
@@ -1189,7 +1189,7 @@ void CCrystalTextView::InvalidateLineCache(int nLineIndex1, int nLineIndex2)
 		nLineIndex2 = upperBound(m_panSubLines);
 	else if (nLineIndex1 > nLineIndex2)
 		std::swap(nLineIndex1, nLineIndex2);
-    if (nLineIndex2 > upperBound(m_panSubLines))
+	if (nLineIndex2 > upperBound(m_panSubLines))
 		nLineIndex2 = upperBound(m_panSubLines);
 	for (int i = nLineIndex1; i <= nLineIndex2; i++)
 		m_panSubLines[i] = -1;
@@ -1340,7 +1340,7 @@ void CCrystalTextView::MergeTextBlocks(TextBlock::Array &pBuf1, TextBlock::Array
 	{
 		if (i < nBlocks1 && j < nBlocks2 &&
 			pBuf1[i].m_nCharPos == pBuf2[j].m_nCharPos)
-        {
+		{
 			pMergedBuf[k].m_nCharPos = pBuf2[j].m_nCharPos;
 			if (pBuf2[j].m_nColorIndex == COLORINDEX_NONE)
 				pMergedBuf[k].m_nColorIndex = pBuf1[i].m_nColorIndex;
@@ -2101,7 +2101,7 @@ int CCrystalTextView::CursorPointToCharPos(int nLineIndex, const POINT &curPoint
 
 	int nIndex = 0;
 	for (nIndex = 0; nIndex < nLength; nIndex++)
-    {
+	{
 		if( nBreaks && nIndex == anBreaks[nYPos] )
 		{
 			nXPos = 0;
@@ -2698,7 +2698,7 @@ POINT CCrystalTextView::ClientToText(const POINT &point)
 	int nBreaks = 0;
 
 	if (pt.y >= 0 && pt.y < nLineCount)
-    {
+	{
 		nLength = GetLineLength( pt.y );
 		anBreaks = new int[nLength];
 		pszLine = GetLineChars(pt.y);
@@ -2871,23 +2871,25 @@ void CCrystalTextView::OnSetFocus()
 	UpdateCaret();
 }
 
-DWORD CCrystalTextView::ParseLinePlain(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf)
+DWORD CCrystalTextView::ParseLinePlain(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
 {
 	return 0;
 }
 
 DWORD CCrystalTextView::ParseLine(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf)
 {
-	return (this->*(m_CurSourceDef->ParseLineX))(dwCookie, nLineIndex, pBuf);
+	int const nLength = GetLineLength(nLineIndex);
+	LPCTSTR const pszChars = GetLineChars(nLineIndex);
+	return (this->*(m_CurSourceDef->ParseLineX))(dwCookie, pszChars, nLength, -1, pBuf);
 }
 
 int CCrystalTextView::CalculateActualOffset(int nLineIndex, int nCharIndex, BOOL bAccumulate)
 {
-	const int nLength = GetLineLength(nLineIndex);
+	int const nLength = GetLineLength(nLineIndex);
 	ASSERT(nCharIndex >= 0 && nCharIndex <= nLength);
-	LPCTSTR pszChars = GetLineChars(nLineIndex);
+	LPCTSTR const pszChars = GetLineChars(nLineIndex);
 	int nOffset = 0;
-	const int nTabSize = GetTabSize();
+	int const nTabSize = GetTabSize();
 	//BEGIN SW
 	int *anBreaks = new int[nLength];
 	int nBreaks = 0;
@@ -2935,8 +2937,8 @@ int CCrystalTextView::ApproxActualOffset(int nLineIndex, int nOffset)
 {
 	if (nOffset == 0)
 		return 0;
-	const int nLength = GetLineLength(nLineIndex);
-	LPCTSTR pszChars = GetLineChars(nLineIndex);
+	int const nLength = GetLineLength(nLineIndex);
+	LPCTSTR const pszChars = GetLineChars(nLineIndex);
 	int nCurrentOffset = 0;
 	int nTabSize = GetTabSize();
 	for (int i = 0 ; i < nLength ; i++)

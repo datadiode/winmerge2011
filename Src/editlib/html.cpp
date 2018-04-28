@@ -39,17 +39,14 @@ using HtmlKeywords::IsUser2Keyword;
 #define COOKIE_USER1            0x0020
 #define COOKIE_EXT_USER1        0x0040
 
-DWORD CCrystalTextView::ParseLineHtml(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf)
+DWORD CCrystalTextView::ParseLineHtml(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
 {
-	int const nLength = GetLineLength(nLineIndex);
 	if (nLength == 0)
 		return dwCookie & (COOKIE_EXT_COMMENT|COOKIE_EXT_USER1);
 
-	LPCTSTR const pszChars = GetLineChars(nLineIndex);
 	BOOL bRedefineBlock = TRUE;
 	BOOL bDecIndex = FALSE;
 	int nIdentBegin = -1;
-	int I = -1;
 	int nPrevI;
 	goto start;
 	do

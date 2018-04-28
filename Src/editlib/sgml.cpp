@@ -111,17 +111,14 @@ static BOOL IsUser1Keyword(LPCTSTR pszChars, int nLength)
 #define COOKIE_USER1            0x0020
 #define COOKIE_EXT_USER1        0x0040
 
-DWORD CCrystalTextView::ParseLineSgml(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf)
+DWORD CCrystalTextView::ParseLineSgml(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
 {
-	int const nLength = GetLineLength(nLineIndex);
 	if (nLength == 0)
 		return dwCookie & COOKIE_EXT_COMMENT;
 
-	LPCTSTR const pszChars = GetLineChars(nLineIndex);
 	BOOL bRedefineBlock = TRUE;
 	BOOL bDecIndex = FALSE;
 	int nIdentBegin = -1;
-	int I = -1;
 	goto start;
 	do
 	{

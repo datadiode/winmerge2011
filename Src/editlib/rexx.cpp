@@ -111,22 +111,19 @@ static BOOL IsUser1Keyword(LPCTSTR pszChars, int nLength)
 
 #define COOKIE_COMMENT          0x0001
 #define COOKIE_PREPROCESSOR     0x0002
+#define COOKIE_CHAR             0x0004
 #define COOKIE_STRING           0x0008
-#define COOKIE_CHAR             0x0010
 #define COOKIE_EXT_COMMENT      0xFF00
 
-DWORD CCrystalTextView::ParseLineRexx(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf)
+DWORD CCrystalTextView::ParseLineRexx(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
 {
-	int const nLength = GetLineLength(nLineIndex);
 	if (nLength == 0)
 		return dwCookie & COOKIE_EXT_COMMENT;
 
-	LPCTSTR const pszChars = GetLineChars(nLineIndex);
 	BOOL bRedefineBlock = TRUE;
 	BOOL bDecIndex = FALSE;
 	enum { False, Start, End } bWasComment = False;
 	int nIdentBegin = -1;
-	int I = -1;
 	do
 	{
 		int const nPrevI = I++;
@@ -190,7 +187,6 @@ DWORD CCrystalTextView::ParseLineRexx(DWORD dwCookie, int nLineIndex, TextBlock:
 			if (I > 0 && pszChars[I] == '*' && pszChars[nPrevI] == '/' && bWasComment != End)
 			{
 				DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
-				//dwCookie |= COOKIE_EXT_COMMENT;
 				dwCookie = dwCookie & ~COOKIE_EXT_COMMENT | dwCookie - COOKIE_EXT_COMMENT & COOKIE_EXT_COMMENT;
 				bWasComment = Start;
 				continue;
@@ -201,7 +197,6 @@ DWORD CCrystalTextView::ParseLineRexx(DWORD dwCookie, int nLineIndex, TextBlock:
 			{
 				if (I > 0 && pszChars[I] == '/' && pszChars[nPrevI] == '*' && bWasComment != Start)
 				{
-					//dwCookie &= ~COOKIE_EXT_COMMENT;
 					dwCookie = dwCookie & ~COOKIE_EXT_COMMENT | dwCookie + COOKIE_EXT_COMMENT & COOKIE_EXT_COMMENT;
 					bRedefineBlock = TRUE;
 					bWasComment = End;

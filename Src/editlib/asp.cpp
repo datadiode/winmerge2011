@@ -209,19 +209,16 @@ static DWORD ScriptCookie(LPCTSTR lang)
 	return COOKIE_EXT_USER1;
 }
 
-DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf)
+DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
 {
-	int const nLength = GetLineLength(nLineIndex);
 	if (nLength == 0)
 		return dwCookie & (COOKIE_EXT_COMMENT | COOKIE_EXT_USER1 | COOKIE_EXT_USER1_GLOBAL | COOKIE_SCRIPT);
 
-	LPCTSTR const pszChars = GetLineChars(nLineIndex);
 	BOOL bRedefineBlock = TRUE;
 	BOOL bDecIndex = FALSE;
 	enum { False, Start, End } bWasComment = False;
 	DWORD dwScriptTagCookie = std::max<DWORD>(dwCookie & (COOKIE_EXT_USER1 << 4), (COOKIE_EXT_USER1_VB << 4)) >> 4;
 	int nIdentBegin = -1;
-	int I = -1;
 	int nPrevI;
 	goto start;
 	do

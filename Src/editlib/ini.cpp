@@ -36,18 +36,15 @@ using CommonKeywords::IsNumeric;
 #define COOKIE_SECTION          0x0020
 #define COOKIE_KEY              0x0040
 
-DWORD CCrystalTextView::ParseLineIni(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf)
+DWORD CCrystalTextView::ParseLineIni(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
 {
-	int const nLength = GetLineLength(nLineIndex);
 	if (nLength == 0)
 		return dwCookie & COOKIE_EXT_COMMENT;
 
-	LPCTSTR const pszChars = GetLineChars(nLineIndex);
 	BOOL bFirstChar = (dwCookie & ~COOKIE_EXT_COMMENT) == 0;
 	BOOL bRedefineBlock = TRUE;
 	BOOL bDecIndex = FALSE;
 	int nIdentBegin = -1;
-	int I = -1;
 	do
 	{
 		int const nPrevI = I++;

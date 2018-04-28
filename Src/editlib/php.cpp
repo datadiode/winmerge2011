@@ -120,18 +120,15 @@ static BOOL IsPhp2Keyword(LPCTSTR pszChars, int nLength)
 #define COOKIE_USER2            0x0040
 #define COOKIE_EXT_USER1        0x0080
 
-DWORD CCrystalTextView::ParseLinePhp(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf)
+DWORD CCrystalTextView::ParseLinePhp(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
 {
-	int const nLength = GetLineLength(nLineIndex);
 	if (nLength == 0)
 		return dwCookie & (COOKIE_EXT_COMMENT|COOKIE_EXT_USER1);
 
-	LPCTSTR const pszChars = GetLineChars(nLineIndex);
 	BOOL bRedefineBlock = TRUE;
 	BOOL bDecIndex = FALSE;
 	enum { False, Start, End } bWasComment = False;
 	int nIdentBegin = -1;
-	int I = -1;
 	int nPrevI;
 	goto start;
 	do

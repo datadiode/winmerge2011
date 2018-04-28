@@ -307,7 +307,7 @@ void CCrystalEditView::OnChar(WPARAM nChar)
 		nChar != 9 && nChar != 10 && nChar != 13)
 	{
 		if (QueryEditable())
-        {
+		{
 			m_pTextBuffer->BeginUndoGroup(m_bMergeUndo);
 
 			POINT ptSelStart, ptSelEnd;
@@ -324,8 +324,8 @@ void CCrystalEditView::OnChar(WPARAM nChar)
 				ptCursorPos = GetCursorPos();
 				if (m_bOvrMode)
 				{
-					LPCTSTR pszChars = GetLineChars(ptCursorPos.y);
-					int nLineLength = GetLineLength(ptCursorPos.y);
+					LPCTSTR const pszChars = GetLineChars(ptCursorPos.y);
+					int const nLineLength = GetLineLength(ptCursorPos.y);
 					int nEndPos = ptCursorPos.x;
 					if (nEndPos < nLineLength)
 					{
@@ -445,9 +445,9 @@ void CCrystalEditView::OnEditTab()
 	}
 	// Overwrite mode, replace next char with tab/spaces
 	if (m_bOvrMode)
-    {
-		int nLineLength = GetLineLength(ptCursorPos.y);
-		LPCTSTR pszLineChars = GetLineChars(ptCursorPos.y);
+	{
+		int const nLineLength = GetLineLength(ptCursorPos.y);
+		LPCTSTR const pszLineChars = GetLineChars(ptCursorPos.y);
 		// Not end of line
 		if (ptCursorPos.x < nLineLength)
 		{
@@ -529,11 +529,11 @@ void CCrystalEditView::OnEditUntab()
 
 		//  Shift selection to left
 		for (int i = nStartLine ; i <= nEndLine ; ++i)
-        {
-			const int nLength = GetLineLength(i);
+		{
+			int const nLength = GetLineLength(i);
 			if (nLength > 0)
 			{
-				const LPCTSTR pszChars = GetLineChars(i);
+				LPCTSTR const pszChars = GetLineChars(i);
 				int nPos = 0, nOffset = 0;
 				while (nPos < nLength)
 				{
@@ -561,7 +561,7 @@ void CCrystalEditView::OnEditUntab()
 		m_pTextBuffer->FlushUndoGroup(this);
 	}
 	else
-    {
+	{
 		POINT ptCursorPos = GetCursorPos();
 		ASSERT_VALIDTEXTPOS(ptCursorPos);
 		if (ptCursorPos.x > 0)
@@ -573,7 +573,7 @@ void CCrystalEditView::OnEditUntab()
 				nNewOffset -= nTabSize;
 			ASSERT(nNewOffset >= 0);
 
-			LPCTSTR pszChars = GetLineChars(ptCursorPos.y);
+			LPCTSTR const pszChars = GetLineChars(ptCursorPos.y);
 			int nCurrentOffset = 0;
 			int i = 0;
 			while (nCurrentOffset < nNewOffset)
@@ -605,14 +605,14 @@ void CCrystalEditView::OnEditSwitchOvrmode()
 
 HRESULT CCrystalEditView::QueryInterface(REFIID iid, void **ppv)
 {
-    static const QITAB rgqit[] = 
-    {   
-        QITABENT(CCrystalEditView, IDropSource),
-        QITABENT(CCrystalEditView, IDataObject),
-        QITABENT(CCrystalEditView, IDropTarget),
-        { 0 }
-    };
-    return QISearch(this, rgqit, iid, ppv);
+	static const QITAB rgqit[] =
+	{
+		QITABENT(CCrystalEditView, IDropSource),
+		QITABENT(CCrystalEditView, IDataObject),
+		QITABENT(CCrystalEditView, IDropTarget),
+		{ 0 }
+	};
+	return QISearch(this, rgqit, iid, ppv);
 }
 
 ULONG CCrystalEditView::AddRef()
@@ -1041,8 +1041,8 @@ void CCrystalEditView::OnEditOperation(int nAction, LPCTSTR pszText)
 			ASSERT(ptCursorPos.y > 0);
 
 			//  Take indentation from the previos line
-			int nLength = m_pTextBuffer->GetLineLength(ptCursorPos.y - 1);
-			LPCTSTR pszLineChars = m_pTextBuffer->GetLineChars(ptCursorPos.y - 1);
+			int const nLength = m_pTextBuffer->GetLineLength(ptCursorPos.y - 1);
+			LPCTSTR const pszLineChars = m_pTextBuffer->GetLineChars(ptCursorPos.y - 1);
 			int nPos = 0;
 			while (nPos < nLength && xisspace(pszLineChars[nPos]))
 				nPos++;
@@ -1107,7 +1107,7 @@ void CCrystalEditView::OnEditOperation(int nAction, LPCTSTR pszText)
 				SetAnchor(pt);
 				EnsureCursorVisible();
 				// m_pTextBuffer->FlushUndoGroup (this);
-            }
+			}
 			else
 			{
 				//  Insert part of the previos line
@@ -1146,7 +1146,7 @@ void CCrystalEditView::OnEditOperation(int nAction, LPCTSTR pszText)
 		{
 			//  Enter stroke!
 			POINT ptCursorPos = GetCursorPos();
-			LPCTSTR pszChars = m_pTextBuffer->GetLineChars(ptCursorPos.y);
+			LPCTSTR const pszChars = m_pTextBuffer->GetLineChars(ptCursorPos.y);
 			if (ptCursorPos.x > 1 && xisalnum(pszChars[ptCursorPos.x - 2]))
 			{
 				LPTSTR pszInsertStr = (TCHAR *) _alloca (sizeof (TCHAR) * 2);
@@ -1169,8 +1169,8 @@ void CCrystalEditView::OnEditOperation(int nAction, LPCTSTR pszText)
 			POINT ptCursorPos = GetCursorPos ();
 
 			//  Take indentation from the previos line
-			const int nLength = m_pTextBuffer->GetLineLength(ptCursorPos.y);
-			const LPCTSTR pszLineChars = m_pTextBuffer->GetLineChars(ptCursorPos.y );
+			int const nLength = m_pTextBuffer->GetLineLength(ptCursorPos.y);
+			LPCTSTR const pszLineChars = m_pTextBuffer->GetLineChars(ptCursorPos.y );
 			int nPos = 0;
 			while (nPos < nLength && xisspace(pszLineChars[nPos]))
 				nPos++;
@@ -1213,8 +1213,8 @@ void CCrystalEditView::OnEditOperation(int nAction, LPCTSTR pszText)
 			POINT ptCursorPos = GetCursorPos();
 
 			//  Take indentation from the previos line
-			const int nLength = m_pTextBuffer->GetLineLength(ptCursorPos.y);
-			const LPCTSTR pszLineChars = m_pTextBuffer->GetLineChars(ptCursorPos.y );
+			int const nLength = m_pTextBuffer->GetLineLength(ptCursorPos.y);
+			LPCTSTR const pszLineChars = m_pTextBuffer->GetLineChars(ptCursorPos.y );
 			int nPos = 0;
 			while (nPos < nLength && xisspace(pszLineChars[nPos]))
 				nPos++;
