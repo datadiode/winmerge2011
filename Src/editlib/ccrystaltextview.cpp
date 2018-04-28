@@ -2871,11 +2871,6 @@ void CCrystalTextView::OnSetFocus()
 	UpdateCaret();
 }
 
-DWORD CCrystalTextView::ParseLinePlain(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
-{
-	return 0;
-}
-
 DWORD CCrystalTextView::ParseLine(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf)
 {
 	if (LPCTSTR const pszChars = GetLineChars(nLineIndex))
@@ -2884,6 +2879,40 @@ DWORD CCrystalTextView::ParseLine(DWORD dwCookie, int nLineIndex, TextBlock::Arr
 		dwCookie = m_CurSourceDef->ParseLineX(dwCookie, pszChars, nLength, -1, pBuf);
 	}
 	return dwCookie;
+}
+
+DWORD CCrystalTextView::ScriptCookie(LPCTSTR lang)
+{
+	if (PathMatchSpec(lang, _T("VB*")))
+		return COOKIE_PARSER_BASIC;
+	if (PathMatchSpec(lang, _T("C#")))
+		return COOKIE_PARSER_CSHARP;
+	if (PathMatchSpec(lang, _T("JS*;JAVA*")))
+		return COOKIE_PARSER_JAVA;
+	if (PathMatchSpec(lang, _T("PERL")))
+		return COOKIE_PARSER_PERL;
+	return COOKIE_PARSER;
+}
+
+CCrystalTextView::TextBlock::ParseProc CCrystalTextView::ScriptParseProc(DWORD dwCookie)
+{
+	switch (dwCookie & COOKIE_PARSER)
+	{
+	case COOKIE_PARSER_BASIC:
+		return &ParseLineBasic;
+	case COOKIE_PARSER_CSHARP:
+		return &ParseLineCSharp;
+	case COOKIE_PARSER_JAVA:
+		return &ParseLineJava;
+	case COOKIE_PARSER_PERL:
+		return &ParseLinePerl;
+	}
+	return &ParseLinePlain;
+}
+
+DWORD CCrystalTextView::ParseLinePlain(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
+{
+	return 0;
 }
 
 int CCrystalTextView::CalculateActualOffset(int nLineIndex, int nCharIndex, BOOL bAccumulate)
