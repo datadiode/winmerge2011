@@ -233,6 +233,26 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 				goto start;
 			}
 
+			switch (dwCookie & COOKIE_PARSER)
+			{
+			case 0:
+				break;
+			case COOKIE_PARSER_BASIC:
+				if (pszChars[I] == '\'')
+				{
+					I = nLength;
+					continue; // breaks the loop
+				}
+				break;
+			default:
+				if (I > 0 && pszChars[I] == '/' && pszChars[nPrevI] == '/' && bWasComment != End)
+				{
+					I = nLength;
+					continue; // breaks the loop
+				}
+				break;
+			}
+
 			//  Extended comment <?....?>
 			if (dwCookie & COOKIE_PARSER)
 			{
@@ -280,16 +300,6 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 
 			switch (dwCookie & COOKIE_PARSER)
 			{
-			case COOKIE_PARSER:
-				if (I > 0 && pszChars[I] == '*' && pszChars[nPrevI] == '/')
-				{
-					DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
-					dwCookie |= COOKIE_EXT_COMMENT;
-					bWasComment = Start;
-					goto start;
-				}
-				bWasComment = False;
-				break;
 			case 0:
 				if (I < nLength - 3 && pszChars[I] == '<' && pszChars[I + 1] == '!' && pszChars[I + 2] == '-' && pszChars[I + 3] == '-')
 				{
@@ -299,6 +309,18 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 					dwCookie &= ~COOKIE_PREPROCESSOR;
 					goto start;
 				}
+				break;
+			case COOKIE_PARSER_BASIC:
+				break;
+			default:
+				if (I > 0 && pszChars[I] == '*' && pszChars[nPrevI] == '/')
+				{
+					DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
+					dwCookie |= COOKIE_EXT_COMMENT;
+					bWasComment = Start;
+					goto start;
+				}
+				bWasComment = False;
 				break;
 			}
 
