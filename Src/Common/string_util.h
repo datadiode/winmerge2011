@@ -99,6 +99,12 @@ BOOL xisequal(LPCTSTR key, size_t len, TCHAR const (&r)[N])
 	return len == N - 1 && compare(key, r, len) == 0;
 }
 
+template<int (*compare)(LPCTSTR, LPCTSTR, size_t), size_t N>
+LPCTSTR xisequal(LPCTSTR key, TCHAR const (&r)[N])
+{
+	return compare(key, r, N - 1) == 0 ? key + N - 1 : NULL;
+}
+
 namespace CommonKeywords
 {
 	BOOL IsNumeric(LPCTSTR pszChars, int nLength);

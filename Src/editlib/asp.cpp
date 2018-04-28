@@ -412,7 +412,7 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, int nLineIndex, TextBlock::
 					bRedefineBlock = TRUE;
 					goto start;
 				}
-				if (I > 0 && pszChars[nPrevI] == '<' && xisequal<_tcsnicmp>(pszChars + I, 8, _T("/script>")))
+				if (I > 0 && pszChars[nPrevI] == '<' && xisequal<_tcsnicmp>(pszChars + I, _T("/script>")))
 				{
 					DEFINE_BLOCK(nPrevI, COLORINDEX_OPERATOR);
 					DEFINE_BLOCK(I, COLORINDEX_PREPROCESSOR);
