@@ -2878,9 +2878,12 @@ DWORD CCrystalTextView::ParseLinePlain(DWORD dwCookie, LPCTSTR const pszChars, i
 
 DWORD CCrystalTextView::ParseLine(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf)
 {
-	int const nLength = GetLineLength(nLineIndex);
-	LPCTSTR const pszChars = GetLineChars(nLineIndex);
-	return (this->*(m_CurSourceDef->ParseLineX))(dwCookie, pszChars, nLength, -1, pBuf);
+	if (LPCTSTR const pszChars = GetLineChars(nLineIndex))
+	{
+		int const nLength = GetLineLength(nLineIndex);
+		dwCookie = m_CurSourceDef->ParseLineX(dwCookie, pszChars, nLength, -1, pBuf);
+	}
+	return dwCookie;
 }
 
 int CCrystalTextView::CalculateActualOffset(int nLineIndex, int nCharIndex, BOOL bAccumulate)
