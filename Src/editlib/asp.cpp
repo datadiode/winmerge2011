@@ -236,7 +236,7 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 		//  User1 end: ?>
 		if (dwCookie & COOKIE_EXT_USER1)
 		{
-			if (I > 0 && pszChars[I] == '>' && (!(dwCookie & COOKIE_SCRIPT) || pszChars[nPrevI] == '?' || pszChars[nPrevI] == '%'))
+			if (I > 0 && pszChars[I] == '>' && ((dwCookie & (COOKIE_SCRIPT | COOKIE_PREPROCESSOR)) == COOKIE_PREPROCESSOR || pszChars[nPrevI] == '?' || pszChars[nPrevI] == '%'))
 			{
 				dwCookie &= ~(COOKIE_EXT_USER1 | COOKIE_SCRIPT);
 				nIdentBegin = -1;
