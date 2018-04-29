@@ -85,7 +85,7 @@ public:
 	void SetCRLFModeStatus(enum CRLFSTYLE);
 	void RefreshOptions();
 	void ShowDiff(bool bScroll);
-	virtual void OnEditOperation(int nAction, LPCTSTR pszText);
+	virtual void OnEditOperation(int nAction, LPCTSTR pszText, int cchText);
 	virtual void OnUpdateCaret(bool bShowHide = false);
 	void UpdateLineLengths();
 	virtual bool IsLineInCurrentDiff(int);

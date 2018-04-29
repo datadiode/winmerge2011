@@ -518,7 +518,7 @@ void CMergeEditView::UpdateLineLengths()
  * @sa CCrystalEditView::OnEditOperation()
  * @todo More edit-events for rescan delaying?
  */
-void CMergeEditView::OnEditOperation(int nAction, LPCTSTR pszText)
+void CMergeEditView::OnEditOperation(int nAction, LPCTSTR pszText, int cchText)
 {
 	if (!QueryEditable())
 	{
@@ -530,7 +530,7 @@ void CMergeEditView::OnEditOperation(int nAction, LPCTSTR pszText)
 	m_pDocument->SetEditedAfterRescan(m_nThisPane);
 
 	// perform original function
-	CCrystalEditView::OnEditOperation(nAction, pszText);
+	CCrystalEditView::OnEditOperation(nAction, pszText, cchText);
 
 	// augment with additional operations
 

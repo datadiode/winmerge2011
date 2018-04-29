@@ -3229,10 +3229,6 @@ void CCrystalTextView::SetAnchor(const POINT & ptNewAnchor)
 	m_ptAnchor = ptNewAnchor;
 }
 
-void CCrystalTextView::OnEditOperation(int nAction, LPCTSTR pszText)
-{
-}
-
 const POINT &CCrystalTextView::GetCursorPos() const
 {
 	return m_ptCursorPos;

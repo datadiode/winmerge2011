@@ -792,7 +792,7 @@ public:
 	void UpdateCompositionWindowFont();
 
 	//  Overridable: an opportunity for Auto-Indent, Smart-Indent etc.
-	virtual void OnEditOperation(int nAction, LPCTSTR pszText);
+	virtual void OnEditOperation(int nAction, LPCTSTR pszText, int cchText) = 0;
 
 public:
 	CCrystalTextView(size_t);

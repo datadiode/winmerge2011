@@ -96,7 +96,7 @@ public:
 
     void ReplaceSelection(LPCTSTR pszNewText, int cchNewText);
 
-    virtual void OnEditOperation(int nAction, LPCTSTR pszText);
+    virtual void OnEditOperation(int nAction, LPCTSTR pszText, int cchText);
 
     virtual TextDefinition *DoSetTextType(TextDefinition *def);
 

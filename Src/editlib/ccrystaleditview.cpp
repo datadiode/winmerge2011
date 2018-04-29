@@ -1029,12 +1029,12 @@ static int bracetype(LPCTSTR s)
 	return bracetype(*s);
 }
 
-void CCrystalEditView::OnEditOperation(int nAction, LPCTSTR pszText)
+void CCrystalEditView::OnEditOperation(int nAction, LPCTSTR pszText, int cchText)
 {
 	if (m_bAutoIndent)
 	{
 		//  Analyse last action...
-		if (nAction == CE_ACTION_TYPING && _tcscmp(pszText, _T("\r\n")) == 0 && !m_bOvrMode)
+		if (nAction == CE_ACTION_TYPING && cchText == 2 && LineInfo::IsDosEol(pszText) && !m_bOvrMode)
 		{
 			//  Enter stroke!
 			POINT ptCursorPos = GetCursorPos();
@@ -1070,7 +1070,7 @@ void CCrystalEditView::OnEditOperation(int nAction, LPCTSTR pszText)
 						}
 					}
 				}
-				//  Insert part of the previos line
+				//  Insert part of the previous line
 				TCHAR *pszInsertStr;
 				if ((GetFlags() & (SRCOPT_BRACEGNU|SRCOPT_BRACEANSI)) && isopenbrace(pszLineChars[nLength - 1]))
 				{

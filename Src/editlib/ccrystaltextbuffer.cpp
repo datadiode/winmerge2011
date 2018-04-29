@@ -793,7 +793,7 @@ void CCrystalTextBuffer::FlushUndoGroup(CCrystalTextView *pSource)
 		if (m_nUndoPosition > 0)
 		{
 			const UndoRecord &undo = GetUndoRecord(m_nUndoPosition - 1);
-			pSource->OnEditOperation(undo.m_nAction, undo.GetText());
+			pSource->OnEditOperation(undo.m_nAction, undo.GetText(), undo.GetTextLength());
 		}
 	}
 	m_bUndoGroup = FALSE;
