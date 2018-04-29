@@ -442,7 +442,6 @@
     <ClCompile Include="editlib\css.cpp" />
     <ClCompile Include="editlib\dcl.cpp" />
     <ClCompile Include="editlib\fortran.cpp" />
-    <ClCompile Include="editlib\html.cpp" />
     <ClCompile Include="editlib\ini.cpp" />
     <ClCompile Include="editlib\innosetup.cpp" />
     <ClCompile Include="editlib\is.cpp" />

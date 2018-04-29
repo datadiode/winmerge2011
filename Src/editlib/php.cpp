@@ -113,17 +113,15 @@ static BOOL IsPhp2Keyword(LPCTSTR pszChars, int nLength)
 
 #define COOKIE_COMMENT          0x0001
 #define COOKIE_PREPROCESSOR     0x0002
-#define COOKIE_EXT_COMMENT      0x0004
+#define COOKIE_CHAR             0x0004
 #define COOKIE_STRING           0x0008
-#define COOKIE_CHAR             0x0010
-#define COOKIE_USER1            0x0020
-#define COOKIE_USER2            0x0040
-#define COOKIE_EXT_USER1        0x0080
+#define COOKIE_EXT_COMMENT      0x0010
+#define COOKIE_USER2            0x0020
 
 DWORD CCrystalTextView::ParseLinePhp(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
 {
 	if (nLength == 0)
-		return dwCookie & (COOKIE_EXT_COMMENT|COOKIE_EXT_USER1);
+		return dwCookie & (COOKIE_EXT_COMMENT | COOKIE_CHAR | COOKIE_STRING);
 
 	BOOL bRedefineBlock = TRUE;
 	BOOL bDecIndex = FALSE;
@@ -133,67 +131,8 @@ DWORD CCrystalTextView::ParseLinePhp(DWORD dwCookie, LPCTSTR const pszChars, int
 	goto start;
 	do
 	{
-		//  Preprocessor start: < or bracket
-		if (!(dwCookie & COOKIE_EXT_USER1) && pszChars[I] == '<' && !(I < nLength - 3 && pszChars[I + 1] == '!' && pszChars[I + 2] == '-' && pszChars[I + 3] == '-'))
-		{
-			DEFINE_BLOCK(I, COLORINDEX_OPERATOR);
-			DEFINE_BLOCK(I + 1, COLORINDEX_PREPROCESSOR);
-			dwCookie |= COOKIE_PREPROCESSOR;
-			nIdentBegin = -1;
-			goto start;
-		}
-
-		//  User1 end: ?>
-		if (dwCookie & COOKIE_EXT_USER1)
-		{
-			if (I > 0 && pszChars[I] == '>' && (pszChars[nPrevI] == '?' || pszChars[nPrevI] == '%'))
-			{
-				dwCookie &= ~COOKIE_EXT_USER1;
-				nIdentBegin = -1;
-				bRedefineBlock = TRUE;
-				bDecIndex = TRUE;
-				goto start;
-			}
-		}
-
-		//  Preprocessor end: > or bracket
-		if (dwCookie & COOKIE_PREPROCESSOR)
-		{
-			if (pszChars[I] == '>')
-			{
-				dwCookie &= ~COOKIE_PREPROCESSOR;
-				nIdentBegin = -1;
-				bRedefineBlock = TRUE;
-				bDecIndex = TRUE;
-				goto start;
-			}
-		}
-
-		//  Preprocessor start: &
-		if (!(dwCookie & COOKIE_EXT_USER1) && pszChars[I] == '&')
-		{
-			dwCookie |= COOKIE_USER1;
-			bRedefineBlock = TRUE;
-			bDecIndex = TRUE;
-			nIdentBegin = -1;
-			goto start;
-		}
-
-		//  Preprocessor end: ;
-		if (dwCookie & COOKIE_USER1)
-		{
-			if (pszChars[I] == ';')
-			{
-				dwCookie &= ~COOKIE_USER1;
-				bRedefineBlock = TRUE;
-				bDecIndex = TRUE;
-				nIdentBegin = -1;
-				goto start;
-			}
-		}
-
 		//  Preprocessor start: $
-		if ((dwCookie & COOKIE_EXT_USER1) && pszChars[I] == '$')
+		if (pszChars[I] == '$')
 		{
 			dwCookie |= COOKIE_USER2;
 			nIdentBegin = -1;
@@ -225,14 +164,6 @@ DWORD CCrystalTextView::ParseLinePhp(DWORD dwCookie, LPCTSTR const pszChars, int
 			else if (dwCookie & (COOKIE_CHAR | COOKIE_STRING))
 			{
 				DEFINE_BLOCK(nPos, COLORINDEX_STRING);
-			}
-			else if (dwCookie & COOKIE_PREPROCESSOR)
-			{
-				DEFINE_BLOCK(nPos, COLORINDEX_PREPROCESSOR);
-			}
-			else if (dwCookie & COOKIE_EXT_USER1)
-			{
-				DEFINE_BLOCK(nPos, COLORINDEX_NORMALTEXT);
 			}
 			else if (xisalnum(pszChars[nPos]) || pszChars[nPos] == '.')
 			{
@@ -281,64 +212,42 @@ DWORD CCrystalTextView::ParseLinePhp(DWORD dwCookie, LPCTSTR const pszChars, int
 			//  Extended comment <!--....-->
 			if (dwCookie & COOKIE_EXT_COMMENT)
 			{
-				if (dwCookie & COOKIE_EXT_USER1)
+				if (I > 0 && pszChars[I] == '/' && pszChars[nPrevI] == '*' && bWasComment != Start)
 				{
-					if (I > 0 && pszChars[I] == '/' && pszChars[nPrevI] == '*' && bWasComment != Start)
-					{
-						dwCookie &= ~COOKIE_EXT_COMMENT;
-						bRedefineBlock = TRUE;
-						bWasComment = End;
-					}
-					else
-					{
-						bWasComment = False;
-					}
+					dwCookie &= ~COOKIE_EXT_COMMENT;
+					bRedefineBlock = TRUE;
+					bWasComment = End;
 				}
 				else
 				{
-					if (I > 1 && pszChars[I] == '>' && pszChars[nPrevI] == '-' && pszChars[nPrevI - 1] == '-')
-					{
-						dwCookie &= ~COOKIE_EXT_COMMENT;
-						bRedefineBlock = TRUE;
-					}
+					bWasComment = False;
 				}
 				goto start;
 			}
 
-			if ((dwCookie & COOKIE_EXT_USER1) && I > 0 && pszChars[I] == '/' && pszChars[nPrevI] == '/' && bWasComment != End)
+			if (I > 0 && pszChars[I] == '/' && pszChars[nPrevI] == '/' && bWasComment != End)
 			{
 				DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
 				dwCookie |= COOKIE_COMMENT;
 				break;
 			}
 
-			if ((dwCookie & COOKIE_EXT_USER1) && pszChars[I] == '#')
+			if (pszChars[I] == '#')
 			{
 				DEFINE_BLOCK(I, COLORINDEX_COMMENT);
 				dwCookie |= COOKIE_COMMENT;
 				break;
 			}
 
-			//  Extended comment <?....?>
-			if (dwCookie & COOKIE_EXT_USER1)
-			{
-				if (I > 0 && pszChars[I] == '>' && (pszChars[nPrevI] == '?' || pszChars[nPrevI] == '%'))
-				{
-					dwCookie &= ~COOKIE_EXT_USER1;
-					bRedefineBlock = TRUE;
-					goto start;
-				}
-			}
-
 			//  Normal text
-			if ((dwCookie & (COOKIE_PREPROCESSOR | COOKIE_EXT_USER1)) && pszChars[I] == '"')
+			if (pszChars[I] == '"')
 			{
 				DEFINE_BLOCK(I, COLORINDEX_STRING);
 				dwCookie |= COOKIE_STRING;
 				goto start;
 			}
 
-			if ((dwCookie & (COOKIE_PREPROCESSOR | COOKIE_EXT_USER1)) && pszChars[I] == '\'')
+			if (pszChars[I] == '\'')
 			{
 				if (I == 0 || !xisxdigit(pszChars[nPrevI]))
 				{
@@ -348,37 +257,14 @@ DWORD CCrystalTextView::ParseLinePhp(DWORD dwCookie, LPCTSTR const pszChars, int
 				}
 			}
 
-			if (dwCookie & COOKIE_EXT_USER1)
+			if (I > 0 && pszChars[I] == '*' && pszChars[nPrevI] == '/')
 			{
-				if (I > 0 && pszChars[I] == '*' && pszChars[nPrevI] == '/')
-				{
-					DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
-					dwCookie |= COOKIE_EXT_COMMENT;
-					bWasComment = Start;
-					goto start;
-				}
-				bWasComment = False;
-			}
-			else
-			{
-				if (I < nLength - 3 && pszChars[I] == '<' && pszChars[I + 1] == '!' && pszChars[I + 2] == '-' && pszChars[I + 3] == '-')
-				{
-					DEFINE_BLOCK(I, COLORINDEX_COMMENT);
-					I += 3;
-					dwCookie |= COOKIE_EXT_COMMENT;
-					dwCookie &= ~COOKIE_PREPROCESSOR;
-					goto start;
-				}
-			}
-
-			//  User1 start: <?
-			if (pszChars[I] == '<' && I < nLength - 1 && (pszChars[I + 1] == '?' || pszChars[I + 1] == '%'))
-			{
-				DEFINE_BLOCK(I, COLORINDEX_NORMALTEXT);
-				dwCookie |= COOKIE_EXT_USER1;
-				nIdentBegin = -1;
+				DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
+				dwCookie |= COOKIE_EXT_COMMENT;
+				bWasComment = Start;
 				goto start;
 			}
+			bWasComment = False;
 
 			if (pBuf == NULL)
 				continue; // No need to extract keywords, so skip rest of loop
@@ -392,63 +278,38 @@ DWORD CCrystalTextView::ParseLinePhp(DWORD dwCookie, LPCTSTR const pszChars, int
 		}
 		if (nIdentBegin >= 0)
 		{
-			if (dwCookie & COOKIE_PREPROCESSOR)
+			if (dwCookie & COOKIE_USER2)
 			{
-				if (IsHtmlKeyword(pszChars + nIdentBegin, I - nIdentBegin) && (pszChars[nIdentBegin - 1] == _T ('<') || pszChars[nIdentBegin - 1] == _T ('/')))
-				{
-					DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
-				}
-				else if (IsUser1Keyword(pszChars + nIdentBegin, I - nIdentBegin))
-				{
-					DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER1);
-				}
-				else if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
-				{
-					DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
-				}
+				DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER1);
 			}
-			else if (dwCookie & COOKIE_EXT_USER1)
+			if (IsPhpKeyword(pszChars + nIdentBegin, I - nIdentBegin))
 			{
-				if (dwCookie & COOKIE_USER2)
+				DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
+			}
+			else if (IsPhp1Keyword(pszChars + nIdentBegin, I - nIdentBegin))
+			{
+				DEFINE_BLOCK(nIdentBegin, COLORINDEX_OPERATOR);
+			}
+			else if (IsPhp2Keyword(pszChars + nIdentBegin, I - nIdentBegin))
+			{
+				DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER2);
+			}
+			else if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
+			{
+				DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
+			}
+			else
+			{
+				for (int j = I; j < nLength; j++)
 				{
-					DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER1);
-				}
-				if (IsPhpKeyword(pszChars + nIdentBegin, I - nIdentBegin))
-				{
-					DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
-				}
-				else if (IsPhp1Keyword(pszChars + nIdentBegin, I - nIdentBegin))
-				{
-					DEFINE_BLOCK(nIdentBegin, COLORINDEX_OPERATOR);
-				}
-				else if (IsPhp2Keyword(pszChars + nIdentBegin, I - nIdentBegin))
-				{
-					DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER2);
-				}
-				else if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
-				{
-					DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
-				}
-				else
-				{
-					for (int j = I; j < nLength; j++)
+					if (!xisspace(pszChars[j]))
 					{
-						if (!xisspace(pszChars[j]))
+						if (pszChars[j] == '(')
 						{
-							if (pszChars[j] == '(')
-							{
-								DEFINE_BLOCK(nIdentBegin, COLORINDEX_FUNCNAME);
-							}
-							break;
+							DEFINE_BLOCK(nIdentBegin, COLORINDEX_FUNCNAME);
 						}
+						break;
 					}
-				}
-			}
-			else if (dwCookie & COOKIE_USER1)
-			{
-				if (IsUser2Keyword(pszChars + nIdentBegin, I - nIdentBegin))
-				{
-					DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER2);
 				}
 			}
 			bRedefineBlock = TRUE;
@@ -457,7 +318,7 @@ DWORD CCrystalTextView::ParseLinePhp(DWORD dwCookie, LPCTSTR const pszChars, int
 		}
 	} while (I < nLength);
 
-	dwCookie &= (COOKIE_EXT_COMMENT | COOKIE_STRING | COOKIE_PREPROCESSOR | COOKIE_EXT_USER1);
+	dwCookie &= (COOKIE_EXT_COMMENT | COOKIE_CHAR | COOKIE_STRING);
 	return dwCookie;
 }
 

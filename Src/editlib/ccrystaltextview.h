@@ -37,6 +37,7 @@
 #define COOKIE_PARSER_CSHARP    0x02000000UL
 #define COOKIE_PARSER_JAVA      0x03000000UL
 #define COOKIE_PARSER_PERL      0x04000000UL
+#define COOKIE_PARSER_PHP       0x05000000UL
 #define COOKIE_PARSER_GLOBAL    0xF0000000UL
 
 #define SRCOPT_COOKIE(X)        ((X) << 4)
@@ -612,6 +613,7 @@ public:
 	static DWORD ScriptCookie(LPCTSTR lang);
 	static TextBlock::ParseProc ScriptParseProc(DWORD dwCookie);
 	static DWORD ParseLinePlain(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	static DWORD ParseLineUnknown(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
 	static DWORD ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
 	static DWORD ParseLineBasic(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
 	static DWORD ParseLineBatch(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
@@ -621,7 +623,6 @@ public:
 	static DWORD ParseLineDcl(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
 	static DWORD ParseLineFortran(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
 	static DWORD ParseLineGo(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	static DWORD ParseLineHtml(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
 	static DWORD ParseLineIni(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
 	static DWORD ParseLineInnoSetup(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
 	static DWORD ParseLineIS(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);

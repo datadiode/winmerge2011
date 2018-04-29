@@ -510,9 +510,6 @@
     <ClCompile Include="editlib\fortran.cpp">
       <Filter>EditLib</Filter>
     </ClCompile>
-    <ClCompile Include="editlib\html.cpp">
-      <Filter>EditLib</Filter>
-    </ClCompile>
     <ClCompile Include="editlib\ini.cpp">
       <Filter>EditLib</Filter>
     </ClCompile>
