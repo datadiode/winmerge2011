@@ -213,6 +213,7 @@ BOOL HtmlKeywords::IsUser1Keyword(LPCTSTR pszChars, int nLength)
 		_T("ROWS"),
 		_T("ROWSPAN"),
 		_T("RULES"),
+		_T("RUNAT"),
 		_T("SCHEME"),
 		_T("SCOPE"),
 		_T("SCROLLING"),

@@ -55,7 +55,7 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 	BOOL bRedefineBlock = TRUE;
 	BOOL bDecIndex = FALSE;
 	enum { False, Start, End } bWasComment = False;
-	DWORD dwScriptTagCookie = (dwCookie & (COOKIE_PARSER << 4)) >> 4;
+	DWORD dwScriptTagCookie = 0;
 	int nIdentBegin = -1;
 	pBuf.m_bRecording = dwCookie & COOKIE_PARSER ? NULL : pBuf;
 	int nPrevI;
@@ -82,7 +82,8 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 				if (dwCookie & COOKIE_SCRIPT)
 				{
 					pBuf.m_bRecording = NULL;
-					dwCookie = dwCookie & ~COOKIE_PARSER | dwScriptTagCookie;
+					dwCookie &= ~COOKIE_PARSER;
+					dwCookie |= dwScriptTagCookie ? dwScriptTagCookie : COOKIE_PARSER_JAVA;
 					nScriptBegin = I + 1;
 				}
 				else
@@ -329,7 +330,7 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 					pBuf.m_bRecording = NULL;
 					nScriptBegin = I + 2;
 				}
-				dwCookie |= (dwCookie & (COOKIE_PARSER << 4)) >> 4;
+				dwCookie |= (dwCookie & COOKIE_PARSER_GLOBAL) >> 4;
 				nIdentBegin = -1;
 				goto start;
 			}
@@ -353,7 +354,7 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 					{
 						if (pchIdent[-1] == '<')
 							dwCookie |= COOKIE_SCRIPT;
-						dwScriptTagCookie = (dwCookie & (COOKIE_PARSER << 4)) >> 4;
+						dwScriptTagCookie = 0;
 					}
 					if (!pBuf.m_bRecording)
 					{
@@ -384,6 +385,13 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 						{
 							dwScriptTagCookie = ScriptCookie(lang);
 						}
+						else if (dwScriptTagCookie == 0 &&
+							xisequal<_tcsnicmp>(pchIdent, cchIdent, _T("runat")) &&
+							_stscanf(pchIdent + cchIdent, _T("%31[^a-zA-Z]%31[a-zA-Z#]"), lang, lang) == 2 &&
+							_tcsicmp(lang, _T("server")) == 0)
+						{
+							dwScriptTagCookie = (dwCookie & COOKIE_PARSER_GLOBAL) >> 4;
+						}
 					}
 					DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER1);
 				}
@@ -396,7 +404,7 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 					if (xisequal<_tcsnicmp>(pchIdent, cchIdent, _T("language")) &&
 						_stscanf(pchIdent + cchIdent, _T("%31[^a-zA-Z]%31[a-zA-Z#]"), lang, lang) == 2)
 					{
-						dwCookie = dwCookie & ~(COOKIE_PARSER << 4) | (ScriptCookie(lang) << 4);
+						dwCookie = dwCookie & ~COOKIE_PARSER_GLOBAL | (ScriptCookie(lang) << 4);
 					}
 				}
 			}
