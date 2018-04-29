@@ -252,6 +252,7 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 						}
 						DEFINE_BLOCK(nPrevI, COLORINDEX_NORMALTEXT);
 						dwCookie &= ~(COOKIE_PARSER | COOKIE_SCRIPT);
+						bRedefineBlock = FALSE;
 						goto start;
 					}
 					if (pszChars[nPrevI] == '<' && xisequal<_tcsnicmp>(pszChars + I, _T("/script>")))

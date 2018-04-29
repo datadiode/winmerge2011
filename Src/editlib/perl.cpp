@@ -346,8 +346,7 @@ DWORD CCrystalTextView::ParseLinePerl(DWORD dwCookie, LPCTSTR const pszChars, in
 			}
 			if (pszChars[I] == '\'')
 			{
-				// if (I + 1 < nLength && pszChars[I + 1] == '\'' || I + 2 < nLength && pszChars[I + 1] != '\\' && pszChars[I + 2] == '\'' || I + 3 < nLength && pszChars[I + 1] == '\\' && pszChars[I + 3] == '\'')
-				if (!I || !xisalnum(pszChars[nPrevI]))
+				if (I == 0 || !xisxdigit(pszChars[nPrevI]))
 				{
 					DEFINE_BLOCK(I, COLORINDEX_STRING);
 					dwCookie |= COOKIE_CHAR;
@@ -356,8 +355,7 @@ DWORD CCrystalTextView::ParseLinePerl(DWORD dwCookie, LPCTSTR const pszChars, in
 			}
 
 			if (pBuf == NULL)
-				continue;               //  We don't need to extract keywords,
-			//  for faster parsing skip the rest of loop
+				continue; // No need to extract keywords, so skip rest of loop
 
 			if (xisalnum(pszChars[I]) || pszChars[I] == '.' && I > 0 && (!xisalpha(pszChars[nPrevI]) && !xisalpha(pszChars[I + 1])))
 			{

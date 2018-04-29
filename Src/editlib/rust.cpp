@@ -256,8 +256,7 @@ DWORD CCrystalTextView::ParseLineRust(DWORD dwCookie, LPCTSTR const pszChars, in
 			}
 
 			if (pBuf == NULL)
-				continue;               //  We don't need to extract keywords,
-			//  for faster parsing skip the rest of loop
+				continue; // No need to extract keywords, so skip rest of loop
 
 			if (xisalnum(pszChars[I]) || pszChars[I] == '.' && I > 0 && (!xisalpha(pszChars[nPrevI]) && !xisalpha(pszChars[I + 1])))
 			{
