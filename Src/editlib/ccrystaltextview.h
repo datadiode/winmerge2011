@@ -39,6 +39,7 @@
 #define COOKIE_PARSER_PERL      0x04000000UL
 #define COOKIE_PARSER_GLOBAL    0xF0000000UL
 
+#define SRCOPT_COOKIE(X)        ((X) << 4)
 C_ASSERT(COOKIE_PARSER_GLOBAL == COOKIE_PARSER << 4);
 
 ////////////////////////////////////////////////////////////////////////////
@@ -717,7 +718,7 @@ public:
 // Tabsize is commented out since we have only GUI setting for it now.
 // Not removed because we may later want to have per-filetype settings again.
 // See ccrystaltextview.cpp for per filetype table initialization.
-	typedef const struct tagTextDefinition
+	typedef struct tagTextDefinition
 	{
 		TextType type;
 		LPCTSTR name;
@@ -727,7 +728,7 @@ public:
 		LPCTSTR opencomment;
 		LPCTSTR closecomment;
 		LPCTSTR commentline;
-	} TextDefinition;
+	} const TextDefinition;
 
 	static const DWORD SRCOPT_INSERTTABS = 1;
 	static const DWORD SRCOPT_SHOWTABS = 2;

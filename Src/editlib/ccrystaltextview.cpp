@@ -270,7 +270,7 @@ LRESULT CCrystalTextView::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 CCrystalTextView::TextDefinition CCrystalTextView::m_StaticSourceDefs[] =
 {
 	SRC_PLAIN, _T ("Plain"), _T ("txt;doc;diz"), &ParseLinePlain, SRCOPT_AUTOINDENT, /*4,*/ _T (""), _T (""), _T (""),
-	SRC_ASP, _T ("ASP"), _T ("asp;aspx"), &ParseLineAsp, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T (""), _T (""), _T ("'"),
+	SRC_ASP, _T ("ASP"), _T ("asp;aspx"), &ParseLineAsp, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI|SRCOPT_COOKIE(COOKIE_PARSER_BASIC), /*2,*/ _T (""), _T (""), _T ("'"),
 	SRC_BASIC, _T ("Basic"), _T ("bas;vb;vbs;frm;dsm;cls;ctl;pag;dsr"), &ParseLineBasic, SRCOPT_AUTOINDENT, /*4,*/ _T (""), _T (""), _T ("\'"),
 	SRC_BATCH, _T ("Batch"), _T ("bat;btm;cmd"), &ParseLineBatch, SRCOPT_INSERTTABS|SRCOPT_AUTOINDENT, /*4,*/ _T (""), _T (""), _T ("rem "),
 	SRC_C, _T ("C"), _T ("c;cc;cpp;cxx;h;hpp;hxx;hm;inl;rh;tlh;tli;xs"), &ParseLineC, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T ("/*"), _T ("*/"), _T ("//"),
@@ -315,7 +315,7 @@ void CCrystalTextView::ScanParserAssociations(LPTSTR p)
 	struct tagTextDefinition *defs = new tagTextDefinition[_countof(m_StaticSourceDefs)];
 	memcpy(defs, m_StaticSourceDefs, sizeof m_StaticSourceDefs);
 	m_SourceDefs = defs;
-	while (TCHAR *q = _tcschr(p, _T('=')))
+	while (LPTSTR q = _tcschr(p, _T('=')))
 	{
 		const size_t r = _tcslen(q);
 		*q++ = _T('\0');
@@ -325,6 +325,16 @@ void CCrystalTextView::ScanParserAssociations(LPTSTR p)
 			tagTextDefinition &def = defs[i];
 			if (_tcsicmp(def.name, p) == 0)
 			{
+				// Look for additional tags at end of entry
+				while (LPTSTR t = _tcsrchr(q, _T(':')))
+				{
+					*t++ = '\0';
+					if (DWORD dwStartCookie = ScriptCookie(t))
+					{
+						def.flags &= ~SRCOPT_COOKIE(COOKIE_PARSER);
+						def.flags |= dwStartCookie << 4;
+					}
+				}
 				def.exts = _tcsdup(q);
 				break;
 			}
@@ -1066,36 +1076,28 @@ void CCrystalTextView::DrawLineHelper(
 
 DWORD CCrystalTextView::GetParseCookie(int nLineIndex)
 {
-	const int nLineCount = GetLineCount ();
+	int const nLineCount = GetLineCount();
 	if (m_ParseCookies.size() == 0)
 	{
 		// must be initialized to invalid value (DWORD) -1
 		m_ParseCookies.assign(nLineCount, -1);
 	}
 
-	if (nLineIndex < 0)
-		return 0;
-	if (m_ParseCookies[nLineIndex] != - 1)
-		return m_ParseCookies[nLineIndex];
-
 	int L = nLineIndex;
-	while (L >= 0 && m_ParseCookies[L] == - 1)
-		L--;
-	L++;
+	while (L >= 0 && m_ParseCookies[L] == -1)
+		--L;
 
+	DWORD dwCookie = L >= 0 ? m_ParseCookies[L] :
+		m_CurSourceDef ? m_CurSourceDef->flags & COOKIE_PARSER_GLOBAL : 0;
+	ASSERT(dwCookie != -1);
 	TextBlock::Array rBlocks = NULL;
-	while (L <= nLineIndex)
+	while (++L <= nLineIndex)
 	{
-		DWORD dwCookie = 0;
-		if (L > 0)
-			dwCookie = m_ParseCookies[L - 1];
-		ASSERT(dwCookie != - 1);
-		m_ParseCookies[L] = ParseLine(dwCookie, L, rBlocks);
-		ASSERT(m_ParseCookies[L] != - 1);
-		L++;
+		m_ParseCookies[L] = dwCookie = ParseLine(dwCookie, L, rBlocks);
+		ASSERT(dwCookie != -1);
 	}
 
-	return m_ParseCookies[nLineIndex];
+	return dwCookie;
 }
 
 //BEGIN SW
