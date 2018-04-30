@@ -15,6 +15,11 @@ BOOL HtmlKeywords::IsHtmlKeyword(LPCTSTR pszChars, int nLength)
 {
 	static LPCTSTR const s_apszHtmlKeywordList[] =
 	{
+		_T("!ATTLIST"),
+		_T("!DOCTYPE"),
+		_T("!ELEMENT"),
+		_T("!ENTITY"),
+		_T("!NOTATION"),
 		_T("A"),
 		_T("ABBR"),
 		_T("ACRONYM"),
@@ -42,7 +47,6 @@ BOOL HtmlKeywords::IsHtmlKeyword(LPCTSTR pszChars, int nLength)
 		_T("DIR"),
 		_T("DIV"),
 		_T("DL"),
-		_T("DOCTYPE"),
 		_T("DT"),
 		_T("EM"),
 		_T("FIELDSET"),
@@ -110,6 +114,33 @@ BOOL HtmlKeywords::IsHtmlKeyword(LPCTSTR pszChars, int nLength)
 		_T("VAR"),
 	};
 	return xiskeyword<_tcsnicmp>(pszChars, nLength, s_apszHtmlKeywordList);
+}
+
+BOOL HtmlKeywords::IsDtdKeyword(LPCTSTR pszChars, int nLength)
+{
+	static LPCTSTR const s_apszUser1KeywordList[] =
+	{
+		_T("#FIXED"),
+		_T("#IMPLIED"),
+		_T("#REQUIRED"),
+		_T("ANY"),
+		_T("CDATA"),
+		_T("EMPTY"),
+		_T("ENTITIES"),
+		_T("ENTITY"),
+		_T("ID"),
+		_T("IDREF"),
+		_T("IDREFS"),
+		_T("IGNORE"),
+		_T("INCLUDE"),
+		_T("NDATA"),
+		_T("NMTOKEN"),
+		_T("NMTOKENS"),
+		_T("PCDATA"),
+		_T("PUBLIC"),
+		_T("SYSTEM"),
+	};
+	return xiskeyword<_tcsnicmp>(pszChars, nLength, s_apszUser1KeywordList);
 }
 
 BOOL HtmlKeywords::IsUser1Keyword(LPCTSTR pszChars, int nLength)

@@ -26,12 +26,13 @@
 using CommonKeywords::IsNumeric;
 
 using HtmlKeywords::IsHtmlKeyword;
+using HtmlKeywords::IsDtdKeyword;
 using HtmlKeywords::IsUser1Keyword;
 using HtmlKeywords::IsUser2Keyword;
 
 #define DEFINE_BLOCK pBuf.DefineBlock
 
-#define COOKIE_COMMENT          0x00010000UL
+#define COOKIE_DTD              0x00010000UL
 #define COOKIE_PREPROCESSOR     0x00020000UL
 #define COOKIE_EXT_COMMENT      0x00040000UL
 #define COOKIE_STRING           0x00080000UL
@@ -49,7 +50,7 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 		{
 			dwCookie = dwCookie & 0xFFFF0000 | ScriptParseProc(dwCookie)(dwCookie, pszChars, I, nScriptBegin - 1, pBuf);
 		}
-		return dwCookie & (COOKIE_EXT_COMMENT | COOKIE_PARSER | COOKIE_PARSER_GLOBAL | COOKIE_SCRIPT | 0xFFFF);
+		return dwCookie & (COOKIE_EXT_COMMENT | COOKIE_PARSER | COOKIE_PARSER_GLOBAL | COOKIE_DTD | COOKIE_SCRIPT | 0xFFFF);
 	}
 
 	BOOL bRedefineBlock = TRUE;
@@ -83,14 +84,14 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 				{
 					pBuf.m_bRecording = NULL;
 					dwCookie &= ~COOKIE_PARSER;
-					dwCookie |= dwScriptTagCookie ? dwScriptTagCookie : COOKIE_PARSER_JAVA;
+					dwCookie |= dwScriptTagCookie ? dwScriptTagCookie : COOKIE_PARSER_JSCRIPT;
 					nScriptBegin = I + 1;
 				}
 				else
 				{
 					bDecIndex = TRUE;
 				}
-				dwCookie &= ~(COOKIE_PREPROCESSOR | COOKIE_SCRIPT);
+				dwCookie &= ~(COOKIE_PREPROCESSOR | COOKIE_DTD | COOKIE_SCRIPT);
 				nIdentBegin = -1;
 				goto start;
 			}
@@ -126,7 +127,7 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 			int const nPos = bDecIndex ? nPrevI : I;
 			bRedefineBlock = FALSE;
 			bDecIndex = FALSE;
-			if (dwCookie & (COOKIE_COMMENT | COOKIE_EXT_COMMENT))
+			if (dwCookie & COOKIE_EXT_COMMENT)
 			{
 				DEFINE_BLOCK(nPos, COLORINDEX_COMMENT);
 			}
@@ -157,13 +158,6 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 		// See bug #1474782 Crash when comparing SQL with with binary data
 		if (I < nLength)
 		{
-			if (dwCookie & COOKIE_COMMENT)
-			{
-				DEFINE_BLOCK(I, COLORINDEX_COMMENT);
-				dwCookie |= COOKIE_COMMENT;
-				break;
-			}
-
 			// Double-quoted text
 			if (dwCookie & COOKIE_STRING)
 			{
@@ -193,10 +187,11 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 				switch (dwCookie & COOKIE_PARSER)
 				{
 				case 0:
-					if (I > 1 && pszChars[I] == '>' && pszChars[nPrevI] == '-' && pszChars[nPrevI - 1] == '-')
+					if (I > 1 && (nIdentBegin == -1 || I - nIdentBegin >= 6) && pszChars[I] == '>' && pszChars[nPrevI] == '-' && pszChars[nPrevI - 1] == '-')
 					{
 						dwCookie &= ~COOKIE_EXT_COMMENT;
 						bRedefineBlock = TRUE;
+						nIdentBegin = -1;
 					}
 					break;
 				case COOKIE_PARSER_BASIC:
@@ -271,6 +266,13 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 					}
 				}
 
+				if (pszChars[I] == '[' || pszChars[I] == ']')
+				{
+					DEFINE_BLOCK(I, COLORINDEX_OPERATOR);
+					dwCookie &= ~COOKIE_PREPROCESSOR;
+					goto start;
+				}
+
 				// Double-quoted text
 				if (pszChars[I] == '"')
 				{
@@ -296,6 +298,7 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 			case 0:
 				if (I < nLength - 3 && pszChars[I] == '<' && pszChars[I + 1] == '!' && pszChars[I + 2] == '-' && pszChars[I + 3] == '-')
 				{
+					nIdentBegin = I;
 					DEFINE_BLOCK(I, COLORINDEX_COMMENT);
 					I += 3;
 					dwCookie |= COOKIE_EXT_COMMENT;
@@ -336,7 +339,7 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 				goto start;
 			}
 
-			if (xisalnum(pszChars[I]) || pszChars[I] == '.')
+			if (xisalnum(pszChars[I]) || pszChars[I] == '.' || pszChars[I] == '-' || pszChars[I] == '!' || pszChars[I] == '#')
 			{
 				if (nIdentBegin == -1)
 					nIdentBegin = I;
@@ -351,7 +354,11 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 			{
 				if (pchIdent[-1] == '<' || pchIdent[-1] == '/')
 				{
-					if (xisequal<_tcsnicmp>(pchIdent, cchIdent, _T("script")))
+					if (*pchIdent == '!')
+					{
+						dwCookie |= COOKIE_DTD;
+					}
+					else if (xisequal<_tcsnicmp>(pchIdent, cchIdent, _T("script")))
 					{
 						if (pchIdent[-1] == '<')
 							dwCookie |= COOKIE_SCRIPT;
@@ -374,7 +381,7 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 				{
 					DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
 				}
-				else if (IsUser1Keyword(pchIdent, cchIdent))
+				else if ((dwCookie & COOKIE_DTD ? IsDtdKeyword : IsUser1Keyword)(pchIdent, cchIdent))
 				{
 					if (dwCookie & COOKIE_SCRIPT)
 					{
@@ -435,6 +442,6 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 		}
 	}
 
-	dwCookie &= (COOKIE_EXT_COMMENT | COOKIE_STRING | COOKIE_PREPROCESSOR | COOKIE_PARSER | COOKIE_PARSER_GLOBAL | COOKIE_SCRIPT | 0xFFFF);
+	dwCookie &= (COOKIE_EXT_COMMENT | COOKIE_STRING | COOKIE_PREPROCESSOR | COOKIE_PARSER | COOKIE_PARSER_GLOBAL | COOKIE_DTD | COOKIE_SCRIPT | 0xFFFF);
 	return dwCookie;
 }
