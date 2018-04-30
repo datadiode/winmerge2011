@@ -56,7 +56,7 @@ static BOOL IsBasicKeyword(LPCTSTR pszChars, int nLength)
 		_T("ByVal"),
 		_T("Call"),
 		_T("Case"),
-		_T("Catch"),
+		_T("Catch") NATIVE_LEXIS_ONLY,
 		_T("CBool"),
 		_T("CByte"),
 		_T("CChar"),
@@ -114,9 +114,12 @@ static BOOL IsBasicKeyword(LPCTSTR pszChars, int nLength)
 		_T("EndProperty"),
 		_T("Enum"),
 		_T("EOF"),
+		_T("Eqv"),
 		_T("Erase"),
 		_T("Error"),
+		_T("Eval") SCRIPT_LEXIS_ONLY,
 		_T("Event"),
+		_T("Execute") SCRIPT_LEXIS_ONLY,
 		_T("Exit"),
 		_T("Exp"),
 		_T("Explicit"),
@@ -124,7 +127,7 @@ static BOOL IsBasicKeyword(LPCTSTR pszChars, int nLength)
 		_T("False"),
 		_T("FileCopy"),
 		_T("FileLen"),
-		_T("Finally"),
+		_T("Finally") NATIVE_LEXIS_ONLY,
 		_T("Fix"),
 		_T("For"),
 		_T("Format"),
@@ -150,6 +153,7 @@ static BOOL IsBasicKeyword(LPCTSTR pszChars, int nLength)
 		_T("Hex"),
 		_T("Hour"),
 		_T("If"),
+		_T("Imp"),
 		_T("Implements"),
 		_T("Imports"),
 		_T("In"),
@@ -274,14 +278,14 @@ static BOOL IsBasicKeyword(LPCTSTR pszChars, int nLength)
 		_T("Text"),
 		_T("TextBox"),
 		_T("Then"),
-		_T("Throw"),
+		_T("Throw") NATIVE_LEXIS_ONLY,
 		_T("Time"),
 		_T("TimeSerial"),
 		_T("TimeValue"),
 		_T("To"),
 		_T("Trim"),
 		_T("True"),
-		_T("Try"),
+		_T("Try") NATIVE_LEXIS_ONLY,
 		_T("TryCast"),
 		_T("Type"),
 		_T("TypeOf"),
@@ -316,14 +320,21 @@ static BOOL IsBasicKeyword(LPCTSTR pszChars, int nLength)
 
 #define COOKIE_COMMENT          0x0001
 #define COOKIE_PREPROCESSOR     0x0002
-#define COOKIE_EXT_COMMENT      0x0004
+#define COOKIE_CHAR             0x0004
 #define COOKIE_STRING           0x0008
-#define COOKIE_CHAR             0x0010
 
 DWORD CCrystalTextView::ParseLineBasic(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
 {
 	if (nLength == 0)
-		return dwCookie & COOKIE_EXT_COMMENT;
+		return dwCookie & ~0xFFFF;
+
+	int const nKeywordMask = (
+		dwCookie & COOKIE_PARSER ?
+		dwCookie & COOKIE_PARSER :
+		dwCookie >> 4 & COOKIE_PARSER
+	) == COOKIE_PARSER_VBSCRIPT ?
+		COMMON_LEXIS | SCRIPT_LEXIS :
+		COMMON_LEXIS | NATIVE_LEXIS;
 
 	BOOL bRedefineBlock = TRUE;
 	BOOL bDecIndex = FALSE;
@@ -336,7 +347,7 @@ DWORD CCrystalTextView::ParseLineBasic(DWORD dwCookie, LPCTSTR const pszChars, i
 			int const nPos = bDecIndex ? nPrevI : I;
 			bRedefineBlock = FALSE;
 			bDecIndex = FALSE;
-			if (dwCookie & (COOKIE_COMMENT | COOKIE_EXT_COMMENT))
+			if (dwCookie & COOKIE_COMMENT)
 			{
 				DEFINE_BLOCK(nPos, COLORINDEX_COMMENT);
 			}
@@ -404,7 +415,7 @@ DWORD CCrystalTextView::ParseLineBasic(DWORD dwCookie, LPCTSTR const pszChars, i
 		}
 		if (nIdentBegin >= 0)
 		{
-			if (IsBasicKeyword(pszChars + nIdentBegin, I - nIdentBegin))
+			if (IsBasicKeyword(pszChars + nIdentBegin, I - nIdentBegin) & nKeywordMask)
 			{
 				DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
 			}
@@ -432,7 +443,7 @@ DWORD CCrystalTextView::ParseLineBasic(DWORD dwCookie, LPCTSTR const pszChars, i
 		}
 	} while (I < nLength);
 
-	dwCookie &= COOKIE_EXT_COMMENT;
+	dwCookie &= ~0xFFFF;
 	return dwCookie;
 }
 

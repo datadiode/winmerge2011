@@ -50,6 +50,7 @@ static BOOL IsJavaKeyword(LPCTSTR pszChars, int nLength)
 		_T("finally"),
 		_T("float"),
 		_T("for"),
+		_T("function") SCRIPT_LEXIS_ONLY,
 		_T("goto"),
 		_T("if"),
 		_T("implements"),
@@ -77,6 +78,7 @@ static BOOL IsJavaKeyword(LPCTSTR pszChars, int nLength)
 		_T("transient"),
 		_T("true"),
 		_T("try"),
+		_T("var") SCRIPT_LEXIS_ONLY,
 		_T("void"),
 		_T("while"),
 	};
@@ -87,14 +89,22 @@ static BOOL IsJavaKeyword(LPCTSTR pszChars, int nLength)
 
 #define COOKIE_COMMENT          0x0001
 #define COOKIE_PREPROCESSOR     0x0002
-#define COOKIE_EXT_COMMENT      0x0004
+#define COOKIE_CHAR             0x0004
 #define COOKIE_STRING           0x0008
-#define COOKIE_CHAR             0x0010
+#define COOKIE_EXT_COMMENT      0x0010
 
 DWORD CCrystalTextView::ParseLineJava(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
 {
 	if (nLength == 0)
-		return dwCookie & COOKIE_EXT_COMMENT;
+		return dwCookie & (COOKIE_EXT_COMMENT | ~0xFFFF);
+
+	int const nKeywordMask = (
+		dwCookie & COOKIE_PARSER ?
+		dwCookie & COOKIE_PARSER :
+		dwCookie >> 4 & COOKIE_PARSER
+	) == COOKIE_PARSER_JSCRIPT ?
+		COMMON_LEXIS | SCRIPT_LEXIS :
+		COMMON_LEXIS | NATIVE_LEXIS;
 
 	BOOL bFirstChar = (dwCookie & ~COOKIE_EXT_COMMENT) == 0;
 	BOOL bRedefineBlock = TRUE;
@@ -246,7 +256,7 @@ DWORD CCrystalTextView::ParseLineJava(DWORD dwCookie, LPCTSTR const pszChars, in
 			{
 				DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
 			}
-			else if (IsJavaKeyword(pszChars + nIdentBegin, I - nIdentBegin))
+			else if (IsJavaKeyword(pszChars + nIdentBegin, I - nIdentBegin) & nKeywordMask)
 			{
 				DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
 			}
@@ -271,7 +281,7 @@ DWORD CCrystalTextView::ParseLineJava(DWORD dwCookie, LPCTSTR const pszChars, in
 	} while (I < nLength);
 
 	if (pszChars[nLength - 1] != '\\')
-		dwCookie &= COOKIE_EXT_COMMENT;
+		dwCookie &= (COOKIE_EXT_COMMENT | ~0xFFFF);
 	return dwCookie;
 }
 

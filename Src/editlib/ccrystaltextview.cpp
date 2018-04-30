@@ -271,7 +271,8 @@ CCrystalTextView::TextDefinition CCrystalTextView::m_StaticSourceDefs[] =
 {
 	SRC_PLAIN, _T("Plain"), _T("txt;doc;diz"), &ParseLinePlain, SRCOPT_AUTOINDENT, /*4,*/ _T(""), _T(""), _T(""),
 	SRC_ASP, _T("ASP"), _T("asp;aspx"), &ParseLineAsp, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI|SRCOPT_COOKIE(COOKIE_PARSER_BASIC), /*2,*/ _T(""), _T(""), _T("'"),
-	SRC_BASIC, _T("Basic"), _T("bas;vb;vbs;frm;dsm;cls;ctl;pag;dsr"), &ParseLineBasic, SRCOPT_AUTOINDENT, /*4,*/ _T(""), _T(""), _T("\'"),
+	SRC_BASIC, _T("Basic"), _T("bas;vb;frm;dsm;cls;ctl;pag;dsr"), &ParseLineBasic, SRCOPT_AUTOINDENT, /*4,*/ _T(""), _T(""), _T("\'"),
+	SRC_VBSCRIPT, _T("VBScript"), _T("vbs"), &ParseLineBasic, SRCOPT_AUTOINDENT|SRCOPT_COOKIE(COOKIE_PARSER_VBSCRIPT), /*4,*/ _T(""), _T(""), _T("\'"),
 	SRC_BATCH, _T("Batch"), _T("bat;btm;cmd"), &ParseLineBatch, SRCOPT_INSERTTABS|SRCOPT_AUTOINDENT, /*4,*/ _T(""), _T(""), _T("rem "),
 	SRC_C, _T("C"), _T("c;cc;cpp;cxx;h;hpp;hxx;hm;inl;rh;tlh;tli;xs"), &ParseLineC, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T("/*"), _T("*/"), _T("//"),
 	SRC_CSHARP, _T("C#"), _T("cs"), &ParseLineCSharp, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T("/*"), _T("*/"), _T("//"),
@@ -283,7 +284,8 @@ CCrystalTextView::TextDefinition CCrystalTextView::m_StaticSourceDefs[] =
 	SRC_INI, _T("INI"), _T("ini;reg;vbp;isl"), &ParseLineIni, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI|SRCOPT_EOLNUNIX, /*2,*/ _T(""), _T(""), _T(";"),
 	SRC_INNOSETUP, _T("InnoSetup"), _T("iss"), &ParseLineInnoSetup, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T("{"), _T("}"), _T(";"),
 	SRC_INSTALLSHIELD, _T("InstallShield"), _T("rul"), &ParseLineIS, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T("/*"), _T("*/"), _T("//"),
-	SRC_JAVA, _T("Java"), _T("java;jav;js;json"), &ParseLineJava, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T("/*"), _T("*/"), _T("//"),
+	SRC_JAVA, _T("Java"), _T("java;jav"), &ParseLineJava, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI|SRCOPT_COOKIE(COOKIE_PARSER_JAVA), /*2,*/ _T("/*"), _T("*/"), _T("//"),
+	SRC_JSCRIPT, _T("JavaScript"), _T("js;json"), &ParseLineJava, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI|SRCOPT_COOKIE(COOKIE_PARSER_JSCRIPT), /*2,*/ _T("/*"), _T("*/"), _T("//"),
 	SRC_LISP, _T("AutoLISP"), _T("lsp;dsl"), &ParseLineLisp, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T(";|"), _T("|;"), _T(";"),
 	SRC_NSIS, _T("NSIS"), _T("nsi;nsh"), &ParseLineNsis, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T("/*"), _T("*/"), _T(";"),
 	SRC_PASCAL, _T("Pascal"), _T("pas"), &ParseLinePascal, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T("{"), _T("}"), _T(""),
@@ -2885,16 +2887,20 @@ DWORD CCrystalTextView::ParseLine(DWORD dwCookie, int nLineIndex, TextBlock::Arr
 
 DWORD CCrystalTextView::ScriptCookie(LPCTSTR lang)
 {
-	if (PathMatchSpec(lang, _T("VB*")))
+	if (PathMatchSpec(lang, _T("VB")))
 		return COOKIE_PARSER_BASIC;
 	if (PathMatchSpec(lang, _T("C#")))
 		return COOKIE_PARSER_CSHARP;
-	if (PathMatchSpec(lang, _T("JS*;JAVA*")))
+	if (PathMatchSpec(lang, _T("JAVA")))
 		return COOKIE_PARSER_JAVA;
 	if (PathMatchSpec(lang, _T("PERL")))
 		return COOKIE_PARSER_PERL;
 	if (PathMatchSpec(lang, _T("PHP")))
 		return COOKIE_PARSER_PHP;
+	if (PathMatchSpec(lang, _T("JS*;JAVAS*")))
+		return COOKIE_PARSER_JSCRIPT;
+	if (PathMatchSpec(lang, _T("VBS*")))
+		return COOKIE_PARSER_VBSCRIPT;
 	return COOKIE_PARSER;
 }
 
@@ -2903,10 +2909,12 @@ CCrystalTextView::TextBlock::ParseProc CCrystalTextView::ScriptParseProc(DWORD d
 	switch (dwCookie & COOKIE_PARSER)
 	{
 	case COOKIE_PARSER_BASIC:
+	case COOKIE_PARSER_VBSCRIPT:
 		return &ParseLineBasic;
 	case COOKIE_PARSER_CSHARP:
 		return &ParseLineCSharp;
 	case COOKIE_PARSER_JAVA:
+	case COOKIE_PARSER_JSCRIPT:
 		return &ParseLineJava;
 	case COOKIE_PARSER_PERL:
 		return &ParseLinePerl;

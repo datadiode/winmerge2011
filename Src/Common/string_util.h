@@ -78,7 +78,11 @@ BOOL xiskeyword(LPCTSTR key, UINT len, LPCTSTR const *lower, LPCTSTR const *uppe
 		LPCTSTR const *match = lower + ((upper - lower) >> 1);
 		int cmp = compare(*match, key, len);
 		if (cmp == 0)
+		{
 			cmp = static_cast<TBYTE>((*match)[len]);
+			if (cmp && cmp < 0x20)
+				return cmp;
+		}
 		if (cmp >= 0)
 			upper = match;
 		if (cmp <= 0)
