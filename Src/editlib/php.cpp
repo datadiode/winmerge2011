@@ -25,10 +25,6 @@
 
 using CommonKeywords::IsNumeric;
 
-using HtmlKeywords::IsHtmlKeyword;
-using HtmlKeywords::IsUser1Keyword;
-using HtmlKeywords::IsUser2Keyword;
-
 static BOOL IsPhpKeyword(LPCTSTR pszChars, int nLength)
 {
 	static LPCTSTR const s_apszPhpKeywordList[] =
