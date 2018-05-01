@@ -132,8 +132,8 @@ DWORD CCrystalTextView::ParseLineDcl(DWORD dwCookie, LPCTSTR const pszChars, int
 		return dwCookie & COOKIE_EXT_COMMENT;
 
 	BOOL bRedefineBlock = TRUE;
-	BOOL bWasCommentStart = FALSE;
 	BOOL bDecIndex = FALSE;
+	enum { False, Start, End } bWasComment = False;
 	int nIdentBegin = -1;
 	do
 	{
@@ -176,10 +176,16 @@ DWORD CCrystalTextView::ParseLineDcl(DWORD dwCookie, LPCTSTR const pszChars, int
 			//  String constant "...."
 			if (dwCookie & COOKIE_STRING)
 			{
-				if (pszChars[I] == '"' && (I == 0 || I == 1 && pszChars[nPrevI] != '\\' || I >= 2 && (pszChars[nPrevI] != '\\' || pszChars[nPrevI] == '\\' && pszChars[nPrevI - 1] == '\\')))
+				if (pszChars[I] == '"')
 				{
 					dwCookie &= ~COOKIE_STRING;
 					bRedefineBlock = TRUE;
+					int nPrevI = I;
+					while (nPrevI && pszChars[--nPrevI] == '\\')
+					{
+						dwCookie ^= COOKIE_STRING;
+						bRedefineBlock ^= TRUE;
+					}
 				}
 				continue;
 			}
@@ -187,10 +193,16 @@ DWORD CCrystalTextView::ParseLineDcl(DWORD dwCookie, LPCTSTR const pszChars, int
 			//  Char constant '..'
 			if (dwCookie & COOKIE_CHAR)
 			{
-				if (pszChars[I] == '\'' && (I == 0 || I == 1 && pszChars[nPrevI] != '\\' || I >= 2 && (pszChars[nPrevI] != '\\' || pszChars[nPrevI] == '\\' && pszChars[nPrevI - 1] == '\\')))
+				if (pszChars[I] == '\'')
 				{
 					dwCookie &= ~COOKIE_CHAR;
 					bRedefineBlock = TRUE;
+					int nPrevI = I;
+					while (nPrevI && pszChars[--nPrevI] == '\\')
+					{
+						dwCookie ^= COOKIE_CHAR;
+						bRedefineBlock ^= TRUE;
+					}
 				}
 				continue;
 			}
@@ -198,17 +210,20 @@ DWORD CCrystalTextView::ParseLineDcl(DWORD dwCookie, LPCTSTR const pszChars, int
 			//  Extended comment /*....*/
 			if (dwCookie & COOKIE_EXT_COMMENT)
 			{
-				// if (I > 0 && pszChars[I] == '/' && pszChars[nPrevI] == '*')
-				if ((I > 1 && pszChars[I] == '/' && pszChars[nPrevI] == '*' /*&& pszChars[nPrevI - 1] != '/'*/ && !bWasCommentStart) || (I == 1 && pszChars[I] == '/' && pszChars[nPrevI] == '*'))
+				if (I > 0 && pszChars[I] == '/' && pszChars[nPrevI] == '*' && bWasComment != Start)
 				{
 					dwCookie &= ~COOKIE_EXT_COMMENT;
 					bRedefineBlock = TRUE;
+					bWasComment = End;
 				}
-				bWasCommentStart = FALSE;
+				else
+				{
+					bWasComment = False;
+				}
 				continue;
 			}
 
-			if (I > 0 && pszChars[I] == '/' && pszChars[nPrevI] == '/')
+			if (I > 0 && pszChars[I] == '/' && pszChars[nPrevI] == '/' && bWasComment != End)
 			{
 				DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
 				dwCookie |= COOKIE_COMMENT;
@@ -224,23 +239,22 @@ DWORD CCrystalTextView::ParseLineDcl(DWORD dwCookie, LPCTSTR const pszChars, int
 			}
 			if (pszChars[I] == '\'')
 			{
-				// if (I + 1 < nLength && pszChars[I + 1] == '\'' || I + 2 < nLength && pszChars[I + 1] != '\\' && pszChars[I + 2] == '\'' || I + 3 < nLength && pszChars[I + 1] == '\\' && pszChars[I + 3] == '\'')
-				if (!I || !xisalnum(pszChars[nPrevI]))
+				if (I == 0 || !xisxdigit(pszChars[nPrevI]))
 				{
 					DEFINE_BLOCK(I, COLORINDEX_STRING);
 					dwCookie |= COOKIE_CHAR;
 					continue;
 				}
 			}
-			if (I > 0 && pszChars[I] == '*' && pszChars[nPrevI] == '/')
+			if (I > 0 && pszChars[I] == '*' && pszChars[nPrevI] == '/' && bWasComment != End)
 			{
 				DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
 				dwCookie |= COOKIE_EXT_COMMENT;
-				bWasCommentStart = TRUE;
+				bWasComment = Start;
 				continue;
 			}
 
-			bWasCommentStart = FALSE;
+			bWasComment = False;
 
 			if (pBuf == NULL)
 				continue; // No need to extract keywords, so skip rest of loop
