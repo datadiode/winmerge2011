@@ -51,7 +51,7 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 		{
 			dwCookie = dwCookie & 0xFFFF0000 | ScriptParseProc(dwCookie)(dwCookie, pszChars, I, nScriptBegin - 1, pBuf);
 		}
-		return dwCookie & (COOKIE_EXT_COMMENT | COOKIE_PARSER | COOKIE_PARSER_GLOBAL | COOKIE_DTD | COOKIE_ASP | 0xFFFF);
+		return dwCookie;
 	}
 
 	BOOL bRedefineBlock = TRUE;
