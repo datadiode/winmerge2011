@@ -50,15 +50,13 @@ static BOOL IsTclKeyword(LPCTSTR pszChars, int nLength)
 #define DEFINE_BLOCK pBuf.DefineBlock
 
 #define COOKIE_COMMENT          0x0001
-#define COOKIE_PREPROCESSOR     0x0002
-#define COOKIE_EXT_COMMENT      0x0004
+#define COOKIE_CHAR             0x0004
 #define COOKIE_STRING           0x0008
-#define COOKIE_CHAR             0x0010
 
 DWORD CCrystalTextView::ParseLineTcl(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
 {
 	if (nLength == 0)
-		return dwCookie & COOKIE_EXT_COMMENT;
+		return dwCookie & COOKIE_STRING;
 
 	BOOL bRedefineBlock = TRUE;
 	BOOL bDecIndex = FALSE;
@@ -71,7 +69,7 @@ DWORD CCrystalTextView::ParseLineTcl(DWORD dwCookie, LPCTSTR const pszChars, int
 			int const nPos = bDecIndex ? nPrevI : I;
 			bRedefineBlock = FALSE;
 			bDecIndex = FALSE;
-			if (dwCookie & (COOKIE_COMMENT | COOKIE_EXT_COMMENT))
+			if (dwCookie & COOKIE_COMMENT)
 			{
 				DEFINE_BLOCK(nPos, COLORINDEX_COMMENT);
 			}
@@ -104,10 +102,16 @@ DWORD CCrystalTextView::ParseLineTcl(DWORD dwCookie, LPCTSTR const pszChars, int
 			//  String constant "...."
 			if (dwCookie & COOKIE_STRING)
 			{
-				if (pszChars[I] == '"' && (I == 0 || I == 1 && pszChars[nPrevI] != '\\' || I >= 2 && (pszChars[nPrevI] != '\\' || pszChars[nPrevI] == '\\' && pszChars[nPrevI - 1] == '\\')))
+				if (pszChars[I] == '"')
 				{
 					dwCookie &= ~COOKIE_STRING;
 					bRedefineBlock = TRUE;
+					int nPrevI = I;
+					while (nPrevI && pszChars[--nPrevI] == '\\')
+					{
+						dwCookie ^= COOKIE_STRING;
+						bRedefineBlock ^= TRUE;
+					}
 				}
 				continue;
 			}
@@ -115,10 +119,16 @@ DWORD CCrystalTextView::ParseLineTcl(DWORD dwCookie, LPCTSTR const pszChars, int
 			//  Char constant '..'
 			if (dwCookie & COOKIE_CHAR)
 			{
-				if (pszChars[I] == '\'' && (I == 0 || I == 1 && pszChars[nPrevI] != '\\' || I >= 2 && (pszChars[nPrevI] != '\\' || pszChars[nPrevI] == '\\' && pszChars[nPrevI - 1] == '\\')))
+				if (pszChars[I] == '\'')
 				{
 					dwCookie &= ~COOKIE_CHAR;
 					bRedefineBlock = TRUE;
+					int nPrevI = I;
+					while (nPrevI && pszChars[--nPrevI] == '\\')
+					{
+						dwCookie ^= COOKIE_CHAR;
+						bRedefineBlock ^= TRUE;
+					}
 				}
 				continue;
 			}
@@ -188,7 +198,7 @@ DWORD CCrystalTextView::ParseLineTcl(DWORD dwCookie, LPCTSTR const pszChars, int
 	} while (I < nLength);
 
 	if (pszChars[nLength - 1] != '\\')
-		dwCookie &= COOKIE_EXT_COMMENT;
+		dwCookie &= COOKIE_STRING;
 	return dwCookie;
 }
 
