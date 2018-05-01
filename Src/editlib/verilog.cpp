@@ -320,7 +320,6 @@ static BOOL IsVerilogNumber(LPCTSTR pszChars, int nLength)
 #define COOKIE_PREPROCESSOR     0x0002
 #define COOKIE_EXT_COMMENT      0x0004
 #define COOKIE_STRING           0x0008
-#define COOKIE_CHAR             0x0010
 
 DWORD CCrystalTextView::ParseLineVerilog(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
 {
@@ -348,7 +347,7 @@ DWORD CCrystalTextView::ParseLineVerilog(DWORD dwCookie, LPCTSTR const pszChars,
 			{
 				DEFINE_BLOCK(nPos, COLORINDEX_PREPROCESSOR);
 			}
-			else if (dwCookie & (COOKIE_CHAR | COOKIE_STRING))
+			else if (dwCookie & COOKIE_STRING)
 			{
 				DEFINE_BLOCK(nPos, COLORINDEX_STRING);
 			}
@@ -377,10 +376,16 @@ DWORD CCrystalTextView::ParseLineVerilog(DWORD dwCookie, LPCTSTR const pszChars,
 			//  String constant "..."
 			if (dwCookie & COOKIE_STRING)
 			{
-				if (pszChars[I] == '"' && (I == 0 || I == 1 && pszChars[nPrevI] != '\\' || I >= 2 && (pszChars[nPrevI] != '\\' || pszChars[nPrevI] == '\\' && pszChars[nPrevI - 1] == '\\')))
+				if (pszChars[I] == '"')
 				{
 					dwCookie &= ~COOKIE_STRING;
 					bRedefineBlock = TRUE;
+					int nPrevI = I;
+					while (nPrevI && pszChars[--nPrevI] == '\\')
+					{
+						dwCookie ^= COOKIE_STRING;
+						bRedefineBlock ^= TRUE;
+					}
 				}
 				continue;
 			}

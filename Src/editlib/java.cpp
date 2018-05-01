@@ -156,10 +156,16 @@ DWORD CCrystalTextView::ParseLineJava(DWORD dwCookie, LPCTSTR const pszChars, in
 			//  String constant "...."
 			if (dwCookie & COOKIE_STRING)
 			{
-				if (pszChars[I] == '"' && (I == 0 || I == 1 && pszChars[nPrevI] != '\\' || I >= 2 && (pszChars[nPrevI] != '\\' || pszChars[nPrevI] == '\\' && pszChars[nPrevI - 1] == '\\')))
+				if (pszChars[I] == '"')
 				{
 					dwCookie &= ~COOKIE_STRING;
 					bRedefineBlock = TRUE;
+					int nPrevI = I;
+					while (nPrevI && pszChars[--nPrevI] == '\\')
+					{
+						dwCookie ^= COOKIE_STRING;
+						bRedefineBlock ^= TRUE;
+					}
 				}
 				continue;
 			}
@@ -167,10 +173,16 @@ DWORD CCrystalTextView::ParseLineJava(DWORD dwCookie, LPCTSTR const pszChars, in
 			//  Char constant '..'
 			if (dwCookie & COOKIE_CHAR)
 			{
-				if (pszChars[I] == '\'' && (I == 0 || I == 1 && pszChars[nPrevI] != '\\' || I >= 2 && (pszChars[nPrevI] != '\\' || pszChars[nPrevI] == '\\' && pszChars[nPrevI - 1] == '\\')))
+				if (pszChars[I] == '\'')
 				{
 					dwCookie &= ~COOKIE_CHAR;
 					bRedefineBlock = TRUE;
+					int nPrevI = I;
+					while (nPrevI && pszChars[--nPrevI] == '\\')
+					{
+						dwCookie ^= COOKIE_CHAR;
+						bRedefineBlock ^= TRUE;
+					}
 				}
 				continue;
 			}
