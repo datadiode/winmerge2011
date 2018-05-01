@@ -11,15 +11,10 @@ BOOL CommonKeywords::IsNumeric(LPCTSTR pszChars, int nLength)
 	return _istdigit(pszChars[nLength > 1 && *pszChars == '.']);
 }
 
-BOOL HtmlKeywords::IsHtmlKeyword(LPCTSTR pszChars, int nLength)
+BOOL HtmlKeywords::IsHtmlTagName(LPCTSTR pszChars, int nLength)
 {
 	static LPCTSTR const s_apszHtmlKeywordList[] =
 	{
-		_T("!ATTLIST"),
-		_T("!DOCTYPE"),
-		_T("!ELEMENT"),
-		_T("!ENTITY"),
-		_T("!NOTATION"),
 		_T("A"),
 		_T("ABBR"),
 		_T("ACRONYM"),
@@ -116,34 +111,7 @@ BOOL HtmlKeywords::IsHtmlKeyword(LPCTSTR pszChars, int nLength)
 	return xiskeyword<_tcsnicmp>(pszChars, nLength, s_apszHtmlKeywordList);
 }
 
-BOOL HtmlKeywords::IsDtdKeyword(LPCTSTR pszChars, int nLength)
-{
-	static LPCTSTR const s_apszUser1KeywordList[] =
-	{
-		_T("#FIXED"),
-		_T("#IMPLIED"),
-		_T("#REQUIRED"),
-		_T("ANY"),
-		_T("CDATA"),
-		_T("EMPTY"),
-		_T("ENTITIES"),
-		_T("ENTITY"),
-		_T("ID"),
-		_T("IDREF"),
-		_T("IDREFS"),
-		_T("IGNORE"),
-		_T("INCLUDE"),
-		_T("NDATA"),
-		_T("NMTOKEN"),
-		_T("NMTOKENS"),
-		_T("PCDATA"),
-		_T("PUBLIC"),
-		_T("SYSTEM"),
-	};
-	return xiskeyword<_tcsnicmp>(pszChars, nLength, s_apszUser1KeywordList);
-}
-
-BOOL HtmlKeywords::IsUser1Keyword(LPCTSTR pszChars, int nLength)
+BOOL HtmlKeywords::IsHtmlAttrName(LPCTSTR pszChars, int nLength)
 {
 	static LPCTSTR const s_apszUser1KeywordList[] =
 	{
@@ -274,9 +242,49 @@ BOOL HtmlKeywords::IsUser1Keyword(LPCTSTR pszChars, int nLength)
 	return xiskeyword<_tcsnicmp>(pszChars, nLength, s_apszUser1KeywordList);
 }
 
-BOOL HtmlKeywords::IsUser2Keyword(LPCTSTR pszChars, int nLength)
+BOOL HtmlKeywords::IsDtdTagName(LPCTSTR pszChars, int nLength)
 {
-	static LPCTSTR const s_apszUser2KeywordList[] =
+	static LPCTSTR const s_apszDtdTagNameList[] =
+	{
+		_T("!ATTLIST"),
+		_T("!DOCTYPE"),
+		_T("!ELEMENT"),
+		_T("!ENTITY"),
+		_T("!NOTATION"),
+	};
+	return xiskeyword<_tcsnicmp>(pszChars, nLength, s_apszDtdTagNameList);
+}
+
+BOOL HtmlKeywords::IsDtdAttrName(LPCTSTR pszChars, int nLength)
+{
+	static LPCTSTR const s_apszDtdAttrNameList[] =
+	{
+		_T("#FIXED"),
+		_T("#IMPLIED"),
+		_T("#REQUIRED"),
+		_T("ANY"),
+		_T("CDATA"),
+		_T("EMPTY"),
+		_T("ENTITIES"),
+		_T("ENTITY"),
+		_T("ID"),
+		_T("IDREF"),
+		_T("IDREFS"),
+		_T("IGNORE"),
+		_T("INCLUDE"),
+		_T("NDATA"),
+		_T("NMTOKEN"),
+		_T("NMTOKENS"),
+		_T("PCDATA"),
+		_T("PUBLIC"),
+		_T("SYSTEM"),
+	};
+	return xiskeyword<_tcsnicmp>(pszChars, nLength, s_apszDtdAttrNameList);
+}
+
+BOOL HtmlKeywords::IsEntityName(LPCTSTR pszChars, int nLength)
+{
+	static LPCTSTR const s_apszHtmlEntityNameList[] =
 	{
 		_T("AElig"),
 		_T("AMP"),
@@ -2404,7 +2412,7 @@ BOOL HtmlKeywords::IsUser2Keyword(LPCTSTR pszChars, int nLength)
 		_T("zwj"),
 		_T("zwnj"),
 	};
-	return xiskeyword<_tcsncmp>(pszChars, nLength, s_apszUser2KeywordList);
+	return xiskeyword<_tcsncmp>(pszChars, nLength, s_apszHtmlEntityNameList);
 }
 
 TESTCASE
@@ -2419,16 +2427,20 @@ TESTCASE
 		TCHAR c, *p, *q;
 		if (pfnIsKeyword && (p = _tcschr(text, '"')) != NULL && (q = _tcschr(++p, '"')) != NULL)
 			VerifyKeyword<_tcsncmp>(pfnIsKeyword, p, static_cast<int>(q - p));
-		else if (_stscanf(text, _T(" BOOL HtmlKeywords::IsHtmlKeyword %c"), &c) == 1 && c == '(')
-			pfnIsKeyword = HtmlKeywords::IsHtmlKeyword;
-		else if (_stscanf(text, _T(" BOOL HtmlKeywords::IsUser1Keyword %c"), &c) == 1 && c == '(')
-			pfnIsKeyword = HtmlKeywords::IsUser1Keyword;
-		else if (_stscanf(text, _T(" BOOL HtmlKeywords::IsUser2Keyword %c"), &c) == 1 && c == '(')
-			pfnIsKeyword = HtmlKeywords::IsUser2Keyword;
+		else if (_stscanf(text, _T(" BOOL HtmlKeywords::IsHtmlTagName%c"), &c) == 1 && c == '(')
+			pfnIsKeyword = HtmlKeywords::IsHtmlTagName;
+		else if (_stscanf(text, _T(" BOOL HtmlKeywords::IsHtmlAttrName %c"), &c) == 1 && c == '(')
+			pfnIsKeyword = HtmlKeywords::IsHtmlAttrName;
+		else if (_stscanf(text, _T(" BOOL HtmlKeywords::IsDtdTagName%c"), &c) == 1 && c == '(')
+			pfnIsKeyword = HtmlKeywords::IsDtdTagName;
+		else if (_stscanf(text, _T(" BOOL HtmlKeywords::IsDtdAttrName %c"), &c) == 1 && c == '(')
+			pfnIsKeyword = HtmlKeywords::IsDtdAttrName;
+		else if (_stscanf(text, _T(" BOOL HtmlKeywords::IsEntityName %c"), &c) == 1 && c == '(')
+			pfnIsKeyword = HtmlKeywords::IsEntityName;
 		else if (pfnIsKeyword && _stscanf(text, _T(" } %c"), &c) == 1 && (c == ';' ? ++count : 0))
 			VerifyKeyword<_tcsncmp>(pfnIsKeyword = NULL, NULL, 0);
 	}
 	fclose(file);
-	assert(count == 3);
+	assert(count == 5);
 	return count;
 }

@@ -116,8 +116,9 @@ namespace CommonKeywords
 
 namespace HtmlKeywords
 {
-	BOOL IsHtmlKeyword(LPCTSTR pszChars, int nLength);
-	BOOL IsDtdKeyword(LPCTSTR pszChars, int nLength);
-	BOOL IsUser1Keyword(LPCTSTR pszChars, int nLength);
-	BOOL IsUser2Keyword(LPCTSTR pszChars, int nLength);
+	BOOL IsHtmlTagName(LPCTSTR pszChars, int nLength);
+	BOOL IsHtmlAttrName(LPCTSTR pszChars, int nLength);
+	BOOL IsDtdTagName(LPCTSTR pszChars, int nLength);
+	BOOL IsDtdAttrName(LPCTSTR pszChars, int nLength);
+	BOOL IsEntityName(LPCTSTR pszChars, int nLength);
 };

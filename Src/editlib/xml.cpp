@@ -24,66 +24,44 @@
 #endif
 
 using CommonKeywords::IsNumeric;
-using HtmlKeywords::IsUser2Keyword;
+using HtmlKeywords::IsDtdTagName;
+using HtmlKeywords::IsDtdAttrName;
+using HtmlKeywords::IsEntityName;
 
-static BOOL IsXmlKeyword(LPCTSTR pszChars, int nLength)
+static BOOL IsXmlTagName(LPCTSTR pszChars, int nLength)
 {
-	static LPCTSTR const s_apszXmlKeywordList[] =
+	static LPCTSTR const s_apszXmlTagNameList[] =
 	{
-		_T("ATTLIST"),
-		_T("DOCTYPE"),
-		_T("ELEMENT"),
-		_T("ENTITY"),
-		_T("NOTATION"),
 		_T("xml"),
 	};
-	return xiskeyword<_tcsnicmp>(pszChars, nLength, s_apszXmlKeywordList);
+	return xiskeyword<_tcsnicmp>(pszChars, nLength, s_apszXmlTagNameList);
 }
 
-static BOOL IsUser1Keyword(LPCTSTR pszChars, int nLength)
+static BOOL IsXmlAttrName(LPCTSTR pszChars, int nLength)
 {
-	static LPCTSTR const s_apszUser1KeywordList[] =
+	static LPCTSTR const s_apszXmlAttrNameList[] =
 	{
-		_T("#FIXED"),
-		_T("#IMPLIED"),
-		_T("#REQUIRED"),
-		_T("ANY"),
-		_T("CDATA"),
-		_T("EMPTY"),
 		_T("encoding"),
-		_T("ENTITIES"),
-		_T("ENTITY"),
-		_T("ID"),
-		_T("IDREF"),
-		_T("IDREFS"),
-		_T("IGNORE"),
-		_T("INCLUDE"),
-		_T("NDATA"),
-		_T("NMTOKEN"),
-		_T("NMTOKENS"),
-		_T("PCDATA"),
-		_T("PUBLIC"),
 		_T("standalone"),
-		_T("SYSTEM"),
 		_T("version"),
 	};
-	return xiskeyword<_tcsnicmp>(pszChars, nLength, s_apszUser1KeywordList);
+	return xiskeyword<_tcsnicmp>(pszChars, nLength, s_apszXmlAttrNameList);
 }
 
 #define DEFINE_BLOCK pBuf.DefineBlock
 
-#define COOKIE_COMMENT          0x0001
+#define COOKIE_DTD              0x0001
 #define COOKIE_PREPROCESSOR     0x0002
-#define COOKIE_EXT_COMMENT      0x0004
+#define COOKIE_CHAR             0x0004
 #define COOKIE_STRING           0x0008
-#define COOKIE_CHAR             0x0010
-#define COOKIE_USER1            0x0020
-#define COOKIE_EXT_USER1        0x0040
+#define COOKIE_EXT_COMMENT      0x0010
+#define COOKIE_ENTITY           0x0020
+#define COOKIE_XML              0x0040
 
 DWORD CCrystalTextView::ParseLineXml(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
 {
 	if (nLength == 0)
-		return dwCookie & COOKIE_EXT_COMMENT;
+		return dwCookie & (COOKIE_EXT_COMMENT | COOKIE_XML | COOKIE_DTD);
 
 	BOOL bRedefineBlock = TRUE;
 	BOOL bDecIndex = FALSE;
@@ -92,7 +70,7 @@ DWORD CCrystalTextView::ParseLineXml(DWORD dwCookie, LPCTSTR const pszChars, int
 	do
 	{
 		//  Preprocessor start: < or bracket
-		if (!(dwCookie & COOKIE_EXT_USER1) && pszChars[I] == '<' && !(I < nLength - 3 && pszChars[I + 1] == '!' && pszChars[I + 2] == '-' && pszChars[I + 3] == '-') || pszChars[I] == '{')
+		if (pszChars[I] == '<' && !(I < nLength - 3 && pszChars[I + 1] == '!' && pszChars[I + 2] == '-' && pszChars[I + 3] == '-'))
 		{
 			DEFINE_BLOCK(I, COLORINDEX_OPERATOR);
 			DEFINE_BLOCK(I + 1, COLORINDEX_PREPROCESSOR);
@@ -104,9 +82,9 @@ DWORD CCrystalTextView::ParseLineXml(DWORD dwCookie, LPCTSTR const pszChars, int
 		//  Preprocessor end: > or bracket
 		if (dwCookie & COOKIE_PREPROCESSOR)
 		{
-			if (pszChars[I] == '>' || pszChars[I] == '}')
+			if (pszChars[I] == '>')
 			{
-				dwCookie &= ~COOKIE_PREPROCESSOR;
+				dwCookie &= ~(COOKIE_PREPROCESSOR | COOKIE_XML | COOKIE_DTD);
 				bRedefineBlock = TRUE;
 				bDecIndex = TRUE;
 				nIdentBegin = -1;
@@ -117,7 +95,7 @@ DWORD CCrystalTextView::ParseLineXml(DWORD dwCookie, LPCTSTR const pszChars, int
 		//  Preprocessor start: &
 		if (pszChars[I] == '&')
 		{
-			dwCookie |= COOKIE_USER1;
+			dwCookie |= COOKIE_ENTITY;
 			bRedefineBlock = TRUE;
 			bDecIndex = TRUE;
 			nIdentBegin = -1;
@@ -125,11 +103,11 @@ DWORD CCrystalTextView::ParseLineXml(DWORD dwCookie, LPCTSTR const pszChars, int
 		}
 
 		//  Preprocessor end: ;
-		if (dwCookie & COOKIE_USER1)
+		if (dwCookie & COOKIE_ENTITY)
 		{
 			if (pszChars[I] == ';')
 			{
-				dwCookie &= ~COOKIE_USER1;
+				dwCookie &= ~COOKIE_ENTITY;
 				bRedefineBlock = TRUE;
 				bDecIndex = TRUE;
 				nIdentBegin = -1;
@@ -144,7 +122,7 @@ DWORD CCrystalTextView::ParseLineXml(DWORD dwCookie, LPCTSTR const pszChars, int
 			int const nPos = bDecIndex ? nPrevI : I;
 			bRedefineBlock = FALSE;
 			bDecIndex = FALSE;
-			if (dwCookie & (COOKIE_COMMENT | COOKIE_EXT_COMMENT))
+			if (dwCookie & COOKIE_EXT_COMMENT)
 			{
 				DEFINE_BLOCK(nPos, COLORINDEX_COMMENT);
 			}
@@ -171,13 +149,6 @@ DWORD CCrystalTextView::ParseLineXml(DWORD dwCookie, LPCTSTR const pszChars, int
 		// See bug #1474782 Crash when comparing SQL with with binary data
 		if (I < nLength)
 		{
-			if (dwCookie & COOKIE_COMMENT)
-			{
-				DEFINE_BLOCK(I, COLORINDEX_COMMENT);
-				dwCookie |= COOKIE_COMMENT;
-				break;
-			}
-
 			//  String constant "...."
 			if (dwCookie & COOKIE_STRING)
 			{
@@ -203,56 +174,94 @@ DWORD CCrystalTextView::ParseLineXml(DWORD dwCookie, LPCTSTR const pszChars, int
 			//  Extended comment <!--....-->
 			if (dwCookie & COOKIE_EXT_COMMENT)
 			{
-				if (I > 1 && pszChars[I] == '>' && pszChars[nPrevI] == '-' && pszChars[nPrevI - 1] == '-')
+				switch (dwCookie & COOKIE_DTD)
 				{
-					dwCookie &= ~COOKIE_EXT_COMMENT;
-					bRedefineBlock = TRUE;
+				case 0:
+					if (I > 1 && (nIdentBegin == -1 || I - nIdentBegin >= 6) && pszChars[I] == '>' && pszChars[nPrevI] == '-' && pszChars[nPrevI - 1] == '-')
+					{
+						dwCookie &= ~COOKIE_EXT_COMMENT;
+						bRedefineBlock = TRUE;
+						nIdentBegin = -1;
+					}
+					break;
+				case COOKIE_DTD:
+					if (I > 0 && (nIdentBegin == -1 || I - nIdentBegin >= 4) && pszChars[I] == '-' && pszChars[nPrevI] == '-')
+					{
+						dwCookie &= ~COOKIE_EXT_COMMENT;
+						bRedefineBlock = TRUE;
+						nIdentBegin = -1;
+					}
+					break;
 				}
 				goto start;
 			}
 
-			//  Extended comment <?....?>
-			if (dwCookie & COOKIE_EXT_USER1)
+			if (pszChars[I] == '[' || pszChars[I] == ']')
 			{
-				if (I > 0 && pszChars[I] == '>' && pszChars[nPrevI] == '?')
-				{
-					dwCookie &= ~COOKIE_EXT_USER1;
-					bRedefineBlock = TRUE;
-				}
+				DEFINE_BLOCK(I, COLORINDEX_OPERATOR);
+				dwCookie &= ~(COOKIE_PREPROCESSOR | COOKIE_DTD);
 				goto start;
 			}
 
-			//  Normal text
-			if (pszChars[I] == '"')
+			if (dwCookie & COOKIE_PREPROCESSOR)
 			{
-				DEFINE_BLOCK(I, COLORINDEX_STRING);
-				dwCookie |= COOKIE_STRING;
-				goto start;
-			}
-
-			if (pszChars[I] == '\'')
-			{
-				if (I == 0 || !xisxdigit(pszChars[nPrevI]))
+				// Double-quoted text
+				if (pszChars[I] == '"')
 				{
 					DEFINE_BLOCK(I, COLORINDEX_STRING);
-					dwCookie |= COOKIE_CHAR;
+					dwCookie |= COOKIE_STRING;
 					goto start;
+				}
+
+				// Single-quoted text
+				if (pszChars[I] == '\'')
+				{
+					if (I == 0 || !xisxdigit(pszChars[nPrevI]))
+					{
+						DEFINE_BLOCK(I, COLORINDEX_STRING);
+						dwCookie |= COOKIE_CHAR;
+						goto start;
+					}
 				}
 			}
 
-			if (!(dwCookie & COOKIE_EXT_USER1) && I < nLength - 3 && pszChars[I] == '<' && pszChars[I + 1] == '!' && pszChars[I + 2] == '-' && pszChars[I + 3] == '-')
+			switch (dwCookie & COOKIE_DTD)
 			{
-				DEFINE_BLOCK(I, COLORINDEX_COMMENT);
-				I += 3;
-				dwCookie |= COOKIE_EXT_COMMENT;
-				dwCookie &= ~COOKIE_PREPROCESSOR;
+			case 0:
+				if (I < nLength - 3 && pszChars[I] == '<' && pszChars[I + 1] == '!' && pszChars[I + 2] == '-' && pszChars[I + 3] == '-')
+				{
+					DEFINE_BLOCK(I, COLORINDEX_COMMENT);
+					nIdentBegin = I;
+					I += 3;
+					dwCookie |= COOKIE_EXT_COMMENT;
+					dwCookie &= ~COOKIE_PREPROCESSOR;
+					goto start;
+				}
+				break;
+			case COOKIE_DTD:
+				if (I < nLength - 1 && pszChars[I] == '-' && pszChars[I + 1] == '-')
+				{
+					DEFINE_BLOCK(I, COLORINDEX_COMMENT);
+					nIdentBegin = I;
+					I += 1;
+					dwCookie |= COOKIE_EXT_COMMENT;
+					goto start;
+				}
+				break;
+			}
+
+			// Xml start: <?
+			if (pszChars[I] == '<' && I < nLength - 1 && pszChars[I + 1] == '?')
+			{
+				DEFINE_BLOCK(I, COLORINDEX_OPERATOR);
+				DEFINE_BLOCK(I + 1, COLORINDEX_PREPROCESSOR);
+				bRedefineBlock = FALSE;
+				dwCookie |= COOKIE_XML | COOKIE_PREPROCESSOR;
+				nIdentBegin = -1;
 				goto start;
 			}
 
-			if (pBuf == NULL)
-				continue; // No need to extract keywords, so skip rest of loop
-
-			if (xisalnum(pszChars[I]) || pszChars[I] == '.')
+			if (xisalnum(pszChars[I]) || pszChars[I] == '.' || pszChars[I] == '-' || pszChars[I] == '!' || pszChars[I] == '#')
 			{
 				if (nIdentBegin == -1)
 					nIdentBegin = I;
@@ -261,31 +270,56 @@ DWORD CCrystalTextView::ParseLineXml(DWORD dwCookie, LPCTSTR const pszChars, int
 		}
 		if (nIdentBegin >= 0)
 		{
+			LPCTSTR const pchIdent = pszChars + nIdentBegin;
+			int const cchIdent = I - nIdentBegin;
 			if (dwCookie & COOKIE_PREPROCESSOR)
 			{
-				if (IsXmlKeyword(pszChars + nIdentBegin, I - nIdentBegin) && (pszChars[nIdentBegin - 1] == _T ('<') || pszChars[nIdentBegin - 1] == _T ('/')))
+				if (dwCookie & COOKIE_XML)
 				{
-					DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
+					if (!pBuf.m_bRecording)
+					{
+						// No need to extract keywords, so skip rest of loop
+					}
+					else if (pchIdent > pszChars && ((pchIdent[-1] == '?' ? IsXmlTagName : IsXmlAttrName)(pchIdent, cchIdent)))
+					{
+						DEFINE_BLOCK(nIdentBegin, pchIdent[-1] == '?' ? COLORINDEX_KEYWORD :  COLORINDEX_USER1);
+					}
 				}
-				else if (IsUser1Keyword(pszChars + nIdentBegin, I - nIdentBegin))
+				else if (pchIdent > pszChars && (pchIdent[-1] == '<' && pchIdent[0] == '!'))
 				{
-					DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER1);
+					dwCookie |= COOKIE_DTD;
+					if (!pBuf.m_bRecording)
+					{
+						// No need to extract keywords, so skip rest of loop
+					}
+					else if (IsDtdTagName(pchIdent, cchIdent))
+					{
+						DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
+					}
 				}
-				else if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
+				else if (!pBuf.m_bRecording)
+				{
+					// No need to extract keywords, so skip rest of loop
+				}
+				else if (IsNumeric(pchIdent, cchIdent))
 				{
 					DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
 				}
+				else if ((dwCookie & COOKIE_DTD) && IsDtdAttrName(pchIdent, cchIdent))
+				{
+					DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER1);
+				}
 			}
-			else if (dwCookie & COOKIE_USER1)
+			else if (IsNumeric(pchIdent, cchIdent))
 			{
-				if (IsUser2Keyword(pszChars + nIdentBegin, I - nIdentBegin))
+				DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
+			}
+			else if (dwCookie & COOKIE_ENTITY)
+			{
+				if (IsEntityName(pchIdent, cchIdent))
 				{
 					DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER2);
 				}
-			}
-			else if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
-			{
-				DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
 			}
 			bRedefineBlock = TRUE;
 			bDecIndex = TRUE;
@@ -293,7 +327,7 @@ DWORD CCrystalTextView::ParseLineXml(DWORD dwCookie, LPCTSTR const pszChars, int
 		}
 	} while (I < nLength);
 
-	dwCookie &= (COOKIE_EXT_COMMENT | COOKIE_STRING | COOKIE_PREPROCESSOR | COOKIE_EXT_USER1);
+	dwCookie &= (COOKIE_EXT_COMMENT | COOKIE_STRING | COOKIE_PREPROCESSOR | COOKIE_XML | COOKIE_DTD);
 	return dwCookie;
 }
 
@@ -309,10 +343,10 @@ TESTCASE
 		TCHAR c, *p, *q;
 		if (pfnIsKeyword && (p = _tcschr(text, '"')) != NULL && (q = _tcschr(++p, '"')) != NULL)
 			VerifyKeyword<_tcsnicmp>(pfnIsKeyword, p, static_cast<int>(q - p));
-		else if (_stscanf(text, _T(" static BOOL IsXmlKeyword %c"), &c) == 1 && c == '(')
-			pfnIsKeyword = IsXmlKeyword;
-		else if (_stscanf(text, _T(" static BOOL IsUser1Keyword %c"), &c) == 1 && c == '(')
-			pfnIsKeyword = IsUser1Keyword;
+		else if (_stscanf(text, _T(" static BOOL IsXmlTagName %c"), &c) == 1 && c == '(')
+			pfnIsKeyword = IsXmlTagName;
+		else if (_stscanf(text, _T(" static BOOL IsXmlAttrName %c"), &c) == 1 && c == '(')
+			pfnIsKeyword = IsXmlAttrName;
 		else if (pfnIsKeyword && _stscanf(text, _T(" } %c"), &c) == 1 && (c == ';' ? ++count : 0))
 			VerifyKeyword<_tcsnicmp>(pfnIsKeyword = NULL, NULL, 0);
 	}
