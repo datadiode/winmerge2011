@@ -85,8 +85,11 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 				{
 					pBuf.m_bRecording = NULL;
 					dwCookie &= ~COOKIE_PARSER;
-					dwCookie |= dwScriptTagCookie ? dwScriptTagCookie : COOKIE_PARSER_JSCRIPT;
-					nScriptBegin = I + 1;
+					if (pszChars[nPrevI] != '/')
+					{
+						dwCookie |= dwScriptTagCookie ? dwScriptTagCookie : COOKIE_PARSER_JSCRIPT;
+						nScriptBegin = I + 1;
+					}
 				}
 				else
 				{
@@ -291,7 +294,7 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 						bRedefineBlock = FALSE;
 						goto start;
 					}
-					if (pszChars[nPrevI] == '<' && xisequal<_tcsnicmp>(pszChars + I, _T("/script>")))
+					if (pszChars[I] == '/' && pszChars[nPrevI] == '<')
 					{
 						pBuf.m_bRecording = pBuf;
 						if (nScriptBegin >= 0)
@@ -412,15 +415,22 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 			{
 				if (pchIdent > pszChars && (pchIdent[-1] == '<' || pchIdent[-1] == '/'))
 				{
-					if (*pchIdent == '!')
+					if (pchIdent[-1] == '<')
 					{
-						dwCookie |= COOKIE_DTD;
-					}
-					else if (xisequal<_tcsnicmp>(pchIdent, cchIdent, _T("script")))
-					{
-						if (pchIdent[-1] == '<')
+						if (*pchIdent == '!')
+						{
+							dwCookie |= COOKIE_DTD;
+						}
+						else if (xisequal<_tcsnicmp>(pchIdent, cchIdent, _T("script")))
+						{
 							dwCookie |= COOKIE_ASP;
-						dwScriptTagCookie = 0;
+							dwScriptTagCookie = 0;
+						}
+						else if (xisequal<_tcsnicmp>(pchIdent, cchIdent, _T("style")))
+						{
+							dwCookie |= COOKIE_ASP;
+							dwScriptTagCookie = COOKIE_PARSER_CSS;
+						}
 					}
 					if (!pBuf.m_bRecording)
 					{
@@ -431,15 +441,7 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 						DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
 					}
 				}
-				else if (!pBuf.m_bRecording)
-				{
-					// No need to extract keywords, so skip rest of loop
-				}
-				else if (IsNumeric(pchIdent, cchIdent))
-				{
-					DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
-				}
-				else if ((dwCookie & COOKIE_DTD ? IsDtdAttrName : IsHtmlAttrName)(pchIdent, cchIdent))
+				else
 				{
 					if (dwCookie & COOKIE_ASP)
 					{
@@ -459,19 +461,27 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 							dwScriptTagCookie = (dwCookie & COOKIE_PARSER_GLOBAL) >> 4;
 						}
 					}
-					DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER1);
+					if (!pBuf.m_bRecording)
+					{
+						// No need to extract keywords, so skip rest of loop
+					}
+					else if (IsNumeric(pchIdent, cchIdent))
+					{
+						DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
+					}
+					else if ((dwCookie & COOKIE_DTD ? IsDtdAttrName : IsHtmlAttrName)(pchIdent, cchIdent))
+					{
+						DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER1);
+					}
 				}
 			}
-			else if (dwCookie & COOKIE_ASP) //COOKIE_PARSER)
+			else if (dwCookie & COOKIE_ASP)
 			{
-				if (dwCookie & COOKIE_ASP)
+				TCHAR lang[32];
+				if (xisequal<_tcsnicmp>(pchIdent, cchIdent, _T("language")) &&
+					_stscanf(pchIdent + cchIdent, _T("%31[^a-zA-Z]%31[a-zA-Z#]"), lang, lang) == 2)
 				{
-					TCHAR lang[32];
-					if (xisequal<_tcsnicmp>(pchIdent, cchIdent, _T("language")) &&
-						_stscanf(pchIdent + cchIdent, _T("%31[^a-zA-Z]%31[a-zA-Z#]"), lang, lang) == 2)
-					{
-						dwCookie = dwCookie & ~COOKIE_PARSER_GLOBAL | (ScriptCookie(lang) << 4);
-					}
+					dwCookie = dwCookie & ~COOKIE_PARSER_GLOBAL | (ScriptCookie(lang) << 4);
 				}
 			}
 			else if (!pBuf.m_bRecording)
