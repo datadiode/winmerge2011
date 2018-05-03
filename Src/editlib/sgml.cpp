@@ -111,7 +111,6 @@ static BOOL IsSgmlAttrName(LPCTSTR pszChars, int nLength)
 #define COOKIE_EXT_COMMENT      0x0004
 #define COOKIE_STRING           0x0008
 #define COOKIE_CHAR             0x0010
-#define COOKIE_ENTITY           0x0020
 
 DWORD CCrystalTextView::ParseLineSgml(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
 {
@@ -140,29 +139,6 @@ DWORD CCrystalTextView::ParseLineSgml(DWORD dwCookie, LPCTSTR const pszChars, in
 			if (pszChars[I] == '>')
 			{
 				dwCookie &= ~(COOKIE_PREPROCESSOR | COOKIE_DTD);
-				bRedefineBlock = TRUE;
-				bDecIndex = TRUE;
-				nIdentBegin = -1;
-				goto start;
-			}
-		}
-
-		//  Preprocessor start: &
-		if (pszChars[I] == '&')
-		{
-			dwCookie |= COOKIE_ENTITY;
-			bRedefineBlock = TRUE;
-			bDecIndex = TRUE;
-			nIdentBegin = -1;
-			goto start;
-		}
-
-		//  Preprocessor end: ;
-		if (dwCookie & COOKIE_ENTITY)
-		{
-			if (pszChars[I] == ';')
-			{
-				dwCookie &= ~COOKIE_ENTITY;
 				bRedefineBlock = TRUE;
 				bDecIndex = TRUE;
 				nIdentBegin = -1;
@@ -346,16 +322,16 @@ DWORD CCrystalTextView::ParseLineSgml(DWORD dwCookie, LPCTSTR const pszChars, in
 			{
 				// No need to extract keywords, so skip rest of loop
 			}
-			else if (dwCookie & COOKIE_ENTITY)
+			else if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
+			{
+				DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
+			}
+			else if (pchIdent > pszChars && pchIdent[-1] == '&')
 			{
 				if (IsEntityName(pszChars + nIdentBegin, I - nIdentBegin))
 				{
 					DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER2);
 				}
-			}
-			else if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
-			{
-				DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
 			}
 			bRedefineBlock = TRUE;
 			bDecIndex = TRUE;
@@ -363,7 +339,6 @@ DWORD CCrystalTextView::ParseLineSgml(DWORD dwCookie, LPCTSTR const pszChars, in
 		}
 	} while (I < nLength);
 
-	dwCookie &= (COOKIE_EXT_COMMENT | COOKIE_STRING | COOKIE_PREPROCESSOR | COOKIE_DTD);
 	return dwCookie;
 }
 

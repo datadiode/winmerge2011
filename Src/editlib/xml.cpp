@@ -55,8 +55,7 @@ static BOOL IsXmlAttrName(LPCTSTR pszChars, int nLength)
 #define COOKIE_CHAR             0x0004
 #define COOKIE_STRING           0x0008
 #define COOKIE_EXT_COMMENT      0x0010
-#define COOKIE_ENTITY           0x0020
-#define COOKIE_XML              0x0040
+#define COOKIE_XML              0x0020
 
 DWORD CCrystalTextView::ParseLineXml(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
 {
@@ -85,29 +84,6 @@ DWORD CCrystalTextView::ParseLineXml(DWORD dwCookie, LPCTSTR const pszChars, int
 			if (pszChars[I] == '>')
 			{
 				dwCookie &= ~(COOKIE_PREPROCESSOR | COOKIE_XML | COOKIE_DTD);
-				bRedefineBlock = TRUE;
-				bDecIndex = TRUE;
-				nIdentBegin = -1;
-				goto start;
-			}
-		}
-
-		//  Preprocessor start: &
-		if (pszChars[I] == '&')
-		{
-			dwCookie |= COOKIE_ENTITY;
-			bRedefineBlock = TRUE;
-			bDecIndex = TRUE;
-			nIdentBegin = -1;
-			goto start;
-		}
-
-		//  Preprocessor end: ;
-		if (dwCookie & COOKIE_ENTITY)
-		{
-			if (pszChars[I] == ';')
-			{
-				dwCookie &= ~COOKIE_ENTITY;
 				bRedefineBlock = TRUE;
 				bDecIndex = TRUE;
 				nIdentBegin = -1;
@@ -314,7 +290,7 @@ DWORD CCrystalTextView::ParseLineXml(DWORD dwCookie, LPCTSTR const pszChars, int
 			{
 				DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
 			}
-			else if (dwCookie & COOKIE_ENTITY)
+			else if (pchIdent > pszChars && pchIdent[-1] == '&')
 			{
 				if (IsEntityName(pchIdent, cchIdent))
 				{
@@ -327,7 +303,6 @@ DWORD CCrystalTextView::ParseLineXml(DWORD dwCookie, LPCTSTR const pszChars, int
 		}
 	} while (I < nLength);
 
-	dwCookie &= (COOKIE_EXT_COMMENT | COOKIE_STRING | COOKIE_PREPROCESSOR | COOKIE_XML | COOKIE_DTD);
 	return dwCookie;
 }
 
