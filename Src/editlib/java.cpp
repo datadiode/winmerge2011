@@ -89,14 +89,17 @@ static BOOL IsJavaKeyword(LPCTSTR pszChars, int nLength)
 
 #define COOKIE_COMMENT          0x0001
 #define COOKIE_PREPROCESSOR     0x0002
-#define COOKIE_CHAR             0x0004
-#define COOKIE_STRING           0x0008
+#define COOKIE_STRING           0x000C
+#define COOKIE_STRING_SINGLE    0x0004
+#define COOKIE_STRING_DOUBLE    0x0008
+#define COOKIE_STRING_REGEXP    0x000C
 #define COOKIE_EXT_COMMENT      0x0010
+#define COOKIE_ACCEPT_REGEXP    0x0020
 
 DWORD CCrystalTextView::ParseLineJava(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
 {
 	if (nLength == 0)
-		return dwCookie & (COOKIE_EXT_COMMENT | ~0xFFFF);
+		return dwCookie & (COOKIE_EXT_COMMENT | COOKIE_ACCEPT_REGEXP | ~0xFFFF);
 
 	int const nKeywordMask = (
 		dwCookie & COOKIE_PARSER ?
@@ -127,7 +130,7 @@ DWORD CCrystalTextView::ParseLineJava(DWORD dwCookie, LPCTSTR const pszChars, in
 			{
 				DEFINE_BLOCK(nPos, COLORINDEX_PREPROCESSOR);
 			}
-			else if (dwCookie & (COOKIE_CHAR | COOKIE_STRING))
+			else if (dwCookie & COOKIE_STRING)
 			{
 				DEFINE_BLOCK(nPos, COLORINDEX_STRING);
 			}
@@ -153,35 +156,51 @@ DWORD CCrystalTextView::ParseLineJava(DWORD dwCookie, LPCTSTR const pszChars, in
 				break;
 			}
 
-			//  String constant "...."
-			if (dwCookie & COOKIE_STRING)
+			switch (dwCookie & COOKIE_STRING)
 			{
-				if (pszChars[I] == '"')
+			case COOKIE_STRING_SINGLE:
+				if (pszChars[I] == '\'')
 				{
-					dwCookie &= ~COOKIE_STRING;
+					dwCookie &= ~COOKIE_STRING_SINGLE;
 					bRedefineBlock = TRUE;
 					int nPrevI = I;
 					while (nPrevI && pszChars[--nPrevI] == '\\')
 					{
-						dwCookie ^= COOKIE_STRING;
+						dwCookie ^= COOKIE_STRING_SINGLE;
 						bRedefineBlock ^= TRUE;
 					}
 				}
 				continue;
-			}
-
-			//  Char constant '..'
-			if (dwCookie & COOKIE_CHAR)
-			{
-				if (pszChars[I] == '\'')
+			case COOKIE_STRING_DOUBLE:
+				if (pszChars[I] == '"')
 				{
-					dwCookie &= ~COOKIE_CHAR;
+					dwCookie &= ~COOKIE_STRING_DOUBLE;
 					bRedefineBlock = TRUE;
 					int nPrevI = I;
 					while (nPrevI && pszChars[--nPrevI] == '\\')
 					{
-						dwCookie ^= COOKIE_CHAR;
+						dwCookie ^= COOKIE_STRING_DOUBLE;
 						bRedefineBlock ^= TRUE;
+					}
+				}
+				continue;
+			case COOKIE_STRING_REGEXP:
+				if (pszChars[I] == '/')
+				{
+					dwCookie &= ~COOKIE_STRING_REGEXP;
+					bRedefineBlock = TRUE;
+					int nPrevI = I;
+					while (nPrevI && pszChars[--nPrevI] == '\\')
+					{
+						dwCookie ^= COOKIE_STRING_REGEXP;
+						bRedefineBlock ^= TRUE;
+					}
+					if (!(dwCookie & COOKIE_STRING_REGEXP))
+					{
+						int nNextI = I;
+						while (++nNextI < nLength && xisalnum(pszChars[nNextI]))
+							I = nNextI;
+						bWasComment = End;
 					}
 				}
 				continue;
@@ -214,7 +233,7 @@ DWORD CCrystalTextView::ParseLineJava(DWORD dwCookie, LPCTSTR const pszChars, in
 			if (pszChars[I] == '"')
 			{
 				DEFINE_BLOCK(I, dwCookie & COOKIE_PREPROCESSOR ? COLORINDEX_PREPROCESSOR : COLORINDEX_STRING);
-				dwCookie |= COOKIE_STRING;
+				dwCookie |= COOKIE_STRING_DOUBLE;
 				continue;
 			}
 			if (pszChars[I] == '\'')
@@ -222,10 +241,22 @@ DWORD CCrystalTextView::ParseLineJava(DWORD dwCookie, LPCTSTR const pszChars, in
 				if (I == 0 || !xisxdigit(pszChars[nPrevI]))
 				{
 					DEFINE_BLOCK(I, dwCookie & COOKIE_PREPROCESSOR ? COLORINDEX_PREPROCESSOR : COLORINDEX_STRING);
-					dwCookie |= COOKIE_CHAR;
+					dwCookie |= COOKIE_STRING_SINGLE;
 					continue;
 				}
 			}
+
+			if (pszChars[I] == '/' && I < nLength - 1 && pszChars[I + 1] != '/' && pszChars[I + 1] != '*')
+			{
+				if (dwCookie & COOKIE_ACCEPT_REGEXP)
+				{
+					DEFINE_BLOCK(I, dwCookie & COOKIE_PREPROCESSOR ? COLORINDEX_PREPROCESSOR : COLORINDEX_STRING);
+					dwCookie &= ~COOKIE_ACCEPT_REGEXP;
+					dwCookie |= COOKIE_STRING_REGEXP;
+					continue;
+				}
+			}
+
 			if (I > 0 && pszChars[I] == '*' && pszChars[nPrevI] == '/' && bWasComment != End)
 			{
 				DEFINE_BLOCK(nPrevI, COLORINDEX_COMMENT);
@@ -252,15 +283,44 @@ DWORD CCrystalTextView::ParseLineJava(DWORD dwCookie, LPCTSTR const pszChars, in
 					bFirstChar = FALSE;
 			}
 
-			if (pBuf == NULL)
-				continue; // No need to extract keywords, so skip rest of loop
-
 			if (xisalnum(pszChars[I]) || pszChars[I] == '.' && I > 0 && (!xisalpha(pszChars[nPrevI]) && !xisalpha(pszChars[I + 1])))
 			{
 				if (nIdentBegin == -1)
 					nIdentBegin = I;
+				dwCookie &= ~COOKIE_ACCEPT_REGEXP;
 				continue;
 			}
+
+			if ((dwCookie & (COOKIE_STRING | COOKIE_COMMENT | COOKIE_EXT_COMMENT)) == 0 && !xisspace(pszChars[I]))
+			{
+				if (I + 1 < nLength)
+				{
+					switch (pszChars[I])
+					{
+					case '/': case '*':
+						switch (pszChars[I + 1])
+						{
+						case '/': case '*':
+							continue;
+						}
+					}
+				}
+				dwCookie |= COOKIE_ACCEPT_REGEXP;
+				switch (TCHAR peer = pszChars[I])
+				{
+				case '+':
+				case '-':
+					if (I == 0 || pszChars[nPrevI] != peer)
+						break;
+					// fall through
+				case ')':
+					dwCookie &= ~COOKIE_ACCEPT_REGEXP;
+					break;
+				}
+			}
+
+			if (pBuf == NULL)
+				continue; // No need to extract keywords, so skip rest of loop
 		}
 		if (nIdentBegin >= 0)
 		{
@@ -293,7 +353,7 @@ DWORD CCrystalTextView::ParseLineJava(DWORD dwCookie, LPCTSTR const pszChars, in
 	} while (I < nLength);
 
 	if (pszChars[nLength - 1] != '\\')
-		dwCookie &= (COOKIE_EXT_COMMENT | ~0xFFFF);
+		dwCookie &= (COOKIE_EXT_COMMENT | COOKIE_ACCEPT_REGEXP | ~0xFFFF);
 	return dwCookie;
 }
 
