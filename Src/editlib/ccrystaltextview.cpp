@@ -375,6 +375,7 @@ void CCrystalTextView::FreeParserAssociations()
 CCrystalTextView::TextDefinition *CCrystalTextView::DoSetTextType(TextDefinition *def)
 {
 	m_CurSourceDef = def;
+	m_ParseCookies.clear();
 	SetFlags(def->flags);
 	return def;
 }
