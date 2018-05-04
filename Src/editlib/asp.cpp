@@ -383,11 +383,11 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 			}
 
 			// Script start: <? or <%
-			if (pszChars[I] == '<' && I < nLength - 1 && (pszChars[I + 1] == '?' || pszChars[I + 1] == '%'))
+			if (pszChars[I] == '<' && (pszChars[I + 1] == '?' || pszChars[I + 1] == '%'))
 			{
 				DEFINE_BLOCK(I, COLORINDEX_NORMALTEXT);
 				dwCookie |= COOKIE_PARSER;
-				if (I < nLength - 2 && pszChars[I + 2] == '@')
+				if (pszChars[I + 2] == '@') // directive expression
 				{
 					dwCookie |= COOKIE_ASP;
 				}
@@ -395,10 +395,22 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 				{
 					pBuf.m_bRecording = NULL;
 					nScriptBegin = I + 2;
-					if (LPCTSTR pScriptBegin = xisequal<_tcsnicmp>(pszChars + nScriptBegin, _T("php")))
-						nScriptBegin = static_cast<int>(pScriptBegin - pszChars);
-					if (nScriptBegin >= nLength || xisspace(pszChars[nScriptBegin]))
+					switch (dwCookie & COOKIE_PARSER_GLOBAL)
 					{
+					case SRCOPT_COOKIE(COOKIE_PARSER_PHP):
+						if (LPCTSTR pScriptBegin = xisequal<_tcsnicmp>(pszChars + nScriptBegin, _T("php")))
+							nScriptBegin = static_cast<int>(pScriptBegin - pszChars);
+						break;
+					}
+					if (!xisalnum(pszChars[nScriptBegin]))
+					{
+						switch (pszChars[nScriptBegin])
+						{
+						case '=': // displaying expression
+						case ':': // displaying expression using HTML encoding
+							++nScriptBegin;
+							break;
+						}
 						dwCookie &= ~COOKIE_PARSER;
 						dwCookie |= (dwCookie & COOKIE_PARSER_GLOBAL) >> 4;
 					}
