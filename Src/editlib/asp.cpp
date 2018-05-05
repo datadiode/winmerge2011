@@ -212,7 +212,7 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 			// Extended comment <!--....-->
 			if (dwCookie & COOKIE_EXT_COMMENT)
 			{
-				switch (dwCookie & (COOKIE_PARSER | COOKIE_DTD))
+				switch (dwCookie & (COOKIE_PARSER | COOKIE_DTD | COOKIE_ASP))
 				{
 				case 0:
 					if (I > 1 && (nIdentBegin == -1 || I - nIdentBegin >= 6) && pszChars[I] == '>' && pszChars[nPrevI] == '-' && pszChars[nPrevI - 1] == '-')
@@ -226,6 +226,15 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 					if (I > 0 && (nIdentBegin == -1 || I - nIdentBegin >= 4) && pszChars[I] == '-' && pszChars[nPrevI] == '-')
 					{
 						dwCookie &= ~COOKIE_EXT_COMMENT;
+						bRedefineBlock = TRUE;
+						nIdentBegin = -1;
+					}
+					break;
+				case COOKIE_ASP:
+					if (I > 2 && (nIdentBegin == -1 || I - nIdentBegin >= 5) && pszChars[I] == '>' &&
+						pszChars[nPrevI] == '%' && pszChars[nPrevI - 1] == '-' && pszChars[nPrevI - 2] == '-')
+					{
+						dwCookie &= ~(COOKIE_EXT_COMMENT | COOKIE_ASP);
 						bRedefineBlock = TRUE;
 						nIdentBegin = -1;
 					}
@@ -386,10 +395,13 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 			if (pszChars[I] == '<' && (pszChars[I + 1] == '?' || pszChars[I + 1] == '%'))
 			{
 				DEFINE_BLOCK(I, COLORINDEX_NORMALTEXT);
-				dwCookie |= COOKIE_PARSER;
 				if (pszChars[I + 2] == '@') // directive expression
 				{
-					dwCookie |= COOKIE_ASP;
+					dwCookie |= COOKIE_ASP | COOKIE_PARSER;
+				}
+				else if (pszChars[I + 2] == '-' && pszChars[I + 3] == '-') // server-side comment
+				{
+					dwCookie |= COOKIE_ASP | COOKIE_EXT_COMMENT;
 				}
 				else
 				{
@@ -402,7 +414,11 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 							nScriptBegin = static_cast<int>(pScriptBegin - pszChars);
 						break;
 					}
-					if (!xisalnum(pszChars[nScriptBegin]))
+					if (xisalnum(pszChars[nScriptBegin]))
+					{
+						dwCookie |= COOKIE_PARSER;
+					}
+					else
 					{
 						switch (pszChars[nScriptBegin])
 						{
