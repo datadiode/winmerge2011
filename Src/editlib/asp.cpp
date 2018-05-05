@@ -495,6 +495,17 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 							dwCookie |= COOKIE_ASP;
 							dwScriptTagCookie = COOKIE_PARSER_CSS;
 						}
+						else switch (dwCookie & COOKIE_PARSER_GLOBAL)
+						{
+						case SRCOPT_COOKIE(COOKIE_PARSER_MWSL):
+							if (xisequal<_tcsnicmp>(pchIdent, cchIdent, _T("mwsl")))
+							{
+								dwCookie |= COOKIE_ASP;
+								dwScriptTagCookie = COOKIE_PARSER_MWSL;
+								DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
+							}
+							break;
+						}
 					}
 					if (!pBuf.m_bRecording)
 					{
@@ -503,6 +514,15 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 					else if ((dwCookie & COOKIE_DTD ? IsDtdTagName : IsHtmlTagName)(pchIdent, cchIdent))
 					{
 						DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
+					}
+					else switch (dwCookie & COOKIE_PARSER_GLOBAL)
+					{
+					case SRCOPT_COOKIE(COOKIE_PARSER_MWSL):
+						if (xisequal<_tcsnicmp>(pchIdent, cchIdent, _T("mwsl")))
+						{
+							DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
+						}
+						break;
 					}
 				}
 				else

@@ -2904,6 +2904,8 @@ DWORD CCrystalTextView::ScriptCookie(LPCTSTR lang)
 		return COOKIE_PARSER_VBSCRIPT;
 	if (PathMatchSpec(lang, _T("CSS")))
 		return COOKIE_PARSER_CSS;
+	if (PathMatchSpec(lang, _T("MWSL")))
+		return COOKIE_PARSER_MWSL;
 	return COOKIE_PARSER;
 }
 
@@ -2918,6 +2920,7 @@ CCrystalTextView::TextBlock::ParseProc CCrystalTextView::ScriptParseProc(DWORD d
 		return &ParseLineCSharp;
 	case COOKIE_PARSER_JAVA:
 	case COOKIE_PARSER_JSCRIPT:
+	case COOKIE_PARSER_MWSL:
 		return &ParseLineJava;
 	case COOKIE_PARSER_PERL:
 		return &ParseLinePerl;
