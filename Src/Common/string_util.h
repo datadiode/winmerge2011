@@ -114,6 +114,11 @@ namespace CommonKeywords
 	BOOL IsNumeric(LPCTSTR pszChars, int nLength);
 };
 
+#define HTML4_LEXIS 002
+#define HTML5_LEXIS 004
+#define HTML4_LEXIS_ONLY _T(_CRT_STRINGIZE(_CRT_APPEND(\, HTML4_LEXIS)))
+#define HTML5_LEXIS_ONLY _T(_CRT_STRINGIZE(_CRT_APPEND(\, HTML5_LEXIS)))
+
 namespace HtmlKeywords
 {
 	BOOL IsHtmlTagName(LPCTSTR pszChars, int nLength);

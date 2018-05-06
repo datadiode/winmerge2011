@@ -331,11 +331,15 @@ void CCrystalTextView::ScanParserAssociations(LPTSTR p)
 				while (LPTSTR t = _tcsrchr(q, _T(':')))
 				{
 					*t++ = '\0';
-					if (DWORD dwStartCookie = ScriptCookie(t))
+					if (DWORD dwStartCookie = ScriptCookie(t, 0))
 					{
 						def.flags &= ~SRCOPT_COOKIE(COOKIE_PARSER);
 						def.flags |= dwStartCookie << 4;
 					}
+					else if (PathMatchSpec(t, _T("HTML4")))
+						def.flags |= SRCOPT_HTML4_LEXIS;
+					else if (PathMatchSpec(t, _T("HTML5")))
+						def.flags |= SRCOPT_HTML5_LEXIS;
 				}
 				def.exts = _tcsdup(q);
 				break;
@@ -2881,12 +2885,12 @@ DWORD CCrystalTextView::ParseLine(DWORD dwCookie, int nLineIndex, TextBlock::Arr
 	if (LPCTSTR const pszChars = GetLineChars(nLineIndex))
 	{
 		int const nLength = GetLineLength(nLineIndex);
-		dwCookie = m_CurSourceDef->ParseLineX(dwCookie, pszChars, nLength, -1, pBuf);
+		dwCookie = (this->*m_CurSourceDef->ParseLineX)(dwCookie, pszChars, nLength, -1, pBuf);
 	}
 	return dwCookie;
 }
 
-DWORD CCrystalTextView::ScriptCookie(LPCTSTR lang)
+DWORD CCrystalTextView::ScriptCookie(LPCTSTR lang, DWORD defval)
 {
 	if (PathMatchSpec(lang, _T("VB")))
 		return COOKIE_PARSER_BASIC;
@@ -2906,7 +2910,7 @@ DWORD CCrystalTextView::ScriptCookie(LPCTSTR lang)
 		return COOKIE_PARSER_CSS;
 	if (PathMatchSpec(lang, _T("MWSL")))
 		return COOKIE_PARSER_MWSL;
-	return COOKIE_PARSER;
+	return defval;
 }
 
 CCrystalTextView::TextBlock::ParseProc CCrystalTextView::ScriptParseProc(DWORD dwCookie)
@@ -4010,7 +4014,7 @@ void CCrystalTextView::SetViewEols(bool bViewEols, bool bDistinguishEols)
 	}
 }
 
-DWORD CCrystalTextView::GetFlags()
+DWORD CCrystalTextView::GetFlags() const
 {
 	return m_dwFlags;
 }

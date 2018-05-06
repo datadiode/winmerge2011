@@ -597,7 +597,7 @@ protected:
 				}
 			}
 		};
-		typedef DWORD (*ParseProc)(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, Array &pBuf);
+		typedef DWORD (CCrystalTextView::*ParseProc)(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, Array &pBuf);
 	};
 
 	//BEGIN SW
@@ -620,44 +620,44 @@ public:
 
 	void GoToLine(int nLine, bool bRelative);
 	DWORD ParseLine(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf);
-	static DWORD ScriptCookie(LPCTSTR lang);
+	static DWORD ScriptCookie(LPCTSTR lang, DWORD defval = COOKIE_PARSER);
 	static TextBlock::ParseProc ScriptParseProc(DWORD dwCookie);
-	static DWORD ParseLinePlain(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	static DWORD ParseLineUnknown(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	static DWORD ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	static DWORD ParseLineBasic(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	static DWORD ParseLineBatch(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	static DWORD ParseLineC(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	static DWORD ParseLineCSharp(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	static DWORD ParseLineCss(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	static DWORD ParseLineDcl(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	static DWORD ParseLineFortran(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	static DWORD ParseLineGo(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	static DWORD ParseLineIni(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	static DWORD ParseLineInnoSetup(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	static DWORD ParseLineIS(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	static DWORD ParseLineJava(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	static DWORD ParseLineLisp(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	static DWORD ParseLineNsis(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	static DWORD ParseLinePascal(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	static DWORD ParseLinePerl(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	static DWORD ParseLinePhp(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	static DWORD ParseLinePo(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	static DWORD ParseLinePowerShell(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	static DWORD ParseLinePython(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	static DWORD ParseLineRexx(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	static DWORD ParseLineRsrc(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	static DWORD ParseLineRuby(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	static DWORD ParseLineRust(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	static DWORD ParseLineSgml(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	static DWORD ParseLineSh(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	static DWORD ParseLineSiod(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	static DWORD ParseLineSql(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	static DWORD ParseLineTcl(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	static DWORD ParseLineTex(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	static DWORD ParseLineVerilog(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	static DWORD ParseLineVhdl(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	static DWORD ParseLineXml(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	DWORD ParseLinePlain(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	DWORD ParseLineUnknown(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	DWORD ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	DWORD ParseLineBasic(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	DWORD ParseLineBatch(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	DWORD ParseLineC(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	DWORD ParseLineCSharp(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	DWORD ParseLineCss(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	DWORD ParseLineDcl(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	DWORD ParseLineFortran(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	DWORD ParseLineGo(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	DWORD ParseLineIni(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	DWORD ParseLineInnoSetup(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	DWORD ParseLineIS(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	DWORD ParseLineJava(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	DWORD ParseLineLisp(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	DWORD ParseLineNsis(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	DWORD ParseLinePascal(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	DWORD ParseLinePerl(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	DWORD ParseLinePhp(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	DWORD ParseLinePo(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	DWORD ParseLinePowerShell(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	DWORD ParseLinePython(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	DWORD ParseLineRexx(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	DWORD ParseLineRsrc(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	DWORD ParseLineRuby(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	DWORD ParseLineRust(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	DWORD ParseLineSgml(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	DWORD ParseLineSh(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	DWORD ParseLineSiod(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	DWORD ParseLineSql(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	DWORD ParseLineTcl(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	DWORD ParseLineTex(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	DWORD ParseLineVerilog(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	DWORD ParseLineVhdl(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	DWORD ParseLineXml(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
 	// Attributes
 public:
 	bool GetViewTabs() const;
@@ -672,7 +672,7 @@ public:
 	void SetViewLineNumbers(bool);
 	void GetFont(LOGFONT &) const;
 	void SetFont(const LOGFONT &);
-	DWORD GetFlags();
+	DWORD GetFlags() const;
 	void SetFlags(DWORD dwFlags);
 	//  [JRT]:
 	bool GetDisableDragAndDrop() const;
@@ -743,18 +743,20 @@ public:
 		LPCTSTR commentline;
 	} const TextDefinition;
 
-	static const DWORD SRCOPT_INSERTTABS = 1;
-	static const DWORD SRCOPT_SHOWTABS = 2;
-	//static const DWORD SRCOPT_BSATBOL = 4;
-	static const DWORD SRCOPT_SELMARGIN = 8;
-	static const DWORD SRCOPT_AUTOINDENT = 16;
-	static const DWORD SRCOPT_BRACEANSI = 32;
-	static const DWORD SRCOPT_BRACEGNU = 64;
-	static const DWORD SRCOPT_EOLNDOS = 128;
-	static const DWORD SRCOPT_EOLNUNIX = 256;
-	static const DWORD SRCOPT_EOLNMAC = 512;
-	static const DWORD SRCOPT_FNBRACE = 1024;
-	//static const DWORD SRCOPT_WORDWRAP = 2048;
+	static DWORD const SRCOPT_INSERTTABS	= 0x0001;
+	static DWORD const SRCOPT_SHOWTABS		= 0x0002;
+//	static DWORD const SRCOPT_BSATBOL		= 0x0004;
+	static DWORD const SRCOPT_SELMARGIN		= 0x0008;
+	static DWORD const SRCOPT_AUTOINDENT	= 0x0010;
+	static DWORD const SRCOPT_BRACEANSI		= 0x0020;
+	static DWORD const SRCOPT_BRACEGNU		= 0x0040;
+	static DWORD const SRCOPT_EOLNDOS		= 0x0080;
+	static DWORD const SRCOPT_EOLNUNIX		= 0x0100;
+	static DWORD const SRCOPT_EOLNMAC		= 0x0200;
+	static DWORD const SRCOPT_FNBRACE		= 0x0400;
+//	static DWORD const SRCOPT_WORDWRAP		= 0x0800;
+	static DWORD const SRCOPT_HTML4_LEXIS	= 0x1000;
+	static DWORD const SRCOPT_HTML5_LEXIS	= 0x2000;
 
 	//  Source type
 	TextDefinition *m_CurSourceDef;
