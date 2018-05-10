@@ -2049,7 +2049,12 @@ void CMainFrame::GetMrgViewFontProperties()
 	m_lfDiff = COptionsMgr::Get(OPT_FONT_FILECMP_LOGFONT);
 	if (OPT_FONT_FILECMP_LOGFONT.IsDefault())
 	{
-		m_lfDiff.lfHeight = -16;
+		m_lfDiff.lfHeight = 0;
+		if (HDC hDC = ::GetDC(NULL))
+		{
+			m_lfDiff.lfHeight = -MulDiv(10, ::GetDeviceCaps(hDC, LOGPIXELSY), 72);
+			::ReleaseDC(NULL, hDC);
+		}
 		m_lfDiff.lfWidth = 0;
 		m_lfDiff.lfEscapement = 0;
 		m_lfDiff.lfOrientation = 0;
