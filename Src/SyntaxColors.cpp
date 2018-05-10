@@ -105,49 +105,52 @@ void CSyntaxColors::SetDefault(UINT i)
 
 		// Hardcoded defaults
 	case COLORINDEX_PREPROCESSOR:
-		color = RGB (0, 128, 192);
+		color = RGB(0, 128, 192);
 		break;
 	case COLORINDEX_COMMENT:
-		color = RGB (0, 128, 0);
+		color = RGB(0, 128, 0);
 		break;
 	case COLORINDEX_NUMBER:
-		color = RGB (0xff, 0x00, 0x00);
+		color = RGB(255, 0, 0);
 		break;
 	case COLORINDEX_OPERATOR:
-		color = RGB (96, 96, 96);
+		color = RGB(96, 96, 96);
 		break;
 	case COLORINDEX_KEYWORD:
-		color = RGB (0, 0, 255);
+		color = RGB(0, 0, 255);
 		break;
 	case COLORINDEX_FUNCNAME:
-		color = RGB (128, 0, 128);
+		color = RGB(128, 0, 128);
 		break;
 	case COLORINDEX_USER1:
-		color = RGB (0, 0, 128);
+		color = RGB(0, 0, 128);
 		break;
 	case COLORINDEX_USER2:
-		color = RGB (0, 128, 192);
+		color = RGB(0, 128, 192);
+		break;
+	case COLORINDEX_USER3:
+		color = RGB(215, 10, 83);
 		break;
 	case COLORINDEX_SELBKGND:
-		color = RGB (0, 0, 0);
+		color = RGB(0, 0, 0);
 		break;
 	case COLORINDEX_SELTEXT:
-		color = RGB (255, 255, 255);
+		color = RGB(255, 255, 255);
 		break;
 	case COLORINDEX_HIGHLIGHTBKGND1:
-		color = RGB (255, 160, 160);
+		color = RGB(255, 160, 160);
 		break;
 	case COLORINDEX_HIGHLIGHTTEXT1:
-		color = RGB (0, 0, 0);
+		color = RGB(0, 0, 0);
 		break;
 	case COLORINDEX_HIGHLIGHTBKGND2:
-		color = RGB (255, 255, 0);
+		color = RGB(255, 255, 0);
 		break;
 	case COLORINDEX_HIGHLIGHTTEXT2:
-		color = RGB (0, 0, 0);
+		color = RGB(0, 0, 0);
 		break;
 	default:
-		color = RGB (128, 0, 0);
+		color = RGB(128, 0, 0);
 		break;
 	}
 	m_colors[i] = color;

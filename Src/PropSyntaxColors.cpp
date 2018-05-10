@@ -35,6 +35,7 @@ LRESULT PropSyntaxColors::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			SyntaxColors.SetDefault(COLORINDEX_PREPROCESSOR);
 			SyntaxColors.SetDefault(COLORINDEX_USER1);
 			SyntaxColors.SetDefault(COLORINDEX_USER2);
+			SyntaxColors.SetDefault(COLORINDEX_USER3);
 			UpdateScreen();
 			break;
 		case MAKEWPARAM(IDC_SCOLOR_KEYWORDS, BN_CLICKED):
@@ -64,6 +65,9 @@ LRESULT PropSyntaxColors::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		case MAKEWPARAM(IDC_SCOLOR_USER2, BN_CLICKED):
 			BrowseColorAndSave(IDC_SCOLOR_USER2, COLORINDEX_USER2);
 			break;
+		case MAKEWPARAM(IDC_SCOLOR_USER3, BN_CLICKED):
+			BrowseColorAndSave(IDC_SCOLOR_USER3, COLORINDEX_USER3);
+			break;
 		case MAKEWPARAM(IDC_SCOLOR_KEYWORDS_BOLD, BN_CLICKED):
 			UpdateBoldStatus(IDC_SCOLOR_KEYWORDS_BOLD, COLORINDEX_KEYWORD);
 			break;
@@ -90,6 +94,9 @@ LRESULT PropSyntaxColors::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			break;
 		case MAKEWPARAM(IDC_SCOLOR_USER2_BOLD, BN_CLICKED):
 			UpdateBoldStatus(IDC_SCOLOR_USER2_BOLD, COLORINDEX_USER2);
+			break;
+		case MAKEWPARAM(IDC_SCOLOR_USER3_BOLD, BN_CLICKED):
+			UpdateBoldStatus(IDC_SCOLOR_USER3_BOLD, COLORINDEX_USER3);
 			break;
 		}
 		break;
@@ -119,6 +126,7 @@ void PropSyntaxColors::UpdateScreen()
 	SetDlgItemInt(IDC_SCOLOR_PREPROCESSOR, SyntaxColors.GetColor(COLORINDEX_PREPROCESSOR));
 	SetDlgItemInt(IDC_SCOLOR_USER1, SyntaxColors.GetColor(COLORINDEX_USER1));
 	SetDlgItemInt(IDC_SCOLOR_USER2, SyntaxColors.GetColor(COLORINDEX_USER2));
+	SetDlgItemInt(IDC_SCOLOR_USER3, SyntaxColors.GetColor(COLORINDEX_USER3));
 	CheckDlgButton(IDC_SCOLOR_KEYWORDS_BOLD, SyntaxColors.GetBold(COLORINDEX_KEYWORD));
 	CheckDlgButton(IDC_SCOLOR_FUNCTIONS_BOLD, SyntaxColors.GetBold(COLORINDEX_FUNCNAME));
 	CheckDlgButton(IDC_SCOLOR_COMMENTS_BOLD, SyntaxColors.GetBold(COLORINDEX_COMMENT));
@@ -128,6 +136,7 @@ void PropSyntaxColors::UpdateScreen()
 	CheckDlgButton(IDC_SCOLOR_PREPROCESSOR_BOLD, SyntaxColors.GetBold(COLORINDEX_PREPROCESSOR));
 	CheckDlgButton(IDC_SCOLOR_USER1_BOLD, SyntaxColors.GetBold(COLORINDEX_USER1));
 	CheckDlgButton(IDC_SCOLOR_USER2_BOLD, SyntaxColors.GetBold(COLORINDEX_USER2));
+	CheckDlgButton(IDC_SCOLOR_USER3_BOLD, SyntaxColors.GetBold(COLORINDEX_USER3));
 }
 
 int PropSyntaxColors::GetCheckVal(UINT nColorIndex)
