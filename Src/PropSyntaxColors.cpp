@@ -104,7 +104,7 @@ LRESULT PropSyntaxColors::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
  */
 void PropSyntaxColors::BrowseColorAndSave(int id, int colorIndex)
 {
-	if (SyntaxColors.ChooseColor(m_hWnd, id))
+	if (SyntaxColors.ChooseColor(m_pWnd, id))
 		SyntaxColors.SetColor(colorIndex, GetDlgItemInt(id));
 }
 

@@ -202,18 +202,20 @@ void CSyntaxColors::SaveToRegistry()
 	}
 }
 
-bool CSyntaxColors::ChooseColor(HWND hDlg, int nIDDlgItem)
+bool CSyntaxColors::ChooseColor(HWindow *pDlg, int nIDDlgItem)
 {
 	CHOOSECOLOR cc;
 	ZeroMemory(&cc, sizeof cc);
 	cc.lStructSize = sizeof cc;
-	cc.hwndOwner = hDlg;
-	cc.Flags = CC_RGBINIT;
+	cc.hwndOwner = pDlg->m_hWnd;
 	cc.lpCustColors = m_rgCustColors;
-	cc.rgbResult = GetDlgItemInt(hDlg, nIDDlgItem, NULL, FALSE);
-	if (!::ChooseColor(&cc))
+	cc.rgbResult = pDlg->GetDlgItemInt(nIDDlgItem, NULL);
+	cc.Flags = cc.rgbResult != CLR_NONE ? CC_RGBINIT : 0;
+	if ((pDlg->GetDlgItem(nIDDlgItem)->GetStyle() & BS_LEFTTEXT) && cc.rgbResult != CLR_NONE)
+		cc.rgbResult = CLR_NONE;
+	else if (!::ChooseColor(&cc))
 		return false;
-	SetDlgItemInt(hDlg, nIDDlgItem, cc.rgbResult, FALSE);
+	pDlg->SetDlgItemInt(nIDDlgItem, cc.rgbResult);
 	return true;
 }
 

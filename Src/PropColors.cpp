@@ -28,6 +28,30 @@ LRESULT PropMergeColors::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_COMMAND:
 		switch (wParam)
 		{
+		case MAKEWPARAM(IDC_COLORSCHEME_GITHUBBITBUCKET, BN_CLICKED):
+			m_clrDiff               = RGB(221,255,221);
+			m_clrDiffDeleted        = RGB(224,224,255);
+			m_clrDiffText           = CLR_NONE;
+			m_clrSelDiff            = RGB(255,221,221);
+			m_clrSelDiffDeleted     = RGB(240,192,192);
+			m_clrSelDiffText        = CLR_NONE;
+			m_clrTrivial            = RGB(251,242,191);
+			m_clrTrivialDeleted     = RGB(233,233,233);
+			m_clrTrivialText        = CLR_NONE;
+			m_clrMoved              = RGB(240,216,192);
+			m_clrMovedDeleted       = RGB(192,192,192);
+			m_clrMovedText          = CLR_NONE;
+			m_clrSelMoved           = RGB(248,112,78);
+			m_clrSelMovedDeleted    = RGB(252,181,163);
+			m_clrSelMovedText       = CLR_NONE;
+			m_clrWordDiff           = RGB(170,255,170);
+			m_clrWordDiffDeleted    = RGB(160,230,160);
+			m_clrWordDiffText       = CLR_NONE;
+			m_clrSelWordDiff        = RGB(255,170,170);
+			m_clrSelWordDiffDeleted = RGB(230,150,140);
+			m_clrSelWordDiffText    = CLR_NONE;
+			SerializeColors(INVALIDATE);
+			break;
 		case MAKEWPARAM(IDC_COLORDEFAULTS_BTN, BN_CLICKED):
 			SerializeColors(SET_DEFAULTS);
 			SerializeColors(INVALIDATE);
@@ -35,17 +59,17 @@ LRESULT PropMergeColors::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		case MAKEWPARAM(IDC_DIFFERENCE_COLOR, BN_CLICKED):
 			BrowseColor(IDC_DIFFERENCE_COLOR, m_clrDiff);
 			break;
-		case MAKEWPARAM(IDC_SEL_DIFFERENCE_COLOR, BN_CLICKED):
-			BrowseColor(IDC_SEL_DIFFERENCE_COLOR, m_clrSelDiff);
-			break;
 		case MAKEWPARAM(IDC_DIFFERENCE_DELETED_COLOR, BN_CLICKED):
 			BrowseColor(IDC_DIFFERENCE_DELETED_COLOR, m_clrDiffDeleted);
 			break;
-		case MAKEWPARAM(IDC_SEL_DIFFERENCE_DELETED_COLOR, BN_CLICKED):
-			BrowseColor(IDC_SEL_DIFFERENCE_DELETED_COLOR, m_clrSelDiffDeleted);
-			break;
 		case MAKEWPARAM(IDC_DIFFERENCE_TEXT_COLOR, BN_CLICKED):
 			BrowseColor(IDC_DIFFERENCE_TEXT_COLOR, m_clrDiffText);
+			break;
+		case MAKEWPARAM(IDC_SEL_DIFFERENCE_COLOR, BN_CLICKED):
+			BrowseColor(IDC_SEL_DIFFERENCE_COLOR, m_clrSelDiff);
+			break;
+		case MAKEWPARAM(IDC_SEL_DIFFERENCE_DELETED_COLOR, BN_CLICKED):
+			BrowseColor(IDC_SEL_DIFFERENCE_DELETED_COLOR, m_clrSelDiffDeleted);
 			break;
 		case MAKEWPARAM(IDC_SEL_DIFFERENCE_TEXT_COLOR, BN_CLICKED):
 			BrowseColor(IDC_SEL_DIFFERENCE_TEXT_COLOR, m_clrSelDiffText);
@@ -83,14 +107,14 @@ LRESULT PropMergeColors::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		case MAKEWPARAM(IDC_WORDDIFF_DELETED_COLOR, BN_CLICKED):
 			BrowseColor(IDC_WORDDIFF_DELETED_COLOR, m_clrWordDiffDeleted);
 			break;
+		case MAKEWPARAM(IDC_WORDDIFF_TEXT_COLOR, BN_CLICKED):
+			BrowseColor(IDC_WORDDIFF_TEXT_COLOR, m_clrWordDiffText);
+			break;
 		case MAKEWPARAM(IDC_SEL_WORDDIFF_COLOR, BN_CLICKED):
 			BrowseColor(IDC_SEL_WORDDIFF_COLOR, m_clrSelWordDiff);
 			break;
 		case MAKEWPARAM(IDC_SEL_WORDDIFF_DELETED_COLOR, BN_CLICKED):
 			BrowseColor(IDC_SEL_WORDDIFF_DELETED_COLOR, m_clrSelWordDiffDeleted);
-			break;
-		case MAKEWPARAM(IDC_WORDDIFF_TEXT_COLOR, BN_CLICKED):
-			BrowseColor(IDC_WORDDIFF_TEXT_COLOR, m_clrWordDiffText);
 			break;
 		case MAKEWPARAM(IDC_SEL_WORDDIFF_TEXT_COLOR, BN_CLICKED):
 			BrowseColor(IDC_SEL_WORDDIFF_TEXT_COLOR, m_clrSelWordDiffText);

@@ -67,7 +67,7 @@ public:
 	void SetDefault(UINT index);
 	void LoadFromRegistry();
 	void SaveToRegistry();
-	bool ChooseColor(HWND hDlg, int nIDDlgItem);
+	bool ChooseColor(HWindow *pDlg, int nIDDlgItem);
 	DWORD ExportOptions(LPCTSTR filename);
 	DWORD ImportOptions(LPCTSTR filename);
 // Implementation methods

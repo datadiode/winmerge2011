@@ -80,7 +80,7 @@ void PropTextColors::WriteOptions()
  */
 void PropTextColors::BrowseColorAndSave(int id, int colorIndex)
 {
-	if (SyntaxColors.ChooseColor(m_hWnd, id))
+	if (SyntaxColors.ChooseColor(m_pWnd, id))
 		SyntaxColors.SetColor(colorIndex, GetDlgItemInt(id));
 }
 

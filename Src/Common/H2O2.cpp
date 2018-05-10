@@ -231,9 +231,17 @@ LRESULT OWindow::MessageReflect_ColorButton<WM_DRAWITEM>(WPARAM, LPARAM lParam)
 	DrawEdge(pdis->hDC, &pdis->rcItem, EDGE_SUNKEN,
 		pdis->itemState & ODS_FOCUS ? BF_RECT|BF_ADJUST|BF_MONO : BF_RECT|BF_ADJUST);
 	COLORREF cr = m_pWnd->GetDlgItemInt(pdis->CtlID);
-	COLORREF crTmp = SetBkColor(pdis->hDC, cr);
-	ExtTextOut(pdis->hDC, 0, 0, ETO_OPAQUE, &pdis->rcItem, 0, 0, 0);
-	SetBkColor(pdis->hDC, crTmp);
+	if (cr != CLR_NONE)
+	{
+		COLORREF crTmp = SetBkColor(pdis->hDC, cr);
+		ExtTextOut(pdis->hDC, 0, 0, ETO_OPAQUE, &pdis->rcItem, 0, 0, 0);
+		SetBkColor(pdis->hDC, crTmp);
+	}
+	else if (HBrush *pBrush = HBrush::CreateHatchBrush(HS_DIAGCROSS, 0))
+	{
+		FillRect(pdis->hDC, &pdis->rcItem, pBrush->m_hBrush);
+		pBrush->DeleteObject();
+	}
 	return TRUE;
 }
 

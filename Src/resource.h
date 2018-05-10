@@ -264,6 +264,7 @@
 #define IDC_CP_UI                               1148
 #define IDC_CP_CUSTOM                           1149
 #define IDC_CUSTOM_CP_NUMBER                    1150
+#define IDC_COLORSCHEME_GITHUBBITBUCKET         1151
 #define IDC_FILTERFILE_NEWBTN                   1152
 #define IDC_FILTERFILE_DELETEBTN                1153
 #define IDC_WORDDIFF_COLOR                      1154

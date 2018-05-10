@@ -31,7 +31,7 @@ BOOL OptionsPanel::OnInitDialog()
  */
 void OptionsPanel::BrowseColor(int id, COLORREF &currentColor)
 {
-	if (SyntaxColors.ChooseColor(m_hWnd, id))
+	if (SyntaxColors.ChooseColor(m_pWnd, id))
 		currentColor = GetDlgItemInt(id);
 }
 

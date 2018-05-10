@@ -225,7 +225,10 @@ void CGhostTextView::GetAdditionalTextBlocks(int nLineIndex, TextBlock::Array &r
 		pBuf->m_nCharPos = wd.start[m_nThisPane];
 		if (lineInCurrentDiff)
 		{
-			pBuf->m_nColorIndex = COLORINDEX_HIGHLIGHTTEXT1 | COLORINDEX_APPLYFORCE;
+			if (COptionsMgr::Get(OPT_CLR_SELECTED_WORDDIFF_TEXT) != CLR_NONE)
+				pBuf->m_nColorIndex = COLORINDEX_HIGHLIGHTTEXT1 | COLORINDEX_APPLYFORCE;
+			else
+				pBuf->m_nColorIndex = COLORINDEX_NONE;
 			if (wd.IsInsert()) // Are char/words inserted/deleted on one side?
 				pBuf->m_nBgColorIndex = COLORINDEX_HIGHLIGHTBKGND4 | COLORINDEX_APPLYFORCE;
 			else
@@ -233,7 +236,10 @@ void CGhostTextView::GetAdditionalTextBlocks(int nLineIndex, TextBlock::Array &r
 		}
 		else
 		{
-			pBuf->m_nColorIndex = COLORINDEX_HIGHLIGHTTEXT2 | COLORINDEX_APPLYFORCE;
+			if (COptionsMgr::Get(OPT_CLR_WORDDIFF_TEXT) != CLR_NONE)
+				pBuf->m_nColorIndex = COLORINDEX_HIGHLIGHTTEXT2 | COLORINDEX_APPLYFORCE;
+			else
+				pBuf->m_nColorIndex = COLORINDEX_NONE;
 			if (wd.IsInsert()) // Are char/words inserted/deleted on one side?
 				pBuf->m_nBgColorIndex = COLORINDEX_HIGHLIGHTBKGND3 | COLORINDEX_APPLYFORCE;
 			else
