@@ -384,6 +384,13 @@ CCrystalTextView::TextDefinition *CCrystalTextView::DoSetTextType(TextDefinition
 	return def;
 }
 
+CCrystalTextView::TextDefinition *CCrystalTextView::GetTextType(int index)
+{
+	if (index >= 0 && index < _countof(m_StaticSourceDefs))
+		return m_SourceDefs + index;
+	return NULL;
+}
+
 CCrystalTextView::TextDefinition *CCrystalTextView::GetTextType(LPCTSTR pszExt)
 {
 	TextDefinition *def = m_SourceDefs;

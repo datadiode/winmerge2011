@@ -1039,12 +1039,17 @@ LRESULT CMainFrame::OnWndMsg<WM_INITMENUPOPUP>(WPARAM wParam, LPARAM lParam)
 			}
 			continue;
 		case ID_COLORSCHEME_FIRST:
-			pMenu->CheckMenuRadioItem(ID_COLORSCHEME_FIRST, ID_COLORSCHEME_LAST, ID_COLORSCHEME_FIRST + m_sourceType);
 			mii.fState = COptionsMgr::Get(OPT_SYNTAX_HIGHLIGHT) ? MF_ENABLED : MF_GRAYED;
-			do
+			while (CCrystalTextView::TextDefinition const *const def =
+				CCrystalTextView::GetTextType(mii.wID - ID_COLORSCHEME_FIRST))
 			{
-				pMenu->EnableMenuItem(mii.wID, mii.fState);
-			} while (++mii.wID <= ID_COLORSCHEME_LAST);
+				ASSERT(def->type == mii.wID - ID_COLORSCHEME_FIRST);
+				ASSERT(mii.wID <= ID_COLORSCHEME_LAST);
+				if (pMenu->EnableMenuItem(mii.wID, mii.fState) == -1)
+					pMenu->AppendMenu(mii.fState, mii.wID, def->name);
+				++mii.wID;
+			}
+			pMenu->CheckMenuRadioItem(ID_COLORSCHEME_FIRST, ID_COLORSCHEME_LAST, ID_COLORSCHEME_FIRST + m_sourceType);
 			continue;
 		case ID_VIEW_CONTEXT_0:
 			pMenu->CheckMenuRadioItem(ID_VIEW_CONTEXT_0, ID_VIEW_CONTEXT_UNLIMITED,

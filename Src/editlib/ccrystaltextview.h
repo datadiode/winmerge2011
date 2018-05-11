@@ -764,6 +764,7 @@ public:
 	static TextDefinition *m_SourceDefs;
 	virtual TextDefinition *DoSetTextType(TextDefinition *);
 	static TextDefinition *GetTextType(LPCTSTR pszExt);
+	static TextDefinition *GetTextType(int index);
 	static void ScanParserAssociations(LPTSTR);
 	static void DumpParserAssociations(LPTSTR);
 	static void FreeParserAssociations();
