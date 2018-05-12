@@ -46,7 +46,7 @@ using HtmlKeywords::IsEntityName;
 
 DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
 {
-	int nScriptBegin = (dwCookie & COOKIE_PARSER) && !(dwCookie & COOKIE_ASP) ? 0 : -1;
+	int nScriptBegin = (dwCookie & COOKIE_PARSER) && !(dwCookie & (COOKIE_ASP | COOKIE_STRING)) ? 0 : -1;
 
 	if (nLength == 0)
 	{
@@ -67,7 +67,7 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 	enum { False, Start, End } bWasComment = False;
 	DWORD dwScriptTagCookie = dwCookie & COOKIE_SCRIPT ? dwCookie & COOKIE_PARSER : 0;
 	int nIdentBegin = -1;
-	pBuf.m_bRecording = dwCookie & COOKIE_PARSER ? NULL : pBuf;
+	pBuf.m_bRecording = nScriptBegin != -1 ? NULL : pBuf;
 	do
 	{
 		int const nPrevI = I++;
@@ -220,6 +220,7 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 					case 0:
 					case COOKIE_PARSER_BASIC:
 					case COOKIE_PARSER_VBSCRIPT:
+					case COOKIE_PARSER | COOKIE_ASP:
 						break;
 					default:
 						int nPrevI = I;
@@ -255,6 +256,7 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 					case 0:
 					case COOKIE_PARSER_BASIC:
 					case COOKIE_PARSER_VBSCRIPT:
+					case COOKIE_PARSER | COOKIE_ASP:
 						break;
 					default:
 						int nPrevI = I;
@@ -281,35 +283,54 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 				}
 				continue;
 			case COOKIE_STRING_REGEXP:
-				if (pszChars[I] == '/')
+				switch (dwCookie & COOKIE_PARSER)
 				{
-					dwCookie &= ~COOKIE_STRING_REGEXP;
-					bRedefineBlock = TRUE;
-					int nPrevI = I;
-					while (nPrevI && pszChars[--nPrevI] == '\\')
+				case COOKIE_PARSER_CSHARP:
+					if (pszChars[I] == '"')
 					{
-						dwCookie ^= COOKIE_STRING_REGEXP;
-						bRedefineBlock ^= TRUE;
-					}
-					if (!(dwCookie & COOKIE_STRING_REGEXP))
-					{
+						dwCookie &= ~COOKIE_STRING_REGEXP;
+						bRedefineBlock = TRUE;
 						int nNextI = I;
-						while (++nNextI < nLength && xisalnum(pszChars[nNextI]))
+						while (++nNextI < nLength && pszChars[nNextI] == '"')
+						{
 							I = nNextI;
-						bWasComment = End;
+							dwCookie ^= COOKIE_STRING_REGEXP;
+							bRedefineBlock ^= TRUE;
+						}
 					}
-					if (!(dwCookie & (COOKIE_STRING | COOKIE_ASP)) && (dwCookie & COOKIE_PARSER_GLOBAL))
+					break;
+				default:
+					if (pszChars[I] == '/')
 					{
-						if (dwScriptTagCookie & COOKIE_PARSER)
+						dwCookie &= ~COOKIE_STRING_REGEXP;
+						bRedefineBlock = TRUE;
+						int nPrevI = I;
+						while (nPrevI && pszChars[--nPrevI] == '\\')
 						{
-							dwCookie &= ~(COOKIE_PARSER | 0xFFFF);
-							dwCookie |= dwScriptTagCookie & COOKIE_PARSER;
+							dwCookie ^= COOKIE_STRING_REGEXP;
+							bRedefineBlock ^= TRUE;
 						}
-						if (dwCookie & COOKIE_PARSER)
+						if (!(dwCookie & COOKIE_STRING_REGEXP))
 						{
-							pBuf.m_bRecording = NULL;
-							nScriptBegin = I + 1;
+							int nNextI = I;
+							while (++nNextI < nLength && xisalnum(pszChars[nNextI]))
+								I = nNextI;
+							bWasComment = End;
 						}
+					}
+					break;
+				}
+				if (!(dwCookie & (COOKIE_STRING | COOKIE_ASP)) && (dwCookie & COOKIE_PARSER_GLOBAL))
+				{
+					if (dwScriptTagCookie & COOKIE_PARSER)
+					{
+						dwCookie &= ~(COOKIE_PARSER | 0xFFFF);
+						dwCookie |= dwScriptTagCookie & COOKIE_PARSER;
+					}
+					if (dwCookie & COOKIE_PARSER)
+					{
+						pBuf.m_bRecording = NULL;
+						nScriptBegin = I + 1;
 					}
 				}
 				continue;
@@ -452,7 +473,7 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 						}
 					}
 					DEFINE_BLOCK(I, COLORINDEX_STRING);
-					dwCookie |= COOKIE_STRING_DOUBLE;
+					dwCookie |= (dwCookie & COOKIE_PARSER) == COOKIE_PARSER_CSHARP && I > 0 && pszChars[nPrevI] == '@' ? COOKIE_STRING_REGEXP : COOKIE_STRING_DOUBLE;
 					continue;
 				}
 
@@ -693,7 +714,7 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 			if (pszChars[I] == '<' && !(I < nLength - 3 && pszChars[I + 1] == '!' && pszChars[I + 2] == '-' && pszChars[I + 3] == '-'))
 			{
 				DEFINE_BLOCK(I, COLORINDEX_OPERATOR);
-				DEFINE_BLOCK(I + 1, COLORINDEX_PREPROCESSOR);
+				bDecIndex = FALSE;
 				dwCookie |= COOKIE_PREPROCESSOR;
 			}
 			break;
