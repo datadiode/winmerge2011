@@ -2917,6 +2917,8 @@ DWORD CCrystalTextView::ScriptCookie(LPCTSTR lang, DWORD defval)
 		return COOKIE_PARSER_CSS;
 	if (PathMatchSpec(lang, _T("MWSL")))
 		return COOKIE_PARSER_MWSL;
+	if (PathMatchSpec(lang, _T("x-jquery-tmpl")))
+		return 0;
 	return defval;
 }
 

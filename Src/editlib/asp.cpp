@@ -630,15 +630,17 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 					{
 						TCHAR lang[32];
 						if (xisequal<_tcsnicmp>(pchIdent, cchIdent, _T("type")) ?
-							_stscanf(pchIdent + cchIdent, _T("%31[^a-zA-Z]%31[a-zA-Z]/%31[a-zA-Z#]"), lang, lang, lang) == 3 :
+							_stscanf(pchIdent + cchIdent, _T("%31[^a-zA-Z]%31[a-zA-Z]/%31[a-zA-Z#\\-]"), lang, lang, lang) == 3 :
 							xisequal<_tcsnicmp>(pchIdent, cchIdent, _T("language")) &&
-							_stscanf(pchIdent + cchIdent, _T("%31[^a-zA-Z]%31[a-zA-Z#]"), lang, lang) == 2)
+							_stscanf(pchIdent + cchIdent, _T("%31[^a-zA-Z]%31[a-zA-Z#\\-]"), lang, lang) == 2)
 						{
 							dwScriptTagCookie = ScriptCookie(lang);
+							if (dwScriptTagCookie == 0)
+								dwCookie &= ~COOKIE_ASP; // Render element content as HTML
 						}
 						else if (dwScriptTagCookie == 0 &&
 							xisequal<_tcsnicmp>(pchIdent, cchIdent, _T("runat")) &&
-							_stscanf(pchIdent + cchIdent, _T("%31[^a-zA-Z]%31[a-zA-Z#]"), lang, lang) == 2 &&
+							_stscanf(pchIdent + cchIdent, _T("%31[^a-zA-Z]%31[a-zA-Z#\\-]"), lang, lang) == 2 &&
 							_tcsicmp(lang, _T("server")) == 0)
 						{
 							dwScriptTagCookie = (dwCookie & COOKIE_PARSER_GLOBAL) >> 4;
