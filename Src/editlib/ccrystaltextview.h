@@ -629,6 +629,7 @@ public:
 	DWORD ParseLineBatch(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
 	DWORD ParseLineC(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
 	DWORD ParseLineCSharp(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	DWORD ParseLineRazor(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
 	DWORD ParseLineCss(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
 	DWORD ParseLineDcl(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
 	DWORD ParseLineFortran(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
@@ -695,6 +696,7 @@ public:
 		SRC_BATCH,
 		SRC_C,
 		SRC_CSHARP,
+		SRC_CSHTML,
 		SRC_CSS,
 		SRC_DCL,
 		SRC_FORTRAN,

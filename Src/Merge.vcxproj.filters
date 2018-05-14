@@ -678,6 +678,9 @@
     <ClCompile Include="editlib\vhdl.cpp">
       <Filter>EditLib</Filter>
     </ClCompile>
+    <ClCompile Include="editlib\razor.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\WindowPlacement.h">
