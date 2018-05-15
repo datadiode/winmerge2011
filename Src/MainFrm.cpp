@@ -1045,7 +1045,7 @@ LRESULT CMainFrame::OnWndMsg<WM_INITMENUPOPUP>(WPARAM wParam, LPARAM lParam)
 				ASSERT(def->type == mii.wID - ID_COLORSCHEME_FIRST);
 				ASSERT(mii.wID <= ID_COLORSCHEME_LAST);
 				if (pMenu->EnableMenuItem(mii.wID, mii.fState) == -1)
-					pMenu->AppendMenu(mii.fState, mii.wID, def->name);
+					pMenu->AppendMenu((mii.wID - ID_COLORSCHEME_FIRST) % 24 ? mii.fState : mii.fState | MF_MENUBREAK, mii.wID, def->name);
 				++mii.wID;
 			}
 			pMenu->CheckMenuRadioItem(ID_COLORSCHEME_FIRST, ID_COLORSCHEME_LAST, ID_COLORSCHEME_FIRST + m_sourceType);
