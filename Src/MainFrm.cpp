@@ -63,7 +63,6 @@
 #include "FileOrFolderSelect.h"
 #include "OpenDlg.h"
 #include "ConsoleWindow.h"
-#include <mlang.h>
 
 using std::vector;
 
@@ -2042,6 +2041,12 @@ void CMainFrame::OnViewSelectfont()
 	}
 }
 
+static int CALLBACK FontEnumProc(LOGFONT const *plf, TEXTMETRIC const *, DWORD, LPARAM lParam)
+{
+	*reinterpret_cast<LOGFONT *>(lParam) = *plf;
+	return 0; // A return value of 0 ends the enumeration
+}
+
 /**
  * @brief Selects font for Merge view.
  *
@@ -2054,9 +2059,11 @@ void CMainFrame::GetMrgViewFontProperties()
 	m_lfDiff = COptionsMgr::Get(OPT_FONT_FILECMP_LOGFONT);
 	if (OPT_FONT_FILECMP_LOGFONT.IsDefault())
 	{
+		lstrcpyn(m_lfDiff.lfFaceName, _T("Courier New"), LF_FACESIZE);
 		m_lfDiff.lfHeight = 0;
 		if (HDC hDC = ::GetDC(NULL))
 		{
+			::EnumFontFamilies(hDC, _T("Consolas"), FontEnumProc, reinterpret_cast<LPARAM>(&m_lfDiff));
 			m_lfDiff.lfHeight = -MulDiv(10, ::GetDeviceCaps(hDC, LOGPIXELSY), 72);
 			::ReleaseDC(NULL, hDC);
 		}
@@ -2072,17 +2079,6 @@ void CMainFrame::GetMrgViewFontProperties()
 		m_lfDiff.lfClipPrecision = CLIP_STROKE_PRECIS;
 		m_lfDiff.lfQuality = DRAFT_QUALITY;
 		m_lfDiff.lfPitchAndFamily = FF_MODERN | FIXED_PITCH;
-		lstrcpyn(m_lfDiff.lfFaceName, _T("Courier New"), LF_FACESIZE);
-		// Adjust defaults according to MLANG
-		MIMECPINFO cpi;
-		ZeroMemory(&cpi, sizeof cpi);
-		CMyComPtr<IMultiLanguage> pMLang;
-		if (SUCCEEDED(pMLang.CoCreateInstance(CLSID_CMultiLanguage, IID_IMultiLanguage)) &&
-			SUCCEEDED(pMLang->GetCodePageInfo(GetACP(), &cpi)))
-		{
-			m_lfDiff.lfCharSet = cpi.bGDICharset;
-			lstrcpyn(m_lfDiff.lfFaceName, cpi.wszFixedWidthFont, LF_FACESIZE);
-		}
 	}
 }
 
