@@ -41,6 +41,7 @@ static BOOL IsRazorCsKeyword(LPCTSTR pszChars, int nLength)
 		_T("do"),
 		_T("for"),
 		_T("foreach"),
+		_T("helper"),
 		_T("if"),
 		_T("lock"),
 		_T("switch"),
@@ -64,6 +65,8 @@ static BOOL IsRazorCsKeyword(LPCTSTR pszChars, int nLength)
 #define COOKIE_ASP              0x00400000UL
 #define COOKIE_SCRIPT           0x00800000UL
 #define COOKIE_RAZOR_NESTING    0x0000FF00UL
+
+#define ODDNESS_AT              0x00000001UL
 
 #define SNORKEL(X) (0 - (X) & (X))
 #define GO_DOWN(C, X) ((C) & ~(X) | (C) - (X) & (X))
@@ -100,6 +103,8 @@ DWORD CCrystalTextView::ParseLineRazor(DWORD dwCookie, LPCTSTR const pszChars, i
 	BOOL bRedefineBlock = TRUE;
 	BOOL bDecIndex = FALSE;
 	enum { False, Start, End } bWasComment = False;
+	DWORD dwOddness = 0;
+	DWORD dwIdentOddness = 0;
 	DWORD dwScriptTagCookie = dwCookie & COOKIE_SCRIPT ? dwCookie & COOKIE_PARSER : 0;
 	int nIdentBegin = -1;
 	pBuf.m_bRecording = nScriptBegin != -1 ? NULL : pBuf;
@@ -142,21 +147,6 @@ DWORD CCrystalTextView::ParseLineRazor(DWORD dwCookie, LPCTSTR const pszChars, i
 		// See bug #1474782 Crash when comparing SQL with with binary data
 		if (I < nLength)
 		{
-			if (pszChars[I] == '@')
-			{
-				if ((dwCookie & COOKIE_RAZOR_NESTING) <= SNORKEL(COOKIE_RAZOR_NESTING))
-				{
-					if (!xisalnum(pszChars[I + 1]))
-					{
-						dwCookie ^= SNORKEL(COOKIE_RAZOR_NESTING);
-					}
-					pBuf.m_bRecording = pBuf;
-					bRedefineBlock = TRUE;
-					bDecIndex = TRUE;
-				}
-				continue;
-			}
-
 			if (pszChars[I] == '{' && (dwCookie & COOKIE_RAZOR_NESTING) && !(dwCookie & COOKIE_SCRIPT))
 			{
 				dwCookie = GO_DOWN(dwCookie, COOKIE_RAZOR_NESTING);
@@ -525,31 +515,57 @@ DWORD CCrystalTextView::ParseLineRazor(DWORD dwCookie, LPCTSTR const pszChars, i
 			if (xisalnum(pszChars[I]) || pszChars[I] == '.' || pszChars[I] == '-' || pszChars[I] == '!' || pszChars[I] == '#')
 			{
 				if (nIdentBegin == -1)
+				{
 					nIdentBegin = I;
+					dwIdentOddness = dwOddness;
+				}
 				dwCookie |= COOKIE_REJECT_REGEXP;
 				continue;
 			}
-		}
-		if (nIdentBegin >= 0)
-		{
-			LPCTSTR const pchIdent = pszChars + nIdentBegin;
-			int const cchIdent = I - nIdentBegin;
-			if (pchIdent > pszChars && pchIdent[-1] == '@')
+
+			if (pszChars[I] == '@')
 			{
+				dwOddness ^= ODDNESS_AT;
 				if ((dwCookie & COOKIE_RAZOR_NESTING) <= SNORKEL(COOKIE_RAZOR_NESTING))
 				{
-					if (IsRazorCsKeyword(pchIdent, cchIdent))
-					{
-						pBuf.m_bRecording = pBuf;
-						DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER3);
-						pBuf.m_bRecording = NULL;
-						nScriptBegin = I + 1;
-						dwCookie |= SNORKEL(COOKIE_RAZOR_NESTING);
-					}
-					else
+					if (!(dwOddness & ODDNESS_AT) || pszChars[I + 1] != '{')
 					{
 						dwCookie &= ~COOKIE_RAZOR_NESTING;
 					}
+					else
+					{
+						dwCookie |= SNORKEL(COOKIE_RAZOR_NESTING);
+					}
+					pBuf.m_bRecording = pBuf;
+					if (nScriptBegin >= 0)
+					{
+						DWORD const dwParser = ParseProcCookie(dwCookie);
+						dwCookie = dwCookie & 0xFFFFFF00 | (this->*ScriptParseProc(dwParser))(dwCookie, pszChars, I, nScriptBegin - 1, pBuf);
+						nScriptBegin = -1;
+					}
+					bRedefineBlock = TRUE;
+					bDecIndex = TRUE;
+				}
+			}
+			else
+			{
+				dwOddness &= ~ODDNESS_AT;
+			}
+		}
+		if (nIdentBegin >= 0 && nScriptBegin == -1)
+		{
+			LPCTSTR const pchIdent = pszChars + nIdentBegin;
+			int const cchIdent = I - nIdentBegin;
+			if (pchIdent > pszChars && (dwIdentOddness & ODDNESS_AT))
+			{
+				if (IsRazorCsKeyword(pchIdent, cchIdent))
+				{
+					pBuf.m_bRecording = pBuf;
+					DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER3);
+					pBuf.m_bRecording = NULL;
+					nScriptBegin = I + 1;
+					if (!(dwCookie & COOKIE_RAZOR_NESTING))
+						dwCookie |= SNORKEL(COOKIE_RAZOR_NESTING);
 				}
 			}
 			else if (dwCookie & (COOKIE_PREPROCESSOR | COOKIE_RAZOR_NESTING))
@@ -576,6 +592,10 @@ DWORD CCrystalTextView::ParseLineRazor(DWORD dwCookie, LPCTSTR const pszChars, i
 						{
 							dwCookie |= COOKIE_ASP | COOKIE_SCRIPT;
 							dwScriptTagCookie = 0;
+						}
+						else if (dwCookie & COOKIE_RAZOR_NESTING)
+						{
+							dwCookie &= ~COOKIE_RAZOR_NESTING;
 						}
 					}
 					if (!pBuf.m_bRecording)
@@ -636,8 +656,8 @@ DWORD CCrystalTextView::ParseLineRazor(DWORD dwCookie, LPCTSTR const pszChars, i
 					DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER2);
 				}
 			}
-			nIdentBegin = -1;
 		}
+		nIdentBegin = -1;
 
 		bRedefineBlock = TRUE;
 		bDecIndex = TRUE;
@@ -646,9 +666,9 @@ DWORD CCrystalTextView::ParseLineRazor(DWORD dwCookie, LPCTSTR const pszChars, i
 		{
 		case 0:
 			// Preprocessor start: < or bracket
-			// TODO: How to distinguish C# generics from tags?
+			// COOKIE_REJECT_REGEXP helps distinguish C# generics from tags.
 			if (pszChars[I] == '<' && !(
-				(dwCookie & COOKIE_RAZOR_NESTING) && !(dwCookie & COOKIE_SCRIPT) ? !xisalnum(pszChars[I + 1]) /*|| dwCookie & COOKIE_REJECT_REGEXP*/ :
+				(dwCookie & COOKIE_RAZOR_NESTING) && !(dwCookie & COOKIE_SCRIPT) ? !xisalnum(pszChars[I + 1]) || dwCookie & COOKIE_REJECT_REGEXP :
 				I < nLength - 3 && pszChars[I + 1] == '!' && pszChars[I + 2] == '-' && pszChars[I + 3] == '-'))
 			{
 				pBuf.m_bRecording = pBuf;
