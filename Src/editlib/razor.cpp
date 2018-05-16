@@ -76,7 +76,7 @@ static DWORD ParseProcCookie(DWORD dwCookie)
 {
 	if (DWORD dwParser = dwCookie & COOKIE_PARSER)
 		return dwParser;
-	return dwCookie & COOKIE_SCRIPT ? 0 : COOKIE_PARSER_CSHARP;
+	return (dwCookie & COOKIE_RAZOR_NESTING) && !(dwCookie & COOKIE_SCRIPT) ? COOKIE_PARSER_CSHARP : 0;
 }
 
 DWORD CCrystalTextView::ParseLineRazor(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
