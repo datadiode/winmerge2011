@@ -451,9 +451,6 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 				if (pszChars[I] == '[' || pszChars[I] == ']')
 				{
 					dwCookie &= ~(COOKIE_PREPROCESSOR | COOKIE_DTD);
-					bRedefineBlock = TRUE;
-					bDecIndex = TRUE;
-					continue;
 				}
 
 				// Double-quoted text
@@ -732,6 +729,7 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 					break;
 				// fall through
 			case ')':
+			case ']':
 				dwCookie |= COOKIE_REJECT_REGEXP;
 				break;
 			}

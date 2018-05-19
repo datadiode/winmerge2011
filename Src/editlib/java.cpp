@@ -236,14 +236,11 @@ DWORD CCrystalTextView::ParseLineJava(DWORD dwCookie, LPCTSTR const pszChars, in
 				dwCookie |= COOKIE_STRING_DOUBLE;
 				continue;
 			}
-			if (pszChars[I] == '\'')
+			if (pszChars[I] == '\'' && (I == 0 || !xisxdigit(pszChars[nPrevI])))
 			{
-				if (I == 0 || !xisxdigit(pszChars[nPrevI]))
-				{
-					DEFINE_BLOCK(I, dwCookie & COOKIE_PREPROCESSOR ? COLORINDEX_PREPROCESSOR : COLORINDEX_STRING);
-					dwCookie |= COOKIE_STRING_SINGLE;
-					continue;
-				}
+				DEFINE_BLOCK(I, dwCookie & COOKIE_PREPROCESSOR ? COLORINDEX_PREPROCESSOR : COLORINDEX_STRING);
+				dwCookie |= COOKIE_STRING_SINGLE;
+				continue;
 			}
 
 			if (pszChars[I] == '/' && I < nLength - 1 && pszChars[I + 1] != '/' && pszChars[I + 1] != '*')
@@ -313,6 +310,7 @@ DWORD CCrystalTextView::ParseLineJava(DWORD dwCookie, LPCTSTR const pszChars, in
 						break;
 					// fall through
 				case ')':
+				case ']':
 					dwCookie |= COOKIE_REJECT_REGEXP;
 					break;
 				}

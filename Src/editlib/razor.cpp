@@ -425,9 +425,6 @@ DWORD CCrystalTextView::ParseLineRazor(DWORD dwCookie, LPCTSTR const pszChars, i
 				if (pszChars[I] == '[' || pszChars[I] == ']')
 				{
 					dwCookie &= ~(COOKIE_PREPROCESSOR | COOKIE_DTD);
-					bRedefineBlock = TRUE;
-					bDecIndex = TRUE;
-					continue;
 				}
 
 				// Double-quoted text
@@ -610,7 +607,7 @@ DWORD CCrystalTextView::ParseLineRazor(DWORD dwCookie, LPCTSTR const pszChars, i
 							dwCookie |= COOKIE_ASP | COOKIE_SCRIPT;
 							dwScriptTagCookie = 0;
 						}
-						else if (dwCookie & COOKIE_RAZOR_NESTING)
+						else
 						{
 							dwCookie &= ~COOKIE_RAZOR_NESTING;
 						}
@@ -746,6 +743,7 @@ DWORD CCrystalTextView::ParseLineRazor(DWORD dwCookie, LPCTSTR const pszChars, i
 					break;
 				// fall through
 			case ')':
+			case ']':
 				dwCookie |= COOKIE_REJECT_REGEXP;
 				break;
 			}
