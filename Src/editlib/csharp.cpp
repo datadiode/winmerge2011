@@ -43,6 +43,8 @@ static BOOL IsCSharpKeyword(LPCTSTR pszChars, int nLength)
 	{
 		_T("abstract"),
 		_T("as"),
+		_T("async"),
+		_T("await"),
 		_T("base"),
 		_T("bool"),
 		_T("break"),

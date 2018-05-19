@@ -30,6 +30,8 @@ static BOOL IsJavaKeyword(LPCTSTR pszChars, int nLength)
 	static LPCTSTR const s_apszJavaKeywordList[] =
 	{
 		_T("abstract"),
+		_T("async") SCRIPT_LEXIS_ONLY,
+		_T("await") SCRIPT_LEXIS_ONLY,
 		_T("boolean"),
 		_T("break"),
 		_T("byte"),
