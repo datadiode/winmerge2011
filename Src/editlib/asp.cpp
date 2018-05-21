@@ -197,9 +197,10 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 							nScriptBegin = -1;
 						}
 						DEFINE_BLOCK(I, COLORINDEX_USER3);
-						if (!(dwCookie & COOKIE_SCRIPT))
-							dwScriptTagCookie &= COOKIE_STRING;
-						dwCookie = dwCookie & ~COOKIE_PARSER | dwScriptTagCookie & (COOKIE_PARSER | COOKIE_STRING);
+						dwCookie &= ~COOKIE_PARSER;
+						dwCookie |= dwScriptTagCookie & COOKIE_STRING;
+						if (!(dwCookie & COOKIE_ASP))
+							dwCookie |= dwScriptTagCookie & COOKIE_PARSER;
 						bRedefineBlock = TRUE;
 						bDecIndex = FALSE;
 						continue;
@@ -215,7 +216,7 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 				{
 					dwCookie &= ~COOKIE_STRING_SINGLE;
 					bRedefineBlock = TRUE;
-					if (dwCookie & COOKIE_ASP)
+					if ((dwCookie & COOKIE_ASP) && !(dwScriptTagCookie & COOKIE_STRING))
 						continue;
 					switch (dwCookie)
 					{
@@ -234,10 +235,11 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 					}
 					if (!(dwCookie & COOKIE_STRING) && (dwCookie & COOKIE_PARSER_GLOBAL))
 					{
-						if (dwScriptTagCookie & COOKIE_PARSER)
+						if (DWORD dwParser = dwCookie & COOKIE_ASP ?
+							(dwCookie & COOKIE_PARSER_GLOBAL >> 4) : dwScriptTagCookie & COOKIE_PARSER)
 						{
 							dwCookie &= ~(COOKIE_PARSER | 0xFFFF);
-							dwCookie |= dwScriptTagCookie & COOKIE_PARSER;
+							dwCookie |= dwParser;
 						}
 						if (dwCookie & COOKIE_PARSER)
 						{
@@ -252,7 +254,7 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 				{
 					dwCookie &= ~COOKIE_STRING_DOUBLE;
 					bRedefineBlock = TRUE;
-					if (dwCookie & COOKIE_ASP)
+					if ((dwCookie & COOKIE_ASP) && !(dwScriptTagCookie & COOKIE_STRING))
 						continue;
 					switch (dwCookie)
 					{
@@ -271,10 +273,11 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 					}
 					if (!(dwCookie & COOKIE_STRING) && (dwCookie & COOKIE_PARSER_GLOBAL))
 					{
-						if (dwScriptTagCookie & COOKIE_PARSER)
+						if (DWORD dwParser = dwCookie & COOKIE_ASP ?
+							(dwCookie & COOKIE_PARSER_GLOBAL >> 4) : dwScriptTagCookie & COOKIE_PARSER)
 						{
 							dwCookie &= ~(COOKIE_PARSER | 0xFFFF);
-							dwCookie |= dwScriptTagCookie & COOKIE_PARSER;
+							dwCookie |= dwParser;
 						}
 						if (dwCookie & COOKIE_PARSER)
 						{
@@ -423,11 +426,11 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 						}
 						DEFINE_BLOCK(nPrevI, COLORINDEX_USER3);
 						if (!(dwCookie & COOKIE_SCRIPT))
-						{
 							dwCookie &= ~COOKIE_ASP;
-							dwScriptTagCookie &= COOKIE_STRING;
-						}
-						dwCookie = dwCookie & ~COOKIE_PARSER | dwScriptTagCookie & (COOKIE_PARSER | COOKIE_STRING);
+						dwCookie &= ~COOKIE_PARSER;
+						dwCookie |= dwScriptTagCookie & COOKIE_STRING;
+						if (!(dwCookie & COOKIE_ASP))
+							dwCookie |= dwScriptTagCookie & COOKIE_PARSER;
 						bRedefineBlock = TRUE;
 						bDecIndex = FALSE;
 						continue;
