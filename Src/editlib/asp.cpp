@@ -426,7 +426,10 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 						}
 						DEFINE_BLOCK(nPrevI, COLORINDEX_USER3);
 						if (!(dwCookie & COOKIE_SCRIPT))
+						{
 							dwCookie &= ~COOKIE_ASP;
+							dwScriptTagCookie &= COOKIE_STRING;
+						}
 						dwCookie &= ~COOKIE_PARSER;
 						dwCookie |= dwScriptTagCookie & COOKIE_STRING;
 						if (!(dwCookie & COOKIE_ASP))
