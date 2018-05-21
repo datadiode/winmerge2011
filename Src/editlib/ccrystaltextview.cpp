@@ -309,7 +309,7 @@ CCrystalTextView::TextDefinition CCrystalTextView::m_StaticSourceDefs[] =
 	SRC_TEX, _T("TEX"), _T("tex;sty;clo;ltx;fd;dtx"), &ParseLineTex, SRCOPT_AUTOINDENT, /*4,*/ _T(""), _T(""), _T("%"),
 	SRC_VERILOG, _T("Verilog"), _T("v;vh"), &ParseLineVerilog, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T("/*"), _T("*/"), _T("//"),
 	SRC_VHDL, _T("VHDL"), _T("vhd;vhdl;vho"), &ParseLineVhdl, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T(""), _T(""), _T("--"),
-	SRC_XML, _T("XML"), _T("xml"), &ParseLineXml, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T("<!--"), _T("-->"), _T("")
+	SRC_XML, _T("XML"), _T("xml;dtd"), &ParseLineXml, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T("<!--"), _T("-->"), _T("")
 }, *CCrystalTextView::m_SourceDefs = m_StaticSourceDefs;
 
 /////////////////////////////////////////////////////////////////////////////
