@@ -665,7 +665,7 @@ DWORD CCrystalTextView::ParseLineRazor(DWORD dwCookie, LPCTSTR const pszChars, i
 				break;
 			}
 
-			if (xisalnum(pszChars[I]) || pszChars[I] == '.' || pszChars[I] == '-' || pszChars[I] == '!' || pszChars[I] == '#')
+			if (xisalnum(pszChars[I]) || pszChars[I] == '.' || pszChars[I] == ':' || pszChars[I] == '-' || pszChars[I] == '!' || pszChars[I] == '#')
 			{
 				if (nIdentBegin == -1)
 					nIdentBegin = I;

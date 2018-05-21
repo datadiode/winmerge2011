@@ -209,7 +209,7 @@ DWORD CCrystalTextView::ParseLineXml(DWORD dwCookie, LPCTSTR const pszChars, int
 				continue;
 			}
 
-			if (xisalnum(pszChars[I]) || pszChars[I] == '.' || pszChars[I] == '-' || pszChars[I] == '!' || pszChars[I] == '#')
+			if (xisalnum(pszChars[I]) || pszChars[I] == '.' || pszChars[I] == ':' || pszChars[I] == '-' || pszChars[I] == '!' || pszChars[I] == '#')
 			{
 				if (nIdentBegin == -1)
 					nIdentBegin = I;
