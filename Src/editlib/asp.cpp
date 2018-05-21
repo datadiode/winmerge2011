@@ -31,6 +31,18 @@ using HtmlKeywords::IsDtdTagName;
 using HtmlKeywords::IsDtdAttrName;
 using HtmlKeywords::IsEntityName;
 
+// Tag names involved in support of XML syntax for JSP scripting elements
+static BOOL IsJspScriptingTagName(LPCTSTR pszChars, int nLength)
+{
+	static LPCTSTR const s_apszJspScriptingTagNameList[] =
+	{
+		_T("jsp:declaration"),
+		_T("jsp:expression"),
+		_T("jsp:scriptlet"),
+	};
+	return xiskeyword<_tcsncmp>(pszChars, nLength, s_apszJspScriptingTagNameList);
+}
+
 #define DEFINE_BLOCK pBuf.DefineBlock
 
 #define COOKIE_DTD              0x00010000UL
@@ -149,8 +161,15 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 							// fall through
 						case '=': // displaying expression
 						case ':': // displaying expression using HTML encoding
-						case '#': // data-binding expression
 							++nScriptBegin;
+							break;
+						case '#': // data-binding expression
+							if (pszChars[++nScriptBegin] == ':')
+								++nScriptBegin;
+							break;
+						case '!': // JSP declaration
+							if ((dwCookie & COOKIE_PARSER) == COOKIE_PARSER_JAVA)
+								++nScriptBegin;
 							break;
 						}
 					}
@@ -553,7 +572,7 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 				break;
 			}
 
-			if (xisalnum(pszChars[I]) || pszChars[I] == '.' || pszChars[I] == '-' || pszChars[I] == '!' || pszChars[I] == '#')
+			if (xisalnum(pszChars[I]) || pszChars[I] == '.' || pszChars[I] == ':' || pszChars[I] == '-' || pszChars[I] == '!' || pszChars[I] == '#')
 			{
 				if (nIdentBegin == -1)
 					nIdentBegin = I;
@@ -594,6 +613,13 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 								dwScriptTagCookie = COOKIE_PARSER_MWSL;
 							}
 							break;
+						case SRCOPT_COOKIE(COOKIE_PARSER_JAVA):
+							if (IsJspScriptingTagName(pchIdent, cchIdent))
+							{
+								dwCookie |= COOKIE_ASP | COOKIE_SCRIPT;
+								dwScriptTagCookie = COOKIE_PARSER_JAVA;
+							}
+							break;
 						}
 					}
 					if (!pBuf.m_bRecording)
@@ -610,6 +636,12 @@ DWORD CCrystalTextView::ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int
 					{
 					case SRCOPT_COOKIE(COOKIE_PARSER_MWSL):
 						if (xisequal<_tcsncmp>(pchIdent, cchIdent, _T("MWSL")))
+						{
+							DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER3);
+						}
+						break;
+					case SRCOPT_COOKIE(COOKIE_PARSER_JAVA):
+						if (IsJspScriptingTagName(pchIdent, cchIdent))
 						{
 							DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER3);
 						}
