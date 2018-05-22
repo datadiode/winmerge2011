@@ -227,7 +227,7 @@ extern COptionDef
 <bool> OPT_CLR_DEFAULT_TEXT_COLORING operator((_T("Settings/DefaultTextColoring"), true));
 // Whether to use default (theme) list colors
 extern COptionDef
-<bool> OPT_CLR_DEFAULT_LIST_COLORING operator((_T("Settings/DefaultListColoring"), true));
+<bool> OPT_CLR_DEFAULT_LIST_COLORING operator((_T("Settings/DefaultListColoring"), false));
 extern COptionDef
 <COLORREF> OPT_LIST_LEFTONLY_BKGD_COLOR operator((_T("Settings/LeftOnlyColor"), RGB(0xFF, 0xCC, 0xCC)));
 extern COptionDef
