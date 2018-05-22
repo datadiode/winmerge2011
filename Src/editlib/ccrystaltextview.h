@@ -769,7 +769,7 @@ public:
 	virtual TextDefinition *DoSetTextType(TextDefinition *);
 	static TextDefinition *GetTextType(LPCTSTR pszExt);
 	static TextDefinition *GetTextType(int index);
-	static void ScanParserAssociations(LPTSTR);
+	static BOOL ScanParserAssociations(LPTSTR);
 	static void DumpParserAssociations(LPTSTR);
 	static void FreeParserAssociations();
 	TextDefinition *SetTextType(LPCTSTR pszExt);

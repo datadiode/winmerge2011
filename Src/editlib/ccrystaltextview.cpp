@@ -91,6 +91,7 @@
 #include "ccrystaltextbuffer.h"
 #include "cfindtextdlg.h"
 #include "coretools.h"
+#include "VersionData.h"
 #include "ViewableWhitespace.h"
 #include "SyntaxColors.h"
 #include "SettingStore.h"
@@ -315,8 +316,32 @@ CCrystalTextView::TextDefinition CCrystalTextView::m_StaticSourceDefs[] =
 /////////////////////////////////////////////////////////////////////////////
 // CCrystalTextView construction/destruction
 
-void CCrystalTextView::ScanParserAssociations(LPTSTR p)
+BOOL CCrystalTextView::ScanParserAssociations(LPTSTR p)
 {
+	p = EatPrefix(p, _T("version="));
+	if (p == NULL)
+		return FALSE;
+	if (_tcsicmp(p, _T("ignore")) != 0)
+	{
+		ULARGE_INTEGER version = { 0xFFFFFFFF, 0xFFFFFFFF };
+		do
+		{
+			version.QuadPart <<= 16;
+			version.QuadPart |= _tcstoul(p, &p, 10);
+		} while (*p && *p++ == _T('.'));
+		while (HIWORD(version.HighPart) == 0xFFFF)
+			version.QuadPart <<= 16;
+		if (VS_FIXEDFILEINFO const *const pVffInfo =
+			reinterpret_cast<const VS_FIXEDFILEINFO *>(CVersionData::Load()->Data()))
+		{
+			if (pVffInfo->dwFileVersionLS != version.LowPart ||
+				pVffInfo->dwFileVersionMS != version.HighPart)
+			{
+				return FALSE;
+			}
+		}
+	}
+	p += _tcslen(p) + 1;
 	struct tagTextDefinition *defs = new tagTextDefinition[_countof(m_StaticSourceDefs)];
 	memcpy(defs, m_StaticSourceDefs, sizeof m_StaticSourceDefs);
 	m_SourceDefs = defs;
@@ -351,10 +376,16 @@ void CCrystalTextView::ScanParserAssociations(LPTSTR p)
 		ASSERT(i < _countof(m_StaticSourceDefs));
 		p = q + r;
 	}
+	return TRUE;
 }
 
 void CCrystalTextView::DumpParserAssociations(LPTSTR p)
 {
+	if (LPCWSTR version = CVersionData::Load()->
+		Find(L"StringFileInfo")->First()->Find(L"FileVersion")->Data())
+	{
+		p += wsprintf(p, _T("version=%ls"), version) + 1;
+	}
 	TextDefinition *def = m_SourceDefs;
 	do
 	{

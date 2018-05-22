@@ -112,29 +112,30 @@ unsigned RemoveLeadingZeros(char *string)
  */
 LPSTR NTAPI EatPrefix(LPCSTR text, LPCSTR prefix)
 {
-	size_t len = strlen(prefix);
-	if (len)
+	if (size_t const len = strlen(prefix))
 		if (_memicmp(text, prefix, len) == 0)
 			return const_cast<LPSTR>(text + len);
-	return 0;
+	return NULL;
 }
 
 /**
  * @brief Eat prefix and return pointer to remaining text
  */
-LPCWSTR NTAPI EatPrefix(LPCWSTR text, LPCWSTR prefix)
+LPWSTR NTAPI EatPrefix(LPCWSTR text, LPCWSTR prefix)
 {
-	int len = lstrlenW(prefix);
-	return StrIsIntlEqualW(FALSE, text, prefix, len) ? text + len : NULL;
+	if (int const len = lstrlenW(prefix))
+		if (StrIsIntlEqualW(FALSE, text, prefix, len))
+			return const_cast<LPWSTR>(text + len);
+	return NULL;
 }
 
 /**
  * @brief Eat prefix and whitespace and return pointer to remaining text
  */
-LPCWSTR NTAPI EatPrefixTrim(LPCWSTR text, LPCWSTR prefix)
+LPWSTR NTAPI EatPrefixTrim(LPCWSTR text, LPCWSTR prefix)
 {
-	text = EatPrefix(text, prefix);
-	return text ? text + StrSpn(text, _T(" \t\r\n")) : NULL;
+	LPWSTR const trim = EatPrefix(text, prefix);
+	return trim ? trim + StrSpn(trim, _T(" \t\r\n")) : NULL;
 }
 
 HANDLE NTAPI RunIt(LPCTSTR szExeFile, LPCTSTR szArgs, LPCTSTR szDir, HANDLE *phReadPipe, WORD wShowWindow)

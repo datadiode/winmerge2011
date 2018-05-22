@@ -8,8 +8,8 @@
 /******** function protos ********/
 
 LPSTR NTAPI EatPrefix(LPCSTR text, LPCSTR prefix);
-LPCWSTR NTAPI EatPrefix(LPCWSTR text, LPCWSTR prefix);
-LPCWSTR NTAPI EatPrefixTrim(LPCWSTR text, LPCWSTR prefix);
+LPWSTR NTAPI EatPrefix(LPCWSTR text, LPCWSTR prefix);
+LPWSTR NTAPI EatPrefixTrim(LPCWSTR text, LPCWSTR prefix);
 
 String GetModulePath(HMODULE hModule = NULL);
 DWORD_PTR GetShellImageList();
