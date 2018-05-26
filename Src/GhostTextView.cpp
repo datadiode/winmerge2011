@@ -27,7 +27,6 @@
 #include "stdafx.h"
 #include "Merge.h"
 #include "MainFrm.h"
-#include "SyntaxColors.h"
 #include "LanguageSelect.h"
 #include "MergeEditView.h"
 #include "MergeDiffDetailView.h"

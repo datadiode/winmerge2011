@@ -6,7 +6,6 @@
 #include "StdAfx.h"
 #include "OptionsPanel.h"
 #include "LanguageSelect.h"
-#include "SyntaxColors.h"
 
 /**
  * @brief Constructor.

@@ -19,7 +19,6 @@
 
 #include "StdAfx.h"
 #include "ccrystaltextview.h"
-#include "SyntaxColors.h"
 #include "string_util.h"
 
 #ifdef _DEBUG

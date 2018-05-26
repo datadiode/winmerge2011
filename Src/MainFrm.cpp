@@ -40,7 +40,6 @@
 #include "MergeEditView.h"
 #include "MergeDiffDetailView.h"
 #include "LocationView.h"
-#include "SyntaxColors.h"
 #include "LineFiltersList.h"
 #include "ConflictFileParser.h"
 #include "Common/coretools.h"

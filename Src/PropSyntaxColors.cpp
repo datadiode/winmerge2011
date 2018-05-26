@@ -6,7 +6,6 @@
 #include "StdAfx.h"
 #include "OptionsPanel.h"
 #include "resource.h"
-#include "SyntaxColors.h"
 #include "PropSyntaxColors.h"
 
 #ifdef _DEBUG

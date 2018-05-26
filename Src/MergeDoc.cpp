@@ -45,7 +45,6 @@
 #include "UniFile.h"
 #include "SaveClosingDlg.h"
 #include "paths.h"
-#include "SyntaxColors.h"
 #include "ProjectFile.h"
 #include "FileOrFolderSelect.h"
 #include "LineFiltersList.h"

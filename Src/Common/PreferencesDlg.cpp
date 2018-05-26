@@ -9,7 +9,6 @@
  */
 #include "StdAfx.h"
 #include "resource.h"
-#include "SyntaxColors.h"
 #include "PreferencesDlg.h"
 #include "Merge.h"
 #include "MainFrm.h"

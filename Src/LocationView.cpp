@@ -31,7 +31,6 @@
 #include "MergeEditView.h"
 #include "LocationView.h"
 #include "Bitmap.h"
-#include "SyntaxColors.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

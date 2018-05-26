@@ -93,7 +93,6 @@
 #include "coretools.h"
 #include "VersionData.h"
 #include "ViewableWhitespace.h"
-#include "SyntaxColors.h"
 #include "SettingStore.h"
 #include "string_util.h"
 #include "pcre.h"

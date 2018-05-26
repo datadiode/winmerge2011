@@ -4,6 +4,7 @@
  * @brief Declaration file for OptionsPanel class.
  */
 #include "OptionsMgr.h"
+#include "SyntaxColors.h"
 
 /**
  * @brief A base class for WinMerge options dialogs.
