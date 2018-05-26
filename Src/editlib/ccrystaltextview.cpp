@@ -289,6 +289,7 @@ CCrystalTextView::TextDefinition CCrystalTextView::m_StaticSourceDefs[] =
 	SRC_JSCRIPT, _T("JavaScript"), _T("js;json"), &ParseLineJava, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI|SRCOPT_COOKIE(COOKIE_PARSER_JSCRIPT), /*2,*/ _T("/*"), _T("*/"), _T("//"),
 	SRC_JSP, _T("JSP"), _T("jsp"), &ParseLineAsp, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI|SRCOPT_COOKIE(COOKIE_PARSER_JAVA), /*2,*/ _T("<!--"), _T("-->"), _T(""),
 	SRC_LISP, _T("AutoLISP"), _T("lsp;dsl"), &ParseLineLisp, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T(";|"), _T("|;"), _T(";"),
+	SRC_LUA, _T("LUA"), _T("lua"), &ParseLineLua, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T(";|"), _T("|;"), _T(";"),
 	SRC_MWSL, _T("MWSL"), _T("mwsl"), &ParseLineAsp, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI|SRCOPT_COOKIE(COOKIE_PARSER_MWSL), /*2,*/ _T("<!--"), _T("-->"), _T(""),
 	SRC_NSIS, _T("NSIS"), _T("nsi;nsh"), &ParseLineNsis, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T("/*"), _T("*/"), _T(";"),
 	SRC_PASCAL, _T("Pascal"), _T("pas"), &ParseLinePascal, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T("{"), _T("}"), _T(""),

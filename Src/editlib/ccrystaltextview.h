@@ -58,7 +58,6 @@ C_ASSERT(COOKIE_PARSER_GLOBAL == COOKIE_PARSER << 4);
 
 class CCrystalTextBuffer;
 class CUpdateContext;
-struct ViewableWhitespaceChars;
 
 ////////////////////////////////////////////////////////////////////////////
 // CCrystalTextView class declaration
@@ -639,6 +638,7 @@ public:
 	DWORD ParseLineIS(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
 	DWORD ParseLineJava(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
 	DWORD ParseLineLisp(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	DWORD ParseLineLua(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
 	DWORD ParseLineNsis(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
 	DWORD ParseLinePascal(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
 	DWORD ParseLinePerl(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
@@ -709,6 +709,7 @@ public:
 		SRC_JSCRIPT,
 		SRC_JSP,
 		SRC_LISP,
+		SRC_LUA,
 		SRC_MWSL,
 		SRC_NSIS,
 		SRC_PASCAL,
