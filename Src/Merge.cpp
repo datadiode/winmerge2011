@@ -416,11 +416,8 @@ void CMergeApp::InitializeSupplements()
 		}
 	}
 	// Create a [Parsers] section as per CCrystalTextView's default settings if not yet present
-	if (GetPrivateProfileSection(_T("Parsers"), buffer, _countof(buffer), ini.c_str()))
-	{
-		CCrystalTextView::ScanParserAssociations(buffer);
-	}
-	else
+	if (!GetPrivateProfileSection(_T("Parsers"), buffer, _countof(buffer), ini.c_str()) ||
+		!CCrystalTextView::ScanParserAssociations(buffer))
 	{
 		CCrystalTextView::DumpParserAssociations(buffer);
 		WritePrivateProfileSection(_T("Parsers"), buffer, ini.c_str());
