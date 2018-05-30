@@ -109,13 +109,10 @@ void CCrystalTextView::ParseLineJava(TextBlock::Cookie &cookie, LPCTSTR const ps
 		return;
 	}
 
-	int const nKeywordMask = (
-		dwCookie & COOKIE_PARSER ?
-		dwCookie & COOKIE_PARSER :
-		dwCookie >> 4 & COOKIE_PARSER
-	) == COOKIE_PARSER_JAVA ?
-		COMMON_LEXIS | NATIVE_LEXIS :
-		COMMON_LEXIS | SCRIPT_LEXIS;
+	DWORD const dwParser = dwCookie & COOKIE_PARSER ?
+		dwCookie & COOKIE_PARSER : dwCookie >> 4 & COOKIE_PARSER;
+	int const nKeywordMask = dwParser == COOKIE_PARSER_JAVA ?
+		COMMON_LEXIS | NATIVE_LEXIS : COMMON_LEXIS | SCRIPT_LEXIS;
 
 	BOOL bFirstChar = (dwCookie & ~COOKIE_EXT_COMMENT) == 0;
 	BOOL bRedefineBlock = TRUE;
@@ -138,7 +135,7 @@ void CCrystalTextView::ParseLineJava(TextBlock::Cookie &cookie, LPCTSTR const ps
 			{
 				DEFINE_BLOCK(nPos, COLORINDEX_PREPROCESSOR);
 			}
-			else if (dwCookie & (COOKIE_STRING | COOKIE_TEMPLATE_STRING))
+			else if (dwCookie & (dwParser == COOKIE_PARSER_JSCRIPT ? COOKIE_TEMPLATE_STRING | COOKIE_STRING : COOKIE_STRING))
 			{
 				DEFINE_BLOCK(nPos, COLORINDEX_STRING);
 			}
@@ -214,7 +211,7 @@ void CCrystalTextView::ParseLineJava(TextBlock::Cookie &cookie, LPCTSTR const ps
 				continue;
 			}
 
-			if (dwCookie & COOKIE_TEMPLATE_STRING)
+			if (dwParser == COOKIE_PARSER_JSCRIPT && (dwCookie & COOKIE_TEMPLATE_STRING))
 			{
 				if (pszChars[I] == '`')
 				{
@@ -292,7 +289,7 @@ void CCrystalTextView::ParseLineJava(TextBlock::Cookie &cookie, LPCTSTR const ps
 				}
 			}
 			// Template string literal
-			if (pszChars[I] == '`')
+			if (dwParser == COOKIE_PARSER_JSCRIPT && pszChars[I] == '`')
 			{
 				DEFINE_BLOCK(I, dwCookie & COOKIE_PREPROCESSOR ? COLORINDEX_PREPROCESSOR : COLORINDEX_STRING);
 				dwCookie |= COOKIE_TEMPLATE_STRING;
@@ -394,7 +391,7 @@ void CCrystalTextView::ParseLineJava(TextBlock::Cookie &cookie, LPCTSTR const ps
 		}
 		bRedefineBlock = TRUE;
 		bDecIndex = TRUE;
-		if ((cookie.m_dwNesting & 0xF) && I < nLength && pszChars[I] == '}')
+		if ((nKeywordMask & SCRIPT_LEXIS) && (cookie.m_dwNesting & 0xF) && I < nLength && pszChars[I] == '}')
 		{
 			--cookie.m_dwNesting;
 			if (!(cookie.m_dwNesting & 0xF))
