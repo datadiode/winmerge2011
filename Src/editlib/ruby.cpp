@@ -131,10 +131,15 @@ inline BOOL xisspace(LPCTSTR pch)
 #define COOKIE_CHAR             0x0010
 #define COOKIE_VARIABLE			0X0020
 
-DWORD CCrystalTextView::ParseLineRuby(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
+void CCrystalTextView::ParseLineRuby(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
 {
+	DWORD &dwCookie = cookie.m_dwCookie;
+
 	if (nLength == 0)
-		return dwCookie & COOKIE_EXT_COMMENT;
+	{
+		dwCookie &= COOKIE_EXT_COMMENT;
+		return;
+	}
 
 	BOOL bRedefineBlock = TRUE;
 	BOOL bDecIndex = FALSE;
@@ -326,7 +331,6 @@ DWORD CCrystalTextView::ParseLineRuby(DWORD dwCookie, LPCTSTR const pszChars, in
 
 	if (pszChars[nLength - 1] != '\\')
 		dwCookie &= COOKIE_EXT_COMMENT;
-	return dwCookie;
 }
 
 TESTCASE

@@ -320,10 +320,15 @@ static BOOL IsVerilogNumber(LPCTSTR pszChars, int nLength)
 #define COOKIE_EXT_COMMENT      0x0004
 #define COOKIE_STRING           0x0008
 
-DWORD CCrystalTextView::ParseLineVerilog(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
+void CCrystalTextView::ParseLineVerilog(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
 {
+	DWORD &dwCookie = cookie.m_dwCookie;
+
 	if (nLength == 0)
-		return dwCookie & COOKIE_EXT_COMMENT;
+	{
+		dwCookie &= COOKIE_EXT_COMMENT;
+		return;
+	}
 
 	BOOL bFirstChar = (dwCookie & ~COOKIE_EXT_COMMENT) == 0;
 	BOOL bRedefineBlock = TRUE;
@@ -477,7 +482,6 @@ DWORD CCrystalTextView::ParseLineVerilog(DWORD dwCookie, LPCTSTR const pszChars,
 	} while (I < nLength);
 
 	dwCookie &= COOKIE_EXT_COMMENT;
-	return dwCookie;
 }
 
 TESTCASE

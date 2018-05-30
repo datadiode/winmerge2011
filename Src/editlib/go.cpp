@@ -113,10 +113,15 @@ static BOOL IsUser1Keyword(LPCTSTR pszChars, int nLength)
 #define COOKIE_CHAR             0x0010
 #define COOKIE_RAWSTRING        0x0020
 
-DWORD CCrystalTextView::ParseLineGo(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
+void CCrystalTextView::ParseLineGo(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
 {
+	DWORD &dwCookie = cookie.m_dwCookie;
+
 	if (nLength == 0)
-		return dwCookie & (COOKIE_EXT_COMMENT | COOKIE_RAWSTRING);
+	{
+		dwCookie &= (COOKIE_EXT_COMMENT | COOKIE_RAWSTRING);
+		return;
+	}
 
 	BOOL bRedefineBlock = TRUE;
 	BOOL bDecIndex = FALSE;
@@ -304,8 +309,7 @@ DWORD CCrystalTextView::ParseLineGo(DWORD dwCookie, LPCTSTR const pszChars, int 
 		}
 	} while (I < nLength);
 
-	dwCookie &= COOKIE_EXT_COMMENT | COOKIE_RAWSTRING;
-	return dwCookie;
+	dwCookie &= (COOKIE_EXT_COMMENT | COOKIE_RAWSTRING);
 }
 
 TESTCASE

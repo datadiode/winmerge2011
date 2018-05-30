@@ -56,10 +56,12 @@ static BOOL IsXmlAttrName(LPCTSTR pszChars, int nLength)
 #define COOKIE_EXT_COMMENT      0x0010
 #define COOKIE_XML              0x0020
 
-DWORD CCrystalTextView::ParseLineXml(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
+void CCrystalTextView::ParseLineXml(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
 {
+	DWORD &dwCookie = cookie.m_dwCookie;
+
 	if (nLength == 0)
-		return dwCookie;
+		return;
 
 	BOOL bRedefineBlock = TRUE;
 	BOOL bDecIndex = FALSE;
@@ -299,8 +301,6 @@ DWORD CCrystalTextView::ParseLineXml(DWORD dwCookie, LPCTSTR const pszChars, int
 			break;
 		}
 	} while (I < nLength);
-
-	return dwCookie;
 }
 
 TESTCASE

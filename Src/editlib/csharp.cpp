@@ -137,11 +137,17 @@ static BOOL IsCSharpKeyword(LPCTSTR pszChars, int nLength)
 #define COOKIE_STRING_DOUBLE    0x0008
 #define COOKIE_STRING_REGEXP    0x000C // actually used here for verbatim string literals
 #define COOKIE_EXT_COMMENT      0x0010
+#define COOKIE_TRANSPARENT      0xFFFFFF80
 
-DWORD CCrystalTextView::ParseLineCSharp(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
+void CCrystalTextView::ParseLineCSharp(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
 {
+	DWORD &dwCookie = cookie.m_dwCookie;
+
 	if (nLength == 0)
-		return dwCookie & (COOKIE_EXT_COMMENT | COOKIE_STRING);
+	{
+		dwCookie &= (COOKIE_TRANSPARENT | COOKIE_EXT_COMMENT | COOKIE_STRING);
+		return;
+	}
 
 	BOOL bFirstChar = (dwCookie & ~COOKIE_EXT_COMMENT) == 0;
 	BOOL bRedefineBlock = TRUE;
@@ -337,8 +343,7 @@ DWORD CCrystalTextView::ParseLineCSharp(DWORD dwCookie, LPCTSTR const pszChars, 
 	} while (I < nLength);
 
 	if (pszChars[nLength - 1] != '\\')
-		dwCookie &= (COOKIE_EXT_COMMENT | COOKIE_STRING);
-	return dwCookie;
+		dwCookie &= (COOKIE_TRANSPARENT | COOKIE_EXT_COMMENT | COOKIE_STRING);
 }
 
 TESTCASE

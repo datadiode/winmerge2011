@@ -346,10 +346,15 @@ static BOOL IsCmdletKeyword(LPCTSTR pszChars, int nLength)
 #define COOKIE_CHAR             0x0010
 #define COOKIE_VARIABLE         0x0020
 
-DWORD CCrystalTextView::ParseLinePowerShell(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
+void CCrystalTextView::ParseLinePowerShell(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
 {
+	DWORD &dwCookie = cookie.m_dwCookie;
+
 	if (nLength == 0)
-		return dwCookie & COOKIE_EXT_COMMENT;
+	{
+		dwCookie &= COOKIE_EXT_COMMENT;
+		return;
+	}
 
 	BOOL bRedefineBlock = TRUE;
 	BOOL bDecIndex = FALSE;
@@ -506,7 +511,6 @@ DWORD CCrystalTextView::ParseLinePowerShell(DWORD dwCookie, LPCTSTR const pszCha
 	} while (I < nLength);
 
 	dwCookie &= COOKIE_EXT_COMMENT;
-	return dwCookie;
 }
 
 TESTCASE

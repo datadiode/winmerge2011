@@ -114,10 +114,15 @@ static BOOL IsUser1Keyword(LPCTSTR pszChars, int nLength)
 #define COOKIE_STRING           0x0008
 #define COOKIE_EXT_COMMENT      0xFF00
 
-DWORD CCrystalTextView::ParseLineRexx(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
+void CCrystalTextView::ParseLineRexx(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
 {
+	DWORD &dwCookie = cookie.m_dwCookie;
+
 	if (nLength == 0)
-		return dwCookie & COOKIE_EXT_COMMENT;
+	{
+		dwCookie &= COOKIE_EXT_COMMENT;
+		return;
+	}
 
 	BOOL bRedefineBlock = TRUE;
 	BOOL bDecIndex = FALSE;
@@ -278,7 +283,6 @@ DWORD CCrystalTextView::ParseLineRexx(DWORD dwCookie, LPCTSTR const pszChars, in
 
 	if (pszChars[nLength - 1] != '\\')
 		dwCookie &= COOKIE_EXT_COMMENT;
-	return dwCookie;
 }
 
 TESTCASE

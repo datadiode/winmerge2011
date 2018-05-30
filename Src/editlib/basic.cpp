@@ -323,11 +323,17 @@ static BOOL IsBasicKeyword(LPCTSTR pszChars, int nLength)
 #define COOKIE_PREPROCESSOR     0x0002
 #define COOKIE_CHAR             0x0004
 #define COOKIE_STRING           0x0008
+#define COOKIE_TRANSPARENT      0xFFFFFF00
 
-DWORD CCrystalTextView::ParseLineBasic(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
+void CCrystalTextView::ParseLineBasic(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
 {
+	DWORD &dwCookie = cookie.m_dwCookie;
+
 	if (nLength == 0)
-		return dwCookie & ~0xFFFF;
+	{
+		dwCookie &= COOKIE_TRANSPARENT;
+		return;
+	}
 
 	int const nKeywordMask = (
 		dwCookie & COOKIE_PARSER ?
@@ -444,8 +450,7 @@ DWORD CCrystalTextView::ParseLineBasic(DWORD dwCookie, LPCTSTR const pszChars, i
 		}
 	} while (I < nLength);
 
-	dwCookie &= ~0xFFFF;
-	return dwCookie;
+	dwCookie &= COOKIE_TRANSPARENT;
 }
 
 TESTCASE

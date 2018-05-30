@@ -79,6 +79,7 @@ static BOOL IsJavaKeyword(LPCTSTR pszChars, int nLength)
 		_T("transient"),
 		_T("true"),
 		_T("try"),
+		_T("undefined") SCRIPT_LEXIS_ONLY,
 		_T("var") SCRIPT_LEXIS_ONLY,
 		_T("void"),
 		_T("while"),
@@ -96,11 +97,17 @@ static BOOL IsJavaKeyword(LPCTSTR pszChars, int nLength)
 #define COOKIE_STRING_REGEXP    0x000C
 #define COOKIE_EXT_COMMENT      0x0010
 #define COOKIE_REJECT_REGEXP    0x0020
+#define COOKIE_TRANSPARENT      0xFFFFFF00
 
-DWORD CCrystalTextView::ParseLineJava(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
+void CCrystalTextView::ParseLineJava(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
 {
+	DWORD &dwCookie = cookie.m_dwCookie;
+
 	if (nLength == 0)
-		return dwCookie & (COOKIE_EXT_COMMENT | COOKIE_REJECT_REGEXP | ~0xFFFF);
+	{
+		dwCookie &= (COOKIE_TRANSPARENT | COOKIE_EXT_COMMENT | COOKIE_REJECT_REGEXP | COOKIE_TEMPLATE_STRING);
+		return;
+	}
 
 	int const nKeywordMask = (
 		dwCookie & COOKIE_PARSER ?
@@ -131,7 +138,7 @@ DWORD CCrystalTextView::ParseLineJava(DWORD dwCookie, LPCTSTR const pszChars, in
 			{
 				DEFINE_BLOCK(nPos, COLORINDEX_PREPROCESSOR);
 			}
-			else if (dwCookie & COOKIE_STRING)
+			else if (dwCookie & (COOKIE_STRING | COOKIE_TEMPLATE_STRING))
 			{
 				DEFINE_BLOCK(nPos, COLORINDEX_STRING);
 			}
@@ -207,6 +214,30 @@ DWORD CCrystalTextView::ParseLineJava(DWORD dwCookie, LPCTSTR const pszChars, in
 				continue;
 			}
 
+			if (dwCookie & COOKIE_TEMPLATE_STRING)
+			{
+				if (pszChars[I] == '`')
+				{
+					dwCookie &= ~COOKIE_TEMPLATE_STRING;
+					bRedefineBlock = TRUE;
+					int nPrevI = I;
+					while (nPrevI && pszChars[--nPrevI] == '\\')
+					{
+						dwCookie ^= COOKIE_TEMPLATE_STRING;
+						bRedefineBlock ^= TRUE;
+					}
+				}
+				else if (pszChars[I] == '$' && pszChars[I + 1] == '{')
+				{
+					dwCookie &= ~COOKIE_TEMPLATE_STRING;
+					bRedefineBlock = TRUE;
+					bDecIndex = TRUE;
+					cookie.m_dwNesting <<= 4;
+					++cookie.m_dwNesting;
+				}
+				continue;
+			}
+
 			//  Extended comment /*....*/
 			if (dwCookie & COOKIE_EXT_COMMENT)
 			{
@@ -230,20 +261,27 @@ DWORD CCrystalTextView::ParseLineJava(DWORD dwCookie, LPCTSTR const pszChars, in
 				break;
 			}
 
-			//  Normal text
+			if (DWORD const dwNesting = cookie.m_dwNesting & 0xF)
+			{
+				if (pszChars[I] == '{' && pszChars[nPrevI] != '$' && dwNesting != 0xF)
+					++cookie.m_dwNesting;
+			}
+
+			// Double-quoted text
 			if (pszChars[I] == '"')
 			{
 				DEFINE_BLOCK(I, dwCookie & COOKIE_PREPROCESSOR ? COLORINDEX_PREPROCESSOR : COLORINDEX_STRING);
 				dwCookie |= COOKIE_STRING_DOUBLE;
 				continue;
 			}
+			// Single-quoted text
 			if (pszChars[I] == '\'' && (I == 0 || !xisxdigit(pszChars[nPrevI])))
 			{
 				DEFINE_BLOCK(I, dwCookie & COOKIE_PREPROCESSOR ? COLORINDEX_PREPROCESSOR : COLORINDEX_STRING);
 				dwCookie |= COOKIE_STRING_SINGLE;
 				continue;
 			}
-
+			// Regular expression literal
 			if (pszChars[I] == '/' && I < nLength - 1 && pszChars[I + 1] != '/' && pszChars[I + 1] != '*')
 			{
 				if (!(dwCookie & COOKIE_REJECT_REGEXP))
@@ -252,6 +290,13 @@ DWORD CCrystalTextView::ParseLineJava(DWORD dwCookie, LPCTSTR const pszChars, in
 					dwCookie |= COOKIE_STRING_REGEXP | COOKIE_REJECT_REGEXP;
 					continue;
 				}
+			}
+			// Template string literal
+			if (pszChars[I] == '`')
+			{
+				DEFINE_BLOCK(I, dwCookie & COOKIE_PREPROCESSOR ? COLORINDEX_PREPROCESSOR : COLORINDEX_STRING);
+				dwCookie |= COOKIE_TEMPLATE_STRING;
+				continue;
 			}
 
 			if (I > 0 && pszChars[I] == '*' && pszChars[nPrevI] == '/' && bWasComment != End)
@@ -316,13 +361,14 @@ DWORD CCrystalTextView::ParseLineJava(DWORD dwCookie, LPCTSTR const pszChars, in
 					break;
 				}
 			}
-
-			if (pBuf == NULL)
-				continue; // No need to extract keywords, so skip rest of loop
 		}
 		if (nIdentBegin >= 0)
 		{
-			if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
+			if (!pBuf.m_bRecording)
+			{
+				// No need to extract keywords, so skip rest of loop
+			}
+			else if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
 			{
 				DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
 			}
@@ -344,15 +390,25 @@ DWORD CCrystalTextView::ParseLineJava(DWORD dwCookie, LPCTSTR const pszChars, in
 					}
 				}
 			}
-			bRedefineBlock = TRUE;
-			bDecIndex = TRUE;
 			nIdentBegin = -1;
+		}
+		bRedefineBlock = TRUE;
+		bDecIndex = TRUE;
+		if ((cookie.m_dwNesting & 0xF) && I < nLength && pszChars[I] == '}')
+		{
+			--cookie.m_dwNesting;
+			if (!(cookie.m_dwNesting & 0xF))
+			{
+				DEFINE_BLOCK(I, COLORINDEX_OPERATOR);
+				cookie.m_dwNesting >>= 4;
+				dwCookie |= COOKIE_TEMPLATE_STRING;
+				bDecIndex = FALSE;
+			}
 		}
 	} while (I < nLength);
 
 	if (pszChars[nLength - 1] != '\\')
-		dwCookie &= (COOKIE_EXT_COMMENT | COOKIE_REJECT_REGEXP | ~0xFFFF);
-	return dwCookie;
+		dwCookie &= (COOKIE_TRANSPARENT | COOKIE_EXT_COMMENT | COOKIE_REJECT_REGEXP | COOKIE_TEMPLATE_STRING);
 }
 
 TESTCASE

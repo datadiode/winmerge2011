@@ -79,10 +79,15 @@ static BOOL IsUser1Keyword(LPCTSTR pszChars, int nLength)
  * Some SQL implementations support nested comments, but they aren't standard.
  * @see https://cloud.google.com/bigquery/docs/reference/standard-sql/lexical
  */
-DWORD CCrystalTextView::ParseLineSql(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
+void CCrystalTextView::ParseLineSql(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
 {
+	DWORD &dwCookie = cookie.m_dwCookie;
+
 	if (nLength == 0)
-		return dwCookie & COOKIE_EXT_COMMENT;
+	{
+		dwCookie &= COOKIE_EXT_COMMENT;
+		return;
+	}
 
 	BOOL bRedefineBlock = TRUE;
 	BOOL bWasCommentStart = FALSE;
@@ -251,7 +256,6 @@ DWORD CCrystalTextView::ParseLineSql(DWORD dwCookie, LPCTSTR const pszChars, int
 
 	if (pszChars[nLength - 1] != '\\')
 		dwCookie &= COOKIE_EXT_COMMENT;
-	return dwCookie;
 }
 
 TESTCASE

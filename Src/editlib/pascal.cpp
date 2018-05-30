@@ -119,10 +119,15 @@ static BOOL IsPascalKeyword(LPCTSTR pszChars, int nLength)
 #define COOKIE_CHAR             0x0010
 #define COOKIE_EXT_COMMENT2     0x0020
 
-DWORD CCrystalTextView::ParseLinePascal(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
+void CCrystalTextView::ParseLinePascal(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
 {
+	DWORD &dwCookie = cookie.m_dwCookie;
+
 	if (nLength == 0)
-		return dwCookie & (COOKIE_EXT_COMMENT | COOKIE_EXT_COMMENT2);
+	{
+		dwCookie &= (COOKIE_EXT_COMMENT | COOKIE_EXT_COMMENT2);
+		return;
+	}
 
 	BOOL bRedefineBlock = TRUE;
 	BOOL bDecIndex = FALSE;
@@ -289,7 +294,6 @@ DWORD CCrystalTextView::ParseLinePascal(DWORD dwCookie, LPCTSTR const pszChars, 
 
 	if (pszChars[nLength - 1] != '\\')
 		dwCookie &= (COOKIE_EXT_COMMENT | COOKIE_EXT_COMMENT2);
-	return dwCookie;
 }
 
 TESTCASE

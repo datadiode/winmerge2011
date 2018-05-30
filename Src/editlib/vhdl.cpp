@@ -329,10 +329,15 @@ static bool IsVhdlChar(LPCTSTR pszChars, int nLength)
 #define COOKIE_EXT_COMMENT      0x0004
 #define COOKIE_STRING           0x0008
 
-DWORD CCrystalTextView::ParseLineVhdl(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
+void CCrystalTextView::ParseLineVhdl(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
 {
+	DWORD &dwCookie = cookie.m_dwCookie;
+
 	if (nLength == 0)
-		return dwCookie & COOKIE_EXT_COMMENT;
+	{
+		dwCookie &= COOKIE_EXT_COMMENT;
+		return;
+	}
 
 	bool bRedefineBlock = true;
 	bool bDecIndex = false;
@@ -455,7 +460,6 @@ DWORD CCrystalTextView::ParseLineVhdl(DWORD dwCookie, LPCTSTR const pszChars, in
 	} while (I < nLength);
 
 	dwCookie &= COOKIE_EXT_COMMENT;
-	return dwCookie;
 }
 
 TESTCASE

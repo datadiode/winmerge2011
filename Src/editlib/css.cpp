@@ -191,11 +191,17 @@ static BOOL IsCss2Keyword(LPCTSTR pszChars, int nLength)
 #define COOKIE_CHAR             0x0010
 #define COOKIE_EXT_DEFINITION   0x0020
 #define COOKIE_EXT_VALUE        0x0040
+#define COOKIE_TRANSPARENT      0xFFFFFF00
 
-DWORD CCrystalTextView::ParseLineCss(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
+void CCrystalTextView::ParseLineCss(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
 {
+	DWORD &dwCookie = cookie.m_dwCookie;
+
 	if (nLength == 0)
-		return dwCookie & (COOKIE_EXT_COMMENT|COOKIE_EXT_DEFINITION|COOKIE_EXT_VALUE);
+	{
+		dwCookie &= (COOKIE_TRANSPARENT | COOKIE_EXT_COMMENT | COOKIE_EXT_DEFINITION | COOKIE_EXT_VALUE);
+		return;
+	}
 
 	BOOL bRedefineBlock = TRUE;
 	BOOL bWasCommentStart = FALSE;
@@ -311,8 +317,7 @@ DWORD CCrystalTextView::ParseLineCss(DWORD dwCookie, LPCTSTR const pszChars, int
 		}
 	} while (I < nLength);
 
-	dwCookie &= (COOKIE_EXT_COMMENT | COOKIE_EXT_DEFINITION | COOKIE_EXT_VALUE);
-	return dwCookie;
+	dwCookie &= (COOKIE_TRANSPARENT | COOKIE_EXT_COMMENT | COOKIE_EXT_DEFINITION | COOKIE_EXT_VALUE);
 }
 
 TESTCASE

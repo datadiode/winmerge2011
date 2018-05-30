@@ -52,10 +52,15 @@ static BOOL IsTclKeyword(LPCTSTR pszChars, int nLength)
 #define COOKIE_CHAR             0x0004
 #define COOKIE_STRING           0x0008
 
-DWORD CCrystalTextView::ParseLineTcl(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
+void CCrystalTextView::ParseLineTcl(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
 {
+	DWORD &dwCookie = cookie.m_dwCookie;
+
 	if (nLength == 0)
-		return dwCookie & COOKIE_STRING;
+	{
+		dwCookie &= COOKIE_STRING;
+		return;
+	}
 
 	BOOL bRedefineBlock = TRUE;
 	BOOL bDecIndex = FALSE;
@@ -198,7 +203,6 @@ DWORD CCrystalTextView::ParseLineTcl(DWORD dwCookie, LPCTSTR const pszChars, int
 
 	if (pszChars[nLength - 1] != '\\')
 		dwCookie &= COOKIE_STRING;
-	return dwCookie;
 }
 
 TESTCASE

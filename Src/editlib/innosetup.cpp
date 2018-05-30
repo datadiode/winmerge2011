@@ -330,10 +330,15 @@ static BOOL IsUser1Keyword(LPCTSTR pszChars, int nLength)
 #define COOKIE_EXT_COMMENT2     0x0020
 #define COOKIE_SECTION          0x0040
 
-DWORD CCrystalTextView::ParseLineInnoSetup(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
+void CCrystalTextView::ParseLineInnoSetup(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
 {
+	DWORD &dwCookie = cookie.m_dwCookie;
+
 	if (nLength == 0)
-		return dwCookie & (COOKIE_EXT_COMMENT | COOKIE_EXT_COMMENT2);
+	{
+		dwCookie &= (COOKIE_EXT_COMMENT | COOKIE_EXT_COMMENT2);
+		return;
+	}
 
 	BOOL bFirstChar = (dwCookie & ~COOKIE_EXT_COMMENT) == 0;
 	BOOL bRedefineBlock = TRUE;
@@ -561,7 +566,6 @@ DWORD CCrystalTextView::ParseLineInnoSetup(DWORD dwCookie, LPCTSTR const pszChar
 
 	if (pszChars[nLength - 1] != '\\')
 		dwCookie &= (COOKIE_EXT_COMMENT | COOKIE_EXT_COMMENT2);
-	return dwCookie;
 }
 
 TESTCASE

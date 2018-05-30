@@ -121,10 +121,15 @@ static BOOL IsUser1Keyword(LPCTSTR pszChars, int nLength)
 #define COOKIE_GET_RAWSTRING_NUMBER_COUNT(cookie) (((cookie) & 0xF0) >> 4)
 #define COOKIE_SET_RAWSTRING_NUMBER_COUNT(cookie, count) (cookie) = (((cookie) & ~0xF0) | ((count) << 4))
 
-DWORD CCrystalTextView::ParseLineRust(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
+void CCrystalTextView::ParseLineRust(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
 {
+	DWORD &dwCookie = cookie.m_dwCookie;
+
 	if (nLength == 0)
-		return dwCookie & (COOKIE_EXT_COMMENT | COOKIE_RAWSTRING | COOKIE_STRING);
+	{
+		dwCookie &= (COOKIE_EXT_COMMENT | COOKIE_RAWSTRING | COOKIE_STRING);
+		return;
+	}
 
 	LPCTSTR pszRawStringBegin = NULL;
 	BOOL bRedefineBlock = TRUE;
@@ -304,8 +309,7 @@ DWORD CCrystalTextView::ParseLineRust(DWORD dwCookie, LPCTSTR const pszChars, in
 		}
 	} while (I < nLength);
 
-	dwCookie &= COOKIE_EXT_COMMENT | COOKIE_RAWSTRING | COOKIE_STRING;
-	return dwCookie;
+	dwCookie &= (COOKIE_EXT_COMMENT | COOKIE_RAWSTRING | COOKIE_STRING);
 }
 
 TESTCASE

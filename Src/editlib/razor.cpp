@@ -100,8 +100,10 @@ static DWORD ParseProcCookie(DWORD dwCookie)
 	return dwCookie & COOKIE_PARSER;
 }
 
-DWORD CCrystalTextView::ParseLineRazor(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
+void CCrystalTextView::ParseLineRazor(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
 {
+	DWORD &dwCookie = cookie.m_dwCookie;
+
 	int nScriptBegin = ((dwCookie & COOKIE_PARSER) ||
 		(dwCookie & COOKIE_RAZOR_NESTING) && !(dwCookie & COOKIE_SCRIPT)) &&
 		!(dwCookie & (COOKIE_ASP | COOKIE_STRING)) ? 0 : -1;
@@ -111,9 +113,9 @@ DWORD CCrystalTextView::ParseLineRazor(DWORD dwCookie, LPCTSTR const pszChars, i
 		if (nScriptBegin >= 0)
 		{
 			DWORD const dwParser = ParseProcCookie(dwCookie);
-			dwCookie = dwCookie & 0xFFFFFF00 | (this->*ScriptParseProc(dwParser))(dwCookie, pszChars, I, nScriptBegin - 1, pBuf);
+			(this->*ScriptParseProc(dwParser))(cookie, pszChars, I, nScriptBegin - 1, pBuf);
 		}
-		return dwCookie;
+		return;
 	}
 
 	int const nHtmlTagNameMask =
@@ -187,7 +189,7 @@ DWORD CCrystalTextView::ParseLineRazor(DWORD dwCookie, LPCTSTR const pszChars, i
 						DEFINE_BLOCK(nScriptBegin, COLORINDEX_USER3);
 						I = nLength;
 						DWORD const dwParser = ParseProcCookie(dwCookie);
-						dwCookie = dwCookie & 0xFFFFFF00 | (this->*ScriptParseProc(dwParser))(dwCookie, pszChars, I, nPos - 1, pBuf);
+						(this->*ScriptParseProc(dwParser))(cookie, pszChars, I, nPos - 1, pBuf);
 						dwCookie = dwCookie & ~COOKIE_PARSER | dwScriptTagCookie & COOKIE_PARSER;
 						continue;
 					}
@@ -214,6 +216,18 @@ DWORD CCrystalTextView::ParseLineRazor(DWORD dwCookie, LPCTSTR const pszChars, i
 		// See bug #1474782 Crash when comparing SQL with with binary data
 		if (I < nLength)
 		{
+			if (!(dwCookie & COOKIE_RAZOR_NESTING) && (cookie.m_dwNesting & 0xF) && pszChars[I] == '}')
+			{
+				int nScriptEnd = I + 1;
+				if (nScriptBegin >= 0 && nScriptEnd > nScriptBegin)
+				{
+					pBuf.m_bRecording = pBuf;
+					(this->*ScriptParseProc(dwCookie))(cookie, pszChars, nScriptEnd, nScriptBegin - 1, pBuf);
+					pBuf.m_bRecording = NULL;
+					nScriptBegin = nScriptEnd;
+				}
+			}
+
 			if (nInlineNesting && !(dwCookie & (COOKIE_STRING | COOKIE_EXT_COMMENT)))
 			{
 				switch (TCHAR ch = pszChars[I])
@@ -234,11 +248,12 @@ DWORD CCrystalTextView::ParseLineRazor(DWORD dwCookie, LPCTSTR const pszChars, i
 					if (nScriptBegin >= 0)
 					{
 						DWORD const dwParser = ParseProcCookie(dwCookie);
-						dwCookie = dwCookie & 0xFFFFFF00 | (this->*ScriptParseProc(dwParser))(dwCookie, pszChars, I, nScriptBegin - 1, pBuf);
+						(this->*ScriptParseProc(dwParser))(cookie, pszChars, I, nScriptBegin - 1, pBuf);
 						nScriptBegin = -1;
 					}
-					dwCookie = dwCookie & ~(COOKIE_PARSER | COOKIE_STRING | COOKIE_REJECT_REGEXP) | dwScriptTagCookie & (COOKIE_PARSER | COOKIE_STRING);
-					dwScriptTagCookie &= ~COOKIE_STRING;
+					dwCookie &= ~(COOKIE_PARSER | COOKIE_STRING | COOKIE_TEMPLATE_STRING | COOKIE_REJECT_REGEXP);
+					dwCookie |= dwScriptTagCookie & (COOKIE_PARSER | COOKIE_STRING | COOKIE_TEMPLATE_STRING);
+					dwScriptTagCookie &= ~(COOKIE_STRING | COOKIE_TEMPLATE_STRING);
 					if (dwCookie & COOKIE_STRING)
 					{
 						DEFINE_BLOCK(I, COLORINDEX_STRING);
@@ -267,7 +282,7 @@ DWORD CCrystalTextView::ParseLineRazor(DWORD dwCookie, LPCTSTR const pszChars, i
 				if (nScriptBegin >= 0)
 				{
 					DWORD const dwParser = ParseProcCookie(dwCookie);
-					dwCookie = dwCookie & 0xFFFFFF00 | (this->*ScriptParseProc(dwParser))(dwCookie, pszChars, I, nScriptBegin - 1, pBuf);
+					(this->*ScriptParseProc(dwParser))(cookie, pszChars, I, nScriptBegin - 1, pBuf);
 					nScriptBegin = -1;
 				}
 				if ((dwCookie & COOKIE_RAZOR_NESTING) == SNORKEL(COOKIE_RAZOR_NESTING))
@@ -275,7 +290,7 @@ DWORD CCrystalTextView::ParseLineRazor(DWORD dwCookie, LPCTSTR const pszChars, i
 				if (!(dwOddness & ODDNESS_AT) && (pszChars[I + 1] == '(' || xisalnum(pszChars[I + 1])))
 				{
 					DEFINE_BLOCK(I, COLORINDEX_USER3);
-					dwScriptTagCookie = dwCookie & (COOKIE_PARSER | COOKIE_STRING);
+					dwScriptTagCookie = dwCookie & (COOKIE_PARSER | COOKIE_STRING | COOKIE_TEMPLATE_STRING);
 					dwCookie &= ~(COOKIE_PARSER | COOKIE_STRING);
 					dwCookie |= COOKIE_PARSER_CSHARP;
 					pBuf.m_bRecording = NULL;
@@ -315,7 +330,7 @@ DWORD CCrystalTextView::ParseLineRazor(DWORD dwCookie, LPCTSTR const pszChars, i
 						if (dwScriptTagCookie & COOKIE_PARSER)
 						{
 							dwCookie &= ~(COOKIE_PARSER | 0xFF);
-							dwCookie |= dwScriptTagCookie & COOKIE_PARSER;
+							dwCookie |= dwScriptTagCookie & (COOKIE_PARSER | COOKIE_TEMPLATE_STRING);
 						}
 						if (dwCookie & (COOKIE_RAZOR_NESTING | COOKIE_PARSER))
 						{
@@ -352,7 +367,7 @@ DWORD CCrystalTextView::ParseLineRazor(DWORD dwCookie, LPCTSTR const pszChars, i
 						if (dwScriptTagCookie & COOKIE_PARSER)
 						{
 							dwCookie &= ~(COOKIE_PARSER | 0xFF);
-							dwCookie |= dwScriptTagCookie & COOKIE_PARSER;
+							dwCookie |= dwScriptTagCookie & (COOKIE_PARSER | COOKIE_TEMPLATE_STRING);
 						}
 						if (dwCookie & (COOKIE_RAZOR_NESTING | COOKIE_PARSER))
 						{
@@ -410,13 +425,27 @@ DWORD CCrystalTextView::ParseLineRazor(DWORD dwCookie, LPCTSTR const pszChars, i
 					if (dwScriptTagCookie & COOKIE_PARSER)
 					{
 						dwCookie &= ~(COOKIE_PARSER | 0xFF);
-						dwCookie |= dwScriptTagCookie & COOKIE_PARSER;
+						dwCookie |= dwScriptTagCookie & (COOKIE_PARSER | COOKIE_TEMPLATE_STRING);
 					}
 					if (dwCookie & (COOKIE_RAZOR_NESTING | COOKIE_PARSER))
 					{
 						pBuf.m_bRecording = NULL;
 						nScriptBegin = I + 1;
 					}
+				}
+				continue;
+			}
+
+			if ((dwCookie & COOKIE_TEMPLATE_STRING) && !(dwCookie & COOKIE_RAZOR_NESTING))
+			{
+				int nScriptEnd = pszChars[I] == '`' ? I + 1 :
+					pszChars[I] == '$' && pszChars[I + 1] == '{' ? I + 2 : 0;
+				if (nScriptBegin >= 0 && nScriptEnd > nScriptBegin)
+				{
+					pBuf.m_bRecording = pBuf;
+					(this->*ScriptParseProc(dwCookie))(cookie, pszChars, nScriptEnd, nScriptBegin - 1, pBuf);
+					pBuf.m_bRecording = NULL;
+					nScriptBegin = nScriptEnd;
 				}
 				continue;
 			}
@@ -494,7 +523,7 @@ DWORD CCrystalTextView::ParseLineRazor(DWORD dwCookie, LPCTSTR const pszChars, i
 					if (nScriptBegin >= 0)
 					{
 						DWORD const dwParser = ParseProcCookie(dwCookie);
-						dwCookie = dwCookie & 0xFFFFFF00 | (this->*ScriptParseProc(dwParser))(dwCookie, pszChars, I, nScriptBegin - 1, pBuf);
+						(this->*ScriptParseProc(dwParser))(cookie, pszChars, I, nScriptBegin - 1, pBuf);
 						nScriptBegin = -1;
 					}
 					DEFINE_BLOCK(I, COLORINDEX_USER3);
@@ -508,7 +537,7 @@ DWORD CCrystalTextView::ParseLineRazor(DWORD dwCookie, LPCTSTR const pszChars, i
 					if (nScriptBegin >= 0)
 					{
 						DWORD const dwParser = ParseProcCookie(dwCookie);
-						dwCookie = dwCookie & 0xFFFFFF00 | (this->*ScriptParseProc(dwParser))(dwCookie, pszChars, I - 1, nScriptBegin - 1, pBuf);
+						(this->*ScriptParseProc(dwParser))(cookie, pszChars, I - 1, nScriptBegin - 1, pBuf);
 						nScriptBegin = -1;
 					}
 					dwCookie = COME_UP(dwCookie, COOKIE_RAZOR_NESTING);
@@ -532,10 +561,15 @@ DWORD CCrystalTextView::ParseLineRazor(DWORD dwCookie, LPCTSTR const pszChars, i
 						if (nScriptBegin >= 0)
 						{
 							DWORD const dwParser = ParseProcCookie(dwCookie);
-							dwCookie = dwCookie & 0xFFFFFF00 | (this->*ScriptParseProc(dwParser))(dwCookie, pszChars, I, nScriptBegin - 1, pBuf);
+							(this->*ScriptParseProc(dwParser))(cookie, pszChars, I, nScriptBegin - 1, pBuf);
 							nScriptBegin = -1;
 						}
 						dwCookie &= ~COOKIE_RAZOR_NESTING;
+						if (dwCookie & COOKIE_TEMPLATE_STRING)
+						{
+							pBuf.m_bRecording = NULL;
+							nScriptBegin = I;
+						}
 					}
 					break;
 				}
@@ -549,7 +583,7 @@ DWORD CCrystalTextView::ParseLineRazor(DWORD dwCookie, LPCTSTR const pszChars, i
 					if (nScriptBegin >= 0)
 					{
 						DWORD const dwParser = ParseProcCookie(dwCookie);
-						dwCookie = dwCookie & 0xFFFFFF00 | (this->*ScriptParseProc(dwParser))(dwCookie, pszChars, I - 1, nScriptBegin - 1, pBuf);
+						(this->*ScriptParseProc(dwParser))(cookie, pszChars, I - 1, nScriptBegin - 1, pBuf);
 						nScriptBegin = -1;
 					}
 					DEFINE_BLOCK(I - 1, COLORINDEX_OPERATOR);
@@ -575,7 +609,7 @@ DWORD CCrystalTextView::ParseLineRazor(DWORD dwCookie, LPCTSTR const pszChars, i
 							if (nScriptBegin >= 0)
 							{
 								DWORD const dwParser = ParseProcCookie(dwCookie);
-								dwCookie = dwCookie & 0xFFFFFF00 | (this->*ScriptParseProc(dwParser))(dwCookie, pszChars, I, nScriptBegin - 1, pBuf);
+								(this->*ScriptParseProc(dwParser))(cookie, pszChars, I, nScriptBegin - 1, pBuf);
 								nScriptBegin = -1;
 							}
 						}
@@ -593,7 +627,7 @@ DWORD CCrystalTextView::ParseLineRazor(DWORD dwCookie, LPCTSTR const pszChars, i
 							if (nScriptBegin >= 0)
 							{
 								DWORD const dwParser = ParseProcCookie(dwCookie);
-								dwCookie = dwCookie & 0xFFFFFF00 | (this->*ScriptParseProc(dwParser))(dwCookie, pszChars, I, nScriptBegin - 1, pBuf);
+								(this->*ScriptParseProc(dwParser))(cookie, pszChars, I, nScriptBegin - 1, pBuf);
 								nScriptBegin = -1;
 							}
 						}
@@ -602,6 +636,20 @@ DWORD CCrystalTextView::ParseLineRazor(DWORD dwCookie, LPCTSTR const pszChars, i
 						continue;
 					}
 				}
+			}
+
+			// Template string literal
+			if (pszChars[I] == '`')
+			{
+				int nScriptEnd = I + 1;
+				if (nScriptBegin >= 0 && nScriptEnd > nScriptBegin)
+				{
+					pBuf.m_bRecording = pBuf;
+					(this->*ScriptParseProc(dwCookie))(cookie, pszChars, nScriptEnd, nScriptBegin - 1, pBuf);
+					pBuf.m_bRecording = NULL;
+					nScriptBegin = nScriptEnd;
+				}
+				continue;
 			}
 
 			switch (dwCookie & (COOKIE_DTD | COOKIE_ASP | COOKIE_SCRIPT) | ParseProcCookie(dwCookie))
@@ -642,7 +690,7 @@ DWORD CCrystalTextView::ParseLineRazor(DWORD dwCookie, LPCTSTR const pszChars, i
 							if (nScriptBegin >= 0)
 							{
 								DWORD const dwParser = ParseProcCookie(dwCookie);
-								dwCookie = dwCookie & 0xFFFFFF00 | (this->*ScriptParseProc(dwParser))(dwCookie, pszChars, I, nScriptBegin - 1, pBuf);
+								(this->*ScriptParseProc(dwParser))(cookie, pszChars, I, nScriptBegin - 1, pBuf);
 								nScriptBegin = -1;
 							}
 						}
@@ -682,7 +730,7 @@ DWORD CCrystalTextView::ParseLineRazor(DWORD dwCookie, LPCTSTR const pszChars, i
 					if (nScriptBegin >= 0)
 					{
 						DWORD const dwParser = ParseProcCookie(dwCookie);
-						dwCookie = dwCookie & 0xFFFFFF00 | (this->*ScriptParseProc(dwParser))(dwCookie, pszChars, I, nScriptBegin - 1, pBuf);
+						(this->*ScriptParseProc(dwParser))(cookie, pszChars, I, nScriptBegin - 1, pBuf);
 						nScriptBegin = -1;
 					}
 					DEFINE_BLOCK(I, COLORINDEX_USER3);
@@ -807,7 +855,7 @@ DWORD CCrystalTextView::ParseLineRazor(DWORD dwCookie, LPCTSTR const pszChars, i
 				if (nScriptBegin >= 0)
 				{
 					DWORD const dwParser = ParseProcCookie(dwCookie);
-					dwCookie = dwCookie & 0xFFFFFF00 | (this->*ScriptParseProc(dwParser))(dwCookie, pszChars, I, nScriptBegin - 1, pBuf);
+					(this->*ScriptParseProc(dwParser))(cookie, pszChars, I, nScriptBegin - 1, pBuf);
 					nScriptBegin = -1;
 				}
 				DEFINE_BLOCK(I, COLORINDEX_OPERATOR);
@@ -873,9 +921,7 @@ DWORD CCrystalTextView::ParseLineRazor(DWORD dwCookie, LPCTSTR const pszChars, i
 		if (nScriptBegin >= 0)
 		{
 			DWORD const dwParser = ParseProcCookie(dwCookie);
-			dwCookie = dwCookie & 0xFFFFFF00 | (this->*ScriptParseProc(dwParser))(dwCookie, pszChars, I, nScriptBegin - 1, pBuf);
+			(this->*ScriptParseProc(dwParser))(cookie, pszChars, I, nScriptBegin - 1, pBuf);
 		}
 	}
-
-	return dwCookie;
 }

@@ -1122,27 +1122,28 @@ void CCrystalTextView::DrawLineHelper(
 	crText = CLR_NONE;
 }*/
 
-DWORD CCrystalTextView::GetParseCookie(int nLineIndex)
+CCrystalTextView::TextBlock::Cookie CCrystalTextView::GetParseCookie(int nLineIndex)
 {
 	int const nLineCount = GetLineCount();
 	if (m_ParseCookies.size() == 0)
 	{
 		// must be initialized to invalid value (DWORD) -1
-		m_ParseCookies.assign(nLineCount, -1);
+		m_ParseCookies.resize(nLineCount);
 	}
 
 	int L = nLineIndex;
-	while (L >= 0 && m_ParseCookies[L] == -1)
+	while (L >= 0 && m_ParseCookies[L].Empty())
 		--L;
 
-	DWORD dwCookie = L >= 0 ? m_ParseCookies[L] :
+	TextBlock::Cookie dwCookie = L >= 0 ? m_ParseCookies[L] :
 		m_CurSourceDef ? m_CurSourceDef->flags & COOKIE_PARSER_GLOBAL : 0;
-	ASSERT(dwCookie != -1);
+	ASSERT(!dwCookie.Empty());
 	TextBlock::Array rBlocks = NULL;
 	while (++L <= nLineIndex)
 	{
-		m_ParseCookies[L] = dwCookie = ParseLine(dwCookie, L, rBlocks);
-		ASSERT(dwCookie != -1);
+		ParseLine(dwCookie, L, rBlocks);
+		m_ParseCookies[L] = dwCookie;
+		ASSERT(!dwCookie.Empty());
 	}
 
 	return dwCookie;
@@ -1455,7 +1456,7 @@ void CCrystalTextView::DrawSingleLine(HSurface *pdc, const RECT &rc, int nLineIn
 		int nLength = GetViewableLineLength(nLineIndex);
 
 		//  Parse the line
-		DWORD dwCookie = GetParseCookie (nLineIndex - 1);
+		TextBlock::Cookie dwCookie = GetParseCookie(nLineIndex - 1);
 		TextBlock::Array pBuf = new TextBlock[(nLength + 1) * 3]; // be aware of nLength == 0
 
 		// insert at least one textblock of normal color at the beginning
@@ -1464,8 +1465,9 @@ void CCrystalTextView::DrawSingleLine(HSurface *pdc, const RECT &rc, int nLineIn
 		pBuf[0].m_nBgColorIndex = COLORINDEX_BKGND;
 		++pBuf.m_nActualItems;
 
-		m_ParseCookies[nLineIndex] = ParseLine(dwCookie, nLineIndex, pBuf);
-		ASSERT(m_ParseCookies[nLineIndex] != -1);
+		ParseLine(dwCookie, nLineIndex, pBuf);
+		m_ParseCookies[nLineIndex] = dwCookie;
+		ASSERT(!m_ParseCookies[nLineIndex].Empty());
 
 		TextBlock::Array pAddedBuf = NULL;
 		GetAdditionalTextBlocks(nLineIndex, pAddedBuf);
@@ -1646,15 +1648,16 @@ void CCrystalTextView::GetHTMLLine(int nLineIndex, String &strHTML)
 	GetLineColors(nLineIndex, crBkgnd, crText);
 
 	// Parse the line
-	DWORD dwCookie = GetParseCookie(nLineIndex - 1);
+	TextBlock::Cookie dwCookie = GetParseCookie(nLineIndex - 1);
 	TextBlock::Array pBuf = new TextBlock[(nLength + 1) * 3]; // be aware of nLength == 0
 	// insert at least one textblock of normal color at the beginning
 	pBuf[0].m_nCharPos = 0;
 	pBuf[0].m_nColorIndex = COLORINDEX_NORMALTEXT;
 	pBuf[0].m_nBgColorIndex = COLORINDEX_BKGND;
 	++pBuf.m_nActualItems;
-	m_ParseCookies[nLineIndex] = ParseLine(dwCookie, nLineIndex, pBuf);
-	ASSERT(m_ParseCookies[nLineIndex] != - 1);
+	ParseLine(dwCookie, nLineIndex, pBuf);
+	m_ParseCookies[nLineIndex] = dwCookie;
+	ASSERT(!m_ParseCookies[nLineIndex].Empty());
 
 	TextBlock::Array pAddedBuf = NULL;
 	GetAdditionalTextBlocks(nLineIndex, pAddedBuf);
@@ -2921,14 +2924,13 @@ void CCrystalTextView::OnSetFocus()
 	UpdateCaret();
 }
 
-DWORD CCrystalTextView::ParseLine(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf)
+void CCrystalTextView::ParseLine(TextBlock::Cookie &dwCookie, int nLineIndex, TextBlock::Array &pBuf)
 {
 	if (LPCTSTR const pszChars = GetLineChars(nLineIndex))
 	{
 		int const nLength = GetLineLength(nLineIndex);
-		dwCookie = (this->*m_CurSourceDef->ParseLineX)(dwCookie, pszChars, nLength, -1, pBuf);
+		(this->*m_CurSourceDef->ParseLineX)(dwCookie, pszChars, nLength, -1, pBuf);
 	}
-	return dwCookie;
 }
 
 DWORD CCrystalTextView::ScriptCookie(LPCTSTR lang, DWORD defval)
@@ -2979,15 +2981,13 @@ CCrystalTextView::TextBlock::ParseProc CCrystalTextView::ScriptParseProc(DWORD d
 	return &ParseLineUnknown;
 }
 
-DWORD CCrystalTextView::ParseLinePlain(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
+void CCrystalTextView::ParseLinePlain(TextBlock::Cookie &dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
 {
-	return 0;
 }
 
-DWORD CCrystalTextView::ParseLineUnknown(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
+void CCrystalTextView::ParseLineUnknown(TextBlock::Cookie &dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
 {
 	pBuf.DefineBlock(I + 1, COLORINDEX_FUNCNAME);
-	return 0;
 }
 
 int CCrystalTextView::CalculateActualOffset(int nLineIndex, int nCharIndex, BOOL bAccumulate)
@@ -3191,7 +3191,7 @@ void CCrystalTextView::UpdateView(CCrystalTextView *pSource, CUpdateContext *pCo
 				ASSERT(cookiesSize == nLineCount);
 				// must be reinitialized to invalid value (DWORD) - 1
 				for (int i = nLineIndex; i < cookiesSize; ++i)
-					m_ParseCookies[i] = -1;
+					m_ParseCookies[i].Clear();
 			}
 			//  This line'th actual length must be recalculated
 			if (m_pnActualLineLength.size())
@@ -3222,15 +3222,11 @@ void CCrystalTextView::UpdateView(CCrystalTextView *pSource, CUpdateContext *pCo
 			stl_size_t arrSize = m_ParseCookies.size();
 			if (arrSize != nLineCount)
 			{
-				stl_size_t oldsize = arrSize; 
 				m_ParseCookies.resize(nLineCount);
 				arrSize = nLineCount;
-				// must be initialized to invalid value (DWORD) - 1
-				for (stl_size_t i = oldsize; i < arrSize; ++i)
-				m_ParseCookies[i] = -1;
 			}
 			for (stl_size_t i = nLineIndex; i < arrSize; ++i)
-				m_ParseCookies[i] = -1;
+				m_ParseCookies[i].Clear();
 		}
 
 		//  Recalculate actual length for all lines below this

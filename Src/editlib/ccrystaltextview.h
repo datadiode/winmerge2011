@@ -53,6 +53,9 @@
 #define SRCOPT_COOKIE(X)        ((X) << 4)
 C_ASSERT(COOKIE_PARSER_GLOBAL == COOKIE_PARSER << 4);
 
+// Cookie bits which are shared across parsers
+#define COOKIE_TEMPLATE_STRING  0x80
+
 ////////////////////////////////////////////////////////////////////////////
 // Forward class declarations
 
@@ -100,14 +103,10 @@ class CCrystalTextView
 public:
 	typedef int Captures[30];
 
-protected:
-	//  Search parameters
-	bool m_bLastSearch;
-	DWORD m_dwLastSearchFlags;
-	String m_strLastFindWhat;
-	bool m_bCursorHidden;
-
 private:
+	LOGFONT m_lfBaseFont;
+	HFont *m_apFonts[4];
+
 	//  Line/character dimensions
 	int m_nLineHeight, m_nCharWidth;
 	void CalcLineCharDim();
@@ -140,21 +139,92 @@ private:
 	int m_nMaxLineLength;
 	int m_nIdealCharPos;
 
-	bool m_bFocused;
-
 	static int FindStringHelper(
 		LPCTSTR pchFindWhere, UINT cchFindWhere,
 		LPCTSTR pchFindWhat, DWORD dwFlags,
 		Captures &ovector);
 
 protected:
-	POINT m_ptAnchor;
-private:
-	LOGFONT m_lfBaseFont;
-	HFont *m_apFonts[4];
+
+	bool m_bFocused;
+	bool m_bCursorHidden;
+	bool m_bOvrMode;
+	bool m_bShowInactiveSelection;
+
+	//  [JRT]
+	bool m_bDisableDragAndDrop;
+
+	//BEGIN SW
+	bool m_bWordWrap;
+	//END SW
+
+	//  Search parameters
+	bool m_bLastSearch;
+	DWORD m_dwLastSearchFlags;
+	String m_strLastFindWhat;
 
 	//  Parsing stuff
-
+	class TextBlock
+	{
+	private:
+		~TextBlock() { } // prevents deletion from outside TextBlock::Array
+	public:
+		int m_nCharPos;
+		int m_nColorIndex;
+		int m_nBgColorIndex;
+		class Array
+		{
+		private:
+			TextBlock *m_pBuf;
+		public:
+			void const *m_bRecording;
+			int m_nActualItems;
+			Array(TextBlock *pBuf)
+				: m_pBuf(pBuf), m_bRecording(m_pBuf), m_nActualItems(0)
+			{ }
+			~Array() { delete[] m_pBuf; }
+			operator TextBlock *() { return m_pBuf; }
+			void swap(Array &other)
+			{
+				std::swap(m_pBuf, other.m_pBuf);
+				std::swap(m_nActualItems, other.m_nActualItems);
+			}
+			__forceinline void DefineBlock(int pos, int colorindex)
+			{
+				if (m_bRecording)
+				{
+					if (m_nActualItems == 0 || m_pBuf[m_nActualItems - 1].m_nCharPos <= pos)
+					{
+						m_pBuf[m_nActualItems].m_nCharPos = pos;
+						m_pBuf[m_nActualItems].m_nColorIndex = colorindex;
+						m_pBuf[m_nActualItems].m_nBgColorIndex = COLORINDEX_BKGND;
+						++m_nActualItems;
+					}
+				}
+			}
+		};
+		class Cookie
+		{
+		public:
+			Cookie(DWORD dwCookie = -1)
+				: m_dwCookie(dwCookie), m_dwNesting(0)
+			{ }
+			void Clear()
+			{
+				m_dwCookie = -1;
+				m_dwNesting = 0;
+			}
+			BOOL Empty() const
+			{
+				return m_dwCookie == -1;
+			}
+			DWORD m_dwCookie;
+			DWORD m_dwNesting;
+		private:
+			void operator=(int);
+		};
+		typedef void (CCrystalTextView::*ParseProc)(Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, Array &pBuf);
+	};
 	/**  
 	This array must be initialized to (DWORD) - 1, code for invalid values (not yet computed).
 	We prefer to limit the recomputing delay to the moment when we need to read
@@ -167,8 +237,8 @@ private:
 	It would be a loss of time to recompute all these values after each action.
 	So we just set all these values to invalid code (DWORD) - 1.
 	*/
-	std::vector<DWORD> m_ParseCookies;
-	DWORD GetParseCookie(int nLineIndex);
+	std::vector<TextBlock::Cookie> m_ParseCookies;
+	TextBlock::Cookie GetParseCookie(int nLineIndex);
 
 	/**
 	Pre-calculated line lengths (in characters)
@@ -178,14 +248,13 @@ private:
 	*/
 	std::vector<int> m_pnActualLineLength;
 
-protected:
 	bool m_bPreparingToDrag;
 	bool m_bDraggingText;
 	bool m_bDragSelection, m_bWordSelection, m_bLineSelection;
 	UINT_PTR m_nDragSelTimer;
 
 	POINT m_ptDrawSelStart, m_ptDrawSelEnd;
-
+	POINT m_ptAnchor;
 	POINT m_ptCursorPos, m_ptCursorLast;
 	POINT m_ptSelStart, m_ptSelEnd;
 	void PrepareSelBounds();
@@ -251,7 +320,6 @@ public:
 protected:
 	POINT WordToRight(POINT pt);
 	POINT WordToLeft(POINT pt);
-	bool m_bOvrMode;
 
 	static HImageList *m_pIcons;
 	static HBrush *m_pHatchBrush;
@@ -261,14 +329,6 @@ protected:
 	bool IsValidTextPos(const POINT &);
 	bool IsValidTextPosX(const POINT &);
 	bool IsValidTextPosY(int);
-
-	bool m_bShowInactiveSelection;
-	//  [JRT]
-	bool m_bDisableDragAndDrop;
-
-	//BEGIN SW
-	bool m_bWordWrap;
-	//END SW
 
 	POINT ClientToText(const POINT &);
 	POINT TextToClient(const POINT &);
@@ -556,49 +616,6 @@ protected:
 	void InvalidateScreenRect();
 	//END SW
 
-	//  Syntax coloring overrides
-	class TextBlock
-	{
-	private:
-		~TextBlock() { } // prevents deletion from outside TextBlock::Array
-	public:
-		int m_nCharPos;
-		int m_nColorIndex;
-		int m_nBgColorIndex;
-		class Array
-		{
-		private:
-			TextBlock *m_pBuf;
-		public:
-			void const *m_bRecording;
-			int m_nActualItems;
-			Array(TextBlock *pBuf)
-				: m_pBuf(pBuf), m_bRecording(m_pBuf), m_nActualItems(0)
-			{ }
-			~Array() { delete[] m_pBuf; }
-			operator TextBlock *() { return m_pBuf; }
-			void swap(Array &other)
-			{
-				std::swap(m_pBuf, other.m_pBuf);
-				std::swap(m_nActualItems, other.m_nActualItems);
-			}
-			__forceinline void DefineBlock(int pos, int colorindex)
-			{
-				if (m_bRecording)
-				{
-					if (m_nActualItems == 0 || m_pBuf[m_nActualItems - 1].m_nCharPos <= pos)
-					{
-						m_pBuf[m_nActualItems].m_nCharPos = pos;
-						m_pBuf[m_nActualItems].m_nColorIndex = colorindex;
-						m_pBuf[m_nActualItems].m_nBgColorIndex = COLORINDEX_BKGND;
-						++m_nActualItems;
-					}
-				}
-			}
-		};
-		typedef DWORD (CCrystalTextView::*ParseProc)(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, Array &pBuf);
-	};
-
 	//BEGIN SW
 	// function to draw a single screen line
 	// (a wrapped line can consist of many screen lines
@@ -618,47 +635,47 @@ public:
 	void GetHTMLAttribute(int nColorIndex, int nBgColorIndex, COLORREF crText, COLORREF crBkgnd, String &);
 
 	void GoToLine(int nLine, bool bRelative);
-	DWORD ParseLine(DWORD dwCookie, int nLineIndex, TextBlock::Array &pBuf);
+	void ParseLine(TextBlock::Cookie &cookie, int nLineIndex, TextBlock::Array &pBuf);
 	static DWORD ScriptCookie(LPCTSTR lang, DWORD defval = COOKIE_PARSER);
 	static TextBlock::ParseProc ScriptParseProc(DWORD dwCookie);
-	DWORD ParseLinePlain(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	DWORD ParseLineUnknown(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	DWORD ParseLineAsp(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	DWORD ParseLineBasic(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	DWORD ParseLineBatch(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	DWORD ParseLineC(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	DWORD ParseLineCSharp(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	DWORD ParseLineRazor(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	DWORD ParseLineCss(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	DWORD ParseLineDcl(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	DWORD ParseLineFortran(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	DWORD ParseLineGo(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	DWORD ParseLineIni(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	DWORD ParseLineInnoSetup(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	DWORD ParseLineIS(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	DWORD ParseLineJava(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	DWORD ParseLineLisp(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	DWORD ParseLineLua(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	DWORD ParseLineNsis(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	DWORD ParseLinePascal(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	DWORD ParseLinePerl(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	DWORD ParseLinePhp(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	DWORD ParseLinePo(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	DWORD ParseLinePowerShell(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	DWORD ParseLinePython(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	DWORD ParseLineRexx(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	DWORD ParseLineRsrc(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	DWORD ParseLineRuby(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	DWORD ParseLineRust(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	DWORD ParseLineSgml(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	DWORD ParseLineSh(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	DWORD ParseLineSiod(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	DWORD ParseLineSql(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	DWORD ParseLineTcl(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	DWORD ParseLineTex(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	DWORD ParseLineVerilog(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	DWORD ParseLineVhdl(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	DWORD ParseLineXml(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	void ParseLinePlain(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	void ParseLineUnknown(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	void ParseLineAsp(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	void ParseLineBasic(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	void ParseLineBatch(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	void ParseLineC(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	void ParseLineCSharp(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	void ParseLineRazor(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	void ParseLineCss(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	void ParseLineDcl(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	void ParseLineFortran(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	void ParseLineGo(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	void ParseLineIni(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	void ParseLineInnoSetup(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	void ParseLineIS(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	void ParseLineJava(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	void ParseLineLisp(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	void ParseLineLua(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	void ParseLineNsis(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	void ParseLinePascal(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	void ParseLinePerl(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	void ParseLinePhp(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	void ParseLinePo(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	void ParseLinePowerShell(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	void ParseLinePython(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	void ParseLineRexx(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	void ParseLineRsrc(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	void ParseLineRuby(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	void ParseLineRust(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	void ParseLineSgml(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	void ParseLineSh(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	void ParseLineSiod(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	void ParseLineSql(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	void ParseLineTcl(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	void ParseLineTex(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	void ParseLineVerilog(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	void ParseLineVhdl(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
+	void ParseLineXml(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
 	// Attributes
 public:
 	bool GetViewTabs() const;

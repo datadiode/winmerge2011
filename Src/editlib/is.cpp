@@ -432,10 +432,15 @@ static BOOL IsUser2Keyword(LPCTSTR pszChars, int nLength)
 #define COOKIE_STRING           0x0008
 #define COOKIE_CHAR             0x0010
 
-DWORD CCrystalTextView::ParseLineIS(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
+void CCrystalTextView::ParseLineIS(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
 {
+	DWORD &dwCookie = cookie.m_dwCookie;
+
 	if (nLength == 0)
-		return dwCookie & COOKIE_EXT_COMMENT;
+	{
+		dwCookie &= COOKIE_EXT_COMMENT;
+		return;
+	}
 
 	BOOL bFirstChar = (dwCookie & ~COOKIE_EXT_COMMENT) == 0;
 	BOOL bRedefineBlock = TRUE;
@@ -638,7 +643,6 @@ DWORD CCrystalTextView::ParseLineIS(DWORD dwCookie, LPCTSTR const pszChars, int 
 
 	if (pszChars[nLength - 1] != '\\')
 		dwCookie &= COOKIE_EXT_COMMENT;
-	return dwCookie;
 }
 
 TESTCASE

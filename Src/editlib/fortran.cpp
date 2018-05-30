@@ -244,11 +244,15 @@ static BOOL IsFortranKeyword(LPCTSTR pszChars, int nLength)
 #define COOKIE_STRING           0x0008
 #define COOKIE_CHAR             0x0010
 
-DWORD CCrystalTextView::ParseLineFortran(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
+void CCrystalTextView::ParseLineFortran(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
 {
-	if (nLength == 0)
-		return dwCookie & COOKIE_EXT_COMMENT;
+	DWORD &dwCookie = cookie.m_dwCookie;
 
+	if (nLength == 0)
+	{
+		dwCookie &= COOKIE_EXT_COMMENT;
+		return;
+	}
 	BOOL bRedefineBlock = TRUE;
 	BOOL bDecIndex = FALSE;
 	int nIdentBegin = -1;
@@ -376,7 +380,6 @@ DWORD CCrystalTextView::ParseLineFortran(DWORD dwCookie, LPCTSTR const pszChars,
 
 	if (pszChars[nLength - 1] != '\\')
 		dwCookie &= COOKIE_EXT_COMMENT;
-	return dwCookie;
 }
 
 TESTCASE

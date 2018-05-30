@@ -338,10 +338,15 @@ static BOOL IsUser2Keyword(LPCTSTR pszChars, int nLength)
 #define COOKIE_STRING           0x0008
 #define COOKIE_EXT_COMMENT      0xFF00
 
-DWORD CCrystalTextView::ParseLineSiod(DWORD dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
+void CCrystalTextView::ParseLineSiod(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
 {
+	DWORD &dwCookie = cookie.m_dwCookie;
+
 	if (nLength == 0)
-		return dwCookie & (COOKIE_EXT_COMMENT | COOKIE_STRING);
+	{
+		dwCookie &= (COOKIE_EXT_COMMENT | COOKIE_STRING);
+		return;
+	}
 
 	BOOL bRedefineBlock = TRUE;
 	BOOL bDefun = FALSE;
@@ -544,7 +549,6 @@ DWORD CCrystalTextView::ParseLineSiod(DWORD dwCookie, LPCTSTR const pszChars, in
 	} while (I < nLength);
 
 	dwCookie &= (COOKIE_EXT_COMMENT | COOKIE_STRING);
-	return dwCookie;
 }
 
 TESTCASE
