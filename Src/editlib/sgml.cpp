@@ -140,7 +140,7 @@ void CCrystalTextView::ParseLineSgml(TextBlock::Cookie &cookie, LPCTSTR const ps
 			{
 				DEFINE_BLOCK(nPos, COLORINDEX_PREPROCESSOR);
 			}
-			else if (xisalnum(pszChars[nPos]) || pszChars[nPos] == '.')
+			else if (nIdentBegin != -1)
 			{
 				DEFINE_BLOCK(nPos, COLORINDEX_NORMALTEXT);
 			}
@@ -253,7 +253,8 @@ void CCrystalTextView::ParseLineSgml(TextBlock::Cookie &cookie, LPCTSTR const ps
 				break;
 			}
 
-			if (xisalnum(pszChars[I]) || pszChars[I] == '.' || pszChars[I] == '-' || pszChars[I] == '!' || pszChars[I] == '#')
+			if (xisalnum(pszChars[I]) || pszChars[I] == '.' || pszChars[I] == '#' ||
+				(dwCookie & COOKIE_PREPROCESSOR) && (pszChars[I] == ':' || pszChars[I] == '-' || pszChars[I] == '!'))
 			{
 				if (nIdentBegin == -1)
 					nIdentBegin = I;
@@ -298,13 +299,13 @@ void CCrystalTextView::ParseLineSgml(TextBlock::Cookie &cookie, LPCTSTR const ps
 			{
 				// No need to extract keywords, so skip rest of loop
 			}
-			else if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
+			else if (IsNumeric(pchIdent, cchIdent))
 			{
 				DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
 			}
 			else if (pchIdent > pszChars && pchIdent[-1] == '&')
 			{
-				if (IsEntityName(pszChars + nIdentBegin, I - nIdentBegin))
+				if (*pchIdent == '#' || IsEntityName(pchIdent, cchIdent))
 				{
 					DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER2);
 				}

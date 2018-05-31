@@ -102,11 +102,7 @@ void CCrystalTextView::ParseLineAsp(TextBlock::Cookie &cookie, LPCTSTR const psz
 			{
 				DEFINE_BLOCK(nPos, COLORINDEX_PREPROCESSOR);
 			}
-			else if (dwCookie & COOKIE_PARSER)
-			{
-				DEFINE_BLOCK(nPos, COLORINDEX_NORMALTEXT);
-			}
-			else if (xisalnum(pszChars[nPos]) || pszChars[nPos] == '.')
+			else if ((dwCookie & COOKIE_PARSER) || (nIdentBegin != -1))
 			{
 				DEFINE_BLOCK(nPos, COLORINDEX_NORMALTEXT);
 			}
@@ -639,7 +635,8 @@ void CCrystalTextView::ParseLineAsp(TextBlock::Cookie &cookie, LPCTSTR const psz
 				break;
 			}
 
-			if (xisalnum(pszChars[I]) || pszChars[I] == '.' || pszChars[I] == ':' || pszChars[I] == '-' || pszChars[I] == '!' || pszChars[I] == '#')
+			if (xisalnum(pszChars[I]) || pszChars[I] == '.' || pszChars[I] == '#' ||
+				(dwCookie & COOKIE_PREPROCESSOR) && (pszChars[I] == ':' || pszChars[I] == '-' || pszChars[I] == '!'))
 			{
 				if (nIdentBegin == -1)
 					nIdentBegin = I;
@@ -767,7 +764,7 @@ void CCrystalTextView::ParseLineAsp(TextBlock::Cookie &cookie, LPCTSTR const psz
 			}
 			else if (pchIdent > pszChars && pchIdent[-1] == '&')
 			{
-				if (IsEntityName(pchIdent, cchIdent))
+				if (*pchIdent == '#' || IsEntityName(pchIdent, cchIdent))
 				{
 					DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER2);
 				}
