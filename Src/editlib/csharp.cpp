@@ -149,7 +149,7 @@ void CCrystalTextView::ParseLineCSharp(TextBlock::Cookie &cookie, LPCTSTR const 
 		return;
 	}
 
-	BOOL bFirstChar = (dwCookie & ~COOKIE_EXT_COMMENT) == 0;
+	BOOL bFirstChar = (dwCookie & ~(COOKIE_TRANSPARENT | COOKIE_EXT_COMMENT)) == 0;
 	BOOL bRedefineBlock = TRUE;
 	BOOL bDecIndex = FALSE;
 	enum { False, Start, End } bWasComment = False;

@@ -114,7 +114,7 @@ void CCrystalTextView::ParseLineJava(TextBlock::Cookie &cookie, LPCTSTR const ps
 	int const nKeywordMask = dwParser == COOKIE_PARSER_JAVA ?
 		COMMON_LEXIS | NATIVE_LEXIS : COMMON_LEXIS | SCRIPT_LEXIS;
 
-	BOOL bFirstChar = (dwCookie & ~COOKIE_EXT_COMMENT) == 0;
+	BOOL bFirstChar = (dwCookie & ~(COOKIE_TRANSPARENT | COOKIE_EXT_COMMENT)) == 0;
 	BOOL bRedefineBlock = TRUE;
 	BOOL bDecIndex = FALSE;
 	enum { False, Start, End } bWasComment = False;
