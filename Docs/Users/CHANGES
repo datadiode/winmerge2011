@@ -1,4 +1,42 @@
+0.2011.008.226
+Changes since preceding release (not necessarily complete):
+• EditLib: Beware of JavaScript regular expression and template string literals
+• EditLib: Add syntax highlighting parsers for CSHTML (Razor C#) and Lua
+• EditLib: Employ subordinate parsers to colorize HTML style and script elements
+• EditLib: Make ParseLineAsp() aware of Java and C# for use with JSP and ASP.NET
+• EditLib: Consolidate HTML parsing logic for HTML/PHP/ASP into ParseLineAsp()
+• EditLib: Filter Java and Basic keywords for native vs. script
+• EditLib: Acknowledge .json and .dtd filename extensions
+• EditLib: Fix issues with C style comments
+• EditLib: Fix issues around backslash escaping and multi-line string literals
+• EditLib: Fix keyword ordering / Add unit tests to verify keyword recognition
+• EditLib: Merge auto-indent fix from Takashi's fork
+• EditLib: Adopt new syntax highlighting parsers from Takashi's fork
+• csharp.cpp: Beware of C# verbatim string literals / Add missing keywords
+• siod.cpp: Allow in-line comments as per R6RS / Fix multi-line string literals
+• ruby.cpp: Support multi-line comments, being enclosed between =begin and =end
+• rexx.cpp: Respect the nestedness of in-line comments / Fix EOL comments
+• pascal.cpp, rexx.cpp: Apostrophes and quotation marks escape themselves
+• {basic|csharp|java}.cpp: Add async and await keywords	
+• MainFrm.cpp: Default to Consolas font if available
+• MainFrm.cpp: Assign LOGFONT::lfHeight so it yields a default font size of 10pt
+• Adopt "GitHub/Bitbucket" file compare color scheme option from Takashi's fork
+• Control recreation of Supplement.ini [Parsers] section through version stamp
+• OptionsDef.h: Enable folder compare view coloring by default
+• Issue #152 Folder compare not refreshing sub nodes of selected node
+• DirCmpReport: Provide CF_UNICODETEXT format in addition to CF_TEXT and CF_HTML
+• H2O2.cpp: Scale dialogs for high-DPI displays
+• MovedBlocks.cpp: Did not consider blocks consisting of several identical lines
+• Slightly misspell the product registry key to not disturb WinMerge 2.x revival
+• Setup: Update SFX stub / Keep setup support files out of archive
+• SortLines.wsc: SortLinesAscendingNoCase(), SortLinesDescendingNoCase()
+• ExplorerDlg.cpp: Last path component got lost when invoked from SelectFolder()
+• File transform scriptlet to pipe JSON through https://github.com/stedolan/jq
+
 0.2011.007.444
+Changes since preceding release (not necessarily complete):
+• *.vcxproj: Enable Address Space Layout Randomization (ASLR)
+• codepage_detect.cpp: Avoid an occasional 1st chance exception in lstrcpynA()
 • DirView.cpp: Take some effort to auto-adapt to dark background themes
 • Fix some high contrast mode issues (#137)
 • Don't hide folders containing items which themselves qualify for showing (#11)

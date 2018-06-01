@@ -36,11 +36,23 @@ function OnReadyStateChangeExternalDoc()
 </script>
 </head>
 <body>
-<h2>WinMerge 0.2011.007.444 Release Notes</h2>
+<h2>WinMerge 0.2011.008.226 Release Notes</h2>
 This is a beta release of WinMerge&nbsp;2011.
-<br>Besides fixing bugs, it includes the following functional enhancements as
+<br>Besides fixing bugs, it includes the following functional changes and enhancements as
 compared to the latest stable release:
 <ul>
+<li><p>The registry key which holds the per-user settings has been renamed from <i>WinMerge</i> to <i>WinMurge</i>,
+	so as to prevent conflicts with Takashi's work on the
+	<a target='_blank' href='https://bitbucket.org/winmerge/winmerge'>new mainline version</a> of WinMerge.
+<li><p>Syntax highlighting logic for HTML and related server-side file formats employs subordinate parsers
+	to yield proper coloring of HTML <code>style</code> and <code>script</code> elements,
+	as well as server-side code blocks coded in different languages.
+	Due to its uniqueness, Razor C# syntax support involves a dedicated parser.
+	Razor VB syntax remains unsupported for now.
+<li><p>New syntax highlighting parsers exist for Go, Rust, VHDL, and Lua,
+	the former three originating from <a target='_blank' href='https://bitbucket.org/sdottaka/winmerge-v2'>Takashi's fork</a>.
+<li><p>File transform scriptlet <i>jq.wsc</i> can be used to canonicalize whitespace
+	in JSON files, and optionally sort their contents by key.
 <li><p>File transform scriptlets can provide custom logic for writing back
 	edited files. They do so by implementing method <code>CreateTextFile</code>,
 	which returns an interface that implements method <code>Write</code>.
@@ -65,7 +77,7 @@ compared to the latest stable release:
 	<a target='_blank' href='http://ebstudio.info'>http://ebstudio.info</a>,
 	because that software is not as free for redistribution as it is for use.
 <li><p>The binary editor finally supports undo/redo &mdash; some two years and a half after
-	<a target='_blank' href='https://bitbucket.org/sdottaka/winmerge-v2'>Takashi's fork</a> came up  with this feature.
+	<a target='_blank' href='https://bitbucket.org/sdottaka/winmerge-v2'>Takashi's fork</a> came up with this feature.
 <li><p>Find &amp; Replace with regular expressions allows replacement strings to
 	contain submatch references \0 through \9 (where \0 refers to the complete
 	match), as well as C-style control character escapes.
@@ -110,10 +122,10 @@ compared to the latest stable release:
 	<i>Send deleted files to Recycle Bin</i>.
 </ul>
 <p>
-Click <a href='https://bitbucket.org/jtuc/winmerge2011/get/0.2011.007.444.zip'>here</a> to obtain the source code for this release.
+Click <a href='https://bitbucket.org/jtuc/winmerge2011/get/0.2011.008.226.zip'>here</a> to obtain the source code for this release.
 <p>
 Click <a href='https://bitbucket.org/jtuc/frhed/get/0.10904.2017.zip'>here</a> to obtain source code for Frhed binaries included in this release.
 <p>
-<i>Jochen Neubeck, November 2017</i>
+<i>Jochen Neubeck, June 2018</i>
 <xml src='WinMerge.chm' onreadystatechange='OnReadyStateChangeExternalDoc()'></xml>
 </body>
