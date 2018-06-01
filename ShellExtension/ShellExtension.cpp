@@ -46,6 +46,14 @@ static CWinMergeShell *pModule = NULL;
 
 static WCHAR const ModuleAtom[] = L"ModuleAtom:4e716236-aa30-4c65-b225-d68bba81e9c2";
 
+static DWORD QueryJobObjectUiRestrictions()
+{
+	JOBOBJECT_BASIC_UI_RESTRICTIONS BasicUIRestrictions = { 0 };
+	if (QueryInformationJobObject(NULL, JobObjectBasicUIRestrictions, &BasicUIRestrictions, sizeof BasicUIRestrictions, NULL))
+		return BasicUIRestrictions.UIRestrictionsClass;
+	return 0;
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // DLL Entry Point
 
@@ -59,6 +67,9 @@ extern "C" BOOL WINAPI _DllMainCRTStartup(HINSTANCE hInstance, DWORD dwReason, L
 			return FALSE;
 		// Refuse to load into ShellExperienceHost.exe to work around Windows 10
 		if (GetModuleHandleW(L"ShellExperienceHost.exe"))
+			return FALSE;
+		// Refuse to load into a process which is part of a job object
+		if (QueryJobObjectUiRestrictions() & JOB_OBJECT_UILIMIT_GLOBALATOMS)
 			return FALSE;
 		if (GlobalFindAtomW(ModuleAtom))
 		{
@@ -217,7 +228,7 @@ static BOOL KillHostingProcesses(HWND hWnd)
 						MB_ICONWARNING | MB_YESNOCANCEL);
 					if (choice == IDYES)
 					{
-						TerminateProcess(hProcess, dwExitCode);
+						TerminateProcess(hProcess, 0);
 						WaitForSingleObject(hProcess, 5000);
 					}
 				}
