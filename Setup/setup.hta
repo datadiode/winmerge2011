@@ -21,15 +21,14 @@ call "%VS100COMNTOOLS%vsvars32.bat"
 set SevenZip=&SevenZip;
 del "WinMerge_&version;_&platform;.7z"
 "%SevenZip%7z.exe" a "WinMerge_&version;_&platform;.7z" ^
--m0=LZMA2 -m1=Deflate ^
 -r .\Build\WinMerge\&platform;\Release\* .\Build\WinMerge\Win32\Release\ShellExtensionU.dll .\Build\WinMerge\x64\Release\ShellExtensionX64.dll ^
 -x!*.lib -x!*.exp -x!*.pdb -x!*.json -x!*.zip -x!*.bak -x!xdoc2txt
-"Setup\7zsd_Deflate.exe" ^
-/sfxcreate "WinMerge_&version;_&platform;_change_7z_to_exe_if_you_want_a_setup.7z" ^
-/config "Setup_&platform;.cfg" ^
+"Setup\&platform;\7zSfxHtm.exe" ^
+/create /dll runas "WinMerge_&version;_&platform;_setup.cpl" ^
+/config "Setup\config.html" ^
 /adjunct "Setup\Support\Downloader.exe" ^
 /adjunct "Setup\Support\Unzipper.exe" ^
-/manifest "Setup\7zsd.sfx.manifest" ^
+/icon "Src\res\merge.ico" 48x48x8 ^
 /Version "&version;" ^
 /CompanyName "Jochen Neubeck" ^
 /ProductName "WinMerge 2011 Setup" ^
@@ -215,7 +214,7 @@ Set env = sh.Environment("Process")
 window.name = "4e716236-aa30-4c65-b225-d68bba81e9c2" & "-" & fso.GetTempName
 
 On Error Resume Next
-executable = sh.RegRead("HKLM\Software\Thingamahoochie\WinMerge\Executable")
+executable = sh.RegRead("HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\DisplayIcon")
 On Error GoTo 0
 
 Sub Job_Uninstall
@@ -230,7 +229,6 @@ Sub Job_Uninstall
 			DeleteLink "AllUsersPrograms"
 			DeleteLink "QuickLaunch"
 			DeleteLink "ContextMenu"
-			KillShellExtensionHosts
 			On Error Resume Next
 			sh.RegDelete "HKCR\.WinMerge\"
 			sh.RegDelete "HKCR\WinMerge.Project.File\DefaultIcon\"
@@ -286,14 +284,19 @@ Function FormatStrings(argv)
 End Function
 
 Function TerminateWinMerge(ScriptName)
+	Dim result
 	TerminateWinMerge = True
 	If IsEmpty(executable) Then Exit Function
 	Do
+		result = KillShellExtensionHosts
 		On Error Resume Next
-		fso.MoveFile executable, executable
+		fso.MoveFolder sProgFolder, sProgFolder
 		If Err.Number <> 70 Then Exit Function
 		On Error GoTo 0
-	Loop Until MsgBox("Please close your current WinMerge sessions, then click OK", vbExclamation Or vbOkCancel, ScriptName) = vbCancel
+		If result = 0 Then
+			result = MsgBox("Cannot proceed because the installation folder is still in use by another application.", vbOkCancel Or vbExclamation, document.title)
+		End If
+	Loop Until result <> 0
 	TerminateWinMerge = False
 End Function
 
@@ -324,13 +327,17 @@ Function LinkExists(ByVal sPath)
 	End If
 End Function
 
-Sub KillShellExtensionHosts
+Function KillShellExtensionHosts
+	Dim result
 	Select Case sha.GetSystemInformation("ProcessorArchitecture")
 	Case PROCESSOR_ARCHITECTURE_IA64, PROCESSOR_ARCHITECTURE_AMD64
-		sh.Run """RegSvr32.exe"" /s /n /i:" & window.name & " """ & sProgFolder & "\ShellExtensionX64.dll""", 1, True
+		result = sh.Run("""RegSvr32.exe"" /s /n /i:" & window.name & " """ & sProgFolder & "\ShellExtensionX64.dll""", 1, True)
 	End Select
-	sh.Run """RegSvr32.exe"" /s /n /i:" & window.name & " """ & sProgFolder & "\ShellExtensionU.dll""", 1, True
-End Sub
+	If result = 0 Then
+		result = sh.Run("""RegSvr32.exe"" /s /n /i:" & window.name & " """ & sProgFolder & "\ShellExtensionU.dll""", 1, True)
+	End If
+	KillShellExtensionHosts = result
+End Function
 
 Sub RegisterShellExtension(flags)
 	Dim verb
@@ -347,6 +354,7 @@ Sub RegisterShellExtension(flags)
 End Sub
 
 Sub WriteExecutablePath(root)
+	' This still goes to WinMerge rather than WinMurge key because 3rd parties expect it there
 	sh.RegWrite root & "\Software\Thingamahoochie\WinMerge\Executable", sProgFolder & "\WinMergeU.exe"
 	Select Case sha.GetSystemInformation("ProcessorArchitecture")
 	Case PROCESSOR_ARCHITECTURE_IA64, PROCESSOR_ARCHITECTURE_AMD64
@@ -491,6 +499,12 @@ Sub Apply
 	If PortableMedia.checked Then
 		fso.CreateTextFile sProgFolder & "\WinMergeU.json"
 	Else
+		' If not yet existing, create WinMurge key as a copy of existing WinMerge key
+		On Error Resume Next
+		sh.RegRead "HKCU\Software\Thingamahoochie\WinMurge\"
+		If Err.Number <> 0 Then sh.Run """%windir%\system32\reg.exe"" copy HKCU\Software\Thingamahoochie\WinMerge HKCU\Software\Thingamahoochie\WinMurge /f /s", 0, True
+		On Error GoTo 0
+		' Create shortcuts
 		For Each element In shortcuts.getElementsByTagName("INPUT")
 			If element.defaultChecked Or maintenance.disabled Then
 				If element.checked Then
@@ -536,7 +550,6 @@ Sub Apply
 				"!!>    CHANGES TO THE PREVIOUS INSTALLATION" & vbLf &_
 				"!!>    AND WANT TO KEEP THEM FOR REFERENCE!",_
 				vbYesNo Or vbExclamation, document.title) = vbYes Then
-			KillShellExtensionHosts
 			On Error Resume Next
 			fso.DeleteFolder sMoveFolder, True
 			On Error GoTo 0
