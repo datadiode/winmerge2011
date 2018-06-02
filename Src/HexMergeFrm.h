@@ -39,6 +39,7 @@ class CHexMergeFrame
 public:
 	CHexMergeFrame(CMainFrame *, CDirFrame * = NULL);
 	void RecalcBytesPerLine();
+	void RefreshOptions();
 	void UpdateResources();
 	BOOL PreTranslateMessage(MSG *);
 	void UpdateEditCmdUI();

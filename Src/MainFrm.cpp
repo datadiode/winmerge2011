@@ -1441,6 +1441,7 @@ void CMainFrame::OnOptions()
 				static_cast<CChildFrame *>(pDocFrame)->FlushAndRescan(TRUE);
 				break;
 			case FRAME_BINARY:
+				static_cast<CHexMergeFrame *>(pDocFrame)->RefreshOptions();
 				static_cast<CHexMergeFrame *>(pDocFrame)->RecalcBytesPerLine();
 				break;
 			case FRAME_FOLDER:

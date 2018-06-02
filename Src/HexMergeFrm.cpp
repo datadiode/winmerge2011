@@ -99,18 +99,11 @@ static void Customize(IHexEditorWindow::Colors *colors)
 	colors->iDiffBkColorValue = COptionsMgr::Get(OPT_CLR_DIFF);
 	colors->iSelDiffBkColorValue = COptionsMgr::Get(OPT_CLR_SELECTED_DIFF);
 	colors->iDiffTextColorValue = COptionsMgr::Get(OPT_CLR_DIFF_TEXT);
+	if (colors->iDiffTextColorValue == CLR_NONE)
+		colors->iDiffTextColorValue = colors->iTextColorValue;
 	colors->iSelDiffTextColorValue = COptionsMgr::Get(OPT_CLR_SELECTED_DIFF_TEXT);
-}
-
-/**
- * @brief Customize a heksedit control's settings and colors
- */
-static void Customize(IHexEditorWindow *pif)
-{
-	Customize(pif->get_settings());
-	Customize(pif->get_colors());
-	LANGID wLangID = (LANGID)GetThreadLocale();
-	pif->load_lang(wLangID);
+	if (colors->iSelDiffTextColorValue == CLR_NONE)
+		colors->iSelDiffTextColorValue = colors->iTextColorValue;
 }
 
 /**
@@ -198,8 +191,10 @@ void CHexMergeFrame::CreateClient()
 	pifRight->share_undorecords(pifLeft->share_undorecords(NULL));
 
 	// adjust a few settings and colors
-	Customize(pifLeft);
-	Customize(pifRight);
+	Customize(pifLeft->get_settings());
+	Customize(pifRight->get_settings());
+	RefreshOptions();
+	UpdateResources();
 }
 
 /**
@@ -213,10 +208,22 @@ void CHexMergeFrame::SetLastCompareResult(int nResult)
 }
 
 /**
+ * @brief Refresh cached options.
+ */
+void CHexMergeFrame::RefreshOptions()
+{
+	Customize(m_pView[0]->GetInterface()->get_colors());
+	Customize(m_pView[1]->GetInterface()->get_colors());
+}
+
+/**
  * @brief Update any resources necessary after a GUI language change
  */
 void CHexMergeFrame::UpdateResources()
 {
+	LANGID wLangID = static_cast<LANGID>(GetThreadLocale());
+	m_pView[0]->GetInterface()->load_lang(wLangID);
+	m_pView[1]->GetInterface()->load_lang(wLangID);
 }
 
 void CHexMergeFrame::UpdateEditCmdUI()
