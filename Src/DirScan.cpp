@@ -319,7 +319,8 @@ void CDiffContext::DirScan_CompareItems()
 		{
 			EnterCriticalSection(&m_csCompareThread);
 			UINT code = parent->diffcode;
-			if ((code & DIFFCODE::COMPAREFLAGS) > (flag & DIFFCODE::COMPAREFLAGS))
+			if ((code & DIFFCODE::SIDEFLAGS) != DIFFCODE::BOTH ||
+				(code & DIFFCODE::COMPAREFLAGS) > (flag & DIFFCODE::COMPAREFLAGS))
 			{
 				mask &= ~DIFFCODE::COMPAREFLAGS;
 				flag &= ~DIFFCODE::COMPAREFLAGS;
@@ -397,7 +398,8 @@ void CDiffContext::DirScan_CompareRequestedItems()
 		{
 			EnterCriticalSection(&m_csCompareThread);
 			UINT code = parent->diffcode;
-			if ((code & DIFFCODE::COMPAREFLAGS) > (flag & DIFFCODE::COMPAREFLAGS))
+			if ((code & DIFFCODE::SIDEFLAGS) != DIFFCODE::BOTH ||
+				(code & DIFFCODE::COMPAREFLAGS) > (flag & DIFFCODE::COMPAREFLAGS))
 			{
 				mask &= ~DIFFCODE::COMPAREFLAGS;
 				flag &= ~DIFFCODE::COMPAREFLAGS;
