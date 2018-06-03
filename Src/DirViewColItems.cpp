@@ -477,7 +477,7 @@ static int ColStatusSort(const CDiffContext *, const void *p, const void *q)
 {
 	const DIFFITEM &ldi = *static_cast<const DIFFITEM *>(p);
 	const DIFFITEM &rdi = *static_cast<const DIFFITEM *>(q);
-	return cmp(rdi.diffcode, ldi.diffcode);
+	return cmp(rdi.diffcode & 0xFFFFF, ldi.diffcode & 0xFFFFF);
 }
 
 /**
