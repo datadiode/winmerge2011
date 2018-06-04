@@ -22,7 +22,7 @@
 
 ;    3. This notice may not be removed or altered from any source distribution.
 
-!define version "0.2011.007.347"
+!define version "0.2011.008.226"
 !define srcdir "..\Build\WinMerge\Win32\Release"
 !define setup "..\Build\WinMerge\Win32\WinMerge_${version}_wine_setup.exe"
 
@@ -126,16 +126,17 @@ Section "Windows Script 5.6 (separate EULA)"
 
 	IfFileExists "$SYSDIR\winecfg.exe" 0 EndInstallScript56
 
-		IfFileExists "${script56}\setup.exe" EndDownloadScript56
+		StrCpy $7 ${script56hash} 7
+		IfFileExists "${script56}\setup-$7.exe" EndDownloadScript56
 			CreateDirectory "${script56}"
-			InetLoad::load /POPUP "Windows Script 5.6" "${script56url}" "${script56}\setup.exe"
+			InetLoad::load /POPUP "Windows Script 5.6" "${script56url}" "${script56}\setup-$7.exe"
 		EndDownloadScript56:
 
 		; verify the SHA2 hash of the file
-		Crypto::HashFile "SHA2" "${script56}\setup.exe"
+		Crypto::HashFile "SHA2" "${script56}\setup-$7.exe"
 		Pop $0
 		StrCmp $0 ${script56hash} +2
-		Abort "${script56}\setup.exe is corrupt"
+		Abort "${script56}\setup-$7.exe is corrupt"
 
 		ExecWait '"${script56}\setup.exe" /C /T:"${script56}"'
 
