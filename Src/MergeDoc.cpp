@@ -2215,7 +2215,7 @@ void CChildFrame::OnToolsCompareSelection()
  */
 void CChildFrame::OnToolsGenerateReport()
 {
-	String s;
+	String s = COptionsMgr::Get(OPT_REPORT_MRU);
 	if (!SelectFile(m_pMDIFrame->m_hWnd, s, IDS_SAVE_AS_TITLE, IDS_HTML_REPORT_FILES, FALSE, _T("htm")))
 		return;
 	// create HTML report
@@ -2226,6 +2226,7 @@ void CChildFrame::OnToolsGenerateReport()
 		LanguageSelect.MsgBox(IDS_REPORT_ERROR, errMsg.c_str(), MB_ICONSTOP);
 		return;
 	}
+	COptionsMgr::SaveOption(OPT_REPORT_MRU, s);
 	WriteReport(file);
 	LanguageSelect.MsgBox(IDS_REPORT_SUCCESS, MB_ICONINFORMATION);
 }

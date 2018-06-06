@@ -304,6 +304,8 @@ extern COptionDef
 <String> OPT_ARCHIVE_MRU operator((_T("Files/ArchiveMRU"), _T("")));
 extern COptionDef
 <String> OPT_CONFLICT_MRU operator((_T("Files/ConflictMRU"), _T("")));
+extern COptionDef
+<String> OPT_REPORT_MRU operator((_T("Files/ReportMRU"), _T("")));
 
 // Startup options
 extern COptionDef
