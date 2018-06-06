@@ -1432,7 +1432,12 @@ void CCrystalTextView::MergeTextBlocks(TextBlock::Array &pBuf1, TextBlock::Array
 				pMergedBuf[k].m_nBgColorIndex = pBuf2[j].m_nBgColorIndex;
 			j++;
 		}
-		k++;
+		if (k == 0 ||
+			pMergedBuf[k].m_nColorIndex != pMergedBuf[k - 1].m_nColorIndex ||
+			pMergedBuf[k].m_nBgColorIndex != pMergedBuf[k - 1].m_nBgColorIndex)
+		{
+			++k;
+		}
 	}
 	pMergedBuf.m_nActualItems = k;
 	pMergedBuf.swap(pBuf1);
