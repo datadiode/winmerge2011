@@ -1556,7 +1556,7 @@ static String EscapeHTML(LPCTSTR pch, int nScreenChars)
  */
 void CCrystalTextView::GetHTMLStyles(String &strStyles)
 {
-	static const int arColorIndices[] = {
+	static int const arColorIndices[] = {
 		COLORINDEX_NORMALTEXT,
 		COLORINDEX_SELTEXT,
 		COLORINDEX_KEYWORD,
@@ -1570,8 +1570,9 @@ void CCrystalTextView::GetHTMLStyles(String &strStyles)
 		COLORINDEX_HIGHLIGHTTEXT2,
 		COLORINDEX_USER1,
 		COLORINDEX_USER2,
+		COLORINDEX_USER3,
 	};
-	static const int arBgColorIndices[] = {
+	static int const arBgColorIndices[] = {
 		COLORINDEX_BKGND,
 		COLORINDEX_SELBKGND,
 		COLORINDEX_HIGHLIGHTBKGND1,
