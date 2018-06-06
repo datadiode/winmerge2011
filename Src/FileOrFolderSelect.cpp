@@ -43,11 +43,12 @@ static LPCWSTR SetDefExt(String &path, LPCWSTR filter)
 	while (*filter)
 	{
 		filter += lstrlenW(filter) + 1;
-		if (LPCWSTR p = EatPrefix(filter, L"*."))
+		// Search from end to start to catch the last of multiple patterns
+		if (LPCWSTR p = StrRStrI(filter, NULL, L"*."))
 		{
-			if (d == String::npos || lstrcmpiW(p, path.c_str() + d + 1) == 0)
+			if (d == String::npos || lstrcmpiW(p + 2, path.c_str() + d + 1) == 0)
 			{
-				defext = p;
+				defext = p + 2;
 				path.resize(n);
 				break;
 			}

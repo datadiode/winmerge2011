@@ -369,9 +369,9 @@ BOOL ExplorerDlg::OnInitDialog()
 			int i = m_pCbFilter->AddString(filter);
 			filter += lstrlenW(filter) + 1;
 			m_pCbFilter->SetItemData(i, reinterpret_cast<UINT_PTR>(filter));
-			if (LPCWSTR p = EatPrefix(filter, L"*."))
-				if (m_defext == p)
-					nCurSel = i;
+			// Search from end to start to catch the last of multiple patterns
+			if (m_defext == StrRStrI(filter, NULL, L"*.") + 2)
+				nCurSel = i;
 			filter += lstrlenW(filter) + 1;
 		}
 
@@ -1105,8 +1105,9 @@ void ExplorerDlg::RefreshListView()
 	if (nCurSel != -1)
 	{
 		filter = reinterpret_cast<LPCWSTR>(m_pCbFilter->GetItemData(nCurSel));
-		if (m_defext)
-			m_defext = EatPrefix(filter, L"*.");
+		// Search from end to start to catch the last of multiple patterns
+		if (m_defext && (m_defext = StrRStrI(filter, NULL, L"*.")) != NULL)
+			m_defext += 2;
 	}
 	else
 	{
