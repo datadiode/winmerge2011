@@ -19,7 +19,7 @@ const TCHAR DocsURL[] = _T("http://manual.winmerge.org/index.html");
 const TCHAR TranslationsUrl[] = _T("http://winmerge.org/translations/");
 
 /** @brief URL of the GPL license. */
-const TCHAR LicenceUrl[] = _T("http://www.gnu.org/licenses/gpl-2.0.html");
+const TCHAR LicenceUrl[] = _T("http://www.gnu.org/licenses/gpl-3.0.html");
 
 /** @brief WinMerge download page URL. */
 const TCHAR DownloadUrl[] = _T("http://winmerge.org/downloads/");
