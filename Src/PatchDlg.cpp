@@ -36,7 +36,7 @@
 /////////////////////////////////////////////////////////////////////////////
 // CPatchDlg dialog
 
-/** 
+/**
  * @brief Constructor, initializes members.
  */
 CPatchDlg::CPatchDlg()
@@ -50,6 +50,8 @@ bool CPatchDlg::UpdateData()
 	DDX_Check<op>(IDC_DIFF_IGNORECASE, m_ignoreCase);
 	DDX_Check<op>(IDC_DIFF_IGNORE_BLANK_LINES, m_ignoreBlankLines);
 	DDX_Check<op>(IDC_DIFF_APPLY_LINE_FILTERS, m_applyLineFilters);
+	DDX_Check<op>(IDC_DIFF_WS_IGNORE_TAB_EXPANSION, m_ignoreTabExpansion);
+	DDX_Check<op>(IDC_DIFF_WS_IGNORE_TRAILING_SPACE, m_ignoreTrailingSpace);
 	DDX_Check<op>(IDC_DIFF_WHITESPACE_COMPARE, m_whitespaceCompare, WHITESPACE_COMPARE_ALL);
 	DDX_Check<op>(IDC_DIFF_WHITESPACE_IGNORE, m_whitespaceCompare, WHITESPACE_IGNORE_CHANGE);
 	DDX_Check<op>(IDC_DIFF_WHITESPACE_IGNOREALL, m_whitespaceCompare, WHITESPACE_IGNORE_ALL);
@@ -104,6 +106,10 @@ LRESULT CPatchDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		case MAKEWPARAM(IDC_DIFF_STYLE, CBN_SELCHANGE):
 			OnSelchangeDiffStyle();
 			break;
+		case MAKEWPARAM(IDC_DIFF_WS_IGNORE_TAB_EXPANSION, BN_CLICKED):
+		case MAKEWPARAM(IDC_DIFF_WS_IGNORE_TRAILING_SPACE, BN_CLICKED):
+			OnCheckWhiteSpace();
+			break;
 		case MAKEWPARAM(IDC_DIFF_FILE1, CBN_DROPDOWN):
 		case MAKEWPARAM(IDC_DIFF_FILE2, CBN_DROPDOWN):
 		case MAKEWPARAM(IDC_DIFF_CONTEXT, CBN_DROPDOWN):
@@ -133,7 +139,7 @@ LRESULT CPatchDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 /////////////////////////////////////////////////////////////////////////////
 // CPatchDlg message handlers
 
-/** 
+/**
  * @brief Called when dialog is closed with OK.
  * Check options and filenames given and close the dialog.
  */
@@ -190,6 +196,8 @@ void CPatchDlg::OnOK()
 
 	m_contextLines = GetDlgItemInt(IDC_DIFF_CONTEXT);
 
+	m_whitespaceCompare |= (m_ignoreTabExpansion ? 4 : 0) | (m_ignoreTrailingSpace ? 8 : 0);
+
 	SaveSettings();
 
 	// Save combobox history
@@ -205,7 +213,7 @@ void CPatchDlg::OnOK()
 	EndDialog(selectCount > 0 ? IDOK : IDCANCEL);
 }
 
-/** 
+/**
  * @brief Initialise dialog data.
  *
  * There are two cases for filename editboxes:
@@ -395,33 +403,31 @@ void CPatchDlg::OnSelchangeResultCombo()
 	}
 }
 
-/** 
+/**
  * @brief Called when diff style dropdown selection is changed.
- * Called when diff style dropdown selection is changed.
  * If the new selection is context patch or unified patch format then
  * enable context lines selection control. Otherwise context lines selection
  * is disabled.
  */
 void CPatchDlg::OnSelchangeDiffStyle()
 {
-	int selection = m_pCbStyle->GetCurSel();
-	// Only context and unified formats allow context lines
-	if ((selection == OUTPUT_CONTEXT) ||
-			(selection == OUTPUT_UNIFIED))
-	{
-		m_pCbContext->EnableWindow(TRUE);
-		// 3 lines is default context for Difftools too
-		m_pCbContext->SetCurSel(2);
-	}
-	else
-	{
-		m_contextLines = 0;
-		m_pCbContext->SetCurSel(0);
-		m_pCbContext->EnableWindow(FALSE);
-	}
+	int const style = m_pCbStyle->GetCurSel();
+	m_pCbContext->EnableWindow(style == OUTPUT_CONTEXT || style == OUTPUT_UNIFIED);
 }
 
-/** 
+/**
+ * @brief Called when any of the whitespace check options is changed.
+ * When using any of the whitespace check options, the radio options are N/A.
+ */
+void CPatchDlg::OnCheckWhiteSpace()
+{
+	BOOL const enable = !(m_ignoreTabExpansion || m_ignoreTrailingSpace);
+	GetDlgItem(IDC_DIFF_WHITESPACE_COMPARE)->EnableWindow(enable);
+	GetDlgItem(IDC_DIFF_WHITESPACE_IGNORE)->EnableWindow(enable);
+	GetDlgItem(IDC_DIFF_WHITESPACE_IGNOREALL)->EnableWindow(enable);
+}
+
+/**
  * @brief Swap filenames on file1 and file2.
  */
 void CPatchDlg::OnDiffSwapFiles()
@@ -438,7 +444,7 @@ void CPatchDlg::OnDiffSwapFiles()
 	}
 }
 
-/** 
+/**
  * @brief Add patch item to internal list.
  * @param [in] pf Patch item to add.
  */
@@ -447,7 +453,7 @@ void CPatchDlg::AddItem(const PATCHFILES& pf)
 	m_fileList.push_back(pf);
 }
 
-/** 
+/**
  * @brief Returns amount of patch items in the internal list.
  * @return Count of patch items in the list.
  */
@@ -456,7 +462,7 @@ int CPatchDlg::GetItemCount()
 	return m_fileList.size();
 }
 
-/** 
+/**
  * @brief Return item in the internal list at given position
  * @param [in] position Zero-based index of item to get
  * @return PATCHFILES from given position.
@@ -466,7 +472,7 @@ const PATCHFILES& CPatchDlg::GetItemAt(int position)
 	return m_fileList.at(position);
 }
 
-/** 
+/**
  * @brief Empties internal item list.
  */
 void CPatchDlg::ClearItems()
@@ -474,52 +480,49 @@ void CPatchDlg::ClearItems()
 	m_fileList.clear();
 }
 
-/** 
+/**
  * @brief Updates patch dialog settings from member variables.
  */
 void CPatchDlg::UpdateSettings()
 {
+	// Check value ranges
+	if (m_outputStyle < OUTPUT_NORMAL || m_outputStyle > OUTPUT_UNIFIED)
+		m_outputStyle = OUTPUT_NORMAL;
+	if (m_contextLines < 0 || m_contextLines > 50)
+		m_contextLines = 3;
+	m_ignoreTabExpansion = (m_whitespaceCompare & 4) != 0;
+	m_ignoreTrailingSpace = (m_whitespaceCompare & 8) != 0;
+	m_whitespaceCompare &= 3;
+	if (m_whitespaceCompare > WHITESPACE_IGNORE_ALL)
+		m_whitespaceCompare = WHITESPACE_COMPARE_ALL;
+	// Update dialog controls with values
 	UpdateData<Set>();
 	m_pCbStyle->SetCurSel(m_outputStyle);
+	OnSelchangeDiffStyle();
 	m_pCbContext->SelectString(-1, NumToStr(m_contextLines).c_str());
-	m_pCbContext->EnableWindow(
-		m_outputStyle == OUTPUT_CONTEXT || m_outputStyle == OUTPUT_UNIFIED);
+	OnCheckWhiteSpace();
 }
 
-/** 
+/**
  * @brief Loads patch dialog settings from registry.
  */
 void CPatchDlg::LoadSettings()
 {
 	if (CRegKeyEx key = SettingStore.GetSectionKey(_T("PatchCreator")))
 	{
-		int patchStyle = key.ReadDword(_T("PatchStyle"), 0);
-		if (patchStyle < OUTPUT_NORMAL || patchStyle > OUTPUT_UNIFIED)
-			patchStyle = OUTPUT_NORMAL;
-		m_outputStyle = (enum output_style) patchStyle;
-		
+		m_outputStyle = (enum output_style) key.ReadDword(_T("PatchStyle"), 0);
 		m_contextLines = key.ReadDword(_T("ContextLines"), 0);
-		if (m_contextLines < 0 || m_contextLines > 50)
-			m_contextLines = 0;
-
 		m_ignoreCase = key.ReadDword(_T("IgnoreCase"), FALSE);
 		m_ignoreBlankLines = key.ReadDword(_T("IgnoreBlankLines"), FALSE);
 		m_applyLineFilters = key.ReadDword(_T("ApplyLineFilters"), FALSE);
-		
 		m_whitespaceCompare = key.ReadDword(_T("Whitespace"), WHITESPACE_COMPARE_ALL);
-		if (m_whitespaceCompare < WHITESPACE_COMPARE_ALL ||
-			m_whitespaceCompare > WHITESPACE_IGNORE_ALL)
-		{
-			m_whitespaceCompare = WHITESPACE_COMPARE_ALL;
-		}
-		
 		m_openToEditor = key.ReadDword(_T("OpenToEditor"), FALSE);
 		m_includeCmdLine = key.ReadDword(_T("IncludeCmdLine"), FALSE);
 	}
 	UpdateSettings();
 }
 
-/** 
+/**
  * @brief Saves patch dialog settings to registry.
  */
 void CPatchDlg::SaveSettings()
@@ -537,13 +540,13 @@ void CPatchDlg::SaveSettings()
 	}
 }
 
-/** 
+/**
  * @brief Resets patch dialog settings to defaults.
  */
 void CPatchDlg::OnDefaultSettings()
 {
 	m_outputStyle = OUTPUT_UNIFIED;
-	m_contextLines = 5;
+	m_contextLines = 3; // 3 lines is default context for Difftools too
 	m_ignoreCase = FALSE;
 	m_ignoreBlankLines = FALSE;
 	m_applyLineFilters = FALSE;

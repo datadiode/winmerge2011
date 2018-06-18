@@ -105,12 +105,10 @@ CLanguageSelect LanguageSelect;
 
 /**
  * @brief custom new handler
- * extern "C" so it can be invoked from diffutils/src/util.c.
  */
-extern "C" int NewHandler(size_t)
+void die(...)
 {
 	OException::Throw(ERROR_OUTOFMEMORY);
-	return 0;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -122,7 +120,7 @@ CMergeApp::CMergeApp()
 , m_bNonInteractive(false)
 , m_nActiveOperations(0)
 {
-	_set_new_handler(NewHandler);
+	_set_new_handler(reinterpret_cast<_PNH>(die));
 }
 
 CMergeApp::~CMergeApp()

@@ -27,7 +27,12 @@ public:
 	BOOL    m_bIgnoreEol;
 	BOOL    m_bIgnoreCase;
 	BOOL    m_bIgnoreBlankLines;
+	BOOL    m_bIgnoreTabExpansion;
+	BOOL    m_bIgnoreTrailingSpace;
 	int     m_nIgnoreWhite;
+	BOOL    m_bMinimal;
+	BOOL    m_bSpeedLargeFiles;
+	BOOL    m_bApplyHistoricCostLimit;
 	BOOL    m_bMovedBlocks;
 	BOOL    m_bMatchSimilarLines;
 	int     m_nMatchSimilarLinesMax;

@@ -48,6 +48,11 @@
 #include stl(functional)
 #include stl(sort)
 
+// Avoid noise from redefinition of EASTL's {U}INT{8|16|32|64}_{MIN|MAX}
+#pragma warning(disable: 4005)
+#include <intsafe.h>
+#pragma warning(default: 4005)
+
 // H2O headers
 #include <H2O.h>
 #include <H2O2.h>

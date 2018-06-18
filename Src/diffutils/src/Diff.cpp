@@ -1,46 +1,55 @@
 /////////////////////////////////////////////////////////////////////////////
-//    WinMerge:  an interactive diff/merge utility
-//    Copyright (C) 1997-2000  Thingamahoochie Software
-//    Author: Dean Grimm
-
-/* GNU DIFF main routine.
-   Copyright (C) 1988, 1989, 1992, 1993 Free Software Foundation, Inc.
-
-This file is part of GNU DIFF.
-
-GNU DIFF is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2, or (at your option)
-any later version.
-
-GNU DIFF is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with GNU DIFF; see the file COPYING.  If not, write to
-the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.  */
-
-/* GNU DIFF was written by Mike Haertel, David Hayes,
-   Richard Stallman, Len Tower, and Paul Eggert.  */
-
+//    License (GPLv3+):
+//    This program is free software; you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation; either version 3 of the License, or (at
+//    your option) any later version.
+//    
+//    This program is distributed in the hope that it will be useful, but
+//    WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+/////////////////////////////////////////////////////////////////////////////
 #include "stdafx.h"
 #define GDIFF_MAIN
-#include "diff.h" 
-#include "io.h"
-#include "diffwrapper.h"
-
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#endif
-
-#ifndef DEFAULT_WIDTH
-#define DEFAULT_WIDTH 130
-#endif
-
-#ifndef GUTTER_WIDTH_MINIMUM
-#define GUTTER_WIDTH_MINIMUM 3
-#endif
+#include <diff.h>
+#include <xalloc.h>
 
 const char allocated_buffer_name[] = "<allocated_buffer>";
+
+/* malloc a block of memory, with fatal error message if we can't do it. */
+
+void *
+xmalloc (size_t size)
+{
+  register void *value;
+
+  if (size == 0)
+    size = 1;
+
+  value = malloc (size);
+
+  if (!value)
+    xalloc_die ();
+  return value;
+}
+
+/* realloc a block of memory, with fatal error message if we can't do it. */
+
+void *
+xrealloc (void *old, size_t size)
+{
+  register void *value;
+
+  if (size == 0)
+    size = 1;
+
+  value = realloc (old, size);
+
+  if (!value)
+    xalloc_die ();
+  return value;
+}

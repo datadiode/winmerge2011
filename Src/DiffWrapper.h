@@ -178,8 +178,8 @@ public:
 	DIFFSTATUS m_status; /**< Status of last compare */
 
 protected:
-	String FormatSwitchString();
-	bool Diff2Files(struct change **, file_data *inf, int *bin_status, int *bin_file);
+	void FormatSwitchString(char *);
+	bool Diff2Files(struct change **, struct comparison *cmp, int *bin_status, int *bin_file);
 	bool LoadWinMergeDiffsFromDiffUtilsScript(struct change *, const file_data *);
 	void WritePatchFile(struct change *script, file_data *inf);
 	int RegExpFilter(int StartPos, int EndPos, int FileNo, bool BreakCondition);

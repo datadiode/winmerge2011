@@ -246,6 +246,12 @@ extern COptionDef
 extern COptionDef
 <bool> OPT_CMP_IGNORE_EOL operator((_T("Settings/IgnoreEol"), false));
 extern COptionDef
+<bool> OPT_CMP_MINIMAL operator((_T("Settings/Minimal"), false));
+extern COptionDef
+<bool> OPT_CMP_SPEED_LARGE_FILES operator((_T("Settings/SpeedLargeFiles"), true));
+extern COptionDef
+<bool> OPT_CMP_APPLY_HISTORIC_COST_LIMIT operator((_T("Settings/ApplyHistoricCostLimit"), false));
+extern COptionDef
 <int> OPT_CMP_METHOD operator((_T("Settings/CompMethod"), CMP_CONTENT));
 extern COptionDef
 <bool> OPT_CMP_MOVED_BLOCKS operator((_T("Settings/MovedBlocks"), false));

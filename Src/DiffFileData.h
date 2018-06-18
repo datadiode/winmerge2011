@@ -7,13 +7,12 @@
  */
 #pragma once
 
-// forward declarations needed by DiffFileData
-struct file_data;
+#include "Diff.h"
 
 /**
  * @brief C++ container for the structure (file_data) used by diffutils' diff_2_files(...)
  */
-struct DiffFileData
+struct DiffFileData : comparison
 {
 // instance interface
 
@@ -28,7 +27,6 @@ struct DiffFileData
 	void SetDisplayFilepaths(LPCTSTR szTrueFilepath1, LPCTSTR szTrueFilepath2);
 
 // Data (public)
-	file_data *const m_inf;
 	bool m_used; // whether m_inf has real data
 	std::vector<FileLocation> m_FileLocation;
 	std::vector<FileTextStats> m_textStats;

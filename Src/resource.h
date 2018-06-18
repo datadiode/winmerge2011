@@ -190,6 +190,9 @@
 #define IDC_TRIVIAL_DIFF_DELETED_COLOR          1054
 #define IDC_UP                                  1055
 #define IDC_DOWN                                1056
+#define IDC_DIFF_MINIMAL                        1057
+#define IDC_DIFF_SPEED_LARGE_FILES              1058
+#define IDC_DIFF_APPLY_HISTORIC_COST_LIMIT      1059
 #define IDC_PRIVATEBUILD                        1062
 #define IDC_MIXED_EOL                           1063
 #define IDC_DIFF_FILE1                          1064
@@ -197,6 +200,8 @@
 #define IDC_DIFF_FILERESULT                     1066
 #define IDC_DIFF_STYLE                          1067
 #define IDC_DIFF_CONTEXT                        1068
+#define IDC_DIFF_WS_IGNORE_TAB_EXPANSION        1069
+#define IDC_DIFF_WS_IGNORE_TRAILING_SPACE       1070
 #define IDC_DIFF_WHITESPACE_COMPARE             1071
 #define IDC_DIFF_WHITESPACE_IGNORE              1072
 #define IDC_DIFF_WHITESPACE_IGNOREALL           1073

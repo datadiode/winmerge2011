@@ -53,6 +53,8 @@ public:
 	String	m_fileResult;
 	BOOL m_ignoreBlankLines;
 	BOOL m_applyLineFilters;
+	BOOL m_ignoreTabExpansion;
+	BOOL m_ignoreTrailingSpace;
 	int m_whitespaceCompare;
 	BOOL m_appendFile;
 	BOOL m_openToEditor;
@@ -90,7 +92,7 @@ protected:
 	void OnSelchangeFile2Combo();
 	void OnSelchangeResultCombo();
 	void OnSelchangeDiffStyle();
+	void OnCheckWhiteSpace();
 	void OnDiffSwapFiles();
 	void OnDefaultSettings();
-
 };

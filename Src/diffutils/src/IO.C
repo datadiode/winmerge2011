@@ -1,363 +1,359 @@
 /* File I/O for GNU DIFF.
-   Copyright (C) 1988, 1989, 1992, 1993 Free Software Foundation, Inc.
 
-This file is part of GNU DIFF.
+   Copyright (C) 1988-1989, 1992-1995, 1998, 2001-2002, 2004, 2006, 2009-2013,
+   2015-2017 Free Software Foundation, Inc.
 
-GNU DIFF is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2, or (at your option)
-any later version.
+   This file is part of GNU DIFF.
 
-GNU DIFF is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-You should have received a copy of the GNU General Public License
-along with GNU DIFF; see the file COPYING.  If not, write to
-the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.  */
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "diff.h"
+#include <cmpbuf.h>
+#include <xalloc.h>
 
-/* Rotate a value n bits to the left. */
-#define UINT_BIT (sizeof (unsigned) * CHAR_BIT)
-#define ROL(v, n) ((v) << (n) | (v) >> (UINT_BIT - (n)))
+/* Rotate an unsigned value to the left.  */
+#define ROL(v, n) ((v) << (n) | (v) >> (sizeof (v) * CHAR_BIT - (n)))
 
-/* Given a hash value and a new character, return a new hash value. */
+/* Given a hash value and a new character, return a new hash value.  */
 #define HASH(h, c) ((c) + ROL (h, 7))
+
+/* The type of a hash value.  */
+typedef unsigned hash_value;
+verify (! TYPE_SIGNED (hash_value));
 
-/* Guess remaining number of lines from number N of lines so far,
-   size S so far, and total size T.  */
-#define GUESS_LINES(n,s,t) (((t) - (s)) / ((n) < 10 ? 32 : (s) / ((n)-1)) + 5)
+#include <common/unicoder.h> /* DetermineEncoding() */
 
-/* Type used for fast prefix comparison in find_identical_ends.  */
-typedef unsigned word;
+size_t apply_prediffer (struct file_data *current, short side, char *buffer, size_t length);
 
-#define EXTERN_C
-#include <common/unicoder.h> // DetermineEncoding()
-
-size_t apply_prediffer(struct file_data *current, short side, char *buffer, size_t length);
-
-/* Lines are put into equivalence classes (of lines that match in line_cmp).
+/* Lines are put into equivalence classes of lines that match in lines_differ.
    Each equivalence class is represented by one of these structures,
    but only while the classes are being computed.
    Afterward, each class is represented by a number.  */
 struct equivclass
 {
-  int next;	/* Next item in this bucket. */
-  unsigned hash;	/* Hash of lines in this class.  */
-  char const HUGE *line;	/* A line that fits this class. */
-  size_t length;	/* The length of that line.  */
+  lin next;		/* Next item in this bucket.  */
+  hash_value hash;	/* Hash of lines in this class.  */
+  char const *line;	/* A line that fits this class.  */
+  size_t length;	/* That line's length, not counting its newline.  */
 };
 
 /* Hash-table: array of buckets, each being a chain of equivalence classes.  */
 static THREAD_LOCAL int *buckets;
-  
+
 /* Number of buckets in the hash table array. */
 static THREAD_LOCAL int nbuckets;
 
 /* Array in which the equivalence classes are allocated.
    The bucket-chains go through the elements in this array.
    The number of an equivalence class is its index in this array.  */
-static THREAD_LOCAL struct equivclass HUGE *equivs;
+static THREAD_LOCAL struct equivclass *equivs;
 
-/* Index of first free element in the array `equivs'.  */
-static THREAD_LOCAL int equivs_index;
+/* Index of first free element in the array 'equivs'.  */
+static THREAD_LOCAL lin equivs_index;
 
-/* Number of elements allocated in the array `equivs'.  */
-static THREAD_LOCAL int equivs_alloc;
+/* Number of elements allocated in the array 'equivs'.  */
+static THREAD_LOCAL lin equivs_alloc;
 
-static void find_and_hash_each_line PARAMS((struct file_data *));
-static void find_identical_ends PARAMS((struct file_data[]));
-static char *prepare_text_end PARAMS((struct file_data *, short));
-static enum UNICODESET get_unicode_signature(struct file_data *, unsigned *bom);
+static UNICODESET get_unicode_signature (struct file_data *, unsigned *bom);
 
 /* Check for binary files and compare them for exact identity.  */
 
 /* Return 1 if BUF contains a non text character.
    SIZE is the number of characters in BUF.  */
 
-#define binary_file_p(buf, size) (size != 0 && memchr (buf, '\0', size) != 0)
+#define binary_file_p(buf, size) (memchr (buf, 0, size) != 0)
 
 /** @brief Get unicode signature from file_data. */
-static enum UNICODESET get_unicode_signature(struct file_data *current, unsigned *bom)
+static UNICODESET get_unicode_signature (struct file_data *current, unsigned *bom)
 {
   unsigned dummy = 0;
   /* Prevent bogus BOMs from crashing in-place transcoding upon Rescan(). */
   if (current->name == allocated_buffer_name &&
-      current->buffered_chars + sizeof(word) + 1 == current->bufsize)
+      current->buffered + sizeof (word) + 1 == current->bufsize)
     {
       return NONE;
     }
-  return DetermineEncoding(current->buffer, current->buffered_chars, bom ? bom : &dummy);
+  return DetermineEncoding ((unsigned char *) FILE_BUFFER (current), current->buffered, bom ? bom : &dummy);
 }
 
 /* Get ready to read the current file.
    Return nonzero if SKIP_TEST is zero,
    and if it appears to be a binary file.  */
 
-int
-sip (current, skip_test)
-     struct file_data *current;
-     int skip_test;
+static bool
+sip (struct file_data *current, bool skip_test)
 {
-  int isbinary = 0;
+  bool isbinary = false;
   /* If we have a nonexistent file at this stage, treat it as empty.  */
   if (current->name == allocated_buffer_name)
-	/* nothing to do */
-	;
+    /* nothing to do */
+    ;
   else if (current->desc < 0)
     {
       /* Leave room for a sentinel.  */
-      current->buffer = xmalloc (sizeof (word));
       current->bufsize = sizeof (word);
-      current->buffered_chars = 0;
+      current->buffer = (word *) xmalloc (current->bufsize);
+      current->buffered = 0;
     }
   else
     {
-      current->bufsize = current->buffered_chars
-        = STAT_BLOCKSIZE (current->stat);
-#ifdef __MSDOS__
-      if ((current->buffer = (char HUGE *) farmalloc (current->bufsize)) == NULL)
-         fatal ("far memory exhausted");
-#else
-      current->buffer = xmalloc (current->bufsize);
-#endif /*__MSDOS__*/
+      current->bufsize = buffer_lcm (sizeof (word),
+                                     STAT_BLOCKSIZE (current->stat),
+                                     PTRDIFF_MAX - 2 * sizeof (word));
+      current->buffer = (word *) xmalloc (current->bufsize);
+      current->buffered = 0;
 
-      if (skip_test)
-        current->buffered_chars = 0;
-      else
+      if (! skip_test)
         {
           /* Check first part of file to see if it's a binary file.  */
-          current->buffered_chars = _read (current->desc,
-            current->buffer,
-#ifdef __MSDOS__
-            (unsigned int)
-#endif /*__MSDOS__*/
-            current->buffered_chars);
-          if (current->buffered_chars == -1)
+          current->buffered = _read (current->desc,
+                                     current->buffer,
+                                     current->bufsize);
+          if (current->buffered == -1)
             pfatal_with_name (current->name);
-          if (!get_unicode_signature(current, NULL))
-            isbinary = binary_file_p(current->buffer, current->buffered_chars);
+          if (!get_unicode_signature (current, NULL))
+            isbinary = binary_file_p (current->buffer, current->buffered);
         }
     }
-  
+
   return isbinary;
 }
 
 /* Slurp the rest of the current file completely into memory.  */
 
-void
-slurp (current)
-     struct file_data *current;
+static void
+slurp (struct file_data *current)
 {
   size_t cc;
   if (current->name == allocated_buffer_name)
-	/* nothing to do */
-	;
+    /* nothing to do */
+    ;
   else if (current->desc < 0)
     /* The file is nonexistent.  */
     ;
-  else if (always_text_flag || current->buffered_chars != 0)
+  else if (current->buffered != 0)
     {
-      enum UNICODESET sig = get_unicode_signature(current, NULL);
+      UNICODESET sig = get_unicode_signature (current, NULL);
       size_t alloc_extra
-        = (1 << sig) & ((1 << UCS2LE) | (1 << UCS2BE) | (1 << UCS4LE) | (1 << UCS4BE))
-          // some flavor of non octet encoded unicode?
-          ? ~0U	// yes, allocate extra room for transcoding
-          : 0U;	// no, allocate no extra room for transcoding
+      = (1 << sig) & ((1 << UCS2LE) | (1 << UCS2BE) | (1 << UCS4LE) | (1 << UCS4BE))
+        // some flavor of non octet encoded unicode?
+        ? ~0U	// yes, allocate extra room for transcoding
+        : 0U;	// no, allocate no extra room for transcoding
 
       for (;;)
         {
-          if (current->buffered_chars == current->bufsize)
+          if (current->buffered == current->bufsize)
             {
               if (S_ISREG (current->stat.st_mode))
                 {
-              /* Get the size out of the stat block.
-                 Allocate 50% extra room for a necessary transcoding to UTF-8.
-                 Allocate enough room for appended newline and sentinel.
-                 Allocate at least one block, to prevent overrunning the buffer
-                 when comparing growing binary files. */
-                  current->bufsize = max (current->bufsize,
-                    (size_t)current->stat.st_size + (alloc_extra & (size_t)current->stat.st_size / 2) + sizeof (word) + 1);
+                  /* Get the size out of the stat block.
+                     Allocate 50% extra room for a necessary transcoding to UTF-8.
+                     Allocate enough room for appended newline and sentinel.
+                     Allocate at least one block, to prevent overrunning the buffer
+                     when comparing growing binary files. */
+                  current->bufsize = MAX (current->bufsize,
+                                          (size_t) current->stat.st_size + (alloc_extra & (size_t) current->stat.st_size / 2) + sizeof (word) + 1);
                 }
               else
                 {
-#ifdef __MSDOS__
-                  current->bufsize += 4096;
-#else
                   current->bufsize = current->bufsize * 2;
-#endif /*__MSDOS__*/
                 }
-#ifdef __MSDOS__
-              current->buffer = (char HUGE *) farrealloc (current->buffer, current->bufsize);
-#else
-              current->buffer = xrealloc (current->buffer, current->bufsize);
-#endif /*__MSDOS__*/
+              current->buffer = (word *) xrealloc (current->buffer, current->bufsize);
             }
           cc = _read (current->desc,
-          current->buffer + current->buffered_chars,
-          current->bufsize - current->buffered_chars);
+                      FILE_BUFFER (current) + current->buffered,
+                      current->bufsize - current->buffered);
           if (cc == 0)
             break;
           if (cc == -1)
             pfatal_with_name (current->name);
-          current->buffered_chars += cc;
+          current->buffered += cc;
         }
-#ifndef __MSDOS__
       /* Allocate 50% extra room for a necessary transcoding to UTF-8.
          Allocate enough room for appended newline and sentinel. */
-      current->bufsize = current->buffered_chars + (alloc_extra & current->buffered_chars / 2) + sizeof (word) + 1;
-      current->buffer = xrealloc (current->buffer, current->bufsize);
-#endif /*!__MSDOS__*/
+      current->bufsize = current->buffered + (alloc_extra & current->buffered / 2) + sizeof (word) + 1;
+      current->buffer = (word *) xrealloc (current->buffer, current->bufsize);
     }
 }
 
-static int
-ISWSPACE (char ch)
-{
-  return ch==' ' || ch=='\t';
-}
+/* Split the file into lines, simultaneously computing the equivalence
+   class for each line.  */
 
-/* Split the file into lines, simultaneously computing the equivalence class for
-   each line. */
 static void
-find_and_hash_each_line (current)
-     struct file_data *current;
+find_and_hash_each_line (struct file_data *current)
 {
-  unsigned h;
-  unsigned char const HUGE *p = (unsigned char const HUGE *) current->prefix_end;
-  unsigned char c;
-  int i, *bucket;
+  char const *p = current->prefix_end;
+  lin i, *bucket;
   size_t length;
 
   /* Cache often-used quantities in local variables to help the compiler.  */
-  char const HUGE **linbuf = current->linbuf;
-  int alloc_lines = current->alloc_lines;
-  int line = 0;
-  int linbuf_base = current->linbuf_base;
-  int *cureqs = (int *) xmalloc (alloc_lines * sizeof (int));
-  struct equivclass HUGE *eqs = equivs;
-  int eqs_index = equivs_index;
-  int eqs_alloc = equivs_alloc;
-  char const HUGE *suffix_begin = current->suffix_begin;
-  char const HUGE *bufend = current->buffer + current->buffered_chars;
-  char const HUGE *incomplete_tail
-    = current->missing_newline && ROBUST_OUTPUT_STYLE (output_style)
-      ? bufend : (char const HUGE *) 0;
-  int varies = length_varies;
+  char const **linbuf = current->linbuf;
+  lin alloc_lines = current->alloc_lines;
+  lin line = 0;
+  lin linbuf_base = current->linbuf_base;
+  lin *cureqs = (lin *) xmalloc (alloc_lines * sizeof *cureqs);
+  struct equivclass *eqs = equivs;
+  lin eqs_index = equivs_index;
+  lin eqs_alloc = equivs_alloc;
+  char const *suffix_begin = current->suffix_begin;
+  char const *bufend = FILE_BUFFER (current) + current->buffered;
+  bool ig_case = ignore_case;
+  enum DIFF_white_space ig_white_space = ignore_white_space;
+  bool diff_length_compare_anyway =
+    ig_white_space != IGNORE_NO_WHITE_SPACE;
+  bool same_length_diff_contents_compare_anyway =
+    diff_length_compare_anyway | ig_case;
+  char const eol_diff = ignore_eol_diff ? '\r' : 'r';
+  /* prepare_text put a zero word at the end of the buffer,
+     so we're not in danger of overrunning the end of the file */
 
-  /* prepare_text_end put a zero word at the end of the buffer, 
-  so we're not in danger of overrunning the end of the file */
-
-  while ((char const HUGE *) p < suffix_begin)
+  while (p < suffix_begin)
     {
-      char const HUGE *ip = (char const HUGE *) p;
+      char const *ip = p;
+      hash_value h = 0;
+      unsigned char c;
 
       /* Compute the equivalence class (hash) for this line.  */
-
-      h = 0;
-
 
       /* loops advance pointer to eol (end of line)
          respecting UNIX (\r), MS-DOS/Windows (\r\n), and MAC (\r) eols */
 
-      /* Hash this line until we find a newline. */
-      if (ignore_case_flag)
+      /* Hash this line until we find a newline.  */
+      /* Note that \r must be hashed (if !ignore_eol_diff) */
+      switch (ig_white_space)
         {
-          if (ignore_all_space_flag)
+        case IGNORE_ALL_SPACE:
+          while ((c = *p++) != '\n' && (c != '\r' || *p == '\n'))
+            if (! isspace (c) || c == eol_diff)
+              h = HASH (h, ig_case ? tolower (c) : c);
+          break;
+
+        case IGNORE_SPACE_CHANGE:
+          while ((c = *p++) != '\n' && (c != '\r' || *p == '\n'))
+            {
+              if (isspace (c) && c != eol_diff)
+                {
+                  do
+                    if ((c = *p++) == '\n')
+                      goto hashing_done;
+                  while (isspace (c));
+
+                  h = HASH (h, ' ');
+                }
+
+              /* C is now the first non-space.  */
+              h = HASH (h, ig_case ? tolower (c) : c);
+            }
+          break;
+
+        case IGNORE_TAB_EXPANSION:
+        case IGNORE_TAB_EXPANSION_AND_TRAILING_SPACE:
+        case IGNORE_TRAILING_SPACE:
+          {
+            size_t column = 0;
             while ((c = *p++) != '\n' && (c != '\r' || *p == '\n'))
               {
-                if (! ISWSPACE (c))
-                  h = HASH (h, isupper (c) ? tolower (c) : c);
-              }
-          else if (ignore_space_change_flag)
-            /* Note that \r must be hashed (if !ignore_eol_diff) */
-            while ((c = *p++) != '\n' && (c != '\r' || *p == '\n'))
-              {
-                if (ISWSPACE (c))
+                if (ig_white_space & IGNORE_TRAILING_SPACE
+                    && isspace (c) && c != eol_diff)
                   {
-                    /* skip whitespace after whitespace */
-                    while (ISWSPACE (c = *p++))
-                      ;
-                    if (c == '\n')
-                      {
-                        goto hashing_done; /* never hash trailing \n */
-                      }
-                    else if (c != '\r')
-                      {
-                  /* runs of whitespace not ending line hashed as one space */
-                        h = HASH (h, ' ');
-                      }
+                    char const *p1 = p;
+                    unsigned char c1;
+                    do
+                      if ((c1 = *p1++) == '\n' || (c1 == '\r' && *p1 != '\n'))
+                        {
+                          p = p1;
+                          goto hashing_done;
+                        }
+                    while (isspace (c1) && c1 != eol_diff);
                   }
-                /* c is now the first non-space.  */
-                /* c can be a \r (CR) if !ignore_eol_diff */
-                h = HASH (h, isupper (c) ? tolower (c) : c);
-                if (c == '\r' && *p != '\n')
-                  goto hashing_done;
-              }
-          else
-            while ((c = *p++) != '\n' && (c != '\r' || *p == '\n'))
-              {
-                h = HASH (h, isupper (c) ? tolower (c) : c);
-              }
-        }
-      else
-        {
-          if (ignore_all_space_flag)
-            while ((c = *p++) != '\n' && (c != '\r' || *p == '\n'))
-              {
-                if (! ISWSPACE (c))
+
+                size_t repetitions = 1;
+
+                if (ig_white_space & IGNORE_TAB_EXPANSION)
+                  switch (c)
+                  {
+                    case '\b':
+                      column -= 0 < column;
+                      break;
+
+                    case '\t':
+                      c = ' ';
+                      repetitions = tabsize - column % tabsize;
+                      column = (column + repetitions < column
+                                ? 0
+                                : column + repetitions);
+                      break;
+
+                    case '\r':
+                      column = 0;
+                      break;
+
+                    default:
+                      column++;
+                      break;
+                    }
+
+                if (ig_case)
+                  c = tolower (c);
+
+                do
                   h = HASH (h, c);
+                while (--repetitions != 0);
               }
-          else if (ignore_space_change_flag)
-            /* Note that \r must be hashed (if !ignore_eol_diff) */
+          }
+          break;
+
+        default:
+          if (ig_case)
             while ((c = *p++) != '\n' && (c != '\r' || *p == '\n'))
-              {
-                if (ISWSPACE (c))
-                  {
-                    /* skip whitespace after whitespace */
-                    while (ISWSPACE (c = *p++))
-                      ;
-                    if (c == '\n')
-                      {
-                        goto hashing_done; /* never hash trailing \n */
-                      }
-                    else if (c != '\r')
-                      {
-                  /* runs of whitespace not ending line hashed as one space */
-                        h = HASH (h, ' ');
-                      }
-                  }
-                /* c is now the first non-space.  */
-                /* c can be a \r (CR) if !ignore_eol_diff */
-                h = HASH (h, c);
-                if (c == '\r' && *p != '\n')
-                  goto hashing_done;
-              }
+              h = HASH (h, tolower (c));
           else
             while ((c = *p++) != '\n' && (c != '\r' || *p == '\n'))
-              {
-                h = HASH (h, c);
-              }
+              h = HASH (h, c);
+          break;
         }
-hashing_done:;
+
+    hashing_done:;
 
       bucket = &buckets[h % nbuckets];
-      length = (char const HUGE *) p - ip - ((char const HUGE *) p == incomplete_tail);
+      length = p - ip - 1;
+
+      if (p == bufend
+          && current->missing_newline
+          && ROBUST_OUTPUT_STYLE (output_style))
+        {
+          /* The last line is incomplete and we do not silently
+             complete lines.  If the line cannot compare equal to any
+             complete line, put it into buckets[-1] so that it can
+             compare equal only to the other file's incomplete line
+             (if one exists).  */
+          if (ig_white_space < IGNORE_TRAILING_SPACE)
+            bucket = &buckets[-1];
+        }
+
       for (i = *bucket;  ;  i = eqs[i].next)
         if (!i)
           {
-            /* Create a new equivalence class in this bucket. */
+            /* Create a new equivalence class in this bucket.  */
             i = eqs_index++;
             if (i == eqs_alloc)
-#ifdef __MSDOS__
-              if ((eqs = (struct equivclass HUGE *) farrealloc (eqs, (long) (eqs_alloc*=2) * sizeof(*eqs))) == NULL)
-                fatal ("far memory exhausted");
-#else
-              eqs = (struct equivclass *)
-                xrealloc (eqs, (eqs_alloc*=2) * sizeof(*eqs));
-#endif /*__MSDOS__*/
+              {
+                if (PTRDIFF_MAX / (2 * sizeof *eqs) <= eqs_alloc)
+                  xalloc_die ();
+                eqs_alloc *= 2;
+                eqs = (struct equivclass *) xrealloc (eqs, eqs_alloc * sizeof *eqs);
+              }
             eqs[i].next = *bucket;
             eqs[i].hash = h;
             eqs[i].line = ip;
@@ -365,23 +361,43 @@ hashing_done:;
             *bucket = i;
             break;
           }
-        /* "line_cmp" changed to "lines_differ" by diffutils 2.8.1 */
-        else if (eqs[i].hash == h
-           && (eqs[i].length == length || varies)
-           && ! line_cmp (eqs[i].line, eqs[i].length, ip, length))
-          /* Reuse existing equivalence class.  */
-            break;
+        else if (eqs[i].hash == h)
+          {
+            char const *eqline = eqs[i].line;
 
-      /* Maybe increase the size of the line table. */
+            /* Reuse existing class if lines_differ reports the lines
+                     equal.  */
+            if (eqs[i].length == length)
+              {
+                /* Reuse existing equivalence class if the lines are identical.
+                   This detects the common case of exact identity
+                   faster than lines_differ would.  */
+                if (memcmp (eqline, ip, length) == 0)
+                  break;
+                if (!same_length_diff_contents_compare_anyway)
+                  continue;
+              }
+            else if (!diff_length_compare_anyway)
+              continue;
+
+            if (! lines_differ (eqline, ip))
+              break;
+          }
+
+      /* Maybe increase the size of the line table.  */
       if (line == alloc_lines)
         {
           /* Double (alloc_lines - linbuf_base) by adding to alloc_lines.  */
+          if (PTRDIFF_MAX / 3 <= alloc_lines
+              || PTRDIFF_MAX / sizeof *cureqs <= 2 * alloc_lines - linbuf_base
+              || PTRDIFF_MAX / sizeof *linbuf <= alloc_lines - linbuf_base)
+            xalloc_die ();
           alloc_lines = 2 * alloc_lines - linbuf_base;
-          cureqs = (int *) xrealloc (cureqs, alloc_lines * sizeof (*cureqs));
-          linbuf = (char const HUGE **) xrealloc ((void *)(linbuf + linbuf_base),
-                     (alloc_lines - linbuf_base)
-                     * sizeof (*linbuf))
-             - linbuf_base;
+          cureqs = (int *) xrealloc (cureqs, alloc_lines * sizeof *cureqs);
+          linbuf += linbuf_base;
+          linbuf = (char const **) xrealloc ((void *) linbuf,
+                                             (alloc_lines - linbuf_base) * sizeof *linbuf);
+          linbuf -= linbuf_base;
         }
       linbuf[line] = ip;
       cureqs[line] = i;
@@ -398,17 +414,24 @@ hashing_done:;
       if (line == alloc_lines)
         {
           /* Double (alloc_lines - linbuf_base) by adding to alloc_lines.  */
+          if (PTRDIFF_MAX / 3 <= alloc_lines
+              || PTRDIFF_MAX / sizeof *cureqs <= 2 * alloc_lines - linbuf_base
+              || PTRDIFF_MAX / sizeof *linbuf <= alloc_lines - linbuf_base)
+            xalloc_die ();
           alloc_lines = 2 * alloc_lines - linbuf_base;
-          linbuf = (char const HUGE **) xrealloc ((void *)(linbuf + linbuf_base),
-                     (alloc_lines - linbuf_base)
-                     * sizeof (*linbuf))
-             - linbuf_base;
+          linbuf += linbuf_base;
+          linbuf = (char const **) xrealloc ((void *) linbuf,
+                                             (alloc_lines - linbuf_base) * sizeof *linbuf);
+          linbuf -= linbuf_base;
         }
-      linbuf[line] = (char const HUGE *) p;
-    
-     if ((char const HUGE *) p == bufend)
+      linbuf[line] = p;
+
+      if (p == bufend)
         {
-          linbuf[line]  -=  (char const HUGE *) p == incomplete_tail;
+          /* If the last line is incomplete and we do not silently
+             complete lines, don't count its appended newline.  */
+          if (current->missing_newline && ROBUST_OUTPUT_STYLE (output_style))
+            linbuf[line]--;
           break;
         }
 
@@ -417,9 +440,8 @@ hashing_done:;
 
       line++;
 
-      while (p[0] != '\n' && (p[0] != '\r' || p[1] == '\n'))
-         p++;
-      p++;
+      while (*p++ != '\n' && (p[-1] != '\r' || p[0] == '\n'))
+        continue;
     }
 
   /* Done with cache in local variables.  */
@@ -435,28 +457,26 @@ hashing_done:;
 /* Convert any non octet encoded unicode text to UTF-8.
    Prepare the end of the text. Make sure it's initialized.
    Make sure text ends in a newline,
-   but remember that we had to add one unless -B is in effect.
-   Return effective start of text to be compared. */
+   but remember that we had to add one.
+   Strip trailing CRs, if that was requested.  */
 
 static char *
-prepare_text_end (current, side)
-     struct file_data *current;
-	 short side;
+prepare_text (struct file_data *current, short side)
 {
-  FSIZE buffered_chars = current->buffered_chars;
-  char *const p = current->buffer;
+  size_t buffered = current->buffered;
+  char *const p = FILE_BUFFER (current);
   char *r = p; // receives the return value
   char *q, *t;
   unsigned bom = 0;
-  enum UNICODESET sig = get_unicode_signature(current, &bom);
+  UNICODESET sig = get_unicode_signature (current, &bom);
   char *const u = p + bom;
 
   if (sig == UCS4LE)
     {
-      FSIZE buffered_words = buffered_chars / 2;
+      size_t buffered_words = buffered / 2;
       unsigned long *q = (unsigned long *)p + buffered_words / 2;
-      buffered_chars += buffered_words;
-      r = p + buffered_chars;
+      buffered += buffered_words;
+      r = p + buffered;
       while (--q >= (unsigned long *)u) // exclude the BOM
         {
           unsigned long u = *q;
@@ -473,7 +493,7 @@ prepare_text_end (current, side)
               *--r = 0x80 + ((u >> 24) & 0x3F);
               *--r = 0xFC + (u >> 30);
             }
-            else if (u >= 0x200000)
+          else if (u >= 0x200000)
             {
               *--r = 0x80 + (u & 0x3F);
               *--r = 0x80 + ((u >> 6) & 0x3F);
@@ -481,25 +501,25 @@ prepare_text_end (current, side)
               *--r = 0x80 + ((u >> 18) & 0x3F);
               *--r = 0xF8 + (u >> 24);
             }
-            else if (u >= 0x10000)
+          else if (u >= 0x10000)
             {
               *--r = 0x80 + (u & 0x3F);
               *--r = 0x80 + ((u >> 6) & 0x3F);
               *--r = 0x80 + ((u >> 12) & 0x3F);
               *--r = 0xF0 + (char)(u >> 18);
             }
-            else if (u >= 0x800)
+          else if (u >= 0x800)
             {
               *--r = 0x80 + (u & 0x3F);
               *--r = 0x80 + ((u >> 6) & 0x3F);
               *--r = 0xE0 + (char)(u >> 12);
             }
-            else if (u >= 0x80 || u == 0) // map NUL to 2 byte sequence so as to prevent it from confusing diff algorithm
+          else if (u >= 0x80 || u == 0) // map NUL to 2 byte sequence so as to prevent it from confusing diff algorithm
             {
               *--r = 0x80 + (u & 0x3F);
               *--r = 0xC0 + (char)(u >> 6);
             }
-            else
+          else
             {
               *--r = (char)u;
             }
@@ -507,17 +527,17 @@ prepare_text_end (current, side)
     }
   else if (sig == UCS4BE)
     {
-      FSIZE buffered_words = buffered_chars / 2;
+      size_t buffered_words = buffered / 2;
       unsigned long *q = (unsigned long *)p + buffered_words / 2;
-      buffered_chars += buffered_words;
-      r = p + buffered_chars;
+      buffered += buffered_words;
+      r = p + buffered;
       while (--q >= (unsigned long *)u) // exclude the BOM
         {
           unsigned long u =
-          ((*q & 0x000000FF) << 24) |
-          ((*q & 0x0000FF00) << 8) |
-          ((*q & 0x00FF0000) >> 8) |
-          ((*q & 0xFF000000) >> 24); // fix byte order
+            ((*q & 0x000000FF) << 24) |
+            ((*q & 0x0000FF00) << 8) |
+            ((*q & 0x00FF0000) >> 8) |
+            ((*q & 0xFF000000) >> 24); // fix byte order
           if (u >= 0x80000000)
             {
               *--r = '?';
@@ -565,10 +585,10 @@ prepare_text_end (current, side)
     }
   else if (sig == UCS2LE)
     {
-      FSIZE buffered_words = buffered_chars / 2;
+      size_t buffered_words = buffered / 2;
       unsigned short *q = (unsigned short *)p + buffered_words;
-      buffered_chars += buffered_words;
-      r = p + buffered_chars;
+      buffered += buffered_words;
+      r = p + buffered;
       while (--q >= (unsigned short *)u) // exclude the BOM
         {
           unsigned short u = *q;
@@ -591,10 +611,10 @@ prepare_text_end (current, side)
     }
   else if (sig == UCS2BE)
     {
-      FSIZE buffered_words = buffered_chars / 2;
+      size_t buffered_words = buffered / 2;
       unsigned short *q = (unsigned short *)p + buffered_words;
-      buffered_chars += buffered_words;
-      r = p + buffered_chars;
+      buffered += buffered_words;
+      r = p + buffered;
       while (--q >= (unsigned short *)u) // exclude the BOM
         {
           unsigned short u = (*q << 8) | (*q >> 8); // fix byte order
@@ -620,88 +640,99 @@ prepare_text_end (current, side)
       r = u; // skip the BOM
     }
 
-  if (buffered_chars == 0 || p[buffered_chars - 1] == '\n' || p[buffered_chars - 1] == '\r')
-    current->missing_newline = 0;
+  if (buffered == 0 || p[buffered - 1] == '\n' || p[buffered - 1] == '\r')
+    current->missing_newline = false;
   else
     {
-      p[buffered_chars++] = '\n';
-      current->missing_newline = 1;
+      p[buffered++] = '\n';
+      current->missing_newline = true;
       --current->count_lfs; // compensate for extra newline
     }
 
-	if (side != -1)
-		buffered_chars = apply_prediffer(current, side, p, buffered_chars);
+  if (side != -1)
+    buffered = apply_prediffer (current, side, p, buffered);
 
-	current->buffered_chars = buffered_chars;
+  current->buffered = buffered;
 
-	/* Count line endings and map them to '\n' if ignore_eol_diff is set. */
-	t = q = p + buffered_chars;
-	while (q > r)
-	{
-		switch (*--t = *--q)
-		{
-		case '\r':
-			++current->count_crs;
-			if (ignore_eol_diff)
-				*t = '\n';
-			break;
-		case '\n':
-			if (q > r && q[-1] == '\r')
-			{
-				++current->count_crlfs;
-				--current->count_crs; // compensate for bogus increment
-				if (ignore_eol_diff)
-					++t;
-			}
-			else
-			{
-				++current->count_lfs;
-			}
-			break;
-		case '\0':
-			++current->count_zeros;
-			break;
-		}
-	}
+  /* Count line endings and map them to '\n' if ignore_eol_diff is set. */
+  t = q = p + buffered;
+  while (q > r)
+    {
+      switch (*--t = *--q)
+        {
+        case '\r':
+          ++current->count_crs;
+          if (ignore_eol_diff)
+            *t = '\n';
+          break;
+        case '\n':
+          if (q > r && q[-1] == '\r')
+            {
+              ++current->count_crlfs;
+              --current->count_crs; // compensate for bogus increment
+              if (ignore_eol_diff)
+                ++t;
+            }
+          else
+            {
+              ++current->count_lfs;
+            }
+          break;
+        case '\0':
+          ++current->count_zeros;
+          break;
+        }
+    }
 
   /* Don't use uninitialized storage when planting or using sentinels.  */
-  bzero (p + buffered_chars, sizeof (word));
+  *(word *)(p + buffered) = 0;
   return t;
+}
+
+/* We have found N lines in a buffer of size S; guess the
+   proportionate number of lines that will be found in a buffer of
+   size T.  However, do not guess a number of lines so large that the
+   resulting line table might cause overflow in size calculations.  */
+static lin
+guess_lines (lin n, size_t s, size_t t)
+{
+  size_t guessed_bytes_per_line = n < 10 ? 32 : s / (n - 1);
+  lin guessed_lines = MAX (1, t / guessed_bytes_per_line);
+  return MIN (guessed_lines, PTRDIFF_MAX / (2 * sizeof (char *) + 1) - 5) + 5;
 }
 
 /* Given a vector of two file_data objects, find the identical
-   prefixes and suffixes of each object. */
+   prefixes and suffixes of each object.  */
 
 static void
-find_identical_ends (filevec)
-     struct file_data filevec[];
+find_identical_ends (struct file_data filevec[])
 {
-  word HUGE *w0, HUGE *w1;
-  char HUGE *p0, HUGE *p1, HUGE *buffer0, HUGE *buffer1;
-  char const HUGE *end0, HUGE *beg0;
-  char const HUGE **linbuf0, HUGE **linbuf1;
-  int i, lines;
-  FSIZE n0, n1;
-  FSIZE tem;
-  FSIZE alloc_lines0, alloc_lines1;
-  int buffered_prefix, prefix_count, prefix_mask;
-  int ttt;
+  word *w0, *w1;
+  char *p0, *p1, *buffer0, *buffer1;
+  char const *end0, *beg0;
+  char const **linbuf0, **linbuf1;
+  lin i, lines;
+  size_t n0, n1;
+  lin alloc_lines0, alloc_lines1;
+  bool prefix_needed;
+  lin buffered_prefix, prefix_count, prefix_mask;
+  lin middle_guess, suffix_guess;
 
   if (filevec[0].desc != filevec[1].desc)
     {
       slurp (&filevec[0]);
-      buffer0 = prepare_text_end (&filevec[0], 0);
+      buffer0 = prepare_text (&filevec[0], 0);
       slurp (&filevec[1]);
-      buffer1 = prepare_text_end (&filevec[1], 1);
+      buffer1 = prepare_text (&filevec[1], 1);
     }
   else
     {
       slurp (&filevec[0]);
-      buffer0 = prepare_text_end (&filevec[0], -1);
+      prepare_text (&filevec[0], -1);
       filevec[1].buffer = filevec[0].buffer;
       filevec[1].bufsize = filevec[0].bufsize;
-      filevec[1].buffered_chars = filevec[0].buffered_chars;
-      buffer1 = buffer0;
+      filevec[1].buffered = filevec[0].buffered;
+      filevec[1].missing_newline = filevec[0].missing_newline;
     }
 
   /* Find identical prefix.  */
@@ -709,8 +740,8 @@ find_identical_ends (filevec)
   p0 = buffer0;
   p1 = buffer1;
 
-  n0 = filevec[0].buffered_chars - (buffer0 - filevec[0].buffer);
-  n1 = filevec[1].buffered_chars - (buffer1 - filevec[1].buffer);
+  n0 = filevec[0].buffered - (buffer0 - FILE_BUFFER (&filevec[0]));
+  n1 = filevec[1].buffered - (buffer1 - FILE_BUFFER (&filevec[1]));
 
   if (p0 == p1)
     /* The buffers are the same; sentinels won't work.  */
@@ -721,32 +752,34 @@ find_identical_ends (filevec)
          to make the equality test false, and thus terminate the loop.  */
 
       if (n0 < n1)
-        p0[n0] = (char)(~p1[n0]);
+        p0[n0] = ~p1[n0];
       else
-        p1[n1] = (char)(~p0[n1]);
+        p1[n1] = ~p0[n1];
 
       /* Loop until first mismatch, or to the sentinel characters.  */
+
+      /* Do bytewise comparison until p0 is aligned on word boundary.  */
+      while (((size_t)p0 & (sizeof(word) - 1)) && *p0 == *p1)
+        p0++, p1++;
 
       /* Compare a word at a time for speed.  */
       w0 = (word *) p0;
       w1 = (word *) p1;
-      while (*w0++ == *w1++)
-        ;
-      --w0, --w1;
+      while (*w0 == *w1)
+        w0++, w1++;
 
       /* Do the last few bytes of comparison a byte at a time.  */
       p0 = (char *) w0;
       p1 = (char *) w1;
-      while (*p0++ == *p1++)
-        ;
-      --p0, --p1;
+      while (*p0 == *p1)
+        p0++, p1++;
 
-      /* Don't mistakenly count missing newline as part of prefix. */
+      /* Don't mistakenly count missing newline as part of prefix.  */
       if (ROBUST_OUTPUT_STYLE (output_style)
-        && (buffer0 + n0 - filevec[0].missing_newline < p0)
-        !=
-        (buffer1 + n1 - filevec[1].missing_newline < p1))
-        --p0, --p1;
+          && ((buffer0 + n0 - filevec[0].missing_newline < p0)
+              !=
+              (buffer1 + n1 - filevec[1].missing_newline < p1)))
+        p0--, p1--;
     }
 
   /* Now P0 and P1 point at the first nonmatching characters.  */
@@ -758,15 +791,15 @@ find_identical_ends (filevec)
   while (p0 != buffer0)
     {
       /* we know p0[-1] == p1[-1], but maybe p0[0] != p1[0] */
-      int linestart=0;
+      int linestart = 0;
       if (p0[-1] == '\n')
-        linestart=1;
+        linestart = 1;
       /* only count \r if not followed by a \n on either side */
       if (p0[-1] == '\r' && p0[0] != '\n' && p1[0] != '\n')
-        linestart=1;
-      if (linestart && !(i--))
+        linestart = 1;
+      if (linestart && ! (i--))
         break;
-    --p0, --p1;
+      --p0, --p1;
     }
 
   /* Record the prefix.  */
@@ -803,14 +836,14 @@ find_identical_ends (filevec)
          this line to the main body.  Discard up to HORIZON_LINES lines from
          the identical suffix.  Also, discard one extra line,
          because shift_boundaries may need it.  */
-      i = horizon_lines + !((buffer0 == p0 || p0[-1] == '\n' || (p0[-1] == '\r' && p0[0] != '\n'))
-          &&
-          (buffer1 == p1 || p1[-1] == '\n' || (p1[-1] == '\r' && p1[0] != '\n')));
+      i = horizon_lines + ! ((buffer0 == p0 || p0[-1] == '\n' || (p0[-1] == '\r' && p0[0] != '\n'))
+                             &&
+                             (buffer1 == p1 || p1[-1] == '\n' || (p1[-1] == '\r' && p1[0] != '\n')));
       while (i-- && p0 != end0)
         while (*p0++ != '\n' && (p0[-1] != '\r' || p0[0] == '\n'))
-          ;
+          continue;
 
-      p1 += p0 - (char HUGE *)beg0;
+      p1 += p0 - beg0;
     }
 
   /* Record the suffix.  */
@@ -820,7 +853,8 @@ find_identical_ends (filevec)
   /* Calculate number of lines of prefix to save.
 
      prefix_count == 0 means save the whole prefix;
-     we need this with for options like -D that output the whole file.
+     we need this for options like -D that output the whole file,
+     or for enormous contexts (to avoid worrying about arithmetic overflow).
      We also need it for options like -F that output some preceding line;
      at least we will need to find the last few lines,
      but since we don't know how many, it's easiest to find them all.
@@ -830,40 +864,44 @@ find_identical_ends (filevec)
      Handle 1 more line than the context says (because we count 1 too many),
      rounded up to the next power of 2 to speed index computation.  */
 
-  if (no_diff_means_no_output && ! function_regexp_list)
+  if (no_diff_means_no_output && ! USE_GNU_REGEX(function_regexp.fastmap)
+      && context < LIN_MAX / 4 && context < (int) n0)
     {
-      for (prefix_count = 1;  prefix_count < context + 1;  prefix_count *= 2)
-        ;
-      prefix_mask = prefix_count - 1;
-      ttt = p0 - (char HUGE *)filevec[0].prefix_end;
-      alloc_lines0
-        = prefix_count
-        + GUESS_LINES (0, 0, ttt)
-        + context;
+      middle_guess = guess_lines (0, 0, p0 - filevec[0].prefix_end);
+      suffix_guess = guess_lines (0, 0, buffer0 + n0 - p0);
+      for (prefix_count = 1;  prefix_count <= context;  prefix_count *= 2)
+        continue;
+      alloc_lines0 = (prefix_count + middle_guess
+                      + MIN (context, suffix_guess));
     }
   else
     {
       prefix_count = 0;
-      prefix_mask = ~0;
-      alloc_lines0 = GUESS_LINES (0, 0, n0);
+      alloc_lines0 = guess_lines (0, 0, n0);
     }
 
+  prefix_mask = prefix_count - 1;
   lines = 0;
-  linbuf0 = (char const HUGE **) xmalloc (alloc_lines0 * sizeof (*linbuf0));
+  linbuf0 = (char const **) xmalloc (alloc_lines0 * sizeof *linbuf0);
+  prefix_needed = ! (no_diff_means_no_output
+                     && filevec[0].prefix_end == p0
+                     && filevec[1].prefix_end == p1);
+  p0 = buffer0;
 
   /* If the prefix is needed, find the prefix lines.  */
-  if (! (no_diff_means_no_output
-   && filevec[0].prefix_end == p0
-   && filevec[1].prefix_end == p1))
+  if (prefix_needed)
     {
-      p0 = buffer0;
       end0 = filevec[0].prefix_end;
       while (p0 != end0)
         {
-          int l = lines++ & prefix_mask;
-          if ((FSIZE)l == alloc_lines0)
-            linbuf0 = (char const HUGE **) xrealloc ((void *)linbuf0, (alloc_lines0 *= 2)
-               * sizeof(*linbuf0));
+          lin l = lines++ & prefix_mask;
+          if (l == alloc_lines0)
+            {
+              if (PTRDIFF_MAX / (2 * sizeof *linbuf0) <= alloc_lines0)
+                xalloc_die ();
+              alloc_lines0 *= 2;
+              linbuf0 = (char const **) xrealloc ((void *) linbuf0, alloc_lines0 * sizeof *linbuf0);
+            }
           linbuf0[l] = p0;
           /* Perry/WinMerge (2004-01-05) altered original diffutils loop "while (*p0++ != '\n') ;" for other EOLs */
           while (1)
@@ -871,20 +909,21 @@ find_identical_ends (filevec)
               char ch = *p0++;
               /* stop at any eol, \n or \r or \r\n */
               if (ch == '\n') break;
-              if (ch == '\r' && (p0==end0 || *p0!='\n')) break;
+              if (ch == '\r' && (p0 == end0 || *p0 != '\n')) break;
             }
         }
     }
   buffered_prefix = prefix_count && context < lines ? context : lines;
 
   /* Allocate line buffer 1.  */
-  tem = prefix_count ? filevec[1].suffix_begin - buffer1 : n1;
-  ttt = filevec[1].prefix_end - buffer1;
-  alloc_lines1
-    = (buffered_prefix
-       + GUESS_LINES (lines, ttt, tem)
-       + context);
-  linbuf1 = (char const HUGE **) xmalloc (alloc_lines1 * sizeof (*linbuf1));
+
+  middle_guess = guess_lines (lines, p0 - buffer0, p1 - filevec[1].prefix_end);
+  suffix_guess = guess_lines (lines, p0 - buffer0, buffer1 + n1 - p1);
+  alloc_lines1 = buffered_prefix + middle_guess + MIN (context, suffix_guess);
+  if (alloc_lines1 < buffered_prefix
+      || PTRDIFF_MAX / sizeof *linbuf1 <= alloc_lines1)
+    xalloc_die ();
+  linbuf1 = (char const **) xmalloc (alloc_lines1 * sizeof (*linbuf1));
 
   if (buffered_prefix != lines)
     {
@@ -900,7 +939,7 @@ find_identical_ends (filevec)
     linbuf1[i] = linbuf0[i] - buffer0 + buffer1;
 
   /* Record the line buffer, adjusted so that
-     linbuf*[0] points at the first differing line.  */
+     linbuf[0] points at the first differing line.  */
   filevec[0].linbuf = linbuf0 + buffered_prefix;
   filevec[1].linbuf = linbuf1 + buffered_prefix;
   filevec[0].linbuf_base = filevec[1].linbuf_base = - buffered_prefix;
@@ -908,81 +947,60 @@ find_identical_ends (filevec)
   filevec[1].alloc_lines = alloc_lines1 - buffered_prefix;
   filevec[0].prefix_lines = filevec[1].prefix_lines = lines;
 }
+
+/* If 1 < k, then (2**k - prime_offset[k]) is the largest prime less
+   than 2**k.  This table is derived from Chris K. Caldwell's list
+   <http://www.utm.edu/research/primes/lists/2small/>.  */
 
-/* Largest primes less than some power of two, for nbuckets.  Values range
-   from useful to preposterous.  If one of these numbers isn't prime
-   after all, don't blame it on me, blame it on primes (6) . . . */
-static int const primes[] =
+static unsigned char const prime_offset[] =
 {
-  509,
-  1021,
-  2039,
-  4093,
-  8191,
-  16381,
-  32749,
-#if 32767 < INT_MAX
-  65521,
-  131071,
-  262139,
-  524287,
-  1048573,
-  2097143,
-  4194301,
-  8388593,
-  16777213,
-  33554393,
-  67108859,     /* Preposterously large . . . */
-  134217689,
-  268435399,
-  536870909,
-  1073741789,
-  2147483647,
-#endif
-  0
+  0, 0, 1, 1, 3, 1, 3, 1, 5, 3, 3, 9, 3, 1, 3, 19, 15, 1, 5, 1, 3, 9, 3,
+  15, 3, 39, 5, 39, 57, 3, 35, 1, 5, 9, 41, 31, 5, 25, 45, 7, 87, 21,
+  11, 57, 17, 55, 21, 115, 59, 81, 27, 129, 47, 111, 33, 55, 5, 13, 27,
+  55, 93, 1, 57, 25
 };
+
+/* Verify that this host's size_t is not too wide for the above table.  */
+
+verify (sizeof (size_t) * CHAR_BIT <= sizeof prime_offset);
 
 /* Given a vector of two file_data objects, read the file associated
    with each one, and build the table of equivalence classes.
-   Return 1 if either file appears to be a binary file.
+   Return nonzero if either file appears to be a binary file.
    If PRETEND_BINARY is nonzero, pretend they are binary regardless.  */
 /* WinMerge: Add int * bin_file param for getting actual binary file
    If bin_file is given, then check both files for binary files,
    otherwise check second file only if first wasn't binary */
-int
-read_files (filevec, pretend_binary, bin_file)
-     struct file_data filevec[];
-     int pretend_binary;
-     int * bin_file;
+bool
+read_files (struct file_data filevec[], bool pretend_binary, int *bin_file)
 {
   int i;
-  int skip_test = always_text_flag | pretend_binary;
-  int appears_binary = 0;
+  bool skip_test = pretend_binary;
+  bool appears_binary = pretend_binary;
 
   if (bin_file)
     *bin_file = 0;
-  appears_binary = pretend_binary | sip (&filevec[0], skip_test);
-  if (bin_file && appears_binary)
+
+  if (sip (&filevec[0], skip_test))
     {
-      *bin_file = 1;
+      appears_binary = true;
+      if (bin_file)
+        *bin_file |= 0x1; // set first bit for first file
+      else
+        skip_test = true; // no need to test the second file
     }
 
-  if (filevec[0].desc != filevec[1].desc)
-    {
-      if (bin_file)
-        {
-          appears_binary = pretend_binary | sip (&filevec[1], skip_test);
-          if (appears_binary)
-            *bin_file |= 0x2; // set second bit for second file
-        }
-      else
-        appears_binary |= sip (&filevec[1], skip_test | appears_binary);
-    }
-  else
+  if (filevec[0].desc == filevec[1].desc)
     {
       filevec[1].buffer = filevec[0].buffer;
       filevec[1].bufsize = filevec[0].bufsize;
-      filevec[1].buffered_chars = filevec[0].buffered_chars;
+      filevec[1].buffered = filevec[0].buffered;
+    }
+  else if (sip (&filevec[1], skip_test))
+    {
+      appears_binary = true;
+      if (bin_file)
+        *bin_file |= 0x2; // set second bit for second file
     }
 
   find_identical_ends (filevec);
@@ -990,44 +1008,42 @@ read_files (filevec, pretend_binary, bin_file)
   /* Don't slurp rest of file when comparing file to itself. */
   if (filevec[0].desc == filevec[1].desc)
     {
-	  filevec[1].count_crs = filevec[0].count_crs;
-	  filevec[1].count_lfs = filevec[0].count_lfs;
-	  filevec[1].count_crlfs = filevec[0].count_crlfs;
-	  filevec[1].count_zeros = filevec[0].count_zeros;
-      return 0;
+      filevec[1].count_crs = filevec[0].count_crs;
+      filevec[1].count_lfs = filevec[0].count_lfs;
+      filevec[1].count_crlfs = filevec[0].count_crlfs;
+      filevec[1].count_zeros = filevec[0].count_zeros;
+      return false;
     }
 
   if (appears_binary || (bin_file && *bin_file > 0))
-    return 1;
-
-  //find_identical_ends (filevec);
+    return true;
 
   equivs_alloc = filevec[0].alloc_lines + filevec[1].alloc_lines + 1;
-#ifdef __MSDOS__
-  if ((equivs = (struct equivclass HUGE *) farmalloc ((long) equivs_alloc * sizeof(struct equivclass))) == NULL)
-    fatal ("far memory exhausted");
-#else
-  equivs = (struct equivclass *) xmalloc (equivs_alloc * sizeof (struct equivclass));
-#endif /*__MSDOS__*/
+  if (PTRDIFF_MAX / sizeof *equivs <= equivs_alloc)
+    xalloc_die ();
+  equivs = (struct equivclass *) xmalloc (equivs_alloc * sizeof *equivs);
   /* Equivalence class 0 is permanently safe for lines that were not
-     hashed.  Real equivalence classes start at 1. */
+     hashed.  Real equivalence classes start at 1.  */
   equivs_index = 1;
 
-  for (i = 0;  primes[i] < equivs_alloc / 3;  i++)
-    if (! primes[i])
-      abort ();
-  nbuckets = primes[i];
+  /* Allocate (one plus) a prime number of hash buckets.  Use a prime
+     number between 1/3 and 2/3 of the value of equiv_allocs,
+     approximately.  */
+  for (i = 9; (1 << i) < equivs_alloc / 3; i++)
+    continue;
+  nbuckets = (1 << i) - prime_offset[i];
+  if (PTRDIFF_MAX / sizeof *buckets <= nbuckets)
+    xalloc_die ();
+  buckets = (int *) zalloc ((nbuckets + 1) * sizeof *buckets);
+  buckets++;
 
-  buckets = (int *) xmalloc (nbuckets * sizeof (*buckets));
-  bzero (buckets, nbuckets * sizeof (*buckets));
-
-  for (i = 0; i < 2; ++i)
+  for (i = 0; i < 2; i++)
     find_and_hash_each_line (&filevec[i]);
 
   filevec[0].equiv_max = filevec[1].equiv_max = equivs_index;
 
   free (equivs);
-  free (buckets);
+  free (buckets - 1);
 
-  return 0;
+  return false;
 }

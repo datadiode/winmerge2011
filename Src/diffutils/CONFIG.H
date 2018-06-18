@@ -15,4 +15,7 @@
 #define HAVE_STRING_H 1
 #define HAVE_TIME_H 1
 
+#define _GL_ATTRIBUTE_PURE /* empty */
+#define _GL_ATTRIBUTE_CONST /* empty */
+
 #define THREAD_LOCAL __declspec(thread)

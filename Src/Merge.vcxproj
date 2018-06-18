@@ -492,6 +492,7 @@
       </PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">
       </PrecompiledHeader>
+      <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
     <ClCompile Include="diffutils\lib\CMPBUF.C">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -504,6 +505,7 @@
       </PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">
       </PrecompiledHeader>
+      <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
     <ClCompile Include="diffutils\src\CONTEXT.C">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -516,44 +518,9 @@
       </PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">
       </PrecompiledHeader>
+      <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
     <ClCompile Include="diffutils\src\Diff.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">
-      </PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="diffutils\src\ED.C">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">
-      </PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="diffutils\GnuVersion.c">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">
-      </PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="diffutils\src\IFDEF.C">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -576,6 +543,7 @@
       </PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">
       </PrecompiledHeader>
+      <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
     <ClCompile Include="diffutils\src\NORMAL.C">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -588,30 +556,7 @@
       </PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">
       </PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="diffutils\lib\REGEX.C">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">
-      </PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="diffutils\src\SIDE.C">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">
-      </PrecompiledHeader>
+      <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
     <ClCompile Include="diffutils\src\UTIL.C">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -624,6 +569,7 @@
       </PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">
       </PrecompiledHeader>
+      <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
     <ClCompile Include="CompareEngines\ByteCompare.cpp" />
     <ClCompile Include="CompareEngines\DiffUtils.cpp" />
@@ -751,6 +697,11 @@
     <ClInclude Include="DiffItemList.h" />
     <ClInclude Include="DiffList.h" />
     <ClInclude Include="DiffTextBuffer.h" />
+    <ClInclude Include="diffutils\lib\diffseq.h" />
+    <ClInclude Include="diffutils\lib\intprops.h" />
+    <ClInclude Include="diffutils\lib\stat-macros.h" />
+    <ClInclude Include="diffutils\lib\verify.h" />
+    <ClInclude Include="diffutils\lib\xalloc.h" />
     <ClInclude Include="DiffWrapper.h" />
     <ClInclude Include="DirCmpReport.h" />
     <ClInclude Include="DirCmpReportDlg.h" />
@@ -889,7 +840,6 @@
     <ClInclude Include="diffutils\lib\CMPBUF.H" />
     <ClInclude Include="diffutils\CONFIG.H" />
     <ClInclude Include="diffutils\src\DIFF.H" />
-    <ClInclude Include="diffutils\lib\REGEX.H" />
     <ClInclude Include="diffutils\src\SYSTEM.H" />
     <ClInclude Include="CompareEngines\ByteCompare.h" />
     <ClInclude Include="CompareEngines\DiffUtils.h" />

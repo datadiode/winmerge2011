@@ -8,7 +8,6 @@
 #include "FileLocation.h"
 #include "CompareOptions.h"
 #include "DiffContext.h"
-#include "DIFF.H"
 #include "ByteCompare.h"
 
 using namespace CompareEngines;

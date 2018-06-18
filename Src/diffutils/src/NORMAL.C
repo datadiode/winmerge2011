@@ -1,32 +1,32 @@
 /* Normal-format output routines for GNU DIFF.
-   Copyright (C) 1988, 1989, 1993 Free Software Foundation, Inc.
 
-This file is part of GNU DIFF.
+   Copyright (C) 1988-1989, 1993, 1995, 1998, 2001, 2006, 2009-2013, 2015-2017
+   Free Software Foundation, Inc.
 
-GNU DIFF is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2, or (at your option)
-any later version.
+   This file is part of GNU DIFF.
 
-GNU DIFF is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-You should have received a copy of the GNU General Public License
-along with GNU DIFF; see the file COPYING.  If not, write to
-the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.  */
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "diff.h"
 
-static void print_normal_hunk PARAMS((struct change *));
+static void print_normal_hunk (struct change *);
 
 /* Print the edit-script SCRIPT as a normal diff.
    INF points to an array of descriptions of the two files.  */
 
 void
-print_normal_script (script)
-     struct change *script;
+print_normal_script (struct change *script)
 {
   print_script (script, find_change, print_normal_hunk);
 }
@@ -36,41 +36,42 @@ print_normal_script (script)
    describing changes in consecutive lines.  */
 
 static void
-print_normal_hunk (hunk)
-     struct change *hunk;
+print_normal_hunk (struct change *hunk)
 {
-  int first0, last0, first1, last1, deletes, inserts;
-  register int i;
-  //int trans_a, trans_b;
-  //int trans_c, trans_d;
+  lin first0, last0, first1, last1;
+  register lin i;
 
   /* Determine range of line numbers involved in each file.  */
-  analyze_hunk (hunk, &first0, &last0, &first1, &last1, &deletes, &inserts);
-  if (!deletes && !inserts)
+  enum changes changes = analyze_hunk (hunk, &first0, &last0, &first1, &last1);
+  if (!changes)
     return;
 
   begin_output ();
 
   /* Print out the line number header for this hunk */
   print_number_range (',', &files[0], first0, last0);
-  fprintf (outfile, "%c", change_letter (inserts, deletes));
+  fputc (change_letter[changes], outfile);
   print_number_range (',', &files[1], first1, last1);
-  fprintf (outfile, "\n");
+  fputc ('\n', outfile);
 
-  //translate_range (&files[0], first0, last0, &trans_a, &trans_b);
-  //translate_range (&files[1], first1, last1, &trans_c, &trans_d);
-  //printf("left=%d,%d   right=%d,%d\n", trans_a, trans_b, trans_c, trans_d);
+  /* Print the lines that the first file has.  */
+  if (changes & OLD)
+    {
+      for (i = first0; i <= last0; i++)
+        {
+          print_1_line ("<", &files[0].linbuf[i]);
+        }
+    }
 
-  /* Print the lines that the first file has. */ 
-  if (deletes)
-    for (i = first0; i <= last0; i++)
-      print_1_line ("<", &files[0].linbuf[i]);
+  if (changes == CHANGED)
+    fputs ("---\n", outfile);
 
-  if (inserts && deletes)
-    fprintf (outfile, "---\n");
-
-  // Print the lines that the second file has.  
-  if (inserts)
-    for (i = first1; i <= last1; i++)
-      print_1_line (">", &files[1].linbuf[i]);
+  /* Print the lines that the second file has.  */
+  if (changes & NEW)
+    {
+      for (i = first1; i <= last1; i++)
+        {
+          print_1_line (">", &files[1].linbuf[i]);
+        }
+    }
 }

@@ -5,7 +5,6 @@
  */
 #include "StdAfx.h"
 #include "DiffContext.h"
-#include "DIFF.H"
 #include "coretools.h"
 #include "DiffList.h"
 
@@ -26,14 +25,14 @@ DiffUtils::DiffUtils(const CDiffContext *context)
  * @brief Compare two files (as earlier specified).
  * @return DIFFCODE as a result of compare.
  */
-int DiffUtils::diffutils_compare_files(file_data *data)
+int DiffUtils::diffutils_compare_files(struct comparison *cmp)
 {
 	int bin_flag = 0;
 	int bin_file = 0; // bitmap for binary files
 
 	// Do the actual comparison (generating a change script)
 	struct change *script = NULL;
-	if (!Diff2Files(&script, data, &bin_flag, &bin_file))
+	if (!Diff2Files(&script, cmp, &bin_flag, &bin_file))
 		return DIFFCODE::CMPERR;
 
 	// DIFFCODE::TEXTFLAGS leaves text vs. binary classification to caller
@@ -47,7 +46,7 @@ int DiffUtils::diffutils_compare_files(file_data *data)
 	if (script && (FilterList::HasRegExps() || bFilterCommentsLines))
 	{
 		struct change *next = script;
-		String asLwrCaseExt = A2T(data[0].name);
+		String asLwrCaseExt = A2T(cmp->file[0].name);
 		String::size_type PosOfDot = asLwrCaseExt.rfind('.');
 		if (PosOfDot != String::npos)
 		{
@@ -68,20 +67,20 @@ int DiffUtils::diffutils_compare_files(file_data *data)
 			debug_script(thisob);
 #endif
 			/* Determine range of line numbers involved in each file.  */
-			int first0 = 0, last0 = 0, first1 = 0, last1 = 0, deletes = 0, inserts = 0;
-			analyze_hunk(thisob, &first0, &last0, &first1, &last1, &deletes, &inserts);
-			if (deletes || inserts || thisob->trivial)
+			int first0 = 0, last0 = 0, first1 = 0, last1 = 0;
+			enum changes changes = analyze_hunk(thisob, &first0, &last0, &first1, &last1);
+			if (changes || thisob->trivial)
 			{
 				/* Print the lines that the first file has.  */
-				int trans_a0 = 0, trans_b0 = 0, trans_a1 = 0, trans_b1 = 0;
-				translate_range(&data[0], first0, last0, &trans_a0, &trans_b0);
-				translate_range(&data[1], first1, last1, &trans_a1, &trans_b1);
+				printint trans_a0 = 0, trans_b0 = 0, trans_a1 = 0, trans_b1 = 0;
+				translate_range(&cmp->file[0], first0, last0, &trans_a0, &trans_b0);
+				translate_range(&cmp->file[1], first1, last1, &trans_a1, &trans_b1);
 
 				//Determine quantity of lines in this block for both sides
 				int QtyLinesLeft = trans_b0 - trans_a0;
 				int QtyLinesRight = trans_b1 - trans_a1;
 
-				if (bFilterCommentsLines && (deletes || inserts))
+				if (bFilterCommentsLines && changes)
 				{
 					OP_TYPE op = PostFilter(
 						thisob->line0, QtyLinesLeft + 1,

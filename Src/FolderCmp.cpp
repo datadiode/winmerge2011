@@ -11,7 +11,6 @@
 #include "DiffContext.h"
 #include "DiffWrapper.h"
 #include "FileTransform.h"
-#include "DIFF.H"
 #include "FolderCmp.h"
 #include "codepage_detect.h"
 #include "TimeSizeCompare.h"
@@ -119,11 +118,11 @@ UINT FolderCmp::prepAndCompareTwoFiles(DIFFITEM *di)
 			m_diffFileData.m_FileLocation[0].filepath,
 			m_diffFileData.m_FileLocation[1].filepath);
 		m_pDiffUtilsEngine->SetToDiffUtils();
-		code = m_pDiffUtilsEngine->diffutils_compare_files(m_diffFileData.m_inf);
+		code = m_pDiffUtilsEngine->diffutils_compare_files(&m_diffFileData);
 		m_ndiffs = m_pDiffUtilsEngine->m_ndiffs;
 		m_ntrivialdiffs = m_pDiffUtilsEngine->m_ntrivialdiffs;
-		CopyTextStats(&m_diffFileData.m_inf[0], &m_diffFileData.m_textStats[0]);
-		CopyTextStats(&m_diffFileData.m_inf[1], &m_diffFileData.m_textStats[1]);
+		CopyTextStats(&m_diffFileData.file[0], &m_diffFileData.m_textStats[0]);
+		CopyTextStats(&m_diffFileData.file[1], &m_diffFileData.m_textStats[1]);
 
 		// If unique item, it was being compared to itself to determine encoding
 		// and the #diffs is invalid
@@ -138,7 +137,7 @@ UINT FolderCmp::prepAndCompareTwoFiles(DIFFITEM *di)
 		if (m_pByteCompare == NULL)
 			m_pByteCompare = new CompareEngines::ByteCompare(m_pCtx);
 
-		m_pByteCompare->SetFileData(2, m_diffFileData.m_inf);
+		m_pByteCompare->SetFileData(2, m_diffFileData.file);
 
 		// use our own byte-by-byte compare
 		code = m_pByteCompare->CompareFiles(&m_diffFileData.m_FileLocation.front());

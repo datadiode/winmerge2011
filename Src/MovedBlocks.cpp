@@ -60,7 +60,7 @@ public:
  match0 set by scan from line1 to inserted
 
 */
-extern "C" void moved_block_analysis(struct change *script, struct file_data fd[])
+void moved_block_analysis(struct change *script, struct file_data fd[])
 {
 	// Hash all altered lines
 	std::map<int, EqGroup> map;
@@ -121,8 +121,7 @@ extern "C" void moved_block_analysis(struct change *script, struct file_data fd[
 					// leave the right side (e->inserted) on e
 					// so no right side on newob
 					// newob will be the moved part only, later after we split off any suffix from it
-					struct change *const newob = static_cast<struct change *>(xmalloc(sizeof(struct change)));
-					memset(newob, 0, sizeof *newob);
+					struct change *const newob = static_cast<struct change *>(zalloc(sizeof(struct change)));
 
 					newob->line0 = i1;
 					newob->line1 = e->line1 + e->inserted;
@@ -146,8 +145,7 @@ extern "C" void moved_block_analysis(struct change *script, struct file_data fd[
 				{
 					// break off any suffix from e
 					// newob will be the suffix, and will get all the right side
-					struct change *const newob = static_cast<struct change *>(xmalloc(sizeof(struct change)));
-					memset(newob, 0, sizeof *newob);
+					struct change *const newob = static_cast<struct change *>(zalloc(sizeof(struct change)));
 
 					newob->line0 = i2;
 					newob->line1 = e->line1;
@@ -212,8 +210,7 @@ extern "C" void moved_block_analysis(struct change *script, struct file_data fd[
 					// leave the left side (e->deleted) on e
 					// so no right side on newob
 					// newob will be the moved part only, later after we split off any suffix from it
-					struct change *const newob = static_cast<struct change *>(xmalloc(sizeof(struct change)));
-					memset(newob, 0, sizeof *newob);
+					struct change *const newob = static_cast<struct change *>(zalloc(sizeof(struct change)));
 
 					newob->line0 = e->line0 + e->deleted;
 					newob->line1 = j1;
@@ -237,8 +234,7 @@ extern "C" void moved_block_analysis(struct change *script, struct file_data fd[
 				{
 					// break off any suffix from e
 					// newob will be the suffix, and will get all the left side
-					struct change *const newob = static_cast<struct change *>(xmalloc(sizeof(struct change)));
-					memset(newob, 0, sizeof *newob);
+					struct change *const newob = static_cast<struct change *>(zalloc(sizeof(struct change)));
 
 					newob->line0 = e->line0;
 					newob->line1 = j2;

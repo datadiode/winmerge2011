@@ -67,13 +67,15 @@ void CPatchTool::AddFiles(const PATCHFILES &files)
 
 /** 
  * @brief Create a patch from files given.
- * @note Files can be given using AddFiles() or selecting using
- * CPatchDlg.
+ * @note Files can be given using AddFiles() or selecting using CPatchDlg.
  */
 void CPatchTool::Run()
 {
 	if (LanguageSelect.DoModal(m_dlgPatch) == IDOK)
 	{
+		// Initialize from global settings, then refine from user input
+		m_diffWrapper.RefreshOptions();
+
 		// These two are from dropdown list - can't be wrong
 		m_diffWrapper.outputStyle = m_dlgPatch.m_outputStyle;
 		m_diffWrapper.nContext = m_dlgPatch.m_contextLines;

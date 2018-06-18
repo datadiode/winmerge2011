@@ -27,9 +27,14 @@ bool PropCompare::UpdateData()
 	DDX_Check<op>(IDC_DIFF_IGNORE_BLANK_LINES, m_bIgnoreBlankLines);
 	DDX_Check<op>(IDC_FILTERCOMMENTS_CHECK, m_bFilterCommentsLines);
 	DDX_Check<op>(IDC_DIFF_IGNOREEOL, m_bIgnoreEol);
+	DDX_Check<op>(IDC_DIFF_WS_IGNORE_TAB_EXPANSION, m_bIgnoreTabExpansion);
+	DDX_Check<op>(IDC_DIFF_WS_IGNORE_TRAILING_SPACE, m_bIgnoreTrailingSpace);
 	DDX_Check<op>(IDC_DIFF_WHITESPACE_COMPARE, m_nIgnoreWhite, 0);
 	DDX_Check<op>(IDC_DIFF_WHITESPACE_IGNORE, m_nIgnoreWhite, 1);
 	DDX_Check<op>(IDC_DIFF_WHITESPACE_IGNOREALL, m_nIgnoreWhite, 2);
+	DDX_Check<op>(IDC_DIFF_MINIMAL, m_bMinimal);
+	DDX_Check<op>(IDC_DIFF_SPEED_LARGE_FILES, m_bSpeedLargeFiles);
+	DDX_Check<op>(IDC_DIFF_APPLY_HISTORIC_COST_LIMIT, m_bApplyHistoricCostLimit);
 	DDX_Check<op>(IDC_MOVED_BLOCKS, m_bMovedBlocks);
 	DDX_Check<op>(IDC_MATCH_SIMILAR_LINES, m_bMatchSimilarLines);
 	DDX_Text<op>(IDC_MATCH_SIMILAR_LINES_MAX, m_nMatchSimilarLinesMax);
@@ -50,6 +55,10 @@ LRESULT PropCompare::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			UpdateData<Get>();
 		switch (wParam)
 		{
+		case MAKEWPARAM(IDC_DIFF_WS_IGNORE_TAB_EXPANSION, BN_CLICKED):
+		case MAKEWPARAM(IDC_DIFF_WS_IGNORE_TRAILING_SPACE, BN_CLICKED):
+			UpdateScreen();
+			break;
 		case MAKEWPARAM(IDC_COMPARE_DEFAULTS, BN_CLICKED):
 			OnDefaults();
 			break;
@@ -66,7 +75,14 @@ LRESULT PropCompare::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
  */
 void PropCompare::ReadOptions()
 {
+	// NB: OPT_CMP_IGNORE_WHITESPACE combines radio options with check options!
 	m_nIgnoreWhite = COptionsMgr::Get(OPT_CMP_IGNORE_WHITESPACE);
+	m_bIgnoreTabExpansion = (m_nIgnoreWhite & 4) != 0;
+	m_bIgnoreTrailingSpace = (m_nIgnoreWhite & 8) != 0;
+	m_nIgnoreWhite &= 3;
+	m_bMinimal = COptionsMgr::Get(OPT_CMP_MINIMAL);
+	m_bSpeedLargeFiles = COptionsMgr::Get(OPT_CMP_SPEED_LARGE_FILES);
+	m_bApplyHistoricCostLimit = COptionsMgr::Get(OPT_CMP_APPLY_HISTORIC_COST_LIMIT);
 	m_bIgnoreBlankLines = COptionsMgr::Get(OPT_CMP_IGNORE_BLANKLINES);
 	m_bFilterCommentsLines = COptionsMgr::Get(OPT_CMP_FILTER_COMMENTLINES);
 	m_bIgnoreCase = COptionsMgr::Get(OPT_CMP_IGNORE_CASE);
@@ -83,7 +99,12 @@ void PropCompare::ReadOptions()
  */
 void PropCompare::WriteOptions()
 {
-	COptionsMgr::SaveOption(OPT_CMP_IGNORE_WHITESPACE, m_nIgnoreWhite);
+	// NB: OPT_CMP_IGNORE_WHITESPACE combines radio options with check options!
+	COptionsMgr::SaveOption(OPT_CMP_IGNORE_WHITESPACE, m_nIgnoreWhite |
+		(m_bIgnoreTabExpansion ? 4 : 0) | (m_bIgnoreTrailingSpace ? 8 : 0));
+	COptionsMgr::SaveOption(OPT_CMP_MINIMAL, m_bMinimal != FALSE);
+	COptionsMgr::SaveOption(OPT_CMP_SPEED_LARGE_FILES, m_bSpeedLargeFiles != FALSE);
+	COptionsMgr::SaveOption(OPT_CMP_APPLY_HISTORIC_COST_LIMIT, m_bApplyHistoricCostLimit != FALSE);
 	COptionsMgr::SaveOption(OPT_CMP_IGNORE_BLANKLINES, m_bIgnoreBlankLines != FALSE);
 	COptionsMgr::SaveOption(OPT_CMP_FILTER_COMMENTLINES, m_bFilterCommentsLines != FALSE);
 	COptionsMgr::SaveOption(OPT_CMP_IGNORE_EOL, m_bIgnoreEol != FALSE);
@@ -99,6 +120,11 @@ void PropCompare::WriteOptions()
 void PropCompare::UpdateScreen()
 {
 	UpdateData<Set>();
+	// When using any of the whitespace check options, the radio options are N/A
+	BOOL bEnable = !(m_bIgnoreTabExpansion || m_bIgnoreTrailingSpace);
+	GetDlgItem(IDC_DIFF_WHITESPACE_COMPARE)->EnableWindow(bEnable);
+	GetDlgItem(IDC_DIFF_WHITESPACE_IGNORE)->EnableWindow(bEnable);
+	GetDlgItem(IDC_DIFF_WHITESPACE_IGNOREALL)->EnableWindow(bEnable);
 }
 
 /** 
@@ -107,6 +133,12 @@ void PropCompare::UpdateScreen()
 void PropCompare::OnDefaults()
 {
 	m_nIgnoreWhite = COptionsMgr::GetDefault(OPT_CMP_IGNORE_WHITESPACE);
+	m_bIgnoreTabExpansion = (m_nIgnoreWhite & 4) != 0;
+	m_bIgnoreTrailingSpace = (m_nIgnoreWhite & 8) != 0;
+	m_nIgnoreWhite &= 3;
+	m_bMinimal = COptionsMgr::GetDefault(OPT_CMP_MINIMAL);
+	m_bSpeedLargeFiles = COptionsMgr::GetDefault(OPT_CMP_SPEED_LARGE_FILES);
+	m_bApplyHistoricCostLimit = COptionsMgr::GetDefault(OPT_CMP_APPLY_HISTORIC_COST_LIMIT);
 	m_bIgnoreEol = COptionsMgr::GetDefault(OPT_CMP_IGNORE_EOL);
 	m_bIgnoreBlankLines = COptionsMgr::GetDefault(OPT_CMP_IGNORE_BLANKLINES);
 	m_bFilterCommentsLines = COptionsMgr::GetDefault(OPT_CMP_FILTER_COMMENTLINES);

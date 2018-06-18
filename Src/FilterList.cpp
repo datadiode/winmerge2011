@@ -16,7 +16,7 @@
 #define new DEBUG_NEW
 #endif
 
-extern "C" size_t apply_prediffer(struct file_data *current, short side, char *buf, size_t len)
+size_t apply_prediffer(struct file_data *current, short side, char *buf, size_t len)
 {
 	CDiffWrapper *const pOptions = CDiffWrapper::m_pActiveInstance;
 	if (pOptions->HasPrediffers())

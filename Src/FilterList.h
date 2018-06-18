@@ -11,7 +11,7 @@
 class LineFiltersList;
 struct LineFilterItem;
 
-extern "C" size_t apply_prediffer(struct file_data *current, short side, char *buf, size_t len);
+size_t apply_prediffer(struct file_data *current, short side, char *buf, size_t len);
 
 #include "RegExpItem.h"
 #include "ScriptItem.h"

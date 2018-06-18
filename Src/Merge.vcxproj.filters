@@ -600,25 +600,10 @@
     <ClCompile Include="diffutils\src\Diff.cpp">
       <Filter>DiffEngine</Filter>
     </ClCompile>
-    <ClCompile Include="diffutils\src\ED.C">
-      <Filter>DiffEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="diffutils\GnuVersion.c">
-      <Filter>DiffEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="diffutils\src\IFDEF.C">
-      <Filter>DiffEngine</Filter>
-    </ClCompile>
     <ClCompile Include="diffutils\src\IO.C">
       <Filter>DiffEngine</Filter>
     </ClCompile>
     <ClCompile Include="diffutils\src\NORMAL.C">
-      <Filter>DiffEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="diffutils\lib\REGEX.C">
-      <Filter>DiffEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="diffutils\src\SIDE.C">
       <Filter>DiffEngine</Filter>
     </ClCompile>
     <ClCompile Include="diffutils\src\UTIL.C">
@@ -1142,9 +1127,6 @@
     <ClInclude Include="diffutils\src\DIFF.H">
       <Filter>DiffEngine</Filter>
     </ClInclude>
-    <ClInclude Include="diffutils\lib\REGEX.H">
-      <Filter>DiffEngine</Filter>
-    </ClInclude>
     <ClInclude Include="diffutils\src\SYSTEM.H">
       <Filter>DiffEngine</Filter>
     </ClInclude>
@@ -1198,6 +1180,21 @@
     </ClInclude>
     <ClInclude Include="EncodingInfo.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="diffutils\lib\diffseq.h">
+      <Filter>DiffEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="diffutils\lib\intprops.h">
+      <Filter>DiffEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="diffutils\lib\stat-macros.h">
+      <Filter>DiffEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="diffutils\lib\verify.h">
+      <Filter>DiffEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="diffutils\lib\xalloc.h">
+      <Filter>DiffEngine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

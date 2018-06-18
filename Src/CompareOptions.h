@@ -33,13 +33,18 @@ private:
 	struct null;
 public:
 	int nIgnoreWhitespace; /**< Ignore whitespace -option. */
+	int nTabSize; /**< Distance between adjacent tab stops. */
 	bool bIgnoreCase; /**< Ignore case -option. */
 	bool bIgnoreBlankLines; /**< Ignore blank lines -option. */
 	bool bIgnoreEol; /**< Ignore EOL differences -option. */
+	bool bMinimal; /**< Minimize the number of affected lines. */
+	bool bSpeedLargeFiles; /**< Speed up the processing of large files. */
+	bool bApplyHistoricCostLimit; /**< Control costs as strictly as Diffutils 2.5 did. */
 	bool bFilterCommentsLines; /**< Ignore Multiline comments differences -option. */
 	bool bApplyLineFilters; /**< Apply line filters? */
 	DIFFOPTIONS(null *)
 	{
 		memset(this, 0, sizeof *this);
+		nTabSize = 8;
 	}
 };
