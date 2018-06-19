@@ -196,7 +196,9 @@ void CPatchDlg::OnOK()
 
 	m_contextLines = GetDlgItemInt(IDC_DIFF_CONTEXT);
 
-	m_whitespaceCompare |= (m_ignoreTabExpansion ? 4 : 0) | (m_ignoreTrailingSpace ? 8 : 0);
+	m_whitespaceCompare |=
+		(m_ignoreTabExpansion ? WHITESPACE_IGNORE_TAB_EXPANSION : 0) |
+		(m_ignoreTrailingSpace ? WHITESPACE_IGNORE_TRAILING_SPACE : 0);
 
 	SaveSettings();
 
@@ -490,9 +492,9 @@ void CPatchDlg::UpdateSettings()
 		m_outputStyle = OUTPUT_NORMAL;
 	if (m_contextLines < 0 || m_contextLines > 50)
 		m_contextLines = 3;
-	m_ignoreTabExpansion = (m_whitespaceCompare & 4) != 0;
-	m_ignoreTrailingSpace = (m_whitespaceCompare & 8) != 0;
-	m_whitespaceCompare &= 3;
+	m_ignoreTabExpansion = (m_whitespaceCompare & WHITESPACE_IGNORE_TAB_EXPANSION) != 0;
+	m_ignoreTrailingSpace = (m_whitespaceCompare & WHITESPACE_IGNORE_TRAILING_SPACE) != 0;
+	m_whitespaceCompare &= WHITESPACE_RADIO_OPTIONS_MASK;
 	if (m_whitespaceCompare > WHITESPACE_IGNORE_ALL)
 		m_whitespaceCompare = WHITESPACE_COMPARE_ALL;
 	// Update dialog controls with values

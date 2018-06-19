@@ -530,6 +530,8 @@ IDR_POPUP_DIFF_OPTIONS MENU
     {
         POPUP "W&hitespaces"
         {
+            MENUITEM "&Tab expansion", IDC_DIFF_WS_IGNORE_TAB_EXPANSION, HELP
+            MENUITEM "T&railing space", IDC_DIFF_WS_IGNORE_TRAILING_SPACE, HELP
             MENUITEM "Com&pare", IDC_DIFF_WHITESPACE_COMPARE
             MENUITEM "I&gnore changes", IDC_DIFF_WHITESPACE_IGNORE
             MENUITEM "Ig&nore all", IDC_DIFF_WHITESPACE_IGNOREALL

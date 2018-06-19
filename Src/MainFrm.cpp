@@ -3671,10 +3671,14 @@ LRESULT CMainFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 	case IDC_DIFF_IGNOREEOL:
 		OnDiffIgnoreEOL();
 		break;
+	case IDC_DIFF_WS_IGNORE_TAB_EXPANSION:
+	case IDC_DIFF_WS_IGNORE_TRAILING_SPACE:
+		OnDiffWhitespace(WHITESPACE_IGNORE_TAB_EXPANSION << (id - IDC_DIFF_WS_IGNORE_TAB_EXPANSION), 0);
+		break;
 	case IDC_DIFF_WHITESPACE_COMPARE:
 	case IDC_DIFF_WHITESPACE_IGNORE:
 	case IDC_DIFF_WHITESPACE_IGNOREALL:
-		OnDiffWhitespace(id - IDC_DIFF_WHITESPACE_COMPARE);
+		OnDiffWhitespace(0, id - IDC_DIFF_WHITESPACE_COMPARE);
 		break;
 	case ID_COMPMETHOD_FULL_CONTENTS:
 	case ID_COMPMETHOD_QUICK_CONTENTS:
@@ -4068,7 +4072,19 @@ void CMainFrame::OnDiffOptionsDropDown(NMTOOLBAR *pToolBar)
 	HMenu *const pPopup = pMenu->GetSubMenu(0);
 	pPopup->CheckMenuItem(IDC_DIFF_IGNORECASE, COptionsMgr::Get(OPT_CMP_IGNORE_CASE) ? MF_CHECKED : 0);
 	pPopup->CheckMenuItem(IDC_DIFF_IGNOREEOL, COptionsMgr::Get(OPT_CMP_IGNORE_EOL) ? MF_CHECKED : 0);
-	switch (const int id = COptionsMgr::Get(OPT_CMP_IGNORE_WHITESPACE) + IDC_DIFF_WHITESPACE_COMPARE)
+
+	// Whitespace options
+	int check = COptionsMgr::Get(OPT_CMP_IGNORE_WHITESPACE);
+	pPopup->CheckMenuItem(IDC_DIFF_WS_IGNORE_TAB_EXPANSION,
+		check & WHITESPACE_IGNORE_TAB_EXPANSION ? MF_CHECKED : 0);
+	pPopup->CheckMenuItem(IDC_DIFF_WS_IGNORE_TRAILING_SPACE,
+		check & WHITESPACE_IGNORE_TRAILING_SPACE ? MF_CHECKED : 0);
+	int radio = check & WHITESPACE_RADIO_OPTIONS_MASK;
+	UINT state = radio != check ? MF_GRAYED : 0;
+	pPopup->EnableMenuItem(IDC_DIFF_WHITESPACE_COMPARE, state);
+	pPopup->EnableMenuItem(IDC_DIFF_WHITESPACE_IGNORE, state);
+	pPopup->EnableMenuItem(IDC_DIFF_WHITESPACE_IGNOREALL, state);
+	switch (const int id = radio + IDC_DIFF_WHITESPACE_COMPARE)
 	{
 	case IDC_DIFF_WHITESPACE_COMPARE:
 	case IDC_DIFF_WHITESPACE_IGNORE:
@@ -4076,6 +4092,8 @@ void CMainFrame::OnDiffOptionsDropDown(NMTOOLBAR *pToolBar)
 		pPopup->CheckMenuRadioItem(id, id, id);
 		break;
 	}
+
+	// Compare methods
 	switch (const int id = COptionsMgr::Get(OPT_CMP_METHOD) + ID_COMPMETHOD_FULL_CONTENTS)
 	{
 	case ID_COMPMETHOD_FULL_CONTENTS:
@@ -4105,9 +4123,11 @@ void CMainFrame::OnDiffIgnoreEOL()
 	ApplyDiffOptions();
 }
 
-void CMainFrame::OnDiffWhitespace(int value)
+void CMainFrame::OnDiffWhitespace(int check, int radio)
 {
-	COptionsMgr::SaveOption(OPT_CMP_IGNORE_WHITESPACE, value);
+	int value = COptionsMgr::Get(OPT_CMP_IGNORE_WHITESPACE);
+	COptionsMgr::SaveOption(OPT_CMP_IGNORE_WHITESPACE,
+		check ? value ^ check : value & WHITESPACE_CHECK_OPTIONS_MASK | radio);
 	ApplyDiffOptions();
 }
 

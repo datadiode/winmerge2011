@@ -19,9 +19,16 @@
  */
 enum
 {
+	/* Radio options */
 	WHITESPACE_COMPARE_ALL,        /**< no special handling of whitespace */
 	WHITESPACE_IGNORE_CHANGE,      /**< ignore changes in whitespace */
 	WHITESPACE_IGNORE_ALL,         /**< ignore whitespace altogether */
+	/* Check options */
+	WHITESPACE_IGNORE_TAB_EXPANSION = 0x04,
+	WHITESPACE_IGNORE_TRAILING_SPACE = 0x08,
+	/* Masks to separate between radio & check options */
+	WHITESPACE_CHECK_OPTIONS_MASK = 0x10 - WHITESPACE_IGNORE_TAB_EXPANSION,
+	WHITESPACE_RADIO_OPTIONS_MASK = WHITESPACE_IGNORE_TAB_EXPANSION - 0x01,
 };
 
 /**

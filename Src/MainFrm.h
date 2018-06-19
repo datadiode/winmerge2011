@@ -257,7 +257,7 @@ protected:
 	void OnDiffOptionsDropDown(NMTOOLBAR *);
 	void OnDiffIgnoreCase();
 	void OnDiffIgnoreEOL();
-	void OnDiffWhitespace(int);
+	void OnDiffWhitespace(int, int);
 	void OnCompareMethod(int);
 	void OnHelpReleasenotes();
 	void OnHelpTranslations();

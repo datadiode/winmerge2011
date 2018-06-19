@@ -94,8 +94,8 @@ void CDiffWrapper::SetToDiffUtils()
 		break;
 	default:
 		ignore_white_space = static_cast<DIFF_white_space>(
-			(nIgnoreWhitespace & 4 ? IGNORE_TAB_EXPANSION : 0) |
-			(nIgnoreWhitespace & 8 ? IGNORE_TRAILING_SPACE : 0));
+			(nIgnoreWhitespace & WHITESPACE_IGNORE_TAB_EXPANSION ? IGNORE_TAB_EXPANSION : 0) |
+			(nIgnoreWhitespace & WHITESPACE_IGNORE_TRAILING_SPACE ? IGNORE_TRAILING_SPACE : 0));
 		break;
 	}
 

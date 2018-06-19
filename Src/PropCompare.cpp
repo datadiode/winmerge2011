@@ -7,6 +7,7 @@
 #include "OptionsPanel.h"
 #include "resource.h"
 #include "PropCompare.h"
+#include "CompareOptions.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -77,9 +78,9 @@ void PropCompare::ReadOptions()
 {
 	// NB: OPT_CMP_IGNORE_WHITESPACE combines radio options with check options!
 	m_nIgnoreWhite = COptionsMgr::Get(OPT_CMP_IGNORE_WHITESPACE);
-	m_bIgnoreTabExpansion = (m_nIgnoreWhite & 4) != 0;
-	m_bIgnoreTrailingSpace = (m_nIgnoreWhite & 8) != 0;
-	m_nIgnoreWhite &= 3;
+	m_bIgnoreTabExpansion = (m_nIgnoreWhite & WHITESPACE_IGNORE_TAB_EXPANSION) != 0;
+	m_bIgnoreTrailingSpace = (m_nIgnoreWhite & WHITESPACE_IGNORE_TRAILING_SPACE) != 0;
+	m_nIgnoreWhite &= WHITESPACE_RADIO_OPTIONS_MASK;
 	m_bMinimal = COptionsMgr::Get(OPT_CMP_MINIMAL);
 	m_bSpeedLargeFiles = COptionsMgr::Get(OPT_CMP_SPEED_LARGE_FILES);
 	m_bApplyHistoricCostLimit = COptionsMgr::Get(OPT_CMP_APPLY_HISTORIC_COST_LIMIT);
@@ -101,7 +102,8 @@ void PropCompare::WriteOptions()
 {
 	// NB: OPT_CMP_IGNORE_WHITESPACE combines radio options with check options!
 	COptionsMgr::SaveOption(OPT_CMP_IGNORE_WHITESPACE, m_nIgnoreWhite |
-		(m_bIgnoreTabExpansion ? 4 : 0) | (m_bIgnoreTrailingSpace ? 8 : 0));
+		(m_bIgnoreTabExpansion ? WHITESPACE_IGNORE_TAB_EXPANSION : 0) |
+		(m_bIgnoreTrailingSpace ? WHITESPACE_IGNORE_TRAILING_SPACE : 0));
 	COptionsMgr::SaveOption(OPT_CMP_MINIMAL, m_bMinimal != FALSE);
 	COptionsMgr::SaveOption(OPT_CMP_SPEED_LARGE_FILES, m_bSpeedLargeFiles != FALSE);
 	COptionsMgr::SaveOption(OPT_CMP_APPLY_HISTORIC_COST_LIMIT, m_bApplyHistoricCostLimit != FALSE);
@@ -133,9 +135,9 @@ void PropCompare::UpdateScreen()
 void PropCompare::OnDefaults()
 {
 	m_nIgnoreWhite = COptionsMgr::GetDefault(OPT_CMP_IGNORE_WHITESPACE);
-	m_bIgnoreTabExpansion = (m_nIgnoreWhite & 4) != 0;
-	m_bIgnoreTrailingSpace = (m_nIgnoreWhite & 8) != 0;
-	m_nIgnoreWhite &= 3;
+	m_bIgnoreTabExpansion = (m_nIgnoreWhite & WHITESPACE_IGNORE_TAB_EXPANSION) != 0;
+	m_bIgnoreTrailingSpace = (m_nIgnoreWhite & WHITESPACE_IGNORE_TRAILING_SPACE) != 0;
+	m_nIgnoreWhite &= WHITESPACE_RADIO_OPTIONS_MASK;
 	m_bMinimal = COptionsMgr::GetDefault(OPT_CMP_MINIMAL);
 	m_bSpeedLargeFiles = COptionsMgr::GetDefault(OPT_CMP_SPEED_LARGE_FILES);
 	m_bApplyHistoricCostLimit = COptionsMgr::GetDefault(OPT_CMP_APPLY_HISTORIC_COST_LIMIT);
