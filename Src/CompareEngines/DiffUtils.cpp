@@ -18,7 +18,6 @@ DiffUtils::DiffUtils(const CDiffContext *context)
 {
 	DIFFOPTIONS::operator=(context->m_options);
 	RefreshFilters();
-	SetToDiffUtils();
 }
 
 /**
@@ -58,7 +57,7 @@ int DiffUtils::diffutils_compare_files(struct comparison *cmp)
 		{
 			/* Find a set of changes that belong together.  */
 			struct change *thisob = next;
-			struct change *end = find_change(next);
+			struct change *end = find_change(cmp, next);
 			/* Disconnect them from the rest of the changes,
 			making them a hunk, and remember the rest for next iteration.  */
 			next = end->link;
@@ -68,7 +67,7 @@ int DiffUtils::diffutils_compare_files(struct comparison *cmp)
 #endif
 			/* Determine range of line numbers involved in each file.  */
 			int first0 = 0, last0 = 0, first1 = 0, last1 = 0;
-			enum changes changes = analyze_hunk(thisob, &first0, &last0, &first1, &last1);
+			enum changes changes = analyze_hunk(cmp, thisob, &first0, &last0, &first1, &last1);
 			if (changes || thisob->trivial)
 			{
 				/* Print the lines that the first file has.  */
@@ -82,7 +81,7 @@ int DiffUtils::diffutils_compare_files(struct comparison *cmp)
 
 				if (bFilterCommentsLines && changes)
 				{
-					OP_TYPE op = PostFilter(
+					OP_TYPE op = PostFilter(cmp,
 						thisob->line0, QtyLinesLeft + 1,
 						thisob->line1, QtyLinesRight + 1,
 						OP_DIFF, asLwrCaseExt.c_str());
@@ -99,8 +98,8 @@ int DiffUtils::diffutils_compare_files(struct comparison *cmp)
 					int line1 = thisob->line1;
 					int end0 = line0 + QtyLinesLeft;
 					int end1 = line1 + QtyLinesRight;
-					if (line0 + RegExpFilter(line0, end0, 0, false) > end0 &&
-						line1 + RegExpFilter(line1, end1, 1, false) > end1)
+					if (line0 + RegExpFilter(cmp, line0, end0, 0, false) > end0 &&
+						line1 + RegExpFilter(cmp, line1, end1, 1, false) > end1)
 					{
 						thisob->trivial = 1;
 					}

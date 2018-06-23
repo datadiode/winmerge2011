@@ -6,6 +6,9 @@
 #include "StdAfx.h"
 #include "FilterList.h"
 #include "LineFiltersList.h"
+#include "DiffItem.h"
+#include "FileLocation.h"
+#include "DiffFileData.h"
 #include "DiffWrapper.h"
 #include "pcre.h"
 #include "unicoder.h"
@@ -16,9 +19,10 @@
 #define new DEBUG_NEW
 #endif
 
-size_t apply_prediffer(struct file_data *current, short side, char *buf, size_t len)
+size_t apply_prediffer(struct comparison *cmp, short side, char *buf, size_t len)
 {
-	CDiffWrapper *const pOptions = CDiffWrapper::m_pActiveInstance;
+	DiffFileData *const pDiffData = static_cast<DiffFileData *>(cmp);
+	CDiffWrapper *const pOptions = pDiffData->m_pDiffWrapper;
 	if (pOptions->HasPrediffers())
 	{
 		const String &filename = pOptions->GetCompareFile(side);

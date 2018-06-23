@@ -23,10 +23,10 @@
 #if USE_GNU_REGEX(1)
 static char const *find_function (char const * const *, lin);
 #endif
-static struct change *find_hunk (struct change *);
-static void mark_ignorable (struct change *);
-static void pr_context_hunk (struct change *);
-static void pr_unidiff_hunk (struct change *);
+static struct change *find_hunk (struct comparison *, struct change *);
+static void mark_ignorable (struct comparison *, struct change *);
+static void pr_context_hunk (struct comparison *, struct file_cursor *, struct change *);
+static void pr_unidiff_hunk (struct comparison *, struct file_cursor *, struct change *);
 
 /* Last place find_function started searching from.  */
 static lin find_function_last_search;
@@ -37,41 +37,42 @@ static lin find_function_last_match;
 /* Print a label for a context diff, with a file name and date or a label.  */
 
 static void
-print_context_label (char const *mark,
+print_context_label (struct comparison *cmp,
+                     char const *mark,
                      struct file_data *inf,
                      char const *name,
                      char const *label)
 {
   if (label)
-    fprintf (outfile, "%s %s\n", mark, label);
+    fprintf (cmp->outfile, "%s %s\n", mark, label);
   else
-    fprintf (outfile, "%s %s\t%s", mark, name, ctime (&inf->stat.st_mtime) );
+    fprintf (cmp->outfile, "%s %s\t%s", mark, name, ctime (&inf->stat.st_mtime) );
 }
 
 /* Print a header for a context diff, with the file names and dates.  */
 
 void
-print_context_header (struct file_data inf[], char const *const *names, bool unidiff)
+print_context_header (struct comparison *cmp, char const *const *names, bool unidiff)
 {
   if (unidiff)
     {
-      print_context_label ("---", &inf[0], names[0], file_label[0]);
-      print_context_label ("+++", &inf[1], names[1], file_label[1]);
+      print_context_label (cmp, "---", &cmp->file[0], names[0], cmp->file_label[0]);
+      print_context_label (cmp, "+++", &cmp->file[1], names[1], cmp->file_label[1]);
     }
   else
     {
-      print_context_label ("***", &inf[0], names[0], file_label[0]);
-      print_context_label ("---", &inf[1], names[1], file_label[1]);
+      print_context_label (cmp, "***", &cmp->file[0], names[0], cmp->file_label[0]);
+      print_context_label (cmp, "---", &cmp->file[1], names[1], cmp->file_label[1]);
     }
 }
 
 /* Print an edit script in context format.  */
 
 void
-print_context_script (struct change *script, bool unidiff)
+print_context_script (struct comparison *cmp, struct file_cursor *cursors, struct change *script, bool unidiff)
 {
-  if (ignore_blank_lines || USE_GNU_REGEX(ignore_regexp.fastmap))
-    mark_ignorable (script);
+  if (cmp->ignore_blank_lines || USE_GNU_REGEX(ignore_regexp.fastmap))
+    mark_ignorable (cmp, script);
   else
     {
       struct change *e;
@@ -79,13 +80,13 @@ print_context_script (struct change *script, bool unidiff)
         e->ignore = false;
     }
 
-  find_function_last_search = - files[0].prefix_lines;
+  find_function_last_search = - cmp->file[0].prefix_lines;
   find_function_last_match = LIN_MAX;
 
   if (unidiff)
-    print_script (script, find_hunk, pr_unidiff_hunk);
+    print_script (cmp, cursors, script, find_hunk, pr_unidiff_hunk);
   else
-    print_script (script, find_hunk, pr_context_hunk);
+    print_script (cmp, cursors, script, find_hunk, pr_context_hunk);
 }
 
 /* Print a pair of line numbers with a comma, translated for file FILE.
@@ -95,7 +96,7 @@ print_context_script (struct change *script, bool unidiff)
    We print the translated (real) line numbers.  */
 
 static void
-print_context_number_range (struct file_data const *file, lin a, lin b)
+print_context_number_range (struct comparison *cmp, struct file_data const *file, lin a, lin b)
 {
   printint trans_a, trans_b;
   translate_range (file, a, b, &trans_a, &trans_b);
@@ -110,9 +111,9 @@ print_context_number_range (struct file_data const *file, lin a, lin b)
      specification.  */
 
   if (trans_b <= trans_a)
-    fprintf (outfile, "%"pI"d", trans_b);
+    fprintf (cmp->outfile, "%"pI"d", trans_b);
   else
-    fprintf (outfile, "%"pI"d,%"pI"d", trans_a, trans_b);
+    fprintf (cmp->outfile, "%"pI"d,%"pI"d", trans_a, trans_b);
 }
 
 #if USE_GNU_REGEX(1)
@@ -140,7 +141,7 @@ print_context_function (FILE *out, char const *function)
    line with the appropriate flag-character.  */
 
 static void
-pr_context_hunk (struct change *hunk)
+pr_context_hunk (struct comparison *cmp, struct file_cursor *cursors, struct change *hunk)
 {
   lin first0, last0, first1, last1, i;
   char const *prefix;
@@ -151,33 +152,33 @@ pr_context_hunk (struct change *hunk)
 
   /* Determine range of line numbers involved in each file.  */
 
-  enum changes changes = analyze_hunk (hunk, &first0, &last0, &first1, &last1);
+  enum changes changes = analyze_hunk (cmp, hunk, &first0, &last0, &first1, &last1);
   if (! changes)
     return;
 
   /* Include a context's width before and after.  */
 
-  i = - files[0].prefix_lines;
-  first0 = MAX (first0 - context, i);
-  first1 = MAX (first1 - context, i);
-  if (last0 < files[0].valid_lines - context)
-    last0 += context;
+  i = - cmp->file[0].prefix_lines;
+  first0 = MAX (first0 - cmp->context, i);
+  first1 = MAX (first1 - cmp->context, i);
+  if (last0 < cmp->file[0].valid_lines - cmp->context)
+    last0 += cmp->context;
   else
-    last0 = files[0].valid_lines - 1;
-  if (last1 < files[1].valid_lines - context)
-    last1 += context;
+    last0 = cmp->file[0].valid_lines - 1;
+  if (last1 < cmp->file[1].valid_lines - cmp->context)
+    last1 += cmp->context;
   else
-    last1 = files[1].valid_lines - 1;
+    last1 = cmp->file[1].valid_lines - 1;
 
 #if USE_GNU_REGEX(1)
   /* If desired, find the preceding function definition line in file 0.  */
   function = NULL;
   if (function_regexp.fastmap)
-    function = find_function (files[0].linbuf, first0);
+    function = find_function (cmp->file[0].linbuf, first0);
 #endif
 
-  begin_output ();
-  out = outfile;
+  begin_output (cmp);
+  out = cmp->outfile;
 
   fputs ("***************", out);
 
@@ -188,7 +189,7 @@ pr_context_hunk (struct change *hunk)
 
   putc ('\n', out);
   fputs ("*** ", out);
-  print_context_number_range (&files[0], first0, last0);
+  print_context_number_range (cmp, &cmp->file[0], first0, last0);
   fputs (" ****", out);
   putc ('\n', out);
 
@@ -214,12 +215,12 @@ pr_context_hunk (struct change *hunk)
                  Otherwise it is "deleted".  */
               prefix = (next->inserted > 0 ? "!" : "-");
             }
-          print_1_line (prefix, &files[0].linbuf[i]);
+          print_1_line (cmp, &cursors[0], prefix, cmp->file[0].prefix_lines + i, iseolch(*cmp->file[0].linbuf[i]));
         }
     }
 
   fputs ("--- ", out);
-  print_context_number_range (&files[1], first1, last1);
+  print_context_number_range (cmp, &cmp->file[1], first1, last1);
   fputs (" ----", out);
   putc ('\n', out);
 
@@ -245,7 +246,7 @@ pr_context_hunk (struct change *hunk)
                  Otherwise it is "inserted".  */
               prefix = (next->deleted > 0 ? "!" : "+");
             }
-          print_1_line (prefix, &files[1].linbuf[i]);
+          print_1_line (cmp, &cursors[1], prefix, cmp->file[1].prefix_lines + i, iseolch(*cmp->file[1].linbuf[i]));
         }
     }
 }
@@ -258,7 +259,7 @@ pr_context_hunk (struct change *hunk)
    We print the translated (real) line numbers.  */
 
 static void
-print_unidiff_number_range (struct file_data const *file, lin a, lin b)
+print_unidiff_number_range (struct comparison *cmp, struct file_data const *file, lin a, lin b)
 {
   printint trans_a, trans_b;
   translate_range (file, a, b, &trans_a, &trans_b);
@@ -268,9 +269,9 @@ print_unidiff_number_range (struct file_data const *file, lin a, lin b)
      which is B.  It would be more logical to print A, but
      'patch' expects B in order to detect diffs against empty files.  */
   if (trans_b <= trans_a)
-    fprintf (outfile, trans_b < trans_a ? "%"pI"d,0" : "%"pI"d", trans_b);
+    fprintf (cmp->outfile, trans_b < trans_a ? "%"pI"d,0" : "%"pI"d", trans_b);
   else
-    fprintf (outfile, "%"pI"d,%"pI"d", trans_a, trans_b - trans_a + 1);
+    fprintf (cmp->outfile, "%"pI"d,%"pI"d", trans_a, trans_b - trans_a + 1);
 }
 
 /* Print a portion of an edit script in unidiff format.
@@ -281,7 +282,7 @@ print_unidiff_number_range (struct file_data const *file, lin a, lin b)
    line with the appropriate flag-character.  */
 
 static void
-pr_unidiff_hunk (struct change *hunk)
+pr_unidiff_hunk (struct comparison *cmp, struct file_cursor *cursors, struct change *hunk)
 {
   lin first0, last0, first1, last1;
   lin i, j, k;
@@ -293,37 +294,37 @@ pr_unidiff_hunk (struct change *hunk)
 
   /* Determine range of line numbers involved in each file.  */
 
-  if (! analyze_hunk (hunk, &first0, &last0, &first1, &last1) )
+  if (! analyze_hunk (cmp, hunk, &first0, &last0, &first1, &last1) )
     return;
 
   /* Include a context's width before and after.  */
 
-  i = - files[0].prefix_lines;
-  first0 = MAX (first0 - context, i);
-  first1 = MAX (first1 - context, i);
-  if (last0 < files[0].valid_lines - context)
-    last0 += context;
+  i = - cmp->file[0].prefix_lines;
+  first0 = MAX (first0 - cmp->context, i);
+  first1 = MAX (first1 - cmp->context, i);
+  if (last0 < cmp->file[0].valid_lines - cmp->context)
+    last0 += cmp->context;
   else
-    last0 = files[0].valid_lines - 1;
-  if (last1 < files[1].valid_lines - context)
-    last1 += context;
+    last0 = cmp->file[0].valid_lines - 1;
+  if (last1 < cmp->file[1].valid_lines - cmp->context)
+    last1 += cmp->context;
   else
-    last1 = files[1].valid_lines - 1;
+    last1 = cmp->file[1].valid_lines - 1;
 
 #if USE_GNU_REGEX(1)
   /* If desired, find the preceding function definition line in file 0.  */
   function = NULL;
   if (function_regexp.fastmap)
-    function = find_function (files[0].linbuf, first0);
+    function = find_function (cmp->file[0].linbuf, first0);
 #endif
 
-  begin_output ();
-  out = outfile;
+  begin_output (cmp);
+  out = cmp->outfile;
 
   fputs ("@@ -", out);
-  print_unidiff_number_range (&files[0], first0, last0);
+  print_unidiff_number_range (cmp, &cmp->file[0], first0, last0);
   fputs (" +", out);
-  print_unidiff_number_range (&files[1], first1, last1);
+  print_unidiff_number_range (cmp, &cmp->file[1], first1, last1);
   fputs (" @@", out);
 
 #if USE_GNU_REGEX(1)
@@ -344,10 +345,10 @@ pr_unidiff_hunk (struct change *hunk)
 
       if (!next || i < next->line0)
         {
-          char const *const *line = &files[0].linbuf[i++];
-          if (! (suppress_blank_empty && **line == '\n') )
-            putc (initial_tab ? '\t' : ' ', out);
-          print_1_line (NULL, line);
+          char const *line = cmp->file[0].linbuf[i];
+          if (! (cmp->suppress_blank_empty && iseolch (*line)) )
+            putc (cmp->initial_tab ? '\t' : ' ', out);
+          print_1_line (cmp, &cursors[0], NULL, cmp->file[0].prefix_lines + i++, false);
           j++;
         }
       else
@@ -357,11 +358,11 @@ pr_unidiff_hunk (struct change *hunk)
           k = next->deleted;
           while (k--)
             {
-              char const * const *line = &files[0].linbuf[i++];
+              char const *line = cmp->file[0].linbuf[i];
               putc ('-', out);
-              if (initial_tab && ! (suppress_blank_empty && **line == '\n') )
+              if (cmp->initial_tab && ! (cmp->suppress_blank_empty && iseolch (*line)) )
                 putc ('\t', out);
-              print_1_line (NULL, line);
+              print_1_line (cmp, &cursors[0], NULL, cmp->file[0].prefix_lines + i++, false);
             }
 
           /* Then output the inserted part. */
@@ -370,11 +371,11 @@ pr_unidiff_hunk (struct change *hunk)
 
           while (k--)
             {
-              char const * const *line = &files[1].linbuf[j++];
+              char const *line = cmp->file[1].linbuf[j];
               putc ('+', out);
-              if (initial_tab && ! (suppress_blank_empty && **line == '\n') )
+              if (cmp->initial_tab && ! (cmp->suppress_blank_empty && iseolch (*line)) )
                 putc ('\t', out);
-              print_1_line (NULL, line);
+              print_1_line (cmp, &cursors[1], NULL, cmp->file[1].prefix_lines + j++, false);
             }
 
           /* We're done with this hunk, so on to the next! */
@@ -389,7 +390,7 @@ pr_unidiff_hunk (struct change *hunk)
    to the 'struct change' for the last change before those lines.  */
 
 static struct change * _GL_ATTRIBUTE_PURE
-find_hunk (struct change *start)
+find_hunk (struct comparison *cmp, struct change *start)
 {
   struct change *prev;
   lin top0, top1;
@@ -398,8 +399,8 @@ find_hunk (struct change *start)
   /* Threshold distance is CONTEXT if the second change is ignorable,
      2 * CONTEXT + 1 otherwise.  Integer overflow can't happen, due
      to CONTEXT_LIM.  */
-  lin ignorable_threshold = context;
-  lin non_ignorable_threshold = 2 * context + 1;
+  lin ignorable_threshold = cmp->context;
+  lin non_ignorable_threshold = 2 * cmp->context + 1;
 
   do
     {
@@ -428,7 +429,7 @@ find_hunk (struct change *start)
    are ignorable lines.  */
 
 static void
-mark_ignorable (struct change *script)
+mark_ignorable (struct comparison *cmp, struct change *script)
 {
   while (script)
     {
@@ -439,7 +440,7 @@ mark_ignorable (struct change *script)
       script->link = NULL;
 
       /* Determine whether this change is ignorable.  */
-      script->ignore = ! analyze_hunk (script,
+      script->ignore = ! analyze_hunk (cmp, script,
                                        &first0, &last0, &first1, &last1);
 
       /* Reconnect the chain as before.  */

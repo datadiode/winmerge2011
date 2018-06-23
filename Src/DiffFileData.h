@@ -9,6 +9,8 @@
 
 #include "Diff.h"
 
+class CDiffWrapper;
+
 /**
  * @brief C++ container for the structure (file_data) used by diffutils' diff_2_files(...)
  */
@@ -27,6 +29,7 @@ struct DiffFileData : comparison
 	void SetDisplayFilepaths(LPCTSTR szTrueFilepath1, LPCTSTR szTrueFilepath2);
 
 // Data (public)
+	CDiffWrapper *m_pDiffWrapper;
 	bool m_used; // whether m_inf has real data
 	std::vector<FileLocation> m_FileLocation;
 	std::vector<FileTextStats> m_textStats;

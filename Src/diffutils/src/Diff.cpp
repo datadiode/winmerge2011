@@ -14,7 +14,6 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////
 #include "stdafx.h"
-#define GDIFF_MAIN
 #include <diff.h>
 #include <xalloc.h>
 

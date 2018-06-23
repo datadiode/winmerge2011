@@ -17,11 +17,12 @@
  * @note Diffcounts are initialized to invalid values, not zeros.
  */
 DiffFileData::DiffFileData(int codepage)
-: m_FileLocation(2)
+: m_pDiffWrapper(NULL)
+, m_FileLocation(2)
 , m_textStats(2)
 , m_sDisplayFilepath(2)
 {
-	memset(file, 0, sizeof file);
+	memset(static_cast<comparison *>(this), 0, sizeof(comparison));
 	m_used = false;
 	Reset();
 	// Set default codepages

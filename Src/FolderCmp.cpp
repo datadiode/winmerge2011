@@ -117,7 +117,7 @@ UINT FolderCmp::prepAndCompareTwoFiles(DIFFITEM *di)
 		m_pDiffUtilsEngine->SetCompareFiles(
 			m_diffFileData.m_FileLocation[0].filepath,
 			m_diffFileData.m_FileLocation[1].filepath);
-		m_pDiffUtilsEngine->SetToDiffUtils();
+		m_pDiffUtilsEngine->SetToDiffUtils(m_diffFileData);
 		code = m_pDiffUtilsEngine->diffutils_compare_files(&m_diffFileData);
 		m_ndiffs = m_pDiffUtilsEngine->m_ndiffs;
 		m_ntrivialdiffs = m_pDiffUtilsEngine->m_ntrivialdiffs;

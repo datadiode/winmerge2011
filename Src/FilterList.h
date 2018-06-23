@@ -40,7 +40,7 @@ public:
 	bool Match(int stringlen, const char *string, int codepage = CP_UTF8);
 
 private:
-	friend size_t apply_prediffer(struct file_data *current, short side, char *buf, size_t len);
+	friend size_t apply_prediffer(struct comparison *cmp, short side, char *buf, size_t len);
 
 	template<class iterator>
 	static void dispose(iterator p, iterator q)

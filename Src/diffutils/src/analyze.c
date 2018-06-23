@@ -26,9 +26,9 @@
 #define ELEMENT lin
 #define EQUAL(x,y) ((x) == (y))
 #define OFFSET lin
-#define EXTRA_CONTEXT_FIELDS /* none */
-#define NOTE_DELETE(c, xoff) (files[0].changed[files[0].realindexes[xoff]] = 1)
-#define NOTE_INSERT(c, yoff) (files[1].changed[files[1].realindexes[yoff]] = 1)
+#define EXTRA_CONTEXT_FIELDS struct file_data *files;
+#define NOTE_DELETE(c, xoff) (c->files[0].changed[c->files[0].realindexes[xoff]] = 1)
+#define NOTE_INSERT(c, yoff) (c->files[1].changed[c->files[1].realindexes[yoff]] = 1)
 #define USE_HEURISTIC 1
 #include <diffseq.h>
 
@@ -45,7 +45,7 @@
    so that it will be printed in the output.  */
 
 static void
-discard_confusing_lines (struct file_data filevec[])
+discard_confusing_lines (struct comparison *cmp)
 {
   int f;
   lin i;
@@ -54,41 +54,41 @@ discard_confusing_lines (struct file_data filevec[])
   lin *p;
 
   /* Allocate our results.  */
-  p = (lin *) xmalloc ( (filevec[0].buffered_lines + filevec[1].buffered_lines)
+  p = (lin *) xmalloc ( (cmp->file[0].buffered_lines + cmp->file[1].buffered_lines)
                         * (2 * sizeof * p) );
   for (f = 0; f < 2; f++)
     {
-      filevec[f].undiscarded = p;  p += filevec[f].buffered_lines;
-      filevec[f].realindexes = p;  p += filevec[f].buffered_lines;
+      cmp->file[f].undiscarded = p;  p += cmp->file[f].buffered_lines;
+      cmp->file[f].realindexes = p;  p += cmp->file[f].buffered_lines;
     }
 
   /* Set up equiv_count[F][I] as the number of lines in file F
      that fall in equivalence class I.  */
 
-  p = (lin *) zalloc (filevec[0].equiv_max * (2 * sizeof * p) );
+  p = (lin *) zalloc (cmp->file[0].equiv_max * (2 * sizeof * p) );
   equiv_count[0] = p;
-  equiv_count[1] = p + filevec[0].equiv_max;
+  equiv_count[1] = p + cmp->file[0].equiv_max;
 
-  for (i = 0; i < filevec[0].buffered_lines; ++i)
-    ++equiv_count[0][filevec[0].equivs[i]];
-  for (i = 0; i < filevec[1].buffered_lines; ++i)
-    ++equiv_count[1][filevec[1].equivs[i]];
+  for (i = 0; i < cmp->file[0].buffered_lines; ++i)
+    ++equiv_count[0][cmp->file[0].equivs[i]];
+  for (i = 0; i < cmp->file[1].buffered_lines; ++i)
+    ++equiv_count[1][cmp->file[1].equivs[i]];
 
   /* Set up tables of which lines are going to be discarded.  */
 
-  discarded[0] = (char *) zalloc (filevec[0].buffered_lines
-                                  + filevec[1].buffered_lines);
-  discarded[1] = discarded[0] + filevec[0].buffered_lines;
+  discarded[0] = (char *) zalloc (cmp->file[0].buffered_lines
+                                  + cmp->file[1].buffered_lines);
+  discarded[1] = discarded[0] + cmp->file[0].buffered_lines;
 
   /* Mark to be discarded each line that matches no line of the other file.
      If a line matches many lines, mark it as provisionally discardable.  */
 
   for (f = 0; f < 2; f++)
     {
-      lin end = filevec[f].buffered_lines;
+      lin end = cmp->file[f].buffered_lines;
       char *discards = discarded[f];
       lin *counts = equiv_count[1 - f];
-      lin *equivs = filevec[f].equivs;
+      lin *equivs = cmp->file[f].equivs;
       lin many = 5;
       lin tem = end / 64;
 
@@ -116,7 +116,7 @@ discard_confusing_lines (struct file_data filevec[])
 
   for (f = 0; f < 2; f++)
     {
-      lin end = filevec[f].buffered_lines;
+      lin end = cmp->file[f].buffered_lines;
       register char *discards = discarded[f];
 
       for (i = 0; i < end; i++)
@@ -226,17 +226,17 @@ discard_confusing_lines (struct file_data filevec[])
   for (f = 0; f < 2; f++)
     {
       char *discards = discarded[f];
-      lin end = filevec[f].buffered_lines;
+      lin end = cmp->file[f].buffered_lines;
       lin j = 0;
       for (i = 0; i < end; ++i)
-        if (minimal || discards[i] == 0)
+        if (cmp->minimal || discards[i] == 0)
           {
-            filevec[f].undiscarded[j] = filevec[f].equivs[i];
-            filevec[f].realindexes[j++] = i;
+            cmp->file[f].undiscarded[j] = cmp->file[f].equivs[i];
+            cmp->file[f].realindexes[j++] = i;
           }
         else
-          filevec[f].changed[i] = 1;
-      filevec[f].nondiscarded_lines = j;
+          cmp->file[f].changed[i] = 1;
+      cmp->file[f].nondiscarded_lines = j;
     }
 
   free (discarded[0]);
@@ -425,7 +425,7 @@ struct change *diff_2_files (struct comparison *cmp, int *bin_status,
      Also, --brief without any --ignore-* options means
      we can speed things up by treating the files as binary.  */
 
-  if (read_files (cmp->file, files_can_be_treated_as_binary, bin_file))
+  if (read_files (cmp, bin_file))
     {
       /* Files with different lengths must be different.  */
       if (cmp->file[0].stat.st_size != cmp->file[1].stat.st_size
@@ -495,7 +495,7 @@ struct change *diff_2_files (struct comparison *cmp, int *bin_status,
     {
       struct context ctxt;
       lin diags;
-      lin const too_expensive = cost_limit ? cost_limit : 4096;
+      lin const too_expensive = cmp->cost_limit ? cmp->cost_limit : 4096;
 
       /* Allocate vectors for the results of comparison:
          a flag for each line of each file, saying whether that line
@@ -511,7 +511,7 @@ struct change *diff_2_files (struct comparison *cmp, int *bin_status,
          because they don't match anything.  Detect them now, and
          avoid even thinking about them in the main comparison algorithm.  */
 
-      discard_confusing_lines (cmp->file);
+      discard_confusing_lines (cmp);
 
       /* Now do the main comparison algorithm, considering just the
          undiscarded lines.  */
@@ -525,7 +525,7 @@ struct change *diff_2_files (struct comparison *cmp, int *bin_status,
       ctxt.fdiag += cmp->file[1].nondiscarded_lines + 1;
       ctxt.bdiag += cmp->file[1].nondiscarded_lines + 1;
 
-      ctxt.heuristic = speed_large_files;
+      ctxt.heuristic = cmp->speed_large_files;
 
       /* Set TOO_EXPENSIVE to be the approximate square root of the
          input size, bounded below by 4096.  4096 seems to be good for
@@ -535,11 +535,10 @@ struct change *diff_2_files (struct comparison *cmp, int *bin_status,
         ctxt.too_expensive <<= 1;
       ctxt.too_expensive = MAX (too_expensive, ctxt.too_expensive);
 
-      files[0] = cmp->file[0];
-      files[1] = cmp->file[1];
+      ctxt.files = cmp->file;
 
       compareseq (0, cmp->file[0].nondiscarded_lines,
-                  0, cmp->file[1].nondiscarded_lines, minimal, &ctxt);
+                  0, cmp->file[1].nondiscarded_lines, cmp->minimal, &ctxt);
 
       free (ctxt.fdiag - (cmp->file[1].nondiscarded_lines + 1));
 
@@ -555,7 +554,7 @@ struct change *diff_2_files (struct comparison *cmp, int *bin_status,
 
       /* Set CHANGES if we had any diffs.
          If some changes are ignored, we must scan the script to decide.  */
-      if (ignore_blank_lines || USE_GNU_REGEX(ignore_regexp.fastmap))
+      if (cmp->ignore_blank_lines || USE_GNU_REGEX(ignore_regexp.fastmap))
         {
           struct change *next = script;
           changes = 0;
@@ -567,7 +566,7 @@ struct change *diff_2_files (struct comparison *cmp, int *bin_status,
 
               /* Find a set of changes that belong together.  */
               this = next;
-              end = find_change (next);
+              end = find_change (cmp, next);
 
               /* Disconnect them from the rest of the changes, making them
                  a hunk, and remember the rest for next iteration.  */
@@ -575,7 +574,7 @@ struct change *diff_2_files (struct comparison *cmp, int *bin_status,
               end->link = 0;
 
               /* Determine whether this hunk is really a difference.  */
-              if (analyze_hunk (this, &first0, &last0, &first1, &last1) )
+              if (analyze_hunk (cmp, this, &first0, &last0, &first1, &last1) )
                 changes = 1;
 
               /* Reconnect the script so it will all be freed properly.  */
@@ -612,4 +611,12 @@ void cleanup_file_buffers (struct comparison *cmp)
   if (cmp->file[0].buffer != cmp->file[1].buffer)
     free (cmp->file[0].buffer);
   free (cmp->file[1].buffer);
+
+  free (cmp->equivs);
+  cmp->equivs = NULL;
+  if (cmp->buckets)
+    {
+      free (cmp->buckets - 1);
+      cmp->buckets = NULL;
+    }
 }

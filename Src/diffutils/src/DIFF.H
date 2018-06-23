@@ -47,12 +47,6 @@ enum changes
 
 /* Variables for command line options */
 
-#ifndef GDIFF_MAIN
-# define XTERN extern THREAD_LOCAL
-#else
-# define XTERN THREAD_LOCAL
-#endif
-
 enum output_style
 {
   /* Default output style.  */
@@ -68,18 +62,6 @@ enum output_style
 /* True for output styles that are robust,
    i.e. can handle a file that ends in a non-newline.  */
 #define ROBUST_OUTPUT_STYLE(S) true
-
-XTERN enum output_style output_style;
-
-/* Nonzero if output cannot be generated for identical files.  */
-XTERN bool no_diff_means_no_output;
-
-/* Number of lines of context to show in each set of diffs.
-   This is zero when context is not to be shown.  */
-XTERN lin context;
-
-/* Number of lines to keep in identical prefix and suffix.  */
-XTERN lin horizon_lines;
 
 /* The significance of white space during comparisons.  */
 enum DIFF_white_space
@@ -104,67 +86,6 @@ enum DIFF_white_space
   /* Ignore all horizontal white space (-w).  */
   IGNORE_ALL_SPACE
 };
-
-XTERN enum DIFF_white_space ignore_white_space;
-
-/* Ignore end of line differences (at least between UNIX & DOS */
-XTERN bool ignore_eol_diff;
-
-/* Ignore changes that affect only blank lines (-B).  */
-XTERN bool ignore_blank_lines;
-
-/* WinMerge moved block code */
-XTERN bool moved_blocks_flag;
-
-/* Files can be compared byte-by-byte, as if they were binary.
-   This depends on various options.  */
-XTERN bool files_can_be_treated_as_binary;
-
-/* Ignore differences in case of letters (-i).  */
-XTERN bool ignore_case;
-
-/* DBCS code page, or 0 if source is ASCII or an extension thereof.  */
-XTERN int dbcs_codepage;
-
-/* File labels for '-c' output headers (--label).  */
-XTERN char *file_label[2];
-
-#if USE_GNU_REGEX(1)
-/* Regexp to identify function-header lines (-F).  */
-XTERN struct re_pattern_buffer function_regexp;
-
-/* Ignore changes that affect only lines matching this regexp (-I).  */
-XTERN struct re_pattern_buffer ignore_regexp;
-#endif
-
-/* Say only whether files differ, not how (-q).  */
-XTERN bool brief;
-
-/* Expand tabs in the output so the text lines up properly
-   despite the characters added to the front of each line (-t).  */
-XTERN bool expand_tabs;
-
-/* Number of columns between tab stops.  */
-XTERN size_t tabsize;
-
-/* Use a tab in the output, rather than a space, before the text of an
-   input line, so as to keep the proper alignment in the input line
-   without changing the characters in it (-T).  */
-XTERN bool initial_tab;
-
-/* Do not output an initial space or tab before the text of an empty line.  */
-XTERN bool suppress_blank_empty;
-
-/* Use heuristics for better speed with large files with a small
-   density of changes.  */
-XTERN bool speed_large_files;
-
-/* Allow for a fallback to Diffutils 2.5 cost control behavior.  */
-XTERN lin cost_limit;
-
-/* Don't discard lines.  This makes things slower (sometimes much
-   slower) but will find a guaranteed minimal set of changes.  */
-XTERN bool minimal;
 
 /* The result of comparison is an "edit script": a chain of 'struct change'.
    Each 'struct change' represents one place where some lines are deleted
@@ -270,17 +191,102 @@ struct file_data {
 
 struct comparison
   {
+    /* Describe the two files currently being compared.  */
     struct file_data file[2];
+
+    /* Hash-table: array of buckets, each being a chain of equivalence classes.  */
+    int *buckets;
+
+    /* Number of buckets in the hash table array. */
+    int nbuckets;
+
+    /* Array in which the equivalence classes are allocated.
+       The bucket-chains go through the elements in this array.
+       The number of an equivalence class is its index in this array.  */
+    struct equivclass *equivs;
+
+    /* Index of first free element in the array 'equivs'.  */
+    lin equivs_index;
+
+    /* Number of elements allocated in the array 'equivs'.  */
+    lin equivs_alloc;
+
+    /* Stdio stream to output diffs to.  */
+    FILE *outfile;
+
+    /* File labels for '-c' output headers (--label).  */
+    char *file_label[2];
+
+#if USE_GNU_REGEX(1)
+    /* Regexp to identify function-header lines (-F).  */
+    struct re_pattern_buffer function_regexp;
+
+    /* Ignore changes that affect only lines matching this regexp (-I).  */
+    struct re_pattern_buffer ignore_regexp;
+#endif
+
+    enum output_style output_style;
+
+    /* The significance of white space during comparisons.  */
+    enum DIFF_white_space ignore_white_space;
+
+    /* DBCS code page, or 0 if source is ASCII or an extension thereof.  */
+    int dbcs_codepage;
+
+    /* Allow for a fallback to Diffutils 2.5 cost control behavior.  */
+    lin cost_limit;
+
+    /* Number of lines of context to show in each set of diffs.
+       This is zero when context is not to be shown.  */
+    lin context;
+
+    /* Number of lines to keep in identical prefix and suffix.  */
+    lin horizon_lines;
+
+    /* Number of columns between tab stops.  */
+    unsigned tabsize;
+
+    /* Ignore differences in case of letters (-i).  */
+    bool ignore_case;
+
+    /* Ignore end of line differences (at least between UNIX & DOS */
+    bool ignore_eol_diff;
+
+    /* Ignore changes that affect only blank lines (-B).  */
+    bool ignore_blank_lines;
+
+    /* Use a tab in the output, rather than a space, before the text of an
+       input line, so as to keep the proper alignment in the input line
+       without changing the characters in it (-T).  */
+    bool initial_tab;
+
+    /* Do not output an initial space or tab before the text of an empty line.  */
+    bool suppress_blank_empty;
+
+    /* Nonzero if output cannot be generated for identical files.  */
+    bool no_diff_means_no_output;
+
+    /* Use heuristics for better speed with large files with a small
+       density of changes.  */
+    bool speed_large_files;
+
+    /* Don't discard lines.  This makes things slower (sometimes much
+       slower) but will find a guaranteed minimal set of changes.  */
+    bool minimal;
   };
 
-/* Describe the two files currently being compared.  */
+struct file_cursor
+{
+    int desc;
+    lin line;
+    int index;
+    int ahead;
+    bool ignore_lf;
+    char chunk[256];
+};
 
-XTERN struct file_data files[2];
-
-/* Stdio stream to output diffs to.  */
+inline bool iseolch (char ch) { return ch == '\n' || ch == '\r'; }
 
-XTERN FILE *outfile;
-
 /* Declare various functions.  */
 
 /* analyze.c */
@@ -289,36 +295,34 @@ extern struct change *diff_2_files (struct comparison *, int *, bool, int*);
 extern void cleanup_file_buffers (struct comparison *);
 
 /* context.c */
-extern void print_context_header (struct file_data[], char const * const *, bool);
-extern void print_context_script (struct change *, bool);
+extern void print_context_header (struct comparison *, char const * const *, bool);
+extern void print_context_script (struct comparison *, struct file_cursor *, struct change *, bool);
 
 /* io.c */
 /* WinMerge: add last pointer param */
-extern bool read_files (struct file_data[], bool, int *);
+extern bool read_files (struct comparison *, int *);
 
 /* normal.c */
-extern void print_normal_script (struct change *);
+extern void print_normal_script (struct comparison *, struct file_cursor *, struct change *);
 
 /* util.c */
 extern char const change_letter[4];
 extern char *concat (char const *, char const *, char const *);
-extern bool lines_differ (char const *, char const *) _GL_ATTRIBUTE_PURE;
+extern bool lines_differ (struct comparison const *, char const *, char const *) _GL_ATTRIBUTE_PURE;
 extern lin translate_line_number (struct file_data const *, lin);
-extern struct change *find_change (struct change *);
-extern struct change *find_reverse_change (struct change *);
+extern struct change *find_change (struct comparison *, struct change *);
 extern void *zalloc (size_t);
-extern enum changes analyze_hunk (struct change *, lin *, lin *, lin *, lin *);
-extern void begin_output (void);
+extern enum changes analyze_hunk (struct comparison *, struct change *, lin *, lin *, lin *, lin *);
+extern void begin_output (struct comparison *);
 extern void debug_script (struct change *);
 extern void fatal (char const *) __attribute__((noreturn));
-extern void output_1_line (char const *, char const *, char const *,
-                           char const *);
 extern void perror_with_name (char const *);
 extern void pfatal_with_name (char const *) __attribute__((noreturn));
-extern void print_1_line (char const *, char const * const *);
+extern void print_1_line (struct comparison *, struct file_cursor *, char const *, lin, bool);
 extern void print_message_queue (void);
-extern void print_number_range (char, struct file_data *, lin, lin);
-extern void print_script (struct change *, struct change * (*) (struct change *),
-                          void (*) (struct change *));
+extern void print_number_range (char, struct file_data *, lin, lin, FILE *);
+extern void print_script (struct comparison *, struct file_cursor *, struct change *,
+                          struct change * (*) (struct comparison *, struct change *),
+                          void (*) (struct comparison *, struct file_cursor *, struct change *));
 extern void translate_range (struct file_data const *, lin, lin,
                              printint *, printint *);

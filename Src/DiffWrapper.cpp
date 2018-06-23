@@ -37,8 +37,6 @@
 
 static void CopyTextStats(const file_data *, FileTextStats *);
 
-THREAD_LOCAL CDiffWrapper *CDiffWrapper::m_pActiveInstance = NULL;
-
 PATCHOPTIONS::PATCHOPTIONS()
 	: outputStyle(OUTPUT_NORMAL)
 	, nContext(0)
@@ -65,8 +63,6 @@ CDiffWrapper::CDiffWrapper(DiffList *pDiffList)
 CDiffWrapper::~CDiffWrapper()
 {
 	delete m_pMovedLines;
-	if (m_pActiveInstance == this)
-		m_pActiveInstance = NULL;
 }
 
 /**
@@ -76,46 +72,38 @@ CDiffWrapper::~CDiffWrapper()
  * values and meanings, with fancy combinations? So not easy to setup. This
  * function maps our easier to handle compare options to diffutils globals.
  */
-void CDiffWrapper::SetToDiffUtils()
+void CDiffWrapper::SetToDiffUtils(DiffFileData &diffdata)
 {
-	m_pActiveInstance = this;
+	diffdata.m_pDiffWrapper = this;
 
-	output_style = outputStyle;
+	diffdata.output_style = outputStyle;
 
-	context = nContext;
+	diffdata.context = nContext;
 
 	switch (nIgnoreWhitespace)
 	{
 	case WHITESPACE_IGNORE_CHANGE:
-		ignore_white_space = IGNORE_SPACE_CHANGE;
+		diffdata.ignore_white_space = IGNORE_SPACE_CHANGE;
 		break;
 	case WHITESPACE_IGNORE_ALL:
-		ignore_white_space = IGNORE_ALL_SPACE;
+		diffdata.ignore_white_space = IGNORE_ALL_SPACE;
 		break;
 	default:
-		ignore_white_space = static_cast<DIFF_white_space>(
+		diffdata.ignore_white_space = static_cast<DIFF_white_space>(
 			(nIgnoreWhitespace & WHITESPACE_IGNORE_TAB_EXPANSION ? IGNORE_TAB_EXPANSION : 0) |
 			(nIgnoreWhitespace & WHITESPACE_IGNORE_TRAILING_SPACE ? IGNORE_TRAILING_SPACE : 0));
 		break;
 	}
 
-	tabsize				=	nTabSize;
-	ignore_blank_lines	=	bIgnoreBlankLines;
-	ignore_case			=	bIgnoreCase;
-	ignore_eol_diff		=	bIgnoreEol;
-	minimal				=	bMinimal;
-	speed_large_files	=	bSpeedLargeFiles;
-	cost_limit			=	bApplyHistoricCostLimit ? 256 : 0;
-
-	files_can_be_treated_as_binary = brief && !(
-		ignore_white_space ||
-		ignore_blank_lines ||
-		ignore_case ||
-		ignore_eol_diff);
-
-	dbcs_codepage = FileTextEncoding::IsCodepageDBCS(m_codepage);
-
-	horizon_lines = 0;// TODO: Make this configurable?
+	diffdata.tabsize			      = nTabSize;
+	diffdata.ignore_blank_lines	= bIgnoreBlankLines;
+	diffdata.ignore_case		      = bIgnoreCase;
+	diffdata.ignore_eol_diff	   = bIgnoreEol;
+	diffdata.minimal			      = bMinimal;
+	diffdata.speed_large_files	   = bSpeedLargeFiles;
+	diffdata.cost_limit			   = bApplyHistoricCostLimit ? 256 : 0;
+	diffdata.dbcs_codepage        = FileTextEncoding::IsCodepageDBCS(m_codepage);
+	diffdata.horizon_lines        = 0; // TODO: Make this configurable?
 }
 
 void CDiffWrapper::RefreshFilters()
@@ -205,8 +193,9 @@ static void ReplaceSpaces(std::string &str, const char *rep)
  * @param [in] FileNameExt		- The file name extension.  Needs to be lower case string ("cpp", "java", "c")
  * @return Revised OP_TYPE of the block, with OP_TRIVIAL indicating that the block should be ignored
  */
-OP_TYPE CDiffWrapper::PostFilter(int LineNumberLeft, int QtyLinesLeft,
-	int LineNumberRight, int QtyLinesRight, OP_TYPE Op, const TCHAR *FileNameExt)
+OP_TYPE CDiffWrapper::PostFilter(struct comparison *cmp,
+	int LineNumberLeft, int QtyLinesLeft, int LineNumberRight,
+	int QtyLinesRight, OP_TYPE Op, const TCHAR *FileNameExt)
 {
 	ASSERT(Op != OP_TRIVIAL);
 	
@@ -221,11 +210,11 @@ OP_TYPE CDiffWrapper::PostFilter(int LineNumberLeft, int QtyLinesLeft,
 
 	OP_TYPE LeftOp = OP_NONE;
 	if (Op != OP_RIGHTONLY)
-		LeftOp = filtercommentsset.PostFilter(LineNumberLeft, QtyLinesLeft, &files[0]);
+		LeftOp = filtercommentsset.PostFilter(LineNumberLeft, QtyLinesLeft, &cmp->file[0]);
 
 	OP_TYPE RightOp = OP_NONE;
 	if (Op != OP_LEFTONLY)
-		RightOp = filtercommentsset.PostFilter(LineNumberRight, QtyLinesRight, &files[1]);
+		RightOp = filtercommentsset.PostFilter(LineNumberRight, QtyLinesRight, &cmp->file[1]);
 
 	for (int i = 0; (i < QtyLinesLeft) || (i < QtyLinesRight); i++)
 	{
@@ -236,13 +225,13 @@ OP_TYPE CDiffWrapper::PostFilter(int LineNumberLeft, int QtyLinesLeft,
 		const char *EndLineRight = LineStrRight;
 		if (i < QtyLinesLeft)
 		{
-			LineStrLeft = files[0].linbuf[LineNumberLeft + i];
-			EndLineLeft = files[0].linbuf[LineNumberLeft + i + 1];
+			LineStrLeft = cmp->file[0].linbuf[LineNumberLeft + i];
+			EndLineLeft = cmp->file[0].linbuf[LineNumberLeft + i + 1];
 		}
 		if (i < QtyLinesRight)
 		{
-			LineStrRight = files[1].linbuf[LineNumberRight + i];
-			EndLineRight = files[1].linbuf[LineNumberRight + i + 1];
+			LineStrRight = cmp->file[1].linbuf[LineNumberRight + i];
+			EndLineRight = cmp->file[1].linbuf[LineNumberRight + i + 1];
 		}
 			
 		if (EndLineLeft && EndLineRight)
@@ -376,7 +365,7 @@ void CDiffWrapper::SetAlternativePaths(const String &altPath1, const String &alt
 
 bool CDiffWrapper::RunFileDiff(DiffFileData &diffdata)
 {
-	SetToDiffUtils();
+	SetToDiffUtils(diffdata);
 
 	// Compare the files, if no error was found.
 	// Last param (bin_file) is NULL since we don't
@@ -400,12 +389,13 @@ bool CDiffWrapper::RunFileDiff(DiffFileData &diffdata)
 	String sTempPath = env_GetTempPath(); // get path to Temp folder
 	String path = paths_ConcatPath(sTempPath, _T("Diff.txt"));
 
-	outfile = _tfopen(path.c_str(), _T("w+"));
-	if (outfile != NULL)
+	diffdata.outfile = _tfopen(path.c_str(), _T("w+"));
+	if (diffdata.outfile != NULL)
 	{
-		print_normal_script(script);
-		fclose(outfile);
-		outfile = NULL;
+		struct file_cursor cursors[_countof(diffdata.file)];
+		print_normal_script(&diffdata, cursors, script);
+		fclose(diffdata.outfile);
+		diffdata.outfile = NULL;
 	}
 #endif
 
@@ -431,14 +421,14 @@ bool CDiffWrapper::RunFileDiff(DiffFileData &diffdata)
 	// Create patch file
 	if (!m_status.bBinaries && !m_sPatchFile.empty())
 	{
-		WritePatchFile(script, &diffdata.file[0]);
+		WritePatchFile(script, &diffdata);
 	}
 	
 	// Go through diffs adding them to WinMerge's diff list
 	// This is done on every WinMerge's doc rescan!
 	if (!m_status.bBinaries && m_pDiffList)
 	{
-		bRet = LoadWinMergeDiffsFromDiffUtilsScript(script, diffdata.file);
+		bRet = LoadWinMergeDiffsFromDiffUtilsScript(script, &diffdata);
 	}			
 
 	// cleanup the script
@@ -555,7 +545,7 @@ bool CDiffWrapper::FixLastDiffRange(int leftBufferLines, int rightBufferLines, b
 /**
  * @brief Formats command-line for diff-engine last run (like it was called from command-line)
  */
-void CDiffWrapper::FormatSwitchString(char *p)
+void CDiffWrapper::FormatSwitchString(struct comparison const *cmp, char *p)
 {
 	*p++ = '-';
 
@@ -575,22 +565,22 @@ void CDiffWrapper::FormatSwitchString(char *p)
 	if (withContext && nContext > 0)
 		p += sprintf(p, "%d", nContext);
 
-	if (ignore_white_space == IGNORE_ALL_SPACE)
+	if (cmp->ignore_white_space == IGNORE_ALL_SPACE)
 		*p++ = 'w';
 
-	if (ignore_blank_lines)
+	if (cmp->ignore_blank_lines)
 		*p++ = 'B';
 
-	if (ignore_case)
+	if (cmp->ignore_case)
 		*p++ = 'i';
 
-	if (ignore_white_space == IGNORE_SPACE_CHANGE)
+	if (cmp->ignore_white_space == IGNORE_SPACE_CHANGE)
 		*p++ = 'b';
 
-	if (ignore_white_space & IGNORE_TAB_EXPANSION)
+	if (cmp->ignore_white_space & IGNORE_TAB_EXPANSION)
 		*p++ = 'E';
 
-	if (ignore_white_space & IGNORE_TRAILING_SPACE)
+	if (cmp->ignore_white_space & IGNORE_TRAILING_SPACE)
 		*p++ = 'Z';
 
 	p[p[-1] == '-' ? -1 : 0] = '\0';
@@ -640,12 +630,13 @@ bool CDiffWrapper::Diff2Files(struct change **diffs, struct comparison *cmp, int
  * @param [in] FileNo File to match.
  * return number of lines matching any of the expressions.
  */
-int CDiffWrapper::RegExpFilter(int StartPos, int EndPos, int FileNo, bool BreakCondition)
+int CDiffWrapper::RegExpFilter(struct comparison *cmp,
+	int StartPos, int EndPos, int FileNo, bool BreakCondition)
 {
 	int line = StartPos;
 	while (line <= EndPos)
 	{
-		const char *string = files[FileNo].linbuf[line];
+		const char *string = cmp->file[FileNo].linbuf[line];
 		int stringlen = linelen(string);
 		if (FilterList::Match(stringlen, string, m_codepage) == BreakCondition)
 			break;
@@ -657,7 +648,7 @@ int CDiffWrapper::RegExpFilter(int StartPos, int EndPos, int FileNo, bool BreakC
 /**
  * @brief Walk the diff utils change script, building the WinMerge list of diff blocks
  */
-bool CDiffWrapper::LoadWinMergeDiffsFromDiffUtilsScript(struct change *script, const file_data *inf)
+bool CDiffWrapper::LoadWinMergeDiffsFromDiffUtilsScript(struct change *script, struct comparison *cmp)
 {
 	//Logic needed for Ignore comment option
 	String asLwrCaseExt;
@@ -677,7 +668,7 @@ bool CDiffWrapper::LoadWinMergeDiffsFromDiffUtilsScript(struct change *script, c
 	{
 		/* Find a set of changes that belong together.  */
 		struct change *thisob = next;
-		struct change *end = find_change(next);
+		struct change *end = find_change(cmp, next);
 		
 #ifdef DEBUG
 		debug_script(thisob);
@@ -692,7 +683,7 @@ bool CDiffWrapper::LoadWinMergeDiffsFromDiffUtilsScript(struct change *script, c
 		making them a hunk, and remember the rest for next iteration.  */
 		next = end->link;
 		end->link = 0;
-		enum changes changes = analyze_hunk(thisob, &first0, &last0, &first1, &last1);
+		enum changes changes = analyze_hunk(cmp, thisob, &first0, &last0, &first1, &last1);
 		/* Reconnect the script so it will all be freed properly.  */
 		end->link = next;
 
@@ -703,8 +694,8 @@ bool CDiffWrapper::LoadWinMergeDiffsFromDiffUtilsScript(struct change *script, c
 				
 			/* Print the lines that the first file has.  */
 			printint trans_a0 = 0, trans_b0 = 0, trans_a1 = 0, trans_b1 = 0;
-			translate_range(&inf[0], first0, last0, &trans_a0, &trans_b0);
-			translate_range(&inf[1], first1, last1, &trans_a1, &trans_b1);
+			translate_range(&cmp->file[0], first0, last0, &trans_a0, &trans_b0);
+			translate_range(&cmp->file[1], first1, last1, &trans_a1, &trans_b1);
 
 			// Store information about these blocks in moved line info
 			if (m_pMovedLines != NULL)
@@ -736,7 +727,7 @@ bool CDiffWrapper::LoadWinMergeDiffsFromDiffUtilsScript(struct change *script, c
 			int QtyLinesRight = trans_b1 - trans_a1;
 			if (bFilterCommentsLines && (op != OP_TRIVIAL))
 			{
-				op = PostFilter(
+				op = PostFilter(cmp,
 					thisob->line0, QtyLinesLeft + 1,
 					thisob->line1, QtyLinesRight + 1,
 					op, asLwrCaseExt.c_str());
@@ -748,8 +739,8 @@ bool CDiffWrapper::LoadWinMergeDiffsFromDiffUtilsScript(struct change *script, c
 				int line1 = thisob->line1;
 				int end0 = line0 + QtyLinesLeft;
 				int end1 = line1 + QtyLinesRight;
-				if (line0 + RegExpFilter(line0, end0, 0, false) > end0 &&
-					line1 + RegExpFilter(line1, end1, 1, false) > end1)
+				if (line0 + RegExpFilter(cmp, line0, end0, 0, false) > end0 &&
+					line1 + RegExpFilter(cmp, line1, end1, 1, false) > end1)
 				{
 					op = OP_TRIVIAL;
 				}
@@ -806,31 +797,30 @@ bool CDiffWrapper::LoadWinMergeDiffsFromDiffUtilsScript(struct change *script, c
  * @param [in] script list of changes.
  * @param [in] inf file_data table containing filenames
  */
-void CDiffWrapper::WritePatchFile(struct change * script, file_data * inf)
+void CDiffWrapper::WritePatchFile(struct change *script, struct comparison *cmp)
 {
-	file_data inf_patch[2];
-	CopyMemory(&inf_patch, inf, sizeof inf_patch);
-	
+	struct comparison cmp_patch = *cmp;
+
 	// Get paths, primarily use alternative paths, only if they are empty
 	// use full filepaths
 	OString path1 = HString::Uni(!m_s1AlternativePath.empty() ?
 		m_s1AlternativePath.c_str() : m_s1File.c_str())->Oct(CP_THREAD_ACP);
 	OString path2 = HString::Uni(!m_s2AlternativePath.empty() ?
 		m_s2AlternativePath.c_str() : m_s2File.c_str())->Oct(CP_THREAD_ACP);
-	inf_patch[0].name = path1.A;
-	inf_patch[1].name = path2.A;
+	cmp_patch.file[0].name = path1.A;
+	cmp_patch.file[1].name = path2.A;
 
-	_tstati64(m_s1File.c_str(), &inf_patch[0].stat);
-	_tstati64(m_s2File.c_str(), &inf_patch[1].stat);
+	_tstati64(m_s1File.c_str(), &cmp_patch.file[0].stat);
+	_tstati64(m_s2File.c_str(), &cmp_patch.file[1].stat);
 
-	outfile = NULL;
+	cmp_patch.outfile = NULL;
 	if (!m_sPatchFile.empty())
 	{
 		LPCTSTR mode = bAppendFiles ? _T("a+") : _T("w+");
-		outfile = _tfopen(m_sPatchFile.c_str(), mode);
+		cmp_patch.outfile = _tfopen(m_sPatchFile.c_str(), mode);
 	}
 
-	if (!outfile)
+	if (!cmp_patch.outfile)
 	{
 		m_status.bPatchFileFailed = true;
 		return;
@@ -842,28 +832,29 @@ void CDiffWrapper::WritePatchFile(struct change * script, file_data * inf)
 	if (bAddCommandline)
 	{
 		char switches[128];
-		FormatSwitchString(switches);
-		fprintf(outfile, "diff%s %s %s\n", switches, path1.A, path2.A);
+		FormatSwitchString(cmp, switches);
+		fprintf(cmp_patch.outfile, "diff%s %s %s\n", switches, path1.A, path2.A);
 	}
 
 	// Output patchfile
-	switch (output_style)
+	struct file_cursor cursors[_countof(cmp->file)];
+	switch (cmp->output_style)
 	{
 	case OUTPUT_NORMAL:
-		print_normal_script(script);
+		print_normal_script(&cmp_patch, cursors, script);
 		break;
 	case OUTPUT_CONTEXT:
-		print_context_header(inf_patch, names, false);
-		print_context_script(script, false);
+		print_context_header(&cmp_patch, names, false);
+		print_context_script(&cmp_patch, cursors, script, false);
 		break;
 	case OUTPUT_UNIFIED:
-		print_context_header(inf_patch, names, true);
-		print_context_script(script, true);
+		print_context_header(&cmp_patch, names, true);
+		print_context_script(&cmp_patch, cursors, script, true);
 		break;
 	}
 
-	fclose(outfile);
-	outfile = NULL;
+	fclose(cmp_patch.outfile);
+	cmp_patch.outfile = NULL;
 }
 
 /**

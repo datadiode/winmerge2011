@@ -148,7 +148,7 @@ class CDiffWrapper
 public:
 	CDiffWrapper(DiffList * = NULL);
 	~CDiffWrapper();
-	void SetToDiffUtils();
+	void SetToDiffUtils(DiffFileData &);
 	void RefreshFilters();
 	void RefreshOptions();
 	void SetCreatePatchFile(const String &filename);
@@ -169,20 +169,19 @@ public:
 	}
 
 	// Postfiltering
-	OP_TYPE PostFilter(
+	OP_TYPE PostFilter(struct comparison *,
 		int LineNumberLeft, int QtyLinesLeft,
 		int LineNumberRight, int QtyLinesRight,
 		OP_TYPE Op, const TCHAR *FileNameExt);
 
-	static THREAD_LOCAL CDiffWrapper *m_pActiveInstance;
 	DIFFSTATUS m_status; /**< Status of last compare */
 
 protected:
-	void FormatSwitchString(char *);
-	bool Diff2Files(struct change **, struct comparison *cmp, int *bin_status, int *bin_file);
-	bool LoadWinMergeDiffsFromDiffUtilsScript(struct change *, const file_data *);
-	void WritePatchFile(struct change *script, file_data *inf);
-	int RegExpFilter(int StartPos, int EndPos, int FileNo, bool BreakCondition);
+	void FormatSwitchString(struct comparison const *, char *);
+	bool Diff2Files(struct change **, struct comparison *, int *bin_status, int *bin_file);
+	bool LoadWinMergeDiffsFromDiffUtilsScript(struct change *, struct comparison *);
+	void WritePatchFile(struct change *script, struct comparison *);
+	int RegExpFilter(struct comparison *, int StartPos, int EndPos, int FileNo, bool BreakCondition);
 
 	int m_codepage; /**< Codepage used in line filter */
 

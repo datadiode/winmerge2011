@@ -34,7 +34,7 @@ verify (! TYPE_SIGNED (hash_value));
 
 #include <common/unicoder.h> /* DetermineEncoding() */
 
-size_t apply_prediffer (struct file_data *current, short side, char *buffer, size_t length);
+size_t apply_prediffer (struct comparison *cmp, short side, char *buffer, size_t length);
 
 /* Lines are put into equivalence classes of lines that match in lines_differ.
    Each equivalence class is represented by one of these structures,
@@ -47,23 +47,6 @@ struct equivclass
   char const *line;	/* A line that fits this class.  */
   size_t length;	/* That line's length, not counting its newline.  */
 };
-
-/* Hash-table: array of buckets, each being a chain of equivalence classes.  */
-static THREAD_LOCAL int *buckets;
-
-/* Number of buckets in the hash table array. */
-static THREAD_LOCAL int nbuckets;
-
-/* Array in which the equivalence classes are allocated.
-   The bucket-chains go through the elements in this array.
-   The number of an equivalence class is its index in this array.  */
-static THREAD_LOCAL struct equivclass *equivs;
-
-/* Index of first free element in the array 'equivs'.  */
-static THREAD_LOCAL lin equivs_index;
-
-/* Number of elements allocated in the array 'equivs'.  */
-static THREAD_LOCAL lin equivs_alloc;
 
 static UNICODESET get_unicode_signature (struct file_data *, unsigned *bom);
 
@@ -191,7 +174,7 @@ slurp (struct file_data *current)
    class for each line.  */
 
 static void
-find_and_hash_each_line (struct file_data *current)
+find_and_hash_each_line (struct comparison *cmp, struct file_data *current)
 {
   char const *p = current->prefix_end;
   lin i, *bucket;
@@ -203,18 +186,21 @@ find_and_hash_each_line (struct file_data *current)
   lin line = 0;
   lin linbuf_base = current->linbuf_base;
   lin *cureqs = (lin *) xmalloc (alloc_lines * sizeof *cureqs);
-  struct equivclass *eqs = equivs;
-  lin eqs_index = equivs_index;
-  lin eqs_alloc = equivs_alloc;
+  struct equivclass *eqs = cmp->equivs;
+  lin eqs_index = cmp->equivs_index;
+  lin eqs_alloc = cmp->equivs_alloc;
   char const *suffix_begin = current->suffix_begin;
   char const *bufend = FILE_BUFFER (current) + current->buffered;
-  bool ig_case = ignore_case;
-  enum DIFF_white_space ig_white_space = ignore_white_space;
-  bool diff_length_compare_anyway =
+  unsigned const tabsize = cmp->tabsize;
+  lin const context = cmp->context;
+  bool const ig_case = cmp->ignore_case;
+  enum DIFF_white_space const ig_white_space = cmp->ignore_white_space;
+  bool const diff_length_compare_anyway =
     ig_white_space != IGNORE_NO_WHITE_SPACE;
-  bool same_length_diff_contents_compare_anyway =
+  bool const same_length_diff_contents_compare_anyway =
     diff_length_compare_anyway | ig_case;
-  char const eol_diff = ignore_eol_diff ? '\r' : 'r';
+  char const eol_diff = cmp->ignore_eol_diff ? '\r' : 'r';
+
   /* prepare_text put a zero word at the end of the buffer,
      so we're not in danger of overrunning the end of the file */
 
@@ -261,7 +247,7 @@ find_and_hash_each_line (struct file_data *current)
         case IGNORE_TAB_EXPANSION_AND_TRAILING_SPACE:
         case IGNORE_TRAILING_SPACE:
           {
-            size_t column = 0;
+            unsigned column = 0;
             while ((c = *p++) != '\n' && (c != '\r' || *p == '\n'))
               {
                 if (ig_white_space & IGNORE_TRAILING_SPACE
@@ -278,7 +264,7 @@ find_and_hash_each_line (struct file_data *current)
                     while (isspace (c1) && c1 != eol_diff);
                   }
 
-                size_t repetitions = 1;
+                unsigned repetitions = 1;
 
                 if (ig_white_space & IGNORE_TAB_EXPANSION)
                   switch (c)
@@ -326,7 +312,7 @@ find_and_hash_each_line (struct file_data *current)
 
     hashing_done:;
 
-      bucket = &buckets[h % nbuckets];
+      bucket = &cmp->buckets[h % cmp->nbuckets];
       length = p - ip - 1;
 
       if (p == bufend
@@ -339,7 +325,7 @@ find_and_hash_each_line (struct file_data *current)
              compare equal only to the other file's incomplete line
              (if one exists).  */
           if (ig_white_space < IGNORE_TRAILING_SPACE)
-            bucket = &buckets[-1];
+            bucket = &cmp->buckets[-1];
         }
 
       for (i = *bucket;  ;  i = eqs[i].next)
@@ -366,7 +352,7 @@ find_and_hash_each_line (struct file_data *current)
             char const *eqline = eqs[i].line;
 
             /* Reuse existing class if lines_differ reports the lines
-                     equal.  */
+               equal.  */
             if (eqs[i].length == length)
               {
                 /* Reuse existing equivalence class if the lines are identical.
@@ -380,7 +366,7 @@ find_and_hash_each_line (struct file_data *current)
             else if (!diff_length_compare_anyway)
               continue;
 
-            if (! lines_differ (eqline, ip))
+            if (! lines_differ (cmp, eqline, ip))
               break;
           }
 
@@ -435,7 +421,7 @@ find_and_hash_each_line (struct file_data *current)
           break;
         }
 
-      if (context <= i && no_diff_means_no_output)
+      if (context <= i && cmp->no_diff_means_no_output)
         break;
 
       line++;
@@ -449,9 +435,9 @@ find_and_hash_each_line (struct file_data *current)
   current->valid_lines = line;
   current->alloc_lines = alloc_lines;
   current->equivs = cureqs;
-  equivs = eqs;
-  equivs_alloc = eqs_alloc;
-  equivs_index = eqs_index;
+  cmp->equivs = eqs;
+  cmp->equivs_alloc = eqs_alloc;
+  cmp->equivs_index = eqs_index;
 }
 
 /* Convert any non octet encoded unicode text to UTF-8.
@@ -461,7 +447,7 @@ find_and_hash_each_line (struct file_data *current)
    Strip trailing CRs, if that was requested.  */
 
 static char *
-prepare_text (struct file_data *current, short side)
+prepare_text (struct comparison *cmp, struct file_data *current, short side)
 {
   size_t buffered = current->buffered;
   char *const p = FILE_BUFFER (current);
@@ -650,7 +636,7 @@ prepare_text (struct file_data *current, short side)
     }
 
   if (side != -1)
-    buffered = apply_prediffer (current, side, p, buffered);
+    buffered = apply_prediffer (cmp, side, p, buffered);
 
   current->buffered = buffered;
 
@@ -662,7 +648,7 @@ prepare_text (struct file_data *current, short side)
         {
         case '\r':
           ++current->count_crs;
-          if (ignore_eol_diff)
+          if (cmp->ignore_eol_diff)
             *t = '\n';
           break;
         case '\n':
@@ -670,7 +656,7 @@ prepare_text (struct file_data *current, short side)
             {
               ++current->count_crlfs;
               --current->count_crs; // compensate for bogus increment
-              if (ignore_eol_diff)
+              if (cmp->ignore_eol_diff)
                 ++t;
             }
           else
@@ -705,7 +691,7 @@ guess_lines (lin n, size_t s, size_t t)
    prefixes and suffixes of each object.  */
 
 static void
-find_identical_ends (struct file_data filevec[])
+find_identical_ends (struct comparison *cmp)
 {
   word *w0, *w1;
   char *p0, *p1, *buffer0, *buffer1;
@@ -717,22 +703,23 @@ find_identical_ends (struct file_data filevec[])
   bool prefix_needed;
   lin buffered_prefix, prefix_count, prefix_mask;
   lin middle_guess, suffix_guess;
+  lin const context = cmp->context;
 
-  if (filevec[0].desc != filevec[1].desc)
+  if (cmp->file[0].desc != cmp->file[1].desc)
     {
-      slurp (&filevec[0]);
-      buffer0 = prepare_text (&filevec[0], 0);
-      slurp (&filevec[1]);
-      buffer1 = prepare_text (&filevec[1], 1);
+      slurp (&cmp->file[0]);
+      buffer0 = prepare_text (cmp, &cmp->file[0], 0);
+      slurp (&cmp->file[1]);
+      buffer1 = prepare_text (cmp, &cmp->file[1], 1);
     }
   else
     {
-      slurp (&filevec[0]);
-      prepare_text (&filevec[0], -1);
-      filevec[1].buffer = filevec[0].buffer;
-      filevec[1].bufsize = filevec[0].bufsize;
-      filevec[1].buffered = filevec[0].buffered;
-      filevec[1].missing_newline = filevec[0].missing_newline;
+      slurp (&cmp->file[0]);
+      prepare_text (cmp, &cmp->file[0], -1);
+      cmp->file[1].buffer = cmp->file[0].buffer;
+      cmp->file[1].bufsize = cmp->file[0].bufsize;
+      cmp->file[1].buffered = cmp->file[0].buffered;
+      cmp->file[1].missing_newline = cmp->file[0].missing_newline;
     }
 
   /* Find identical prefix.  */
@@ -740,8 +727,8 @@ find_identical_ends (struct file_data filevec[])
   p0 = buffer0;
   p1 = buffer1;
 
-  n0 = filevec[0].buffered - (buffer0 - FILE_BUFFER (&filevec[0]));
-  n1 = filevec[1].buffered - (buffer1 - FILE_BUFFER (&filevec[1]));
+  n0 = cmp->file[0].buffered - (buffer0 - FILE_BUFFER (&cmp->file[0]));
+  n1 = cmp->file[1].buffered - (buffer1 - FILE_BUFFER (&cmp->file[1]));
 
   if (p0 == p1)
     /* The buffers are the same; sentinels won't work.  */
@@ -776,9 +763,9 @@ find_identical_ends (struct file_data filevec[])
 
       /* Don't mistakenly count missing newline as part of prefix.  */
       if (ROBUST_OUTPUT_STYLE (output_style)
-          && ((buffer0 + n0 - filevec[0].missing_newline < p0)
+          && ((buffer0 + n0 - cmp->file[0].missing_newline < p0)
               !=
-              (buffer1 + n1 - filevec[1].missing_newline < p1)))
+              (buffer1 + n1 - cmp->file[1].missing_newline < p1)))
         p0--, p1--;
     }
 
@@ -786,7 +773,7 @@ find_identical_ends (struct file_data filevec[])
 
   /* Skip back to last line-beginning in the prefix,
      and then discard up to HORIZON_LINES lines from the prefix.  */
-  i = horizon_lines;
+  i = cmp->horizon_lines;
   /* This loop can be done in one line, but isn't not easy to read, so unrolled into simple statements */
   while (p0 != buffer0)
     {
@@ -803,8 +790,8 @@ find_identical_ends (struct file_data filevec[])
     }
 
   /* Record the prefix.  */
-  filevec[0].prefix_end = p0;
-  filevec[1].prefix_end = p1;
+  cmp->file[0].prefix_end = p0;
+  cmp->file[1].prefix_end = p1;
 
   /* Find identical suffix.  */
 
@@ -813,14 +800,14 @@ find_identical_ends (struct file_data filevec[])
   p1 = buffer1 + n1;
 
   if (! ROBUST_OUTPUT_STYLE (output_style)
-      || filevec[0].missing_newline == filevec[1].missing_newline)
+      || cmp->file[0].missing_newline == cmp->file[1].missing_newline)
     {
       end0 = p0;  /* Addr of last char in file 0.  */
 
       /* Get value of P0 at which we should stop scanning backward:
          this is when either P0 or P1 points just past the last char
          of the identical prefix.  */
-      beg0 = filevec[0].prefix_end + (n0 < n1 ? 0 : n0 - n1);
+      beg0 = cmp->file[0].prefix_end + (n0 < n1 ? 0 : n0 - n1);
 
       /* Scan back until chars don't match or we reach that point.  */
       while (p0 != beg0)
@@ -836,9 +823,9 @@ find_identical_ends (struct file_data filevec[])
          this line to the main body.  Discard up to HORIZON_LINES lines from
          the identical suffix.  Also, discard one extra line,
          because shift_boundaries may need it.  */
-      i = horizon_lines + ! ((buffer0 == p0 || p0[-1] == '\n' || (p0[-1] == '\r' && p0[0] != '\n'))
-                             &&
-                             (buffer1 == p1 || p1[-1] == '\n' || (p1[-1] == '\r' && p1[0] != '\n')));
+      i = cmp->horizon_lines + ! ((buffer0 == p0 || p0[-1] == '\n' || (p0[-1] == '\r' && p0[0] != '\n'))
+                                  &&
+                                  (buffer1 == p1 || p1[-1] == '\n' || (p1[-1] == '\r' && p1[0] != '\n')));
       while (i-- && p0 != end0)
         while (*p0++ != '\n' && (p0[-1] != '\r' || p0[0] == '\n'))
           continue;
@@ -847,8 +834,8 @@ find_identical_ends (struct file_data filevec[])
     }
 
   /* Record the suffix.  */
-  filevec[0].suffix_begin = p0;
-  filevec[1].suffix_begin = p1;
+  cmp->file[0].suffix_begin = p0;
+  cmp->file[1].suffix_begin = p1;
 
   /* Calculate number of lines of prefix to save.
 
@@ -864,10 +851,10 @@ find_identical_ends (struct file_data filevec[])
      Handle 1 more line than the context says (because we count 1 too many),
      rounded up to the next power of 2 to speed index computation.  */
 
-  if (no_diff_means_no_output && ! USE_GNU_REGEX(function_regexp.fastmap)
+  if (cmp->no_diff_means_no_output && ! USE_GNU_REGEX(function_regexp.fastmap)
       && context < LIN_MAX / 4 && context < (int) n0)
     {
-      middle_guess = guess_lines (0, 0, p0 - filevec[0].prefix_end);
+      middle_guess = guess_lines (0, 0, p0 - cmp->file[0].prefix_end);
       suffix_guess = guess_lines (0, 0, buffer0 + n0 - p0);
       for (prefix_count = 1;  prefix_count <= context;  prefix_count *= 2)
         continue;
@@ -883,15 +870,15 @@ find_identical_ends (struct file_data filevec[])
   prefix_mask = prefix_count - 1;
   lines = 0;
   linbuf0 = (char const **) xmalloc (alloc_lines0 * sizeof *linbuf0);
-  prefix_needed = ! (no_diff_means_no_output
-                     && filevec[0].prefix_end == p0
-                     && filevec[1].prefix_end == p1);
+  prefix_needed = ! (cmp->no_diff_means_no_output
+                     && cmp->file[0].prefix_end == p0
+                     && cmp->file[1].prefix_end == p1);
   p0 = buffer0;
 
   /* If the prefix is needed, find the prefix lines.  */
   if (prefix_needed)
     {
-      end0 = filevec[0].prefix_end;
+      end0 = cmp->file[0].prefix_end;
       while (p0 != end0)
         {
           lin l = lines++ & prefix_mask;
@@ -917,7 +904,7 @@ find_identical_ends (struct file_data filevec[])
 
   /* Allocate line buffer 1.  */
 
-  middle_guess = guess_lines (lines, p0 - buffer0, p1 - filevec[1].prefix_end);
+  middle_guess = guess_lines (lines, p0 - buffer0, p1 - cmp->file[1].prefix_end);
   suffix_guess = guess_lines (lines, p0 - buffer0, buffer1 + n1 - p1);
   alloc_lines1 = buffered_prefix + middle_guess + MIN (context, suffix_guess);
   if (alloc_lines1 < buffered_prefix
@@ -940,12 +927,12 @@ find_identical_ends (struct file_data filevec[])
 
   /* Record the line buffer, adjusted so that
      linbuf[0] points at the first differing line.  */
-  filevec[0].linbuf = linbuf0 + buffered_prefix;
-  filevec[1].linbuf = linbuf1 + buffered_prefix;
-  filevec[0].linbuf_base = filevec[1].linbuf_base = - buffered_prefix;
-  filevec[0].alloc_lines = alloc_lines0 - buffered_prefix;
-  filevec[1].alloc_lines = alloc_lines1 - buffered_prefix;
-  filevec[0].prefix_lines = filevec[1].prefix_lines = lines;
+  cmp->file[0].linbuf = linbuf0 + buffered_prefix;
+  cmp->file[1].linbuf = linbuf1 + buffered_prefix;
+  cmp->file[0].linbuf_base = cmp->file[1].linbuf_base = - buffered_prefix;
+  cmp->file[0].alloc_lines = alloc_lines0 - buffered_prefix;
+  cmp->file[1].alloc_lines = alloc_lines1 - buffered_prefix;
+  cmp->file[0].prefix_lines = cmp->file[1].prefix_lines = lines;
 }
 
 /* If 1 < k, then (2**k - prime_offset[k]) is the largest prime less
@@ -972,16 +959,16 @@ verify (sizeof (size_t) * CHAR_BIT <= sizeof prime_offset);
    If bin_file is given, then check both files for binary files,
    otherwise check second file only if first wasn't binary */
 bool
-read_files (struct file_data filevec[], bool pretend_binary, int *bin_file)
+read_files (struct comparison *cmp, int *bin_file)
 {
   int i;
-  bool skip_test = pretend_binary;
-  bool appears_binary = pretend_binary;
+  bool skip_test = false;
+  bool appears_binary = false;
 
   if (bin_file)
     *bin_file = 0;
 
-  if (sip (&filevec[0], skip_test))
+  if (sip (&cmp->file[0], skip_test))
     {
       appears_binary = true;
       if (bin_file)
@@ -990,60 +977,61 @@ read_files (struct file_data filevec[], bool pretend_binary, int *bin_file)
         skip_test = true; // no need to test the second file
     }
 
-  if (filevec[0].desc == filevec[1].desc)
+  if (cmp->file[0].desc == cmp->file[1].desc)
     {
-      filevec[1].buffer = filevec[0].buffer;
-      filevec[1].bufsize = filevec[0].bufsize;
-      filevec[1].buffered = filevec[0].buffered;
+      cmp->file[1].buffer = cmp->file[0].buffer;
+      cmp->file[1].bufsize = cmp->file[0].bufsize;
+      cmp->file[1].buffered = cmp->file[0].buffered;
     }
-  else if (sip (&filevec[1], skip_test))
+  else if (sip (&cmp->file[1], skip_test))
     {
       appears_binary = true;
       if (bin_file)
         *bin_file |= 0x2; // set second bit for second file
     }
 
-  find_identical_ends (filevec);
+  find_identical_ends (cmp);
 
   /* Don't slurp rest of file when comparing file to itself. */
-  if (filevec[0].desc == filevec[1].desc)
+  if (cmp->file[0].desc == cmp->file[1].desc)
     {
-      filevec[1].count_crs = filevec[0].count_crs;
-      filevec[1].count_lfs = filevec[0].count_lfs;
-      filevec[1].count_crlfs = filevec[0].count_crlfs;
-      filevec[1].count_zeros = filevec[0].count_zeros;
+      cmp->file[1].count_crs = cmp->file[0].count_crs;
+      cmp->file[1].count_lfs = cmp->file[0].count_lfs;
+      cmp->file[1].count_crlfs = cmp->file[0].count_crlfs;
+      cmp->file[1].count_zeros = cmp->file[0].count_zeros;
       return false;
     }
 
   if (appears_binary || (bin_file && *bin_file > 0))
     return true;
 
-  equivs_alloc = filevec[0].alloc_lines + filevec[1].alloc_lines + 1;
-  if (PTRDIFF_MAX / sizeof *equivs <= equivs_alloc)
+  cmp->equivs_alloc = cmp->file[0].alloc_lines + cmp->file[1].alloc_lines + 1;
+  if (PTRDIFF_MAX / sizeof *cmp->equivs <= cmp->equivs_alloc)
     xalloc_die ();
-  equivs = (struct equivclass *) xmalloc (equivs_alloc * sizeof *equivs);
+  cmp->equivs = (struct equivclass *) xmalloc (cmp->equivs_alloc * sizeof *cmp->equivs);
   /* Equivalence class 0 is permanently safe for lines that were not
      hashed.  Real equivalence classes start at 1.  */
-  equivs_index = 1;
+  cmp->equivs_index = 1;
 
   /* Allocate (one plus) a prime number of hash buckets.  Use a prime
      number between 1/3 and 2/3 of the value of equiv_allocs,
      approximately.  */
-  for (i = 9; (1 << i) < equivs_alloc / 3; i++)
+  for (i = 9; (1 << i) < cmp->equivs_alloc / 3; i++)
     continue;
-  nbuckets = (1 << i) - prime_offset[i];
-  if (PTRDIFF_MAX / sizeof *buckets <= nbuckets)
+  cmp->nbuckets = (1 << i) - prime_offset[i];
+  if (PTRDIFF_MAX / sizeof *cmp->buckets <= cmp->nbuckets)
     xalloc_die ();
-  buckets = (int *) zalloc ((nbuckets + 1) * sizeof *buckets);
-  buckets++;
+  cmp->buckets = (int *) zalloc ((cmp->nbuckets + 1) * sizeof *cmp->buckets) + 1;
 
   for (i = 0; i < 2; i++)
-    find_and_hash_each_line (&filevec[i]);
+    find_and_hash_each_line (cmp, &cmp->file[i]);
 
-  filevec[0].equiv_max = filevec[1].equiv_max = equivs_index;
+  cmp->file[0].equiv_max = cmp->file[1].equiv_max = cmp->equivs_index;
 
-  free (equivs);
-  free (buckets - 1);
+  free (cmp->equivs);
+  cmp->equivs = NULL;
+  free (cmp->buckets - 1);
+  cmp->buckets = NULL;
 
   return false;
 }

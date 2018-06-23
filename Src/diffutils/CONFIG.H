@@ -17,5 +17,3 @@
 
 #define _GL_ATTRIBUTE_PURE /* empty */
 #define _GL_ATTRIBUTE_CONST /* empty */
-
-#define THREAD_LOCAL __declspec(thread)

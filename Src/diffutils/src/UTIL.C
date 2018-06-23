@@ -52,16 +52,11 @@ fatal (char const *msgid)
 }
 
 void
-begin_output (void)
+begin_output (struct comparison *cmp)
 {
-  assert(outfile);
+  assert(cmp->outfile);
 }
 
-static int iseolch (char ch)
-{
-  return ch == '\n' || ch == '\r';
-}
-
 /* Compare two lines (typically one from each input file)
    according to the command line options.
    For efficiency, this is invoked only when the lines do not match exactly
@@ -69,12 +64,16 @@ static int iseolch (char ch)
    Return nonzero if the lines differ.  */
 
 bool
-lines_differ (char const *s1, char const *s2)
+lines_differ (struct comparison const *cmp, char const *s1, char const *s2)
 {
   register char const *t1 = s1;
   register char const *t2 = s2;
-  size_t column = 0;
-
+  unsigned column = 0;
+  enum DIFF_white_space const ignore_white_space = cmp->ignore_white_space;
+  unsigned const tabsize = cmp->tabsize;
+  bool const ignore_case = cmp->ignore_case;
+  bool const ignore_eol_diff = cmp->ignore_eol_diff;
+  int const dbcs_codepage = cmp->dbcs_codepage;
   while (1)
     {
       register unsigned char c1 = *t1++;
@@ -87,8 +86,8 @@ lines_differ (char const *s1, char const *s2)
             {
             case IGNORE_ALL_SPACE:
               /* For -w, just skip past any white space.  */
-              while (isspace (c1) && ! iseolch(c1)) c1 = *t1++;
-              while (isspace (c2) && ! iseolch(c2)) c2 = *t2++;
+              while (isspace (c1) && ! iseolch (c1)) c1 = *t1++;
+              while (isspace (c2) && ! iseolch (c2)) c2 = *t2++;
               break;
 
             case IGNORE_SPACE_CHANGE:
@@ -97,7 +96,7 @@ lines_differ (char const *s1, char const *s2)
               all if it is at the end of the line.  */
               if (isspace (c1))
                 {
-                  while (! iseolch(c1))
+                  while (! iseolch (c1))
                     {
                       c1 = *t1++;
                       if (! isspace (c1))
@@ -112,7 +111,7 @@ lines_differ (char const *s1, char const *s2)
               /* Likewise for line 2.  */
               if (isspace (c2))
                 {
-                  while (! iseolch(c2))
+                  while (! iseolch (c2))
                     {
                       c2 = *t2++;
                       if (! isspace (c2))
@@ -129,14 +128,14 @@ lines_differ (char const *s1, char const *s2)
                   /* If we went too far when doing the simple test
                      for equality, go back to the first non-white-space
                      character in both sides and try again.  */
-                  if (c2 == ' ' && ! iseolch(c1)
+                  if (c2 == ' ' && ! iseolch (c1)
                       && s1 + 1 < t1
                       && isspace ((unsigned char) t1[-2]))
                     {
                       --t1;
                       continue;
                     }
-                  if (c1 == ' ' && ! iseolch(c2)
+                  if (c1 == ' ' && ! iseolch (c2)
                       && s2 + 1 < t2
                       && isspace ((unsigned char) t2[-2]))
                     {
@@ -149,24 +148,24 @@ lines_differ (char const *s1, char const *s2)
 
             case IGNORE_TRAILING_SPACE:
             case IGNORE_TAB_EXPANSION_AND_TRAILING_SPACE:
-              /* Use while (...) so as to not acidentally break the switch */
+              /* Use while (...) so as to not accidentally break the switch */
               while (isspace (c1) && isspace (c2))
                 {
                   unsigned char c;
-                  if (! iseolch(c1))
+                  if (! iseolch (c1))
                     {
                       char const *p = t1;
-                      while (! iseolch(c = *p) && isspace (c))
+                      while (! iseolch (c = *p) && isspace (c))
                         ++p;
-                      if (! iseolch(c))
+                      if (! iseolch (c))
                         break;
                     }
-                  if (! iseolch(c2))
+                  if (! iseolch (c2))
                     {
                       char const *p = t2;
-                      while (! iseolch(c = *p) && isspace (c))
+                      while (! iseolch (c = *p) && isspace (c))
                         ++p;
-                      if (! iseolch(c))
+                      if (! iseolch (c))
                         break;
                     }
                   /* Both lines have nothing but whitespace left.  */
@@ -179,7 +178,7 @@ lines_differ (char const *s1, char const *s2)
               if ((c1 == ' ' && c2 == '\t')
                   || (c1 == '\t' && c2 == ' '))
                 {
-                  size_t column2 = column;
+                  unsigned column2 = column;
                   for (;; c1 = *t1++)
                     {
                       if (c1 == ' ')
@@ -228,7 +227,7 @@ lines_differ (char const *s1, char const *s2)
           if (c1 != c2)
             break;
         }
-      if (iseolch(c1))
+      if (iseolch (c1))
         return false;
 
       column += c1 == '\t' ? tabsize - column % tabsize : 1;
@@ -241,17 +240,11 @@ lines_differ (char const *s1, char const *s2)
    Return the last link before the first gap.  */
 
 struct change * _GL_ATTRIBUTE_CONST
-find_change (struct change *start)
+find_change (struct comparison *cmp, struct change *start)
 {
   return start;
 }
 
-struct change * _GL_ATTRIBUTE_CONST
-find_reverse_change (struct change *start)
-{
-  return start;
-}
-
 /* Divide SCRIPT into pieces by calling HUNKFUN and
    print each piece with PRINTFUN.
    Both functions take one arg, an edit script.
@@ -264,11 +257,16 @@ find_reverse_change (struct change *start)
    link at the end) and prints it.  */
 
 void
-print_script (struct change *script,
-              struct change * (*hunkfun) (struct change *),
-              void (*printfun) (struct change *))
+print_script (struct comparison *cmp, struct file_cursor *cursors, struct change *script,
+              struct change * (*hunkfun) (struct comparison *, struct change *),
+              void (*printfun) (struct comparison *, struct file_cursor *, struct change *))
 {
   struct change *next = script;
+
+  /* Initialize cursors */
+  memset(cursors, 0, _countof(cmp->file) * sizeof *cursors);
+  _lseek(cursors[0].desc = cmp->file[0].desc, 0, SEEK_SET);
+  _lseek(cursors[1].desc = cmp->file[1].desc, 0, SEEK_SET);
 
   while (next)
     {
@@ -276,7 +274,7 @@ print_script (struct change *script,
 
       /* Find a set of changes that belong together.  */
       this = next;
-      end = (*hunkfun) (next);
+      end = (*hunkfun) (cmp, next);
 
       /* Disconnect them from the rest of the changes,
          making them a hunk, and remember the rest for next iteration.  */
@@ -287,11 +285,47 @@ print_script (struct change *script,
 #endif
 
       /* Print this hunk.  */
-      (*printfun) (this);
+      (*printfun) (cmp, cursors, this);
 
       /* Reconnect the script so it will all be freed properly.  */
       end->link = next;
     }
+}
+
+static bool
+output_1_line (struct file_cursor *p, lin line, FILE *out)
+{
+	do
+	{
+		while (p->ahead > 0)
+		{
+			char c = p->chunk[p->index];
+			++p->index;
+			--p->ahead;
+			if (p->ignore_lf)
+			{
+				p->ignore_lf = false;
+				if (c == '\n')
+					continue;
+			}
+			if (c == '\r')
+			{
+				p->ignore_lf = true;
+				c = '\n';
+			}
+			if (p->line == line)
+				putc(c, out);
+			if (c == '\n')
+			{
+				++p->line;
+				if (p->line > line)
+					return true;
+			}
+		}
+		p->index = 0;
+		p->ahead = _read(p->desc, p->chunk, sizeof p->chunk);
+	} while (p->ahead > 0);
+	return false;
 }
 
 /* Print the text of a single line LINE,
@@ -300,10 +334,9 @@ print_script (struct change *script,
    end in a blank, unless it is a single blank.  */
 
 void
-print_1_line (char const *line_flag, char const *const *line)
+print_1_line (struct comparison *cmp, struct file_cursor *cursor, char const *line_flag, lin line, bool empty)
 {
-  char const *base = line[0], *limit = line[1]; /* Help the compiler.  */
-  FILE *out = outfile; /* Help the compiler some more.  */
+  FILE *const out = cmp->outfile; /* Help the compiler some more.  */
   char const *flag_format = 0;
 
   /* If -T was specified, use a Tab between the line-flag and the text.
@@ -313,10 +346,10 @@ print_1_line (char const *line_flag, char const *const *line)
 
   if (line_flag && *line_flag)
     {
-      char const *flag_format_1 = flag_format = initial_tab ? "%s\t" : "%s ";
+      char const *flag_format_1 = flag_format = cmp->initial_tab ? "%s\t" : "%s ";
       char const *line_flag_1 = line_flag;
 
-      if (suppress_blank_empty && **line == '\n')
+      if (cmp->suppress_blank_empty && empty)
         {
           flag_format_1 = "%s";
 
@@ -329,90 +362,11 @@ print_1_line (char const *line_flag, char const *const *line)
       fprintf (out, flag_format_1, line_flag_1);
     }
 
-  output_1_line (base, limit, flag_format, line_flag);
-
-  if ((!line_flag || line_flag[0]) && limit[-1] != '\n' && limit[-1] != '\r')
+  if (!output_1_line(cursor, line, out) && (!line_flag || line_flag[0]))
     {
       fprintf (out, "\n\\ %s\n", "No newline at end of file");
     }
 }
-
-/* A version of fwrite which converts any embedded \r or \n or \r\n to \n,
-   for use with mixed eol mode input being written to a text mode stream.  */
-static void
-fwrite_textify (char const *p, char const *q, FILE *stream)
-{
-  while (p < q)
-    {
-      char c = *p++;
-      if (c == '\r') /* carriage return? */
-        {
-          if (p < q && *p == '\n')
-            continue; /* yes, but it's followed by \n, so ignore it */
-          c = '\n'; /* replace with \n */
-        }
-      /* (any bare \n characters are ok, stream will convert them) */
-      putc(c, stream);
-    }
-}
-
-/* Output a line from BASE up to LIMIT.
-   With -t, expand white space characters to spaces, and if FLAG_FORMAT
-   is nonzero, output it with argument LINE_FLAG after every
-   internal carriage return, so that tab stops continue to line up.  */
-
-void
-output_1_line (char const *base, char const *limit, char const *flag_format,
-               char const *line_flag)
-{
-  char * pos = NULL;
-  if (!expand_tabs)
-    fwrite_textify (base, limit, outfile);
-  else
-    {
-      register FILE *out = outfile;
-      register unsigned char c;
-      register char const *t = base;
-      register size_t column = 0;
-      size_t tab_size = tabsize;
-
-      while (t < limit)
-        {
-          switch ((c = *t++))
-            {
-            case '\t':
-              {
-                size_t spaces = tab_size - column % tab_size;
-                column += spaces;
-                do
-                  putc (' ', out);
-                while (--spaces);
-              }
-              break;
-
-            case '\r':
-              putc (c, out);
-              if (flag_format && t < limit && *t != '\n')
-                fprintf (out, flag_format, line_flag);
-              column = 0;
-              break;
-
-            case '\b':
-              if (column == 0)
-                continue;
-              column--;
-              putc (c, out);
-              break;
-
-            default:
-              column += isprint (c) != 0;
-              putc (c, out);
-              break;
-            }
-        }
-    }
-}
-
 
 char const change_letter[] = { 0, 'd', 'a', 'c' };
 
@@ -449,7 +403,7 @@ translate_range (struct file_data const *file,
    We print the translated (real) line numbers.  */
 
 void
-print_number_range (char sepchar, struct file_data *file, lin a, lin b)
+print_number_range (char sepchar, struct file_data *file, lin a, lin b, FILE *out)
 {
   printint trans_a, trans_b;
   translate_range (file, a, b, &trans_a, &trans_b);
@@ -458,9 +412,9 @@ print_number_range (char sepchar, struct file_data *file, lin a, lin b)
      In this case, we should print the line number before the range,
      which is B.  */
   if (trans_b > trans_a)
-    fprintf (outfile, "%"pI"d%c%"pI"d", trans_a, sepchar, trans_b);
+    fprintf (out, "%"pI"d%c%"pI"d", trans_a, sepchar, trans_b);
   else
-    fprintf (outfile, "%"pI"d", trans_b);
+    fprintf (out, "%"pI"d", trans_b);
 }
 
 /* Look at a hunk of edit script and report the range of lines in each file
@@ -477,7 +431,8 @@ print_number_range (char sepchar, struct file_data *file, lin a, lin b)
    and CHANGED if both kinds of changes are found. */
 
 enum changes
-analyze_hunk (struct change *hunk,
+analyze_hunk (struct comparison *cmp,
+              struct change *hunk,
               lin *first0, lin *last0,
               lin *first1, lin *last1)
 {
@@ -485,18 +440,18 @@ analyze_hunk (struct change *hunk,
   lin l0, l1;
   lin show_from, show_to;
   lin i;
-  bool trivial = ignore_blank_lines || USE_GNU_REGEX(ignore_regexp.fastmap);
-  size_t trivial_length = ignore_blank_lines - 1;
+  bool trivial = cmp->ignore_blank_lines || USE_GNU_REGEX(ignore_regexp.fastmap);
+  size_t trivial_length = cmp->ignore_blank_lines - 1;
   /* If 0, ignore zero-length lines;
      if SIZE_MAX, do not ignore lines just because of their length.  */
 
   bool skip_white_space =
-    ignore_blank_lines && IGNORE_TRAILING_SPACE <= ignore_white_space;
+    cmp->ignore_blank_lines && IGNORE_TRAILING_SPACE <= cmp->ignore_white_space;
   bool skip_leading_white_space =
-    skip_white_space && IGNORE_SPACE_CHANGE <= ignore_white_space;
+    skip_white_space && IGNORE_SPACE_CHANGE <= cmp->ignore_white_space;
 
-  char const * const *linbuf0 = files[0].linbuf;  /* Help the compiler.  */
-  char const * const *linbuf1 = files[1].linbuf;
+  char const *const *linbuf0 = cmp->file[0].linbuf;  /* Help the compiler.  */
+  char const *const *linbuf1 = cmp->file[1].linbuf;
 
   show_from = show_to = 0;
 
@@ -512,14 +467,14 @@ analyze_hunk (struct change *hunk,
       show_to += next->inserted;
 
       for (i = next->line0; i <= l0 && trivial; i++)
-          {
-            char const *line = linbuf0[i];
+        {
+          char const *line = linbuf0[i];
           char const *lastbyte = linbuf0[i + 1] - 1;
-          char const *newline = lastbyte + ! iseolch(*lastbyte);
+          char const *newline = lastbyte + ! iseolch (*lastbyte);
           size_t len = newline - line;
           char const *p = line;
           if (skip_white_space)
-            for (; ! iseolch(*p); p++)
+            for (; ! iseolch (*p); p++)
               if (! isspace ((unsigned char) *p))
                 {
                   if (! skip_leading_white_space)
@@ -530,17 +485,17 @@ analyze_hunk (struct change *hunk,
               && (! USE_GNU_REGEX(ignore_regexp.fastmap)
                   || USE_GNU_REGEX(re_search (&ignore_regexp, line, len, 0, len, 0) < 0)))
               trivial = 0;
-          }
+        }
 
       for (i = next->line1; i <= l1 && trivial; i++)
-          {
-            char const *line = linbuf1[i];
+        {
+          char const *line = linbuf1[i];
           char const *lastbyte = linbuf1[i + 1] - 1;
-          char const *newline = lastbyte + ! iseolch(*lastbyte);
+          char const *newline = lastbyte + ! iseolch (*lastbyte);
           size_t len = newline - line;
           char const *p = line;
           if (skip_white_space)
-            for (; ! iseolch(*p); p++)
+            for (; ! iseolch (*p); p++)
               if (! isspace ((unsigned char) *p))
                 {
                   if (! skip_leading_white_space)
@@ -551,9 +506,8 @@ analyze_hunk (struct change *hunk,
               && (! USE_GNU_REGEX(ignore_regexp.fastmap)
                   || USE_GNU_REGEX(re_search (&ignore_regexp, line, len, 0, len, 0) < 0)))
               trivial = 0;
-          }
-    }
-  while ((next = next->link) != 0);
+        }
+    } while ((next = next->link) != 0);
 
   *last0 = l0;
   *last1 = l1;
