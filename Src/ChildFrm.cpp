@@ -213,7 +213,7 @@ void CChildFrame::DoPrint()
 
 void CChildFrame::ReloadDocs()
 {
-	UpdateCmdUI();
+	int nCurDiff = GetCurrentDiff();
 	if (!FileLoadResult::IsError(ReloadDoc(0)) &&
 		!FileLoadResult::IsError(ReloadDoc(1)))
 	{
@@ -224,7 +224,7 @@ void CChildFrame::ReloadDocs()
 		bool bIdentical = false;
 		Rescan2(bIdentical);
 	}
-	UpdateAllViews();
+	m_pView[0]->SelectDiff(nCurDiff);
 }
 
 void CChildFrame::AlignScrollPositions()
