@@ -271,18 +271,20 @@ void CGhostTextView::DrawSingleLine(HSurface *pdc, const RECT &rc, int nLineInde
 	CCrystalTextView::DrawSingleLine(pdc, rc, nLineIndex);
 	// If this is a placeholder for a sequence of excluded lines,
 	// indicate its length by drawing a label in italic letters.
-	const LineInfo &li = m_pTextBuffer->GetLineInfo(nLineIndex);
+	LineInfo const &li = m_pTextBuffer->GetLineInfo(nLineIndex);
 	if (li.m_dwFlags & LF_GHOST)
 	{
-		const int nCharWidth = GetCharWidth();
-		const int nLineHeight = GetLineHeight();
+		int const nCharWidth = GetCharWidth();
+		int const nLineHeight = GetLineHeight();
 		if (li.m_nSkippedLines != 0)
 		{
+			COLORREF const crTmp = pdc->SetTextColor(GetColor(COLORINDEX_NORMALTEXT));
 			pdc->SelectObject(GetFont(COLORINDEX_LAST));
 			pdc->DrawText(
 				FormatAmount<IDS_LINE_EXCLUDED, IDS_LINES_EXCLUDED>(li.m_nSkippedLines),
 				const_cast<RECT *>(&rc),
 				DT_CENTER | DT_VCENTER | DT_NOPREFIX | DT_SINGLELINE | DT_END_ELLIPSIS);
+			pdc->SetTextColor(crTmp);
 		}
 		else if (COptionsMgr::Get(OPT_CROSS_HATCH_DELETED_LINES))
 		{
