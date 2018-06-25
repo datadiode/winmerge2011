@@ -114,7 +114,8 @@ protected:
 	bool m_bModified;
 	bool m_bInsertTabs;
 	CRLFSTYLE m_nCRLFMode;
-	int  m_nTabSize;
+	int m_nTabSize;
+	int m_nParseCookieCount;
 
 	enum
 	{
@@ -217,6 +218,15 @@ public:
 	{
 		return GetLineInfo(nLine).m_dwFlags;
 	}
+	LineInfo::TextBlock::Cookie const &GetParseCookie(int nLine) const
+	{
+		LineInfo const &li = m_aLines[nLine];
+		return li.m_cookie;
+	}
+	void SetParseCookie(int nLine, LineInfo::TextBlock::Cookie const &cookie)
+	{
+		m_aLines[nLine].m_cookie = cookie;
+	}
 	int FindLineWithFlag(DWORD dwFlag, int nLine = -1) const;
 	void SetLineFlags(int nLine, DWORD dwFlags);
 	void GetText(int nStartLine, int nStartChar, int nEndLine, int nEndChar,
@@ -254,13 +264,14 @@ public:
 	//END SW
 	void RestoreLastChangePos(POINT pt);
 
-	//  Browse undo sequence
+	// Browse undo sequence
 	stl_size_t GetUndoActionCode(int &nAction, stl_size_t pos = 0) const;
 	stl_size_t GetRedoActionCode(int &nAction, stl_size_t pos = 0) const;
 
-	//  Notify all connected views about changes in name of file
-	CCrystalTextView::TextDefinition *RetypeViews(LPCTSTR lpszFileName);
-	//  Notify all connected views about changes in text
+	int GetParseCookieCount() const;
+	void SetParseCookieCount(int);
+
+	// Notify all connected views about changes in text
 	void UpdateViews(CCrystalTextView *pSource, CUpdateContext *pContext,
 		DWORD dwUpdateFlags, int nLineIndex = -1);
 

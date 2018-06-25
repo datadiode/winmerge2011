@@ -413,7 +413,8 @@ void CCrystalTextView::FreeParserAssociations()
 CCrystalTextView::TextDefinition *CCrystalTextView::DoSetTextType(TextDefinition *def)
 {
 	m_CurSourceDef = def;
-	m_ParseCookies.clear();
+	ASSERT(m_pTextBuffer);
+	InitParseCookie();
 	SetFlags(def->flags);
 	return def;
 }
@@ -475,7 +476,7 @@ CCrystalTextView::CCrystalTextView(size_t ZeroInit)
 
 CCrystalTextView::~CCrystalTextView()
 {
-	ASSERT(m_pTextBuffer == NULL);   //  Must be correctly detached
+	ASSERT(m_pTextBuffer == NULL); // Must be correctly detached
 }
 
 HRESULT CCrystalTextView::QueryInterface(REFIID iid, void **ppv)
@@ -618,7 +619,7 @@ int CCrystalTextView::GetLineActualLength(int nLineIndex)
 	if (m_pnActualLineLength[nLineIndex] != - 1)
 		return m_pnActualLineLength[nLineIndex];
 
-	//  Actual line length is not determined yet, let's calculate a little
+	// Actual line length is not determined yet, let's calculate a little
 	int nActualLength = 0;
 	const int nLength = GetLineLength(nLineIndex);
 	if (nLength > 0)
@@ -1062,7 +1063,7 @@ void CCrystalTextView::DrawLineHelper(
 		ASSERT(nSelEnd >= 0 && nSelEnd <= nCount);
 		ASSERT(nSelBegin <= nSelEnd);
 
-		//  Draw part of the text before selection
+		// Draw part of the text before selection
 		if (nSelBegin > 0)
 		{
 			DrawLineHelperImpl(pdc, ptOrigin, rcClip,
@@ -1124,28 +1125,20 @@ void CCrystalTextView::DrawLineHelper(
 
 CCrystalTextView::TextBlock::Cookie CCrystalTextView::GetParseCookie(int nLineIndex)
 {
-	int const nLineCount = GetLineCount();
-	if (m_ParseCookies.size() == 0)
-	{
-		// must be initialized to invalid value (DWORD) -1
-		m_ParseCookies.resize(nLineCount);
-	}
-
-	int L = nLineIndex;
-	while (L >= 0 && m_ParseCookies[L].Empty())
-		--L;
-
-	TextBlock::Cookie dwCookie = L >= 0 ? m_ParseCookies[L] :
-		m_CurSourceDef ? m_CurSourceDef->flags & COOKIE_PARSER_GLOBAL : 0;
-	ASSERT(!dwCookie.Empty());
+	int const nLineCount = m_pTextBuffer->GetLineCount();
+	int L = m_pTextBuffer->GetParseCookieCount() - 1;
+	TextBlock::Cookie dwCookie = m_pTextBuffer->GetParseCookie(nLineIndex < L ? nLineIndex : L);
 	TextBlock::Array rBlocks = NULL;
-	while (++L <= nLineIndex)
+	ASSERT(!dwCookie.Empty());
+	while (L < nLineIndex)
 	{
 		ParseLine(dwCookie, L, rBlocks);
-		m_ParseCookies[L] = dwCookie;
 		ASSERT(!dwCookie.Empty());
+		if (++L < nLineCount)
+			m_pTextBuffer->SetParseCookie(L, dwCookie);
 	}
-
+	if (L < nLineCount)
+		m_pTextBuffer->SetParseCookieCount(L + 1);
 	return dwCookie;
 }
 
@@ -1448,7 +1441,7 @@ void CCrystalTextView::DrawSingleLine(HSurface *pdc, const RECT &rc, int nLineIn
 {
 	ASSERT(nLineIndex >= 0 && nLineIndex < GetLineCount());
 
-	//  Acquire the background color for the current line
+	// Acquire the background color for the current line
 	COLORREF crBkgnd, crText;
 	GetLineColors(nLineIndex, crBkgnd, crText);
 	if (crBkgnd != CLR_NONE)
@@ -1456,12 +1449,12 @@ void CCrystalTextView::DrawSingleLine(HSurface *pdc, const RECT &rc, int nLineIn
 	if (crText != CLR_NONE)
 		pdc->SetTextColor(crText);
 
-	if (LPCTSTR pszChars = GetLineChars(nLineIndex))
+	if (LPCTSTR const pszChars = GetLineChars(nLineIndex))
 	{
-		int nLength = GetViewableLineLength(nLineIndex);
+		int const nLength = GetViewableLineLength(nLineIndex);
 
-		//  Parse the line
-		TextBlock::Cookie dwCookie = GetParseCookie(nLineIndex - 1);
+		// Parse the line
+		TextBlock::Cookie dwCookie = GetParseCookie(nLineIndex);
 		TextBlock::Array pBuf = new TextBlock[(nLength + 1) * 3]; // be aware of nLength == 0
 
 		// insert at least one textblock of normal color at the beginning
@@ -1471,8 +1464,16 @@ void CCrystalTextView::DrawSingleLine(HSurface *pdc, const RECT &rc, int nLineIn
 		++pBuf.m_nActualItems;
 
 		ParseLine(dwCookie, nLineIndex, pBuf);
-		m_ParseCookies[nLineIndex] = dwCookie;
-		ASSERT(!m_ParseCookies[nLineIndex].Empty());
+		ASSERT(!dwCookie.Empty());
+		if (m_pTextBuffer->GetParseCookieCount() <= nLineIndex)
+		{
+			int nNextLineIndex = nLineIndex + 1;
+			if (nNextLineIndex < m_pTextBuffer->GetLineCount())
+			{
+				m_pTextBuffer->SetParseCookie(nNextLineIndex, dwCookie);
+				m_pTextBuffer->SetParseCookieCount(nNextLineIndex + 1);
+			}
+		}
 
 		TextBlock::Array pAddedBuf = NULL;
 		GetAdditionalTextBlocks(nLineIndex, pAddedBuf);
@@ -1489,7 +1490,7 @@ void CCrystalTextView::DrawSingleLine(HSurface *pdc, const RECT &rc, int nLineIn
 		WrapLineCached(nLineIndex, &anBreaks.front() + 1, nBreaks);
 		anBreaks[++nBreaks] = nLength;
 
-		//  Draw the line text
+		// Draw the line text
 		const int nCharWidth = GetCharWidth();
 		POINT origin = { rc.left - m_nOffsetChar * nCharWidth, rc.top };
 
@@ -1644,58 +1645,68 @@ void CCrystalTextView::GetHTMLAttribute(
  */
 void CCrystalTextView::GetHTMLLine(int nLineIndex, String &strHTML)
 {
-	ASSERT(nLineIndex >= -1 && nLineIndex < GetLineCount ());
+	ASSERT(nLineIndex >= -1 && nLineIndex < GetLineCount());
 
-	int nLength = GetViewableLineLength(nLineIndex);
-	LPCTSTR pszChars = GetLineChars(nLineIndex);
-
-	// Acquire the background color for the current line
-	COLORREF crBkgnd, crText;
-	GetLineColors(nLineIndex, crBkgnd, crText);
-
-	// Parse the line
-	TextBlock::Cookie dwCookie = GetParseCookie(nLineIndex - 1);
-	TextBlock::Array pBuf = new TextBlock[(nLength + 1) * 3]; // be aware of nLength == 0
-	// insert at least one textblock of normal color at the beginning
-	pBuf[0].m_nCharPos = 0;
-	pBuf[0].m_nColorIndex = COLORINDEX_NORMALTEXT;
-	pBuf[0].m_nBgColorIndex = COLORINDEX_BKGND;
-	++pBuf.m_nActualItems;
-	ParseLine(dwCookie, nLineIndex, pBuf);
-	m_ParseCookies[nLineIndex] = dwCookie;
-	ASSERT(!m_ParseCookies[nLineIndex].Empty());
-
-	TextBlock::Array pAddedBuf = NULL;
-	GetAdditionalTextBlocks(nLineIndex, pAddedBuf);
-	MergeTextBlocks(pBuf, pAddedBuf);
-
-	///////
-
-	String strExpanded;
-	const int nScreenChars = GetScreenChars();
-
-	int nActualOffset = 0;
-
-	strHTML += _T("<code>");
-
-	int i = 0;
-	while (i < pBuf.m_nActualItems)
+	if (LPCTSTR const pszChars = GetLineChars(nLineIndex))
 	{
-		int j = i + 1;
-		int nBlockLength = (j < pBuf.m_nActualItems ? pBuf[j].m_nCharPos : nLength) - pBuf[i].m_nCharPos;
-		nActualOffset += ExpandChars(pszChars, pBuf[i].m_nCharPos, nBlockLength, strExpanded, nActualOffset);
-		if (!strExpanded.empty())
-		{
-			strHTML += _T("<span ");
-			GetHTMLAttribute(pBuf[i].m_nColorIndex, pBuf[i].m_nBgColorIndex, crText, crBkgnd, strHTML);
-			strHTML += _T(">");
-			strHTML += EscapeHTML(strExpanded.c_str(), nScreenChars);
-			strHTML += _T("</span>");
-		}
-		i = j;
-	}
+		int const nLength = GetViewableLineLength(nLineIndex);
 
-	strHTML += _T("</code>");
+		// Acquire the background color for the current line
+		COLORREF crBkgnd, crText;
+		GetLineColors(nLineIndex, crBkgnd, crText);
+
+		// Parse the line
+		TextBlock::Cookie dwCookie = GetParseCookie(nLineIndex);
+		TextBlock::Array pBuf = new TextBlock[(nLength + 1) * 3]; // be aware of nLength == 0
+
+		// insert at least one textblock of normal color at the beginning
+		pBuf[0].m_nCharPos = 0;
+		pBuf[0].m_nColorIndex = COLORINDEX_NORMALTEXT;
+		pBuf[0].m_nBgColorIndex = COLORINDEX_BKGND;
+		++pBuf.m_nActualItems;
+
+		ParseLine(dwCookie, nLineIndex, pBuf);
+		ASSERT(!dwCookie.Empty());
+		if (m_pTextBuffer->GetParseCookieCount() <= nLineIndex)
+		{
+			int nNextLineIndex = nLineIndex + 1;
+			if (nNextLineIndex < m_pTextBuffer->GetLineCount())
+			{
+				m_pTextBuffer->SetParseCookie(nNextLineIndex, dwCookie);
+				m_pTextBuffer->SetParseCookieCount(nNextLineIndex + 1);
+			}
+		}
+
+		TextBlock::Array pAddedBuf = NULL;
+		GetAdditionalTextBlocks(nLineIndex, pAddedBuf);
+		MergeTextBlocks(pBuf, pAddedBuf);
+
+		String strExpanded;
+		const int nScreenChars = GetScreenChars();
+
+		int nActualOffset = 0;
+
+		strHTML += _T("<code>");
+
+		int i = 0;
+		while (i < pBuf.m_nActualItems)
+		{
+			int j = i + 1;
+			int nBlockLength = (j < pBuf.m_nActualItems ? pBuf[j].m_nCharPos : nLength) - pBuf[i].m_nCharPos;
+			nActualOffset += ExpandChars(pszChars, pBuf[i].m_nCharPos, nBlockLength, strExpanded, nActualOffset);
+			if (!strExpanded.empty())
+			{
+				strHTML += _T("<span ");
+				GetHTMLAttribute(pBuf[i].m_nColorIndex, pBuf[i].m_nBgColorIndex, crText, crBkgnd, strHTML);
+				strHTML += _T(">");
+				strHTML += EscapeHTML(strExpanded.c_str(), nScreenChars);
+				strHTML += _T("</span>");
+			}
+			i = j;
+		}
+
+		strHTML += _T("</code>");
+	}
 }
 
 COLORREF CCrystalTextView::GetColor(int nColorIndex)
@@ -1870,7 +1881,6 @@ void CCrystalTextView::OnDraw(HSurface *pdc)
 
 	// if the private arrays (m_ParseCookies and m_pnActualLineLength) 
 	// are defined, check they are in phase with the text buffer
-	ASSERT(m_ParseCookies.size() == 0 || m_ParseCookies.size() == nLineCount);
 	ASSERT(m_pnActualLineLength.size() == 0 || m_pnActualLineLength.size() == nLineCount);
 
 	RECT rcLine;
@@ -1887,7 +1897,7 @@ void CCrystalTextView::OnDraw(HSurface *pdc)
 		if (nCurrentLine < nLineCount)
 		{
 			rcLine.bottom = rcLine.top + GetSubLines(nCurrentLine) * nLineHeight;
-			if (pdc->RectVisible(&rcLine))
+			//if (pdc->RectVisible(&rcLine))
 			{
 				rcLine.right = GetMarginWidth();
 				DrawMargin(pdc, rcLine, nCurrentLine, nCurrentLine + 1);
@@ -1913,6 +1923,22 @@ void CCrystalTextView::OnDraw(HSurface *pdc)
 	}
 }
 
+void CCrystalTextView::InitParseCookie()
+{
+	if (m_pTextBuffer)
+	{
+		if (m_CurSourceDef)
+		{
+			m_pTextBuffer->SetParseCookieCount(1);
+			m_pTextBuffer->SetParseCookie(0, m_CurSourceDef->flags & COOKIE_PARSER_GLOBAL);
+		}
+		else
+		{
+			m_pTextBuffer->SetParseCookieCount(0);
+		}
+	}
+}
+
 void CCrystalTextView::ResetView()
 {
 	// m_bWordWrap = FALSE;
@@ -1935,7 +1961,7 @@ void CCrystalTextView::ResetView()
 			m_apFonts[I] = NULL;
 		}
 	}
-	m_ParseCookies.clear();
+	InitParseCookie();
 	m_pnActualLineLength.clear();
 	m_ptCursorPos.x = 0;
 	m_ptCursorPos.y = 0;
@@ -2344,7 +2370,7 @@ int CCrystalTextView::ComputeRealLine(int nApparentLine) const
 int CCrystalTextView::GetLineCount()
 {
 	if (m_pTextBuffer == NULL)
-		return 1;                   //  Single empty line
+		return 1; // Single empty line
 
 	int nLineCount = m_pTextBuffer->GetLineCount();
 	ASSERT(nLineCount > 0);
@@ -2476,7 +2502,7 @@ void CCrystalTextView::ReAttachToBuffer(CCrystalTextBuffer *pBuf)
 		m_pTextBuffer->AddView(this);
 	// don't reset CCrystalEditView options
 	CCrystalTextView::ResetView();
-	//  Update vertical scrollbar only
+	// Update vertical scrollbar only
 	RecalcVertScrollBar();
 }
 
@@ -2493,7 +2519,7 @@ void CCrystalTextView::AttachToBuffer(CCrystalTextBuffer *pBuf)
 	if (m_pTextBuffer)
 		m_pTextBuffer->AddView (this);
 	ResetView();
-	//  Update scrollbars
+	// Update scrollbars
 	RecalcVertScrollBar();
 	RecalcHorzScrollBar();
 }
@@ -3072,7 +3098,7 @@ int CCrystalTextView::ApproxActualOffset(int nLineIndex, int nOffset)
 
 void CCrystalTextView::EnsureCursorVisible()
 {
-	//  Scroll vertically
+	// Scroll vertically
 	int nSubLineCount = GetSubLineCount();
 	int nNewTopSubLine = m_nTopSubLine;
 	POINT subLinePos;
@@ -3106,7 +3132,7 @@ void CCrystalTextView::EnsureCursorVisible()
 
 	ScrollToSubLine(nNewTopSubLine);
 
-	//  Scroll horizontally
+	// Scroll horizontally
 	// we do not need horizontally scrolling, if we wrap the words
 	if (!m_bWordWrap)
 	{
@@ -3190,16 +3216,11 @@ void CCrystalTextView::UpdateView(CCrystalTextView *pSource, CUpdateContext *pCo
 	{
 		if (nLineIndex != -1)
 		{
-			//  All text below this line should be reparsed
-			const int cookiesSize = m_ParseCookies.size();
-			if (cookiesSize > 0)
-			{
-				ASSERT(cookiesSize == nLineCount);
-				// must be reinitialized to invalid value (DWORD) - 1
-				for (int i = nLineIndex; i < cookiesSize; ++i)
-					m_ParseCookies[i].Clear();
-			}
-			//  This line'th actual length must be recalculated
+			// All text below this line should be reparsed
+			if (m_pTextBuffer->GetParseCookieCount() > nLineIndex)
+				m_pTextBuffer->SetParseCookieCount(nLineIndex + 1);
+
+			// This line'th actual length must be recalculated
 			if (m_pnActualLineLength.size())
 			{
 				ASSERT(m_pnActualLineLength.size() == nLineCount);
@@ -3209,7 +3230,7 @@ void CCrystalTextView::UpdateView(CCrystalTextView *pSource, CUpdateContext *pCo
 				InvalidateLineCache(nLineIndex, nLineIndex);
 				//END SW
 			}
-			//  Repaint the lines
+			// Repaint the lines
 			InvalidateLines(nLineIndex, -1);
 		}
 	}
@@ -3220,28 +3241,19 @@ void CCrystalTextView::UpdateView(CCrystalTextView *pSource, CUpdateContext *pCo
 			nLineIndex = m_nTopLine < nLineIndex ? m_nTopLine : nLineIndex;
 
 		if (nLineIndex == -1)
-			nLineIndex = 0;         //  Refresh all text
+			nLineIndex = 0; // Refresh all text
 
-		//  All text below this line should be reparsed
-		if (m_ParseCookies.size())
-		{
-			stl_size_t arrSize = m_ParseCookies.size();
-			if (arrSize != nLineCount)
-			{
-				m_ParseCookies.resize(nLineCount);
-				arrSize = nLineCount;
-			}
-			for (stl_size_t i = nLineIndex; i < arrSize; ++i)
-				m_ParseCookies[i].Clear();
-		}
+		// All text below this line should be reparsed
+		if (m_pTextBuffer->GetParseCookieCount() > nLineIndex)
+			m_pTextBuffer->SetParseCookieCount(nLineIndex + 1);
 
-		//  Recalculate actual length for all lines below this
+		// Recalculate actual length for all lines below this
 		if (m_pnActualLineLength.size())
 		{
 			stl_size_t arrsize = m_pnActualLineLength.size();
 			if (arrsize != nLineCount)
 			{
-				//  Reallocate actual length array
+				// Reallocate actual length array
 				stl_size_t oldsize = arrsize; 
 				m_pnActualLineLength.resize(nLineCount);
 				arrsize = nLineCount;
@@ -3255,11 +3267,11 @@ void CCrystalTextView::UpdateView(CCrystalTextView *pSource, CUpdateContext *pCo
 		//BEGIN SW
 		InvalidateLineCache(nLineIndex, -1);
 		//END SW
-		//  Repaint the lines
+		// Repaint the lines
 		InvalidateLines(nLineIndex, -1);
 	}
 
-	//  All those points must be recalculated and validated
+	// All those points must be recalculated and validated
 	if (pContext != NULL)
 	{
 		pContext->RecalcPoint(m_ptCursorPos);
@@ -3284,13 +3296,13 @@ void CCrystalTextView::UpdateView(CCrystalTextView *pSource, CUpdateContext *pCo
 		UpdateCaret();
 	}
 
-	//  Recalculate vertical scrollbar, if needed
+	// Recalculate vertical scrollbar, if needed
 	if ((dwFlags & UPDATE_VERTRANGE) != 0)
 	{
 		RecalcVertScrollBar();
 	}
 
-	//  Recalculate horizontal scrollbar, if needed
+	// Recalculate horizontal scrollbar, if needed
 	if ((dwFlags & UPDATE_HORZRANGE) != 0)
 	{
 		m_nMaxLineLength = -1;
@@ -3587,7 +3599,7 @@ BOOL CCrystalTextView::HighlightText(
 		}
 		ptEndPos.x = nLength;
 	}
-	ASSERT_VALIDTEXTPOS(m_ptCursorPos);  //  Probably 'nLength' is bigger than expected...
+	ASSERT_VALIDTEXTPOS(m_ptCursorPos); // Probably 'nLength' is bigger than expected...
 
 	m_ptCursorPos = bCursorToLeft ? ptStartPos : ptEndPos;
 	m_ptAnchor = m_ptCursorPos;
@@ -3844,16 +3856,16 @@ int CCrystalTextView::FindTextInBlock(
 					ptFoundPos = ptCurrentPos;
 					return nCaptures;
 				}
-				//  Go further, text was not found
+				// Go further, text was not found
 				ptCurrentPos.x = 0;
 				ptCurrentPos.y++;
 			}
 
-			//  End of text reached
+			// End of text reached
 			if (!bWrapSearch)
 				return -1;
 
-			//  Start from the beginning
+			// Start from the beginning
 			bWrapSearch = FALSE;
 			ptCurrentPos = ptBlockBegin;
 		}
@@ -3877,7 +3889,7 @@ void CCrystalTextView::OnEditFind()
 	dlg.m_bNoWrap = (dwFlags & FIND_NO_WRAP) != 0;
 	dlg.m_sText = m_strLastFindWhat;
 
-	//  Take the current selection, if any
+	// Take the current selection, if any
 	if (IsSelection())
 	{
 		POINT ptSelStart, ptSelEnd;
@@ -3899,14 +3911,14 @@ void CCrystalTextView::OnEditFind()
 	}
 
 	// Execute Find dialog
-	dlg.m_ptCurrentPos = m_ptCursorPos;   //  Search from cursor position
+	dlg.m_ptCurrentPos = m_ptCursorPos; // Search from cursor position
 
 	// m_bShowInactiveSelection = TRUE; // FP: removed because I like it
 	LanguageSelect.DoModal(dlg);
 	// m_bShowInactiveSelection = FALSE; // FP: removed because I like it
 	if (dlg.m_bConfirmed)
 	{
-		//  Save search parameters for 'F3' command
+		// Save search parameters for 'F3' command
 		m_bLastSearch = true;
 		m_strLastFindWhat = dlg.m_sText;
 		m_dwLastSearchFlags = 0;
@@ -4115,13 +4127,13 @@ int CCrystalTextView::GetMarginWidth()
 	return nMarginWidth;
 }
 
-//  [JRT]
+// [JRT]
 bool CCrystalTextView::GetDisableDragAndDrop() const
 {
 	return m_bDisableDragAndDrop;
 }
 
-//  [JRT]
+// [JRT]
 void CCrystalTextView::SetDisableDragAndDrop(bool bDisableDragAndDrop)
 {
 	m_bDisableDragAndDrop = bDisableDragAndDrop;
@@ -4358,7 +4370,7 @@ LPCTSTR CCrystalTextView::GetTextBufferEol(int nLine) const
 // This function assumes selection is in one line
 void CCrystalTextView::EnsureSelectionVisible()
 {
-	//  Scroll vertically
+	// Scroll vertically
 	//BEGIN SW
 	int nSubLineCount = GetSubLineCount();
 	int nNewTopSubLine = m_nTopSubLine;

@@ -211,6 +211,9 @@ void CChildFrame::DoPrint()
 		NULL);
 }
 
+/**
+ * @brief Reload documents in response to changing the number of context lines.
+ */
 void CChildFrame::ReloadDocs()
 {
 	int nCurDiff = GetCurrentDiff();
@@ -221,8 +224,14 @@ void CChildFrame::ReloadDocs()
 		m_pView[1]->ReAttachToBuffer(m_ptBuf[1]);
 		m_pDetailView[0]->ReAttachToBuffer(m_ptBuf[0]);
 		m_pDetailView[1]->ReAttachToBuffer(m_ptBuf[1]);
+		// Compute all parse cookies in advance, before losing context
+		m_pView[0]->GetParseCookie(m_pView[0]->GetLineCount() - 1);
+		m_pView[1]->GetParseCookie(m_pView[1]->GetLineCount() - 1);
 		bool bIdentical = false;
 		Rescan2(bIdentical);
+		// Parse cookies are still in place, only need to adjust their counts
+		m_ptBuf[0]->SetParseCookieCount(m_ptBuf[0]->GetLineCount());
+		m_ptBuf[1]->SetParseCookieCount(m_ptBuf[1]->GetLineCount());
 	}
 	m_pView[0]->SelectDiff(nCurDiff);
 }

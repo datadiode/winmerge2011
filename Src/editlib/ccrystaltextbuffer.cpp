@@ -134,6 +134,7 @@ CCrystalTextBuffer::CCrystalTextBuffer()
 	m_bUndoGroup = m_bUndoBeginGroup = FALSE;
 	m_bInsertTabs = true;
 	m_nTabSize = 4;
+	m_nParseCookieCount = 0;
 	//BEGIN SW
 	m_ptLastChange.x = m_ptLastChange.y = -1;
 	//END SW
@@ -433,19 +434,14 @@ void CCrystalTextBuffer::RemoveView(CCrystalTextView *pView)
 		m_lpViews.erase(pos);
 }
 
-CCrystalTextView::TextDefinition *CCrystalTextBuffer::RetypeViews(LPCTSTR lpszFileName)
+int CCrystalTextBuffer::GetParseCookieCount() const
 {
-	LPCTSTR ext = PathFindExtension(lpszFileName);
-	if (*ext == _T('.'))
-		++ext;
-	CCrystalTextView::TextDefinition *def = CCrystalTextView::GetTextType(ext);
-	std::list<CCrystalTextView *>::iterator pos = m_lpViews.begin();
-	while (pos != m_lpViews.end())
-	{
-		CCrystalTextView *const pView = *pos++;
-		pView->SetTextType(def);
-	}
-	return def;
+	return m_nParseCookieCount;
+}
+
+void CCrystalTextBuffer::SetParseCookieCount(int nParseCookieCount)
+{
+	m_nParseCookieCount = nParseCookieCount;
 }
 
 void CCrystalTextBuffer::UpdateViews(CCrystalTextView *pSource, CUpdateContext *pContext, DWORD dwUpdateFlags, int nLineIndex)

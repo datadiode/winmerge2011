@@ -15,7 +15,7 @@ class CGhostTextBuffer;
 ////////////////////////////////////////////////////////////////////////////
 // CCrystalTextView class declaration
 
-/** 
+/**
 This class hooks CCrystalEditViewEx to work with ghost lines. 
 
 Use a CGhostTextBuffer buffer and virtualize some functions 
@@ -32,7 +32,7 @@ protected:
 	CGhostTextView(CChildFrame *, int, size_t);
 
 private:
-	/** 
+	/**
 	 * @brief Real point structure to preserve a position during Rescan 
 	 * 
 	 * @note The preserved positions are also updated in CCrystalTextView::UpdateView
@@ -51,7 +51,7 @@ private:
 		SCursorPushed() : x(0), y(0), nToFirstReal(0) { }
 	};
 	
-	/** 
+	/**
 	 * @brief Save a position to be able to restore it after Rescan.
 	 * The saved position is based only on real lines
 	 *
@@ -59,7 +59,7 @@ private:
 	 * For positions which are sometimes invalid, use a flag
 	 */
 	void pushPosition(SCursorPushed &Sdest, POINT pt);
-	/** 
+	/**
 	 * @brief Restore cursors after Rescan.
 	 *
 	 * @note : also scroll to the old top line
@@ -80,7 +80,8 @@ private:
 	SCursorPushed m_ptSavedSelStartPushed, m_ptSavedSelEndPushed;
 	/// memorize top line positions
 	int m_nTopSubLinePushed;
-	/** last change position, in the buffer ; used in insertText
+	/**
+	 * last change position, in the buffer ; used in insertText
 	 * initialized with (-1,-1), so don't assert for this invalid value
 	 */
 	SCursorPushed m_ptLastChangePushed;

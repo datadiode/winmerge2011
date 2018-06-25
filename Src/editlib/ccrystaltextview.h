@@ -30,7 +30,7 @@
  */
 #pragma once
 
-#include "SyntaxColors.h"
+#include "LineInfo.h"
 
 #define COMMON_LEXIS 001
 #define NATIVE_LEXIS 002
@@ -163,89 +163,21 @@ protected:
 	DWORD m_dwLastSearchFlags;
 	String m_strLastFindWhat;
 
-	//  Parsing stuff
-	class TextBlock
-	{
-	private:
-		~TextBlock() { } // prevents deletion from outside TextBlock::Array
-	public:
-		int m_nCharPos;
-		int m_nColorIndex;
-		int m_nBgColorIndex;
-		class Array
-		{
-		private:
-			TextBlock *m_pBuf;
-		public:
-			void const *m_bRecording;
-			int m_nActualItems;
-			Array(TextBlock *pBuf)
-				: m_pBuf(pBuf), m_bRecording(m_pBuf), m_nActualItems(0)
-			{ }
-			~Array() { delete[] m_pBuf; }
-			operator TextBlock *() { return m_pBuf; }
-			void swap(Array &other)
-			{
-				std::swap(m_pBuf, other.m_pBuf);
-				std::swap(m_nActualItems, other.m_nActualItems);
-			}
-			__forceinline void DefineBlock(int pos, int colorindex)
-			{
-				if (m_bRecording)
-				{
-					if (m_nActualItems == 0 || m_pBuf[m_nActualItems - 1].m_nCharPos <= pos)
-					{
-						m_pBuf[m_nActualItems].m_nCharPos = pos;
-						m_pBuf[m_nActualItems].m_nColorIndex = colorindex;
-						m_pBuf[m_nActualItems].m_nBgColorIndex = COLORINDEX_BKGND;
-						++m_nActualItems;
-					}
-				}
-			}
-		};
-		class Cookie
-		{
-		public:
-			Cookie(DWORD dwCookie = -1)
-				: m_dwCookie(dwCookie), m_dwNesting(0)
-			{ }
-			void Clear()
-			{
-				m_dwCookie = -1;
-				m_dwNesting = 0;
-			}
-			BOOL Empty() const
-			{
-				return m_dwCookie == -1;
-			}
-			DWORD m_dwCookie;
-			DWORD m_dwNesting;
-		private:
-			void operator=(int);
-		};
-		typedef void (CCrystalTextView::*ParseProc)(Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, Array &pBuf);
-	};
-	/**  
-	This array must be initialized to (DWORD) - 1, code for invalid values (not yet computed).
-	We prefer to limit the recomputing delay to the moment when we need to read
-	a parseCookie value for drawing.
-	GetParseCookie must always be used to read the m_ParseCookies value of a line.
-	If the actual value is invalid code, GetParseCookie computes the value, 
-	stores it in m_ParseCookies, and returns the new valid value.
-	When we edit the text, the parse cookies value may change for the modified line
-	and all the lines below (As m_ParseCookies[line i] depends on m_ParseCookies[line (i-1)])
-	It would be a loss of time to recompute all these values after each action.
-	So we just set all these values to invalid code (DWORD) - 1.
-	*/
-	std::vector<TextBlock::Cookie> m_ParseCookies;
+	typedef LineInfo::TextBlock TextBlock;
+
+	/**
+	 * @brief Compute the parse cookie value of a line.
+	 *
+	 * @note Once computed, the value is cached in LineInfo::m_cookie.
+	 */
 	TextBlock::Cookie GetParseCookie(int nLineIndex);
 
 	/**
-	Pre-calculated line lengths (in characters)
-	This array works as the parse cookie Array
-	and must be initialized to - 1, code for invalid values (not yet computed).
-	for the same reason.
-	*/
+	 * @brief Pre-calculated line lengths (in characters)
+	 *
+	 * @note The values in this array are computed in a lazy fashion, and must
+	 * be initialized to -1, code for invalid values (not yet computed).
+	 */
 	std::vector<int> m_pnActualLineLength;
 
 	bool m_bPreparingToDrag;
@@ -272,6 +204,8 @@ protected:
 
 	bool m_bBookmarkExist;        // More bookmarks
 	void ToggleBookmark(int nLine);
+
+	void InitParseCookie();
 
 public:
 	virtual void ResetView();
