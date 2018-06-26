@@ -81,6 +81,7 @@ void CPatchTool::Run()
 		m_diffWrapper.nContext = m_dlgPatch.m_contextLines;
 		// Checkbox - can't be wrong
 		m_diffWrapper.bAddCommandline = m_dlgPatch.m_includeCmdLine != FALSE;
+		m_diffWrapper.bOmitTimestamps = m_dlgPatch.m_useGenericPaths == BST_INDETERMINATE;
 		m_diffWrapper.bAppendFiles = m_dlgPatch.m_appendFile != FALSE;
 
 		// These are from checkboxes and radiobuttons - can't be wrong
@@ -103,15 +104,19 @@ void CPatchTool::Run()
 		// Select patch create -mode
 		m_diffWrapper.SetCreatePatchFile(m_dlgPatch.m_fileResult);
 
-		const int fileCount = m_dlgPatch.GetItemCount();
+		String const altPath1 = &_T("a")[m_dlgPatch.m_useGenericPaths == BST_UNCHECKED];
+		String const altPath2 = &_T("b")[m_dlgPatch.m_useGenericPaths == BST_UNCHECKED];
+		int const fileCount = m_dlgPatch.GetItemCount();
 		int index = 0;
 		while (index < fileCount)
 		{
-			const PATCHFILES &files = m_dlgPatch.GetItemAt(index);
-			
+			PATCHFILES const &files = m_dlgPatch.GetItemAt(index);
 			// Set up DiffWrapper
 			m_diffWrapper.SetPaths(files.lfile, files.rfile);
-			m_diffWrapper.SetAlternativePaths(files.pathLeft, files.pathRight);
+			if (m_dlgPatch.m_useGenericPaths != BST_UNCHECKED)
+				m_diffWrapper.SetAlternativePaths(altPath1, altPath2, true);
+			else
+				m_diffWrapper.SetAlternativePaths(files.pathLeft, files.pathRight);
 			m_diffWrapper.SetCompareFiles(files.lfile, files.rfile);
 			if (!m_diffWrapper.RunFileDiff())
 			{

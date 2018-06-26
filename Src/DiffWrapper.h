@@ -112,6 +112,7 @@ struct PATCHOPTIONS
 	enum output_style outputStyle; /**< Patch file style. */
 	int nContext; /**< Number of context lines. */
 	bool bAddCommandline; /**< Add diff-style commandline to patch file. */
+	bool bOmitTimestamps; /**< Omit timestamps from patch file. */
 	bool bAppendFiles; /**< Do we append to existing patch file? */
 protected:
 	PATCHOPTIONS();
@@ -154,7 +155,7 @@ public:
 	void SetCreatePatchFile(const String &filename);
 	void SetDetectMovedBlocks(bool bDetectMovedBlocks);
 	void SetPaths(const String &filepath1, const String &filepath2);
-	void SetAlternativePaths(const String &altPath1, const String &altPath2);
+	void SetAlternativePaths(const String &altPath1, const String &altPath2, bool bAddCommonSuffix = false);
 	void SetCodepage(int codepage) { m_codepage = codepage; }
 	bool RunFileDiff();
 	bool RunFileDiff(DiffFileData &diffdata);

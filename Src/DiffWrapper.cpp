@@ -41,6 +41,7 @@ PATCHOPTIONS::PATCHOPTIONS()
 	: outputStyle(OUTPUT_NORMAL)
 	, nContext(0)
 	, bAddCommandline(true)
+	, bOmitTimestamps(false)
 	, bAppendFiles(false)
 {
 }
@@ -356,11 +357,27 @@ void CDiffWrapper::SetCompareFiles(const String &OriginalFile1, const String &Or
  * we want to use relative paths.
  * @param [in] altPath1 Alternative file path of first file.
  * @param [in] altPath2 Alternative file path of second file.
+ * @param [in] bAddCommonSuffix Whether to add the common suffix of the original paths.
  */
-void CDiffWrapper::SetAlternativePaths(const String &altPath1, const String &altPath2)
+void CDiffWrapper::SetAlternativePaths(const String &altPath1, const String &altPath2, bool bAddCommonSuffix)
 {
 	m_s1AlternativePath = altPath1;
 	m_s2AlternativePath = altPath2;
+	if (bAddCommonSuffix)
+	{
+		LPCWSTR q1, p1 = NULL;
+		LPCWSTR q2, p2 = NULL;
+		do
+		{
+			p1 = StrRChrW(m_s1File.c_str(), q1 = p1, L'\\');
+			p2 = StrRChrW(m_s2File.c_str(), q2 = p2, L'\\');
+		} while (p1 && p2 && StrCmpIW(p1, p2) == 0);
+		if (q1 && q2)
+		{
+			string_replace(m_s1AlternativePath += q1, L'\\', L'/');
+			string_replace(m_s2AlternativePath += q2, L'\\', L'/');
+		}
+	}
 }
 
 bool CDiffWrapper::RunFileDiff(DiffFileData &diffdata)
@@ -809,6 +826,13 @@ void CDiffWrapper::WritePatchFile(struct change *script, struct comparison *cmp)
 		m_s2AlternativePath.c_str() : m_s2File.c_str())->Oct(CP_THREAD_ACP);
 	cmp_patch.file[0].name = path1.A;
 	cmp_patch.file[1].name = path2.A;
+
+	if (bOmitTimestamps)
+	{
+		// use names as labels to have timestamps omitted
+		cmp_patch.file_label[0] = cmp_patch.file[0].name;
+		cmp_patch.file_label[1] = cmp_patch.file[1].name;
+	}
 
 	_tstati64(m_s1File.c_str(), &cmp_patch.file[0].stat);
 	_tstati64(m_s2File.c_str(), &cmp_patch.file[1].stat);

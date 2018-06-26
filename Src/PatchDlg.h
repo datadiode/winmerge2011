@@ -59,6 +59,7 @@ public:
 	BOOL m_appendFile;
 	BOOL m_openToEditor;
 	BOOL m_includeCmdLine;
+	int m_useGenericPaths;
 
 	enum output_style m_outputStyle; /**< Patch style (context, unified etc.) */
 	int m_contextLines; /**< How many context lines are added. */

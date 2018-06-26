@@ -215,7 +215,7 @@ struct comparison
     FILE *outfile;
 
     /* File labels for '-c' output headers (--label).  */
-    char *file_label[2];
+    char const *file_label[2];
 
 #if USE_GNU_REGEX(1)
     /* Regexp to identify function-header lines (-F).  */

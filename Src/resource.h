@@ -215,6 +215,7 @@
 #define IDC_DATABASE_LIST                       1081
 #define IDC_MULTI_CHECKOUT                      1082
 #define IDC_CHECKIN                             1083
+#define IDC_DIFF_USE_GENERIC_PATHS              1090
 #define IDC_EXT_EDITOR_BROWSE                   1091
 #define IDC_EXT_EDITOR_PATH                     1092
 #define IDC_DIFF_SWAPFILES                      1093

@@ -61,6 +61,7 @@ bool CPatchDlg::UpdateData()
 	DDX_CBStringExact<op>(IDC_DIFF_FILERESULT, m_fileResult);
 	DDX_Check<op>(IDC_DIFF_OPENTOEDITOR, m_openToEditor);
 	DDX_Check<op>(IDC_DIFF_INCLCMDLINE, m_includeCmdLine);
+	DDX_Check<op>(IDC_DIFF_USE_GENERIC_PATHS, m_useGenericPaths);
 	return true;
 }
 
@@ -520,6 +521,7 @@ void CPatchDlg::LoadSettings()
 		m_whitespaceCompare = key.ReadDword(_T("Whitespace"), WHITESPACE_COMPARE_ALL);
 		m_openToEditor = key.ReadDword(_T("OpenToEditor"), FALSE);
 		m_includeCmdLine = key.ReadDword(_T("IncludeCmdLine"), FALSE);
+		m_useGenericPaths = key.ReadDword(_T("UseGenericPaths"), FALSE);
 	}
 	UpdateSettings();
 }
@@ -539,6 +541,7 @@ void CPatchDlg::SaveSettings()
 		key.WriteDword(_T("Whitespace"), m_whitespaceCompare);
 		key.WriteDword(_T("OpenToEditor"), m_openToEditor);
 		key.WriteDword(_T("IncludeCmdLine"), m_includeCmdLine);
+		key.WriteDword(_T("UseGenericPaths"), m_useGenericPaths);
 	}
 }
 
