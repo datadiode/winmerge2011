@@ -889,6 +889,19 @@
 #define ID_ALL_RIGHT                            32841
 #define ID_ALL_LEFT                             32842
 #define ID_MERGE_DELETE                         32845
+
+#define ID_VIEW_CONTEXT_0                       32850
+#define ID_VIEW_CONTEXT_1                       32851
+#define ID_VIEW_CONTEXT_2                       32852
+#define ID_VIEW_CONTEXT_3                       32853
+#define ID_VIEW_CONTEXT_4                       32854
+#define ID_VIEW_CONTEXT_5                       32855
+#define ID_VIEW_CONTEXT_6                       32856
+#define ID_VIEW_CONTEXT_7                       32857
+#define ID_VIEW_CONTEXT_8                       32858
+#define ID_VIEW_CONTEXT_9                       32859
+#define ID_VIEW_CONTEXT_UNLIMITED               32860
+
 #define ID_TOOLS_CUSTOMIZECOLUMNS               32864
 #define ID_TOOLS_GENERATEPATCH                  32865
 #define ID_TOOLS_FILTERS                        32866
@@ -911,14 +924,6 @@
 #define ID_FILE_OPEN_WITHEDITOR                 32945
 #define ID_FILE_OPEN_WITH                       32946
 #define ID_FILE_OPEN_FOLDER                     32947
-
-#define ID_VIEW_CONTEXT_0                       32950
-#define ID_VIEW_CONTEXT_1                       32951
-#define ID_VIEW_CONTEXT_2                       32952
-#define ID_VIEW_CONTEXT_3                       32953
-#define ID_VIEW_CONTEXT_4                       32954
-#define ID_VIEW_CONTEXT_5                       32955
-#define ID_VIEW_CONTEXT_UNLIMITED               32956
 
 #define ID_TOOLS_SAVE_TO_XLS_ALL                32960
 #define ID_TOOLS_SAVE_TO_XLS_SELECTED           32961

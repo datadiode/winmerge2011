@@ -419,6 +419,13 @@ LRESULT CChildFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 		case ID_VIEW_CONTEXT_3:
 		case ID_VIEW_CONTEXT_4:
 		case ID_VIEW_CONTEXT_5:
+		case ID_VIEW_CONTEXT_6:
+		case ID_VIEW_CONTEXT_7:
+		case ID_VIEW_CONTEXT_8:
+		case ID_VIEW_CONTEXT_9:
+			// Limiting context discards unsaved changes, so better avoid that.
+			if (m_ptBuf[0]->IsModified() || m_ptBuf[1]->IsModified())
+				return TRUE;
 			// Editing does not work with limited context, so disable it.
 			m_ptBuf[0]->SetReadOnly();
 			m_ptBuf[1]->SetReadOnly();
