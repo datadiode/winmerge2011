@@ -429,18 +429,16 @@ BOOL COpenDlg::OnInitDialog()
 		index = m_pCbExt->InsertString(0, filterString.c_str());
 	m_pCbExt->SetCurSel(index);
 
-	if (m_sLeftFile.empty())
+	if (m_sLeftFile.empty() && m_sRightFile.empty())
+	{
 		m_pCbLeft->GetWindowText(m_sLeftFile);
-	else
-		paths_UndoMagic(m_sLeftFile);
-
-	if (m_sRightFile.empty())
 		m_pCbRight->GetWindowText(m_sRightFile);
+	}
 	else
+	{
+		paths_UndoMagic(m_sLeftFile);
 		paths_UndoMagic(m_sRightFile);
-
-	if (m_sFilter.empty())
-		m_pCbExt->GetWindowText(m_sFilter);
+	}
 
 	UpdateData<Set>();
 
