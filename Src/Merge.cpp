@@ -298,7 +298,7 @@ int CMergeApp::ExitInstance(HRESULT hr)
 	if (hr == S_OK)
 	{
 		// Deallocate custom parser associations
-		CCrystalTextView::FreeParserAssociations();
+		CCrystalTextBuffer::FreeParserAssociations();
 		CCrystalTextView::FreeSharedResources();
 		// Remove tempfolder
 		ClearTempfolder(env_GetTempPath());
@@ -413,9 +413,9 @@ void CMergeApp::InitializeSupplements()
 	}
 	// Create a [Parsers] section as per CCrystalTextView's default settings if not yet present
 	if (!GetPrivateProfileSection(_T("Parsers"), buffer, _countof(buffer), ini.c_str()) ||
-		!CCrystalTextView::ScanParserAssociations(buffer))
+		!CCrystalTextBuffer::ScanParserAssociations(buffer))
 	{
-		CCrystalTextView::DumpParserAssociations(buffer);
+		CCrystalTextBuffer::DumpParserAssociations(buffer);
 		WritePrivateProfileSection(_T("Parsers"), buffer, ini.c_str());
 	}
 	// Create a [FileTransforms] section with some working defaults if not yet present

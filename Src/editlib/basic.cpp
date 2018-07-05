@@ -15,8 +15,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "StdAfx.h"
-#include "ccrystaltextview.h"
-#include "string_util.h"
+#include "ccrystaltextbuffer.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -325,7 +324,7 @@ static BOOL IsBasicKeyword(LPCTSTR pszChars, int nLength)
 #define COOKIE_STRING           0x0008
 #define COOKIE_TRANSPARENT      0xFFFFFF00
 
-void CCrystalTextView::ParseLineBasic(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
+void CCrystalTextBuffer::ParseLineBasic(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
 {
 	DWORD &dwCookie = cookie.m_dwCookie;
 

@@ -1885,15 +1885,13 @@ void CChildFrame::OpenDocs(
 	// we use recognized type for unrecognized side too.
 	
 	bool syntaxHLEnabled = COptionsMgr::Get(OPT_SYNTAX_HIGHLIGHT);
-	CCrystalTextView::TextDefinition *bLeftTyped = NULL;
-	CCrystalTextView::TextDefinition *bRightTyped = NULL;
+	CCrystalTextBuffer::TextDefinition *bLeftTyped = NULL;
+	CCrystalTextBuffer::TextDefinition *bRightTyped = NULL;
 	
 	if (syntaxHLEnabled)
 	{
-		bLeftTyped = pLeft->SetTextType(sextL.c_str());
-		pLeftDetail->SetTextType(bLeftTyped);
-		bRightTyped = pRight->SetTextType(sextR.c_str());
-		pRightDetail->SetTextType(bRightTyped);
+		bLeftTyped = m_ptBuf[0]->SetTextType(sextL.c_str());
+		bRightTyped = m_ptBuf[1]->SetTextType(sextR.c_str());
 	}
 
 	// If textypes of the files aren't recogzined by their extentions,
@@ -1901,24 +1899,18 @@ void CChildFrame::OpenDocs(
 	if (bLeftTyped == NULL && bRightTyped == NULL)
 	{
 		if (LPCTSTR sFirstLine = m_ptBuf[0]->GetLineChars(0))
-			bLeftTyped = pLeft->SetTextTypeByContent(sFirstLine);
+			bLeftTyped = m_ptBuf[0]->SetTextTypeByContent(sFirstLine);
 		if (LPCTSTR sFirstLine = m_ptBuf[1]->GetLineChars(0))
-			bRightTyped = pRight->SetTextTypeByContent(sFirstLine);
+			bRightTyped = m_ptBuf[1]->SetTextTypeByContent(sFirstLine);
 	}
 
 	// If other side didn't have recognized texttype, apply recognized
 	// type to unrecognized one. (comparing file.cpp and file.bak applies
 	// cpp file type to .bak file.
 	if (bRightTyped == NULL)
-	{
-		pRight->SetTextType(bLeftTyped);
-		pRightDetail->SetTextType(bLeftTyped);
-	}
+		m_ptBuf[1]->SetTextType(bLeftTyped);
 	if (bLeftTyped == NULL)
-	{
-		pLeft->SetTextType(bRightTyped);
-		pLeftDetail->SetTextType(bRightTyped);
-	}
+		m_ptBuf[0]->SetTextType(bRightTyped);
 
 	// Check the EOL sensitivity option (do it before Rescan)
 	if (m_ptBuf[0]->GetCRLFMode() != m_ptBuf[1]->GetCRLFMode() &&
@@ -2189,11 +2181,12 @@ void CChildFrame::OnToolsCompareSelection()
 	int nSide = 0;
 	do
 	{
+		CDiffTextBuffer *const pBuf = m_ptBuf[nSide];
 		CMergeEditView *const pView = m_pView[nSide];
 		CDiffTextBuffer *const pTargetBuf = pMergeDoc->m_ptBuf[nSide];
 		CMergeEditView *const pTargetView = pMergeDoc->m_pView[nSide];
 		// Have the modal MergeDoc inherit the current syntax coloring rules.
-		pTargetView->SetTextType(pView->m_CurSourceDef);
+		pTargetBuf->SetTextType(pBuf->m_CurSourceDef);
 		POINT ptStart, ptEnd;
 		pView->GetSelection(ptStart, ptEnd);
 		String text;

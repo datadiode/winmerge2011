@@ -15,8 +15,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "StdAfx.h"
-#include "ccrystaltextview.h"
-#include "string_util.h"
+#include "ccrystaltextbuffer.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -56,7 +55,7 @@ static BOOL IsJspScriptingTagName(LPCTSTR pszChars, int nLength)
 #define COOKIE_SCRIPT           0x00800000UL
 #define COOKIE_TRANSPARENT      0x0000007FUL
 
-void CCrystalTextView::ParseLineAsp(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
+void CCrystalTextBuffer::ParseLineAsp(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
 {
 	DWORD &dwCookie = cookie.m_dwCookie;
 

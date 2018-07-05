@@ -31,6 +31,7 @@
 #pragma once
 
 #include "LineInfo.h"
+#include "string_util.h"
 
 #define COMMON_LEXIS 001
 #define NATIVE_LEXIS 002
@@ -100,9 +101,6 @@ class CCrystalTextView
 	, public IDropSource
 	, public IDataObject
 {
-public:
-	typedef int Captures[30];
-
 private:
 	LOGFONT m_lfBaseFont;
 	HFont *m_apFonts[4];
@@ -118,7 +116,6 @@ private:
 	bool m_bSelMargin;
 	bool m_bViewLineNumbers;
 	bool m_bSeparateCombinedChars;
-	DWORD m_dwFlags;
 
 	CSyntaxColors *m_pColors;
 
@@ -139,11 +136,6 @@ private:
 	int m_nMaxLineLength;
 	int m_nIdealCharPos;
 
-	static int FindStringHelper(
-		LPCTSTR pchFindWhere, UINT cchFindWhere,
-		LPCTSTR pchFindWhat, DWORD dwFlags,
-		Captures &ovector);
-
 protected:
 
 	bool m_bFocused;
@@ -162,23 +154,6 @@ protected:
 	bool m_bLastSearch;
 	DWORD m_dwLastSearchFlags;
 	String m_strLastFindWhat;
-
-	typedef LineInfo::TextBlock TextBlock;
-
-	/**
-	 * @brief Compute the parse cookie value of a line.
-	 *
-	 * @note Once computed, the value is cached in LineInfo::m_cookie.
-	 */
-	TextBlock::Cookie GetParseCookie(int nLineIndex);
-
-	/**
-	 * @brief Pre-calculated line lengths (in characters)
-	 *
-	 * @note The values in this array are computed in a lazy fashion, and must
-	 * be initialized to -1, code for invalid values (not yet computed).
-	 */
-	std::vector<int> m_pnActualLineLength;
 
 	bool m_bPreparingToDrag;
 	bool m_bDraggingText;
@@ -205,8 +180,6 @@ protected:
 	bool m_bBookmarkExist;        // More bookmarks
 	void ToggleBookmark(int nLine);
 
-	void InitParseCookie();
-
 public:
 	virtual void ResetView();
 
@@ -228,17 +201,17 @@ public:
 	STDMETHOD(DUnadvise)(DWORD);
 	STDMETHOD(EnumDAdvise)(LPENUMSTATDATA *);
 	
-	int GetLineCount();
+	int GetLineCount() const;
 	virtual int ComputeRealLine(int nApparentLine) const;
 	virtual void OnUpdateCaret(bool bShowHide);
 	bool IsTextBufferInitialized() const;
 	LPCTSTR GetTextBufferEol(int nLine) const;
 
-	CSyntaxColors *GetSyntaxColors() { return m_pColors; }
+	CSyntaxColors *GetSyntaxColors() const { return m_pColors; }
 	void SetColorContext(CSyntaxColors *pColors) { m_pColors = pColors; }
 	virtual void SetSelection(const POINT &ptStart, const POINT &ptEnd);
 
-	bool IsSelection();
+	bool IsSelection() const;
 	bool HasFocus() const { return m_bFocused; }
 	virtual bool QueryEditable();
 
@@ -260,9 +233,9 @@ protected:
 	CCrystalTextBuffer *m_pTextBuffer;
 	POINT m_ptDraggedTextBegin, m_ptDraggedTextEnd;
 	int GetMarginWidth();
-	bool IsValidTextPos(const POINT &);
-	bool IsValidTextPosX(const POINT &);
-	bool IsValidTextPosY(int);
+	bool IsValidTextPos(POINT const &) const;
+	bool IsValidTextPosX(POINT const &) const;
+	bool IsValidTextPosY(int) const;
 
 	POINT ClientToText(const POINT &);
 	POINT TextToClient(const POINT &);
@@ -436,7 +409,6 @@ public:
 	int GetLineLength(int nLineIndex) const;
 	int GetFullLineLength(int nLineIndex) const;
 	int GetViewableLineLength(int nLineIndex) const;
-	int GetLineActualLength(int nLineIndex);
 	LPCTSTR GetLineChars(int nLineIndex) const;
 	DWORD GetLineFlags(int nLineIndex) const;
 	void GetSelection(POINT &ptStart, POINT &ptEnd);
@@ -464,7 +436,7 @@ protected:
 		int nColorIndex, int nBgColorIndex, COLORREF crText, COLORREF crBkgnd,
 		LPCTSTR pszChars, int nOffset, int nCount, int &nActualOffset, POINT ptTextPos,
 		int nBgColorIndexZeorWidthBlock, int cxZeorWidthBlock);
-	virtual void DrawSingleLine(HSurface *, const RECT &, int nLineIndex);
+	virtual bool DrawSingleLine(HSurface *, const RECT &, int nLineIndex);
 	virtual void DrawMargin(HSurface *, const RECT &, int nLineIndex, int nLineNumber);
 
 	int GetCharWidthFromChar(LPCTSTR) const;
@@ -569,47 +541,6 @@ public:
 	void GetHTMLAttribute(int nColorIndex, int nBgColorIndex, COLORREF crText, COLORREF crBkgnd, String &);
 
 	void GoToLine(int nLine, bool bRelative);
-	void ParseLine(TextBlock::Cookie &cookie, int nLineIndex, TextBlock::Array &pBuf);
-	static DWORD ScriptCookie(LPCTSTR lang, DWORD defval = COOKIE_PARSER);
-	static TextBlock::ParseProc ScriptParseProc(DWORD dwCookie);
-	void ParseLinePlain(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineUnknown(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineAsp(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineBasic(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineBatch(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineC(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineCSharp(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineRazor(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineCss(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineDcl(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineFortran(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineGo(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineIni(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineInnoSetup(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineIS(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineJava(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineLisp(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineLua(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineNsis(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLinePascal(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLinePerl(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLinePhp(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLinePo(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLinePowerShell(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLinePython(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineRexx(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineRsrc(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineRuby(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineRust(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineSgml(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineSh(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineSiod(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineSql(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineTcl(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineTex(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineVerilog(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineVhdl(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineXml(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
 	// Attributes
 public:
 	bool GetViewTabs() const;
@@ -624,8 +555,6 @@ public:
 	void SetViewLineNumbers(bool);
 	void GetFont(LOGFONT &) const;
 	void SetFont(const LOGFONT &);
-	DWORD GetFlags() const;
-	void SetFlags(DWORD dwFlags);
 	//  [JRT]:
 	bool GetDisableDragAndDrop() const;
 	void SetDisableDragAndDrop(bool);
@@ -637,97 +566,6 @@ public:
 	//END SW
 
 	int m_nLastFindWhatLen;
-
-	enum TextType
-	{
-		SRC_PLAIN,
-		SRC_ASP,
-		SRC_BASIC,
-		SRC_VBSCRIPT,
-		SRC_BATCH,
-		SRC_C,
-		SRC_CSHARP,
-		SRC_CSHTML,
-		SRC_CSS,
-		SRC_DCL,
-		SRC_FORTRAN,
-		SRC_GO,
-		SRC_HTML,
-		SRC_INI,
-		SRC_INNOSETUP,
-		SRC_INSTALLSHIELD,
-		SRC_JAVA,
-		SRC_JSCRIPT,
-		SRC_JSP,
-		SRC_LISP,
-		SRC_LUA,
-		SRC_MWSL,
-		SRC_NSIS,
-		SRC_PASCAL,
-		SRC_PERL,
-		SRC_PHP,
-		SRC_PO,
-		SRC_POWERSHELL,
-		SRC_PYTHON,
-		SRC_REXX,
-		SRC_RSRC,
-		SRC_RUBY,
-		SRC_RUST,
-		SRC_SGML,
-		SRC_SH,
-		SRC_SIOD,
-		SRC_SQL,
-		SRC_TCL,
-		SRC_TEX,
-		SRC_VERILOG,
-		SRC_VHDL,
-		SRC_XML
-	};
-
-// Tabsize is commented out since we have only GUI setting for it now.
-// Not removed because we may later want to have per-filetype settings again.
-// See ccrystaltextview.cpp for per filetype table initialization.
-	typedef struct tagTextDefinition
-	{
-		TextType type;
-		LPCTSTR name;
-		LPCTSTR exts;
-		TextBlock::ParseProc ParseLineX;
-		DWORD flags;
-		LPCTSTR opencomment;
-		LPCTSTR closecomment;
-		LPCTSTR commentline;
-	} const TextDefinition;
-
-	static DWORD const SRCOPT_INSERTTABS	= 0x0001;
-	static DWORD const SRCOPT_SHOWTABS		= 0x0002;
-//	static DWORD const SRCOPT_BSATBOL		= 0x0004;
-	static DWORD const SRCOPT_SELMARGIN		= 0x0008;
-	static DWORD const SRCOPT_AUTOINDENT	= 0x0010;
-	static DWORD const SRCOPT_BRACEANSI		= 0x0020;
-	static DWORD const SRCOPT_BRACEGNU		= 0x0040;
-	static DWORD const SRCOPT_EOLNDOS		= 0x0080;
-	static DWORD const SRCOPT_EOLNUNIX		= 0x0100;
-	static DWORD const SRCOPT_EOLNMAC		= 0x0200;
-	static DWORD const SRCOPT_FNBRACE		= 0x0400;
-//	static DWORD const SRCOPT_WORDWRAP		= 0x0800;
-	static DWORD const SRCOPT_HTML4_LEXIS	= 0x1000;
-	static DWORD const SRCOPT_HTML5_LEXIS	= 0x2000;
-
-	//  Source type
-	TextDefinition *m_CurSourceDef;
-	static TextDefinition m_StaticSourceDefs[];
-	static TextDefinition *m_SourceDefs;
-	virtual TextDefinition *DoSetTextType(TextDefinition *);
-	static TextDefinition *GetTextType(LPCTSTR pszExt);
-	static TextDefinition *GetTextType(int index);
-	static BOOL ScanParserAssociations(LPTSTR);
-	static void DumpParserAssociations(LPTSTR);
-	static void FreeParserAssociations();
-	TextDefinition *SetTextType(LPCTSTR pszExt);
-	TextDefinition *SetTextType(TextType enuType);
-	TextDefinition *SetTextType(TextDefinition *);
-	TextDefinition *SetTextTypeByContent(LPCTSTR pszContent);
 
 	// Operations
 public:
@@ -770,7 +608,7 @@ public:
 	CCrystalTextView(size_t);
 	~CCrystalTextView();
 #ifdef _DEBUG
-	void AssertValidTextPos(const POINT & pt);
+	void AssertValidTextPos(POINT const &) const;
 #endif
 	int GetScrollPos(UINT nBar, UINT nSBCode);
 

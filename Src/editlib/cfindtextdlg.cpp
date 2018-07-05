@@ -143,7 +143,7 @@ void CFindTextDlg::OnOK()
 	}
 	m_pCbFindText->SaveState(_T("Files\\FindInFile"));
 	POINT ptTextPos;
-	CCrystalTextView::Captures captures;
+	Captures captures;
 	if (m_pBuddy->FindText(m_sText.c_str(), m_ptCurrentPos, dwSearchFlags, !m_bNoWrap, ptTextPos, captures) < 0)
 	{
 		LanguageSelect.Format(

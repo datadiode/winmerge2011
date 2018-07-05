@@ -43,7 +43,6 @@
  */
 #include "StdAfx.h"
 #include "ccrystaltextbuffer.h"
-#include "string_util.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -868,7 +867,7 @@ void CCrystalTextView::OnRButtonDown(LPARAM lParam)
 	}
 }
 
-bool CCrystalTextView::IsSelection()
+bool CCrystalTextView::IsSelection() const
 {
 	return m_ptSelStart != m_ptSelEnd;
 }

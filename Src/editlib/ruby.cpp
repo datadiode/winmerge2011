@@ -15,8 +15,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "StdAfx.h"
-#include "ccrystaltextview.h"
-#include "string_util.h"
+#include "ccrystaltextbuffer.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -131,7 +130,7 @@ inline BOOL xisspace(LPCTSTR pch)
 #define COOKIE_CHAR             0x0010
 #define COOKIE_VARIABLE			0X0020
 
-void CCrystalTextView::ParseLineRuby(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
+void CCrystalTextBuffer::ParseLineRuby(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
 {
 	DWORD &dwCookie = cookie.m_dwCookie;
 

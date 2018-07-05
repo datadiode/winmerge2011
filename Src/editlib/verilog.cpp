@@ -15,8 +15,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "StdAfx.h"
-#include "ccrystaltextview.h"
-#include "string_util.h"
+#include "ccrystaltextbuffer.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -320,7 +319,7 @@ static BOOL IsVerilogNumber(LPCTSTR pszChars, int nLength)
 #define COOKIE_EXT_COMMENT      0x0004
 #define COOKIE_STRING           0x0008
 
-void CCrystalTextView::ParseLineVerilog(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
+void CCrystalTextBuffer::ParseLineVerilog(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
 {
 	DWORD &dwCookie = cookie.m_dwCookie;
 

@@ -15,8 +15,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "StdAfx.h"
-#include "ccrystaltextview.h"
-#include "string_util.h"
+#include "ccrystaltextbuffer.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -56,7 +55,7 @@ static BOOL IsXmlAttrName(LPCTSTR pszChars, int nLength)
 #define COOKIE_EXT_COMMENT      0x0010
 #define COOKIE_XML              0x0020
 
-void CCrystalTextView::ParseLineXml(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
+void CCrystalTextBuffer::ParseLineXml(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
 {
 	DWORD &dwCookie = cookie.m_dwCookie;
 

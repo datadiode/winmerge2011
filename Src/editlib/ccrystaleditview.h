@@ -53,7 +53,6 @@ protected:
     POINT m_ptSavedSelStart, m_ptSavedSelEnd;
 private:
     POINT m_ptDropPos;
-    bool m_bAutoIndent;
 
 public:
     virtual void ResetView();
@@ -72,9 +71,6 @@ protected:
 	void DeleteCurrentSelection();
 
 public:
-	bool GetAutoIndent() const { return m_bAutoIndent; }
-	void SetAutoIndent(bool bAutoIndent) { m_bAutoIndent = bAutoIndent; }
-
     CCrystalEditView(size_t);
     ~CCrystalEditView();
 
@@ -97,8 +93,6 @@ public:
     void ReplaceSelection(LPCTSTR pszNewText, int cchNewText);
 
     virtual void OnEditOperation(int nAction, LPCTSTR pszText, int cchText);
-
-    virtual TextDefinition *DoSetTextType(TextDefinition *def);
 
     // Implementation
 protected:

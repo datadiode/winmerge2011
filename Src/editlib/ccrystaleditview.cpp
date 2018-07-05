@@ -70,7 +70,6 @@
 #include "ccrystaleditview.h"
 #include "ceditreplacedlg.h"
 #include "SettingStore.h"
-#include "string_util.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -86,18 +85,11 @@ static const unsigned int MAX_TAB_LEN = 64;  // Same as in CrystalViewText.cpp
 
 CCrystalEditView::CCrystalEditView(size_t ZeroInit)
 : CCrystalTextView(ZeroInit)
-, m_bAutoIndent(true)
 {
 }
 
 CCrystalEditView::~CCrystalEditView()
 {
-}
-
-CCrystalTextView::TextDefinition *CCrystalEditView::DoSetTextType(TextDefinition *def)
-{
-	SetAutoIndent((def->flags & SRCOPT_AUTOINDENT) != 0);
-	return CCrystalTextView::DoSetTextType(def);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1031,7 +1023,8 @@ static int bracetype(LPCTSTR s)
 
 void CCrystalEditView::OnEditOperation(int nAction, LPCTSTR pszText, int cchText)
 {
-	if (m_bAutoIndent)
+	DWORD const dwFlags = m_pTextBuffer->GetFlags();
+	if (dwFlags & SRCOPT_AUTOINDENT)
 	{
 		//  Analyse last action...
 		if (nAction == CE_ACTION_TYPING && cchText == 2 && LineInfo::IsDosEol(pszText) && !m_bOvrMode)
@@ -1049,7 +1042,7 @@ void CCrystalEditView::OnEditOperation(int nAction, LPCTSTR pszText, int cchText
 
 			if (nPos > 0)
 			{
-				if ((GetFlags() & SRCOPT_BRACEGNU) && isclosebrace(pszLineChars[nLength - 1]) && ptCursorPos.y > 0 && nPos && nPos == nLength - 1)
+				if ((dwFlags & SRCOPT_BRACEGNU) && isclosebrace(pszLineChars[nLength - 1]) && ptCursorPos.y > 0 && nPos && nPos == nLength - 1)
 				{
 					if (pszLineChars[nPos - 1] == _T('\t'))
 					{
@@ -1072,7 +1065,7 @@ void CCrystalEditView::OnEditOperation(int nAction, LPCTSTR pszText, int cchText
 				}
 				//  Insert part of the previous line
 				TCHAR *pszInsertStr;
-				if ((GetFlags() & (SRCOPT_BRACEGNU|SRCOPT_BRACEANSI)) && isopenbrace(pszLineChars[nLength - 1]))
+				if ((dwFlags & (SRCOPT_BRACEGNU | SRCOPT_BRACEANSI)) && isopenbrace(pszLineChars[nLength - 1]))
 				{
 					if (m_pTextBuffer->GetInsertTabs())
 					{
@@ -1112,7 +1105,7 @@ void CCrystalEditView::OnEditOperation(int nAction, LPCTSTR pszText, int cchText
 			{
 				//  Insert part of the previos line
 				TCHAR *pszInsertStr;
-				if ((GetFlags() & (SRCOPT_BRACEGNU|SRCOPT_BRACEANSI)) && isopenbrace(pszLineChars[nLength - 1]))
+				if ((dwFlags & (SRCOPT_BRACEGNU | SRCOPT_BRACEANSI)) && isopenbrace(pszLineChars[nLength - 1]))
 				{
 					if (m_pTextBuffer->GetInsertTabs())
 					{
@@ -1142,7 +1135,7 @@ void CCrystalEditView::OnEditOperation(int nAction, LPCTSTR pszText, int cchText
 				}
 			}
 		}
-		else if (nAction == CE_ACTION_TYPING && (GetFlags() & SRCOPT_FNBRACE) && bracetype (pszText) == 3)
+		else if (nAction == CE_ACTION_TYPING && (dwFlags & SRCOPT_FNBRACE) && bracetype(pszText) == 3)
 		{
 			//  Enter stroke!
 			POINT ptCursorPos = GetCursorPos();
@@ -1163,7 +1156,7 @@ void CCrystalEditView::OnEditOperation(int nAction, LPCTSTR pszText, int cchText
 				// m_pTextBuffer->FlushUndoGroup (this);
 			}
 		}
-		else if (nAction == CE_ACTION_TYPING && (GetFlags() & SRCOPT_BRACEGNU) && isopenbrace(pszText))
+		else if (nAction == CE_ACTION_TYPING && (dwFlags & SRCOPT_BRACEGNU) && isopenbrace(pszText))
 		{
 			//  Enter stroke!
 			POINT ptCursorPos = GetCursorPos ();
@@ -1207,14 +1200,14 @@ void CCrystalEditView::OnEditOperation(int nAction, LPCTSTR pszText, int cchText
 				// m_pTextBuffer->FlushUndoGroup (this);
 			}
 		}
-		else if (nAction == CE_ACTION_TYPING && (GetFlags() & (SRCOPT_BRACEGNU|SRCOPT_BRACEANSI)) && isclosebrace(pszText))
+		else if (nAction == CE_ACTION_TYPING && (dwFlags & (SRCOPT_BRACEGNU | SRCOPT_BRACEANSI)) && isclosebrace(pszText))
 		{
 			//  Enter stroke!
 			POINT ptCursorPos = GetCursorPos();
 
 			//  Take indentation from the previos line
 			int const nLength = m_pTextBuffer->GetLineLength(ptCursorPos.y);
-			LPCTSTR const pszLineChars = m_pTextBuffer->GetLineChars(ptCursorPos.y );
+			LPCTSTR const pszLineChars = m_pTextBuffer->GetLineChars(ptCursorPos.y);
 			int nPos = 0;
 			while (nPos < nLength && xisspace(pszLineChars[nPos]))
 				nPos++;

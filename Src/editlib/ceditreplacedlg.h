@@ -43,7 +43,7 @@ private:
 	CCrystalEditView *const m_pBuddy;
 	int m_nCaptures;
 	POINT m_ptFoundAt;
-	CCrystalTextView::Captures m_captures;
+	Captures m_captures;
 	int DoHighlightText(BOOL bNotifyIfNotFound);
 	void UpdateControls();
 

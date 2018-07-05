@@ -117,7 +117,6 @@ public:
 	using CCrystalTextView::GetSubLineCount;
 	using CCrystalTextView::GetSubLineIndex;
 	using CCrystalTextView::GetLineBySubLine;
-	using CCrystalTextView::GetParseCookie;
 
 protected:
 	virtual ~CMergeEditView();

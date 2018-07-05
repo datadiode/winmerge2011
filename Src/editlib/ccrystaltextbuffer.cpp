@@ -62,6 +62,8 @@
 #include "StdAfx.h"
 #include "ccrystaltextbuffer.h"
 #include "coretools.h"
+#include "VersionData.h"
+#include <pcre.h>
 #include <mbctype.h>
 
 #ifdef _DEBUG
@@ -140,6 +142,8 @@ CCrystalTextBuffer::CCrystalTextBuffer()
 	//END SW
 	m_dwCurrentRevisionNumber = 0;
 	m_dwRevisionNumberOnSave = 0;
+
+	SetTextType(SRC_PLAIN);
 }
 
 CCrystalTextBuffer::~CCrystalTextBuffer()
@@ -429,18 +433,20 @@ void CCrystalTextBuffer::AddView(CCrystalTextView * pView)
 void CCrystalTextBuffer::RemoveView(CCrystalTextView *pView)
 {
 	std::list<CCrystalTextView *>::iterator pos = std::find(m_lpViews.begin(), m_lpViews.end(), pView);
-	assert(pos != m_lpViews.end());
+	ASSERT(pos != m_lpViews.end());
 	if (pos != m_lpViews.end())
 		m_lpViews.erase(pos);
 }
 
 int CCrystalTextBuffer::GetParseCookieCount() const
 {
+	ASSERT(m_nParseCookieCount >= 0 && m_nParseCookieCount <= GetLineCount());
 	return m_nParseCookieCount;
 }
 
 void CCrystalTextBuffer::SetParseCookieCount(int nParseCookieCount)
 {
+	ASSERT(nParseCookieCount >= 0 && nParseCookieCount <= GetLineCount());
 	m_nParseCookieCount = nParseCookieCount;
 }
 
@@ -479,6 +485,9 @@ void CCrystalTextBuffer::InternalDeleteText(CCrystalTextView *pSource,
 	// assert to be sure to catch these 'do nothing' cases.
 	ASSERT(nStartLine != nEndLine || nStartChar != nEndChar);
 	ASSERT(!m_bReadOnly);
+
+	if (m_nParseCookieCount > nStartLine)
+		m_nParseCookieCount = nStartLine + 1;
 
 	CDeleteContext context;
 	context.m_ptStart.y = nStartLine;
@@ -564,6 +573,9 @@ POINT CCrystalTextBuffer::InternalInsertText(CCrystalTextView *pSource,
 	ASSERT(nPos >= 0 && nPos <= m_aLines[nLine].Length());
 	ASSERT(!m_bReadOnly);
 
+	if (m_nParseCookieCount > nLine)
+		m_nParseCookieCount = nLine + 1;
+
 	CInsertContext context;
 	context.m_ptStart.x = nPos;
 	context.m_ptStart.y = nLine;
@@ -577,7 +589,6 @@ POINT CCrystalTextBuffer::InternalInsertText(CCrystalTextView *pSource,
 		// remove end of line (we'll put it back on afterwards)
 		sTail = StripTail(nLine, nRestCount);
 	}
-
 
 	int nInsertedLines = 0;
 	int nCurrentLine = nLine;
@@ -813,6 +824,92 @@ int CCrystalTextBuffer::FindNextBookmarkLine(int nCurrentLine, int nDirection) c
 	return nCurrentLine;
 }
 
+static const TCHAR *MemSearch(const TCHAR *p, size_t pLen, const TCHAR *q, size_t qLen)
+{
+	if (qLen > pLen)
+		return NULL;
+	const TCHAR *pEnd = p + pLen - qLen;
+	const TCHAR *qEnd = q + qLen;
+	do
+	{
+		const TCHAR *u = p;
+		const TCHAR *v = q;
+		do
+		{
+			if (v == qEnd)
+				return p;
+		} while (*u++ == *v++);
+	} while (++p <= pEnd);
+	return NULL;
+}
+
+int CCrystalTextBuffer::FindStringHelper(
+	LPCTSTR pchFindWhere, UINT cchFindWhere,
+	LPCTSTR pchFindWhat, DWORD dwFlags,
+	Captures &ovector)
+{
+	if (dwFlags & FIND_REGEXP)
+	{
+		const char *errormsg = NULL;
+		int erroroffset = 0;
+		const OString regexString = HString::Uni(pchFindWhat)->Oct(CP_UTF8);
+		pcre *regexp = pcre_compile(regexString.A,
+			dwFlags & FIND_MATCH_CASE ?
+			PCRE_UTF8 | PCRE_BSR_ANYCRLF :
+			PCRE_UTF8 | PCRE_BSR_ANYCRLF | PCRE_CASELESS,
+			&errormsg,
+			&erroroffset, NULL);
+		pcre_extra *pe = NULL;
+		if (regexp)
+		{
+			errormsg = NULL;
+			pe = pcre_study(regexp, 0, &errormsg);
+		}
+
+		const OString compString = HString::Uni(pchFindWhere, cchFindWhere)->Oct(CP_UTF8);
+		int result = pcre_exec(
+			regexp, pe, compString.A, compString.ByteLen(), 0, 0, ovector, _countof(ovector));
+
+		if (result >= 0)
+		{
+			// Convert UTF-8 offsets to WCHAR offsets
+			int i = 2 * std::max(result, 1);
+			do
+			{
+				--i;
+				ovector[i] = MultiByteToWideChar(CP_UTF8, 0, compString.A, ovector[i], 0, 0);
+			} while(i != 0);
+		}
+
+		pcre_free(regexp);
+		pcre_free(pe);
+		return result;
+	}
+	else
+	{
+		ASSERT(pchFindWhere != NULL);
+		ASSERT(pchFindWhat != NULL);
+		const int cchFindWhat = static_cast<int>(_tcslen(pchFindWhat));
+		ovector[0] = 0;
+		ovector[1] = cchFindWhat;
+		while (LPCTSTR pchPos = MemSearch(pchFindWhere, cchFindWhere, pchFindWhat, cchFindWhat))
+		{
+			int nLen = static_cast<int>(pchPos - pchFindWhere);
+			ovector[0] += nLen;
+			ovector[1] += nLen;
+			if ((dwFlags & FIND_WHOLE_WORD) == 0)
+				return 0;
+			if (!(nLen > 0 && xisalnum(pchPos[-1]) || xisalnum(pchPos[cchFindWhat])))
+				return 0;
+			++ovector[0];
+			++ovector[1];
+			pchFindWhere = pchPos + 1;
+		}
+		return -1;
+	}
+	ASSERT(FALSE); // Unreachable
+}
+
 //BEGIN SW
 POINT CCrystalTextBuffer::GetLastChangePos() const
 {
@@ -824,14 +921,374 @@ void CCrystalTextBuffer::RestoreLastChangePos(POINT pt)
 	m_ptLastChange = pt;
 }
 
+DWORD CCrystalTextBuffer::GetFlags() const
+{
+	return m_dwFlags;
+}
+
+void CCrystalTextBuffer::SetFlags(DWORD dwFlags)
+{
+	m_dwFlags = dwFlags;
+}
+
 int CCrystalTextBuffer::GetTabSize() const
 {
-	ASSERT( m_nTabSize >= 0 && m_nTabSize <= 64 );
+	ASSERT(m_nTabSize >= 0 && m_nTabSize <= 64);
 	return m_nTabSize;
 }
 
 void CCrystalTextBuffer::SetTabSize(int nTabSize)
 {
-	ASSERT( nTabSize >= 0 && nTabSize <= 64 );
+	ASSERT(nTabSize >= 0 && nTabSize <= 64);
 	m_nTabSize = nTabSize;
+	int const nLineCount = GetLineCount();
+	for (int nLineIndex = 0; nLineIndex < nLineCount; ++nLineIndex)
+		m_aLines[nLineIndex].m_nActualLineLength = 0;
+}
+
+/**
+ * @brief Get the line length, for cursor movement 
+ *
+ * @note There are at least 4 line lengths:
+ * - number of characters (memory, no EOL)
+ * - number of characters (memory, with EOL)
+ * - number of characters for cursor position (tabs are expanded, no EOL)
+ * - number of displayed characters (tabs are expanded, with EOL)
+ * Corresponding functions:
+ * - GetLineLength
+ * - GetFullLineLength
+ * - GetLineActualLength
+ * - ExpandChars (returns the line to be displayed as a String)
+ */
+int CCrystalTextBuffer::GetLineActualLength(int nLineIndex)
+{
+	LineInfo &li = m_aLines[nLineIndex];
+
+	// Actual line length is not determined yet, let's calculate a little
+	int nActualLength = li.m_nActualLineLength;
+	int const nLength = GetLineLength(nLineIndex);
+	if (nLength > nActualLength)
+	{
+		LPCTSTR const pszChars = GetLineChars(nLineIndex);
+		int const nTabSize = GetTabSize();
+		for (int i = 0; i < nLength; i++)
+		{
+			TCHAR const c = pszChars[i];
+			ASSERT(c != _T('\r') && c != _T('\n'));
+			if (c == _T('\t'))
+				nActualLength += (nTabSize - nActualLength % nTabSize);
+			else if (c >= _T('\x00') && c <= _T('\x1F') && c != _T('\r') && c != _T('\n'))
+				nActualLength += 3;
+			/*else if (c >= UNI_SUR_MIN && c <= UNI_SUR_MAX)
+				nActualLength += 5;*/
+			else
+				nActualLength++;
+		}
+	}
+
+	li.m_nActualLineLength = nActualLength;
+	return nActualLength;
+}
+
+// Tabsize is commented out since we have only GUI setting for it now.
+// Not removed because we may later want to have per-filetype settings again.
+// See ccrystaltextview.h for table declaration.
+CCrystalTextBuffer::TextDefinition CCrystalTextBuffer::m_StaticSourceDefs[] =
+{
+	SRC_PLAIN, _T("Plain"), _T("txt;doc;diz"), &ParseLinePlain, SRCOPT_AUTOINDENT, /*4,*/ _T(""), _T(""), _T(""),
+	SRC_ASP, _T("ASP"), _T("asp;aspx"), &ParseLineAsp, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI|SRCOPT_COOKIE(COOKIE_PARSER_BASIC), /*2,*/ _T(""), _T(""), _T("'"),
+	SRC_BASIC, _T("Basic"), _T("bas;vb;frm;dsm;cls;ctl;pag;dsr"), &ParseLineBasic, SRCOPT_AUTOINDENT, /*4,*/ _T(""), _T(""), _T("\'"),
+	SRC_VBSCRIPT, _T("VBScript"), _T("vbs"), &ParseLineBasic, SRCOPT_AUTOINDENT|SRCOPT_COOKIE(COOKIE_PARSER_VBSCRIPT), /*4,*/ _T(""), _T(""), _T("\'"),
+	SRC_BATCH, _T("Batch"), _T("bat;btm;cmd"), &ParseLineBatch, SRCOPT_INSERTTABS|SRCOPT_AUTOINDENT, /*4,*/ _T(""), _T(""), _T("rem "),
+	SRC_C, _T("C"), _T("c;cc;cpp;cxx;h;hpp;hxx;hm;inl;rh;tlh;tli;xs"), &ParseLineC, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T("/*"), _T("*/"), _T("//"),
+	SRC_CSHARP, _T("C#"), _T("cs"), &ParseLineCSharp, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T("/*"), _T("*/"), _T("//"),
+	SRC_CSHTML, _T("CSHTML"), _T("cshtml"), &ParseLineRazor, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T("/*"), _T("*/"), _T("//"),
+	SRC_CSS, _T("CSS"), _T("css"), &ParseLineCss, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T("/*"), _T("*/"), _T(""),
+	SRC_DCL, _T("DCL"), _T("dcl;dcc"), &ParseLineDcl, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T("/*"), _T("*/"), _T("//"),
+	SRC_FORTRAN, _T("Fortran"), _T("f;f90;f9p;fpp;for;f77"), &ParseLineFortran, SRCOPT_INSERTTABS|SRCOPT_AUTOINDENT, /*8,*/ _T(""), _T(""), _T("!"),
+	SRC_GO, _T("Go"), _T("go"), &ParseLineGo, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T("/*"), _T("*/"), _T("//"),
+	SRC_HTML, _T("HTML"), _T("html;htm;shtml;ihtml;ssi;stm;stml"), &ParseLineAsp, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI|SRCOPT_COOKIE(COOKIE_PARSER), /*2,*/ _T("<!--"), _T("-->"), _T(""),
+	SRC_INI, _T("INI"), _T("ini;reg;vbp;isl"), &ParseLineIni, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI|SRCOPT_EOLNUNIX, /*2,*/ _T(""), _T(""), _T(";"),
+	SRC_INNOSETUP, _T("InnoSetup"), _T("iss"), &ParseLineInnoSetup, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T("{"), _T("}"), _T(";"),
+	SRC_INSTALLSHIELD, _T("InstallShield"), _T("rul"), &ParseLineIS, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T("/*"), _T("*/"), _T("//"),
+	SRC_JAVA, _T("Java"), _T("java;jav"), &ParseLineJava, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI|SRCOPT_COOKIE(COOKIE_PARSER_JAVA), /*2,*/ _T("/*"), _T("*/"), _T("//"),
+	SRC_JSCRIPT, _T("JavaScript"), _T("js;json"), &ParseLineJava, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI|SRCOPT_COOKIE(COOKIE_PARSER_JSCRIPT), /*2,*/ _T("/*"), _T("*/"), _T("//"),
+	SRC_JSP, _T("JSP"), _T("jsp"), &ParseLineAsp, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI|SRCOPT_COOKIE(COOKIE_PARSER_JAVA), /*2,*/ _T("<!--"), _T("-->"), _T(""),
+	SRC_LISP, _T("AutoLISP"), _T("lsp;dsl"), &ParseLineLisp, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T(";|"), _T("|;"), _T(";"),
+	SRC_LUA, _T("LUA"), _T("lua"), &ParseLineLua, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T(";|"), _T("|;"), _T(";"),
+	SRC_MWSL, _T("MWSL"), _T("mwsl"), &ParseLineAsp, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI|SRCOPT_COOKIE(COOKIE_PARSER_MWSL), /*2,*/ _T("<!--"), _T("-->"), _T(""),
+	SRC_NSIS, _T("NSIS"), _T("nsi;nsh"), &ParseLineNsis, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T("/*"), _T("*/"), _T(";"),
+	SRC_PASCAL, _T("Pascal"), _T("pas"), &ParseLinePascal, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T("{"), _T("}"), _T(""),
+	SRC_PERL, _T("Perl"), _T("pl;pm;plx"), &ParseLinePerl, SRCOPT_AUTOINDENT|SRCOPT_EOLNUNIX, /*4,*/ _T(""), _T(""), _T("#"),
+	SRC_PHP, _T("PHP"), _T("php;php3;php4;php5;phtml"), &ParseLineAsp, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI|SRCOPT_COOKIE(COOKIE_PARSER_PHP), /*2,*/ _T("/*"), _T("*/"), _T("//"),
+	SRC_PO, _T("PO"), _T("po;pot"), &ParseLinePo, SRCOPT_AUTOINDENT|SRCOPT_EOLNUNIX, /*4,*/ _T(""), _T(""), _T("#"),
+	SRC_POWERSHELL, _T("PowerShell"), _T("ps1"), &ParseLinePowerShell, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T(""), _T(""), _T("#"),
+	SRC_PYTHON, _T("Python"), _T("py"), &ParseLinePython, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T("/*"), _T("*/"), _T("//"),
+	SRC_REXX, _T("REXX"), _T("rex;rexx"), &ParseLineRexx, SRCOPT_AUTOINDENT, /*4,*/ _T("/*"), _T("*/"), _T("//"),
+	SRC_RSRC, _T("Resources"), _T("rc;dlg;r16;r32;rc2"), &ParseLineRsrc, SRCOPT_AUTOINDENT, /*4,*/ _T("/*"), _T("*/"), _T("//"),
+	SRC_RUBY, _T("Ruby"), _T("rb;rbw;rake;gemspec"), &ParseLineRuby, SRCOPT_AUTOINDENT|SRCOPT_EOLNUNIX, /*4,*/ _T(""), _T(""), _T("#"),
+	SRC_RUST, _T("Rust"), _T("rs"), &ParseLineRust, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T("/*"), _T("*/"), _T("//"),
+	SRC_SGML, _T("Sgml"), _T("sgm;sgml"), &ParseLineSgml, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T("<!--"), _T("-->"), _T(""),
+	SRC_SH, _T("Shell"), _T("sh;conf"), &ParseLineSh, SRCOPT_INSERTTABS|SRCOPT_AUTOINDENT|SRCOPT_EOLNUNIX, /*4,*/ _T(""), _T(""), _T("#"),
+	SRC_SIOD, _T("SIOD"), _T("scm"), &ParseLineSiod, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T(";|"), _T("|;"), _T(";"),
+	SRC_SQL, _T("SQL"), _T("sql"), &ParseLineSql, SRCOPT_AUTOINDENT, /*4,*/ _T("/*"), _T("*/"), _T("//"),
+	SRC_TCL, _T("TCL"), _T("tcl"), &ParseLineTcl, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI|SRCOPT_EOLNUNIX, /*2,*/ _T(""), _T(""), _T("#"),
+	SRC_TEX, _T("TEX"), _T("tex;sty;clo;ltx;fd;dtx"), &ParseLineTex, SRCOPT_AUTOINDENT, /*4,*/ _T(""), _T(""), _T("%"),
+	SRC_VERILOG, _T("Verilog"), _T("v;vh"), &ParseLineVerilog, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T("/*"), _T("*/"), _T("//"),
+	SRC_VHDL, _T("VHDL"), _T("vhd;vhdl;vho"), &ParseLineVhdl, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T(""), _T(""), _T("--"),
+	SRC_XML, _T("XML"), _T("xml;dtd"), &ParseLineXml, SRCOPT_AUTOINDENT|SRCOPT_BRACEANSI, /*2,*/ _T("<!--"), _T("-->"), _T("")
+}, *CCrystalTextBuffer::m_SourceDefs = m_StaticSourceDefs;
+
+/////////////////////////////////////////////////////////////////////////////
+// CCrystalTextView construction/destruction
+
+BOOL CCrystalTextBuffer::ScanParserAssociations(LPTSTR p)
+{
+	p = EatPrefix(p, _T("version="));
+	if (p == NULL)
+		return FALSE;
+	if (_tcsicmp(p, _T("ignore")) != 0)
+	{
+		ULARGE_INTEGER version = { 0xFFFFFFFF, 0xFFFFFFFF };
+		do
+		{
+			version.QuadPart <<= 16;
+			version.QuadPart |= _tcstoul(p, &p, 10);
+		} while (*p && *p++ == _T('.'));
+		while (HIWORD(version.HighPart) == 0xFFFF)
+			version.QuadPart <<= 16;
+		if (VS_FIXEDFILEINFO const *const pVffInfo =
+			reinterpret_cast<const VS_FIXEDFILEINFO *>(CVersionData::Load()->Data()))
+		{
+			if (pVffInfo->dwFileVersionLS != version.LowPart ||
+				pVffInfo->dwFileVersionMS != version.HighPart)
+			{
+				return FALSE;
+			}
+		}
+	}
+	p += _tcslen(p) + 1;
+	struct tagTextDefinition *defs = new tagTextDefinition[_countof(m_StaticSourceDefs)];
+	memcpy(defs, m_StaticSourceDefs, sizeof m_StaticSourceDefs);
+	m_SourceDefs = defs;
+	while (LPTSTR q = _tcschr(p, _T('=')))
+	{
+		const size_t r = _tcslen(q);
+		*q++ = _T('\0');
+		size_t i;
+		for (i = 0 ; i < _countof(m_StaticSourceDefs) ; ++i)
+		{
+			tagTextDefinition &def = defs[i];
+			if (_tcsicmp(def.name, p) == 0)
+			{
+				// Look for additional tags at end of entry
+				while (LPTSTR t = _tcsrchr(q, _T(':')))
+				{
+					*t++ = '\0';
+					if (DWORD dwStartCookie = ScriptCookie(t, 0))
+					{
+						def.flags &= ~SRCOPT_COOKIE(COOKIE_PARSER);
+						def.flags |= dwStartCookie << 4;
+					}
+					else if (PathMatchSpec(t, _T("HTML4")))
+						def.flags |= SRCOPT_HTML4_LEXIS;
+					else if (PathMatchSpec(t, _T("HTML5")))
+						def.flags |= SRCOPT_HTML5_LEXIS;
+				}
+				def.exts = _tcsdup(q);
+				break;
+			}
+		}
+		ASSERT(i < _countof(m_StaticSourceDefs));
+		p = q + r;
+	}
+	return TRUE;
+}
+
+void CCrystalTextBuffer::DumpParserAssociations(LPTSTR p)
+{
+	if (LPCWSTR version = CVersionData::Load()->
+		Find(L"StringFileInfo")->First()->Find(L"FileVersion")->Data())
+	{
+		p += wsprintf(p, _T("version=%ls"), version) + 1;
+	}
+	TextDefinition *def = m_SourceDefs;
+	do
+	{
+		p += wsprintf(p, _T("%-16s= %s"), def->name, def->exts) + 1;
+	} while (++def < m_SourceDefs + _countof(m_StaticSourceDefs));
+	*p = _T('\0');
+}
+
+void CCrystalTextBuffer::FreeParserAssociations()
+{
+	if (m_SourceDefs != m_StaticSourceDefs)
+	{
+		size_t i;
+		for (i = 0 ; i < _countof(m_StaticSourceDefs) ; ++i)
+		{
+			TextDefinition &def = m_SourceDefs[i];
+			if (def.exts != m_StaticSourceDefs[i].exts)
+				free(const_cast<LPTSTR>(def.exts));
+		}
+		delete[] m_SourceDefs;
+		m_SourceDefs = m_StaticSourceDefs;
+	}
+}
+
+CCrystalTextBuffer::TextDefinition *CCrystalTextBuffer::GetTextType(int index)
+{
+	if (index >= 0 && index < _countof(m_StaticSourceDefs))
+		return m_SourceDefs + index;
+	return NULL;
+}
+
+CCrystalTextBuffer::TextDefinition *CCrystalTextBuffer::GetTextType(LPCTSTR pszExt)
+{
+	TextDefinition *def = m_SourceDefs;
+	do if (PathMatchSpec(pszExt, def->exts))
+	{
+		return def;
+	} while (++def < m_SourceDefs + _countof(m_StaticSourceDefs));
+	return NULL;
+}
+
+CCrystalTextBuffer::TextDefinition *CCrystalTextBuffer::SetTextType(LPCTSTR pszExt)
+{
+	m_CurSourceDef = m_SourceDefs;
+	TextDefinition *def = GetTextType(pszExt);
+	return SetTextType(def);
+}
+
+CCrystalTextBuffer::TextDefinition *CCrystalTextBuffer::SetTextType(TextType enuType)
+{
+	m_CurSourceDef = m_SourceDefs;
+	TextDefinition *def = m_SourceDefs;
+	do if (def->type == enuType)
+	{
+		return SetTextType(def);
+	} while (++def < m_SourceDefs + _countof(m_StaticSourceDefs));
+	return NULL;
+}
+
+CCrystalTextBuffer::TextDefinition *CCrystalTextBuffer::SetTextType(TextDefinition *def)
+{
+	if (def != NULL && m_CurSourceDef != def)
+	{
+		m_CurSourceDef = def;
+		InitParseCookie();
+		SetFlags(def->flags);
+	}
+	return def;
+}
+
+// Analyze the first line of file to detect its type
+// Mainly it works for xml files
+CCrystalTextBuffer::TextDefinition *CCrystalTextBuffer::SetTextTypeByContent(LPCTSTR pszContent)
+{
+	Captures captures;
+	if (FindStringHelper(pszContent, static_cast<UINT>(_tcslen(pszContent)),
+		_T("^\\s*\\<\\?xml\\s+.+?\\?\\>\\s*$"), FIND_REGEXP, captures) >= 0)
+	{
+		return SetTextType(SRC_XML);
+	}
+	return NULL;
+}
+
+void CCrystalTextBuffer::InitParseCookie()
+{
+	if (m_CurSourceDef)
+	{
+		SetParseCookieCount(1);
+		m_aLines[0].m_cookie = TextBlock::Cookie(m_CurSourceDef->flags & COOKIE_PARSER_GLOBAL);
+	}
+	else
+	{
+		SetParseCookieCount(0);
+	}
+}
+
+TextBlock::Cookie CCrystalTextBuffer::GetParseCookie(int nLineIndex)
+{
+	int const nLineCount = GetLineCount();
+	int L = GetParseCookieCount() - 1;
+	LineInfo const &li = m_aLines[nLineIndex < L ? nLineIndex : L];
+	TextBlock::Cookie cookie = li.m_cookie;
+	TextBlock::Array rBlocks = NULL;
+	ASSERT(!cookie.Empty());
+	while (L < nLineIndex)
+	{
+		ParseLine(cookie, L, rBlocks);
+		ASSERT(!cookie.Empty());
+		if (++L < nLineCount)
+			m_aLines[L].m_cookie = cookie;
+	}
+	SetParseCookieCount(L < nLineCount ? L + 1 : nLineCount);
+	return cookie;
+}
+
+void CCrystalTextBuffer::ParseLine(TextBlock::Cookie &cookie, int nLineIndex, TextBlock::Array &pBuf)
+{
+	if (LPCTSTR const pszChars = GetLineChars(nLineIndex))
+	{
+		int const nLength = GetLineLength(nLineIndex);
+		(this->*m_CurSourceDef->ParseLineX)(cookie, pszChars, nLength, -1, pBuf);
+	}
+}
+
+DWORD CCrystalTextBuffer::ScriptCookie(LPCTSTR lang, DWORD defval)
+{
+	if (PathMatchSpec(lang, _T("VB")))
+		return COOKIE_PARSER_BASIC;
+	if (PathMatchSpec(lang, _T("C#")))
+		return COOKIE_PARSER_CSHARP;
+	if (PathMatchSpec(lang, _T("JAVA")))
+		return COOKIE_PARSER_JAVA;
+	if (PathMatchSpec(lang, _T("PERL")))
+		return COOKIE_PARSER_PERL;
+	if (PathMatchSpec(lang, _T("PHP")))
+		return COOKIE_PARSER_PHP;
+	if (PathMatchSpec(lang, _T("JS*;JAVAS*")))
+		return COOKIE_PARSER_JSCRIPT;
+	if (PathMatchSpec(lang, _T("VBS*")))
+		return COOKIE_PARSER_VBSCRIPT;
+	if (PathMatchSpec(lang, _T("CSS")))
+		return COOKIE_PARSER_CSS;
+	if (PathMatchSpec(lang, _T("MWSL")))
+		return COOKIE_PARSER_MWSL;
+	if (PathMatchSpec(lang, _T("x-jquery-tmpl")))
+		return 0;
+	return defval;
+}
+
+TextBlock::ParseProc CCrystalTextBuffer::ScriptParseProc(DWORD dwCookie)
+{
+	switch (dwCookie & COOKIE_PARSER)
+	{
+	case COOKIE_PARSER_BASIC:
+	case COOKIE_PARSER_VBSCRIPT:
+		return &ParseLineBasic;
+	case COOKIE_PARSER_CSHARP:
+		return &ParseLineCSharp;
+	case COOKIE_PARSER_JAVA:
+	case COOKIE_PARSER_JSCRIPT:
+	case COOKIE_PARSER_MWSL:
+		return &ParseLineJava;
+	case COOKIE_PARSER_PERL:
+		return &ParseLinePerl;
+	case COOKIE_PARSER_PHP:
+		return &ParseLinePhp;
+	case COOKIE_PARSER_CSS:
+		return &ParseLineCss;
+	}
+	return &ParseLineUnknown;
+}
+
+void CCrystalTextBuffer::ParseLinePlain(TextBlock::Cookie &dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
+{
+}
+
+void CCrystalTextBuffer::ParseLineUnknown(TextBlock::Cookie &dwCookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
+{
+	pBuf.DefineBlock(I + 1, COLORINDEX_FUNCNAME);
 }

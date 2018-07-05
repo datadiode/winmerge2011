@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  string_util.h
  *
  * @brief Char classification routines declarations.
@@ -54,6 +54,8 @@ inline int xisspace(wint_t c)
 {
 	return _istspace(normch(c));
 }
+
+typedef int Captures[30];
 
 /**
  * @brief Unit test helper.
