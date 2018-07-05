@@ -155,8 +155,6 @@ private:
 	 */
 	FileTextEncoding m_encoding;
 
-	bool FlagIsSet(UINT line, DWORD flag) const;
-
 public:
 	CDiffTextBuffer(CChildFrame *pDoc, int pane);
 	~CDiffTextBuffer();

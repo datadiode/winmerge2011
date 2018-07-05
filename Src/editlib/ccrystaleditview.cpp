@@ -215,7 +215,7 @@ void CCrystalEditView::OnEditDelete()
 			ptSelEnd.y++;
 			ptSelEnd.x = 0;
 		}
-		else 
+		else
 		{
 			ptSelEnd.x++;
 		}
@@ -743,7 +743,7 @@ bool CCrystalEditView::DoDropText(HGLOBAL hData, const POINT &ptClient)
 	{
 		m_pTextBuffer->BeginUndoGroup();
 		bGroupFlag = true;
-	} 
+	}
 
 	POINT ptCurPos = m_pTextBuffer->InsertText(this, ptDropPos.y, ptDropPos.x, pszText, cchText, CE_ACTION_DRAGDROP);  //   [JRT]
 	ASSERT_VALIDTEXTPOS(ptCurPos);

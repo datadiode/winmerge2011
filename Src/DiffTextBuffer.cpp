@@ -101,16 +101,6 @@ UndoRecord &CDiffTextBuffer::AddUndoRecord(BOOL bInsert, const POINT &ptStartPos
 	}
 	return ur;
 }
-/**
- * @brief Checks if a flag is set for line.
- * @param [in] line Index (0-based) for line.
- * @param [in] flag Flag to check.
- * @return TRUE if flag is set, FALSE otherwise.
- */
-bool CDiffTextBuffer::FlagIsSet(UINT line, DWORD flag) const
-{
-	return (m_aLines[line].m_dwFlags & flag) == flag;
-}
 
 /**
 Remove blank lines and clear winmerge flags
