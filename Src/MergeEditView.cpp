@@ -646,9 +646,6 @@ void CMergeEditView::OnTimer(UINT_PTR nIDEvent)
  */
 void CMergeEditView::OnUpdateCaret(bool bShowHide)
 {
-	if (!IsTextBufferInitialized())
-		return;
-
 	if (bShowHide)
 		return;
 

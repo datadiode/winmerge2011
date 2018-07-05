@@ -204,7 +204,6 @@ public:
 	int GetLineCount() const;
 	virtual int ComputeRealLine(int nApparentLine) const;
 	virtual void OnUpdateCaret(bool bShowHide);
-	bool IsTextBufferInitialized() const;
 	LPCTSTR GetTextBufferEol(int nLine) const;
 
 	CSyntaxColors *GetSyntaxColors() const { return m_pColors; }

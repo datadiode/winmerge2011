@@ -122,7 +122,6 @@ class CCrystalTextBuffer
 public:
 	DWORD m_dwCurrentRevisionNumber;
 	DWORD m_dwRevisionNumberOnSave;
-	bool IsTextBufferInitialized() const { return m_bInit; }
 
 protected:
 	bool m_bInit;
