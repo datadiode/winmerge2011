@@ -74,17 +74,15 @@ void CMergeDiffDetailView::SetSelection(const POINT &ptStart, const POINT &ptEnd
 	CCrystalTextView::SetSelection(ptStartNew, ptEndNew);
 }
 
-void CMergeDiffDetailView::DrawSingleLine(HSurface *pdc, const RECT &rc, int nLineIndex)
+bool CMergeDiffDetailView::DrawSingleLine(HSurface *pdc, const RECT &rc, int nLineIndex)
 {
 	if (nLineIndex < m_lineBegin || nLineIndex >= m_lineEnd)
 	{
 		pdc->SetBkColor(GetColor(COLORINDEX_WHITESPACE));
 		pdc->ExtTextOut(0, 0, ETO_OPAQUE, &rc, NULL, 0);
+		return true;
 	}
-	else
-	{
-		CGhostTextView::DrawSingleLine(pdc, rc, nLineIndex);
-	}
+	return CGhostTextView::DrawSingleLine(pdc, rc, nLineIndex);
 }
 
 /// virtual, avoid coloring the whole diff with diff color 
@@ -212,7 +210,7 @@ int CMergeDiffDetailView::GetDiffLineLength()
 		validLineEnd = m_lineEnd;
 	for (int i = m_lineBegin; i < validLineEnd; ++i)
 	{
-		int nActualLength = GetLineActualLength(i);
+		int nActualLength = m_pTextBuffer->GetLineActualLength(i);
 		if (nMaxLineLength < nActualLength)
 			nMaxLineLength = nActualLength;
 	}

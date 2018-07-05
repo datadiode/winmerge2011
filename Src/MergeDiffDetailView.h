@@ -70,7 +70,7 @@ public:
 protected:
 	virtual void ScrollToSubLine(int nNewTopLine);
 	virtual ~CMergeDiffDetailView();
-	virtual void DrawSingleLine(HSurface *, const RECT &, int nLineIndex);
+	virtual bool DrawSingleLine(HSurface *, const RECT &, int nLineIndex);
 	virtual void GetLineColors(int nLineIndex, COLORREF &crBkgnd, COLORREF &crText);
 	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
 	void OnContextMenu(LPARAM);

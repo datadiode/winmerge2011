@@ -266,34 +266,37 @@ void CGhostTextView::DrawMargin(HSurface * pdc, const RECT & rect, int nLineInde
 	CCrystalTextView::DrawMargin(pdc, rect, nLineIndex, nRealLineNumber);
 }
 
-void CGhostTextView::DrawSingleLine(HSurface *pdc, const RECT &rc, int nLineIndex)
+bool CGhostTextView::DrawSingleLine(HSurface *pdc, const RECT &rc, int nLineIndex)
 {
-	CCrystalTextView::DrawSingleLine(pdc, rc, nLineIndex);
-	// If this is a placeholder for a sequence of excluded lines,
-	// indicate its length by drawing a label in italic letters.
+	if (CCrystalTextView::DrawSingleLine(pdc, rc, nLineIndex))
+		return true;
 	LineInfo const &li = m_pTextBuffer->GetLineInfo(nLineIndex);
 	if (li.m_dwFlags & LF_GHOST)
 	{
-		int const nCharWidth = GetCharWidth();
-		int const nLineHeight = GetLineHeight();
+		// If this is a placeholder for a sequence of excluded lines,
+		// indicate its length by drawing a label in italic letters.
 		if (li.m_nSkippedLines != 0)
 		{
-			COLORREF const crTmp = pdc->SetTextColor(GetColor(COLORINDEX_NORMALTEXT));
 			pdc->SelectObject(GetFont(COLORINDEX_LAST));
+			pdc->ExtTextOut(0, 0, ETO_OPAQUE, &rc, NULL, 0);
 			pdc->DrawText(
 				FormatAmount<IDS_LINE_EXCLUDED, IDS_LINES_EXCLUDED>(li.m_nSkippedLines),
 				const_cast<RECT *>(&rc),
 				DT_CENTER | DT_VCENTER | DT_NOPREFIX | DT_SINGLELINE | DT_END_ELLIPSIS);
-			pdc->SetTextColor(crTmp);
+			return true;
 		}
-		else if (COptionsMgr::Get(OPT_CROSS_HATCH_DELETED_LINES))
+		if (COptionsMgr::Get(OPT_CROSS_HATCH_DELETED_LINES))
 		{
+			int const nCharWidth = GetCharWidth();
+			int const nLineHeight = GetLineHeight();
 			pdc->SetBrushOrgEx(
 				-(m_nOffsetChar * nCharWidth),
 				-(m_nTopSubLine * nLineHeight), NULL);
 			pdc->FillRect(&rc, m_pHatchBrush);
+			return true;
 		}
 	}
+	return false;
 }
 
 /**

@@ -248,7 +248,7 @@ BOOL CCrystalTextBuffer::InitNew(CRLFSTYLE nCrlfStyle)
 	ASSERT(!m_bInit);
 	ASSERT(m_aLines.size() == 0);
 	ASSERT(nCrlfStyle >= 0 && nCrlfStyle <= 2);
-	InsertLine(_T(""), 0);
+	InsertLine(NULL, 0);
 	m_bInit = true;
 	m_bReadOnly = false;
 	m_nCRLFMode = nCrlfStyle;
@@ -651,7 +651,7 @@ POINT CCrystalTextBuffer::InternalInsertText(CCrystalTextView *pSource,
 				// We left cursor after last screen line
 				// which is an illegal cursor position
 				// so manufacture a new trailing line
-				InsertLine(_T(""), 0);
+				InsertLine(NULL, 0);
 				nInsertedLines++;
 			}
 			break;

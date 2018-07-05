@@ -115,7 +115,7 @@ public:
 protected:
 	virtual bool IsLineInCurrentDiff(int) = 0;
 	virtual void GetAdditionalTextBlocks(int nLineIndex, TextBlock::Array &pBuf);
-	virtual void DrawSingleLine(HSurface *, const RECT &, int nLineIndex);
+	virtual bool DrawSingleLine(HSurface *, const RECT &, int nLineIndex);
 	virtual void DrawMargin(HSurface *, const RECT &, int nLineIndex, int nLineNumber);
 	BOOL OnMouseWheel(WPARAM, LPARAM);
 };

@@ -1141,17 +1141,13 @@ void CCrystalTextView::MergeTextBlocks(TextBlock::Array &pBuf1, TextBlock::Array
 	TextBlock::Array(NULL).swap(pBuf2); // micro-optimize memory footprint
 }
 
-void CCrystalTextView::DrawSingleLine(HSurface *pdc, const RECT &rc, int nLineIndex)
+bool CCrystalTextView::DrawSingleLine(HSurface *pdc, const RECT &rc, int nLineIndex)
 {
 	ASSERT(nLineIndex >= 0 && nLineIndex < GetLineCount());
 
 	// Acquire the background color for the current line
 	COLORREF crBkgnd, crText;
 	GetLineColors(nLineIndex, crBkgnd, crText);
-	if (crBkgnd != CLR_NONE)
-		pdc->SetBkColor(crBkgnd);
-	if (crText != CLR_NONE)
-		pdc->SetTextColor(crText);
 
 	if (LPCTSTR const pszChars = GetLineChars(nLineIndex))
 	{
@@ -1205,12 +1201,13 @@ void CCrystalTextView::DrawSingleLine(HSurface *pdc, const RECT &rc, int nLineIn
 			pdc->SetBkColor(crBkgnd == CLR_NONE ? GetColor(COLORINDEX_WHITESPACE) : crBkgnd);
 			pdc->ExtTextOut(0, 0, ETO_OPAQUE, &frect, NULL, 0);
 		}
+		return true;
 	}
-	else
-	{
-		pdc->SetBkColor(crBkgnd == CLR_NONE ? GetColor(COLORINDEX_WHITESPACE) : crBkgnd);
-		pdc->ExtTextOut(0, 0, ETO_OPAQUE, &rc, NULL, 0);
-	}
+
+	// For placeholder lines, just set colors but leave the rest to the caller
+	pdc->SetBkColor(crBkgnd == CLR_NONE ? GetColor(COLORINDEX_WHITESPACE) : crBkgnd);
+	pdc->SetTextColor(GetColor(COLORINDEX_NORMALTEXT));
+	return false;
 }
 
 /**
@@ -1562,6 +1559,7 @@ void CCrystalTextView::OnDraw(HSurface *pdc)
 	int const nSubLineOffset = GetSubLineIndex(m_nTopLine) - m_nTopSubLine;
 	if (nSubLineOffset < 0)
 		rcLine.top = nSubLineOffset * nLineHeight;
+	rcLine.bottom = rcLine.top;
 
 	int nCurrentLine = m_nTopLine;
 	while (rcLine.top < rcClient.bottom)
@@ -1570,14 +1568,18 @@ void CCrystalTextView::OnDraw(HSurface *pdc)
 		rcLine.right = rcClient.right;
 		if (nCurrentLine < nLineCount)
 		{
-			rcLine.bottom = rcLine.top + GetSubLines(nCurrentLine) * nLineHeight;
-			//if (pdc->RectVisible(&rcLine))
+			if (int const nSubLines = GetSubLines(nCurrentLine))
 			{
-				rcLine.right = GetMarginWidth();
-				DrawMargin(pdc, rcLine, nCurrentLine, nCurrentLine + 1);
-				rcLine.left = rcLine.right;
-				rcLine.right = rcClient.right;
-				DrawSingleLine(pdc, rcLine, nCurrentLine);
+				rcLine.bottom += nSubLines * nLineHeight;
+				if (pdc->RectVisible(&rcLine))
+				{
+					rcLine.right = GetMarginWidth();
+					DrawMargin(pdc, rcLine, nCurrentLine, nCurrentLine + 1);
+					rcLine.left = rcLine.right;
+					rcLine.right = rcClient.right;
+					if (!DrawSingleLine(pdc, rcLine, nCurrentLine))
+						pdc->ExtTextOut(0, 0, ETO_OPAQUE, &rcLine, NULL, 0);
+				}
 			}
 			++nCurrentLine;
 		}
