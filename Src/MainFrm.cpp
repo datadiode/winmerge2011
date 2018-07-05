@@ -1036,8 +1036,8 @@ LRESULT CMainFrame::OnWndMsg<WM_INITMENUPOPUP>(WPARAM wParam, LPARAM lParam)
 			continue;
 		case ID_COLORSCHEME_FIRST:
 			mii.fState = COptionsMgr::Get(OPT_SYNTAX_HIGHLIGHT) ? MF_ENABLED : MF_GRAYED;
-			while (CCrystalTextView::TextDefinition const *const def =
-				CCrystalTextView::GetTextType(mii.wID - ID_COLORSCHEME_FIRST))
+			while (CCrystalTextBuffer::TextDefinition const *const def =
+				CCrystalTextBuffer::GetTextType(mii.wID - ID_COLORSCHEME_FIRST))
 			{
 				ASSERT(def->type == mii.wID - ID_COLORSCHEME_FIRST);
 				ASSERT(mii.wID <= ID_COLORSCHEME_LAST);

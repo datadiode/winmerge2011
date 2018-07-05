@@ -225,8 +225,8 @@ void CChildFrame::ReloadDocs()
 		m_pDetailView[0]->ReAttachToBuffer(m_ptBuf[0]);
 		m_pDetailView[1]->ReAttachToBuffer(m_ptBuf[1]);
 		// Compute all parse cookies in advance, before losing context
-		m_pView[0]->GetParseCookie(m_pView[0]->GetLineCount() - 1);
-		m_pView[1]->GetParseCookie(m_pView[1]->GetLineCount() - 1);
+		m_ptBuf[0]->GetParseCookie(m_ptBuf[0]->GetLineCount() - 1);
+		m_ptBuf[1]->GetParseCookie(m_ptBuf[1]->GetLineCount() - 1);
 		bool bIdentical = false;
 		Rescan2(bIdentical);
 		// Parse cookies are still in place, only need to adjust their counts
@@ -749,12 +749,10 @@ LRESULT CChildFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 	default:
 		if (id >= ID_COLORSCHEME_FIRST && id <= ID_COLORSCHEME_LAST)
 		{
-			CCrystalTextView::TextType enuType = static_cast
-				<CCrystalTextView::TextType>(id - ID_COLORSCHEME_FIRST);
-			m_pView[0]->SetTextType(enuType);
-			m_pView[1]->SetTextType(enuType);
-			m_pDetailView[0]->SetTextType(enuType);
-			m_pDetailView[1]->SetTextType(enuType);
+			CCrystalTextBuffer::TextType enuType = static_cast
+				<CCrystalTextBuffer::TextType>(id - ID_COLORSCHEME_FIRST);
+			m_ptBuf[0]->SetTextType(enuType);
+			m_ptBuf[1]->SetTextType(enuType);
 			UpdateAllViews();
 			UpdateSourceTypeUI();
 			break;
@@ -1225,7 +1223,10 @@ void CChildFrame::UpdateSourceTypeUI()
 {
 	if (CCrystalTextView *pTextView = GetActiveMergeView())
 	{
-		m_pMDIFrame->UpdateSourceTypeUI(pTextView->m_CurSourceDef->type);
+		if (CCrystalTextBuffer *pTextBuffer = pTextView->GetTextBuffer())
+		{
+			m_pMDIFrame->UpdateSourceTypeUI(pTextBuffer->m_CurSourceDef->type);
+		}
 	}
 }
 
