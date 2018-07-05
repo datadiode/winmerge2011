@@ -22,17 +22,15 @@
  *
  * GetLineColors (in MergeEditView) reads it to choose the line color.
  */
-enum GHOST_LINEFLAGS
+enum GHOST_LINEFLAGS : DWORD
 {
-	LF_GHOST = 0x00400000L, /**< Ghost line. */
-	LF_DIFF = 0x00200000L,
-	LF_TRIVIAL = 0x00800000L,
-	LF_MOVED = 0x01000000L,
-	LF_SKIPPED = 0x02000000L, /**< Skipped line. */
+	LF_GHOST				= 0x00200000UL, /**< Ghost line. */
+	LF_DIFF					= 0x00400000UL,
+	LF_TRIVIAL				= 0x00800000UL,
+	LF_MOVED				= 0x01000000UL,
+	LF_SKIPPED				= 0x02000000UL, /**< Skipped line. */
+	LF_WINMERGE_FLAGS		= 0x04000000UL - LF_GHOST,
 };
-
-// WINMERGE_FLAGS is MERGE_LINEFLAGS | GHOST_LINEFLAGS | LF_TRIVIAL | LF_MOVED
-#define LF_WINMERGE_FLAGS    0x03E00000
 
 C_ASSERT(LF_WINMERGE_FLAGS == (LF_TRIVIAL | LF_MOVED | LF_DIFF | LF_SKIPPED | LF_GHOST));
 
@@ -101,9 +99,6 @@ private:
 	std::vector<RealityBlock> m_RealityBlocks; /**< Mapping of real and apparent lines. */
 
 	// Operations
-private:
-	BOOL InternalInsertGhostLine(CCrystalTextView *pSource, int nLine);
-	BOOL InternalDeleteGhostLine(CCrystalTextView *pSource, int nLine, int nCount);
 public:
 	// Construction/destruction code
 	CGhostTextBuffer();
@@ -117,11 +112,11 @@ public:
 	virtual void DeleteText(CCrystalTextView *pSource, int nStartLine,
 		int nStartPos, int nEndLine, int nEndPos,
 		int nAction = CE_ACTION_UNKNOWN, BOOL bHistory = TRUE);
-	BOOL InsertGhostLine(CCrystalTextView *pSource, int nLine);
+	void InsertGhostLine(int nLine);
 
 	// Undo/Redo
-	virtual bool Undo(CCrystalTextView *pSource, POINT &ptCursorPos);
-	virtual bool Redo(CCrystalTextView *pSource, POINT &ptCursorPos);
+	virtual bool Undo(POINT &ptCursorPos);
+	virtual bool Redo(POINT &ptCursorPos);
 
 public:
 	//@{
@@ -132,7 +127,7 @@ public:
 	 *
 	 * This mapping is needed to handle ghost lines (ones with no text or
 	 * EOL chars) which WinMerge uses for left-only or right-only lines.
-	*/
+	 */
 	int ApparentLastRealLine() const;
 	int ComputeRealLine(int nApparentLine) const;
 	int ComputeApparentLine(int nRealLine) const;
@@ -156,7 +151,7 @@ private:
 	We should call a CCrystalTextBuffer function to add the correct EOL
 	(if CCrystalTextBuffer keeps the default EOL for the file)
 	*/
-	void RecomputeEOL(CCrystalTextView *pSource, int nStartLine, int nEndLine);
+	void RecomputeEOL(int nStartLine, int nEndLine);
 
 #ifdef _DEBUG
 	/** For debugging purpose */

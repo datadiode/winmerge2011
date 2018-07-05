@@ -660,7 +660,9 @@ void CChildFrame::CopyMultipleList(int srcPane, int dstPane, int firstDiff, int 
 	firstDiff = max(0, firstDiff);
 	if (firstDiff > lastDiff)
 		return;
-	
+
+	m_nCurDiff = m_diffList.FirstSignificantDiff();
+
 	// Note we don't care about m_nDiffs count to become zero,
 	// because we don't rescan() so it does not change
 
@@ -736,8 +738,7 @@ bool CChildFrame::SanityCheckDiff(const DIFFRANGE *pdr) const
  * @return true if ok, false if sync failure & need to abort copy
  * previous action (allows one undo for copy all)
  */
-bool CChildFrame::ListCopy(int srcPane, int dstPane, int nDiff /* = -1*/,
-		bool bGroupWithPrevious /*= false*/)
+bool CChildFrame::ListCopy(int srcPane, int dstPane, int nDiff, bool bGroupWithPrevious)
 {
 	int firstDiff, lastDiff;
 	// If diff-number not given, determine it from active view
@@ -764,17 +765,15 @@ bool CChildFrame::ListCopy(int srcPane, int dstPane, int nDiff /* = -1*/,
 		// curView is the view which is changed, so the opposite of the source view
 		CMergeEditView *const dstView = m_pView[dstPane];
 
-		// If we remove whole diff from current view, we must fix cursor
+		// (If we remove whole diff from current view, we must fix cursor
 		// position first. Normally we would move to end of previous line,
-		// but we want to move to begin of that line for usability.
-		if ((pcd->op == OP_LEFTONLY && dstPane == 0) ||
-			(pcd->op == OP_RIGHTONLY && dstPane == 1))
+		// but we want to move to begin of that line for usability.)
+		// Really? I'd say always moving to start of diff is less surprising.
+		if (m_nCurDiff == nDiff)
 		{
-			POINT currentPos = dstView->GetCursorPos();
-			currentPos.x = 0;
-			if (currentPos.y > 0)
-				--currentPos.y;
-			dstView->SetCursorPos(currentPos);
+			// fix any out-of-range text positions
+			dstView->GoToLine(0, true);
+			dstView->ShowDiff(true);
 		}
 
 		dbuf->BeginUndoGroup(bGroupWithPrevious);
@@ -791,17 +790,14 @@ bool CChildFrame::ListCopy(int srcPane, int dstPane, int nDiff /* = -1*/,
 			cd_dpastend < sbuf->GetLineCount() ? cd_dpastend : cd_dend,
 			cd_dpastend < sbuf->GetLineCount() ? 0 : sbuf->GetLineLength(cd_dend),
 			strLine, pszCRLF);
-		dbuf->DeleteText(dstView, cd_dbegin, 0,
+		dbuf->DeleteText(NULL, cd_dbegin, 0,
 			cd_dpastend < dbuf->GetLineCount() ? cd_dpastend : cd_dend,
 			cd_dpastend < dbuf->GetLineCount() ? 0 : dbuf->GetLineLength(cd_dend),
 			CE_ACTION_MERGE);
 		if (int cchText = strLine.length())
-			dbuf->InsertText(dstView, cd_dbegin, 0, strLine.c_str(), cchText, CE_ACTION_MERGE);
+			dbuf->InsertText(NULL, cd_dbegin, 0, strLine.c_str(), cchText, CE_ACTION_MERGE);
 
 		dbuf->FlushUndoGroup(dstView);
-
-		// remove the diff
-		SetCurrentDiff(-1);
 
 		// reset the mod status of the source view because we do make some
 		// changes, but none that concern the source text

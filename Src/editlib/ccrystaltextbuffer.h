@@ -252,8 +252,8 @@ public:
 	// Undo/Redo
 	bool CanUndo() const;
 	bool CanRedo() const;
-	virtual bool Undo(CCrystalTextView *pSource, POINT &ptCursorPos) = 0;
-	virtual bool Redo(CCrystalTextView *pSource, POINT &ptCursorPos) = 0;
+	virtual bool Undo(POINT &ptCursorPos) = 0;
+	virtual bool Redo(POINT &ptCursorPos) = 0;
 
 	//  Undo grouping
 	void BeginUndoGroup(BOOL bMergeWithPrevious = FALSE);

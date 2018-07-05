@@ -57,96 +57,10 @@ void CGhostTextBuffer::FreeAll()
 	CCrystalTextBuffer::FreeAll();
 }
 
-/**
- * @brief Insert a ghost line.
- * @param [in] pSource View into which to insert the line.
- * @param [in] nLine Line (apparent/screen) where to insert the ghost line.
- * @return TRUE if the insertion succeeded, FALSE otherwise.
- */
-BOOL CGhostTextBuffer::InternalInsertGhostLine(CCrystalTextView *pSource, int nLine)
-{
-	ASSERT(m_bInit); // Missed to call InitNew() or LoadFromFile() first?
-
-	ASSERT(nLine >= 0 && nLine <= GetLineCount());
-	if (m_bReadOnly)
-		return FALSE;
-
-	CInsertContext context;
-	context.m_ptStart.x = 0;
-	context.m_ptStart.y = nLine;
-	context.m_ptEnd.x = 0;
-	context.m_ptEnd.y = nLine + 1;
-
-	CCrystalTextBuffer::InsertLine (_T(""), 0, nLine);
-	if (pSource != NULL)
-		UpdateViews (pSource, &context, UPDATE_HORZRANGE | UPDATE_VERTRANGE, nLine);
-
-	SetModified();
-
-	OnNotifyLineHasBeenEdited(nLine);
-	return TRUE;
-}
-
-/** InternalDeleteGhostLine accepts only apparent line numbers */
-/**
- * @brief Delete a ghost line.
- * @param [in] pSource View into which to insert the line.
- * @param [in] nLine Line index where to insert the ghost line.
- * @return TRUE if the deletion succeeded, FALSE otherwise.
- * @note @p nLine must be an apparent line number (ghost lines added).
- */
-BOOL CGhostTextBuffer::InternalDeleteGhostLine(CCrystalTextView *pSource, int nLine, int nCount)
-{
-	ASSERT(m_bInit); // Missed to call InitNew() or LoadFromFile() first?
-
-	ASSERT(nLine >= 0 && nLine <= GetLineCount());
-
-	if (m_bReadOnly)
-		return FALSE;
-	if (nCount == 0)
-		return TRUE;
-
-	CDeleteContext context;
-	context.m_ptStart.y = nLine;
-	context.m_ptStart.x = 0;
-	context.m_ptEnd.y = nLine + nCount;
-	context.m_ptEnd.x = 0;
-
-	for (int i = nLine ; i < nLine + nCount; i++)
-	{
-		ASSERT(GetLineFlags(i) & LF_GHOST);
-		m_aLines[i].Clear();
-	}
-
-	vector<LineInfo>::iterator iterBegin = m_aLines.begin() + nLine;
-	vector<LineInfo>::iterator iterEnd = iterBegin + nCount;
-	m_aLines.erase(iterBegin, iterEnd);
-
-	if (pSource != NULL)
-	{
-		// The last parameter is optimization - don't recompute lines preceeding
-		// the removed line.
-		if (nLine == GetLineCount())
-		{
-			UpdateViews (pSource, &context, UPDATE_HORZRANGE | UPDATE_VERTRANGE,
-					GetLineCount() - 1);
-		}
-		else
-		{
-			UpdateViews (pSource, &context, UPDATE_HORZRANGE | UPDATE_VERTRANGE,
-					nLine);
-		}
-	}
-
-	SetModified();
-
-	return TRUE;
-}
-
 ////////////////////////////////////////////////////////////////////////////
 // undo/redo functions
 
-bool CGhostTextBuffer::Undo(CCrystalTextView *pSource, POINT &ptCursorPos)
+bool CGhostTextBuffer::Undo(POINT &ptCursorPos)
 {
 	ASSERT(CanUndo());
 	ASSERT((m_aUndoBuf[0].m_dwFlags & UNDO_BEGINGROUP) != 0);
@@ -167,7 +81,7 @@ bool CGhostTextBuffer::Undo(CCrystalTextView *pSource, POINT &ptCursorPos)
 			if (apparent_ptStartPos.y >= GetLineCount() || (GetLineFlags(apparent_ptStartPos.y) & LF_GHOST) == 0)
 			{
 				// if we don't find it, we insert it 
-				InsertGhostLine(pSource, apparent_ptStartPos.y);
+				InsertGhostLine(apparent_ptStartPos.y);
 				// and recompute apparent_ptEndPos
 				apparent_ptEndPos.y = ComputeApparentLine(ur.m_ptEndPos.y, ur.m_ptEndPos_nGhost);
 			}
@@ -178,7 +92,7 @@ bool CGhostTextBuffer::Undo(CCrystalTextView *pSource, POINT &ptCursorPos)
 			if (apparent_ptEndPos.y >= GetLineCount() || (GetLineFlags(apparent_ptEndPos.y) & LF_GHOST) == 0)
 			{
 				// if we don't find it, we insert it
-				InsertGhostLine(pSource, apparent_ptEndPos.y);
+				InsertGhostLine(apparent_ptEndPos.y);
 			}
 
 		if (dwFlags & UNDO_INSERT)
@@ -190,12 +104,12 @@ bool CGhostTextBuffer::Undo(CCrystalTextView *pSource, POINT &ptCursorPos)
 			// we need to put the cursor before the deleted section
 			String text;
 			ur.m_redo_ptEndPos.x = apparent_ptEndPos.x;
-			ur.m_redo_ptEndPos.y = ComputeRealLineAndGhostAdjustment (apparent_ptEndPos.y, ur.m_redo_ptEndPos_nGhost);
+			ur.m_redo_ptEndPos.y = ComputeRealLineAndGhostAdjustment(apparent_ptEndPos.y, ur.m_redo_ptEndPos_nGhost);
 
 			// flags are going to be deleted so we store them now
-			const DWORD bLastLineGhost = GetLineFlags(apparent_ptEndPos.y) & LF_GHOST;
+			DWORD const bLastLineGhost = GetLineFlags(apparent_ptEndPos.y) & LF_GHOST;
 
-			const int size = GetLineCount();
+			int const size = GetLineCount();
 			if ((apparent_ptStartPos.y < size) &&
 				(apparent_ptStartPos.x <= m_aLines[apparent_ptStartPos.y].Length()) &&
 				(apparent_ptEndPos.y < size) &&
@@ -205,7 +119,7 @@ bool CGhostTextBuffer::Undo(CCrystalTextView *pSource, POINT &ptCursorPos)
 					apparent_ptEndPos.y, apparent_ptEndPos.x, text, _T("\n"));
 				if (ur.VerifyText(text))
 				{
-					InternalDeleteText(pSource, 
+					InternalDeleteText(NULL,
 						apparent_ptStartPos.y, apparent_ptStartPos.x,
 						apparent_ptEndPos.y, apparent_ptEndPos.x);
 					m_dwCurrentRevisionNumber++;
@@ -255,32 +169,32 @@ bool CGhostTextBuffer::Undo(CCrystalTextView *pSource, POINT &ptCursorPos)
 			// it is not easy to know when Recompute so we do it always
 			RecomputeRealityMapping();
 
-			RecomputeEOL(pSource, apparent_ptStartPos.y, apparent_ptStartPos.y);
+			RecomputeEOL(apparent_ptStartPos.y, apparent_ptStartPos.y);
 		}
 		else
 		{
-			ptCursorPos = InternalInsertText(pSource, 
+			ptCursorPos = InternalInsertText(NULL,
 				apparent_ptStartPos.y, apparent_ptStartPos.x,
 				ur.GetText(), ur.GetTextLength());
 			m_dwCurrentRevisionNumber++;
 
 			// for the flags, the logic is nearly the same as in insertText
-			int bFirstLineGhost = ((GetLineFlags(apparent_ptStartPos.y) & LF_GHOST) != 0);
+			int bFirstLineGhost = (GetLineFlags(apparent_ptStartPos.y) & LF_GHOST) != 0;
 			// when inserting an EOL terminated text into a ghost line,
 			// there is a dicrepancy between nInsertedLines and nEndLine-nRealLine
-			const bool bDiscrepancyInInsertedLines = bFirstLineGhost && ptCursorPos.x == 0;
+			bool const bDiscrepancyInInsertedLines = bFirstLineGhost && ptCursorPos.x == 0;
 
 			int i;
-			for (i = apparent_ptStartPos.y ; i < ptCursorPos.y ; i++)
+			for (i = apparent_ptStartPos.y; i < ptCursorPos.y; i++)
 				OnNotifyLineHasBeenEdited(i);
 			if (!bDiscrepancyInInsertedLines)
 				OnNotifyLineHasBeenEdited(i);
 
 			// We know the number of real lines in the deleted block (including partial lines for extremities)
 			// there may be more lines (difficult to explain) then they must be ghost
-			for (i = apparent_ptStartPos.y ; i < apparent_ptStartPos.y + ur.m_nRealLinesInDeletedBlock ; i++)
+			for (i = apparent_ptStartPos.y; i < apparent_ptStartPos.y + ur.m_nRealLinesInDeletedBlock; i++)
 				m_aLines[i].m_dwFlags &= ~LF_GHOST;
-			for ( ; i <= ptCursorPos.y ; i++)
+			for (; i <= ptCursorPos.y; i++)
 			{
 				LineInfo &li = m_aLines[i];
 				li.m_dwFlags |= LF_GHOST;
@@ -290,7 +204,7 @@ bool CGhostTextBuffer::Undo(CCrystalTextView *pSource, POINT &ptCursorPos)
 			// it is not easy to know when Recompute so we do it always
 			RecomputeRealityMapping();
 
-			RecomputeEOL(pSource, apparent_ptStartPos.y, ptCursorPos.y);
+			RecomputeEOL(apparent_ptStartPos.y, ptCursorPos.y);
 		}
 
 		// store infos for redo
@@ -324,28 +238,28 @@ bool CGhostTextBuffer::Undo(CCrystalTextView *pSource, POINT &ptCursorPos)
 	return false;
 }
 
-bool CGhostTextBuffer::Redo(CCrystalTextView *pSource, POINT &ptCursorPos)
+bool CGhostTextBuffer::Redo(POINT &ptCursorPos)
 {
 	ASSERT(CanRedo());
 	ASSERT((m_aUndoBuf[0].m_dwFlags & UNDO_BEGINGROUP) != 0);
 	ASSERT((m_aUndoBuf[m_nUndoPosition].m_dwFlags & UNDO_BEGINGROUP) != 0);
 
-	while(1)
+	for (;;)
 	{
-		const GhostUndoRecord &ur = m_aUndoBuf[m_nUndoPosition];
+		GhostUndoRecord const &ur = m_aUndoBuf[m_nUndoPosition];
 		POINT apparent_ptStartPos = ur.m_redo_ptStartPos;
-		apparent_ptStartPos.y = ComputeApparentLine (ur.m_redo_ptStartPos.y, ur.m_redo_ptStartPos_nGhost);
+		apparent_ptStartPos.y = ComputeApparentLine(ur.m_redo_ptStartPos.y, ur.m_redo_ptStartPos_nGhost);
 		POINT apparent_ptEndPos = ur.m_redo_ptEndPos;
-		apparent_ptEndPos.y = ComputeApparentLine (ur.m_redo_ptEndPos.y, ur.m_redo_ptEndPos_nGhost);
+		apparent_ptEndPos.y = ComputeApparentLine(ur.m_redo_ptEndPos.y, ur.m_redo_ptEndPos_nGhost);
 
 		if (ur.m_redo_ptStartPos_nGhost > 0) 
 			// we need a ghost line at position apparent_ptStartPos.y
 			if (apparent_ptStartPos.y >= GetLineCount() || (GetLineFlags(apparent_ptStartPos.y) & LF_GHOST) == 0)
 			{
 				// if we don't find it, we insert it 
-				InsertGhostLine (pSource, apparent_ptStartPos.y);
+				InsertGhostLine(apparent_ptStartPos.y);
 				// and recompute apparent_ptEndPos
-				apparent_ptEndPos.y = ComputeApparentLine (ur.m_redo_ptEndPos.y, ur.m_redo_ptEndPos_nGhost);
+				apparent_ptEndPos.y = ComputeApparentLine(ur.m_redo_ptEndPos.y, ur.m_redo_ptEndPos_nGhost);
 			} 
 
 		// EndPos defined only for UNDO_DELETE (when we delete)
@@ -354,13 +268,13 @@ bool CGhostTextBuffer::Redo(CCrystalTextView *pSource, POINT &ptCursorPos)
 			if (apparent_ptEndPos.y >= GetLineCount() || (GetLineFlags(apparent_ptEndPos.y) & LF_GHOST) == 0)
 			{
 				// if we don't find it, we insert it
-				InsertGhostLine (pSource, apparent_ptEndPos.y);
+				InsertGhostLine(apparent_ptEndPos.y);
 			}
 
 		// now we can use normal (CGhostTextBuffer::) insertTxt or deleteText
 		if (ur.m_dwFlags & UNDO_INSERT)
 		{
-			ptCursorPos = InsertText(pSource, apparent_ptStartPos.y, apparent_ptStartPos.x,
+			ptCursorPos = InsertText(NULL, apparent_ptStartPos.y, apparent_ptStartPos.x,
 				ur.GetText(), ur.GetTextLength(), 0, FALSE);
 		}
 		else
@@ -371,12 +285,12 @@ bool CGhostTextBuffer::Redo(CCrystalTextView *pSource, POINT &ptCursorPos)
 				apparent_ptEndPos.y, apparent_ptEndPos.x, text, _T("\n"));
 			ASSERT(ur.VerifyText(text));
 #endif
-			DeleteText(pSource, apparent_ptStartPos.y, apparent_ptStartPos.x, 
+			DeleteText(NULL, apparent_ptStartPos.y, apparent_ptStartPos.x, 
 				apparent_ptEndPos.y, apparent_ptEndPos.x, 0, FALSE);
 			ptCursorPos = apparent_ptStartPos;
 		}
 		m_nUndoPosition++;
-		if (m_nUndoPosition == m_aUndoBuf.size ())
+		if (m_nUndoPosition == m_aUndoBuf.size())
 			break;
 		if ((m_aUndoBuf[m_nUndoPosition].m_dwFlags & UNDO_BEGINGROUP) != 0)
 			break;
@@ -437,9 +351,6 @@ UndoRecord &CGhostTextBuffer::AddUndoRecord(BOOL bInsert, const POINT &ptStartPo
 	return m_aUndoBuf.back();
 }
 
-
-
-
 ////////////////////////////////////////////////////////////////////////////
 // edition functions
 
@@ -449,9 +360,7 @@ UndoRecord &CGhostTextBuffer::AddUndoRecord(BOOL bInsert, const POINT &ptStartPo
  * @param [in] nLine Line number (apparent/screen) where the insertion starts.
  * @param [in] nPos Character position where the insertion starts.
  * @param [in] pszText The text to insert.
- * @param [out] nEndLine Line number of last added line in the buffer.
- * @param [out] nEndChar Character position of the end of the added text
- *   in the buffer.
+ * @param [in] cchText The length of the text to insert.
  * @param [in] nAction Edit action.
  * @param [in] bHistory Save insertion for undo/redo?
  * @return TRUE if the insertion succeeded, FALSE otherwise.
@@ -470,7 +379,7 @@ POINT CGhostTextBuffer::InsertText(CCrystalTextView *pSource,
 	{
 		if (!m_bUndoGroup)
 		{
-			BeginUndoGroup ();
+			BeginUndoGroup();
 			bGroupFlag = TRUE;
 		} 
 	}
@@ -484,11 +393,11 @@ POINT CGhostTextBuffer::InsertText(CCrystalTextView *pSource,
 	m_dwCurrentRevisionNumber++;
 
 	// set WinMerge flags
-	const DWORD bFirstLineGhost = GetLineFlags(nLine) & LF_GHOST;
+	DWORD const bFirstLineGhost = GetLineFlags(nLine) & LF_GHOST;
 
 	// when inserting an EOL terminated text into a ghost line,
 	// there is a dicrepancy between nInsertedLines and nEndLine-nRealLine
-	const bool bDiscrepancyInInsertedLines = bFirstLineGhost && ptCursorPos.x == 0;
+	bool const bDiscrepancyInInsertedLines = bFirstLineGhost && ptCursorPos.x == 0;
 
 	// compute the number of real lines created (for undo)
 	int nRealLinesCreated = ptCursorPos.y - nLine;
@@ -497,7 +406,7 @@ POINT CGhostTextBuffer::InsertText(CCrystalTextView *pSource,
 		++nRealLinesCreated;
 
 	int i;
-	for (i = nLine ; i < ptCursorPos.y ; i++)
+	for (i = nLine; i < ptCursorPos.y; i++)
 	{
 		// update line revision numbers of modified lines
 		m_aLines[i].m_dwRevisionNumber = m_dwCurrentRevisionNumber;
@@ -509,23 +418,7 @@ POINT CGhostTextBuffer::InsertText(CCrystalTextView *pSource,
 		OnNotifyLineHasBeenEdited(i);
 	}
 
-	// when inserting into a ghost line block, we want to replace ghost lines
-	// with our text, so delete some ghost lines below the inserted text
-	if (bFirstLineGhost)
-	{
-		// where is the first line after the inserted text ?
-		int nInsertedTextLinesCount = ptCursorPos.y - nLine + (bDiscrepancyInInsertedLines ? 0 : 1);
-		int nLineAfterInsertedBlock = nLine + nInsertedTextLinesCount;
-		// delete at most nInsertedTextLinesCount - 1 ghost lines
-		// as the first ghost line has been reused
-		int nMaxGhostLineToDelete = min(nInsertedTextLinesCount - 1, GetLineCount()-nLineAfterInsertedBlock);
-		for (i = 0 ; i < nMaxGhostLineToDelete ; i++)
-			if ((GetLineFlags(nLineAfterInsertedBlock+i) & LF_GHOST) == 0)
-				break;
-		InternalDeleteGhostLine(pSource, nLineAfterInsertedBlock, i);
-	}
-
-	for (i = nLine ; i < ptCursorPos.y ; i++)
+	for (i = nLine; i < ptCursorPos.y; i++)
 		m_aLines[i].m_dwFlags &= ~LF_GHOST;
 	if (!bDiscrepancyInInsertedLines)
 		// if there is no discrepancy, the final cursor line is real
@@ -542,7 +435,7 @@ POINT CGhostTextBuffer::InsertText(CCrystalTextView *pSource,
 		RecomputeRealityMapping();
 	}
 
-	RecomputeEOL(pSource, nLine, ptCursorPos.y);
+	RecomputeEOL(nLine, ptCursorPos.y);
 
 	if (bHistory)
 	{
@@ -567,13 +460,13 @@ POINT CGhostTextBuffer::InsertText(CCrystalTextView *pSource,
  * @param [in] nLine Line number (apparent/screen) where the deletion starts.
  * @param [in] nPos Character position where the deletion starts.
  * @param [in] nEndLine Line number (apparent/screen) where the deletion ends.
- * @param [out] nEndChar Character position where the deletion ends.
+ * @param [in] nEndChar Character position where the deletion ends.
  * @param [in] nAction Edit action.
  * @param [in] bHistory Save insertion for undo/redo?
  * @return TRUE if the deletion succeeded, FALSE otherwise.
  */
-void CGhostTextBuffer::DeleteText(CCrystalTextView * pSource, int nStartLine,
-		int nStartChar, int nEndLine, int nEndChar, int nAction, BOOL bHistory)
+void CGhostTextBuffer::DeleteText(CCrystalTextView *pSource,
+	int nStartLine, int nStartChar, int nEndLine, int nEndChar, int nAction, BOOL bHistory)
 {
 	String sTextToDelete;
 	GetText(nStartLine, nStartChar, nEndLine, nEndChar, sTextToDelete);
@@ -607,8 +500,8 @@ void CGhostTextBuffer::DeleteText(CCrystalTextView * pSource, int nStartLine,
 	paSavedRevisonNumbers.resize(j);
 
 	// flags are going to be deleted so we store them now
-	const DWORD bLastLineGhost = GetLineFlags(nEndLine) & LF_GHOST;
-	const DWORD bFirstLineGhost = GetLineFlags(nStartLine) & LF_GHOST;
+	DWORD const bLastLineGhost = GetLineFlags(nEndLine) & LF_GHOST;
+	DWORD const bFirstLineGhost = GetLineFlags(nStartLine) & LF_GHOST;
 	// count the number of real lines in the deleted block (for first/last line,
 	// include partial real lines)
 	int nRealLinesInDeletedBlock = ComputeRealLine(nEndLine) - ComputeRealLine(nStartLine);
@@ -649,7 +542,7 @@ void CGhostTextBuffer::DeleteText(CCrystalTextView * pSource, int nStartLine,
 		RecomputeRealityMapping();
 	}
 
-	RecomputeEOL(pSource, nStartLine, nStartLine);
+	RecomputeEOL(nStartLine, nStartLine);
 
 	if (bHistory)
 	{
@@ -667,20 +560,19 @@ void CGhostTextBuffer::DeleteText(CCrystalTextView * pSource, int nStartLine,
 
 /**
  * @brief Insert a ghost line to the buffer (and view).
- * @param [in] pSource The view to which to add the ghost line.
  * @param [in] Line index (apparent/screen) where to add the ghost line.
- * @return TRUE if the addition succeeded, FALSE otherwise.
  */
-BOOL CGhostTextBuffer::InsertGhostLine(CCrystalTextView * pSource, int nLine)
+void CGhostTextBuffer::InsertGhostLine(int nLine)
 {
-	if (!InternalInsertGhostLine(pSource, nLine))
-		return FALSE;
+	ASSERT(m_bInit); // Missed to call InitNew() or LoadFromFile() first?
+	ASSERT(nLine >= 0 && nLine <= GetLineCount());
+	ASSERT(!m_bReadOnly);
+	CCrystalTextBuffer::InsertLine(NULL, 0, nLine);
 	// Set WinMerge flags  
 	m_aLines[nLine].m_dwFlags |= LF_GHOST;
 	RecomputeRealityMapping();
 	// Don't need to recompute EOL as real lines are unchanged.
 	// Never AddUndoRecord as Rescan clears the ghost lines.
-	return TRUE;
 }
 
 /**
@@ -688,7 +580,7 @@ BOOL CGhostTextBuffer::InsertGhostLine(CCrystalTextView * pSource, int nLine)
  */
 void CGhostTextBuffer::RemoveAllGhostLines(DWORD dwMask)
 {
-	const size_t n = m_aLines.size();
+	stl_size_t const n = m_aLines.size();
 	stl_size_t i = 0;
 	stl_size_t j = 0;
 	// Free the buffer of ghost lines, and compact non-ghost lines
@@ -720,10 +612,10 @@ void CGhostTextBuffer::RemoveAllGhostLines(DWORD dwMask)
  */
 int CGhostTextBuffer::ApparentLastRealLine() const
 {
-	const int size = m_RealityBlocks.size();
+	stl_size_t const size = m_RealityBlocks.size();
 	if (size == 0)
 		return -1;
-	const RealityBlock &block = m_RealityBlocks.back();
+	RealityBlock const &block = m_RealityBlocks.back();
 	return block.nStartApparent + block.nCount - 1;
 }
 
@@ -738,34 +630,32 @@ int CGhostTextBuffer::ApparentLastRealLine() const
  */
 int CGhostTextBuffer::ComputeRealLine(int nApparentLine) const
 {
-	const int size = m_RealityBlocks.size();
-	if (size == 0)
+	RealityBlock const *blo = m_RealityBlocks.begin();
+	RealityBlock const *bhi = m_RealityBlocks.end();
+	if (blo == bhi)
 		return 0;
 
 	// after last apparent line ?
 	ASSERT(nApparentLine < GetLineCount());
 
 	// after last block ?
-	const RealityBlock &maxblock = m_RealityBlocks.back();
+	RealityBlock const &maxblock = m_RealityBlocks.back();
 	if (nApparentLine >= maxblock.nStartApparent + maxblock.nCount)
 		return maxblock.nStartReal + maxblock.nCount;
 
 	// binary search to find correct (or nearest block)
-	int blo = 0;
-	int bhi = size - 1;
-	while (blo <= bhi)
+	while (blo < bhi)
 	{
-		int i = (blo + bhi) / 2;
-		const RealityBlock &block = m_RealityBlocks[i];
-		if (nApparentLine < block.nStartApparent)
-			bhi = i - 1;
-		else if (nApparentLine >= block.nStartApparent + block.nCount)
-			blo = i + 1;
-		else // found it inside this block
-			return (nApparentLine - block.nStartApparent) + block.nStartReal;
+		RealityBlock const *const b = blo + ((bhi - blo) >> 1);
+		if (nApparentLine < b->nStartApparent + b->nCount)
+			bhi = b;
+		if (nApparentLine >= b->nStartApparent)
+			blo = b + 1;
 	}
-	// it is a ghost line just before block blo
-	return m_RealityBlocks[blo].nStartReal;
+	if (bhi < blo) // found it inside this block
+		return (nApparentLine - bhi->nStartApparent) + bhi->nStartReal;
+	// it is a ghost line just before block bhi
+	return bhi->nStartReal;
 }
 
 /**
@@ -776,29 +666,27 @@ int CGhostTextBuffer::ComputeRealLine(int nApparentLine) const
  */
 int CGhostTextBuffer::ComputeApparentLine(int nRealLine) const
 {
-	const int size = m_RealityBlocks.size();
-	if (size == 0)
+	RealityBlock const *blo = m_RealityBlocks.begin();
+	RealityBlock const *bhi = m_RealityBlocks.end();
+	if (blo == bhi)
 		return 0;
 
 	// after last block ?
-	const RealityBlock & maxblock = m_RealityBlocks.back();
+	RealityBlock const &maxblock = m_RealityBlocks.back();
 	if (nRealLine >= maxblock.nStartReal + maxblock.nCount)
 		return GetLineCount();
 
 	// binary search to find correct (or nearest block)
-	int blo = 0;
-	int bhi = size - 1;
-	while (blo <= bhi)
+	while (blo < bhi)
 	{
-		int i = (blo + bhi) / 2;
-		const RealityBlock & block = m_RealityBlocks[i];
-		if (nRealLine < block.nStartReal)
-			bhi = i - 1;
-		else if (nRealLine >= block.nStartReal + block.nCount)
-			blo = i + 1;
-		else
-			return (nRealLine - block.nStartReal) + block.nStartApparent;
+		RealityBlock const *const b = blo + ((bhi - blo) >> 1);
+		if (nRealLine < b->nStartReal + b->nCount)
+			bhi = b;
+		if (nRealLine >= b->nStartReal)
+			blo = b + 1;
 	}
+	if (bhi < blo)
+		return bhi->nStartReal;
 	// Should have found it; all real lines should be in a block
 	ASSERT(0);
 	return -1;
@@ -814,11 +702,11 @@ int CGhostTextBuffer::ComputeApparentLine(int nRealLine) const
  * @param [out] decToReal Difference of the apparent and real line.
  * @return The real line for the apparent line.
  */
-int CGhostTextBuffer::ComputeRealLineAndGhostAdjustment(int nApparentLine,
-		int& decToReal) const
+int CGhostTextBuffer::ComputeRealLineAndGhostAdjustment(int nApparentLine, int &decToReal) const
 {
-	const int size = m_RealityBlocks.size();
-	if (size == 0) 
+	RealityBlock const *blo = m_RealityBlocks.begin();
+	RealityBlock const *bhi = m_RealityBlocks.end();
+	if (blo == bhi)
 	{
 		decToReal = 0;
 		return 0;
@@ -828,7 +716,7 @@ int CGhostTextBuffer::ComputeRealLineAndGhostAdjustment(int nApparentLine,
 	ASSERT(nApparentLine < GetLineCount());
 
 	// after last block ?
-	const RealityBlock & maxblock = m_RealityBlocks.back();
+	RealityBlock const &maxblock = m_RealityBlocks.back();
 	if (nApparentLine >= maxblock.nStartApparent + maxblock.nCount)
 	{
 		decToReal = GetLineCount() - nApparentLine;
@@ -836,25 +724,22 @@ int CGhostTextBuffer::ComputeRealLineAndGhostAdjustment(int nApparentLine,
 	}
 
 	// binary search to find correct (or nearest block)
-	int blo = 0;
-	int bhi = size - 1;
-	while (blo <= bhi)
+	while (blo < bhi)
 	{
-		int i = (blo + bhi) / 2;
-		const RealityBlock & block = m_RealityBlocks[i];
-		if (nApparentLine < block.nStartApparent)
-			bhi = i - 1;
-		else if (nApparentLine >= block.nStartApparent + block.nCount)
-			blo = i + 1;
-		else // found it inside this block
-		{
-			decToReal = 0;
-			return (nApparentLine - block.nStartApparent) + block.nStartReal;
-		}
+		RealityBlock const *const b = blo + ((bhi - blo) >> 1);
+		if (nApparentLine < b->nStartApparent + b->nCount)
+			bhi = b;
+		if (nApparentLine >= b->nStartApparent)
+			blo = b + 1;
+	}
+	if (bhi < blo) // found it inside this block
+	{
+		decToReal = 0;
+		return (nApparentLine - bhi->nStartApparent) + bhi->nStartReal;
 	}
 	// it is a ghost line just before block blo
-	decToReal = m_RealityBlocks[blo].nStartApparent - nApparentLine;
-	return m_RealityBlocks[blo].nStartReal;
+	decToReal = bhi->nStartApparent - nApparentLine;
+	return bhi->nStartReal;
 }
 
 /**
@@ -866,66 +751,48 @@ int CGhostTextBuffer::ComputeRealLineAndGhostAdjustment(int nApparentLine,
  */
 int CGhostTextBuffer::ComputeApparentLine(int nRealLine, int decToReal) const
 {
-	int nPreviousBlock;
-	int nApparent;
+	int nApparent = GetLineCount();
 
-	const int size = (int) m_RealityBlocks.size();
-	int blo = 0;
-	int bhi = size - 1;
-	int i;
-	if (size == 0)
+	RealityBlock const *blo = m_RealityBlocks.begin();
+	RealityBlock const *bhi = m_RealityBlocks.end();
+	if (blo == bhi)
 		return 0;
 
 	// after last block ?
-	const RealityBlock & maxblock = m_RealityBlocks.back();
-	if (nRealLine >= maxblock.nStartReal + maxblock.nCount)
+	RealityBlock const &maxblock = m_RealityBlocks.back();
+	if (nRealLine < maxblock.nStartReal + maxblock.nCount)
 	{
-		nPreviousBlock = size - 1;
-		nApparent = GetLineCount();
-		goto limitWithPreviousBlock;
-	}
-
-	// binary search to find correct (or nearest block)
-	while (blo <= bhi)
-	{
-		i = (blo + bhi) / 2;
-		const RealityBlock & block = m_RealityBlocks[i];
-		if (nRealLine < block.nStartReal)
-			bhi = i - 1;
-		else if (nRealLine >= block.nStartReal + block.nCount)
-			blo = i + 1;
-		else
+		// binary search to find correct (or nearest block)
+		while (blo < bhi)
 		{
-			if (nRealLine > block.nStartReal)
-				// limited by the previous line in this block
-				return (nRealLine - block.nStartReal) + block.nStartApparent;
-			nPreviousBlock = i - 1;
-			nApparent = (nRealLine - block.nStartReal) + block.nStartApparent;
-			goto limitWithPreviousBlock;
+			RealityBlock const *const b = blo + ((bhi - blo) >> 1);
+			if (nRealLine < b->nStartReal + b->nCount)
+				bhi = b;
+			if (nRealLine >= b->nStartReal)
+				blo = b + 1;
 		}
-	}
-	// Should have found it; all real lines should be in a block
-	ASSERT(0);
-	return -1;
-
-limitWithPreviousBlock:
-	// we must keep above the value lastApparentInPreviousBlock
-	int lastApparentInPreviousBlock;
-	if (nPreviousBlock == -1)
-		lastApparentInPreviousBlock = -1;
-	else
-	{
-		const RealityBlock & previousBlock = m_RealityBlocks[nPreviousBlock];
-		lastApparentInPreviousBlock = previousBlock.nStartApparent + previousBlock.nCount - 1;
+		if (bhi == blo) // not found
+		{
+			// Should have found it; all real lines should be in a block
+			ASSERT(0);
+			return -1;
+		}
+		// found it inside this block
+		nApparent = (nRealLine - bhi->nStartReal) + bhi->nStartApparent;
+		if (nRealLine > bhi->nStartReal)
+			// limited by the previous line in this block
+			return nApparent;
 	}
 
-	while (decToReal --) 
+	// we must not go below the value nextApparentAfterPreviousBlock
+	int nextApparentAfterPreviousBlock = 0;
+	if (bhi > m_RealityBlocks.begin())
 	{
-		nApparent --;
-		if (nApparent == lastApparentInPreviousBlock)
-			return nApparent + 1;
+		RealityBlock const &previousBlock = *--bhi;
+		nextApparentAfterPreviousBlock = previousBlock.nStartApparent + previousBlock.nCount;
 	}
-	return nApparent;
+	nApparent -= decToReal;
+	return std::max(nApparent, nextApparentAfterPreviousBlock);
 }
 
 /** Do what we need to do just after we've been reloaded */
@@ -941,7 +808,7 @@ void CGhostTextBuffer::RecomputeRealityMapping()
 	m_RealityBlocks.clear();
 	stl_size_t reality = 0; // last encountered real line
 	stl_size_t i = 0; // current line
-	const stl_size_t n = m_aLines.size();
+	stl_size_t const n = m_aLines.size();
 
 	// This used to be a state machine with 2 states, but has been converted to
 	// human-readable code to help get an idea how to account for skipped lines.
@@ -982,7 +849,7 @@ void CGhostTextBuffer::RecomputeRealityMapping()
 }
 
 /** we recompute EOL from the real line before nStartLine to nEndLine */
-void CGhostTextBuffer::RecomputeEOL(CCrystalTextView *pSource, int nStartLine, int nEndLine)
+void CGhostTextBuffer::RecomputeEOL(int nStartLine, int nEndLine)
 {
 	int nApparentLastRealLine = ApparentLastRealLine();
 	if (nApparentLastRealLine <= nEndLine)
@@ -995,7 +862,7 @@ void CGhostTextBuffer::RecomputeEOL(CCrystalTextView *pSource, int nStartLine, i
 		if (nRealBeforeStart >= 0)
 			nStartLine = nRealBeforeStart;
 	}
-	for (int i = nEndLine ; i >= nStartLine ; i--)
+	for (int i = nEndLine; i >= nStartLine; i--)
 	{
 		LineInfo &li = m_aLines[i];
 		if ((li.m_dwFlags & LF_GHOST) != 0 || i == nApparentLastRealLine)
@@ -1004,8 +871,6 @@ void CGhostTextBuffer::RecomputeEOL(CCrystalTextView *pSource, int nStartLine, i
 			{
 				// if a ghost line has an EOL, remove it
 				li.RemoveEol();
-				if (pSource != NULL)
-					UpdateViews(pSource, NULL, UPDATE_HORZRANGE | UPDATE_SINGLELINE, i);
 			}
 		}
 		else
@@ -1013,33 +878,30 @@ void CGhostTextBuffer::RecomputeEOL(CCrystalTextView *pSource, int nStartLine, i
 			if (!li.HasEol()) 
 			{
 				// if a real line (not the last) has no EOL, add one
-				AppendLine(i, GetDefaultEol(), (int) _tcslen(GetDefaultEol()));
-				if (pSource != NULL)
-					UpdateViews(pSource, NULL, UPDATE_HORZRANGE | UPDATE_SINGLELINE, i);
+				LPCTSTR const pszText = GetDefaultEol();
+				AppendLine(i, pszText, static_cast<int>(_tcslen(pszText)));
 			}
 		}
 	}
 }
 
 #ifdef _DEBUG
-/** 
-Check all lines, and ASSERT if reality blocks differ from flags. 
-This means that this only has effect in DEBUG build
-*/
+/**
+ * Check all lines, and ASSERT if reality blocks differ from flags.
+ * This means that this only has effect in DEBUG build
+ */
 void CGhostTextBuffer::checkFlagsFromReality() const
 {
-	const int size = m_RealityBlocks.size();
 	int i = 0;
-	for (int b = 0 ; b < size ; b ++)
+	for (RealityBlock const *b = m_RealityBlocks.begin(); b != m_RealityBlocks.end(); ++b)
 	{
-		const RealityBlock & block = m_RealityBlocks[b];
-		for ( ; i < block.nStartApparent ; i++)
+		for (; i < b->nStartApparent; i++)
 			ASSERT((GetLineFlags(i) & LF_GHOST) != 0);
-		for ( ; i < block.nStartApparent+block.nCount ; i++)
+		for (; i < b->nStartApparent + b->nCount; i++)
 			ASSERT((GetLineFlags(i) & LF_GHOST) == 0);
 	}
 
-	for ( ; i < GetLineCount() ; i++)
+	for (; i < GetLineCount(); i++)
 		ASSERT((GetLineFlags(i) & LF_GHOST) != 0);
 }
 #endif

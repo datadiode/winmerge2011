@@ -956,7 +956,7 @@ bool CCrystalEditView::DoEditUndo()
 	if (m_pTextBuffer != NULL && m_pTextBuffer->CanUndo())
 	{
 		POINT ptCursorPos;
-		if (m_pTextBuffer->Undo(this, ptCursorPos))
+		if (m_pTextBuffer->Undo(ptCursorPos))
 		{
 			ASSERT_VALIDTEXTPOS(ptCursorPos);
 			SetAnchor(ptCursorPos);
@@ -974,7 +974,7 @@ bool CCrystalEditView::DoEditRedo()
 	if (m_pTextBuffer != NULL && m_pTextBuffer->CanRedo())
 	{
 		POINT ptCursorPos;
-		if (m_pTextBuffer->Redo(this, ptCursorPos))
+		if (m_pTextBuffer->Redo(ptCursorPos))
 		{
 			ASSERT_VALIDTEXTPOS(ptCursorPos);
 			SetAnchor(ptCursorPos);
