@@ -42,25 +42,35 @@ CGhostTextView::CGhostTextView(CChildFrame *pDocument, int nThisPane, size_t Zer
 {
 }
 
-void CGhostTextView::popPosition(SCursorPushed Ssrc, POINT & pt)
+void CGhostTextView::popPosition(SCursorPushed const &src, POINT &pt) const
 {
-	pt.x = Ssrc.x;
+	pt.x = src.x;
 	pt.y = static_cast<CGhostTextBuffer *>
-		(m_pTextBuffer)->ComputeApparentLine(Ssrc.y, Ssrc.nToFirstReal);
+		(m_pTextBuffer)->ComputeApparentLine(src.y, src.nToFirstReal);
 	// if the cursor was in a trailing ghost line, and this disappeared,
 	// got at the end of the last line
-	if (pt.y >= GetLineCount())
+	int const yLimit = GetLineCount() - 1;
+	if (pt.y > yLimit)
 	{
-		pt.y = GetLineCount()-1;
+		pt.y = yLimit;
 		pt.x = GetLineLength(pt.y);
 	}
 }
 
-void CGhostTextView::pushPosition(SCursorPushed & Sdest, POINT pt)
+void CGhostTextView::pushPosition(SCursorPushed &dst, POINT &pt) const
 {
-	Sdest.x = pt.x;
-	Sdest.y = static_cast<CGhostTextBuffer *>
-		(m_pTextBuffer)->ComputeRealLineAndGhostAdjustment(pt.y, Sdest.nToFirstReal);
+	int const yLimit = GetLineCount() - 1;
+	if (pt.y > yLimit)
+		pt.y = yLimit;
+	if (pt.y >= 0)
+	{
+		int const xLimit = GetLineLength(pt.y);
+		if (pt.x > xLimit)
+			pt.x = xLimit;
+	}
+	dst.x = pt.x;
+	dst.y = static_cast<CGhostTextBuffer *>
+		(m_pTextBuffer)->ComputeRealLineAndGhostAdjustment(pt.y, dst.nToFirstReal);
 }
 
 void CGhostTextView::PopCursors()
@@ -68,15 +78,15 @@ void CGhostTextView::PopCursors()
 	POINT ptCursorLast = m_ptCursorLast;
 	popPosition(m_ptCursorPosPushed, ptCursorLast);
 
-	ASSERT_VALIDTEXTPOS (ptCursorLast);
-	SetCursorPos (ptCursorLast);
+	ASSERT_VALIDTEXTPOS(ptCursorLast);
+	SetCursorPos(ptCursorLast);
 
 	popPosition(m_ptSelStartPushed, m_ptSelStart);
-	ASSERT_VALIDTEXTPOS (m_ptSelStart);
+	ASSERT_VALIDTEXTPOS(m_ptSelStart);
 	popPosition(m_ptSelEndPushed, m_ptSelEnd);
-	ASSERT_VALIDTEXTPOS (m_ptSelEnd);
+	ASSERT_VALIDTEXTPOS(m_ptSelEnd);
 	popPosition(m_ptAnchorPushed, m_ptAnchor);
-	ASSERT_VALIDTEXTPOS (m_ptAnchor);
+	ASSERT_VALIDTEXTPOS(m_ptAnchor);
 	// laoran 2003/09/03
 	// here is what we did before, maybe we have to do it, but test with pushed positions
 	// SetSelection (ptCursorLast, ptCursorLast);
@@ -148,8 +158,7 @@ void CGhostTextView::PushCursors()
 		pushPosition(m_ptSavedSelEndPushed, m_ptSavedSelEnd);
 	}
 
-	pushPosition(m_ptLastChangePushed,
-		static_cast<CGhostTextBuffer *>(m_pTextBuffer)->GetLastChangePos());
+	pushPosition(m_ptLastChangePushed, m_pTextBuffer->GetLastChangePos());
 
 	// and top line positions
 	m_nTopSubLinePushed = m_nTopSubLine;

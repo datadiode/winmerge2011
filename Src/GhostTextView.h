@@ -58,13 +58,13 @@ private:
 	 * @note We can only push/pop valid positions
 	 * For positions which are sometimes invalid, use a flag
 	 */
-	void pushPosition(SCursorPushed &Sdest, POINT pt);
+	void pushPosition(SCursorPushed &, POINT &) const;
 	/**
 	 * @brief Restore cursors after Rescan.
 	 *
 	 * @note : also scroll to the old top line
 	 */
-	void popPosition(SCursorPushed Ssrc, POINT &pt);
+	void popPosition(SCursorPushed const &, POINT &) const;
 
 	/// basic cursor
 	SCursorPushed m_ptCursorPosPushed;
