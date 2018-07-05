@@ -313,23 +313,12 @@ void CMergeDiffDetailView::PopCursors()
 	m_lineBegin = m_lineBeginPushed;
 	m_lineEnd = m_lineEndPushed;
 	// clip the involved coordinates to their valid ranges
-	int nLineCount = GetLineCount();
-	if (m_lineBegin >= nLineCount)
-	{
-		// even the first line is invalid, stop displaying the diff
-		m_lineBegin = m_lineEnd = m_nTopLine = m_nTopSubLine = 0;
-	}
-	else
-	{
-		// just check that all positions all valid
-		if (m_lineEnd > nLineCount)
-			m_lineEnd = nLineCount;
-		if (m_ptCursorPos.y >= nLineCount)
-			m_ptCursorPos.y = nLineCount - 1;
-		int nLineLength = GetLineLength(m_ptCursorPos.y);
-		if (m_ptCursorPos.x > nLineLength)
-			m_ptCursorPos.x = nLineLength;
-	}
+	int const nLineCount = GetLineCount();
+	// check that all positions all valid
+	if (m_lineBegin > nLineCount)
+		m_lineBegin = nLineCount;
+	if (m_lineEnd > nLineCount)
+		m_lineEnd = nLineCount;
 }
 
 /**
