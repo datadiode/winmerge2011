@@ -1048,10 +1048,17 @@ LRESULT CMainFrame::OnWndMsg<WM_INITMENUPOPUP>(WPARAM wParam, LPARAM lParam)
 			pMenu->CheckMenuRadioItem(ID_COLORSCHEME_FIRST, ID_COLORSCHEME_LAST, ID_COLORSCHEME_FIRST + m_sourceType);
 			continue;
 		case ID_VIEW_CONTEXT_0:
-			pMenu->CheckMenuRadioItem(ID_VIEW_CONTEXT_0, ID_VIEW_CONTEXT_UNLIMITED,
-				pDocFrame->GetFrameType() == FRAME_FILE ? static_cast<CChildFrame *>(pDocFrame)->m_idContextLines : 0);
-			// Limiting context is only allowed when there are no unsaved changes.
-			mii.fState = m_cmdState.Save & MF_GRAYED ? MF_ENABLED : MF_GRAYED;
+			if (pDocFrame->GetFrameType() == FRAME_FILE)
+			{
+				CChildFrame *const pSpecific = static_cast<CChildFrame *>(pDocFrame);
+				pMenu->CheckMenuRadioItem(ID_VIEW_CONTEXT_0, ID_VIEW_CONTEXT_UNLIMITED, pSpecific->m_idContextLines);
+				mii.fState = pSpecific->CanLimitContext() ? MF_ENABLED : MF_GRAYED;
+			}
+			else
+			{
+				ASSERT(FALSE);
+				mii.fState = MF_GRAYED;
+			}
 			do
 			{
 				pMenu->EnableMenuItem(mii.wID, mii.fState);

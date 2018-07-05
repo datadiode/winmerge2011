@@ -1128,6 +1128,13 @@ int CChildFrame::LeftLineInMovedBlock(int apparentLine)
 	return movedLine;
 }
 
+bool CChildFrame::CanLimitContext() const
+{
+	// For limiting context, require normal buffers with no unsaved changes.
+	return m_nBufferType[0] < BUFFER_UNNAMED && !m_ptBuf[0]->IsModified()
+		&& m_nBufferType[1] < BUFFER_UNNAMED && !m_ptBuf[1]->IsModified();
+}
+
 /**
  * @brief Save modified documents.
  * This function asks if user wants to save modified documents. We also

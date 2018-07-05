@@ -149,6 +149,7 @@ public:
 
 	void GetWordDiffArray(int nLineIndex, std::vector<wdiff> &worddiffs) const;
 
+	bool CanLimitContext() const;
 	bool SaveModified();
 	void SetTitle();
 
