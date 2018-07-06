@@ -253,7 +253,7 @@ void CEditReplaceDlg::OnEditSkip()
 	SetDefID(m_nCaptures >= 0 ? IDC_EDIT_REPLACE : IDC_EDIT_SKIP);
 }
 
-void CEditReplaceDlg::ReplaceSelection()
+void CEditReplaceDlg::ReplaceSelection(bool bGroupWithPrevious)
 {
 	LPCTSTR p = m_sNewText.c_str();
 	int n = m_sNewText.size();
@@ -321,7 +321,7 @@ void CEditReplaceDlg::ReplaceSelection()
 		p = s.c_str();
 		n = s.length();
 	}
-	m_pBuddy->ReplaceSelection(p, n);
+	m_pBuddy->ReplaceSelection(p, n, bGroupWithPrevious);
 }
 
 void CEditReplaceDlg::OnEditReplace()
@@ -396,7 +396,7 @@ void CEditReplaceDlg::OnEditReplaceAll()
 	{
 		//  We have highlighted text
 		m_pBuddy->m_nLastReplaceLen = 0;
-		ReplaceSelection();
+		ReplaceSelection(nNumReplaced != 0);
 		nNumReplaced++;
 
 		//  Manually recalculate points

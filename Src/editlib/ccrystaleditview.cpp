@@ -911,7 +911,7 @@ void CCrystalEditView::OnEditReplace()
  * - FIND_REGEXP: use the regular expression.
  * @return TRUE if succeeded.
  */
-void CCrystalEditView::ReplaceSelection(LPCTSTR pszNewText, int cchNewText)
+void CCrystalEditView::ReplaceSelection(LPCTSTR pszNewText, int cchNewText, bool bGroupWithPrevious)
 {
 	if (cchNewText == 0)
 	{
@@ -921,7 +921,7 @@ void CCrystalEditView::ReplaceSelection(LPCTSTR pszNewText, int cchNewText)
 
 	ASSERT(pszNewText);
 
-	m_pTextBuffer->BeginUndoGroup();
+	m_pTextBuffer->BeginUndoGroup(bGroupWithPrevious);
 
 	POINT ptCursorPos, ptEndOfBlock;
 	GetSelection(ptCursorPos, ptEndOfBlock);

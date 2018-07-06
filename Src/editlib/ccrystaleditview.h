@@ -90,7 +90,7 @@ public:
 
 	virtual void UpdateView(CCrystalTextView * pSource, CUpdateContext * pContext, DWORD dwFlags, int nLineIndex = -1);
 
-    void ReplaceSelection(LPCTSTR pszNewText, int cchNewText);
+    void ReplaceSelection(LPCTSTR pszNewText, int cchNewText, bool bGroupWithPrevious = false);
 
     virtual void OnEditOperation(int nAction, LPCTSTR pszText, int cchText);
 

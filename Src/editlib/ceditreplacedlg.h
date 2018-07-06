@@ -75,7 +75,7 @@ protected:
 	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
 
 	void UpdateRegExp();
-	void ReplaceSelection();
+	void ReplaceSelection(bool bGroupWithPrevious = false);
 
 	// Generated message map functions
 	void OnChangeEditText();
