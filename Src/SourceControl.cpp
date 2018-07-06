@@ -54,11 +54,12 @@ int CMainFrame::SaveToVersionControl(LPCTSTR pszSavePath)
 				// Dialog not suppressed - show it and allow user to select "checkout all"
 				if (!m_CheckOutMulti)
 				{
-					dlg.m_bMultiCheckouts = FALSE;
+					dlg.m_bMultiCheckouts = SettingStore.GetProfileInt(_T("Settings"), _T("MultiCheckouts"), FALSE);
 					int choice = LanguageSelect.DoModal(dlg);
 					m_CheckOutMulti = dlg.m_bMultiCheckouts;
 					if (choice != IDOK)
 						return IDCANCEL;
+					SettingStore.WriteProfileInt(_T("Settings"), _T("MultiCheckouts"), dlg.m_bMultiCheckouts);
 				}
 				// process versioning system specific action
 				WaitStatusCursor waitstatus(IDS_VSS_CHECKOUT_STATUS);
@@ -83,11 +84,12 @@ int CMainFrame::SaveToVersionControl(LPCTSTR pszSavePath)
 				// Dialog not suppressed - show it and allow user to select "checkout all"
 				if (!m_CheckOutMulti)
 				{
-					dlg.m_bMultiCheckouts = FALSE;
+					dlg.m_bMultiCheckouts = SettingStore.GetProfileInt(_T("Settings"), _T("MultiCheckouts"), FALSE);
 					int choice = LanguageSelect.DoModal(dlg);
 					m_CheckOutMulti = dlg.m_bMultiCheckouts;
 					if (choice != IDOK)
 						return IDCANCEL;
+					SettingStore.WriteProfileInt(_T("Settings"), _T("MultiCheckouts"), dlg.m_bMultiCheckouts);
 				}
 				// process versioning system specific action
 				WaitStatusCursor waitstatus(IDS_VSS_CHECKOUT_STATUS);
@@ -202,7 +204,7 @@ int CMainFrame::SaveToVersionControl(LPCTSTR pszSavePath)
 				CCCPrompt dlg;
 				if (!m_CheckOutMulti)
 				{
-					dlg.m_bMultiCheckouts = FALSE;
+					dlg.m_bMultiCheckouts = SettingStore.GetProfileInt(_T("Settings"), _T("MultiCheckouts"), FALSE);
 					dlg.m_comments = _T("");
 					dlg.m_bCheckin = FALSE;
 					int choice = LanguageSelect.DoModal(dlg);
@@ -211,6 +213,7 @@ int CMainFrame::SaveToVersionControl(LPCTSTR pszSavePath)
 					m_bCheckinVCS = dlg.m_bCheckin;
 					if (choice != IDOK)
 						return IDCANCEL;
+					SettingStore.WriteProfileInt(_T("Settings"), _T("MultiCheckouts"), dlg.m_bMultiCheckouts);
 				}
 				// process versioning system specific action
 				WaitStatusCursor waitstatus(IDS_VSS_CHECKOUT_STATUS);
