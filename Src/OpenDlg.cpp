@@ -440,6 +440,9 @@ BOOL COpenDlg::OnInitDialog()
 		paths_UndoMagic(m_sRightFile);
 	}
 
+	if (m_sFilter.empty())
+		m_pCbExt->GetWindowText(m_sFilter);
+
 	UpdateData<Set>();
 
 	m_nCompareAs = m_pCbCompareAs->GetCurSel();
