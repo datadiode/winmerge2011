@@ -1443,7 +1443,7 @@ void CMainFrame::OnOptions()
 			{
 			case FRAME_FILE:
 				static_cast<CChildFrame *>(pDocFrame)->RefreshOptions();
-				static_cast<CChildFrame *>(pDocFrame)->FlushAndRescan(TRUE);
+				static_cast<CChildFrame *>(pDocFrame)->FlushAndRescan();
 				break;
 			case FRAME_BINARY:
 				static_cast<CHexMergeFrame *>(pDocFrame)->RefreshOptions();
@@ -2303,7 +2303,7 @@ void CMainFrame::ApplyDiffOptions()
 		{
 		case FRAME_FILE:
 			static_cast<CChildFrame *>(pDocFrame)->RefreshOptions();
-			static_cast<CChildFrame *>(pDocFrame)->FlushAndRescan(TRUE);
+			static_cast<CChildFrame *>(pDocFrame)->FlushAndRescan();
 			break;
 		}
 	}
@@ -2970,7 +2970,7 @@ bool CMainFrame::SelectFilter()
 			if (idRefreshFiles == IDYES)
 			{
 				static_cast<CChildFrame *>(pDocFrame)->RefreshOptions();
-				static_cast<CChildFrame *>(pDocFrame)->FlushAndRescan(TRUE);
+				static_cast<CChildFrame *>(pDocFrame)->FlushAndRescan();
 			}
 			break;
 		}

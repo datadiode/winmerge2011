@@ -43,7 +43,6 @@ enum
 enum
 {
 	RESCAN_OK, /**< Rescan succeeded */
-	RESCAN_SUPPRESSED, /**< Rescan not done - suppressed */
 	RESCAN_FILE_ERR, /**< Error reading file */
 	RESCAN_TEMP_ERR, /**< Error saving to temp file */
 };
@@ -113,7 +112,7 @@ public:
 	void AlignScrollPositions();
 
 	bool PromptAndSaveIfNeeded(bool bAllowCancel);
-	void FlushAndRescan(bool bForced = false);
+	void FlushAndRescan();
 	void RescanIfNeeded(DWORD timeout);
 	void SetCurrentDiff(int nDiff);
 	int GetCurrentDiff() { return m_nCurDiff; }
@@ -194,9 +193,9 @@ private:
 	bool DoSave(bool &bSaveSuccess, int nBuffer);
 	bool DoSaveAs(int nBuffer);
 
-	int Rescan(bool &bIdentical, bool bForced = false);
+	int Rescan(bool &bIdentical);
 	int Rescan2(bool &bIdentical);
-	void ShowRescanError(int nRescanResult, BOOL bIdentical);
+	void ShowRescanError(int nRescanResult, bool bIdentical);
 	void AddUndoAction(UINT nBegin, UINT nEnd, UINT nDiff, int nBlanks, BOOL bInsert, CMergeEditView *pList);
 	void CopyAllList(int srcPane, int dstPane);
 	void CopyMultipleList(int srcPane, int dstPane, int firstDiff, int lastDiff);
@@ -267,7 +266,6 @@ private:
 	bool m_bInitialReadOnly[MERGE_VIEW_COUNT]; /**< Left/right doc initial read-only state */
 	bool m_bMergingMode; /**< Merging or Edit mode */
 	bool m_bMixedEol; /**< Does this document have mixed EOL style? */
-	BYTE m_bLockRescan; /**< Automatic rescan enabled/disabled */
 	bool m_bHasSyncPoints;
 	FileTime m_LastRescan; /**< Time of last rescan (for delaying) */ 
 	CDiffWrapper m_diffWrapper;

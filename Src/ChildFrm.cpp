@@ -377,7 +377,7 @@ LRESULT CChildFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 		{
 			// Refresh display using text-buffers
 			// NB: This DOES NOT reload files!
-			FlushAndRescan(true);
+			FlushAndRescan();
 		}
 		break;
 	case ID_VIEW_LINENUMBERS:
@@ -395,7 +395,7 @@ LRESULT CChildFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 	case ID_VIEW_LINEDIFFS:
 		COptionsMgr::SaveOption(OPT_WORDDIFF_HIGHLIGHT, !COptionsMgr::Get(OPT_WORDDIFF_HIGHLIGHT));
 		RefreshOptions();
-		FlushAndRescan(true);
+		FlushAndRescan();
 		UpdateSingleCmdUI<ID_VIEW_LINEDIFFS>();
 		break;
 	case ID_VIEW_WORDWRAP:

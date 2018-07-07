@@ -204,6 +204,8 @@ bool CChildFrame::OnL2r()
 			done = true;
 		}
 	}
+	if (done)
+		FlushAndRescan();
 	return done;
 }
 
@@ -242,6 +244,8 @@ bool CChildFrame::OnR2l()
 			done = true;
 		}
 	}
+	if (done)
+		FlushAndRescan();
 	return done;
 }
 
@@ -255,6 +259,7 @@ void CChildFrame::OnAllLeft()
 		return;
 	WaitStatusCursor waitstatus(IDS_STATUS_COPYALL2L);
 	CopyAllList(1, 0);
+	FlushAndRescan();
 }
 
 /**
@@ -267,6 +272,7 @@ void CChildFrame::OnAllRight()
 		return;
 	WaitStatusCursor waitstatus(IDS_STATUS_COPYALL2R);
 	CopyAllList(0, 1);
+	FlushAndRescan();
 }
 
 void CChildFrame::SetUnpacker(PackingInfo * infoNewHandler)
@@ -328,8 +334,6 @@ static void SaveBuffForDiff(CDiffTextBuffer &buf, bool bUnicode,
  *
  * [out] If TRUE binary file was detected.
  * @param bIdentical [out] If TRUE files were identical
- * @param bForced [in] If TRUE, suppressing is ignored and rescan
- * is done always
  * @return Tells if rescan was successfully, was suppressed, or
  * error happened
  * If this code is OK, Rescan has detached the views temporarily
@@ -338,15 +342,9 @@ static void SaveBuffForDiff(CDiffTextBuffer &buf, bool bUnicode,
  * touched by Rescan().
  * @sa CDiffWrapper::RunFileDiff()
  */
-int CChildFrame::Rescan(bool &bIdentical, bool bForced)
+int CChildFrame::Rescan(bool &bIdentical)
 {
 	DiffFileInfo fileInfo;
-
-	if (!bForced)
-	{
-		if (m_bLockRescan)
-			return RESCAN_SUPPRESSED;
-	}
 
 	// Check if files have been modified since last rescan
 	// Ignore checking in case of scratchpads (empty filenames)
@@ -607,13 +605,11 @@ void CChildFrame::FlagMovedLines(MovedLines *pMovedLines,
  * @param bIdentical [in] Were files identical?.
  * @sa CChildFrame::Rescan()
  */
-void CChildFrame::ShowRescanError(int nRescanResult, BOOL bIdentical)
+void CChildFrame::ShowRescanError(int nRescanResult, bool bIdentical)
 {
 	// Rescan was suppressed, there is no sensible status
 	switch (nRescanResult)
 	{
-	case RESCAN_SUPPRESSED:
-		return;
 	case RESCAN_FILE_ERR:
 		LanguageSelect.MsgBox(IDS_FILEERROR, MB_ICONSTOP);
 		return;
@@ -672,15 +668,12 @@ void CChildFrame::CopyMultipleList(int srcPane, int dstPane, int firstDiff, int 
 	{
 		if (m_diffList.IsDiffSignificant(i))
 		{
-			defer::Decrement<BYTE> Decrement = { &++m_bLockRescan };
 			if (!ListCopy(srcPane, dstPane, i, bGroupWithPrevious))
 				return; // sync failure
 			// Group merge with previous (merge undo data to one action)
 			bGroupWithPrevious = true;
 		}
 	}
-
-	FlushAndRescan();
 }
 
 /**
@@ -744,10 +737,6 @@ bool CChildFrame::ListCopy(int srcPane, int dstPane, int nDiff, bool bGroupWithP
 	// If diff-number not given, determine it from active view
 	if (nDiff != -1 || (nDiff = GetContextDiff(firstDiff, lastDiff)) != -1)
 	{
-		// suppress Rescan during this method
-		// (Not only do we not want to rescan a lot of times, but
-		// it will wreck the line status array to rescan as we merge)
-		defer::Decrement<BYTE> Decrement = { &++m_bLockRescan };
 		const DIFFRANGE *const pcd = m_diffList.DiffRangeAt(nDiff);
 		CDiffTextBuffer *const sbuf = m_ptBuf[srcPane];
 		CDiffTextBuffer *const dbuf = m_ptBuf[dstPane];
@@ -803,8 +792,6 @@ bool CChildFrame::ListCopy(int srcPane, int dstPane, int nDiff, bool bGroupWithP
 		// changes, but none that concern the source text
 		sbuf->SetModified(bSrcWasMod);
 	}
-
-	FlushAndRescan();
 	return true;
 }
 
@@ -1167,15 +1154,10 @@ void CChildFrame::SetCurrentDiff(int nDiff)
  * 
  * Update view and restore cursor and scroll position after
  * rescanning document.
- * @param [in] bForced If TRUE rescan cannot be suppressed
  */
-void CChildFrame::FlushAndRescan(bool bForced)
+void CChildFrame::FlushAndRescan()
 {
 	if (m_idContextLines < ID_VIEW_CONTEXT_UNLIMITED)
-		return;
-
-	// Ignore suppressing when forced rescan
-	if (!bForced && m_bLockRescan)
 		return;
 
 	WaitStatusCursor waitstatus(IDS_STATUS_RESCANNING);
@@ -1191,7 +1173,7 @@ void CChildFrame::FlushAndRescan(bool bForced)
 		pActiveView->HideCursor();
 
 	bool bIdentical = false;
-	int nRescanResult = Rescan(bIdentical, bForced);
+	int nRescanResult = Rescan(bIdentical);
 
 	// restore cursors and caret
 	m_pView[0]->PopCursors();
@@ -1210,8 +1192,7 @@ void CChildFrame::FlushAndRescan(bool bForced)
 	UpdateCmdUI();
 
 	// Show possible error after updating screen
-	if (nRescanResult != RESCAN_SUPPRESSED)
-		ShowRescanError(nRescanResult, bIdentical);
+	ShowRescanError(nRescanResult, bIdentical);
 
 	GetSystemTimeAsFileTime(&m_LastRescan);
 }
@@ -1251,7 +1232,7 @@ void CChildFrame::OnFileSave()
 		if (m_pDirDoc)
 		{
 			if (m_bEditAfterRescan[0] || m_bEditAfterRescan[1])
-				FlushAndRescan(false);
+				FlushAndRescan();
 			m_pDirDoc->UpdateChangedItem(this);
 		}
 	}
@@ -1279,7 +1260,7 @@ void CChildFrame::OnFileSaveLeft()
 		if (m_pDirDoc)
 		{
 			if (m_bEditAfterRescan[0] || m_bEditAfterRescan[1])
-				FlushAndRescan(false);
+				FlushAndRescan();
 			m_pDirDoc->UpdateChangedItem(this);
 		}
 	}
@@ -1307,7 +1288,7 @@ void CChildFrame::OnFileSaveRight()
 		if (m_pDirDoc)
 		{
 			if (m_bEditAfterRescan[0] || m_bEditAfterRescan[1])
-				FlushAndRescan(false);
+				FlushAndRescan();
 			m_pDirDoc->UpdateChangedItem(this);
 		}
 	}
@@ -1652,7 +1633,7 @@ bool CChildFrame::PromptAndSaveIfNeeded(bool bAllowCancel)
 		if (m_pDirDoc)
 		{
 			if (m_bEditAfterRescan[0] || m_bEditAfterRescan[1])
-				FlushAndRescan(false);
+				FlushAndRescan();
 			m_pDirDoc->UpdateChangedItem(this);
 		}
 	}
@@ -2559,7 +2540,7 @@ void CChildFrame::SetSyncPoint()
 	for (int nBuffer = 0; nBuffer < m_nBuffers; ++nBuffer)
 		m_pView[nBuffer]->SetSelectionMargin(true);
 
-	FlushAndRescan(true);
+	FlushAndRescan();
 }
 
 bool CChildFrame::IsCursorAtSyncPoint()
@@ -2593,7 +2574,7 @@ void CChildFrame::ClearSyncPoint()
 		if (m_ptBuf[nBuffer]->FindLineWithFlag(LF_INVALID_BREAKPOINT) != -1)
 			m_bHasSyncPoints = true;
 	}
-	FlushAndRescan(true);
+	FlushAndRescan();
 }
 
 /**
@@ -2611,7 +2592,7 @@ void CChildFrame::ClearSyncPoints()
 			m_ptBuf[nBuffer]->SetLineFlags(nLine, dwFlags & ~LF_INVALID_BREAKPOINT);
 		}
 	}
-	FlushAndRescan(true);
+	FlushAndRescan();
 }
 
 void CChildFrame::UpdateAllViews()

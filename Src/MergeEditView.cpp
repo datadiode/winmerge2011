@@ -544,6 +544,8 @@ void CMergeEditView::OnEditOperation(int nAction, LPCTSTR pszText, int cchText)
 		// If timer starting fails, rescan immediately
 		switch (nAction)
 		{
+		case CE_ACTION_MERGE:
+			break;
 		case CE_ACTION_TYPING:
 		case CE_ACTION_REPLACE:
 		case CE_ACTION_BACKSPACE:
@@ -646,6 +648,9 @@ void CMergeEditView::OnTimer(UINT_PTR nIDEvent)
  */
 void CMergeEditView::OnUpdateCaret(bool bShowHide)
 {
+	if (m_pTextBuffer == NULL)
+		return;
+
 	if (bShowHide)
 		return;
 
@@ -827,7 +832,7 @@ void CMergeEditView::OnConvertEolTo(UINT nID)
 	if (m_pTextBuffer->applyEOLMode())
 	{
 		m_pDocument->UpdateHeaderPath(m_nThisPane);
-		m_pDocument->FlushAndRescan(true);
+		m_pDocument->FlushAndRescan();
 	}
 }
 

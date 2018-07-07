@@ -590,7 +590,7 @@ void CDirView::PerformActionList(FileActionScript &actionScript)
 	// Reset suppressing VSS dialog for multiple files.
 	// Set in CMainFrame::SaveToVersionControl().
 	m_pFrame->m_pMDIFrame->m_CheckOutMulti = FALSE;
-	m_pFrame->m_pMDIFrame->m_bVssSuppressPathCheck = false;
+	m_pFrame->m_pMDIFrame->m_bVssSuppressPathCheck = FALSE;
 
 	theApp.AddOperation();
 	try
