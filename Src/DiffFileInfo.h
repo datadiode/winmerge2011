@@ -26,14 +26,6 @@
 #include "FileTextStats.h"
 
 /**
- * @brief Class for fileflags and coding info.
- */
-struct DiffFileFlags : public FileFlags
-{
-	String ToString() const;
-};
-
-/**
  * @brief Information for file.
  * This class expands DirItem class with encoding information and
  * text stats information.
@@ -49,7 +41,6 @@ struct DiffFileInfo : public DirItem
 		VersionInvalid
 	} versionChecked;
 	FileVersion version; /**< string of fixed file version, eg, 1.2.3.4 */
-	DiffFileFlags flags; /**< file attributes */
 	FileTextEncoding encoding; /**< unicode or codepage info */
 	FileTextStats m_textStats; /**< EOL, zero-byte etc counts */
 

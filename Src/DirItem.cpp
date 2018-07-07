@@ -24,6 +24,26 @@
 #include "paths.h"
 
 /**
+ * @brief Convert file flags to string presentation.
+ * This function converts file flags to a string presentation that can be
+ * shown in the GUI.
+ * @return File flags as a string.
+ */
+String FileFlags::ToString() const
+{
+	String sflags;
+	if (attributes & FILE_ATTRIBUTE_READONLY)
+		sflags.push_back(_T('R'));
+	if (attributes & FILE_ATTRIBUTE_HIDDEN)
+		sflags.push_back(_T('H'));
+	if (attributes & FILE_ATTRIBUTE_SYSTEM)
+		sflags.push_back(_T('S'));
+	if (attributes & FILE_ATTRIBUTE_ARCHIVE)
+		sflags.push_back(_T('A'));
+	return sflags;
+}
+
+/**
  * @brief Update fileinfo from given file.
  * This function updates file's information from given item. Function
  * does not set filename and path.

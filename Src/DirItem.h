@@ -30,6 +30,7 @@ struct FileFlags
 	DWORD attributes; /**< Fileattributes for item */
 	FileFlags() : attributes(0) { }
 	void reset() { attributes = 0; } /// Reset fileattributes
+	String ToString() const;
 };
 
 /**
