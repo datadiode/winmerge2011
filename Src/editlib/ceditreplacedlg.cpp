@@ -47,7 +47,7 @@
 CEditReplaceDlg::CEditReplaceDlg(CCrystalEditView * pBuddy)
 	: ODialog(IDD_EDIT_REPLACE)
 	, m_pBuddy(pBuddy)
-	, m_nScope(-1)
+	, m_nScope(WholeFileScope)
 	, m_nCaptures(-1)
 	, m_bEnableScopeSelection(true)
 	, m_bConfirmed(false)
@@ -75,8 +75,8 @@ bool CEditReplaceDlg::UpdateData()
 	DDX_Check<op>(IDC_EDIT_REGEXP, m_bRegExp);
 	DDX_CBStringExact<op>(IDC_EDIT_FINDTEXT, m_sText);
 	DDX_CBStringExact<op>(IDC_EDIT_REPLACE_WITH, m_sNewText);
-	DDX_Check<op>(IDC_EDIT_SCOPE_SELECTION, m_nScope, 0);
-	DDX_Check<op>(IDC_EDIT_SCOPE_WHOLE_FILE, m_nScope, 1);
+	DDX_Check<op>(IDC_EDIT_SCOPE_SELECTION, m_nScope, SelectionScope);
+	DDX_Check<op>(IDC_EDIT_SCOPE_WHOLE_FILE, m_nScope, WholeFileScope);
 	DDX_Check<op>(IDC_EDIT_SCOPE_DONT_WRAP, m_bNoWrap);
 	return true;
 }
@@ -197,7 +197,7 @@ int CEditReplaceDlg::DoHighlightText(BOOL bNotifyIfNotFound)
 	}
 
 	int nCaptures;
-	if (m_nScope == 0)
+	if (m_nScope == SelectionScope)
 	{
 		// Searching selection only
 		nCaptures = m_pBuddy->FindTextInBlock(m_sText.c_str(), m_ptFoundAt,
@@ -211,14 +211,14 @@ int CEditReplaceDlg::DoHighlightText(BOOL bNotifyIfNotFound)
 
 	if (nCaptures < 0)
 	{
-		if (bNotifyIfNotFound) 
+		if (bNotifyIfNotFound)
 			LanguageSelect.Format(IDS_EDIT_TEXT_NOT_FOUND, m_sText.c_str()).MsgBox(MB_ICONINFORMATION);
-		if (m_nScope == 0)
+		if (m_nScope == SelectionScope)
 			m_ptCurrentPos = m_ptBlockBegin;
 		return -1;
 	}
-
-	m_pBuddy->HighlightText(m_ptFoundAt, m_pBuddy->m_nLastFindWhatLen);
+	// Ternary logic: bCursorToLeft == ~FALSE prevents the view from scrolling
+	m_pBuddy->HighlightText(m_ptFoundAt, m_pBuddy->m_nLastFindWhatLen, bNotifyIfNotFound ? FALSE : ~FALSE);
 	return nCaptures;
 }
 
@@ -475,10 +475,11 @@ void CEditReplaceDlg::OnEditReplaceAll()
 			}
 		}
 	}
+	m_pBuddy->EnsureSelectionVisible(TRUE);
 	// Let user know how many strings were replaced
 	LanguageSelect.FormatStrings(
 		IDS_NUM_REPLACED, NumToStr(nNumReplaced).c_str()
-	).MsgBox(MB_ICONINFORMATION|MB_DONT_DISPLAY_AGAIN);
+	).MsgBox(MB_ICONINFORMATION | MB_DONT_DISPLAY_AGAIN);
 }
 
 void CEditReplaceDlg::OnRegExp()
@@ -495,9 +496,4 @@ void CEditReplaceDlg::UpdateControls()
 	GetDlgItem(IDC_EDIT_REPLACE)->EnableWindow(enable);
 	GetDlgItem(IDC_EDIT_REPLACE_ALL)->EnableWindow(enable);
 	UpdateRegExp();
-}
-
-void CEditReplaceDlg::SetScope(bool bWithSelection)
-{
-	m_nScope = bWithSelection ? 0 : 1;
 }

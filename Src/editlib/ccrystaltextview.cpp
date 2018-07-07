@@ -3062,21 +3062,15 @@ BOOL CCrystalTextView::HighlightText(
 	}
 	ASSERT_VALIDTEXTPOS(m_ptCursorPos); // Probably 'nLength' is bigger than expected...
 
-	m_ptCursorPos = bCursorToLeft ? ptStartPos : ptEndPos;
+	m_ptCursorPos = bCursorToLeft == TRUE ? ptStartPos : ptEndPos;
 	m_ptAnchor = m_ptCursorPos;
 	SetSelection(ptStartPos, ptEndPos);
 	UpdateCaret();
 
-	// Scrolls found text to middle of screen if out-of-screen
-	int nScreenLines = GetScreenLines();
-	if (ptStartPos.y < m_nTopLine || ptEndPos.y > m_nTopLine + nScreenLines)
-	{
-		if (ptStartPos.y > nScreenLines / 2)
-			ScrollToLine(ptStartPos.y - nScreenLines / 2);
-		else
-			ScrollToLine(ptStartPos.y);
-	}
-	EnsureSelectionVisible();
+	// Ternary logic: bCursorToLeft == ~FALSE prevents the view from scrolling
+	if (bCursorToLeft != ~FALSE)
+		EnsureSelectionVisible(TRUE);
+
 	return TRUE;
 }
 
@@ -3811,19 +3805,29 @@ LPCTSTR CCrystalTextView::GetTextBufferEol(int nLine) const
 }
 
 // This function assumes selection is in one line
-void CCrystalTextView::EnsureSelectionVisible()
+void CCrystalTextView::EnsureSelectionVisible(BOOL bCenter)
 {
 	// Scroll vertically
 	//BEGIN SW
-	int nSubLineCount = GetSubLineCount();
+	int const nScreenLines = GetScreenLines();
+	int const nSubLineCount = GetSubLineCount();
 	int nNewTopSubLine = m_nTopSubLine;
 	POINT subLinePos;
+
+	if (bCenter && (m_ptSelStart.y < m_nTopLine || m_ptSelEnd.y > m_nTopLine + nScreenLines))
+	{
+		// Scrolls selected text to middle of screen if out-of-screen
+		if (m_ptSelStart.y > nScreenLines / 2)
+			nNewTopSubLine = m_ptSelStart.y - nScreenLines / 2;
+		else
+			nNewTopSubLine = m_ptSelStart.y;
+	}
 
 	CharPosToPoint(m_ptSelStart.y, m_ptSelStart.x, subLinePos);
 	subLinePos.y += GetSubLineIndex(m_ptSelStart.y);
 
-	if (nNewTopSubLine <= subLinePos.y - GetScreenLines())
-		nNewTopSubLine = subLinePos.y - GetScreenLines() + 1;
+	if (nNewTopSubLine <= subLinePos.y - nScreenLines)
+		nNewTopSubLine = subLinePos.y - nScreenLines + 1;
 	if (nNewTopSubLine > subLinePos.y)
 		nNewTopSubLine = subLinePos.y;
 

@@ -50,12 +50,18 @@ private:
 	// Construction
 public:
 	CEditReplaceDlg(CCrystalEditView *pBuddy);
-	void SetScope(bool bWithSelection);
+
+	enum
+	{
+		SelectionScope,
+		WholeFileScope,
+	};
 
 	bool m_bEnableScopeSelection;
 	bool m_bConfirmed;
 	POINT m_ptCurrentPos;
-	POINT m_ptBlockBegin, m_ptBlockEnd;
+	POINT m_ptBlockBegin;
+	POINT m_ptBlockEnd;
 
 	BOOL m_bMatchCase;
 	BOOL m_bWholeWord;

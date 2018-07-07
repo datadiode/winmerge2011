@@ -584,7 +584,7 @@ public:
 
 	//  Operations
 	void EnsureCursorVisible();
-	void EnsureSelectionVisible();
+	void EnsureSelectionVisible(BOOL bCenter = FALSE);
 
 	//  Text search helpers
 	int FindText(LPCTSTR pszText, const POINT &ptStartPos,

@@ -851,7 +851,6 @@ void CCrystalEditView::OnEditReplace()
 		GetSelection(m_ptSavedSelStart, m_ptSavedSelEnd);
 		m_bSelectionPushed = TRUE;
 
-		dlg.SetScope(TRUE);       //  Replace in current selection
 		dlg.m_ptCurrentPos = m_ptSavedSelStart;
 		dlg.m_bEnableScopeSelection = TRUE;
 		dlg.m_ptBlockBegin = m_ptSavedSelStart;
@@ -860,10 +859,11 @@ void CCrystalEditView::OnEditReplace()
 		// If the selection is in one line, copy text to dialog
 		if (m_ptSavedSelStart.y == m_ptSavedSelEnd.y)
 			GetText(m_ptSavedSelStart, m_ptSavedSelEnd, dlg.m_sText);
+		else
+			dlg.m_nScope = dlg.SelectionScope;
 	}
 	else
 	{
-		dlg.SetScope(FALSE);      // Set scope when no selection
 		dlg.m_ptCurrentPos = GetCursorPos();
 		dlg.m_bEnableScopeSelection = FALSE;
 
