@@ -1196,6 +1196,9 @@
     <ClInclude Include="diffutils\lib\xalloc.h">
       <Filter>DiffEngine</Filter>
     </ClInclude>
+    <ClInclude Include="editlib\TextBlock.h">
+      <Filter>EditLib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Midl Include="WinMerge.idl">

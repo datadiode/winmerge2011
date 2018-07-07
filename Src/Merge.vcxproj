@@ -712,6 +712,7 @@
     <ClInclude Include="DirReportTypes.h" />
     <ClInclude Include="DirView.h" />
     <ClInclude Include="Common\DllProxies.h" />
+    <ClInclude Include="editlib\TextBlock.h" />
     <ClInclude Include="EditorFilepathBar.h" />
     <ClInclude Include="EncodingInfo.h" />
     <ClInclude Include="Environment.h" />
