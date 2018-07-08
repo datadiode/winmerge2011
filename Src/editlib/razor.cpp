@@ -129,7 +129,7 @@ void CCrystalTextBuffer::ParseLineRazor(TextBlock::Cookie &cookie, LPCTSTR const
 	DWORD dwScriptTagCookie = dwCookie & COOKIE_SCRIPT ? dwCookie & COOKIE_PARSER : 0;
 	int nIdentBegin = -1;
 	int nInlineNesting = 0;
-	pBuf.m_bRecording = nScriptBegin != -1 ? NULL : pBuf;
+	pBuf.m_bRecording = nScriptBegin != -1 ? NULL : &*pBuf;
 	do
 	{
 		int const nDecIndex = I++;

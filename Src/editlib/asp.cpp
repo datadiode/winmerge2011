@@ -80,7 +80,7 @@ void CCrystalTextBuffer::ParseLineAsp(TextBlock::Cookie &cookie, LPCTSTR const p
 	enum { False, Start, End } bWasComment = False;
 	DWORD dwScriptTagCookie = dwCookie & COOKIE_SCRIPT ? dwCookie & COOKIE_PARSER : 0;
 	int nIdentBegin = -1;
-	pBuf.m_bRecording = nScriptBegin != -1 ? NULL : pBuf;
+	pBuf.m_bRecording = nScriptBegin != -1 ? NULL : &*pBuf;
 	do
 	{
 		int const nPrevI = I++;

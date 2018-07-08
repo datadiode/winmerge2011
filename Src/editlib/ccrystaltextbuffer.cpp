@@ -1214,7 +1214,7 @@ TextBlock::Cookie CCrystalTextBuffer::GetParseCookie(int nLineIndex)
 	int L = GetParseCookieCount() - 1;
 	LineInfo const &li = m_aLines[nLineIndex < L ? nLineIndex : L];
 	TextBlock::Cookie cookie = li.m_cookie;
-	TextBlock::Array rBlocks = NULL;
+	TextBlock::Array rBlocks(NULL);
 	ASSERT(!cookie.Empty());
 	while (L < nLineIndex)
 	{

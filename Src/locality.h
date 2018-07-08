@@ -27,7 +27,7 @@ namespace locality
 		{
 			_ltot(n, out, r);
 		}
-		NumToLocaleStr(INT n)
+		explicit NumToLocaleStr(INT n)
 		{
 			TCHAR numbuff[24];
 			getLocaleStr(_ltot(n, numbuff, 10));
@@ -36,7 +36,7 @@ namespace locality
 		{
 			_i64tot(n, out, r);
 		}
-		NumToLocaleStr(INT64 n)
+		explicit NumToLocaleStr(INT64 n)
 		{
 			TCHAR numbuff[24];
 			getLocaleStr(_i64tot(n, numbuff, 10));
@@ -45,7 +45,7 @@ namespace locality
 		{
 			_ultot(n, out, r);
 		}
-		NumToLocaleStr(UINT n)
+		explicit NumToLocaleStr(UINT n)
 		{
 			TCHAR numbuff[24];
 			getLocaleStr(_ultot(n, numbuff, 10));
@@ -54,7 +54,7 @@ namespace locality
 		{
 			_ui64tot(n, out, r);
 		}
-		NumToLocaleStr(UINT64 n)
+		explicit NumToLocaleStr(UINT64 n)
 		{
 			TCHAR numbuff[24];
 			getLocaleStr(_ui64tot(n, numbuff, 10));

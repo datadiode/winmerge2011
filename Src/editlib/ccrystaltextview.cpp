@@ -1082,7 +1082,7 @@ void CCrystalTextView::MergeTextBlocks(TextBlock::Array &pBuf1, TextBlock::Array
 {
 	int const nBlocks1 = pBuf1.m_nActualItems;
 	int const nBlocks2 = pBuf2.m_nActualItems;
-	TextBlock::Array pMergedBuf = new TextBlock[nBlocks1 + nBlocks2];
+	TextBlock::Array pMergedBuf(new TextBlock[nBlocks1 + nBlocks2]);
 	int i = 0, j = 0, k = 0;
 	while (i < nBlocks1 || j < nBlocks2)
 	{
@@ -1154,7 +1154,7 @@ bool CCrystalTextView::DrawSingleLine(HSurface *pdc, const RECT &rc, int nLineIn
 		int const nLength = GetViewableLineLength(nLineIndex);
 
 		// Parse the line
-		TextBlock::Array pBuf = new TextBlock[(nLength + 1) * 3]; // be aware of nLength == 0
+		TextBlock::Array pBuf(new TextBlock[(nLength + 1) * 3]); // be aware of nLength == 0
 		// insert at least one textblock of normal color at the beginning
 		pBuf[0].m_nCharPos = 0;
 		pBuf[0].m_nColorIndex = COLORINDEX_NORMALTEXT;
@@ -1162,7 +1162,7 @@ bool CCrystalTextView::DrawSingleLine(HSurface *pdc, const RECT &rc, int nLineIn
 		++pBuf.m_nActualItems;
 		m_pTextBuffer->ParseLine(m_pTextBuffer->GetParseCookie(nLineIndex), nLineIndex, pBuf);
 
-		TextBlock::Array pAddedBuf = NULL;
+		TextBlock::Array pAddedBuf(NULL);
 		GetAdditionalTextBlocks(nLineIndex, pAddedBuf);
 		MergeTextBlocks(pBuf, pAddedBuf);
 
@@ -1344,7 +1344,7 @@ void CCrystalTextView::GetHTMLLine(int nLineIndex, String &strHTML)
 		int const nLength = GetViewableLineLength(nLineIndex);
 
 		// Parse the line
-		TextBlock::Array pBuf = new TextBlock[(nLength + 1) * 3]; // be aware of nLength == 0
+		TextBlock::Array pBuf(new TextBlock[(nLength + 1) * 3]); // be aware of nLength == 0
 		// insert at least one textblock of normal color at the beginning
 		pBuf[0].m_nCharPos = 0;
 		pBuf[0].m_nColorIndex = COLORINDEX_NORMALTEXT;
@@ -1352,7 +1352,7 @@ void CCrystalTextView::GetHTMLLine(int nLineIndex, String &strHTML)
 		++pBuf.m_nActualItems;
 		m_pTextBuffer->ParseLine(m_pTextBuffer->GetParseCookie(nLineIndex), nLineIndex, pBuf);
 
-		TextBlock::Array pAddedBuf = NULL;
+		TextBlock::Array pAddedBuf(NULL);
 		GetAdditionalTextBlocks(nLineIndex, pAddedBuf);
 		MergeTextBlocks(pBuf, pAddedBuf);
 

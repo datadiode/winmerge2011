@@ -28,7 +28,7 @@ public:
 	public:
 		void const *m_bRecording;
 		int m_nActualItems;
-		Array(TextBlock *pBuf)
+		explicit Array(TextBlock *pBuf)
 			: m_pBuf(pBuf), m_bRecording(m_pBuf), m_nActualItems(0)
 		{ }
 		~Array() { delete[] m_pBuf; }
@@ -58,7 +58,7 @@ public:
 	class Cookie
 	{
 	public:
-		Cookie(DWORD dwCookie = -1)
+		explicit Cookie(DWORD dwCookie = -1)
 			: m_dwCookie(dwCookie), m_dwNesting(0)
 		{ }
 		void Clear()
