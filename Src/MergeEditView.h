@@ -85,7 +85,6 @@ public:
 	void ShowDiff(bool bScroll);
 	virtual void OnEditOperation(int nAction, LPCTSTR pszText, int cchText);
 	virtual void OnUpdateCaret(bool bShowHide = false);
-	void UpdateLineLengths();
 	virtual bool IsLineInCurrentDiff(int);
 	void SelectNone();
 	void SelectDiff(int nDiff, bool bScroll = true);

@@ -500,15 +500,6 @@ void CMergeEditView::OnLButtonUp()
 }
 
 /**
- * @brief Finds longest line (needed for scrolling etc).
- * @sa CCrystalTextView::GetMaxLineLength()
- */
-void CMergeEditView::UpdateLineLengths()
-{
-	GetMaxLineLength();
-}
-
-/**
  * @brief This function is called before other edit events.
  * @param [in] nAction Edit operation to do
  * @param [in] pszText Text to insert, delete etc
