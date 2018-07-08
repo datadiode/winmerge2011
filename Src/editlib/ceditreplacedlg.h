@@ -49,7 +49,7 @@ private:
 
 	// Construction
 public:
-	CEditReplaceDlg(CCrystalEditView *pBuddy);
+	explicit CEditReplaceDlg(CCrystalEditView *);
 
 	enum
 	{

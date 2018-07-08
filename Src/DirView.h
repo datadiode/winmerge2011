@@ -82,7 +82,7 @@ class CDirView
 	friend CDirFrame;
 	friend DirCmpReport;
 public:
-	CDirView(CDirFrame *);           // protected constructor used by dynamic creation
+	explicit CDirView(CDirFrame *);
 	virtual ~CDirView();
 
 // Operations

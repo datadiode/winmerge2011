@@ -23,7 +23,7 @@
 class FileOperationsDlg : public ODialog
 {
 public:
-	FileOperationsDlg(SHFILEOPSTRUCT &);
+	explicit FileOperationsDlg(SHFILEOPSTRUCT &);
 	~FileOperationsDlg();
 
 private:
@@ -73,7 +73,7 @@ private:
 	{
 		CRITICAL_SECTION *const p;
 	public:
-		AutoLock(CRITICAL_SECTION *p): p(p) { EnterCriticalSection(p); }
+		explicit AutoLock(CRITICAL_SECTION *p): p(p) { EnterCriticalSection(p); }
 		~AutoLock() { LeaveCriticalSection(p); }
 	};
 
@@ -81,7 +81,7 @@ private:
 	{
 		HANDLE const h;
 	public:
-		AutoWait(HANDLE h): h(h) { }
+		explicit AutoWait(HANDLE h): h(h) { }
 		~AutoWait() { WaitForSingleObject(h, INFINITE); }
 	};
 

@@ -87,8 +87,8 @@ void CDiffContext::LoadFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *fil
 			OException::Throw(tool.c_str());
 		}
 		defer::CloseHandle<2> CloseHandle = { hProcess, hReadPipe };
-		HandleReadStream stream = hReadPipe;
-		StreamLineReader reader = &stream;
+		HandleReadStream stream(hReadPipe);
+		StreamLineReader reader(&stream);
 		int state = 0;
 		std::string head;
 		std::string line;

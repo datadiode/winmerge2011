@@ -604,8 +604,8 @@ public:
 	virtual void OnEditOperation(int nAction, LPCTSTR pszText, int cchText) = 0;
 
 public:
-	CCrystalTextView(size_t);
-	~CCrystalTextView();
+	explicit CCrystalTextView(size_t);
+	virtual ~CCrystalTextView();
 #ifdef _DEBUG
 	void AssertValidTextPos(POINT const &) const;
 #endif

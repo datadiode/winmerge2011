@@ -3436,8 +3436,8 @@ int CMainFrame::RunTool(LPCTSTR tool, LPCTSTR args, LPCTSTR path, UINT id, UINT 
 	{
 		defer::CloseHandle<2> CloseHandle = { hProcess, hReadPipe };
 		prompt = LanguageSelect.LoadString(id) + _T("\n\n");
-		HandleReadStream stream = hReadPipe;
-		StreamLineReader reader = &stream;
+		HandleReadStream stream(hReadPipe);
+		StreamLineReader reader(&stream);
 		std::string line;
 		while (std::string::size_type size = reader.readLine(line))
 		{

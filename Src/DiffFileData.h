@@ -18,7 +18,7 @@ struct DiffFileData : comparison
 {
 // instance interface
 
-	DiffFileData(int codepage);
+	explicit DiffFileData(int codepage);
 	~DiffFileData();
 
 	bool OpenFiles(LPCTSTR szFilepath1, LPCTSTR szFilepath2);

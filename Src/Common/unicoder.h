@@ -29,16 +29,16 @@ namespace ucr
 	 */
 	struct buffer
 	{
-		unsigned char * ptr; /**< Pointer to a buffer. */
+		unsigned char *ptr; /**< Pointer to a buffer. */
 		unsigned int capacity; /**< Buffer's size in bytes. */
 		unsigned int size; /**< Size of the data in the buffer, <= capacity. */
 
-		buffer(unsigned int initialSize);
+		explicit buffer(unsigned int initialSize);
 		~buffer();
 		void resize(unsigned int newSize);
 	};
 
-	unsigned int get_unicode_char(unsigned char * ptr, UNICODESET unicoding, int codepage = 0);
+	unsigned int get_unicode_char(unsigned char *ptr, UNICODESET unicoding, int codepage = 0);
 	void maketstring(String &str, const char *lpd, int len, int codepage, bool *lossy);
 	unsigned int byteToUnicode(unsigned char ch, unsigned int codepage);
 

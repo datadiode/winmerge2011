@@ -71,8 +71,8 @@ protected:
 	void DeleteCurrentSelection();
 
 public:
-    CCrystalEditView(size_t);
-    ~CCrystalEditView();
+    explicit CCrystalEditView(size_t);
+    virtual ~CCrystalEditView();
 
 	bool GetOverwriteMode() const { return m_bOvrMode; }
 	void SetOverwriteMode(bool bOvrMode = TRUE) { m_bOvrMode = bOvrMode; }

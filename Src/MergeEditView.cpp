@@ -1127,7 +1127,7 @@ HMenu *CMergeEditView::ApplyPatch(IStream *pstm, int id)
 	IStream_Reset(pstm);
 	HMenu *pMenu = id ? NULL : HMenu::CreatePopupMenu();
 	CDiffTextBuffer *const pTextBuffer = GetTextBuffer();
-	StreamLineReader reader = pstm;
+	StreamLineReader reader(pstm);
 	std::string line;
 	OString text = NULL;
 	unsigned pos1, len1, pos2, len2;

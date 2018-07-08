@@ -32,7 +32,7 @@ class HandleReadStream : public SequentialReadStream
 {
 	HANDLE const handle;
 public:
-	HandleReadStream(HANDLE handle)
+	explicit HandleReadStream(HANDLE handle)
 		: handle(handle)
 	{
 	}
@@ -94,7 +94,7 @@ private:
 class HtmWriteStream : public SequentialWriteStream
 {
 public:
-	HtmWriteStream(IHTMLDocument2 *pDocument)
+	explicit HtmWriteStream(IHTMLDocument2 *pDocument)
 		: m_pDocument(pDocument)
 		, m_psa(SafeArrayCreateVector(VT_VARIANT, 0, 1))
 	{
@@ -124,7 +124,7 @@ class StreamLineReader
 	ULONG ahead;
 	char chunk[256];
 public:
-	StreamLineReader(ISequentialStream *pstm)
+	explicit StreamLineReader(ISequentialStream *pstm)
 		: pstm(pstm), index(0), ahead(0)
 	{
 	}

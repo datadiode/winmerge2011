@@ -366,7 +366,7 @@ void PropVss::WriteOptions()
 			}
 			// Leave the whole bunch of rules not referring to WinMerge as is.
 			std::string line;
-			StreamLineReader reader = src;
+			StreamLineReader reader(src);
 			while (reader.readLine(line))
 			{
 				NClearCase::CTypeMgrMapRule rule;
@@ -424,7 +424,7 @@ BOOL PropVss::OnInitDialog()
 	if (NClearCase::CTypeMgrMapStream pstm = STGM_READ | STGM_SHARE_DENY_WRITE)
 	{
 		std::string line;
-		StreamLineReader reader = pstm;
+		StreamLineReader reader(pstm);
 		DWORD verbs = NClearCase::none;
 		while (reader.readLine(line))
 		{

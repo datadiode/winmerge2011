@@ -47,7 +47,7 @@ private:
 
 	// Construction
 public:
-	CFindTextDlg(CCrystalTextView *pBuddy);
+	explicit CFindTextDlg(CCrystalTextView *);
 
 	POINT m_ptCurrentPos;
 	bool m_bConfirmed;
