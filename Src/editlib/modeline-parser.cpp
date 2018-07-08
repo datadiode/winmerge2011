@@ -517,7 +517,7 @@ modeline_parser_apply_modeline (CCrystalTextView *view)
 	
 	if (has_option (&options, MODELINE_SET_TAB_WIDTH))
 	{
-		buffer->SetTabSize(options.tab_width, buffer->GetSeparateCombinedChars());
+		buffer->SetTabSize(min(options.tab_width, 64U), buffer->GetSeparateCombinedChars());
 	}
 	
 	/*if (has_option (&options, MODELINE_SET_INDENT_WIDTH))
