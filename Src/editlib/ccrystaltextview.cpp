@@ -532,7 +532,7 @@ int CCrystalTextView::ExpandChars(LPCTSTR pszChars, int nOffset, int nCount, Str
 			else
 			{
 				line.push_back(c);
-				nCurPos += GetCharWidthFromChar(pszChars + i);
+				nCurPos += m_pTextBuffer->GetCharWidthFromChar(pszChars + i);
 			}
 		}
 	}
@@ -542,46 +542,10 @@ int CCrystalTextView::ExpandChars(LPCTSTR pszChars, int nOffset, int nCount, Str
 		{
 			TCHAR c = pszChars[i];
 			line.push_back(c);
-			nCurPos += GetCharWidthFromChar(pszChars + i);
+			nCurPos += m_pTextBuffer->GetCharWidthFromChar(pszChars + i);
 		}
 	}
 	return nCurPos;
-}
-
-/**
- * @brief Return width of specified character
- */
-int CCrystalTextView::GetCharWidthFromChar(LPCTSTR pch) const
-{
-	UINT ch = *pch;
-	if (ch >= _T('\x00') && ch <= _T('\x1F') && ch != _T('\t') && ch != _T('\r') && ch != _T('\n'))
-		return 3;
-
-	if (ch >= UNI_SUR_LOW_START && ch <= UNI_SUR_LOW_END)
-		return 0;
-
-	if (ch >= UNI_SUR_HIGH_START && ch <= UNI_SUR_HIGH_END)
-	{
-		/* If the 16 bits following the high surrogate are in the source buffer... */
-		UINT ch2 = *++pch;
-		/* If it's a low surrogate, convert to UTF32. */
-		if (ch2 >= UNI_SUR_LOW_START && ch2 <= UNI_SUR_LOW_END)
-		{
-			ch = ((ch - UNI_SUR_HIGH_START) << 10) + (ch2 - UNI_SUR_LOW_START) + 0x10000;
-		}
-		else
-		{
-			ch = '?';
-		}
-	}
-	/*if (ch >= UNI_SUR_MIN && ch <= UNI_SUR_MAX)
-		return 5;*/
-	// This assumes a fixed width font
-	// But the UNICODE case handles double-wide glyphs (primarily Chinese characters)
-	int wcwidth = mk_wcwidth(ch);
-	if (wcwidth < (m_bSeparateCombinedChars ? 1 : 0))
-		wcwidth = 1; // applies to 8-bit control characters in range 0x7F..0x9F
-	return wcwidth;
 }
 
 /**
@@ -593,7 +557,7 @@ int CCrystalTextView::GetCharWidthFromDisplayableChar(LPCTSTR pch) const
 {
 	if (*pch == _T(' ') && m_bViewTabs)
 		pch = &ViewableWhitespaceChars::c_space;
-	return GetCharWidthFromChar(pch);
+	return m_pTextBuffer->GetCharWidthFromChar(pch);
 }
 
 /**
@@ -612,7 +576,7 @@ void CCrystalTextView::DrawLineHelperImpl(
 	nActualOffset += ExpandChars(pszChars, nOffset, nCount, line, nActualOffset);
 	// When not separating combined characters, assume at most 5 characters per
 	// combination, and go with the risk of visual glitches when proved wrong.
-	int const nMaxCombinings = m_bSeparateCombinedChars ? 1 : 5;
+	int const nMaxCombinings = m_pTextBuffer->GetSeparateCombinedChars() ? 1 : 5;
 	int const nMaxEscapement = 2;
 	// TODO: When implementing fallback to %04X format, set nMaxEscapement to 4.
 	LPCTSTR const szLine = line.c_str();
@@ -639,7 +603,7 @@ void CCrystalTextView::DrawLineHelperImpl(
 		for ( ; i < nLength; ++i)
 		{
 			int pnWidthsCurrent = szLine[i] < _T('\t') ?
-				nCharWidth : nCharWidth * GetCharWidthFromChar(szLine + i);
+				nCharWidth : nCharWidth * m_pTextBuffer->GetCharWidthFromChar(szLine + i);
 			ptOrigin.x += pnWidthsCurrent;
 			if (ptOrigin.x >= clipLeft)
 			{
@@ -696,7 +660,7 @@ void CCrystalTextView::DrawLineHelperImpl(
 				}*/
 				else
 				{
-					nSumWidth += pnWidths[i - iBegin] = nCharWidth * GetCharWidthFromChar(szLine + i);
+					nSumWidth += pnWidths[i - iBegin] = nCharWidth * m_pTextBuffer->GetCharWidthFromChar(szLine + i);
 				}
 				++i;
 			}
@@ -766,7 +730,7 @@ void CCrystalTextView::DrawLineHelperImpl(
 	for ( ; i < nLength; ++i)
 	{
 		ptOrigin.x += szLine[i] < _T('\t') ?
-			nCharWidth : nCharWidth * GetCharWidthFromChar(szLine + i);
+			nCharWidth : nCharWidth * m_pTextBuffer->GetCharWidthFromChar(szLine + i);
 	}
 }
 
@@ -872,7 +836,7 @@ void CCrystalTextView::WrapLine(int nLineIndex, int *anBreaks, int &nBreaks)
 		// increment char counter (evtl. expand tab)
 		int nIncrement = szLine[i] == _T('\t') ?
 			nTabWidth - nCharCount % nTabWidth :
-			GetCharWidthFromChar(szLine + i);
+			m_pTextBuffer->GetCharWidthFromChar(szLine + i);
 		nLineCharCount += nIncrement;
 		nCharCount += nIncrement;
 
@@ -1607,7 +1571,6 @@ void CCrystalTextView::ResetView()
 	m_nOffsetChar = 0;
 	m_nLineHeight = -1;
 	m_nCharWidth = -1;
-	m_nMaxLineLength = -1;
 	m_nScreenLines = INT_MIN;
 	m_nScreenChars = INT_MIN;
 	m_nIdealCharPos = -1;
@@ -1655,7 +1618,7 @@ void CCrystalTextView::UpdateCaret(bool bShowHide)
 				if (LPCTSTR pch = GetLineChars(m_ptCursorPos.y))
 				{
 					pch += m_ptCursorPos.x;
-					nWidth = GetCharWidth() * GetCharWidthFromChar(pch);
+					nWidth = GetCharWidth() * m_pTextBuffer->GetCharWidthFromChar(pch);
 					if (*pch == _T('\t'))
 					{
 						int nTabSize = GetTabSize();
@@ -1675,10 +1638,6 @@ void CCrystalTextView::UpdateCaret(bool bShowHide)
 	HideCaret();
 }
 
-void CCrystalTextView::OnUpdateCaret(bool)
-{
-}
-
 int CCrystalTextView::GetTabSize() const
 {
 	return m_pTextBuffer ? m_pTextBuffer->GetTabSize() : 4;
@@ -1686,7 +1645,7 @@ int CCrystalTextView::GetTabSize() const
 
 bool CCrystalTextView::GetSeparateCombinedChars() const
 {
-	return m_bSeparateCombinedChars;
+	return m_pTextBuffer ? m_pTextBuffer->GetSeparateCombinedChars() : false;
 }
 
 void CCrystalTextView::SetTabSize(int nTabSize, bool bSeparateCombinedChars)
@@ -1694,16 +1653,7 @@ void CCrystalTextView::SetTabSize(int nTabSize, bool bSeparateCombinedChars)
 	ASSERT(nTabSize >= 0 && nTabSize <= 64);
 	if (m_pTextBuffer == NULL)
 		return;
-	if (m_pTextBuffer->GetTabSize() != nTabSize ||
-		m_bSeparateCombinedChars != bSeparateCombinedChars)
-	{
-		m_pTextBuffer->SetTabSize(nTabSize);
-		m_bSeparateCombinedChars = bSeparateCombinedChars;
-		m_nMaxLineLength = -1;
-		RecalcHorzScrollBar();
-		Invalidate();
-		UpdateCaret();
-	}
+	m_pTextBuffer->SetTabSize(nTabSize, bSeparateCombinedChars);
 }
 
 HFont *CCrystalTextView::GetFont(int nColorIndex)
@@ -1963,20 +1913,9 @@ int CCrystalTextView::GetCharWidth()
 	return m_nCharWidth;
 }
 
-int CCrystalTextView::GetMaxLineLength()
+int CCrystalTextView::GetMaxLineLength(bool bRecalc)
 {
-	if (m_nMaxLineLength == -1)
-	{
-		m_nMaxLineLength = 0;
-		int const nLineCount = GetLineCount ();
-		for (int i = 0; i < nLineCount; ++i)
-		{
-			int const nActualLength = m_pTextBuffer->GetLineActualLength(i);
-			if (m_nMaxLineLength < nActualLength)
-				m_nMaxLineLength = nActualLength;
-		}
-	}
-	return m_nMaxLineLength;
+	return m_pTextBuffer ? m_pTextBuffer->GetMaxLineLength(bRecalc) : 0;
 }
 
 void CCrystalTextView::GoToLine(int nLine, bool bRelative)
@@ -2355,7 +2294,7 @@ int CCrystalTextView::RecalcHorzScrollBar(bool bPositionOnly)
 				si.nPage = pSiblingView->GetScreenChars();
 				si.nMin = 0;
 				// Horiz scroll limit to longest line + one screenwidth 
-				si.nMax = pSiblingView->GetMaxLineLength() + si.nPage;
+				si.nMax = pSiblingView->GetMaxLineLength(true) + si.nPage;
 			}
 			si.nPos = pSiblingView->m_nOffsetChar;
 			pSiblingView->SetScrollInfo(SB_HORZ, &si);
@@ -2852,7 +2791,6 @@ void CCrystalTextView::UpdateView(CCrystalTextView *pSource, CUpdateContext *pCo
 	// Recalculate horizontal scrollbar, if needed
 	if ((dwFlags & UPDATE_HORZRANGE) != 0)
 	{
-		m_nMaxLineLength = -1;
 		RecalcHorzScrollBar();
 	}
 }
@@ -3792,6 +3730,8 @@ bool CCrystalTextView::GetWordWrapping() const
 
 void CCrystalTextView::SetWordWrapping(bool bWordWrap)
 {
+	if (m_bWordWrap == bWordWrap)
+		return;
 	m_bWordWrap = bWordWrap;
 	if (m_hWnd)
 	{

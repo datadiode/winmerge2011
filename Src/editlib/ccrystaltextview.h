@@ -115,7 +115,6 @@ private:
 	bool m_bDistinguishEols;
 	bool m_bSelMargin;
 	bool m_bViewLineNumbers;
-	bool m_bSeparateCombinedChars;
 
 	CSyntaxColors *m_pColors;
 
@@ -133,7 +132,6 @@ private:
 	int m_nLastLineIndexCalculatedSubLineIndex;
 	//END SW
 
-	int m_nMaxLineLength;
 	int m_nIdealCharPos;
 
 protected:
@@ -203,7 +201,7 @@ public:
 	
 	int GetLineCount() const;
 	virtual int ComputeRealLine(int nApparentLine) const;
-	virtual void OnUpdateCaret(bool bShowHide);
+	virtual void OnUpdateCaret(bool bShowHide) = 0;
 	LPCTSTR GetTextBufferEol(int nLine) const;
 
 	CSyntaxColors *GetSyntaxColors() const { return m_pColors; }
@@ -347,7 +345,7 @@ protected:
 	int SubLineHomeToCharPos(int nLineIndex, int nSubLineOffset);
 	//END SW
 	int GetCharWidth();
-	int GetMaxLineLength();
+	int GetMaxLineLength(bool bRecalc = false);
 	int GetScreenLines();
 	int GetScreenChars();
 	HFont *GetFont(int nColorIndex = 0);
@@ -438,7 +436,6 @@ protected:
 	virtual bool DrawSingleLine(HSurface *, const RECT &, int nLineIndex);
 	virtual void DrawMargin(HSurface *, const RECT &, int nLineIndex, int nLineNumber);
 
-	int GetCharWidthFromChar(LPCTSTR) const;
 	int GetCharWidthFromDisplayableChar(LPCTSTR) const;
 
 	void AdjustCursorAfterMoveLeft();

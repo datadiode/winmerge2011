@@ -669,6 +669,9 @@
     <ClCompile Include="editlib\lua.cpp">
       <Filter>EditLib</Filter>
     </ClCompile>
+    <ClCompile Include="editlib\modeline-parser.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\WindowPlacement.h">
@@ -1197,6 +1200,9 @@
       <Filter>DiffEngine</Filter>
     </ClInclude>
     <ClInclude Include="editlib\TextBlock.h">
+      <Filter>EditLib</Filter>
+    </ClInclude>
+    <ClInclude Include="editlib\modeline-parser.h">
       <Filter>EditLib</Filter>
     </ClInclude>
   </ItemGroup>

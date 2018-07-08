@@ -403,13 +403,19 @@ int CChildFrame::Rescan2(bool &bIdentical)
 	int nBuffer;
 
 	bool bUnicode = false;
+	int nTabSize = m_ptBuf[0]->GetTabSize();
 	for (nBuffer = 0; nBuffer < m_nBuffers; nBuffer++)
+	{
 		if (m_ptBuf[nBuffer]->getUnicoding() != NONE)
 			bUnicode = true;
+		if (m_ptBuf[nBuffer]->GetTabSize() != nTabSize)
+			nTabSize = 0;
+	}
 
 	// Set paths for diffing and run diff
 	m_diffWrapper.SetCompareFiles(m_strPath[0], m_strPath[1]);
 	m_diffWrapper.SetCodepage(bUnicode ? CP_UTF8 : m_ptBuf[0]->m_encoding.m_codepage);
+	m_diffWrapper.nTabSize = nTabSize ? nTabSize : COptionsMgr::Get(OPT_TAB_SIZE);
 
 	int nResult = RESCAN_FILE_ERR;
 	bool diffSuccess = false;

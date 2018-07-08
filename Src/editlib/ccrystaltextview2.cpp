@@ -55,17 +55,21 @@
 
 void CCrystalTextView::AdjustCursorAfterMoveLeft()
 {
-	LPCTSTR pszChars = GetLineChars(m_ptCursorPos.y);
-	while (m_ptCursorPos.x > 0 && GetCharWidthFromChar(pszChars + m_ptCursorPos.x) == 0)
-		--m_ptCursorPos.x;
+	if (LPCTSTR const pszChars = GetLineChars(m_ptCursorPos.y))
+	{
+		while (m_ptCursorPos.x > 0 && m_pTextBuffer->GetCharWidthFromChar(pszChars + m_ptCursorPos.x) == 0)
+			--m_ptCursorPos.x;
+	}
 }
 
 void CCrystalTextView::AdjustCursorAfterMoveRight()
 {
-	const int nLength = GetLineLength(m_ptCursorPos.y);
-	const LPCTSTR pszChars = GetLineChars(m_ptCursorPos.y);
-	while (m_ptCursorPos.x < nLength && GetCharWidthFromChar(pszChars + m_ptCursorPos.x) == 0)
-		++m_ptCursorPos.x;
+	if (LPCTSTR const pszChars = GetLineChars(m_ptCursorPos.y))
+	{
+		int const nLength = GetLineLength(m_ptCursorPos.y);
+		while (m_ptCursorPos.x < nLength && m_pTextBuffer->GetCharWidthFromChar(pszChars + m_ptCursorPos.x) == 0)
+			++m_ptCursorPos.x;
+	}
 }
 
 void CCrystalTextView::MoveLeft(BOOL bSelect)

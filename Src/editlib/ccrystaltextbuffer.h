@@ -124,13 +124,17 @@ public:
 	DWORD m_dwRevisionNumberOnSave;
 
 protected:
+#ifdef _DEBUG
 	bool m_bInit;
+#endif
 	bool m_bReadOnly;
 	bool m_bModified;
 	bool m_bInsertTabs;
+	bool m_bSeparateCombinedChars;
 	CRLFSTYLE m_nCRLFMode;
 	DWORD m_dwFlags;
 	int m_nTabSize;
+	int m_nMaxLineLength;
 	int m_nParseCookieCount;
 
 	enum
@@ -286,9 +290,12 @@ public:
 
 	// Tabbing
 	int GetTabSize() const;
-	void SetTabSize(int nTabSize);
+	bool GetSeparateCombinedChars() const;
+	void SetTabSize(int nTabSize, bool bSeparateCombinedChars);
 
+	int GetCharWidthFromChar(LPCTSTR pch) const;
 	int GetLineActualLength(int nLineIndex);
+	int GetMaxLineLength(bool bRecalc);
 
 	// More bookmarks
 	int FindNextBookmarkLine(int nCurrentLine, int nDirection) const;

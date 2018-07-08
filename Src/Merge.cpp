@@ -33,6 +33,7 @@
 #include "coretools.h"
 #include "paths.h"
 #include "LanguageSelect.h"
+#include "editlib/modeline-parser.h"
 
 // For shutdown cleanup
 #include "codepage_detect.h"
@@ -297,6 +298,8 @@ int CMergeApp::ExitInstance(HRESULT hr)
 {
 	if (hr == S_OK)
 	{
+		// Shutdown modelines support
+		modeline_parser_shutdown();
 		// Deallocate custom parser associations
 		CCrystalTextBuffer::FreeParserAssociations();
 		CCrystalTextView::FreeSharedResources();
@@ -426,6 +429,8 @@ void CMergeApp::InitializeSupplements()
 			_T("vcxproj = script:\\FileTransforms\\msxml.wsc?transform='\\FileTransforms\\msxml-sort.xslt'\0");
 		WritePrivateProfileSection(_T("FileTransforms"), buffer, ini.c_str());
 	}
+	// Initialize modelines support
+	modeline_parser_init(ini.c_str());
 }
 
 /**

@@ -64,7 +64,7 @@
 #include "coretools.h"
 #include "VersionData.h"
 #include <pcre.h>
-#include <mbctype.h>
+#include "wcwidth.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -128,7 +128,9 @@ void CCrystalTextBuffer::CDeleteContext::RecalcPoint(POINT & ptPoint)
 
 CCrystalTextBuffer::CCrystalTextBuffer()
 {
+#ifdef _DEBUG
 	m_bInit = false;
+#endif
 	m_bReadOnly = false;
 	m_bModified = false;
 	m_nCRLFMode = CRLF_STYLE_DOS;
@@ -136,6 +138,7 @@ CCrystalTextBuffer::CCrystalTextBuffer()
 	m_bUndoGroup = m_bUndoBeginGroup = FALSE;
 	m_bInsertTabs = true;
 	m_nTabSize = 4;
+	m_bSeparateCombinedChars = false;
 	m_nParseCookieCount = 0;
 	//BEGIN SW
 	m_ptLastChange.x = m_ptLastChange.y = -1;
@@ -237,7 +240,9 @@ void CCrystalTextBuffer::FreeAll()
 	// Free text
 	std::for_each(m_aLines.begin(), m_aLines.end(), std::mem_fun_ref(&LineInfo::Clear));
 	m_aLines.clear();
+#ifdef _DEBUG
 	m_bInit = false;
+#endif
 	//BEGIN SW
 	m_ptLastChange.x = m_ptLastChange.y = -1;
 	//END SW
@@ -249,7 +254,9 @@ BOOL CCrystalTextBuffer::InitNew(CRLFSTYLE nCrlfStyle)
 	ASSERT(m_aLines.size() == 0);
 	ASSERT(nCrlfStyle >= 0 && nCrlfStyle <= 2);
 	InsertLine(NULL, 0);
+#ifdef _DEBUG
 	m_bInit = true;
+#endif
 	m_bReadOnly = false;
 	m_nCRLFMode = nCrlfStyle;
 	m_bModified = false;
@@ -937,13 +944,58 @@ int CCrystalTextBuffer::GetTabSize() const
 	return m_nTabSize;
 }
 
-void CCrystalTextBuffer::SetTabSize(int nTabSize)
+bool CCrystalTextBuffer::GetSeparateCombinedChars() const
+{
+	return m_bSeparateCombinedChars;
+}
+
+void CCrystalTextBuffer::SetTabSize(int nTabSize, bool bSeparateCombinedChars)
 {
 	ASSERT(nTabSize >= 0 && nTabSize <= 64);
 	m_nTabSize = nTabSize;
+	m_bSeparateCombinedChars = bSeparateCombinedChars;
+	m_nMaxLineLength = -1;
 	int const nLineCount = GetLineCount();
 	for (int nLineIndex = 0; nLineIndex < nLineCount; ++nLineIndex)
-		m_aLines[nLineIndex].m_nActualLineLength = 0;
+		m_aLines[nLineIndex].m_nActualLineLength = -1;
+}
+
+/**
+ * @brief Return width of specified character
+ */
+int CCrystalTextBuffer::GetCharWidthFromChar(LPCTSTR pch) const
+{
+	UINT ch = *pch;
+	ASSERT(ch != _T('\t') && ch != _T('\r') && ch != _T('\n'));
+
+	if (ch >= _T('\x00') && ch <= _T('\x1F'))
+		return 3;
+
+	if (ch >= UNI_SUR_LOW_START && ch <= UNI_SUR_LOW_END)
+		return 0;
+
+	if (ch >= UNI_SUR_HIGH_START && ch <= UNI_SUR_HIGH_END)
+	{
+		/* If the 16 bits following the high surrogate are in the source buffer... */
+		UINT ch2 = *++pch;
+		/* If it's a low surrogate, convert to UTF32. */
+		if (ch2 >= UNI_SUR_LOW_START && ch2 <= UNI_SUR_LOW_END)
+		{
+			ch = ((ch - UNI_SUR_HIGH_START) << 10) + (ch2 - UNI_SUR_LOW_START) + 0x10000;
+		}
+		else
+		{
+			ch = '?';
+		}
+	}
+	/*if (ch >= UNI_SUR_MIN && ch <= UNI_SUR_MAX)
+		return 5;*/
+	// This assumes a fixed width font
+	// But the UNICODE case handles double-wide glyphs (primarily Chinese characters)
+	int wcwidth = mk_wcwidth(ch);
+	if (wcwidth < (m_bSeparateCombinedChars ? 1 : 0))
+		wcwidth = 1; // applies to 8-bit control characters in range 0x7F..0x9F
+	return wcwidth;
 }
 
 /**
@@ -964,11 +1016,12 @@ int CCrystalTextBuffer::GetLineActualLength(int nLineIndex)
 {
 	LineInfo &li = m_aLines[nLineIndex];
 
-	// Actual line length is not determined yet, let's calculate a little
 	int nActualLength = li.m_nActualLineLength;
-	int const nLength = GetLineLength(nLineIndex);
-	if (nLength > nActualLength)
+	if (nActualLength == -1)
 	{
+		// Actual line length is not determined yet, let's calculate a little
+		nActualLength = 0;
+		int const nLength = GetLineLength(nLineIndex);
 		LPCTSTR const pszChars = GetLineChars(nLineIndex);
 		int const nTabSize = GetTabSize();
 		for (int i = 0; i < nLength; i++)
@@ -977,17 +1030,28 @@ int CCrystalTextBuffer::GetLineActualLength(int nLineIndex)
 			ASSERT(c != _T('\r') && c != _T('\n'));
 			if (c == _T('\t'))
 				nActualLength += (nTabSize - nActualLength % nTabSize);
-			else if (c >= _T('\x00') && c <= _T('\x1F') && c != _T('\r') && c != _T('\n'))
-				nActualLength += 3;
-			/*else if (c >= UNI_SUR_MIN && c <= UNI_SUR_MAX)
-				nActualLength += 5;*/
 			else
-				nActualLength++;
+				nActualLength += GetCharWidthFromChar(pszChars + i);
+		}
+		li.m_nActualLineLength = nActualLength;
+	}
+	return nActualLength;
+}
+
+int CCrystalTextBuffer::GetMaxLineLength(bool bRecalc)
+{
+	if (m_nMaxLineLength == -1 || bRecalc)
+	{
+		m_nMaxLineLength = 0;
+		int const nLineCount = GetLineCount();
+		for (int i = 0; i < nLineCount; ++i)
+		{
+			int const nActualLength = GetLineActualLength(i);
+			if (m_nMaxLineLength < nActualLength)
+				m_nMaxLineLength = nActualLength;
 		}
 	}
-
-	li.m_nActualLineLength = nActualLength;
-	return nActualLength;
+	return m_nMaxLineLength;
 }
 
 // Tabsize is commented out since we have only GUI setting for it now.
@@ -1197,6 +1261,7 @@ CCrystalTextBuffer::TextDefinition *CCrystalTextBuffer::SetTextTypeByContent(LPC
 
 void CCrystalTextBuffer::InitParseCookie()
 {
+	m_nMaxLineLength = -1;
 	if (m_CurSourceDef)
 	{
 		SetParseCookieCount(1);

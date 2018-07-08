@@ -19,7 +19,7 @@
  */
 LineInfo::LineInfo()
 : m_dwFlags(0)
-, m_nActualLineLength(0)
+, m_nActualLineLength(-1)
 , m_dwRevisionNumber(0)
 , m_nMax(0)
 , m_nLength(0)
@@ -35,7 +35,7 @@ LineInfo::LineInfo()
 void LineInfo::Clear()
 {
 	m_dwFlags = 0;
-	m_nActualLineLength = 0;
+	m_nActualLineLength = -1;
 	m_dwRevisionNumber = 0;
 	m_nMax = 0;
 	m_nLength = 0;
@@ -87,7 +87,7 @@ void LineInfo::Append(LPCTSTR pszChars, int nLength)
 	}
 	m_nLength -= m_nEolChars;
 	ASSERT(m_nLength + m_nEolChars <= m_nMax);
-	m_nActualLineLength = 0;
+	m_nActualLineLength = -1;
 }
 
 /**
@@ -155,7 +155,7 @@ void LineInfo::Delete(int nStartChar, int nEndChar)
 	}
 	m_nLength -= (nEndChar - nStartChar);
 	m_pcLine[FullLength()] = _T('\0');
-	m_nActualLineLength = 0;
+	m_nActualLineLength = -1;
 }
 
 /**
@@ -176,7 +176,7 @@ void LineInfo::RemoveEol()
 	if (m_pcLine)
 		m_pcLine[m_nLength] = _T('\0');
 	m_nEolChars = 0;
-	m_nActualLineLength = 0;
+	m_nActualLineLength = -1;
 }
 
 /**

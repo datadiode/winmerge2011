@@ -324,7 +324,7 @@ void CCrystalEditView::OnChar(WPARAM nChar)
 						do
 						{
 							++nEndPos;
-						} while (nEndPos < nLineLength && GetCharWidthFromChar(pszChars + nEndPos) == 0);
+						} while (nEndPos < nLineLength && m_pTextBuffer->GetCharWidthFromChar(pszChars + nEndPos) == 0);
 						m_pTextBuffer->DeleteText(this, ptCursorPos.y, ptCursorPos.x, ptCursorPos.y, nEndPos, CE_ACTION_TYPING);     // [JRT]
 					}
 				}

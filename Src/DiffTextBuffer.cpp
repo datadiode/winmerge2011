@@ -255,7 +255,9 @@ FileLoadResult::FILES_RESULT CDiffTextBuffer::LoadFromFile(LPCTSTR pszFileName,
 			// (view does not work for empty buffers)
 			ASSERT(m_aLines.size() > 0);
 			
+#ifdef _DEBUG
 			m_bInit = true;
+#endif
 			m_bModified = false;
 			m_bUndoGroup = m_bUndoBeginGroup = FALSE;
 			m_nSyncPosition = m_nUndoPosition = 0;

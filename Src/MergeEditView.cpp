@@ -33,6 +33,7 @@
 #include "ShellContextMenu.h"
 #include "paths.h"
 #include "PidlContainer.h"
+#include "editlib/modeline-parser.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -831,7 +832,7 @@ void CMergeEditView::OnConvertEolTo(UINT nID)
  * @brief Reload options.
  */
 void CMergeEditView::RefreshOptions()
-{ 
+{
 	// Set tab type (tabs/spaces)
 	m_pTextBuffer->SetInsertTabs(COptionsMgr::Get(OPT_TAB_TYPE) == 0);
 	SetSelectionMargin(COptionsMgr::Get(OPT_VIEW_FILEMARGIN));
@@ -850,6 +851,8 @@ void CMergeEditView::RefreshOptions()
 	const bool mixedEOLs = COptionsMgr::Get(OPT_ALLOW_MIXED_EOL) ||
 		m_pDocument->IsMixedEOL(m_nThisPane);
 	SetViewEols(COptionsMgr::Get(OPT_VIEW_WHITESPACE), mixedEOLs);
+
+	modeline_parser_apply_modeline(this);
 
 	OnSize();
 	CCrystalTextView::OnSize();

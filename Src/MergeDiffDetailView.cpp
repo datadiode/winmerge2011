@@ -55,8 +55,7 @@ LRESULT CMergeDiffDetailView::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam
  */
 void CMergeDiffDetailView::RefreshOptions()
 {
-	SetTabSize(COptionsMgr::Get(OPT_TAB_SIZE),
-		COptionsMgr::Get(OPT_SEPARATE_COMBINING_CHARS));
+	// Tab size is set at buffer level, so no need to set it here again
 	SetViewTabs(COptionsMgr::Get(OPT_VIEW_WHITESPACE));
 	bool bMixedEOL = COptionsMgr::Get(OPT_ALLOW_MIXED_EOL) ||
 		m_pDocument->IsMixedEOL(m_nThisPane);
