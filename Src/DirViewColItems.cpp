@@ -402,7 +402,7 @@ static String ColEOLTypeGet(const CDiffContext *, const void *p)
 	{
 		String s = LanguageSelect.LoadString(IDS_EOL_MIXED);
 		TCHAR strstats[40];
-		_sntprintf(strstats, _countof(strstats), _T(":%d/%d/%d"), stats.ncrlfs, stats.ncrs, stats.nlfs);
+		_sntprintf(strstats, _countof(strstats), _T(":%u/%u/%u"), stats.ncrlfs, stats.ncrs, stats.nlfs);
 		s += strstats;
 		return s;
 	}
