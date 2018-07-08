@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  LogFile.h
  *
  * @brief Implementation file for CLogFile

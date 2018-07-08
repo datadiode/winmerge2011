@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  LogFile.h
  *
  * @brief Declaration file for CLogFile
@@ -25,11 +25,11 @@
  * @note User can easily define more levels, just add new constant to
  * struct LOGLEVEL above, and possibly prefix to GetPrefix(UINT level).
  */
-extern class CLogFile  
+extern class CLogFile
 {
 public:
 	/** @brief Messagelevels for log writing. */
-	enum 
+	enum
 	{
 		LALL = -1, /**< All messages written */
 		LERROR = 0x1, /**< Error messages */
@@ -87,6 +87,9 @@ protected:
 	void WriteRaw(LPCTSTR msg);
 
 private:
+	CLogFile(const CLogFile &); // disallow copy construction
+	CLogFile &operator=(const CLogFile &); // disallow assignment
+
 	HANDLE    m_hLogMutex; /**< Mutex protecting log writing */
 	DWORD     m_nMaxSize; /**< Max size of the log file */
 	BOOL      m_bEnabled; /**< Is logging enabled? */
