@@ -498,6 +498,7 @@ CLanguageSelect::CLanguageSelect()
 , m_ctlLangList(NULL)
 , m_hCurrentDll(0)
 , m_wCurLanguage(wSourceLangId)
+, m_codepage(0)
 {
 	static const LONG FloatScript[] =
 	{
