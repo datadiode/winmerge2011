@@ -966,7 +966,6 @@ void CCrystalTextBuffer::SetTabSize(int nTabSize, bool bSeparateCombinedChars)
 int CCrystalTextBuffer::GetCharWidthFromChar(LPCTSTR pch) const
 {
 	UINT ch = *pch;
-	ASSERT(ch != _T('\t') && ch != _T('\r') && ch != _T('\n'));
 
 	if (ch >= _T('\x00') && ch <= _T('\x1F'))
 		return 3;
