@@ -21,7 +21,7 @@ static BSTR vim_languages;
 static BSTR emacs_languages;
 static BSTR kate_languages;
 
-typedef enum
+enum ModelineSet
 {
 	MODELINE_SET_NONE = 0,
 	MODELINE_SET_TAB_WIDTH = 1 << 0,
@@ -31,11 +31,11 @@ typedef enum
 	MODELINE_SET_RIGHT_MARGIN_POSITION = 1 << 4,
 	MODELINE_SET_LANGUAGE = 1 << 5,
 	MODELINE_SET_INSERT_SPACES = 1 << 6
-} ModelineSet;
+};
 
-typedef struct _ModelineOptions
+struct ModelineOptions
 {
-	const TCHAR	*language_id;
+	String		language_id;
 
 	/* these options are similar to the GtkSourceView properties of the
 	 * same names.
@@ -46,11 +46,9 @@ typedef struct _ModelineOptions
 	bool		wrap_mode;
 	bool		display_right_margin;
 	UINT		right_margin_position;
-	
-	int			set; /* combined from ModelineSet bits */
-} ModelineOptions;
 
-#define MODELINE_OPTIONS_DATA_KEY "ModelineOptionsDataKey"
+	int			set; /* combined from ModelineSet bits */
+};
 
 static BOOL
 has_option (ModelineOptions *options,
@@ -174,7 +172,7 @@ parse_vim_modeline (const TCHAR *s, ModelineOptions *options)
 			break;
 
 		if (_tcsncmp (s, _T("set "), 4) == 0 ||
-		    _tcsncmp (s, _T("se "), 3) == 0)
+			_tcsncmp (s, _T("se "), 3) == 0)
 		{
 			s = _tcschr(s, ' ') + 1;
 			in_set = TRUE;
@@ -207,13 +205,13 @@ parse_vim_modeline (const TCHAR *s, ModelineOptions *options)
 		}
 
 		if (_tcscmp (key.c_str(), _T("ft")) == 0 ||
-		    _tcscmp (key.c_str(), _T("filetype")) == 0)
+			_tcscmp (key.c_str(), _T("filetype")) == 0)
 		{
 			options->language_id = get_language_id_vim (value.c_str());
 			options->set |= MODELINE_SET_LANGUAGE;
 		}
 		else if (_tcscmp (key.c_str(), _T("et")) == 0 ||
-		    _tcscmp (key.c_str(), _T("expandtab")) == 0)
+			_tcscmp (key.c_str(), _T("expandtab")) == 0)
 		{
 			options->insert_spaces = !neg;
 			options->set |= MODELINE_SET_INSERT_SPACES;
@@ -450,12 +448,12 @@ parse_modeline (LineInfo const &li, int line_number, int line_count, ModelineOpt
 			continue;
 
 		if ((line_number <= 3 || line_number > line_count - 3) &&
-		    (_tcsncmp (s, _T("ex:"), 3) == 0 ||
-		     _tcsncmp (s, _T("vi:"), 3) == 0 ||
-		     _tcsncmp (s, _T("vim:"), 4) == 0))
+			(_tcsncmp (s, _T("ex:"), 3) == 0 ||
+			 _tcsncmp (s, _T("vi:"), 3) == 0 ||
+			 _tcsncmp (s, _T("vim:"), 4) == 0))
 		{
-	    	while (*s != ':') s++;
-	    	s = parse_vim_modeline (s + 1, options);
+			while (*s != ':') s++;
+			s = parse_vim_modeline (s + 1, options);
 		}
 		else if (line_number <= 2 && _tcsncmp (s, _T("-*-"), 3) == 0)
 		{
@@ -477,7 +475,6 @@ modeline_parser_apply_modeline (CCrystalTextView *view)
 	int iter = 0;
 	int line_count = buffer->GetLineCount();
 	
-	options.language_id = NULL;
 	options.set = MODELINE_SET_NONE;
 
 	/* Parse the modelines on the 10 first lines... */
@@ -504,9 +501,9 @@ modeline_parser_apply_modeline (CCrystalTextView *view)
 	}
 
 	/* Try to set language */
-	if (has_option (&options, MODELINE_SET_LANGUAGE) && options.language_id)
+	if (has_option (&options, MODELINE_SET_LANGUAGE))
 	{
-		buffer->SetTextType(options.language_id);
+		buffer->SetTextType(options.language_id.c_str());
 	}
 
 	/* Apply the options we got from modelines */
@@ -545,4 +542,4 @@ modeline_parser_apply_modeline (CCrystalTextView *view)
 	}*/
 }
 
-/* vi:ts=8 */
+/* vi:ts=4 */
