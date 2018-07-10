@@ -1,6 +1,9 @@
 <scriptlet>
 
 <implements type="Automation">
+	<property name='view' dispid='0'>
+		<put/>
+	</property>
 	<method name="Tabify"/>
 	<method name="Untabify"/>
 </implements>
@@ -12,11 +15,10 @@ Dim wsh
 Set wsh = CreateObject("WScript.Shell")
 
 Dim TabWidth
-TabWidth = 4
 
-On Error Resume Next
-TabWidth = wsh.RegRead("HKCU\Software\Thingamahoochie\WinMerge\Settings\TabSize")
-On Error GoTo 0
+Sub put_view(view)
+	TabWidth = view.TabSize
+End Sub
 
 Function GetEOL(Text)
 	Dim match

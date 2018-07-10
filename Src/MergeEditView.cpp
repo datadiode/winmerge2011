@@ -30,6 +30,7 @@
 #include "Environment.h"
 #include "ConsoleWindow.h"
 #include "Common/stream_util.h"
+#include "Common/coretools.h"
 #include "ShellContextMenu.h"
 #include "paths.h"
 #include "PidlContainer.h"
@@ -750,6 +751,8 @@ void CMergeEditView::OnContextMenu(LPARAM lParam)
 		OException::Check(CoGetObject(pluginMoniker.c_str(), NULL,
 			IID_IDispatch, reinterpret_cast<void **>(&spDispatch)));
 		CMyDispId DispId;
+		DispId.Call(spDispatch,
+			CMyDispParams<1>().Unnamed(static_cast<IMergeEditView *>(this)), DISPATCH_PROPERTYPUTREF);
 
 		if (SUCCEEDED(DispId.Init(spDispatch, L"ShowConsole")))
 		{
@@ -1314,6 +1317,25 @@ HRESULT CMergeEditView::Drop(IDataObject *pDataObj, DWORD grfKeyState, POINTL pt
 		hr = CGhostTextView::Drop(pDataObj, grfKeyState, pt, pdwEffect);
 	}
 	return hr;
+}
+
+HRESULT CMergeEditView::FindBehavior(BSTR bstrBehavior, BSTR bstrBehaviorUrl, IElementBehaviorSite *pSite, IElementBehavior **ppBehavior)
+{
+	if (EatPrefix(bstrBehaviorUrl, L"#WinMerge#"))
+	{
+		if (StrCmpIW(bstrBehavior, L"MergeEditView") == 0)
+		{
+			*ppBehavior = this;
+			return S_OK;
+		}
+	}
+	return m_pDocument->FindBehavior(bstrBehavior, bstrBehaviorUrl, pSite, ppBehavior);
+}
+
+HRESULT CMergeEditView::get_TabSize(long *pnTabSize)
+{
+	*pnTabSize = GetTabSize();
+	return S_OK;
 }
 
 bool CMergeEditView::IsShellMenuCmdID(UINT id)

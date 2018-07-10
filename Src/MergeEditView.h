@@ -56,7 +56,9 @@ We could define a new class which derives from CGhostTextBuffer to clear the DIF
 and calls a virtual function for additional things to do on the flag.
 Maybe in the future...
 */
-class CMergeEditView : public CGhostTextView
+class CMergeEditView
+	: public CGhostTextView
+	, public CScriptable<IMergeEditView>
 {
 public:
 	// Object that displays status line info for one side of a merge view
@@ -72,6 +74,10 @@ public:
 	// IDropTarget
 	STDMETHOD(DragEnter)(IDataObject *pDataObj, DWORD grfKeyState, POINTL pt, DWORD *pdwEffect);
 	STDMETHOD(Drop)(IDataObject *pDataObj, DWORD grfKeyState, POINTL pt, DWORD *pdwEffect);
+	// IElementBehaviorFactory
+	STDMETHOD(FindBehavior)(BSTR, BSTR, IElementBehaviorSite *, IElementBehavior **);
+	// IMergeEditView
+	STDMETHOD(get_TabSize)(long *pnTabSize);
 
 	static bool IsShellMenuCmdID(UINT);
 	void HandleMenuSelect(WPARAM wParam, LPARAM lParam);

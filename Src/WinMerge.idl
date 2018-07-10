@@ -78,6 +78,19 @@ interface IMergeDoc : IDispatch
 };
 
 [
+	object,
+	uuid(FEF67C90-2EEB-425C-900C-447EBAB0B3B5),
+	dual,
+	helpstring("IMergeEditView Interface"),
+	pointer_default(unique)
+]
+interface IMergeEditView : IDispatch
+{
+	[id(1), propget]
+	HRESULT TabSize([out, retval] long *pnTabSize);
+};
+
+[
 	uuid(0EB943A0-9233-4618-8147-C2AD5042D933),
 	version(1.0),
 	helpstring("WinMerge 2011 Type Library")
@@ -87,4 +100,5 @@ library WinMergeLib
 	interface IStrings;
 	interface IMergeApp;
 	interface IMergeDoc;
+	interface IMergeEditView;
 };
