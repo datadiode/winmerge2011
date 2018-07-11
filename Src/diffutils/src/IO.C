@@ -48,15 +48,6 @@ struct equivclass
   size_t length;	/* That line's length, not counting its newline.  */
 };
 
-static UNICODESET get_unicode_signature (struct file_data *, unsigned *bom);
-
-/* Check for binary files and compare them for exact identity.  */
-
-/* Return 1 if BUF contains a non text character.
-   SIZE is the number of characters in BUF.  */
-
-#define binary_file_p(buf, size) (memchr (buf, 0, size) != 0)
-
 /** @brief Get unicode signature from file_data. */
 static UNICODESET get_unicode_signature (struct file_data *current, unsigned *bom)
 {
@@ -69,6 +60,31 @@ static UNICODESET get_unicode_signature (struct file_data *current, unsigned *bo
     }
   return DetermineEncoding ((unsigned char *) FILE_BUFFER (current), current->buffered, bom ? bom : &dummy);
 }
+
+/* Read a block of data into a file buffer, checking for EOF and error.  */
+
+unsigned
+file_block_read (struct file_data *current, size_t size)
+{
+  unsigned block_size = (unsigned)MIN (size, STAT_BLOCKSIZE (current->stat));
+  if (block_size)
+    {
+      int s = _read (current->desc,
+                     FILE_BUFFER (current) + current->buffered, block_size);
+      if (s == -1)
+        pfatal_with_name (current->name);
+      current->buffered += s;
+      block_size = s;
+    }
+  return block_size;
+}
+
+/* Check for binary files and compare them for exact identity.  */
+
+/* Return 1 if BUF contains a non text character.
+   SIZE is the number of characters in BUF.  */
+
+#define binary_file_p(buf, size) (memchr (buf, 0, size) != 0)
 
 /* Get ready to read the current file.
    Return nonzero if SKIP_TEST is zero,
@@ -100,11 +116,7 @@ sip (struct file_data *current, bool skip_test)
       if (! skip_test)
         {
           /* Check first part of file to see if it's a binary file.  */
-          current->buffered = _read (current->desc,
-                                     current->buffer,
-                                     current->bufsize);
-          if (current->buffered == -1)
-            pfatal_with_name (current->name);
+          file_block_read (current, current->bufsize);
           if (!get_unicode_signature (current, NULL))
             isbinary = binary_file_p (current->buffer, current->buffered);
         }
@@ -118,7 +130,6 @@ sip (struct file_data *current, bool skip_test)
 static void
 slurp (struct file_data *current)
 {
-  size_t cc;
   if (current->name == allocated_buffer_name)
     /* nothing to do */
     ;
@@ -154,14 +165,8 @@ slurp (struct file_data *current)
                 }
               current->buffer = (word *) xrealloc (current->buffer, current->bufsize);
             }
-          cc = _read (current->desc,
-                      FILE_BUFFER (current) + current->buffered,
-                      current->bufsize - current->buffered);
-          if (cc == 0)
+          if (file_block_read (current, current->bufsize - current->buffered) == 0)
             break;
-          if (cc == -1)
-            pfatal_with_name (current->name);
-          current->buffered += cc;
         }
       /* Allocate 50% extra room for a necessary transcoding to UTF-8.
          Allocate enough room for appended newline and sentinel. */
@@ -683,8 +688,8 @@ static lin
 guess_lines (lin n, size_t s, size_t t)
 {
   size_t guessed_bytes_per_line = n < 10 ? 32 : s / (n - 1);
-  lin guessed_lines = MAX (1, t / guessed_bytes_per_line);
-  return MIN (guessed_lines, PTRDIFF_MAX / (2 * sizeof (char *) + 1) - 5) + 5;
+  size_t guessed_lines = MAX (1, t / guessed_bytes_per_line);
+  return (lin)(MIN (guessed_lines, LIN_MAX / (2 * sizeof (char *) + 1) - 5) + 5);
 }
 
 /* Given a vector of two file_data objects, find the identical
