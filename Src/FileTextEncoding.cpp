@@ -125,7 +125,7 @@ void FileTextEncoding::UpdateDefaultCodepage(int cpDefaultMode, int customCodepa
 }
 
 /**
- * @brief Get appropriate default codepage 
+ * @brief Get appropriate default codepage
  */
 int FileTextEncoding::GetDefaultCodepage()
 {

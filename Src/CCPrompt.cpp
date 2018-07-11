@@ -67,7 +67,7 @@ LRESULT CCCPrompt::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
  * @brief Handler for WM_INITDIALOG; conventional location to initialize
  * controls. At this point dialog and control windows exist.
  */
-BOOL CCCPrompt::OnInitDialog() 
+BOOL CCCPrompt::OnInitDialog()
 {
 	ODialog::OnInitDialog();
 	LanguageSelect.TranslateDialog(m_hWnd);

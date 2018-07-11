@@ -316,6 +316,6 @@ private:
 
 } // namespace Json
 
-/// Specialize std::swap() for Json::Value. 
+/// Specialize std::swap() for Json::Value.
 template<>
 inline void eastl::swap(Json::Value& a, Json::Value& b) { a.swap(b); }

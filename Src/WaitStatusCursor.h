@@ -2,16 +2,16 @@
  *  @file WaitStatusCursor.h
  *
  *  @brief Declaration WaitStatusCursor classes.
- */ 
+ */
 #pragma once
 
 class IStatusDisplay;
 
 /**
  * @brief WaitStatusCursor enhanced cursor with GUI status feedback.
- * 
+ *
  * A WaitStatusCursor does what a CWaitCursor does, plus the caller selects
- * the wait cursor and sets the status message. 
+ * the wait cursor and sets the status message.
  * Clients create WaitStatusCursors instead of CWaitCursors (don't mix them), and are isolated from
  * status message implementation.
  */

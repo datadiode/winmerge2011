@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  PropArchive.cpp
  *
  * @brief Implementation of PropArchive propertysheet
@@ -19,7 +19,7 @@ PropArchive::PropArchive()
 {
 }
 
-/** 
+/**
  * @brief Sets update handlers for dialog controls.
  */
 template<ODialog::DDX_Operation op>
@@ -48,7 +48,7 @@ LRESULT PropArchive::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	return OptionsPanel::WindowProc(message, wParam, lParam);
 }
 
-/** 
+/**
  * @brief Reads options values from storage to UI.
  */
 void PropArchive::ReadOptions()
@@ -57,7 +57,7 @@ void PropArchive::ReadOptions()
 	m_bProbeType = COptionsMgr::Get(OPT_ARCHIVE_PROBETYPE);
 }
 
-/** 
+/**
  * @brief Writes options values from UI to storage.
  */
 void PropArchive::WriteOptions()
@@ -66,7 +66,7 @@ void PropArchive::WriteOptions()
 	COptionsMgr::SaveOption(OPT_ARCHIVE_PROBETYPE, m_bProbeType != FALSE);
 }
 
-/** 
+/**
  * @brief Called Updates controls enabled/disables state.
  */
 void PropArchive::UpdateScreen()

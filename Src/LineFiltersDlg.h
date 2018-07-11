@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  LineFiltersDlg.h
  *
  * @brief Declaration file for Line Filter dialog

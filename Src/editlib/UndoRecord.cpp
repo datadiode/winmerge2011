@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  UndoRecord.cpp
  *
  * @brief Implementation of UndoRecord struct.

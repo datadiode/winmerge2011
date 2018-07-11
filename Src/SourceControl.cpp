@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  SourceControl.cpp
  *
  * @brief Implementation file for some source control-related functions.
@@ -175,7 +175,7 @@ int CMainFrame::SaveToVersionControl(LPCTSTR pszSavePath)
 					if (lstrcmpi(bstrLocalSpec, pszSavePath))
 					{
 						// BSP - if the directories are different, let the user confirm the CheckOut
-						int iRes = LanguageSelect.MsgBox(IDS_VSSFOLDER_AND_FILE_NOMATCH, 
+						int iRes = LanguageSelect.MsgBox(IDS_VSSFOLDER_AND_FILE_NOMATCH,
 								MB_YESNO | MB_YES_TO_ALL | MB_ICONWARNING);
 
 						if (iRes == IDNO)

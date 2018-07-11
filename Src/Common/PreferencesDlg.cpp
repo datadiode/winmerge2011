@@ -1,4 +1,4 @@
-/** 
+/**
  * @file PreferencesDlg.cpp
  *
  * @brief Implementation file for CPreferencesDlg
@@ -102,7 +102,7 @@ LRESULT CPreferencesDlg::OnNotify(NMHDR *pNMHDR)
 /////////////////////////////////////////////////////////////////////////////
 // CPreferencesDlg message handlers
 
-BOOL CPreferencesDlg::OnInitDialog() 
+BOOL CPreferencesDlg::OnInitDialog()
 {
 	ODialog::OnInitDialog();
 	LanguageSelect.TranslateDialog(m_hWnd);
@@ -141,7 +141,7 @@ BOOL CPreferencesDlg::OnInitDialog()
 	AddPage(&m_pageShell);
 
 	ReadOptions();
-	
+
 	SetFocus();
 
 	return TRUE;
@@ -158,7 +158,7 @@ void CPreferencesDlg::OnDestroy()
 	SettingStore.WriteProfileInt(_T("Settings"), _T("OptStartPage"), m_nPageIndex);
 }
 
-void CPreferencesDlg::OnHelpButton() 
+void CPreferencesDlg::OnHelpButton()
 {
 	theApp.m_pMainWnd->ShowHelp(OptionsHelpLocation);
 }
@@ -199,7 +199,7 @@ void CPreferencesDlg::OnSelchangingPages(NMTREEVIEW *pNM)
 			reinterpret_cast<OptionsPanel *>(m_tcPages->GetItemData(htiSel));
 		ASSERT(pPage);
 		pPage->ShowWindow(SW_HIDE);
-	}	
+	}
 }
 
 void CPreferencesDlg::OnSelchangedPages(NMTREEVIEW *pNM)
@@ -286,7 +286,7 @@ void CPreferencesDlg::SaveOptions()
 	m_pageSyntaxColors.WriteOptions();
 	SyntaxColors.SaveToRegistry();
 	m_pageCodepage.WriteOptions();
-	m_pageVss.WriteOptions();	
+	m_pageVss.WriteOptions();
 	m_pageArchive.WriteOptions();
 	m_pageBackups.WriteOptions();
 	m_pageShell.WriteOptions();

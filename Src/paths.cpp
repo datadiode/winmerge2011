@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  paths.cpp
  *
  * @brief Path handling routines
@@ -10,7 +10,7 @@
 static const TCHAR paths_magic_prefix[] = _T("\\\\?\\");
 static const TCHAR paths_magic_uncfix[] = _T("?\\UNC\\");
 
-/** 
+/**
  * @brief Checks if string ends with slash.
  * This function checks if given string ends with slash. In many places,
  * especially in GUI, we assume folder paths end with slash.
@@ -23,7 +23,7 @@ bool paths_EndsWithSlash(LPCTSTR s)
 	return !PathIsFileSpec(s);
 }
 
-/** 
+/**
  * @brief Checks if path exists and if it points to folder or file.
  * This function first checks if path exists. If path exists
  * then function checks if path points to folder or file.
@@ -113,7 +113,7 @@ String paths_GetLongPath(LPCTSTR szPath)
 	// Fail when file/directory does not exist      No                Yes
 	//
 	// Fully qualify/normalize name using GetFullPathName.
-	
+
 	String sFull(szPath, len + 1);
 	sFull[len] = _T('?');
 	if (PathIsRelative(szPath))
@@ -220,7 +220,7 @@ bool paths_CreateIfNeeded(LPCTSTR szPath, bool bExcludeLeaf)
 	return true;
 }
 
-/** 
+/**
  * @brief Check if paths are both folders or files.
  * This function checks if paths are "compatible" as in many places we need
  * to have two folders or two files.
@@ -263,12 +263,12 @@ BOOL paths_IsShortcut(LPCTSTR inPath)
 //	use IShellLink to expand the shortcut
 //	returns the expanded file, or "" on error
 //
-//	original code was part of CShortcut 
+//	original code was part of CShortcut
 //	1996 by Rob Warner
 //	rhwarner@southeast.net
 //	http://users.southeast.net/~rhwarner
 
-/** 
+/**
  * @brief Expand given shortcut to full path.
  * @param [in] inFile Shortcut to expand.
  * @return Full path or empty string if error happened.
@@ -304,7 +304,7 @@ String ExpandShortcut(LPCTSTR inFile)
 	return SUCCEEDED(hr) ? outFile : String();
 }
 
-/** 
+/**
  * @brief Append subpath to path.
  * This function appends subpath to given path. Function ensures there
  * is only one backslash between path parts.
@@ -325,7 +325,7 @@ String paths_ConcatPath(const String &path, const String &subpath)
 		return path + &_T("\\")[subpath.c_str()[0] == _T('\\')] + subpath;
 }
 
-/** 
+/**
  * @brief Get parent path.
  * This function returns parent path for given path. For example for
  * path "c:\folder\subfolder" we return "c:\folder".

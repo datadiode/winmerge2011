@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  string_util.cpp
  *
  * @brief Char classification routines implementations.

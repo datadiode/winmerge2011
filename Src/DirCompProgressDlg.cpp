@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  DirCompProgressDlg.cpp
  *
  * @brief Implementation file for Directory compare state dialog
@@ -91,7 +91,7 @@ LRESULT DirCompProgressDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lPara
  * Center the dialog to main window.
  * @return TRUE (see the comment inside function).
  */
-BOOL DirCompProgressDlg::OnInitDialog() 
+BOOL DirCompProgressDlg::OnInitDialog()
 {
 	ODialog::OnInitDialog();
 	SetFocus();

@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  PropColors.cpp
  *
  * @brief Implementation of PropMergeColors propertysheet
@@ -12,7 +12,7 @@
 #define new DEBUG_NEW
 #endif
 
-/** 
+/**
  * @brief Default constructor.
  */
 PropMergeColors::PropMergeColors()
@@ -129,7 +129,7 @@ LRESULT PropMergeColors::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	return OptionsPanel::WindowProc(message, wParam, lParam);
 }
 
-/** 
+/**
  * @brief Reads options values from storage to UI.
  * (Property sheet calls this before displaying all property pages)
  */
@@ -145,7 +145,7 @@ void PropMergeColors::UpdateScreen()
 	CheckDlgButton(IDC_CROSS_HATCH_DELETED_LINES, m_bCrossHatchDeletedLines);
 }
 
-/** 
+/**
  * @brief Writes options values from UI to storage.
  * (Property sheet calls this after displaying all property pages)
  */
@@ -168,15 +168,15 @@ void PropMergeColors::SerializeColors(OPERATION op)
 	SerializeColor(op, IDC_TRIVIAL_DIFF_COLOR, OPT_CLR_TRIVIAL_DIFF, m_clrTrivial);
 	SerializeColor(op, IDC_TRIVIAL_DIFF_DELETED_COLOR, OPT_CLR_TRIVIAL_DIFF_DELETED, m_clrTrivialDeleted);
 	SerializeColor(op, IDC_TRIVIAL_DIFF_TEXT_COLOR, OPT_CLR_TRIVIAL_DIFF_TEXT, m_clrTrivialText);
-	
+
 	SerializeColor(op, IDC_MOVEDBLOCK_COLOR, OPT_CLR_MOVEDBLOCK, m_clrMoved);
 	SerializeColor(op, IDC_MOVEDBLOCK_DELETED_COLOR, OPT_CLR_MOVEDBLOCK_DELETED, m_clrMovedDeleted);
 	SerializeColor(op, IDC_MOVEDBLOCK_TEXT_COLOR, OPT_CLR_MOVEDBLOCK_TEXT, m_clrMovedText);
-	
+
 	SerializeColor(op, IDC_SEL_MOVEDBLOCK_COLOR, OPT_CLR_SELECTED_MOVEDBLOCK, m_clrSelMoved);
 	SerializeColor(op, IDC_SEL_MOVEDBLOCK_DELETED_COLOR, OPT_CLR_SELECTED_MOVEDBLOCK_DELETED, m_clrSelMovedDeleted);
 	SerializeColor(op, IDC_SEL_MOVEDBLOCK_TEXT_COLOR, OPT_CLR_SELECTED_MOVEDBLOCK_TEXT, m_clrSelMovedText);
-	
+
 	SerializeColor(op, IDC_WORDDIFF_COLOR, OPT_CLR_WORDDIFF, m_clrWordDiff);
 	SerializeColor(op, IDC_WORDDIFF_DELETED_COLOR, OPT_CLR_WORDDIFF_DELETED, m_clrWordDiffDeleted);
 	SerializeColor(op, IDC_WORDDIFF_TEXT_COLOR, OPT_CLR_WORDDIFF_TEXT, m_clrWordDiffText);

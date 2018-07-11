@@ -258,7 +258,7 @@ void FileOperationsDlg::UpdateProgress()
 		m_progress.FileNameChanged = false;
 	}
 	if (m_progress.BytesChanged)
-	{	
+	{
 		while (m_progress.TotalFileSize.QuadPart > LONG_MAX)
 		{
 			m_progress.TotalFileSize.QuadPart >>= 1;
@@ -270,7 +270,7 @@ void FileOperationsDlg::UpdateProgress()
 	}
 }
 
-BOOL FileOperationsDlg::OnInitDialog() 
+BOOL FileOperationsDlg::OnInitDialog()
 {
 	ODialog::OnInitDialog();
 	LanguageSelect.TranslateDialog(m_hWnd);

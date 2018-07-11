@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  PropShell.h
  *
  * @brief Implementation file for Shell Options dialog.
@@ -37,7 +37,7 @@ static BOOL OwnsShellExtension()
 		&& exe + PathCommonPrefix(exe, dll, NULL) + 1 == PathFindFileName(exe);
 }
 
-PropShell::PropShell() 
+PropShell::PropShell()
 : OptionsPanel(IDD_PROPPAGE_SHELL, sizeof *this)
 , m_bOwnsShellExtension(OwnsShellExtension())
 {
@@ -95,7 +95,7 @@ LRESULT PropShell::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	return OptionsPanel::WindowProc(message, wParam, lParam);
 }
 
-/** 
+/**
  * @brief Reads options values from storage to UI.
  */
 void PropShell::ReadOptions()
@@ -106,7 +106,7 @@ void PropShell::ReadOptions()
 	m_bEnableMegeEditShellContextMenu = COptionsMgr::Get(OPT_MERGEEDITVIEW_ENABLE_SHELL_CONTEXT_MENU);
 }
 
-/** 
+/**
  * @brief Writes options values from UI to storage.
  */
 void PropShell::WriteOptions()
@@ -166,7 +166,7 @@ void PropShell::SaveContextRegValues()
 			dwContextEnabled |= CONTEXT_F_SUBFOLDERS;
 		if (m_bContextFlattened == BST_CHECKED || m_bContextSubfolders == BST_INDETERMINATE)
 			dwContextEnabled |= CONTEXT_F_FLATTENED;
-			
+
 		reg.WriteDword(f_RegValueEnabled, dwContextEnabled);
 	}
 }

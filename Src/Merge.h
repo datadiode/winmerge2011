@@ -15,7 +15,7 @@
 //    You should have received a copy of the GNU General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////
-/** 
+/**
  * @file  Merge.h
  *
  * @brief main header file for the MERGE application
@@ -45,7 +45,7 @@ enum FRAMETYPE
 	FRAME_BINARY, /**< Binary compare frame. */
 };
 
-/** 
+/**
  * @brief WinMerge application class
  */
 extern class CMergeApp

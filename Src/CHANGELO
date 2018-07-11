@@ -936,7 +936,7 @@ Sun Jan  6 18:42:23 1991  Michael I Bushnell  (mib at geech.ai.mit.edu)
 	* context.c (print_context_number_range,
 	print_unidiff_number_range): Don't print N,M when N=M, print
 	just N instead.
-	
+
 	* README: Updated for version 1.15.
 	Makefile: Updated for version 1.15.
 

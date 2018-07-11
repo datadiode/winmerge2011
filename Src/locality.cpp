@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  locality.h
  *
  * @brief Implementation of helper functions involving locale

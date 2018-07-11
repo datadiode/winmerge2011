@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  FilterList.h
  *
  * @brief Implementation file for FilterList.
@@ -244,7 +244,7 @@ bool FilterList::Match(int stringlen, const char *string, int codepage)
 		// to a surrogate pair, transcoding to UTF-16 might grow the data size
 		// by a factor of 4.
 		buf.resize(stringlen * 4);
-		ucr::convert(NONE, codepage, (const unsigned char *)string, 
+		ucr::convert(NONE, codepage, (const unsigned char *)string,
 				stringlen, UTF8, CP_UTF8, &buf);
 		string = (const char *)buf.ptr;
 		stringlen = buf.size;

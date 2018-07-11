@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  MergeDocDiffSync.cpp
  *
  * @brief Code to layout diff blocks, to find matching lines, and insert ghost lines
@@ -186,7 +186,7 @@ void CChildFrame::AdjustDiffBlocks()
 						dr.end1    = pdr->begin1 + map_line0 - 1;
 						newDiffList.AddDiff(dr);
 						line1 = map_line0;
-					} 
+					}
 					dr.begin1  = pdr->begin1 + line1;
 					do
 					{

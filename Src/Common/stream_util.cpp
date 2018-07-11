@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  stream_util.cpp
  *
  * @brief ISequentialStream implementations which may be of some utility.
@@ -74,7 +74,7 @@ HRESULT STDMETHODCALLTYPE HtmWriteStream::Write(const void *pv, ULONG cb, ULONG 
 std::string::size_type StreamLineReader::readLine(std::string &s)
 {
 	s.resize(0);
-	do 
+	do
 	{
 		std::string::size_type n = s.size();
 		s.resize(n + ahead);

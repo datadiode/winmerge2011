@@ -59,7 +59,7 @@
 //	01-Jun-99 to 31-Aug-99
 //		Sven Wiegand (search for "//BEGIN SW" to find my changes):
 //
-//	+ FEATURE: support for language switching on the fly with class 
+//	+ FEATURE: support for language switching on the fly with class
 //			CCrystalParser
 //	+	FEATURE: word wrapping
 //	+ FIX:	Setting m_nIdealCharPos, when choosing cursor position by mouse
@@ -73,7 +73,7 @@
 //
 //	+ FIX: Opening large files won't crash anymore and will go very fast
 //	       (removed call to RecalcVertScrollBar() in WrapLineCached())
-//	+ FIX: Problems with repainting and cursor-position by resizing window 
+//	+ FIX: Problems with repainting and cursor-position by resizing window
 //	       fixed by adding call to ScrollToSubLine() in OnSize().
 //	+ FEATURE: Supporting [Return] to exit incremental-search-mode
 //		     (see OnChar())
@@ -280,7 +280,7 @@ CCrystalTextView::~CCrystalTextView()
 
 HRESULT CCrystalTextView::QueryInterface(REFIID iid, void **ppv)
 {
-	static const QITAB rgqit[] = 
+	static const QITAB rgqit[] =
 	{
 		QITABENT(CCrystalTextView, IDropSource),
 		QITABENT(CCrystalTextView, IDataObject),
@@ -786,7 +786,7 @@ void CCrystalTextView::DrawLineHelper(
 		{
 			DrawLineHelperImpl(pdc, ptOrigin, rcClip,
 				nColorIndex & ~COLORINDEX_APPLYFORCE,
-				nBgColorIndex & ~COLORINDEX_APPLYFORCE, 
+				nBgColorIndex & ~COLORINDEX_APPLYFORCE,
 				GetColor(COLORINDEX_SELTEXT),
 				GetColor(COLORINDEX_SELBKGND),
 				pszChars, nOffset + nSelBegin, nSelEnd - nSelBegin, nActualOffset,
@@ -849,7 +849,7 @@ void CCrystalTextView::WrapLine(int nLineIndex, int *anBreaks, int &nBreaks)
 		// wrap line
 		if (nLineCharCount >= nMaxLineWidth)
 		{
-			// if no wrap position found, but line is to wide, 
+			// if no wrap position found, but line is to wide,
 			// wrap at current position
 			if( nLastBreakPos == 0 )
 			{
@@ -909,7 +909,7 @@ void CCrystalTextView::InvalidateLineCache(int nLineIndex1, int nLineIndex2)
 
 /**
  * @brief Invalidate sub line index cache from the specified index to the end of file.
- * @param [in] nLineIndex Index of the first line to invalidate 
+ * @param [in] nLineIndex Index of the first line to invalidate
  */
 void CCrystalTextView::InvalidateSubLineIndexCache(int nLineIndex)
 {
@@ -932,7 +932,7 @@ void CCrystalTextView::InvalidateScreenRect()
 
 void CCrystalTextView::DrawScreenLine(
 	HSurface *pdc, POINT &ptOrigin, const RECT &rcClip,
-	TextBlock::Array &pBuf, int &nActualItem, 
+	TextBlock::Array &pBuf, int &nActualItem,
 	COLORREF crText, COLORREF crBkgnd,
 	LPCTSTR pszChars, int nOffset, int nCount, int &nActualOffset, int nLineIndex)
 {
@@ -951,7 +951,7 @@ void CCrystalTextView::DrawScreenLine(
 	ASSERT(nActualItem < pBuf.m_nActualItems);
 
 	if (pBuf.m_nActualItems > 0 && nActualItem < pBuf.m_nActualItems - 1 &&
-		pBuf[nActualItem + 1].m_nCharPos >= nOffset && 
+		pBuf[nActualItem + 1].m_nCharPos >= nOffset &&
 		pBuf[nActualItem + 1].m_nCharPos <= nOffset + nCount)
 	{
 		ASSERT(pBuf[nActualItem].m_nCharPos >= 0 &&
@@ -965,7 +965,7 @@ void CCrystalTextView::DrawScreenLine(
 			{
 				DrawLineHelper(pdc, ptOrigin, rcClip,
 					pBuf[nActualItem].m_nColorIndex, pBuf[nActualItem].m_nBgColorIndex,
-					crText, crBkgnd, pszChars, ptTextPos.x, 
+					crText, crBkgnd, pszChars, ptTextPos.x,
 					nCount, nActualOffset, ptTextPos,
 					nBgColorIndexZeorWidthBlock, cxZeroWidthBlock);
 				nBgColorIndexZeorWidthBlock = 0;
@@ -1270,7 +1270,7 @@ void CCrystalTextView::GetHTMLStyles(String &strStyles)
 void CCrystalTextView::GetHTMLAttribute(
 	int nColorIndex, int nBgColorIndex, COLORREF crText, COLORREF crBkgnd, String &strAttr)
 {
-	if ((crText == CLR_NONE || (nColorIndex & COLORINDEX_APPLYFORCE)) && 
+	if ((crText == CLR_NONE || (nColorIndex & COLORINDEX_APPLYFORCE)) &&
 		(crBkgnd == CLR_NONE || (nBgColorIndex & COLORINDEX_APPLYFORCE)))
 	{
 		strAttr.append_sprintf(_T("class='sf%db%d'"),
@@ -1819,7 +1819,7 @@ int CCrystalTextView::CursorPointToCharPos(int nLineIndex, const POINT &curPoint
 		}
 	}
 	delete[] anBreaks;
-	return nIndex;	
+	return nIndex;
 }
 
 void CCrystalTextView::SubLineCursorPosToTextPos(int x, int y, POINT &textPos)
@@ -1870,7 +1870,7 @@ int CCrystalTextView::SubLineEndToCharPos(int nLineIndex, int nSubLineOffset)
 	return nReturnVal;
 }
 
-/** 
+/**
  * @brief Calculate first character position in (sub)line.
  * @param [in] nLineIndex Linenumber to check.
  * @param [in] nSublineOffset Subline index in wrapped line.
@@ -2076,9 +2076,9 @@ LPCTSTR CCrystalTextView::GetLineChars(int nLineIndex) const
 	return m_pTextBuffer ? m_pTextBuffer->GetLineChars(nLineIndex) : NULL;
 }
 
-/** 
+/**
  * @brief Reattach buffer after deleting/inserting ghost lines :
- * 
+ *
  * @note no need to reinitialize the horizontal scrollbar
  * no need to reset the editor options (m_bOvrMode, m_bLastReplace)
  */
@@ -2096,7 +2096,7 @@ void CCrystalTextView::ReAttachToBuffer(CCrystalTextBuffer *pBuf)
 	RecalcVertScrollBar();
 }
 
-/** 
+/**
  * @brief Attach buffer (maybe for the first time)
  * initialize the view and initialize both scrollbars
  */
@@ -2293,7 +2293,7 @@ int CCrystalTextView::RecalcHorzScrollBar(bool bPositionOnly)
 				si.fMask = SIF_DISABLENOSCROLL | SIF_PAGE | SIF_POS | SIF_RANGE;
 				si.nPage = pSiblingView->GetScreenChars();
 				si.nMin = 0;
-				// Horiz scroll limit to longest line + one screenwidth 
+				// Horiz scroll limit to longest line + one screenwidth
 				si.nMax = pSiblingView->GetMaxLineLength(true) + si.nPage;
 			}
 			si.nPos = pSiblingView->m_nOffsetChar;
@@ -2341,7 +2341,7 @@ BOOL CCrystalTextView::OnSetCursor(UINT nHitTest)
 	return FALSE;
 }
 
-/** 
+/**
  * @brief Converts client area point to text position.
  * @param [in] point Client area point.
  * @return Text position (line index, char index in line).
@@ -2663,7 +2663,7 @@ void CCrystalTextView::EnsureCursorVisible()
 		int nActualPos = CalculateActualOffset(m_ptCursorPos.y, m_ptCursorPos.x);
 		int nNewOffset = m_nOffsetChar;
 		int const nScreenChars = GetScreenChars();
-	  
+	
 		// Keep 5 chars visible right to cursor
 		if (nActualPos > nNewOffset + nScreenChars - 5)
 		{
@@ -2972,7 +2972,7 @@ HGLOBAL CCrystalTextView::PrepareDragData()
 	return hData;
 }
 
-/** 
+/**
  * @brief Select text in editor.
  * @param [in] ptStartPos Star position for highlight.
  * @param [in] nLength Count of characters to highlight.
@@ -3379,7 +3379,7 @@ void CCrystalTextView::OnEditRepeat()
 	}
 }
 
-/** 
+/**
  * @brief Adds/removes bookmark on given line.
  * This functions adds bookmark or removes bookmark on given line.
  * @param [in] Index (0-based) of line to add/remove bookmark.
@@ -3393,7 +3393,7 @@ void CCrystalTextView::ToggleBookmark(int nLine)
 	m_bBookmarkExist = nBookmarkLine >= 0;
 }
 
-/** 
+/**
  * @brief Called when Toggle Bookmark is selected from the GUI.
  */
 void CCrystalTextView::OnToggleBookmark()
@@ -3741,7 +3741,7 @@ void CCrystalTextView::SetWordWrapping(bool bWordWrap)
 
 LPCTSTR CCrystalTextView::GetTextBufferEol(int nLine) const
 {
-	return m_pTextBuffer->GetLineEol(nLine); 
+	return m_pTextBuffer->GetLineEol(nLine);
 }
 
 // This function assumes selection is in one line
@@ -3807,7 +3807,7 @@ void CCrystalTextView::EnsureSelectionVisible(BOOL bCenter)
 		// Selection fits to screen, scroll whole selection visible
 		if (nSelLen < nScreenChars)
 		{
-			// Begin of selection not visible 
+			// Begin of selection not visible
 			if (nBeginOffset > nScreenChars)
 			{
 				// Scroll so that there is max 5 chars margin at end

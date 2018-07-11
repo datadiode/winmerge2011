@@ -13,7 +13,7 @@
 //    You should have received a copy of the GNU General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////
-/** 
+/**
  * @file  DiffList.h
  *
  * @brief Declaration file for DiffList class
@@ -85,7 +85,7 @@ struct DiffRangeInfo
  * There are two kinds of diffs:
  * - significant diffs are 'normal' diffs we want to merge and browse
  * - non-significant diffs are diffs ignored by linefilters
- * 
+ *
  * The code assumes diff lists don't grow bigger than 32-bit int type's
  * range. And what a trouble we'd have if we have so many diffs...
  */

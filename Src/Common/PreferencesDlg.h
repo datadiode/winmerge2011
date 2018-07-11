@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  PreferencesDlg.h
  *
  * @brief Declaration of CPreferencesDlg class
@@ -40,13 +40,13 @@ protected:
 // Dialog Data
 	HTreeView *m_tcPages;
 
-	int m_nPageCount;	
+	int m_nPageCount;
 	int m_nPageIndex;
 	PropGeneral m_pageGeneral;
 	PropCompare m_pageCompare;
 	PropEditor m_pageEditor;
 	PropHexEditor m_pageHexEditor;
-	PropVss m_pageVss;	
+	PropVss m_pageVss;
 	PropRegistry m_pageSystem;
 	PropCodepage m_pageCodepage;
 	PropMergeColors m_pageMergeColors;

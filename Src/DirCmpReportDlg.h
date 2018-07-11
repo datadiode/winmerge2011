@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  DirCmpReportDlg.h
  *
  * @brief Declaration file for DirCmpReport Dialog.
@@ -9,7 +9,7 @@
 #include "DirReportTypes.h"
 #include "SuperComboBox.h"
 
-/** 
+/**
  * @brief Folder compare dialog class.
  * This dialog (and class) showa folder-compare report's selections
  * for user. Also filename and path for report file can be chosen

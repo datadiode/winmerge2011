@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  PropCompare.cpp
  *
  * @brief Implementation of PropCompare propertysheet
@@ -13,7 +13,7 @@
 #define new DEBUG_NEW
 #endif
 
-/** 
+/**
  * @brief Constructor.
  */
 PropCompare::PropCompare()
@@ -69,7 +69,7 @@ LRESULT PropCompare::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	return OptionsPanel::WindowProc(message, wParam, lParam);
 }
 
-/** 
+/**
  * @brief Reads options values from storage to UI.
  * Property sheet calls this before displaying GUI to load values
  * into members.
@@ -93,7 +93,7 @@ void PropCompare::ReadOptions()
 	m_nMatchSimilarLinesMax = COptionsMgr::Get(OPT_CMP_MATCH_SIMILAR_LINES_MAX);
 }
 
-/** 
+/**
  * @brief Writes options values from UI to storage.
  * Property sheet calls this after dialog is closed with OK button to
  * store values in member variables.
@@ -116,7 +116,7 @@ void PropCompare::WriteOptions()
 	COptionsMgr::SaveOption(OPT_CMP_MATCH_SIMILAR_LINES_MAX, m_nMatchSimilarLinesMax);
 }
 
-/** 
+/**
  * @brief Called before propertysheet is drawn.
  */
 void PropCompare::UpdateScreen()
@@ -129,7 +129,7 @@ void PropCompare::UpdateScreen()
 	GetDlgItem(IDC_DIFF_WHITESPACE_IGNOREALL)->EnableWindow(bEnable);
 }
 
-/** 
+/**
  * @brief Sets options to defaults
  */
 void PropCompare::OnDefaults()

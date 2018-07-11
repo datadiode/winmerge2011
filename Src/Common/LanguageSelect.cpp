@@ -36,13 +36,13 @@ public:
 	LANGID id; /**< Language ID. */
 
 	static LANGID LangId(const char *lang, const char *sublang);
-	
+
 	/**
 	 * A constructor taking a language id as parameter.
 	 * @param [in] id Language ID to use.
 	 */
 	LangFileInfo(LANGID id): id(id) { };
-	
+
 	LangFileInfo(LPCTSTR path);
 	String GetString(LCTYPE type) const;
 
@@ -513,7 +513,7 @@ CLanguageSelect::CLanguageSelect()
 
 /**
  * @brief Load language.file
- * @param [in] wLangId 
+ * @param [in] wLangId
  * @return TRUE on success, FALSE otherwise.
  */
 bool CLanguageSelect::LoadLanguageFile(LANGID wLangId)
@@ -730,7 +730,7 @@ bool CLanguageSelect::LoadLanguageFile(LANGID wLangId)
 
 /**
  * @brief Set UI language.
- * @param [in] wLangId 
+ * @param [in] wLangId
  * @return TRUE on success, FALSE otherwise.
  */
 bool CLanguageSelect::SetLanguage(LANGID wLangId)
@@ -1182,7 +1182,7 @@ int LocalString::MsgBox(UINT type)
 	return theApp.DoMessageBox(*this, type, id);
 }
 
-void CLanguageSelect::OnOK() 
+void CLanguageSelect::OnOK()
 {
 	int index = m_ctlLangList->GetCurSel();
 	if (index < 0)

@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  stringdiffs.h
  *
  * @brief Interface file declaring sd_ComputeWordDiffs (q.v.)

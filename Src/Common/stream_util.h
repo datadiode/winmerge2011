@@ -1,11 +1,11 @@
-/** 
+/**
  * @file  stream_util.h
  *
  * @brief ISequentialStream implementations which may be of some utility.
  */
 #pragma once
 
-/** 
+/**
  * @brief A sequential stream.
  */
 class SequentialStream : public ISequentialStream

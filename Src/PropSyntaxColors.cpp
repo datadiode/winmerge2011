@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  PropSyntaxColors.cpp
  *
  * @brief Implementation of PropSyntaxColors propertysheet
@@ -105,7 +105,7 @@ LRESULT PropSyntaxColors::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	return OptionsPanel::WindowProc(message, wParam, lParam);
 }
 
-/** 
+/**
  * @brief Let user browse common color dialog, and select a color & save to registry
  */
 void PropSyntaxColors::BrowseColorAndSave(int id, int colorIndex)

@@ -13,7 +13,7 @@
 //    You should have received a copy of the GNU General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////
-/** 
+/**
  * @file  ConfigLog.h
  *
  * @brief Declaration file ConfigLog class
@@ -23,7 +23,7 @@
 class CfgSettings;
 class UniStdioFile;
 
-/** 
+/**
  * @brief Compare-related settings.
  */
 struct COMPARESETTINGS
@@ -32,7 +32,7 @@ struct COMPARESETTINGS
 	bool bStopAfterFirst;
 };
 
-/** 
+/**
  * @brief View settings for directory compare
  */
 struct VIEWSETTINGS
@@ -46,7 +46,7 @@ struct VIEWSETTINGS
 	bool bTreeView;
 };
 
-/** 
+/**
  * @brief Misc WinMerge settings
  */
 struct MISCSETTINGS
@@ -71,7 +71,7 @@ struct MISCSETTINGS
 	bool bMerge7zProbeSignature;
 };
 
-/** 
+/**
  * @brief Codepage WinMerge settings
  */
 struct CPSETTINGS
@@ -81,7 +81,7 @@ struct CPSETTINGS
 	bool bDetectCodepage;
 };
 
-/** 
+/**
  * @brief Major Font WinMerge settings
  */
 struct FONTSETTINGS
@@ -90,7 +90,7 @@ struct FONTSETTINGS
 	String sFacename;
 };
 
-/** 
+/**
  * @brief Class for saving configuration log file
  */
 class CConfigLog

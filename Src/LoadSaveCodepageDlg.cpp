@@ -102,7 +102,7 @@ LRESULT CLoadSaveCodepageDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lPa
  * @brief Handler for WM_INITDIALOG; conventional location to initialize controls
  * At this point dialog and control windows exist
  */
-BOOL CLoadSaveCodepageDlg::OnInitDialog() 
+BOOL CLoadSaveCodepageDlg::OnInitDialog()
 {
 	OResizableDialog::OnInitDialog();
 	LanguageSelect.TranslateDialog(m_hWnd);

@@ -16,7 +16,7 @@
 //    You should have received a copy of the GNU General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////
-/** 
+/**
  * @file  FileOrFolderSelect.cpp
  *
  * @brief Implementation of the file and folder selection routines.
@@ -139,11 +139,11 @@ BOOL SelectFile(HWND parent, String &path,
 
 	if (bRetVal)
 		path = sSelectedFile;
-	
+
 	return bRetVal;
 }
 
-/** 
+/**
  * @brief Helper function for selecting directory
  * @param [in] parent Handle to parent window
  * @param [out] path Selected path is returned in this string
@@ -208,7 +208,7 @@ static int CALLBACK BrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM lParam, LPAR
 }
 
 
-/** 
+/**
  * @brief Shows file/folder selection dialog.
  *
  * We need this custom function so we can select files and folders with the

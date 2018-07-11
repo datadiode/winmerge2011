@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  ViewableWhitespace.h
  *
  * @brief Repository of character tables used to display whitespace (when View/Whitespace enabled)

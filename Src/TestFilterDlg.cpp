@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  TestFilterDlg.cpp
  *
  * @brief Dialog for testing file filters
@@ -60,12 +60,12 @@ BOOL CTestFilterDlg::OnInitDialog()
 	GetDlgItem(IDC_TEST_TEXT)->SetFocus();
 
 	SetDlgItemText(IDC_HEADER_FILTER_NAME, m_pFileFilter->name.c_str());
-	
+
 	return FALSE;
 }
 
 /** @brief User pressed Text button. */
-void CTestFilterDlg::OnTestBtn() 
+void CTestFilterDlg::OnTestBtn()
 {
 	String text;
 	GetDlgItemText(IDC_TEST_TEXT, text);

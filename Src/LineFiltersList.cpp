@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  LineFiltersList.cpp
  *
  * @brief Implementation for LineFiltersList class.

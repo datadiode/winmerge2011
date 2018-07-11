@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  DirColsDlg.h
  *
  * @brief Declaration file for CDirColsDlg
@@ -35,7 +35,7 @@ public:
 		int def_phy;
 		column(WORD idName, WORD idDesc, int log, int phy, int def_phy)
 			: idName(idName), idDesc(idDesc), log(log), phy(phy), def_phy(def_phy)
-		{ } 
+		{ }
 	};
 	typedef std::vector<column> ColumnArray;
 

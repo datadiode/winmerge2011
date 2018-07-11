@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  locality.h
  *
  * @brief Declaration of helper functions involving locale
@@ -70,9 +70,9 @@ namespace locality
 	public:
 		enum UTime { UTime };
 		enum LTime { LTime };
-		TimeString(const SYSTEMTIME &st) { Format(st); } 
-		TimeString(const FILETIME &ft, enum UTime) { FormatAsUTime(ft); } 
-		TimeString(const FILETIME &ft, enum LTime) { FormatAsLTime(ft); } 
+		TimeString(const SYSTEMTIME &st) { Format(st); }
+		TimeString(const FILETIME &ft, enum UTime) { FormatAsUTime(ft); }
+		TimeString(const FILETIME &ft, enum LTime) { FormatAsLTime(ft); }
 	};
 };
 

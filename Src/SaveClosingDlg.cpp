@@ -144,7 +144,7 @@ void SaveClosingDlg::OnOK()
 	EndDialog(IDOK);
 }
 
-/** 
+/**
  * @brief Called when 'Discard All' button is selected.
  */
 void SaveClosingDlg::OnDiscardAll()

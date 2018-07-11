@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  LineInfo.cpp
  *
  * @brief Implementation of LineInfo class.
@@ -133,7 +133,7 @@ bool LineInfo::ChangeEol(LPCTSTR lpEOL)
 		delete[] m_pcLine;
 		m_pcLine = pcNewBuf;
 	}
-  
+
 	// copy also the 0 to zero-terminate the line
 	memcpy(m_pcLine + m_nLength, lpEOL, sizeof(TCHAR) * (nNewEolChars + 1));
 	m_nEolChars = nNewEolChars;

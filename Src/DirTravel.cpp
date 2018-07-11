@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  DirTravel.cpp
  *
  * @brief Implementation file for Directory traversal functions.

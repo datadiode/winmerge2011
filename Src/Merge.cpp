@@ -247,7 +247,7 @@ HRESULT CMergeApp::InitInstance()
 
 			CCrystalTextView::InitSharedResources();
 
-			// Register the main window class. 
+			// Register the main window class.
 			const WNDCLASS wc =
 			{
 				CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS,

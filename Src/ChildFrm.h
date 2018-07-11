@@ -15,7 +15,7 @@
 //    You should have received a copy of the GNU General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////
-/** 
+/**
  * @file  ChildFrm.h
  *
  * @brief interface of the CChildFrame class
@@ -52,10 +52,10 @@ enum
  */
 enum SAVERESULTS_TYPE
 {
-	SAVE_DONE, /**< Saving succeeded */  
-	SAVE_FAILED, /**< Saving failed */  
-	SAVE_NO_FILENAME, /**< File has no filename */  
-	SAVE_CANCELLED, /**< Saving was cancelled */  
+	SAVE_DONE, /**< Saving succeeded */
+	SAVE_FAILED, /**< Saving failed */
+	SAVE_NO_FILENAME, /**< File has no filename */
+	SAVE_CANCELLED, /**< Saving was cancelled */
 };
 
 enum MERGEVIEW_INDEX_TYPE
@@ -74,7 +74,7 @@ class CLocationView;
 class PackingInfo;
 class CDirFrame;
 
-/** 
+/**
  * @brief Frame class for file compare, handles panes, statusbar etc.
  */
 class CChildFrame
@@ -267,7 +267,7 @@ private:
 	bool m_bMergingMode; /**< Merging or Edit mode */
 	bool m_bMixedEol; /**< Does this document have mixed EOL style? */
 	bool m_bHasSyncPoints;
-	FileTime m_LastRescan; /**< Time of last rescan (for delaying) */ 
+	FileTime m_LastRescan; /**< Time of last rescan (for delaying) */
 	CDiffWrapper m_diffWrapper;
 	/// information about the file packer/unpacker
 	const std::auto_ptr<PackingInfo> m_pInfoUnpacker;

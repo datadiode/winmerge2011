@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  Environment.cpp
  *
  * @brief Environment related routines.
@@ -19,7 +19,7 @@ static const TCHAR TempFolderPrefix[] = _T("WinMerge_TEMP_%u");
  */
 static String strTempPath;
 
-/** 
+/**
  * @brief Get folder for temporary files.
  * This function returns system temp folder.
  * @param [out] pnerr Error code if erorr happened.

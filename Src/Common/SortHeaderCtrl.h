@@ -2,7 +2,7 @@
  *  @file SortHeaderCtrl.h
  *
  *  @brief Declaration of CSortHeaderCtrl
- */ 
+ */
 #pragma once
 
 /////////////////////////////////////////////////////////////////////////////

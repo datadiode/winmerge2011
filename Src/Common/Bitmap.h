@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  Bitmap.h
  *
  * @brief Declaration file for Bitmap helper functions.

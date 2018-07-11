@@ -15,7 +15,7 @@
 //    You should have received a copy of the GNU General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////
-/** 
+/**
  * @file  EditorFilePathBar.h
  *
  * @brief Interface of the CEditorFilePathBar class.
@@ -26,7 +26,7 @@
 /**
  * @brief Types for buffer. Buffer's type defines behavior
  * of buffer when saving etc.
- * 
+ *
  * Difference between BUFFER_NORMAL and BUFFER_NORMAL_NAMED is
  * that _NAMED has description text given and which is shown
  * instead of filename.
@@ -46,9 +46,9 @@ enum BUFFERTYPE
 
 /**
  * @brief A dialog bar with two controls for left/right path.
- * This class is a dialog bar for the both files path in the editor. 
+ * This class is a dialog bar for the both files path in the editor.
  * The bar looks like a statusBar (font, height). The control
- * displays a tip for each path (as a tooltip). 
+ * displays a tip for each path (as a tooltip).
  */
 class CEditorFilePathBar
 	: ZeroInit<CEditorFilePathBar>
@@ -56,7 +56,7 @@ class CEditorFilePathBar
 	, public CFloatState
 	, public CSplitState
 {
-public : 
+public:
 	CEditorFilePathBar(const LONG *FloatScript = NULL, const LONG *SplitScript = NULL);
 	~CEditorFilePathBar();
 

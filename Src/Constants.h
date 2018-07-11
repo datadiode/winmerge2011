@@ -1,4 +1,4 @@
-/** 
+/**
  * @file Constants.h
  *
  * @brief WinMerge constants, URLs, paths etc.

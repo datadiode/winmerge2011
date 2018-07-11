@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  OptionsPanel.cpp
  *
  * @brief Implementation of OptionsPanel class.
@@ -25,7 +25,7 @@ BOOL OptionsPanel::OnInitDialog()
 	return TRUE;
 }
 
-/** 
+/**
  * @brief Let user browse common color dialog, and select a color
  */
 void OptionsPanel::BrowseColor(int id, COLORREF &currentColor)

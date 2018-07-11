@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  DirViewColHandler.cpp
  *
  * @brief Methods of CDirView dealing with the listview (of file results)

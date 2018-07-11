@@ -317,7 +317,7 @@ HRESULT Format7zDLL::Interface::Updater::Commit(HWND hwndParent)
 
 		CObjectVector<CUpdatePair> updatePairs;
 		GetUpdatePairInfoList(dirItems, archiveItems, NFileTimeType::EEnum(fileTimeType), updatePairs); // must be done only once!!!
-  
+
 		CObjectVector<CUpdatePair2> operationChain;
 		UpdateProduce(dirItems, archiveItems, updatePairs, NUpdateArchive::kAddActionSet, operationChain);*/
 

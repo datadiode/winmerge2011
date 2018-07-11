@@ -31,7 +31,7 @@
  *			<!-- -->, <![ []]>, and DTD tags), but applying meta information is
  *			left to the caller. Thus, the library does not exactly implement an
  *			XML parser. It just helps reading XML.
- *			
+ *
  *			This library is not modeled after an existing pull parsing API,
  *			so don't expect to find the same methods you've seen elsewhere.
  *			In particular, this library does not follow XmlPull's event model,
@@ -409,7 +409,7 @@ void CMarkdown::Scan()
 								if (!(quoting & 1))
 									quoting ^= 2;
 								break;
-							case '\'': 
+							case '\'':
 								if (!(quoting & 2))
 									quoting ^= 1;
 								break;
@@ -501,7 +501,7 @@ bool CMarkdown::Pull()
 						if (!(quoting & 1))
 							quoting ^= 2;
 						break;
-					case '\'': 
+					case '\'':
 						if (!(quoting & 2))
 							quoting ^= 1;
 						break;
@@ -599,7 +599,7 @@ CMarkdown::HSTR CMarkdown::GetTagText()
 					if (!(quoting & 1))
 						quoting ^= 2;
 					break;
-				case '\'': 
+				case '\'':
 					if (!(quoting & 2))
 						quoting ^= 1;
 					break;
@@ -635,7 +635,7 @@ CMarkdown::HSTR CMarkdown::GetInnerText()
 			if (!(quoting & 1))
 				quoting ^= 2;
 			break;
-		case '\'': 
+		case '\'':
 			if (!(quoting & 2))
 				quoting ^= 1;
 			break;
@@ -731,7 +731,7 @@ CMarkdown::HSTR CMarkdown::GetAttribute(const char *key, const void *pv)
 			case '"':
 			case '\'':
 				equals = false;
-				cvalue = static_cast<UINT>(token.upper - (value = token.lower)); 
+				cvalue = static_cast<UINT>(token.upper - (value = token.lower));
 				if (cvalue >= 2)
 				{
 					++value;

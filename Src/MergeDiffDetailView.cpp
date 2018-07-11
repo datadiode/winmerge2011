@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  MergeDiffDetailView.cpp
  *
  * @brief Implementation file for CMergeDiffDetailView
@@ -84,11 +84,11 @@ bool CMergeDiffDetailView::DrawSingleLine(HSurface *pdc, const RECT &rc, int nLi
 	return CGhostTextView::DrawSingleLine(pdc, rc, nLineIndex);
 }
 
-/// virtual, avoid coloring the whole diff with diff color 
+/// virtual, avoid coloring the whole diff with diff color
 void CMergeDiffDetailView::GetLineColors(int nLineIndex, COLORREF &crBkgnd, COLORREF &crText)
 {
 	DWORD dwLineFlags = GetLineFlags(nLineIndex);
-	// Line with WinMerge flag, 
+	// Line with WinMerge flag,
 	// Lines with only the LF_DIFF/LF_TRIVIAL flags are not colored with Winmerge colors
 	if (dwLineFlags & (LF_WINMERGE_FLAGS & ~LF_DIFF & ~LF_TRIVIAL & ~LF_MOVED))
 	{
@@ -182,16 +182,16 @@ void CMergeDiffDetailView::ScrollToSubLine(int nNewTopLine)
 		nNewTopLine = m_lineBegin;
 
 	m_nTopLine = nNewTopLine;
-	
+
 	POINT pt = GetCursorPos();
 	if (EnsureInDiff(pt))
 		SetCursorPos(pt);
-	
+
 	POINT ptSelStart, ptSelEnd;
 	GetSelection(ptSelStart, ptSelEnd);
 	if (EnsureInDiff(ptSelStart) || EnsureInDiff(ptSelEnd))
 		SetSelection(ptSelStart, ptSelEnd);
-	
+
 	CCrystalTextView::ScrollToSubLine(nNewTopLine);
 }
 
@@ -242,7 +242,7 @@ int CMergeDiffDetailView::RecalcHorzScrollBar(bool bPositionOnly)
 		si.fMask = SIF_DISABLENOSCROLL | SIF_PAGE | SIF_POS | SIF_RANGE;
 		si.nPage = GetScreenChars();
 		si.nMin = 0;
-		// Horiz scroll limit to longest line + one screenwidth 
+		// Horiz scroll limit to longest line + one screenwidth
 		si.nMax = nMaxLineLen + si.nPage;
 	}
 	si.nPos = m_nOffsetChar;

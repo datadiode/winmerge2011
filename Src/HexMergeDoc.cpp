@@ -197,7 +197,7 @@ bool CHexMergeFrame::PromptAndSaveIfNeeded(bool bAllowCancel)
 		}
 	}
 	else
-	{	
+	{
 		result = false;
 	}
 
@@ -228,7 +228,7 @@ void CHexMergeFrame::OnRefresh()
 /**
  * @brief Saves both files
  */
-void CHexMergeFrame::OnFileSave() 
+void CHexMergeFrame::OnFileSave()
 {
 	BOOL bUpdate = FALSE;
 	if (m_pView[0]->GetModified())

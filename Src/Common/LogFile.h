@@ -33,7 +33,7 @@ public:
 	{
 		LALL = -1, /**< All messages written */
 		LERROR = 0x1, /**< Error messages */
-		LWARNING = 0x2, /**< Warning messages */ 
+		LWARNING = 0x2, /**< Warning messages */
 		LNOTICE = 0x4, /**< Important messages */
 		LMSG = 0x8, /**< Normal messages */
 		LCODEFLOW = 0x10, /**< Code flow messages */

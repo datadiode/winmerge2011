@@ -13,7 +13,7 @@
 //    You should have received a copy of the GNU General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////
-/** 
+/**
  * @file  AboutDlg.h
  *
  * @brief Declaration file for CAboutDlg.
@@ -21,9 +21,9 @@
  */
 #pragma once
 
-/** 
+/**
  * @brief About-dialog class.
- * 
+ *
  * Shows About-dialog bitmap and draws version number and other
  * texts into it.
  */

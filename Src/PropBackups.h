@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  PropBackups.h
  *
  * @brief Declaration file for PropBackups propertyheet

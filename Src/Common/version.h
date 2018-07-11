@@ -2,7 +2,7 @@
  *  @file version.h
  *
  *  @brief Declaration of CVersionInfo class
- */ 
+ */
 #pragma once
 
 /**

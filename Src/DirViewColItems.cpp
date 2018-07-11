@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  DirViewColItems.cpp
  *
  * @brief Code for individual columns in the DirView

@@ -2,7 +2,7 @@
  *  @file DirScan.cpp
  *
  *  @brief Implementation of DirScan (q.v.) and helper functions
- */ 
+ */
 #include "StdAfx.h"
 #include "Merge.h"
 #include "LogFile.h"
@@ -25,7 +25,7 @@
  *   contain into list.
  *
  * Items are tested against file filters in this function.
- * 
+ *
  * @param [in] leftsubdir Left side subdirectory under root path
  * @param [in] bLeftUniq Is left-side folder unique folder?
  * @param [in] rightsubdir Right side subdirectory under root path
@@ -87,7 +87,7 @@ int CDiffContext::DirScan_GetItems(
 			(leftsubprefix + leftDirs[0].filename).c_str(),
 			(rightsubprefix + rightDirs[0].filename).c_str());
 
-	DirItemArray::size_type i = 0, j = 0; 
+	DirItemArray::size_type i = 0, j = 0;
 	for (;;)
 	{
 		if (ShouldAbort())
@@ -228,7 +228,7 @@ int CDiffContext::DirScan_GetItems(
 		}
 
 		// Comparing file leftFiles[i].name to rightFiles[j].name
-		
+
 		if (i < leftFiles.size() && (j == rightFiles.size() ||
 				m_piFilterGlobal->collateFile(leftFiles[i].filename.c_str(), rightFiles[j].filename.c_str()) < 0))
 		{
@@ -541,7 +541,7 @@ void CDiffContext::SetDiffItemStats(const FolderCmp &fc, DIFFITEM *di)
 	{
 		di->right.encoding = fc.m_diffFileData.m_FileLocation[1].encoding;
 	}
-	
+
 	if (!di->isSideRightOnly())
 	{
 		di->left.encoding = fc.m_diffFileData.m_FileLocation[0].encoding;

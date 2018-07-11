@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  codepage_detect.cpp
  *
  * @brief Deducing codepage from file contents, when we can

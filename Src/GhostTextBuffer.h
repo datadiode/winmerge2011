@@ -17,7 +17,7 @@
  * information; here are the list of WinMerge flags.
  * So, these constants are used with the SetLineFlags(2) calls.
  *
- * LF_GHOST must be cleared and set in GhostTextBuffer.cpp 
+ * LF_GHOST must be cleared and set in GhostTextBuffer.cpp
  * and MergeDoc.cpp (Rescan) only.
  *
  * GetLineColors (in MergeEditView) reads it to choose the line color.
@@ -43,12 +43,12 @@ C_ASSERT(LF_WINMERGE_FLAGS == (LF_TRIVIAL | LF_MOVED | LF_DIFF | LF_SKIPPED | LF
 
 /**
  * @brief A class handling ghost lines.
- * Features offered with this class : 
+ * Features offered with this class :
  * <ul>
- *  <li> apparent/real line conversion 
- *  <li> insertText/deleteText working with ghost lines 
- *  <li> AddUndoRecord/Undo/Redo working with ghost lines 
- *  <li> insertGhostLine function 
+ *  <li> apparent/real line conversion
+ *  <li> insertText/deleteText working with ghost lines
+ *  <li> AddUndoRecord/Undo/Redo working with ghost lines
+ *  <li> insertGhostLine function
  * </ul>
  */
 class CGhostTextBuffer : public CCrystalTextBuffer
@@ -62,10 +62,10 @@ protected:
 	};
 
 protected:
-	/** 
+	/**
 	We need another array with our richer structure.
 
-	We share the positions with the CCrystalTextBuffer object. 
+	We share the positions with the CCrystalTextBuffer object.
 	We share m_bUndoGroup, its utility is to check we opened the UndoBeginGroup.
 	We share m_nUndoBufSize which is the max buffer size.
 	*/
@@ -139,14 +139,14 @@ public:
 
 	/** for loading file */
 	void FinishLoading();
-	/** for saving file */ 
+	/** for saving file */
 	void RemoveAllGhostLines(DWORD dwMask = LF_GHOST);
 
 
 private:
 	void RecomputeRealityMapping();
-	/** 
-	Code to set EOL, if the status ghost/real of the line changes 
+	/**
+	Code to set EOL, if the status ghost/real of the line changes
 
 	We should call a CCrystalTextBuffer function to add the correct EOL
 	(if CCrystalTextBuffer keeps the default EOL for the file)

@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  RegKey.cpp
  *
  * @brief Implementation of CRegKeyEx C++ wrapper class for reading Windows registry
@@ -27,7 +27,7 @@ CRegKeyEx::~CRegKeyEx()
  */
 void CRegKeyEx::Close()
 {
-	if (m_hKey) 
+	if (m_hKey)
 	{
 		RegCloseKey(m_hKey);
 		m_hKey = NULL;
@@ -137,7 +137,7 @@ DWORD CRegKeyEx::ReadDword(LPCTSTR pszKey, DWORD defval) const
 	DWORD dwSize = sizeof (DWORD);
 
 	DWORD value;
-	LONG ret = RegQueryValueEx(m_hKey, pszKey, NULL, 
+	LONG ret = RegQueryValueEx(m_hKey, pszKey, NULL,
 		&dwType, (LPBYTE)&value, &dwSize);
 
 	if (ret != ERROR_SUCCESS || dwType != REG_DWORD)

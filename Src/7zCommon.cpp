@@ -255,7 +255,7 @@ CDirView::DirItemEnumerator::DirItemEnumerator(CDirView *pView, int nFlags)
 			{
 				continue;
 			}
-			if (m_bRight) 
+			if (m_bRight)
 			{
 				// Enumerating items on right side
 				if (!di->isSideLeftOnly())

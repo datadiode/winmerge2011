@@ -2,7 +2,7 @@
  *  @file version.cpp
  *
  *  @brief Implementation of CVersionInfo class
- */ 
+ */
 #include "StdAfx.h"
 #include "version.h"
 
@@ -15,7 +15,7 @@ struct LANGUAGEANDCODEPAGE
 	WORD wCodePage;
 };
 
-/** 
+/**
  * @brief Constructor.
  * @param [in] szFileToVersion Filename to read version from.
  * @param [in] bDllVersion If TRUE queries DLL version.
@@ -28,7 +28,7 @@ CVersionInfo::CVersionInfo(LPCTSTR szFileName)
 	GetVersionInfo(szFileName);
 }
 
-/** 
+/**
  * @brief Constructor for asking version number from known module.
  * @param [in] hModule Handle to module for version info.
  */
@@ -47,7 +47,7 @@ CVersionInfo::~CVersionInfo()
 	delete[] m_pVffInfo;
 }
 
-/** 
+/**
  * @brief Return file version string.
  * @return File version as string.
  */
@@ -56,7 +56,7 @@ String CVersionInfo::GetFileVersion() const
 	return QueryValue(_T("FileVersion"));
 }
 
-/** 
+/**
  * @brief Return private build number.
  * @return Private build number as string.
  */
@@ -65,7 +65,7 @@ String CVersionInfo::GetPrivateBuild() const
 	return QueryValue(_T("PrivateBuild"));
 }
 
-/** 
+/**
  * @brief Return special build number.
  * @return Special build number as string.
  */
@@ -74,7 +74,7 @@ String CVersionInfo::GetSpecialBuild() const
 	return QueryValue(_T("SpecialBuild"));
 }
 
-/** 
+/**
  * @brief Return company name.
  * @return Company name.
  */
@@ -83,7 +83,7 @@ String CVersionInfo::GetCompanyName() const
 	return QueryValue(_T("CompanyName"));
 }
 
-/** 
+/**
  * @brief Return file description string.
  * @return File description string.
  */
@@ -92,7 +92,7 @@ String CVersionInfo::GetFileDescription() const
 	return QueryValue(_T("FileDescription"));
 }
 
-/** 
+/**
  * @brief Return internal name.
  * @return Internal name.
  */
@@ -101,7 +101,7 @@ String CVersionInfo::GetInternalName() const
 	return QueryValue(_T("InternalName"));
 }
 
-/** 
+/**
  * @brief Return copyright info.
  * @return Copyright info.
  */
@@ -110,7 +110,7 @@ String CVersionInfo::GetLegalCopyright() const
 	return QueryValue(_T("LegalCopyright"));
 }
 
-/** 
+/**
  * @brief Return original filename.
  * @return Original filename.
  */
@@ -119,7 +119,7 @@ String CVersionInfo::GetOriginalFilename() const
 	return QueryValue(_T("OriginalFilename"));
 }
 
-/** 
+/**
  * @brief Return product's version number.
  * @return Product's version number as string.
  */
@@ -128,7 +128,7 @@ String CVersionInfo::GetProductVersion() const
 	return QueryValue(_T("ProductVersion"));
 }
 
-/** 
+/**
  * @brief Format version string from numbers.
  * Version number consists of four WORD (16-bit) numbers. This function
  * formats those numbers to string, where numbers are separated by
@@ -149,7 +149,7 @@ String CVersionInfo::MakeVersionString(DWORD hi, DWORD lo) const
 	return ver;
 }
 
-/** 
+/**
  * @brief Return numeric product's version number.
  * This function returns version number given as a number in version info.
  * @return Product's version number as string.
@@ -159,7 +159,7 @@ String CVersionInfo::GetFixedProductVersion() const
 	return MakeVersionString(dwProductVersionMS, dwProductVersionLS);
 }
 
-/** 
+/**
  * @brief Return numeric file's version number.
  * This function returns version number given as a number in version info.
  * @return File's version number as string.
@@ -169,7 +169,7 @@ String CVersionInfo::GetFixedFileVersion() const
 	return MakeVersionString(dwFileVersionMS, dwFileVersionLS);
 }
 
-/** 
+/**
  * @brief Return numeric file's version number.
  * This function returns version number given as two DWORDs.
  * @param [out] versionMS High DWORD for version number.
@@ -187,7 +187,7 @@ BOOL CVersionInfo::GetFixedFileVersion(DWORD &versionMS, DWORD &versionLS) const
 	return FALSE;
 }
 
-/** 
+/**
  * @brief Return comment string.
  * @return Comment string.
  */
@@ -196,7 +196,7 @@ String CVersionInfo::GetComments() const
 	return QueryValue(_T("Comments"));
 }
 
-/** 
+/**
  * @brief Read version info from file.
  * This function reads version information from file's version resource
  * to member variables.
@@ -237,7 +237,7 @@ void CVersionInfo::GetVersionInfo(LPCTSTR szFileName)
 	}
 }
 
-/** 
+/**
  * @brief Read value from version info data.
  * @param [in] szId Name of value/string to read.
  * @param [out] Value read.
@@ -255,7 +255,7 @@ String CVersionInfo::QueryValue(LPCTSTR id) const
 		String(static_cast<LPCTSTR>(pv), len - 1) : String();
 }
 
-/** 
+/**
  * @brief Get codepage for given language.
  * This function finds codepage value for given language from version info.
  * That is, we have certain combinations of language-codepage in version info.
@@ -270,7 +270,7 @@ WORD CVersionInfo::GetCodepageForLanguage(WORD wLanguage)
 	UINT cbTranslate;
 	// Read the list of languages and code pages.
 
-	VerQueryValue(m_pVffInfo, 
+	VerQueryValue(m_pVffInfo,
 				_T("\\VarFileInfo\\Translation"),
 				(LPVOID*)&lpTranslate,
 				&cbTranslate);

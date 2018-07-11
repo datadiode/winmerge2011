@@ -20,7 +20,7 @@
  *  @file FileTransform.h
  *
  *  @brief Declaration of file transformations
- */ 
+ */
 #pragma once
 
 #include "Common/UniFile.h"

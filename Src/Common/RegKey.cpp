@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  RegKey.cpp
  *
  * @brief Implementation of CRegKeyEx C++ wrapper class for reading Windows registry
@@ -37,7 +37,7 @@ CRegKeyEx::~CRegKeyEx()
  */
 void CRegKeyEx::Close()
 {
-	if (m_hKey) 
+	if (m_hKey)
 	{
 		m_store.RegCloseKey(m_hKey);
 		m_hKey = NULL;

@@ -1,4 +1,4 @@
-/** 
+/**
  * @file FileTextStats.h
  *
  * @brief Declaration file for FileTextStats structure.

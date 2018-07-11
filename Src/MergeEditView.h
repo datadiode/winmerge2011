@@ -15,7 +15,7 @@
 //    You should have received a copy of the GNU General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////
-/** 
+/**
  * @file  MergeEditView.h
  *
  * @brief Declaration file for CMergeEditView
@@ -24,12 +24,12 @@
 
 #include "GhostTextView.h"
 
-/** 
+/**
  * @brief Non-diff lines shown above diff when scrolling to it
  */
 const UINT CONTEXT_LINES_ABOVE = 5;
 
-/** 
+/**
  * @brief Non-diff lines shown below diff when scrolling to it
  */
 const UINT CONTEXT_LINES_BELOW = 3;
@@ -46,12 +46,12 @@ class CShellContextMenu;
 This class is the base class for WinMerge editor panels.
 It hooks the painting of ghost lines (GetLineColors), the shared
 scrollbar (OnUpdateSibling...).
-It offers the UI interface commands to work with diffs 
+It offers the UI interface commands to work with diffs
 
 @todo
 If we keep GetLineColors here, we should clear DIFF flag here
-and not in CGhostTextBuffer (when insertText/deleteText). 
-Small problem... This class doesn't derives from CGhostTextBuffer... 
+and not in CGhostTextBuffer (when insertText/deleteText).
+Small problem... This class doesn't derives from CGhostTextBuffer...
 We could define a new class which derives from CGhostTextBuffer to clear the DIFF flag.
 and calls a virtual function for additional things to do on the flag.
 Maybe in the future...

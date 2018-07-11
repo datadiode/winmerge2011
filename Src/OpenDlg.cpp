@@ -490,7 +490,7 @@ void COpenDlg::OnBrowseButton(UINT idPath, UINT idFilter)
 	{
 		SetDlgItemText(idPath, path.c_str());
 		UpdateButtonStates();
-	}	
+	}
 }
 
 void COpenDlg::OnSelchangeCompareAs()
@@ -500,12 +500,12 @@ void COpenDlg::OnSelchangeCompareAs()
 	m_pTgCompareAs->SetCheck(m_nCompareAs == nCurSel);
 }
 
-/** 
+/**
  * @brief Called when dialog is closed with "OK".
  *
  * Checks that paths are valid and sets filters.
  */
-void COpenDlg::OnOK() 
+void COpenDlg::OnOK()
 {
 	UpdateData<Get>();
 	TrimPaths();
@@ -563,7 +563,7 @@ void COpenDlg::OnOK()
 	EndDialog(IDOK);
 }
 
-/** 
+/**
  * @brief Called when dialog is closed via Cancel.
  *
  * Open-dialog is canceled when 'Cancel' button is selected or
@@ -582,7 +582,7 @@ void COpenDlg::OnCancel()
 	EndDialog(IDCANCEL);
 }
 
-/** 
+/**
  * @brief Enable/disable components based on validity of paths.
  */
 void COpenDlg::UpdateButtonStates()
@@ -651,7 +651,7 @@ void COpenDlg::OnSelchangePathCombo(HSuperComboBox *pCb)
 	UpdateButtonStates();
 }
 
-/** 
+/**
  * @brief Called every time paths are edited.
  */
 void COpenDlg::OnEditchangePathCombo(HSuperComboBox *pCb)
@@ -706,7 +706,7 @@ void COpenDlg::SetStatus(UINT msgID)
 	SetDlgItemText(IDC_OPEN_STATUS, msg.c_str());
 }
 
-/** 
+/**
  * @brief Called when "Select..." button for filters is selected.
  */
 void COpenDlg::OnSelectFilter()
@@ -899,7 +899,7 @@ void COpenDlg::OnSelchangeFilter()
 	}
 }
 
-/** 
+/**
  * @brief Removes whitespaces from left and right paths
  * @note Assumes UpdateData(TRUE) is called before this function.
  */

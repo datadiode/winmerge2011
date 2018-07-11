@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  IOptionsPanel.h
  *
  * @brief Declaration file for IOptionsPanel Interface

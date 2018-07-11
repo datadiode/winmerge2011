@@ -1,11 +1,11 @@
-/** 
+/**
  * @file  SyntaxColors.h
  *
  * @brief Declaration file for SyntaxColors class
  */
 #pragma once
 
-/** 
+/**
  * @brief Indexes to color table
  */
 enum COLORINDEX
@@ -48,7 +48,7 @@ enum COLORINDEX
 
 const int COLORINDEX_COUNT = COLORINDEX_LAST - COLORINDEX_NONE;
 
-/** 
+/**
  * @brief Wrapper for Syntax coloring colors.
  *
  * This class is wrapper for syntax colors. We can use this class in editor

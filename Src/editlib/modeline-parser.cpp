@@ -75,7 +75,7 @@ modeline_parser_shutdown ()
 
 	if (kate_languages != NULL)
 		SysFreeString (kate_languages);
-	
+
 	vim_languages = NULL;
 	emacs_languages = NULL;
 	kate_languages = NULL;
@@ -150,7 +150,7 @@ skip_whitespaces (const TCHAR **s)
 }
 
 /* Parse vi(m) modelines.
- * Vi(m) modelines looks like this: 
+ * Vi(m) modelines looks like this:
  *   - first form:   [text]{white}{vi:|vim:|ex:}[white]{options}
  *   - second form:  [text]{white}{vi:|vim:|ex:}[white]se[t] {options}:[text]
  * They can happen on the three first or last lines.
@@ -250,7 +250,7 @@ parse_vim_modeline (const TCHAR *s, ModelineOptions *options)
 				options->display_right_margin = TRUE;
 				options->set |= MODELINE_SET_SHOW_RIGHT_MARGIN |
 				                MODELINE_SET_RIGHT_MARGIN_POSITION;
-				
+
 			}
 		}
 	}
@@ -414,7 +414,7 @@ parse_kate_modeline (const TCHAR *s, ModelineOptions *options)
 			              _tcscmp (value.c_str(), _T("true")) == 0 ||
 			              _tcscmp (value.c_str(), _T("1")) == 0;
 			options->wrap_mode = intval;
-			options->set |= MODELINE_SET_WRAP_MODE;			
+			options->set |= MODELINE_SET_WRAP_MODE;
 		}
 		else if (_tcscmp (key.c_str(), _T("word-wrap-column")) == 0)
 		{
@@ -474,7 +474,7 @@ modeline_parser_apply_modeline (CCrystalTextView *view)
 	CCrystalTextBuffer *buffer = view->GetTextBuffer();
 	int iter = 0;
 	int line_count = buffer->GetLineCount();
-	
+
 	options.set = MODELINE_SET_NONE;
 
 	/* Parse the modelines on the 10 first lines... */
@@ -511,30 +511,30 @@ modeline_parser_apply_modeline (CCrystalTextView *view)
 	{
 		buffer->SetInsertTabs(!options.insert_spaces);
 	}
-	
+
 	if (has_option (&options, MODELINE_SET_TAB_WIDTH))
 	{
 		buffer->SetTabSize(min(options.tab_width, 64U), buffer->GetSeparateCombinedChars());
 	}
-	
+
 	/*if (has_option (&options, MODELINE_SET_INDENT_WIDTH))
 	{
 		// Unavailable in CrystalEdit
 		buffer->SetIndentWidth(options.indent_width);
 	}*/
-	
+
 	/*if (has_option (&options, MODELINE_SET_WRAP_MODE))
 	{
 		// Ignored for WinMerge
 		view->SetWordWrapping(options.wrap_mode);
 	}*/
-	
+
 	/*if (has_option (&options, MODELINE_SET_RIGHT_MARGIN_POSITION))
 	{
 		// Unavailable in CrystalEdit
 		view->SetRightMarginPosition(options.right_margin_position);
 	}*/
-	
+
 	/*if (has_option (&options, MODELINE_SET_SHOW_RIGHT_MARGIN))
 	{
 		// Unavailable in CrystalEdit

@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  DirCmpReportDlg.cpp
  *
  * @brief Implementation file for DirCmpReport dialog

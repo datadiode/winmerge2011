@@ -17,7 +17,7 @@
  *  @file FileFilter.cpp
  *
  *  @brief Implementation of FileFilter.
- */ 
+ */
 #include "StdAfx.h"
 #include "FileFilter.h"
 #include "Common/coretools.h"
@@ -186,7 +186,7 @@ int FileFilter::TestAgainstRegList(const vector<regexp_item> &filterList, LPCTST
 {
 	ASSERT(!filterList.empty());
 	const char *pathString = NULL;
-	UINT pathLength = 0; 
+	UINT pathLength = 0;
 	const char *nameString = NULL;
 	UINT nameLength = 0;
 	const UINT lenName = static_cast<UINT>(_tcslen(szName));

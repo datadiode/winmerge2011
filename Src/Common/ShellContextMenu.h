@@ -19,7 +19,7 @@
  *	@file ShellContextMenu.h
  *
  *	@brief Declaration of class CShellContextMenu
- */ 
+ */
 #pragma once
 
 #include <MyCom.h>
@@ -36,7 +36,7 @@ struct __declspec(uuid("bcfce0a0-ec17-11d0-8d10-00a0c90f2719")) IContextMenu3;
  * Usage:
  * <ol>
  * <li>Show popup menu via TrackPopupMenu[Ex]() with TPM_RETURNCMD flag using handle that is returned by GetHMENU().
- *	   Handle WM_INITMENUPOPUP, WM_DRAWITEM, WM_MEASUREITEM and WM_MENUCHAR in window procedure of the menu owner 
+ *	   Handle WM_INITMENUPOPUP, WM_DRAWITEM, WM_MEASUREITEM and WM_MENUCHAR in window procedure of the menu owner
  *	   and pass them to HandleMenuMessage().</li>
  * <li>Call InvokeCommand() with nCmd returned by TrackPopupMenu[Ex]().</li>
  * </ol>

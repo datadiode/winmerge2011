@@ -2,7 +2,7 @@
  *  @file UniMarkdownFile.cpp
  *
  *  @brief Implementation of UniMarkdownFile class.
- */ 
+ */
 #include "StdAfx.h"
 #include "UniMarkdownFile.h"
 #include "markdown.h"

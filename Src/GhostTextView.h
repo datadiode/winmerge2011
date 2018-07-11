@@ -16,14 +16,14 @@ class CGhostTextBuffer;
 // CCrystalTextView class declaration
 
 /**
-This class hooks CCrystalEditViewEx to work with ghost lines. 
+This class hooks CCrystalEditViewEx to work with ghost lines.
 
-Use a CGhostTextBuffer buffer and virtualize some functions 
-to handle apparent/real lines differences. 
+Use a CGhostTextBuffer buffer and virtualize some functions
+to handle apparent/real lines differences.
 
 We don't need to hook the drawing. Drawing ghost lines with the function used for
-real lines is correct, as they are empty and have no EOL. 
-WinMerge also paints the ghost lines in a custom color through virtualizing 
+real lines is correct, as they are empty and have no EOL.
+WinMerge also paints the ghost lines in a custom color through virtualizing
 GetLineColors (in MergeEditView).
 */
 class CGhostTextView : public CCrystalEditView
@@ -33,8 +33,8 @@ protected:
 
 private:
 	/**
-	 * @brief Real point structure to preserve a position during Rescan 
-	 * 
+	 * @brief Real point structure to preserve a position during Rescan
+	 *
 	 * @note The preserved positions are also updated in CCrystalTextView::UpdateView
 	 * or in CCrystalEditView::UpdateView
 	 * except for m_ptLastChange, which is set just after the call to UpdateView
@@ -45,12 +45,12 @@ private:
 		int x;
 		/// real line number of itself (is the line is real)/the first real line after this line (else)
 		int y;
-		/// 0 (is the line is real)/ distance to the first real line after this one 
+		/// 0 (is the line is real)/ distance to the first real line after this one
 		int nToFirstReal;
 
 		SCursorPushed() : x(0), y(0), nToFirstReal(0) { }
 	};
-	
+
 	/**
 	 * @brief Save a position to be able to restore it after Rescan.
 	 * The saved position is based only on real lines

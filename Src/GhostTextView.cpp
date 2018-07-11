@@ -118,7 +118,7 @@ void CGhostTextView::PopCursors()
 		ptLastChange.x = -1;
 		ptLastChange.y = -1;
 	}
-	else 
+	else
 	{
 		popPosition(m_ptLastChangePushed, ptLastChange);
 		ASSERT_VALIDTEXTPOS(ptLastChange);
@@ -259,7 +259,7 @@ void CGhostTextView::GetAdditionalTextBlocks(int nLineIndex, TextBlock::Array &r
 }
 
 /**
- * @brief Draw selection margin. 
+ * @brief Draw selection margin.
  * @param [in] pdc         Pointer to draw context.
  * @param [in] rect        The rectangle to draw.
  * @param [in] nLineIndex  Index of line in view.
@@ -335,7 +335,7 @@ void CGhostTextView::ZoomText(short amount)
 
 		lf.lfHeight = -MulDiv(nPointSize, nLogPixelsY, 72);
 
-		for (int nPane = 0; nPane < MERGE_VIEW_COUNT; nPane++) 
+		for (int nPane = 0; nPane < MERGE_VIEW_COUNT; nPane++)
 		{
 			if (CCrystalTextView *const pView = m_pDocument->GetView(nPane))
 			{

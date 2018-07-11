@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  TestFilterDlg.h
  *
  * @brief Declaration file for CTestFilterDlg class

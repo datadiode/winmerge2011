@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  MovedLines.cpp
  *
  * @brief Implementation of MovedLines class.

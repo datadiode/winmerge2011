@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  stringdiffs.cpp
  *
  * @brief Implementation file for sd_ComputeWordDiffs (q.v.)
@@ -630,7 +630,7 @@ void stringdiffs::ComputeByteDiff(wdiff const &diff,
 			if (!matchchar(py1[0], py2[0], m_case_sensitive))
 				break; // done with forward search
 		}
-		else 
+		else
 		{
 			if (matchchar(py1[0], py2[0], m_case_sensitive))
 			{
@@ -741,7 +741,7 @@ void stringdiffs::ComputeByteDiff(wdiff const &diff,
 					break; // done with forward search
 				}
 			}
-			else 
+			else
 			{
 				if (matchchar(pz1[0], pz2[0], m_case_sensitive))
 				{
@@ -769,22 +769,22 @@ void stringdiffs::ComputeByteDiff(wdiff const &diff,
 
 		// Store results of advance into return variables (end1 & end2)
 		// return -1 for Not found, otherwise distance from begin
-		if (found && pz1 == pbeg1 ) 
+		if (found && pz1 == pbeg1)
 		{
 			// Found on begin
 			end1 = 0;
 		}
-		else if (pz1 <= pbeg1 || pz1 < py1) 
+		else if (pz1 <= pbeg1 || pz1 < py1)
 		{
 			// No visible diff in line 1
-			end1 = -1; 
+			end1 = -1;
 		}
 		else
 		{
 			// Found on distance line 1
 			end1 = static_cast<int>(pz1 - pbeg1);
 		}
-		if (found && pz2 == pbeg2 ) 
+		if (found && pz2 == pbeg2)
 		{
 			// Found on begin
 			end2 = 0;
@@ -792,7 +792,7 @@ void stringdiffs::ComputeByteDiff(wdiff const &diff,
 		else if (pz2 <= pbeg2 || pz2 < py2)
 		{
 			// No visible diff in line 2
-			end2 = -1; 
+			end2 = -1;
 		}
 		else
 		{
@@ -817,7 +817,7 @@ void stringdiffs::wordLevelToByteLevel() const
 #ifdef STRINGDIFF_LOGGING
 		DbgPrint("actual\n left = %d,%d\n right = %d,%d\n",
 			diff.start[0], diff.end[0], diff.start[1], diff.end[1]);
-#endif	
+#endif
 		// Check for first and last difference in word
 		int begin1, begin2, end1, end2;
 		ComputeByteDiff(diff, begin1, begin2, end1, end2, false);
@@ -856,7 +856,7 @@ void stringdiffs::wordLevelToByteLevel() const
 #ifdef STRINGDIFF_LOGGING
 		DbgPrint("changed\n left = %d,%d\n right = %d,%d\n",
 			diff.start[0], diff.end[0], diff.start[1], diff.end[1]);
-#endif	
+#endif
 		// Nothing to display, remove item
 		if (diff.start[0] == diff.end[0] && diff.start[1] == diff.end[1])
 		{
@@ -876,7 +876,7 @@ void stringdiffs::wordLevelToByteLevel() const
 		if (bRepeat && len1 > 1 && len2 > 1)
 		{
 			// define offset to zero
-			int s1 = 0, e1 = 0, s2 = 0, e2 = 0; 
+			int s1 = 0, e1 = 0, s2 = 0, e2 = 0;
 			// Try to synchron side1 from begin
 			bool bsynchron = findsyn(diff,
 				begin1, begin2, end1, end2,
@@ -932,7 +932,7 @@ void stringdiffs::wordLevelToByteLevel() const
 #ifdef STRINGDIFF_LOGGING
 				DbgPrint("changed\n left = %d,%d\n right = %d,%d\n",
 					diff.start[0], diff.end[0], diff.start[1], diff.end[1]);
-#endif			
+#endif
 				// visible sync on side1 and side2
 				// new in middle with diff
 				wdiff wdfm(diff.end[0], wdf.start[0],
@@ -964,7 +964,7 @@ void stringdiffs::wordLevelToByteLevel() const
 #ifdef STRINGDIFF_LOGGING
 				DbgPrint("changed\n left = %d,%d\n right = %d,%d\n",
 					diff.start[0], diff.end[0],diff.start[1], diff.end[1]);
-#endif	
+#endif
 				m_diffs.insert(m_diffs.begin() + i + 1, wdf);
 			}
 			else if ((begin2 >= 0) && (begin2 < end2))
@@ -980,14 +980,14 @@ void stringdiffs::wordLevelToByteLevel() const
 					diff.start[0], diff.end[0],diff.start[1], diff.end[1]);
 				DbgPrint("insert\n left = %d,%d\n right = %d,%d\n",
 					wdf.start[0], wdf.end[0], wdf.start[1], wdf.end[1]);
-#endif	
+#endif
 				// change end of actual diff
 				diff.end[0] = diff.start[0] + s1 + begin1;
 				diff.end[1] = diff.start[1] + s2 + begin2;
 #ifdef STRINGDIFF_LOGGING
 				DbgPrint("changed\n left = %d,%d\n right = %d,%d\n",
 					diff.start[0], diff.end[0],diff.start[1], diff.end[1]);
-#endif	
+#endif
 				m_diffs.insert(m_diffs.begin() + i + 1, wdf);
 			}
 		}

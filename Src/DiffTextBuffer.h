@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  DiffTextBuffer.h
  *
  * @brief Declaration of CDiffTextBuffer class
@@ -144,7 +144,7 @@ private:
 	int m_unpackerSubcode; /**< Plugin information. */
 	bool m_bMixedEOL; /**< EOL style of this buffer is mixed? */
 
-	/** 
+	/**
 	 * @brief Unicode encoding from UNICODESET.
 	 *
 	 * @note m_unicoding and m_codepage are indications of how the buffer is

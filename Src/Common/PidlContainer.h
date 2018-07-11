@@ -19,7 +19,7 @@
  *	@file PidlContainer.h
  *
  *	@brief Declaration of class CPidlContainer
- */ 
+ */
 #pragma once
 
 #include <MyCom.h>
@@ -30,7 +30,7 @@
  * When showing shell context menu we need to collect pidls for items.
  * This class simplifies this task.
  * Items are stored in vector. Memory allocated for pidls are freed in destructor.
- * You can add items and then query container size and pointer to 
+ * You can add items and then query container size and pointer to
  * LPCITEMIDLIST needed by IContextMenu::GetUIObjectOf
  */
 class CPidlContainer
@@ -53,7 +53,7 @@ public:
 	 *
 	 * @param[in]	pidl	item to add
 	 */
-	void Add(LPITEMIDLIST pidl) { m_container.push_back(pidl); } 
+	void Add(LPITEMIDLIST pidl) { m_container.push_back(pidl); }
 
 	/**
 	 * @brief Returns pointer to array of LPCITEMIDLIST items

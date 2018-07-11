@@ -17,7 +17,7 @@
  *  @file FileFilterMgr.cpp
  *
  *  @brief Implementation of FileFilterMgr and supporting routines
- */ 
+ */
 #include "StdAfx.h"
 #include "pcre.h"
 #include "FileFilterMgr.h"

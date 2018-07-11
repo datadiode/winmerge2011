@@ -99,7 +99,7 @@ enum
 	CE_ACTION_SWAPCASE = 15,
 	CE_ACTION_CAPITALIZE = 16,
 	CE_ACTION_SENTENCIZE = 17,
-	CE_ACTION_RECODE = 18, 
+	CE_ACTION_RECODE = 18,
 	CE_ACTION_SPELL = 19
 	//  ...
 	//  Expandable: user actions allowed

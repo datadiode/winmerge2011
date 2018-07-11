@@ -33,7 +33,7 @@
 #define new DEBUG_NEW
 #endif
 
-/** 
+/**
  * @brief Constructor initialising members.
  */
 PropGeneral::PropGeneral()
@@ -91,7 +91,7 @@ LRESULT PropGeneral::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	return OptionsPanel::WindowProc(message, wParam, lParam);
 }
 
-/** 
+/**
  * @brief Reads options values from storage to UI.
  */
 void PropGeneral::ReadOptions()
@@ -109,7 +109,7 @@ void PropGeneral::ReadOptions()
 	m_bShowSelectFolderOnStartup = COptionsMgr::Get(OPT_SHOW_SELECT_FILES_AT_STARTUP);
 }
 
-/** 
+/**
  * @brief Writes options values from UI to storage.
  */
 void PropGeneral::WriteOptions()
@@ -132,7 +132,7 @@ void PropGeneral::UpdateScreen()
 	UpdateData<Set>();
 }
 
-/** 
+/**
  * @brief Called when user wants to see all messageboxes again.
  */
 void PropGeneral::OnResetAllMessageBoxes()

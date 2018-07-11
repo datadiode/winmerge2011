@@ -36,7 +36,7 @@
 //  ... it's being edited very rapidly so sorry for non-commented
 //        and maybe "ugly" code ...
 ////////////////////////////////////////////////////////////////////////////
-/** 
+/**
  * @file  ccrystaltextview2.cpp
  *
  * @brief More functions for CCrystalTextView class.
@@ -536,7 +536,7 @@ void CCrystalTextView::SelectAll()
 	UpdateCaret();
 }
 
-/** 
+/**
  * @brief Called when left mousebutton pressed down in editor.
  * This function handles left mousebutton down in editor.
  * @param [in] nFlags Flags indicating if virtual keys are pressed.
@@ -818,7 +818,7 @@ void CCrystalTextView::OnTimer(UINT_PTR nIDEvent)
 	}
 }
 
-/** 
+/**
  * @brief Called when mouse is double-clicked in editor.
  * This function handles mouse double-click in editor. There are many things
  * we can do, depending on where mouse is double-clicked etc:

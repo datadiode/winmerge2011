@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  LanguageSelect.h
  *
  * @brief Declaration file for CLanguageSelect dialog.

@@ -124,7 +124,7 @@ public:
 // Implementation types
 private:
 	typedef enum { SIDE_LEFT, SIDE_RIGHT } SIDE_TYPE;
-	
+
 // Implementation in DirActions.cpp
 private:
 	String GetSelectedFileName(SIDE_TYPE stype);

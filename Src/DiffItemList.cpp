@@ -2,7 +2,7 @@
  *  @file DiffItemList.cpp
  *
  *  @brief Implementation of DiffItemList
- */ 
+ */
 #include "StdAfx.h"
 #include "DiffItemList.h"
 
@@ -57,7 +57,7 @@ void DiffItemList::RemoveAll()
 
 /**
  * @brief Get pointer to first child item in structured DIFFITEM tree
- * @param  parent [in] Pointer to parent item 
+ * @param  parent [in] Pointer to parent item
  * @return Pointer to first child item
  */
 DIFFITEM *DiffItemList::GetFirstChildDiff(const DIFFITEM *parent) const

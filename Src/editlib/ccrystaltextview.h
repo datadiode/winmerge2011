@@ -23,7 +23,7 @@
 //  ... it's being edited very rapidly so sorry for non-commented
 //        and maybe "ugly" code ...
 ////////////////////////////////////////////////////////////////////////////
-/** 
+/**
  * @file  ccrystaltextview.h
  *
  * @brief Declaration file for CCrystalTextView
@@ -73,7 +73,7 @@ enum
 	FIND_WHOLE_WORD = 0x0002,
 	FIND_REGEXP = 0x0004,
 	FIND_DIRECTION_UP = 0x0010,
-	REPLACE_SELECTION = 0x0100, 
+	REPLACE_SELECTION = 0x0100,
 	FIND_NO_WRAP = 0x0200
 };
 
@@ -198,7 +198,7 @@ public:
 	STDMETHOD(DAdvise)(LPFORMATETC, DWORD, LPADVISESINK, LPDWORD);
 	STDMETHOD(DUnadvise)(DWORD);
 	STDMETHOD(EnumDAdvise)(LPENUMSTATDATA *);
-	
+
 	int GetLineCount() const;
 	virtual int ComputeRealLine(int nApparentLine) const;
 	virtual void OnUpdateCaret(bool bShowHide) = 0;

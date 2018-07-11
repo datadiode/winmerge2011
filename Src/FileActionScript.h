@@ -20,7 +20,7 @@
  */
 #pragma once
 
-/** 
+/**
  * @brief FileAction presents one filesystem action we want to do.
  *
  * Action consists of source, destination and action type. This
@@ -35,7 +35,7 @@ struct FileAction
 	 * higher level actions user is doing (e.g. synchronizing).
 	 */
 	enum ACT_TYPE
-	{ 
+	{
 		ACT_COPY,     /**< Copy the item(s). */
 		ACT_MOVE,     /**< Move the item(s). */
 		ACT_DEL,      /**< Delete the item(s). */
@@ -46,7 +46,7 @@ struct FileAction
 	String dest; /**< Destination action */
 };
 
-/** 
+/**
  * @brief FileActionItem presents one filesystem action from GUI perspective.
  */
 struct FileActionItem : public FileAction
@@ -88,7 +88,7 @@ struct FileActionItem : public FileAction
 	UI_SIDE UIDestination; /**< Destination UI-side */
 };
 
-/** 
+/**
  * @brief FileActionScript holds list of fileactions and runs those actions.
  *
  * This class holds list of actions we want to make with filesystem. After

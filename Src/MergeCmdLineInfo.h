@@ -15,7 +15,7 @@
 //    You should have received a copy of the GNU General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////
-/** 
+/**
  * @file  MergeCmdLineInfo.h
  *
  * @brief MergeCmdLineInfo class declaration.
@@ -25,7 +25,7 @@
 
 class IOptionDef;
 
-/** 
+/**
  * @brief WinMerge's command line handler.
  * This class calls command line parser(s) and allows reading parsed values
  * from public member variables.

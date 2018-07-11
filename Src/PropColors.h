@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  PropColors.h
  *
  * @brief Declaration file for PropMergeColors propertyheet
@@ -15,7 +15,7 @@ public:
 	virtual void ReadOptions();
 	virtual void WriteOptions();
 	virtual void UpdateScreen();
-	
+
 // Dialog Data
 private:
 	COLORREF	m_clrDiff;

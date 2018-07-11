@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  MergeDocLineDiffs.cpp
  *
  * @brief Implementation file for word diff highlighting (F4) for merge edit & detail views

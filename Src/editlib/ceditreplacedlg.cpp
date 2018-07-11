@@ -278,7 +278,7 @@ void CEditReplaceDlg::ReplaceSelection(bool bGroupWithPrevious)
 						m_pBuddy->GetSelection(ptStart, ptEnd);
 						m_pBuddy->GetText(ptStart, ptEnd, t);
 					}
-					i *= 2; 
+					i *= 2;
 					s.append(t.c_str() + m_captures[i] - m_captures[0],
 						t.c_str() + m_captures[i + 1] - m_captures[0]);
 				}
@@ -464,7 +464,7 @@ void CEditReplaceDlg::OnEditReplaceAll()
 		}
 
 		// after wrapping, stop at m_ptFirstFound
-		// so we don't replace twice when replacement string includes replaced string 
+		// so we don't replace twice when replacement string includes replaced string
 		// (like replace "here" with "there")
 		if (bWrapped)
 		{

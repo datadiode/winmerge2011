@@ -1,4 +1,4 @@
-/** 
+/**
  * @file FileLocation.h
  *
  * @brief Declaration for FileLocation class.
@@ -21,7 +21,7 @@ struct FileLocation
 	 * system can set these to "WinMerge v2.1.2.0" and "WinMerge 2.1.4.0"
 	 * which is more pleasant and informative than temporary paths.
 	 */
-	/*@{*/ 
+	/*@{*/
 	String description;
 	/*@}*/
 	FileTextEncoding encoding; /**< Encoding info for the file. */

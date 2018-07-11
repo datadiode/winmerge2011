@@ -17,7 +17,7 @@
  *  @file FileFilterMgr.h
  *
  *  @brief Declaration file for FileFilterMgr
- */ 
+ */
 #pragma once
 
 #include "FileFilter.h"

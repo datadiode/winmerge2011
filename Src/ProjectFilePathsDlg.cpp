@@ -18,7 +18,7 @@
 #define new DEBUG_NEW
 #endif
 
-/** 
+/**
  * @brief Standard constructor.
  */
 ProjectFilePathsDlg::ProjectFilePathsDlg()
@@ -70,10 +70,10 @@ LRESULT ProjectFilePathsDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lPar
 	return ODialog::WindowProc(message, wParam, lParam);
 }
 
-/** 
+/**
  * @brief Initialize dialog.
  */
-BOOL ProjectFilePathsDlg::OnInitDialog() 
+BOOL ProjectFilePathsDlg::OnInitDialog()
 {
 	// Cancel out any invalid paths
 	if (INVALID_FILE_ATTRIBUTES == GetFileAttributes(
@@ -98,7 +98,7 @@ BOOL ProjectFilePathsDlg::OnInitDialog()
 	return FALSE;
 }
 
-/** 
+/**
  * @brief Called when Browse-button for left path is selected.
  */
 void ProjectFilePathsDlg::OnBnClickedProjLfileBrowse()
@@ -110,7 +110,7 @@ void ProjectFilePathsDlg::OnBnClickedProjLfileBrowse()
 	}
 }
 
-/** 
+/**
  * @brief Called when Browse-button for right path is selected.
  */
 void ProjectFilePathsDlg::OnBnClickedProjRfileBrowse()
@@ -122,7 +122,7 @@ void ProjectFilePathsDlg::OnBnClickedProjRfileBrowse()
 	}
 }
 
-/** 
+/**
  * @brief Called when Selec-button for filter is selected.
  */
 void ProjectFilePathsDlg::OnBnClickedProjFilterSelect()
@@ -132,7 +132,7 @@ void ProjectFilePathsDlg::OnBnClickedProjFilterSelect()
 	SetDlgItemText(IDC_PROJ_FILTER_EDIT, filterNameOrMask.c_str());
 }
 
-/** 
+/**
  * @brief Callled when Open-button for project file is selected.
  */
 void ProjectFilePathsDlg::OnBnClickedProjOpen()
@@ -153,7 +153,7 @@ void ProjectFilePathsDlg::OnBnClickedProjOpen()
 	LanguageSelect.MsgBox(IDS_PROJFILE_LOAD_SUCCESS, MB_ICONINFORMATION);
 }
 
-/** 
+/**
  * @brief Called when Save-button for project file is selected.
  */
 void ProjectFilePathsDlg::OnBnClickedProjSave()
@@ -189,7 +189,7 @@ void ProjectFilePathsDlg::OnBnClickedProjSave()
 	LanguageSelect.MsgBox(IDS_PROJFILE_SAVE_SUCCESS, MB_ICONINFORMATION);
 }
 
-/** 
+/**
  * @brief Allow user to select a file to open/save.
  */
 String ProjectFilePathsDlg::AskProjectFileName(BOOL bOpen)

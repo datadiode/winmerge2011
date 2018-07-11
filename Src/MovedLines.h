@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  MovedLines.h
  *
  * @brief Declaration of MovedLines class

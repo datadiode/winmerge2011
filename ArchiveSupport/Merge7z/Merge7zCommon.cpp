@@ -62,9 +62,9 @@ using namespace NWindows;
 using namespace NFile;
 
 void AddDirFileInfo(
-	const UString &prefix, 
+	const UString &prefix,
 	const UString &fullPathName,
-	NFind::CFileInfo &fileInfo, 
+	NFind::CFileInfo &fileInfo,
 	CDirItems &dirItems)
 {
 	CDirItem item;
@@ -83,14 +83,14 @@ void AddDirFileInfo(
 
 static void EnumerateDirectory(
 	const UString &baseFolderPrefix,
-	const UString &directory, 
+	const UString &directory,
 	const UString &prefix,
 	CDirItems &dirItems)
 {
 	NFind::CEnumerator enumerator(baseFolderPrefix + directory + L'*');
 	NFind::CFileInfo fileInfo;
 	while (enumerator.Next(fileInfo))
-	{ 
+	{
 		AddDirFileInfo(prefix, directory + fileInfo.Name, fileInfo, dirItems);
 		if (fileInfo.IsDir())
 		{
@@ -107,7 +107,7 @@ static bool IsItWindowsNT()
 {
   OSVERSIONINFO versionInfo;
   versionInfo.dwOSVersionInfoSize = sizeof(versionInfo);
-  if (!::GetVersionEx(&versionInfo)) 
+  if (!::GetVersionEx(&versionInfo))
     return false;
   return (versionInfo.dwPlatformId == VER_PLATFORM_WIN32_NT);
 }
@@ -855,7 +855,7 @@ DWORD Merge7z::GetSignature(LPCTSTR path, CH_SIGNATURE sig)
 		ReadFile(h, sig, sizeof(CH_SIGNATURE), &cchSig, 0);
 		if (cchSig >= 64 && MAKEWORD(sig[0],sig[1]) == IMAGE_DOS_SIGNATURE)
 		{
-			DWORD offset = 
+			DWORD offset =
 			(
 				LPDWORD(sig)[5]	//DOS CS:IP
 			?	512UL * (LPWORD(sig)[1] ? LPWORD(sig)[2] - 1 : LPWORD(sig)[2]) + LPWORD(sig)[1]

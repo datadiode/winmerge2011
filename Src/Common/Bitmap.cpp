@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  Bitmap.cpp
  *
  * @brief Implementation file for Bitmap helper functions.

@@ -13,7 +13,7 @@
 //    You should have received a copy of the GNU General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////
-/** 
+/**
  * @file  PatchTool.h
  *
  * @brief Declaration file for PatchTool class
@@ -22,7 +22,7 @@
 
 #include "PatchDlg.h"
 
-/** 
+/**
  * @brief Files used for patch creating.
  * Stores paths of two files used to create a patch. Left side file
  * is considered as "original" file and right side file as "changed" file.
@@ -44,7 +44,7 @@ struct PATCHFILES
 	PATCHFILES(const PATCHFILES &);
 };
 
-/** 
+/**
  * @brief A class which creates patch files.
  * This class is used to create patch files. The files to patch can be added
  * to list before calling CreatePatch(). Or user can select files in the

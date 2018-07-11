@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  SharedFilterDlg.cpp
  *
  * @brief Dialog where user choose shared or private filter

@@ -16,7 +16,7 @@
 //    You should have received a copy of the GNU General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////
-/** 
+/**
  * @file  EditorFilepathBar.cpp
  *
  * @brief Implementation file for CEditorFilepathBar class
@@ -32,8 +32,8 @@
 #define new DEBUG_NEW
 #endif
 
-/** 
- * @brief Format the path for display in header control. 
+/**
+ * @brief Format the path for display in header control.
  *
  * Formats path so it fits to given length, tries to end lines after
  * slash characters.
@@ -155,7 +155,7 @@ void CEditorFilePathBar::OnToolTipNotify(TOOLTIPTEXT *pTTT)
 {
 	if (pTTT->uFlags & TTF_IDISHWND)
 	{
-		// idFrom is actually the HWND of the CEdit 
+		// idFrom is actually the HWND of the CEdit
 		UINT nID = reinterpret_cast<HWindow *>(pTTT->hdr.idFrom)->GetDlgCtrlID();
 		if (nID == IDC_STATIC_TITLE_LEFT || nID == IDC_STATIC_TITLE_RIGHT)
 		{
@@ -195,7 +195,7 @@ const String &CEditorFilePathBar::GetTitle(int pane)
 	return sOriginalText;
 }
 
-/** 
+/**
  * @brief Set the path for one side
  *
  * @param [in] pane Index (0-based) of pane to update.
@@ -221,7 +221,7 @@ void CEditorFilePathBar::SetText(int pane, LPCTSTR lpszString, BOOL bDirty, BUFF
 	SetModify(pane, bDirty);
 }
 
-/** 
+/**
  * @brief Get the modification flag for one side
  *
  * @param [in] pane Index (0-based) of pane to query.
@@ -231,7 +231,7 @@ BOOL CEditorFilePathBar::GetModify(int pane)
 	return m_Edit[pane]->GetModify();
 }
 
-/** 
+/**
  * @brief Set the modification flag for one side
  *
  * @param [in] pane Index (0-based) of pane to update.
@@ -243,7 +243,7 @@ void CEditorFilePathBar::SetModify(int pane, BOOL bDirty)
 	RefreshDisplayText(m_Edit[pane], m_rgOriginalText[pane]);
 }
 
-/** 
+/**
  * @brief Set the active status for one status (change the appearance)
  *
  * @param [in] pane Index (0-based) of pane to update.

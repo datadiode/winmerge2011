@@ -213,7 +213,7 @@ void CMergeEditView::GetLineColors(int nLineIndex, COLORREF &crBkgnd, COLORREF &
 					crBkgnd = COptionsMgr::Get(OPT_CLR_SELECTED_DIFF);
 					crText = COptionsMgr::Get(OPT_CLR_SELECTED_DIFF_TEXT);
 				}
-			
+
 			}
 			else
 			{
@@ -927,7 +927,7 @@ void CMergeEditView::OnEditCopyLineNumbers()
 	CloseClipboard();
 }
 
-void CMergeEditView::OnSize() 
+void CMergeEditView::OnSize()
 {
 	if (HStatusBar *const pBar = m_pStatusBar)
 	{
@@ -985,12 +985,12 @@ int CMergeEditView::GetEmptySubLines(int nLineIndex)
 
 /**
  * @brief Invalidate sub line index cache from the specified index to the end of file.
- * @param [in] nLineIndex Index of the first line to invalidate 
+ * @param [in] nLineIndex Index of the first line to invalidate
  */
 void CMergeEditView::InvalidateSubLineIndexCache(int nLineIndex)
 {
     // We have to invalidate sub line index cache on both panes.
-	for (int nPane = 0; nPane < 2; nPane++) 
+	for (int nPane = 0; nPane < 2; nPane++)
 	{
 		if (CMergeEditView *pView = m_pDocument->GetView(nPane))
 			pView->CCrystalTextView::InvalidateSubLineIndexCache(nLineIndex);
@@ -1392,7 +1392,7 @@ HMENU CMergeEditView::ListShellContextMenu()
 	String file = m_pDocument->m_strPath[this->m_nThisPane];
 	paths_UndoMagic(file);
 	LPCTSTR fileName = PathFindFileName(file.c_str());
-	
+
 	CMyComPtr<IShellFolder> pDesktop;
 	HRESULT hr = SHGetDesktopFolder(&pDesktop);
 	if (FAILED(hr))

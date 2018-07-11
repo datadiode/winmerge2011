@@ -51,7 +51,7 @@ static const int DIFFMARKER_WIDTH = 6;
 /** @brief Minimum height of the visible area indicator */
 static const int INDICATOR_MIN_HEIGHT = 5;
 
-/** 
+/**
  * @brief Bars in location pane
  */
 enum CLocationView::LOCBAR_TYPE
@@ -83,8 +83,8 @@ CLocationView::~CLocationView()
 
 HRESULT CLocationView::QueryInterface(REFIID iid, void **ppv)
 {
-	static const QITAB rgqit[] = 
-	{   
+	static const QITAB rgqit[] =
+	{
 		QITABENT(CLocationView, IDropTarget),
 		{ 0 }
 	};
@@ -170,7 +170,7 @@ LRESULT CLocationView::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return OWindow::WindowProc(uMsg, wParam, lParam);
 }
 
-void CLocationView::SetConnectMovedBlocks(int displayMovedBlocks) 
+void CLocationView::SetConnectMovedBlocks(int displayMovedBlocks)
 {
 	if (m_displayMovedBlocks == displayMovedBlocks)
 		return;
@@ -487,7 +487,7 @@ void CLocationView::CalculateBlocks()
 /**
  * @brief Calculate Blocksize to pixel.
  * @param [in] nBlockStart line where block starts
- * @param [in] nBlockEnd   line where block ends 
+ * @param [in] nBlockEnd   line where block ends
  * @param [in] nBlockLength length of the block
  * @param [in,out] nBeginY pixel in y  where block starts
  * @param [in,out] nEndY   pixel in y  where block ends
@@ -503,7 +503,7 @@ void CLocationView::CalculateBlocksPixel(int nBlockStart, int nBlockEnd,
 	nBeginY = (int)(nBlockStart * m_lineInPix + Y_OFFSET);
 	nEndY = (int)((nBlockStart + nBlockHeight) * m_lineInPix + Y_OFFSET);
 }
-/** 
+/**
  * @brief Draw maps of files.
  *
  * Draws maps of differences in files. Difference list is walked and
@@ -542,7 +542,7 @@ void CLocationView::OnDraw(HSurface *pdc)
 	pdcMem->DeleteDC();
 }
 
-/** 
+/**
  * @brief Draw one block of map.
  * @param [in] pDC Draw context.
  * @param [in] r Rectangle to draw.
@@ -640,7 +640,7 @@ void CLocationView::GotoLocation(const POINT &point)
 /**
  * Show context menu and handle user selection.
  */
-void CLocationView::OnContextMenu(LPARAM lParam) 
+void CLocationView::OnContextMenu(LPARAM lParam)
 {
 	POINT point;
 	POINTSTOPOINT(point, lParam);
@@ -724,7 +724,7 @@ void CLocationView::OnContextMenu(LPARAM lParam)
 	}
 }
 
-/** 
+/**
  * @brief Calculates view/real line in file from given YCoord in bar.
  * @param [in] nYCoord ycoord in pane
  * @param [in] bar bar/file
@@ -758,7 +758,7 @@ int CLocationView::GetLineFromYPos(int nYCoord, CMergeEditView *pView)
 	return nLine;
 }
 
-/** 
+/**
  * @brief Determines if given coords are inside left/right bar.
  * @param rc [in] size of locationpane client area
  * @param pt [in] point we want to check, in client coordinates.
@@ -782,7 +782,7 @@ CLocationView::LOCBAR_TYPE CLocationView::IsInsideBar(const POINT &pt)
 	return retVal;
 }
 
-/** 
+/**
  * @brief Draws rect indicating visible area in file views.
  *
  * @param [in] nTopLine New topline for indicator
@@ -805,7 +805,7 @@ void CLocationView::DrawVisibleAreaRect(HSurface *pClientDC, int nTopLine, int n
 			(static_cast<double>(nTopLine * m_lineInPix)));
 	int nBottomCoord = static_cast<int>(Y_OFFSET +
 			(static_cast<double>(nBottomLine * m_lineInPix)));
-	
+
 	double xbarBottom = min<double>(nbLines / m_pixInLines + Y_OFFSET, m_size.cy - Y_OFFSET);
 	int barBottom = (int)xbarBottom;
 	// Make sure bottom coord is in bar range
@@ -826,7 +826,7 @@ void CLocationView::DrawVisibleAreaRect(HSurface *pClientDC, int nTopLine, int n
 			if ((nBottomCoord - nTopCoord) < INDICATOR_MIN_HEIGHT)
 			{
 				// If we have a high number of lines, it may be better
-				// to keep the topline, otherwise the cursor can 
+				// to keep the topline, otherwise the cursor can
 				// jump up and down unexpected
 				nBottomCoord = nTopCoord + INDICATOR_MIN_HEIGHT;
 			}
@@ -870,7 +870,7 @@ void CLocationView::UpdateVisiblePos(int nTopLine, int nBottomLine)
 	}
 }
 
-/** 
+/**
  * @brief Draw lines connecting moved blocks.
  */
 void CLocationView::DrawConnectLines(HSurface *pClientDC)
@@ -888,7 +888,7 @@ void CLocationView::DrawConnectLines(HSurface *pClientDC)
 	pClientDC->SelectObject(oldPen);
 }
 
-/** 
+/**
  * @brief Draw marker for top of currently selected difference.
  * This function draws marker for top of currently selected difference.
  * This marker makes it a lot easier to see where currently selected

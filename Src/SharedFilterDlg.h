@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  SharedFilterDlg.h
  *
  * @brief Declaration file for CSharedFilterDlg.

@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  PropTextColors.h
  *
  * @brief Declaration file for PropTextColors propertyheet

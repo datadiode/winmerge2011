@@ -55,7 +55,7 @@ struct DIFFCODE
  *
  * This class is for backend differences processing, presenting physical
  * files and folders. This class is not for GUI data like selection or
- * visibility statuses. So do not include any GUI-dependent data here. 
+ * visibility statuses. So do not include any GUI-dependent data here.
  */
 struct DIFFITEM : ListEntry
 {

@@ -338,7 +338,7 @@ BOOL ExplorerDlg::OnInitDialog()
 	m_pTcFilter->SetItemSize(rect.bottom - rect.top, rect.bottom - rect.top);
 
 	m_pPbNewFolder = static_cast<HButton *>(GetDlgItem(IDC_BUTTON_NEW_FOLDER));
-	
+
 	if (m_bHasListView)
 	{
 		m_pLv = static_cast<HListView *>(

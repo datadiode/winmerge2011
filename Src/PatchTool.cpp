@@ -65,7 +65,7 @@ void CPatchTool::AddFiles(const PATCHFILES &files)
 	m_dlgPatch.AddItem(files);
 }
 
-/** 
+/**
  * @brief Create a patch from files given.
  * @note Files can be given using AddFiles() or selecting using CPatchDlg.
  */

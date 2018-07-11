@@ -13,7 +13,7 @@
 //    You should have received a copy of the GNU General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////
-/** 
+/**
  * @file  AboutDlg.cpp
  *
  * @brief Implementation of the About-dialog.
@@ -72,10 +72,10 @@ LRESULT CAboutDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	return ODialog::WindowProc(message, wParam, lParam);
 }
 
-/** 
+/**
  * @brief Read version info from resource to dialog.
  */
-BOOL CAboutDlg::OnInitDialog() 
+BOOL CAboutDlg::OnInitDialog()
 {
 	ODialog::OnInitDialog();
 	LanguageSelect.TranslateDialog(m_hWnd);

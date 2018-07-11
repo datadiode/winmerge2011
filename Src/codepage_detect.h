@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  codepage_detect.h
  *
  * @brief Declaration file for codepage detection routines.

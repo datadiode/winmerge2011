@@ -4,7 +4,7 @@
  * @brief Project-wide includes and declarations
  */
 
-// On Win XP, with VS2008, do not use default WINVER 0x0600 because of 
+// On Win XP, with VS2008, do not use default WINVER 0x0600 because of
 // some windows structure used in API (on VISTA they are longer)
 #define WINVER 0x0502
 

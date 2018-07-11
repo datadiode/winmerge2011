@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  PropEditor.h
  *
  * @brief Declaration file for PropEditor propertyheet

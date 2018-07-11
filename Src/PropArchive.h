@@ -1,10 +1,10 @@
-/** 
+/**
  * @file  PropArchive.h
  *
  * @brief Declaration file for PropArchive propertyheet
  */
 
-/** 
+/**
  * @brief Class for Archive Support options page.
  */
 class PropArchive : public OptionsPanel

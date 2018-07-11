@@ -20,7 +20,7 @@
  *  @file WaitStatusCursor.cpp
  *
  *  @brief Implementation of the WaitStatusCursur class.
- */ 
+ */
 #include "StdAfx.h"
 #include "Merge.h"
 

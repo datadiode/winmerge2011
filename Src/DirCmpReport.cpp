@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  DirCmpReport.cpp
  *
  * @brief Implementation file for DirCmpReport

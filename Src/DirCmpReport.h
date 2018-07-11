@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  DirCmpReport.h
  *
  * @brief Declaration file for DirCmpReport.

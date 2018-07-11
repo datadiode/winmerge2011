@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  PropListColors.h
  *
  * @brief Declaration file for PropListColors propertyheet

@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  LoadSaveCodepageDlg.h
  *
  * @brief Declaration of the dialog used to select codepages

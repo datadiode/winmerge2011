@@ -543,7 +543,7 @@ CMyComBSTR CWinMergeShell::FormatCmdLine(LPCTSTR winmergePath,
 	// Consider EXT_FLATTENED only when working with flags as found in registry
 	if (flags != m_dwContextMenuEnabled)
 		flags &= ~EXT_FLATTENED;
-		
+
 	switch (flags & (EXT_SUBFOLDERS | EXT_FLATTENED))
 	{
 	case EXT_SUBFOLDERS:
@@ -591,8 +591,8 @@ HRESULT CWinMergeShell::RegisterClassObject(BOOL bRegister)
 
 HRESULT CWinMergeShell::QueryInterface(REFIID iid, void **ppv)
 {
-	static const QITAB rgqit[] = 
-	{   
+	static const QITAB rgqit[] =
+	{
 		QITABENT(CWinMergeShell, IClassFactory),
 		QITABENT(CWinMergeShell, IShellExtInit),
 		QITABENT(CWinMergeShell, IContextMenu),

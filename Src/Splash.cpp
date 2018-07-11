@@ -38,7 +38,7 @@
 /** @brief Image dimensions. */
 static const SIZE ImageDimensions = { 550, 350 };
 
-/** 
+/**
  * @brief Area for version text in splash image.
  * @note Translations may have language name after version number.
  */
@@ -71,7 +71,7 @@ static const UINT_PTR SplashTimerID = 1;
 /////////////////////////////////////////////////////////////////////////////
 //   Splash Screen class
 
-/** 
+/**
  * @brief Constructor.
  */
 CSplashWnd::CSplashWnd(HWindow *pWndMain)
@@ -105,10 +105,10 @@ CSplashWnd::CSplashWnd(HWindow *pWndMain)
 				}
 			}
 		}
-	}	
+	}
 }
 
-/** 
+/**
  * @brief Destructor.
  */
 CSplashWnd::~CSplashWnd()
@@ -198,7 +198,7 @@ LRESULT CSplashWnd::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return lResult;
 }
 
-/** 
+/**
  * @brief Paint splashscreen.
  * Draws image to window size (which is already set to image size).
  * Then adds texts over image.

@@ -17,8 +17,8 @@ public:
 	// IUnknown
 	STDMETHOD(QueryInterface)(REFIID iid, void **ppv)
 	{
-		static const QITAB rgqit[] = 
-		{   
+		static const QITAB rgqit[] =
+		{
 			QITABENT(CMyDispatch, IDispatch),
 			{ 0 }
 		};
@@ -81,8 +81,8 @@ public:
 	// IUnknown
 	STDMETHOD(QueryInterface)(REFIID iid, void **ppv)
 	{
-		static const QITAB rgqit[] = 
-		{   
+		static const QITAB rgqit[] =
+		{
 			QITABENT(CScriptable, IDispatch),
 			QITABENT(CScriptable, IElementBehavior),
 			QITABENT(CScriptable, IElementBehaviorFactory),

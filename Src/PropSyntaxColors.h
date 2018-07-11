@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  PropSyntaxColors.h
  *
  * @brief Declaration file for PropSyntaxColors propertyheet

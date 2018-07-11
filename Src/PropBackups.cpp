@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  PropBackups.cpp
  *
  * @brief Implementation of PropBackups propertysheet
@@ -13,7 +13,7 @@
 #define new DEBUG_NEW
 #endif
 
-/** 
+/**
  * @brief Constructor taking OptionsManager parameter.
  */
 PropBackups::PropBackups()
@@ -52,7 +52,7 @@ LRESULT PropBackups::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	return OptionsPanel::WindowProc(message, wParam, lParam);
 }
 
-/** 
+/**
  * @brief Reads options values from storage to UI.
  */
 void PropBackups::ReadOptions()
@@ -65,7 +65,7 @@ void PropBackups::ReadOptions()
 	m_bAppendTime = COptionsMgr::Get(OPT_BACKUP_ADD_TIME);
 }
 
-/** 
+/**
  * @brief Writes options values from UI to storage.
  */
 void PropBackups::WriteOptions()
@@ -84,7 +84,7 @@ void PropBackups::WriteOptions()
 	COptionsMgr::SaveOption(OPT_BACKUP_ADD_TIME, m_bAppendTime != FALSE);
 }
 
-/** 
+/**
  * @brief Called before propertysheet is drawn.
  */
 void PropBackups::UpdateScreen()
@@ -92,7 +92,7 @@ void PropBackups::UpdateScreen()
 	UpdateData<Set>();
 }
 
-/** 
+/**
  * @brief Called when user selects Browse-button.
  */
 void PropBackups::OnBnClickedBackupBrowse()

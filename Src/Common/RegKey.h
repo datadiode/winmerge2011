@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  RegKey.cpp
  *
  * @brief Declaration of CRegKeyEx C++ wrapper class for reading Windows registry

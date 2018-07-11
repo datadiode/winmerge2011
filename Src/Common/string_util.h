@@ -6,7 +6,7 @@
 #pragma once
 
 // Convert any negative inputs to negative char equivalents
-// This is aimed at correcting any chars mistakenly 
+// This is aimed at correcting any chars mistakenly
 // sign-extended to negative ints.
 // This is ok for the UNICODE build because UCS-2LE code bytes
 // do not extend as high as 2Gig (actually even full Unicode

@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  FolderCmp.h
  *
  * @brief Declaration file for FolderCmp
@@ -31,7 +31,7 @@ public:
 	const LONG m_iCompareThread;
 
 	DiffFileData m_diffFileData;
-	
+
 private:
 	void GetComparePaths(const DIFFITEM *di, String &left, String &right) const;
 

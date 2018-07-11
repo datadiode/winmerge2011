@@ -497,7 +497,7 @@ void CDirView::ListContextMenu(POINT point)
 	FormatContextMenu(pPopup, ID_DIR_OPEN_RIGHT_WITH, nOpenableOnRightWith, nTotal);
 	FormatContextMenu(pPopup, ID_DIR_OPEN_LEFT_WITHEDITOR, nOpenableOnLeftWith, nTotal);
 	FormatContextMenu(pPopup, ID_DIR_OPEN_RIGHT_WITHEDITOR, nOpenableOnRightWith, nTotal);
-	
+
 	pPopup->EnableMenuItem(ID_DIR_ITEM_RENAME, nTotal == 1 ? MF_ENABLED : MF_GRAYED);
 
 	if (COptionsMgr::Get(OPT_DIRVIEW_ENABLE_SHELL_CONTEXT_MENU))
@@ -1951,7 +1951,7 @@ void CDirView::OnUpdateStatusNum()
 	items = GetItemCount();
 	int focusItem = GetFocusedItem();
 
-	pMDIFrame->UpdateCmdUI<ID_CURDIFF>( 
+	pMDIFrame->UpdateCmdUI<ID_CURDIFF>(
 		GetItemState(focusItem, LVIS_SELECTED) ? MF_ENABLED : MF_GRAYED);
 
 	BYTE enable = MF_GRAYED;
@@ -2186,8 +2186,8 @@ LRESULT CDirView::HandleMenuMessage(UINT message, WPARAM wParam, LPARAM lParam)
 	return res;
 }
 
-/** 
- * @brief Retrieves file list of all selected files, and store them like 
+/**
+ * @brief Retrieves file list of all selected files, and store them like
  * file_path1\nfile_path2\n...file_pathN\n
  *
  * @param [out] pstm Stream where file list will be stored
@@ -2219,9 +2219,9 @@ void CDirView::PrepareDragData(UniStdioFile &file)
 	file.WriteString(_T(""), 1); // include terminating zero
 }
 
-/** 
- * @brief Drag files/directories from folder compare listing view. 
- */ 
+/**
+ * @brief Drag files/directories from folder compare listing view.
+ */
 void CDirView::ReflectBeginDrag()
 {
 	DWORD de;
@@ -2230,8 +2230,8 @@ void CDirView::ReflectBeginDrag()
 
 HRESULT CDirView::QueryInterface(REFIID iid, void **ppv)
 {
-    static const QITAB rgqit[] = 
-    {   
+    static const QITAB rgqit[] =
+    {
         QITABENT(CDirView, IDropSource),
         QITABENT(CDirView, IDataObject),
         { 0 }

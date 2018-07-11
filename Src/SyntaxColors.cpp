@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  SyntaxColors.cpp
  *
  * @brief Implementation for SyntaxColors class.

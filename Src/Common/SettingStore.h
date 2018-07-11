@@ -84,7 +84,7 @@ private:
 	/// Company name in the registry key (under HKCU/Software).
 	LPCTSTR m_sCompanyName;
 	/// Application name in the registry (under the company key).
-	LPCTSTR m_sApplicationName;	
+	LPCTSTR m_sApplicationName;
 #ifdef _DEBUG
 	/// Help catch accidental calls from a different thread
 	class CThreadIntegrity

@@ -429,7 +429,7 @@ LONG CSettingStore::RegQueryValueEx(HKEY hKey, LPCTSTR lpValueName, LPDWORD lpTy
 					{
 						if (*lpcbData < cbData)
 							lResult = ERROR_MORE_DATA;
-						else 
+						else
 							MultiByteToWideChar(CP_UTF8, 0, str, -1, reinterpret_cast<LPWSTR>(lpData), len);
 					}
 					*lpcbData = cbData;

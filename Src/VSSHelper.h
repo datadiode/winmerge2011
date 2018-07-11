@@ -14,7 +14,7 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 /////////////////////////////////////////////////////////////////////////////
-/** 
+/**
  * @file  VSSHelper.h
  *
  * @brief Declaration file for VSSHelper

@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  PropListColors.cpp
  *
  * @brief Implementation of PropListColors propertysheet
@@ -12,7 +12,7 @@
 #define new DEBUG_NEW
 #endif
 
-/** 
+/**
  * @brief Default constructor.
  */
 PropListColors::PropListColors()
@@ -48,7 +48,7 @@ LRESULT PropListColors::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	return OptionsPanel::WindowProc(message, wParam, lParam);
 }
 
-/** 
+/**
  * @brief Reads options values from storage to UI.
  * (Property sheet calls this before displaying all property pages)
  */
@@ -58,7 +58,7 @@ void PropListColors::ReadOptions()
 	SerializeColors(READ_OPTIONS);
 }
 
-/** 
+/**
  * @brief Writes options values from UI to storage.
  * (Property sheet calls this after displaying all property pages)
  */
@@ -82,7 +82,7 @@ void PropListColors::UpdateScreen()
 	SerializeColors(INVALIDATE);
 }
 
-/** 
+/**
  * @brief Set colors to track standard (theme) colors
  */
 void PropListColors::OnDefaultsStandardColors()
@@ -91,7 +91,7 @@ void PropListColors::OnDefaultsStandardColors()
 	UpdateScreen();
 }
 
-/** 
+/**
  * @brief Enable / disable color controls on dialog.
  * @param [in] bEnable If TRUE color controls are enabled.
  */

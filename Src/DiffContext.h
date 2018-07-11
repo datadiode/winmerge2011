@@ -19,7 +19,7 @@ class CompareStats;
  * This class holds data of the current folder compare. There are paths
  * to compare, filters used, compare options etc. And compare results list
  * is also contained in this class. Many compare classes and functions have
- * a pointer to instance of this class. 
+ * a pointer to instance of this class.
  *
  * Folder compare comprises two phases executed in two threads:
  * - first thread collects items to compare to compare-time list

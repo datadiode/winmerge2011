@@ -65,7 +65,7 @@ void CDirView::DoCopyRightToLeft()
 		{
 			FileActionItem act;
 			GetItemFileNames(di, act.dest, act.src);
-			
+
 			// We must check that paths still exists
 			if (!CheckPathsExist(act.src.c_str()))
 				return;
@@ -530,7 +530,7 @@ bool CDirView::ConfirmActionList(FileActionScript &actionList)
 			}
 		}
 		break;
-		
+
 	case FileAction::ACT_DEL:
 		break;
 
@@ -565,7 +565,7 @@ bool CDirView::ConfirmActionList(FileActionScript &actionList)
 		break;
 
 	// Invalid operation
-	default: 
+	default:
 		LogErrorString(_T("Unknown fileoperation in CDirView::ConfirmActionList()"));
 		_RPTF0(_CRT_ERROR, "Unknown fileoperation in CDirView::ConfirmActionList()");
 		break;
@@ -667,7 +667,7 @@ BOOL CDirView::IsItemOpenable(const DIFFITEM *di) const
 			return FALSE;
 		}
 	}
-	else 
+	else
 	{
 		if (!di->isDirectory() &&
 			(di->isSideRightOnly() || di->isSideLeftOnly()))
@@ -983,7 +983,7 @@ bool CDirView::RenameOnSameDir(LPCTSTR szOldFileName, LPCTSTR szNewFileName)
 bool CDirView::DoItemRename(int iItem, LPCTSTR szNewItemName)
 {
 	ASSERT(NULL != szNewItemName);
-	
+
 	String sLeftFile, sRightFile;
 
 	// We must check that paths still exists

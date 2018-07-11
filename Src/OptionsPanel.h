@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  OptionsPanel.h
  *
  * @brief Declaration file for OptionsPanel class.

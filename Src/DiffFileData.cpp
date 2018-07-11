@@ -1,4 +1,4 @@
-/** 
+/**
  * @file DiffFileData.cpp
  *
  * @brief Code for DiffFileData class
@@ -113,7 +113,7 @@ bool DiffFileData::DoOpenFiles()
 		{
 			return false;
 		}
-		
+
 		if (_tcsicmp(m_FileLocation[0].filepath.c_str(), m_FileLocation[1].filepath.c_str()) == 0)
 		{
 			file[1].desc = file[0].desc;

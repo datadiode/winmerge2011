@@ -6,7 +6,7 @@
  */
 #pragma once
 
-/** 
+/**
  * @brief Support For Descriptions On Undo/Redo Actions.
  *
  * We need a structure to remember richer information position
@@ -36,10 +36,10 @@ public:
 	POINT m_redo_ptStartPos, m_redo_ptEndPos;  // Block of text participating
 	int m_redo_ptStartPos_nGhost, m_redo_ptEndPos_nGhost;
 
-	int m_nRealLinesCreated;         //  number of lines created during insertion 
+	int m_nRealLinesCreated;         //  number of lines created during insertion
 		                                //  (= total of real lines after - total before)
-	int m_nRealLinesInDeletedBlock;  //  number of real lines in the deleted block 
-		                                // (<> total of real lines after - total before  
+	int m_nRealLinesInDeletedBlock;  //  number of real lines in the deleted block
+		                                // (<> total of real lines after - total before
 		                                //  as first/end line may be just truncated, not removed)
 
 public:

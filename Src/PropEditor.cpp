@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  PropEditor.cpp
  *
  * @brief Implementation of PropEditor propertysheet
@@ -16,7 +16,7 @@
 /** @brief Maximum size for tabs in spaces. */
 #define MAX_TABSIZE 64
 
-/** 
+/**
  * @brief Constructor.
  */
 PropEditor::PropEditor()
@@ -24,7 +24,7 @@ PropEditor::PropEditor()
 {
 }
 
-/** 
+/**
  * @brief Function handling dialog data exchange between GUI and variables.
  */
 template<ODialog::DDX_Operation op>
@@ -65,7 +65,7 @@ LRESULT PropEditor::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	return OptionsPanel::WindowProc(message, wParam, lParam);
 }
 
-/** 
+/**
  * @brief Reads options values from storage to UI.
  */
 void PropEditor::ReadOptions()
@@ -81,7 +81,7 @@ void PropEditor::ReadOptions()
 	m_breakChars = COptionsMgr::Get(OPT_BREAK_SEPARATORS);
 }
 
-/** 
+/**
  * @brief Writes options values from UI to storage.
  */
 void PropEditor::WriteOptions()
@@ -97,7 +97,7 @@ void PropEditor::WriteOptions()
 	COptionsMgr::SaveOption(OPT_BREAK_SEPARATORS, m_breakChars);
 }
 
-/** 
+/**
  * @brief Called before propertysheet is drawn.
  */
 BOOL PropEditor::OnInitDialog()
@@ -115,7 +115,7 @@ BOOL PropEditor::OnInitDialog()
 	return OptionsPanel::OnInitDialog();
 }
 
-/** 
+/**
  * @brief Update availability of line difference controls
  */
 void PropEditor::UpdateScreen()

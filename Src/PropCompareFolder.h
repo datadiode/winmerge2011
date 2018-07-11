@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  PropCompareFolder.h
  *
  * @brief Declaration of PropCompareFolder propertysheet

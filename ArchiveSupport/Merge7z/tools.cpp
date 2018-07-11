@@ -75,7 +75,7 @@ void ComplainCreateObject(HMODULE handle, LPCTSTR name)
 	LPTSTR pszContext = szContext + wsprintf(szContext, _T("%.100s@"), name);
 	::GetModuleFileName(handle, pszContext, 500);
 	Complain(RPC_S_INTERFACE_NOT_FOUND, szContext);
-} 
+}
 
 /**
  * @brief Release interface until ref count reaches 0.
@@ -86,7 +86,7 @@ void ComplainCreateObject(HMODULE handle, LPCTSTR name)
 void NTAPI Release(IUnknown *punk)
 {
 	while (punk)
-	{	
+	{
 		ULONG Release = punk->Release();
 		if (Release == 0)
 		{

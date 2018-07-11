@@ -41,7 +41,7 @@ void CChildFrame::DoFileEncodingDialog()
 {
 	if (!PromptAndSaveIfNeeded(true))
 		return;
-	
+
 	CLoadSaveCodepageDlg dlg;
 	dlg.m_nLoadCodepage = m_ptBuf[0]->getCodepage();
 	dlg.m_nSaveCodepage = m_ptBuf[0]->getCodepage();

@@ -27,7 +27,7 @@ int HSuperComboBox::FindString(int nIndexStart, LPCTSTR lpszString)
 
 /**
  * @brief Adds a string to the list box of a combo box
- * @param lpszItem Pointer to the null-terminated string that is to be added. 
+ * @param lpszItem Pointer to the null-terminated string that is to be added.
  */
 int HSuperComboBox::AddString(LPCTSTR lpszItem)
 {
@@ -37,7 +37,7 @@ int HSuperComboBox::AddString(LPCTSTR lpszItem)
 /**
  * @brief Inserts a string into the list box of a combo box.
  * @param nIndex The zero-based index to the position in the list box that receives the string.
- * @param lpszItem Pointer to the null-terminated string that is to be added. 
+ * @param lpszItem Pointer to the null-terminated string that is to be added.
  */
 int HSuperComboBox::InsertString(int nIndex, LPCTSTR lpszItem)
 {
@@ -90,7 +90,7 @@ void HSuperComboBox::LoadState(LPCTSTR szRegSubKey, UINT nMaxItems)
 	}
 }
 
-/** 
+/**
  * @brief Saves strings in combobox.
  * This function saves strings in combobox, in editbox and in dropdown.
  * Whitespace characters are stripped from begin and end of the strings
@@ -140,7 +140,7 @@ void HSuperComboBox::AutoCompleteFromLB(int nIndexFrom)
 {
 	if (GetKeyState(VK_BACK) < 0 || GetKeyState(VK_DELETE) < 0)
 		return;
-	
+
 	HEdit *const pEdit = GetEditControl();
 	// Don't take action on programmatic changes to the control's content!
 	if (!pEdit->GetModify())
@@ -152,7 +152,7 @@ void HSuperComboBox::AutoCompleteFromLB(int nIndexFrom)
 	// bail out if no text
 	if (s.empty())
 		return;
-	
+
 	// look for the string that is prefixed by the typed text
 	int idx = FindString(nIndexFrom, s.c_str());
 	if (idx == CB_ERR)

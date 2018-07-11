@@ -142,7 +142,7 @@ void CDiffContext::UpdateVersion(DIFFITEM *di, BOOL bLeft) const
 
 	if (di->isDirectory())
 		return;
-	
+
 	String spath;
 	if (bLeft)
 	{
@@ -162,7 +162,7 @@ void CDiffContext::UpdateVersion(DIFFITEM *di, BOOL bLeft) const
 			return;
 		spath = GetRightFilepathAndName(di);
 	}
-	
+
 	// Get version info if it exists
 	CVersionInfo ver(spath.c_str());
 	if (ver.GetFixedFileVersion(dfi.version.m_versionMS, dfi.version.m_versionLS))
@@ -236,7 +236,7 @@ void CDiffContext::CompareDirectories(bool bOnlyRequested)
 	m_hSemaphore = CreateSemaphore(0, 0, LONG_MAX, 0);
 	InitializeCriticalSection(&m_csCompareThread);
 	m_diCompareThread = NULL;
-	
+
 	m_nCompareThreads = COptionsMgr::Get(OPT_CMP_COMPARE_THREADS);
 	m_iCompareThread = -1;
 	if (m_nCompareThreads < 0)

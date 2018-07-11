@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  DiffTextBuffer.cpp
  *
  * @brief Implementation file for CDiffTextBuffer
@@ -104,7 +104,7 @@ UndoRecord &CDiffTextBuffer::AddUndoRecord(BOOL bInsert, const POINT &ptStartPos
 
 /**
 Remove blank lines and clear winmerge flags
-(2003-06-21, Perry: I don't understand why this is necessary, but if this isn't 
+(2003-06-21, Perry: I don't understand why this is necessary, but if this isn't
 done, more and more gray lines appear in the file)
 (2003-07-31, Laoran I don't understand either why it is necessary, but it works
 fine, so let's go on with it)
@@ -120,7 +120,7 @@ void CDiffTextBuffer::prepareForRescan()
 	}
 }
 
-/** 
+/**
  * @brief Called when line has been edited.
  * After editing a line, we don't know if there is a diff or not.
  * So we clear the LF_DIFF flag (and it is more easy to read during edition).
@@ -202,10 +202,10 @@ FileLoadResult::FILES_RESULT CDiffTextBuffer::LoadFromFile(LPCTSTR pszFileName,
 			// Manually grow line array exponentially
 			UINT arraysize = 500;
 			m_aLines.resize(arraysize);
-			
+
 			// preveol must be initialized for empty files
 			preveol = _T("\n");
-			
+
 			do
 			{
 				bool lossy = false;
@@ -242,7 +242,7 @@ FileLoadResult::FILES_RESULT CDiffTextBuffer::LoadFromFile(LPCTSTR pszFileName,
 
 			// fix array size (due to our manual exponential growth
 			m_aLines.resize(lineno);
-			
+
 			//Try to determine current CRLF mode (most frequent)
 			if (nCrlfStyle == CRLF_STYLE_AUTOMATIC)
 			{
@@ -250,11 +250,11 @@ FileLoadResult::FILES_RESULT CDiffTextBuffer::LoadFromFile(LPCTSTR pszFileName,
 			}
 			ASSERT(nCrlfStyle >= 0 && nCrlfStyle <= 3);
 			SetCRLFMode(nCrlfStyle);
-			
+
 			//  At least one empty line must present
 			// (view does not work for empty buffers)
 			ASSERT(m_aLines.size() > 0);
-			
+
 #ifdef _DEBUG
 			m_bInit = true;
 #endif
@@ -265,7 +265,7 @@ FileLoadResult::FILES_RESULT CDiffTextBuffer::LoadFromFile(LPCTSTR pszFileName,
 			m_dwCurrentRevisionNumber = 0;
 			m_dwRevisionNumberOnSave = 0;
 			m_ptLastChange.x = m_ptLastChange.y = -1;
-			
+
 			FinishLoading();
 			// flags don't need initialization because 0 is the default value
 
@@ -300,7 +300,7 @@ FileLoadResult::FILES_RESULT CDiffTextBuffer::LoadFromFile(LPCTSTR pszFileName,
 			}
 			InitNew(); // leave crystal editor in valid, empty state
 		}
-		
+
 		// close the file now to free the handle
 		pufile->Close();
 	}
@@ -438,6 +438,6 @@ int CDiffTextBuffer::SaveToFile(LPCTSTR pszFileName,
 	// remember revision number on save
 	m_dwRevisionNumberOnSave = m_dwCurrentRevisionNumber;
 	// redraw line revision marks
-	UpdateViews(NULL, NULL, UPDATE_FLAGSONLY);	
+	UpdateViews(NULL, NULL, UPDATE_FLAGSONLY);
 	return SAVE_DONE;
 }

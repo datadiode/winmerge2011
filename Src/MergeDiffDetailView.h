@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  MergeDiffDetailView.h
  *
  * @brief Declaration of CMergeDiffDetailView class
@@ -27,7 +27,7 @@ protected:
 	/// first line of diff (first displayable line)
 	int m_lineBegin;
 	/// last line of diff (last displayable line)
-	int m_lineEnd; 
+	int m_lineEnd;
 	/// memorize first line of diff
 	int m_lineBeginPushed;
 	/// memorize last line of diff
@@ -55,7 +55,7 @@ public:
 
 	/* Push cursors before detaching buffer
 	 *
-	 * @note : laoran 2003/10/03 : don't bother with real lines. 
+	 * @note : laoran 2003/10/03 : don't bother with real lines.
 	 * I tried and it does not work fine
 	 */
 	void PushCursors();

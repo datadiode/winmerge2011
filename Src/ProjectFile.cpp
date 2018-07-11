@@ -35,7 +35,7 @@ const char Subfolders_element_name[] = "subfolders";
 const char Left_ro_element_name[] = "left-readonly";
 const char Right_ro_element_name[] = "right-readonly";
 
-/** 
+/**
  * @brief Standard constructor.
  */
  ProjectFile::ProjectFile()
@@ -45,7 +45,7 @@ const char Right_ro_element_name[] = "right-readonly";
 {
 }
 
-/** 
+/**
  * @brief Open given path-file and read data from it to member variables.
  * @param [in] path Path to project file.
  * @param [out] sError Error string if error happened.
@@ -124,7 +124,7 @@ bool ProjectFile::Read(LPCTSTR path)
 	return loaded;
 }
 
-/** 
+/**
  * @brief Save data from member variables to path-file.
  * @param [in] path Path to project file.
  * @param [out] sError Error string if error happened.

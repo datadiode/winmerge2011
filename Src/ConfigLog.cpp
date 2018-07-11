@@ -4,7 +4,7 @@
 //    it under the terms of the GNU General Public License as published by
 //    the Free Software Foundation; either version 3 of the License, or (at
 //    your option) any later version.
-//    
+//
 //    This program is distributed in the hope that it will be useful, but
 //    WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -13,7 +13,7 @@
 //    You should have received a copy of the GNU General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////
-/** 
+/**
  * @file  ConfigLog.cpp
  *
  * @brief CConfigLog implementation
@@ -41,7 +41,7 @@ CConfigLog::~CConfigLog()
 	delete m_pfile;
 }
 
-/** 
+/**
  * @brief Return logfile name and path
  */
 String CConfigLog::GetFileName() const
@@ -198,7 +198,7 @@ void CConfigLog::WriteVersionOf1(int indent, LPTSTR path, bool bDllGetVersion)
 	{
 		if (HINSTANCE hinstDll = LoadLibrary(path))
 		{
-			DLLGETVERSIONPROC DllGetVersion = (DLLGETVERSIONPROC) 
+			DLLGETVERSIONPROC DllGetVersion = (DLLGETVERSIONPROC)
 				GetProcAddress(hinstDll, "DllGetVersion");
 			if (DllGetVersion)
 			{
@@ -286,7 +286,7 @@ void CConfigLog::WriteItemWhitespace(int indent, LPCTSTR key, int *pvalue)
 	}
 }
 
-/** 
+/**
  * @brief Write logfile
  */
 bool CConfigLog::DoFile(bool writing, String &sError)
@@ -426,7 +426,7 @@ bool CConfigLog::DoFile(bool writing, String &sError)
 	WriteItemYesNo(2, _T("Syntax Highlight"), &m_miscSettings.bSyntaxHighlight);
 	WriteItem(2, _T("Tab size"), m_miscSettings.nTabSize);
 	WriteItemYesNoInverted(2, _T("Insert tabs"), &m_miscSettings.nInsertTabs);
-	
+
 // Font settings
 	FileWriteString(_T("\r\n Font:\r\n"));
 	FileWriteString(_T("  Font facename: %s\r\n"), m_fontSettings.sFacename.c_str());
@@ -451,7 +451,7 @@ bool CConfigLog::DoFile(bool writing, String &sError)
 	return true;
 }
 
-/** 
+/**
  * @brief Parse Windows version data to string.
  * @return String describing Windows version.
  */

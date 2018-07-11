@@ -16,7 +16,7 @@
 //    You should have received a copy of the GNU General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////
-/** 
+/**
  * @file  DirDoc.cpp
  *
  * @brief Implementation file for CDirDoc
@@ -107,7 +107,7 @@ bool CDirFrame::InitCompare(LPCTSTR pszLeft, LPCTSTR pszRight, int nRecursive, C
 		m_pTempPathContext->m_strLeftRoot = m_pCtxt->GetLeftPath();
 		m_pTempPathContext->m_strRightRoot = m_pCtxt->GetRightPath();
 	}
-	
+
 	m_nRecursive = nRecursive;
 	return bNeedCompare;
 }
@@ -428,7 +428,7 @@ bool CDirFrame::IsShowable(const DIFFITEM *di) const
 			// In the tree-view we show subfolders with identical/different
 			// status. The flat view only shows files inside folders. So if we
 			// filter by status the files inside folder are filtered too and
-			// users see files appearing/disappearing without clear logic.		
+			// users see files appearing/disappearing without clear logic.
 			if (COptionsMgr::Get(OPT_TREE_MODE))
 			{
 				// Need to stay visible due to presence of identical child items?
@@ -614,7 +614,7 @@ bool CDirFrame::CloseMergeDocs()
  * @brief Obtain a merge doc to display a difference in files.
  * @param [out] pNew Set to TRUE if a new doc is created,
  * and FALSE if an existing one reused.
- * @return Pointer to CMergeDoc to use (new or existing). 
+ * @return Pointer to CMergeDoc to use (new or existing).
  */
 CChildFrame *CDirFrame::GetMergeDocForDiff()
 {
@@ -627,7 +627,7 @@ CChildFrame *CDirFrame::GetMergeDocForDiff()
  * @brief Obtain a hex merge doc to display a difference in files.
  * @param [out] pNew Set to TRUE if a new doc is created,
  * and FALSE if an existing one reused.
- * @return Pointer to CHexMergeDoc to use (new or existing). 
+ * @return Pointer to CHexMergeDoc to use (new or existing).
  */
 CHexMergeFrame *CDirFrame::GetHexMergeDocForDiff()
 {
@@ -655,7 +655,7 @@ void CDirFrame::UpdateChangedItem(const CChildFrame *pMergeDoc)
 	// If we failed files could have been swapped so lets try again
 	if (!di)
 		di = FindItemFromPaths(paths[1], paths[0]);
-	
+
 	// Update status if paths were found for items.
 	// Fail means we had unique items compared as 'renamed' items
 	// so there really is not status to update.

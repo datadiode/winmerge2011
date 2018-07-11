@@ -1,4 +1,4 @@
-/** 
+/**
  * @file DiffFileData.h
  *
  * @brief Declaration for DiffFileData class.

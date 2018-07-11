@@ -2,7 +2,7 @@
  *  @file LineFiltersDlg.cpp
  *
  *  @brief Implementation of Line Filter dialog
- */ 
+ */
 #include "StdAfx.h"
 #include "Merge.h"
 #include "LanguageSelect.h"

@@ -13,7 +13,7 @@
 //    You should have received a copy of the GNU General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////
-/** 
+/**
  * @file  PatchDlg.h
  *
  * @brief Declaration file for patch creation dialog
@@ -27,7 +27,7 @@ struct PATCHFILES;
 /////////////////////////////////////////////////////////////////////////////
 // PatchDlg dialog
 
-/** 
+/**
  * @brief Dialog class for Generate Patch -dialog.
  * This dialog allows user to select files from which to create a patch,
  * patch file's filename and several options related to patch.

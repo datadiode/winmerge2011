@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  DirColsDlg.cpp
  *
  * @brief Implementation file for CDirColsDlg
@@ -82,7 +82,7 @@ LRESULT CDirColsDlg::OnNotify(NMHDR *pNMHDR)
 /**
  * @brief Dialog initialisation. Load column lists.
  */
-BOOL CDirColsDlg::OnInitDialog() 
+BOOL CDirColsDlg::OnInitDialog()
 {
 	ODialog::OnInitDialog();
 	LanguageSelect.TranslateDialog(m_hWnd);
@@ -151,7 +151,7 @@ void CDirColsDlg::MoveItem(int index, int newIndex)
 
 	// Delete column
 	m_listColumns->DeleteItem(index);
-	
+
 	// Insert column in new index
 	m_listColumns->InsertItem(newIndex, text.c_str());
 	m_listColumns->SetItemState(newIndex, state, LVIS_SELECTED);
@@ -175,7 +175,7 @@ void CDirColsDlg::OnUp()
 /**
  * @brief Move selected items down (in show list)
  */
-void CDirColsDlg::OnDown() 
+void CDirColsDlg::OnDown()
 {
 	int lower = m_listColumns->GetNextItem(-1, LVNI_SELECTED);
 	int upper = lower + m_listColumns->GetSelectedCount();
@@ -187,7 +187,7 @@ void CDirColsDlg::OnDown()
 /**
  * @brief User clicked ok, so we update m_cols and close.
  */
-void CDirColsDlg::OnOK() 
+void CDirColsDlg::OnOK()
 {
 	int phy = 0;
 	for (int i = 0; i < m_listColumns->GetItemCount(); i++)

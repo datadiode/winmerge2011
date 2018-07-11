@@ -71,7 +71,7 @@ bool CShellContextMenu::InvokeCommand(UINT nCmd, HWND hWnd)
 		ASSERT(SUCCEEDED(hr));
 		return SUCCEEDED(hr);
 	}
-	else 
+	else
 	{
 		return false;
 	}

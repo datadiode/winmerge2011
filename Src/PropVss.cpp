@@ -321,7 +321,7 @@ LRESULT PropVss::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	return OptionsPanel::WindowProc(message, wParam, lParam);
 }
 
-/** 
+/**
  * @brief Reads options values from storage to UI.
  */
 void PropVss::ReadOptions()
@@ -331,7 +331,7 @@ void PropVss::ReadOptions()
 		m_strPath = COptionsMgr::Get(*pOpt);
 }
 
-/** 
+/**
  * @brief Writes options values from UI to storage.
  */
 void PropVss::WriteOptions()
@@ -471,7 +471,7 @@ BOOL PropVss::OnInitDialog()
 /**
  * @brief Called when user has selected VSS version.
  */
-void PropVss::UpdateScreen() 
+void PropVss::UpdateScreen()
 {
 	String tempStr = LanguageSelect.LoadString(
 		m_nVerSys == VCS_CLEARCASE ? IDS_CC_CMD :

@@ -4,7 +4,7 @@
 //    it under the terms of the GNU General Public License as published by
 //    the Free Software Foundation; either version 3 of the License, or (at
 //    your option) any later version.
-//    
+//
 //    This program is distributed in the hope that it will be useful, but
 //    WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -13,7 +13,7 @@
 //    You should have received a copy of the GNU General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////
-/** 
+/**
  * @file  DiffWrapper.cpp
  *
  * @brief Code for DiffWrapper class
@@ -199,10 +199,10 @@ OP_TYPE CDiffWrapper::PostFilter(struct comparison *cmp,
 	int QtyLinesRight, OP_TYPE Op, const TCHAR *FileNameExt)
 {
 	ASSERT(Op != OP_TRIVIAL);
-	
+
 	//First of all get the comment marker set used to indicate comment blocks
 	FilterCommentsSet filtercommentsset = GetSetForFileType(FileNameExt);
-	if (filtercommentsset.StartMarker.empty() && 
+	if (filtercommentsset.StartMarker.empty() &&
 		filtercommentsset.EndMarker.empty() &&
 		filtercommentsset.InlineMarker.empty())
 	{
@@ -234,9 +234,9 @@ OP_TYPE CDiffWrapper::PostFilter(struct comparison *cmp,
 			LineStrRight = cmp->file[1].linbuf[LineNumberRight + i];
 			EndLineRight = cmp->file[1].linbuf[LineNumberRight + i + 1];
 		}
-			
+
 		if (EndLineLeft && EndLineRight)
-		{	
+		{
 			std::string LineDataLeft(LineStrLeft, EndLineLeft);
 			std::string LineDataRight(LineStrRight, EndLineRight);
 
@@ -315,7 +315,7 @@ OP_TYPE CDiffWrapper::PostFilter(struct comparison *cmp,
 			}
 
 			if (LineDataLeft != LineDataRight)
-			{	
+			{
 				return Op;
 			}
 		}
@@ -419,7 +419,7 @@ bool CDiffWrapper::RunFileDiff(DiffFileData &diffdata)
 	// First determine what happened during comparison
 	// If there were errors or files were binaries, don't bother
 	// creating diff-lists or patches
-	
+
 	// diff_2_files set bin_flag to -1 if different binary
 	// diff_2_files set bin_flag to +1 if same binary
 	if (bin_flag != 0)
@@ -440,13 +440,13 @@ bool CDiffWrapper::RunFileDiff(DiffFileData &diffdata)
 	{
 		WritePatchFile(script, &diffdata);
 	}
-	
+
 	// Go through diffs adding them to WinMerge's diff list
 	// This is done on every WinMerge's doc rescan!
 	if (!m_status.bBinaries && m_pDiffList)
 	{
 		bRet = LoadWinMergeDiffsFromDiffUtilsScript(script, &diffdata);
-	}			
+	}
 
 	// cleanup the script
 	while (script != NULL)
@@ -530,7 +530,7 @@ bool CDiffWrapper::FixLastDiffRange(int leftBufferLines, int rightBufferLines, b
 				++dr->end1;
 			}
 		}
-		else 
+		else
 		{
 			// we have to create the DIFF
 			DIFFRANGE dr;
@@ -686,7 +686,7 @@ bool CDiffWrapper::LoadWinMergeDiffsFromDiffUtilsScript(struct change *script, s
 		/* Find a set of changes that belong together.  */
 		struct change *thisob = next;
 		struct change *end = find_change(cmp, next);
-		
+
 #ifdef DEBUG
 		debug_script(thisob);
 #endif
@@ -708,7 +708,7 @@ bool CDiffWrapper::LoadWinMergeDiffsFromDiffUtilsScript(struct change *script, s
 		{
 			OP_TYPE op = changes == CHANGED ? OP_DIFF :
 				changes == OLD ? OP_LEFTONLY : changes == NEW ? OP_RIGHTONLY : OP_TRIVIAL;
-				
+
 			/* Print the lines that the first file has.  */
 			printint trans_a0 = 0, trans_b0 = 0, trans_a1 = 0, trans_b1 = 0;
 			translate_range(&cmp->file[0], first0, last0, &trans_a0, &trans_b0);

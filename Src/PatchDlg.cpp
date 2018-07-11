@@ -172,7 +172,7 @@ void CPatchDlg::OnOK()
 		m_pCbResult->SetFocus();
 		return;
 	}
- 
+
 	// Check that result (patch) file is absolute path
 	if (PathIsRelative(m_fileResult.c_str()))
 	{
@@ -180,7 +180,7 @@ void CPatchDlg::OnOK()
 		m_pCbResult->SetFocus();
 		return;
 	}
-	
+
 	// Result file already exists and append not selected
 	if (m_pCbResult->SendDlgItemMessage(1001, EM_GETMODIFY) && !m_appendFile &&
 		paths_DoesPathExist(m_fileResult.c_str()) == IS_EXISTING_FILE)
@@ -279,7 +279,7 @@ BOOL CPatchDlg::OnInitDialog()
 		m_pCbContext->AddString(_T("5"));
 		m_pCbContext->AddString(_T("7"));
 	}
-	
+
 	LoadSettings();
 
 	return TRUE;

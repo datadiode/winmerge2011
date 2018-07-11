@@ -166,7 +166,7 @@ function Navigate(direction)
 
 	var body = cf.document.body;
 	var table = body.children[0];
-	
+
 	table.runtimeStyle.zoom = ContentZoom.options(ContentZoom.selectedIndex).innerHTML;
 
 	with (table.rows[0])

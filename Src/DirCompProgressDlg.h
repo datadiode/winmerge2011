@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  DirCompProgressDlg.h
  *
  * @brief Declaration file for Directory compare statusdialog class
@@ -15,7 +15,7 @@ class CompareStatisticsDlg;
 
 /**
  * @brief Class for directory compare statusdialog.
- * 
+ *
  * Implements non-modal dialog directory compares. We create this
  * modeless dialog when we start the compare and destroy it after
  * compare is ready. Dialog itself shows counts of total found items

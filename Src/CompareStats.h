@@ -2,7 +2,7 @@
  *  @file CompareStats.h
  *
  *  @brief Declaration of class CompareStats
- */ 
+ */
 #pragma once
 
 struct DIFFITEM;

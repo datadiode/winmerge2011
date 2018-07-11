@@ -4,7 +4,7 @@ Copyright (C) 2000 Raihan Kibria
 SPDX-License-Identifier: GPL-3.0-or-later
 Last change: 2017-06-18 by Jochen Neubeck
 */
-/** 
+/**
  * @file  heksedit.h
  *
  * @brief Interface definition for the hekseditor window.

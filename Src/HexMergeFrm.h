@@ -15,7 +15,7 @@
 //    You should have received a copy of the GNU General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////
-/** 
+/**
  * @file  HexMergeFrm.h
  *
  * @brief interface of the CHexMergeFrame class
@@ -26,7 +26,7 @@
 
 class CHexMergeView;
 
-/** 
+/**
  * @brief Frame class for file compare, handles panes, statusbar etc.
  */
 class CHexMergeFrame

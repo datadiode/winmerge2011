@@ -184,7 +184,7 @@ bool CChildFrame::OnL2r()
 {
 	bool done = false;
 	// Check that right side is not readonly
-	if (!m_ptBuf[1]->GetReadOnly()) 
+	if (!m_ptBuf[1]->GetReadOnly())
 	{
 		int firstDiff, lastDiff;
 		int currentDiff = GetContextDiff(firstDiff, lastDiff);
@@ -289,8 +289,8 @@ void CChildFrame::SetUnpacker(PackingInfo * infoNewHandler)
 /**
  * @brief Save an editor text buffer to a file for prediffing (make UCS-2LE if appropriate)
  *
- * @note 
- * original file is Ansi : 
+ * @note
+ * original file is Ansi :
  *   buffer  -> save as Ansi -> Ansi plugins -> diffutils
  * original file is Unicode (UCS2-LE, UCS2-BE, UTF-8) :
  *   buffer  -> save as UCS2-LE -> Unicode plugins -> convert to UTF-8 -> diffutils
@@ -490,9 +490,9 @@ int CChildFrame::Rescan2(bool &bIdentical)
 		nResult = RESCAN_OK;
 		// Now update views and buffers for ghost lines
 
-		// Prevent displaying views during this update 
+		// Prevent displaying views during this update
 		// BTW, this solves the problem of double asserts
-		// (during the display of an assert message box, a second assert in one of the 
+		// (during the display of an assert message box, a second assert in one of the
 		//  display functions happens, and hides the first assert)
 		m_pView[0]->DetachFromBuffer();
 		m_pView[1]->DetachFromBuffer();
@@ -525,7 +525,7 @@ int CChildFrame::Rescan2(bool &bIdentical)
 		// Apply flags to lines that moved, to differentiate from appeared/disappeared lines
 		if (MovedLines *pMovedLines = m_diffWrapper.GetMovedLines())
 			FlagMovedLines(pMovedLines, m_ptBuf[0], m_ptBuf[1]);
-		
+
 		// After PrimeTextBuffers() we know amount of real diffs
 		// (m_nDiffs) and trivial diffs (m_nTrivialDiffs)
 
@@ -809,10 +809,10 @@ bool CChildFrame::ListCopy(int srcPane, int dstPane, int nDiff, bool bGroupWithP
  * normal filename fails, to let user choose another filename/location.
  * Also, if file is unnamed file (e.g. scratchpad) then it must be saved
  * using this function.
- * @param [in, out] strPath 
+ * @param [in, out] strPath
  * - [in] : Initial path shown to user
  * - [out] : Path to new filename if saving succeeds
- * @param [in, out] nSaveResult 
+ * @param [in, out] nSaveResult
  * - [in] : Statuscode telling why we ended up here. Maybe the result of
  * previous save.
  * - [out] : Statuscode of this saving try
@@ -947,7 +947,7 @@ bool CChildFrame::DoSave(bool &bSaveSuccess, int nBuffer)
 		{
 			bSaveSuccess = false;
 			return true;
-		}		
+		}
 	}
 
 	// use a temp packer
@@ -956,7 +956,7 @@ bool CChildFrame::DoSave(bool &bSaveSuccess, int nBuffer)
 	PackingInfo infoTempUnpacker = *m_pInfoUnpacker;
 
 	bSaveSuccess = false;
-	
+
 	// Check third arg possibly given from command-line
 	if (!m_pInfoUnpacker->saveAsPath.empty())
 	{
@@ -979,7 +979,7 @@ bool CChildFrame::DoSave(bool &bSaveSuccess, int nBuffer)
 	// FALSE as long as the user is not satisfied
 	// TRUE if saving succeeds, even with another filename, or if the user cancels
 	bool result = false;
-	// the error code from the latest save operation, 
+	// the error code from the latest save operation,
 	// or SAVE_DONE when the save succeeds
 	// TODO: Shall we return this code in addition to bSaveSuccess ?
 	int nSaveResult = SAVE_NO_FILENAME;
@@ -1055,7 +1055,7 @@ bool CChildFrame::DoSaveAs(int nBuffer)
 	// FALSE as long as the user is not satisfied
 	// TRUE if saving succeeds, even with another filename, or if the user cancels
 	bool result = false;
-	// the error code from the latest save operation, 
+	// the error code from the latest save operation,
 	// or SAVE_DONE when the save succeeds
 
 	// Use SAVE_NO_FILENAME to prevent asking about error
@@ -1157,7 +1157,7 @@ void CChildFrame::SetCurrentDiff(int nDiff)
 
 /**
  * @brief Take care of rescanning document.
- * 
+ *
  * Update view and restore cursor and scroll position after
  * rescanning document.
  */
@@ -1331,11 +1331,11 @@ void CChildFrame::OnUpdateStatusNum()
 
 	String s;
 	const int nDiffs = m_diffList.GetSignificantDiffs();
-	
+
 	// Files are identical - show text "Identical"
 	if (nDiffs <= 0)
 		s = LanguageSelect.LoadString(IDS_IDENTICAL);
-	
+
 	// There are differences, but no selected diff
 	// - show amount of diffs
 	else if (GetCurrentDiff() < 0)
@@ -1343,7 +1343,7 @@ void CChildFrame::OnUpdateStatusNum()
 		s = LanguageSelect.LoadString(nDiffs == 1 ? IDS_1_DIFF_FOUND : IDS_NO_DIFF_SEL_FMT);
 		string_replace(s, _T("%1"), NumToStr(nDiffs, 10).c_str());
 	}
-	
+
 	// There are differences and diff selected
 	// - show diff number and amount of diffs
 	else
@@ -1361,7 +1361,7 @@ void CChildFrame::OnUpdateStatusNum()
  *
  * @note Buffers may have different length after PrimeTextBuffers. Indeed, no
  * synchronization is needed after the last line. So no ghost line will be created
- * to face an ignored difference in the last line (typically : 'ignore blank lines' 
+ * to face an ignored difference in the last line (typically : 'ignore blank lines'
  * + empty last line on one side).
  * If you feel that different length buffers are really strange, CHANGE FIRST
  * the last diff to take into account the empty last line.
@@ -1627,7 +1627,7 @@ bool CChildFrame::PromptAndSaveIfNeeded(bool bAllowCancel)
 		}
 	}
 	else
-	{	
+	{
 		result = false;
 	}
 
@@ -1867,17 +1867,17 @@ void CChildFrame::OpenDocs(
 	CMergeEditView *const pRight = GetRightView();
 	CMergeDiffDetailView *const pLeftDetail = GetLeftDetailView();
 	CMergeDiffDetailView *const pRightDetail = GetRightDetailView();
-	
+
 	// set the document types (do it before Rescan)
 	// Warning : it is the first thing to do (must be done before UpdateView,
 	// or any function that calls UpdateView, like SelectDiff)
 	// Note: If option enabled, and another side type is not recognized,
 	// we use recognized type for unrecognized side too.
-	
+
 	bool syntaxHLEnabled = COptionsMgr::Get(OPT_SYNTAX_HIGHLIGHT);
 	CCrystalTextBuffer::TextDefinition *bLeftTyped = NULL;
 	CCrystalTextBuffer::TextDefinition *bRightTyped = NULL;
-	
+
 	if (syntaxHLEnabled)
 	{
 		bLeftTyped = m_ptBuf[0]->SetTextType(sextL.c_str());
@@ -1885,7 +1885,7 @@ void CChildFrame::OpenDocs(
 	}
 
 	// If textypes of the files aren't recogzined by their extentions,
-	// try to recognize them using their first lines 
+	// try to recognize them using their first lines
 	if (bLeftTyped == NULL && bRightTyped == NULL)
 	{
 		if (LPCTSTR sFirstLine = m_ptBuf[0]->GetLineChars(0))
@@ -1921,9 +1921,9 @@ void CChildFrame::OpenDocs(
 	// Open filed if rescan succeed and files are not binaries
 	if (nRescanResult != RESCAN_OK)
 	{
-		// CChildFrame::Rescan fails if files do not exist on both sides 
-		// or the really arcane case that the temp files couldn't be created, 
-		// which is too obscure to bother reporting if you can't write to 
+		// CChildFrame::Rescan fails if files do not exist on both sides
+		// or the really arcane case that the temp files couldn't be created,
+		// which is too obscure to bother reporting if you can't write to
 		// your temp directory, doing nothing is graceful enough for that).
 		ShowRescanError(nRescanResult, bIdentical);
 		DestroyFrame();
@@ -2494,7 +2494,6 @@ HRESULT CChildFrame::LimitContext(long nLines)
 		ID_VIEW_CONTEXT_0 + nLines : ID_VIEW_CONTEXT_UNLIMITED);
 	return S_OK;
 }
-
 
 /**
  * @brief Add or move synchronization point

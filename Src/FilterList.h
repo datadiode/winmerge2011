@@ -25,7 +25,7 @@ size_t apply_prediffer(struct file_data *current, short side, char *buf, size_t 
 class FilterList
 {
 public:
-	
+
 	FilterList();
 	~FilterList();
 

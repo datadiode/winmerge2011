@@ -15,7 +15,7 @@
 //    You should have received a copy of the GNU General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////
-/** 
+/**
  * @file  MainFrm.h
  *
  * @brief Declaration file for CMainFrame
@@ -171,7 +171,7 @@ public:
 	/**
 	 * @name Version Control System (VCS) integration.
 	 */
-	/*@{*/ 
+	/*@{*/
 protected:
 	String m_strVssUser; /**< Visual Source Safe User ID */
 	String m_strVssPassword; /**< Visual Source Safe Password */

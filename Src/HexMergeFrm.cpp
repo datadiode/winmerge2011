@@ -159,7 +159,7 @@ CHexMergeView *CHexMergeFrame::CreatePane(int iPane)
 		SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
 
 	pView->m_pStatusBar = pBar;
-	
+
 	return pView;
 }
 

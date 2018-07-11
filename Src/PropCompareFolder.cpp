@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  PropCompareFolder.cpp
  *
  * @brief Implementation of PropCompareFolder propertysheet
@@ -15,7 +15,7 @@
 
 static const int Mega = 1024 * 1024;
 
-/** 
+/**
  * @brief Constructor.
  */
 PropCompareFolder::PropCompareFolder()
@@ -83,7 +83,7 @@ LRESULT PropCompareFolder::WindowProc(UINT message, WPARAM wParam, LPARAM lParam
 	return OptionsPanel::WindowProc(message, wParam, lParam);
 }
 
-/** 
+/**
  * @brief Reads options values from storage to UI.
  * Property sheet calls this before displaying GUI to load values
  * into members.
@@ -100,7 +100,7 @@ void PropCompareFolder::ReadOptions()
 	m_nCompareThreads = COptionsMgr::Get(OPT_CMP_COMPARE_THREADS);
 }
 
-/** 
+/**
  * @brief Writes options values from UI to storage.
  * Property sheet calls this after dialog is closed with OK button to
  * store values in member variables.
@@ -117,7 +117,7 @@ void PropCompareFolder::WriteOptions()
 	COptionsMgr::SaveOption(OPT_CMP_COMPARE_THREADS, m_nCompareThreads);
 }
 
-/** 
+/**
  * @brief Called before propertysheet is drawn.
  */
 BOOL PropCompareFolder::OnInitDialog()
@@ -138,7 +138,7 @@ BOOL PropCompareFolder::OnInitDialog()
 	return OptionsPanel::OnInitDialog();
 }
 
-/** 
+/**
  * @brief Sets options to defaults
  */
 void PropCompareFolder::OnDefaults()
@@ -153,7 +153,7 @@ void PropCompareFolder::OnDefaults()
 	UpdateScreen();
 }
 
-/** 
+/**
  * @brief Called when compare method dropdown selection is changed.
  * Enables / disables "Stop compare after first difference" checkbox.
  * That checkbox is valid only for quick contents compare method.

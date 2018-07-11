@@ -969,7 +969,7 @@ static COptionDef<int> *Lookup3StateOption(UINT id)
  * @brief This handler updates the menus from time to time.
  */
 template<>
-LRESULT CMainFrame::OnWndMsg<WM_INITMENUPOPUP>(WPARAM wParam, LPARAM lParam) 
+LRESULT CMainFrame::OnWndMsg<WM_INITMENUPOPUP>(WPARAM wParam, LPARAM lParam)
 {
 	if (HIWORD(lParam)) // bSysMenu
 		return 0;
@@ -1167,7 +1167,7 @@ LRESULT CMainFrame::OnWndMsg<WM_MENUSELECT>(WPARAM wParam, LPARAM lParam)
 /////////////////////////////////////////////////////////////////////////////
 // CMainFrame message handlers
 
-void CMainFrame::OnFileOpen() 
+void CMainFrame::OnFileOpen()
 {
 	UpdateDocFrameSettings(NULL);
 	FileLocation filelocLeft, filelocRight;
@@ -1284,7 +1284,7 @@ void CMainFrame::RedisplayAllDirDocs()
 /**
  * @brief Show/Hide different files/directories
  */
-void CMainFrame::OnOptionsShowDifferent() 
+void CMainFrame::OnOptionsShowDifferent()
 {
 	bool val = COptionsMgr::Get(OPT_SHOW_DIFFERENT);
 	COptionsMgr::SaveOption(OPT_SHOW_DIFFERENT, !val); // reverse
@@ -1294,7 +1294,7 @@ void CMainFrame::OnOptionsShowDifferent()
 /**
  * @brief Show/Hide identical files/directories
  */
-void CMainFrame::OnOptionsShowIdentical() 
+void CMainFrame::OnOptionsShowIdentical()
 {
 	bool val = COptionsMgr::Get(OPT_SHOW_IDENTICAL);
 	COptionsMgr::SaveOption(OPT_SHOW_IDENTICAL, !val); // reverse
@@ -1304,7 +1304,7 @@ void CMainFrame::OnOptionsShowIdentical()
 /**
  * @brief Show/Hide left-only files/directories
  */
-void CMainFrame::OnOptionsShowUniqueLeft() 
+void CMainFrame::OnOptionsShowUniqueLeft()
 {
 	bool val = COptionsMgr::Get(OPT_SHOW_UNIQUE_LEFT);
 	COptionsMgr::SaveOption(OPT_SHOW_UNIQUE_LEFT, !val); // reverse
@@ -1314,7 +1314,7 @@ void CMainFrame::OnOptionsShowUniqueLeft()
 /**
  * @brief Show/Hide right-only files/directories
  */
-void CMainFrame::OnOptionsShowUniqueRight() 
+void CMainFrame::OnOptionsShowUniqueRight()
 {
 	bool val = COptionsMgr::Get(OPT_SHOW_UNIQUE_RIGHT);
 	COptionsMgr::SaveOption(OPT_SHOW_UNIQUE_RIGHT, !val); // reverse
@@ -1344,7 +1344,7 @@ void CMainFrame::OnOptionsShowSkipped()
 /**
  * @brief Show GNU licence information in notepad (local file) or in Web Browser
  */
-void CMainFrame::OnHelpGnulicense() 
+void CMainFrame::OnHelpGnulicense()
 {
 	const String spath = GetModulePath() + LicenseFile;
 	OpenFileOrUrl(spath.c_str(), LicenceUrl);
@@ -1408,7 +1408,7 @@ void CMainFrame::SetEOLMixed(bool bAllow)
 /**
  * @brief Opens Options-dialog and saves changed options
  */
-void CMainFrame::OnOptions() 
+void CMainFrame::OnOptions()
 {
 	// Using singleton shared syntax colors
 	CPreferencesDlg dlg;
@@ -1920,7 +1920,7 @@ bool CMainFrame::CreateBackup(bool bFolder, LPCTSTR pszPath)
 	// Determine backup folder
 	switch (COptionsMgr::Get(OPT_BACKUP_LOCATION))
 	{
-	case PropBackups::FOLDER_GLOBAL: 
+	case PropBackups::FOLDER_GLOBAL:
 		// Put backups to global folder defined in options
 		bakPath = COptionsMgr::Get(OPT_BACKUP_GLOBALFOLDER);
 		if (!bakPath.empty())
@@ -2009,14 +2009,14 @@ void CMainFrame::UpdateMrgViewFont()
 
 /**
  * @brief Select font for Merge/Dir view
- * 
+ *
  * Shows font selection dialog to user, sets current font and saves
  * selected font properties to registry. Selects fon type to active
  * view (Merge/Dir compare). If there is no open views, then font
  * is selected for Merge view (for example user may want to change to
  * unicode font before comparing files).
  */
-void CMainFrame::OnViewSelectfont() 
+void CMainFrame::OnViewSelectfont()
 {
 	CHOOSEFONT cf;
 	ZeroMemory(&cf, sizeof cf);
@@ -2098,7 +2098,7 @@ void CMainFrame::GetDirViewFontProperties()
  * Disable user-selected font for active view type (Merge/Dir compare).
  * If there is no open views, then Merge view font is changed.
  */
-void CMainFrame::OnViewUsedefaultfont() 
+void CMainFrame::OnViewUsedefaultfont()
 {
 	switch (GetActiveDocFrame()->GetFrameType())
 	{
@@ -2161,7 +2161,7 @@ void CMainFrame::OnHelpContents()
 		ShellExecute(NULL, _T("open"), DocsURL, NULL, NULL, SW_SHOWNORMAL);
 }
 
-void CMainFrame::InitialActivate(int nCmdShow) 
+void CMainFrame::InitialActivate(int nCmdShow)
 {
 	CWindowPlacement wp;
 	CRegKeyEx rk = SettingStore.GetSectionKey(_T("Settings"));
@@ -2291,7 +2291,7 @@ void CMainFrame::addToMru(LPCTSTR szItem, LPCTSTR szRegSubKey, UINT nMaxItems)
 	}
 }
 
-void CMainFrame::ApplyDiffOptions() 
+void CMainFrame::ApplyDiffOptions()
 {
 	HWindow *pChild = NULL;
 	while ((pChild = m_pWndMDIClient->FindWindowEx(pChild, WinMergeWindowClass)) != NULL)
@@ -2312,7 +2312,7 @@ void CMainFrame::ApplyDiffOptions()
 /**
  * @brief Apply tabs and eols settings to all merge documents
  */
-void CMainFrame::ApplyViewWhitespace() 
+void CMainFrame::ApplyViewWhitespace()
 {
 	HWindow *pChild = NULL;
 	bool opt_view_whitespace = COptionsMgr::Get(OPT_VIEW_WHITESPACE);
@@ -2351,7 +2351,7 @@ void CMainFrame::ApplyViewWhitespace()
 	}
 }
 
-void CMainFrame::OnViewWhitespace() 
+void CMainFrame::OnViewWhitespace()
 {
 	bool bViewWhitespace = COptionsMgr::Get(OPT_VIEW_WHITESPACE);
 	COptionsMgr::SaveOption(OPT_VIEW_WHITESPACE, !bViewWhitespace);
@@ -2794,7 +2794,7 @@ static void LoadConfigLog(CConfigLog &configLog, LOGFONT &lfDiff, ConfigLogDirec
 	LoadConfigIntSetting(configLog.m_miscSettings.nInsertTabs, OPT_TAB_TYPE, cfgdir);
 	LoadConfigIntSetting(configLog.m_miscSettings.nTabSize, OPT_TAB_SIZE, cfgdir);
 	LoadConfigBoolSetting(configLog.m_miscSettings.bPreserveFiletimes, OPT_PRESERVE_FILETIMES, cfgdir);
-	LoadConfigBoolSetting(configLog.m_miscSettings.bMatchSimilarLines, OPT_CMP_MATCH_SIMILAR_LINES, cfgdir);	
+	LoadConfigBoolSetting(configLog.m_miscSettings.bMatchSimilarLines, OPT_CMP_MATCH_SIMILAR_LINES, cfgdir);
 	LoadConfigIntSetting(configLog.m_miscSettings.nMatchSimilarLinesMax, OPT_CMP_MATCH_SIMILAR_LINES_MAX, cfgdir);
 	LoadConfigBoolSetting(configLog.m_miscSettings.bMerge7zEnable, OPT_ARCHIVE_ENABLE, cfgdir);
 	LoadConfigBoolSetting(configLog.m_miscSettings.bMerge7zProbeSignature, OPT_ARCHIVE_PROBETYPE, cfgdir);
@@ -2850,7 +2850,7 @@ void CMainFrame::OnUseDesktopSpecificSettings()
 
 /**
  * @brief Open two new empty docs, 'Scratchpads'
- * 
+ *
  * Allows user to open two empty docs, to paste text to
  * compare from clipboard.
  * @note File filenames are set emptys and filedescriptors
@@ -2858,7 +2858,7 @@ void CMainFrame::OnUseDesktopSpecificSettings()
  * @sa CChildFrame::OpenDocs()
  * @sa CChildFrame::TrySaveAs()
  */
-void CMainFrame::OnFileNew() 
+void CMainFrame::OnFileNew()
 {
 	// If the dirdoc we are supposed to use is busy doing a diff, bail out
 	if (IsComparing())
@@ -3410,7 +3410,7 @@ LRESULT CMainFrame::OnWndMsg<WM_TIMER>(WPARAM wParam, LPARAM)
 
 /**
  * @brief Close all open windows.
- * 
+ *
  * Asks about saving unsaved files and then closes all open windows.
  */
 void CMainFrame::OnWindowCloseAll()
@@ -3474,7 +3474,7 @@ bool CMainFrame::CreateCaret(HListView *pLv, int index)
 
 /**
  * @brief Checkin in file into ClearCase.
- */ 
+ */
 void CMainFrame::CheckinToClearCase(LPCTSTR strDestinationPath)
 {
 	strDestinationPath = paths_UndoMagic(wcsdupa(strDestinationPath));
@@ -3491,7 +3491,7 @@ void CMainFrame::CheckinToClearCase(LPCTSTR strDestinationPath)
 	}
 }
 
-/** 
+/**
  * @brief Opens dialog for user to Load, edit and save project files.
  * This dialog gets current compare paths and filter (+other properties
  * possible in project files) and initializes the dialog with them.
@@ -3533,7 +3533,7 @@ void CMainFrame::OnSaveProject()
 	sht.DoModal(NULL, GetLastActivePopup()->m_hWnd);
 }
 
-/** 
+/**
  * @brief Start flashing window if window is inactive.
  */
 void CMainFrame::StartFlashing()
@@ -3547,7 +3547,7 @@ void CMainFrame::StartFlashing()
 	}
 }
 
-/** 
+/**
  * @brief Stop flashing window when window is activated.
  *
  * If WinMerge is inactive when compare finishes, we start flashing window
@@ -4139,7 +4139,7 @@ void CMainFrame::OnDiffWhitespace(int check, int radio)
 }
 
 void CMainFrame::OnCompareMethod(int value)
-{ 
+{
 	COptionsMgr::SaveOption(OPT_CMP_METHOD, value);
 }
 
@@ -4246,7 +4246,7 @@ bool CMainFrame::DoOpenConflict(LPCTSTR conflictFile, const MergeCmdLineInfo *cm
 	return conflictCompared;
 }
 
-/** 
+/**
  * @brief Read project and perform comparison specified
  * @param [in] sProject Full path to project file.
  * @return TRUE if loading project file and starting compare succeeded.
@@ -4288,7 +4288,7 @@ bool CMainFrame::LoadAndOpenProjectFile(LPCTSTR lpProject)
 	DWORD dwLeftFlags = FFILEOPEN_DETECT;
 	filelocLeft.filepath = project.m_sLeftFile;
 	if (!filelocLeft.filepath.empty())
-	{	
+	{
 		dwLeftFlags |= FFILEOPEN_PROJECT;
 		if (project.m_bLeftPathReadOnly)
 			dwLeftFlags |= FFILEOPEN_READONLY;
@@ -4297,7 +4297,7 @@ bool CMainFrame::LoadAndOpenProjectFile(LPCTSTR lpProject)
 	DWORD dwRightFlags = FFILEOPEN_DETECT;
 	filelocRight.filepath = project.m_sRightFile;
 	if (!filelocRight.filepath.empty())
-	{	
+	{
 		dwRightFlags |= FFILEOPEN_PROJECT;
 		if (project.m_bRightPathReadOnly)
 			dwRightFlags |= FFILEOPEN_READONLY;

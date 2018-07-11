@@ -54,7 +54,7 @@
 //		     Editor won't crash any more i.e. by selecting whole buffer and
 //		     deleting it and then executing ID_EDIT_GOTO_LAST_CHANGE-command.
 ////////////////////////////////////////////////////////////////////////////
-/** 
+/**
  * @file ccrystaltextbuffer.cpp
  *
  * @brief Code for CCrystalTextBuffer class
@@ -157,7 +157,7 @@ CCrystalTextBuffer::~CCrystalTextBuffer()
 /////////////////////////////////////////////////////////////////////////////
 // CCrystalTextBuffer message handlers
 
-/** 
+/**
  * @brief Insert the same line once or several times
  *
  * @param nPosition : not defined (or -1) = add lines at the end of array
@@ -330,7 +330,7 @@ LPCTSTR CCrystalTextBuffer::GetLineEol(int nLine) const
 	return _T("");
 }
 
-bool CCrystalTextBuffer::ChangeLineEol(int nLine, LPCTSTR lpEOL) 
+bool CCrystalTextBuffer::ChangeLineEol(int nLine, LPCTSTR lpEOL)
 {
 	return m_aLines[nLine].ChangeEol(lpEOL);
 }
@@ -672,7 +672,7 @@ POINT CCrystalTextBuffer::InternalInsertText(CCrystalTextView *pSource,
 	// Compute the context : all positions after context.m_ptBegin are
 	// shifted accordingly to (context.m_ptEnd - context.m_ptBegin)
 	// The begin point is the insertion point.
-	// The end point is more tedious : if we insert in a ghost line, we reuse it, 
+	// The end point is more tedious : if we insert in a ghost line, we reuse it,
 	// so we insert fewer lines than the number of lines in the text buffer
 	if (nEndLine - nLine != nInsertedLines)
 	{
@@ -998,7 +998,7 @@ int CCrystalTextBuffer::GetCharWidthFromChar(LPCTSTR pch) const
 }
 
 /**
- * @brief Get the line length, for cursor movement 
+ * @brief Get the line length, for cursor movement
  *
  * @note There are at least 4 line lengths:
  * - number of characters (memory, no EOL)

@@ -1,4 +1,4 @@
-/** 
+/**
  * @file OptionsMgr.h
  *
  * @brief Option accessors to support existing OptionsMgr coding style

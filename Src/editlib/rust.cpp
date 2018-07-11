@@ -196,7 +196,7 @@ void CCrystalTextBuffer::ParseLineRust(TextBlock::Cookie &cookie, LPCTSTR const 
 				const int nNumberCount = COOKIE_GET_RAWSTRING_NUMBER_COUNT(dwCookie);
 				if (I >= nNumberCount && pszChars[I - nNumberCount] == '"')
 				{
-					if ((pszRawStringBegin < pszChars + I - nNumberCount) && 
+					if ((pszRawStringBegin < pszChars + I - nNumberCount) &&
 						(std::count(pszChars + I - nNumberCount + 1, pszChars + I + 1, '#') == nNumberCount))
 					{
 						dwCookie &= ~COOKIE_RAWSTRING;

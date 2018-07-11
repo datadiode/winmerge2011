@@ -143,7 +143,7 @@ LRESULT PropRegistry::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	return OptionsPanel::WindowProc(message, wParam, lParam);
 }
 
-/** 
+/**
  * @brief Reads options values from storage to UI.
  */
 void PropRegistry::ReadOptions()
@@ -157,7 +157,7 @@ void PropRegistry::ReadOptions()
 	m_tempFolder = COptionsMgr::Get(OPT_CUSTOM_TEMP_PATH);
 }
 
-/** 
+/**
  * @brief Writes options values from UI to storage.
  */
 void PropRegistry::WriteOptions()

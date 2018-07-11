@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  LocationView.h
  *
  * @brief Declaration of CLocationView class
@@ -43,7 +43,7 @@ struct DiffBlock
 	unsigned diff_index; /**< Index of difference in the original diff list. */
 };
 
-/** 
+/**
  * @brief Class showing map of files.
  * The location is a view showing two vertical bars. Each bar depicts one file
  * in the file compare. The bars show a scaled view of the files. The

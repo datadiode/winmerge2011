@@ -2,7 +2,7 @@
  *  @file SortHeaderCtrl.cpp
  *
  *  @brief Implementation of CSortHeaderCtrl
- */ 
+ */
 #include "StdAfx.h"
 #include "SortHeaderCtrl.h"
 
@@ -56,7 +56,7 @@ LRESULT CSortHeaderCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	int nSavedDC = pdc->SaveDC();
 	// Set clipping region to limit drawing within column
 	pdc->IntersectClipRect(rcLabel.left, rcLabel.top, rcLabel.right, rcLabel.bottom);
-	// Labels are offset by a certain amount	
+	// Labels are offset by a certain amount
 	// This offset is related to the width of a space character
 	SIZE ext;
 	pdc->GetTextExtent(_T("  "), 2, &ext);

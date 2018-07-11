@@ -2,7 +2,7 @@
  *  @file DiffItem.cpp
  *
  *  @brief Implementation of DIFFITEM
- */ 
+ */
 #include "StdAfx.h"
 #include "DiffItem.h"
 #include "paths.h"

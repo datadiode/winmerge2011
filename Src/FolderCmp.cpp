@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  FolderCmp.cpp
  *
  * @brief Implementation file for FolderCmp
@@ -73,7 +73,7 @@ UINT FolderCmp::prepAndCompareTwoFiles(DIFFITEM *di)
 		{
 			// store true names for diff utils patch file
 			m_diffFileData.SetDisplayFilepaths(origFileName1.c_str(), origFileName2.c_str());
-		
+
 			if (!m_diffFileData.OpenFiles(origFileName1.c_str(), origFileName2.c_str()))
 			{
 				return 0; // yields an error icon
@@ -112,7 +112,7 @@ UINT FolderCmp::prepAndCompareTwoFiles(DIFFITEM *di)
 			m_pDiffUtilsEngine = new CompareEngines::DiffUtils(m_pCtx);
 
 		m_pDiffUtilsEngine->SetCodepage(
-			m_diffFileData.m_FileLocation[0].encoding.m_unicoding ? 
+			m_diffFileData.m_FileLocation[0].encoding.m_unicoding ?
 				CP_UTF8 : m_diffFileData.m_FileLocation[0].encoding.m_codepage);
 		m_pDiffUtilsEngine->SetCompareFiles(
 			m_diffFileData.m_FileLocation[0].filepath,

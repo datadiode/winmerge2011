@@ -234,7 +234,7 @@ namespace H2O
 			return ::ScrollWindow(m_hWnd, dx, dy, prcArea, prcClip);
 		}
 		BOOL ScrollWindowEx(int dx, int dy,
-			const RECT *prcArea = NULL, const RECT *prcClip = NULL, 
+			const RECT *prcArea = NULL, const RECT *prcClip = NULL,
 			HRGN hrgnUpdate = NULL, RECT *prcUpdate = NULL, UINT flags = 0)
 		{
 			assert(::IsWindow(m_hWnd));
@@ -1467,7 +1467,7 @@ namespace H2O
 		}
 
 		LCID GetLocale()
-		// Retrieves the locale of the list box. The high-order word contains the country/region code 
+		// Retrieves the locale of the list box. The high-order word contains the country/region code
 		//  and the low-order word contains the language identifier.
 		{
 			assert(::IsWindow(m_hWnd));
@@ -1608,7 +1608,7 @@ namespace H2O
 		}
 
 		int GetSelItems(int nMaxItems, LPINT rgIndex)
-		// Creates an array of the indexes of all selected items in a multiple-selection list box 
+		// Creates an array of the indexes of all selected items in a multiple-selection list box
 		// and returns the total number of selected items.
 		{
 			assert(::IsWindow(m_hWnd));
@@ -1719,8 +1719,8 @@ namespace H2O
 	{
 	public:
 		int AddString(LPCTSTR lpszString)
-		// Adds a string to the list box of a combo box. If the combo box does not 
-		// have the CBS_SORT style, the string is added to the end of the list. 
+		// Adds a string to the list box of a combo box. If the combo box does not
+		// have the CBS_SORT style, the string is added to the end of the list.
 		// Otherwise, the string is inserted into the list, and the list is sorted.
 		{
 			assert(::IsWindow(m_hWnd));
@@ -1742,7 +1742,7 @@ namespace H2O
 		}
 
 		void Cut()
-		// Deletes the current selection, if any, in the edit control and copies 
+		// Deletes the current selection, if any, in the edit control and copies
 		// the deleted text to the clipboard in CF_TEXT format.
 		{
 			assert(::IsWindow(m_hWnd));
@@ -1750,14 +1750,14 @@ namespace H2O
 		}
 
 		int DeleteString(int nIndex)
-		// Deletes a string in the list box of a combo box. 
+		// Deletes a string in the list box of a combo box.
 		{
 			assert(::IsWindow(m_hWnd));
 			return (int)::SendMessage(m_hWnd, CB_DELETESTRING, (WPARAM)nIndex, 0);
 		}
 
 		int Dir(UINT attr, LPCTSTR lpszWildCard)
-		// Adds the names of directories and files that match a specified string 
+		// Adds the names of directories and files that match a specified string
 		// and set of file attributes.
 		{
 			assert(::IsWindow(m_hWnd));
@@ -1765,7 +1765,7 @@ namespace H2O
 		}
 
 		int FindString(int nIndexStart, LPCTSTR lpszString)
-		// Search the list box of a combo box for an item beginning with the 
+		// Search the list box of a combo box for an item beginning with the
 		// characters in a specified string.
 		{
 			assert(::IsWindow(m_hWnd));
@@ -1773,7 +1773,7 @@ namespace H2O
 		}
 
 		int FindStringExact(int nIndexStart, LPCTSTR lpszString)
-		// Find the first list box string in a combo box that matches the string specified in lpszString. 
+		// Find the first list box string in a combo box that matches the string specified in lpszString.
 		{
 			assert(::IsWindow(m_hWnd));
 			return (int)::SendMessage(m_hWnd, CB_FINDSTRINGEXACT, (WPARAM)nIndexStart, (LPARAM)lpszString);
@@ -1787,14 +1787,14 @@ namespace H2O
 		}
 
 		int GetCurSel()
-		// Retrieves the index of the currently selected item, if any, in the list box of the combo box. 
+		// Retrieves the index of the currently selected item, if any, in the list box of the combo box.
 		{
 			assert(::IsWindow(m_hWnd));
 			return (int)::SendMessage(m_hWnd, CB_GETCURSEL, 0,0);
 		}
 
 		void GetDroppedControlRect(LPRECT prc)
-		// Retrieves the screen coordinates of the combo box in its dropped-down state. 
+		// Retrieves the screen coordinates of the combo box in its dropped-down state.
 		{
 			assert(::IsWindow(m_hWnd));
 			::SendMessage(m_hWnd, CB_GETDROPPEDCONTROLRECT, 0, (LPARAM)prc);
@@ -1808,7 +1808,7 @@ namespace H2O
 		}
 
 		int GetDroppedWidth()
-		// Retrieves the minimum allowable width, in pixels, of the list box of the combo box 
+		// Retrieves the minimum allowable width, in pixels, of the list box of the combo box
 		// with the CBS_DROPDOWN or CBS_DROPDOWNLIST style.
 		{
 			assert(::IsWindow(m_hWnd));
@@ -1816,8 +1816,8 @@ namespace H2O
 		}
 
 		DWORD GetEditSel()
-		// Gets the starting and ending character positions of the current selection 
-		// in the edit control of the combo box. 
+		// Gets the starting and ending character positions of the current selection
+		// in the edit control of the combo box.
 		{
 			assert(::IsWindow(m_hWnd));
 			return (int)::SendMessage(m_hWnd, CB_GETEDITSEL, 0, 0);
@@ -1831,7 +1831,7 @@ namespace H2O
 		}
 
 		int GetHorizontalExtent()
-		// Retrieve from the combo box the width, in pixels, by which the list box can 
+		// Retrieve from the combo box the width, in pixels, by which the list box can
 		// be scrolled horizontally (the scrollable width).
 		{
 			assert(::IsWindow(m_hWnd));
@@ -1893,7 +1893,7 @@ namespace H2O
 		}
 
 		int InitStorage(int nItems, int nBytes)
-		// Allocates memory for storing list box items. Use this before adding a 
+		// Allocates memory for storing list box items. Use this before adding a
 		// large number of items to the list box portion of a combo box.
 		{
 			assert(::IsWindow(m_hWnd));
@@ -1901,7 +1901,7 @@ namespace H2O
 		}
 
 		int InsertString(int nIndex, LPCTSTR lpszString)
-		// Inserts a string into the list box of the combo box. Unlike the AddString, 
+		// Inserts a string into the list box of the combo box. Unlike the AddString,
 		// a list with the CBS_SORT style is not sorted.
 		{
 			assert(::IsWindow(m_hWnd));
@@ -1960,7 +1960,7 @@ namespace H2O
 		}
 
 		int SetExtendedUI(BOOL bExtended)
-		// Selects either the default user interface or the extended user interface for the combo box that 
+		// Selects either the default user interface or the extended user interface for the combo box that
 		// has the CBS_DROPDOWN or CBS_DROPDOWNLIST style.
 		{
 			assert(::IsWindow(m_hWnd));
@@ -2033,7 +2033,7 @@ namespace H2O
 		}
 
 		int GetFirstVisibleLine()
-		// Returns the zero-based index of the first visible character in a single-line edit control 
+		// Returns the zero-based index of the first visible character in a single-line edit control
 		// or the zero-based index of the uppermost visible line in a multiline edit control.
 		{
 			assert(::IsWindow(m_hWnd));
@@ -2041,7 +2041,7 @@ namespace H2O
 		}
 
 		HLOCAL GetHandle()
-		// Returns a handle identifying the buffer containing the multiline edit control's text. 
+		// Returns a handle identifying the buffer containing the multiline edit control's text.
 		// It is not processed by single-line edit controls.
 		{
 			assert(::IsWindow(m_hWnd));
@@ -2120,7 +2120,7 @@ namespace H2O
 		}
 
 		void SetHandle(HLOCAL hBuffer)
-		// Sets a handle to the memory used as a text buffer, empties the undo buffer, 
+		// Sets a handle to the memory used as a text buffer, empties the undo buffer,
 		// resets the scroll positions to zero, and redraws the window.
 		{
 			assert(::IsWindow(m_hWnd));
@@ -2156,7 +2156,7 @@ namespace H2O
 		}
 
 		BOOL FmtLines(BOOL bAddEOL)
-		// Adds or removes soft line-break characters (two carriage returns and a line feed) to the ends of wrapped lines 
+		// Adds or removes soft line-break characters (two carriage returns and a line feed) to the ends of wrapped lines
 		// in a multiline edit control. It is not processed by single-line edit controls.
 		{
 			assert(::IsWindow(m_hWnd));
@@ -2164,7 +2164,7 @@ namespace H2O
 		}
 
 		void LimitText(int nChars)
-		// Sets the text limit of an edit control. The text limit is the maximum amount of text, in TCHARs, 
+		// Sets the text limit of an edit control. The text limit is the maximum amount of text, in TCHARs,
 		// that the user can type into the edit control.
 		{
 			assert(::IsWindow(m_hWnd));
@@ -2180,7 +2180,7 @@ namespace H2O
 		}
 
 		int LineIndex(int nLine)
-		// Returns the character of a line in a multiline edit control. 
+		// Returns the character of a line in a multiline edit control.
 		// This message is the reverse of the EM_LINEFROMCHAR message
 		{
 			assert(::IsWindow(m_hWnd));
@@ -2188,7 +2188,7 @@ namespace H2O
 		}
 
 		int LineLength(int nLine)
-		// Returns the length, in characters, of a single-line edit control. In a multiline edit control, 
+		// Returns the length, in characters, of a single-line edit control. In a multiline edit control,
 		//	returns the length, in characters, of a specified line.
 		{
 			assert(::IsWindow(m_hWnd));
@@ -2198,12 +2198,12 @@ namespace H2O
 		void LineScroll(int nLines, int nChars)
 		// Scrolls the text vertically in a single-line edit control or horizontally in a multiline edit control.
 		{
-			assert(::IsWindow(m_hWnd)); 
+			assert(::IsWindow(m_hWnd));
 			::SendMessage(m_hWnd, EM_LINESCROLL, (WPARAM)nChars, (LPARAM)nLines);
 		}
 
 		void ReplaceSel(LPCTSTR lpszNewText, BOOL bCanUndo = FALSE)
-		// Replaces the current selection with the text in an application-supplied buffer, sends the parent window 
+		// Replaces the current selection with the text in an application-supplied buffer, sends the parent window
 		// EN_UPDATE and EN_CHANGE messages, and updates the undo buffer.
 		{
 			assert(::IsWindow(m_hWnd));
@@ -3229,12 +3229,12 @@ namespace H2O
 			lvc.mask = LVCF_TEXT | LVCF_ORDER | LVCF_FMT;
 			if (-1 != iWidth)
 			{
-				lvc.mask |= LVCF_WIDTH; 
-				lvc.cx = iWidth; 
+				lvc.mask |= LVCF_WIDTH;
+				lvc.cx = iWidth;
 			}
 			if (-1 != iSubItem)
 			{
-				lvc.mask |= LVCF_SUBITEM; 
+				lvc.mask |= LVCF_SUBITEM;
 				lvc.iSubItem = iSubItem;
 			}
 			lvc.iOrder = iCol;
@@ -3451,7 +3451,7 @@ namespace H2O
 
 		BOOL GetItemText(HTREEITEM hItem, LPTSTR pszText, UINT cchTextMax)
 		// Retrieves the text for a tree-view item.
-		// Note: Although the tree-view control allows any length string to be stored 
+		// Note: Although the tree-view control allows any length string to be stored
 		//       as item text, only the first 260 characters are displayed.
 		{
 			using ::SendMessage;
@@ -3466,7 +3466,7 @@ namespace H2O
 
 		String GetItemText(HTREEITEM hItem, UINT cchTextMax = 260)
 		// Retrieves the text for a tree-view item.
-		// Note: Although the tree-view control allows any length string to be stored 
+		// Note: Although the tree-view control allows any length string to be stored
 		//       as item text, only the first 260 characters are displayed.
 		{
 			LPTSTR pszText = (LPTSTR)_alloca(cchTextMax * sizeof(TCHAR));
@@ -4098,13 +4098,13 @@ namespace H2O
 	{
 	public:
 		BOOL SetParts(int iParts, const int *iPaneWidths)
-		// Sets the number of parts in a status window and the coordinate of the right edge of each part. 
+		// Sets the number of parts in a status window and the coordinate of the right edge of each part.
 		// If an element of iPaneWidths is -1, the right edge of the corresponding part extends
 		// to the border of the window
 		{
 			assert(::IsWindow(m_hWnd));
-			assert(iParts <= 256);	
-			return (BOOL)::SendMessage(m_hWnd, SB_SETPARTS, iParts, (LPARAM)iPaneWidths);		
+			assert(iParts <= 256);
+			return (BOOL)::SendMessage(m_hWnd, SB_SETPARTS, iParts, (LPARAM)iPaneWidths);
 		}
 
 		int GetParts()

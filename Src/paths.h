@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  paths.h
  *
  * @brief Declaration file for path routines

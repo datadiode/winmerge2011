@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  CompareOptions.h
  *
  * @brief Compare options classes and types.
@@ -11,7 +11,7 @@
  * Examples:
  * "abc def" is only equivalent to "abcdef" under WHITESPACE_IGNORE_ALL
  *
- * but "abc def" is equivalent to "abc    def" under both 
+ * but "abc def" is equivalent to "abc    def" under both
  *   WHITESPACE_IGNORE_CHANGE and WHITESPACE_IGNORE_ALL
  *
  * Also, trailing and leading whitespace is ignored for both

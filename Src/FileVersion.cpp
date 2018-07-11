@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  FileVersion.cpp
  *
  * @brief Implementation for FileVersion

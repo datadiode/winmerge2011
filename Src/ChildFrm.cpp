@@ -16,7 +16,7 @@
 //    You should have received a copy of the GNU General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////
-/** 
+/**
  * @file  ChildFrm.cpp
  *
  * @brief Implementation file for CChildFrame
@@ -191,7 +191,7 @@ void CChildFrame::OnOpenFileWithEditor()
 }
 
 /**
- * @brief Open the folder containing the active file 
+ * @brief Open the folder containing the active file
  */
 void CChildFrame::OnOpenFolder()
 {
@@ -928,7 +928,7 @@ CMergeEditView *CChildFrame::CreatePane(int iPane)
 		SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
 
 	pView->m_pStatusBar = pBar;
-	
+
 	return pView;
 }
 
@@ -936,7 +936,7 @@ CMergeEditView *CChildFrame::CreatePane(int iPane)
 * @brief Create the child frame, the splitter, the filename bar, the status bar,
 * the diff dockable bar, and the four views
 *
-* @note  the panels layout is 
+* @note  the panels layout is
 * <ul>
 *  <li>   -----------
 *  <li>		!  header !
@@ -996,7 +996,7 @@ void CChildFrame::CreateClient()
 /////////////////////////////////////////////////////////////////////////////
 // CChildFrame message handlers
 
-void CChildFrame::ActivateFrame() 
+void CChildFrame::ActivateFrame()
 {
 	TCHAR entry[8];
 	GetAtomName(static_cast<ATOM>(m_pHandleSet->m_id), entry, _countof(entry));

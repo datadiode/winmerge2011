@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  stringdiffsi.h
  *
  * @brief Declaration file for class stringdiffs
@@ -33,7 +33,7 @@ private:
 	{
 		dlword,
 		dlspace,
-		dlbreak, 
+		dlbreak,
 		dlinsert,
 	};
 	/**
@@ -43,8 +43,8 @@ private:
 	{
 		synbegin1,
 		synbegin2,
-		synend1, 
-		synend2 
+		synend1,
+		synend2
 	};
 
 	struct word

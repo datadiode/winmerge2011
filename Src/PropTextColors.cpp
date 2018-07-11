@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  PropTextColors.cpp
  *
  * @brief Implementation of PropTextColors propertysheet
@@ -12,7 +12,7 @@
 #define new DEBUG_NEW
 #endif
 
-/** 
+/**
  * @brief Default constructor.
  */
 PropTextColors::PropTextColors()
@@ -54,7 +54,7 @@ LRESULT PropTextColors::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	return OptionsPanel::WindowProc(message, wParam, lParam);
 }
 
-/** 
+/**
  * @brief Reads options values from storage to UI.
  * (Property sheet calls this before displaying all property pages)
  */
@@ -63,7 +63,7 @@ void PropTextColors::ReadOptions()
 	m_bCustomColors = COptionsMgr::Get(OPT_CLR_DEFAULT_TEXT_COLORING) ? FALSE : TRUE;
 }
 
-/** 
+/**
  * @brief Writes options values from UI to storage.
  * (Property sheet calls this after displaying all property pages)
  */
@@ -72,7 +72,7 @@ void PropTextColors::WriteOptions()
 	COptionsMgr::SaveOption(OPT_CLR_DEFAULT_TEXT_COLORING, m_bCustomColors == FALSE);
 }
 
-/** 
+/**
  * @brief Let user browse common color dialog, and select a color
  * @param [in] colorButton Button for which to change color.
  * @param [in] colorIndex Index to color table.
@@ -101,7 +101,7 @@ void PropTextColors::UpdateScreen()
 	SetDlgItemInt(IDC_SELECTION_TEXT_COLOR, SyntaxColors.GetColor(COLORINDEX_SELTEXT));
 }
 
-/** 
+/**
  * @brief Set colors to track standard (theme) colors
  */
 void PropTextColors::OnDefaultsStandardColors()
@@ -118,7 +118,7 @@ void PropTextColors::OnDefaultsStandardColors()
 	UpdateScreen();
 }
 
-/** 
+/**
  * @brief Enable / disable color controls on dialog.
  * @param [in] bEnable If TRUE color controls are enabled.
  */

@@ -4,7 +4,7 @@
 //    it under the terms of the GNU General Public License as published by
 //    the Free Software Foundation; either version 3 of the License, or (at
 //    your option) any later version.
-//    
+//
 //    This program is distributed in the hope that it will be useful, but
 //    WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -13,7 +13,7 @@
 //    You should have received a copy of the GNU General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////////
-/** 
+/**
  * @file  FilterCommentsManager.h
  *
  * @brief FilterCommentsManager class declaration.
@@ -54,10 +54,10 @@ struct FilterCommentsSet
 @note
 The ignore-comment logic can only use ANSI strings, because the search buffer is
 char* type.
-FilterCommentsManager uses _T logic, only so-as to allow UNICODE file names to be 
+FilterCommentsManager uses _T logic, only so-as to allow UNICODE file names to be
 used for the INI file, or INI file base directory.
 After retrieving data from INI file, the data is converted to ANSI.
-If no INI file exist, or the INI file is empty, then a default INI file is 
+If no INI file exist, or the INI file is empty, then a default INI file is
 created with default values that are assoicated with most commen languages.
 */
 class FilterCommentsManager
