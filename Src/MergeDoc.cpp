@@ -47,6 +47,7 @@
 #include "FileOrFolderSelect.h"
 #include "LineFiltersList.h"
 #include "stream_util.h"
+#include "editlib/modeline-parser.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -399,6 +400,9 @@ int CChildFrame::Rescan2(bool &bIdentical)
 	// Clear moved lines lists
 	if (MovedLines *pMovedLines = m_diffWrapper.GetMovedLines())
 		pMovedLines->Clear();
+
+	modeline_parser_apply_modeline(m_pView[0]);
+	modeline_parser_apply_modeline(m_pView[1]);
 
 	int nBuffer;
 
