@@ -193,6 +193,7 @@
 #define IDC_DIFF_MINIMAL                        1057
 #define IDC_DIFF_SPEED_LARGE_FILES              1058
 #define IDC_DIFF_APPLY_HISTORIC_COST_LIMIT      1059
+#define IDC_HONOR_MODELINES                     1061
 #define IDC_PRIVATEBUILD                        1062
 #define IDC_MIXED_EOL                           1063
 #define IDC_DIFF_FILE1                          1064

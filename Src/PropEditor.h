@@ -27,6 +27,7 @@ public:
 	int     m_nTabSize;
 	BOOL    m_bAutomaticRescan;
 	BOOL    m_bAllowMixedEol;
+	BOOL    m_bHonorModelines;
 	BOOL    m_bViewLineDifferences;
 	BOOL    m_bCharLevel;
 	int     m_nBreakType;

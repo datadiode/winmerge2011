@@ -1404,6 +1404,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 1
     AUTOCHECKBOX    "&Highlight syntax", IDC_HILITE_CHECK, 7, 7, 215, 10, 0, WS_EX_LEFT
     AUTOCHECKBOX    "&Automatic rescan", IDC_AUTOMRESCAN_CHECK, 7, 17, 215, 10, 0, WS_EX_LEFT
     AUTOCHECKBOX    "&Preserve original EOL chars", IDC_MIXED_EOL, 7, 27, 215, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Honor Emacs/Kate/Vim &modelines", IDC_HONOR_MODELINES, 7, 37, 215, 10, 0, WS_EX_LEFT
     GROUPBOX        "Tabs", IDC_STATIC, 7, 54, 221, 60, WS_GROUP, WS_EX_LEFT
     LTEXT           "&Tab size:", IDC_STATIC, 14, 63, 201, 8, SS_LEFT, WS_EX_LEFT
     EDITTEXT        IDC_TAB_EDIT, 24, 74, 18, 12, ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER, WS_EX_LEFT

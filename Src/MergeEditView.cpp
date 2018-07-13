@@ -855,7 +855,8 @@ void CMergeEditView::RefreshOptions()
 		m_pDocument->IsMixedEOL(m_nThisPane);
 	SetViewEols(COptionsMgr::Get(OPT_VIEW_WHITESPACE), mixedEOLs);
 
-	modeline_parser_apply_modeline(this);
+	if (COptionsMgr::Get(OPT_HONOR_MODELINES))
+		modeline_parser_apply_modeline(this);
 
 	OnSize();
 	CCrystalTextView::OnSize();

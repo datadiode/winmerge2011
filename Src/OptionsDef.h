@@ -90,6 +90,8 @@ extern COptionDef
 extern COptionDef
 <bool> OPT_ALLOW_MIXED_EOL operator((_T("Settings/AllowMixedEOL"), false));
 extern COptionDef
+<bool> OPT_HONOR_MODELINES operator((_T("Settings/HonorModelines"), true));
+extern COptionDef
 <bool> OPT_SEPARATE_COMBINING_CHARS operator((_T("Settings/SeparateCombiningChars"), false));
 extern COptionDef
 <int> OPT_TAB_SIZE operator((_T("Settings/TabSize"), 4));

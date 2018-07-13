@@ -401,8 +401,11 @@ int CChildFrame::Rescan2(bool &bIdentical)
 	if (MovedLines *pMovedLines = m_diffWrapper.GetMovedLines())
 		pMovedLines->Clear();
 
-	modeline_parser_apply_modeline(m_pView[0]);
-	modeline_parser_apply_modeline(m_pView[1]);
+	if (COptionsMgr::Get(OPT_HONOR_MODELINES))
+	{
+		modeline_parser_apply_modeline(m_pView[0]);
+		modeline_parser_apply_modeline(m_pView[1]);
+	}
 
 	int nBuffer;
 
