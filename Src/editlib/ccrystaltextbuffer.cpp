@@ -65,6 +65,7 @@
 #include "VersionData.h"
 #include <pcre.h>
 #include "wcwidth.h"
+#include "modeline-parser.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -140,6 +141,7 @@ CCrystalTextBuffer::CCrystalTextBuffer()
 	m_nTabSize = 4;
 	m_bSeparateCombinedChars = false;
 	m_nParseCookieCount = 0;
+	m_nModeLineOverrides = 0;
 	//BEGIN SW
 	m_ptLastChange.x = m_ptLastChange.y = -1;
 	//END SW
@@ -952,12 +954,34 @@ bool CCrystalTextBuffer::GetSeparateCombinedChars() const
 void CCrystalTextBuffer::SetTabSize(int nTabSize, bool bSeparateCombinedChars)
 {
 	ASSERT(nTabSize >= 0 && nTabSize <= 64);
-	m_nTabSize = nTabSize;
+	if (!(m_nModeLineOverrides & MODELINE_SET_TAB_WIDTH))
+		m_nTabSize = nTabSize;
 	m_bSeparateCombinedChars = bSeparateCombinedChars;
 	m_nMaxLineLength = -1;
 	int const nLineCount = GetLineCount();
 	for (int nLineIndex = 0; nLineIndex < nLineCount; ++nLineIndex)
 		m_aLines[nLineIndex].m_nActualLineLength = -1;
+}
+
+bool CCrystalTextBuffer::GetInsertTabs() const
+{
+	return m_bInsertTabs;
+}
+
+void CCrystalTextBuffer::SetInsertTabs(bool bInsertTabs)
+{
+	if (!(m_nModeLineOverrides & MODELINE_SET_INSERT_SPACES))
+		m_bInsertTabs = bInsertTabs;
+}
+
+void CCrystalTextBuffer::ParseModeLine()
+{
+	m_nModeLineOverrides |= modeline_parser_apply_modeline(this);
+}
+
+void CCrystalTextBuffer::ParseEditorConfig(LPCTSTR path)
+{
+	// TODO
 }
 
 /**

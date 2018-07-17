@@ -21,18 +21,6 @@ static BSTR vim_languages;
 static BSTR emacs_languages;
 static BSTR kate_languages;
 
-enum ModelineSet
-{
-	MODELINE_SET_NONE = 0,
-	MODELINE_SET_TAB_WIDTH = 1 << 0,
-	MODELINE_SET_INDENT_WIDTH = 1 << 1,
-	MODELINE_SET_WRAP_MODE = 1 << 2,
-	MODELINE_SET_SHOW_RIGHT_MARGIN = 1 << 3,
-	MODELINE_SET_RIGHT_MARGIN_POSITION = 1 << 4,
-	MODELINE_SET_LANGUAGE = 1 << 5,
-	MODELINE_SET_INSERT_SPACES = 1 << 6
-};
-
 struct ModelineOptions
 {
 	String		language_id;
@@ -467,11 +455,10 @@ parse_modeline (LineInfo const &li, int line_number, int line_count, ModelineOpt
 	}
 }
 
-void
-modeline_parser_apply_modeline (CCrystalTextView *view)
+int
+modeline_parser_apply_modeline (CCrystalTextBuffer *buffer)
 {
 	ModelineOptions options;
-	CCrystalTextBuffer *buffer = view->GetTextBuffer();
 	int iter = 0;
 	int line_count = buffer->GetLineCount();
 
@@ -540,6 +527,8 @@ modeline_parser_apply_modeline (CCrystalTextView *view)
 		// Unavailable in CrystalEdit
 		view->ShowRightMargin(options.display_right_margin);
 	}*/
+
+	return options.set;
 }
 
 /* vi:ts=4 */

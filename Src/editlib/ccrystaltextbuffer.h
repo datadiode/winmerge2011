@@ -136,6 +136,7 @@ protected:
 	int m_nTabSize;
 	int m_nMaxLineLength;
 	int m_nParseCookieCount;
+	int m_nModeLineOverrides;
 
 	enum
 	{
@@ -282,8 +283,8 @@ public:
 		DWORD dwUpdateFlags, int nLineIndex = -1);
 
 	// Tabs/space inserting
-	bool GetInsertTabs() const { return m_bInsertTabs; }
-	void SetInsertTabs(bool bInsertTabs) { m_bInsertTabs = bInsertTabs; }
+	bool GetInsertTabs() const;
+	void SetInsertTabs(bool bInsertTabs);
 
 	DWORD GetFlags() const;
 	void SetFlags(DWORD dwFlags);
@@ -292,6 +293,9 @@ public:
 	int GetTabSize() const;
 	bool GetSeparateCombinedChars() const;
 	void SetTabSize(int nTabSize, bool bSeparateCombinedChars);
+
+	void ParseModeLine();
+	void ParseEditorConfig(LPCTSTR path);
 
 	int GetCharWidthFromChar(LPCTSTR pch) const;
 	int GetLineActualLength(int nLineIndex);

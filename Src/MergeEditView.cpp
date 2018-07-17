@@ -34,7 +34,6 @@
 #include "ShellContextMenu.h"
 #include "paths.h"
 #include "PidlContainer.h"
-#include "editlib/modeline-parser.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -854,9 +853,6 @@ void CMergeEditView::RefreshOptions()
 	const bool mixedEOLs = COptionsMgr::Get(OPT_ALLOW_MIXED_EOL) ||
 		m_pDocument->IsMixedEOL(m_nThisPane);
 	SetViewEols(COptionsMgr::Get(OPT_VIEW_WHITESPACE), mixedEOLs);
-
-	if (COptionsMgr::Get(OPT_HONOR_MODELINES))
-		modeline_parser_apply_modeline(this);
 
 	OnSize();
 	CCrystalTextView::OnSize();

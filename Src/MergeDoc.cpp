@@ -47,7 +47,6 @@
 #include "FileOrFolderSelect.h"
 #include "LineFiltersList.h"
 #include "stream_util.h"
-#include "editlib/modeline-parser.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -401,10 +400,17 @@ int CChildFrame::Rescan2(bool &bIdentical)
 	if (MovedLines *pMovedLines = m_diffWrapper.GetMovedLines())
 		pMovedLines->Clear();
 
-	if (COptionsMgr::Get(OPT_HONOR_MODELINES))
+	m_ptBuf[0]->m_nModeLineOverrides = 0;
+	m_ptBuf[1]->m_nModeLineOverrides = 0;
+	if (COptionsMgr::Get(OPT_HONOR_MODELINES) & 1)
 	{
-		modeline_parser_apply_modeline(m_pView[0]);
-		modeline_parser_apply_modeline(m_pView[1]);
+		m_ptBuf[0]->ParseModeLine();
+		m_ptBuf[1]->ParseModeLine();
+	}
+	if (COptionsMgr::Get(OPT_HONOR_MODELINES) & 2)
+	{
+		m_ptBuf[0]->ParseEditorConfig(m_strPath[0].c_str());
+		m_ptBuf[1]->ParseEditorConfig(m_strPath[1].c_str());
 	}
 
 	int nBuffer;
