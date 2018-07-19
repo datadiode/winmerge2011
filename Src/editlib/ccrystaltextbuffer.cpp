@@ -66,6 +66,7 @@
 #include <pcre.h>
 #include "wcwidth.h"
 #include "modeline-parser.h"
+#include <editorconfig/editorconfig.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -981,7 +982,42 @@ void CCrystalTextBuffer::ParseModeLine()
 
 void CCrystalTextBuffer::ParseEditorConfig(LPCTSTR path)
 {
-	// TODO
+	OString const utf8path = HString::Uni(path)->Oct(CP_UTF8);
+	if (editorconfig_handle const eh = editorconfig_handle_init())
+	{
+		int const result = editorconfig_parse(utf8path.A, eh);
+		if (result == 0)
+		{
+			int const count = editorconfig_handle_get_name_value_count(eh);
+			for (int index = 0; index < count; ++index)
+			{
+				char const *name, *value;
+				editorconfig_handle_get_name_value(eh, index, &name, &value);
+				int flag = ~m_nModeLineOverrides & (
+					strcmp(name, "indent_style") == 0 ? MODELINE_SET_INSERT_SPACES :
+					strcmp(name, "tab_width") == 0 ? MODELINE_SET_TAB_WIDTH : 0);
+				switch (flag)
+				{
+				case MODELINE_SET_INSERT_SPACES:
+					if (strcmp(value, "tab") == 0)
+						SetInsertTabs(true);
+					else if (strcmp(value, "space") == 0)
+						SetInsertTabs(false);
+					else
+						flag = 0;
+					break;
+				case MODELINE_SET_TAB_WIDTH:
+					if (unsigned long tab_width = strtoul(value, NULL, 10))
+						SetTabSize(min(tab_width, 64UL), GetSeparateCombinedChars());
+					else
+						flag = 0;
+					break;
+				}
+				m_nModeLineOverrides |= flag;
+			}
+		}
+		editorconfig_handle_destroy(eh);
+	}
 }
 
 /**

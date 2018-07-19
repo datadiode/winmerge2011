@@ -3,10 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ShellExtension", "ShellExtension\ShellExtension.vcxproj", "{5615F4FD-FFC4-460F-9D12-26EFF2B558E4}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Merge", "Src\Merge.vcxproj", "{2A81DB64-C062-48AF-8D2E-23B68320142D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0965E596-DF96-4BC5-A7E8-7CBA12A61BF7} = {0965E596-DF96-4BC5-A7E8-7CBA12A61BF7}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pcre", "Externals\pcre\Win32\pcre.vcxproj", "{F7E6A782-1C15-46E3-B645-922494B9F146}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Merge7z", "ArchiveSupport\Merge7z\Merge7z.vcxproj", "{D81E504D-E716-456E-BEAC-26F0FCCD7E8C}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "editorconfig-core-c", "Externals\editorconfig-core-c\Win32\editorconfig-core-c.vcxproj", "{0965E596-DF96-4BC5-A7E8-7CBA12A61BF7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -62,6 +67,17 @@ Global
 		{D81E504D-E716-456E-BEAC-26F0FCCD7E8C}.System32|Win32.ActiveCfg = Release|Win32
 		{D81E504D-E716-456E-BEAC-26F0FCCD7E8C}.System32|Win32.Build.0 = Release|Win32
 		{D81E504D-E716-456E-BEAC-26F0FCCD7E8C}.System32|x64.ActiveCfg = Release|Win32
+		{0965E596-DF96-4BC5-A7E8-7CBA12A61BF7}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0965E596-DF96-4BC5-A7E8-7CBA12A61BF7}.Debug|Win32.Build.0 = Debug|Win32
+		{0965E596-DF96-4BC5-A7E8-7CBA12A61BF7}.Debug|x64.ActiveCfg = Debug|x64
+		{0965E596-DF96-4BC5-A7E8-7CBA12A61BF7}.Debug|x64.Build.0 = Debug|x64
+		{0965E596-DF96-4BC5-A7E8-7CBA12A61BF7}.Release|Win32.ActiveCfg = Release|Win32
+		{0965E596-DF96-4BC5-A7E8-7CBA12A61BF7}.Release|Win32.Build.0 = Release|Win32
+		{0965E596-DF96-4BC5-A7E8-7CBA12A61BF7}.Release|x64.ActiveCfg = Release|x64
+		{0965E596-DF96-4BC5-A7E8-7CBA12A61BF7}.Release|x64.Build.0 = Release|x64
+		{0965E596-DF96-4BC5-A7E8-7CBA12A61BF7}.System32|Win32.ActiveCfg = Release|Win32
+		{0965E596-DF96-4BC5-A7E8-7CBA12A61BF7}.System32|Win32.Build.0 = Release|Win32
+		{0965E596-DF96-4BC5-A7E8-7CBA12A61BF7}.System32|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -4,3 +4,4 @@ Versions of external components
 This file lists versions of the external components we are using.
 
 PCRE: 8.13
+editorconfig-core-c: 0.12.1
