@@ -25,7 +25,7 @@ EXTERN_C __inline int StrLenW(LPCWSTR p)
 
 EXTERN_C __inline LPSTR StrCpyNA(LPSTR p, LPCSTR q, int capacity)
 {
-	if (_memccpy(p, q, 0, capacity) == NULL)
+	if (_memccpy(p, q, 0, capacity - 1) == NULL)
 		p[capacity - 1] = '\0';
 	return p;
 }
