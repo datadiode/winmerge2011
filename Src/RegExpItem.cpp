@@ -31,6 +31,7 @@ static int FindSlash(LPCTSTR buf, int len)
 const char *regexp_item::assign(LPCTSTR pch, int cch)
 {
 	UINT codepage = CP_ACP;
+	BYTE hashcode = 0xFF;
 	if (const int i = FindSlash(pch, cch))
 	{
 		int j = i;
@@ -50,6 +51,9 @@ const char *regexp_item::assign(LPCTSTR pch, int cch)
 				break;
 			case _T('p'):
 				permutive = true;
+				break;
+			case _T('='):
+				hashcode = static_cast<BYTE>(~_ttol(pch + j + 1));
 				break;
 			case _T(':'):
 			case _T('<'):
@@ -72,6 +76,10 @@ const char *regexp_item::assign(LPCTSTR pch, int cch)
 		++pch;
 		cch = i - 1;
 	}
+	// If a hashcode was assigned which does not conflict with valid UTF-8,
+	// use it in place of an unspecified injectString.
+	if (injectString == NULL && hashcode >= 0xF5 && hashcode <= 0xFF)
+		injectString = HString::Oct(reinterpret_cast<char *>(&hashcode), 1);
 	filterString = HString::Uni(pch, cch)->Oct(codepage);
 	const char *errormsg = NULL;
 	int erroroffset = 0;

@@ -172,7 +172,19 @@ void FilterList::AddFrom(LineFiltersList &list)
 HRESULT FilterList::AddFilter(String &filter, LPCTSTR filterStr, LineFilterItem *item)
 {
 	HRESULT hr = S_OK;
-	if (LPCTSTR regexp = EatPrefix(filterStr, _T("regexp:")))
+	// The * and regexp: prefixes yield the same result.
+	// The * prefix syntactically mimics C's pointer dereferencing operator, so
+	// one can think of the subsequent regular expression literal as evaluating
+	// to a pointer to the matching content.
+	if (LPCTSTR regexp = EatPrefix(filterStr, _T("*")))
+	{
+		regexp_item filter;
+		if (filter.assign(regexp, static_cast<int>(_tcslen(regexp))))
+		{
+			m_predifferRegExps.push_back(filter);
+		}
+	}
+	else if (LPCTSTR regexp = EatPrefix(filterStr, _T("regexp:")))
 	{
 		regexp_item filter;
 		if (filter.assign(regexp, static_cast<int>(_tcslen(regexp))))

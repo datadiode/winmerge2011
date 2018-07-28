@@ -66,7 +66,12 @@ void LineFiltersDlg::OnCustomdraw(HSurface *pDC)
 
 	LPCTSTR pchExpression = strExpression.c_str();
 	String::size_type cchExpression = strExpression.length();
-	if (LPCTSTR p = EatPrefix(pchExpression, _T("regexp:")))
+	if (LPCTSTR p = EatPrefix(pchExpression, _T("*")))
+	{
+		cchExpression -= static_cast<String::size_type>(p - pchExpression);
+		pchExpression = p;
+	}
+	else if (LPCTSTR p = EatPrefix(pchExpression, _T("regexp:")))
 	{
 		cchExpression -= static_cast<String::size_type>(p - pchExpression);
 		pchExpression = p;
