@@ -30,9 +30,9 @@ bool PropCompare::UpdateData()
 	DDX_Check<op>(IDC_DIFF_IGNOREEOL, m_bIgnoreEol);
 	DDX_Check<op>(IDC_DIFF_WS_IGNORE_TAB_EXPANSION, m_bIgnoreTabExpansion);
 	DDX_Check<op>(IDC_DIFF_WS_IGNORE_TRAILING_SPACE, m_bIgnoreTrailingSpace);
-	DDX_Check<op>(IDC_DIFF_WHITESPACE_COMPARE, m_nIgnoreWhite, 0);
-	DDX_Check<op>(IDC_DIFF_WHITESPACE_IGNORE, m_nIgnoreWhite, 1);
-	DDX_Check<op>(IDC_DIFF_WHITESPACE_IGNOREALL, m_nIgnoreWhite, 2);
+	DDX_Check<op>(IDC_DIFF_WHITESPACE_COMPARE, m_nIgnoreWhite, WHITESPACE_COMPARE_ALL);
+	DDX_Check<op>(IDC_DIFF_WHITESPACE_IGNORE, m_nIgnoreWhite, WHITESPACE_IGNORE_CHANGE);
+	DDX_Check<op>(IDC_DIFF_WHITESPACE_IGNOREALL, m_nIgnoreWhite, WHITESPACE_IGNORE_ALL);
 	DDX_Check<op>(IDC_DIFF_MINIMAL, m_bMinimal);
 	DDX_Check<op>(IDC_DIFF_SPEED_LARGE_FILES, m_bSpeedLargeFiles);
 	DDX_Check<op>(IDC_DIFF_APPLY_HISTORIC_COST_LIMIT, m_bApplyHistoricCostLimit);

@@ -38,7 +38,7 @@
 // For shutdown cleanup
 #include "codepage_detect.h"
 
-#define operator(args) args
+#define inline(args) args
 #include "OptionsDef.h"
 
 #ifdef _DEBUG

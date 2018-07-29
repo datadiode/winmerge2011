@@ -402,12 +402,12 @@ int CChildFrame::Rescan2(bool &bIdentical)
 
 	m_ptBuf[0]->m_nModeLineOverrides = 0;
 	m_ptBuf[1]->m_nModeLineOverrides = 0;
-	if (COptionsMgr::Get(OPT_HONOR_MODELINES) & 1)
+	if (COptionsMgr::Get(OPT_TAB_TYPE) & TAB_TYPE_HONOR_MODELINES)
 	{
 		m_ptBuf[0]->ParseModeLine();
 		m_ptBuf[1]->ParseModeLine();
 	}
-	if (COptionsMgr::Get(OPT_HONOR_MODELINES) & 2)
+	if (COptionsMgr::Get(OPT_TAB_TYPE) & TAB_TYPE_HONOR_EDITOR_CONFIG)
 	{
 		m_ptBuf[0]->ParseEditorConfig(m_strPath[0].c_str());
 		m_ptBuf[1]->ParseEditorConfig(m_strPath[1].c_str());

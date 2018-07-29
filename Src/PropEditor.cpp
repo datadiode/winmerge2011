@@ -31,8 +31,8 @@ template<ODialog::DDX_Operation op>
 bool PropEditor::UpdateData()
 {
 	DDX_Check<op>(IDC_HILITE_CHECK, m_bHiliteSyntax);
-	DDX_Check<op>(IDC_PROP_INSERT_TABS, m_nTabType, 0);
-	DDX_Check<op>(IDC_PROP_INSERT_SPACES, m_nTabType, 1);
+	DDX_Check<op>(IDC_PROP_INSERT_TABS, m_nTabType, TAB_TYPE_INSERT_TABS);
+	DDX_Check<op>(IDC_PROP_INSERT_SPACES, m_nTabType, TAB_TYPE_INSERT_SPACES);
 	DDX_Text<op>(IDC_TAB_EDIT, m_nTabSize);
 	DDX_Check<op>(IDC_AUTOMRESCAN_CHECK, m_bAutomaticRescan);
 	DDX_Check<op>(IDC_MIXED_EOL, m_bAllowMixedEol);
@@ -74,11 +74,12 @@ void PropEditor::ReadOptions()
 {
 	m_nTabSize = COptionsMgr::Get(OPT_TAB_SIZE);
 	m_nTabType = COptionsMgr::Get(OPT_TAB_TYPE);
+	m_bHonorModelines = (m_nTabType & TAB_TYPE_HONOR_MODELINES) != 0;
+	m_bHonorEditorConfig = (m_nTabType & TAB_TYPE_HONOR_EDITOR_CONFIG) != 0;
+	m_nTabType &= TAB_TYPE_RADIO_OPTIONS_MASK;
 	m_bAutomaticRescan = COptionsMgr::Get(OPT_AUTOMATIC_RESCAN);
 	m_bHiliteSyntax = COptionsMgr::Get(OPT_SYNTAX_HIGHLIGHT);
 	m_bAllowMixedEol = COptionsMgr::Get(OPT_ALLOW_MIXED_EOL);
-	m_bHonorModelines = (COptionsMgr::Get(OPT_HONOR_MODELINES) & 1) != 0;
-	m_bHonorEditorConfig = (COptionsMgr::Get(OPT_HONOR_MODELINES) & 2) != 0;
 	m_bViewLineDifferences = COptionsMgr::Get(OPT_WORDDIFF_HIGHLIGHT);
 	m_bCharLevel = COptionsMgr::Get(OPT_CHAR_LEVEL);
 	m_nBreakType = COptionsMgr::Get(OPT_BREAK_TYPE);
@@ -91,11 +92,11 @@ void PropEditor::ReadOptions()
 void PropEditor::WriteOptions()
 {
 	COptionsMgr::SaveOption(OPT_TAB_SIZE, m_nTabSize);
-	COptionsMgr::SaveOption(OPT_TAB_TYPE, m_nTabType);
+	COptionsMgr::SaveOption(OPT_TAB_TYPE, m_nTabType |
+		(m_bHonorModelines ? TAB_TYPE_HONOR_MODELINES : 0) |
+		(m_bHonorEditorConfig ? TAB_TYPE_HONOR_EDITOR_CONFIG : 0));
 	COptionsMgr::SaveOption(OPT_AUTOMATIC_RESCAN, m_bAutomaticRescan != FALSE);
 	COptionsMgr::SaveOption(OPT_ALLOW_MIXED_EOL, m_bAllowMixedEol != FALSE);
-	COptionsMgr::SaveOption(OPT_HONOR_MODELINES,
-		(m_bHonorModelines ? 1 : 0) | (m_bHonorEditorConfig ? 2 : 0));
 	COptionsMgr::SaveOption(OPT_SYNTAX_HIGHLIGHT, m_bHiliteSyntax != FALSE);
 	COptionsMgr::SaveOption(OPT_WORDDIFF_HIGHLIGHT, m_bViewLineDifferences != FALSE);
 	COptionsMgr::SaveOption(OPT_CHAR_LEVEL, m_bCharLevel != FALSE);
