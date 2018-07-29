@@ -1,3 +1,25 @@
+0.2011.008.311
+Changes since preceding release (not necessarily complete):
+• Allow file filters to declare case sensitivity for filenames (related to #158)
+• An alternate syntax for early-applied line filters: */(foo|bar)/g=N (N <= 10)
+• Issue #159 demoGuessEncoding_po() could read beyond allocated memory
+• Make CMergeEditView scriptable, and Tabify.wsc aware of per-file tab size
+• EditLib: Figure tab size and expansion options from .editorconfig files
+• EditLib: Figure tab size and expansion options from Emacs/Kate/Vim modelines
+• SourceControl.cpp: Remember MultiCheckouts option in registry
+• Avoid some redundant drawing during replacements performed through Replace All
+• EditLib: Create an undo group for replacements performed through Replace All
+• Avoid some redundant drawing during undo/redo and copying of multiple diffs
+• OpenDlg.cpp: Don't prefill Right: from MRU when Left: was drag/dropped (#145)
+• PatchTool: Option to use generic paths, and optionally also omit timestamps
+• EditLib: Fix syntax highlighting glitches when using View > Context > ...
+• ChildFrm.cpp: Preserve currently selected diff across View > Context > ...
+• Don't let early-applied line filters mess up patches
+• Upgrade Diffutils to 3.6 / Make -E and -Z options accessible through UI
+• Upgrade WinMerge license to GPLv3
+• SelectFile(): Multi-pattern filters produced wrong default filename extensions
+• CChildFrame::OnToolsGenerateReport(): Remember last save path in registry
+
 0.2011.008.226
 Changes since preceding release (not necessarily complete):
 • EditLib: Beware of JavaScript regular expression and template string literals
