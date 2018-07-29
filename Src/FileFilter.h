@@ -43,6 +43,7 @@ struct FileFilter
 	String fullpath;		/**< Full path to filter file */
 	String sql;				/**< SQL query template for LogParser */
 	BYTE sqlopt[2];			/**< Which sides to apply it to */
+	bool casesensitive;
 	std::vector<std::map<String, String> > params;	/**< SQL query parameters */
 	std::vector<String> rawsql;					/**< Raw SQL clause as provided by user */
 	std::vector<regexp_item> filefilters;		/**< List of inclusion rules for files */

@@ -239,29 +239,29 @@ void CDiffContext::LoadFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *fil
 class DiffFilterCollate
 {
 	IDiffFilter *const m_piDiffFilter;
-	int (IDiffFilter::*const m_pfnCollate)(LPCTSTR, LPCTSTR);
+	int (IDiffFilter::*const m_pfnCollate)(LPCTSTR, LPCTSTR, bool);
 public:
-	DiffFilterCollate(IDiffFilter *piDiffFilter, int (IDiffFilter::*pfnCollate)(LPCTSTR, LPCTSTR))
+	DiffFilterCollate(IDiffFilter *piDiffFilter, int (IDiffFilter::*pfnCollate)(LPCTSTR, LPCTSTR, bool))
 		: m_piDiffFilter(piDiffFilter)
 		, m_pfnCollate(pfnCollate)
 	{
 	}
 	bool operator()(DirItem const &elem1, DirItem const &elem2)
 	{
-		if (int cmp = (m_piDiffFilter->*m_pfnCollate)(elem1.filename.c_str(), elem2.filename.c_str()))
+		if (int cmp = (m_piDiffFilter->*m_pfnCollate)(elem1.filename.c_str(), elem2.filename.c_str(), false))
 			return cmp < 0;
 		if (elem1.size.int64 != elem2.size.int64)
 			return elem1.size.int64 < elem2.size.int64;
 		if (elem1.mtime != elem2.mtime)
 			return elem1.mtime < elem2.mtime;
-		return (m_piDiffFilter->*m_pfnCollate)(elem1.path.c_str(), elem2.path.c_str()) < 0;
+		return (m_piDiffFilter->*m_pfnCollate)(elem1.path.c_str(), elem2.path.c_str(), false) < 0;
 	}
 };
 
 /**
  * @brief sort specified array
  */
-void CDiffContext::Sort(DirItemArray *dirs, int (IDiffFilter::*pfnCollate)(LPCTSTR, LPCTSTR)) const
+void CDiffContext::Sort(DirItemArray *dirs, int (IDiffFilter::*pfnCollate)(LPCTSTR, LPCTSTR, bool)) const
 {
 	std::sort(dirs->begin(), dirs->end(), DiffFilterCollate(m_piFilterGlobal, pfnCollate));
 }

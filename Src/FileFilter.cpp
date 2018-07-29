@@ -55,6 +55,7 @@ static void AddFilterPattern(vector<regexp_item> &filterList, LPCTSTR psz)
 FileFilter::FileFilter()
 	: params(2)
 	, rawsql(2)
+	, casesensitive(false)
 {
 }
 
@@ -421,7 +422,6 @@ bool FileFilter::Load()
 		else if (LPCTSTR psz = EatPrefixTrim(sLine.c_str(), _T("def:")))
 		{
 			// specifies default
-			String str = psz;
 			if (PathMatchSpec(psz, _T("0;no;exclude")))
 				default_include = false;
 			else if (PathMatchSpec(psz, _T("1;yes;include")))
@@ -436,6 +436,14 @@ bool FileFilter::Load()
 		{
 			// activates SQL clause on right side
 			sqlopt[1] = static_cast<BYTE>(_ttol(psz));
+		}
+		else if (LPCTSTR psz = EatPrefixTrim(sLine.c_str(), _T("case-sensitive:")))
+		{
+			// specifies case sensitivity
+			if (PathMatchSpec(psz, _T("0;no")))
+				casesensitive = false;
+			else if (PathMatchSpec(psz, _T("1;yes")))
+				casesensitive = true;
 		}
 		else if (LPCTSTR psz = EatPrefixTrim(sLine.c_str(), _T("f:")))
 		{

@@ -167,5 +167,5 @@ private:
 
 	void LoadAndSortFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *files, int side) const;
 	void LoadFiles(LPCTSTR sDir, DirItemArray *dirs, DirItemArray *files, int side) const;
-	void Sort(DirItemArray *dirs, int (IDiffFilter::*pfnCollate)(LPCTSTR, LPCTSTR)) const;
+	void Sort(DirItemArray *dirs, int (IDiffFilter::*pfnCollate)(LPCTSTR, LPCTSTR, bool)) const;
 };

@@ -30,20 +30,17 @@ const TCHAR FileFilterExt[] = _T("*.flt");
 /// Interface for testing files & directories for exclusion, as diff traverses file tree
 extern class IDiffFilter
 {
-private:
-	const static bool casesensitive = false;
 public:
 	virtual BSTR getSql(int side) { return NULL; }
 	virtual bool includeFile(LPCTSTR szPath, LPCTSTR szFileName) { return true; }
 	virtual bool includeDir(LPCTSTR szPath, LPCTSTR szDirName) { return true; }
-	virtual bool isCaseSensitive() { return casesensitive; }
 	// Compare (NLS aware) two filenames, potentially ignoring character case
-	virtual int collateFile(LPCTSTR szFileName1, LPCTSTR szFileName2)
+	virtual int collateFile(LPCTSTR szFileName1, LPCTSTR szFileName2, bool casesensitive = false)
 	{
 		return (casesensitive ? _tcscoll : _tcsicoll)(szFileName1, szFileName2);
 	}
 	// Compare (NLS aware) two dirnames, potentially ignoring character case
-	virtual int collateDir(LPCTSTR szDirName1, LPCTSTR szDirName2)
+	virtual int collateDir(LPCTSTR szDirName1, LPCTSTR szDirName2, bool casesensitive = false)
 	{
 		return (casesensitive ? _tcscoll : _tcsicoll)(szDirName1, szDirName2);
 	}
@@ -107,14 +104,14 @@ public:
 	FileFilter *SetFilter(const String &filter);
 
 	// Overrides
-	virtual BSTR getSql(int);
-	virtual bool includeFile(LPCTSTR, LPCTSTR);
-	virtual bool includeDir(LPCTSTR, LPCTSTR);
-	virtual int collateFile(LPCTSTR, LPCTSTR);
-	virtual int collateDir(LPCTSTR, LPCTSTR);
+	virtual BSTR getSql(int) override;
+	virtual bool includeFile(LPCTSTR, LPCTSTR) override;
+	virtual bool includeDir(LPCTSTR, LPCTSTR) override;
+	virtual int collateFile(LPCTSTR, LPCTSTR, bool) override;
+	virtual int collateDir(LPCTSTR, LPCTSTR, bool) override;
 
 protected:
-	virtual bool CreateFromMask();
+	virtual bool CreateFromMask() override;
 
 private:
 	FileFilter *m_currentFilter;     /*< Currently selected filefilter */

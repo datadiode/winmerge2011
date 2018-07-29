@@ -223,18 +223,26 @@ bool FileFilterHelper::includeDir(LPCTSTR szPath, LPCTSTR szDirName)
 	return m_currentFilter->TestDirNameAgainstFilter(szPath, szDirName);
 }
 
-int FileFilterHelper::collateFile(LPCTSTR p, LPCTSTR q)
+int FileFilterHelper::collateFile(LPCTSTR p, LPCTSTR q, bool casesensitive)
 {
-	if (m_currentFilter && !m_currentFilter->fileprefilters.empty())
-		return regexp_item::collate(m_currentFilter->fileprefilters, p, q);
-	return IDiffFilter::collateFile(p, q);
+	if (m_currentFilter)
+	{
+		casesensitive = m_currentFilter->casesensitive;
+		if (!m_currentFilter->fileprefilters.empty())
+			return regexp_item::collate(m_currentFilter->fileprefilters, p, q, casesensitive);
+	}
+	return IDiffFilter::collateFile(p, q, casesensitive);
 }
 
-int FileFilterHelper::collateDir(LPCTSTR p, LPCTSTR q)
+int FileFilterHelper::collateDir(LPCTSTR p, LPCTSTR q, bool casesensitive)
 {
-	if (m_currentFilter && !m_currentFilter->dirprefilters.empty())
-		return regexp_item::collate(m_currentFilter->dirprefilters, p, q);
-	return IDiffFilter::collateDir(p, q);
+	if (m_currentFilter)
+	{
+		casesensitive = m_currentFilter->casesensitive;
+		if (!m_currentFilter->dirprefilters.empty())
+			return regexp_item::collate(m_currentFilter->dirprefilters, p, q, casesensitive);
+	}
+	return IDiffFilter::collateDir(p, q, casesensitive);
 }
 
 /**
