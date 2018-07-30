@@ -299,6 +299,7 @@ extern void print_context_header (struct comparison *, char const * const *, boo
 extern void print_context_script (struct comparison *, struct file_cursor *, struct change *, bool);
 
 /* io.c */
+extern unsigned file_block_read (struct file_data *, size_t);
 /* WinMerge: add last pointer param */
 extern bool read_files (struct comparison *, int *);
 

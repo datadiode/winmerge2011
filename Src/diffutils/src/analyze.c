@@ -459,14 +459,8 @@ struct change *diff_2_files (struct comparison *cmp, int *bin_status,
                 if (0 <= cmp->file[f].desc)
                   while (cmp->file[f].buffered < buffer_size)
                     {
-                      int r = _read (cmp->file[f].desc,
-                                     cmp->file[f].buffer + cmp->file[f].buffered,
-                                     buffer_size - cmp->file[f].buffered);
-                      if (r == 0)
+                      if (file_block_read(&cmp->file[f], buffer_size - cmp->file[f].buffered) == 0)
                         break;
-                      if (r < 0)
-                        fatal (cmp->file[f].name);
-                      cmp->file[f].buffered += r;
                     }
 
               /* If the buffers differ, the files differ.  */
