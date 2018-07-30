@@ -62,7 +62,7 @@ static const UT_icd ut_int_pair_icd = {sizeof(int_pair),NULL,NULL,NULL};
 EDITORCONFIG_LOCAL
 int ec_glob(const char *pattern, const char *string)
 {
-    size_t                    i;
+    int                       i;
     int_pair *                p;
     char *                    c;
     char                      pcre_str[2 * PATTERN_MAX] = "^";
@@ -75,9 +75,8 @@ int ec_glob(const char *pattern, const char *string)
     pcre *                    re;
     int                       rc;
     int *                     pcre_result;
-    size_t                    pcre_result_len;
+    int                       pcre_result_len;
     char                      l_pattern[2 * PATTERN_MAX];
-    int                       pattern_length = strlen(pattern);
     _Bool                     are_brace_paired;
     UT_array *                nums;     /* number ranges */
     int                       ret = 0;
@@ -357,7 +356,7 @@ int ec_glob(const char *pattern, const char *string)
             ++ i, p = (int_pair *) utarray_next(nums, p))
     {
         const char * substring_start = string + pcre_result[2 * i];
-        size_t  substring_length = pcre_result[2 * i + 1] - pcre_result[2 * i];
+        int     substring_length = pcre_result[2 * i + 1] - pcre_result[2 * i];
         char *       num_string;
         int          num;
 
