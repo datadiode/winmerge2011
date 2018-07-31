@@ -98,6 +98,7 @@
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
+      <StringPooling>true</StringPooling>
     </ClCompile>
     <ResourceCompile>
       <AdditionalIncludeDirectories>Languages;$(OUTDIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -133,6 +134,7 @@
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
+      <StringPooling>true</StringPooling>
     </ClCompile>
     <ResourceCompile>
       <AdditionalIncludeDirectories>Languages;$(OUTDIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
