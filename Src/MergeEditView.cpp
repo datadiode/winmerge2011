@@ -836,7 +836,9 @@ void CMergeEditView::OnConvertEolTo(UINT nID)
 void CMergeEditView::RefreshOptions()
 {
 	// Set tab type (tabs/spaces)
-	m_pTextBuffer->SetInsertTabs(COptionsMgr::Get(OPT_TAB_TYPE) == 0);
+	int const nTabType = COptionsMgr::Get(OPT_TAB_TYPE);
+	m_pTextBuffer->SetInsertTabs(
+		(nTabType & TAB_TYPE_RADIO_OPTIONS_MASK) == TAB_TYPE_INSERT_TABS);
 	SetSelectionMargin(COptionsMgr::Get(OPT_VIEW_FILEMARGIN));
 
 	if (!COptionsMgr::Get(OPT_SYNTAX_HIGHLIGHT))
