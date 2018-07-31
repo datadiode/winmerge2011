@@ -1,4 +1,4 @@
-0.2011.008.311
+0.2011.008.313
 Changes since preceding release (not necessarily complete):
 • Allow file filters to declare case sensitivity for filenames (related to #158)
 • An alternate syntax for early-applied line filters: */(foo|bar)/g=N (N <= 10)
