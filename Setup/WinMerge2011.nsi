@@ -22,7 +22,7 @@
 
 ;    3. This notice may not be removed or altered from any source distribution.
 
-!define version "0.2011.008.226"
+!define version "0.2011.008.313"
 !define srcdir "..\Build\WinMerge\Win32\Release"
 !define setup "..\Build\WinMerge\Win32\WinMerge_${version}_wine_setup.exe"
 
@@ -39,6 +39,9 @@
 
 !define startmenu "$SMPROGRAMS"
 !define uninstaller "uninstall.exe"
+
+!include LogicLib.nsh
+!include x64.nsh
 
 ;--------------------------------
 
@@ -79,6 +82,18 @@ UninstPage instfiles
 
 AutoCloseWindow false
 ShowInstDetails show
+
+Function .onInit
+	IfFileExists "$SYSDIR\winecfg.exe" EndVerifyPlatform
+		${If} ${RunningX64}
+			StrCpy $6 "_x64"
+		${Else}
+			StrCpy $6 ""
+		${EndIf}
+		MessageBox MB_OK "This installer is for Wine only.$\nPlease run WinMerge_${version}$6_setup.cpl instead."
+		Quit
+	EndVerifyPlatform:
+FunctionEnd
 
 ; install main application
 Section "Main Application (GNU GPLv2)"
