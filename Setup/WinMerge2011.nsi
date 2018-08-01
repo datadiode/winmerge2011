@@ -96,7 +96,7 @@ Function .onInit
 FunctionEnd
 
 ; install main application
-Section "Main Application (GNU GPLv2)"
+Section "Main Application (GNU GPLv3)"
 
 	; write executable path to (ir)relevant places
 	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\WinMerge.exe" "" "$INSTDIR\WinMergeU.exe"
