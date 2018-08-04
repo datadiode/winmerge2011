@@ -21,6 +21,7 @@ public:
 
 // Dialog Data
 	BOOL  m_bScroll;
+	BOOL  m_bEnableScrollAnimation;
 	BOOL  m_bDisableSplash;
 	BOOL  m_bSingleInstance;
 	BOOL  m_bVerifyPaths;

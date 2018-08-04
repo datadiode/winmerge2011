@@ -68,7 +68,7 @@ public:
 
 // Implementation
 protected:
-	virtual void ScrollToSubLine(int nNewTopLine);
+	virtual int ScrollToSubLine(int nNewTopLine, bool bRedraw = true);
 	virtual ~CMergeDiffDetailView();
 	virtual bool DrawSingleLine(HSurface *, const RECT &, int nLineIndex);
 	virtual void GetLineColors(int nLineIndex, COLORREF &crBkgnd, COLORREF &crText);

@@ -577,20 +577,23 @@ void CMergeEditView::OnEditOperation(int nAction, LPCTSTR pszText, int cchText)
  */
 void CMergeEditView::ShowDiff(bool bScroll)
 {
-	const int nDiff = m_pDocument->GetCurrentDiff();
+	int const nDiff = m_pDocument->GetCurrentDiff();
 
 	// Try to trap some errors
 	if (nDiff >= m_pDocument->m_diffList.GetSize())
 		TRACE("Selected diff > diffcount (%d > %d)!",
 			nDiff, m_pDocument->m_diffList.GetSize());
 
-	CMergeEditView *const pCurrentView = m_pDocument->GetView(m_nThisPane);
-	CMergeEditView *const pOtherView = m_pDocument->GetView(1 - m_nThisPane);
+	CMergeEditView *const rgpView[2] =
+	{
+		m_pDocument->GetView(m_nThisPane),
+		m_pDocument->GetView(1 - m_nThisPane),
+	};
 
 	if (nDiff >= 0 && nDiff < m_pDocument->m_diffList.GetSize())
 	{
 		POINT ptStart, ptEnd;
-		const DIFFRANGE *curDiff = m_pDocument->m_diffList.DiffRangeAt(nDiff);
+		DIFFRANGE const *const curDiff = m_pDocument->m_diffList.DiffRangeAt(nDiff);
 
 		ptStart.x = 0;
 		ptStart.y = curDiff->dbegin0;
@@ -607,21 +610,60 @@ void CMergeEditView::ShowDiff(bool bScroll)
 			int nLine = GetSubLineIndex(ptStart.y) - CONTEXT_LINES_ABOVE;
 			if (nLine < 0)
 				nLine = 0;
-			pCurrentView->ScrollToSubLine(nLine);
-			pOtherView->ScrollToSubLine(nLine);
+			rgpView[0]->UpdateWindow();
+			rgpView[1]->UpdateWindow();
+			int nrgScroll[2] =
+			{
+				rgpView[0]->ScrollToSubLine(nLine, false),
+				rgpView[1]->ScrollToSubLine(nLine, false),
+			};
+			if ((COptionsMgr::Get(OPT_PHONY_EFFECTS) & PHONY_EFFECTS_ENABLE_SCROLL_ANIMATION) &&
+				nrgScroll[0] == nrgScroll[1])
+			{
+				COLORREF const crMargin = rgpView[0]->GetColor(COLORINDEX_SELMARGIN);
+				COLORREF const crBackground = rgpView[0]->GetColor(COLORINDEX_BKGND);
+				int nDelta = nrgScroll[0] > 0 ? 8 : nrgScroll[0] < 0 ? -8 : 0;
+				int nLimit = 5;
+				while ((nDelta ^ (nrgScroll[0] -= nDelta)) > 0) // holds until we touch or cross zero
+				{
+					int nSide = 0;
+					do
+					{
+						RECT rcUpdate;
+						if (rgpView[nSide]->ScrollWindowEx(0, nDelta, NULL, NULL, NULL, &rcUpdate))
+						{
+							if (HSurface *const pDC = rgpView[nSide]->GetDC())
+							{
+								rcUpdate.left = rgpView[nSide]->GetMarginWidth() - MARGIN_REV_WIDTH;
+								pDC->SetBkColor(crBackground);
+								pDC->ExtTextOut(0, 0, ETO_OPAQUE, &rcUpdate, NULL, 0, NULL);
+								rcUpdate.right = rcUpdate.left;
+								rcUpdate.left = 0;
+								pDC->SetBkColor(crMargin);
+								pDC->ExtTextOut(0, 0, ETO_OPAQUE, &rcUpdate, NULL, 0, NULL);
+								rgpView[nSide]->ReleaseDC(pDC);
+							}
+						}
+					} while (nSide ^= 1);
+					nrgScroll[1] = nrgScroll[0];
+					if (--nLimit == 0)
+						break;
+					Sleep(20);
+				}
+				nrgScroll[0] = nrgScroll[1];
+			}
+			rgpView[0]->ScrollWindow(0, nrgScroll[0]);
+			rgpView[1]->ScrollWindow(0, nrgScroll[1]);
 		}
 
-		pCurrentView->SetCursorPos(ptStart);
-		pOtherView->SetCursorPos(ptStart);
-		pCurrentView->SetAnchor(ptStart);
-		pOtherView->SetAnchor(ptStart);
-		pCurrentView->SetSelection(ptStart, ptStart);
-		pOtherView->SetSelection(ptStart, ptStart);
-
-		Invalidate();
+		rgpView[0]->SetCursorPos(ptStart);
+		rgpView[1]->SetCursorPos(ptStart);
+		rgpView[0]->SetAnchor(ptStart);
+		rgpView[1]->SetAnchor(ptStart);
+		rgpView[0]->SetSelection(ptStart, ptStart);
+		rgpView[1]->SetSelection(ptStart, ptStart);
 	}
 }
-
 
 void CMergeEditView::OnTimer(UINT_PTR nIDEvent)
 {

@@ -1443,20 +1443,21 @@ CAPTION "General"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
     AUTOCHECKBOX    "Automatically &scroll to first difference", IDC_SCROLL_CHECK, 7, 7, 220, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "&Disable Splash Screen", IDC_DISABLE_SPLASH, 7, 17, 220, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Cl&ose windows with ESC", IDC_ESC_CLOSES_WINDOW, 7, 27, 220, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "&Automatically verify paths in Open-dialog", IDC_VERIFY_OPEN_PATHS, 7, 37, 220, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "All&ow only one instance to run", IDC_SINGLE_INSTANCE, 7, 47, 220, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "As&k when closing multiple windows", IDC_ASK_MULTIWINDOW_CLOSE, 7, 57, 220, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "&Preserve file time in file compare", IDC_PRESERVE_FILETIME, 7, 67, 220, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Show ""Select Files or Folders"" Dialog on Startup", IDC_STARTUP_FOLDER_SELECT, 7, 77, 220, 10, 0, WS_EX_LEFT
-    LTEXT           "O&pen-dialog Auto-Completion:", IDC_STATIC, 19, 91, 208, 8, SS_LEFT, WS_EX_LEFT
-    COMBOBOX        IDC_AUTO_COMPLETE_SOURCE, 20, 101, 147, 150, WS_TABSTOP | WS_VSCROLL | CBS_DROPDOWNLIST, WS_EX_LEFT
-    GROUPBOX        "Enable multiple compare windows for", IDC_STATIC, 7, 120, 221, 37, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "&Folder compare", IDC_MULTIDOC_DIRCMP, 15, 132, 206, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Fil&e compare", IDC_MULTIDOC_FILECMP, 15, 142, 206, 10, 0, WS_EX_LEFT
-    LTEXT           "WinMerge allows hiding some common messageboxes. Press the Reset button to make all messageboxes visible again.", IDC_STATIC, 7, 173, 168, 48, SS_LEFT, WS_EX_LEFT
-    PUSHBUTTON      "Reset", IDC_RESET_ALL_MESSAGE_BOXES, 180, 187, 50, 14, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Enable scroll ani&mation", IDC_ENABLE_SCROLL_ANIMATION, 7, 17, 220, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "&Disable Splash Screen", IDC_DISABLE_SPLASH, 7, 27, 220, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Cl&ose windows with ESC", IDC_ESC_CLOSES_WINDOW, 7, 37, 220, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "&Automatically verify paths in Open-dialog", IDC_VERIFY_OPEN_PATHS, 7, 47, 220, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "All&ow only one instance to run", IDC_SINGLE_INSTANCE, 7, 57, 220, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "As&k when closing multiple windows", IDC_ASK_MULTIWINDOW_CLOSE, 7, 67, 220, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "&Preserve file time in file compare", IDC_PRESERVE_FILETIME, 7, 77, 220, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Show ""Select Files or Folders"" Dialog on Startup", IDC_STARTUP_FOLDER_SELECT, 7, 87, 220, 10, 0, WS_EX_LEFT
+    LTEXT           "O&pen-dialog Auto-Completion:", IDC_STATIC, 19, 101, 208, 8, SS_LEFT, WS_EX_LEFT
+    COMBOBOX        IDC_AUTO_COMPLETE_SOURCE, 20, 111, 147, 150, WS_TABSTOP | WS_VSCROLL | CBS_DROPDOWNLIST, WS_EX_LEFT
+    GROUPBOX        "Enable multiple compare windows for", IDC_STATIC, 7, 130, 221, 37, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "&Folder compare", IDC_MULTIDOC_DIRCMP, 15, 142, 206, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Fil&e compare", IDC_MULTIDOC_FILECMP, 15, 152, 206, 10, 0, WS_EX_LEFT
+    LTEXT           "WinMerge allows hiding some common messageboxes. Press the Reset button to make all messageboxes visible again.", IDC_STATIC, 7, 183, 168, 48, SS_LEFT, WS_EX_LEFT
+    PUSHBUTTON      "Reset", IDC_RESET_ALL_MESSAGE_BOXES, 180, 197, 50, 14, 0, WS_EX_LEFT
 }
 
 

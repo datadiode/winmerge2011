@@ -22,6 +22,15 @@ enum
 	TAB_TYPE_RADIO_OPTIONS_MASK = TAB_TYPE_HONOR_MODELINES - 0x01,
 };
 
+/**
+ * @brief Options to control some phony effects with no actual relevance
+ */
+enum
+{
+	PHONY_EFFECTS_DISABLE_SPLASH = 0x01,
+	PHONY_EFFECTS_ENABLE_SCROLL_ANIMATION = 0x02,
+};
+
 #endif
 
 // User's language
@@ -62,7 +71,7 @@ extern COptionDef
 extern COptionDef
 <bool> OPT_SYNTAX_HIGHLIGHT inline((_T("Settings/HiliteSyntax"), true));
 extern COptionDef
-<bool> OPT_DISABLE_SPLASH inline((_T("Settings/DisableSplash"), false));
+<int> OPT_PHONY_EFFECTS inline((_T("Settings/PhonyEffects"), 0));
 extern COptionDef
 <bool> OPT_VIEW_WHITESPACE inline((_T("Settings/ViewWhitespace"), false));
 extern COptionDef

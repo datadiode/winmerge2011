@@ -634,8 +634,7 @@ void CCrystalTextView::OnMouseMove(LPARAM lParam)
 						ptEnd.x = SubLineEndToCharPos(ptEnd.y, pos.y);
 					else
 					{
-						int	nLine, nSubLine;
-						GetLineBySubLine(nSublineIndex, nLine, nSubLine);
+						int nLine, nSubLine = GetLineBySubLine(nSublineIndex, nLine);
 						ptEnd.y = nLine;
 						ptEnd.x = SubLineHomeToCharPos(nLine, nSubLine);
 					}
@@ -652,8 +651,7 @@ void CCrystalTextView::OnMouseMove(LPARAM lParam)
 						ptNewCursorPos.x = SubLineEndToCharPos(ptNewCursorPos.y, pos.y);
 					else
 					{
-						int	nLine, nSubLine;
-						GetLineBySubLine(nSublineIndex, nLine, nSubLine);
+						int nLine, nSubLine = GetLineBySubLine(nSublineIndex, nLine);
 						ptNewCursorPos.y = nLine;
 						ptNewCursorPos.x = SubLineHomeToCharPos(nLine, nSubLine);
 					}

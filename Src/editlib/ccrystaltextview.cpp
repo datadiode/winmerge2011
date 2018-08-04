@@ -105,13 +105,6 @@ using std::vector;
 #define new DEBUG_NEW
 #endif
 
-/** @brief Width of revision marks. */
-const UINT MARGIN_REV_WIDTH = 3;
-/** @brief Width of icons printed in the margin. */
-const UINT MARGIN_ICON_WIDTH = 12;
-/** @brief Height of icons printed in the margin. */
-const UINT MARGIN_ICON_HEIGHT = 12;
-
 /** @brief Color of unsaved line revision mark (dark yellow). */
 const COLORREF UNSAVED_REVMARK_CLR = RGB(0xD7, 0xD7, 0x00);
 /** @brief Color of saved line revision mark (green). */
@@ -419,8 +412,9 @@ void CCrystalTextView::ScrollToChar(int nNewOffsetChar)
  * (Kimmo) think it is good for us too.
  * @param [in] nNewTopSubLine New top line for view.
  */
-void CCrystalTextView::ScrollToSubLine(int nNewTopSubLine)
+int CCrystalTextView::ScrollToSubLine(int nNewTopSubLine, bool bRedraw)
 {
+	int nScrollLines = 0;
 	if (m_nTopSubLine != nNewTopSubLine)
 	{
 		// Limit scrolling so that we show one empty line at end of file
@@ -429,19 +423,23 @@ void CCrystalTextView::ScrollToSubLine(int nNewTopSubLine)
 			nNewTopSubLine = nMaxTopSubLine;
 		if (nNewTopSubLine < 0)
 			nNewTopSubLine = 0;
-		if (int const nScrollLines = m_nTopSubLine - nNewTopSubLine)
+		nScrollLines = m_nTopSubLine - nNewTopSubLine;
+		if (nScrollLines)
 		{
+			nScrollLines *= GetLineHeight();
 			m_nTopSubLine = nNewTopSubLine;
 			// OnDraw() uses m_nTopLine to determine topline
-			int dummy;
-			GetLineBySubLine(m_nTopSubLine, m_nTopLine, dummy);
-			ScrollWindow(0, nScrollLines * GetLineHeight());
-			UpdateWindow();
+			GetLineBySubLine(m_nTopSubLine, m_nTopLine);
+			if (bRedraw)
+			{
+				ScrollWindow(0, nScrollLines);
+				UpdateWindow();
+			}
 			RecalcVertScrollBar(true);
-			int nDummy;
-			GetLineBySubLine(m_nTopSubLine, m_nTopLine, nDummy);
+			GetLineBySubLine(m_nTopSubLine, m_nTopLine);
 		}
 	}
+	return nScrollLines;
 }
 
 void CCrystalTextView::ScrollToLine(int nNewTopLine)
@@ -1737,16 +1735,16 @@ int CCrystalTextView::GetEmptySubLines(int nLineIndex)
 bool CCrystalTextView::IsEmptySubLineIndex(int nSubLineIndex)
 {
 	int nLineIndex;
-	int dummy;
-	GetLineBySubLine(nSubLineIndex, nLineIndex, dummy);
-	int nSubLineIndexNextLine = GetSubLineIndex(nLineIndex) + GetSubLines(nLineIndex);
-	if (nSubLineIndexNextLine - GetEmptySubLines(nLineIndex) <= nSubLineIndex && nSubLineIndex < nSubLineIndexNextLine)
-		return true;
-	else
+	GetLineBySubLine(nSubLineIndex, nLineIndex);
+	int const nSubLineIndexNextLine = GetSubLineIndex(nLineIndex) + GetSubLines(nLineIndex);
+	if (nSubLineIndex >= nSubLineIndexNextLine)
 		return false;
+	if (nSubLineIndex < nSubLineIndexNextLine - GetEmptySubLines(nLineIndex))
+		return false;
+	return true;
 }
 
-int CCrystalTextView::CharPosToPoint( int nLineIndex, int nCharPos, POINT &charPoint )
+int CCrystalTextView::CharPosToPoint(int nLineIndex, int nCharPos, POINT &charPoint)
 {
 	// if we do not wrap lines, y is allways 0 and x is equl to nCharPos
 	if (!m_bWordWrap)
@@ -1756,7 +1754,7 @@ int CCrystalTextView::CharPosToPoint( int nLineIndex, int nCharPos, POINT &charP
 	}
 
 	// line is wrapped
-	int *anBreaks = new int[GetLineLength (nLineIndex)];
+	int *anBreaks = new int[GetLineLength(nLineIndex)];
 	int nBreaks = 0;
 
 	WrapLineCached(nLineIndex, anBreaks, nBreaks);
@@ -1825,8 +1823,8 @@ int CCrystalTextView::CursorPointToCharPos(int nLineIndex, const POINT &curPoint
 void CCrystalTextView::SubLineCursorPosToTextPos(int x, int y, POINT &textPos)
 {
 	// Get line breaks
-	int nSubLineOffset, nLine;
-	GetLineBySubLine(y, nLine, nSubLineOffset);
+	int nLine;
+	int const nSubLineOffset = GetLineBySubLine(y, nLine);
 	// compute cursor-position
 	POINT curPoint = { x, nSubLineOffset };
 	textPos.x = CursorPointToCharPos(nLine, curPoint);
@@ -2021,7 +2019,7 @@ int CCrystalTextView::GetSubLineIndex(int nLineIndex)
 }
 
 // See comment in the header file
-void CCrystalTextView::GetLineBySubLine(int nSubLineIndex, int &nLine, int &nSubLine)
+int CCrystalTextView::GetLineBySubLine(int nSubLineIndex, int &nLine)
 {
 	ASSERT( nSubLineIndex < GetSubLineCount() );
 
@@ -2029,8 +2027,7 @@ void CCrystalTextView::GetLineBySubLine(int nSubLineIndex, int &nLine, int &nSub
 	if (!m_bWordWrap)
 	{
 		nLine = nSubLineIndex;
-		nSubLine = 0;
-		return;
+		return 0;
 	}
 
 	// compute result
@@ -2049,7 +2046,7 @@ void CCrystalTextView::GetLineBySubLine(int nSubLineIndex, int &nLine, int &nSub
 
 	ASSERT(i < nLineCount);
 	nLine = i;
-	nSubLine = nSubLineIndex - nSubLineCount + nLastSubLines;
+	return nSubLineIndex - nSubLineCount + nLastSubLines;
 }
 
 int CCrystalTextView::GetLineLength(int nLineIndex) const
@@ -2361,10 +2358,9 @@ POINT CCrystalTextView::ClientToText(const POINT &point)
 		pt.y = 0;
 
 	int nLine;
-	int nSubLineOffset;
 	int nOffsetChar = m_nOffsetChar;
 
-	GetLineBySubLine( pt.y, nLine, nSubLineOffset );
+	int const nSubLineOffset = GetLineBySubLine(pt.y, nLine);
 	pt.y = nLine;
 
 	LPCTSTR pszLine = NULL;
@@ -2650,8 +2646,7 @@ void CCrystalTextView::EnsureCursorVisible()
 	}
 	else
 	{
-		int dummy;
-		GetLineBySubLine(nNewTopSubLine, m_nTopLine, dummy);
+		GetLineBySubLine(nNewTopSubLine, m_nTopLine);
 	}
 
 	ScrollToSubLine(nNewTopSubLine);
@@ -3501,7 +3496,7 @@ int CCrystalTextView::GetMarginWidth()
 			nMarginWidth += 2; // Small gap when symbol part disabled
 	}
 	if (m_bSelMargin)
-		nMarginWidth += MARGIN_ICON_WIDTH  + 7; // Width for icon markers and some margin
+		nMarginWidth += MARGIN_ICON_WIDTH + 7; // Width for icon markers and some margin
 	else
 		nMarginWidth += MARGIN_REV_WIDTH; // Space for revision marks
 	return nMarginWidth;
@@ -3786,8 +3781,7 @@ void CCrystalTextView::EnsureSelectionVisible(BOOL bCenter)
 	}
 	else
 	{
-		int dummy;
-		GetLineBySubLine(nNewTopSubLine, m_nTopLine, dummy);
+		GetLineBySubLine(nNewTopSubLine, m_nTopLine);
 	}
 
 	ScrollToSubLine(nNewTopSubLine);

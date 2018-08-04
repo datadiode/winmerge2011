@@ -172,7 +172,7 @@ bool CMergeDiffDetailView::EnsureInDiff(POINT &pt)
 }
 
 /// virtual, ensure we remain in diff
-void CMergeDiffDetailView::ScrollToSubLine(int nNewTopLine)
+int CMergeDiffDetailView::ScrollToSubLine(int nNewTopLine, bool bRedraw)
 {
 	const int nMaxTopLine = m_lineEnd - GetScreenLines();
 
@@ -192,7 +192,7 @@ void CMergeDiffDetailView::ScrollToSubLine(int nNewTopLine)
 	if (EnsureInDiff(ptSelStart) || EnsureInDiff(ptSelEnd))
 		SetSelection(ptSelStart, ptSelEnd);
 
-	CCrystalTextView::ScrollToSubLine(nNewTopLine);
+	return CCrystalTextView::ScrollToSubLine(nNewTopLine, bRedraw);
 }
 
 /*

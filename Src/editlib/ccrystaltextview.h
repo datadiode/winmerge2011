@@ -136,6 +136,13 @@ private:
 
 protected:
 
+	/** @brief Width of revision marks. */
+	static UINT const MARGIN_REV_WIDTH = 3;
+	/** @brief Width of icons printed in the margin. */
+	static UINT const MARGIN_ICON_WIDTH = 12;
+	/** @brief Height of icons printed in the margin. */
+	static UINT const MARGIN_ICON_HEIGHT = 12;
+
 	bool m_bFocused;
 	bool m_bCursorHidden;
 	bool m_bOvrMode;
@@ -367,7 +374,7 @@ protected:
 	@param bTrackScrollBar TRUE to recalculate the scroll bar after scrolling,
 		else FALSE.
 	*/
-	virtual void ScrollToSubLine(int nNewTopSubLine);
+	virtual int ScrollToSubLine(int nNewTopSubLine, bool bRedraw = true);
 	//END SW
 
 	//  Splitter support
@@ -398,9 +405,9 @@ protected:
 	 * @brief Splits the given subline index into line and sub line of this line.
 	 * @param [in] nSubLineIndex The zero based index of the subline to get info about
 	 * @param [out] nLine Gets the line number the give subline is included in
-	 * @param [out] nSubLine Get the subline of the given subline relative to nLine
+	 * @return The subline of the given subline relative to nLine
 	 */
-	void GetLineBySubLine(int nSubLineIndex, int &nLine, int &nSubLine);
+	int GetLineBySubLine(int nSubLineIndex, int &nLine);
 
 public:
 	int GetLineLength(int nLineIndex) const;

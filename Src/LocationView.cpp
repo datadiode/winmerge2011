@@ -746,15 +746,8 @@ int CLocationView::GetLineFromYPos(int nYCoord, CMergeEditView *pView)
 	}
 
 	// Find the real (not wrapped) line number from sub-line index.
-	int nLine = 0;
-	int nSubLine = 0;
-	pView->GetLineBySubLine(nSubLineIndex, nLine, nSubLine);
-
-	// Convert line number to line index.
-	if (nLine > 0)
-	{
-		nLine -= 1;
-	}
+	int nLine;
+	pView->GetLineBySubLine(nSubLineIndex, nLine);
 	return nLine;
 }
 

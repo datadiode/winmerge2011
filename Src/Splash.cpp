@@ -84,7 +84,7 @@ CSplashWnd::CSplashWnd(HWindow *pWndMain)
 
 	//BringWindowToTop(m_hWnd);
 	m_bAutoDelete = true;
-	if (COptionsMgr::Get(OPT_DISABLE_SPLASH))
+	if (COptionsMgr::Get(OPT_PHONY_EFFECTS) & PHONY_EFFECTS_DISABLE_SPLASH)
 		return;
 	SetTimer(SplashTimerID, 5000);
 	HListView::Create(WS_CHILD | WS_VISIBLE,
