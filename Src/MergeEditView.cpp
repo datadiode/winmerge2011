@@ -624,7 +624,7 @@ void CMergeEditView::ShowDiff(bool bScroll)
 				COLORREF const crBackground = rgpView[0]->GetColor(COLORINDEX_BKGND);
 				int nDelta = nrgScroll[0] > 0 ? 8 : nrgScroll[0] < 0 ? -8 : 0;
 				int nLimit = 5;
-				while ((nDelta ^ (nrgScroll[0] -= nDelta)) > 0) // holds until we touch or cross zero
+				while (nDelta * (nrgScroll[0] -= nDelta) > 0) // holds until we touch or cross zero
 				{
 					int nSide = 0;
 					do
