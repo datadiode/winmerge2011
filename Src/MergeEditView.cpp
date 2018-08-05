@@ -610,8 +610,7 @@ void CMergeEditView::ShowDiff(bool bScroll)
 			int nLine = GetSubLineIndex(ptStart.y) - CONTEXT_LINES_ABOVE;
 			if (nLine < 0)
 				nLine = 0;
-			rgpView[0]->UpdateWindow();
-			rgpView[1]->UpdateWindow();
+			m_pDocument->UpdateWindow();
 			int nrgScroll[2] =
 			{
 				rgpView[0]->ScrollToSubLine(nLine, false),
