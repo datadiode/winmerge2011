@@ -9,7 +9,12 @@
 struct regexp_item
 {
 	HString *filterString; /** Original regular expression string */
-	HString *injectString; /** String to inject in place of submatches */
+	union
+	{
+		HString *injectString; /** String to inject in place of submatches */
+		char uniliteral[4]; /** sscanf format string to parse a unicode literal */
+		int is_uniliteral : 1;
+	};
 	HString *filenameSpec; /** Optional target filename patterns */
 	pcre *pRegExp; /**< Compiled regular expression */
 	pcre_extra *pRegExpExtra; /**< Additional information got from regex study */
@@ -40,7 +45,8 @@ struct regexp_item
 	void dispose()
 	{
 		filterString->Free();
-		injectString->Free();
+		if (!is_uniliteral)
+			injectString->Free();
 		filenameSpec->Free();
 		pcre_free(pRegExp);
 		pcre_free(pRegExpExtra);

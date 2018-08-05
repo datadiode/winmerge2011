@@ -53,7 +53,26 @@ const char *regexp_item::assign(LPCTSTR pch, int cch)
 				permutive = true;
 				break;
 			case _T('='):
-				hashcode = static_cast<BYTE>(~_ttol(pch + j + 1));
+				if (pch[j + 1] != '%')
+				{
+					hashcode = static_cast<BYTE>(~_ttol(pch + j + 1));
+				}
+				else if (_stscanf(pch + j + 1, _T("%2h[%1-9]%1h[dx]"), uniliteral, uniliteral + 2) == 2)
+				{
+					if (uniliteral[1])
+					{
+						// length limitation is present -> advance by 3 chars
+						j += 3;
+					}
+					else
+					{
+						// length limitation is missing -> advance by 2 chars
+						j += 2;
+						uniliteral[1] = uniliteral[2];
+						uniliteral[2] = '\0';
+					}
+					ASSERT(is_uniliteral);
+				}
 				break;
 			case _T(':'):
 			case _T('<'):
@@ -107,8 +126,12 @@ int regexp_item::process(const std::vector<regexp_item> &relist,
 		const regexp_item &filter = *iter++;
 		if (filename && filter.filenameSpec && !::PathMatchSpec(filename, filter.filenameSpec->T))
 			continue;
-		HString *const injectString = filter.injectString;
-		UINT const injectLength = injectString->ByteLen();
+		char const *const injectString(
+			!filter.is_uniliteral ? filter.injectString->A :
+			filter.uniliteral);
+		UINT const injectLength(
+			!filter.is_uniliteral ? filter.injectString->ByteLen() :
+			isdigit(filter.uniliteral[1]) ? filter.uniliteral[1] - '0' : 1);
 		char *buf = dst;
 		int i = 0;
 		while (i < len)
@@ -126,7 +149,7 @@ int regexp_item::process(const std::vector<regexp_item> &relist,
 			{
 				int tmplen = ovector[1] - ovector[0];
 				char *const tmpbuf = new char[tmplen];
-				const char *q = injectString->A;
+				const char *q = injectString;
 				char *p = tmpbuf;
 				while (char c = *q++)
 				{
@@ -184,6 +207,40 @@ int regexp_item::process(const std::vector<regexp_item> &relist,
 						{
 							memcpy(buf, src + i, d);
 							buf += d;
+						}
+						else if (filter.uniliteral)
+						{
+							while (i + injectLength <= j)
+							{
+								unsigned u;
+								if (sscanf(src + i, injectString, &u) == 1)
+								{
+									// do like prepare_text() does for UCS2LE
+									if (u >= 0x10000)
+									{
+										// out of range -> copy as is
+										memcpy(buf, src + i, d);
+										buf += d;
+									}
+									else if (u >= 0x800)
+									{
+										*buf++ = 0xE0 + (u >> 12);
+										*buf++ = 0x80 + ((u >> 6) & 0x3F);
+										*buf++ = 0x80 + (u & 0x3F);
+									}
+									else if (u >= 0x80 || u == 0) // map NUL to 2 byte sequence so as to prevent it from confusing diff algorithm
+									{
+										*buf++ = 0xC0 + (u >> 6);
+										*buf++ = 0x80 + (u & 0x3F);
+									}
+									else
+									{
+										*buf++ = static_cast<char>(u);
+									}
+									break;
+								}
+								++i;
+							}
 						}
 						else if (injectLength <= d)
 						{
