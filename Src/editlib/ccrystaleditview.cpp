@@ -83,6 +83,9 @@ static const unsigned int MAX_TAB_LEN = 64;  // Same as in CrystalViewText.cpp
 /////////////////////////////////////////////////////////////////////////////
 // CCrystalEditView
 
+bool CCrystalEditView::m_bLastReplace = false;
+DWORD CCrystalEditView::m_dwLastReplaceFlags = 0;
+
 CCrystalEditView::CCrystalEditView(size_t ZeroInit)
 : CCrystalTextView(ZeroInit)
 {
@@ -98,7 +101,7 @@ CCrystalEditView::~CCrystalEditView()
 void CCrystalEditView::ResetView()
 {
 	m_bOvrMode = false;
-	m_bLastReplace = FALSE;
+	m_bLastReplace = false;
 	CCrystalTextView::ResetView();
 }
 
@@ -880,7 +883,7 @@ void CCrystalEditView::OnEditReplace()
 	if (dlg.m_bConfirmed)
 	{
 		//  Save Replace parameters for 'F3' command
-		m_bLastReplace = TRUE;
+		m_bLastReplace = true;
 		m_strLastFindWhat = dlg.m_sText;
 		m_dwLastReplaceFlags = 0;
 		if (dlg.m_bMatchCase)

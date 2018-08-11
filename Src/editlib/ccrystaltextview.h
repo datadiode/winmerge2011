@@ -156,9 +156,9 @@ protected:
 	//END SW
 
 	//  Search parameters
-	bool m_bLastSearch;
-	DWORD m_dwLastSearchFlags;
-	String m_strLastFindWhat;
+	static bool m_bLastSearch;
+	static DWORD m_dwLastSearchFlags;
+	static String m_strLastFindWhat;
 
 	bool m_bPreparingToDrag;
 	bool m_bDraggingText;

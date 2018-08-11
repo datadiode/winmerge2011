@@ -43,8 +43,8 @@ public:
     int m_nLastReplaceLen;
 
 protected:
-    BOOL m_bLastReplace;
-    DWORD m_dwLastReplaceFlags;
+    static bool m_bLastReplace;
+    static DWORD m_dwLastReplaceFlags;
 
 protected:
     bool m_bDropPosVisible;

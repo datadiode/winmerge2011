@@ -127,6 +127,9 @@ static int upperBound(const std::vector<int> &v)
 	return v.size() - 1;
 }
 
+bool CCrystalTextView::m_bLastSearch = false;
+DWORD CCrystalTextView::m_dwLastSearchFlags = 0;
+String CCrystalTextView::m_strLastFindWhat;
 HImageList *CCrystalTextView::m_pIcons = NULL;
 HBrush *CCrystalTextView::m_pHatchBrush = NULL;
 
