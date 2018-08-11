@@ -284,7 +284,6 @@ void CMergeEditView::SelectDiff(int nDiff, bool bScroll)
 		TRACE("Selected diff > diffcount (%d >= %d)",
 			nDiff, m_pDocument->m_diffList.GetSize());
 
-	SelectNone();
 	m_pDocument->SetCurrentDiff(nDiff);
 	ShowDiff(bScroll);
 	m_pDocument->UpdateAllViews();
@@ -434,15 +433,6 @@ void CMergeEditView::OnPrevdiff()
 		if (curDiff >= 0)
 			SelectDiff(curDiff);
 	}
-}
-
-/**
- * @brief Clear selection
- */
-void CMergeEditView::SelectNone()
-{
-	SetSelection(m_ptCursorPos, m_ptCursorPos);
-	UpdateCaret();
 }
 
 /**

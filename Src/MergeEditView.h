@@ -92,7 +92,6 @@ public:
 	virtual void OnEditOperation(int nAction, LPCTSTR pszText, int cchText);
 	virtual void OnUpdateCaret(bool bShowHide = false);
 	virtual bool IsLineInCurrentDiff(int);
-	void SelectNone();
 	void SelectDiff(int nDiff, bool bScroll = true);
 	CDiffTextBuffer *GetTextBuffer() { return static_cast<CDiffTextBuffer *>(m_pTextBuffer); }
 	void UpdateResources();
