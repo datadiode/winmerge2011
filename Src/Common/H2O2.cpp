@@ -414,35 +414,17 @@ void ODialog::Update3StateCheckBoxLabel(UINT id)
 		pButton->GetWindowText(text);
 		HWindow::CreateEx(0, WC_STATIC, text.c_str(), WS_CHILD, 0, 0, 0, 0, pButton, 1);
 	}
-	// If there is a \t to split the text in twice, the shorter part shows up
-	// for BST_(UN)CHECKED, and the longer part shows up for BST_INDETERMINATE.
-	// The shorter part is assumed to be a prefix of the longer part.
+	// If there is a \t to split the text in twice, the first part shows up for
+	// BST_(UN)CHECKED, and the second part shows up for BST_INDETERMINATE.
 	String::size_type i = text.find(_T('\t'));
+	LPCTSTR buf = text.c_str();
 	if (i != String::npos)
 	{
-		String::size_type j = text.length() - i;
-		if (pButton->GetCheck() == BST_INDETERMINATE ? i <= j : i > j)
-		{
-			// If there is an &, move it where it belongs.
-			j = text.find(_T('&'));
-			if (j != String::npos)
-			{
-				text.erase(j, 1);
-				text.insert(i + j, 1, _T('&'));
-				--i;
-			}
-			// Swap texts before and after the \t.
-			TCHAR *const buf = &text.front();
-			buf[i] = _T('\0');
-			_tcsrev(buf);
-			_tcsrev(buf + i + 1);
-			buf[i] = _T('\t');
-			_tcsrev(buf);
-		}
-		// Exclude excess text from \t onwards. (In other words: Do not rely on
-		// Visual Styles being in effect, and empirics about their behaviors.)
-		text.resize(text.find(_T('\t')));
-		pButton->SetWindowText(text.c_str());
+		if (pButton->GetCheck() == BST_INDETERMINATE)
+			buf += i + 1;
+		else
+			text.resize(i);
+		pButton->SetWindowText(buf);
 	}
 }
 
