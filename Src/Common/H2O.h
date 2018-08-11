@@ -1033,6 +1033,10 @@ namespace H2O
 	{
 	public:
 		using Bitmap<HGdiObj>::m_hBitmap;
+		static HBitmap *Create(int nWidth, int nHeight, UINT nPlanes, UINT nBitCount, LPCVOID lpBits)
+		{
+			return reinterpret_cast<HBitmap *>(::CreateBitmap(nWidth, nHeight, nPlanes, nBitCount, lpBits));
+		}
 	};
 
 	template<class Super>
@@ -1056,6 +1060,10 @@ namespace H2O
 		static HBrush *CreateHatchBrush(int iHatch, COLORREF crColor)
 		{
 			return reinterpret_cast<HBrush *>(::CreateHatchBrush(iHatch, crColor));
+		}
+		static HBrush *CreatePatternBrush(HBitmap *pBitmap)
+		{
+			return reinterpret_cast<HBrush *>(::CreatePatternBrush(pBitmap->m_hBitmap));
 		}
 	};
 
