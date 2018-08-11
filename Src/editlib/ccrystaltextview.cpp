@@ -131,17 +131,14 @@ bool CCrystalTextView::m_bLastSearch = false;
 DWORD CCrystalTextView::m_dwLastSearchFlags = 0;
 String CCrystalTextView::m_strLastFindWhat;
 HImageList *CCrystalTextView::m_pIcons = NULL;
-HBrush *CCrystalTextView::m_pHatchBrush = NULL;
 
 void CCrystalTextView::InitSharedResources()
 {
 	m_pIcons = LanguageSelect.LoadImageList(IDR_MARGIN_ICONS, MARGIN_ICON_WIDTH, 0);
-	m_pHatchBrush = HBrush::CreateHatchBrush(HS_DIAGCROSS, 0);
 }
 
 void CCrystalTextView::FreeSharedResources()
 {
-	m_pHatchBrush->DeleteObject();
 	m_pIcons->Destroy();
 }
 
@@ -257,7 +254,7 @@ LRESULT CCrystalTextView::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return OWindow::WindowProc(uMsg, wParam, lParam);
 }
 
-CCrystalTextView::CCrystalTextView(size_t ZeroInit)
+CCrystalTextView::CCrystalTextView(HWindow *pWnd, size_t ZeroInit)
 : H2O::ZeroInit<CCrystalTextView>(ZeroInit)
 , m_bSelMargin(true)
 , m_nLastLineIndexCalculatedSubLineIndex(-1)
@@ -267,11 +264,14 @@ CCrystalTextView::CCrystalTextView(size_t ZeroInit)
 	// font
 	_tcscpy(m_lfBaseFont.lfFaceName, _T("FixedSys"));
 	m_lfBaseFont.lfWeight = FW_NORMAL;
+	Subclass(pWnd);
+	CalcLineCharDim();
 }
 
 CCrystalTextView::~CCrystalTextView()
 {
 	ASSERT(m_pTextBuffer == NULL); // Must be correctly detached
+	ASSERT(m_pHatchBrush == NULL);
 }
 
 HRESULT CCrystalTextView::QueryInterface(REFIID iid, void **ppv)
@@ -360,7 +360,6 @@ HRESULT CCrystalTextView::EnumDAdvise(LPENUMSTATDATA*)
 {
 	return E_NOTIMPL;
 }
-
 
 /////////////////////////////////////////////////////////////////////////////
 // CCrystalTextView drawing
@@ -923,7 +922,6 @@ void CCrystalTextView::InvalidateSubLineIndexCache(int nLineIndex)
  */
 void CCrystalTextView::InvalidateScreenRect()
 {
-	CalcLineCharDim();
 	RECT rect;
 	GetClientRect(&rect);
 	m_nScreenChars = (rect.right - rect.left - GetMarginWidth()) / GetCharWidth();
@@ -1570,21 +1568,11 @@ void CCrystalTextView::ResetView()
 	m_nTopLine = 0;
 	m_nTopSubLine = 0;
 	m_nOffsetChar = 0;
-	m_nLineHeight = -1;
-	m_nCharWidth = -1;
 	m_nScreenLines = INT_MIN;
 	m_nScreenChars = INT_MIN;
 	m_nIdealCharPos = -1;
 	m_ptAnchor.x = 0;
 	m_ptAnchor.y = 0;
-	for (int I = 0; I < 4; I++)
-	{
-		if (m_apFonts[I] != NULL)
-		{
-			m_apFonts[I]->DeleteObject();
-			m_apFonts[I] = NULL;
-		}
-	}
 	if (m_pTextBuffer)
 		m_pTextBuffer->InitParseCookie();
 	m_ptCursorPos.x = 0;
@@ -1698,26 +1686,34 @@ HFont *CCrystalTextView::GetFont(int nColorIndex)
 void CCrystalTextView::CalcLineCharDim()
 {
 	HSurface *pdc = GetDC();
-	HGdiObj *pOldFont = pdc->SelectObject(GetFont());
-	SIZE szCharExt;
-	pdc->GetTextExtent(_T("X"), 1, &szCharExt);
-	m_nLineHeight = szCharExt.cy;
-	if (m_nLineHeight < 1)
-		m_nLineHeight = 1;
-	m_nCharWidth = szCharExt.cx;
-	/*
-	TEXTMETRIC tm;
-	if (pdc->GetTextMetrics(&tm))
-	m_nCharWidth -= tm.tmOverhang;
-	*/
-	pdc->SelectObject(pOldFont);
+	pdc->SelectObject(GetFont());
+	pdc->GetTextExtent(_T("X"), 1, &m_szCharExt);
+	if (m_szCharExt.cy < 1)
+		m_szCharExt.cy = 1;
 	ReleaseDC(pdc);
+}
+
+void CCrystalTextView::DeleteFonts()
+{
+	for (int i = 0; i < _countof(m_apFonts); ++i)
+	{
+		if (m_apFonts[i])
+		{
+			VERIFY(m_apFonts[i]->DeleteObject());
+			m_apFonts[i] = NULL;
+		}
+	}
+	if (m_pHatchBrush)
+	{
+		VERIFY(m_pHatchBrush->DeleteObject());
+		m_pHatchBrush = NULL;
+	}
 }
 
 int CCrystalTextView::GetLineHeight()
 {
-	ASSERT(m_nLineHeight != -1);
-	return m_nLineHeight;
+	ASSERT(m_szCharExt.cy > 0);
+	return m_szCharExt.cy;
 }
 
 int CCrystalTextView::GetSubLines(int nLineIndex)
@@ -1909,9 +1905,7 @@ int CCrystalTextView::SubLineHomeToCharPos(int nLineIndex, int nSubLineOffset)
 
 int CCrystalTextView::GetCharWidth()
 {
-	if (m_nCharWidth == -1)
-		CalcLineCharDim();
-	return m_nCharWidth;
+	return m_szCharExt.cx;
 }
 
 int CCrystalTextView::GetMaxLineLength(bool bRecalc)
@@ -2024,7 +2018,7 @@ int CCrystalTextView::GetSubLineIndex(int nLineIndex)
 // See comment in the header file
 int CCrystalTextView::GetLineBySubLine(int nSubLineIndex, int &nLine)
 {
-	ASSERT( nSubLineIndex < GetSubLineCount() );
+	ASSERT(nSubLineIndex < GetSubLineCount());
 
 	// if we do not wrap words, nLine is equal to nSubLineIndex and nSubLine is allways 0
 	if (!m_bWordWrap)
@@ -2154,14 +2148,7 @@ void CCrystalTextView::OnDestroy()
 {
 	GetFont()->GetLogFont(&m_lfBaseFont);
 	DetachFromBuffer();
-	for (int I = 0; I < 4; I++)
-	{
-		if (m_apFonts[I] != NULL)
-		{
-			m_apFonts[I]->DeleteObject();
-			m_apFonts[I] = NULL;
-		}
-	}
+	DeleteFonts();
 }
 
 void CCrystalTextView::OnSize()
@@ -2860,18 +2847,36 @@ void CCrystalTextView::GetFont(LOGFONT &lf) const
 	lf = m_lfBaseFont;
 }
 
-void CCrystalTextView::SetFont(const LOGFONT &lf)
+void CCrystalTextView::SetFont(LOGFONT const &lf, int nHatchStyle)
 {
+	ASSERT(m_hWnd);
 	m_lfBaseFont = lf;
-	m_nCharWidth = -1;
-	m_nLineHeight = -1;
-	for (int i = 0; i < 4; ++i)
+	DeleteFonts();
+	CalcLineCharDim();
+	switch (nHatchStyle)
 	{
-		if (m_apFonts[i] != NULL)
+	case 1:
+		m_pHatchBrush = HBrush::CreateHatchBrush(HS_DIAGCROSS, 0);
+		break;
+	case 2:
+		SIZE const size = { std::min(m_szCharExt.cx, 16L), std::min(m_szCharExt.cy, 32L) };
+		POINT const center = { size.cx >> 1, size.cy >> 1 };
+		WORD pattern[33];
+		memset(pattern, -1, sizeof pattern);
+		for (int z = 0; z <= 2; z += 2)
 		{
-			m_apFonts[i]->DeleteObject();
-			m_apFonts[i] = NULL;
+			for (int y = z; y <= center.y; y += 4)
+			{
+				for (int x = z; x <= center.x; x += 4)
+				{
+					pattern[center.y + y] = pattern[center.y - y] ^=
+						(1 << (center.x - x)) | (1 << (center.x + x));
+				}
+			}
 		}
+		HBitmap *pBitmap = HBitmap::Create(size.cx, size.cy, 1, 1, pattern);
+		m_pHatchBrush = HBrush::CreatePatternBrush(pBitmap);
+		break;
 	}
 	OnSize();
 	Invalidate();

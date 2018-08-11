@@ -106,8 +106,9 @@ private:
 	HFont *m_apFonts[4];
 
 	//  Line/character dimensions
-	int m_nLineHeight, m_nCharWidth;
+	SIZE m_szCharExt;
 	void CalcLineCharDim();
+	void DeleteFonts();
 
 	//  Text attributes
 	bool m_bViewTabs;
@@ -233,7 +234,7 @@ protected:
 	POINT WordToLeft(POINT pt);
 
 	static HImageList *m_pIcons;
-	static HBrush *m_pHatchBrush;
+	HBrush *m_pHatchBrush;
 	CCrystalTextBuffer *m_pTextBuffer;
 	POINT m_ptDraggedTextBegin, m_ptDraggedTextEnd;
 	int GetMarginWidth();
@@ -557,7 +558,7 @@ public:
 	bool GetViewLineNumbers() const;
 	void SetViewLineNumbers(bool);
 	void GetFont(LOGFONT &) const;
-	void SetFont(const LOGFONT &);
+	void SetFont(LOGFONT const &, int nHatchStyle);
 	//  [JRT]:
 	bool GetDisableDragAndDrop() const;
 	void SetDisableDragAndDrop(bool);
@@ -608,7 +609,7 @@ public:
 	virtual void OnEditOperation(int nAction, LPCTSTR pszText, int cchText) = 0;
 
 public:
-	explicit CCrystalTextView(size_t);
+	CCrystalTextView(HWindow *, size_t);
 	virtual ~CCrystalTextView();
 #ifdef _DEBUG
 	void AssertValidTextPos(POINT const &) const;

@@ -23,9 +23,8 @@ using std::vector;
  * @brief Constructor.
  */
 CMergeDiffDetailView::CMergeDiffDetailView(HWindow *pWnd, CChildFrame *pDocument, int nThisPane)
-: CGhostTextView(pDocument, nThisPane, sizeof *this)
+: CGhostTextView(pWnd, pDocument, nThisPane, sizeof *this)
 {
-	Subclass(pWnd);
 }
 
 CMergeDiffDetailView::~CMergeDiffDetailView()
@@ -60,6 +59,7 @@ void CMergeDiffDetailView::RefreshOptions()
 	bool bMixedEOL = COptionsMgr::Get(OPT_ALLOW_MIXED_EOL) ||
 		m_pDocument->IsMixedEOL(m_nThisPane);
 	SetViewEols(COptionsMgr::Get(OPT_VIEW_WHITESPACE), bMixedEOL);
+	SetFont(theApp.m_pMainWnd->m_lfDiff, COptionsMgr::Get(OPT_CROSS_HATCH_DELETED_LINES));
 }
 
 /// virtual, ensure we remain in diff
@@ -357,5 +357,4 @@ void CMergeDiffDetailView::DocumentsLoaded()
 {
 	RefreshOptions();
 	SetWordWrapping(FALSE);
-	SetFont(theApp.m_pMainWnd->m_lfDiff);
 }

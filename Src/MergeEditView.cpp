@@ -74,11 +74,10 @@ static const UINT MergeViewCmdLast	= 0xAFFF;
 // CMergeEditView
 
 CMergeEditView::CMergeEditView(HWindow *pWnd, CChildFrame *pDocument, int nThisPane)
-	: CGhostTextView(pDocument, nThisPane, sizeof *this)
+	: CGhostTextView(pWnd, pDocument, nThisPane, sizeof *this)
 	, m_pShellContextMenu(new CShellContextMenu(MergeViewCmdFirst, MergeViewCmdLast))
 {
 	ASSERT(m_hShellContextMenu == NULL);
-	Subclass(pWnd);
 	RegisterDragDrop(m_hWnd, this);
 }
 
@@ -611,7 +610,10 @@ void CMergeEditView::ShowDiff(bool bScroll)
 			{
 				COLORREF const crMargin = rgpView[0]->GetColor(COLORINDEX_SELMARGIN);
 				COLORREF const crBackground = rgpView[0]->GetColor(COLORINDEX_BKGND);
-				int nDelta = nrgScroll[0] > 0 ? 8 : nrgScroll[0] < 0 ? -8 : 0;
+				// Align scroll delta with brush used to draw deleted lines to avoid visual jitter
+				int nDelta = COptionsMgr::Get(OPT_CROSS_HATCH_DELETED_LINES) == 2 ? GetLineHeight() : 8;
+				if (nrgScroll[0] < 0)
+					nDelta = -nDelta;
 				int nLimit = 5;
 				while (nDelta * (nrgScroll[0] -= nDelta) > 0) // holds until we touch or cross zero
 				{
@@ -887,9 +889,7 @@ void CMergeEditView::RefreshOptions()
 		m_pDocument->IsMixedEOL(m_nThisPane);
 	SetViewEols(COptionsMgr::Get(OPT_VIEW_WHITESPACE), mixedEOLs);
 
-	OnSize();
-	CCrystalTextView::OnSize();
-	Invalidate();
+	SetFont(theApp.m_pMainWnd->m_lfDiff, COptionsMgr::Get(OPT_CROSS_HATCH_DELETED_LINES));
 }
 
 /**
@@ -1074,7 +1074,6 @@ bool CMergeEditView::IsDiffVisible(const DIFFRANGE *diff, int nLinesBelow /*=0*/
 void CMergeEditView::DocumentsLoaded()
 {
 	RefreshOptions();
-	SetFont(theApp.m_pMainWnd->m_lfDiff);
 	UpdateLineInfoStatus();
 }
 

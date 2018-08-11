@@ -247,7 +247,7 @@ extern COptionDef
 <COLORREF> OPT_CLR_SELECTED_WORDDIFF_TEXT inline((_T("Settings/SelectedWordDifferenceTextColor"), RGB(0,0,0)));
 // Whether to cross-hatch deleted lines
 extern COptionDef
-<bool> OPT_CROSS_HATCH_DELETED_LINES inline((_T("Settings/CrossHatchDeletedLines"), false));
+<int> OPT_CROSS_HATCH_DELETED_LINES inline((_T("Settings/CrossHatchDeletedLines"), 0));
 // Whether to use default (theme) text colors
 extern COptionDef
 <bool> OPT_CLR_DEFAULT_TEXT_COLORING inline((_T("Settings/DefaultTextColoring"), true));

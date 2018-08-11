@@ -29,7 +29,7 @@ GetLineColors (in MergeEditView).
 class CGhostTextView : public CCrystalEditView
 {
 protected:
-	CGhostTextView(CChildFrame *, int, size_t);
+	CGhostTextView(HWindow *, CChildFrame *, int, size_t);
 
 private:
 	/**

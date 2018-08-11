@@ -35,8 +35,8 @@
 /**
  * @brief Constructor, initializes members.
  */
-CGhostTextView::CGhostTextView(CChildFrame *pDocument, int nThisPane, size_t ZeroInit)
-: CCrystalEditView(ZeroInit)
+CGhostTextView::CGhostTextView(HWindow *pWnd, CChildFrame *pDocument, int nThisPane, size_t ZeroInit)
+: CCrystalEditView(pWnd, ZeroInit)
 , m_pDocument(pDocument)
 , m_nThisPane(nThisPane)
 {
@@ -293,7 +293,7 @@ bool CGhostTextView::DrawSingleLine(HSurface *pdc, const RECT &rc, int nLineInde
 				DT_CENTER | DT_VCENTER | DT_NOPREFIX | DT_SINGLELINE | DT_END_ELLIPSIS);
 			return true;
 		}
-		if (COptionsMgr::Get(OPT_CROSS_HATCH_DELETED_LINES))
+		if (m_pHatchBrush)
 		{
 			int const nCharWidth = GetCharWidth();
 			int const nLineHeight = GetLineHeight();
@@ -334,15 +334,17 @@ void CGhostTextView::ZoomText(short amount)
 
 		lf.lfHeight = -MulDiv(nPointSize, nLogPixelsY, 72);
 
+		int const nHatchStyle = COptionsMgr::Get(OPT_CROSS_HATCH_DELETED_LINES);
+
 		for (int nPane = 0; nPane < MERGE_VIEW_COUNT; nPane++)
 		{
 			if (CCrystalTextView *const pView = m_pDocument->GetView(nPane))
 			{
-				pView->SetFont(lf);
+				pView->SetFont(lf, nHatchStyle);
 			}
 			if (CCrystalTextView *const pView = m_pDocument->GetDetailView(nPane))
 			{
-				pView->SetFont(lf);
+				pView->SetFont(lf, nHatchStyle);
 			}
 		}
 

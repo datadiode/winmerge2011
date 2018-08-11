@@ -86,8 +86,8 @@ static const unsigned int MAX_TAB_LEN = 64;  // Same as in CrystalViewText.cpp
 bool CCrystalEditView::m_bLastReplace = false;
 DWORD CCrystalEditView::m_dwLastReplaceFlags = 0;
 
-CCrystalEditView::CCrystalEditView(size_t ZeroInit)
-: CCrystalTextView(ZeroInit)
+CCrystalEditView::CCrystalEditView(HWindow *pWnd, size_t ZeroInit)
+: CCrystalTextView(pWnd, ZeroInit)
 {
 }
 

@@ -1986,6 +1986,7 @@ void CMainFrame::UpdateDirViewFont()
 
 void CMainFrame::UpdateMrgViewFont()
 {
+	int const nHatchStyle = COptionsMgr::Get(OPT_CROSS_HATCH_DELETED_LINES);
 	// Update document fonts
 	HWindow *pChild = NULL;
 	while ((pChild = m_pWndMDIClient->FindWindowEx(pChild, WinMergeWindowClass)) != NULL)
@@ -1998,9 +1999,9 @@ void CMainFrame::UpdateMrgViewFont()
 			do
 			{
 				if (CMergeEditView *pView = pSpecific->GetView(nSide))
-					pView->SetFont(m_lfDiff);
+					pView->SetFont(m_lfDiff, nHatchStyle);
 				if (CMergeDiffDetailView *pView = pSpecific->GetDetailView(nSide))
-					pView->SetFont(m_lfDiff);
+					pView->SetFont(m_lfDiff, nHatchStyle);
 			} while (nSide ^= 1);
 			pSpecific->AlignScrollPositions();
 		}
