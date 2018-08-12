@@ -611,7 +611,7 @@ void CMergeEditView::ShowDiff(bool bScroll)
 				COLORREF const crMargin = rgpView[0]->GetColor(COLORINDEX_SELMARGIN);
 				COLORREF const crBackground = rgpView[0]->GetColor(COLORINDEX_BKGND);
 				// Align scroll delta with brush used to draw deleted lines to avoid visual jitter
-				int nDelta = COptionsMgr::Get(OPT_CROSS_HATCH_DELETED_LINES) == 2 ? GetLineHeight() : 8;
+				int nDelta = COptionsMgr::Get(OPT_CROSS_HATCH_DELETED_LINES) == 2 ? GetLineHeight() : 16;
 				if (nrgScroll[0] < 0)
 					nDelta = -nDelta;
 				int nLimit = 5;
