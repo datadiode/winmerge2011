@@ -2874,8 +2874,11 @@ void CCrystalTextView::SetFont(LOGFONT const &lf, int nHatchStyle)
 				}
 			}
 		}
-		HBitmap *pBitmap = HBitmap::Create(size.cx, size.cy, 1, 1, pattern);
-		m_pHatchBrush = HBrush::CreatePatternBrush(pBitmap);
+		if (HBitmap *pBitmap = HBitmap::Create(size.cx, size.cy, 1, 1, pattern))
+		{
+			m_pHatchBrush = HBrush::CreatePatternBrush(pBitmap);
+			VERIFY(pBitmap->DeleteObject());
+		}
 		break;
 	}
 	OnSize();
