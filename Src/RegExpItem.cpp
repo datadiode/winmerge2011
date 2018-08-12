@@ -129,7 +129,7 @@ int regexp_item::process(const std::vector<regexp_item> &relist,
 		char const *const injectString(
 			!filter.is_uniliteral ? filter.injectString->A :
 			filter.uniliteral);
-		UINT const injectLength(
+		int const injectLength(
 			!filter.is_uniliteral ? filter.injectString->ByteLen() :
 			isdigit(filter.uniliteral[1]) ? filter.uniliteral[1] - '0' : 1);
 		char *buf = dst;
