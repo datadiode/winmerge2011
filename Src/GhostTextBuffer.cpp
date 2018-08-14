@@ -686,7 +686,7 @@ int CGhostTextBuffer::ComputeApparentLine(int nRealLine) const
 			blo = b + 1;
 	}
 	if (bhi < blo)
-		return bhi->nStartReal;
+		return (nRealLine - bhi->nStartReal) + bhi->nStartApparent;
 	// Should have found it; all real lines should be in a block
 	ASSERT(0);
 	return -1;
