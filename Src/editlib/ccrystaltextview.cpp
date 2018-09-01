@@ -1573,8 +1573,6 @@ void CCrystalTextView::ResetView()
 	m_nIdealCharPos = -1;
 	m_ptAnchor.x = 0;
 	m_ptAnchor.y = 0;
-	if (m_pTextBuffer)
-		m_pTextBuffer->InitParseCookie();
 	m_ptCursorPos.x = 0;
 	m_ptCursorPos.y = 0;
 	m_ptSelStart = m_ptSelEnd = m_ptCursorPos;
@@ -1584,10 +1582,14 @@ void CCrystalTextView::ResetView()
 		KillTimer(m_nDragSelTimer);
 	}
 	m_bDragSelection = false;
-	if (m_hWnd)
+	if (m_pTextBuffer)
 	{
-		InvalidateScreenRect();
-		UpdateCaret();
+		m_pTextBuffer->InitParseCookie();
+		if (m_hWnd)
+		{
+			InvalidateScreenRect();
+			UpdateCaret();
+		}
 	}
 	m_bShowInactiveSelection = true; // FP: reverted because I like it
 }
