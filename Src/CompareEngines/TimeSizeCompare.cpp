@@ -4,6 +4,7 @@
  * @brief Implementation file for TimeSizeCompare
  */
 #include "StdAfx.h"
+#include "Merge.h"
 #include "DiffItem.h"
 #include "DiffWrapper.h"
 #include "DiffContext.h"

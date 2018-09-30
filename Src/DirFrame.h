@@ -34,6 +34,7 @@ typedef std::list<CChildFrame *> MergeDocPtrList;
 typedef std::list<CHexMergeFrame *> HexMergeDocPtrList;
 class CTempPathContext;
 struct FileActionItem;
+class MergeCmdLineInfo;
 
 /**
  * @brief Frame window for Directory Compare window
@@ -92,8 +93,9 @@ public:
 
 // Implementation
 public:
-	bool InitCompare(LPCTSTR pszLeft, LPCTSTR pszRight, int nRecursive, CTempPathContext *);
+	bool InitCompare(LPCTSTR pszLeft, LPCTSTR pszRight, int nRecursive, const MergeCmdLineInfo *, CTempPathContext *);
 	void InitMrgmanCompare();
+	void RefreshOptions();
 	void Rescan(int nCompareSelected = 0);
 	int GetRecursive() const { return m_nRecursive; }
 	void CompareReady();
@@ -142,6 +144,7 @@ private:
 	MergeDocPtrList m_MergeDocs; /**< List of file compares opened from this compare */
 	HexMergeDocPtrList m_HexMergeDocs; /**< List of hex file compares opened from this compare */
 	int m_nRecursive; /**< Is current compare recursive? (ternary logic - 2 means flat) */
+	int m_nCompMethod; /**< Compare method */
 	String m_strLeftDesc; /**< Left side desription text */
 	String m_strRightDesc; /**< Left side desription text */
 };

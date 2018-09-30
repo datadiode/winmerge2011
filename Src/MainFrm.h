@@ -97,6 +97,7 @@ public:
 		DWORD dwLeftFlags,
 		DWORD dwRightFlags,
 		int nRecursive = 0,
+		const MergeCmdLineInfo *cmdInfo = NULL,
 		CDirFrame * = NULL);
 	CEditorFrame *ShowMergeDoc(CDirFrame *,
 		FileLocation & filelocLeft,

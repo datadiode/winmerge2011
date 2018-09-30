@@ -55,6 +55,7 @@ public:
 	int m_nSingleInstance; /**< Allow only one instance of WinMerge executable. */
 	int m_nCmdShow; /**< Initial state of the application's window. */
 	int m_nRecursive; /**< Include sub folder in directories compare. */
+	int m_nCompMethod; /**< Compare method */
 	bool m_bNonInteractive; /**< Suppress user's notifications. */
 	bool m_bShowUsage; /**< Show a brief reminder to command line arguments. */
 	int m_nCodepage;  /**< Codepage. */

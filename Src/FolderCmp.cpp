@@ -4,6 +4,7 @@
  * @brief Implementation file for FolderCmp
  */
 #include "StdAfx.h"
+#include "Merge.h"
 #include "DiffUtils.h"
 #include "ByteCompare.h"
 #include "LogFile.h"

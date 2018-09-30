@@ -108,6 +108,7 @@ MergeCmdLineInfo::MergeCmdLineInfo(LPCTSTR q):
 	m_invocationMode(InvocationModeNone),
 	m_bExitIfNoDiff(Disabled),
 	m_nRecursive(0),
+	m_nCompMethod(-1),
 	m_bNonInteractive(false),
 	m_nSingleInstance(-1),
 	m_bShowUsage(false),
@@ -295,6 +296,21 @@ void MergeCmdLineInfo::ParseWinMergeCmdLine(LPCTSTR q)
 		{
 			// -f "mask" - file filter mask ("*.h *.cpp")
 			q = EatParam(q, m_sFileFilter);
+		}
+		else if (param == _T("m"))
+		{
+			// -m "method" - compare method
+			q = EatParam(q, param);
+			if (param == _T("Full"))
+				m_nCompMethod = CMP_CONTENT;
+			else if (param == _T("Quick"))
+				m_nCompMethod = CMP_QUICK_CONTENT;
+			else if (param == _T("Date"))
+				m_nCompMethod = CMP_DATE;
+			else if (param == _T("SizeDate"))
+				m_nCompMethod = CMP_DATE_SIZE;
+			else if (param == _T("Size"))
+				m_nCompMethod = CMP_SIZE;
 		}
 		else if (param == _T("t"))
 		{

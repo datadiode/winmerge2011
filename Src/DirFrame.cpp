@@ -85,6 +85,7 @@ CDirFrame::CDirFrame(CMainFrame *pMDIFrame)
 , m_pCtxt(NULL)
 , m_pCompareStats(new CompareStats)
 , m_nRecursive(0)
+, m_nCompMethod(-1)
 , m_pTempPathContext(NULL)
 {
 	Subclass(pMDIFrame->CreateChildHandle());

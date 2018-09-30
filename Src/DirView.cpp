@@ -1053,7 +1053,7 @@ void CDirView::OpenSelection(LPCTSTR szCompareAs, UINT idCompareAs)
 			filelocLeft, filelocRight,
 			leftFlags | FFILEOPEN_NOMRU | FFILEOPEN_DETECT,
 			rightFlags | FFILEOPEN_NOMRU | FFILEOPEN_DETECT,
-			m_pFrame->GetRecursive(), m_pFrame);
+			m_pFrame->GetRecursive(), NULL, m_pFrame);
 	}
 }
 

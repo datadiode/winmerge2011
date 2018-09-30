@@ -1450,6 +1450,7 @@ void CMainFrame::OnOptions()
 				static_cast<CHexMergeFrame *>(pDocFrame)->RecalcBytesPerLine();
 				break;
 			case FRAME_FOLDER:
+				static_cast<CDirFrame *>(pDocFrame)->RefreshOptions();
 				break;
 			}
 		}
@@ -1476,7 +1477,7 @@ bool CMainFrame::DoFileOpen(
 {
 	PackingInfo packingInfo;
 	return DoFileOpen(packingInfo, ID_MERGE_COMPARE,
-		filelocLeft, filelocRight, dwLeftFlags, dwRightFlags, nRecursive, pDirDoc);
+		filelocLeft, filelocRight, dwLeftFlags, dwRightFlags, nRecursive, NULL, pDirDoc);
 }
 
 CEditorFrame *CMainFrame::ActivateOpenDoc(
@@ -1556,6 +1557,7 @@ bool CMainFrame::DoFileOpen(
 	DWORD dwLeftFlags,
 	DWORD dwRightFlags,
 	int nRecursive,
+	const MergeCmdLineInfo *cmdInfo,
 	CDirFrame *pDirDoc)
 {
 	// If the dirdoc we are supposed to use is busy doing a diff, bail out
@@ -1855,7 +1857,7 @@ bool CMainFrame::DoFileOpen(
 			// exception. There is no point in checking return value.
 			bool bNeedCompare = pDirDoc->InitCompare(
 				filelocLeft.filepath.c_str(), filelocRight.filepath.c_str(),
-				nRecursive, pTempPathContext);
+				nRecursive, cmdInfo, pTempPathContext);
 			LogFile.Write(CLogFile::LNOTICE, _T("Open dirs: Left: %s\n\tRight: %s."),
 				filelocLeft.filepath.c_str(), filelocRight.filepath.c_str());
 
@@ -3188,7 +3190,7 @@ void CMainFrame::OnFileStartCollect()
 		String path = GetClearTempPath(pTempPathContext, _T("0"));
 		pTempPathContext->m_strLeftDisplayRoot.push_back(_T('*'));
 		pTempPathContext->m_strRightDisplayRoot = m_lastCollectFolder;
-		pDirDoc->InitCompare(path.c_str(), m_lastCollectFolder.c_str(), 3, pTempPathContext);
+		pDirDoc->InitCompare(path.c_str(), m_lastCollectFolder.c_str(), 3, NULL, pTempPathContext);
 		String empty;
 		pDirDoc->SetDescriptions(empty, empty);
 		pDirDoc->ActivateFrame();
@@ -3312,7 +3314,7 @@ bool CMainFrame::ParseArgsAndDoOpen(const MergeCmdLineInfo &cmdInfo)
 					packingInfo, ID_MERGE_COMPARE,
 					filelocLeft, filelocRight,
 					cmdInfo.m_dwLeftFlags, cmdInfo.m_dwRightFlags,
-					cmdInfo.m_nRecursive);
+					cmdInfo.m_nRecursive, &cmdInfo);
 			}
 		}
 		else if (ProjectFile::IsProjectFile(filelocLeft.filepath.c_str()))

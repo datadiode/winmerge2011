@@ -86,7 +86,7 @@ bool CDirFrame::InitContext(LPCTSTR pszLeft, LPCTSTR pszRight, int nRecursive, D
  * @param [in] paths Paths to compare
  * @param [in] nRecursive If != 0 subdirectories are included to compare.
  */
-bool CDirFrame::InitCompare(LPCTSTR pszLeft, LPCTSTR pszRight, int nRecursive, CTempPathContext *pTempPathContext)
+bool CDirFrame::InitCompare(LPCTSTR pszLeft, LPCTSTR pszRight, int nRecursive, const MergeCmdLineInfo *cmdInfo, CTempPathContext *pTempPathContext)
 {
 	m_pDirView->DeleteAllItems();
 
@@ -109,6 +109,12 @@ bool CDirFrame::InitCompare(LPCTSTR pszLeft, LPCTSTR pszRight, int nRecursive, C
 	}
 
 	m_nRecursive = nRecursive;
+
+	if (cmdInfo)
+	{
+		m_nCompMethod = cmdInfo->m_nCompMethod;
+	}
+
 	return bNeedCompare;
 }
 
@@ -326,6 +332,16 @@ CDirFrame::AllowUpwardDirectory(String &leftParent, String &rightParent)
 }
 
 /**
+ * @brief Refresh cached options.
+ *
+ * NB: This cancels any compare method specified on the command line.
+ */
+void CDirFrame::RefreshOptions()
+{
+	m_nCompMethod = -1;
+}
+
+/**
  * @brief Perform directory comparison again from scratch
  */
 void CDirFrame::Rescan(int nCompareSelected)
@@ -351,7 +367,7 @@ void CDirFrame::Rescan(int nCompareSelected)
 	m_pCtxt->m_options.bIgnoreCase = COptionsMgr::Get(OPT_CMP_IGNORE_CASE);
 	m_pCtxt->m_options.bIgnoreEol = COptionsMgr::Get(OPT_CMP_IGNORE_EOL);
 	m_pCtxt->m_options.bApplyLineFilters = COptionsMgr::Get(OPT_LINEFILTER_ENABLED);
-	m_pCtxt->m_nCompMethod = COptionsMgr::Get(OPT_CMP_METHOD);
+	m_pCtxt->m_nCompMethod = m_nCompMethod != -1 ? m_nCompMethod : COptionsMgr::Get(OPT_CMP_METHOD);
 	m_pCtxt->m_bGuessEncoding = COptionsMgr::Get(OPT_CP_DETECT);
 	m_pCtxt->m_bIgnoreSmallTimeDiff = COptionsMgr::Get(OPT_IGNORE_SMALL_FILETIME);
 	m_pCtxt->m_bStopAfterFirstDiff = COptionsMgr::Get(OPT_CMP_STOP_AFTER_FIRST);

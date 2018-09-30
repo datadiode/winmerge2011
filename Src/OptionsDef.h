@@ -6,6 +6,71 @@
 #ifndef inline
 #define inline(args)
 
+/** @enum COMPARE_TYPE
+ * @brief Different foldercompare methods.
+ * These values are the foldercompare methods WinMerge supports.
+ */
+
+/** @var CMP_CONTENT
+ * @brief Normal by content compare.
+ * This compare type is first, default and all-seeing compare type.
+ * diffutils is used for producing compare results. So all limitations
+ * of diffutils (like buffering) apply to this compare method. But this
+ * is also currently only compare method that produces difference lists
+ * we can use in file compare.
+ */
+
+/** @var CMP_QUICK_CONTENT
+ * @brief Faster byte per byte -compare.
+ * This type of compare was a response for needing faster compare results
+ * in folder compare. It independent from diffutils, and fully customised
+ * for WinMerge. It basically does byte-per-byte compare, still implementing
+ * different whitespace ignore options.
+ *
+ * Optionally this compare type can be stopped when first difference is found.
+ * Which gets compare as fast as possible. But misses sometimes binary files
+ * if zero bytes aren't found before first difference. Also difference counts
+ * are not useful with that option.
+ */
+
+/** @var CMP_DATE
+ * @brief Compare by modified date.
+ * This compare type was added after requests and realization that in some
+ * situations difference in file's timestamps is enough to judge them
+ * different. E.g. when modifying files in local machine, file timestamps
+ * are certainly different after modifying them. This method doesn't even
+ * open files for reading them. It only reads file's infos for timestamps
+ * and compares them.
+ *
+ * This is no doubt fastest way to compare files.
+ */
+
+/** @var CMP_DATE_SIZE
+ * @brief Compare by date and then by size.
+ * This method is basically same than CMP_DATE, but it adds check for file
+ * sizes if timestamps are identical. This is because there are situations
+ * timestamps can't be trusted alone, especially with network shares. Adding
+ * checking for file sizes adds some more reliability for results with
+ * minimal increase in compare time.
+ */
+
+/** @var CMP_SIZE
+ * @brief Compare by file size.
+ * This compare method compares file sizes. This isn't quite accurate method,
+ * other than it can detect files that certainly differ. But it can show lot of
+ * different files as identical too. Advantage is in some use cases where different
+ * size always means files are different. E.g. automatically created logs - when
+ * more data is added size increases.
+ */
+enum COMPARE_TYPE
+{
+	CMP_CONTENT,
+	CMP_QUICK_CONTENT,
+	CMP_DATE,
+	CMP_DATE_SIZE,
+	CMP_SIZE,
+};
+
 /**
  * @brief TAB handling options
  */
