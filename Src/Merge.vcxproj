@@ -927,6 +927,7 @@
     <po Include="..\Translations\WinMerge\Italian.po" />
     <po Include="..\Translations\WinMerge\Japanese.po" />
     <po Include="..\Translations\WinMerge\Korean.po" />
+    <po Include="..\Translations\WinMerge\Lithuanian.po" />
     <po Include="..\Translations\WinMerge\Norwegian.po" />
     <po Include="..\Translations\WinMerge\Persian.po" />
     <po Include="..\Translations\WinMerge\Polish.po" />
