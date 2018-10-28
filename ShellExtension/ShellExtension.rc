@@ -86,6 +86,8 @@ END
 #include "Languages\ShellExtensionJapanese.rc"
 #pragma code_page(949)
 #include "Languages\ShellExtensionKorean.rc"
+#pragma code_page(1257)
+#include "Languages\ShellExtensionLithuanian.rc"
 #pragma code_page(1252)
 #include "Languages\ShellExtensionNorwegian.rc"
 #pragma code_page(1256)

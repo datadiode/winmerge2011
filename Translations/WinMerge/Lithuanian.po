@@ -1,0 +1,5708 @@
+# This file is part from WinMerge <http://winmerge.org/>
+# Released under the "GNU General Public License"
+#
+# Translators:
+# * Tichij <tichij at mail.com>
+#
+# ID line follows -- this is updated by SVN
+# $Id: Lithuanian.po
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: WinMerge\n"
+"Report-Msgid-Bugs-To: http://bugs.winmerge.org/\n"
+"POT-Creation-Date: 2018-07-29 15:47+0000\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Tichij <tichij@mail.com>\n"
+"Language-Team: Lithuanian <winmerge-translate@lists.sourceforge.net>\n"
+"Language: lt\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CP1257\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Poedit-Language: Lithuanian\n"
+"X-Poedit-SourceCharset: CP1257\n"
+"X-Poedit-Basepath: ../../Src/\n"
+"X-Generator: Poedit 2.1.1\n"
+
+#. LANGUAGE, SUBLANGUAGE
+#, c-format
+msgid "LANG_ENGLISH, SUBLANG_ENGLISH_US"
+msgstr "LANG_LITHUANIAN, SUBLANG_DEFAULT"
+
+#. Codepage
+#, c-format
+msgid "1252"
+msgstr "1257"
+
+#: Merge.rc:17
+#: Merge.rc:148
+#: Merge.rc:270
+#: Merge.rc:344
+#, c-format
+msgid "&File"
+msgstr "&Failas"
+
+#: Merge.rc:19
+#: Merge.rc:150
+#: Merge.rc:272
+#: Merge.rc:346
+#, c-format
+msgid "&New\tCtrl+N"
+msgstr "&Naujas\tCtrl+N"
+
+#: Merge.rc:20
+#: Merge.rc:151
+#: Merge.rc:273
+#: Merge.rc:347
+#, c-format
+msgid "&Open...\tCtrl+O"
+msgstr "&Atverti...\tCtrl+O"
+
+#: Merge.rc:21
+#: Merge.rc:152
+#: Merge.rc:274
+#: Merge.rc:348
+#, c-format
+msgid "Op&en Conflict File..."
+msgstr "Atv&erti konfliktø failà..."
+
+#: Merge.rc:22
+#: Merge.rc:153
+#: Merge.rc:275
+#: Merge.rc:349
+#, c-format
+msgid "Start Collec&tion..."
+msgstr "Pradë&ti kaupimà..."
+
+#: Merge.rc:24
+#: Merge.rc:155
+#: Merge.rc:277
+#: Merge.rc:351
+#, c-format
+msgid "Open Pro&ject...\tCtrl+J"
+msgstr "Atverti pro&jektà...\tCtrl+J"
+
+#: Merge.rc:25
+#: Merge.rc:156
+#: Merge.rc:278
+#: Merge.rc:352
+#, c-format
+msgid "Sa&ve Project..."
+msgstr "Ið&saugoti projektà..."
+
+#: Merge.rc:27
+#: Merge.rc:158
+#: Merge.rc:280
+#: Merge.rc:354
+#, c-format
+msgid "Recent Projects"
+msgstr "Paskutinieji projektai"
+
+#: Merge.rc:29
+#: Merge.rc:370
+#, c-format
+msgid "L&eft Read-only"
+msgstr "&Kairysis tik skaitymui"
+
+#: Merge.rc:30
+#: Merge.rc:371
+#, c-format
+msgid "Ri&ght Read-only"
+msgstr "&Deðinysis tik skaitymui"
+
+#: Merge.rc:32
+#, c-format
+msgid "Collect &Mode\tF9"
+msgstr "Kaupi&mo reþimas\tF9"
+
+#: Merge.rc:34
+#, c-format
+msgid "File En&coding"
+msgstr "Failo ko&duotë"
+
+#: Merge.rc:36
+#: Merge.rc:172
+#: Merge.rc:284
+#: Merge.rc:384
+#, c-format
+msgid "E&xit"
+msgstr "&Iðeiti"
+
+#: Merge.rc:38
+#: Merge.rc:174
+#: Merge.rc:286
+#: Merge.rc:386
+#, c-format
+msgid "&Edit"
+msgstr "R&edaguoti"
+
+#: Merge.rc:40
+#: Merge.rc:183
+#: Merge.rc:396
+#, c-format
+msgid "Select &All\tCtrl+A"
+msgstr "P&aþymëti viskà\tCtrl+A"
+
+#: Merge.rc:42
+#: Merge.rc:188
+#: Merge.rc:288
+#: Merge.rc:414
+#, c-format
+msgid "&Options..."
+msgstr "Nu&ostatos..."
+
+#: Merge.rc:44
+#: Merge.rc:190
+#: Merge.rc:290
+#: Merge.rc:416
+#, c-format
+msgid "&View"
+msgstr "&Vaizdas"
+
+#: Merge.rc:46
+#, c-format
+msgid "Show &Identical Items"
+msgstr "Rodyti &identiðkus elementus"
+
+#: Merge.rc:47
+#, c-format
+msgid "Show &Different Items"
+msgstr "Ro&dyti skirtingus elementus"
+
+#: Merge.rc:48
+#, c-format
+msgid "Show L&eft Unique Items"
+msgstr "Rodyti unikalius &elementus kairëje"
+
+#: Merge.rc:49
+#, c-format
+msgid "Show Ri&ght Unique Items"
+msgstr "Rodyti unikalius ele&mentus deðinëje"
+
+#: Merge.rc:50
+#, c-format
+msgid "Show S&kipped Items"
+msgstr "Rodyti praleis&tus elementus"
+
+#: Merge.rc:51
+#, c-format
+msgid "S&how Binary Files"
+msgstr "R&odyti binarinius failus"
+
+#: Merge.rc:53
+#, c-format
+msgid "Show Hidd&en Items"
+msgstr "Rodyti slepiamus eleme&ntus"
+
+#: Merge.rc:55
+#, c-format
+msgid "Tree &Mode"
+msgstr "&Medþio reþimas"
+
+#: Merge.rc:56
+#, c-format
+msgid "E&xpand All Subfolders"
+msgstr "Ið&skleisti visus pakatalogius"
+
+#: Merge.rc:57
+#, c-format
+msgid "&Collapse All Subfolders"
+msgstr "Sus&kleisti visus pakatalogius"
+
+#: Merge.rc:59
+#: Merge.rc:292
+#: Merge.rc:418
+#, c-format
+msgid "Select &Font..."
+msgstr "Parinkti &ðriftà..."
+
+#: Merge.rc:60
+#: Merge.rc:293
+#: Merge.rc:419
+#, c-format
+msgid "Use Default F&ont"
+msgstr "Naud&oti numatytàjá ðriftà"
+
+#: Merge.rc:62
+#: Merge.rc:201
+#: Merge.rc:295
+#: Merge.rc:457
+#, c-format
+msgid "&Toolbar"
+msgstr "Mygtukø juos&ta"
+
+#: Merge.rc:64
+#: Merge.rc:203
+#: Merge.rc:297
+#: Merge.rc:459
+#, c-format
+msgid "&None"
+msgstr "&Nerodoma"
+
+#: Merge.rc:65
+#: Merge.rc:204
+#: Merge.rc:298
+#: Merge.rc:460
+#, c-format
+msgid "&Small"
+msgstr "Maþ&i mygtukai"
+
+#: Merge.rc:66
+#: Merge.rc:205
+#: Merge.rc:299
+#: Merge.rc:461
+#, c-format
+msgid "&Big"
+msgstr "&Dideli mygtukai"
+
+#: Merge.rc:68
+#: Merge.rc:207
+#: Merge.rc:301
+#: Merge.rc:463
+#, c-format
+msgid "&Status Bar"
+msgstr "Bû&senos juosta"
+
+#: Merge.rc:69
+#: Merge.rc:208
+#: Merge.rc:302
+#: Merge.rc:464
+#, c-format
+msgid "Ta&b Bar"
+msgstr "&Korteliø juosta"
+
+#: Merge.rc:70
+#, c-format
+msgid "Comp&are Statistics"
+msgstr "Lyginimo st&atistika"
+
+#: Merge.rc:72
+#: Merge.rc:210
+#: Merge.rc:304
+#: Merge.rc:468
+#, c-format
+msgid "&Language..."
+msgstr "Ka&lba..."
+
+#: Merge.rc:74
+#: Merge.rc:212
+#: Merge.rc:470
+#, c-format
+msgid "Refresh\tF5"
+msgstr "Atnaujinti\tF5"
+
+#: Merge.rc:75
+#, c-format
+msgid "&Refresh Selected\tCtrl+F5"
+msgstr "&Atnaujinti paþymëtà\tCtrl+F5"
+
+#: Merge.rc:77
+#: Merge.rc:214
+#: Merge.rc:472
+#, c-format
+msgid "&Merge"
+msgstr "&Sulieti"
+
+#: Merge.rc:79
+#, c-format
+msgid "Co&mpare\tEnter"
+msgstr "Ly&ginti\tEnter"
+
+#: Merge.rc:81
+#: Merge.rc:216
+#: Merge.rc:474
+#, c-format
+msgid "&Next Difference\tAlt+Down"
+msgstr "&Kitas skirtumas\tAlt+Down"
+
+#: Merge.rc:82
+#: Merge.rc:217
+#: Merge.rc:475
+#, c-format
+msgid "&Previous Difference\tAlt+Up"
+msgstr "&Praeitas skirtumas\tAlt+Up"
+
+#: Merge.rc:84
+#: Merge.rc:219
+#: Merge.rc:477
+#, c-format
+msgid "&First Difference\tAlt+Home"
+msgstr "&Pirmas skirtumas\tAlt+Home"
+
+#: Merge.rc:85
+#: Merge.rc:478
+#, c-format
+msgid "&Current Difference\tAlt+Enter"
+msgstr "&Dabartinis skirtumas\tAlt+Enter"
+
+#: Merge.rc:86
+#: Merge.rc:220
+#: Merge.rc:479
+#, c-format
+msgid "&Last Difference\tAlt+End"
+msgstr "&Paskutinis skirtumas\tAlt+End"
+
+#: Merge.rc:88
+#: Merge.rc:222
+#: Merge.rc:481
+#, c-format
+msgid "Copy to &Right\tAlt+Right"
+msgstr "Kopijuoti á &deðinæ\tAlt+Right"
+
+#: Merge.rc:89
+#: Merge.rc:223
+#: Merge.rc:482
+#, c-format
+msgid "Copy to L&eft\tAlt+Left"
+msgstr "Kopijuoti á k&airæ\tAlt+Left"
+
+#: Merge.rc:91
+#, c-format
+msgid "&Delete\tDel"
+msgstr "&Trinti\tDel"
+
+#: Merge.rc:93
+#: Merge.rc:231
+#: Merge.rc:306
+#: Merge.rc:493
+#, c-format
+msgid "&Tools"
+msgstr "Á&rankiai"
+
+#: Merge.rc:95
+#: Merge.rc:630
+#, c-format
+msgid "&Customize Columns..."
+msgstr "&Parinkti stulpelius..."
+
+#: Merge.rc:96
+#: Merge.rc:233
+#: Merge.rc:308
+#: Merge.rc:495
+#, c-format
+msgid "&Filters..."
+msgstr "&Filtrai..."
+
+#: Merge.rc:97
+#: Merge.rc:234
+#: Merge.rc:309
+#: Merge.rc:496
+#, c-format
+msgid "&Generate Patch..."
+msgstr "&Generuoti pataisà..."
+
+#: Merge.rc:98
+#: Merge.rc:235
+#: Merge.rc:497
+#, c-format
+msgid "Generate &Report..."
+msgstr "Ku&rti ataskaità..."
+
+#: Merge.rc:99
+#, c-format
+msgid "Save to &Excel spreadsheet"
+msgstr "Iðsaugoti á „&Excel“ skaièiuoklæ"
+
+#: Merge.rc:101
+#: Merge.rc:106
+#: Merge.rc:111
+#, c-format
+msgid "&All"
+msgstr "V&iskà"
+
+#: Merge.rc:102
+#: Merge.rc:107
+#: Merge.rc:112
+#, c-format
+msgid "&Selected"
+msgstr "Pa&sirinktas"
+
+#: Merge.rc:104
+#, c-format
+msgid "Show in Excel &Viewer"
+msgstr "Rodyti su „Excel &Viewer“'iu"
+
+#: Merge.rc:109
+#, c-format
+msgid "&Print with Excel Viewer"
+msgstr "S&pausdinti su „Excel Viewer“'iu"
+
+#: Merge.rc:115
+#: Merge.rc:237
+#: Merge.rc:311
+#: Merge.rc:500
+#, c-format
+msgid "&Debug"
+msgstr "&Derinimas"
+
+#: Merge.rc:117
+#: Merge.rc:239
+#: Merge.rc:313
+#: Merge.rc:502
+#, c-format
+msgid "&Load Config..."
+msgstr "Áke&lti konfigûracijà..."
+
+#: Merge.rc:118
+#: Merge.rc:240
+#: Merge.rc:314
+#: Merge.rc:503
+#, c-format
+msgid "&Reset Options"
+msgstr "Atku&rti parametrus"
+
+#: Merge.rc:120
+#: Merge.rc:242
+#: Merge.rc:316
+#: Merge.rc:505
+#, c-format
+msgid "&Window"
+msgstr "&Langas"
+
+#: Merge.rc:122
+#: Merge.rc:244
+#: Merge.rc:318
+#: Merge.rc:507
+#, c-format
+msgid "Cl&ose"
+msgstr "Uþ&verti"
+
+#: Merge.rc:123
+#: Merge.rc:245
+#: Merge.rc:319
+#: Merge.rc:508
+#, c-format
+msgid "Clo&se All"
+msgstr "Uþv&erti viskà"
+
+#: Merge.rc:125
+#: Merge.rc:247
+#: Merge.rc:321
+#: Merge.rc:510
+#, c-format
+msgid "Change &Pane\tF6"
+msgstr "Keisti &polangá\tF6"
+
+#: Merge.rc:127
+#: Merge.rc:249
+#: Merge.rc:323
+#: Merge.rc:512
+#, c-format
+msgid "Tile &Horizontally"
+msgstr "Iðkloti &gulsèiai"
+
+#: Merge.rc:128
+#: Merge.rc:250
+#: Merge.rc:324
+#: Merge.rc:513
+#, c-format
+msgid "Tile &Vertically"
+msgstr "Iðkloti &staèiai"
+
+#: Merge.rc:129
+#: Merge.rc:251
+#: Merge.rc:325
+#: Merge.rc:514
+#, c-format
+msgid "&Cascade"
+msgstr "&Iðdëstyti pakopomis"
+
+#: Merge.rc:131
+#: Merge.rc:253
+#: Merge.rc:327
+#: Merge.rc:516
+#: Merge.rc:1693
+#, c-format
+msgid "&Help"
+msgstr "&Þinynas"
+
+#: Merge.rc:133
+#: Merge.rc:255
+#: Merge.rc:329
+#: Merge.rc:518
+#, c-format
+msgid "&WinMerge Help\tF1"
+msgstr "&„WinMerge“ þinynas\tF1"
+
+#: Merge.rc:135
+#: Merge.rc:257
+#: Merge.rc:331
+#: Merge.rc:520
+#, c-format
+msgid "R&elease Notes"
+msgstr "L&aidos informacija"
+
+#: Merge.rc:136
+#: Merge.rc:258
+#: Merge.rc:332
+#: Merge.rc:521
+#, c-format
+msgid "&Translations"
+msgstr "Ver&timai"
+
+#: Merge.rc:137
+#: Merge.rc:259
+#: Merge.rc:333
+#: Merge.rc:522
+#, c-format
+msgid "C&onfiguration"
+msgstr "K&onfigûracija"
+
+#: Merge.rc:139
+#: Merge.rc:261
+#: Merge.rc:335
+#: Merge.rc:524
+#, c-format
+msgid "&GNU General Public License"
+msgstr "&GNU Bendroji vieðoji licencija"
+
+#: Merge.rc:140
+#: Merge.rc:262
+#: Merge.rc:336
+#: Merge.rc:525
+#, c-format
+msgid "&About WinMerge..."
+msgstr "&Apie „WinMerge“..."
+
+#: Merge.rc:160
+#: Merge.rc:356
+#, c-format
+msgid "&Save\tCtrl+S"
+msgstr "Ið&saugoti\tCtrl+S"
+
+#: Merge.rc:161
+#: Merge.rc:357
+#, c-format
+msgid "Save &Left"
+msgstr "Iðsaugoti &kairájá"
+
+#: Merge.rc:163
+#: Merge.rc:168
+#: Merge.rc:359
+#: Merge.rc:364
+#, c-format
+msgid "&Save"
+msgstr "Ið&saugoti"
+
+#: Merge.rc:164
+#: Merge.rc:169
+#: Merge.rc:360
+#: Merge.rc:365
+#, c-format
+msgid "Save &As..."
+msgstr "Iðs&augoti kaip..."
+
+#: Merge.rc:166
+#: Merge.rc:362
+#, c-format
+msgid "Save &Right"
+msgstr "Iðsaugoti &deðinájá"
+
+#: Merge.rc:176
+#: Merge.rc:388
+#, c-format
+msgid "&Undo\tCtrl+Z"
+msgstr "Atða&ukti\tCtrl+Z"
+
+#: Merge.rc:177
+#: Merge.rc:389
+#, c-format
+msgid "&Redo\tCtrl+Y"
+msgstr "Paka&rtoti\tCtrl+Y"
+
+#: Merge.rc:179
+#: Merge.rc:391
+#, c-format
+msgid "Cu&t\tCtrl+X"
+msgstr "Iðkirp&ti\tCtrl+X"
+
+#: Merge.rc:180
+#: Merge.rc:392
+#, c-format
+msgid "&Copy\tCtrl+C"
+msgstr "&Kopijuoti\tCtrl+C"
+
+#: Merge.rc:181
+#: Merge.rc:393
+#, c-format
+msgid "&Paste\tCtrl+V"
+msgstr "Áter&pti\tCtrl+V"
+
+#: Merge.rc:185
+#: Merge.rc:398
+#, c-format
+msgid "F&ind...\tCtrl+F"
+msgstr "R&asti...\tCtrl+F"
+
+#: Merge.rc:186
+#: Merge.rc:399
+#, c-format
+msgid "R&eplace...\tCtrl+H"
+msgstr "&Pakeisti...\tCtrl+H"
+
+#: Merge.rc:192
+#: Merge.rc:420
+#, c-format
+msgid "&Zoom"
+msgstr "&Keisti mastelá"
+
+#: Merge.rc:194
+#: Merge.rc:422
+#, c-format
+msgid "Zoom &In\tCtrl++"
+msgstr "Did&inti\tCtrl++"
+
+#: Merge.rc:195
+#: Merge.rc:423
+#, c-format
+msgid "Zoom &Out\tCtrl+-"
+msgstr "Maþint&i\tCtrl+-"
+
+#: Merge.rc:196
+#: Merge.rc:424
+#, c-format
+msgid "&Normal\tCtrl+*"
+msgstr "&Normalus\tCtrl+*"
+
+#: Merge.rc:199
+#: Merge.rc:447
+#, c-format
+msgid "&Lock Panes"
+msgstr "Uþrakinti po&langius"
+
+#: Merge.rc:225
+#: Merge.rc:484
+#, c-format
+msgid "C&opy to Right and Advance\tAlt+Ctrl+Right"
+msgstr "K&opijuoti á deðinæ ir Daugiau\tAlt+Ctrl+Right"
+
+#: Merge.rc:226
+#: Merge.rc:485
+#, c-format
+msgid "Copy &to Left and Advance\tAlt+Ctrl+Left"
+msgstr "Kopijuo&ti á kairæ ir Daugiau\tAlt+Ctrl+Left"
+
+#: Merge.rc:228
+#: Merge.rc:487
+#, c-format
+msgid "Copy &All to Right"
+msgstr "Kopijuoti &viskà á deðinæ"
+
+#: Merge.rc:229
+#: Merge.rc:488
+#, c-format
+msgid "Cop&y All to Left"
+msgstr "Kop&ijuoti viskà á kairæ"
+
+#: Merge.rc:282
+#, c-format
+msgid "Use &desktop specific settings"
+msgstr "Nau&doti specifinius nustatymus"
+
+#: Merge.rc:368
+#, c-format
+msgid "Print Previe&w"
+msgstr "Spaudinio perþiûr&a"
+
+#: Merge.rc:373
+#, c-format
+msgid "&Convert Line Endings to"
+msgstr "Keisti eiluèiø pabaigos formatà á"
+
+#: Merge.rc:375
+#, c-format
+msgid "&Windows (CRLF)"
+msgstr "&Windows (CRLF)"
+
+#: Merge.rc:376
+#, c-format
+msgid "&Unix (LF)"
+msgstr "&Unix (LF)"
+
+#: Merge.rc:377
+#, c-format
+msgid "&Mac (CR)"
+msgstr "&Mac (CR)"
+
+#: Merge.rc:380
+#, c-format
+msgid "&Merge Mode\tF9"
+msgstr "Sulieji&mo reþimas\tF9"
+
+#: Merge.rc:382
+#, c-format
+msgid "&File Encoding..."
+msgstr "&Failo koduotë..."
+
+#: Merge.rc:395
+#, c-format
+msgid "Select Line &Difference\tF4"
+msgstr "Paþymëti &skirtumà\tF4"
+
+#: Merge.rc:401
+#, c-format
+msgid "Advanced"
+msgstr "Daugiau"
+
+#: Merge.rc:403
+#, c-format
+msgid "&Copy With Line Numbers\tCtrl+Shift+C"
+msgstr "&Kopijuoti su eiluèiø numeriais\tCtrl+Shift+C"
+
+#: Merge.rc:405
+#, c-format
+msgid "&Bookmarks"
+msgstr "&Þymës"
+
+#: Merge.rc:407
+#, c-format
+msgid "&Toggle Bookmark\tCtrl+F2"
+msgstr "&Uþdëti þymæ\tCtrl+F2"
+
+#: Merge.rc:408
+#, c-format
+msgid "&Next Bookmark\tF2"
+msgstr "&Kita þymë\tF2"
+
+#: Merge.rc:409
+#, c-format
+msgid "&Previous bookmark\tShift+F2"
+msgstr "&Ankstesnë þyma\tShift+F2"
+
+#: Merge.rc:410
+#, c-format
+msgid "&Clear All Bookmarks"
+msgstr "&Iðvalyti visas þymes"
+
+#: Merge.rc:412
+#, c-format
+msgid "&Go To...\tCtrl+G"
+msgstr "&Pereiti á...\tCtrl+G"
+
+#: Merge.rc:426
+#, c-format
+msgid "Syntax Highlight"
+msgstr "Sintaksës paryðkinimas"
+
+#: Merge.rc:428
+#, c-format
+msgid "No Highlighting"
+msgstr "Nenaudoti paryðkinimo"
+
+#: Merge.rc:431
+#, c-format
+msgid "&Context"
+msgstr "&Kontekstas"
+
+#: Merge.rc:433
+#, c-format
+msgid "&Unlimited"
+msgstr "&Neribota"
+
+#: Merge.rc:435
+#, c-format
+msgid "&0 Lines"
+msgstr "&0 eiluèiø"
+
+#: Merge.rc:436
+#, c-format
+msgid "&1 Line"
+msgstr "&1 eilutë"
+
+#: Merge.rc:437
+#, c-format
+msgid "&2 Lines"
+msgstr "&2 eilutës"
+
+#: Merge.rc:438
+#, c-format
+msgid "&3 Lines"
+msgstr "&3 eilutës"
+
+#: Merge.rc:439
+#, c-format
+msgid "&4 Lines"
+msgstr "&4 eilutës"
+
+#: Merge.rc:440
+#, c-format
+msgid "&5 Lines"
+msgstr "&5 eilutës"
+
+#: Merge.rc:441
+#, c-format
+msgid "&6 Lines"
+msgstr "&6 eilutës"
+
+#: Merge.rc:442
+#, c-format
+msgid "&7 Lines"
+msgstr "&7 eilutës"
+
+#: Merge.rc:443
+#, c-format
+msgid "&8 Lines"
+msgstr "&8 eilutës"
+
+#: Merge.rc:444
+#, c-format
+msgid "&9 Lines"
+msgstr "&9 eilutës"
+
+#: Merge.rc:448
+#, c-format
+msgid "&View Whitespace"
+msgstr "&Rodyti tarpus"
+
+#: Merge.rc:449
+#, c-format
+msgid "Vie&w Line Differences"
+msgstr "Ro&dyti skirtumus eilutëse"
+
+#: Merge.rc:450
+#, c-format
+msgid "View Line &Numbers"
+msgstr "Rodyti eiluèiø &numerius"
+
+#: Merge.rc:451
+#, c-format
+msgid "View &Margins"
+msgstr "Rodyti &paraðtes"
+
+#: Merge.rc:452
+#, c-format
+msgid "W&rap Lines"
+msgstr "S&kaidyti eilutes"
+
+#: Merge.rc:453
+#, c-format
+msgid "Separate combining characters\tCtrl+M"
+msgstr "Atskirti kombinacinius diakritinius þenklus\tCtrl+M"
+
+#: Merge.rc:455
+#, c-format
+msgid "Sw&ap Panes\tCtrl+U"
+msgstr "Sukeisti pol&angius\tCtrl+U"
+
+#: Merge.rc:465
+#, c-format
+msgid "Diff &Pane"
+msgstr "Skirtumø &polangis"
+
+#: Merge.rc:466
+#, c-format
+msgid "Lo&cation Pane"
+msgstr "Vi&etos polangis"
+
+#: Merge.rc:490
+#, c-format
+msgid "&Synchronization Point\tAlt+S"
+msgstr "&Sinchronizavimo taðkas\tAlt+S"
+
+#: Merge.rc:491
+#, c-format
+msgid "Clear Sync&hronization Points"
+msgstr "Iðvalyti sinc&hronizavino taðkus"
+
+#: Merge.rc:498
+#, c-format
+msgid "Compare &Selection..."
+msgstr "Lyginti paþymëtà &sritá..."
+
+#: Merge.rc:535
+#: Merge.rc:1004
+#, c-format
+msgid "W&hitespaces"
+msgstr "T&arpai"
+
+#: Merge.rc:537
+#: Merge.rc:1005
+#: Merge.rc:1356
+#, c-format
+msgid "Ignore &tab expansion"
+msgstr "Ignoruoti skirtumus tarp &TAB ir tarpø"
+
+#: Merge.rc:538
+#: Merge.rc:1006
+#, c-format
+msgid "Ignore t&railing space"
+msgstr "Ignoruoti ta&rpus eiluèiø pabaigoje"
+
+#: Merge.rc:539
+#: Merge.rc:1007
+#, c-format
+msgid "Com&pare"
+msgstr "Ly&ginti"
+
+#: Merge.rc:540
+#: Merge.rc:1008
+#, c-format
+msgid "I&gnore changes"
+msgstr "I&gnoruoti pokyèius"
+
+#: Merge.rc:541
+#: Merge.rc:1009
+#, c-format
+msgid "Ig&nore all"
+msgstr "Ig&noruoti viskà"
+
+#: Merge.rc:543
+#: Merge.rc:1012
+#: Merge.rc:1362
+#, c-format
+msgid "Ignore c&ase"
+msgstr "Nep&aisyti raidþiø dydþio"
+
+#: Merge.rc:544
+#: Merge.rc:1363
+#, c-format
+msgid "Igno&re carriage return differences (Windows/Unix/Mac)"
+msgstr "Igno&ruoti eiluèiø pabaigos skirtumus (Windows/Unix/Mac)"
+
+#: Merge.rc:545
+#: Merge.rc:1383
+#, c-format
+msgid "&Compare method:"
+msgstr "&Lyginimo metodas:"
+
+#: Merge.rc:547
+#: Merge.rc:1718
+#, c-format
+msgid "Full Contents"
+msgstr "Visas turinys"
+
+#: Merge.rc:548
+#: Merge.rc:1719
+#, c-format
+msgid "Quick Contents"
+msgstr "Turinys (greitai)"
+
+#: Merge.rc:549
+#: Merge.rc:1720
+#, c-format
+msgid "Modified Date"
+msgstr "Pakeista data"
+
+#: Merge.rc:550
+#: Merge.rc:1721
+#, c-format
+msgid "Modified Date and Size"
+msgstr "Pakeista data ir dydis"
+
+#: Merge.rc:551
+#: Merge.rc:1722
+#: Merge.rc:1868
+#, c-format
+msgid "Size"
+msgstr "Dydis"
+
+#: Merge.rc:562
+#, c-format
+msgid "Co&mpare"
+msgstr "Lygi&nti"
+
+#: Merge.rc:563
+#, c-format
+msgid "Compare &As"
+msgstr "Lyginti k&aip"
+
+#: Merge.rc:565
+#, c-format
+msgid "&Text"
+msgstr "&Tekstas"
+
+#: Merge.rc:566
+#, c-format
+msgid "&Archive"
+msgstr "&Archyvas"
+
+#: Merge.rc:567
+#, c-format
+msgid "&Binary"
+msgstr "&Binarinis"
+
+#: Merge.rc:568
+#, c-format
+msgid "&XML"
+msgstr "&XML"
+
+#: Merge.rc:569
+#, c-format
+msgid "PluginMonikers"
+msgstr "PluginMonikers"
+
+#: Merge.rc:572
+#: Merge.rc:675
+#: Merge.rc:694
+#, c-format
+msgid "&Copy"
+msgstr "&Kopijuoti"
+
+#: Merge.rc:574
+#, c-format
+msgid "&Left to Right (%1 of %2)"
+msgstr "&Kairájá á deðinæ (%1 of %2)"
+
+#: Merge.rc:575
+#, c-format
+msgid "L&eft to... (%1 of %2)"
+msgstr "&Kairájá á... (%1 of %2)"
+
+#: Merge.rc:576
+#, c-format
+msgid "&Right to Left (%1 of %2)"
+msgstr "&Deðinájá á kairæ (%1 of %2)"
+
+#: Merge.rc:577
+#, c-format
+msgid "R&ight to... (%1 of %2)"
+msgstr "&Deðinájá á... (%1 of %2)"
+
+#: Merge.rc:579
+#, c-format
+msgid "&Move"
+msgstr "&Perkelti"
+
+#: Merge.rc:581
+#, c-format
+msgid "&Left to... (%1 of %2)"
+msgstr "&Kairájá á... (%1 of %2)"
+
+#: Merge.rc:582
+#, c-format
+msgid "&Right to... (%1 of %2)"
+msgstr "&Deðinájá á... (%1 of %2)"
+
+#: Merge.rc:584
+#, c-format
+msgid "&Delete"
+msgstr "&Trinti"
+
+#: Merge.rc:586
+#: Merge.rc:612
+#, c-format
+msgid "&Left (%1 of %2)"
+msgstr "&Kairájá (%1 of %2)"
+
+#: Merge.rc:587
+#: Merge.rc:613
+#, c-format
+msgid "&Right (%1 of %2)"
+msgstr "&Deðinájá (%1 of %2)"
+
+#: Merge.rc:588
+#: Merge.rc:614
+#, c-format
+msgid "&Both (%1 of %2)"
+msgstr "A&bu (%1 ið %2)"
+
+#: Merge.rc:590
+#, c-format
+msgid "Re&name"
+msgstr "Pervardi&nti"
+
+#: Merge.rc:591
+#, c-format
+msgid "&Hide Items"
+msgstr "&Slëpti elementus"
+
+#: Merge.rc:593
+#, c-format
+msgid "&Open Left"
+msgstr "&Atverti kairájá"
+
+#: Merge.rc:595
+#: Merge.rc:603
+#: Merge.rc:701
+#, c-format
+msgid "with &Registered Application"
+msgstr "su &Registruota programa"
+
+#: Merge.rc:596
+#: Merge.rc:604
+#: Merge.rc:702
+#, c-format
+msgid "with &External Editor"
+msgstr "su Iðoriniu r&edaktoriumi"
+
+#: Merge.rc:597
+#: Merge.rc:605
+#: Merge.rc:703
+#, c-format
+msgid "&with..."
+msgstr "&su..."
+
+#: Merge.rc:599
+#: Merge.rc:607
+#: Merge.rc:705
+#, c-format
+msgid "Containing &Folder"
+msgstr "&Katalogà"
+
+#: Merge.rc:601
+#, c-format
+msgid "O&pen Right"
+msgstr "A&tverti deðinájá"
+
+#: Merge.rc:610
+#, c-format
+msgid "Cop&y Pathnames"
+msgstr "Kopijuot&i katalogø vardus"
+
+#: Merge.rc:616
+#, c-format
+msgid "Copy &Filenames"
+msgstr "Kopijuoti &failø vardus"
+
+#: Merge.rc:618
+#, c-format
+msgid "&Zip"
+msgstr "&Zip"
+
+#: Merge.rc:620
+#, c-format
+msgid "&Left... (%1 of %2)"
+msgstr "&Kairájá... (%1 of %2)"
+
+#: Merge.rc:621
+#, c-format
+msgid "&Right... (%1 of %2)"
+msgstr "&Deðinájá... (%1 of %2)"
+
+#: Merge.rc:622
+#, c-format
+msgid "&Both... (%1 of %2)"
+msgstr "A&bu... (%1 of %2)"
+
+#: Merge.rc:623
+#, c-format
+msgid "&Differences... (%1 of %2)"
+msgstr "Skirtumai... (%1 of %2)"
+
+#: Merge.rc:626
+#, c-format
+msgid "&Refresh"
+msgstr "&Atnaujinti"
+
+#: Merge.rc:640
+#, c-format
+msgid "&Copy Full Path"
+msgstr "Kopijuoti pilnà &kelià"
+
+#: Merge.rc:641
+#, c-format
+msgid "Copy &Filename"
+msgstr "Kopijuoti &failo vardà"
+
+#: Merge.rc:645
+#, c-format
+msgid "Base Version"
+msgstr "Pagrindinë versija"
+
+#: Merge.rc:646
+#, c-format
+msgid "Source Version"
+msgstr "Iðeities versija"
+
+#: Merge.rc:647
+#, c-format
+msgid "Destination Version"
+msgstr "Rezultato versija"
+
+#: Merge.rc:657
+#, c-format
+msgid "G&oto Line %1"
+msgstr "E&iti á %1 eilutæ"
+
+#: Merge.rc:658
+#: Merge.rc:697
+#, c-format
+msgid "&Goto..."
+msgstr "&Pereiti á..."
+
+#: Merge.rc:660
+#, c-format
+msgid "&No Moved Blocks"
+msgstr "&Neperkelti blokai"
+
+#: Merge.rc:661
+#, c-format
+msgid "&All Moved Blocks"
+msgstr "&Visi perkelti blokai"
+
+#: Merge.rc:662
+#, c-format
+msgid "Moved Block for &Current Diff"
+msgstr "Perkelti blokai ð&iame palyginime"
+
+#: Merge.rc:672
+#: Merge.rc:685
+#, c-format
+msgid "C&opy to Right"
+msgstr "K&opijuoti á deðinæ"
+
+#: Merge.rc:673
+#: Merge.rc:686
+#, c-format
+msgid "Cop&y to Left"
+msgstr "Kop&ijuoti á kairæ"
+
+#: Merge.rc:688
+#, c-format
+msgid "&Select Line Difference"
+msgstr "&Paþymëti skirtumà"
+
+#: Merge.rc:690
+#, c-format
+msgid "&Undo"
+msgstr "Atða&ukti"
+
+#: Merge.rc:691
+#, c-format
+msgid "&Redo"
+msgstr "Paka&rtoti"
+
+#: Merge.rc:693
+#, c-format
+msgid "Cu&t"
+msgstr "Iðkirp&ti"
+
+#: Merge.rc:695
+#, c-format
+msgid "&Paste"
+msgstr "Áter&pti"
+
+#: Merge.rc:699
+#, c-format
+msgid "Op&en"
+msgstr "Atv&erti"
+
+#: Merge.rc:717
+#, c-format
+msgid "About WinMerge"
+msgstr "Apie WinMerge"
+
+#: Merge.rc:722
+#, c-format
+msgid "Version %s"
+msgstr "Versija %s"
+
+#: Merge.rc:723
+#, c-format
+msgid "Private Build: %s"
+msgstr "Neoficiali versija: %s"
+
+#: Merge.rc:724
+#: Merge.rc:857
+#: Merge.rc:873
+#: Merge.rc:1017
+#: Merge.rc:1028
+#: Merge.rc:1111
+#: Merge.rc:1123
+#: Merge.rc:1532
+#: Merge.rc:1546
+#, c-format
+msgid "OK"
+msgstr "Gerai"
+
+#: Merge.rc:725
+#, c-format
+msgid "Visit the WinMerge HomePage!"
+msgstr "Aplankykite „WinMerge“ namø puslapá!"
+
+#: Merge.rc:728
+#, c-format
+msgid "Contributors"
+msgstr "Talkininkai"
+
+#: Merge.rc:735
+#: Merge.rc:1709
+#, c-format
+msgid "Open"
+msgstr "Atverti"
+
+#: Merge.rc:740
+#: Merge.rc:757
+#, c-format
+msgid "Attribute Filter:"
+msgstr "Atributø filtras:"
+
+#: Merge.rc:742
+#: Merge.rc:759
+#, c-format
+msgid "&New folder"
+msgstr "&Naujas katalogas"
+
+#: Merge.rc:743
+#, c-format
+msgid "Filena&me:"
+msgstr "Failo vardas:"
+
+#: Merge.rc:745
+#: Merge.rc:760
+#, c-format
+msgid "&OK"
+msgstr "&Gerai"
+
+#: Merge.rc:746
+#: Merge.rc:761
+#: Merge.rc:1053
+#: Merge.rc:1681
+#, c-format
+msgid "&Cancel"
+msgstr "&Atsisakyti"
+
+#: Merge.rc:753
+#, c-format
+msgid "Select Folder"
+msgstr "Pasirinkti katalogà"
+
+#: Merge.rc:768
+#: Merge.rc:1816
+#, c-format
+msgid "Rational ClearCase"
+msgstr "Rational ClearCase"
+
+#: Merge.rc:771
+#, c-format
+msgid "CheckOut"
+msgstr "Paimti"
+
+#: Merge.rc:772
+#: Merge.rc:858
+#: Merge.rc:874
+#: Merge.rc:914
+#: Merge.rc:938
+#: Merge.rc:963
+#: Merge.rc:1018
+#: Merge.rc:1029
+#: Merge.rc:1112
+#: Merge.rc:1124
+#: Merge.rc:1533
+#: Merge.rc:1547
+#: Merge.rc:1588
+#: Merge.rc:1607
+#, c-format
+msgid "Cancel"
+msgstr "Atsisakyti"
+
+#: Merge.rc:773
+#: Merge.rc:1587
+#, c-format
+msgid "Save As..."
+msgstr "Iðsaugoti kaip..."
+
+#: Merge.rc:775
+#: Merge.rc:1370
+#, c-format
+msgid "Comments"
+msgstr "Komentarai"
+
+#: Merge.rc:776
+#: Merge.rc:1585
+#, c-format
+msgid "&Apply to all items"
+msgstr "T&aikyti viskam"
+
+#: Merge.rc:777
+#, c-format
+msgid "&CheckIn after checkout"
+msgstr "&Áregistruoti po paëmimo"
+
+#: Merge.rc:784
+#, c-format
+msgid "Compare Statistics"
+msgstr "Lyginimo statistika"
+
+#: Merge.rc:787
+#, c-format
+msgid "Folders:"
+msgstr "Katalogai:"
+
+#: Merge.rc:788
+#, c-format
+msgid "Files:"
+msgstr "Failai:"
+
+#: Merge.rc:789
+#: Merge.rc:1906
+#, c-format
+msgid "Different"
+msgstr "Skirtingas"
+
+#: Merge.rc:790
+#: Merge.rc:810
+#, c-format
+msgid "Text:"
+msgstr "Tekstas:"
+
+#: Merge.rc:793
+#: Merge.rc:813
+#, c-format
+msgid "Binary:"
+msgstr "Binarinis:"
+
+#: Merge.rc:796
+#, c-format
+msgid "Unique"
+msgstr "Unikalus"
+
+#: Merge.rc:797
+#, c-format
+msgid "Left:"
+msgstr "Kairá:"
+
+#: Merge.rc:802
+#, c-format
+msgid "Right:"
+msgstr "Deðiná:"
+
+#: Merge.rc:807
+#: Merge.rc:1900
+#, c-format
+msgid "Identical"
+msgstr "Identiðkas"
+
+#: Merge.rc:817
+#, c-format
+msgid "Total:"
+msgstr "Ið viso:"
+
+#: Merge.rc:822
+#, c-format
+msgid "Close"
+msgstr "Uþverti"
+
+#: Merge.rc:829
+#: Merge.rc:1839
+#, c-format
+msgid "Confirm Copy"
+msgstr "Patvirtinti kopijavimà"
+
+#: Merge.rc:834
+#, c-format
+msgid "From left"
+msgstr "Ið kairës"
+
+#: Merge.rc:836
+#, c-format
+msgid "To right"
+msgstr "Á deðinæ"
+
+#: Merge.rc:838
+#, c-format
+msgid "Make &writable"
+msgstr "Padaryti &áraðomu"
+
+#: Merge.rc:839
+#: Merge.rc:1486
+#, c-format
+msgid "&Ignore folder structure"
+msgstr "Nepaisyt&i katalogø struktûros"
+
+#: Merge.rc:840
+#, c-format
+msgid "Yes"
+msgstr "Taip"
+
+#: Merge.rc:841
+#, c-format
+msgid "No"
+msgstr "Ne"
+
+#: Merge.rc:848
+#, c-format
+msgid "Folder Compare Report"
+msgstr "Katalogø lyginimo ataskaita"
+
+#: Merge.rc:851
+#, c-format
+msgid "Report &File:"
+msgstr "Ataskaitos &failas:"
+
+#: Merge.rc:853
+#: Merge.rc:1143
+#: Merge.rc:1147
+#: Merge.rc:1203
+#, c-format
+msgid "Browse..."
+msgstr "Rasti..."
+
+#: Merge.rc:854
+#, c-format
+msgid "&Style:"
+msgstr "&Stilius:"
+
+#: Merge.rc:856
+#, c-format
+msgid "&Copy to Clipboard"
+msgstr "&Kopijuoti á mainø sritá"
+
+#: Merge.rc:865
+#, c-format
+msgid "Display Columns"
+msgstr "Rodyti stulpelius"
+
+#: Merge.rc:869
+#, c-format
+msgid "Move &Up"
+msgstr "Perkelti a&ukðtyn"
+
+#: Merge.rc:870
+#, c-format
+msgid "Move &Down"
+msgstr "Perkelti þ&emyn"
+
+#: Merge.rc:872
+#: Merge.rc:1016
+#: Merge.rc:1281
+#: Merge.rc:1345
+#: Merge.rc:1373
+#: Merge.rc:1394
+#, c-format
+msgid "Defaults"
+msgstr "Numat. reikðmës"
+
+#: Merge.rc:882
+#, c-format
+msgid " Folder Compare Progress"
+msgstr " Katalogø lyginimo eiga"
+
+#: Merge.rc:885
+#, c-format
+msgid "Stop"
+msgstr "Sustoti"
+
+#: Merge.rc:886
+#: Merge.rc:962
+#, c-format
+msgid "Pause\tContinue\t"
+msgstr "Pauzë\tTæsti\t"
+
+#: Merge.rc:890
+#, c-format
+msgid "Comparing items..."
+msgstr "Lygina elementus..."
+
+#: Merge.rc:891
+#, c-format
+msgid "Items compared:"
+msgstr "Elementø palyginta:"
+
+#: Merge.rc:892
+#, c-format
+msgid "Items total:"
+msgstr "Ið viso elementø:"
+
+#: Merge.rc:901
+#, c-format
+msgid "Find"
+msgstr "Rasti"
+
+#: Merge.rc:904
+#: Merge.rc:924
+#, c-format
+msgid "Fi&nd what:"
+msgstr "Ko &ieðkoti?:"
+
+#: Merge.rc:906
+#: Merge.rc:928
+#, c-format
+msgid "Match &whole word only"
+msgstr "Tik &pilnø þodþiø"
+
+#: Merge.rc:907
+#: Merge.rc:929
+#, c-format
+msgid "Match &case"
+msgstr "Paisyti &raidþiø dydþio"
+
+#: Merge.rc:908
+#: Merge.rc:930
+#, c-format
+msgid "Regular &expression"
+msgstr "Naud. reguliariàjà &iðraiðkà"
+
+#: Merge.rc:909
+#, c-format
+msgid "D&on't wrap end of file"
+msgstr "Pasiekus fail&o galà, nepradëti ið pradþiø"
+
+#: Merge.rc:910
+#, c-format
+msgid "Direction"
+msgstr "Kryptis"
+
+#: Merge.rc:911
+#, c-format
+msgid "&Up"
+msgstr "&Atgal"
+
+#: Merge.rc:912
+#, c-format
+msgid "&Down"
+msgstr "&Pirmyn"
+
+#: Merge.rc:913
+#: Merge.rc:935
+#, c-format
+msgid "&Find Next"
+msgstr "&Rasti kità"
+
+#: Merge.rc:921
+#, c-format
+msgid "Replace"
+msgstr "Pakeisti"
+
+#: Merge.rc:926
+#, c-format
+msgid "Re&place with:"
+msgstr "&Pakeisti su:"
+
+#: Merge.rc:931
+#, c-format
+msgid "&Don't wrap end of file"
+msgstr "Neskai&dyti failo gale"
+
+#: Merge.rc:932
+#, c-format
+msgid "Replace in"
+msgstr "Keisti"
+
+#: Merge.rc:933
+#, c-format
+msgid "&Selection"
+msgstr "&Paþym. fragmente"
+
+#: Merge.rc:934
+#, c-format
+msgid "Wh&ole file"
+msgstr "Vi&same faile"
+
+#: Merge.rc:936
+#, c-format
+msgid "&Replace"
+msgstr "&Pakeisti"
+
+#: Merge.rc:937
+#, c-format
+msgid "Replace &All"
+msgstr "Pakeisti v&iskà"
+
+#: Merge.rc:970
+#, c-format
+msgid "Filefilters"
+msgstr "Failo filtrai"
+
+#: Merge.rc:974
+#, c-format
+msgid "Test..."
+msgstr "Testas..."
+
+#: Merge.rc:975
+#, c-format
+msgid "Install..."
+msgstr "Diegti..."
+
+#: Merge.rc:976
+#, c-format
+msgid "New..."
+msgstr "Naujas..."
+
+#: Merge.rc:977
+#, c-format
+msgid "Edit..."
+msgstr "Redaguoti..."
+
+#: Merge.rc:978
+#, c-format
+msgid "Delete..."
+msgstr "Trinti..."
+
+#: Merge.rc:985
+#, c-format
+msgid "Patch Generator"
+msgstr "Pataisø generatorius"
+
+#: Merge.rc:988
+#, c-format
+msgid "File&1:"
+msgstr "Failas&1:"
+
+#: Merge.rc:990
+#: Merge.rc:1076
+#: Merge.rc:1180
+#: Merge.rc:1505
+#, c-format
+msgid "&Browse..."
+msgstr "&Rasti..."
+
+#: Merge.rc:991
+#, c-format
+msgid "File&2:"
+msgstr "Failas&2:"
+
+#: Merge.rc:993
+#: Merge.rc:1513
+#, c-format
+msgid "Br&owse..."
+msgstr "Ra&sti..."
+
+#: Merge.rc:994
+#, c-format
+msgid "&Swap"
+msgstr "&Sukeisti"
+
+#: Merge.rc:995
+#, c-format
+msgid "Append to &existing file"
+msgstr "Pridëti prie &esamo failo"
+
+#: Merge.rc:996
+#, c-format
+msgid "Res&ult:"
+msgstr "Rez&ultatas:"
+
+#: Merge.rc:998
+#: Merge.rc:1079
+#, c-format
+msgid "Bro&wse..."
+msgstr "Ras&ti..."
+
+#: Merge.rc:999
+#, c-format
+msgid "&Format"
+msgstr "&Formatas"
+
+#: Merge.rc:1000
+#, c-format
+msgid "St&yle:"
+msgstr "St&ilius:"
+
+#: Merge.rc:1002
+#, c-format
+msgid "&Context:"
+msgstr "&Kontekstas:"
+
+#: Merge.rc:1010
+#: Merge.rc:1361
+#, c-format
+msgid "Ignore blan&k lines"
+msgstr "Nepaisyti &tuðèiø eiluèiø"
+
+#: Merge.rc:1011
+#, c-format
+msgid "Apply &line filters"
+msgstr "Taikyti ei&lutës filtrus"
+
+#: Merge.rc:1013
+#, c-format
+msgid "Inclu&de command line"
+msgstr "Áterpti koman&dinæ eilutæ"
+
+#: Merge.rc:1014
+#, c-format
+msgid "Use generic paths"
+msgstr "Naudoti bendrinius kelius"
+
+#: Merge.rc:1015
+#, c-format
+msgid "Open to e&xternal editor"
+msgstr "Atverti &iðoriniame redaktoriuje"
+
+#: Merge.rc:1025
+#, c-format
+msgid "Language"
+msgstr "Kalba"
+
+#: Merge.rc:1031
+#, c-format
+msgid "Available languages:"
+msgstr "Galimos kalbos:"
+
+#: Merge.rc:1038
+#: Merge.rc:1213
+#, c-format
+msgid "Codepage"
+msgstr "Koduotës"
+
+#: Merge.rc:1041
+#, c-format
+msgid "Affects"
+msgstr "Paveiks"
+
+#: Merge.rc:1042
+#: Merge.rc:1601
+#, c-format
+msgid "&Left"
+msgstr "&Kairëje"
+
+#: Merge.rc:1043
+#: Merge.rc:1045
+#, c-format
+msgid "(Affects)"
+msgstr "(Paveiks)"
+
+#: Merge.rc:1044
+#: Merge.rc:1602
+#, c-format
+msgid "&Right"
+msgstr "&Deðinëje"
+
+#: Merge.rc:1046
+#, c-format
+msgid "Select Codepage for"
+msgstr "Parinkti koduotæ"
+
+#: Merge.rc:1047
+#, c-format
+msgid "&File Loading:"
+msgstr "&Failo ákëlimui:"
+
+#: Merge.rc:1049
+#, c-format
+msgid "File &Saving:"
+msgstr "Failo ið&saugojimui:"
+
+#: Merge.rc:1051
+#, c-format
+msgid "&Use same codepage for both"
+msgstr "Na&udoti tà paèià koduotæ abiem atvejais"
+
+#: Merge.rc:1052
+#, c-format
+msgid "&Apply"
+msgstr "T&aikyti"
+
+#: Merge.rc:1070
+#, c-format
+msgid "Select Files or Folders"
+msgstr "Parinkite failus ar katalogus"
+
+#: Merge.rc:1073
+#, c-format
+msgid "Files or Folders to Compare"
+msgstr "Failai arba katalogai palyginimui"
+
+#: Merge.rc:1074
+#: Merge.rc:1141
+#, c-format
+msgid "&Left:"
+msgstr "&Kairëje:"
+
+#: Merge.rc:1077
+#: Merge.rc:1145
+#, c-format
+msgid "&Right:"
+msgstr "&Deðinëje:"
+
+#: Merge.rc:1080
+#: Merge.rc:1149
+#, c-format
+msgid "&Filter:"
+msgstr "&Filtras:"
+
+#: Merge.rc:1082
+#: Merge.rc:1151
+#, c-format
+msgid "Select..."
+msgstr "Parinkti..."
+
+#: Merge.rc:1083
+#, c-format
+msgid "&Compare As:"
+msgstr "&Lyginti kaip:"
+
+#: Merge.rc:1085
+#, c-format
+msgid "By Default"
+msgstr "Numat. reikðmës"
+
+#: Merge.rc:1086
+#, c-format
+msgid "&Include Subfolders\t&Include Subfolders but ignore folder structure"
+msgstr ""
+
+#: Merge.rc:1087
+#, c-format
+msgid "Status:"
+msgstr "Bûsena:"
+
+#: Merge.rc:1088
+#, c-format
+msgid "SQL Query Parameters"
+msgstr "SQL uþklausos parametrai"
+
+#: Merge.rc:1095
+#, c-format
+msgid "Left"
+msgstr "Kairá"
+
+#: Merge.rc:1103
+#, c-format
+msgid "Right"
+msgstr "Deðiná"
+
+#: Merge.rc:1113
+#: Merge.rc:1125
+#, c-format
+msgid "Help"
+msgstr "Pagalba"
+
+#: Merge.rc:1120
+#, c-format
+msgid "Options"
+msgstr "Nuostatos"
+
+#: Merge.rc:1129
+#, c-format
+msgid " Categories"
+msgstr " Kategorijos"
+
+#: Merge.rc:1130
+#, c-format
+msgid "Import..."
+msgstr "Importuoti..."
+
+#: Merge.rc:1131
+#, c-format
+msgid "Export..."
+msgstr "Eksportuoti..."
+
+#: Merge.rc:1138
+#, c-format
+msgid "Paths"
+msgstr "Keliai"
+
+#: Merge.rc:1144
+#, c-format
+msgid "R&ead-only"
+msgstr "T&ik skaitymui"
+
+#: Merge.rc:1148
+#, c-format
+msgid "Re&ad-only"
+msgstr "Tik sk&aitymui"
+
+#: Merge.rc:1152
+#, c-format
+msgid "&Include Subfolders\tInclude Subfolders but ignore folder structure"
+msgstr "Átraukt&i pakatalogius\tÁtraukti pakatalogius, bet ignoruoti katalogo struktûrà"
+
+#: Merge.rc:1153
+#, c-format
+msgid "&Create project specific configuration file"
+msgstr "&Kurti projektui skirtà konfigûracijos failà"
+
+#: Merge.rc:1154
+#, c-format
+msgid "Open..."
+msgstr "Atverti..."
+
+#: Merge.rc:1155
+#, c-format
+msgid "Save..."
+msgstr "Iðsaugoti..."
+
+#: Merge.rc:1162
+#, c-format
+msgid "Archive Support"
+msgstr "Archyvø palaikymo"
+
+#: Merge.rc:1165
+#, c-format
+msgid "&Enable archive file support"
+msgstr "Á&jungti archyvo failø palaikymà"
+
+#: Merge.rc:1166
+#, c-format
+msgid "&Detect archive type from file signature"
+msgstr "&Nustatyti archyvo tipà ið failo paraðo"
+
+#: Merge.rc:1173
+#, c-format
+msgid "Version Control"
+msgstr "Versijø kontrolës"
+
+#: Merge.rc:1176
+#, c-format
+msgid "&Versioning System:"
+msgstr "&Versijavimo sistema:"
+
+#: Merge.rc:1178
+#: Merge.rc:1738
+#, c-format
+msgid "&Path to cleartool.exe:"
+msgstr "Ke&lias iki „cleartool.exe“:"
+
+#: Merge.rc:1181
+#, c-format
+msgid "ClearCase Type Manager Setup"
+msgstr "ClearCase Type Manager nustatymai"
+
+#: Merge.rc:1183
+#, c-format
+msgid "compare"
+msgstr "lyginti"
+
+#: Merge.rc:1184
+#, c-format
+msgid "xcompare"
+msgstr "xlyginti"
+
+#: Merge.rc:1185
+#, c-format
+msgid "merge"
+msgstr "sulieti"
+
+#: Merge.rc:1186
+#, c-format
+msgid "xmerge"
+msgstr "xsulieti"
+
+#: Merge.rc:1193
+#, c-format
+msgid "Backup Files"
+msgstr "Rezerviniø failø kurimo"
+
+#: Merge.rc:1196
+#, c-format
+msgid "Create backup files in:"
+msgstr "Kurti rezervinius failus kai:"
+
+#: Merge.rc:1197
+#: Merge.rc:1457
+#, c-format
+msgid "&Folder compare"
+msgstr "Lyginami &katalogai"
+
+#: Merge.rc:1198
+#: Merge.rc:1458
+#, c-format
+msgid "Fil&e compare"
+msgstr "Lyginami fai&lai"
+
+#: Merge.rc:1199
+#, c-format
+msgid "Create backup files into:"
+msgstr "Kurti rezervinius failus:"
+
+#: Merge.rc:1200
+#, c-format
+msgid "&Original file's folder"
+msgstr "Pradinio fail&o kataloge"
+
+#: Merge.rc:1201
+#, c-format
+msgid "&Global backup folder:"
+msgstr "&Bendrame rezervavimo kataloge:"
+
+#: Merge.rc:1204
+#, c-format
+msgid "Backup filename:"
+msgstr "Rezervinio failo vardas:"
+
+#: Merge.rc:1205
+#, c-format
+msgid "&Append .bak -extension"
+msgstr "&Pridëti .bak -iðplëtimà"
+
+#: Merge.rc:1206
+#, c-format
+msgid "A&ppend timestamp"
+msgstr "P&ridëti laiko þymà"
+
+#: Merge.rc:1216
+#, c-format
+msgid "Default Codepage"
+msgstr "Numatytoji koduotë"
+
+#: Merge.rc:1217
+#, c-format
+msgid "Select the default codepage assumed when loading non-Unicode files:"
+msgstr "Parinkite numatytàjà koduotæ, kuri bus naudojama ákeliant ne Unicode failus:"
+
+#: Merge.rc:1218
+#, c-format
+msgid "System codepage"
+msgstr "Sistemos koduotë"
+
+#: Merge.rc:1219
+#, c-format
+msgid "According to WinMerge User Interface"
+msgstr "Pagal „WinMerge“ naudotojo sàsajà"
+
+#: Merge.rc:1220
+#, c-format
+msgid "Custom codepage:"
+msgstr "Pasirinkt. koduotë:"
+
+#: Merge.rc:1222
+#, c-format
+msgid ""
+"Detect codepage info for these files:\n"
+".html, .rc, .xml, .po"
+msgstr ""
+"Aptikti koduotæ ðiems failams:\n"
+".html, .rc, .xml, .po"
+
+#: Merge.rc:1229
+#, c-format
+msgid "List"
+msgstr "Sàraðø"
+
+#: Merge.rc:1232
+#, c-format
+msgid "&Use customized list colors"
+msgstr "Na&udoti pasirinktines sàraðo spalvas"
+
+#: Merge.rc:1233
+#, c-format
+msgid "Custom list colors"
+msgstr "Pasirinktinës sàraðo spalvos"
+
+#: Merge.rc:1234
+#, c-format
+msgid "Left-only items:"
+msgstr "Elementai tik kairëje:"
+
+#: Merge.rc:1235
+#, c-format
+msgid "Right-only items:"
+msgstr "Elementai tik deðinëje:"
+
+#: Merge.rc:1236
+#, c-format
+msgid "Otherwise suspicious items:"
+msgstr "Kitaip átartini elementai:"
+
+#: Merge.rc:1237
+#: Merge.rc:1296
+#: Merge.rc:1312
+#, c-format
+msgid "Background"
+msgstr "Fono"
+
+#: Merge.rc:1247
+#, c-format
+msgid "Syntax"
+msgstr "Sintaksës"
+
+#: Merge.rc:1250
+#, c-format
+msgid "Keywords:"
+msgstr "Raktaþodþiai:"
+
+#: Merge.rc:1251
+#, c-format
+msgid "Function names:"
+msgstr "Funkcijø vardai:"
+
+#: Merge.rc:1252
+#, c-format
+msgid "Comments:"
+msgstr "Komentarai:"
+
+#: Merge.rc:1253
+#, c-format
+msgid "Numbers:"
+msgstr "Skaièiai:"
+
+#: Merge.rc:1254
+#, c-format
+msgid "Operators:"
+msgstr "Operatoriai:"
+
+#: Merge.rc:1255
+#, c-format
+msgid "Strings:"
+msgstr "Eilutës:"
+
+#: Merge.rc:1256
+#, c-format
+msgid "Preprocessor:"
+msgstr "Preprocessorius:"
+
+#: Merge.rc:1257
+#, c-format
+msgid "User 1:"
+msgstr "Naudotojas 1:"
+
+#: Merge.rc:1258
+#, c-format
+msgid "User 2:"
+msgstr "Naudotojas 2:"
+
+#: Merge.rc:1259
+#, c-format
+msgid "User 3:"
+msgstr "Naudotojas 3:"
+
+#: Merge.rc:1260
+#: Merge.rc:1288
+#: Merge.rc:1297
+#: Merge.rc:1314
+#: Merge.rc:1401
+#, c-format
+msgid "Text"
+msgstr "Tekstø"
+
+#: Merge.rc:1262
+#: Merge.rc:1264
+#: Merge.rc:1266
+#: Merge.rc:1268
+#: Merge.rc:1270
+#: Merge.rc:1272
+#: Merge.rc:1274
+#: Merge.rc:1276
+#: Merge.rc:1278
+#: Merge.rc:1280
+#, c-format
+msgid "Bold"
+msgstr "Pastorintas"
+
+#: Merge.rc:1291
+#, c-format
+msgid "&Use customized text colors"
+msgstr "Na&udoti pasirinktines teksto spalvas"
+
+#: Merge.rc:1292
+#, c-format
+msgid "Custom text colors"
+msgstr "Pasirinktinës teksto spalvos"
+
+#: Merge.rc:1293
+#, c-format
+msgid "Whitespace:"
+msgstr "Tarpas:"
+
+#: Merge.rc:1294
+#, c-format
+msgid "Regular text:"
+msgstr "Paprastas tekstas:"
+
+#: Merge.rc:1295
+#, c-format
+msgid "Selection:"
+msgstr "Paþymëtas fragmentas:"
+
+#: Merge.rc:1309
+#: Merge.rc:1891
+#, c-format
+msgid "Differences"
+msgstr "Skirtumø"
+
+#: Merge.rc:1313
+#, c-format
+msgid "Deleted"
+msgstr "Iðtrinto"
+
+#: Merge.rc:1315
+#, c-format
+msgid "Difference:"
+msgstr "Skirtumas:"
+
+#: Merge.rc:1319
+#, c-format
+msgid "Selected Difference:"
+msgstr "Paþymëtas skirtumas:"
+
+#: Merge.rc:1323
+#, c-format
+msgid "Ignored Difference:"
+msgstr "Ignoruotas skirtumas:"
+
+#: Merge.rc:1327
+#, c-format
+msgid "Moved:"
+msgstr "Perkeltas:"
+
+#: Merge.rc:1331
+#, c-format
+msgid "Selected Moved:"
+msgstr "Paþymëtas perkeltas:"
+
+#: Merge.rc:1335
+#, c-format
+msgid "Word Difference:"
+msgstr "Þodþio skirtumas:"
+
+#: Merge.rc:1339
+#, c-format
+msgid "Selected Word Diff:"
+msgstr "Paþym. þodþio skirtumas:"
+
+#: Merge.rc:1343
+#, c-format
+msgid "Cross-&hatch deleted lines\tDot-&hatch deleted lines"
+msgstr ""
+
+#: Merge.rc:1344
+#, c-format
+msgid "GitHub/Bitbucket"
+msgstr "GitHub/Bitbucket"
+
+#: Merge.rc:1352
+#: Merge.rc:1442
+#, c-format
+msgid "General"
+msgstr "Bendros"
+
+#: Merge.rc:1355
+#, c-format
+msgid "Whitespace"
+msgstr "Tarpai"
+
+#: Merge.rc:1357
+#, c-format
+msgid "Ignore trailing &space"
+msgstr "Ignoruoti tarpu&s pabaigoje"
+
+#: Merge.rc:1358
+#, c-format
+msgid "&Compare"
+msgstr "Lyginti"
+
+#: Merge.rc:1359
+#, c-format
+msgid "&Ignore change"
+msgstr "&Ignoruoti pokyèius"
+
+#: Merge.rc:1360
+#, c-format
+msgid "I&gnore all"
+msgstr "I&gnoruoti visus"
+
+#: Merge.rc:1364
+#, c-format
+msgid "E&nable moved block detection"
+msgstr "Áju&ngti perkeltø blokø aptikimà"
+
+#: Merge.rc:1365
+#, c-format
+msgid "&Match similar lines"
+msgstr "&Sutapdinti panaðias eilutes"
+
+#: Merge.rc:1366
+#, c-format
+msgid "C&ontext limit:"
+msgstr "K&onteksto limitas:"
+
+#: Merge.rc:1368
+#, c-format
+msgid "Minimize number of affected lines"
+msgstr "Sumaþinti paveiktø eiluèiø skaièiø"
+
+#: Merge.rc:1369
+#, c-format
+msgid "Speed up processing of large files"
+msgstr "Paspartinti dideliø failø apdorojimà"
+
+#: Merge.rc:1371
+#, c-format
+msgid "Filter Comments"
+msgstr "Filtruoti komentarus"
+
+#: Merge.rc:1372
+#, c-format
+msgid "Apply historic cost limit"
+msgstr "Taikyti istoriná sànaudø limità"
+
+#: Merge.rc:1380
+#: Merge.rc:1869
+#, c-format
+msgid "Folder"
+msgstr "Katalogø"
+
+#: Merge.rc:1385
+#, c-format
+msgid "S&top after first difference"
+msgstr "Sus&toti radus pirmà skirtumà"
+
+#: Merge.rc:1386
+#, c-format
+msgid "Ign&ore time differences less than 3 seconds"
+msgstr "Ign&oruoti maþesná nei 3 sekundþiø laiko skirtumà"
+
+#: Merge.rc:1387
+#, c-format
+msgid "&Self-compare unique files"
+msgstr "&Savarankiðkai lyginti unikalius failus"
+
+#: Merge.rc:1388
+#, c-format
+msgid "&Include unique subfolders contents"
+msgstr "Átraukt&i unikalø pakatalogiø turiná"
+
+#: Merge.rc:1389
+#, c-format
+msgid "C&ache compare results of visited folders"
+msgstr "&Atsiminti aplankytø katalogø lyginimo rezultatus"
+
+#: Merge.rc:1390
+#, c-format
+msgid "&Quick compare limit (MB):"
+msgstr "&Greitojo palyginimo limitas (MB):"
+
+#: Merge.rc:1392
+#, c-format
+msgid "&Number of compare threads (a negative value implies addition of the number of available CPU cores):"
+msgstr "Lygi&nimo srautø skaièius (neigiama reikðmë reiðkia turimø procesoriaus branduoliø skaièiaus pridëjimà):"
+
+#: Merge.rc:1404
+#, c-format
+msgid "&Highlight syntax"
+msgstr "&Naudoti sintaksës paryðkinimà"
+
+#: Merge.rc:1405
+#, c-format
+msgid "&Automatic rescan"
+msgstr "&Automatiðkai perskanuoti"
+
+#: Merge.rc:1406
+#, c-format
+msgid "&Preserve original EOL chars"
+msgstr "Iðsaugoti originalø eiluèiø pabaigos formatà"
+
+#: Merge.rc:1407
+#, c-format
+msgid "Honor .editorcon&fig files"
+msgstr "Gerbti .editorcon&fig failus"
+
+#: Merge.rc:1408
+#, c-format
+msgid "Honor Emacs/Kate/Vim &modelines"
+msgstr "Gerbti Emacs/Kate/Vim &modelinus"
+
+#: Merge.rc:1409
+#, c-format
+msgid "Tabs"
+msgstr "TAB simboliai"
+
+#: Merge.rc:1410
+#, c-format
+msgid "&Tab size:"
+msgstr "&TAB simbolio dydis:"
+
+#: Merge.rc:1412
+#, c-format
+msgid "&Insert Tabs"
+msgstr "Áterpt&i TAB simbolius"
+
+#: Merge.rc:1413
+#, c-format
+msgid "Insert &Spaces"
+msgstr "Áterpti tarpu&s"
+
+#: Merge.rc:1414
+#, c-format
+msgid "Line Difference Coloring"
+msgstr "Skirtumø eilutëse spalvinimas"
+
+#: Merge.rc:1415
+#, c-format
+msgid "View line &differences"
+msgstr "Rodyti &skirtumus eilutëse"
+
+#: Merge.rc:1417
+#, c-format
+msgid "W&ord break characters:"
+msgstr "Þ&odþiø skirtukø simboliai:"
+
+#: Merge.rc:1419
+#, c-format
+msgid "Narrow down to &character level"
+msgstr "Apriboti iki &simbolio lygmens"
+
+#: Merge.rc:1426
+#, c-format
+msgid "Linefilters"
+msgstr "Eilutës filtrai"
+
+#: Merge.rc:1429
+#, c-format
+msgid "Enable Line Filters"
+msgstr "Ájungti eilutës filtrus"
+
+#: Merge.rc:1431
+#, c-format
+msgid "Test Case:"
+msgstr "Testavimo atvejis:"
+
+#: Merge.rc:1433
+#, c-format
+msgid "New"
+msgstr "Naujas"
+
+#: Merge.rc:1434
+#, c-format
+msgid "Edit"
+msgstr "Redaguoti"
+
+#: Merge.rc:1435
+#, c-format
+msgid "Remove"
+msgstr "Paðalinti"
+
+#: Merge.rc:1445
+#, c-format
+msgid "Automatically &scroll to first difference"
+msgstr "Automatiðkai pereiti prie pirmo &skirtumo"
+
+#: Merge.rc:1446
+#, c-format
+msgid "Enable scroll ani&mation"
+msgstr ""
+
+#: Merge.rc:1447
+#, c-format
+msgid "&Disable Splash Screen"
+msgstr "&Iðjungti prisistatymo langà"
+
+#: Merge.rc:1448
+#, c-format
+msgid "Cl&ose windows with ESC"
+msgstr "Uþverti langus „ESC“ klaviðu"
+
+#: Merge.rc:1449
+#, c-format
+msgid "&Automatically verify paths in Open-dialog"
+msgstr "&Automatiðkai tikrinti kelius „Atverti“ lange"
+
+#: Merge.rc:1450
+#, c-format
+msgid "All&ow only one instance to run"
+msgstr "Tik viena program&os kopija vienu metu"
+
+#: Merge.rc:1451
+#, c-format
+msgid "As&k when closing multiple windows"
+msgstr "&Klausti patvirtinimo, kai uþdaromi keli langai"
+
+#: Merge.rc:1452
+#, c-format
+msgid "&Preserve file time in file compare"
+msgstr "Lyginant failus ne&pakeisti failo keitimo laiko"
+
+#: Merge.rc:1453
+#, c-format
+msgid "Show \"Select Files or Folders\" Dialog on Startup"
+msgstr "Rodyti „Pasirinkti failus ar katalogus“ startuojant"
+
+#: Merge.rc:1454
+#, c-format
+msgid "O&pen-dialog Auto-Completion:"
+msgstr "Lango „Atverti“ automatinis uþ&pildymas:"
+
+#: Merge.rc:1456
+#, c-format
+msgid "Enable multiple compare windows for"
+msgstr "Ájungti daugkartinio palyginimo langus kai"
+
+#: Merge.rc:1459
+#, c-format
+msgid "WinMerge allows hiding some common messageboxes. Press the Reset button to make all messageboxes visible again."
+msgstr "„WinMerge“ leidþia paslëpti kai kuriuos bendrus praneðimus. Paspauskite mygtukà „Atkurti“, kad visi praneðimai vël bûtø matomi."
+
+#: Merge.rc:1460
+#, c-format
+msgid "Reset"
+msgstr "Atkurti"
+
+#: Merge.rc:1467
+#: Merge.rc:1892
+#: Merge.rc:2012
+#, c-format
+msgid "Binary"
+msgstr "Binariniø"
+
+#: Merge.rc:1470
+#, c-format
+msgid "Number of bytes to display per line:"
+msgstr "Baitø skaièius, rodomas kiekvienoje eilutëje:"
+
+#: Merge.rc:1472
+#, c-format
+msgid "Automatically adjust number of bytes per line (uncheck this if you want WinMerge to use your own choice for bytes per line)"
+msgstr ""
+"Automatiðkai reguliuoti baitø skaièiø kiekvienoje eilutëje (nuimkite, jei norite, kad „WinMerge“ naudotø jûsø parinktà baitø eilutëje "
+"skaièiø)"
+
+#: Merge.rc:1479
+#, c-format
+msgid "Shell Integration"
+msgstr "Integr. Windows aplinkoje"
+
+#: Merge.rc:1482
+#, c-format
+msgid "Explorer"
+msgstr "„Explorer“'is"
+
+#: Merge.rc:1483
+#, c-format
+msgid "&Add to context menu"
+msgstr "&Pridëti á kontekstiná meniu"
+
+#: Merge.rc:1484
+#, c-format
+msgid "E&nable advanced menu"
+msgstr "Áju&ngti iðplëstiná meniu"
+
+#: Merge.rc:1485
+#, c-format
+msgid "In&clude subfolders by default"
+msgstr "Átraukt&i pakatalogius"
+
+#: Merge.rc:1487
+#, c-format
+msgid "Folder compare"
+msgstr "Katalogø lyginimas"
+
+#: Merge.rc:1488
+#, c-format
+msgid "Add &Shell menu to context menu"
+msgstr "Pridëti &sistemos meniu á kontekstiná meniu"
+
+#: Merge.rc:1489
+#, c-format
+msgid "File compare"
+msgstr "Failø lyginimas"
+
+#: Merge.rc:1490
+#, c-format
+msgid "Add S&hell menu to context menu"
+msgstr "Pridëti s&istemos meniu á kontekstiná meniu"
+
+#: Merge.rc:1497
+#, c-format
+msgid "System"
+msgstr "Sistemos"
+
+#: Merge.rc:1500
+#, c-format
+msgid "Use S&hell file operations"
+msgstr "Naudoti s&istemos funkcijas failø operacijoms"
+
+#: Merge.rc:1501
+#, c-format
+msgid "&Send deleted files to Recycle Bin"
+msgstr "&Siøsti iðtrintus failus á ðiukðliadëþæ"
+
+#: Merge.rc:1502
+#, c-format
+msgid "Use Shell file browse &dialogs"
+msgstr "Naudoti sistemos &dialogo langus failø narðymui"
+
+#: Merge.rc:1503
+#, c-format
+msgid "&External editor:"
+msgstr "Iðorinis r&edaktorius:"
+
+#: Merge.rc:1506
+#, c-format
+msgid "Supple&ment folder:"
+msgstr "Papildi&niø katalogas:"
+
+#: Merge.rc:1508
+#, c-format
+msgid "B&rowse..."
+msgstr "R&asti..."
+
+#: Merge.rc:1509
+#, c-format
+msgid "Temporary files folder"
+msgstr "Laikinø failø katalogas"
+
+#: Merge.rc:1510
+#, c-format
+msgid "S&ystem's temp folder"
+msgstr "S&istemos laikinasis katalogas"
+
+#: Merge.rc:1511
+#, c-format
+msgid "C&ustom folder:"
+msgstr "P&asirinktinis katalogas:"
+
+#: Merge.rc:1520
+#, c-format
+msgid "Save modified files?"
+msgstr "Iðsaugoti pakeistus failus?"
+
+#: Merge.rc:1523
+#, c-format
+msgid "Left side file"
+msgstr "Kairysis failas"
+
+#: Merge.rc:1525
+#, c-format
+msgid "&Save changes"
+msgstr "Ið&saugoti pakeitimus"
+
+#: Merge.rc:1526
+#, c-format
+msgid "&Discard changes"
+msgstr "&Atmesti pakeitimus"
+
+#: Merge.rc:1527
+#, c-format
+msgid "Right side file"
+msgstr "Deðinysis failas"
+
+#: Merge.rc:1529
+#, c-format
+msgid "S&ave changes"
+msgstr "Iðs&augoti pakeitimus"
+
+#: Merge.rc:1530
+#, c-format
+msgid "Dis&card changes"
+msgstr "A&tmesti pakeitimus"
+
+#: Merge.rc:1531
+#, c-format
+msgid "Disca&rd All"
+msgstr "Atmes&ti viskà"
+
+#: Merge.rc:1540
+#, c-format
+msgid "Shared or Private Filter"
+msgstr "Bendro naudojimo ar asmeninis filtras"
+
+#: Merge.rc:1543
+#, c-format
+msgid "Which type of filter do you want to create?"
+msgstr "Kokio tipo filtrà norite sukurti?"
+
+#: Merge.rc:1544
+#, c-format
+msgid "Shared Filter (for all users on this machine)"
+msgstr "Bendrai naudojami filtrai (visiems kompiuterio naudotojams)"
+
+#: Merge.rc:1545
+#, c-format
+msgid "Private Filter (only for current user)"
+msgstr "Asmeniniai filtrai (tik ðiam naudotojui)"
+
+#: Merge.rc:1554
+#, c-format
+msgid "Test Filter"
+msgstr "Testuoti filtrà"
+
+#: Merge.rc:1557
+#, c-format
+msgid "Testing filter ..."
+msgstr "Testuojamas filtras ..."
+
+#: Merge.rc:1559
+#, c-format
+msgid "&Enter text to test:"
+msgstr "Áv&eskite tekstà patikrinimui:"
+
+#: Merge.rc:1561
+#, c-format
+msgid "&Folder Name"
+msgstr "&Katalogo vardas"
+
+#: Merge.rc:1562
+#, c-format
+msgid "Result:"
+msgstr "Rezultatas:"
+
+#: Merge.rc:1564
+#, c-format
+msgid "&Test"
+msgstr "&Testuoti"
+
+#: Merge.rc:1565
+#, c-format
+msgid "&Close"
+msgstr "&Uþverti"
+
+#: Merge.rc:1572
+#, c-format
+msgid "Visual SourceSafe"
+msgstr "Visual SourceSafe"
+
+#: Merge.rc:1577
+#, c-format
+msgid "Database:"
+msgstr "Duomenø bazë:"
+
+#: Merge.rc:1579
+#, c-format
+msgid "Project:"
+msgstr "Projektas:"
+
+#: Merge.rc:1581
+#, c-format
+msgid "User:"
+msgstr "Naudotojas:"
+
+#: Merge.rc:1583
+#, c-format
+msgid "Password:"
+msgstr "Slaptaþodis:"
+
+#: Merge.rc:1586
+#, c-format
+msgid "Check Out"
+msgstr "Paimti"
+
+#: Merge.rc:1595
+#, c-format
+msgid "Go To"
+msgstr "Pereiti á"
+
+#: Merge.rc:1598
+#, c-format
+msgid "G&oto:"
+msgstr "P&ereiti:"
+
+#: Merge.rc:1600
+#, c-format
+msgid "File"
+msgstr "Failas"
+
+#: Merge.rc:1603
+#, c-format
+msgid "Goto what"
+msgstr "Pereiti á"
+
+#: Merge.rc:1604
+#, c-format
+msgid "Li&ne"
+msgstr "Ei&lutæ"
+
+#: Merge.rc:1605
+#, c-format
+msgid "&Difference"
+msgstr "&Skirtumà"
+
+#: Merge.rc:1606
+#, c-format
+msgid "&Go To"
+msgstr "&Pereiti á"
+
+#: Merge.rc:1617
+#, c-format
+msgid "Ready"
+msgstr "Parengtas"
+
+#: Merge.rc:1618
+#, c-format
+msgid ""
+"Create empty documents\n"
+"New Documents (Ctrl+N)"
+msgstr ""
+"Kurti tuðèius dokumentus\n"
+"Nauji dokumentai (Ctrl+N)"
+
+#: Merge.rc:1619
+#, c-format
+msgid ""
+"Open an existing document\n"
+"Open (Ctrl+O)"
+msgstr ""
+"Atverti aktyvø dokumentà\n"
+"Atverti (Ctrl+O)"
+
+#: Merge.rc:1620
+#, c-format
+msgid ""
+"Close the active document\n"
+"Close"
+msgstr ""
+"Uþverti aktyvø dokumentà\n"
+"Uþverti"
+
+#: Merge.rc:1621
+#, c-format
+msgid ""
+"Save the active document\n"
+"Save (Ctrl+S)"
+msgstr ""
+"Iðsaugoti aktyvø dokumentà\n"
+"Iðsaugoti (Ctrl+S)"
+
+#: Merge.rc:1622
+#, c-format
+msgid ""
+"Save the active document with a new name\n"
+"Save As"
+msgstr ""
+"Iðsaugoti aktyvø dokumentà kitu vardu\n"
+"Iðsaugoti kaip"
+
+#: Merge.rc:1623
+#, c-format
+msgid ""
+"Change the printing options\n"
+"Page Setup"
+msgstr ""
+"Pakeisti spausdinimo parinktis\n"
+"Puslapio nuostatos"
+
+#: Merge.rc:1624
+#, c-format
+msgid ""
+"Change the printer and printing options\n"
+"Print Setup"
+msgstr ""
+"Pakeisti spausdintuvo ir spausdinimo parinktis\n"
+"Spausdinimo nuostatos"
+
+#: Merge.rc:1625
+#, c-format
+msgid ""
+"Print the active document\n"
+"Print"
+msgstr ""
+"Spausdinti aktyvø dokumentà\n"
+"Spausdinti"
+
+#: Merge.rc:1626
+#, c-format
+msgid ""
+"Display full pages\n"
+"Print Preview"
+msgstr ""
+"Rodyti pilnus puslapius\n"
+"Spausdinimo perþiûra"
+
+#: Merge.rc:1627
+#, c-format
+msgid "Make all hidden items visible again"
+msgstr "Padaryti visus paslëptus elementus vël matomais"
+
+#: Merge.rc:1628
+#, c-format
+msgid "Toggle tree mode"
+msgstr "Medþio reþimas"
+
+#: Merge.rc:1629
+#, c-format
+msgid "Expand all subfolders"
+msgstr "Iðskleisti visus pakatalogius"
+
+#: Merge.rc:1630
+#, c-format
+msgid "Collapse all subfolders"
+msgstr "Suskleisti visus pakatalogius"
+
+#: Merge.rc:1631
+#, c-format
+msgid ""
+"Open project file\n"
+"Project file (Ctrl+J)"
+msgstr ""
+"Atverti projekto failà\n"
+"Projekto failas (Ctrl+J)"
+
+#: Merge.rc:1632
+#, c-format
+msgid "Unknown error attempting to open project file"
+msgstr "Neþinoma klaida bandant atidaryti projekto failà"
+
+#: Merge.rc:1633
+#, c-format
+msgid "Unknown error attempting to save project file"
+msgstr "Neþinoma klaida bandant iðsaugoti projekto failà"
+
+#: Merge.rc:1634
+#, c-format
+msgid "Project File"
+msgstr "Projekto failas"
+
+#: Merge.rc:1635
+#, c-format
+msgid "Project file successfully loaded."
+msgstr "Projekto failas sëkmingai ákrautas."
+
+#: Merge.rc:1636
+#, c-format
+msgid "Project file successfully saved."
+msgstr "Projekto failas sëkmingai iðsaugotas."
+
+#: Merge.rc:1637
+#, c-format
+msgid ""
+"Save current paths and options to project file\n"
+"Save Project File"
+msgstr ""
+"Iðsaugoti aktualius kelius ir nuostatas projekto faile\n"
+"Iðsaugoti projekto failà"
+
+#: Merge.rc:1638
+#, c-format
+msgid ""
+"Display program information, version number and copyright\n"
+"About"
+msgstr ""
+"Rodo programos informacijà, versijos numerá ir autorines teises\n"
+"Apie"
+
+#: Merge.rc:1639
+#, c-format
+msgid ""
+"Quit the application; prompts to save documents\n"
+"Exit"
+msgstr ""
+"Baigti programos darbà; raginama áraðyti dokumentus\n"
+"Iðeiti"
+
+#: Merge.rc:1640
+#: Merge.rc:1641
+#: Merge.rc:1642
+#: Merge.rc:1643
+#: Merge.rc:1644
+#: Merge.rc:1645
+#: Merge.rc:1646
+#: Merge.rc:1647
+#: Merge.rc:1648
+#: Merge.rc:1649
+#: Merge.rc:1650
+#: Merge.rc:1651
+#: Merge.rc:1652
+#: Merge.rc:1653
+#: Merge.rc:1654
+#: Merge.rc:1655
+#, c-format
+msgid "Open this document"
+msgstr "Atverti ðá dokumentà"
+
+#: Merge.rc:1656
+#, c-format
+msgid ""
+"Switch to the next window pane\n"
+"Next Pane"
+msgstr ""
+"Persijungti á kità polangá\n"
+"Kitas polangis"
+
+#: Merge.rc:1657
+#, c-format
+msgid ""
+"Switch back to the previous window pane\n"
+"Previous Pane"
+msgstr ""
+"Persijungti atgal á buvusá polangá\n"
+"Ankstesnis polangis"
+
+#: Merge.rc:1658
+#, c-format
+msgid ""
+"Arrange windows so they overlap\n"
+"Cascade Windows"
+msgstr ""
+"Iðdëstyti langus persidengianèia tvarka pakopomis\n"
+"Iðdëstyti pakopomis"
+
+#: Merge.rc:1659
+#, c-format
+msgid ""
+"Arrange windows as non-overlapping tiles horizontally\n"
+"Tile Windows Horizontally"
+msgstr ""
+"Iðdëstyti langus nepersidengianèia tvarka gulsèiai\n"
+"Iðkloti langus gulsèiai"
+
+#: Merge.rc:1660
+#, c-format
+msgid ""
+"Arrange windows as non-overlapping tiles vertically\n"
+"Tile Windows Vertically"
+msgstr ""
+"Iðdëstyti langus nepersidengianèia tvarka staèiai\n"
+"Iðkloti langus staèiai"
+
+#: Merge.rc:1661
+#, c-format
+msgid ""
+"Copy the selection and put it on the Clipboard\n"
+"Copy"
+msgstr ""
+"Nukopijuoti paþymëtà fragmentà á mainø sritá\n"
+"Kopijuoti"
+
+#: Merge.rc:1662
+#, c-format
+msgid ""
+"Cut the selection and put it on the Clipboard\n"
+"Cut"
+msgstr ""
+"Iðkirpti paþymëta fragmentà ir patalpinti mainø srityje\n"
+"Iðkirpti"
+
+#: Merge.rc:1663
+#, c-format
+msgid ""
+"Find the specified text\n"
+"Find"
+msgstr ""
+"Rasti nurodytà tekstà\n"
+"Rasti"
+
+#: Merge.rc:1664
+#, c-format
+msgid ""
+"Insert Clipboard contents\n"
+"Paste"
+msgstr ""
+"Áterpti mainø srities turiná\n"
+"Áterpti"
+
+#: Merge.rc:1665
+#, c-format
+msgid ""
+"Repeat the last action\n"
+"Repeat"
+msgstr ""
+"Pakartoti paskutiná veiksmà\n"
+"Pakartoti"
+
+#: Merge.rc:1666
+#, c-format
+msgid ""
+"Replace specific text with different text\n"
+"Replace"
+msgstr ""
+"Pakeisti konkretø tekstà kitu tekstu\n"
+"Pakeisti"
+
+#: Merge.rc:1667
+#, c-format
+msgid ""
+"Select the entire document\n"
+"Select All"
+msgstr ""
+"Paþymëti visà dokumentà\n"
+"Paþymëti viskà"
+
+#: Merge.rc:1668
+#, c-format
+msgid ""
+"Undo the last action\n"
+"Undo (Ctrl+Z)"
+msgstr ""
+"Atðaukti paskutiná veiksmà\n"
+"Atðaukti (Ctrl+Z)"
+
+#: Merge.rc:1669
+#, c-format
+msgid ""
+"Redo the previously undone action\n"
+"Redo (Ctrl+Y)"
+msgstr ""
+"Pakartoti anksèiau anuliuotà veiksmà\n"
+"Pakartoti (Ctrl+Y)"
+
+#: Merge.rc:1670
+#, c-format
+msgid ""
+"Show or hide the toolbar\n"
+"Toggle ToolBar"
+msgstr ""
+"Rodyti arba slëpti mygtukø juostà\n"
+"Perjungti mygtukø juostà"
+
+#: Merge.rc:1671
+#, c-format
+msgid ""
+"Show or hide the status bar\n"
+"Toggle StatusBar"
+msgstr ""
+"Rodyti arba slëpti bûsenos juostà\n"
+"Perjungti bûsenos juostà"
+
+#: Merge.rc:1672
+#, c-format
+msgid ""
+"Show or hide the tab bar\n"
+"Toggle TabBar"
+msgstr ""
+"Rodyti arba slëpti korteliø juostà\n"
+"Perjungti korteliø juostà"
+
+#: Merge.rc:1673
+#, c-format
+msgid ""
+"Automatically resize panes\n"
+"Lock Panes"
+msgstr ""
+"Automatiðkai keièia polangiø matmenis\n"
+"Uþrakinti polangius"
+
+#: Merge.rc:1675
+#, c-format
+msgid "Preserve original EOL chars"
+msgstr "Iðsaugoti originalø eiluèiø pabaigos formatà"
+
+#: Merge.rc:1676
+#: Merge.rc:1677
+#, c-format
+msgid "Right click on the path to copy"
+msgstr "Kad nukopijuoti, spustelëkite deðiniuoju pelës mygtuku ant kelio"
+
+#: Merge.rc:1678
+#, c-format
+msgid ""
+"Developers:\n"
+"Dean Grimm, Christian List, Kimmo Varis, Jochen Tucht, Tim Gerundt, Takashi Sawanaki, Gal Hammer, Alexander Skinner"
+msgstr ""
+"Kûrëjai:\n"
+"Dean Grimm, Christian List, Kimmo Varis, Jochen Tucht, Tim Gerundt, Takashi Sawanaki, Gal Hammer, Alexander Skinner"
+
+#: Merge.rc:1679
+#, c-format
+msgid ""
+"WinMerge comes with ABSOLUTELY NO WARRANTY. This is free software and you are welcome to redistribute it under certain circumstances; see "
+"the GNU General Public License in the Help menu for details."
+msgstr ""
+"„WinMerge“ tiekiama VISIÐKAI BE JOKIØ GARANTIJØ. Tai nemokama programinë áranga ir jûs galite jà platinti tam tikromis sàlygomis. Daugiau "
+"apie tai rasite „Pagalbos“ meniu punkte „GNU Bendroji vieðoji licencija“."
+
+#: Merge.rc:1680
+#, c-format
+msgid "&Ok"
+msgstr "&Gerai"
+
+#: Merge.rc:1682
+#, c-format
+msgid "&Abort"
+msgstr "Nutr&aukti"
+
+#: Merge.rc:1683
+#, c-format
+msgid "&Retry"
+msgstr "Ka&rtoti"
+
+#: Merge.rc:1684
+#, c-format
+msgid "&Ignore"
+msgstr "&Ignoruoti"
+
+#: Merge.rc:1685
+#, c-format
+msgid "Ignore &all"
+msgstr "Ignoruoti visk&à"
+
+#: Merge.rc:1686
+#, c-format
+msgid "&Yes"
+msgstr "&Taip"
+
+#: Merge.rc:1687
+#, c-format
+msgid "Yes to &all"
+msgstr "T&aip visiems"
+
+#: Merge.rc:1688
+#, c-format
+msgid "&No"
+msgstr "&Ne"
+
+#: Merge.rc:1689
+#, c-format
+msgid "No to a&ll"
+msgstr "Ne vi&siems"
+
+#: Merge.rc:1690
+#, c-format
+msgid "&Continue"
+msgstr "Tæ&sti"
+
+#: Merge.rc:1691
+#, c-format
+msgid "&Skip"
+msgstr "Pralei&sti"
+
+#: Merge.rc:1692
+#, c-format
+msgid "Skip &all"
+msgstr "Praleisti visk&à"
+
+#: Merge.rc:1694
+#, c-format
+msgid "Don't display this &message again."
+msgstr "Daugiau nerodyti ðio praneði&mo."
+
+#: Merge.rc:1695
+#, c-format
+msgid "Don't ask this &question again."
+msgstr "Daugiau neklausti ðio &klausimo."
+
+#: Merge.rc:1696
+#, c-format
+msgid "Compare"
+msgstr "Lyginimo"
+
+#: Merge.rc:1697
+#, c-format
+msgid "Editor"
+msgstr "Redaktoriaus"
+
+#: Merge.rc:1698
+#, c-format
+msgid "Colors"
+msgstr "Spalvø"
+
+#: Merge.rc:1699
+#, c-format
+msgid "To:"
+msgstr "Á:"
+
+#: Merge.rc:1700
+#, c-format
+msgid "From left:"
+msgstr "Ið kairës:"
+
+#: Merge.rc:1701
+#, c-format
+msgid "To left:"
+msgstr "Á kairæ:"
+
+#: Merge.rc:1702
+#, c-format
+msgid "From right:"
+msgstr "Ið deðinës:"
+
+#: Merge.rc:1703
+#, c-format
+msgid "To right:"
+msgstr "Á deðinæ:"
+
+#: Merge.rc:1704
+#, c-format
+msgid "Version %1"
+msgstr "Versija %1"
+
+#: Merge.rc:1705
+#, c-format
+msgid "Options (%1)"
+msgstr "Nuostatos (%1)"
+
+#: Merge.rc:1706
+#, c-format
+msgid "All message boxes are now displayed again."
+msgstr "Dabar vël bus rodom ivisi praneðimai."
+
+#: Merge.rc:1707
+#, c-format
+msgid ""
+"Modifications have been made to the current file comparison session.  Some settings may not take place until the current file comparison "
+"is restarted."
+msgstr ""
+"Dabartiniame failø palyginimo seanse buvo atlikti pakeitimai.  Kai kurie nustatymai gali neveikti, kol failø palyginimas nebus paleistas "
+"ið naujo."
+
+#: Merge.rc:1708
+#, c-format
+msgid ""
+"Are you sure you want to reset all WinMerge options to default values?\n"
+"\n"
+"Please re-start WinMerge after the reset."
+msgstr ""
+"Ar tikrai norite atstatyti visø „WinMerge“ parametrø numatytàsias reikðmes?\n"
+"\n"
+"Paleiskite „WinMerge“ ið naujo po atstatymo."
+
+#: Merge.rc:1710
+#, c-format
+msgid "Programs|*.exe;*.bat;*.cmd|All Files (*.*)|*.*||"
+msgstr "Programos|*.exe;*.bat;*.cmd|Visi failai (*.*)|*.*||"
+
+#: Merge.rc:1711
+#, c-format
+msgid "All Files (*.*)|*.*||"
+msgstr "Visi failai (*.*)|*.*||"
+
+#: Merge.rc:1712
+#, c-format
+msgid "WinMerge Project Files (*.WinMerge)|*.WinMerge||"
+msgstr "„WinMerge“ projekto failai (*.WinMerge)|*.WinMerge||"
+
+#: Merge.rc:1713
+#, c-format
+msgid "Options files (*.ini)|*.ini|All Files (*.*)|*.*||"
+msgstr "Nuostatø failai (*.ini)|*.ini|Visi failai (*.*)|*.*||"
+
+#: Merge.rc:1714
+#, c-format
+msgid "Text Files (*.csv;*.asc;*.rpt;*.txt)|*.csv;*.asc;*.rpt;*.txt|All Files (*.*)|*.*||"
+msgstr "Teksto failai (*.csv;*.asc;*.rpt;*.txt)|*.csv;*.asc;*.rpt;*.txt|Visi failai (*.*)|*.*||"
+
+#: Merge.rc:1715
+#, c-format
+msgid "HTML Files (*.htm,*.html)|*.htm;*.html|All Files (*.*)|*.*||"
+msgstr "HTML failai (*.htm,*.html)|*.htm;*.html|Visi failai (*.*)|*.*||"
+
+#: Merge.rc:1716
+#, c-format
+msgid "XML Files (*.xml)|*.xml|All Files (*.*)|*.*||"
+msgstr "XML failai (*.xml)|*.xml|Visi failai (*.*)|*.*||"
+
+#: Merge.rc:1717
+#, c-format
+msgid "XLS Files (*.xls)|*.xls|All Files (*.*)|*.*||"
+msgstr "XLS failai (*.xls)|*.xls|All Files (*.*)|*.*||"
+
+#: Merge.rc:1723
+#, c-format
+msgid "Name"
+msgstr "Pavadinimas"
+
+#: Merge.rc:1724
+#, c-format
+msgid "Location"
+msgstr "Vieta"
+
+#: Merge.rc:1725
+#, c-format
+msgid "Filters"
+msgstr "Filtrai"
+
+#: Merge.rc:1726
+#, c-format
+msgid "Description"
+msgstr "Apraðas"
+
+#: Merge.rc:1727
+#, c-format
+msgid "Select filename for new filter"
+msgstr "Nurodykite naujo filtro failo vardà"
+
+#: Merge.rc:1728
+#, c-format
+msgid "File Filters (*.flt)|*.flt|All Files (*.*)|*.*||"
+msgstr "Failo filtrai (*.flt)|*.flt|Visi failai (*.*)|*.*||"
+
+#: Merge.rc:1729
+#, c-format
+msgid ""
+"Cannot find file filter template file!\n"
+"\n"
+"Please copy file %1 to WinMerge/Filters -folder:\n"
+"%2."
+msgstr ""
+"Nepavyko rasti failø filtro ðablono failo!\n"
+"\n"
+"Nukopijuokit %1 failà á WinMerge/Filters katalogà:\n"
+"%2."
+
+#: Merge.rc:1730
+#, c-format
+msgid ""
+"Cannot copy filter template file to filter folder:\n"
+"%1\n"
+"\n"
+"Please make sure the folder exists and is writable."
+msgstr ""
+"Nepavyko kopijuoti filtro ðablono failo á filtrø katalogà:\n"
+"%1\n"
+"\n"
+"Ásitikinkite, kad katalogas egzistuoja ir yra áraðomas."
+
+#: Merge.rc:1731
+#, c-format
+msgid ""
+"User's filter file folder is not defined!\n"
+"\n"
+"Please select filter folder in Options/System."
+msgstr ""
+"Vartotojo filtrø failø katalotgas nëra apibrëþtas!\n"
+"\n"
+"Nurodykite filtrø katalogà „Nuostatos/Sistemos“ meniu punkte."
+
+#: Merge.rc:1732
+#, c-format
+msgid ""
+"Failed to delete the filter file:\n"
+"%1\n"
+"\n"
+"Maybe the file is read-only?"
+msgstr ""
+"Nepavyko iðtrinti filtro failo:\n"
+"%1\n"
+"\n"
+"Gal failo statusas yra „Tik skaitymui“?"
+
+#: Merge.rc:1733
+#, c-format
+msgid "Locate filter file to install"
+msgstr "Rasti filtro diegimo failà"
+
+#: Merge.rc:1734
+#, c-format
+msgid ""
+"Installing filter file failed.\n"
+"\n"
+"Could not copy new filter file to filter folder."
+msgstr ""
+"Filtro failo diegimas nepavyko.\n"
+"\n"
+"Nepavyko nukopijuoti naujo filtro failo á filtrø katalogà."
+
+#: Merge.rc:1735
+#, c-format
+msgid "Filter file already exists. Overwrite existing filter?"
+msgstr "Filtro failas jau yra. Perraðyti esamà filtrà?"
+
+#: Merge.rc:1736
+#, c-format
+msgid "Regular expression"
+msgstr "Reguliarioji iðraiðka"
+
+#: Merge.rc:1737
+#, c-format
+msgid "Filters were updated. Refresh current folder compare?"
+msgstr "Filtrai buvo atnaujinti. Atnaujinti dabartinio katalogo palyginimà?"
+
+#: Merge.rc:1739
+#, c-format
+msgid "&Path to SS.EXE:"
+msgstr "Ke&lias iki „SS.EXE“:"
+
+#: Merge.rc:1740
+#, c-format
+msgid "&Path to TF.EXE:"
+msgstr "Ke&lias iki „TF.EXE“:"
+
+#: Merge.rc:1741
+#, c-format
+msgid "Folder Comparison Results"
+msgstr "Katalogø lyginimo rezultatai"
+
+#: Merge.rc:1742
+#, c-format
+msgid "File Comparison"
+msgstr "Failo palyginimas"
+
+#: Merge.rc:1743
+#, c-format
+msgid "Untitled left"
+msgstr "Bevardis kairysis"
+
+#: Merge.rc:1744
+#, c-format
+msgid "Untitled right"
+msgstr "Bevardis deðinysis"
+
+#: Merge.rc:1745
+#, c-format
+msgid "Theirs File"
+msgstr "Jø failas"
+
+#: Merge.rc:1746
+#, c-format
+msgid "Mine File"
+msgstr "Mano failas"
+
+#: Merge.rc:1747
+#, c-format
+msgid "Scanning files..."
+msgstr "Skanuojami failai..."
+
+#: Merge.rc:1748
+#, c-format
+msgid "Opening selection"
+msgstr "Pasirinkimo atvërimas"
+
+#: Merge.rc:1749
+#, c-format
+msgid "Copying Left to Right"
+msgstr "Kopijuojama kairë á deðinæ"
+
+#: Merge.rc:1750
+#, c-format
+msgid "Copying Right to Left"
+msgstr "Kopijuojama deðinë á kairæ"
+
+#: Merge.rc:1751
+#, c-format
+msgid "Copying All to Left"
+msgstr "Kopijuoti viskà á kairæ"
+
+#: Merge.rc:1752
+#, c-format
+msgid "Copying All to Right"
+msgstr "Kopijuoti viskà á deðinæ"
+
+#: Merge.rc:1753
+#, c-format
+msgid "Copying files..."
+msgstr "Kopijuojami failai..."
+
+#: Merge.rc:1754
+#, c-format
+msgid "Deleting files..."
+msgstr "Trinami failai..."
+
+#: Merge.rc:1755
+#, c-format
+msgid "Moving files..."
+msgstr "Perkeliami failai..."
+
+#: Merge.rc:1756
+#, c-format
+msgid "Creating the report..."
+msgstr "Kuriama ataskaita..."
+
+#: Merge.rc:1757
+#, c-format
+msgid "Undoing the last operation..."
+msgstr "Paskutinës operacijos atðaukimas..."
+
+#: Merge.rc:1758
+#, c-format
+msgid "Redoing the previous operation..."
+msgstr "Paskutinës operacijos kartojimas..."
+
+#: Merge.rc:1759
+#, c-format
+msgid "Ln: %s  Col: %d/%d  Ch: %d/%d  EOL: %s"
+msgstr "Eil.: %s  Stlp.: %d/%d  Sk.: %d/%d  EPS: %s"
+
+#: Merge.rc:1760
+#, c-format
+msgid "Line: %s"
+msgstr "Eilutë: %s"
+
+#: Merge.rc:1761
+#, c-format
+msgid "Ln: %s  Col: %d/%d  Ch: %d/%d"
+msgstr "Eil.: %s  Stlp.: %d/%d  Sk.: %d/%d"
+
+#: Merge.rc:1762
+#, c-format
+msgid "Merge"
+msgstr "Sulieti"
+
+#: Merge.rc:1763
+#, c-format
+msgid "Difference %1 of %2"
+msgstr "Skirtumas %1 ið %2"
+
+#: Merge.rc:1764
+#, c-format
+msgid "%1 Differences Found"
+msgstr "Rasta %1 skirtumø"
+
+#: Merge.rc:1765
+#, c-format
+msgid "1 Difference Found"
+msgstr "Rastas 1 skirtumas"
+
+#: Merge.rc:1766
+#, c-format
+msgid "RO"
+msgstr "RO"
+
+#: Merge.rc:1767
+#, c-format
+msgid "Item %1 of %2"
+msgstr "Elementas %1 ið %2"
+
+#: Merge.rc:1768
+#, c-format
+msgid "Items: %1"
+msgstr "Elementø: %1"
+
+#: Merge.rc:1769
+#, c-format
+msgid "Collect"
+msgstr "Kaupti"
+
+#: Merge.rc:1770
+#, c-format
+msgid "Select two existing folders or files to compare"
+msgstr "Nurodykite lyginimui du egzistuojanèius katalogus ar failus"
+
+#: Merge.rc:1771
+#, c-format
+msgid "Folder Selection"
+msgstr "Katalogo iðrinkimas"
+
+#: Merge.rc:1772
+#, c-format
+msgid "Select two folders or two files to compare."
+msgstr "Nurodykite lyginimui du katalogus ar failus."
+
+#: Merge.rc:1773
+#, c-format
+msgid "Left path is invalid!"
+msgstr "Kairysis kelias klaidingas!"
+
+#: Merge.rc:1774
+#, c-format
+msgid "Right path is invalid!"
+msgstr "Deðinysis kelias klaidingas!"
+
+#: Merge.rc:1775
+#, c-format
+msgid "Both paths are invalid!"
+msgstr "Abu keliai klaidingi!"
+
+#: Merge.rc:1776
+#, c-format
+msgid "Cannot compare file and folder!"
+msgstr "Negalima lyginti failo ir katalogo!"
+
+#: Merge.rc:1777
+#, c-format
+msgid "File not found: %1"
+msgstr "Nerastas failas: %1"
+
+#: Merge.rc:1778
+#, c-format
+msgid "File not unpacked: %1"
+msgstr "Failas %1 neiðpakuotas"
+
+#: Merge.rc:1779
+#, c-format
+msgid ""
+"Cannot move file\n"
+"%1\n"
+"to\n"
+"%2\n"
+"\n"
+"%3"
+msgstr ""
+"Negalima perkelti failo\n"
+"%1\n"
+"to\n"
+"%2\n"
+"\n"
+"%3"
+
+#: Merge.rc:1780
+#, c-format
+msgid ""
+"Cannot copy file\n"
+"%1\n"
+"to\n"
+"%2\n"
+"\n"
+"%3"
+msgstr ""
+"Negalima nukopijuoti failo\n"
+"%1\n"
+"to\n"
+"%2\n"
+"\n"
+"%3"
+
+#: Merge.rc:1781
+#, c-format
+msgid ""
+"Cannot delete file\n"
+"%1\n"
+"\n"
+"%3"
+msgstr ""
+"Negalima iðtrinti failo\n"
+"%1\n"
+"\n"
+"%3"
+
+#: Merge.rc:1782
+#, c-format
+msgid ""
+"Cannot open file\n"
+"%1\n"
+"\n"
+"%2"
+msgstr ""
+"Negalima atidaryti failo\n"
+"%1\n"
+"\n"
+"%2"
+
+#: Merge.rc:1783
+#, c-format
+msgid "Failed to parse conflict file."
+msgstr "Nepavyko iðnagrinëti konfliktø failo."
+
+#: Merge.rc:1784
+#, c-format
+msgid ""
+"The file\n"
+"%1\n"
+"is not a conflict file."
+msgstr ""
+"Failas\n"
+"%1\n"
+"nëra konfliktø failas."
+
+#: Merge.rc:1785
+#, c-format
+msgid ""
+"The target path\n"
+"%2\n"
+"refers to an already existing file.\n"
+"\n"
+"Are you ready to lose this file?"
+msgstr ""
+"Rezultatø kelias\n"
+"%2\n"
+"rodo á jau egzistuojantá failà.\n"
+"\n"
+"Ar esate pasirengæs prarasti ðá failà?"
+
+#: Merge.rc:1786
+#, c-format
+msgid ""
+"The target path\n"
+"%2\n"
+"refers to an already existing read-only or hidden file.\n"
+"\n"
+"Are you ready to lose this file despite its protective attributes?"
+msgstr ""
+"Rezultatø kelias\n"
+"%2\n"
+"rodo á jau egzistuojantá failà, kurio statusas yra „Tik skaitymui“ ar „Paslëptas“.\n"
+"\n"
+"Ar esate pasirengæs prarasti ðá failà, nepaisydamas jo apsauginiø savybiø?"
+
+#: Merge.rc:1787
+#, c-format
+msgid ""
+"The target path\n"
+"%2\n"
+"refers to an already existing empty folder.\n"
+"\n"
+"Are you ready to lose this folder?"
+msgstr ""
+"Rezultatø kelias\n"
+"%2\n"
+"rodo á jau egzistuojantá tuðèià katalogà.\n"
+"\n"
+"Ar esate pasirengæs prarasti ðá katalogà?"
+
+#: Merge.rc:1788
+#, c-format
+msgid ""
+"The target path\n"
+"%2\n"
+"refers to an already existing nonempty folder.\n"
+"\n"
+"Are you ready to lose this folder and all its contents?"
+msgstr ""
+"Rezultatø kelias\n"
+"%2\n"
+"rodo á jau egzistuojantá ne tuðèià katalogà.\n"
+"\n"
+"Ar esate pasirengæs prarasti ðá katalogà ir visà jo turiná?"
+
+#: Merge.rc:1789
+#, c-format
+msgid ""
+"Click Continue only if you are sure that you want to irreversibly delete the selected items, including the contents of involved folders!"
+msgstr ""
+"Spauskite Tæsti tik tada, jei esate tikri, kad norite negráþtamai panaikinti pasirinktus elementus, áskaitant átrauktø katalogø turiná!"
+
+#: Merge.rc:1790
+#, c-format
+msgid "Save As"
+msgstr "Iðsaugoti kaip"
+
+#: Merge.rc:1791
+#, c-format
+msgid "Save changes to %1?"
+msgstr "Iðsaugoti pakeitimus á %1?"
+
+#: Merge.rc:1792
+#, c-format
+msgid ""
+"%1\n"
+"is marked read-only. Would you like to override the read-only file? (No to save as new filename.)"
+msgstr ""
+"%1\n"
+"paþymëtas „Tik skaitymui“. Ar norite perraðyti „Tik skaitymui“ skirtà failà? (Ne, jei áraðyti nauju vardu.)"
+
+#: Merge.rc:1793
+#, c-format
+msgid "Error checking destination writeability"
+msgstr "Klaida tikrinant rezultatø áraðomumà"
+
+#: Merge.rc:1794
+#, c-format
+msgid "Error backing up file"
+msgstr "Klaida kuriant rezerviná failà"
+
+#: Merge.rc:1795
+#, c-format
+msgid ""
+"Unable to backup original file:\n"
+"%1\n"
+"\n"
+"Continue anyway?"
+msgstr ""
+"Nepavyko sukurti rezervinës kopijos failui:\n"
+"%1\n"
+"\n"
+"Vis tiek tæsti?"
+
+#: Merge.rc:1796
+#, c-format
+msgid ""
+"Saving file failed.\n"
+"%1\n"
+"%2\rDo you want to:\n"
+"\t-use a different filename (Press Ok)\n"
+"\t-abort the current operation (Press Cancel)?"
+msgstr ""
+"Failo áraðyti nepavyko.\n"
+"%1\n"
+"%2\rAr norite:\n"
+"\t-panaudoti kità failo vardà (spauskite Gerai)\n"
+"\t-nutraukti ðià operacijà (spauskite Atsisakyti)?"
+
+#: Merge.rc:1797
+#, c-format
+msgid ""
+"Another application has updated file\n"
+"%1\n"
+"since WinMerge loaded it.\n"
+"\n"
+"Overwrite changed file?"
+msgstr ""
+"Kita programa pakeitë failà\n"
+"%1\n"
+"po to, kai jis buvo ákeltas á „Winmerge“.\n"
+"\n"
+"Perraðyti pakeistà failà?"
+
+#: Merge.rc:1798
+#, c-format
+msgid ""
+"%1\n"
+"is marked read-only. Would you like to override the read-only item?"
+msgstr ""
+"%1\n"
+"paþymëtas „Tik skaitymui“. Ar norite perraðyti „Tik skaitymui“ skirtà elementà?"
+
+#: Merge.rc:1799
+#, c-format
+msgid ""
+"Another application has updated file\n"
+"%1\n"
+"since WinMerge scanned it last time.\n"
+"\n"
+"Do you want to reload the file?"
+msgstr ""
+"Kita programa pakeitë failà\n"
+"%1\n"
+"po to, kai jis buvo paskutiná kartà skanuotas „Winmerge“.\n"
+"\n"
+"Ákelti failà ið naujo?"
+
+#: Merge.rc:1800
+#, c-format
+msgid "Save Left File As"
+msgstr "Iðsaugoti kairájá failà kaip"
+
+#: Merge.rc:1801
+#, c-format
+msgid "Save Right File As"
+msgstr "Iðsaugoti daðinájá failà kaip"
+
+#: Merge.rc:1802
+#, c-format
+msgid ""
+"The file\n"
+"%1\n"
+"has disappeared. Please save a copy of the file to continue."
+msgstr ""
+"Failas\n"
+"% 1\n"
+"dingo. Norëdami tæsti, áraðykite failo kopijà."
+
+#: Merge.rc:1803
+#, c-format
+msgid ""
+"Cannot merge differences when documents are not in synch.\n"
+"\n"
+"Refresh documents before continuing."
+msgstr ""
+"Negalima sulieti skirtumø, kai dokumentai nëra sinchronizuoti.\n"
+"\n"
+"Atnaujinkite dokumentus prieð tæsiant."
+
+#: Merge.rc:1804
+#, c-format
+msgid "You must specify a SourceSafe project path in order to continue (ie:  $/MyProject)"
+msgstr "Norëdami tæsti, turite nurodyti kelià iki SourceSafe projekto (pvz.:  $/MyProject)"
+
+#: Merge.rc:1805
+#, c-format
+msgid "Checkout files from versioning system..."
+msgstr "Paimti failus ið versijavimo sistemos..."
+
+#: Merge.rc:1806
+#, c-format
+msgid "Versioning System returned an error while attempting to check out the file.  Unable to continue..."
+msgstr "Versijavimo sistema gràþino klaidà bandant paimti failà.  Negalima tæsti..."
+
+#: Merge.rc:1807
+#, c-format
+msgid "Error executing versioning system command."
+msgstr "Klaida vykdant versijavimo sistemos komandà."
+
+#: Merge.rc:1808
+#, c-format
+msgid "The VSS Working Folder and the location of the current file do not match. Continue?"
+msgstr "Nesutampa VSS darbinio katalogo ir dabartinio failo buvimo vieta. Tæsti?"
+
+#: Merge.rc:1809
+#, c-format
+msgid "No VSS database(s) found!"
+msgstr "Nerasta VSS duomenø bazë (-ës)!"
+
+#: Merge.rc:1810
+#, c-format
+msgid "Error from VSS:"
+msgstr "VSS klaida:"
+
+#: Merge.rc:1811
+#, c-format
+msgid ""
+"Versioning System returned an error while attempting to check in the file.\n"
+" Please, check config spec of used view.\n"
+" Undo checkout operation?"
+msgstr ""
+"Versijavimo sistema gràþino klaidà bandant áregistruoti failà.\n"
+" Patikrinkite naudoto rodinio konfigûracijà.\n"
+" Atðaukti paëmimo operacijà?"
+
+#: Merge.rc:1812
+#, c-format
+msgid ""
+"Versioning System returned an error while attempting to undo checkout the file.\n"
+" Please, check config spec of used view. "
+msgstr ""
+"Versijavimo sistema gràþino klaidà bandant atðaukti failo paëmimà.\n"
+" Patikrinkite naudoto rodinio konfigûracijà. "
+
+#: Merge.rc:1813
+#: Merge.rc:2016
+#, c-format
+msgid "None"
+msgstr "Nëra"
+
+#: Merge.rc:1814
+#, c-format
+msgid "Visual SourceSafe (less than 5.0)"
+msgstr "Visual SourceSafe (ankstesnë uþ 5.0)"
+
+#: Merge.rc:1815
+#, c-format
+msgid "Visual SourceSafe (5.0 and above)"
+msgstr "Visual SourceSafe (5.0 ir vëlesnë)"
+
+#: Merge.rc:1817
+#, c-format
+msgid "Team Foundation Server"
+msgstr "„Team Foundation“ serveris"
+
+#: Merge.rc:1818
+#, c-format
+msgid "Break at whitespace"
+msgstr "Skaidyti per tarpà"
+
+#: Merge.rc:1819
+#, c-format
+msgid "Break at whitespace or punctuation"
+msgstr "Skaidyti per tarpà ar skirtukà"
+
+#: Merge.rc:1820
+#: Merge.rc:1822
+#, c-format
+msgid "Copy selected item to named directory"
+msgstr "Kopijuoti paþymëtà elementà á ávardytàjá katalogà"
+
+#: Merge.rc:1821
+#: Merge.rc:1823
+#, c-format
+msgid "Copy selected item to custom directory"
+msgstr "Kopijuoti paþymëtà elementà á pasirinktiná katalogà"
+
+#: Merge.rc:1824
+#, c-format
+msgid "Delete selected item on left"
+msgstr "Iðtrinti paþymëtà elementà kairëje"
+
+#: Merge.rc:1825
+#, c-format
+msgid "Delete selected item on right"
+msgstr "Iðtrinti paþymëtà elementà deðinëje"
+
+#: Merge.rc:1826
+#, c-format
+msgid "Delete selected item(s) on both sides"
+msgstr "Iðtrinti paþymëtà (-us) elementà (-us) abiejose pusëse"
+
+#: Merge.rc:1827
+#, c-format
+msgid "Hide selected item(s) (on the fly filter)"
+msgstr "Slëpti pasirinktà elementà (-us) (greitas filtras)"
+
+#: Merge.rc:1828
+#, c-format
+msgid "Rename selected item on both sides"
+msgstr "Pervardinti paþymëtà elementà abiejose pusëse"
+
+#: Merge.rc:1829
+#, c-format
+msgid "Select destination folder"
+msgstr "Pasirinkti rezultatø katalogà"
+
+#: Merge.rc:1830
+#, c-format
+msgid "Left side - select destination folder:"
+msgstr "Kairioji pusë - nurodykit rezultatø katalogà:"
+
+#: Merge.rc:1831
+#, c-format
+msgid "Right side - select destination folder:"
+msgstr "Deðinioji pusë - nurodykit rezultatø katalogà:"
+
+#: Merge.rc:1832
+#, c-format
+msgid "(%1 of %2 Files Affected)"
+msgstr "(Paveikta %1 ið %2 failø)"
+
+#: Merge.rc:1833
+#, c-format
+msgid ""
+"Are you sure you want to delete\n"
+"\n"
+"%1 ?"
+msgstr ""
+"Ar tikrai norite iðtrinti\n"
+"\n"
+"%1 ?"
+
+#: Merge.rc:1834
+#, c-format
+msgid "Are you sure you want to copy:"
+msgstr "Ar tikrai norite nukopijuoti:"
+
+#: Merge.rc:1835
+#, c-format
+msgid "Are you sure you want to copy %d items:"
+msgstr "Ar tikrai norite nukopijuoti %d elementus:"
+
+#: Merge.rc:1836
+#, c-format
+msgid ""
+"Operation aborted!\n"
+"\n"
+"Folder contents at disks has changed, path\n"
+"%1\n"
+"was not found.\n"
+"\n"
+"Please refresh the compare."
+msgstr ""
+"Operacija nutraukta!\n"
+"\n"
+"Pasikeitë katalogø turinys diske, kelias\n"
+"%1\n"
+"nerastas.\n"
+"Atnaujinkite palyginimà."
+
+#: Merge.rc:1837
+#, c-format
+msgid "Are you sure you want to move:"
+msgstr "Ar tikrai norite perkelti:"
+
+#: Merge.rc:1838
+#, c-format
+msgid "Are you sure you want to move %d items:"
+msgstr "Ar tikrai norite perkelti %d elementus:"
+
+#: Merge.rc:1840
+#, c-format
+msgid "Confirm Move"
+msgstr "Patvirtinti perkëlimà"
+
+#: Merge.rc:1841
+#, c-format
+msgid "Open left file"
+msgstr "Atverti kairájá failà"
+
+#: Merge.rc:1842
+#, c-format
+msgid "Open the left file to external editor"
+msgstr "Atverti kairájá failà iðoriniame redaktoriuje"
+
+#: Merge.rc:1843
+#, c-format
+msgid "Open left file with ..."
+msgstr "Atverti kairájá failà su ..."
+
+#: Merge.rc:1844
+#, c-format
+msgid "Open right file"
+msgstr "Atverti deðinájá failà"
+
+#: Merge.rc:1845
+#, c-format
+msgid "Open the right file to external editor"
+msgstr "Atverti deðinájá failà iðoriniame redaktoriuje"
+
+#: Merge.rc:1846
+#, c-format
+msgid "Open right file with..."
+msgstr "Atverti deðinájá failà su..."
+
+#: Merge.rc:1847
+#, c-format
+msgid "Failed to execute external editor: %1"
+msgstr "Nepavyko paleisti iðorinio redaktoriaus: %1"
+
+#: Merge.rc:1848
+#, c-format
+msgid "Unknown extension on external editor: %1"
+msgstr "Neþinomas iðoriniam redaktoriui plëtinys: %1"
+
+#: Merge.rc:1849
+#, c-format
+msgid "Copy filenames to clipboard"
+msgstr "Kopijuoti failø vardus á mainø sritá"
+
+#: Merge.rc:1850
+#, c-format
+msgid "Copy left side pathnames to clipboard"
+msgstr "Kopijuoti kairës pusës katalogø vardus á mainø sritá"
+
+#: Merge.rc:1851
+#, c-format
+msgid "Copy right side pathnames to clipboard"
+msgstr "Kopijuoti deðinës pusës katalogø vardus á mainø sritá"
+
+#: Merge.rc:1852
+#, c-format
+msgid "Copy both sides pathnames to clipboard"
+msgstr "Kopijuoti abiejø pusës katalogø vardus á mainø sritá"
+
+#: Merge.rc:1853
+#, c-format
+msgid "Left Shell menu"
+msgstr "Kairysis sistemos meniu"
+
+#: Merge.rc:1854
+#, c-format
+msgid "Right Shell menu"
+msgstr "Deðinysis sistemos meniu"
+
+#: Merge.rc:1855
+#, c-format
+msgid "Unknown archive format"
+msgstr "Neþinomo formato archyvas"
+
+#: Merge.rc:1856
+#, c-format
+msgid ""
+"%1:\n"
+"\n"
+"Can't store as \"%2\""
+msgstr ""
+"%1:\n"
+"\n"
+"Negalima áraðyti kaip „%2“"
+
+#: Merge.rc:1857
+#, c-format
+msgid "Exit code #%d"
+msgstr "Iðëjimo kodas #%d"
+
+#: Merge.rc:1858
+#, c-format
+msgid "The number of selectable files is limited to %1"
+msgstr "Pasirinktinø failø skaièius apribotas iki %1"
+
+#: Merge.rc:1859
+#, c-format
+msgid "Add items from left side to archive"
+msgstr "Pridëti kairës pusës elementus á archyvà"
+
+#: Merge.rc:1860
+#, c-format
+msgid "Add items from right side to archive"
+msgstr "Pridëti deðinës pusës elementus á archyvà"
+
+#: Merge.rc:1861
+#, c-format
+msgid "Add items from both sides to archive"
+msgstr "Pridëti elementus ið abiejø pusiø á archyvà"
+
+#: Merge.rc:1862
+#, c-format
+msgid "Add different items to archive (both sides)"
+msgstr "Pridëti skirtingus elementusá archyvà (abiejø pusiø)"
+
+#: Merge.rc:1863
+#, c-format
+msgid "Move selected file on left to custom directory"
+msgstr "Perkelti pasirinktà failà kairëje á pasirinktà katalogà"
+
+#: Merge.rc:1864
+#, c-format
+msgid "Move selected file on right to custom directory"
+msgstr "Perkelti pasirinktà failà deðinëje á pasirinktà katalogà"
+
+#: Merge.rc:1865
+#, c-format
+msgid "Filename"
+msgstr "Failo vardas"
+
+#: Merge.rc:1866
+#, c-format
+msgid "Date"
+msgstr "Data"
+
+#: Merge.rc:1867
+#, c-format
+msgid "Attributes"
+msgstr "Atributai"
+
+#: Merge.rc:1870
+#, c-format
+msgid "Comparison result"
+msgstr "Lyginimo rezultatas"
+
+#: Merge.rc:1871
+#, c-format
+msgid "Left Date"
+msgstr "Kairiojo data"
+
+#: Merge.rc:1872
+#, c-format
+msgid "Right Date"
+msgstr "Deðiniojo data"
+
+#: Merge.rc:1873
+#, c-format
+msgid "Extension"
+msgstr "Plëtinys"
+
+#: Merge.rc:1874
+#, c-format
+msgid "Left Size"
+msgstr "Kairiojo dydis"
+
+#: Merge.rc:1875
+#, c-format
+msgid "Right Size"
+msgstr "Deðiniojo dydis"
+
+#: Merge.rc:1876
+#, c-format
+msgid "Right Size (Short)"
+msgstr "Deðiniojo dydis (trumpas)"
+
+#: Merge.rc:1877
+#, c-format
+msgid "Left Size (Short)"
+msgstr "Kairiojo dydis (trumpas)"
+
+#: Merge.rc:1878
+#, c-format
+msgid "Left Creation Time"
+msgstr "Kairiojo sukûrimo laikas"
+
+#: Merge.rc:1879
+#, c-format
+msgid "Right Creation Time"
+msgstr "Deðiniojo sukûrimo laikas"
+
+#: Merge.rc:1880
+#, c-format
+msgid "Newer File"
+msgstr "Naujesnis failas"
+
+#: Merge.rc:1881
+#, c-format
+msgid "Left File Version"
+msgstr "Kairiojo failo versija"
+
+#: Merge.rc:1882
+#, c-format
+msgid "Right File Version"
+msgstr "Deðiniojo failo versija"
+
+#: Merge.rc:1883
+#, c-format
+msgid "Short Result"
+msgstr "Trumpas rezultatas"
+
+#: Merge.rc:1884
+#, c-format
+msgid "Left Attributes"
+msgstr "Kairiojo atributai"
+
+#: Merge.rc:1885
+#, c-format
+msgid "Right Attributes"
+msgstr "Deðiniojo atributai"
+
+#: Merge.rc:1886
+#, c-format
+msgid "Left EOL"
+msgstr "Kairiojo eiluèiø pabaigos formatas"
+
+#: Merge.rc:1887
+#, c-format
+msgid "Right EOL"
+msgstr "Deðiniojo eiluèiø pabaigos formatas"
+
+#: Merge.rc:1888
+#, c-format
+msgid "Left Encoding"
+msgstr "Kairiojo koduotë"
+
+#: Merge.rc:1889
+#, c-format
+msgid "Right Encoding"
+msgstr "Deðiniojo koduotë"
+
+#: Merge.rc:1890
+#, c-format
+msgid "Ignored Diff."
+msgstr "Ignoruoti skirtumai."
+
+#: Merge.rc:1893
+#, c-format
+msgid "Unable to compare files"
+msgstr "Neámanoma palyginti failø"
+
+#: Merge.rc:1894
+#, c-format
+msgid "Item aborted"
+msgstr "Elementø praleista"
+
+#: Merge.rc:1895
+#, c-format
+msgid "File skipped"
+msgstr "Praleistas failas"
+
+#: Merge.rc:1896
+#, c-format
+msgid "Folder skipped"
+msgstr "Praleistas katalogas"
+
+#: Merge.rc:1897
+#, c-format
+msgid "Left only: %1"
+msgstr "Tik kairysis: %1"
+
+#: Merge.rc:1898
+#, c-format
+msgid "Right only: %1"
+msgstr "Tik deðinysis: %1"
+
+#: Merge.rc:1899
+#, c-format
+msgid "Binary files are identical"
+msgstr "Binariniai failai yra vienodi"
+
+#: Merge.rc:1901
+#, c-format
+msgid "Binary files are different"
+msgstr "Binariniai failai yra skirtingi"
+
+#: Merge.rc:1902
+#, c-format
+msgid "Files are different"
+msgstr "Failai yra skirtingi"
+
+#: Merge.rc:1903
+#, c-format
+msgid "Folders are different"
+msgstr "Katalogai yra skirtingi"
+
+#: Merge.rc:1904
+#, c-format
+msgid "Left Only"
+msgstr "Tik kairysis"
+
+#: Merge.rc:1905
+#, c-format
+msgid "Right Only"
+msgstr "Tik deðinysis"
+
+#: Merge.rc:1907
+#, c-format
+msgid "Error"
+msgstr "Klaida"
+
+#: Merge.rc:1908
+#, c-format
+msgid "Text files are identical"
+msgstr "Tekstiniai failai yra vienodi"
+
+#: Merge.rc:1909
+#, c-format
+msgid "Text files are different"
+msgstr "Tekstiniai failai yra skirtingi"
+
+#: Merge.rc:1910
+#, c-format
+msgid "Elapsed time: %ld ms"
+msgstr "Praëjæs laikas: %ld ms"
+
+#: Merge.rc:1911
+#, c-format
+msgid "1 item selected"
+msgstr "pasirinktas 1 elementas"
+
+#: Merge.rc:1912
+#, c-format
+msgid "%1 items selected"
+msgstr "pasirinkta %1 elementø"
+
+#: Merge.rc:1913
+#, c-format
+msgid "Filename or folder name."
+msgstr "Failo arba katalogo vardas."
+
+#: Merge.rc:1914
+#, c-format
+msgid "Subfolder name when subfolders are included."
+msgstr "Pakatalogio pavadinimas, jei átraukiami pakatalogiai."
+
+#: Merge.rc:1915
+#, c-format
+msgid "Comparison result, long form."
+msgstr "Lyginimo rezultatas, iðsami forma."
+
+#: Merge.rc:1916
+#, c-format
+msgid "Left side modification date."
+msgstr "Kairiosios pusës redagavimo data."
+
+#: Merge.rc:1917
+#, c-format
+msgid "Right side modification date."
+msgstr "Deðiniosios pusës redagavimo data."
+
+#: Merge.rc:1918
+#, c-format
+msgid "File's extension."
+msgstr "Failo plëtinys."
+
+#: Merge.rc:1919
+#, c-format
+msgid "Left file size in bytes."
+msgstr "Kairiojo failo dydis baitais."
+
+#: Merge.rc:1920
+#, c-format
+msgid "Right file size in bytes."
+msgstr "Deðiniojo failo dydis baitais."
+
+#: Merge.rc:1921
+#, c-format
+msgid "Left file size abbreviated."
+msgstr "Kairiojo failo dydis sutrumpintas."
+
+#: Merge.rc:1922
+#, c-format
+msgid "Right file size abbreviated."
+msgstr "Deðiniojo failo dydis sutrumpintas."
+
+#: Merge.rc:1923
+#, c-format
+msgid "Left side creation time."
+msgstr "Kairiosios pusës sukûrimo laikas."
+
+#: Merge.rc:1924
+#, c-format
+msgid "Right side creation time."
+msgstr "Deðiniosios pusës sukûrimo laikas."
+
+#: Merge.rc:1925
+#, c-format
+msgid "Tells which side has newer modification date."
+msgstr "Parodo, kurioje pusëje yra naujesnë modifikavimo data."
+
+#: Merge.rc:1926
+#, c-format
+msgid "Left side file version, only for some filetypes."
+msgstr "Kairiojo failo versija, tik kai kuriems failø tipams."
+
+#: Merge.rc:1927
+#, c-format
+msgid "Right side file version, only for some filetypes."
+msgstr "Deðiniojo failo versija, tik kai kuriems failø tipams."
+
+#: Merge.rc:1928
+#, c-format
+msgid "Short comparison result."
+msgstr "Trumpo palyginimo rezultatai."
+
+#: Merge.rc:1929
+#, c-format
+msgid "Left side attributes."
+msgstr "Kairiosios pusës atributai."
+
+#: Merge.rc:1930
+#, c-format
+msgid "Right side attributes."
+msgstr "Deðiniosios pusës atributai."
+
+#: Merge.rc:1931
+#, c-format
+msgid "Left side file EOL type"
+msgstr "Kairiojo failo eiluèiø pabaigos formatas"
+
+#: Merge.rc:1932
+#, c-format
+msgid "Right side file EOL type"
+msgstr "Deðiniojo failo eiluèiø pabaigos formatas"
+
+#: Merge.rc:1933
+#, c-format
+msgid "Left side encoding."
+msgstr "Kairiosios pusës koduotë."
+
+#: Merge.rc:1934
+#, c-format
+msgid "Right side encoding."
+msgstr "Deðiniosios pusës koduotë."
+
+#: Merge.rc:1935
+#, c-format
+msgid "Number of ignored differences in file. These differences are ignored by WinMerge and cannot be merged."
+msgstr "Ignoruotø skirtumø skaièius faile. Ðie skirtumai yra „WinMerge“ ignoruoti ir negali bûti sulieti."
+
+#: Merge.rc:1936
+#, c-format
+msgid "Number of differences in file. This number does not include ignored differences."
+msgstr "Skirtumø skaièius faile. Ðis skaièius neapima ignoruotø skirtumø."
+
+#: Merge.rc:1937
+#, c-format
+msgid "Shows an asterisk (*) if the file is binary."
+msgstr "Rodyti þvaigþdutæ (*) jei failas yra binarinis."
+
+#: Merge.rc:1938
+#, c-format
+msgid "Compare %1 with %2"
+msgstr "Lyginti %1 su %2"
+
+#: Merge.rc:1939
+#, c-format
+msgid "Comma-separated list"
+msgstr "Kableliais sudalintas sàraðas"
+
+#: Merge.rc:1940
+#, c-format
+msgid "Semicolon-separated list"
+msgstr "Kabliataðkiais sudalintas sàraðas"
+
+#: Merge.rc:1941
+#, c-format
+msgid "Tab-separated list"
+msgstr "TAB simboliais sudalintas sàraðas"
+
+#: Merge.rc:1942
+#, c-format
+msgid "Simple HTML"
+msgstr "Paprastas HTML"
+
+#: Merge.rc:1943
+#, c-format
+msgid "Simple XML"
+msgstr "Paprastas XML"
+
+#: Merge.rc:1944
+#, c-format
+msgid "The report file already exists. Do you want to overwrite existing file?"
+msgstr "Ataskaitos failas jau yra. Ar norite perraðyti esamà failà?"
+
+#: Merge.rc:1945
+#, c-format
+msgid ""
+"Error creating the report:\n"
+"%1"
+msgstr ""
+"Klaida kuriant ataskaità:\n"
+"%1"
+
+#: Merge.rc:1946
+#, c-format
+msgid "The report has been created successfully."
+msgstr "Ataskaita sukurta sëkmingai."
+
+#: Merge.rc:1947
+#, c-format
+msgid "The same file is opened in both panels."
+msgstr "Tas pats failas pasirinktas abiejose pusëse."
+
+#: Merge.rc:1948
+#, c-format
+msgid "The selected files are identical."
+msgstr "Pasirinkti failai yra vienodi."
+
+#: Merge.rc:1949
+#, c-format
+msgid "An error occurred while comparing the files."
+msgstr "Lyginant failus ávyko klaida."
+
+#: Merge.rc:1950
+#, c-format
+msgid "Temporary files could not be created. Check your temporary path settings."
+msgstr "Nepavyko sukurti laikinø failø. Patikrinkite laikinøjø keliø nustatymus."
+
+#: Merge.rc:1951
+#, c-format
+msgid ""
+"These files use different carriage return types.\n"
+"\n"
+"Do you want to treat all carriage return types as equivalent for this comparison?\n"
+"\n"
+"Note: If you always want to treat all carriage return types as equivalent, set the option 'Ignore carriage return differences..' in the "
+"Compare tab of the options dialog (available under Edit/Options)."
+msgstr ""
+"Ðie failai naudoja skirtingus eiluèiø pabaigos formatus.\n"
+"\n"
+"Ar norite, kad ðio palyginimo metu á tai nebûtø kreipiamas dëmesys?\n"
+"\n"
+"Pastaba: Jei norite, kad á eiluèiø pabaigos skirtumus nebûtø kreipamas dëmesys visada, „Nuostatø“ (Redaguoti / Nuostatos...) ekrano "
+"„Lyginimo“ dalyje ájunkite „Ignoruoti eiluèiø pabaigos skirtumus“."
+
+#: Merge.rc:1952
+#, c-format
+msgid ""
+"The EOL are of different types (Windows/Unix/Mac) in the file '%1'.\n"
+" With the current options, they will be unified to the main type.\n"
+" Do you want to change the options and preserve the different EOL ?"
+msgstr ""
+"Faile '%1' yra skirtingø eilutës pabaigos tipø (Windows/Unix/Mac).\n"
+"Remiantis dabartinëmis nuostatomis, jos bus suvienodintos su pagrindiniu tipu.\n"
+"Ar norite pakeisti parametrus ir iðlaikyti skirtingus eilutës pabaigos tipus ?"
+
+#: Merge.rc:1953
+#, c-format
+msgid "The selected folder is invalid."
+msgstr "Pasirinktas katalogas yra netinkamas."
+
+#: Merge.rc:1954
+#, c-format
+msgid "Cannot open a binary file to editor."
+msgstr "Negalima atidaryti binarinio failo redaktoriuje."
+
+#: Merge.rc:1955
+#, c-format
+msgid ""
+"Different codepages found in left (cp%d) and right (cp%d) files. \n"
+"Displaying each file in its codepage will give a better display but merging/copying will be dangerous.\n"
+"Would you like to treat both files as being in the default windows codepage (recommended)?"
+msgstr ""
+"Skiriasi kairiojo (cp%d) ir deðiniojo (cp%d) failø koduotës. \n"
+"Kiekvieno failo rodymas savoje koduotëje duos geresná vaizdà, bet gali pavojingas suliejant ar kopijuojant.\n"
+"Ar norite, kad abu failai bûtø rodomi numatytoje „Windows“ koduotëje (rekomenduojama)?"
+
+#: Merge.rc:1956
+#, c-format
+msgid "Warning: Files use different encodings, left=%s and right=%s, and merging may lead to information loss."
+msgstr "Áspëjimas: Skiriasi failø koduotës, kairiojo=%s, o deðiniojo=%s. Susiliejimas gali sukelti informacijos praradimà."
+
+#: Merge.rc:1957
+#, c-format
+msgid "Information lost due to encoding errors: both files"
+msgstr "Informacija prarasta dël kodavimo klaidø: abu failai"
+
+#: Merge.rc:1958
+#, c-format
+msgid "Information lost due to encoding errors: right file"
+msgstr "Informacija prarasta dël kodavimo klaidø: deðinysis failas"
+
+#: Merge.rc:1959
+#, c-format
+msgid "Information lost due to encoding errors: left file"
+msgstr "Informacija prarasta dël kodavimo klaidø: kairysis failas"
+
+#: Merge.rc:1960
+#, c-format
+msgid "No difference"
+msgstr "Nëra skirtumø"
+
+#: Merge.rc:1961
+#, c-format
+msgid "Line difference"
+msgstr "Skirtumai eilutëje"
+
+#: Merge.rc:1962
+#, c-format
+msgid "Replaced %1 string(s)."
+msgstr "Pakeista %1 eilutë(-ës)."
+
+#: Merge.rc:1963
+#, c-format
+msgid "Cannot find string \"%s\""
+msgstr "Nerasta eilutë \"%s\""
+
+#: Merge.rc:1964
+#, c-format
+msgid "Copy Full Path"
+msgstr "Kopijuoti pilnà kelià"
+
+#: Merge.rc:1965
+#, c-format
+msgid "Copy Filename"
+msgstr "Kopijuoti failo vardà"
+
+#: Merge.rc:1966
+#, c-format
+msgid "Location Pane"
+msgstr "Vietos polangis"
+
+#: Merge.rc:1967
+#, c-format
+msgid "Diff Pane"
+msgstr "Skirtumø polangis"
+
+#: Merge.rc:1968
+#, c-format
+msgid "Patch file successfully written."
+msgstr "Pataisø failas sëkmingai áraðytas."
+
+#: Merge.rc:1969
+#, c-format
+msgid "1. item is not found or is directory!"
+msgstr "1. elementas nerastas arba tai katalogas!"
+
+#: Merge.rc:1970
+#, c-format
+msgid "2. item is not found or is directory!"
+msgstr "2. elementas nerastas arba tai katalogas!"
+
+#: Merge.rc:1971
+#, c-format
+msgid "The patch file already exists. Do you want to overwrite it?"
+msgstr "Pataisø failas jau yra. Uþraðyti ant virðaus?"
+
+#: Merge.rc:1972
+#, c-format
+msgid "[%1 files selected]"
+msgstr "[pasirinkta %1 failø]"
+
+#: Merge.rc:1973
+#, c-format
+msgid "Normal"
+msgstr "Normalus"
+
+#: Merge.rc:1974
+#, c-format
+msgid "Context"
+msgstr "Kontekstinis"
+
+#: Merge.rc:1975
+#, c-format
+msgid "Unified"
+msgstr "Unifikuotas"
+
+#: Merge.rc:1976
+#, c-format
+msgid "Could not write to file %1."
+msgstr "Nepavyko raðymas á failà %1."
+
+#: Merge.rc:1977
+#, c-format
+msgid "The specified output path is not an absolute path: %1"
+msgstr "Nurodytas rezultato kelias nëra absoliutus kelias: %1"
+
+#: Merge.rc:1978
+#, c-format
+msgid "Specify an output file"
+msgstr "Nurodykite failà rezultatams"
+
+#: Merge.rc:1979
+#, c-format
+msgid "Cannot create a patch file from binary files."
+msgstr "Negalima kurti pataisø failo ið binariniø failø."
+
+#: Merge.rc:1980
+#, c-format
+msgid "Cannot create a patch file from directories."
+msgstr "Negalima kurti pataisø failo ið katalogø."
+
+#: Merge.rc:1981
+#, c-format
+msgid ""
+"Please save all files first.\n"
+"\n"
+"Creating a patch requires that there are no unsaved changes in files."
+msgstr ""
+"Pirmiausia iðsaugokite visus failus.\n"
+"\n"
+"Pataisos kûrimui reikia, kad failuose nebûtø neiðsaugotø pakeitimø."
+
+#: Merge.rc:1982
+#, c-format
+msgid "Folder does not exist."
+msgstr "Katalogas nerastas."
+
+#: Merge.rc:1983
+#, c-format
+msgid "Current directory comparison results will be cleared."
+msgstr "Dabartiniai katalogø palyginimø rezultatai bus iðvalyti."
+
+#: Merge.rc:1984
+#, c-format
+msgid "Select file for export"
+msgstr "Pasirinkite failà eksportui"
+
+#: Merge.rc:1985
+#, c-format
+msgid "Select file for import"
+msgstr "Pasirinkite failà importui"
+
+#: Merge.rc:1986
+#, c-format
+msgid "Options imported from the file."
+msgstr "Ið failo importuoti parametrai."
+
+#: Merge.rc:1987
+#, c-format
+msgid "Options exported to the file."
+msgstr "Á failà eksportuoti parametrai."
+
+#: Merge.rc:1988
+#, c-format
+msgid "Failed to import options from the file."
+msgstr "Nepavyko importuoti parametrø ið failo."
+
+#: Merge.rc:1989
+#, c-format
+msgid "Failed to write options to the file."
+msgstr "Nepavyko áraðyti parametrø á failà."
+
+#: Merge.rc:1990
+#, c-format
+msgid ""
+"You are about to close several compare windows.\n"
+"\n"
+"Do you want to continue?"
+msgstr ""
+"Jûs ketinate uþdaryti keletà palyginimo langø.\n"
+"\n"
+"Ar norite tæsti?"
+
+#: Merge.rc:1991
+#, c-format
+msgid "Regular expression error"
+msgstr "Reguliariosios iðraiðkos klaida"
+
+#: Merge.rc:1992
+#, c-format
+msgid "No match"
+msgstr "Atitikmenø nerasta"
+
+#: Merge.rc:1993
+#, c-format
+msgid "Invalid regular expression"
+msgstr "Netinkama reguliarioji iðraiðka"
+
+#: Merge.rc:1994
+#, c-format
+msgid "Invalid collation character"
+msgstr "Netinkamas sujungimo simbolis"
+
+#: Merge.rc:1995
+#, c-format
+msgid "Invalid character class name"
+msgstr "Neteisingas simbolio klasës pavadinimas"
+
+#: Merge.rc:1996
+#, c-format
+msgid "Trailing backslash"
+msgstr "Kairinis brûkðnys pabaigoje"
+
+#: Merge.rc:1997
+#, c-format
+msgid "Invalid back reference"
+msgstr "Neteisinga atgalinë nuoroda"
+
+#: Merge.rc:1998
+#, c-format
+msgid "Unmatched [ or [^"
+msgstr "Nesuporuotas [ arba [^"
+
+#: Merge.rc:1999
+#, c-format
+msgid "Unmatched ( or \\("
+msgstr "Nesuporuotas ( arba \\("
+
+#: Merge.rc:2000
+#, c-format
+msgid "Unmatched \\{"
+msgstr "Nesuporuotas \\{"
+
+#: Merge.rc:2001
+#, c-format
+msgid "Invalid content of \\{\\}"
+msgstr "Netinkamas \\{\\} turinys"
+
+#: Merge.rc:2002
+#, c-format
+msgid "Invalid range end"
+msgstr "Neteisinga diapazono pabaiga"
+
+#: Merge.rc:2003
+#, c-format
+msgid "Out of memory"
+msgstr "Nepakanka atminties"
+
+#: Merge.rc:2004
+#, c-format
+msgid "Invalid preceding regular expression"
+msgstr "Netinkama ankstesnë reguliarioji iðraiðka"
+
+#: Merge.rc:2005
+#, c-format
+msgid "Premature end of regular expression"
+msgstr "Prieðlaikinë reguliariosios iðraiðkos pabaiga"
+
+#: Merge.rc:2006
+#, c-format
+msgid "Regular expression too big"
+msgstr "Reguliarioji iðraiðka per ilga"
+
+#: Merge.rc:2007
+#, c-format
+msgid "Unmatched ) or \\)"
+msgstr "Nesuporuotas ) arba \\)"
+
+#: Merge.rc:2008
+#, c-format
+msgid "Win"
+msgstr "Win"
+
+#: Merge.rc:2009
+#, c-format
+msgid "Mac"
+msgstr "Mac"
+
+#: Merge.rc:2010
+#, c-format
+msgid "Unix"
+msgstr "Unix"
+
+#: Merge.rc:2011
+#, c-format
+msgid "Mixed"
+msgstr "Miðrus"
+
+#: Merge.rc:2013
+#, c-format
+msgid "LF"
+msgstr "LF"
+
+#: Merge.rc:2014
+#, c-format
+msgid "CR"
+msgstr "CR"
+
+#: Merge.rc:2015
+#, c-format
+msgid "CRLF"
+msgstr "CRLF"
+
+#: Merge.rc:2017
+#, c-format
+msgid "Save the left file"
+msgstr "Iðsaugoti kairájá failà"
+
+#: Merge.rc:2018
+#, c-format
+msgid "Save the right file"
+msgstr "Iðsaugoti deðinájá failà"
+
+#: Merge.rc:2019
+#, c-format
+msgid "Save the left file with name..."
+msgstr "Iðsaugoti kairájá failà kaip..."
+
+#: Merge.rc:2020
+#, c-format
+msgid "Save the right file with name..."
+msgstr "Iðsaugoti deðinájá failà kaip..."
+
+#: Merge.rc:2021
+#, c-format
+msgid "Change left side file/folder read-only status"
+msgstr "Keisti kairiojo failo/katalogo „Tik skaitymui“ statusà"
+
+#: Merge.rc:2022
+#, c-format
+msgid "Change right side file/folder read-only status"
+msgstr "Keisti deðiniojo failo/katalogo „Tik skaitymui“ statusà"
+
+#: Merge.rc:2023
+#, c-format
+msgid "Convert EOL to Windows mode"
+msgstr "Keisti eiluèiø pabaigos formatà á Windows"
+
+#: Merge.rc:2024
+#, c-format
+msgid "Convert EOL to Unix mode"
+msgstr "Keisti eiluèiø pabaigos formatà á Unix"
+
+#: Merge.rc:2025
+#, c-format
+msgid "Convert EOL to Mac mode"
+msgstr "Keisti eiluèiø pabaigos formatà á Mac"
+
+#: Merge.rc:2026
+#, c-format
+msgid "Switch between editing and merging modes"
+msgstr "Persijungti tarp redagavimo ir suliejimo reþimø"
+
+#: Merge.rc:2027
+#, c-format
+msgid ""
+"View and adjust file encoding properties\n"
+"File encoding properties"
+msgstr ""
+"Perþiûrëti ir suderinti failø kodavimo ypatybes\n"
+"Failø kodavimo ypatybës"
+
+#: Merge.rc:2028
+#, c-format
+msgid "Open and resolve conflict file"
+msgstr "Atidaryti ir iðspræsti konfliktø failà"
+
+#: Merge.rc:2029
+#, c-format
+msgid "Collect items from subsequent command line invocations to a folder compare window"
+msgstr "Renka elementus á katalogø palyginimo langà ið vëlesniø komandinës eilutës iðkvietimø"
+
+#: Merge.rc:2030
+#, c-format
+msgid ""
+"Select difference area in the current line\n"
+"Difference in the Current Line"
+msgstr ""
+"Paþymëti skirtumø sritá dabartinëje eilutëje\n"
+"Dabartinës eilutës skirtumai"
+
+#: Merge.rc:2031
+#, c-format
+msgid ""
+"Go to line or difference\n"
+"Go to (Ctrl+G)"
+msgstr ""
+"Pereiti á eilutæ ar skirtumà\n"
+"Pereiti á (Ctrl+G)"
+
+#: Merge.rc:2032
+#, c-format
+msgid ""
+"Set program options\n"
+"Options"
+msgstr ""
+"Nustatyti programos parametrus\n"
+"Nuostatos"
+
+#: Merge.rc:2033
+#, c-format
+msgid ""
+"Refresh display\n"
+"Refresh (F5)"
+msgstr ""
+"Atnaujinti\n"
+"Atnaujinti (F5)"
+
+#: Merge.rc:2034
+#, c-format
+msgid "Copy selected lines to clipboard adding linenumbers to line begin"
+msgstr "Kopijuoti paþymëtas eilutes á mainø sritá, pridedant eiluèiø numerius eilutës pradþioje"
+
+#: Merge.rc:2035
+#, c-format
+msgid "Refresh selected items"
+msgstr "Atnaujinti paþymëtus elementus"
+
+#: Merge.rc:2036
+#, c-format
+msgid "Toggle bookmark"
+msgstr "Uþdëti þymæ"
+
+#: Merge.rc:2037
+#, c-format
+msgid "Go to next bookmark"
+msgstr "Pereiti á tolesnæ þymæ"
+
+#: Merge.rc:2038
+#, c-format
+msgid "Go to previous bookmark"
+msgstr "Pereiti á ankstesnæ þymà"
+
+#: Merge.rc:2039
+#, c-format
+msgid "Clear all bookmarks"
+msgstr "Iðvalyti visas þymes"
+
+#: Merge.rc:2040
+#, c-format
+msgid ""
+"Displays items that are exactly the same\n"
+"Show Identical Items"
+msgstr ""
+"Rodo elementus, kurie yra visiðkai vienodi\n"
+"Rodyti identiðkus elementus"
+
+#: Merge.rc:2041
+#, c-format
+msgid ""
+"Displays items that have differences\n"
+"Show Different Items"
+msgstr ""
+"Rodo elementus, kurie turi skirtumø\n"
+"Rodyti skirtingus elementus"
+
+#: Merge.rc:2042
+#, c-format
+msgid ""
+"Displays items that exist in only on the left side\n"
+"Show Left Unique Items"
+msgstr ""
+"Rodo elementus, kurie egzistuoja tik kairëje pusëje\n"
+"Rodyti unikalius elementus kairëje"
+
+#: Merge.rc:2043
+#, c-format
+msgid ""
+"Displays items that exist in only on the right side\n"
+"Show Right Unique Items"
+msgstr ""
+"Rodo elementus, kurie egzistuoja tik deðinëje pusëje\n"
+"Rodyti unikalius elementus deðinëje"
+
+#: Merge.rc:2044
+#, c-format
+msgid ""
+"Displays binary files\n"
+"Show Binary Files"
+msgstr ""
+"Rodo binarinius failus\n"
+"Rodyti binarinius failus"
+
+#: Merge.rc:2045
+#, c-format
+msgid ""
+"Displays skipped items\n"
+"Show Skipped Items"
+msgstr ""
+"Rodo praleistus elementus\n"
+"Rodyti praleistus elementus"
+
+#: Merge.rc:2046
+#, c-format
+msgid ""
+"Select the font for the view\n"
+"Select View Font"
+msgstr ""
+"Iðrinkti ðriftà perþiûrai\n"
+"Parinkti perþiûros ðriftà"
+
+#: Merge.rc:2047
+#, c-format
+msgid ""
+"Revert to using the default system font for view\n"
+"Default Font"
+msgstr "Gráþti prie numatyto sistemos ðrifto naudojimo perþiûrai"
+
+#: Merge.rc:2048
+#, c-format
+msgid "Shows whitespace characters"
+msgstr "Rodo tarpo simbolius"
+
+#: Merge.rc:2049
+#, c-format
+msgid "Toggle Diff Pane"
+msgstr "Skirtumø polangis"
+
+#: Merge.rc:2050
+#, c-format
+msgid "Location pane shows overall picture from files"
+msgstr "Vietos polangis rodo bendrà vaizdà ið failø"
+
+#: Merge.rc:2051
+#, c-format
+msgid "Show folder compare statistics dialog"
+msgstr "Rodyti katalogø lyginimo statistikos dialogà"
+
+#: Merge.rc:2052
+#, c-format
+msgid ""
+"Select the current user interface language\n"
+"Language"
+msgstr ""
+"Parinkti naudotojo sàsajos kalbà\n"
+"Kalba"
+
+#: Merge.rc:2053
+#, c-format
+msgid ""
+"Shows differences inside lines with different colors\n"
+"Show Line Difference"
+msgstr ""
+"Rodo skirtumus eilutëse kita spalva\n"
+"Rodyti skirtumus eilutëje"
+
+#: Merge.rc:2054
+#, c-format
+msgid "Swap the positions of the two panes"
+msgstr "Sukeisti dviejø polangiø pozicijas"
+
+#: Merge.rc:2055
+#, c-format
+msgid ""
+"Shows line numbers\n"
+"Show Line Numbers"
+msgstr ""
+"Parodo eiluèiø numerius\n"
+"Rodyti eiluèiø numerius"
+
+#: Merge.rc:2056
+#, c-format
+msgid ""
+"Enable word wrap\n"
+"Wrap Lines"
+msgstr ""
+"Ájungia teksto skaidymà á eilutes\n"
+"Skaidyti eilutes"
+
+#: Merge.rc:2057
+#, c-format
+msgid ""
+"Shows selection margins for both panes\n"
+"Show Selection Margins"
+msgstr ""
+"Rodo abiejø polangiø pasirinkimo paraðtes\n"
+"Rodyti pasirinkimo paraðtes"
+
+#: Merge.rc:2058
+#, c-format
+msgid "Increase text size"
+msgstr "Padidinti teksto dydá"
+
+#: Merge.rc:2059
+#, c-format
+msgid "Decrease text size"
+msgstr "Sumaþinti teksto dydá"
+
+#: Merge.rc:2060
+#, c-format
+msgid "Reset text zoom to default size"
+msgstr "Graþinti numatytàjá teksto dydá"
+
+#: Merge.rc:2061
+#, c-format
+msgid ""
+"Scroll to the previous difference\n"
+"Previous Difference (Alt+Up)"
+msgstr ""
+"Perðokti á ankstesná skirtumà\n"
+"Praeitas skirtumas (Alt+Up)"
+
+#: Merge.rc:2062
+#, c-format
+msgid ""
+"Scroll to the next difference\n"
+"Next Difference (Alt+Down)"
+msgstr ""
+"Perðokti á tolesná skirtumà\n"
+"Kitas skirtumas (Alt+Down)"
+
+#: Merge.rc:2063
+#, c-format
+msgid ""
+"Scroll to the first difference\n"
+"First Difference (Alt+Home)"
+msgstr ""
+"Perðokti á pirmà skirtumà\n"
+"Pirmas skirtumas (Alt+Home)"
+
+#: Merge.rc:2064
+#, c-format
+msgid ""
+"Scroll to the current difference\n"
+"Current Difference (Alt+Enter)"
+msgstr ""
+"Perðokti á dabartiná skirtumà\n"
+"Dabartinis skirtumas (Alt+Enter)"
+
+#: Merge.rc:2065
+#, c-format
+msgid ""
+"Scroll to the last difference\n"
+"Last Difference (Alt+End)"
+msgstr ""
+"Perðokti á paskutiná skirtumà\n"
+"Paskutinis skirtumas (Alt+End)"
+
+#: Merge.rc:2066
+#, c-format
+msgid ""
+"Copy the selected text to the right file\n"
+"Copy Right (Alt+Right)"
+msgstr ""
+"Kopijuoti paþymëtà tekstà á deðinájá failà\n"
+"Kopijuoti á deðinæ"
+
+#: Merge.rc:2067
+#, c-format
+msgid ""
+"Copy the selected text to the left file\n"
+"Copy Left (Alt+Left)"
+msgstr ""
+"Kopijuoti paþymëtà tekstà á kairájá failà\n"
+"Kopijuoti á kairæ"
+
+#: Merge.rc:2068
+#, c-format
+msgid ""
+"Copy difference to right and advance to next\n"
+"Copy Right and Advance (Ctrl+Alt+Right)"
+msgstr ""
+"Kopijuoti skirtumà á deðinæ ir perðokti á tolesná\n"
+"Kopijuoti á deðinæ ir Daugiau (Ctrl+Alt+Right)"
+
+#: Merge.rc:2069
+#, c-format
+msgid ""
+"Copy difference to left and advance to next\n"
+"Copy Left and Advance (Ctrl+Alt+Left)"
+msgstr ""
+"Kopijuoti skirtumà á kairæ ir perðokti á tolesná\n"
+"Kopijuoti á kairæ ir Daugiau (Ctrl+Alt+Left)"
+
+#: Merge.rc:2070
+#, c-format
+msgid ""
+"Copy all differences to the right file\n"
+"All Right"
+msgstr ""
+"Kopijuoti visus skirtumus á deðinájá failà\n"
+"Viskà á deðinæ"
+
+#: Merge.rc:2071
+#, c-format
+msgid ""
+"Copy all differences to the left file\n"
+"All Left"
+msgstr ""
+"Kopijuoti visus skirtumus á kairájá failà\n"
+"Viskà á kairæ"
+
+#: Merge.rc:2072
+#, c-format
+msgid "Delete selected items from both directories"
+msgstr "Naikinti pasirinktus elementus ið abiejø katalogø"
+
+#: Merge.rc:2073
+#, c-format
+msgid "Compare selected item (compare first item if multiple items selected)"
+msgstr "Palyginti paþymëtà elementà (palyginti pirmàjá elementà, jei paþymëti keli elementai)"
+
+#: Merge.rc:2074
+#, c-format
+msgid "Select and reorder directory compare columns"
+msgstr "Pasirinkti ir pertvarkyti katalogø palyginimo stulpelius"
+
+#: Merge.rc:2075
+#, c-format
+msgid "Generate a patch-file"
+msgstr "Generuoti pataisos failà"
+
+#: Merge.rc:2076
+#, c-format
+msgid ""
+"Select and modify filters\n"
+"Filters"
+msgstr ""
+"Pasirinkti ir keisti filtrus\n"
+"Filtrai"
+
+#: Merge.rc:2077
+#, c-format
+msgid "Generates a report from compare results"
+msgstr "Sukuria palyginimo rezultatø ataskaità"
+
+#: Merge.rc:2078
+#, c-format
+msgid ""
+"Activates next visible file\n"
+"Activate next File"
+msgstr ""
+"Suaktyvina kità matomà failà\n"
+"Suaktyvinti kità failà"
+
+#: Merge.rc:2079
+#, c-format
+msgid "Closes all open windows"
+msgstr "Uþveria visus atidarytus langus"
+
+#: Merge.rc:2080
+#, c-format
+msgid ""
+"Opens the WinMerge Help\n"
+"WinMerge Help"
+msgstr ""
+"Atverèia „WinMerge“ pagalbos dokumentà\n"
+"„WinMerge“ pagalba"
+
+#: Merge.rc:2081
+#, c-format
+msgid "Outputs current WinMerge version info and configuration to text file"
+msgstr "Iðveda dabartinæ „WinMerge“ versijos informacijà ir konfigûracijà á tekstiná failà"
+
+#: Merge.rc:2082
+#, c-format
+msgid "Display the GNU General Public License"
+msgstr "Rodo GNU Bendràjà Vieðàjà Licencijà"
+
+#: Merge.rc:2083
+#, c-format
+msgid "Private Build: %1"
+msgstr "Neoficiali versija: %1"
+
+#: Merge.rc:2084
+#, c-format
+msgid ""
+"Opens the release notes document\n"
+"Release Notes"
+msgstr ""
+"Atverèia dokumentà su laidos informacija\n"
+"Laidos informacija"
+
+#: Merge.rc:2085
+#, c-format
+msgid ""
+"Opens the translations website\n"
+"Translations"
+msgstr ""
+"Atverèia vertimø tinklapá\n"
+"Vertimai"
+
+#: Merge.rc:2086
+#, c-format
+msgid "<None>"
+msgstr "<Nëra>"
+
+#: Merge.rc:2087
+#, c-format
+msgid "Open the file with registered application"
+msgstr "Atverti failà su registruota programa"
+
+#: Merge.rc:2088
+#, c-format
+msgid "Open the file with external editor"
+msgstr "Atverti failà iðoriniame redaktoriuje"
+
+#: Merge.rc:2089
+#, c-format
+msgid "Open the file with a particular program"
+msgstr "Atverti failà su konkreèia programa"
+
+#: Merge.rc:2090
+#, c-format
+msgid "Do not display moved blocks"
+msgstr "Nerodyti perkeltø blokø"
+
+#: Merge.rc:2091
+#, c-format
+msgid "Display all moved blocks"
+msgstr "Rodyti visus perkeltus blokus"
+
+#: Merge.rc:2092
+#, c-format
+msgid "Display moved blocks only from current diff"
+msgstr "Rodyti tik ðiame palyginime perkeltus blokus"
+
+#: Merge.rc:2093
+#, c-format
+msgid "Go to diff under cursor"
+msgstr "Pereiti á skirtumà po kursoriumi"
+
+#: Merge.rc:2094
+#, c-format
+msgid "Disabled"
+msgstr "Iðjungtas"
+
+#: Merge.rc:2095
+#, c-format
+msgid "From file system"
+msgstr "Ið sistemos"
+
+#: Merge.rc:2096
+#, c-format
+msgid "From MRU list"
+msgstr "Ið daþniausiai naudojamø sàraðo"
+
+#: Merge.rc:2097
+#, c-format
+msgid "Hide the toolbar"
+msgstr "Slëpti mygtukø juostà"
+
+#: Merge.rc:2098
+#, c-format
+msgid "Show small toolbar"
+msgstr "Rodyti maþø mygtukø juostà"
+
+#: Merge.rc:2099
+#, c-format
+msgid "Show big toolbar"
+msgstr "Rodyti dideliø mygtukø juostà"
+
+#: Merge.rc:2100
+#, c-format
+msgid "Selection left"
+msgstr "Paþymëtas fragmentas kairëje"
+
+#: Merge.rc:2101
+#, c-format
+msgid "Selection right"
+msgstr "Paþymëtas fragmentas deðinëje"
+
+#: Merge.rc:2102
+#, c-format
+msgid "Print..."
+msgstr "Spausdinti..."
+
+#: Merge.rc:2103
+#, c-format
+msgid "Page Setup..."
+msgstr "Puslapio nuostatos..."
+
+#: Merge.rc:2104
+#, c-format
+msgid "Page Zoom:"
+msgstr "Puslapio mastelio keitimas:"
+
+#: Merge.rc:2105
+#, c-format
+msgid "Content Zoom:"
+msgstr "Turinio mastelio keitimas:"
+
+#: Merge.rc:2106
+#, c-format
+msgid "%d line excluded"
+msgstr "%d eilutë iðbraukta"
+
+#: Merge.rc:2107
+#, c-format
+msgid "%d lines excluded"
+msgstr "%d eilutës iðbrauktos"
+
+#: Merge.rc:2108
+#, c-format
+msgid "Shell menu"
+msgstr "Sistemos meniu"
+
