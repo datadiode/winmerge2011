@@ -84,6 +84,9 @@ Localization:
   Lee Jae-Hong <pyrasis@users.sourceforge.net>
   Sushizang <sushizang@empal.com>
 
+* Lithuanian:
+  Dalius Guzauskas (aka Tichij) <tichij AT mail DOT com>
+
 * Norwegian:
   Hans Fredrik Nordhaug <hansfn@users.sourceforge.net>
 

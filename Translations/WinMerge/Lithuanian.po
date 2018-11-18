@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WinMerge\n"
 "Report-Msgid-Bugs-To: http://bugs.winmerge.org/\n"
-"POT-Creation-Date: 2018-07-29 15:47+0000\n"
+"POT-Creation-Date: 2018-08-11 11:21+0000\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Tichij <tichij@mail.com>\n"
 "Language-Team: Lithuanian <winmerge-translate@lists.sourceforge.net>\n"
@@ -21,9 +21,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Poedit-Language: Lithuanian\n"
-"X-Poedit-SourceCharset: CP1257\n"
+"X-Poedit-SourceCharset: CP1252\n"
 "X-Poedit-Basepath: ../../Src/\n"
-"X-Generator: Poedit 2.1.1\n"
+"X-Generator: Poedit 2.2\n"
 
 #. LANGUAGE, SUBLANGUAGE
 #, c-format
@@ -163,7 +163,7 @@ msgstr "&Vaizdas"
 #: Merge.rc:46
 #, c-format
 msgid "Show &Identical Items"
-msgstr "Rodyti &identiðkus elementus"
+msgstr "Rodyti v&ienodus elementus"
 
 #: Merge.rc:47
 #, c-format
@@ -1429,40 +1429,40 @@ msgstr "Failai:"
 #: Merge.rc:1906
 #, c-format
 msgid "Different"
-msgstr "Skirtingas"
+msgstr "Yra skirtingi"
 
 #: Merge.rc:790
 #: Merge.rc:810
 #, c-format
 msgid "Text:"
-msgstr "Tekstas:"
+msgstr "Tekstiniai:"
 
 #: Merge.rc:793
 #: Merge.rc:813
 #, c-format
 msgid "Binary:"
-msgstr "Binarinis:"
+msgstr "Binariniai:"
 
 #: Merge.rc:796
 #, c-format
 msgid "Unique"
-msgstr "Unikalus"
+msgstr "Yra unikalûs"
 
 #: Merge.rc:797
 #, c-format
 msgid "Left:"
-msgstr "Kairá:"
+msgstr "Kairëje:"
 
 #: Merge.rc:802
 #, c-format
 msgid "Right:"
-msgstr "Deðiná:"
+msgstr "Deðinëje:"
 
 #: Merge.rc:807
 #: Merge.rc:1900
 #, c-format
 msgid "Identical"
-msgstr "Identiðkas"
+msgstr "Yra vienodi"
 
 #: Merge.rc:817
 #, c-format
@@ -1922,7 +1922,7 @@ msgstr "Numat. reikðmës"
 #: Merge.rc:1086
 #, c-format
 msgid "&Include Subfolders\t&Include Subfolders but ignore folder structure"
-msgstr ""
+msgstr "Átraukt&i pakatalogius\tÁtraukt&i pakatalogius, bet ignoruoti katalogo struktûrà"
 
 #: Merge.rc:1087
 #, c-format
@@ -2336,7 +2336,7 @@ msgstr "Paþym. þodþio skirtumas:"
 #: Merge.rc:1343
 #, c-format
 msgid "Cross-&hatch deleted lines\tDot-&hatch deleted lines"
-msgstr ""
+msgstr "&Uþðtrichuoti paðalintas eilutes\t&Uþtaðkuoti paðalintas eilutes"
 
 #: Merge.rc:1344
 #, c-format
@@ -2553,7 +2553,7 @@ msgstr "Automatiðkai pereiti prie pirmo &skirtumo"
 #: Merge.rc:1446
 #, c-format
 msgid "Enable scroll ani&mation"
-msgstr ""
+msgstr "Ájungti slinkties ani&macijà"
 
 #: Merge.rc:1447
 #, c-format
@@ -2625,9 +2625,7 @@ msgstr "Baitø skaièius, rodomas kiekvienoje eilutëje:"
 #: Merge.rc:1472
 #, c-format
 msgid "Automatically adjust number of bytes per line (uncheck this if you want WinMerge to use your own choice for bytes per line)"
-msgstr ""
-"Automatiðkai reguliuoti baitø skaièiø kiekvienoje eilutëje (nuimkite, jei norite, kad „WinMerge“ naudotø jûsø parinktà baitø eilutëje "
-"skaièiø)"
+msgstr "Automatiðkai reguliuoti baitø skaièiø kiekvienoje eilutëje (nuimkite, jei norite, kad „WinMerge“ naudotø jûsø parinktà baitø eilutëje skaièiø)"
 
 #: Merge.rc:1479
 #, c-format
@@ -5254,7 +5252,7 @@ msgid ""
 "Show Identical Items"
 msgstr ""
 "Rodo elementus, kurie yra visiðkai vienodi\n"
-"Rodyti identiðkus elementus"
+"Rodyti vienodus elementus"
 
 #: Merge.rc:2041
 #, c-format
