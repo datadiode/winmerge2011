@@ -720,7 +720,7 @@ find_identical_ends (struct comparison *cmp)
   else
     {
       slurp (&cmp->file[0]);
-      prepare_text (cmp, &cmp->file[0], -1);
+      buffer0 = buffer1 = prepare_text (cmp, &cmp->file[0], -1);
       cmp->file[1].buffer = cmp->file[0].buffer;
       cmp->file[1].bufsize = cmp->file[0].bufsize;
       cmp->file[1].buffered = cmp->file[0].buffered;
