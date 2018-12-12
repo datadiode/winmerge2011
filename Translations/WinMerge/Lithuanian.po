@@ -2,7 +2,7 @@
 # Released under the "GNU General Public License"
 #
 # Translators:
-# * Tichij <tichij at mail.com>
+# * Dalius Guzauskas (aka Tichij) (tichij AT mail DOT com)
 #
 # ID line follows -- this is updated by SVN
 # $Id: Lithuanian.po
@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: WinMerge\n"
 "Report-Msgid-Bugs-To: http://bugs.winmerge.org/\n"
 "POT-Creation-Date: 2018-08-11 11:21+0000\n"
-"PO-Revision-Date: \n"
+"PO-Revision-Date: 2018-11-12 08:50+0200\n"
 "Last-Translator: Tichij <tichij@mail.com>\n"
 "Language-Team: Lithuanian <winmerge-translate@lists.sourceforge.net>\n"
 "Language: lt\n"
@@ -3253,12 +3253,8 @@ msgstr ""
 
 #: Merge.rc:1679
 #, c-format
-msgid ""
-"WinMerge comes with ABSOLUTELY NO WARRANTY. This is free software and you are welcome to redistribute it under certain circumstances; see "
-"the GNU General Public License in the Help menu for details."
-msgstr ""
-"„WinMerge“ tiekiama VISIÐKAI BE JOKIØ GARANTIJØ. Tai nemokama programinë áranga ir jûs galite jà platinti tam tikromis sàlygomis. Daugiau "
-"apie tai rasite „Pagalbos“ meniu punkte „GNU Bendroji vieðoji licencija“."
+msgid "WinMerge comes with ABSOLUTELY NO WARRANTY. This is free software and you are welcome to redistribute it under certain circumstances; see the GNU General Public License in the Help menu for details."
+msgstr "„WinMerge“ tiekiama VISIÐKAI BE JOKIØ GARANTIJØ. Tai nemokama programinë áranga ir jûs galite jà platinti tam tikromis sàlygomis. Daugiau apie tai rasite „Þinyno“ meniu punkte „GNU Bendroji vieðoji licencija“."
 
 #: Merge.rc:1680
 #, c-format
@@ -3387,12 +3383,8 @@ msgstr "Dabar vël bus rodom ivisi praneðimai."
 
 #: Merge.rc:1707
 #, c-format
-msgid ""
-"Modifications have been made to the current file comparison session.  Some settings may not take place until the current file comparison "
-"is restarted."
-msgstr ""
-"Dabartiniame failø palyginimo seanse buvo atlikti pakeitimai.  Kai kurie nustatymai gali neveikti, kol failø palyginimas nebus paleistas "
-"ið naujo."
+msgid "Modifications have been made to the current file comparison session.  Some settings may not take place until the current file comparison is restarted."
+msgstr "Dabartiniame failø palyginimo seanse buvo atlikti pakeitimai.  Kai kurie nustatymai gali neveikti, kol failø palyginimas nebus paleistas ið naujo."
 
 #: Merge.rc:1708
 #, c-format
@@ -3894,10 +3886,8 @@ msgstr ""
 
 #: Merge.rc:1789
 #, c-format
-msgid ""
-"Click Continue only if you are sure that you want to irreversibly delete the selected items, including the contents of involved folders!"
-msgstr ""
-"Spauskite Tæsti tik tada, jei esate tikri, kad norite negráþtamai panaikinti pasirinktus elementus, áskaitant átrauktø katalogø turiná!"
+msgid "Click Continue only if you are sure that you want to irreversibly delete the selected items, including the contents of involved folders!"
+msgstr "Spauskite Tæsti tik tada, jei esate tikri, kad norite negráþtamai panaikinti pasirinktus elementus, áskaitant átrauktø katalogø turiná!"
 
 #: Merge.rc:1790
 #, c-format
@@ -4761,15 +4751,13 @@ msgid ""
 "\n"
 "Do you want to treat all carriage return types as equivalent for this comparison?\n"
 "\n"
-"Note: If you always want to treat all carriage return types as equivalent, set the option 'Ignore carriage return differences..' in the "
-"Compare tab of the options dialog (available under Edit/Options)."
+"Note: If you always want to treat all carriage return types as equivalent, set the option 'Ignore carriage return differences..' in the Compare tab of the options dialog (available under Edit/Options)."
 msgstr ""
 "Ðie failai naudoja skirtingus eiluèiø pabaigos formatus.\n"
 "\n"
 "Ar norite, kad ðio palyginimo metu á tai nebûtø kreipiamas dëmesys?\n"
 "\n"
-"Pastaba: Jei norite, kad á eiluèiø pabaigos skirtumus nebûtø kreipamas dëmesys visada, „Nuostatø“ (Redaguoti / Nuostatos...) ekrano "
-"„Lyginimo“ dalyje ájunkite „Ignoruoti eiluèiø pabaigos skirtumus“."
+"Pastaba: Jei norite, kad á eiluèiø pabaigos skirtumus nebûtø kreipamas dëmesys visada, „Nuostatø“ (Redaguoti / Nuostatos...) ekrano „Lyginimo“ dalyje ájunkite „Ignoruoti eiluèiø pabaigos skirtumus“."
 
 #: Merge.rc:1952
 #, c-format
@@ -5313,7 +5301,9 @@ msgstr ""
 msgid ""
 "Revert to using the default system font for view\n"
 "Default Font"
-msgstr "Gráþti prie numatyto sistemos ðrifto naudojimo perþiûrai"
+msgstr ""
+"Gráþti prie numatyto sistemos ðrifto naudojimo perþiûrai\n"
+"Numatytasis ðriftas"
 
 #: Merge.rc:2048
 #, c-format
@@ -5554,7 +5544,7 @@ msgid ""
 "WinMerge Help"
 msgstr ""
 "Atverèia „WinMerge“ pagalbos dokumentà\n"
-"„WinMerge“ pagalba"
+"„WinMerge“ þinynas"
 
 #: Merge.rc:2081
 #, c-format
@@ -5703,4 +5693,3 @@ msgstr "%d eilutës iðbrauktos"
 #, c-format
 msgid "Shell menu"
 msgstr "Sistemos meniu"
-

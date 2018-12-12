@@ -2,7 +2,7 @@
 # Released under the "GNU General Public License"
 #
 # Translators:
-# * Tichij <tichij at mail.com>
+# * Dalius Guzauskas (aka Tichij) (tichij AT mail DOT com)
 #
 # ID line follows -- this is updated by SVN
 # $Id: Lithuanian.po
@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WinMerge Shell Extension\n"
 "Report-Msgid-Bugs-To: http://bugs.winmerge.org/\n"
-"POT-Creation-Date: \n"
-"PO-Revision-Date: \n"
+"POT-Creation-Date: 2011-08-27 13:32+0000\n"
+"PO-Revision-Date: 2018-09-12 10:18+0200\n"
 "Last-Translator: Tichij <tichij@mail.com>\n"
 "Language-Team: Lithuanian <winmerge-translate@lists.sourceforge.net>\n"
 "Language: lt\n"
@@ -21,7 +21,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Poedit-Language: Lithuanian\n"
-"X-Poedit-SourceCharset: CP1257\n"
+"X-Poedit-SourceCharset: CP1252\n"
 "X-Poedit-Basepath: ../../ShellExtension/Languages/\n"
 "X-Generator: Poedit 2.1.1\n"
 
@@ -92,4 +92,3 @@ msgstr ""
 #, c-format
 msgid "Re-select First"
 msgstr ""
-
