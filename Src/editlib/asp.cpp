@@ -79,6 +79,8 @@ void CCrystalTextBuffer::ParseLineAsp(TextBlock::Cookie &cookie, LPCTSTR const p
 	BOOL bDecIndex = FALSE;
 	enum { False, Start, End } bWasComment = False;
 	DWORD dwScriptTagCookie = dwCookie & COOKIE_SCRIPT ? dwCookie & COOKIE_PARSER : 0;
+	if (dwScriptTagCookie == COOKIE_PARSER_MWSL)
+		dwScriptTagCookie = COOKIE_PARSER_JSCRIPT;
 	int nIdentBegin = -1;
 	pBuf.m_bRecording = nScriptBegin != -1 ? NULL : &*pBuf;
 	do
@@ -127,8 +129,16 @@ void CCrystalTextBuffer::ParseLineAsp(TextBlock::Cookie &cookie, LPCTSTR const p
 					nScriptBegin = nScriptEnd;
 				}
 			}
-			// Script start: <? or <%
-			if (pszChars[I] == '<' && (pszChars[I + 1] == '?' || pszChars[I + 1] == '%'))
+			// Script start: <? or <% or <MWSL>
+			if (pszChars[I] == '<' && (
+				(dwCookie & COOKIE_PARSER_GLOBAL) == SRCOPT_COOKIE(COOKIE_PARSER_MWSL) ?
+				I + 5 < nLength &&
+				pszChars[I + 1] == 'M' &&
+				pszChars[I + 2] == 'W' &&
+				pszChars[I + 3] == 'S' &&
+				pszChars[I + 4] == 'L' &&
+				pszChars[I + 5] == '>' :
+				(pszChars[I + 1] == '?' || pszChars[I + 1] == '%')))
 			{
 				pBuf.m_bRecording = pBuf;
 				if (nScriptBegin >= 0)
@@ -149,17 +159,19 @@ void CCrystalTextBuffer::ParseLineAsp(TextBlock::Cookie &cookie, LPCTSTR const p
 				}
 				else
 				{
-					I += 2;
 					pBuf.m_bRecording = NULL;
-					nScriptBegin = I;
+					nScriptBegin = I += 2;
 					switch (dwCookie & COOKIE_PARSER_GLOBAL)
 					{
+					case SRCOPT_COOKIE(COOKIE_PARSER_MWSL):
+						nScriptBegin = I += 4;
+						break;
 					case SRCOPT_COOKIE(COOKIE_PARSER_PHP):
 						if (LPCTSTR pScriptBegin = xisequal<_tcsnicmp>(pszChars + nScriptBegin, _T("php")))
 							nScriptBegin = static_cast<int>(pScriptBegin - pszChars);
 						break;
 					}
-					if (xisalnum(pszChars[nScriptBegin]))
+					if (pszChars[nScriptBegin - 1] != '>' && xisalnum(pszChars[nScriptBegin]))
 					{
 						dwCookie |= COOKIE_PARSER; // unknown coding language
 					}
@@ -199,7 +211,8 @@ void CCrystalTextBuffer::ParseLineAsp(TextBlock::Cookie &cookie, LPCTSTR const p
 			if ((dwCookie & COOKIE_PARSER) && I > 0)
 			{
 				// Extended comment <?....?>
-				if (pszChars[I] == '>' && (pszChars[nPrevI] == '?' || pszChars[nPrevI] == '%'))
+				if ((dwCookie & COOKIE_PARSER_GLOBAL) != SRCOPT_COOKIE(COOKIE_PARSER_MWSL) &&
+					pszChars[I] == '>' && ((pszChars[nPrevI] == '?' || pszChars[nPrevI] == '%')))
 				{
 					pBuf.m_bRecording = pBuf;
 					if (nScriptBegin >= 0)
@@ -269,11 +282,15 @@ void CCrystalTextBuffer::ParseLineAsp(TextBlock::Cookie &cookie, LPCTSTR const p
 						DEFINE_BLOCK(I, COLORINDEX_USER3);
 						dwCookie &= ~COOKIE_PARSER;
 						dwCookie |= dwScriptTagCookie & COOKIE_STRING;
-						if (dwCookie & COOKIE_TEMPLATE_STRING)
+						if (dwCookie & COOKIE_SCRIPT)
 						{
 							dwScriptTagCookie = COOKIE_PARSER_JSCRIPT; // works around forgetful line break
 							pBuf.m_bRecording = pBuf;
 							nScriptBegin = I + 1;
+						}
+						else
+						{
+							dwScriptTagCookie = 0;
 						}
 						if (!(dwCookie & COOKIE_ASP))
 							dwCookie |= dwScriptTagCookie & COOKIE_PARSER;
@@ -513,6 +530,31 @@ void CCrystalTextBuffer::ParseLineAsp(TextBlock::Cookie &cookie, LPCTSTR const p
 							(this->*ScriptParseProc(dwCookie))(cookie, pszChars, I, nScriptBegin - 1, pBuf);
 							nScriptBegin = -1;
 						}
+						if (I + 5 < nLength &&
+							pszChars[I + 1] == 'M' &&
+							pszChars[I + 2] == 'W' &&
+							pszChars[I + 3] == 'S' &&
+							pszChars[I + 4] == 'L' &&
+							pszChars[I + 5] == '>')
+						{
+							pBuf.m_bRecording = pBuf;
+							if (nScriptBegin >= 0)
+							{
+								(this->*ScriptParseProc(dwCookie))(cookie, pszChars, I, nScriptBegin - 1, pBuf);
+								nScriptBegin = -1;
+							}
+							DEFINE_BLOCK(nPrevI, COLORINDEX_USER3);
+							I += 5;
+							dwCookie &= ~COOKIE_PARSER;
+							if (dwCookie & COOKIE_SCRIPT)
+							{
+								dwCookie |= dwScriptTagCookie & COOKIE_PARSER;
+								nScriptBegin = I + 1;
+							}
+							bRedefineBlock = TRUE;
+							bDecIndex = FALSE;
+							continue;
+						}
 						DEFINE_BLOCK(nPrevI, COLORINDEX_OPERATOR);
 						DEFINE_BLOCK(I, COLORINDEX_PREPROCESSOR);
 						dwCookie &= ~(COOKIE_PARSER | COOKIE_SCRIPT);
@@ -669,13 +711,6 @@ void CCrystalTextBuffer::ParseLineAsp(TextBlock::Cookie &cookie, LPCTSTR const p
 						}
 						else switch (dwCookie & COOKIE_PARSER_GLOBAL)
 						{
-						case SRCOPT_COOKIE(COOKIE_PARSER_MWSL):
-							if (xisequal<_tcsncmp>(pchIdent, cchIdent, _T("MWSL")))
-							{
-								dwCookie |= COOKIE_ASP | COOKIE_SCRIPT;
-								dwScriptTagCookie = COOKIE_PARSER_MWSL;
-							}
-							break;
 						case SRCOPT_COOKIE(COOKIE_PARSER_JAVA):
 							if (IsJspScriptingTagName(pchIdent, cchIdent))
 							{
@@ -697,12 +732,6 @@ void CCrystalTextBuffer::ParseLineAsp(TextBlock::Cookie &cookie, LPCTSTR const p
 					}
 					else switch (dwCookie & COOKIE_PARSER_GLOBAL)
 					{
-					case SRCOPT_COOKIE(COOKIE_PARSER_MWSL):
-						if (xisequal<_tcsncmp>(pchIdent, cchIdent, _T("MWSL")))
-						{
-							DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER3);
-						}
-						break;
 					case SRCOPT_COOKIE(COOKIE_PARSER_JAVA):
 						if (IsJspScriptingTagName(pchIdent, cchIdent))
 						{
