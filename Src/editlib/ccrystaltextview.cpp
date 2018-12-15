@@ -209,10 +209,10 @@ LRESULT CCrystalTextView::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		OnMouseMove(lParam);
 		break;
 	case WM_LBUTTONDOWN:
-		OnLButtonDown(lParam);
+		OnLButtonDown(wParam, lParam);
 		break;
 	case WM_LBUTTONUP:
-		OnLButtonUp(lParam);
+		OnLButtonUp(wParam, lParam);
 		break;
 	case WM_LBUTTONDBLCLK:
 		OnLButtonDblClk(lParam);
@@ -3009,7 +3009,7 @@ BOOL CCrystalTextView::HighlightText(
 	ASSERT_VALIDTEXTPOS(m_ptCursorPos); // Probably 'nLength' is bigger than expected...
 
 	m_ptCursorPos = bCursorToLeft == TRUE ? ptStartPos : ptEndPos;
-	m_ptAnchor = m_ptCursorPos;
+	m_ptAnchor = bCursorToLeft == TRUE ? ptEndPos : ptStartPos;
 	SetSelection(ptStartPos, ptEndPos);
 	UpdateCaret();
 
