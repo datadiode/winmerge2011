@@ -785,7 +785,14 @@ void CMergeEditView::OnContextMenu(LPARAM lParam)
 		CMyDispId DispId;
 		DispId.Call(spDispatch,
 			CMyDispParams<1>().Unnamed(static_cast<IMergeEditView *>(this)), DISPATCH_PROPERTYPUTREF);
-
+		if (LPCTSTR query = StrChr(pluginMoniker.c_str(), _T('?')))
+		{
+			if (SUCCEEDED(DispId.Init(spDispatch, L"Arguments")))
+			{
+				OException::Check(DispId.Call(spDispatch,
+					CMyDispParams<1>().Unnamed(query + 1), DISPATCH_PROPERTYPUT));
+			}
+		}
 		if (SUCCEEDED(DispId.Init(spDispatch, L"ShowConsole")))
 		{
 			CMyVariant var;
