@@ -134,6 +134,9 @@ LRESULT CSplashWnd::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		OWindow::WindowProc(WM_SETREDRAW, TRUE, 0);
 		RedrawWindow(NULL, NULL, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN);
 		return lResult;
+	case WM_MDINEXT:
+		lParam = !lParam;
+		break;
 	case WM_TIMER:
 		C_ASSERT(SplashTimerID == WM_CREATE);
 	case WM_PARENTNOTIFY:
