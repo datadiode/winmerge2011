@@ -16,6 +16,8 @@ Spëti ið failo vardo plëtinio = mapping:%SupplementFolder%\Supplement.ini?FileTr
 [EditorScripts.Menu]
 Konvertuoti á didþiàsias raides = MakeUpper@script:\EditorScripts\Basic.wsc
 Konvertuoti á maþàsias raides = MakeLower@script:\EditorScripts\Basic.wsc
+Tokenize Alphanumeric = Tokenize@script:\EditorScripts\Basic.wsc?re.pattern='[^\w]+'
+Tokenize Nonwhitespace = Tokenize@script:\EditorScripts\Basic.wsc?re.pattern='[\s]+'
 Taikyti filtro komandà... = ExecFilterCommand@script:\EditorScripts\ExecFilterCommand.wsc
 Áterpti datà = InsertDate@script:\EditorScripts\Basic.wsc
 Áterpti laikà = InsertTime@script:\EditorScripts\Basic.wsc

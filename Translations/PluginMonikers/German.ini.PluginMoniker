@@ -16,6 +16,8 @@ Aus Dateiendung ableiten = mapping:%SupplementFolder%\Supplement.ini?FileTransfo
 [EditorScripts.Menu]
 In Großbuchstaben umwandeln = MakeUpper@script:\EditorScripts\Basic.wsc
 In Kleinbuchstaben umwandeln = MakeLower@script:\EditorScripts\Basic.wsc
+Tokenize Alphanumeric = Tokenize@script:\EditorScripts\Basic.wsc?re.pattern='[^\w]+'
+Tokenize Nonwhitespace = Tokenize@script:\EditorScripts\Basic.wsc?re.pattern='[\s]+'
 Filterbefehl anwenden... = ExecFilterCommand@script:\EditorScripts\ExecFilterCommand.wsc
 Datum einfügen = InsertDate@script:\EditorScripts\Basic.wsc
 Uhrzeit einfügen = InsertTime@script:\EditorScripts\Basic.wsc

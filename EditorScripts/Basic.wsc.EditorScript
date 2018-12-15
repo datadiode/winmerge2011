@@ -5,6 +5,8 @@
 	<method name="MakeLower"/>
 	<method name="InsertDate"/>
 	<method name="InsertTime"/>
+	<method name="Tokenize"/>
+	<property name="Arguments"/>
 </implements>
 
 <script language="VBS">
@@ -27,5 +29,15 @@ End Function
 Function InsertTime(Text)
 	InsertTime = FormatDateTime(Time, vbShortTime)
 End Function
+
+Function Tokenize(Text)
+	Dim re
+	Set re = New RegExp
+	re.Global = True
+	re.IgnoreCase = True
+	Execute Arguments
+	Tokenize = re.Replace(Text, vbCrLf)
+End Function
+
 </script>
 </scriptlet>

@@ -16,6 +16,8 @@ Diga a partir da extensão do ficheiro = mapping:%SupplementFolder%\Supplement.in
 [EditorScripts.Menu]
 Converter selecção para Maiúsculas = MakeUpper@script:\EditorScripts\Basic.wsc
 Converter selecção para Minúsculas = MakeLower@script:\EditorScripts\Basic.wsc
+Tokenize Alphanumeric = Tokenize@script:\EditorScripts\Basic.wsc?re.pattern='[^\w]+'
+Tokenize Nonwhitespace = Tokenize@script:\EditorScripts\Basic.wsc?re.pattern='[\s]+'
 Aplicar Comando do Filtro... = ExecFilterCommand@script:\EditorScripts\ExecFilterCommand.wsc
 Inserir Data = InsertDate@script:\EditorScripts\Basic.wsc
 Inserir Hora = InsertTime@script:\EditorScripts\Basic.wsc
