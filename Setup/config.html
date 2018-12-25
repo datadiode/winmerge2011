@@ -1,0 +1,255 @@
+<head>
+<meta http-equiv='X-UA-Compatible' content='IE=EmulateIE7'>
+<meta http-equiv='Content-Type' content='text/html; charset=utf-8'/>
+<meta http-equiv='MSThemeCompatible' content='yes'>
+<style>
+*
+{
+	font: 10pt sans-serif;
+}
+body
+{
+	margin: 5pt;
+	overflow: hidden;
+	background-color: buttonface;
+}
+button
+{
+	height: 18pt;
+	width: 60pt;
+	margin-left: 5pt;
+}
+legend
+{
+	padding-bottom: 3pt;
+}
+fieldset
+{
+	padding-top: 5pt;
+}
+a.about
+{
+	text-decoration: none;
+	font-weight: bold;
+	cursor: help;
+}
+#progressbar
+{
+	background-color: buttonshadow;
+	border: 0 solid highlight;
+	overflow: hidden;
+	width: 100%;
+	height: 12pt;
+	margin-bottom: 5pt;
+}
+#progresstxt
+{
+	position: absolute;
+	color: highlighttext;
+	left: 5pt;
+	width: 100%;
+	height: 12pt;
+}
+#buttons
+{
+	position: absolute;
+	text-align: right;
+	margin: 5pt;
+	right: 0pt;
+	bottom: 0pt;
+}
+</style>
+
+<script id='script' type='text/vbs'>
+Option Explicit
+
+script.addBehavior "#7zSfxHtm#Host?dialogHeight:110pt;dialogWidth:330pt", dialogArguments
+
+Const xdoc2txt_x64_url = "http://ebstudio.info/download/KWICFinder/xd2tx217_x64.zip"
+Const xdoc2txt_x64_sha = "f502a53398b1537c5e8435a3bd234f0fcce844f2a87153f93868d759dd905969"
+Const vcredist_x64_v100_url = "http://download.microsoft.com/download/A/8/0/A80747C3-41BD-45DF-B505-E9710D2744E0/vcredist_x64.exe"
+Const vcredist_x64_v100_sha = "c6cd2d3f0b11dc2a604ffdc4dd97861a83b77e21709ba71b962a47759c93f4c8"
+
+Const xdoc2txt_x86_url = "http://ebstudio.info/download/KWICFinder/xd2tx217.zip"
+Const xdoc2txt_x86_sha = "d82badc1855b5470a307c0dada2268494b114e68e5f11150d2788b31e1797697"
+Const vcredist_x86_v100_url = "http://download.microsoft.com/download/C/6/D/C6D0FD4E-9E53-4897-9B91-836EBA2AACD3/vcredist_x86.exe"
+Const vcredist_x86_v100_sha = "66b797b3b4f99488f53c2b676610dfe9868984c779536891a8d8f73ee214bc4b"
+
+Dim sh, fso, sha, tlb, env, sys, platform, system32, tmpfolder
+Dim xdoc2txt_url, xdoc2txt_sha, vcredist_v100_url, vcredist_v100_sha
+
+Set sh = CreateObject("WScript.Shell")
+Set fso = CreateObject("Scripting.FileSystemObject")
+Set sha = CreateObject("Shell.Application")
+Set tlb = CreateObject("Scriptlet.TypeLib")
+Set env = sh.Environment("Process")
+Set sys = sh.Environment("System")
+
+If env("PROCESSOR_ARCHITECTURE") = sys("PROCESSOR_ARCHITECTURE") Then
+	system32 = "system32"
+Else
+	system32 = "sysnative"
+End If
+
+Select Case env("PROCESSOR_ARCHITECTURE")
+	Case "AMD64"
+		platform = "x64"
+		xdoc2txt_url = xdoc2txt_x64_url
+		xdoc2txt_sha = xdoc2txt_x64_sha
+		vcredist_v100_url = vcredist_x64_v100_url
+		vcredist_v100_sha = vcredist_x64_v100_sha
+	Case Else
+		platform = "x86"
+		xdoc2txt_url = xdoc2txt_x86_url
+		xdoc2txt_sha = xdoc2txt_x86_sha
+		vcredist_v100_url = vcredist_x86_v100_url
+		vcredist_v100_sha = vcredist_x86_v100_sha
+End Select
+
+Sub UpdateProgress
+	Dim progress
+	progress = script.Progress
+	progresstxt.innerText = CLng(progress * 100) & "%"
+	progressbar.style.borderLeftWidth = CLng(progress * progressbar.offsetWidth) & "px"
+End Sub
+
+Sub LockUI(disabled)
+	Dim element
+	For Each element In document.getElementsByTagName("BUTTON")
+		element.disabled = disabled
+	Next
+End Sub
+
+Sub Window_OnLoad
+	Dim version
+	version = script.VersionString("ProductVersion")
+	document.title = "WinMerge " & version & " [" & platform & "]"
+	intro.innerText = Replace(intro.innerText, "{version}", version)
+End Sub
+
+Sub Window_OnError(description, url, line)
+	MsgBox "Error in line " & line & ":" & vbCrLf & description, vbError, document.title
+	close
+End Sub
+
+Function FormatText(s)
+	FormatText = Trim(Replace(Replace(s, vbCrLf & vbCrLf, vbLf & vbLf), vbCrLf, " "))
+End Function
+
+Function FormatStrings(argv)
+	Dim s, i
+	s = Split(argv(0), "%")
+	argv(0) = "%"
+	For i = 1 To UBound(s)
+		s(i) = argv(Asc(s(i)) - Asc("0")) & Mid(s(i), 2)
+	Next
+	FormatStrings = Join(s, "")
+End Function
+
+Function DownloadAndSave3rdPartyFile(url, sha, name)
+	Dim cmd, dst
+	dst = tmpfolder & "\" & name
+	cmd = FormatStrings(Array("""%1\Downloader.exe"" /passive:0 /timeout:30000 /bubble /owner:%2 /sha256:%3 ""%4"" ""%5""", tmpfolder, script.Hwnd, sha, url, dst))
+	If sh.Run(cmd, 1, True) <> 0 Then
+		On Error Resume Next
+		fso.DeleteFile dst, True
+		On Error Goto 0
+		DownloadAndSave3rdPartyFile = MsgBox(_
+			"3rd party distribution package download failed." & vbLf & vbLf &_
+			"URL: " & url & vbLf & vbLf & "Filename: " & name & vbLf & vbLf &_
+			"Operation canceled.",_
+			vbExclamation, document.title)
+	End If
+End Function
+
+Sub TgXDoc2Txt_OnClick
+	TgVCRedist.parentElement.disabled = Not TgXDoc2Txt.checked
+	TgVCRedist.checked = False
+End Sub
+
+Sub AboutXDoc2Txt_OnClick
+	MsgBox FormatText(xdoc2txt_about.text), vbInformation, document.title
+	window.event.returnValue = False
+End Sub
+
+Sub AboutVCRedist_OnClick
+	MsgBox FormatText(vcredist_v100_about.text), vbInformation, document.title
+	window.event.returnValue = False
+End Sub
+
+Sub PbOK_OnClick
+	tmpfolder = fso.GetSpecialFolder(0).Path & "\Installer\" & Mid(tlb.Guid, 1, 38)
+	If fso.FileExists(tmpfolder) Then Err.Raise vbObjectError,, "Temporary folder naming conflict"
+	LockUI True
+	progressbar.style.borderLeftWidth = "0px"
+	script.ExtractPayload tmpfolder & "\Install"
+	Dim ExitCode
+	Do
+		ExitCode = script.ExitCode
+		UpdateProgress
+	Loop While ExitCode = 259
+	progressbar.style.borderLeftWidth = progressbar.offsetWidth & "px"
+	ExitCode = script.ExitCode
+	If ExitCode <> 0 Then Err.Raise vbObjectError,, "Extraction failed with error code 0x" & Hex(ExitCode)
+	LockUI False
+	If TgXDoc2Txt.checked Then
+		script.ExtractAdjunct tmpfolder
+		If DownloadAndSave3rdPartyFile(xdoc2txt_url, xdoc2txt_sha, "xdoc2txt.zip") <> 0 Then Exit Sub
+		sh.Run FormatStrings(Array("""%1\Unzipper.exe"" ""%1\xdoc2txt.zip"" /o ""%1\Install\xdoc2txt"" /i ""\command:*""", tmpfolder)), 0, True
+	End If
+	If TgVCRedist.checked Then
+		If DownloadAndSave3rdPartyFile(vcredist_v100_url, vcredist_v100_sha, "vcredist_v100.exe") <> 0 Then Exit Sub
+		sh.Run FormatStrings(Array("""%1\vcredist_v100.exe"" /passive", tmpfolder)), 0, True
+	End If
+	script.WindowState = 0
+	sh.Run """%SystemRoot%\" & system32 & "\mshta.exe"" """ & tmpfolder & "\Install\setup.hta"" ""install"" """ & platform & """ ""ModuleAtom:4e716236-aa30-4c65-b225-d68bba81e9c2""", 1, True
+	On Error Resume Next
+	fso.DeleteFolder tmpfolder, True
+	On Error GoTo 0
+	close
+End Sub
+
+Sub PbCancel_OnClick
+	returnValue = vbCancel
+	close
+End Sub
+</script>
+
+<title>7zSfxHtm</title>
+<comment id='xdoc2txt_about'>
+WinMerge comes with a file transform scriptlet for piping office-type
+files through xdoc2txt.exe. Due to lack of a redistribution license,
+xdoc2txt.exe cannot legally be included in the WinMerge distribution.
+However, checking this option instructs Setup to download the xdoc2txt
+distribution package from http://ebstudio.info, and after integrity
+verification by its SHA-256 hash, extract the relevant file(s) to their
+expected location(s).
+</comment>
+<comment id='vcredist_v100_about'>
+If in doubt whether the VC++ runtime DLLs needed by xdoc2txt.exe are present
+on your machine, check this option to instruct Setup to download the proper
+redistributable package from http://download.microsoft.com, and after
+integrity verification by its SHA-256 hash, run its setup routine.
+</comment>
+</head>
+<body>
+<div id='intro'>Do you want to install WinMerge {version}?</div>
+<fieldset>
+	<legend>
+		<input type='checkbox' id='TgXDoc2Txt'>
+		Download and integrate xdoc2txt 2.17
+		<a class='about' id='AboutXDoc2Txt'>&#9432;</a>
+	</legend>
+	<legend disabled>
+		<input type='checkbox' id='TgVCRedist'>
+		Download and install VC++ 2010 SP1 Redistributable Package
+		<a class='about' id='AboutVCRedist'>&#9432;</a>
+	</legend>
+</fieldset>
+<div id='buttons'>
+<center id='progresstxt'>0%</center>
+<div id='progressbar'></div>
+<button id='PbOK' accesskey='Y'><u>Y</u>es</button>
+<button id='PbCancel' accesskey='N'><u>N</u>o</button>
+</div>
+</body>

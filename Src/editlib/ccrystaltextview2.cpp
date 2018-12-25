@@ -531,8 +531,8 @@ void CCrystalTextView::SelectAll()
 	int nLineCount = GetLineCount();
 	m_ptCursorPos.y = nLineCount - 1;
 	m_ptCursorPos.x = GetLineLength(m_ptCursorPos.y);
-	POINT ptStart = { 0, 0 };
-	SetSelection(ptStart, m_ptCursorPos);
+	m_ptAnchor.x = m_ptAnchor.y = 0;
+	SetSelection(m_ptAnchor, m_ptCursorPos);
 	UpdateCaret();
 }
 
@@ -542,18 +542,15 @@ void CCrystalTextView::SelectAll()
  * @param [in] nFlags Flags indicating if virtual keys are pressed.
  * @param [in] point Point where mousebutton is pressed.
  */
-void CCrystalTextView::OnLButtonDown(LPARAM lParam)
+void CCrystalTextView::OnLButtonDown(WPARAM wParam, LPARAM lParam)
 {
 	POINT point;
 	POINTSTOPOINT(point, lParam);
 	SetFocus();
 
-	bool bShift = GetKeyState(VK_SHIFT) < 0;
-	bool bControl = GetKeyState(VK_CONTROL) < 0;
-
 	if (point.x < GetMarginWidth())
 	{
-		if (bControl)
+		if (wParam & MK_CONTROL)
 		{
 			SelectAll();
 		}
@@ -565,7 +562,7 @@ void CCrystalTextView::OnLButtonDown(LPARAM lParam)
 			POINT pos;
 			CharPosToPoint(m_ptCursorPos.y, m_ptCursorPos.x, pos);
 			m_ptCursorPos.x = SubLineHomeToCharPos(m_ptCursorPos.y, pos.y);
-			if (!bShift)
+			if (!(wParam & MK_SHIFT))
 				m_ptAnchor = m_ptCursorPos;
 			SetCapture();
 			m_nDragSelTimer = SetTimer(CRYSTAL_TIMER_DRAGSEL, 100);
@@ -577,7 +574,7 @@ void CCrystalTextView::OnLButtonDown(LPARAM lParam)
 		}
 	}
 	else
-    {
+	{
 		POINT ptText = ClientToText(point);
 		PrepareSelBounds();
 		//  [JRT]:  Support For Disabling Drag and Drop...
@@ -590,12 +587,12 @@ void CCrystalTextView::OnLButtonDown(LPARAM lParam)
 		{
 			AdjustTextPoint(point);
 			m_ptCursorPos = ClientToText(point);
-			if (!bShift)
+			if (!(wParam & MK_SHIFT))
 				m_ptAnchor = m_ptCursorPos;
 			SetCapture();
 			m_nDragSelTimer = SetTimer(CRYSTAL_TIMER_DRAGSEL, 100);
 			ASSERT(m_nDragSelTimer != 0);
-			m_bWordSelection = bControl;
+			m_bWordSelection = (wParam & MK_CONTROL) != 0;
 			m_bLineSelection = false;
 			m_bDragSelection = true;
 			OnMouseMove(lParam);
@@ -714,13 +711,14 @@ void CCrystalTextView::OnMouseMove(LPARAM lParam)
 	ASSERT_VALIDTEXTPOS(m_ptCursorPos);
 }
 
-void CCrystalTextView::OnLButtonUp(LPARAM lParam)
+void CCrystalTextView::OnLButtonUp(WPARAM wParam, LPARAM lParam)
 {
 	POINT point;
 	POINTSTOPOINT(point, lParam);
 
 	if (m_bDragSelection)
 	{
+		m_ptAnchor = m_ptCursorPos == m_ptSelEnd ? m_ptSelStart : m_ptSelEnd;
 		EnsureCursorVisible();
 		ReleaseCapture();
 		KillTimer(m_nDragSelTimer);
@@ -732,9 +730,12 @@ void CCrystalTextView::OnLButtonUp(LPARAM lParam)
 		m_bPreparingToDrag = false;
 		AdjustTextPoint(point);
 		m_ptCursorPos = ClientToText(point);
+		m_ptAnchor = m_ptCursorPos;
 		EnsureCursorVisible();
 		SetSelection(m_ptCursorPos, m_ptCursorPos);
 		UpdateCaret();
+		//  Moving to normal selection mode
+		::SetCursor(::LoadCursor(NULL, MAKEINTRESOURCE(IDC_IBEAM)));
 	}
 
 	ASSERT_VALIDTEXTPOS(m_ptCursorPos);

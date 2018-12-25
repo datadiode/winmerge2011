@@ -111,6 +111,7 @@ static BOOL IsPhp2Keyword(LPCTSTR pszChars, int nLength)
 #define COOKIE_STRING           0x0008
 #define COOKIE_EXT_COMMENT      0x0010
 #define COOKIE_USER2            0x0020
+#define COOKIE_TRANSPARENT      0xFFFFFF00
 
 void CCrystalTextBuffer::ParseLinePhp(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
 {
@@ -118,7 +119,7 @@ void CCrystalTextBuffer::ParseLinePhp(TextBlock::Cookie &cookie, LPCTSTR const p
 
 	if (nLength == 0)
 	{
-		dwCookie &= (COOKIE_EXT_COMMENT | COOKIE_CHAR | COOKIE_STRING);
+		dwCookie &= (COOKIE_TRANSPARENT | COOKIE_EXT_COMMENT | COOKIE_CHAR | COOKIE_STRING);
 		return;
 	}
 
@@ -329,7 +330,7 @@ void CCrystalTextBuffer::ParseLinePhp(TextBlock::Cookie &cookie, LPCTSTR const p
 		}
 	} while (I < nLength);
 
-	dwCookie &= (COOKIE_EXT_COMMENT | COOKIE_CHAR | COOKIE_STRING);
+	dwCookie &= (COOKIE_TRANSPARENT | COOKIE_EXT_COMMENT | COOKIE_CHAR | COOKIE_STRING);
 }
 
 TESTCASE

@@ -311,5 +311,5 @@ UNICODESET DetermineEncoding(unsigned char *pBuffer, size_t size, unsigned *pBom
 		return NONE;
 	}
 	*pBom = 0;
-	return CheckForInvalidUtf8(pBuffer, bufSize) ? NONE : UTF8;
+	return CheckForInvalidUtf8(pBuffer, size) ? NONE : UTF8;
 }

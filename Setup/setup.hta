@@ -8,14 +8,6 @@
 	scroll='no'
 	singleInstance='yes'
 	icon='WinMergeU.exe'/>
-<comment id='setup_cfg'>
-;!@Install@!UTF-8!
-Title="WinMerge &version; [&platform;]"
-BeginPrompt="Do you want to install WinMerge &version;?"
-InstallPath="%%T\\Install"
-RunProgram="%%P:\"%SystemRoot%\\system32\\mshta.exe\" \"%%T\\Install\\setup.hta\" \"install\" \"&platform;\" \"ModuleAtom:4e716236-aa30-4c65-b225-d68bba81e9c2\""
-;!@InstallEnd@!
-</comment>
 <comment id='setup_bat'>
 call "%VS100COMNTOOLS%vsvars32.bat"
 set SevenZip=&SevenZip;
@@ -194,9 +186,6 @@ Option Explicit
 
 Const PROCESSOR_ARCHITECTURE_IA64 = 6
 Const PROCESSOR_ARCHITECTURE_AMD64 = 9
-
-Const adTypeBinary = 1
-Const adSaveCreateOverWrite = 2
 
 Const xdoc2txt_url = "http://ebstudio.info/download/KWICFinder/xd2tx2161.zip"
 Const xdoc2txt_sha = "b8ce64177ebd63ec3ebe5ca8cd3740e69f295b33a97ff84cdd47735e01077dc3"
@@ -432,59 +421,12 @@ Sub PbOK_OnClick
 	setTimeout "Apply", 0, "VBS"
 End Sub
 
-Sub DownloadAndSave3rdPartyFile(choice, prompt, url, sha, name)
-	Dim cmd, dst
-	dst = sTempFolder & "\" & name
-	If choice <> vbCancel Then
-		choice = MsgBox(FormatText(prompt), vbYesNoCancel Or vbQuestion, document.title)
-	End If
-	If choice <> vbYes Then
-		On Error Resume Next
-		fso.DeleteFile dst, True
-		On Error Goto 0
-		Exit Sub
-	End If
-	cmd = FormatStrings(Array("""%1\Downloader.exe"" /passive:0 /timeout:30000 /bubble /hta:%2 /sha256:%3 ""%4"" ""%5""", sTempFolder, window.name, sha, url, dst))
-	If sh.Run(cmd, 1, True) <> 0 Then
-		On Error Resume Next
-		fso.DeleteFile dst, True
-		On Error Goto 0
-		choice = MsgBox(_
-			"3rd party distribution package download failed." & vbLf & vbLf &_
-			"URL: " & url & vbLf & vbLf & "Filename: " & name & vbLf & vbLf &_
-			"Operation canceled.",_
-			vbOkCancel Or vbExclamation, document.title)
-		Exit Sub
-	End If
-End Sub
-
-Function Download3rdPartyFiles
-	Dim choice
-	DownloadAndSave3rdPartyFile choice, xdoc2txt_prompt.text, xdoc2txt_url, xdoc2txt_sha, "xdoc2txt.zip"
-	If choice = vbYes Then
-		DownloadAndSave3rdPartyFile choice, vcredist_x86_v100_prompt.text, vcredist_x86_v100_url, vcredist_x86_v100_sha, "vcredist_x86_v100.exe"
-	End If
-	Download3rdPartyFiles = choice <> vbCancel
-End Function
-
-Function Install3rdPartyFiles
-	If fso.FileExists(sTempFolder & "\xdoc2txt.zip") Then
-		sh.Run FormatStrings(Array("""%1\Unzipper.exe"" ""%1\xdoc2txt.zip"" /o ""%2\xdoc2txt"" /i ""\command:*""", sTempFolder, sThisFolder)), 0, True
-	End If
-	If fso.FileExists(sTempFolder & "\vcredist_x86_v100.exe") Then
-		sh.Run FormatStrings(Array("""%1\vcredist_x86_v100.exe"" /passive", sTempFolder)), 0, True
-	End If
-	Install3rdPartyFiles = True
-End Function
-
 Sub Apply
 	Dim element, sSetupCmdLine
 	document.body.style.cursor = "arrow"
 	sThisFolder = fso.GetParentFolderName(app.icon)
 	If maintenance.disabled Then
 		sTempFolder = fso.GetParentFolderName(sThisFolder)
-		If Not Download3rdPartyFiles Then Exit Sub
-		If Not Install3rdPartyFiles Then Exit Sub
 		sProgFolder = EdFolder.value
 		If Not InstallFiles Then Exit Sub
 		' Preserve existing WinMergeU.json from former installation if present
@@ -583,10 +525,6 @@ Sub Job_Version
 	fso.CreateTextFile(path, True).Write content
 	version = Replace(version, "XXXXX.", "0.")
 	version = Replace(version, "BUILD.", "")
-	content = Replace(setup_cfg.text, "&platform;", platform)
-	content = Replace(content, "&version;", version)
-	path = fso.GetParentFolderName(location.pathname) & "_" & platform & ".cfg"
-	fso.CreateTextFile(path, True).Write Unescape(content)
 	content = Replace(setup_bat.text, "&platform;", platform)
 	content = Replace(content, "&version;_Win32", "&version;")
 	content = Replace(content, "&version;", version)

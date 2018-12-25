@@ -634,10 +634,10 @@ public:
 	void OnSize();
 	void OnVScroll(UINT nSBCode);
 	BOOL OnSetCursor(UINT nHitTest);
-	void OnLButtonDown(LPARAM);
+	void OnLButtonDown(WPARAM, LPARAM);
 	void OnSetFocus();
 	void OnHScroll(UINT nSBCode);
-	void OnLButtonUp(LPARAM);
+	void OnLButtonUp(WPARAM, LPARAM);
 	void OnMouseMove(LPARAM);
 	void OnTimer(UINT_PTR nIDEvent);
 	void OnKillFocus();

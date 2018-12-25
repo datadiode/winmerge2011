@@ -16,6 +16,8 @@ Tell from filename extension = mapping:%SupplementFolder%\Supplement.ini?FileTra
 [EditorScripts.Menu]
 Make Selection Uppercase = MakeUpper@script:\EditorScripts\Basic.wsc
 Make Selection Lowercase = MakeLower@script:\EditorScripts\Basic.wsc
+Tokenize Alphanumeric = Tokenize@script:\EditorScripts\Basic.wsc?re.pattern='[^\w]+'
+Tokenize Nonwhitespace = Tokenize@script:\EditorScripts\Basic.wsc?re.pattern='[\s]+'
 Apply Filter Command... = ExecFilterCommand@script:\EditorScripts\ExecFilterCommand.wsc
 Insert Date = InsertDate@script:\EditorScripts\Basic.wsc
 Insert Time = InsertTime@script:\EditorScripts\Basic.wsc

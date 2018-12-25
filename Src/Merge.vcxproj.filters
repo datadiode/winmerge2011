@@ -1423,6 +1423,9 @@
     <po Include="..\Translations\WinMerge\Ukrainian.po">
       <Filter>Translation Files</Filter>
     </po>
+    <po Include="..\Translations\WinMerge\Lithuanian.po">
+      <Filter>Translation Files</Filter>
+    </po>
   </ItemGroup>
   <ItemGroup>
     <flt Include="..\Filters\ADAMulti.flt">
@@ -1524,6 +1527,9 @@
       <Filter>Plugin Monikers</Filter>
     </PluginMoniker>
     <PluginMoniker Include="..\Translations\PluginMonikers\German.ini.PluginMoniker">
+      <Filter>Plugin Monikers</Filter>
+    </PluginMoniker>
+    <PluginMoniker Include="..\Translations\PluginMonikers\Lithuanian.ini.PluginMoniker">
       <Filter>Plugin Monikers</Filter>
     </PluginMoniker>
     <PluginMoniker Include="..\Translations\PluginMonikers\Portuguese.ini.PluginMoniker">
