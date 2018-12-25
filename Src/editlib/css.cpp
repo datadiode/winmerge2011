@@ -183,11 +183,7 @@ static BOOL IsCss2Keyword(LPCTSTR pszChars, int nLength)
 
 #define DEFINE_BLOCK pBuf.DefineBlock
 
-#define COOKIE_COMMENT          0x0001
-#define COOKIE_PREPROCESSOR     0x0002
-#define COOKIE_EXT_COMMENT      0x0004
-#define COOKIE_STRING           0x0008
-#define COOKIE_CHAR             0x0010
+#define COOKIE_EXT_COMMENT      0x0010
 #define COOKIE_EXT_DEFINITION   0x0020
 #define COOKIE_EXT_VALUE        0x0040
 #define COOKIE_TRANSPARENT      0xFFFFFF00
