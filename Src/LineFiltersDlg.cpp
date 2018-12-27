@@ -23,6 +23,9 @@
 /** @brief Location for file compare specific help to open. */
 static const TCHAR FilterHelpLocation[] = _T("::/htmlhelp/Filters.html");
 
+/** @brief ID for the scroll timer used to auto-scroll the filter list during drag & drop. */
+static const UINT_PTR ScrollTimerID = 1;
+
 /////////////////////////////////////////////////////////////////////////////
 // LineFiltersDlg property page
 
@@ -182,6 +185,66 @@ LRESULT LineFiltersDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_HELP:
 		theApp.m_pMainWnd->ShowHelp(FilterHelpLocation);
 		return 0;
+	case WM_TIMER:
+		if (wParam == ScrollTimerID)
+		{
+			RECT rc;
+			m_TvFilter->GetClientRect(&rc);
+			POINT pt;
+			GetCursorPos(&pt);
+			m_TvFilter->ScreenToClient(&pt);
+			if (pt.y >= rc.bottom)
+				m_TvFilter->PostMessage(WM_VSCROLL, SB_LINEDOWN, 0);
+			else if (pt.y < rc.top)
+				m_TvFilter->PostMessage(WM_VSCROLL, SB_LINEUP, 0);
+		}
+		break;
+	case WM_MOUSEMOVE:
+		if (GetCapture())
+		{
+			TVHITTESTINFO ht;
+			POINTSTOPOINT(ht.pt, lParam);
+			MapWindowPoints(m_TvFilter, &ht.pt, 1);
+			RECT rc;
+			rc.bottom = m_TvFilter->GetScrollPos(SB_VERT) ? -8 : 0;
+			if (HTREEITEM const hItem = m_TvFilter->HitTest(&ht))
+				if (m_TvFilter->GetParentItem(hItem) == NULL)
+					m_TvFilter->GetItemRect(hItem, &rc, FALSE);
+			SetCaretPos(0, rc.bottom);
+		}
+		break;
+	case WM_LBUTTONUP:
+		if (HTREEITEM const hSelection = m_TvFilter->GetSelection())
+		{
+			TVHITTESTINFO ht;
+			POINTSTOPOINT(ht.pt, lParam);
+			MapWindowPoints(m_TvFilter, &ht.pt, 1);
+			TCHAR text[MAX_PATH];
+			TVINSERTSTRUCT tvis;
+			tvis.hParent = TVI_ROOT;
+			tvis.hInsertAfter = TVI_FIRST;
+			if (HTREEITEM const hItem = m_TvFilter->HitTest(&ht))
+				if (m_TvFilter->GetParentItem(hItem) == NULL)
+					tvis.hInsertAfter = hItem;
+			tvis.item.mask = TVIF_TEXT | TVIF_STATE;
+			tvis.item.stateMask = TVIS_STATEIMAGEMASK;
+			tvis.item.hItem = hSelection;
+			tvis.item.pszText = text;
+			tvis.item.cchTextMax = _countof(text);
+			if (m_TvFilter->GetItem(&tvis.item))
+			{
+				if (HTREEITEM const hItem = m_TvFilter->InsertItem(&tvis))
+				{
+					m_TvFilter->DeleteItem(hSelection);
+					m_TvFilter->SelectItem(hItem);
+				}
+			}
+		}
+		m_TvFilter->HideCaret();
+		DestroyCaret();
+		ReleaseCapture();
+		KillTimer(ScrollTimerID);
+		break;
 	case WM_NOTIFY:
 		if (LRESULT lResult = OnNotify(reinterpret_cast<UNotify *>(lParam)))
 			return lResult;
@@ -250,6 +313,16 @@ LRESULT LineFiltersDlg::OnNotify(UNotify *pNM)
 			return 1;
 		case TVN_SELCHANGED:
 			OnSelchanged();
+			break;
+		case TVN_BEGINDRAG:
+			m_TvFilter->SelectItem(pNM->TREEVIEW.itemNew.hItem);
+			if (GetEditableItem())
+			{
+				m_TvFilter->CreateCaret(NULL, 16000, 2);
+				m_TvFilter->ShowCaret();
+				SetTimer(ScrollTimerID, 250);
+				SetCapture();
+			}
 			break;
 		case NM_CLICK:
 			OnClick(pNM);
