@@ -3,12 +3,13 @@
 if not exist %1 rem: goto :usage
 if not exist %2 rem: goto :usage
 
-set SevenZip=\7z1604bin
-"%SevenZip%\7z.exe" e -so %~1 _7z.dll > %~2\7z.dll
-copy "%SevenZip%\History.txt" %~2
-copy "%SevenZip%\License.txt" %~2
-md %~2\Lang
-copy "%SevenZip%\Lang" %~2\Lang
+set SevenZip=%ProgramFiles%\7-Zip
+cd %~2
+"%SevenZip%\7z.exe" e -so %~1 _7z.dll > 7z.dll
+"%SevenZip%\7z.exe" e -y %~1 History.txt License.txt
+md Lang
+cd Lang
+"%SevenZip%\7z.exe" e -y %~1 *.ttt *.txt -x!History.txt -x!License.txt
 
 exit
 

@@ -1,57 +1,7 @@
 /* Merge7zCommon.cpp: Provide a handy C++ interface to access 7Zip services
-
 Copyright (c) 2003 Jochen Tucht
-
-This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Lesser General Public
-License as published by the Free Software Foundation; either
-version 2.1 of the License, or (at your option) any later version.
-
-This library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Lesser General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public
-License along with this library; if not, write to the Free Software
-Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-Please mind 2. b) of the GNU LGPL terms, and log your changes below.
-
-DATE:		BY:					DESCRIPTION:
-==========	==================	================================================
-2003-12-09	Jochen Tucht		Created
-2003-12-16	Jochen Tucht		GuessFormat() now checks for directory
-2004-03-18	Jochen Tucht		Experimental DllGetVersion() based on rcsid.
-2004-10-10	Jochen Tucht		DllGetVersion() based on new REVISION.TXT
-2005-01-15	Jochen Tucht		Changed as explained in revision.txt
-2005-02-26	Jochen Tucht		Changed as explained in revision.txt
-2005-03-19	Jochen Tucht		Changed as explained in revision.txt
-2005-06-22	Jochen Tucht		Treat .ear and .war like .zip
-2005-07-05	Jochen Tucht		Add missing .tbz2
-2005-08-20	Jochen Tucht		Option to guess archive format by signature.
-								EnumerateDirectory() in EnumDirItems.cpp has
-								somewhat changed so I can no longer use it.
-2005-10-02	Jochen Tucht		Add CHM format
-2005-11-19	Jochen Tucht		Minor changes to build against 7z430 beta
-2006-06-28	Jochen Neubeck		Add ISO format (introduced with 7z436 beta)
-								Add NSIS format (introduced with 7z440 beta)
-2007-01-27	Jochen Neubeck		Unassociate .exe filename extension from NSIS
-								format due to undesired side effect on WinMerge
-2007-04-20	Jochen Neubeck		Cope with 7z445's revised plugin system
-2007-07-13	Jochen Neubeck		Pass MSI files to CAB handler
-2007-08-25	Jochen Neubeck		Add COM format (introduced with 7z452 beta)
-								This format also handles MSI files, which are
-								therefore no longer passed to the CAB handler.
-2007-09-01	Jochen Neubeck		No longer #include "LangUtils.h", which has
-								moved to a different location as of 7z453 beta.
-2007-12-22	Jochen Neubeck		Unassociate .001 filename extension
-2008-08-03	Jochen Neubeck		Add LZMA format (introduced with 7z458 beta)
-2010-04-24	Jochen Neubeck		New formats introduced with 7z459 beta:
-								XAR, MUB, HFS, DMG, ELF (not sure if they work)
-2017-02-09	Jochen Neubeck		Cope with TFS temporary file name decorations
-								when extracting e.g. .tar.gz or .tar.bz2 files.
-*/
+SPDX-License-Identifier: LGPL-2.1-or-later
+Last change: 2018-12-28 by Jochen Neubeck */
 
 #include "stdafx.h"
 #include "Merge7zCommon.h"
@@ -87,7 +37,8 @@ static void EnumerateDirectory(
 	const UString &prefix,
 	CDirItems &dirItems)
 {
-	NFind::CEnumerator enumerator(baseFolderPrefix + directory + L'*');
+	NFind::CEnumerator enumerator;
+	enumerator.SetDirPrefix(baseFolderPrefix + directory);
 	NFind::CFileInfo fileInfo;
 	while (enumerator.Next(fileInfo))
 	{

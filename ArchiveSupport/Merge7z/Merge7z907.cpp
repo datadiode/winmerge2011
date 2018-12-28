@@ -1,28 +1,7 @@
-/*/Merge7z907.cpp
-
+/* Merge7z907.cpp
 Copyright (c) Jochen Neubeck
-
-This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Lesser General Public
-License as published by the Free Software Foundation; either
-version 2.1 of the License, or (at your option) any later version.
-
-This library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Lesser General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public
-License along with this library; if not, write to the Free Software
-Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-Please mind 2. b) of the GNU LGPL terms, and log your changes below.
-
-DATE:		BY:					DESCRIPTION:
-==========	==================	================================================
-2009-09-26	Jochen Neubeck		Branched from Merge7z459.cpp
-2010-04-24	Jochen Neubeck		Fix compression
-*/
+SPDX-License-Identifier: LGPL-2.1-or-later
+Last change: 2018-12-28 by Jochen Neubeck */
 
 #include "stdafx.h"
 
@@ -74,8 +53,8 @@ public:
 		indices(indices),
 		numItems(numItems)
 	{
-		ExtractCallbackSpec->ProgressDialog = &ProgressDialog;
-		ProgressDialog.CompressingMode = false;
+		ExtractCallbackSpec->ProgressDialog = this;
+		CompressingMode = false;
 		//result = E_FAIL;
 		if (HRESULT hr = Create(GetUnicodeString(title), hwndParent))
 		{
@@ -156,7 +135,8 @@ HRESULT Format7zDLL::Interface::Inspector::Extract(HWND hwndParent, LPCTSTR fold
 		(
 			false,
 			NExtract::NPathMode::kFullPaths,
-			NExtract::NOverwriteMode::kOverwrite
+			NExtract::NOverwriteMode::kOverwrite,
+			false
 		);
 
 		CExtractNtOptions ntOptions;
@@ -247,7 +227,7 @@ public:
 		file(file)
 	{
 		result = E_FAIL;
-		updateCallbackGUI->ProgressDialog = &ProgressDialog;
+		updateCallbackGUI->ProgressDialog = this;
 		if (HRESULT hr = Create(GetUnicodeString(title), hwndParent))
 		{
 			Complain(hr, NULL);
