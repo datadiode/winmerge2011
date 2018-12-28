@@ -201,7 +201,7 @@ LRESULT LineFiltersDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	case WM_MOUSEMOVE:
-		if (GetCapture())
+		if (GetCapture() == m_hWnd)
 		{
 			TVHITTESTINFO ht;
 			POINTSTOPOINT(ht.pt, lParam);
@@ -225,7 +225,7 @@ LRESULT LineFiltersDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	case WM_LBUTTONUP:
-		if (GetCapture())
+		if (GetCapture() == m_hWnd)
 		{
 			TVHITTESTINFO ht;
 			POINTSTOPOINT(ht.pt, lParam);
@@ -272,7 +272,7 @@ LRESULT LineFiltersDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		OnCheckStateChange(reinterpret_cast<HTREEITEM>(lParam));
 		break;
 	case WM_HOTKEY:
-		if (GetCapture())
+		if (GetCapture() == m_hWnd)
 			break;
 		switch (wParam)
 		{
@@ -308,7 +308,8 @@ LRESULT LineFiltersDlg::OnNotify(UNotify *pNM)
 		case NM_KILLFOCUS:
 			UnregisterHotKey(m_hWnd, MAKEWPARAM(IDC_LFILTER_LIST, VK_F2));
 			UnregisterHotKey(m_hWnd, MAKEWPARAM(IDC_LFILTER_LIST, VK_SPACE));
-			ReleaseCapture();
+			if (GetCapture() == m_hWnd)
+				ReleaseCapture();
 			break;
 		case TVN_ITEMEXPANDING:
 			if (pNM->TREEVIEW.action == TVE_EXPAND &&
