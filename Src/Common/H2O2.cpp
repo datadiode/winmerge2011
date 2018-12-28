@@ -544,6 +544,21 @@ LRESULT OPropertySheet::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 	case WM_ACTIVATE:
 		OWindow(hWnd).MessageReflect_TopLevelWindow<WM_ACTIVATE>(wParam, lParam);
 		break;
+	case WM_COMMAND:
+		switch (wParam)
+		{
+		case MAKEWPARAM(IDOK, BN_CLICKED):
+		case MAKEWPARAM(IDCANCEL, BN_CLICKED):
+			// If the current property page has captured the mouse, don't close
+			// the property sheet but rather just release the mouse capture.
+			if (GetCapture() == PropSheet_GetCurrentPageHwnd(hWnd))
+			{
+				ReleaseCapture();
+				return 0;
+			}
+			break;
+		}
+		break;
 	}
 	return ::DefDlgProc(hWnd, uMsg, wParam, lParam);
 }

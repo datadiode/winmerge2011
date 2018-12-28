@@ -38,6 +38,7 @@ LineFiltersDlg::LineFiltersDlg()
 , m_EdFilter(NULL)
 , m_pEdTestCase(NULL)
 , m_pLvTestCase(NULL)
+, m_hLastNonEditableItem(NULL)
 , m_bIgnoreRegExp(FALSE)
 , m_bLineFiltersDirty(FALSE)
 {
@@ -205,16 +206,26 @@ LRESULT LineFiltersDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			TVHITTESTINFO ht;
 			POINTSTOPOINT(ht.pt, lParam);
 			MapWindowPoints(m_TvFilter, &ht.pt, 1);
-			RECT rc;
-			rc.bottom = m_TvFilter->GetScrollPos(SB_VERT) ? -8 : 0;
-			if (HTREEITEM const hItem = m_TvFilter->HitTest(&ht))
-				if (m_TvFilter->GetParentItem(hItem) == NULL)
-					m_TvFilter->GetItemRect(hItem, &rc, FALSE);
-			SetCaretPos(0, rc.bottom);
+			int bottom = m_TvFilter->GetScrollPos(SB_VERT) ? -8 : 0;
+			HTREEITEM hItem = m_TvFilter->HitTest(&ht);
+			if (hItem && GetEditableItem(hItem))
+			{
+				RECT rc;
+				m_TvFilter->GetItemRect(hItem, &rc, FALSE);
+				bottom = rc.bottom;
+			}
+			else if (m_hLastNonEditableItem &&
+				(hItem = m_TvFilter->GetNextSiblingItem(m_hLastNonEditableItem)) != NULL)
+			{
+				RECT rc;
+				m_TvFilter->GetItemRect(hItem, &rc, FALSE);
+				bottom = rc.top;
+			}
+			SetCaretPos(0, bottom);
 		}
 		break;
 	case WM_LBUTTONUP:
-		if (HTREEITEM const hSelection = m_TvFilter->GetSelection())
+		if (GetCapture())
 		{
 			TVHITTESTINFO ht;
 			POINTSTOPOINT(ht.pt, lParam);
@@ -222,28 +233,29 @@ LRESULT LineFiltersDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			TCHAR text[MAX_PATH];
 			TVINSERTSTRUCT tvis;
 			tvis.hParent = TVI_ROOT;
-			tvis.hInsertAfter = TVI_FIRST;
-			if (HTREEITEM const hItem = m_TvFilter->HitTest(&ht))
-				if (m_TvFilter->GetParentItem(hItem) == NULL)
-					tvis.hInsertAfter = hItem;
+			HTREEITEM hItem = m_TvFilter->HitTest(&ht);
+			tvis.hInsertAfter = hItem && GetEditableItem(hItem) ? hItem :
+				m_hLastNonEditableItem ? m_hLastNonEditableItem : TVI_FIRST;
 			tvis.item.mask = TVIF_TEXT | TVIF_STATE;
 			tvis.item.stateMask = TVIS_STATEIMAGEMASK;
-			tvis.item.hItem = hSelection;
+			tvis.item.hItem = m_TvFilter->GetSelection();
 			tvis.item.pszText = text;
 			tvis.item.cchTextMax = _countof(text);
-			if (m_TvFilter->GetItem(&tvis.item))
+			if (tvis.item.hItem && m_TvFilter->GetItem(&tvis.item) &&
+				(hItem = m_TvFilter->InsertItem(&tvis)) != NULL)
 			{
-				if (HTREEITEM const hItem = m_TvFilter->InsertItem(&tvis))
-				{
-					m_TvFilter->DeleteItem(hSelection);
-					m_TvFilter->SelectItem(hItem);
-				}
+				m_TvFilter->DeleteItem(tvis.item.hItem);
+				m_TvFilter->SelectItem(hItem);
 			}
+			ReleaseCapture();
 		}
-		m_TvFilter->HideCaret();
-		DestroyCaret();
-		ReleaseCapture();
-		KillTimer(ScrollTimerID);
+		break;
+	case WM_CAPTURECHANGED:
+		if (KillTimer(ScrollTimerID))
+		{
+			m_TvFilter->HideCaret();
+			DestroyCaret();
+		}
 		break;
 	case WM_NOTIFY:
 		if (LRESULT lResult = OnNotify(reinterpret_cast<UNotify *>(lParam)))
@@ -260,6 +272,8 @@ LRESULT LineFiltersDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		OnCheckStateChange(reinterpret_cast<HTREEITEM>(lParam));
 		break;
 	case WM_HOTKEY:
+		if (GetCapture())
+			break;
 		switch (wParam)
 		{
 		case MAKEWPARAM(IDC_LFILTER_LIST, VK_F2):
@@ -294,6 +308,7 @@ LRESULT LineFiltersDlg::OnNotify(UNotify *pNM)
 		case NM_KILLFOCUS:
 			UnregisterHotKey(m_hWnd, MAKEWPARAM(IDC_LFILTER_LIST, VK_F2));
 			UnregisterHotKey(m_hWnd, MAKEWPARAM(IDC_LFILTER_LIST, VK_SPACE));
+			ReleaseCapture();
 			break;
 		case TVN_ITEMEXPANDING:
 			if (pNM->TREEVIEW.action == TVE_EXPAND &&
@@ -316,11 +331,11 @@ LRESULT LineFiltersDlg::OnNotify(UNotify *pNM)
 			break;
 		case TVN_BEGINDRAG:
 			m_TvFilter->SelectItem(pNM->TREEVIEW.itemNew.hItem);
-			if (GetEditableItem())
+			m_TvFilter->SetFocus();
+			if (GetEditableItem() && SetTimer(ScrollTimerID, 250))
 			{
 				m_TvFilter->CreateCaret(NULL, 16000, 2);
 				m_TvFilter->ShowCaret();
-				SetTimer(ScrollTimerID, 250);
 				SetCapture();
 			}
 			break;
@@ -446,7 +461,7 @@ void LineFiltersDlg::InitList()
 		{
 			*q++ = _T('\0');
 			string_format text(_T("[%s]"), p);
-			AddRow(text.c_str(), _tcschr(q, _T('1')) != 0 ? 1 : 0, 1);
+			m_hLastNonEditableItem = AddRow(text.c_str(), _tcschr(q, _T('1')) != 0 ? 1 : 0, 1);
 		}
 		p += n + 1;
 	}
@@ -511,10 +526,11 @@ HTREEITEM LineFiltersDlg::AddRow(LPCTSTR filter, int usage, int cChildren)
 	return m_TvFilter->InsertItem(&tvis);
 }
 
-HTREEITEM LineFiltersDlg::GetEditableItem()
+HTREEITEM LineFiltersDlg::GetEditableItem(HTREEITEM hItem)
 {
 	// Only items with neither children nor a parent are editable.
-	HTREEITEM hItem = m_TvFilter->GetSelection();
+	if (hItem == NULL)
+		hItem = m_TvFilter->GetSelection();
 	if (hItem)
 	{
 		TVITEM item;

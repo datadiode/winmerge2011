@@ -44,7 +44,7 @@ protected:
 	void PopulateSection(HTREEITEM);
 	void DoInPlaceEditingEvents();
 	HTREEITEM AddRow(LPCTSTR filter = NULL, int usage = 0, int cChildren = 0);
-	HTREEITEM GetEditableItem();
+	HTREEITEM GetEditableItem(HTREEITEM = NULL);
 	void EditSelectedFilter();
 
 private:
@@ -53,4 +53,5 @@ private:
 	HEdit *m_EdFilter;
 	HEdit *m_pEdTestCase;
 	HListView *m_pLvTestCase;
+	HTREEITEM m_hLastNonEditableItem;
 };
