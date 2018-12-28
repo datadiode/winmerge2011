@@ -164,7 +164,7 @@ protected:
 	bool m_bPreparingToDrag;
 	bool m_bDraggingText;
 	bool m_bDragSelection, m_bWordSelection, m_bLineSelection;
-	UINT_PTR m_nDragSelTimer;
+	static UINT_PTR const m_nDragSelTimer = 1001;
 
 	POINT m_ptDrawSelStart, m_ptDrawSelEnd;
 	POINT m_ptAnchor;

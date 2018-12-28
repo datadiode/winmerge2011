@@ -48,8 +48,6 @@
 #define new DEBUG_NEW
 #endif
 
-#define CRYSTAL_TIMER_DRAGSEL   1001
-
 /////////////////////////////////////////////////////////////////////////////
 // CCrystalTextView
 
@@ -565,8 +563,8 @@ void CCrystalTextView::OnLButtonDown(WPARAM wParam, LPARAM lParam)
 			if (!(wParam & MK_SHIFT))
 				m_ptAnchor = m_ptCursorPos;
 			SetCapture();
-			m_nDragSelTimer = SetTimer(CRYSTAL_TIMER_DRAGSEL, 100);
-			ASSERT(m_nDragSelTimer != 0);
+			SetTimer(m_nDragSelTimer, 100);
+			C_ASSERT(m_nDragSelTimer != 0);
 			m_bWordSelection = false;
 			m_bLineSelection = true;
 			m_bDragSelection = true;
@@ -590,8 +588,8 @@ void CCrystalTextView::OnLButtonDown(WPARAM wParam, LPARAM lParam)
 			if (!(wParam & MK_SHIFT))
 				m_ptAnchor = m_ptCursorPos;
 			SetCapture();
-			m_nDragSelTimer = SetTimer(CRYSTAL_TIMER_DRAGSEL, 100);
-			ASSERT(m_nDragSelTimer != 0);
+			SetTimer(m_nDragSelTimer, 100);
+			C_ASSERT(m_nDragSelTimer != 0);
 			m_bWordSelection = (wParam & MK_CONTROL) != 0;
 			m_bLineSelection = false;
 			m_bDragSelection = true;
@@ -743,7 +741,7 @@ void CCrystalTextView::OnLButtonUp(WPARAM wParam, LPARAM lParam)
 
 void CCrystalTextView::OnTimer(UINT_PTR nIDEvent)
 {
-	if (nIDEvent == CRYSTAL_TIMER_DRAGSEL)
+	if (nIDEvent == m_nDragSelTimer)
 	{
 		ASSERT(m_bDragSelection);
 		POINT pt;
@@ -845,8 +843,8 @@ void CCrystalTextView::OnLButtonDblClk(LPARAM lParam)
 		m_ptCursorPos = ClientToText(point);
 		m_ptAnchor = m_ptCursorPos;
 		SetCapture();
-		m_nDragSelTimer = SetTimer(CRYSTAL_TIMER_DRAGSEL, 100);
-		ASSERT(m_nDragSelTimer != 0);
+		SetTimer(m_nDragSelTimer, 100);
+		C_ASSERT(m_nDragSelTimer != 0);
 		m_bWordSelection = true;
 		m_bLineSelection = false;
 		m_bDragSelection = true;
