@@ -266,7 +266,7 @@ bool UniMemFile::DoOpen(LPCTSTR filename, DWORD dwOpenAccess, DWORD dwOpenShareM
 		return false;
 	}
 
-	m_base = (LPBYTE)MapViewOfFile(m_hMapping, dwMapViewAccess, 0, 0, m_filesize.Lo);
+	m_base = static_cast<LPBYTE>(MapViewOfFile(m_hMapping, dwMapViewAccess, 0, 0, m_filesize.Lo));
 	if (!m_base)
 	{
 		LastError(_T("MapViewOfFile"), GetLastError());
@@ -359,12 +359,11 @@ bool UniMemFile::ReadString(String &line, String &eol, bool *lossy)
 {
 	line.clear();
 	eol.clear();
-	LPCTSTR pchLine = (LPCTSTR)m_current;
 
 	// shortcut methods in case file is in the same encoding as our Strings
-
 	if (m_unicoding == UCS2LE)
 	{
+		LPCWSTR const pchLine = reinterpret_cast<LPCWSTR>(m_current);
 		int cchLine = 0;
 		// If there aren't any wchars left in the file, return FALSE to indicate EOF
 		if (m_current - m_base + 1 >= m_filesize.int64)
@@ -372,14 +371,15 @@ bool UniMemFile::ReadString(String &line, String &eol, bool *lossy)
 		// Loop through wchars, watching for eol chars or zero
 		while (m_current - m_base + 1 < m_filesize.int64)
 		{
-			wchar_t wch = *(wchar_t *)m_current;
+			WCHAR const wch = *reinterpret_cast<LPCWSTR>(m_current);
 			m_current += 2;
 			if (wch == '\n' || wch == '\r')
 			{
 				eol += wch;
 				if (wch == '\r')
 				{
-					if (m_current - m_base + 1 < m_filesize.int64 && *(wchar_t *)m_current == '\n')
+					if (m_current - m_base + 1 < m_filesize.int64 &&
+						*reinterpret_cast<LPCWSTR>(m_current) == '\n')
 					{
 						eol += '\n';
 						m_current += 2;
@@ -433,7 +433,7 @@ bool UniMemFile::ReadString(String &line, String &eol, bool *lossy)
 			++m_txtstats.nlosses;
 		if (!eof)
 		{
-			eol += (TCHAR) * eolptr;
+			eol += static_cast<TCHAR>(*eolptr);
 			if (*eolptr == '\r')
 			{
 				if (eolptr - m_base + (m_charsize - 1) < m_filesize.int64 && eolptr[1] == '\n')
