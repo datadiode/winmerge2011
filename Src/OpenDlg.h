@@ -97,7 +97,7 @@ protected:
 	LRESULT OnNotify(UNotify *);
 
 	void OnDestroy();
-	void OnBrowseButton(UINT idPath, UINT idFilter);
+	void OnBrowseButton(HSuperComboBox *pCbPath, HSuperComboBox *pCbFilter);
 	void OnSelchangeCompareAs();
 	void OnOK();
 	void OnCancel();

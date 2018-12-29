@@ -297,10 +297,10 @@ LRESULT COpenDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 				m_fCompareAs = m_pTgCompareAs->GetCheck();
 			break;
 		case MAKEWPARAM(IDC_LEFT_BUTTON, BN_CLICKED):
-			OnBrowseButton(IDC_LEFT_COMBO, IDC_RIGHT_COMBO);
+			OnBrowseButton(m_pCbLeft, m_pCbRight);
 			break;
 		case MAKEWPARAM(IDC_RIGHT_BUTTON, BN_CLICKED):
-			OnBrowseButton(IDC_RIGHT_COMBO, IDC_LEFT_COMBO);
+			OnBrowseButton(m_pCbRight, m_pCbLeft);
 			break;
 		case MAKEWPARAM(IDC_SELECT_FILTER, BN_CLICKED):
 			OnSelectFilter();
@@ -543,17 +543,19 @@ void COpenDlg::OnDestroy()
 /**
  * @brief Called when "Browse..." button is selected for left or right path.
  */
-void COpenDlg::OnBrowseButton(UINT idPath, UINT idFilter)
+void COpenDlg::OnBrowseButton(HSuperComboBox *pCbPath, HSuperComboBox *pCbFilter)
 {
 	String path, filter;
-	GetDlgItemText(idPath, path);
-	GetDlgItemText(idFilter, filter);
+	pCbPath->GetWindowText(path);
+	pCbFilter->GetWindowText(filter);
 	if (paths_DoesPathExist(path.c_str()) == IS_EXISTING_FILE)
 		path.resize(path.rfind(_T('\\')) + 1);
 	filter.erase(0, filter.rfind(_T('\\')) + 1);
 	if (SelectFileOrFolder(m_hWnd, path, filter))
 	{
-		SetDlgItemText(idPath, path.c_str());
+		pCbPath->SetCurSel(-1);
+		pCbPath->SetWindowText(path.c_str());
+		pCbPath->EnsureSelection();
 		UpdateButtonStates();
 	}
 }
