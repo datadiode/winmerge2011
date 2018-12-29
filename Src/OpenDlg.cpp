@@ -209,20 +209,23 @@ LRESULT COpenDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			POINT pt;
 			POINTSTOPOINT(pt, lParam);
-			HWindow *pwndHit = ChildWindowFromPoint(pt, CWP_SKIPINVISIBLE | CWP_SKIPDISABLED | CWP_SKIPTRANSPARENT);
-			switch (pwndHit->GetDlgCtrlID())
+			if (HWindow *const pwndHit = ChildWindowFromPoint(pt,
+				CWP_SKIPINVISIBLE | CWP_SKIPDISABLED | CWP_SKIPTRANSPARENT))
 			{
-			case IDC_LEFT_COMBO:
-			case IDC_RIGHT_COMBO:
-				if (!pwndHit->IsChild(HWindow::GetFocus()))
+				switch (pwndHit->GetDlgCtrlID())
 				{
-					SetCursor(m_hIconRotate);
+				case IDC_LEFT_COMBO:
+				case IDC_RIGHT_COMBO:
+					if (!pwndHit->IsChild(HWindow::GetFocus()))
+					{
+						SetCursor(m_hIconRotate);
+						break;
+					}
+					// fall through
+				default:
+					SetCursor(m_hCursorNo);
 					break;
 				}
-				// fall through
-			default:
-				SetCursor(m_hCursorNo);
-				break;
 			}
 		}
 		break;
@@ -231,29 +234,32 @@ LRESULT COpenDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			POINT pt;
 			POINTSTOPOINT(pt, lParam);
-			HWindow *pwndHit = ChildWindowFromPoint(pt, CWP_SKIPINVISIBLE | CWP_SKIPDISABLED | CWP_SKIPTRANSPARENT);
-			switch (pwndHit->GetDlgCtrlID())
+			if (HWindow *const pwndHit = ChildWindowFromPoint(pt,
+				CWP_SKIPINVISIBLE | CWP_SKIPDISABLED | CWP_SKIPTRANSPARENT))
 			{
-			case IDC_LEFT_COMBO:
-			case IDC_RIGHT_COMBO:
-				if (!pwndHit->IsChild(HWindow::GetFocus()))
+				switch (pwndHit->GetDlgCtrlID())
 				{
-					String a, b;
-					m_pCbLeft->GetWindowText(a);
-					m_pCbRight->GetWindowText(b);
-					m_pCbLeft->SetCurSel(-1);
-					m_pCbLeft->SetWindowText(b.c_str());
-					m_pCbRight->SetCurSel(-1);
-					m_pCbRight->SetWindowText(a.c_str());
-					m_pCbLeft->EnsureSelection();
-					m_pCbRight->EnsureSelection();
-					GotoDlgCtrl(pwndHit);
-					UpdateButtonStates();
+				case IDC_LEFT_COMBO:
+				case IDC_RIGHT_COMBO:
+					if (!pwndHit->IsChild(HWindow::GetFocus()))
+					{
+						String a, b;
+						m_pCbLeft->GetWindowText(a);
+						m_pCbRight->GetWindowText(b);
+						m_pCbLeft->SetCurSel(-1);
+						m_pCbLeft->SetWindowText(b.c_str());
+						m_pCbRight->SetCurSel(-1);
+						m_pCbRight->SetWindowText(a.c_str());
+						m_pCbLeft->EnsureSelection();
+						m_pCbRight->EnsureSelection();
+						GotoDlgCtrl(pwndHit);
+						UpdateButtonStates();
+					}
+					break;
 				}
-				break;
 			}
+			ReleaseCapture();
 		}
-		ReleaseCapture();
 		break;
 	case WM_DROPFILES:
 		OnDropFiles(reinterpret_cast<HDROP>(wParam));
