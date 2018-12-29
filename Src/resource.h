@@ -58,6 +58,7 @@
 #define IDD_PROPPAGE_COLORS_LIST                239
 #define IDD_BROWSE_FOR_FILE                     240
 #define IDD_BROWSE_FOR_FOLDER                   241
+#define IDI_ROTATE2                             302
 #define IDR_SPLASH                              308
 #define IDB_TOOLBAR_ENABLED                     311
 #define IDB_TOOLBAR_ENABLED32                   312

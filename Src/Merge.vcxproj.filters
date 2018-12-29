@@ -1284,6 +1284,9 @@
     <None Include="res\notequalfile.ico">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="res\questionmark.ico">
+      <Filter>Resource Files</Filter>
+    </None>
     <None Include="res\rfile.ico">
       <Filter>Resource Files</Filter>
     </None>
@@ -1297,6 +1300,9 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="res\right_to_left.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\rotate2.ico">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="res\sigma.ico">
@@ -1319,9 +1325,6 @@
     </None>
     <None Include="..\Translations\WinMerge\UpdatePoFilesFromPotFile.vbs">
       <Filter>Batch files</Filter>
-    </None>
-    <None Include="res\questionmark.ico">
-      <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

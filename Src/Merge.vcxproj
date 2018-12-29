@@ -887,6 +887,7 @@
     <None Include="res\right.bmp" />
     <None Include="res\right_to_browse.bmp" />
     <None Include="res\right_to_left.bmp" />
+    <None Include="res\rotate2.ico" />
     <None Include="res\sigma.ico" />
     <None Include="CHANGELO" />
     <None Include="..\Translations\WinMerge\BuildMergeLangDll.bat" />

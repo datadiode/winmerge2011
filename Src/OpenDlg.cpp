@@ -68,6 +68,8 @@ COpenDlg::COpenDlg()
 	: OResizableDialog(IDD_OPEN)
 	, m_nAutoComplete(COptionsMgr::Get(OPT_AUTO_COMPLETE_SOURCE))
 	, m_fCompareAs(BST_CHECKED)
+	, m_hIconRotate(LanguageSelect.LoadIcon(IDI_ROTATE2))
+	, m_hCursorNo(LoadCursor(NULL, IDC_NO))
 {
 	static const LONG FloatScript[] =
 	{
@@ -132,6 +134,10 @@ LRESULT COpenDlg::OnNotify(UNotify *pNM)
 	case IDC_RIGHT_COMBO:
 		switch (pNM->HDR.code)
 		{
+		case CBEN_DRAGBEGIN:
+			GotoDlgCtrl(pNM->pwndFrom);
+			SetCapture();
+			break;
 		case CBEN_GETDISPINFO:
 			SHFILEINFO sfi;
 			DWORD_PTR result = 0;
@@ -198,6 +204,57 @@ LRESULT COpenDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_TIMER:
 		OnTimer(wParam);
 		break;
+	case WM_MOUSEMOVE:
+		if (GetCapture() == m_hWnd)
+		{
+			POINT pt;
+			POINTSTOPOINT(pt, lParam);
+			HWindow *pwndHit = ChildWindowFromPoint(pt, CWP_SKIPINVISIBLE | CWP_SKIPDISABLED | CWP_SKIPTRANSPARENT);
+			switch (pwndHit->GetDlgCtrlID())
+			{
+			case IDC_LEFT_COMBO:
+			case IDC_RIGHT_COMBO:
+				if (!pwndHit->IsChild(HWindow::GetFocus()))
+				{
+					SetCursor(m_hIconRotate);
+					break;
+				}
+				// fall through
+			default:
+				SetCursor(m_hCursorNo);
+				break;
+			}
+		}
+		break;
+	case WM_LBUTTONUP:
+		if (GetCapture() == m_hWnd)
+		{
+			POINT pt;
+			POINTSTOPOINT(pt, lParam);
+			HWindow *pwndHit = ChildWindowFromPoint(pt, CWP_SKIPINVISIBLE | CWP_SKIPDISABLED | CWP_SKIPTRANSPARENT);
+			switch (pwndHit->GetDlgCtrlID())
+			{
+			case IDC_LEFT_COMBO:
+			case IDC_RIGHT_COMBO:
+				if (!pwndHit->IsChild(HWindow::GetFocus()))
+				{
+					String a, b;
+					m_pCbLeft->GetWindowText(a);
+					m_pCbRight->GetWindowText(b);
+					m_pCbLeft->SetCurSel(-1);
+					m_pCbLeft->SetWindowText(b.c_str());
+					m_pCbRight->SetCurSel(-1);
+					m_pCbRight->SetWindowText(a.c_str());
+					m_pCbLeft->EnsureSelection();
+					m_pCbRight->EnsureSelection();
+					GotoDlgCtrl(pwndHit);
+					UpdateButtonStates();
+				}
+				break;
+			}
+		}
+		ReleaseCapture();
+		break;
 	case WM_DROPFILES:
 		OnDropFiles(reinterpret_cast<HDROP>(wParam));
 		break;
@@ -216,10 +273,18 @@ LRESULT COpenDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		switch (wParam)
 		{
 		case IDOK:
-			OnOK();
+			// When owning the mouse capture, release it and stay open.
+			if (GetCapture() == m_hWnd)
+				ReleaseCapture();
+			else
+				OnOK();
 			break;
 		case IDCANCEL:
-			OnCancel();
+			// When owning the mouse capture, release it and stay open.
+			if (GetCapture() == m_hWnd)
+				ReleaseCapture();
+			else
+				OnCancel();
 			break;
 		case ID_HELP:
 			OnHelp();

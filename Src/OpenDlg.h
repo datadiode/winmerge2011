@@ -68,9 +68,12 @@ private:
 		AUTO_COMPLETE_FILE_SYSTEM,
 		AUTO_COMPLETE_RECENTLY_USED
 	};
-	const int m_nAutoComplete;
+	int const m_nAutoComplete;
 	int m_nCompareAs;
 	UINT m_fCompareAs;
+
+	HICON const m_hIconRotate;
+	HCURSOR const m_hCursorNo;
 
 	int m_cyFull;
 

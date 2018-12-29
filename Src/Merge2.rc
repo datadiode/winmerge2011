@@ -46,6 +46,9 @@ IDI_NOTEQUALTEXTFILE    ICON                    "res/notequaltextfile.ico"
 // Below icon originates from http://whytehouse.com/usa/icons/HelpBlue.zip,
 // which is subject to the terms given in http://whytehouse.com/usa/faq.asp.
 IDI_QUESTION_MARK       ICON                    "res/questionmark.ico"
+// Below icon originates from https://github.com/NetEaseGame/ATX,
+// which is subject to the Apache-2.0 License
+IDI_ROTATE2             ICON                    "res/rotate2.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
