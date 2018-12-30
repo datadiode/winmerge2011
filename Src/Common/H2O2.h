@@ -502,4 +502,5 @@ namespace H2O
 	HIMAGELIST Create3StateImageList();
 	void GetDesktopWorkArea(HWND, LPRECT);
 	void CenterWindow(HWindow *, HWindow *pParent = NULL);
+	LPTSTR AllocDispinfoText(String &);
 }

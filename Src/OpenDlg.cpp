@@ -48,17 +48,15 @@ static const TCHAR OpenDlgHelpLocation[] = _T("::/htmlhelp/Open_paths.html");
 
 static void EnsureCurSelPathCombo(HSuperComboBox *pCb)
 {
-	if (pCb->GetCurSel() < 0)
+	String path;
+	pCb->GetWindowText(path);
+	if (!paths_EndsWithSlash(path.c_str()) && PathIsDirectory(path.c_str()))
 	{
-		String path;
-		pCb->GetWindowText(path);
-		if (!paths_EndsWithSlash(path.c_str()) && PathIsDirectory(path.c_str()))
-		{
-			path.push_back(_T('\\'));
-			pCb->SetWindowText(path.c_str());
-		}
-		pCb->SetCurSel(0);
+		path.push_back(_T('\\'));
 	}
+	pCb->SetCurSel(-1);
+	pCb->SetWindowText(path.c_str());
+	pCb->EnsureSelection();
 }
 
 /**
@@ -141,31 +139,18 @@ LRESULT COpenDlg::OnNotify(UNotify *pNM)
 		case CBEN_GETDISPINFO:
 			SHFILEINFO sfi;
 			DWORD_PTR result = 0;
-			if (pNM->COMBOBOXEX.ceItem.pszText == NULL)
-			{
-				// WINEBUG: Wine does not provide a buffer.
-				if (pNM->COMBOBOXEX.ceItem.iItem == 0 && !pNM->pCB->GetDroppedState())
-				{
-					pNM->COMBOBOXEX.ceItem.cchTextMax = pNM->pCB->GetWindowTextLength() + 1;
-					pNM->COMBOBOXEX.ceItem.pszText = (LPTSTR)_alloca(
-						pNM->COMBOBOXEX.ceItem.cchTextMax * sizeof(TCHAR));
-				}
-				else
-				{
-					int index = static_cast<int>(pNM->COMBOBOXEX.ceItem.iItem);
-					pNM->COMBOBOXEX.ceItem.cchTextMax = pNM->pCB->GetLBTextLen(index) + 1;
-					pNM->COMBOBOXEX.ceItem.pszText = (LPTSTR)_alloca(
-						pNM->COMBOBOXEX.ceItem.cchTextMax * sizeof(TCHAR));
-					pNM->pCB->GetLBText(index, pNM->COMBOBOXEX.ceItem.pszText);
-				}
-			}
+			String text;
 			if (pNM->COMBOBOXEX.ceItem.iItem == 0 && !pNM->pCB->GetDroppedState())
 			{
-				pNM->pCB->GetWindowText(pNM->COMBOBOXEX.ceItem.pszText, pNM->COMBOBOXEX.ceItem.cchTextMax);
+				pNM->pCB->GetWindowText(text);
 			}
-			if (paths_EndsWithSlash(pNM->COMBOBOXEX.ceItem.pszText))
+			else
 			{
-				if (LPCTSTR p = PathSkipRoot(pNM->COMBOBOXEX.ceItem.pszText))
+				pNM->pCB->GetLBText(static_cast<int>(pNM->COMBOBOXEX.ceItem.iItem), text);
+			}
+			if (paths_EndsWithSlash(text.c_str()))
+			{
+				if (LPCTSTR p = PathSkipRoot(text.c_str()))
 				{
 					TCHAR path[MAX_PATH];
 					GetWindowsDirectory(path, MAX_PATH);
@@ -178,7 +163,7 @@ LRESULT COpenDlg::OnNotify(UNotify *pNM)
 			}
 			else
 			{
-				LPCTSTR path = PathFindExtension(pNM->COMBOBOXEX.ceItem.pszText);
+				LPCTSTR path = PathFindExtension(text.c_str());
 				sfi.dwAttributes = FILE_ATTRIBUTE_NORMAL;
 				result = SHGetFileInfo(path, 0, &sfi, sizeof sfi, SHGFI_SYSICONINDEX | SHGFI_USEFILEATTRIBUTES);
 			}
@@ -187,6 +172,7 @@ LRESULT COpenDlg::OnNotify(UNotify *pNM)
 				pNM->COMBOBOXEX.ceItem.iImage = sfi.iIcon;
 				pNM->COMBOBOXEX.ceItem.iSelectedImage = sfi.iIcon;
 			}
+			pNM->COMBOBOXEX.ceItem.pszText = H2O::AllocDispinfoText(text);
 			break;
 		}
 		break;

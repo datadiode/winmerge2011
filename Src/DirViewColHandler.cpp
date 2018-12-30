@@ -178,26 +178,6 @@ void CDirView::UpdateDiffItemStatus(UINT nIdx)
 	RedrawItems(nIdx, nIdx);
 }
 
-static std::vector<String> rgDispinfoText(2); // used in function below
-
-/**
- * @brief Allocate a text buffer to assign to NMLVDISPINFO::item::pszText
- * Quoting from SDK Docs:
- *	If the LVITEM structure is receiving item text, the pszText and cchTextMax
- *	members specify the address and size of a buffer. You can either copy text to
- *	the buffer or assign the address of a string to the pszText member. In the
- *	latter case, you must not change or delete the string until the corresponding
- *	item text is deleted or two additional LVN_GETDISPINFO messages have been sent.
- */
-static LPTSTR NTAPI AllocDispinfoText(String &s)
-{
-	static int i = 0;
-	rgDispinfoText[i].swap(s);
-	LPCTSTR pszText = rgDispinfoText[i].c_str();
-	i ^= 1;
-	return (LPTSTR)pszText;
-}
-
 /**
  * @brief Respond to LVN_GETDISPINFO message
  */
@@ -224,7 +204,7 @@ void CDirView::ReflectGetdispinfo(NMLVDISPINFO *pParam)
 		{
 			s.insert(0, m_szAsterisk);
 		}
-		pParam->item.pszText = AllocDispinfoText(s);
+		pParam->item.pszText = H2O::AllocDispinfoText(s);
 	}
 	if (pParam->item.mask & LVIF_IMAGE)
 	{
