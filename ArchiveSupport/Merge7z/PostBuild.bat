@@ -9,9 +9,16 @@ cd %~2
 "%SevenZip%\7z.exe" e -y %~1 History.txt License.txt
 md Lang
 cd Lang
-"%SevenZip%\7z.exe" e -y %~1 *.ttt *.txt -x!History.txt -x!License.txt
+"%SevenZip%\7z.exe" e -y %~1 *.ttt *.txt -x!History.txt -x!License.txt -x!readme.txt
+for %%$ in (*_*.txt) do call :hyphenize %%$
 
 exit
+
+:hyphenize
+set $=%1
+del %$:_=-%
+rename %$% %$:_=-%
+goto :eof
 
 :usage
 echo ####################################################################
