@@ -2071,7 +2071,8 @@ void CMainFrame::GetMrgViewFontProperties()
 		m_lfDiff.lfHeight = 0;
 		if (HDC hDC = ::GetDC(NULL))
 		{
-			::EnumFontFamilies(hDC, _T("Consolas"), FontEnumProc, reinterpret_cast<LPARAM>(&m_lfDiff));
+			LPCTSTR const lpLogfont = wine_version ? _T("Liberation Mono") : _T("Consolas");
+			::EnumFontFamilies(hDC, lpLogfont, FontEnumProc, reinterpret_cast<LPARAM>(&m_lfDiff));
 			m_lfDiff.lfHeight = -MulDiv(10, ::GetDeviceCaps(hDC, LOGPIXELSY), 72);
 			::ReleaseDC(NULL, hDC);
 		}
