@@ -199,10 +199,14 @@ static LRESULT CALLBACK WndProcDropping(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
 	return lResult;
 }
 
-void HSuperComboBox::AdjustDroppedWidth()
+int HSuperComboBox::AdjustDroppedWidth()
 {
 	int cxMax = 0;
 	int cchTextMax = 0;
+	int nSelect = -1;
+	int const cchSelect = GetWindowTextLength();
+	LPTSTR const pszSelect = static_cast<LPTSTR>(_alloca((cchSelect + 1) * sizeof *pszSelect));
+	GetWindowText(pszSelect, cchSelect + 1);
 	const int nCount = GetCount();
 	const int cxExtra = GetSystemMetrics(SM_CXVSCROLL) + 2 * GetSystemMetrics(SM_CXBORDER);
 	const int cxAvail = GetSystemMetrics(SM_CXSCREEN) - cxExtra;
@@ -213,7 +217,7 @@ void HSuperComboBox::AdjustDroppedWidth()
 		if (cchTextMax < cchText)
 			cchTextMax = cchText;
 	}
-	LPTSTR const pszText = reinterpret_cast<LPTSTR>(_alloca((cchTextMax + 1) * sizeof *pszText));
+	LPTSTR const pszText = static_cast<LPTSTR>(_alloca((cchTextMax + 1) * sizeof *pszText));
 	if (HSurface *pdc = GetDC())
 	{
 		pdc->SelectObject(GetFont());
@@ -223,6 +227,8 @@ void HSuperComboBox::AdjustDroppedWidth()
 			SIZE size;
 			if (pdc->GetTextExtent(pszText, cchText, &size) && (cxMax < size.cx))
 				cxMax = size.cx;
+			if (_tcscmp(pszText, pszSelect) == 0)
+				nSelect = nIndex;
 		}
 		ReleaseDC(pdc);
 		if (cxMax > cxAvail)
@@ -242,13 +248,5 @@ void HSuperComboBox::AdjustDroppedWidth()
 			SetWindowLongPtr(GWLP_WNDPROC,
 			reinterpret_cast<LONG_PTR>(WndProcDropping)));
 	}
-}
-
-void HSuperComboBox::EnsureSelection()
-{
-	int sel = GetCurSel();
-	String text;
-	GetWindowText(text);
-	SetCurSel(sel != CB_ERR && !text.empty() ? sel : 0);
-	SetWindowText(text.c_str());
+	return nSelect;
 }

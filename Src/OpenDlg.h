@@ -79,6 +79,9 @@ private:
 
 	FileFilter *m_currentFilter;
 
+	int m_nSelectCbPath;
+	String m_sSelectCbPath;
+
 // Implementation
 protected:
 	void UpdateButtonStates();
