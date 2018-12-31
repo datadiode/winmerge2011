@@ -1,3 +1,31 @@
+2011.008.532
+Changes since preceding release (not necessarily complete):
+• MainFrm.cpp: Prefer Liberation Mono font when running under Wine
+• OpenDlg: Don't let the ComboBoxEx32 control truncate paths behind the scenes
+• OpenDlg: After OnBrowseButton(), kept showing filetype icon from previous file
+• OpenDlg: Support switching sides through drag & drop between filetype icons
+• ArchiveSupport: Upgrade to 7-Zip 18.05
+• LineFiltersDlg.cpp: Allow reordering of line filters through drag & drop
+• ccrystaltextbuffer.cpp: Associate .jspx filename extension with ParseLineAsp()
+• asp.cpp: Borrow part of razor logic to handle MWSL insde <style> or <script>
+• asp.cpp: Help JavasScript template strings recover from ASP inline expressions
+• Setup: Move xdoc2txt download option to config.html / Go for new xdoc2txt 2.17
+• DetermineEncoding(): Extend scope of CheckForInvalidUtf8() to the whole buffer	
+• Issue #168 Changing CTRL + TAB and CTRL + SHIFT + TAB behavior
+• Basic.wsc: Add a regex-driven Tokenize function
+• MergeEditView.cpp: Support arguments in EditorScript plugin monikers
+• EditLib: Adopt fix for https://github.com/WinMerge/winmerge-v2/issues/109	
+• diffutils/src/IO.C: Upgrade to Diffutils 3.6 left self-compare feature broken
+• Issue #165 Add translation into Lithuanian
+• Issue #163 Add options to command line to change "compare methods"
+• EditLib: Limiting context while in line wrap mode was causing a crash
+• GhostTextBuffer.cpp: 1234 (51d372dc04d9) broke moved block indicators
+• Option to dot-rather-than-cross-hatch deleted lines (may reduce visual jitter)
+• EditLib: Remember Find/Replace options in class rather than instance members
+• LineFilters: Allow early-applied line filters to substitute unicode literals
+• LocationView.cpp: Fix an off-by-one bug
+• Smooth scrolling to a distant diff (#161)
+
 0.2011.008.313
 Changes since preceding release (not necessarily complete):
 • Allow file filters to declare case sensitivity for filenames (related to #158)

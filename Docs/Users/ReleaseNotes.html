@@ -40,10 +40,10 @@ function OnReadyStateChangeExternalDoc()
 </script>
 </head>
 <body>
-<h2>WinMerge 0.2011.008.313 Release Notes</h2>
-This is a beta release of WinMerge&nbsp;2011.
+<h2>WinMerge 2011.008.532 Release Notes</h2>
+This is a stable release of WinMerge&nbsp;2011.
 <br>Besides fixing bugs, it includes the following functional changes and enhancements as
-compared to the latest stable release:
+compared to the previous stable release:
 <ul>
 <li><p>File filters can specify <code>case-sensitive: yes</code> to declare case sensitivity for filenames.
 <li><p>The possibility to assign equivalence class identifiers to early-applied line filters makes the feature more straightforward to use for
@@ -53,6 +53,14 @@ compared to the latest stable release:
 	Equivalence class identifiers can range between 0 and 10, with 0 being the default if no value is specified.
 	Another use case of equivalence class identifiers is <code>equiv-f:</code> rules in file filters. For example, a file filter could specify the rules
 	<code>equiv-f: /\.(cpp|cxx)$/i=1</code> and <code>equiv-f: /\.(hpp|hxx)$/i=2</code>.
+<li><p>Similar syntax as used with equivalence class identifiers enables early-applied line filters to unescape escaped unicode codepoints on the fly.
+	Such filters use a scanf-style format specifier to extract the (hexa)decimal ordinal value from an escape sequence representing a codepoint.
+	<br>A line filter which address the use case described
+	<a target='_blank' href='http://forums.winmerge.org/viewtopic.php?f=4&t=1154'>here</a> would read <code>*/(#\d+)/g=%d</code>.
+	<br>The JavaScript equivalent would read <code>*/(\\u[[:xdigit:]]{4})/g=%4x</code>.
+<li><p>The method to use for a folder comparison can be specified on the command line, as per
+	<a target='_blank' href='https://bitbucket.org/jtuc/winmerge2011/issues/163'>Issue #163</a>.
+	<br>The possible options are /m Full, /m Quick, /m Date, /m SizeDate, and /m Size.
 <li><p>The <i>Compare &rarr; General</i> page of the <i>Options</i> dialog provides additional options to deal with whitespace differences.
 <li><p>The <i>Editor &rarr; Text</i> page of the <i>Options</i> dialog provides options to honor <i>.editorconfig</i> files and Emacs/Kate/Vim modelines.
 <li><p>The registry key which holds the per-user settings has been renamed from <i>WinMerge</i> to <i>WinMurge</i>,
@@ -89,8 +97,7 @@ compared to the latest stable release:
 	<br>The <i>FileTransforms</i> folder also contains an associated options file <i>astyle.opt</i>,
 	which you may want to edit to tweak various aspects of source code formatting to your needs.
 <li><p>It has become easier to get the prerequisites for file transform scriptlet
-	<i>xdoc2txt.wsc</i> in place, by simply confirming the respective prompt that
-	shows up during setup.
+	<i>xdoc2txt.wsc</i> in place, by simply checking the respective option offered during setup.
 	<br>This involves downloading the xdoc2txt distribution package from
 	<a target='_blank' href='http://ebstudio.info'>http://ebstudio.info</a>,
 	because that software is not as free for redistribution as it is for use.
@@ -134,16 +141,18 @@ compared to the latest stable release:
 <li><p>The <i>Open</i> dialog allows you to specify filter masks with spaces
 	by enclosing them in quotation marks, as per 
 	<a target='_blank' href='http://forums.winmerge.org/viewtopic.php?f=4&t=1142'>this suggestion</a>.
+<li><p>The filetype icons shown in the <i>Open</i> dialog's input fields are drag &amp; drop sensitive,
+	and in the event of it will exchange field contents with one another.
 <li><p>Disabling the new system option <i>Use Shell file operations</i> allows the
 	Folder Compare window to perform file operations on files with long paths.
 	<br>Note, however, that this option comes at the price of losing the option to
 	<i>Send deleted files to Recycle Bin</i>.
 </ul>
 <p>
-Click <a href='https://bitbucket.org/jtuc/winmerge2011/get/0.2011.008.313.zip'>here</a> to obtain the source code for this release.
+Click <a href='https://bitbucket.org/jtuc/winmerge2011/get/2011.008.532.zip'>here</a> to obtain the source code for this release.
 <p>
 Click <a href='https://bitbucket.org/jtuc/frhed/get/0.10905.2018.zip'>here</a> to obtain source code for Frhed binaries included in this release.
 <p>
-<i>Jochen Neubeck, July 2018</i>
+<i>Jochen Neubeck, December 2018</i>
 <xml src='WinMerge.chm' onreadystatechange='OnReadyStateChangeExternalDoc()'></xml>
 </body>

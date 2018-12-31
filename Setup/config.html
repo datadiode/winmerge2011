@@ -5,7 +5,7 @@
 <style>
 *
 {
-	font: 10pt sans-serif;
+	font: 11pt sans-serif;
 }
 body
 {
@@ -22,16 +22,23 @@ button
 legend
 {
 	padding-bottom: 3pt;
+	color: windowtext;
 }
 fieldset
 {
 	padding-top: 5pt;
 }
+input
+{
+	vertical-align: middle;
+}
 a.about
 {
 	text-decoration: none;
-	font-weight: bold;
 	cursor: help;
+	font-family: webdings;
+	font-size: 12pt;
+	vertical-align: middle;
 }
 #progressbar
 {
@@ -63,7 +70,7 @@ a.about
 <script id='script' type='text/vbs'>
 Option Explicit
 
-script.addBehavior "#7zSfxHtm#Host?dialogHeight:110pt;dialogWidth:330pt", dialogArguments
+script.addBehavior "#7zSfxHtm#Host?dialogHeight:110pt;dialogWidth:380pt", dialogArguments
 
 Const xdoc2txt_x64_url = "http://ebstudio.info/download/KWICFinder/xd2tx217_x64.zip"
 Const xdoc2txt_x64_sha = "f502a53398b1537c5e8435a3bd234f0fcce844f2a87153f93868d759dd905969"
@@ -238,12 +245,12 @@ integrity verification by its SHA-256 hash, run its setup routine.
 	<legend>
 		<input type='checkbox' id='TgXDoc2Txt'>
 		Download and integrate xdoc2txt 2.17
-		<a class='about' id='AboutXDoc2Txt'>&#9432;</a>
+		<a class='about' id='AboutXDoc2Txt'>i</a>
 	</legend>
 	<legend disabled>
 		<input type='checkbox' id='TgVCRedist'>
 		Download and install VC++ 2010 SP1 Redistributable Package
-		<a class='about' id='AboutVCRedist'>&#9432;</a>
+		<a class='about' id='AboutVCRedist'>i</a>
 	</legend>
 </fieldset>
 <div id='buttons'>
