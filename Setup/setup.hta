@@ -516,12 +516,14 @@ Sub Job_Version
 	content = Replace(content, "&www;", parts(3))
 	path = argv(2)
 	If fso.OpenTextFile(path).ReadAll <> content Then
+		fso.GetFile(path).Attributes = 0
 		fso.CreateTextFile(path, True).Write content
 	End If
 	platform = argv(3)
 	version = Join(parts, ".")
 	path = location.pathname
 	content = Replace(fso.OpenTextFile(path).ReadAll, app.version, version)
+	fso.GetFile(path).Attributes = 0
 	fso.CreateTextFile(path, True).Write content
 	version = Replace(version, "XXXXX.", "0.")
 	version = Replace(version, "BUILD.", "")
@@ -530,10 +532,12 @@ Sub Job_Version
 	content = Replace(content, "&version;", version)
 	content = Replace(content, "&SevenZip;", sh.RegRead("HKLM\Software\7-Zip\Path"))
 	path = fso.GetParentFolderName(location.pathname) & "_" & platform & ".bat"
+	fso.GetFile(path).Attributes = 0
 	fso.CreateTextFile(path, True).Write content
 	path = fso.GetParentFolderName(location.pathname) & "\WinMerge2011.nsi"
 	parts = Split(fso.OpenTextFile(path).ReadAll, """", 3)
 	parts(1) = version
+	fso.GetFile(path).Attributes = 0
 	fso.CreateTextFile(path, True).Write Join(parts, """")
 	close
 End Sub
