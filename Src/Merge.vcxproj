@@ -854,7 +854,7 @@
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="version.rh">
-      <Command>"$(SystemRoot)\system32\mshta.exe" "$(SolutionDir)Setup\setup.hta" "hidden:version" "%(FullPath)" "$(Platform)"</Command>
+      <Command>"$(SystemRoot)\system32\mshta.exe" "$(SolutionDir)Setup\setup.hta" "silent:hidden:version" "%(FullPath)" "$(Platform)"</Command>
       <Outputs>$(SolutionDir)Setup_$(Platform).bat;%(Outputs)</Outputs>
     </CustomBuild>
     <None Include="res\binarydiff.ico" />

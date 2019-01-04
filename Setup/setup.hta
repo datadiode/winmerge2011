@@ -3,7 +3,7 @@
 <meta http-equiv='MSThemeCompatible' CONTENT='yes'>
 <hta:application
 	id='app'
-	version='XXXXX.2011.008.226'
+	version='XXXXX.2011.000.000'
 	applicationName='WinMerge &amp;version; Setup'
 	scroll='no'
 	singleInstance='yes'
@@ -192,19 +192,43 @@ Const xdoc2txt_sha = "b8ce64177ebd63ec3ebe5ca8cd3740e69f295b33a97ff84cdd47735e01
 Const vcredist_x86_v100_url = "http://download.microsoft.com/download/C/6/D/C6D0FD4E-9E53-4897-9B91-836EBA2AACD3/vcredist_x86.exe"
 Const vcredist_x86_v100_sha = "66b797b3b4f99488f53c2b676610dfe9868984c779536891a8d8f73ee214bc4b"
 
-Dim sh, fso, sha, env, version, argv, executable
+Dim sh, fso, sha, env, version, argv, silent, executable
 Dim sProgFolder, sThisFolder, sTempFolder, sMoveFolder
 
+version = app.version
+version = Replace(version, "XXXXX.", "0.")
+version = Replace(version, "BUILD.", "")
+document.title = Replace(app.applicationName, "&version;", version)
+
+window.onload = GetRef("Job_Default")
+argv = Eval("Array(" & Replace(Trim(app.commandLine), """ ", """,") & ")")
+
+If UBound(argv) > 0 Then
+	Dim opt
+	For Each opt In Split(argv(1), ":")
+		Select Case LCase(opt)
+		Case "hidden"
+			moveTo 0, -16000
+		Case "silent"
+			silent = True
+		Case Else
+			window.onload = GetRef("Job_" & opt)
+		End Select
+	Next
+End If
+
+On Error Resume Next
 Set sh = CreateObject("WScript.Shell")
 Set fso = CreateObject("Scripting.FileSystemObject")
 Set sha = CreateObject("Shell.Application")
 Set env = sh.Environment("Process")
-
 window.name = "4e716236-aa30-4c65-b225-d68bba81e9c2" & "-" & fso.GetTempName
-
-On Error Resume Next
 executable = sh.RegRead("HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\DisplayIcon")
 On Error GoTo 0
+
+Sub Window_OnError(description, url, line)
+	If silent Then close
+End Sub
 
 Sub Job_Uninstall
 	sProgFolder = fso.GetParentFolderName(app.icon)
@@ -237,26 +261,6 @@ Sub Job_Uninstall
 	End If
 	close
 End Sub
-
-version = app.version
-version = Replace(version, "XXXXX.", "0.")
-version = Replace(version, "BUILD.", "")
-document.title = Replace(app.applicationName, "&version;", version)
-
-window.onload = GetRef("Job_Default")
-argv = Eval("Array(" & Replace(Trim(app.commandLine), """ ", """,") & ")")
-
-If UBound(argv) > 0 Then
-	Dim opt
-	For Each opt In Split(argv(1), ":")
-		Select Case LCase(opt)
-		Case "hidden"
-			moveTo 0, -16000
-		Case Else
-			window.onload = GetRef("Job_" & opt)
-		End Select
-	Next
-End If
 
 Function FormatText(s)
 	FormatText = Trim(Replace(Replace(s, vbCrLf & vbCrLf, vbLf & vbLf), vbCrLf, " "))
@@ -516,14 +520,12 @@ Sub Job_Version
 	content = Replace(content, "&www;", parts(3))
 	path = argv(2)
 	If fso.OpenTextFile(path).ReadAll <> content Then
-		fso.GetFile(path).Attributes = 0
 		fso.CreateTextFile(path, True).Write content
 	End If
 	platform = argv(3)
 	version = Join(parts, ".")
 	path = location.pathname
 	content = Replace(fso.OpenTextFile(path).ReadAll, app.version, version)
-	fso.GetFile(path).Attributes = 0
 	fso.CreateTextFile(path, True).Write content
 	version = Replace(version, "XXXXX.", "0.")
 	version = Replace(version, "BUILD.", "")
@@ -532,12 +534,10 @@ Sub Job_Version
 	content = Replace(content, "&version;", version)
 	content = Replace(content, "&SevenZip;", sh.RegRead("HKLM\Software\7-Zip\Path"))
 	path = fso.GetParentFolderName(location.pathname) & "_" & platform & ".bat"
-	fso.GetFile(path).Attributes = 0
 	fso.CreateTextFile(path, True).Write content
 	path = fso.GetParentFolderName(location.pathname) & "\WinMerge2011.nsi"
 	parts = Split(fso.OpenTextFile(path).ReadAll, """", 3)
 	parts(1) = version
-	fso.GetFile(path).Attributes = 0
 	fso.CreateTextFile(path, True).Write Join(parts, """")
 	close
 End Sub
