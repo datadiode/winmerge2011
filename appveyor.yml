@@ -5,6 +5,7 @@ platform: Win32
 shallow_clone: true
 build_script:
 - cmd: >-
-    appveyorbuild.cmd Win32!Release
+    appveyorbuild.cmd Win32!Release x64!Release
 artifacts:
 - path: Build/WinMerge/Win32/Release
+- path: Build/WinMerge/x64/Release
