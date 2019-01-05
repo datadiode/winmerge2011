@@ -3,13 +3,16 @@
 if not exist %1 rem: goto :usage
 if not exist %2 rem: goto :usage
 
-set SevenZip=%ProgramFiles%\7-Zip
+REM Locate 7z.exe
+set $=%ProgramFiles%\7-zip;%ProgramFiles(x86)%\7-zip
+for %%$ in (7z.exe) do if not "%%~$$:$" == "" set SevenZip=%%~$$:$
+
 cd %~2
-"%SevenZip%\7z.exe" e -so %~1 _7z.dll > 7z.dll
-"%SevenZip%\7z.exe" e -y %~1 History.txt License.txt
+"%SevenZip%" e -so %~1 _7z.dll > 7z.dll
+"%SevenZip%" e -y %~1 History.txt License.txt
 md Lang
 cd Lang
-"%SevenZip%\7z.exe" e -y %~1 *.ttt *.txt -x!History.txt -x!License.txt -x!readme.txt
+"%SevenZip%" e -y %~1 *.ttt *.txt -x!History.txt -x!License.txt -x!readme.txt
 for %%$ in (*_*.txt) do call :hyphenize %%$
 
 exit
