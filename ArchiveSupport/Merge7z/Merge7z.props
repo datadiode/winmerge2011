@@ -1,6 +1,7 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Label="UserMacros">
-    <PathTo7z>D:</PathTo7z>
-    <NameOf7z>7z1805</NameOf7z>
+    <NameOf7z>7z1806</NameOf7z>
+    <PathTo7zSrc Condition="'$(PathTo7zSrc)' == ''">D:\$(NameOf7z)</PathTo7zSrc>
+    <PathTo7zMsi Condition="'$(PathTo7zMsi)' == ''">D:\$(NameOf7z)</PathTo7zMsi>
   </PropertyGroup>
 </Project>
