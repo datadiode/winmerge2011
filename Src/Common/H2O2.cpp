@@ -35,6 +35,9 @@
 
 using namespace H2O;
 
+ATOM OWindow::m_button;
+HIGHCONTRAST OWindow::m_highcontrast;
+
 #define DEFAULT_DPI 96
 
 static int GetScalingDPI()
@@ -155,6 +158,14 @@ OWindow::~OWindow()
 		DestroyWindow();
 }
 
+void OWindow::OnSettingChange()
+{
+	WNDCLASS wc;
+	m_button = static_cast<ATOM>(GetClassInfo(NULL, WC_BUTTON, &wc));
+	m_highcontrast.cbSize = sizeof m_highcontrast;
+	SystemParametersInfo(SPI_GETHIGHCONTRAST, sizeof m_highcontrast, &m_highcontrast, FALSE);
+}
+
 struct DrawItemStruct_WebLinkButton : DRAWITEMSTRUCT
 {
 	void DrawItem() const
@@ -246,6 +257,36 @@ LRESULT OWindow::MessageReflect_ColorButton<WM_DRAWITEM>(WPARAM, LPARAM lParam)
 }
 
 template<>
+LRESULT OWindow::MessageReflect_Static<WM_CTLCOLORSTATIC>(WPARAM wParam, LPARAM lParam)
+{
+	HWindow *const control = reinterpret_cast<HWindow *>(lParam);
+	HSurface *const surface = reinterpret_cast<HSurface *>(wParam);
+	ATOM const ctlclass = control->GetClassAtom();
+	if (ctlclass == m_button)
+	{
+		DWORD const ctlstyle = control->GetStyle();
+		if (m_highcontrast.dwFlags & HCF_HIGHCONTRASTON)
+		{
+			// high-contrast themes play nice with disabled groupboxes, so no reason to mess with them
+		}
+		else if ((ctlstyle & (WS_DISABLED | BS_TYPEMASK)) == (WS_DISABLED | BS_GROUPBOX))
+		{
+			RECT rc;
+			control->GetClientRect(&rc);
+			rc.left += 9; // found through trial & error - doesn't seem to vary
+			surface->SetTextColor(GetSysColor(COLOR_GRAYTEXT));
+			TCHAR text[1024];
+			int const len = control->GetWindowText(text, _countof(text));
+			surface->SelectObject(control->GetFont());
+			surface->DrawText(text, len, &rc, DT_SINGLELINE | DT_CALCRECT);
+			surface->DrawText(text, len, &rc, DT_SINGLELINE);
+			surface->ExcludeClipRect(rc.left, rc.top, rc.right, rc.bottom);
+		}
+	}
+	return 0;
+}
+
+template<>
 LRESULT OWindow::MessageReflect_TopLevelWindow<WM_ACTIVATE>(WPARAM wParam, LPARAM lParam)
 {
 	if (HWindow *pwndOther = reinterpret_cast<HWindow *>(lParam))
@@ -322,16 +363,19 @@ INT_PTR ODialog::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 LRESULT ODialog::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	ODialog *const pThis = FromHandle(reinterpret_cast<HWindow *>(hWnd));
-	switch (uMsg)
-	{
-	case WM_ACTIVATE:
-		pThis->MessageReflect_TopLevelWindow<WM_ACTIVATE>(wParam, lParam);
-		break;
-	}
 	LRESULT lResult = 0;
 	try
 	{
 		lResult = pThis->WindowProc(uMsg, wParam, lParam);
+		switch (uMsg)
+		{
+		case WM_ACTIVATE:
+			pThis->MessageReflect_TopLevelWindow<WM_ACTIVATE>(wParam, lParam);
+			break;
+		case WM_CTLCOLORSTATIC:
+			pThis->MessageReflect_Static<WM_CTLCOLORSTATIC>(wParam, lParam);
+			break;
+		}
 	}
 	catch (OException *e)
 	{

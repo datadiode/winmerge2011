@@ -155,6 +155,7 @@ static int GetMenuBitmapExcessWidth()
 CMainFrame::CMainFrame(HWindow *pWnd, const MergeCmdLineInfo &cmdInfo)
 {
 	Subclass(pWnd);
+	OnSettingChange();
 
 	theApp.m_pMainWnd = this;
 
@@ -3827,6 +3828,9 @@ LRESULT CMainFrame::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		break;
 	case WM_INITMENUPOPUP:
 		return OnWndMsg<WM_INITMENUPOPUP>(wParam, lParam);
+	case WM_SETTINGCHANGE:
+		OnSettingChange();
+		break;
 	case WM_MENUCHAR:
 		if (LRESULT lResult = OnWndMsg<WM_MENUCHAR>(wParam, lParam))
 			return lResult;

@@ -214,6 +214,9 @@ namespace H2O
 			return reinterpret_cast<OWindow *>(::GetWindowLongPtr(pWnd->m_hWnd, GWLP_THIS));
 		}
 		virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
+		static void OnSettingChange();
+		static ATOM m_button;
+		static HIGHCONTRAST m_highcontrast;
 		WNDPROC m_pfnSuper;
 		bool m_bAutoDelete;
 	public:
@@ -223,6 +226,8 @@ namespace H2O
 		LRESULT MessageReflect_WebLinkButton(WPARAM, LPARAM);
 		template<UINT>
 		LRESULT MessageReflect_ColorButton(WPARAM, LPARAM);
+		template<UINT>
+		LRESULT MessageReflect_Static(WPARAM, LPARAM);
 		void SwapPanes(UINT, UINT);
 	private:
 		template<UINT GWLP_THIS>
