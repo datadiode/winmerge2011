@@ -1,36 +1,18 @@
 ; NSIS script for a Wine compatible WinMerge 2011 installer
-; Altered by Jochen Neubeck
-;
-; Used to be: basic script template for NSIS installers
-;
+; Modified by Jochen Neubeck from:
+; basic script template for NSIS installers
 ; Written by Philip Chu
 ; Copyright (c) 2004-2005 Technicat, LLC
-;
-; This software is provided 'as-is', without any express or implied warranty.
-; In no event will the authors be held liable for any damages arising from the use of this software.
+; SPDX-License-Identifier: Zlib
 
-; Permission is granted to anyone to use this software for any purpose,
-; including commercial applications, and to alter it ; and redistribute
-; it freely, subject to the following restrictions:
-
-;    1. The origin of this software must not be misrepresented; you must not claim that
-;       you wrote the original software. If you use this software in a product, an
-;       acknowledgment in the product documentation would be appreciated but is not required.
-
-;    2. Altered source versions must be plainly marked as such, and must not be
-;       misrepresented as being the original software.
-
-;    3. This notice may not be removed or altered from any source distribution.
-
-!define version "0.2011.008.313"
+!define version "0.2011.009.027"
 !define srcdir "..\Build\WinMerge\Win32\Release"
+!define unxutils "..\3rdparty\unxutils"
 !define setup "..\Build\WinMerge\Win32\WinMerge_${version}_wine_setup.exe"
 
 !define script56 "$%ProgramFiles%\Windows Script 5.6"
 !define script56url "http://informax.serveftp.com/files/progtools/wsh56-scr56en.exe"
 !define script56hash "f356ee7b0ea496ec3725b340e2aab03847beb504928a6608e6ec0b5bd8fb1f3c"
-; possible fallback(s):
-; "ftp://24-129-233-75.eastlink.ca/array1/SKC/Support/WindowsScript/scripten.exe"
 
 ; registry stuff
 
@@ -41,6 +23,7 @@
 !define uninstaller "uninstall.exe"
 
 !include LogicLib.nsh
+!include WordFunc.nsh
 !include x64.nsh
 
 ;--------------------------------
@@ -93,6 +76,12 @@ Function .onInit
 		MessageBox MB_OK "This installer is for Wine only.$\nPlease run WinMerge_${version}$6_setup.cpl instead."
 		Quit
 	EndVerifyPlatform:
+	System::Call "ntdll::wine_get_version() t .r0 ? c"
+	${VersionCompare} "$0" "3.0.4" $1
+	IntCmp $1 1 EndVerifyWineVersion EndVerifyWineVersion
+		MessageBox MB_OK "You're on Wine $0.$\nThis installer requires Wine 3.0.4 or higher."
+		Quit
+	EndVerifyWineVersion:
 FunctionEnd
 
 ; install main application
@@ -119,8 +108,10 @@ Section "Main Application (GNU GPLv3)"
 
 	; package all files, recursively, preserving attributes
 	; assume files are in the correct places
-
 	File /a /r /x *.lib /x *.exp /x *.pdb /x *.hta /x *.json /x *.log /x *.bak /x *.zip /x xdoc2txt "${srcdir}\*.*"
+
+	; include sort.exe from https://sf.net/projects/unxutils, to compensate for Wine's lack of same
+	File /a "${unxutils}\sort.exe"
 
 	RegDLL "$INSTDIR\ShellExtensionU.dll"
 
@@ -153,7 +144,7 @@ Section "Windows Script 5.6 (separate EULA)"
 		StrCmp $0 ${script56hash} +2
 		Abort "${script56}\setup-$7.exe is corrupt"
 
-		ExecWait '"${script56}\setup.exe" /C /T:"${script56}"'
+		ExecWait '"${script56}\setup-$7.exe" /C /T:"${script56}"'
 
 		RegDLL "${script56}\jscript.dll"
 		RegDLL "${script56}\vbscript.dll"
