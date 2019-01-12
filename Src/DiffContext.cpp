@@ -339,7 +339,7 @@ DWORD CDiffContext::DiffThreadCollect()
  */
 DWORD CDiffContext::DiffThreadCompare()
 {
-	CoInitializeEx(NULL, COINIT_MULTITHREADED);
+	HRESULT const hrMultiThreaded = CoInitializeEx(NULL, COINIT_MULTITHREADED);
 	// Now do all pending file comparisons
 	if (m_bOnlyRequested)
 		DirScan_CompareRequestedItems();
@@ -353,6 +353,7 @@ DWORD CDiffContext::DiffThreadCompare()
 		// Send message to UI to update
 		m_pWindow->PostMessage(MSG_UI_UPDATE);
 	}
-	CoUninitialize();
+	if (SUCCEEDED(hrMultiThreaded))
+		CoUninitialize();
 	return 0;
 }
