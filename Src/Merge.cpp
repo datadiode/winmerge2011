@@ -26,6 +26,7 @@
 #include <new.h> // _set_new_handler
 #include <process.h> // _cexit
 #include "Environment.h"
+#include "Common/DllProxies.h"
 #include "Common/SettingStore.h"
 #include "Merge.h"
 #include "MainFrm.h"
@@ -154,8 +155,6 @@ HRESULT CMergeApp::InitInstance()
 	if (BOOL (WINAPI *SetDllDirectory)(LPCTSTR) = (BOOL (WINAPI *)(LPCTSTR))GetProcAddress(hLibrary, _CRT_STRINGIZE(SetDllDirectory)))
 		SetDllDirectory(_T(""));
 
-	InitCommonControls();    // initialize common control library
-
 #ifdef _DEBUG
 	// Runtime switch so programmer may set this in interactive debugger
 	int dbgmem = 0;
@@ -236,6 +235,18 @@ HRESULT CMergeApp::InitInstance()
 		}
 		else
 		{
+			static INITCOMMONCONTROLSEX const icc = { sizeof icc, ICC_WIN95_CLASSES | ICC_USEREX_CLASSES };
+			InitCommonControlsEx(&icc); // initialize common control library
+
+			if (KERNEL32V51 == NULL)
+			{
+				AllocConsole();
+				if (HWND hWnd = GetConsoleWindow())
+				{
+					ShowWindow(hWnd, SW_HIDE);
+					SetConsoleTitle(_T("WinMerge"));
+				}
+			}
 			// Cleanup left over tempfiles from previous instances. Normally
 			// this should do nothing. But if for some reason WinMerge missed
 			// to delete temp files this makes sure they are removed.

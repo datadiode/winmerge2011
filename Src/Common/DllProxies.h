@@ -70,13 +70,13 @@ struct MSHTML
 
 extern DllProxy::Instance<struct MSHTML> MSHTML;
 
-// ADVAPI32 dll proxy for Vista+
-struct ADVAPI32V6
+// KERNEL32 dll proxy for XP+
+struct KERNEL32V51
 {
-	LONG(WINAPI*RegLoadAppKey)(LPCTSTR, PHKEY, REGSAM, DWORD, DWORD);
+	BOOL(WINAPI*AttachConsole)(DWORD);
 	HMODULE H;
 };
 
-extern DllProxy::Instance<struct ADVAPI32V6> ADVAPI32V6;
+extern DllProxy::Instance<struct KERNEL32V51> KERNEL32V51;
 
 #endif
