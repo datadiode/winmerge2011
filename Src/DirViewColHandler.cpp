@@ -202,7 +202,11 @@ void CDirView::ReflectGetdispinfo(NMLVDISPINFO *pParam)
 		if ((idName == IDS_COLHDR_LTIMEM && di->left.mtime > di->right.mtime) ||
 			(idName == IDS_COLHDR_RTIMEM && di->left.mtime < di->right.mtime))
 		{
-			s.insert(0, m_szAsterisk);
+			s.insert(0, _T("* "));
+		}
+		else
+		{
+			s.insert(0, _T("  "));
 		}
 		pParam->item.pszText = H2O::AllocDispinfoText(s);
 	}

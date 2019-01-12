@@ -68,7 +68,6 @@ static const UINT RightCmdLast	= 0xCFFF;
 HFont *CDirView::m_font = NULL;
 HImageList *CDirView::m_imageList = NULL;
 HImageList *CDirView::m_imageState = NULL;
-TCHAR const CDirView::m_szAsterisk[] = _T("* ");
 
 CDirView::CDirView(CDirFrame *pFrame)
 	: m_numcols(-1)
@@ -76,6 +75,7 @@ CDirView::CDirView(CDirFrame *pFrame)
 	, m_pFrame(pFrame)
 	, m_cxPadding(6)
 	, m_cxAsterisk(0)
+	, m_cxExtraSpacing(0)
 	, m_nHiddenItems(0)
 	, m_nSpecialItems(0)
 	, m_pCmpProgressDlg(NULL)
@@ -184,7 +184,8 @@ void CDirView::UpdateFont()
 	{
 		SetFont(NULL);
 	}
-	m_cxAsterisk = GetStringWidth(m_szAsterisk);
+	m_cxAsterisk = GetStringWidth(_T("*"));
+	m_cxExtraSpacing = m_cxAsterisk - GetStringWidth(_T(" "));
 }
 
 void CDirView::OnInitialUpdate()
@@ -1389,7 +1390,7 @@ LRESULT CDirView::ReflectNotify(UNotify *pNM)
 		case IDS_COLHDR_RTIMEM:
 			static SYSTEMTIME const st = { 7000, 10, 0, 30, 20, 40, 50, 600 };
 			locality::TimeString s(st);
-			int const cx = 2 * m_cxPadding + m_cxAsterisk + GetStringWidth(s.c_str());
+			int const cx = 2 * m_cxPadding + 3 * m_cxAsterisk + GetStringWidth(s.c_str());
 			SetColumnWidth(pNM->HEADER.iItem, cx);
 			return 1;
 		}
@@ -1802,8 +1803,6 @@ LRESULT CDirView::ReflectCustomDraw(NMLVCUSTOMDRAW *pNM)
 	{
 	case CDDS_PREPAINT:
 		OnUpdateStatusNum();
-		if (COptionsMgr::Get(OPT_CLR_DEFAULT_LIST_COLORING))
-			break;
 		// fall through
 	case CDDS_ITEMPREPAINT:
 		return CDRF_NOTIFYITEMDRAW;
@@ -1812,60 +1811,78 @@ LRESULT CDirView::ReflectCustomDraw(NMLVCUSTOMDRAW *pNM)
 		{
 			COLORREF const clrText = ::GetSysColor(COLOR_WINDOWTEXT);
 			COLORREF const clrTextBk = ::GetSysColor(COLOR_WINDOW);
-			switch (di->diffcode & (DIFFCODE::SIDEFLAGS | DIFFCODE::COMPAREFLAGS))
+			if (!COptionsMgr::Get(OPT_CLR_DEFAULT_LIST_COLORING))
 			{
-			case DIFFCODE::BOTH | DIFFCODE::NOCMP:
-			case DIFFCODE::BOTH | DIFFCODE::SAME:
-				// either identical or irrelevant
-				break;
-			case DIFFCODE::LEFT:
-				// left-only
-				(
-					SquareColorDistance(COptionsMgr::Get(OPT_LIST_LEFTONLY_BKGD_COLOR), clrText) <
-					SquareColorDistance(COptionsMgr::Get(OPT_LIST_LEFTONLY_BKGD_COLOR), clrTextBk) ?
-					pNM->clrText : pNM->clrTextBk
-				) = COptionsMgr::Get(OPT_LIST_LEFTONLY_BKGD_COLOR);
-				break;
-			case DIFFCODE::RIGHT:
-				// right-only
-				(
-					SquareColorDistance(COptionsMgr::Get(OPT_LIST_RIGHTONLY_BKGD_COLOR), clrText) <
-					SquareColorDistance(COptionsMgr::Get(OPT_LIST_RIGHTONLY_BKGD_COLOR), clrTextBk) ?
-					pNM->clrText : pNM->clrTextBk
-				) = COptionsMgr::Get(OPT_LIST_RIGHTONLY_BKGD_COLOR);
-				break;
-			default:
-				// otherwise suspicious
-				(
-					SquareColorDistance(COptionsMgr::Get(OPT_LIST_SUSPICIOUS_BKGD_COLOR), clrText) <
-					SquareColorDistance(COptionsMgr::Get(OPT_LIST_SUSPICIOUS_BKGD_COLOR), clrTextBk) ?
-					pNM->clrText : pNM->clrTextBk
-				) = COptionsMgr::Get(OPT_LIST_SUSPICIOUS_BKGD_COLOR);
-				break;
+				switch (di->diffcode & (DIFFCODE::SIDEFLAGS | DIFFCODE::COMPAREFLAGS))
+				{
+				case DIFFCODE::BOTH | DIFFCODE::NOCMP:
+				case DIFFCODE::BOTH | DIFFCODE::SAME:
+					// either identical or irrelevant
+					break;
+				case DIFFCODE::LEFT:
+					// left-only
+					(
+						SquareColorDistance(COptionsMgr::Get(OPT_LIST_LEFTONLY_BKGD_COLOR), clrText) <
+						SquareColorDistance(COptionsMgr::Get(OPT_LIST_LEFTONLY_BKGD_COLOR), clrTextBk) ?
+						pNM->clrText : pNM->clrTextBk
+					) = COptionsMgr::Get(OPT_LIST_LEFTONLY_BKGD_COLOR);
+					break;
+				case DIFFCODE::RIGHT:
+					// right-only
+					(
+						SquareColorDistance(COptionsMgr::Get(OPT_LIST_RIGHTONLY_BKGD_COLOR), clrText) <
+						SquareColorDistance(COptionsMgr::Get(OPT_LIST_RIGHTONLY_BKGD_COLOR), clrTextBk) ?
+						pNM->clrText : pNM->clrTextBk
+					) = COptionsMgr::Get(OPT_LIST_RIGHTONLY_BKGD_COLOR);
+					break;
+				default:
+					// otherwise suspicious
+					(
+						SquareColorDistance(COptionsMgr::Get(OPT_LIST_SUSPICIOUS_BKGD_COLOR), clrText) <
+						SquareColorDistance(COptionsMgr::Get(OPT_LIST_SUSPICIOUS_BKGD_COLOR), clrTextBk) ?
+						pNM->clrText : pNM->clrTextBk
+					) = COptionsMgr::Get(OPT_LIST_SUSPICIOUS_BKGD_COLOR);
+					break;
+				}
 			}
 			switch (f_cols[ColPhysToLog(pNM->iSubItem)].idName)
 			{
 			case IDS_COLHDR_LTIMEM:
 			case IDS_COLHDR_RTIMEM:
-				bool const hasfocus = pNM->nmcd.hdr.hwndFrom == ::GetFocus();
-				bool const selected = GetItemState(static_cast<int>(pNM->nmcd.dwItemSpec), LVIS_SELECTED) != 0;
-				::SetBkColor(pNM->nmcd.hdc,
-					selected ? ::GetSysColor(hasfocus ? COLOR_HIGHLIGHT : COLOR_BTNFACE) :
-					pNM->clrTextBk == CLR_DEFAULT ? clrTextBk : pNM->clrTextBk);
-				::SetTextColor(pNM->nmcd.hdc,
-					selected ? ::GetSysColor(hasfocus ? COLOR_HIGHLIGHTTEXT : COLOR_BTNTEXT) :
-					pNM->clrText == CLR_DEFAULT ? clrText : pNM->clrText);
-				// Erase the cell's background
-				::ExtTextOut(pNM->nmcd.hdc, pNM->nmcd.rc.left, pNM->nmcd.rc.top, ETO_OPAQUE, &pNM->nmcd.rc, NULL, 0, NULL);
-				// Draw the cell's text
-				TCHAR text[80];
-				GetItemText(static_cast<int>(pNM->nmcd.dwItemSpec), pNM->iSubItem, text, _countof(text));
-				RECT rc = pNM->nmcd.rc;
-				rc.left += m_cxPadding;
-				if (*text != *m_szAsterisk)
-					rc.left += m_cxAsterisk;
-				::DrawText(pNM->nmcd.hdc, text, -1, &rc, DT_SINGLELINE | DT_VCENTER | DT_END_ELLIPSIS | DT_NOPREFIX);
-				return CDRF_SKIPDEFAULT;
+				// Reasons for OS version specific code paths:
+				// - I saw SetTextJustification() work on XP but not on W7
+				// - XP doesn't seem to respect CDRF_SKIPDEFAULT
+				if (m_vista_or_greater)
+				{
+					bool const hasfocus = pNM->nmcd.hdr.hwndFrom == ::GetFocus();
+					bool const selected = GetItemState(static_cast<int>(pNM->nmcd.dwItemSpec), LVIS_SELECTED) != 0;
+					::SetBkColor(pNM->nmcd.hdc,
+						selected ? ::GetSysColor(hasfocus ? COLOR_HIGHLIGHT : COLOR_BTNFACE) :
+						pNM->clrTextBk == CLR_DEFAULT ? clrTextBk : pNM->clrTextBk);
+					::SetTextColor(pNM->nmcd.hdc,
+						selected ? ::GetSysColor(hasfocus ? COLOR_HIGHLIGHTTEXT : COLOR_BTNTEXT) :
+						pNM->clrText == CLR_DEFAULT ? clrText : pNM->clrText);
+					// Erase the cell's background
+					::ExtTextOut(pNM->nmcd.hdc, pNM->nmcd.rc.left, pNM->nmcd.rc.top, ETO_OPAQUE, &pNM->nmcd.rc, NULL, 0, NULL);
+					// Draw the cell's text
+					TCHAR text[80];
+					GetItemText(static_cast<int>(pNM->nmcd.dwItemSpec), pNM->iSubItem, text, _countof(text));
+					RECT rc = pNM->nmcd.rc;
+					rc.left += m_cxPadding;
+					int offset = 0;
+					if (text[0] == ' ' && text[1] == ' ')
+					{
+						rc.left += 2 * m_cxAsterisk - m_cxExtraSpacing;
+						offset = 2;
+					}
+					::DrawText(pNM->nmcd.hdc, text + offset, -1, &rc, DT_SINGLELINE | DT_VCENTER | DT_END_ELLIPSIS | DT_NOPREFIX);
+					return CDRF_SKIPDEFAULT;
+				}
+				SetTextJustification(pNM->nmcd.hdc, m_cxExtraSpacing, 1);
+				break;
+			default:
+				SetTextJustification(pNM->nmcd.hdc, 0, 0);
+				break;
 			}
 		}
 		break;
