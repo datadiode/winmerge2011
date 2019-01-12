@@ -199,14 +199,10 @@ static LRESULT CALLBACK WndProcDropping(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
 	return lResult;
 }
 
-int HSuperComboBox::AdjustDroppedWidth()
+void HSuperComboBox::AdjustDroppedWidth()
 {
 	int cxMax = 0;
 	int cchTextMax = 0;
-	int nSelect = -1;
-	int const cchSelect = GetWindowTextLength();
-	LPTSTR const pszSelect = static_cast<LPTSTR>(_alloca((cchSelect + 1) * sizeof *pszSelect));
-	GetWindowText(pszSelect, cchSelect + 1);
 	const int nCount = GetCount();
 	const int cxExtra = GetSystemMetrics(SM_CXVSCROLL) + 2 * GetSystemMetrics(SM_CXBORDER);
 	const int cxAvail = GetSystemMetrics(SM_CXSCREEN) - cxExtra;
@@ -227,8 +223,6 @@ int HSuperComboBox::AdjustDroppedWidth()
 			SIZE size;
 			if (pdc->GetTextExtent(pszText, cchText, &size) && (cxMax < size.cx))
 				cxMax = size.cx;
-			if (_tcscmp(pszText, pszSelect) == 0)
-				nSelect = nIndex;
 		}
 		ReleaseDC(pdc);
 		if (cxMax > cxAvail)
@@ -248,5 +242,13 @@ int HSuperComboBox::AdjustDroppedWidth()
 			SetWindowLongPtr(GWLP_WNDPROC,
 			reinterpret_cast<LONG_PTR>(WndProcDropping)));
 	}
-	return nSelect;
+}
+
+void HSuperComboBox::RestoreClientArea()
+{
+	if (wine_version)
+		return; // It seems they missed to implement this glitch...
+	// Trigger a WM_WINDOWPOSCHANGING to recover from some obscure corruption
+	// which obstructs further drawing to a ComboBoxEx control's client area.
+	SetWindowPos(NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOREDRAW | SWP_NOACTIVATE);
 }

@@ -46,16 +46,10 @@ static const TCHAR OpenDlgHelpLocation[] = _T("::/htmlhelp/Open_paths.html");
 /////////////////////////////////////////////////////////////////////////////
 // COpenDlg dialog
 
-static void EnsureCurSelPathCombo(HSuperComboBox *pCb)
+static void PathAddBackslashIfDirectory(String &path)
 {
-	String path;
-	pCb->GetWindowText(path);
 	if (!paths_EndsWithSlash(path.c_str()) && PathIsDirectory(path.c_str()))
-	{
 		path.push_back(_T('\\'));
-	}
-	pCb->SetCurSel(0);
-	pCb->SetWindowText(path.c_str());
 }
 
 /**
@@ -123,6 +117,29 @@ bool COpenDlg::UpdateData()
 	return true;
 }
 
+static int GetFileTypeIcon(LPCTSTR text)
+{
+	SHFILEINFO sfi;
+	DWORD_PTR result = 0;
+	if (!paths_EndsWithSlash(text))
+	{
+		LPCTSTR path = PathFindExtension(text);
+		if (path[0] == _T('\0') || path[1] == _T('\0'))
+			path = _T(".*");
+		sfi.dwAttributes = FILE_ATTRIBUTE_NORMAL;
+		result = SHGetFileInfo(path, 0, &sfi, sizeof sfi, SHGFI_SYSICONINDEX | SHGFI_USEFILEATTRIBUTES);
+	}
+	else if (LPCTSTR p = PathSkipRoot(text))
+	{
+		TCHAR path[MAX_PATH];
+		GetWindowsDirectory(path, MAX_PATH);
+		if (*p == _T('\0'))
+			*PathSkipRoot(path) = _T('\0');
+		result = SHGetFileInfo(path, 0, &sfi, sizeof sfi, SHGFI_SYSICONINDEX);
+	}
+	return result != 0 ? sfi.iIcon : 0;
+}
+
 LRESULT COpenDlg::OnNotify(UNotify *pNM)
 {
 	switch (pNM->HDR.idFrom)
@@ -136,51 +153,51 @@ LRESULT COpenDlg::OnNotify(UNotify *pNM)
 			SetCapture();
 			break;
 		case CBEN_GETDISPINFO:
-			SHFILEINFO sfi;
-			DWORD_PTR result = 0;
 			String text;
-			if (pNM->COMBOBOXEX.ceItem.iItem != 0 || (pNM->COMBOBOXEX.ceItem.mask & CBEIF_TEXT) == 0)
-			{
-				pNM->pCB->GetLBText(static_cast<int>(pNM->COMBOBOXEX.ceItem.iItem), text);
-			}
-			else if (pNM->pCB->GetDroppedState())
-			{
-				text = m_sSelectCbPath;
-			}
-			else
-			{
-				pNM->pCB->GetWindowText(text);
-			}
-			pNM->COMBOBOXEX.ceItem.pszText = H2O::AllocDispinfoText(text);
-			if (paths_EndsWithSlash(pNM->COMBOBOXEX.ceItem.pszText))
-			{
-				if (LPCTSTR p = PathSkipRoot(pNM->COMBOBOXEX.ceItem.pszText))
-				{
-					TCHAR path[MAX_PATH];
-					GetWindowsDirectory(path, MAX_PATH);
-					if (*p == _T('\0'))
-					{
-						*PathSkipRoot(path) = _T('\0');
-					}
-					result = SHGetFileInfo(path, 0, &sfi, sizeof sfi, SHGFI_SYSICONINDEX);
-				}
-			}
-			else
-			{
-				LPCTSTR path = PathFindExtension(pNM->COMBOBOXEX.ceItem.pszText);
-				sfi.dwAttributes = FILE_ATTRIBUTE_NORMAL;
-				result = SHGetFileInfo(path, 0, &sfi, sizeof sfi, SHGFI_SYSICONINDEX | SHGFI_USEFILEATTRIBUTES);
-			}
-			if (result != 0)
-			{
-				pNM->COMBOBOXEX.ceItem.iImage = sfi.iIcon;
-				pNM->COMBOBOXEX.ceItem.iSelectedImage = sfi.iIcon;
-			}
+			pNM->pCB->GetLBText(static_cast<int>(pNM->COMBOBOXEX.ceItem.iItem), text);
+			int iIcon = GetFileTypeIcon(text.c_str());
+			pNM->COMBOBOXEX.ceItem.iImage = iIcon;
+			pNM->COMBOBOXEX.ceItem.iSelectedImage = iIcon;
 			break;
 		}
 		break;
 	}
 	return 0;
+}
+
+BOOL COpenDlg::DrawItemPathCombo(HWND hWnd, DRAWITEMSTRUCT *pdis)
+{
+	if (pdis->CtlType == ODT_COMBOBOX && (pdis->itemState & ODS_COMBOBOXEDIT))
+	{
+		if (HImageList *piml = reinterpret_cast<HImageList *>(GetShellImageList()))
+		{
+			String text;
+			reinterpret_cast<HWindow *>(hWnd)->GetWindowText(text);
+			int const displacement = wine_version ? 3 : 0;
+			piml->DrawEx(GetFileTypeIcon(text.c_str()), pdis->hDC,
+				pdis->rcItem.left + displacement, pdis->rcItem.top,
+				0, 0, GetSysColor(COLOR_WINDOW), CLR_NONE,
+				ILD_NORMAL);
+		}
+		return TRUE;
+	}
+	return FALSE;
+}
+
+LRESULT COpenDlg::WndProcPathCombo(WNDPROC pfnSuper, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	switch (uMsg)
+	{
+	case WM_DRAWITEM:
+		// Wine seems to hide the edit control from the user while the list is
+		// dropped, but rather shows them a piece of owner drawn text instead.
+		if (wine_version) 
+			::CallWindowProc(pfnSuper, hWnd, uMsg, wParam, lParam);
+		if (!DrawItemPathCombo(hWnd, reinterpret_cast<DRAWITEMSTRUCT *>(lParam)) && !wine_version)
+			::CallWindowProc(pfnSuper, hWnd, uMsg, wParam, lParam);
+		return 0;
+	}
+	return ::CallWindowProc(pfnSuper, hWnd, uMsg, wParam, lParam);
 }
 
 LRESULT COpenDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
@@ -235,9 +252,7 @@ LRESULT COpenDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 						String a, b;
 						m_pCbLeft->GetWindowText(a);
 						m_pCbRight->GetWindowText(b);
-						m_pCbLeft->SetCurSel(0);
 						m_pCbLeft->SetWindowText(b.c_str());
-						m_pCbRight->SetCurSel(0);
 						m_pCbRight->SetWindowText(a.c_str());
 						GotoDlgCtrl(pwndHit);
 						UpdateButtonStates();
@@ -256,10 +271,18 @@ LRESULT COpenDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			m_currentFilter = NULL;
 			UpdateButtonStates();
+			if (wine_version)
+			{
+				RegisterHotKey(m_hWnd, MAKEWPARAM(0, VK_F4), 0, VK_F4);
+			}
 		}
 		else
 		{
 			ExtractParameterValues();
+			if (wine_version)
+			{
+				UnregisterHotKey(m_hWnd, MAKEWPARAM(0, VK_F4));
+			}
 		}
 		break;
 	case WM_COMMAND:
@@ -351,35 +374,16 @@ LRESULT COpenDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			break;
 		case MAKEWPARAM(IDC_LEFT_COMBO, CBN_DROPDOWN):
 		case MAKEWPARAM(IDC_RIGHT_COMBO, CBN_DROPDOWN):
-			m_nSelectCbPath = reinterpret_cast<HSuperComboBox *>(lParam)->AdjustDroppedWidth();
-			if (m_nSelectCbPath > 0 || wine_version) // winebug: better lose icon than text content
-			{
-				// Remove the icon issue placeholder.
-				reinterpret_cast<HSuperComboBox *>(lParam)->DeleteString(0);
-			}
-			else
-			{
-				reinterpret_cast<HSuperComboBox *>(lParam)->GetWindowText(m_sSelectCbPath);
-			}
-			RegisterHotKey(m_hWnd, MAKEWPARAM(LOWORD(wParam), VK_DELETE), MOD_SHIFT, VK_DELETE);
-			break;
 		case MAKEWPARAM(IDC_EXT_COMBO, CBN_DROPDOWN):
 			reinterpret_cast<HSuperComboBox *>(lParam)->AdjustDroppedWidth();
 			RegisterHotKey(m_hWnd, MAKEWPARAM(LOWORD(wParam), VK_DELETE), MOD_SHIFT, VK_DELETE);
 			break;
 		case MAKEWPARAM(IDC_LEFT_COMBO, CBN_CLOSEUP):
 		case MAKEWPARAM(IDC_RIGHT_COMBO, CBN_CLOSEUP):
-			if (m_nSelectCbPath > 0 || wine_version) // winebug: better lose icon than text content
-			{
-				// Restore the icon issue placeholder.
-				reinterpret_cast<HSuperComboBox *>(lParam)->InsertString(0, LPSTR_TEXTCALLBACK);
-			}
-			else
-			{
-				m_sSelectCbPath.clear();
-			}
-			// fall through
 		case MAKEWPARAM(IDC_EXT_COMBO, CBN_CLOSEUP):
+			reinterpret_cast<HSuperComboBox *>(lParam)->RestoreClientArea();
+			if (wine_version)
+				reinterpret_cast<HSuperComboBox *>(lParam)->GetEditControl()->SetFocus();
 			UnregisterHotKey(m_hWnd, MAKEWPARAM(LOWORD(wParam), VK_DELETE));
 			break;
 		case MAKEWPARAM(IDC_COMPARE_AS_COMBO, CBN_SELCHANGE):
@@ -388,12 +392,33 @@ LRESULT COpenDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	case WM_HOTKEY:
-		if (HIWORD(wParam) == VK_DELETE)
+		switch (HIWORD(wParam))
 		{
+		case VK_F4:
+			if (HWindow *pwndFocus = HWindow::GetFocus())
+			{
+				int id = 0;
+				if (IsChild(pwndFocus)) do
+				{
+					id = pwndFocus->GetDlgCtrlID();
+					pwndFocus = pwndFocus->GetParent();
+				} while (pwndFocus != m_pWnd);
+				switch (id)
+				{
+				case IDC_LEFT_COMBO:
+				case IDC_RIGHT_COMBO:
+				case IDC_EXT_COMBO:
+					SendDlgItemMessage(id, CB_SHOWDROPDOWN, !SendDlgItemMessage(id, CB_GETDROPPEDSTATE));
+					break;
+				}
+			}
+			break;
+		case VK_DELETE:
 			HSuperComboBox *const pCb = static_cast<HSuperComboBox *>(GetDlgItem(LOWORD(wParam)));
 			pCb->DeleteString(pCb->GetCurSel());
 			pCb->SetWindowText(_T(""));
 			SendMessage(WM_COMMAND, MAKEWPARAM(LOWORD(wParam), CBN_EDITCHANGE), reinterpret_cast<LPARAM>(pCb));
+			break;
 		}
 		break;
 	case WM_NOTIFY:
@@ -416,17 +441,19 @@ LRESULT COpenDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
  */
 BOOL COpenDlg::OnInitDialog()
 {
-	OResizableDialog::OnInitDialog();
-	LanguageSelect.TranslateDialog(m_hWnd);
-
 	RECT rc;
 	GetWindowRect(&rc);
 	m_cyFull = rc.bottom - rc.top;
 
+	OResizableDialog::OnInitDialog();
+	LanguageSelect.TranslateDialog(m_hWnd);
+
 	m_pPbOk = static_cast<HButton *>(GetDlgItem(IDOK));
 
-	m_pCbLeft = static_cast<HSuperComboBox *>(GetDlgItem(IDC_LEFT_COMBO));
-	m_pCbRight = static_cast<HSuperComboBox *>(GetDlgItem(IDC_RIGHT_COMBO));
+	m_pCbLeft = static_cast<HSuperComboBox *>(
+		SubclassDlgItem<COpenDlg, IDC_LEFT_COMBO, &COpenDlg::WndProcPathCombo>());
+	m_pCbRight = static_cast<HSuperComboBox *>(
+		SubclassDlgItem<COpenDlg, IDC_RIGHT_COMBO, &COpenDlg::WndProcPathCombo>());
 	m_pCbExt = static_cast<HSuperComboBox *>(GetDlgItem(IDC_EXT_COMBO));
 
 	m_pCbCompareAs = static_cast<HComboBox *>(GetDlgItem(IDC_COMPARE_AS_COMBO));
@@ -527,15 +554,6 @@ BOOL COpenDlg::OnInitDialog()
 	OnSelchangeCompareAs();
 	Update3StateCheckBoxLabel(IDC_RECURS_CHECK);
 
-	// Insert placeholders to represent items which are not yet listed as MRU.
-	// These placeholders are removed upon dropdown and restored upon closeup.
-	// They are invisible to users, but exist merely to help fix icon issues.
-	m_pCbLeft->InsertString(0, LPSTR_TEXTCALLBACK);
-	m_pCbRight->InsertString(0, LPSTR_TEXTCALLBACK);
-
-	// Make the icons show up
-	EnsureCurSelPathCombo(m_pCbLeft);
-	EnsureCurSelPathCombo(m_pCbRight);
 	return TRUE;
 }
 
@@ -561,7 +579,6 @@ void COpenDlg::OnBrowseButton(HSuperComboBox *pCbPath, HSuperComboBox *pCbFilter
 	filter.erase(0, filter.rfind(_T('\\')) + 1);
 	if (SelectFileOrFolder(m_hWnd, path, filter))
 	{
-		pCbPath->SetCurSel(0);
 		pCbPath->SetWindowText(path.c_str());
 		UpdateButtonStates();
 	}
@@ -720,9 +737,10 @@ void COpenDlg::UpdateButtonStates()
  */
 void COpenDlg::OnSelchangePathCombo(HSuperComboBox *pCb)
 {
-	if (!pCb->GetDroppedState() && pCb->GetCurSel() == 0)
-		pCb->SetCurSel(1);
+	pCb->RestoreClientArea();
 	UpdateButtonStates();
+	if (wine_version && !pCb->GetDroppedState())
+		pCb->GetEditControl()->SetFocus();
 }
 
 /**
@@ -1038,6 +1056,7 @@ void COpenDlg::OnDropFiles(HDROP dropInfo)
 			if (!expandedFile.empty())
 				files[i] = expandedFile;
 		}
+		PathAddBackslashIfDirectory(files[i]);
 	}
 
 	// Add dropped paths to the dialog
@@ -1066,9 +1085,6 @@ void COpenDlg::OnDropFiles(HDROP dropInfo)
 	}
 	UpdateData<Set>();
 	UpdateButtonStates();
-	// Make the icons show up
-	EnsureCurSelPathCombo(m_pCbLeft);
-	EnsureCurSelPathCombo(m_pCbRight);
 	// Free the memory block containing the dropped-file information
 	DragFinish(dropInfo);
 }

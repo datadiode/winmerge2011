@@ -79,9 +79,6 @@ private:
 
 	FileFilter *m_currentFilter;
 
-	int m_nSelectCbPath;
-	String m_sSelectCbPath;
-
 // Implementation
 protected:
 	void UpdateButtonStates();
@@ -96,6 +93,9 @@ protected:
 			bool UpdateData();
 	virtual BOOL OnInitDialog();
 	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
+
+	BOOL DrawItemPathCombo(HWND, DRAWITEMSTRUCT *);
+	LRESULT WndProcPathCombo(WNDPROC, HWND, UINT, WPARAM, LPARAM);
 
 	LRESULT OnNotify(UNotify *);
 
