@@ -1,64 +1,9 @@
-/* FloatState.cpp
-
-[The MIT license]
-
-Copyright (c) Jochen Tucht
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
-Last change: 2013-03-09 by Jochen Neubeck
-*/
+// FloatState.cpp
+// Copyright (c) Jochen Tucht
+// SPDX-License-Identifier: MIT
+// Last change: 2019-01-12 by Jochen Neubeck
 #include "StdAfx.h"
 #include "FloatState.h"
-
-static void NTAPI WineAwareSetWindowPlacement(HWND hwnd, WINDOWPLACEMENT const *pwp)
-{
-	if (wine_version)
-	{
-		// Compensate for http://bugs.winehq.org/show_bug.cgi?id=33124
-		if (pwp->flags & WPF_SETMINPOSITION)
-		{
-			WINDOWPLACEMENT wp;
-			LONG style = GetWindowLong(hwnd, GWL_STYLE);
-			SetWindowLong(hwnd, GWL_STYLE, style | WS_MINIMIZE);
-			SetWindowPos(hwnd, NULL,
-				pwp->ptMinPosition.x, pwp->ptMinPosition.y, 0, 0,
-				SWP_NOSIZE | SWP_NOZORDER | SWP_NOREDRAW | SWP_NOACTIVATE);
-			GetWindowPlacement(hwnd, &wp);
-			SetWindowLong(hwnd, GWL_STYLE, style | WS_MAXIMIZE);
-			SetWindowPos(hwnd, NULL,
-				pwp->ptMaxPosition.x, pwp->ptMaxPosition.y, 0, 0,
-				SWP_NOSIZE | SWP_NOZORDER | SWP_NOREDRAW | SWP_NOACTIVATE);
-			GetWindowPlacement(hwnd, &wp);
-			SetWindowLong(hwnd, GWL_STYLE, style);
-		}
-		SetWindowPos(hwnd, NULL,
-			pwp->rcNormalPosition.left, pwp->rcNormalPosition.top,
-			pwp->rcNormalPosition.right - pwp->rcNormalPosition.left,
-			pwp->rcNormalPosition.bottom - pwp->rcNormalPosition.top,
-			SWP_NOZORDER | SWP_NOACTIVATE);
-	}
-	else
-	{
-		SetWindowPlacement(hwnd, pwp);
-	}
-}
 
 static HWND NTAPI GetNextDlgGroupSibling(HWND hwndThis)
 {
@@ -162,12 +107,12 @@ BOOL CFloatState::Float(WINDOWPOS *pParam)
 							(::SendDlgItemMessage(hwndInner, 1001, WM_GETDLGCODE, 0, 0) & DLGC_HASSETSEL))
 						{
 							LPARAM sel = ::SendMessage(hwndInner, CB_GETEDITSEL, 0, 0);
-							::WineAwareSetWindowPlacement(hwndInner, &wp);
+							::SetWindowPlacement(hwndInner, &wp);
 							::SendMessage(hwndInner, CB_SETEDITSEL, 0, sel);
 						}
 						else
 						{
-							::WineAwareSetWindowPlacement(hwndInner, &wp);
+							::SetWindowPlacement(hwndInner, &wp);
 						}
 					}
 				}
