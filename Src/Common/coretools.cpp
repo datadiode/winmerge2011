@@ -229,7 +229,9 @@ void DecorateCmdLine(String &sCmdLine, String &sExecutable)
 	{
 		sExecutable = sCmdLine.substr(0U, pos);
 		string_trim_ws(sExecutable);
-		if (sExecutable.front() != _T('"'))
+		// Double quotes around the exe path part of sCmdLine confuse wine,
+		// so don't insert ones unless the exe path actually contains spaces.
+		if (sExecutable.front() != _T('"') && sExecutable.find(' ') != String::npos)
 		{
 			sCmdLine.insert(sExecutable.length(), 1U, _T('"'));
 			sCmdLine.insert(0U, 1U, _T('"'));
