@@ -7,30 +7,7 @@
 // Copyright (c) 2005-2010  David Nash (as of Win32++ v7.0.2)
 // Copyright (c) 2011-2016  Jochen Neubeck
 //
-// Permission is hereby granted, free of charge, to
-// any person obtaining a copy of this software and
-// associated documentation files (the "Software"),
-// to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify,
-// merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom
-// the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice
-// shall be included in all copies or substantial portions
-// of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
-// ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
-// TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
-// PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
-// SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
-// ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
-// ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
-// OR OTHER DEALINGS IN THE SOFTWARE.
-//
+// SPDX-License-Identifier: MIT
 ////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
@@ -170,7 +147,7 @@ namespace H2O
 			HWindow *const pWnd = GetDlgItem(id);
 			assert(pWnd != NULL);
 			::SetWindowLongPtr(pWnd->m_hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
-			WNDPROC pfnSubclass = OException::WndProc<ExplorerDlg, id, 0, MemberWndProc>;
+			WNDPROC pfnSubclass = OException::WndProc<T, id, 0, MemberWndProc>;
 			OException::SuperWndProc<T, id>() = reinterpret_cast<WNDPROC>(
 				::SetWindowLongPtr(pWnd->m_hWnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(pfnSubclass)));
 			return pWnd;
@@ -215,6 +192,7 @@ namespace H2O
 		}
 		virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
 		static void OnSettingChange();
+		static BOOL const m_vista_or_greater;
 		static ATOM m_button;
 		static HIGHCONTRAST m_highcontrast;
 		WNDPROC m_pfnSuper;

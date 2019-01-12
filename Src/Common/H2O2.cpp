@@ -3,30 +3,7 @@
 // Copyright (c) 2005-2010  David Nash (as of Win32++ v7.0.2)
 // Copyright (c) 2011-2018  Jochen Neubeck
 //
-// Permission is hereby granted, free of charge, to
-// any person obtaining a copy of this software and
-// associated documentation files (the "Software"),
-// to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify,
-// merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom
-// the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice
-// shall be included in all copies or substantial portions
-// of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
-// ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
-// TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
-// PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
-// SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
-// ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
-// ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
-// OR OTHER DEALINGS IN THE SOFTWARE.
-//
+// SPDX-License-Identifier: MIT
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "StdAfx.h"
@@ -34,6 +11,33 @@
 #include "SettingStore.h"
 
 using namespace H2O;
+
+/*
+ * IsWindowsVersionOrGreater() originates from
+ * https://github.com/brunophilipe/SDL2/.../SDL_windows.c
+ * Copyright (C) 1997-2018 Sam Lantinga <slouken@libsdl.org>
+ * SPDX-License-Identifier: Zlib
+ */
+static BOOL IsWindowsVersionOrGreater(WORD wMajorVersion, WORD wMinorVersion, WORD wServicePackMajor)
+{
+	OSVERSIONINFOEX osvi;
+	DWORDLONG const dwlConditionMask = VerSetConditionMask(
+		VerSetConditionMask(
+		VerSetConditionMask(
+		0, VER_MAJORVERSION, VER_GREATER_EQUAL ),
+		VER_MINORVERSION, VER_GREATER_EQUAL ),
+		VER_SERVICEPACKMAJOR, VER_GREATER_EQUAL );
+
+	ZeroMemory(&osvi, sizeof osvi);
+	osvi.dwOSVersionInfoSize = sizeof(osvi);
+	osvi.dwMajorVersion = wMajorVersion;
+	osvi.dwMinorVersion = wMinorVersion;
+	osvi.wServicePackMajor = wServicePackMajor;
+
+	return VerifyVersionInfo(&osvi, VER_MAJORVERSION | VER_MINORVERSION | VER_SERVICEPACKMAJOR, dwlConditionMask);
+}
+
+BOOL const OWindow::m_vista_or_greater = IsWindowsVersionOrGreater(6, 0, 0);
 
 ATOM OWindow::m_button;
 HIGHCONTRAST OWindow::m_highcontrast;
