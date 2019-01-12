@@ -202,7 +202,7 @@ int regexp_item::process(const std::vector<regexp_item> &relist,
 					j = ovector[index];
 					if (i < j)
 					{
-						size_t d = j - i;
+						int d = j - i;
 						if (index == 1 || (index & 1) == 0)
 						{
 							memcpy(buf, src + i, d);
