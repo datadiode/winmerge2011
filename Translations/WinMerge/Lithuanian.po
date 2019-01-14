@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: WinMerge\n"
 "Report-Msgid-Bugs-To: http://bugs.winmerge.org/\n"
 "POT-Creation-Date: 2018-08-11 11:21+0000\n"
-"PO-Revision-Date: 2018-11-12 08:50+0200\n"
+"PO-Revision-Date: 2019-01-03 08:44+0200\n"
 "Last-Translator: Tichij <tichij@mail.com>\n"
 "Language-Team: Lithuanian <winmerge-translate@lists.sourceforge.net>\n"
 "Language: lt\n"
@@ -1868,7 +1868,7 @@ msgstr "Failo ið&saugojimui:"
 #: Merge.rc:1051
 #, c-format
 msgid "&Use same codepage for both"
-msgstr "Na&udoti tà paèià koduotæ abiem atvejais"
+msgstr "Na&udoti tà paèià koduotæ abiems"
 
 #: Merge.rc:1052
 #, c-format
@@ -2588,7 +2588,7 @@ msgstr "Lyginant failus ne&pakeisti failo keitimo laiko"
 #: Merge.rc:1453
 #, c-format
 msgid "Show \"Select Files or Folders\" Dialog on Startup"
-msgstr "Rodyti „Pasirinkti failus ar katalogus“ startuojant"
+msgstr "Rodyti „Parinkite failus ar katalogus“ startuojant"
 
 #: Merge.rc:1454
 #, c-format
