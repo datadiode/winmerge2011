@@ -186,7 +186,7 @@ void CDirView::ReflectGetdispinfo(NMLVDISPINFO *pParam)
 	int const nIdx = pParam->item.iItem;
 	int const i = ColPhysToLog(pParam->item.iSubItem);
 	WORD const idName = f_cols[i].idName;
-	DIFFITEM *di = GetDiffItem(nIdx);
+	DIFFITEM const *const di = GetDiffItem(nIdx);
 	if (di == NULL)
 	{
 		if (idName == IDS_COLHDR_FILENAME)
@@ -199,14 +199,14 @@ void CDirView::ReflectGetdispinfo(NMLVDISPINFO *pParam)
 	{
 		String s = ColGetTextToDisplay(i, di);
 		// Add '*' to newer time field
-		if ((idName == IDS_COLHDR_LTIMEM && di->left.mtime > di->right.mtime) ||
-			(idName == IDS_COLHDR_RTIMEM && di->left.mtime < di->right.mtime))
+		switch (idName)
 		{
-			s.insert(0, _T("* "));
-		}
-		else
-		{
-			s.insert(0, _T("  "));
+		case IDS_COLHDR_LTIMEM:
+			s.insert(0, di->left.mtime > di->right.mtime ? _T("* ") : _T("  "));
+			break;
+		case IDS_COLHDR_RTIMEM:
+			s.insert(0, di->left.mtime < di->right.mtime ? _T("* ") : _T("  "));
+			break;
 		}
 		pParam->item.pszText = H2O::AllocDispinfoText(s);
 	}
