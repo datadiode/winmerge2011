@@ -73,7 +73,7 @@ public:
 
 	// change an existing difference
 	bool UpdateInfoFromDiskHalf(DIFFITEM *, bool bLeft, bool bMakeWritable = false);
-	void UpdateStatusFromDisk(DIFFITEM *, bool bLeft, bool bRight, bool bMakeWritable = false);
+	void UpdateStatusFromDisk(DIFFITEM *, bool bLeft, bool bRight, bool bMakeWritable = false, bool bPreserveInfo = false);
 
 	IDiffFilter *m_piFilterGlobal; /**< Interface for file filtering. */
 

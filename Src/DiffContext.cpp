@@ -62,17 +62,23 @@ String CDiffContext::GetRightFilepathAndName(const DIFFITEM *di) const
  * @param [in] bLeft Update left-side info.
  * @param [in] bRight Update right-side info.
  */
-void CDiffContext::UpdateStatusFromDisk(DIFFITEM *di, bool bLeft, bool bRight, bool bMakeWritable)
+void CDiffContext::UpdateStatusFromDisk(DIFFITEM *di, bool bLeft, bool bRight, bool bMakeWritable, bool bPreserveInfo)
 {
 	if (bLeft)
 	{
-		di->left.ClearPartial();
+		if (bPreserveInfo)
+			di->left.DirItem::ClearPartial();
+		else
+			di->left.ClearPartial();
 		if (!di->isSideRightOnly())
 			UpdateInfoFromDiskHalf(di, true, bMakeWritable);
 	}
 	if (bRight)
 	{
-		di->right.ClearPartial();
+		if (bPreserveInfo)
+			di->right.DirItem::ClearPartial();
+		else
+			di->right.ClearPartial();
 		if (!di->isSideLeftOnly())
 			UpdateInfoFromDiskHalf(di, false, bMakeWritable);
 	}

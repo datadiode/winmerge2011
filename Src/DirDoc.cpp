@@ -831,6 +831,7 @@ bool CDirFrame::UpdateDiffAfterOperation(const FileActionItem &act, bool bMakeTa
 	bool bUpdateLeft = false;
 	bool bUpdateRight = false;
 	bool bDetachments = false;
+	bool bPreserveInfo = false;
 	// Use FileActionItem types for simplicity for now.
 	// Better would be to use FileAction contained, since it is not
 	// UI dependent.
@@ -855,10 +856,20 @@ bool CDirFrame::UpdateDiffAfterOperation(const FileActionItem &act, bool bMakeTa
 		{
 		case FileActionItem::UI_LEFT:
 			bUpdateLeft = true;
+			bPreserveInfo = true;
+			di->left.versionChecked = di->right.versionChecked;
+			di->left.version = di->right.version;
+			di->left.encoding = di->right.encoding;
+			di->left.m_textStats = di->right.m_textStats;
 			break;
 
 		case FileActionItem::UI_RIGHT:
 			bUpdateRight = true;
+			bPreserveInfo = true;
+			di->right.versionChecked = di->left.versionChecked;
+			di->right.version = di->left.version;
+			di->right.encoding = di->left.encoding;
+			di->right.m_textStats = di->left.m_textStats;
 			break;
 		}
 		break;
@@ -901,7 +912,7 @@ bool CDirFrame::UpdateDiffAfterOperation(const FileActionItem &act, bool bMakeTa
 	}
 	if (bUpdateLeft || bUpdateRight)
 	{
-		m_pCtxt->UpdateStatusFromDisk(di, bUpdateLeft, bUpdateRight, bMakeTargetItemWritable);
+		m_pCtxt->UpdateStatusFromDisk(di, bUpdateLeft, bUpdateRight, bMakeTargetItemWritable, bPreserveInfo);
 		m_pDirView->UpdateDiffItemStatus(act.context);
 	}
 	return bDetachments;
