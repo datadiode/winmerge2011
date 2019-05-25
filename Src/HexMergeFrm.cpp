@@ -86,6 +86,7 @@ static void Customize(IHexEditorWindow::Settings *settings)
 	settings->iAutomaticBPL = FALSE;
 	settings->iBytesPerLine = 16;
 	settings->iFontSize = 8;
+	settings->prefer_CF_HDROP = FALSE;
 }
 
 /**
@@ -180,7 +181,7 @@ void CHexMergeFrame::CreateClient()
 
 	if (pifLeft == NULL || pifLeft->get_interface_version() < HEKSEDIT_INTERFACE_VERSION)
 	{
-		return;
+		OException::Throw(E_NOINTERFACE);
 	}
 
 	// tell the heksedit controls about each other

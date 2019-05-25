@@ -21,7 +21,7 @@
  * @brief interface of the CHexMergeFrame class
  *
  */
-#define HEKSEDIT_INTERFACE_VERSION 2
+#define HEKSEDIT_INTERFACE_VERSION 3
 #include "heksedit.h"
 
 class CHexMergeView;
