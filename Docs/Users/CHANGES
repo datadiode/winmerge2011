@@ -1,3 +1,16 @@
+2011.009.217
+Changes since preceding release (not necessarily complete):
+• Upgrade to 7-Zip 19.00
+• Upgrade to xdoc2txt 2.19
+• Avoid inappropriate action when drag-dropping files onto binary editor (#172)
+• DirView: Copying items between sides was blanking out some meta information
+• WinMerge2011.nsi: Require Wine 3.0.4+ / Include sort.exe from UnxUtils
+• DirView: With colors enabled, date columns did not display correctly on XP
+• DecorateCmdLine(): Cope with some command line parsing inaccuracy in Wine
+• ConsoleWindow: Although of vanishing relevance, restore W2K compatibility
+• DiffContext.cpp: Must not CoUninitialize() when CoInitializeEx() failed
+• H2O2: Mess with disabled groupboxes refusing to gray out their labels
+
 2011.008.532
 Changes since preceding release (not necessarily complete):
 • MainFrm.cpp: Prefer Liberation Mono font when running under Wine
