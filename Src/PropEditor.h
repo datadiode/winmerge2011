@@ -17,9 +17,9 @@ public:
 	PropEditor();
 
 // Implement IOptionsPanel
-	virtual void ReadOptions();
-	virtual void WriteOptions();
-	virtual void UpdateScreen();
+	virtual void ReadOptions() override;
+	virtual void WriteOptions() override;
+	virtual void UpdateScreen() override;
 
 // Dialog Data
 	BOOL    m_bHiliteSyntax;
@@ -38,6 +38,6 @@ public:
 protected:
 	template<DDX_Operation>
 			bool UpdateData();
-	virtual BOOL OnInitDialog();
+	virtual BOOL OnInitDialog() override;
 	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
 };

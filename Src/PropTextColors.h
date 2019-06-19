@@ -14,8 +14,9 @@ public:
 	PropTextColors();
 
 // Implement IOptionsPanel
-	virtual void ReadOptions();
-	virtual void WriteOptions();
+	virtual void ReadOptions() override;
+	virtual void WriteOptions() override;
+	virtual void UpdateScreen() override;
 
 // Dialog Data
 private:
@@ -24,7 +25,6 @@ private:
 protected:
 	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
 	void BrowseColorAndSave(int id, int colorIndex);
-	void UpdateScreen();
 	void EnableColorButtons(BOOL bEnable);
 	void OnDefaultsStandardColors();
 };

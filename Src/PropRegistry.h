@@ -33,9 +33,9 @@ public:
 	PropRegistry();
 
 // Implement IOptionsPanel
-	virtual void ReadOptions();
-	virtual void WriteOptions();
-	virtual void UpdateScreen();
+	virtual void ReadOptions() override;
+	virtual void WriteOptions() override;
+	virtual void UpdateScreen() override;
 
 	String	m_strEditorPath;
 	BOOL	m_bUseShellFileOperations;
@@ -50,7 +50,7 @@ protected:
 	template<DDX_Operation>
 			bool UpdateData();
 	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
-	virtual BOOL OnInitDialog();
+	virtual BOOL OnInitDialog() override;
 	void OnBrowseEditor();
 	void OnBrowseSupplementFolder();
 	void OnBrowseTmpFolder();

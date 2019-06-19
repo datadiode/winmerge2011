@@ -12,9 +12,9 @@ public:
 	PropMergeColors();
 
 // Implement IOptionsPanel
-	virtual void ReadOptions();
-	virtual void WriteOptions();
-	virtual void UpdateScreen();
+	virtual void ReadOptions() override;
+	virtual void WriteOptions() override;
+	virtual void UpdateScreen() override;
 
 // Dialog Data
 private:

@@ -40,22 +40,22 @@ class CCrystalEditView
 {
 
 public:
-    int m_nLastReplaceLen;
+	int m_nLastReplaceLen;
 
 protected:
-    static bool m_bLastReplace;
-    static DWORD m_dwLastReplaceFlags;
+	static bool m_bLastReplace;
+	static DWORD m_dwLastReplaceFlags;
 
 protected:
-    bool m_bDropPosVisible;
-    POINT m_ptSavedCaretPos;
-    bool m_bSelectionPushed;
-    POINT m_ptSavedSelStart, m_ptSavedSelEnd;
+	bool m_bDropPosVisible;
+	POINT m_ptSavedCaretPos;
+	bool m_bSelectionPushed;
+	POINT m_ptSavedSelStart, m_ptSavedSelEnd;
 private:
-    POINT m_ptDropPos;
+	POINT m_ptDropPos;
 
 public:
-    virtual void ResetView();
+	virtual void ResetView() override;
 
 	STDMETHOD(QueryInterface)(REFIID, void **);
 	STDMETHOD_(ULONG, AddRef)();
@@ -66,8 +66,8 @@ public:
 	STDMETHOD(Drop)(IDataObject *pDataObj, DWORD grfKeyState, POINTL pt, DWORD *pdwEffect);
 
 protected:
-	virtual DWORD GetDropEffect();
-	virtual void OnDropSource(DWORD de);
+	virtual DWORD GetDropEffect() override;
+	virtual void OnDropSource(DWORD de) override;
 	void DeleteCurrentSelection();
 
 public:
@@ -77,42 +77,42 @@ public:
 	bool GetOverwriteMode() const { return m_bOvrMode; }
 	void SetOverwriteMode(bool bOvrMode = TRUE) { m_bOvrMode = bOvrMode; }
 
-    void ShowDropIndicator(const POINT &point);
-    void HideDropIndicator();
+	void ShowDropIndicator(const POINT &point);
+	void HideDropIndicator();
 
-    bool DoDropText(HGLOBAL hData, const POINT &ptClient);
-    void DoDragScroll(const POINT &point);
+	bool DoDropText(HGLOBAL hData, const POINT &ptClient);
+	void DoDragScroll(const POINT &point);
 
 	bool DoEditUndo();
-    bool DoEditRedo();
+	bool DoEditRedo();
 
-    bool QueryEditable();
+	bool QueryEditable();
 
-	virtual void UpdateView(CCrystalTextView * pSource, CUpdateContext * pContext, DWORD dwFlags, int nLineIndex = -1);
+	virtual void UpdateView(CCrystalTextView * pSource, CUpdateContext * pContext, DWORD dwFlags, int nLineIndex = -1) override;
 
-    void ReplaceSelection(LPCTSTR pszNewText, int cchNewText, bool bGroupWithPrevious = false);
+	void ReplaceSelection(LPCTSTR pszNewText, int cchNewText, bool bGroupWithPrevious = false);
 
-    virtual void OnEditOperation(int nAction, LPCTSTR pszText, int cchText);
+	virtual void OnEditOperation(int nAction, LPCTSTR pszText, int cchText) override;
 
-    // Implementation
+	// Implementation
 protected:
-    // Generated message map functions
-    bool m_bMergeUndo;
+	// Generated message map functions
+	bool m_bMergeUndo;
 public:
 	void OnEditCut();
 	void OnEditPaste();
-    void OnEditDelete();
-    void OnChar(WPARAM);
-    void OnEditDeleteBack();
-    void OnEditUntab();
-    void OnEditTab();
-    void OnEditSwitchOvrmode();
-    void OnEditReplace();
-    void OnEditLowerCase();
-    void OnEditUpperCase();
-    void OnEditSwapCase();
-    void OnEditCapitalize();
-    void OnEditSentence();
+	void OnEditDelete();
+	void OnChar(WPARAM);
+	void OnEditDeleteBack();
+	void OnEditUntab();
+	void OnEditTab();
+	void OnEditSwitchOvrmode();
+	void OnEditReplace();
+	void OnEditLowerCase();
+	void OnEditUpperCase();
+	void OnEditSwapCase();
+	void OnEditCapitalize();
+	void OnEditSentence();
 	void OnEditGotoLastChange();
 	void OnEditDeleteWord();
 	void OnEditDeleteWordBack();

@@ -11,7 +11,7 @@ public:
 	PropSyntaxColors();
 
 // Implement IOptionsPanel
-	virtual void UpdateScreen();
+	virtual void UpdateScreen() override;
 
 protected:
 	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);

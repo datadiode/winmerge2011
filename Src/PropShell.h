@@ -14,9 +14,9 @@ public:
 	PropShell();
 
 // Implement IOptionsPanel
-	virtual void ReadOptions();
-	virtual void WriteOptions();
-	virtual void UpdateScreen();
+	virtual void ReadOptions() override;
+	virtual void WriteOptions() override;
+	virtual void UpdateScreen() override;
 
 	BOOL m_bContextAdded;
 	BOOL m_bContextAdvanced;

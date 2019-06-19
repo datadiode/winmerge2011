@@ -13,9 +13,9 @@ public:
 	PropVss();
 
 // Implement IOptionsPanel
-	virtual void ReadOptions();
-	virtual void WriteOptions();
-	virtual void UpdateScreen();
+	virtual void ReadOptions() override;
+	virtual void WriteOptions() override;
+	virtual void UpdateScreen() override;
 
 	String	m_strPath;
 	int		m_nVerSys;
@@ -30,7 +30,7 @@ protected:
 	DWORD GetClearCaseVerbs();
 	void SetClearCaseVerbs(DWORD);
 
-	virtual BOOL OnInitDialog();
+	virtual BOOL OnInitDialog() override;
 	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
 	LRESULT OnNotify(UNotify *);
 

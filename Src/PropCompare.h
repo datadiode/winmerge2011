@@ -19,9 +19,9 @@ public:
 	PropCompare();
 
 // Implement IOptionsPanel
-	virtual void ReadOptions();
-	virtual void WriteOptions();
-	virtual void UpdateScreen();
+	virtual void ReadOptions() override;
+	virtual void WriteOptions() override;
+	virtual void UpdateScreen() override;
 
 // Dialog Data
 	BOOL    m_bIgnoreEol;

@@ -161,7 +161,7 @@ public:
 
 	virtual UndoRecord &AddUndoRecord(BOOL bInsert, const POINT &ptStartPos,
 		const POINT &ptEndPos, LPCTSTR pszText, int cchText,
-		int nLinesToValidate, int nActionType = CE_ACTION_UNKNOWN);
+		int nLinesToValidate, int nActionType = CE_ACTION_UNKNOWN) override;
 
 	FileLoadResult::FILES_RESULT LoadFromFile(LPCTSTR pszFileName,
 		PackingInfo *infoUnpacker, bool &readOnly, CRLFSTYLE nCrlfStyle,
@@ -178,6 +178,6 @@ public:
 	void SetMixedEOL(bool bMixed) { m_bMixedEOL = bMixed; }
 
 	void prepareForRescan();
-	virtual void OnNotifyLineHasBeenEdited(int nLine);
+	virtual void OnNotifyLineHasBeenEdited(int nLine) override;
 	bool IsSaveable() const;
 };
