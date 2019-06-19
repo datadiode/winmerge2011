@@ -58,7 +58,7 @@ static UNICODESET get_unicode_signature (struct file_data *current, unsigned *bo
     {
       return NONE;
     }
-  return DetermineEncoding ((unsigned char *) FILE_BUFFER (current), current->buffered, bom ? bom : &dummy);
+  return DetermineEncoding ((unsigned char *) FILE_BUFFER (current), current->buffered, current->buffered, bom ? bom : &dummy);
 }
 
 /* Read a block of data into a file buffer, checking for EOF and error.  */

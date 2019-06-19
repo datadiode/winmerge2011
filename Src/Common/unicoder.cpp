@@ -245,7 +245,7 @@ inline int CoincidenceOf(int mask) { return mask & mask - 1; }
  * FF FE 00 00 UTF-32, little endian
  * 00 00 FE FF UTF-32, big-endian
  */
-UNICODESET DetermineEncoding(unsigned char *pBuffer, size_t size, unsigned *pBom)
+UNICODESET DetermineEncoding(unsigned char *pBuffer, size_t size, size_t total, unsigned *pBom)
 {
 	if (size == 0)
 		return NONE;
@@ -255,10 +255,13 @@ UNICODESET DetermineEncoding(unsigned char *pBuffer, size_t size, unsigned *pBom
 	memcpy(&sig, pBuffer, min(size, sizeof sig));
 	// check for the two possible 4 bytes signatures
 	*pBom = sizeof sig;
-	if (sig == 0x0000FEFF)
-		return UCS4LE;
-	if (sig == 0xFFFE0000)
-		return UCS4BE;
+	if ((total & 3) == 0)
+	{
+		if (sig == 0x0000FEFF)
+			return UCS4LE;
+		if (sig == 0xFFFE0000)
+			return UCS4BE;
+	}
 	// check for the only possible 3 bytes signature
 	reinterpret_cast<BYTE *>(&sig)[--*pBom] = 0x00;
 	if (sig == 0xBFBBEF)
@@ -272,41 +275,44 @@ UNICODESET DetermineEncoding(unsigned char *pBuffer, size_t size, unsigned *pBom
 	}
 	if (memchr(pBuffer, 0, bufSize))
 	{
-		int icheck = IS_TEXT_UNICODE_NOT_UNICODE_MASK ^
-			IS_TEXT_UNICODE_UNICODE_MASK ^ IS_TEXT_UNICODE_CONTROLS ^
-			IS_TEXT_UNICODE_REVERSE_MASK ^ IS_TEXT_UNICODE_REVERSE_CONTROLS;
-		if (IsTextUnicode(pBuffer, bufSize, &icheck)
-		||	(
-				icheck &
-				(
-					IS_TEXT_UNICODE_UNICODE_MASK ^
-					IS_TEXT_UNICODE_REVERSE_MASK ^
-					IS_TEXT_UNICODE_SIGNATURE ^
-					IS_TEXT_UNICODE_REVERSE_SIGNATURE
-				)
-			) > (icheck & IS_TEXT_UNICODE_NOT_UNICODE_MASK)
-		||	CoincidenceOf
-			(
-				icheck &
-				(
-					IS_TEXT_UNICODE_SIGNATURE |
-					IS_TEXT_UNICODE_STATISTICS
-				)
-			)
-		||	CoincidenceOf
-			(
-				icheck &
-				(
-					IS_TEXT_UNICODE_REVERSE_SIGNATURE |
-					IS_TEXT_UNICODE_REVERSE_STATISTICS
-				)
-			))
+		if ((total & 1) == 0)
 		{
-			*pBom = icheck &
-			(
-				IS_TEXT_UNICODE_SIGNATURE | IS_TEXT_UNICODE_REVERSE_SIGNATURE
-			) ? 2 : 0;
-			return (icheck & 0xF) >= ((icheck >> 4) & 0xF) ? UCS2LE : UCS2BE;
+			int icheck = IS_TEXT_UNICODE_NOT_UNICODE_MASK ^
+				IS_TEXT_UNICODE_UNICODE_MASK ^ IS_TEXT_UNICODE_CONTROLS ^
+				IS_TEXT_UNICODE_REVERSE_MASK ^ IS_TEXT_UNICODE_REVERSE_CONTROLS;
+			if (IsTextUnicode(pBuffer, bufSize, &icheck)
+			||	(
+					icheck &
+					(
+						IS_TEXT_UNICODE_UNICODE_MASK ^
+						IS_TEXT_UNICODE_REVERSE_MASK ^
+						IS_TEXT_UNICODE_SIGNATURE ^
+						IS_TEXT_UNICODE_REVERSE_SIGNATURE
+					)
+				) > (icheck & IS_TEXT_UNICODE_NOT_UNICODE_MASK)
+			||	CoincidenceOf
+				(
+					icheck &
+					(
+						IS_TEXT_UNICODE_SIGNATURE |
+						IS_TEXT_UNICODE_STATISTICS
+					)
+				)
+			||	CoincidenceOf
+				(
+					icheck &
+					(
+						IS_TEXT_UNICODE_REVERSE_SIGNATURE |
+						IS_TEXT_UNICODE_REVERSE_STATISTICS
+					)
+				))
+			{
+				*pBom = icheck &
+				(
+					IS_TEXT_UNICODE_SIGNATURE | IS_TEXT_UNICODE_REVERSE_SIGNATURE
+				) ? 2 : 0;
+				return (icheck & 0xF) >= ((icheck >> 4) & 0xF) ? UCS2LE : UCS2BE;
+			}
 		}
 		return NONE;
 	}

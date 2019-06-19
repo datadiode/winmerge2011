@@ -67,6 +67,7 @@ class CMarkdown::FileImage
 //	Map a file into process memory. Optionally convert UCS2 source to UTF8.
 public:
 	DWORD cbImage;
+	DWORD cbTotal;
 	union
 	{
 		PVOID pvImage;

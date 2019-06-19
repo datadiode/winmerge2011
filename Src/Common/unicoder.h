@@ -49,4 +49,4 @@ namespace ucr
 
 #endif
 
-UNICODESET DetermineEncoding(unsigned char *pBuffer, size_t size, unsigned *pBom);
+UNICODESET DetermineEncoding(unsigned char *pBuffer, size_t size, size_t total, unsigned *pBom);

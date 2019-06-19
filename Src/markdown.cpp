@@ -834,7 +834,7 @@ int CMarkdown::FileImage::GuessByteOrder(DWORD dwBOM)
 }
 
 CMarkdown::FileImage::FileImage(LPCTSTR path, DWORD trunc, int flags)
-: pvImage(NULL), cbImage(0), nByteOrder(0)
+: pvImage(NULL), cbImage(0), cbTotal(0), nByteOrder(0)
 {
 	HANDLE hFile = 0;
 	if (flags & Mapping)
@@ -851,6 +851,7 @@ CMarkdown::FileImage::FileImage(LPCTSTR path, DWORD trunc, int flags)
 			cbImage = GetFileSize(hFile, 0);
 			if (cbImage != INVALID_FILE_SIZE)
 			{
+				cbTotal = cbImage;
 				if (trunc && cbImage > trunc)
 				{
 					cbImage = trunc;

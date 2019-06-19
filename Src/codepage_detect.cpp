@@ -237,7 +237,7 @@ void GuessCodepageEncoding(LPCTSTR filepath, FileTextEncoding *encoding, bool bG
 	encoding->m_guessed = false;
 	encoding->m_binary = false;
 	unsigned bom = 0;
-	if (UNICODESET ucs = DetermineEncoding(fi.pbImage, fi.cbImage, &bom))
+	if (UNICODESET ucs = DetermineEncoding(fi.pbImage, fi.cbImage, fi.cbTotal, &bom))
 	{
 		encoding->SetUnicoding(ucs);
 		encoding->m_bom = bom != 0;

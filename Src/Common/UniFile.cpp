@@ -296,7 +296,7 @@ void UniMemFile::ReadBom()
 	m_charsize = 1;
 	unsigned bom = 0;
 
-	m_unicoding = DetermineEncoding(lpByte, m_filesize.Lo, &bom);
+	m_unicoding = DetermineEncoding(lpByte, m_filesize.Lo, m_filesize.Lo, &bom);
 	switch (m_unicoding)
 	{
 	case UCS2LE:
