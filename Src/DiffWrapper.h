@@ -82,7 +82,7 @@ class CDiffWrapper
 	, public FilterList /**< Filter list for line filters. */
 {
 public:
-	CDiffWrapper(DiffList * = NULL);
+	explicit CDiffWrapper(DiffList * = NULL);
 	~CDiffWrapper();
 	void SetToDiffUtils(DiffFileData &);
 	void RefreshFilters();

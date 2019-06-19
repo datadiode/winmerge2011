@@ -27,7 +27,7 @@ class ExplorerDlg
 	, public OResizableDialog
 {
 public:
-	ExplorerDlg(UINT idd);
+	explicit ExplorerDlg(UINT idd);
 	~ExplorerDlg();
 
 	String m_title;

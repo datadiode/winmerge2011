@@ -41,9 +41,9 @@ public:
 	 * A constructor taking a language id as parameter.
 	 * @param [in] id Language ID to use.
 	 */
-	LangFileInfo(LANGID id): id(id) { };
+	explicit LangFileInfo(LANGID id): id(id) { }
 
-	LangFileInfo(LPCTSTR path);
+	explicit LangFileInfo(LPCTSTR path);
 	String GetString(LCTYPE type) const;
 
 private:
@@ -794,7 +794,7 @@ String CLanguageSelect::GetFileName(LANGID wLangId)
 	while ((h = FindFile(h, pattern.c_str(), &ff)) != INVALID_HANDLE_VALUE)
 	{
 		filename = path + ff.cFileName;
-		LangFileInfo lfi = filename.c_str();
+		LangFileInfo const lfi(filename.c_str());
 		if (lfi.id == wLangId)
 			ff.dwFileAttributes = INVALID_FILE_ATTRIBUTES; // terminate loop
 		else
@@ -1219,7 +1219,7 @@ void CLanguageSelect::LoadAndDisplayLanguages()
 	HANDLE h = INVALID_HANDLE_VALUE;
 	do
 	{
-		LangFileInfo &lfi =
+		LangFileInfo const &lfi =
 			h == INVALID_HANDLE_VALUE
 		?	LangFileInfo(wSourceLangId)
 		:	LangFileInfo((path + ff.cFileName).c_str());

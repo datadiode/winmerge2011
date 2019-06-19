@@ -20,8 +20,8 @@ private:
 	WORD m_wLanguage; /**< Language-ID to use (if given) */
 	WORD m_wCodepage;
 public:
-	CVersionInfo(LPCTSTR szFileName);
-	CVersionInfo(HINSTANCE hModule = NULL);
+	explicit CVersionInfo(LPCTSTR szFileName);
+	explicit CVersionInfo(HINSTANCE hModule = NULL);
 	~CVersionInfo();
 	String GetFileVersion() const;
 	String GetCompanyName() const;

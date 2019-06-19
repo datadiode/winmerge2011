@@ -65,7 +65,7 @@ struct CExcelExport::BiffRecord
 	WORD id;
 	WORD size;
 	BYTE data[2048];
-	BiffRecord(RecordType id): id(id), size(0)
+	explicit BiffRecord(RecordType id): id(id), size(0)
 	{
 	}
 	template<class T>

@@ -16,7 +16,7 @@ class CTestFilterDlg : public ODialog
 {
 // Construction
 public:
-	CTestFilterDlg(FileFilter *pFileFilter);
+	explicit CTestFilterDlg(FileFilter *pFileFilter);
 
 // Implementation data
 private:

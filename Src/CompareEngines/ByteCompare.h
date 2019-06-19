@@ -21,7 +21,7 @@ namespace CompareEngines
 class ByteCompare : public DIFFOPTIONS
 {
 public:
-	ByteCompare(const CDiffContext *);
+	explicit ByteCompare(const CDiffContext *);
 	void SetFileData(int items, file_data *data);
 	unsigned CompareFiles(FileLocation *location);
 

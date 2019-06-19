@@ -4,7 +4,7 @@ class CSplitState
 {
 protected:
 	//Construction
-	CSplitState(LONG const *SplitScript = 0): SplitScript(SplitScript) { }
+	explicit CSplitState(LONG const *SplitScript = 0): SplitScript(SplitScript) { }
 	//Data
 	LONG const *SplitScript;
 	//Methods

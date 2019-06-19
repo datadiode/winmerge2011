@@ -17,7 +17,7 @@ namespace CompareEngines
 class TimeSizeCompare
 {
 public:
-	TimeSizeCompare(const CDiffContext *);
+	explicit TimeSizeCompare(const CDiffContext *);
 	int CompareFiles(int compMethod, const DIFFITEM *di);
 
 private:

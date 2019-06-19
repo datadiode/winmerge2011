@@ -49,7 +49,7 @@ public:
 	bool bApplyHistoricCostLimit; /**< Control costs as strictly as Diffutils 2.5 did. */
 	bool bFilterCommentsLines; /**< Ignore Multiline comments differences -option. */
 	bool bApplyLineFilters; /**< Apply line filters? */
-	DIFFOPTIONS(null *)
+	explicit DIFFOPTIONS(null *)
 	{
 		memset(this, 0, sizeof *this);
 		nTabSize = 8;

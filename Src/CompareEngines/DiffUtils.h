@@ -21,7 +21,7 @@ namespace CompareEngines
 class DiffUtils : public CDiffWrapper
 {
 public:
-	DiffUtils(const CDiffContext *);
+	explicit DiffUtils(const CDiffContext *);
 	int diffutils_compare_files(struct comparison *);
 
 	int m_ndiffs; /**< Real diffs found. */

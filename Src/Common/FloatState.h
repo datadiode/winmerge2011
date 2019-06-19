@@ -30,7 +30,7 @@ class CFloatState : public CFloatFlags
 {
 protected:
 	//Construction
-	CFloatState(LONG const *FloatScript = 0): FloatScript(FloatScript) { }
+	explicit CFloatState(LONG const *FloatScript = 0): FloatScript(FloatScript) { }
 	//Data
 	LONG const *FloatScript;
 	int cx;
