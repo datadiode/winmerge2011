@@ -73,7 +73,6 @@ public:
 	DWORD ImportOptions(LPCTSTR filename);
 // Implementation methods
 private:
-	bool IsThemeableColorIndex(UINT nColorIndex) const;
 	bool GetSystemColorIndex(UINT nColorIndex, int * pSysIndex) const;
 
 // Implementation data

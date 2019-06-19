@@ -45,17 +45,6 @@ void CSyntaxColors::LoadFromRegistry()
 }
 
 /**
- * @brief Checks if given color is themeable.
- * @param [in] nColorIndex Index of color to check.
- * @return true if color is themeable, false otherwise.
- */
-bool CSyntaxColors::IsThemeableColorIndex(UINT nColorIndex) const
-{
-	int temp = 0;
-	return GetSystemColorIndex(nColorIndex, &temp);
-}
-
-/**
  * @brief Get system color for this index.
  * Returns the system color for given index in the case it varies by
  * used theme.
