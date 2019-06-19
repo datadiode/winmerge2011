@@ -14,6 +14,7 @@ class UniMarkdownFile : public UniMemFile
 {
 public:
 	UniMarkdownFile();
+	virtual ~UniMarkdownFile() { UniMarkdownFile::Close(); }
 	virtual bool OpenReadOnly(LPCTSTR filename);
 	virtual void Close();
 	virtual bool ReadString(String &line, String &eol, bool *lossy);

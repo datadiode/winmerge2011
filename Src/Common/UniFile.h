@@ -121,7 +121,7 @@ class UniMemFile : public UniLocalFile
 	friend class UniMarkdownFile;
 public:
 	UniMemFile();
-	virtual ~UniMemFile() { Close(); }
+	virtual ~UniMemFile() { UniMemFile::Close(); }
 
 	virtual bool OpenReadOnly(LPCTSTR filename);
 	virtual bool OpenCreate(LPCTSTR filename) { return false; }

@@ -557,7 +557,7 @@ UniStdioFile::UniStdioFile()
 UniStdioFile::~UniStdioFile()
 {
 	m_pstm->Release();
-	Close();
+	UniStdioFile::Close();
 }
 
 void UniStdioFile::Attach(ISequentialStream *pstm)

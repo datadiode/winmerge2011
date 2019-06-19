@@ -260,7 +260,7 @@ CCrystalTextView::CCrystalTextView(HWindow *pWnd, size_t ZeroInit)
 , m_nLastLineIndexCalculatedSubLineIndex(-1)
 {
 	m_bAutoDelete = true;
-	ResetView();
+	CCrystalTextView::ResetView();
 	// font
 	_tcscpy(m_lfBaseFont.lfFaceName, _T("FixedSys"));
 	m_lfBaseFont.lfWeight = FW_NORMAL;
