@@ -131,7 +131,7 @@ std::string valueToQuotedString(const char* value) {
     default:
       if (isControlCharacter(c)) {
         char buffer[8];
-        sprintf(buffer, "\\u04x", c);
+        sprintf(buffer, "\\u%04x", c);
         result += buffer;
       } else {
         result.push_back(c);
