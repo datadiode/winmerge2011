@@ -37,11 +37,14 @@ public:
 	BOOL    m_bMatchSimilarLines;
 	int     m_nMatchSimilarLinesMax;
 	BOOL    m_bFilterCommentsLines;
+	int     m_nDiffAlgorithm;
+	BOOL    m_bIndentHeuristic;
 
 // Implementation
 protected:
 	template<DDX_Operation>
 			bool UpdateData();
+	virtual BOOL OnInitDialog() override;
 	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
 	void OnDefaults();
 };

@@ -166,6 +166,8 @@
 #define IDC_BPL_AUTO                            1022
 #define IDC_DISABLE_SPLASH                      1023
 #define IDC_ENABLE_SCROLL_ANIMATION             1024
+#define IDC_DIFF_ALGORITHM                      1025
+#define IDC_INDENT_HEURISTIC                    1026
 #define IDC_DIFF_IGNOREEOL                      1027
 #define IDC_USER                                1027
 #define IDC_PASSWORD                            1028

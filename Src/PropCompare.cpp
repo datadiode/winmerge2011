@@ -39,12 +39,26 @@ bool PropCompare::UpdateData()
 	DDX_Check<op>(IDC_MOVED_BLOCKS, m_bMovedBlocks);
 	DDX_Check<op>(IDC_MATCH_SIMILAR_LINES, m_bMatchSimilarLines);
 	DDX_Text<op>(IDC_MATCH_SIMILAR_LINES_MAX, m_nMatchSimilarLinesMax);
+	DDX_CBIndex<op>(IDC_DIFF_ALGORITHM, m_nDiffAlgorithm);
+	DDX_Check<op>(IDC_INDENT_HEURISTIC, m_bIndentHeuristic);
 	if (HEdit *pEdit = static_cast<HEdit *>(GetDlgItem(IDC_MATCH_SIMILAR_LINES_MAX)))
 	{
 		pEdit->EnableWindow(m_bMatchSimilarLines);
 		pEdit->LimitText(3);
 	}
 	return true;
+}
+
+BOOL PropCompare::OnInitDialog()
+{
+	if (HComboBox *combo = static_cast<HComboBox *>(GetDlgItem(IDC_DIFF_ALGORITHM)))
+	{
+		combo->AddString(_T("gnu"));
+		combo->AddString(_T("myers"));
+		combo->AddString(_T("patience"));
+		combo->AddString(_T("histogram"));
+	}
+	return OptionsPanel::OnInitDialog();
 }
 
 LRESULT PropCompare::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
@@ -58,6 +72,7 @@ LRESULT PropCompare::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		{
 		case MAKEWPARAM(IDC_DIFF_WS_IGNORE_TAB_EXPANSION, BN_CLICKED):
 		case MAKEWPARAM(IDC_DIFF_WS_IGNORE_TRAILING_SPACE, BN_CLICKED):
+		case MAKEWPARAM(IDC_DIFF_ALGORITHM, CBN_SELCHANGE):
 			UpdateScreen();
 			break;
 		case MAKEWPARAM(IDC_COMPARE_DEFAULTS, BN_CLICKED):
@@ -91,6 +106,8 @@ void PropCompare::ReadOptions()
 	m_bMovedBlocks = COptionsMgr::Get(OPT_CMP_MOVED_BLOCKS);
 	m_bMatchSimilarLines = COptionsMgr::Get(OPT_CMP_MATCH_SIMILAR_LINES);
 	m_nMatchSimilarLinesMax = COptionsMgr::Get(OPT_CMP_MATCH_SIMILAR_LINES_MAX);
+	m_nDiffAlgorithm = COptionsMgr::Get(OPT_CMP_DIFF_ALGORITHM);
+	m_bIndentHeuristic = COptionsMgr::Get(OPT_CMP_INDENT_HEURISTIC);
 }
 
 /**
@@ -114,6 +131,8 @@ void PropCompare::WriteOptions()
 	COptionsMgr::SaveOption(OPT_CMP_MOVED_BLOCKS, m_bMovedBlocks != FALSE);
 	COptionsMgr::SaveOption(OPT_CMP_MATCH_SIMILAR_LINES, m_bMatchSimilarLines != FALSE);
 	COptionsMgr::SaveOption(OPT_CMP_MATCH_SIMILAR_LINES_MAX, m_nMatchSimilarLinesMax);
+	COptionsMgr::SaveOption(OPT_CMP_DIFF_ALGORITHM, m_nDiffAlgorithm);
+	COptionsMgr::SaveOption(OPT_CMP_INDENT_HEURISTIC, m_bIndentHeuristic != FALSE);
 }
 
 /**
@@ -127,6 +146,11 @@ void PropCompare::UpdateScreen()
 	GetDlgItem(IDC_DIFF_WHITESPACE_COMPARE)->EnableWindow(bEnable);
 	GetDlgItem(IDC_DIFF_WHITESPACE_IGNORE)->EnableWindow(bEnable);
 	GetDlgItem(IDC_DIFF_WHITESPACE_IGNOREALL)->EnableWindow(bEnable);
+	bEnable = m_nDiffAlgorithm == 0;
+	GetDlgItem(IDC_DIFF_SPEED_LARGE_FILES)->EnableWindow(bEnable);
+	GetDlgItem(IDC_DIFF_APPLY_HISTORIC_COST_LIMIT)->EnableWindow(bEnable);
+	bEnable = m_nDiffAlgorithm != 0;
+	GetDlgItem(IDC_INDENT_HEURISTIC)->EnableWindow(bEnable);
 }
 
 /**

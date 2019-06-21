@@ -30,6 +30,7 @@
 #include "FileTextStats.h"
 #include "FolderCmp.h"
 #include "Environment.h"
+#include "xdiff_gnudiff_compat.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -96,15 +97,16 @@ void CDiffWrapper::SetToDiffUtils(DiffFileData &diffdata)
 		break;
 	}
 
-	diffdata.tabsize			      = nTabSize;
+	diffdata.tabsize			= nTabSize;
 	diffdata.ignore_blank_lines	= bIgnoreBlankLines;
-	diffdata.ignore_case		      = bIgnoreCase;
-	diffdata.ignore_eol_diff	   = bIgnoreEol;
-	diffdata.minimal			      = bMinimal;
-	diffdata.speed_large_files	   = bSpeedLargeFiles;
-	diffdata.cost_limit			   = bApplyHistoricCostLimit ? 256 : 0;
-	diffdata.dbcs_codepage        = FileTextEncoding::IsCodepageDBCS(m_codepage);
-	diffdata.horizon_lines        = 0; // TODO: Make this configurable?
+	diffdata.ignore_case		= bIgnoreCase;
+	diffdata.ignore_eol_diff	= bIgnoreEol;
+	diffdata.minimal			= bMinimal;
+	diffdata.indent_heuristic	= bIndentHeuristic;
+	diffdata.speed_large_files	= bSpeedLargeFiles;
+	diffdata.cost_limit			= bApplyHistoricCostLimit ? 256 : 0;
+	diffdata.dbcs_codepage		= FileTextEncoding::IsCodepageDBCS(m_codepage);
+	diffdata.horizon_lines		= nDiffAlgorithm != DIFF_ALGORITHM_GNU && bIndentHeuristic ? 100 : 0; // TODO: Make this configurable?
 }
 
 void CDiffWrapper::RefreshFilters()
@@ -121,6 +123,7 @@ void CDiffWrapper::RefreshFilters()
 
 void CDiffWrapper::RefreshOptions()
 {
+	nDiffAlgorithm = COptionsMgr::Get(OPT_CMP_DIFF_ALGORITHM);
 	nIgnoreWhitespace = COptionsMgr::Get(OPT_CMP_IGNORE_WHITESPACE);
 	nTabSize = COptionsMgr::Get(OPT_TAB_SIZE);
 	bIgnoreBlankLines = COptionsMgr::Get(OPT_CMP_IGNORE_BLANKLINES);
@@ -130,6 +133,7 @@ void CDiffWrapper::RefreshOptions()
 	bMinimal = COptionsMgr::Get(OPT_CMP_MINIMAL);
 	bSpeedLargeFiles = COptionsMgr::Get(OPT_CMP_SPEED_LARGE_FILES);
 	bApplyLineFilters = COptionsMgr::Get(OPT_LINEFILTER_ENABLED);
+	bIndentHeuristic = COptionsMgr::Get(OPT_CMP_INDENT_HEURISTIC);
 	RefreshFilters();
 	SetDetectMovedBlocks(COptionsMgr::Get(OPT_CMP_MOVED_BLOCKS));
 }
@@ -626,7 +630,10 @@ bool CDiffWrapper::Diff2Files(struct change **diffs, struct comparison *cmp, int
 	try
 	{
 		// Diff files.
-		*diffs = diff_2_files(cmp, bin_status, m_pMovedLines != NULL, bin_file);
+		if (nDiffAlgorithm == DIFF_ALGORITHM_GNU)
+			*diffs = diff_2_files(cmp, bin_status, m_pMovedLines != NULL, bin_file);
+		else
+			*diffs = diff_2_files_xdiff(cmp, m_pMovedLines != NULL, bin_file, nDiffAlgorithm);
 	}
 	catch (OException *e)
 	{

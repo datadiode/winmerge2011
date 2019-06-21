@@ -31,6 +31,14 @@ enum
 	WHITESPACE_RADIO_OPTIONS_MASK = WHITESPACE_IGNORE_TAB_EXPANSION - 0x01,
 };
 
+enum DiffAlgorithm
+{
+	DIFF_ALGORITHM_GNU = 0,
+	DIFF_ALGORITHM_XDF_MYERS = 1,
+	DIFF_ALGORITHM_XDF_PATIENCE = 2,
+	DIFF_ALGORITHM_XDF_HISTOGRAM = 3,
+};
+
 /**
  * @brief Diffutils options.
  */
@@ -39,6 +47,7 @@ struct DIFFOPTIONS
 private:
 	struct null;
 public:
+	int nDiffAlgorithm; /**< Algorithm to use. */
 	int nIgnoreWhitespace; /**< Ignore whitespace -option. */
 	int nTabSize; /**< Distance between adjacent tab stops. */
 	bool bIgnoreCase; /**< Ignore case -option. */
@@ -49,6 +58,7 @@ public:
 	bool bApplyHistoricCostLimit; /**< Control costs as strictly as Diffutils 2.5 did. */
 	bool bFilterCommentsLines; /**< Ignore Multiline comments differences -option. */
 	bool bApplyLineFilters; /**< Apply line filters? */
+	bool bIndentHeuristic; /**< Apply indent heuristic? */
 	explicit DIFFOPTIONS(null *)
 	{
 		memset(this, 0, sizeof *this);

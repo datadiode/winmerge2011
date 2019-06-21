@@ -273,6 +273,9 @@ struct comparison
     /* Don't discard lines.  This makes things slower (sometimes much
        slower) but will find a guaranteed minimal set of changes.  */
     bool minimal;
+
+    /* LibXDiff only: Whether to apply indent heuristic.  */
+    bool indent_heuristic;
   };
 
 struct file_cursor

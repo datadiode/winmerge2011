@@ -1363,13 +1363,15 @@ FONT 8, "MS Shell Dlg", 0, 0, 1
     AUTOCHECKBOX    "Igno&re carriage return differences (Windows/Unix/Mac)", IDC_DIFF_IGNOREEOL, 7, 100, 221, 10, 0, WS_EX_LEFT
     AUTOCHECKBOX    "E&nable moved block detection", IDC_MOVED_BLOCKS, 7, 110, 221, 10, 0, WS_EX_LEFT
     AUTOCHECKBOX    "&Match similar lines", IDC_MATCH_SIMILAR_LINES, 7, 120, 221, 10, 0, WS_EX_LEFT
-    RTEXT           "C&ontext limit:", IDC_STATIC, 7, 132, 155, 8, SS_RIGHT, WS_EX_LEFT
-    EDITTEXT        IDC_MATCH_SIMILAR_LINES_MAX, 169, 130, 50, 12, ES_AUTOHSCROLL | ES_NUMBER, WS_EX_RTLREADING
-    AUTOCHECKBOX    "Minimize number of affected lines", IDC_DIFF_MINIMAL, 7, 146, 221, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Speed up processing of large files", IDC_DIFF_SPEED_LARGE_FILES, 7, 156, 221, 10, 0, WS_EX_LEFT
-    GROUPBOX        "Comments", IDC_STATIC, 7, 171, 221, 32, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Filter Comments", IDC_FILTERCOMMENTS_CHECK, 15, 181, 205, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Apply historic cost limit", IDC_DIFF_APPLY_HISTORIC_COST_LIMIT, 7, 208, 150, 10, 0, WS_EX_LEFT
+    RTEXT           "C&ontext limit:", IDC_STATIC, 7, 132, 160, 8, SS_RIGHT, WS_EX_LEFT
+    EDITTEXT        IDC_MATCH_SIMILAR_LINES_MAX, 174, 130, 50, 12, ES_AUTOHSCROLL | ES_NUMBER, WS_EX_RTLREADING
+    LTEXT           "&Diff algorithm:", IDC_STATIC, 7, 152, 100, 9, SS_LEFT, WS_EX_LEFT
+    COMBOBOX        IDC_DIFF_ALGORITHM, 110, 150, 114, 150, WS_TABSTOP | WS_VSCROLL | CBS_DROPDOWNLIST, WS_EX_LEFT
+    AUTOCHECKBOX    "Minimize number of affected lines", IDC_DIFF_MINIMAL, 7, 167, 221, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Speed up processing of large files", IDC_DIFF_SPEED_LARGE_FILES, 7, 177, 221, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Apply indent &heuristic", IDC_INDENT_HEURISTIC, 7, 187, 221, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Filter Comments", IDC_FILTERCOMMENTS_CHECK, 7, 197, 221, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Apply historic cost limit", IDC_DIFF_APPLY_HISTORIC_COST_LIMIT, 7, 212, 150, 10, 0, WS_EX_LEFT
     PUSHBUTTON      "Defaults", IDC_COMPARE_DEFAULTS, 160, 208, 70, 14, 0, WS_EX_LEFT
 }
 

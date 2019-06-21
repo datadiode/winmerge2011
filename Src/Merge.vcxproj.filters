@@ -64,6 +64,9 @@
     <Filter Include="jsoncpp">
       <UniqueIdentifier>{c2d1496e-6cb0-451f-a091-c5b78c410383}</UniqueIdentifier>
     </Filter>
+    <Filter Include="libxdiff">
+      <UniqueIdentifier>{ac20538c-3987-4f4f-a6fb-651308bea2b2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="7zCommon.cpp">
@@ -672,6 +675,30 @@
     <ClCompile Include="editlib\modeline-parser.cpp">
       <Filter>EditLib</Filter>
     </ClCompile>
+    <ClCompile Include="libxdiff\xdiffi.c">
+      <Filter>libxdiff</Filter>
+    </ClCompile>
+    <ClCompile Include="libxdiff\xemit.c">
+      <Filter>libxdiff</Filter>
+    </ClCompile>
+    <ClCompile Include="libxdiff\xhistogram.c">
+      <Filter>libxdiff</Filter>
+    </ClCompile>
+    <ClCompile Include="libxdiff\xmerge.c">
+      <Filter>libxdiff</Filter>
+    </ClCompile>
+    <ClCompile Include="libxdiff\xpatience.c">
+      <Filter>libxdiff</Filter>
+    </ClCompile>
+    <ClCompile Include="libxdiff\xprepare.c">
+      <Filter>libxdiff</Filter>
+    </ClCompile>
+    <ClCompile Include="libxdiff\xutils.c">
+      <Filter>libxdiff</Filter>
+    </ClCompile>
+    <ClCompile Include="xdiff_gnudiff_compat.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\WindowPlacement.h">
@@ -1204,6 +1231,33 @@
     </ClInclude>
     <ClInclude Include="editlib\modeline-parser.h">
       <Filter>EditLib</Filter>
+    </ClInclude>
+    <ClInclude Include="libxdiff\xdiff.h">
+      <Filter>libxdiff</Filter>
+    </ClInclude>
+    <ClInclude Include="libxdiff\xdiffi.h">
+      <Filter>libxdiff</Filter>
+    </ClInclude>
+    <ClInclude Include="libxdiff\xemit.h">
+      <Filter>libxdiff</Filter>
+    </ClInclude>
+    <ClInclude Include="libxdiff\xinclude.h">
+      <Filter>libxdiff</Filter>
+    </ClInclude>
+    <ClInclude Include="libxdiff\xmacros.h">
+      <Filter>libxdiff</Filter>
+    </ClInclude>
+    <ClInclude Include="libxdiff\xprepare.h">
+      <Filter>libxdiff</Filter>
+    </ClInclude>
+    <ClInclude Include="libxdiff\xtypes.h">
+      <Filter>libxdiff</Filter>
+    </ClInclude>
+    <ClInclude Include="libxdiff\xutils.h">
+      <Filter>libxdiff</Filter>
+    </ClInclude>
+    <ClInclude Include="xdiff_gnudiff_compat.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
