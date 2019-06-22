@@ -344,7 +344,7 @@ BOOL ExplorerDlg::OnInitDialog()
 		m_pLv = static_cast<HListView *>(
 			SubclassDlgItem<ExplorerDlg, IDC_LIST_FILE, &ExplorerDlg::WndProcFilter>());
 		m_pLv->SetImageList(iml, LVSIL_SMALL);
-	    m_pLv->SetExtendedStyle(LVS_EX_FULLROWSELECT | LVS_EX_HEADERDRAGDROP | LVS_EX_INFOTIP);
+		m_pLv->SetExtendedStyle(LVS_EX_FULLROWSELECT | LVS_EX_HEADERDRAGDROP | LVS_EX_INFOTIP);
 
 		if (!m_bEnableMultiSelect)
 			m_pLv->SetStyle(m_pLv->GetStyle() | LVS_SINGLESEL);
@@ -550,18 +550,18 @@ LRESULT ExplorerDlg::OnItemExpanding(NMTREEVIEW *pNMTreeView)
 
 LRESULT ExplorerDlg::OnCustomDraw(NMTVCUSTOMDRAW *pCD)
 {
-    switch (pCD->nmcd.dwDrawStage)
-    {
-    case CDDS_PREPAINT:
-        return CDRF_NOTIFYITEMDRAW;
+	switch (pCD->nmcd.dwDrawStage)
+	{
+	case CDDS_PREPAINT:
+		return CDRF_NOTIFYITEMDRAW;
 
 	case CDDS_ITEMPREPAINT:
 		if ((pCD->nmcd.lItemlParam & ~0xFFFF) == 0 && pCD->nmcd.uItemState == 0)
 		{
 			pCD->clrText = AttributesToTextColor(static_cast<DWORD>(pCD->nmcd.lItemlParam));
 		}
-        break;
-    }
+		break;
+	}
 	return CDRF_DODEFAULT;
 }
 
@@ -800,10 +800,10 @@ IShellFolder *ExplorerDlg::GetShellFolder(HTREEITEM hItem) const
 
 void ExplorerDlg::PopulateTreeView()
 {
-    m_pTv->SetRedraw(FALSE);
-    HCURSOR const hCursor = SetCursor(LoadCursor(NULL, IDC_WAIT));
+	m_pTv->SetRedraw(FALSE);
+	HCURSOR const hCursor = SetCursor(LoadCursor(NULL, IDC_WAIT));
 
-    m_pTv->DeleteAllItems();
+	m_pTv->DeleteAllItems();
 
 	LPITEMIDLIST p = NULL;
 	WCHAR path[MAX_PATH];
@@ -842,8 +842,8 @@ void ExplorerDlg::PopulateTreeView()
 		m_shell->BindToObject(p, NULL, IID_IShellFolder, (void**)&m_network);
 	}
 
-    SetCursor(hCursor);
-    SetRedraw(TRUE);
+	SetCursor(hCursor);
+	SetRedraw(TRUE);
 }
 
 HTREEITEM ExplorerDlg::ExpandPartial(HTREEITEM hRoot, LPWSTR full)
@@ -971,19 +971,17 @@ void ExplorerDlg::setSelectedFullPath(const std::wstring &sPath)
 
 DWORD ExplorerDlg::getPath(HTREEITEM hItem, std::wstring &sPath)
 {
-    std::wstring sItem;
+	std::wstring sItem;
 	WCHAR path[MAX_PATH];
 	TVITEM item;
 	item.mask = TVIF_TEXT | TVIF_PARAM;
 	item.hItem = hItem;
 	item.pszText = path;
 	item.cchTextMax = _countof(path);
-	UINT state = 0;
 	sPath.clear();
-    while (item.hItem != NULL)
-    {
+	while (item.hItem != NULL)
+	{
 		m_pTv->GetItem(&item);
-		state |= item.state & item.stateMask;
 		item.stateMask = 0;
 		item.hItem = m_pTv->GetParentItem(item.hItem);
 		if (item.hItem == NULL)
@@ -1022,7 +1020,7 @@ DWORD ExplorerDlg::getPath(HTREEITEM hItem, std::wstring &sPath)
 		if (sItem.rfind('\\') + 1 != sItem.length())
 			sItem.push_back('\\');
 		sPath = sItem + sPath;
-    }
+	}
 	DWORD dwFilter = 0;
 	if (!sPath.empty())
 	{
@@ -1457,7 +1455,7 @@ void ExplorerDlg::OnOK()
 			if (dwAttributes != INVALID_FILE_ATTRIBUTES)
 			{
 				int choice = LanguageSelect.FormatStrings(
-					dwAttributes & ProtectiveFileAttributes ? IDS_TRASH_FILE_ATTENTIVE : IDS_TRASH_FILE,
+					(dwAttributes & ProtectiveFileAttributes) ? IDS_TRASH_FILE_ATTENTIVE : IDS_TRASH_FILE,
 					NULL, m_path.c_str()).MsgBox(MB_YESNO | MB_HIGHLIGHT_ARGUMENTS | MB_ICONWARNING | MB_DEFBUTTON2);
 				if (choice != IDYES)
 					return;
