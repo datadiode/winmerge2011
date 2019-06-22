@@ -516,8 +516,7 @@ bool CDiffWrapper::FixLastDiffRange(int leftBufferLines, int rightBufferLines, b
 	// If one file has EOL before EOF and other not...
 	if (m_status.bLeftMissingNL != m_status.bRightMissingNL)
 	{
-		const int count = m_pDiffList->GetSize();
-		if (count > 0 && !bIgnoreBlankLines)
+		if (int const count = m_pDiffList->GetSize())
 		{
 			DIFFRANGE *dr = m_pDiffList->DiffRangeAt(count - 1);
 
