@@ -337,7 +337,6 @@ void
 print_1_line (struct comparison *cmp, struct file_cursor *cursor, char const *line_flag, lin line, bool empty)
 {
   FILE *const out = cmp->outfile; /* Help the compiler some more.  */
-  char const *flag_format = 0;
 
   /* If -T was specified, use a Tab between the line-flag and the text.
      Otherwise use a Space (as Unix diff does).
@@ -346,7 +345,7 @@ print_1_line (struct comparison *cmp, struct file_cursor *cursor, char const *li
 
   if (line_flag && *line_flag)
     {
-      char const *flag_format_1 = flag_format = cmp->initial_tab ? "%s\t" : "%s ";
+      char const *flag_format_1 = cmp->initial_tab ? "%s\t" : "%s ";
       char const *line_flag_1 = line_flag;
 
       if (cmp->suppress_blank_empty && empty)
