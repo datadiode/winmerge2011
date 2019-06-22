@@ -194,12 +194,14 @@ unsigned ByteCompare::CompareFiles(FileLocation *location, const stl_size_t x, c
 				{
 					// EOL on left side only
 					count[1] = NULL;
+					blankness_type[0] = BLANK; // Simulate a BLANK.
 					continue;
 				}
 				if (blankness_type[1] & (CR | LF | CRLF))
 				{
 					// EOL on right side only
 					count[0] = NULL;
+					blankness_type[1] = BLANK; // Simulate a BLANK.
 					continue;
 				}
 			}
