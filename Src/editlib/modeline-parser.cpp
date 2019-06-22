@@ -147,8 +147,6 @@ static const TCHAR *
 parse_vim_modeline (const TCHAR *s, ModelineOptions *options)
 {
 	BOOL in_set = FALSE;
-	BOOL neg;
-	UINT intval;
 	String key, value;
 
 	while (*s != '\0' && !(in_set && *s == ':'))
@@ -166,7 +164,7 @@ parse_vim_modeline (const TCHAR *s, ModelineOptions *options)
 			in_set = TRUE;
 		}
 
-		neg = FALSE;
+		BOOL neg = FALSE;
 		if (_tcsncmp (s, _T("no"), 2) == 0)
 		{
 			neg = TRUE;
@@ -207,7 +205,7 @@ parse_vim_modeline (const TCHAR *s, ModelineOptions *options)
 		else if (_tcscmp (key.c_str(), _T("ts")) == 0 ||
 			 _tcscmp (key.c_str(), _T("tabstop")) == 0)
 		{
-			intval = _ttoi (value.c_str());
+			UINT intval = _ttoi (value.c_str());
 			if (intval)
 			{
 				options->tab_width = intval;
@@ -217,7 +215,7 @@ parse_vim_modeline (const TCHAR *s, ModelineOptions *options)
 		else if (_tcscmp (key.c_str(), _T("sw")) == 0 ||
 			 _tcscmp (key.c_str(), _T("shiftwidth")) == 0)
 		{
-			intval = _ttoi (value.c_str());
+			UINT intval = _ttoi (value.c_str());
 			if (intval)
 			{
 				options->indent_width = intval;
@@ -231,14 +229,13 @@ parse_vim_modeline (const TCHAR *s, ModelineOptions *options)
 		}
 		else if (_tcscmp (key.c_str(), _T("textwidth")) == 0)
 		{
-			intval = _ttoi (value.c_str());
+			UINT intval = _ttoi (value.c_str());
 			if (intval)
 			{
 				options->right_margin_position = intval;
 				options->display_right_margin = TRUE;
 				options->set |= MODELINE_SET_SHOW_RIGHT_MARGIN |
 				                MODELINE_SET_RIGHT_MARGIN_POSITION;
-
 			}
 		}
 	}
