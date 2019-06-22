@@ -767,7 +767,6 @@ bool CLanguageSelect::GetPoHeaderProperty(const char *name, std::string &value) 
 		{
 			p += len + 1;
 			p += strspn(p, " \t");
-			bool lossy = false;
 			len = strcspn(p, " \t\r\n");
 			value.assign(p, static_cast<std::string::size_type>(len));
 			return true;
