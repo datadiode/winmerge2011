@@ -546,38 +546,6 @@ struct change *diff_2_files (struct comparison *cmp, int *bin_status,
 
       script = build_script (cmp->file);
 
-      /* Set CHANGES if we had any diffs.
-         If some changes are ignored, we must scan the script to decide.  */
-      if (cmp->ignore_blank_lines || USE_GNU_REGEX(ignore_regexp.fastmap))
-        {
-          struct change *next = script;
-          changes = 0;
-
-          while (next && changes == 0)
-            {
-              struct change *this, *end;
-              lin first0, last0, first1, last1;
-
-              /* Find a set of changes that belong together.  */
-              this = next;
-              end = find_change (cmp, next);
-
-              /* Disconnect them from the rest of the changes, making them
-                 a hunk, and remember the rest for next iteration.  */
-              next = end->link;
-              end->link = 0;
-
-              /* Determine whether this hunk is really a difference.  */
-              if (analyze_hunk (cmp, this, &first0, &last0, &first1, &last1) )
-                changes = 1;
-
-              /* Reconnect the script so it will all be freed properly.  */
-              end->link = next;
-            }
-        }
-      else
-        changes = (script != 0);
-
       /* WinMerge moved block support */
       if (moved_blocks_flag)
         {
