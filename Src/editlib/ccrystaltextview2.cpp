@@ -546,7 +546,7 @@ void CCrystalTextView::OnLButtonDown(WPARAM wParam, LPARAM lParam)
 	POINTSTOPOINT(point, lParam);
 	SetFocus();
 
-	if (point.x < GetMarginWidth())
+	if (point.x < GetMarginWidth() || KillTimer(m_nTripleClickTimer))
 	{
 		if (wParam & MK_CONTROL)
 		{
@@ -608,57 +608,49 @@ void CCrystalTextView::OnMouseMove(LPARAM lParam)
 	POINTSTOPOINT(point, lParam);
 	if (m_bDragSelection)
 	{
-		bool bOnMargin = point.x < GetMarginWidth();
-
 		AdjustTextPoint(point);
 		POINT ptNewCursorPos = ClientToText(point);
 
 		POINT ptStart, ptEnd;
 		if (m_bLineSelection)
 		{
-			if (bOnMargin)
+			POINT pos;
+			ptEnd = m_ptAnchor;
+			CharPosToPoint(ptEnd.y, ptEnd.x, pos);
+			if (ptNewCursorPos.y < m_ptAnchor.y ||
+				ptNewCursorPos.y == m_ptAnchor.y && ptNewCursorPos.x < m_ptAnchor.x)
 			{
-				POINT pos;
-				ptEnd = m_ptAnchor;
-				CharPosToPoint(ptEnd.y, ptEnd.x, pos);
-				if (ptNewCursorPos.y < m_ptAnchor.y ||
-					ptNewCursorPos.y == m_ptAnchor.y && ptNewCursorPos.x < m_ptAnchor.x)
-				{
-					const int nSublineIndex = GetSubLineIndex(ptEnd.y) + pos.y + 1;
-					if (nSublineIndex >= GetSubLineCount())
-						ptEnd.x = SubLineEndToCharPos(ptEnd.y, pos.y);
-					else
-					{
-						int nLine, nSubLine = GetLineBySubLine(nSublineIndex, nLine);
-						ptEnd.y = nLine;
-						ptEnd.x = SubLineHomeToCharPos(nLine, nSubLine);
-					}
-					CharPosToPoint(ptNewCursorPos.y, ptNewCursorPos.x, pos);
-					ptNewCursorPos.x = SubLineHomeToCharPos(ptNewCursorPos.y, pos.y);
-				}
+				const int nSublineIndex = GetSubLineIndex(ptEnd.y) + pos.y + 1;
+				if (nSublineIndex >= GetSubLineCount())
+					ptEnd.x = SubLineEndToCharPos(ptEnd.y, pos.y);
 				else
 				{
-					ptEnd.x = SubLineHomeToCharPos(ptEnd.y, pos.y);
-					m_ptCursorPos = ptNewCursorPos;
-					CharPosToPoint(ptNewCursorPos.y, ptNewCursorPos.x, pos);
-					const int nSublineIndex = GetSubLineIndex(ptNewCursorPos.y) + pos.y + 1;
-					if (nSublineIndex >= GetSubLineCount())
-						ptNewCursorPos.x = SubLineEndToCharPos(ptNewCursorPos.y, pos.y);
-					else
-					{
-						int nLine, nSubLine = GetLineBySubLine(nSublineIndex, nLine);
-						ptNewCursorPos.y = nLine;
-						ptNewCursorPos.x = SubLineHomeToCharPos(nLine, nSubLine);
-					}
+					int nLine, nSubLine = GetLineBySubLine(nSublineIndex, nLine);
+					ptEnd.y = nLine;
+					ptEnd.x = SubLineHomeToCharPos(nLine, nSubLine);
 				}
-				m_ptCursorPos = ptNewCursorPos;
-				SetSelection(ptNewCursorPos, ptEnd);
-				UpdateCaret();
-				return;
+				CharPosToPoint(ptNewCursorPos.y, ptNewCursorPos.x, pos);
+				ptNewCursorPos.x = SubLineHomeToCharPos(ptNewCursorPos.y, pos.y);
 			}
-			//  Moving to normal selection mode
-			::SetCursor(::LoadCursor(NULL, MAKEINTRESOURCE(IDC_IBEAM)));
-			m_bLineSelection = m_bWordSelection = false;
+			else
+			{
+				ptEnd.x = SubLineHomeToCharPos(ptEnd.y, pos.y);
+				m_ptCursorPos = ptNewCursorPos;
+				CharPosToPoint(ptNewCursorPos.y, ptNewCursorPos.x, pos);
+				const int nSublineIndex = GetSubLineIndex(ptNewCursorPos.y) + pos.y + 1;
+				if (nSublineIndex >= GetSubLineCount())
+					ptNewCursorPos.x = SubLineEndToCharPos(ptNewCursorPos.y, pos.y);
+				else
+				{
+					int nLine, nSubLine = GetLineBySubLine(nSublineIndex, nLine);
+					ptNewCursorPos.y = nLine;
+					ptNewCursorPos.x = SubLineHomeToCharPos(nLine, nSubLine);
+				}
+			}
+			m_ptCursorPos = ptNewCursorPos;
+			SetSelection(ptNewCursorPos, ptEnd);
+			UpdateCaret();
+			return;
 		}
 
 		if (m_bWordSelection)
@@ -813,6 +805,10 @@ void CCrystalTextView::OnTimer(UINT_PTR nIDEvent)
 			}
 		}
 	}
+	else if (nIDEvent == m_nTripleClickTimer)
+	{
+		KillTimer(m_nTripleClickTimer);
+	}
 }
 
 /**
@@ -836,6 +832,8 @@ void CCrystalTextView::OnLButtonDblClk(LPARAM lParam)
 		ToggleBookmark(ptCursorPos.y);
 		return;
 	}
+
+	SetTimer(m_nTripleClickTimer, GetDoubleClickTime());
 
 	if (!m_bDragSelection)
 	{

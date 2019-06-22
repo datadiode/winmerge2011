@@ -165,6 +165,7 @@ protected:
 	bool m_bDraggingText;
 	bool m_bDragSelection, m_bWordSelection, m_bLineSelection;
 	static UINT_PTR const m_nDragSelTimer = 1001;
+	static UINT_PTR const m_nTripleClickTimer = 1002;
 
 	POINT m_ptDrawSelStart, m_ptDrawSelEnd;
 	POINT m_ptAnchor;
