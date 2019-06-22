@@ -473,7 +473,6 @@ void CCrystalEditView::OnEditTab()
 	// Text selected, no overwrite mode, replace sel with tab
 	if (IsSelection())
 	{
-		POINT ptSelEnd;
 		GetSelection(ptCursorPos, ptSelEnd);
 		// [JRT]:
 		m_pTextBuffer->DeleteText(this, ptCursorPos.y, ptCursorPos.x, ptSelEnd.y, ptSelEnd.x, CE_ACTION_TYPING);
