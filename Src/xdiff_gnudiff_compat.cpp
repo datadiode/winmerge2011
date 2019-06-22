@@ -1,9 +1,6 @@
 #include "StdAfx.h"
-#include <io.h>
-#include <sys/stat.h>
 #include "CompareOptions.h"
 #include "diff.h"
-#include "xalloc.h"
 #include "libxdiff/xinclude.h"
 
 // Does the binary layout of struct change match that of xdchange_t?
