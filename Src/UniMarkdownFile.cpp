@@ -218,7 +218,6 @@ bool UniMarkdownFile::ReadString(String &line, String &eol, bool *lossy)
 			}
 			else if (m_current < m_base + m_filesize.Lo)
 			{
-				bDone = true;
 				line = maketstring((const char *)m_current, static_cast<int>(m_base + m_filesize.Lo - m_current));
 				CollapseWhitespace(line);
 				m_current = m_base + m_filesize.Lo;
