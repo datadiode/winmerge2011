@@ -438,7 +438,7 @@ ConversionResult ConvertUTF32toUTF8 (
 					    ch = UNI_REPLACEMENT_CHAR;
 					    result = sourceIllegal;
 	}
-	
+
 	target += bytesToWrite;
 	if (target > targetEnd) {
 	    --source; /* Back up source pointer! */
