@@ -87,8 +87,8 @@ void NTAPI Release(IUnknown *punk)
 {
 	while (punk)
 	{
-		ULONG Release = punk->Release();
-		if (Release == 0)
+		ULONG release = punk->Release();
+		if (release == 0)
 		{
 			punk = 0;
 		}

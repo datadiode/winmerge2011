@@ -200,8 +200,8 @@ class CThreadUpdating : public CProgressThreadVirt
 protected:
 	virtual HRESULT ProcessVirt()
 	{
-		HRESULT result = outArchive->UpdateItems(file, numItems, updateCallbackSpec);
-		return result;
+		HRESULT res = outArchive->UpdateItems(file, numItems, updateCallbackSpec);
+		return res;
 	}
 	CUpdateCallbackGUI *updateCallbackGUI;
 	IOutArchive *outArchive;
