@@ -384,7 +384,7 @@ find_and_hash_each_line (struct comparison *cmp, struct file_data *current)
               || PTRDIFF_MAX / sizeof *linbuf <= alloc_lines - linbuf_base)
             xalloc_die ();
           alloc_lines = 2 * alloc_lines - linbuf_base;
-          cureqs = (int *) xrealloc (cureqs, alloc_lines * sizeof *cureqs);
+          cureqs = (lin *) xrealloc (cureqs, alloc_lines * sizeof *cureqs);
           linbuf += linbuf_base;
           linbuf = (char const **) xrealloc ((void *) linbuf,
                                              (alloc_lines - linbuf_base) * sizeof *linbuf);
@@ -1026,7 +1026,7 @@ read_files (struct comparison *cmp, int *bin_file)
   cmp->nbuckets = (1 << i) - prime_offset[i];
   if (PTRDIFF_MAX / sizeof *cmp->buckets <= cmp->nbuckets)
     xalloc_die ();
-  cmp->buckets = (int *) zalloc ((cmp->nbuckets + 1) * sizeof *cmp->buckets) + 1;
+  cmp->buckets = (lin *) zalloc ((cmp->nbuckets + 1) * sizeof *cmp->buckets) + 1;
 
   for (i = 0; i < 2; i++)
     find_and_hash_each_line (cmp, &cmp->file[i]);

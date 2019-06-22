@@ -701,7 +701,7 @@ bool CDiffWrapper::LoadWinMergeDiffsFromDiffUtilsScript(struct change *script, s
 		/* Print thisob hunk.  */
 		//(*printfun) (thisob);
 		/* Determine range of line numbers involved in each file.  */
-		int first0 = 0, last0 = 0, first1 = 0, last1 = 0;
+		lin first0 = 0, last0 = 0, first1 = 0, last1 = 0;
 
 		/* Disconnect them from the rest of the changes,
 		making them a hunk, and remember the rest for next iteration.  */

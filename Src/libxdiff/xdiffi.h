@@ -41,7 +41,10 @@ typedef struct s_xdchange {
 	struct s_xdchange *next;
 	long i1, i2;
 	long chg1, chg2;
-	int ignore;
+	bool ignore;
+	bool trivial;	/* Flag if change is trivial (ignored blanks or filtered regexps) */
+	long match0;	/* side0 matching line for line 1 */ /* WinMerge moved block code */
+	long match1;	/* side1 matching line for line 0 */ /* WinMerge moved block code */
 } xdchange_t;
 
 

@@ -6,6 +6,17 @@
 #include "xalloc.h"
 #include "libxdiff/xinclude.h"
 
+// Does the binary layout of struct change match that of xdchange_t?
+C_ASSERT(sizeof(change) == sizeof(xdchange_t));
+C_ASSERT(offsetof(change, line0) == offsetof(xdchange_t, i1));
+C_ASSERT(offsetof(change, line1) == offsetof(xdchange_t, i2));
+C_ASSERT(offsetof(change, deleted) == offsetof(xdchange_t, chg1));
+C_ASSERT(offsetof(change, inserted) == offsetof(xdchange_t, chg2));
+C_ASSERT(offsetof(change, ignore) == offsetof(xdchange_t, ignore));
+C_ASSERT(offsetof(change, trivial) == offsetof(xdchange_t, trivial));
+C_ASSERT(offsetof(change, match0) == offsetof(xdchange_t, match0));
+C_ASSERT(offsetof(change, match1) == offsetof(xdchange_t, match1));
+
 static int hunk_func(long start_a, long count_a, long start_b, long count_b, void *cb_data)
 {
 	return 0;
@@ -72,26 +83,12 @@ struct change *diff_2_files_xdiff(struct comparison *cmp, int bMoved_blocks_flag
 	xecfg.hunk_func = hunk_func;
 	if (xdl_diff_modified(&mmfile1, &mmfile2, &xpp, &xecfg, &ecb, &xe, &xscr) == 0)
 	{
-		change *prev = NULL;
-		for (xdchange_t *xcur = xscr; xcur; xcur = xcur->next)
-		{
-			change *const e = static_cast<change *>(xmalloc(sizeof(change)));
-			e->line0 = xcur->i1;
-			e->line1 = xcur->i2;
-			e->deleted = xcur->chg1;
-			e->inserted = xcur->chg2;
-			e->match0 = -1;
-			e->match1 = -1;
-			e->trivial = xcur->ignore != 0;
-			e->link = NULL;
-			prev = (prev ? prev->link : script) = e;
-		}
+		script = reinterpret_cast<change *>(xscr);
 		if (bMoved_blocks_flag)
 		{
 			void moved_block_analysis(struct change *script, struct file_data fd[]);
 			moved_block_analysis(script, cmp->file);
 		}
-		xdl_free_script(xscr);
 		xdl_free_env(&xe);
 	}
 

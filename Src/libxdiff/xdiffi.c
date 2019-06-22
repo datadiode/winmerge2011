@@ -377,7 +377,10 @@ static xdchange_t *xdl_add_change(xdchange_t *xscr, long i1, long i2, long chg1,
 	xch->i2 = i2;
 	xch->chg1 = chg1;
 	xch->chg2 = chg2;
-	xch->ignore = 0;
+	xch->ignore = false;
+	xch->trivial = false;
+	xch->match0 = -1; /* WinMerge moved block code */
+	xch->match1 = -1; /* WinMerge moved block code */
 
 	return xch;
 }
@@ -992,7 +995,7 @@ static void xdl_mark_ignorable(xdchange_t *xscr, xdfenv_t *xe, long flags)
 	xdchange_t *xch;
 
 	for (xch = xscr; xch; xch = xch->next) {
-		int ignore = 1;
+		bool ignore = true;
 		xrecord_t **rec;
 		long i;
 

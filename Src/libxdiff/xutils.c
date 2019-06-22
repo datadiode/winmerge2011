@@ -147,7 +147,7 @@ long xdl_guess_lines(mmfile_t *mf, long sample) {
 	return nl + 1;
 }
 
-int xdl_blankline(const char *line, long size, long flags)
+bool xdl_blankline(const char *line, long size, long flags)
 {
 	long i;
 

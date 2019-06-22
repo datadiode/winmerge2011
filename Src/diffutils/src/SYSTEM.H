@@ -103,7 +103,7 @@ typedef unsigned UNALIGNED word;
 /* The signed integer type of a line number.  Since files are read
    into main memory, ptrdiff_t should be wide enough.  */
 
-typedef int lin;
+typedef long lin;
 #define LIN_MAX INT_MAX
 
 /* The signed integer type for printing line numbers, and its printf

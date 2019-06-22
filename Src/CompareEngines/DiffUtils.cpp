@@ -66,7 +66,7 @@ int DiffUtils::diffutils_compare_files(struct comparison *cmp)
 			debug_script(thisob);
 #endif
 			/* Determine range of line numbers involved in each file.  */
-			int first0 = 0, last0 = 0, first1 = 0, last1 = 0;
+			lin first0 = 0, last0 = 0, first1 = 0, last1 = 0;
 			enum changes changes = analyze_hunk(cmp, thisob, &first0, &last0, &first1, &last1);
 			if (changes || thisob->trivial)
 			{

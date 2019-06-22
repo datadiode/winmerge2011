@@ -100,12 +100,12 @@ enum DIFF_white_space
 
 struct change
 {
-  struct change *link;		/* Previous or next edit command  */
-  lin inserted;			/* # lines of file 1 changed here.  */
-  lin deleted;			/* # lines of file 0 changed here.  */
-  lin line0;			/* Line number of 1st deleted line.  */
-  lin line1;			/* Line number of 1st inserted line.  */
-  bool ignore;			/* Flag used in context.c.  */
+  struct change *link;          /* Previous or next edit command  */
+  lin line0;                    /* Line number of 1st deleted line.  */
+  lin line1;                    /* Line number of 1st inserted line.  */
+  lin deleted;                  /* # lines of file 0 changed here.  */
+  lin inserted;                 /* # lines of file 1 changed here.  */
+  bool ignore;                  /* Flag used in context.c.  */
   bool trivial;                 /* Flag if change is trivial (ignored blanks or filtered regexps) */
   lin match0;                   /* side0 matching line for line 1 */ /* WinMerge moved block code */
   lin match1;                   /* side1 matching line for line 0 */ /* WinMerge moved block code */
@@ -118,9 +118,9 @@ extern const char allocated_buffer_name[];
 /* Data on one input file being compared.  */
 
 struct file_data {
-    int             desc;	/* File descriptor  */
-    char const      *name;	/* File name  */
-    struct _stati64 stat;	/* File status from fstat()  */
+    int             desc;   /* File descriptor  */
+    char const      *name;  /* File name  */
+    struct _stati64 stat;   /* File status from fstat()  */
 
     /* Buffer in which text of file is read.  */
     word *buffer;
@@ -195,7 +195,7 @@ struct comparison
     struct file_data file[2];
 
     /* Hash-table: array of buckets, each being a chain of equivalence classes.  */
-    int *buckets;
+    lin *buckets;
 
     /* Number of buckets in the hash table array. */
     int nbuckets;

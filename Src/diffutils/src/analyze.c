@@ -514,7 +514,7 @@ struct change *diff_2_files (struct comparison *cmp, int *bin_status,
       ctxt.yvec = cmp->file[1].undiscarded;
       diags = (cmp->file[0].nondiscarded_lines
                + cmp->file[1].nondiscarded_lines + 3);
-      ctxt.fdiag = (int *) xmalloc (diags * (2 * sizeof * ctxt.fdiag));
+      ctxt.fdiag = (lin *) xmalloc (diags * (2 * sizeof * ctxt.fdiag));
       ctxt.bdiag = ctxt.fdiag + diags;
       ctxt.fdiag += cmp->file[1].nondiscarded_lines + 1;
       ctxt.bdiag += cmp->file[1].nondiscarded_lines + 1;
@@ -556,7 +556,7 @@ struct change *diff_2_files (struct comparison *cmp, int *bin_status,
           while (next && changes == 0)
             {
               struct change *this, *end;
-              int first0, last0, first1, last1;
+              lin first0, last0, first1, last1;
 
               /* Find a set of changes that belong together.  */
               this = next;
