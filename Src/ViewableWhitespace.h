@@ -13,14 +13,13 @@
  */
 struct ViewableWhitespaceChars
 {
-	// U+BB: RIGHT POINTING DOUBLE ANGLE QUOTATION MARK
-	// U+B7: MIDDLE DOT
-	// U+A7: SECTION SIGN
-	// U+B6: PILCROW SIGN
-	// U+A4: CURRENCY SIGN
+	// U+00BB: RIGHT POINTING DOUBLE ANGLE QUOTATION MARK
+	// U+00B7: MIDDLE DOT
+	// U+00AC: NOT SIGN
+	// U+2193: DOWN ARROW
 	static const TCHAR c_tab	= L'\x00BB'; /**< Visible character for tabs. */
 	static const TCHAR c_space	= L'\x00B7'; /**< Visible character for spaces. */
-	static const TCHAR c_cr		= L'\x00A7'; /**< Visible character for CR EOL chars. */
-	static const TCHAR c_lf		= L'\x00B6'; /**< Visible character for LF EOL chars. */
-	static const TCHAR c_eol	= L'\x00A4'; /**< Visible character for general EOL chars. */
+	static const TCHAR c_cr		= L'\x00AC'; /**< Visible character for CR EOL chars. */
+	static const TCHAR c_lf		= L'\x2193'; /**< Visible character for LF EOL chars. */
+	static const TCHAR c_eol	= L'\x00AC'; /**< Visible character for general EOL chars. */
 };
