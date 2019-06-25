@@ -2,7 +2,7 @@
 # Released under the "GNU General Public License"
 #
 # Translators:
-# * Dalius Guzauskas (aka Tichij) (tichij AT mail DOT com)
+# * Dalius Guzauskas (aka Tichij) <tichij AT mail DOT com>
 #
 # ID line follows -- this is updated by SVN
 # $Id: Lithuanian.po
@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WinMerge\n"
 "Report-Msgid-Bugs-To: http://bugs.winmerge.org/\n"
-"POT-Creation-Date: 2018-08-11 11:21+0000\n"
-"PO-Revision-Date: 2019-01-03 08:44+0200\n"
+"POT-Creation-Date: 2019-06-22 08:38+0000\n"
+"PO-Revision-Date: 2019-06-25 08:40+0200\n"
 "Last-Translator: Tichij <tichij@mail.com>\n"
 "Language-Team: Lithuanian <winmerge-translate@lists.sourceforge.net>\n"
 "Language: lt\n"
@@ -23,7 +23,7 @@ msgstr ""
 "X-Poedit-Language: Lithuanian\n"
 "X-Poedit-SourceCharset: CP1252\n"
 "X-Poedit-Basepath: ../../Src/\n"
-"X-Generator: Poedit 2.2\n"
+"X-Generator: Poedit 2.2.3\n"
 
 #. LANGUAGE, SUBLANGUAGE
 #, c-format
@@ -2391,7 +2391,7 @@ msgstr "K&onteksto limitas:"
 #: Merge.rc:1368
 #, c-format
 msgid "&Diff algorithm:"
-msgstr ""
+msgstr "Lyginimo algoritmas:"
 
 #: Merge.rc:1370
 #, c-format
@@ -2406,7 +2406,7 @@ msgstr "Paspartinti dideliø failø apdorojimà"
 #: Merge.rc:1372
 #, c-format
 msgid "Apply indent &heuristic"
-msgstr ""
+msgstr "Taikyti &heuristinæ átraukà"
 
 #: Merge.rc:1373
 #, c-format
@@ -3660,7 +3660,7 @@ msgstr "Paskutinës operacijos kartojimas..."
 #: Merge.rc:1761
 #, c-format
 msgid "Ln: %s  Col: %d/%d  Ch: %d/%d  EOL: %s"
-msgstr "Eil.: %s  Stlp.: %d/%d  Sk.: %d/%d  EPS: %s"
+msgstr "Eil.: %s  Stlp.: %d/%d  Sk.: %d/%d  EPF: %s"
 
 #: Merge.rc:1762
 #, c-format
@@ -4352,7 +4352,7 @@ msgstr "Perkelti pasirinktà failà deðinëje á pasirinktà katalogà"
 #: Merge.rc:1867
 #, c-format
 msgid "Filename"
-msgstr "Failo vardas"
+msgstr "Failas"
 
 #: Merge.rc:1868
 #, c-format
@@ -4447,12 +4447,12 @@ msgstr "Deðiniojo atributai"
 #: Merge.rc:1888
 #, c-format
 msgid "Left EOL"
-msgstr "Kairiojo eiluèiø pabaigos formatas"
+msgstr "Kairiojo EPF"
 
 #: Merge.rc:1889
 #, c-format
 msgid "Right EOL"
-msgstr "Deðiniojo eiluèiø pabaigos formatas"
+msgstr "Deðiniojo EPF"
 
 #: Merge.rc:1890
 #, c-format
@@ -4467,7 +4467,7 @@ msgstr "Deðiniojo koduotë"
 #: Merge.rc:1892
 #, c-format
 msgid "Ignored Diff."
-msgstr "Ignoruoti skirtumai."
+msgstr "Ignoruoti skirtumai"
 
 #: Merge.rc:1895
 #, c-format
@@ -4652,12 +4652,12 @@ msgstr "Deðiniosios pusës atributai."
 #: Merge.rc:1933
 #, c-format
 msgid "Left side file EOL type"
-msgstr "Kairiojo failo eiluèiø pabaigos formatas"
+msgstr "Kairiojo failo eiluèiø pabaigos formatas."
 
 #: Merge.rc:1934
 #, c-format
 msgid "Right side file EOL type"
-msgstr "Deðiniojo failo eiluèiø pabaigos formatas"
+msgstr "Deðiniojo failo eiluèiø pabaigos formatas."
 
 #: Merge.rc:1935
 #, c-format
@@ -5701,5 +5701,5 @@ msgstr "%d eilutës iðbrauktos"
 #: Merge.rc:2110
 #, c-format
 msgid "Shell menu"
-msgstr ""
+msgstr "Sistemos meniu"
 
