@@ -49,16 +49,19 @@ struct equivclass
 };
 
 /** @brief Get unicode signature from file_data. */
-static UNICODESET get_unicode_signature (struct file_data *current, unsigned *bom)
+static void get_unicode_signature (struct file_data *current)
 {
-  unsigned dummy = 0;
   /* Prevent bogus BOMs from crashing in-place transcoding upon Rescan(). */
   if (current->name == allocated_buffer_name &&
       current->buffered + sizeof (word) + 1 == current->bufsize)
     {
-      return NONE;
+      current->sig = UTF8;
+      current->bom = 0;
     }
-  return DetermineEncoding ((unsigned char *) FILE_BUFFER (current), current->buffered, current->buffered, bom ? bom : &dummy);
+  else
+    {
+      current->sig = DetermineEncoding ((unsigned char *) FILE_BUFFER (current), current->buffered, current->buffered, &current->bom);
+    }
 }
 
 /* Read a block of data into a file buffer, checking for EOF and error.  */
@@ -112,16 +115,16 @@ sip (struct file_data *current, bool skip_test)
                                      PTRDIFF_MAX - 2 * sizeof (word));
       current->buffer = (word *) xmalloc (current->bufsize);
       current->buffered = 0;
-
-      if (! skip_test)
-        {
-          /* Check first part of file to see if it's a binary file.  */
-          file_block_read (current, current->bufsize);
-          if (!get_unicode_signature (current, NULL))
-            isbinary = binary_file_p (current->buffer, current->buffered);
-        }
+      file_block_read (current, current->bufsize);
     }
 
+  get_unicode_signature (current);
+
+  if (!skip_test && !current->sig)
+    {
+      /* Check first part of file to see if it's a binary file.  */
+      isbinary = binary_file_p (current->buffer, current->buffered);
+    }
   return isbinary;
 }
 
@@ -138,9 +141,8 @@ slurp (struct file_data *current)
     ;
   else if (current->buffered != 0)
     {
-      UNICODESET sig = get_unicode_signature (current, NULL);
-      size_t alloc_extra
-      = (1 << sig) & ((1 << UCS2LE) | (1 << UCS2BE) | (1 << UCS4LE) | (1 << UCS4BE))
+      size_t const alloc_extra
+      = ((1 << current->sig) & ((1 << UCS2LE) | (1 << UCS2BE) | (1 << UCS4LE) | (1 << UCS4BE)))
         // some flavor of non octet encoded unicode?
         ? ~0U	// yes, allocate extra room for transcoding
         : 0U;	// no, allocate no extra room for transcoding
@@ -458,9 +460,8 @@ prepare_text (struct comparison *cmp, struct file_data *current, short side)
   char *const p = FILE_BUFFER (current);
   char *r = p; // receives the return value
   char *q, *t;
-  unsigned bom = 0;
-  UNICODESET sig = get_unicode_signature (current, &bom);
-  char *const u = p + bom;
+  UNICODESET const sig = current->sig;
+  char *const u = p + current->bom;
 
   if (sig == UCS4LE)
     {
@@ -505,7 +506,7 @@ prepare_text (struct comparison *cmp, struct file_data *current, short side)
               *--r = 0x80 + ((u >> 6) & 0x3F);
               *--r = 0xE0 + (char)(u >> 12);
             }
-          else if (u >= 0x80 || u == 0) // map NUL to 2 byte sequence so as to prevent it from confusing diff algorithm
+          else if (u >= 0x80)
             {
               *--r = 0x80 + (u & 0x3F);
               *--r = 0xC0 + (char)(u >> 6);
@@ -563,7 +564,7 @@ prepare_text (struct comparison *cmp, struct file_data *current, short side)
               *--r = 0x80 + ((u >> 6) & 0x3F);
               *--r = 0xE0 + (char)(u >> 12);
             }
-          else if (u >= 0x80 || u == 0) // map NUL to 2 byte sequence so as to prevent it from confusing diff algorithm
+          else if (u >= 0x80)
             {
               *--r = 0x80 + (u & 0x3F);
               *--r = 0xC0 + (char)(u >> 6);
@@ -589,7 +590,7 @@ prepare_text (struct comparison *cmp, struct file_data *current, short side)
               *--r = 0x80 + ((u >> 6) & 0x3F);
               *--r = 0xE0 + (u >> 12);
             }
-          else if (u >= 0x80 || u == 0) // map NUL to 2 byte sequence so as to prevent it from confusing diff algorithm
+          else if (u >= 0x80)
             {
               *--r = 0x80 + (u & 0x3F);
               *--r = 0xC0 + (u >> 6);
@@ -615,7 +616,7 @@ prepare_text (struct comparison *cmp, struct file_data *current, short side)
               *--r = 0x80 + ((u >> 6) & 0x3F);
               *--r = 0xE0 + (u >> 12);
             }
-          else if (u >= 0x80 || u == 0) // map NUL to 2 byte sequence so as to prevent it from confusing diff algorithm
+          else if (u >= 0x80)
             {
               *--r = 0x80 + (u & 0x3F);
               *--r = 0xC0 + (u >> 6);
@@ -987,6 +988,8 @@ read_files (struct comparison *cmp, int *bin_file)
       cmp->file[1].buffer = cmp->file[0].buffer;
       cmp->file[1].bufsize = cmp->file[0].bufsize;
       cmp->file[1].buffered = cmp->file[0].buffered;
+      cmp->file[1].sig = cmp->file[0].sig;
+      cmp->file[1].bom = cmp->file[0].bom;
     }
   else if (sip (&cmp->file[1], skip_test))
     {

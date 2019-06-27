@@ -228,7 +228,7 @@ int regexp_item::process(const std::vector<regexp_item> &relist,
 										*buf++ = 0x80 + ((u >> 6) & 0x3F);
 										*buf++ = 0x80 + (u & 0x3F);
 									}
-									else if (u >= 0x80 || u == 0) // map NUL to 2 byte sequence so as to prevent it from confusing diff algorithm
+									else if (u >= 0x80)
 									{
 										*buf++ = 0xC0 + (u >> 6);
 										*buf++ = 0x80 + (u & 0x3F);

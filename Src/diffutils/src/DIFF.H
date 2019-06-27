@@ -181,6 +181,10 @@ struct file_data {
 
     /* text stats for WinMerge */
     lin count_crlfs, count_crs, count_lfs, count_zeros;
+
+    /* Encoding info for WinMerge */
+    enum UnicodeSet sig;
+    unsigned bom;
 };
 
 /* The file buffer, considered as an array of bytes rather than

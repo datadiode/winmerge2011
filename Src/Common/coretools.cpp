@@ -8,18 +8,6 @@
 #include "coretools.h"
 #include "paths.h"
 
-int linelen(const char *string)
-{
-	int stringlen = 0;
-	while (char c = string[stringlen])
-	{
-		if (c == '\r' || c == '\n')
-			break;
-		++stringlen;
-	}
-	return stringlen;
-}
-
 /**
  * @brief Convert C style \\nnn, \\r, \\n, \\t etc into their indicated characters.
  * @param [in] codepage Codepage to use in conversion.

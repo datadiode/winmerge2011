@@ -9,7 +9,7 @@
 #pragma once
 
 /** @brief Known Unicode encodings. */
-typedef enum
+typedef enum UnicodeSet
 {
 	NONE,      /**< No unicode. */
 	UCS2LE,    /**< UCS-2 / UTF-16 little endian. */
