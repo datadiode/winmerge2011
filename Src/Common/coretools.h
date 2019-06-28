@@ -14,8 +14,6 @@ LPWSTR NTAPI EatPrefixTrim(LPCWSTR text, LPCWSTR prefix);
 String GetModulePath(HMODULE hModule = NULL);
 DWORD_PTR GetShellImageList();
 
-int linelen(const char *string);
-
 unsigned Unslash(unsigned codepage, char *string);
 
 inline void Unslash(unsigned codepage, std::string &s)

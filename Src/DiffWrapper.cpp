@@ -659,9 +659,14 @@ int CDiffWrapper::RegExpFilter(struct comparison *cmp,
 	int line = StartPos;
 	while (line <= EndPos)
 	{
-		const char *string = cmp->file[FileNo].linbuf[line];
-		int stringlen = linelen(string);
-		if (FilterList::Match(stringlen, string, m_codepage) == BreakCondition)
+		// find_and_hash_each_line() records "one more line start than
+		// lines, so that we can compute the length of any buffered line".
+		const char *const p = cmp->file[FileNo].linbuf[line];
+		const char *q = cmp->file[FileNo].linbuf[line + 1];
+		// exclude the line ending
+		int n;
+		do n = static_cast<int>(q - p); while (n && iseolch(*--q));
+		if (FilterList::Match(n, p, m_codepage) == BreakCondition)
 			break;
 		++line;
 	}
