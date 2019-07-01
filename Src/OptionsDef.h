@@ -365,7 +365,7 @@ extern COptionDef
 extern COptionDef
 <int> OPT_CMP_DIFF_ALGORITHM inline((_T("Settings/DiffAlgorithm"), 0));
 extern COptionDef
-<bool> OPT_CMP_INDENT_HEURISTIC inline((_T("Settings/IndentHeuristic"), false));
+<bool> OPT_CMP_INDENT_HEURISTIC inline((_T("Settings/IndentHeuristic"), true));
 
 // Multidoc enable/disable per document type
 extern COptionDef
