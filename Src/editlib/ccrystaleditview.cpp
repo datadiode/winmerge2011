@@ -1023,13 +1023,18 @@ static int bracetype(LPCTSTR s)
 	return bracetype(*s);
 }
 
+static bool iseol(LPCTSTR pszText, int cchText)
+{
+	return cchText == 1 && LineInfo::IsEol(*pszText) || cchText == 2 && LineInfo::IsDosEol(pszText);
+}
+
 void CCrystalEditView::OnEditOperation(int nAction, LPCTSTR pszText, int cchText)
 {
 	DWORD const dwFlags = m_pTextBuffer->GetFlags();
 	if (dwFlags & SRCOPT_AUTOINDENT)
 	{
 		//  Analyse last action...
-		if (nAction == CE_ACTION_TYPING && cchText == 2 && LineInfo::IsDosEol(pszText) && !m_bOvrMode)
+		if (nAction == CE_ACTION_TYPING && iseol(pszText, cchText) && !m_bOvrMode)
 		{
 			//  Enter stroke!
 			POINT ptCursorPos = GetCursorPos();
