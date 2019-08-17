@@ -70,11 +70,11 @@ struct change *diff_2_files_xdiff(struct comparison *cmp, int bMoved_blocks_flag
 
 	mmfile_t mmfile1 = {
 		const_cast<char *>(cmp->file[0].prefix_end),
-		static_cast<long>(cmp->file[0].suffix_begin - cmp->file[0].prefix_end)
+		static_cast<long>(cmp->file[0].suffix_begin - cmp->file[0].prefix_end) - cmp->file[0].missing_newline
 	};
 	mmfile_t mmfile2 = {
 		const_cast<char *>(cmp->file[1].prefix_end),
-		static_cast<long>(cmp->file[1].suffix_begin - cmp->file[1].prefix_end)
+		static_cast<long>(cmp->file[1].suffix_begin - cmp->file[1].prefix_end) - cmp->file[1].missing_newline
 	};
 
 	xecfg.hunk_func = hunk_func;

@@ -331,8 +331,7 @@ find_and_hash_each_line (struct comparison *cmp, struct file_data *current)
              complete line, put it into buckets[-1] so that it can
              compare equal only to the other file's incomplete line
              (if one exists).  */
-          if (ig_white_space < IGNORE_TRAILING_SPACE)
-            bucket = &cmp->buckets[-1];
+          bucket = &cmp->buckets[-1]; /* WinMerge: regardless of ig_white_space */
         }
 
       for (i = *bucket;  ;  i = eqs[i].next)

@@ -194,6 +194,11 @@ int xdl_recmatch(const char *l1, long s1, const char *l2, long s2, long flags)
 {
 	int i1, i2;
 
+	bool const has_eol1 = s1 && is_eol(l1 + s1 - 1, l1 + s1);
+	bool const has_eol2 = s2 && is_eol(l2 + s2 - 1, l2 + s2);
+	if (has_eol1 != has_eol2)
+		return 0;
+
 	if (s1 == s2 && !memcmp(l1, l2, s1))
 		return 1;
 	if (!(flags & XDF_INEXACT_MATCH))
