@@ -2414,9 +2414,10 @@ msgstr "コメントの差異を無視する"
 msgid "Apply historic cost limit"
 msgstr ""
 
+#. Options dialog|Categories
 #: Merge.rc:1382
-#: Merge.rc:1871
 #, c-format
+msgctxt "Options dialog|Categories"
 msgid "Folder"
 msgstr "フォルダ"
 
@@ -2615,10 +2616,10 @@ msgstr "WinMerge は、いくつかの共通メッセージボックスを非表示にできます。 全ての
 msgid "Reset"
 msgstr "リセット"
 
+#. Options dialog|Categories
 #: Merge.rc:1469
-#: Merge.rc:1894
-#: Merge.rc:2014
 #, c-format
+msgctxt "Options dialog|Categories"
 msgid "Binary"
 msgstr "バイナリ"
 
@@ -4277,6 +4278,13 @@ msgstr ""
 msgid "Attributes"
 msgstr ""
 
+#. DirView|ColumnHeader
+#: Merge.rc:1871
+#, c-format
+msgctxt "DirView|ColumnHeader"
+msgid "Folder"
+msgstr "フォルダ"
+
 #: Merge.rc:1872
 #, c-format
 msgid "Comparison result"
@@ -4381,6 +4389,13 @@ msgstr "右エンコーディング"
 #, c-format
 msgid "Ignored Diff."
 msgstr "無視された差異数"
+
+#. DirView|ColumnHeader
+#: Merge.rc:1894
+#, c-format
+msgctxt "DirView|ColumnHeader"
+msgid "Binary"
+msgstr "バイナリ"
 
 #: Merge.rc:1895
 #, c-format
@@ -5006,6 +5021,13 @@ msgstr "Unix"
 #, c-format
 msgid "Mixed"
 msgstr "Mixed"
+
+#. EOL Type
+#: Merge.rc:2014
+#, c-format
+msgctxt "EOL Type"
+msgid "Binary"
+msgstr "バイナリ"
 
 #: Merge.rc:2015
 #, c-format

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WinMerge\n"
 "Report-Msgid-Bugs-To: http://bugs.winmerge.org/\n"
-"POT-Creation-Date: 2019-06-22 08:38+0000\n"
+"POT-Creation-Date: 2019-10-05 12:36+0000\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: English <winmerge-translate@lists.sourceforge.net>\n"
@@ -2408,9 +2408,10 @@ msgstr ""
 msgid "Apply historic cost limit"
 msgstr ""
 
+#. Options dialog|Categories
 #: Merge.rc:1382
-#: Merge.rc:1871
 #, c-format
+msgctxt "Options dialog|Categories"
 msgid "Folder"
 msgstr ""
 
@@ -2609,10 +2610,10 @@ msgstr ""
 msgid "Reset"
 msgstr ""
 
+#. Options dialog|Categories
 #: Merge.rc:1469
-#: Merge.rc:1894
-#: Merge.rc:2014
 #, c-format
+msgctxt "Options dialog|Categories"
 msgid "Binary"
 msgstr ""
 
@@ -4005,6 +4006,13 @@ msgstr ""
 msgid "Attributes"
 msgstr ""
 
+#. DirView|ColumnHeader
+#: Merge.rc:1871
+#, c-format
+msgctxt "DirView|ColumnHeader"
+msgid "Folder"
+msgstr ""
+
 #: Merge.rc:1872
 #, c-format
 msgid "Comparison result"
@@ -4108,6 +4116,13 @@ msgstr ""
 #: Merge.rc:1892
 #, c-format
 msgid "Ignored Diff."
+msgstr ""
+
+#. DirView|ColumnHeader
+#: Merge.rc:1894
+#, c-format
+msgctxt "DirView|ColumnHeader"
+msgid "Binary"
 msgstr ""
 
 #: Merge.rc:1895
@@ -4693,6 +4708,13 @@ msgstr ""
 #: Merge.rc:2013
 #, c-format
 msgid "Mixed"
+msgstr ""
+
+#. EOL Type
+#: Merge.rc:2014
+#, c-format
+msgctxt "EOL Type"
+msgid "Binary"
 msgstr ""
 
 #: Merge.rc:2015

@@ -1379,7 +1379,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 1
 
 IDD_PROPPAGE_COMPARE_FOLDER DIALOGEX 105, 0, 236, 222
 STYLE DS_CONTROL | DS_SHELLFONT | WS_CAPTION | WS_CHILDWINDOW
-CAPTION "Folder"
+CAPTION "Folder" //msgctxt Options dialog|Categories
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
     LTEXT           "&Compare method:", IDC_STATIC, 7, 9, 100, 9, SS_LEFT, WS_EX_LEFT
@@ -1466,7 +1466,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 1
 
 IDD_PROPPAGE_HEX_EDITOR DIALOGEX 105, 0, 235, 215
 STYLE DS_CONTROL | DS_SHELLFONT | WS_CAPTION | WS_CHILDWINDOW
-CAPTION "Binary"
+CAPTION "Binary" //msgctxt Options dialog|Categories
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
     LTEXT           "Number of bytes to display per line:", IDC_STATIC, 7, 7, 220, 8, SS_LEFT, WS_EX_LEFT
@@ -1868,7 +1868,7 @@ STRINGTABLE
     IDS_COLHDR_TIMEM              "Date"
     IDS_COLHDR_ATTRIBUTES         "Attributes"
     IDS_COLHDR_SIZE               "Size"
-    IDS_COLHDR_DIR                "Folder"
+    IDS_COLHDR_DIR                "Folder" //msgctxt DirView|ColumnHeader
     IDS_COLHDR_RESULT             "Comparison result"
     IDS_COLHDR_LTIMEM             "Left Date"
     IDS_COLHDR_RTIMEM             "Right Date"
@@ -1891,7 +1891,7 @@ STRINGTABLE
     IDS_COLHDR_RENCODING          "Right Encoding"
     IDS_COLHDR_NIDIFFS            "Ignored Diff."
     IDS_COLHDR_NSDIFFS            "Differences"
-    IDS_COLHDR_BINARY             "Binary"
+    IDS_COLHDR_BINARY             "Binary" //msgctxt DirView|ColumnHeader
     IDS_CANT_COMPARE_FILES        "Unable to compare files"
     IDS_ABORTED_ITEM              "Item aborted"
     IDS_FILE_SKIPPED              "File skipped"
@@ -2011,7 +2011,7 @@ STRINGTABLE
     IDS_EOL_MAC                   "Mac"
     IDS_EOL_UNIX                  "Unix"
     IDS_EOL_MIXED                 "Mixed"
-    IDS_EOL_BIN                   "Binary"
+    IDS_EOL_BIN                   "Binary" //msgctxt EOL Type
     IDS_EOL_LF                    "LF"
     IDS_EOL_CR                    "CR"
     IDS_EOL_CRLF                  "CRLF"

@@ -2412,9 +2412,10 @@ msgstr "过滤注释"
 msgid "Apply historic cost limit"
 msgstr ""
 
+#. Options dialog|Categories
 #: Merge.rc:1382
-#: Merge.rc:1871
 #, c-format
+msgctxt "Options dialog|Categories"
 msgid "Folder"
 msgstr "文件夹"
 
@@ -2613,10 +2614,10 @@ msgstr "WinMerge允许隐藏一些常见的提示信息, 点击“重置”按钮可以使隐藏的信息新显
 msgid "Reset"
 msgstr "重置"
 
+#. Options dialog|Categories
 #: Merge.rc:1469
-#: Merge.rc:1894
-#: Merge.rc:2014
 #, c-format
+msgctxt "Options dialog|Categories"
 msgid "Binary"
 msgstr "二进制"
 
@@ -4249,6 +4250,13 @@ msgstr "日期"
 msgid "Attributes"
 msgstr "属性"
 
+#. DirView|ColumnHeader
+#: Merge.rc:1871
+#, c-format
+msgctxt "DirView|ColumnHeader"
+msgid "Folder"
+msgstr "文件夹"
+
 #: Merge.rc:1872
 #, c-format
 msgid "Comparison result"
@@ -4353,6 +4361,13 @@ msgstr "右侧文件编码"
 #, c-format
 msgid "Ignored Diff."
 msgstr "忽略的不同处"
+
+#. DirView|ColumnHeader
+#: Merge.rc:1894
+#, c-format
+msgctxt "DirView|ColumnHeader"
+msgid "Binary"
+msgstr "二进制"
 
 #: Merge.rc:1895
 #, c-format
@@ -4967,6 +4982,13 @@ msgstr "Unix"
 #, c-format
 msgid "Mixed"
 msgstr "混合"
+
+#. EOL Type
+#: Merge.rc:2014
+#, c-format
+msgctxt "EOL Type"
+msgid "Binary"
+msgstr ""
 
 #: Merge.rc:2015
 #, c-format

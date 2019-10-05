@@ -2415,9 +2415,10 @@ msgstr "Фільтр коментарів"
 msgid "Apply historic cost limit"
 msgstr ""
 
+#. Options dialog|Categories
 #: Merge.rc:1382
-#: Merge.rc:1871
 #, c-format
+msgctxt "Options dialog|Categories"
 msgid "Folder"
 msgstr "Тека"
 
@@ -2616,10 +2617,10 @@ msgstr "WinMerge не показує деякі повідомлення. Натисніть Скинути, щоб демонстру
 msgid "Reset"
 msgstr "Скинути"
 
+#. Options dialog|Categories
 #: Merge.rc:1469
-#: Merge.rc:1894
-#: Merge.rc:2014
 #, c-format
+msgctxt "Options dialog|Categories"
 msgid "Binary"
 msgstr "Бінарний"
 
@@ -4280,6 +4281,13 @@ msgstr ""
 msgid "Attributes"
 msgstr ""
 
+#. DirView|ColumnHeader
+#: Merge.rc:1871
+#, c-format
+msgctxt "DirView|ColumnHeader"
+msgid "Folder"
+msgstr "Тека"
+
 #: Merge.rc:1872
 #, c-format
 msgid "Comparison result"
@@ -4384,6 +4392,13 @@ msgstr "Кодування файлу праворуч"
 #, c-format
 msgid "Ignored Diff."
 msgstr "Знех. відмінності"
+
+#. DirView|ColumnHeader
+#: Merge.rc:1894
+#, c-format
+msgctxt "DirView|ColumnHeader"
+msgid "Binary"
+msgstr "Бінарний"
 
 #: Merge.rc:1895
 #, c-format
@@ -5007,6 +5022,13 @@ msgstr "Unix"
 #, c-format
 msgid "Mixed"
 msgstr "Мішаний"
+
+#. EOL Type
+#: Merge.rc:2014
+#, c-format
+msgctxt "EOL Type"
+msgid "Binary"
+msgstr "Бінарний"
 
 #: Merge.rc:2015
 #, c-format

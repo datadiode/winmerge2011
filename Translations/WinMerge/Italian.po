@@ -2412,9 +2412,10 @@ msgstr "Filtra i commenti"
 msgid "Apply historic cost limit"
 msgstr ""
 
+#. Options dialog|Categories
 #: Merge.rc:1382
-#: Merge.rc:1871
 #, c-format
+msgctxt "Options dialog|Categories"
 msgid "Folder"
 msgstr "Cartella"
 
@@ -2613,10 +2614,10 @@ msgstr "WinMerge ti permette di nascondere alcuni messaggi comuni. Premi il puls
 msgid "Reset"
 msgstr "Ripristina"
 
+#. Options dialog|Categories
 #: Merge.rc:1469
-#: Merge.rc:1894
-#: Merge.rc:2014
 #, c-format
+msgctxt "Options dialog|Categories"
 msgid "Binary"
 msgstr "Binario"
 
@@ -4263,6 +4264,13 @@ msgstr ""
 msgid "Attributes"
 msgstr ""
 
+#. DirView|ColumnHeader
+#: Merge.rc:1871
+#, c-format
+msgctxt "DirView|ColumnHeader"
+msgid "Folder"
+msgstr "Cartella"
+
 #: Merge.rc:1872
 #, c-format
 msgid "Comparison result"
@@ -4367,6 +4375,13 @@ msgstr "Codifica di destra"
 #, c-format
 msgid "Ignored Diff."
 msgstr "Diff. ignorate"
+
+#. DirView|ColumnHeader
+#: Merge.rc:1894
+#, c-format
+msgctxt "DirView|ColumnHeader"
+msgid "Binary"
+msgstr "Binario"
 
 #: Merge.rc:1895
 #, c-format
@@ -4990,6 +5005,13 @@ msgstr "Unix"
 #, c-format
 msgid "Mixed"
 msgstr "Mescolato"
+
+#. EOL Type
+#: Merge.rc:2014
+#, c-format
+msgctxt "EOL Type"
+msgid "Binary"
+msgstr "Binario"
 
 #: Merge.rc:2015
 #, c-format

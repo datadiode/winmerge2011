@@ -2412,9 +2412,10 @@ msgstr "Comentarii filtre"
 msgid "Apply historic cost limit"
 msgstr ""
 
+#. Options dialog|Categories
 #: Merge.rc:1382
-#: Merge.rc:1871
 #, c-format
+msgctxt "Options dialog|Categories"
 msgid "Folder"
 msgstr "Director"
 
@@ -2613,10 +2614,10 @@ msgstr "WinMerge permite ascunderea unor casete de mesaj. Apasã butonul Revenire
 msgid "Reset"
 msgstr "Revenire"
 
+#. Options dialog|Categories
 #: Merge.rc:1469
-#: Merge.rc:1894
-#: Merge.rc:2014
 #, c-format
+msgctxt "Options dialog|Categories"
 msgid "Binary"
 msgstr "Binar"
 
@@ -4263,6 +4264,13 @@ msgstr ""
 msgid "Attributes"
 msgstr ""
 
+#. DirView|ColumnHeader
+#: Merge.rc:1871
+#, c-format
+msgctxt "DirView|ColumnHeader"
+msgid "Folder"
+msgstr "Director"
+
 #: Merge.rc:1872
 #, c-format
 msgid "Comparison result"
@@ -4367,6 +4375,13 @@ msgstr "Set de caractere dreapta"
 #, fuzzy, c-format
 msgid "Ignored Diff."
 msgstr "Diferenþe ignorate"
+
+#. DirView|ColumnHeader
+#: Merge.rc:1894
+#, c-format
+msgctxt "DirView|ColumnHeader"
+msgid "Binary"
+msgstr "Binar"
 
 #: Merge.rc:1895
 #, c-format
@@ -4990,6 +5005,13 @@ msgstr "Unix"
 #, c-format
 msgid "Mixed"
 msgstr "Amestecat"
+
+#. EOL Type
+#: Merge.rc:2014
+#, c-format
+msgctxt "EOL Type"
+msgid "Binary"
+msgstr "Binar"
 
 #: Merge.rc:2015
 #, c-format

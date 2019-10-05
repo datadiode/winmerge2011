@@ -2415,9 +2415,10 @@ msgstr "Filter-commentaar"
 msgid "Apply historic cost limit"
 msgstr ""
 
+#. Options dialog|Categories
 #: Merge.rc:1382
-#: Merge.rc:1871
 #, c-format
+msgctxt "Options dialog|Categories"
 msgid "Folder"
 msgstr "Map"
 
@@ -2616,10 +2617,10 @@ msgstr "WinMerge staat toe dat een aantal algemene berichtvensters verborgen wor
 msgid "Reset"
 msgstr "Herstellen"
 
+#. Options dialog|Categories
 #: Merge.rc:1469
-#: Merge.rc:1894
-#: Merge.rc:2014
 #, c-format
+msgctxt "Options dialog|Categories"
 msgid "Binary"
 msgstr "Binair"
 
@@ -4281,6 +4282,13 @@ msgstr ""
 msgid "Attributes"
 msgstr ""
 
+#. DirView|ColumnHeader
+#: Merge.rc:1871
+#, c-format
+msgctxt "DirView|ColumnHeader"
+msgid "Folder"
+msgstr "Map"
+
 #: Merge.rc:1872
 #, c-format
 msgid "Comparison result"
@@ -4385,6 +4393,13 @@ msgstr "Tekenset rechts"
 #, c-format
 msgid "Ignored Diff."
 msgstr "Genegeerde versch."
+
+#. DirView|ColumnHeader
+#: Merge.rc:1894
+#, c-format
+msgctxt "DirView|ColumnHeader"
+msgid "Binary"
+msgstr "Binair"
 
 #: Merge.rc:1895
 #, c-format
@@ -5008,6 +5023,13 @@ msgstr "Unix"
 #, c-format
 msgid "Mixed"
 msgstr "Gemengd"
+
+#. EOL Type
+#: Merge.rc:2014
+#, c-format
+msgctxt "EOL Type"
+msgid "Binary"
+msgstr "Binair"
 
 #: Merge.rc:2015
 #, c-format
