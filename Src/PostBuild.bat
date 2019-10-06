@@ -58,9 +58,20 @@ for %%$ in (
 goto :PlatformName$
 
 :PlatformName$
+
+REM Copy AStyle
 set $=..\3rdparty\AStyle\build\cb-bcc32c\bin\;..\3rdparty\AStyle\build\cb-mingw\bin\
 for %%$ in (
 	AStyle.exe
+) do if not "%%~$$:$" == "" (
+	xcopy /y "%%~$$:$" "%~2"
+	set $=
+)
+
+REM Copy protodec
+set $=..\3rdparty\protodec\
+for %%$ in (
+	protodec.exe
 ) do if not "%%~$$:$" == "" (
 	xcopy /y "%%~$$:$" "%~2"
 	set $=

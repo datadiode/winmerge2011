@@ -1066,6 +1066,7 @@
     <FileTransform Include="..\FileTransforms\MediaInfo.wsc.FileTransform" />
     <FileTransform Include="..\FileTransforms\msxml.wsc.FileTransform" />
     <FileTransform Include="..\FileTransforms\msxml-sort.xslt.FileTransform" />
+    <FileTransform Include="..\FileTransforms\protodec.wsc.FileTransform" />
     <FileTransform Include="..\FileTransforms\xdoc2txt.wsc.FileTransform" />
   </ItemGroup>
   <ItemGroup>

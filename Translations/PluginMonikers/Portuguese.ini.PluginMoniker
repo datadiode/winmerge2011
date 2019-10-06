@@ -9,6 +9,8 @@ Linhas Numeradas = script:\FileTransforms\LinesNumbered.wsc
 Linhas Ordenadas = script:\FileTransforms\LinesSorted.wsc
 JSON = script:\FileTransforms\jq.wsc
 JSON Sorted = script:\FileTransforms\jq.wsc?options='--sort-keys'
+Protobuf Schema = script:\FileTransforms\protodec.wsc?options='--schema'
+Protobuf Content = script:\FileTransforms\protodec.wsc?options='--print'
 XML Ordenado = script:\FileTransforms\msxml.wsc?transform='\FileTransforms\msxml-sort.xslt'
 Astyle Código Fonte Formatado = script:\FileTransforms\astyle.wsc?optfile='\FileTransforms\astyle.opt'
 Diga a partir da extensão do ficheiro = mapping:%SupplementFolder%\Supplement.ini?FileTransforms

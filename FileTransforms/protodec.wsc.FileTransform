@@ -1,0 +1,32 @@
+<scriptlet>
+
+<implements type='automation'>
+	<method name='OpenTextFile'/>
+	<property name='ShowConsole'/>
+	<property name='ReadOnly'/>
+	<property name='Encoding'/>
+	<property name='Arguments'/>
+</implements>
+
+<script language='vbs'>
+Option Explicit
+
+Const ShowConsole = 0
+Const ReadOnly = True
+Const Encoding = "UTF-8"
+
+Dim sh
+Set sh = CreateObject("WScript.Shell")
+
+Function OpenTextFile(path)
+	Dim ex, options
+	If Not IsEmpty(Arguments) Then Execute Arguments
+	Set ex = sh.Exec("""protodec.exe"" " & options & " """ & path & """")
+	If ex.StdOut.AtEndOfStream Then
+		Set OpenTextFile = ex.StdErr
+	Else
+		Set OpenTextFile = ex.StdOut
+	End If
+End Function
+</script>
+</scriptlet>

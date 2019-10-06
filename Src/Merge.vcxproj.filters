@@ -1557,6 +1557,9 @@
     <FileTransform Include="..\FileTransforms\gedcom.wsc.FileTransform">
       <Filter>File Transforms</Filter>
     </FileTransform>
+    <FileTransform Include="..\FileTransforms\jq.wsc.FileTransform">
+      <Filter>File Transforms</Filter>
+    </FileTransform>
     <FileTransform Include="..\FileTransforms\LinesNumbered.wsc.FileTransform">
       <Filter>File Transforms</Filter>
     </FileTransform>
@@ -1572,10 +1575,10 @@
     <FileTransform Include="..\FileTransforms\msxml-sort.xslt.FileTransform">
       <Filter>File Transforms</Filter>
     </FileTransform>
-    <FileTransform Include="..\FileTransforms\xdoc2txt.wsc.FileTransform">
+    <FileTransform Include="..\FileTransforms\protodec.wsc.FileTransform">
       <Filter>File Transforms</Filter>
     </FileTransform>
-    <FileTransform Include="..\FileTransforms\jq.wsc.FileTransform">
+    <FileTransform Include="..\FileTransforms\xdoc2txt.wsc.FileTransform">
       <Filter>File Transforms</Filter>
     </FileTransform>
   </ItemGroup>
