@@ -9,8 +9,8 @@ Numeruotos eilutës = script:\FileTransforms\LinesNumbered.wsc
 Rikiuotos eilutës = script:\FileTransforms\LinesSorted.wsc
 JSON = script:\FileTransforms\jq.wsc
 Rikiuotas JSON = script:\FileTransforms\jq.wsc?options='--sort-keys'
-Protobuf Schema = script:\FileTransforms\protodec.wsc?options='--schema'
-Protobuf Content = script:\FileTransforms\protodec.wsc?options='--print'
+Protobuf schema = script:\FileTransforms\protodec.wsc?options='--schema'
+Protobuf turinys = script:\FileTransforms\protodec.wsc?options='--print'
 Rikiuotas XML = script:\FileTransforms\msxml.wsc?transform='\FileTransforms\msxml-sort.xslt'
 Astyle formato pirminis programos tekstas = script:\FileTransforms\astyle.wsc?optfile='\FileTransforms\astyle.opt'
 Spëti ið failo vardo plëtinio = mapping:%SupplementFolder%\Supplement.ini?FileTransforms
