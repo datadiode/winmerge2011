@@ -481,6 +481,7 @@ namespace H2O
 	};
 
 	// Utility functions
+	void __declspec(noreturn) ThrowJsonException(const char *);
 	HWND GetTopLevelParent(HWND);
 	HIMAGELIST Create3StateImageList();
 	void GetDesktopWorkArea(HWND, LPRECT);

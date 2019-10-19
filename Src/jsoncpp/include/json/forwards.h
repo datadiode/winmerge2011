@@ -32,13 +32,7 @@ static inline double modf(double d, double *integral_part) {
 
 namespace H2O {
 
-class OException;
-
-inline void __declspec(noreturn) ThrowJsonException(const char* msg) {
-  wchar_t buf[1024];
-  buf[mbstowcs(buf, msg, 1023)] = L'\0';
-  throw reinterpret_cast<OException*>(buf);
-}
+void __declspec(noreturn) ThrowJsonException(const char* msg);
 
 } // namespace H2O
 

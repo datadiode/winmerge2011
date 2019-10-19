@@ -611,6 +611,13 @@ LRESULT OPropertySheet::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 	return ::DefDlgProc(hWnd, uMsg, wParam, lParam);
 }
 
+void H2O::ThrowJsonException(const char *msg)
+{
+	wchar_t buf[1024];
+	buf[mbstowcs(buf, msg, 1023)] = L'\0';
+	throw reinterpret_cast<OException*>(buf);
+}
+
 HWND H2O::GetTopLevelParent(HWND hWnd)
 {
 	while (HWND hWndParent = ::GetParent(hWnd))
