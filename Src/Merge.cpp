@@ -152,7 +152,7 @@ HRESULT CMergeApp::InitInstance()
 	HMODULE hLibrary = GetModuleHandle(_T("kernel32.dll"));
 	if (BOOL (WINAPI *SetSearchPathMode)(DWORD) = (BOOL (WINAPI *)(DWORD))GetProcAddress(hLibrary, "SetSearchPathMode"))
 		SetSearchPathMode(0x00000001L /*BASE_SEARCH_PATH_ENABLE_SAFE_SEARCHMODE*/ | 0x00008000L /*BASE_SEARCH_PATH_PERMANENT*/);
-	if (BOOL (WINAPI *SetDllDirectory)(LPCTSTR) = (BOOL (WINAPI *)(LPCTSTR))GetProcAddress(hLibrary, _CRT_STRINGIZE(SetDllDirectory)))
+	if (BOOL (WINAPI *SetDllDirectory)(LPCTSTR) = (BOOL (WINAPI *)(LPCTSTR))GetProcAddress(hLibrary, STRINGIZE(SetDllDirectory)))
 		SetDllDirectory(_T(""));
 
 #ifdef _DEBUG

@@ -122,9 +122,32 @@ extern const char *const wine_version;
 #	define DEBUG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
 #endif
 
-// Below token pasting macros have been adopted from
-// https://github.com/alexforencich/templates/blob/master/xmega.cpp/usart.h,
-// which is MIT licensed, and Copyright (c) 2011 Alex Forencich.
+// Stringize macros taken from
+// https://github.com/adobe/chromium/blob/master/base/stringize_macros.h
+// Copyright (c) 2010 The Chromium Authors
+// SPDX-License-Identifier: BSD-3-Clause
+
+// This is not very useful as it does not expand defined symbols if
+// called directly. Use its counterpart without the _NO_EXPANSION
+// suffix, below.
+#define STRINGIZE_NO_EXPANSION(x) #x
+
+// Use this to quote the provided parameter, first expanding it if it
+// is a preprocessor symbol.
+//
+// For example, if:
+//   #define A FOO
+//   #define B(x) myobj->FunctionCall(x)
+//
+// Then:
+//   STRINGIZE(A) produces "FOO"
+//   STRINGIZE(B(y)) produces "myobj->FunctionCall(y)"
+#define STRINGIZE(x) STRINGIZE_NO_EXPANSION(x)
+
+// Token pasting macros taken from
+// https://github.com/alexforencich/templates/blob/master/xmega.cpp/usart.h
+// Copyright (c) 2011 Alex Forencich
+// SPDX-License-Identifier: MIT
 
 #define TOKEN_PASTE2_INT(x, y) x ## y
 #define TOKEN_PASTE2(x, y) TOKEN_PASTE2_INT(x, y)
@@ -187,8 +210,9 @@ void LogErrorString(any fmt, ...)
 #define strdupa(s) strcpy((char *)_alloca(strlen(s) + 1), s)
 #define wcsdupa(s) wcscpy((wchar_t *)_alloca((wcslen(s) + 1) * sizeof(wchar_t)), s)
 
-// Below definition of VA_NUM_ARGS() follows shogun-toolbox's parameters.hpp,
-// which is BSD 3-clause licensed, and Copyright (c) 2012-2013 Sergey Lisitsyn.
+// Below definition of VA_NUM_ARGS() follows shogun-toolbox's parameters.hpp
+// Copyright (c) 2012-2013 Sergey Lisitsyn.
+// SPDX-License-Identifier: BSD-3-Clause
 
 // pure magic, for the brave souls
 #define VA_NUM_ARGS(...) VA_NUM_ARGS_IMPL_((__VA_ARGS__,5,4,3,2,1))

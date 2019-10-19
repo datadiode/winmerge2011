@@ -675,7 +675,7 @@ void H2O::GetDesktopWorkArea(HWND hWnd, LPRECT prcDesktop)
 		typedef BOOL (WINAPI* LPGMI)(HMONITOR, LPMONITORINFO);
 		typedef HMONITOR (WINAPI* LPMFW)(HWND, DWORD);
 		LPMFW pfnMonitorFromWindow = (LPMFW)::GetProcAddress(hUser32, "MonitorFromWindow");
-		LPGMI pfnGetMonitorInfo = (LPGMI)::GetProcAddress(hUser32, _CRT_STRINGIZE(GetMonitorInfo));
+		LPGMI pfnGetMonitorInfo = (LPGMI)::GetProcAddress(hUser32, STRINGIZE(GetMonitorInfo));
 		// Take multi-monitor systems into account
 		if (pfnGetMonitorInfo && pfnMonitorFromWindow)
 		{

@@ -78,7 +78,7 @@ BOOL PropHexEditor::OnInitDialog()
 {
 	if (HEdit *edit = static_cast<HEdit *>(GetDlgItem(IDC_BPL_EDIT)))
 	{
-		edit->SetLimitText(sizeof _CRT_STRINGIZE(MAX_BPL) - 1);
+		edit->SetLimitText(sizeof STRINGIZE(MAX_BPL) - 1);
 	}
 	return OptionsPanel::OnInitDialog();
 }

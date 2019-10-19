@@ -111,7 +111,7 @@ BOOL PropEditor::OnInitDialog()
 {
 	if (HEdit *edit = static_cast<HEdit *>(GetDlgItem(IDC_TAB_EDIT)))
 	{
-		edit->SetLimitText(sizeof _CRT_STRINGIZE(MAX_TABSIZE) - 1);
+		edit->SetLimitText(sizeof STRINGIZE(MAX_TABSIZE) - 1);
 	}
 
 	if (HComboBox *combo = static_cast<HComboBox *>(GetDlgItem(IDC_BREAK_TYPE)))
