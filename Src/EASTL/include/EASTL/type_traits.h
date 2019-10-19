@@ -26,12 +26,6 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-///////////////////////////////////////////////////////////////////////////////
-// EASTL/type_traits.h
-//
-// Copyright (c) 2005, Electronic Arts. All rights reserved.
-// Written and maintained by Paul Pedriana.
-///////////////////////////////////////////////////////////////////////////////
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -130,6 +124,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //    rank                              An integer value representing the rank of objects of type T. The term 'rank' here is used to describe the number of dimensions of an array type.
 //    extent                            An integer value representing the extent (dimension) of the I'th bound of objects of type T. If the type T is not an array type, has rank of less than I, or if I == 0 and T is of type 'array of unknown bound of U,' then value shall evaluate to zero; otherwise value shall evaluate to the number of elements in the I'th array bound of T. The term 'extent' here is used to describe the number of elements in an array type.
 //    remove_const                      The member typedef type shall be the same as T except that any top level const-qualifier has been removed. remove_const<const volatile int>::type evaluates to volatile int, whereas remove_const<const int*> is const int*.
+//   *union_cast                        Allows for easy-to-read casting between types that are unrelated but have binary equivalence. The classic use case is converting between float and int32_t bit representations. 
 //
 // * is_aligned is not found in Boost nor the C++ standard update proposal.
 //
@@ -149,17 +144,17 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // As of this writing (5/2005), type_traits here requires a well-conforming 
 // C++ compiler with respect to template metaprogramming. To use this library
 // you need to have at least one of the following:
-//     MSVC++ 7.1       (includes Win32, XBox 360, Win64, and WinCE platforms)
-//     GCC 3.2          (includes Playstation 3, and Linux platforms)
-//     Metrowerks 8.0   (incluees Playstation 3, Windows, and other platforms)
-//     SN Systems       (not the GCC 2.95-based compilers)
+//     MSVC++ 7.1       (includes Win32, XBox, XBox 360, Win64, and WinCE platforms)
+//     GCC 3.2          (includes Playstation 3, MacOSX, and Linux platforms)
+//     Metrowerks 8.0   (incluees Playstation 3, GameCube Revolution, MacOSX, Windows, and other platforms)
+//     SN Systems       (includes the Playstation 2 and GameCube platform, but not the GCC 2.95-based compilers)
 //     EDG              (includes any compiler with EDG as a back-end, such as the Intel compiler)
 //     Comeau           (this is a C++ to C generator)
 //
 // It may be useful to list the compilers/platforms the current version of 
 // type_traits doesn't support:
 //     Borland C++      (it simply has too many bugs with respect to templates).
-//     GCC 2.96          With a little effort, type_traits can probably be made to work with this compiler.
+//     GCC 2.96         (includes Playstation 2 and GameCube platforms). With a little effort, type_traits can probably be made to work with this compiler.
 //////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -183,6 +178,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <EASTL/internal/config.h>
 #include <stddef.h>                 // Is needed for size_t usage by some traits.
+
+#if defined(EA_PRAGMA_ONCE_SUPPORTED)
+    #pragma once // Some compilers (e.g. VC++) benefit significantly from using this. We've measured 3-4% build speed improvements in apps as a result.
+#endif
 
 
 

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005,2009-2010 Electronic Arts, Inc.  All rights reserved.
+Copyright (C) 2005,2009,2010,2012 Electronic Arts, Inc.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -372,14 +372,6 @@ namespace eastl
 
         using base_type::mCompare;
 
-        enum
-        {
-            kKeyAlignment         = EASTL_ALIGN_OF(key_type),
-            kKeyAlignmentOffset   = 0,                          // To do: Make sure this really is zero for all uses of this template.
-            kValueAlignment       = EASTL_ALIGN_OF(value_type),
-            kValueAlignmentOffset = 0                           // To fix: This offset is zero for sets and >0 for maps. Need to fix this.
-        };
-
     public:
         rbtree_node_base  mAnchor;      /// This node acts as end() and its mpLeft points to begin(), and mpRight points to rbegin() (the last node on the right).
         size_type         mnSize;       /// Stores the count of nodes in the tree (not counting the anchor node).
@@ -458,7 +450,7 @@ namespace eastl
         void erase(const key_type* first, const key_type* last);
 
         void clear();
-        void reset();
+        void reset_lose_memory(); // This is a unilateral reset to an initially empty state. No destructors are called, no deallocation occurs.
 
         iterator       find(const key_type& key);
         const_iterator find(const key_type& key) const;
@@ -488,6 +480,10 @@ namespace eastl
 
         bool validate() const;
         int  validate_iterator(const_iterator i) const;
+
+        #if EASTL_RESET_ENABLED
+            void reset(); // This function name is deprecated; use reset_lose_memory instead.
+        #endif
 
     protected:
         node_type*  DoAllocateNode();
@@ -656,7 +652,7 @@ namespace eastl
           mnSize(0),
           mAllocator(EASTL_RBTREE_DEFAULT_NAME)
     {
-        reset();
+        reset_lose_memory();
     }
 
 
@@ -666,7 +662,7 @@ namespace eastl
           mnSize(0),
           mAllocator(allocator)
     {
-        reset();
+        reset_lose_memory();
     }
 
 
@@ -677,7 +673,7 @@ namespace eastl
           mnSize(0),
           mAllocator(allocator)
     {
-        reset();
+        reset_lose_memory();
     }
 
 
@@ -688,7 +684,7 @@ namespace eastl
           mnSize(0),
           mAllocator(x.mAllocator)
     {
-        reset();
+        reset_lose_memory();
 
         if(x.mAnchor.mpNodeParent) // mAnchor.mpNodeParent is the rb_tree root node.
         {
@@ -708,7 +704,7 @@ namespace eastl
           mnSize(0),
           mAllocator(allocator)
     {
-        reset();
+        reset_lose_memory();
 
         #if EASTL_EXCEPTIONS_ENABLED
             try
@@ -1321,14 +1317,24 @@ namespace eastl
         // Erase the entire tree. DoNukeSubtree is not a 
         // conventional erase function, as it does no rebalancing.
         DoNukeSubtree((node_type*)mAnchor.mpNodeParent);
-        reset();
+        reset_lose_memory();
     }
 
 
+    #if EASTL_RESET_ENABLED
+        // This function name is deprecated; use reset_lose_memory instead.
+        template <typename K, typename V, typename C, typename A, typename E, bool bM, bool bU>
+        inline void rbtree<K, V, C, A, E, bM, bU>::reset()
+        {
+            reset_lose_memory();
+        }
+    #endif
+
+
     template <typename K, typename V, typename C, typename A, typename E, bool bM, bool bU>
-    inline void rbtree<K, V, C, A, E, bM, bU>::reset()
+    inline void rbtree<K, V, C, A, E, bM, bU>::reset_lose_memory()
     {
-        // The reset function is a special extension function which unilaterally 
+        // The reset_lose_memory function is a special extension function which unilaterally 
         // resets the container to an empty state without freeing the memory of 
         // the contained objects. This is useful for very quickly tearing down a 
         // container built into scratch memory.
@@ -1682,7 +1688,7 @@ namespace eastl
     inline typename rbtree<K, V, C, A, E, bM, bU>::node_type*
     rbtree<K, V, C, A, E, bM, bU>::DoAllocateNode()
     {
-        return (node_type*)allocate_memory(mAllocator, sizeof(node_type), kValueAlignment, kValueAlignmentOffset);
+        return (node_type*)allocate_memory(mAllocator, sizeof(node_type), EASTL_ALIGN_OF(value_type), 0);
     }
 
 
@@ -1707,7 +1713,7 @@ namespace eastl
             try
             {
         #endif
-                ::new(&pNode->mValue) value_type(key);
+                ::new((void*)&pNode->mValue) value_type(key);
 
         #if EASTL_EXCEPTIONS_ENABLED
             }
@@ -1742,7 +1748,7 @@ namespace eastl
             try
             {
         #endif
-                ::new(&pNode->mValue) value_type(value);
+                ::new((void*)&pNode->mValue) value_type(value);
         #if EASTL_EXCEPTIONS_ENABLED
             }
             catch(...)

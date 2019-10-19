@@ -532,14 +532,14 @@ bool UniMemFile::ReadString(String &line, String &eol, bool *lossy)
 		{
 			return true;
 		}
-		TCHAR targetBuf[2];
+		convert_utf::UTF16 targetBuf[2];
 		convert_utf::UTF16 *targetStart = targetBuf;
 		const convert_utf::UTF32 *sourceStart = &ch;
 		convert_utf::ConversionResult result = convert_utf::ConvertUTF32toUTF16(
 			&sourceStart, sourceStart + 1,
 			&targetStart, targetStart + 2,
 			convert_utf::lenientConversion);
-		Append(line, targetBuf, static_cast<String::size_type>(targetStart - targetBuf));
+		Append(line, reinterpret_cast<LPCWSTR>(targetBuf), static_cast<String::size_type>(targetStart - targetBuf));
 	}
 	return true;
 }

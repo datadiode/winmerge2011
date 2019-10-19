@@ -26,25 +26,23 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-///////////////////////////////////////////////////////////////////////////////
-// EASTL/sort_extra.h
-// Written by Paul Pedriana - 2005
-//////////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////////
 // This file implements additional sort algorithms beyond the basic set.
 // Included here are:
-//    radix_sort
-//    comb_sort
-//    bubble_sort
-//    selection_sort
-//    shaker_sort
-//    bucket_sort
+//    radix_sort            -- Stable. Important and useful sort for integral data.
+//    comb_sort             -- Unstable.
+//    bubble_sort           -- Stable. Useful in practice for sorting tiny sets of data (<= 10 elements).
+//    selection_sort        -- Unstable.
+//    shaker_sort           -- Stable.
+//    bucket_sort           -- Stable. 
 //
 //////////////////////////////////////////////////////////////////////////////
 
+
 #ifndef EASTL_SORT_EXTRA_H
 #define EASTL_SORT_EXTRA_H
+
 
 #include <EASTL/internal/config.h>
 #include <EASTL/iterator.h>
@@ -53,35 +51,45 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <EASTL/heap.h>
 #include <EASTL/allocator.h>
 
+#if defined(EA_PRAGMA_ONCE_SUPPORTED)
+    #pragma once // Some compilers (e.g. VC++) benefit significantly from using this. We've measured 3-4% build speed improvements in apps as a result.
+#endif
+
+
+
+#if !defined(EASTL_PLATFORM_PREFERRED_ALIGNMENT)
+        #define EASTL_PLATFORM_PREFERRED_ALIGNMENT 16
+#endif
+
+
 namespace eastl
 {
-
-    /// extract_radix_key
-    ///
-    /// Default radix sort integer value reader. It expects the sorted elements 
-    /// to have an integer member of type radix_type and of name "mKey". 
-    ///
-    template <typename Node>
-    struct extract_radix_key
-    {
-        typedef typename Node::radix_type radix_type;
-
-        const radix_type operator()(const Node& x) const
-            { return x.mKey; }
-    };
-
-
     /// radix_sort
     ///
     /// Implements a classic LSD (least significant digit) radix sort.
     /// See http://en.wikipedia.org/wiki/Radix_sort.
-    /// To consider: A static linked-list implementation may be faster than the version here.
-    ///
+    /// This sort requires that the sorted data be of a type that has a member
+    /// radix_type typedef and an mKey member of that type. The type must be
+    /// an integral type. This limits what can be sorted, but radix_sort is 
+    /// very fast -- typically faster than any other sort.
+    /// For example:
+    ///     struct Sortable {
+    ///         typedef int radix_type;
+    ///         radix_type mKey;
+    ///         // User data goes here, or the user can inherit from Sortable.
+    ///     };
+    /// or, more generally:
+    ///     template <typname Integer>
+    ///     struct Sortable {
+    ///         typedef Integer radix_type;
+    ///         Integer mKey;
+    ///     };
+    /// 
     /// Example usage:
     ///     struct Element {
     ///         typedef uint16_t radix_type;
     ///         uint16_t mKey;
-    ///         uint16_t mData;
+    ///         uint16_t mUserData;
     ///     };
     ///
     ///     Element elementArray[100];
@@ -89,108 +97,128 @@ namespace eastl
     ///
     ///     radix_sort<Element*, extract_radix_key<Element> >(elementArray, elementArray + 100, buffer);
     ///
-    template <typename RandomAccessIterator, typename ExtractKey>
-    void radix_sort_impl(RandomAccessIterator first, RandomAccessIterator last, RandomAccessIterator buffer, ExtractKey extractKey, uint8_t)
+    /// To consider: A static linked-list implementation may be faster than the version here.
+
+    namespace Internal
     {
-        uint32_t EA_PREFIX_ALIGN(16) bucketSize[256] EA_POSTFIX_ALIGN(16);
-        uint32_t EA_PREFIX_ALIGN(16) bucketPosition[256] EA_POSTFIX_ALIGN(16);
-        RandomAccessIterator temp;
-        uint32_t i;
-
-        memset(bucketSize, 0, sizeof(bucketSize));
-
-        for(temp = first; temp != last; ++temp)
-            ++bucketSize[extractKey(*temp)];
-
-        for(bucketPosition[0] = 0, i = 0; i < 255; i++)
-            bucketPosition[i + 1] = bucketPosition[i] + bucketSize[i];
-
-        for(temp = first; temp != last; ++temp)
+        /// extract_radix_key
+        ///
+        /// Default radix sort integer value reader. It expects the sorted elements 
+        /// to have an integer member of type radix_type and of name "mKey". 
+        ///
+        template <typename Node>
+        struct extract_radix_key
         {
-            const size_t radixByte = extractKey(*temp);
-            buffer[bucketPosition[radixByte]++] = *temp;
-        }
-    }
+            typedef typename Node::radix_type radix_type;
 
+            const radix_type operator()(const Node& x) const
+                { return x.mKey; }
+        };
 
-    template <typename RandomAccessIterator, typename ExtractKey>
-    void radix_sort_impl(RandomAccessIterator first, RandomAccessIterator last, RandomAccessIterator buffer, ExtractKey extractKey, uint16_t)
-    {
-        uint32_t EA_PREFIX_ALIGN(16) bucketSize[256] EA_POSTFIX_ALIGN(16);
-        uint32_t EA_PREFIX_ALIGN(16) bucketPosition[256] EA_POSTFIX_ALIGN(16);
-        RandomAccessIterator temp;
-        uint32_t i;
-
-        // Process byte 0 (least significant byte).
-        memset(bucketSize, 0, sizeof(bucketSize));
-
-        for(temp = first; temp != last; ++temp)
-            ++bucketSize[extractKey(*temp) & 0xff];
-
-        for(bucketPosition[0] = 0, i = 0; i < 255; i++)
-            bucketPosition[i + 1] = bucketPosition[i] + bucketSize[i];
-
-        for(temp = first; temp != last; ++temp)
+        // uint8_t version.
+        template <typename RandomAccessIterator, typename ExtractKey>
+        void radix_sort_impl(RandomAccessIterator first, RandomAccessIterator last, RandomAccessIterator buffer, ExtractKey extractKey, uint8_t)
         {
-            const size_t radixByte = extractKey(*temp) & 0xff;
-            buffer[bucketPosition[radixByte]++] = *temp;
-        }
+            uint32_t EA_PREFIX_ALIGN(EASTL_PLATFORM_PREFERRED_ALIGNMENT) bucketSize[256];       // The alignment of this variable isn't required; it merely 
+            uint32_t EA_PREFIX_ALIGN(EASTL_PLATFORM_PREFERRED_ALIGNMENT) bucketPosition[256];   // allows the code below to be faster on some platforms.
+            RandomAccessIterator temp;
+            uint32_t i;
 
-
-        // Process byte 1 (second least significant byte).
-        memset(bucketSize, 0, sizeof(bucketSize));
-
-        for(temp = buffer, last = buffer + (last - first); temp != last; ++temp)
-            ++bucketSize[extractKey(*temp) >> 8];
-
-        for(bucketPosition[0] = 0, i = 0; i < 255; i++)
-            bucketPosition[i + 1] = bucketPosition[i] + bucketSize[i];
-        
-        for(temp = buffer; temp != last; ++temp)
-        {
-            const size_t radixByte = extractKey(*temp) >> 8;
-            first[bucketPosition[radixByte]++] = *temp;
-        }
-    }
-
-
-    template <typename RandomAccessIterator, typename ExtractKey, typename IntegerType>
-    void radix_sort_impl(RandomAccessIterator first, RandomAccessIterator last, RandomAccessIterator buffer, ExtractKey extractKey, IntegerType)
-    {
-        uint32_t EA_PREFIX_ALIGN(16) bucketSize[256] EA_POSTFIX_ALIGN(16);
-        uint32_t EA_PREFIX_ALIGN(16) bucketPosition[256] EA_POSTFIX_ALIGN(16);
-        RandomAccessIterator temp;
-        uint32_t i;
-
-        for(uint32_t j = 0; j < (8 * sizeof(IntegerType)); j += 8)
-        {
             memset(bucketSize, 0, sizeof(bucketSize));
 
             for(temp = first; temp != last; ++temp)
-                ++bucketSize[(extractKey(*temp) >> j) & 0xff];
+                ++bucketSize[extractKey(*temp)];
 
-            bucketPosition[0] = 0;
-            for(i = 0; i < 255; i++)
+            for(bucketPosition[0] = 0, i = 0; i < 255; i++)
                 bucketPosition[i + 1] = bucketPosition[i] + bucketSize[i];
 
             for(temp = first; temp != last; ++temp)
             {
-                const size_t radixByte = ((extractKey(*temp) >> j) & 0xff);
+                const size_t radixByte = extractKey(*temp);
+                buffer[bucketPosition[radixByte]++] = *temp;
+            }
+        }
+
+        // uint16_t version.
+        template <typename RandomAccessIterator, typename ExtractKey>
+        void radix_sort_impl(RandomAccessIterator first, RandomAccessIterator last, RandomAccessIterator buffer, ExtractKey extractKey, uint16_t)
+        {
+            uint32_t EA_PREFIX_ALIGN(EASTL_PLATFORM_PREFERRED_ALIGNMENT) bucketSize[256];       // The alignment of this variable isn't required; it merely 
+            uint32_t EA_PREFIX_ALIGN(EASTL_PLATFORM_PREFERRED_ALIGNMENT) bucketPosition[256];   // allows the code below to be faster on some platforms.
+            RandomAccessIterator temp;
+            uint32_t i;
+
+            // Process byte 0 (least significant byte).
+            memset(bucketSize, 0, sizeof(bucketSize));
+
+            for(temp = first; temp != last; ++temp)
+                ++bucketSize[extractKey(*temp) & 0xff];
+
+            for(bucketPosition[0] = 0, i = 0; i < 255; i++)
+                bucketPosition[i + 1] = bucketPosition[i] + bucketSize[i];
+
+            for(temp = first; temp != last; ++temp)
+            {
+                const size_t radixByte = extractKey(*temp) & 0xff;
                 buffer[bucketPosition[radixByte]++] = *temp;
             }
 
-            last   = buffer + (last - first);
-            temp   = first;
-            first  = buffer;
-            buffer = temp; 
-        }
-    }
 
+            // Process byte 1 (second least significant byte).
+            memset(bucketSize, 0, sizeof(bucketSize));
+
+            for(temp = buffer, last = buffer + (last - first); temp != last; ++temp)
+                ++bucketSize[extractKey(*temp) >> 8];
+
+            for(bucketPosition[0] = 0, i = 0; i < 255; i++)
+                bucketPosition[i + 1] = bucketPosition[i] + bucketSize[i];
+            
+            for(temp = buffer; temp != last; ++temp)
+            {
+                const size_t radixByte = extractKey(*temp) >> 8;
+                first[bucketPosition[radixByte]++] = *temp;
+            }
+        }
+
+
+        // Generic version.
+        template <typename RandomAccessIterator, typename ExtractKey, typename IntegerType>
+        void radix_sort_impl(RandomAccessIterator first, RandomAccessIterator last, RandomAccessIterator buffer, ExtractKey extractKey, IntegerType)
+        {
+            uint32_t EA_PREFIX_ALIGN(EASTL_PLATFORM_PREFERRED_ALIGNMENT) bucketSize[256];       // The alignment of this variable isn't required; it merely 
+            uint32_t EA_PREFIX_ALIGN(EASTL_PLATFORM_PREFERRED_ALIGNMENT) bucketPosition[256];   // allows the code below to be faster on some platforms.
+            RandomAccessIterator temp;
+            uint32_t i;
+
+            for(uint32_t j = 0; j < (8 * sizeof(IntegerType)); j += 8)
+            {
+                memset(bucketSize, 0, sizeof(bucketSize));
+
+                for(temp = first; temp != last; ++temp)
+                    ++bucketSize[(extractKey(*temp) >> j) & 0xff];
+
+                bucketPosition[0] = 0;
+                for(i = 0; i < 255; i++)
+                    bucketPosition[i + 1] = bucketPosition[i] + bucketSize[i];
+
+                for(temp = first; temp != last; ++temp)
+                {
+                    const size_t radixByte = ((extractKey(*temp) >> j) & 0xff);
+                    buffer[bucketPosition[radixByte]++] = *temp;
+                }
+
+                last   = buffer + (last - first);
+                temp   = first;
+                first  = buffer;
+                buffer = temp; 
+            }
+        }
+    } // namespace Internal
 
     template <typename RandomAccessIterator, typename ExtractKey>
     void radix_sort(RandomAccessIterator first, RandomAccessIterator last, RandomAccessIterator buffer)
     {
-        radix_sort_impl<RandomAccessIterator>(first, last, buffer, ExtractKey(), typename ExtractKey::radix_type());
+        eastl::Internal::radix_sort_impl<RandomAccessIterator>(first, last, buffer, ExtractKey(), typename ExtractKey::radix_type());
     }
 
 
@@ -251,61 +279,64 @@ namespace eastl
     /// small range sizes, such as 10 or less items. You may be better off using
     /// insertion_sort for cases where bubble_sort works.
     ///
-    template <typename ForwardIterator, typename StrictWeakOrdering>
-    void bubble_sort_impl(ForwardIterator first, ForwardIterator last, StrictWeakOrdering compare, EASTL_ITC_NS::forward_iterator_tag)
+    namespace Internal
     {
-        ForwardIterator iCurrent, iNext;
-
-        while(first != last)
+        template <typename ForwardIterator, typename StrictWeakOrdering>
+        void bubble_sort_impl(ForwardIterator first, ForwardIterator last, StrictWeakOrdering compare, EASTL_ITC_NS::forward_iterator_tag)
         {
-            iNext = iCurrent = first;
-            
-            for(++iNext; iNext != last; iCurrent = iNext, ++iNext) 
-            {
-                if(compare(*iNext, *iCurrent))
-                {
-                    EASTL_VALIDATE_COMPARE(!compare(*iCurrent, *iNext)); // Validate that the compare function is sane.
-                    eastl::iter_swap(iCurrent, iNext);
-                }
-            }
-            last = iCurrent;
-        }
-    }
-
-    template <typename BidirectionalIterator, typename StrictWeakOrdering>
-    void bubble_sort_impl(BidirectionalIterator first, BidirectionalIterator last, StrictWeakOrdering compare, EASTL_ITC_NS::bidirectional_iterator_tag)
-    {
-        if(first != last)
-        {
-            BidirectionalIterator iCurrent, iNext, iLastModified;
-
-            last--;
+            ForwardIterator iCurrent, iNext;
 
             while(first != last)
             {
-                iLastModified = iNext = iCurrent = first;
+                iNext = iCurrent = first;
                 
-                for(++iNext; iCurrent != last; iCurrent = iNext, ++iNext)
+                for(++iNext; iNext != last; iCurrent = iNext, ++iNext) 
                 {
                     if(compare(*iNext, *iCurrent))
                     {
                         EASTL_VALIDATE_COMPARE(!compare(*iCurrent, *iNext)); // Validate that the compare function is sane.
-                        iLastModified = iCurrent;
                         eastl::iter_swap(iCurrent, iNext);
                     }
                 }
-
-                last = iLastModified;
+                last = iCurrent;
             }
         }
-    }
+
+        template <typename BidirectionalIterator, typename StrictWeakOrdering>
+        void bubble_sort_impl(BidirectionalIterator first, BidirectionalIterator last, StrictWeakOrdering compare, EASTL_ITC_NS::bidirectional_iterator_tag)
+        {
+            if(first != last)
+            {
+                BidirectionalIterator iCurrent, iNext, iLastModified;
+
+                last--;
+
+                while(first != last)
+                {
+                    iLastModified = iNext = iCurrent = first;
+                    
+                    for(++iNext; iCurrent != last; iCurrent = iNext, ++iNext)
+                    {
+                        if(compare(*iNext, *iCurrent))
+                        {
+                            EASTL_VALIDATE_COMPARE(!compare(*iCurrent, *iNext)); // Validate that the compare function is sane.
+                            iLastModified = iCurrent;
+                            eastl::iter_swap(iCurrent, iNext);
+                        }
+                    }
+
+                    last = iLastModified;
+                }
+            }
+        }
+    } // namespace Internal
 
     template <typename ForwardIterator, typename StrictWeakOrdering>
     inline void bubble_sort(ForwardIterator first, ForwardIterator last, StrictWeakOrdering compare)
     {
         typedef typename eastl::iterator_traits<ForwardIterator>::iterator_category IC;
 
-        eastl::bubble_sort_impl<ForwardIterator, StrictWeakOrdering>(first, last, compare, IC());
+        eastl::Internal::bubble_sort_impl<ForwardIterator, StrictWeakOrdering>(first, last, compare, IC());
     }
 
     template <typename ForwardIterator>
@@ -314,7 +345,7 @@ namespace eastl
         typedef eastl::less<typename eastl::iterator_traits<ForwardIterator>::value_type> Less;
         typedef typename eastl::iterator_traits<ForwardIterator>::iterator_category IC;
 
-        eastl::bubble_sort_impl<ForwardIterator, Less>(first, last, Less(), IC());
+        eastl::Internal::bubble_sort_impl<ForwardIterator, Less>(first, last, Less(), IC());
     }
 
 
@@ -429,12 +460,14 @@ namespace eastl
     /// Implements the BucketSort algorithm. 
     ///
     /// Example usage:
-    ///     int* pArray = new int[1000];
-    ///     for(int i = 0; i < 1000; i++)
-    ///         pArray[i] = rand() % 32; // Note: The C rand function is a poor random number generator.
-    ///     vector<int> intVector[32];
-    ///     bucket_sort(pArray, pArray + 1000; intVector);
-    ///     delete[] pArray;
+    ///  const size_t kElementRange = 32;
+    ///  vector<int>  intArray(1000);
+    ///  
+    ///  for(int i = 0; i < 1000; i++)
+    ///     intArray[i] = rand() % kElementRange;
+    ///  
+    ///  vector< vector<int> > bucketArray(kElementRange);
+    ///  bucket_sort(intArray.begin(), intArray.end(), bucketArray, eastl::hash_use_self<int>());
     ///
     template <typename T>
     struct hash_use_self
@@ -443,6 +476,17 @@ namespace eastl
             { return x; }
     };
 
+    // Requires buckeyArray to be an array of arrays with a size equal to the range of values
+    // returned by the hash function. The hash function is required to return a unique value
+    // for each uniquely sorted element. Usually the way this is done is the elements are 
+    // integers of a limited range (e.g. 0-64) and the hash function returns the element value
+    // itself. If you had a case where all elements were always even numbers (e.g. 0-128), 
+    // you could use a custom hash function that returns (element value / 2).
+    //
+    // The user is required to provide an empty bucketArray to this function. This function returns
+    // with the bucketArray non-empty. This function doesn't clear the bucketArray because that takes
+    // time and the user might not need it to be cleared, at least at that time.
+    // 
     template <typename ForwardIterator, typename ContainerArray, typename HashFunction>
     void bucket_sort(ForwardIterator first, ForwardIterator last, ContainerArray& bucketArray, HashFunction hash /*= hash_use_self*/)
     {
@@ -461,6 +505,7 @@ namespace eastl
 
 
 #endif // Header include guard
+
 
 
 

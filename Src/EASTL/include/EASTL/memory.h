@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2009-2010 Electronic Arts, Inc.  All rights reserved.
+Copyright (C) 2009,2010,2012 Electronic Arts, Inc.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -26,13 +26,6 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-///////////////////////////////////////////////////////////////////////////////
-// EASTL/memory.h
-//
-// Copyright (c) 2005, Electronic Arts. All rights reserved.
-// Written and maintained by Paul Pedriana.
-// The uninitialized_move function was written by Ryan Ingram.
-///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
 // This file implements the following functions from the C++ standard that 
@@ -87,6 +80,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     #pragma warning(push)
     #pragma warning(disable: 4530)  // C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
 #endif
+
+#if defined(EA_PRAGMA_ONCE_SUPPORTED)
+    #pragma once // Some compilers (e.g. VC++) benefit significantly from using this. We've measured 3-4% build speed improvements in apps as a result.
+#endif
+
 
 
 namespace eastl
@@ -179,7 +177,7 @@ namespace eastl
                 try
                 {
                     for(; first != last; ++first, ++dest)
-                        ::new(&*dest) value_type(*first);
+                        ::new((void*)&*dest) value_type(*first);
                 }
                 catch(...)
                 {
@@ -189,7 +187,7 @@ namespace eastl
                 }
             #else
                 for(; first != last; ++first, ++dest)
-                    ::new(&*dest) value_type(*first);
+                    ::new((void*)&*dest) value_type(*first);
             #endif
 
             return dest;
@@ -345,7 +343,7 @@ namespace eastl
             try
             {
                 for(; first != last; ++first, ++currentDest)
-                    ::new(&*currentDest) value_type(*first);
+                    ::new((void*)&*currentDest) value_type(*first);
             }
             catch(...)
             {
@@ -355,7 +353,7 @@ namespace eastl
             }
         #else
             for(; first != last; ++first, ++currentDest)
-                ::new(&*currentDest) value_type(*first);
+                ::new((void*)&*currentDest) value_type(*first);
         #endif
 
         return currentDest;
@@ -380,11 +378,7 @@ namespace eastl
     {
         typedef typename eastl::iterator_traits<ForwardIterator>::value_type value_type;
 
-        // Note: has_trivial_assign isn't actually the right thing to use here, as it 
-        // refers to assignment as opposed to construction. Bug Paul Pedriana if this 
-        // is becoming a problem. In the meantime, this code assumes that if has_trivial_assign
-        // is present for a type, then has_trivial_copy is as well.
-        return uninitialized_copy_impl(first, last, result, has_trivial_assign<value_type>());
+        return uninitialized_copy_impl(first, last, result, is_pod<value_type>()); // Is is_pod the best type trait to use? 
     }
 
     /// uninitialized_copy_ptr
@@ -425,7 +419,7 @@ namespace eastl
             try
             {
                 for(; currentDest != last; ++currentDest)
-                    ::new(&*currentDest) value_type(value);
+                    ::new((void*)&*currentDest) value_type(value);
             }
             catch(...)
             {
@@ -435,7 +429,7 @@ namespace eastl
             }
         #else
             for(; currentDest != last; ++currentDest)
-                ::new(&*currentDest) value_type(value);
+                ::new((void*)&*currentDest) value_type(value);
         #endif
     }
 
@@ -490,7 +484,7 @@ namespace eastl
             try
             {
                 for(; n > 0; --n, ++currentDest)
-                    ::new(&*currentDest) value_type(value);
+                    ::new((void*)&*currentDest) value_type(value);
             }
             catch(...)
             {
@@ -500,7 +494,7 @@ namespace eastl
             }
         #else
             for(; n > 0; --n, ++currentDest)
-                ::new(&*currentDest) value_type(value);
+                ::new((void*)&*currentDest) value_type(value);
         #endif
     }
 

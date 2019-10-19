@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005,2009-2010 Electronic Arts, Inc.  All rights reserved.
+Copyright (C) 2005,2009,2010,2012 Electronic Arts, Inc.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -37,6 +37,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include <limits.h>
+#include <EASTL/internal/type_compound.h>
 
 
 namespace eastl
@@ -44,6 +45,18 @@ namespace eastl
 
     // The following properties or relations are defined here. If the given 
     // item is missing then it simply hasn't been implemented, at least not yet.
+    //    is_const
+    //    is_volatile
+    //    is_abstract
+    //    is_signed
+    //    is_unsigned
+    //    alignment_of
+    //    is_aligned
+    //    rank
+    //    extent
+    //    is_base_of
+
+
 
     ///////////////////////////////////////////////////////////////////////
     // is_const
@@ -51,6 +64,9 @@ namespace eastl
     // is_const<T>::value == true if and only if T has const-qualification.
     //
     ///////////////////////////////////////////////////////////////////////
+
+    #define EASTL_TYPE_TRAIT_is_const_CONFORMANCE 1    // is_const is conforming.
+
     template <typename T> struct is_const_value                    : public false_type{};
     template <typename T> struct is_const_value<const T*>          : public true_type{};
     template <typename T> struct is_const_value<const volatile T*> : public true_type{};
@@ -66,6 +82,8 @@ namespace eastl
     // is_volatile<T>::value == true  if and only if T has volatile-qualification.
     //
     ///////////////////////////////////////////////////////////////////////
+
+    #define EASTL_TYPE_TRAIT_is_volatile_CONFORMANCE 1    // is_volatile is conforming.
 
     template <typename T> struct is_volatile_value                    : public false_type{};
     template <typename T> struct is_volatile_value<volatile T*>       : public true_type{};
@@ -85,7 +103,14 @@ namespace eastl
     //
     ///////////////////////////////////////////////////////////////////////
 
-    // Not implemented yet.
+    #if EASTL_INTRINSIC_TYPE_TRAITS_AVAILABLE && (defined(_MSC_VER) || defined(EA_COMPILER_GNUC) || defined(EA_COMPILER_CLANG))
+        #define EASTL_TYPE_TRAIT_is_abstract_CONFORMANCE 1    // is_abstract is conforming.
+
+        template <typename T> 
+        struct is_abstract : public integral_constant<bool, __is_abstract(T)>{};
+    #else
+        // Not implemented yet.
+    #endif
 
 
 
@@ -105,6 +130,9 @@ namespace eastl
     // types, we provide the EASTL_DECLARE_SIGNED macro to allow you to 
     // set a given class to be identified as a signed type.
     ///////////////////////////////////////////////////////////////////////
+
+    #define EASTL_TYPE_TRAIT_is_signed_CONFORMANCE 1    // is_signed is conforming.
+
     template <typename T> struct is_signed : public false_type{};
 
     template <> struct is_signed<signed char>              : public true_type{};
@@ -149,6 +177,9 @@ namespace eastl
     // types, we provide the EASTL_DECLARE_UNSIGNED macro to allow you to 
     // set a given class to be identified as an unsigned type.
     ///////////////////////////////////////////////////////////////////////
+
+    #define EASTL_TYPE_TRAIT_is_unsigned_CONFORMANCE 1    // is_unsigned is conforming.
+
     template <typename T> struct is_unsigned : public false_type{};
 
     template <> struct is_unsigned<unsigned char>              : public true_type{};
@@ -186,6 +217,9 @@ namespace eastl
     // alignment_of may only be applied to complete types.
     //
     ///////////////////////////////////////////////////////////////////////
+
+    #define EASTL_TYPE_TRAIT_alignment_of_CONFORMANCE 1    // alignment_of is conforming.
+
     template <typename T>
     struct alignment_of_value{ static const size_t value = EASTL_ALIGN_OF(T); };
 
@@ -201,6 +235,9 @@ namespace eastl
     // than default alignment, which is taken to be 8. This allows for 
     // doing specialized object allocation and placement for such types.
     ///////////////////////////////////////////////////////////////////////
+
+    #define EASTL_TYPE_TRAIT_is_aligned_CONFORMANCE 1    // is_aligned is conforming.
+
     template <typename T>
     struct is_aligned_value{ static const bool value = (EASTL_ALIGN_OF(T) > 8); };
 
@@ -253,7 +290,15 @@ namespace eastl
     //
     ///////////////////////////////////////////////////////////////////////
 
-    // Not implemented yet.
+    #if EASTL_INTRINSIC_TYPE_TRAITS_AVAILABLE && (defined(_MSC_VER) || defined(EA_COMPILER_GNUC) || defined(EA_COMPILER_CLANG))
+        #define EASTL_TYPE_TRAIT_is_base_of_CONFORMANCE 1    // is_base_of is conforming.
+
+        template <typename Base, typename Derived> 
+        struct is_base_of : public integral_constant<bool, __is_base_of(Base, Derived) || is_same<Base, Derived>::value>{};
+    #else
+        // Not implemented yet.
+        // This appears to be implementable. 
+    #endif
 
 
 

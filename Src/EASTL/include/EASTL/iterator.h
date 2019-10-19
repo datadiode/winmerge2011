@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2009-2010 Electronic Arts, Inc.  All rights reserved.
+Copyright (C) 2009,2010,2012 Electronic Arts, Inc.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -26,12 +26,6 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-///////////////////////////////////////////////////////////////////////////////
-// EASTL/iterator.h
-//
-// Copyright (c) 2005, Electronic Arts. All rights reserved.
-// Written and maintained by Paul Pedriana.
-///////////////////////////////////////////////////////////////////////////////
 
 
 #ifndef EASTL_ITERATOR_H
@@ -68,10 +62,12 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     #pragma warning(push)           // VC++ generates a bogus warning that you cannot code away.
     #pragma warning(disable: 4619)  // There is no warning number 'number'.
     #pragma warning(disable: 4217)  // Member template functions cannot be used for copy-assignment or copy-construction.
-#elif defined(__SNC__)
-    #pragma control %push diag
-    #pragma diag_suppress=187       // Pointless comparison of unsigned integer with zero
 #endif
+
+#if defined(EA_PRAGMA_ONCE_SUPPORTED)
+    #pragma once // Some compilers (e.g. VC++) benefit significantly from using this. We've measured 3-4% build speed improvements in apps as a result.
+#endif
+
 
 
 namespace eastl
@@ -608,8 +604,6 @@ namespace eastl
 
 #if defined(_MSC_VER)
     #pragma warning(pop)
-#elif defined(__SNC__)
-    #pragma control %pop diag
 #endif
 
 

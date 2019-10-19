@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005,2009-2010 Electronic Arts, Inc.  All rights reserved.
+Copyright (C) 2005,2009,2010,2012 Electronic Arts, Inc.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -36,6 +36,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define EASTL_INTERNAL_TYPE_COMPOUND_H
 
 
+#include <EASTL/internal/type_fundamental.h>
+
+
 namespace eastl
 {
 
@@ -58,6 +61,7 @@ namespace eastl
     //   is_same
     //   is_convertible
 
+
     ///////////////////////////////////////////////////////////////////////
     // is_array
     //
@@ -66,6 +70,9 @@ namespace eastl
     // the code below and says that returning an array is illegal.
     //
     ///////////////////////////////////////////////////////////////////////
+
+    #define EASTL_TYPE_TRAIT_is_array_CONFORMANCE 1    // is_array is conforming; doesn't make mistakes.
+
     template <typename T>
     T (*is_array_tester1(empty<T>))(empty<T>);
     char is_array_tester1(...);     // May need to use __cdecl under VC++.
@@ -93,8 +100,23 @@ namespace eastl
     // This category includes reference to function types.
     //
     ///////////////////////////////////////////////////////////////////////
+
+    #define EASTL_TYPE_TRAIT_is_reference_CONFORMANCE 1    // is_reference is conforming; doesn't make mistakes.
+
     template <typename T> struct is_reference : public false_type{};
     template <typename T> struct is_reference<T&> : public true_type{};
+
+
+
+    ///////////////////////////////////////////////////////////////////////
+    // is_member_object_pointer
+    //
+    // is_member_object_pointer<T>::value == true if and only if T is a 
+    // pointer to data member type.
+    //
+    ///////////////////////////////////////////////////////////////////////
+
+    // Not implemented yet.
 
 
 
@@ -109,6 +131,9 @@ namespace eastl
     // for additional arguments if necessary.
     // To do: Make volatile and const volatile versions of these in addition to non-const and const.
     ///////////////////////////////////////////////////////////////////////
+
+    #define EASTL_TYPE_TRAIT_is_member_function_pointer_CONFORMANCE 1    // is_member_function_pointer is conforming; doesn't make mistakes.
+
     template <typename T> struct is_mem_fun_pointer_value : public false_type{};
     template <typename R, typename T> struct is_mem_fun_pointer_value<R (T::*)()> : public true_type{};
     template <typename R, typename T> struct is_mem_fun_pointer_value<R (T::*)() const> : public true_type{};
@@ -141,6 +166,9 @@ namespace eastl
     //    is_member_function_pointer<T>::value == true
     //
     ///////////////////////////////////////////////////////////////////////
+
+    #define EASTL_TYPE_TRAIT_is_member_pointer_CONFORMANCE 1    // is_member_pointer is conforming; doesn't make mistakes.
+
     template <typename T> 
     struct is_member_pointer : public integral_constant<bool, is_member_function_pointer<T>::value>{};
 
@@ -157,6 +185,9 @@ namespace eastl
     // member types.
     //
     ///////////////////////////////////////////////////////////////////////
+
+    #define EASTL_TYPE_TRAIT_is_pointer_CONFORMANCE 1    // is_pointer is conforming; doesn't make mistakes.
+
     template <typename T> struct is_pointer_helper : public false_type{};
 
     template <typename T> struct is_pointer_helper<T*>                : public true_type{};
@@ -179,11 +210,15 @@ namespace eastl
     // if and only if T and U are the same type.
     //
     ///////////////////////////////////////////////////////////////////////
+
+    #define EASTL_TYPE_TRAIT_is_same_CONFORMANCE 1    // is_same is conforming; doesn't make mistakes.
+
     template<typename T, typename U>
     struct is_same : public false_type { };
 
     template<typename T>
     struct is_same<T, T> : public true_type { };
+
 
 
     ///////////////////////////////////////////////////////////////////////
@@ -209,7 +244,18 @@ namespace eastl
     //    struct D : B, C {};
     //    is_convertible<D*, A*>::value; // Generates compiler error.
     ///////////////////////////////////////////////////////////////////////
-    #if !defined(__GNUC__) || (__GNUC__ >= 3) // GCC 2.x doesn't like the code below.
+
+    #if EASTL_INTRINSIC_TYPE_TRAITS_AVAILABLE && (defined(_MSC_VER) || defined(EA_COMPILER_CLANG))
+        #define EASTL_TYPE_TRAIT_is_convertible_CONFORMANCE 1    // is_convertible is conforming.
+
+        template <typename From, typename To>
+        struct is_convertible : public integral_constant<bool, __is_convertible_to(From, To)>{};
+
+    #elif !defined(__GNUC__) || (__GNUC__ >= 3) // GCC 2.x doesn't like the code below.
+
+        #define EASTL_TYPE_TRAIT_is_convertible_CONFORMANCE 0    // is_convertible is not fully conforming.
+
+        // Some variations of EDG generate a warning about the usage below: Test(...) - aggregate type passed through ellipsis (it's not portable to pass a non-POD as ellipsis).
         template <typename From, typename To, bool is_from_void = false, bool is_to_void = false>
         struct is_convertible_helper {
             static yes_type Test(To);  // May need to use __cdecl under VC++.
@@ -230,6 +276,9 @@ namespace eastl
         struct is_convertible : public is_convertible_helper<From, To, is_void<From>::value, is_void<To>::value>::result {};
 
     #else
+
+        #define EASTL_TYPE_TRAIT_is_convertible_CONFORMANCE 0    // is_convertible is not conforming.
+
         template <typename From, typename To>
         struct is_convertible : public false_type{};
     #endif
@@ -245,7 +294,16 @@ namespace eastl
     // via 'msl::is_union<T>::value'. The user can force something to be 
     // evaluated as a union via EASTL_DECLARE_UNION.
     ///////////////////////////////////////////////////////////////////////
-    template <typename T> struct is_union : public false_type{};
+    #if EASTL_INTRINSIC_TYPE_TRAITS_AVAILABLE && (defined(_MSC_VER) || defined(EA_COMPILER_GNUC) || defined(EA_COMPILER_CLANG))
+        #define EASTL_TYPE_TRAIT_is_union_CONFORMANCE 1    // is_union is conforming.
+
+        template <typename T> 
+        struct is_union : public integral_constant<bool, __is_union(T)>{};
+    #else
+        #define EASTL_TYPE_TRAIT_is_union_CONFORMANCE 0    // is_union is not fully conforming.
+
+        template <typename T> struct is_union : public false_type{};
+    #endif
 
     #define EASTL_DECLARE_UNION(T) namespace eastl{ template <> struct is_union<T> : public true_type{}; template <> struct is_union<const T> : public true_type{}; }
 
@@ -262,11 +320,14 @@ namespace eastl
     // distinguish between unions and classes. As a result, is_class
     // will erroneously evaluate to true for union types.
     ///////////////////////////////////////////////////////////////////////
-    #if defined(__MWERKS__)
-        // To do: Switch this to use msl_utility type traits.
+    #if EASTL_INTRINSIC_TYPE_TRAITS_AVAILABLE && (defined(_MSC_VER) || defined(EA_COMPILER_GNUC) || defined(EA_COMPILER_CLANG))
+        #define EASTL_TYPE_TRAIT_is_class_CONFORMANCE 1    // is_class is conforming.
+
         template <typename T> 
-        struct is_class : public false_type{};
+        struct is_class : public integral_constant<bool, __is_class(T)>{};
     #elif !defined(__GNUC__) || (((__GNUC__ * 100) + __GNUC_MINOR__) >= 304) // Not GCC or GCC 3.4+
+        #define EASTL_TYPE_TRAIT_is_class_CONFORMANCE   EASTL_TYPE_TRAIT_is_union_CONFORMANCE
+
         template <typename U> static yes_type is_class_helper(void (U::*)());
         template <typename U> static no_type  is_class_helper(...);
 
@@ -275,6 +336,8 @@ namespace eastl
             sizeof(is_class_helper<T>(0)) == sizeof(yes_type) && !is_union<T>::value
         >{};
     #else
+        #define EASTL_TYPE_TRAIT_is_class_CONFORMANCE 0    // is_class is not fully conforming.
+
         // GCC 2.x version, due to GCC being broken.
         template <typename T> 
         struct is_class : public false_type{};
@@ -288,32 +351,44 @@ namespace eastl
     // is_enum<T>::value == true if and only if T is an enumeration type.
     //
     ///////////////////////////////////////////////////////////////////////
-    struct int_convertible{ int_convertible(int); };
 
-    template <bool is_arithmetic_or_reference>
-    struct is_enum_helper { template <typename T> struct nest : public is_convertible<T, int_convertible>{}; };
+    #if EASTL_INTRINSIC_TYPE_TRAITS_AVAILABLE && (defined(_MSC_VER) || defined(EA_COMPILER_GNUC) || defined(EA_COMPILER_CLANG))
+        #define EASTL_TYPE_TRAIT_is_enum_CONFORMANCE 1     // is_enum is conforming. 
 
-    template <>
-    struct is_enum_helper<true> { template <typename T> struct nest : public false_type {}; };
+        template <typename T> 
+        struct is_enum : public integral_constant<bool, __is_enum(T)>{};
+    #else
+        #define EASTL_TYPE_TRAIT_is_enum_CONFORMANCE 1    // is_enum is conforming.
 
-    template <typename T>
-    struct is_enum_helper2
-    {
-        typedef type_or<is_arithmetic<T>::value, is_reference<T>::value, is_class<T>::value> selector;
-        typedef is_enum_helper<selector::value> helper_t;
-        typedef typename add_reference<T>::type ref_t;
-        typedef typename helper_t::template nest<ref_t> result;
-    };
+        struct int_convertible{ int_convertible(int); };
 
-    template <typename T> 
-    struct is_enum : public integral_constant<bool, is_enum_helper2<T>::result::value>{};
+        template <bool is_arithmetic_or_reference>
+        struct is_enum_helper { template <typename T> struct nest : public is_convertible<T, int_convertible>{}; };
 
-    template <> struct is_enum<void> : public false_type {};
-    template <> struct is_enum<void const> : public false_type {};
-    template <> struct is_enum<void volatile> : public false_type {};
-    template <> struct is_enum<void const volatile> : public false_type {};
+        template <>
+        struct is_enum_helper<true> { template <typename T> struct nest : public false_type {}; };
+
+        template <typename T>
+        struct is_enum_helper2
+        {
+            typedef type_or<is_arithmetic<T>::value, is_reference<T>::value, is_class<T>::value> selector;
+            typedef is_enum_helper<selector::value> helper_t;
+            typedef typename add_reference<T>::type ref_t;
+            typedef typename helper_t::template nest<ref_t> result;
+        };
+
+        template <typename T> 
+        struct is_enum : public integral_constant<bool, is_enum_helper2<T>::result::value>{};
+
+        template <> struct is_enum<void> : public false_type {};
+        template <> struct is_enum<void const> : public false_type {};
+        template <> struct is_enum<void volatile> : public false_type {};
+        template <> struct is_enum<void const volatile> : public false_type {};
+    #endif
 
     #define EASTL_DECLARE_ENUM(T) namespace eastl{ template <> struct is_enum<T> : public true_type{}; template <> struct is_enum<const T> : public true_type{}; }
+
+
 
 
     ///////////////////////////////////////////////////////////////////////
@@ -324,50 +399,60 @@ namespace eastl
     // be applied to complete types.
     //
     ///////////////////////////////////////////////////////////////////////
-    template <typename T>
-    struct is_polymorphic_imp1
-    {
-        typedef typename remove_cv<T>::type t;
 
-        struct helper_1 : public t
+    #if EASTL_INTRINSIC_TYPE_TRAITS_AVAILABLE && (defined(_MSC_VER) || defined(EA_COMPILER_GNUC) || defined(EA_COMPILER_CLANG))
+        #define EASTL_TYPE_TRAIT_is_polymorphic_CONFORMANCE 1    // is_polymorphic is conforming. 
+
+        template <typename T> 
+        struct is_polymorphic : public integral_constant<bool, __is_polymorphic(T)>{};
+    #else
+        #define EASTL_TYPE_TRAIT_is_polymorphic_CONFORMANCE 1    // is_polymorphic is conforming.
+
+        template <typename T>
+        struct is_polymorphic_imp1
         {
-            helper_1();
-            ~helper_1() throw();
-            char pad[64];
+            typedef typename remove_cv<T>::type t;
+
+            struct helper_1 : public t
+            {
+                helper_1();
+                ~helper_1() throw();
+                char pad[64];
+            };
+
+            struct helper_2 : public t
+            {
+                helper_2();
+                virtual ~helper_2() throw();
+                #ifndef _MSC_VER
+                    virtual void foo();
+                #endif
+                char pad[64];
+            };
+
+            static const bool value = (sizeof(helper_1) == sizeof(helper_2));
         };
 
-        struct helper_2 : public t
-        {
-            helper_2();
-            virtual ~helper_2() throw();
-            #ifndef _MSC_VER
-                virtual void foo();
-            #endif
-            char pad[64];
+        template <typename T>
+        struct is_polymorphic_imp2{ static const bool value = false; };
+
+        template <bool is_class>
+        struct is_polymorphic_selector{ template <typename T> struct rebind{ typedef is_polymorphic_imp2<T> type; }; };
+
+        template <>
+        struct is_polymorphic_selector<true>{ template <typename T> struct rebind{ typedef is_polymorphic_imp1<T> type; }; };
+
+        template <typename T>
+        struct is_polymorphic_value{
+            typedef is_polymorphic_selector<is_class<T>::value> selector;
+            typedef typename selector::template rebind<T> binder;
+            typedef typename binder::type imp_type;
+            static const bool value = imp_type::value;
         };
 
-        static const bool value = (sizeof(helper_1) == sizeof(helper_2));
-    };
-
-    template <typename T>
-    struct is_polymorphic_imp2{ static const bool value = false; };
-
-    template <bool is_class>
-    struct is_polymorphic_selector{ template <typename T> struct rebind{ typedef is_polymorphic_imp2<T> type; }; };
-
-    template <>
-    struct is_polymorphic_selector<true>{ template <typename T> struct rebind{ typedef is_polymorphic_imp1<T> type; }; };
-
-    template <typename T>
-    struct is_polymorphic_value{
-        typedef is_polymorphic_selector<is_class<T>::value> selector;
-        typedef typename selector::template rebind<T> binder;
-        typedef typename binder::type imp_type;
-        static const bool value = imp_type::value;
-    };
-
-    template <typename T> 
-    struct is_polymorphic : public integral_constant<bool, is_polymorphic_value<T>::value>{};
+        template <typename T> 
+        struct is_polymorphic : public integral_constant<bool, is_polymorphic_value<T>::value>{};
+    #endif
 
 
 
@@ -378,6 +463,9 @@ namespace eastl
     // is_function<T>::value == true  if and only if T is a function type.
     //
     ///////////////////////////////////////////////////////////////////////
+
+    #define EASTL_TYPE_TRAIT_is_function_CONFORMANCE 1    // is_function is conforming.
+
     template <typename R> struct is_function_ptr_helper : public false_type{};
     template <typename R> struct is_function_ptr_helper<R (*)()> : public true_type{};
     template <typename R, typename Arg0> struct is_function_ptr_helper<R (*)(Arg0)> : public true_type{};
@@ -418,6 +506,8 @@ namespace eastl
     // defined object type).
     ///////////////////////////////////////////////////////////////////////
 
+    #define EASTL_TYPE_TRAIT_is_object_CONFORMANCE  (EASTL_TYPE_TRAIT_is_reference_CONFORMANCE && EASTL_TYPE_TRAIT_is_void_CONFORMANCE && EASTL_TYPE_TRAIT_is_function_CONFORMANCE)
+
     template <typename T> 
     struct is_object : public integral_constant<bool,
         !is_reference<T>::value && !is_void<T>::value && !is_function<T>::value
@@ -435,6 +525,9 @@ namespace eastl
     //    is_member_pointer<T>::value
     //
     ///////////////////////////////////////////////////////////////////////
+
+    #define EASTL_TYPE_TRAIT_is_scalar_CONFORMANCE 1    // is_scalar is conforming.
+
     template <typename T>
     struct is_scalar : public integral_constant<bool, is_arithmetic<T>::value || is_enum<T>::value>{};
 
@@ -459,6 +552,9 @@ namespace eastl
     //    is_void<T>::value == false
     //
     ///////////////////////////////////////////////////////////////////////
+
+    #define EASTL_TYPE_TRAIT_is_compound_CONFORMANCE  EASTL_TYPE_TRAIT_is_fundamental_CONFORMANCE
+
     template <typename T> 
     struct is_compound : public integral_constant<bool, !is_fundamental<T>::value>{};
 

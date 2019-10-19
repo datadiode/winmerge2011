@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2009-2010 Electronic Arts, Inc.  All rights reserved.
+Copyright (C) 2009,2010,2012 Electronic Arts, Inc.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -26,12 +26,6 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-///////////////////////////////////////////////////////////////////////////////
-// EASTL/hash_map.h
-//
-// Copyright (c) 2005, Electronic Arts. All rights reserved.
-// Written and maintained by Paul Pedriana.
-///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
 // This file is based on the TR1 (technical report 1) reference implementation
@@ -50,6 +44,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <EASTL/internal/hashtable.h>
 #include <EASTL/functional.h>
 #include <EASTL/utility.h>
+
+#if defined(EA_PRAGMA_ONCE_SUPPORTED)
+    #pragma once // Some compilers (e.g. VC++) benefit significantly from using this. We've measured 3-4% build speed improvements in apps as a result.
+#endif
 
 
 
@@ -92,7 +90,9 @@ namespace eastl
     ///
     /// Implements a hash_map, which is a hashed associative container.
     /// Lookups are O(1) (that is, they are fast) but the container is 
-    /// not sorted.
+    /// not sorted. Note that lookups are only O(1) if the hash table
+    /// is well-distributed (non-colliding). The lookup approaches
+    /// O(n) behavior as the table becomes increasingly poorly distributed.
     ///
     /// set_max_load_factor
     /// If you want to make a hashtable never increase its bucket usage,
@@ -211,10 +211,13 @@ namespace eastl
 
         mapped_type& operator[](const key_type& key)
         {
-            const typename base_type::iterator it = base_type::find(key);
-            if(it != base_type::end())
-                return (*it).second;
-            return (*base_type::insert(value_type(key, mapped_type())).first).second;
+            return (*base_type::DoInsertKey(key, true_type()).first).second;
+
+            // Slower reference version:
+            //const typename base_type::iterator it = base_type::find(key);
+            //if(it != base_type::end())
+            //    return (*it).second;
+            //return (*base_type::insert(value_type(key, mapped_type())).first).second;
         }
 
     }; // hash_map

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2009-2010 Electronic Arts, Inc.  All rights reserved.
+Copyright (C) 2009,2010,2012 Electronic Arts, Inc.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -26,12 +26,6 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-///////////////////////////////////////////////////////////////////////////////
-// EASTL/allocator.h
-//
-// Copyright (c) 2005, Electronic Arts. All rights reserved.
-// Written and maintained by Paul Pedriana.
-///////////////////////////////////////////////////////////////////////////////
 
 
 #ifndef EASTL_ALLOCATOR_H
@@ -46,6 +40,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     #pragma warning(push)
     #pragma warning(disable: 4189) // local variable is initialized but not referenced
 #endif
+
+#if defined(EA_PRAGMA_ONCE_SUPPORTED)
+    #pragma once // Some compilers (e.g. VC++) benefit significantly from using this. We've measured 3-4% build speed improvements in apps as a result.
+#endif
+
 
 
 namespace eastl
@@ -103,9 +102,40 @@ namespace eastl
     bool operator==(const allocator& a, const allocator& b);
     bool operator!=(const allocator& a, const allocator& b);
 
+
+
+    /// dummy_allocator
+    ///
+    class EASTL_API dummy_allocator
+    {
+    public:
+        EASTL_ALLOCATOR_EXPLICIT dummy_allocator(const char* = NULL) { }
+        dummy_allocator(const dummy_allocator&) { }
+        dummy_allocator(const dummy_allocator&, const char*) { }
+
+        dummy_allocator& operator=(const dummy_allocator&) { return *this; }
+
+        void* allocate(size_t, int = 0)                 { return NULL; }
+        void* allocate(size_t, size_t, size_t, int = 0) { return NULL; }
+        void  deallocate(void*, size_t)                 { }
+
+        const char* get_name() const      { return ""; }
+        void        set_name(const char*) { }
+    };
+
+    inline bool operator==(const dummy_allocator&, const dummy_allocator&) { return true;  }
+    inline bool operator!=(const dummy_allocator&, const dummy_allocator&) { return false; }
+
+
+
+    /// Defines a static default allocator which is constant across all types.
+    /// This is different from get_default_allocator, which is is bound at
+    /// compile-time and expected to differ per allocator type.
+    /// Currently this Default Allocator applies only to CoreAllocatorAdapter.
+    /// To consider: This naming of this function is too similar to get_default_allocator
+    /// and instead should be named something like GetStaticDefaultAllocator.
     EASTL_API allocator* GetDefaultAllocator();
     EASTL_API allocator* SetDefaultAllocator(allocator* pAllocator);
-
 
 
     /// get_default_allocator
@@ -181,6 +211,7 @@ namespace eastl
 
     #ifdef _MSC_VER
         #pragma warning(push, 0)
+        #pragma warning(disable: 4265 4365 4836)
         #include <new>
         #pragma warning(pop)
     #else

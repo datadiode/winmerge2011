@@ -46,14 +46,17 @@ void* operator new[](size_t size, size_t alignment, size_t alignmentOffset,
 #endif
 }
 
-// Support EASTL as per <EASTL/string.h> line 197.
+// Support EASTL's Vsnprintf(), as described in <EASTL/string.h>
 int Vsnprintf8(char* pDestination, size_t n, const char* pFormat, va_list arguments)
 {
 	// The _vscprintf() avoids reallocations by pretending C99 conformance.
 	return n ? _vsnprintf(pDestination, n, pFormat, arguments) : _vscprintf(pFormat, arguments);
 }
 
-// Support EASTL as per <EASTL/string.h> line 198.
+#if EA_WCHAR_UNIQUE
+#define Vsnprintf16 VsnprintfW
+#endif
+
 int Vsnprintf16(wchar_t* pDestination, size_t n, const wchar_t* pFormat, va_list arguments)
 {
 	// The _vscwprintf() avoids reallocations by pretending C99 conformance.

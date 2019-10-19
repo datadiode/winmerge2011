@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005,2009-2010 Electronic Arts, Inc.  All rights reserved.
+Copyright (C) 2005,2009,2010,2012 Electronic Arts, Inc.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -57,6 +57,7 @@ namespace eastl
     //    remove_pointer
     //    add_pointer
     //    aligned_storage
+    //    union_cast
 
 
     ///////////////////////////////////////////////////////////////////////
@@ -68,6 +69,8 @@ namespace eastl
     // add_signed<unsigned int>::type is int
     //
     ///////////////////////////////////////////////////////////////////////
+
+    #define EASTL_TYPE_TRAIT_add_signed_CONFORMANCE 1    // add_signed is conforming.
 
     template<class T>
     struct add_signed
@@ -123,6 +126,8 @@ namespace eastl
     //
     ///////////////////////////////////////////////////////////////////////
 
+    #define EASTL_TYPE_TRAIT_add_unsigned_CONFORMANCE 1    // add_unsigned is conforming.
+
     template<class T>
     struct add_unsigned
     { typedef T type; };
@@ -166,6 +171,56 @@ namespace eastl
     #endif
 
     ///////////////////////////////////////////////////////////////////////
+    // remove_const
+    //
+    // Remove const from a type.
+    //
+    // The remove_const transformation trait removes top-level const 
+    // qualification (if any) from the type to which it is applied. For a 
+    // given type T, remove_const<T const>::type is equivalent to the type T. 
+    // For example, remove_const<char*>::type is equivalent to char* while 
+    // remove_const<const char*>::type is equivalent to const char*. 
+    // In the latter case, the const qualifier modifies char, not *, and is 
+    // therefore not at the top level.
+    //
+    ///////////////////////////////////////////////////////////////////////
+
+    #define EASTL_TYPE_TRAIT_remove_const_CONFORMANCE 1    // remove_const is conforming.
+
+    template<typename T>
+    struct remove_const{ typedef T type; };
+
+    template<typename T>
+    struct remove_const<T const>{ typedef T type; };
+  
+
+
+    ///////////////////////////////////////////////////////////////////////
+    // remove_volatile
+    //
+    // Remove volatile from a type.
+    //
+    // The remove_volatile transformation trait removes top-level volatile 
+    // qualification (if any) from the type to which it is applied. 
+    // For a given type T, the type remove_volatile <T volatile>::T is equivalent 
+    // to the type T. For example, remove_volatile <char* volatile>::type is 
+    // equivalent to char* while remove_volatile <volatile char*>::type is 
+    // equivalent to volatile char*. In the latter case, the volatile qualifier 
+    // modifies char, not *, and is therefore not at the top level.
+    //
+    ///////////////////////////////////////////////////////////////////////
+
+    #define EASTL_TYPE_TRAIT_remove_volatile_CONFORMANCE 1    // remove_volatile is conforming.
+
+    template<typename T>
+    struct remove_volatile{ typedef T type; };
+
+    template<typename T>
+    struct remove_volatile<T volatile>{ typedef T type; };
+  
+
+
+    ///////////////////////////////////////////////////////////////////////
     // remove_cv
     //
     // Remove const and volatile from a type.
@@ -178,6 +233,10 @@ namespace eastl
     // char, not *, and is therefore not at the top level.
     //
     ///////////////////////////////////////////////////////////////////////
+
+    #define EASTL_TYPE_TRAIT_remove_cv_CONFORMANCE 1    // remove_cv is conforming.
+
+    /* Older version
     template <typename T> struct remove_cv_imp{};
     template <typename T> struct remove_cv_imp<T*>                { typedef T unqualified_type; };
     template <typename T> struct remove_cv_imp<const T*>          { typedef T unqualified_type; };
@@ -190,9 +249,77 @@ namespace eastl
     template <typename T, size_t N> struct remove_cv<T const[N]>         { typedef T type[N]; };
     template <typename T, size_t N> struct remove_cv<T volatile[N]>      { typedef T type[N]; };
     template <typename T, size_t N> struct remove_cv<T const volatile[N]>{ typedef T type[N]; };
+    */
 
-
+    template<typename T>
+    struct remove_cv
+    {
+        typedef typename remove_const<typename remove_volatile<T>::type>::type type;
+    };
   
+
+
+    ///////////////////////////////////////////////////////////////////////
+    // add_const
+    //
+    // Add const to a type.
+    //
+    // Tor a given type T, add_const<T>::type is equivalent to T 
+    // const if is_const<T>::value == false, and
+    //    - is_void<T>::value == true, or
+    //    - is_object<T>::value == true.
+    //
+    // Otherwise, add_const<T>::type is equivalent to T.
+    //
+    ///////////////////////////////////////////////////////////////////////
+
+    #define EASTL_TYPE_TRAIT_add_const_CONFORMANCE 1    // add_const is conforming.
+
+    template<typename T>
+    struct add_const{ typedef T const type; };
+   
+
+
+    ///////////////////////////////////////////////////////////////////////
+    // add_volatile
+    //
+    // Add volatile to a type.
+    // 
+    // For a given type T, add_volatile<T>::type is equivalent to T volatile 
+    // if is_volatile<T>::value == false, and
+    //   - is_void<T>::value == true, or
+    //   - is_object<T>::value == true.
+    //
+    // Otherwise, add_volatile<T>::type is equivalent to T.
+    //
+    ///////////////////////////////////////////////////////////////////////
+
+    #define EASTL_TYPE_TRAIT_add_volatile_CONFORMANCE 1    // add_volatile is conforming.
+
+    template<typename T>
+    struct add_volatile{ typedef T volatile type; };
+  
+
+
+    ///////////////////////////////////////////////////////////////////////
+    // add_cv
+    //
+    // The add_cv transformation trait adds const and volatile qualification 
+    // to the type to which it is applied. For a given type T, 
+    // add_volatile<T>::type is equivalent to add_const<add_volatile<T>::type>::type.
+    //
+    ///////////////////////////////////////////////////////////////////////
+
+    #define EASTL_TYPE_TRAIT_add_cv_CONFORMANCE 1    // add_cv is conforming.
+
+    template<typename T>
+    struct add_cv
+    {
+        typedef typename add_const<typename add_volatile<T>::type>::type type;
+    };
+
+
+
     ///////////////////////////////////////////////////////////////////////
     // add_reference
     //
@@ -204,6 +331,9 @@ namespace eastl
     // and T otherwise.
     //
     ///////////////////////////////////////////////////////////////////////
+
+    #define EASTL_TYPE_TRAIT_add_reference_CONFORMANCE 1    // add_reference is conforming.
+
     template <typename T>
     struct add_reference_impl{ typedef T& type; };
 
@@ -215,6 +345,123 @@ namespace eastl
 
     template <typename T>
     struct add_reference { typedef typename add_reference_impl<T>::type type; };
+
+
+
+    ///////////////////////////////////////////////////////////////////////
+    // remove_reference
+    //
+    // Remove reference from a type.
+    //
+    // The remove_reference transformation trait removes top-level of 
+    // indirection by reference (if any) from the type to which it is applied. 
+    // For a given type T, remove_reference<T&>::type is equivalent to T.
+    //
+    ///////////////////////////////////////////////////////////////////////
+
+    // Not implemented yet.
+
+
+
+    ///////////////////////////////////////////////////////////////////////
+    // remove_pointer
+    //
+    // Remove pointer from a type.
+    //
+    // The remove_pointer transformation trait removes top-level indirection 
+    // by pointer (if any) from the type to which it is applied. Pointers to 
+    // members are not affected. For a given type T, remove_pointer<T*>::type 
+    // is equivalent to T.
+    //
+    ///////////////////////////////////////////////////////////////////////
+
+    // Not implemented yet.
+
+
+
+    ///////////////////////////////////////////////////////////////////////
+    // remove_extent
+    //
+    // The remove_extent transformation trait removes a dimension from an array.
+    // For a given non-array type T, remove_extent<T>::type is equivalent to T.
+    // For a given array type T[N], remove_extent<T[N]>::type is equivalent to T.
+    // For a given array type const T[N], remove_extent<const T[N]>::type is equivalent to const T.
+    // For example, given a multi-dimensional array type T[M][N], remove_extent<T[M][N]>::type is equivalent to T[N].
+    ///////////////////////////////////////////////////////////////////////
+
+    // Not implemented yet.
+
+
+
+    ///////////////////////////////////////////////////////////////////////
+    // remove_all_extents
+    //
+    // The remove_all_extents transformation trait removes all dimensions from an array.
+    // For a given non-array type T, remove_all_extents<T>::type is equivalent to T.
+    // For a given array type T[N], remove_all_extents<T[N]>::type is equivalent to T.
+    // For a given array type const T[N], remove_all_extents<const T[N]>::type is equivalent to const T.
+    // For example, given a multi-dimensional array type T[M][N], remove_all_extents<T[M][N]>::type is equivalent to T.
+    ///////////////////////////////////////////////////////////////////////
+
+    // Not implemented yet.
+
+
+
+    ///////////////////////////////////////////////////////////////////////
+    // aligned_storage
+    //
+    // The aligned_storage transformation trait provides a type that is 
+    // suitably aligned to store an object whose size is does not exceed length 
+    // and whose alignment is a divisor of alignment. When using aligned_storage, 
+    // length must be non-zero, and alignment must be equal to alignment_of<T>::value 
+    // for some type T.
+    //
+    ///////////////////////////////////////////////////////////////////////
+
+    // template <size_t length, size_t alignment> struct aligned_storage;
+    // Not implemented yet.
+
+
+    ///////////////////////////////////////////////////////////////////////
+    // union_cast
+    //
+    // Safely converts between unrelated types that have a binary equivalency.
+    // This appoach is required by strictly conforming C++ compilers because
+    // directly using a C or C++ cast between unrelated types is fraught with 
+    // the possibility of undefined runtime behavior due to type aliasing.
+    // The Source and Dest types must be POD types due to the use of a union 
+    // in C++ versions prior to C++11. C++11 relaxes the definition of a POD
+    // such that it allows a classes with trivial default constructors whereas 
+    // previous versions did not, so beware of this when writing portable code.
+    //
+    // Example usage:
+    //    float f32 = 1.234f;
+    //    uint32_t n32 = union_cast<uint32_t>(f32);
+    //
+    // Example possible mis-usage:
+    // The following is valid only if you are aliasing the pointer value and 
+    // not what it points to. Most of the time the user intends the latter, 
+    // which isn't strictly possible.
+    //    Widget* pWidget = CreateWidget();
+    //    Foo*    pFoo    = union_cast<Foo*>(pWidget);
+    ///////////////////////////////////////////////////////////////////////
+
+    template <typename DestType, typename SourceType>
+    DestType union_cast(SourceType sourceValue)
+    {
+        EASTL_CT_ASSERT((sizeof(DestType) == sizeof(SourceType)) && 
+                        (EA_ALIGN_OF(DestType) == EA_ALIGN_OF(SourceType)));               // To support differening alignments, we would need to use a memcpy-based solution or find a way to make the two union members align with each other.
+        //EASTL_CT_ASSERT(is_pod<DestType>::value && is_pod<SourceType>::value);           // Disabled because we don't want to restrict what the user can do, as some compiler's definitions of is_pod aren't up to C++11 Standards.
+        //EASTL_CT_ASSERT(!is_pointer<DestType>::value && !is_pointer<SourceType>::value); // Disabled because it's valid to alias pointers as long as you are aliasong the pointer value and not what it points to.
+
+        union {
+            SourceType sourceValue;
+            DestType   destValue;
+        } u;
+        u.sourceValue = sourceValue;
+
+        return u.destValue;
+    }
 
 
 } // namespace eastl

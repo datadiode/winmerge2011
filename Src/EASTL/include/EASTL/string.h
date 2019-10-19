@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005,2009-2010 Electronic Arts, Inc.  All rights reserved.
+Copyright (C) 2005,2009,2010,2012 Electronic Arts, Inc.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -131,15 +131,12 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 #include <stddef.h>             // size_t, ptrdiff_t, etc.
 #include <stdarg.h>             // vararg functionality.
+
 #include <stdlib.h>             // malloc, free.
 #include <stdio.h>              // snprintf, etc.
 #include <ctype.h>              // toupper, etc.
 #include <wchar.h>              // toupper, etc.
-#ifdef __MWERKS__
-    #include <../Include/string.h> // Force the compiler to use the std lib header.
-#else
     #include <string.h> // strlen, etc.
-#endif
 #ifdef _MSC_VER
     #pragma warning(pop)
 #endif
@@ -160,6 +157,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     #pragma warning(disable: 4267)  // 'argument' : conversion from 'size_t' to 'const uint32_t', possible loss of data. This is a bogus warning resulting from a bug in VC++.
     #pragma warning(disable: 4480)  // nonstandard extension used: specifying underlying type for enum
 #endif
+
+#if defined(EA_PRAGMA_ONCE_SUPPORTED)
+    #pragma once // Some compilers (e.g. VC++) benefit significantly from using this. We've measured 3-4% build speed improvements in apps as a result.
+#endif
+
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -187,28 +189,76 @@ const eastl_size_t EASTL_STRING_INITIAL_CAPACITY = 8;
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Vsnprintf8 / Vsnprintf16
+// Vsnprintf
 //
-// The user is expected to supply these functions. Note that these functions
-// are expected to accept parameters as per the C99 standard. These functions
-// can deal with C99 standard return values or Microsoft non-standard return
-// values but act more efficiently if implemented via the C99 style.
+// The user is expected to supply these functions one way or another. Note that
+// these functions are expected to accept parameters as per the C99 standard. 
+// These functions can deal with C99 standard return values or Microsoft non-standard 
+// return values but act more efficiently if implemented via the C99 style.
+//
+// In the case of EASTL_EASTDC_VSNPRINTF == 1, the user is expected to either 
+// link EAStdC or provide the functions below that act the same. In the case of 
+// EASTL_EASTDC_VSNPRINTF == 0, the user is expected to provide the function 
+// implementations, and may simply use C vsnprintf if desired, though it's not
+// completely portable between compilers.
+//
+#if EASTL_EASTDC_VSNPRINTF
+    namespace EA
+    {
+        namespace StdC
+        {
+            // Provided by the EAStdC package or by the user.
+            EASTL_EASTDC_API int Vsnprintf(char8_t*  EA_RESTRICT pDestination, size_t n, const char8_t*  EA_RESTRICT pFormat, va_list arguments);
+            EASTL_EASTDC_API int Vsnprintf(char16_t* EA_RESTRICT pDestination, size_t n, const char16_t* EA_RESTRICT pFormat, va_list arguments);
+            EASTL_EASTDC_API int Vsnprintf(char32_t* EA_RESTRICT pDestination, size_t n, const char32_t* EA_RESTRICT pFormat, va_list arguments);
+            #if defined(EA_WCHAR_UNIQUE) && EA_WCHAR_UNIQUE
+                EASTL_EASTDC_API int Vsnprintf(wchar_t* EA_RESTRICT pDestination, size_t n, const wchar_t* EA_RESTRICT pFormat, va_list arguments);
+            #endif
+        }
+    }
 
-extern int Vsnprintf8 (char8_t*  pDestination, size_t n, const char8_t*  pFormat, va_list arguments);
-extern int Vsnprintf16(char16_t* pDestination, size_t n, const char16_t* pFormat, va_list arguments);
-extern int Vsnprintf32(char32_t* pDestination, size_t n, const char32_t* pFormat, va_list arguments);
+    namespace eastl
+    {
+        inline int Vsnprintf(char8_t* EA_RESTRICT pDestination, size_t n, const char8_t* EA_RESTRICT pFormat, va_list arguments)
+            { return EA::StdC::Vsnprintf(pDestination, n, pFormat, arguments); }
 
-namespace eastl
-{
-    inline int Vsnprintf(char8_t* pDestination, size_t n, const char8_t* pFormat, va_list arguments)
-        { return Vsnprintf8(pDestination, n, pFormat, arguments); }
+        inline int Vsnprintf(char16_t* EA_RESTRICT pDestination, size_t n, const char16_t* EA_RESTRICT pFormat, va_list arguments)
+            { return EA::StdC::Vsnprintf(pDestination, n, pFormat, arguments); }
 
-    inline int Vsnprintf(char16_t* pDestination, size_t n, const char16_t* pFormat, va_list arguments)
-        { return Vsnprintf16(pDestination, n, pFormat, arguments); }
+        inline int Vsnprintf(char32_t* EA_RESTRICT pDestination, size_t n, const char32_t* EA_RESTRICT pFormat, va_list arguments)
+            { return EA::StdC::Vsnprintf(pDestination, n, pFormat, arguments); }
 
-    inline int Vsnprintf(char32_t* pDestination, size_t n, const char32_t* pFormat, va_list arguments)
-        { return Vsnprintf32(pDestination, n, pFormat, arguments); }
-}
+        #if defined(EA_WCHAR_UNIQUE) && EA_WCHAR_UNIQUE
+            inline int Vsnprintf(wchar_t* EA_RESTRICT pDestination, size_t n, const wchar_t* EA_RESTRICT pFormat, va_list arguments)
+            { return EA::StdC::Vsnprintf(pDestination, n, pFormat, arguments); }
+        #endif
+    }
+#else
+    // User-provided functions.
+    extern int Vsnprintf8 (char8_t*  pDestination, size_t n, const char8_t*  pFormat, va_list arguments);
+    extern int Vsnprintf16(char16_t* pDestination, size_t n, const char16_t* pFormat, va_list arguments);
+    extern int Vsnprintf32(char32_t* pDestination, size_t n, const char32_t* pFormat, va_list arguments);
+    #if defined(EA_WCHAR_UNIQUE) && EA_WCHAR_UNIQUE
+        extern int VsnprintfW(wchar_t* pDestination, size_t n, const wchar_t* pFormat, va_list arguments);
+    #endif
+
+    namespace eastl
+    {
+        inline int Vsnprintf(char8_t* pDestination, size_t n, const char8_t* pFormat, va_list arguments)
+            { return Vsnprintf8(pDestination, n, pFormat, arguments); }
+
+        inline int Vsnprintf(char16_t* pDestination, size_t n, const char16_t* pFormat, va_list arguments)
+            { return Vsnprintf16(pDestination, n, pFormat, arguments); }
+
+        inline int Vsnprintf(char32_t* pDestination, size_t n, const char32_t* pFormat, va_list arguments)
+            { return Vsnprintf32(pDestination, n, pFormat, arguments); }
+
+        #if defined(EA_WCHAR_UNIQUE) && EA_WCHAR_UNIQUE
+            inline int Vsnprintf(wchar_t* pDestination, size_t n, const wchar_t* pFormat, va_list arguments)
+                { return VsnprintfW(pDestination, n, pFormat, arguments); }
+        #endif
+    }
+#endif
 ///////////////////////////////////////////////////////////////////////////////
 
 
@@ -245,6 +295,9 @@ namespace eastl
         signed char    mEmptyS8[1];
         char16_t       mEmpty16[1];
         char32_t       mEmpty32[1];
+    #if defined(EA_WCHAR_UNIQUE) && EA_WCHAR_UNIQUE
+        wchar_t         mEmptyWchar[1];
+    #endif
     };
     extern EASTL_API EmptyString gEmptyString;
 
@@ -253,7 +306,9 @@ namespace eastl
     inline const char*          GetEmptyString(char)          { return gEmptyString.mEmpty8;  }
     inline const char16_t*      GetEmptyString(char16_t)      { return gEmptyString.mEmpty16; }
     inline const char32_t*      GetEmptyString(char32_t)      { return gEmptyString.mEmpty32; }
-
+    #if defined(EA_WCHAR_UNIQUE) && EA_WCHAR_UNIQUE
+        inline const wchar_t*   GetEmptyString(wchar_t)       { return gEmptyString.mEmptyWchar; }
+    #endif
 
     ///////////////////////////////////////////////////////////////////////////////
     /// basic_string
@@ -286,7 +341,7 @@ namespace eastl
         typedef ptrdiff_t                                       difference_type;
         typedef Allocator                                       allocator_type;
 
-        #if defined(_MSC_VER) && (_MSC_VER >= 1400) // _MSC_VER of 1400 means VC8 (VS2005), 1500 means VC9 (VS2008)
+        #if defined(_MSC_VER) && (_MSC_VER >= 1400) && (_MSC_VER <= 1600) && !EASTL_STD_CPP_ONLY  // _MSC_VER of 1400 means VS2005, 1600 means VS2010. VS2011 generates errors with usage of enum:size_type.
             enum : size_type {                      // Use Microsoft enum language extension, allowing for smaller debug symbols than using a static const. Users have been affected by this.
                 npos     = (size_type)-1,
                 kMaxSize = (size_type)-2
@@ -295,12 +350,6 @@ namespace eastl
             static const size_type npos     = (size_type)-1;      /// 'npos' means non-valid position or simply non-position.
             static const size_type kMaxSize = (size_type)-2;      /// -1 is reserved for 'npos'. It also happens to be slightly beneficial that kMaxSize is a value less than -1, as it helps us deal with potential integer wraparound issues.
         #endif
-
-        enum
-        {
-            kAlignment       = EASTL_ALIGN_OF(T),
-            kAlignmentOffset = 0
-        };
 
     public:
         // CtorDoNotInitialize exists so that we can create a constructor that allocates but doesn't 
@@ -424,7 +473,7 @@ namespace eastl
         reverse_iterator erase(reverse_iterator position);
         reverse_iterator erase(reverse_iterator first, reverse_iterator last);
         void             clear();
-        void             reset();                      // This is a unilateral reset to an initially empty state. No destructors are called, no deallocation occurs.
+        void             reset_lose_memory();                       // This is a unilateral reset to an initially empty state. No destructors are called, no deallocation occurs.
 
         //Replacement operations
         basic_string&  replace(size_type position, size_type n, const basic_string& x);
@@ -506,6 +555,10 @@ namespace eastl
         bool validate() const;
         int  validate_iterator(const_iterator i) const;
 
+        #if EASTL_RESET_ENABLED
+            void reset(); // This function name is deprecated; use reset_lose_memory instead.
+        #endif
+
     protected:
         // Helper functions for initialization/insertion operations.
         value_type* DoAllocate(size_type n);
@@ -550,6 +603,10 @@ namespace eastl
     inline char32_t CharToLower(char32_t c)
         { if((unsigned)c <= 0xff) return (char32_t)tolower((uint8_t)c); return c; }
 
+    #if defined(EA_WCHAR_UNIQUE) && EA_WCHAR_UNIQUE
+        inline wchar_t CharToLower(wchar_t c)
+            { if((unsigned)c <= 0xff) return (wchar_t)tolower((uint8_t)c); return c; }
+    #endif
 
 
     inline char8_t CharToUpper(char8_t c)
@@ -561,6 +618,10 @@ namespace eastl
     inline char32_t CharToUpper(char32_t c)
         { if((unsigned)c <= 0xff) return (char32_t)toupper((uint8_t)c); return c; }
 
+    #if defined(EA_WCHAR_UNIQUE) && EA_WCHAR_UNIQUE
+        inline wchar_t CharToUpper(wchar_t c)
+            { if((unsigned)c <= 0xff) return (wchar_t)toupper((uint8_t)c); return c; }
+    #endif
 
 
     template <typename T>
@@ -621,6 +682,18 @@ namespace eastl
         return NULL;
     }
 
+    #if defined(EA_WCHAR_UNIQUE) && EA_WCHAR_UNIQUE
+        inline const wchar_t* Find(const wchar_t* p, wchar_t c, size_t n)
+        {
+            for(; n > 0; --n, ++p)
+            {
+                if(*p == c)
+                    return p;
+            }
+
+            return NULL;
+        }
+    #endif
 
     inline size_t CharStrlen(const char8_t* p)
     {
@@ -650,6 +723,15 @@ namespace eastl
         return (size_t)(pCurrent - p);
     }
 
+    #if defined(EA_WCHAR_UNIQUE) && EA_WCHAR_UNIQUE
+        inline size_t CharStrlen(const wchar_t* p)
+        {
+            const wchar_t* pCurrent = p;
+            while(*pCurrent)
+                ++pCurrent;
+            return (size_t)(pCurrent - p);
+        }
+    #endif
 
     template <typename T>
     inline T* CharStringUninitializedCopy(const T* pSource, const T* pSourceEnd, T* pDestination)
@@ -686,7 +768,16 @@ namespace eastl
         return pDestination + n;
     }
 
-
+    #if defined(EA_WCHAR_UNIQUE) && EA_WCHAR_UNIQUE
+        inline wchar_t* CharStringUninitializedFillN(wchar_t* pDestination, size_t n, const wchar_t c)
+        {
+            wchar_t* pDest32          = pDestination;
+            const wchar_t* const pEnd = pDestination + n;
+            while(pDest32 < pEnd)
+                *pDest32++ = c;
+            return pDestination + n;
+        }
+    #endif
 
     inline char8_t* CharTypeAssignN(char8_t* pDestination, size_t n, char8_t c)
     {
@@ -713,7 +804,16 @@ namespace eastl
         return pDestination;
     }
 
-
+    #if defined(EA_WCHAR_UNIQUE) && EA_WCHAR_UNIQUE
+        inline wchar_t* CharTypeAssignN(wchar_t* pDestination, size_t n, wchar_t c)
+        {
+            wchar_t* pDest32          = pDestination;
+            const wchar_t* const pEnd = pDestination + n;
+            while(pDest32 < pEnd)
+                *pDest32++ = c;
+            return pDestination;
+        }
+    #endif
 
     ///////////////////////////////////////////////////////////////////////////////
     // basic_string
@@ -1172,8 +1272,18 @@ namespace eastl
     } 
 
 
+    #if EASTL_RESET_ENABLED
+        // This function name is deprecated; use reset_lose_memory instead.
+        template <typename T, typename Allocator>
+        inline void basic_string<T, Allocator>::reset()
+        {
+            reset_lose_memory();
+        }
+    #endif
+
+
     template <typename T, typename Allocator>
-    inline void basic_string<T, Allocator>::reset()
+    inline void basic_string<T, Allocator>::reset_lose_memory()
     {
         // The reset function is a special extension function which unilaterally 
         // resets the container to an empty state without freeing the memory of 
@@ -2151,40 +2261,6 @@ namespace eastl
     }
 
 
-    #if defined(EA_PLATFORM_XENON) // If XBox 360...
-       
-        template <typename T, typename Allocator>
-        typename basic_string<T, Allocator>::size_type
-        basic_string<T, Allocator>::find(const value_type* p, size_type position, size_type n) const
-        {
-            const size_type nLength = (size_type)(mpEnd - mpBegin);
-
-            if(n || (position > nLength))
-            {
-                if(position < nLength)
-                {
-                    size_type nRemain = nLength - position;
-
-                    if(n <= nRemain)
-                    {
-                        nRemain -= (n - 1);
-
-                        for(const value_type* p1, *p2 = mpBegin + position;
-                            (p1 = Find(p2, *p, nRemain)) != 0;
-                            nRemain -= (p1 - p2) + 1, p2 = (p1 + 1))
-                        {
-                            if(Compare(p1, p, n) == 0)
-                                return (size_type)(p1 - mpBegin);
-                        }
-                    }
-                }
-
-                return npos;
-            }
-
-            return position;
-        }
-    #else
         template <typename T, typename Allocator>
         typename basic_string<T, Allocator>::size_type
         basic_string<T, Allocator>::find(const value_type* p, size_type position, size_type n) const
@@ -2205,7 +2281,6 @@ namespace eastl
             }
             return npos;
         }
-    #endif
 
 
     template <typename T, typename Allocator>
@@ -2317,24 +2392,6 @@ namespace eastl
     }
 
 
-    #if defined(EA_PLATFORM_XENON) // If XBox 360...
-        
-        template <typename T, typename Allocator>
-        typename basic_string<T, Allocator>::size_type
-        basic_string<T, Allocator>::find_first_of(const value_type* p, size_type position, size_type n) const
-        {
-            // If position is >= size, we return npos.
-            if(n && (position < (size_type)(mpEnd - mpBegin)))
-            {
-                for(const value_type* p1 = (mpBegin + position); p1 < mpEnd; ++p1)
-                {
-                    if(Find(p, *p1, n) != 0)
-                        return (size_type)(p1 - mpBegin);
-                }
-            }
-            return npos;
-        }
-    #else
         template <typename T, typename Allocator>
         typename basic_string<T, Allocator>::size_type
         basic_string<T, Allocator>::find_first_of(const value_type* p, size_type position, size_type n) const
@@ -2350,7 +2407,6 @@ namespace eastl
             }
             return npos;
         }
-    #endif
 
 
     template <typename T, typename Allocator>
@@ -2377,37 +2433,6 @@ namespace eastl
     }
 
 
-    #if defined(EA_PLATFORM_XENON) // If XBox 360...
-       
-        template <typename T, typename Allocator>
-        typename basic_string<T, Allocator>::size_type
-        basic_string<T, Allocator>::find_last_of(const value_type* p, size_type position, size_type n) const
-        {
-            // If n is zero or position is >= size, we return npos.
-            const size_type nLength = (size_type)(mpEnd - mpBegin);
-
-            if(n && nLength)
-            {
-                const value_type* p1;
-
-                if(position < nLength)
-                    p1 = mpBegin + position;
-                else
-                    p1 = mpEnd - 1;
-
-                for(;;)
-                {
-                    if(Find(p, *p1, n))
-                        return (size_type)(p1 - mpBegin);
-
-                    if(p1-- == mpBegin)
-                        break;
-                }
-            }
-
-            return npos;
-        }
-    #else
         template <typename T, typename Allocator>
         typename basic_string<T, Allocator>::size_type
         basic_string<T, Allocator>::find_last_of(const value_type* p, size_type position, size_type n) const
@@ -2425,7 +2450,6 @@ namespace eastl
             }
             return npos;
         }
-    #endif
 
 
     template <typename T, typename Allocator>
@@ -2584,7 +2608,7 @@ namespace eastl
         return compare(mpBegin + pos1, 
                        mpBegin + pos1 + eastl::min_alt(n1, (size_type)(mpEnd - mpBegin) - pos1),
                        x.mpBegin + pos2, 
-                       x.mpBegin + pos2 + eastl::min_alt(n2, (size_type)(mpEnd - mpBegin) - pos2));
+                       x.mpBegin + pos2 + eastl::min_alt(n2, (size_type)(x.mpEnd - x.mpBegin) - pos2));
     }
 
 

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2009-2010 Electronic Arts, Inc.  All rights reserved.
+Copyright (C) 2009,2010,2012 Electronic Arts, Inc.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -26,12 +26,6 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-///////////////////////////////////////////////////////////////////////////////
-// EASTL/list.h
-//
-// Copyright (c) 2005, Electronic Arts. All rights reserved.
-// Written and maintained by Paul Pedriana.
-///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
 // This file implements a doubly-linked list, much like the C++ std::list class.
@@ -87,6 +81,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     #pragma warning(disable: 4530)  // C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
     #pragma warning(disable: 4345)  // Behavior change: an object of POD type constructed with an initializer of the form () will be default-initialized
 #endif
+
+#if defined(EA_PRAGMA_ONCE_SUPPORTED)
+    #pragma once // Some compilers (e.g. VC++) benefit significantly from using this. We've measured 3-4% build speed improvements in apps as a result.
+#endif
+
 
 
 namespace eastl
@@ -233,12 +232,6 @@ namespace eastl
         #else
             typedef ListNodeBase                     base_node_type; // We use ListNodeBase instead of ListNode<T> because we don't want to create a T.
         #endif
-
-        enum
-        {
-            kAlignment       = EASTL_ALIGN_OF(T),
-            kAlignmentOffset = 0                    // offsetof(node_type, mValue);
-        };
 
     protected:
         base_node_type mNode;
@@ -391,7 +384,7 @@ namespace eastl
         reverse_iterator erase(reverse_iterator first, reverse_iterator last);
 
         void clear();
-        void reset();
+        void reset_lose_memory();    // This is a unilateral reset to an initially empty state. No destructors are called, no deallocation occurs.
 
         void remove(const T& x);
 
@@ -403,6 +396,10 @@ namespace eastl
         void splice(iterator position, this_type& x);
         void splice(iterator position, this_type& x, iterator i);
         void splice(iterator position, this_type& x, iterator first, iterator last);
+
+        #if EASTL_RESET_ENABLED
+            void reset(); // This function name is deprecated; use reset_lose_memory instead.
+        #endif
 
     public:
         // Sorting functionality
@@ -520,8 +517,8 @@ namespace eastl
 
     inline void ListNodeBase::remove()
     {
-        mpPrev->mpNext = mpNext;
-        mpNext->mpPrev = mpPrev;
+        mpNext->mpPrev = mpPrev;  // These two lines were previously reversed in order, but they caused a crash
+        mpPrev->mpNext = mpNext;  // in optimized PS3 GCC compiler builds due to code misgeneration.
     }
 
 
@@ -692,7 +689,7 @@ namespace eastl
     inline typename ListBase<T, Allocator>::node_type*
     ListBase<T, Allocator>::DoAllocateNode()
     {
-        return (node_type*)allocate_memory(mAllocator, sizeof(node_type), kAlignment, kAlignmentOffset);
+        return (node_type*)allocate_memory(mAllocator, sizeof(node_type), EASTL_ALIGN_OF(T), 0);
     }
 
 
@@ -1000,10 +997,20 @@ namespace eastl
     }
 
 
+    #if EASTL_RESET_ENABLED
+        // This function name is deprecated; use reset_lose_memory instead.
+        template <typename T, typename Allocator>
+        inline void list<T, Allocator>::reset()
+        {
+            reset_lose_memory();
+        }
+    #endif
+
+
     template <typename T, typename Allocator>
-    inline void list<T, Allocator>::reset()
+    inline void list<T, Allocator>::reset_lose_memory()
     {
-        // The reset function is a special extension function which unilaterally 
+        // The reset_lose_memory function is a special extension function which unilaterally 
         // resets the container to an empty state without freeing the memory of 
         // the contained objects. This is useful for very quickly tearing down a 
         // container built into scratch memory.
@@ -1587,7 +1594,7 @@ namespace eastl
         #if EASTL_EXCEPTIONS_ENABLED
             try
             {
-                ::new(&pNode->mValue) value_type(value);
+                ::new((void*)&pNode->mValue) value_type(value);
             }
             catch(...)
             {
@@ -1595,7 +1602,7 @@ namespace eastl
                 throw;
             }
         #else
-            ::new(&pNode->mValue) value_type(value);
+            ::new((void*)&pNode->mValue) value_type(value);
         #endif
 
         return pNode;
@@ -1611,7 +1618,7 @@ namespace eastl
         #if EASTL_EXCEPTIONS_ENABLED
             try
             {
-                ::new(&pNode->mValue) value_type();
+                ::new((void*)&pNode->mValue) value_type();
             }
             catch(...)
             {
@@ -1619,7 +1626,7 @@ namespace eastl
                 throw;
             }
         #else
-            ::new(&pNode->mValue) value_type;
+            ::new((void*)&pNode->mValue) value_type;
         #endif
 
         return pNode;
@@ -1716,6 +1723,21 @@ namespace eastl
         #if EASTL_LIST_SIZE_CACHE
             --mSize;
         #endif
+
+        /* Test version that uses union intermediates
+        union
+        {
+            ListNodeBase* mpBase;
+            node_type*    mpNode;
+        } node = { pNode };
+
+        node.mpNode->~node_type();
+        node.mpBase->remove();
+        DoFreeNode(node.mpNode);
+        #if EASTL_LIST_SIZE_CACHE
+            --mSize;
+        #endif
+        */
     }
 
 

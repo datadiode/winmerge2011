@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005,2009-2010 Electronic Arts, Inc.  All rights reserved.
+Copyright (C) 2005,2009,2010,2012 Electronic Arts, Inc.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -38,6 +38,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <EASTL/internal/config.h>
 #include <EASTL/type_traits.h>
+
+#if defined(EA_PRAGMA_ONCE_SUPPORTED)
+    #pragma once // Some compilers (e.g. VC++) benefit significantly from using this. We've measured 3-4% build speed improvements in apps as a result.
+#endif
+
 
 
 namespace eastl
@@ -244,20 +249,43 @@ namespace eastl
     {
         bool operator()(const T& a, const U& b) const
             { return a == b; }
+        bool operator()(const U& b, const T& a) const   // If you are getting a 'operator() already defined' error related to on this line while compiling a 
+            { return b == a; }                          // hashtable class (e.g. hash_map), it's likely that you are using hashtable::find_as when you should
+    };                                                  // be using hashtable::find instead. The problem is that (const T, U) collide. To do: make this work.
+
+    template <typename T>
+    struct equal_to_2<T, T> : public equal_to<T>
+    {
     };
+
 
     template <typename T, typename U>
     struct not_equal_to_2 : public binary_function<T, U, bool>
     {
         bool operator()(const T& a, const U& b) const
             { return a != b; }
+        bool operator()(const U& b, const T& a) const
+            { return b != a; }
     };
+
+    template <typename T>
+    struct not_equal_to_2<T, T> : public not_equal_to<T>
+    {
+    };
+
 
     template <typename T, typename U>
     struct less_2 : public binary_function<T, U, bool>
     {
         bool operator()(const T& a, const U& b) const
             { return a < b; }
+        bool operator()(const U& b, const T& a) const
+            { return b < a; }
+    };
+
+    template <typename T>
+    struct less_2<T, T> : public less<T>
+    {
     };
 
 
@@ -302,6 +330,73 @@ namespace eastl
         { return binary_negate<Predicate>(predicate); }
 
 
+
+    /// unary_compose
+    ///
+    template<typename Operation1, typename Operation2>
+    struct unary_compose : public unary_function<typename Operation2::argument_type, typename Operation1::result_type>
+    {
+    protected:
+        Operation1 op1;
+        Operation2 op2;
+
+    public:
+        unary_compose(const Operation1& x, const Operation2& y)
+            : op1(x), op2(y) {}
+
+        typename Operation1::result_type operator()(const typename Operation2::argument_type& x) const
+            { return op1(op2(x)); }
+
+        typename Operation1::result_type operator()(typename Operation2::argument_type& x) const
+            { return op1(op2(x)); }
+    };
+
+    template<typename Operation1,typename Operation2>
+    inline unary_compose<Operation1,Operation2>
+    compose1(const Operation1& op1, const Operation2& op2)
+    {
+        return unary_compose<Operation1, Operation2>(op1,op2);
+    }
+
+
+    /// binary_compose
+    ///
+    template <class Operation1, class Operation2, class Operation3>
+    class binary_compose : public unary_function<typename Operation2::argument_type, typename Operation1::result_type> 
+    {
+    protected:
+        Operation1 op1;
+        Operation2 op2;
+        Operation3 op3;
+
+    public:
+        // Support binary functors too.
+        typedef typename Operation2::argument_type first_argument_type;
+        typedef typename Operation3::argument_type second_argument_type;
+
+        binary_compose(const Operation1& x, const Operation2& y, const Operation3& z) 
+            : op1(x), op2(y), op3(z) { }
+
+        typename Operation1::result_type operator()(const typename Operation2::argument_type& x) const 
+            { return op1(op2(x),op3(x)); }
+
+        typename Operation1::result_type operator()(typename Operation2::argument_type& x) const 
+            { return op1(op2(x),op3(x)); }
+
+        typename Operation1::result_type operator()(const typename Operation2::argument_type& x,const typename Operation3::argument_type& y) const 
+            { return op1(op2(x),op3(y)); }
+
+        typename Operation1::result_type operator()(typename Operation2::argument_type& x, typename Operation3::argument_type& y) const 
+            { return op1(op2(x),op3(y)); }
+    };
+
+
+    template <class Operation1, class Operation2, class Operation3>
+    inline binary_compose<Operation1, Operation2, Operation3>
+    compose2(const Operation1& op1, const Operation2& op2, const Operation3& op3)
+    {
+        return binary_compose<Operation1, Operation2, Operation3>(op1, op2, op3);
+    }
 
 
     ///////////////////////////////////////////////////////////////////////
@@ -410,7 +505,8 @@ namespace eastl
     ///    transform(pIntArrayBegin, pIntArrayEnd, pIntArrayBegin, ptr_fun(factorial));
     ///
     template <typename Arg, typename Result>
-    inline pointer_to_unary_function<Arg, Result> ptr_fun(Result (*pFunction)(Arg))
+    inline pointer_to_unary_function<Arg, Result>
+    ptr_fun(Result (*pFunction)(Arg))
         { return pointer_to_unary_function<Arg, Result>(pFunction); }
 
 
@@ -452,7 +548,8 @@ namespace eastl
     ///    transform(pIntArray1Begin, pIntArray1End, pIntArray2Begin, pIntArray1Begin, ptr_fun(multiply));
     ///
     template <typename Arg1, typename Arg2, typename Result>
-    inline pointer_to_binary_function<Arg1, Arg2, Result> ptr_fun(Result (*pFunction)(Arg1, Arg2))
+    inline pointer_to_binary_function<Arg1, Arg2, Result>
+    ptr_fun(Result (*pFunction)(Arg1, Arg2))
         { return pointer_to_binary_function<Arg1, Arg2, Result>(pFunction); }
 
 
@@ -480,13 +577,13 @@ namespace eastl
     public:
         typedef Result (T::*MemberFunction)();
 
-        EA_FORCE_INLINE explicit mem_fun_t(MemberFunction pMemberFunction)
+        inline explicit mem_fun_t(MemberFunction pMemberFunction)
             : mpMemberFunction(pMemberFunction)
         {
             // Empty
         }
 
-        EA_FORCE_INLINE Result operator()(T* pT) const
+        inline Result operator()(T* pT) const
         {
             return (pT->*mpMemberFunction)();
         }
@@ -506,13 +603,13 @@ namespace eastl
     public:
         typedef Result (T::*MemberFunction)(Argument);
 
-        EA_FORCE_INLINE explicit mem_fun1_t(MemberFunction pMemberFunction)
+        inline explicit mem_fun1_t(MemberFunction pMemberFunction)
             : mpMemberFunction(pMemberFunction)
         {
             // Empty
         }
 
-        EA_FORCE_INLINE Result operator()(T* pT, Argument arg) const
+        inline Result operator()(T* pT, Argument arg) const
         {
             return (pT->*mpMemberFunction)(arg);
         }
@@ -535,13 +632,13 @@ namespace eastl
     public:
         typedef Result (T::*MemberFunction)() const;
 
-        EA_FORCE_INLINE explicit const_mem_fun_t(MemberFunction pMemberFunction)
+        inline explicit const_mem_fun_t(MemberFunction pMemberFunction)
             : mpMemberFunction(pMemberFunction)
         {
             // Empty
         }
 
-        EA_FORCE_INLINE Result operator()(const T* pT) const
+        inline Result operator()(const T* pT) const
         {
             return (pT->*mpMemberFunction)();
         }
@@ -564,13 +661,13 @@ namespace eastl
     public:
         typedef Result (T::*MemberFunction)(Argument) const;
 
-        EA_FORCE_INLINE explicit const_mem_fun1_t(MemberFunction pMemberFunction)
+        inline explicit const_mem_fun1_t(MemberFunction pMemberFunction)
             : mpMemberFunction(pMemberFunction)
         {
             // Empty
         }
 
-        EA_FORCE_INLINE Result operator()(const T* pT, Argument arg) const
+        inline Result operator()(const T* pT, Argument arg) const
         {
             return (pT->*mpMemberFunction)(arg);
         }
@@ -589,29 +686,31 @@ namespace eastl
     ///    TestClass* pTestClassArray[3] = { ... };
     ///    for_each(pTestClassArray, pTestClassArray + 3, &TestClass::print);
     ///
+	/// Note: using conventional inlining here to avoid issues on GCC/Linux
+	///
     template <typename Result, typename T>
-    EA_FORCE_INLINE mem_fun_t<Result, T>
+    inline mem_fun_t<Result, T>
     mem_fun(Result (T::*MemberFunction)())
     {
         return eastl::mem_fun_t<Result, T>(MemberFunction);
     }
 
     template <typename Result, typename T, typename Argument>
-    EA_FORCE_INLINE mem_fun1_t<Result, T, Argument>
+    inline mem_fun1_t<Result, T, Argument>
     mem_fun(Result (T::*MemberFunction)(Argument))
     {
         return eastl::mem_fun1_t<Result, T, Argument>(MemberFunction);
     }
 
     template <typename Result, typename T>
-    EA_FORCE_INLINE const_mem_fun_t<Result, T>
+    inline const_mem_fun_t<Result, T>
     mem_fun(Result (T::*MemberFunction)() const)
     {
         return eastl::const_mem_fun_t<Result, T>(MemberFunction);
     }
 
     template <typename Result, typename T, typename Argument>
-    EA_FORCE_INLINE const_mem_fun1_t<Result, T, Argument>
+    inline const_mem_fun1_t<Result, T, Argument>
     mem_fun(Result (T::*MemberFunction)(Argument) const)
     {
         return eastl::const_mem_fun1_t<Result, T, Argument>(MemberFunction);
@@ -635,13 +734,13 @@ namespace eastl
     public:
         typedef Result (T::*MemberFunction)();
 
-        EA_FORCE_INLINE explicit mem_fun_ref_t(MemberFunction pMemberFunction)
+        inline explicit mem_fun_ref_t(MemberFunction pMemberFunction)
             : mpMemberFunction(pMemberFunction)
         {
             // Empty
         }
 
-        EA_FORCE_INLINE Result operator()(T& t) const
+        inline Result operator()(T& t) const
         {
             return (t.*mpMemberFunction)();
         }
@@ -659,13 +758,13 @@ namespace eastl
     public:
         typedef Result (T::*MemberFunction)(Argument);
 
-        EA_FORCE_INLINE explicit mem_fun1_ref_t(MemberFunction pMemberFunction)
+        inline explicit mem_fun1_ref_t(MemberFunction pMemberFunction)
             : mpMemberFunction(pMemberFunction)
         {
             // Empty
         }
 
-        EA_FORCE_INLINE Result operator()(T& t, Argument arg) const
+        inline Result operator()(T& t, Argument arg) const
         {
             return (t.*mpMemberFunction)(arg);
         }
@@ -683,13 +782,13 @@ namespace eastl
     public:
         typedef Result (T::*MemberFunction)() const;
 
-        EA_FORCE_INLINE explicit const_mem_fun_ref_t(MemberFunction pMemberFunction)
+        inline explicit const_mem_fun_ref_t(MemberFunction pMemberFunction)
             : mpMemberFunction(pMemberFunction)
         {
             // Empty
         }
 
-        EA_FORCE_INLINE Result operator()(const T& t) const
+        inline Result operator()(const T& t) const
         {
             return (t.*mpMemberFunction)();
         }
@@ -707,13 +806,13 @@ namespace eastl
     public:
         typedef Result (T::*MemberFunction)(Argument) const;
 
-        EA_FORCE_INLINE explicit const_mem_fun1_ref_t(MemberFunction pMemberFunction)
+        inline explicit const_mem_fun1_ref_t(MemberFunction pMemberFunction)
             : mpMemberFunction(pMemberFunction)
         {
             // Empty
         }
 
-        EA_FORCE_INLINE Result operator()(const T& t, Argument arg) const
+        inline Result operator()(const T& t, Argument arg) const
         {
             return (t.*mpMemberFunction)(arg);
         }
@@ -729,29 +828,31 @@ namespace eastl
     ///    TestClass testClassArray[3];
     ///    for_each(testClassArray, testClassArray + 3, &TestClass::print);
     ///
+	/// Note: using conventional inlining here to avoid issues on GCC/Linux
+	///
     template <typename Result, typename T>
-    EA_FORCE_INLINE mem_fun_ref_t<Result, T>
+    inline mem_fun_ref_t<Result, T>
     mem_fun_ref(Result (T::*MemberFunction)())
     {
         return eastl::mem_fun_ref_t<Result, T>(MemberFunction);
     }
 
     template <typename Result, typename T, typename Argument>
-    EA_FORCE_INLINE mem_fun1_ref_t<Result, T, Argument>
+    inline mem_fun1_ref_t<Result, T, Argument>
     mem_fun_ref(Result (T::*MemberFunction)(Argument))
     {
         return eastl::mem_fun1_ref_t<Result, T, Argument>(MemberFunction);
     }
 
     template <typename Result, typename T>
-    EA_FORCE_INLINE const_mem_fun_ref_t<Result, T>
+    inline const_mem_fun_ref_t<Result, T>
     mem_fun_ref(Result (T::*MemberFunction)() const)
     {
         return eastl::const_mem_fun_ref_t<Result, T>(MemberFunction);
     }
 
     template <typename Result, typename T, typename Argument>
-    EA_FORCE_INLINE const_mem_fun1_ref_t<Result, T, Argument>
+    inline const_mem_fun1_ref_t<Result, T, Argument>
     mem_fun_ref(Result (T::*MemberFunction)(Argument) const)
     {
         return eastl::const_mem_fun1_ref_t<Result, T, Argument>(MemberFunction);
@@ -836,8 +937,8 @@ namespace eastl
     {
         size_t operator()(const char8_t* p) const
         {
-            size_t c, result = 2166136261U;  // FNV1 hash. Perhaps the best string hash.
-            while((c = (uint8_t)*p++) != 0)  // Using '!=' disables compiler warnings.
+            uint32_t c, result = 2166136261U;   // FNV1 hash. Perhaps the best string hash. Intentionally uint32_t instead of size_t, so the behavior is the same regardless of size.
+            while((c = (uint8_t)*p++) != 0)     // Using '!=' disables compiler warnings.
                 result = (result * 16777619) ^ c;
             return (size_t)result;
         }
@@ -847,8 +948,8 @@ namespace eastl
     {
         size_t operator()(const char8_t* p) const
         {
-            size_t c, result = 2166136261U;
-            while((c = (uint8_t)*p++) != 0) // cast to unsigned 8 bit.
+            uint32_t c, result = 2166136261U;   // Intentionally uint32_t instead of size_t, so the behavior is the same regardless of size.
+            while((c = (uint8_t)*p++) != 0)     // cast to unsigned 8 bit.
                 result = (result * 16777619) ^ c;
             return (size_t)result;
         }
@@ -858,8 +959,8 @@ namespace eastl
     {
         size_t operator()(const char16_t* p) const
         {
-            size_t c, result = 2166136261U;
-            while((c = (uint16_t)*p++) != 0) // cast to unsigned 16 bit.
+            uint32_t c, result = 2166136261U;   // Intentionally uint32_t instead of size_t, so the behavior is the same regardless of size.
+            while((c = (uint16_t)*p++) != 0)    // cast to unsigned 16 bit.
                 result = (result * 16777619) ^ c;
             return (size_t)result;
         }
@@ -869,8 +970,8 @@ namespace eastl
     {
         size_t operator()(const char16_t* p) const
         {
-            size_t c, result = 2166136261U;
-            while((c = (uint16_t)*p++) != 0) // cast to unsigned 16 bit.
+            uint32_t c, result = 2166136261U;   // Intentionally uint32_t instead of size_t, so the behavior is the same regardless of size.
+            while((c = (uint16_t)*p++) != 0)    // cast to unsigned 16 bit.
                 result = (result * 16777619) ^ c;
             return (size_t)result;
         }
@@ -880,8 +981,8 @@ namespace eastl
     {
         size_t operator()(const char32_t* p) const
         {
-            size_t c, result = 2166136261U;
-            while((c = (uint32_t)*p++) != 0) // cast to unsigned 32 bit.
+            uint32_t c, result = 2166136261U;   // Intentionally uint32_t instead of size_t, so the behavior is the same regardless of size.
+            while((c = (uint32_t)*p++) != 0)    // cast to unsigned 32 bit.
                 result = (result * 16777619) ^ c;
             return (size_t)result;
         }
@@ -891,8 +992,8 @@ namespace eastl
     {
         size_t operator()(const char32_t* p) const
         {
-            size_t c, result = 2166136261U;
-            while((c = (uint32_t)*p++) != 0) // cast to unsigned 32 bit.
+            uint32_t c, result = 2166136261U;   // Intentionally uint32_t instead of size_t, so the behavior is the same regardless of size.
+            while((c = (uint32_t)*p++) != 0)    // cast to unsigned 32 bit.
                 result = (result * 16777619) ^ c;
             return (size_t)result;
         }
@@ -915,7 +1016,7 @@ namespace eastl
         size_t operator()(const string_type& s) const
         {
             const unsigned_value_type* p = (const unsigned_value_type*)s.c_str();
-            size_t c, result = 2166136261U;
+            uint32_t c, result = 2166136261U;   // Intentionally uint32_t instead of size_t, so the behavior is the same regardless of size.
             while((c = *p++) != 0)
                 result = (result * 16777619) ^ c;
             return (size_t)result;

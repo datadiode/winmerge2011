@@ -26,10 +26,6 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-///////////////////////////////////////////////////////////////////////////////
-// EASTL/utility.h
-// Written and maintained by Paul Pedriana - 2005.
-///////////////////////////////////////////////////////////////////////////////
 
 
 
@@ -46,6 +42,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     #pragma warning(disable: 4217)  // Member template functions cannot be used for copy-assignment or copy-construction.
     #pragma warning(disable: 4512)  // 'class' : assignment operator could not be generated.  // This disabling would best be put elsewhere.
 #endif
+
+#if defined(EA_PRAGMA_ONCE_SUPPORTED)
+    #pragma once // Some compilers (e.g. VC++) benefit significantly from using this. We've measured 3-4% build speed improvements in apps as a result.
+#endif
+
 
 
 namespace eastl
@@ -142,6 +143,7 @@ namespace eastl
     template <typename Pair>
     struct use_first            // : public unary_function<Pair, typename Pair::first_type> // Perhaps we want to make it a subclass of unary_function.
     {
+        typedef Pair argument_type;
         typedef typename Pair::first_type result_type;
 
         const result_type& operator()(const Pair& x) const
@@ -156,6 +158,7 @@ namespace eastl
     template <typename Pair>
     struct use_second           // : public unary_function<Pair, typename Pair::second_type> // Perhaps we want to make it a subclass of unary_function.
     {
+        typedef Pair argument_type;
         typedef typename Pair::second_type result_type;
 
         const result_type& operator()(const Pair& x) const

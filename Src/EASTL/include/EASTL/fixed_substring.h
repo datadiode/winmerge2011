@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2009-2010 Electronic Arts, Inc.  All rights reserved.
+Copyright (C) 2009,2010,2012 Electronic Arts, Inc.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -26,12 +26,6 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-///////////////////////////////////////////////////////////////////////////////
-// EASTL/fixed_substring.h
-//
-// Copyright (c) 2005, Electronic Arts. All rights reserved.
-// Written and maintained by Paul Pedriana.
-///////////////////////////////////////////////////////////////////////////////
 
 
 #ifndef EASTL_FIXED_SUBSTRING_H
@@ -39,6 +33,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include <EASTL/string.h>
+
+#if defined(EA_PRAGMA_ONCE_SUPPORTED)
+    #pragma once // Some compilers (e.g. VC++) benefit significantly from using this. We've measured 3-4% build speed improvements in apps as a result.
+#endif
+
 
 
 namespace eastl
@@ -114,7 +113,7 @@ namespace eastl
         using base_type::mpBegin;
         using base_type::mpEnd;
         using base_type::mpCapacity;
-        using base_type::reset;
+        using base_type::reset_lose_memory;
         using base_type::mAllocator;
 
     public:
@@ -165,7 +164,7 @@ namespace eastl
         {
             // We need to reset, as otherwise the parent destructor will
             // attempt to free our memory.
-            reset();
+            reset_lose_memory();
         }
 
         this_type& operator=(const base_type& x)

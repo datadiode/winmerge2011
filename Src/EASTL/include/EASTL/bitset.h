@@ -60,11 +60,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     #pragma warning(push, 0)
 #endif
 #include <stddef.h>
-#ifdef __MWERKS__
-    #include <../Include/string.h> // Force the compiler to use the std lib header.
-#else
     #include <string.h>
-#endif
 #ifdef _MSC_VER
     #pragma warning(pop)
 #endif
@@ -82,70 +78,61 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #if defined(_MSC_VER)
     #pragma warning(push)
     #pragma warning(disable: 4127)  // Conditional expression is constant
-#elif defined(__SNC__)
-    #pragma control %push diag
-    #pragma diag_suppress=187       // Pointless comparison of unsigned integer with zero
 #endif
+
+#if defined(EA_PRAGMA_ONCE_SUPPORTED)
+    #pragma once // Some compilers (e.g. VC++) benefit significantly from using this. We've measured 3-4% build speed improvements in apps as a result.
+#endif
+
 
 
 namespace eastl
 {
-
-    /// BitsetWordType
-    ///
-    /// Defines the integral data type used by bitset.
-    /// The C++ standard specifies that the std::bitset word type be unsigned long, 
-    /// but that isn't necessarily the most efficient data type for the given platform.
-    /// We can follow the standard and be potentially less efficient or we can do what
-    /// is more efficient but less like the C++ std::bitset.
-    ///
-    #if(EA_PLATFORM_WORD_SIZE == 4)
-        typedef uint32_t BitsetWordType;
-        const   uint32_t kBitsPerWord      = 32;
-        const   uint32_t kBitsPerWordMask  = 31;
-        const   uint32_t kBitsPerWordShift =  5;
-    #else
-        typedef uint64_t BitsetWordType;
-        const   uint32_t kBitsPerWord      = 64;
-        const   uint32_t kBitsPerWordMask  = 63;
-        const   uint32_t kBitsPerWordShift =  6;
-    #endif
-
+    // To consider: Enable this for backwards compatibility with any user code that might be using BitsetWordType:
+    // #define BitsetWordType EASTL_BITSET_WORD_TYPE_DEFAULT
 
 
     /// BITSET_WORD_COUNT
     ///
     /// Defines the number of words we use, based on the number of bits.
+    /// nBitCount refers to the number of bits in a bitset.
+    /// WordType refers to the type of integer word which stores bitet data. By default it is BitsetWordType.
     ///
     #if !defined(__GNUC__) || (__GNUC__ >= 3) // GCC 2.x can't handle the simpler declaration below.
-        #define BITSET_WORD_COUNT(nBitCount) (N == 0 ? 1 : ((N - 1) / (8 * sizeof(BitsetWordType)) + 1))
+        #define BITSET_WORD_COUNT(nBitCount, WordType) (N == 0 ? 1 : ((N - 1) / (8 * sizeof(WordType)) + 1))
     #else
-        #define BITSET_WORD_COUNT(nBitCount) ((N - 1) / (8 * sizeof(BitsetWordType)) + 1)
+        #define BITSET_WORD_COUNT(nBitCount, WordType) ((N - 1) / (8 * sizeof(WordType)) + 1)
     #endif
-
 
 
     /// BitsetBase
     ///
     /// This is a default implementation that works for any number of words.
     ///
-    template <size_t NW> // Templated on the number of words used to hold the bitset.
+    template <size_t NW, typename WordType> // Templated on the number of words used to hold the bitset and the word type.
     struct BitsetBase
     {
-        typedef BitsetWordType word_type;
-        typedef BitsetBase<NW> this_type;
+        typedef WordType                 word_type;
+        typedef BitsetBase<NW, WordType> this_type;
       #if EASTL_BITSET_SIZE_T
-        typedef size_t         size_type;
+        typedef size_t                   size_type;
       #else
-        typedef eastl_size_t   size_type;
+        typedef eastl_size_t             size_type;
       #endif
+
+        enum {
+            kBitsPerWord      = (8 * sizeof(word_type)),
+            kBitsPerWordMask  = (kBitsPerWord - 1),
+            kBitsPerWordShift = ((kBitsPerWord == 8) ? 3 : ((kBitsPerWord == 16) ? 4 : ((kBitsPerWord == 32) ? 5 : (((kBitsPerWord == 64) ? 6 : 7)))))
+        };
 
     public:
         word_type mWord[NW];
 
     public:
         BitsetBase();
-        BitsetBase(uint32_t value);
+        BitsetBase(uint32_t value); // This exists only for compatibility with std::bitset, which has a 'long' constructor.
+      //BitsetBase(uint64_t value); // Disabled because it causes conflicts with the 32 bit version with existing user code. Use from_uint64 to init from a uint64_t instead.
 
         void operator&=(const this_type& x);
         void operator|=(const this_type& x);
@@ -164,7 +151,12 @@ namespace eastl
         bool      any() const;
         size_type count() const;
 
+        void          from_uint32(uint32_t value);
+        void          from_uint64(uint64_t value);
+
         unsigned long to_ulong() const;
+        uint32_t      to_uint32() const;
+        uint64_t      to_uint64() const;
 
         word_type& DoGetWord(size_type i);
         word_type  DoGetWord(size_type i) const;
@@ -179,20 +171,26 @@ namespace eastl
 
 
 
-    /// BitsetBase<1>
+    /// BitsetBase<1, WordType>
     /// 
     /// This is a specialization for a bitset that fits within one word.
     ///
-    template <>
-    struct BitsetBase<1>
+    template <typename WordType>
+    struct BitsetBase<1, WordType>
     {
-        typedef BitsetWordType word_type;
-        typedef BitsetBase<1>  this_type;
+        typedef WordType                word_type;
+        typedef BitsetBase<1, WordType> this_type;
       #if EASTL_BITSET_SIZE_T
-        typedef size_t         size_type;
+        typedef size_t                  size_type;
       #else
-        typedef eastl_size_t   size_type;
+        typedef eastl_size_t            size_type;
       #endif
+
+        enum {
+            kBitsPerWord      = (8 * sizeof(word_type)),
+            kBitsPerWordMask  = (kBitsPerWord - 1),
+            kBitsPerWordShift = ((kBitsPerWord == 8) ? 3 : ((kBitsPerWord == 16) ? 4 : ((kBitsPerWord == 32) ? 5 : (((kBitsPerWord == 64) ? 6 : 7)))))
+        };
 
     public:
         word_type mWord[1]; // Defined as an array of 1 so that bitset can treat this BitsetBase like others.
@@ -200,6 +198,7 @@ namespace eastl
     public:
         BitsetBase();
         BitsetBase(uint32_t value);
+      //BitsetBase(uint64_t value); // Disabled because it causes conflicts with the 32 bit version with existing user code. Use from_uint64 instead.
 
         void operator&=(const this_type& x);
         void operator|=(const this_type& x);
@@ -218,7 +217,12 @@ namespace eastl
         bool      any() const;
         size_type count() const;
 
+        void          from_uint32(uint32_t value);
+        void          from_uint64(uint64_t value);
+
         unsigned long to_ulong() const;
+        uint32_t      to_uint32() const;
+        uint64_t      to_uint64() const;
 
         word_type& DoGetWord(size_type);
         word_type  DoGetWord(size_type) const;
@@ -229,25 +233,31 @@ namespace eastl
         size_type DoFindLast() const;
         size_type DoFindPrev(size_type last_find) const;
 
-    }; // BitsetBase<1>
+    }; // BitsetBase<1, WordType>
 
 
 
-    /// BitsetBase<2>
+    /// BitsetBase<2, WordType>
     /// 
     /// This is a specialization for a bitset that fits within two words.
     /// The difference here is that we avoid branching (ifs and loops).
     ///
-    template <>
-    struct BitsetBase<2>
+    template <typename WordType>
+    struct BitsetBase<2, WordType>
     {
-        typedef BitsetWordType word_type;
-        typedef BitsetBase<2>  this_type;
+        typedef WordType                 word_type;
+        typedef BitsetBase<2, WordType>  this_type;
       #if EASTL_BITSET_SIZE_T
-        typedef size_t         size_type;
+        typedef size_t                   size_type;
       #else
-        typedef eastl_size_t   size_type;
+        typedef eastl_size_t             size_type;
       #endif
+
+        enum {
+            kBitsPerWord      = (8 * sizeof(word_type)),
+            kBitsPerWordMask  = (kBitsPerWord - 1),
+            kBitsPerWordShift = ((kBitsPerWord == 8) ? 3 : ((kBitsPerWord == 16) ? 4 : ((kBitsPerWord == 32) ? 5 : (((kBitsPerWord == 64) ? 6 : 7)))))
+        };
 
     public:
         word_type mWord[2];
@@ -255,6 +265,7 @@ namespace eastl
     public:
         BitsetBase();
         BitsetBase(uint32_t value);
+      //BitsetBase(uint64_t value); // Disabled because it causes conflicts with the 32 bit version with existing user code. Use from_uint64 instead.
 
         void operator&=(const this_type& x);
         void operator|=(const this_type& x);
@@ -273,7 +284,12 @@ namespace eastl
         bool      any() const;
         size_type count() const;
 
+        void          from_uint32(uint32_t value);
+        void          from_uint64(uint64_t value);
+
         unsigned long to_ulong() const;
+        uint32_t      to_uint32() const;
+        uint64_t      to_uint64() const;
 
         word_type& DoGetWord(size_type);
         word_type  DoGetWord(size_type) const;
@@ -284,7 +300,7 @@ namespace eastl
         size_type DoFindLast() const;
         size_type DoFindPrev(size_type last_find) const;
 
-    }; // BitsetBase<2>
+    }; // BitsetBase<2, WordType>
 
 
 
@@ -293,34 +309,36 @@ namespace eastl
     ///
     /// Implements a bitset much like the C++ std::bitset.
     ///
-    /// As of this writing we don't have an implementation of bitset<0>,
-    /// as it is deemed an academic exercise that nobody should actually
-    /// use and it would increase code space.
+    /// As of this writing we don't implement a specialization of bitset<0>,
+    /// as it is deemed an academic exercise that nobody would actually
+    /// use and it would increase code space and provide little practical
+    /// benefit. Note that this doesn't mean bitset<0> isn't supported; 
+    /// it means that our version of it isn't as efficient as it would be 
+    /// if a specialization was made for it.
     ///
-    /// Note: bitset shifts of a magnitude >= sizeof(BitsetWordType)
-    /// (e.g. shift of 32 on a 32 bit system) are not guaranteed to work
-    /// properly. This is because some systems (e.g. Intel x86) take the
-    /// shift value and mod it to the word size and thus a shift of 32
-    /// can become a shift of 0 on a 32 bit system. We don't attempt to
-    /// resolve this behaviour in this class because doing so would lead
-    /// to a less efficient implementation and the vast majority of the 
-    /// time the user doesn't do shifts of >= word size. You can work 
-    /// around this by implementing a shift of 32 as two shifts of 16.
+    /// - N can be any unsigned (non-zero) value, though memory usage is 
+    ///   linear with respect to N, so large values of N use large amounts of memory.
+    /// - WordType must be one of [uint16_t, uint32_t, uint64_t, uint128_t] 
+    ///   and the compiler must support the type. By default the WordType is
+    ///   the largest native register type that the target platform supports.
     ///
-    template <size_t N>
-    class bitset : private BitsetBase<BITSET_WORD_COUNT(N)>
+    template <size_t N, typename WordType = EASTL_BITSET_WORD_TYPE_DEFAULT>
+    class bitset : private BitsetBase<BITSET_WORD_COUNT(N, WordType), WordType>
     {
     public:
-        typedef BitsetBase<BITSET_WORD_COUNT(N)>    base_type;
-        typedef bitset<N>                           this_type;
-        typedef BitsetWordType                      word_type;
-        typedef typename base_type::size_type       size_type;
+        typedef BitsetBase<BITSET_WORD_COUNT(N, WordType), WordType>  base_type;
+        typedef bitset<N, WordType>                                   this_type;
+        typedef WordType                                              word_type;
+        typedef typename base_type::size_type                         size_type;
 
         enum
         {
-            kSize      = N,
-            kWordCount = BITSET_WORD_COUNT(N),
-            kNW        = kWordCount             // This name is deprecated.
+            kBitsPerWord      = (8 * sizeof(word_type)),
+            kBitsPerWordMask  = (kBitsPerWord - 1),
+            kBitsPerWordShift = ((kBitsPerWord == 8) ? 3 : ((kBitsPerWord == 16) ? 4 : ((kBitsPerWord == 32) ? 5 : (((kBitsPerWord == 64) ? 6 : 7))))),
+            kSize             = N,                               // The number of bits the bitset holds
+            kWordSize         = sizeof(word_type),               // The size of individual words the bitset uses to hold the bits.
+            kWordCount        = BITSET_WORD_COUNT(N, WordType)   // The number of words the bitset uses to hold the bits. sizeof(bitset<N, WordType>) == kWordSize * kWordCount.
         };
 
         using base_type::mWord;
@@ -329,6 +347,11 @@ namespace eastl
         using base_type::DoFindNext;
         using base_type::DoFindLast;
         using base_type::DoFindPrev;
+        using base_type::to_ulong;
+        using base_type::to_uint32;
+        using base_type::to_uint64;
+        using base_type::count;
+        using base_type::any;
 
     public:
         /// reference
@@ -341,7 +364,7 @@ namespace eastl
         class reference
         {
         protected:
-            friend class bitset;
+            friend class bitset<N, WordType>;
 
             word_type* mpBitWord;
             size_type  mnBitIndex;
@@ -366,6 +389,7 @@ namespace eastl
 
         bitset();
         bitset(uint32_t value);
+      //bitset(uint64_t value); // Disabled because it causes conflicts with the 32 bit version with existing user code. Use from_uint64 instead.
 
         // We don't define copy constructor and operator= because 
         // the compiler-generated versions will suffice.
@@ -393,16 +417,21 @@ namespace eastl
         const word_type* data() const;
         word_type*       data();
 
-        unsigned long to_ulong() const;
+        void          from_uint32(uint32_t value);
+        void          from_uint64(uint64_t value);
 
-        size_type count() const;
+      //unsigned long to_ulong()  const;    // We inherit this from the base class.
+      //uint32_t      to_uint32() const;
+      //uint64_t      to_uint64() const;
+
+      //size_type count() const;            // We inherit this from the base class.
         size_type size() const;
 
         bool operator==(const this_type& x) const;
         bool operator!=(const this_type& x) const;
 
         bool test(size_type i) const;
-        bool any() const;
+      //bool any() const;                   // We inherit this from the base class.
         bool none() const;
 
         this_type operator<<(size_type n) const;
@@ -432,36 +461,230 @@ namespace eastl
     ///
     /// This is a fast trick way to count bits without branches nor memory accesses.
     ///
-    #if(EA_PLATFORM_WORD_SIZE == 4)
-        inline uint32_t BitsetCountBits(uint32_t x)
-        {
-            x = x - ((x >> 1) & 0x55555555);
-            x = (x & 0x33333333) + ((x >> 2) & 0x33333333);
-            x = (x + (x >> 4)) & 0x0F0F0F0F;
-            return (uint32_t)((x * 0x01010101) >> 24);
-        }
-    #else
-        inline uint32_t BitsetCountBits(uint64_t x)
-        {
-            // GCC 3.x's implementation of UINT64_C is broken and fails to deal with 
-            // the code below correctly. So we make a workaround for it. Earlier and 
-            // later versions of GCC don't have this bug.
-            #if defined(__GNUC__) && (__GNUC__ == 3)
-                x = x - ((x >> 1) & 0x5555555555555555ULL);
-                x = (x & 0x3333333333333333ULL) + ((x >> 2) & 0x3333333333333333ULL);
-                x = (x + (x >> 4)) & 0x0F0F0F0F0F0F0F0FULL;
-                return (uint32_t)((x * 0x0101010101010101ULL) >> 56);
-            #else
-                x = x - ((x >> 1) & UINT64_C(0x5555555555555555));
-                x = (x & UINT64_C(0x3333333333333333)) + ((x >> 2) & UINT64_C(0x3333333333333333));
-                x = (x + (x >> 4)) & UINT64_C(0x0F0F0F0F0F0F0F0F);
-                return (uint32_t)((x * UINT64_C(0x0101010101010101)) >> 56);
-            #endif
-        }
-    #endif
+    inline uint32_t BitsetCountBits(uint64_t x)
+    {
+        // GCC 3.x's implementation of UINT64_C is broken and fails to deal with 
+        // the code below correctly. So we make a workaround for it. Earlier and 
+        // later versions of GCC don't have this bug.
+        #if defined(__GNUC__) && (__GNUC__ == 3)
+            x = x - ((x >> 1) & 0x5555555555555555ULL);
+            x = (x & 0x3333333333333333ULL) + ((x >> 2) & 0x3333333333333333ULL);
+            x = (x + (x >> 4)) & 0x0F0F0F0F0F0F0F0FULL;
+            return (uint32_t)((x * 0x0101010101010101ULL) >> 56);
+        #else
+            x = x - ((x >> 1) & UINT64_C(0x5555555555555555));
+            x = (x & UINT64_C(0x3333333333333333)) + ((x >> 2) & UINT64_C(0x3333333333333333));
+            x = (x + (x >> 4)) & UINT64_C(0x0F0F0F0F0F0F0F0F);
+            return (uint32_t)((x * UINT64_C(0x0101010101010101)) >> 56);
+        #endif
+    }
+
+    inline uint32_t BitsetCountBits(uint32_t x)
+    {
+        x = x - ((x >> 1) & 0x55555555);
+        x = (x & 0x33333333) + ((x >> 2) & 0x33333333);
+        x = (x + (x >> 4)) & 0x0F0F0F0F;
+        return (uint32_t)((x * 0x01010101) >> 24);
+    }
+
+    inline uint32_t BitsetCountBits(uint16_t x)
+    {
+        return BitsetCountBits((uint32_t)x);
+    }
+
+    inline uint32_t BitsetCountBits(uint8_t x)
+    {
+        return BitsetCountBits((uint32_t)x);
+    }
+
 
     // const static char kBitsPerUint16[16] = { 0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4 };
     #define EASTL_BITSET_COUNT_STRING "\0\1\1\2\1\2\2\3\1\2\2\3\2\3\3\4"
+
+
+    inline uint32_t GetFirstBit(uint8_t x)
+    {
+        if(x)
+        {
+            uint32_t n = 1;
+
+            if((x & 0x0000000F) == 0) { n +=  4; x >>=  4; }
+            if((x & 0x00000003) == 0) { n +=  2; x >>=  2; }
+
+            return (uint32_t)(n - (x & 1));
+        }
+
+        return 8;
+    }
+
+    inline uint32_t GetFirstBit(uint16_t x)
+    {
+        if(x)
+        {
+            uint32_t n = 1;
+
+            if((x & 0x000000FF) == 0) { n +=  8; x >>=  8; }
+            if((x & 0x0000000F) == 0) { n +=  4; x >>=  4; }
+            if((x & 0x00000003) == 0) { n +=  2; x >>=  2; }
+
+            return (uint32_t)(n - (x & 1));
+        }
+
+        return 16;
+    }
+
+    inline uint32_t GetFirstBit(uint32_t x)
+    {
+        if(x)
+        {
+            uint32_t n = 1;
+
+            if((x & 0x0000FFFF) == 0) { n += 16; x >>= 16; }
+            if((x & 0x000000FF) == 0) { n +=  8; x >>=  8; }
+            if((x & 0x0000000F) == 0) { n +=  4; x >>=  4; }
+            if((x & 0x00000003) == 0) { n +=  2; x >>=  2; }
+
+            return (n - (x & 1));
+        }
+
+        return 32;
+    }
+
+    inline uint32_t GetFirstBit(uint64_t x)
+    {
+        if(x)
+        {
+            uint32_t n = 1;
+
+            if((x & 0xFFFFFFFF) == 0) { n += 32; x >>= 32; }
+            if((x & 0x0000FFFF) == 0) { n += 16; x >>= 16; }
+            if((x & 0x000000FF) == 0) { n +=  8; x >>=  8; }
+            if((x & 0x0000000F) == 0) { n +=  4; x >>=  4; }
+            if((x & 0x00000003) == 0) { n +=  2; x >>=  2; }
+
+            return (n - ((uint32_t)x & 1));
+        }
+
+        return 64;
+    }
+
+
+    #if EASTL_INT128_SUPPORTED
+        inline uint32_t GetFirstBit(eastl_uint128_t x)
+        {
+            if(x)
+            {
+                uint32_t n = 1;
+
+                if((x & UINT64_C(0xFFFFFFFFFFFFFFFF)) == 0) { n += 64; x >>= 64; }
+                if((x & 0xFFFFFFFF) == 0)                   { n += 32; x >>= 32; }
+                if((x & 0x0000FFFF) == 0)                   { n += 16; x >>= 16; }
+                if((x & 0x000000FF) == 0)                   { n +=  8; x >>=  8; }
+                if((x & 0x0000000F) == 0)                   { n +=  4; x >>=  4; }
+                if((x & 0x00000003) == 0)                   { n +=  2; x >>=  2; }
+
+                return (n - ((uint32_t)x & 1));
+            }
+
+            return 128;
+        }
+    #endif
+
+    inline uint32_t GetLastBit(uint8_t x)
+    {
+        if(x)
+        {
+            uint32_t n = 0;
+
+            if(x & 0xFFF0) { n +=  4; x >>=  4; }
+            if(x & 0xFFFC) { n +=  2; x >>=  2; }
+            if(x & 0xFFFE) { n +=  1;           }
+
+            return n;
+        }
+
+        return 8;
+    }
+
+    inline uint32_t GetLastBit(uint16_t x)
+    {
+        if(x)
+        {
+            uint32_t n = 0;
+
+            if(x & 0xFF00) { n +=  8; x >>=  8; }
+            if(x & 0xFFF0) { n +=  4; x >>=  4; }
+            if(x & 0xFFFC) { n +=  2; x >>=  2; }
+            if(x & 0xFFFE) { n +=  1;           }
+
+            return n;
+        }
+
+        return 16;
+    }
+
+    inline uint32_t GetLastBit(uint32_t x)
+    {
+        if(x)
+        {
+            uint32_t n = 0;
+
+            if(x & 0xFFFF0000) { n += 16; x >>= 16; }
+            if(x & 0xFFFFFF00) { n +=  8; x >>=  8; }
+            if(x & 0xFFFFFFF0) { n +=  4; x >>=  4; }
+            if(x & 0xFFFFFFFC) { n +=  2; x >>=  2; }
+            if(x & 0xFFFFFFFE) { n +=  1;           }
+
+            return n;
+        }
+
+        return 32;
+    }
+
+    inline uint32_t GetLastBit(uint64_t x)
+    {
+        if(x)
+        {
+            uint32_t n = 0;
+
+            if(x & UINT64_C(0xFFFFFFFF00000000)) { n += 32; x >>= 32; }
+            if(x & 0xFFFF0000)                   { n += 16; x >>= 16; }
+            if(x & 0xFFFFFF00)                   { n +=  8; x >>=  8; }
+            if(x & 0xFFFFFFF0)                   { n +=  4; x >>=  4; }
+            if(x & 0xFFFFFFFC)                   { n +=  2; x >>=  2; }
+            if(x & 0xFFFFFFFE)                   { n +=  1;           }
+
+            return n;
+        }
+
+        return 64;
+    }
+
+    #if EASTL_INT128_SUPPORTED
+        inline uint32_t GetLastBit(eastl_uint128_t x)
+        {
+            if(x)
+            {
+                uint32_t n = 0;
+                
+                eastl_uint128_t mask(UINT64_C(0xFFFFFFFF00000000)); // There doesn't seem to exist compiler support for INT128_C() by any compiler. EAStdC's int128_t supports it though.
+                mask <<= 64;
+
+                if(x & mask)                         { n += 64; x >>= 64; }
+                if(x & UINT64_C(0xFFFFFFFF00000000)) { n += 32; x >>= 32; }
+                if(x & UINT64_C(0x00000000FFFF0000)) { n += 16; x >>= 16; }
+                if(x & UINT64_C(0x00000000FFFFFF00)) { n +=  8; x >>=  8; }
+                if(x & UINT64_C(0x00000000FFFFFFF0)) { n +=  4; x >>=  4; }
+                if(x & UINT64_C(0x00000000FFFFFFFC)) { n +=  2; x >>=  2; }
+                if(x & UINT64_C(0x00000000FFFFFFFE)) { n +=  1;           }
+
+                return n;
+            }
+
+            return 128;
+        }
+    #endif
+
 
 
 
@@ -478,50 +701,69 @@ namespace eastl
     // For our tests (~NW < 16), the latter (using []) access resulted in faster code. 
     ///////////////////////////////////////////////////////////////////////////
 
-    template <size_t NW>
-    inline BitsetBase<NW>::BitsetBase()
+    template <size_t NW, typename WordType>
+    inline BitsetBase<NW, WordType>::BitsetBase()
     {
         reset();
     }
 
 
-    template <size_t NW>
-    inline BitsetBase<NW>::BitsetBase(uint32_t value)
+    template <size_t NW, typename WordType>
+    inline BitsetBase<NW, WordType>::BitsetBase(uint32_t value)
     {
-        // This implementation assumes that sizeof(value) <= sizeof(BitsetWordType).
-        EASTL_CT_ASSERT(sizeof(value) <= sizeof(BitsetWordType));
+        // This implementation assumes that sizeof(value) <= sizeof(word_type).
+        //EASTL_CT_ASSERT(sizeof(value) <= sizeof(word_type)); Disabled because we now have support for uint8_t and uint16_t word types. It would be nice to have a runtime assert that tested this.
 
         reset();
         mWord[0] = static_cast<word_type>(value);
     }
 
 
-    template <size_t NW>
-    inline void BitsetBase<NW>::operator&=(const this_type& x)
+    /*
+    template <size_t NW, typename WordType>
+    inline BitsetBase<NW, WordType>::BitsetBase(uint64_t value)
+    {
+        reset();
+
+        #if(EA_PLATFORM_WORD_SIZE == 4)
+            mWord[0] = static_cast<word_type>(value);
+
+            EASTL_CT_ASSERT(NW > 2); // We can assume this because we have specializations of BitsetBase for <1> and <2>.
+            //if(NW > 1) // NW is a template constant, but it would be a little messy to take advantage of it's const-ness.
+                mWord[1] = static_cast<word_type>(value >> 32);
+        #else
+            mWord[0] = static_cast<word_type>(value);
+        #endif
+    }
+    */
+
+
+    template <size_t NW, typename WordType>
+    inline void BitsetBase<NW, WordType>::operator&=(const this_type& x)
     {
         for(size_t i = 0; i < NW; i++)
             mWord[i] &= x.mWord[i];
     }
 
 
-    template <size_t NW>
-    inline void BitsetBase<NW>::operator|=(const this_type& x)
+    template <size_t NW, typename WordType>
+    inline void BitsetBase<NW, WordType>::operator|=(const this_type& x)
     {
         for(size_t i = 0; i < NW; i++)
             mWord[i] |= x.mWord[i];
     }
 
 
-    template <size_t NW>
-    inline void BitsetBase<NW>::operator^=(const this_type& x)
+    template <size_t NW, typename WordType>
+    inline void BitsetBase<NW, WordType>::operator^=(const this_type& x)
     {
         for(size_t i = 0; i < NW; i++)
             mWord[i] ^= x.mWord[i];
     }
 
 
-    template <size_t NW>
-    inline void BitsetBase<NW>::operator<<=(size_type n)
+    template <size_t NW, typename WordType>
+    inline void BitsetBase<NW, WordType>::operator<<=(size_type n)
     {
         const size_type nWordShift = (size_type)(n >> kBitsPerWordShift);
 
@@ -542,8 +784,8 @@ namespace eastl
     }
 
 
-    template <size_t NW>
-    inline void BitsetBase<NW>::operator>>=(size_type n)
+    template <size_t NW, typename WordType>
+    inline void BitsetBase<NW, WordType>::operator>>=(size_type n)
     {
         const size_type nWordShift = (size_type)(n >> kBitsPerWordShift);
 
@@ -562,8 +804,8 @@ namespace eastl
     }
 
 
-    template <size_t NW>
-    inline void BitsetBase<NW>::flip()
+    template <size_t NW, typename WordType>
+    inline void BitsetBase<NW, WordType>::flip()
     {
         for(size_t i = 0; i < NW; i++)
             mWord[i] = ~mWord[i];
@@ -571,17 +813,17 @@ namespace eastl
     }
 
 
-    template <size_t NW>
-    inline void BitsetBase<NW>::set()
+    template <size_t NW, typename WordType>
+    inline void BitsetBase<NW, WordType>::set()
     {
         for(size_t i = 0; i < NW; i++)
-            mWord[i] = ~static_cast<word_type>(0);
+            mWord[i] = static_cast<word_type>(~static_cast<word_type>(0));
         // We let the parent class turn off any upper bits.
     }
 
 
-    template <size_t NW>
-    inline void BitsetBase<NW>::set(size_type i, bool value)
+    template <size_t NW, typename WordType>
+    inline void BitsetBase<NW, WordType>::set(size_type i, bool value)
     {
         if(value)
             mWord[i >> kBitsPerWordShift] |=  (static_cast<word_type>(1) << (i & kBitsPerWordMask));
@@ -590,8 +832,8 @@ namespace eastl
     }
 
 
-    template <size_t NW>
-    inline void BitsetBase<NW>::reset()
+    template <size_t NW, typename WordType>
+    inline void BitsetBase<NW, WordType>::reset()
     {
         if(NW > 16) // This is a constant expression and should be optimized away.
         {
@@ -606,8 +848,8 @@ namespace eastl
     }
 
 
-    template <size_t NW>
-    inline bool BitsetBase<NW>::operator==(const this_type& x) const
+    template <size_t NW, typename WordType>
+    inline bool BitsetBase<NW, WordType>::operator==(const this_type& x) const
     {
         for(size_t i = 0; i < NW; i++)
         {
@@ -618,8 +860,8 @@ namespace eastl
     }
 
 
-    template <size_t NW>
-    inline bool BitsetBase<NW>::any() const
+    template <size_t NW, typename WordType>
+    inline bool BitsetBase<NW, WordType>::any() const
     {
         for(size_t i = 0; i < NW; i++)
         {
@@ -630,15 +872,15 @@ namespace eastl
     }
 
 
-    template <size_t NW>
-    inline typename BitsetBase<NW>::size_type
-    BitsetBase<NW>::count() const
+    template <size_t NW, typename WordType>
+    inline typename BitsetBase<NW, WordType>::size_type
+    BitsetBase<NW, WordType>::count() const
     {
         size_type n = 0;
 
         for(size_t i = 0; i < NW; i++)
         {
-            #if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 304) && !defined(__SNC__) && !defined(EA_PLATFORM_ANDROID) // GCC 3.4 or later
+            #if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 304) && !defined(CS_UNDEFINED_STRING) && !defined(CS_UNDEFINED_STRING) // GCC 3.4 or later
                 #if(EA_PLATFORM_WORD_SIZE == 4)
                     n += (size_type)__builtin_popcountl(mWord[i]);
                 #else
@@ -659,8 +901,33 @@ namespace eastl
     }
 
 
-    template <size_t NW>
-    inline unsigned long BitsetBase<NW>::to_ulong() const
+    template <size_t NW, typename WordType>
+    inline void BitsetBase<NW, WordType>::from_uint32(uint32_t value)
+    {
+        reset();
+        mWord[0] = static_cast<word_type>(value);
+    }
+
+
+    template <size_t NW, typename WordType>
+    inline void BitsetBase<NW, WordType>::from_uint64(uint64_t value)
+    {
+        reset();
+
+        #if(EA_PLATFORM_WORD_SIZE == 4)
+            mWord[0] = static_cast<word_type>(value);
+
+            EASTL_CT_ASSERT(NW > 2); // We can assume this because we have specializations of BitsetBase for <1> and <2>.
+            //if(NW > 1) // NW is a template constant, but it would be a little messy to take advantage of it's const-ness.
+                mWord[1] = static_cast<word_type>(value >> 32);
+        #else
+            mWord[0] = static_cast<word_type>(value);
+        #endif
+    }
+
+
+    template <size_t NW, typename WordType>
+    inline unsigned long BitsetBase<NW, WordType>::to_ulong() const
     {
         #if EASTL_EXCEPTIONS_ENABLED
             for(size_t i = 1; i < NW; ++i)
@@ -673,63 +940,69 @@ namespace eastl
     }
 
 
-    template <size_t NW>
-    inline typename BitsetBase<NW>::word_type&
-    BitsetBase<NW>::DoGetWord(size_type i)
+    template <size_t NW, typename WordType>
+    inline uint32_t BitsetBase<NW, WordType>::to_uint32() const
+    {
+        #if EASTL_EXCEPTIONS_ENABLED
+            // Verify that high words or bits are not set and thus that to_uint32 doesn't lose information.
+            for(size_t i = 1; i < NW; ++i)
+            {
+                if(mWord[i])
+                    throw overflow_error("BitsetBase::to_uint32");
+            }
+            
+            #if(EA_PLATFORM_WORD_SIZE > 4) // if we have 64 bit words...
+                if(mWord[0] >> 32)
+                    throw overflow_error("BitsetBase::to_uint32");
+            #endif
+        #endif
+
+        return (uint32_t)mWord[0];
+    }
+
+
+    template <size_t NW, typename WordType>
+    inline uint64_t BitsetBase<NW, WordType>::to_uint64() const
+    {
+        #if EASTL_EXCEPTIONS_ENABLED
+            // Verify that high words are not set and thus that to_uint64 doesn't lose information.
+            
+            EASTL_CT_ASSERT(NW > 2); // We can assume this because we have specializations of BitsetBase for <1> and <2>.
+            for(size_t i = 2; i < NW; ++i)
+            {
+                if(mWord[i])
+                    throw overflow_error("BitsetBase::to_uint64");
+            }
+        #endif
+
+        #if(EA_PLATFORM_WORD_SIZE == 4)
+            EASTL_CT_ASSERT(NW > 2); // We can assume this because we have specializations of BitsetBase for <1> and <2>.
+            return (mWord[1] << 32) | mWord[0];
+        #else
+            return (uint64_t)mWord[0];
+        #endif
+    }
+
+
+    template <size_t NW, typename WordType>
+    inline typename BitsetBase<NW, WordType>::word_type&
+    BitsetBase<NW, WordType>::DoGetWord(size_type i)
     {
         return mWord[i >> kBitsPerWordShift];
     }
 
 
-    template <size_t NW>
-    inline typename BitsetBase<NW>::word_type
-    BitsetBase<NW>::DoGetWord(size_type i) const
+    template <size_t NW, typename WordType>
+    inline typename BitsetBase<NW, WordType>::word_type
+    BitsetBase<NW, WordType>::DoGetWord(size_type i) const
     {
         return mWord[i >> kBitsPerWordShift];
     }
 
 
-    #if(EA_PLATFORM_WORD_SIZE == 4)
-        inline uint32_t GetFirstBit(uint32_t x)
-        {
-            if(x)
-            {
-                uint32_t n = 1;
-
-                if((x & 0x0000FFFF) == 0) { n += 16; x >>= 16; }
-                if((x & 0x000000FF) == 0) { n +=  8; x >>=  8; }
-                if((x & 0x0000000F) == 0) { n +=  4; x >>=  4; }
-                if((x & 0x00000003) == 0) { n +=  2; x >>=  2; }
-
-                return (n - ((uint32_t)x & 1));
-            }
-
-            return 32;
-        }
-    #else
-        inline uint32_t GetFirstBit(uint64_t x)
-        {
-            if(x)
-            {
-                uint32_t n = 1;
-
-                if((x & 0xFFFFFFFF) == 0) { n += 32; x >>= 32; }
-                if((x & 0x0000FFFF) == 0) { n += 16; x >>= 16; }
-                if((x & 0x000000FF) == 0) { n +=  8; x >>=  8; }
-                if((x & 0x0000000F) == 0) { n +=  4; x >>=  4; }
-                if((x & 0x00000003) == 0) { n +=  2; x >>=  2; }
-
-                return (n - ((uint32_t)x & 1));
-            }
-
-            return 64;
-        }
-    #endif
-
-
-    template <size_t NW>
-    inline typename BitsetBase<NW>::size_type 
-    BitsetBase<NW>::DoFindFirst() const
+    template <size_t NW, typename WordType>
+    inline typename BitsetBase<NW, WordType>::size_type 
+    BitsetBase<NW, WordType>::DoFindFirst() const
     {
         for(size_type word_index = 0; word_index < NW; ++word_index)
         {
@@ -743,9 +1016,9 @@ namespace eastl
     }
 
 
-    template <size_t NW>
-    inline typename BitsetBase<NW>::size_type 
-    BitsetBase<NW>::DoFindNext(size_type last_find) const
+    template <size_t NW, typename WordType>
+    inline typename BitsetBase<NW, WordType>::size_type 
+    BitsetBase<NW, WordType>::DoFindNext(size_type last_find) const
     {
         // Start looking from the next bit.
         ++last_find;
@@ -778,48 +1051,10 @@ namespace eastl
     }
 
 
-    #if(EA_PLATFORM_WORD_SIZE == 4)
-        inline uint32_t GetLastBit(uint32_t x)
-        {
-            if(x)
-            {
-                uint32_t n = 0;
 
-                if(x & 0xFFFF0000) { n += 16; x >>= 16; }
-                if(x & 0xFFFFFF00) { n +=  8; x >>=  8; }
-                if(x & 0xFFFFFFF0) { n +=  4; x >>=  4; }
-                if(x & 0xFFFFFFFC) { n +=  2; x >>=  2; }
-                if(x & 0xFFFFFFFE) { n +=  1;           }
-
-                return n;
-            }
-
-            return 32;
-        }
-    #else
-        inline uint32_t GetLastBit(uint64_t x)
-        {
-            if(x)
-            {
-                uint32_t n = 0;
-
-                if(x & UINT64_C(0xFFFFFFFF00000000)) { n += 32; x >>= 32; }
-                if(x & 0xFFFF0000)                   { n += 16; x >>= 16; }
-                if(x & 0xFFFFFF00)                   { n +=  8; x >>=  8; }
-                if(x & 0xFFFFFFF0)                   { n +=  4; x >>=  4; }
-                if(x & 0xFFFFFFFC)                   { n +=  2; x >>=  2; }
-                if(x & 0xFFFFFFFE)                   { n +=  1;           }
-
-                return n;
-            }
-
-            return 64;
-        }
-    #endif
-
-    template <size_t NW>
-    inline typename BitsetBase<NW>::size_type 
-    BitsetBase<NW>::DoFindLast() const
+    template <size_t NW, typename WordType>
+    inline typename BitsetBase<NW, WordType>::size_type 
+    BitsetBase<NW, WordType>::DoFindLast() const
     {
         for(size_t word_index = (size_type)NW - 1; word_index < NW; --word_index)
         {
@@ -833,9 +1068,9 @@ namespace eastl
     }
 
 
-    template <size_t NW>
-    inline typename BitsetBase<NW>::size_type 
-    BitsetBase<NW>::DoFindPrev(size_type last_find) const
+    template <size_t NW, typename WordType>
+    inline typename BitsetBase<NW, WordType>::size_type 
+    BitsetBase<NW, WordType>::DoFindPrev(size_type last_find) const
     {
         if(last_find > 0)
         {
@@ -867,70 +1102,94 @@ namespace eastl
 
 
     ///////////////////////////////////////////////////////////////////////////
-    // BitsetBase<1>
+    // BitsetBase<1, WordType>
     ///////////////////////////////////////////////////////////////////////////
 
-    inline BitsetBase<1>::BitsetBase()
+    template <typename WordType>
+    inline BitsetBase<1, WordType>::BitsetBase()
     {
         mWord[0] = 0;
     }
 
 
-    inline BitsetBase<1>::BitsetBase(uint32_t value)
+    template <typename WordType>
+    inline BitsetBase<1, WordType>::BitsetBase(uint32_t value)
     {
-        // This implementation assumes that sizeof(value) <= sizeof(BitsetWordType).
-        EASTL_CT_ASSERT(sizeof(value) <= sizeof(BitsetWordType));
+        // This implementation assumes that sizeof(value) <= sizeof(word_type).
+        //EASTL_CT_ASSERT(sizeof(value) <= sizeof(word_type)); Disabled because we now have support for uint8_t and uint16_t word types. It would be nice to have a runtime assert that tested this.
 
         mWord[0] = static_cast<word_type>(value);
     }
 
 
-    inline void BitsetBase<1>::operator&=(const this_type& x)
+    /*
+    template <typename WordType>
+    inline BitsetBase<1, WordType>::BitsetBase(uint64_t value)
+    {
+        #if(EA_PLATFORM_WORD_SIZE == 4)
+            EASTL_ASSERT(value <= 0xffffffff);
+            mWord[0] = static_cast<word_type>(value);   // This potentially loses data, but that's what the user is requesting.
+        #else
+            mWord[0] = static_cast<word_type>(value);
+        #endif
+    }
+    */
+
+
+    template <typename WordType>
+    inline void BitsetBase<1, WordType>::operator&=(const this_type& x)
     {
         mWord[0] &= x.mWord[0];
     }
 
 
-    inline void BitsetBase<1>::operator|=(const this_type& x)
+    template <typename WordType>
+    inline void BitsetBase<1, WordType>::operator|=(const this_type& x)
     {
         mWord[0] |= x.mWord[0];
     }
 
 
-    inline void BitsetBase<1>::operator^=(const this_type& x)
+    template <typename WordType>
+    inline void BitsetBase<1, WordType>::operator^=(const this_type& x)
     {
         mWord[0] ^= x.mWord[0];
     }
 
 
-    inline void BitsetBase<1>::operator<<=(size_type n)
+    template <typename WordType>
+    inline void BitsetBase<1, WordType>::operator<<=(size_type n)
     {
         mWord[0] <<= n;
         // We let the parent class turn off any upper bits.
     }
 
 
-    inline void BitsetBase<1>::operator>>=(size_type n)
+    template <typename WordType>
+    inline void BitsetBase<1, WordType>::operator>>=(size_type n)
     {
         mWord[0] >>= n;
     }
 
 
-    inline void BitsetBase<1>::flip()
+    template <typename WordType>
+    inline void BitsetBase<1, WordType>::flip()
     {
         mWord[0] = ~mWord[0];
         // We let the parent class turn off any upper bits.
     }
 
 
-    inline void BitsetBase<1>::set()
+    template <typename WordType>
+    inline void BitsetBase<1, WordType>::set()
     {
-        mWord[0] = ~static_cast<word_type>(0);
+        mWord[0] = static_cast<word_type>(~static_cast<word_type>(0));
         // We let the parent class turn off any upper bits.
     }
 
 
-    inline void BitsetBase<1>::set(size_type i, bool value)
+    template <typename WordType>
+    inline void BitsetBase<1, WordType>::set(size_type i, bool value)
     {
         if(value)
             mWord[0] |=  (static_cast<word_type>(1) << i);
@@ -939,28 +1198,32 @@ namespace eastl
     }
 
 
-    inline void BitsetBase<1>::reset()
+    template <typename WordType>
+    inline void BitsetBase<1, WordType>::reset()
     {
         mWord[0] = 0;
     }
 
 
-    inline bool BitsetBase<1>::operator==(const this_type& x) const
+    template <typename WordType>
+    inline bool BitsetBase<1, WordType>::operator==(const this_type& x) const
     {
         return mWord[0] == x.mWord[0];
     }
 
 
-    inline bool BitsetBase<1>::any() const
+    template <typename WordType>
+    inline bool BitsetBase<1, WordType>::any() const
     {
         return mWord[0] != 0;
     }
 
 
-    inline BitsetBase<1>::size_type
-    BitsetBase<1>::count() const
+    template <typename WordType>
+    inline typename BitsetBase<1, WordType>::size_type
+    BitsetBase<1, WordType>::count() const
     {
-        #if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 304) && !defined(__SNC__) && !defined(EA_PLATFORM_ANDROID) // GCC 3.4 or later
+        #if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 304) && !defined(CS_UNDEFINED_STRING) && !defined(CS_UNDEFINED_STRING) // GCC 3.4 or later
             #if(EA_PLATFORM_WORD_SIZE == 4)
                 return (size_type)__builtin_popcountl(mWord[0]);
             #else
@@ -977,35 +1240,83 @@ namespace eastl
     }
 
 
-    inline unsigned long BitsetBase<1>::to_ulong() const
+    template <typename WordType>
+    inline void BitsetBase<1, WordType>::from_uint32(uint32_t value)
+    {
+        mWord[0] = static_cast<word_type>(value);
+    }
+
+
+    template <typename WordType>
+    inline void BitsetBase<1, WordType>::from_uint64(uint64_t value)
+    {
+        #if(EA_PLATFORM_WORD_SIZE == 4)
+            EASTL_ASSERT(value <= 0xffffffff);
+            mWord[0] = static_cast<word_type>(value);   // This potentially loses data, but that's what the user is requesting.
+        #else
+            mWord[0] = static_cast<word_type>(value);
+        #endif
+    }
+
+
+    template <typename WordType>
+    inline unsigned long BitsetBase<1, WordType>::to_ulong() const
     {
         return static_cast<unsigned long>(mWord[0]);
     }
 
 
-    inline BitsetBase<1>::word_type&
-    BitsetBase<1>::DoGetWord(size_type)
+    template <typename WordType>
+    inline uint32_t BitsetBase<1, WordType>::to_uint32() const
+    {
+        #if EASTL_EXCEPTIONS_ENABLED
+            // Verify that high bits are not set and thus that to_uint32 doesn't lose information.
+
+            #if(EA_PLATFORM_WORD_SIZE > 4) // If we are using 64 bit words...
+                if(mWord[0] >> 32)
+                    throw overflow_error("BitsetBase::to_uint32");
+            #endif
+        #endif
+
+        return static_cast<uint32_t>(mWord[0]);
+    }
+
+
+    template <typename WordType>
+    inline uint64_t BitsetBase<1, WordType>::to_uint64() const
+    {
+        // This implementation is the same regardless of the word size, and there is no possibility of overflow_error.
+        return static_cast<uint64_t>(mWord[0]);
+    }
+
+
+    template <typename WordType>
+    inline typename BitsetBase<1, WordType>::word_type&
+    BitsetBase<1, WordType>::DoGetWord(size_type)
     {
         return mWord[0];
     }
 
 
-    inline BitsetBase<1>::word_type
-    BitsetBase<1>::DoGetWord(size_type) const
+    template <typename WordType>
+    inline typename BitsetBase<1, WordType>::word_type
+    BitsetBase<1, WordType>::DoGetWord(size_type) const
     {
         return mWord[0];
     }
 
 
-    inline BitsetBase<1>::size_type
-    BitsetBase<1>::DoFindFirst() const
+    template <typename WordType>
+    inline typename BitsetBase<1, WordType>::size_type
+    BitsetBase<1, WordType>::DoFindFirst() const
     {
         return GetFirstBit(mWord[0]);
     }
 
 
-    inline BitsetBase<1>::size_type 
-    BitsetBase<1>::DoFindNext(size_type last_find) const
+    template <typename WordType>
+    inline typename BitsetBase<1, WordType>::size_type 
+    BitsetBase<1, WordType>::DoFindNext(size_type last_find) const
     {
         if(++last_find < kBitsPerWord)
         {
@@ -1019,15 +1330,17 @@ namespace eastl
     }
 
 
-    inline BitsetBase<1>::size_type 
-    BitsetBase<1>::DoFindLast() const
+    template <typename WordType>
+    inline typename BitsetBase<1, WordType>::size_type 
+    BitsetBase<1, WordType>::DoFindLast() const
     {
         return GetLastBit(mWord[0]);
     }
 
 
-    inline BitsetBase<1>::size_type 
-    BitsetBase<1>::DoFindPrev(size_type last_find) const
+    template <typename WordType>
+    inline typename BitsetBase<1, WordType>::size_type 
+    BitsetBase<1, WordType>::DoFindPrev(size_type last_find) const
     {
         if(last_find > 0)
         {
@@ -1044,77 +1357,106 @@ namespace eastl
 
 
     ///////////////////////////////////////////////////////////////////////////
-    // BitsetBase<2>
+    // BitsetBase<2, WordType>
     ///////////////////////////////////////////////////////////////////////////
 
-    inline BitsetBase<2>::BitsetBase()
+    template <typename WordType>
+    inline BitsetBase<2, WordType>::BitsetBase()
     {
         mWord[0] = 0;
         mWord[1] = 0;
     }
 
 
-    inline BitsetBase<2>::BitsetBase(uint32_t value)
+    template <typename WordType>
+    inline BitsetBase<2, WordType>::BitsetBase(uint32_t value)
     {
-        // This implementation assumes that sizeof(value) <= sizeof(BitsetWordType).
-        EASTL_CT_ASSERT(sizeof(value) <= sizeof(BitsetWordType));
+        // This implementation assumes that sizeof(value) <= sizeof(word_type).
+        //EASTL_CT_ASSERT(sizeof(value) <= sizeof(word_type)); Disabled because we now have support for uint8_t and uint16_t word types. It would be nice to have a runtime assert that tested this.
 
         mWord[0] = static_cast<word_type>(value);
         mWord[1] = 0;
     }
 
 
-    inline void BitsetBase<2>::operator&=(const this_type& x)
+    /*
+    template <typename WordType>
+    inline BitsetBase<2, WordType>::BitsetBase(uint64_t value)
+    {
+        #if(EA_PLATFORM_WORD_SIZE == 4)
+            mWord[0] = static_cast<word_type>(value);
+            mWord[1] = static_cast<word_type>(value >> 32);
+        #else
+            mWord[0] = static_cast<word_type>(value);
+            mWord[1] = 0;
+        #endif
+    }
+    */
+
+
+    template <typename WordType>
+    inline void BitsetBase<2, WordType>::operator&=(const this_type& x)
     {
         mWord[0] &= x.mWord[0];
         mWord[1] &= x.mWord[1];
     }
 
 
-    inline void BitsetBase<2>::operator|=(const this_type& x)
+    template <typename WordType>
+    inline void BitsetBase<2, WordType>::operator|=(const this_type& x)
     {
         mWord[0] |= x.mWord[0];
         mWord[1] |= x.mWord[1];
     }
 
 
-    inline void BitsetBase<2>::operator^=(const this_type& x)
+    template <typename WordType>
+    inline void BitsetBase<2, WordType>::operator^=(const this_type& x)
     {
         mWord[0] ^= x.mWord[0];
         mWord[1] ^= x.mWord[1];
     }
 
 
-    inline void BitsetBase<2>::operator<<=(size_type n)
+    template <typename WordType>
+    inline void BitsetBase<2, WordType>::operator<<=(size_type n)
     {
-        if(EASTL_UNLIKELY(n >= kBitsPerWord))   // parent expected to handle high bits and n >= 64
+        if(n) // to avoid a shift by kBitsPerWord, which is undefined
         {
-            mWord[1] = mWord[0];
-            mWord[0] = 0;
-            n -= kBitsPerWord;
-        }
+            if(EASTL_UNLIKELY(n >= kBitsPerWord))   // parent expected to handle high bits and n >= 64
+            {
+                mWord[1] = mWord[0];
+                mWord[0] = 0;
+                n -= kBitsPerWord;
+            }
 
-        mWord[1] = (mWord[1] << n) | (mWord[0] >> (kBitsPerWord - n)); // Intentionally use | instead of +.
-        mWord[0] <<= n;
-        // We let the parent class turn off any upper bits.
+            mWord[1] = (mWord[1] << n) | (mWord[0] >> (kBitsPerWord - n)); // Intentionally use | instead of +.
+            mWord[0] <<= n;
+            // We let the parent class turn off any upper bits.
+        }
     }
 
 
-    inline void BitsetBase<2>::operator>>=(size_type n)
+    template <typename WordType>
+    inline void BitsetBase<2, WordType>::operator>>=(size_type n)
     {
-        if(EASTL_UNLIKELY(n >= kBitsPerWord))   // parent expected to handle n >= 64
+        if(n) // to avoid a shift by kBitsPerWord, which is undefined
         {
-            mWord[0] = mWord[1];
-            mWord[1] = 0;
-            n -= kBitsPerWord;
+            if(EASTL_UNLIKELY(n >= kBitsPerWord))   // parent expected to handle n >= 64
+            {
+                mWord[0] = mWord[1];
+                mWord[1] = 0;
+                n -= kBitsPerWord;
+            }
+            
+            mWord[0] = (mWord[0] >> n) | (mWord[1] << (kBitsPerWord - n)); // Intentionally use | instead of +.
+            mWord[1] >>= n;
         }
-
-        mWord[0] = (mWord[0] >> n) | (mWord[1] << (kBitsPerWord - n)); // Intentionally use | instead of +.
-        mWord[1] >>= n;
     }
 
 
-    inline void BitsetBase<2>::flip()
+    template <typename WordType>
+    inline void BitsetBase<2, WordType>::flip()
     {
         mWord[0] = ~mWord[0];
         mWord[1] = ~mWord[1];
@@ -1122,7 +1464,8 @@ namespace eastl
     }
 
 
-    inline void BitsetBase<2>::set()
+    template <typename WordType>
+    inline void BitsetBase<2, WordType>::set()
     {
         mWord[0] = ~static_cast<word_type>(0);
         mWord[1] = ~static_cast<word_type>(0);
@@ -1130,7 +1473,8 @@ namespace eastl
     }
 
 
-    inline void BitsetBase<2>::set(size_type i, bool value)
+    template <typename WordType>
+    inline void BitsetBase<2, WordType>::set(size_type i, bool value)
     {
         if(value)
             mWord[i >> kBitsPerWordShift] |=  (static_cast<word_type>(1) << (i & kBitsPerWordMask));
@@ -1139,30 +1483,34 @@ namespace eastl
     }
 
 
-    inline void BitsetBase<2>::reset()
+    template <typename WordType>
+    inline void BitsetBase<2, WordType>::reset()
     {
         mWord[0] = 0;
         mWord[1] = 0;
     }
 
 
-    inline bool BitsetBase<2>::operator==(const this_type& x) const
+    template <typename WordType>
+    inline bool BitsetBase<2, WordType>::operator==(const this_type& x) const
     {
         return (mWord[0] == x.mWord[0]) && (mWord[1] == x.mWord[1]);
     }
 
 
-    inline bool BitsetBase<2>::any() const
+    template <typename WordType>
+    inline bool BitsetBase<2, WordType>::any() const
     {
         // Or with two branches: { return (mWord[0] != 0) || (mWord[1] != 0); }
         return (mWord[0] | mWord[1]) != 0; 
     }
 
 
-    inline BitsetBase<2>::size_type
-    BitsetBase<2>::count() const
+    template <typename WordType>
+    inline typename BitsetBase<2, WordType>::size_type
+    BitsetBase<2, WordType>::count() const
     {
-        #if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 304) && !defined(__SNC__) && !defined(EA_PLATFORM_ANDROID) // GCC 3.4 or later
+        #if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 304) && !defined(CS_UNDEFINED_STRING) && !defined(CS_UNDEFINED_STRING) // GCC 3.4 or later
             #if(EA_PLATFORM_WORD_SIZE == 4)
                 return (size_type)__builtin_popcountl(mWord[0])  + (size_type)__builtin_popcountl(mWord[1]);
             #else
@@ -1175,7 +1523,29 @@ namespace eastl
     }
 
 
-    inline unsigned long BitsetBase<2>::to_ulong() const
+    template <typename WordType>
+    inline void BitsetBase<2, WordType>::from_uint32(uint32_t value)
+    {
+        mWord[0] = static_cast<word_type>(value);
+        mWord[1] = 0;
+    }
+
+
+    template <typename WordType>
+    inline void BitsetBase<2, WordType>::from_uint64(uint64_t value)
+    {
+        #if(EA_PLATFORM_WORD_SIZE == 4)
+            mWord[0] = static_cast<word_type>(value);
+            mWord[1] = static_cast<word_type>(value >> 32);
+        #else
+            mWord[0] = static_cast<word_type>(value);
+            mWord[1] = 0;
+        #endif
+    }
+
+
+    template <typename WordType>
+    inline unsigned long BitsetBase<2, WordType>::to_ulong() const
     {
         #if EASTL_EXCEPTIONS_ENABLED
             if(mWord[1])
@@ -1185,22 +1555,62 @@ namespace eastl
     }
 
 
-    inline BitsetBase<2>::word_type&
-    BitsetBase<2>::DoGetWord(size_type i)
+    template <typename WordType>
+    inline uint32_t BitsetBase<2, WordType>::to_uint32() const
+    {
+        #if EASTL_EXCEPTIONS_ENABLED
+            // Verify that high words or bits are not set and thus that to_uint32 doesn't lose information.
+
+            #if(EA_PLATFORM_WORD_SIZE == 4)
+                if(mWord[1])
+                    throw overflow_error("BitsetBase::to_uint32");
+            #else
+                if(mWord[1] || (mWord[0] >> 32))
+                    throw overflow_error("BitsetBase::to_uint32");
+            #endif
+        #endif
+
+        return (uint32_t)mWord[0];
+    }
+
+
+    template <typename WordType>
+    inline uint64_t BitsetBase<2, WordType>::to_uint64() const
+    {
+        #if(EA_PLATFORM_WORD_SIZE == 4)
+            // There can't possibly be an overflow_error here.
+
+            return ((uint64_t)mWord[1] << 32) | mWord[0];
+        #else
+            #if EASTL_EXCEPTIONS_ENABLED
+                if(mWord[1])
+                    throw overflow_error("BitsetBase::to_uint64");
+            #endif
+
+            return (uint64_t)mWord[0];
+        #endif
+    }
+
+
+    template <typename WordType>
+    inline typename BitsetBase<2, WordType>::word_type&
+    BitsetBase<2, WordType>::DoGetWord(size_type i)
     {
         return mWord[i >> kBitsPerWordShift];
     }
 
 
-    inline BitsetBase<2>::word_type
-    BitsetBase<2>::DoGetWord(size_type i) const
+    template <typename WordType>
+    inline typename BitsetBase<2, WordType>::word_type
+    BitsetBase<2, WordType>::DoGetWord(size_type i) const
     {
         return mWord[i >> kBitsPerWordShift];
     }
 
 
-    inline BitsetBase<2>::size_type 
-    BitsetBase<2>::DoFindFirst() const
+    template <typename WordType>
+    inline typename BitsetBase<2, WordType>::size_type 
+    BitsetBase<2, WordType>::DoFindFirst() const
     {
         size_type fbiw = GetFirstBit(mWord[0]);
 
@@ -1216,8 +1626,9 @@ namespace eastl
     }
 
 
-    inline BitsetBase<2>::size_type 
-    BitsetBase<2>::DoFindNext(size_type last_find) const
+    template <typename WordType>
+    inline typename BitsetBase<2, WordType>::size_type 
+    BitsetBase<2, WordType>::DoFindNext(size_type last_find) const
     {
         // If the last find was in the first word, we must check it and then possibly the second.
         if(++last_find < (size_type)kBitsPerWord)
@@ -1254,8 +1665,9 @@ namespace eastl
     }
 
 
-    inline BitsetBase<2>::size_type 
-    BitsetBase<2>::DoFindLast() const
+    template <typename WordType>
+    inline typename BitsetBase<2, WordType>::size_type 
+    BitsetBase<2, WordType>::DoFindLast() const
     {
         size_type lbiw = GetLastBit(mWord[1]);
 
@@ -1271,8 +1683,9 @@ namespace eastl
     }
 
 
-    inline BitsetBase<2>::size_type 
-    BitsetBase<2>::DoFindPrev(size_type last_find) const
+    template <typename WordType>
+    inline typename BitsetBase<2, WordType>::size_type 
+    BitsetBase<2, WordType>::DoFindPrev(size_type last_find) const
     {
         // If the last find was in the second word, we must check it and then possibly the first.
         if(last_find > (size_type)kBitsPerWord)
@@ -1314,8 +1727,8 @@ namespace eastl
     // bitset::reference
     ///////////////////////////////////////////////////////////////////////////
 
-    template <size_t N>
-    inline bitset<N>::reference::reference(const bitset& x, size_type i)
+    template <size_t N, typename WordType>
+    inline bitset<N, WordType>::reference::reference(const bitset& x, size_type i)
         : mpBitWord(&const_cast<bitset&>(x).DoGetWord(i)),
           mnBitIndex(i & kBitsPerWordMask)
     {   // We have an issue here because the above is casting away the const-ness of the source bitset.
@@ -1323,9 +1736,9 @@ namespace eastl
     }
 
 
-    template <size_t N>
-    inline typename bitset<N>::reference&
-    bitset<N>::reference::operator=(bool value)
+    template <size_t N, typename WordType>
+    inline typename bitset<N, WordType>::reference&
+    bitset<N, WordType>::reference::operator=(bool value)
     {
         if(value)
             *mpBitWord |=  (static_cast<word_type>(1) << (mnBitIndex & kBitsPerWordMask));
@@ -1335,9 +1748,9 @@ namespace eastl
     }
 
 
-    template <size_t N>
-    inline typename bitset<N>::reference&
-    bitset<N>::reference::operator=(const reference& x)
+    template <size_t N, typename WordType>
+    inline typename bitset<N, WordType>::reference&
+    bitset<N, WordType>::reference::operator=(const reference& x)
     {
         if(*x.mpBitWord & (static_cast<word_type>(1) << (x.mnBitIndex & kBitsPerWordMask)))
             *mpBitWord |=  (static_cast<word_type>(1) << (mnBitIndex & kBitsPerWordMask));
@@ -1347,24 +1760,24 @@ namespace eastl
     }
 
 
-    template <size_t N>
-    inline bool bitset<N>::reference::operator~() const
+    template <size_t N, typename WordType>
+    inline bool bitset<N, WordType>::reference::operator~() const
     {
         return (*mpBitWord & (static_cast<word_type>(1) << (mnBitIndex & kBitsPerWordMask))) == 0;
     }
 
 
     //Defined inline in the class because Metrowerks fails to be able to compile it here.
-    //template <size_t N>
-    //inline bitset<N>::reference::operator bool() const
+    //template <size_t N, typename WordType>
+    //inline bitset<N, WordType>::reference::operator bool() const
     //{
     //    return (*mpBitWord & (static_cast<word_type>(1) << (mnBitIndex & kBitsPerWordMask))) != 0;
     //}
 
 
-    template <size_t N>
-    inline typename bitset<N>::reference&
-    bitset<N>::reference::flip()
+    template <size_t N, typename WordType>
+    inline typename bitset<N, WordType>::reference&
+    bitset<N, WordType>::reference::flip()
     {
         *mpBitWord ^= static_cast<word_type>(1) << (mnBitIndex & kBitsPerWordMask);
         return *this;
@@ -1377,59 +1790,70 @@ namespace eastl
     // bitset
     ///////////////////////////////////////////////////////////////////////////
 
-    template <size_t N>
-    inline bitset<N>::bitset()
+    template <size_t N, typename WordType>
+    inline bitset<N, WordType>::bitset()
         : base_type()
     {
         // Empty. The base class will set all bits to zero.
     }
 
 
-    template <size_t N>
-    inline bitset<N>::bitset(uint32_t value)
+    template <size_t N, typename WordType>
+    inline bitset<N, WordType>::bitset(uint32_t value)
         : base_type(value)
     {
         if((N & kBitsPerWordMask) || (N == 0)) // If there are any high bits to clear... (If we didn't have this check, then the code below would do the wrong thing when N == 32.
-            mWord[kNW - 1] &= ~(~static_cast<word_type>(0) << (N & kBitsPerWordMask)); // This clears any high unused bits.
+            mWord[kWordCount - 1] &= ~(~static_cast<word_type>(0) << (N & kBitsPerWordMask)); // This clears any high unused bits.
     }
 
 
-    template <size_t N>
-    inline typename bitset<N>::this_type&
-    bitset<N>::operator&=(const this_type& x)
+    /*
+    template <size_t N, typename WordType>
+    inline bitset<N, WordType>::bitset(uint64_t value)
+        : base_type(value)
+    {
+        if((N & kBitsPerWordMask) || (N == 0)) // If there are any high bits to clear...
+            mWord[kWordCount - 1] &= ~(~static_cast<word_type>(0) << (N & kBitsPerWordMask)); // This clears any high unused bits.
+    }
+    */
+
+
+    template <size_t N, typename WordType>
+    inline typename bitset<N, WordType>::this_type&
+    bitset<N, WordType>::operator&=(const this_type& x)
     {
         base_type::operator&=(x);
         return *this;
     }
 
 
-    template <size_t N>
-    inline typename bitset<N>::this_type&
-    bitset<N>::operator|=(const this_type& x)
+    template <size_t N, typename WordType>
+    inline typename bitset<N, WordType>::this_type&
+    bitset<N, WordType>::operator|=(const this_type& x)
     {
         base_type::operator|=(x);
         return *this;
     }
 
 
-    template <size_t N>
-    inline typename bitset<N>::this_type&
-    bitset<N>::operator^=(const this_type& x)
+    template <size_t N, typename WordType>
+    inline typename bitset<N, WordType>::this_type&
+    bitset<N, WordType>::operator^=(const this_type& x)
     {
         base_type::operator^=(x);
         return *this;
     }
 
 
-    template <size_t N>
-    inline typename bitset<N>::this_type&
-    bitset<N>::operator<<=(size_type n)
+    template <size_t N, typename WordType>
+    inline typename bitset<N, WordType>::this_type&
+    bitset<N, WordType>::operator<<=(size_type n)
     {
         if(EASTL_LIKELY((intptr_t)n < (intptr_t)N))
         {
             base_type::operator<<=(n);
             if((N & kBitsPerWordMask) || (N == 0)) // If there are any high bits to clear... (If we didn't have this check, then the code below would do the wrong thing when N == 32.
-                mWord[kNW - 1] &= ~(~static_cast<word_type>(0) << (N & kBitsPerWordMask)); // This clears any high unused bits. We need to do this so that shift operations proceed correctly.
+                mWord[kWordCount - 1] &= ~(~static_cast<word_type>(0) << (N & kBitsPerWordMask)); // This clears any high unused bits. We need to do this so that shift operations proceed correctly.
         }
         else
             base_type::reset();
@@ -1437,9 +1861,9 @@ namespace eastl
     }
 
 
-    template <size_t N>
-    inline typename bitset<N>::this_type&
-    bitset<N>::operator>>=(size_type n)
+    template <size_t N, typename WordType>
+    inline typename bitset<N, WordType>::this_type&
+    bitset<N, WordType>::operator>>=(size_type n)
     {
         if(EASTL_LIKELY(n < N))
             base_type::operator>>=(n);
@@ -1449,20 +1873,20 @@ namespace eastl
     }
 
 
-    template <size_t N>
-    inline typename bitset<N>::this_type&
-    bitset<N>::set()
+    template <size_t N, typename WordType>
+    inline typename bitset<N, WordType>::this_type&
+    bitset<N, WordType>::set()
     {
         base_type::set(); // This sets all bits.
         if((N & kBitsPerWordMask) || (N == 0)) // If there are any high bits to clear... (If we didn't have this check, then the code below would do the wrong thing when N == 32.
-            mWord[kNW - 1] &= ~(~static_cast<word_type>(0) << (N & kBitsPerWordMask)); // This clears any high unused bits. We need to do this so that shift operations proceed correctly.
+            mWord[kWordCount - 1] &= ~(~static_cast<word_type>(0) << (N & kBitsPerWordMask)); // This clears any high unused bits. We need to do this so that shift operations proceed correctly.
         return *this;
     }
 
 
-    template <size_t N>
-    inline typename bitset<N>::this_type&
-    bitset<N>::set(size_type i, bool value)
+    template <size_t N, typename WordType>
+    inline typename bitset<N, WordType>::this_type&
+    bitset<N, WordType>::set(size_type i, bool value)
     {
         if(i < N)
             base_type::set(i, value);
@@ -1480,18 +1904,18 @@ namespace eastl
     }
 
 
-    template <size_t N>
-    inline typename bitset<N>::this_type&
-    bitset<N>::reset()
+    template <size_t N, typename WordType>
+    inline typename bitset<N, WordType>::this_type&
+    bitset<N, WordType>::reset()
     {
         base_type::reset();
         return *this;
     }
 
 
-    template <size_t N>
-    inline typename bitset<N>::this_type&
-    bitset<N>::reset(size_type i)
+    template <size_t N, typename WordType>
+    inline typename bitset<N, WordType>::this_type&
+    bitset<N, WordType>::reset(size_type i)
     {
         if(EASTL_LIKELY(i < N))
             DoGetWord(i) &= ~(static_cast<word_type>(1) << (i & kBitsPerWordMask));
@@ -1509,20 +1933,20 @@ namespace eastl
     }
 
         
-    template <size_t N>
-    inline typename bitset<N>::this_type&
-    bitset<N>::flip()
+    template <size_t N, typename WordType>
+    inline typename bitset<N, WordType>::this_type&
+    bitset<N, WordType>::flip()
     {
         base_type::flip();
         if((N & kBitsPerWordMask) || (N == 0)) // If there are any high bits to clear... (If we didn't have this check, then the code below would do the wrong thing when N == 32.
-            mWord[kNW - 1] &= ~(~static_cast<word_type>(0) << (N & kBitsPerWordMask)); // This clears any high unused bits. We need to do this so that shift operations proceed correctly.
+            mWord[kWordCount - 1] &= ~(~static_cast<word_type>(0) << (N & kBitsPerWordMask)); // This clears any high unused bits. We need to do this so that shift operations proceed correctly.
         return *this;
     }
 
 
-    template <size_t N>
-    inline typename bitset<N>::this_type&
-    bitset<N>::flip(size_type i)
+    template <size_t N, typename WordType>
+    inline typename bitset<N, WordType>::this_type&
+    bitset<N, WordType>::flip(size_type i)
     {
         if(EASTL_LIKELY(i < N))
             DoGetWord(i) ^= (static_cast<word_type>(1) << (i & kBitsPerWordMask));
@@ -1540,17 +1964,17 @@ namespace eastl
     }
         
 
-    template <size_t N>
-    inline typename bitset<N>::this_type
-    bitset<N>::operator~() const
+    template <size_t N, typename WordType>
+    inline typename bitset<N, WordType>::this_type
+    bitset<N, WordType>::operator~() const
     {
         return this_type(*this).flip();
     }
 
 
-    template <size_t N>
-    inline typename bitset<N>::reference
-    bitset<N>::operator[](size_type i)
+    template <size_t N, typename WordType>
+    inline typename bitset<N, WordType>::reference
+    bitset<N, WordType>::operator[](size_type i)
     {
         #if EASTL_ASSERT_ENABLED
             if(EASTL_UNLIKELY(!(i < N)))
@@ -1561,8 +1985,8 @@ namespace eastl
     }
 
 
-    template <size_t N>
-    inline bool bitset<N>::operator[](size_type i) const
+    template <size_t N, typename WordType>
+    inline bool bitset<N, WordType>::operator[](size_type i) const
     {
         #if EASTL_ASSERT_ENABLED
             if(EASTL_UNLIKELY(!(i < N)))
@@ -1573,59 +1997,93 @@ namespace eastl
     }
 
 
-    template <size_t N>
-    inline const typename bitset<N>::word_type* bitset<N>::data() const
+    template <size_t N, typename WordType>
+    inline const typename bitset<N, WordType>::word_type* bitset<N, WordType>::data() const
     {
         return base_type::mWord;
     }
 
 
-    template <size_t N>
-    inline typename bitset<N>::word_type* bitset<N>::data()
+    template <size_t N, typename WordType>
+    inline typename bitset<N, WordType>::word_type* bitset<N, WordType>::data()
     {
         return base_type::mWord;
     }
 
 
-    template <size_t N>
-    inline unsigned long bitset<N>::to_ulong() const
+    template <size_t N, typename WordType>
+    inline void bitset<N, WordType>::from_uint32(uint32_t value)
     {
-        return base_type::to_ulong();
+        base_type::from_uint32(value);
+
+        if((N & kBitsPerWordMask) || (N == 0)) // If there are any high bits to clear... (If we didn't have this check, then the code below would do the wrong thing when N == 32.
+            mWord[kWordCount - 1] &= ~(~static_cast<word_type>(0) << (N & kBitsPerWordMask)); // This clears any high unused bits. We need to do this so that shift operations proceed correctly.
     }
 
 
-    template <size_t N>
-    inline typename bitset<N>::size_type
-    bitset<N>::count() const
+    template <size_t N, typename WordType>
+    inline void bitset<N, WordType>::from_uint64(uint64_t value)
     {
-        return base_type::count();
+        base_type::from_uint64(value);
+
+        if((N & kBitsPerWordMask) || (N == 0)) // If there are any high bits to clear... (If we didn't have this check, then the code below would do the wrong thing when N == 32.
+            mWord[kWordCount - 1] &= ~(~static_cast<word_type>(0) << (N & kBitsPerWordMask)); // This clears any high unused bits. We need to do this so that shift operations proceed correctly.
     }
 
 
-    template <size_t N>
-    inline typename bitset<N>::size_type
-    bitset<N>::size() const
+    // template <size_t N, typename WordType>
+    // inline unsigned long bitset<N, WordType>::to_ulong() const
+    // {
+    //     return base_type::to_ulong();
+    // }
+
+
+    // template <size_t N, typename WordType>
+    // inline uint32_t bitset<N, WordType>::to_uint32() const
+    // {
+    //     return base_type::to_uint32();
+    // }
+
+
+    // template <size_t N, typename WordType>
+    // inline uint64_t bitset<N, WordType>::to_uint64() const
+    // {
+    //     return base_type::to_uint64();
+    // }
+
+
+    // template <size_t N, typename WordType>
+    // inline typename bitset<N, WordType>::size_type
+    // bitset<N, WordType>::count() const
+    // {
+    //     return base_type::count();
+    // }
+
+
+    template <size_t N, typename WordType>
+    inline typename bitset<N, WordType>::size_type
+    bitset<N, WordType>::size() const
     {
         return (size_type)N;
     }
 
 
-    template <size_t N>
-    inline bool bitset<N>::operator==(const this_type& x) const
+    template <size_t N, typename WordType>
+    inline bool bitset<N, WordType>::operator==(const this_type& x) const
     {
         return base_type::operator==(x);
     }
 
 
-    template <size_t N>
-    inline bool bitset<N>::operator!=(const this_type& x) const
+    template <size_t N, typename WordType>
+    inline bool bitset<N, WordType>::operator!=(const this_type& x) const
     {
         return !base_type::operator==(x);
     }
 
 
-    template <size_t N>
-    inline bool bitset<N>::test(size_type i) const
+    template <size_t N, typename WordType>
+    inline bool bitset<N, WordType>::test(size_type i) const
     {
         if(EASTL_LIKELY(i < N))
             return (DoGetWord(i) & (static_cast<word_type>(1) << (i & kBitsPerWordMask))) != 0;
@@ -1643,82 +2101,82 @@ namespace eastl
     }
 
 
-    template <size_t N>
-    inline bool bitset<N>::any() const
-    {
-        return base_type::any();
-    }
+    // template <size_t N, typename WordType>
+    // inline bool bitset<N, WordType>::any() const
+    // {
+    //     return base_type::any();
+    // }
 
 
-    template <size_t N>
-    inline bool bitset<N>::none() const
+    template <size_t N, typename WordType>
+    inline bool bitset<N, WordType>::none() const
     {
         return !base_type::any();
     }
 
 
-    template <size_t N>
-    inline typename bitset<N>::this_type
-    bitset<N>::operator<<(size_type n) const
+    template <size_t N, typename WordType>
+    inline typename bitset<N, WordType>::this_type
+    bitset<N, WordType>::operator<<(size_type n) const
     {
         return this_type(*this).operator<<=(n);
     }
 
 
-    template <size_t N>
-    inline typename bitset<N>::this_type
-    bitset<N>::operator>>(size_type n) const
+    template <size_t N, typename WordType>
+    inline typename bitset<N, WordType>::this_type
+    bitset<N, WordType>::operator>>(size_type n) const
     {
         return this_type(*this).operator>>=(n);
     }
 
 
-    template <size_t N>
-    inline typename bitset<N>::size_type
-    bitset<N>::find_first() const
+    template <size_t N, typename WordType>
+    inline typename bitset<N, WordType>::size_type
+    bitset<N, WordType>::find_first() const
     {
         const size_type i = base_type::DoFindFirst();
 
-        if(i < (kNW * kBitsPerWord)) // This multiplication is a compile-time constant.
+        if(i < (kWordCount * kBitsPerWord)) // This multiplication is a compile-time constant.
             return i;
 
         return kSize;
     }
 
 
-    template <size_t N>
-    inline typename bitset<N>::size_type
-    bitset<N>::find_next(size_type last_find) const
+    template <size_t N, typename WordType>
+    inline typename bitset<N, WordType>::size_type
+    bitset<N, WordType>::find_next(size_type last_find) const
     {
         const size_type i = base_type::DoFindNext(last_find);
 
-        if(i < (kNW * kBitsPerWord))// This multiplication is a compile-time constant.
+        if(i < (kWordCount * kBitsPerWord))// This multiplication is a compile-time constant.
             return i;
 
         return kSize;
     }
 
 
-    template <size_t N>
-    inline typename bitset<N>::size_type
-    bitset<N>::find_last() const
+    template <size_t N, typename WordType>
+    inline typename bitset<N, WordType>::size_type
+    bitset<N, WordType>::find_last() const
     {
         const size_type i = base_type::DoFindLast();
 
-        if(i < (kNW * kBitsPerWord)) // This multiplication is a compile-time constant.
+        if(i < (kWordCount * kBitsPerWord)) // This multiplication is a compile-time constant.
             return i;
 
         return kSize;
     }
 
 
-    template <size_t N>
-    inline typename bitset<N>::size_type
-    bitset<N>::find_prev(size_type last_find) const
+    template <size_t N, typename WordType>
+    inline typename bitset<N, WordType>::size_type
+    bitset<N, WordType>::find_prev(size_type last_find) const
     {
         const size_type i = base_type::DoFindPrev(last_find);
 
-        if(i < (kNW * kBitsPerWord))// This multiplication is a compile-time constant.
+        if(i < (kWordCount * kBitsPerWord))// This multiplication is a compile-time constant.
             return i;
 
         return kSize;
@@ -1730,25 +2188,25 @@ namespace eastl
     // global operators
     ///////////////////////////////////////////////////////////////////////////
 
-    template <size_t N>
-    inline bitset<N> operator&(const bitset<N>& a, const bitset<N>& b)
+    template <size_t N, typename WordType>
+    inline bitset<N, WordType> operator&(const bitset<N, WordType>& a, const bitset<N, WordType>& b)
     {
         // We get betting inlining when we don't declare temporary variables.
-        return bitset<N>(a).operator&=(b);
+        return bitset<N, WordType>(a).operator&=(b);
     }
 
 
-    template <size_t N>
-    inline bitset<N> operator|(const bitset<N>& a, const bitset<N>& b)
+    template <size_t N, typename WordType>
+    inline bitset<N, WordType> operator|(const bitset<N, WordType>& a, const bitset<N, WordType>& b)
     {
-        return bitset<N>(a).operator|=(b);
+        return bitset<N, WordType>(a).operator|=(b);
     }
 
 
-    template <size_t N>
-    inline bitset<N> operator^(const bitset<N>& a, const bitset<N>& b)
+    template <size_t N, typename WordType>
+    inline bitset<N, WordType> operator^(const bitset<N, WordType>& a, const bitset<N, WordType>& b)
     {
-        return bitset<N>(a).operator^=(b);
+        return bitset<N, WordType>(a).operator^=(b);
     }
 
 
@@ -1757,8 +2215,6 @@ namespace eastl
 
 #if defined(_MSC_VER)
     #pragma warning(pop)
-#elif defined(__SNC__)
-    #pragma control %pop diag
 #endif
 
 

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2009-2010 Electronic Arts, Inc.  All rights reserved.
+Copyright (C) 2009,2010,2012 Electronic Arts, Inc.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -26,17 +26,10 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-///////////////////////////////////////////////////////////////////////////////
-// EASTL/fixed_hash_set.h
-//
-// Copyright (c) 2005, Electronic Arts. All rights reserved.
-// Written and maintained by Paul Pedriana.
-///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
 // This file implements a hash_set which uses a fixed size memory pool for 
 // its buckets and nodes. 
-//
 ///////////////////////////////////////////////////////////////////////////////
 
 
@@ -46,6 +39,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <EASTL/hash_set.h>
 #include <EASTL/internal/fixed_pool.h>
+
+#if defined(EA_PRAGMA_ONCE_SUPPORTED)
+    #pragma once // Some compilers (e.g. VC++) benefit significantly from using this. We've measured 3-4% build speed improvements in apps as a result.
+#endif
 
 
 
@@ -81,34 +78,31 @@ namespace eastl
     ///     Predicate              hash_set equality testing function. See hash_set.
     ///
     template <typename Value, size_t nodeCount, size_t bucketCount = nodeCount + 1, bool bEnableOverflow = true,
-              typename Hash = eastl::hash<Value>, typename Predicate = eastl::equal_to<Value>, bool bCacheHashCode = false, typename Allocator = EASTLAllocatorType>
+              typename Hash = eastl::hash<Value>, typename Predicate = eastl::equal_to<Value>, bool bCacheHashCode = false, typename OverflowAllocator = EASTLAllocatorType>
     class fixed_hash_set : public hash_set<Value,
                                            Hash,
                                            Predicate,
                                            fixed_hashtable_allocator<
                                                 bucketCount + 1, 
-                                                sizeof(typename hash_set<Value, Hash, Predicate, Allocator, bCacheHashCode>::node_type), 
+                                                sizeof(typename hash_set<Value, Hash, Predicate, OverflowAllocator, bCacheHashCode>::node_type), 
                                                 nodeCount, 
-                                                hash_set<Value, Hash, Predicate, Allocator, bCacheHashCode>::kValueAlignment, 
-                                                hash_set<Value, Hash, Predicate, Allocator, bCacheHashCode>::kValueAlignmentOffset, 
+                                                EASTL_ALIGN_OF(Value), 
+                                                0,
                                                 bEnableOverflow,
-                                                Allocator>, 
+                                                OverflowAllocator>, 
                                            bCacheHashCode>
     {
     public:
-        typedef fixed_hash_set<Value, nodeCount, bucketCount, bEnableOverflow, Hash, Predicate, bCacheHashCode, Allocator> this_type;
         typedef fixed_hashtable_allocator<bucketCount + 1, sizeof(typename hash_set<Value, Hash, Predicate, 
-                        Allocator, bCacheHashCode>::node_type), nodeCount, hash_set<Value, Hash, Predicate, 
-                        Allocator, bCacheHashCode>::kValueAlignment, hash_set<Value, Hash, Predicate, 
-                        Allocator, bCacheHashCode>::kValueAlignmentOffset, bEnableOverflow, Allocator>              fixed_allocator_type;
-        typedef hash_set<Value, Hash, Predicate, fixed_allocator_type, bCacheHashCode>                              base_type;
-        typedef typename base_type::node_type                                                                       node_type;
-        typedef typename base_type::size_type                                                                       size_type;
+                        OverflowAllocator, bCacheHashCode>::node_type), nodeCount, EASTL_ALIGN_OF(Value), 0,
+                        bEnableOverflow, OverflowAllocator>                                                                        fixed_allocator_type;
+        typedef typename fixed_allocator_type::overflow_allocator_type                                                             overflow_allocator_type;
+        typedef fixed_hash_set<Value, nodeCount, bucketCount, bEnableOverflow, Hash, Predicate, bCacheHashCode, OverflowAllocator> this_type;
+        typedef hash_set<Value, Hash, Predicate, fixed_allocator_type, bCacheHashCode>                                             base_type;
+        typedef typename base_type::node_type                                                                                      node_type;
+        typedef typename base_type::size_type                                                                                      size_type;
 
-        enum
-        {
-            kMaxSize = nodeCount
-        };
+        enum { kMaxSize = nodeCount };
 
         using base_type::mAllocator;
 
@@ -117,125 +111,37 @@ namespace eastl
         char        mNodeBuffer[fixed_allocator_type::kBufferSize]; // kBufferSize will take into account alignment requirements.
 
     public:
-        /// fixed_hash_set
-        ///
-        /// Construct an empty fixed_hash_set with a given set of parameters.
-        ///
+        explicit fixed_hash_set(const overflow_allocator_type& overflowAllocator);
+
         explicit fixed_hash_set(const Hash& hashFunction = Hash(), 
-                                const Predicate& predicate = Predicate())
-            : base_type(prime_rehash_policy::GetPrevBucketCountOnly(bucketCount), 
-                        hashFunction, predicate, fixed_allocator_type(NULL, mBucketBuffer))
-        {
-            EASTL_CT_ASSERT((nodeCount >= 1) && (bucketCount >= 2));
-            base_type::set_max_load_factor(10000.f); // Set it so that we will never resize.
+                                const Predicate& predicate = Predicate());
 
-            #if EASTL_NAME_ENABLED
-                mAllocator.set_name(EASTL_FIXED_HASH_SET_DEFAULT_NAME);
-            #endif
+        fixed_hash_set(const Hash& hashFunction, 
+                       const Predicate& predicate,
+                       const overflow_allocator_type& overflowAllocator);
 
-            mAllocator.reset(mNodeBuffer);
-        }
-
-
-        /// fixed_hash_set
-        ///
-        /// Construct a fixed_hash_set from a source sequence and with a given set of parameters.
-        ///
         template <typename InputIterator>
         fixed_hash_set(InputIterator first, InputIterator last,
                        const Hash& hashFunction = Hash(),
-                       const Predicate& predicate = Predicate())
-            : base_type(prime_rehash_policy::GetPrevBucketCountOnly(bucketCount), hashFunction, 
-                        predicate, fixed_allocator_type(NULL, mBucketBuffer))
-        {
-            EASTL_CT_ASSERT((nodeCount >= 1) && (bucketCount >= 2));
-            base_type::set_max_load_factor(10000.f); // Set it so that we will never resize.
+                       const Predicate& predicate = Predicate());
 
-            #if EASTL_NAME_ENABLED
-                mAllocator.set_name(EASTL_FIXED_HASH_SET_DEFAULT_NAME);
-            #endif
+        fixed_hash_set(const this_type& x);
 
-            mAllocator.reset(mNodeBuffer);
-            base_type::insert(first, last);
-        }
+        this_type& operator=(const this_type& x);
 
+        void swap(this_type& x);
 
-        /// fixed_hash_set
-        ///
-        /// Copy constructor
-        ///
-        fixed_hash_set(const this_type& x)
-            : base_type(prime_rehash_policy::GetPrevBucketCountOnly(bucketCount), x.hash_function(),
-                        x.equal_function(), fixed_allocator_type(NULL, mBucketBuffer))
-        {
-            EASTL_CT_ASSERT((nodeCount >= 1) && (bucketCount >= 2));
-            base_type::set_max_load_factor(10000.f); // Set it so that we will never resize.
+        void reset_lose_memory(); // This is a unilateral reset to an initially empty state. No destructors are called, no deallocation occurs.
 
-            #if EASTL_NAME_ENABLED
-                mAllocator.set_name(x.mAllocator.get_name());
-            #endif
+        size_type max_size() const;
 
-            mAllocator.reset(mNodeBuffer);
-            base_type::insert(x.begin(), x.end());
-        }
+        overflow_allocator_type& get_overflow_allocator();
+        void                     set_overflow_allocator(const overflow_allocator_type& allocator);
 
-
-        /// operator=
-        ///
-        /// We provide an override so that assignment is done correctly.
-        ///
-        this_type& operator=(const this_type& x)
-        {
-            if(this != &x)
-            {
-                base_type::clear();
-                base_type::insert(x.begin(), x.end());
-            }
-            return *this;
-        }
-
-
-        void swap(this_type& x)
-        {
-            // We must do a brute-force swap, because fixed containers cannot share memory allocations.
-            // Note that we create a temp value on the stack. This approach may fail if the size of the 
-            // container is too large. We have a rule against allocating memory from the heap, and so 
-            // if the user wants to swap two large objects of this class, the user will currently need 
-            // to implement it manually. To consider: add code to allocate a temporary buffer if the 
-            // size of the container is too large for the stack.
-            EASTL_ASSERT(sizeof(x) < EASTL_MAX_STACK_USAGE); // It is dangerous to try to create objects that are too big for the stack.
-
-            const this_type temp(*this); // Can't call eastl::swap because that would
-            *this = x;                   // itself call this member swap function.
-            x     = temp;
-        }
-
-
-        void reset()
-        {
-            base_type::reset();
-            base_type::get_allocator().reset(mNodeBuffer);
-        }
-
-
-        size_type max_size() const
-        {
-            return kMaxSize;
-        }
-
+        #if EASTL_RESET_ENABLED
+            void reset(); // This function name is deprecated; use reset_lose_memory instead.
+        #endif
     }; // fixed_hash_set
-
-
-    ///////////////////////////////////////////////////////////////////////
-    // global operators
-    ///////////////////////////////////////////////////////////////////////
-
-    template <typename Value, size_t nodeCount, size_t bucketCount, bool bEnableOverflow, typename Hash, typename Predicate, bool bCacheHashCode>
-    inline void swap(fixed_hash_set<Value, nodeCount, bucketCount, bEnableOverflow, Hash, Predicate, bCacheHashCode>& a, 
-                     fixed_hash_set<Value, nodeCount, bucketCount, bEnableOverflow, Hash, Predicate, bCacheHashCode>& b)
-    {
-        a.swap(b);
-    }
 
 
 
@@ -255,34 +161,31 @@ namespace eastl
     ///     Predicate              hash_set equality testing function. See hash_set.
     ///
     template <typename Value, size_t nodeCount, size_t bucketCount = nodeCount + 1, bool bEnableOverflow = true,
-              typename Hash = eastl::hash<Value>, typename Predicate = eastl::equal_to<Value>, bool bCacheHashCode = false, typename Allocator = EASTLAllocatorType>
+              typename Hash = eastl::hash<Value>, typename Predicate = eastl::equal_to<Value>, bool bCacheHashCode = false, typename OverflowAllocator = EASTLAllocatorType>
     class fixed_hash_multiset : public hash_multiset<Value,
                                                      Hash,
                                                      Predicate,
                                                      fixed_hashtable_allocator<
                                                         bucketCount + 1, 
-                                                        sizeof(typename hash_multiset<Value, Hash, Predicate, Allocator, bCacheHashCode>::node_type),
+                                                        sizeof(typename hash_multiset<Value, Hash, Predicate, OverflowAllocator, bCacheHashCode>::node_type),
                                                         nodeCount,
-                                                        hash_multiset<Value, Hash, Predicate, Allocator, bCacheHashCode>::kValueAlignment, 
-                                                        hash_multiset<Value, Hash, Predicate, Allocator, bCacheHashCode>::kValueAlignmentOffset, 
+                                                        EASTL_ALIGN_OF(Value), 
+                                                        0, 
                                                         bEnableOverflow,
-                                                        Allocator>,
+                                                        OverflowAllocator>,
                                                      bCacheHashCode>
     {
     public:
-        typedef fixed_hash_multiset<Value, nodeCount, bucketCount, bEnableOverflow, Hash, Predicate, bCacheHashCode, Allocator> this_type;
         typedef fixed_hashtable_allocator<bucketCount + 1, sizeof(typename hash_multiset<Value, Hash, Predicate, 
-                    Allocator, bCacheHashCode>::node_type), nodeCount, hash_multiset<Value, Hash, Predicate, 
-                    Allocator, bCacheHashCode>::kValueAlignment, hash_multiset<Value, Hash, Predicate, 
-                    Allocator, bCacheHashCode>::kValueAlignmentOffset, bEnableOverflow, Allocator>                          fixed_allocator_type;
-        typedef hash_multiset<Value, Hash, Predicate, fixed_allocator_type, bCacheHashCode>                                 base_type;
-        typedef typename base_type::node_type                                                                               node_type;
-        typedef typename base_type::size_type                                                                               size_type;
+                    OverflowAllocator, bCacheHashCode>::node_type), nodeCount, EASTL_ALIGN_OF(Value), 0,
+                    bEnableOverflow, OverflowAllocator>                                                                                 fixed_allocator_type;
+        typedef typename fixed_allocator_type::overflow_allocator_type                                                                  overflow_allocator_type;
+        typedef hash_multiset<Value, Hash, Predicate, fixed_allocator_type, bCacheHashCode>                                             base_type;
+        typedef fixed_hash_multiset<Value, nodeCount, bucketCount, bEnableOverflow, Hash, Predicate, bCacheHashCode, OverflowAllocator> this_type;
+        typedef typename base_type::node_type                                                                                           node_type;
+        typedef typename base_type::size_type                                                                                           size_type;
 
-        enum
-        {
-            kMaxSize = nodeCount
-        };
+        enum { kMaxSize = nodeCount };
 
         using base_type::mAllocator;
 
@@ -291,104 +194,400 @@ namespace eastl
         char        mNodeBuffer[fixed_allocator_type::kBufferSize]; // kBufferSize will take into account alignment requirements.
 
     public:
-        /// fixed_hash_multiset
-        ///
-        /// Construct an empty fixed_hash_multiset with a given set of parameters.
-        ///
+        explicit fixed_hash_multiset(const overflow_allocator_type& overflowAllocator);
+
         explicit fixed_hash_multiset(const Hash& hashFunction = Hash(), 
-                                     const Predicate& predicate = Predicate())
-            : base_type(prime_rehash_policy::GetPrevBucketCountOnly(bucketCount), hashFunction, 
-                        predicate, fixed_allocator_type(NULL, mBucketBuffer))
-        {
-            EASTL_CT_ASSERT((nodeCount >= 1) && (bucketCount >= 2));
-            base_type::set_max_load_factor(10000.f); // Set it so that we will never resize.
+                                     const Predicate& predicate = Predicate());
 
-            #if EASTL_NAME_ENABLED
-                mAllocator.set_name(EASTL_FIXED_HASH_MULTISET_DEFAULT_NAME);
-            #endif
+        fixed_hash_multiset(const Hash& hashFunction, 
+                            const Predicate& predicate,
+                            const overflow_allocator_type& overflowAllocator);
 
-            mAllocator.reset(mNodeBuffer);
-        }
-
-
-        /// fixed_hash_multiset
-        ///
-        /// Construct a fixed_hash_multiset from a source sequence and with a given set of parameters.
-        ///
         template <typename InputIterator>
         fixed_hash_multiset(InputIterator first, InputIterator last, 
                             const Hash& hashFunction = Hash(), 
-                            const Predicate& predicate = Predicate())
-            : base_type(prime_rehash_policy::GetPrevBucketCountOnly(bucketCount), hashFunction, 
-                        predicate, fixed_allocator_type(NULL, mBucketBuffer))
-        {
-            EASTL_CT_ASSERT((nodeCount >= 1) && (bucketCount >= 2));
-            base_type::set_max_load_factor(10000.f); // Set it so that we will never resize.
+                            const Predicate& predicate = Predicate());
 
-            #if EASTL_NAME_ENABLED
-                mAllocator.set_name(EASTL_FIXED_HASH_MULTISET_DEFAULT_NAME);
+        fixed_hash_multiset(const this_type& x);
+
+        this_type& operator=(const this_type& x);
+
+        void swap(this_type& x);
+
+        void reset_lose_memory(); // This is a unilateral reset to an initially empty state. No destructors are called, no deallocation occurs.
+
+        size_type max_size() const;
+
+        overflow_allocator_type& get_overflow_allocator();
+        void                     set_overflow_allocator(const overflow_allocator_type& allocator);
+
+        #if EASTL_RESET_ENABLED
+            void reset(); // This function name is deprecated; use reset_lose_memory instead.
+        #endif
+    }; // fixed_hash_multiset
+
+
+
+
+
+    ///////////////////////////////////////////////////////////////////////
+    // fixed_hash_set
+    ///////////////////////////////////////////////////////////////////////
+
+    template <typename Value, size_t nodeCount, size_t bucketCount, bool bEnableOverflow, typename Hash, typename Predicate, bool bCacheHashCode, typename OverflowAllocator>
+    inline fixed_hash_set<Value, nodeCount, bucketCount, bEnableOverflow, Hash, Predicate, bCacheHashCode, OverflowAllocator>::
+    fixed_hash_set(const overflow_allocator_type& overflowAllocator)
+        : base_type(prime_rehash_policy::GetPrevBucketCountOnly(bucketCount), 
+                    Hash(), Predicate(), fixed_allocator_type(NULL, mBucketBuffer, overflowAllocator))
+    {
+        EASTL_CT_ASSERT((nodeCount >= 1) && (bucketCount >= 2));
+        base_type::set_max_load_factor(10000.f); // Set it so that we will never resize.
+
+        #if EASTL_NAME_ENABLED
+            mAllocator.set_name(EASTL_FIXED_HASH_SET_DEFAULT_NAME);
+        #endif
+
+        mAllocator.reset(mNodeBuffer);
+    }
+
+
+    template <typename Value, size_t nodeCount, size_t bucketCount, bool bEnableOverflow, typename Hash, typename Predicate, bool bCacheHashCode, typename OverflowAllocator>
+    inline fixed_hash_set<Value, nodeCount, bucketCount, bEnableOverflow, Hash, Predicate, bCacheHashCode, OverflowAllocator>::
+    fixed_hash_set(const Hash& hashFunction, 
+                   const Predicate& predicate)
+        : base_type(prime_rehash_policy::GetPrevBucketCountOnly(bucketCount), 
+                    hashFunction, predicate, fixed_allocator_type(NULL, mBucketBuffer))
+    {
+        EASTL_CT_ASSERT((nodeCount >= 1) && (bucketCount >= 2));
+        base_type::set_max_load_factor(10000.f); // Set it so that we will never resize.
+
+        #if EASTL_NAME_ENABLED
+            mAllocator.set_name(EASTL_FIXED_HASH_SET_DEFAULT_NAME);
+        #endif
+
+        mAllocator.reset(mNodeBuffer);
+    }
+
+
+    template <typename Value, size_t nodeCount, size_t bucketCount, bool bEnableOverflow, typename Hash, typename Predicate, bool bCacheHashCode, typename OverflowAllocator>
+    inline fixed_hash_set<Value, nodeCount, bucketCount, bEnableOverflow, Hash, Predicate, bCacheHashCode, OverflowAllocator>::
+    fixed_hash_set(const Hash& hashFunction, 
+                   const Predicate& predicate,
+                   const overflow_allocator_type& overflowAllocator)
+        : base_type(prime_rehash_policy::GetPrevBucketCountOnly(bucketCount), 
+                    hashFunction, predicate, fixed_allocator_type(NULL, mBucketBuffer, overflowAllocator))
+    {
+        EASTL_CT_ASSERT((nodeCount >= 1) && (bucketCount >= 2));
+        base_type::set_max_load_factor(10000.f); // Set it so that we will never resize.
+
+        #if EASTL_NAME_ENABLED
+            mAllocator.set_name(EASTL_FIXED_HASH_SET_DEFAULT_NAME);
+        #endif
+
+        mAllocator.reset(mNodeBuffer);
+    }
+
+
+    template <typename Value, size_t nodeCount, size_t bucketCount, bool bEnableOverflow, typename Hash, typename Predicate, bool bCacheHashCode, typename OverflowAllocator>
+    template <typename InputIterator>
+    fixed_hash_set<Value, nodeCount, bucketCount, bEnableOverflow, Hash, Predicate, bCacheHashCode, OverflowAllocator>::
+    fixed_hash_set(InputIterator first, InputIterator last,
+                   const Hash& hashFunction,
+                   const Predicate& predicate)
+        : base_type(prime_rehash_policy::GetPrevBucketCountOnly(bucketCount), hashFunction, 
+                    predicate, fixed_allocator_type(NULL, mBucketBuffer))
+    {
+        EASTL_CT_ASSERT((nodeCount >= 1) && (bucketCount >= 2));
+        base_type::set_max_load_factor(10000.f); // Set it so that we will never resize.
+
+        #if EASTL_NAME_ENABLED
+            mAllocator.set_name(EASTL_FIXED_HASH_SET_DEFAULT_NAME);
+        #endif
+
+        mAllocator.reset(mNodeBuffer);
+        base_type::insert(first, last);
+    }
+
+
+    template <typename Value, size_t nodeCount, size_t bucketCount, bool bEnableOverflow, typename Hash, typename Predicate, bool bCacheHashCode, typename OverflowAllocator>
+    inline fixed_hash_set<Value, nodeCount, bucketCount, bEnableOverflow, Hash, Predicate, bCacheHashCode, OverflowAllocator>::
+    fixed_hash_set(const this_type& x)
+        : base_type(prime_rehash_policy::GetPrevBucketCountOnly(bucketCount), x.hash_function(),
+                    x.equal_function(), fixed_allocator_type(NULL, mBucketBuffer))
+    {
+        mAllocator.copy_overflow_allocator(x.mAllocator);
+
+        #if EASTL_NAME_ENABLED
+            mAllocator.set_name(x.mAllocator.get_name());
+        #endif
+
+        EASTL_CT_ASSERT((nodeCount >= 1) && (bucketCount >= 2));
+        base_type::set_max_load_factor(10000.f); // Set it so that we will never resize.
+
+        mAllocator.reset(mNodeBuffer);
+        base_type::insert(x.begin(), x.end());
+    }
+
+
+    template <typename Value, size_t nodeCount, size_t bucketCount, bool bEnableOverflow, typename Hash, typename Predicate, bool bCacheHashCode, typename OverflowAllocator>
+    typename fixed_hash_set<Value, nodeCount, bucketCount, bEnableOverflow, Hash, Predicate, bCacheHashCode, OverflowAllocator>::this_type& 
+    fixed_hash_set<Value, nodeCount, bucketCount, bEnableOverflow, Hash, Predicate, bCacheHashCode, OverflowAllocator>::operator=(const this_type& x)
+    {
+        if(this != &x)
+        {
+            base_type::clear();
+
+            #if EASTL_ALLOCATOR_COPY_ENABLED
+                mAllocator = x.mAllocator;
             #endif
 
-            mAllocator.reset(mNodeBuffer);
-            base_type::insert(first, last);
-        }
-
-
-        /// fixed_hash_multiset
-        ///
-        /// Copy constructor
-        ///
-        fixed_hash_multiset(const this_type& x)
-            : base_type(prime_rehash_policy::GetPrevBucketCountOnly(bucketCount), x.hash_function(), 
-                        x.equal_function(), fixed_allocator_type(NULL, mBucketBuffer))
-        {
-            EASTL_CT_ASSERT((nodeCount >= 1) && (bucketCount >= 2));
-            base_type::set_max_load_factor(10000.f); // Set it so that we will never resize.
-
-            #if EASTL_NAME_ENABLED
-                mAllocator.set_name(x.mAllocator.get_name());
-            #endif
-
-            mAllocator.reset(mNodeBuffer);
             base_type::insert(x.begin(), x.end());
         }
+        return *this;
+    }
 
 
-        /// operator=
-        ///
-        /// We provide an override so that assignment is done correctly.
-        ///
-        this_type& operator=(const this_type& x)
+    template <typename Value, size_t nodeCount, size_t bucketCount, bool bEnableOverflow, typename Hash, typename Predicate, bool bCacheHashCode, typename OverflowAllocator>
+    inline void fixed_hash_set<Value, nodeCount, bucketCount, bEnableOverflow, Hash, Predicate, bCacheHashCode, OverflowAllocator>::
+    swap(this_type& x)
+    {
+        // We must do a brute-force swap, because fixed containers cannot share memory allocations.
+        // Note that we create a temp value on the stack. This approach may fail if the size of the 
+        // container is too large. We have a rule against allocating memory from the heap, and so 
+        // if the user wants to swap two large objects of this class, the user will currently need 
+        // to implement it manually. To consider: add code to allocate a temporary buffer if the 
+        // size of the container is too large for the stack.
+        EASTL_ASSERT(sizeof(x) < EASTL_MAX_STACK_USAGE); // It is dangerous to try to create objects that are too big for the stack.
+
+        const this_type temp(*this); // Can't call eastl::swap because that would
+        *this = x;                   // itself call this member swap function.
+        x     = temp;
+    }
+
+
+    #if EASTL_RESET_ENABLED
+        // This function name is deprecated; use reset_lose_memory instead.
+        template <typename Value, size_t nodeCount, size_t bucketCount, bool bEnableOverflow, typename Hash, typename Predicate, bool bCacheHashCode, typename OverflowAllocator>
+        void fixed_hash_set<Value, nodeCount, bucketCount, bEnableOverflow, Hash, Predicate, bCacheHashCode, OverflowAllocator>::
+        reset()
         {
-            if(this != &x)
-            {
-                base_type::clear();
-                base_type::insert(x.begin(), x.end());
-            }
-            return *this;
+            reset_lose_memory();
         }
+    #endif
+
+    template <typename Value, size_t nodeCount, size_t bucketCount, bool bEnableOverflow, typename Hash, typename Predicate, bool bCacheHashCode, typename OverflowAllocator>
+    void fixed_hash_set<Value, nodeCount, bucketCount, bEnableOverflow, Hash, Predicate, bCacheHashCode, OverflowAllocator>::
+    reset_lose_memory()
+    {
+        base_type::reset_lose_memory();
+        base_type::get_allocator().reset(mNodeBuffer);
+    }
 
 
-        void swap(this_type& x)
+    template <typename Value, size_t nodeCount, size_t bucketCount, bool bEnableOverflow, typename Hash, typename Predicate, bool bCacheHashCode, typename OverflowAllocator>
+    inline typename fixed_hash_set<Value, nodeCount, bucketCount, bEnableOverflow, Hash, Predicate, bCacheHashCode, OverflowAllocator>::size_type 
+    fixed_hash_set<Value, nodeCount, bucketCount, bEnableOverflow, Hash, Predicate, bCacheHashCode, OverflowAllocator>::max_size() const
+    {
+        return kMaxSize;
+    }
+
+
+    template <typename Value, size_t nodeCount, size_t bucketCount, bool bEnableOverflow, typename Hash, typename Predicate, bool bCacheHashCode, typename OverflowAllocator>
+    inline typename fixed_hash_set<Value, nodeCount, bucketCount, bEnableOverflow, Hash, Predicate, bCacheHashCode, OverflowAllocator>::overflow_allocator_type& 
+    fixed_hash_set<Value, nodeCount, bucketCount, bEnableOverflow, Hash, Predicate, bCacheHashCode, OverflowAllocator>::get_overflow_allocator()
+    {
+        return mAllocator.get_overflow_allocator();
+    }
+
+
+    template <typename Value, size_t nodeCount, size_t bucketCount, bool bEnableOverflow, typename Hash, typename Predicate, bool bCacheHashCode, typename OverflowAllocator>
+    inline void fixed_hash_set<Value, nodeCount, bucketCount, bEnableOverflow, Hash, Predicate, bCacheHashCode, OverflowAllocator>::
+    set_overflow_allocator(const overflow_allocator_type& allocator)
+    {
+        mAllocator.set_overflow_allocator(allocator);
+    }
+
+    ///////////////////////////////////////////////////////////////////////
+    // global operators
+    ///////////////////////////////////////////////////////////////////////
+
+    template <typename Value, size_t nodeCount, size_t bucketCount, bool bEnableOverflow, typename Hash, typename Predicate, bool bCacheHashCode>
+    inline void swap(fixed_hash_set<Value, nodeCount, bucketCount, bEnableOverflow, Hash, Predicate, bCacheHashCode>& a, 
+                     fixed_hash_set<Value, nodeCount, bucketCount, bEnableOverflow, Hash, Predicate, bCacheHashCode>& b)
+    {
+        a.swap(b);
+    }
+
+
+
+
+    ///////////////////////////////////////////////////////////////////////
+    // fixed_hash_multiset
+    ///////////////////////////////////////////////////////////////////////
+
+    template <typename Value, size_t nodeCount, size_t bucketCount, bool bEnableOverflow, typename Hash, typename Predicate, bool bCacheHashCode, typename OverflowAllocator>
+    inline fixed_hash_multiset<Value, nodeCount, bucketCount, bEnableOverflow, Hash, Predicate, bCacheHashCode, OverflowAllocator>::
+    fixed_hash_multiset(const overflow_allocator_type& overflowAllocator)
+        : base_type(prime_rehash_policy::GetPrevBucketCountOnly(bucketCount), Hash(), 
+                    Predicate(), fixed_allocator_type(NULL, mBucketBuffer, overflowAllocator))
+    {
+        EASTL_CT_ASSERT((nodeCount >= 1) && (bucketCount >= 2));
+        base_type::set_max_load_factor(10000.f); // Set it so that we will never resize.
+
+        #if EASTL_NAME_ENABLED
+            mAllocator.set_name(EASTL_FIXED_HASH_MULTISET_DEFAULT_NAME);
+        #endif
+
+        mAllocator.reset(mNodeBuffer);
+    }
+
+
+    template <typename Value, size_t nodeCount, size_t bucketCount, bool bEnableOverflow, typename Hash, typename Predicate, bool bCacheHashCode, typename OverflowAllocator>
+    inline fixed_hash_multiset<Value, nodeCount, bucketCount, bEnableOverflow, Hash, Predicate, bCacheHashCode, OverflowAllocator>::
+    fixed_hash_multiset(const Hash& hashFunction, 
+                        const Predicate& predicate)
+        : base_type(prime_rehash_policy::GetPrevBucketCountOnly(bucketCount), hashFunction, 
+                    predicate, fixed_allocator_type(NULL, mBucketBuffer))
+    {
+        EASTL_CT_ASSERT((nodeCount >= 1) && (bucketCount >= 2));
+        base_type::set_max_load_factor(10000.f); // Set it so that we will never resize.
+
+        #if EASTL_NAME_ENABLED
+            mAllocator.set_name(EASTL_FIXED_HASH_MULTISET_DEFAULT_NAME);
+        #endif
+
+        mAllocator.reset(mNodeBuffer);
+    }
+
+
+    template <typename Value, size_t nodeCount, size_t bucketCount, bool bEnableOverflow, typename Hash, typename Predicate, bool bCacheHashCode, typename OverflowAllocator>
+    inline fixed_hash_multiset<Value, nodeCount, bucketCount, bEnableOverflow, Hash, Predicate, bCacheHashCode, OverflowAllocator>::
+    fixed_hash_multiset(const Hash& hashFunction, 
+                        const Predicate& predicate,
+                        const overflow_allocator_type& overflowAllocator)
+        : base_type(prime_rehash_policy::GetPrevBucketCountOnly(bucketCount), hashFunction, 
+                    predicate, fixed_allocator_type(NULL, mBucketBuffer, overflowAllocator))
+    {
+        EASTL_CT_ASSERT((nodeCount >= 1) && (bucketCount >= 2));
+        base_type::set_max_load_factor(10000.f); // Set it so that we will never resize.
+
+        #if EASTL_NAME_ENABLED
+            mAllocator.set_name(EASTL_FIXED_HASH_MULTISET_DEFAULT_NAME);
+        #endif
+
+        mAllocator.reset(mNodeBuffer);
+    }
+
+
+    template <typename Value, size_t nodeCount, size_t bucketCount, bool bEnableOverflow, typename Hash, typename Predicate, bool bCacheHashCode, typename OverflowAllocator>
+    template <typename InputIterator>
+    inline fixed_hash_multiset<Value, nodeCount, bucketCount, bEnableOverflow, Hash, Predicate, bCacheHashCode, OverflowAllocator>::
+    fixed_hash_multiset(InputIterator first, InputIterator last, 
+                        const Hash& hashFunction, 
+                        const Predicate& predicate)
+        : base_type(prime_rehash_policy::GetPrevBucketCountOnly(bucketCount), hashFunction, 
+                    predicate, fixed_allocator_type(NULL, mBucketBuffer))
+    {
+        EASTL_CT_ASSERT((nodeCount >= 1) && (bucketCount >= 2));
+        base_type::set_max_load_factor(10000.f); // Set it so that we will never resize.
+
+        #if EASTL_NAME_ENABLED
+            mAllocator.set_name(EASTL_FIXED_HASH_MULTISET_DEFAULT_NAME);
+        #endif
+
+        mAllocator.reset(mNodeBuffer);
+        base_type::insert(first, last);
+    }
+
+
+    template <typename Value, size_t nodeCount, size_t bucketCount, bool bEnableOverflow, typename Hash, typename Predicate, bool bCacheHashCode, typename OverflowAllocator>
+    inline fixed_hash_multiset<Value, nodeCount, bucketCount, bEnableOverflow, Hash, Predicate, bCacheHashCode, OverflowAllocator>::
+    fixed_hash_multiset(const this_type& x)
+        : base_type(prime_rehash_policy::GetPrevBucketCountOnly(bucketCount), x.hash_function(), 
+                    x.equal_function(), fixed_allocator_type(NULL, mBucketBuffer))
+    {
+        mAllocator.copy_overflow_allocator(x.mAllocator);
+
+        #if EASTL_NAME_ENABLED
+            mAllocator.set_name(x.mAllocator.get_name());
+        #endif
+
+        EASTL_CT_ASSERT((nodeCount >= 1) && (bucketCount >= 2));
+        base_type::set_max_load_factor(10000.f); // Set it so that we will never resize.
+
+        mAllocator.reset(mNodeBuffer);
+        base_type::insert(x.begin(), x.end());
+    }
+
+
+    template <typename Value, size_t nodeCount, size_t bucketCount, bool bEnableOverflow, typename Hash, typename Predicate, bool bCacheHashCode, typename OverflowAllocator>
+    inline typename fixed_hash_multiset<Value, nodeCount, bucketCount, bEnableOverflow, Hash, Predicate, bCacheHashCode, OverflowAllocator>::this_type& 
+    fixed_hash_multiset<Value, nodeCount, bucketCount, bEnableOverflow, Hash, Predicate, bCacheHashCode, OverflowAllocator>::operator=(const this_type& x)
+    {
+        if(this != &x)
         {
-            // Fixed containers use a special swap that can deal with excessively large buffers.
-            eastl::fixed_swap(*this, x);
+            base_type::clear();
+
+            #if EASTL_ALLOCATOR_COPY_ENABLED
+                mAllocator = x.mAllocator;
+            #endif
+
+            base_type::insert(x.begin(), x.end());
         }
+        return *this;
+    }
 
 
-        void reset()
+    template <typename Value, size_t nodeCount, size_t bucketCount, bool bEnableOverflow, typename Hash, typename Predicate, bool bCacheHashCode, typename OverflowAllocator>
+    inline void fixed_hash_multiset<Value, nodeCount, bucketCount, bEnableOverflow, Hash, Predicate, bCacheHashCode, OverflowAllocator>::
+    swap(this_type& x)
+    {
+        // Fixed containers use a special swap that can deal with excessively large buffers.
+        eastl::fixed_swap(*this, x);
+    }
+
+
+    #if EASTL_RESET_ENABLED
+        // This function name is deprecated; use reset_lose_memory instead.
+        template <typename Value, size_t nodeCount, size_t bucketCount, bool bEnableOverflow, typename Hash, typename Predicate, bool bCacheHashCode, typename OverflowAllocator>
+        inline void fixed_hash_multiset<Value, nodeCount, bucketCount, bEnableOverflow, Hash, Predicate, bCacheHashCode, OverflowAllocator>::
+        reset()
         {
-            base_type::reset();
-            base_type::get_allocator().reset(mNodeBuffer);
+            reset_lose_memory();
         }
+    #endif
+
+    template <typename Value, size_t nodeCount, size_t bucketCount, bool bEnableOverflow, typename Hash, typename Predicate, bool bCacheHashCode, typename OverflowAllocator>
+    inline void fixed_hash_multiset<Value, nodeCount, bucketCount, bEnableOverflow, Hash, Predicate, bCacheHashCode, OverflowAllocator>::
+    reset_lose_memory()
+    {
+        base_type::reset_lose_memory();
+        base_type::get_allocator().reset(mNodeBuffer);
+    }
 
 
-        size_type max_size() const
-        {
-            return kMaxSize;
-        }
+    template <typename Value, size_t nodeCount, size_t bucketCount, bool bEnableOverflow, typename Hash, typename Predicate, bool bCacheHashCode, typename OverflowAllocator>
+    inline typename fixed_hash_multiset<Value, nodeCount, bucketCount, bEnableOverflow, Hash, Predicate, bCacheHashCode, OverflowAllocator>::size_type 
+    fixed_hash_multiset<Value, nodeCount, bucketCount, bEnableOverflow, Hash, Predicate, bCacheHashCode, OverflowAllocator>::max_size() const
+    {
+        return kMaxSize;
+    }
 
-    }; // fixed_hash_multiset
+
+    template <typename Value, size_t nodeCount, size_t bucketCount, bool bEnableOverflow, typename Hash, typename Predicate, bool bCacheHashCode, typename OverflowAllocator>
+    inline typename fixed_hash_multiset<Value, nodeCount, bucketCount, bEnableOverflow, Hash, Predicate, bCacheHashCode, OverflowAllocator>::overflow_allocator_type& 
+    fixed_hash_multiset<Value, nodeCount, bucketCount, bEnableOverflow, Hash, Predicate, bCacheHashCode, OverflowAllocator>::get_overflow_allocator()
+    {
+        return mAllocator.get_overflow_allocator();
+    }
+
+
+    template <typename Value, size_t nodeCount, size_t bucketCount, bool bEnableOverflow, typename Hash, typename Predicate, bool bCacheHashCode, typename OverflowAllocator>
+    inline void fixed_hash_multiset<Value, nodeCount, bucketCount, bEnableOverflow, Hash, Predicate, bCacheHashCode, OverflowAllocator>::
+    set_overflow_allocator(const overflow_allocator_type& allocator)
+    {
+        mAllocator.set_overflow_allocator(allocator);
+    }
 
 
     ///////////////////////////////////////////////////////////////////////

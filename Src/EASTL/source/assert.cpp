@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2009-2010 Electronic Arts, Inc.  All rights reserved.
+Copyright (C) 2009,2010,2012 Electronic Arts, Inc.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -26,12 +26,6 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-///////////////////////////////////////////////////////////////////////////////
-// EASTL/assert.cpp
-//
-// Copyright (c) 2005, Electronic Arts. All rights reserved.
-// Written and maintained by Paul Pedriana.
-///////////////////////////////////////////////////////////////////////////////
 
 
 
@@ -44,14 +38,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     #if defined _MSC_VER
         #include <crtdbg.h>
     #endif
-    #if defined(EA_PLATFORM_WINDOWS)
         #ifndef WIN32_LEAN_AND_MEAN
             #define WIN32_LEAN_AND_MEAN
         #endif
-        #include <windows.h>
-    #elif defined(EA_PLATFORM_XENON)
-        #include <comdecl.h>
-    #endif
+        #include <Windows.h>
     #pragma warning(pop)
 #else
     #include <stdio.h>
@@ -95,16 +85,13 @@ namespace eastl
     ///
     EASTL_API void AssertionFailureFunctionDefault(const char* pExpression, void* /*pContext*/)
     {
-#if defined(EA_DEBUG) || defined(_DEBUG)       
-        // We cannot use puts() because it appends a newline.
-        // We cannot use printf(pExpression) because pExpression might have formatting statements.
         #if defined(EA_PLATFORM_MICROSOFT)
             OutputDebugStringA(pExpression);
             (void)pExpression;
         #else
             printf("%s", pExpression); // Write the message to stdout, which happens to be the trace view for many console debug machines.
         #endif
-#endif
+
         EASTL_DEBUG_BREAK();
     }
 

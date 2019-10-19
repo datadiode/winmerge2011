@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005,2009-2010 Electronic Arts, Inc.  All rights reserved.
+Copyright (C) 2005,2009,2010,2012 Electronic Arts, Inc.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -62,6 +62,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     #include <new>
 #endif
 
+#if defined(_MSC_VER)
+    #pragma warning(push)
+    #pragma warning(disable: 4275) // non dll-interface class used as base for DLL-interface classkey 'identifier'
+#endif
 
 
 namespace eastl
@@ -127,7 +131,6 @@ namespace eastl
     template<size_t size>
     struct aligned_buffer<size, 128>  { EA_PREFIX_ALIGN(128) aligned_buffer_char buffer[size] EA_POSTFIX_ALIGN(128); };
 
-    #if !defined(EA_PLATFORM_PSP) // This compiler fails to compile alignment >= 256 and gives an error.
 
     template<size_t size>
     struct aligned_buffer<size, 256>  { EA_PREFIX_ALIGN(256) aligned_buffer_char buffer[size] EA_POSTFIX_ALIGN(256); };
@@ -144,7 +147,6 @@ namespace eastl
     template<size_t size>
     struct aligned_buffer<size, 4096> { EA_PREFIX_ALIGN(4096) aligned_buffer_char buffer[size] EA_POSTFIX_ALIGN(4096); };
 
-    #endif // EA_PLATFORM_PSP
 
 
 
@@ -158,7 +160,7 @@ namespace eastl
     /// In particular, the fixed_pool and fixed_pool_with_overflow classes
     /// are based on fixed_pool_base.
     ///
-    struct EASTL_API fixed_pool_base
+    struct fixed_pool_base
     {
     public:
         /// fixed_pool_base
@@ -167,15 +169,23 @@ namespace eastl
             : mpHead((Link*)pMemory)
             , mpNext((Link*)pMemory)
             , mpCapacity((Link*)pMemory)
-            #if EASTL_DEBUG
             , mnNodeSize(0) // This is normally set in the init function.
-            #endif
         {
             #if EASTL_FIXED_SIZE_TRACKING_ENABLED
                 mnCurrentSize = 0;
                 mnPeakSize    = 0;
             #endif
         }
+
+
+        /// fixed_pool_base
+        ///
+        // Disabled because the default is sufficient. While it normally makes no sense to deep copy
+        // this data, our usage of this class is such that this is OK and wanted.
+        //
+        // fixed_pool_base(const fixed_pool_base& x)
+        // {
+        // }
 
 
         /// operator=
@@ -194,8 +204,8 @@ namespace eastl
         /// behaviour will be undefined. You can only call this function
         /// after constructing the fixed_pool with the default constructor.
         ///
-        void init(void* pMemory, size_t memorySize, size_t nodeSize,
-                  size_t alignment, size_t alignmentOffset = 0);
+        EASTL_API void init(void* pMemory, size_t memorySize, size_t nodeSize,
+                            size_t alignment, size_t alignmentOffset = 0);
 
 
         /// peak_size
@@ -283,6 +293,16 @@ namespace eastl
         {
             init(pMemory, memorySize, nodeSize, alignment, alignmentOffset);
         }
+
+
+        /// fixed_pool
+        ///
+        // Disabled because the default is sufficient. While it normally makes no sense to deep copy
+        // this data, our usage of this class is such that this is OK and wanted.
+        //
+        // fixed_pool(const fixed_pool& x)
+        // {
+        // }
 
 
         /// operator=
@@ -381,13 +401,24 @@ namespace eastl
 
     /// fixed_pool_with_overflow
     ///
-    template <typename Allocator = EASTLAllocatorType>
+    template <typename OverflowAllocator = EASTLAllocatorType>
     class fixed_pool_with_overflow : public fixed_pool_base
     {
     public:
+        typedef OverflowAllocator overflow_allocator_type;
+
+
         fixed_pool_with_overflow(void* pMemory = NULL)
             : fixed_pool_base(pMemory),
               mOverflowAllocator(EASTL_FIXED_POOL_DEFAULT_NAME)
+        {
+            // Leave mpPoolBegin, mpPoolEnd uninitialized.
+        }
+
+
+        fixed_pool_with_overflow(void* pMemory, const overflow_allocator_type& allocator)
+            : fixed_pool_base(pMemory),
+              mOverflowAllocator(allocator)
         {
             // Leave mpPoolBegin, mpPoolEnd uninitialized.
         }
@@ -403,8 +434,26 @@ namespace eastl
         }
 
 
-        /// operator=
-        ///
+        fixed_pool_with_overflow(void* pMemory, size_t memorySize, size_t nodeSize, 
+                                 size_t alignment, size_t alignmentOffset,
+                                 const overflow_allocator_type& allocator)
+            : mOverflowAllocator(allocator)
+        {
+            fixed_pool_base::init(pMemory, memorySize, nodeSize, alignment, alignmentOffset);
+
+            mpPoolBegin = pMemory;
+        }
+
+
+        // Disabled because the default is sufficient. While it normally makes no sense to deep copy
+        // this data, our usage of this class is such that this is OK and wanted.
+        //
+        //fixed_pool_with_overflow(const fixed_pool_with_overflow& x)
+        //{
+        //    ...
+        //}
+
+
         fixed_pool_with_overflow& operator=(const fixed_pool_with_overflow& x)
         {
             #if EASTL_ALLOCATOR_COPY_ENABLED
@@ -491,8 +540,8 @@ namespace eastl
         }
 
     public:
-        Allocator  mOverflowAllocator; 
-        void*      mpPoolBegin;         // Ideally we wouldn't need this member variable. he problem is that the information about the pool buffer and object size is stored in the owning container and we can't have access to it without increasing the amount of code we need and by templating more code. It may turn out that simply storing data here is smaller in the end.
+        OverflowAllocator mOverflowAllocator; 
+        void*             mpPoolBegin;         // Ideally we wouldn't need this member variable. he problem is that the information about the pool buffer and object size is stored in the owning container and we can't have access to it without increasing the amount of code we need and by templating more code. It may turn out that simply storing data here is smaller in the end.
 
     }; // fixed_pool_with_overflow              
 
@@ -524,15 +573,15 @@ namespace eastl
     ///     nodeAlignment          The alignment of the objects to allocate.
     ///     nodeAlignmentOffset    The alignment offset of the objects to allocate.
     ///     bEnableOverflow        Whether or not we should use the overflow heap if our object pool is exhausted.
-    ///     Allocator              Overflow allocator, which is only used if bEnableOverflow == true. Defaults to the global heap.
+    ///     OverflowAllocator      Overflow allocator, which is only used if bEnableOverflow == true. Defaults to the global heap.
     ///
-    template <size_t nodeSize, size_t nodeCount, size_t nodeAlignment, size_t nodeAlignmentOffset, bool bEnableOverflow, typename Allocator = EASTLAllocatorType>
+    template <size_t nodeSize, size_t nodeCount, size_t nodeAlignment, size_t nodeAlignmentOffset, bool bEnableOverflow, typename OverflowAllocator = EASTLAllocatorType>
     class fixed_node_allocator
     {
     public:
-        typedef typename type_select<bEnableOverflow, fixed_pool_with_overflow<Allocator>, fixed_pool>::type  pool_type;
-        typedef fixed_node_allocator<nodeSize, nodeCount, nodeAlignment, nodeAlignmentOffset, bEnableOverflow, Allocator>   this_type;
-        typedef Allocator overflow_allocator_type;
+        typedef typename type_select<bEnableOverflow, fixed_pool_with_overflow<OverflowAllocator>, fixed_pool>::type  pool_type;
+        typedef fixed_node_allocator<nodeSize, nodeCount, nodeAlignment, nodeAlignmentOffset, bEnableOverflow, OverflowAllocator>   this_type;
+        typedef OverflowAllocator overflow_allocator_type;
 
         enum
         {
@@ -560,6 +609,12 @@ namespace eastl
         }
 
 
+        fixed_node_allocator(void* pNodeBuffer, const overflow_allocator_type& allocator)
+            : mPool(pNodeBuffer, kNodesSize, kNodeSize, kNodeAlignment, kNodeAlignmentOffset, allocator)
+        {
+        }
+
+
         /// fixed_node_allocator
         ///
         /// Note that we are copying x.mpHead to our own fixed_pool. This at first may seem 
@@ -575,12 +630,8 @@ namespace eastl
         /// Perhaps some day we'll find a more elegant yet costless way around this. 
         ///
         fixed_node_allocator(const this_type& x)
-            : mPool(x.mPool.mpNext, kNodesSize, kNodeSize, kNodeAlignment, kNodeAlignmentOffset)
+            : mPool(x.mPool.mpNext, kNodesSize, kNodeSize, kNodeAlignment, kNodeAlignmentOffset, x.mPool.mOverflowAllocator)
         {
-            // Problem: how do we copy mPool.mOverflowAllocator if mPool is fixed_pool_with_overflow?
-            // Probably we should use mPool = x.mPool, though it seems a little odd to do so after
-            // doing the copying above.
-            mPool = x.mPool;
         }
 
 
@@ -657,19 +708,25 @@ namespace eastl
             mPool.mOverflowAllocator = allocator;
         }
 
+
+        void copy_overflow_allocator(const this_type& x)  // This function exists so we can write generic code that works for allocators that do and don't have overflow allocators.
+        {
+            mPool.mOverflowAllocator = x.mPool.mOverflowAllocator;
+        }
+
     }; // fixed_node_allocator
 
 
     // This is a near copy of the code above, with the only difference being 
     // the 'false' bEnableOverflow template parameter, the pool_type and this_type typedefs, 
     // and the get_overflow_allocator / set_overflow_allocator functions.
-    template <size_t nodeSize, size_t nodeCount, size_t nodeAlignment, size_t nodeAlignmentOffset, typename Allocator>
-    class fixed_node_allocator<nodeSize, nodeCount, nodeAlignment, nodeAlignmentOffset, false, Allocator>
+    template <size_t nodeSize, size_t nodeCount, size_t nodeAlignment, size_t nodeAlignmentOffset, typename OverflowAllocator>
+    class fixed_node_allocator<nodeSize, nodeCount, nodeAlignment, nodeAlignmentOffset, false, OverflowAllocator>
     {
     public:
         typedef fixed_pool pool_type;
-        typedef fixed_node_allocator<nodeSize, nodeCount, nodeAlignment, nodeAlignmentOffset, false, Allocator>   this_type;
-        typedef Allocator overflow_allocator_type;
+        typedef fixed_node_allocator<nodeSize, nodeCount, nodeAlignment, nodeAlignmentOffset, false, OverflowAllocator>   this_type;
+        typedef OverflowAllocator overflow_allocator_type;
 
         enum
         {
@@ -691,7 +748,27 @@ namespace eastl
         }
 
 
-        fixed_node_allocator(const this_type& x)
+        fixed_node_allocator(void* pNodeBuffer, const overflow_allocator_type& /*allocator*/) // allocator is unused because bEnableOverflow is false in this specialization.
+            : mPool(pNodeBuffer, kNodesSize, kNodeSize, kNodeAlignment, kNodeAlignmentOffset)
+        {
+        }
+
+
+        /// fixed_node_allocator
+        ///
+        /// Note that we are copying x.mpHead to our own fixed_pool. This at first may seem 
+        /// broken, as fixed pools cannot take over ownership of other fixed pools' memory.
+        /// However, we declare that this copy ctor can only ever be safely called when 
+        /// the user has intentionally pre-seeded the source with the destination pointer.
+        /// This is somewhat playing with fire, but it allows us to get around chicken-and-egg
+        /// problems with containers being their own allocators, without incurring any memory
+        /// costs or extra code costs. There's another reason for this: we very strongly want
+        /// to avoid full copying of instances of fixed_pool around, especially via the stack.
+        /// Larger pools won't even be able to fit on many machine's stacks. So this solution
+        /// is also a mechanism to prevent that situation from existing and being used. 
+        /// Perhaps some day we'll find a more elegant yet costless way around this. 
+        ///
+        fixed_node_allocator(const this_type& x)            // No need to copy the overflow allocator, because bEnableOverflow is false in this specialization.
             : mPool(x.mPool.mpNext, kNodesSize, kNodeSize, kNodeAlignment, kNodeAlignmentOffset)
         {
         }
@@ -753,7 +830,8 @@ namespace eastl
         overflow_allocator_type& get_overflow_allocator()
         {
             EASTL_ASSERT(false);
-            return *(overflow_allocator_type*)NULL; // This is not pretty.
+            overflow_allocator_type* pNULL = NULL;
+            return *pNULL; // This is not pretty, but it should never execute. This is here only to allow this to compile.
         }
 
 
@@ -763,7 +841,14 @@ namespace eastl
             EASTL_ASSERT(false);
         }
 
+
+        void copy_overflow_allocator(const this_type&)  // This function exists so we can write generic code that works for allocators that do and don't have overflow allocators.
+        {
+            // We don't have an overflow allocator.
+        }
+
     }; // fixed_node_allocator
+
 
 
 
@@ -771,17 +856,17 @@ namespace eastl
     // global operators
     ///////////////////////////////////////////////////////////////////////
 
-    template <size_t nodeSize, size_t nodeCount, size_t nodeAlignment, size_t nodeAlignmentOffset, bool bEnableOverflow, typename Allocator>
-    inline bool operator==(const fixed_node_allocator<nodeSize, nodeCount, nodeAlignment, nodeAlignmentOffset, bEnableOverflow, Allocator>& a, 
-                           const fixed_node_allocator<nodeSize, nodeCount, nodeAlignment, nodeAlignmentOffset, bEnableOverflow, Allocator>& b)
+    template <size_t nodeSize, size_t nodeCount, size_t nodeAlignment, size_t nodeAlignmentOffset, bool bEnableOverflow, typename OverflowAllocator>
+    inline bool operator==(const fixed_node_allocator<nodeSize, nodeCount, nodeAlignment, nodeAlignmentOffset, bEnableOverflow, OverflowAllocator>& a, 
+                           const fixed_node_allocator<nodeSize, nodeCount, nodeAlignment, nodeAlignmentOffset, bEnableOverflow, OverflowAllocator>& b)
     {
         return (&a == &b); // They are only equal if they are the same object.
     }
 
 
-    template <size_t nodeSize, size_t nodeCount, size_t nodeAlignment, size_t nodeAlignmentOffset, bool bEnableOverflow, typename Allocator>
-    inline bool operator!=(const fixed_node_allocator<nodeSize, nodeCount, nodeAlignment, nodeAlignmentOffset, bEnableOverflow, Allocator>& a, 
-                           const fixed_node_allocator<nodeSize, nodeCount, nodeAlignment, nodeAlignmentOffset, bEnableOverflow, Allocator>& b)
+    template <size_t nodeSize, size_t nodeCount, size_t nodeAlignment, size_t nodeAlignmentOffset, bool bEnableOverflow, typename OverflowAllocator>
+    inline bool operator!=(const fixed_node_allocator<nodeSize, nodeCount, nodeAlignment, nodeAlignmentOffset, bEnableOverflow, OverflowAllocator>& a, 
+                           const fixed_node_allocator<nodeSize, nodeCount, nodeAlignment, nodeAlignmentOffset, bEnableOverflow, OverflowAllocator>& b)
     {
         return (&a != &b); // They are only equal if they are the same object.
     }
@@ -806,15 +891,15 @@ namespace eastl
     ///     nodeAlignment          The alignment of the objects to allocate.
     ///     nodeAlignmentOffset    The alignment offset of the objects to allocate.
     ///     bEnableOverflow        Whether or not we should use the overflow heap if our object pool is exhausted.
-    ///     Allocator              Overflow allocator, which is only used if bEnableOverflow == true. Defaults to the global heap.
+    ///     OverflowAllocator      Overflow allocator, which is only used if bEnableOverflow == true. Defaults to the global heap.
     ///
-    template <size_t bucketCount, size_t nodeSize, size_t nodeCount, size_t nodeAlignment, size_t nodeAlignmentOffset, bool bEnableOverflow, typename Allocator = EASTLAllocatorType>
+    template <size_t bucketCount, size_t nodeSize, size_t nodeCount, size_t nodeAlignment, size_t nodeAlignmentOffset, bool bEnableOverflow, typename OverflowAllocator = EASTLAllocatorType>
     class fixed_hashtable_allocator
     {
     public:
-        typedef typename type_select<bEnableOverflow, fixed_pool_with_overflow<Allocator>, fixed_pool>::type                                 pool_type;
-        typedef fixed_hashtable_allocator<bucketCount, nodeSize, nodeCount, nodeAlignment, nodeAlignmentOffset, bEnableOverflow, Allocator>  this_type;
-        typedef Allocator overflow_allocator_type;
+        typedef typename type_select<bEnableOverflow, fixed_pool_with_overflow<OverflowAllocator>, fixed_pool>::type                                 pool_type;
+        typedef fixed_hashtable_allocator<bucketCount, nodeSize, nodeCount, nodeAlignment, nodeAlignmentOffset, bEnableOverflow, OverflowAllocator>  this_type;
+        typedef OverflowAllocator overflow_allocator_type;
 
         enum
         {
@@ -834,6 +919,7 @@ namespace eastl
         void*     mpBucketBuffer;
 
     public:
+        // Disabled because it causes compile conflicts.
         //fixed_hashtable_allocator(const char* pName)
         //{
         //    mPool.set_name(pName);
@@ -847,8 +933,23 @@ namespace eastl
         }
 
 
+        fixed_hashtable_allocator(void* pNodeBuffer, const overflow_allocator_type& allocator)
+            : mPool(pNodeBuffer, kBufferSize, kNodeSize, kNodeAlignment, kNodeAlignmentOffset, allocator),
+              mpBucketBuffer(NULL)
+        {
+            // EASTL_ASSERT(false); // As it stands now, this is not supposed to be called.
+        }
+
+
         fixed_hashtable_allocator(void* pNodeBuffer, void* pBucketBuffer)
             : mPool(pNodeBuffer, kBufferSize, kNodeSize, kNodeAlignment, kNodeAlignmentOffset),
+              mpBucketBuffer(pBucketBuffer)
+        {
+        }
+
+
+        fixed_hashtable_allocator(void* pNodeBuffer, void* pBucketBuffer, const overflow_allocator_type& allocator)
+            : mPool(pNodeBuffer, kBufferSize, kNodeSize, kNodeAlignment, kNodeAlignmentOffset, allocator),
               mpBucketBuffer(pBucketBuffer)
         {
         }
@@ -860,20 +961,16 @@ namespace eastl
         /// See the discussion above in fixed_node_allocator for important information about this.
         ///
         fixed_hashtable_allocator(const this_type& x)
-            : mPool(x.mPool.mpHead, kBufferSize, kNodeSize, kNodeAlignment, kNodeAlignmentOffset),
+            : mPool(x.mPool.mpHead, kBufferSize, kNodeSize, kNodeAlignment, kNodeAlignmentOffset, x.mPool.mOverflowAllocator),
               mpBucketBuffer(x.mpBucketBuffer)
         {
-            // Problem: how do we copy mPool.mOverflowAllocator if mPool is fixed_pool_with_overflow?
-            // Probably we should use mPool = x.mPool, though it seems a little odd to do so after
-            // doing the copying above.
-            mPool = x.mPool;
         }
 
 
         fixed_hashtable_allocator& operator=(const fixed_hashtable_allocator& x)
         {
             mPool = x.mPool;
-            return *this; // Do nothing. Ignore the source type.
+            return *this;
         }
 
 
@@ -950,19 +1047,24 @@ namespace eastl
             mPool.mOverflowAllocator = allocator;
         }
 
+        void copy_overflow_allocator(const this_type& x)  // This function exists so we can write generic code that works for allocators that do and don't have overflow allocators.
+        {
+            mPool.mOverflowAllocator = x.mPool.mOverflowAllocator;
+        }
+
     }; // fixed_hashtable_allocator
 
 
     // This is a near copy of the code above, with the only difference being 
     // the 'false' bEnableOverflow template parameter, the pool_type and this_type typedefs, 
     // and the get_overflow_allocator / set_overflow_allocator functions.
-    template <size_t bucketCount, size_t nodeSize, size_t nodeCount, size_t nodeAlignment, size_t nodeAlignmentOffset, typename Allocator>
-    class fixed_hashtable_allocator<bucketCount, nodeSize, nodeCount, nodeAlignment, nodeAlignmentOffset, false, Allocator>
+    template <size_t bucketCount, size_t nodeSize, size_t nodeCount, size_t nodeAlignment, size_t nodeAlignmentOffset, typename OverflowAllocator>
+    class fixed_hashtable_allocator<bucketCount, nodeSize, nodeCount, nodeAlignment, nodeAlignmentOffset, false, OverflowAllocator>
     {
     public:
         typedef fixed_pool pool_type;
-        typedef fixed_hashtable_allocator<bucketCount, nodeSize, nodeCount, nodeAlignment, nodeAlignmentOffset, false, Allocator>  this_type;
-        typedef Allocator overflow_allocator_type;
+        typedef fixed_hashtable_allocator<bucketCount, nodeSize, nodeCount, nodeAlignment, nodeAlignmentOffset, false, OverflowAllocator>  this_type;
+        typedef OverflowAllocator overflow_allocator_type;
 
         enum
         {
@@ -982,12 +1084,20 @@ namespace eastl
         void*     mpBucketBuffer;
 
     public:
+        // Disabled because it causes compile conflicts.
         //fixed_hashtable_allocator(const char* pName)
         //{
         //    mPool.set_name(pName);
         //}
 
         fixed_hashtable_allocator(void* pNodeBuffer)
+            : mPool(pNodeBuffer, kBufferSize, kNodeSize, kNodeAlignment, kNodeAlignmentOffset),
+              mpBucketBuffer(NULL)
+        {
+            // EASTL_ASSERT(false); // As it stands now, this is not supposed to be called.
+        }
+
+        fixed_hashtable_allocator(void* pNodeBuffer, const overflow_allocator_type& /*allocator*/) // allocator is unused because bEnableOverflow is false in this specialization.
             : mPool(pNodeBuffer, kBufferSize, kNodeSize, kNodeAlignment, kNodeAlignmentOffset),
               mpBucketBuffer(NULL)
         {
@@ -1002,12 +1112,19 @@ namespace eastl
         }
 
 
+        fixed_hashtable_allocator(void* pNodeBuffer, void* pBucketBuffer, const overflow_allocator_type& /*allocator*/) // allocator is unused because bEnableOverflow is false in this specialization.
+            : mPool(pNodeBuffer, kBufferSize, kNodeSize, kNodeAlignment, kNodeAlignmentOffset),
+              mpBucketBuffer(pBucketBuffer)
+        {
+        }
+
+
         /// fixed_hashtable_allocator
         ///
         /// Note that we are copying x.mpHead and mpBucketBuffer to our own fixed_pool. 
         /// See the discussion above in fixed_node_allocator for important information about this.
         ///
-        fixed_hashtable_allocator(const this_type& x)
+        fixed_hashtable_allocator(const this_type& x)   // No need to copy the overflow allocator, because bEnableOverflow is false in this specialization.
             : mPool(x.mPool.mpHead, kBufferSize, kNodeSize, kNodeAlignment, kNodeAlignmentOffset),
               mpBucketBuffer(x.mpBucketBuffer)
         {
@@ -1017,7 +1134,7 @@ namespace eastl
         fixed_hashtable_allocator& operator=(const fixed_hashtable_allocator& x)
         {
             mPool = x.mPool;
-            return *this; // Do nothing. Ignore the source type.
+            return *this;
         }
 
 
@@ -1086,13 +1203,19 @@ namespace eastl
         overflow_allocator_type& get_overflow_allocator()
         {
             EASTL_ASSERT(false);
-            return *(overflow_allocator_type*)NULL; // This is not pretty.
+            overflow_allocator_type* pNULL = NULL;
+            return *pNULL; // This is not pretty, but it should never execute. This is here only to allow this to compile.
         }
 
         void set_overflow_allocator(const overflow_allocator_type& /*allocator*/)
         {
             // We don't have an overflow allocator.
             EASTL_ASSERT(false);
+        }
+
+        void copy_overflow_allocator(const this_type&)  // This function exists so we can write generic code that works for allocators that do and don't have overflow allocators.
+        {
+            // We don't have an overflow allocator.
         }
 
     }; // fixed_hashtable_allocator
@@ -1102,17 +1225,17 @@ namespace eastl
     // global operators
     ///////////////////////////////////////////////////////////////////////
 
-    template <size_t bucketCount, size_t nodeSize, size_t nodeCount, size_t nodeAlignment, size_t nodeAlignmentOffset, bool bEnableOverflow, typename Allocator>
-    inline bool operator==(const fixed_hashtable_allocator<bucketCount, nodeSize, nodeCount, nodeAlignment, nodeAlignmentOffset, bEnableOverflow, Allocator>& a, 
-                           const fixed_hashtable_allocator<bucketCount, nodeSize, nodeCount, nodeAlignment, nodeAlignmentOffset, bEnableOverflow, Allocator>& b)
+    template <size_t bucketCount, size_t nodeSize, size_t nodeCount, size_t nodeAlignment, size_t nodeAlignmentOffset, bool bEnableOverflow, typename OverflowAllocator>
+    inline bool operator==(const fixed_hashtable_allocator<bucketCount, nodeSize, nodeCount, nodeAlignment, nodeAlignmentOffset, bEnableOverflow, OverflowAllocator>& a, 
+                           const fixed_hashtable_allocator<bucketCount, nodeSize, nodeCount, nodeAlignment, nodeAlignmentOffset, bEnableOverflow, OverflowAllocator>& b)
     {
         return (&a == &b); // They are only equal if they are the same object.
     }
 
 
-    template <size_t bucketCount, size_t nodeSize, size_t nodeCount, size_t nodeAlignment, size_t nodeAlignmentOffset, bool bEnableOverflow, typename Allocator>
-    inline bool operator!=(const fixed_hashtable_allocator<bucketCount, nodeSize, nodeCount, nodeAlignment, nodeAlignmentOffset, bEnableOverflow, Allocator>& a, 
-                           const fixed_hashtable_allocator<bucketCount, nodeSize, nodeCount, nodeAlignment, nodeAlignmentOffset, bEnableOverflow, Allocator>& b)
+    template <size_t bucketCount, size_t nodeSize, size_t nodeCount, size_t nodeAlignment, size_t nodeAlignmentOffset, bool bEnableOverflow, typename OverflowAllocator>
+    inline bool operator!=(const fixed_hashtable_allocator<bucketCount, nodeSize, nodeCount, nodeAlignment, nodeAlignmentOffset, bEnableOverflow, OverflowAllocator>& a, 
+                           const fixed_hashtable_allocator<bucketCount, nodeSize, nodeCount, nodeAlignment, nodeAlignmentOffset, bEnableOverflow, OverflowAllocator>& b)
     {
         return (&a != &b); // They are only equal if they are the same object.
     }
@@ -1134,14 +1257,14 @@ namespace eastl
     ///     nodeAlignment          The alignment of the objects to allocate.
     ///     nodeAlignmentOffset    The alignment offset of the objects to allocate.
     ///     bEnableOverflow        Whether or not we should use the overflow heap if our object pool is exhausted.
-    ///     Allocator              Overflow allocator, which is only used if bEnableOverflow == true. Defaults to the global heap.
+    ///     OverflowAllocator      Overflow allocator, which is only used if bEnableOverflow == true. Defaults to the global heap.
     ///
-    template <size_t nodeSize, size_t nodeCount, size_t nodeAlignment, size_t nodeAlignmentOffset, bool bEnableOverflow, typename Allocator = EASTLAllocatorType>
+    template <size_t nodeSize, size_t nodeCount, size_t nodeAlignment, size_t nodeAlignmentOffset, bool bEnableOverflow, typename OverflowAllocator = EASTLAllocatorType>
     class fixed_vector_allocator
     {
     public:
-        typedef fixed_vector_allocator<nodeSize, nodeCount, nodeAlignment, nodeAlignmentOffset, bEnableOverflow, Allocator>  this_type;
-        typedef Allocator overflow_allocator_type;
+        typedef fixed_vector_allocator<nodeSize, nodeCount, nodeAlignment, nodeAlignmentOffset, bEnableOverflow, OverflowAllocator>  this_type;
+        typedef OverflowAllocator overflow_allocator_type;
 
         enum
         {
@@ -1158,6 +1281,7 @@ namespace eastl
         void*                   mpPoolBegin;         // To consider: Find some way to make this data unnecessary, without increasing template proliferation.
 
     public:
+        // Disabled because it causes compile conflicts.
         //fixed_vector_allocator(const char* pName = NULL)
         //{
         //    mOverflowAllocator.set_name(pName);
@@ -1168,15 +1292,29 @@ namespace eastl
         {
         }
 
+        fixed_vector_allocator(void* pNodeBuffer, const overflow_allocator_type& allocator)
+            : mOverflowAllocator(allocator), mpPoolBegin(pNodeBuffer)
+        {
+        }
+
+        // Disabled because the default is sufficient.
+        //fixed_vector_allocator(const fixed_vector_allocator& x)
+        //{
+        //    mpPoolBegin        = x.mpPoolBegin;
+        //    mOverflowAllocator = x.mOverflowAllocator;
+        //}
+
         fixed_vector_allocator& operator=(const fixed_vector_allocator& x)
         {
+            // We leave our mpPoolBegin variable alone.
+
             #if EASTL_ALLOCATOR_COPY_ENABLED
                 mOverflowAllocator = x.mOverflowAllocator;
             #else
                 (void)x;
             #endif
 
-            return *this; // Do nothing. Ignore the source type.
+            return *this;
         }
 
         void* allocate(size_t n, int flags = 0)
@@ -1215,15 +1353,20 @@ namespace eastl
             mOverflowAllocator = allocator;
         }
 
+        void copy_overflow_allocator(const this_type& x)  // This function exists so we can write generic code that works for allocators that do and don't have overflow allocators.
+        {
+            mOverflowAllocator = x.mOverflowAllocator;
+        }
+
     }; // fixed_vector_allocator
 
 
-    template <size_t nodeSize, size_t nodeCount, size_t nodeAlignment, size_t nodeAlignmentOffset, typename Allocator>
-    class fixed_vector_allocator<nodeSize, nodeCount, nodeAlignment, nodeAlignmentOffset, false, Allocator>
+    template <size_t nodeSize, size_t nodeCount, size_t nodeAlignment, size_t nodeAlignmentOffset, typename OverflowAllocator>
+    class fixed_vector_allocator<nodeSize, nodeCount, nodeAlignment, nodeAlignmentOffset, false, OverflowAllocator>
     {
     public:
-        typedef fixed_vector_allocator<nodeSize, nodeCount, nodeAlignment, nodeAlignmentOffset, false, Allocator>  this_type;
-        typedef Allocator overflow_allocator_type;
+        typedef fixed_vector_allocator<nodeSize, nodeCount, nodeAlignment, nodeAlignmentOffset, false, OverflowAllocator>  this_type;
+        typedef OverflowAllocator overflow_allocator_type;
 
         enum
         {
@@ -1235,6 +1378,7 @@ namespace eastl
             kNodeAlignmentOffset = nodeAlignmentOffset
         };
 
+        // Disabled because it causes compile conflicts.
         //fixed_vector_allocator(const char* = NULL) // This char* parameter is present so that this class can be like the other version.
         //{
         //}
@@ -1242,6 +1386,23 @@ namespace eastl
         fixed_vector_allocator(void* /*pNodeBuffer*/)
         {
         }
+
+        fixed_vector_allocator(void* /*pNodeBuffer*/, const overflow_allocator_type& /*allocator*/)  // allocator is unused because bEnableOverflow is false in this specialization.
+        {
+        }
+
+        /// fixed_vector_allocator
+        ///
+        // Disabled because there is nothing to do. No member data. And the default for this is sufficient.
+        // fixed_vector_allocator(const fixed_vector_allocator&)
+        // {
+        // }
+
+        // Disabled because there is nothing to do. No member data.
+        //fixed_vector_allocator& operator=(const fixed_vector_allocator& x)
+        //{
+        //    return *this;
+        //}
 
         void* allocate(size_t /*n*/, int /*flags*/ = 0)
         {
@@ -1272,13 +1433,18 @@ namespace eastl
         {
             EASTL_ASSERT(false);
             overflow_allocator_type* pNULL = NULL;
-            return *pNULL; // This is not pretty, but it should never execute.
+            return *pNULL; // This is not pretty, but it should never execute. This is here only to allow this to compile.
         }
 
         void set_overflow_allocator(const overflow_allocator_type& /*allocator*/)
         {
             // We don't have an overflow allocator.
             EASTL_ASSERT(false);
+        }
+
+        void copy_overflow_allocator(const this_type&)  // This function exists so we can write generic code that works for allocators that do and don't have overflow allocators.
+        {
+            // We don't have an overflow allocator.
         }
 
     }; // fixed_vector_allocator
@@ -1288,17 +1454,17 @@ namespace eastl
     // global operators
     ///////////////////////////////////////////////////////////////////////
 
-    template <size_t nodeSize, size_t nodeCount, size_t nodeAlignment, size_t nodeAlignmentOffset, bool bEnableOverflow, typename Allocator>
-    inline bool operator==(const fixed_vector_allocator<nodeSize, nodeCount, nodeAlignment, nodeAlignmentOffset, bEnableOverflow, Allocator>& a, 
-                           const fixed_vector_allocator<nodeSize, nodeCount, nodeAlignment, nodeAlignmentOffset, bEnableOverflow, Allocator>& b)
+    template <size_t nodeSize, size_t nodeCount, size_t nodeAlignment, size_t nodeAlignmentOffset, bool bEnableOverflow, typename OverflowAllocator>
+    inline bool operator==(const fixed_vector_allocator<nodeSize, nodeCount, nodeAlignment, nodeAlignmentOffset, bEnableOverflow, OverflowAllocator>& a, 
+                           const fixed_vector_allocator<nodeSize, nodeCount, nodeAlignment, nodeAlignmentOffset, bEnableOverflow, OverflowAllocator>& b)
     {
         return (&a == &b); // They are only equal if they are the same object.
     }
 
 
-    template <size_t nodeSize, size_t nodeCount, size_t nodeAlignment, size_t nodeAlignmentOffset, bool bEnableOverflow, typename Allocator>
-    inline bool operator!=(const fixed_vector_allocator<nodeSize, nodeCount, nodeAlignment, nodeAlignmentOffset, bEnableOverflow, Allocator>& a, 
-                           const fixed_vector_allocator<nodeSize, nodeCount, nodeAlignment, nodeAlignmentOffset, bEnableOverflow, Allocator>& b)
+    template <size_t nodeSize, size_t nodeCount, size_t nodeAlignment, size_t nodeAlignmentOffset, bool bEnableOverflow, typename OverflowAllocator>
+    inline bool operator!=(const fixed_vector_allocator<nodeSize, nodeCount, nodeAlignment, nodeAlignmentOffset, bEnableOverflow, OverflowAllocator>& a, 
+                           const fixed_vector_allocator<nodeSize, nodeCount, nodeAlignment, nodeAlignmentOffset, bEnableOverflow, OverflowAllocator>& b)
     {
         return (&a != &b); // They are only equal if they are the same object.
     }
@@ -1358,39 +1524,10 @@ namespace eastl
 } // namespace eastl
 
 
+#if defined(_MSC_VER)
+    #pragma warning(pop)
+#endif
+
+
 #endif // Header include guard
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

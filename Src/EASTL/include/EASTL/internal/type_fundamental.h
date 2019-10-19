@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005,2009-2010 Electronic Arts, Inc.  All rights reserved.
+Copyright (C) 2005,2009,2010,2012 Electronic Arts, Inc.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -42,6 +42,11 @@ namespace eastl
 
     // The following properties or relations are defined here. If the given 
     // item is missing then it simply hasn't been implemented, at least not yet.
+    //   is_void
+    //   is_integral
+    //   is_floating_point
+    //   is_arithmetic
+    //   is_fundamental
 
 
     ///////////////////////////////////////////////////////////////////////
@@ -51,12 +56,16 @@ namespace eastl
     //    [const][volatile] void
     //
     ///////////////////////////////////////////////////////////////////////
+
+    #define EASTL_TYPE_TRAIT_is_void_CONFORMANCE 1    // is_void is conforming.
+
     template <typename T> struct is_void : public false_type{};
 
     template <> struct is_void<void> : public true_type{};
     template <> struct is_void<void const> : public true_type{};
     template <> struct is_void<void volatile> : public true_type{};
     template <> struct is_void<void const volatile> : public true_type{};
+
 
 
     ///////////////////////////////////////////////////////////////////////
@@ -78,6 +87,9 @@ namespace eastl
     //    [const] [volatile] unsigned long long
     //
     ///////////////////////////////////////////////////////////////////////
+
+    #define EASTL_TYPE_TRAIT_is_integral_CONFORMANCE 1    // is_integral is conforming.
+
     template <typename T> struct is_integral : public false_type{};
 
     // To do: Need to define volatile and const volatile versions of these.
@@ -107,10 +119,12 @@ namespace eastl
     template <> struct is_integral<const bool>      : public true_type{};
     template <> struct is_integral<char>            : public true_type{};
     template <> struct is_integral<const char>      : public true_type{};
-    #ifndef EA_WCHAR_T_NON_NATIVE // If wchar_t is a native type instead of simply a define to an existing type...
+    #ifndef EA_WCHAR_T_NON_NATIVE // If wchar_t is a native type instead of simply a define to an existing type which is already handled above...
         template <> struct is_integral<wchar_t>         : public true_type{};
         template <> struct is_integral<const wchar_t>   : public true_type{};
     #endif
+
+
 
     ///////////////////////////////////////////////////////////////////////
     // is_floating_point
@@ -121,6 +135,9 @@ namespace eastl
     //    [const] [volatile] long double
     //
     ///////////////////////////////////////////////////////////////////////
+
+    #define EASTL_TYPE_TRAIT_is_floating_point_CONFORMANCE 1    // is_floating_point is conforming.
+
     template <typename T> struct is_floating_point : public false_type{};
 
     // To do: Need to define volatile and const volatile versions of these.
@@ -141,10 +158,14 @@ namespace eastl
     //    is_integral<T>::value == true
     //
     ///////////////////////////////////////////////////////////////////////
+
+    #define EASTL_TYPE_TRAIT_is_arithmetic_CONFORMANCE 1    // is_arithmetic is conforming.
+
     template <typename T> 
     struct is_arithmetic : public integral_constant<bool,
         is_integral<T>::value || is_floating_point<T>::value
     >{};
+
 
 
     ///////////////////////////////////////////////////////////////////////
@@ -155,10 +176,14 @@ namespace eastl
     //    is_integral<T>::value == true, or
     //    is_void<T>::value == true
     ///////////////////////////////////////////////////////////////////////
+
+    #define EASTL_TYPE_TRAIT_is_fundamental_CONFORMANCE 1    // is_fundamental is conforming.
+
     template <typename T> 
     struct is_fundamental : public integral_constant<bool,
         is_void<T>::value || is_integral<T>::value || is_floating_point<T>::value
     >{};
+
 
 } // namespace eastl
 

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005,2009-2010 Electronic Arts, Inc.  All rights reserved.
+Copyright (C) 2005,2009,2010,2012 Electronic Arts, Inc.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -26,11 +26,6 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-///////////////////////////////////////////////////////////////////////////////
-// EASTL/red_black_tree.cpp
-//
-// Written and maintained by Paul Pedriana - 2005.
-///////////////////////////////////////////////////////////////////////////////
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -361,8 +356,11 @@ namespace eastl
             {
                 // Because pNode is the tree begin(), pNode->mpNodeLeft must be NULL.
                 // Here we assign the new begin() (first node).
-                if(pNode->mpNodeRight)
+                if(pNode->mpNodeRight && pNodeChild)
+                {
+                    EASTL_ASSERT(pNodeChild != NULL); // Logically pNodeChild should always be valid.
                     pNodeLeftmostRef = RBTreeGetMinChild(pNodeChild); 
+                }
                 else
                     pNodeLeftmostRef = pNode->mpNodeParent; // This  makes (pNodeLeftmostRef == end()) if (pNode == root node)
             }
@@ -371,8 +369,11 @@ namespace eastl
             {
                 // Because pNode is the tree rbegin(), pNode->mpNodeRight must be NULL.
                 // Here we assign the new rbegin() (last node)
-                if(pNode->mpNodeLeft)
+                if(pNode->mpNodeLeft && pNodeChild)
+                {
+                    EASTL_ASSERT(pNodeChild != NULL); // Logically pNodeChild should always be valid.
                     pNodeRightmostRef = RBTreeGetMaxChild(pNodeChild);
+                }
                 else // pNodeChild == pNode->mpNodeLeft
                     pNodeRightmostRef = pNode->mpNodeParent; // makes pNodeRightmostRef == &mAnchor if pNode == pNodeRootRef
             }
