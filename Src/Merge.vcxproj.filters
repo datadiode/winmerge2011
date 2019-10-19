@@ -621,22 +621,22 @@
     <ClCompile Include="CompareEngines\TimeSizeCompare.cpp">
       <Filter>Compare Engines</Filter>
     </ClCompile>
-    <ClCompile Include="EASTL\src\allocator.cpp">
+    <ClCompile Include="EASTL\source\allocator.cpp">
       <Filter>EASTL</Filter>
     </ClCompile>
-    <ClCompile Include="EASTL\src\assert.cpp">
+    <ClCompile Include="EASTL\source\assert.cpp">
       <Filter>EASTL</Filter>
     </ClCompile>
-    <ClCompile Include="EASTL\src\fixed_pool.cpp">
+    <ClCompile Include="EASTL\source\fixed_pool.cpp">
       <Filter>EASTL</Filter>
     </ClCompile>
-    <ClCompile Include="EASTL\src\hashtable.cpp">
+    <ClCompile Include="EASTL\source\hashtable.cpp">
       <Filter>EASTL</Filter>
     </ClCompile>
-    <ClCompile Include="EASTL\src\red_black_tree.cpp">
+    <ClCompile Include="EASTL\source\red_black_tree.cpp">
       <Filter>EASTL</Filter>
     </ClCompile>
-    <ClCompile Include="EASTL\src\string.cpp">
+    <ClCompile Include="EASTL\source\string.cpp">
       <Filter>EASTL</Filter>
     </ClCompile>
     <ClCompile Include="system32\system32.cpp">
