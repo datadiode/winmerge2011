@@ -134,8 +134,8 @@ Value::CZString::~CZString() {
 }
 
 void Value::CZString::swap(CZString& other) {
-  std::swap(cstr_, other.cstr_);
-  std::swap(index_, other.index_);
+  eastl::swap(cstr_, other.cstr_);
+  eastl::swap(index_, other.index_);
 }
 
 Value::CZString& Value::CZString::operator=(CZString other) {

@@ -96,7 +96,7 @@ BOOL xiskeyword(LPCTSTR key, UINT len, LPCTSTR const *lower, LPCTSTR const *uppe
 template<int (*compare)(LPCTSTR, LPCTSTR, size_t), typename T, size_t N>
 BOOL xiskeyword(LPCTSTR key, UINT len, T (&r)[N])
 {
-	return xiskeyword<compare>(key, len, std::begin(r), std::end(r));
+	return xiskeyword<compare>(key, len, eastl::begin(r), eastl::end(r));
 }
 
 template<int (*compare)(LPCTSTR, LPCTSTR, size_t), size_t N>

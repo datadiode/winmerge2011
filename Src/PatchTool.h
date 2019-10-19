@@ -37,8 +37,8 @@ struct PATCHFILES
 	// Swap sides
 	void swap_sides()
 	{
-		std::swap(lfile, rfile);
-		std::swap(pathLeft, pathRight);
+		eastl::swap(lfile, rfile);
+		eastl::swap(pathLeft, pathRight);
 	}
 	PATCHFILES() { }
 	PATCHFILES(const PATCHFILES &);

@@ -972,7 +972,7 @@ bool CDirView::OpenTwoItems(const DIFFITEM *di1, const DIFFITEM *di2, String &pa
 	// Ensure that di1 is on left (swap if needed)
 	if (di1->isSideRightOnly() || (di1->isSideBoth() && di2->isSideLeftOnly()))
 	{
-		std::swap(di1, di2);
+		eastl::swap(di1, di2);
 	}
 	// Fill in pathLeft & pathRight
 	String temp;

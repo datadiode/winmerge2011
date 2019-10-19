@@ -35,8 +35,8 @@ public:
 		operator TextBlock *() { return m_pBuf; }
 		void swap(Array &other)
 		{
-			std::swap(m_pBuf, other.m_pBuf);
-			std::swap(m_nActualItems, other.m_nActualItems);
+			eastl::swap(m_pBuf, other.m_pBuf);
+			eastl::swap(m_nActualItems, other.m_nActualItems);
 		}
 		__forceinline void DefineBlock(int pos, int colorindex)
 		{

@@ -145,8 +145,8 @@ OP_TYPE FilterCommentsSet::PostFilter(int StartPos, int QtyLinesInBlock, const f
 	const char *upperOutsideInlineComment = linebuf[upperOutsideInlineCommentLine];
 	if (!InlineMarker.empty())
 	{
-		std::swap(lowerOutsideInlineComment, upperOutsideInlineComment);
-		std::swap(lowerOutsideInlineCommentLine, upperOutsideInlineCommentLine);
+		eastl::swap(lowerOutsideInlineComment, upperOutsideInlineComment);
+		eastl::swap(lowerOutsideInlineCommentLine, upperOutsideInlineCommentLine);
 		for (int i = StartPos ; i < EndPos ; ++i)
 		{
 			const char *lower = linebuf[i];

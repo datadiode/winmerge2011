@@ -2128,14 +2128,14 @@ void CChildFrame::SwapFiles()
 		m_pDetailView[0]->GetDlgCtrlID(), m_pDetailView[1]->GetDlgCtrlID());
 
 	// Swap buffers and so on
-	std::swap(m_ptBuf[0], m_ptBuf[1]);
-	std::swap(m_pView[0], m_pView[1]);
-	std::swap(m_pDetailView[0], m_pDetailView[1]);
-	std::swap(m_pSaveFileInfo[0], m_pSaveFileInfo[1]);
-	std::swap(m_pRescanFileInfo[0], m_pRescanFileInfo[1]);
-	std::swap(m_pFileTextStats[0], m_pFileTextStats[1]);
-	std::swap(m_nBufferType[0], m_nBufferType[1]);
-	std::swap(m_bEditAfterRescan[0], m_bEditAfterRescan[1]);
+	eastl::swap(m_ptBuf[0], m_ptBuf[1]);
+	eastl::swap(m_pView[0], m_pView[1]);
+	eastl::swap(m_pDetailView[0], m_pDetailView[1]);
+	eastl::swap(m_pSaveFileInfo[0], m_pSaveFileInfo[1]);
+	eastl::swap(m_pRescanFileInfo[0], m_pRescanFileInfo[1]);
+	eastl::swap(m_pFileTextStats[0], m_pFileTextStats[1]);
+	eastl::swap(m_nBufferType[0], m_nBufferType[1]);
+	eastl::swap(m_bEditAfterRescan[0], m_bEditAfterRescan[1]);
 	m_strDesc[0].swap(m_strDesc[1]);
 
 	m_strPath[0].swap(m_strPath[1]);

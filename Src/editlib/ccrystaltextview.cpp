@@ -900,7 +900,7 @@ void CCrystalTextView::InvalidateLineCache(int nLineIndex1, int nLineIndex2)
 	if (nLineIndex2 == -1)
 		nLineIndex2 = upperBound(m_panSubLines);
 	else if (nLineIndex1 > nLineIndex2)
-		std::swap(nLineIndex1, nLineIndex2);
+		eastl::swap(nLineIndex1, nLineIndex2);
 	if (nLineIndex2 > upperBound(m_panSubLines))
 		nLineIndex2 = upperBound(m_panSubLines);
 	for (int i = nLineIndex1; i <= nLineIndex2; i++)

@@ -46,7 +46,7 @@ struct pod {
                   size * sizeof(type) / sizeof(alignment) : -1 ];
   operator type* () { return reinterpret_cast<type*>(data); }
   static void swap(void* p, void* q) {
-    std::swap(*static_cast<pod*>(p), *static_cast<pod*>(q));
+    eastl::swap(*static_cast<pod*>(p), *static_cast<pod*>(q));
   }
 };
 

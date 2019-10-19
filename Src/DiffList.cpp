@@ -28,11 +28,11 @@
  */
 void DIFFRANGE::swap_sides()
 {
-	std::swap(begin0, begin1);
-	std::swap(end0, end1);
-	std::swap(dbegin0, dbegin1);
-	std::swap(dend0, dend1);
-	std::swap(blank0, blank1);
+	eastl::swap(begin0, begin1);
+	eastl::swap(end0, end1);
+	eastl::swap(dbegin0, dbegin1);
+	eastl::swap(dend0, dend1);
+	eastl::swap(blank0, blank1);
 }
 
 /**
@@ -423,7 +423,7 @@ int DiffList::FinishSyncPoint(int nDiff, int nRealStartLine[])
 
 void DiffList::swap(DiffList &other)
 {
-	std::swap(m_firstSignificant, other.m_firstSignificant);
-	std::swap(m_lastSignificant, other.m_lastSignificant);
+	eastl::swap(m_firstSignificant, other.m_firstSignificant);
+	eastl::swap(m_lastSignificant, other.m_lastSignificant);
 	m_diffs.swap(other.m_diffs);
 }

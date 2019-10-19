@@ -691,7 +691,7 @@ bool CDirFrame::AddToCollection(FileLocation &filelocLeft, FileLocation &fileloc
 	LPCTSTR rname = EatPrefix(filelocRight.filepath.c_str(), rpath.c_str());
 	if (rname == NULL)
 	{
-		std::swap(filelocLeft, filelocRight);
+		eastl::swap(filelocLeft, filelocRight);
 		rname = EatPrefix(filelocRight.filepath.c_str(), rpath.c_str());
 		if (rname == NULL)
 		{

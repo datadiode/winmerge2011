@@ -60,7 +60,7 @@ public:
 	COptionDef(LPCTSTR name, T value)
 		: IOptionDef(typeOf<T>(), name), defValue(value)
 	{
-		std::swap(curValue, value);
+		eastl::swap(curValue, value);
 	}
 	void Reset()
 	{
@@ -85,7 +85,7 @@ public:
 	template<class T>
 	static void Set(COptionDef<T> &opt, T value)
 	{
-		std::swap(opt.curValue, value);
+		eastl::swap(opt.curValue, value);
 	}
 	template<class T>
 	static void Reset(COptionDef<T> &opt)
@@ -100,7 +100,7 @@ public:
 	template<class T>
 	static LSTATUS SaveOption(COptionDef<T> &opt, T value)
 	{
-		std::swap(opt.curValue, value);
+		eastl::swap(opt.curValue, value);
 		return opt.SaveOption();
 	}
 };
