@@ -41,14 +41,14 @@ protected:
 		First = this;
 	}
 	template<class T> static VARTYPE typeOf();
-	template<> VARTYPE typeOf<BYTE>() { return VT_UI1; }
-	template<> VARTYPE typeOf<int>() { return VT_I4; }
-	template<> VARTYPE typeOf<unsigned int>() { return VT_UI4; }
-	template<> VARTYPE typeOf<long>() { return VT_I4; }
-	template<> VARTYPE typeOf<unsigned long>() { return VT_UI4; }
-	template<> VARTYPE typeOf<bool>() { return VT_BOOL; }
-	template<> VARTYPE typeOf<String>() { return VT_BSTR; }
-	template<> VARTYPE typeOf<LogFont>() { return VT_FONT; }
+	template<> static VARTYPE typeOf<BYTE>() { return VT_UI1; }
+	template<> static VARTYPE typeOf<int>() { return VT_I4; }
+	template<> static VARTYPE typeOf<unsigned int>() { return VT_UI4; }
+	template<> static VARTYPE typeOf<long>() { return VT_I4; }
+	template<> static VARTYPE typeOf<unsigned long>() { return VT_UI4; }
+	template<> static VARTYPE typeOf<bool>() { return VT_BOOL; }
+	template<> static VARTYPE typeOf<String>() { return VT_BSTR; }
+	template<> static VARTYPE typeOf<LogFont>() { return VT_FONT; }
 };
 
 template<class T>
