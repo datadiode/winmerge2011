@@ -111,9 +111,9 @@ print_context_number_range (struct comparison *cmp, struct file_data const *file
      specification.  */
 
   if (trans_b <= trans_a)
-    fprintf (cmp->outfile, "%"pI"d", trans_b);
+    fprintf (cmp->outfile, "%" pI "d", trans_b);
   else
-    fprintf (cmp->outfile, "%"pI"d,%"pI"d", trans_a, trans_b);
+    fprintf (cmp->outfile, "%" pI "d,%" pI "d", trans_a, trans_b);
 }
 
 #if USE_GNU_REGEX(1)
@@ -269,9 +269,9 @@ print_unidiff_number_range (struct comparison *cmp, struct file_data const *file
      which is B.  It would be more logical to print A, but
      'patch' expects B in order to detect diffs against empty files.  */
   if (trans_b <= trans_a)
-    fprintf (cmp->outfile, trans_b < trans_a ? "%"pI"d,0" : "%"pI"d", trans_b);
+    fprintf (cmp->outfile, trans_b < trans_a ? "%" pI "d,0" : "%" pI "d", trans_b);
   else
-    fprintf (cmp->outfile, "%"pI"d,%"pI"d", trans_a, trans_b - trans_a + 1);
+    fprintf (cmp->outfile, "%" pI "d,%" pI "d", trans_a, trans_b - trans_a + 1);
 }
 
 /* Print a portion of an edit script in unidiff format.

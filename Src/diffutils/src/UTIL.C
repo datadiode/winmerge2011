@@ -411,9 +411,9 @@ print_number_range (char sepchar, struct file_data *file, lin a, lin b, FILE *ou
      In this case, we should print the line number before the range,
      which is B.  */
   if (trans_b > trans_a)
-    fprintf (out, "%"pI"d%c%"pI"d", trans_a, sepchar, trans_b);
+    fprintf (out, "%" pI "d%c%" pI "d", trans_a, sepchar, trans_b);
   else
-    fprintf (out, "%"pI"d", trans_b);
+    fprintf (out, "%" pI "d", trans_b);
 }
 
 /* Look at a hunk of edit script and report the range of lines in each file
@@ -554,7 +554,7 @@ debug_script (struct change *sp)
       printint line1 = sp->line1;
       printint deleted = sp->deleted;
       printint inserted = sp->inserted;
-      fprintf (stderr, "%3"pI"d %3"pI"d delete %"pI"d insert %"pI"d\n",
+      fprintf (stderr, "%3" pI "d %3" pI "d delete %" pI "d insert %" pI "d\n",
                line0, line1, deleted, inserted);
     }
 

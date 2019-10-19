@@ -145,7 +145,7 @@ interface Merge7z *Merge7z::Proxy::operator->()
 {
 	static DllProxy::Instance<struct Merge7zDLL> DLL =
 	{
-		"Merge7z\\Merge7z%u%02u"DECORATE_U".dll",
+		"Merge7z\\Merge7z%u%02u" DECORATE_U ".dll",
 		"DllGetVersion",
 		"Merge7z",
 		(HMODULE)0
