@@ -343,6 +343,10 @@ bool CConfigLog::DoFile(bool writing, String &sError)
 #		ifdef _WIN64
 		_T(" _WIN64")
 #		endif
+		_T(" _MSC_FULL_VER=")
+		_T(STRINGIZE(_MSC_FULL_VER))
+		_T(" _MSC_BUILD=")
+		_T(STRINGIZE(_MSC_BUILD))
 	);
 
 	LPCTSTR szCmdLine = ::GetCommandLine();
