@@ -23,6 +23,23 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
     </ClCompile>
   </ItemDefinitionGroup>
+  <Choose>
+    <When Condition="'$(PlatformToolset)' == 'v90' or '$(PlatformToolset)' == 'v100' or '$(PlatformToolset)' == 'Windows7.1SDK'">
+      <PropertyGroup Label="UserMacros">
+        <AdditionalDependenciesEx>noarg.obj;noenv.obj</AdditionalDependenciesEx>
+      </PropertyGroup>
+    </When>
+    <Otherwise>
+      <PropertyGroup Label="UserMacros">
+        <AdditionalDependenciesEx>noenv.obj</AdditionalDependenciesEx>
+      </PropertyGroup>
+    </Otherwise>
+  </Choose>
+  <ItemDefinitionGroup>
+    <Link>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;$(AdditionalDependenciesEx)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup>
     <imp>
       <CommandLineTemplate>lib /MACHINE:$(TargetMachine) /DEF:"%(FullPath)" /OUT:"$(IntDir)%(Filename).lib"</CommandLineTemplate>

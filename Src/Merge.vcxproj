@@ -135,7 +135,7 @@
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>version.lib;shlwapi.lib;urlmon.lib;imm32.lib;HtmlHelp.lib;comctl32.lib;oleacc.lib;noarg.obj;noenv.obj;pcre.lib;editorconfig-core-c.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>version.lib;shlwapi.lib;urlmon.lib;imm32.lib;HtmlHelp.lib;comctl32.lib;oleacc.lib;pcre.lib;editorconfig-core-c.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(IntDir);$(SolutionDir)BuildTmp\lib\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -161,7 +161,7 @@
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>version.lib;shlwapi.lib;urlmon.lib;imm32.lib;HtmlHelp.lib;comctl32.lib;oleacc.lib;noarg.obj;noenv.obj;pcre.lib;editorconfig-core-c.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>version.lib;shlwapi.lib;urlmon.lib;imm32.lib;HtmlHelp.lib;comctl32.lib;oleacc.lib;pcre.lib;editorconfig-core-c.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(IntDir);$(SolutionDir)BuildTmp\lib\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -186,7 +186,7 @@
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>version.lib;shlwapi.lib;urlmon.lib;imm32.lib;HtmlHelp.lib;comctl32.lib;oleacc.lib;noarg.obj;noenv.obj;pcre.lib;editorconfig-core-c.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>version.lib;shlwapi.lib;urlmon.lib;imm32.lib;HtmlHelp.lib;comctl32.lib;oleacc.lib;pcre.lib;editorconfig-core-c.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(IntDir);$(SolutionDir)BuildTmp\lib\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Windows</SubSystem>
     </Link>
@@ -211,7 +211,7 @@
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>version.lib;shlwapi.lib;urlmon.lib;imm32.lib;HtmlHelp.lib;comctl32.lib;oleacc.lib;noarg.obj;noenv.obj;pcre.lib;editorconfig-core-c.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>version.lib;shlwapi.lib;urlmon.lib;imm32.lib;HtmlHelp.lib;comctl32.lib;oleacc.lib;pcre.lib;editorconfig-core-c.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(IntDir);$(SolutionDir)BuildTmp\lib\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Windows</SubSystem>
     </Link>
