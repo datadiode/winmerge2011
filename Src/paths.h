@@ -27,6 +27,7 @@ bool paths_CreateIfNeeded(LPCTSTR, bool bExcludeLeaf = false);
 PATH_EXISTENCE GetPairComparability(LPCTSTR, LPCTSTR);
 BOOL paths_IsShortcut(LPCTSTR);
 String ExpandShortcut(LPCTSTR);
+void paths_DragQuery(HDROP, UINT, String &);
 String paths_ConcatPath(const String &, const String &);
 String paths_GetParentPath(LPCTSTR);
 

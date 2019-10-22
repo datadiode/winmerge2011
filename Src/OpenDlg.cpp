@@ -46,12 +46,6 @@ static const TCHAR OpenDlgHelpLocation[] = _T("::/htmlhelp/Open_paths.html");
 /////////////////////////////////////////////////////////////////////////////
 // COpenDlg dialog
 
-static void PathAddBackslashIfDirectory(String &path)
-{
-	if (!paths_EndsWithSlash(path.c_str()) && PathIsDirectory(path.c_str()))
-		path.push_back(_T('\\'));
-}
-
 /**
  * @brief Standard constructor.
  */
@@ -1038,25 +1032,7 @@ void COpenDlg::OnDropFiles(HDROP dropInfo)
 	// get all file names. but we'll only need the first one.
 	for (i = 0; i < fileCount; i++)
 	{
-		// Get the number of bytes required by the file's full pathname
-		if (UINT len = DragQueryFile(dropInfo, i, NULL, 0))
-		{
-			files[i].resize(len);
-			DragQueryFile(dropInfo, i, files[i].begin(), len + 1);
-		}
-	}
-
-	for (i = 0; i < fileCount; i++)
-	{
-		if (paths_IsShortcut(files[i].c_str()))
-		{
-			// if this was a shortcut, we need to expand it to the target path
-			String expandedFile = ExpandShortcut(files[i].c_str());
-			// if that worked, we should have a real file name
-			if (!expandedFile.empty())
-				files[i] = expandedFile;
-		}
-		PathAddBackslashIfDirectory(files[i]);
+		paths_DragQuery(dropInfo, i, files[i]);
 	}
 
 	// Add dropped paths to the dialog

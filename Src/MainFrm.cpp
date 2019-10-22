@@ -2602,27 +2602,10 @@ LRESULT CMainFrame::OnWndMsg<WM_DROPFILES>(WPARAM wParam, LPARAM)
 	// get all file names. but we'll only need the first one.
 	for (i = 0; i < fileCount; i++)
 	{
-		// Get the number of bytes required by the file's full pathname
-		if (UINT len = DragQueryFile(dropInfo, i, NULL, 0))
-		{
-			files[i].resize(len);
-			DragQueryFile(dropInfo, i, &files[i].front(), len + 1);
-		}
+		paths_DragQuery(dropInfo, i, files[i]);
 	}
 	// Free the memory block containing the dropped-file information
 	DragFinish(dropInfo);
-
-	for (i = 0; i < fileCount; i++)
-	{
-		if (paths_IsShortcut(files[i].c_str()))
-		{
-			// if this was a shortcut, we need to expand it to the target path
-			String expandedFile = ExpandShortcut(files[i].c_str());
-			// if that worked, we should have a real file name
-			if (!expandedFile.empty())
-				files[i] = expandedFile;
-		}
-	}
 
 	// If Ctrl pressed, do recursive compare
 	int nRecursive = ::GetAsyncKeyState(VK_CONTROL) < 0 ? 1 : 0;

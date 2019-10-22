@@ -304,6 +304,26 @@ String ExpandShortcut(LPCTSTR inFile)
 	return SUCCEEDED(hr) ? outFile : String();
 }
 
+void paths_DragQuery(HDROP dropInfo, UINT i, String &path)
+{
+	// Get the number of bytes required by the file's full pathname
+	if (UINT const len = DragQueryFile(dropInfo, i, NULL, 0))
+	{
+		path.resize(len);
+		DragQueryFile(dropInfo, i, path.begin(), len + 1);
+		if (paths_IsShortcut(path.c_str()))
+		{
+			// if this was a shortcut, we need to expand it to the target path
+			String const expandedFile = ExpandShortcut(path.c_str());
+			// if that worked, we should have a real file name
+			if (!expandedFile.empty())
+				path = expandedFile;
+		}
+		if (!paths_EndsWithSlash(path.c_str()) && PathIsDirectory(path.c_str()))
+			path.push_back(_T('\\'));
+	}
+}
+
 /**
  * @brief Append subpath to path.
  * This function appends subpath to given path. Function ensures there
