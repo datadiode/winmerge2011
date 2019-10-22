@@ -2,9 +2,6 @@
 // Copyright (C) 2006-2015
 // http://www.resedit.net
 
-// CAUTION: Beware of infected goo.gl links on www.resedit.net. They pretend to
-// refer to .7z files, but once clicked, they point you to a download wrapper.
-// The download links at http://humzagroup.com/dl/software seem to be clean.
 #include "resource.h"
 
 
@@ -1072,10 +1069,10 @@ FONT 8, "MS Shell Dlg", 0, 0, 1
 {
     GROUPBOX        "Files or Folders to Compare", IDC_FILES_DIRS_GROUP, 7, 7, 302, 111, WS_GROUP, WS_EX_TRANSPARENT
     RTEXT           "&Left:", IDC_STATIC, 13, 24, 65, 8, SS_RIGHT, WS_EX_LEFT
-    CONTROL         "", IDC_LEFT_COMBO, "ComboBoxEx32", 0x50210042 | WS_CLIPCHILDREN, 81, 22, 167, 150, 0x00000010
+    CONTROL         "", IDC_LEFT_COMBO, "ComboBoxEx32", 0x52210042, 81, 22, 167, 150, 0x00000010
     PUSHBUTTON      "&Browse...", IDC_LEFT_BUTTON, 252, 22, 50, 14, WS_GROUP, WS_EX_LEFT
     RTEXT           "&Right:", IDC_STATIC, 13, 40, 65, 8, SS_RIGHT, WS_EX_LEFT
-    CONTROL         "", IDC_RIGHT_COMBO, "ComboBoxEx32", 0x50210042 | WS_CLIPCHILDREN, 81, 38, 167, 150, 0x00000010
+    CONTROL         "", IDC_RIGHT_COMBO, "ComboBoxEx32", 0x52210042, 81, 38, 167, 150, 0x00000010
     PUSHBUTTON      "Bro&wse...", IDC_RIGHT_BUTTON, 252, 38, 50, 14, WS_GROUP, WS_EX_LEFT
     RTEXT           "&Filter:", IDC_STATIC, 13, 56, 65, 8, SS_RIGHT, WS_EX_LEFT
     COMBOBOX        IDC_EXT_COMBO, 81, 54, 167, 150, WS_TABSTOP | WS_VSCROLL | CBS_DROPDOWN | CBS_AUTOHSCROLL, WS_EX_LEFT
@@ -1341,7 +1338,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 1
     CONTROL         "", IDC_SEL_WORDDIFF_DELETED_COLOR, WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW, 156, 149, 17, 14, WS_EX_LEFT
     CONTROL         "", IDC_SEL_WORDDIFF_TEXT_COLOR, WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW | BS_LEFTTEXT, 199, 149, 17, 14, WS_EX_LEFT
     AUTO3STATE      "Cross-&hatch deleted lines\tDot-&hatch deleted lines", IDC_CROSS_HATCH_DELETED_LINES, 7, 169, 220, 10, 0, WS_EX_LEFT
-    PUSHBUTTON      "GitHub/Bitbucket", IDC_COLORSCHEME_GITHUBBITBUCKET, 85, 208, 70, 14, WS_EX_LEFT
+    PUSHBUTTON      "GitHub/Bitbucket", IDC_COLORSCHEME_GITHUBBITBUCKET, 85, 208, 70, 14, 0, WS_EX_LEFT
     PUSHBUTTON      "Defaults", IDC_COLORDEFAULTS_BTN, 160, 208, 70, 14, 0, WS_EX_LEFT
 }
 
