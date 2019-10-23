@@ -320,7 +320,7 @@ HRESULT CMainFrame::get_Strings(IDispatch **ppDispatch)
 	return S_OK;
 }
 
-HRESULT CMainFrame::ShowHTMLDialog(LPCOLESTR url, VARIANT *arguments, BSTR features, VARIANT *ret)
+HRESULT CMainFrame::ShowHTMLDialog(BSTR url, VARIANT *arguments, BSTR features, VARIANT *ret)
 {
 	String moniker = url;
 	CMyComPtr<IMoniker> spMoniker;
@@ -332,9 +332,11 @@ HRESULT CMainFrame::ShowHTMLDialog(LPCOLESTR url, VARIANT *arguments, BSTR featu
 		flags = HTMLDLG_MODELESS | HTMLDLG_VERIFY;
 	else if (EatPrefix(url, L"print_template:"))
 		flags = HTMLDLG_MODAL | HTMLDLG_VERIFY | HTMLDLG_PRINT_TEMPLATE;
-	hr = MSHTML->ShowHTMLDialogEx(m_hWnd, spMoniker, flags, arguments, features, ret);
+	BOOL const bEnabled = IsWindowEnabled();
+	HWND const hWnd = bEnabled ? m_hWnd : ::GetActiveWindow();
+	hr = MSHTML->ShowHTMLDialogEx(hWnd, spMoniker, flags, arguments, features, ret);
 	// Compensate for StayModal()
-	EnableWindow(TRUE);
+	EnableWindow(bEnabled);
 	return hr;
 }
 
@@ -3265,7 +3267,7 @@ bool CMainFrame::ParseArgsAndDoOpen(const MergeCmdLineInfo &cmdInfo)
 		{
 			// Running a .WinMerge script with no files should explain its usage.
 			CMyVariant ret;
-			HRESULT hr = ShowHTMLDialog(cmdInfo.m_sRunScript.c_str(), &CMyVariant(this), NULL, &ret);
+			HRESULT hr = ShowHTMLDialog(const_cast<BSTR>(cmdInfo.m_sRunScript.c_str()), &CMyVariant(this), NULL, &ret);
 			if (FAILED(hr))
 			{
 				OException(hr).ReportError(m_hWnd);
@@ -3323,7 +3325,7 @@ bool CMainFrame::ParseArgsAndDoOpen(const MergeCmdLineInfo &cmdInfo)
 			if (pDocFrame->GetFrameType() == FRAME_FILE)
 			{
 				CMyVariant ret;
-				HRESULT hr = ShowHTMLDialog(cmdInfo.m_sRunScript.c_str(),
+				HRESULT hr = ShowHTMLDialog(const_cast<BSTR>(cmdInfo.m_sRunScript.c_str()),
 					&CMyVariant(static_cast<CChildFrame *>(pDocFrame)), NULL, &ret);
 				if (FAILED(hr))
 				{

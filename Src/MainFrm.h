@@ -61,7 +61,7 @@ public:
 	STDMETHOD(put_StatusText)(BSTR bsStatusText);
 	STDMETHOD(get_StatusText)(BSTR *pbsStatusText);
 	STDMETHOD(get_Strings)(IDispatch **ppDispatch);
-	STDMETHOD(ShowHTMLDialog)(LPCOLESTR url, VARIANT *arguments, BSTR features, VARIANT *ret);
+	STDMETHOD(ShowHTMLDialog)(BSTR url, VARIANT *arguments, BSTR features, VARIANT *ret);
 	STDMETHOD(ParseCmdLine)(BSTR cmdline, BSTR directory);
 	STDMETHOD(StayModal)();
 
