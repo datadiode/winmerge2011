@@ -23,13 +23,12 @@
  */
 #include "StdAfx.h"
 #include <process.h>
+#include "Merge.h"
 #include "FileFilterHelper.h"
 #include "DiffContext.h"
 #include "paths.h"
-#include "CompareStats.h"
 #include "codepage_detect.h"
 #include "Common/version.h"
-#include "OptionsMgr.h"
 
 /**
  * @brief Force compare to be single-threaded.
@@ -221,6 +220,8 @@ bool CDiffContext::ShouldAbort() const
 		MSG msg;
 		while (::PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
 		{
+			if (theApp.PreTranslateMessage(&msg))
+				continue;
 			::TranslateMessage(&msg);
 			::DispatchMessage(&msg);
 		}
