@@ -16,6 +16,10 @@
       <Targets>_flt</Targets>
     </AvailableItemName>
     <AvailableItemName
+      Include="EventHandler">
+      <Targets>_EventHandler</Targets>
+    </AvailableItemName>
+    <AvailableItemName
       Include="PrintTemplate">
       <Targets>_PrintTemplate</Targets>
     </AvailableItemName>
@@ -54,6 +58,12 @@
   </UsingTask>
   <UsingTask
     TaskName="flt"
+    TaskFactory="XamlTaskFactory"
+    AssemblyName="Microsoft.Build.Tasks.v4.0">
+    <Task>$(MSBuildThisFileDirectory)$(MSBuildThisFileName).xml</Task>
+  </UsingTask>
+  <UsingTask
+    TaskName="EventHandler"
     TaskFactory="XamlTaskFactory"
     AssemblyName="Microsoft.Build.Tasks.v4.0">
     <Task>$(MSBuildThisFileDirectory)$(MSBuildThisFileName).xml</Task>
@@ -244,6 +254,50 @@
     </ItemGroup>
     <MakeDir
       Directories="@(fltDirsToMake-&gt;'%(RootDir)%(Directory)')" />
+  </Target>
+  <Target
+    Name="_EventHandler"
+    BeforeTargets="Midl"
+    AfterTargets="CustomBuild"
+    Condition="'@(EventHandler)' != ''"
+    DependsOnTargets="ComputeEventHandlerOutput"
+    Outputs="%(EventHandler.Outputs)"
+    Inputs="%(EventHandler.Identity);%(EventHandler.AdditionalDependencies);$(MSBuildProjectFile)">
+    <ItemGroup
+      Condition="'@(SelectedFiles)' != ''">
+      <EventHandler
+        Remove="@(EventHandler)"
+        Condition="'%(Identity)' != '@(SelectedFiles)'" />
+    </ItemGroup>
+    <ItemGroup>
+      <EventHandler_tlog
+        Include="%(EventHandler.Outputs)"
+        Condition="'%(EventHandler.Outputs)' != '' and '%(EventHandler.ExcludedFromBuild)' != 'true'">
+        <Source>@(EventHandler, '|')</Source>
+      </EventHandler_tlog>
+    </ItemGroup>
+    <Message
+      Importance="High"
+      Text="%(EventHandler.Outputs)" />
+    <WriteLinesToFile
+      Condition="'@(EventHandler_tlog)' != '' and '%(EventHandler_tlog.ExcludedFromBuild)' != 'true'"
+      File="$(IntDir)$(ProjectName).write.1.tlog"
+      Lines="^%(EventHandler_tlog.Source);@(EventHandler_tlog-&gt;'%(Fullpath)')" />
+    <EventHandler
+      Condition="'@(EventHandler)' != '' and '%(EventHandler.ExcludedFromBuild)' != 'true'"
+      CommandLineTemplate="%(EventHandler.CommandLineTemplate)"
+      Inputs="%(EventHandler.Identity)" />
+  </Target>
+  <Target
+    Name="ComputeEventHandlerOutput"
+    Condition="'@(EventHandler)' != ''">
+    <ItemGroup>
+      <EventHandlerDirsToMake
+        Condition="'@(EventHandler)' != '' and '%(EventHandler.ExcludedFromBuild)' != 'true'"
+        Include="%(EventHandler.Outputs)" />
+    </ItemGroup>
+    <MakeDir
+      Directories="@(EventHandlerDirsToMake-&gt;'%(RootDir)%(Directory)')" />
   </Target>
   <Target
     Name="_PrintTemplate"

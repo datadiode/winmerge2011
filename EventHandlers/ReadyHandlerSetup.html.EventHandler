@@ -1,0 +1,152 @@
+<!DOCTYPE html public "-//W3C//DTD HTML 4.0 Strict//en">
+<style type="text/css">
+html
+{
+	overflow: hidden;
+}
+body
+{
+	font: 14px sans-serif;
+	margin: 10px;
+	color: buttontext;
+	background-color: buttonface;
+}
+fieldset
+{
+	display: block;
+	width: 100%;
+	border: 2px groove;
+}
+legend
+{
+	color: buttontext;
+}
+legend label:first-child
+{
+	display: inline-block;
+	width: 80px;
+}
+form
+{
+	margin: 4px;
+}
+input[type=text], input[type=password]
+{
+	border: 1px solid buttonshadow;
+}
+#PbOk, #PbCancel
+{
+	width: 40%;
+	margin: 10px;
+}
+#EdPassword
+{
+	display: block;
+	width: 100%;
+	margin-bottom: 5px;
+}
+</style>
+<script type='text/vbs'>
+Option Explicit
+
+'Makes use of code from https://github.com/EnclaveConsulting/ISA-Server-TMG/blob/master/ISA_E-Mail_Alert.vbs
+
+'These weird constants do NOT cause any communications with schemas.microsoft.com.  They are just naming conventions.
+Const cdoSendUsingMethod =        "http://schemas.microsoft.com/cdo/configuration/sendusing"
+Const cdoSMTPServer =             "http://schemas.microsoft.com/cdo/configuration/smtpserver"
+Const cdoSMTPServerPort =         "http://schemas.microsoft.com/cdo/configuration/smtpserverport"
+Const cdoSMTPUseSSL =             "http://schemas.microsoft.com/cdo/configuration/smtpusessl"
+Const cdoSMTPConnectionTimeout =  "http://schemas.microsoft.com/cdo/configuration/smtpconnectiontimeout"
+Const cdoSMTPAuthenticate =       "http://schemas.microsoft.com/cdo/configuration/smtpauthenticate"
+Const cdoSendUserName =           "http://schemas.microsoft.com/cdo/configuration/sendusername"
+Const cdoSendPassword =           "http://schemas.microsoft.com/cdo/configuration/sendpassword"
+Const cdoSendUsingPickup =        1    'Use the local IIS-SMTP service for delivery.
+Const cdoSendUsingPort =          2    'Use a remote SMTP server for delivery.
+
+Const cdoAnonymous =              0 'Do not authenticate
+Const cdoBasic =                  1 'basic (clear-text) authentication
+Const cdoNTLM =                   2 'NTLM
+
+Set returnValue = Nothing
+
+Dim sh
+Set sh = CreateObject("WScript.Shell")
+
+Sub Window_OnLoad
+	On Error Resume Next
+	FmAccountSettings.EdHost.value = sh.RegRead("HKCU\Software\Thingamahoochie\WinMurge\ReadyScript\Host")
+	FmAccountSettings.EdPort.value = sh.RegRead("HKCU\Software\Thingamahoochie\WinMurge\ReadyScript\Port")
+	FmAccountSettings.EdUsername.value = sh.RegRead("HKCU\Software\Thingamahoochie\WinMurge\ReadyScript\Username")
+	FmAccountSettings.TgSSL.checked = sh.RegRead("HKCU\Software\Thingamahoochie\WinMurge\ReadyScript\SSL")
+	FmAccountSettings.EdFrom.value = sh.RegRead("HKCU\Software\Thingamahoochie\WinMurge\ReadyScript\From")
+	FmAccountSettings.EdTo.value = sh.RegRead("HKCU\Software\Thingamahoochie\WinMurge\ReadyScript\To")
+	On Error GoTo 0
+End Sub
+
+Sub PbOk_OnClick
+	Dim message, config
+
+	If TgAccountSettings.checked Then
+		sh.RegWrite "HKCU\Software\Thingamahoochie\WinMurge\ReadyScript\Host", FmAccountSettings.EdHost.value
+		sh.RegWrite "HKCU\Software\Thingamahoochie\WinMurge\ReadyScript\Port", FmAccountSettings.EdPort.value, "REG_DWORD"
+		sh.RegWrite "HKCU\Software\Thingamahoochie\WinMurge\ReadyScript\Username", FmAccountSettings.EdUsername.value
+		sh.RegWrite "HKCU\Software\Thingamahoochie\WinMurge\ReadyScript\SSL", FmAccountSettings.TgSSL.checked, "REG_DWORD"
+		sh.RegWrite "HKCU\Software\Thingamahoochie\WinMurge\ReadyScript\From", FmAccountSettings.EdFrom.value
+		sh.RegWrite "HKCU\Software\Thingamahoochie\WinMurge\ReadyScript\To", FmAccountSettings.EdTo.value
+	End If
+
+	Set message = CreateObject("CDO.Message")
+	message.From = FmAccountSettings.EdFrom.value
+	message.To = FmAccountSettings.EdTo.value
+
+	Set config = message.Configuration
+	config.Fields(cdoSendUsingMethod) = cdoSendUsingPort
+	config.Fields(cdoSMTPServer) = FmAccountSettings.EdHost.value
+	config.Fields(cdoSMTPServerPort) = FmAccountSettings.EdPort.value
+	config.Fields(cdoSMTPUseSSL) = FmAccountSettings.TgSSL.checked
+	config.Fields(cdoSendUserName) = FmAccountSettings.EdUsername.value
+	config.Fields(cdoSMTPAuthenticate) = cdoBasic
+	config.Fields(cdoSMTPConnectionTimeout) = 30
+	config.Fields(cdoSendPassword) = EdPassword.value
+	config.Fields.Update
+
+	Set returnValue = message
+	close
+End Sub
+
+Sub PbCancel_OnClick
+	close
+End Sub
+
+Sub TgAccountSettings_OnClick
+	FmAccountSettings.disabled = Not TgAccountSettings.checked
+End Sub
+
+Sub Document_OnKeyDown
+	Select Case window.event.keyCode
+	Case 13:
+		PbOk_OnClick
+	Case 27:
+		PbCancel_OnClick
+	End Select
+End Sub
+</script>
+<meta http-equiv='MSThemeCompatible' content='yes'>
+<body>
+<title>Please enter your email provider password</title>
+<label for='EdPassword'>Password:</label><input id='EdPassword' type='password'>
+<fieldset>
+<legend><input id='TgAccountSettings' type='checkbox'><label for='TgAccountSettings'>Account settings</label></legend>
+<form disabled id='FmAccountSettings'>
+<legend><label for='EdHost'>Host:</label><input size='50' id='EdHost' type='text' value='smtp.example.com'></legend>
+<legend><label for='EdPort'>Port:</label><input size='5' id='EdPort' type='text' value='25'><input id='TgSSL' type='checkbox'><label for='TgSSL'>SSL</label></legend>
+<legend><label for='EdUsername'>Username:</label><input size='50' id='EdUsername' type='text' value='sender@example.com'></legend>
+<legend><label for='EdFrom'>From:</label><input id='EdFrom' size='50' type='text' value='Message Sender &lt;sender@example.com&gt;'></legend>
+<legend><label for='EdTo'>To:</label><input id='EdTo' size='50' type='text' value='Message Recipient &lt;recipient@example.com&gt;'></legend>
+</form>
+</fieldset>
+<center>
+<input id='PbOk' type='button' value='OK'>
+<input id='PbCancel' type='button' value='Cancel'>
+</center>
+</body>

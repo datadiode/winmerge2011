@@ -222,7 +222,7 @@ void CDirView::OnInitialUpdate()
 void CDirView::StartCompare()
 {
 	if (m_pCmpProgressDlg == NULL)
-		m_pCmpProgressDlg = new DirCompProgressDlg(m_pFrame);
+		m_pCmpProgressDlg = new DirCompProgressDlg(this);
 	m_compareStart = clock();
 }
 
@@ -1318,9 +1318,20 @@ LRESULT CDirView::ReflectKeydown(NMLVKEYDOWN *pParam)
 void CDirView::OnUpdateUIMessage()
 {
 	// Close and destroy the dialog after compare
-	delete m_pCmpProgressDlg;
-	m_pCmpProgressDlg = NULL;
-
+	if (m_pCmpProgressDlg)
+	{
+		if (!m_pCmpProgressDlg->IsWindowEnabled())
+		{
+			// Don't destroy it yet because it has invoked some popup.
+			// When it finds itself hidden once that popup has closed,
+			// it will post another MSG_UI_UPDATE to get us back here.
+			m_pCmpProgressDlg->ShowWindow(SW_HIDE);
+			m_pCmpProgressDlg->GetWindow(GW_ENABLEDPOPUP)->PostMessage(WM_CLOSE);
+			return;
+		}
+		delete m_pCmpProgressDlg;
+		m_pCmpProgressDlg = NULL;
+	}
 	m_pFrame->CompareReady();
 	// Don't Redisplay() if triggered by OnMarkedRescan()
 	if (GetItemCount() == 0)

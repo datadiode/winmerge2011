@@ -879,12 +879,13 @@ EXSTYLE WS_EX_TOOLWINDOW
 CAPTION " Folder Compare Progress"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
-    DEFPUSHBUTTON   "Stop", IDCANCEL, 166, 7, 83, 14, 0, WS_EX_LEFT
-    PUSHBUTTON      "Pause\tContinue\t", IDC_PAUSE_CONTINUE, 166, 23, 83, 14, 0, WS_EX_LEFT
+    DEFPUSHBUTTON   "Pause\tContinue\t", IDC_PAUSE_CONTINUE, 134, 7, 64, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Stop", IDCANCEL, 200, 7, 49, 14, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Send email when ready", IDC_SEND_EMAIL_WHEN_READY, 134, 28, 114, 8, 0, WS_EX_LEFT
     CONTROL         "", IDC_PROGRESSCOMPARE, PROGRESS_CLASS, WS_BORDER, 7, 68, 242, 9, WS_EX_LEFT
     RTEXT           "0", IDC_ITEMSCOMPARED, 95, 29, 30, 8, SS_RIGHT, WS_EX_LEFT
     RTEXT           "0", IDC_ITEMSTOTAL, 95, 19, 30, 8, SS_RIGHT, WS_EX_LEFT
-    LTEXT           "Comparing items...", IDC_STATIC, 7, 7, 150, 8, SS_LEFT, WS_EX_LEFT
+    LTEXT           "Comparing items...", IDC_STATIC, 7, 7, 118, 8, SS_LEFT, WS_EX_LEFT
     LTEXT           "Items compared:", IDC_STATIC, 7, 29, 85, 8, SS_LEFT, WS_EX_LEFT
     LTEXT           "Items total:", IDC_STATIC, 7, 19, 85, 8, SS_LEFT, WS_EX_LEFT
     EDITTEXT        IDC_RIGHT_EDIT, 7, 54, 242, 12, NOT WS_TABSTOP | ES_AUTOHSCROLL | ES_READONLY, WS_EX_LEFT

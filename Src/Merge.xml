@@ -175,6 +175,64 @@
     DisplayName=""
     ItemType="flt" />
   <Rule
+    Name="EventHandler"
+    PageTemplate="tool"
+    DisplayName=""
+    Order="200">
+    <Rule.DataSource>
+      <DataSource
+        Persistence="ProjectFile"
+        ItemType="EventHandler" />
+    </Rule.DataSource>
+    <Rule.Categories>
+      <Category
+        Name="General">
+        <Category.DisplayName>
+          <sys:String>General</sys:String>
+        </Category.DisplayName>
+      </Category>
+      <Category
+        Name="Command Line"
+        Subtype="CommandLine">
+        <Category.DisplayName>
+          <sys:String>Command Line</sys:String>
+        </Category.DisplayName>
+      </Category>
+    </Rule.Categories>
+    <StringListProperty
+      Name="Inputs"
+      Category="Command Line"
+      IsRequired="true"
+      Switch=" ">
+      <StringListProperty.DataSource>
+        <DataSource
+          Persistence="ProjectFile"
+          ItemType="EventHandler"
+          SourceType="Item" />
+      </StringListProperty.DataSource>
+    </StringListProperty>
+    <StringProperty
+      Name="CommandLineTemplate"
+      DisplayName="Command Line"
+      Visible="False"
+      IncludeInCommandLine="False" />
+    <StringListProperty
+      Name="Outputs"
+      DisplayName="Outputs"
+      Visible="False"
+      IncludeInCommandLine="False" />
+  </Rule>
+  <ItemType
+    Name="EventHandler"
+    DisplayName="" />
+  <FileExtension
+    Name="*.EventHandler"
+    ContentType="EventHandler" />
+  <ContentType
+    Name="EventHandler"
+    DisplayName=""
+    ItemType="EventHandler" />
+  <Rule
     Name="PrintTemplate"
     PageTemplate="tool"
     DisplayName=""

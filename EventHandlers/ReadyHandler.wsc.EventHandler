@@ -1,0 +1,32 @@
+<scriptlet>
+
+<implements type='automation'>
+	<property name='app' dispid='0'/>
+	<method name='Setup'/>
+	<method name='Ready'/>
+</implements>
+
+<script language='vbs'>
+Dim message
+Set message = Nothing
+
+Function Setup
+	Set message = app.ShowHTMLDialog("modal:\EventHandlers\ReadyHandlerSetup.html", vbNull, "dialogWidth: 450px; dialogHeight: 240px;")
+	If Not message Is Nothing Then
+		message.Subject = "WinMerge folder compare in progress" 
+		message.TextBody = "Believe it or not: WinMerge folder compare is in progress!"
+		message.Send
+		Setup = True
+	End If
+End Function
+
+Sub Ready
+	If Not message Is Nothing Then
+		message.Subject = "WinMerge folder compare finished" 
+		message.TextBody = "Believe it or not: WinMerge folder compare has finished!"
+		message.Send
+	End If
+End Sub
+
+</script>
+</scriptlet>

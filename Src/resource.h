@@ -150,6 +150,7 @@
 #define IDC_COMPARE_AS_CHECK                    1007
 #define IDC_PATH_EDIT                           1007
 #define IDC_BROWSE_BUTTON                       1008
+#define IDC_SEND_EMAIL_WHEN_READY               1009
 #define IDC_SCROLL_CHECK                        1010
 #define IDC_VSS_L1                              1010
 #define IDC_RECURS_CHECK                        1011

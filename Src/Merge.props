@@ -50,6 +50,12 @@
     </flt>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup>
+    <EventHandler>
+      <CommandLineTemplate>copy "%(FullPath)" "$(OutDir)EventHandlers\%(Filename)"</CommandLineTemplate>
+      <Outputs>$(OutDir)EventHandlers\%(Filename)</Outputs>
+    </EventHandler>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup>
     <PrintTemplate>
       <CommandLineTemplate>copy "%(FullPath)" "$(OutDir)PrintTemplates\%(Filename)"</CommandLineTemplate>
       <Outputs>$(OutDir)PrintTemplates\%(Filename)</Outputs>

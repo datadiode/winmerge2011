@@ -1054,6 +1054,10 @@
     </imp>
   </ItemGroup>
   <ItemGroup>
+    <EventHandler Include="..\EventHandlers\ReadyHandler.wsc.EventHandler" />
+    <EventHandler Include="..\EventHandlers\ReadyHandlerSetup.html.EventHandler" />
+  </ItemGroup>
+  <ItemGroup>
     <PrintTemplate Include="..\PrintTemplates\MergeDocPrintTemplate.html.PrintTemplate" />
   </ItemGroup>
   <ItemGroup>

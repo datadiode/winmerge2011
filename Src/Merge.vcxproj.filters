@@ -49,6 +49,9 @@
     <Filter Include="system32">
       <UniqueIdentifier>{02c15c13-7566-448b-8f29-77c06942eb80}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Event Handlers">
+      <UniqueIdentifier>{b1043411-1df3-45bf-95f0-de94419bd821}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Print Templates">
       <UniqueIdentifier>{12bb3806-c8e5-4eec-94a9-0deeabd1c5ed}</UniqueIdentifier>
     </Filter>
@@ -1541,6 +1544,14 @@
       <Filter>system32</Filter>
     </imp>
     <imp Include="Common\ntdll.imp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EventHandler Include="..\EventHandlers\ReadyHandler.wsc.EventHandler">
+      <Filter>Event Handlers</Filter>
+    </EventHandler>
+    <EventHandler Include="..\EventHandlers\ReadyHandlerSetup.html.EventHandler">
+      <Filter>Event Handlers</Filter>
+    </EventHandler>
   </ItemGroup>
   <ItemGroup>
     <PrintTemplate Include="..\PrintTemplates\MergeDocPrintTemplate.html.PrintTemplate">

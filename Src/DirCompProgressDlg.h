@@ -8,6 +8,7 @@
 #include "CompareStats.h"
 
 class CDirFrame;
+class CDirView;
 class CompareStatisticsDlg;
 
 /////////////////////////////////////////////////////////////////////////////
@@ -31,7 +32,7 @@ class DirCompProgressDlg : public ODialog
 {
 // Construction
 public:
-	DirCompProgressDlg(CDirFrame *);
+	DirCompProgressDlg(CDirView *);
 	~DirCompProgressDlg();
 
 // Implementation
@@ -40,10 +41,14 @@ protected:
 	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
 
 	void OnTimer(UINT_PTR nIDEvent);
+	BOOL ReadyHandlerSetup();
+	void ReadyHandlerReady();
 
 private:
+	CDirView *const m_pDirView;
 	CDirFrame *const m_pDirDoc; /**< Pointer to dirdoc we are comparing */
 	CompareStatisticsDlg *const m_pStatsDlg;
 	String m_strPauseContinue;
 	int m_rotPauseContinue;
+	CMyComPtr<IDispatch> m_spReadyHandler;
 };

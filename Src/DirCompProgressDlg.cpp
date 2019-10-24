@@ -9,7 +9,9 @@
 #include "DirCompProgressDlg.h"
 #include "MainFrm.h"
 #include "DirFrame.h"
+#include "DirView.h"
 #include "CompareStatisticsDlg.h"
+#include "Environment.h"
 #include "paths.h"
 
 #ifdef _DEBUG
@@ -26,10 +28,11 @@ static const UINT UPDATE_INTERVAL = 400;
  * @brief Constructor.
  * @param [in] pParent Parent window for progress dialog.
  */
-DirCompProgressDlg::DirCompProgressDlg(CDirFrame *pDirDoc)
+DirCompProgressDlg::DirCompProgressDlg(CDirView *pDirView)
 : ODialog(IDD_DIRCOMP_PROGRESS)
-, m_pDirDoc(pDirDoc)
-, m_pStatsDlg(new CompareStatisticsDlg(pDirDoc->GetCompareStats()))
+, m_pDirView(pDirView)
+, m_pDirDoc(pDirView->m_pFrame)
+, m_pStatsDlg(new CompareStatisticsDlg(m_pDirDoc->GetCompareStats()))
 , m_rotPauseContinue(0)
 {
 	LanguageSelect.Create(*this, theApp.m_pMainWnd->GetLastActivePopup()->m_hWnd);
@@ -70,7 +73,23 @@ LRESULT DirCompProgressDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lPara
 				m_strPauseContinue.substr(0, m_strPauseContinue.find('\t')).c_str());
 			m_rotPauseContinue = (m_rotPauseContinue + 1) % 2;
 			break;
+		case IDC_SEND_EMAIL_WHEN_READY:
+			if (!IsDlgButtonChecked(IDC_SEND_EMAIL_WHEN_READY) || !ReadyHandlerSetup())
+			{
+				CheckDlgButton(IDC_SEND_EMAIL_WHEN_READY, BST_UNCHECKED);
+				m_spReadyHandler.Release();
+			}
+			break;
 		}
+		break;
+	case WM_DESTROY:
+		if (IsDlgButtonChecked(IDC_SEND_EMAIL_WHEN_READY))
+			ReadyHandlerReady();
+		break;
+	case WM_ENABLE:
+		// Did DirView ask for another MSG_UI_UPDATE?
+		if (wParam && !IsWindowVisible())
+			m_pDirView->PostMessage(MSG_UI_UPDATE);
 		break;
 	case WM_TIMER:
 		OnTimer(wParam);
@@ -157,5 +176,51 @@ void DirCompProgressDlg::OnTimer(UINT_PTR nIDEvent)
 			}
 			m_pStatsDlg->Update();
 		}
+	}
+}
+
+BOOL DirCompProgressDlg::ReadyHandlerSetup()
+{
+	BOOL bResult = FALSE;
+	BOOL const bModal = theApp.m_pMainWnd->EnableWindow(FALSE);
+	try
+	{
+		String pluginMoniker = L"script:\\EventHandlers\\ReadyHandler.wsc";
+		env_ResolveMoniker(pluginMoniker);
+		OException::Check(CoGetObject(pluginMoniker.c_str(), NULL,
+			IID_IDispatch, reinterpret_cast<void **>(&m_spReadyHandler)));
+		CMyDispId DispId;
+		DispId.Call(m_spReadyHandler,
+			CMyDispParams<1>().Unnamed(static_cast<IMergeApp *>(theApp.m_pMainWnd)), DISPATCH_PROPERTYPUTREF);
+		OException::Check(DispId.Init(m_spReadyHandler, L"Setup"));
+		CMyVariant var;
+		OException::Check(DispId.Call(m_spReadyHandler,
+			CMyDispParams<0>().Unnamed, DISPATCH_METHOD, &var));
+		OException::Check(var.ChangeType(VT_BOOL));
+		bResult = V_BOOL(&var) != VARIANT_FALSE;
+	}
+	catch (OException *e)
+	{
+		e->ReportError(m_hWnd, MB_ICONSTOP);
+		delete e;
+	}
+	theApp.m_pMainWnd->EnableWindow(!bModal);
+	SetActiveWindow();
+	return bResult;
+}
+
+void DirCompProgressDlg::ReadyHandlerReady()
+{
+	try
+	{
+		CMyDispId DispId;
+		OException::Check(DispId.Init(m_spReadyHandler, L"Ready"));
+		OException::Check(DispId.Call(m_spReadyHandler,
+			CMyDispParams<0>().Unnamed, DISPATCH_METHOD));
+	}
+	catch (OException *e)
+	{
+		e->ReportError(m_hWnd, MB_ICONSTOP);
+		delete e;
 	}
 }
