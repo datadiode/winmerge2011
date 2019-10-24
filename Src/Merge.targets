@@ -96,12 +96,12 @@
   </UsingTask>
   <Target
     Name="_imp"
-    BeforeTargets="$(impBeforeTargets)"
-    AfterTargets="$(impAfterTargets)"
+    BeforeTargets="Midl"
+    AfterTargets="CustomBuild"
     Condition="'@(imp)' != ''"
-    DependsOnTargets="$(impDependsOn);ComputeimpOutput"
+    DependsOnTargets="ComputeimpOutput"
     Outputs="%(imp.Outputs)"
-    Inputs="%(imp.Identity);%(imp.AdditionalDependencies);$(MSBuildProjectFile)">
+    Inputs="%(imp.Identity);$(MSBuildProjectFile)">
     <ItemGroup
       Condition="'@(SelectedFiles)' != ''">
       <imp
@@ -117,7 +117,7 @@
     </ItemGroup>
     <Message
       Importance="High"
-      Text="%(imp.ExecutionDescription)" />
+      Text="%(imp.Outputs)" />
     <WriteLinesToFile
       Condition="'@(imp_tlog)' != '' and '%(imp_tlog.ExcludedFromBuild)' != 'true'"
       File="$(IntDir)$(ProjectName).write.1.tlog"
@@ -125,7 +125,6 @@
     <imp
       Condition="'@(imp)' != '' and '%(imp.ExcludedFromBuild)' != 'true'"
       CommandLineTemplate="%(imp.CommandLineTemplate)"
-      AdditionalOptions="%(imp.AdditionalOptions)"
       Inputs="%(imp.Identity)" />
   </Target>
   <PropertyGroup>
@@ -160,12 +159,12 @@
   </Target>
   <Target
     Name="_po"
-    BeforeTargets="$(poBeforeTargets)"
-    AfterTargets="$(poAfterTargets)"
+    BeforeTargets="Midl"
+    AfterTargets="CustomBuild"
     Condition="'@(po)' != ''"
-    DependsOnTargets="$(poDependsOn);ComputepoOutput"
+    DependsOnTargets="ComputepoOutput"
     Outputs="%(po.Outputs)"
-    Inputs="%(po.Identity);%(po.AdditionalDependencies);$(MSBuildProjectFile)">
+    Inputs="%(po.Identity);$(MSBuildProjectFile)">
     <ItemGroup
       Condition="'@(SelectedFiles)' != ''">
       <po
@@ -181,7 +180,7 @@
     </ItemGroup>
     <Message
       Importance="High"
-      Text="%(po.ExecutionDescription)" />
+      Text="%(po.Outputs)" />
     <WriteLinesToFile
       Condition="'@(po_tlog)' != '' and '%(po_tlog.ExcludedFromBuild)' != 'true'"
       File="$(IntDir)$(ProjectName).write.1.tlog"
@@ -189,19 +188,8 @@
     <po
       Condition="'@(po)' != '' and '%(po.ExcludedFromBuild)' != 'true'"
       CommandLineTemplate="%(po.CommandLineTemplate)"
-      AdditionalOptions="%(po.AdditionalOptions)"
       Inputs="%(po.Identity)" />
   </Target>
-  <PropertyGroup>
-    <ComputeLinkInputsTargets>
-            $(ComputeLinkInputsTargets);
-            ComputepoOutput;
-          </ComputeLinkInputsTargets>
-    <ComputeLibInputsTargets>
-            $(ComputeLibInputsTargets);
-            ComputepoOutput;
-          </ComputeLibInputsTargets>
-  </PropertyGroup>
   <Target
     Name="ComputepoOutput"
     Condition="'@(po)' != ''">
@@ -209,27 +197,18 @@
       <poDirsToMake
         Condition="'@(po)' != '' and '%(po.ExcludedFromBuild)' != 'true'"
         Include="%(po.Outputs)" />
-      <Link
-        Include="%(poDirsToMake.Identity)"
-        Condition="'%(Extension)'=='.obj' or '%(Extension)'=='.res' or '%(Extension)'=='.rsc' or '%(Extension)'=='.lib'" />
-      <Lib
-        Include="%(poDirsToMake.Identity)"
-        Condition="'%(Extension)'=='.obj' or '%(Extension)'=='.res' or '%(Extension)'=='.rsc' or '%(Extension)'=='.lib'" />
-      <ImpLib
-        Include="%(poDirsToMake.Identity)"
-        Condition="'%(Extension)'=='.obj' or '%(Extension)'=='.res' or '%(Extension)'=='.rsc' or '%(Extension)'=='.lib'" />
     </ItemGroup>
     <MakeDir
       Directories="@(poDirsToMake-&gt;'%(RootDir)%(Directory)')" />
   </Target>
   <Target
     Name="_flt"
-    BeforeTargets="$(fltBeforeTargets)"
-    AfterTargets="$(fltAfterTargets)"
+    BeforeTargets="Midl"
+    AfterTargets="CustomBuild"
     Condition="'@(flt)' != ''"
-    DependsOnTargets="$(fltDependsOn);ComputefltOutput"
+    DependsOnTargets="ComputefltOutput"
     Outputs="%(flt.Outputs)"
-    Inputs="%(flt.Identity);%(flt.AdditionalDependencies);$(MSBuildProjectFile)">
+    Inputs="%(flt.Identity);$(MSBuildProjectFile)">
     <ItemGroup
       Condition="'@(SelectedFiles)' != ''">
       <flt
@@ -245,7 +224,7 @@
     </ItemGroup>
     <Message
       Importance="High"
-      Text="%(flt.ExecutionDescription)" />
+      Text="%(flt.Outputs)" />
     <WriteLinesToFile
       Condition="'@(flt_tlog)' != '' and '%(flt_tlog.ExcludedFromBuild)' != 'true'"
       File="$(IntDir)$(ProjectName).write.1.tlog"
@@ -253,19 +232,8 @@
     <flt
       Condition="'@(flt)' != '' and '%(flt.ExcludedFromBuild)' != 'true'"
       CommandLineTemplate="%(flt.CommandLineTemplate)"
-      AdditionalOptions="%(flt.AdditionalOptions)"
       Inputs="%(flt.Identity)" />
   </Target>
-  <PropertyGroup>
-    <ComputeLinkInputsTargets>
-            $(ComputeLinkInputsTargets);
-            ComputefltOutput;
-          </ComputeLinkInputsTargets>
-    <ComputeLibInputsTargets>
-            $(ComputeLibInputsTargets);
-            ComputefltOutput;
-          </ComputeLibInputsTargets>
-  </PropertyGroup>
   <Target
     Name="ComputefltOutput"
     Condition="'@(flt)' != ''">
@@ -273,27 +241,18 @@
       <fltDirsToMake
         Condition="'@(flt)' != '' and '%(flt.ExcludedFromBuild)' != 'true'"
         Include="%(flt.Outputs)" />
-      <Link
-        Include="%(fltDirsToMake.Identity)"
-        Condition="'%(Extension)'=='.obj' or '%(Extension)'=='.res' or '%(Extension)'=='.rsc' or '%(Extension)'=='.lib'" />
-      <Lib
-        Include="%(fltDirsToMake.Identity)"
-        Condition="'%(Extension)'=='.obj' or '%(Extension)'=='.res' or '%(Extension)'=='.rsc' or '%(Extension)'=='.lib'" />
-      <ImpLib
-        Include="%(fltDirsToMake.Identity)"
-        Condition="'%(Extension)'=='.obj' or '%(Extension)'=='.res' or '%(Extension)'=='.rsc' or '%(Extension)'=='.lib'" />
     </ItemGroup>
     <MakeDir
       Directories="@(fltDirsToMake-&gt;'%(RootDir)%(Directory)')" />
   </Target>
   <Target
     Name="_PrintTemplate"
-    BeforeTargets="$(PrintTemplateBeforeTargets)"
-    AfterTargets="$(PrintTemplateAfterTargets)"
+    BeforeTargets="Midl"
+    AfterTargets="CustomBuild"
     Condition="'@(PrintTemplate)' != ''"
-    DependsOnTargets="$(PrintTemplateDependsOn);ComputePrintTemplateOutput"
+    DependsOnTargets="ComputePrintTemplateOutput"
     Outputs="%(PrintTemplate.Outputs)"
-    Inputs="%(PrintTemplate.Identity);%(PrintTemplate.AdditionalDependencies);$(MSBuildProjectFile)">
+    Inputs="%(PrintTemplate.Identity);$(MSBuildProjectFile)">
     <ItemGroup
       Condition="'@(SelectedFiles)' != ''">
       <PrintTemplate
@@ -309,7 +268,7 @@
     </ItemGroup>
     <Message
       Importance="High"
-      Text="%(PrintTemplate.ExecutionDescription)" />
+      Text="%(PrintTemplate.Outputs)" />
     <WriteLinesToFile
       Condition="'@(PrintTemplate_tlog)' != '' and '%(PrintTemplate_tlog.ExcludedFromBuild)' != 'true'"
       File="$(IntDir)$(ProjectName).write.1.tlog"
@@ -317,19 +276,8 @@
     <PrintTemplate
       Condition="'@(PrintTemplate)' != '' and '%(PrintTemplate.ExcludedFromBuild)' != 'true'"
       CommandLineTemplate="%(PrintTemplate.CommandLineTemplate)"
-      AdditionalOptions="%(PrintTemplate.AdditionalOptions)"
       Inputs="%(PrintTemplate.Identity)" />
   </Target>
-  <PropertyGroup>
-    <ComputeLinkInputsTargets>
-            $(ComputeLinkInputsTargets);
-            ComputePrintTemplateOutput;
-          </ComputeLinkInputsTargets>
-    <ComputeLibInputsTargets>
-            $(ComputeLibInputsTargets);
-            ComputePrintTemplateOutput;
-          </ComputeLibInputsTargets>
-  </PropertyGroup>
   <Target
     Name="ComputePrintTemplateOutput"
     Condition="'@(PrintTemplate)' != ''">
@@ -337,27 +285,18 @@
       <PrintTemplateDirsToMake
         Condition="'@(PrintTemplate)' != '' and '%(PrintTemplate.ExcludedFromBuild)' != 'true'"
         Include="%(PrintTemplate.Outputs)" />
-      <Link
-        Include="%(PrintTemplateDirsToMake.Identity)"
-        Condition="'%(Extension)'=='.obj' or '%(Extension)'=='.res' or '%(Extension)'=='.rsc' or '%(Extension)'=='.lib'" />
-      <Lib
-        Include="%(PrintTemplateDirsToMake.Identity)"
-        Condition="'%(Extension)'=='.obj' or '%(Extension)'=='.res' or '%(Extension)'=='.rsc' or '%(Extension)'=='.lib'" />
-      <ImpLib
-        Include="%(PrintTemplateDirsToMake.Identity)"
-        Condition="'%(Extension)'=='.obj' or '%(Extension)'=='.res' or '%(Extension)'=='.rsc' or '%(Extension)'=='.lib'" />
     </ItemGroup>
     <MakeDir
       Directories="@(PrintTemplateDirsToMake-&gt;'%(RootDir)%(Directory)')" />
   </Target>
   <Target
     Name="_FileTransform"
-    BeforeTargets="$(FileTransformBeforeTargets)"
-    AfterTargets="$(FileTransformAfterTargets)"
+    BeforeTargets="Midl"
+    AfterTargets="CustomBuild"
     Condition="'@(FileTransform)' != ''"
-    DependsOnTargets="$(FileTransformDependsOn);ComputeFileTransformOutput"
+    DependsOnTargets="ComputeFileTransformOutput"
     Outputs="%(FileTransform.Outputs)"
-    Inputs="%(FileTransform.Identity);%(FileTransform.AdditionalDependencies);$(MSBuildProjectFile)">
+    Inputs="%(FileTransform.Identity);$(MSBuildProjectFile)">
     <ItemGroup
       Condition="'@(SelectedFiles)' != ''">
       <FileTransform
@@ -373,7 +312,7 @@
     </ItemGroup>
     <Message
       Importance="High"
-      Text="%(FileTransform.ExecutionDescription)" />
+      Text="%(FileTransform.Outputs)" />
     <WriteLinesToFile
       Condition="'@(FileTransform_tlog)' != '' and '%(FileTransform_tlog.ExcludedFromBuild)' != 'true'"
       File="$(IntDir)$(ProjectName).write.1.tlog"
@@ -381,19 +320,8 @@
     <FileTransform
       Condition="'@(FileTransform)' != '' and '%(FileTransform.ExcludedFromBuild)' != 'true'"
       CommandLineTemplate="%(FileTransform.CommandLineTemplate)"
-      AdditionalOptions="%(FileTransform.AdditionalOptions)"
       Inputs="%(FileTransform.Identity)" />
   </Target>
-  <PropertyGroup>
-    <ComputeLinkInputsTargets>
-            $(ComputeLinkInputsTargets);
-            ComputeFileTransformOutput;
-          </ComputeLinkInputsTargets>
-    <ComputeLibInputsTargets>
-            $(ComputeLibInputsTargets);
-            ComputeFileTransformOutput;
-          </ComputeLibInputsTargets>
-  </PropertyGroup>
   <Target
     Name="ComputeFileTransformOutput"
     Condition="'@(FileTransform)' != ''">
@@ -401,27 +329,18 @@
       <FileTransformDirsToMake
         Condition="'@(FileTransform)' != '' and '%(FileTransform.ExcludedFromBuild)' != 'true'"
         Include="%(FileTransform.Outputs)" />
-      <Link
-        Include="%(FileTransformDirsToMake.Identity)"
-        Condition="'%(Extension)'=='.obj' or '%(Extension)'=='.res' or '%(Extension)'=='.rsc' or '%(Extension)'=='.lib'" />
-      <Lib
-        Include="%(FileTransformDirsToMake.Identity)"
-        Condition="'%(Extension)'=='.obj' or '%(Extension)'=='.res' or '%(Extension)'=='.rsc' or '%(Extension)'=='.lib'" />
-      <ImpLib
-        Include="%(FileTransformDirsToMake.Identity)"
-        Condition="'%(Extension)'=='.obj' or '%(Extension)'=='.res' or '%(Extension)'=='.rsc' or '%(Extension)'=='.lib'" />
     </ItemGroup>
     <MakeDir
       Directories="@(FileTransformDirsToMake-&gt;'%(RootDir)%(Directory)')" />
   </Target>
   <Target
     Name="_PluginMoniker"
-    BeforeTargets="$(PluginMonikerBeforeTargets)"
-    AfterTargets="$(PluginMonikerAfterTargets)"
+    BeforeTargets="Midl"
+    AfterTargets="CustomBuild"
     Condition="'@(PluginMoniker)' != ''"
-    DependsOnTargets="$(PluginMonikerDependsOn);ComputePluginMonikerOutput"
+    DependsOnTargets="ComputePluginMonikerOutput"
     Outputs="%(PluginMoniker.Outputs)"
-    Inputs="%(PluginMoniker.Identity);%(PluginMoniker.AdditionalDependencies);$(MSBuildProjectFile)">
+    Inputs="%(PluginMoniker.Identity);$(MSBuildProjectFile)">
     <ItemGroup
       Condition="'@(SelectedFiles)' != ''">
       <PluginMoniker
@@ -437,7 +356,7 @@
     </ItemGroup>
     <Message
       Importance="High"
-      Text="%(PluginMoniker.ExecutionDescription)" />
+      Text="%(PluginMoniker.Outputs)" />
     <WriteLinesToFile
       Condition="'@(PluginMoniker_tlog)' != '' and '%(PluginMoniker_tlog.ExcludedFromBuild)' != 'true'"
       File="$(IntDir)$(ProjectName).write.1.tlog"
@@ -445,19 +364,8 @@
     <PluginMoniker
       Condition="'@(PluginMoniker)' != '' and '%(PluginMoniker.ExcludedFromBuild)' != 'true'"
       CommandLineTemplate="%(PluginMoniker.CommandLineTemplate)"
-      AdditionalOptions="%(PluginMoniker.AdditionalOptions)"
       Inputs="%(PluginMoniker.Identity)" />
   </Target>
-  <PropertyGroup>
-    <ComputeLinkInputsTargets>
-            $(ComputeLinkInputsTargets);
-            ComputePluginMonikerOutput;
-          </ComputeLinkInputsTargets>
-    <ComputeLibInputsTargets>
-            $(ComputeLibInputsTargets);
-            ComputePluginMonikerOutput;
-          </ComputeLibInputsTargets>
-  </PropertyGroup>
   <Target
     Name="ComputePluginMonikerOutput"
     Condition="'@(PluginMoniker)' != ''">
@@ -465,27 +373,18 @@
       <PluginMonikerDirsToMake
         Condition="'@(PluginMoniker)' != '' and '%(PluginMoniker.ExcludedFromBuild)' != 'true'"
         Include="%(PluginMoniker.Outputs)" />
-      <Link
-        Include="%(PluginMonikerDirsToMake.Identity)"
-        Condition="'%(Extension)'=='.obj' or '%(Extension)'=='.res' or '%(Extension)'=='.rsc' or '%(Extension)'=='.lib'" />
-      <Lib
-        Include="%(PluginMonikerDirsToMake.Identity)"
-        Condition="'%(Extension)'=='.obj' or '%(Extension)'=='.res' or '%(Extension)'=='.rsc' or '%(Extension)'=='.lib'" />
-      <ImpLib
-        Include="%(PluginMonikerDirsToMake.Identity)"
-        Condition="'%(Extension)'=='.obj' or '%(Extension)'=='.res' or '%(Extension)'=='.rsc' or '%(Extension)'=='.lib'" />
     </ItemGroup>
     <MakeDir
       Directories="@(PluginMonikerDirsToMake-&gt;'%(RootDir)%(Directory)')" />
   </Target>
   <Target
     Name="_EditorScript"
-    BeforeTargets="$(EditorScriptBeforeTargets)"
-    AfterTargets="$(EditorScriptAfterTargets)"
+    BeforeTargets="Midl"
+    AfterTargets="CustomBuild"
     Condition="'@(EditorScript)' != ''"
-    DependsOnTargets="$(EditorScriptDependsOn);ComputeEditorScriptOutput"
+    DependsOnTargets="ComputeEditorScriptOutput"
     Outputs="%(EditorScript.Outputs)"
-    Inputs="%(EditorScript.Identity);%(EditorScript.AdditionalDependencies);$(MSBuildProjectFile)">
+    Inputs="%(EditorScript.Identity);$(MSBuildProjectFile)">
     <ItemGroup
       Condition="'@(SelectedFiles)' != ''">
       <EditorScript
@@ -501,7 +400,7 @@
     </ItemGroup>
     <Message
       Importance="High"
-      Text="%(EditorScript.ExecutionDescription)" />
+      Text="%(EditorScript.Outputs)" />
     <WriteLinesToFile
       Condition="'@(EditorScript_tlog)' != '' and '%(EditorScript_tlog.ExcludedFromBuild)' != 'true'"
       File="$(IntDir)$(ProjectName).write.1.tlog"
@@ -512,16 +411,6 @@
       AdditionalOptions="%(EditorScript.AdditionalOptions)"
       Inputs="%(EditorScript.Identity)" />
   </Target>
-  <PropertyGroup>
-    <ComputeLinkInputsTargets>
-            $(ComputeLinkInputsTargets);
-            ComputeEditorScriptOutput;
-          </ComputeLinkInputsTargets>
-    <ComputeLibInputsTargets>
-            $(ComputeLibInputsTargets);
-            ComputeEditorScriptOutput;
-          </ComputeLibInputsTargets>
-  </PropertyGroup>
   <Target
     Name="ComputeEditorScriptOutput"
     Condition="'@(EditorScript)' != ''">
@@ -529,27 +418,18 @@
       <EditorScriptDirsToMake
         Condition="'@(EditorScript)' != '' and '%(EditorScript.ExcludedFromBuild)' != 'true'"
         Include="%(EditorScript.Outputs)" />
-      <Link
-        Include="%(EditorScriptDirsToMake.Identity)"
-        Condition="'%(Extension)'=='.obj' or '%(Extension)'=='.res' or '%(Extension)'=='.rsc' or '%(Extension)'=='.lib'" />
-      <Lib
-        Include="%(EditorScriptDirsToMake.Identity)"
-        Condition="'%(Extension)'=='.obj' or '%(Extension)'=='.res' or '%(Extension)'=='.rsc' or '%(Extension)'=='.lib'" />
-      <ImpLib
-        Include="%(EditorScriptDirsToMake.Identity)"
-        Condition="'%(Extension)'=='.obj' or '%(Extension)'=='.res' or '%(Extension)'=='.rsc' or '%(Extension)'=='.lib'" />
     </ItemGroup>
     <MakeDir
       Directories="@(EditorScriptDirsToMake-&gt;'%(RootDir)%(Directory)')" />
   </Target>
   <Target
     Name="_docs"
-    BeforeTargets="$(docsBeforeTargets)"
-    AfterTargets="$(docsAfterTargets)"
+    BeforeTargets="Midl"
+    AfterTargets="CustomBuild"
     Condition="'@(docs)' != ''"
-    DependsOnTargets="$(docsDependsOn);ComputedocsOutput"
+    DependsOnTargets="ComputedocsOutput"
     Outputs="%(docs.Outputs)"
-    Inputs="%(docs.Identity);%(docs.AdditionalDependencies);$(MSBuildProjectFile)">
+    Inputs="%(docs.Identity);$(MSBuildProjectFile)">
     <ItemGroup
       Condition="'@(SelectedFiles)' != ''">
       <docs
@@ -565,7 +445,7 @@
     </ItemGroup>
     <Message
       Importance="High"
-      Text="%(docs.ExecutionDescription)" />
+      Text="%(docs.Outputs)" />
     <WriteLinesToFile
       Condition="'@(docs_tlog)' != '' and '%(docs_tlog.ExcludedFromBuild)' != 'true'"
       File="$(IntDir)$(ProjectName).write.1.tlog"
@@ -576,16 +456,6 @@
       AdditionalOptions="%(docs.AdditionalOptions)"
       Inputs="%(docs.Identity)" />
   </Target>
-  <PropertyGroup>
-    <ComputeLinkInputsTargets>
-            $(ComputeLinkInputsTargets);
-            ComputedocsOutput;
-          </ComputeLinkInputsTargets>
-    <ComputeLibInputsTargets>
-            $(ComputeLibInputsTargets);
-            ComputedocsOutput;
-          </ComputeLibInputsTargets>
-  </PropertyGroup>
   <Target
     Name="ComputedocsOutput"
     Condition="'@(docs)' != ''">
@@ -593,27 +463,18 @@
       <docsDirsToMake
         Condition="'@(docs)' != '' and '%(docs.ExcludedFromBuild)' != 'true'"
         Include="%(docs.Outputs)" />
-      <Link
-        Include="%(docsDirsToMake.Identity)"
-        Condition="'%(Extension)'=='.obj' or '%(Extension)'=='.res' or '%(Extension)'=='.rsc' or '%(Extension)'=='.lib'" />
-      <Lib
-        Include="%(docsDirsToMake.Identity)"
-        Condition="'%(Extension)'=='.obj' or '%(Extension)'=='.res' or '%(Extension)'=='.rsc' or '%(Extension)'=='.lib'" />
-      <ImpLib
-        Include="%(docsDirsToMake.Identity)"
-        Condition="'%(Extension)'=='.obj' or '%(Extension)'=='.res' or '%(Extension)'=='.rsc' or '%(Extension)'=='.lib'" />
     </ItemGroup>
     <MakeDir
       Directories="@(docsDirsToMake-&gt;'%(RootDir)%(Directory)')" />
   </Target>
   <Target
     Name="_setup"
-    BeforeTargets="$(setupBeforeTargets)"
-    AfterTargets="$(setupAfterTargets)"
+    BeforeTargets="Midl"
+    AfterTargets="CustomBuild"
     Condition="'@(setup)' != ''"
-    DependsOnTargets="$(setupDependsOn);ComputesetupOutput"
+    DependsOnTargets="ComputesetupOutput"
     Outputs="%(setup.Outputs)"
-    Inputs="%(setup.Identity);%(setup.AdditionalDependencies);$(MSBuildProjectFile)">
+    Inputs="%(setup.Identity);$(MSBuildProjectFile)">
     <ItemGroup
       Condition="'@(SelectedFiles)' != ''">
       <setup
@@ -629,7 +490,7 @@
     </ItemGroup>
     <Message
       Importance="High"
-      Text="%(setup.ExecutionDescription)" />
+      Text="%(setup.Outputs)" />
     <WriteLinesToFile
       Condition="'@(setup_tlog)' != '' and '%(setup_tlog.ExcludedFromBuild)' != 'true'"
       File="$(IntDir)$(ProjectName).write.1.tlog"
@@ -640,16 +501,6 @@
       AdditionalOptions="%(setup.AdditionalOptions)"
       Inputs="%(setup.Identity)" />
   </Target>
-  <PropertyGroup>
-    <ComputeLinkInputsTargets>
-            $(ComputeLinkInputsTargets);
-            ComputesetupOutput;
-          </ComputeLinkInputsTargets>
-    <ComputeLibInputsTargets>
-            $(ComputeLibInputsTargets);
-            ComputesetupOutput;
-          </ComputeLibInputsTargets>
-  </PropertyGroup>
   <Target
     Name="ComputesetupOutput"
     Condition="'@(setup)' != ''">
@@ -657,15 +508,6 @@
       <setupDirsToMake
         Condition="'@(setup)' != '' and '%(setup.ExcludedFromBuild)' != 'true'"
         Include="%(setup.Outputs)" />
-      <Link
-        Include="%(setupDirsToMake.Identity)"
-        Condition="'%(Extension)'=='.obj' or '%(Extension)'=='.res' or '%(Extension)'=='.rsc' or '%(Extension)'=='.lib'" />
-      <Lib
-        Include="%(setupDirsToMake.Identity)"
-        Condition="'%(Extension)'=='.obj' or '%(Extension)'=='.res' or '%(Extension)'=='.rsc' or '%(Extension)'=='.lib'" />
-      <ImpLib
-        Include="%(setupDirsToMake.Identity)"
-        Condition="'%(Extension)'=='.obj' or '%(Extension)'=='.res' or '%(Extension)'=='.rsc' or '%(Extension)'=='.lib'" />
     </ItemGroup>
     <MakeDir
       Directories="@(setupDirsToMake-&gt;'%(RootDir)%(Directory)')" />
