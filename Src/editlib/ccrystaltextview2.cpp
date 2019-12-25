@@ -135,18 +135,10 @@ void CCrystalTextView::MoveRight(BOOL bSelect)
 void CCrystalTextView::MoveWordLeft(BOOL bSelect)
 {
 	PrepareSelBounds();
-	if (m_ptDrawSelStart != m_ptDrawSelEnd && !bSelect)
+	if (m_ptDrawSelStart != m_ptDrawSelEnd && !bSelect || m_ptCursorPos.x == 0)
 	{
 		MoveLeft(bSelect);
 		return;
-	}
-
-	if (m_ptCursorPos.x == 0)
-	{
-		if (m_ptCursorPos.y == 0)
-			return;
-		--m_ptCursorPos.y;
-		m_ptCursorPos.x = GetLineLength(m_ptCursorPos.y);
 	}
 
 	LPCTSTR pszChars = GetLineChars(m_ptCursorPos.y);
@@ -184,28 +176,14 @@ void CCrystalTextView::MoveWordLeft(BOOL bSelect)
 void CCrystalTextView::MoveWordRight(BOOL bSelect)
 {
 	PrepareSelBounds();
-	if (m_ptDrawSelStart != m_ptDrawSelEnd && !bSelect)
+	int const nLength = GetLineLength(m_ptCursorPos.y);
+	if (m_ptDrawSelStart != m_ptDrawSelEnd && !bSelect || m_ptCursorPos.x == nLength)
 	{
 		MoveRight(bSelect);
 		return;
 	}
 
-	if (m_ptCursorPos.x == GetLineLength (m_ptCursorPos.y))
-	{
-		if (m_ptCursorPos.y == GetLineCount() - 1)
-			return;
-		++m_ptCursorPos.y;
-		m_ptCursorPos.x = 0;
-	}
-
-	const int nLength = GetLineLength(m_ptCursorPos.y);
-	if (m_ptCursorPos.x == nLength)
-	{
-		MoveRight(bSelect);
-		return;
-	}
-
-	const LPCTSTR pszChars = GetLineChars(m_ptCursorPos.y);
+	LPCTSTR const pszChars = GetLineChars(m_ptCursorPos.y);
 	int nPos = m_ptCursorPos.x;
 	if (xisalnum(pszChars[nPos]))
 	{
@@ -546,7 +524,7 @@ void CCrystalTextView::OnLButtonDown(WPARAM wParam, LPARAM lParam)
 	POINTSTOPOINT(point, lParam);
 	SetFocus();
 
-	if (point.x < GetMarginWidth() || KillTimer(m_nTripleClickTimer))
+	if (KillTimer(m_nTripleClickTimer) || point.x < GetMarginWidth())
 	{
 		if (wParam & MK_CONTROL)
 		{
