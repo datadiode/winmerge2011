@@ -49,7 +49,6 @@ private:
 public:
 	explicit CFindTextDlg(CCrystalTextView *);
 
-	POINT m_ptCurrentPos;
 	bool m_bConfirmed;
 
 	// Dialog Data

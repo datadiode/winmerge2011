@@ -3314,8 +3314,6 @@ void CCrystalTextView::OnEditFind()
 	}
 
 	// Execute Find dialog
-	dlg.m_ptCurrentPos = m_ptCursorPos; // Search from cursor position
-
 	// m_bShowInactiveSelection = TRUE; // FP: removed because I like it
 	LanguageSelect.DoModal(dlg);
 	// m_bShowInactiveSelection = FALSE; // FP: removed because I like it
@@ -3376,7 +3374,7 @@ void CCrystalTextView::OnEditRepeat()
 		if (FindText(sText.c_str(), ptSearchPos, m_dwLastSearchFlags,
 			(m_dwLastSearchFlags & FIND_NO_WRAP) == 0, ptFoundPos, captures) < 0)
 		{
-			LanguageSelect.Format(IDS_EDIT_TEXT_NOT_FOUND, sText.c_str()).MsgBox();
+			LanguageSelect.Format(IDS_EDIT_TEXT_NOT_FOUND, sText.c_str()).MsgBox(MB_ICONINFORMATION);
 			return;
 		}
 		HighlightText(ptFoundPos, m_nLastFindWhatLen, (m_dwLastSearchFlags & FIND_DIRECTION_UP) != 0);

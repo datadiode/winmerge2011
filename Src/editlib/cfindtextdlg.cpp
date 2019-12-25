@@ -142,18 +142,21 @@ void CFindTextDlg::OnOK()
 		bCursorToLeft = TRUE;
 	}
 	m_pCbFindText->SaveState(_T("Files\\FindInFile"));
-	POINT ptTextPos;
+
+	POINT ptFoundPos, ptSearchPos;
+
+	if (dwSearchFlags & FIND_DIRECTION_UP)
+		m_pBuddy->GetSelection(ptSearchPos, ptFoundPos);
+	else
+		m_pBuddy->GetSelection(ptFoundPos, ptSearchPos);
+
 	Captures captures;
-	if (m_pBuddy->FindText(m_sText.c_str(), m_ptCurrentPos, dwSearchFlags, !m_bNoWrap, ptTextPos, captures) < 0)
+	if (m_pBuddy->FindText(m_sText.c_str(), ptSearchPos, dwSearchFlags, !m_bNoWrap, ptFoundPos, captures) < 0)
 	{
-		LanguageSelect.Format(
-			IDS_EDIT_TEXT_NOT_FOUND, m_sText.c_str()
-		).MsgBox(MB_ICONINFORMATION);
-		m_ptCurrentPos.x = 0;
-		m_ptCurrentPos.y = 0;
+		LanguageSelect.Format(IDS_EDIT_TEXT_NOT_FOUND, m_sText.c_str()).MsgBox(MB_ICONINFORMATION);
 		return;
 	}
-	m_pBuddy->HighlightText(ptTextPos, m_pBuddy->m_nLastFindWhatLen, bCursorToLeft);
+	m_pBuddy->HighlightText(ptFoundPos, m_pBuddy->m_nLastFindWhatLen, bCursorToLeft);
 	EndDialog(IDOK);
 }
 
