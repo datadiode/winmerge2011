@@ -515,8 +515,8 @@ void CCrystalTextBuffer::InternalDeleteText(CCrystalTextView *pSource,
 	else
 	{
 		// delete multiple lines
-		const int nRestCount = m_aLines[nEndLine].FullLength() - nEndChar;
-		String sTail(m_aLines[nEndLine].GetLine(nEndChar), nRestCount);
+		int const nRestCount = m_aLines[nEndLine].FullLength() - nEndChar;
+		String const sTail(m_aLines[nEndLine].GetLine(nEndChar), nRestCount);
 
 		vector<LineInfo>::iterator iterBegin = m_aLines.begin() + nStartLine + 1;
 		vector<LineInfo>::iterator iterEnd = m_aLines.begin() + nEndLine + 1;
@@ -525,10 +525,7 @@ void CCrystalTextBuffer::InternalDeleteText(CCrystalTextView *pSource,
 
 		//  nEndLine is no more valid
 		m_aLines[nStartLine].DeleteEnd(nStartChar);
-		if (nRestCount > 0)
-		{
-			AppendLine(nStartLine, sTail.c_str(), sTail.length());
-		}
+		AppendLine(nStartLine, sTail.c_str(), sTail.length());
 		if (pSource)
 			UpdateViews(pSource, &context, UPDATE_HORZRANGE | UPDATE_VERTRANGE, nStartLine);
 	}
@@ -539,24 +536,6 @@ void CCrystalTextBuffer::InternalDeleteText(CCrystalTextView *pSource,
 	m_ptLastChange = context.m_ptStart;
 	//END SW
 }
-
-// Remove the last [bytes] characters from specified line, and return them
-// (EOL characters are included)
-String CCrystalTextBuffer::StripTail(int i, int bytes)
-{
-	LineInfo & li = m_aLines[i];
-	// Must at least take off the EOL characters
-	ASSERT(bytes >= li.FullLength() - li.Length());
-
-	const int offset = li.FullLength() - bytes;
-	// Must not take off more than exist
-	ASSERT(offset >= 0);
-
-	String ret(li.GetLine(offset), bytes);
-	li.DeleteEnd(offset);
-	return ret;
-}
-
 
 /**
  * @brief Insert text to the buffer.
@@ -592,28 +571,24 @@ POINT CCrystalTextBuffer::InternalInsertText(CCrystalTextView *pSource,
 	int nEndLine = 0;
 	int nEndChar = 0;
 
-	int nRestCount = GetFullLineLength(nLine) - nPos;
-	String sTail;
-	if (nRestCount > 0)
-	{
-		// remove end of line (we'll put it back on afterwards)
-		sTail = StripTail(nLine, nRestCount);
-	}
+	int const nRestCount = m_aLines[nLine].FullLength() - nPos;
+	String const sTail(m_aLines[nLine].GetLine(nPos), nRestCount);
+	// remove end of line (we'll put it back on afterwards)
+	m_aLines[nLine].DeleteEnd(nPos);
 
 	int nInsertedLines = 0;
 	int nCurrentLine = nLine;
-	int nTextPos;
 	for (;;)
 	{
-		int haseol = 0;
-		nTextPos = 0;
+		bool haseol = false;
+		int nTextPos = 0;
 		// advance to end of line
 		while (nTextPos < cchText && !LineInfo::IsEol(pszText[nTextPos]))
 			nTextPos++;
 		// advance after EOL of line
 		if (nTextPos < cchText)
 		{
-			haseol = 1;
+			haseol = true;
 			LPCTSTR eol = &pszText[nTextPos];
 			nTextPos++;
 			if (nTextPos < cchText && LineInfo::IsDosEol(eol))
@@ -654,7 +629,7 @@ POINT CCrystalTextBuffer::InternalInsertText(CCrystalTextView *pSource,
 					nInsertedLines++;
 				}
 				else
-					AppendLine(nEndLine, sTail.c_str(), nRestCount);
+					AppendLine(nEndLine, sTail.c_str(), sTail.length());
 			}
 			if (nEndLine == GetLineCount())
 			{

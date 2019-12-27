@@ -184,7 +184,6 @@ protected:
 	// Implementation
 	POINT InternalInsertText(CCrystalTextView *, int nLine, int nPos, LPCTSTR pszText, int cchText);
 	void InternalDeleteText(CCrystalTextView *, int nStartLine, int nStartPos, int nEndLine, int nEndPos);
-	String StripTail(int i, int bytes);
 
 	// Operations
 public:
