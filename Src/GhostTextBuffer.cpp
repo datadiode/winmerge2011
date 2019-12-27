@@ -469,6 +469,10 @@ void CGhostTextBuffer::DeleteText(CCrystalTextView *pSource,
 	int nStartLine, int nStartChar, int nEndLine, int nEndChar, int nAction, BOOL bHistory)
 {
 	String sTextToDelete;
+	int const nLineCount = GetLineCount();
+	while (nEndLine < nLineCount - 1 && GetLineFlags(nEndLine) & LF_GHOST)
+		++nEndLine;
+
 	GetText(nStartLine, nStartChar, nEndLine, nEndChar, sTextToDelete);
 	// If there is nothing to delete, bail out.
 	if (sTextToDelete.empty())
@@ -851,7 +855,7 @@ void CGhostTextBuffer::RecomputeRealityMapping()
 /** we recompute EOL from the real line before nStartLine to nEndLine */
 void CGhostTextBuffer::RecomputeEOL(int nStartLine, int nEndLine)
 {
-	int nApparentLastRealLine = ApparentLastRealLine();
+	int const nApparentLastRealLine = ApparentLastRealLine();
 	if (nApparentLastRealLine <= nEndLine)
 	{
 		// EOL may have to change on the real line before nStartLine
