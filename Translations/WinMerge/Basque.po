@@ -24,1267 +24,1268 @@ msgstr "LANG_BASQUE, SUBLANG_DEFAULT"
 msgid "1252"
 msgstr "1252"
 
-#: Merge.rc:17
-#: Merge.rc:148
-#: Merge.rc:270
-#: Merge.rc:344
+#: Merge.rc:14
+#: Merge.rc:147
+#: Merge.rc:269
+#: Merge.rc:343
 #, c-format
 msgid "&File"
 msgstr "&Agiria"
 
-#: Merge.rc:19
-#: Merge.rc:150
-#: Merge.rc:272
-#: Merge.rc:346
+#: Merge.rc:16
+#: Merge.rc:149
+#: Merge.rc:271
+#: Merge.rc:345
 #, c-format
 msgid "&New\tCtrl+N"
 msgstr "&Berria\tCtrl+N"
 
-#: Merge.rc:20
-#: Merge.rc:151
-#: Merge.rc:273
-#: Merge.rc:347
+#: Merge.rc:17
+#: Merge.rc:150
+#: Merge.rc:272
+#: Merge.rc:346
 #, c-format
 msgid "&Open...\tCtrl+O"
 msgstr "&Ireki...\tCtrl+O"
 
-#: Merge.rc:21
-#: Merge.rc:152
-#: Merge.rc:274
-#: Merge.rc:348
+#: Merge.rc:18
+#: Merge.rc:151
+#: Merge.rc:273
+#: Merge.rc:347
 #, c-format
 msgid "Op&en Conflict File..."
 msgstr "Ire&ki Agiri Gatazka..."
 
-#: Merge.rc:22
-#: Merge.rc:153
-#: Merge.rc:275
-#: Merge.rc:349
+#: Merge.rc:19
+#: Merge.rc:152
+#: Merge.rc:274
+#: Merge.rc:348
 #, c-format
 msgid "Start Collec&tion..."
 msgstr ""
 
-#: Merge.rc:24
-#: Merge.rc:155
-#: Merge.rc:277
-#: Merge.rc:351
+#: Merge.rc:21
+#: Merge.rc:154
+#: Merge.rc:276
+#: Merge.rc:350
 #, c-format
 msgid "Open Pro&ject...\tCtrl+J"
 msgstr "Ireki  Egit&asmoa...\tCtrl+J"
 
-#: Merge.rc:25
-#: Merge.rc:156
-#: Merge.rc:278
-#: Merge.rc:352
+#: Merge.rc:22
+#: Merge.rc:155
+#: Merge.rc:277
+#: Merge.rc:351
 #, c-format
 msgid "Sa&ve Project..."
 msgstr "Gor&de Egitasmoa..."
 
-#: Merge.rc:27
-#: Merge.rc:158
-#: Merge.rc:280
-#: Merge.rc:354
+#: Merge.rc:24
+#: Merge.rc:157
+#: Merge.rc:279
+#: Merge.rc:353
 #, c-format
 msgid "Recent Projects"
 msgstr "Azken Egitasmoak"
 
-#: Merge.rc:29
-#: Merge.rc:370
+#: Merge.rc:26
+#: Merge.rc:369
 #, c-format
 msgid "L&eft Read-only"
 msgstr "Ezkerra Irakurri-bakarrik"
 
-#: Merge.rc:30
-#: Merge.rc:371
+#: Merge.rc:27
+#: Merge.rc:370
 #, c-format
 msgid "Ri&ght Read-only"
 msgstr "Eskuina Irakurri-bakarrik"
 
-#: Merge.rc:32
+#: Merge.rc:29
 #, c-format
 msgid "Collect &Mode\tF9"
 msgstr ""
 
-#: Merge.rc:34
+#: Merge.rc:31
 #, c-format
 msgid "File En&coding"
 msgstr "Agiri Ko&deaketa"
 
-#: Merge.rc:36
-#: Merge.rc:172
-#: Merge.rc:284
-#: Merge.rc:384
+#: Merge.rc:33
+#: Merge.rc:171
+#: Merge.rc:283
+#: Merge.rc:383
 #, c-format
 msgid "E&xit"
 msgstr "Ir&ten"
 
-#: Merge.rc:38
-#: Merge.rc:174
-#: Merge.rc:286
-#: Merge.rc:386
+#: Merge.rc:35
+#: Merge.rc:173
+#: Merge.rc:285
+#: Merge.rc:385
 #, c-format
 msgid "&Edit"
 msgstr "&Editatu"
 
-#: Merge.rc:40
-#: Merge.rc:183
-#: Merge.rc:396
+#: Merge.rc:37
+#: Merge.rc:182
+#: Merge.rc:395
 #, c-format
 msgid "Select &All\tCtrl+A"
 msgstr "Hautatu &Denak\t Ctrl+A"
 
-#: Merge.rc:42
-#: Merge.rc:188
-#: Merge.rc:288
-#: Merge.rc:414
+#: Merge.rc:39
+#: Merge.rc:187
+#: Merge.rc:287
+#: Merge.rc:413
 #, c-format
 msgid "&Options..."
 msgstr "&Aukerak..."
 
-#: Merge.rc:44
-#: Merge.rc:190
-#: Merge.rc:290
-#: Merge.rc:416
+#: Merge.rc:41
+#: Merge.rc:189
+#: Merge.rc:289
+#: Merge.rc:415
 #, c-format
 msgid "&View"
 msgstr "&Ikusi"
 
-#: Merge.rc:46
+#: Merge.rc:43
 #, c-format
 msgid "Show &Identical Items"
 msgstr "Erakutsi Gai &Berdinak"
 
-#: Merge.rc:47
+#: Merge.rc:44
 #, c-format
 msgid "Show &Different Items"
 msgstr "Erakutsi Gai &Ezberdinak"
 
-#: Merge.rc:48
+#: Merge.rc:45
 #, c-format
 msgid "Show L&eft Unique Items"
 msgstr "Erakutsi E&zkerreko Unique gaiak"
 
-#: Merge.rc:49
+#: Merge.rc:46
 #, c-format
 msgid "Show Ri&ght Unique Items"
 msgstr "Erakutsi E&skuineko Unique gaiak"
 
-#: Merge.rc:50
+#: Merge.rc:47
 #, c-format
 msgid "Show S&kipped Items"
 msgstr "Erakutsi &Jauzitako Gaiak"
 
-#: Merge.rc:51
+#: Merge.rc:48
 #, c-format
 msgid "S&how Binary Files"
 msgstr "&Erakutsi Agiri Binarioak"
 
-#: Merge.rc:53
+#: Merge.rc:50
 #, c-format
 msgid "Show Hidd&en Items"
 msgstr "Erakutsi E&zkutatutako Gaiak"
 
-#: Merge.rc:55
+#: Merge.rc:52
 #, c-format
 msgid "Tree &Mode"
 msgstr "Zuhaitz &Modua"
 
-#: Merge.rc:56
+#: Merge.rc:53
 #, c-format
 msgid "E&xpand All Subfolders"
 msgstr "H&edatu Azpiagiritegi Guztiak"
 
-#: Merge.rc:57
+#: Merge.rc:54
 #, c-format
 msgid "&Collapse All Subfolders"
 msgstr "&Azpiagiritegi Denak Erauzi"
 
-#: Merge.rc:59
-#: Merge.rc:292
-#: Merge.rc:418
+#: Merge.rc:56
+#: Merge.rc:291
+#: Merge.rc:417
 #, c-format
 msgid "Select &Font..."
 msgstr "Hautatu &Hizkia..."
 
-#: Merge.rc:60
-#: Merge.rc:293
-#: Merge.rc:419
+#: Merge.rc:57
+#: Merge.rc:292
+#: Merge.rc:418
 #, c-format
 msgid "Use Default F&ont"
 msgstr "Erabili Berezko H&izkia"
 
-#: Merge.rc:62
-#: Merge.rc:201
-#: Merge.rc:295
-#: Merge.rc:457
+#: Merge.rc:59
+#: Merge.rc:454
+#, c-format
+msgid "Sw&ap Panes\tCtrl+U"
+msgstr ""
+
+#: Merge.rc:61
+#: Merge.rc:200
+#: Merge.rc:294
+#: Merge.rc:456
 #, c-format
 msgid "&Toolbar"
 msgstr "&Tresnabarra"
+
+#: Merge.rc:63
+#: Merge.rc:202
+#: Merge.rc:296
+#: Merge.rc:458
+#, c-format
+msgid "&None"
+msgstr "&Ezer ez"
 
 #: Merge.rc:64
 #: Merge.rc:203
 #: Merge.rc:297
 #: Merge.rc:459
 #, c-format
-msgid "&None"
-msgstr "&Ezer ez"
+msgid "&Small"
+msgstr "Txiki&a"
 
 #: Merge.rc:65
 #: Merge.rc:204
 #: Merge.rc:298
 #: Merge.rc:460
 #, c-format
-msgid "&Small"
-msgstr "Txiki&a"
-
-#: Merge.rc:66
-#: Merge.rc:205
-#: Merge.rc:299
-#: Merge.rc:461
-#, c-format
 msgid "&Big"
 msgstr "&Handia"
+
+#: Merge.rc:67
+#: Merge.rc:206
+#: Merge.rc:300
+#: Merge.rc:462
+#, c-format
+msgid "&Status Bar"
+msgstr "&Egoera Barra"
 
 #: Merge.rc:68
 #: Merge.rc:207
 #: Merge.rc:301
 #: Merge.rc:463
 #, c-format
-msgid "&Status Bar"
-msgstr "&Egoera Barra"
-
-#: Merge.rc:69
-#: Merge.rc:208
-#: Merge.rc:302
-#: Merge.rc:464
-#, c-format
 msgid "Ta&b Bar"
 msgstr "&Fitxa Barra"
 
-#: Merge.rc:70
+#: Merge.rc:69
 #, c-format
-msgid "Comp&are Statistics"
+msgid "Compa&re Statistics"
 msgstr ""
 
-#: Merge.rc:72
-#: Merge.rc:210
-#: Merge.rc:304
-#: Merge.rc:468
+#: Merge.rc:71
+#: Merge.rc:209
+#: Merge.rc:303
+#: Merge.rc:467
 #, c-format
-msgid "&Language..."
+msgid "Lang&uage..."
 msgstr "&Hizkuntza"
 
-#: Merge.rc:74
-#: Merge.rc:212
-#: Merge.rc:470
+#: Merge.rc:73
+#: Merge.rc:211
+#: Merge.rc:469
 #, c-format
 msgid "Refresh\tF5"
 msgstr "Ber&ritu\tF5"
 
-#: Merge.rc:75
+#: Merge.rc:74
 #, c-format
-msgid "&Refresh Selected\tCtrl+F5"
+msgid "Refresh Se&lected\tCtrl+F5"
 msgstr "&Berritu Hautatutakoa\tCtrl+F5"
 
-#: Merge.rc:77
-#: Merge.rc:214
-#: Merge.rc:472
+#: Merge.rc:76
+#: Merge.rc:213
+#: Merge.rc:471
 #, c-format
 msgid "&Merge"
 msgstr "Ba&tu"
 
-#: Merge.rc:79
+#: Merge.rc:78
 #, c-format
 msgid "Co&mpare\tEnter"
 msgstr "&Alderatu\tEnter"
+
+#: Merge.rc:80
+#: Merge.rc:215
+#: Merge.rc:473
+#, c-format
+msgid "&Next Difference\tAlt+Down"
+msgstr "&Hurrengo Ezberdintasuna\tAlt+Down"
 
 #: Merge.rc:81
 #: Merge.rc:216
 #: Merge.rc:474
 #, c-format
-msgid "&Next Difference\tAlt+Down"
-msgstr "&Hurrengo Ezberdintasuna\tAlt+Down"
-
-#: Merge.rc:82
-#: Merge.rc:217
-#: Merge.rc:475
-#, c-format
 msgid "&Previous Difference\tAlt+Up"
 msgstr "A&urreko Ezberdintasuna\tAlt+Up"
 
-#: Merge.rc:84
-#: Merge.rc:219
-#: Merge.rc:477
+#: Merge.rc:83
+#: Merge.rc:218
+#: Merge.rc:476
 #, c-format
 msgid "&First Difference\tAlt+Home"
 msgstr "&Lehen Ezberdintasuna\tAlt+Home"
 
-#: Merge.rc:85
-#: Merge.rc:478
+#: Merge.rc:84
+#: Merge.rc:477
 #, c-format
 msgid "&Current Difference\tAlt+Enter"
 msgstr "&Uneko Ezberdintasuna\tAlt+Enter"
 
-#: Merge.rc:86
-#: Merge.rc:220
-#: Merge.rc:479
+#: Merge.rc:85
+#: Merge.rc:219
+#: Merge.rc:478
 #, c-format
 msgid "&Last Difference\tAlt+End"
 msgstr "&Azken Ezberdintasuna\tAlt+End"
+
+#: Merge.rc:87
+#: Merge.rc:221
+#: Merge.rc:480
+#, c-format
+msgid "Copy to &Right\tAlt+Right"
+msgstr "Kopiatu E&skuinera\tAlt+Right"
 
 #: Merge.rc:88
 #: Merge.rc:222
 #: Merge.rc:481
 #, c-format
-msgid "Copy to &Right\tAlt+Right"
-msgstr "Kopiatu E&skuinera\tAlt+Right"
-
-#: Merge.rc:89
-#: Merge.rc:223
-#: Merge.rc:482
-#, c-format
 msgid "Copy to L&eft\tAlt+Left"
 msgstr "Kopiatu E&zkerrera\tAlt+Left"
 
-#: Merge.rc:91
+#: Merge.rc:90
 #, c-format
 msgid "&Delete\tDel"
 msgstr "&Ezabatu\tDel"
 
-#: Merge.rc:93
-#: Merge.rc:231
-#: Merge.rc:306
-#: Merge.rc:493
+#: Merge.rc:92
+#: Merge.rc:230
+#: Merge.rc:305
+#: Merge.rc:492
 #, c-format
 msgid "&Tools"
 msgstr "&Tresnak"
 
-#: Merge.rc:95
-#: Merge.rc:630
+#: Merge.rc:94
+#: Merge.rc:629
 #, c-format
 msgid "&Customize Columns..."
 msgstr "&Antolatu Zutabeak..."
+
+#: Merge.rc:95
+#: Merge.rc:232
+#: Merge.rc:307
+#: Merge.rc:494
+#, c-format
+msgid "&Filters..."
+msgstr "&Iragazkiak..."
 
 #: Merge.rc:96
 #: Merge.rc:233
 #: Merge.rc:308
 #: Merge.rc:495
 #, c-format
-msgid "&Filters..."
-msgstr "&Iragazkiak..."
-
-#: Merge.rc:97
-#: Merge.rc:234
-#: Merge.rc:309
-#: Merge.rc:496
-#, c-format
 msgid "&Generate Patch..."
 msgstr "&Sortu Helburua..."
 
-#: Merge.rc:98
-#: Merge.rc:235
-#: Merge.rc:497
+#: Merge.rc:97
+#: Merge.rc:234
+#: Merge.rc:496
 #, c-format
 msgid "Generate &Report..."
 msgstr "Sortu &Jakinarazpena..."
 
-#: Merge.rc:99
+#: Merge.rc:98
 #, c-format
 msgid "Save to &Excel spreadsheet"
+msgstr ""
+
+#: Merge.rc:100
+#: Merge.rc:105
+#: Merge.rc:110
+#, c-format
+msgid "&All"
 msgstr ""
 
 #: Merge.rc:101
 #: Merge.rc:106
 #: Merge.rc:111
 #, c-format
-msgid "&All"
-msgstr ""
-
-#: Merge.rc:102
-#: Merge.rc:107
-#: Merge.rc:112
-#, c-format
 msgid "&Selected"
 msgstr ""
 
-#: Merge.rc:104
+#: Merge.rc:103
 #, c-format
 msgid "Show in Excel &Viewer"
 msgstr ""
 
-#: Merge.rc:109
+#: Merge.rc:108
 #, c-format
 msgid "&Print with Excel Viewer"
 msgstr ""
 
-#: Merge.rc:115
-#: Merge.rc:237
-#: Merge.rc:311
-#: Merge.rc:500
+#: Merge.rc:114
+#: Merge.rc:236
+#: Merge.rc:310
+#: Merge.rc:499
 #, c-format
 msgid "&Debug"
 msgstr "&Garbiketa"
+
+#: Merge.rc:116
+#: Merge.rc:238
+#: Merge.rc:312
+#: Merge.rc:501
+#, c-format
+msgid "&Load Config..."
+msgstr "G&ertatu Itxurapena..."
 
 #: Merge.rc:117
 #: Merge.rc:239
 #: Merge.rc:313
 #: Merge.rc:502
 #, c-format
-msgid "&Load Config..."
-msgstr "G&ertatu Itxurapena..."
-
-#: Merge.rc:118
-#: Merge.rc:240
-#: Merge.rc:314
-#: Merge.rc:503
-#, c-format
 msgid "&Reset Options"
 msgstr "&Birrezarri Aukerak"
 
-#: Merge.rc:120
-#: Merge.rc:242
-#: Merge.rc:316
-#: Merge.rc:505
+#: Merge.rc:119
+#: Merge.rc:241
+#: Merge.rc:315
+#: Merge.rc:504
 #, c-format
 msgid "&Window"
 msgstr "&Leihoa"
+
+#: Merge.rc:121
+#: Merge.rc:243
+#: Merge.rc:317
+#: Merge.rc:506
+#, c-format
+msgid "Cl&ose"
+msgstr "It&xi"
 
 #: Merge.rc:122
 #: Merge.rc:244
 #: Merge.rc:318
 #: Merge.rc:507
 #, c-format
-msgid "Cl&ose"
-msgstr "It&xi"
-
-#: Merge.rc:123
-#: Merge.rc:245
-#: Merge.rc:319
-#: Merge.rc:508
-#, c-format
 msgid "Clo&se All"
 msgstr "I&txi Denak"
 
-#: Merge.rc:125
-#: Merge.rc:247
-#: Merge.rc:321
-#: Merge.rc:510
+#: Merge.rc:124
+#: Merge.rc:246
+#: Merge.rc:320
+#: Merge.rc:509
 #, c-format
 msgid "Change &Pane\tF6"
 msgstr "Aldatu &Panela\tF6"
+
+#: Merge.rc:126
+#: Merge.rc:248
+#: Merge.rc:322
+#: Merge.rc:511
+#, c-format
+msgid "Tile &Horizontally"
+msgstr "Eradonki &Etzana"
 
 #: Merge.rc:127
 #: Merge.rc:249
 #: Merge.rc:323
 #: Merge.rc:512
 #, c-format
-msgid "Tile &Horizontally"
-msgstr "Eradonki &Etzana"
+msgid "Tile &Vertically"
+msgstr "Eradonki &Zutia"
 
 #: Merge.rc:128
 #: Merge.rc:250
 #: Merge.rc:324
 #: Merge.rc:513
 #, c-format
-msgid "Tile &Vertically"
-msgstr "Eradonki &Zutia"
-
-#: Merge.rc:129
-#: Merge.rc:251
-#: Merge.rc:325
-#: Merge.rc:514
-#, c-format
 msgid "&Cascade"
 msgstr "&Urjauzia"
 
-#: Merge.rc:131
-#: Merge.rc:253
-#: Merge.rc:327
-#: Merge.rc:516
+#: Merge.rc:130
+#: Merge.rc:252
+#: Merge.rc:326
+#: Merge.rc:515
 #: Merge.rc:1695
 #, c-format
 msgid "&Help"
 msgstr "&Laguntza"
 
-#: Merge.rc:133
-#: Merge.rc:255
-#: Merge.rc:329
-#: Merge.rc:518
+#: Merge.rc:132
+#: Merge.rc:254
+#: Merge.rc:328
+#: Merge.rc:517
 #, c-format
 msgid "&WinMerge Help\tF1"
 msgstr "&WinMerge Laguntza\tF1"
+
+#: Merge.rc:134
+#: Merge.rc:256
+#: Merge.rc:330
+#: Merge.rc:519
+#, c-format
+msgid "R&elease Notes"
+msgstr "Argitalpen &Oharrak"
 
 #: Merge.rc:135
 #: Merge.rc:257
 #: Merge.rc:331
 #: Merge.rc:520
 #, c-format
-msgid "R&elease Notes"
-msgstr "Argitalpen &Oharrak"
+msgid "&Translations"
+msgstr "It&zulpenak"
 
 #: Merge.rc:136
 #: Merge.rc:258
 #: Merge.rc:332
 #: Merge.rc:521
 #, c-format
-msgid "&Translations"
-msgstr "It&zulpenak"
-
-#: Merge.rc:137
-#: Merge.rc:259
-#: Merge.rc:333
-#: Merge.rc:522
-#, c-format
 msgid "C&onfiguration"
 msgstr "I&txurapena"
+
+#: Merge.rc:138
+#: Merge.rc:260
+#: Merge.rc:334
+#: Merge.rc:523
+#, c-format
+msgid "&GNU General Public License"
+msgstr "&GNU Baimen Publiko Orokorra "
 
 #: Merge.rc:139
 #: Merge.rc:261
 #: Merge.rc:335
 #: Merge.rc:524
 #, c-format
-msgid "&GNU General Public License"
-msgstr "&GNU Baimen Publiko Orokorra "
-
-#: Merge.rc:140
-#: Merge.rc:262
-#: Merge.rc:336
-#: Merge.rc:525
-#, c-format
 msgid "&About WinMerge..."
 msgstr "&WinMergeri buruz..."
 
-#: Merge.rc:160
-#: Merge.rc:356
+#: Merge.rc:159
+#: Merge.rc:355
 #, c-format
 msgid "&Save\tCtrl+S"
 msgstr "&Gorde\tCtrl+S"
 
-#: Merge.rc:161
-#: Merge.rc:357
+#: Merge.rc:160
+#: Merge.rc:356
 #, c-format
 msgid "Save &Left"
 msgstr "Gorde &Ezkerra"
+
+#: Merge.rc:162
+#: Merge.rc:167
+#: Merge.rc:358
+#: Merge.rc:363
+#, c-format
+msgid "&Save"
+msgstr "&Gorde"
 
 #: Merge.rc:163
 #: Merge.rc:168
 #: Merge.rc:359
 #: Merge.rc:364
 #, c-format
-msgid "&Save"
-msgstr "&Gorde"
-
-#: Merge.rc:164
-#: Merge.rc:169
-#: Merge.rc:360
-#: Merge.rc:365
-#, c-format
 msgid "Save &As..."
 msgstr "Gorde Ho&nela..."
 
-#: Merge.rc:166
-#: Merge.rc:362
+#: Merge.rc:165
+#: Merge.rc:361
 #, c-format
 msgid "Save &Right"
 msgstr "Gorde &Eskuina"
 
-#: Merge.rc:176
-#: Merge.rc:388
+#: Merge.rc:175
+#: Merge.rc:387
 #, c-format
 msgid "&Undo\tCtrl+Z"
 msgstr "&Desegin\tCtrl+Z"
 
-#: Merge.rc:177
-#: Merge.rc:389
+#: Merge.rc:176
+#: Merge.rc:388
 #, c-format
 msgid "&Redo\tCtrl+Y"
 msgstr "Birr&egin\tCtrl+Y"
 
-#: Merge.rc:179
-#: Merge.rc:391
+#: Merge.rc:178
+#: Merge.rc:390
 #, c-format
 msgid "Cu&t\tCtrl+X"
 msgstr "&Ebaki\tCtrl+X"
 
-#: Merge.rc:180
-#: Merge.rc:392
+#: Merge.rc:179
+#: Merge.rc:391
 #, c-format
 msgid "&Copy\tCtrl+C"
 msgstr "&Kopiatu\tCtrl+C"
 
-#: Merge.rc:181
-#: Merge.rc:393
+#: Merge.rc:180
+#: Merge.rc:392
 #, c-format
 msgid "&Paste\tCtrl+V"
 msgstr "&Itsatsi\tCtrl+V"
 
-#: Merge.rc:185
-#: Merge.rc:398
+#: Merge.rc:184
+#: Merge.rc:397
 #, c-format
 msgid "F&ind...\tCtrl+F"
 msgstr "&Bilatu...\tCtrl+F"
 
-#: Merge.rc:186
-#: Merge.rc:399
+#: Merge.rc:185
+#: Merge.rc:398
 #, c-format
 msgid "R&eplace...\tCtrl+H"
 msgstr "O&rdeztu...\tCtrl+H"
 
-#: Merge.rc:192
-#: Merge.rc:420
+#: Merge.rc:191
+#: Merge.rc:419
 #, c-format
 msgid "&Zoom"
 msgstr "&Zooma"
 
-#: Merge.rc:194
-#: Merge.rc:422
+#: Merge.rc:193
+#: Merge.rc:421
 #, c-format
 msgid "Zoom &In\tCtrl++"
 msgstr "Zooma &Handitu\tCtrl++"
 
-#: Merge.rc:195
-#: Merge.rc:423
+#: Merge.rc:194
+#: Merge.rc:422
 #, c-format
 msgid "Zoom &Out\tCtrl+-"
 msgstr "Zooma &Gutxitu\tCtrl+-"
 
-#: Merge.rc:196
-#: Merge.rc:424
+#: Merge.rc:195
+#: Merge.rc:423
 #, c-format
 msgid "&Normal\tCtrl+*"
 msgstr "&Normala\tCtrl+*"
 
-#: Merge.rc:199
-#: Merge.rc:447
+#: Merge.rc:198
+#: Merge.rc:446
 #, c-format
 msgid "&Lock Panes"
 msgstr "&Blokeatu Panelak"
 
-#: Merge.rc:225
-#: Merge.rc:484
+#: Merge.rc:224
+#: Merge.rc:483
 #, c-format
 msgid "C&opy to Right and Advance\tAlt+Ctrl+Right"
 msgstr "K&opiatu Eskuinera eta Aurrera egin\tAlt+Ctrl+Right"
 
-#: Merge.rc:226
-#: Merge.rc:485
+#: Merge.rc:225
+#: Merge.rc:484
 #, c-format
 msgid "Copy &to Left and Advance\tAlt+Ctrl+Left"
 msgstr "Kopiatu E&zkerrera eta Aurrera egin\tAlt+Ctrl+Right"
 
-#: Merge.rc:228
-#: Merge.rc:487
+#: Merge.rc:227
+#: Merge.rc:486
 #, c-format
 msgid "Copy &All to Right"
 msgstr "Kopiatu &Dena Eskuinera"
 
-#: Merge.rc:229
-#: Merge.rc:488
+#: Merge.rc:228
+#: Merge.rc:487
 #, c-format
 msgid "Cop&y All to Left"
 msgstr "Kopia&tu Dena Ezkerrera"
 
-#: Merge.rc:282
+#: Merge.rc:281
 #, c-format
 msgid "Use &desktop specific settings"
 msgstr ""
 
-#: Merge.rc:368
+#: Merge.rc:367
 #, c-format
 msgid "Print Previe&w"
 msgstr ""
 
-#: Merge.rc:373
+#: Merge.rc:372
 #, c-format
 msgid "&Convert Line Endings to"
 msgstr "&Bihurtu Lerro Amaierak hona"
 
-#: Merge.rc:375
+#: Merge.rc:374
 #, c-format
 msgid "&Windows (CRLF)"
 msgstr "&Windows (CRLF)"
 
-#: Merge.rc:376
+#: Merge.rc:375
 #, c-format
 msgid "&Unix (LF)"
 msgstr "&Unix (LF)"
 
-#: Merge.rc:377
+#: Merge.rc:376
 #, c-format
 msgid "&Mac (CR)"
 msgstr "&Mac (CR)"
 
-#: Merge.rc:380
+#: Merge.rc:379
 #, c-format
 msgid "&Merge Mode\tF9"
 msgstr "&Batu Modua\tF9"
 
-#: Merge.rc:382
+#: Merge.rc:381
 #, c-format
 msgid "&File Encoding..."
 msgstr "&Agiria Kodeatzen..."
 
-#: Merge.rc:395
+#: Merge.rc:394
 #, c-format
 msgid "Select Line &Difference\tF4"
 msgstr "Hautatu Lerro &Ezberdintasunak\tF4"
 
-#: Merge.rc:401
+#: Merge.rc:400
 #, c-format
 msgid "Advanced"
 msgstr "Aurreratua"
 
-#: Merge.rc:403
+#: Merge.rc:402
 #, c-format
 msgid "&Copy With Line Numbers\tCtrl+Shift+C"
 msgstr "&Kopiatu Lerro Zenbakiekin\tCtrl+Shift+C"
 
-#: Merge.rc:405
+#: Merge.rc:404
 #, c-format
 msgid "&Bookmarks"
 msgstr "&Lastermarkak"
 
-#: Merge.rc:407
+#: Merge.rc:406
 #, c-format
 msgid "&Toggle Bookmark\tCtrl+F2"
 msgstr "&Aldatu Lastermarka\tCtrl+F2"
 
-#: Merge.rc:408
+#: Merge.rc:407
 #, c-format
 msgid "&Next Bookmark\tF2"
 msgstr "&Hurrengo Lastermarka\tF2"
 
-#: Merge.rc:409
+#: Merge.rc:408
 #, c-format
 msgid "&Previous bookmark\tShift+F2"
 msgstr "&Aurreko lastermarka\tShift+F2"
 
-#: Merge.rc:410
+#: Merge.rc:409
 #, c-format
 msgid "&Clear All Bookmarks"
 msgstr "&Garbitu Lastermarka Guztiak"
 
-#: Merge.rc:412
+#: Merge.rc:411
 #, c-format
 msgid "&Go To...\tCtrl+G"
 msgstr "&Joan Hona...\tCtrl+G"
 
-#: Merge.rc:426
+#: Merge.rc:425
 #, c-format
 msgid "Syntax Highlight"
 msgstr "Joskera Nabarmentzea"
 
-#: Merge.rc:428
+#: Merge.rc:427
 #, c-format
 msgid "No Highlighting"
 msgstr "Ez Nabarmenduta"
 
-#: Merge.rc:431
+#: Merge.rc:430
 #, c-format
 msgid "&Context"
 msgstr ""
 
-#: Merge.rc:433
+#: Merge.rc:432
 #, c-format
 msgid "&Unlimited"
 msgstr ""
 
-#: Merge.rc:435
+#: Merge.rc:434
 #, c-format
 msgid "&0 Lines"
 msgstr ""
 
-#: Merge.rc:436
+#: Merge.rc:435
 #, c-format
 msgid "&1 Line"
 msgstr ""
 
-#: Merge.rc:437
+#: Merge.rc:436
 #, c-format
 msgid "&2 Lines"
 msgstr ""
 
-#: Merge.rc:438
+#: Merge.rc:437
 #, c-format
 msgid "&3 Lines"
 msgstr ""
 
-#: Merge.rc:439
+#: Merge.rc:438
 #, c-format
 msgid "&4 Lines"
 msgstr ""
 
-#: Merge.rc:440
+#: Merge.rc:439
 #, c-format
 msgid "&5 Lines"
 msgstr ""
 
-#: Merge.rc:441
+#: Merge.rc:440
 #, c-format
 msgid "&6 Lines"
 msgstr ""
 
-#: Merge.rc:442
+#: Merge.rc:441
 #, c-format
 msgid "&7 Lines"
 msgstr ""
 
-#: Merge.rc:443
+#: Merge.rc:442
 #, c-format
 msgid "&8 Lines"
 msgstr ""
 
-#: Merge.rc:444
+#: Merge.rc:443
 #, c-format
 msgid "&9 Lines"
 msgstr ""
 
-#: Merge.rc:448
+#: Merge.rc:447
 #, c-format
 msgid "&View Whitespace"
 msgstr "&Ikusi Zurigunea"
 
-#: Merge.rc:449
+#: Merge.rc:448
 #, c-format
 msgid "Vie&w Line Differences"
 msgstr "I&kusi Lerro Ezberdintasunak"
 
-#: Merge.rc:450
+#: Merge.rc:449
 #, c-format
 msgid "View Line &Numbers"
 msgstr "Ikusi Lerro &Zenbakiak"
 
-#: Merge.rc:451
+#: Merge.rc:450
 #, c-format
 msgid "View &Margins"
 msgstr "Ikusi &Bazterrak"
 
-#: Merge.rc:452
+#: Merge.rc:451
 #, c-format
 msgid "W&rap Lines"
 msgstr "I&nguratu Lerroak"
 
-#: Merge.rc:453
+#: Merge.rc:452
 #, c-format
 msgid "Separate combining characters\tCtrl+M"
 msgstr ""
 
-#: Merge.rc:455
-#, c-format
-msgid "Sw&ap Panes\tCtrl+U"
-msgstr ""
-
-#: Merge.rc:465
+#: Merge.rc:464
 #, c-format
 msgid "Diff &Pane"
 msgstr "Ezberd &Panela"
 
-#: Merge.rc:466
+#: Merge.rc:465
 #, c-format
 msgid "Lo&cation Pane"
 msgstr "&Kokaleku Panela"
 
-#: Merge.rc:490
+#: Merge.rc:489
 #, c-format
 msgid "&Synchronization Point\tAlt+S"
 msgstr ""
 
-#: Merge.rc:491
+#: Merge.rc:490
 #, c-format
 msgid "Clear Sync&hronization Points"
 msgstr ""
 
-#: Merge.rc:498
+#: Merge.rc:497
 #, c-format
 msgid "Compare &Selection..."
 msgstr ""
 
-#: Merge.rc:535
+#: Merge.rc:534
 #: Merge.rc:1004
 #, c-format
 msgid "W&hitespaces"
 msgstr "Zurig&uneak"
 
-#: Merge.rc:537
+#: Merge.rc:536
 #: Merge.rc:1005
 #: Merge.rc:1356
 #, c-format
 msgid "Ignore &tab expansion"
 msgstr ""
 
-#: Merge.rc:538
+#: Merge.rc:537
 #: Merge.rc:1006
 #, c-format
 msgid "Ignore t&railing space"
 msgstr ""
 
-#: Merge.rc:539
+#: Merge.rc:538
 #: Merge.rc:1007
 #, c-format
 msgid "Com&pare"
 msgstr "Al&deratu"
 
-#: Merge.rc:540
+#: Merge.rc:539
 #: Merge.rc:1008
 #, c-format
 msgid "I&gnore changes"
 msgstr "&Ezikusi aldaketak"
 
-#: Merge.rc:541
+#: Merge.rc:540
 #: Merge.rc:1009
 #, c-format
 msgid "Ig&nore all"
 msgstr "E&zikusi denak"
 
-#: Merge.rc:543
+#: Merge.rc:542
 #: Merge.rc:1012
 #: Merge.rc:1362
 #, c-format
 msgid "Ignore c&ase"
 msgstr "Ezikusi &kasua"
 
-#: Merge.rc:544
+#: Merge.rc:543
 #: Merge.rc:1363
 #, c-format
 msgid "Igno&re carriage return differences (Windows/Unix/Mac)"
 msgstr "Ezikusi gurdi itzulera ezberdintasunak (Windows/Unix/Mac)"
 
-#: Merge.rc:545
+#: Merge.rc:544
 #: Merge.rc:1385
 #, c-format
 msgid "&Compare method:"
 msgstr ""
 
-#: Merge.rc:547
+#: Merge.rc:546
 #: Merge.rc:1720
 #, c-format
 msgid "Full Contents"
 msgstr "Eduki Denak"
 
-#: Merge.rc:548
+#: Merge.rc:547
 #: Merge.rc:1721
 #, c-format
 msgid "Quick Contents"
 msgstr "Eduki Azkarrak"
 
-#: Merge.rc:549
+#: Merge.rc:548
 #: Merge.rc:1722
 #, c-format
 msgid "Modified Date"
 msgstr "Eguna Aldatuta"
 
-#: Merge.rc:550
+#: Merge.rc:549
 #: Merge.rc:1723
 #, c-format
 msgid "Modified Date and Size"
 msgstr "Eguna eta Neurria Aldatuta"
 
-#: Merge.rc:551
+#: Merge.rc:550
 #: Merge.rc:1724
 #: Merge.rc:1870
 #, c-format
 msgid "Size"
 msgstr "Neurria"
 
-#: Merge.rc:562
+#: Merge.rc:561
 #, c-format
 msgid "Co&mpare"
 msgstr ""
 
-#: Merge.rc:563
+#: Merge.rc:562
 #, c-format
 msgid "Compare &As"
 msgstr ""
 
-#: Merge.rc:565
+#: Merge.rc:564
 #, c-format
 msgid "&Text"
 msgstr ""
 
-#: Merge.rc:566
+#: Merge.rc:565
 #, c-format
 msgid "&Archive"
 msgstr ""
 
-#: Merge.rc:567
+#: Merge.rc:566
 #, c-format
 msgid "&Binary"
 msgstr ""
 
-#: Merge.rc:568
+#: Merge.rc:567
 #, c-format
 msgid "&XML"
 msgstr "&XML"
 
-#: Merge.rc:569
+#: Merge.rc:568
 #, c-format
 msgid "PluginMonikers"
 msgstr ""
 
-#: Merge.rc:572
-#: Merge.rc:675
-#: Merge.rc:694
+#: Merge.rc:571
+#: Merge.rc:674
+#: Merge.rc:693
 #, c-format
 msgid "&Copy"
 msgstr "&Kopiatu"
 
-#: Merge.rc:574
+#: Merge.rc:573
 #, c-format
 msgid "&Left to Right (%1 of %2)"
 msgstr "Ezkerra Eskuinera (%1 %2-tik)"
 
-#: Merge.rc:575
+#: Merge.rc:574
 #, c-format
 msgid "L&eft to... (%1 of %2)"
 msgstr "Ezkerra hona... (%1 %2-tik)"
 
-#: Merge.rc:576
+#: Merge.rc:575
 #, c-format
 msgid "&Right to Left (%1 of %2)"
 msgstr "Eskuina Ezkerrera (%1 %2-tik)"
 
-#: Merge.rc:577
+#: Merge.rc:576
 #, c-format
 msgid "R&ight to... (%1 of %2)"
 msgstr "Eskuina hona... (%1 %2-tik)"
 
-#: Merge.rc:579
+#: Merge.rc:578
 #, c-format
 msgid "&Move"
 msgstr "&Mugitu"
 
-#: Merge.rc:581
+#: Merge.rc:580
 #, c-format
 msgid "&Left to... (%1 of %2)"
 msgstr "Ezkerra hona... (%1 %2-tik)"
 
-#: Merge.rc:582
+#: Merge.rc:581
 #, c-format
 msgid "&Right to... (%1 of %2)"
 msgstr "Eskuina hona... (%1 %2-tik)"
 
-#: Merge.rc:584
+#: Merge.rc:583
 #, c-format
 msgid "&Delete"
 msgstr "&Ezabatu"
 
-#: Merge.rc:586
-#: Merge.rc:612
+#: Merge.rc:585
+#: Merge.rc:611
 #, c-format
 msgid "&Left (%1 of %2)"
 msgstr "E&zkerra (%1 %2-tik)"
 
-#: Merge.rc:587
-#: Merge.rc:613
+#: Merge.rc:586
+#: Merge.rc:612
 #, c-format
 msgid "&Right (%1 of %2)"
 msgstr "E&skuina (%1 %2-tik)"
 
-#: Merge.rc:588
-#: Merge.rc:614
+#: Merge.rc:587
+#: Merge.rc:613
 #, c-format
 msgid "&Both (%1 of %2)"
 msgstr "&Biak (%1 %2-tik)"
 
-#: Merge.rc:590
+#: Merge.rc:589
 #, c-format
 msgid "Re&name"
 msgstr "Birri&zendatu"
 
-#: Merge.rc:591
+#: Merge.rc:590
 #, c-format
 msgid "&Hide Items"
 msgstr "&Ezkutatu Gaiak"
 
-#: Merge.rc:593
+#: Merge.rc:592
 #, c-format
 msgid "&Open Left"
 msgstr "&Ireki Ezkerrekoa"
+
+#: Merge.rc:594
+#: Merge.rc:602
+#: Merge.rc:700
+#, c-format
+msgid "with &Registered Application"
+msgstr "&Erregistratutako Aplikazioarekin"
 
 #: Merge.rc:595
 #: Merge.rc:603
 #: Merge.rc:701
 #, c-format
-msgid "with &Registered Application"
-msgstr "&Erregistratutako Aplikazioarekin"
+msgid "with &External Editor"
+msgstr "&Kanpoko Editorearekin"
 
 #: Merge.rc:596
 #: Merge.rc:604
 #: Merge.rc:702
 #, c-format
-msgid "with &External Editor"
-msgstr "&Kanpoko Editorearekin"
-
-#: Merge.rc:597
-#: Merge.rc:605
-#: Merge.rc:703
-#, c-format
 msgid "&with..."
 msgstr "&Honekin..."
 
-#: Merge.rc:599
-#: Merge.rc:607
-#: Merge.rc:705
+#: Merge.rc:598
+#: Merge.rc:606
+#: Merge.rc:704
 #, c-format
 msgid "Containing &Folder"
 msgstr ""
 
-#: Merge.rc:601
+#: Merge.rc:600
 #, c-format
 msgid "O&pen Right"
 msgstr "Ire&ki Eskuina"
 
-#: Merge.rc:610
+#: Merge.rc:609
 #, c-format
 msgid "Cop&y Pathnames"
 msgstr "Kopiatu &Helburu-izenak"
 
-#: Merge.rc:616
+#: Merge.rc:615
 #, c-format
 msgid "Copy &Filenames"
 msgstr "Kopiatu &Agirizenak"
 
-#: Merge.rc:618
+#: Merge.rc:617
 #, c-format
 msgid "&Zip"
 msgstr "&Zipa"
 
-#: Merge.rc:620
+#: Merge.rc:619
 #, c-format
 msgid "&Left... (%1 of %2)"
 msgstr "E&zkerra... (%1 %2-tik)"
 
-#: Merge.rc:621
+#: Merge.rc:620
 #, c-format
 msgid "&Right... (%1 of %2)"
 msgstr "E&skuina... (%1 %2-tik)"
 
-#: Merge.rc:622
+#: Merge.rc:621
 #, c-format
 msgid "&Both... (%1 of %2)"
 msgstr "&Both... (%1 %2-tik)"
 
-#: Merge.rc:623
+#: Merge.rc:622
 #, c-format
 msgid "&Differences... (%1 of %2)"
 msgstr "&Ezberdintasunak... (%1 %2-tik)"
 
-#: Merge.rc:626
+#: Merge.rc:625
 #, c-format
 msgid "&Refresh"
 msgstr "&Berritu"
 
-#: Merge.rc:640
+#: Merge.rc:639
 #, c-format
 msgid "&Copy Full Path"
 msgstr "Kopiatu Helburu O&soa"
 
-#: Merge.rc:641
+#: Merge.rc:640
 #, c-format
 msgid "Copy &Filename"
 msgstr "Kopiatu &Agirizena"
 
-#: Merge.rc:645
+#: Merge.rc:644
 #, c-format
 msgid "Base Version"
 msgstr ""
 
-#: Merge.rc:646
+#: Merge.rc:645
 #, c-format
 msgid "Source Version"
 msgstr ""
 
-#: Merge.rc:647
+#: Merge.rc:646
 #, c-format
 msgid "Destination Version"
 msgstr ""
 
-#: Merge.rc:657
+#: Merge.rc:656
 #, c-format
 msgid "G&oto Line %1"
 msgstr "&Joan lerro honetara: %1"
 
-#: Merge.rc:658
-#: Merge.rc:697
+#: Merge.rc:657
+#: Merge.rc:696
 #, c-format
 msgid "&Goto..."
 msgstr "&Joan hona..."
 
-#: Merge.rc:660
+#: Merge.rc:659
 #, c-format
 msgid "&No Moved Blocks"
 msgstr "Mugitu &Gabeko Bloke Guztiak"
 
-#: Merge.rc:661
+#: Merge.rc:660
 #, c-format
 msgid "&All Moved Blocks"
 msgstr "&Mugitutako Bloke Guztiak"
 
-#: Merge.rc:662
+#: Merge.rc:661
 #, c-format
 msgid "Moved Block for &Current Diff"
 msgstr "&Uneko Ezberd Mugitutako Blokeak "
 
-#: Merge.rc:672
-#: Merge.rc:685
+#: Merge.rc:671
+#: Merge.rc:684
 #, c-format
 msgid "C&opy to Right"
 msgstr "K&opiatu Eskuinera"
 
-#: Merge.rc:673
-#: Merge.rc:686
+#: Merge.rc:672
+#: Merge.rc:685
 #, c-format
 msgid "Cop&y to Left"
 msgstr "Kop&iatu Ezkerrera"
 
-#: Merge.rc:688
+#: Merge.rc:687
 #, c-format
 msgid "&Select Line Difference"
 msgstr "&Hautatu Lerro Ezberdintasuna"
 
-#: Merge.rc:690
+#: Merge.rc:689
 #, c-format
 msgid "&Undo"
 msgstr "&Desegin"
 
-#: Merge.rc:691
+#: Merge.rc:690
 #, c-format
 msgid "&Redo"
 msgstr "&Birregin"
 
-#: Merge.rc:693
+#: Merge.rc:692
 #, c-format
 msgid "Cu&t"
 msgstr "Eba&ki"
 
-#: Merge.rc:695
+#: Merge.rc:694
 #, c-format
 msgid "&Paste"
 msgstr "&Itsatsi"
 
-#: Merge.rc:699
+#: Merge.rc:698
 #, c-format
 msgid "Op&en"
 msgstr "Ire&ki"
 
-#: Merge.rc:717
+#: Merge.rc:716
 #, c-format
 msgid "About WinMerge"
 msgstr "WinMergeri buruz"
 
-#: Merge.rc:722
+#: Merge.rc:721
 #, c-format
 msgid "Version %s"
 msgstr ""
 
-#: Merge.rc:723
+#: Merge.rc:722
 #, c-format
 msgid "Private Build: %s"
 msgstr ""
 
-#: Merge.rc:724
-#: Merge.rc:857
-#: Merge.rc:873
+#: Merge.rc:723
+#: Merge.rc:856
+#: Merge.rc:872
 #: Merge.rc:1017
 #: Merge.rc:1028
 #: Merge.rc:1111
@@ -1295,72 +1296,72 @@ msgstr ""
 msgid "OK"
 msgstr "Ongi"
 
-#: Merge.rc:725
+#: Merge.rc:724
 #, c-format
 msgid "Visit the WinMerge HomePage!"
 msgstr "Ikusi WinMerge Webgunea!"
 
-#: Merge.rc:728
+#: Merge.rc:727
 #, c-format
 msgid "Contributors"
 msgstr "Laguntzaileak"
 
-#: Merge.rc:735
+#: Merge.rc:734
 #: Merge.rc:1711
 #, c-format
 msgid "Open"
 msgstr "Ireki"
 
-#: Merge.rc:740
-#: Merge.rc:757
+#: Merge.rc:739
+#: Merge.rc:756
 #, c-format
 msgid "Attribute Filter:"
 msgstr ""
 
-#: Merge.rc:742
-#: Merge.rc:759
+#: Merge.rc:741
+#: Merge.rc:758
 #, c-format
 msgid "&New folder"
 msgstr ""
 
-#: Merge.rc:743
+#: Merge.rc:742
 #, c-format
 msgid "Filena&me:"
 msgstr ""
 
-#: Merge.rc:745
-#: Merge.rc:760
+#: Merge.rc:744
+#: Merge.rc:759
 #, c-format
 msgid "&OK"
 msgstr ""
 
-#: Merge.rc:746
-#: Merge.rc:761
+#: Merge.rc:745
+#: Merge.rc:760
 #: Merge.rc:1053
 #: Merge.rc:1683
 #, c-format
 msgid "&Cancel"
 msgstr "&Ezeztatu"
 
-#: Merge.rc:753
+#: Merge.rc:752
 #, c-format
 msgid "Select Folder"
 msgstr ""
 
-#: Merge.rc:768
+#: Merge.rc:767
 #: Merge.rc:1818
 #, c-format
 msgid "Rational ClearCase"
 msgstr "KasuArgi Arrazionala"
 
-#: Merge.rc:771
+#: Merge.rc:770
 #, c-format
 msgid "CheckOut"
 msgstr "Egiaztatu"
 
-#: Merge.rc:772
-#: Merge.rc:858
-#: Merge.rc:874
+#: Merge.rc:771
+#: Merge.rc:857
+#: Merge.rc:873
 #: Merge.rc:914
 #: Merge.rc:938
 #: Merge.rc:963
@@ -1376,140 +1377,140 @@ msgstr "Egiaztatu"
 msgid "Cancel"
 msgstr "Ezeztatu"
 
-#: Merge.rc:773
+#: Merge.rc:772
 #: Merge.rc:1589
 #, c-format
 msgid "Save As..."
 msgstr "Gorde Honela..."
 
-#: Merge.rc:775
+#: Merge.rc:774
 #, c-format
 msgid "Comments"
 msgstr "Aipamenak"
 
-#: Merge.rc:776
+#: Merge.rc:775
 #: Merge.rc:1587
 #, c-format
 msgid "&Apply to all items"
 msgstr "Ezarri gai guztiei"
 
-#: Merge.rc:777
+#: Merge.rc:776
 #, c-format
 msgid "&CheckIn after checkout"
 msgstr "Aurkeztu egiaztatu ondoren"
 
-#: Merge.rc:784
+#: Merge.rc:783
 #, c-format
 msgid "Compare Statistics"
 msgstr "Alderatu Estatistikak"
 
-#: Merge.rc:787
+#: Merge.rc:786
 #, c-format
 msgid "Folders:"
 msgstr "Agiritegiak:"
 
-#: Merge.rc:788
+#: Merge.rc:787
 #, c-format
 msgid "Files:"
 msgstr "Agiriak:"
 
-#: Merge.rc:789
+#: Merge.rc:788
 #: Merge.rc:1908
 #, c-format
 msgid "Different"
 msgstr "Ezberdin"
 
-#: Merge.rc:790
-#: Merge.rc:810
+#: Merge.rc:789
+#: Merge.rc:809
 #, c-format
 msgid "Text:"
 msgstr "Idazkia:"
 
-#: Merge.rc:793
-#: Merge.rc:813
+#: Merge.rc:792
+#: Merge.rc:812
 #, c-format
 msgid "Binary:"
 msgstr "Binarioa:"
 
-#: Merge.rc:796
+#: Merge.rc:795
 #, c-format
 msgid "Unique"
 msgstr "Unique"
 
-#: Merge.rc:797
+#: Merge.rc:796
 #, c-format
 msgid "Left:"
 msgstr "Ezker:"
 
-#: Merge.rc:802
+#: Merge.rc:801
 #, c-format
 msgid "Right:"
 msgstr "Eskuin:"
 
-#: Merge.rc:807
+#: Merge.rc:806
 #: Merge.rc:1902
 #, c-format
 msgid "Identical"
 msgstr "Berdin"
 
-#: Merge.rc:817
+#: Merge.rc:816
 #, c-format
 msgid "Total:"
 msgstr "Guztira:"
 
-#: Merge.rc:822
+#: Merge.rc:821
 #, c-format
 msgid "Close"
 msgstr "Itxi"
 
-#: Merge.rc:829
+#: Merge.rc:828
 #: Merge.rc:1841
 #, c-format
 msgid "Confirm Copy"
 msgstr "Berretsi Kopiatzea"
 
-#: Merge.rc:834
+#: Merge.rc:833
 #, c-format
 msgid "From left"
 msgstr "Ezkerretik"
 
-#: Merge.rc:836
+#: Merge.rc:835
 #, c-format
 msgid "To right"
 msgstr "Eskuinera"
 
-#: Merge.rc:838
+#: Merge.rc:837
 #, c-format
 msgid "Make &writable"
 msgstr ""
 
-#: Merge.rc:839
+#: Merge.rc:838
 #: Merge.rc:1488
 #, c-format
 msgid "&Ignore folder structure"
 msgstr ""
 
-#: Merge.rc:840
+#: Merge.rc:839
 #, c-format
 msgid "Yes"
 msgstr "Bai"
 
-#: Merge.rc:841
+#: Merge.rc:840
 #, c-format
 msgid "No"
 msgstr "Ez"
 
-#: Merge.rc:848
+#: Merge.rc:847
 #, c-format
 msgid "Folder Compare Report"
 msgstr "Agiritegi Alderaketa Jakinarazpena"
 
-#: Merge.rc:851
+#: Merge.rc:850
 #, c-format
 msgid "Report &File:"
 msgstr "Jakinarazi &Agiria:"
 
-#: Merge.rc:853
+#: Merge.rc:852
 #: Merge.rc:1143
 #: Merge.rc:1147
 #: Merge.rc:1203
@@ -1517,32 +1518,32 @@ msgstr "Jakinarazi &Agiria:"
 msgid "Browse..."
 msgstr "Bilatu..."
 
-#: Merge.rc:854
+#: Merge.rc:853
 #, c-format
 msgid "&Style:"
 msgstr "&Estiloa"
 
-#: Merge.rc:856
+#: Merge.rc:855
 #, c-format
 msgid "&Copy to Clipboard"
 msgstr "&Kopiatu Gakoan"
 
-#: Merge.rc:865
+#: Merge.rc:864
 #, c-format
 msgid "Display Columns"
 msgstr "Erakutsi Zutabeak"
 
-#: Merge.rc:869
+#: Merge.rc:868
 #, c-format
 msgid "Move &Up"
 msgstr "Mugitu &Gora"
 
-#: Merge.rc:870
+#: Merge.rc:869
 #, c-format
 msgid "Move &Down"
 msgstr "Mugitu &Behera"
 
-#: Merge.rc:872
+#: Merge.rc:871
 #: Merge.rc:1016
 #: Merge.rc:1281
 #: Merge.rc:1345
@@ -1552,10 +1553,16 @@ msgstr "Mugitu &Behera"
 msgid "Defaults"
 msgstr "Berezkoak"
 
-#: Merge.rc:882
+#: Merge.rc:881
 #, c-format
 msgid " Folder Compare Progress"
 msgstr "Agiritegi Alderaketa Garapena"
+
+#: Merge.rc:884
+#: Merge.rc:962
+#, c-format
+msgid "Pause\tContinue\t"
+msgstr ""
 
 #: Merge.rc:885
 #, c-format
@@ -1563,9 +1570,8 @@ msgid "Stop"
 msgstr "Gelditu"
 
 #: Merge.rc:886
-#: Merge.rc:962
 #, c-format
-msgid "Pause\tContinue\t"
+msgid "Send email when ready"
 msgstr ""
 
 #: Merge.rc:890
