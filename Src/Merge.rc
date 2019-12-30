@@ -56,6 +56,8 @@ IDR_DIRDOCTYPE MENU
         MENUITEM "Select &Font...", ID_VIEW_SELECTFONT
         MENUITEM "Use Default F&ont", ID_VIEW_USEDEFAULTFONT
         MENUITEM SEPARATOR
+        MENUITEM "Sw&ap Panes\tCtrl+U", ID_VIEW_SWAPPANES
+        MENUITEM SEPARATOR
         POPUP "&Toolbar"
         {
             MENUITEM "&None", ID_TOOLBAR_NONE
@@ -64,12 +66,12 @@ IDR_DIRDOCTYPE MENU
         }
         MENUITEM "&Status Bar", ID_VIEW_STATUS_BAR, HELP
         MENUITEM "Ta&b Bar", ID_VIEW_TAB_BAR, HELP
-        MENUITEM "Comp&are Statistics", ID_VIEW_DIR_STATISTICS
+        MENUITEM "Compa&re Statistics", ID_VIEW_DIR_STATISTICS
         MENUITEM SEPARATOR
-        MENUITEM "&Language...", ID_VIEW_LANGUAGE
+        MENUITEM "Lang&uage...", ID_VIEW_LANGUAGE
         MENUITEM SEPARATOR
         MENUITEM "Refresh\tF5", ID_REFRESH
-        MENUITEM "&Refresh Selected\tCtrl+F5", ID_DIR_RESCAN
+        MENUITEM "Refresh Se&lected\tCtrl+F5", ID_DIR_RESCAN
     }
     POPUP "&Merge"
     {
@@ -204,7 +206,7 @@ IDR_HEXDOCTYPE MENU
         MENUITEM "&Status Bar", ID_VIEW_STATUS_BAR, HELP
         MENUITEM "Ta&b Bar", ID_VIEW_TAB_BAR, HELP
         MENUITEM SEPARATOR
-        MENUITEM "&Language...", ID_VIEW_LANGUAGE
+        MENUITEM "Lang&uage...", ID_VIEW_LANGUAGE
         MENUITEM SEPARATOR
         MENUITEM "Refresh\tF5", ID_REFRESH
     }
@@ -298,7 +300,7 @@ IDR_MAINFRAME MENU
         MENUITEM "&Status Bar", ID_VIEW_STATUS_BAR, HELP
         MENUITEM "Ta&b Bar", ID_VIEW_TAB_BAR, HELP
         MENUITEM SEPARATOR
-        MENUITEM "&Language...", ID_VIEW_LANGUAGE
+        MENUITEM "Lang&uage...", ID_VIEW_LANGUAGE
     }
     POPUP "&Tools"
     {
@@ -462,7 +464,7 @@ IDR_MERGEDOCTYPE MENU
         MENUITEM "Diff &Pane", ID_VIEW_DETAIL_BAR, HELP
         MENUITEM "Lo&cation Pane", ID_VIEW_LOCATION_BAR, HELP
         MENUITEM SEPARATOR
-        MENUITEM "&Language...", ID_VIEW_LANGUAGE
+        MENUITEM "Lang&uage...", ID_VIEW_LANGUAGE
         MENUITEM SEPARATOR
         MENUITEM "Refresh\tF5", ID_REFRESH
     }

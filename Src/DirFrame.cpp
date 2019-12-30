@@ -437,6 +437,9 @@ LRESULT CDirFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 	case ID_VIEW_DIR_STATISTICS:
 		m_pDirView->OnViewCompareStatistics();
 		break;
+	case ID_VIEW_SWAPPANES:
+		SwapSides();
+		break;
 	case ID_TOOLS_CUSTOMIZECOLUMNS:
 		m_pDirView->OnCustomizeColumns();
 		break;

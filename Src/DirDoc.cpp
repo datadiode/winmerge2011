@@ -248,8 +248,7 @@ void CDirFrame::InitMrgmanCompare()
 		xml.Push();
 	}
 
-	if (m_pCtxt)
-		m_pDirView->Redisplay();
+	Redisplay();
 
 	if (bNeedCompare)
 		if (int nCompareSelected = m_pDirView->GetItemCount())
@@ -483,16 +482,11 @@ bool CDirFrame::IsShowable(const DIFFITEM *di) const
  */
 void CDirFrame::Redisplay()
 {
-	if (!m_pDirView)
-		return;
-
 	// Do not redisplay an empty CDirView
 	// Not only does it not have results, but AddSpecialItems will crash
 	// trying to dereference null context pointer to get to paths
-	if (!m_pCtxt)
-		return;
-
-	m_pDirView->Redisplay();
+	if (m_pCtxt)
+		m_pDirView->Redisplay();
 }
 
 /**
@@ -759,7 +753,42 @@ void CDirFrame::SetDescriptions(const String &strLeftDesc, const String &strRigh
 {
 	m_strLeftDesc = strLeftDesc;
 	m_strRightDesc = strRightDesc;
+	UpdateTitle();
+}
 
+void CDirFrame::SwapSides()
+{
+	WaitStatusCursor waitCursor;
+	std::swap(m_bROLeft, m_bRORight);
+	std::swap(m_strLeftDesc, m_strRightDesc);
+	// Loop through the cached contexts
+	LIST_ENTRY *entry = &m_root;
+	while ((entry = entry->Flink) != &m_root)
+	{
+		CDiffContext *pCtxt = static_cast<CDiffContext *>(entry);
+		pCtxt->SwapSides();
+		// Loop through the cached items
+		DIFFITEM *di = NULL;
+		while ((di = pCtxt->GetNextDiff(di)) != NULL)
+		{
+			std::swap(di->left, di->right);
+			switch (di->diffcode & DIFFCODE::SIDEFLAGS)
+			{
+			case DIFFCODE::LEFT:
+			case DIFFCODE::RIGHT:
+				di->diffcode ^= DIFFCODE::LEFT ^ DIFFCODE::RIGHT;
+				break;
+			}
+		}
+	}
+	m_pCompareStats->SwapSides();
+	// Update UI
+	UpdateTitle();
+	Redisplay();
+}
+
+void CDirFrame::UpdateTitle()
+{
 	String strTitle;
 	if (!m_pCtxt || m_pCtxt->GetLeftPath().empty() ||
 		m_pCtxt->GetRightPath().empty())

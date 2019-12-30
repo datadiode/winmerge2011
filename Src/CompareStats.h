@@ -80,6 +80,7 @@ public:
 	int GetComparedItems() const { return m_nComparedItems; }
 	const DIFFITEM *GetCurDiffItem();
 	void Reset();
+	void SwapSides();
 	static RESULT GetColImage(const DIFFITEM *);
 	bool MsgWait() const
 	{

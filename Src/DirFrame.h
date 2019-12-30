@@ -111,6 +111,8 @@ public:
 	void UpdateHeaderPath(BOOL bLeft);
 	void AbortCurrentScan();
 	void SetDescriptions(const String &strLeftDesc, const String &strRightDesc);
+	void SwapSides();
+	void UpdateTitle();
 	void ApplyLeftDisplayRoot(String &);
 	void ApplyRightDisplayRoot(String &);
 

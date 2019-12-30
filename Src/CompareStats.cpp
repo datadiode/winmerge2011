@@ -110,6 +110,15 @@ void CompareStats::Reset()
 }
 
 /**
+ * @brief Swap left vs. right side figures
+ */
+void CompareStats::SwapSides()
+{
+	std::swap(m_counts[DIFFIMG_LUNIQUE], m_counts[DIFFIMG_RUNIQUE]);
+	std::swap(m_counts[DIFFIMG_LDIRUNIQUE], m_counts[DIFFIMG_RDIRUNIQUE]);
+}
+
+/**
  * @brief Return image index appropriate for this row
  */
 CompareStats::RESULT CompareStats::GetColImage(const DIFFITEM *di)

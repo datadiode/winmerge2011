@@ -71,6 +71,8 @@ public:
 	String GetLeftFilepathAndName(const DIFFITEM *di) const;
 	String GetRightFilepathAndName(const DIFFITEM *di) const;
 
+	void SwapSides();
+
 	// change an existing difference
 	bool UpdateInfoFromDiskHalf(DIFFITEM *, bool bLeft, bool bMakeWritable = false);
 	void UpdateStatusFromDisk(DIFFITEM *, bool bLeft, bool bRight, bool bMakeWritable = false, bool bPreserveInfo = false);

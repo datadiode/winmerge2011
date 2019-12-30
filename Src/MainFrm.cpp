@@ -839,6 +839,7 @@ const BYTE *CMainFrame::CmdState::Lookup(UINT id) const
 	case ID_FILE_RIGHT_READONLY:
 		return &RightReadOnly;
 	case ID_REFRESH:
+	case ID_VIEW_SWAPPANES:
 		return &Refresh;
 	case ID_FILE_ENCODING:
 		return &FileEncoding;

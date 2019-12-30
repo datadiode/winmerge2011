@@ -53,6 +53,11 @@ String CDiffContext::GetRightFilepathAndName(const DIFFITEM *di) const
 	return path.empty() ? path : paths_ConcatPath(path, di->right.filename);
 }
 
+void CDiffContext::SwapSides()
+{
+	std::swap(m_paths[0], m_paths[1]);
+}
+
 /**
  * @brief Update info in item in result list from disk.
  * This function updates result list item's file information from actual
