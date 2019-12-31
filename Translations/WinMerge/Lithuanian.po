@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WinMerge\n"
 "Report-Msgid-Bugs-To: http://bugs.winmerge.org/\n"
-"POT-Creation-Date: 2019-10-05 12:36+0000\n"
-"PO-Revision-Date: 2019-10-08 08:00+0200\n"
+"POT-Creation-Date: 2019-12-30 10:51+0000\n"
+"PO-Revision-Date: 2019-12-31 08:18+0200\n"
 "Last-Translator: Tichij <tichij@mail.com>\n"
 "Language-Team: Lithuanian <winmerge-translate@lists.sourceforge.net>\n"
 "Language: lt\n"
@@ -1583,7 +1583,7 @@ msgstr "Sustoti"
 #: Merge.rc:886
 #, c-format
 msgid "Send email when ready"
-msgstr ""
+msgstr "Siøsti el. laiðkà, kai paruoðta"
 
 #: Merge.rc:890
 #, c-format
