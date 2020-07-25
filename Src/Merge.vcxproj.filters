@@ -1606,6 +1606,9 @@
     <PluginMoniker Include="..\Translations\PluginMonikers\Portuguese.ini.PluginMoniker">
       <Filter>Plugin Monikers</Filter>
     </PluginMoniker>
+    <PluginMoniker Include="..\Translations\PluginMonikers\French.ini.PluginMoniker">
+      <Filter>Plugin Monikers</Filter>
+    </PluginMoniker>
   </ItemGroup>
   <ItemGroup>
     <EditorScript Include="..\EditorScripts\Basic.wsc.EditorScript">

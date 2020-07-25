@@ -1,30 +1,33 @@
 # This file is part from WinMerge <http://winmerge.org/>
 # Released under the "GNU General Public License"
 #
-# Maintainer:
-# * t3chnob0y <t3chnob0y at outlook.com>
-#
 # Translators:
 # * Jean-F Jolin <jean-f-j at users.sourceforge.net>
 # * Gil Andre <gil_andre at compuserve.com>
 # * Laurent Ganier <ccganier at club-internet.fr>
 # * Dominique Saussereau <redguff at users.sourceforge.net>
+# * t3chnob0y <t3chnob0y at outlook.com>
 #
 # ID line follows -- this is updated by SVN
-# $Id: French.po 6851 2009-06-14 13:59:11Z gerundt $
+# $Id: French.po
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: WinMerge\n"
+"Project-Id-Version: WinMerge Shell Extension\n"
 "Report-Msgid-Bugs-To: http://bugs.winmerge.org/\n"
-"POT-Creation-Date: \n"
-"PO-Revision-Date: 2019-10-16 00:00-0000\n"
+"POT-Creation-Date: 2020-01-04 20:30-0500\n"
+"PO-Revision-Date: 2020-01-04 20:30-0500\n"
 "Last-Translator: t3chnob0y <t3chnob0y at outlook.com>\n"
 "Language-Team: French <winmerge-translate@lists.sourceforge.net>\n"
+"Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=CP1252\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: fr\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Poedit-Language: French\n"
+"X-Poedit-SourceCharset: CP1252\n"
+"X-Poedit-Basepath: ../../ShellExtension/Languages/\n"
+"X-Generator: Poedit 2.2.4\n"
 
 #. AFX_TARG
 #: ShellExtensionTemplate.rc:25
@@ -62,7 +65,7 @@ msgstr "Ouvrir avec WinMerge"
 #: ShellExtensionTemplate.rc:45
 #, c-format
 msgid "Please select no more than 2 items"
-msgstr "SVP ne pas sélectionner plus de 2 éléments"
+msgstr "Veuillez ne pas sélectionner plus de 2 éléments"
 
 #: ShellExtensionTemplate.rc:46
 #, c-format
@@ -77,17 +80,17 @@ msgstr "Comparer..."
 #: ShellExtensionTemplate.rc:48
 #, c-format
 msgid "Compare To"
-msgstr "Comparer avec"
+msgstr "Comparer à"
 
 #: ShellExtensionTemplate.rc:49
 #, c-format
 msgid "Save this path. Select another path to compare with this path."
-msgstr "Conserver ce chemin. Sélectionnez un autre chemin pour effectuer la comparaison."
+msgstr "Enregistrez ce chemin. Sélectionnez un autre chemin à comparer avec ce chemin."
 
 #: ShellExtensionTemplate.rc:50
 #, c-format
 msgid "Compare to saved path (%1)"
-msgstr "Comparer au chemin conservé (%1)"
+msgstr "Comparer au chemin enregistré (%1)"
 
 #: ShellExtensionTemplate.rc:51
 #, c-format

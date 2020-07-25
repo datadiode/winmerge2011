@@ -1,0 +1,31 @@
+[Locale]
+CodePage = 1252
+
+[CompareAs.Menu]
+MediaInfo = script:\FileTransforms\MediaInfo.wsc
+XDoc2Txt Distillate = script:\FileTransforms\xdoc2txt.wsc
+GEDCOM = script:\FileTransforms\gedcom.wsc
+Lignes numérotées = script:\FileTransforms\LinesNumbered.wsc
+Lignes triées = script:\FileTransforms\LinesSorted.wsc
+JSON = script:\FileTransforms\jq.wsc
+JSON trié = script:\FileTransforms\jq.wsc?options='--sort-keys'
+Schéma Protobuf = script:\FileTransforms\protodec.wsc?options='--schema'
+Contenu Protobuf = script:\FileTransforms\protodec.wsc?options='--print'
+XML trié = script:\FileTransforms\msxml.wsc?transform='\FileTransforms\msxml-sort.xslt'
+Code source formaté Astyle = script:\FileTransforms\astyle.wsc?optfile='\FileTransforms\astyle.opt'
+Déterminer à partir de l'extension du fichier = mapping:%SupplementFolder%\Supplement.ini?FileTransforms
+
+[EditorScripts.Menu]
+Rendre la sélection en majuscules = MakeUpper@script:\EditorScripts\Basic.wsc
+Rendre la sélection en minuscules = MakeLower@script:\EditorScripts\Basic.wsc
+Tokenize Alphanumeric = Tokenize@script:\EditorScripts\Basic.wsc?re.pattern='[^\w]+'
+Tokenize Nonwhitespace = Tokenize@script:\EditorScripts\Basic.wsc?re.pattern='[\s]+'
+Appliquer la commande de filtrage ... = ExecFilterCommand@script:\EditorScripts\ExecFilterCommand.wsc
+Insérer la date = InsertDate@script:\EditorScripts\Basic.wsc
+Insérer l'heure = InsertTime@script:\EditorScripts\Basic.wsc
+Tri croissant des lignes = SortLinesAscending@script:\EditorScripts\SortLines.wsc
+Tri décroissant des lignes = SortLinesDescending@script:\EditorScripts\SortLines.wsc
+Tri ascendant des lignes en ignorant la casse = SortLinesAscendingNoCase@script:\EditorScripts\SortLines.wsc
+Tri descendant des lignes en ignorant la casse = SortLinesDescendingNoCase@script:\EditorScripts\SortLines.wsc
+Tabuler une sélection = Tabify@script:\EditorScripts\Tabify.wsc
+Détabuler une sélection = Untabify@script:\EditorScripts\Tabify.wsc

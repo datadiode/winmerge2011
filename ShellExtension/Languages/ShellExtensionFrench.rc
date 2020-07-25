@@ -26,13 +26,13 @@ BEGIN
     IDS_PROJNAME            "ShellExtension"
     IDS_CONTEXT_MENU        "WinMerge"
     IDS_CONTEXT_HELP        "Ouvrir avec WinMerge"
-    IDS_CONTEXT_HELP_MANYITEMS "SVP ne pas sélectionner plus de 2 éléments"
+    IDS_CONTEXT_HELP_MANYITEMS "Veuillez ne pas sélectionner plus de 2 éléments"
     IDS_COMPARE             "Comparer"
     IDS_COMPARE_ELLIPSIS    "Comparer..."
-    IDS_COMPARE_TO          "Comparer avec"
-    IDS_HELP_SAVETHIS       "Conserver ce chemin. Puis en choisir un second pour effectuer la comparaison."
-    IDS_HELP_COMPARESAVED   "Comparer au chemin conservé (%1)"
-    IDS_RESELECT_FIRST      "Ressaisir le premier"
+    IDS_COMPARE_TO          "Comparer à"
+    IDS_HELP_SAVETHIS       "Enregistrez ce chemin. Sélectionnez un autre chemin à comparer avec ce chemin."
+    IDS_HELP_COMPARESAVED   "Comparer au chemin enregistré (%1)"
+    IDS_RESELECT_FIRST      "Re-select First"
 END
 
 /////////////////////////////////////////////////////////////////////////////

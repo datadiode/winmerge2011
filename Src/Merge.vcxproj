@@ -1075,6 +1075,7 @@
   </ItemGroup>
   <ItemGroup>
     <PluginMoniker Include="..\Translations\PluginMonikers\English.ini.PluginMoniker" />
+    <PluginMoniker Include="..\Translations\PluginMonikers\French.ini.PluginMoniker" />
     <PluginMoniker Include="..\Translations\PluginMonikers\German.ini.PluginMoniker" />
     <PluginMoniker Include="..\Translations\PluginMonikers\Lithuanian.ini.PluginMoniker" />
     <PluginMoniker Include="..\Translations\PluginMonikers\Portuguese.ini.PluginMoniker" />
