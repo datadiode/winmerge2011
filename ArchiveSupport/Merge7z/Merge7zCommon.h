@@ -13,7 +13,7 @@
 
 // Merge7z includes
 #include "tools.h"
-#define DllBuild_Merge7z 31
+#define DllBuild_Merge7z 32
 #include "Merge7z.h"
 
 typedef char SZ_EXTENSION[8];
@@ -102,6 +102,8 @@ interface Format7zDLL::Interface : Merge7z::Format
 		NFile::NFind::CFileInfo fileInfo;
 		Inspector(Format7zDLL::Interface *, LPCTSTR);
 		void Init(HWND);
+		unsigned OpenThread();
+		static unsigned CALLBACK OpenThreadStatic(void *);
 	};
 	virtual Merge7z::Format::Inspector *Open(HWND, LPCTSTR);
 	interface Updater : Merge7z::Format::Updater
