@@ -1996,7 +1996,6 @@ FileLoadResult::FILES_RESULT CChildFrame::ReloadDoc(int index)
 	bool readOnly = m_ptBuf[index]->GetReadOnly();
 
 	// Prevent displaying views during LoadFile
-	// Note : attach buffer again only if both loads succeed
 	// clear undo buffers
 	// free the buffers
 	m_pView[index]->DetachFromBuffer();
@@ -2004,7 +2003,12 @@ FileLoadResult::FILES_RESULT CChildFrame::ReloadDoc(int index)
 	m_ptBuf[index]->FreeAll();
 
 	// Load file
-	return LoadOneFile(index, readOnly, fileinfo);
+	FileLoadResult::FILES_RESULT result = LoadOneFile(index, readOnly, fileinfo);
+
+	m_pView[index]->ReAttachToBuffer(m_ptBuf[index]);
+	m_pDetailView[index]->ReAttachToBuffer(m_ptBuf[index]);
+
+	return result;
 }
 
 /**

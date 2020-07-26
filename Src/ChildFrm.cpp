@@ -220,10 +220,6 @@ void CChildFrame::ReloadDocs()
 	if (!FileLoadResult::IsError(ReloadDoc(0)) &&
 		!FileLoadResult::IsError(ReloadDoc(1)))
 	{
-		m_pView[0]->ReAttachToBuffer(m_ptBuf[0]);
-		m_pView[1]->ReAttachToBuffer(m_ptBuf[1]);
-		m_pDetailView[0]->ReAttachToBuffer(m_ptBuf[0]);
-		m_pDetailView[1]->ReAttachToBuffer(m_ptBuf[1]);
 		// Compute all parse cookies in advance, before losing context
 		m_ptBuf[0]->GetParseCookie(m_ptBuf[0]->GetLineCount() - 1);
 		m_ptBuf[1]->GetParseCookie(m_ptBuf[1]->GetLineCount() - 1);
