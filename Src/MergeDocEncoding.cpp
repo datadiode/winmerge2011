@@ -39,7 +39,7 @@
  */
 void CChildFrame::DoFileEncodingDialog()
 {
-	if (!PromptAndSaveIfNeeded(true))
+	if (!SaveModified())
 		return;
 
 	CLoadSaveCodepageDlg dlg;
