@@ -33,6 +33,17 @@ struct FileFlags
 	String ToString() const;
 };
 
+struct FileInfo
+{
+	FileTime ctime; /**< time of creation */
+	FileTime mtime; /**< time of last modify */
+	CY size; /**< file size in bytes, -1 means file does not exist*/
+	FileFlags flags; /**< file attributes */
+	FileInfo() { size.int64 = -1; }
+	BOOL Update(LPCTSTR);
+	BOOL ApplyFileTimeTo(LPCTSTR) const;
+};
+
 /**
  * @brief Information for file.
  * This class stores basic information from a file or folder.
@@ -42,17 +53,9 @@ struct FileFlags
  * @note times in are seconds since January 1, 1970.
  * See Dirscan.cpp/fentry and Dirscan.cpp/LoadFiles()
  */
-struct DirItem
+struct DirItem : FileInfo
 {
-	FileTime ctime; /**< time of creation */
-	FileTime mtime; /**< time of last modify */
-	CY size; /**< file size in bytes, -1 means file does not exist*/
 	String filename; /**< filename for this item */
 	String path; /**< full path (excluding filename) for the item */
-	FileFlags flags; /**< file attributes */
-
-	DirItem() { size.int64 = -1; }
-	BOOL Update(LPCTSTR);
-	BOOL ApplyFileTimeTo(LPCTSTR) const;
 	void ClearPartial();
 };

@@ -50,7 +50,7 @@ String FileFlags::ToString() const
  * @param [in] sFilePath Full path to file/directory to update
  * @return TRUE if information was updated (item was found).
  */
-BOOL DirItem::Update(LPCTSTR sFilePath)
+BOOL FileInfo::Update(LPCTSTR sFilePath)
 {
 	size.int64 = -1;
 	flags.reset();
@@ -88,7 +88,7 @@ BOOL DirItem::Update(LPCTSTR sFilePath)
 /**
  * @brief Update file's modification time.
  */
-BOOL DirItem::ApplyFileTimeTo(LPCTSTR path) const
+BOOL FileInfo::ApplyFileTimeTo(LPCTSTR path) const
 {
 	HANDLE h = ::CreateFile(path, GENERIC_WRITE,
 							FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
