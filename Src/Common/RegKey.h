@@ -45,7 +45,7 @@ public:
 			return this;
 		}
 	};
-	typedef Blob<MAX_PATH * sizeof(TCHAR)> MaxPath;
+	typedef Blob<4096 * sizeof(TCHAR)> MaxPath;
 	struct StringRef : BLOB
 	{
 		StringRef(LPTSTR val, UINT len)
