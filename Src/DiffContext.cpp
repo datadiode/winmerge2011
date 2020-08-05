@@ -89,6 +89,39 @@ void CDiffContext::UpdateStatusFromDisk(DIFFITEM *di, bool bLeft, bool bRight, b
 }
 
 /**
+ * @brief Update diff item
+ */
+void CDiffContext::UpdateDiffItemEx(DIFFITEM *di)
+{
+	UpdateDiffItem(di);
+	// 1. Clear flags
+	di->diffcode &= ~(DIFFCODE::TEXTFLAGS | DIFFCODE::COMPAREFLAGS);
+	// 2. Process unique files
+	// We must compare unique files to itself to detect encoding
+	if (di->isSideLeftOnly() || di->isSideRightOnly())
+	{
+		if (m_nCompMethod != CMP_DATE &&
+			m_nCompMethod != CMP_DATE_SIZE &&
+			m_nCompMethod != CMP_SIZE)
+		{
+			di->diffcode |= DIFFCODE::SAME;
+			FolderCmp folderCmp(this);
+			int diffCode = folderCmp.prepAndCompareTwoFiles(di);
+			// Add possible binary flag for unique items
+			if (diffCode & DIFFCODE::BIN)
+				di->diffcode |= DIFFCODE::BIN;
+		}
+	}
+	// 3. Compare two files
+	else
+	{
+		// Really compare
+		FolderCmp folderCmp(this);
+		di->diffcode |= folderCmp.prepAndCompareTwoFiles(di);
+	}
+}
+
+/**
  * @brief Update file information from disk for DIFFITEM.
  * This function updates DIFFITEM's file information from actual file in
  * the disk. This updates info like date, size and attributes.

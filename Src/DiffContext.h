@@ -126,6 +126,7 @@ public:
 	const DWORD m_dwContext; /**< Context code used with CLearCase mrgman files */
 
 	bool UpdateDiffItem(DIFFITEM *);
+	void UpdateDiffItemEx(DIFFITEM *);
 // creation and use, called on main thread
 	void CompareDirectories(bool bOnlyRequested);
 
