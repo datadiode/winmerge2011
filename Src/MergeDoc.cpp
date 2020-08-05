@@ -1138,23 +1138,6 @@ bool CChildFrame::CanLimitContext() const
 }
 
 /**
- * @brief Save modified documents.
- * This function asks if user wants to save modified documents. We also
- * allow user to cancel the closing.
- *
- * There is a special trick avoiding showing two save-dialogs, as MFC framework
- * sometimes calls this function twice. We use static counter for these calls
- * and if we already have saving in progress (counter == 1) we skip the new
- * saving dialog.
- *
- * @return TRUE if docs are closed, FALSE if closing is cancelled.
- */
-bool CChildFrame::SaveModified()
-{
-	return PromptAndSaveIfNeeded(true);
-}
-
-/**
  * @brief Sets the current difference.
  * @param [in] nDiff Difference to set as current difference.
  */
@@ -1602,7 +1585,7 @@ CChildFrame::FileChange CChildFrame::IsFileChangedOnDisk(LPCTSTR szPath,
  * we do after saving to different filename? Empty description?
  * @todo Parameter @p bAllowCancel is always true in callers - can be removed.
  */
-bool CChildFrame::PromptAndSaveIfNeeded(bool bAllowCancel)
+bool CChildFrame::SaveModified()
 {
 	const BOOL bLModified = m_ptBuf[0]->IsModified();
 	const BOOL bRModified = m_ptBuf[1]->IsModified();
@@ -1618,8 +1601,6 @@ bool CChildFrame::PromptAndSaveIfNeeded(bool bAllowCancel)
 	dlg.m_bAskForRight = bRModified;
 	dlg.m_sLeftFile = pathLeft.empty() ? m_strDesc[0] : pathLeft;
 	dlg.m_sRightFile = pathRight.empty() ? m_strDesc[1] : pathRight;
-	if (!bAllowCancel)
-		dlg.m_bDisableCancel = TRUE;
 
 	bool result = true;
 	bool bLSaveSuccess = false;

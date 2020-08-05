@@ -111,7 +111,6 @@ public:
 	void UpdateMergeStatusUI();
 	void AlignScrollPositions();
 
-	bool PromptAndSaveIfNeeded(bool bAllowCancel);
 	void FlushAndRescan();
 	void RescanIfNeeded(DWORD timeout);
 	void SetCurrentDiff(int nDiff);
@@ -121,9 +120,10 @@ public:
 	void SetMergingMode(bool bMergingMode);
 	void SetDetectMovedBlocks(bool bDetectMovedBlocks);
 	bool IsMixedEOL(int nBuffer) const;
-	void ActivateFrame();
-	virtual void RecalcLayout();
-	virtual BOOL PreTranslateMessage(MSG *);
+	virtual void ActivateFrame() override;
+	virtual void RecalcLayout() override;
+	virtual void SavePosition() override;
+	virtual BOOL PreTranslateMessage(MSG *) override;
 
 	int GetActiveMergeViewIndexType() const;
 	CGhostTextView *GetActiveTextView() const;
@@ -169,7 +169,6 @@ public:
 	std::vector<CMergeEditView*>::iterator curUndo;
 
 private:
-	void SavePosition();
 	void SetLastCompareResult(int nResult);
 	CMergeEditView *CreatePane(int iPane);
 	void CreateClient();
@@ -196,7 +195,6 @@ private:
 	int Rescan(bool &bIdentical);
 	int Rescan2(bool &bIdentical);
 	void ShowRescanError(int nRescanResult, bool bIdentical);
-	void AddUndoAction(UINT nBegin, UINT nEnd, UINT nDiff, int nBlanks, BOOL bInsert, CMergeEditView *pList);
 	void CopyAllList(int srcPane, int dstPane);
 	void CopyMultipleList(int srcPane, int dstPane, int firstDiff, int lastDiff);
 	bool SanityCheckDiff(const DIFFRANGE *) const;
