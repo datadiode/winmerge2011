@@ -40,46 +40,6 @@
 #endif
 
 /**
- * @brief Update diff item
- */
-static void UpdateDiffItem(DIFFITEM *di, CDiffContext *pCtxt)
-{
-	di->diffcode |= DIFFCODE::SIDEFLAGS;
-	di->left.ClearPartial();
-	di->right.ClearPartial();
-	if (!pCtxt->UpdateInfoFromDiskHalf(di, TRUE))
-		di->diffcode &= ~DIFFCODE::LEFT;
-	if (!pCtxt->UpdateInfoFromDiskHalf(di, FALSE))
-		di->diffcode &= ~DIFFCODE::RIGHT;
-	// 1. Clear flags
-	di->diffcode &= ~(DIFFCODE::TEXTFLAGS | DIFFCODE::COMPAREFLAGS);
-	// 2. Process unique files
-	// We must compare unique files to itself to detect encoding
-	if (di->isSideLeftOnly() || di->isSideRightOnly())
-	{
-		int compareMethod = pCtxt->m_nCompMethod;
-		if (compareMethod != CMP_DATE &&
-			compareMethod != CMP_DATE_SIZE &&
-			compareMethod != CMP_SIZE)
-		{
-			di->diffcode |= DIFFCODE::SAME;
-			FolderCmp folderCmp(pCtxt);
-			int diffCode = folderCmp.prepAndCompareTwoFiles(di);
-			// Add possible binary flag for unique items
-			if (diffCode & DIFFCODE::BIN)
-				di->diffcode |= DIFFCODE::BIN;
-		}
-	}
-	// 3. Compare two files
-	else
-	{
-		// Really compare
-		FolderCmp folderCmp(pCtxt);
-		di->diffcode |= folderCmp.prepAndCompareTwoFiles(di);
-	}
-}
-
-/**
  * @brief Issue an error popup if passed in HRESULT is nonzero
  */
 static int Try(HRESULT hr, UINT type = MB_OKCANCEL | MB_ICONSTOP)
@@ -110,7 +70,7 @@ int CHexMergeFrame::UpdateDiffItem(CDirFrame *pDirDoc)
 		const String &pathRight = m_strPath[1];
 		if (DIFFITEM *di = pDirDoc->FindItemFromPaths(pathLeft.c_str(), pathRight.c_str()))
 		{
-			::UpdateDiffItem(di, pDirDoc->GetDiffContext());
+			pDirDoc->GetDiffContext()->UpdateDiffItemEx(di);
 		}
 	}
 	int lengthLeft = m_pView[0]->GetLength();
@@ -126,7 +86,7 @@ int CHexMergeFrame::UpdateDiffItem(CDirFrame *pDirDoc)
 /**
  * @brief Asks and then saves modified files
  */
-bool CHexMergeFrame::PromptAndSaveIfNeeded(bool bAllowCancel)
+bool CHexMergeFrame::SaveModified()
 {
 	const BOOL bLModified = m_pView[0]->GetModified();
 	const BOOL bRModified = m_pView[1]->GetModified();
@@ -134,26 +94,15 @@ bool CHexMergeFrame::PromptAndSaveIfNeeded(bool bAllowCancel)
 	if (!bLModified && !bRModified) //Both files unmodified
 		return true;
 
-	const String &pathLeft = m_strPath[0];
-	const String &pathRight = m_strPath[1];
+	SaveClosingDlg dlg;
+	dlg.m_bAskForLeft = bLModified;
+	dlg.m_bAskForRight = bRModified;
+	dlg.m_sLeftFile = m_strPath[0].empty() ? m_strDesc[0] : m_strPath[0];
+	dlg.m_sRightFile = m_strPath[1].empty() ? m_strDesc[1] : m_strPath[1];
 
 	bool result = true;
 	bool bLSaveSuccess = false;
 	bool bRSaveSuccess = false;
-
-	SaveClosingDlg dlg;
-	dlg.m_bAskForLeft = bLModified;
-	dlg.m_bAskForRight = bRModified;
-	if (!bAllowCancel)
-		dlg.m_bDisableCancel = TRUE;
-	if (!pathLeft.empty())
-		dlg.m_sLeftFile = pathLeft;
-	else
-		dlg.m_sLeftFile = m_strDesc[0];
-	if (!pathRight.empty())
-		dlg.m_sRightFile = pathRight;
-	else
-		dlg.m_sRightFile = m_strDesc[1];
 
 	if (LanguageSelect.DoModal(dlg) == IDOK)
 	{
@@ -161,7 +110,7 @@ bool CHexMergeFrame::PromptAndSaveIfNeeded(bool bAllowCancel)
 		{
 			if (dlg.m_leftSave == SaveClosingDlg::SAVECLOSING_SAVE)
 			{
-				switch (Try(m_pView[0]->SaveFile(pathLeft.c_str())))
+				switch (Try(m_pView[0]->SaveFile(m_strPath[0].c_str())))
 				{
 				case 0:
 					bLSaveSuccess = true;
@@ -180,7 +129,7 @@ bool CHexMergeFrame::PromptAndSaveIfNeeded(bool bAllowCancel)
 		{
 			if (dlg.m_rightSave == SaveClosingDlg::SAVECLOSING_SAVE)
 			{
-				switch (Try(m_pView[1]->SaveFile(pathRight.c_str())))
+				switch (Try(m_pView[1]->SaveFile(m_strPath[1].c_str())))
 				{
 				case 0:
 					bRSaveSuccess = true;
@@ -209,14 +158,6 @@ bool CHexMergeFrame::PromptAndSaveIfNeeded(bool bAllowCancel)
 	}
 
 	return result;
-}
-
-/**
- * @brief Save modified documents
- */
-bool CHexMergeFrame::SaveModified()
-{
-	return PromptAndSaveIfNeeded(true);
 }
 
 void CHexMergeFrame::OnRefresh()

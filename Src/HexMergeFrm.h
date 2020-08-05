@@ -56,7 +56,6 @@ private:
 	CHexMergeView *CreatePane(int);
 	void SetLastCompareResult(int nResult);
 	int UpdateDiffItem(CDirFrame *);
-	bool PromptAndSaveIfNeeded(bool bAllowCancel);
 	CHexMergeView *GetActiveView() const;
 	void UpdateHeaderPath(int pane);
 	static void CopySel(CHexMergeView *pViewSrc, CHexMergeView *pViewDst);
