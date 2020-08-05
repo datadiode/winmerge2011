@@ -34,8 +34,8 @@ private:
 	{
 		return FALSE;
 	}
-	template<class CodePoint, int CodeShift>
-	unsigned CompareFiles(FileLocation *, stl_size_t x = 1, stl_size_t j = 0);
+	template<class CodePoint, int CodeShift, int x, int j>
+	unsigned CompareFiles(FileLocation *);
 	const CDiffContext *const m_pCtxt;
 	HANDLE m_osfhandle[2];
 	__int64 m_st_size[2];

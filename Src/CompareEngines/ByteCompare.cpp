@@ -13,8 +13,8 @@
 using namespace CompareEngines;
 
 /** @brief Quick contents compare's file buffer size. */
-static const size_t CMPBUFF = 0x8000;
-static const size_t PADDING = 0x0008;
+static const size_t CMPBUFF = 0x040000;
+static const size_t PADDING = 0x000008;
 
 /**
  * @brief Default constructor.
@@ -66,32 +66,32 @@ BOOL ByteCompare::IsDBCSLeadByteEx<BYTE>(int codepage, BYTE byte)
 	return ::IsDBCSLeadByteEx(codepage, byte);
 }
 
-template<class CodePoint, int CodeShift>
-unsigned ByteCompare::CompareFiles(FileLocation *location, const stl_size_t x, const stl_size_t j)
+template<class CodePoint, int CodeShift, int x, int j>
+unsigned ByteCompare::CompareFiles(FileLocation *location)
 {
 	char buff[2][CMPBUFF + PADDING];
 	stl_size_t bytes_ahead[2] = { 0, 0 };
 	stl_size_t read_ahead_size[2] = { CMPBUFF, CMPBUFF };
+	stl_size_t advancement[2];
 	unsigned blankness_type[2] = { START, START };
 	unsigned blankness_type_prev[2];
-	int codepage[2] =
+	int const codepage[2] =
 	{
 		FileTextEncoding::IsCodepageDBCS(location[0].encoding.m_codepage),
 		FileTextEncoding::IsCodepageDBCS(location[1].encoding.m_codepage)
 	};
 	unsigned nocount[2] = { 0, 0 };
 	unsigned *count[2] = { NULL, NULL };
-	stl_size_t advancement[2];
 	CodePoint c[2] = { '?', '?' };
 	CodePoint *cursor[2] = { c, c };
 	unsigned diffcode = DIFFCODE::SAME;
-	BOOL ok = TRUE;
-
-	while (true)
+	BOOL failed = FALSE;
+	BOOL const both = m_osfhandle[j ^ x] != m_osfhandle[j];
+	for (;;) switch (both)
 	{
-		stl_size_t i = j;
-		do
+	case TRUE:
 		{
+			enum { i = j };
 			if (unsigned *pcount = count[i])
 			{
 				++*pcount;
@@ -111,24 +111,22 @@ unsigned ByteCompare::CompareFiles(FileLocation *location, const stl_size_t x, c
 				}
 				else if (read_ahead_size[i] == CMPBUFF)
 				{
-					size_t const bytes_left = bytes_ahead[i];
 					// Pad for alignment.
-					size_t const padding = PADDING - bytes_left;
-					char *const left = buff[i] + padding;
-					memcpy(left, cursor[i], bytes_left);
-					cursor[i] = reinterpret_cast<CodePoint *>(left);
+					stl_size_t const padding = PADDING - bytes_ahead[i];
+					cursor[i] = static_cast<CodePoint *>(memcpy(
+						buff[i] + padding, cursor[i], bytes_ahead[i]));
 					DWORD bytes_read = 0;
-					ok = ReadFile(m_osfhandle[i], left + bytes_left,
-						read_ahead_size[i], &bytes_read, NULL);
+					BOOL const ok = ReadFile(m_osfhandle[i], cursor[i] +
+						bytes_ahead[i], read_ahead_size[i], &bytes_read, NULL);
+					if (!ok || (bytes_read & sizeof(CodePoint) - 1) != 0)
+						failed = TRUE;
 					bytes_ahead[i] += read_ahead_size[i] = bytes_read;
-					if (ok && (bytes_read & sizeof(CodePoint) - 1) != 0)
-						ok = FALSE;
 				}
 			}
 			count[i] = &nocount[i];
 			advancement[i] = 0;
 			blankness_type[i] = i;
-			if (size_t n = bytes_ahead[i] / sizeof(CodePoint))
+			if (bytes_ahead[i] >= sizeof(CodePoint))
 			{
 				advancement[i] = 1;
 				blankness_type[i] = NEITHER;
@@ -144,7 +142,7 @@ unsigned ByteCompare::CompareFiles(FileLocation *location, const stl_size_t x, c
 					count[i] = &m_textStats[i].nzeros;
 					break;
 				case '\r' << CodeShift:
-					if (n < 2 || cursor[i][1] != ('\n' << CodeShift))
+					if (bytes_ahead[i] < 2 * sizeof(CodePoint) || cursor[i][1] != ('\n' << CodeShift))
 					{
 						blankness_type[i] = CR;
 						count[i] = &m_textStats[i].ncrs;
@@ -172,7 +170,89 @@ unsigned ByteCompare::CompareFiles(FileLocation *location, const stl_size_t x, c
 					break;
 				}
 			}
-		} while (m_osfhandle[i ^= x] != m_osfhandle[j]);
+		}
+	default:
+		{
+			enum { i = j ^ x };
+			if (unsigned *pcount = count[i])
+			{
+				++*pcount;
+				cursor[i] += advancement[i];
+				bytes_ahead[i] -= advancement[i] * sizeof(CodePoint);
+				blankness_type_prev[i] = blankness_type[i];
+			}
+			if (bytes_ahead[i] < 8)
+			{
+				if (m_pCtxt->ShouldAbort())
+					return DIFFCODE::CMPABORT;
+				if (m_pCtxt->m_bStopAfterFirstDiff && (diffcode == DIFFCODE::DIFF))
+				{
+					// Do not read more data, but continue to process what is
+					// already in memory.
+					bytes_ahead[i] = 0;
+				}
+				else if (read_ahead_size[i] == CMPBUFF)
+				{
+					// Pad for alignment.
+					stl_size_t const padding = PADDING - bytes_ahead[i];
+					cursor[i] = static_cast<CodePoint *>(memcpy(
+						buff[i] + padding, cursor[i], bytes_ahead[i]));
+					DWORD bytes_read = 0;
+					BOOL const ok = ReadFile(m_osfhandle[i], cursor[i] +
+						bytes_ahead[i], read_ahead_size[i], &bytes_read, NULL);
+					if (!ok || (bytes_read & sizeof(CodePoint) - 1) != 0)
+						failed = TRUE;
+					bytes_ahead[i] += read_ahead_size[i] = bytes_read;
+				}
+			}
+			count[i] = &nocount[i];
+			advancement[i] = 0;
+			blankness_type[i] = i;
+			if (bytes_ahead[i] >= sizeof(CodePoint))
+			{
+				advancement[i] = 1;
+				blankness_type[i] = NEITHER;
+				c[i] = cursor[i][0];
+				switch (c[i])
+				{
+				case 0x20 << CodeShift:
+				case '\t' << CodeShift:
+					blankness_type[i] = BLANK;
+					break;
+				case '\0' << CodeShift:
+					//blankness_type[i] = ZERO;
+					count[i] = &m_textStats[i].nzeros;
+					break;
+				case '\r' << CodeShift:
+					if (bytes_ahead[i] < 2 * sizeof(CodePoint) || cursor[i][1] != ('\n' << CodeShift))
+					{
+						blankness_type[i] = CR;
+						count[i] = &m_textStats[i].ncrs;
+					}
+					else
+					{
+						advancement[i] = 2;
+						blankness_type[i] = CRLF;
+						count[i] = &m_textStats[i].ncrlfs;
+					}
+					blankness_type_prev[i] = BLANK; // Simulate a preceding BLANK.
+					break;
+				case '\n' << CodeShift:
+					blankness_type[i] = LF;
+					count[i] = &m_textStats[i].nlfs;
+					blankness_type_prev[i] = BLANK; // Simulate a preceding BLANK.
+					break;
+				default:
+					if (codepage[i] != 0 &&
+						(blankness_type_prev[i] & LEADBYTE) == 0 &&
+						IsDBCSLeadByteEx(codepage[i], c[i]))
+					{
+						blankness_type[i] = LEADBYTE;
+					}
+					break;
+				}
+			}
+		}
 		int mask = blankness_type[0] | blankness_type[1];
 		if (mask & ~(NEITHER | LEADBYTE))
 		{
@@ -181,12 +261,12 @@ unsigned ByteCompare::CompareFiles(FileLocation *location, const stl_size_t x, c
 			{
 			case EOF_0 | START:
 				m_textStats[1] = m_textStats[0];
-				return ok ? DIFFCODE::SAME : DIFFCODE::CMPERR;
+				return failed ? DIFFCODE::CMPERR : DIFFCODE::SAME;
 			case EOF_1 | START:
 				m_textStats[0] = m_textStats[1];
-				return ok ? DIFFCODE::SAME : DIFFCODE::CMPERR;
+				return failed ? DIFFCODE::CMPERR : DIFFCODE::SAME;
 			case EOF_0 | EOF_1:
-				return ok ? diffcode : DIFFCODE::CMPERR;
+				return failed ? DIFFCODE::CMPERR : diffcode;
 			}
 			if (bIgnoreBlankLines)
 			{
@@ -305,41 +385,64 @@ unsigned ByteCompare::CompareFiles(FileLocation *location)
 	case CaseLabel<NONE, UTF8>::Value:
 	case CaseLabel<UTF8, NONE>::Value:
 	case CaseLabel<UTF8, UTF8>::Value:
-		code = CompareFiles<BYTE, 0>(location);
+		code = CompareFiles<BYTE, 0, 1, 0>(location);
 		break;
 	case CaseLabel<UCS2LE, UCS2LE>::Value:
-		code = CompareFiles<WCHAR, 0>(location);
+		code = CompareFiles<WCHAR, 0, 1, 0>(location);
 		break;
 	case CaseLabel<UCS2BE, UCS2BE>::Value:
-		code = CompareFiles<WCHAR, 8>(location);
+		code = CompareFiles<WCHAR, 8, 1, 0>(location);
 		break;
 	case CaseLabel<UCS4LE, UCS4LE>::Value:
-		code = CompareFiles<ULONG, 0>(location);
+		code = CompareFiles<ULONG, 0, 1, 0>(location);
 		break;
 	case CaseLabel<UCS4BE, UCS4BE>::Value:
-		code = CompareFiles<ULONG, 16>(location);
+		code = CompareFiles<ULONG, 16, 1, 0>(location);
 		break;
 	default:
-		stl_size_t i = 0;
-		do
+		BOOL const both = m_osfhandle[1] != m_osfhandle[0];
+		switch (both)
 		{
-			switch (location[i].encoding.m_unicoding)
+		case TRUE:
+			switch (location[1].encoding.m_unicoding)
 			{
 			case NONE:
 			case UTF8:
-				code = CompareFiles<BYTE, 0>(location, 0, i);
+				code = CompareFiles<BYTE, 0, 0, 1>(location);
 				break;
 			case UCS2LE:
-				code = CompareFiles<WCHAR, 0>(location, 0, i);
+				code = CompareFiles<WCHAR, 0, 0, 1>(location);
 				break;
 			case UCS2BE:
-				code = CompareFiles<WCHAR, 8>(location, 0, i);
+				code = CompareFiles<WCHAR, 8, 0, 1>(location);
 				break;
 			case UCS4LE:
-				code = CompareFiles<ULONG, 0>(location, 0, i);
+				code = CompareFiles<ULONG, 0, 0, 1>(location);
 				break;
 			case UCS4BE:
-				code = CompareFiles<ULONG, 16>(location, 0, i);
+				code = CompareFiles<ULONG, 16, 0, 1>(location);
+				break;
+			}
+			if (code == DIFFCODE::CMPERR || code == DIFFCODE::CMPABORT)
+				break;
+		default:
+			switch (location[0].encoding.m_unicoding)
+			{
+			case NONE:
+			case UTF8:
+				code = CompareFiles<BYTE, 0, 0, 0>(location);
+				break;
+			case UCS2LE:
+				code = CompareFiles<WCHAR, 0, 0, 0>(location);
+				break;
+			case UCS2BE:
+				code = CompareFiles<WCHAR, 8, 0, 0>(location);
+				break;
+			case UCS4LE:
+				code = CompareFiles<ULONG, 0, 0, 0>(location);
+				break;
+			case UCS4BE:
+				code = CompareFiles<ULONG, 16, 0, 0>(location);
 				break;
 			}
 			if (code == DIFFCODE::CMPERR || code == DIFFCODE::CMPABORT)
@@ -348,7 +451,7 @@ unsigned ByteCompare::CompareFiles(FileLocation *location)
 			// Note that since full compare operates on transcoded content, it
 			// may flag files as equal which byte compare considers different.
 			code = DIFFCODE::DIFF;
-		} while (m_osfhandle[i ^= 1] != m_osfhandle[0]);
+		}
 		break;
 	}
 	// Indicate that text vs. binary classification is up to caller.
