@@ -1,5 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="UserMacros">
+    <DisableCopyRules>false</DisableCopyRules>
+  </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>.;CompareEngines;Common;EASTL\include;jsoncpp\include;editlib;diffutils;diffutils\lib;diffutils\src;..\Externals\expat\lib;..\Externals\expat\xmlwf;..\Externals\editorconfig-core-c\include;..\Externals\pcre\Win32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -39,54 +42,63 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup>
     <po>
+      <ExcludedFromBuild>$(DisableCopyRules)</ExcludedFromBuild>
       <CommandLineTemplate>copy "%(FullPath)" "$(OutDir)Languages\%(Filename)%(Extension)"</CommandLineTemplate>
       <Outputs>$(OutDir)Languages\%(Filename)%(Extension)</Outputs>
     </po>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup>
     <flt>
+      <ExcludedFromBuild>$(DisableCopyRules)</ExcludedFromBuild>
       <CommandLineTemplate>copy "%(FullPath)" "$(OutDir)Filters\%(Filename)%(Extension)"</CommandLineTemplate>
       <Outputs>$(OutDir)Filters\%(Filename)%(Extension)</Outputs>
     </flt>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup>
     <EventHandler>
+      <ExcludedFromBuild>$(DisableCopyRules)</ExcludedFromBuild>
       <CommandLineTemplate>copy "%(FullPath)" "$(OutDir)EventHandlers\%(Filename)"</CommandLineTemplate>
       <Outputs>$(OutDir)EventHandlers\%(Filename)</Outputs>
     </EventHandler>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup>
     <PrintTemplate>
+      <ExcludedFromBuild>$(DisableCopyRules)</ExcludedFromBuild>
       <CommandLineTemplate>copy "%(FullPath)" "$(OutDir)PrintTemplates\%(Filename)"</CommandLineTemplate>
       <Outputs>$(OutDir)PrintTemplates\%(Filename)</Outputs>
     </PrintTemplate>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup>
     <FileTransform>
+      <ExcludedFromBuild>$(DisableCopyRules)</ExcludedFromBuild>
       <CommandLineTemplate>copy "%(FullPath)" "$(OutDir)FileTransforms\%(Filename)"</CommandLineTemplate>
       <Outputs>$(OutDir)FileTransforms\%(Filename)</Outputs>
     </FileTransform>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup>
     <PluginMoniker>
+      <ExcludedFromBuild>$(DisableCopyRules)</ExcludedFromBuild>
       <CommandLineTemplate>copy "%(FullPath)" "$(OutDir)PluginMonikers\%(Filename)"</CommandLineTemplate>
       <Outputs>$(OutDir)PluginMonikers\%(Filename)</Outputs>
     </PluginMoniker>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup>
     <EditorScript>
+      <ExcludedFromBuild>$(DisableCopyRules)</ExcludedFromBuild>
       <CommandLineTemplate>copy "%(FullPath)" "$(OutDir)EditorScripts\%(Filename)"</CommandLineTemplate>
       <Outputs>$(OutDir)EditorScripts\%(Filename)</Outputs>
     </EditorScript>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup>
     <docs>
+      <ExcludedFromBuild>$(DisableCopyRules)</ExcludedFromBuild>
       <CommandLineTemplate>copy "%(FullPath)" "$(OutDir)Docs\%(Filename)%(Extension)"</CommandLineTemplate>
       <Outputs>$(OutDir)Docs\%(Filename)%(Extension)</Outputs>
     </docs>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup>
     <setup>
+      <ExcludedFromBuild>$(DisableCopyRules)</ExcludedFromBuild>
       <CommandLineTemplate>copy "%(FullPath)" "$(OutDir)%(Filename)%(Extension)"</CommandLineTemplate>
       <Outputs>$(OutDir)%(Filename)%(Extension)</Outputs>
     </setup>
