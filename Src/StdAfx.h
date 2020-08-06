@@ -159,7 +159,7 @@ extern const char *const wine_version;
 #ifdef _DEBUG
 #define TESTCASE \
 	static int UNIQUENAME(TestMethod)(); \
-	static int UNIQUENAME(TestResult) = UNIQUENAME(TestMethod)(); \
+	static int UNIQUENAME(TestResult) = IsDebuggerPresent() ? UNIQUENAME(TestMethod)() : 0; \
 	static int UNIQUENAME(TestMethod)()
 #else
 #define TESTCASE inline int UNIQUENAME(TestMethod)()
