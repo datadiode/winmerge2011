@@ -32,6 +32,17 @@ for %%$ in (
 	copy /y "%$%jq-win32.exe" "%~2jq\jq.exe"
 	set $=
 )
+
+REM Copy WinIMergeLib
+set $=..\..\winimerge\Build\Release\
+for %%$ in (
+	.
+) do if not "%%~$$:$" == "" (
+	xcopy /y "%$%WinIMergeLib.dll" "%~2WinIMerge\"
+	xcopy /y "%$%WinIMergeLib.pdb" "%~2WinIMerge\"
+	xcopy /y "..\..\freeimage\license-gplv3.txt" "%~2WinIMerge\"
+	set $=
+)
 goto :PlatformName$
 
 :PlatformName$x64
@@ -53,6 +64,17 @@ for %%$ in (
 	xcopy /yt "%%~$$:$" "%~2jq\"
 	copy /y "%$%COPYING" "%~2jq\"
 	copy /y "%$%jq-win64.exe" "%~2jq\jq.exe"
+	set $=
+)
+
+REM Copy WinIMergeLib
+set $=..\..\winimerge\Build\x64\Release\
+for %%$ in (
+	.
+) do if not "%%~$$:$" == "" (
+	xcopy /y "%$%WinIMergeLib.dll" "%~2WinIMerge\"
+	xcopy /y "%$%WinIMergeLib.pdb" "%~2WinIMerge\"
+	xcopy /y "..\..\freeimage\license-gplv3.txt" "%~2WinIMerge\"
 	set $=
 )
 goto :PlatformName$

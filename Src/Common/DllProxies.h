@@ -79,4 +79,21 @@ struct KERNEL32V51
 
 extern DllProxy::Instance<struct KERNEL32V51> KERNEL32V51;
 
+// Forward declarations
+interface IImgMergeWindow;
+interface IImgToolWindow;
+
+// WinIMergeLib dll proxy
+struct WinIMergeLib
+{
+	IImgMergeWindow *(*WinIMerge_CreateWindow)(HINSTANCE hInstance, HWND hWndParent, int nID);
+	bool (*WinIMerge_DestroyWindow)(IImgMergeWindow *pImgMergeWindow);
+	IImgToolWindow *(*WinIMerge_CreateToolWindow)(HINSTANCE hInstance, HWND hWndParent, IImgMergeWindow *pImgMergeWindow);
+	bool (*WinIMerge_DestroyToolWindow)(IImgToolWindow *pImgToolWindow);
+	IImgMergeWindow *(*WinIMerge_CreateWindowless)();
+	HMODULE H;
+};
+
+extern DllProxy::Instance<struct WinIMergeLib> WinIMergeLib;
+
 #endif

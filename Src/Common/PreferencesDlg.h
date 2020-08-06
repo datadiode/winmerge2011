@@ -23,6 +23,7 @@
 #include "PropBackups.h"
 #include "PropShell.h"
 #include "PropCompareFolder.h"
+#include "PropCompareImage.h"
 
 class COptionsMgr;
 
@@ -57,6 +58,7 @@ protected:
 	PropBackups m_pageBackups;
 	PropShell m_pageShell;
 	PropCompareFolder m_pageCompareFolder;
+	PropCompareImage m_pageCompareImage;
 
 	static String m_pathMRU;
 

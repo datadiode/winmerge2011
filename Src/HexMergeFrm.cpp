@@ -170,7 +170,7 @@ CHexMergeView *CHexMergeFrame::CreatePane(int iPane)
 void CHexMergeFrame::CreateClient()
 {
 	// Merge frame has a header bar at top
-	m_wndFilePathBar.Create(m_hWnd);
+	m_wndFilePathBar.Create(m_hWnd, WS_VSCROLL);
 
 	m_pView[0] = CreatePane(0);
 	m_pView[1] = CreatePane(1);

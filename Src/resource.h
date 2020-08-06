@@ -17,6 +17,7 @@
 #define IDR_MERGEDOCTYPE                        109
 #define IDR_DIRDOCTYPE                          110
 #define IDR_HEXDOCTYPE                          111
+#define IDR_IMGDOCTYPE                          112
 #define IDD_ABOUTBOX                            200
 #define IDD_PROP_VSS                            201
 #define IDD_OPEN                                202
@@ -58,6 +59,7 @@
 #define IDD_PROPPAGE_COLORS_LIST                239
 #define IDD_BROWSE_FOR_FILE                     240
 #define IDD_BROWSE_FOR_FOLDER                   241
+#define IDD_PROPPAGE_COMPARE_IMAGE              242
 #define IDI_ROTATE2                             302
 #define IDR_SPLASH                              308
 #define IDB_TOOLBAR_ENABLED                     311
@@ -459,6 +461,8 @@
 #define IDC_TAB_FILTER                          1359
 #define IDC_TOGGLE_HIDDEN                       1360
 #define IDC_TOGGLE_SYSTEM                       1361
+#define IDC_COMPAREIMAGE_PATTERNS               1390
+#define IDC_COMPAREIMAGE_DEFAULTS               1391
 #define IDC_SQL_QUERY_PARAMS_GROUP              1400
 #define IDC_SQL_QUERY_PARAMS_LEFT               1401
 #define IDC_SQL_QUERY_PARAMS_RIGHT              1402
@@ -772,8 +776,6 @@
 #define ID_MRGMAN_BASE                          18050
 #define ID_MRGMAN_SOURCE                        18051
 #define ID_MRGMAN_DESTINATION                   18052
-#define IDS_LOCBAR_CAPTION                      18064
-#define IDS_DIFFBAR_CAPTION                     18065
 #define IDS_DIFF_SUCCEEDED                      18400
 #define IDS_DIFF_ITEM1NOTFOUND                  18401
 #define IDS_DIFF_ITEM2NOTFOUND                  18402
@@ -884,6 +886,7 @@
 #define ID_VIEW_EXPAND_ALLSUBDIRS               32828
 #define ID_VIEW_COLLAPSE_ALLSUBDIRS             32829
 #define ID_VIEW_SEPARATE_COMBINING_CHARS        32830
+#define ID_VIEW_IMAGETOOLBOX                    32831
 #define ID_PREVDIFF                             32832
 #define ID_NEXTDIFF                             32833
 #define ID_FIRSTDIFF                            32834
@@ -918,8 +921,9 @@
 #define ID_MERGE_COMPARE_TEXT                   32880
 #define ID_MERGE_COMPARE_ZIP                    32881
 #define ID_MERGE_COMPARE_HEX                    32882
-#define ID_MERGE_COMPARE_XML                    32883
-#define ID_DEBUG_LOADCONFIG                     32884
+#define ID_MERGE_COMPARE_IMG                    32883
+#define ID_MERGE_COMPARE_XML                    32884
+#define ID_DEBUG_LOADCONFIG                     32885
 #define ID_WINDOW_CHANGE_PANE                   32896
 #define ID_WINDOW_CLOSEALL                      32897
 #define ID_HELP_CONTENTS                        32912

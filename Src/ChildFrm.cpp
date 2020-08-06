@@ -977,7 +977,7 @@ void CChildFrame::CreateClient()
 		0, cyClient + 8, 100, cyClient + cyScroll, m_wndDiffViewBar.m_pWnd, 0x1001), this, 1);
 
 	// Merge frame has a header bar at top
-	m_wndFilePathBar.Create(m_hWnd);
+	m_wndFilePathBar.Create(m_hWnd, WS_VSCROLL);
 
 	m_pView[0] = CreatePane(0);
 	m_pView[1] = CreatePane(1);
@@ -1028,9 +1028,9 @@ void CChildFrame::SavePosition()
 }
 
 /**
-* @brief Reflect comparison result in window's icon.
-* @param nResult [in] Last comparison result which the application returns.
-*/
+ * @brief Reflect comparison result in window's icon.
+ * @param nResult [in] Last comparison result which the application returns.
+ */
 void CChildFrame::SetLastCompareResult(int nResult)
 {
 	LoadIcon(nResult == 0 ?

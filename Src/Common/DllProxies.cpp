@@ -104,3 +104,17 @@ DllProxy::Instance<struct KERNEL32V51> KERNEL32V51 =
 	"AttachConsole",
 	(HMODULE)0
 };
+
+/**
+ * @brief WinIMergeLib dll proxy
+ */
+DllProxy::Instance<struct WinIMergeLib> WinIMergeLib =
+{
+	"WinIMerge\\WinIMergeLib.dll",
+	"WinIMerge_CreateWindow",
+	"WinIMerge_DestroyWindow",
+	"WinIMerge_CreateToolWindow",
+	"WinIMerge_DestroyToolWindow",
+	"WinIMerge_CreateWindowless",
+	(HMODULE)0
+};

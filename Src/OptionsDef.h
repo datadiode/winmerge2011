@@ -127,6 +127,8 @@ extern COptionDef
 <int> OPT_SHOW_LOCATIONBAR inline((_T("Settings/ShowLocationBar"), 1));
 extern COptionDef
 <int> OPT_SHOW_DIFFVIEWBAR inline((_T("Settings/ShowDiffViewBar"), 1));
+extern COptionDef
+<int> OPT_SHOW_IMAGETOOLBOX inline((_T("Settings/ShowImageToolbox"), 1));
 
 extern COptionDef
 <int> OPT_TOOLBAR_SIZE inline((_T("Settings/ToolbarSize"), 0));
@@ -366,6 +368,32 @@ extern COptionDef
 <int> OPT_CMP_DIFF_ALGORITHM inline((_T("Settings/DiffAlgorithm"), 0));
 extern COptionDef
 <bool> OPT_CMP_INDENT_HEURISTIC inline((_T("Settings/IndentHeuristic"), true));
+
+// Image Compare options
+extern COptionDef
+<String> OPT_CMP_IMG_FILEPATTERNS inline((_T("Settings/ImageFilePatterns"), _T("*.bmp;*.cut;*.dds;*.exr;*.g3;*.gif;*.hdr;*.ico;*.iff;*.lbm;*.j2k;*.j2c;*.jng;*.jp2;*.jpg;*.jif;*.jpeg;*.jpe;*.jxr;*.wdp;*.hdp;*.koa;*.mng;*.pcd;*.pcx;*.pfm;*.pct;*.pict;*.pic;*.png;*.pbm;*.pgm;*.ppm;*.psd;*.ras;*.sgi;*.rgb;*.rgba;*.bw;*.tga;*.targa;*.tif;*.tiff;*.wap;*.wbmp;*.wbm;*.webp;*.xbm;*.xpm")));
+extern COptionDef
+<bool> OPT_CMP_IMG_SHOWDIFFERENCES inline((_T("Settings/ImageShowDifferences"), true));
+extern COptionDef
+<int> OPT_CMP_IMG_OVERLAYMOVE inline((_T("Settings/ImageOverlayMode"), 0));
+extern COptionDef
+<int> OPT_CMP_IMG_OVERLAYALPHA inline((_T("Settings/ImageOverlayAlpha"), 30));
+extern COptionDef
+<int> OPT_CMP_IMG_DRAGGING_MODE inline((_T("Settings/ImageDraggingMode"), 1));
+extern COptionDef
+<int> OPT_CMP_IMG_ZOOM inline((_T("Settings/ImageZoom"), 1000));
+extern COptionDef
+<bool> OPT_CMP_IMG_USEBACKCOLOR inline((_T("Settings/ImageUseBackColor"), true));
+extern COptionDef
+<COLORREF> OPT_CMP_IMG_BACKCOLOR inline((_T("Settings/ImageBackColor"), RGB(255,255,255)));
+extern COptionDef
+<int> OPT_CMP_IMG_DIFFBLOCKSIZE inline((_T("Settings/ImageDiffBlockSize"), 8));
+extern COptionDef
+<int> OPT_CMP_IMG_DIFFCOLORALPHA inline((_T("Settings/ImageDiffColorAlpha"), 70));
+extern COptionDef
+<int> OPT_CMP_IMG_THRESHOLD inline((_T("Settings/ImageColorDistanceThreshold"), 0));
+extern COptionDef
+<int> OPT_CMP_IMG_INSERTIONDELETIONDETECTION_MODE inline((_T("Settings/ImageInsertionDeletionDetectionMode"), 0));
 
 // Multidoc enable/disable per document type
 extern COptionDef

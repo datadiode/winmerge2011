@@ -60,7 +60,7 @@ public:
 	CEditorFilePathBar(const LONG *FloatScript = NULL, const LONG *SplitScript = NULL);
 	~CEditorFilePathBar();
 
-	BOOL Create(HWND);
+	BOOL Create(HWND, DWORD);
 
 	// Implement IFilepathHeaders
 	void SetText(int pane, LPCTSTR, BOOL bDirty, BUFFERTYPE = BUFFER_NORMAL);

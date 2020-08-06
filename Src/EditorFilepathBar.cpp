@@ -121,11 +121,18 @@ CEditorFilePathBar::~CEditorFilePathBar()
  * @param [in] pParentWnd Parent window for edit controls.
  * @return TRUE if succeeded, FALSE otherwise.
  */
-BOOL CEditorFilePathBar::Create(HWND parent)
+BOOL CEditorFilePathBar::Create(HWND parent, DWORD style)
 {
 	CFloatState::Clear();
 	LanguageSelect.Create(*this, parent);
 	SetDlgCtrlID(0x1000);
+	RECT rc;
+	GetWindowRect(&rc);
+	if (style & WS_VSCROLL)
+		rc.right += GetSystemMetrics(SM_CXVSCROLL);
+	if (style & WS_HSCROLL)
+		rc.bottom += GetSystemMetrics(SM_CYHSCROLL);
+	SetWindowPos(NULL, 0, 0, rc.right - rc.left, rc.bottom - rc.top, SWP_NOMOVE | SWP_NOZORDER | SWP_NOSENDCHANGING);
 	m_Edit[0] = static_cast<HEdit *>(GetDlgItem(IDC_STATIC_TITLE_LEFT));
 	m_Edit[0]->SetLimitText(0x7FFF);
 	m_Edit[1] = static_cast<HEdit *>(GetDlgItem(IDC_STATIC_TITLE_RIGHT));

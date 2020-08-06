@@ -264,6 +264,129 @@ IDR_HEXDOCTYPE MENU
 
 
 
+IDR_IMGDOCTYPE MENU
+{
+    POPUP "&File"
+    {
+        MENUITEM "&New\tCtrl+N", ID_FILE_NEW
+        MENUITEM "&Open...\tCtrl+O", ID_FILE_OPEN
+        MENUITEM "Op&en Conflict File...", ID_FILE_OPENCONFLICT
+        MENUITEM "Start Collec&tion...", ID_FILE_STARTCOLLECT
+        MENUITEM SEPARATOR
+        MENUITEM "Open Pro&ject...\tCtrl+J", ID_FILE_OPENPROJECT
+        MENUITEM "Sa&ve Project...", ID_FILE_SAVEPROJECT
+        MENUITEM SEPARATOR
+        MENUITEM "Recent Projects", ID_FILE_MRU_FILE1, INACTIVE
+        MENUITEM SEPARATOR
+        MENUITEM "&Save\tCtrl+S", ID_FILE_SAVE
+        POPUP "Save &Left"
+        {
+            MENUITEM "&Save", ID_FILE_SAVE_LEFT
+            MENUITEM "Save &As...", ID_FILE_SAVEAS_LEFT
+        }
+        POPUP "Save &Right"
+        {
+            MENUITEM "&Save", ID_FILE_SAVE_RIGHT
+            MENUITEM "Save &As...", ID_FILE_SAVEAS_RIGHT
+        }
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit", ID_APP_EXIT
+    }
+    POPUP "&Edit"
+    {
+        MENUITEM "&Undo\tCtrl+Z", ID_EDIT_UNDO
+        MENUITEM "&Redo\tCtrl+Y", ID_EDIT_REDO
+        MENUITEM SEPARATOR
+        MENUITEM "Cu&t\tCtrl+X", ID_EDIT_CUT
+        MENUITEM "&Copy\tCtrl+C", ID_EDIT_COPY
+        MENUITEM "&Paste\tCtrl+V", ID_EDIT_PASTE
+        MENUITEM SEPARATOR
+        MENUITEM "Select &All\tCtrl+A", ID_EDIT_SELECT_ALL
+        MENUITEM SEPARATOR
+        MENUITEM "F&ind...\tCtrl+F", ID_EDIT_FIND
+        MENUITEM "R&eplace...\tCtrl+H", ID_EDIT_REPLACE
+        MENUITEM SEPARATOR
+        MENUITEM "&Options...", ID_OPTIONS
+    }
+    POPUP "&View"
+    {
+        POPUP "&Zoom"
+        {
+            MENUITEM "Zoom &In\tCtrl++", ID_VIEW_ZOOMIN
+            MENUITEM "Zoom &Out\tCtrl+-", ID_VIEW_ZOOMOUT
+            MENUITEM "&Normal\tCtrl+*", ID_VIEW_ZOOMNORMAL
+        }
+        MENUITEM SEPARATOR
+        MENUITEM "&Lock Panes", ID_VIEW_RESIZE_PANES, HELP
+        MENUITEM SEPARATOR
+        POPUP "&Toolbar"
+        {
+            MENUITEM "&None", ID_TOOLBAR_NONE
+            MENUITEM "&Small", ID_TOOLBAR_SMALL
+            MENUITEM "&Big", ID_TOOLBAR_BIG
+        }
+        MENUITEM "&Status Bar", ID_VIEW_STATUS_BAR, HELP
+        MENUITEM "Ta&b Bar", ID_VIEW_TAB_BAR, HELP
+        MENUITEM "Lo&cation Pane", ID_VIEW_IMAGETOOLBOX, HELP
+        MENUITEM SEPARATOR
+        MENUITEM "Lang&uage...", ID_VIEW_LANGUAGE
+        MENUITEM SEPARATOR
+        MENUITEM "Refresh\tF5", ID_REFRESH
+    }
+    POPUP "&Merge"
+    {
+        MENUITEM "&Next Difference\tAlt+Down", ID_NEXTDIFF
+        MENUITEM "&Previous Difference\tAlt+Up", ID_PREVDIFF
+        MENUITEM SEPARATOR
+        MENUITEM "&First Difference\tAlt+Home", ID_FIRSTDIFF
+        MENUITEM "&Last Difference\tAlt+End", ID_LASTDIFF
+        MENUITEM SEPARATOR
+        MENUITEM "Copy to &Right\tAlt+Right", ID_L2R
+        MENUITEM "Copy to L&eft\tAlt+Left", ID_R2L
+        MENUITEM SEPARATOR
+        MENUITEM "C&opy to Right and Advance\tAlt+Ctrl+Right", ID_L2RNEXT
+        MENUITEM "Copy &to Left and Advance\tAlt+Ctrl+Left", ID_R2LNEXT
+        MENUITEM SEPARATOR
+        MENUITEM "Copy &All to Right", ID_ALL_RIGHT
+        MENUITEM "Cop&y All to Left", ID_ALL_LEFT
+    }
+    POPUP "&Tools"
+    {
+        MENUITEM "&Filters...", ID_TOOLS_FILTERS
+        MENUITEM "&Generate Patch...", ID_TOOLS_GENERATEPATCH
+        MENUITEM "Generate &Report...", ID_TOOLS_GENERATEREPORT
+    }
+    POPUP "&Debug"
+    {
+        MENUITEM "&Load Config...", ID_DEBUG_LOADCONFIG
+        MENUITEM "&Reset Options", ID_DEBUG_RESETOPTIONS
+    }
+    POPUP "&Window"
+    {
+        MENUITEM "Cl&ose", ID_FILE_CLOSE
+        MENUITEM "Clo&se All", ID_WINDOW_CLOSEALL
+        MENUITEM SEPARATOR
+        MENUITEM "Change &Pane\tF6", ID_WINDOW_CHANGE_PANE
+        MENUITEM SEPARATOR
+        MENUITEM "Tile &Horizontally", ID_WINDOW_TILE_HORZ
+        MENUITEM "Tile &Vertically", ID_WINDOW_TILE_VERT
+        MENUITEM "&Cascade", ID_WINDOW_CASCADE
+    }
+    POPUP "&Help"
+    {
+        MENUITEM "&WinMerge Help\tF1", ID_HELP_CONTENTS
+        MENUITEM SEPARATOR
+        MENUITEM "R&elease Notes", ID_HELP_RELEASENOTES
+        MENUITEM "&Translations", ID_HELP_TRANSLATIONS
+        MENUITEM "C&onfiguration", ID_HELP_GETCONFIG
+        MENUITEM SEPARATOR
+        MENUITEM "&GNU General Public License", ID_HELP_GNULICENSE
+        MENUITEM "&About WinMerge...", ID_APP_ABOUT
+    }
+}
+
+
+
 IDR_MAINFRAME MENU
 {
     POPUP "&File"
@@ -564,6 +687,7 @@ IDR_POPUP_DIRVIEW MENU
             MENUITEM "&Text", ID_MERGE_COMPARE_TEXT
             MENUITEM "&Archive", ID_MERGE_COMPARE_ZIP
             MENUITEM "&Binary", ID_MERGE_COMPARE_HEX
+            MENUITEM "&Image", ID_MERGE_COMPARE_IMG
             MENUITEM "&XML", ID_MERGE_COMPARE_XML
             MENUITEM "PluginMonikers", ID_SCRIPT_LAST
         }
@@ -940,7 +1064,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 1
 
 
 
-IDD_EDITOR_HEADERBAR DIALOGEX 0, 0, 32, 32
+IDD_EDITOR_HEADERBAR DIALOGEX 0, 0, 22, 32
 STYLE DS_CONTROL | DS_SHELLFONT | WS_VISIBLE | WS_CHILDWINDOW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
@@ -1120,15 +1244,14 @@ STYLE DS_CENTER | DS_MODALFRAME | DS_SHELLFONT | WS_CAPTION | WS_POPUP | WS_SYSM
 CAPTION "Options"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
+    CONTROL         "", IDC_TREEOPT_PAGES, WC_TREEVIEW, WS_TABSTOP | WS_BORDER | TVS_DISABLEDRAGDROP | TVS_SHOWSELALWAYS, 7, 7, 96, 215, WS_EX_LEFT
+    CONTROL         "", IDC_TREEOPT_HOSTFRAME, WC_STATIC, NOT WS_VISIBLE | WS_DISABLED | SS_BLACKFRAME, 110, 0, 225, 222, WS_EX_LEFT
+    CONTROL         "", IDC_STATIC, WC_STATIC, SS_ETCHEDHORZ, 7, 230, 328, 1, WS_EX_LEFT
+    PUSHBUTTON      "Import...", IDC_TREEOPT_IMPORT, 7, 237, 50, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Export...", IDC_TREEOPT_EXPORT, 62, 237, 50, 14, 0, WS_EX_LEFT
     DEFPUSHBUTTON   "OK", IDOK, 177, 237, 50, 14, 0, WS_EX_LEFT
     PUSHBUTTON      "Cancel", IDCANCEL, 231, 237, 50, 14, 0, WS_EX_LEFT
     PUSHBUTTON      "Help", IDC_TREEOPT_HELP, 285, 237, 50, 14, 0, WS_EX_LEFT
-    CONTROL         "", IDC_TREEOPT_PAGES, WC_TREEVIEW, WS_TABSTOP | WS_BORDER | TVS_DISABLEDRAGDROP | TVS_SHOWSELALWAYS, 7, 20, 96, 202, WS_EX_LEFT
-    CONTROL         "", IDC_TREEOPT_HOSTFRAME, WC_STATIC, NOT WS_VISIBLE | WS_DISABLED | SS_BLACKFRAME, 110, 0, 225, 222, WS_EX_LEFT
-    CONTROL         "", IDC_STATIC, WC_STATIC, SS_ETCHEDHORZ, 7, 230, 328, 1, WS_EX_LEFT
-    LTEXT           " Categories", IDC_STATIC, 7, 7, 96, 13, SS_LEFT | SS_CENTERIMAGE | SS_SUNKEN, WS_EX_LEFT
-    PUSHBUTTON      "Import...", IDC_TREEOPT_IMPORT, 7, 237, 50, 14, 0, WS_EX_LEFT
-    PUSHBUTTON      "Export...", IDC_TREEOPT_EXPORT, 62, 237, 50, 14, 0, WS_EX_LEFT
 }
 
 
@@ -1395,6 +1518,18 @@ FONT 8, "MS Shell Dlg", 0, 0, 1
     EDITTEXT        IDC_COMPARE_THREAD_COUNT, 194, 115, 30, 14, ES_RIGHT | ES_NUMBER, WS_EX_LEFT
     PUSHBUTTON      "Defaults", IDC_COMPAREFOLDER_DEFAULTS, 160, 208, 70, 14, 0, WS_EX_LEFT
 }
+
+
+
+IDD_PROPPAGE_COMPARE_IMAGE DIALOGEX 105, 0, 236, 222
+STYLE DS_CONTROL | DS_SHELLFONT | WS_CAPTION | WS_CHILDWINDOW
+CAPTION "Image"
+FONT 8, "MS Shell Dlg", 0, 0, 1
+BEGIN
+    LTEXT           "Image File &Patterns:", IDC_STATIC, 7, 6, 200, 10
+    COMBOBOX        IDC_COMPAREIMAGE_PATTERNS, 7, 18, 223, 150, WS_TABSTOP | WS_VSCROLL | CBS_DROPDOWN | CBS_AUTOHSCROLL
+    PUSHBUTTON      "Defaults", IDC_COMPAREIMAGE_DEFAULTS, 160, 208, 70, 14
+END
 
 
 
@@ -1965,8 +2100,6 @@ STRINGTABLE
     IDS_EDIT_TEXT_NOT_FOUND       "Cannot find string ""%s"""
     ID_EDITOR_COPY_PATH           "Copy Full Path"
     ID_EDITOR_COPY_FILENAME       "Copy Filename"
-    IDS_LOCBAR_CAPTION            "Location Pane"
-    IDS_DIFFBAR_CAPTION           "Diff Pane"
     IDS_DIFF_SUCCEEDED            "Patch file successfully written."
     IDS_DIFF_ITEM1NOTFOUND        "1. item is not found or is directory!"
     IDS_DIFF_ITEM2NOTFOUND        "2. item is not found or is directory!"
@@ -2050,6 +2183,7 @@ STRINGTABLE
     ID_VIEW_WHITESPACE            "Shows whitespace characters"
     ID_VIEW_DETAIL_BAR            "Toggle Diff Pane"
     ID_VIEW_LOCATION_BAR          "Location pane shows overall picture from files"
+    ID_VIEW_IMAGETOOLBOX          "Location pane shows overall picture from files"
     ID_VIEW_DIR_STATISTICS        "Show folder compare statistics dialog"
     ID_VIEW_LANGUAGE              "Select the current user interface language\nLanguage"
     ID_VIEW_LINEDIFFS             "Shows differences inside lines with different colors\nShow Line Difference"

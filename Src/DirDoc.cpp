@@ -27,6 +27,7 @@
 #include "ChildFrm.h"
 #include "LanguageSelect.h"
 #include "HexMergeFrm.h"
+#include "ImgMergeFrm.h"
 #include "7zCommon.h"
 #include "DirFrame.h"
 #include "DirView.h"
@@ -46,7 +47,7 @@
  */
 bool CDirFrame::CanFrameClose()
 {
-	return m_MergeDocs.empty() && m_HexMergeDocs.empty();
+	return m_MergeDocs.empty() && m_HexMergeDocs.empty() && m_ImgMergeDocs.empty();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -569,6 +570,14 @@ void CDirFrame::AddMergeDoc(CHexMergeFrame *pHexMergeDoc)
 }
 
 /**
+ * @brief A new ImgMergeDoc has been opened.
+ */
+void CDirFrame::AddMergeDoc(CImgMergeFrame *pHexMergeDoc)
+{
+	m_ImgMergeDocs.push_back(pHexMergeDoc);
+}
+
+/**
  * @brief MergeDoc informs us it is closing.
  */
 void CDirFrame::MergeDocClosing(CChildFrame *pMergeDoc)
@@ -590,6 +599,19 @@ void CDirFrame::MergeDocClosing(CHexMergeFrame *pHexMergeDoc)
 		m_HexMergeDocs.begin(), m_HexMergeDocs.end(), pHexMergeDoc);
 	if (pos != m_HexMergeDocs.end())
 		m_HexMergeDocs.erase(pos);
+	else
+		assert(false);
+}
+
+/**
+ * @brief MergeDoc informs us it is closing.
+ */
+void CDirFrame::MergeDocClosing(CImgMergeFrame *pImgMergeDoc)
+{
+	ImgMergeDocPtrList::iterator pos = std::find(
+		m_ImgMergeDocs.begin(), m_ImgMergeDocs.end(), pImgMergeDoc);
+	if (pos != m_ImgMergeDocs.end())
+		m_ImgMergeDocs.erase(pos);
 	else
 		assert(false);
 }
@@ -644,6 +666,19 @@ CHexMergeFrame *CDirFrame::GetHexMergeDocForDiff()
 	CHexMergeFrame *pHexMergeDoc = new CHexMergeFrame(m_pMDIFrame, this);
 	AddMergeDoc(pHexMergeDoc);
 	return pHexMergeDoc;
+}
+
+/**
+ * @brief Obtain an img merge doc to display a difference in files.
+ * @param [out] pNew Set to TRUE if a new doc is created,
+ * and FALSE if an existing one reused.
+ * @return Pointer to CImgMergeDoc to use (new or existing).
+ */
+CImgMergeFrame *CDirFrame::GetImgMergeDocForDiff()
+{
+	CImgMergeFrame *pImgMergeDoc = new CImgMergeFrame(m_pMDIFrame, this);
+	AddMergeDoc(pImgMergeDoc);
+	return pImgMergeDoc;
 }
 
 /**

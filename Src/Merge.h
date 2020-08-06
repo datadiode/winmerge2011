@@ -43,6 +43,7 @@ enum FRAMETYPE
 	FRAME_FOLDER, /**< Folder compare frame. */
 	FRAME_FILE, /**< File compare frame. */
 	FRAME_BINARY, /**< Binary compare frame. */
+	FRAME_IMGFILE, /**< Image file compare frame. */
 };
 
 /**

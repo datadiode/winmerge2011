@@ -31,6 +31,7 @@ class CDirView;
 class CDirFrame;
 class CDocFrame;
 class CHexMergeFrame;
+class CImgMergeFrame;
 class CMergeEditView;
 class CMergeDiffDetailView;
 class LineFiltersList;
@@ -107,6 +108,11 @@ public:
 		PackingInfo * infoUnpacker = NULL,
 		LPCTSTR sCompareAs = NULL);
 	CHexMergeFrame *ShowHexMergeDoc(CDirFrame *,
+		const FileLocation &,
+		const FileLocation &,
+		BOOL bLeftRO, BOOL bRightRO,
+		LPCTSTR sCompareAs);
+	CImgMergeFrame *ShowImgMergeDoc(CDirFrame *,
 		const FileLocation &,
 		const FileLocation &,
 		BOOL bLeftRO, BOOL bRightRO,
@@ -273,13 +279,13 @@ private:
 	bool CloseDocFrame(CDocFrame *);
 	CChildFrame *GetMergeDocToShow(CDirFrame *);
 	CHexMergeFrame *GetHexMergeDocToShow(CDirFrame *);
+	CImgMergeFrame *GetImgMergeDocToShow(CDirFrame *);
 	CDirFrame *GetDirDocToShow();
 	void UpdateDirViewFont();
 	void UpdateMrgViewFont();
 	void OpenFileOrUrl(LPCTSTR szFile, LPCTSTR szUrl);
 	BOOL CreateToobar();
 	void LoadToolbarImages();
-	HMENU NewMenu(int ID);
 	CDocFrame *FindFrameOfType(FRAMETYPE);
 	CEditorFrame *ActivateOpenDoc(CDirFrame *, FileLocation &, FileLocation &, LPCTSTR, UINT, FRAMETYPE);
 

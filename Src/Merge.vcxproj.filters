@@ -702,6 +702,15 @@
     <ClCompile Include="xdiff_gnudiff_compat.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ImgMergeFrm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PropCompareImage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WildcardDropList.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\WindowPlacement.h">
@@ -1260,6 +1269,15 @@
       <Filter>libxdiff</Filter>
     </ClInclude>
     <ClInclude Include="xdiff_gnudiff_compat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ImgMergeFrm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PropCompareImage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WildcardDropList.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

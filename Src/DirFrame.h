@@ -30,8 +30,10 @@
 
 class CDirView;
 class CHexMergeFrame;
+class CImgMergeFrame;
 typedef std::list<CChildFrame *> MergeDocPtrList;
 typedef std::list<CHexMergeFrame *> HexMergeDocPtrList;
+typedef std::list<CImgMergeFrame *> ImgMergeDocPtrList;
 class CTempPathContext;
 struct FileActionItem;
 class MergeCmdLineInfo;
@@ -89,6 +91,7 @@ public:
 	bool CloseMergeDocs();
 	CChildFrame *GetMergeDocForDiff();
 	CHexMergeFrame *GetHexMergeDocForDiff();
+	CImgMergeFrame *GetImgMergeDocForDiff();
 	bool CanFrameClose();
 
 // Implementation
@@ -105,8 +108,10 @@ public:
 	void Redisplay();
 	void AddMergeDoc(CChildFrame *);
 	void AddMergeDoc(CHexMergeFrame *);
+	void AddMergeDoc(CImgMergeFrame *);
 	void MergeDocClosing(CChildFrame *);
 	void MergeDocClosing(CHexMergeFrame *);
+	void MergeDocClosing(CImgMergeFrame *);
 	bool UpdateDiffAfterOperation(const FileActionItem &, bool bMakeTargetItemWritable);
 	void UpdateHeaderPath(BOOL bLeft);
 	void AbortCurrentScan();
@@ -145,6 +150,7 @@ private:
 	CompareStats *const m_pCompareStats; /**< Compare statistics */
 	MergeDocPtrList m_MergeDocs; /**< List of file compares opened from this compare */
 	HexMergeDocPtrList m_HexMergeDocs; /**< List of hex file compares opened from this compare */
+	ImgMergeDocPtrList m_ImgMergeDocs; /**< List of image file compares opened from this compare */
 	int m_nRecursive; /**< Is current compare recursive? (ternary logic - 2 means flat) */
 	int m_nCompMethod; /**< Compare method */
 	String m_strLeftDesc; /**< Left side desription text */

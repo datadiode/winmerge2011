@@ -413,6 +413,7 @@ LRESULT CDirFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 	case ID_MERGE_COMPARE_TEXT:
 	case ID_MERGE_COMPARE_ZIP:
 	case ID_MERGE_COMPARE_HEX:
+	case ID_MERGE_COMPARE_IMG:
 	case ID_MERGE_COMPARE_XML:
 		m_pDirView->OpenSelection(NULL, id);
 		break;
@@ -573,7 +574,7 @@ LRESULT CDirFrame::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 void CDirFrame::CreateClient()
 {
 	// Dir frame has a header bar at top
-	m_wndFilePathBar.Create(m_hWnd);
+	m_wndFilePathBar.Create(m_hWnd, 0);
 	RECT rect;
 	m_wndFilePathBar.GetClientRect(&rect);
 	// Directory frame has a status bar

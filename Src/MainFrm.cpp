@@ -34,6 +34,7 @@
 #include "DirFrame.h"
 #include "ChildFrm.h"
 #include "HexMergeFrm.h"
+#include "ImgMergeFrm.h"
 #include "DirView.h"
 #include "MergeEditView.h"
 #include "MergeDiffDetailView.h"
@@ -863,6 +864,7 @@ const BYTE *CMainFrame::CmdState::Lookup(UINT id) const
 	case ID_MERGE_COMPARE:
 	case ID_MERGE_COMPARE_XML:
 	case ID_MERGE_COMPARE_HEX:
+	case ID_MERGE_COMPARE_IMG:
 		return &MergeCompare;
 	case ID_CURDIFF:
 		return &CurDiff;;
@@ -965,6 +967,8 @@ static COptionDef<int> *Lookup3StateOption(UINT id)
 		return &OPT_SHOW_LOCATIONBAR;
 	case ID_VIEW_DETAIL_BAR:
 		return &OPT_SHOW_DIFFVIEWBAR;
+	case ID_VIEW_IMAGETOOLBOX:
+		return &OPT_SHOW_IMAGETOOLBOX;
 	}
 	return NULL;
 }
@@ -1078,6 +1082,7 @@ LRESULT CMainFrame::OnWndMsg<WM_INITMENUPOPUP>(WPARAM wParam, LPARAM lParam)
 			continue;
 		case ID_VIEW_LOCATION_BAR:
 		case ID_VIEW_DETAIL_BAR:
+		case ID_VIEW_IMAGETOOLBOX:
 			if (HWindow *pBar = pDocFrame ?
 				reinterpret_cast<HWindow *>(pDocFrame->m_hWnd)->GetDlgItem(mii.wID) : NULL)
 			{
@@ -1230,6 +1235,16 @@ CEditorFrame *CMainFrame::ShowMergeDoc(CDirFrame *pDirDoc,
 	if ((dwLeftFlags & FFILEOPEN_DETECTBIN) && filelocLeft.encoding.m_binary ||
 		(dwRightFlags & FFILEOPEN_DETECTBIN) && filelocRight.encoding.m_binary)
 	{
+		if (PathMatchSpec(filelocLeft.filepath.c_str(), COptionsMgr::Get(OPT_CMP_IMG_FILEPATTERNS).c_str()) &&
+			PathMatchSpec(filelocRight.filepath.c_str(), COptionsMgr::Get(OPT_CMP_IMG_FILEPATTERNS).c_str()))
+		{
+			if (CEditorFrame *pDoc = ActivateOpenDoc(pDirDoc,
+				filelocLeft, filelocRight, sCompareAs, ID_MERGE_COMPARE_IMG, FRAME_IMGFILE))
+			{
+				return pDoc;
+			}
+			return ShowImgMergeDoc(pDirDoc, filelocLeft, filelocRight, bLeftRO, bRightRO, sCompareAs);
+		}
 		if (CEditorFrame *pDoc = ActivateOpenDoc(pDirDoc,
 			filelocLeft, filelocRight, sCompareAs, ID_MERGE_COMPARE_HEX, FRAME_BINARY))
 		{
@@ -1270,6 +1285,19 @@ CHexMergeFrame *CMainFrame::ShowHexMergeDoc(CDirFrame *pDirDoc,
 		pHexMergeDoc->m_sCompareAs = sCompareAs;
 	}
 	return pHexMergeDoc;
+}
+
+CImgMergeFrame *CMainFrame::ShowImgMergeDoc(CDirFrame *pDirDoc,
+	const FileLocation &left, const FileLocation &right,
+	BOOL bLeftRO, BOOL bRightRO, LPCTSTR sCompareAs)
+{
+	CImgMergeFrame *const pImgMergeDoc = GetImgMergeDocToShow(pDirDoc);
+	if (pImgMergeDoc != NULL)
+	{
+		pImgMergeDoc->OpenDocs(left, right, bLeftRO, bRightRO);
+		pImgMergeDoc->m_sCompareAs = sCompareAs;
+	}
+	return pImgMergeDoc;
 }
 
 void CMainFrame::RedisplayAllDirDocs()
@@ -1719,6 +1747,14 @@ bool CMainFrame::DoFileOpen(
 				packingInfo.pluginMoniker.c_str(), ID_MERGE_COMPARE_HEX, FRAME_BINARY))
 			{
 				ShowHexMergeDoc(pDirDoc, filelocLeft, filelocRight, bROLeft, bRORight, packingInfo.pluginMoniker.c_str());
+			}
+			return true;
+		case ID_MERGE_COMPARE_IMG:
+			// Open files in binary editor
+			if (!ActivateOpenDoc(pDirDoc, filelocLeft, filelocRight,
+				packingInfo.pluginMoniker.c_str(), ID_MERGE_COMPARE_IMG, FRAME_IMGFILE))
+			{
+				ShowImgMergeDoc(pDirDoc, filelocLeft, filelocRight, bROLeft, bRORight, packingInfo.pluginMoniker.c_str());
 			}
 			return true;
 		}
@@ -2452,6 +2488,25 @@ CHexMergeFrame *CMainFrame::GetHexMergeDocToShow(CDirFrame *pDirDoc)
 	}
 	// Create a new merge doc
 	return new CHexMergeFrame(this);
+}
+
+CImgMergeFrame *CMainFrame::GetImgMergeDocToShow(CDirFrame *pDirDoc)
+{
+	if (pDirDoc)
+	{
+		return pDirDoc->GetImgMergeDocForDiff();
+	}
+	if (!COptionsMgr::Get(OPT_MULTIDOC_MERGEDOCS))
+	{
+		if (CDocFrame *pFrame = FindFrameOfType(FRAME_IMGFILE))
+		{
+			CImgMergeFrame *pDoc = static_cast<CImgMergeFrame *>(pFrame);
+			if (pDoc->SaveModified())
+				pFrame->PostMessage(WM_CLOSE);
+		}
+	}
+	// Create a new merge doc
+	return new CImgMergeFrame(this);
 }
 
 /// Get pointer to a dir doc for displaying a scan
