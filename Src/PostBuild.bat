@@ -87,7 +87,7 @@ for %%$ in (
 )
 
 REM Copy WinMerge.chm
-xcopy /y "..\..\WM2011_Help\Build\Manual\htmlhelp\WinMerge.chm" "%~2Docs\"
+xcopy /y "..\..\winmerge2011_help\Build\Manual\htmlhelp\WinMerge.chm" "%~2Docs\"
 
 REM Create English.pot and MergeLang.rc from Merge.rc
 cd ..\Translations\WinMerge
