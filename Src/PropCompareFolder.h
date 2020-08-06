@@ -34,6 +34,7 @@ public:
 	BOOL    m_bCacheResults;
 	UINT    m_nQuickCompareLimit;
 	int     m_nCompareThreads;
+
 // Implementation
 protected:
 	template<DDX_Operation>
@@ -41,5 +42,4 @@ protected:
 	virtual BOOL OnInitDialog() override;
 	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
 	void OnDefaults();
-	void OnCbnSelchangeComparemethodcombo();
 };
