@@ -835,20 +835,17 @@ IDR_POPUP_MERGEVIEW MENU
 //
 // Dialog resources
 //
-IDD_ABOUTBOX DIALOGEX 0, 0, 223, 124
+IDD_ABOUTBOX DIALOGEX 0, 0, 366, 237
 STYLE DS_CENTER | DS_MODALFRAME | DS_SHELLFONT | WS_CAPTION | WS_POPUP | WS_SYSMENU
 CAPTION "About WinMerge"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
-    ICON            "", IDC_ABOUTBOX_ICON, 24, 14, 21, 20, SS_ICON, WS_EX_LEFT
-    LTEXT           "WinMerge", IDC_STATIC, 63, 13, 63, 8, SS_LEFT | SS_NOPREFIX, WS_EX_LEFT
-    LTEXT           "Version %s", IDC_VERSION, 63, 23, 153, 8, SS_LEFT | SS_NOPREFIX, WS_EX_LEFT
-    LTEXT           "Private Build: %s", IDC_PRIVATEBUILD, 63, 33, 153, 8, SS_LEFT, WS_EX_LEFT
-    DEFPUSHBUTTON   "OK", IDOK, 166, 103, 50, 14, 0, WS_EX_LEFT
-    CONTROL         "Visit the WinMerge HomePage!", IDC_WWW, WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW, 7, 79, 209, 10, WS_EX_LEFT
-    CONTROL         "", IDC_STATIC, WC_STATIC, SS_ETCHEDHORZ, 7, 95, 208, 1, WS_EX_LEFT
-    LTEXT           "[VERSION COPYRIGHT GOES HERE]", IDC_COMPANY, 7, 49, 209, 20, SS_LEFT, WS_EX_LEFT
-    PUSHBUTTON      "Contributors", IDC_OPEN_CONTRIBUTORS, 7, 103, 65, 14, 0, WS_EX_LEFT
+    LTEXT           "", IDC_GNU_ASCII, 7, 50, 200, 121
+    LTEXT           "Version %s", IDC_VERSION, 240, 155, 117, 20, SS_NOPREFIX
+    LTEXT           "[VERSION COPYRIGHT GOES HERE]", IDC_COMPANY, 7, 177, 350, 36
+    DEFPUSHBUTTON   "OK", IDOK, 295, 220, 65, 14
+    PUSHBUTTON      "Contributors", IDC_OPEN_CONTRIBUTORS, 7, 220, 65, 14
+    CONTROL         "Visit the WinMerge HomePage!", IDC_WWW,WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW, 120, 222, 167, 10
 }
 
 
@@ -1581,7 +1578,6 @@ FONT 8, "MS Shell Dlg", 0, 0, 1
 {
     AUTOCHECKBOX    "Automatically &scroll to first difference", IDC_SCROLL_CHECK, 7, 7, 220, 10, 0, WS_EX_LEFT
     AUTOCHECKBOX    "Enable scroll ani&mation", IDC_ENABLE_SCROLL_ANIMATION, 7, 17, 220, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "&Disable Splash Screen", IDC_DISABLE_SPLASH, 7, 27, 220, 10, 0, WS_EX_LEFT
     AUTOCHECKBOX    "Cl&ose windows with ESC", IDC_ESC_CLOSES_WINDOW, 7, 37, 220, 10, 0, WS_EX_LEFT
     AUTOCHECKBOX    "&Automatically verify paths in Open-dialog", IDC_VERIFY_OPEN_PATHS, 7, 47, 220, 10, 0, WS_EX_LEFT
     AUTOCHECKBOX    "All&ow only one instance to run", IDC_SINGLE_INSTANCE, 7, 57, 220, 10, 0, WS_EX_LEFT
@@ -1812,7 +1808,6 @@ STRINGTABLE
     IDC_MIXED_EOL                 "Preserve original EOL chars"
     IDC_STATIC_TITLE_LEFT         "Right click on the path to copy"
     IDC_STATIC_TITLE_RIGHT        "Right click on the path to copy"
-    IDS_SPLASH_DEVELOPERS         "Developers:\nDean Grimm, Christian List, Kimmo Varis, Jochen Tucht, Tim Gerundt, Takashi Sawanaki, Gal Hammer, Alexander Skinner"
     IDS_SPLASH_GPLTEXT            "WinMerge comes with ABSOLUTELY NO WARRANTY. This is free software and you are welcome to redistribute it under certain circumstances; see the GNU General Public License in the Help menu for details."
     IDS_MESSAGEBOX_OK             "&Ok"
     IDS_MESSAGEBOX_CANCEL         "&Cancel"

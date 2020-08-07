@@ -29,6 +29,6 @@ set PathTo7zMsi=%~dp0appveyor-downloads
 
 for %%p in (%*) do (
   for /F "tokens=1,2 delims=!" %%u in ("%%p") do (
-    MSBuild WinMerge.sln /t:Rebuild /p:Platform="%%u" /p:Configuration="%%v" || pause
+    MSBuild WinMerge.sln /t:Rebuild /p:Platform="%%u" /p:Configuration="%%v" || goto :eof
   )
 )

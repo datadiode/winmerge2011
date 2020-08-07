@@ -1,17 +1,5 @@
-/////////////////////////////////////////////////////////////////////////////
-//    License (GPLv3+):
-//    This program is free software; you can redistribute it and/or modify
-//    it under the terms of the GNU General Public License as published by
-//    the Free Software Foundation; either version 3 of the License, or
-//    (at your option) any later version.
-//
-//    This program is distributed in the hope that it will be useful, but
-//    WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//    General Public License for more details.
-//
-//    You should have received a copy of the GNU General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+﻿/////////////////////////////////////////////////////////////////////////////
+//    SPDX-License-Identifier: GPL-3.0-or-later
 /////////////////////////////////////////////////////////////////////////////
 /**
  * @file  AboutDlg.cpp
@@ -28,8 +16,39 @@
 #include "paths.h"
 #include "coretools.h"
 
-CAboutDlg::CAboutDlg() : ODialog(IDD_ABOUTBOX)
+// https://www.gnu.org/graphics/gnu-ascii.html
+// Copyright (c) 2001 Free Software Foundation, Inc.
+// Converted with https://tomeko.net/online_tools/cpp_text_escape.php
+static const char gnu_ascii[] =
+"  ,           ,\n"
+" /             \\\n"
+"((__-^^-,-^^-__))\n"
+" `-_---' `---_-'\n"
+"  `--|o` 'o|--'\n"
+"     \\  `  /\n"
+"      ): :(\n"
+"      :o_o:\n"
+"       \"-\"";
+
+CAboutDlg::CAboutDlg()
+	: ODialog(IDD_ABOUTBOX)
+	, m_font_gnu_ascii(NULL)
 {
+	if (HRSRC hRsrc = FindResource(NULL, MAKEINTRESOURCE(IDR_SPLASH), _T("IMAGE")))
+	{
+		if (HGLOBAL hGlob = LoadResource(NULL, hRsrc))
+		{
+			if (BYTE *pbData = static_cast<BYTE *>(LockResource(hGlob)))
+			{
+				DWORD cbData = SizeofResource(NULL, hRsrc);
+				if (IStream *pstm = SHCreateMemStream(pbData, cbData))
+				{
+					OleLoadPicture(pstm, cbData, FALSE, IID_IPicture, (void**)&m_spIPicture);
+					pstm->Release();
+				}
+			}
+		}
+	}
 }
 
 LRESULT CAboutDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
@@ -61,12 +80,38 @@ LRESULT CAboutDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			return MessageReflect_WebLinkButton<WM_DRAWITEM>(wParam, lParam);
 		}
 		break;
+	case WM_CTLCOLORSTATIC:
+		if (reinterpret_cast<HWindow *>(lParam)->GetDlgCtrlID() == IDC_GNU_ASCII)
+			reinterpret_cast<HSurface *>(wParam)->SetTextColor(RGB(128, 128, 128));
+		reinterpret_cast<HSurface *>(wParam)->SetBkMode(TRANSPARENT);
+		return reinterpret_cast<LRESULT>(GetStockObject(NULL_BRUSH));
+	case WM_ERASEBKGND:
+		if (m_spIPicture)
+		{
+			HSurface *const pdc = reinterpret_cast<HSurface *>(wParam);
+			RECT rc;
+			GetClientRect(&rc);
+			SIZE size;
+			m_spIPicture->get_Width(&size.cx);
+			m_spIPicture->get_Height(&size.cy);
+			rc.top = MulDiv(rc.right, size.cy, size.cx);
+			pdc->SetBkColor(GetSysColor(COLOR_BTNFACE));
+			pdc->ExtTextOut(0, 0, ETO_OPAQUE, &rc, NULL, 0);
+			rc.bottom = rc.top;
+			rc.top = 0;
+			m_spIPicture->Render(pdc->m_hDC, 0, 0, rc.right, rc.bottom, 0, size.cy, size.cx, -size.cy, NULL);
+			return TRUE;
+		}
+		break;
 	case WM_SETCURSOR:
 		switch (::GetDlgCtrlID(reinterpret_cast<HWND>(wParam)))
 		{
 		case IDC_WWW:
 			return MessageReflect_WebLinkButton<WM_SETCURSOR>(wParam, lParam);
 		}
+		break;
+	case WM_NCDESTROY:
+		VERIFY(m_font_gnu_ascii->DeleteObject());
 		break;
 	}
 	return ODialog::WindowProc(message, wParam, lParam);
@@ -80,9 +125,18 @@ BOOL CAboutDlg::OnInitDialog()
 	ODialog::OnInitDialog();
 	LanguageSelect.TranslateDialog(m_hWnd);
 
-	// Load application icon
-	HICON icon = LanguageSelect.LoadIcon(IDR_MAINFRAME);
-	SendDlgItemMessage(IDC_ABOUTBOX_ICON, STM_SETICON, reinterpret_cast<WPARAM>(icon));
+	if (HWindow *const ctrl = GetDlgItem(IDC_GNU_ASCII))
+	{
+		HSurface *pdc = ctrl->GetDC();
+		int logpixelsy = pdc->GetDeviceCaps(LOGPIXELSY);
+		int fontHeight = -MulDiv(14, logpixelsy, 72);
+		m_font_gnu_ascii = HFont::Create(fontHeight, 0, 0, 0, FW_BOLD, FALSE,
+			FALSE, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
+			DEFAULT_QUALITY, DEFAULT_PITCH, _T("Courier New"));
+		ctrl->SetFont(m_font_gnu_ascii);
+		SetDlgItemTextA(IDC_GNU_ASCII, gnu_ascii);
+		ctrl->ReleaseDC(pdc);
+	}
 
 	CVersionInfo version;
 
@@ -90,23 +144,24 @@ BOOL CAboutDlg::OnInitDialog()
 	if (GetDlgItemText(IDC_VERSION, fmt, _countof(fmt)))
 	{
 		String s = version.GetProductVersion();
+		int n = s.length();
 #ifdef _WIN64
-		s += _T(" [64 bit]");
+		s += _T("\n64-bit");
+#else
+		s += _T("\n32-bit");
 #endif
 #ifdef _DEBUG
-		s += _T(" [Debug]");
+		s += _T(" Debug");
 #endif
+		String private_build = version.GetPrivateBuild();
+		if (!private_build.empty())
+			s += _T(" + ") + private_build;
 		s = string_format(fmt, s.c_str());
 		SetDlgItemText(IDC_VERSION, s.c_str());
 	}
-	if (GetDlgItemText(IDC_PRIVATEBUILD, fmt, _countof(fmt)))
-	{
-		String s = version.GetPrivateBuild();
-		if (!s.empty())
-			s = string_format(fmt, s.c_str());
-		SetDlgItemText(IDC_PRIVATEBUILD, s.c_str());
-	}
-	String copyright = version.GetLegalCopyright();
+	String copyright = LanguageSelect.LoadString(IDS_SPLASH_GPLTEXT);
+	copyright += _T("\n");
+	copyright += version.GetLegalCopyright();
 	SetDlgItemText(IDC_COMPANY, copyright.c_str());
 	return TRUE;
 }

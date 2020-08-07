@@ -167,7 +167,6 @@
 #define IDC_IGNOREREGEXP                        1020
 #define IDC_BPL_EDIT                            1021
 #define IDC_BPL_AUTO                            1022
-#define IDC_DISABLE_SPLASH                      1023
 #define IDC_ENABLE_SCROLL_ANIMATION             1024
 #define IDC_DIFF_ALGORITHM                      1025
 #define IDC_INDENT_HEURISTIC                    1026
@@ -434,7 +433,7 @@
 #define IDC_LFILTER_ADDBTN                      1328
 #define IDC_LFILTER_EDITBTN                     1329
 #define IDC_LFILTER_REMOVEBTN                   1331
-#define IDC_ABOUTBOX_ICON                       1334
+#define IDC_GNU_ASCII                           1334
 #define IDC_ASK_MULTIWINDOW_CLOSE               1335
 #define IDC_COLDLG_LIST                         1336
 #define IDC_PRESERVE_FILETIME                   1337
@@ -502,7 +501,6 @@
 #define IDC_ENABLE_MERGEEDIT_SHELL_CONTEXT_MENU 8616
 #define ID_SCRIPT_FIRST                         8700
 #define ID_SCRIPT_LAST                          8749
-#define IDS_SPLASH_DEVELOPERS                   8976
 #define IDS_SPLASH_GPLTEXT                      8977
 #define IDS_MESSAGEBOX_OK                       9001
 #define IDS_MESSAGEBOX_CANCEL                   9002

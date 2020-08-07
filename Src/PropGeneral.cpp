@@ -61,7 +61,6 @@ bool PropGeneral::UpdateData()
 {
 	DDX_Check<op>(IDC_SCROLL_CHECK, m_bScroll);
 	DDX_Check<op>(IDC_ENABLE_SCROLL_ANIMATION, m_bEnableScrollAnimation);
-	DDX_Check<op>(IDC_DISABLE_SPLASH, m_bDisableSplash);
 	DDX_Check<op>(IDC_SINGLE_INSTANCE, m_bSingleInstance);
 	DDX_Check<op>(IDC_VERIFY_OPEN_PATHS, m_bVerifyPaths);
 	DDX_Check<op>(IDC_ESC_CLOSES_WINDOW, m_bCloseWindowWithEsc);
@@ -100,7 +99,6 @@ void PropGeneral::ReadOptions()
 	m_bScroll = COptionsMgr::Get(OPT_SCROLL_TO_FIRST);
 	int flags = COptionsMgr::Get(OPT_PHONY_EFFECTS);
 	m_bEnableScrollAnimation = (flags & PHONY_EFFECTS_ENABLE_SCROLL_ANIMATION) != 0;
-	m_bDisableSplash = (flags & PHONY_EFFECTS_DISABLE_SPLASH) != 0;
 	m_bSingleInstance = COptionsMgr::Get(OPT_SINGLE_INSTANCE);
 	m_bVerifyPaths = COptionsMgr::Get(OPT_VERIFY_OPEN_PATHS);
 	m_bCloseWindowWithEsc = COptionsMgr::Get(OPT_CLOSE_WITH_ESC);
@@ -119,8 +117,7 @@ void PropGeneral::WriteOptions()
 {
 	COptionsMgr::SaveOption(OPT_SCROLL_TO_FIRST, m_bScroll == BST_CHECKED);
 	COptionsMgr::SaveOption(OPT_PHONY_EFFECTS,
-		(m_bEnableScrollAnimation ? PHONY_EFFECTS_ENABLE_SCROLL_ANIMATION : 0) |
-		(m_bDisableSplash ? PHONY_EFFECTS_DISABLE_SPLASH : 0));
+		(m_bEnableScrollAnimation ? PHONY_EFFECTS_ENABLE_SCROLL_ANIMATION : 0));
 	COptionsMgr::SaveOption(OPT_SINGLE_INSTANCE, m_bSingleInstance == BST_CHECKED);
 	COptionsMgr::SaveOption(OPT_VERIFY_OPEN_PATHS, m_bVerifyPaths == BST_CHECKED);
 	COptionsMgr::SaveOption(OPT_CLOSE_WITH_ESC, m_bCloseWindowWithEsc == BST_CHECKED);
