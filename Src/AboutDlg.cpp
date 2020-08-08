@@ -162,6 +162,9 @@ BOOL CAboutDlg::OnInitDialog()
 	String copyright = LanguageSelect.LoadString(IDS_SPLASH_GPLTEXT);
 	copyright += _T("\n");
 	copyright += version.GetLegalCopyright();
+	String::size_type const pos = copyright.rfind(_T('\xA9'));
+	if (pos != String::npos)
+		copyright.insert(pos, 3, _T(' ')); // approximate an em space
 	SetDlgItemText(IDC_COMPANY, copyright.c_str());
 	return TRUE;
 }
