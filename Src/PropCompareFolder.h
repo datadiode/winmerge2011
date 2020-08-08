@@ -33,6 +33,7 @@ public:
 	BOOL    m_bWalkUniques;
 	BOOL    m_bCacheResults;
 	UINT    m_nQuickCompareLimit;
+	UINT    m_nBinaryCompareLimit;
 	int     m_nCompareThreads;
 
 // Implementation

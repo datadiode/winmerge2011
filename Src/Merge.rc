@@ -668,6 +668,7 @@ IDR_POPUP_DIFF_OPTIONS MENU
         {
             MENUITEM "Full Contents", ID_COMPMETHOD_FULL_CONTENTS
             MENUITEM "Quick Contents", ID_COMPMETHOD_QUICK_CONTENTS
+            MENUITEM "Binary Contents", ID_COMPMETHOD_BINARY_CONTENTS
             MENUITEM "Modified Date", ID_COMPMETHOD_MODDATE
             MENUITEM "Modified Date and Size", ID_COMPMETHOD_DATESIZE
             MENUITEM "Size", ID_COMPMETHOD_SIZE
@@ -1510,9 +1511,11 @@ FONT 8, "MS Shell Dlg", 0, 0, 1
     AUTOCHECKBOX    "&Include unique subfolders contents", IDC_COMPARE_WALKUNIQUES, 7, 61, 222, 10, 0, WS_EX_LEFT
     AUTOCHECKBOX    "C&ache compare results of visited folders", IDC_COMPARE_CACHE_RESULTS, 7, 72, 222, 8, 0, WS_EX_LEFT
     LTEXT           "&Quick compare limit (MB):", IDC_STATIC, 7, 85, 165, 8, SS_LEFT, WS_EX_LEFT
-    EDITTEXT        IDC_COMPARE_QUICKC_LIMIT, 194, 83, 30, 14, ES_RIGHT | ES_NUMBER, WS_EX_LEFT
-    LTEXT           "&Number of compare threads (a negative value implies addition of the number of available CPU cores):", IDC_STATIC, 7, 101, 165, 24, SS_LEFT, WS_EX_LEFT
-    EDITTEXT        IDC_COMPARE_THREAD_COUNT, 194, 115, 30, 14, ES_RIGHT | ES_NUMBER, WS_EX_LEFT
+    EDITTEXT        IDC_COMPARE_QUICKC_LIMIT, 194, 83, 30, 12, ES_RIGHT | ES_NUMBER, WS_EX_LEFT
+    LTEXT           "&Binary compare limit (MB):", IDC_STATIC, 7, 99, 165, 8
+    EDITTEXT        IDC_COMPARE_BINARYC_LIMIT, 194, 97, 30, 12, ES_RIGHT | ES_NUMBER, WS_EX_LEFT
+    LTEXT           "&Number of compare threads (a negative value implies addition of the number of available CPU cores):", IDC_STATIC, 7, 113, 165, 24, SS_LEFT, WS_EX_LEFT
+    EDITTEXT        IDC_COMPARE_THREAD_COUNT, 194, 127, 30, 12, ES_RIGHT | ES_NUMBER, WS_EX_LEFT
     PUSHBUTTON      "Defaults", IDC_COMPAREFOLDER_DEFAULTS, 160, 208, 70, 14, 0, WS_EX_LEFT
 }
 
@@ -1849,6 +1852,7 @@ STRINGTABLE
     IDS_XLS_REPORT_FILES          "XLS Files (*.xls)|*.xls|All Files (*.*)|*.*||"
     ID_COMPMETHOD_FULL_CONTENTS   "Full Contents"
     ID_COMPMETHOD_QUICK_CONTENTS  "Quick Contents"
+    ID_COMPMETHOD_BINARY_CONTENTS "Binary Contents"
     ID_COMPMETHOD_MODDATE         "Modified Date"
     ID_COMPMETHOD_DATESIZE        "Modified Date and Size"
     ID_COMPMETHOD_SIZE            "Size"

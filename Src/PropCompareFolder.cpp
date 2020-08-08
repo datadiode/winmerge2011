@@ -33,6 +33,7 @@ bool PropCompareFolder::UpdateData()
 	DDX_Check<op>(IDC_COMPARE_WALKUNIQUES, m_bWalkUniques);
 	DDX_Check<op>(IDC_COMPARE_CACHE_RESULTS, m_bCacheResults);
 	DDX_Text<op>(IDC_COMPARE_QUICKC_LIMIT, m_nQuickCompareLimit);
+	DDX_Text<op>(IDC_COMPARE_BINARYC_LIMIT, m_nBinaryCompareLimit);
 	DDX_Text<op>(IDC_COMPARE_THREAD_COUNT, m_nCompareThreads);
 	return true;
 }
@@ -97,6 +98,7 @@ void PropCompareFolder::ReadOptions()
 	m_bWalkUniques = COptionsMgr::Get(OPT_CMP_WALK_UNIQUES);
 	m_bCacheResults = COptionsMgr::Get(OPT_CMP_CACHE_RESULTS);
 	m_nQuickCompareLimit = COptionsMgr::Get(OPT_CMP_QUICK_LIMIT) / Mega;
+	m_nBinaryCompareLimit = COptionsMgr::Get(OPT_CMP_BINARY_LIMIT) / Mega;
 	m_nCompareThreads = COptionsMgr::Get(OPT_CMP_COMPARE_THREADS);
 }
 
@@ -114,6 +116,7 @@ void PropCompareFolder::WriteOptions()
 	COptionsMgr::SaveOption(OPT_CMP_WALK_UNIQUES, m_bWalkUniques != FALSE);
 	COptionsMgr::SaveOption(OPT_CMP_CACHE_RESULTS, m_bCacheResults != FALSE);
 	COptionsMgr::SaveOption(OPT_CMP_QUICK_LIMIT, m_nQuickCompareLimit * Mega);
+	COptionsMgr::SaveOption(OPT_CMP_BINARY_LIMIT, m_nBinaryCompareLimit * Mega);
 	COptionsMgr::SaveOption(OPT_CMP_COMPARE_THREADS, m_nCompareThreads);
 }
 
@@ -127,6 +130,8 @@ BOOL PropCompareFolder::OnInitDialog()
 		String item = LanguageSelect.LoadString(ID_COMPMETHOD_FULL_CONTENTS);
 		combo->AddString(item.c_str());
 		item = LanguageSelect.LoadString(ID_COMPMETHOD_QUICK_CONTENTS);
+		combo->AddString(item.c_str());
+		item = LanguageSelect.LoadString(ID_COMPMETHOD_BINARY_CONTENTS);
 		combo->AddString(item.c_str());
 		item = LanguageSelect.LoadString(ID_COMPMETHOD_MODDATE);
 		combo->AddString(item.c_str());
@@ -149,6 +154,7 @@ void PropCompareFolder::OnDefaults()
 	m_bWalkUniques = COptionsMgr::GetDefault(OPT_CMP_WALK_UNIQUES);
 	m_bCacheResults = COptionsMgr::GetDefault(OPT_CMP_CACHE_RESULTS);
 	m_nQuickCompareLimit = COptionsMgr::GetDefault(OPT_CMP_QUICK_LIMIT) / Mega;
+	m_nBinaryCompareLimit = COptionsMgr::GetDefault(OPT_CMP_BINARY_LIMIT) / Mega;
 	m_nCompareThreads = COptionsMgr::GetDefault(OPT_CMP_COMPARE_THREADS);
 	UpdateScreen();
 }

@@ -60,6 +60,7 @@
 #define IDD_BROWSE_FOR_FILE                     240
 #define IDD_BROWSE_FOR_FOLDER                   241
 #define IDD_PROPPAGE_COMPARE_IMAGE              242
+#define IDD_PROPPAGE_COMPARE_BINARY             243
 #define IDI_ROTATE2                             302
 #define IDR_SPLASH                              308
 #define IDB_TOOLBAR_ENABLED                     311
@@ -450,8 +451,7 @@
 #define IDC_COMPARE_WALKUNIQUES                 1349
 #define IDC_COMPARE_QUICKC_LIMIT                1350
 #define IDC_MATCH_SIMILAR_LINES_MAX             1351
-#define IDC_TREE_FOLDER                         1352
-#define IDC_LIST_FILE                           1353
+#define IDC_COMPARE_BINARYC_LIMIT               1353
 #define IDC_BUTTON_NEW_FOLDER                   1354
 #define IDC_STATIC_FILTER                       1355
 #define IDC_COMBO_FILTER                        1356
@@ -460,6 +460,8 @@
 #define IDC_TAB_FILTER                          1359
 #define IDC_TOGGLE_HIDDEN                       1360
 #define IDC_TOGGLE_SYSTEM                       1361
+#define IDC_TREE_FOLDER                         1370
+#define IDC_LIST_FILE                           1371
 #define IDC_COMPAREIMAGE_PATTERNS               1390
 #define IDC_COMPAREIMAGE_DEFAULTS               1391
 #define IDC_SQL_QUERY_PARAMS_GROUP              1400
@@ -538,9 +540,10 @@
 #define IDS_INIFILES                            16421
 #define ID_COMPMETHOD_FULL_CONTENTS             16432
 #define ID_COMPMETHOD_QUICK_CONTENTS            16433
-#define ID_COMPMETHOD_MODDATE                   16434
-#define ID_COMPMETHOD_DATESIZE                  16435
-#define ID_COMPMETHOD_SIZE                      16436
+#define ID_COMPMETHOD_BINARY_CONTENTS           16434
+#define ID_COMPMETHOD_MODDATE                   16435
+#define ID_COMPMETHOD_DATESIZE                  16436
+#define ID_COMPMETHOD_SIZE                      16437
 #define IDS_FILTERFILE_NAMETITLE                16448
 #define IDS_FILTERFILE_PATHTITLE                16449
 #define IDS_FILTER_TITLE                        16450

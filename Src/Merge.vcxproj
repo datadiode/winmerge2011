@@ -260,6 +260,7 @@
     <ClCompile Include="CCPrompt.cpp" />
     <ClCompile Include="ChildFrm.cpp" />
     <ClCompile Include="codepage_detect.cpp" />
+    <ClCompile Include="CompareEngines\BinaryCompare.cpp" />
     <ClCompile Include="CompareStatisticsDlg.cpp" />
     <ClCompile Include="CompareStats.cpp" />
     <ClCompile Include="ConfigLog.cpp" />
@@ -756,6 +757,7 @@
     <ClInclude Include="CCPrompt.h" />
     <ClInclude Include="ChildFrm.h" />
     <ClInclude Include="codepage_detect.h" />
+    <ClInclude Include="CompareEngines\BinaryCompare.h" />
     <ClInclude Include="CompareOptions.h" />
     <ClInclude Include="CompareStatisticsDlg.h" />
     <ClInclude Include="CompareStats.h" />

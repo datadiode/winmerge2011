@@ -372,6 +372,7 @@ void CDirFrame::Rescan(int nCompareSelected)
 	m_pCtxt->m_bIgnoreSmallTimeDiff = COptionsMgr::Get(OPT_IGNORE_SMALL_FILETIME);
 	m_pCtxt->m_bStopAfterFirstDiff = COptionsMgr::Get(OPT_CMP_STOP_AFTER_FIRST);
 	m_pCtxt->m_nQuickCompareLimit = COptionsMgr::Get(OPT_CMP_QUICK_LIMIT);
+    m_pCtxt->m_nBinaryCompareLimit = COptionsMgr::Get(OPT_CMP_BINARY_LIMIT);
 	m_pCtxt->m_bSelfCompare = COptionsMgr::Get(OPT_CMP_SELF_COMPARE);
 	m_pCtxt->m_bWalkUniques = COptionsMgr::Get(OPT_CMP_WALK_UNIQUES);
 

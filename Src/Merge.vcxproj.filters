@@ -711,6 +711,9 @@
     <ClCompile Include="WildcardDropList.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CompareEngines\BinaryCompare.cpp">
+      <Filter>Compare Engines</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\WindowPlacement.h">
@@ -1279,6 +1282,9 @@
     </ClInclude>
     <ClInclude Include="WildcardDropList.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CompareEngines\BinaryCompare.h">
+      <Filter>Compare Engines</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

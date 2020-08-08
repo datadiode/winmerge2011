@@ -101,6 +101,11 @@ public:
 	int m_nQuickCompareLimit;
 
 	/**
+	 * Threshold size for switching to binary compare.
+	 */
+	int m_nBinaryCompareLimit;
+
+	/**
 	 * Self-compare unique files to detect encoding and EOL style.
 	 *
 	 * This value is true by default.

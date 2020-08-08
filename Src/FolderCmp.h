@@ -8,6 +8,7 @@
 #include "DiffFileData.h"
 #include "DiffUtils.h"
 #include "ByteCompare.h"
+#include "BinaryCompare.h"
 #include "TimeSizeCompare.h"
 
 class CDiffContext;
@@ -38,5 +39,6 @@ private:
 	CDiffContext *const m_pCtx;
 	CompareEngines::DiffUtils *m_pDiffUtilsEngine;
 	CompareEngines::ByteCompare *m_pByteCompare;
+	CompareEngines::BinaryCompare *m_pBinaryCompare;
 	CompareEngines::TimeSizeCompare *m_pTimeSizeCompare;
 };

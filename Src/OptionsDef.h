@@ -69,6 +69,7 @@ enum COMPARE_TYPE
 	CMP_DATE,
 	CMP_DATE_SIZE,
 	CMP_SIZE,
+	CMP_BINARY_CONTENT,
 };
 
 /**
@@ -356,6 +357,8 @@ extern COptionDef
 <bool> OPT_CMP_STOP_AFTER_FIRST inline((_T("Settings/StopAfterFirst"), false));
 extern COptionDef
 <UINT> OPT_CMP_QUICK_LIMIT inline((_T("Settings/QuickMethodLimit"), 4 * 1024 * 1024));
+extern COptionDef
+<UINT> OPT_CMP_BINARY_LIMIT inline((_T("Settings/BinaryMethodLimit"), 64 * 1024 * 1024));
 extern COptionDef
 <int> OPT_CMP_COMPARE_THREADS inline((_T("Settings/CompareThreads"), -1));
 extern COptionDef

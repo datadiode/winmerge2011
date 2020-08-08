@@ -6,7 +6,6 @@
 #include "StdAfx.h"
 #include "Merge.h"
 #include "DiffUtils.h"
-#include "ByteCompare.h"
 #include "LogFile.h"
 #include "paths.h"
 #include "DiffContext.h"
@@ -14,7 +13,6 @@
 #include "FileTransform.h"
 #include "FolderCmp.h"
 #include "codepage_detect.h"
-#include "TimeSizeCompare.h"
 
 /**
  * @brief Copy text stat results from diffutils back into the FileTextStats structure
@@ -30,6 +28,7 @@ static void CopyTextStats(const file_data * inf, FileTextStats * myTextStats)
 FolderCmp::FolderCmp(CDiffContext *pCtxt, LONG iCompareThread)
 : m_pDiffUtilsEngine(NULL)
 , m_pByteCompare(NULL)
+, m_pBinaryCompare(NULL)
 , m_pTimeSizeCompare(NULL)
 , m_ndiffs(CDiffContext::DIFFS_UNKNOWN)
 , m_ntrivialdiffs(CDiffContext::DIFFS_UNKNOWN)
@@ -43,6 +42,7 @@ FolderCmp::~FolderCmp()
 {
 	delete m_pDiffUtilsEngine;
 	delete m_pByteCompare;
+	delete m_pBinaryCompare;
 	delete m_pTimeSizeCompare;
 }
 
@@ -60,7 +60,9 @@ UINT FolderCmp::prepAndCompareTwoFiles(DIFFITEM *di)
 
 	UINT code = DIFFCODE::FILE | DIFFCODE::CMPERR; // yields a warning icon
 
-	if (nCompMethod == CMP_CONTENT || nCompMethod == CMP_QUICK_CONTENT)
+	if (nCompMethod == CMP_CONTENT ||
+		nCompMethod == CMP_QUICK_CONTENT ||
+		nCompMethod == CMP_BINARY_CONTENT)
 	{
 		// Reset text stats
 		m_diffFileData.m_textStats[0].clear();
@@ -91,9 +93,14 @@ UINT FolderCmp::prepAndCompareTwoFiles(DIFFITEM *di)
 			else
 				m_diffFileData.m_FileLocation[1].encoding = m_diffFileData.m_FileLocation[0].encoding;
 
-			// If either file is larger than limit compare files by quick contents
+			// If either file is larger than limit fall back to cheaper method
 			// This allows us to (faster) compare big binary files
-			if (di->left.size.int64 > m_pCtx->m_nQuickCompareLimit ||
+			if (di->left.size.int64 > m_pCtx->m_nBinaryCompareLimit ||
+				di->right.size.int64 > m_pCtx->m_nBinaryCompareLimit)
+			{
+				nCompMethod = CMP_BINARY_CONTENT;
+			}
+			else if (di->left.size.int64 > m_pCtx->m_nQuickCompareLimit ||
 				di->right.size.int64 > m_pCtx->m_nQuickCompareLimit)
 			{
 				nCompMethod = CMP_QUICK_CONTENT;
@@ -147,6 +154,21 @@ UINT FolderCmp::prepAndCompareTwoFiles(DIFFITEM *di)
 		m_diffFileData.m_textStats[1] = m_pByteCompare->m_textStats[1];
 
 		// Quick contents doesn't know about diff counts
+		// Set to special value to indicate invalid
+		m_ndiffs = CDiffContext::DIFFS_UNKNOWN_QUICKCOMPARE;
+		m_ntrivialdiffs = CDiffContext::DIFFS_UNKNOWN_QUICKCOMPARE;
+	}
+	else if (nCompMethod == CMP_BINARY_CONTENT)
+	{
+		if (m_pBinaryCompare == NULL)
+			m_pBinaryCompare = new CompareEngines::BinaryCompare(m_pCtx);
+
+		m_pBinaryCompare->SetFileData(2, m_diffFileData.file);
+
+		// use our own byte-by-byte compare
+		code = m_pBinaryCompare->CompareFiles();
+
+		// Binary contents doesn't know about diff counts
 		// Set to special value to indicate invalid
 		m_ndiffs = CDiffContext::DIFFS_UNKNOWN_QUICKCOMPARE;
 		m_ntrivialdiffs = CDiffContext::DIFFS_UNKNOWN_QUICKCOMPARE;
