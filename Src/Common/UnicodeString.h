@@ -28,8 +28,8 @@ using std::max;
 
 typedef std_tchar(string) String;
 
-String::size_type string_replace(String &, LPCTSTR find, LPCTSTR replace);
-String::size_type string_replace(String &, TCHAR find, TCHAR replace);
+int string_replace(String &, LPCTSTR find, LPCTSTR replace, int = 0);
+int string_replace(String &, TCHAR find, TCHAR replace, int = 0);
 
 // Trimming
 void string_trim_ws(String &);

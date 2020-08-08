@@ -29,20 +29,21 @@
  * @param [in] target A string containing another string to replace.
  * @param [in] find A string to search and replace with another (@p replace).
  * @param [in] replace A string used to replace original (@p find).
+ * @param [in] n When negative, limits the number of replacements to -n.
  */
-String::size_type string_replace(String &target, LPCTSTR find, LPCTSTR replace)
+int string_replace(String &target, LPCTSTR find, LPCTSTR replace, int n)
 {
 	const String::size_type find_len =
 		static_cast<String::size_type>(_tcslen(find));
 	const String::size_type replace_len =
 		static_cast<String::size_type>(_tcslen(replace));
 	String::size_type pos = 0;
-	String::size_type n = 0;
 	while ((pos = target.find(find, pos)) != String::npos)
 	{
 		target.replace(pos, find_len, replace, replace_len);
 		pos += replace_len;
-		++n;
+		if (++n == 0)
+			break;
 	}
 	return n;
 }
@@ -55,16 +56,17 @@ String::size_type string_replace(String &target, LPCTSTR find, LPCTSTR replace)
  * @param [in] target A string containing an character to replace.
  * @param [in] find A character to search and replace with another (@p replace).
  * @param [in] replace A character used to replace original (@p find).
+ * @param [in] n When negative, limits the number of replacements to -n.
  */
-String::size_type string_replace(String &target, TCHAR find, TCHAR replace)
+int string_replace(String &target, TCHAR find, TCHAR replace, int n)
 {
-	String::size_type n = 0;
 	for (String::iterator it = target.begin(); it != target.end(); ++it)
 	{
 		if (*it == find)
 		{
 			*it = replace;
-			++n;
+			if (++n == 0)
+				break;
 		}
 	}
 	return n;
