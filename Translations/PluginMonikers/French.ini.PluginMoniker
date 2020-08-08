@@ -11,6 +11,8 @@ JSON = script:\FileTransforms\jq.wsc
 JSON trié = script:\FileTransforms\jq.wsc?options='--sort-keys'
 Schéma Protobuf = script:\FileTransforms\protodec.wsc?options='--schema'
 Contenu Protobuf = script:\FileTransforms\protodec.wsc?options='--print'
+SQLite DB Schema = external:"%ProgramFiles(x86)%\SQLiteCompare\SQLiteCompare.exe" /CompareSchemaOnly "<path>" "<path>"
+SQLite DB Content = external:"%ProgramFiles(x86)%\SQLiteCompare\SQLiteCompare.exe" "<path>" "<path>"
 XML trié = script:\FileTransforms\msxml.wsc?transform='\FileTransforms\msxml-sort.xslt'
 Code source formaté Astyle = script:\FileTransforms\astyle.wsc?optfile='\FileTransforms\astyle.opt'
 Déterminer à partir de l'extension du fichier = mapping:%SupplementFolder%\Supplement.ini?FileTransforms

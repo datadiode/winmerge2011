@@ -1653,6 +1653,12 @@ bool CMainFrame::DoFileOpen(
 		dwRightFlags &= ~FFILEOPEN_DETECT;
 	}
 
+	// Save the MRU left and right files
+	if (!(dwLeftFlags & FFILEOPEN_NOMRU))
+		addToMru(filelocLeft.filepath.c_str(), _T("Files\\Left"));
+	if (!(dwRightFlags & FFILEOPEN_NOMRU))
+		addToMru(filelocRight.filepath.c_str(), _T("Files\\Right"));
+
 	env_ResolveMoniker(packingInfo.pluginMoniker);
 	if (LPCTSTR ini = EatPrefix(packingInfo.pluginMoniker.c_str(), _T("mapping:")))
 	{
@@ -1676,7 +1682,36 @@ bool CMainFrame::DoFileOpen(
 			packingInfo.pluginMoniker.clear();
 		env_ResolveMoniker(packingInfo.pluginMoniker);
 	}
-
+	if (LPCTSTR cmd = EatPrefix(packingInfo.pluginMoniker.c_str(), _T("external:")))
+	{
+		String sCmd = cmd;
+		string_replace(sCmd, _T("<wpath>"), filelocLeft.filepath.c_str(), -1);
+		string_replace(sCmd, _T("<path>"), paths_UndoMagic(wcsdupa(filelocLeft.filepath.c_str())), -1);
+		string_replace(sCmd, _T("<wpath>"), filelocRight.filepath.c_str(), -1);
+		string_replace(sCmd, _T("<path>"), paths_UndoMagic(wcsdupa(filelocRight.filepath.c_str())), -1);
+		String sExecutable;
+		DecorateCmdLine(sCmd, sExecutable);
+		if (!paths_PathIsExe(sExecutable.c_str()))
+		{
+			// Don't know how to invoke external editor (it doesn't end with
+			// an obvious executable extension)
+			LanguageSelect.FormatStrings(IDS_UNKNOWN_EXECUTE_FILE, sExecutable.c_str()).MsgBox(MB_ICONSTOP);
+			return false;
+		}
+		STARTUPINFO si;
+		ZeroMemory(&si, sizeof si);
+		si.cb = sizeof si;
+		PROCESS_INFORMATION pi;
+		if (!CreateProcess(NULL, const_cast<LPTSTR>(sCmd.c_str()), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi))
+		{
+			// Error invoking external editor
+			LanguageSelect.FormatStrings(IDS_ERROR_EXECUTE_FILE, sExecutable.c_str()).MsgBox(MB_ICONSTOP);
+			return false;
+		}
+		CloseHandle(pi.hThread);
+		CloseHandle(pi.hProcess);
+		return true;
+	}
 	if (!packingInfo.pluginMoniker.empty())
 	{
 		if (packingInfo.pluginMoniker == _T("text"))
@@ -1706,12 +1741,6 @@ bool CMainFrame::DoFileOpen(
 		dwLeftFlags &= ~FFILEOPEN_DETECT;
 		dwRightFlags &= ~FFILEOPEN_DETECT;
 	}
-
-	// Save the MRU left and right files
-	if (!(dwLeftFlags & FFILEOPEN_NOMRU))
-		addToMru(filelocLeft.filepath.c_str(), _T("Files\\Left"));
-	if (!(dwRightFlags & FFILEOPEN_NOMRU))
-		addToMru(filelocRight.filepath.c_str(), _T("Files\\Right"));
 
 	if (1)
 	{
@@ -2737,25 +2766,25 @@ void CMainFrame::OpenFileToExternalEditor(LPCTSTR file, LPCTSTR editor, int line
 	}
 	String sExecutable;
 	DecorateCmdLine(sCmd, sExecutable);
-	if (paths_PathIsExe(sExecutable.c_str()))
-	{
-		STARTUPINFO si;
-		ZeroMemory(&si, sizeof si);
-		si.cb = sizeof si;
-		PROCESS_INFORMATION pi;
-		if (!CreateProcess(NULL, const_cast<LPTSTR>(sCmd.c_str()),
-				NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi))
-		{
-			// Error invoking external editor
-			LanguageSelect.FormatStrings(IDS_ERROR_EXECUTE_FILE, sExecutable.c_str()).MsgBox(MB_ICONSTOP);
-		}
-	}
-	else
+	if (!paths_PathIsExe(sExecutable.c_str()))
 	{
 		// Don't know how to invoke external editor (it doesn't end with
 		// an obvious executable extension)
 		LanguageSelect.FormatStrings(IDS_UNKNOWN_EXECUTE_FILE, sExecutable.c_str()).MsgBox(MB_ICONSTOP);
+		return;
 	}
+	STARTUPINFO si;
+	ZeroMemory(&si, sizeof si);
+	si.cb = sizeof si;
+	PROCESS_INFORMATION pi;
+	if (!CreateProcess(NULL, const_cast<LPTSTR>(sCmd.c_str()), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi))
+	{
+		// Error invoking external editor
+		LanguageSelect.FormatStrings(IDS_ERROR_EXECUTE_FILE, sExecutable.c_str()).MsgBox(MB_ICONSTOP);
+		return;
+	}
+	CloseHandle(pi.hThread);
+	CloseHandle(pi.hProcess);
 }
 
 void CMainFrame::OpenFileWith(LPCTSTR file) const
