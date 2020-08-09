@@ -90,9 +90,10 @@ LRESULT WildcardDropList::LbWndProc(HWND hwnd, UINT message, WPARAM wParam, LPAR
  * @brief Handles the CBN_DROPDOWN notification.
  * @param [in] hCb Handle to ComboBox control.
  * @param [in] columns Number of columns to fit in one line.
- * @param [in] pch Semicolon delimited list of wildcard patterns.
+ * @param [in] fixedPatterns Semicolon delimited list of wildcard patterns.
+ * @param [in] allowUserAddedPatterns Whether to allow user-added patterns
  */
-void WildcardDropList::OnDropDown(HWND hCb, int columns, LPCTSTR pch)
+void WildcardDropList::OnDropDown(HWND hCb, int columns, LPCTSTR fixedPatterns, bool allowUserAddedPatterns)
 {
 	COMBOBOXINFO info;
 	info.cbSize = sizeof info;
@@ -123,6 +124,7 @@ void WildcardDropList::OnDropDown(HWND hCb, int columns, LPCTSTR pch)
 	TCHAR *const patterns = static_cast<TCHAR *>(_alloca(len * sizeof(TCHAR)));
 	::GetWindowText(hCb, patterns, len);
 	int i = 0;
+	LPCTSTR pch = fixedPatterns;
 	while (size_t const cch = _tcscspn(pch += _tcsspn(pch, _T("; ")), _T("; ")))
 	{
 		TCHAR text[20];
@@ -138,11 +140,34 @@ void WildcardDropList::OnDropDown(HWND hCb, int columns, LPCTSTR pch)
 		++i;
 		pch += cch;
 	}
+	if (allowUserAddedPatterns)
+	{
+		pch = patterns;
+		while (size_t const cch = _tcscspn(pch += _tcsspn(pch, _T("; ")), _T("; ")))
+		{
+			TCHAR text[20];
+			*std::copy<>(pch, pch + std::min<>(cch, _countof(text) - 1), text) = _T('\0');
+			if (!fixedPatterns[0] || !PathMatchSpec(text, fixedPatterns))
+			{
+				TCITEM item;
+				item.dwStateMask = TCIS_HIGHLIGHTED;
+				item.dwState = TCIS_HIGHLIGHTED;
+				item.pszText = text;
+				item.mask = TCIF_TEXT;
+				TabCtrl_InsertItem(hTc, i, &item);
+				item.mask = TCIF_STATE;
+				TabCtrl_SetItem(hTc, i, &item);
+				++i;
+			}
+			pch += cch;
+		}
+	}
 	TabCtrl_SetCurSel(hTc, -1);
 	TabCtrl_AdjustRect(hTc, FALSE, &rc);
 	rc.right = static_cast<int>(::SendMessage(hCb, CB_GETDROPPEDWIDTH, 0, 0));
 	::SetWindowPos(info.hwndList, NULL, 0, 0, rc.right, rc.top, SWP_NOMOVE | SWP_NOZORDER);
 	::RegisterHotKey(info.hwndList, IDCANCEL, 0, VK_ESCAPE);
+	::SetCursor(::LoadCursor(NULL, IDC_ARROW));
 	LONG_PTR pfnSuper = ::SetWindowLongPtr(info.hwndList, GWLP_WNDPROC, (LONG_PTR)LbWndProc);
 	::SetWindowLongPtr(info.hwndList, GWLP_USERDATA, pfnSuper);
 }
