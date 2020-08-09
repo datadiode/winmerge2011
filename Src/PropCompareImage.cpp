@@ -73,6 +73,7 @@ void PropCompareImage::ReadOptions()
  */
 void PropCompareImage::WriteOptions()
 {
+	WildcardRemoveDuplicatePatterns(m_sFilePatterns);
 	COptionsMgr::SaveOption(OPT_CMP_IMG_FILEPATTERNS, m_sFilePatterns);
 }
 

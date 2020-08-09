@@ -26,4 +26,5 @@ protected:
 	void BrowseColor(int id, COLORREF &currentColor);
 	void SerializeColor(OPERATION op, int id, COptionDef<COLORREF> &optionName, COLORREF &color);
 	int ValidateNumber(HEdit *edit, int iMin, int iMax);
+	static void WildcardRemoveDuplicatePatterns(String &patterns);
 };
