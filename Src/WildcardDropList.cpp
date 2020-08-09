@@ -129,7 +129,7 @@ void WildcardDropList::OnDropDown(HWND hCb, int columns, LPCTSTR pch)
 		*std::copy<>(pch, pch + std::min<>(cch, _countof(text) - 1), text) = _T('\0');
 		TCITEM item;
 		item.dwStateMask = TCIS_HIGHLIGHTED;
-		item.dwState = PathMatchSpec(text, patterns) ? TCIS_HIGHLIGHTED : 0;
+		item.dwState = (patterns[0] && PathMatchSpec(text, patterns)) ? TCIS_HIGHLIGHTED : 0;
 		item.pszText = text;
 		item.mask = TCIF_TEXT;
 		TabCtrl_InsertItem(hTc, i, &item);
