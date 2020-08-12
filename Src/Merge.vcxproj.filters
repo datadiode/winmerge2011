@@ -714,6 +714,9 @@
     <ClCompile Include="CompareEngines\BinaryCompare.cpp">
       <Filter>Compare Engines</Filter>
     </ClCompile>
+    <ClCompile Include="PropLexers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\WindowPlacement.h">
@@ -1285,6 +1288,9 @@
     </ClInclude>
     <ClInclude Include="CompareEngines\BinaryCompare.h">
       <Filter>Compare Engines</Filter>
+    </ClInclude>
+    <ClInclude Include="PropLexers.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

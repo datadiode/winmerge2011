@@ -462,6 +462,7 @@
     <ClCompile Include="PropEditor.cpp" />
     <ClCompile Include="PropGeneral.cpp" />
     <ClCompile Include="PropHexEditor.cpp" />
+    <ClCompile Include="PropLexers.cpp" />
     <ClCompile Include="PropListColors.cpp" />
     <ClCompile Include="PropRegistry.cpp" />
     <ClCompile Include="PropShell.cpp" />
@@ -880,6 +881,7 @@
     <ClInclude Include="PropEditor.h" />
     <ClInclude Include="PropGeneral.h" />
     <ClInclude Include="PropHexEditor.h" />
+    <ClInclude Include="PropLexers.h" />
     <ClInclude Include="PropListColors.h" />
     <ClInclude Include="PropRegistry.h" />
     <ClInclude Include="PropShell.h" />

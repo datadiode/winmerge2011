@@ -11,6 +11,7 @@
 #include "PropGeneral.h"
 #include "PropCompare.h"
 #include "PropEditor.h"
+#include "PropLexers.h"
 #include "PropHexEditor.h"
 #include "PropVss.h"
 #include "PropRegistry.h"
@@ -46,6 +47,7 @@ protected:
 	PropGeneral m_pageGeneral;
 	PropCompare m_pageCompare;
 	PropEditor m_pageEditor;
+	PropLexers m_pageLexers;
 	PropHexEditor m_pageHexEditor;
 	PropVss m_pageVss;
 	PropRegistry m_pageSystem;
