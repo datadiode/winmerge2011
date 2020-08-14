@@ -59,6 +59,7 @@ enum SRCOPTIONS : DWORD
 	SRCOPT_EOLNMAC			= 0x0200,
 	SRCOPT_FNBRACE			= 0x0400,
 //	SRCOPT_WORDWRAP			= 0x0800,
+	SRCOPT_HTML_LEXIS		= 0x3000,
 	SRCOPT_HTML4_LEXIS		= 0x1000,
 	SRCOPT_HTML5_LEXIS		= 0x2000,
 };
@@ -372,6 +373,7 @@ public:
 	//  Source type
 	TextDefinition *m_CurSourceDef;
 	static TextDefinition m_StaticSourceDefs[];
+	static int const m_SourceDefsCount;
 	static TextDefinition *m_SourceDefs;
 	static TextDefinition *GetTextType(LPCTSTR pszExt);
 	static TextDefinition *GetTextType(int index);

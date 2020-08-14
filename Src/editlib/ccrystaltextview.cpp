@@ -2317,11 +2317,11 @@ BOOL CCrystalTextView::OnSetCursor(UINT nHitTest)
 			PrepareSelBounds();
 			if (!IsInsideSelBlock(ptText))
 			{
-				::SetCursor(::LoadCursor(NULL, MAKEINTRESOURCE(IDC_IBEAM)));
+				::SetCursor(::LoadCursor(NULL, IDC_IBEAM));
 			}
 			else if (!m_bDisableDragAndDrop)   // If Drag And Drop Not Disabled
 			{
-				::SetCursor(::LoadCursor(NULL, MAKEINTRESOURCE(IDC_ARROW)));
+				::SetCursor(::LoadCursor(NULL, IDC_ARROW));
 			}
 			// So else we return TRUE but don't set a cursor? Looks like a bug...
 		}
