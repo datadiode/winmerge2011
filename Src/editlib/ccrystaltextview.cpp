@@ -419,6 +419,9 @@ int CCrystalTextView::ScrollToSubLine(int nNewTopSubLine, bool bRedraw)
 	int nScrollLines = 0;
 	if (m_nTopSubLine != nNewTopSubLine)
 	{
+		RECT rcScroll;
+		GetClientRect(&rcScroll);
+		rcScroll.top += GetTopMarginHeight();
 		// Limit scrolling so that we show one empty line at end of file
 		int const nMaxTopSubLine = GetSubLineCount() - 1;
 		if (nNewTopSubLine > nMaxTopSubLine)
@@ -434,7 +437,7 @@ int CCrystalTextView::ScrollToSubLine(int nNewTopSubLine, bool bRedraw)
 			GetLineBySubLine(m_nTopSubLine, m_nTopLine);
 			if (bRedraw)
 			{
-				ScrollWindow(0, nScrollLines);
+				ScrollWindow(0, nScrollLines, &rcScroll, &rcScroll);
 				UpdateWindow();
 			}
 			RecalcVertScrollBar(true);
@@ -925,7 +928,7 @@ void CCrystalTextView::InvalidateScreenRect()
 	RECT rect;
 	GetClientRect(&rect);
 	m_nScreenChars = (rect.right - rect.left - GetMarginWidth()) / GetCharWidth();
-	m_nScreenLines = (rect.bottom - rect.top) / GetLineHeight();
+	m_nScreenLines = (rect.bottom - rect.top - GetTopMarginHeight()) / GetLineHeight();
 	InvalidateLineCache(0, -1);
 }
 
@@ -1357,6 +1360,54 @@ DWORD CCrystalTextView::GetLineFlags(int nLineIndex) const
 	return m_pTextBuffer ? m_pTextBuffer->GetLineFlags(nLineIndex) : 0;
 }
 
+void CCrystalTextView::DrawRuler(HSurface *pdc, int left, int top, int width, int height, int charwidth, int offset)
+{
+	HGdiObj *const pOldFont = pdc->SelectObject(m_apFonts[0]);
+	UINT const uiOldAlign = pdc->SetTextAlign(TA_LEFT);
+	UINT const uiOldMode = pdc->SetBkMode(TRANSPARENT);
+	HGdiObj *const pOldPen = pdc->SelectStockObject(WHITE_PEN);
+	int const bottom = top + height - 1;
+	TCHAR szNumbers[32];
+	TEXTMETRIC tm;
+	pdc->GetTextMetrics(&tm);
+	for (int i = 0; i < width / charwidth; ++i)
+	{
+		int x = left + i * charwidth;
+		int const tickscale =
+			(((i + offset) % 10) == 0) ? 60 :
+			(((i + offset) % 5) == 0) ? 40 :
+			20;
+		pdc->MoveTo(x, bottom - MulDiv(height, tickscale, 100));
+		pdc->LineTo(x, bottom);
+		if (((i + offset) % 10) == 0)
+		{
+			int const len = wsprintf(szNumbers, _T("%d"), offset + i);
+			pdc->TextOut(x, top - tm.tmInternalLeading, szNumbers, len);
+		}
+	}
+	if (int const delta = offset % 10)
+	{
+		offset -= delta;
+		int const len = wsprintf(szNumbers, _T("%d"), offset);
+		if (len > delta)
+			pdc->TextOut(left, top - tm.tmInternalLeading, szNumbers + delta, len - delta);
+	}
+	pdc->MoveTo(left, bottom);
+	pdc->LineTo(left + width, bottom);
+	pdc->SelectObject(pOldPen);
+	pdc->SetTextAlign(uiOldAlign);
+	pdc->SetBkMode(uiOldMode);
+	pdc->SelectObject(pOldFont);
+}
+
+void CCrystalTextView::DrawTopMargin(HSurface *pdc, const RECT &rect)
+{
+	pdc->SetBkColor(GetColor(COLORINDEX_SELMARGIN));
+	pdc->ExtTextOut(0, 0, ETO_OPAQUE, &rect, NULL, 0);
+	pdc->SetTextColor(GetColor(COLORINDEX_NORMALTEXT));
+	DrawRuler(pdc, GetMarginWidth(), 0, rect.right - rect.left, rect.bottom - rect.top, GetCharWidth(), m_nOffsetChar);
+}
+
 /**
  * @brief Draw selection margin.
  * @param [in] pdc         Pointer to draw context.
@@ -1515,6 +1566,8 @@ void CCrystalTextView::OnDraw(HSurface *pdc)
 
 	int const nLineCount = GetLineCount();
 	int const nLineHeight = GetLineHeight();
+	int const nTopMarginHeight = GetTopMarginHeight();
+
 	PrepareSelBounds();
 
 	RECT rcLine;
@@ -1522,6 +1575,7 @@ void CCrystalTextView::OnDraw(HSurface *pdc)
 	int const nSubLineOffset = GetSubLineIndex(m_nTopLine) - m_nTopSubLine;
 	if (nSubLineOffset < 0)
 		rcLine.top = nSubLineOffset * nLineHeight;
+	rcLine.top += nTopMarginHeight;
 	rcLine.bottom = rcLine.top;
 
 	int nCurrentLine = m_nTopLine;
@@ -1560,6 +1614,9 @@ void CCrystalTextView::OnDraw(HSurface *pdc)
 		}
 		rcLine.top = rcLine.bottom;
 	}
+	rcClient.bottom = rcClient.top + nTopMarginHeight;
+	if (pdc->RectVisible(&rcClient))
+		DrawTopMargin(pdc, rcClient);
 }
 
 void CCrystalTextView::ResetView()
@@ -1712,7 +1769,7 @@ void CCrystalTextView::DeleteFonts()
 	}
 }
 
-int CCrystalTextView::GetLineHeight()
+int CCrystalTextView::GetLineHeight() const
 {
 	ASSERT(m_szCharExt.cy > 0);
 	return m_szCharExt.cy;
@@ -1905,7 +1962,7 @@ int CCrystalTextView::SubLineHomeToCharPos(int nLineIndex, int nSubLineOffset)
 }
 //END SW
 
-int CCrystalTextView::GetCharWidth()
+int CCrystalTextView::GetCharWidth() const
 {
 	return m_szCharExt.cx;
 }
@@ -2343,7 +2400,7 @@ POINT CCrystalTextView::ClientToText(const POINT &point)
 	int const nLineCount = GetLineCount();
 
 	POINT pt;
-	pt.y = m_nTopSubLine + point.y / GetLineHeight();
+	pt.y = m_nTopSubLine + (point.y - GetTopMarginHeight()) / GetLineHeight();
 	if (pt.y >= nSubLineCount)
 		pt.y = nSubLineCount - 1;
 	if (pt.y < 0)
@@ -2448,7 +2505,7 @@ POINT CCrystalTextView::TextToClient(const POINT &point)
 	int const nSubLineStart = CharPosToPoint(point.y, point.x, charPoint);
 	charPoint.y += GetSubLineIndex(point.y);
 	// compute y-position
-	POINT pt = { 0, (charPoint.y - m_nTopSubLine) * GetLineHeight() };
+	POINT pt = { 0, (charPoint.y - m_nTopSubLine) * GetLineHeight() + GetTopMarginHeight() };
 	if (charPoint.x != 0)
 	{
 		// we have to calculate x-position
@@ -2480,6 +2537,7 @@ void CCrystalTextView::InvalidateLines(int nLine1, int nLine2)
 {
 	RECT rcInvalid;
 	GetClientRect(&rcInvalid);
+	int const nTopMarginHeight = GetTopMarginHeight();
 	int const nLineHeight = GetLineHeight();
 	if (nLine2 != -1)
 	{
@@ -2490,14 +2548,14 @@ void CCrystalTextView::InvalidateLines(int nLine1, int nLine2)
 			nLine2 = nTemp;
 		}
 		//BEGIN SW
-		rcInvalid.bottom = (GetSubLineIndex(nLine2) - m_nTopSubLine + GetSubLines(nLine2)) * nLineHeight;
+		rcInvalid.bottom = (GetSubLineIndex(nLine2) - m_nTopSubLine + GetSubLines(nLine2)) * nLineHeight + nTopMarginHeight;
 		/*ORIGINAL
 		rcInvalid.top = (nLine1 - m_nTopLine) * GetLineHeight();
 		rcInvalid.bottom = (nLine2 - m_nTopLine + 1) * GetLineHeight();
 		*/
 		//END SW
 	}
-	rcInvalid.top = (GetSubLineIndex(nLine1) - m_nTopSubLine) * nLineHeight;
+	rcInvalid.top = (GetSubLineIndex(nLine1) - m_nTopSubLine) * nLineHeight + nTopMarginHeight;
 	InvalidateRect(&rcInvalid, FALSE);
 }
 
@@ -2818,6 +2876,19 @@ void CCrystalTextView::UpdateCompositionWindowFont() /* IME */
 	GetFont()->GetLogFont(&logfont);
 	ImmSetCompositionFont(hIMC, &logfont);
 	ImmReleaseContext(m_hWnd, hIMC);
+}
+
+void CCrystalTextView::SetTopMargin(bool bTopMargin)
+{
+	if (m_bTopMargin != bTopMargin)
+	{
+		m_bTopMargin = bTopMargin;
+		if (m_hWnd)
+		{
+			OnSize();
+			Invalidate();
+		}
+	}
 }
 
 void CCrystalTextView::SetSelectionMargin(bool bSelMargin)
@@ -3472,6 +3543,11 @@ void CCrystalTextView::SetViewEols(bool bViewEols, bool bDistinguishEols)
 	}
 }
 
+bool CCrystalTextView::GetTopMargin() const
+{
+	return m_bTopMargin;
+}
+
 bool CCrystalTextView::GetSelectionMargin() const
 {
 	return m_bSelMargin;
@@ -3482,6 +3558,11 @@ bool CCrystalTextView::GetViewLineNumbers() const
 	return m_bViewLineNumbers;
 }
 
+int CCrystalTextView::GetTopMarginHeight() const
+{
+	return m_bTopMargin ? GetLineHeight() : 0;
+}
+
 /**
  * @brief Calculate margin area width.
  * This function calculates needed margin width. Needed width is (approx.)
@@ -3490,7 +3571,7 @@ bool CCrystalTextView::GetViewLineNumbers() const
  * biggest number fits.
  * @return Margin area width in pixels.
  */
-int CCrystalTextView::GetMarginWidth()
+int CCrystalTextView::GetMarginWidth() const
 {
 	int nMarginWidth = 0;
 	if (m_bViewLineNumbers)

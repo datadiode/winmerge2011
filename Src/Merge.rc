@@ -571,10 +571,11 @@ IDR_MERGEDOCTYPE MENU
         MENUITEM "Vie&w Line Differences", ID_VIEW_LINEDIFFS, HELP
         MENUITEM "View Line &Numbers", ID_VIEW_LINENUMBERS, HELP
         MENUITEM "View &Margins", ID_VIEW_FILEMARGIN, HELP
-        MENUITEM "W&rap Lines", ID_VIEW_WORDWRAP, HELP
+        MENUITEM "View &Rulers", ID_VIEW_RULER, HELP
+        MENUITEM "Wr&ap Lines", ID_VIEW_WORDWRAP, HELP
         MENUITEM "Separate combining characters\tCtrl+M", ID_VIEW_SEPARATE_COMBINING_CHARS, HELP
         MENUITEM SEPARATOR
-        MENUITEM "Sw&ap Panes\tCtrl+U", ID_VIEW_SWAPPANES
+        MENUITEM "Swap Panes\tCtrl+U", ID_VIEW_SWAPPANES
         MENUITEM SEPARATOR
         POPUP "&Toolbar"
         {
@@ -2203,6 +2204,7 @@ STRINGTABLE
     ID_VIEW_LINENUMBERS           "Shows line numbers\nShow Line Numbers"
     ID_VIEW_WORDWRAP              "Enable word wrap\nWrap Lines"
     ID_VIEW_FILEMARGIN            "Shows selection margins for both panes\nShow Selection Margins"
+    ID_VIEW_RULER                 "Shows horizontal rulers for both panes\nShow Horizontal Rulers"
     ID_VIEW_ZOOMIN                "Increase text size"
     ID_VIEW_ZOOMOUT               "Decrease text size"
     ID_VIEW_ZOOMNORMAL            "Reset text zoom to default size"

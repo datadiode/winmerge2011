@@ -871,6 +871,7 @@
 #define ID_REFRESH                              32787
 #define ID_EDIT_COPY_LINENUMBERS                32788
 #define ID_DIR_RESCAN                           32789
+#define ID_VIEW_RULER                           32790
 #define ID_OPTIONS_SHOWIDENTICAL                32800
 #define ID_OPTIONS_SHOWDIFFERENT                32801
 #define ID_OPTIONS_SHOWUNIQUELEFT               32802

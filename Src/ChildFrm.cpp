@@ -268,6 +268,14 @@ void CChildFrame::UpdateSingleCmdUI<ID_VIEW_FILEMARGIN>()
 }
 
 template<>
+void CChildFrame::UpdateSingleCmdUI<ID_VIEW_RULER>()
+{
+	m_pMDIFrame->UpdateCmdUI<ID_VIEW_RULER>(
+		m_pView[0] == NULL ? MF_GRAYED :
+		m_pView[0]->GetTopMargin() ? MF_CHECKED : 0);
+}
+
+template<>
 void CChildFrame::UpdateSingleCmdUI<ID_VIEW_LINEDIFFS>()
 {
 	m_pMDIFrame->UpdateCmdUI<ID_VIEW_LINEDIFFS>(
@@ -327,6 +335,11 @@ LRESULT CChildFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 	case ID_EOL_TO_UNIX:
 	case ID_EOL_TO_MAC:
 		pActiveView->OnConvertEolTo(id);
+		break;
+	case ID_VIEW_RULER:
+		COptionsMgr::SaveOption(OPT_VIEW_RULER, !m_pView[0]->GetTopMargin());
+		RefreshOptions();
+		UpdateSingleCmdUI<ID_VIEW_RULER>();
 		break;
 	case ID_TOOLS_COMPARE_SELECTION:
 		OnToolsCompareSelection();
@@ -1174,6 +1187,7 @@ void CChildFrame::UpdateCmdUI()
 
 	UpdateSingleCmdUI<ID_VIEW_LINENUMBERS>();
 	UpdateSingleCmdUI<ID_VIEW_FILEMARGIN>();
+	UpdateSingleCmdUI<ID_VIEW_RULER>();
 	UpdateSingleCmdUI<ID_VIEW_LINEDIFFS>();
 	UpdateSingleCmdUI<ID_VIEW_WORDWRAP>();
 	UpdateSingleCmdUI<ID_VIEW_SEPARATE_COMBINING_CHARS>();

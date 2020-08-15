@@ -658,6 +658,12 @@ void CMainFrame::UpdateCmdUI<ID_VIEW_FILEMARGIN>(BYTE uFlags)
 }
 
 template<>
+void CMainFrame::UpdateCmdUI<ID_VIEW_RULER>(BYTE uFlags)
+{
+	m_cmdState.TopMargin = uFlags;
+}
+
+template<>
 void CMainFrame::UpdateCmdUI<ID_VIEW_WORDWRAP>(BYTE uFlags)
 {
 	m_cmdState.WordWrapping = uFlags;
@@ -907,6 +913,8 @@ const BYTE *CMainFrame::CmdState::Lookup(UINT id) const
 		return &ViewLineNumbers;
 	case ID_VIEW_FILEMARGIN:
 		return &SelectionMargin;
+	case ID_VIEW_RULER:
+		return &TopMargin;
 	case ID_VIEW_WORDWRAP:
 		return &WordWrapping;
 	case ID_VIEW_LINEDIFFS:

@@ -346,6 +346,7 @@ private:
 		BYTE CollectMode;
 		BYTE ViewLineNumbers;
 		BYTE SelectionMargin;
+		BYTE TopMargin;
 		BYTE WordWrapping;
 		BYTE WordDiffHighlight;
 		BYTE SeparateCombinedChars;

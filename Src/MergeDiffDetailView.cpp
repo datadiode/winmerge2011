@@ -54,6 +54,9 @@ LRESULT CMergeDiffDetailView::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam
  */
 void CMergeDiffDetailView::RefreshOptions()
 {
+	SetSelectionMargin(COptionsMgr::Get(OPT_VIEW_FILEMARGIN));
+	SetTopMargin(COptionsMgr::Get(OPT_VIEW_RULER));
+	SetViewLineNumbers(COptionsMgr::Get(OPT_VIEW_LINENUMBERS));
 	// Tab size is set at buffer level, so no need to set it here again
 	SetViewTabs(COptionsMgr::Get(OPT_VIEW_WHITESPACE));
 	bool bMixedEOL = COptionsMgr::Get(OPT_ALLOW_MIXED_EOL) ||
@@ -273,7 +276,7 @@ int CMergeDiffDetailView::RecalcVertScrollBar(bool bPositionOnly)
 		int lineHeight = GetLineHeight();
 		if (rc.bottom >= lineHeight)
 			rc.bottom -= lineHeight / 2;
-		m_nScreenLines = rc.bottom / lineHeight;
+		m_nScreenLines = (rc.bottom - GetTopMarginHeight()) / lineHeight;
 		if (m_nTopSubLine > m_lineEnd - m_nScreenLines)
 			ScrollToSubLine(m_lineEnd - m_nScreenLines);
 	}

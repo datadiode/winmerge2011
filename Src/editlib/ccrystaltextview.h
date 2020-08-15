@@ -114,6 +114,7 @@ private:
 	bool m_bViewTabs;
 	bool m_bViewEols;
 	bool m_bDistinguishEols;
+	bool m_bTopMargin;
 	bool m_bSelMargin;
 	bool m_bViewLineNumbers;
 
@@ -238,7 +239,8 @@ protected:
 	HBrush *m_pHatchBrush;
 	CCrystalTextBuffer *m_pTextBuffer;
 	POINT m_ptDraggedTextBegin, m_ptDraggedTextEnd;
-	int GetMarginWidth();
+	int GetMarginWidth() const;
+	int GetTopMarginHeight() const;
 	bool IsValidTextPos(POINT const &) const;
 	bool IsValidTextPosX(POINT const &) const;
 	bool IsValidTextPosY(int) const;
@@ -262,7 +264,7 @@ protected:
 	int m_nTopSubLine;
 	//END SW
 
-	int GetLineHeight();
+	int GetLineHeight() const;
 	//BEGIN SW
 	/**
 	Returns the number of sublines the given line contains of.
@@ -353,7 +355,7 @@ protected:
 	*/
 	int SubLineHomeToCharPos(int nLineIndex, int nSubLineOffset);
 	//END SW
-	int GetCharWidth();
+	int GetCharWidth() const;
 	int GetMaxLineLength(bool bRecalc = false);
 	int GetScreenLines();
 	int GetScreenChars();
@@ -443,6 +445,8 @@ protected:
 		LPCTSTR pszChars, int nOffset, int nCount, int &nActualOffset, POINT ptTextPos,
 		int nBgColorIndexZeorWidthBlock, int cxZeorWidthBlock);
 	virtual bool DrawSingleLine(HSurface *, const RECT &, int nLineIndex);
+	void DrawRuler(HSurface *pdc, int left, int top, int width, int height, int charwidth, int offset);
+	virtual void DrawTopMargin(HSurface *, const RECT &);
 	virtual void DrawMargin(HSurface *, const RECT &, int nLineIndex, int nLineNumber);
 
 	int GetCharWidthFromDisplayableChar(LPCTSTR) const;
@@ -554,6 +558,8 @@ public:
 	int GetTabSize() const;
 	bool GetSeparateCombinedChars() const;
 	void SetTabSize(int nTabSize, bool bSeparateCombinedChars);
+	bool GetTopMargin() const;
+	void SetTopMargin(bool bTopMargin);
 	bool GetSelectionMargin() const;
 	void SetSelectionMargin(bool);
 	bool GetViewLineNumbers() const;

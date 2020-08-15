@@ -880,6 +880,7 @@ void CMergeEditView::RefreshOptions()
 	m_pTextBuffer->SetInsertTabs(
 		(nTabType & TAB_TYPE_RADIO_OPTIONS_MASK) == TAB_TYPE_INSERT_TABS);
 	SetSelectionMargin(COptionsMgr::Get(OPT_VIEW_FILEMARGIN));
+	SetTopMargin(COptionsMgr::Get(OPT_VIEW_RULER));
 
 	if (!COptionsMgr::Get(OPT_SYNTAX_HIGHLIGHT))
 		m_pTextBuffer->SetTextType(CCrystalTextBuffer::SRC_PLAIN);

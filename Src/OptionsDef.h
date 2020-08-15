@@ -196,6 +196,8 @@ extern COptionDef
 extern COptionDef
 <bool> OPT_VIEW_FILEMARGIN inline((_T("Settings/ViewFileMargin"), false));
 extern COptionDef
+<bool> OPT_VIEW_RULER inline((_T("Settings/ViewRuler"), false));
+extern COptionDef
 <bool> OPT_MERGEEDITVIEW_ENABLE_SHELL_CONTEXT_MENU inline((_T("Settings/MergeEditViewEnableShellContextMenu"), false));
 
 extern COptionDef
