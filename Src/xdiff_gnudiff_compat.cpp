@@ -42,8 +42,6 @@ struct change *diff_2_files_xdiff(struct comparison *cmp, int bMoved_blocks_flag
 
 	if (cmp->ignore_case)
 		xpp.flags |= XDF_IGNORE_CASE;
-	if (cmp->ignore_eol_diff)
-		xpp.flags |= XDF_IGNORE_CR_AT_EOL;
 	if (cmp->ignore_blank_lines)
 		xpp.flags |= XDF_IGNORE_BLANK_LINES;
 	if (cmp->minimal)

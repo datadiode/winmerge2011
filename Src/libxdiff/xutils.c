@@ -160,23 +160,6 @@ bool xdl_blankline(const char *line, long size, long flags)
 	return (i == size);
 }
 
-/*
- * Have we eaten everything on the line, except for an optional
- * CR at the very end?
- */
-static int ends_with_optional_cr(const char *l, long s, long i)
-{
-	int complete = s && is_eol(l + s - 1, l + s);
-
-	if (complete)
-		s--;
-	if (s == i)
-		return 1;
-	/* do not ignore CR at the end of an incomplete line */
-	if (complete && s == i + 1 && l[i] == '\r')
-		return 1;
-	return 0;
-}
 static inline int match_a_byte(char ch1, char ch2, long flags)
 {
 	if (ch1 == ch2)
@@ -244,14 +227,11 @@ int xdl_recmatch(const char *l1, long s1, const char *l2, long s2, long flags)
 			i1++;
 			i2++;
 		}
-	} else if (flags & XDF_IGNORE_CR_AT_EOL) {
-		/* Find the first difference and see how the line ends */
-		while (i1 < s1 && i2 < s2 && match_a_byte(l1[i1], l2[i2], flags)) {
-			i1++;
-			i2++;
+	} else {
+		while (i1 < s1 && i2 < s2) {
+			if (!match_a_byte(l1[i1++], l2[i2++], flags))
+				return 0;
 		}
-		return (ends_with_optional_cr(l1, s1, i1) &&
-			ends_with_optional_cr(l2, s2, i2));
 	}
 
 	/*
@@ -286,16 +266,9 @@ static unsigned long xdl_hash_record_with_whitespace(char const **data,
 		char const *top, long flags) {
 	unsigned long ha = 5381;
 	char const *ptr = *data;
-	int cr_at_eol_only = (flags & XDF_WHITESPACE_FLAGS) == XDF_IGNORE_CR_AT_EOL;
 
 	for (; ptr < top && !is_eol(ptr, top); ptr++) {
-		if (cr_at_eol_only) {
-			/* do not ignore CR at the end of an incomplete line */
-			if (*ptr == '\r' &&
-			    (ptr + 1 < top && ptr[1] == '\n'))
-				continue;
-		}
-		else if (XDL_ISSPACE(*ptr)) {
+		if (XDL_ISSPACE(*ptr)) {
 			const char *ptr2 = ptr;
 			int at_eol;
 			while (ptr + 1 < top && XDL_ISSPACE(ptr[1])
