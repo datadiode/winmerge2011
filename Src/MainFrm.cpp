@@ -162,6 +162,16 @@ CMainFrame::CMainFrame(HWindow *pWnd, const MergeCmdLineInfo &cmdInfo)
 
 	InitOptions();
 
+	if (HDC hMemDC = ::CreateCompatibleDC(NULL))
+	{
+		RECT rc = { 0, 0, 16, 16 };
+		m_hbmMenuCheck = ::CreateCompatibleBitmap(hMemDC, 16, 16);
+		HGDIOBJ hTmpObj = ::SelectObject(hMemDC, m_hbmMenuCheck);
+		::DrawFrameControl(hMemDC, &rc, DFC_MENU, DFCS_MENUCHECK);
+		::SelectObject(hMemDC, hTmpObj);
+		::DeleteDC(hMemDC);
+	}
+
 	if (HICON hMergeIcon = LanguageSelect.LoadIcon(IDR_MAINFRAME))
 		SetIcon(hMergeIcon, TRUE);
 
@@ -230,6 +240,8 @@ CMainFrame::~CMainFrame()
 
 	sd_SetBreakChars(NULL);
 
+	if (m_hbmMenuCheck)
+		::DeleteObject(m_hbmMenuCheck);
 	if (m_imlMenu)
 		m_imlMenu->Destroy();
 	if (m_imlToolbarEnabled)
@@ -424,6 +436,7 @@ void CMainFrame::InitCmdUI()
 	m_wndToolBar->EnableButton(ID_R2LNEXT, FALSE);
 	m_wndToolBar->EnableButton(ID_ALL_LEFT, FALSE);
 	m_wndToolBar->EnableButton(ID_ALL_RIGHT, FALSE);
+	m_wndToolBar->EnableButton(ID_VIEW_TABLELAYOUT, FALSE);
 	m_wndToolBar->EnableButton(ID_REFRESH, FALSE);
 	m_wndToolBar->EnableButton(ID_PREVDIFF, FALSE);
 	m_wndToolBar->EnableButton(ID_NEXTDIFF, FALSE);
@@ -576,6 +589,14 @@ template<>
 void CMainFrame::UpdateCmdUI<ID_EDIT_REPLACE>(BYTE uFlags)
 {
 	m_cmdState.Replace = uFlags;
+}
+
+template<>
+void CMainFrame::UpdateCmdUI<ID_VIEW_TABLELAYOUT>(BYTE uFlags)
+{
+	m_cmdState.TableLayout = uFlags;
+	m_wndToolBar->EnableButton(ID_VIEW_TABLELAYOUT, !(uFlags & MF_GRAYED));
+	m_wndToolBar->CheckButton(ID_VIEW_TABLELAYOUT, (uFlags & MF_CHECKED) != 0);
 }
 
 template<>
@@ -758,10 +779,15 @@ LRESULT CMainFrame::OnWndMsg<WM_DRAWITEM>(WPARAM, LPARAM lParam)
 		UINT uStateMask = LOBYTE(LOWORD(dwOsVer)) < 6 ? ODS_GRAYED : ODS_SELECTED | ODS_GRAYED;
 		if ((lpdis->itemState & uStateMask) == uStateMask)
 			fStyle |= ILD_BLEND;
-		m_imlMenu->Draw(LOWORD(lpdis->itemData), lpdis->hDC,
-			lpdis->rcItem.left + GetMenuBitmapExcessWidth() - 16,
-			lpdis->rcItem.top + (lpdis->rcItem.bottom - lpdis->rcItem.top - 16) / 2,
-			fStyle);
+		int const cxMenuBitmapExcess = GetMenuBitmapExcessWidth();
+		int x = lpdis->rcItem.left + cxMenuBitmapExcess - 18;
+		int y = lpdis->rcItem.top + (lpdis->rcItem.bottom - lpdis->rcItem.top - 16) / 2;
+		m_imlMenu->Draw(LOWORD(lpdis->itemData), lpdis->hDC, x, y, fStyle);
+		if (lpdis->itemState & ODS_CHECKED)
+		{
+			x -= cxMenuBitmapExcess / 2;
+			::MaskBlt(lpdis->hDC, x, y, 16, 16, lpdis->hDC, x, y, m_hbmMenuCheck, 0, 0, SRCAND);
+		}
 	}
 	return 0;
 }
@@ -867,6 +893,8 @@ const BYTE *CMainFrame::CmdState::Lookup(UINT id) const
 		return &Paste;
 	case ID_EDIT_REPLACE:
 		return &Replace;
+	case ID_VIEW_TABLELAYOUT:
+		return &TableLayout;
 	case ID_MERGE_COMPARE:
 	case ID_MERGE_COMPARE_XML:
 	case ID_MERGE_COMPARE_HEX:
@@ -4030,6 +4058,8 @@ BOOL CMainFrame::CreateToobar()
 		ID_ALL_RIGHT,
 		ID_ALL_LEFT,
 		0,
+		ID_VIEW_TABLELAYOUT,
+		0,
 		ID_REFRESH,
 		buttons // NB: This extra entry is there to complete initialization.
 	};
@@ -4137,7 +4167,6 @@ void CMainFrame::OnToolbarBig()
 void CMainFrame::OnToolTipText(TOOLTIPTEXT *pTTT)
 {
 	// need to handle both ANSI and UNICODE versions of the message
-	String strFullText;
 	LPCTSTR strTipText = _T("");
 	UINT_PTR nID = pTTT->hdr.idFrom;
 	if (pTTT->uFlags & TTF_IDISHWND)
@@ -4147,13 +4176,14 @@ void CMainFrame::OnToolTipText(TOOLTIPTEXT *pTTT)
 	}
 	if (nID != 0) // will be zero on a separator
 	{
-		strFullText = LanguageSelect.LoadString(static_cast<UINT>(nID));
+		m_strTipText = LanguageSelect.LoadString(static_cast<UINT>(nID));
 		// don't handle the message if no string resource found
-		String::size_type i = strFullText.find(_T('\n'));
 		C_ASSERT(-1 == String::npos);
-		strTipText = strFullText.c_str() + i + 1;
+		int i = static_cast<int>(m_strTipText.find(_T('\n')));
+		strTipText = m_strTipText.c_str() + i + 1;
 	}
-	lstrcpyn(pTTT->szText, strTipText, _countof(pTTT->szText));
+	pTTT->hinst = NULL;
+	pTTT->lpszText = const_cast<LPWSTR>(strTipText);
 	// bring the tooltip window above other popup windows
 	::SetWindowPos(pTTT->hdr.hwndFrom, HWND_TOP, 0, 0, 0, 0,
 		SWP_NOACTIVATE | SWP_NOSIZE | SWP_NOMOVE | SWP_NOOWNERZORDER);

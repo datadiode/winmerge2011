@@ -477,6 +477,58 @@ LRESULT CChildFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 		ClearSyncPoints();
 		UpdateSyncPointUI();
 		break;
+	case ID_VIEW_TABLELAYOUT:
+		if (m_ptBuf[0]->GetTableLayout())
+		{
+			m_ptBuf[0]->SetTableLayout(NULL);
+			m_ptBuf[1]->SetTableLayout(NULL);
+		}
+		else if (int const canTableLayout = pActiveView->CanTableLayout())
+		{
+			POINT ptStart, ptEnd;
+			pActiveView->GetSelection(ptStart, ptEnd);
+			String text;
+			pActiveView->GetText(ptStart, ptEnd, text);
+			switch (canTableLayout)
+			{
+			case -2:
+				// Right-to-left selection
+				std::swap(text[0], text[1]);
+			case 2:
+				ASSERT(text.length() == 2);
+				// If two chars are selected, treat 2nd char as quotation mark.
+				m_ptBuf[0]->SetFieldEnclosure(text[1]);
+				m_ptBuf[1]->SetFieldEnclosure(text[1]);
+				break;
+			default:
+				ASSERT(text.length() == 1);
+				// In TSV world, go with a newline to disable quotation logic.
+				TCHAR const quote = text[0] == _T('\t') ? _T('\n') : _T('"');
+				m_ptBuf[0]->SetFieldEnclosure(quote);
+				m_ptBuf[1]->SetFieldEnclosure(quote);
+				break;
+			}
+			m_ptBuf[0]->SetFieldDelimiter(text[0]);
+			m_ptBuf[1]->SetFieldDelimiter(text[0]);
+			m_ptBuf[0]->SetTableLayout(this);
+			m_ptBuf[1]->SetTableLayout(this);
+			m_aColumnWidths.resize(0);
+			AutoFitColumn(m_ptBuf[0]);
+			AutoFitColumn(m_ptBuf[1]);
+		}
+		else
+		{
+			// can happen when invoked through Ctrl+T
+			break;
+		}
+		m_pView[0]->RecalcHorzScrollBar();
+		m_pView[1]->RecalcHorzScrollBar();
+		m_pDetailView[0]->RecalcHorzScrollBar();
+		m_pDetailView[1]->RecalcHorzScrollBar();
+		UpdateAllViews();
+		pActiveView->UpdateCaret();
+		UpdateCmdUI();
+		break;
 	case ID_EDIT_SELECT_ALL:
 		pTextView->SelectAll();
 		break;
@@ -1139,6 +1191,9 @@ void CChildFrame::UpdateGeneralCmdUI()
 		pTextView && pTextView->IsSelection() ? MF_ENABLED : MF_GRAYED);
 	m_pMDIFrame->UpdateCmdUI<ID_EDIT_PASTE>(
 		pTextView && pTextView->QueryEditable() && IsClipboardFormatAvailable(CF_UNICODETEXT) ? MF_ENABLED : MF_GRAYED);
+	m_pMDIFrame->UpdateCmdUI<ID_VIEW_TABLELAYOUT>(
+		m_ptBuf[0]->GetTableLayout() ? MF_CHECKED :
+		pTextView && pTextView->CanTableLayout() ? MF_ENABLED : MF_GRAYED);
 	m_pMDIFrame->UpdateCmdUI<ID_TOOLS_COMPARE_SELECTION>(
 		m_pOpener == NULL && m_pView[0]->IsSelection() && m_pView[1]->IsSelection() ? MF_ENABLED : MF_GRAYED);
 

@@ -72,11 +72,57 @@
 #define new DEBUG_NEW
 #endif
 
-using std::vector;
-
 #ifdef _DEBUG
 #define _ADVANCED_BUGCHECK  1
 #endif
+
+void CCrystalTextBuffer::TableLayout::AutoFitColumn(CCrystalTextBuffer *pTextBuffer)
+{
+	TCHAR const sep = pTextBuffer->GetFieldDelimiter();
+	int const quote = pTextBuffer->GetFieldEnclosure();
+	int const nLineCount = pTextBuffer->GetLineCount();
+	pTextBuffer->m_nMaxLineLength = -1;
+	for (int i = 0; i < nLineCount; ++i)
+	{
+		bool bInQuote = false;
+		int nColumn2 = 0;
+		int nColumnWidth = 1;
+		LineInfo &li = pTextBuffer->m_aLines[i];
+		LPCTSTR const pszChars = li.GetLine();
+		int const nLineLength = li.Length();
+		li.m_nActualLineLength = -1;
+		for (int j = 0; j < nLineLength; ++j)
+		{
+			TCHAR const c = pszChars[j];
+			if (c == quote)
+				bInQuote = !bInQuote;
+			if (!bInQuote && c == sep)
+			{
+				if (static_cast<int>(m_aColumnWidths.size()) <= nColumn2)
+					m_aColumnWidths.resize(nColumn2 + 1, nMinColumnWidth);
+				if (m_aColumnWidths[nColumn2] < nColumnWidth)
+					m_aColumnWidths[nColumn2] = nColumnWidth;
+				nColumnWidth = 1;
+				++nColumn2;
+			}
+			else
+			{
+				nColumnWidth += c == _T('\t') ? 1 :
+					pTextBuffer->GetCharWidthFromChar(pszChars + j);
+			}
+		}
+		if (static_cast<int>(m_aColumnWidths.size()) <= nColumn2)
+			m_aColumnWidths.resize(nColumn2 + 1, nMinColumnWidth);
+		if (m_aColumnWidths[nColumn2] < nColumnWidth)
+			m_aColumnWidths[nColumn2] = nColumnWidth;
+	}
+}
+
+int CCrystalTextBuffer::TableLayout::GetColumnWidth(int nColumn) const
+{
+	int const nCount = static_cast<int>(m_aColumnWidths.size());
+	return (nColumn < nCount ? m_aColumnWidths[nColumn] : nMinColumnWidth) + 1;
+}
 
 /////////////////////////////////////////////////////////////////////////////
 // CCrystalTextBuffer::CUpdateContext
@@ -129,6 +175,10 @@ void CCrystalTextBuffer::CDeleteContext::RecalcPoint(POINT & ptPoint)
 // CCrystalTextBuffer
 
 CCrystalTextBuffer::CCrystalTextBuffer()
+: m_pTableLayout(NULL)
+, m_cFieldDelimiter(_T(';'))
+, m_cFieldEnclosure(_T('"'))
+, m_bAllowNewlinesInQuotes(false)
 {
 #ifdef _DEBUG
 	m_bInit = false;
@@ -518,8 +568,8 @@ void CCrystalTextBuffer::InternalDeleteText(CCrystalTextView *pSource,
 		int const nRestCount = m_aLines[nEndLine].FullLength() - nEndChar;
 		String const sTail(m_aLines[nEndLine].GetLine(nEndChar), nRestCount);
 
-		vector<LineInfo>::iterator iterBegin = m_aLines.begin() + nStartLine + 1;
-		vector<LineInfo>::iterator iterEnd = m_aLines.begin() + nEndLine + 1;
+		std::vector<LineInfo>::iterator iterBegin = m_aLines.begin() + nStartLine + 1;
+		std::vector<LineInfo>::iterator iterEnd = m_aLines.begin() + nEndLine + 1;
 		std::for_each(iterBegin, iterEnd, std::mem_fun_ref(&LineInfo::Clear));
 		m_aLines.erase(iterBegin, iterEnd);
 
@@ -939,6 +989,55 @@ void CCrystalTextBuffer::SetTabSize(int nTabSize, bool bSeparateCombinedChars)
 		m_aLines[nLineIndex].m_nActualLineLength = -1;
 }
 
+CCrystalTextBuffer::TableLayout *CCrystalTextBuffer::GetTableLayout() const
+{
+	return m_pTableLayout;
+}
+
+void CCrystalTextBuffer::SetTableLayout(TableLayout *pTableLayout)
+{
+	m_pTableLayout = pTableLayout;
+	m_nMaxLineLength = -1;
+	int const nLineCount = GetLineCount();
+	for (int nLineIndex = 0; nLineIndex < nLineCount; ++nLineIndex)
+		m_aLines[nLineIndex].m_nActualLineLength = -1;
+}
+
+int CCrystalTextBuffer::GetColumnWidth(int nColumnIndex) const
+{
+	ASSERT(nColumnIndex >= 0);
+	if (nColumnIndex < static_cast<int>(m_pTableLayout->m_aColumnWidths.size()))
+		return m_pTableLayout->m_aColumnWidths[nColumnIndex];
+	else
+		return m_nTabSize;
+}
+
+void CCrystalTextBuffer::SetColumnWidth(int nColumnIndex, int nColumnWidth)
+{
+	ASSERT(nColumnIndex >= 0);
+	ASSERT(nColumnWidth >= 0);
+	if (nColumnIndex >= static_cast<int>(m_pTableLayout->m_aColumnWidths.size()))
+		m_pTableLayout->m_aColumnWidths.resize(nColumnIndex + 1, m_nTabSize);
+	m_pTableLayout->m_aColumnWidths[nColumnIndex] = nColumnWidth;
+}
+
+int CCrystalTextBuffer::GetColumnCount(int nLineIndex) const
+{
+	ASSERT(nLineIndex >= 0);
+	int nColumnCount = 0;
+	const TCHAR* pszLine = GetLineChars(nLineIndex);
+	int nLength = GetLineLength(nLineIndex);
+	bool bInQuote = false;
+	for (int j = 0; j < nLength; ++j)
+	{
+		if (pszLine[j] == m_cFieldEnclosure)
+			bInQuote = !bInQuote;
+		else if (!bInQuote && pszLine[j] == m_cFieldDelimiter)
+			++nColumnCount;
+	}
+	return nColumnCount;
+}
+
 bool CCrystalTextBuffer::GetInsertTabs() const
 {
 	return m_bInsertTabs;
@@ -1057,15 +1156,45 @@ int CCrystalTextBuffer::GetLineActualLength(int nLineIndex)
 		nActualLength = 0;
 		int const nLength = GetLineLength(nLineIndex);
 		LPCTSTR const pszChars = GetLineChars(nLineIndex);
-		int const nTabSize = GetTabSize();
-		for (int i = 0; i < nLength; i++)
+		if (m_pTableLayout)
 		{
-			TCHAR const c = pszChars[i];
-			ASSERT(c != _T('\r') && c != _T('\n'));
-			if (c == _T('\t'))
-				nActualLength += (nTabSize - nActualLength % nTabSize);
-			else
-				nActualLength += GetCharWidthFromChar(pszChars + i);
+			int nTabStop = 0;
+			int nColumn = 0;
+			int const sep = GetFieldDelimiter();
+			int const quote = GetFieldEnclosure();
+			bool bInQuote = false;
+			bool bInQuoteBegin = false;
+			for (int i = 0; i < nLength; i++)
+			{
+				TCHAR const c = pszChars[i];
+				ASSERT(c != _T('\r') && c != _T('\n'));
+				if (c == quote)
+					bInQuote = !bInQuote;
+				if (!bInQuote && c == sep)
+				{
+					while (nTabStop <= nActualLength)
+						nTabStop += m_pTableLayout->GetColumnWidth(nColumn++);
+					nActualLength = nTabStop;
+				}
+				else
+				{
+					nActualLength += c == _T('\t') ? 1 :
+						GetCharWidthFromChar(pszChars + i);
+				}
+			}
+		}
+		else
+		{
+			int const nTabSize = GetTabSize();
+			for (int i = 0; i < nLength; i++)
+			{
+				TCHAR const c = pszChars[i];
+				ASSERT(c != _T('\r') && c != _T('\n'));
+				if (c == _T('\t'))
+					nActualLength += (nTabSize - nActualLength % nTabSize);
+				else
+					nActualLength += GetCharWidthFromChar(pszChars + i);
+			}
 		}
 		li.m_nActualLineLength = nActualLength;
 	}

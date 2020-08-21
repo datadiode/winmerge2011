@@ -207,6 +207,8 @@ protected:
 	HTabCtrl *m_wndTabBar;
 	HStatic *m_wndCloseBox;
 
+	String m_strTipText;
+	HBITMAP m_hbmMenuCheck;
 	HImageList *m_imlMenu;
 	HImageList *m_imlToolbarEnabled; /**< Images for toolbar */
 	HImageList *m_imlToolbarDisabled; /**< Images for toolbar */
@@ -338,6 +340,7 @@ private:
 		BYTE Copy;
 		BYTE Paste;
 		BYTE Replace;
+		BYTE TableLayout;
 		BYTE SelectLineDiff;
 		BYTE EolToDos;
 		BYTE EolToUnix;

@@ -881,22 +881,16 @@ void CMergeEditView::RefreshOptions()
 		(nTabType & TAB_TYPE_RADIO_OPTIONS_MASK) == TAB_TYPE_INSERT_TABS);
 	SetSelectionMargin(COptionsMgr::Get(OPT_VIEW_FILEMARGIN));
 	SetTopMargin(COptionsMgr::Get(OPT_VIEW_RULER));
-
 	if (!COptionsMgr::Get(OPT_SYNTAX_HIGHLIGHT))
 		m_pTextBuffer->SetTextType(CCrystalTextBuffer::SRC_PLAIN);
-
 	// SetTextType will revert to language dependent defaults for tab
 	SetTabSize(COptionsMgr::Get(OPT_TAB_SIZE),
 		COptionsMgr::Get(OPT_SEPARATE_COMBINING_CHARS));
 	SetViewTabs(COptionsMgr::Get(OPT_VIEW_WHITESPACE));
-
 	SetWordWrapping(COptionsMgr::Get(OPT_WORDWRAP));
-	SetViewLineNumbers(COptionsMgr::Get(OPT_VIEW_LINENUMBERS));
-
-	const bool mixedEOLs = COptionsMgr::Get(OPT_ALLOW_MIXED_EOL) ||
-		m_pDocument->IsMixedEOL(m_nThisPane);
-	SetViewEols(COptionsMgr::Get(OPT_VIEW_WHITESPACE), mixedEOLs);
-
+	SetViewLineNumbers(m_pDocument->GetLineNumberDigits());
+	SetViewEols(COptionsMgr::Get(OPT_VIEW_WHITESPACE),
+		COptionsMgr::Get(OPT_ALLOW_MIXED_EOL) || m_pDocument->IsMixedEOL(m_nThisPane));
 	SetFont(theApp.m_pMainWnd->m_lfDiff, COptionsMgr::Get(OPT_CROSS_HATCH_DELETED_LINES));
 }
 

@@ -116,7 +116,7 @@ private:
 	bool m_bDistinguishEols;
 	bool m_bTopMargin;
 	bool m_bSelMargin;
-	bool m_bViewLineNumbers;
+	BYTE m_bViewLineNumbers;
 
 	CSyntaxColors *m_pColors;
 
@@ -175,9 +175,8 @@ protected:
 	void PrepareSelBounds();
 
 	//  Helper functions
-	int ExpandChars(LPCTSTR pszChars, int nOffset, int nCount, String &line, int nActualOffset);
+	int ExpandChars(LPCTSTR, int nOffset, int nCount, String &line, int nActualOffset);
 
-	int ApproxActualOffset(int nLineIndex, int nOffset);
 	void AdjustTextPoint(POINT & point);
 	void DrawLineHelperImpl(HSurface *pdc, POINT &ptOrigin, const RECT &rcClip,
 		int nColorIndex, int nBgColorIndex, COLORREF crText, COLORREF crBkgnd,
@@ -210,6 +209,7 @@ public:
 	STDMETHOD(EnumDAdvise)(LPENUMSTATDATA *);
 
 	int GetLineCount() const;
+	BYTE GetLineNumberDigits() const;
 	virtual int ComputeRealLine(int nApparentLine) const;
 	virtual void OnUpdateCaret(bool bShowHide) = 0;
 	LPCTSTR GetTextBufferEol(int nLine) const;
@@ -217,6 +217,7 @@ public:
 	CSyntaxColors *GetSyntaxColors() const { return m_pColors; }
 	void SetColorContext(CSyntaxColors *pColors) { m_pColors = pColors; }
 	virtual void SetSelection(const POINT &ptStart, const POINT &ptEnd);
+	int CanTableLayout() const;
 
 	bool IsSelection() const;
 	bool HasFocus() const { return m_bFocused; }
@@ -227,6 +228,9 @@ public:
 	void SelectAll();
 	void UpdateCaret(bool bShowHide = false);
 	void SetAnchor(const POINT &);
+
+	virtual int RecalcVertScrollBar(bool bPositionOnly = false);
+	virtual int RecalcHorzScrollBar(bool bPositionOnly = false);
 
 	static void InitSharedResources();
 	static void FreeSharedResources();
@@ -360,9 +364,6 @@ protected:
 	int GetScreenLines();
 	int GetScreenChars();
 	HFont *GetFont(int nColorIndex = 0);
-
-	virtual int RecalcVertScrollBar(bool bPositionOnly = false);
-	virtual int RecalcHorzScrollBar(bool bPositionOnly = false);
 
 	//  Scrolling helpers
 	void ScrollToChar(int nNewOffsetChar);
@@ -562,8 +563,8 @@ public:
 	void SetTopMargin(bool bTopMargin);
 	bool GetSelectionMargin() const;
 	void SetSelectionMargin(bool);
-	bool GetViewLineNumbers() const;
-	void SetViewLineNumbers(bool);
+	BYTE GetViewLineNumbers() const;
+	void SetViewLineNumbers(BYTE);
 	void GetFont(LOGFONT &) const;
 	void SetFont(LOGFONT const &, int nHatchStyle);
 	//  [JRT]:

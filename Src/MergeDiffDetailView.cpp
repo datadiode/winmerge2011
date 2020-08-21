@@ -56,12 +56,11 @@ void CMergeDiffDetailView::RefreshOptions()
 {
 	SetSelectionMargin(COptionsMgr::Get(OPT_VIEW_FILEMARGIN));
 	SetTopMargin(COptionsMgr::Get(OPT_VIEW_RULER));
-	SetViewLineNumbers(COptionsMgr::Get(OPT_VIEW_LINENUMBERS));
+	SetViewLineNumbers(m_pDocument->GetLineNumberDigits());
 	// Tab size is set at buffer level, so no need to set it here again
 	SetViewTabs(COptionsMgr::Get(OPT_VIEW_WHITESPACE));
-	bool bMixedEOL = COptionsMgr::Get(OPT_ALLOW_MIXED_EOL) ||
-		m_pDocument->IsMixedEOL(m_nThisPane);
-	SetViewEols(COptionsMgr::Get(OPT_VIEW_WHITESPACE), bMixedEOL);
+	SetViewEols(COptionsMgr::Get(OPT_VIEW_WHITESPACE),
+		COptionsMgr::Get(OPT_ALLOW_MIXED_EOL) || m_pDocument->IsMixedEOL(m_nThisPane));
 	SetFont(theApp.m_pMainWnd->m_lfDiff, COptionsMgr::Get(OPT_CROSS_HATCH_DELETED_LINES));
 }
 

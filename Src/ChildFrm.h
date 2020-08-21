@@ -80,6 +80,7 @@ class CDirFrame;
 class CChildFrame
 	: ZeroInit<CChildFrame>
 	, public CEditorFrame
+	, public CCrystalTextBuffer::TableLayout
 	, public CScriptable<IMergeDoc>
 	, private CFloatFlags
 {
@@ -111,6 +112,7 @@ public:
 	void UpdateMergeStatusUI();
 	void AlignScrollPositions();
 
+	BYTE GetLineNumberDigits() const;
 	void FlushAndRescan();
 	void RescanIfNeeded(DWORD timeout);
 	void SetCurrentDiff(int nDiff);

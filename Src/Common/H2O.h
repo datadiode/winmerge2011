@@ -1207,6 +1207,10 @@ namespace H2O
 		{
 			return ::DrawFocusRect(m_hDC, prc);
 		}
+		BOOL DrawEdge(LPRECT prc, UINT edge, UINT flags)
+		{
+			return ::DrawEdge(m_hDC, prc, edge, flags);
+		}
 		BOOL PathCompactPath(LPTSTR path, UINT dx)
 		{
 			return ::PathCompactPath(m_hDC, path, dx);

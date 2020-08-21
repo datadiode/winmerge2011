@@ -121,6 +121,20 @@ public:
 class CCrystalTextBuffer
 {
 public:
+	class TableLayout
+	{
+		friend CCrystalTextBuffer;
+	public:
+		// Uncommented method below is intended for when column widths become manually adjustable.
+		// virtual void UpdateTableLayout(CCrystalTextBuffer *) = 0;
+		void AutoFitColumn(CCrystalTextBuffer *);
+		int GetColumnWidth(int) const;
+	protected:
+		std::vector<int> m_aColumnWidths;
+	private:
+		static int const nMinColumnWidth = 2;
+	} friend;
+
 	DWORD m_dwCurrentRevisionNumber;
 	DWORD m_dwRevisionNumberOnSave;
 
@@ -177,6 +191,12 @@ protected:
 	// Connected views
 	std::list<CCrystalTextView *> m_lpViews;
 
+	// Table Editing
+	TableLayout *m_pTableLayout;
+	TCHAR m_cFieldDelimiter;
+	TCHAR m_cFieldEnclosure;
+	bool m_bAllowNewlinesInQuotes;
+
 	// Helper methods
 	void InsertLine(LPCTSTR pszLine, int nLength, int nPosition = -1);
 	void AppendLine(int nLineIndex, LPCTSTR pszChars, int nLength);
@@ -200,6 +220,15 @@ public:
 	void SetModified(bool bModified = true) { m_bModified = bModified; }
 	bool IsModified() const { return m_bModified; }
 
+	void SetFieldDelimiter(TCHAR cFieldDelimiter) { m_cFieldDelimiter = cFieldDelimiter; }
+	TCHAR GetFieldDelimiter() const { return m_cFieldDelimiter; }
+	void SetFieldEnclosure(TCHAR cFieldEnclosure) { m_cFieldEnclosure = cFieldEnclosure; }
+	TCHAR GetFieldEnclosure() const { return m_cFieldEnclosure; }
+	void SetTableLayout(TableLayout *pTableLayout);
+	TableLayout *GetTableLayout() const;
+	int GetColumnWidth (int nColumnIndex) const;
+	void SetColumnWidth (int nColumnIndex, int nColumnWidth);
+	int GetColumnCount (int nLineIndex) const;
 	// 'Unsaved' indicator
 	void SetUnsaved() { m_nSyncPosition = std::vector<UndoRecord>::npos; }
 	bool IsUnsaved() const { return m_nSyncPosition != m_nUndoPosition; }

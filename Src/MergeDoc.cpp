@@ -1151,6 +1151,21 @@ void CChildFrame::SetCurrentDiff(int nDiff)
 	OnUpdateStatusNum();
 }
 
+BYTE CChildFrame::GetLineNumberDigits() const
+{
+	BYTE bMaxDigits = 0;
+	if (COptionsMgr::Get(OPT_VIEW_LINENUMBERS))
+	{
+		for (int i = 0; i < _countof(m_pView); ++i)
+		{
+			BYTE bDigits = m_pView[i]->GetLineNumberDigits();
+			if (bMaxDigits < bDigits)
+				bMaxDigits = bDigits;
+		}
+	}
+	return bMaxDigits;
+}
+
 /**
  * @brief Take care of rescanning document.
  *
@@ -1177,6 +1192,17 @@ void CChildFrame::FlushAndRescan()
 	bool bIdentical = false;
 	int nRescanResult = Rescan(bIdentical);
 
+	if (m_ptBuf[0]->GetTableLayout())
+	{
+		m_aColumnWidths.resize(0);
+		AutoFitColumn(m_ptBuf[0]);
+		AutoFitColumn(m_ptBuf[1]);
+		m_pView[0]->RecalcHorzScrollBar();
+		m_pView[1]->RecalcHorzScrollBar();
+		m_pDetailView[0]->RecalcHorzScrollBar();
+		m_pDetailView[1]->RecalcHorzScrollBar();
+	}
+
 	// restore cursors and caret
 	m_pView[0]->PopCursors();
 	m_pView[1]->PopCursors();
@@ -1188,6 +1214,13 @@ void CChildFrame::FlushAndRescan()
 	// because of ghostlines, m_nTopLine may differ just after Rescan
 	// scroll both views to the same top line
 	AlignScrollPositions();
+
+	// Align widths of line number margins when visible
+	BYTE const bLineNumberDigits = GetLineNumberDigits();
+	m_pView[0]->SetViewLineNumbers(bLineNumberDigits);
+	m_pView[1]->SetViewLineNumbers(bLineNumberDigits);
+	m_pDetailView[0]->SetViewLineNumbers(bLineNumberDigits);
+	m_pDetailView[1]->SetViewLineNumbers(bLineNumberDigits);
 
 	// Refresh display
 	UpdateAllViews();
