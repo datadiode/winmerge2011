@@ -303,8 +303,16 @@ LRESULT CHexMergeFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 	case ID_L2R:
 		OnL2r();
 		break;
+	case ID_L2RNEXT:
+		OnL2r();
+		pActiveView->OnNextdiff();
+		break;
 	case ID_R2L:
 		OnR2l();
+		break;
+	case ID_R2LNEXT:
+		OnR2l();
+		pActiveView->OnNextdiff();
 		break;
 	case ID_ALL_LEFT:
 		OnAllLeft();
