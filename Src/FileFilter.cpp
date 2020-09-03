@@ -359,16 +359,16 @@ void FileFilter::EmptyFilterList(vector<regexp_item> &filterList)
  */
 bool FileFilter::Load()
 {
+	Clear();
+	sql.clear();
+
+	const bool bIsMask = CreateFromMask();
+
 	UniMemFile file;
 	if (!file.OpenReadOnly(fullpath.c_str()))
 		return false;
 
 	file.ReadBom(); // in case it is a Unicode file, let UniMemFile handle BOM
-
-	Clear();
-	sql.clear();
-
-	const bool bIsMask = CreateFromMask();
 
 	String sLine, sEol;
 	bool lossy = false;
