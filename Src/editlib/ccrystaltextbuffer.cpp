@@ -111,10 +111,14 @@ void CCrystalTextBuffer::TableLayout::AutoFitColumn(CCrystalTextBuffer *pTextBuf
 					pTextBuffer->GetCharWidthFromChar(pszChars + j);
 			}
 		}
-		if (static_cast<int>(m_aColumnWidths.size()) <= nColumn2)
-			m_aColumnWidths.resize(nColumn2 + 1, nMinColumnWidth);
-		if (m_aColumnWidths[nColumn2] < nColumnWidth)
-			m_aColumnWidths[nColumn2] = nColumnWidth;
+		// Exclude lines with no separator at all from column width calculation
+		if (nColumn2 != 0)
+		{
+			if (static_cast<int>(m_aColumnWidths.size()) <= nColumn2)
+				m_aColumnWidths.resize(nColumn2 + 1, nMinColumnWidth);
+			if (m_aColumnWidths[nColumn2] < nColumnWidth)
+				m_aColumnWidths[nColumn2] = nColumnWidth;
+		}
 	}
 }
 
