@@ -448,14 +448,14 @@ int editorconfig_parse(const char* full_filename, editorconfig_handle h)
         eh->name_values = NULL;
         eh->name_value_count = 0;
     }
-    memset(&hfp, 0, sizeof(hfp));
-
-    hfp.full_filename = strdup(full_filename);
 
     /* return an error if file path is not absolute */
     if (!is_file_path_absolute(full_filename)) {
         return EDITORCONFIG_PARSE_NOT_FULL_PATH;
     }
+
+    memset(&hfp, 0, sizeof(hfp));
+    hfp.full_filename = strdup(full_filename);
 
 #ifdef WIN32
     /* replace all backslashes with slashes on Windows */
