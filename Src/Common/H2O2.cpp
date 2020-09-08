@@ -758,7 +758,6 @@ OException::OException(DWORD err, LPCTSTR fmt)
 		FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS;
 	switch (HIWORD(err))
 	{
-	case 0x8007: // LogParser error
 	case 0x800A: // VBScript or JScript error
 		err = DISP_E_EXCEPTION;
 		// fall through

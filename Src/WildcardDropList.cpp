@@ -260,7 +260,10 @@ void WildcardDropList::OnItemActivate(HWND hLv, int iItem, int iSubItem, int col
 	ListView_GetSubItemRect(hLv, iItem, iSubItem, LVIR_BOUNDS, &rc);
 	TCHAR text[4096];
 	ListView_GetItemText(hLv, iItem, iSubItem, text, _countof(text));
-	HWND hCb = ::CreateWindow(WC_COMBOBOX, NULL, WS_CHILD | WS_VISIBLE | WS_TABSTOP | CBS_DROPDOWN | CBS_AUTOHSCROLL | CBS_NOINTEGRALHEIGHT, rc.left, rc.top - 1, rc.right - rc.left, 0, hLv, reinterpret_cast<HMENU>(1), NULL, NULL);
+	HWND hCb = ::CreateWindow(WC_COMBOBOX, NULL, WS_CHILD | WS_VISIBLE |
+		WS_TABSTOP | CBS_DROPDOWN | CBS_AUTOHSCROLL | CBS_NOINTEGRALHEIGHT,
+		rc.left, rc.top - 1, rc.right - rc.left, 0,
+		hLv, reinterpret_cast<HMENU>(1), NULL, NULL);
 	::SetWindowLongPtr(hCb, GWLP_USERDATA, MAKELPARAM(iItem, iSubItem));
 	::SetWindowText(hCb, text);
 	::SendMessage(hCb, WM_SETFONT, ::SendMessage(hLv, WM_GETFONT, 0, 0), 0);

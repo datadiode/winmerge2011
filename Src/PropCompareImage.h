@@ -1,4 +1,4 @@
-/** 
+/**
  * @file  PropCompareImage.h
  *
  * @brief Declaration of PropCompareImage propertysheet

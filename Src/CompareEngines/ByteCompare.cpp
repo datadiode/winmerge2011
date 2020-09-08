@@ -347,8 +347,7 @@ public:
 
 /**
  * @brief Compare two specified files, byte-by-byte
- * @param [in] bStopAfterFirstDiff Stop compare after we find first difference?
- * @param [in] piAbortable Interface allowing to abort compare
+ * @param [in] location FileLocation
  * @return DIFFCODE
  */
 unsigned ByteCompare::CompareFiles(FileLocation *location)

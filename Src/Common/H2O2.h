@@ -128,6 +128,8 @@ namespace H2O
 		}
 		HWindow *Subclass(HWindow *pWnd)
 		{
+			if (pWnd == NULL)
+				OException::Throw(E_HANDLE);
 			return Subclass<GWLP_USERDATA>(pWnd);
 		}
 		// Subclass a dialog item through a dedicated OWindow
