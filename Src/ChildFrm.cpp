@@ -44,8 +44,6 @@
 /** @brief Location for file compare specific help to open. */
 static const TCHAR MergeViewHelpLocation[] = _T("::/htmlhelp/Compare_files.html");
 
-static void SaveBuffForDiff(CDiffTextBuffer & buf, CDiffTextBuffer & buf2, DiffFileData &diffdata, int i);
-
 /////////////////////////////////////////////////////////////////////////////
 // CChildFrame
 
@@ -240,9 +238,9 @@ void CChildFrame::AlignScrollPositions()
 
 BOOL CChildFrame::PreTranslateMessage(MSG *pMsg)
 {
-	if (CCrystalTextView *pTextView = GetActiveTextView())
+	if (CCrystalTextView *const pTextView = GetActiveTextView())
 	{
-		HACCEL hAccel = m_pHandleSet->m_hAccelShared;
+		HACCEL const hAccel = m_pHandleSet->m_hAccelShared;
 		if (hAccel && ::TranslateAccelerator(m_hWnd, hAccel, pMsg))
 		{
 			return TRUE;
@@ -804,9 +802,6 @@ LRESULT CChildFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 			}
 		}
 		break;
-	case IDCANCEL:
-		PostMessage(WM_CLOSE);
-		break;
 	default:
 		if (id >= ID_COLORSCHEME_FIRST && id <= ID_COLORSCHEME_LAST)
 		{
@@ -908,26 +903,43 @@ CChildFrame::CChildFrame(CMainFrame *pMDIFrame, CDirFrame *pDirDoc, CChildFrame 
 , m_pRescanFileInfo(2)
 , m_pFileTextStats(2)
 {
-	curUndo = undoTgt.begin();
-	ASSERT(m_bMixedEol == false);
-	ASSERT(m_pView[0] == NULL);
-	ASSERT(m_pView[1] == NULL);
-	ASSERT(m_pDetailView[0] == NULL);
-	ASSERT(m_pDetailView[1] == NULL);
-	m_bMergingMode = COptionsMgr::Get(OPT_MERGE_MODE);
-	ASSERT(m_bEditAfterRescan[0] == false);
-	ASSERT(m_bEditAfterRescan[1] == false);
-	ASSERT(m_bInitialReadOnly[0] == false);
-	ASSERT(m_bInitialReadOnly[1] == false);
-	m_ptBuf[0] = new CDiffTextBuffer(this, 0);
-	m_ptBuf[1] = new CDiffTextBuffer(this, 1);
-	m_diffWrapper.RefreshOptions();
-	Subclass(pMDIFrame->CreateChildHandle());
-	CreateClient();
-	RecalcLayout();
-	if (m_pOpener)
-		EnableModeless(FALSE);
-	m_bAutoDelete = true;
+	try
+	{
+		Subclass(pMDIFrame->CreateChildHandle());
+		curUndo = undoTgt.begin();
+		ASSERT(m_bMixedEol == false);
+		ASSERT(m_pView[0] == NULL);
+		ASSERT(m_pView[1] == NULL);
+		ASSERT(m_pDetailView[0] == NULL);
+		ASSERT(m_pDetailView[1] == NULL);
+		m_bMergingMode = COptionsMgr::Get(OPT_MERGE_MODE);
+		ASSERT(m_bEditAfterRescan[0] == false);
+		ASSERT(m_bEditAfterRescan[1] == false);
+		ASSERT(m_bInitialReadOnly[0] == false);
+		ASSERT(m_bInitialReadOnly[1] == false);
+		m_ptBuf[0] = new CDiffTextBuffer(this, 0);
+		m_ptBuf[1] = new CDiffTextBuffer(this, 1);
+		m_diffWrapper.RefreshOptions();
+		CreateClient();
+		RecalcLayout();
+		if (m_pOpener)
+			EnableModeless(FALSE);
+		m_bAutoDelete = true;
+	}
+	catch (OException *)
+	{
+		Unconstruct();
+		throw;
+	}
+}
+
+/**
+ * Dispose of stuff outside the scope of member or base class destructors.
+ */
+void CChildFrame::Unconstruct()
+{
+	delete m_ptBuf[0];
+	delete m_ptBuf[1];
 }
 
 /**
@@ -937,8 +949,7 @@ CChildFrame::~CChildFrame()
 {
 	if (m_pDirDoc)
 		m_pDirDoc->MergeDocClosing(this);
-	delete m_ptBuf[0];
-	delete m_ptBuf[1];
+	Unconstruct();
 }
 
 CMergeEditView *CChildFrame::CreatePane(int iPane)

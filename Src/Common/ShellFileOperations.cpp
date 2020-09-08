@@ -28,13 +28,13 @@
 ShellFileOperations::ShellFileOperations(HWND hwnd, UINT wFunc,
 	DWORD dwFlags, size_t fromMax, size_t toMax) : dwFlags(dwFlags)
 {
-	std::auto_ptr<TCHAR, true> apFrom(fromMax ? new TCHAR[fromMax + 1] : NULL);
-	std::auto_ptr<TCHAR, true> apTo(toMax ? new TCHAR[toMax + 1] : NULL);
+	scoped_array<TCHAR> apFrom(fromMax ? new TCHAR[fromMax + 1] : NULL);
+	scoped_array<TCHAR> apTo(toMax ? new TCHAR[toMax + 1] : NULL);
 	SHFILEOPSTRUCT::hwnd = H2O::GetTopLevelParent(hwnd);
 	SHFILEOPSTRUCT::wFunc = wFunc;
 	SHFILEOPSTRUCT::fFlags = LOWORD(dwFlags);
-	SHFILEOPSTRUCT::pFrom = pFrom = apFrom.release();
-	SHFILEOPSTRUCT::pTo = pTo = apTo.release();
+	SHFILEOPSTRUCT::pFrom = pFrom = apFrom.detach();
+	SHFILEOPSTRUCT::pTo = pTo = apTo.detach();
 }
 
 ShellFileOperations::~ShellFileOperations()

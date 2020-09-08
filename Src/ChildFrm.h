@@ -176,6 +176,7 @@ private:
 	void CreateClient();
 	template<UINT>
 	void UpdateSingleCmdUI();
+	void Unconstruct();
 	virtual ~CChildFrame();
 	virtual FRAMETYPE GetFrameType() const { return FRAME_FILE; }
 	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
@@ -270,7 +271,7 @@ private:
 	FileTime m_LastRescan; /**< Time of last rescan (for delaying) */
 	CDiffWrapper m_diffWrapper;
 	/// information about the file packer/unpacker
-	const std::auto_ptr<PackingInfo> m_pInfoUnpacker;
+	scoped_ptr<PackingInfo> const m_pInfoUnpacker;
 
 	static const LONG FloatScript[];
 	static const LONG SplitScript[];

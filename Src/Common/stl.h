@@ -8,11 +8,13 @@ namespace eastl { }
 namespace std { using namespace eastl; }
 #define stl(x) <eastl/x.h>
 #define stl_size_t eastl_size_t
-// EASTL as currently used with WinMerge 2011 lacks an auto_ptr template.
-// Resort to the implementation published in 1999 by Nicolai M. Josuttis.
-#include "auto_ptr.h"
-// Another lacking of EASTL is the rotate() algorithm.
-#include "rotate.h"
+
+// Neglect C++11 and use EASTL's deprecated scoped_ptr/scoped_array templates
+#include <eastl/scoped_ptr.h>
+#include <eastl/scoped_array.h>
+using eastl::scoped_ptr;
+using eastl::scoped_array;
+
 // std::begin() and std::end() as available in C++11.
 namespace eastl
 {

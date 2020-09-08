@@ -3521,25 +3521,52 @@ namespace eastl
         return eastl::copy(first2, last2, eastl::copy(first1, last1, result));
     }
 
+    /// rotate
+    ///
+    /// Effects: For each non-negative integer i < (last - first), places the element from the 
+    /// position first + i into position first + (i + (last - middle)) % (last - first).
+    ///
+    /// Returns: first + (last - middle). That is, returns where first went to.
+    /// 
+    /// Remarks: This is a left rotate.
+    /// 
+    /// Requires: [first,middle) and [middle,last) shall be valid ranges. ForwardIterator shall 
+    /// satisfy the requirements of ValueSwappable (17.6.3.2). The type of *first shall satisfy 
+    /// the requirements of MoveConstructible (Table 20) and the requirements of MoveAssignable.
+    ///
+    /// Complexity: At most last - first swaps.
+    ///
+    /// Note: While rotate works on ForwardIterators (e.g. slist) and BidirectionalIterators (e.g. list), 
+    /// you can get much better performance (O(1) instead of O(n)) with slist and list rotation by 
+    /// doing splice operations on those lists instead of calling this rotate function. 
+    ///
+    /// Note: This is a suboptimal backport from a more recent version of EASTL
+    ///
+    template<typename ForwardIterator>
+    ForwardIterator rotate(ForwardIterator first, ForwardIterator middle, ForwardIterator last)
+    {
+        ForwardIterator current = middle;
+        do {
+            swap(*first++, *current++);
+            if(first == middle)
+                middle = current;
+        } while(current != last);
+        ForwardIterator result = first;
+        current = middle;
+        while(current != last)
+        {
+            swap(*first++, *current++);
+            if(first == middle)
+                middle = current;
+            else if(current == last)
+                current = middle;
+        }
 
+        return result; // result points to first + (last - middle).
+    }
 
 } // namespace eastl
 
 
 
 #endif // Header include guard
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

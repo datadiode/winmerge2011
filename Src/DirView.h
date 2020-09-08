@@ -256,10 +256,10 @@ protected:
 	String m_lastLeftPath;
 	String m_lastRightPath;
 
-	CShellContextMenu *m_pShellContextMenuLeft; /**< Shell context menu for group of left files */
+	scoped_ptr<CShellContextMenu> const m_pShellContextMenuLeft; /**< Shell context menu for group of left files */
 	HMENU m_hShellContextMenuLeft;
 
-	CShellContextMenu *m_pShellContextMenuRight; /**< Shell context menu for group of right files */
+	scoped_ptr<CShellContextMenu> const m_pShellContextMenuRight; /**< Shell context menu for group of right files */
 	HMENU m_hShellContextMenuRight;
 
 	HMenu *m_pCompareAsScriptMenu;

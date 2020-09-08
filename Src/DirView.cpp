@@ -80,20 +80,17 @@ CDirView::CDirView(CDirFrame *pFrame)
 	, m_nSpecialItems(0)
 	, m_pCmpProgressDlg(NULL)
 	, m_compareStart(0)
-	, m_bTreeMode(false)
+	, m_bTreeMode(COptionsMgr::Get(OPT_TREE_MODE))
 	, m_pShellContextMenuLeft(new CShellContextMenu(LeftCmdFirst, LeftCmdLast))
 	, m_hShellContextMenuLeft(NULL)
 	, m_pShellContextMenuRight(new CShellContextMenu(RightCmdFirst, RightCmdLast))
 	, m_hShellContextMenuRight(NULL)
 	, m_pCompareAsScriptMenu(NULL)
 {
-	m_bTreeMode =  COptionsMgr::Get(OPT_TREE_MODE);
 }
 
 CDirView::~CDirView()
 {
-	delete m_pShellContextMenuRight;
-	delete m_pShellContextMenuLeft;
 	delete m_pCmpProgressDlg;
 }
 
@@ -644,7 +641,7 @@ HMENU CDirView::ListShellContextMenu(SIDE_TYPE side)
 		return NULL;
 
 	CShellContextMenu *pscm = (side == SIDE_LEFT) ?
-		m_pShellContextMenuLeft : m_pShellContextMenuRight;
+		m_pShellContextMenuLeft.get() : m_pShellContextMenuRight.get();
 	return pscm->QueryShellContextMenu(pContextMenu);
 }
 
