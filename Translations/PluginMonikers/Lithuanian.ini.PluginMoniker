@@ -11,8 +11,6 @@ JSON = script:\FileTransforms\jq.wsc
 Rikiuotas JSON = script:\FileTransforms\jq.wsc?options='--sort-keys'
 Protobuf schema = script:\FileTransforms\protodec.wsc?options='--schema'
 Protobuf turinys = script:\FileTransforms\protodec.wsc?options='--print'
-SQLite DB Schema = external:"%ProgramFiles(x86)%\SQLiteCompare\SQLiteCompare.exe" /CompareSchemaOnly "<path>" "<path>"
-SQLite DB Content = external:"%ProgramFiles(x86)%\SQLiteCompare\SQLiteCompare.exe" "<path>" "<path>"
 Rikiuotas XML = script:\FileTransforms\msxml.wsc?transform='\FileTransforms\msxml-sort.xslt'
 Astyle formato pirminis programos tekstas = script:\FileTransforms\astyle.wsc?optfile='\FileTransforms\astyle.opt'
 Spëti ið failo vardo plëtinio = mapping:%SupplementFolder%\Supplement.ini?FileTransforms
