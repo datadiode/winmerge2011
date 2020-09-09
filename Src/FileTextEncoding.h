@@ -18,6 +18,7 @@ public:
 	bool m_bom; /**< Unicode byte marker */
 	bool m_guessed; /**< Whether encoding was guessed from content */
 	bool m_binary;
+	bool m_sqlite; /**< Whether SQLite file signature was found */
 
 	FileTextEncoding();
 	void Clear();

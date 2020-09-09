@@ -29,6 +29,7 @@ void FileTextEncoding::Clear()
 	m_bom = false;
 	m_guessed = false;
 	m_binary = false;
+	m_sqlite = false;
 }
 
 /**

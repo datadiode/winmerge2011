@@ -236,8 +236,16 @@ void GuessCodepageEncoding(LPCTSTR filepath, FileTextEncoding *encoding, bool bG
 	encoding->m_bom = false;
 	encoding->m_guessed = false;
 	encoding->m_binary = false;
+	encoding->m_sqlite = false;
 	unsigned bom = 0;
-	if (UNICODESET ucs = DetermineEncoding(fi.pbImage, fi.cbImage, fi.cbTotal, &bom))
+	static const char sqlite3[] = "SQLite format 3";
+	if (fi.cbImage > sizeof sqlite3 && memcmp(fi.pbImage, sqlite3, sizeof sqlite3) == 0)
+	{
+		bom = sizeof sqlite3;
+		encoding->m_binary = true;
+		encoding->m_sqlite = true;
+	}
+	else if (UNICODESET ucs = DetermineEncoding(fi.pbImage, fi.cbImage, fi.cbTotal, &bom))
 	{
 		encoding->SetUnicoding(ucs);
 		encoding->m_bom = bom != 0;
