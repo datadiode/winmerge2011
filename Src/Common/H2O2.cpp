@@ -174,6 +174,9 @@ struct DrawItemStruct_WebLinkButton : DRAWITEMSTRUCT
 {
 	void DrawItem() const
 	{
+		// Neglect pressedness - no flicker-prone drawing while having capture
+		if (hwndItem == ::GetCapture())
+			return;
 		TCHAR cText[INTERNET_MAX_PATH_LENGTH];
 		int cchText = ::GetWindowText(hwndItem, cText, _countof(cText));
 		COLORREF clrText = ::GetSysColor(COLOR_HOTLIGHT);
@@ -193,6 +196,15 @@ struct DrawItemStruct_WebLinkButton : DRAWITEMSTRUCT
 			::ExtTextOut(hDC, 0, 0, ETO_OPAQUE, &rcItem, 0, 0, 0);
 			::SetBkMode(hDC, TRANSPARENT);
 			::SetTextColor(hDC, clrText);
+			if (!(itemState & ODS_NOACCEL))
+			{
+				if (LPWSTR p = StrChrW(cText, L'&'))
+				{
+					// Text is underlined already, so prefer a combining caron
+					p[0] = p[1];
+					p[1] = L'\x30C';
+				}
+			}
 			::DrawText(hDC, cText, cchText, &rcText, DT_LEFT);
 			rcText.top = rcText.bottom - 1;
 			::SetBkColor(hDC, clrText);
