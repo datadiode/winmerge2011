@@ -27,6 +27,8 @@ for %%p in (
 set PathTo7zSrc=%~dp0appveyor-downloads\7z1900-src\7z-a6e2c7e401a3e5976e8522de518a169b0d8a7fac
 set PathTo7zMsi=%~dp0appveyor-downloads
 
+"%ProgramFiles%\Microsoft SDKs\Windows\v7.1\Setup\WindowsSdkVer.exe" -version:v7.1
+
 for %%p in (%*) do (
   for /F "tokens=1,2 delims=!" %%u in ("%%p") do (
     MSBuild WinMerge.sln /t:Rebuild /p:Platform="%%u" /p:Configuration="%%v" || goto :eof
