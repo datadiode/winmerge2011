@@ -46,7 +46,7 @@ InstallDir "$PROGRAMFILES\WinMerge2011"
 InstallDirRegKey HKLM "${regkey}" ""
 
 LicenseText "License"
-LicenseData "${srcdir}\Docs\COPYING"
+LicenseData "${srcdir}\Docs\LICENSE"
 
 ; pages
 ; we keep it simple - leave out selectable installation types

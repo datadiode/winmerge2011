@@ -24,8 +24,11 @@ const TCHAR LicenceUrl[] = _T("http://www.gnu.org/licenses/gpl-3.0.html");
 /** @brief WinMerge download page URL. */
 const TCHAR DownloadUrl[] = _T("http://winmerge.org/downloads/");
 
-/** @brief Relative (to WinMerge executable ) path to local help file. */
+/** @brief Relative (to WinMerge executable) path to local help file. */
 const TCHAR DocsPath[] = _T("\\Docs\\WinMerge.chm");
+
+/** @brief Relative (to WinMerge executable) path to Frhed local help file. */
+const TCHAR DocsPathFrhed[] = _T("\\Frhed\\Docs\\Frhed.chm");
 
 /** @brief Contributors list. */
 const TCHAR ContributorsPath[] = _T("\\contributors.txt");
@@ -34,15 +37,10 @@ const TCHAR ContributorsPath[] = _T("\\contributors.txt");
 const TCHAR RelNotes[] = _T("\\Docs\\ReleaseNotes.html");
 
 /** @brief GPL Licence local file name. */
-const TCHAR LicenseFile[] = _T("\\Copying");
+const TCHAR LicenseFile[] = _T("\\Docs\\LICENSE");
 
 /** @brief WinMerge folder in My Folders-folder. */
 const TCHAR WinMergeDocumentsFolder[] = _T("WinMerge");
-
-/** @brief Executable Filename for ANSI build. */
-const TCHAR ExecutableFilename[] = _T("WinMerge.exe");
-/** @brief Executable Filename for Unicode build. */
-const TCHAR ExecutableFilenameU[] = _T("WinMergeU.exe");
 
 /**
  * @brief Flags used when opening files
