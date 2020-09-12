@@ -459,6 +459,7 @@
     <ClCompile Include="PropCompare.cpp" />
     <ClCompile Include="PropCompareFolder.cpp" />
     <ClCompile Include="PropCompareImage.cpp" />
+    <ClCompile Include="PropCompareSQLite.cpp" />
     <ClCompile Include="PropEditor.cpp" />
     <ClCompile Include="PropGeneral.cpp" />
     <ClCompile Include="PropHexEditor.cpp" />
@@ -481,6 +482,7 @@
     <ClCompile Include="SourceControl.cpp" />
     <ClCompile Include="Splash.cpp" />
     <ClCompile Include="Common\SplitState.cpp" />
+    <ClCompile Include="SQLiteMergeFrm.cpp" />
     <ClCompile Include="StdAfx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -749,6 +751,7 @@
     <ClCompile Include="xdiff_gnudiff_compat.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Common\AccChildren.h" />
     <ClInclude Include="Common\defer.h" />
     <ClInclude Include="Common\PidlManager.h" />
     <ClInclude Include="Common\WindowPlacement.h" />
@@ -878,6 +881,7 @@
     <ClInclude Include="PropCompare.h" />
     <ClInclude Include="PropCompareFolder.h" />
     <ClInclude Include="PropCompareImage.h" />
+    <ClInclude Include="PropCompareSQLite.h" />
     <ClInclude Include="PropEditor.h" />
     <ClInclude Include="PropGeneral.h" />
     <ClInclude Include="PropHexEditor.h" />
@@ -902,6 +906,7 @@
     <ClInclude Include="Common\SortHeaderCtrl.h" />
     <ClInclude Include="Splash.h" />
     <ClInclude Include="Common\SplitState.h" />
+    <ClInclude Include="SQLiteMergeFrm.h" />
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="Common\stream_util.h" />
     <ClInclude Include="Common\string_util.h" />

@@ -8,11 +8,11 @@
  *
  */
 #include "StdAfx.h"
-#include "Constants.h"
 #include "Merge.h"
 #include "LanguageSelect.h"
 #include "AboutDlg.h"
 #include "common/version.h"
+#include "common/coretools.h"
 #include "paths.h"
 #include "coretools.h"
 
@@ -29,6 +29,67 @@ static const char gnu_ascii[] =
 "      ): :(\n"
 "      :o_o:\n"
 "       \"-\"";
+
+static void MakeWebLinkButton(HWND hWnd, int nID)
+{
+	TCHAR szText[1024];
+	HWND const hwndStatic = ::GetDlgItem(hWnd, nID);
+	::GetWindowText(hwndStatic, szText, _countof(szText));
+	HDC const hDC = ::GetDC(NULL);
+	HFONT const hFont = (HFONT)::SendMessage(hwndStatic, WM_GETFONT, 0, 0);
+	::SelectObject(hDC, hFont);
+	if (LPTSTR const szLower = StrChr(szText, _T('[')))
+	{
+		StrTrim(szLower, _T("["));
+		if (LPTSTR const szUpper = StrChr(szLower, _T(']')))
+		{
+			*szUpper = _T('\0');
+			int y = 0;
+			LPCTSTR szLine = szText;
+			LPCTSTR q = szLower;
+			RECT rgrc[2];
+			::GetClientRect(hwndStatic, &rgrc[1]);
+			::DrawText(hDC, szText, q - szText, &rgrc[1], DT_CALCRECT | DT_WORDBREAK);
+			while (LPCTSTR const p = StrRChr(szText, q, _T(' ')))
+			{
+				q = p;
+				::GetClientRect(hwndStatic, &rgrc[0]);
+				::DrawText(hDC, szText, q - szText, &rgrc[0], DT_CALCRECT | DT_WORDBREAK);
+				if (rgrc[1].bottom > rgrc[0].bottom)
+				{
+					y += rgrc[1].bottom - rgrc[0].bottom;
+					rgrc[1].bottom = rgrc[0].bottom;
+					if (szLine <= p)
+						szLine = p + 1;
+				}
+			}
+			::GetClientRect(hwndStatic, &rgrc[0]);
+			::DrawText(hDC, szLine, szLower - szLine, &rgrc[0], DT_CALCRECT | DT_WORDBREAK);
+			::GetClientRect(hwndStatic, &rgrc[1]);
+			::DrawText(hDC, szLine, szUpper - szLine, &rgrc[1], DT_CALCRECT | DT_WORDBREAK);
+			if (rgrc[1].bottom > rgrc[0].bottom)
+			{
+				y += rgrc[1].bottom - rgrc[0].bottom;
+				szLower[-1] = '\n';
+				rgrc[0].right = rgrc[0].top = 0;
+				::DrawText(hDC, szLower, szUpper - szLower, &rgrc[1], DT_CALCRECT);
+			}
+			rgrc[1].right -= rgrc[0].right;
+			rgrc[1].bottom -= rgrc[1].top;
+			::MapWindowPoints(hwndStatic, hWnd, (LPPOINT)&rgrc, 2);
+			HWND const hwndButton = ::CreateWindow(WC_BUTTON, szLower,
+				WS_CHILD | WS_TABSTOP | WS_VISIBLE | BS_OWNERDRAW | BS_NOTIFY,
+				rgrc[0].right, rgrc[0].top + y, rgrc[1].right, rgrc[1].bottom + 1,
+				hWnd, (HMENU)nID, 0, 0);
+			::SendMessage(hwndButton, WM_SETFONT, (WPARAM)hFont, 0);
+			::SetWindowPos(hwndButton, hwndStatic, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+			*szUpper = _T(']');
+			StrTrim(szUpper, _T("]"));
+		}
+		::SetWindowText(hwndStatic, szText);
+	}
+	::ReleaseDC(NULL, hDC);
+}
 
 CAboutDlg::CAboutDlg()
 	: ODialog(IDD_ABOUTBOX)
@@ -63,10 +124,16 @@ LRESULT CAboutDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			EndDialog(wParam);
 			break;
 		case IDC_OPEN_CONTRIBUTORS:
-			OnBnClickedOpenContributors();
+			OpenFileOrUrl(ContributorsPath, NULL);
 			break;
 		case IDC_WWW:
 			if ((UINT)ShellExecute(NULL, _T("open"), WinMergeURL, NULL, NULL, SW_SHOWNORMAL) > 32)
+				MessageReflect_WebLinkButton<WM_COMMAND>(wParam, lParam);
+			else
+				MessageBeep(0); // unable to execute file!
+			break;
+		case IDC_COMPANY:
+			if (OpenFileOrUrl(LicenseFile, LicenceUrl))
 				MessageReflect_WebLinkButton<WM_COMMAND>(wParam, lParam);
 			else
 				MessageBeep(0); // unable to execute file!
@@ -77,6 +144,7 @@ LRESULT CAboutDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		switch (wParam)
 		{
 		case IDC_WWW:
+		case IDC_COMPANY:
 			return MessageReflect_WebLinkButton<WM_DRAWITEM>(wParam, lParam);
 		}
 		break;
@@ -85,6 +153,10 @@ LRESULT CAboutDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			reinterpret_cast<HSurface *>(wParam)->SetTextColor(RGB(128, 128, 128));
 		reinterpret_cast<HSurface *>(wParam)->SetBkMode(TRANSPARENT);
 		return reinterpret_cast<LRESULT>(GetStockObject(NULL_BRUSH));
+	case WM_CTLCOLORBTN:
+		if (reinterpret_cast<HWindow *>(lParam)->GetDlgCtrlID() == IDC_COMPANY)
+			return reinterpret_cast<LRESULT>(GetStockObject(NULL_BRUSH));
+		break;
 	case WM_ERASEBKGND:
 		if (m_spIPicture)
 		{
@@ -107,6 +179,7 @@ LRESULT CAboutDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		switch (::GetDlgCtrlID(reinterpret_cast<HWND>(wParam)))
 		{
 		case IDC_WWW:
+		case IDC_COMPANY:
 			return MessageReflect_WebLinkButton<WM_SETCURSOR>(wParam, lParam);
 		}
 		break;
@@ -166,37 +239,30 @@ BOOL CAboutDlg::OnInitDialog()
 	if (pos != String::npos)
 		copyright.insert(pos, 3, _T(' ')); // approximate an em space
 	SetDlgItemText(IDC_COMPANY, copyright.c_str());
+	MakeWebLinkButton(m_hWnd, IDC_COMPANY);
 	return TRUE;
 }
 
 /**
- * @brief Show contributors list.
- * Opens Contributors.txt into notepad.
+ * @brief Open file, if it exists, else open url
  */
-void CAboutDlg::OnBnClickedOpenContributors()
+bool CAboutDlg::OpenFileOrUrl(LPCTSTR szFile, LPCTSTR szUrl)
 {
-	String defPath = GetModulePath();
-	// Don't add quotation marks yet, CFile doesn't like them
-	String docPath = defPath + ContributorsPath;
+	HINSTANCE ret = NULL;
+	String docPath = GetModulePath() + szFile;
 	if (paths_DoesPathExist(docPath.c_str()) == IS_EXISTING_FILE)
 	{
-		// Now, add quotation marks so ShellExecute() doesn't fail if path
-		// includes spaces
 		docPath.insert(docPath.begin(), _T('"'));
 		docPath.push_back(_T('"'));
-		HINSTANCE ret = ShellExecute(m_hWnd, NULL, _T("notepad"), docPath.c_str(), defPath.c_str(), SW_SHOWNORMAL);
-
-		// values < 32 are errors (ref to MSDN)
-		if ((int)ret < 32)
-		{
-			// Try to open with associated application (.txt)
-			ret = ShellExecute(m_hWnd, _T("open"), docPath.c_str(), NULL, NULL, SW_SHOWNORMAL);
-			if ((int)ret < 32)
-				LanguageSelect.MsgBox(IDS_ERROR_EXECUTE_FILE, _T("Notepad.exe"), MB_ICONSTOP);
-		}
+		ret = ShellExecute(m_hWnd, _T("open"), _T("notepad.exe"), docPath.c_str(), NULL, SW_SHOWNORMAL);
+	}
+	else if (szUrl)
+	{
+		ret = ShellExecute(NULL, _T("open"), szUrl, NULL, NULL, SW_SHOWNORMAL);
 	}
 	else
 	{
 		LanguageSelect.MsgBox(IDS_ERROR_FILE_NOT_FOUND, docPath.c_str(), MB_ICONSTOP);
 	}
+	return reinterpret_cast<UINT_PTR>(ret) > HINSTANCE_ERROR;
 }

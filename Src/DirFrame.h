@@ -31,9 +31,11 @@
 class CDirView;
 class CHexMergeFrame;
 class CImgMergeFrame;
+class CSQLiteMergeFrame;
 typedef std::list<CChildFrame *> MergeDocPtrList;
 typedef std::list<CHexMergeFrame *> HexMergeDocPtrList;
 typedef std::list<CImgMergeFrame *> ImgMergeDocPtrList;
+typedef std::list<CSQLiteMergeFrame *> SQLiteMergeDocPtrList;
 class CTempPathContext;
 struct FileActionItem;
 class MergeCmdLineInfo;
@@ -55,10 +57,10 @@ public:
 	BOOL PreTranslateMessage(MSG *);
 	void SetStatus(LPCTSTR szStatus);
 	void SetFilterStatusDisplay(LPCTSTR szFilter);
-	BOOL GetLeftReadOnly() const { return m_bROLeft; }
-	BOOL GetRightReadOnly() const { return m_bRORight; }
-	void SetLeftReadOnly(BOOL bReadOnly);
-	void SetRightReadOnly(BOOL bReadOnly);
+	bool GetLeftReadOnly() const { return m_bROLeft; }
+	bool GetRightReadOnly() const { return m_bRORight; }
+	void SetLeftReadOnly(bool bReadOnly);
+	void SetRightReadOnly(bool bReadOnly);
 	bool AddToCollection(FileLocation &, FileLocation &);
 	HStatusBar *m_wndStatusBar;
 	void UpdateResources();
@@ -70,9 +72,10 @@ public:
 
 protected:
 
-	BOOL m_bROLeft; /**< Is left side read-only */
-	BOOL m_bRORight; /**< Is right side read-only */
+	bool m_bROLeft; /**< Is left side read-only */
+	bool m_bRORight; /**< Is right side read-only */
 
+	void Unconstruct();
 	virtual ~CDirFrame();
 	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
 
@@ -92,6 +95,7 @@ public:
 	CChildFrame *GetMergeDocForDiff();
 	CHexMergeFrame *GetHexMergeDocForDiff();
 	CImgMergeFrame *GetImgMergeDocForDiff();
+	CSQLiteMergeFrame *GetSQLiteMergeDocForDiff();
 	bool CanFrameClose();
 
 // Implementation
@@ -109,9 +113,11 @@ public:
 	void AddMergeDoc(CChildFrame *);
 	void AddMergeDoc(CHexMergeFrame *);
 	void AddMergeDoc(CImgMergeFrame *);
+	void AddMergeDoc(CSQLiteMergeFrame *);
 	void MergeDocClosing(CChildFrame *);
 	void MergeDocClosing(CHexMergeFrame *);
 	void MergeDocClosing(CImgMergeFrame *);
+	void MergeDocClosing(CSQLiteMergeFrame *);
 	bool UpdateDiffAfterOperation(const FileActionItem &, bool bMakeTargetItemWritable);
 	void UpdateHeaderPath(BOOL bLeft);
 	void AbortCurrentScan();
@@ -151,6 +157,7 @@ private:
 	MergeDocPtrList m_MergeDocs; /**< List of file compares opened from this compare */
 	HexMergeDocPtrList m_HexMergeDocs; /**< List of hex file compares opened from this compare */
 	ImgMergeDocPtrList m_ImgMergeDocs; /**< List of image file compares opened from this compare */
+	SQLiteMergeDocPtrList m_SQLiteMergeDocs; /**< List of SQLite DB compares opened from this compare */
 	int m_nRecursive; /**< Is current compare recursive? (ternary logic - 2 means flat) */
 	int m_nCompMethod; /**< Compare method */
 	String m_strLeftDesc; /**< Left side desription text */

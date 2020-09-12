@@ -21,7 +21,7 @@
  * @brief interface of the CHexMergeFrame class
  *
  */
-#define HEKSEDIT_INTERFACE_VERSION 3
+#define HEKSEDIT_INTERFACE_VERSION 4
 #include "heksedit.h"
 
 class CHexMergeView;
@@ -42,9 +42,10 @@ public:
 	BOOL PreTranslateMessage(MSG *);
 	void UpdateEditCmdUI();
 	void UpdateCmdUI();
-	HRESULT OpenDocs(const FileLocation &, const FileLocation &, BOOL bROLeft, BOOL bRORight);
+	void OpenDocs(FileLocation &, FileLocation &, bool bROLeft, bool bRORight);
 	bool SaveModified();
 	void SetTitle();
+	HMenu *GetBookmarkMenu() const { return m_pBookmarkMenu; }
 
 private:
 	virtual ~CHexMergeFrame();
@@ -74,6 +75,8 @@ private:
 	void OnViewZoom(int direction);
 
 // Implementation data
+    HMenu *m_pBookmarkMenu;
+
 	static const LONG FloatScript[];
 	static const LONG SplitScript[];
 	CHexMergeView *m_pView[MERGE_VIEW_COUNT]; /**< Pointer to left/right view */

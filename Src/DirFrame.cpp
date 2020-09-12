@@ -88,17 +88,33 @@ CDirFrame::CDirFrame(CMainFrame *pMDIFrame)
 , m_nCompMethod(-1)
 , m_pTempPathContext(NULL)
 {
-	Subclass(pMDIFrame->CreateChildHandle());
-	LoadIcon(CompareStats::DIFFIMG_DIR);
-	CreateClient();
-	RecalcLayout();
-	m_bAutoDelete = true;
+    try
+    {
+	    Subclass(pMDIFrame->CreateChildHandle());
+	    LoadIcon(CompareStats::DIFFIMG_DIR);
+	    CreateClient();
+	    RecalcLayout();
+	    m_bAutoDelete = true;
+    }
+    catch (OException *)
+    {
+		Unconstruct();
+		throw;
+    }
+}
+
+/**
+ * Dispose of stuff outside the scope of member or base class destructors.
+ */
+void CDirFrame::Unconstruct()
+{
+	delete m_pCompareStats;
+	delete m_pDirView;
 }
 
 CDirFrame::~CDirFrame()
 {
 	DeleteContext();
-	delete m_pCompareStats;
 	// Inform all of our merge docs that we're closing
 	MergeDocPtrList::iterator ppMergeDoc = m_MergeDocs.begin();
 	while (ppMergeDoc != m_MergeDocs.end())
@@ -118,7 +134,7 @@ CDirFrame::~CDirFrame()
 		WaitStatusCursor waitstatus(IDS_STATUS_DELETEFILES);
 		m_pTempPathContext = m_pTempPathContext->DeleteHead();
 	}
-	delete m_pDirView;
+    Unconstruct();
 }
 
 void CDirFrame::DeleteContext()
@@ -414,6 +430,7 @@ LRESULT CDirFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 	case ID_MERGE_COMPARE_ZIP:
 	case ID_MERGE_COMPARE_HEX:
 	case ID_MERGE_COMPARE_IMG:
+	case ID_MERGE_COMPARE_SQLITE:
 	case ID_MERGE_COMPARE_XML:
 		m_pDirView->OpenSelection(NULL, id);
 		break;
@@ -490,9 +507,6 @@ LRESULT CDirFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 		{
 			pWndNext->SetFocus();
 		}
-		break;
-	case IDCANCEL:
-		PostMessage(WM_CLOSE);
 		break;
 	}
 	return 0;
@@ -670,7 +684,7 @@ void CDirFrame::AlignStatusBar(int cx)
  * @brief Set left side readonly-status
  * @param bReadOnly New status
  */
-void CDirFrame::SetLeftReadOnly(BOOL bReadOnly)
+void CDirFrame::SetLeftReadOnly(bool bReadOnly)
 {
 	m_bROLeft = bReadOnly;
 	m_wndStatusBar->SetPartText(PANE_LEFT_RO, m_bROLeft ?
@@ -681,7 +695,7 @@ void CDirFrame::SetLeftReadOnly(BOOL bReadOnly)
  * @brief Set right side readonly-status
  * @param bReadOnly New status
  */
-void CDirFrame::SetRightReadOnly(BOOL bReadOnly)
+void CDirFrame::SetRightReadOnly(bool bReadOnly)
 {
 	m_bRORight = bReadOnly;
 	m_wndStatusBar->SetPartText(PANE_RIGHT_RO, m_bRORight ?
@@ -749,6 +763,11 @@ BOOL CDirFrame::PreTranslateMessage(MSG *pMsg)
 	// Check if we got 'ESC pressed' -message
 	if (pMsg->message == WM_KEYDOWN)
 	{
+		HACCEL hAccel = m_pHandleSet->m_hAccelShared;
+		if (hAccel && ::TranslateAccelerator(m_hWnd, hAccel, pMsg))
+		{
+			return TRUE;
+		}
 		switch (pMsg->wParam)
 		{
 		case VK_ESCAPE:

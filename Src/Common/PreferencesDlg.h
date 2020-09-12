@@ -25,6 +25,7 @@
 #include "PropShell.h"
 #include "PropCompareFolder.h"
 #include "PropCompareImage.h"
+#include "PropCompareSQLite.h"
 
 class COptionsMgr;
 
@@ -61,6 +62,7 @@ protected:
 	PropShell m_pageShell;
 	PropCompareFolder m_pageCompareFolder;
 	PropCompareImage m_pageCompareImage;
+	PropCompareSQLite m_pageCompareSQLite;
 
 	static String m_pathMRU;
 

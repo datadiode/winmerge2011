@@ -72,6 +72,20 @@ enum COMPARE_TYPE
 	CMP_SIZE,
 };
 
+enum SQLITE_COMPAREFLAGS
+{
+	/* Radio options */
+	SQLITE_CMP_SCHEMA_ONLY,
+	SQLITE_CMP_SCHEMA_AND_DATA,
+	/* Check options */
+	SQLITE_CMP_USE_FILE_PATTERNS = 0x02,
+	SQLITE_CMP_PROMPT_FOR_OPTIONS = 0x04,
+	SQLITE_CMP_COMPARE_BLOB_FIELDS = 0x08,
+	/* Masks to separate between radio & check options */
+	SQLITE_CMP_CHECK_OPTIONS_MASK = 0x10 - SQLITE_CMP_USE_FILE_PATTERNS,
+	SQLITE_CMP_RADIO_OPTIONS_MASK = SQLITE_CMP_USE_FILE_PATTERNS - 0x01,
+};
+
 /**
  * @brief TAB handling options
  */
@@ -377,6 +391,10 @@ extern COptionDef
 // Image Compare options
 extern COptionDef
 <String> OPT_CMP_IMG_FILEPATTERNS inline((_T("Settings/ImageFilePatterns"), _T("*.bmp;*.cut;*.dds;*.exr;*.g3;*.gif;*.hdr;*.ico;*.iff;*.lbm;*.j2k;*.j2c;*.jng;*.jp2;*.jpg;*.jif;*.jpeg;*.jpe;*.jxr;*.wdp;*.hdp;*.koa;*.mng;*.pcd;*.pcx;*.pfm;*.pct;*.pict;*.pic;*.png;*.pbm;*.pgm;*.ppm;*.psd;*.ras;*.sgi;*.rgb;*.rgba;*.bw;*.tga;*.targa;*.tif;*.tiff;*.wap;*.wbmp;*.wbm;*.webp;*.xbm;*.xpm")));
+extern COptionDef
+<String> OPT_CMP_SQLITE_FILEPATTERNS inline((_T("Settings/SQLiteFilePatterns"), _T("*.db;*.sdb;*.sqlite;*.db3;*.s3db;*.sqlite3;*.sl3")));
+extern COptionDef
+<int> OPT_CMP_SQLITE_COMPAREFLAGS inline((_T("Settings/SQLiteCompareFlags"), 0));
 extern COptionDef
 <bool> OPT_CMP_IMG_SHOWDIFFERENCES inline((_T("Settings/ImageShowDifferences"), true));
 extern COptionDef

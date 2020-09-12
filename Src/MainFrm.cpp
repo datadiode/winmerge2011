@@ -35,6 +35,7 @@
 #include "ChildFrm.h"
 #include "HexMergeFrm.h"
 #include "ImgMergeFrm.h"
+#include "SQLiteMergeFrm.h"
 #include "DirView.h"
 #include "MergeEditView.h"
 #include "MergeDiffDetailView.h"
@@ -94,11 +95,14 @@ const CMainFrame::MENUITEM_ICON CMainFrame::m_MenuIcons[] = {
 	{ ID_EDIT_SELECT_ALL,			IDB_EDIT_SELECTALL,				},
 	{ ID_TOOLS_CUSTOMIZECOLUMNS,	IDB_TOOLS_COLUMNS,				},
 	{ ID_TOOLS_GENERATEPATCH,		IDB_TOOLS_GENERATEPATCH,		},
+	{ ID_TOOLS_EXPORT_DATA_DIFFS,	IDB_TOOLS_EXPORT_DATA_DIFFS,	},
 	{ ID_FILE_PRINT,				IDB_FILE_PRINT,					},
 	{ ID_TOOLS_GENERATEREPORT,		IDB_TOOLS_GENERATEREPORT,		},
 	{ ID_EDIT_TOGGLE_BOOKMARK,		IDB_EDIT_TOGGLE_BOOKMARK,		},
 	{ ID_EDIT_GOTO_NEXT_BOOKMARK,	IDB_EDIT_GOTO_NEXT_BOOKMARK,	},
 	{ ID_EDIT_GOTO_PREV_BOOKMARK,	IDB_EDIT_GOTO_PREV_BOOKMARK,	},
+	{ ID_EDIT_ADD_BOOKMARK,         IDB_EDIT_ADD_BOOKMARK,	        },
+	{ ID_EDIT_REMOVE_BOOKMARK,	    IDB_EDIT_REMOVE_BOOKMARK,	    },
 	{ ID_EDIT_CLEAR_ALL_BOOKMARKS,	IDB_EDIT_CLEAR_ALL_BOOKMARKS,	},
 	{ ID_VIEW_ZOOMIN,				IDB_VIEW_ZOOMIN,				},
 	{ ID_VIEW_ZOOMOUT,				IDB_VIEW_ZOOMOUT,				},
@@ -128,6 +132,9 @@ const CMainFrame::MENUITEM_ICON CMainFrame::m_MenuIcons[] = {
 /** @brief Timer ID for window flashing timer. */
 static const UINT ID_TIMER_FLASH = 1;
 
+/** @brief Timer ID for tab item close box. */
+static const UINT ID_TIMER_CLOSE = 2;
+
 /** @brief Timeout for window flashing timer, in milliseconds. */
 static const UINT WINDOW_FLASH_TIMEOUT = 500;
 
@@ -154,6 +161,7 @@ static int GetMenuBitmapExcessWidth()
  * @todo Preference for logging?
  */
 CMainFrame::CMainFrame(HWindow *pWnd, const MergeCmdLineInfo &cmdInfo)
+	: m_hrAutomation(S_FALSE)
 {
 	Subclass(pWnd);
 	OnSettingChange();
@@ -484,17 +492,23 @@ void CMainFrame::UpdateCmdUI<ID_MERGE_COMPARE>(BYTE uFlags)
 template<>
 void CMainFrame::UpdateCmdUI<ID_L2R>(BYTE uFlags)
 {
-	m_cmdState.LeftToRight = uFlags;
-	m_wndToolBar->EnableButton(ID_L2R, !(uFlags & MF_GRAYED));
-	m_wndToolBar->EnableButton(ID_L2RNEXT, !(uFlags & MF_GRAYED));
+	switch (uFlags & 0xF0)
+	{
+	case 0x00: m_wndToolBar->EnableButton(ID_L2RNEXT, !(uFlags & MF_GRAYED));
+	case 0x10: m_wndToolBar->EnableButton(ID_L2R, !(uFlags & MF_GRAYED));
+	}
+	m_cmdState.LeftToRight = uFlags & 0xF;
 }
 
 template<>
 void CMainFrame::UpdateCmdUI<ID_R2L>(BYTE uFlags)
 {
-	m_cmdState.RightToLeft = uFlags;
-	m_wndToolBar->EnableButton(ID_R2L, !(uFlags & MF_GRAYED));
-	m_wndToolBar->EnableButton(ID_R2LNEXT, !(uFlags & MF_GRAYED));
+	switch (uFlags & 0xF0)
+	{
+	case 0x00: m_wndToolBar->EnableButton(ID_R2LNEXT, !(uFlags & MF_GRAYED));
+	case 0x10: m_wndToolBar->EnableButton(ID_R2L, !(uFlags & MF_GRAYED));
+	}
+	m_cmdState.RightToLeft = uFlags & 0xF;
 }
 
 template<>
@@ -514,17 +528,23 @@ void CMainFrame::UpdateCmdUI<ID_ALL_RIGHT>(BYTE uFlags)
 template<>
 void CMainFrame::UpdateCmdUI<ID_PREVDIFF>(BYTE uFlags)
 {
-	m_cmdState.PrevDiff = uFlags;
-	m_wndToolBar->EnableButton(ID_PREVDIFF, !(uFlags & MF_GRAYED));
-	m_wndToolBar->EnableButton(ID_FIRSTDIFF, !(uFlags & MF_GRAYED));
+	switch (uFlags & 0xF0)
+	{
+	case 0x00: m_wndToolBar->EnableButton(ID_FIRSTDIFF, !(uFlags & MF_GRAYED));
+	case 0x10: m_wndToolBar->EnableButton(ID_PREVDIFF, !(uFlags & MF_GRAYED));
+	}
+	m_cmdState.PrevDiff = uFlags & 0xF;
 }
 
 template<>
 void CMainFrame::UpdateCmdUI<ID_NEXTDIFF>(BYTE uFlags)
 {
-	m_cmdState.NextDiff = uFlags;
-	m_wndToolBar->EnableButton(ID_NEXTDIFF, !(uFlags & MF_GRAYED));
-	m_wndToolBar->EnableButton(ID_LASTDIFF, !(uFlags & MF_GRAYED));
+	switch (uFlags & 0xF0)
+	{
+	case 0x00: m_wndToolBar->EnableButton(ID_LASTDIFF, !(uFlags & MF_GRAYED));
+	case 0x10: m_wndToolBar->EnableButton(ID_NEXTDIFF, !(uFlags & MF_GRAYED));
+	}
+	m_cmdState.NextDiff = uFlags & 0xF;
 }
 
 template<>
@@ -652,6 +672,12 @@ template<>
 void CMainFrame::UpdateCmdUI<ID_TOOLS_GENERATEREPORT>(BYTE uFlags)
 {
 	m_cmdState.GenerateReport = uFlags;
+}
+
+template<>
+void CMainFrame::UpdateCmdUI<ID_TOOLS_EXPORT_DATA_DIFFS>(BYTE uFlags)
+{
+	m_cmdState.ExportDataDiffs = uFlags;
 }
 
 template<>
@@ -899,6 +925,7 @@ const BYTE *CMainFrame::CmdState::Lookup(UINT id) const
 	case ID_MERGE_COMPARE_XML:
 	case ID_MERGE_COMPARE_HEX:
 	case ID_MERGE_COMPARE_IMG:
+	case ID_MERGE_COMPARE_SQLITE:
 		return &MergeCompare;
 	case ID_CURDIFF:
 		return &CurDiff;;
@@ -935,6 +962,8 @@ const BYTE *CMainFrame::CmdState::Lookup(UINT id) const
 		return &EolToMac;
 	case ID_TOOLS_GENERATEREPORT:
 		return &GenerateReport;
+	case ID_TOOLS_EXPORT_DATA_DIFFS:
+		return &ExportDataDiffs;
 	case ID_FILE_COLLECTMODE:
 		return &CollectMode;
 	case ID_VIEW_LINENUMBERS:
@@ -955,6 +984,7 @@ const BYTE *CMainFrame::CmdState::Lookup(UINT id) const
 		return &ToggleBookmark;
 	case ID_EDIT_GOTO_NEXT_BOOKMARK:
 	case ID_EDIT_GOTO_PREV_BOOKMARK:
+	case ID_EDIT_REMOVE_BOOKMARK:
 	case ID_EDIT_CLEAR_ALL_BOOKMARKS:
 		return &NavigateBookmarks;
 	case ID_SET_SYNCPOINT:
@@ -1237,6 +1267,33 @@ static void FileLocationGuessEncodings(FileLocation &fileloc, bool bGuessEncodin
 }
 
 /**
+ * @brief Wrap CEditorFrame::OpenDocs() to catch its exceptions
+ *
+ * In case of an exception, closes the child window and shows a message box
+ */
+void CMainFrame::OpenDocs(CEditorFrame *pDocFrame, FileLocation &filelocLeft, FileLocation &filelocRight, bool bROLeft, bool bRORight)
+{
+	try
+	{
+		pDocFrame->OpenDocs(filelocLeft, filelocRight, bROLeft, bRORight);
+	}
+	catch (OException *e)
+	{
+		pDocFrame->DestroyFrame();
+		e->ReportError(m_hWnd, MB_ICONSTOP);
+		delete e;
+	}
+}
+
+void CMainFrame::RecycleMergeDoc(FRAMETYPE frameType)
+{
+	if (!COptionsMgr::Get(OPT_MULTIDOC_MERGEDOCS))
+		if (CDocFrame *const pFrame = FindFrameOfType(frameType))
+			if (static_cast<CEditorFrame *>(pFrame)->SaveModified())
+				pFrame->DestroyFrameAsync();
+}
+
+/**
  * @brief Creates new MergeDoc instance and shows documents.
  * @param [in] pDirDoc Dir compare document to create a new Merge document for.
  * @param [in] filelocLeft Left side file location info.
@@ -1246,7 +1303,7 @@ static void FileLocationGuessEncodings(FileLocation &fileloc, bool bGuessEncodin
  * @param [in] infoUnpacker Plugin info.
  * @return OPENRESULTS_TYPE for success/failure code.
  */
-CEditorFrame *CMainFrame::ShowMergeDoc(CDirFrame *pDirDoc,
+void CMainFrame::ShowMergeDoc(CDirFrame *pDirDoc,
 	FileLocation &filelocLeft, FileLocation &filelocRight,
 	DWORD dwLeftFlags, DWORD dwRightFlags, PackingInfo *infoUnpacker, LPCTSTR sCompareAs)
 {
@@ -1271,69 +1328,80 @@ CEditorFrame *CMainFrame::ShowMergeDoc(CDirFrame *pDirDoc,
 	if ((dwLeftFlags & FFILEOPEN_DETECTBIN) && filelocLeft.encoding.m_binary ||
 		(dwRightFlags & FFILEOPEN_DETECTBIN) && filelocRight.encoding.m_binary)
 	{
-		if (PathMatchSpec(filelocLeft.filepath.c_str(), COptionsMgr::Get(OPT_CMP_IMG_FILEPATTERNS).c_str()) &&
+		// No issue to repeat COptionsMgr::Get() as it is no more expensive than referencing a variable.
+		if (!COptionsMgr::Get(OPT_CMP_IMG_FILEPATTERNS).empty() &&
+			PathMatchSpec(filelocLeft.filepath.c_str(), COptionsMgr::Get(OPT_CMP_IMG_FILEPATTERNS).c_str()) &&
 			PathMatchSpec(filelocRight.filepath.c_str(), COptionsMgr::Get(OPT_CMP_IMG_FILEPATTERNS).c_str()))
 		{
-			if (CEditorFrame *pDoc = ActivateOpenDoc(pDirDoc,
-				filelocLeft, filelocRight, sCompareAs, ID_MERGE_COMPARE_IMG, FRAME_IMGFILE))
-			{
-				return pDoc;
-			}
-			return ShowImgMergeDoc(pDirDoc, filelocLeft, filelocRight, bLeftRO, bRightRO, sCompareAs);
+			ShowImgMergeDoc(pDirDoc, filelocLeft, filelocRight, bLeftRO, bRightRO, sCompareAs);
+			return;
 		}
-		if (CEditorFrame *pDoc = ActivateOpenDoc(pDirDoc,
-			filelocLeft, filelocRight, sCompareAs, ID_MERGE_COMPARE_HEX, FRAME_BINARY))
+		if (!(COptionsMgr::Get(OPT_CMP_SQLITE_COMPAREFLAGS) & SQLITE_CMP_USE_FILE_PATTERNS) ?
+			filelocLeft.encoding.m_sqlite && filelocRight.encoding.m_sqlite :
+			!COptionsMgr::Get(OPT_CMP_SQLITE_FILEPATTERNS).empty() &&
+			PathMatchSpec(filelocLeft.filepath.c_str(), COptionsMgr::Get(OPT_CMP_SQLITE_FILEPATTERNS).c_str()) &&
+			PathMatchSpec(filelocRight.filepath.c_str(), COptionsMgr::Get(OPT_CMP_SQLITE_FILEPATTERNS).c_str()))
 		{
-			return pDoc;
+			ShowSQLiteMergeDoc(pDirDoc, filelocLeft, filelocRight, bLeftRO, bRightRO, sCompareAs);
+			return;
 		}
-		return ShowHexMergeDoc(pDirDoc, filelocLeft, filelocRight, bLeftRO, bRightRO, sCompareAs);
+		ShowHexMergeDoc(pDirDoc, filelocLeft, filelocRight, bLeftRO, bRightRO, sCompareAs);
+		return;
 	}
 
-	if (CEditorFrame *pDoc = ActivateOpenDoc(pDirDoc,
-		filelocLeft, filelocRight, sCompareAs, ID_MERGE_COMPARE_TEXT, FRAME_FILE))
-	{
-		return pDoc;
-	}
-	CChildFrame *const pMergeDoc = GetMergeDocToShow(pDirDoc);
-	if (pMergeDoc != NULL)
+	if (ActivateOpenDoc(pDirDoc, filelocLeft, filelocRight, sCompareAs, ID_MERGE_COMPARE_TEXT, FRAME_FILE))
+		return;
+	if (CChildFrame *const pDocFrame = GetMergeDocToShow(pDirDoc))
 	{
 		if (sCompareAs != NULL)
-			pMergeDoc->m_sCompareAs = sCompareAs;
+			pDocFrame->m_sCompareAs = sCompareAs;
 		// if an unpacker is selected, it must be used during LoadFromFile
 		// MergeDoc must memorize it for SaveToFile
 		// Warning : this unpacker may differ from the pDirDoc one
 		// (through menu : "Plugins"->"Open with unpacker")
-		pMergeDoc->SetUnpacker(infoUnpacker);
+		pDocFrame->SetUnpacker(infoUnpacker);
 		// Note that OpenDocs() takes care of closing compare window when needed.
-		pMergeDoc->OpenDocs(filelocLeft, filelocRight, bLeftRO, bRightRO);
+		OpenDocs(pDocFrame, filelocLeft, filelocRight, bLeftRO, bRightRO);
 	}
-	return pMergeDoc;
 }
 
-CHexMergeFrame *CMainFrame::ShowHexMergeDoc(CDirFrame *pDirDoc,
-	const FileLocation &left, const FileLocation &right,
-	BOOL bLeftRO, BOOL bRightRO, LPCTSTR sCompareAs)
+void CMainFrame::ShowHexMergeDoc(CDirFrame *pDirDoc,
+	FileLocation &left, FileLocation &right,
+	bool bLeftRO, bool bRightRO, LPCTSTR sCompareAs)
 {
-	CHexMergeFrame *const pHexMergeDoc = GetHexMergeDocToShow(pDirDoc);
-	if (pHexMergeDoc != NULL)
+	if (ActivateOpenDoc(pDirDoc, left, right, sCompareAs, ID_MERGE_COMPARE_HEX, FRAME_BINARY))
+		return;
+	if (CHexMergeFrame *const pDocFrame = GetHexMergeDocToShow(pDirDoc))
 	{
-		pHexMergeDoc->OpenDocs(left, right, bLeftRO, bRightRO);
-		pHexMergeDoc->m_sCompareAs = sCompareAs;
+		pDocFrame->m_sCompareAs = sCompareAs;
+		OpenDocs(pDocFrame, left, right, bLeftRO, bRightRO);
 	}
-	return pHexMergeDoc;
 }
 
-CImgMergeFrame *CMainFrame::ShowImgMergeDoc(CDirFrame *pDirDoc,
-	const FileLocation &left, const FileLocation &right,
-	BOOL bLeftRO, BOOL bRightRO, LPCTSTR sCompareAs)
+void CMainFrame::ShowImgMergeDoc(CDirFrame *pDirDoc,
+	FileLocation &left, FileLocation &right,
+	bool bLeftRO, bool bRightRO, LPCTSTR sCompareAs)
 {
-	CImgMergeFrame *const pImgMergeDoc = GetImgMergeDocToShow(pDirDoc);
-	if (pImgMergeDoc != NULL)
+	if (ActivateOpenDoc(pDirDoc, left, right, sCompareAs, ID_MERGE_COMPARE_IMG, FRAME_IMGFILE))
+		return;
+	if (CImgMergeFrame *const pDocFrame = GetImgMergeDocToShow(pDirDoc))
 	{
-		pImgMergeDoc->OpenDocs(left, right, bLeftRO, bRightRO);
-		pImgMergeDoc->m_sCompareAs = sCompareAs;
+		pDocFrame->m_sCompareAs = sCompareAs;
+		OpenDocs(pDocFrame, left, right, bLeftRO, bRightRO);
 	}
-	return pImgMergeDoc;
+}
+
+void CMainFrame::ShowSQLiteMergeDoc(CDirFrame *pDirDoc,
+	FileLocation &left, FileLocation &right,
+	bool bLeftRO, bool bRightRO, LPCTSTR sCompareAs)
+{
+	if (ActivateOpenDoc(pDirDoc, left, right, sCompareAs, ID_MERGE_COMPARE_IMG, FRAME_SQLITEDB))
+		return;
+	if (CSQLiteMergeFrame *const pDocFrame = GetSQLiteMergeDocToShow(pDirDoc))
+	{
+		pDocFrame->m_sCompareAs = sCompareAs;
+		OpenDocs(pDocFrame, left, right, bLeftRO, bRightRO);
+	}
 }
 
 void CMainFrame::RedisplayAllDirDocs()
@@ -1407,15 +1475,6 @@ void CMainFrame::OnOptionsShowSkipped()
 	bool val = COptionsMgr::Get(OPT_SHOW_SKIPPED);
 	COptionsMgr::SaveOption(OPT_SHOW_SKIPPED, !val); // reverse
 	RedisplayAllDirDocs();
-}
-
-/**
- * @brief Show GNU licence information in notepad (local file) or in Web Browser
- */
-void CMainFrame::OnHelpGnulicense()
-{
-	const String spath = GetModulePath() + LicenseFile;
-	OpenFileOrUrl(spath.c_str(), LicenceUrl);
 }
 
 /**
@@ -1632,8 +1691,8 @@ bool CMainFrame::DoFileOpen(
 	if (IsComparing())
 		return false;
 
-	BOOL bROLeft = (dwLeftFlags & FFILEOPEN_READONLY) != 0;
-	BOOL bRORight = (dwRightFlags & FFILEOPEN_READONLY) != 0;
+	bool bROLeft = (dwLeftFlags & FFILEOPEN_READONLY) != 0;
+	bool bRORight = (dwRightFlags & FFILEOPEN_READONLY) != 0;
 
 	// pop up dialog unless arguments exist (and are compatible)
 	DWORD attrLeft = FILE_ATTRIBUTE_DIRECTORY;
@@ -1660,8 +1719,8 @@ bool CMainFrame::DoFileOpen(
 		filelocLeft.filepath = dlg.m_sLeftFile;
 		filelocRight.filepath = dlg.m_sRightFile;
 		nRecursive = dlg.m_nRecursive;
-		bROLeft = dlg.m_bLeftPathReadOnly;
-		bRORight = dlg.m_bRightPathReadOnly;
+		bROLeft = dlg.m_bLeftPathReadOnly != FALSE;
+		bRORight = dlg.m_bRightPathReadOnly != FALSE;
 		attrLeft = dlg.m_attrLeft;
 		attrRight = dlg.m_attrRight;
 		// TODO: add codepage options to open dialog?
@@ -1808,19 +1867,15 @@ bool CMainFrame::DoFileOpen(
 			break;
 		case ID_MERGE_COMPARE_HEX:
 			// Open files in binary editor
-			if (!ActivateOpenDoc(pDirDoc, filelocLeft, filelocRight,
-				packingInfo.pluginMoniker.c_str(), ID_MERGE_COMPARE_HEX, FRAME_BINARY))
-			{
-				ShowHexMergeDoc(pDirDoc, filelocLeft, filelocRight, bROLeft, bRORight, packingInfo.pluginMoniker.c_str());
-			}
+			ShowHexMergeDoc(pDirDoc, filelocLeft, filelocRight, bROLeft, bRORight, packingInfo.pluginMoniker.c_str());
 			return true;
 		case ID_MERGE_COMPARE_IMG:
-			// Open files in binary editor
-			if (!ActivateOpenDoc(pDirDoc, filelocLeft, filelocRight,
-				packingInfo.pluginMoniker.c_str(), ID_MERGE_COMPARE_IMG, FRAME_IMGFILE))
-			{
-				ShowImgMergeDoc(pDirDoc, filelocLeft, filelocRight, bROLeft, bRORight, packingInfo.pluginMoniker.c_str());
-			}
+			// Open files in image file editor
+			ShowImgMergeDoc(pDirDoc, filelocLeft, filelocRight, bROLeft, bRORight, packingInfo.pluginMoniker.c_str());
+			return true;
+		case ID_MERGE_COMPARE_SQLITE:
+			// Open files in SQLite Compare
+			ShowSQLiteMergeDoc(pDirDoc, filelocLeft, filelocRight, bROLeft, bRORight, packingInfo.pluginMoniker.c_str());
 			return true;
 		}
 		try
@@ -2246,28 +2301,17 @@ BOOL CMainFrame::IsComparing()
 }
 
 /**
- * @brief Open file, if it exists, else open url
- */
-void CMainFrame::OpenFileOrUrl(LPCTSTR szFile, LPCTSTR szUrl)
-{
-	if (paths_DoesPathExist(szFile) == IS_EXISTING_FILE)
-		ShellExecute(m_hWnd, _T("open"), _T("notepad.exe"), szFile, NULL, SW_SHOWNORMAL);
-	else
-		ShellExecute(NULL, _T("open"), szUrl, NULL, NULL, SW_SHOWNORMAL);
-}
-
-/**
  * @brief Open WinMerge help.
  *
  * If local HTMLhelp file is found, open it, otherwise open HTML page from web.
  */
-void CMainFrame::OnHelpContents()
+void CMainFrame::OnHelpContents(LPCTSTR filename)
 {
-	String sPath = GetModulePath(0) + DocsPath;
-	if (paths_DoesPathExist(sPath.c_str()) == IS_EXISTING_FILE)
-		::HtmlHelp(NULL, sPath.c_str(), HH_DISPLAY_TOC, NULL);
-	else
-		ShellExecute(NULL, _T("open"), DocsURL, NULL, NULL, SW_SHOWNORMAL);
+	String path = GetModulePath() + filename;
+	if (paths_DoesPathExist(path.c_str()) == IS_EXISTING_FILE)
+		::HtmlHelp(NULL, path.c_str(), HH_DISPLAY_TOC, NULL);
+	else LanguageSelect.FormatStrings(IDS_ERROR_FILE_NOT_FOUND,
+		path.c_str()).MsgBox(MB_HIGHLIGHT_ARGUMENTS | MB_ICONSTOP);
 }
 
 void CMainFrame::InitialActivate(int nCmdShow)
@@ -2481,6 +2525,19 @@ CDocFrame *CMainFrame::FindFrameOfType(FRAMETYPE frameType)
 	return NULL;
 }
 
+HMenu *CMainFrame::FindSubMenuById(HMenu *pMenu, UINT id)
+{
+	HMenu *pSubMenu = NULL;
+	UINT count = pMenu->GetMenuItemCount();
+	UINT state;
+	do
+	{
+		pSubMenu = count != 0 ? pMenu->GetSubMenu(--count) : NULL;
+		state = pSubMenu ? pSubMenu->GetMenuState(id) : 0xFFFFFFFF;
+	} while (state == 0xFFFFFFFF && count != 0);
+	return pSubMenu;
+}
+
 HWindow *CMainFrame::CreateChildHandle() const
 {
 	MDICREATESTRUCT mcs;
@@ -2504,74 +2561,56 @@ HWindow *CMainFrame::CreateChildHandle() const
  * not contain diffs. Then we have only file compare, and if we also have
  * limited file compare windows, we always reuse existing MergeDoc.
  * @param [in] pDirDoc Dir compare document.
- * @param [out] pNew Did we create a new document?
  * @return Pointer to merge document.
  */
 CChildFrame *CMainFrame::GetMergeDocToShow(CDirFrame *pDirDoc)
 {
 	if (pDirDoc)
-	{
 		return pDirDoc->GetMergeDocForDiff();
-	}
-	if (!COptionsMgr::Get(OPT_MULTIDOC_MERGEDOCS))
-	{
-		if (CDocFrame *pFrame = FindFrameOfType(FRAME_FILE))
-		{
-			CChildFrame *pDoc = static_cast<CChildFrame *>(pFrame);
-			if (pDoc->SaveModified())
-				pFrame->PostMessage(WM_CLOSE);
-		}
-	}
-	// Create a new merge doc
+	RecycleMergeDoc(FRAME_FILE);
 	return new CChildFrame(this);
 }
 
 /**
  * @brief Obtain a hex merge doc to display a difference in files.
- * This function (usually) uses DirDoc to determine if new or existing
- * MergeDoc is used. However there is exceptional case when DirDoc does
- * not contain diffs. Then we have only file compare, and if we also have
- * limited file compare windows, we always reuse existing MergeDoc.
+ * See GetMergeDocToShow() on merge doc reuse strategy.
  * @param [in] pDirDoc Dir compare document.
- * @param [out] pNew Did we create a new document?
  * @return Pointer to merge document.
  */
 CHexMergeFrame *CMainFrame::GetHexMergeDocToShow(CDirFrame *pDirDoc)
 {
 	if (pDirDoc)
-	{
 		return pDirDoc->GetHexMergeDocForDiff();
-	}
-	if (!COptionsMgr::Get(OPT_MULTIDOC_MERGEDOCS))
-	{
-		if (CDocFrame *pFrame = FindFrameOfType(FRAME_BINARY))
-		{
-			CHexMergeFrame *pDoc = static_cast<CHexMergeFrame *>(pFrame);
-			if (pDoc->SaveModified())
-				pFrame->PostMessage(WM_CLOSE);
-		}
-	}
-	// Create a new merge doc
+	RecycleMergeDoc(FRAME_BINARY);
 	return new CHexMergeFrame(this);
 }
 
+/**
+ * @brief Obtain an image merge doc to display a difference in files.
+ * See GetMergeDocToShow() on merge doc reuse strategy.
+ * @param [in] pDirDoc Dir compare document.
+ * @return Pointer to merge document.
+ */
 CImgMergeFrame *CMainFrame::GetImgMergeDocToShow(CDirFrame *pDirDoc)
 {
 	if (pDirDoc)
-	{
 		return pDirDoc->GetImgMergeDocForDiff();
-	}
-	if (!COptionsMgr::Get(OPT_MULTIDOC_MERGEDOCS))
-	{
-		if (CDocFrame *pFrame = FindFrameOfType(FRAME_IMGFILE))
-		{
-			CImgMergeFrame *pDoc = static_cast<CImgMergeFrame *>(pFrame);
-			if (pDoc->SaveModified())
-				pFrame->PostMessage(WM_CLOSE);
-		}
-	}
-	// Create a new merge doc
+	RecycleMergeDoc(FRAME_IMGFILE);
 	return new CImgMergeFrame(this);
+}
+
+/**
+ * @brief Obtain an SQLite DB merge doc to display a difference in files.
+ * See GetMergeDocToShow() on merge doc reuse strategy.
+ * @param [in] pDirDoc Dir compare document.
+ * @return Pointer to merge document.
+ */
+CSQLiteMergeFrame *CMainFrame::GetSQLiteMergeDocToShow(CDirFrame *pDirDoc)
+{
+	if (pDirDoc)
+		return pDirDoc->GetSQLiteMergeDocForDiff();
+	RecycleMergeDoc(FRAME_SQLITEDB);
+	return new CSQLiteMergeFrame(this);
 }
 
 /// Get pointer to a dir doc for displaying a scan
@@ -2769,6 +2808,73 @@ LRESULT CMainFrame::OnWndMsg<WM_DROPFILES>(WPARAM wParam, LPARAM)
 	filelocRight.filepath = files[1];
 	DoFileOpen(filelocLeft, filelocRight, FFILEOPEN_DETECT, FFILEOPEN_DETECT, nRecursive);
 	return 0;
+}
+
+DWORD CMainFrame::CLRExec(LPCWSTR path, LPCWSTR type, LPCWSTR method, LPCWSTR arg)
+{
+	if (!m_spMetaHost)
+		OException::Check(MSCOREE->CLRCreateInstance(CLSID_CLRMetaHost, IID_ICLRMetaHost, (LPVOID*)&m_spMetaHost));
+	if (!m_spRuntimeInfo)
+		OException::Check(m_spMetaHost->GetRuntime(L"v4.0.30319", IID_ICLRRuntimeInfo, (LPVOID*)&m_spRuntimeInfo));
+	if (!m_spRuntimeHost)
+		OException::Check(m_spRuntimeInfo->GetInterface(CLSID_CLRRuntimeHost, IID_ICLRRuntimeHost, (LPVOID*)&m_spRuntimeHost));
+	m_spRuntimeHost->Start();
+	DWORD ret = 0;
+	OException::Check(m_spRuntimeHost->ExecuteInDefaultAppDomain(path, type, method, arg, &ret));
+	return ret;
+}
+
+DWORD CMainFrame::CLRExecSQLiteCompare(LPCWSTR type, LPCWSTR method, LPCWSTR arg)
+{
+	static const WCHAR SQLiteCompare[] = L"\\SQLiteCompare\\bin\\SQLiteCompare.exe";
+	return CLRExec(GetModulePath().append(SQLiteCompare).c_str(), type, method, arg);
+}
+
+IUIAutomation *CMainFrame::UIAutomation()
+{
+	if (m_hrAutomation == S_FALSE)
+		m_hrAutomation = CoCreateInstance(__uuidof(CUIAutomation), NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&m_spAutomation));
+	return m_spAutomation;
+}
+
+HRESULT CMainFrame::AddAutomationEventHandler(IUIAutomationElement *element, IUIAutomationEventHandler *handler)
+{
+	return element == NULL ? E_POINTER :
+		m_spAutomation->AddAutomationEventHandler(UIA_Invoke_InvokedEventId, element, TreeScope_Subtree, NULL, handler);
+}
+
+HRESULT CMainFrame::RemoveAutomationEventHandler(IUIAutomationElement *element, IUIAutomationEventHandler *handler)
+{
+	return element == NULL ? E_POINTER :
+		m_spAutomation->RemoveAutomationEventHandler(UIA_Invoke_InvokedEventId, element, handler);
+}
+
+BYTE CMainFrame::GetCommandState(IAccessible *accessible)
+{
+	BYTE state = 0;
+	if (accessible)
+	{
+		VARIANT var;
+		var.vt = VT_I4;
+		var.lVal = 0;
+		accessible->get_accState(var, &var);
+		if (var.lVal & STATE_SYSTEM_UNAVAILABLE)
+			state |= MF_GRAYED;
+		if (var.lVal & STATE_SYSTEM_CHECKED)
+			state |= MF_CHECKED;
+	}
+	return state;
+}
+
+void CMainFrame::DoDefaultAction(IAccessible *accessible)
+{
+	if (accessible)
+	{
+		VARIANT var;
+		var.vt = VT_I4;
+		var.lVal = 0;
+		accessible->accDoDefaultAction(var);
+	}
 }
 
 /**
@@ -3143,6 +3249,16 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 {
 	if (pMsg->message >= WM_KEYFIRST && pMsg->message <= WM_KEYLAST)
 	{
+		if (m_hAccelTable != NULL &&
+			::TranslateAccelerator(m_hWnd, m_hAccelTable, pMsg))
+		{
+			return TRUE;
+		}
+		if ((pMsg->message == WM_KEYDOWN || pMsg->message == WM_SYSKEYDOWN) &&
+			::TranslateMDISysAccel(m_pWndMDIClient->m_hWnd, pMsg))
+		{
+			return TRUE;
+		}
 		CDocFrame *const pDocFrame = GetActiveDocFrame();
 		if (pDocFrame && pDocFrame->PreTranslateMessage(pMsg))
 		{
@@ -3176,16 +3292,6 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 				UpdateIndicators();
 				break;
 			}
-		}
-		if (m_hAccelTable != NULL &&
-			::TranslateAccelerator(m_hWnd, m_hAccelTable, pMsg))
-		{
-			return TRUE;
-		}
-		if ((pMsg->message == WM_KEYDOWN || pMsg->message == WM_SYSKEYDOWN) &&
-			::TranslateMDISysAccel(m_pWndMDIClient->m_hWnd, pMsg))
-		{
-			return TRUE;
 		}
 	}
 	return FALSE;
@@ -3222,20 +3328,20 @@ void CMainFrame::ShowHelp(LPCTSTR helpLocation /*= NULL*/)
 {
 	if (helpLocation == NULL)
 	{
-		OnHelpContents();
+		OnHelpContents(DocsPath);
 	}
 	else
 	{
-		String sPath = GetModulePath(0) + DocsPath;
-		if (paths_DoesPathExist(sPath.c_str()) == IS_EXISTING_FILE)
+		String path = GetModulePath() + DocsPath;
+		if (paths_DoesPathExist(path.c_str()) == IS_EXISTING_FILE)
 		{
-			sPath += helpLocation;
-			::HtmlHelp(NULL, sPath.c_str(), HH_DISPLAY_TOPIC, NULL);
+			path += helpLocation;
+			::HtmlHelp(NULL, path.c_str(), HH_DISPLAY_TOPIC, NULL);
 		}
 		else if (LPCTSTR helpTarget = EatPrefix(helpLocation, _T("::/htmlhelp/")))
 		{
-			string_replace(sPath = DocsURL, _T("index.html"), helpTarget);
-			ShellExecute(NULL, _T("open"), sPath.c_str(), NULL, NULL, SW_SHOWNORMAL);
+			string_replace(path = DocsURL, _T("index.html"), helpTarget);
+			ShellExecute(NULL, _T("open"), path.c_str(), NULL, NULL, SW_SHOWNORMAL);
 		}
 	}
 }
@@ -3515,6 +3621,17 @@ LRESULT CMainFrame::OnWndMsg<WM_TIMER>(WPARAM wParam, LPARAM)
 		// See OnActivate()
 		FlashWindow(TRUE);
 		break;
+	case ID_TIMER_CLOSE:
+		POINT pt;
+		GetCursorPos(&pt);
+		RECT rc;
+		m_wndTabBar->GetWindowRect(&rc);
+		if (!PtInRect(&rc, pt))
+		{
+			m_wndCloseBox->ShowWindow(SW_HIDE);
+			KillTimer(ID_TIMER_CLOSE);
+		}
+		break;
 	}
 	return 0;
 }
@@ -3735,6 +3852,12 @@ LRESULT CMainFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 	case ID_APP_ABOUT:
 		LanguageSelect.DoModal(CAboutDlg());
 		break;
+	case ID_HELP_ABOUT_SQLITECOMPARE:
+		CLRExecSQLiteCompare(L"SQLiteTurbo.Program", L"About", L"About SQLite Compare");
+		break;
+	case ID_HELP_ABOUT_FRHED:
+		hekseditU->About(m_hWnd);
+		break;
 	case ID_HELP:
 		ShowHelp();
 		break;
@@ -3839,10 +3962,10 @@ LRESULT CMainFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 		OnWindowCloseAll();
 		break;
 	case ID_HELP_CONTENTS:
-		OnHelpContents();
+		OnHelpContents(DocsPath);
 		break;
-	case ID_HELP_GNULICENSE:
-		OnHelpGnulicense();
+	case ID_HELP_FRHED:
+		OnHelpContents(DocsPathFrhed);
 		break;
 	case ID_HELP_RELEASENOTES:
 		OnHelpReleasenotes();
@@ -3894,6 +4017,7 @@ LRESULT CMainFrame::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			}
 			m_wndCloseBox->SetStyle(m_wndCloseBox->GetStyle() & ~SS_SUNKEN);
 			m_wndCloseBox->ShowWindow(SW_HIDE);
+			KillTimer(ID_TIMER_CLOSE);
 			break;
 		}
 		if (CDocFrame *pDocFrame = GetActiveDocFrame())
@@ -3962,7 +4086,8 @@ LRESULT CMainFrame::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		PostQuitMessage(0);
 		break;
 	case WM_SETCURSOR:
-		if (wParam == reinterpret_cast<WPARAM>(m_wndTabBar))
+		if (wParam == reinterpret_cast<WPARAM>(m_wndTabBar) ||
+			wParam == reinterpret_cast<WPARAM>(m_wndCloseBox))
 		{
 			TCHITTESTINFO hti;
 			GetCursorPos(&hti.pt);
@@ -3981,18 +4106,15 @@ LRESULT CMainFrame::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 				m_wndCloseBox->EnableWindow(PtInRect(&rect, hti.pt));
 				m_wndTabBar->MapWindowPoints(m_pWnd, (LPPOINT)&rect, 2);
 				m_wndCloseBox->SetWindowPos(NULL, rect.left, rect.top, 16, 16, SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_NOZORDER);
+				SetTimer(ID_TIMER_CLOSE, 400);
 			}
 			else
 			{
 				m_wndCloseBox->ShowWindow(SW_HIDE);
+				KillTimer(ID_TIMER_CLOSE);
 			}
 			::SetWindowLongPtr(m_wndCloseBox->m_hWnd, GWLP_USERDATA, iItem);
 		}
-		else if (wParam != reinterpret_cast<WPARAM>(m_wndCloseBox))
-		{
-			m_wndCloseBox->ShowWindow(SW_HIDE);
-		}
-
 		if (WaitStatusCursor::SetCursor(this))
 			return TRUE;
 		break;
@@ -4509,14 +4631,7 @@ void CMainFrame::SetActiveMenu(HMenu *pMenu)
 	}
 	else
 	{
-		HMenu *pWindowMenu = NULL;
-		UINT count = pMenu->GetMenuItemCount();
-		UINT state;
-		do
-		{
-			pWindowMenu = count != 0 ? pMenu->GetSubMenu(--count) : NULL;
-			state = pWindowMenu ? pWindowMenu->GetMenuState(ID_WINDOW_CASCADE) : 0xFFFFFFFF;
-		} while (state == 0xFFFFFFFF && count != 0);
+		HMenu *const pWindowMenu = FindSubMenuById(pMenu, ID_WINDOW_CASCADE);
 		m_pWndMDIClient->SendMessage(WM_MDISETMENU,
 			reinterpret_cast<WPARAM>(pMenu),
 			reinterpret_cast<LPARAM>(pWindowMenu));
@@ -4597,6 +4712,7 @@ void CMainFrame::RecalcLayout()
 	RECT rectClient;
 	GetClientRect(&rectClient);
 	m_wndCloseBox->ShowWindow(SW_HIDE);
+	KillTimer(ID_TIMER_CLOSE);
 	if (m_wndToolBar && (m_wndToolBar->GetStyle() & WS_VISIBLE))
 	{
 		m_wndToolBar->MoveWindow(0, 0, 0, 0);

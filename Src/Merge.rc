@@ -130,13 +130,15 @@ IDR_DIRDOCTYPE MENU
     POPUP "&Help"
     {
         MENUITEM "&WinMerge Help\tF1", ID_HELP_CONTENTS
+        MENUITEM "&Frhed Help", ID_HELP_FRHED
         MENUITEM SEPARATOR
         MENUITEM "R&elease Notes", ID_HELP_RELEASENOTES
         MENUITEM "&Translations", ID_HELP_TRANSLATIONS
         MENUITEM "C&onfiguration", ID_HELP_GETCONFIG
         MENUITEM SEPARATOR
-        MENUITEM "&GNU General Public License", ID_HELP_GNULICENSE
         MENUITEM "&About WinMerge...", ID_APP_ABOUT
+        MENUITEM "A&bout Frhed...", ID_HELP_ABOUT_FRHED
+        MENUITEM "Abo&ut SQLite Compare...", ID_HELP_ABOUT_SQLITECOMPARE
     }
 }
 
@@ -221,11 +223,14 @@ IDR_HEXDOCTYPE MENU
         MENUITEM "Copy to &Right\tAlt+Right", ID_L2R
         MENUITEM "Copy to L&eft\tAlt+Left", ID_R2L
         MENUITEM SEPARATOR
-        MENUITEM "C&opy to Right and Advance\tAlt+Ctrl+Right", ID_L2RNEXT
-        MENUITEM "Copy &to Left and Advance\tAlt+Ctrl+Left", ID_R2LNEXT
-        MENUITEM SEPARATOR
         MENUITEM "Copy &All to Right", ID_ALL_RIGHT
         MENUITEM "Cop&y All to Left", ID_ALL_LEFT
+    }
+    POPUP "&Bookmarks"
+    {
+        MENUITEM "&Add Bookmark...\tF2", ID_EDIT_ADD_BOOKMARK
+        MENUITEM "&Remove Bookmark...\tShift+F2", ID_EDIT_REMOVE_BOOKMARK
+        MENUITEM "&Clear All Bookmarks\tCtrl+Shift+F2", ID_EDIT_CLEAR_ALL_BOOKMARKS
     }
     POPUP "&Tools"
     {
@@ -252,13 +257,15 @@ IDR_HEXDOCTYPE MENU
     POPUP "&Help"
     {
         MENUITEM "&WinMerge Help\tF1", ID_HELP_CONTENTS
+        MENUITEM "&Frhed Help", ID_HELP_FRHED
         MENUITEM SEPARATOR
         MENUITEM "R&elease Notes", ID_HELP_RELEASENOTES
         MENUITEM "&Translations", ID_HELP_TRANSLATIONS
         MENUITEM "C&onfiguration", ID_HELP_GETCONFIG
         MENUITEM SEPARATOR
-        MENUITEM "&GNU General Public License", ID_HELP_GNULICENSE
         MENUITEM "&About WinMerge...", ID_APP_ABOUT
+        MENUITEM "A&bout Frhed...", ID_HELP_ABOUT_FRHED
+        MENUITEM "Abo&ut SQLite Compare...", ID_HELP_ABOUT_SQLITECOMPARE
     }
 }
 
@@ -375,13 +382,100 @@ IDR_IMGDOCTYPE MENU
     POPUP "&Help"
     {
         MENUITEM "&WinMerge Help\tF1", ID_HELP_CONTENTS
+        MENUITEM "&Frhed Help", ID_HELP_FRHED
         MENUITEM SEPARATOR
         MENUITEM "R&elease Notes", ID_HELP_RELEASENOTES
         MENUITEM "&Translations", ID_HELP_TRANSLATIONS
         MENUITEM "C&onfiguration", ID_HELP_GETCONFIG
         MENUITEM SEPARATOR
-        MENUITEM "&GNU General Public License", ID_HELP_GNULICENSE
         MENUITEM "&About WinMerge...", ID_APP_ABOUT
+        MENUITEM "A&bout Frhed...", ID_HELP_ABOUT_FRHED
+        MENUITEM "Abo&ut SQLite Compare...", ID_HELP_ABOUT_SQLITECOMPARE
+    }
+}
+
+
+
+IDR_SQLITEDOCTYPE MENU
+{
+    POPUP "&File"
+    {
+        MENUITEM "&New\tCtrl+N", ID_FILE_NEW
+        MENUITEM "&Open...\tCtrl+O", ID_FILE_OPEN
+        MENUITEM "Op&en Conflict File...", ID_FILE_OPENCONFLICT
+        MENUITEM "Start Collec&tion...", ID_FILE_STARTCOLLECT
+        MENUITEM SEPARATOR
+        MENUITEM "Open Pro&ject...\tCtrl+J", ID_FILE_OPENPROJECT
+        MENUITEM "Sa&ve Project...", ID_FILE_SAVEPROJECT
+        MENUITEM SEPARATOR
+        MENUITEM "Recent Projects", ID_FILE_MRU_FILE1, INACTIVE
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit", ID_APP_EXIT
+    }
+    POPUP "&Edit"
+    {
+        MENUITEM "&Options...", ID_OPTIONS
+    }
+    POPUP "&View"
+    {
+        POPUP "&Toolbar"
+        {
+            MENUITEM "&None", ID_TOOLBAR_NONE
+            MENUITEM "&Small", ID_TOOLBAR_SMALL
+            MENUITEM "&Big", ID_TOOLBAR_BIG
+        }
+        MENUITEM "&Status Bar", ID_VIEW_STATUS_BAR, HELP
+        MENUITEM "Ta&b Bar", ID_VIEW_TAB_BAR, HELP
+        MENUITEM SEPARATOR
+        MENUITEM "Lang&uage...", ID_VIEW_LANGUAGE
+        MENUITEM SEPARATOR
+        MENUITEM "Refresh\tF5", ID_REFRESH
+    }
+    POPUP "&Merge"
+    {
+        MENUITEM "&Next Difference\tAlt+Down", ID_NEXTDIFF
+        MENUITEM "&Previous Difference\tAlt+Up", ID_PREVDIFF
+        MENUITEM SEPARATOR
+        MENUITEM "Copy to &Right\tAlt+Right", ID_L2R
+        MENUITEM "Copy to L&eft\tAlt+Left", ID_R2L
+    }
+    POPUP "&Tools"
+    {
+        MENUITEM "&Filters...", ID_TOOLS_FILTERS
+        MENUITEM "&Generate Patch...", ID_TOOLS_GENERATEPATCH
+        MENUITEM SEPARATOR
+        MENUITEM "&Export data differences...", ID_TOOLS_EXPORT_DATA_DIFFS
+		MENUITEM "Generate change script (left -> &right)...", ID_TOOLS_GENERATE_CHANGE_SCRIPT_L2R
+		MENUITEM "Generate change script (right -> &left)...", ID_TOOLS_GENERATE_CHANGE_SCRIPT_R2L
+    }
+    POPUP "&Debug"
+    {
+        MENUITEM "&Load Config...", ID_DEBUG_LOADCONFIG
+        MENUITEM "&Reset Options", ID_DEBUG_RESETOPTIONS
+    }
+    POPUP "&Window"
+    {
+        MENUITEM "Cl&ose", ID_FILE_CLOSE
+        MENUITEM "Clo&se All", ID_WINDOW_CLOSEALL
+        MENUITEM SEPARATOR
+        MENUITEM "Change &Pane\tF6", ID_WINDOW_CHANGE_PANE
+        MENUITEM SEPARATOR
+        MENUITEM "Tile &Horizontally", ID_WINDOW_TILE_HORZ
+        MENUITEM "Tile &Vertically", ID_WINDOW_TILE_VERT
+        MENUITEM "&Cascade", ID_WINDOW_CASCADE
+    }
+    POPUP "&Help"
+    {
+        MENUITEM "&WinMerge Help\tF1", ID_HELP_CONTENTS
+        MENUITEM "&Frhed Help", ID_HELP_FRHED
+        MENUITEM SEPARATOR
+        MENUITEM "R&elease Notes", ID_HELP_RELEASENOTES
+        MENUITEM "&Translations", ID_HELP_TRANSLATIONS
+        MENUITEM "C&onfiguration", ID_HELP_GETCONFIG
+        MENUITEM SEPARATOR
+        MENUITEM "&About WinMerge...", ID_APP_ABOUT
+        MENUITEM "A&bout Frhed...", ID_HELP_ABOUT_FRHED
+        MENUITEM "Abo&ut SQLite Compare...", ID_HELP_ABOUT_SQLITECOMPARE
     }
 }
 
@@ -449,13 +543,15 @@ IDR_MAINFRAME MENU
     POPUP "&Help"
     {
         MENUITEM "&WinMerge Help\tF1", ID_HELP_CONTENTS
+        MENUITEM "&Frhed Help", ID_HELP_FRHED
         MENUITEM SEPARATOR
         MENUITEM "R&elease Notes", ID_HELP_RELEASENOTES
         MENUITEM "&Translations", ID_HELP_TRANSLATIONS
         MENUITEM "C&onfiguration", ID_HELP_GETCONFIG
         MENUITEM SEPARATOR
-        MENUITEM "&GNU General Public License", ID_HELP_GNULICENSE
         MENUITEM "&About WinMerge...", ID_APP_ABOUT
+        MENUITEM "A&bout Frhed...", ID_HELP_ABOUT_FRHED
+        MENUITEM "Abo&ut SQLite Compare...", ID_HELP_ABOUT_SQLITECOMPARE
     }
 }
 
@@ -528,8 +624,8 @@ IDR_MERGEDOCTYPE MENU
         {
             MENUITEM "&Toggle Bookmark\tCtrl+F2", ID_EDIT_TOGGLE_BOOKMARK
             MENUITEM "&Next Bookmark\tF2", ID_EDIT_GOTO_NEXT_BOOKMARK
-            MENUITEM "&Previous bookmark\tShift+F2", ID_EDIT_GOTO_PREV_BOOKMARK
-            MENUITEM "&Clear All Bookmarks", ID_EDIT_CLEAR_ALL_BOOKMARKS
+            MENUITEM "&Previous Bookmark\tShift+F2", ID_EDIT_GOTO_PREV_BOOKMARK
+            MENUITEM "&Clear All Bookmarks\tCtrl+Shift+F2", ID_EDIT_CLEAR_ALL_BOOKMARKS
         }
         MENUITEM "&Go To...\tCtrl+G", ID_EDIT_WMGOTO
         MENUITEM SEPARATOR
@@ -640,13 +736,15 @@ IDR_MERGEDOCTYPE MENU
     POPUP "&Help"
     {
         MENUITEM "&WinMerge Help\tF1", ID_HELP_CONTENTS
+        MENUITEM "&Frhed Help", ID_HELP_FRHED
         MENUITEM SEPARATOR
         MENUITEM "R&elease Notes", ID_HELP_RELEASENOTES
         MENUITEM "&Translations", ID_HELP_TRANSLATIONS
         MENUITEM "C&onfiguration", ID_HELP_GETCONFIG
         MENUITEM SEPARATOR
-        MENUITEM "&GNU General Public License", ID_HELP_GNULICENSE
         MENUITEM "&About WinMerge...", ID_APP_ABOUT
+        MENUITEM "A&bout Frhed...", ID_HELP_ABOUT_FRHED
+        MENUITEM "Abo&ut SQLite Compare...", ID_HELP_ABOUT_SQLITECOMPARE
     }
 }
 
@@ -691,6 +789,7 @@ IDR_POPUP_DIRVIEW MENU
             MENUITEM "&Archive", ID_MERGE_COMPARE_ZIP
             MENUITEM "&Binary", ID_MERGE_COMPARE_HEX
             MENUITEM "&Image", ID_MERGE_COMPARE_IMG
+            MENUITEM "&SQLite", ID_MERGE_COMPARE_SQLITE
             MENUITEM "&XML", ID_MERGE_COMPARE_XML
             MENUITEM "PluginMonikers", ID_SCRIPT_LAST
         }
@@ -847,8 +946,8 @@ FONT 8, "MS Shell Dlg", 0, 0, 1
 {
     LTEXT           "", IDC_GNU_ASCII, 7, 50, 200, 121
     LTEXT           "Version %s", IDC_VERSION, 240, 155, 117, 20, SS_NOPREFIX
-    LTEXT           "[VERSION COPYRIGHT GOES HERE]", IDC_COMPANY, 7, 177, 350, 36
     DEFPUSHBUTTON   "OK", IDOK, 295, 220, 65, 14
+    LTEXT           "[VERSION COPYRIGHT GOES HERE]", IDC_COMPANY, 7, 177, 350, 36
     PUSHBUTTON      "Contributors", IDC_OPEN_CONTRIBUTORS, 7, 220, 65, 14
     CONTROL         "Visit the WinMerge HomePage!", IDC_WWW,WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW, 120, 222, 167, 10
 }
@@ -1151,10 +1250,10 @@ STYLE DS_CENTER | DS_MODALFRAME | DS_SHELLFONT | WS_CAPTION | WS_CLIPCHILDREN | 
 CAPTION "Language"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
-    PUSHBUTTON      "OK", IDOK, 47, 123, 52, 14, 0, WS_EX_LEFT
-    PUSHBUTTON      "Cancel", IDCANCEL, 115, 123, 52, 14, 0, WS_EX_LEFT
-    LISTBOX         IDC_LANGUAGE_LIST, 7, 16, 200, 99, WS_TABSTOP | WS_VSCROLL | LBS_NOINTEGRALHEIGHT | LBS_SORT | LBS_NOTIFY, WS_EX_LEFT
     LTEXT           "Available languages:", IDC_STATIC, 7, 7, 140, 8, SS_LEFT, WS_EX_LEFT
+    LISTBOX         IDC_LANGUAGE_LIST, 7, 16, 200, 99, WS_GROUP | WS_TABSTOP | WS_VSCROLL | LBS_SORT | LBS_NOTIFY, WS_EX_LEFT
+    PUSHBUTTON      "OK", IDOK, 47, 123, 52, 14, WS_GROUP, WS_EX_LEFT
+    PUSHBUTTON      "Cancel", IDCANCEL, 115, 123, 52, 14, 0, WS_EX_LEFT
 }
 
 
@@ -1542,8 +1641,25 @@ CAPTION "Image"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 BEGIN
     LTEXT           "Image File &Patterns:", IDC_STATIC, 7, 6, 200, 10
-    COMBOBOX        IDC_COMPAREIMAGE_PATTERNS, 7, 18, 223, 150, WS_TABSTOP | WS_VSCROLL | CBS_DROPDOWN | CBS_AUTOHSCROLL
+    COMBOBOX        IDC_COMPAREIMAGE_PATTERNS, 7, 18, 223, 0, WS_TABSTOP | WS_VSCROLL | CBS_DROPDOWN | CBS_AUTOHSCROLL | CBS_NOINTEGRALHEIGHT
     PUSHBUTTON      "Defaults", IDC_COMPAREIMAGE_DEFAULTS, 160, 208, 70, 14
+END
+
+
+
+IDD_PROPPAGE_COMPARE_SQLITE DIALOGEX 105, 0, 236, 222
+STYLE DS_CONTROL | DS_SHELLFONT | WS_CAPTION | WS_CHILDWINDOW
+CAPTION "SQLite"
+FONT 8, "MS Shell Dlg", 0, 0, 1
+BEGIN
+    AUTORADIOBUTTON "Detect from file sig&nature", IDC_COMPARESQLITE_DETECT_BY_SIGNATURE, 7, 6, 222, 10, WS_GROUP, WS_EX_LEFT
+    AUTORADIOBUTTON "Detect from filename &pattern", IDC_COMPARESQLITE_DETECT_BY_FILENAME, 7, 17, 200, 10, 0, WS_EX_LEFT
+    COMBOBOX        IDC_COMPARESQLITE_PATTERNS, 7, 29, 223, 0, WS_GROUP | WS_TABSTOP | WS_VSCROLL | CBS_DROPDOWN | CBS_AUTOHSCROLL | CBS_NOINTEGRALHEIGHT
+    AUTOCHECKBOX    "Pro&mpt for options", IDC_COMPARESQLITE_PROMPT_FOR_OPTIONS, 7, 46, 222, 10, WS_GROUP, WS_EX_LEFT
+    AUTORADIOBUTTON "Compare &schema only", IDC_COMPARESQLITE_SCHEMA_ONLY, 7, 57, 222, 10, WS_GROUP, WS_EX_LEFT
+    AUTORADIOBUTTON "Compare schema and &data", IDC_COMPARESQLITE_SCHEMA_AND_DATA, 7, 68, 222, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Compare &BLOB fields", IDC_COMPARESQLITE_BLOB_FIELDS, 17, 79, 222, 10, WS_GROUP, WS_EX_LEFT
+    PUSHBUTTON      "Defaults", IDC_COMPARESQLITE_DEFAULTS, 160, 208, 70, 14, WS_GROUP, WS_EX_LEFT
 END
 
 
@@ -1787,6 +1903,8 @@ STRINGTABLE
     IDS_PROJFILE_SAVE_SUCCESS     "Project file successfully saved."
     ID_FILE_SAVEPROJECT           "Save current paths and options to project file\nSave Project File"
     ID_APP_ABOUT                  "Display program information, version number and copyright\nAbout"
+    ID_HELP_ABOUT_FRHED           "Display program information, version number and copyright\nAbout"
+    ID_HELP_ABOUT_SQLITECOMPARE   "Display program information, version number and copyright\nAbout"
     ID_APP_EXIT                   "Quit the application; prompts to save documents\nExit"
     ID_FILE_MRU_FILE1             "Open this document"
     ID_FILE_MRU_FILE2             "Open this document"
@@ -1826,7 +1944,7 @@ STRINGTABLE
     IDC_MIXED_EOL                 "Preserve original EOL chars"
     IDC_STATIC_TITLE_LEFT         "Right click on the path to copy"
     IDC_STATIC_TITLE_RIGHT        "Right click on the path to copy"
-    IDS_SPLASH_GPLTEXT            "WinMerge comes with ABSOLUTELY NO WARRANTY. This is free software and you are welcome to redistribute it under certain circumstances; see the GNU General Public License in the Help menu for details."
+    IDS_SPLASH_GPLTEXT            "WinMerge comes with ABSOLUTELY NO WARRANTY. This is free software and you are welcome to redistribute it under certain circumstances; see the [GNU General Public License] for details."
     IDS_MESSAGEBOX_OK             "&Ok"
     IDS_MESSAGEBOX_CANCEL         "&Cancel"
     IDS_MESSAGEBOX_ABORT          "&Abort"
@@ -2233,7 +2351,6 @@ STRINGTABLE
     ID_WINDOW_CLOSEALL            "Closes all open windows"
     ID_HELP_CONTENTS              "Opens the WinMerge Help\nWinMerge Help"
     ID_HELP_GETCONFIG             "Outputs current WinMerge version info and configuration to text file"
-    ID_HELP_GNULICENSE            "Display the GNU General Public License"
     IDS_PRIVATEBUILD_FMT          "Private Build: %1"
     ID_HELP_RELEASENOTES          "Opens the release notes document\nRelease Notes"
     ID_HELP_TRANSLATIONS          "Opens the translations website\nTranslations"
@@ -2267,8 +2384,18 @@ STRINGTABLE
 //
 // Accelerator resources
 //
+IDR_DIRDOCTYPE ACCELERATORS
+{
+    VK_F2,          ID_DIR_ITEM_RENAME, VIRTKEY
+}
+
+
+
 IDR_HEXDOCTYPE ACCELERATORS
 {
+    VK_F2,          ID_EDIT_ADD_BOOKMARK, VIRTKEY
+    VK_F2,          ID_EDIT_REMOVE_BOOKMARK, VIRTKEY, SHIFT
+    VK_F2,          ID_EDIT_CLEAR_ALL_BOOKMARKS, VIRTKEY, CONTROL, SHIFT
     VK_F3,          ID_EDIT_REPEAT, VIRTKEY, SHIFT
     VK_F3,          ID_EDIT_REPEAT, VIRTKEY
     VK_F3,          ID_EDIT_REPEAT, VIRTKEY, CONTROL, SHIFT
@@ -2306,9 +2433,6 @@ IDR_MAINFRAME ACCELERATORS
     VK_F8,          ID_NEXTDIFF, VIRTKEY
     VK_F7,          ID_PREVDIFF, VIRTKEY
     VK_END,         ID_LASTDIFF, VIRTKEY, ALT
-    VK_F2,          ID_DIR_ITEM_RENAME, VIRTKEY
-    VK_F4,          ID_SELECT_NEXT_LINEDIFF, VIRTKEY
-    VK_F4,          ID_SELECT_PREV_LINEDIFF, VIRTKEY, SHIFT
     VK_F5,          ID_REFRESH, VIRTKEY
     VK_F5,          ID_DIR_RESCAN, VIRTKEY, CONTROL
     VK_F6,          ID_NEXT_PANE, VIRTKEY
@@ -2382,6 +2506,8 @@ IDR_MERGEDOCTYPE ACCELERATORS
     VK_F2,          ID_EDIT_TOGGLE_BOOKMARK, VIRTKEY, CONTROL
     VK_F2,          ID_EDIT_GOTO_NEXT_BOOKMARK, VIRTKEY
     VK_F2,          ID_EDIT_GOTO_PREV_BOOKMARK, VIRTKEY, SHIFT
+    VK_F4,          ID_SELECT_NEXT_LINEDIFF, VIRTKEY
+    VK_F4,          ID_SELECT_PREV_LINEDIFF, VIRTKEY, SHIFT
     VK_HOME,        ID_EDIT_HOME, VIRTKEY
     VK_HOME,        ID_EDIT_TEXT_BEGIN, VIRTKEY, CONTROL
     VK_HOME,        ID_EDIT_EXT_HOME, VIRTKEY, SHIFT

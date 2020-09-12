@@ -37,6 +37,12 @@
 #include <mshtmhst.h>
 //#include <mshtmcid.h>
 
+// CLR MetaHost header
+#include <MetaHost.h>
+
+// UI Automation
+#include <uiautomationclient.h>
+
 // STL headers
 #include <stl.h>
 #include stl(list)

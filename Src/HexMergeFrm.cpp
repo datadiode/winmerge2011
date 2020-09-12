@@ -223,6 +223,8 @@ void CHexMergeFrame::UpdateResources()
 	LANGID wLangID = static_cast<LANGID>(GetThreadLocale());
 	m_pView[0]->GetInterface()->load_lang(wLangID);
 	m_pView[1]->GetInterface()->load_lang(wLangID);
+	m_pBookmarkMenu = CMainFrame::FindSubMenuById(m_pHandleSet->m_pMenuShared, ID_EDIT_CLEAR_ALL_BOOKMARKS);
+	GetActiveView()->UpdateBookmarkMenu();
 }
 
 void CHexMergeFrame::UpdateEditCmdUI()
@@ -300,6 +302,23 @@ LRESULT CHexMergeFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 		UpdateHeaderPath(GetActiveView()->m_nThisPane);
 		UpdateCmdUI();
 		break;
+	case ID_EDIT_WMGOTO:
+		pActiveView->OnEditGoto();
+		break;
+	case ID_EDIT_ADD_BOOKMARK:
+		pActiveView->OnAddBookmark();
+		break;
+	case ID_EDIT_REMOVE_BOOKMARK:
+		pActiveView->OnRemoveBookmark();
+		break;
+	case ID_EDIT_CLEAR_ALL_BOOKMARKS:
+		pActiveView->OnClearAllBookmark();
+		break;
+	case ID_EDIT_GO_BOOKMARK1: case ID_EDIT_GO_BOOKMARK2: case ID_EDIT_GO_BOOKMARK3:
+	case ID_EDIT_GO_BOOKMARK4: case ID_EDIT_GO_BOOKMARK5: case ID_EDIT_GO_BOOKMARK6:
+	case ID_EDIT_GO_BOOKMARK7: case ID_EDIT_GO_BOOKMARK8: case ID_EDIT_GO_BOOKMARK9:
+		pActiveView->OnGotoBookmark(id - ID_EDIT_GO_BOOKMARK1);
+		break;
 	case ID_L2R:
 		OnL2r();
 		break;
@@ -358,9 +377,6 @@ LRESULT CHexMergeFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 		{
 			pWndNext->SetFocus();
 		}
-		break;
-	case IDCANCEL:
-		PostMessage(WM_CLOSE);
 		break;
 	default:
 		return FALSE;
@@ -447,13 +463,6 @@ LRESULT CHexMergeFrame::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 BOOL CHexMergeFrame::PreTranslateMessage(MSG *pMsg)
 {
-	// First check our own accelerators, then pass down to heksedit.
-	// This is essential for, e.g., ID_VIEW_ZOOMIN/ID_VIEW_ZOOMOUT.
-	if (m_pMDIFrame->m_hAccelTable &&
-		::TranslateAccelerator(m_pMDIFrame->m_hWnd, m_pMDIFrame->m_hAccelTable, pMsg))
-	{
-		return TRUE;
-	}
 	if (CHexMergeView *pView = GetActiveView())
 	{
 		HACCEL hAccel = m_pHandleSet->m_hAccelShared;

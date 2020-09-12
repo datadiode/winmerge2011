@@ -26,7 +26,7 @@ public:
 protected:
 	virtual BOOL OnInitDialog();
 	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
-	void OnBnClickedOpenContributors();
+	bool OpenFileOrUrl(LPCTSTR szFile, LPCTSTR szUrl);
 
 	CMyComPtr<IPicture> m_spIPicture;
 	HFont *m_font_gnu_ascii;

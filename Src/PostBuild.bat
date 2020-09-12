@@ -108,6 +108,18 @@ for %%$ in (
 	set $=
 )
 
+REM Copy SQLiteCompare
+set $=..\..\SQLiteCompare\SQLiteTurbo\bin\Release\
+for %%$ in (
+	.
+) do if not "%%~$$:$" == "" (
+	xcopy /ys "%$%*.dll" "%~2SQLiteCompare\bin\"
+	xcopy /ys "%$%*.pdb" "%~2SQLiteCompare\bin\"
+	xcopy /y "%$%SQLiteCompare.*" "%~2SQLiteCompare\bin\"
+	xcopy /y "..\..\SQLiteCompare\LICENSE" "%~2SQLiteCompare\"
+	set $=
+)
+
 REM Copy WinMerge.chm
 xcopy /y "..\..\winmerge2011_help\Build\Manual\htmlhelp\WinMerge.chm" "%~2Docs\"
 

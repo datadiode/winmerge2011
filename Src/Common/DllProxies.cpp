@@ -106,6 +106,16 @@ DllProxy::Instance<struct KERNEL32V51> KERNEL32V51 =
 };
 
 /**
+ * @brief heksedit dll proxy
+ */
+DllProxy::Instance<struct hekseditU> hekseditU =
+{
+	"Frhed\\hekseditU.dll",
+	"About",
+	(HMODULE)0
+};
+
+/**
  * @brief WinIMergeLib dll proxy
  */
 DllProxy::Instance<struct WinIMergeLib> WinIMergeLib =
@@ -116,5 +126,15 @@ DllProxy::Instance<struct WinIMergeLib> WinIMergeLib =
 	"WinIMerge_CreateToolWindow",
 	"WinIMerge_DestroyToolWindow",
 	"WinIMerge_CreateWindowless",
+	(HMODULE)0
+};
+
+/**
+ * @brief MSCOREE dll proxy
+ */
+DllProxy::Instance<struct MSCOREE> MSCOREE =
+{
+	"MSCOREE.DLL",
+	"CLRCreateInstance",
 	(HMODULE)0
 };

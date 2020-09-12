@@ -609,6 +609,11 @@ void CDocFrame::DestroyFrame()
 	GetParent()->SendMessage(WM_MDIDESTROY, reinterpret_cast<WPARAM>(m_hWnd));
 }
 
+void CDocFrame::DestroyFrameAsync()
+{
+	GetParent()->PostMessage(WM_MDIDESTROY, reinterpret_cast<WPARAM>(m_hWnd));
+}
+
 void CDocFrame::RecalcLayout()
 {
 	RECT rect;

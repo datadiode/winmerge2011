@@ -13,7 +13,7 @@
 
 #include "WinIMergeLib.h"
 
-/** 
+/**
  * @brief Frame class for file compare, handles panes, statusbar etc.
  */
 class CImgMergeFrame
@@ -26,7 +26,7 @@ public:
 
 // Operations
 public:
-	HRESULT OpenDocs(const FileLocation &, const FileLocation &, BOOL bROLeft, BOOL bRORight);
+	void OpenDocs(FileLocation &, FileLocation &, bool bROLeft, bool bRORight);
 	bool SaveModified();
 	void UpdateResources();
 	bool IsModified() const;
@@ -67,12 +67,12 @@ private:
 	void OnViewZoomIn();
 	void OnViewZoomOut();
 	void OnViewZoomNormal();
-    void OnWindowChangePane();
-    int TrySaveAs(int pane, String &);
+	void OnWindowChangePane();
+	int TrySaveAs(int pane, String &);
 	bool DoSave(int pane);
 	bool DoSaveAs(int pane);
 	static void OnChildPaneEvent(const IImgMergeWindow::Event& evt);
-    static void CALLBACK HandleWinEvent(HWINEVENTHOOK, DWORD, HWND, LONG, LONG, DWORD, DWORD);
+	static void CALLBACK HandleWinEvent(HWINEVENTHOOK, DWORD, HWND, LONG, LONG, DWORD, DWORD);
 	IImgMergeWindow *m_pImgMergeWindow;
 	IImgToolWindow *m_pImgToolWindow;
 
@@ -83,7 +83,7 @@ private:
 	BOOL CreateClient();
 // Implementation data
 	CSubFrame m_wndLocationBar;
-    FileInfo m_fileInfo[2];
-    HStatusBar *m_pStatusBar[2];
+	FileInfo m_fileInfo[2];
+	HStatusBar *m_pStatusBar[2];
 	static const LONG FloatScript[];
 };

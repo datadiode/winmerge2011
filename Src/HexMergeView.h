@@ -60,22 +60,20 @@ public:
 	void SetReadOnly(BOOL);
 	void ResizeWindow();
 	void RepaintRange(int, int);
+    void UpdateBookmarkMenu();
 	BOOL IsFileChangedOnDisk(LPCTSTR);
 	void ZoomText(int amount);
 	// Overrides
 protected:
 	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
 
-	template<UINT>
-	LRESULT OnWndMsg(WPARAM, LPARAM);
-
-// Operations
-
 // Implementation data
 	LONG m_style;
-// Generated message map functions
+
+// Message handlers
     void OnEraseBkgnd();
 	void OnSize();
+
 public:
 	void OnEditFind();
 	void OnEditReplace();
@@ -87,6 +85,11 @@ public:
 	void OnEditSelectAll();
 	void OnEditUndo();
 	void OnEditRedo();
+	void OnEditGoto();
+    void OnAddBookmark();
+    void OnRemoveBookmark();
+    void OnClearAllBookmark();
+    void OnGotoBookmark(int);
 	void OnFirstdiff();
 	void OnLastdiff();
 	void OnNextdiff();

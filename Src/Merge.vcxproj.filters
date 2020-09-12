@@ -717,6 +717,12 @@
     <ClCompile Include="PropLexers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SQLiteMergeFrm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PropCompareSQLite.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\WindowPlacement.h">
@@ -1290,6 +1296,15 @@
       <Filter>Compare Engines</Filter>
     </ClInclude>
     <ClInclude Include="PropLexers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SQLiteMergeFrm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\AccChildren.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PropCompareSQLite.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

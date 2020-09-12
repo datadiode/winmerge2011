@@ -20,7 +20,6 @@
 #include "paths.h"
 #include "FileOrFolderSelect.h"
 #include "SaveClosingDlg.h"
-#include "Constants.h"
 #include "Common/DllProxies.h"
 #include "Common/SettingStore.h"
 #include <cmath>
@@ -94,52 +93,52 @@ void CImgMergeFrame::RecalcLayout()
 			rectClient.left, rectClient.top,
 			rectClient.right - rectClient.left,
 			rectClient.bottom - rectClient.top);
-    }
-    if (m_pImgMergeWindow->GetPaneCount() >= 2)
-    {
-        if (HDWP const hdwp = ::BeginDeferWindowPos(4))
-        {
-            RECT rc0, rc1, rc;
-            ::GetWindowRect(m_pImgMergeWindow->GetPaneHWND(0), &rc0);
-            m_wndFilePathBar.ScreenToClient(&rc0);
-            ::GetWindowRect(m_pImgMergeWindow->GetPaneHWND(1), &rc1);
-            m_wndFilePathBar.ScreenToClient(&rc1);
-            if (HWindow *const pwndSibling = m_wndFilePathBar.GetDlgItem(IDC_STATIC_TITLE_LEFT))
-            {
-                pwndSibling->GetWindowRect(&rc);
-                m_wndFilePathBar.ScreenToClient(&rc);
-                ::DeferWindowPos(hdwp, pwndSibling->m_hWnd, NULL,
-                    rc0.left, rc.top, rc0.right - rc0.left, rc.bottom - rc.top, SWP_NOZORDER);
-            }
-            if (HWindow *const pwndSibling = m_wndFilePathBar.GetDlgItem(IDC_STATIC_TITLE_RIGHT))
-            {
-                pwndSibling->GetWindowRect(&rc);
-                m_wndFilePathBar.ScreenToClient(&rc);
-                ::DeferWindowPos(hdwp, pwndSibling->m_hWnd, NULL,
-                    rc1.left, rc.top, rc1.right - rc1.left, rc.bottom - rc.top, SWP_NOZORDER);
-            }
-            m_wndFilePathBar.GetClientRect(&rc);
-            if (HWindow *const pwndSibling = m_wndFilePathBar.GetDlgItem(0x6000))
-            {
-                ::DeferWindowPos(hdwp, pwndSibling->m_hWnd, NULL,
-                    rc0.left, rc.bottom - rc0.top, rc0.right - rc0.left, rc0.top, SWP_NOZORDER);
-            }
-            if (HWindow *const pwndSibling = m_wndFilePathBar.GetDlgItem(0x6001))
-            {
-                ::DeferWindowPos(hdwp, pwndSibling->m_hWnd, NULL,
-                    rc1.left, rc.bottom - rc1.top, rc1.right - rc1.left, rc1.top, SWP_NOZORDER);
-            }
-            ::EndDeferWindowPos(hdwp);
-        }
+	}
+	if (m_pImgMergeWindow->GetPaneCount() >= 2)
+	{
+		if (HDWP const hdwp = ::BeginDeferWindowPos(4))
+		{
+			RECT rc0, rc1, rc;
+			::GetWindowRect(m_pImgMergeWindow->GetPaneHWND(0), &rc0);
+			m_wndFilePathBar.ScreenToClient(&rc0);
+			::GetWindowRect(m_pImgMergeWindow->GetPaneHWND(1), &rc1);
+			m_wndFilePathBar.ScreenToClient(&rc1);
+			if (HWindow *const pwndSibling = m_wndFilePathBar.GetDlgItem(IDC_STATIC_TITLE_LEFT))
+			{
+				pwndSibling->GetWindowRect(&rc);
+				m_wndFilePathBar.ScreenToClient(&rc);
+				::DeferWindowPos(hdwp, pwndSibling->m_hWnd, NULL,
+					rc0.left, rc.top, rc0.right - rc0.left, rc.bottom - rc.top, SWP_NOZORDER);
+			}
+			if (HWindow *const pwndSibling = m_wndFilePathBar.GetDlgItem(IDC_STATIC_TITLE_RIGHT))
+			{
+				pwndSibling->GetWindowRect(&rc);
+				m_wndFilePathBar.ScreenToClient(&rc);
+				::DeferWindowPos(hdwp, pwndSibling->m_hWnd, NULL,
+					rc1.left, rc.top, rc1.right - rc1.left, rc.bottom - rc.top, SWP_NOZORDER);
+			}
+			m_wndFilePathBar.GetClientRect(&rc);
+			if (HWindow *const pwndSibling = m_wndFilePathBar.GetDlgItem(0x6000))
+			{
+				::DeferWindowPos(hdwp, pwndSibling->m_hWnd, NULL,
+					rc0.left, rc.bottom - rc0.top, rc0.right - rc0.left, rc0.top, SWP_NOZORDER);
+			}
+			if (HWindow *const pwndSibling = m_wndFilePathBar.GetDlgItem(0x6001))
+			{
+				::DeferWindowPos(hdwp, pwndSibling->m_hWnd, NULL,
+					rc1.left, rc.bottom - rc1.top, rc1.right - rc1.left, rc1.top, SWP_NOZORDER);
+			}
+			::EndDeferWindowPos(hdwp);
+		}
 	}
 	UpdateHeaderPath(0);
 	UpdateHeaderPath(1);
 }
 
-HRESULT CImgMergeFrame::OpenDocs(
-	const FileLocation &filelocLeft,
-	const FileLocation &filelocRight,
-	BOOL bROLeft, BOOL bRORight)
+void CImgMergeFrame::OpenDocs(
+	FileLocation &filelocLeft,
+	FileLocation &filelocRight,
+	bool bROLeft, bool bRORight)
 {
 	//m_pView[index]->SetReadOnly(readOnly);
 	m_strPath[0] = filelocLeft.filepath;
@@ -157,27 +156,25 @@ HRESULT CImgMergeFrame::OpenDocs(
 		m_nBufferType[1] = BUFFER_NORMAL_NAMED;
 	}
 
-	bool bResult = m_pImgMergeWindow->OpenImages(m_strPath[0].c_str(), m_strPath[1].c_str());
+	m_pImgMergeWindow->OpenImages(m_strPath[0].c_str(), m_strPath[1].c_str());
 
-    UpdateDiffItem(NULL);
+	UpdateDiffItem(NULL);
 
-    ActivateFrame();
+	ActivateFrame();
 
 	if (COptionsMgr::Get(OPT_SCROLL_TO_FIRST))
 		m_pImgMergeWindow->FirstDiff();
 
 	for (int pane = 0; pane < m_pImgMergeWindow->GetPaneCount(); ++pane)
-    {
-        HWND hwndPane = m_pImgMergeWindow->GetPaneHWND(pane);
-        LONG style = ::GetWindowLong(hwndPane, GWL_STYLE);
-        ::SetWindowLong(hwndPane, GWL_STYLE, style | WS_TABSTOP);
-    }
+	{
+		HWND hwndPane = m_pImgMergeWindow->GetPaneHWND(pane);
+		LONG style = ::GetWindowLong(hwndPane, GWL_STYLE);
+		::SetWindowLong(hwndPane, GWL_STYLE, style | WS_TABSTOP);
+	}
 
-    ::SetFocus(m_pImgMergeWindow->GetPaneHWND(0));
+	::SetFocus(m_pImgMergeWindow->GetPaneHWND(0));
 
-    UpdateCmdUI();
-
-	return bResult;
+	UpdateCmdUI();
 }
 
 bool CImgMergeFrame::IsModified() const
@@ -191,7 +188,7 @@ bool CImgMergeFrame::IsModified() const
 BOOL CImgMergeFrame::IsFileChangedOnDisk(int pane) const
 {
 	BOOL bChanged = FALSE;
-    FileInfo fileInfo;
+	FileInfo fileInfo;
 	if (fileInfo.Update(m_strPath[pane].c_str()))
 	{
 		UINT64 lower = min(fileInfo.mtime.castTo<UINT64>(), m_fileInfo[pane].mtime.castTo<UINT64>());
@@ -208,7 +205,7 @@ void CImgMergeFrame::OnChildPaneEvent(const IImgMergeWindow::Event& evt)
 	CImgMergeFrame *const pFrame = static_cast<CImgMergeFrame *>(evt.userdata);
 	switch (evt.eventType)
 	{
-    case IImgMergeWindow::KEYDOWN:
+	case IImgMergeWindow::KEYDOWN:
 		switch (evt.keycode)
 		{
 		case VK_PRIOR:
@@ -229,11 +226,11 @@ void CImgMergeFrame::OnChildPaneEvent(const IImgMergeWindow::Event& evt)
 			}
 			break;
 		}
-        break;
-    case IImgMergeWindow::MOUSEMOVE:
-    case IImgMergeWindow::LBUTTONUP:
-        pFrame->UpdateCmdUI();
-        break;
+		break;
+	case IImgMergeWindow::MOUSEMOVE:
+	case IImgMergeWindow::LBUTTONUP:
+		pFrame->UpdateCmdUI();
+		break;
 	}
 }
 
@@ -244,20 +241,23 @@ BOOL CImgMergeFrame::CreateClient()
 {
 	// Merge frame has a header bar at top
 	m_wndFilePathBar.Create(m_hWnd, 0);
-    m_pImgMergeWindow = WinIMergeLib->WinIMerge_CreateWindow(WinIMergeLib->H, m_wndFilePathBar.m_hWnd, 152);
+	m_pImgMergeWindow = WinIMergeLib->WinIMerge_CreateWindow(WinIMergeLib->H, m_wndFilePathBar.m_hWnd, 152);
 	m_wndLocationBar.Subclass(HWindow::CreateEx(
-		0, WinMergeWindowClass, NULL, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
+		WS_EX_CONTROLPARENT, WinMergeWindowClass, NULL,
+		WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
 		0, 0, 0, 0, m_pWnd, ID_VIEW_IMAGETOOLBOX));
-    m_pImgToolWindow = WinIMergeLib->WinIMerge_CreateToolWindow(WinIMergeLib->H, m_wndLocationBar.m_hWnd, m_pImgMergeWindow);
-    if (HWND hImgToolWindow = m_pImgToolWindow ? m_pImgToolWindow->GetHWND() : NULL)
-    {
-        ::SetWindowLongPtr(hImgToolWindow, GWLP_ID, 152);
-        ::SetWindowPos(hImgToolWindow, NULL, 4, 0, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
-        RECT rc;
-        ::GetWindowRect(hImgToolWindow, &rc);
-        m_wndLocationBar.SetWindowPos(NULL, 0, 0, rc.right - rc.left + 8, rc.bottom - rc.top,
-            SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOSENDCHANGING);
-    }
+	m_pImgToolWindow = WinIMergeLib->WinIMerge_CreateToolWindow(WinIMergeLib->H, m_wndLocationBar.m_hWnd, m_pImgMergeWindow);
+	if (HWND hImgToolWindow = m_pImgToolWindow ? m_pImgToolWindow->GetHWND() : NULL)
+	{
+		::SetWindowLongPtr(hImgToolWindow, GWLP_ID, 152);
+		LONG style = ::GetWindowLong(hImgToolWindow, GWL_EXSTYLE);
+		::SetWindowLong(hImgToolWindow, GWL_EXSTYLE, style | WS_EX_CONTROLPARENT);
+		::SetWindowPos(hImgToolWindow, NULL, 4, 0, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
+		RECT rc;
+		::GetWindowRect(hImgToolWindow, &rc);
+		m_wndLocationBar.SetWindowPos(NULL, 0, 0, rc.right - rc.left + 8, rc.bottom - rc.top,
+			SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOSENDCHANGING);
+	}
 	RECT rect0, rect1;
 	HEdit *pEdit0 = m_wndFilePathBar.GetControlRect(0, &rect0);
 	HEdit *pEdit1 = m_wndFilePathBar.GetControlRect(1, &rect1);
@@ -273,7 +273,7 @@ BOOL CImgMergeFrame::CreateClient()
 		m_wndFilePathBar.m_pWnd, 0x6001);
 	pBar->SetStyle(pBar->GetStyle() | CCS_NORESIZE);
 
-    RECT rect;
+	RECT rect;
 	pBar->GetWindowRect(&rect);
 	m_wndFilePathBar.ScreenToClient(&rect);
 	const int cyStatusBar = rect.bottom - rect.top;
@@ -382,8 +382,8 @@ void CImgMergeFrame::OnFileSaveAsRight()
 
 void CImgMergeFrame::OnWindowChangePane()
 {
-    int pane = m_pImgMergeWindow->GetActivePane() ? 0 : 1;
-    ::SetFocus(m_pImgMergeWindow->GetPaneHWND(pane));
+	int pane = m_pImgMergeWindow->GetActivePane() ? 0 : 1;
+	::SetFocus(m_pImgMergeWindow->GetPaneHWND(pane));
 }
 
 /**
@@ -465,14 +465,14 @@ int CImgMergeFrame::UpdateDiffItem(CDirFrame *pDirDoc)
 int CImgMergeFrame::TrySaveAs(int pane, String &strPath)
 {
 	if (m_pImgMergeWindow->SaveImageAs(pane, strPath.c_str()))
-    {
+	{
 		m_strPath[pane] = strPath;
 		UpdateDiffItem(m_pDirDoc);
 		m_fileInfo[pane].Update(m_strPath[pane].c_str());
 		UpdateHeaderPath(pane);
-    	return 0;
-    }
-    String sError = GetSysError(GetLastError());
+		return 0;
+	}
+	String sError = GetSysError(GetLastError());
 	return LanguageSelect.FormatStrings(IDS_FILESAVE_FAILED,
 		paths_UndoMagic(wcsdupa(strPath.c_str())), sError.c_str()
 	).MsgBox(MB_OKCANCEL | MB_HIGHLIGHT_ARGUMENTS | MB_ICONWARNING);
@@ -482,14 +482,14 @@ bool CImgMergeFrame::DoSave(int pane)
 {
 	if (m_pImgMergeWindow->IsModified(pane))
 	{
-	    // Ask user what to do about FILE_ATTRIBUTE_READONLY
-	    String strPath = m_pImgMergeWindow->GetFileName(pane);
-	    if (DWORD attr = paths_IsReadonlyFile(strPath.c_str()))
-		    if (theApp.m_pMainWnd->HandleReadonlySave(attr, strPath) == IDCANCEL)
-			    return false;
-	    // Take a chance to create a backup
-	    if (!theApp.m_pMainWnd->CreateBackup(false, strPath.c_str()))
-		    return false;
+		// Ask user what to do about FILE_ATTRIBUTE_READONLY
+		String strPath = m_pImgMergeWindow->GetFileName(pane);
+		if (DWORD attr = paths_IsReadonlyFile(strPath.c_str()))
+			if (theApp.m_pMainWnd->HandleReadonlySave(attr, strPath) == IDCANCEL)
+				return false;
+		// Take a chance to create a backup
+		if (!theApp.m_pMainWnd->CreateBackup(false, strPath.c_str()))
+			return false;
 		if (int choice = TrySaveAs(pane, strPath))
 			return choice == IDOK && DoSaveAs(pane);
 	}
@@ -500,8 +500,8 @@ bool CImgMergeFrame::DoSaveAs(int pane)
 {
 	String strPath = m_strPath[pane];
 	HWND const parent = m_pImgMergeWindow->GetPaneHWND(pane);
-    UINT const title = pane == 0 ? IDS_SAVE_LEFT_AS : IDS_SAVE_RIGHT_AS;
-    int choice = IDOK;
+	UINT const title = pane == 0 ? IDS_SAVE_LEFT_AS : IDS_SAVE_RIGHT_AS;
+	int choice = IDOK;
 	while (choice == IDOK && SelectFile(parent, strPath, title, 0, FALSE))
 		choice = TrySaveAs(pane, strPath);
 	return choice == 0;
@@ -520,7 +520,6 @@ bool CImgMergeFrame::DoSaveAs(int pane)
  * so instead of filename, description is shown.
  * @todo If we have filename and description for file, what should
  * we do after saving to different filename? Empty description?
- * @todo Parameter @p bAllowCancel is always true in callers - can be removed.
  */
 bool CImgMergeFrame::SaveModified()
 {
@@ -600,14 +599,9 @@ void CImgMergeFrame::UpdateResources()
  */
 BOOL CImgMergeFrame::PreTranslateMessage(MSG* pMsg)
 {
-	// First check our own accelerators, then pass down to embedded window.
-	// This is essential for, e.g., ID_VIEW_ZOOMIN/ID_VIEW_ZOOMOUT.
-	if (m_pMDIFrame->m_hAccelTable &&
-		::TranslateAccelerator(m_pMDIFrame->m_hWnd, m_pMDIFrame->m_hAccelTable, pMsg))
-	{
-		return TRUE;
-	}
-	return FALSE;
+	if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_ESCAPE)
+		return FALSE; // Shortcut IsDialogMessage() to retain OPT_CLOSE_WITH_ESC functionality
+	return ::IsDialogMessage(m_hWnd, pMsg);
 }
 
 /**
@@ -617,7 +611,7 @@ BOOL CImgMergeFrame::PreTranslateMessage(MSG* pMsg)
 void CImgMergeFrame::UpdateCmdUI()
 {
 	POINT pt = { -1, -1 };
-    POINT ptCursor;
+	POINT ptCursor;
 	GetCursorPos(&ptCursor);
 	for (int pane = 0; pane < m_pImgMergeWindow->GetPaneCount(); ++pane)
 	{
@@ -633,13 +627,13 @@ void CImgMergeFrame::UpdateCmdUI()
 
 	for (int pane = 0; pane < m_pImgMergeWindow->GetPaneCount(); ++pane)
 	{
-    	RGBQUAD color = m_pImgMergeWindow->GetPixelColor(pane, pt.x, pt.y);
+		RGBQUAD color = m_pImgMergeWindow->GetPixelColor(pane, pt.x, pt.y);
 		// Update mod indicators
 		String ind = m_wndFilePathBar.GetTitle(pane);
 		if (m_pImgMergeWindow->IsModified(pane) ? ind[0] != _T('*') : ind[0] == _T('*'))
 			UpdateHeaderPath(pane);
-        if (nActivePane != -1)
-		    m_wndFilePathBar.SetActive(pane, pane == nActivePane);
+		if (nActivePane != -1)
+			m_wndFilePathBar.SetActive(pane, pane == nActivePane);
 		POINT ptReal;
 		String text;
 		if (m_pImgMergeWindow->ConvertToRealPos(pane, pt, ptReal))
@@ -658,18 +652,18 @@ void CImgMergeFrame::UpdateCmdUI()
 				m_pImgMergeWindow->GetImageBitsPerPixel(pane)
 				);
 
-        HStatusBar *pBar = static_cast<HStatusBar *>(m_wndFilePathBar.GetDlgItem(0x6000 + pane));
-        pBar->SetPartText(0, text.c_str());
+		HStatusBar *pBar = static_cast<HStatusBar *>(m_wndFilePathBar.GetDlgItem(0x6000 + pane));
+		pBar->SetPartText(0, text.c_str());
 	}
-    m_pMDIFrame->UpdateCmdUI<ID_FILE_SAVE>(IsModified() ? MF_ENABLED : MF_GRAYED);
-    m_pMDIFrame->UpdateCmdUI<ID_EDIT_UNDO>(m_pImgMergeWindow->IsUndoable() ? MF_ENABLED : MF_GRAYED);
-    m_pMDIFrame->UpdateCmdUI<ID_EDIT_REDO>(m_pImgMergeWindow->IsRedoable() ? MF_ENABLED : MF_GRAYED);
-    m_pMDIFrame->UpdateCmdUI<ID_NEXTDIFF>(m_pImgMergeWindow->GetNextDiffIndex() != -1 ? MF_ENABLED : MF_GRAYED);
-    m_pMDIFrame->UpdateCmdUI<ID_PREVDIFF>(m_pImgMergeWindow->GetPrevDiffIndex() != -1 ? MF_ENABLED : MF_GRAYED);
-    int const diffIndex = m_pImgMergeWindow->GetCurrentDiffIndex();
+	m_pMDIFrame->UpdateCmdUI<ID_FILE_SAVE>(IsModified() ? MF_ENABLED : MF_GRAYED);
+	m_pMDIFrame->UpdateCmdUI<ID_EDIT_UNDO>(m_pImgMergeWindow->IsUndoable() ? MF_ENABLED : MF_GRAYED);
+	m_pMDIFrame->UpdateCmdUI<ID_EDIT_REDO>(m_pImgMergeWindow->IsRedoable() ? MF_ENABLED : MF_GRAYED);
+	m_pMDIFrame->UpdateCmdUI<ID_NEXTDIFF>(m_pImgMergeWindow->GetNextDiffIndex() != -1 ? MF_ENABLED : MF_GRAYED);
+	m_pMDIFrame->UpdateCmdUI<ID_PREVDIFF>(m_pImgMergeWindow->GetPrevDiffIndex() != -1 ? MF_ENABLED : MF_GRAYED);
+	int const diffIndex = m_pImgMergeWindow->GetCurrentDiffIndex();
 	m_pMDIFrame->UpdateCmdUI<ID_R2L>(diffIndex != -1 && !m_pImgMergeWindow->GetReadOnly(0) ? MF_ENABLED : MF_GRAYED);
 	m_pMDIFrame->UpdateCmdUI<ID_L2R>(diffIndex != -1 && !m_pImgMergeWindow->GetReadOnly(1) ? MF_ENABLED : MF_GRAYED);
-    int const diffCount = m_pImgMergeWindow->GetDiffCount();
+	int const diffCount = m_pImgMergeWindow->GetDiffCount();
 	m_pMDIFrame->UpdateCmdUI<ID_ALL_LEFT>(diffCount != 0 && !m_pImgMergeWindow->GetReadOnly(0) ? MF_ENABLED : MF_GRAYED);
 	m_pMDIFrame->UpdateCmdUI<ID_ALL_RIGHT>(diffCount != 0 && !m_pImgMergeWindow->GetReadOnly(1) ? MF_ENABLED : MF_GRAYED);
 }
@@ -878,11 +872,8 @@ LRESULT CImgMergeFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 		break;
 	case ID_NEXT_PANE:
 	case ID_WINDOW_CHANGE_PANE:
-        OnWindowChangePane();
+		OnWindowChangePane();
 		UpdateCmdUI();
-		break;
-	case IDCANCEL:
-		PostMessage(WM_CLOSE);
 		break;
 	default:
 		return FALSE;
@@ -892,10 +883,10 @@ LRESULT CImgMergeFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 
 void CImgMergeFrame::HandleWinEvent(HWINEVENTHOOK hook, DWORD, HWND hwnd, LONG, LONG, DWORD, DWORD)
 {
-    HWindow *const pwnd = reinterpret_cast<HWindow *>(hwnd);
-    HWindow *const pwndFrame = pwnd->GetParent()->GetParent();
-    static_cast<CImgMergeFrame *>(OWindow::FromHandle(pwndFrame))->RecalcLayout();
-    UnhookWinEvent(hook);
+	HWindow *const pwnd = reinterpret_cast<HWindow *>(hwnd);
+	HWindow *const pwndFrame = pwnd->GetParent()->GetParent();
+	static_cast<CImgMergeFrame *>(OWindow::FromHandle(pwndFrame))->RecalcLayout();
+	UnhookWinEvent(hook);
 }
 
 LRESULT CImgMergeFrame::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -909,32 +900,32 @@ LRESULT CImgMergeFrame::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_MOUSEACTIVATE:
 		switch (HIWORD(lParam))
 		{
-        case WM_LBUTTONDOWN:
-        case WM_RBUTTONDOWN:
+		case WM_LBUTTONDOWN:
+		case WM_RBUTTONDOWN:
 			POINT pt;
 			GetCursorPos(&pt);
 			HWND hwndHit = ::WindowFromPoint(pt);
-            if (hwndHit == m_pImgMergeWindow->GetHWND())
-            {
-                SetWinEventHook(EVENT_SYSTEM_CAPTUREEND, EVENT_SYSTEM_CAPTUREEND, NULL,
-                    HandleWinEvent, GetCurrentProcessId(), GetCurrentThreadId(), WINEVENT_OUTOFCONTEXT);
-            }
-            else if (::IsChild(m_pImgMergeWindow->GetHWND(), hwndHit))
-            {
-                int pane = m_pImgMergeWindow->GetPaneCount();
-    		    while (pane)
-                {
-                    HWND hwndPane = m_pImgMergeWindow->GetPaneHWND(--pane);
-                    bool active = false;
-                    if (hwndPane == hwndHit)
-                    {
-                        m_pImgMergeWindow->SetActivePane(pane);
-                        active = true;
-                    }
-                    m_wndFilePathBar.SetActive(pane, active);
-                }
-            }
-            break;
+			if (hwndHit == m_pImgMergeWindow->GetHWND())
+			{
+				SetWinEventHook(EVENT_SYSTEM_CAPTUREEND, EVENT_SYSTEM_CAPTUREEND, NULL,
+					HandleWinEvent, GetCurrentProcessId(), GetCurrentThreadId(), WINEVENT_OUTOFCONTEXT);
+			}
+			else if (::IsChild(m_pImgMergeWindow->GetHWND(), hwndHit))
+			{
+				int pane = m_pImgMergeWindow->GetPaneCount();
+				while (pane)
+				{
+					HWND hwndPane = m_pImgMergeWindow->GetPaneHWND(--pane);
+					bool active = false;
+					if (hwndPane == hwndHit)
+					{
+						m_pImgMergeWindow->SetActivePane(pane);
+						active = true;
+					}
+					m_wndFilePathBar.SetActive(pane, active);
+				}
+			}
+			break;
 		}
 		break;
 	case WM_NCACTIVATE:
@@ -947,19 +938,19 @@ LRESULT CImgMergeFrame::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_CLOSE:
 		if (!SaveModified())
 			return 0;
-       	SaveOptions();
+		SaveOptions();
 		break;
-    case WM_DESTROY:
-	    if (m_pImgMergeWindow)
-        {
-		    VERIFY(WinIMergeLib->WinIMerge_DestroyWindow(m_pImgMergeWindow));
-            m_pImgMergeWindow = NULL;
-        }
-	    if (m_pImgToolWindow)
-        {
-		    VERIFY(WinIMergeLib->WinIMerge_DestroyToolWindow(m_pImgToolWindow));
-            m_pImgToolWindow = NULL;
-        }
+	case WM_DESTROY:
+		if (m_pImgMergeWindow)
+		{
+			VERIFY(WinIMergeLib->WinIMerge_DestroyWindow(m_pImgMergeWindow));
+			m_pImgMergeWindow = NULL;
+		}
+		if (m_pImgToolWindow)
+		{
+			VERIFY(WinIMergeLib->WinIMerge_DestroyToolWindow(m_pImgToolWindow));
+			m_pImgToolWindow = NULL;
+		}
 		break;
 	}
 	return CDocFrame::WindowProc(uMsg, wParam, lParam);

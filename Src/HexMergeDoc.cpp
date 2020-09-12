@@ -255,8 +255,9 @@ void CHexMergeFrame::OnFileSaveAsRight()
 */
 HRESULT CHexMergeFrame::LoadOneFile(int index, const FileLocation &fileinfo, BOOL readOnly)
 {
-	if (Try(m_pView[index]->LoadFile(fileinfo.filepath.c_str()), MB_ICONSTOP) != 0)
-		return E_FAIL;
+	HRESULT hr = m_pView[index]->LoadFile(fileinfo.filepath.c_str());
+	if (FAILED(hr))
+		return hr;
 	m_pView[index]->SetReadOnly(readOnly);
 	m_strPath[index] = fileinfo.filepath;
 	ASSERT(m_nBufferType[index] == BUFFER_NORMAL); // should have been initialized to BUFFER_NORMAL in constructor
@@ -273,31 +274,23 @@ HRESULT CHexMergeFrame::LoadOneFile(int index, const FileLocation &fileinfo, BOO
 /**
  * @brief Load files and initialize frame's compare result icon
  */
-HRESULT CHexMergeFrame::OpenDocs(
-	const FileLocation &filelocLeft,
-	const FileLocation &filelocRight,
-	BOOL bROLeft, BOOL bRORight)
+void CHexMergeFrame::OpenDocs(
+	FileLocation &filelocLeft,
+	FileLocation &filelocRight,
+	bool bROLeft, bool bRORight)
 {
-	HRESULT hr;
-	if (SUCCEEDED(hr = LoadOneFile(0, filelocLeft, bROLeft)) &&
-		SUCCEEDED(hr = LoadOneFile(1, filelocRight, bRORight)))
-	{
-		int nResult = UpdateDiffItem(NULL);
-		// An extra ResizeWindow() on the left view aligns scroll ranges, and
-		// also triggers initial diff coloring by invalidating the client area.
-		m_pView[0]->ResizeWindow();
-		ActivateFrame();
-		UpdateWindow();
-		if (nResult == 0)
-			AlertFilesIdentical();
-		else if (COptionsMgr::Get(OPT_SCROLL_TO_FIRST))
-			SendMessage(WM_COMMAND, ID_FIRSTDIFF);
-	}
-	else
-	{
-		DestroyFrame();
-	}
-	return hr;
+	OException::Check(LoadOneFile(0, filelocLeft, bROLeft));
+	OException::Check(LoadOneFile(1, filelocRight, bRORight));
+	int nResult = UpdateDiffItem(NULL);
+	// An extra ResizeWindow() on the left view aligns scroll ranges, and
+	// also triggers initial diff coloring by invalidating the client area.
+	m_pView[0]->ResizeWindow();
+	ActivateFrame();
+	UpdateWindow();
+	if (nResult == 0)
+		AlertFilesIdentical();
+	else if (COptionsMgr::Get(OPT_SCROLL_TO_FIRST))
+		SendMessage(WM_COMMAND, ID_FIRSTDIFF);
 }
 
 /**

@@ -28,6 +28,7 @@
 #include "LanguageSelect.h"
 #include "HexMergeFrm.h"
 #include "ImgMergeFrm.h"
+#include "SQLiteMergeFrm.h"
 #include "7zCommon.h"
 #include "DirFrame.h"
 #include "DirView.h"
@@ -47,7 +48,7 @@
  */
 bool CDirFrame::CanFrameClose()
 {
-	return m_MergeDocs.empty() && m_HexMergeDocs.empty() && m_ImgMergeDocs.empty();
+	return m_MergeDocs.empty() && m_HexMergeDocs.empty() && m_ImgMergeDocs.empty() && m_SQLiteMergeDocs.empty();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -557,34 +558,42 @@ DIFFITEM *CDirFrame::FindItemFromPaths(LPCTSTR pathLeft, LPCTSTR pathRight)
 /**
  * @brief A new MergeDoc has been opened.
  */
-void CDirFrame::AddMergeDoc(CChildFrame *pMergeDoc)
+void CDirFrame::AddMergeDoc(CChildFrame *pDocFrame)
 {
-	m_MergeDocs.push_back(pMergeDoc);
+	m_MergeDocs.push_back(pDocFrame);
 }
 
 /**
  * @brief A new HexMergeDoc has been opened.
  */
-void CDirFrame::AddMergeDoc(CHexMergeFrame *pHexMergeDoc)
+void CDirFrame::AddMergeDoc(CHexMergeFrame *pDocFrame)
 {
-	m_HexMergeDocs.push_back(pHexMergeDoc);
+	m_HexMergeDocs.push_back(pDocFrame);
 }
 
 /**
  * @brief A new ImgMergeDoc has been opened.
  */
-void CDirFrame::AddMergeDoc(CImgMergeFrame *pHexMergeDoc)
+void CDirFrame::AddMergeDoc(CImgMergeFrame *pDocFrame)
 {
-	m_ImgMergeDocs.push_back(pHexMergeDoc);
+	m_ImgMergeDocs.push_back(pDocFrame);
+}
+
+/**
+ * @brief A new SQLiteMergeDoc has been opened.
+ */
+void CDirFrame::AddMergeDoc(CSQLiteMergeFrame *pDocFrame)
+{
+	m_SQLiteMergeDocs.push_back(pDocFrame);
 }
 
 /**
  * @brief MergeDoc informs us it is closing.
  */
-void CDirFrame::MergeDocClosing(CChildFrame *pMergeDoc)
+void CDirFrame::MergeDocClosing(CChildFrame *pDocFrame)
 {
 	MergeDocPtrList::iterator pos = std::find(
-		m_MergeDocs.begin(), m_MergeDocs.end(), pMergeDoc);
+		m_MergeDocs.begin(), m_MergeDocs.end(), pDocFrame);
 	if (pos != m_MergeDocs.end())
 		m_MergeDocs.erase(pos);
 	else
@@ -594,10 +603,10 @@ void CDirFrame::MergeDocClosing(CChildFrame *pMergeDoc)
 /**
  * @brief MergeDoc informs us it is closing.
  */
-void CDirFrame::MergeDocClosing(CHexMergeFrame *pHexMergeDoc)
+void CDirFrame::MergeDocClosing(CHexMergeFrame *pDocFrame)
 {
 	HexMergeDocPtrList::iterator pos = std::find(
-		m_HexMergeDocs.begin(), m_HexMergeDocs.end(), pHexMergeDoc);
+		m_HexMergeDocs.begin(), m_HexMergeDocs.end(), pDocFrame);
 	if (pos != m_HexMergeDocs.end())
 		m_HexMergeDocs.erase(pos);
 	else
@@ -607,12 +616,25 @@ void CDirFrame::MergeDocClosing(CHexMergeFrame *pHexMergeDoc)
 /**
  * @brief MergeDoc informs us it is closing.
  */
-void CDirFrame::MergeDocClosing(CImgMergeFrame *pImgMergeDoc)
+void CDirFrame::MergeDocClosing(CImgMergeFrame *pDocFrame)
 {
 	ImgMergeDocPtrList::iterator pos = std::find(
-		m_ImgMergeDocs.begin(), m_ImgMergeDocs.end(), pImgMergeDoc);
+		m_ImgMergeDocs.begin(), m_ImgMergeDocs.end(), pDocFrame);
 	if (pos != m_ImgMergeDocs.end())
 		m_ImgMergeDocs.erase(pos);
+	else
+		assert(false);
+}
+
+/**
+ * @brief MergeDoc informs us it is closing.
+ */
+void CDirFrame::MergeDocClosing(CSQLiteMergeFrame *pDocFrame)
+{
+	SQLiteMergeDocPtrList::iterator pos = std::find(
+		m_SQLiteMergeDocs.begin(), m_SQLiteMergeDocs.end(), pDocFrame);
+	if (pos != m_SQLiteMergeDocs.end())
+		m_SQLiteMergeDocs.erase(pos);
 	else
 		assert(false);
 }
@@ -628,58 +650,77 @@ bool CDirFrame::CloseMergeDocs()
 {
 	while (!m_MergeDocs.empty())
 	{
-		CChildFrame *pMergeDoc = m_MergeDocs.front();
-		if (!pMergeDoc->SaveModified())
+		CChildFrame *pDocFrame = m_MergeDocs.front();
+		if (!pDocFrame->SaveModified())
 			return false;
-		pMergeDoc->SendMessage(WM_CLOSE);
+		pDocFrame->DestroyFrame();
 	}
 	while (!m_HexMergeDocs.empty())
 	{
-		CHexMergeFrame *pHexMergeDoc = m_HexMergeDocs.front();
-		if (!pHexMergeDoc->SaveModified())
+		CHexMergeFrame *pDocFrame = m_HexMergeDocs.front();
+		if (!pDocFrame->SaveModified())
 			return false;
-		pHexMergeDoc->SendMessage(WM_CLOSE);
+		pDocFrame->DestroyFrame();
+	}
+	while (!m_ImgMergeDocs.empty())
+	{
+		CImgMergeFrame *pDocFrame = m_ImgMergeDocs.front();
+		if (!pDocFrame->SaveModified())
+			return false;
+		pDocFrame->DestroyFrame();
+	}
+	while (!m_SQLiteMergeDocs.empty())
+	{
+		CSQLiteMergeFrame *pDocFrame = m_SQLiteMergeDocs.front();
+		if (!pDocFrame->SaveModified())
+			return false;
+		pDocFrame->DestroyFrame();
 	}
 	return true;
 }
 
 /**
  * @brief Obtain a merge doc to display a difference in files.
- * @param [out] pNew Set to TRUE if a new doc is created,
- * and FALSE if an existing one reused.
  * @return Pointer to CMergeDoc to use (new or existing).
  */
 CChildFrame *CDirFrame::GetMergeDocForDiff()
 {
-	CChildFrame *pMergeDoc = new CChildFrame(m_pMDIFrame, this);
-	AddMergeDoc(pMergeDoc);
-	return pMergeDoc;
+	CChildFrame *pDocFrame = new CChildFrame(m_pMDIFrame, this);
+	AddMergeDoc(pDocFrame);
+	return pDocFrame;
 }
 
 /**
  * @brief Obtain a hex merge doc to display a difference in files.
- * @param [out] pNew Set to TRUE if a new doc is created,
- * and FALSE if an existing one reused.
  * @return Pointer to CHexMergeDoc to use (new or existing).
  */
 CHexMergeFrame *CDirFrame::GetHexMergeDocForDiff()
 {
-	CHexMergeFrame *pHexMergeDoc = new CHexMergeFrame(m_pMDIFrame, this);
-	AddMergeDoc(pHexMergeDoc);
-	return pHexMergeDoc;
+	CHexMergeFrame *pDocFrame = new CHexMergeFrame(m_pMDIFrame, this);
+	AddMergeDoc(pDocFrame);
+	return pDocFrame;
 }
 
 /**
  * @brief Obtain an img merge doc to display a difference in files.
- * @param [out] pNew Set to TRUE if a new doc is created,
- * and FALSE if an existing one reused.
  * @return Pointer to CImgMergeDoc to use (new or existing).
  */
 CImgMergeFrame *CDirFrame::GetImgMergeDocForDiff()
 {
-	CImgMergeFrame *pImgMergeDoc = new CImgMergeFrame(m_pMDIFrame, this);
-	AddMergeDoc(pImgMergeDoc);
-	return pImgMergeDoc;
+	CImgMergeFrame *pDocFrame = new CImgMergeFrame(m_pMDIFrame, this);
+	AddMergeDoc(pDocFrame);
+	return pDocFrame;
+}
+
+/**
+ * @brief Obtain an SQLite merge doc to display a difference in files.
+ * @return Pointer to CSQLiteMergeDoc to use (new or existing).
+ */
+CSQLiteMergeFrame *CDirFrame::GetSQLiteMergeDocForDiff()
+{
+	CSQLiteMergeFrame *pDocFrame = new CSQLiteMergeFrame(m_pMDIFrame, this);
+	AddMergeDoc(pDocFrame);
+	return pDocFrame;
 }
 
 /**

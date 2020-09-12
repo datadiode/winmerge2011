@@ -79,6 +79,15 @@ struct KERNEL32V51
 
 extern DllProxy::Instance<struct KERNEL32V51> KERNEL32V51;
 
+// heksedit dll proxy
+struct hekseditU
+{
+	int(WINAPI*About)(HWND);
+	HMODULE H;
+};
+
+extern DllProxy::Instance<struct hekseditU> hekseditU;
+
 // Forward declarations
 interface IImgMergeWindow;
 interface IImgToolWindow;
@@ -95,5 +104,13 @@ struct WinIMergeLib
 };
 
 extern DllProxy::Instance<struct WinIMergeLib> WinIMergeLib;
+
+struct MSCOREE
+{
+	HRESULT(STDAPICALLTYPE*CLRCreateInstance)(REFCLSID, REFIID, LPVOID *);
+	HMODULE H;
+};
+
+extern DllProxy::Instance<struct MSCOREE> MSCOREE;
 
 #endif

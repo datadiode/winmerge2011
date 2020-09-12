@@ -44,6 +44,8 @@ enum FRAMETYPE
 	FRAME_FILE, /**< File compare frame. */
 	FRAME_BINARY, /**< Binary compare frame. */
 	FRAME_IMGFILE, /**< Image file compare frame. */
+	FRAME_SQLITEDB, /**< SQLite DB compare frame. */
+	FRAMETYPE_COUNT
 };
 
 /**
@@ -102,6 +104,7 @@ private:
 	LONG m_nActiveOperations; /**< Active operations count. */
 } theApp;
 
+#include "Constants.h"
 #include "Common/RegKey.h"
 #include "CompareStats.h"
 #include "DiffTextBuffer.h"
@@ -129,6 +132,7 @@ public:
 	} *const m_pHandleSet;
 	virtual void ActivateFrame();
 	void DestroyFrame();
+	void DestroyFrameAsync();
 	virtual void SavePosition()
 	{
 	}
@@ -183,6 +187,8 @@ protected:
 	}
 	void AlertFilesIdentical() const;
 public:
+	virtual void OpenDocs(FileLocation &filelocLeft, FileLocation &filelocRight, bool bROLeft, bool bRORight) = 0;
+	virtual bool SaveModified() = 0;
 	void DirDocClosing(CDirFrame *pDirDoc)
 	{
 		ASSERT(m_pDirDoc == pDirDoc);

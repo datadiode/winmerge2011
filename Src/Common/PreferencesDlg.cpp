@@ -121,6 +121,7 @@ BOOL CPreferencesDlg::OnInitDialog()
 		AddPage(&m_pageCompare, htiBranch);
 		AddPage(&m_pageCompareFolder, htiBranch);
 		AddPage(&m_pageCompareImage, htiBranch);
+		AddPage(&m_pageCompareSQLite, htiBranch);
 	}
 	if (HTREEITEM htiBranch = AddBranch(IDS_OPTIONSPG_EDITOR))
 	{
@@ -262,6 +263,7 @@ void CPreferencesDlg::ReadOptions()
 	ReadOptions(&m_pageCompare);
 	ReadOptions(&m_pageCompareFolder);
 	ReadOptions(&m_pageCompareImage);
+	ReadOptions(&m_pageCompareSQLite);
 	ReadOptions(&m_pageEditor);
 	ReadOptions(&m_pageLexers);
 	ReadOptions(&m_pageHexEditor);
@@ -283,6 +285,7 @@ void CPreferencesDlg::SaveOptions()
 	m_pageCompare.WriteOptions();
 	m_pageCompareFolder.WriteOptions();
 	m_pageCompareImage.WriteOptions();
+	m_pageCompareSQLite.WriteOptions();
 	m_pageEditor.WriteOptions();
 	m_pageLexers.WriteOptions();
 	m_pageHexEditor.WriteOptions();

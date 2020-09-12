@@ -30,6 +30,7 @@
 #include "LanguageSelect.h"
 #include "paths.h"
 #include "Environment.h"
+#include "Common/DllProxies.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -42,7 +43,7 @@ static HRESULT NTAPI SE(BOOL f)
 {
 	if (f)
 		return S_OK;
-	HRESULT hr = (HRESULT)::GetLastError();
+	HRESULT hr = HRESULT_FROM_WIN32(::GetLastError());
 	ASSERT(hr);
 	if (hr == 0)
 		hr = E_UNEXPECTED;
@@ -86,6 +87,7 @@ LRESULT CHexMergeView::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_SETFOCUS:
 		m_pDocument->m_wndFilePathBar.SetActive(m_nThisPane, true);
+        UpdateBookmarkMenu();
 		break;
 	case WM_KILLFOCUS:
 		m_pDocument->m_wndFilePathBar.SetActive(m_nThisPane, false);
@@ -159,7 +161,7 @@ LPCTSTR CHexMergeView::RegisterClass()
 	static void *pv = NULL;
 	if (pv == NULL)
 	{
-		pv = LoadLibrary(_T("Frhed\\hekseditU.dll"));
+		pv = hekseditU->H;
 		WNDCLASS wc;
 		if (!::GetClassInfo(NULL, _T("heksedit"), &wc))
 			OException::Throw(GetLastError());
@@ -393,6 +395,14 @@ void CHexMergeView::RepaintRange(int i, int j)
 	m_pif->repaint(i / iBytesPerLine, j / iBytesPerLine);
 }
 
+void CHexMergeView::UpdateBookmarkMenu()
+{
+    HMenu *const pMenu = m_pDocument->GetBookmarkMenu();
+    m_pif->make_bookmark_list(pMenu->m_hMenu, ID_EDIT_GO_BOOKMARK1);
+	m_pDocument->m_pMDIFrame->UpdateCmdUI<ID_EDIT_GOTO_NEXT_BOOKMARK>(
+        pMenu->GetMenuItemCount() > 3 ? MF_ENABLED : MF_GRAYED);
+}
+
 /**
  * @brief Find a sequence of bytes
  */
@@ -468,6 +478,32 @@ void CHexMergeView::OnEditUndo()
 void CHexMergeView::OnEditRedo()
 {
 	m_pif->CMD_edit_redo();
+}
+
+void CHexMergeView::OnEditGoto()
+{
+	m_pif->CMD_goto();
+}
+
+void CHexMergeView::OnAddBookmark()
+{
+	m_pif->CMD_add_bookmark();
+}
+
+void CHexMergeView::OnRemoveBookmark()
+{
+	m_pif->CMD_remove_bkm();
+}
+
+void CHexMergeView::OnClearAllBookmark()
+{
+	m_pif->CMD_clear_all_bmk();
+    UpdateBookmarkMenu();
+}
+
+void CHexMergeView::OnGotoBookmark(int i)
+{
+	m_pif->CMD_goto_bookmark(i);
 }
 
 /**

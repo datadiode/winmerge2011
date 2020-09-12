@@ -8,7 +8,6 @@
 #include "Environment.h"
 #include "Merge.h"
 #include "OptionsMgr.h"
-#include "Constants.h"
 
 /** @brief Temp folder name prefix for WinMerge temp folders. */
 static const TCHAR TempFolderPrefix[] = _T("WinMerge_TEMP_%u");

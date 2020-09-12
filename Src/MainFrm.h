@@ -21,7 +21,6 @@
  * @brief Declaration file for CMainFrame
  *
  */
-#include "Constants.h"
 #include "VSSHelper.h"
 #include "MergeCmdLineInfo.h"
 #include "../BuildTmp/Merge/midl/WinMerge_h.h"
@@ -32,6 +31,7 @@ class CDirFrame;
 class CDocFrame;
 class CHexMergeFrame;
 class CImgMergeFrame;
+class CSQLiteMergeFrame;
 class CMergeEditView;
 class CMergeDiffDetailView;
 class LineFiltersList;
@@ -100,22 +100,27 @@ public:
 		int nRecursive = 0,
 		const MergeCmdLineInfo *cmdInfo = NULL,
 		CDirFrame * = NULL);
-	CEditorFrame *ShowMergeDoc(CDirFrame *,
-		FileLocation & filelocLeft,
-		FileLocation & filelocRight,
+	void ShowMergeDoc(CDirFrame *,
+		FileLocation &filelocLeft,
+		FileLocation &filelocRight,
 		DWORD dwLeftFlags = 0,
 		DWORD dwRightFlags = 0,
 		PackingInfo * infoUnpacker = NULL,
 		LPCTSTR sCompareAs = NULL);
-	CHexMergeFrame *ShowHexMergeDoc(CDirFrame *,
-		const FileLocation &,
-		const FileLocation &,
-		BOOL bLeftRO, BOOL bRightRO,
+	void ShowHexMergeDoc(CDirFrame *,
+		FileLocation &,
+		FileLocation &,
+		bool bLeftRO, bool bRightRO,
 		LPCTSTR sCompareAs);
-	CImgMergeFrame *ShowImgMergeDoc(CDirFrame *,
-		const FileLocation &,
-		const FileLocation &,
-		BOOL bLeftRO, BOOL bRightRO,
+	void ShowImgMergeDoc(CDirFrame *,
+		FileLocation &,
+		FileLocation &,
+		bool bLeftRO, bool bRightRO,
+		LPCTSTR sCompareAs);
+	void ShowSQLiteMergeDoc(CDirFrame *,
+		FileLocation &,
+		FileLocation &,
+		bool bLeftRO, bool bRightRO,
 		LPCTSTR sCompareAs);
 	void UpdateResources();
 	static bool CreateBackup(bool bFolder, LPCTSTR pszPath);
@@ -140,13 +145,18 @@ public:
 	bool DoOpenConflict(LPCTSTR, const MergeCmdLineInfo * = NULL);
 	bool LoadAndOpenProjectFile(LPCTSTR);
 	HWindow *CreateChildHandle() const;
+	static HMenu *FindSubMenuById(HMenu *pMenu, UINT id);
 	CDocFrame *GetActiveDocFrame(BOOL *pfActive = NULL);
 	void SetActiveMenu(HMenu *);
-
 	HMenu *SetScriptMenu(HMenu *, LPCSTR section);
-
 	BYTE QueryCmdState(UINT id) const;
-
+	DWORD CLRExec(LPCWSTR path, LPCWSTR type, LPCWSTR method, LPCWSTR arg);
+	DWORD CLRExecSQLiteCompare(LPCWSTR type, LPCWSTR method, LPCWSTR arg);
+	IUIAutomation *UIAutomation();
+	HRESULT AddAutomationEventHandler(IUIAutomationElement *, IUIAutomationEventHandler *);
+	HRESULT RemoveAutomationEventHandler(IUIAutomationElement *, IUIAutomationEventHandler *);
+	static BYTE GetCommandState(IAccessible *);
+	static void DoDefaultAction(IAccessible *);
 	static void OpenFileToExternalEditor(LPCTSTR file, LPCTSTR editor = NULL, int line = 0, int column = 0);
 	void OpenFileWith(LPCTSTR file) const;
 	void OpenFolder(LPCTSTR file) const;
@@ -239,11 +249,10 @@ protected:
 	void OnOptionsShowSkipped();
 	void OnFileOpen();
 	void OnFileClose();
-	void OnHelpGnulicense();
 	void OnOptions();
 	void OnViewSelectfont();
 	void OnViewUsedefaultfont();
-	void OnHelpContents();
+	void OnHelpContents(LPCTSTR);
 	void OnViewWhitespace();
 	void OnToolsGeneratePatch();
 	void OnSaveConfigData();
@@ -251,7 +260,6 @@ protected:
 	void OnFileNew();
 	void OnDebugLoadConfig();
 	void OnViewStatusBar();
-	void OnViewToolbar();
 	void OnViewTabBar();
 	void OnResizePanes();
 	void OnFileStartCollect();
@@ -282,13 +290,15 @@ private:
 	CChildFrame *GetMergeDocToShow(CDirFrame *);
 	CHexMergeFrame *GetHexMergeDocToShow(CDirFrame *);
 	CImgMergeFrame *GetImgMergeDocToShow(CDirFrame *);
+	CSQLiteMergeFrame *GetSQLiteMergeDocToShow(CDirFrame *);
 	CDirFrame *GetDirDocToShow();
 	void UpdateDirViewFont();
 	void UpdateMrgViewFont();
-	void OpenFileOrUrl(LPCTSTR szFile, LPCTSTR szUrl);
 	BOOL CreateToobar();
 	void LoadToolbarImages();
 	CDocFrame *FindFrameOfType(FRAMETYPE);
+	void OpenDocs(CEditorFrame *, FileLocation &, FileLocation &, bool bROLeft, bool bRORight);
+	void RecycleMergeDoc(FRAMETYPE);
 	CEditorFrame *ActivateOpenDoc(CDirFrame *, FileLocation &, FileLocation &, LPCTSTR, UINT, FRAMETYPE);
 
 	void LoadFilesMRU();
@@ -312,6 +322,13 @@ private:
 		Strings() : CMyDispatch<IDispatch>(__uuidof(IStrings)) { }
 		STDMETHOD(Invoke)(DISPID, REFIID, LCID, WORD, DISPPARAMS *, VARIANT *, EXCEPINFO *, UINT *);
 	} m_Strings;
+
+	CMyComPtr<ICLRMetaHost> m_spMetaHost;
+	CMyComPtr<ICLRRuntimeInfo> m_spRuntimeInfo;
+	CMyComPtr<ICLRRuntimeHost> m_spRuntimeHost;
+
+	CMyComPtr<IUIAutomation> m_spAutomation;
+	HRESULT m_hrAutomation;
 
 	struct CmdState
 	{
@@ -346,6 +363,7 @@ private:
 		BYTE EolToUnix;
 		BYTE EolToMac;
 		BYTE GenerateReport;
+		BYTE ExportDataDiffs;
 		BYTE CollectMode;
 		BYTE ViewLineNumbers;
 		BYTE SelectionMargin;

@@ -1616,7 +1616,6 @@ CChildFrame::FileChange CChildFrame::IsFileChangedOnDisk(LPCTSTR szPath,
  * so instead of filename, description is shown.
  * @todo If we have filename and description for file, what should
  * we do after saving to different filename? Empty description?
- * @todo Parameter @p bAllowCancel is always true in callers - can be removed.
  */
 bool CChildFrame::SaveModified()
 {
@@ -1841,10 +1840,7 @@ void CChildFrame::OpenDocs(
 
 	// Bail out if either side failed
 	if (!FileLoadResult::IsOk(nLeftSuccess) || !FileLoadResult::IsOk(nRightSuccess))
-	{
-		DestroyFrame();
-		return;
-	}
+		OException::ThrowSilent();
 
 	// Warn user if file load was lossy (bad encoding)
 	// TODO: It would be nice to report how many lines were lossy
@@ -1944,17 +1940,16 @@ void CChildFrame::OpenDocs(
 	}
 
 	int nRescanResult = Rescan(bIdentical);
-
-	// Open filed if rescan succeed and files are not binaries
-	if (nRescanResult != RESCAN_OK)
+	// CChildFrame::Rescan fails if files do not exist on both sides
+	// or the really arcane case that the temp files couldn't be created,
+	// which is too obscure to bother reporting if you can't write to
+	// your temp directory, doing nothing is graceful enough for that).
+	switch (nRescanResult)
 	{
-		// CChildFrame::Rescan fails if files do not exist on both sides
-		// or the really arcane case that the temp files couldn't be created,
-		// which is too obscure to bother reporting if you can't write to
-		// your temp directory, doing nothing is graceful enough for that).
-		ShowRescanError(nRescanResult, bIdentical);
-		DestroyFrame();
-		return;
+	case RESCAN_FILE_ERR:
+		OException::Throw(LanguageSelect.LoadString(IDS_FILEERROR).c_str());
+	case RESCAN_TEMP_ERR:
+		OException::Throw(LanguageSelect.LoadString(IDS_TEMP_FILEERROR).c_str());
 	}
 
 	pLeft->DocumentsLoaded();

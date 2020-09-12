@@ -1014,7 +1014,7 @@ HImageList *CLanguageSelect::LoadImageList(UINT id, int cx, int cGrow) const
 
 void CLanguageSelect::UpdateResources()
 {
-	HMenu *rgpGarbageMenu[] = { theApp.m_pMainWnd->m_pMenuDefault, NULL, NULL, NULL };
+	HMenu *rgpGarbageMenu[FRAMETYPE_COUNT] = { theApp.m_pMainWnd->m_pMenuDefault };
 
 	theApp.m_pMainWnd->m_pMenuDefault = LoadMenu(IDR_MAINFRAME);
 	HWindow *const pWndMDIClient = theApp.m_pMainWnd->m_pWndMDIClient;
@@ -1244,6 +1244,7 @@ void CLanguageSelect::LoadAndDisplayLanguages()
 		if (lfi.id == m_wCurLanguage)
 			m_ctlLangList->SetCurSel(i);
 	} while ((h = FindFile(h, pattern.c_str(), &ff)) != INVALID_HANDLE_VALUE);
+	m_ctlLangList->SetCurSel(m_ctlLangList->GetCurSel()); // avoids arrow key anomaly
 }
 
 /**
