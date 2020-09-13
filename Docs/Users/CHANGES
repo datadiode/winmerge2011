@@ -1,3 +1,39 @@
+0.2011.210.381
+Changes since preceding release (not necessarily complete):
+• Integrate SQLite Compare into WinMerge GUI
+• Add Bookmarks menu to binary comparison view
+• Backport and use scoped_ptr, scoped_array, rotate() from recent EASTL
+• OWindow::Subclass(): Throw an exception when HWND is NULL
+• EditorConfig: editorconfig_parse() with insane filename produced a memory leak
+• FileFilter::Load(): Fix surprising behavior when FileFilter.tmpl was missing
+• HexMergeFrm.cpp: Respond to "Copy and Advance" commands
+• Support table layout for delimiter-separated files (similar to 2.16)
+• LibXDiff: Drop XDF_IGNORE_CR_AT_EOL logic due to issues / Fix XDF_IGNORE_CASE
+• Optionally show rulers at top of text editor panes (ported from 2.16)
+• Make EditLib Lexer file type associations configurable in Options dialog
+• Adopt binary compare option for folder compare from winmerge-v2
+• Move splash screen artwork to AboutBox / Replace list of devs with ASCII art
+• Adopt image comparison view from winmerge-v2
+• ByteCompare: Unfold a loop and increase buffers to save some time
+• Port from winmerge-v2: Issue #367 Deadlock comparing encrypted 7z files
+• Setup: Upgrade to xdoc2txt 2.20
+• Add "Swap Panes" menu item to Folder Compare window (adopted from winmerge-v2)
+• GhostTextBuffer: Don't unexpectedly restore empty lines user wants to delete
+• EditLib: Fix https://github.com/WinMerge/winmerge/issues/202
+• EditLib: Tweak word-wise caret movmt across lines (adopted from winmerge-v2)
+• Add an option to DirCompProgressDlg to send an email when ready (#101)
+• Single-threaded folder compare missed to theApp.PreTranslateMessage()
+• ConfigLog.cpp: Add _MSC_FULL_VER and _MSC_BUILD to build config info
+• File transform scriptlet to decode Protobuf messages with protodec.exe
+• EditLib: Fix auto-indent when EOL-style is not CRLF (adopted from winmerge-v2)
+• ViewableWhitespace.h: Use less brassy graphic symbols to indicate line endings
+• EditLib: Have line selection mode stay until drag end / Detect triple-click
+• DiffWrapper.cpp: Fix an apparent bug in CDiffWrapper::FixLastDiffRange()
+• ByteCompare: Ignoring both whitespace & blank lines did not work consistently
+• Offer a choice between Diffutils and LibXDiff (based on Takashi's work)
+• json_writer.cpp: valueToQuotedString() was messing up some control characters
+• Misdetection of odd-length files as UCS-2 was leading to folder compare errors
+
 2011.009.217
 Changes since preceding release (not necessarily complete):
 • Upgrade to 7-Zip 19.00

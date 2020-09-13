@@ -9,7 +9,7 @@ body
 	font-family: verdana, sans-serif;
 	font-size: 10pt;
 }
-li
+. features li
 {
 	margin-bottom: 1em;
 }
@@ -40,118 +40,39 @@ function OnReadyStateChangeExternalDoc()
 </script>
 </head>
 <body>
-<h2>WinMerge 2011.009.217 Release Notes</h2>
-This is a maintenance release which fixes bugs and updates 3rd party components, but is otherwise identical to WinMerge 2011.008.532.
-<p>WinMerge 2011.008.532 includes the following functional changes and enhancements as compared to the previous stable release:
-<ul>
-<li><p>File filters can specify <code>case-sensitive: yes</code> to declare case sensitivity for filenames.
-<li><p>The possibility to assign equivalence class identifiers to early-applied line filters makes the feature more straightforward to use for
-	creating sets of synonyms. For example, you can declare line filters like <code>*/(stupid|dumb)/g=1</code> and <code>*/(clever|smart)/g=2</code>,
-	without explicitly specifying a replacement string that ensures that the filter doesn't accidentally catch deletions, while also being unique enough
-	to avoid otherwise false positives, while also adhering to the technical requirement to not exceed the length of the shortest possible match.
-	Equivalence class identifiers can range between 0 and 10, with 0 being the default if no value is specified.
-	Another use case of equivalence class identifiers is <code>equiv-f:</code> rules in file filters. For example, a file filter could specify the rules
-	<code>equiv-f: /\.(cpp|cxx)$/i=1</code> and <code>equiv-f: /\.(hpp|hxx)$/i=2</code>.
-<li><p>Similar syntax as used with equivalence class identifiers enables early-applied line filters to unescape escaped unicode codepoints on the fly.
-	Such filters use a scanf-style format specifier to extract the (hexa)decimal ordinal value from an escape sequence representing a codepoint.
-	<br>A line filter which address the use case described
-	<a target='_blank' href='http://forums.winmerge.org/viewtopic.php?f=4&t=1154'>here</a> would read <code>*/(#\d+)/g=%d</code>.
-	<br>The JavaScript equivalent would read <code>*/(\\u[[:xdigit:]]{4})/g=%4x</code>.
-<li><p>The method to use for a folder comparison can be specified on the command line, as per
-	<a target='_blank' href='https://bitbucket.org/jtuc/winmerge2011/issues/163'>Issue #163</a>.
-	<br>The possible options are /m Full, /m Quick, /m Date, /m SizeDate, and /m Size.
-<li><p>The <i>Compare &rarr; General</i> page of the <i>Options</i> dialog provides additional options to deal with whitespace differences.
-<li><p>The <i>Editor &rarr; Text</i> page of the <i>Options</i> dialog provides options to honor <i>.editorconfig</i> files and Emacs/Kate/Vim modelines.
-<li><p>The registry key which holds the per-user settings has been renamed from <i>WinMerge</i> to <i>WinMurge</i>,
-	so as to prevent conflicts with Takashi's work on the
-	<a target='_blank' href='https://bitbucket.org/winmerge/winmerge'>new mainline version</a> of WinMerge.
-<li><p>Syntax highlighting logic for HTML and related server-side file formats employs subordinate parsers
-	to yield proper coloring of HTML <code>style</code> and <code>script</code> elements,
-	as well as server-side code blocks coded in different languages.
-	Due to its uniqueness, Razor C# syntax support involves a dedicated parser.
-	Razor VB syntax remains unsupported for now.
-<li><p>New syntax highlighting parsers exist for Go, Rust, VHDL, and Lua,
-	the former three originating from <a target='_blank' href='https://bitbucket.org/sdottaka/winmerge-v2'>Takashi's fork</a>.
-<li><p>On its <i>Colors &rarr; Differences</i> page, the <i>Options</i> dialog allows you to assign an alternate color scheme
-	which yields a Bitbucket/GitHub like look. This new color scheme, which was adopted from
-	<a target='_blank' href='https://bitbucket.org/sdottaka/winmerge-v2'>Takashi's fork</a>,
-	uses brighter background colors than the default ones, allowing it to retain syntax highlighting without losing too much contrast.
-<li><p>File transform scriptlet <i>jq.wsc</i> can be used to canonicalize whitespace
-	in JSON files, and optionally sort their contents by key.
-<li><p>File transform scriptlets can provide custom logic for writing back
-	edited files. They do so by implementing method <code>CreateTextFile</code>,
-	which returns an interface that implements method <code>Write</code>.
-	<br>As an example of such scriptlet, <i>gedcom.wsc</i> transforms GEDCOM
-	files in a way that enables WinMerge to produce more meaningful results, by
-	adding complete nesting context to every line of involved files.
-	<br>When saving back edited files, <i>gedcom.wsc</i> removes the added
-	context, thereby restoring syntactic integrity.
-	<br>Another interesting aspect of <i>gedcom.wsc</i> is how it reads ANSEL or
-	UTF-8 input, and writes UTF-8 output, using the Scripting.FileSystemObject,
-	despite its TextStream interface not exactly being designed to support
-	anything but ANSI or UTF-16 encoding.
-<li><p>File transform scriptlet <i>astyle.wsc</i> can be used to run several types of source code files
-	through <a target='_blank' href='http://astyle.sourceforge.net/'>Artistic Style</a>.
-	<br>It takes effect when you choose to <i>Compare As &rarr; Astyle Formatted Source Code</i>.
-	<br>The <i>FileTransforms</i> folder also contains an associated options file <i>astyle.opt</i>,
-	which you may want to edit to tweak various aspects of source code formatting to your needs.
-<li><p>It has become easier to get the prerequisites for file transform scriptlet
-	<i>xdoc2txt.wsc</i> in place, by simply checking the respective option offered during setup.
-	<br>This involves downloading the xdoc2txt distribution package from
-	<a target='_blank' href='http://ebstudio.info'>http://ebstudio.info</a>,
-	because that software is not as free for redistribution as it is for use.
-<li><p>The binary editor finally supports undo/redo &mdash; some two years and a half after
-	<a target='_blank' href='https://bitbucket.org/sdottaka/winmerge-v2'>Takashi's fork</a> came up with this feature.
-<li><p>Find &amp; Replace with regular expressions allows replacement strings to
-	contain submatch references \0 through \9 (where \0 refers to the complete
-	match), as well as C-style control character escapes.
-	<br>As a side effect, this enhancement solves
-	<a target='_blank' href='https://bitbucket.org/jtuc/winmerge2011/issues/70'>Issue #70</a>.
-<li><p>Option <i>/config</i> points WinMerge to a JSON configuration file which
-	it will use instead of the system registry to maintain most of its settings.
-	<br>Settings for the WinMerge shell extension are an exception in that they
-	are always kept in the system registry.
-	<br><i>/config</i> replaces the defective <i>/reghive</i> option, which
-	turned out to be inherently unfixable.
-	<br>If a <i>WinMergeU.json</i> exists in the folder from where
-	<i>WinMergeU.exe</i> is started, then WinMerge will use it by default.
-	This is a preferable way to install WinMerge on portable media.
-	<br>There is no <i>WinMergeU.json</i> included in the distro because it can
-	be trivially created as an empty text file.
-<li><p>When creating a .WinMerge project file, you can instruct WinMerge to
-	maintain most settings in a project specific JSON configuration file so you
-	can tweak them to specific needs without affecting the global settings. 
-	The configuration file is created in the same folder as the project file.
-	The name of the configuration file is formed by appending extension
-	<i>.json</i> to the name of the project file.
-<li><p>Menu command <i>File &rarr; Use desktop specific settings</i> allows you
-	to maintain settings in a desktop specific location.
-	<br>The core motivation for this option was to ease working with TFS and
-	ClearCase at the same time, by doing ClearCase stuff on a separate desktop.
-	<br>The feature is designed to work with
-	<a target='_blank' href='https://technet.microsoft.com/en-us/sysinternals/cc817881'>Sysinternals Desktops v2.0</a>.
-	<br>It may or may not work with other tools which create (the illusion of) additional desktops.
-	<br>In particular, it does not work with the <i>Virtual Desktops</i> feature built into Windows&nbsp;10.
-<li><p>Context menu commands <i>Open &rarr; Containing Folder</i> are
-	provided where applicable, essentially following the suggestion from
-	<a target='_blank' href='https://bitbucket.org/jtuc/winmerge2011/issues/54'>Issue #54</a>.
-<li><p>When prompted to confirm a <i>Copy/Move &rarr; Left/Right to...</i>
-	operation, you have the option to <i>Ignore folder structure</i>.
-<li><p>The <i>Open</i> dialog allows you to specify filter masks with spaces
-	by enclosing them in quotation marks, as per 
-	<a target='_blank' href='http://forums.winmerge.org/viewtopic.php?f=4&t=1142'>this suggestion</a>.
-<li><p>The filetype icons shown in the <i>Open</i> dialog's input fields are drag &amp; drop sensitive,
-	and in the event of it will exchange field contents with one another.
-<li><p>Disabling the new system option <i>Use Shell file operations</i> allows the
-	Folder Compare window to perform file operations on files with long paths.
-	<br>Note, however, that this option comes at the price of losing the option to
-	<i>Send deleted files to Recycle Bin</i>.
+<h2>WinMerge 0.2011.210.381 Release Notes</h2>
+This is an experimental release of WinMerge 2011.<br>
+It includes the following enhancements as compared to the previous stable release:
+<ul class='features'>
+<li><p><a href='https://github.com/winmerge/winimerge'>WinIMergeLib</a> is used for image comparison.
+	<br>This feature was adopted from WinMerge 2.16.
+<li><p>SQLite 3 database files are presented in a <a target='_blank' href='https://github.com/datadiode/SQLiteCompare'>modified version</a> of <a target='_blank' href='https://www.codeproject.com/Articles/220018/SQLite-Compare-Utility'>SQLite Compare</a>
+	which allows its embedding into the WinMerge GUI.
+	<br>This modified version also fixes quite a number of bugs found in the original product, and continues to work independently from WinMerge.
+<li><p>As an alternative to GNU diff, you can choose among algorithms provided by LibXDiff.
+	<br>In particular, you may find LibXDiff's <i>indent heuristics</i> option useful.
+	<br>This feature was adopted from WinMerge 2.16.
+<li><p>File transform scriptlet <i>protodec.wsc</i> can be used to decode Protobuf messages.
+<li><p>The binary comparison view includes a Bookmarks menu.
+<li><p>File type associations for syntax coloring are configurable in Options dialog.
+<li><p>Following a suggestion made <a target='_blank' href='https://bitbucket.org/jtuc/winmerge2011/issues/101'>here</a>,
+	the folder compare progress dialog offers an option to send an email when ready.
+<li><p>The text comparison view can be switched to <i>Table Layout</i> to achieve column-wise alignment of CSV-like files.
+	<br>The detailed procedure is to select one instance of the character which the file at hand uses as its field separator, and then type Ctrl+T, or invoke the command through toolbar or menu.
+	<br>If the file also reserves a character for enquoting values to allow them to include instances of the field separator character, you can tell WinMerge so by
+	selecting two adjacent characters, the first one representing a field separator, and the second one representing a field enquoting character.
+	<br>Hint: If the field separator follows the field enquoting character, you'd perform the selection from right to left.
+	<br>Note that WinMerge 2.16's <i>Table Compare</i> feature is superior in that it allows you to adjust cell widths, and can wrap texts inside cells accordingly.
+	<br>I found this feature to be quite a nightmare to implement in a way that does not mess up editing, so resorted to a simplified, tab-stop like approach.
 </ul>
-<p>
-Click <a href='https://bitbucket.org/jtuc/winmerge2011/get/2011.009.217.zip'>here</a> to obtain the source code for this release.
-<p>
-Click <a href='https://bitbucket.org/jtuc/frhed/get/0.10906.2019.zip'>here</a> to obtain source code for Frhed binaries included in this release.
-<p>
-<i>Jochen Neubeck, December 2018</i>
+<h5>Source code links for GPL-licensed binaries included in this release:</h5>
+<ul>
+<li><a href='https://github.com/datadiode/winmerge2011/releases/tag/0.2011.210.381'>Source code of WinMerge 2011</a>
+<li><a href='https://github.com/datadiode/frhed/releases/tag/0.10907.2020'>Source code of Frhed</a>
+<li><a href='https://github.com/WinMerge/winimerge/releases/tag/1.0.20.0'>Source code of WinIMerge</a>
+<li><a href='https://github.com/datadiode/SQLiteCompare/releases/tag/v3.0.32'>Source code of SQLite Compare</a>
+<li><a href='https://github.com/schdub/protodec/releases/tag/v0.6.3-win'>Source code of protodec</a>
+</ul>
+<i>Jochen Neubeck, September 2020</i>
 <xml src='WinMerge.chm' onreadystatechange='OnReadyStateChangeExternalDoc()'></xml>
 </body>

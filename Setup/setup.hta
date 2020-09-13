@@ -3,7 +3,7 @@
 <meta http-equiv='MSThemeCompatible' CONTENT='yes'>
 <hta:application
 	id='app'
-	version='XXXXX.2011.210.326'
+	version='XXXXX.2011.210.381'
 	applicationName='WinMerge &amp;version; Setup'
 	scroll='no'
 	singleInstance='yes'
@@ -507,7 +507,7 @@ Sub Job_Version
 	Dim parts, content, path, platform
 	parts = Split(app.version, ".")
 	parts(3) = Right("0" & DatePart("ww", Now), 2) & DatePart("w", Now)
-	parts(2) = Left(parts(1), 1) & Right("00" & (DatePart("yyyy", Now) - parts(1) + 1), 2)
+	parts(2) = Left(parts(2), 1) & Right("00" & (DatePart("yyyy", Now) - parts(1) + 1), 2)
 	content = version_h.text
 	content = Replace(content, "&kind;", parts(0))
 	content = Replace(content, "&major;", parts(1))
