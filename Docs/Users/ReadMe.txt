@@ -34,8 +34,8 @@ for WinMerge development issues.
 
 Bugs and feature requests
 =========================
-If an issue with WinMerge 2011 is not resolved in the the WinMerge forums, check
-the issue tracker at https://bitbucket.org/jtuc/winmerge2011/issues.
+If an issue with WinMerge 2011 is not resolved in the WinMerge forums, check the
+issue tracker at https://github.com/datadiode/winmerge2011/issues.
 
 If you submit a bug, please include the WinMerge version number in your
 report. You can generate a configuration log by clicking Help>Configuration.
