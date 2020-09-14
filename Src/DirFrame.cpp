@@ -768,16 +768,6 @@ BOOL CDirFrame::PreTranslateMessage(MSG *pMsg)
 		{
 			return TRUE;
 		}
-		switch (pMsg->wParam)
-		{
-		case VK_ESCAPE:
-			if (m_pDirView->GetEditControl())
-			{
-				DispatchMessage(pMsg);
-				return TRUE;
-			}
-			break;
-		}
 	}
 	return FALSE;
 }

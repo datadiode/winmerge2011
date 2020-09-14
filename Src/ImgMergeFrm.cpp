@@ -599,8 +599,6 @@ void CImgMergeFrame::UpdateResources()
  */
 BOOL CImgMergeFrame::PreTranslateMessage(MSG* pMsg)
 {
-	if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_ESCAPE)
-		return FALSE; // Shortcut IsDialogMessage() to retain OPT_CLOSE_WITH_ESC functionality
 	return ::IsDialogMessage(m_hWnd, pMsg);
 }
 

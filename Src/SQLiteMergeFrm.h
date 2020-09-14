@@ -17,7 +17,7 @@
 class CSQLiteMergeFrame
 	: ZeroInit<CSQLiteMergeFrame>
 	, public CEditorFrame
-    , public IUIAutomationEventHandler
+	, public IUIAutomationEventHandler
 {
 public:
 	CSQLiteMergeFrame(CMainFrame *, CDirFrame * = NULL);
@@ -61,15 +61,15 @@ private:
 	template<UINT>
 	LRESULT OnWndMsg(WPARAM, LPARAM);
 
-    CMyComPtr<IUIAutomationElement> m_spToolStrip;
-    CMyComPtr<IAccessible> m_spGenerateChangeScriptLeftToRight;
-    CMyComPtr<IAccessible> m_spGenerateChangeScriptRightToLeft;
-    CMyComPtr<IAccessible> m_spAccExit;
-    CMyComPtr<IAccessible> m_spAccRefresh;
-    CMyComPtr<IAccessible> m_spAccPrevDiff;
-    CMyComPtr<IAccessible> m_spAccNextDiff;
-    CMyComPtr<IAccessible> m_spAccCopyLeftToRight;
-    CMyComPtr<IAccessible> m_spAccCopyRightToLeft;
-    CMyComPtr<IAccessible> m_spAccEditSelectedItem;
-    CMyComPtr<IAccessible> m_spAccExportDataDiffs;
+	CMyComPtr<IUIAutomationElement> m_spToolStrip;
+	CMyComPtr<IAccessible> m_spGenerateChangeScriptLeftToRight;
+	CMyComPtr<IAccessible> m_spGenerateChangeScriptRightToLeft;
+	CMyComPtr<IAccessible> m_spAccExit;
+	CMyComPtr<IAccessible> m_spAccRefresh;
+	CMyComPtr<IAccessible> m_spAccPrevDiff;
+	CMyComPtr<IAccessible> m_spAccNextDiff;
+	CMyComPtr<IAccessible> m_spAccCopyLeftToRight;
+	CMyComPtr<IAccessible> m_spAccCopyRightToLeft;
+	CMyComPtr<IAccessible> m_spAccEditSelectedItem;
+	CMyComPtr<IAccessible> m_spAccExportDataDiffs;
 };

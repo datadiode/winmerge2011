@@ -3260,16 +3260,14 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 			return TRUE;
 		}
 		CDocFrame *const pDocFrame = GetActiveDocFrame();
-		if (pDocFrame && pDocFrame->PreTranslateMessage(pMsg))
-		{
-			return TRUE;
-		}
 		// Check if we got 'ESC pressed' -message
 		if (pMsg->message == WM_KEYDOWN)
 		{
 			switch (pMsg->wParam)
 			{
 			case VK_ESCAPE:
+				if (::SendMessage(pMsg->hwnd, WM_GETDLGCODE, 0, reinterpret_cast<LPARAM>(pMsg)) & DLGC_WANTMESSAGE)
+					break;
 				if (m_invocationMode != MergeCmdLineInfo::InvocationModeNone)
 				{
 					if (pDocFrame && CloseDocFrame(pDocFrame))
@@ -3292,6 +3290,10 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 				UpdateIndicators();
 				break;
 			}
+		}
+		if (pDocFrame && pDocFrame->PreTranslateMessage(pMsg))
+		{
+			return TRUE;
 		}
 	}
 	return FALSE;
