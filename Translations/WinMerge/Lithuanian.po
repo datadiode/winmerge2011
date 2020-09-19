@@ -10,9 +10,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WinMerge\n"
-"Report-Msgid-Bugs-To: http://bugs.winmerge.org/\n"
-"POT-Creation-Date: 2019-12-30 10:51+0000\n"
-"PO-Revision-Date: 2019-12-31 08:18+0200\n"
+"Report-Msgid-Bugs-To: https://bugs.winmerge.org/\n"
+"POT-Creation-Date: 2020-09-12 15:41+0000\n"
+"PO-Revision-Date: 2020-09-16 16:16+0300\n"
 "Last-Translator: Tichij <tichij@mail.com>\n"
 "Language-Team: Lithuanian <winmerge-translate@lists.sourceforge.net>\n"
 "Language: lt\n"
@@ -23,7 +23,7 @@ msgstr ""
 "X-Poedit-Language: Lithuanian\n"
 "X-Poedit-SourceCharset: CP1252\n"
 "X-Poedit-Basepath: ../../Src/\n"
-"X-Generator: Poedit 2.2.4\n"
+"X-Generator: Poedit 2.4.1\n"
 
 #. LANGUAGE, SUBLANGUAGE
 #, c-format
@@ -252,7 +252,7 @@ msgstr "Naud&oti numatytàjá ðriftà"
 #: Merge.rc:59
 #, c-format
 msgid "Sw&ap Panes\tCtrl+U"
-msgstr ""
+msgstr "Sukeisti pol&angius\tCtrl+U"
 
 #: Merge.rc:61
 #: Merge.rc:202
@@ -612,7 +612,7 @@ msgstr "&Þinynas"
 #: Merge.rc:738
 #, c-format
 msgid "&WinMerge Help\tF1"
-msgstr "&„WinMerge“ þinynas\tF1"
+msgstr "„&WinMerge“ þinynas\tF1"
 
 #: Merge.rc:133
 #: Merge.rc:260
@@ -622,7 +622,7 @@ msgstr "&„WinMerge“ þinynas\tF1"
 #: Merge.rc:739
 #, c-format
 msgid "&Frhed Help"
-msgstr ""
+msgstr "„&Frhed“ þinynas"
 
 #: Merge.rc:135
 #: Merge.rc:262
@@ -672,7 +672,7 @@ msgstr "&Apie „WinMerge“..."
 #: Merge.rc:746
 #, c-format
 msgid "A&bout Frhed..."
-msgstr ""
+msgstr "A&pie „Frhed“..."
 
 #: Merge.rc:141
 #: Merge.rc:268
@@ -682,7 +682,7 @@ msgstr ""
 #: Merge.rc:747
 #, c-format
 msgid "Abo&ut SQLite Compare..."
-msgstr ""
+msgstr "Ap&ie SQLite Compare..."
 
 #: Merge.rc:161
 #: Merge.rc:288
@@ -832,12 +832,12 @@ msgstr "&Þymës"
 #: Merge.rc:231
 #, c-format
 msgid "&Add Bookmark...\tF2"
-msgstr ""
+msgstr "&Uþdëti þymà...\tF2"
 
 #: Merge.rc:232
 #, c-format
 msgid "&Remove Bookmark...\tShift+F2"
-msgstr ""
+msgstr "P&aðalinti þymà...\tShift+F2"
 
 #: Merge.rc:233
 #: Merge.rc:628
@@ -866,17 +866,17 @@ msgstr "Kopijuo&ti á kairæ ir Daugiau\tAlt+Ctrl+Left"
 #: Merge.rc:447
 #, c-format
 msgid "&Export data differences..."
-msgstr ""
+msgstr "&Eksportuoti duomenø skirtumus..."
 
 #: Merge.rc:448
 #, c-format
 msgid "Generate change script (left -> &right)..."
-msgstr ""
+msgstr "Kurti pakeitimø skriptà (kairë -> &deðinë)..."
 
 #: Merge.rc:449
 #, c-format
 msgid "Generate change script (right -> &left)..."
-msgstr ""
+msgstr "Kurti pakeitimø skriptà (deðinë -> &kairë)..."
 
 #: Merge.rc:498
 #, c-format
@@ -936,7 +936,7 @@ msgstr "&Kopijuoti su eiluèiø numeriais\tCtrl+Shift+C"
 #: Merge.rc:625
 #, c-format
 msgid "&Toggle Bookmark\tCtrl+F2"
-msgstr "&Uþdëti þymæ\tCtrl+F2"
+msgstr "Perjung&ti þymæ\tCtrl+F2"
 
 #: Merge.rc:626
 #, c-format
@@ -1046,17 +1046,17 @@ msgstr "Rodyti &paraðtes"
 #: Merge.rc:670
 #, c-format
 msgid "View &Rulers"
-msgstr ""
+msgstr "&Rodyti liniuotes"
 
 #: Merge.rc:671
 #, c-format
 msgid "Table Layout\tCtrl+T"
-msgstr ""
+msgstr "Iðdëstyti lentele\tCtrl+T"
 
 #: Merge.rc:672
 #, c-format
 msgid "Wr&ap Lines"
-msgstr "S&kaidyti eilutes"
+msgstr "Sk&aidyti eilutes"
 
 #: Merge.rc:673
 #, c-format
@@ -1160,7 +1160,7 @@ msgstr "Turinys (greitai)"
 #: Merge.rc:1988
 #, c-format
 msgid "Binary Contents"
-msgstr ""
+msgstr "Binarinis turinys"
 
 #: Merge.rc:772
 #: Merge.rc:1989
@@ -1209,12 +1209,12 @@ msgstr "&Binarinis"
 #: Merge.rc:791
 #, c-format
 msgid "&Image"
-msgstr ""
+msgstr "&Paveikslëlis"
 
 #: Merge.rc:792
 #, c-format
 msgid "&SQLite"
-msgstr ""
+msgstr "&SQLite"
 
 #: Merge.rc:793
 #, c-format
@@ -1470,7 +1470,7 @@ msgstr "Áter&pti"
 #: Merge.rc:924
 #, c-format
 msgid "Table Layout"
-msgstr ""
+msgstr "Iðdëstymas lentele"
 
 #: Merge.rc:926
 #, c-format
@@ -2260,7 +2260,7 @@ msgstr "xsulieti"
 #: Merge.rc:1417
 #, c-format
 msgid "Lexers"
-msgstr ""
+msgstr "Lekseriø"
 
 #: Merge.rc:1428
 #, c-format
@@ -2660,7 +2660,7 @@ msgstr "&Greitojo palyginimo limitas (MB):"
 #: Merge.rc:1629
 #, c-format
 msgid "&Binary compare limit (MB):"
-msgstr ""
+msgstr "&Binariniø palyginimo limitas (MB):"
 
 #: Merge.rc:1631
 #, c-format
@@ -2670,47 +2670,47 @@ msgstr "Lygi&nimo srautø skaièius (neigiama reikðmë reiðkia turimø procesoriaus 
 #: Merge.rc:1640
 #, c-format
 msgid "Image"
-msgstr ""
+msgstr "Paveikslëliø"
 
 #: Merge.rc:1643
 #, c-format
 msgid "Image File &Patterns:"
-msgstr ""
+msgstr "&Paveikslëliø failø ðablonai:"
 
 #: Merge.rc:1652
 #, c-format
 msgid "SQLite"
-msgstr ""
+msgstr "SQLite"
 
 #: Merge.rc:1655
 #, c-format
 msgid "Detect from file sig&nature"
-msgstr ""
+msgstr "&Nustatyti ið failo paraðo"
 
 #: Merge.rc:1656
 #, c-format
 msgid "Detect from filename &pattern"
-msgstr ""
+msgstr "Nustatyti ið failo &vardo ðablono"
 
 #: Merge.rc:1658
 #, c-format
 msgid "Pro&mpt for options"
-msgstr ""
+msgstr "Klau&sti nuostatø"
 
 #: Merge.rc:1659
 #, c-format
 msgid "Compare &schema only"
-msgstr ""
+msgstr "Lyginti tik &schemà"
 
 #: Merge.rc:1660
 #, c-format
 msgid "Compare schema and &data"
-msgstr ""
+msgstr "Lyginti schemà ir &duomenis"
 
 #: Merge.rc:1661
 #, c-format
 msgid "Compare &BLOB fields"
-msgstr ""
+msgstr "Lyginti &BLOB laukus"
 
 #: Merge.rc:1672
 #, c-format
@@ -3690,12 +3690,12 @@ msgstr "XLS failai (*.xls)|*.xls|All Files (*.*)|*.*||"
 #: Merge.rc:1992
 #, c-format
 msgid "Lexer"
-msgstr ""
+msgstr "Lekseris"
 
 #: Merge.rc:1993
 #, c-format
 msgid "File types"
-msgstr ""
+msgstr "Failø tipai"
 
 #: Merge.rc:1994
 #, c-format
@@ -5477,7 +5477,7 @@ msgstr ""
 #: Merge.rc:2303
 #, c-format
 msgid "Toggle table layout (Enabling requires the selection to span an occurrence of the delimiter, and optionally an adjacent occurrence of a quotation mark)"
-msgstr ""
+msgstr "Perjungti á rodymà lentele (ájungimui reikia, kad paþymëta sritis apimtø skyriklio pasikartojimà, ir pasirinktinai gretimà kabuèiø pasikartojimà)"
 
 #: Merge.rc:2304
 #, c-format
@@ -5655,7 +5655,7 @@ msgstr ""
 #: Merge.rc:2329
 #, c-format
 msgid "Shows horizontal rulers for both panes\nShow Horizontal Rulers"
-msgstr ""
+msgstr "Rodo horizontalias liniuotes abiejuose polangiuose\nRodyti horizontalias liniuotes"
 
 #: Merge.rc:2330
 #, c-format
