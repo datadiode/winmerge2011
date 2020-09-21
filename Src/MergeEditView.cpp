@@ -605,6 +605,11 @@ void CMergeEditView::ShowDiff(bool bScroll)
 				rgpView[0]->ScrollToSubLine(nLine, false),
 				rgpView[1]->ScrollToSubLine(nLine, false),
 			};
+			RECT rcScroll[2];
+			rgpView[0]->GetClientRect(&rcScroll[0]);
+			rcScroll[0].top += rgpView[0]->GetTopMarginHeight();
+			rgpView[1]->GetClientRect(&rcScroll[1]);
+			rcScroll[1].top += rgpView[1]->GetTopMarginHeight();
 			if ((COptionsMgr::Get(OPT_PHONY_EFFECTS) & PHONY_EFFECTS_ENABLE_SCROLL_ANIMATION) &&
 				nrgScroll[0] == nrgScroll[1])
 			{
@@ -621,7 +626,7 @@ void CMergeEditView::ShowDiff(bool bScroll)
 					do
 					{
 						RECT rcUpdate;
-						if (rgpView[nSide]->ScrollWindowEx(0, nDelta, NULL, NULL, NULL, &rcUpdate))
+						if (rgpView[nSide]->ScrollWindowEx(0, nDelta, &rcScroll[nSide], &rcScroll[nSide], NULL, &rcUpdate))
 						{
 							if (HSurface *const pDC = rgpView[nSide]->GetDC())
 							{
@@ -643,8 +648,8 @@ void CMergeEditView::ShowDiff(bool bScroll)
 				}
 				nrgScroll[0] = nrgScroll[1];
 			}
-			rgpView[0]->ScrollWindow(0, nrgScroll[0]);
-			rgpView[1]->ScrollWindow(0, nrgScroll[1]);
+			rgpView[0]->ScrollWindow(0, nrgScroll[0], &rcScroll[0], &rcScroll[0]);
+			rgpView[1]->ScrollWindow(0, nrgScroll[1], &rcScroll[1], &rcScroll[1]);
 		}
 
 		rgpView[0]->SetCursorPos(ptStart);
