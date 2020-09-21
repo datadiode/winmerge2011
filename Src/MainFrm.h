@@ -267,9 +267,7 @@ protected:
 	void OnWindowCloseAll();
 	void OnSaveProject();
 	void OnDebugResetOptions();
-	void OnToolbarNone();
-	void OnToolbarSmall();
-	void OnToolbarBig();
+	void OnToolbarSize(int);
 	void OnToolTipText(TOOLTIPTEXT *);
 	void OnDiffOptionsDropDown(NMTOOLBAR *);
 	void OnDiffIgnoreCase();
@@ -295,6 +293,7 @@ private:
 	void UpdateDirViewFont();
 	void UpdateMrgViewFont();
 	BOOL CreateToobar();
+	void LoadToolbarImageList(int cxHave, int cxWant);
 	void LoadToolbarImages();
 	CDocFrame *FindFrameOfType(FRAMETYPE);
 	void OpenDocs(CEditorFrame *, FileLocation &, FileLocation &, bool bROLeft, bool bRORight);
@@ -329,6 +328,8 @@ private:
 
 	CMyComPtr<IUIAutomation> m_spAutomation;
 	HRESULT m_hrAutomation;
+
+	ULONG_PTR m_gdiplusToken;
 
 	struct CmdState
 	{

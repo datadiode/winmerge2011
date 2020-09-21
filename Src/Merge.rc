@@ -63,6 +63,7 @@ IDR_DIRDOCTYPE MENU
             MENUITEM "&None", ID_TOOLBAR_NONE
             MENUITEM "&Small", ID_TOOLBAR_SMALL
             MENUITEM "&Big", ID_TOOLBAR_BIG
+            MENUITEM "&Huge", ID_TOOLBAR_HUGE
         }
         MENUITEM "&Status Bar", ID_VIEW_STATUS_BAR, HELP
         MENUITEM "Ta&b Bar", ID_VIEW_TAB_BAR, HELP
@@ -204,6 +205,7 @@ IDR_HEXDOCTYPE MENU
             MENUITEM "&None", ID_TOOLBAR_NONE
             MENUITEM "&Small", ID_TOOLBAR_SMALL
             MENUITEM "&Big", ID_TOOLBAR_BIG
+            MENUITEM "&Huge", ID_TOOLBAR_HUGE
         }
         MENUITEM "&Status Bar", ID_VIEW_STATUS_BAR, HELP
         MENUITEM "Ta&b Bar", ID_VIEW_TAB_BAR, HELP
@@ -331,6 +333,7 @@ IDR_IMGDOCTYPE MENU
             MENUITEM "&None", ID_TOOLBAR_NONE
             MENUITEM "&Small", ID_TOOLBAR_SMALL
             MENUITEM "&Big", ID_TOOLBAR_BIG
+            MENUITEM "&Huge", ID_TOOLBAR_HUGE
         }
         MENUITEM "&Status Bar", ID_VIEW_STATUS_BAR, HELP
         MENUITEM "Ta&b Bar", ID_VIEW_TAB_BAR, HELP
@@ -423,6 +426,7 @@ IDR_SQLITEDOCTYPE MENU
             MENUITEM "&None", ID_TOOLBAR_NONE
             MENUITEM "&Small", ID_TOOLBAR_SMALL
             MENUITEM "&Big", ID_TOOLBAR_BIG
+            MENUITEM "&Huge", ID_TOOLBAR_HUGE
         }
         MENUITEM "&Status Bar", ID_VIEW_STATUS_BAR, HELP
         MENUITEM "Ta&b Bar", ID_VIEW_TAB_BAR, HELP
@@ -513,6 +517,7 @@ IDR_MAINFRAME MENU
             MENUITEM "&None", ID_TOOLBAR_NONE
             MENUITEM "&Small", ID_TOOLBAR_SMALL
             MENUITEM "&Big", ID_TOOLBAR_BIG
+            MENUITEM "&Huge", ID_TOOLBAR_HUGE
         }
         MENUITEM "&Status Bar", ID_VIEW_STATUS_BAR, HELP
         MENUITEM "Ta&b Bar", ID_VIEW_TAB_BAR, HELP
@@ -679,6 +684,7 @@ IDR_MERGEDOCTYPE MENU
             MENUITEM "&None", ID_TOOLBAR_NONE
             MENUITEM "&Small", ID_TOOLBAR_SMALL
             MENUITEM "&Big", ID_TOOLBAR_BIG
+            MENUITEM "&Huge", ID_TOOLBAR_HUGE
         }
         MENUITEM "&Status Bar", ID_VIEW_STATUS_BAR, HELP
         MENUITEM "Ta&b Bar", ID_VIEW_TAB_BAR, HELP

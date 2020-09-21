@@ -68,8 +68,6 @@
 #define IDR_SPLASH                              308
 #define IDB_TOOLBAR_ENABLED                     311
 #define IDB_TOOLBAR_ENABLED32                   312
-#define IDB_TOOLBAR_DISABLED                    313
-#define IDB_TOOLBAR_DISABLED32                  314
 #define IDB_WINMERGE                            315
 #define IDB_EDIT_COPY                           316
 #define IDB_EDIT_CUT                            317
@@ -1007,11 +1005,12 @@
 #define ID_TOOLBAR_NONE                         33164
 #define ID_TOOLBAR_SMALL                        33165
 #define ID_TOOLBAR_BIG                          33166
-#define ID_VIEW_RESIZE_PANES                    33167
-#define ID_HELP_RELEASENOTES                    33168
+#define ID_TOOLBAR_HUGE                         33167
+#define ID_VIEW_RESIZE_PANES                    33168
 #define ID_VIEW_ZOOMIN                          33169
 #define ID_VIEW_ZOOMNORMAL                      33170
 #define ID_VIEW_ZOOMOUT                         33171
+#define ID_HELP_RELEASENOTES                    33173
 #define ID_HELP_TRANSLATIONS                    33174
 #define IDS_IDLEMESSAGE                         33175
 #define IDS_SELECTION_LEFT                      33176
@@ -1022,4 +1021,4 @@
 #define IDS_CONTENT_ZOOM                        40359
 #define IDS_LINE_EXCLUDED                       40360
 #define IDS_LINES_EXCLUDED                      40361
-#define IDS_SHELL_CONTEXT_MENU					40362
+#define IDS_SHELL_CONTEXT_MENU                  40362

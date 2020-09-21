@@ -133,7 +133,7 @@ extern COptionDef
 
 // Show/hide toolbar/statusbar/tabbar
 extern COptionDef
-<bool> OPT_SHOW_TOOLBAR inline((_T("Settings/ShowToolbar"), true));
+<int> OPT_TOOLBAR_SIZE inline((_T("Settings/ToolbarSize"), 1));
 extern COptionDef
 <bool> OPT_SHOW_STATUSBAR inline((_T("Settings/ShowStatusbar"), true));
 extern COptionDef
@@ -145,8 +145,6 @@ extern COptionDef
 extern COptionDef
 <int> OPT_SHOW_IMAGETOOLBOX inline((_T("Settings/ShowImageToolbox"), 1));
 
-extern COptionDef
-<int> OPT_TOOLBAR_SIZE inline((_T("Settings/ToolbarSize"), 0));
 extern COptionDef
 <bool> OPT_RESIZE_PANES inline((_T("Settings/AutoResizePanes"), false));
 

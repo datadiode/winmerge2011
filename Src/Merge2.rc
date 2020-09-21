@@ -116,8 +116,6 @@ IDB_MERGE_COMPARE       BITMAP                  "res/compare.bmp"
 // Design & UI, Print Design and Presentation Design.
 IDB_TOOLBAR_ENABLED     BITMAP                  "res/ToolbarEnabled.bmp"
 IDB_TOOLBAR_ENABLED32   BITMAP                  "res/ToolbarEnabled32.bmp"
-IDB_TOOLBAR_DISABLED    BITMAP                  "res/ToolbarDisabled.bmp"
-IDB_TOOLBAR_DISABLED32  BITMAP                  "res/ToolbarDisabled32.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //

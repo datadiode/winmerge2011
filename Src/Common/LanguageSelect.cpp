@@ -1005,6 +1005,16 @@ HICON CLanguageSelect::LoadSmallIcon(UINT id) const
 		hinst, MAKEINTRESOURCE(id), IMAGE_ICON, 16, 16, LR_SHARED));
 }
 
+BITMAPINFOHEADER const *CLanguageSelect::LoadBitmapInfo(UINT id) const
+{
+	const HINSTANCE hinst = FindResourceHandle(MAKEINTRESOURCE(id), RT_BITMAP);
+	LPCVOID pResData = NULL;
+	if (HRSRC hResInfo = FindResource(hinst, MAKEINTRESOURCE(id), RT_BITMAP))
+		if (HGLOBAL hResData = LoadResource(hinst, hResInfo))
+			pResData = LockResource(hResData);
+	return static_cast<BITMAPINFOHEADER const *>(pResData);
+}
+
 HImageList *CLanguageSelect::LoadImageList(UINT id, int cx, int cGrow) const
 {
 	const HINSTANCE hinst = FindResourceHandle(MAKEINTRESOURCE(id), RT_BITMAP);

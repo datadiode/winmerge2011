@@ -1673,15 +1673,13 @@
     <docs Include="..\Docs\Users\CHANGES">
       <Filter>Doc Files</Filter>
     </docs>
-    <docs Include="COPYING">
-      <Filter>Doc Files</Filter>
-    </docs>
     <docs Include="..\Docs\Users\ReadMe.txt">
       <Filter>Doc Files</Filter>
     </docs>
     <docs Include="..\Docs\Users\ReleaseNotes.html">
       <Filter>Doc Files</Filter>
     </docs>
+    <docs Include="..\LICENSE" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="version.rh">

@@ -43,6 +43,9 @@
 // UI Automation
 #include <uiautomationclient.h>
 
+// GdiPlus
+#include <GdiPlus.h>
+
 // STL headers
 #include <stl.h>
 #include stl(list)

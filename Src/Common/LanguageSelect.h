@@ -45,6 +45,7 @@ public:
 	HACCEL LoadAccelerators(UINT) const;
 	HICON LoadIcon(UINT) const;
 	HICON LoadSmallIcon(UINT) const;
+	BITMAPINFOHEADER const *LoadBitmapInfo(UINT id) const;
 	HImageList *LoadImageList(UINT, int cx, int cGrow = 0) const;
 	bool TranslateString(LPCSTR, std::string &) const;
 	bool TranslateString(LPCWSTR, std::wstring &) const;

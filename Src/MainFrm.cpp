@@ -101,8 +101,8 @@ const CMainFrame::MENUITEM_ICON CMainFrame::m_MenuIcons[] = {
 	{ ID_EDIT_TOGGLE_BOOKMARK,		IDB_EDIT_TOGGLE_BOOKMARK,		},
 	{ ID_EDIT_GOTO_NEXT_BOOKMARK,	IDB_EDIT_GOTO_NEXT_BOOKMARK,	},
 	{ ID_EDIT_GOTO_PREV_BOOKMARK,	IDB_EDIT_GOTO_PREV_BOOKMARK,	},
-	{ ID_EDIT_ADD_BOOKMARK,         IDB_EDIT_ADD_BOOKMARK,	        },
-	{ ID_EDIT_REMOVE_BOOKMARK,	    IDB_EDIT_REMOVE_BOOKMARK,	    },
+	{ ID_EDIT_ADD_BOOKMARK,			IDB_EDIT_ADD_BOOKMARK,	        },
+	{ ID_EDIT_REMOVE_BOOKMARK,		IDB_EDIT_REMOVE_BOOKMARK,	    },
 	{ ID_EDIT_CLEAR_ALL_BOOKMARKS,	IDB_EDIT_CLEAR_ALL_BOOKMARKS,	},
 	{ ID_VIEW_ZOOMIN,				IDB_VIEW_ZOOMIN,				},
 	{ ID_VIEW_ZOOMOUT,				IDB_VIEW_ZOOMOUT,				},
@@ -153,6 +153,104 @@ static int GetMenuBitmapExcessWidth()
 	return max(cxExcess, 0);
 }
 
+/**
+ * @brief Convert stream of BYTEs to RGBQUADs.
+ */
+static void ConvertRGB(int width, int height, const BYTE *src, RGBQUAD *dst)
+{
+	dst += height * width;
+	for (int y = 0; y < height; ++y)
+	{
+		dst -= width;
+		for (int x = 0; x < width; ++x)
+		{
+			union
+			{
+				RGBQUAD val;
+				DWORD sig;
+			} u = { *src++, *src++, *src++, 0xFF };
+			if (u.sig != 0xFFFF00FF) // rgb(0xff, 0, 0xff) == mask color
+				dst[x] = u.val;
+		}
+	}
+}
+
+/**
+ * @brief Convert to gray values and reduce the brightness range.
+ */
+static void LoseColors(RGBQUAD *p, RGBQUAD *q)
+{
+	while (p != q)
+	{
+		if (p->rgbReserved != 0)
+		{
+			p->rgbBlue = p->rgbGreen = p->rgbRed = (
+				p->rgbBlue * 114U +
+				p->rgbGreen * 587U +
+				p->rgbRed * 299U +
+				255 * 1500U) / 2500U;
+		}
+		++p;
+	}
+}
+
+/**
+ * @brief Create scaled bitmap from RGBQUADs.
+ */
+static HBITMAP CreateBitmap(int cxHave, int cxWant, int cyHave, int cyWant, RGBQUAD *src)
+{
+	HBITMAP hBitmap = NULL;
+	Gdiplus::Bitmap bitmapSrc(cxHave, cyHave, cxHave * 4,
+		PixelFormat32bppPARGB, reinterpret_cast<BYTE *>(src));
+	if ((cxHave != cxWant) || (cyHave != cyWant))
+	{
+		Gdiplus::Bitmap bitmapDst(cxWant, cyWant, PixelFormat32bppPARGB);
+		Gdiplus::Graphics dcDst(&bitmapDst);
+		dcDst.SetInterpolationMode(Gdiplus::InterpolationModeHighQualityBicubic);
+		dcDst.DrawImage(&bitmapSrc, 0, 0, cxWant, cyWant);
+		bitmapDst.GetHBITMAP(Gdiplus::Color::Transparent, &hBitmap);
+	}
+	else
+	{
+		bitmapSrc.GetHBITMAP(Gdiplus::Color::Transparent, &hBitmap);
+	}
+	return hBitmap;
+}
+
+/**
+ * @brief Load toolbar image list.
+ */
+void CMainFrame::LoadToolbarImageList(int cxHave, int cxWant)
+{
+	UINT const nIDResource = cxHave == 16 ? IDB_TOOLBAR_ENABLED : IDB_TOOLBAR_ENABLED32;
+	if (BITMAPINFOHEADER const *const pBitmapInfo = LanguageSelect.LoadBitmapInfo(nIDResource))
+	{
+		int const cTiles = pBitmapInfo->biWidth / cxHave;
+		int const cyHave = pBitmapInfo->biHeight;
+		int const cyWant = cxWant - 1;
+		int const cxHaves = cxHave * cTiles;
+		int const cxWants = cxWant * cTiles;
+		std::vector<RGBQUAD> buf(pBitmapInfo->biWidth * pBitmapInfo->biHeight);
+		ConvertRGB(pBitmapInfo->biWidth, pBitmapInfo->biHeight,
+			reinterpret_cast<BYTE const *>(pBitmapInfo) + pBitmapInfo->biSize, buf.data());
+		if (HBITMAP const hBitmap = CreateBitmap(cxHaves, cxWants, cyHave, cyWant, buf.data()))
+		{
+			m_imlToolbarEnabled = HImageList::Create(cxWant, cyWant, ILC_COLOR32, cTiles, 0);
+			if (m_imlToolbarEnabled)
+				m_imlToolbarEnabled->Add(hBitmap, NULL);
+			DeleteObject(hBitmap);
+		}
+		LoseColors(buf.begin(), buf.end());
+		if (HBITMAP const hBitmap = CreateBitmap(cxHaves, cxWants, cyHave, cyWant, buf.data()))
+		{
+			m_imlToolbarDisabled = HImageList::Create(cxWant, cyWant, ILC_COLOR32, cTiles, 0);
+			if (m_imlToolbarDisabled)
+				m_imlToolbarDisabled->Add(hBitmap, NULL);
+			DeleteObject(hBitmap);
+		}
+	}
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // CMainFrame construction/destruction
 
@@ -169,6 +267,9 @@ CMainFrame::CMainFrame(HWindow *pWnd, const MergeCmdLineInfo &cmdInfo)
 	theApp.m_pMainWnd = this;
 
 	InitOptions();
+
+	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
+	Gdiplus::GdiplusStartup(&m_gdiplusToken, &gdiplusStartupInput, NULL);
 
 	if (HDC hMemDC = ::CreateCompatibleDC(NULL))
 	{
@@ -258,6 +359,8 @@ CMainFrame::~CMainFrame()
 		m_imlToolbarDisabled->Destroy();
 
 	CDirView::ReleaseSharedResources();
+
+	Gdiplus::GdiplusShutdown(m_gdiplusToken);
 
 	theApp.m_pMainWnd = NULL;
 }
@@ -1069,11 +1172,8 @@ LRESULT CMainFrame::OnWndMsg<WM_INITMENUPOPUP>(WPARAM wParam, LPARAM lParam)
 		// Handle the exceptional cases
 		switch (mii.wID)
 		{
-		case ID_TOOLBAR_NONE:
-			pMenu->CheckMenuRadioItem(ID_TOOLBAR_NONE, ID_TOOLBAR_BIG,
-				!COptionsMgr::Get(OPT_SHOW_TOOLBAR) ? ID_TOOLBAR_NONE :
-				!COptionsMgr::Get(OPT_TOOLBAR_SIZE) ? ID_TOOLBAR_SMALL :
-				ID_TOOLBAR_BIG, MF_BYCOMMAND);
+		case ID_TOOLBAR_HUGE:
+			pMenu->CheckMenuRadioItem(0, i, COptionsMgr::Get(OPT_TOOLBAR_SIZE), MF_BYPOSITION);
 			continue;
 		case ID_FILE_NEW:
 		case ID_FILE_OPEN:
@@ -3809,7 +3909,7 @@ LRESULT CMainFrame::OnWndMsg<WM_ACTIVATE>(WPARAM wParam, LPARAM lParam)
 template<>
 LRESULT CMainFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 {
-	switch (const UINT id = lParam ? static_cast<UINT>(wParam) : LOWORD(wParam))
+	switch (UINT const id = lParam ? static_cast<UINT>(wParam) : LOWORD(wParam))
 	{
 	case ID_FILE_MRU_FILE1:
 	case ID_FILE_MRU_FILE2:
@@ -3876,13 +3976,10 @@ LRESULT CMainFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 		OnViewWhitespace();
 		break;
 	case ID_TOOLBAR_NONE:
-		OnToolbarNone();
-		break;
 	case ID_TOOLBAR_SMALL:
-		OnToolbarSmall();
-		break;
 	case ID_TOOLBAR_BIG:
-		OnToolbarBig();
+	case ID_TOOLBAR_HUGE:
+		OnToolbarSize(id - ID_TOOLBAR_NONE);
 		break;
 	case ID_VIEW_TAB_BAR:
 		OnViewTabBar();
@@ -4195,7 +4292,7 @@ BOOL CMainFrame::CreateToobar()
 
 	LoadToolbarImages();
 
-	if (!COptionsMgr::Get(OPT_SHOW_TOOLBAR))
+	if (COptionsMgr::Get(OPT_TOOLBAR_SIZE) == 0)
 		m_wndToolBar->ShowWindow(SW_HIDE);
 
 	return TRUE;
@@ -4219,30 +4316,25 @@ void CMainFrame::LoadToolbarImages()
 	m_wndToolBar->SetImageList(NULL);
 	m_wndToolBar->SetDisabledImageList(NULL);
 	if (m_imlToolbarEnabled)
+	{
 		m_imlToolbarEnabled->Destroy();
+		m_imlToolbarEnabled = NULL;
+	}
 	if (m_imlToolbarDisabled)
+	{
 		m_imlToolbarDisabled->Destroy();
-
-	int cxyButton = 0;
-	int toolbarSize = COptionsMgr::Get(OPT_TOOLBAR_SIZE);
-	if (toolbarSize == 0)
-	{
-		m_imlToolbarEnabled = LanguageSelect.LoadImageList(IDB_TOOLBAR_ENABLED, 16);
-		m_imlToolbarDisabled = LanguageSelect.LoadImageList(IDB_TOOLBAR_DISABLED, 16);
-		cxyButton = 24;
+		m_imlToolbarDisabled = NULL;
 	}
-	else if (toolbarSize == 1)
+	if (int const toolbarSizeWant = MulDiv(16, GetSystemMetrics(SM_CXSMICON), 16) * COptionsMgr::Get(OPT_TOOLBAR_SIZE))
 	{
-		m_imlToolbarEnabled = LanguageSelect.LoadImageList(IDB_TOOLBAR_ENABLED32, 32);
-		m_imlToolbarDisabled = LanguageSelect.LoadImageList(IDB_TOOLBAR_DISABLED32, 32);
-		cxyButton = 40;
+		int const toolbarSizeHave = toolbarSizeWant <= 20 ? 16 : 32;
+		LoadToolbarImageList(toolbarSizeHave, toolbarSizeWant);
+		m_wndToolBar->SetExtendedStyle(0);
+		m_wndToolBar->SetButtonSize(toolbarSizeWant + 8, toolbarSizeWant + 8);
+		m_wndToolBar->SetImageList(m_imlToolbarEnabled);
+		m_wndToolBar->SetDisabledImageList(m_imlToolbarDisabled);
+		m_wndToolBar->SetExtendedStyle(TBSTYLE_EX_DRAWDDARROWS);
 	}
-
-	m_wndToolBar->SetExtendedStyle(0);
-	m_wndToolBar->SetButtonSize(cxyButton, cxyButton);
-	m_wndToolBar->SetImageList(m_imlToolbarEnabled);
-	m_wndToolBar->SetDisabledImageList(m_imlToolbarDisabled);
-	m_wndToolBar->SetExtendedStyle(TBSTYLE_EX_DRAWDDARROWS);
 }
 
 /**
@@ -4259,31 +4351,12 @@ void CMainFrame::OnDebugResetOptions()
 	}
 }
 
-/** @brief Hide the toolbar. */
-void CMainFrame::OnToolbarNone()
+/** @brief Show the toolbar. */
+void CMainFrame::OnToolbarSize(int value)
 {
-	COptionsMgr::SaveOption(OPT_SHOW_TOOLBAR, false);
-	m_wndToolBar->ShowWindow(SW_HIDE);
-	RecalcLayout();
-}
-
-/** @brief Show small toolbar. */
-void CMainFrame::OnToolbarSmall()
-{
-	COptionsMgr::SaveOption(OPT_SHOW_TOOLBAR, true);
-	COptionsMgr::SaveOption(OPT_TOOLBAR_SIZE, 0);
+	COptionsMgr::SaveOption(OPT_TOOLBAR_SIZE, value);
 	LoadToolbarImages();
-	m_wndToolBar->ShowWindow(SW_SHOW);
-	RecalcLayout();
-}
-
-/** @brief Show big toolbar. */
-void CMainFrame::OnToolbarBig()
-{
-	COptionsMgr::SaveOption(OPT_SHOW_TOOLBAR, true);
-	COptionsMgr::SaveOption(OPT_TOOLBAR_SIZE, 1);
-	LoadToolbarImages();
-	m_wndToolBar->ShowWindow(SW_SHOW);
+	m_wndToolBar->ShowWindow(value ? SW_SHOW : SW_HIDE);
 	RecalcLayout();
 }
 
