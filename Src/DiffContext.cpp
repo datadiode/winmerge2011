@@ -55,7 +55,7 @@ String CDiffContext::GetRightFilepathAndName(const DIFFITEM *di) const
 
 void CDiffContext::SwapSides()
 {
-	std::swap(m_paths[0], m_paths[1]);
+	eastl::swap(m_paths[0], m_paths[1]);
 }
 
 /**
