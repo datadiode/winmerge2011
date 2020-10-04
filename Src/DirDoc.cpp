@@ -836,8 +836,8 @@ void CDirFrame::SetDescriptions(const String &strLeftDesc, const String &strRigh
 void CDirFrame::SwapSides()
 {
 	WaitStatusCursor waitCursor;
-	std::swap(m_bROLeft, m_bRORight);
-	std::swap(m_strLeftDesc, m_strRightDesc);
+	eastl::swap(m_bROLeft, m_bRORight);
+	eastl::swap(m_strLeftDesc, m_strRightDesc);
 	// Loop through the cached contexts
 	LIST_ENTRY *entry = &m_root;
 	while ((entry = entry->Flink) != &m_root)
@@ -848,7 +848,7 @@ void CDirFrame::SwapSides()
 		DIFFITEM *di = NULL;
 		while ((di = pCtxt->GetNextDiff(di)) != NULL)
 		{
-			std::swap(di->left, di->right);
+			eastl::swap(di->left, di->right);
 			switch (di->diffcode & DIFFCODE::SIDEFLAGS)
 			{
 			case DIFFCODE::LEFT:

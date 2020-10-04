@@ -491,7 +491,7 @@ LRESULT CChildFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 			{
 			case -2:
 				// Right-to-left selection
-				std::swap(text[0], text[1]);
+				eastl::swap(text[0], text[1]);
 			case 2:
 				ASSERT(text.length() == 2);
 				// If two chars are selected, treat 2nd char as quotation mark.

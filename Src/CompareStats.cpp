@@ -114,8 +114,8 @@ void CompareStats::Reset()
  */
 void CompareStats::SwapSides()
 {
-	std::swap(m_counts[DIFFIMG_LUNIQUE], m_counts[DIFFIMG_RUNIQUE]);
-	std::swap(m_counts[DIFFIMG_LDIRUNIQUE], m_counts[DIFFIMG_RDIRUNIQUE]);
+	eastl::swap(m_counts[DIFFIMG_LUNIQUE], m_counts[DIFFIMG_RUNIQUE]);
+	eastl::swap(m_counts[DIFFIMG_LDIRUNIQUE], m_counts[DIFFIMG_RDIRUNIQUE]);
 }
 
 /**
