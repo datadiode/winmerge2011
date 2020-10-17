@@ -43,8 +43,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy /y . $(SolutionDir)Build\WinMerge\Win32\$(Configuration)\
-copy /y . $(SolutionDir)Build\WinMerge\x64\$(Configuration)\
+    <PostBuildEvent>xcopy /y . $(SolutionDir)Build\WinMerge\Win32\$(Configuration)\
+xcopy /y . $(SolutionDir)Build\WinMerge\x64\$(Configuration)\
 </PostBuildEvent>
   </PropertyGroup>
 </Project>
