@@ -120,6 +120,18 @@ for %%$ in (
 	set $=
 )
 
+REM Copy ReoGridCompare
+set $=..\..\ReoGrid\Compare\bin\Release\
+for %%$ in (
+	.
+) do if not "%%~$$:$" == "" (
+	xcopy /ys "%$%*.dll" "%~2ReoGridCompare\bin\"
+	xcopy /ys "%$%*.pdb" "%~2ReoGridCompare\bin\"
+	xcopy /y "%$%ReoGridCompare.*" "%~2ReoGridCompare\bin\"
+	xcopy /y "..\..\ReoGrid\LICENSE" "%~2ReoGridCompare\"
+	set $=
+)
+
 REM Copy WinMerge.chm
 xcopy /y "..\..\winmerge2011_help\Build\Manual\htmlhelp\WinMerge.chm" "%~2Docs\"
 

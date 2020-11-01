@@ -723,6 +723,12 @@
     <ClCompile Include="PropCompareSQLite.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PropCompareReoGrid.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ReoGridMergeFrm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\WindowPlacement.h">
@@ -1305,6 +1311,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PropCompareSQLite.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PropCompareReoGrid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ReoGridMergeFrm.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

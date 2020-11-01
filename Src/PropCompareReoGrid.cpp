@@ -1,13 +1,13 @@
 /**
- * @file  PropCompareImage.cpp
+ * @file  PropCompareReoGrid.cpp
  *
- * @brief Implementation of PropCompareImage propertysheet
+ * @brief Implementation of PropCompareReoGrid propertysheet
  */
 #include "stdafx.h"
 #include "OptionsPanel.h"
 #include "resource.h"
 #include "LanguageSelect.h"
-#include "PropCompareImage.h"
+#include "PropCompareReoGrid.h"
 #include "WildcardDropList.h"
 
 #ifdef _DEBUG
@@ -18,19 +18,19 @@
  * @brief Constructor.
  * @param [in] optionsMgr Pointer to COptionsMgr.
  */
-PropCompareImage::PropCompareImage() 
-: OptionsPanel(IDD_PROPPAGE_COMPARE_IMAGE, sizeof *this)
+PropCompareReoGrid::PropCompareReoGrid() 
+: OptionsPanel(IDD_PROPPAGE_COMPARE_REOGRID, sizeof *this)
 {
 }
 
 template<ODialog::DDX_Operation op>
-bool PropCompareImage::UpdateData()
+bool PropCompareReoGrid::UpdateData()
 {
 	DDX_Text<op>(IDC_FILEPATS, m_sFilePatterns);
 	return true;
 }
 
-LRESULT PropCompareImage::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT PropCompareReoGrid::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
 	{
@@ -44,11 +44,11 @@ LRESULT PropCompareImage::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			break;
 		case MAKEWPARAM(IDC_FILEPATS, CBN_DROPDOWN):
 			WildcardDropList::OnDropDown(reinterpret_cast<HWND>(lParam), 6,
-				COptionsMgr::GetDefault(OPT_CMP_IMG_FILEPATTERNS).c_str());
+				_T("*.xlsx;*.rgf;*.tsv;*.csv"));
 			break;
 		case MAKEWPARAM(IDC_FILEPATS, CBN_CLOSEUP):
 			WildcardDropList::OnCloseUp(reinterpret_cast<HWND>(lParam));
-			UpdateData<Get>();
+   			UpdateData<Get>();
 			break;
 		}
 		break;
@@ -61,9 +61,9 @@ LRESULT PropCompareImage::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
  * Property sheet calls this before displaying GUI to load values
  * into members.
  */
-void PropCompareImage::ReadOptions()
+void PropCompareReoGrid::ReadOptions()
 {
-	m_sFilePatterns = COptionsMgr::Get(OPT_CMP_IMG_FILEPATTERNS);
+	m_sFilePatterns = COptionsMgr::Get(OPT_CMP_REOGRID_FILEPATTERNS);
 }
 
 /** 
@@ -71,22 +71,22 @@ void PropCompareImage::ReadOptions()
  * Property sheet calls this after dialog is closed with OK button to
  * store values in member variables.
  */
-void PropCompareImage::WriteOptions()
+void PropCompareReoGrid::WriteOptions()
 {
 	WildcardRemoveDuplicatePatterns(m_sFilePatterns);
-	COptionsMgr::SaveOption(OPT_CMP_IMG_FILEPATTERNS, m_sFilePatterns);
+	COptionsMgr::SaveOption(OPT_CMP_REOGRID_FILEPATTERNS, m_sFilePatterns);
 }
 
 /** 
  * @brief Sets options to defaults
  */
-void PropCompareImage::OnDefaults()
+void PropCompareReoGrid::OnDefaults()
 {
-	m_sFilePatterns = COptionsMgr::GetDefault(OPT_CMP_IMG_FILEPATTERNS);
+	m_sFilePatterns = COptionsMgr::GetDefault(OPT_CMP_REOGRID_FILEPATTERNS);
 	UpdateScreen();
 }
 
-void PropCompareImage::UpdateScreen()
+void PropCompareReoGrid::UpdateScreen()
 {
 	UpdateData<Set>();
 }

@@ -112,11 +112,6 @@ IDR_DIRDOCTYPE MENU
             MENUITEM "&Selected", ID_TOOLS_PRINT_AS_XLS_SELECTED
         }
     }
-    POPUP "&Debug"
-    {
-        MENUITEM "&Load Config...", ID_DEBUG_LOADCONFIG
-        MENUITEM "&Reset Options", ID_DEBUG_RESETOPTIONS
-    }
     POPUP "&Window"
     {
         MENUITEM "Cl&ose", ID_FILE_CLOSE
@@ -137,9 +132,7 @@ IDR_DIRDOCTYPE MENU
         MENUITEM "&Translations", ID_HELP_TRANSLATIONS
         MENUITEM "C&onfiguration", ID_HELP_GETCONFIG
         MENUITEM SEPARATOR
-        MENUITEM "&About WinMerge...", ID_APP_ABOUT
-        MENUITEM "A&bout Frhed...", ID_HELP_ABOUT_FRHED
-        MENUITEM "Abo&ut SQLite Compare...", ID_HELP_ABOUT_SQLITECOMPARE
+        MENUITEM "&About", ID_APP_ABOUT, INACTIVE
     }
 }
 
@@ -225,6 +218,9 @@ IDR_HEXDOCTYPE MENU
         MENUITEM "Copy to &Right\tAlt+Right", ID_L2R
         MENUITEM "Copy to L&eft\tAlt+Left", ID_R2L
         MENUITEM SEPARATOR
+        MENUITEM "C&opy to Right and Advance\tAlt+Ctrl+Right", ID_L2RNEXT
+        MENUITEM "Copy &to Left and Advance\tAlt+Ctrl+Left", ID_R2LNEXT
+        MENUITEM SEPARATOR
         MENUITEM "Copy &All to Right", ID_ALL_RIGHT
         MENUITEM "Cop&y All to Left", ID_ALL_LEFT
     }
@@ -239,11 +235,6 @@ IDR_HEXDOCTYPE MENU
         MENUITEM "&Filters...", ID_TOOLS_FILTERS
         MENUITEM "&Generate Patch...", ID_TOOLS_GENERATEPATCH
         MENUITEM "Generate &Report...", ID_TOOLS_GENERATEREPORT
-    }
-    POPUP "&Debug"
-    {
-        MENUITEM "&Load Config...", ID_DEBUG_LOADCONFIG
-        MENUITEM "&Reset Options", ID_DEBUG_RESETOPTIONS
     }
     POPUP "&Window"
     {
@@ -265,9 +256,7 @@ IDR_HEXDOCTYPE MENU
         MENUITEM "&Translations", ID_HELP_TRANSLATIONS
         MENUITEM "C&onfiguration", ID_HELP_GETCONFIG
         MENUITEM SEPARATOR
-        MENUITEM "&About WinMerge...", ID_APP_ABOUT
-        MENUITEM "A&bout Frhed...", ID_HELP_ABOUT_FRHED
-        MENUITEM "Abo&ut SQLite Compare...", ID_HELP_ABOUT_SQLITECOMPARE
+        MENUITEM "&About", ID_APP_ABOUT, INACTIVE
     }
 }
 
@@ -366,10 +355,96 @@ IDR_IMGDOCTYPE MENU
         MENUITEM "&Generate Patch...", ID_TOOLS_GENERATEPATCH
         MENUITEM "Generate &Report...", ID_TOOLS_GENERATEREPORT
     }
-    POPUP "&Debug"
+    POPUP "&Window"
     {
-        MENUITEM "&Load Config...", ID_DEBUG_LOADCONFIG
-        MENUITEM "&Reset Options", ID_DEBUG_RESETOPTIONS
+        MENUITEM "Cl&ose", ID_FILE_CLOSE
+        MENUITEM "Clo&se All", ID_WINDOW_CLOSEALL
+        MENUITEM SEPARATOR
+        MENUITEM "Change &Pane\tF6", ID_WINDOW_CHANGE_PANE
+        MENUITEM SEPARATOR
+        MENUITEM "Tile &Horizontally", ID_WINDOW_TILE_HORZ
+        MENUITEM "Tile &Vertically", ID_WINDOW_TILE_VERT
+        MENUITEM "&Cascade", ID_WINDOW_CASCADE
+    }
+    POPUP "&Help"
+    {
+        MENUITEM "&WinMerge Help\tF1", ID_HELP_CONTENTS
+        MENUITEM "&Frhed Help", ID_HELP_FRHED
+        MENUITEM SEPARATOR
+        MENUITEM "R&elease Notes", ID_HELP_RELEASENOTES
+        MENUITEM "&Translations", ID_HELP_TRANSLATIONS
+        MENUITEM "C&onfiguration", ID_HELP_GETCONFIG
+        MENUITEM SEPARATOR
+        MENUITEM "&About", ID_APP_ABOUT, INACTIVE
+    }
+}
+
+
+
+IDR_REOGRIDDOCTYPE MENU
+{
+    POPUP "&File"
+    {
+        MENUITEM "&New\tCtrl+N", ID_FILE_NEW
+        MENUITEM "&Open...\tCtrl+O", ID_FILE_OPEN
+        MENUITEM "Op&en Conflict File...", ID_FILE_OPENCONFLICT
+        MENUITEM "Start Collec&tion...", ID_FILE_STARTCOLLECT
+        MENUITEM SEPARATOR
+        MENUITEM "Open Pro&ject...\tCtrl+J", ID_FILE_OPENPROJECT
+        MENUITEM "Sa&ve Project...", ID_FILE_SAVEPROJECT
+        MENUITEM SEPARATOR
+        MENUITEM "Recent Projects", ID_FILE_MRU_FILE1, INACTIVE
+        MENUITEM SEPARATOR
+        MENUITEM "&Save\tCtrl+S", ID_FILE_SAVE
+        POPUP "Save &Left"
+        {
+            MENUITEM "&Save", ID_FILE_SAVE_LEFT
+            MENUITEM "Save &As...", ID_FILE_SAVEAS_LEFT
+        }
+        POPUP "Save &Right"
+        {
+            MENUITEM "&Save", ID_FILE_SAVE_RIGHT
+            MENUITEM "Save &As...", ID_FILE_SAVEAS_RIGHT
+        }
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit", ID_APP_EXIT
+    }
+    POPUP "&Edit"
+    {
+        MENUITEM "&Options...", ID_OPTIONS
+    }
+    POPUP "&View"
+    {
+        POPUP "&Toolbar"
+        {
+            MENUITEM "&None", ID_TOOLBAR_NONE
+            MENUITEM "&Small", ID_TOOLBAR_SMALL
+            MENUITEM "&Big", ID_TOOLBAR_BIG
+            MENUITEM "&Huge", ID_TOOLBAR_HUGE
+        }
+        MENUITEM "&Status Bar", ID_VIEW_STATUS_BAR, HELP
+        MENUITEM "Ta&b Bar", ID_VIEW_TAB_BAR, HELP
+        MENUITEM SEPARATOR
+        MENUITEM "Lang&uage...", ID_VIEW_LANGUAGE
+    }
+    POPUP "&Merge"
+    {
+        MENUITEM "&Next Difference\tAlt+Down", ID_NEXTDIFF
+        MENUITEM "&Previous Difference\tAlt+Up", ID_PREVDIFF
+        MENUITEM SEPARATOR
+        MENUITEM "&First Difference\tAlt+Home", ID_FIRSTDIFF
+        MENUITEM "&Last Difference\tAlt+End", ID_LASTDIFF
+        MENUITEM SEPARATOR
+        MENUITEM "Copy to &Right\tAlt+Right", ID_L2R
+        MENUITEM "Copy to L&eft\tAlt+Left", ID_R2L
+        MENUITEM SEPARATOR
+        MENUITEM "C&opy to Right and Advance\tAlt+Ctrl+Right", ID_L2RNEXT
+        MENUITEM "Copy &to Left and Advance\tAlt+Ctrl+Left", ID_R2LNEXT
+    }
+    POPUP "&Tools"
+    {
+        MENUITEM "&Filters...", ID_TOOLS_FILTERS
+        MENUITEM "&Generate Patch...", ID_TOOLS_GENERATEPATCH
     }
     POPUP "&Window"
     {
@@ -391,9 +466,7 @@ IDR_IMGDOCTYPE MENU
         MENUITEM "&Translations", ID_HELP_TRANSLATIONS
         MENUITEM "C&onfiguration", ID_HELP_GETCONFIG
         MENUITEM SEPARATOR
-        MENUITEM "&About WinMerge...", ID_APP_ABOUT
-        MENUITEM "A&bout Frhed...", ID_HELP_ABOUT_FRHED
-        MENUITEM "Abo&ut SQLite Compare...", ID_HELP_ABOUT_SQLITECOMPARE
+        MENUITEM "&About", ID_APP_ABOUT, INACTIVE
     }
 }
 
@@ -452,11 +525,6 @@ IDR_SQLITEDOCTYPE MENU
 		MENUITEM "Generate change script (left -> &right)...", ID_TOOLS_GENERATE_CHANGE_SCRIPT_L2R
 		MENUITEM "Generate change script (right -> &left)...", ID_TOOLS_GENERATE_CHANGE_SCRIPT_R2L
     }
-    POPUP "&Debug"
-    {
-        MENUITEM "&Load Config...", ID_DEBUG_LOADCONFIG
-        MENUITEM "&Reset Options", ID_DEBUG_RESETOPTIONS
-    }
     POPUP "&Window"
     {
         MENUITEM "Cl&ose", ID_FILE_CLOSE
@@ -477,9 +545,7 @@ IDR_SQLITEDOCTYPE MENU
         MENUITEM "&Translations", ID_HELP_TRANSLATIONS
         MENUITEM "C&onfiguration", ID_HELP_GETCONFIG
         MENUITEM SEPARATOR
-        MENUITEM "&About WinMerge...", ID_APP_ABOUT
-        MENUITEM "A&bout Frhed...", ID_HELP_ABOUT_FRHED
-        MENUITEM "Abo&ut SQLite Compare...", ID_HELP_ABOUT_SQLITECOMPARE
+        MENUITEM "&About", ID_APP_ABOUT, INACTIVE
     }
 }
 
@@ -529,11 +595,6 @@ IDR_MAINFRAME MENU
         MENUITEM "&Filters...", ID_TOOLS_FILTERS
         MENUITEM "&Generate Patch...", ID_TOOLS_GENERATEPATCH
     }
-    POPUP "&Debug"
-    {
-        MENUITEM "&Load Config...", ID_DEBUG_LOADCONFIG
-        MENUITEM "&Reset Options", ID_DEBUG_RESETOPTIONS
-    }
     POPUP "&Window"
     {
         MENUITEM "Cl&ose", ID_FILE_CLOSE
@@ -554,9 +615,7 @@ IDR_MAINFRAME MENU
         MENUITEM "&Translations", ID_HELP_TRANSLATIONS
         MENUITEM "C&onfiguration", ID_HELP_GETCONFIG
         MENUITEM SEPARATOR
-        MENUITEM "&About WinMerge...", ID_APP_ABOUT
-        MENUITEM "A&bout Frhed...", ID_HELP_ABOUT_FRHED
-        MENUITEM "Abo&ut SQLite Compare...", ID_HELP_ABOUT_SQLITECOMPARE
+        MENUITEM "&About", ID_APP_ABOUT, INACTIVE
     }
 }
 
@@ -723,11 +782,6 @@ IDR_MERGEDOCTYPE MENU
         MENUITEM "Generate &Report...", ID_TOOLS_GENERATEREPORT
         MENUITEM "Compare &Selection...", ID_TOOLS_COMPARE_SELECTION
     }
-    POPUP "&Debug"
-    {
-        MENUITEM "&Load Config...", ID_DEBUG_LOADCONFIG
-        MENUITEM "&Reset Options", ID_DEBUG_RESETOPTIONS
-    }
     POPUP "&Window"
     {
         MENUITEM "Cl&ose", ID_FILE_CLOSE
@@ -748,9 +802,7 @@ IDR_MERGEDOCTYPE MENU
         MENUITEM "&Translations", ID_HELP_TRANSLATIONS
         MENUITEM "C&onfiguration", ID_HELP_GETCONFIG
         MENUITEM SEPARATOR
-        MENUITEM "&About WinMerge...", ID_APP_ABOUT
-        MENUITEM "A&bout Frhed...", ID_HELP_ABOUT_FRHED
-        MENUITEM "Abo&ut SQLite Compare...", ID_HELP_ABOUT_SQLITECOMPARE
+        MENUITEM "&About", ID_APP_ABOUT, INACTIVE
     }
 }
 
@@ -795,6 +847,7 @@ IDR_POPUP_DIRVIEW MENU
             MENUITEM "&Archive", ID_MERGE_COMPARE_ZIP
             MENUITEM "&Binary", ID_MERGE_COMPARE_HEX
             MENUITEM "&Image", ID_MERGE_COMPARE_IMG
+            MENUITEM "&ReoGrid", ID_MERGE_COMPARE_REOGRID
             MENUITEM "&SQLite", ID_MERGE_COMPARE_SQLITE
             MENUITEM "&XML", ID_MERGE_COMPARE_XML
             MENUITEM "PluginMonikers", ID_SCRIPT_LAST
@@ -1647,8 +1700,20 @@ CAPTION "Image"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 BEGIN
     LTEXT           "Image File &Patterns:", IDC_STATIC, 7, 6, 200, 10
-    COMBOBOX        IDC_COMPAREIMAGE_PATTERNS, 7, 18, 223, 0, WS_TABSTOP | WS_VSCROLL | CBS_DROPDOWN | CBS_AUTOHSCROLL | CBS_NOINTEGRALHEIGHT
-    PUSHBUTTON      "Defaults", IDC_COMPAREIMAGE_DEFAULTS, 160, 208, 70, 14
+    COMBOBOX        IDC_FILEPATS, 7, 18, 223, 0, WS_TABSTOP | WS_VSCROLL | CBS_DROPDOWN | CBS_AUTOHSCROLL | CBS_NOINTEGRALHEIGHT
+    PUSHBUTTON      "Defaults", IDC_DEFAULTS, 160, 208, 70, 14
+END
+
+
+
+IDD_PROPPAGE_COMPARE_REOGRID DIALOGEX 105, 0, 236, 222
+STYLE DS_CONTROL | DS_SHELLFONT | WS_CAPTION | WS_CHILDWINDOW
+CAPTION "ReoGrid"
+FONT 8, "MS Shell Dlg", 0, 0, 1
+BEGIN
+    LTEXT           "ReoGrid File &Patterns:", IDC_STATIC, 7, 6, 200, 10
+    COMBOBOX        IDC_FILEPATS, 7, 18, 223, 0, WS_TABSTOP | WS_VSCROLL | CBS_DROPDOWN | CBS_AUTOHSCROLL | CBS_NOINTEGRALHEIGHT
+    PUSHBUTTON      "Defaults", IDC_DEFAULTS, 160, 208, 70, 14
 END
 
 

@@ -24,9 +24,9 @@ public:
     operator void const *() const { return m_data; }
     IAccessible *Find(LPCWSTR name, long kind) const
     {
-		VARIANT varChild;
-		varChild.vt = VT_I4;
-		varChild.lVal = 0;
+        VARIANT varChild;
+        varChild.vt = VT_I4;
+        varChild.lVal = 0;
         for (long index = 0; index < m_count; ++index)
         {
             IAccessible *const child = static_cast

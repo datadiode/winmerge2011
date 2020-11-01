@@ -32,6 +32,7 @@ class CDocFrame;
 class CHexMergeFrame;
 class CImgMergeFrame;
 class CSQLiteMergeFrame;
+class CReoGridMergeFrame;
 class CMergeEditView;
 class CMergeDiffDetailView;
 class LineFiltersList;
@@ -117,6 +118,11 @@ public:
 		FileLocation &,
 		bool bLeftRO, bool bRightRO,
 		LPCTSTR sCompareAs);
+	void ShowReoGridMergeDoc(CDirFrame *,
+		FileLocation &,
+		FileLocation &,
+		bool bLeftRO, bool bRightRO,
+		LPCTSTR sCompareAs);
 	void ShowSQLiteMergeDoc(CDirFrame *,
 		FileLocation &,
 		FileLocation &,
@@ -150,8 +156,8 @@ public:
 	void SetActiveMenu(HMenu *);
 	HMenu *SetScriptMenu(HMenu *, LPCSTR section);
 	BYTE QueryCmdState(UINT id) const;
-	DWORD CLRExec(LPCWSTR path, LPCWSTR type, LPCWSTR method, LPCWSTR arg);
-	DWORD CLRExecSQLiteCompare(LPCWSTR type, LPCWSTR method, LPCWSTR arg);
+	DWORD CLRExec(LPCWSTR method, LPCWSTR arg);
+	void CLRFree(DWORD);
 	IUIAutomation *UIAutomation();
 	HRESULT AddAutomationEventHandler(IUIAutomationElement *, IUIAutomationEventHandler *);
 	HRESULT RemoveAutomationEventHandler(IUIAutomationElement *, IUIAutomationEventHandler *);
@@ -289,6 +295,7 @@ private:
 	CHexMergeFrame *GetHexMergeDocToShow(CDirFrame *);
 	CImgMergeFrame *GetImgMergeDocToShow(CDirFrame *);
 	CSQLiteMergeFrame *GetSQLiteMergeDocToShow(CDirFrame *);
+	CReoGridMergeFrame *GetReoGridMergeDocToShow(CDirFrame *);
 	CDirFrame *GetDirDocToShow();
 	void UpdateDirViewFont();
 	void UpdateMrgViewFont();
@@ -325,6 +332,8 @@ private:
 	CMyComPtr<ICLRMetaHost> m_spMetaHost;
 	CMyComPtr<ICLRRuntimeInfo> m_spRuntimeInfo;
 	CMyComPtr<ICLRRuntimeHost> m_spRuntimeHost;
+	CMyComPtr<ICLRControl> m_spControl;
+	CMyComPtr<ICLRTaskManager> m_spTaskManager;
 
 	CMyComPtr<IUIAutomation> m_spAutomation;
 	HRESULT m_hrAutomation;

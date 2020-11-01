@@ -45,6 +45,7 @@ enum FRAMETYPE
 	FRAME_BINARY, /**< Binary compare frame. */
 	FRAME_IMGFILE, /**< Image file compare frame. */
 	FRAME_SQLITEDB, /**< SQLite DB compare frame. */
+	FRAME_REOGRID, /**< ReoGrid compare frame. */
 	FRAMETYPE_COUNT
 };
 

@@ -84,8 +84,7 @@ void CSQLiteMergeFrame::OpenDocs(
 	SetTitle();
 
 	int const flags = COptionsMgr::Get(OPT_CMP_SQLITE_COMPAREFLAGS);
-	DWORD const result = m_pMDIFrame->CLRExecSQLiteCompare(
-		L"SQLiteTurbo.Program", L"Embed", string_format(
+	DWORD const result = m_pMDIFrame->CLRExec(L"SQLiteCompare", string_format(
 		L"/ParentWindow %p%hs%hs%hs \"%s\" \"%s\"", m_hWnd,
 		&"\0 /CompareSchemaOnly"[(flags & SQLITE_CMP_RADIO_OPTIONS_MASK) == SQLITE_CMP_SCHEMA_ONLY],
 		&"\0 /CompareBlobFields"[(flags & SQLITE_CMP_COMPARE_BLOB_FIELDS) != 0],

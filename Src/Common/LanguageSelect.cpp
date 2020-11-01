@@ -872,16 +872,7 @@ void CLanguageSelect::TranslateMenu(HMenu *pMenu) const
 		pMenu->GetMenuItemInfo(i, TRUE, &mii);
 		if (HMenu *pSubMenu = reinterpret_cast<HMenu *>(mii.hSubMenu))
 		{
-			// Conditionally remove debug menu.
-			// Finds debug menu by looking for a submenu which
-			// starts with item ID_DEBUG_LOADCONFIG.
-			if (!DebugMenu && pSubMenu->GetMenuItemID(0) == ID_DEBUG_LOADCONFIG)
-			{
-				pMenu->DeleteMenu(i, MF_BYPOSITION);
-				continue;
-			}
 			TranslateMenu(pSubMenu);
-			mii.wID = reinterpret_cast<UINT>(pSubMenu);
 		}
 		// Prevent some menues which happen to lack a bitmap from rendering differently
 		mii.fMask = fMask;

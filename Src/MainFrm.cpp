@@ -36,6 +36,7 @@
 #include "HexMergeFrm.h"
 #include "ImgMergeFrm.h"
 #include "SQLiteMergeFrm.h"
+#include "ReoGridMergeFrm.h"
 #include "DirView.h"
 #include "MergeEditView.h"
 #include "MergeDiffDetailView.h"
@@ -249,6 +250,35 @@ void CMainFrame::LoadToolbarImageList(int cxHave, int cxWant)
 			DeleteObject(hBitmap);
 		}
 	}
+}
+
+static HICON LoadAboutIcon(LPCTSTR name)
+{
+	TCHAR path[MAX_PATH];
+	GetModuleFileName(NULL, path, _countof(path));
+	if (name)
+	{
+		PathRemoveFileSpec(path);
+		PathAppend(path, name);
+	}
+	HICON hIcon = NULL;
+	return ExtractIconEx(path, 0, NULL, &hIcon, 1) ? hIcon : NULL;
+}
+
+static HICON LoadAboutIcon(UINT itemID)
+{
+	switch (itemID)
+	{
+	case ID_APP_ABOUT:
+		return LoadAboutIcon(static_cast<LPCTSTR>(NULL));
+	case ID_HELP_ABOUT_FRHED:
+		return LoadAboutIcon(_T("Frhed\\Frhed.exe"));
+	case ID_HELP_ABOUT_REOGRID:
+		return LoadAboutIcon(_T("ReoGridCompare\\bin\\ReoGridCompare.exe"));
+	case ID_HELP_ABOUT_SQLITECOMPARE:
+		return LoadAboutIcon(_T("SQLiteCompare\\bin\\SQLiteCompare.exe"));
+	}
+	return NULL;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -911,7 +941,15 @@ LRESULT CMainFrame::OnWndMsg<WM_DRAWITEM>(WPARAM, LPARAM lParam)
 		int const cxMenuBitmapExcess = GetMenuBitmapExcessWidth();
 		int x = lpdis->rcItem.left + cxMenuBitmapExcess - 18;
 		int y = lpdis->rcItem.top + (lpdis->rcItem.bottom - lpdis->rcItem.top - 16) / 2;
-		m_imlMenu->Draw(LOWORD(lpdis->itemData), lpdis->hDC, x, y, fStyle);
+		if (HICON hIcon = LoadAboutIcon(lpdis->itemID))
+		{
+			::DrawIconEx(lpdis->hDC, x, y, hIcon, 16, 16, 0, NULL, DI_NORMAL);
+			::DestroyIcon(hIcon);
+		}
+		else
+		{
+			m_imlMenu->Draw(LOWORD(lpdis->itemData), lpdis->hDC, x, y, fStyle);
+		}
 		if (lpdis->itemState & ODS_CHECKED)
 		{
 			x -= cxMenuBitmapExcess / 2;
@@ -1163,11 +1201,11 @@ LRESULT CMainFrame::OnWndMsg<WM_INITMENUPOPUP>(WPARAM wParam, LPARAM lParam)
 	}
 	MENUITEMINFO mii;
 	mii.cbSize = sizeof mii;
-	mii.fMask = MIIM_STATE | MIIM_ID;
 	UINT i = pMenu->GetMenuItemCount();
 	while (i)
 	{
 		--i;
+		mii.fMask = MIIM_STATE | MIIM_ID;
 		pMenu->GetMenuItemInfo(i, TRUE, &mii);
 		// Handle the exceptional cases
 		switch (mii.wID)
@@ -1182,6 +1220,33 @@ LRESULT CMainFrame::OnWndMsg<WM_INITMENUPOPUP>(WPARAM wParam, LPARAM lParam)
 			mii.fState = m_wndTabBar->IsWindowEnabled() ? MF_ENABLED : MF_GRAYED;
 			pMenu->EnableMenuItem(mii.wID, mii.fState);
 			continue;
+		case ID_APP_ABOUT:
+			if (mii.fState & MF_DISABLED)
+			{
+				HMenu *pPopup = HMenu::CreatePopupMenu();
+				mii.fMask = MIIM_BITMAP;
+				mii.hbmpItem = HBMMENU_CALLBACK;
+				pPopup->AppendMenu(MF_STRING, ID_APP_ABOUT, L"&WinMerge...");
+				pPopup->SetMenuItemInfo(0, TRUE, &mii);
+				pPopup->AppendMenu(MF_STRING, ID_HELP_ABOUT_FRHED, L"&Frhed...");
+				pPopup->SetMenuItemInfo(1, TRUE, &mii);
+				pPopup->AppendMenu(MF_STRING, ID_HELP_ABOUT_REOGRID, L"&ReoGrid...");
+				pPopup->SetMenuItemInfo(2, TRUE, &mii);
+				pPopup->AppendMenu(MF_STRING, ID_HELP_ABOUT_SQLITECOMPARE, L"&SQLite Compare...");
+				pPopup->SetMenuItemInfo(3, TRUE, &mii);
+				mii.fMask = MIIM_STATE | MIIM_ID | MIIM_SUBMENU;
+				mii.fState = MF_STRING;
+				mii.wID = 0;
+				mii.hSubMenu = pPopup->m_hMenu;
+				pMenu->SetMenuItemInfo(i, TRUE, &mii);
+#ifdef _DEBUG
+				pMenu->InsertMenu(--i, MF_BYPOSITION | MF_SEPARATOR);
+				pMenu->InsertMenu(++i, MF_BYPOSITION, ID_DEBUG_LOADCONFIG, L"&Load Config...");
+				pMenu->InsertMenu(++i, MF_BYPOSITION, ID_DEBUG_RESETOPTIONS, L"&Reset Options");
+#endif
+				continue;
+			}
+			break;
 		case ID_FILE_MRU_FILE1:
 			if (mii.fState & MF_DISABLED)
 			{
@@ -1422,11 +1487,10 @@ void CMainFrame::ShowMergeDoc(CDirFrame *pDirDoc,
 		FileLocationGuessEncodings(filelocRight, bGuessEncoding);
 	}
 
-	bool bLeftRO = (dwLeftFlags & FFILEOPEN_READONLY) > 0;
-	bool bRightRO = (dwRightFlags & FFILEOPEN_READONLY) > 0;
+	bool const bLeftRO = (dwLeftFlags & FFILEOPEN_READONLY) > 0;
+	bool const bRightRO = (dwRightFlags & FFILEOPEN_READONLY) > 0;
 
-	if ((dwLeftFlags & FFILEOPEN_DETECTBIN) && filelocLeft.encoding.m_binary ||
-		(dwRightFlags & FFILEOPEN_DETECTBIN) && filelocRight.encoding.m_binary)
+	if ((dwLeftFlags | dwRightFlags) & FFILEOPEN_DETECTBIN)
 	{
 		// No issue to repeat COptionsMgr::Get() as it is no more expensive than referencing a variable.
 		if (!COptionsMgr::Get(OPT_CMP_IMG_FILEPATTERNS).empty() &&
@@ -1434,6 +1498,13 @@ void CMainFrame::ShowMergeDoc(CDirFrame *pDirDoc,
 			PathMatchSpec(filelocRight.filepath.c_str(), COptionsMgr::Get(OPT_CMP_IMG_FILEPATTERNS).c_str()))
 		{
 			ShowImgMergeDoc(pDirDoc, filelocLeft, filelocRight, bLeftRO, bRightRO, sCompareAs);
+			return;
+		}
+		if (!COptionsMgr::Get(OPT_CMP_REOGRID_FILEPATTERNS).empty() &&
+			PathMatchSpec(filelocLeft.filepath.c_str(), COptionsMgr::Get(OPT_CMP_REOGRID_FILEPATTERNS).c_str()) &&
+			PathMatchSpec(filelocRight.filepath.c_str(), COptionsMgr::Get(OPT_CMP_REOGRID_FILEPATTERNS).c_str()))
+		{
+			ShowReoGridMergeDoc(pDirDoc, filelocLeft, filelocRight, bLeftRO, bRightRO, sCompareAs);
 			return;
 		}
 		if (!(COptionsMgr::Get(OPT_CMP_SQLITE_COMPAREFLAGS) & SQLITE_CMP_USE_FILE_PATTERNS) ?
@@ -1445,8 +1516,12 @@ void CMainFrame::ShowMergeDoc(CDirFrame *pDirDoc,
 			ShowSQLiteMergeDoc(pDirDoc, filelocLeft, filelocRight, bLeftRO, bRightRO, sCompareAs);
 			return;
 		}
-		ShowHexMergeDoc(pDirDoc, filelocLeft, filelocRight, bLeftRO, bRightRO, sCompareAs);
-		return;
+		if ((dwLeftFlags & FFILEOPEN_DETECTBIN) && filelocLeft.encoding.m_binary ||
+			(dwRightFlags & FFILEOPEN_DETECTBIN) && filelocRight.encoding.m_binary)
+		{
+			ShowHexMergeDoc(pDirDoc, filelocLeft, filelocRight, bLeftRO, bRightRO, sCompareAs);
+			return;
+		}
 	}
 
 	if (ActivateOpenDoc(pDirDoc, filelocLeft, filelocRight, sCompareAs, ID_MERGE_COMPARE_TEXT, FRAME_FILE))
@@ -1495,9 +1570,22 @@ void CMainFrame::ShowSQLiteMergeDoc(CDirFrame *pDirDoc,
 	FileLocation &left, FileLocation &right,
 	bool bLeftRO, bool bRightRO, LPCTSTR sCompareAs)
 {
-	if (ActivateOpenDoc(pDirDoc, left, right, sCompareAs, ID_MERGE_COMPARE_IMG, FRAME_SQLITEDB))
+	if (ActivateOpenDoc(pDirDoc, left, right, sCompareAs, ID_MERGE_COMPARE_SQLITE, FRAME_SQLITEDB))
 		return;
 	if (CSQLiteMergeFrame *const pDocFrame = GetSQLiteMergeDocToShow(pDirDoc))
+	{
+		pDocFrame->m_sCompareAs = sCompareAs;
+		OpenDocs(pDocFrame, left, right, bLeftRO, bRightRO);
+	}
+}
+
+void CMainFrame::ShowReoGridMergeDoc(CDirFrame *pDirDoc,
+	FileLocation &left, FileLocation &right,
+	bool bLeftRO, bool bRightRO, LPCTSTR sCompareAs)
+{
+	if (ActivateOpenDoc(pDirDoc, left, right, sCompareAs, ID_MERGE_COMPARE_REOGRID, FRAME_REOGRID))
+		return;
+	if (CReoGridMergeFrame *const pDocFrame = GetReoGridMergeDocToShow(pDirDoc))
 	{
 		pDocFrame->m_sCompareAs = sCompareAs;
 		OpenDocs(pDocFrame, left, right, bLeftRO, bRightRO);
@@ -1977,6 +2065,10 @@ bool CMainFrame::DoFileOpen(
 			// Open files in SQLite Compare
 			ShowSQLiteMergeDoc(pDirDoc, filelocLeft, filelocRight, bROLeft, bRORight, packingInfo.pluginMoniker.c_str());
 			return true;
+		case ID_MERGE_COMPARE_REOGRID:
+			// Open files in ReoGrid Compare
+			ShowReoGridMergeDoc(pDirDoc, filelocLeft, filelocRight, bROLeft, bRORight, packingInfo.pluginMoniker.c_str());
+			return true;
 		}
 		try
 		{
@@ -2386,6 +2478,8 @@ void CMainFrame::OnViewUsedefaultfont()
  */
 void CMainFrame::UpdateResources()
 {
+	if (m_spTaskManager)
+		m_spTaskManager->SetUILocale(GetThreadLocale());
 	m_wndStatusBar->SetPartText(0, LanguageSelect.LoadString(IDS_IDLEMESSAGE).c_str());
 	HWindow *pChild = NULL;
 	while ((pChild = m_pWndMDIClient->FindWindowEx(pChild, WinMergeWindowClass)) != NULL)
@@ -2700,6 +2794,20 @@ CImgMergeFrame *CMainFrame::GetImgMergeDocToShow(CDirFrame *pDirDoc)
 }
 
 /**
+ * @brief Obtain an ReoGrid merge doc to display a difference in files.
+ * See GetMergeDocToShow() on merge doc reuse strategy.
+ * @param [in] pDirDoc Dir compare document.
+ * @return Pointer to merge document.
+ */
+CReoGridMergeFrame *CMainFrame::GetReoGridMergeDocToShow(CDirFrame *pDirDoc)
+{
+	if (pDirDoc)
+		return pDirDoc->GetReoGridMergeDocForDiff();
+	RecycleMergeDoc(FRAME_REOGRID);
+	return new CReoGridMergeFrame(this);
+}
+
+/**
  * @brief Obtain an SQLite DB merge doc to display a difference in files.
  * See GetMergeDocToShow() on merge doc reuse strategy.
  * @param [in] pDirDoc Dir compare document.
@@ -2910,7 +3018,7 @@ LRESULT CMainFrame::OnWndMsg<WM_DROPFILES>(WPARAM wParam, LPARAM)
 	return 0;
 }
 
-DWORD CMainFrame::CLRExec(LPCWSTR path, LPCWSTR type, LPCWSTR method, LPCWSTR arg)
+DWORD CMainFrame::CLRExec(LPCWSTR method, LPCWSTR arg)
 {
 	if (!m_spMetaHost)
 		OException::Check(MSCOREE->CLRCreateInstance(CLSID_CLRMetaHost, IID_ICLRMetaHost, (LPVOID*)&m_spMetaHost));
@@ -2918,16 +3026,17 @@ DWORD CMainFrame::CLRExec(LPCWSTR path, LPCWSTR type, LPCWSTR method, LPCWSTR ar
 		OException::Check(m_spMetaHost->GetRuntime(L"v4.0.30319", IID_ICLRRuntimeInfo, (LPVOID*)&m_spRuntimeInfo));
 	if (!m_spRuntimeHost)
 		OException::Check(m_spRuntimeInfo->GetInterface(CLSID_CLRRuntimeHost, IID_ICLRRuntimeHost, (LPVOID*)&m_spRuntimeHost));
+	if (!m_spControl)
+		OException::Check(m_spRuntimeHost->GetCLRControl(&m_spControl));
+	if (!m_spTaskManager)
+		OException::Check(m_spControl->GetCLRManager(IID_ICLRTaskManager, (LPVOID*)&m_spTaskManager));
 	m_spRuntimeHost->Start();
+	m_spTaskManager->SetUILocale(GetThreadLocale());
 	DWORD ret = 0;
+	static const WCHAR path[] = L"AppDomainHost.dll";
+	static const WCHAR type[] = L"AppDomainHost.AppDomainHost";
 	OException::Check(m_spRuntimeHost->ExecuteInDefaultAppDomain(path, type, method, arg, &ret));
 	return ret;
-}
-
-DWORD CMainFrame::CLRExecSQLiteCompare(LPCWSTR type, LPCWSTR method, LPCWSTR arg)
-{
-	static const WCHAR SQLiteCompare[] = L"\\SQLiteCompare\\bin\\SQLiteCompare.exe";
-	return CLRExec(GetModulePath().append(SQLiteCompare).c_str(), type, method, arg);
 }
 
 IUIAutomation *CMainFrame::UIAutomation()
@@ -3366,8 +3475,12 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 			switch (pMsg->wParam)
 			{
 			case VK_ESCAPE:
-				if (::SendMessage(pMsg->hwnd, WM_GETDLGCODE, 0, reinterpret_cast<LPARAM>(pMsg)) & DLGC_WANTMESSAGE)
-					break;
+				if (UINT dlgcode = static_cast<UINT>(::SendMessage(
+					pMsg->hwnd, WM_GETDLGCODE, pMsg->wParam, reinterpret_cast<LPARAM>(pMsg))))
+				{
+					if ((dlgcode & (DLGC_WANTMESSAGE | DLGC_HASSETSEL)) == (DLGC_WANTMESSAGE | DLGC_HASSETSEL))
+						break;
+				}
 				if (m_invocationMode != MergeCmdLineInfo::InvocationModeNone)
 				{
 					if (pDocFrame && CloseDocFrame(pDocFrame))
@@ -3955,7 +4068,10 @@ LRESULT CMainFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 		LanguageSelect.DoModal(CAboutDlg());
 		break;
 	case ID_HELP_ABOUT_SQLITECOMPARE:
-		CLRExecSQLiteCompare(L"SQLiteTurbo.Program", L"About", L"About SQLite Compare");
+		CLRExec(L"SQLiteCompare", L"/About \"About SQLite Compare\"");
+		break;
+	case ID_HELP_ABOUT_REOGRID:
+		CLRExec(L"ReoGridCompare", L"/About \"About ReoGrid\"");
 		break;
 	case ID_HELP_ABOUT_FRHED:
 		hekseditU->About(m_hWnd);

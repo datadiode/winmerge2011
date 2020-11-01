@@ -4,9 +4,9 @@
 //    SPDX-License-Identifier: GPL-3.0-or-later
 /////////////////////////////////////////////////////////////////////////////
 /**
- * @file  SQLiteMergeFrm.h
+ * @file  ReoGridMergeFrm.h
  *
- * @brief interface of the CSQLiteMergeFrame class
+ * @brief interface of the CReoGridMergeFrame class
  *
  */
 #pragma once
@@ -14,13 +14,13 @@
 /**
  * @brief Frame class for file compare, handles panes, statusbar etc.
  */
-class CSQLiteMergeFrame
-	: ZeroInit<CSQLiteMergeFrame>
+class CReoGridMergeFrame
+	: ZeroInit<CReoGridMergeFrame>
 	, public CEditorFrame
 	, public IUIAutomationEventHandler
 {
 public:
-	CSQLiteMergeFrame(CMainFrame *, CDirFrame * = NULL);
+	CReoGridMergeFrame(CMainFrame *, CDirFrame * = NULL);
 
 // Operations
 	void OpenDocs(FileLocation &, FileLocation &, bool bROLeft, bool bRORight);
@@ -35,7 +35,7 @@ public:
 	{
 		static const QITAB rgqit[] =
 		{
-			QITABENT(CSQLiteMergeFrame, IUIAutomationEventHandler),
+			QITABENT(CReoGridMergeFrame, IUIAutomationEventHandler),
 			{ 0 }
 		};
 		return QISearch(this, rgqit, iid, ppv);
@@ -53,23 +53,42 @@ public:
 
 // Implementation
 private:
-	virtual ~CSQLiteMergeFrame();
+	virtual ~CReoGridMergeFrame();
 	void SetTitle();
+	void SetLastCompareResult(bool);
+	void UpdateLastCompareResult();
+	void UpdateDiffItem(CDirFrame *);
 	void UpdateCmdUI();
-	virtual FRAMETYPE GetFrameType() const { return FRAME_SQLITEDB; }
+	virtual FRAMETYPE GetFrameType() const { return FRAME_REOGRID; }
 	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
 	template<UINT>
 	LRESULT OnWndMsg(WPARAM, LPARAM);
 
+	BYTE m_cmdStateSaveLeft;
+	BYTE m_cmdStateSaveRight;
+
 	CMyComPtr<IUIAutomationElement> m_spToolStrip;
-	CMyComPtr<IAccessible> m_spGenerateChangeScriptLeftToRight;
-	CMyComPtr<IAccessible> m_spGenerateChangeScriptRightToLeft;
 	CMyComPtr<IAccessible> m_spAccExit;
-	CMyComPtr<IAccessible> m_spAccRefresh;
+	CMyComPtr<IAccessible> m_spAccSave;
+	CMyComPtr<IAccessible> m_spAccSaveLeft;
+	CMyComPtr<IAccessible> m_spAccSaveLeftAs;
+	CMyComPtr<IAccessible> m_spAccSaveRight;
+	CMyComPtr<IAccessible> m_spAccSaveRightAs;
+	CMyComPtr<IAccessible> m_spAccRecalculate;
+	CMyComPtr<IAccessible> m_spAccLanguage;
+	CMyComPtr<IAccessible> m_spAccCut;
+	CMyComPtr<IAccessible> m_spAccCopy;
+	CMyComPtr<IAccessible> m_spAccPaste;
+	CMyComPtr<IAccessible> m_spAccUndo;
+	CMyComPtr<IAccessible> m_spAccRedo;
 	CMyComPtr<IAccessible> m_spAccPrevDiff;
 	CMyComPtr<IAccessible> m_spAccNextDiff;
+	CMyComPtr<IAccessible> m_spAccFirstDiff;
+	CMyComPtr<IAccessible> m_spAccLastDiff;
 	CMyComPtr<IAccessible> m_spAccCopyLeftToRight;
 	CMyComPtr<IAccessible> m_spAccCopyRightToLeft;
-	CMyComPtr<IAccessible> m_spAccEditSelectedItem;
-	CMyComPtr<IAccessible> m_spAccExportDataDiffs;
+	CMyComPtr<IAccessible> m_spAccLeftHeader;
+	CMyComPtr<IAccessible> m_spAccRightHeader;
+	CMyComPtr<IAccessible> m_spAccLeftGrid;
+	CMyComPtr<IAccessible> m_spAccRightGrid;
 };

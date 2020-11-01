@@ -29,6 +29,7 @@
 #include "HexMergeFrm.h"
 #include "ImgMergeFrm.h"
 #include "SQLiteMergeFrm.h"
+#include "ReoGridMergeFrm.h"
 #include "7zCommon.h"
 #include "DirFrame.h"
 #include "DirView.h"
@@ -48,7 +49,11 @@
  */
 bool CDirFrame::CanFrameClose()
 {
-	return m_MergeDocs.empty() && m_HexMergeDocs.empty() && m_ImgMergeDocs.empty() && m_SQLiteMergeDocs.empty();
+	return m_MergeDocs.empty()
+		&& m_HexMergeDocs.empty()
+		&& m_ImgMergeDocs.empty()
+		&& m_SQLiteMergeDocs.empty()
+		&& m_ReoGridMergeDocs.empty();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -373,7 +378,7 @@ void CDirFrame::Rescan(int nCompareSelected)
 	m_pCtxt->m_bIgnoreSmallTimeDiff = COptionsMgr::Get(OPT_IGNORE_SMALL_FILETIME);
 	m_pCtxt->m_bStopAfterFirstDiff = COptionsMgr::Get(OPT_CMP_STOP_AFTER_FIRST);
 	m_pCtxt->m_nQuickCompareLimit = COptionsMgr::Get(OPT_CMP_QUICK_LIMIT);
-    m_pCtxt->m_nBinaryCompareLimit = COptionsMgr::Get(OPT_CMP_BINARY_LIMIT);
+	m_pCtxt->m_nBinaryCompareLimit = COptionsMgr::Get(OPT_CMP_BINARY_LIMIT);
 	m_pCtxt->m_bSelfCompare = COptionsMgr::Get(OPT_CMP_SELF_COMPARE);
 	m_pCtxt->m_bWalkUniques = COptionsMgr::Get(OPT_CMP_WALK_UNIQUES);
 
@@ -588,6 +593,14 @@ void CDirFrame::AddMergeDoc(CSQLiteMergeFrame *pDocFrame)
 }
 
 /**
+ * @brief A new ImgMergeDoc has been opened.
+ */
+void CDirFrame::AddMergeDoc(CReoGridMergeFrame *pDocFrame)
+{
+	m_ReoGridMergeDocs.push_back(pDocFrame);
+}
+
+/**
  * @brief MergeDoc informs us it is closing.
  */
 void CDirFrame::MergeDocClosing(CChildFrame *pDocFrame)
@@ -640,6 +653,19 @@ void CDirFrame::MergeDocClosing(CSQLiteMergeFrame *pDocFrame)
 }
 
 /**
+ * @brief MergeDoc informs us it is closing.
+ */
+void CDirFrame::MergeDocClosing(CReoGridMergeFrame *pDocFrame)
+{
+	ReoGridMergeDocPtrList::iterator pos = std::find(
+		m_ReoGridMergeDocs.begin(), m_ReoGridMergeDocs.end(), pDocFrame);
+	if (pos != m_ReoGridMergeDocs.end())
+		m_ReoGridMergeDocs.erase(pos);
+	else
+		assert(false);
+}
+
+/**
  * @brief Close MergeDocs opened from DirDoc.
  *
  * Asks confirmation for docs containing unsaved data and then
@@ -672,6 +698,13 @@ bool CDirFrame::CloseMergeDocs()
 	while (!m_SQLiteMergeDocs.empty())
 	{
 		CSQLiteMergeFrame *pDocFrame = m_SQLiteMergeDocs.front();
+		if (!pDocFrame->SaveModified())
+			return false;
+		pDocFrame->DestroyFrame();
+	}
+	while (!m_ReoGridMergeDocs.empty())
+	{
+		CReoGridMergeFrame *pDocFrame = m_ReoGridMergeDocs.front();
 		if (!pDocFrame->SaveModified())
 			return false;
 		pDocFrame->DestroyFrame();
@@ -719,6 +752,17 @@ CImgMergeFrame *CDirFrame::GetImgMergeDocForDiff()
 CSQLiteMergeFrame *CDirFrame::GetSQLiteMergeDocForDiff()
 {
 	CSQLiteMergeFrame *pDocFrame = new CSQLiteMergeFrame(m_pMDIFrame, this);
+	AddMergeDoc(pDocFrame);
+	return pDocFrame;
+}
+
+/**
+ * @brief Obtain an ReoGrid merge doc to display a difference in files.
+ * @return Pointer to CReoGridMergeDoc to use (new or existing).
+ */
+CReoGridMergeFrame *CDirFrame::GetReoGridMergeDocForDiff()
+{
+	CReoGridMergeFrame *pDocFrame = new CReoGridMergeFrame(m_pMDIFrame, this);
 	AddMergeDoc(pDocFrame);
 	return pDocFrame;
 }

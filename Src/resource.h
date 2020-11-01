@@ -19,6 +19,7 @@
 #define IDR_HEXDOCTYPE                          111
 #define IDR_IMGDOCTYPE                          112
 #define IDR_SQLITEDOCTYPE                       113
+#define IDR_REOGRIDDOCTYPE                      114
 #define IDD_ABOUTBOX                            200
 #define IDD_PROP_VSS                            201
 #define IDD_OPEN                                202
@@ -64,6 +65,7 @@
 #define IDD_PROPPAGE_COMPARE_BINARY             243
 #define IDD_PROPPAGE_LEXERS                     244
 #define IDD_PROPPAGE_COMPARE_SQLITE             245
+#define IDD_PROPPAGE_COMPARE_REOGRID            246
 #define IDI_ROTATE2                             302
 #define IDR_SPLASH                              308
 #define IDB_TOOLBAR_ENABLED                     311
@@ -476,8 +478,8 @@
 #define IDC_COMPARESQLITE_DETECT_BY_FILENAME    1369
 #define IDC_TREE_FOLDER                         1370
 #define IDC_LIST_FILE                           1371
-#define IDC_COMPAREIMAGE_PATTERNS               1390
-#define IDC_COMPAREIMAGE_DEFAULTS               1391
+#define IDC_FILEPATS                            1390
+#define IDC_DEFAULTS                            1391
 #define IDC_SQL_QUERY_PARAMS_GROUP              1400
 #define IDC_SQL_QUERY_PARAMS_LEFT               1401
 #define IDC_SQL_QUERY_PARAMS_RIGHT              1402
@@ -941,6 +943,7 @@
 #define ID_TOOLS_GENERATE_CHANGE_SCRIPT_L2R     32870
 #define ID_TOOLS_GENERATE_CHANGE_SCRIPT_R2L     32871
 #define ID_HELP_ABOUT_SQLITECOMPARE             32872
+#define ID_HELP_ABOUT_REOGRID                   32873
 #define ID_HELP_FRHED                           32875
 #define ID_HELP_ABOUT_FRHED                     32876
 #define ID_MERGE_COMPARE                        32879
@@ -950,6 +953,7 @@
 #define ID_MERGE_COMPARE_IMG                    32883
 #define ID_MERGE_COMPARE_XML                    32884
 #define ID_MERGE_COMPARE_SQLITE                 32885
+#define ID_MERGE_COMPARE_REOGRID                32886
 #define ID_WINDOW_CHANGE_PANE                   32896
 #define ID_WINDOW_CLOSEALL                      32897
 #define ID_HELP_CONTENTS                        32912

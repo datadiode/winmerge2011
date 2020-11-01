@@ -32,10 +32,12 @@ class CDirView;
 class CHexMergeFrame;
 class CImgMergeFrame;
 class CSQLiteMergeFrame;
+class CReoGridMergeFrame;
 typedef std::list<CChildFrame *> MergeDocPtrList;
 typedef std::list<CHexMergeFrame *> HexMergeDocPtrList;
 typedef std::list<CImgMergeFrame *> ImgMergeDocPtrList;
 typedef std::list<CSQLiteMergeFrame *> SQLiteMergeDocPtrList;
+typedef std::list<CReoGridMergeFrame *> ReoGridMergeDocPtrList;
 class CTempPathContext;
 struct FileActionItem;
 class MergeCmdLineInfo;
@@ -96,6 +98,7 @@ public:
 	CHexMergeFrame *GetHexMergeDocForDiff();
 	CImgMergeFrame *GetImgMergeDocForDiff();
 	CSQLiteMergeFrame *GetSQLiteMergeDocForDiff();
+	CReoGridMergeFrame *GetReoGridMergeDocForDiff();
 	bool CanFrameClose();
 
 // Implementation
@@ -114,10 +117,12 @@ public:
 	void AddMergeDoc(CHexMergeFrame *);
 	void AddMergeDoc(CImgMergeFrame *);
 	void AddMergeDoc(CSQLiteMergeFrame *);
+	void AddMergeDoc(CReoGridMergeFrame *);
 	void MergeDocClosing(CChildFrame *);
 	void MergeDocClosing(CHexMergeFrame *);
 	void MergeDocClosing(CImgMergeFrame *);
 	void MergeDocClosing(CSQLiteMergeFrame *);
+	void MergeDocClosing(CReoGridMergeFrame *);
 	bool UpdateDiffAfterOperation(const FileActionItem &, bool bMakeTargetItemWritable);
 	void UpdateHeaderPath(BOOL bLeft);
 	void AbortCurrentScan();
@@ -158,6 +163,7 @@ private:
 	HexMergeDocPtrList m_HexMergeDocs; /**< List of hex file compares opened from this compare */
 	ImgMergeDocPtrList m_ImgMergeDocs; /**< List of image file compares opened from this compare */
 	SQLiteMergeDocPtrList m_SQLiteMergeDocs; /**< List of SQLite DB compares opened from this compare */
+	ReoGridMergeDocPtrList m_ReoGridMergeDocs; /**< List of ReoGrid file compares opened from this compare */
 	int m_nRecursive; /**< Is current compare recursive? (ternary logic - 2 means flat) */
 	int m_nCompMethod; /**< Compare method */
 	String m_strLeftDesc; /**< Left side desription text */
