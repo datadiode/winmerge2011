@@ -431,6 +431,7 @@ LRESULT CDirFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 	case ID_MERGE_COMPARE_HEX:
 	case ID_MERGE_COMPARE_IMG:
 	case ID_MERGE_COMPARE_SQLITE:
+	case ID_MERGE_COMPARE_REOGRID:
 	case ID_MERGE_COMPARE_XML:
 		m_pDirView->OpenSelection(NULL, id);
 		break;
