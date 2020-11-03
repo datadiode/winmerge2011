@@ -397,6 +397,20 @@ Merge7z::Format *CExternalArchiveFormat::GuessFormat(LPCTSTR path)
 			}
 		}
 	}
+	else
+	{
+		// The pattern is not included in ExternalArchiveFormat.ini.
+		// If explicitly configured to be handled otherwise, bypass the Merge7z.dll.
+		if (!COptionsMgr::Get(OPT_CMP_IMG_FILEPATTERNS).empty() &&
+			PathMatchSpec(ext, COptionsMgr::Get(OPT_CMP_IMG_FILEPATTERNS).c_str()) ||
+			!COptionsMgr::Get(OPT_CMP_REOGRID_FILEPATTERNS).empty() &&
+			PathMatchSpec(ext, COptionsMgr::Get(OPT_CMP_REOGRID_FILEPATTERNS).c_str()) ||
+			!COptionsMgr::Get(OPT_CMP_SQLITE_FILEPATTERNS).empty() &&
+			PathMatchSpec(ext, COptionsMgr::Get(OPT_CMP_SQLITE_FILEPATTERNS).c_str()))
+		{
+			path = NULL;
+		}
+	}
 	if (path != NULL)
 	{
 		ASSERT(pFormat == NULL);
