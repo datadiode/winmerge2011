@@ -74,6 +74,7 @@ private:
 	CMyComPtr<IAccessible> m_spAccSaveLeftAs;
 	CMyComPtr<IAccessible> m_spAccSaveRight;
 	CMyComPtr<IAccessible> m_spAccSaveRightAs;
+	CMyComPtr<IAccessible> m_spAccFormatCells;
 	CMyComPtr<IAccessible> m_spAccRecalculate;
 	CMyComPtr<IAccessible> m_spAccLanguage;
 	CMyComPtr<IAccessible> m_spAccCut;

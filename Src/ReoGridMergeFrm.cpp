@@ -147,6 +147,10 @@ void CReoGridMergeFrame::OpenDocs(
 							m_spAccSaveRightAs = menuitemChildren2.Find(L"SaveRightAs", ROLE_SYSTEM_MENUITEM);
 						}
 					}
+					if (AccChildren menuitemChildren = menubarChildren.Find(L"Cells", ROLE_SYSTEM_MENUITEM))
+					{
+						m_spAccFormatCells = menuitemChildren.Find(L"Format", ROLE_SYSTEM_MENUITEM);
+					}
 					if (AccChildren menuitemChildren = menubarChildren.Find(L"Formula", ROLE_SYSTEM_MENUITEM))
 					{
 						m_spAccRecalculate = menuitemChildren.Find(L"Recalculate", ROLE_SYSTEM_MENUITEM);
@@ -212,7 +216,7 @@ void CReoGridMergeFrame::OpenDocs(
 
 	// Initial UpdateCmdUI() triggers SetTitle() due to out of sync m_cmdStateSave* flags.
 	ActivateFrame();
-	PostMessage(WM_COMMAND, ID_CURDIFF);
+	PostMessage(WM_COMMAND, ID_DIR_RESCAN);
 }
 
 /**
@@ -463,6 +467,9 @@ LRESULT CReoGridMergeFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 		CMainFrame::DoDefaultAction(m_spAccRecalculate);
 		break;
 	case ID_CURDIFF:
+		CMainFrame::DoDefaultAction(m_spAccFormatCells);
+		break;
+	case ID_DIR_RESCAN:
 		// Take some initial actions after files are loaded
 		UpdateCmdUI();
 		if (COptionsMgr::Get(OPT_SCROLL_TO_FIRST))
