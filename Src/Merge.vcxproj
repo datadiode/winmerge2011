@@ -141,7 +141,7 @@
       <SubSystem>Windows</SubSystem>
     </Link>
     <PostBuildEvent>
-      <Command>PostBuild.bat "$(IntDir)" "$(OutDir)" $(PlatformName)</Command>
+      <Command>PostBuild.bat "$(IntDir)" "$(OutDir)" $(PlatformName) $(ConfigurationName)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -167,7 +167,7 @@
       <SubSystem>Windows</SubSystem>
     </Link>
     <PostBuildEvent>
-      <Command>PostBuild.bat "$(IntDir)" "$(OutDir)" $(PlatformName)</Command>
+      <Command>PostBuild.bat "$(IntDir)" "$(OutDir)" $(PlatformName) $(ConfigurationName)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -191,7 +191,7 @@
       <SubSystem>Windows</SubSystem>
     </Link>
     <PostBuildEvent>
-      <Command>PostBuild.bat "$(IntDir)" "$(OutDir)" $(PlatformName)</Command>
+      <Command>PostBuild.bat "$(IntDir)" "$(OutDir)" $(PlatformName) $(ConfigurationName)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -216,7 +216,7 @@
       <SubSystem>Windows</SubSystem>
     </Link>
     <PostBuildEvent>
-      <Command>PostBuild.bat "$(IntDir)" "$(OutDir)" $(PlatformName)</Command>
+      <Command>PostBuild.bat "$(IntDir)" "$(OutDir)" $(PlatformName) $(ConfigurationName)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='System32|Win32'">

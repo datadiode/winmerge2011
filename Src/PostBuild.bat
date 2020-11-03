@@ -8,6 +8,7 @@ REM echo %0
 REM echo $(IntDir) = %1
 REM echo $(OutDir) = %2
 REM echo $(PlatformName) = %3
+REM echo $(ConfigurationName) = %4
 
 goto :PlatformName$%3
 
@@ -109,7 +110,7 @@ for %%$ in (
 )
 
 REM Copy SQLiteCompare
-set $=..\..\SQLiteCompare\SQLiteTurbo\bin\Release\
+set $=..\..\SQLiteCompare\SQLiteTurbo\bin\%4\
 for %%$ in (
 	.
 ) do if not "%%~$$:$" == "" (
@@ -121,7 +122,7 @@ for %%$ in (
 )
 
 REM Copy ReoGridCompare
-set $=..\..\ReoGrid\Compare\bin\Release\
+set $=..\..\ReoGrid\Compare\bin\%4\
 for %%$ in (
 	.
 ) do if not "%%~$$:$" == "" (
@@ -146,10 +147,10 @@ link /DLL /NOENTRY /MACHINE:IX86 /OUT:"%~2MergeLang.dll" "%~1\MergeLang.res"
 exit
 
 :usage
-echo ####################################################################
-echo # Merge.vcproj post-build script                                   #
-echo # Not intended for direct invocation through user interface        #
-echo # Post-build command line:                                         #
-echo # PostBuild.bat "$(IntDir)" "$(OutDir)" $(PlatformName)            #
-echo ####################################################################
+echo ##############################################################################
+echo # Merge.vcproj post-build script                                             #
+echo # Not intended for direct invocation through user interface                  #
+echo # Post-build command line:                                                   #
+echo # PostBuild.bat "$(IntDir)" "$(OutDir)" $(PlatformName) $(ConfigurationName) #
+echo ##############################################################################
 pause
