@@ -58,6 +58,20 @@ static long GetAccessibleState(IAccessible *accessible)
 	return var.lVal;
 }
 
+static HWND GetAccessibleHWnd(IAccessible *accessible)
+{
+	HWND hwnd = NULL;
+	if (accessible)
+	{
+		CMyComPtr<IOleWindow> spWindow;
+		if (SUCCEEDED(accessible->QueryInterface(&spWindow)))
+		{
+			spWindow->GetWindow(&hwnd);
+		}
+	}
+	return hwnd;
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // CReoGridMergeFrame
 
@@ -179,6 +193,13 @@ void CReoGridMergeFrame::OpenDocs(
 					m_spAccLastDiff = toolbarChildren.Find(L"LastDiff", ROLE_SYSTEM_PUSHBUTTON);
 					m_spAccCopyLeftToRight = toolbarChildren.Find(L"CopyLeftToRight", ROLE_SYSTEM_PUSHBUTTON);
 					m_spAccCopyRightToLeft = toolbarChildren.Find(L"CopyRightToLeft", ROLE_SYSTEM_PUSHBUTTON);
+				}
+			}
+			if (AccChildren windowChildren = formChildren.Find(L"FontStrip", ROLE_SYSTEM_WINDOW))
+			{
+				if (AccChildren toolbarChildren = windowChildren.Find(L"FontStrip", ROLE_SYSTEM_TOOLBAR))
+				{
+					m_spAccZoom = toolbarChildren.Find(L"Zoom", ROLE_SYSTEM_COMBOBOX);
 				}
 			}
 			if (AccChildren windowChildren = formChildren.Find(L"SplitContainer", ROLE_SYSTEM_WINDOW))
@@ -448,19 +469,22 @@ LRESULT CReoGridMergeFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 	case ID_EDIT_REDO:
 		CMainFrame::DoDefaultAction(m_spAccRedo);
 		break;
+	case ID_VIEW_ZOOMNORMAL:
+		if (HWND const hwnd = GetAccessibleHWnd(m_spAccZoom))
+			::SendMessage(hwnd, CB_SETCURSEL, 10, 0); // 110%
+		// fall through
+	case ID_VIEW_ZOOMIN:
+	case ID_VIEW_ZOOMOUT:
+		if (HWND const hwnd = GetAccessibleHWnd(m_spAccZoom))
+			::PostMessage(hwnd, WM_KEYDOWN, id == ID_VIEW_ZOOMIN ? VK_DOWN : VK_UP, 0);
+		break;
 	case ID_NEXT_PANE:
 	case ID_WINDOW_CHANGE_PANE:
-		if (IAccessible *accessible =
+		if (HWND const hwnd = GetAccessibleHWnd(
 			GetAccessibleState(m_spAccLeftHeader) & (STATE_SYSTEM_FOCUSED | STATE_SYSTEM_READONLY)
-			? m_spAccRightGrid : m_spAccLeftGrid)
+			? m_spAccRightGrid : m_spAccLeftGrid))
 		{
-			CMyComPtr<IOleWindow> spWindow;
-			if (SUCCEEDED(accessible->QueryInterface(&spWindow)))
-			{
-				HWND hwnd = NULL;
-				if (SUCCEEDED(spWindow->GetWindow(&hwnd)))
-					::SetFocus(hwnd);
-			}
+			::SetFocus(hwnd);
 		}
 		break;
 	case ID_REFRESH:

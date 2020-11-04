@@ -29,6 +29,8 @@ public:
         varChild.lVal = 0;
         for (long index = 0; index < m_count; ++index)
         {
+            if (V_VT(&m_data[index]) != VT_DISPATCH)
+                continue;
             IAccessible *const child = static_cast
                 <IAccessible *>(V_DISPATCH(&m_data[index]));
             if (long const role = kind & RoleMask)

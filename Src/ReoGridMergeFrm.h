@@ -88,6 +88,7 @@ private:
 	CMyComPtr<IAccessible> m_spAccLastDiff;
 	CMyComPtr<IAccessible> m_spAccCopyLeftToRight;
 	CMyComPtr<IAccessible> m_spAccCopyRightToLeft;
+	CMyComPtr<IAccessible> m_spAccZoom;
 	CMyComPtr<IAccessible> m_spAccLeftHeader;
 	CMyComPtr<IAccessible> m_spAccRightHeader;
 	CMyComPtr<IAccessible> m_spAccLeftGrid;
