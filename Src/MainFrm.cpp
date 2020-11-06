@@ -1188,6 +1188,7 @@ LRESULT CMainFrame::OnWndMsg<WM_INITMENUPOPUP>(WPARAM wParam, LPARAM lParam)
 {
 	if (HIWORD(lParam)) // bSysMenu
 		return 0;
+	UINT const fAllowedStates = GetCapture() ? ~MF_DISABLED : 0;
 	HMenu *const pMenu = reinterpret_cast<HMenu *>(wParam);
 	CDocFrame *const pDocFrame = GetActiveDocFrame();
 	switch (pDocFrame->GetFrameType())
@@ -1340,6 +1341,8 @@ LRESULT CMainFrame::OnWndMsg<WM_INITMENUPOPUP>(WPARAM wParam, LPARAM lParam)
 		if (const BYTE *state = m_cmdState.Lookup(mii.wID))
 		{
 			mii.fState = *state;
+			if (mii.fState & MF_DISABLED)
+				mii.fState &= fAllowedStates;
 		}
 		// Handle the option driven cases
 		else if (COptionDef<bool> *option = LookupOption(mii.wID))
@@ -3021,15 +3024,15 @@ LRESULT CMainFrame::OnWndMsg<WM_DROPFILES>(WPARAM wParam, LPARAM)
 DWORD CMainFrame::CLRExec(LPCWSTR method, LPCWSTR arg)
 {
 	if (!m_spMetaHost)
-		OException::Check(MSCOREE->CLRCreateInstance(CLSID_CLRMetaHost, IID_ICLRMetaHost, (LPVOID*)&m_spMetaHost));
+		OException::Check(MSCOREE->CLRCreateInstance(CLSID_CLRMetaHost, IID_PPV_ARGS(&m_spMetaHost)));
 	if (!m_spRuntimeInfo)
-		OException::Check(m_spMetaHost->GetRuntime(L"v4.0.30319", IID_ICLRRuntimeInfo, (LPVOID*)&m_spRuntimeInfo));
+		OException::Check(m_spMetaHost->GetRuntime(L"v4.0.30319", IID_PPV_ARGS(&m_spRuntimeInfo)));
 	if (!m_spRuntimeHost)
-		OException::Check(m_spRuntimeInfo->GetInterface(CLSID_CLRRuntimeHost, IID_ICLRRuntimeHost, (LPVOID*)&m_spRuntimeHost));
+		OException::Check(m_spRuntimeInfo->GetInterface(CLSID_CLRRuntimeHost, IID_PPV_ARGS(&m_spRuntimeHost)));
 	if (!m_spControl)
 		OException::Check(m_spRuntimeHost->GetCLRControl(&m_spControl));
 	if (!m_spTaskManager)
-		OException::Check(m_spControl->GetCLRManager(IID_ICLRTaskManager, (LPVOID*)&m_spTaskManager));
+		OException::Check(m_spControl->GetCLRManager(IID_PPV_ARGS(&m_spTaskManager)));
 	m_spRuntimeHost->Start();
 	m_spTaskManager->SetUILocale(GetThreadLocale());
 	DWORD ret = 0;

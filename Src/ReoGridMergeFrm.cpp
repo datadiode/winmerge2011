@@ -360,7 +360,8 @@ void CReoGridMergeFrame::UpdateCmdUI()
 	if (m_pMDIFrame->GetActiveDocFrame() != this)
 		return;
 	m_pMDIFrame->UpdateCmdUI<ID_FILE_SAVE>(CMainFrame::GetCommandState(m_spAccSave));
-	m_pMDIFrame->UpdateCmdUI<ID_EDIT_UNDO>(CMainFrame::GetCommandState(m_spAccUndo));
+	// For ID_EDIT_UNDO, leave keyboard accelerators enabled even if menu item is grayed
+	m_pMDIFrame->UpdateCmdUI<ID_EDIT_UNDO>(CMainFrame::GetCommandState(m_spAccUndo) | MF_DISABLED);
 	m_pMDIFrame->UpdateCmdUI<ID_EDIT_REDO>(CMainFrame::GetCommandState(m_spAccRedo));
 	m_pMDIFrame->UpdateCmdUI<ID_NEXTDIFF>(CMainFrame::GetCommandState(m_spAccNextDiff));
 	m_pMDIFrame->UpdateCmdUI<ID_PREVDIFF>(CMainFrame::GetCommandState(m_spAccPrevDiff));

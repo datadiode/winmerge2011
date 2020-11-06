@@ -62,6 +62,11 @@ HRESULT CChildFrame::FindBehavior(BSTR bstrBehavior, BSTR bstrBehaviorUrl, IElem
 
 void CChildFrame::OnEditUndo()
 {
+	if (curUndo == undoTgt.begin())
+	{
+		ASSERT(FALSE);
+		return;
+	}
 	CMergeEditView *tgt = *(curUndo - 1);
 	if (tgt->QueryEditable())
 	{
@@ -83,6 +88,11 @@ void CChildFrame::OnEditUndo()
 
 void CChildFrame::OnEditRedo()
 {
+	if (curUndo == undoTgt.end())
+	{
+		ASSERT(FALSE);
+		return;
+	}
 	CMergeEditView *tgt = *(curUndo);
 	if (tgt->QueryEditable())
 	{
