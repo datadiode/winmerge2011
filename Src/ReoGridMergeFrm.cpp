@@ -470,14 +470,34 @@ LRESULT CReoGridMergeFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 	case ID_EDIT_REDO:
 		CMainFrame::DoDefaultAction(m_spAccRedo);
 		break;
-	case ID_VIEW_ZOOMNORMAL:
-		if (HWND const hwnd = GetAccessibleHWnd(m_spAccZoom))
-			::SendMessage(hwnd, CB_SETCURSEL, 10, 0); // 110%
-		// fall through
 	case ID_VIEW_ZOOMIN:
+	case ID_VIEW_ZOOMNORMAL:
 	case ID_VIEW_ZOOMOUT:
-		if (HWND const hwnd = GetAccessibleHWnd(m_spAccZoom))
-			::PostMessage(hwnd, WM_KEYDOWN, id == ID_VIEW_ZOOMIN ? VK_DOWN : VK_UP, 0);
+		if (HComboBox *const pwndCombo = reinterpret_cast<HComboBox *>(GetAccessibleHWnd(m_spAccZoom)))
+		{
+			C_ASSERT(ID_VIEW_ZOOMNORMAL - ID_VIEW_ZOOMIN == 1);
+			C_ASSERT(ID_VIEW_ZOOMNORMAL - ID_VIEW_ZOOMOUT == -1);
+			TCHAR text[6] = _T("100%");
+			int index = ID_VIEW_ZOOMNORMAL - id;
+			if (index)
+				pwndCombo->GetWindowText(text, _countof(text));
+			index += pwndCombo->FindStringExact(-1, text);
+			if (index >= 0 && index < pwndCombo->GetCount() && index != pwndCombo->GetCurSel())
+			{
+				pwndCombo->SetCurSel(index);
+				// Do some magic to trigger an event in the hosted application
+				COMBOBOXINFO info;
+				info.cbSize = sizeof info;
+				if (::GetComboBoxInfo(pwndCombo->m_hWnd, &info))
+				{
+					HEdit *pwndItem = reinterpret_cast<HEdit *>(info.hwndItem);
+					pwndItem->SetSel(0, 0);
+					pwndItem->ReplaceSel(_T(""));
+					if (::GetFocus() == info.hwndItem)
+						pwndItem->SetSel(0, -1);
+				}
+			}
+		}
 		break;
 	case ID_NEXT_PANE:
 	case ID_WINDOW_CHANGE_PANE:
