@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WinMerge\n"
 "Report-Msgid-Bugs-To: https://bugs.winmerge.org/\n"
-"POT-Creation-Date: 2020-09-12 15:41+0000\n"
-"PO-Revision-Date: 2020-09-16 16:16+0300\n"
+"POT-Creation-Date: 2020-11-02 06:13+0000\n"
+"PO-Revision-Date: 2020-11-09 09:59+0300\n"
 "Last-Translator: Tichij <tichij@mail.com>\n"
 "Language-Team: Lithuanian <winmerge-translate@lists.sourceforge.net>\n"
 "Language: lt\n"
@@ -319,7 +319,7 @@ msgstr "&Dideli mygtukai"
 #: Merge.rc:753
 #, c-format
 msgid "&Huge"
-msgstr ""
+msgstr "&Milþiniðki mygtukai"
 
 #: Merge.rc:68
 #: Merge.rc:203
@@ -1234,7 +1234,7 @@ msgstr "&Paveikslëlis"
 #: Merge.rc:857
 #, c-format
 msgid "&ReoGrid"
-msgstr ""
+msgstr "&ReoGrid"
 
 #: Merge.rc:858
 #, c-format
@@ -2706,12 +2706,12 @@ msgstr "&Paveikslëliø failø ðablonai:"
 #: Merge.rc:1718
 #, c-format
 msgid "ReoGrid"
-msgstr ""
+msgstr "ReoGrid"
 
 #: Merge.rc:1721
 #, c-format
 msgid "ReoGrid File &Patterns:"
-msgstr ""
+msgstr "ReoGrid failø &ðablonai:"
 
 #: Merge.rc:1730
 #, c-format
@@ -3329,7 +3329,7 @@ msgstr ""
 #: Merge.rc:1985
 #, c-format
 msgid "Display program information, version number and copyright\nAbout"
-msgstr ""
+msgstr "Parodo programos informacijà, versijos numerá ir autorines teises\nApie"
 
 #: Merge.rc:1986
 #, c-format
