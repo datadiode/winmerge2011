@@ -5,17 +5,21 @@ namespace AppDomainHost
 {
     public static class AppDomainHost
     {
-        static Lazy<AppDomain> domSQLiteCompare =
-            new Lazy<AppDomain>(() => AppDomain.CreateDomain("SQLiteCompare"));
+        static Lazy<AppDomain> domSQLiteCompare = new Lazy<AppDomain>(() =>
+            AppDomain.CreateDomain("SQLiteCompare", null,
+            AppDomain.CurrentDomain.BaseDirectory + "SQLiteCompare\\bin\\",
+            null, false));
 
-        static Lazy<AppDomain> domReoGridCompare =
-            new Lazy<AppDomain>(() => AppDomain.CreateDomain("ReoGridCompare"));
+        static Lazy<AppDomain> domReoGridCompare = new Lazy<AppDomain>(() =>
+            AppDomain.CreateDomain("ReoGridCompare", null,
+            AppDomain.CurrentDomain.BaseDirectory + "ReoGridCompare\\bin\\",
+            null, false));
 
         public static int SQLiteCompare(string args) =>
-            ExecuteAssembly(domSQLiteCompare.Value, "SQLiteCompare\\bin\\SQLiteCompare.exe", args);
+            ExecuteAssembly(domSQLiteCompare.Value, "SQLiteCompare.exe", args);
 
         public static int ReoGridCompare(string args) =>
-            ExecuteAssembly(domReoGridCompare.Value, "ReoGridCompare\\bin\\ReoGridCompare.exe", args);
+            ExecuteAssembly(domReoGridCompare.Value, "ReoGridCompare.exe", args);
 
         /// <summary>
         /// https://github.com/adamabdelhamed/PowerArgs
@@ -74,6 +78,6 @@ namespace AppDomainHost
         }
 
         static int ExecuteAssembly(AppDomain dom, string path, string args) =>
-            dom.ExecuteAssembly(AppDomain.CurrentDomain.BaseDirectory + path, SplitArgs(args));
+            dom.ExecuteAssembly(dom.BaseDirectory + path, SplitArgs(args));
     }
 }
