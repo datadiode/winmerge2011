@@ -1,5 +1,5 @@
 WinMerge 2011 was long ago forked from WinMerge, when the project was in a dead end.
-Meanwhile, [winmerge.org](https://winmerge.org/) abandoned their original codebase in favor of [Takashi's fork](https://github.com/winmerge),
+Meanwhile, [winmerge.org](https://winmerge.org/) abandoned their original codebase in favor of [Takashi's fork](https://github.com/WinMerge/winmerge),
 whose development is driven forward with enthusiasm. Development of WinMerge 2011 has not entirely ceased, but is a sporadic business.
 
 ### November 2020 brings new features to WinMerge 2011
