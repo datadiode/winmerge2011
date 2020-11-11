@@ -43,8 +43,12 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy /y . $(SolutionDir)Build\WinMerge\Win32\$(Configuration)\
-xcopy /y . $(SolutionDir)Build\WinMerge\x64\$(Configuration)\
+    <PostBuildEvent>for %25%25P in (Win32 x64) do (
+  xcopy /y . $(SolutionDir)Build\WinMerge\%25%25P\$(Configuration)\
+  xcopy /ys $(SolutionDir)..\ReoGrid\Compare\bin\$(Configuration) $(SolutionDir)Build\WinMerge\%25%25P\$(Configuration)\ReoGridCompare\bin\
+  xcopy /ys $(SolutionDir)..\SQLiteCompare\SQLiteTurbo\bin\$(Configuration) $(SolutionDir)Build\WinMerge\%25%25P\$(Configuration)\SQLiteCompare\bin\
+)
+exit 0
 </PostBuildEvent>
   </PropertyGroup>
 </Project>
