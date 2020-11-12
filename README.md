@@ -7,5 +7,5 @@ whose development is driven forward with enthusiasm. Development of WinMerge 201
 ![SQLite Compare integrated into WinMerge GUI](Screenshots/SQLiteCompareHostedInWinMerge2011.png)  
 *SQLite 3 database file comparison powered by [SQLite Compare](https://github.com/datadiode/SQLiteCompare)*
 
-![ReoGrid Compare integrated into WinMerge GUI](Screenshots/ReoGridCompareHostedInWinmerge2011.png)  
+![ReoGrid Compare integrated into WinMerge GUI](Screenshots/ReoGridCompareHostedInWinMerge2011.png)  
 *Excel .xlsx file comparison powered by [ReoGrid](https://github.com/datadiode/ReoGrid)*
