@@ -40,7 +40,7 @@ function OnReadyStateChangeExternalDoc()
 </script>
 </head>
 <body>
-<h2>WinMerge 0.2011.210.381 Release Notes</h2>
+<h2>WinMerge 0.2011.210.466 Release Notes</h2>
 This is an experimental release of WinMerge 2011.<br>
 It includes the following enhancements as compared to the previous stable release:
 <ul class='features'>
@@ -49,6 +49,11 @@ It includes the following enhancements as compared to the previous stable releas
 <li><p>SQLite 3 database files are presented in a <a target='_blank' href='https://github.com/datadiode/SQLiteCompare'>modified version</a> of <a target='_blank' href='https://www.codeproject.com/Articles/220018/SQLite-Compare-Utility'>SQLite Compare</a>
 	which allows its embedding into the WinMerge GUI.
 	<br>This modified version also fixes quite a number of bugs found in the original product, and continues to work independently from WinMerge.
+<li><p>Limited support for Excel .xlsx files is offered through <a target='_blank' href='https://github.com/datadiode/ReoGrid'>ReoGrid</a>.
+	<br>The ReoGrid Compare application implemented by that fork is specifically tailored to run inside the WinMerge GUI, but can also be used as a standalone application.
+	<p><u>An urgent warning on this one:</u>
+	<br>While ReoGrid supports a remarkable subset of Excel's features, a round trip through ReoGrid isn't lossless.
+	<br>Therefore, take extra care when saving .xlsx files back after editing, and double-check whether the round-trip loss is tolerable for you.
 <li><p>As an alternative to GNU diff, you can choose among algorithms provided by LibXDiff.
 	<br>In particular, you may find LibXDiff's <i>indent heuristics</i> option useful.
 	<br>This feature was adopted from WinMerge 2.16.
@@ -64,14 +69,15 @@ It includes the following enhancements as compared to the previous stable releas
 	<br>Note that WinMerge 2.16's <i>Table Compare</i> feature is superior in that it allows you to adjust cell widths, and can wrap texts inside cells accordingly.
 	<br>I found this feature to be quite a nightmare to implement in a way that does not mess up editing, so resorted to a simplified, tab-stop like approach.
 </ul>
-<h5>Source code links for GPL-licensed binaries included in this release:</h5>
+<h5>Source code links for GPL-licensed/infected binaries included in this release:</h5>
 <ul>
-<li><a target='_blank' href='https://github.com/datadiode/winmerge2011/releases/tag/0.2011.210.381'>Source code of WinMerge 2011</a>
-<li><a target='_blank' href='https://github.com/datadiode/frhed/releases/tag/0.10907.2020'>Source code of Frhed</a>
-<li><a target='_blank' href='https://github.com/WinMerge/winimerge/releases/tag/1.0.20.0'>Source code of WinIMerge</a>
-<li><a target='_blank' href='https://github.com/datadiode/SQLiteCompare/releases/tag/v3.0.32'>Source code of SQLite Compare</a>
-<li><a target='_blank' href='https://github.com/schdub/protodec/releases/tag/v0.6.3-win'>Source code of protodec</a>
+<li><a target='_blank' href='https://github.com/datadiode/winmerge2011/releases/tag/0.2011.210.466'>WinMerge 2011</a>
+<li><a target='_blank' href='https://github.com/datadiode/frhed/releases/tag/0.10907.2020'>Frhed</a>
+<li><a target='_blank' href='https://github.com/WinMerge/winimerge/releases/tag/1.0.20.0'>WinIMerge</a>
+<li><a target='_blank' href='https://github.com/datadiode/SQLiteCompare/releases/tag/3.1.0.0-datadiode-006'>SQLite Compare</a>
+<li><a target='_blank' href='https://github.com/datadiode/ReoGrid/releases/tag/2.3.0.0-datadiode-094'>ReoGrid</a>
+<li><a target='_blank' href='https://github.com/schdub/protodec/releases/tag/v0.6.3-win'>protodec</a>
 </ul>
-<i>Jochen Neubeck, September 2020</i>
+<i>Jochen Neubeck, November 2020</i>
 <xml src='WinMerge.chm' onreadystatechange='OnReadyStateChangeExternalDoc()'></xml>
 </body>

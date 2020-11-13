@@ -1,3 +1,11 @@
+0.2011.210.466
+Changes since preceding release (not necessarily complete):
+• Support Excel .xlsx files through ReoGrid
+• Merge pull request #3 from Jonimoose/eastl_vs_std_fixes
+• CMergeEditView::ShowDiff(): Exclude top margin area from scrolling
+• Adopt DPI aware toolbar from winmerge-v2
+• Tweak Diffutils 3.6 ignore blank lines option for CRLF line endings
+
 0.2011.210.381
 Changes since preceding release (not necessarily complete):
 • Integrate SQLite Compare into WinMerge GUI
