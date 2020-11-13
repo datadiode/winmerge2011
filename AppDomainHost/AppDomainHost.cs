@@ -1,4 +1,14 @@
-﻿using System;
+﻿// AppDomainHost.cs
+// Copyright (c) datadiode
+// SPDX-License-Identifier: MIT
+// This file provides AppDomain-aware entrypoints to the .NET applications
+// hosted within WinMerge. The code is inspired by the following sources:
+// https://github.com/KirillOsenkov/AppDomainManagerTest
+// https://www.mode19.net/posts/clrhostingright/
+// It does not implement a CustomAppDomainManager, because I am in lack of
+// understanding why I would need that.
+
+using System;
 using System.Collections.Generic;
 
 namespace AppDomainHost
