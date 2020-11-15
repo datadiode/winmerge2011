@@ -392,6 +392,7 @@ int CChildFrame::Rescan2(bool &bIdentical)
 	GetSystemTimeAsFileTime(&m_LastRescan);
 
 	DiffFileData diffdata(FileTextEncoding::GetDefaultCodepage());
+	TextDefinition const *const pTextDefinition = m_ptBuf[0]->m_CurSourceDef;
 
 	// Clear diff list
 	m_diffList.Clear();
@@ -437,7 +438,7 @@ int CChildFrame::Rescan2(bool &bIdentical)
 	{
 		for (nBuffer = 0; nBuffer < m_nBuffers; nBuffer++)
 			SaveBuffForDiff(*m_ptBuf[nBuffer], bUnicode, diffdata, nBuffer);
-		diffSuccess = m_diffWrapper.RunFileDiff(diffdata);
+		diffSuccess = m_diffWrapper.RunFileDiff(diffdata, pTextDefinition);
 	}
 	else
 	{
@@ -485,7 +486,7 @@ int CChildFrame::Rescan2(bool &bIdentical)
 					nApparentStartLine[nBuffer], nApparentLines[nBuffer]);
 			}
 
-			diffSuccess = m_diffWrapper.RunFileDiff(diffdata);
+			diffSuccess = m_diffWrapper.RunFileDiff(diffdata, pTextDefinition);
 			nDiff = m_diffList.FinishSyncPoint(nDiff, nRealStartLine);
 
 			for (nBuffer = 0; nBuffer < m_nBuffers; nBuffer++)

@@ -91,7 +91,7 @@ public:
 	void SetAlternativePaths(const String &altPath1, const String &altPath2, bool bAddCommonSuffix = false);
 	void SetCodepage(int codepage) { m_codepage = codepage; }
 	bool RunFileDiff();
-	bool RunFileDiff(DiffFileData &diffdata);
+	bool RunFileDiff(DiffFileData &, TextDefinition const * = NULL);
 	bool AddDiffRange(UINT begin0, UINT end0, UINT begin1, UINT end1, OP_TYPE op);
 	bool FixLastDiffRange(int leftBufferLines, int rightBufferLines, bool bIgnoreBlankLines);
 	MovedLines *GetMovedLines() { return m_pMovedLines; }
@@ -102,7 +102,7 @@ public:
 		return side == 0 ? m_sOriginalFile1 : m_sOriginalFile2;
 	}
 
-	TextDefinition const *InitPostFilter(DiffFileData *cmp) const;
+	TextDefinition const *InitPostFilter(DiffFileData *, TextDefinition const * = NULL) const;
 
 	// Postfiltering
 	OP_TYPE PostFilter(DiffFileData *,
@@ -115,7 +115,7 @@ public:
 protected:
 	void FormatSwitchString(struct comparison const *, char *);
 	bool Diff2Files(struct change **, struct comparison *, int *bin_status, int *bin_file);
-	bool LoadWinMergeDiffsFromDiffUtilsScript(struct change *, DiffFileData *);
+	bool LoadWinMergeDiffsFromDiffUtilsScript(struct change *, DiffFileData *, TextDefinition const *);
 	void WritePatchFile(struct change *script, struct comparison *);
 	int RegExpFilter(struct comparison *, int StartPos, int EndPos, int FileNo, bool BreakCondition);
 

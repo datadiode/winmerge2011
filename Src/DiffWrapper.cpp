@@ -236,26 +236,21 @@ static void ReplaceSpaces(String &str, LPCTSTR rep)
 	}
 }
 
-TextDefinition const *CDiffWrapper::InitPostFilter(DiffFileData *cmp) const
+TextDefinition const *CDiffWrapper::InitPostFilter(DiffFileData *cmp, TextDefinition const *pTextDefinition) const
 {
-	TextDefinition const *pTextDefinition = NULL;
-	if (bFilterCommentsLines)
-	{
+	if (!bFilterCommentsLines)
+		return NULL;
+	if (pTextDefinition == NULL)
 		if (LPCTSTR ext = PathFindExtension(m_sOriginalFile1.c_str()))
-		{
 			if (*ext != _T('\0'))
-			{
 				pTextDefinition = TextDefinition::GetTextType(ext + 1);
-				if (pTextDefinition)
-				{
-					TextBlock::Cookie cookie(pTextDefinition->flags & COOKIE_PARSER_GLOBAL);
-					cmp->parsed[0] = 0;
-					cmp->cookie[0] = cookie;
-					cmp->parsed[1] = 0;
-					cmp->cookie[1] = cookie;
-				}
-			}
-		}
+	if (pTextDefinition != NULL)
+	{
+		TextBlock::Cookie cookie(pTextDefinition->flags & COOKIE_PARSER_GLOBAL);
+		cmp->parsed[0] = 0;
+		cmp->cookie[0] = cookie;
+		cmp->parsed[1] = 0;
+		cmp->cookie[1] = cookie;
 	}
 	return pTextDefinition;
 }
@@ -380,7 +375,7 @@ void CDiffWrapper::SetAlternativePaths(const String &altPath1, const String &alt
 	}
 }
 
-bool CDiffWrapper::RunFileDiff(DiffFileData &diffdata)
+bool CDiffWrapper::RunFileDiff(DiffFileData &diffdata, TextDefinition const *pTextDefinition)
 {
 	SetToDiffUtils(diffdata);
 
@@ -445,7 +440,7 @@ bool CDiffWrapper::RunFileDiff(DiffFileData &diffdata)
 	// This is done on every WinMerge's doc rescan!
 	if (!m_status.bBinaries && m_pDiffList)
 	{
-		bRet = LoadWinMergeDiffsFromDiffUtilsScript(script, &diffdata);
+		bRet = LoadWinMergeDiffsFromDiffUtilsScript(script, &diffdata, pTextDefinition);
 	}
 
 	// cleanup the script
@@ -672,9 +667,10 @@ int CDiffWrapper::RegExpFilter(struct comparison *cmp,
 /**
  * @brief Walk the diff utils change script, building the WinMerge list of diff blocks
  */
-bool CDiffWrapper::LoadWinMergeDiffsFromDiffUtilsScript(struct change *script, DiffFileData *cmp)
+bool CDiffWrapper::LoadWinMergeDiffsFromDiffUtilsScript(
+	struct change *script, DiffFileData *cmp, TextDefinition const *pPostFilter)
 {
-	TextDefinition const *const pPostFilter = InitPostFilter(cmp);
+	pPostFilter = InitPostFilter(cmp, pPostFilter);
 
 	struct change *next = script;
 	while (next)
