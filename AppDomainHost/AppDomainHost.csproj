@@ -45,8 +45,8 @@
   <PropertyGroup>
     <PostBuildEvent>for %25%25P in (Win32 x64) do (
   xcopy /y . $(SolutionDir)Build\WinMerge\%25%25P\$(Configuration)\
-  xcopy /ys $(SolutionDir)..\ReoGrid\Compare\bin\$(Configuration) $(SolutionDir)Build\WinMerge\%25%25P\$(Configuration)\ReoGridCompare\bin\
-  xcopy /ys $(SolutionDir)..\SQLiteCompare\SQLiteTurbo\bin\$(Configuration) $(SolutionDir)Build\WinMerge\%25%25P\$(Configuration)\SQLiteCompare\bin\
+  xcopy /ysU $(SolutionDir)..\ReoGrid\Compare\bin\$(Configuration) $(SolutionDir)Build\WinMerge\%25%25P\$(Configuration)\ReoGridCompare\bin\
+  xcopy /ysU $(SolutionDir)..\SQLiteCompare\SQLiteTurbo\bin\$(Configuration) $(SolutionDir)Build\WinMerge\%25%25P\$(Configuration)\SQLiteCompare\bin\
 )
 exit 0
 </PostBuildEvent>
