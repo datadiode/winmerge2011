@@ -117,6 +117,7 @@ static BOOL IsPascalKeyword(LPCTSTR pszChars, int nLength)
 #define COOKIE_STRING           0x0008
 #define COOKIE_CHAR             0x0010
 #define COOKIE_EXT_COMMENT2     0x0020
+#define COOKIE_TRANSPARENT      0xFFFFFF00
 
 void TextDefinition::ParseLinePascal(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf) const
 {
@@ -124,7 +125,7 @@ void TextDefinition::ParseLinePascal(TextBlock::Cookie &cookie, LPCTSTR const ps
 
 	if (nLength == 0)
 	{
-		dwCookie &= (COOKIE_EXT_COMMENT | COOKIE_EXT_COMMENT2);
+		dwCookie &= (COOKIE_TRANSPARENT | COOKIE_EXT_COMMENT | COOKIE_EXT_COMMENT2);
 		return;
 	}
 
@@ -292,7 +293,7 @@ void TextDefinition::ParseLinePascal(TextBlock::Cookie &cookie, LPCTSTR const ps
 	} while (I < nLength);
 
 	if (pszChars[nLength - 1] != '\\')
-		dwCookie &= (COOKIE_EXT_COMMENT | COOKIE_EXT_COMMENT2);
+		dwCookie &= (COOKIE_TRANSPARENT | COOKIE_EXT_COMMENT | COOKIE_EXT_COMMENT2);
 }
 
 TESTCASE
