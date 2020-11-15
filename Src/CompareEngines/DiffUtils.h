@@ -22,7 +22,7 @@ class DiffUtils : public CDiffWrapper
 {
 public:
 	explicit DiffUtils(const CDiffContext *);
-	int diffutils_compare_files(struct comparison *);
+	int diffutils_compare_files(DiffFileData *);
 
 	int m_ndiffs; /**< Real diffs found. */
 	int m_ntrivialdiffs; /**< Ignored diffs found. */

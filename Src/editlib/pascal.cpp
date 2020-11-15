@@ -118,7 +118,7 @@ static BOOL IsPascalKeyword(LPCTSTR pszChars, int nLength)
 #define COOKIE_CHAR             0x0010
 #define COOKIE_EXT_COMMENT2     0x0020
 
-void CCrystalTextBuffer::ParseLinePascal(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
+void TextDefinition::ParseLinePascal(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf) const
 {
 	DWORD &dwCookie = cookie.m_dwCookie;
 

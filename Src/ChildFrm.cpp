@@ -815,8 +815,8 @@ LRESULT CChildFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 	default:
 		if (id >= ID_COLORSCHEME_FIRST && id <= ID_COLORSCHEME_LAST)
 		{
-			CCrystalTextBuffer::TextType enuType = static_cast
-				<CCrystalTextBuffer::TextType>(id - ID_COLORSCHEME_FIRST);
+			TextDefinition::TextType enuType = static_cast
+				<TextDefinition::TextType>(id - ID_COLORSCHEME_FIRST);
 			m_ptBuf[0]->SetTextType(enuType);
 			m_ptBuf[1]->SetTextType(enuType);
 			UpdateAllViews();

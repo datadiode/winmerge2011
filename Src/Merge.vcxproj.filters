@@ -219,9 +219,6 @@
     <ClCompile Include="FileVersion.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FilterCommentsManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="FilterList.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -729,6 +726,9 @@
     <ClCompile Include="ReoGridMergeFrm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="editlib\TextBlock.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\WindowPlacement.h">
@@ -879,9 +879,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="FileVersion.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="FilterCommentsManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="FilterList.h">

@@ -254,7 +254,7 @@ void CGhostTextView::GetAdditionalTextBlocks(int nLineIndex, TextBlock::Array &r
 		pBuf->m_nColorIndex = COLORINDEX_NONE;
 		pBuf->m_nBgColorIndex = COLORINDEX_NONE;
 	}
-	rpBuf.m_nActualItems = nWordDiffs * 2 + 1;
+	rpBuf.m_nBack = nWordDiffs * 2;
 }
 
 /**

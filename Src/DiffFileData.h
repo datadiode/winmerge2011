@@ -8,16 +8,18 @@
 #pragma once
 
 #include "Diff.h"
+#include "editlib/TextBlock.h"
 
 class CDiffWrapper;
 
 /**
  * @brief C++ container for the structure (file_data) used by diffutils' diff_2_files(...)
  */
-struct DiffFileData : comparison
+class DiffFileData
+	: ZeroInit<DiffFileData>
+	, public comparison
 {
-// instance interface
-
+public:
 	explicit DiffFileData(int codepage);
 	~DiffFileData();
 
@@ -25,16 +27,15 @@ struct DiffFileData : comparison
 	HANDLE GetFileHandle(int i);
 	void *AllocBuffer(int i, size_t len, size_t alloc_extra);
 	void Reset();
-	void Close() { Reset(); }
 	void SetDisplayFilepaths(LPCTSTR szTrueFilepath1, LPCTSTR szTrueFilepath2);
 
-// Data (public)
 	CDiffWrapper *m_pDiffWrapper;
 	bool m_used; // whether m_inf has real data
-	std::vector<FileLocation> m_FileLocation;
-	std::vector<FileTextStats> m_textStats;
-
-	std::vector<String> m_sDisplayFilepath;
+	FileLocation m_FileLocation[2];
+	FileTextStats m_textStats[2];
+	String m_sDisplayFilepath[2];
+	TextBlock::Cookie cookie[2];
+	int parsed[2];
 
 private:
 	bool DoOpenFiles();

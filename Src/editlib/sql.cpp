@@ -78,7 +78,7 @@ static BOOL IsUser1Keyword(LPCTSTR pszChars, int nLength)
  * Some SQL implementations support nested comments, but they aren't standard.
  * @see https://cloud.google.com/bigquery/docs/reference/standard-sql/lexical
  */
-void CCrystalTextBuffer::ParseLineSql(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
+void TextDefinition::ParseLineSql(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf) const
 {
 	DWORD &dwCookie = cookie.m_dwCookie;
 

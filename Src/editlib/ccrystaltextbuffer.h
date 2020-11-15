@@ -45,25 +45,6 @@ enum LINEFLAGS : DWORD
 
 #define LF_BOOKMARK(id)     (LF_BOOKMARK_FIRST << id)
 
-enum SRCOPTIONS : DWORD
-{
-	SRCOPT_INSERTTABS		= 0x0001,
-	SRCOPT_SHOWTABS			= 0x0002,
-//	SRCOPT_BSATBOL			= 0x0004,
-	SRCOPT_SELMARGIN		= 0x0008,
-	SRCOPT_AUTOINDENT		= 0x0010,
-	SRCOPT_BRACEANSI		= 0x0020,
-	SRCOPT_BRACEGNU			= 0x0040,
-	SRCOPT_EOLNDOS			= 0x0080,
-	SRCOPT_EOLNUNIX			= 0x0100,
-	SRCOPT_EOLNMAC			= 0x0200,
-	SRCOPT_FNBRACE			= 0x0400,
-//	SRCOPT_WORDWRAP			= 0x0800,
-	SRCOPT_HTML_LEXIS		= 0x3000,
-	SRCOPT_HTML4_LEXIS		= 0x1000,
-	SRCOPT_HTML5_LEXIS		= 0x2000,
-};
-
 enum CRLFSTYLE
 {
 	CRLF_STYLE_AUTOMATIC = -1,
@@ -338,81 +319,12 @@ public:
 		LPCTSTR pchFindWhat, DWORD dwFlags,
 		Captures &ovector);
 
-	enum TextType
-	{
-		SRC_PLAIN,
-		SRC_ASP,
-		SRC_BASIC,
-		SRC_VBSCRIPT,
-		SRC_BATCH,
-		SRC_C,
-		SRC_CSHARP,
-		SRC_CSHTML,
-		SRC_CSS,
-		SRC_DCL,
-		SRC_FORTRAN,
-		SRC_GO,
-		SRC_HTML,
-		SRC_INI,
-		SRC_INNOSETUP,
-		SRC_INSTALLSHIELD,
-		SRC_JAVA,
-		SRC_JSCRIPT,
-		SRC_JSP,
-		SRC_LISP,
-		SRC_LUA,
-		SRC_MWSL,
-		SRC_NSIS,
-		SRC_PASCAL,
-		SRC_PERL,
-		SRC_PHP,
-		SRC_PO,
-		SRC_POWERSHELL,
-		SRC_PYTHON,
-		SRC_REXX,
-		SRC_RSRC,
-		SRC_RUBY,
-		SRC_RUST,
-		SRC_SGML,
-		SRC_SH,
-		SRC_SIOD,
-		SRC_SQL,
-		SRC_TCL,
-		SRC_TEX,
-		SRC_VERILOG,
-		SRC_VHDL,
-		SRC_XML
-	};
-
-// Tabsize is commented out since we have only GUI setting for it now.
-// Not removed because we may later want to have per-filetype settings again.
-// See ccrystaltextview.cpp for per filetype table initialization.
-	typedef struct tagTextDefinition
-	{
-		TextType type;
-		LPCTSTR name;
-		LPCTSTR exts;
-		TextBlock::ParseProc ParseLineX;
-		DWORD flags;
-		LPCTSTR opencomment;
-		LPCTSTR closecomment;
-		LPCTSTR commentline;
-	} const TextDefinition;
-
 	//  Source type
-	TextDefinition *m_CurSourceDef;
-	static TextDefinition m_StaticSourceDefs[];
-	static int const m_SourceDefsCount;
-	static TextDefinition *m_SourceDefs;
-	static TextDefinition *GetTextType(LPCTSTR pszExt);
-	static TextDefinition *GetTextType(int index);
-	static BOOL ScanParserAssociations(LPTSTR);
-	static void DumpParserAssociations(LPTSTR);
-	static void FreeParserAssociations();
-	TextDefinition *SetTextType(LPCTSTR pszExt);
-	TextDefinition *SetTextType(TextType enuType);
-	TextDefinition *SetTextType(TextDefinition *);
-	TextDefinition *SetTextTypeByContent(LPCTSTR pszContent);
+	TextDefinition const *m_CurSourceDef;
+	TextDefinition const *SetTextType(LPCTSTR pszExt);
+	TextDefinition const *SetTextType(TextDefinition::TextType enuType);
+	TextDefinition const *SetTextType(TextDefinition const *);
+	TextDefinition const *SetTextTypeByContent(LPCTSTR pszContent);
 
 	void InitParseCookie();
 
@@ -423,47 +335,7 @@ public:
 	 */
 	TextBlock::Cookie GetParseCookie(int nLineIndex);
 
-	void ParseLine(TextBlock::Cookie &cookie, int nLineIndex, TextBlock::Array &pBuf);
+	void ParseLine(TextBlock::Cookie &cookie, int nLineIndex, TextBlock::Array &pBuf) const;
 
 private:
-	static DWORD ScriptCookie(LPCTSTR lang, DWORD defval = COOKIE_PARSER);
-	static TextBlock::ParseProc ScriptParseProc(DWORD dwCookie);
-	void ParseLinePlain(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineUnknown(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineAsp(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineBasic(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineBatch(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineC(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineCSharp(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineRazor(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineCss(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineDcl(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineFortran(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineGo(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineIni(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineInnoSetup(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineIS(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineJava(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineLisp(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineLua(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineNsis(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLinePascal(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLinePerl(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLinePhp(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLinePo(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLinePowerShell(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLinePython(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineRexx(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineRsrc(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineRuby(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineRust(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineSgml(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineSh(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineSiod(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineSql(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineTcl(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineTex(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineVerilog(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineVhdl(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
-	void ParseLineXml(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf);
 };

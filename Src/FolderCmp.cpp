@@ -148,7 +148,7 @@ UINT FolderCmp::prepAndCompareTwoFiles(DIFFITEM *di)
 		m_pByteCompare->SetFileData(2, m_diffFileData.file);
 
 		// use our own byte-by-byte compare
-		code = m_pByteCompare->CompareFiles(&m_diffFileData.m_FileLocation.front());
+		code = m_pByteCompare->CompareFiles(m_diffFileData.m_FileLocation);
 
 		m_diffFileData.m_textStats[0] = m_pByteCompare->m_textStats[0];
 		m_diffFileData.m_textStats[1] = m_pByteCompare->m_textStats[1];

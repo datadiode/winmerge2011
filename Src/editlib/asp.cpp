@@ -62,7 +62,7 @@ static DWORD ParseProcCookie(DWORD dwCookie)
 	return dwCookie & COOKIE_PARSER;
 }
 
-void CCrystalTextBuffer::ParseLineAsp(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
+void TextDefinition::ParseLineAsp(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf) const
 {
 	DWORD &dwCookie = cookie.m_dwCookie;
 
@@ -81,8 +81,8 @@ void CCrystalTextBuffer::ParseLineAsp(TextBlock::Cookie &cookie, LPCTSTR const p
 	}
 
 	int const nHtmlTagNameMask =
-		(m_dwFlags & SRCOPT_HTML_LEXIS) == SRCOPT_HTML4_LEXIS ? COMMON_LEXIS | HTML4_LEXIS :
-		(m_dwFlags & SRCOPT_HTML_LEXIS) == SRCOPT_HTML5_LEXIS ? COMMON_LEXIS | HTML5_LEXIS :
+		(flags & SRCOPT_HTML_LEXIS) == SRCOPT_HTML4_LEXIS ? COMMON_LEXIS | HTML4_LEXIS :
+		(flags & SRCOPT_HTML_LEXIS) == SRCOPT_HTML5_LEXIS ? COMMON_LEXIS | HTML5_LEXIS :
 		COMMON_LEXIS | HTML4_LEXIS | HTML5_LEXIS;
 
 	BOOL bRedefineBlock = TRUE;

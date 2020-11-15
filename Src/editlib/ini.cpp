@@ -34,7 +34,7 @@ using CommonKeywords::IsNumeric;
 #define COOKIE_SECTION          0x0020
 #define COOKIE_KEY              0x0040
 
-void CCrystalTextBuffer::ParseLineIni(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
+void TextDefinition::ParseLineIni(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf) const
 {
 	DWORD &dwCookie = cookie.m_dwCookie;
 

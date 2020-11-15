@@ -11,7 +11,7 @@
 #include "WildcardDropList.h"
 #include "Environment.h"
 #include "paths.h"
-#include <ccrystaltextbuffer.h>
+#include "editlib/TextBlock.h"
 #include <strsafe.h>
 
 #ifdef _DEBUG
@@ -35,10 +35,10 @@ BOOL PropLexers::OnInitDialog()
 	m_pLv->SetExtendedStyle(LVS_EX_FULLROWSELECT);
 	m_pLv->InsertColumn(0, LanguageSelect.LoadString(IDS_LEXERS_LEXERTITLE).c_str());
 	m_pLv->InsertColumn(1, LanguageSelect.LoadString(IDS_LEXERS_FILETYPESTITLE).c_str());
-	for (int i = 0; i < CCrystalTextBuffer::m_SourceDefsCount; ++i)
+	for (int i = 0; i < TextDefinition::m_SourceDefsCount; ++i)
 	{
-		m_pLv->InsertItem(i, CCrystalTextBuffer::m_StaticSourceDefs[i].name);
-		m_pLv->SetItemText(i, 1, CCrystalTextBuffer::m_SourceDefs[i].exts);
+		m_pLv->InsertItem(i, TextDefinition::m_StaticSourceDefs[i].name);
+		m_pLv->SetItemText(i, 1, TextDefinition::m_SourceDefs[i].exts);
 	}
 	m_pLv->SetColumnWidth(0, LVSCW_AUTOSIZE);
 	m_pLv->SetColumnWidth(1, LVSCW_AUTOSIZE_USEHEADER);
@@ -52,7 +52,7 @@ void PropLexers::OnLvnItemactivate(NMHDR *pNMHDR)
 {
 	LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
 	WildcardDropList::OnItemActivate(pNMLV->hdr.hwndFrom, pNMLV->iItem,
-		1, 4, CCrystalTextBuffer::m_StaticSourceDefs[pNMLV->iItem].exts);
+		1, 4, TextDefinition::m_StaticSourceDefs[pNMLV->iItem].exts);
 }
 
 LRESULT PropLexers::OnNotify(NMHDR *pNMHDR)
@@ -115,11 +115,11 @@ void PropLexers::WriteOptions()
 	StringCchPrintfEx(bufptr, remaining, &bufptr, &remaining, 0, _T("version=ignore"));
 	++bufptr;
 	--remaining;
-	for (int i = 0; i < CCrystalTextBuffer::m_SourceDefsCount; ++i)
+	for (int i = 0; i < TextDefinition::m_SourceDefsCount; ++i)
 	{
 		TCHAR text[4096];
 		m_pLv->GetItemText(i, 1, text, _countof(text));
-		if (FAILED(StringCchPrintfEx(bufptr, remaining, &bufptr, &remaining, 0, _T("%s=%s"), CCrystalTextBuffer::m_StaticSourceDefs[i].name, text)))
+		if (FAILED(StringCchPrintfEx(bufptr, remaining, &bufptr, &remaining, 0, _T("%s=%s"), TextDefinition::m_StaticSourceDefs[i].name, text)))
 			break;
 		++bufptr;
 		--remaining;
@@ -127,9 +127,9 @@ void PropLexers::WriteOptions()
 	if (remaining)
 	{
 		*++bufptr = _T('\0');
-		CCrystalTextBuffer::FreeParserAssociations();
-		CCrystalTextBuffer::ScanParserAssociations(buffer);
-		CCrystalTextBuffer::DumpParserAssociations(buffer);
+		TextDefinition::FreeParserAssociations();
+		TextDefinition::ScanParserAssociations(buffer);
+		TextDefinition::DumpParserAssociations(buffer);
 		String supplementFolder = COptionsMgr::Get(OPT_SUPPLEMENT_FOLDER);
 		supplementFolder = env_ExpandVariables(supplementFolder.c_str());
 		String ini = paths_ConcatPath(supplementFolder, _T("Supplement.ini"));
@@ -142,9 +142,9 @@ void PropLexers::WriteOptions()
  */
 void PropLexers::OnDefaults()
 {
-	for (int i = 0; i < CCrystalTextBuffer::m_SourceDefsCount; ++i)
+	for (int i = 0; i < TextDefinition::m_SourceDefsCount; ++i)
 	{
-		m_pLv->SetItemText(i, 1, CCrystalTextBuffer::m_StaticSourceDefs[i].exts);
+		m_pLv->SetItemText(i, 1, TextDefinition::m_StaticSourceDefs[i].exts);
 	}
 }
 

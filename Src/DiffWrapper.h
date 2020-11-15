@@ -25,7 +25,6 @@
 #include "FileLocation.h"
 #include "FileTextStats.h"
 #include "CompareOptions.h"
-#include "FilterCommentsManager.h"
 #include "FilterList.h"
 #include "LineFiltersList.h"
 #include "diffutils/config.h"
@@ -33,9 +32,9 @@
 class CDiffContext;
 struct DIFFRANGE;
 class DiffList;
-struct DiffFileData;
+class DiffFileData;
 struct file_data;
-struct FilterCommentsSet;
+struct TextDefinition;
 class MovedLines;
 enum OP_TYPE;
 
@@ -78,7 +77,6 @@ struct DIFFSTATUS
 class CDiffWrapper
 	: public DIFFOPTIONS
 	, public PATCHOPTIONS
-	, public FilterCommentsManager
 	, public FilterList /**< Filter list for line filters. */
 {
 public:
@@ -104,18 +102,20 @@ public:
 		return side == 0 ? m_sOriginalFile1 : m_sOriginalFile2;
 	}
 
+	TextDefinition const *InitPostFilter(DiffFileData *cmp) const;
+
 	// Postfiltering
-	OP_TYPE PostFilter(struct comparison *,
-		int LineNumberLeft, int QtyLinesLeft,
-		int LineNumberRight, int QtyLinesRight,
-		OP_TYPE Op, const TCHAR *FileNameExt);
+	OP_TYPE PostFilter(DiffFileData *,
+		int LineNumberLeft, int EndLineNumberLeft,
+		int LineNumberRight, int EndLineNumberRight,
+		OP_TYPE Op, TextDefinition const *);
 
 	DIFFSTATUS m_status; /**< Status of last compare */
 
 protected:
 	void FormatSwitchString(struct comparison const *, char *);
 	bool Diff2Files(struct change **, struct comparison *, int *bin_status, int *bin_file);
-	bool LoadWinMergeDiffsFromDiffUtilsScript(struct change *, struct comparison *);
+	bool LoadWinMergeDiffsFromDiffUtilsScript(struct change *, DiffFileData *);
 	void WritePatchFile(struct change *script, struct comparison *);
 	int RegExpFilter(struct comparison *, int StartPos, int EndPos, int FileNo, bool BreakCondition);
 

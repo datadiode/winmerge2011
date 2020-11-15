@@ -887,7 +887,7 @@ void CMergeEditView::RefreshOptions()
 	SetSelectionMargin(COptionsMgr::Get(OPT_VIEW_FILEMARGIN));
 	SetTopMargin(COptionsMgr::Get(OPT_VIEW_RULER));
 	if (!COptionsMgr::Get(OPT_SYNTAX_HIGHLIGHT))
-		m_pTextBuffer->SetTextType(CCrystalTextBuffer::SRC_PLAIN);
+		m_pTextBuffer->SetTextType(TextDefinition::SRC_PLAIN);
 	// SetTextType will revert to language dependent defaults for tab
 	SetTabSize(COptionsMgr::Get(OPT_TAB_SIZE),
 		COptionsMgr::Get(OPT_SEPARATE_COMBINING_CHARS));

@@ -113,7 +113,7 @@ static BOOL IsPhp2Keyword(LPCTSTR pszChars, int nLength)
 #define COOKIE_USER2            0x0020
 #define COOKIE_TRANSPARENT      0xFFFFFF00
 
-void CCrystalTextBuffer::ParseLinePhp(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
+void TextDefinition::ParseLinePhp(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf) const
 {
 	DWORD &dwCookie = cookie.m_dwCookie;
 

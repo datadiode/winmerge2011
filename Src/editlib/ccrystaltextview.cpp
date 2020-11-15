@@ -1095,15 +1095,15 @@ void CCrystalTextView::DrawScreenLine(
 	frect.top = ptOrigin.y;
 	frect.bottom = frect.top + nLineHeight;
 
-	ASSERT(nActualItem < pBuf.m_nActualItems);
+	ASSERT(nActualItem <= pBuf.m_nBack);
 
-	if (pBuf.m_nActualItems > 0 && nActualItem < pBuf.m_nActualItems - 1 &&
+	if (nActualItem < pBuf.m_nBack &&
 		pBuf[nActualItem + 1].m_nCharPos >= nOffset &&
 		pBuf[nActualItem + 1].m_nCharPos <= nOffset + nCount)
 	{
 		ASSERT(pBuf[nActualItem].m_nCharPos >= 0 &&
 			pBuf[nActualItem].m_nCharPos <= nLineLength);
-		while (nActualItem < pBuf.m_nActualItems - 1 &&
+		while (nActualItem < pBuf.m_nBack &&
 			pBuf[nActualItem + 1].m_nCharPos <= nOffset + nCount)
 		{
 			ASSERT(pBuf[nActualItem].m_nCharPos >= 0 && pBuf[nActualItem].m_nCharPos <= nLineLength);
@@ -1191,28 +1191,15 @@ void CCrystalTextView::DrawScreenLine(
 
 void CCrystalTextView::MergeTextBlocks(TextBlock::Array &pBuf1, TextBlock::Array &pBuf2)
 {
-	int const nBlocks1 = pBuf1.m_nActualItems;
-	int const nBlocks2 = pBuf2.m_nActualItems;
+	if (!pBuf1 || !pBuf2)
+		return;
+	int const nBlocks1 = pBuf1.m_nBack + 1;
+	int const nBlocks2 = pBuf2.m_nBack + 1;
 	TextBlock::Array pMergedBuf(new TextBlock[nBlocks1 + nBlocks2]);
 	int i = 0, j = 0, k = 0;
 	while (i < nBlocks1 || j < nBlocks2)
 	{
-		if (i < nBlocks1 && j < nBlocks2 &&
-			pBuf1[i].m_nCharPos == pBuf2[j].m_nCharPos)
-		{
-			pMergedBuf[k].m_nCharPos = pBuf2[j].m_nCharPos;
-			if (pBuf2[j].m_nColorIndex == COLORINDEX_NONE)
-				pMergedBuf[k].m_nColorIndex = pBuf1[i].m_nColorIndex;
-			else
-				pMergedBuf[k].m_nColorIndex = pBuf2[j].m_nColorIndex;
-			if (pBuf2[j].m_nBgColorIndex == COLORINDEX_NONE)
-				pMergedBuf[k].m_nBgColorIndex = pBuf1[i].m_nBgColorIndex;
-			else
-				pMergedBuf[k].m_nBgColorIndex = pBuf2[j].m_nBgColorIndex;
-			i++;
-			j++;
-		}
-		else if (j >= nBlocks2 ||
+		if (j >= nBlocks2 ||
 			(i < nBlocks1 && pBuf1[i].m_nCharPos < pBuf2[j].m_nCharPos))
 		{
 			pMergedBuf[k].m_nCharPos = pBuf1[i].m_nCharPos;
@@ -1240,14 +1227,28 @@ void CCrystalTextView::MergeTextBlocks(TextBlock::Array &pBuf1, TextBlock::Array
 				pMergedBuf[k].m_nBgColorIndex = pBuf2[j].m_nBgColorIndex;
 			j++;
 		}
+		else
+		{
+			ASSERT(pBuf1[i].m_nCharPos == pBuf2[j].m_nCharPos);
+			pMergedBuf[k].m_nCharPos = pBuf2[j].m_nCharPos;
+			if (pBuf2[j].m_nColorIndex == COLORINDEX_NONE)
+				pMergedBuf[k].m_nColorIndex = pBuf1[i].m_nColorIndex;
+			else
+				pMergedBuf[k].m_nColorIndex = pBuf2[j].m_nColorIndex;
+			if (pBuf2[j].m_nBgColorIndex == COLORINDEX_NONE)
+				pMergedBuf[k].m_nBgColorIndex = pBuf1[i].m_nBgColorIndex;
+			else
+				pMergedBuf[k].m_nBgColorIndex = pBuf2[j].m_nBgColorIndex;
+			i++;
+			j++;
+		}
 		if (k == 0 ||
 			pMergedBuf[k].m_nColorIndex != pMergedBuf[k - 1].m_nColorIndex ||
 			pMergedBuf[k].m_nBgColorIndex != pMergedBuf[k - 1].m_nBgColorIndex)
 		{
-			++k;
+			pMergedBuf.m_nBack = k++;
 		}
 	}
-	pMergedBuf.m_nActualItems = k;
 	pMergedBuf.swap(pBuf1);
 	TextBlock::Array(NULL).swap(pBuf2); // micro-optimize memory footprint
 }
@@ -1265,12 +1266,11 @@ bool CCrystalTextView::DrawSingleLine(HSurface *pdc, const RECT &rc, int nLineIn
 		int const nLength = GetViewableLineLength(nLineIndex);
 
 		// Parse the line
-		TextBlock::Array pBuf(new TextBlock[(nLength + 1) * 3]); // be aware of nLength == 0
+		TextBlock::Array pBuf(new TextBlock[nLength + 1]); // be aware of nLength == 0
 		// insert at least one textblock of normal color at the beginning
 		pBuf[0].m_nCharPos = 0;
 		pBuf[0].m_nColorIndex = COLORINDEX_NORMALTEXT;
 		pBuf[0].m_nBgColorIndex = COLORINDEX_BKGND;
-		++pBuf.m_nActualItems;
 		m_pTextBuffer->ParseLine(m_pTextBuffer->GetParseCookie(nLineIndex), nLineIndex, pBuf);
 
 		TextBlock::Array pAddedBuf(NULL);
@@ -1455,12 +1455,11 @@ void CCrystalTextView::GetHTMLLine(int nLineIndex, String &strHTML)
 		int const nLength = GetViewableLineLength(nLineIndex);
 
 		// Parse the line
-		TextBlock::Array pBuf(new TextBlock[(nLength + 1) * 3]); // be aware of nLength == 0
+		TextBlock::Array pBuf(new TextBlock[nLength + 1]); // be aware of nLength == 0
 		// insert at least one textblock of normal color at the beginning
 		pBuf[0].m_nCharPos = 0;
 		pBuf[0].m_nColorIndex = COLORINDEX_NORMALTEXT;
 		pBuf[0].m_nBgColorIndex = COLORINDEX_BKGND;
-		++pBuf.m_nActualItems;
 		m_pTextBuffer->ParseLine(m_pTextBuffer->GetParseCookie(nLineIndex), nLineIndex, pBuf);
 
 		TextBlock::Array pAddedBuf(NULL);
@@ -1475,10 +1474,10 @@ void CCrystalTextView::GetHTMLLine(int nLineIndex, String &strHTML)
 		strHTML += _T("<code>");
 
 		int i = 0;
-		while (i < pBuf.m_nActualItems)
+		while (i <= pBuf.m_nBack)
 		{
 			int j = i + 1;
-			int nBlockLength = (j < pBuf.m_nActualItems ? pBuf[j].m_nCharPos : nLength) - pBuf[i].m_nCharPos;
+			int nBlockLength = (j <= pBuf.m_nBack ? pBuf[j].m_nCharPos : nLength) - pBuf[i].m_nCharPos;
 			nActualOffset += ExpandChars(pszChars, pBuf[i].m_nCharPos, nBlockLength, strExpanded, nActualOffset);
 			if (!strExpanded.empty())
 			{

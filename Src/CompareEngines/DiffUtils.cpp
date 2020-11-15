@@ -24,7 +24,7 @@ DiffUtils::DiffUtils(const CDiffContext *context)
  * @brief Compare two files (as earlier specified).
  * @return DIFFCODE as a result of compare.
  */
-int DiffUtils::diffutils_compare_files(struct comparison *cmp)
+int DiffUtils::diffutils_compare_files(DiffFileData *cmp)
 {
 	int bin_flag = 0;
 	int bin_file = 0; // bitmap for binary files
@@ -45,13 +45,8 @@ int DiffUtils::diffutils_compare_files(struct comparison *cmp)
 	if (script && (FilterList::HasRegExps() || bFilterCommentsLines))
 	{
 		struct change *next = script;
-		String asLwrCaseExt = A2T(cmp->file[0].name);
-		String::size_type PosOfDot = asLwrCaseExt.rfind('.');
-		if (PosOfDot != String::npos)
-		{
-			asLwrCaseExt.erase(0, PosOfDot + 1);
-			CharLower(&asLwrCaseExt.front());
-		}
+
+		TextDefinition const *const pPostFilter = InitPostFilter(cmp);
 
 		while (next)
 		{
@@ -79,12 +74,12 @@ int DiffUtils::diffutils_compare_files(struct comparison *cmp)
 				int QtyLinesLeft = trans_b0 - trans_a0;
 				int QtyLinesRight = trans_b1 - trans_a1;
 
-				if (bFilterCommentsLines && changes)
+				if (pPostFilter && changes)
 				{
 					OP_TYPE op = PostFilter(cmp,
-						thisob->line0, QtyLinesLeft + 1,
-						thisob->line1, QtyLinesRight + 1,
-						OP_DIFF, asLwrCaseExt.c_str());
+						thisob->line0, thisob->line0 + QtyLinesLeft + 1,
+						thisob->line1, thisob->line1 + QtyLinesRight + 1,
+						OP_DIFF, pPostFilter);
 					if (op == OP_TRIVIAL)
 						thisob->trivial = 1;
 				}

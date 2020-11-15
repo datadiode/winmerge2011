@@ -1031,10 +1031,10 @@ static bool iseol(LPCTSTR pszText, int cchText)
 void CCrystalEditView::OnEditOperation(int nAction, LPCTSTR pszText, int cchText)
 {
 	DWORD const dwFlags = m_pTextBuffer->GetFlags();
-	if (dwFlags & SRCOPT_AUTOINDENT)
+	if ((dwFlags & TextDefinition::SRCOPT_AUTOINDENT) && (nAction == CE_ACTION_TYPING))
 	{
 		//  Analyse last action...
-		if (nAction == CE_ACTION_TYPING && iseol(pszText, cchText) && !m_bOvrMode)
+		if (iseol(pszText, cchText) && !m_bOvrMode)
 		{
 			//  Enter stroke!
 			POINT ptCursorPos = GetCursorPos();
@@ -1049,7 +1049,7 @@ void CCrystalEditView::OnEditOperation(int nAction, LPCTSTR pszText, int cchText
 
 			if (nPos > 0)
 			{
-				if ((dwFlags & SRCOPT_BRACEGNU) && isclosebrace(pszLineChars[nLength - 1]) && ptCursorPos.y > 0 && nPos && nPos == nLength - 1)
+				if ((dwFlags & TextDefinition::SRCOPT_BRACEGNU) && isclosebrace(pszLineChars[nLength - 1]) && ptCursorPos.y > 0 && nPos && nPos == nLength - 1)
 				{
 					if (pszLineChars[nPos - 1] == _T('\t'))
 					{
@@ -1072,7 +1072,7 @@ void CCrystalEditView::OnEditOperation(int nAction, LPCTSTR pszText, int cchText
 				}
 				//  Insert part of the previous line
 				TCHAR *pszInsertStr;
-				if ((dwFlags & (SRCOPT_BRACEGNU | SRCOPT_BRACEANSI)) && isopenbrace(pszLineChars[nLength - 1]))
+				if ((dwFlags & (TextDefinition::SRCOPT_BRACEGNU | TextDefinition::SRCOPT_BRACEANSI)) && isopenbrace(pszLineChars[nLength - 1]))
 				{
 					if (m_pTextBuffer->GetInsertTabs())
 					{
@@ -1112,7 +1112,7 @@ void CCrystalEditView::OnEditOperation(int nAction, LPCTSTR pszText, int cchText
 			{
 				//  Insert part of the previos line
 				TCHAR *pszInsertStr;
-				if ((dwFlags & (SRCOPT_BRACEGNU | SRCOPT_BRACEANSI)) && isopenbrace(pszLineChars[nLength - 1]))
+				if ((dwFlags & (TextDefinition::SRCOPT_BRACEGNU | TextDefinition::SRCOPT_BRACEANSI)) && isopenbrace(pszLineChars[nLength - 1]))
 				{
 					if (m_pTextBuffer->GetInsertTabs())
 					{
@@ -1142,7 +1142,7 @@ void CCrystalEditView::OnEditOperation(int nAction, LPCTSTR pszText, int cchText
 				}
 			}
 		}
-		else if (nAction == CE_ACTION_TYPING && (dwFlags & SRCOPT_FNBRACE) && bracetype(pszText) == 3)
+		else if ((dwFlags & TextDefinition::SRCOPT_FNBRACE) && bracetype(pszText) == 3)
 		{
 			//  Enter stroke!
 			POINT ptCursorPos = GetCursorPos();
@@ -1163,7 +1163,7 @@ void CCrystalEditView::OnEditOperation(int nAction, LPCTSTR pszText, int cchText
 				// m_pTextBuffer->FlushUndoGroup (this);
 			}
 		}
-		else if (nAction == CE_ACTION_TYPING && (dwFlags & SRCOPT_BRACEGNU) && isopenbrace(pszText))
+		else if ((dwFlags & TextDefinition::SRCOPT_BRACEGNU) && isopenbrace(pszText))
 		{
 			//  Enter stroke!
 			POINT ptCursorPos = GetCursorPos ();
@@ -1207,7 +1207,7 @@ void CCrystalEditView::OnEditOperation(int nAction, LPCTSTR pszText, int cchText
 				// m_pTextBuffer->FlushUndoGroup (this);
 			}
 		}
-		else if (nAction == CE_ACTION_TYPING && (dwFlags & (SRCOPT_BRACEGNU | SRCOPT_BRACEANSI)) && isclosebrace(pszText))
+		else if ((dwFlags & (TextDefinition::SRCOPT_BRACEGNU | TextDefinition::SRCOPT_BRACEANSI)) && isclosebrace(pszText))
 		{
 			//  Enter stroke!
 			POINT ptCursorPos = GetCursorPos();

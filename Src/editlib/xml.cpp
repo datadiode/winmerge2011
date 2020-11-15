@@ -55,7 +55,7 @@ static BOOL IsXmlAttrName(LPCTSTR pszChars, int nLength)
 #define COOKIE_EXT_COMMENT      0x0010
 #define COOKIE_XML              0x0020
 
-void CCrystalTextBuffer::ParseLineXml(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
+void TextDefinition::ParseLineXml(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf) const
 {
 	DWORD &dwCookie = cookie.m_dwCookie;
 

@@ -1898,8 +1898,8 @@ void CChildFrame::OpenDocs(
 	// we use recognized type for unrecognized side too.
 
 	bool syntaxHLEnabled = COptionsMgr::Get(OPT_SYNTAX_HIGHLIGHT);
-	CCrystalTextBuffer::TextDefinition *bLeftTyped = NULL;
-	CCrystalTextBuffer::TextDefinition *bRightTyped = NULL;
+	TextDefinition const *bLeftTyped = NULL;
+	TextDefinition const *bRightTyped = NULL;
 
 	if (syntaxHLEnabled)
 	{

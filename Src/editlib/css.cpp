@@ -188,7 +188,7 @@ static BOOL IsCss2Keyword(LPCTSTR pszChars, int nLength)
 #define COOKIE_EXT_VALUE        0x0040
 #define COOKIE_TRANSPARENT      0xFFFFFF00
 
-void CCrystalTextBuffer::ParseLineCss(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
+void TextDefinition::ParseLineCss(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf) const
 {
 	DWORD &dwCookie = cookie.m_dwCookie;
 

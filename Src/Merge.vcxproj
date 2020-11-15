@@ -309,6 +309,7 @@
     <ClCompile Include="editlib\razor.cpp" />
     <ClCompile Include="editlib\go.cpp" />
     <ClCompile Include="editlib\rust.cpp" />
+    <ClCompile Include="editlib\TextBlock.cpp" />
     <ClCompile Include="editlib\vhdl.cpp" />
     <ClCompile Include="EditorFilepathBar.cpp" />
     <ClCompile Include="Environment.cpp" />
@@ -325,7 +326,6 @@
     <ClCompile Include="FileTextEncoding.cpp" />
     <ClCompile Include="FileTransform.cpp" />
     <ClCompile Include="FileVersion.cpp" />
-    <ClCompile Include="FilterCommentsManager.cpp" />
     <ClCompile Include="FilterList.cpp" />
     <ClCompile Include="Common\FloatState.cpp" />
     <ClCompile Include="FolderCmp.cpp" />
@@ -819,7 +819,6 @@
     <ClInclude Include="FileTextStats.h" />
     <ClInclude Include="FileTransform.h" />
     <ClInclude Include="FileVersion.h" />
-    <ClInclude Include="FilterCommentsManager.h" />
     <ClInclude Include="FilterList.h" />
     <ClInclude Include="Common\FloatState.h" />
     <ClInclude Include="FolderCmp.h" />

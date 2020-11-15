@@ -70,7 +70,7 @@ static BOOL IsLuaKeyword(LPCTSTR pszChars, int nLength)
 #define ENCODE_BALANCE(number) ((number) << 8)
 #define DECODE_BALANCE(cookie) (((cookie) & COOKIE_BALANCE) >> 8)
 
-void CCrystalTextBuffer::ParseLineLua(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
+void TextDefinition::ParseLineLua(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf) const
 {
 	DWORD &dwCookie = cookie.m_dwCookie;
 

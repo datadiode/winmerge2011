@@ -130,7 +130,7 @@ inline BOOL xisspace(LPCTSTR pch)
 #define COOKIE_CHAR             0x0010
 #define COOKIE_VARIABLE			0X0020
 
-void CCrystalTextBuffer::ParseLineRuby(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
+void TextDefinition::ParseLineRuby(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf) const
 {
 	DWORD &dwCookie = cookie.m_dwCookie;
 

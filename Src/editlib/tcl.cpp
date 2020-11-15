@@ -51,7 +51,7 @@ static BOOL IsTclKeyword(LPCTSTR pszChars, int nLength)
 #define COOKIE_CHAR             0x0004
 #define COOKIE_STRING           0x0008
 
-void CCrystalTextBuffer::ParseLineTcl(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
+void TextDefinition::ParseLineTcl(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf) const
 {
 	DWORD &dwCookie = cookie.m_dwCookie;
 

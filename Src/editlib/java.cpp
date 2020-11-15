@@ -98,7 +98,7 @@ static BOOL IsJavaKeyword(LPCTSTR pszChars, int nLength)
 #define COOKIE_REJECT_REGEXP    0x0020
 #define COOKIE_TRANSPARENT      0xFFFFFF00
 
-void CCrystalTextBuffer::ParseLineJava(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
+void TextDefinition::ParseLineJava(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf) const
 {
 	DWORD &dwCookie = cookie.m_dwCookie;
 

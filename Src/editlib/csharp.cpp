@@ -138,7 +138,7 @@ static BOOL IsCSharpKeyword(LPCTSTR pszChars, int nLength)
 #define COOKIE_EXT_COMMENT      0x0010
 #define COOKIE_TRANSPARENT      0xFFFFFF80
 
-void CCrystalTextBuffer::ParseLineCSharp(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
+void TextDefinition::ParseLineCSharp(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf) const
 {
 	DWORD &dwCookie = cookie.m_dwCookie;
 

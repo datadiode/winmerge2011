@@ -33,30 +33,6 @@
 #include "LineInfo.h"
 #include "string_util.h"
 
-#define COMMON_LEXIS 001
-#define NATIVE_LEXIS 002
-#define SCRIPT_LEXIS 004
-#define NATIVE_LEXIS_ONLY _T(STRINGIZE(TOKEN_PASTE2(\, NATIVE_LEXIS)))
-#define SCRIPT_LEXIS_ONLY _T(STRINGIZE(TOKEN_PASTE2(\, SCRIPT_LEXIS)))
-
-#define COOKIE_PARSER           0x0F000000UL
-#define COOKIE_PARSER_BASIC     0x01000000UL
-#define COOKIE_PARSER_CSHARP    0x02000000UL
-#define COOKIE_PARSER_JAVA      0x03000000UL
-#define COOKIE_PARSER_PERL      0x04000000UL
-#define COOKIE_PARSER_PHP       0x05000000UL
-#define COOKIE_PARSER_JSCRIPT   0x06000000UL
-#define COOKIE_PARSER_VBSCRIPT  0x07000000UL
-#define COOKIE_PARSER_CSS       0x08000000UL
-#define COOKIE_PARSER_MWSL      0x09000000UL
-#define COOKIE_PARSER_GLOBAL    0xF0000000UL
-
-#define SRCOPT_COOKIE(X)        ((X) << 4)
-C_ASSERT(COOKIE_PARSER_GLOBAL == COOKIE_PARSER << 4);
-
-// Cookie bits which are shared across parsers
-#define COOKIE_TEMPLATE_STRING  0x80
-
 ////////////////////////////////////////////////////////////////////////////
 // Forward class declarations
 

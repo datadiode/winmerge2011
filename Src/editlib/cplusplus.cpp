@@ -240,7 +240,7 @@ static BOOL IsUser1Keyword(LPCTSTR pszChars, int nLength)
 #define COOKIE_STRING           0x0008
 #define COOKIE_CHAR             0x0010
 
-void CCrystalTextBuffer::ParseLineC(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf)
+void TextDefinition::ParseLineC(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf) const
 {
 	DWORD &dwCookie = cookie.m_dwCookie;
 
@@ -289,7 +289,7 @@ void CCrystalTextBuffer::ParseLineC(TextBlock::Cookie &cookie, LPCTSTR const psz
 		// Can be bigger than length if there is binary data
 		// See bug #1474782 Crash when comparing SQL with with binary data
 		if (I < nLength)
-	    {
+		{
 			if (dwCookie & COOKIE_COMMENT)
 			{
 				DEFINE_BLOCK(I, COLORINDEX_COMMENT);
@@ -407,7 +407,7 @@ void CCrystalTextBuffer::ParseLineC(TextBlock::Cookie &cookie, LPCTSTR const psz
 				continue;
 			}
 		}
-        if (nIdentBegin >= 0)
+		if (nIdentBegin >= 0)
 		{
 			// If preceded by an apostrophe, assume that the identifier is a
 			// continuation of a numeric literal using C++14 digit grouping.
