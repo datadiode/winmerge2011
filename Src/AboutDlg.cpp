@@ -49,12 +49,12 @@ static void MakeWebLinkButton(HWND hWnd, int nID)
 			LPCTSTR q = szLower;
 			RECT rgrc[2];
 			::GetClientRect(hwndStatic, &rgrc[1]);
-			::DrawText(hDC, szText, q - szText, &rgrc[1], DT_CALCRECT | DT_WORDBREAK);
+			::DrawText(hDC, szText, static_cast<int>(q - szText), &rgrc[1], DT_CALCRECT | DT_WORDBREAK);
 			while (LPCTSTR const p = StrRChr(szText, q, _T(' ')))
 			{
 				q = p;
 				::GetClientRect(hwndStatic, &rgrc[0]);
-				::DrawText(hDC, szText, q - szText, &rgrc[0], DT_CALCRECT | DT_WORDBREAK);
+				::DrawText(hDC, szText, static_cast<int>(q - szText), &rgrc[0], DT_CALCRECT | DT_WORDBREAK);
 				if (rgrc[1].bottom > rgrc[0].bottom)
 				{
 					y += rgrc[1].bottom - rgrc[0].bottom;
@@ -64,15 +64,15 @@ static void MakeWebLinkButton(HWND hWnd, int nID)
 				}
 			}
 			::GetClientRect(hwndStatic, &rgrc[0]);
-			::DrawText(hDC, szLine, szLower - szLine, &rgrc[0], DT_CALCRECT | DT_WORDBREAK);
+			::DrawText(hDC, szLine, static_cast<int>(szLower - szLine), &rgrc[0], DT_CALCRECT | DT_WORDBREAK);
 			::GetClientRect(hwndStatic, &rgrc[1]);
-			::DrawText(hDC, szLine, szUpper - szLine, &rgrc[1], DT_CALCRECT | DT_WORDBREAK);
+			::DrawText(hDC, szLine, static_cast<int>(szUpper - szLine), &rgrc[1], DT_CALCRECT | DT_WORDBREAK);
 			if (rgrc[1].bottom > rgrc[0].bottom)
 			{
 				y += rgrc[1].bottom - rgrc[0].bottom;
 				szLower[-1] = '\n';
 				rgrc[0].right = rgrc[0].top = 0;
-				::DrawText(hDC, szLower, szUpper - szLower, &rgrc[1], DT_CALCRECT);
+				::DrawText(hDC, szLower, static_cast<int>(szUpper - szLower), &rgrc[1], DT_CALCRECT);
 			}
 			rgrc[1].right -= rgrc[0].right;
 			rgrc[1].bottom -= rgrc[1].top;
