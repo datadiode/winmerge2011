@@ -7,5 +7,7 @@ build_script:
 - cmd: >-
     appveyorbuild.cmd Win32!Debug x64!Debug Win32!Release x64!Release
 artifacts:
+- path: Build/WinMerge/Win32/Debug
+- path: Build/WinMerge/x64/Debug
 - path: Build/WinMerge/Win32/Release
 - path: Build/WinMerge/x64/Release
