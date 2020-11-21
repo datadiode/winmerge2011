@@ -116,8 +116,9 @@ unsigned ByteCompare::CompareFiles(FileLocation *location)
 					cursor[i] = static_cast<CodePoint *>(memcpy(
 						buff[i] + padding, cursor[i], bytes_ahead[i]));
 					DWORD bytes_read = 0;
-					BOOL const ok = ReadFile(m_osfhandle[i], cursor[i] +
-						bytes_ahead[i], read_ahead_size[i], &bytes_read, NULL);
+					BOOL const ok = ReadFile(m_osfhandle[i],
+						reinterpret_cast<char *>(cursor[i]) + bytes_ahead[i],
+						read_ahead_size[i], &bytes_read, NULL);
 					if (!ok || (bytes_read & sizeof(CodePoint) - 1) != 0)
 						failed = TRUE;
 					bytes_ahead[i] += read_ahead_size[i] = bytes_read;
@@ -198,8 +199,9 @@ unsigned ByteCompare::CompareFiles(FileLocation *location)
 					cursor[i] = static_cast<CodePoint *>(memcpy(
 						buff[i] + padding, cursor[i], bytes_ahead[i]));
 					DWORD bytes_read = 0;
-					BOOL const ok = ReadFile(m_osfhandle[i], cursor[i] +
-						bytes_ahead[i], read_ahead_size[i], &bytes_read, NULL);
+					BOOL const ok = ReadFile(m_osfhandle[i],
+						reinterpret_cast<char *>(cursor[i]) + bytes_ahead[i],
+						read_ahead_size[i], &bytes_read, NULL);
 					if (!ok || (bytes_read & sizeof(CodePoint) - 1) != 0)
 						failed = TRUE;
 					bytes_ahead[i] += read_ahead_size[i] = bytes_read;
