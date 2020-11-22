@@ -317,8 +317,7 @@ void TextDefinition::ParseLineJava(TextBlock::Cookie &cookie, LPCTSTR const pszC
 					dwCookie |= COOKIE_PREPROCESSOR;
 					continue;
 				}
-				if (!xisspace(pszChars[I]))
-					bFirstChar = FALSE;
+				bFirstChar = xisspace(pszChars[I]);
 			}
 
 			if (xisalnum(pszChars[I]) || pszChars[I] == '.' && I > 0 && (!xisalpha(pszChars[nPrevI]) && !xisalpha(pszChars[I + 1])))

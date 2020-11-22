@@ -186,8 +186,7 @@ void TextDefinition::ParseLineIni(TextBlock::Cookie &cookie, LPCTSTR const pszCh
 					DEFINE_BLOCK(I, COLORINDEX_KEYWORD);
 					dwCookie |= COOKIE_KEY;
 				}
-				if (!xisspace(pszChars[I]))
-					bFirstChar = FALSE;
+				bFirstChar = xisspace(pszChars[I]);
 			}
 
 			if (pBuf == NULL)

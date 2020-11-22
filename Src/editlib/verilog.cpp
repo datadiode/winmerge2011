@@ -446,8 +446,7 @@ void TextDefinition::ParseLineVerilog(TextBlock::Cookie &cookie, LPCTSTR const p
 					dwCookie |= COOKIE_PREPROCESSOR;
 					continue;
 				}
-				if (!xisspace(pszChars[I]))
-					bFirstChar = FALSE;
+				bFirstChar = xisspace(pszChars[I]);
 			}
 
 			if (pBuf == NULL)

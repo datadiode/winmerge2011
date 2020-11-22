@@ -393,8 +393,7 @@ void TextDefinition::ParseLineC(TextBlock::Cookie &cookie, LPCTSTR const pszChar
 					dwCookie |= COOKIE_PREPROCESSOR;
 					continue;
 				}
-				if (!xisspace(pszChars[I]))
-					bFirstChar = FALSE;
+				bFirstChar = xisspace(pszChars[I]);
 			}
 
 			if (pBuf == NULL)
