@@ -55,6 +55,11 @@ inline int xisspace(wint_t c)
 	return _istspace(normch(c));
 }
 
+static BOOL xisspace(LPCTSTR p, LPCTSTR q)
+{
+	return p && (p == q || xisspace(*p));
+}
+
 typedef int Captures[30];
 
 /**

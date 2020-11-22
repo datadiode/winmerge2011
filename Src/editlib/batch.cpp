@@ -668,9 +668,9 @@ static BOOL IsUser2Keyword(LPCTSTR pszChars, int nLength)
 
 #define COOKIE_COMMENT          0x0001
 #define COOKIE_PREPROCESSOR     0x0002
-#define COOKIE_EXT_COMMENT      0x0004
 #define COOKIE_STRING           0x0008
 #define COOKIE_CHAR             0x0010
+#define COOKIE_RAWSTRING        0x0020
 
 void TextDefinition::ParseLineBatch(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf) const
 {
@@ -678,13 +678,14 @@ void TextDefinition::ParseLineBatch(TextBlock::Cookie &cookie, LPCTSTR const psz
 
 	if (nLength == 0)
 	{
-		dwCookie &= COOKIE_EXT_COMMENT;
+		dwCookie &= COOKIE_RAWSTRING;
 		return;
 	}
 
-	BOOL bFirstChar = (dwCookie & ~COOKIE_EXT_COMMENT) == 0;
+	BOOL bFirstChar = TRUE;
 	BOOL bRedefineBlock = TRUE;
 	BOOL bDecIndex = FALSE;
+	DWORD dwFollowUpCookie = dwCookie & COOKIE_RAWSTRING;
 	int nIdentBegin = -1;
 	do
 	{
@@ -694,11 +695,11 @@ void TextDefinition::ParseLineBatch(TextBlock::Cookie &cookie, LPCTSTR const psz
 			int const nPos = bDecIndex ? nPrevI : I;
 			bRedefineBlock = FALSE;
 			bDecIndex = FALSE;
-			if (dwCookie & (COOKIE_COMMENT | COOKIE_EXT_COMMENT))
+			if (dwCookie & COOKIE_COMMENT)
 			{
 				DEFINE_BLOCK(nPos, COLORINDEX_COMMENT);
 			}
-			else if (dwCookie & (COOKIE_CHAR | COOKIE_STRING))
+			else if (dwCookie & (COOKIE_CHAR | COOKIE_STRING | COOKIE_RAWSTRING))
 			{
 				DEFINE_BLOCK(nPos, COLORINDEX_STRING);
 			}
@@ -765,7 +766,6 @@ void TextDefinition::ParseLineBatch(TextBlock::Cookie &cookie, LPCTSTR const psz
 			if (dwCookie & COOKIE_PREPROCESSOR)
 			{
 				DEFINE_BLOCK(I, COLORINDEX_PREPROCESSOR);
-				dwCookie |= COOKIE_PREPROCESSOR;
 				break;
 			}
 
@@ -786,29 +786,25 @@ void TextDefinition::ParseLineBatch(TextBlock::Cookie &cookie, LPCTSTR const psz
 				}
 			}
 
-			if (bFirstChar)
+			if (bFirstChar && !xisspace(pszChars[I]))
 			{
-				if (nLength >= I + 4 && !_tcsnicmp(pszChars + I, _T("TEXT"), 4))
+				if (dwCookie & COOKIE_RAWSTRING)
 				{
-					DEFINE_BLOCK(I, COLORINDEX_COMMENT);
-					dwCookie |= COOKIE_EXT_COMMENT;
-					continue;
+					if (!xisspace(xisequal<_tcsnicmp>(pszChars + I, _T("ENDTEXT")), pszChars + nLength))
+						break;
+					dwFollowUpCookie &= ~COOKIE_RAWSTRING;
+					dwCookie &= ~COOKIE_RAWSTRING;
 				}
-				if (nLength >= I + 7 && !_tcsnicmp(pszChars + I, _T("ENDTEXT"), 7))
+				else if (xisspace(xisequal<_tcsnicmp>(pszChars + I, _T("TEXT")), pszChars + nLength))
 				{
-					DEFINE_BLOCK(I, COLORINDEX_COMMENT);
-					dwCookie &= ~COOKIE_EXT_COMMENT;
-					continue;
+					dwFollowUpCookie |= COOKIE_RAWSTRING;
 				}
-				if (dwCookie & COOKIE_EXT_COMMENT)
-					continue;
-				if (nLength >= I + 3 && !_tcsnicmp(pszChars + I, _T("REM"), 3) && (xisspace(pszChars[I + 3]) || nLength == I + 3))
+				else if (xisspace(xisequal<_tcsnicmp>(pszChars + I, _T("REM")), pszChars + nLength))
 				{
 					DEFINE_BLOCK(I, COLORINDEX_COMMENT);
 					dwCookie |= COOKIE_COMMENT;
 					break;
 				}
-
 				if (pszChars[I] == ':')
 				{
 					if (nLength > I + 2 && !(xisalnum(pszChars[I+1]) || xisspace(pszChars[I+1])))
@@ -821,7 +817,7 @@ void TextDefinition::ParseLineBatch(TextBlock::Cookie &cookie, LPCTSTR const psz
 					dwCookie |= COOKIE_PREPROCESSOR;
 					continue;
 				}
-				bFirstChar = xisspace(pszChars[I]);
+				bFirstChar = FALSE;
 			}
 
 			if (pBuf == NULL)
@@ -836,32 +832,30 @@ void TextDefinition::ParseLineBatch(TextBlock::Cookie &cookie, LPCTSTR const psz
 		}
 		if (nIdentBegin >= 0)
 		{
-			if ((dwCookie & COOKIE_PREPROCESSOR))
+			LPCTSTR const pchIdent = pszChars + nIdentBegin;
+			int const cchIdent = I - nIdentBegin;
+			if (dwCookie & COOKIE_PREPROCESSOR)
 			{
 				DEFINE_BLOCK(nIdentBegin, COLORINDEX_PREPROCESSOR);
 			}
-			else if (dwCookie & COOKIE_EXT_COMMENT)
-			{
-				DEFINE_BLOCK(nIdentBegin, COLORINDEX_COMMENT);
-			}
-			else if (IsBatKeyword(pszChars + nIdentBegin, I - nIdentBegin))
+			else if (IsBatKeyword(pchIdent, cchIdent))
 			{
 				DEFINE_BLOCK(nIdentBegin, COLORINDEX_KEYWORD);
-				if ((I - nIdentBegin == 4 && !_tcsnicmp(pszChars + nIdentBegin, _T("GOTO"), 4)) ||
-					(I - nIdentBegin == 5 && !_tcsnicmp(pszChars + nIdentBegin, _T("GOSUB"), 5)))
+				if (xisequal<_tcsnicmp>(pchIdent, cchIdent, _T("GOTO")) ||
+					xisequal<_tcsnicmp>(pchIdent, cchIdent, _T("GOSUB")))
 				{
 					dwCookie = COOKIE_PREPROCESSOR;
 				}
 			}
-			else if (IsUser1Keyword(pszChars + nIdentBegin, I - nIdentBegin))
+			else if (IsUser1Keyword(pchIdent, cchIdent))
 			{
 				DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER1);
 			}
-			else if (IsUser2Keyword(pszChars + nIdentBegin, I - nIdentBegin))
+			else if (IsUser2Keyword(pchIdent, cchIdent))
 			{
 				DEFINE_BLOCK(nIdentBegin, COLORINDEX_USER2);
 			}
-			else if (IsNumeric(pszChars + nIdentBegin, I - nIdentBegin))
+			else if (IsNumeric(pchIdent, cchIdent))
 			{
 				DEFINE_BLOCK(nIdentBegin, COLORINDEX_NUMBER);
 			}
@@ -871,7 +865,7 @@ void TextDefinition::ParseLineBatch(TextBlock::Cookie &cookie, LPCTSTR const psz
 		}
 	} while (I < nLength);
 
-	dwCookie &= COOKIE_EXT_COMMENT;
+	dwCookie = dwFollowUpCookie;
 }
 
 TESTCASE
