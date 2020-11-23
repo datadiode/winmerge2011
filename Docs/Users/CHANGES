@@ -1,3 +1,10 @@
+0.2011.210.481
+Changes since preceding release (not necessarily complete):
+• batch.cpp: Colorize TCC text blocks as strings rather than comments
+• ByteCompare.cpp: Fix pointer arithmetic when assuming UCS-2 or UCS-4 (#6)
+• ParseLineInnoSetup(): Pass [Code] sections on to ParseLinePascal() (like 2.16)
+• Adopt syntax highlighter based comment filtering from 2.16
+
 0.2011.210.466
 Changes since preceding release (not necessarily complete):
 • Support Excel .xlsx files through ReoGrid
