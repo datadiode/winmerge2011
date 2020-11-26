@@ -144,17 +144,14 @@ LRESULT CMergeEditView::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 void CMergeEditView::OnNotity(LPARAM lParam)
 {
-	union
+	UNotify *const unm = reinterpret_cast<UNotify *>(lParam);
+	if (unm->hwndFrom == m_pStatusBar->m_hWnd)
 	{
-		LPARAM lp;
-		NMHDR *hdr;
-		NMMOUSE *mouse;
-	} const nm = { lParam };
-	if (nm.hdr->hwndFrom == m_pStatusBar->m_hWnd)
-	{
-		if (nm.hdr->code == NM_CLICK)
+		switch (unm->HDR.code)
 		{
-			switch (nm.mouse->dwItemSpec)
+		case NM_CLICK:
+			SetFocus();
+			switch (unm->MOUSE.dwItemSpec)
 			{
 			case PANE_RO:
 				m_bOvrMode = !m_bOvrMode;
@@ -162,6 +159,23 @@ void CMergeEditView::OnNotity(LPARAM lParam)
 				UpdateLineInfoStatus();
 				break;
 			}
+			break;
+		case NM_DBLCLK:
+			switch (unm->MOUSE.dwItemSpec)
+			{
+			case PANE_EOL:
+				if (HMenu *pFileMenu = CMainFrame::FindSubMenuById(m_pDocument->m_pHandleSet->m_pMenuShared, ID_APP_EXIT))
+				{
+					if (HMenu *pLineEndingsMenu = CMainFrame::FindSubMenuById(pFileMenu, ID_EOL_TO_DOS))
+					{
+						POINT pt = unm->MOUSE.pt;
+						unm->pwndFrom->ClientToScreen(&pt);
+						pLineEndingsMenu->TrackPopupMenu(TPM_LEFTALIGN, pt.x, pt.y, theApp.m_pMainWnd->m_pWnd);
+					}
+				}
+				break;
+			}
+			break;
 		}
 	}
 }
