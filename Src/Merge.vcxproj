@@ -258,6 +258,7 @@
   <ItemGroup>
     <ClCompile Include="7zCommon.cpp" />
     <ClCompile Include="AboutDlg.cpp" />
+    <ClCompile Include="CodepageDropList.cpp" />
     <ClCompile Include="Common\Bitmap.cpp" />
     <ClCompile Include="CCPrompt.cpp" />
     <ClCompile Include="ChildFrm.cpp" />
@@ -755,6 +756,7 @@
     <ClCompile Include="xdiff_gnudiff_compat.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CodepageDropList.h" />
     <ClInclude Include="Common\AccChildren.h" />
     <ClInclude Include="Common\defer.h" />
     <ClInclude Include="Common\PidlManager.h" />

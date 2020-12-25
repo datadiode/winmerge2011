@@ -2022,6 +2022,40 @@ FileLoadResult::FILES_RESULT CChildFrame::ReloadDoc(int index)
 }
 
 /**
+ * @brief Change a document's read or write encoding.
+ * @param [in] index Index of file in internal buffers.
+ * @param [in] codepage Codepage to switch to.
+ */
+void CChildFrame::SwitchEncoding(int index, UINT codepage)
+{
+	if (GetKeyState(VK_SHIFT) < 0)
+	{
+		// Don't reload, but use the selected encoding when saving the file
+		m_ptBuf[index]->m_encoding.m_codepage = codepage;
+		m_ptBuf[index]->m_encoding.m_unicoding = codepage == CP_UTF8 ? UTF8 : NONE;
+		m_ptBuf[index]->m_encoding.m_bom = codepage == CP_UTF8 && GetKeyState(VK_CONTROL) < 0;
+		m_pView[index]->SetEncodingStatus(m_ptBuf[index]->m_encoding.GetName().c_str());
+		m_ptBuf[index]->SetModified();
+		UpdateHeaderPath(index);
+		UpdateCmdUI();
+	}
+	else if (SaveModified())
+	{
+		// Reload assuming the selected encoding
+		m_ptBuf[index]->m_encoding.m_codepage = codepage;
+		m_ptBuf[index]->m_encoding.m_unicoding = codepage == CP_UTF8 ? UTF8 : NONE;
+		m_ptBuf[index]->m_encoding.m_bom = codepage == CP_UTF8 && GetKeyState(VK_CONTROL) < 0;
+		FileLoadResult::FILES_RESULT result = ReloadDoc(index);
+		if (FileLoadResult::IsLossy(result))
+		{
+			LanguageSelect.MsgBox(index == 0 ? IDS_LOSSY_TRANSCODING_LEFT : IDS_LOSSY_TRANSCODING_RIGHT, MB_ICONSTOP);
+		}
+		m_pView[index]->SetEncodingStatus(m_ptBuf[index]->m_encoding.GetName().c_str());
+		FlushAndRescan();
+	}
+}
+
+/**
  * @brief Refresh cached options.
  *
  * For compare speed, we have to cache some frequently needed options,

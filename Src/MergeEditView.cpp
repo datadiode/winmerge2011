@@ -34,6 +34,7 @@
 #include "ShellContextMenu.h"
 #include "paths.h"
 #include "PidlContainer.h"
+#include "CodepageDropList.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -124,6 +125,19 @@ LRESULT CMergeEditView::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_NOTIFY:
 		OnNotity(lParam);
 		break;
+	case WM_COMMAND:
+		switch (wParam)
+		{
+			int index;
+			UINT codepage;
+		case MAKEWPARAM(PANE_ENCODING, CBN_SELENDOK):
+			index = reinterpret_cast<HComboBox *>(lParam)->GetCurSel();
+			codepage = static_cast<UINT>(reinterpret_cast<HComboBox *>(lParam)->GetItemData(index));
+			reinterpret_cast<HComboBox *>(lParam)->ShowDropDown(FALSE);
+			m_pDocument->SwitchEncoding(m_nThisPane, codepage);
+			break;
+		}
+		break;
 	case WM_HSCROLL:
 		// In limited context mode, invalidate panes to ensure proper rendering
 		// of placeholders for sequences of excluded lines.
@@ -173,6 +187,9 @@ void CMergeEditView::OnNotity(LPARAM lParam)
 						pLineEndingsMenu->TrackPopupMenu(TPM_LEFTALIGN, pt.x, pt.y, theApp.m_pMainWnd->m_pWnd);
 					}
 				}
+				break;
+			case PANE_ENCODING:
+				CodepageDropList::OnItemActivate(unm->hwndFrom, m_hWnd, PANE_ENCODING);
 				break;
 			}
 			break;

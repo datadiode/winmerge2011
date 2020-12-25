@@ -729,6 +729,9 @@
     <ClCompile Include="editlib\TextBlock.cpp">
       <Filter>EditLib</Filter>
     </ClCompile>
+    <ClCompile Include="CodepageDropList.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\WindowPlacement.h">
@@ -1314,6 +1317,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ReoGridMergeFrm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CodepageDropList.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

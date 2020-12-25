@@ -82,6 +82,8 @@ unsigned RemoveLeadingZeros(char *string)
 			continue;
 		}
 		c = *q++;
+		if (c == ' ')
+			c = '\0';
 		if (d != '\0' && (c < '0' || c > '9'))
 		{
 			*p++ = d;
