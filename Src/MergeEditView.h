@@ -109,10 +109,8 @@ public:
 	void OnLastdiff();
 	void OnNextdiff();
 	void OnPrevdiff();
-	void OnSelectLineDiff();
 	void OnConvertEolTo(UINT);
 	void OnEditCopyLineNumbers();
-	void OnViewMargin();
 
 	using CGhostTextView::GetFullySelectedLines;
 	using CGhostTextView::GetSelection;

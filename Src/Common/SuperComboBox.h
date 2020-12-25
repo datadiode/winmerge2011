@@ -6,7 +6,6 @@
 class HSuperComboBox : public HComboBox
 {
 public:
-	void SetAutoComplete(INT nSource);
 	HEdit *GetEditControl()
 	{
 		return reinterpret_cast<HEdit *>(SendMessage(CBEM_GETEDITCONTROL));
