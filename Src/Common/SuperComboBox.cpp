@@ -172,27 +172,35 @@ static LRESULT CALLBACK WndProcDropping(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
 	LRESULT lResult = ::CallWindowProc(DefWndProcDropping, hWnd, uMsg, wParam, lParam);
 	switch (uMsg)
 	{
-	case WM_CTLCOLORLISTBOX:
+	case WM_CAPTURECHANGED:
 		::SetWindowLongPtr(hWnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(DefWndProcDropping));
 		DefWndProcDropping = NULL;
-		if (HListBox *pLb = reinterpret_cast<HListBox *>(lParam))
+		break;
+	case WM_WINDOWPOSCHANGING:
+		WINDOWPOS *pwp = reinterpret_cast<WINDOWPOS *>(lParam);
+		if ((pwp->flags & (SWP_NOMOVE | SWP_NOSIZE)) == 0)
 		{
-			RECT rc;
-			pLb->GetWindowRect(&rc);
-			RECT rcBounds;
-			H2O::GetDesktopWorkArea(hWnd, &rcBounds);
-			rcBounds.right -= rc.right - rc.left;
-			rcBounds.bottom -= rc.bottom - rc.top;
-			// Keep the dropped control within the work area
-			if (rc.left < rcBounds.left)
-				rc.left = rcBounds.left;
-			if (rc.left > rcBounds.right)
-				rc.left = rcBounds.right;
-			if (rc.top < rcBounds.top)
-				rc.top = rcBounds.top;
-			if (rc.top > rcBounds.bottom)
-				rc.top = rcBounds.bottom;
-			pLb->SetWindowPos(NULL, rc.left, rc.top, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
+			COMBOBOXINFO info;
+			info.cbSize = sizeof info;
+			if (::GetComboBoxInfo(hWnd, &info))
+			{
+				HComboBox *pCb = reinterpret_cast<HComboBox *>(info.hwndCombo);
+				RECT rc;
+				pCb->GetWindowRect(&rc);
+				RECT rcClip;
+				H2O::GetDesktopWorkArea(pCb->m_hWnd, &rcClip);
+				rcClip.right -= pwp->cx;
+				rcClip.bottom -= pwp->cy;
+				// Keep the dropped control within the work area
+				if (pwp->x < rcClip.left)
+					pwp->x = rcClip.left;
+				if (pwp->x > rcClip.right)
+					pwp->x = rcClip.right;
+				if (pwp->y > rcClip.bottom)
+					pwp->y = rc.top - pwp->cy;
+				if (pwp->y < rcClip.top)
+					pwp->y = rcClip.top;
+			}
 		}
 		break;
 	}
@@ -201,11 +209,27 @@ static LRESULT CALLBACK WndProcDropping(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
 
 void HSuperComboBox::AdjustDroppedWidth()
 {
+	COMBOBOXINFO info;
+	info.cbSize = sizeof info;
+	HComboBox *pCb = GetComboControl();
+	if (!::GetComboBoxInfo(pCb ? pCb->m_hWnd : m_hWnd, &info))
+		return;
+	HListBox *pLb = reinterpret_cast<HListBox *>(info.hwndList);
+	RECT rc;
+	pLb->GetWindowRect(&rc);
+	int cyEdge = rc.bottom - rc.top + info.rcButton.bottom + 1;
+	pLb->GetClientRect(&rc);
+	cyEdge -= rc.bottom;
+	H2O::GetDesktopWorkArea(m_hWnd, &rc);
+	int const cyItem = pLb->GetItemHeight(0);
+	int const cyClip = (rc.bottom - rc.top - cyEdge) / 2 / cyItem * cyItem + cyEdge;
+	GetWindowRect(&rc);
+	SetWindowPos(NULL, 0, 0, rc.right - rc.left, cyClip, SWP_NOMOVE | SWP_NOZORDER);
 	int cxMax = 0;
 	int cchTextMax = 0;
-	const int nCount = GetCount();
-	const int cxExtra = GetSystemMetrics(SM_CXVSCROLL) + 2 * GetSystemMetrics(SM_CXBORDER);
-	const int cxAvail = GetSystemMetrics(SM_CXSCREEN) - cxExtra;
+	int const nCount = GetCount();
+	int const cxExtra = GetSystemMetrics(SM_CXVSCROLL) + 2 * GetSystemMetrics(SM_CXBORDER);
+	int const cxAvail = GetSystemMetrics(SM_CXSCREEN) - cxExtra;
 	int nIndex;
 	for (nIndex = 0 ; nIndex < nCount ; ++nIndex)
 	{
@@ -236,12 +260,9 @@ void HSuperComboBox::AdjustDroppedWidth()
 	POINT pt = { cxMax + cxExtra, 0};
 	pWndInner->MapWindowPoints(this, &pt, 1);
 	SetDroppedWidth(pt.x);
-	if (DefWndProcDropping == NULL)
-	{
-		DefWndProcDropping = reinterpret_cast<WNDPROC>(
-			SetWindowLongPtr(GWLP_WNDPROC,
-			reinterpret_cast<LONG_PTR>(WndProcDropping)));
-	}
+	DefWndProcDropping = reinterpret_cast<WNDPROC>(
+		::SetWindowLongPtr(info.hwndList, GWLP_WNDPROC,
+		reinterpret_cast<LONG_PTR>(WndProcDropping)));
 }
 
 void HSuperComboBox::RestoreClientArea()
