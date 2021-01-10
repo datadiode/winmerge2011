@@ -44,11 +44,11 @@ LRESULT PropCompareReoGrid::WindowProc(UINT message, WPARAM wParam, LPARAM lPara
 			break;
 		case MAKEWPARAM(IDC_FILEPATS, CBN_DROPDOWN):
 			WildcardDropList::OnDropDown(reinterpret_cast<HWND>(lParam), 6,
-				_T("*.xlsx;*.rgf;*.tsv;*.csv"));
+				(COptionsMgr::GetDefault(OPT_CMP_REOGRID_FILEPATTERNS) + _T(";*.csv;*.tsv")).c_str());
 			break;
 		case MAKEWPARAM(IDC_FILEPATS, CBN_CLOSEUP):
 			WildcardDropList::OnCloseUp(reinterpret_cast<HWND>(lParam));
-   			UpdateData<Get>();
+			UpdateData<Get>();
 			break;
 		}
 		break;

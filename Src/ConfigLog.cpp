@@ -194,6 +194,16 @@ void CConfigLog::WriteVersionOf1(int indent, LPTSTR path, bool bDllGetVersion)
 	CVersionInfo vi(path);
 	String sVersion = vi.GetFixedProductVersion();
 
+	if (!sVersion.empty())
+	{
+		String sVersionEx = vi.GetProductVersion();
+		if (sVersionEx.find_last_of('-') != sVersionEx.find_first_of('-'))
+		{
+			// looks like what Zoltu.Versioning creates with tags like v1.3-RC
+			sVersion = sVersionEx;
+		}
+	}
+
 	if (bDllGetVersion)
 	{
 		if (HINSTANCE hinstDll = LoadLibrary(path))
@@ -375,10 +385,13 @@ bool CConfigLog::DoFile(bool writing, String &sError)
 	FileWriteString(_T("\r\n"));
 	WriteVersionOf1(1, _T("COMCTL32.dll"));
 	WriteVersionOf1(1, _T("shlwapi.dll"));
-	WriteVersionOf1(1, _T("MergeLang.dll"));
+	WriteVersionOf1(1, _T("MergeLang.dll"), false);
 	WriteVersionOf1(1, _T("ShellExtensionU.dll"), false);
 	WriteVersionOf1(1, _T("ShellExtensionX64.dll"), false);
 	WriteVersionOf1(1, _T("Frhed\\hekseditU.dll"), false);
+	WriteVersionOf1(1, _T("WinIMerge\\WinIMergeLib.dll"), false);
+	WriteVersionOf1(1, _T("SQLiteCompare\\bin\\SQLiteCompare.exe"), false);
+	WriteVersionOf1(1, _T("ReoGridCompare\\bin\\ReoGridCompare.exe"), false);
 
 	TCHAR path[MAX_PATH];
 	GetModuleFileName(0, path, _countof(path));

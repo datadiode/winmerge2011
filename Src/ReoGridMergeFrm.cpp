@@ -129,7 +129,8 @@ void CReoGridMergeFrame::OpenDocs(
 	}
 
 	DWORD const result = m_pMDIFrame->CLRExec(L"ReoGridCompare", string_format(
-		L"/ParentWindow %p \"%s\" \"%s\"", m_hWnd,
+		L"/ParentWindow %p /b2xtranslate \"%s\\B2XTranslator\\bin\" \"%s\" \"%s\"",
+		m_hWnd, GetModulePath().c_str(),
 		paths_UndoMagic(wcsdupa(filelocLeft.filepath.c_str())),
 		paths_UndoMagic(wcsdupa(filelocRight.filepath.c_str()))).c_str());
 

@@ -133,6 +133,18 @@ for %%$ in (
 	set $=
 )
 
+REM Copy B2XTranslator
+set $=..\..\B2XTranslator\src\Shell\xls2x\bin\%4\
+for %%$ in (
+	.
+) do if not "%%~$$:$" == "" (
+	xcopy /y "%$%*.dll" "%~2B2XTranslator\bin\"
+	xcopy /y "%$%*.pdb" "%~2B2XTranslator\bin\"
+	xcopy /y "%$%*.exe" "%~2B2XTranslator\bin\"
+	xcopy /y "..\..\B2XTranslator\LICENSE" "%~2B2XTranslator\"
+	set $=
+)
+
 REM Copy WinMerge.chm
 xcopy /y "..\..\winmerge2011_help\Build\Manual\htmlhelp\WinMerge.chm" "%~2Docs\"
 

@@ -1,18 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////
-//    License (GPLv2+):
-//    This program is free software; you can redistribute it and/or modify
-//    it under the terms of the GNU General Public License as published by
-//    the Free Software Foundation; either version 2 of the License, or
-//    (at your option) any later version.
-//
-//    This program is distributed in the hope that it will be useful, but
-//    WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//    General Public License for more details.
-//
-//    You should have received a copy of the GNU General Public License
-//    along with this program; if not, write to the Free Software
-//    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+// Modified from https://github.com/WinMerge/winimerge
+// SPDX-License-Identifier: GPL-3.0-or-later
 /////////////////////////////////////////////////////////////////////////////
 
 #pragma once
@@ -33,10 +21,12 @@ struct IImgMergeWindow
 		MOUSEMOVE, MOUSEWHEEL, CONTEXTMENU,
 		KEYDOWN, KEYUP,
 		SIZE, HSCROLL, VSCROLL, SETFOCUS, KILLFOCUS,
-		REFRESH, SCROLLTODIFF, OPEN
+		REFRESH, SCROLLTODIFF, OPEN, NEW
 	};
 	enum DRAGGING_MODE {
-		NONE = 0, MOVE, ADJUST_OFFSET
+		NONE = 0, MOVE, ADJUST_OFFSET, VERTICAL_WIPE, HORIZONTAL_WIPE,
+		RECTANGLE_SELECT,
+		MOVE_IMAGE = 256, RESIZE_WIDTH, RESIZE_HEIGHT, RESIZE_BOTH
 	};
 	struct Event
 	{
@@ -146,12 +136,30 @@ struct IImgMergeWindow
 	virtual COLORREF GetSelDiffDeletedColor() const = 0;
 	virtual void SetSelDiffDeletedColor(COLORREF clrSelDiffDeletedColor) = 0;
 	virtual bool ConvertToRealPos(int pane, const POINT& pt, POINT& ptReal) const = 0;
+	virtual float GetVectorImageZoomRatio() const = 0;
+	virtual void SetVectorImageZoomRatio(float zoom) = 0;
+	virtual bool CloseImages() = 0;
+	virtual bool NewImages(int nImages, int nPages, int width, int height) = 0;
+	virtual bool Copy() = 0;
+	virtual bool Cut() = 0;
+	virtual bool Delete() = 0;
+	virtual bool Paste() = 0;
+	virtual bool SelectAll() = 0;
+	virtual bool Cancel() = 0;
+	virtual RECT GetRectangleSelection(int pane) const = 0;
+	virtual bool IsCopyable() const = 0;
+	virtual bool IsCuttable() const = 0;
+	virtual bool IsPastable() const = 0;
+	virtual bool IsCancellable() const = 0;
+	virtual bool IsRectangleSelectionVisible(int pane) const = 0;
 };
 
 struct IImgToolWindow
 {
+	typedef void(*TranslateCallback)(int id, const wchar_t *org, size_t dstbufsize, wchar_t *dst);
 	virtual HWND GetHWND() const = 0;
 	virtual void Sync() = 0;
+	virtual void Translate(TranslateCallback translateCallback) = 0;
 };
 
 extern "C"

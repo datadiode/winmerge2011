@@ -390,7 +390,7 @@ extern COptionDef
 extern COptionDef
 <String> OPT_CMP_IMG_FILEPATTERNS inline((_T("Settings/ImageFilePatterns"), _T("*.bmp;*.cut;*.dds;*.exr;*.g3;*.gif;*.hdr;*.ico;*.iff;*.lbm;*.j2k;*.j2c;*.jng;*.jp2;*.jpg;*.jif;*.jpeg;*.jpe;*.jxr;*.wdp;*.hdp;*.koa;*.mng;*.pcd;*.pcx;*.pfm;*.pct;*.pict;*.pic;*.png;*.pbm;*.pgm;*.ppm;*.psd;*.ras;*.sgi;*.rgb;*.rgba;*.bw;*.tga;*.targa;*.tif;*.tiff;*.wap;*.wbmp;*.wbm;*.webp;*.xbm;*.xpm")));
 extern COptionDef
-<String> OPT_CMP_REOGRID_FILEPATTERNS inline((_T("Settings/ReoGridFilePatterns"), _T("*.xlsx;*.rgf")));
+<String> OPT_CMP_REOGRID_FILEPATTERNS inline((_T("Settings/ReoGridFilePatterns"), _T("*.xlsx;*.xlsm;*.xltx;*.xltm;*.xls;*.xlt;*.rgf")));
 extern COptionDef
 <String> OPT_CMP_SQLITE_FILEPATTERNS inline((_T("Settings/SQLiteFilePatterns"), _T("*.db;*.sdb;*.sqlite;*.db3;*.s3db;*.sqlite3;*.sl3")));
 extern COptionDef
