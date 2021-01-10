@@ -35,12 +35,22 @@ function OnReadyStateChangeExternalDoc()
 				return false;
 			}
 		}
+		var elements = document.getElementsByTagName("a");
+		for (var i = 0; i < elements.length; ++i)
+		{
+			elements[i].onclick = function()
+			{
+				var sh = new ActiveXObject("wscript.shell");
+				sh.run(this.href);
+				return false;
+			}
+		}
 	}
 }
 </script>
 </head>
 <body>
-<h2>WinMerge 0.2011.210.481 Release Notes</h2>
+<h2>WinMerge 0.2011.211.031 Release Notes</h2>
 This is an experimental release of WinMerge 2011.<br>
 It includes the following enhancements as compared to the previous stable release:
 <ul class='features'>
@@ -49,7 +59,9 @@ It includes the following enhancements as compared to the previous stable releas
 <li><p>SQLite 3 database files are presented in a <a target='_blank' href='https://github.com/datadiode/SQLiteCompare'>modified version</a> of <a target='_blank' href='https://www.codeproject.com/Articles/220018/SQLite-Compare-Utility'>SQLite Compare</a>
 	which allows its embedding into the WinMerge GUI.
 	<br>This modified version also fixes quite a number of bugs found in the original product, and continues to work independently from WinMerge.
-<li><p>Limited support for Excel .xlsx files is offered through <a target='_blank' href='https://github.com/datadiode/ReoGrid'>ReoGrid</a>.
+<li><p>Limited support for Excel .xlsx files,
+	and with the help of <a target='_blank' href='https://github.com/datadiode/B2XTranslator'>B2XTranslator</a> also for Excel 2003 .xls files,
+	is offered through <a target='_blank' href='https://github.com/datadiode/ReoGrid'>ReoGrid</a>.
 	<br>The ReoGrid Compare application implemented by that fork is specifically tailored to run inside the WinMerge GUI, but can also be used as a standalone application.
 	<p><u>An urgent warning on this one:</u>
 	<br>While ReoGrid supports a remarkable subset of Excel's features, a round trip through ReoGrid isn't lossless.
@@ -67,19 +79,18 @@ It includes the following enhancements as compared to the previous stable releas
 	selecting two adjacent characters, the first one representing a field separator, and the second one representing a field enquoting character.
 	<br>Hint: If the field separator follows the field enquoting character, you'd perform the selection from right to left.
 	<br>Note that WinMerge 2.16's <i>Table Compare</i> feature is superior in that it allows you to adjust cell widths, and can wrap texts inside cells accordingly.
-	<br>I found this feature to be quite a nightmare to implement in a way that does not mess up editing, so resorted to a simplified, tab-stop like approach.
 <li><p>The <i>Filter Comments</i> option employs the syntax highlighter to extend its usefulness to many more file types than were addressed by the former approach.
 	<br>This feature was adopted from WinMerge 2.16.
 </ul>
 <h5>Source code links for GPL-licensed/infected binaries included in this release:</h5>
 <ul>
-<li><a target='_blank' href='https://github.com/datadiode/winmerge2011/releases/tag/0.2011.210.481'>WinMerge 2011</a>
+<li><a target='_blank' href='https://github.com/datadiode/winmerge2011/releases/tag/0.2011.211.031'>WinMerge 2011</a>
 <li><a target='_blank' href='https://github.com/datadiode/frhed/releases/tag/0.10907.2020'>Frhed</a>
-<li><a target='_blank' href='https://github.com/WinMerge/winimerge/releases/tag/1.0.20.0'>WinIMerge</a>
+<li><a target='_blank' href='https://github.com/WinMerge/winimerge/releases/tag/1.0.22.0'>WinIMerge</a>
 <li><a target='_blank' href='https://github.com/datadiode/SQLiteCompare/releases/tag/3.1.0.0-datadiode-006'>SQLite Compare</a>
-<li><a target='_blank' href='https://github.com/datadiode/ReoGrid/releases/tag/2.3.0.0-datadiode-094'>ReoGrid</a>
+<li><a target='_blank' href='https://github.com/datadiode/ReoGrid/releases/tag/2.3.0.0-datadiode-171'>ReoGrid</a>
 <li><a target='_blank' href='https://github.com/schdub/protodec/releases/tag/v0.6.3-win'>protodec</a>
 </ul>
-<i>Jochen Neubeck, November 2020</i>
+<i>Jochen Neubeck, January 2021</i>
 <xml src='WinMerge.chm' onreadystatechange='OnReadyStateChangeExternalDoc()'></xml>
 </body>

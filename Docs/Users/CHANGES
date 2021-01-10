@@ -1,3 +1,9 @@
+0.2011.211.031
+Changes since preceding release (not necessarily complete):
+• Upgrade to ReoGrid 2.3.0.0-datadiode-171
+• Add B2XTranslator to convert .xls to .xlsx for ReoGrid
+• Upgrade to WinIMerge 1.0.22.0 (new features yet to be supported)
+
 0.2011.210.481
 Changes since preceding release (not necessarily complete):
 • batch.cpp: Colorize TCC text blocks as strings rather than comments
