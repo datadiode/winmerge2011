@@ -915,14 +915,6 @@ void CCrystalEditView::OnEditReplace()
  */
 void CCrystalEditView::ReplaceSelection(LPCTSTR pszNewText, int cchNewText, bool bGroupWithPrevious)
 {
-	if (cchNewText == 0)
-	{
-		DeleteCurrentSelection();
-		return;
-	}
-
-	ASSERT(pszNewText);
-
 	m_pTextBuffer->BeginUndoGroup(bGroupWithPrevious);
 
 	POINT ptCursorPos, ptEndOfBlock;
@@ -939,9 +931,17 @@ void CCrystalEditView::ReplaceSelection(LPCTSTR pszNewText, int cchNewText, bool
 	if (IsSelection())
 		m_pTextBuffer->DeleteText(this, ptCursorPos.y, ptCursorPos.x, ptEndOfBlock.y, ptEndOfBlock.x, CE_ACTION_REPLACE);
 
-	ASSERT_VALIDTEXTPOS(ptCursorPos);
+	if (cchNewText != 0)
+	{
+		ASSERT(pszNewText);
+		ASSERT_VALIDTEXTPOS(ptCursorPos);
+		ptEndOfBlock = m_pTextBuffer->InsertText(this, ptCursorPos.y, ptCursorPos.x, pszNewText, cchNewText, CE_ACTION_REPLACE);  //  [JRT]
+	}
+	else
+	{
+		ptEndOfBlock = ptCursorPos;
+	}
 
-	ptEndOfBlock = m_pTextBuffer->InsertText(this, ptCursorPos.y, ptCursorPos.x, pszNewText, cchNewText, CE_ACTION_REPLACE);  //  [JRT]
 	m_nLastReplaceLen = cchNewText;
 
 	ASSERT_VALIDTEXTPOS(ptCursorPos);
