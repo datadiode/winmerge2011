@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WinMerge\n"
 "Report-Msgid-Bugs-To: https://bugs.winmerge.org/\n"
-"POT-Creation-Date: 2020-11-02 06:13+0000\n"
-"PO-Revision-Date: 2020-11-09 09:59+0300\n"
+"POT-Creation-Date: 2020-11-13 07:43+0000\n"
+"PO-Revision-Date: 2021-01-13 13:13+0200\n"
 "Last-Translator: Tichij <tichij@mail.com>\n"
 "Language-Team: Lithuanian <winmerge-translate@lists.sourceforge.net>\n"
 "Language: lt\n"
@@ -23,7 +23,7 @@ msgstr ""
 "X-Poedit-Language: Lithuanian\n"
 "X-Poedit-SourceCharset: CP1252\n"
 "X-Poedit-Basepath: ../../Src/\n"
-"X-Generator: Poedit 2.4.1\n"
+"X-Generator: Poedit 2.4.2\n"
 
 #. LANGUAGE, SUBLANGUAGE
 #, c-format
@@ -1051,7 +1051,7 @@ msgstr "&9 eilutës"
 #: Merge.rc:746
 #, c-format
 msgid "&View Whitespace"
-msgstr "&Rodyti tarpus"
+msgstr "&Rodyti tarpø simbolius"
 
 #: Merge.rc:747
 #, c-format
@@ -1148,7 +1148,7 @@ msgstr "I&gnoruoti pokyèius"
 #: Merge.rc:1309
 #, c-format
 msgid "Ig&nore all"
-msgstr "Ig&noruoti viskà"
+msgstr "Ig&noruoti visus"
 
 #: Merge.rc:839
 #: Merge.rc:1312
