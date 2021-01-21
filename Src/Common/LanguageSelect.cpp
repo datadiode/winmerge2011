@@ -841,15 +841,38 @@ bool CLanguageSelect::TranslateString(LPCWSTR rc, std::wstring &ws) const
 {
 	unsigned line = TransformIndex(rc);
 	const std::string &s = m_strarray[line];
+	bool modified = false;
 	if (int len = s.length())
 	{
 		ws.resize(len);
 		const char *msgstr = s.c_str();
 		len = MultiByteToWideChar(m_codepage, 0, msgstr, -1, &ws.front(), len + 1);
 		ws.resize(len - 1);
-		return true;
+		rc = ws.c_str();
+		modified = true;
 	}
-	return false;
+	std::string::size_type offset = 0;
+	while (LPCWSTR const escape = wcschr(rc + offset, L'\\'))
+	{
+		offset += static_cast<std::string::size_type>(escape - rc) + 1;
+		if (rc[offset] == L'u')
+		{
+			if (!modified)
+			{
+				ws = rc;
+				rc = ws.c_str();
+				modified = true;
+			}
+			int value = 0;
+			ws[offset] = L'f'; // Don't catch anything less than four hex digits
+			if (swscanf(&rc[offset], L"%5x", &value) == 1 && (value & 0xF0000) != 0)
+			{
+				ws[offset - 1] = static_cast<wchar_t>(value);
+				ws.erase(offset, 5);
+			}
+		}
+	}
+	return modified;
 }
 
 void CLanguageSelect::TranslateMenu(HMenu *pMenu) const
@@ -866,7 +889,7 @@ void CLanguageSelect::TranslateMenu(HMenu *pMenu) const
 		MENUITEMINFO mii;
 		mii.cbSize = sizeof mii;
 		mii.fMask = MIIM_STATE | MIIM_ID | MIIM_SUBMENU | MIIM_STRING | MIIM_FTYPE;
-		TCHAR text[80];
+		TCHAR text[256];
 		mii.dwTypeData = text;
 		mii.cch = _countof(text);
 		pMenu->GetMenuItemInfo(i, TRUE, &mii);
@@ -899,7 +922,7 @@ void CLanguageSelect::TranslateDialog(HWND h) const
 	UINT gw = GW_CHILD;
 	do
 	{
-		TCHAR text[80];
+		TCHAR text[256];
 		::GetWindowText(h, text, _countof(text));
 		String s;
 		if (TranslateString(text, s))
