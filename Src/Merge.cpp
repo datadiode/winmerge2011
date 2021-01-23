@@ -198,11 +198,16 @@ HRESULT CMergeApp::InitInstance()
 		// Parse command-line arguments.
 		MergeCmdLineInfo cmdInfo = GetCommandLine();
 
-		SettingStore.SetFileName(cmdInfo.m_sConfigFileName);
+		bool const portable = SettingStore.SetFileName(cmdInfo.m_sConfigFileName) && cmdInfo.m_sConfigFileName.empty();
 		if (HKEY loadkey = SettingStore.GetAppRegistryKey())
 		{
 			IOptionDef::InitOptions(loadkey, NULL);
 			SettingStore.RegCloseKey(loadkey);
+		}
+		if (portable && OPT_SUPPLEMENT_FOLDER.IsDefault())
+		{
+			string_format path(_T("%%PortableRoot%%ProgramData\\%s"), WinMergeDocumentsFolder);
+			COptionsMgr::Set<String>(OPT_SUPPLEMENT_FOLDER, path);
 		}
 
 		if (int logging = COptionsMgr::Get(OPT_LOGGING))
