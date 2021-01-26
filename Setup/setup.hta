@@ -3,7 +3,7 @@
 <meta http-equiv='MSThemeCompatible' CONTENT='yes'>
 <hta:application
 	id='app'
-	version='XXXXX.2011.211.031'
+	version='XXXXX.2011.211.053'
 	applicationName='WinMerge &amp;version; Setup'
 	scroll='no'
 	singleInstance='yes'
@@ -13,8 +13,8 @@ call "%VS100COMNTOOLS%vsvars32.bat"
 set SevenZip=&SevenZip;
 del "WinMerge_&version;_&platform;.7z"
 "%SevenZip%7z.exe" a "WinMerge_&version;_&platform;.7z" ^
--r .\Build\WinMerge\&platform;\Release\* .\Build\WinMerge\Win32\Release\ShellExtensionU.dll .\Build\WinMerge\x64\Release\ShellExtensionX64.dll ^
--x!*.lib -x!*.exp -x!*.pdb -x!*.json -x!*.zip -x!*.bak -x!xdoc2txt
+-r .\Build\WinMerge\&platform;\Release\* .\Build\WinMerge\Win32\Release\ShellExtensionU.dll .\Build\WinMerge\x64\Release\ShellExtensionX64.dll .\Setup\WinMergeU.json ^
+-x!*.lib -x!*.exp -x!*.pdb -x!*.zip -x!*.bak -x!xdoc2txt
 "Setup\&platform;\7zSfxHtm.exe" ^
 /create /dll runas "WinMerge_&version;_&platform;_setup.cpl" ^
 /config "Setup\config.html" ^
@@ -437,11 +437,10 @@ Sub Apply
 	Else
 		sProgFolder = sThisFolder
 	End If
-	If PortableMedia.checked Then
-		fso.CreateTextFile sProgFolder & "\WinMergeU.json"
-	Else
-		' If not yet existing, create WinMurge key as a copy of existing WinMerge key
+	If Not PortableMedia.checked Then
 		On Error Resume Next
+		fso.DeleteFile sProgFolder & "\WinMergeU.json"
+		' If not yet existing, create WinMurge key as a copy of existing WinMerge key
 		sh.RegRead "HKCU\Software\Thingamahoochie\WinMurge\"
 		If Err.Number <> 0 Then sh.Run """%windir%\system32\reg.exe"" copy HKCU\Software\Thingamahoochie\WinMerge HKCU\Software\Thingamahoochie\WinMurge /f /s", 0, True
 		On Error GoTo 0
