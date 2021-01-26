@@ -35,7 +35,7 @@ for %%$ in (
 )
 
 REM Copy WinIMergeLib
-set $=..\..\winimerge\Build\Release\
+set $=..\..\winimerge\Build\%4\
 for %%$ in (
 	.
 ) do if not "%%~$$:$" == "" (
@@ -69,7 +69,7 @@ for %%$ in (
 )
 
 REM Copy WinIMergeLib
-set $=..\..\winimerge\Build\x64\Release\
+set $=..\..\winimerge\Build\x64\%4\
 for %%$ in (
 	.
 ) do if not "%%~$$:$" == "" (
