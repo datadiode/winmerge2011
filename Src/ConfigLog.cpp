@@ -185,9 +185,10 @@ void CConfigLog::WriteVersionOf1(int indent, LPTSTR path, bool bDllGetVersion)
 	if (!sVersion.empty())
 	{
 		String sVersionEx = vi.GetProductVersion();
-		if (sVersionEx.find_last_of('-') != sVersionEx.find_first_of('-'))
+		if (sVersionEx[sVersionEx.find_last_of('.') + 1] == 'g' ||
+			sVersionEx.find_last_of('-') != sVersionEx.find_first_of('-'))
 		{
-			// looks like what Zoltu.Versioning creates with tags like v1.3-RC
+			// looks like pre-release version string from Zoltu.Versioning or GIT-VS-VERSION-GEN.bat
 			sVersion = sVersionEx;
 		}
 	}
