@@ -138,12 +138,12 @@ Function GetStringsFromRcFile(ByVal sRcFilePath)
             '--------------------------------------------------------------------------------
             If FoundRegExpMatch(sLine, """((?:""""|[^""])*)""", oMatch) Then 'String...
               sTemp = oMatch.SubMatches(0)
-              If (sTemp <> "") And (oBlacklist.Exists(sTemp) = False) Then 'If NOT blacklisted...
+              If Not oBlacklist.Test(sTemp) Then 'If NOT blacklisted...
                 sLine = Replace(sLine, """" & sTemp & """", """" & sReference & """", 1, 1)
                 sString = Replace(sTemp, """""", "\""")
-                If (FoundRegExpMatch(sLine, "//#\. (.*?)$", oMatch) = True) Then 'If found a comment for the translators...
+                If FoundRegExpMatch(sLine, "//#\. (.*?)$", oMatch) Then 'If found a comment for the translators...
                   sComment = Trim(oMatch.SubMatches(0))
-                ElseIf (FoundRegExpMatch(sLine, "//msgctxt (.*?)$", oMatch) = True) Then 'If found a context for the translation...
+                ElseIf FoundRegExpMatch(sLine, "//msgctxt (.*?)$", oMatch) Then 'If found a context for the translation...
                   sContext = Trim(oMatch.SubMatches(0))
                   sComment = sContext
                 End If
@@ -152,13 +152,13 @@ Function GetStringsFromRcFile(ByVal sRcFilePath)
           End If
           
         Case VERSIONINFO_BLOCK:
-          If (FoundRegExpMatch(sLine, "BLOCK ""([0-9A-F]+)""", oMatch) = True) Then 'StringFileInfo.Block...
+          If FoundRegExpMatch(sLine, "BLOCK ""([0-9A-F]+)""", oMatch) Then 'StringFileInfo.Block...
             sString = oMatch.SubMatches(0)
             sComment = "StringFileInfo.Block"
-          ElseIf (FoundRegExpMatch(sLine, "VALUE ""Comments"", ""(.*?)\\?0?""", oMatch) = True) Then 'StringFileInfo.Comments...
+          ElseIf FoundRegExpMatch(sLine, "VALUE ""Comments"", ""(.*?)\\?0?""", oMatch) Then 'StringFileInfo.Comments...
             sString = oMatch.SubMatches(0)
             sComment = "You should use a string like ""Translated by "" followed by the translator names for this string. It is ONLY VISIBLE in the StringFileInfo.Comments property from the final resource file!"
-          ElseIf (FoundRegExpMatch(sLine, "VALUE ""Translation"", (.*?)$", oMatch) = True) Then 'VarFileInfo.Translation...
+          ElseIf FoundRegExpMatch(sLine, "VALUE ""Translation"", (.*?)$", oMatch) Then 'VarFileInfo.Translation...
             sString = oMatch.SubMatches(0)
             sComment = "VarFileInfo.Translation"
           End If
@@ -212,22 +212,13 @@ End Function
 ''
 ' ...
 Function GetStringBlacklist(ByVal sTxtFilePath)
-  Dim oBlacklist, oTxtFile, sLine
-  
-  Set oBlacklist = CreateObject("Scripting.Dictionary")
-  
-  If (oFSO.FileExists(sTxtFilePath) = True) Then 'If the blacklist file exists...
-    Set oTxtFile = oFSO.OpenTextFile(sTxtFilePath, ForReading)
-    Do Until oTxtFile.AtEndOfStream = True 'For all lines...
-      sLine = Trim(oTxtFile.ReadLine)
-      
-      If (sLine <> "") Then
-        If (oBlacklist.Exists(sLine) = False) Then 'If the key is NOT already used...
-          oBlacklist.Add sLine, True
-        End If
-      End If
-    Loop
-    oTxtFile.Close
+  Dim oBlacklist, sAll
+  Set oBlacklist = New RegExp
+  If oFSO.FileExists(sTxtFilePath) Then 'If the blacklist file exists...
+    sAll = oFSO.OpenTextFile(sTxtFilePath, ForReading).ReadAll
+    oBlacklist.Pattern = Replace(Trim(sAll), vbCrLf, "|")
+  Else
+    oBlacklist.Pattern = "^$"
   End If
   Set GetStringBlacklist = oBlacklist
 End Function

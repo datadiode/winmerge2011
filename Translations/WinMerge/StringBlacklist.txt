@@ -1,13 +1,10 @@
-(filter name)
-[VERSION COPYRIGHT GOES HERE]
-_HDR_POPUP_
-_ITEM_POPUP_
-_POPUP_
-<PlaceHolder>
-0
-0.00
-IDS_SAVEVSS_FMT
-MS Shell Dlg
-Static
-Version 1.0
-WinMerge
+^\(filter name\)$
+^\[VERSION COPYRIGHT GOES HERE\]$
+_POPUP_$
+^[\d\.]+$
+^IDS_SAVEVSS_FMT$
+^MS Shell Dlg$
+^Static$
+^WinMerge$
+%$
+^$
