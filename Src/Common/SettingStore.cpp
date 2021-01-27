@@ -201,7 +201,7 @@ bool CSettingStore::SetFileName(String sFileName)
 					sAlternateFileName.swap(sFileName);
 					m_bUseDesktopSpecificSettings = true;
 				}
-				PathStripToRoot(&sAlternateFileName.front());
+				sAlternateFileName.resize(sAlternateFileName.rfind(_T('\\')) + 1);
 				SetEnvironmentVariable(_T("PortableRoot"), sAlternateFileName.c_str());
 			}
 		}
