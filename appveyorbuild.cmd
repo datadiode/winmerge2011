@@ -28,8 +28,8 @@ for %%p in (
 set PathTo7zSrc=%~dp0appveyor-downloads\7z1900-src\7z-a6e2c7e401a3e5976e8522de518a169b0d8a7fac
 set PathTo7zMsi=%~dp0appveyor-downloads
 
-"%SevenZip%" x -oappveyor-downloads -t# appveyor-downloads\WinMerge_0.2011.210.381_setup.cpl 1.7zSfxHtm.exe
-"%SevenZip%" x -oappveyor-downloads appveyor-downloads\1.7zSfxHtm.exe DOWNLOADER
+"%SevenZip%" x -oappveyor-downloads -t# "%~dp0appveyor-downloads\WinMerge_0.2011.210.381_setup.cpl" 1.7zSfxHtm.exe
+"%SevenZip%" x -oappveyor-downloads "%~dp0appveyor-downloads\1.7zSfxHtm.exe" DOWNLOADER
 copy /Y appveyor-downloads\DOWNLOADER Setup\Support\Downloader.exe
 
 "%ProgramFiles%\Microsoft SDKs\Windows\v7.1\Setup\WindowsSdkVer.exe" -q -version:v7.1
