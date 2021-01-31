@@ -14,6 +14,15 @@ goto :PlatformName$%3
 
 :PlatformName$Win32
 
+REM Copy AStyle
+set $=..\3rdparty\AStyle\build\vs2010\binstatic\
+for %%$ in (
+	AStyle.exe
+) do if not "%%~$$:$" == "" (
+	xcopy /y "%%~$$:$" "%~2"
+	set $=
+)
+
 REM Copy tidy
 set $=..\3rdparty\tidy\build32\MinSizeRel\
 for %%$ in (
@@ -48,6 +57,15 @@ goto :PlatformName$
 
 :PlatformName$x64
 
+REM Copy AStyle
+set $=..\3rdparty\AStyle\build\vs2010\x64\binstatic\
+for %%$ in (
+	AStyle.exe
+) do if not "%%~$$:$" == "" (
+	xcopy /y "%%~$$:$" "%~2"
+	set $=
+)
+
 REM Copy tidy
 set $=..\3rdparty\tidy\build64\MinSizeRel\
 for %%$ in (
@@ -81,15 +99,6 @@ for %%$ in (
 goto :PlatformName$
 
 :PlatformName$
-
-REM Copy AStyle
-set $=..\3rdparty\AStyle\build\cb-bcc32c\bin\;..\3rdparty\AStyle\build\cb-mingw\bin\
-for %%$ in (
-	AStyle.exe
-) do if not "%%~$$:$" == "" (
-	xcopy /y "%%~$$:$" "%~2"
-	set $=
-)
 
 REM Copy protodec
 set $=..\3rdparty\protodec\
