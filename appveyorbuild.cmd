@@ -14,10 +14,11 @@ for %%p in (
   https://7-zip.org/a/7z1900.msi!7z1900.msi
   https://7-zip.org/a/7z1900-x64.msi!7z1900-x64.msi
   https://github.com/kornelski/7z/archive/a6e2c7e401a3e5976e8522de518a169b0d8a7fac.zip!7z1900-src.zip
+  https://github.com/datadiode/winmerge2011/releases/download/0.2011.210.381/WinMerge_0.2011.210.381_setup.cpl
 ) do (
   for /F "tokens=1,2 delims=!" %%u in ("%%p") do (
     if not exist appveyor-downloads\%%v (
-      powershell -command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest %%u -Outfile appveyor-downloads\%%v"
+      powershell -command "Invoke-WebRequest %%u -Outfile appveyor-downloads\%%v"
     )
   )
 )
@@ -26,6 +27,10 @@ for %%p in (
 
 set PathTo7zSrc=%~dp0appveyor-downloads\7z1900-src\7z-a6e2c7e401a3e5976e8522de518a169b0d8a7fac
 set PathTo7zMsi=%~dp0appveyor-downloads
+
+"%SevenZip%" x -oappveyor-downloads -t# appveyor-downloads\WinMerge_0.2011.210.381_setup.cpl 1.7zSfxHtm.exe
+"%SevenZip%" x -oappveyor-downloads appveyor-downloads\1.7zSfxHtm.exe DOWNLOADER
+copy /Y appveyor-downloads\DOWNLOADER Setup\Support\Downloader.exe
 
 "%ProgramFiles%\Microsoft SDKs\Windows\v7.1\Setup\WindowsSdkVer.exe" -q -version:v7.1
 
