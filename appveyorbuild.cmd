@@ -21,7 +21,7 @@ for %%p in (
   )
 )
 
-set PathTo7zSrc=%~dp03rdparty\7z1900-src\7z-a6e2c7e401a3e5976e8522de518a169b0d8a7fac
+set PathTo7zSrc=%~dp03rdparty\7z-a6e2c7e401a3e5976e8522de518a169b0d8a7fac
 set PathTo7zMsi=%~dp03rdparty
 
 call 3rdparty\configure.bat
