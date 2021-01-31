@@ -32,6 +32,9 @@ set PathTo7zMsi=%~dp0appveyor-downloads
 copy appveyor-downloads\tidy-html5.zip 3rdparty\
 call 3rdparty\configure.bat
 
+MSBuild 3rdparty\tidy\build32\tidy.sln /t:Rebuild /p:Configuration="MinSizeRel"
+MSBuild 3rdparty\tidy\build64\tidy.sln /t:Rebuild /p:Configuration="MinSizeRel"
+
 "%SevenZip%" x -oappveyor-downloads -t# "%~dp0appveyor-downloads\WinMerge_0.2011.210.381_setup.cpl" 1.7zSfxHtm.exe
 "%SevenZip%" x -oappveyor-downloads "%~dp0appveyor-downloads\1.7zSfxHtm.exe" DOWNLOADER
 copy /Y appveyor-downloads\DOWNLOADER Setup\Support\Downloader.exe
