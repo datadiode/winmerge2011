@@ -3,7 +3,7 @@ setlocal
 call "%VS140COMNTOOLS%\vsdevcmd.bat"
 
 REM Locate 7z.exe
-set SevenZip=%ProgramFiles%\7-Zip\
+set SevenZip=%ProgramFiles%\7-Zip\7z.exe
 
 cd /d "%~dp0"
 

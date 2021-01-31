@@ -5,10 +5,10 @@
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 @echo off
 setlocal
-set SevenZip=%ProgramFiles%\7-Zip\
+set SevenZip=%ProgramFiles%\7-Zip\7z.exe
 cd /d "%~dp0"
 REM Extract all archives contained in this folder, but keep any existing files
-"%SevenZip%\7z.exe" x -aos "*.zip"
+"%SevenZip%" x -aos "*.zip"
 REM Run CMake on tidy source tree
 for /d %%x in (%~dp0\tidy-html*) do (
 	if not exist "%%x\CMakeLists.txt" goto :invalid-argument
