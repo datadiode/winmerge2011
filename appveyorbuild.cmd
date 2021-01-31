@@ -19,7 +19,7 @@ for %%p in (
 ) do (
   for /F "tokens=1,2 delims=!" %%u in ("%%p") do (
     if not exist 3rdparty\%%v (
-      powershell -command "Invoke-WebRequest %%u -Outfile 3rdparty\%%v"
+      powershell -command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest %%u -Outfile 3rdparty\%%v"
     )
   )
 )
