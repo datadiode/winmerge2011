@@ -13,6 +13,8 @@ for %%p in (
   https://github.com/kornelski/7z/archive/a6e2c7e401a3e5976e8522de518a169b0d8a7fac.zip!7z1900-src.zip
   https://github.com/htacg/tidy-html5/archive/5.7.28.zip!tidy-html5.zip
   https://fossies.org/windows/misc/AStyle_3.1_windows.zip!AStyle_3.1_windows.zip
+  https://github.com/WinMerge/winimerge/releases/download/v1.0.25/winimerge-1-0-25-0-exe.zip!winimerge-1-0-25-0-exe.zip
+  https://github.com/WinMerge/freeimage/archive/master.zip!freeimage-master.zip
   https://github.com/datadiode/winmerge2011/releases/download/0.2011.210.381/WinMerge_0.2011.210.381_setup.cpl!WinMerge_0.2011.210.381_setup.cpl
 ) do (
   for /F "tokens=1,2 delims=!" %%u in ("%%p") do (

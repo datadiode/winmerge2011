@@ -44,13 +44,14 @@ for %%$ in (
 )
 
 REM Copy WinIMergeLib
-set $=..\..\winimerge\Build\%4\
+set $=..\..\winimerge\Build\%4\;..\3rdparty\WinIMerge\bin\
 for %%$ in (
 	.
 ) do if not "%%~$$:$" == "" (
 	xcopy /y "%$%WinIMergeLib.dll" "%~2WinIMerge\"
 	xcopy /y "%$%WinIMergeLib.pdb" "%~2WinIMerge\"
 	xcopy /y "..\..\freeimage\license-gplv3.txt" "%~2WinIMerge\"
+	if errorlevel 1 xcopy /y "..\3rdparty\freeimage-master\license-gplv3.txt" "%~2WinIMerge\"
 	set $=
 )
 goto :PlatformName$
@@ -87,13 +88,14 @@ for %%$ in (
 )
 
 REM Copy WinIMergeLib
-set $=..\..\winimerge\Build\x64\%4\
+set $=..\..\winimerge\Build\x64\%4\;..\3rdparty\WinIMerge\bin64\
 for %%$ in (
 	.
 ) do if not "%%~$$:$" == "" (
 	xcopy /y "%$%WinIMergeLib.dll" "%~2WinIMerge\"
 	xcopy /y "%$%WinIMergeLib.pdb" "%~2WinIMerge\"
 	xcopy /y "..\..\freeimage\license-gplv3.txt" "%~2WinIMerge\"
+	if errorlevel 1 xcopy /y "..\3rdparty\freeimage-master\license-gplv3.txt" "%~2WinIMerge\"
 	set $=
 )
 goto :PlatformName$
