@@ -121,14 +121,14 @@ for %%$ in (
 )
 
 REM Copy SQLiteCompare
-set $=..\..\SQLiteCompare\SQLiteTurbo\bin\%4\
+set $=..\..\SQLiteCompare\SQLiteTurbo\bin\%4\;..\3rdparty\SQLiteCompare-3.1.0.0-datadiode-006\bin\Release\
 for %%$ in (
 	.
 ) do if not "%%~$$:$" == "" (
-	xcopy /ys "%$%*.dll" "%~2SQLiteCompare\bin\"
-	xcopy /ys "%$%*.pdb" "%~2SQLiteCompare\bin\"
-	xcopy /y "%$%SQLiteCompare.*" "%~2SQLiteCompare\bin\"
-	xcopy /y "..\..\SQLiteCompare\LICENSE" "%~2SQLiteCompare\"
+	xcopy /ys "%%~$$:$\*.dll" "%~2SQLiteCompare\bin\"
+	xcopy /ys "%%~$$:$\*.pdb" "%~2SQLiteCompare\bin\"
+	xcopy /y "%%~$$:$\SQLiteCompare.*" "%~2SQLiteCompare\bin\"
+	xcopy /y "%%~$$:$\..\..\..\LICENSE" "%~2SQLiteCompare\"
 	set $=
 )
 

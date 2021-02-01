@@ -13,6 +13,7 @@ for %%p in (
   https://github.com/kornelski/7z/archive/a6e2c7e401a3e5976e8522de518a169b0d8a7fac.zip!7z1900-src.zip
   https://github.com/htacg/tidy-html5/archive/5.7.28.zip!tidy-html5.zip
   https://fossies.org/windows/misc/AStyle_3.1_windows.zip!AStyle_3.1_windows.zip
+  https://github.com/datadiode/SQLiteCompare/archive/3.1.0.0-datadiode-006.zip!SQLiteCompare-3.1.0.0-datadiode-006.zip
   https://github.com/WinMerge/winimerge/releases/download/v1.0.25/winimerge-1-0-25-0-exe.zip!winimerge-1-0-25-0-exe.zip
   https://github.com/WinMerge/freeimage/archive/master.zip!freeimage-master.zip
   https://github.com/datadiode/winmerge2011/releases/download/0.2011.210.381/WinMerge_0.2011.210.381_setup.cpl!WinMerge_0.2011.210.381_setup.cpl
@@ -34,6 +35,8 @@ MSBuild 3rdparty\tidy\build64\tidy.sln /t:Rebuild /p:Platform="x64" /p:Configura
 
 MSBuild 3rdparty\AStyle\build\vs2010\AStyle.sln /t:Rebuild /p:Platform="Win32" /p:Configuration="Static"
 MSBuild 3rdparty\AStyle\build\vs2010\AStyle.sln /t:Rebuild /p:Platform="x64" /p:Configuration="Static"
+
+MSBuild 3rdparty\SQLiteCompare-3.1.0.0-datadiode-006\SQLiteTurboDiff.sln /t:Rebuild /p:Platform="Any CPU" /p:Configuration="Release"
 
 "%SevenZip%" x -o3rdparty -t# "%~dp03rdparty\WinMerge_0.2011.210.381_setup.cpl" 1.7zSfxHtm.exe
 "%SevenZip%" x -o3rdparty "%~dp03rdparty\1.7zSfxHtm.exe" DOWNLOADER
