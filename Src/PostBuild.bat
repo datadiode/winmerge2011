@@ -121,7 +121,7 @@ for %%$ in (
 )
 
 REM Copy SQLiteCompare
-set $=..\..\SQLiteCompare\SQLiteTurbo\bin\%4\;..\3rdparty\%SQLiteCompare%\SQLiteTurbo\bin\Release\
+set $=..\..\SQLiteCompare\SQLiteTurbo\bin\%4\;..\3rdparty\SQLiteCompare\SQLiteTurbo\bin\%4\
 for %%$ in (
 	.
 ) do if not "%%~$$:$" == "" (
