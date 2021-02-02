@@ -129,7 +129,7 @@ for %%$ in (
 	xcopy /ys "%%~$$:$\*.pdb" "%~2SQLiteCompare\bin\"
 	xcopy /y "%%~$$:$\SQLiteCompare.*" "%~2SQLiteCompare\bin\"
 	xcopy /y "%%~$$:$\..\..\..\LICENSE" "%~2SQLiteCompare\"
-	if errorlevel 1 xcopy /y ..\3rdparty\SQLiteCompare_LICENSE "%~2SQLiteCompare\"
+	if errorlevel 1 copy /y ..\3rdparty\SQLiteCompare_LICENSE "%~2SQLiteCompare\LICENSE"
 	set $=
 )
 
@@ -142,19 +142,20 @@ for %%$ in (
 	xcopy /ys "%%~$$:$\*.pdb" "%~2ReoGridCompare\bin\"
 	xcopy /y "%%~$$:$\ReoGridCompare.*" "%~2ReoGridCompare\bin\"
 	xcopy /y "..\..\ReoGrid\LICENSE" "%~2ReoGridCompare\"
-	if errorlevel 1 xcopy /y ..\3rdparty\ReoGrid_LICENSE "%~2ReoGridCompare\"
+	if errorlevel 1 copy /y ..\3rdparty\ReoGrid_LICENSE "%~2ReoGridCompare\LICENSE"
 	set $=
 )
 
 REM Copy B2XTranslator
-set $=..\..\B2XTranslator\src\Shell\xls2x\bin\%4\
+set $=..\..\B2XTranslator\src\Shell\xls2x\bin\%4\;..\3rdparty\B2XTranslator\src\Shell\xls2x\bin\%4\
 for %%$ in (
 	.
 ) do if not "%%~$$:$" == "" (
-	xcopy /y "%$%*.dll" "%~2B2XTranslator\bin\"
-	xcopy /y "%$%*.pdb" "%~2B2XTranslator\bin\"
-	xcopy /y "%$%*.exe" "%~2B2XTranslator\bin\"
+	xcopy /y "%%~$$:$\*.dll" "%~2B2XTranslator\bin\"
+	xcopy /y "%%~$$:$\*.pdb" "%~2B2XTranslator\bin\"
+	xcopy /y "%%~$$:$\*.exe" "%~2B2XTranslator\bin\"
 	xcopy /y "..\..\B2XTranslator\LICENSE" "%~2B2XTranslator\"
+	if errorlevel 1 copy /y ..\3rdparty\B2XTranslator_LICENSE "%~2B2XTranslator\LICENSE"
 	set $=
 )
 

@@ -2,6 +2,7 @@ setlocal
 
 set SQLiteCompareTag=3.1.0.0-datadiode-007
 set ReoGridTag=2.3.0.0-datadiode-178
+set B2XTranslatorTag=1.0.0.0-datadiode-006
 
 call "%VS140COMNTOOLS%\vsdevcmd.bat"
 
@@ -22,6 +23,9 @@ for %%p in (
   https://github.com/datadiode/ReoGrid/blob/master/LICENSE!ReoGrid_LICENSE
   https://github.com/datadiode/ReoGrid/releases/download/%ReoGridTag%/ReoGridCompare_%ReoGridTag%-Debug.zip!ReoGridCompare_Debug
   https://github.com/datadiode/ReoGrid/releases/download/%ReoGridTag%/ReoGridCompare_%ReoGridTag%-Release.zip!ReoGridCompare_Release
+  https://github.com/datadiode/B2XTranslator/blob/master/LICENSE!B2XTranslator_LICENSE
+  https://github.com/datadiode/B2XTranslator/releases/download/%B2XTranslatorTag%/xls2x_%B2XTranslatorTag%-Debug.zip!xls2x_Debug
+  https://github.com/datadiode/B2XTranslator/releases/download/%B2XTranslatorTag%/xls2x_%B2XTranslatorTag%-Release.zip!xls2x_Release
   https://github.com/WinMerge/winimerge/releases/download/v1.0.25/winimerge-1-0-25-0-exe.zip!winimerge-1-0-25-0-exe.zip
   https://github.com/WinMerge/freeimage/archive/master.zip!freeimage-master.zip
   https://github.com/datadiode/winmerge2011/releases/download/0.2011.210.381/WinMerge_0.2011.210.381_setup.cpl!WinMerge_0.2011.210.381_setup.cpl
@@ -49,6 +53,9 @@ MSBuild 3rdparty\AStyle\build\vs2010\AStyle.sln /t:Rebuild /p:Platform="x64" /p:
 
 "%SevenZip%" x -o3rdparty\ReoGrid\Compare\bin\Debug\ "%~dp03rdparty\ReoGridCompare_Debug"
 "%SevenZip%" x -o3rdparty\ReoGrid\Compare\bin\Release\ "%~dp03rdparty\ReoGridCompare_Release"
+
+"%SevenZip%" x -o3rdparty\B2XTranslator\src\Shell\xls2x\bin\Debug\ "%~dp03rdparty\xls2x_Debug"
+"%SevenZip%" x -o3rdparty\B2XTranslator\src\Shell\xls2x\bin\Release\ "%~dp03rdparty\xls2x_Release"
 
 "%SevenZip%" x -o3rdparty -t# "%~dp03rdparty\WinMerge_0.2011.210.381_setup.cpl" 1.7zSfxHtm.exe
 "%SevenZip%" x -o3rdparty "%~dp03rdparty\1.7zSfxHtm.exe" DOWNLOADER
