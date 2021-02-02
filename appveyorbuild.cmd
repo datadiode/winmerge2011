@@ -1,6 +1,7 @@
 setlocal
 
 set SQLiteCompareTag=3.1.0.0-datadiode-007
+set ReoGridTag=2.3.0.0-datadiode-178
 
 call "%VS140COMNTOOLS%\vsdevcmd.bat"
 
@@ -15,8 +16,12 @@ for %%p in (
   https://github.com/kornelski/7z/archive/a6e2c7e401a3e5976e8522de518a169b0d8a7fac.zip!7z1900-src.zip
   https://github.com/htacg/tidy-html5/archive/5.7.28.zip!tidy-html5.zip
   https://fossies.org/windows/misc/AStyle_3.1_windows.zip!AStyle_3.1_windows.zip
+  https://github.com/datadiode/SQLiteCompare/blob/master/LICENSE!SQLiteCompare_LICENSE
   https://github.com/datadiode/SQLiteCompare/releases/download/%SQLiteCompareTag%/SQLiteCompare_%SQLiteCompareTag%-Debug.zip!SQLiteCompare_Debug
   https://github.com/datadiode/SQLiteCompare/releases/download/%SQLiteCompareTag%/SQLiteCompare_%SQLiteCompareTag%-Release.zip!SQLiteCompare_Release
+  https://github.com/datadiode/ReoGrid/blob/master/LICENSE!ReoGrid_LICENSE
+  https://github.com/datadiode/ReoGrid/releases/download/%ReoGridTag%/ReoGridCompare_%ReoGridTag%-Debug.zip!ReoGridCompare_Debug
+  https://github.com/datadiode/ReoGrid/releases/download/%ReoGridTag%/ReoGridCompare_%ReoGridTag%-Release.zip!ReoGridCompare_Release
   https://github.com/WinMerge/winimerge/releases/download/v1.0.25/winimerge-1-0-25-0-exe.zip!winimerge-1-0-25-0-exe.zip
   https://github.com/WinMerge/freeimage/archive/master.zip!freeimage-master.zip
   https://github.com/datadiode/winmerge2011/releases/download/0.2011.210.381/WinMerge_0.2011.210.381_setup.cpl!WinMerge_0.2011.210.381_setup.cpl
@@ -41,6 +46,9 @@ MSBuild 3rdparty\AStyle\build\vs2010\AStyle.sln /t:Rebuild /p:Platform="x64" /p:
 
 "%SevenZip%" x -o3rdparty\SQLiteCompare\SQLiteTurbo\bin\Debug\ "%~dp03rdparty\SQLiteCompare_Debug"
 "%SevenZip%" x -o3rdparty\SQLiteCompare\SQLiteTurbo\bin\Release\ "%~dp03rdparty\SQLiteCompare_Release"
+
+"%SevenZip%" x -o3rdparty\ReoGrid\Compare\bin\Debug\ "%~dp03rdparty\ReoGridCompare_Debug"
+"%SevenZip%" x -o3rdparty\ReoGrid\Compare\bin\Release\ "%~dp03rdparty\ReoGridCompare_Release"
 
 "%SevenZip%" x -o3rdparty -t# "%~dp03rdparty\WinMerge_0.2011.210.381_setup.cpl" 1.7zSfxHtm.exe
 "%SevenZip%" x -o3rdparty "%~dp03rdparty\1.7zSfxHtm.exe" DOWNLOADER

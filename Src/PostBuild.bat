@@ -129,18 +129,20 @@ for %%$ in (
 	xcopy /ys "%%~$$:$\*.pdb" "%~2SQLiteCompare\bin\"
 	xcopy /y "%%~$$:$\SQLiteCompare.*" "%~2SQLiteCompare\bin\"
 	xcopy /y "%%~$$:$\..\..\..\LICENSE" "%~2SQLiteCompare\"
+	if errorlevel 1 xcopy /y ..\3rdparty\SQLiteCompare_LICENSE "%~2SQLiteCompare\"
 	set $=
 )
 
 REM Copy ReoGridCompare
-set $=..\..\ReoGrid\Compare\bin\%4\
+set $=..\..\ReoGrid\Compare\bin\%4\;..\3rdparty\ReoGrid\Compare\bin\%4\
 for %%$ in (
 	.
 ) do if not "%%~$$:$" == "" (
-	xcopy /ys "%$%*.dll" "%~2ReoGridCompare\bin\"
-	xcopy /ys "%$%*.pdb" "%~2ReoGridCompare\bin\"
-	xcopy /y "%$%ReoGridCompare.*" "%~2ReoGridCompare\bin\"
+	xcopy /ys "%%~$$:$\*.dll" "%~2ReoGridCompare\bin\"
+	xcopy /ys "%%~$$:$\*.pdb" "%~2ReoGridCompare\bin\"
+	xcopy /y "%%~$$:$\ReoGridCompare.*" "%~2ReoGridCompare\bin\"
 	xcopy /y "..\..\ReoGrid\LICENSE" "%~2ReoGridCompare\"
+	if errorlevel 1 xcopy /y ..\3rdparty\ReoGrid_LICENSE "%~2ReoGridCompare\"
 	set $=
 )
 
