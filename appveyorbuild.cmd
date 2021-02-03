@@ -34,6 +34,7 @@ for %%p in (
   https://raw.githubusercontent.com/WinMerge/freeimage/master/license-gplv3.txt!FreeImage_license-gplv3.txt
   https://github.com/WinMerge/winimerge/releases/download/v1.0.25/winimerge-1-0-25-0-exe.zip!winimerge-1-0-25-0-exe.zip
   https://github.com/datadiode/winmerge2011/releases/download/0.2011.210.381/WinMerge_0.2011.210.381_setup.cpl!WinMerge_0.2011.210.381_setup.cpl
+  https://github.com/datadiode/winmerge2011_help/releases/download/0.2011.008.226/WinMerge.chm!WinMerge.chm
 ) do (
   for /F "tokens=1,2 delims=!" %%u in ("%%p") do (
     if not exist 3rdparty\%%v (

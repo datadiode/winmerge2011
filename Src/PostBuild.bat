@@ -95,7 +95,7 @@ for %%$ in (
 	xcopy /y "%%~$$:$\WinIMergeLib.dll" "%~2WinIMerge\"
 	xcopy /y "%%~$$:$\WinIMergeLib.pdb" "%~2WinIMerge\"
 	xcopy /y "..\..\freeimage\license-gplv3.txt" "%~2WinIMerge\"
-	if errorlevel 1 xcopy /y "..\3rdparty\freeimage-master\license-gplv3.txt" "%~2WinIMerge\"
+	if errorlevel 1 copy /y "..\3rdparty\FreeImage_license-gplv3.txt" "%~2WinIMerge\license-gplv3.txt"
 	set $=
 )
 goto :PlatformName$
@@ -160,7 +160,13 @@ for %%$ in (
 )
 
 REM Copy WinMerge.chm
-xcopy /y "..\..\winmerge2011_help\Build\Manual\htmlhelp\WinMerge.chm" "%~2Docs\"
+set $=..\..\winmerge2011_help\Build\Manual\htmlhelp\;..\3rdparty\
+for %%$ in (
+	WinMerge.chm
+) do if not "%%~$$:$" == "" (
+	copy /y "%%~$$:$" "%~2Docs\"
+	set $=
+)
 
 REM Create English.pot and MergeLang.rc from Merge.rc
 cd ..\Translations\WinMerge
