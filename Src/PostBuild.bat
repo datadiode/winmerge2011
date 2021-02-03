@@ -51,7 +51,7 @@ for %%$ in (
 	xcopy /y "%%~$$:$\WinIMergeLib.dll" "%~2WinIMerge\"
 	xcopy /y "%%~$$:$\WinIMergeLib.pdb" "%~2WinIMerge\"
 	xcopy /y "..\..\freeimage\license-gplv3.txt" "%~2WinIMerge\"
-	if errorlevel 1 xcopy /y "..\3rdparty\freeimage-master\license-gplv3.txt" "%~2WinIMerge\"
+	if errorlevel 1 copy /y "..\3rdparty\FreeImage_license-gplv3.txt" "%~2WinIMerge\license-gplv3.txt"
 	set $=
 )
 goto :PlatformName$
@@ -112,7 +112,7 @@ for %%$ in (
 )
 
 REM Copy Frhed
-set $=..\..\Frhed\Build\FRHED\%3\UnicodeRelease
+set $=..\..\Frhed\Build\FRHED\%3\Unicode%4;..\3rdparty\Frhed\Build\FRHED\%3\Unicode%4
 for %%$ in (
 	.
 ) do if not "%%~$$:$" == "" (

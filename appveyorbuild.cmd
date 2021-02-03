@@ -1,5 +1,6 @@
 setlocal
 
+set FrhedTag=0.10909.2021
 set SQLiteCompareTag=3.1.0.0-datadiode-007
 set ReoGridTag=2.3.0.0-datadiode-178
 set B2XTranslatorTag=1.0.0.0-datadiode-006
@@ -17,17 +18,21 @@ for %%p in (
   https://github.com/kornelski/7z/archive/a6e2c7e401a3e5976e8522de518a169b0d8a7fac.zip!7z1900-src.zip
   https://github.com/htacg/tidy-html5/archive/5.7.28.zip!tidy-html5.zip
   https://fossies.org/windows/misc/AStyle_3.1_windows.zip!AStyle_3.1_windows.zip
-  https://github.com/datadiode/SQLiteCompare/blob/master/LICENSE!SQLiteCompare_LICENSE
+  https://github.com/datadiode/frhed/releases/download/v%FrhedTag%/Frhed_%FrhedTag%-Win32-UnicodeDebug.zip!Frhed_Win32-UnicodeDebug
+  https://github.com/datadiode/frhed/releases/download/v%FrhedTag%/Frhed_%FrhedTag%-Win32-UnicodeRelease.zip!Frhed_Win32-UnicodeRelease
+  https://github.com/datadiode/frhed/releases/download/v%FrhedTag%/Frhed_%FrhedTag%-x64-UnicodeDebug.zip!Frhed_x64-UnicodeDebug
+  https://github.com/datadiode/frhed/releases/download/v%FrhedTag%/Frhed_%FrhedTag%-x64-UnicodeRelease.zip!Frhed_x64-UnicodeRelease
+  https://raw.githubusercontent.com/datadiode/SQLiteCompare/master/LICENSE!SQLiteCompare_LICENSE
   https://github.com/datadiode/SQLiteCompare/releases/download/%SQLiteCompareTag%/SQLiteCompare_%SQLiteCompareTag%-Debug.zip!SQLiteCompare_Debug
   https://github.com/datadiode/SQLiteCompare/releases/download/%SQLiteCompareTag%/SQLiteCompare_%SQLiteCompareTag%-Release.zip!SQLiteCompare_Release
-  https://github.com/datadiode/ReoGrid/blob/master/LICENSE!ReoGrid_LICENSE
+  https://raw.githubusercontent.com/datadiode/ReoGrid/master/LICENSE!ReoGrid_LICENSE
   https://github.com/datadiode/ReoGrid/releases/download/%ReoGridTag%/ReoGridCompare_%ReoGridTag%-Debug.zip!ReoGridCompare_Debug
   https://github.com/datadiode/ReoGrid/releases/download/%ReoGridTag%/ReoGridCompare_%ReoGridTag%-Release.zip!ReoGridCompare_Release
-  https://github.com/datadiode/B2XTranslator/blob/master/LICENSE!B2XTranslator_LICENSE
+  https://raw.githubusercontent.com/datadiode/B2XTranslator/master/LICENSE!B2XTranslator_LICENSE
   https://github.com/datadiode/B2XTranslator/releases/download/%B2XTranslatorTag%/xls2x_%B2XTranslatorTag%-Debug.zip!xls2x_Debug
   https://github.com/datadiode/B2XTranslator/releases/download/%B2XTranslatorTag%/xls2x_%B2XTranslatorTag%-Release.zip!xls2x_Release
+  https://raw.githubusercontent.com/WinMerge/freeimage/master/license-gplv3.txt!FreeImage_license-gplv3.txt
   https://github.com/WinMerge/winimerge/releases/download/v1.0.25/winimerge-1-0-25-0-exe.zip!winimerge-1-0-25-0-exe.zip
-  https://github.com/WinMerge/freeimage/archive/master.zip!freeimage-master.zip
   https://github.com/datadiode/winmerge2011/releases/download/0.2011.210.381/WinMerge_0.2011.210.381_setup.cpl!WinMerge_0.2011.210.381_setup.cpl
 ) do (
   for /F "tokens=1,2 delims=!" %%u in ("%%p") do (
@@ -47,6 +52,11 @@ MSBuild 3rdparty\tidy\build64\tidy.sln /t:Rebuild /p:Platform="x64" /p:Configura
 
 MSBuild 3rdparty\AStyle\build\vs2010\AStyle.sln /t:Rebuild /p:Platform="Win32" /p:Configuration="Static"
 MSBuild 3rdparty\AStyle\build\vs2010\AStyle.sln /t:Rebuild /p:Platform="x64" /p:Configuration="Static"
+
+"%SevenZip%" x -o3rdparty\Frhed\Build\FRHED\Win32\UnicodeDebug\ "%~dp03rdparty\Frhed_Win32-UnicodeDebug"
+"%SevenZip%" x -o3rdparty\Frhed\Build\FRHED\Win32\UnicodeRelease\ "%~dp03rdparty\Frhed_Win32-UnicodeRelease"
+"%SevenZip%" x -o3rdparty\Frhed\Build\FRHED\x64\UnicodeDebug\ "%~dp03rdparty\Frhed_x64-UnicodeDebug"
+"%SevenZip%" x -o3rdparty\Frhed\Build\FRHED\x64\UnicodeRelease\ "%~dp03rdparty\Frhed_x64-UnicodeRelease"
 
 "%SevenZip%" x -o3rdparty\SQLiteCompare\SQLiteTurbo\bin\Debug\ "%~dp03rdparty\SQLiteCompare_Debug"
 "%SevenZip%" x -o3rdparty\SQLiteCompare\SQLiteTurbo\bin\Release\ "%~dp03rdparty\SQLiteCompare_Release"
