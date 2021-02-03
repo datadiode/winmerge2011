@@ -11,4 +11,4 @@ artifacts:
 - path: Build/WinMerge/x64/Debug
 - path: Build/WinMerge/Win32/Release
 - path: Build/WinMerge/x64/Release
-- path: *.cpl
+- path: WinMerge_*.cpl
