@@ -79,3 +79,5 @@ for %%p in (%*) do (
     MSBuild WinMerge.sln /t:Rebuild /p:Platform="%%u" /p:Configuration="%%v" || goto :eof
   )
 )
+
+for %%f in (Setup_*.bat) do call %%f
