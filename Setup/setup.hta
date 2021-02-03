@@ -9,9 +9,8 @@
 	singleInstance='yes'
 	icon='WinMergeU.exe'/>
 <comment id='setup_bat'>
-set SevenZip=&SevenZip;
 del "WinMerge_&version;_&platform;.7z"
-"%SevenZip%7z.exe" a "WinMerge_&version;_&platform;.7z" ^
+"%ProgramFiles%\7-Zip\7z.exe" a "WinMerge_&version;_&platform;.7z" ^
 -r .\Build\WinMerge\&platform;\Release\* .\Build\WinMerge\Win32\Release\ShellExtensionU.dll .\Build\WinMerge\x64\Release\ShellExtensionX64.dll .\Setup\WinMergeU.json ^
 -x!*.lib -x!*.exp -x!*.pdb -x!*.zip -x!*.bak -x!xdoc2txt
 "Setup\&platform;\7zSfxHtm.exe" ^
@@ -525,7 +524,6 @@ Sub Job_Version
 	content = Replace(setup_bat.text, "&platform;", platform)
 	content = Replace(content, "&version;_Win32", "&version;")
 	content = Replace(content, "&version;", version)
-	content = Replace(content, "&SevenZip;", sh.RegRead("HKLM\Software\7-Zip\Path"))
 	path = fso.GetParentFolderName(location.pathname) & "_" & platform & ".bat"
 	fso.CreateTextFile(path, True).Write content
 	path = fso.GetParentFolderName(location.pathname) & "\WinMerge2011.nsi"
