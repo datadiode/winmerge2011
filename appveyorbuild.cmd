@@ -80,4 +80,7 @@ for %%p in (%*) do (
   )
 )
 
+dir *.bat
 for %%f in (Setup_*.bat) do call %%f
+dir *.7z
+dir *.cpl
