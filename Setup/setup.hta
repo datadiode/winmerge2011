@@ -502,8 +502,7 @@ End Sub
 
 Sub Job_Version
 	Dim describe, parts, delta, content, path, platform
-	describe = sh.Exec("""%ProgramW6432%\Git\cmd\git.exe"" describe --tags").StdOut.ReadAll
-	describe = Replace("BUILD." + describe, "BUILD.0.", "XXXXX.")
+	describe = Replace("BUILD." + argv(4), "BUILD.0.", "XXXXX.")
 	parts = Split(describe, "-")
 	delta = 0
 	If UBound(parts) > 0 Then

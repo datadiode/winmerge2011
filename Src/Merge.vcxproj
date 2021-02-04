@@ -958,7 +958,7 @@
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="version.rh">
-      <Command>"$(SystemRoot)\system32\mshta.exe" "$(SolutionDir)Setup\setup.hta" "silent:hidden:version" "%(FullPath)" "$(Platform)"</Command>
+      <Command>FOR /F "tokens=*" %%A IN ('"git describe --tags"') DO "$(SystemRoot)\system32\mshta.exe" "$(SolutionDir)Setup\setup.hta" "silent:hidden:version" "%(FullPath)" "$(Platform)" "%%A"</Command>
       <Outputs>$(SolutionDir)Setup_$(Platform).bat;%(Outputs)</Outputs>
     </CustomBuild>
     <None Include="res\binarydiff.ico" />
