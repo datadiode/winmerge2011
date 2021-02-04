@@ -1,9 +1,9 @@
 setlocal
 
-where git.exe
-git describe --tags
-start /wait "%SystemRoot%\SysWOW64\mshta.exe" "%~dp0Setup\setup.hta" "silent:hidden:version" "%~dp0src\version.rh" "Win32"
-start /wait "%SystemRoot%\SysWOW64\mshta.exe" "%~dp0Setup\setup.hta" "silent:hidden:version" "%~dp0src\version.rh" "x64"
+FOR /F "tokens=*" %%A IN ('"git describe --tags"') DO SET GIT_DESCRIBE=%%A
+echo GIT_DESCRIBE=%GIT_DESCRIBE%
+start /wait "%SystemRoot%\system32\mshta.exe" "%~dp0Setup\setup.hta" "silent:hidden:version" "%~dp0src\version.rh" "Win32" "%GIT_DESCRIBE%"
+start /wait "%SystemRoot%\system32\mshta.exe" "%~dp0Setup\setup.hta" "silent:hidden:version" "%~dp0src\version.rh" "x64" "%GIT_DESCRIBE%"
 type "%~dp0src\version.rh"
 dir *.bat
 
