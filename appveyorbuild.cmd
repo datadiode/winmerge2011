@@ -2,13 +2,6 @@ setlocal
 
 FOR /F "tokens=*" %%A IN ('"git describe --tags"') DO SET GIT_DESCRIBE=%%A
 echo GIT_DESCRIBE=%GIT_DESCRIBE%
-start /wait "%SystemRoot%\system32\mshta.exe" "%~dp0Setup\setup.hta" "silent:hidden:version" "%~dp0src\version.rh" "Win32" "%GIT_DESCRIBE%"
-echo %errorlevel%
-start /wait "%SystemRoot%\system32\mshta.exe" "%~dp0Setup\setup.hta" "silent:hidden:version" "%~dp0src\version.rh" "x64" "%GIT_DESCRIBE%"
-echo %errorlevel%
-type "%~dp0Setup\setup.err"
-type "%~dp0src\version.rh"
-dir *.bat
 
 set FrhedTag=0.10909.2021
 set SQLiteCompareTag=3.1.0.0-datadiode-007
@@ -89,6 +82,13 @@ for %%p in (%*) do (
     MSBuild WinMerge.sln /t:Rebuild /p:Platform="%%u" /p:Configuration="%%v" || goto :eof
   )
 )
+
+start /wait "%SystemRoot%\system32\mshta.exe" "%~dp0Setup\setup.hta" "silent:hidden:version" "%~dp0src\version.rh" "Win32" "%GIT_DESCRIBE%"
+start /wait "%SystemRoot%\system32\mshta.exe" "%~dp0Setup\setup.hta" "silent:hidden:version" "%~dp0src\version.rh" "x64" "%GIT_DESCRIBE%"
+
+type "%~dp0Setup\setup.err"
+type "%~dp0src\version.rh"
+dir *.bat
 
 for %%f in (Setup_*.bat) do call %%f
 dir *.7z
