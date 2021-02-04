@@ -31,6 +31,14 @@ public:
 	void UpdateResources();
 	bool IsModified() const;
 	BOOL IsFileChangedOnDisk(int pane) const;
+	bool GetShowDifferences() const;
+	int GetDraggingMode() const;
+	int GetDiffBlockSize() const;
+	double GetColorDistanceThreshold() const;
+	int GetInsertionDeletionDetectionMode() const;
+	double GetZoom() const;
+	int GetOverlayMode() const;
+	float GetVectorImageZoomRatio() const;
 
 	virtual void ActivateFrame() override;
 	virtual void SavePosition() override;
@@ -68,6 +76,10 @@ private:
 	void OnViewZoomOut();
 	void OnViewZoomNormal();
 	void OnWindowChangePane();
+	void OnBackColor();
+	void OnStepPage(int direction);
+	void OnStepPageCurPane(int direction);
+	void OnCompareText();
 	int TrySaveAs(int pane, String &);
 	bool DoSave(int pane);
 	bool DoSaveAs(int pane);
@@ -86,4 +98,5 @@ private:
 	FileInfo m_fileInfo[2];
 	HStatusBar *m_pStatusBar[2];
 	static const LONG FloatScript[];
+	static COLORREF m_rgCustColors[16];
 };

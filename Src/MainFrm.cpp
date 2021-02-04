@@ -885,6 +885,30 @@ void CMainFrame::UpdateCmdUI<ID_CLEAR_SYNCPOINTS>(BYTE uFlags)
 	m_cmdState.ClearSyncPoints = uFlags;
 }
 
+template<>
+void CMainFrame::UpdateCmdUI<ID_IMG_PREVPAGE>(BYTE uFlags)
+{
+	m_cmdState.ImgPrevPage = uFlags;
+}
+
+template<>
+void CMainFrame::UpdateCmdUI<ID_IMG_NEXTPAGE>(BYTE uFlags)
+{
+	m_cmdState.ImgNextPage = uFlags;
+}
+
+template<>
+void CMainFrame::UpdateCmdUI<ID_IMG_CURPANE_PREVPAGE>(BYTE uFlags)
+{
+	m_cmdState.ImgCurPanePrevPage = uFlags;
+}
+
+template<>
+void CMainFrame::UpdateCmdUI<ID_IMG_CURPANE_NEXTPAGE>(BYTE uFlags)
+{
+	m_cmdState.ImgCurPaneNextPage = uFlags;
+}
+
 void CMainFrame::DrawMenuDefault(DRAWITEMSTRUCT *)
 {
 }
@@ -1132,6 +1156,14 @@ const BYTE *CMainFrame::CmdState::Lookup(UINT id) const
 		return &SetSyncPoint;
 	case ID_CLEAR_SYNCPOINTS:
 		return &ClearSyncPoints;
+	case ID_IMG_PREVPAGE:
+		return &ImgPrevPage;
+	case ID_IMG_NEXTPAGE:
+		return &ImgNextPage;
+	case ID_IMG_CURPANE_PREVPAGE:
+		return &ImgCurPanePrevPage;
+	case ID_IMG_CURPANE_NEXTPAGE:
+		return &ImgCurPaneNextPage;
 	}
 	return NULL;
 }
@@ -1303,6 +1335,109 @@ LRESULT CMainFrame::OnWndMsg<WM_INITMENUPOPUP>(WPARAM wParam, LPARAM lParam)
 			{
 				pMenu->EnableMenuItem(mii.wID, mii.fState);
 			} while (++mii.wID <= ID_VIEW_CONTEXT_UNLIMITED);
+			continue;
+		case ID_IMG_VIEWDIFFERENCES:
+			if (pDocFrame->GetFrameType() == FRAME_IMGFILE)
+			{
+				CImgMergeFrame *const pSpecific = static_cast<CImgMergeFrame *>(pDocFrame);
+				pMenu->CheckMenuItem(mii.wID, pSpecific->GetShowDifferences() ? MF_CHECKED : MF_UNCHECKED);
+			}
+			continue;
+		case ID_IMG_DRAGGINGMODE_NONE:
+			if (pDocFrame->GetFrameType() == FRAME_IMGFILE)
+			{
+				CImgMergeFrame *const pSpecific = static_cast<CImgMergeFrame *>(pDocFrame);
+				int const id = ID_IMG_DRAGGINGMODE_NONE + pSpecific->GetDraggingMode();
+				pMenu->CheckMenuRadioItem(ID_IMG_DRAGGINGMODE_NONE, ID_IMG_DRAGGINGMODE_RECTANGLE_SELECT, id);
+			}
+			continue;
+		case ID_IMG_DIFFBLOCKSIZE_1:
+			if (pDocFrame->GetFrameType() == FRAME_IMGFILE)
+			{
+				CImgMergeFrame *const pSpecific = static_cast<CImgMergeFrame *>(pDocFrame);
+				int bit = pSpecific->GetDiffBlockSize();
+				int id = 0;
+				if (bit >= 1 && bit <= 32 && (bit & bit - 1) == 0)
+				{
+					id = ID_IMG_DIFFBLOCKSIZE_1;
+					while (bit >>= 1) ++id;
+				}
+				pMenu->CheckMenuRadioItem(ID_IMG_DIFFBLOCKSIZE_1, ID_IMG_DIFFBLOCKSIZE_32, id);
+			}
+			continue;
+		case ID_IMG_THRESHOLD_0:
+			if (pDocFrame->GetFrameType() == FRAME_IMGFILE)
+			{
+				CImgMergeFrame *const pSpecific = static_cast<CImgMergeFrame *>(pDocFrame);
+				double threshold = pSpecific->GetColorDistanceThreshold();
+				int bit = static_cast<int>(threshold);
+				int id = 0;
+				if (static_cast<double>(bit) == threshold)
+				{
+					if (bit == 0)
+					{
+						id = ID_IMG_THRESHOLD_0;
+					}
+					else if (bit >= 1 && bit <= 64 && (bit & bit - 1) == 0)
+					{
+						id = ID_IMG_THRESHOLD_1;
+						while (bit >>= 1) ++id;
+					}
+				}
+				pMenu->CheckMenuRadioItem(ID_IMG_THRESHOLD_0, ID_IMG_THRESHOLD_64, id);
+			}
+			continue;
+		case ID_IMG_INSERTIONDELETIONDETECTION_NONE:
+			if (pDocFrame->GetFrameType() == FRAME_IMGFILE)
+			{
+				CImgMergeFrame *const pSpecific = static_cast<CImgMergeFrame *>(pDocFrame);
+				int const id = ID_IMG_INSERTIONDELETIONDETECTION_NONE + pSpecific->GetInsertionDeletionDetectionMode();
+				pMenu->CheckMenuRadioItem(ID_IMG_INSERTIONDELETIONDETECTION_NONE, ID_IMG_INSERTIONDELETIONDETECTION_HORZ, id);
+			}
+			continue;
+		case ID_IMG_ZOOM_25:
+			if (pDocFrame->GetFrameType() == FRAME_IMGFILE)
+			{
+				CImgMergeFrame *const pSpecific = static_cast<CImgMergeFrame *>(pDocFrame);
+				double zoom = pSpecific->GetZoom() * 4.0;
+				int bit = static_cast<int>(zoom);
+				int id = 0;
+				if (static_cast<double>(bit) == zoom)
+				{
+					if (bit >= 1 && bit <= 32 && (bit & bit - 1) == 0)
+					{
+						id = ID_IMG_ZOOM_25;
+						while (bit >>= 1) ++id;
+					}
+				}
+				pMenu->CheckMenuRadioItem(ID_IMG_ZOOM_25, ID_IMG_ZOOM_800, id);
+			}
+			continue;
+		case ID_IMG_OVERLAY_NONE:
+			if (pDocFrame->GetFrameType() == FRAME_IMGFILE)
+			{
+				CImgMergeFrame *const pSpecific = static_cast<CImgMergeFrame *>(pDocFrame);
+				int const id = ID_IMG_OVERLAY_NONE + pSpecific->GetOverlayMode();
+				pMenu->CheckMenuRadioItem(ID_IMG_OVERLAY_NONE, ID_IMG_OVERLAY_ALPHABLEND_ANIM, id);
+			}
+			continue;
+		case ID_IMG_VECTORIMAGESCALING_25:
+			if (pDocFrame->GetFrameType() == FRAME_IMGFILE)
+			{
+				CImgMergeFrame *const pSpecific = static_cast<CImgMergeFrame *>(pDocFrame);
+				float zoom = pSpecific->GetVectorImageZoomRatio() * 4.0f;
+				int bit = static_cast<int>(zoom);
+				int id = 0;
+				if (static_cast<double>(bit) == zoom)
+				{
+					if (bit >= 1 && bit <= 32 && (bit & bit - 1) == 0)
+					{
+						id = ID_IMG_VECTORIMAGESCALING_25;
+						while (bit >>= 1) ++id;
+					}
+				}
+				pMenu->CheckMenuRadioItem(ID_IMG_VECTORIMAGESCALING_25, ID_IMG_VECTORIMAGESCALING_800, id);
+			}
 			continue;
 		case ID_FILE_CLOSE:
 		case ID_WINDOW_CLOSEALL:
@@ -4392,13 +4527,13 @@ BOOL CMainFrame::CreateToobar()
 		ID_L2RNEXT,
 		ID_R2LNEXT,
 		0,
-		optionsButton,
-		ID_TOOLS_FILTERS,
-		0,
 		ID_ALL_RIGHT,
 		ID_ALL_LEFT,
 		0,
 		ID_VIEW_TABLELAYOUT,
+		0,
+		optionsButton,
+		ID_TOOLS_FILTERS,
 		0,
 		ID_REFRESH,
 		buttons // NB: This extra entry is there to complete initialization.

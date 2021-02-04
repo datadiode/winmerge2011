@@ -417,6 +417,8 @@ extern COptionDef
 <int> OPT_CMP_IMG_THRESHOLD inline((_T("Settings/ImageColorDistanceThreshold"), 0));
 extern COptionDef
 <int> OPT_CMP_IMG_INSERTIONDELETIONDETECTION_MODE inline((_T("Settings/ImageInsertionDeletionDetectionMode"), 0));
+extern COptionDef
+<int> OPT_CMP_IMG_VECTOR_IMAGE_ZOOM_RATIO inline((_T("Settings/ImageVectorImageZoomRatio"), 1000));
 
 // Multidoc enable/disable per document type
 extern COptionDef

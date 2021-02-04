@@ -315,7 +315,7 @@ IDR_IMGDOCTYPE MENU
             MENUITEM "&Normal\tCtrl+*", ID_VIEW_ZOOMNORMAL
         }
         MENUITEM SEPARATOR
-        MENUITEM "&Lock Panes", ID_VIEW_RESIZE_PANES, HELP
+        MENUITEM "View &Differences", ID_IMG_VIEWDIFFERENCES, HELP
         MENUITEM SEPARATOR
         POPUP "&Toolbar"
         {
@@ -349,11 +349,84 @@ IDR_IMGDOCTYPE MENU
         MENUITEM "Copy &All to Right", ID_ALL_RIGHT
         MENUITEM "Cop&y All to Left", ID_ALL_LEFT
     }
+    POPUP "&Image"
+    {
+        POPUP "Diff &Block Size"
+        {
+            MENUITEM "&1", ID_IMG_DIFFBLOCKSIZE_1
+            MENUITEM "&2", ID_IMG_DIFFBLOCKSIZE_2
+            MENUITEM "&4", ID_IMG_DIFFBLOCKSIZE_4
+            MENUITEM "&8", ID_IMG_DIFFBLOCKSIZE_8
+            MENUITEM "1&6", ID_IMG_DIFFBLOCKSIZE_16
+            MENUITEM "&32", ID_IMG_DIFFBLOCKSIZE_32
+        }
+        POPUP "&Ignore Color Difference (Color Distance Threshold)"
+        {
+            MENUITEM "&0", ID_IMG_THRESHOLD_0
+            MENUITEM "&2", ID_IMG_THRESHOLD_2
+            MENUITEM "&4", ID_IMG_THRESHOLD_4
+            MENUITEM "&8", ID_IMG_THRESHOLD_8
+            MENUITEM "&16", ID_IMG_THRESHOLD_16
+            MENUITEM "&32", ID_IMG_THRESHOLD_32
+            MENUITEM "&64", ID_IMG_THRESHOLD_64
+        }
+        POPUP "Ins&ertion/Deletion Detection"
+        {
+            MENUITEM "&None", ID_IMG_INSERTIONDELETIONDETECTION_NONE
+            MENUITEM "&Vertical", ID_IMG_INSERTIONDELETIONDETECTION_VERT
+            MENUITEM "&Horizontal", ID_IMG_INSERTIONDELETIONDETECTION_HORZ
+        }
+        MENUITEM SEPARATOR
+        MENUITEM "&Previous Page\tPage \\u2191", ID_IMG_PREVPAGE
+        MENUITEM "&Next Page\tPage \\u2193", ID_IMG_NEXTPAGE
+        POPUP "&Active Pane"
+        {
+            MENUITEM "&Previous Page\tShift+Page \\u2191", ID_IMG_CURPANE_PREVPAGE
+            MENUITEM "&Next Page\tShift+Page \\u2193", ID_IMG_CURPANE_NEXTPAGE
+        }
+        MENUITEM SEPARATOR
+        POPUP "&Zoom"
+        {
+            MENUITEM "&800%", ID_IMG_ZOOM_800
+            MENUITEM "&400%", ID_IMG_ZOOM_400
+            MENUITEM "&200%", ID_IMG_ZOOM_200
+            MENUITEM "&100%", ID_IMG_ZOOM_100
+            MENUITEM "5&0%", ID_IMG_ZOOM_50
+            MENUITEM "2&5%", ID_IMG_ZOOM_25
+        }
+        POPUP "&Overlay"
+        {
+            MENUITEM "&None", ID_IMG_OVERLAY_NONE
+            MENUITEM "&XOR", ID_IMG_OVERLAY_XOR
+            MENUITEM "&Alpha Blend", ID_IMG_OVERLAY_ALPHABLEND
+            MENUITEM "Alpha &Blend Animation", ID_IMG_OVERLAY_ALPHABLEND_ANIM
+        }
+        POPUP "Dragging &Mode"
+        {
+            MENUITEM "&None", ID_IMG_DRAGGINGMODE_NONE
+            MENUITEM "&Move", ID_IMG_DRAGGINGMODE_MOVE
+            MENUITEM "&Adjust Offset", ID_IMG_DRAGGINGMODE_ADJUST_OFFSET
+            MENUITEM "&Vertical Wipe", ID_IMG_DRAGGINGMODE_VERTICAL_WIPE
+            MENUITEM "&Horizontal Wipe", ID_IMG_DRAGGINGMODE_HORIZONTAL_WIPE
+            MENUITEM "&Rectangle Select", ID_IMG_DRAGGINGMODE_RECTANGLE_SELECT
+        }
+        MENUITEM "&Set Background Color", ID_IMG_USEBACKCOLOR
+        POPUP "&Vector Image Scaling"
+        {
+            MENUITEM "&800%", ID_IMG_VECTORIMAGESCALING_800
+            MENUITEM "&400%", ID_IMG_VECTORIMAGESCALING_400
+            MENUITEM "&200%", ID_IMG_VECTORIMAGESCALING_200
+            MENUITEM "&100%", ID_IMG_VECTORIMAGESCALING_100
+            MENUITEM "5&0%", ID_IMG_VECTORIMAGESCALING_50
+            MENUITEM "2&5%", ID_IMG_VECTORIMAGESCALING_25
+        }
+        MENUITEM SEPARATOR
+        MENUITEM "Compare Extracted &Text From Image", ID_IMG_COMPARE_EXTRACTED_TEXT
+    }
     POPUP "&Tools"
     {
         MENUITEM "&Filters...", ID_TOOLS_FILTERS
         MENUITEM "&Generate Patch...", ID_TOOLS_GENERATEPATCH
-        MENUITEM "Generate &Report...", ID_TOOLS_GENERATEREPORT
     }
     POPUP "&Window"
     {
@@ -2487,6 +2560,16 @@ IDR_HEXDOCTYPE ACCELERATORS
     VK_F3,          ID_EDIT_REPEAT, VIRTKEY
     VK_F3,          ID_EDIT_REPEAT, VIRTKEY, CONTROL, SHIFT
     VK_F3,          ID_EDIT_REPEAT, VIRTKEY, CONTROL
+}
+
+
+
+IDR_IMGDOCTYPE ACCELERATORS
+{
+    VK_NEXT,        ID_IMG_NEXTPAGE, VIRTKEY
+    VK_NEXT,        ID_IMG_CURPANE_NEXTPAGE, VIRTKEY, SHIFT
+    VK_PRIOR,       ID_IMG_PREVPAGE, VIRTKEY
+    VK_PRIOR,       ID_IMG_CURPANE_PREVPAGE, VIRTKEY, SHIFT
 }
 
 

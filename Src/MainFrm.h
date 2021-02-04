@@ -386,6 +386,10 @@ private:
 		BYTE NavigateBookmarks;
 		BYTE SetSyncPoint;
 		BYTE ClearSyncPoints;
+		BYTE ImgPrevPage;
+		BYTE ImgNextPage;
+		BYTE ImgCurPanePrevPage;
+		BYTE ImgCurPaneNextPage;
 		const BYTE *Lookup(UINT id) const;
 	} m_cmdState;
 	HRESULT m_hrRegister;

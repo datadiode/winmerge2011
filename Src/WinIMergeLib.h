@@ -28,6 +28,9 @@ struct IImgMergeWindow
 		RECTANGLE_SELECT,
 		MOVE_IMAGE = 256, RESIZE_WIDTH, RESIZE_HEIGHT, RESIZE_BOTH
 	};
+	enum OCR_RESULT_TYPE {
+		TEXT_ONLY = 0, TEXT_PER_LINE_YAML, TEXT_PER_WORD_YAML
+	};
 	struct Event
 	{
 		void *userdata;
@@ -152,6 +155,7 @@ struct IImgMergeWindow
 	virtual bool IsPastable() const = 0;
 	virtual bool IsCancellable() const = 0;
 	virtual bool IsRectangleSelectionVisible(int pane) const = 0;
+	virtual BSTR ExtractTextFromImage(int pane, int page, OCR_RESULT_TYPE resultType) = 0;
 };
 
 struct IImgToolWindow

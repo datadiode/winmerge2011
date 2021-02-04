@@ -17,6 +17,8 @@
 #include "DirFrame.h"
 #include "LanguageSelect.h"
 #include "ImgMergeFrm.h"
+#include "ChildFrm.h"
+#include "MergeEditView.h"
 #include "paths.h"
 #include "FileOrFolderSelect.h"
 #include "SaveClosingDlg.h"
@@ -36,6 +38,8 @@ const LONG CImgMergeFrame::FloatScript[] =
 	152, BY<1000>::X2R | BY<1000>::Y2B,
 	0
 };
+
+COLORREF CImgMergeFrame::m_rgCustColors[16];
 
 /////////////////////////////////////////////////////////////////////////////
 // CImgMergeFrame construction/destruction
@@ -172,7 +176,7 @@ void CImgMergeFrame::OpenDocs(
 		::SetWindowLong(hwndPane, GWL_STYLE, style | WS_TABSTOP);
 	}
 
-	::SetFocus(m_pImgMergeWindow->GetPaneHWND(0));
+	m_pImgMergeWindow->SetActivePane(0);
 
 	UpdateCmdUI();
 }
@@ -198,6 +202,46 @@ BOOL CImgMergeFrame::IsFileChangedOnDisk(int pane) const
 		bChanged = upper - lower > tolerance || m_fileInfo[pane].size.int64 != fileInfo.size.int64;
 	}
 	return bChanged;
+}
+
+bool CImgMergeFrame::GetShowDifferences() const
+{
+	return m_pImgMergeWindow->GetShowDifferences();
+}
+
+int CImgMergeFrame::GetDraggingMode() const
+{
+	return m_pImgMergeWindow->GetDraggingMode();
+}
+
+int CImgMergeFrame::GetDiffBlockSize() const
+{
+	return m_pImgMergeWindow->GetDiffBlockSize();
+}
+
+double CImgMergeFrame::GetColorDistanceThreshold() const
+{
+	return m_pImgMergeWindow->GetColorDistanceThreshold();
+}
+
+int CImgMergeFrame::GetInsertionDeletionDetectionMode() const
+{
+	return m_pImgMergeWindow->GetInsertionDeletionDetectionMode();
+}
+
+double CImgMergeFrame::GetZoom() const
+{
+	return m_pImgMergeWindow->GetZoom();
+}
+
+int CImgMergeFrame::GetOverlayMode() const
+{
+	return m_pImgMergeWindow->GetOverlayMode();
+}
+
+float CImgMergeFrame::GetVectorImageZoomRatio() const
+{
+	return m_pImgMergeWindow->GetVectorImageZoomRatio();
 }
 
 void CImgMergeFrame::OnChildPaneEvent(const IImgMergeWindow::Event& evt)
@@ -321,6 +365,7 @@ void CImgMergeFrame::LoadOptions()
 	m_pImgMergeWindow->SetDiffColorAlpha(COptionsMgr::Get(OPT_CMP_IMG_DIFFCOLORALPHA) / 100.0);
 	m_pImgMergeWindow->SetColorDistanceThreshold(COptionsMgr::Get(OPT_CMP_IMG_THRESHOLD) / 1000.0);
 	m_pImgMergeWindow->SetInsertionDeletionDetectionMode(static_cast<IImgMergeWindow::INSERTION_DELETION_DETECTION_MODE>(COptionsMgr::Get(OPT_CMP_IMG_INSERTIONDELETIONDETECTION_MODE)));
+	m_pImgMergeWindow->SetVectorImageZoomRatio(COptionsMgr::Get(OPT_CMP_IMG_VECTOR_IMAGE_ZOOM_RATIO) / 1000.0f);
 }
 
 void CImgMergeFrame::SaveOptions()
@@ -337,6 +382,7 @@ void CImgMergeFrame::SaveOptions()
 	COptionsMgr::SaveOption(OPT_CMP_IMG_DIFFCOLORALPHA, static_cast<int>(m_pImgMergeWindow->GetDiffColorAlpha() * 100.0));
 	COptionsMgr::SaveOption(OPT_CMP_IMG_THRESHOLD, static_cast<int>(m_pImgMergeWindow->GetColorDistanceThreshold() * 1000));
 	COptionsMgr::SaveOption(OPT_CMP_IMG_INSERTIONDELETIONDETECTION_MODE, static_cast<int>(m_pImgMergeWindow->GetInsertionDeletionDetectionMode()));
+	COptionsMgr::SaveOption(OPT_CMP_IMG_VECTOR_IMAGE_ZOOM_RATIO, static_cast<int>(m_pImgMergeWindow->GetVectorImageZoomRatio() * 1000));
 }
 
 /**
@@ -383,7 +429,7 @@ void CImgMergeFrame::OnFileSaveAsRight()
 void CImgMergeFrame::OnWindowChangePane()
 {
 	int pane = m_pImgMergeWindow->GetActivePane() ? 0 : 1;
-	::SetFocus(m_pImgMergeWindow->GetPaneHWND(pane));
+	m_pImgMergeWindow->SetActivePane(pane);
 }
 
 /**
@@ -599,6 +645,11 @@ void CImgMergeFrame::UpdateResources()
  */
 BOOL CImgMergeFrame::PreTranslateMessage(MSG* pMsg)
 {
+	HACCEL hAccel = m_pHandleSet->m_hAccelShared;
+	if (hAccel && ::TranslateAccelerator(m_hWnd, hAccel, pMsg))
+	{
+		return TRUE;
+	}
 	return ::IsDialogMessage(m_hWnd, pMsg);
 }
 
@@ -622,6 +673,7 @@ void CImgMergeFrame::UpdateCmdUI()
 	double colorDistance01 = m_pImgMergeWindow->GetColorDistance(0, 1, pt.x, pt.y);
 
 	int const nActivePane = m_pImgMergeWindow->GetActivePane();
+	bool const bActivePaneValid = nActivePane != -1 && nActivePane < 2;
 
 	for (int pane = 0; pane < m_pImgMergeWindow->GetPaneCount(); ++pane)
 	{
@@ -630,7 +682,7 @@ void CImgMergeFrame::UpdateCmdUI()
 		String ind = m_wndFilePathBar.GetTitle(pane);
 		if (m_pImgMergeWindow->IsModified(pane) ? ind[0] != _T('*') : ind[0] == _T('*'))
 			UpdateHeaderPath(pane);
-		if (nActivePane != -1)
+		if (bActivePaneValid)
 			m_wndFilePathBar.SetActive(pane, pane == nActivePane);
 		POINT ptReal;
 		String text;
@@ -656,6 +708,9 @@ void CImgMergeFrame::UpdateCmdUI()
 	m_pMDIFrame->UpdateCmdUI<ID_FILE_SAVE>(IsModified() ? MF_ENABLED : MF_GRAYED);
 	m_pMDIFrame->UpdateCmdUI<ID_EDIT_UNDO>(m_pImgMergeWindow->IsUndoable() ? MF_ENABLED : MF_GRAYED);
 	m_pMDIFrame->UpdateCmdUI<ID_EDIT_REDO>(m_pImgMergeWindow->IsRedoable() ? MF_ENABLED : MF_GRAYED);
+	m_pMDIFrame->UpdateCmdUI<ID_EDIT_CUT>(m_pImgMergeWindow->IsCuttable() ? MF_ENABLED : MF_GRAYED);
+	m_pMDIFrame->UpdateCmdUI<ID_EDIT_COPY>(m_pImgMergeWindow->IsCopyable() ? MF_ENABLED : MF_GRAYED);
+	m_pMDIFrame->UpdateCmdUI<ID_EDIT_PASTE>(m_pImgMergeWindow->IsPastable() ? MF_ENABLED : MF_GRAYED);
 	m_pMDIFrame->UpdateCmdUI<ID_NEXTDIFF>(m_pImgMergeWindow->GetNextDiffIndex() != -1 ? MF_ENABLED : MF_GRAYED);
 	m_pMDIFrame->UpdateCmdUI<ID_PREVDIFF>(m_pImgMergeWindow->GetPrevDiffIndex() != -1 ? MF_ENABLED : MF_GRAYED);
 	int const diffIndex = m_pImgMergeWindow->GetCurrentDiffIndex();
@@ -664,6 +719,28 @@ void CImgMergeFrame::UpdateCmdUI()
 	int const diffCount = m_pImgMergeWindow->GetDiffCount();
 	m_pMDIFrame->UpdateCmdUI<ID_ALL_LEFT>(diffCount != 0 && !m_pImgMergeWindow->GetReadOnly(0) ? MF_ENABLED : MF_GRAYED);
 	m_pMDIFrame->UpdateCmdUI<ID_ALL_RIGHT>(diffCount != 0 && !m_pImgMergeWindow->GetReadOnly(1) ? MF_ENABLED : MF_GRAYED);
+	int const pageIndex[] =
+	{
+		m_pImgMergeWindow->GetCurrentPage(0),
+		m_pImgMergeWindow->GetCurrentPage(1),
+	};
+	int const pageCount[] =
+	{
+		m_pImgMergeWindow->GetPageCount(0),
+		m_pImgMergeWindow->GetPageCount(1),
+	};
+	m_pMDIFrame->UpdateCmdUI<ID_IMG_PREVPAGE>(
+		bActivePaneValid && std::max(pageIndex[0], pageIndex[1]) > 0 ?
+		MF_ENABLED : MF_GRAYED);
+	m_pMDIFrame->UpdateCmdUI<ID_IMG_NEXTPAGE>(
+		bActivePaneValid && std::min(pageIndex[0], pageIndex[1]) < std::max(pageCount[0], pageCount[1]) - 1 ?
+		MF_ENABLED : MF_GRAYED);
+	m_pMDIFrame->UpdateCmdUI<ID_IMG_CURPANE_PREVPAGE>(
+		bActivePaneValid && pageIndex[nActivePane] > 0 ?
+		MF_ENABLED : MF_GRAYED);
+	m_pMDIFrame->UpdateCmdUI<ID_IMG_CURPANE_NEXTPAGE>(
+		bActivePaneValid && pageIndex[nActivePane] < pageCount[pageIndex[nActivePane]] - 1 ?
+		MF_ENABLED : MF_GRAYED);
 }
 
 /**
@@ -787,6 +864,78 @@ void CImgMergeFrame::OnAllRight()
 	UpdateLastCompareResult();
 }
 
+/**
+ * @brief Set the background color
+ */
+void CImgMergeFrame::OnBackColor()
+{
+	CHOOSECOLOR cc;
+	ZeroMemory(&cc, sizeof cc);
+	cc.lStructSize = sizeof cc;
+	cc.hwndOwner = m_hWnd;
+	cc.lpCustColors = m_rgCustColors;
+	RGBQUAD backColor = m_pImgMergeWindow->GetBackColor();
+	cc.rgbResult = RGB(backColor.rgbRed, backColor.rgbGreen, backColor.rgbBlue);
+	cc.Flags = CC_RGBINIT;
+	if (::ChooseColor(&cc))
+	{
+		backColor.rgbRed = GetRValue(cc.rgbResult);
+		backColor.rgbGreen = GetGValue(cc.rgbResult);
+		backColor.rgbBlue = GetBValue(cc.rgbResult);
+		m_pImgMergeWindow->SetBackColor(backColor);
+	}
+}
+
+void CImgMergeFrame::OnStepPage(int direction)
+{
+	int const pane = m_pImgMergeWindow->GetActivePane();
+	int page = m_pImgMergeWindow->GetCurrentPage(pane);
+	if (direction < 0 && page == 0 ||
+		direction > 0 && page == m_pImgMergeWindow->GetPageCount(pane) - 1)
+	{
+		page = m_pImgMergeWindow->GetCurrentPage(pane ^ 1);
+	}
+	m_pImgMergeWindow->SetCurrentPageAll(page + direction);
+	UpdateLastCompareResult();
+	UpdateCmdUI();
+}
+
+void CImgMergeFrame::OnStepPageCurPane(int direction)
+{
+	int const pane = m_pImgMergeWindow->GetActivePane();
+	int const page = m_pImgMergeWindow->GetCurrentPage(pane);
+	m_pImgMergeWindow->SetCurrentPage(pane, page + direction);
+	UpdateLastCompareResult();
+	UpdateCmdUI();
+}
+
+void CImgMergeFrame::OnCompareText()
+{
+	FileLocation filelocLeft, filelocRight;
+	filelocLeft.description = LanguageSelect.LoadString(IDS_SELECTION_LEFT);
+	filelocRight.description = LanguageSelect.LoadString(IDS_SELECTION_RIGHT);
+	CChildFrame *const pMergeDoc = new CChildFrame(m_pMDIFrame);
+	pMergeDoc->OpenDocs(filelocLeft, filelocRight, FALSE, FALSE);
+	int nSide = 0;
+	do
+	{
+		CMergeEditView *const pTargetView = pMergeDoc->GetView(nSide);
+		CDiffTextBuffer *const pTargetBuf = pTargetView->GetTextBuffer();
+		int nPage = m_pImgMergeWindow->GetCurrentPage(nSide);
+		// Trick the TextBuffer to flag the to-be-inserted text as revision 0.
+		--pTargetBuf->m_dwCurrentRevisionNumber;
+		CMyComBSTR text;
+		text.m_str = m_pImgMergeWindow->ExtractTextFromImage(nSide, nPage, IImgMergeWindow::TEXT_ONLY);
+		if (int const length = text.Length())
+		{
+			pTargetBuf->InsertText(pTargetView, 0, 0, text, length, CE_ACTION_UNKNOWN, FALSE);
+		}
+		pTargetBuf->SetModified(false);
+	} while (nSide ^= 1);
+	pMergeDoc->FlushAndRescan();
+	pMergeDoc->ActivateFrame();
+}
+
 template<>
 LRESULT CImgMergeFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 {
@@ -814,6 +963,21 @@ LRESULT CImgMergeFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 		break;
 	case ID_EDIT_REDO:
 		OnEditRedo();
+		UpdateCmdUI();
+		break;
+	case ID_EDIT_CUT:
+		m_pImgMergeWindow->Cut();
+		UpdateLastCompareResult();
+		UpdateCmdUI();
+		break;
+	case ID_EDIT_COPY:
+		m_pImgMergeWindow->Copy();
+		UpdateLastCompareResult();
+		UpdateCmdUI();
+		break;
+	case ID_EDIT_PASTE:
+		m_pImgMergeWindow->Paste();
+		UpdateLastCompareResult();
 		UpdateCmdUI();
 		break;
 	case ID_L2R:
@@ -847,6 +1011,83 @@ LRESULT CImgMergeFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 		break;
 	case ID_VIEW_ZOOMNORMAL:
 		OnViewZoomNormal();
+		break;
+	case ID_IMG_VIEWDIFFERENCES:
+		m_pImgMergeWindow->SetShowDifferences(!m_pImgMergeWindow->GetShowDifferences());
+		break;
+	case ID_IMG_DRAGGINGMODE_NONE:
+	case ID_IMG_DRAGGINGMODE_MOVE:
+	case ID_IMG_DRAGGINGMODE_ADJUST_OFFSET:
+	case ID_IMG_DRAGGINGMODE_VERTICAL_WIPE:
+	case ID_IMG_DRAGGINGMODE_HORIZONTAL_WIPE:
+	case ID_IMG_DRAGGINGMODE_RECTANGLE_SELECT:
+		m_pImgMergeWindow->SetDraggingMode(
+			static_cast<IImgMergeWindow::DRAGGING_MODE>(id - ID_IMG_DRAGGINGMODE_NONE));
+		break;
+	case ID_IMG_DIFFBLOCKSIZE_1:
+	case ID_IMG_DIFFBLOCKSIZE_2:
+	case ID_IMG_DIFFBLOCKSIZE_4:
+	case ID_IMG_DIFFBLOCKSIZE_8:
+	case ID_IMG_DIFFBLOCKSIZE_16:
+	case ID_IMG_DIFFBLOCKSIZE_32:
+		m_pImgMergeWindow->SetDiffBlockSize(1 << (id - ID_IMG_DIFFBLOCKSIZE_1));
+		break;
+	case ID_IMG_THRESHOLD_0:
+	case ID_IMG_THRESHOLD_1:
+	case ID_IMG_THRESHOLD_2:
+	case ID_IMG_THRESHOLD_4:
+	case ID_IMG_THRESHOLD_8:
+	case ID_IMG_THRESHOLD_16:
+	case ID_IMG_THRESHOLD_32:
+	case ID_IMG_THRESHOLD_64:
+		m_pImgMergeWindow->SetColorDistanceThreshold(id == ID_IMG_THRESHOLD_0 ? 0 : 1 << (id - ID_IMG_THRESHOLD_1));
+		break;
+	case ID_IMG_INSERTIONDELETIONDETECTION_NONE:
+	case ID_IMG_INSERTIONDELETIONDETECTION_VERT:
+	case ID_IMG_INSERTIONDELETIONDETECTION_HORZ:
+		m_pImgMergeWindow->SetInsertionDeletionDetectionMode(
+			static_cast<IImgMergeWindow::INSERTION_DELETION_DETECTION_MODE>(id - ID_IMG_INSERTIONDELETIONDETECTION_NONE));
+		break;
+	case ID_IMG_ZOOM_25:
+	case ID_IMG_ZOOM_50:
+	case ID_IMG_ZOOM_100:
+	case ID_IMG_ZOOM_200:
+	case ID_IMG_ZOOM_400:
+	case ID_IMG_ZOOM_800:
+		m_pImgMergeWindow->SetZoom((1 << (id - ID_IMG_ZOOM_25)) / 4.0);
+		break;
+	case ID_IMG_OVERLAY_NONE:
+	case ID_IMG_OVERLAY_XOR:
+	case ID_IMG_OVERLAY_ALPHABLEND:
+	case ID_IMG_OVERLAY_ALPHABLEND_ANIM:
+		m_pImgMergeWindow->SetOverlayMode(
+			static_cast<IImgMergeWindow::OVERLAY_MODE>(id - ID_IMG_OVERLAY_NONE));
+		break;
+	case ID_IMG_USEBACKCOLOR:
+		OnBackColor();
+		break;
+	case ID_IMG_VECTORIMAGESCALING_25:
+	case ID_IMG_VECTORIMAGESCALING_50:
+	case ID_IMG_VECTORIMAGESCALING_100:
+	case ID_IMG_VECTORIMAGESCALING_200:
+	case ID_IMG_VECTORIMAGESCALING_400:
+	case ID_IMG_VECTORIMAGESCALING_800:
+		m_pImgMergeWindow->SetVectorImageZoomRatio((1 << (id - ID_IMG_VECTORIMAGESCALING_25)) / 4.0f);
+		break;
+	case ID_IMG_PREVPAGE:
+		OnStepPage(-1);
+		break;
+	case ID_IMG_NEXTPAGE:
+		OnStepPage(+1);
+		break;
+	case ID_IMG_CURPANE_PREVPAGE:
+		OnStepPageCurPane(-1);
+		break;
+	case ID_IMG_CURPANE_NEXTPAGE:
+		OnStepPageCurPane(+1);
+		break;
+	case ID_IMG_COMPARE_EXTRACTED_TEXT:
+		OnCompareText();
 		break;
 	case ID_FILE_SAVE:
 		OnFileSave();
