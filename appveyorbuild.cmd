@@ -1,5 +1,11 @@
 setlocal
 
+git describe --tags
+start /wait "%SystemRoot%\system32\mshta.exe" "%~dp0Setup\setup.hta" "silent:hidden:version" "%~dp0src\version.rh" "Win32"
+start /wait "%SystemRoot%\system32\mshta.exe" "%~dp0Setup\setup.hta" "silent:hidden:version" "%~dp0src\version.rh" "x64"
+type "%~dp0src\version.rh"
+dir *.bat
+
 set FrhedTag=0.10909.2021
 set SQLiteCompareTag=3.1.0.0-datadiode-007
 set ReoGridTag=2.3.0.0-datadiode-178
@@ -80,10 +86,6 @@ for %%p in (%*) do (
   )
 )
 
-start /wait "%SystemRoot%\system32\mshta.exe" "%~dp0Setup\setup.hta" "silent:hidden:version" "%~dp0src\version.rh" "Win32"
-start /wait "%SystemRoot%\system32\mshta.exe" "%~dp0Setup\setup.hta" "silent:hidden:version" "%~dp0src\version.rh" "x64"
-
-dir *.bat
 for %%f in (Setup_*.bat) do call %%f
 dir *.7z
 dir *.cpl
