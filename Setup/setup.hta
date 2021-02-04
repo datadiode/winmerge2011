@@ -501,10 +501,18 @@ Sub PbCancel_OnClick
 End Sub
 
 Sub Job_Version
-	Dim parts, content, path, platform
-	parts = Split(app.version, ".")
-	parts(3) = Right("0" & DatePart("ww", Now), 2) & DatePart("w", Now)
-	parts(2) = Left(parts(2), 1) & Right("00" & (DatePart("yyyy", Now) - parts(1) + 1), 2)
+	Dim describe, parts, delta, content, path, platform
+	describe = sh.Exec("git describe --tags").StdOut.ReadAll
+	describe = Replace("BUILD." + describe, "BUILD.0.", "XXXXX.")
+	parts = Split(describe, "-")
+	delta = 0
+	If UBound(parts) > 0 Then
+		delta = CInt(parts(1))
+		parts(0) = Replace(parts(0), "BUILD.", "XXXXX.")
+	End If
+	version = parts(0)
+	parts = Split(version, ".")
+	parts(3) = Right("00" & (parts(3) + delta), 3)
 	content = version_h.text
 	content = Replace(content, "&kind;", parts(0))
 	content = Replace(content, "&major;", parts(1))
