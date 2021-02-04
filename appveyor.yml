@@ -2,7 +2,6 @@ version: 1.0.{build}
 image: Visual Studio 2015
 configuration: Release
 platform: Win32
-shallow_clone: true
 build_script:
 - cmd: >-
     appveyorbuild.cmd Win32!Debug x64!Debug Win32!Release x64!Release
