@@ -220,7 +220,12 @@ executable = sh.RegRead("HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstal
 On Error GoTo 0
 
 Sub Window_OnError(description, url, line)
-	If silent Then close
+	If silent Then
+		On Error Resume Next
+		fso.CreateTextFile(Replace(location.pathname, ".hta", ".err"), True).Write description & vbCrLf & url & vbCrLf & line & vbCrLf
+		On Error GoTo 0
+		close
+	End If
 End Sub
 
 Sub Job_Uninstall
