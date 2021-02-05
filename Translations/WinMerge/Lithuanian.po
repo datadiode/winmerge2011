@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WinMerge\n"
 "Report-Msgid-Bugs-To: https://bugs.winmerge.org/\n"
-"POT-Creation-Date: 2020-11-13 07:43+0000\n"
-"PO-Revision-Date: 2021-01-13 13:13+0200\n"
+"POT-Creation-Date: 2021-02-04 11:05+0000\n"
+"PO-Revision-Date: 2021-02-04 16:16+0200\n"
 "Last-Translator: Tichij <tichij@mail.com>\n"
 "Language-Team: Lithuanian <winmerge-translate@lists.sourceforge.net>\n"
 "Language: lt\n"
@@ -887,7 +887,7 @@ msgstr "&Iðvalyti visas þymes\tCtrl+Shift+F2"
 #: Merge.rc:318
 #, c-format
 msgid "View &Differences"
-msgstr ""
+msgstr "Ro&dyti skirtumus"
 
 #: Merge.rc:329
 #: Merge.rc:840
@@ -904,126 +904,126 @@ msgstr "&Paveikslëlis"
 #: Merge.rc:354
 #, c-format
 msgid "Diff &Block Size"
-msgstr ""
+msgstr "Skirtumø &bloko dydis"
 
 #: Merge.rc:356
 #, c-format
 msgid "&1"
-msgstr ""
+msgstr "&1"
 
 #: Merge.rc:357
 #: Merge.rc:366
 #, c-format
 msgid "&2"
-msgstr ""
+msgstr "&2"
 
 #: Merge.rc:358
 #: Merge.rc:367
 #, c-format
 msgid "&4"
-msgstr ""
+msgstr "&4"
 
 #: Merge.rc:359
 #: Merge.rc:368
 #, c-format
 msgid "&8"
-msgstr ""
+msgstr "&8"
 
 #: Merge.rc:360
 #, c-format
 msgid "1&6"
-msgstr ""
+msgstr "1&6"
 
 #: Merge.rc:361
 #: Merge.rc:370
 #, c-format
 msgid "&32"
-msgstr ""
+msgstr "&32"
 
 #: Merge.rc:363
 #, c-format
 msgid "&Ignore Color Difference (Color Distance Threshold)"
-msgstr ""
+msgstr "&Ignoruoti spalvos skirtumus (Spalvø atstumo slenkstis)"
 
 #: Merge.rc:365
 #, c-format
 msgid "&0"
-msgstr ""
+msgstr "&0"
 
 #: Merge.rc:369
 #, c-format
 msgid "&16"
-msgstr ""
+msgstr "&16"
 
 #: Merge.rc:371
 #, c-format
 msgid "&64"
-msgstr ""
+msgstr "&64"
 
 #: Merge.rc:373
 #, c-format
 msgid "Ins&ertion/Deletion Detection"
-msgstr ""
+msgstr "Át&erpimo/Iðtrynimo aptikimas"
 
 #: Merge.rc:376
 #, c-format
 msgid "&Vertical"
-msgstr ""
+msgstr "&Vertikaliai"
 
 #: Merge.rc:377
 #, c-format
 msgid "&Horizontal"
-msgstr ""
+msgstr "&Horizontaliai"
 
 #: Merge.rc:380
 #, c-format
 msgid "&Previous Page\tPage \\u2191"
-msgstr ""
+msgstr "&Praeitas psl.\tPage \\u2191"
 
 #: Merge.rc:381
 #, c-format
 msgid "&Next Page\tPage \\u2193"
-msgstr ""
+msgstr "&Kitas psl.\tPage \\u2193"
 
 #: Merge.rc:382
 #, c-format
 msgid "&Active Pane"
-msgstr ""
+msgstr "&Aktyvus polangis"
 
 #: Merge.rc:384
 #, c-format
 msgid "&Previous Page\tShift+Page \\u2191"
-msgstr ""
+msgstr "&Praeitas psl.\tShift+Page \\u2191"
 
 #: Merge.rc:385
 #, c-format
 msgid "&Next Page\tShift+Page \\u2193"
-msgstr ""
+msgstr "&Kitas psl.\tShift+Page \\u2193"
 
 #: Merge.rc:397
 #, c-format
 msgid "&Overlay"
-msgstr ""
+msgstr "&Perdengimas"
 
 #: Merge.rc:400
 #, c-format
 msgid "&XOR"
-msgstr ""
+msgstr "&XOR"
 
 #: Merge.rc:401
 #, c-format
 msgid "&Alpha Blend"
-msgstr ""
+msgstr "&Alfa sl. suliejimas"
 
 #: Merge.rc:402
 #, c-format
 msgid "Alpha &Blend Animation"
-msgstr ""
+msgstr "Alfa sl. &suliejimo animacija"
 
 #: Merge.rc:404
 #, c-format
 msgid "Dragging &Mode"
-msgstr ""
+msgstr "Vilki&mo reþimas"
 
 #: Merge.rc:407
 #: Merge.rc:952
@@ -1034,37 +1034,37 @@ msgstr "&Perkelti"
 #: Merge.rc:408
 #, c-format
 msgid "&Adjust Offset"
-msgstr ""
+msgstr "&Reguliuoti poslinká"
 
 #: Merge.rc:409
 #, c-format
 msgid "&Vertical Wipe"
-msgstr ""
+msgstr "&Vertikalus trinimas"
 
 #: Merge.rc:410
 #, c-format
 msgid "&Horizontal Wipe"
-msgstr ""
+msgstr "&Horizontalus trinimas"
 
 #: Merge.rc:411
 #, c-format
 msgid "&Rectangle Select"
-msgstr ""
+msgstr "&Staèiakampis þymëjimas"
 
 #: Merge.rc:413
 #, c-format
 msgid "&Set Background Color"
-msgstr ""
+msgstr "Nu&statyti fono spalvà"
 
 #: Merge.rc:414
 #, c-format
 msgid "&Vector Image Scaling"
-msgstr ""
+msgstr "&Vektoriniø vaizdø mastelio keitimas"
 
 #: Merge.rc:424
 #, c-format
 msgid "Compare Extracted &Text From Image"
-msgstr ""
+msgstr "Lyginti ið paveikslëlio iðtrauktà &tekstà"
 
 #: Merge.rc:613
 #, c-format
