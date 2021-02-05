@@ -51,8 +51,8 @@ DirCmpReport::DirCmpReport(CDirView *pList)
 	m_rootPaths[0] = ctxt->GetLeftPath();
 	m_rootPaths[1] = ctxt->GetRightPath();
 	// If inside archive, convert paths
-	pDoc->ApplyLeftDisplayRoot(m_rootPaths[0]);
-	pDoc->ApplyRightDisplayRoot(m_rootPaths[1]);
+	pDoc->ApplyDisplayRoot(m_rootPaths[0]);
+	pDoc->ApplyDisplayRoot(m_rootPaths[1]);
 	paths_UndoMagic(m_rootPaths[0]);
 	paths_UndoMagic(m_rootPaths[1]);
 }

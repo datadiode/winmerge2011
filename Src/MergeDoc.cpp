@@ -2088,12 +2088,7 @@ void CChildFrame::UpdateHeaderPath(int pane)
 	{
 		sText = m_strPath[pane];
 		if (m_pDirDoc)
-		{
-			if (pane == 0)
-				m_pDirDoc->ApplyLeftDisplayRoot(sText);
-			else
-				m_pDirDoc->ApplyRightDisplayRoot(sText);
-		}
+			m_pDirDoc->ApplyDisplayRoot(sText);
 	}
 
 	m_wndFilePathBar.SetText(pane, sText.c_str(), m_ptBuf[pane]->IsModified(), m_nBufferType[pane]);

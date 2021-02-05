@@ -23,6 +23,8 @@ public:
 	String m_strRightRoot;
 	String m_strLeftParent;
 	String m_strRightParent;
+	void ApplyDisplayRoot(String &);
+	void SwapSides();
 	CTempPathContext *DeleteHead();
 };
 

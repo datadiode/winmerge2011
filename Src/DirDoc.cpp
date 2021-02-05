@@ -107,8 +107,8 @@ bool CDirFrame::InitCompare(LPCTSTR pszLeft, LPCTSTR pszRight, int nRecursive, c
 
 	if (pTempPathContext)
 	{
-		ApplyLeftDisplayRoot(pTempPathContext->m_strLeftDisplayRoot);
-		ApplyRightDisplayRoot(pTempPathContext->m_strRightDisplayRoot);
+		ApplyDisplayRoot(pTempPathContext->m_strLeftDisplayRoot);
+		ApplyDisplayRoot(pTempPathContext->m_strRightDisplayRoot);
 		pTempPathContext->m_pParent = m_pTempPathContext;
 		m_pTempPathContext = pTempPathContext;
 		m_pTempPathContext->m_strLeftRoot = m_pCtxt->GetLeftPath();
@@ -837,7 +837,7 @@ void CDirFrame::UpdateHeaderPath(BOOL bLeft)
 		else
 		{
 			sText = m_pCtxt->GetLeftPath();
-			ApplyLeftDisplayRoot(sText);
+			ApplyDisplayRoot(sText);
 		}
 		nPane = 0;
 	}
@@ -848,7 +848,7 @@ void CDirFrame::UpdateHeaderPath(BOOL bLeft)
 		else
 		{
 			sText = m_pCtxt->GetRightPath();
-			ApplyRightDisplayRoot(sText);
+			ApplyDisplayRoot(sText);
 		}
 		nPane = 1;
 	}
@@ -903,6 +903,8 @@ void CDirFrame::SwapSides()
 		}
 	}
 	m_pCompareStats->SwapSides();
+	if (m_pTempPathContext)
+		m_pTempPathContext->SwapSides();
 	// Update UI
 	UpdateTitle();
 	Redisplay();
@@ -920,11 +922,11 @@ void CDirFrame::UpdateTitle()
 	{
 		const TCHAR strSeparator[] = _T(" - ");
 		String strPath = m_pCtxt->GetLeftPath();
-		ApplyLeftDisplayRoot(strPath);
+		ApplyDisplayRoot(strPath);
 		strTitle = PathFindFileName(strPath.c_str());
 		strTitle += strSeparator;
 		strPath = m_pCtxt->GetRightPath();
-		ApplyRightDisplayRoot(strPath);
+		ApplyDisplayRoot(strPath);
 		strTitle += PathFindFileName(strPath.c_str());
 	}
 	SetWindowText(strTitle.c_str());
@@ -933,37 +935,17 @@ void CDirFrame::UpdateTitle()
 }
 
 /**
- * @brief Replace internal root by display root (left).
- * When we have a archive file open, this function converts physical folder
+ * @brief Replace internal root by display root.
+ * When we have an archive file open, this function converts physical folder
  * (that is in the temp folder where archive was extracted) to the virtual
  * path for showing. The virtual path is path to the archive file, archive
  * file name and folder inside the archive.
  * @param [in, out] sText Path to convert.
  */
-void CDirFrame::ApplyLeftDisplayRoot(String &sText)
+void CDirFrame::ApplyDisplayRoot(String &sText)
 {
 	if (m_pTempPathContext)
-	{
-		sText.erase(0, m_pTempPathContext->m_strLeftRoot.length());
-		sText = paths_ConcatPath(m_pTempPathContext->m_strLeftDisplayRoot, sText);
-	}
-}
-
-/**
- * @brief Replace internal root by display root (right).
- * When we have a archive file open, this function converts physical folder
- * (that is in the temp folder where archive was extracted) to the virtual
- * path for showing. The virtual path is path to the archive file, archive
- * file name and folder inside the archive.
- * @param [in, out] sText Path to convert.
- */
-void CDirFrame::ApplyRightDisplayRoot(String &sText)
-{
-	if (m_pTempPathContext)
-	{
-		sText.erase(0, m_pTempPathContext->m_strRightRoot.length());
-		sText = paths_ConcatPath(m_pTempPathContext->m_strRightDisplayRoot, sText);
-	}
+		m_pTempPathContext->ApplyDisplayRoot(sText);
 }
 
 /**

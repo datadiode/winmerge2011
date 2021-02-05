@@ -129,8 +129,7 @@ public:
 	void SetDescriptions(const String &strLeftDesc, const String &strRightDesc);
 	void SwapSides();
 	void UpdateTitle();
-	void ApplyLeftDisplayRoot(String &);
-	void ApplyRightDisplayRoot(String &);
+	void ApplyDisplayRoot(String &);
 
 	bool IsShowable(const DIFFITEM *) const;
 

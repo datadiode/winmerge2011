@@ -101,6 +101,38 @@ String NTAPI GetClearTempPath(LPVOID pOwner, LPCTSTR pchExt)
 }
 
 /**
+ * @brief Replace internal root by display root.
+ * When we have an archive file open, this function converts physical folder
+ * (that is in the temp folder where archive was extracted) to the virtual
+ * path for showing. The virtual path is path to the archive file, archive
+ * file name and folder inside the archive.
+ * @param [in, out] sText Path to convert.
+ */
+void CTempPathContext::ApplyDisplayRoot(String &sText)
+{
+	if (std::equal(m_strLeftRoot.begin(), m_strLeftRoot.end(), sText.begin()))
+	{
+		sText.erase(0, m_strLeftRoot.length());
+		sText = paths_ConcatPath(m_strLeftDisplayRoot, sText);
+	}
+	else if (std::equal(m_strRightRoot.begin(), m_strRightRoot.end(), sText.begin()))
+	{
+		sText.erase(0, m_strRightRoot.length());
+		sText = paths_ConcatPath(m_strRightDisplayRoot, sText);
+	}
+}
+
+/**
+ * @brief Swap left vs. right side properties
+ */
+void CTempPathContext::SwapSides()
+{
+	eastl::swap(m_strLeftDisplayRoot, m_strRightDisplayRoot);
+	eastl::swap(m_strLeftRoot, m_strRightRoot);
+	eastl::swap(m_strLeftParent, m_strRightParent);
+}
+
+/**
  * @brief Delete head of temp path context list, and return its parent context.
  */
 CTempPathContext *CTempPathContext::DeleteHead()
