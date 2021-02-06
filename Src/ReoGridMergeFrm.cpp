@@ -113,6 +113,17 @@ void CReoGridMergeFrame::OpenDocs(
 	FileLocation &filelocRight,
 	bool bROLeft, bool bRORight)
 {
+	// Warn about potential data loss on a round trip through ReoGrid
+	static const TCHAR ExcelFilePatterns[] = _T("*.xlsx; *.xlsm; *.xltx; *.xltm; *.xls; *.xlt");
+	bool isExcel = false;
+	bool isOther = false;
+	(PathMatchSpec(filelocLeft.filepath.c_str(), ExcelFilePatterns) ? isExcel : isOther) = true;
+	(PathMatchSpec(filelocRight.filepath.c_str(), ExcelFilePatterns) ? isExcel : isOther) = true;
+	if (isExcel)
+		LanguageSelect.MsgBox(IDS_EXCEL_DATA_LOSS_WARNING, MB_ICONWARNING | MB_DONT_DISPLAY_AGAIN);
+	if (isOther)
+		LanguageSelect.MsgBox(IDS_WHITESPACE_LOSS_WARNING, MB_ICONWARNING | MB_DONT_DISPLAY_AGAIN);
+
 	m_strPath[0] = filelocLeft.filepath;
 	ASSERT(m_nBufferType[0] == BUFFER_NORMAL); // should have been initialized to BUFFER_NORMAL in constructor
 	if (!filelocLeft.description.empty())

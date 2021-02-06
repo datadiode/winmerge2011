@@ -1072,3 +1072,5 @@
 #define IDS_LINE_EXCLUDED                       40360
 #define IDS_LINES_EXCLUDED                      40361
 #define IDS_SHELL_CONTEXT_MENU                  40362
+#define IDS_EXCEL_DATA_LOSS_WARNING             40363
+#define IDS_WHITESPACE_LOSS_WARNING             40364

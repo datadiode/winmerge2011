@@ -2537,6 +2537,8 @@ STRINGTABLE
     IDS_LINE_EXCLUDED             "%d line excluded"
     IDS_LINES_EXCLUDED            "%d lines excluded"
     IDS_SHELL_CONTEXT_MENU        "Shell menu"
+    IDS_EXCEL_DATA_LOSS_WARNING   "ReoGrid recognizes only part of the content present in Excel files,\nand also does not write back all sorts of content it manages to read in.\nTherefore, beware of the potential data loss when saving back files."
+    IDS_WHITESPACE_LOSS_WARNING   "ReoGrid does not preserve whitespace outside of values parsed from separator-delimited files.\nTherefore, beware of the potential loss of whitespace when saving back files."
 }
 
 
