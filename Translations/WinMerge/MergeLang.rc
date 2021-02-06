@@ -2537,6 +2537,8 @@ STRINGTABLE
     IDS_LINE_EXCLUDED             "Merge.rc:2537"
     IDS_LINES_EXCLUDED            "Merge.rc:2538"
     IDS_SHELL_CONTEXT_MENU        "Merge.rc:2539"
+    IDS_EXCEL_DATA_LOSS_WARNING   "Merge.rc:2540"
+    IDS_WHITESPACE_LOSS_WARNING   "Merge.rc:2541"
 }
 
 

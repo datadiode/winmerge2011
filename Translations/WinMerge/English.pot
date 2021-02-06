@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WinMerge\n"
 "Report-Msgid-Bugs-To: http://bugs.winmerge.org/\n"
-"POT-Creation-Date: 2021-02-04 11:05+0000\n"
+"POT-Creation-Date: 2021-02-06 09:22+0000\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: English <winmerge-translate@lists.sourceforge.net>\n"
@@ -5649,5 +5649,15 @@ msgstr ""
 #: Merge.rc:2539
 #, c-format
 msgid "Shell menu"
+msgstr ""
+
+#: Merge.rc:2540
+#, c-format
+msgid "ReoGrid recognizes only part of the content present in Excel files,\nand also does not write back all sorts of content it manages to read in.\nTherefore, beware of the potential data loss when saving back files."
+msgstr ""
+
+#: Merge.rc:2541
+#, c-format
+msgid "ReoGrid might not preserve whitespace outside of values parsed from separator-delimited files.\nTherefore, beware of the potential loss of whitespace when saving back files."
 msgstr ""
 
