@@ -5,7 +5,10 @@
 	<property name='ShowConsole'/>
 	<property name='ReadOnly'/>
 	<property name='Encoding'/>
-	<property name='Arguments'/>
+	<property name='TextType'/>
+	<property name='Arguments'>
+		<put internalName='put_Arguments'/>
+	</property>
 </implements>
 
 <script language='vbs'>
@@ -15,12 +18,18 @@ Const ShowConsole = 0
 Const ReadOnly = True
 Const Encoding = "UTF-8"
 
+Dim TextType, options
+
 Dim sh
 Set sh = CreateObject("WScript.Shell")
 
-Function OpenTextFile(path)
-	Dim ex, options
+Sub put_Arguments(Arguments)
 	If Not IsEmpty(Arguments) Then Execute Arguments
+	If InStr(options, "-t html") Then TextType = "HTML"
+End Sub
+
+Function OpenTextFile(path)
+	Dim ex
 	Set ex = sh.Exec("""pandoc.exe"" " & options & " """ & path & """")
 	If ex.StdOut.AtEndOfStream Then
 		Set OpenTextFile = ex.StdErr
