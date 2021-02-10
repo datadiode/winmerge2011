@@ -39,6 +39,13 @@ BOOL PropLexers::OnInitDialog()
 	{
 		m_pLv->InsertItem(i, TextDefinition::m_StaticSourceDefs[i].name);
 		m_pLv->SetItemText(i, 1, TextDefinition::m_SourceDefs[i].exts);
+		WORD loWord = LOWORD(TextDefinition::m_SourceDefs[i].flags);
+		if (loWord == 0)
+			loWord = LOWORD(TextDefinition::m_StaticSourceDefs[i].flags);
+		WORD hiWord = 1 << (TextDefinition::m_SourceDefs[i].flags >> 28);
+		if (hiWord == 1)
+			hiWord = 1 << (TextDefinition::m_StaticSourceDefs[i].flags >> 28);
+		m_pLv->SetItemData(i, MAKELPARAM(loWord, hiWord));
 	}
 	m_pLv->SetColumnWidth(0, LVSCW_AUTOSIZE);
 	m_pLv->SetColumnWidth(1, LVSCW_AUTOSIZE_USEHEADER);
@@ -51,8 +58,25 @@ BOOL PropLexers::OnInitDialog()
 void PropLexers::OnLvnItemactivate(NMHDR *pNMHDR)
 {
 	LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
+	HMenu *pMenu = NULL;
+	if (TextDefinition::m_StaticSourceDefs[pNMLV->iItem].flags & TextDefinition::SRCOPT_HTML_LEXIS)
+	{
+		pMenu = HMenu::CreateMenu();
+		pMenu->AppendMenu(MF_OWNERDRAW, IDS_LEXER_RECOGNIZE_HTML4_TAGS,
+			reinterpret_cast<LPCWSTR>(TextDefinition::SRCOPT_HTML4_LEXIS));
+		pMenu->AppendMenu(MF_OWNERDRAW, IDS_LEXER_RECOGNIZE_HTML5_TAGS,
+			reinterpret_cast<LPCWSTR>(TextDefinition::SRCOPT_HTML5_LEXIS));
+		switch (TextDefinition::m_StaticSourceDefs[pNMLV->iItem].flags & COOKIE_PARSER_GLOBAL)
+		{
+		case SRCOPT_COOKIE(COOKIE_PARSER):
+			// static or unobvious kind of dynamic HTML (TODO: Offer other options here?)
+			pMenu->AppendMenu(MF_OWNERDRAW, IDS_LEXER_RECOGNIZE_MWSL_TAG,
+				reinterpret_cast<LPCWSTR>(0x10000 << (SRCOPT_COOKIE(COOKIE_PARSER_MWSL) >> 28)));
+			break;
+		}
+	}
 	WildcardDropList::OnItemActivate(pNMLV->hdr.hwndFrom, pNMLV->iItem,
-		1, 4, TextDefinition::m_StaticSourceDefs[pNMLV->iItem].exts);
+		1, 4, TextDefinition::m_StaticSourceDefs[pNMLV->iItem].exts, true, pMenu->m_hMenu);
 }
 
 LRESULT PropLexers::OnNotify(NMHDR *pNMHDR)
@@ -121,6 +145,16 @@ void PropLexers::WriteOptions()
 		m_pLv->GetItemText(i, 1, text, _countof(text));
 		if (FAILED(StringCchPrintfEx(bufptr, remaining, &bufptr, &remaining, 0, _T("%s=%s"), TextDefinition::m_StaticSourceDefs[i].name, text)))
 			break;
+		UINT_PTR const uItemData = m_pLv->GetItemData(i);
+		if (uItemData & TextDefinition::SRCOPT_HTML4_LEXIS)
+			if (FAILED(StringCchPrintfEx(bufptr, remaining, &bufptr, &remaining, 0, _T(":HTML4"))))
+				break;
+		if (uItemData & TextDefinition::SRCOPT_HTML5_LEXIS)
+			if (FAILED(StringCchPrintfEx(bufptr, remaining, &bufptr, &remaining, 0, _T(":HTML5"))))
+				break;
+		if (uItemData & (0x10000 << (SRCOPT_COOKIE(COOKIE_PARSER_MWSL) >> 28)))
+			if (FAILED(StringCchPrintfEx(bufptr, remaining, &bufptr, &remaining, 0, _T(":MWSL"))))
+				break;
 		++bufptr;
 		--remaining;
 	}

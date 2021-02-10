@@ -99,18 +99,27 @@ BOOL TextDefinition::ScanParserAssociations(LPTSTR p)
 			if (_tcsicmp(def.name, p) == 0)
 			{
 				// Look for additional tags at end of entry
+				DWORD srcopt_html_lexis = 0;
 				while (LPTSTR t = _tcsrchr(q, _T(':')))
 				{
 					*t++ = '\0';
-					if (DWORD dwStartCookie = ScriptCookie(t, 0))
+					if (m_StaticSourceDefs[i].flags & SRCOPT_HTML_LEXIS)
 					{
-						def.flags &= ~SRCOPT_COOKIE(COOKIE_PARSER);
-						def.flags |= dwStartCookie << 4;
+						if (DWORD dwStartCookie = ScriptCookie(t, 0))
+						{
+							def.flags &= ~SRCOPT_COOKIE(COOKIE_PARSER);
+							def.flags |= dwStartCookie << 4;
+						}
+						else if (PathMatchSpec(t, _T("HTML4")))
+							srcopt_html_lexis |= SRCOPT_HTML4_LEXIS;
+						else if (PathMatchSpec(t, _T("HTML5")))
+							srcopt_html_lexis |= SRCOPT_HTML5_LEXIS;
 					}
-					else if (PathMatchSpec(t, _T("HTML4")))
-						def.flags |= SRCOPT_HTML4_LEXIS;
-					else if (PathMatchSpec(t, _T("HTML5")))
-						def.flags |= SRCOPT_HTML5_LEXIS;
+				}
+				if (srcopt_html_lexis != 0)
+				{
+					def.flags &= ~SRCOPT_HTML_LEXIS;
+					def.flags |= srcopt_html_lexis;
 				}
 				def.exts = _tcsdup(q);
 				break;
@@ -129,11 +138,33 @@ void TextDefinition::DumpParserAssociations(LPTSTR p)
 	{
 		p += wsprintf(p, _T("version=%ls"), version) + 1;
 	}
-	TextDefinition const *def = m_SourceDefs;
-	do
+	for (int i = 0; i < _countof(m_StaticSourceDefs); ++i)
 	{
-		p += wsprintf(p, _T("%-16s= %s"), def->name, def->exts) + 1;
-	} while (++def < m_SourceDefs + _countof(m_StaticSourceDefs));
+		TextDefinition const &def = m_SourceDefs[i];
+		p += wsprintf(p, _T("%-16s= %s"), def.name, def.exts);
+		if (m_StaticSourceDefs[i].flags & SRCOPT_HTML_LEXIS)
+		{
+			switch (def.flags & SRCOPT_HTML_LEXIS)
+			{
+			case SRCOPT_HTML4_LEXIS:
+				p += wsprintf(p, _T(":HTML4"));
+				break;
+			case SRCOPT_HTML5_LEXIS:
+				p += wsprintf(p, _T(":HTML5"));
+				break;
+			}
+			if ((def.flags & COOKIE_PARSER_GLOBAL) != (m_StaticSourceDefs[i].flags & COOKIE_PARSER_GLOBAL))
+			{
+				switch (def.flags & COOKIE_PARSER_GLOBAL)
+				{
+				case SRCOPT_COOKIE(COOKIE_PARSER_MWSL):
+					p += wsprintf(p, _T(":MWSL"));
+					break;
+				}
+			}
+		}
+		++p;
+	}
 	*p = _T('\0');
 }
 

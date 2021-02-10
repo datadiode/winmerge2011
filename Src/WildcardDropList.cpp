@@ -3,38 +3,111 @@
 // SPDX-License-Identifier: WTFPL
 
 #include "stdafx.h"
-#if 0 // Change to 1 if in doubt whether stdafx.h includes them already
-#include <windows.h>
-#include <shlwapi.h>
-#include <commctrl.h>
-#include <stdlib.h>
-#include <malloc.h>
-#include <tchar.h>
-#include <algorithm>
-#endif
-
 #include "WildcardDropList.h"
+#include "LanguageSelect.h"
 
 /**
  * @brief DropList window procedure.
  */
 LRESULT WildcardDropList::LbWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+	WNDPROC const pfnSuper = (WNDPROC)::GetWindowLongPtr(hwnd, GWLP_USERDATA);
 	switch (message)
 	{
-	case WM_DRAWITEM:
-		if (wParam == IDCANCEL)
+	case WM_PAINT:
+		PAINTSTRUCT ps;
+		if (HDC const hDC = ::BeginPaint(hwnd, &ps))
 		{
-			DRAWITEMSTRUCT *const pdis = reinterpret_cast<DRAWITEMSTRUCT *>(lParam);
-			::DrawFrameControl(pdis->hDC, &pdis->rcItem, DFC_CAPTION, DFCS_CAPTIONCLOSE | DFCS_FLAT | DFCS_MONO);
-			return 1;
+			RECT rc;
+			GetClientRect(hwnd, &rc);
+			::SetTextColor(hDC, GetSysColor(COLOR_BTNTEXT));
+			::SetBkColor(hDC, GetSysColor(COLOR_BTNFACE));
+			int const cxCross = ::GetSystemMetrics(SM_CXVSCROLL) - 1;
+			RECT rcMenu = { rc.right - cxCross, rc.top - 1, rc.right + 1, rc.top + cxCross };
+			::DrawFrameControl(hDC, &rcMenu, DFC_CAPTION, DFCS_CAPTIONCLOSE | DFCS_FLAT);
+			rcMenu.top = rcMenu.bottom;
+			rcMenu.bottom = rc.bottom;
+			::ExtTextOut(hDC, rcMenu.left, rcMenu.top, ETO_OPAQUE, &rcMenu, NULL, 0, NULL);
+			if (HMENU const hMenu = ::GetMenu(hwnd))
+			{
+				rc.right -= cxCross;
+				HFONT const hFont = reinterpret_cast<HFONT>(::SendMessage(hwnd, WM_GETFONT, 0, 0));
+				::SelectObject(hDC, hFont);
+				int const n = ::GetMenuItemCount(hMenu);
+				for (int i = 0; i < n; ++i)
+				{
+					RECT rcMenu;
+					::GetMenuItemRect(hwnd, hMenu, i, &rcMenu);
+					UINT const id = ::GetMenuItemID(hMenu, i);
+					UINT const state = ::GetMenuState(hMenu, i, MF_BYPOSITION);
+					rcMenu.bottom += rc.top - rcMenu.top;
+					rcMenu.top = rc.top;
+					rcMenu.left = rc.left;
+					rcMenu.right = rc.right;
+					rc.top = rcMenu.bottom;
+					::ExtTextOut(hDC, rcMenu.left, rcMenu.top, ETO_OPAQUE, &rcMenu, NULL, 0, NULL);
+					rcMenu.left = rc.left + 1;
+					rcMenu.right = rcMenu.left + rcMenu.bottom - rcMenu.top;
+					::InflateRect(&rcMenu, -2, -2);
+					::DrawFrameControl(hDC, &rcMenu, DFC_BUTTON, state & MF_CHECKED ? DFCS_BUTTONCHECK | DFCS_FLAT | DFCS_CHECKED : DFCS_BUTTONCHECK | DFCS_FLAT);
+					rcMenu.left = rcMenu.right + 3;
+					rcMenu.right = rc.right;
+					try
+					{
+						::DrawText(hDC, LanguageSelect.LoadString(id).c_str(), -1, &rcMenu, DT_LEFT | DT_SINGLELINE | DT_VCENTER);
+					}
+					catch (OException *e)
+					{
+						::DrawText(hDC, e->msg, -1, &rcMenu, DT_LEFT | DT_SINGLELINE | DT_VCENTER);
+					}
+				}
+			}
+			::EndPaint(hwnd, &ps);
 		}
-		break;
+		return 0;
 	case WM_LBUTTONDOWN:
-		if (HWND hTc = GetDlgItem(hwnd, 100))
+		if (HWND const hTc = GetDlgItem(hwnd, 100))
 		{
 			TCHITTESTINFO info;
 			POINTSTOPOINT(info.pt, lParam);
+			RECT rc;
+			::GetClientRect(hwnd, &rc);
+			int const cxCross = ::GetSystemMetrics(SM_CXVSCROLL) - 1;
+			RECT rcMenu = { rc.right - cxCross, rc.top - 1, rc.right + 1, rc.top + cxCross };
+			if (::PtInRect(&rcMenu, info.pt))
+			{
+				if (HWND const hCb = reinterpret_cast<HWND>(::GetWindowLongPtr(hTc, GWLP_USERDATA)))
+				{
+					::EnableWindow(hTc, FALSE);
+					::PostMessage(hCb, CB_SHOWDROPDOWN, 0, 0);
+					break;
+				}
+			}
+			if (HMENU const hMenu = ::GetMenu(hwnd))
+			{
+				rc.right -= cxCross;
+				int const n = ::GetMenuItemCount(hMenu);
+				for (int i = 0; i < n; ++i)
+				{
+					RECT rcMenu;
+					::GetMenuItemRect(hwnd, hMenu, i, &rcMenu);
+					rcMenu.bottom += rc.top - rcMenu.top;
+					rcMenu.top = rc.top;
+					rcMenu.left = rc.left;
+					rcMenu.right = rc.right;
+					rc.top = rcMenu.bottom;
+					if (::PtInRect(&rcMenu, info.pt))
+					{
+						UINT state = ::GetMenuState(hMenu, i, MF_BYPOSITION);
+						state ^= MF_CHECKED;
+						::CheckMenuItem(hMenu, i, MF_BYPOSITION | state);
+						rcMenu.right = rcMenu.left + rcMenu.bottom - rcMenu.top;
+						::RedrawWindow(hwnd, &rcMenu, NULL, RDW_INVALIDATE);
+						::EnableWindow(hTc, TRUE);
+					}
+				}
+			}
+			::MapWindowPoints(hwnd, hTc, &info.pt, 1);
 			int i = TabCtrl_HitTest(hTc, &info);
 			if (i != -1)
 			{
@@ -46,23 +119,12 @@ LRESULT WildcardDropList::LbWndProc(HWND hwnd, UINT message, WPARAM wParam, LPAR
 				TabCtrl_SetItem(hTc, i, &item);
 				::EnableWindow(hTc, TRUE);
 			}
-			else if (HWND hwndHit = ::ChildWindowFromPoint(hwnd, info.pt))
-			{
-				if (hwndHit != hwnd && ::GetDlgCtrlID(hwndHit) == IDCANCEL)
-				{
-					if (HWND hCb = reinterpret_cast<HWND>(::GetWindowLongPtr(hTc, GWLP_USERDATA)))
-					{
-						::EnableWindow(hTc, FALSE);
-						::SendMessage(hCb, CB_SHOWDROPDOWN, 0, 0);
-					}
-				}
-			}
 		}
 		break;
 	case WM_RBUTTONDOWN:
-		if (HWND hTc = ::GetDlgItem(hwnd, 100))
+		if (HWND const hTc = ::GetDlgItem(hwnd, 100))
 		{
-			if (HWND hCb = reinterpret_cast<HWND>(::GetWindowLongPtr(hTc, GWLP_USERDATA)))
+			if (HWND const hCb = reinterpret_cast<HWND>(::GetWindowLongPtr(hTc, GWLP_USERDATA)))
 			{
 				::SendMessage(hCb, CB_SHOWDROPDOWN, 0, 0);
 			}
@@ -71,9 +133,9 @@ LRESULT WildcardDropList::LbWndProc(HWND hwnd, UINT message, WPARAM wParam, LPAR
 	case WM_HOTKEY:
 		if (wParam == IDCANCEL)
 		{
-			if (HWND hTc = ::GetDlgItem(hwnd, 100))
+			if (HWND const hTc = ::GetDlgItem(hwnd, 100))
 			{
-				if (HWND hCb = reinterpret_cast<HWND>(::GetWindowLongPtr(hTc, GWLP_USERDATA)))
+				if (HWND const hCb = reinterpret_cast<HWND>(::GetWindowLongPtr(hTc, GWLP_USERDATA)))
 				{
 					::EnableWindow(hTc, FALSE);
 					::SendMessage(hCb, CB_SHOWDROPDOWN, 0, 0);
@@ -81,8 +143,15 @@ LRESULT WildcardDropList::LbWndProc(HWND hwnd, UINT message, WPARAM wParam, LPAR
 			}
 		}
 		break;
+	case WM_DESTROY:
+		if (HMENU const hMenu = ::GetMenu(hwnd))
+			::DestroyMenu(hMenu);
+		break;
+	case WM_WINDOWPOSCHANGED:
+		// Redraw window including frame to remove possible animation leftovers
+		::RedrawWindow(hwnd, NULL, NULL, RDW_INVALIDATE | RDW_FRAME);
+		break;
 	}
-	WNDPROC pfnSuper = (WNDPROC)::GetWindowLongPtr(hwnd, GWLP_USERDATA);
 	return ::CallWindowProc(pfnSuper, hwnd, message, wParam, lParam);
 }
 
@@ -93,7 +162,8 @@ LRESULT WildcardDropList::LbWndProc(HWND hwnd, UINT message, WPARAM wParam, LPAR
  * @param [in] fixedPatterns Semicolon delimited list of wildcard patterns.
  * @param [in] allowUserAddedPatterns Whether to allow user-added patterns
  */
-void WildcardDropList::OnDropDown(HWND hCb, int columns, LPCTSTR fixedPatterns, bool allowUserAddedPatterns)
+void WildcardDropList::OnDropDown(HWND hCb,
+	int columns, LPCTSTR fixedPatterns, bool allowUserAddedPatterns, HMENU hMenu)
 {
 	COMBOBOXINFO info;
 	info.cbSize = sizeof info;
@@ -101,15 +171,25 @@ void WildcardDropList::OnDropDown(HWND hCb, int columns, LPCTSTR fixedPatterns, 
 		return;
 	RECT rc;
 	::GetClientRect(info.hwndList, &rc);
-	int const cxCross = ::GetSystemMetrics(SM_CXVSCROLL);
-	::CreateWindow(WC_BUTTON, NULL,
-		WS_CHILD | WS_VISIBLE | BS_OWNERDRAW,
-		rc.right - cxCross, 0, cxCross, cxCross,
-		info.hwndList, reinterpret_cast<HMENU>(IDCANCEL), NULL, NULL);
+	LONG_PTR pfnSuper = ::SetWindowLongPtr(info.hwndList, GWLP_WNDPROC, (LONG_PTR)LbWndProc);
+	::SetWindowLongPtr(info.hwndList, GWLP_USERDATA, pfnSuper);
+	::SetWindowLongPtr(info.hwndList, GWLP_ID, (LONG_PTR)hMenu);
+	if (hMenu)
+	{
+		if (int n = ::GetMenuItemCount(hMenu))
+		{
+			RECT rcMenu;
+			::GetMenuItemRect(info.hwndList, hMenu, 0, &rcMenu);
+			rc.top -= rcMenu.top;
+			::GetMenuItemRect(info.hwndList, hMenu, n - 1, &rcMenu);
+			rc.top += rcMenu.bottom;
+		}
+	}
+	int const cxCross = ::GetSystemMetrics(SM_CXVSCROLL) - 1;
 	HWND const hTc = ::CreateWindow(WC_TABCONTROL, NULL,
 		WS_CHILD | WS_VISIBLE | WS_DISABLED | TCS_BUTTONS |
 		TCS_FIXEDWIDTH | TCS_FORCELABELLEFT | TCS_MULTILINE,
-		0, 0, rc.right, 10000,
+		0, rc.top, rc.right - cxCross, 10000,
 		info.hwndList, reinterpret_cast<HMENU>(100), NULL, NULL);
 	::SetWindowLongPtr(hTc, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(hCb));
 	::SendMessage(hTc, WM_SETFONT, ::SendMessage(hCb, WM_GETFONT, 0, 0), 0);
@@ -165,25 +245,23 @@ void WildcardDropList::OnDropDown(HWND hCb, int columns, LPCTSTR fixedPatterns, 
 	TabCtrl_SetCurSel(hTc, -1);
 	TabCtrl_AdjustRect(hTc, FALSE, &rc);
 	rc.right = static_cast<int>(::SendMessage(hCb, CB_GETDROPPEDWIDTH, 0, 0));
-	::SetWindowPos(info.hwndList, NULL, 0, 0, rc.right, rc.top, SWP_NOMOVE | SWP_NOZORDER);
+	::SetWindowPos(info.hwndList, NULL, 0, 0, rc.right, rc.top - 2, SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
 	::RegisterHotKey(info.hwndList, IDCANCEL, 0, VK_ESCAPE);
 	::SetCursor(::LoadCursor(NULL, IDC_ARROW));
-	LONG_PTR pfnSuper = ::SetWindowLongPtr(info.hwndList, GWLP_WNDPROC, (LONG_PTR)LbWndProc);
-	::SetWindowLongPtr(info.hwndList, GWLP_USERDATA, pfnSuper);
 }
 
 /**
  * @brief Handles the CBN_CLOSEUP notification.
  * @param [in] hCb Handle to ComboBox control.
  */
-bool WildcardDropList::OnCloseUp(HWND hCb)
+HWND WildcardDropList::OnCloseUp(HWND hCb)
 {
 	COMBOBOXINFO info;
 	info.cbSize = sizeof info;
 	if (!::GetComboBoxInfo(hCb, &info))
-		return false;
+		return NULL;
 	::UnregisterHotKey(info.hwndList, IDCANCEL);
-	bool ret = false;
+	HWND ret = NULL;
 	if (HWND const hTc = ::GetDlgItem(info.hwndList, 100))
 	{
 		if (::IsWindowEnabled(hTc))
@@ -212,7 +290,7 @@ bool WildcardDropList::OnCloseUp(HWND hCb)
 			*pch = _T('\0');
 			::SetWindowText(hCb, patterns);
 			::SendMessage(hCb, CB_SETEDITSEL, 0, MAKELPARAM(0, -1));
-			ret = true;
+			ret = info.hwndList;
 		}
 		::DestroyWindow(hTc);
 	}
@@ -232,11 +310,36 @@ LRESULT WildcardDropList::LvWndProc(HWND hwnd, UINT message, WPARAM wParam, LPAR
 			TCHAR text[4096];
 			LONG_PTR data;
 		case CBN_CLOSEUP:
-			if (OnCloseUp(reinterpret_cast<HWND>(lParam)))
+			if (HWND const hwndList = OnCloseUp(reinterpret_cast<HWND>(lParam)))
 			{
 				::GetWindowText(reinterpret_cast<HWND>(lParam), text, _countof(text));
 				data = ::GetWindowLongPtr(reinterpret_cast<HWND>(lParam), GWLP_USERDATA);
 				ListView_SetItemText(hwnd, SHORT LOWORD(data), SHORT HIWORD(data), text);
+				if (HMENU const hMenu = GetMenu(hwndList))
+				{
+					LVITEM item;
+					item.mask = LVIF_PARAM;
+					item.iItem = SHORT LOWORD(data);
+					item.iSubItem = 0;
+					if (ListView_GetItem(hwnd, &item))
+					{
+						int const n = GetMenuItemCount(hMenu);
+						for (int i = 0; i < n; ++i)
+						{
+							MENUITEMINFO mii;
+							mii.cbSize = sizeof mii;
+							mii.fMask = MIIM_STATE | MIIM_DATA;
+							if (GetMenuItemInfo(hMenu, i, TRUE, &mii))
+							{
+								if (mii.fState & MF_CHECKED)
+									item.lParam |= mii.dwItemData;
+								else
+									item.lParam &= ~mii.dwItemData;
+							}
+						}
+						ListView_SetItem(hwnd, &item);
+					}
+				}
 			}
 			::DestroyWindow(reinterpret_cast<HWND>(lParam));
 			::SetWindowLongPtr(hwnd, GWLP_WNDPROC, (LONG_PTR)pfnSuper);
@@ -253,7 +356,8 @@ LRESULT WildcardDropList::LvWndProc(HWND hwnd, UINT message, WPARAM wParam, LPAR
 	return ::CallWindowProc(pfnSuper, hwnd, message, wParam, lParam);
 }
 
-void WildcardDropList::OnItemActivate(HWND hLv, int iItem, int iSubItem, int columns, LPCTSTR fixedPatterns, bool allowUserAddedPatterns)
+void WildcardDropList::OnItemActivate(HWND hLv, int iItem, int iSubItem,
+	int columns, LPCTSTR fixedPatterns, bool allowUserAddedPatterns, HMENU hMenu)
 {
 	RECT rc;
 	ListView_EnsureVisible(hLv, iItem, FALSE);
@@ -270,6 +374,32 @@ void WildcardDropList::OnItemActivate(HWND hLv, int iItem, int iSubItem, int col
 	::SetFocus(hCb);
 	LONG_PTR pfnSuper = ::SetWindowLongPtr(hLv, GWLP_WNDPROC, (LONG_PTR)LvWndProc);
 	::SetWindowLongPtr(hLv, GWLP_USERDATA, pfnSuper);
-	OnDropDown(hCb, columns, fixedPatterns, allowUserAddedPatterns);
+	if (hMenu)
+	{
+		LVITEM item;
+		item.mask = LVIF_PARAM;
+		item.iItem = iItem;
+		item.iSubItem = 0;
+		if (ListView_GetItem(hLv, &item))
+		{
+			MENUITEMINFO mii;
+			mii.cbSize = sizeof mii;
+			mii.fType = MFT_OWNERDRAW;
+			int const n = ::GetMenuItemCount(hMenu);
+			for (int i = 0; i < n; ++i)
+			{
+				mii.fMask = MIIM_STATE | MIIM_DATA;
+				if (::GetMenuItemInfo(hMenu, i, TRUE, &mii))
+				{
+					mii.fMask = MIIM_STATE | MIIM_TYPE;
+					if (item.lParam & mii.dwItemData)
+						mii.fState |= MF_CHECKED;
+					::SetMenuItemInfo(hMenu, i, TRUE, &mii);
+					mii.fType |= MFT_MENUBARBREAK;
+				}
+			}
+		}
+	}
+	OnDropDown(hCb, columns, fixedPatterns, allowUserAddedPatterns, hMenu);
 	::SendMessage(hCb, CB_SHOWDROPDOWN, TRUE, 0);
 }
