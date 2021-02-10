@@ -20,7 +20,8 @@ Const Encoding = "UTF-8"
 
 Dim TextType, options
 
-Dim sh
+Dim sh, tmpfile
+
 Set sh = CreateObject("WScript.Shell")
 
 Sub put_Arguments(Arguments)
@@ -28,8 +29,33 @@ Sub put_Arguments(Arguments)
 	If InStr(options, "-t html") Then TextType = "HTML"
 End Sub
 
+Class TempFile
+	Private fs, path
+
+	Private Sub Class_Initialize
+		Set fs = CreateObject("Scripting.FileSystemObject")
+	End Sub
+
+	Private Sub Class_Terminate
+		If Not IsEmpty(path) Then fs.DeleteFile path
+	End Sub
+
+	Public Function CreatePath(suffix)
+		path = fs.GetSpecialFolder(2) & "\" & Mid(CreateObject("Scriptlet.TypeLib").Guid, 2, 36) & suffix
+		CreatePath = path
+	End Function
+End Class
+
 Function OpenTextFile(path)
-	Dim ex
+	Dim ex, temp
+	If InStr(path & "*", ".doc*") <> 0 Then
+		Set tmpfile = New TempFile
+		temp = tmpfile.CreatePath(".docx")
+		path = Replace(path, "\\?\UNC\", "\\")
+		path = Replace(path, "\\?\", "")
+		sh.Run """%WinMergeRoot%\B2XTranslator\bin\doc2x.exe"" """ & path & """ -o """ & temp & """", 0, True
+		path = temp
+	End If
 	Set ex = sh.Exec("""pandoc.exe"" " & options & " """ & path & """")
 	If ex.StdOut.AtEndOfStream Then
 		Set OpenTextFile = ex.StdErr

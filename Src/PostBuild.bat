@@ -146,8 +146,21 @@ for %%$ in (
 	set $=
 )
 
-REM Copy B2XTranslator
+REM Copy B2XTranslator\src\Shell\xls2x
 set $=..\..\B2XTranslator\src\Shell\xls2x\bin\%4\;..\3rdparty\B2XTranslator\src\Shell\xls2x\bin\%4\
+for %%$ in (
+	.
+) do if not "%%~$$:$" == "" (
+	xcopy /y "%%~$$:$\*.dll" "%~2B2XTranslator\bin\"
+	xcopy /y "%%~$$:$\*.pdb" "%~2B2XTranslator\bin\"
+	xcopy /y "%%~$$:$\*.exe" "%~2B2XTranslator\bin\"
+	xcopy /y "..\..\B2XTranslator\LICENSE" "%~2B2XTranslator\"
+	if errorlevel 1 copy /y ..\3rdparty\B2XTranslator_LICENSE "%~2B2XTranslator\LICENSE"
+	set $=
+)
+
+REM Copy B2XTranslator\src\Shell\doc2x
+set $=..\..\B2XTranslator\src\Shell\doc2x\bin\%4\;..\3rdparty\B2XTranslator\src\Shell\doc2x\bin\%4\
 for %%$ in (
 	.
 ) do if not "%%~$$:$" == "" (

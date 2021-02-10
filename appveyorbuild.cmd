@@ -32,6 +32,8 @@ for %%p in (
   https://github.com/datadiode/ReoGrid/releases/download/%ReoGridTag%/ReoGridCompare_%ReoGridTag%-Debug.zip!ReoGridCompare_Debug
   https://github.com/datadiode/ReoGrid/releases/download/%ReoGridTag%/ReoGridCompare_%ReoGridTag%-Release.zip!ReoGridCompare_Release
   https://raw.githubusercontent.com/datadiode/B2XTranslator/master/LICENSE!B2XTranslator_LICENSE
+  https://github.com/datadiode/B2XTranslator/releases/download/%B2XTranslatorTag%/doc2x_%B2XTranslatorTag%-Debug.zip!doc2x_Debug
+  https://github.com/datadiode/B2XTranslator/releases/download/%B2XTranslatorTag%/doc2x_%B2XTranslatorTag%-Release.zip!doc2x_Release
   https://github.com/datadiode/B2XTranslator/releases/download/%B2XTranslatorTag%/xls2x_%B2XTranslatorTag%-Debug.zip!xls2x_Debug
   https://github.com/datadiode/B2XTranslator/releases/download/%B2XTranslatorTag%/xls2x_%B2XTranslatorTag%-Release.zip!xls2x_Release
   https://raw.githubusercontent.com/WinMerge/freeimage/master/license-gplv3.txt!FreeImage_license-gplv3.txt
@@ -70,6 +72,8 @@ MSBuild 3rdparty\AStyle\build\vs2010\AStyle.sln /t:Rebuild /p:Platform="x64" /p:
 
 "%SevenZip%" x -o3rdparty\B2XTranslator\src\Shell\xls2x\bin\Debug\ "%~dp03rdparty\xls2x_Debug"
 "%SevenZip%" x -o3rdparty\B2XTranslator\src\Shell\xls2x\bin\Release\ "%~dp03rdparty\xls2x_Release"
+"%SevenZip%" x -o3rdparty\B2XTranslator\src\Shell\doc2x\bin\Debug\ "%~dp03rdparty\doc2x_Debug"
+"%SevenZip%" x -o3rdparty\B2XTranslator\src\Shell\doc2x\bin\Release\ "%~dp03rdparty\doc2x_Release"
 
 "%SevenZip%" x -o3rdparty -t# "%~dp03rdparty\WinMerge_0.2011.210.381_setup.cpl" 1.7zSfxHtm.exe
 "%SevenZip%" x -o3rdparty "%~dp03rdparty\1.7zSfxHtm.exe" DOWNLOADER
