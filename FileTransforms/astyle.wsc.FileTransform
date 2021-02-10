@@ -30,7 +30,7 @@ Function OpenTextFile(path)
 		options = options & " --options=""" & optfile & """"
 	End If
 	options = options & " --stdin=""" & path & """"
-	Set astyle = sh.Exec("""astyle.exe""" & options)
+	Set astyle = sh.Exec("""%WinMergeRoot%\astyle.exe""" & options)
 	Set OpenTextFile = astyle.StdOut
 End Function
 </script>

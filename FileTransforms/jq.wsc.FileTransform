@@ -24,7 +24,7 @@ Function OpenTextFile(path)
 	Dim ex, options, filter
 	filter = "."
 	If Not IsEmpty(Arguments) Then Execute Arguments
-	Set ex = sh.Exec("""jq\jq.exe"" " & options & " " & filter & " " & """" & path & """")
+	Set ex = sh.Exec("""%WinMergeRoot%\jq\jq.exe"" " & options & " " & filter & " " & """" & path & """")
 	If ex.StdOut.AtEndOfStream Then
 		Set OpenTextFile = ex.StdErr
 	Else

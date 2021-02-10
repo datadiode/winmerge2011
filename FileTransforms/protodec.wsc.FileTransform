@@ -21,7 +21,7 @@ Set sh = CreateObject("WScript.Shell")
 Function OpenTextFile(path)
 	Dim ex, options
 	If Not IsEmpty(Arguments) Then Execute Arguments
-	Set ex = sh.Exec("""protodec.exe"" " & options & " """ & path & """")
+	Set ex = sh.Exec("""%WinMergeRoot%\protodec.exe"" " & options & " """ & path & """")
 	If ex.StdOut.AtEndOfStream Then
 		Set OpenTextFile = ex.StdErr
 	Else

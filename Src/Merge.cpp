@@ -354,6 +354,7 @@ int CMergeApp::DoMessageBox(LPCTSTR lpszPrompt, UINT nType, UINT nIDPrompt)
  */
 void CMergeApp::InitializeSupplements()
 {
+	SetEnvironmentVariable(_T("WinMergeRoot"), GetModulePath().c_str());
 	String supplementFolder = COptionsMgr::Get(OPT_SUPPLEMENT_FOLDER);
 	supplementFolder = env_ExpandVariables(supplementFolder.c_str());
 	if (!globalFileFilter.SetUserFilterPath(supplementFolder))
