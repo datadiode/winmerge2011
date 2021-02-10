@@ -135,7 +135,7 @@ public:
 	void UpdateHeaderActivity(int pane, bool bActivate);
 	void RefreshOptions();
 	void OpenDocs(FileLocation &, FileLocation &, bool bROLeft, bool bRORight);
-	void SwitchEncoding(int index, UINT codepage);
+	void SwitchEncoding(int index, UINT codepage, bool reload);
 	int RightLineInMovedBlock(int leftLine);
 	int LeftLineInMovedBlock(int rightLine);
 	void SetEditedAfterRescan(int nBuffer);

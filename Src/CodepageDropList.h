@@ -7,6 +7,7 @@ class CodepageDropList
 private:
 	static BOOL CALLBACK EnumCodePagesProc(LPTSTR);
 	static LRESULT CALLBACK SbWndProc(HWND, UINT, WPARAM, LPARAM);
+	static LRESULT CALLBACK LbWndProc(HWND, UINT, WPARAM, LPARAM);
 public:
 	static void OnItemActivate(HWND, HWND, int);
 };

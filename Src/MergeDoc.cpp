@@ -2025,10 +2025,11 @@ FileLoadResult::FILES_RESULT CChildFrame::ReloadDoc(int index)
  * @brief Change a document's read or write encoding.
  * @param [in] index Index of file in internal buffers.
  * @param [in] codepage Codepage to switch to.
+ * @param [in] reload Whether to reload file.
  */
-void CChildFrame::SwitchEncoding(int index, UINT codepage)
+void CChildFrame::SwitchEncoding(int index, UINT codepage, bool reload)
 {
-	if (GetKeyState(VK_SHIFT) < 0)
+	if (!reload)
 	{
 		// Don't reload, but use the selected encoding when saving the file
 		m_ptBuf[index]->m_encoding.m_codepage = codepage;

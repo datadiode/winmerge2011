@@ -130,11 +130,24 @@ LRESULT CMergeEditView::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			int index;
 			UINT codepage;
+			bool reload;
+			HComboBox *pCb;
+			COMBOBOXINFO info;
 		case MAKEWPARAM(PANE_ENCODING, CBN_SELENDOK):
-			index = reinterpret_cast<HComboBox *>(lParam)->GetCurSel();
-			codepage = static_cast<UINT>(reinterpret_cast<HComboBox *>(lParam)->GetItemData(index));
-			reinterpret_cast<HComboBox *>(lParam)->ShowDropDown(FALSE);
-			m_pDocument->SwitchEncoding(m_nThisPane, codepage);
+			pCb = reinterpret_cast<HComboBox *>(lParam);
+			index = pCb->GetCurSel();
+			codepage = static_cast<UINT>(pCb->GetItemData(index));
+			reload = true;
+			info.cbSize = sizeof info;
+			if (GetComboBoxInfo(pCb->m_hWnd, &info))
+			{
+				if (HMenu *pMenu = reinterpret_cast<HWindow *>(info.hwndList)->GetMenu())
+				{
+					reload = (pMenu->GetMenuState(IDS_CODEPAGE_RELOAD_FILE) & MF_CHECKED) != 0;
+				}
+			}
+			pCb->ShowDropDown(FALSE);
+			m_pDocument->SwitchEncoding(m_nThisPane, codepage, reload);
 			break;
 		}
 		break;
