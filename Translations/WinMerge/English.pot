@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WinMerge\n"
 "Report-Msgid-Bugs-To: http://bugs.winmerge.org/\n"
-"POT-Creation-Date: 2021-02-06 09:22+0000\n"
+"POT-Creation-Date: 2021-02-10 09:07+0000\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: English <winmerge-translate@lists.sourceforge.net>\n"
@@ -5659,5 +5659,25 @@ msgstr ""
 #: Merge.rc:2541
 #, c-format
 msgid "ReoGrid might not preserve whitespace outside of values parsed from separator-delimited files.\nTherefore, beware of the potential loss of whitespace when saving back files."
+msgstr ""
+
+#: Merge.rc:2542
+#, c-format
+msgid "Reload file"
+msgstr ""
+
+#: Merge.rc:2543
+#, c-format
+msgid "Recognize HTML4 tags"
+msgstr ""
+
+#: Merge.rc:2544
+#, c-format
+msgid "Recognize HTML5 tags"
+msgstr ""
+
+#: Merge.rc:2545
+#, c-format
+msgid "Recognize MWSL tag"
 msgstr ""
 
