@@ -952,13 +952,8 @@ void CMergeEditView::GotoLine(int nLine)
 	CMergeEditView *const pLeftView = m_pDocument->GetLeftView();
 	CMergeEditView *const pRightView = m_pDocument->GetRightView();
 
-	// Scroll line to center of view
-	int nScrollLine = GetSubLineIndex(nLine) - GetScreenLines() / 2;
-	if (nScrollLine < 0)
-		nScrollLine = 0;
+	ScrollIntoView(nLine);
 
-	pLeftView->ScrollToSubLine(nScrollLine);
-	pRightView->ScrollToSubLine(nScrollLine);
 	POINT ptPos;
 	ptPos.x = 0;
 	ptPos.y = min(nLine, pLeftView->GetSubLineCount() - 1);
@@ -967,6 +962,24 @@ void CMergeEditView::GotoLine(int nLine)
 	ptPos.y = min(nLine, pRightView->GetSubLineCount() - 1);
 	pRightView->SetCursorPos(ptPos);
 	pRightView->SetAnchor(ptPos);
+}
+
+/**
+ * @brief Scroll given line into view.
+ * @param [in] nLine Apparent destination line number (including deleted lines)
+ */
+void CMergeEditView::ScrollIntoView(int nLine)
+{
+	CMergeEditView *const pLeftView = m_pDocument->GetLeftView();
+	CMergeEditView *const pRightView = m_pDocument->GetRightView();
+
+	// Scroll line to center of view
+	int nScrollLine = GetSubLineIndex(nLine) - GetScreenLines() / 2;
+	if (nScrollLine < 0)
+		nScrollLine = 0;
+
+	pLeftView->ScrollToSubLine(nScrollLine);
+	pRightView->ScrollToSubLine(nScrollLine);
 }
 
 /**

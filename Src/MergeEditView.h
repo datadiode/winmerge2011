@@ -98,6 +98,7 @@ public:
 	virtual int RecalcVertScrollBar(bool bPositionOnly = false);
 	virtual void GetLineColors(int nLineIndex, COLORREF &crBkgnd, COLORREF &crText);
 	void GotoLine(int nLine);
+	void ScrollIntoView(int nLine);
 	int GetTopLine() const { return m_nTopLine; }
 	int GetTopSubLine() const { return m_nTopSubLine; }
 	virtual int GetEmptySubLines(int nLineIndex);

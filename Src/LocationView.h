@@ -82,7 +82,6 @@ protected:
 	enum LOCBAR_TYPE;
 	CChildFrame *const m_pMergeDoc;
 	void DrawRect(HSurface *, const RECT& r, COLORREF cr, BOOL bSelected = FALSE);
-	void GotoLocation(const POINT &point);
 	int GetLineFromYPos(int nYCoord, CMergeEditView *);
 	LOCBAR_TYPE IsInsideBar(const POINT &pt);
 	void DrawVisibleAreaRect(HSurface *, int nTopLine = -1, int nBottomLine = -1);

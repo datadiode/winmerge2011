@@ -570,13 +570,28 @@ void CLocationView::DrawRect(HSurface *pDC, const RECT& r, COLORREF cr, BOOL bSe
 }
 
 /**
- * @brief Capture the mouse target.
+ * @brief Scroll both views to point given.
+ *
+ * Scroll views to given line. There is two ways to scroll, based on
+ * view lines (ghost lines counted in) or on real lines (no ghost lines).
+ * In most cases view lines should be used as it avoids real line number
+ * calculation and is able to scroll to all lines - real line numbers
+ * cannot be used to scroll to ghost lines.
+ *
+ * @param [in] lParam Point to move to
  */
 void CLocationView::OnDown(LPARAM lParam)
 {
 	POINT point;
 	POINTSTOPOINT(point, lParam);
-	GotoLocation(point);
+
+	LOCBAR_TYPE bar = IsInsideBar(point);
+	if (bar != BAR_NONE)
+	{
+		CMergeEditView *pView = m_pMergeDoc->GetActiveMergeView();
+		int line = GetLineFromYPos(point.y, pView);
+		pView->ScrollIntoView(line);
+	}
 }
 
 /**
@@ -608,33 +623,6 @@ void CLocationView::OnDrag(LPARAM lParam)
 	si.nPos = nSubLine;
 	pView->SetScrollInfo(SB_VERT, &si);
 	pView->SendMessage(WM_VSCROLL, MAKEWPARAM(SB_THUMBPOSITION, 0), NULL);
-}
-
-/**
- * @brief Scroll both views to point given.
- *
- * Scroll views to given line. There is two ways to scroll, based on
- * view lines (ghost lines counted in) or on real lines (no ghost lines).
- * In most cases view lines should be used as it avoids real line number
- * calculation and is able to scroll to all lines - real line numbers
- * cannot be used to scroll to ghost lines.
- *
- * @param [in] point Point to move to
- * @return TRUE if succeeds, FALSE if point not inside bars.
- */
-void CLocationView::GotoLocation(const POINT &point)
-{
-	LOCBAR_TYPE bar = IsInsideBar(point);
-	if (bar != BAR_NONE)
-	{
-		C_ASSERT(BAR_LEFT == 0);
-		C_ASSERT(BAR_RIGHT == 1);
-		CMergeEditView *pView = bar == BAR_YAREA ?
-			m_pMergeDoc->GetActiveMergeView() : m_pMergeDoc->GetView(bar);
-		int line = GetLineFromYPos(point.y, pView);
-		pView->SetFocus();
-		pView->GotoLine(line);
-	}
 }
 
 /**
