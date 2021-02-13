@@ -7,6 +7,7 @@ set FrhedTag=0.10909.2021
 set SQLiteCompareTag=3.1.0.0-datadiode-007
 set ReoGridTag=2.3.0.0-datadiode-178
 set B2XTranslatorTag=1.0.0.0-datadiode-006
+set ToxyExtractTag=1.6.0.0-datadiode-008
 
 call "%VS140COMNTOOLS%\vsdevcmd.bat"
 
@@ -31,6 +32,9 @@ for %%p in (
   https://raw.githubusercontent.com/datadiode/ReoGrid/master/LICENSE!ReoGrid_LICENSE
   https://github.com/datadiode/ReoGrid/releases/download/%ReoGridTag%/ReoGridCompare_%ReoGridTag%-Debug.zip!ReoGridCompare_Debug
   https://github.com/datadiode/ReoGrid/releases/download/%ReoGridTag%/ReoGridCompare_%ReoGridTag%-Release.zip!ReoGridCompare_Release
+  https://raw.githubusercontent.com/datadiode/toxy/master/LICENSE!toxy_LICENSE
+  https://github.com/datadiode/toxy/releases/download/%ToxyExtractTag%/ToxyExtract_%ToxyExtractTag%-Debug.zip!ToxyExtract_Debug
+  https://github.com/datadiode/toxy/releases/download/%ToxyExtractTag%/ToxyExtract_%ToxyExtractTag%-Release.zip!ToxyExtract_Release
   https://raw.githubusercontent.com/datadiode/B2XTranslator/master/LICENSE!B2XTranslator_LICENSE
   https://github.com/datadiode/B2XTranslator/releases/download/%B2XTranslatorTag%/doc2x_%B2XTranslatorTag%-Debug.zip!doc2x_Debug
   https://github.com/datadiode/B2XTranslator/releases/download/%B2XTranslatorTag%/doc2x_%B2XTranslatorTag%-Release.zip!doc2x_Release
@@ -69,6 +73,9 @@ MSBuild 3rdparty\AStyle\build\vs2010\AStyle.sln /t:Rebuild /p:Platform="x64" /p:
 
 "%SevenZip%" x -o3rdparty\ReoGrid\Compare\bin\Debug\ "%~dp03rdparty\ReoGridCompare_Debug"
 "%SevenZip%" x -o3rdparty\ReoGrid\Compare\bin\Release\ "%~dp03rdparty\ReoGridCompare_Release"
+
+"%SevenZip%" x -o3rdparty\toxy\Toxy.Tools\ToxyExtract\bin\Debug\ "%~dp03rdparty\ToxyExtract_Debug"
+"%SevenZip%" x -o3rdparty\toxy\Toxy.Tools\ToxyExtract\bin\Release\ "%~dp03rdparty\ToxyExtract_Release"
 
 "%SevenZip%" x -o3rdparty\B2XTranslator\src\Shell\xls2x\bin\Debug\ "%~dp03rdparty\xls2x_Debug"
 "%SevenZip%" x -o3rdparty\B2XTranslator\src\Shell\xls2x\bin\Release\ "%~dp03rdparty\xls2x_Release"

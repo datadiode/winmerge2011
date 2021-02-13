@@ -6,6 +6,7 @@ MediaInfo = script:\FileTransforms\MediaInfo.wsc
 Pandoc HTML = script:\FileTransforms\pandoc.wsc?options='-t html'
 Pandoc Markdown = script:\FileTransforms\pandoc.wsc?options='-t markdown'
 Pandoc Plain = script:\FileTransforms\pandoc.wsc?options='-t plain'
+ToxyExtract = script:\FileTransforms\ToxyExtract.wsc
 XDoc2Txt-Destillat = script:\FileTransforms\xdoc2txt.wsc
 GEDCOM = script:\FileTransforms\gedcom.wsc
 Zeilen nummeriert = script:\FileTransforms\LinesNumbered.wsc

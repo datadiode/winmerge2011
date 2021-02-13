@@ -5,7 +5,8 @@
 <style>
 *
 {
-	font: 11pt sans-serif;
+	font-size: 11pt;
+	font-family: sans-serif;
 }
 body
 {
@@ -27,6 +28,10 @@ legend
 fieldset
 {
 	padding-top: 5pt;
+}
+p
+{
+	margin: 5pt;
 }
 input
 {
@@ -70,7 +75,7 @@ a.about
 <script id='script' type='text/vbs'>
 Option Explicit
 
-script.addBehavior "#7zSfxHtm#Host?dialogHeight:110pt;dialogWidth:380pt", dialogArguments
+script.addBehavior "#7zSfxHtm#Host?dialogHeight:160pt;dialogWidth:380pt", dialogArguments
 
 Const xdoc2txt_x64_url = "http://ebstudio.info/download/KWICFinder/xd2tx220_x64.zip"
 Const xdoc2txt_x64_sha = "153e41d5a07fee3cf95e4c3f7e16bcced93cd6b836321767e76e768db307f5e9"
@@ -252,6 +257,7 @@ integrity verification by its SHA-256 hash, run its setup routine.
 		Download and install VC++ 2015-2019 Redistributable Package
 		<a class='about' id='AboutVCRedist'>i</a>
 	</legend>
+	<p>Note: Use of xdoc2txt with WinMerge 2011 is discouraged in favor of ToxyExtract, which is bundeled with WinMerge 2011 and accessible through <i>Compare As</i>.</p>
 </fieldset>
 <div id='buttons'>
 <center id='progresstxt'>0%</center>

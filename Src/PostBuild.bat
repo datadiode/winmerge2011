@@ -146,6 +146,19 @@ for %%$ in (
 	set $=
 )
 
+REM Copy ToxyExtract
+set $=..\..\toxy\Toxy.Tools\ToxyExtract\bin\%4\;..\3rdparty\toxy\Toxy.Tools\ToxyExtract\bin\%4\
+for %%$ in (
+	.
+) do if not "%%~$$:$" == "" (
+	xcopy /y "%%~$$:$\*.dll" "%~2ToxyExtract\bin\"
+	xcopy /y "%%~$$:$\*.pdb" "%~2ToxyExtract\bin\"
+	xcopy /y "%%~$$:$\*.exe" "%~2ToxyExtract\bin\"
+	xcopy /y "..\..\toxy\LICENSE" "%~2ToxyExtract\"
+	if errorlevel 1 copy /y ..\3rdparty\toxy_LICENSE "%~2BToxyExtract\LICENSE"
+	set $=
+)
+
 REM Copy B2XTranslator\src\Shell\xls2x
 set $=..\..\B2XTranslator\src\Shell\xls2x\bin\%4\;..\3rdparty\B2XTranslator\src\Shell\xls2x\bin\%4\
 for %%$ in (

@@ -7,22 +7,22 @@
 #pragma once
 
 /** @brief URL for hyperlink in About-dialog. */
-const TCHAR WinMergeURL[] = _T("http://winmerge.org/");
+const TCHAR WinMergeURL[] = _T("https://winmerge.org/");
 
 /**
  * @brief URL to help index in internet.
  * We use internet help when local help file is not found (not installed).
  */
-const TCHAR DocsURL[] = _T("http://manual.winmerge.org/index.html");
+const TCHAR DocsURL[] = _T("https://manual.winmerge.org/index.html");
 
 /** @brief URL to translations page in internet. */
-const TCHAR TranslationsUrl[] = _T("http://winmerge.org/translations/");
+const TCHAR TranslationsUrl[] = _T("https://winmerge.org/translations/");
 
 /** @brief URL of the GPL license. */
-const TCHAR LicenceUrl[] = _T("http://www.gnu.org/licenses/gpl-3.0.html");
+const TCHAR LicenceUrl[] = _T("https://www.gnu.org/licenses/agpl-3.0.html");
 
 /** @brief WinMerge download page URL. */
-const TCHAR DownloadUrl[] = _T("http://winmerge.org/downloads/");
+const TCHAR DownloadUrl[] = _T("https://winmerge.org/downloads/");
 
 /** @brief Relative (to WinMerge executable) path to local help file. */
 const TCHAR DocsPath[] = _T("\\Docs\\WinMerge.chm");

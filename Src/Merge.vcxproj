@@ -1096,6 +1096,7 @@
     <FileTransform Include="..\FileTransforms\msxml-sort.xslt.FileTransform" />
     <FileTransform Include="..\FileTransforms\pandoc.wsc.FileTransform" />
     <FileTransform Include="..\FileTransforms\protodec.wsc.FileTransform" />
+    <FileTransform Include="..\FileTransforms\ToxyExtract.wsc.FileTransform" />
     <FileTransform Include="..\FileTransforms\xdoc2txt.wsc.FileTransform" />
   </ItemGroup>
   <ItemGroup>
