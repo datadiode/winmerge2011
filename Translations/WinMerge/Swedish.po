@@ -3704,8 +3704,8 @@ msgstr "Högerklicka på sökvägen för att kopiera"
 
 #: Merge.rc:2107
 #, c-format
-msgid "WinMerge comes with ABSOLUTELY NO WARRANTY. This is free software and you are welcome to redistribute it under certain circumstances; see the [GNU General Public License] for details."
-msgstr "WinMerge kommer med ABSOLUT INGA GARANTIER. Detta är fri programvara och du är välkommen att vidaredistribuera den under vissa omständigheter; se [GNU General Public License] för detaljer."
+msgid "WinMerge comes with ABSOLUTELY NO WARRANTY. This is free software and you are welcome to redistribute it under certain circumstances; see the [GNU Affero General Public License] for details."
+msgstr "WinMerge kommer med ABSOLUT INGA GARANTIER. Detta är fri programvara och du är välkommen att vidaredistribuera den under vissa omständigheter; se [GNU Affero General Public License] för detaljer."
 
 #: Merge.rc:2108
 #, c-format

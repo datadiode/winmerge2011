@@ -3708,7 +3708,7 @@ msgstr "Clic droit sur le chemin pour le copier"
 
 #: Merge.rc:2107
 #, c-format
-msgid "WinMerge comes with ABSOLUTELY NO WARRANTY. This is free software and you are welcome to redistribute it under certain circumstances; see the [GNU General Public License] for details."
+msgid "WinMerge comes with ABSOLUTELY NO WARRANTY. This is free software and you are welcome to redistribute it under certain circumstances; see the [GNU Affero General Public License] for details."
 msgstr "WinMerge est fourni SANS AUCUNE GARANTIE. Ceci est un logiciel libre et vous êtes invité à le redistribuer sous certaines conditions; voir la [licence publique générale GNU] pour plus de détails."
 
 #: Merge.rc:2108

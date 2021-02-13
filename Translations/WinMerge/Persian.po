@@ -3701,7 +3701,7 @@ msgstr "˜áíÏ ÑÇÓÊ ãæÔæÇÑå ÑÇ Ñæí ãÓíÑ İÔÇÑÏåíÏ ÊÇ ÑæäæÔÊ ÈÑÏÇÑí ÑÏÏ "
 
 #: Merge.rc:2107
 #, c-format
-msgid "WinMerge comes with ABSOLUTELY NO WARRANTY. This is free software and you are welcome to redistribute it under certain circumstances; see the [GNU General Public License] for details."
+msgid "WinMerge comes with ABSOLUTELY NO WARRANTY. This is free software and you are welcome to redistribute it under certain circumstances; see the [GNU Affero General Public License] for details."
 msgstr " æíäãÑÌ È˜áí ÈÏæä åí ÖãÇäÊí ÚÑÖå ãí ÔæÏ. Çíä í˜ äÑã ÇİÒÇÑ ÑÇíÇä ÇÓÊ æ ÔãÇ ÊÍÊ ÈÑÎí ÔÑÇíØ ÕÇÍÈ ÇÎÊíÇÑ ÏÑ äÔÑ Âä åÓÊíÏ. ÈÑÇí ÌÒÆíÇÊ ãÌæÒ Úãæãí ˜áí   Ìí Çä íæ   ÑÇ ÏÑ ÒíäÇä / İåÑÓÊ ÑÇåäãÇ ÈÈíäíÏ "
 
 #: Merge.rc:2108

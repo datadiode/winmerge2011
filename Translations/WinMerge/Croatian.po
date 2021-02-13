@@ -3704,7 +3704,7 @@ msgstr "Desni klik na stazu koju trba kopirati"
 
 #: Merge.rc:2107
 #, fuzzy, c-format
-msgid "WinMerge comes with ABSOLUTELY NO WARRANTY. This is free software and you are welcome to redistribute it under certain circumstances; see the [GNU General Public License] for details."
+msgid "WinMerge comes with ABSOLUTELY NO WARRANTY. This is free software and you are welcome to redistribute it under certain circumstances; see the [GNU Affero General Public License] for details."
 msgstr "WinMerge je program BEZ IKAKVE GARANCIJE. To je besplatan softver koji možete dalje distribuirati pod odreðenim okolnostima prema [GNU javnoj licenci] koju pogledajte u datoteci pomoæi."
 
 #: Merge.rc:2108

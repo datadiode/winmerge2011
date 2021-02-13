@@ -3707,7 +3707,7 @@ msgstr "Kopyalamak Ýçin Dizinde Sað Týkla"
 
 #: Merge.rc:2107
 #, c-format
-msgid "WinMerge comes with ABSOLUTELY NO WARRANTY. This is free software and you are welcome to redistribute it under certain circumstances; see the [GNU General Public License] for details."
+msgid "WinMerge comes with ABSOLUTELY NO WARRANTY. This is free software and you are welcome to redistribute it under certain circumstances; see the [GNU Affero General Public License] for details."
 msgstr "WinMerge Size Hiçbir Þeyi Garanti Etmez. Bu Program, Belirli Þartlar Altýnda Serbestçe Çoðaltýp Daðýtabileceðiniz Özgür Bir Yazýlýmdýr. Detaylar Ýçin Yardým Menüsünden [GNU General Public Lisansý]'na Bakýnýz."
 
 #: Merge.rc:2108

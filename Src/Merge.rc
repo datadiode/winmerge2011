@@ -2104,7 +2104,7 @@ STRINGTABLE
     IDC_MIXED_EOL                 "Preserve original EOL chars"
     IDC_STATIC_TITLE_LEFT         "Right click on the path to copy"
     IDC_STATIC_TITLE_RIGHT        "Right click on the path to copy"
-    IDS_SPLASH_GPLTEXT            "WinMerge comes with ABSOLUTELY NO WARRANTY. This is free software and you are welcome to redistribute it under certain circumstances; see the [GNU General Public License] for details."
+    IDS_SPLASH_GPLTEXT            "WinMerge comes with ABSOLUTELY NO WARRANTY. This is free software and you are welcome to redistribute it under certain circumstances; see the [GNU Affero General Public License] for details."
     IDS_MESSAGEBOX_OK             "&Ok"
     IDS_MESSAGEBOX_CANCEL         "&Cancel"
     IDS_MESSAGEBOX_ABORT          "&Abort"
