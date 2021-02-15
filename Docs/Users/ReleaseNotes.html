@@ -50,7 +50,7 @@ function OnReadyStateChangeExternalDoc()
 </script>
 </head>
 <body>
-<h2>WinMerge 0.2011.211.031 Release Notes</h2>
+<h2>WinMerge [WinMergeTag] Release Notes</h2>
 This is an experimental release of WinMerge 2011.<br>
 It includes the following enhancements as compared to the previous stable release:
 <ul class='features'>
@@ -70,6 +70,12 @@ It includes the following enhancements as compared to the previous stable releas
 	<br>In particular, you may find LibXDiff's <i>indent heuristics</i> option useful.
 	<br>This feature was adopted from WinMerge 2.16.
 <li><p>File transform scriptlet <i>protodec.wsc</i> can be used to decode Protobuf messages.
+	<br>This feature makes use of <a target='_blank' href='https://github.com/schdub/protodec'>protodec</a>, which is bundled with WinMerge 2011.
+<li><p>File transform scriptlet <i>pandoc.wsc</i> can be used to convert various kinds of document files to Markdown, HTML or plain text.
+	<br>This feature requires pandoc.exe to be on the executable search path, which you can achieve by installing <a target='_blank' href='https://github.com/jgm/pandoc/releases'>pandoc</a>.
+<li><p>File transform scriptlet <i>ToxyExtract.wsc</i> can be used to convert various kinds of document files to plain text.
+	<br>This feature makes use of <a target='_blank' href='https://github.com/datadiode/toxy'>toxy</a>,
+	which is bundled with WinMerge 2011 and appears to be a capable open-source replacement for xdoc2txt.
 <li><p>The binary comparison view includes a Bookmarks menu.
 <li><p>File type associations for syntax coloring are configurable in Options dialog.
 <li><p>Following a suggestion made ages ago on Bitbucket, the folder compare progress dialog offers an option to send an email when ready.
@@ -82,15 +88,18 @@ It includes the following enhancements as compared to the previous stable releas
 <li><p>The <i>Filter Comments</i> option employs the syntax highlighter to extend its usefulness to many more file types than were addressed by the former approach.
 	<br>This feature was adopted from WinMerge 2.16.
 </ul>
-<h5>Source code links for GPL-licensed/infected binaries included in this release:</h5>
+<h5>Source code links for binaries included in this release:</h5>
 <ul>
-<li><a target='_blank' href='https://github.com/datadiode/winmerge2011/releases/tag/0.2011.211.031'>WinMerge 2011</a>
-<li><a target='_blank' href='https://github.com/datadiode/frhed/releases/tag/0.10907.2020'>Frhed</a>
-<li><a target='_blank' href='https://github.com/WinMerge/winimerge/releases/tag/1.0.22.0'>WinIMerge</a>
-<li><a target='_blank' href='https://github.com/datadiode/SQLiteCompare/releases/tag/3.1.0.0-datadiode-006'>SQLite Compare</a>
-<li><a target='_blank' href='https://github.com/datadiode/ReoGrid/releases/tag/2.3.0.0-datadiode-171'>ReoGrid</a>
+<li><a target='_blank' href='https://github.com/datadiode/winmerge2011/releases/tag/[WinMergeTag]'>WinMerge 2011</a>
+<li><a target='_blank' href='https://github.com/datadiode/frhed/releases/tag/[FrhedTag]'>Frhed</a>
+<li><a target='_blank' href='https://github.com/WinMerge/winimerge/releases/tag/v1.0.25'>WinIMerge</a>
+<li><a target='_blank' href='https://sourceforge.net/p/astyle/code/HEAD/tree/tags/3.1/'>Artistic Style</a>
+<li><a target='_blank' href='https://github.com/datadiode/SQLiteCompare/releases/tag/[SQLiteCompareTag]'>SQLite Compare</a>
+<li><a target='_blank' href='https://github.com/datadiode/ReoGrid/releases/tag/[ReoGridTag]'>ReoGrid</a>
+<li><a target='_blank' href='https://github.com/datadiode/B2XTranslator/releases/tag/[B2XTranslatorTag]'>B2XTranslator</a>
+<li><a target='_blank' href='https://github.com/datadiode/toxy/releases/tag/[ToxyExtractTag]'>toxy</a>
 <li><a target='_blank' href='https://github.com/schdub/protodec/releases/tag/v0.6.3-win'>protodec</a>
 </ul>
-<i>Jochen Neubeck, January 2021</i>
+<i>Jochen Neubeck, February 2021</i>
 <xml src='WinMerge.chm' onreadystatechange='OnReadyStateChangeExternalDoc()'></xml>
 </body>

@@ -10,6 +10,15 @@ REM echo $(OutDir) = %2
 REM echo $(PlatformName) = %3
 REM echo $(ConfigurationName) = %4
 
+for /f tokens^=2^ delims^=^" %%$ in (
+  'findstr "\/Version" ..\Setup_%3.bat'
+) do set WinMergeTag=%%$
+
+echo WinMergeTag=%WinMergeTag%
+
+call WriteDocFile.bat ..\Docs\Users\CHANGES > "%~2Docs\CHANGES"
+call WriteDocFile.bat ..\Docs\Users\ReleaseNotes.html > "%~2Docs\ReleaseNotes.html"
+
 goto :PlatformName$%3
 
 :PlatformName$Win32

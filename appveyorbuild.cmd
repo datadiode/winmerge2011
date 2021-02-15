@@ -4,10 +4,11 @@ FOR /F "tokens=*" %%A IN ('"git describe --tags"') DO SET GIT_DESCRIBE=%%A
 echo GIT_DESCRIBE=%GIT_DESCRIBE%
 
 set FrhedTag=0.10909.2021
-set SQLiteCompareTag=3.1.0.0-datadiode-007
-set ReoGridTag=2.3.0.0-datadiode-178
-set B2XTranslatorTag=1.0.0.0-datadiode-006
-set ToxyExtractTag=1.6.0.0-datadiode-008
+set WinIMergeTag=1.0.25
+set SQLiteCompareTag=3.1.0.0-datadiode-008
+set ReoGridTag=2.3.0.0-datadiode-179
+set B2XTranslatorTag=1.0.0.0-datadiode-007
+set ToxyExtractTag=1.6.0.0-datadiode-013
 
 call "%VS140COMNTOOLS%\vsdevcmd.bat"
 
