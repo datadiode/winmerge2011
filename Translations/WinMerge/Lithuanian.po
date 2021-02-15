@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WinMerge\n"
 "Report-Msgid-Bugs-To: https://bugs.winmerge.org/\n"
-"POT-Creation-Date: 2021-02-04 11:05+0000\n"
-"PO-Revision-Date: 2021-02-04 16:16+0200\n"
+"POT-Creation-Date: 2021-02-13 19:33+0000\n"
+"PO-Revision-Date: 2021-02-15 14:15+0200\n"
 "Last-Translator: Tichij <tichij@mail.com>\n"
 "Language-Team: Lithuanian <winmerge-translate@lists.sourceforge.net>\n"
 "Language: lt\n"
@@ -3709,7 +3709,7 @@ msgstr "Kad nukopijuoti, spustelëkite deðiniuoju pelës mygtuku ant kelio"
 #: Merge.rc:2107
 #, c-format
 msgid "WinMerge comes with ABSOLUTELY NO WARRANTY. This is free software and you are welcome to redistribute it under certain circumstances; see the [GNU Affero General Public License] for details."
-msgstr "„WinMerge“ tiekiama VISIÐKAI BE JOKIØ GARANTIJØ. Tai nemokama programinë áranga ir jûs galite jà platinti tam tikromis sàlygomis. Daugiau apie tai rasite „Þinyno“ meniu punkte [„GNU Bendroji vieðoji licencija“]."
+msgstr "„WinMerge“ tiekiama VISIÐKAI BE JOKIØ GARANTIJØ. Tai nemokama programinë áranga ir jûs galite jà platinti tam tikromis sàlygomis. Daugiau apie tai rasite „Þinyno“ meniu punkte [„GNU Affero Bendroji vieðoji licencija“]."
 
 #: Merge.rc:2108
 #, c-format
@@ -6179,30 +6179,30 @@ msgstr "Sistemos meniu"
 #: Merge.rc:2540
 #, c-format
 msgid "ReoGrid recognizes only part of the content present in Excel files,\nand also does not write back all sorts of content it manages to read in.\nTherefore, beware of the potential data loss when saving back files."
-msgstr ""
+msgstr "„ReoGrid“ atpaþásta tik dalá „Excel“ failuose esanèio turinio\nbei áraðo atgal ne viskà, kà sugeba perskaityti.\nTodël saugokitës galimo duomenø praradimo iðsaugodami failus atgal."
 
 #: Merge.rc:2541
 #, c-format
 msgid "ReoGrid might not preserve whitespace outside of values parsed from separator-delimited files.\nTherefore, beware of the potential loss of whitespace when saving back files."
-msgstr ""
+msgstr "„Reogrid“ gali neiðlaikyti uþ reikðmiø ribø esanèiø tarpø, iðtrauktø ið skyrikliais atskirtø failø.\nTodël saugokitës galimo tarpø praradimo iðsaugant failus atgal. "
 
 #: Merge.rc:2542
 #, c-format
 msgid "Reload file"
-msgstr ""
+msgstr "Ákelti failà ið naujo"
 
 #: Merge.rc:2543
 #, c-format
 msgid "Recognize HTML4 tags"
-msgstr ""
+msgstr "Atpaþinti HTML4 þymes"
 
 #: Merge.rc:2544
 #, c-format
 msgid "Recognize HTML5 tags"
-msgstr ""
+msgstr "Atpaþinti HTML5 þymes"
 
 #: Merge.rc:2545
 #, c-format
 msgid "Recognize MWSL tag"
-msgstr ""
+msgstr "Atpaþinti MWSL þymæ"
 
