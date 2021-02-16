@@ -8,7 +8,11 @@ set WinIMergeTag=1.0.25
 set SQLiteCompareTag=3.1.0.0-datadiode-008
 set ReoGridTag=2.3.0.0-datadiode-179
 set B2XTranslatorTag=1.0.0.0-datadiode-007
-set ToxyExtractTag=1.6.0.0-datadiode-013
+set ToxyTag=1.6.0.0-datadiode-015
+set AStyleTag=3.1
+set HtmlTidyTag=5.7.28
+set ProtoDecTag=0.6.3
+set jqTag=1.6
 
 call "%VS140COMNTOOLS%\vsdevcmd.bat"
 
@@ -21,8 +25,12 @@ for %%p in (
   https://7-zip.org/a/7z1900.msi!7z1900.msi
   https://7-zip.org/a/7z1900-x64.msi!7z1900-x64.msi
   https://github.com/kornelski/7z/archive/a6e2c7e401a3e5976e8522de518a169b0d8a7fac.zip!7z1900-src.zip
-  https://github.com/htacg/tidy-html5/archive/5.7.28.zip!tidy-html5.zip
-  https://fossies.org/windows/misc/AStyle_3.1_windows.zip!AStyle_3.1_windows.zip
+  https://github.com/htacg/tidy-html5/archive/%HtmlTidyTag%.zip!tidy-html5.zip
+  https://fossies.org/windows/misc/AStyle_%AStyleTag%_windows.zip!AStyle_windows.zip
+  https://github.com/schdub/protodec/releases/download/v%ProtoDecTag%-win/protodec.exe!protodec\protodec.exe
+  https://raw.githubusercontent.com/stedolan/jq/master/COPYING!jq\COPYING
+  https://github.com/stedolan/jq/releases/download/jq-%jqTag%/jq-win32.exe!jq\jq-win32.exe
+  https://github.com/stedolan/jq/releases/download/jq-%jqTag%/jq-win64.exe!jq\jq-win64.exe
   https://github.com/datadiode/frhed/releases/download/v%FrhedTag%/Frhed_%FrhedTag%-Win32-UnicodeDebug.zip!Frhed_Win32-UnicodeDebug
   https://github.com/datadiode/frhed/releases/download/v%FrhedTag%/Frhed_%FrhedTag%-Win32-UnicodeRelease.zip!Frhed_Win32-UnicodeRelease
   https://github.com/datadiode/frhed/releases/download/v%FrhedTag%/Frhed_%FrhedTag%-x64-UnicodeDebug.zip!Frhed_x64-UnicodeDebug
@@ -34,15 +42,15 @@ for %%p in (
   https://github.com/datadiode/ReoGrid/releases/download/%ReoGridTag%/ReoGridCompare_%ReoGridTag%-Debug.zip!ReoGridCompare_Debug
   https://github.com/datadiode/ReoGrid/releases/download/%ReoGridTag%/ReoGridCompare_%ReoGridTag%-Release.zip!ReoGridCompare_Release
   https://raw.githubusercontent.com/datadiode/toxy/master/LICENSE!toxy_LICENSE
-  https://github.com/datadiode/toxy/releases/download/%ToxyExtractTag%/ToxyExtract_%ToxyExtractTag%-Debug.zip!ToxyExtract_Debug
-  https://github.com/datadiode/toxy/releases/download/%ToxyExtractTag%/ToxyExtract_%ToxyExtractTag%-Release.zip!ToxyExtract_Release
+  https://github.com/datadiode/toxy/releases/download/%ToxyTag%/ToxyExtract_%ToxyTag%-Debug.zip!ToxyExtract_Debug
+  https://github.com/datadiode/toxy/releases/download/%ToxyTag%/ToxyExtract_%ToxyTag%-Release.zip!ToxyExtract_Release
   https://raw.githubusercontent.com/datadiode/B2XTranslator/master/LICENSE!B2XTranslator_LICENSE
   https://github.com/datadiode/B2XTranslator/releases/download/%B2XTranslatorTag%/doc2x_%B2XTranslatorTag%-Debug.zip!doc2x_Debug
   https://github.com/datadiode/B2XTranslator/releases/download/%B2XTranslatorTag%/doc2x_%B2XTranslatorTag%-Release.zip!doc2x_Release
   https://github.com/datadiode/B2XTranslator/releases/download/%B2XTranslatorTag%/xls2x_%B2XTranslatorTag%-Debug.zip!xls2x_Debug
   https://github.com/datadiode/B2XTranslator/releases/download/%B2XTranslatorTag%/xls2x_%B2XTranslatorTag%-Release.zip!xls2x_Release
   https://raw.githubusercontent.com/WinMerge/freeimage/master/license-gplv3.txt!FreeImage_license-gplv3.txt
-  https://github.com/WinMerge/winimerge/releases/download/v1.0.25/winimerge-1-0-25-0-exe.zip!winimerge-1-0-25-0-exe.zip
+  https://github.com/WinMerge/winimerge/releases/download/v%WinIMergeTag%/winimerge-%WinIMergeTag:.=-%-0-exe.zip!winimerge-exe.zip
   https://github.com/datadiode/winmerge2011/releases/download/0.2011.210.381/WinMerge_0.2011.210.381_setup.cpl!WinMerge_0.2011.210.381_setup.cpl
   https://github.com/datadiode/winmerge2011_help/releases/download/0.2011.008.226/WinMerge.chm!WinMerge.chm
 ) do (
