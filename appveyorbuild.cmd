@@ -1,6 +1,6 @@
 setlocal
 
-FOR /F "tokens=*" %%A IN ('"git describe --tags"') DO SET GIT_DESCRIBE=%%A
+FOR /F "tokens=*" %%A IN ('"git describe --tags --long --abbrev=40"') DO SET GIT_DESCRIBE=%%A
 echo GIT_DESCRIBE=%GIT_DESCRIBE%
 
 set FrhedTag=0.10909.2021
