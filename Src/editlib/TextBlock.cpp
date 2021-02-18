@@ -15,6 +15,7 @@ TextDefinition const TextDefinition::m_StaticSourceDefs[] =
 {
 	SRC_PLAIN, _T("Plain"), _T("txt;doc;diz"), &ParseLinePlain, SRCOPT_AUTOINDENT, /*4,*/ _T(""), _T(""), _T(""),
 	SRC_ASP, _T("ASP"), _T("asp;aspx"), &ParseLineAsp, SRCOPT_AUTOINDENT | SRCOPT_BRACEANSI | SRCOPT_HTML_LEXIS | SRCOPT_COOKIE(COOKIE_PARSER_BASIC), /*2,*/ _T(""), _T(""), _T("'"),
+	SRC_AUTOIT, _T("AutoIt"), _T("au3"), &ParseLineAutoIt, SRCOPT_AUTOINDENT, /*4,*/ _T(""), _T(""), _T(";"),
 	SRC_BASIC, _T("Basic"), _T("bas;vb;frm;dsm;cls;ctl;pag;dsr"), &ParseLineBasic, SRCOPT_AUTOINDENT, /*4,*/ _T(""), _T(""), _T("\'"),
 	SRC_VBSCRIPT, _T("VBScript"), _T("vbs"), &ParseLineBasic, SRCOPT_AUTOINDENT | SRCOPT_COOKIE(COOKIE_PARSER_VBSCRIPT), /*4,*/ _T(""), _T(""), _T("\'"),
 	SRC_BATCH, _T("Batch"), _T("bat;btm;cmd"), &ParseLineBatch, SRCOPT_INSERTTABS | SRCOPT_AUTOINDENT, /*4,*/ _T(""), _T(""), _T("rem "),

@@ -474,6 +474,9 @@
     <ClCompile Include="editlib\asp.cpp">
       <Filter>EditLib</Filter>
     </ClCompile>
+    <ClCompile Include="editlib\autoit.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
     <ClCompile Include="editlib\basic.cpp">
       <Filter>EditLib</Filter>
     </ClCompile>

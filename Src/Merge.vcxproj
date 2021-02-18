@@ -516,6 +516,7 @@
     </ClCompile>
     <ClCompile Include="WMGotoDlg.cpp" />
     <ClCompile Include="editlib\asp.cpp" />
+    <ClCompile Include="editlib\autoit.cpp" />
     <ClCompile Include="editlib\basic.cpp" />
     <ClCompile Include="editlib\batch.cpp" />
     <ClCompile Include="editlib\ccrystaleditview.cpp" />
