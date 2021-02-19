@@ -1,6 +1,22 @@
 [WinMergeTag]
 Changes since preceding release (not necessarily complete):
-• ...
+• Upgrade to ReoGrid 2.3.0.0-datadiode-180 for new LCS alignment feature
+• Upgrade to WinIMerge 1.0.25 and support some new features including OCR
+• Reflect transition to AGPL (which is due to use of iTextSharp) in About box
+• File transform scriptlet to pipe documents through ToxyExtract.exe
+• File transform scriptlet to pipe documents through pandoc.exe
+• Missed to sync pane title bars when swapping panes while working with archives
+• PropLexers: Expose some HTML syntax highlighting options through DropList GUI
+• MergeEditView: Add "Reload file" checkbox to codepage selection combobox
+• setup.hta: Create version number from git describe
+• CSettingStore: Set %PortableRoot% to program folder (seems more convenient)
+• Setup: Default to portable mode when the .cpl file is unpacked with 7-Zip
+• LocationView: Mere click is no reason to move the caret (sf.net bug #2237)
+• Merge.cpp: Set WinMergeRoot environment variable for use in scriptlets
+• ConfigLog.cpp: Spot pre-release version strings from GIT-VS-VERSION-GEN.bat
+• Merge.cpp: Make default supplement folder location sensitive to portable mode
+• CLanguageSelect::TranslateString(): Allow \u escaped Unicode character codes
+• CCrystalEditView: Missed to apply undo grouping when replacing with emptiness
 
 0.2011.211.031
 Changes since preceding release (not necessarily complete):
