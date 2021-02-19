@@ -379,7 +379,6 @@ void TextDefinition::ParseLineBasic(TextBlock::Cookie &cookie, LPCTSTR const psz
 			if (dwCookie & COOKIE_COMMENT)
 			{
 				DEFINE_BLOCK(I, COLORINDEX_COMMENT);
-				dwCookie |= COOKIE_COMMENT;
 				break;
 			}
 

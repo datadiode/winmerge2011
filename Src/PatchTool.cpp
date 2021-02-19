@@ -142,7 +142,7 @@ void CPatchTool::Run()
 
 		if (index == fileCount)
 		{
-			LanguageSelect.MsgBox(IDS_DIFF_SUCCEEDED, MB_ICONINFORMATION|MB_DONT_DISPLAY_AGAIN);
+			LanguageSelect.MsgBox(IDS_DIFF_SUCCEEDED, MB_ICONINFORMATION | MB_DONT_DISPLAY_AGAIN);
 			if (m_dlgPatch.m_openToEditor)
 			{
 				CMainFrame::OpenFileToExternalEditor(m_dlgPatch.m_fileResult.c_str());

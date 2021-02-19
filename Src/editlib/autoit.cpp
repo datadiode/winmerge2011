@@ -492,7 +492,7 @@ static BOOL IsAutoItKeyword(LPCTSTR pszChars, int nLength)
 #define COOKIE_STRING           0x000C
 #define COOKIE_STRING_SINGLE    0x0004
 #define COOKIE_STRING_DOUBLE    0x0008
-#define COOKIE_EXT_COMMENT      0x0010
+#define COOKIE_EXT_COMMENT      0xFF00
 #define COOKIE_TRANSPARENT      0xFFFFFF00
 
 void TextDefinition::ParseLineAutoIt(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf) const
@@ -501,11 +501,11 @@ void TextDefinition::ParseLineAutoIt(TextBlock::Cookie &cookie, LPCTSTR const ps
 
 	if (nLength == 0)
 	{
-		dwCookie &= (COOKIE_TRANSPARENT | COOKIE_EXT_COMMENT);
+		dwCookie &= COOKIE_TRANSPARENT;
 		return;
 	}
 
-	BOOL bFirstChar = (dwCookie & ~COOKIE_EXT_COMMENT) == 0;
+	BOOL bFirstChar = TRUE;
 	BOOL bRedefineBlock = TRUE;
 	BOOL bDecIndex = FALSE;
 	int nIdentBegin = -1;
@@ -547,8 +547,41 @@ void TextDefinition::ParseLineAutoIt(TextBlock::Cookie &cookie, LPCTSTR const ps
 			if (dwCookie & COOKIE_COMMENT)
 			{
 				DEFINE_BLOCK(I, COLORINDEX_COMMENT);
-				dwCookie |= COOKIE_COMMENT;
 				break;
+			}
+
+			if (!bFirstChar)
+			{
+				if (dwCookie & COOKIE_EXT_COMMENT)
+				{
+					break;
+				}
+			}
+			else if (!xisspace(pszChars[I]))
+			{
+				bFirstChar = FALSE;
+				if (xisspace(xisequal<_tcsnicmp>(pszChars + I, _T("#cs")), pszChars + nLength) ||
+					xisspace(xisequal<_tcsnicmp>(pszChars + I, _T("#comments-start")), pszChars + nLength))
+				{
+					DEFINE_BLOCK(I, COLORINDEX_COMMENT);
+					dwCookie = dwCookie & ~COOKIE_EXT_COMMENT | dwCookie - COOKIE_EXT_COMMENT & COOKIE_EXT_COMMENT;
+					break;
+				}
+				if (dwCookie & COOKIE_EXT_COMMENT)
+				{
+					if (xisspace(xisequal<_tcsnicmp>(pszChars + I, _T("#ce")), pszChars + nLength) ||
+						xisspace(xisequal<_tcsnicmp>(pszChars + I, _T("#comments-end")), pszChars + nLength))
+					{
+						dwCookie = dwCookie & ~COOKIE_EXT_COMMENT | dwCookie + COOKIE_EXT_COMMENT & COOKIE_EXT_COMMENT;
+					}
+					break;
+				}
+				if (pszChars[I] == '#')
+				{
+					DEFINE_BLOCK(I, COLORINDEX_PREPROCESSOR);
+					dwCookie |= COOKIE_PREPROCESSOR;
+					continue;
+				}
 			}
 
 			//  String constant "...."
@@ -599,17 +632,6 @@ void TextDefinition::ParseLineAutoIt(TextBlock::Cookie &cookie, LPCTSTR const ps
 			if (dwCookie & COOKIE_PREPROCESSOR)
 				continue;
 
-			if (bFirstChar)
-			{
-				if (pszChars[I] == '#')
-				{
-					DEFINE_BLOCK(I, COLORINDEX_PREPROCESSOR);
-					dwCookie |= COOKIE_PREPROCESSOR;
-					continue;
-				}
-				bFirstChar = xisspace(pszChars[I]);
-			}
-
 			if (pBuf == NULL)
 				continue; // No need to extract keywords, so skip rest of loop
 
@@ -650,7 +672,7 @@ void TextDefinition::ParseLineAutoIt(TextBlock::Cookie &cookie, LPCTSTR const ps
 		}
 	} while (I < nLength);
 
-	dwCookie &= (COOKIE_TRANSPARENT | COOKIE_EXT_COMMENT);
+	dwCookie &= COOKIE_TRANSPARENT;
 }
 
 TESTCASE
