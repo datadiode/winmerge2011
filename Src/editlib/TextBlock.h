@@ -132,6 +132,7 @@ struct TextDefinition
 		SRC_JSP,
 		SRC_LISP,
 		SRC_LUA,
+		SRC_MARKDOWN,
 		SRC_MWSL,
 		SRC_NSIS,
 		SRC_PASCAL,
@@ -219,6 +220,7 @@ private:
 	void ParseLineJava(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf) const;
 	void ParseLineLisp(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf) const;
 	void ParseLineLua(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf) const;
+	void ParseLineMarkdown(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf) const;
 	void ParseLineNsis(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf) const;
 	void ParseLinePascal(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf) const;
 	void ParseLinePerl(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf) const;

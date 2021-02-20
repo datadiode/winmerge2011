@@ -534,6 +534,9 @@
     <ClCompile Include="editlib\lisp.cpp">
       <Filter>EditLib</Filter>
     </ClCompile>
+    <ClCompile Include="editlib\md.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
     <ClCompile Include="editlib\nsis.cpp">
       <Filter>EditLib</Filter>
     </ClCompile>

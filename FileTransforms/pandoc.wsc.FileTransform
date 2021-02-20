@@ -26,7 +26,11 @@ Set sh = CreateObject("WScript.Shell")
 
 Sub put_Arguments(Arguments)
 	If Not IsEmpty(Arguments) Then Execute Arguments
-	If InStr(options, "-t html") Then TextType = "HTML"
+	If InStr(options, "-t html") Then
+		TextType = "HTML"
+	ElseIf InStr(options, "-t markdown") Then
+		TextType = "MD"
+	End If
 End Sub
 
 Class TempFile

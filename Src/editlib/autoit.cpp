@@ -6,7 +6,7 @@
 //  Copyright:  Ferdinand Prantl, portions by Stcherbatchenko Andrei
 //  E-mail:     prantl@ff.cuni.cz
 //
-//  Visual AutoIt syntax highlighing definition
+//  AutoIt syntax highlighing definition
 //
 //  You are free to use or modify this code to the following restrictions:
 //  - Acknowledge me somewhere in your about box, simple "Parts of code by.."
