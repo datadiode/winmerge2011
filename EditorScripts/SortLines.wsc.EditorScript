@@ -11,29 +11,29 @@
 // Adapted from Takashi's fork
 
 function SortLinesAscending(Text) {
-	var eol = Text.match(/\r\n|\r|\n/);
-	var lines = Text.split(/\r\n|\r|\n/);
+	var eol = Text.match(/\r\n?|\n/);
+	var lines = Text.split(/[\r\n]/);
 	lines.sort();
 	return lines.join(eol) + (/[\r\n]$/.test(Text) ? eol : "");
 }
 
 function SortLinesDescending(Text) {
-	var eol = Text.match(/\r\n|\r|\n/);
-	var lines = Text.split(/\r\n|\r|\n/);
+	var eol = Text.match(/\r\n?|\n/);
+	var lines = Text.split(/[\r\n]/);
 	lines.sort(function(a, b) { return a < b ? 1 : -1; });
 	return lines.join(eol) + (/[\r\n]$/.test(Text) ? eol : "");
 }
 
 function SortLinesAscendingNoCase(Text) {
-	var eol = Text.match(/\r\n|\r|\n/);
-	var lines = Text.split(/\r\n|\r|\n/);
+	var eol = Text.match(/\r\n?|\n/);
+	var lines = Text.split(/[\r\n]/);
 	lines.sort(function(a, b) { return a.toLowerCase() > b.toLowerCase() ? 1 : -1; });
 	return lines.join(eol) + (/[\r\n]$/.test(Text) ? eol : "");
 }
 
 function SortLinesDescendingNoCase(Text) {
-	var eol = Text.match(/\r\n|\r|\n/);
-	var lines = Text.split(/\r\n|\r|\n/);
+	var eol = Text.match(/\r\n?|\n/);
+	var lines = Text.split(/[\r\n]/);
 	lines.sort(function(a, b) { return a.toLowerCase() < b.toLowerCase() ? 1 : -1; });
 	return lines.join(eol) + (/[\r\n]$/.test(Text) ? eol : "");
 }
