@@ -1267,7 +1267,7 @@ void CCrystalTextBuffer::InitParseCookie()
 	if (m_CurSourceDef)
 	{
 		SetParseCookieCount(1);
-		m_aLines[0].m_cookie = TextBlock::Cookie(m_CurSourceDef->flags & COOKIE_PARSER_GLOBAL);
+		m_aLines[0].m_cookie = TextBlock::Cookie(m_CurSourceDef->flags & (COOKIE_PARSER_GLOBAL | COOKIE_PARSER));
 	}
 	else
 	{

@@ -95,6 +95,7 @@ public:
 #define COOKIE_PARSER_VBSCRIPT  0x07000000UL
 #define COOKIE_PARSER_CSS       0x08000000UL
 #define COOKIE_PARSER_MWSL      0x09000000UL
+#define COOKIE_PARSER_MARKDOWN  0x0A000000UL
 #define COOKIE_PARSER_GLOBAL    0xF0000000UL
 
 #define SRCOPT_COOKIE(X)        ((X) << 4)
@@ -220,7 +221,6 @@ private:
 	void ParseLineJava(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf) const;
 	void ParseLineLisp(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf) const;
 	void ParseLineLua(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf) const;
-	void ParseLineMarkdown(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf) const;
 	void ParseLineNsis(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf) const;
 	void ParseLinePascal(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf) const;
 	void ParseLinePerl(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf) const;

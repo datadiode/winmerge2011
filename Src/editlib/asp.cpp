@@ -41,6 +41,32 @@ static BOOL IsJspScriptingTagName(LPCTSTR pszChars, int nLength)
 	return xiskeyword<_tcsncmp>(pszChars, nLength, s_apszJspScriptingTagNameList);
 }
 
+// Names of HTML tags which escape from Markdown syntax when placed at beginning of line
+static BOOL IsMarkdownEscapingHtmlTagName(LPCTSTR pszChars, int nLength)
+{
+	static LPCTSTR const s_apszMarkdownEscapingHtmlTagNameList[] =
+	{
+		_T("address"),
+		_T("blockquote"),
+		_T("div"),
+		_T("dl"),
+		_T("h1"),
+		_T("h2"),
+		_T("h3"),
+		_T("h4"),
+		_T("h5"),
+		_T("h6"),
+		_T("noscript"),
+		_T("ol"),
+		_T("p"),
+		_T("pre"),
+		_T("style"),
+		_T("table"),
+		_T("ul"),
+	};
+	return xiskeyword<_tcsnicmp>(pszChars, nLength, s_apszMarkdownEscapingHtmlTagNameList);
+}
+
 #define DEFINE_BLOCK pBuf.DefineBlock
 
 #define COOKIE_DTD              0x00010000UL
@@ -66,7 +92,9 @@ void TextDefinition::ParseLineAsp(TextBlock::Cookie &cookie, LPCTSTR const pszCh
 {
 	DWORD &dwCookie = cookie.m_dwCookie;
 
-	int nScriptBegin = ((dwCookie & COOKIE_PARSER) ||
+	int nScriptBegin = (
+		(dwCookie & COOKIE_PARSER) &&
+		(dwCookie & COOKIE_PARSER) != COOKIE_PARSER_MARKDOWN ||
 		(dwCookie & COOKIE_RAZOR_NESTING) && !(dwCookie & COOKIE_SCRIPT)) &&
 		!(dwCookie & (COOKIE_ASP | COOKIE_STRING)) ? 0 : -1;
 
@@ -126,99 +154,39 @@ void TextDefinition::ParseLineAsp(TextBlock::Cookie &cookie, LPCTSTR const pszCh
 		// See bug #1474782 Crash when comparing SQL with with binary data
 		if (I < nLength)
 		{
-			if (!(dwCookie & COOKIE_RAZOR_NESTING) && (cookie.m_dwNesting & 0xF) && pszChars[I] == '}')
+			if ((dwCookie & (COOKIE_PARSER_GLOBAL | COOKIE_PARSER | COOKIE_EXT_COMMENT)) ==
+				(SRCOPT_COOKIE(COOKIE_PARSER_MARKDOWN) | COOKIE_PARSER_MARKDOWN))
 			{
-				int nScriptEnd = I + 1;
-				if (nScriptBegin >= 0 && nScriptEnd > nScriptBegin)
+				if (I == 0 && pszChars[0] == '#')
 				{
-					pBuf.m_bRecording = pBuf;
-					(this->*ScriptParseProc(dwCookie))(cookie, pszChars, nScriptEnd, nScriptBegin - 1, pBuf);
-					pBuf.m_bRecording = NULL;
-					nScriptBegin = nScriptEnd;
+					DEFINE_BLOCK(0, COLORINDEX_KEYWORD);
+					break;
 				}
 			}
-			// Script start: <? or <% or <MWSL>
-			if (pszChars[I] == '<' && (
-				(dwCookie & COOKIE_PARSER_GLOBAL) == SRCOPT_COOKIE(COOKIE_PARSER_MWSL) ?
-				I + 5 < nLength &&
-				pszChars[I + 1] == 'M' &&
-				pszChars[I + 2] == 'W' &&
-				pszChars[I + 3] == 'S' &&
-				pszChars[I + 4] == 'L' &&
-				pszChars[I + 5] == '>' :
+			if ((dwCookie & (COOKIE_PARSER_GLOBAL | COOKIE_PARSER)) !=
+				(SRCOPT_COOKIE(COOKIE_PARSER_MARKDOWN) | COOKIE_PARSER_MARKDOWN))
+			{
+				if (!(dwCookie & COOKIE_RAZOR_NESTING) && (cookie.m_dwNesting & 0xF) && pszChars[I] == '}')
+				{
+					int nScriptEnd = I + 1;
+					if (nScriptBegin >= 0 && nScriptEnd > nScriptBegin)
+					{
+						pBuf.m_bRecording = pBuf;
+						(this->*ScriptParseProc(dwCookie))(cookie, pszChars, nScriptEnd, nScriptBegin - 1, pBuf);
+						pBuf.m_bRecording = NULL;
+						nScriptBegin = nScriptEnd;
+					}
+				}
+				// Script start: <? or <% or <MWSL>
+				if (pszChars[I] == '<' && (
+					(dwCookie & COOKIE_PARSER_GLOBAL) == SRCOPT_COOKIE(COOKIE_PARSER_MWSL) ?
+					I + 5 < nLength &&
+					pszChars[I + 1] == 'M' &&
+					pszChars[I + 2] == 'W' &&
+					pszChars[I + 3] == 'S' &&
+					pszChars[I + 4] == 'L' &&
+					pszChars[I + 5] == '>' :
 				(pszChars[I + 1] == '?' || pszChars[I + 1] == '%')))
-			{
-				pBuf.m_bRecording = pBuf;
-				if (nScriptBegin >= 0)
-				{
-					DWORD const dwParser = ParseProcCookie(dwCookie);
-					(this->*ScriptParseProc(dwParser))(cookie, pszChars, I, nScriptBegin - 1, pBuf);
-					nScriptBegin = -1;
-				}
-				DEFINE_BLOCK(I, COLORINDEX_USER3);
-				bRedefineBlock = TRUE;
-				if (pszChars[I + 2] == '@') // directive expression
-				{
-					I += 3;
-					dwCookie |= COOKIE_ASP | COOKIE_PARSER;
-				}
-				else if (pszChars[I + 2] == '-' && pszChars[I + 3] == '-') // server-side comment
-				{
-					dwCookie |= COOKIE_ASP | COOKIE_EXT_COMMENT;
-				}
-				else
-				{
-					pBuf.m_bRecording = NULL;
-					nScriptBegin = I += 2;
-					switch (dwCookie & COOKIE_PARSER_GLOBAL)
-					{
-					case SRCOPT_COOKIE(COOKIE_PARSER_MWSL):
-						nScriptBegin = I += 4;
-						break;
-					case SRCOPT_COOKIE(COOKIE_PARSER_PHP):
-						if (LPCTSTR pScriptBegin = xisequal<_tcsnicmp>(pszChars + nScriptBegin, _T("php")))
-							nScriptBegin = static_cast<int>(pScriptBegin - pszChars);
-						break;
-					}
-					dwScriptTagCookie &= COOKIE_PARSER;
-					dwScriptTagCookie |= dwCookie & (COOKIE_STRING | COOKIE_TEMPLATE_STRING);
-					dwCookie &= ~COOKIE_STRING;
-					if (pszChars[nScriptBegin - 1] != '>' && xisalnum(pszChars[nScriptBegin]))
-					{
-						dwCookie |= COOKIE_PARSER; // unknown coding language
-					}
-					else
-					{
-						dwCookie |= COOKIE_RAZOR_NESTING;
-						switch (pszChars[nScriptBegin])
-						{
-						case '$': // expression builder
-							dwCookie |= COOKIE_PARSER; // unknown coding language
-							// fall through
-						case '=': // displaying expression
-						case ':': // displaying expression using HTML encoding
-							++nScriptBegin;
-							break;
-						case '#': // data-binding expression
-							if (pszChars[++nScriptBegin] == ':')
-								++nScriptBegin;
-							break;
-						case '!': // JSP declaration
-							if ((dwCookie & COOKIE_PARSER_GLOBAL) == SRCOPT_COOKIE(COOKIE_PARSER_JAVA))
-								++nScriptBegin;
-							break;
-						}
-					}
-				}
-				nIdentBegin = -1;
-				continue;
-			}
-
-			if ((dwCookie & (COOKIE_PARSER | COOKIE_RAZOR_NESTING)) && I > 0)
-			{
-				// Extended comment <?....?>
-				if ((dwCookie & COOKIE_PARSER_GLOBAL) != SRCOPT_COOKIE(COOKIE_PARSER_MWSL) &&
-					pszChars[I] == '>' && ((pszChars[nPrevI] == '?' || pszChars[nPrevI] == '%')))
 				{
 					pBuf.m_bRecording = pBuf;
 					if (nScriptBegin >= 0)
@@ -227,55 +195,70 @@ void TextDefinition::ParseLineAsp(TextBlock::Cookie &cookie, LPCTSTR const pszCh
 						(this->*ScriptParseProc(dwParser))(cookie, pszChars, I, nScriptBegin - 1, pBuf);
 						nScriptBegin = -1;
 					}
-					DEFINE_BLOCK(nPrevI, COLORINDEX_USER3);
-					if (!(dwCookie & COOKIE_SCRIPT))
-					{
-						dwCookie &= ~COOKIE_ASP;
-						dwScriptTagCookie &= COOKIE_STRING;
-					}
-					dwCookie &= ~(COOKIE_PARSER | COOKIE_RAZOR_NESTING);
-					dwCookie |= dwScriptTagCookie & (COOKIE_STRING | COOKIE_TEMPLATE_STRING);
-					dwScriptTagCookie &= ~COOKIE_STRING;
-					if (dwCookie & COOKIE_TEMPLATE_STRING)
-					{
-						pBuf.m_bRecording = NULL;
-						nScriptBegin = I + 1;
-					}
-					if (!(dwCookie & COOKIE_ASP))
-						dwCookie |= dwScriptTagCookie & COOKIE_PARSER;
+					DEFINE_BLOCK(I, COLORINDEX_USER3);
 					bRedefineBlock = TRUE;
-					bDecIndex = FALSE;
-					continue;
-				}
-			}
-
-			switch (dwCookie & COOKIE_PARSER_GLOBAL)
-			{
-			case SRCOPT_COOKIE(COOKIE_PARSER_MWSL):
-				if (pszChars[I] == ':')
-				{
-					// Script start: :=
-					if (pszChars[I + 1] == '=')
+					if (pszChars[I + 2] == '@') // directive expression
 					{
-						pBuf.m_bRecording = pBuf;
-						if (nScriptBegin >= 0)
-						{
-							DWORD const dwParser = ParseProcCookie(dwCookie);
-							(this->*ScriptParseProc(dwParser))(cookie, pszChars, I, nScriptBegin - 1, pBuf);
-							nScriptBegin = -1;
-						}
-						DEFINE_BLOCK(I, COLORINDEX_USER3);
+						I += 3;
+						dwCookie |= COOKIE_ASP | COOKIE_PARSER;
+					}
+					else if (pszChars[I + 2] == '-' && pszChars[I + 3] == '-') // server-side comment
+					{
+						dwCookie |= COOKIE_ASP | COOKIE_EXT_COMMENT;
+					}
+					else
+					{
 						pBuf.m_bRecording = NULL;
-						nScriptBegin = I + 2;
+						nScriptBegin = I += 2;
+						switch (dwCookie & COOKIE_PARSER_GLOBAL)
+						{
+						case SRCOPT_COOKIE(COOKIE_PARSER_MWSL):
+							nScriptBegin = I += 4;
+							break;
+						case SRCOPT_COOKIE(COOKIE_PARSER_PHP):
+							if (LPCTSTR pScriptBegin = xisequal<_tcsnicmp>(pszChars + nScriptBegin, _T("php")))
+								nScriptBegin = static_cast<int>(pScriptBegin - pszChars);
+							break;
+						}
 						dwScriptTagCookie &= COOKIE_PARSER;
 						dwScriptTagCookie |= dwCookie & (COOKIE_STRING | COOKIE_TEMPLATE_STRING);
-						dwCookie &= ~(COOKIE_PARSER | COOKIE_STRING);
-						dwCookie |= COOKIE_RAZOR_NESTING;
-						nIdentBegin = -1;
-						continue;
+						dwCookie &= ~COOKIE_STRING;
+						if (pszChars[nScriptBegin - 1] != '>' && xisalnum(pszChars[nScriptBegin]))
+						{
+							dwCookie |= COOKIE_PARSER; // unknown coding language
+						}
+						else
+						{
+							dwCookie |= COOKIE_RAZOR_NESTING;
+							switch (pszChars[nScriptBegin])
+							{
+							case '$': // expression builder
+								dwCookie |= COOKIE_PARSER; // unknown coding language
+								// fall through
+							case '=': // displaying expression
+							case ':': // displaying expression using HTML encoding
+								++nScriptBegin;
+								break;
+							case '#': // data-binding expression
+								if (pszChars[++nScriptBegin] == ':')
+									++nScriptBegin;
+								break;
+							case '!': // JSP declaration
+								if ((dwCookie & COOKIE_PARSER_GLOBAL) == SRCOPT_COOKIE(COOKIE_PARSER_JAVA))
+									++nScriptBegin;
+								break;
+							}
+						}
 					}
-					// Script end: :
-					if (dwCookie & COOKIE_RAZOR_NESTING)
+					nIdentBegin = -1;
+					continue;
+				}
+
+				if ((dwCookie & (COOKIE_PARSER | COOKIE_RAZOR_NESTING)) && I > 0)
+				{
+					// Extended comment <?....?>
+					if ((dwCookie & COOKIE_PARSER_GLOBAL) != SRCOPT_COOKIE(COOKIE_PARSER_MWSL) &&
+						pszChars[I] == '>' && ((pszChars[nPrevI] == '?' || pszChars[nPrevI] == '%')))
 					{
 						pBuf.m_bRecording = pBuf;
 						if (nScriptBegin >= 0)
@@ -284,7 +267,12 @@ void TextDefinition::ParseLineAsp(TextBlock::Cookie &cookie, LPCTSTR const pszCh
 							(this->*ScriptParseProc(dwParser))(cookie, pszChars, I, nScriptBegin - 1, pBuf);
 							nScriptBegin = -1;
 						}
-						DEFINE_BLOCK(I, COLORINDEX_USER3);
+						DEFINE_BLOCK(nPrevI, COLORINDEX_USER3);
+						if (!(dwCookie & COOKIE_SCRIPT))
+						{
+							dwCookie &= ~COOKIE_ASP;
+							dwScriptTagCookie &= COOKIE_STRING;
+						}
 						dwCookie &= ~(COOKIE_PARSER | COOKIE_RAZOR_NESTING);
 						dwCookie |= dwScriptTagCookie & (COOKIE_STRING | COOKIE_TEMPLATE_STRING);
 						dwScriptTagCookie &= ~COOKIE_STRING;
@@ -300,164 +288,217 @@ void TextDefinition::ParseLineAsp(TextBlock::Cookie &cookie, LPCTSTR const pszCh
 						continue;
 					}
 				}
-				break;
-			}
 
-			switch (dwCookie & COOKIE_STRING)
-			{
-			case COOKIE_STRING_SINGLE:
-				if (pszChars[I] == '\'')
+				switch (dwCookie & COOKIE_PARSER_GLOBAL)
 				{
-					dwCookie &= ~COOKIE_STRING_SINGLE;
-					bRedefineBlock = TRUE;
-					if ((dwCookie & COOKIE_ASP) && !(dwScriptTagCookie & COOKIE_STRING))
-						continue;
-					switch (ParseProcCookie(dwCookie))
+				case SRCOPT_COOKIE(COOKIE_PARSER_MWSL):
+					if (pszChars[I] == ':')
 					{
-					case 0:
-					case COOKIE_PARSER_BASIC:
-					case COOKIE_PARSER_VBSCRIPT:
-						break;
-					default:
-						int nPrevI = I;
-						while (nPrevI && pszChars[--nPrevI] == '\\')
+						// Script start: :=
+						if (pszChars[I + 1] == '=')
 						{
-							dwCookie ^= COOKIE_STRING_SINGLE;
-							bRedefineBlock ^= TRUE;
-						}
-						break;
-					}
-					if (!(dwCookie & COOKIE_STRING) && (dwCookie & (COOKIE_RAZOR_NESTING | COOKIE_PARSER)))
-					{
-						if (dwScriptTagCookie & COOKIE_PARSER)
-						{
-							dwCookie &= ~(COOKIE_PARSER | 0xFF);
-							dwCookie |= dwScriptTagCookie & (COOKIE_PARSER | COOKIE_TEMPLATE_STRING);
-						}
-						if (dwCookie & (COOKIE_RAZOR_NESTING | COOKIE_PARSER))
-						{
+							pBuf.m_bRecording = pBuf;
+							if (nScriptBegin >= 0)
+							{
+								DWORD const dwParser = ParseProcCookie(dwCookie);
+								(this->*ScriptParseProc(dwParser))(cookie, pszChars, I, nScriptBegin - 1, pBuf);
+								nScriptBegin = -1;
+							}
+							DEFINE_BLOCK(I, COLORINDEX_USER3);
 							pBuf.m_bRecording = NULL;
-							nScriptBegin = I + 1;
+							nScriptBegin = I + 2;
+							dwScriptTagCookie &= COOKIE_PARSER;
+							dwScriptTagCookie |= dwCookie & (COOKIE_STRING | COOKIE_TEMPLATE_STRING);
+							dwCookie &= ~(COOKIE_PARSER | COOKIE_STRING);
+							dwCookie |= COOKIE_RAZOR_NESTING;
+							nIdentBegin = -1;
+							continue;
+						}
+						// Script end: :
+						if (dwCookie & COOKIE_RAZOR_NESTING)
+						{
+							pBuf.m_bRecording = pBuf;
+							if (nScriptBegin >= 0)
+							{
+								DWORD const dwParser = ParseProcCookie(dwCookie);
+								(this->*ScriptParseProc(dwParser))(cookie, pszChars, I, nScriptBegin - 1, pBuf);
+								nScriptBegin = -1;
+							}
+							DEFINE_BLOCK(I, COLORINDEX_USER3);
+							dwCookie &= ~(COOKIE_PARSER | COOKIE_RAZOR_NESTING);
+							dwCookie |= dwScriptTagCookie & (COOKIE_STRING | COOKIE_TEMPLATE_STRING);
+							dwScriptTagCookie &= ~COOKIE_STRING;
+							if (dwCookie & COOKIE_TEMPLATE_STRING)
+							{
+								pBuf.m_bRecording = NULL;
+								nScriptBegin = I + 1;
+							}
+							if (!(dwCookie & COOKIE_ASP))
+								dwCookie |= dwScriptTagCookie & COOKIE_PARSER;
+							bRedefineBlock = TRUE;
+							bDecIndex = FALSE;
+							continue;
 						}
 					}
-				}
-				continue;
-			case COOKIE_STRING_DOUBLE:
-				if (pszChars[I] == '"')
-				{
-					dwCookie &= ~COOKIE_STRING_DOUBLE;
-					bRedefineBlock = TRUE;
-					if ((dwCookie & COOKIE_ASP) && !(dwScriptTagCookie & COOKIE_STRING))
-						continue;
-					switch (ParseProcCookie(dwCookie))
-					{
-					case 0:
-					case COOKIE_PARSER_BASIC:
-					case COOKIE_PARSER_VBSCRIPT:
-						break;
-					default:
-						int nPrevI = I;
-						while (nPrevI && pszChars[--nPrevI] == '\\')
-						{
-							dwCookie ^= COOKIE_STRING_DOUBLE;
-							bRedefineBlock ^= TRUE;
-						}
-						break;
-					}
-					if (!(dwCookie & COOKIE_STRING) && (dwCookie & (COOKIE_RAZOR_NESTING | COOKIE_PARSER)))
-					{
-						if (dwScriptTagCookie & COOKIE_PARSER)
-						{
-							dwCookie &= ~(COOKIE_PARSER | 0xFF);
-							dwCookie |= dwScriptTagCookie & (COOKIE_PARSER | COOKIE_TEMPLATE_STRING);
-						}
-						if (dwCookie & (COOKIE_RAZOR_NESTING | COOKIE_PARSER))
-						{
-							pBuf.m_bRecording = NULL;
-							nScriptBegin = I + 1;
-						}
-					}
-				}
-				continue;
-			case COOKIE_STRING_REGEXP:
-				switch (ParseProcCookie(dwCookie))
-				{
-				case 0:
-				case COOKIE_PARSER_CSS:
-				case COOKIE_PARSER_BASIC:
-				case COOKIE_PARSER_VBSCRIPT:
 					break;
-				case COOKIE_PARSER_JSCRIPT:
-					if (pszChars[I] == '/')
+				}
+
+				switch (dwCookie & COOKIE_STRING)
+				{
+				case COOKIE_STRING_SINGLE:
+					if (pszChars[I] == '\'')
 					{
-						dwCookie &= ~COOKIE_STRING_REGEXP;
+						dwCookie &= ~COOKIE_STRING_SINGLE;
 						bRedefineBlock = TRUE;
-						int nPrevI = I;
-						while (nPrevI && pszChars[--nPrevI] == '\\')
+						if ((dwCookie & COOKIE_ASP) && !(dwScriptTagCookie & COOKIE_STRING))
+							continue;
+						switch (ParseProcCookie(dwCookie))
 						{
-							dwCookie ^= COOKIE_STRING_REGEXP;
-							bRedefineBlock ^= TRUE;
+						case 0:
+						case COOKIE_PARSER_BASIC:
+						case COOKIE_PARSER_VBSCRIPT:
+							break;
+						default:
+							int nPrevI = I;
+							while (nPrevI && pszChars[--nPrevI] == '\\')
+							{
+								dwCookie ^= COOKIE_STRING_SINGLE;
+								bRedefineBlock ^= TRUE;
+							}
+							break;
 						}
-						if (!(dwCookie & COOKIE_STRING_REGEXP))
+						if (!(dwCookie & COOKIE_STRING) && (dwCookie & (COOKIE_RAZOR_NESTING | COOKIE_PARSER)))
 						{
-							int nNextI = I;
-							while (++nNextI < nLength && xisalnum(pszChars[nNextI]))
-								I = nNextI;
-							bWasComment = End;
+							if (dwScriptTagCookie & COOKIE_PARSER)
+							{
+								dwCookie &= ~(COOKIE_PARSER | 0xFF);
+								dwCookie |= dwScriptTagCookie & (COOKIE_PARSER | COOKIE_TEMPLATE_STRING);
+							}
+							if (dwCookie & (COOKIE_RAZOR_NESTING | COOKIE_PARSER))
+							{
+								pBuf.m_bRecording = NULL;
+								nScriptBegin = I + 1;
+							}
 						}
 					}
-					break;
-				default:
+					continue;
+				case COOKIE_STRING_DOUBLE:
 					if (pszChars[I] == '"')
 					{
-						dwCookie &= ~COOKIE_STRING_REGEXP;
+						dwCookie &= ~COOKIE_STRING_DOUBLE;
 						bRedefineBlock = TRUE;
-						int nNextI = I;
-						while (++nNextI < nLength && pszChars[nNextI] == '"')
+						if ((dwCookie & COOKIE_ASP) && !(dwScriptTagCookie & COOKIE_STRING))
+							continue;
+						switch (ParseProcCookie(dwCookie))
 						{
-							I = nNextI;
-							dwCookie ^= COOKIE_STRING_REGEXP;
-							bRedefineBlock ^= TRUE;
+						case 0:
+						case COOKIE_PARSER_BASIC:
+						case COOKIE_PARSER_VBSCRIPT:
+							break;
+						default:
+							int nPrevI = I;
+							while (nPrevI && pszChars[--nPrevI] == '\\')
+							{
+								dwCookie ^= COOKIE_STRING_DOUBLE;
+								bRedefineBlock ^= TRUE;
+							}
+							break;
+						}
+						if (!(dwCookie & COOKIE_STRING) && (dwCookie & (COOKIE_RAZOR_NESTING | COOKIE_PARSER)))
+						{
+							if (dwScriptTagCookie & COOKIE_PARSER)
+							{
+								dwCookie &= ~(COOKIE_PARSER | 0xFF);
+								dwCookie |= dwScriptTagCookie & (COOKIE_PARSER | COOKIE_TEMPLATE_STRING);
+							}
+							if (dwCookie & (COOKIE_RAZOR_NESTING | COOKIE_PARSER))
+							{
+								pBuf.m_bRecording = NULL;
+								nScriptBegin = I + 1;
+							}
 						}
 					}
-					break;
-				}
-				if (!(dwCookie & COOKIE_STRING) && (dwCookie & (COOKIE_RAZOR_NESTING | COOKIE_PARSER)))
-				{
-					if (dwScriptTagCookie & COOKIE_PARSER)
+					continue;
+				case COOKIE_STRING_REGEXP:
+					switch (ParseProcCookie(dwCookie))
 					{
-						dwCookie &= ~(COOKIE_PARSER | 0xFF);
-						dwCookie |= dwScriptTagCookie & (COOKIE_PARSER | COOKIE_TEMPLATE_STRING);
+					case 0:
+					case COOKIE_PARSER_CSS:
+					case COOKIE_PARSER_BASIC:
+					case COOKIE_PARSER_VBSCRIPT:
+						break;
+					case COOKIE_PARSER_JSCRIPT:
+						if (pszChars[I] == '/')
+						{
+							dwCookie &= ~COOKIE_STRING_REGEXP;
+							bRedefineBlock = TRUE;
+							int nPrevI = I;
+							while (nPrevI && pszChars[--nPrevI] == '\\')
+							{
+								dwCookie ^= COOKIE_STRING_REGEXP;
+								bRedefineBlock ^= TRUE;
+							}
+							if (!(dwCookie & COOKIE_STRING_REGEXP))
+							{
+								int nNextI = I;
+								while (++nNextI < nLength && xisalnum(pszChars[nNextI]))
+									I = nNextI;
+								bWasComment = End;
+							}
+						}
+						break;
+					default:
+						if (pszChars[I] == '"')
+						{
+							dwCookie &= ~COOKIE_STRING_REGEXP;
+							bRedefineBlock = TRUE;
+							int nNextI = I;
+							while (++nNextI < nLength && pszChars[nNextI] == '"')
+							{
+								I = nNextI;
+								dwCookie ^= COOKIE_STRING_REGEXP;
+								bRedefineBlock ^= TRUE;
+							}
+						}
+						break;
 					}
-					if (dwCookie & (COOKIE_RAZOR_NESTING | COOKIE_PARSER))
+					if (!(dwCookie & COOKIE_STRING) && (dwCookie & (COOKIE_RAZOR_NESTING | COOKIE_PARSER)))
 					{
+						if (dwScriptTagCookie & COOKIE_PARSER)
+						{
+							dwCookie &= ~(COOKIE_PARSER | 0xFF);
+							dwCookie |= dwScriptTagCookie & (COOKIE_PARSER | COOKIE_TEMPLATE_STRING);
+						}
+						if (dwCookie & (COOKIE_RAZOR_NESTING | COOKIE_PARSER))
+						{
+							pBuf.m_bRecording = NULL;
+							nScriptBegin = I + 1;
+						}
+					}
+					continue;
+				}
+
+				if ((dwCookie & COOKIE_TEMPLATE_STRING) && !(dwCookie & COOKIE_RAZOR_NESTING))
+				{
+					int nScriptEnd = pszChars[I] == '`' ? I + 1 :
+						pszChars[I] == '$' && pszChars[I + 1] == '{' ? I + 2 : 0;
+					if (nScriptBegin >= 0 && nScriptEnd > nScriptBegin)
+					{
+						pBuf.m_bRecording = pBuf;
+						(this->*ScriptParseProc(dwCookie))(cookie, pszChars, nScriptEnd, nScriptBegin - 1, pBuf);
 						pBuf.m_bRecording = NULL;
-						nScriptBegin = I + 1;
+						nScriptBegin = nScriptEnd;
 					}
+					continue;
 				}
-				continue;
 			}
-
-			if ((dwCookie & COOKIE_TEMPLATE_STRING) && !(dwCookie & COOKIE_RAZOR_NESTING))
-			{
-				int nScriptEnd = pszChars[I] == '`' ? I + 1 :
-					pszChars[I] == '$' && pszChars[I + 1] == '{' ? I + 2 : 0;
-				if (nScriptBegin >= 0 && nScriptEnd > nScriptBegin)
-				{
-					pBuf.m_bRecording = pBuf;
-					(this->*ScriptParseProc(dwCookie))(cookie, pszChars, nScriptEnd, nScriptBegin - 1, pBuf);
-					pBuf.m_bRecording = NULL;
-					nScriptBegin = nScriptEnd;
-				}
-				continue;
-			}
-
 			// Extended comment <!--....-->
 			if (dwCookie & COOKIE_EXT_COMMENT)
 			{
 				switch (dwCookie & (COOKIE_PARSER | COOKIE_DTD | COOKIE_ASP))
 				{
 				case 0:
+				case COOKIE_PARSER_MARKDOWN:
 					if (I > 1 && (nIdentBegin == -1 || I - nIdentBegin >= 6) && pszChars[I] == '>' && pszChars[nPrevI] == '-' && pszChars[nPrevI - 1] == '-')
 					{
 						dwCookie &= ~COOKIE_EXT_COMMENT;
@@ -504,6 +545,7 @@ void TextDefinition::ParseLineAsp(TextBlock::Cookie &cookie, LPCTSTR const pszCh
 			switch (dwCookie & COOKIE_PARSER)
 			{
 			case 0:
+			case COOKIE_PARSER_MARKDOWN:
 				break;
 			case COOKIE_PARSER_BASIC:
 			case COOKIE_PARSER_VBSCRIPT:
@@ -522,8 +564,12 @@ void TextDefinition::ParseLineAsp(TextBlock::Cookie &cookie, LPCTSTR const pszCh
 				break;
 			}
 
-			if (dwCookie & (COOKIE_PREPROCESSOR | COOKIE_RAZOR_NESTING | COOKIE_PARSER))
+			switch (dwCookie & (COOKIE_PREPROCESSOR | COOKIE_RAZOR_NESTING | COOKIE_PARSER))
 			{
+			case 0:
+			case COOKIE_PARSER_MARKDOWN:
+				break;
+			default:
 				if (pszChars[I] == '<' && pszChars[I + 1] == '/')
 				{
 					pBuf.m_bRecording = pBuf;
@@ -622,6 +668,7 @@ void TextDefinition::ParseLineAsp(TextBlock::Cookie &cookie, LPCTSTR const pszCh
 			switch (dwCookie & (COOKIE_DTD | COOKIE_ASP | COOKIE_SCRIPT) | ParseProcCookie(dwCookie))
 			{
 			case 0:
+			case COOKIE_PARSER_MARKDOWN:
 			case COOKIE_SCRIPT | COOKIE_PARSER_BASIC:
 			case COOKIE_SCRIPT | COOKIE_PARSER_CSHARP:
 				if (I < nLength - 3 && pszChars[I] == '<' && pszChars[I + 1] == '!' && pszChars[I + 2] == '-' && pszChars[I + 3] == '-')
@@ -687,6 +734,40 @@ void TextDefinition::ParseLineAsp(TextBlock::Cookie &cookie, LPCTSTR const pszCh
 					nIdentBegin = I;
 				dwCookie |= COOKIE_REJECT_REGEXP;
 				continue;
+			}
+
+			switch (dwCookie & (COOKIE_PARSER_GLOBAL | COOKIE_PARSER))
+			{
+			case SRCOPT_COOKIE(COOKIE_PARSER_MARKDOWN) | COOKIE_PARSER_MARKDOWN:
+				if (I == 0 && pszChars[0] == '<')
+				{
+					LPCTSTR const p = pszChars + 1;
+					if (LPCTSTR const q = _tcschr(p, '>'))
+					{
+						if (IsMarkdownEscapingHtmlTagName(p, static_cast<int>(q - p)))
+						{
+							dwCookie &= ~COOKIE_PARSER;
+							break;
+						}
+					}
+				}
+				continue;
+			case SRCOPT_COOKIE(COOKIE_PARSER_MARKDOWN):
+				if (I == 0 && pszChars[0] == '<' && pszChars[1] == '/')
+				{
+					LPCTSTR const p = pszChars + 2;
+					if (LPCTSTR const q = _tcschr(p, '>'))
+					{
+						if (IsMarkdownEscapingHtmlTagName(p, static_cast<int>(q - p)))
+						{
+							dwCookie |= COOKIE_PARSER_MARKDOWN;
+							DEFINE_BLOCK(2, COLORINDEX_KEYWORD);
+							DEFINE_BLOCK(2 + static_cast<int>(q - p), COLORINDEX_NORMALTEXT);
+							continue;
+						}
+					}
+				}
+				break;
 			}
 		}
 		if (nIdentBegin >= 0)

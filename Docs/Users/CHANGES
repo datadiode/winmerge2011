@@ -1,6 +1,6 @@
 [WinMergeTag]
 Changes since preceding release (not necessarily complete):
-• EditLib: Colorize unindented Markdown headings (i.e. just unindented headings)
+• EditLib: Colorize some Markdown (unindented headings, comments, HTML islands)
 • EditLib: Adopt AutoIt parser from 2.16
 • Upgrade to ReoGrid 2.3.0.0-datadiode-180 for new LCS alignment feature
 • Upgrade to WinIMerge 1.0.25 and support some new features including OCR

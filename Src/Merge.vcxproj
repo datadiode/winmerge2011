@@ -306,7 +306,6 @@
     <ClCompile Include="DirViewColItems.cpp" />
     <ClCompile Include="Common\DllProxies.cpp" />
     <ClCompile Include="editlib\lua.cpp" />
-    <ClCompile Include="editlib\md.cpp" />
     <ClCompile Include="editlib\modeline-parser.cpp" />
     <ClCompile Include="editlib\razor.cpp" />
     <ClCompile Include="editlib\go.cpp" />
