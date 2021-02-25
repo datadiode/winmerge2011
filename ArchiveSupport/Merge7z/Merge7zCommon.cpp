@@ -682,6 +682,9 @@ DEFINE_FORMAT(CHfsHandler,		E3, "hfs", "");
 DEFINE_FORMAT(CDmgHandler,		E4, "dmg", "");
 DEFINE_FORMAT(CElfHandler,		DE, "elf", "");
 #endif
+#if MY_VER_MAJOR * 100 + MY_VER_MINOR >= 1506
+DEFINE_FORMAT(CRar5Handler,		CC, "rar", "Rar!\x1a\x07\x01\x00");
+#endif
 
 /**
  * @brief Construct Merge7z interface.
