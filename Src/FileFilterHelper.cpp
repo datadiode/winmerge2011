@@ -23,6 +23,7 @@
 #include "FileFilterHelper.h"
 #include "coretools.h"
 #include "paths.h"
+#include "Environment.h"
 
 using std::vector;
 
@@ -97,7 +98,8 @@ FileFilter *FileFilterHelper::FindFilter(LPCTSTR filterName)
  */
 bool FileFilterHelper::SetUserFilterPath(const String &filterPath)
 {
-	m_sUserSelFilterPath = paths_ConcatPath(filterPath, _T("Filters\\"));
+	String const path = env_ExpandVariables(filterPath.c_str());
+	m_sUserSelFilterPath = paths_ConcatPath(path, _T("Filters\\"));
 	return paths_CreateIfNeeded(m_sUserSelFilterPath.c_str());
 }
 
