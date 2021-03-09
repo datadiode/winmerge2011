@@ -25,6 +25,7 @@
 #include "Environment.h"
 #include "PropRegistry.h"
 #include "Common/RegKey.h"
+#include "Common/SettingStore.h"
 #include "Common/coretools.h"
 #include "Common/SuperComboBox.h"
 #include "FileOrFolderSelect.h"
@@ -78,9 +79,11 @@ BOOL PropRegistry::OnInitDialog()
 			PathAppend(path, WinMergeDocumentsFolder);
 			pCb->AddString(path);
 		}
-		if (GetEnvironmentVariable(_T("PortableRoot"), path, _countof(path)))
+		if (!SettingStore.GetFileName().empty())
 		{
-			wsprintf(path, _T("%%PortableRoot%%ProgramData\\%s"), WinMergeDocumentsFolder);
+			wsprintf(path, _T("%%WinMergeRoot%%\\ProgramData\\%s"), WinMergeDocumentsFolder);
+			pCb->AddString(path);
+			wsprintf(path, _T("%%WinMergeDrive%%\\ProgramData\\%s"), WinMergeDocumentsFolder);
 			pCb->AddString(path);
 		}
 	}

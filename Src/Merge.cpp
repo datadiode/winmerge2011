@@ -123,6 +123,24 @@ CMergeApp::CMergeApp()
 , m_nActiveOperations(0)
 {
 	_set_new_handler(reinterpret_cast<_PNH>(die));
+	// Set environment variables referring to the folder where the executing
+	// program resides, as well as to the root folder thereof, following the
+	// naming of OS-provided SystemRoot and SystemDrive variables.
+	TCHAR path[MAX_PATH];
+	switch (GetModuleFileName(NULL, path, _countof(path)))
+	{
+	case 0: // failed
+	case MAX_PATH: // buffer too small
+		break;
+	default:
+		PathRemoveFileSpec(path);
+		SetEnvironmentVariable(_T("WinMergeRoot"), path);
+		if (LPTSTR tail = PathSkipRoot(path))
+		{
+			*--tail = _T('\0');
+			SetEnvironmentVariable(_T("WinMergeDrive"), path);
+		}
+	}
 }
 
 CMergeApp::~CMergeApp()
@@ -206,7 +224,7 @@ HRESULT CMergeApp::InitInstance()
 		}
 		if (portable && OPT_SUPPLEMENT_FOLDER.IsDefault())
 		{
-			string_format path(_T("%%PortableRoot%%ProgramData\\%s"), WinMergeDocumentsFolder);
+			string_format path(_T("%%WinMergeRoot%%\\ProgramData\\%s"), WinMergeDocumentsFolder);
 			COptionsMgr::Set<String>(OPT_SUPPLEMENT_FOLDER, path);
 		}
 
@@ -354,7 +372,6 @@ int CMergeApp::DoMessageBox(LPCTSTR lpszPrompt, UINT nType, UINT nIDPrompt)
  */
 void CMergeApp::InitializeSupplements()
 {
-	SetEnvironmentVariable(_T("WinMergeRoot"), GetModulePath().c_str());
 	String supplementFolder = COptionsMgr::Get(OPT_SUPPLEMENT_FOLDER);
 	supplementFolder = env_ExpandVariables(supplementFolder.c_str());
 	if (!globalFileFilter.SetUserFilterPath(supplementFolder))
