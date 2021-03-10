@@ -381,6 +381,7 @@ bool CConfigLog::DoFile(bool writing, String &sError)
 	WriteVersionOf1(1, _T("WinIMerge\\WinIMergeLib.dll"), false);
 	WriteVersionOf1(1, _T("SQLiteCompare\\bin\\SQLiteCompare.exe"), false);
 	WriteVersionOf1(1, _T("ReoGridCompare\\bin\\ReoGridCompare.exe"), false);
+	WriteVersionOf1(1, _T("ToxyExtract\\bin\\ToxyExtract.exe"), false);
 	WriteVersionOf1(1, _T("B2XTranslator\\bin\\xls2x.exe"), false);
 
 	TCHAR path[MAX_PATH];

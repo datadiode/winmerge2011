@@ -156,7 +156,7 @@ for %%$ in (
 )
 
 REM Copy ToxyExtract
-set $=..\..\toxy\Toxy.Tools\ToxyExtract\bin\%4\;..\3rdparty\toxy\Toxy.Tools\ToxyExtract\bin\%4\
+set $=..\..\toxy\Toxy.Tools\ToxyExtract\bin\%4\net40\;..\3rdparty\toxy\Toxy.Tools\ToxyExtract\bin\%4\
 for %%$ in (
 	.
 ) do if not "%%~$$:$" == "" (

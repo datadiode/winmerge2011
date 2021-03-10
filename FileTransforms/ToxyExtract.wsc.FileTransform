@@ -5,6 +5,9 @@
 	<property name='ShowConsole'/>
 	<property name='ReadOnly'/>
 	<property name='Encoding'/>
+	<property name='Arguments'>
+		<put internalName='put_Arguments'/>
+	</property>
 </implements>
 
 <script language='vbs'>
@@ -14,13 +17,19 @@ Const ShowConsole = 0
 Const ReadOnly = True
 Const Encoding = "UTF-8"
 
+Dim options
+
 Dim sh
 Set sh = CreateObject("WScript.Shell")
+
+Sub put_Arguments(Arguments)
+	If Not IsEmpty(Arguments) Then Execute Arguments
+End Sub
 
 Function OpenTextFile(path)
 	path = Replace(path, "\\?\UNC\", "\\")
 	path = Replace(path, "\\?\", "")
-	Set OpenTextFile = sh.Exec("""%WinMergeRoot%\ToxyExtract\bin\ToxyExtract.exe"" """ & path & """").StdOut
+	Set OpenTextFile = sh.Exec("""%WinMergeRoot%\ToxyExtract\bin\ToxyExtract.exe"" " & options & " """ & path & """").StdOut
 End Function
 </script>
 </scriptlet>
