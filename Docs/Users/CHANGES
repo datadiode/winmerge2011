@@ -1,5 +1,12 @@
 [WinMergeTag]
 Changes since preceding release (not necessarily complete):
+• Upgrade to Toxy 1.6.0-datadiode-49-gc904104
+• Drop PortableRoot environment variable in favor of WinMergeRoot/WinMergeDrive
+• FileFilterHelper::SetUserFilterPath(): Resolve environment variables (#14)
+• ArchiveSupport: Support RAR5 (https://github.com/WinMerge/winmerge/issues/644)
+
+0.2011.211.110
+Changes since preceding release (not necessarily complete):
 • EditLib: Colorize some Markdown (unindented headings, comments, HTML islands)
 • EditLib: Adopt AutoIt parser from 2.16
 • Upgrade to ReoGrid 2.3.0.0-datadiode-180 for new LCS alignment feature
