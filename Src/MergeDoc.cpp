@@ -1378,13 +1378,7 @@ void CChildFrame::OnUpdateStatusNum()
 
 /**
  * @brief Build the diff array and prepare buffers accordingly (insert ghost lines, set WinMerge flags)
- *
- * @note Buffers may have different length after PrimeTextBuffers. Indeed, no
- * synchronization is needed after the last line. So no ghost line will be created
- * to face an ignored difference in the last line (typically : 'ignore blank lines'
- * + empty last line on one side).
- * If you feel that different length buffers are really strange, CHANGE FIRST
- * the last diff to take into account the empty last line.
+ * @note Buffers may have different length after PrimeTextBuffers() if last line lacks an EOL on one side.
  */
 void CChildFrame::PrimeTextBuffers()
 {
@@ -1403,8 +1397,8 @@ void CChildFrame::PrimeTextBuffers()
 	m_ptBuf[1]->RemoveAllGhostLines(LF_SKIPPED);
 	UINT lcount0 = m_ptBuf[0]->GetLineCount();
 	UINT lcount1 = m_ptBuf[1]->GetLineCount();
-// this ASSERT may be false because of empty last line (see function's note)
-//	ASSERT(lcount0new == lcount1new);
+	ASSERT(nContextLines != UINT_MAX || // neglect the case of limited context here as it can vary
+		lcount0new + m_diffWrapper.m_status.bLeftMissingNL == lcount1new + m_diffWrapper.m_status.bRightMissingNL);
 	m_ptBuf[0]->m_aLines.resize(lcount0new);
 	m_ptBuf[1]->m_aLines.resize(lcount1new);
 

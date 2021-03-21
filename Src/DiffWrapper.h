@@ -57,8 +57,8 @@ protected:
  */
 struct DIFFSTATUS
 {
-	BOOL bLeftMissingNL; /**< Left file is missing EOL before EOF */
-	BOOL bRightMissingNL; /**< Right file is missing EOL before EOF */
+	bool bLeftMissingNL; /**< Left file is missing EOL before EOF */
+	bool bRightMissingNL; /**< Right file is missing EOL before EOF */
 	bool bBinaries; /**< Files are binaries */
 	bool bIdentical; /**< diffutils said files are identical */
 	bool bPatchFileFailed; /**< Creating patch file failed */
