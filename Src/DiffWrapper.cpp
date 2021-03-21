@@ -497,63 +497,6 @@ bool CDiffWrapper::AddDiffRange(UINT begin0, UINT end0, UINT begin1, UINT end1, 
 }
 
 /**
- * @brief Expand last DIFFRANGE of file by one line to contain last line after EOL.
- * @param [in] leftBufferLines size of array pane left
- * @param [in] rightBufferLines size of array pane right
- * @param [in] bIgnoreBlankLines, if true we allways add a new diff and make as trivial
- */
-bool CDiffWrapper::FixLastDiffRange(int leftBufferLines, int rightBufferLines, bool bIgnoreBlankLines)
-{
-	// If one file has EOL before EOF and other not...
-	if (m_status.bLeftMissingNL != m_status.bRightMissingNL)
-	{
-		if (int const count = m_pDiffList->GetSize())
-		{
-			DIFFRANGE *dr = m_pDiffList->DiffRangeAt(count - 1);
-
-			if (m_status.bRightMissingNL)
-			{
-				if (dr->op == OP_RIGHTONLY)
-					dr->op = OP_DIFF;
-				++dr->end0;
-			}
-			else
-			{
-				if (dr->op == OP_LEFTONLY)
-					dr->op = OP_DIFF;
-				++dr->end1;
-			}
-		}
-		else
-		{
-			// we have to create the DIFF
-			DIFFRANGE dr;
-			dr.end0 = leftBufferLines - 1;
-			dr.end1 = rightBufferLines - 1;
-			if (m_status.bRightMissingNL)
-			{
-				dr.begin0 = dr.end0;
-				dr.begin1 = dr.end1 + 1;
-				dr.op = OP_LEFTONLY;
-			}
-			else
-			{
-				dr.begin0 = dr.end0 + 1;
-				dr.begin1 = dr.end1;
-				dr.op = OP_RIGHTONLY;
-			}
-			if (bIgnoreBlankLines)
-				dr.op = OP_TRIVIAL;
-			ASSERT(dr.begin0 == dr.begin1);
-
-			if (!AddDiffRange(dr.begin0, dr.end0, dr.begin1, dr.end1, dr.op))
-				return false;
-		}
-	}
-	return true;
-}
-
-/**
  * @brief Formats command-line for diff-engine last run (like it was called from command-line)
  */
 void CDiffWrapper::FormatSwitchString(struct comparison const *cmp, char *p)

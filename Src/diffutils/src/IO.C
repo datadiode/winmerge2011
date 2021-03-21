@@ -220,7 +220,7 @@ find_and_hash_each_line (struct comparison *cmp, struct file_data *current)
       /* Compute the equivalence class (hash) for this line.  */
 
       /* loops advance pointer to eol (end of line)
-         respecting UNIX (\r), MS-DOS/Windows (\r\n), and MAC (\r) eols */
+         respecting UNIX (\n), MS-DOS/Windows (\r\n), and MAC (\r) eols */
 
       /* Hash this line until we find a newline.  */
       /* Note that \r must be hashed (if !ignore_eol_diff) */
@@ -331,7 +331,8 @@ find_and_hash_each_line (struct comparison *cmp, struct file_data *current)
              complete line, put it into buckets[-1] so that it can
              compare equal only to the other file's incomplete line
              (if one exists).  */
-          bucket = &cmp->buckets[-1]; /* WinMerge: regardless of ig_white_space */
+          if (ig_white_space < IGNORE_TRAILING_SPACE)
+            bucket = &cmp->buckets[-1];
         }
 
       for (i = *bucket;  ;  i = eqs[i].next)
@@ -716,6 +717,19 @@ find_identical_ends (struct comparison *cmp)
       buffer0 = prepare_text (cmp, &cmp->file[0], 0);
       slurp (&cmp->file[1]);
       buffer1 = prepare_text (cmp, &cmp->file[1], 1);
+      /* If EOL was missing on one side, ensure same EOL type on both sides */
+      if (cmp->file[0].missing_newline != cmp->file[1].missing_newline)
+        {
+          int const other = cmp->file[0].missing_newline ? 1 : 0;
+          char *p = (char *)cmp->file[other].buffer + cmp->file[other].buffered;
+          if (*--p != '\n')
+            *p = '\n';
+          else if (p > (cmp->file[0].missing_newline ? buffer1 : buffer0) && *--p == '\r')
+            {
+              *p = '\n';
+              --cmp->file[other].buffered;
+            }
+        }
     }
   else
     {

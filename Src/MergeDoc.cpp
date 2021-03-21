@@ -518,16 +518,6 @@ int CChildFrame::Rescan2(bool &bIdentical)
 		m_ptBuf[0]->prepareForRescan();
 		m_ptBuf[1]->prepareForRescan();
 
-		// ..lasf DIFFRANGE of file which has EOL must be
-		// fixed to contain last line too
-		if (!m_diffWrapper.FixLastDiffRange(
-				m_ptBuf[0]->GetLineCount(),
-				m_ptBuf[1]->GetLineCount(),
-				m_diffWrapper.bIgnoreBlankLines))
-		{
-			nResult = RESCAN_FILE_ERR;
-		}
-
 		// Divide diff blocks to match lines.
 		if (COptionsMgr::Get(OPT_CMP_MATCH_SIMILAR_LINES))
 			AdjustDiffBlocks();
@@ -1558,9 +1548,8 @@ void CChildFrame::PrimeTextBuffers()
 		LineInfo &info1 = m_ptBuf[1]->m_aLines[i];
 		if (((info0.m_dwFlags | info1.m_dwFlags) & LF_WINMERGE_FLAGS) == 0)
 		{
-			int len = info0.Length();
-			if (len != info1.Length() ||
-				memcmp(info0.GetLine(), info1.GetLine(), len * sizeof(TCHAR)) != 0)
+			if (info0.Length() != info1.Length() || info0.HasEol() != info1.HasEol() ||
+				memcmp(info0.GetLine(), info1.GetLine(), info0.Length() * sizeof(TCHAR)) != 0)
 			{
 				info0.m_dwFlags |= LF_TRIVIAL;
 				info1.m_dwFlags |= LF_TRIVIAL;

@@ -344,9 +344,6 @@ void DiffList::AddExtraLinesCounts(
 	for (;;)
 	{
 		DIFFRANGE &curDiff = iter != iterEnd ? iter++->diffrange : endDiff;
-		// this guarantees that all the diffs are synchronized
-		// TODO: This assert has been observed to fire with a binary file misdetected as UCS2-LE
-		assert(curDiff.begin0 + nLeftLines == curDiff.begin1 + nRightLines);
 		if (bLimitedContext)
 		{
 			LineInfo *pli = NULL;
@@ -388,6 +385,9 @@ void DiffList::AddExtraLinesCounts(
 		}
 		if (&curDiff == &endDiff)
 			break;
+		// this guarantees that all the diffs are synchronized
+		// TODO: This assert has been observed to fire with a binary file misdetected as UCS2-LE
+		assert(curDiff.begin0 + nLeftLines == curDiff.begin1 + nRightLines);
 		end0 = curDiff.end0 + 1 + nContextLines;
 		end1 = curDiff.end1 + 1 + nContextLines;
 		UINT nline0 = end0 - curDiff.begin0;

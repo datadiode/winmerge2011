@@ -93,7 +93,6 @@ public:
 	bool RunFileDiff();
 	bool RunFileDiff(DiffFileData &, TextDefinition const * = NULL);
 	bool AddDiffRange(UINT begin0, UINT end0, UINT begin1, UINT end1, OP_TYPE op);
-	bool FixLastDiffRange(int leftBufferLines, int rightBufferLines, bool bIgnoreBlankLines);
 	MovedLines *GetMovedLines() { return m_pMovedLines; }
 	void SetCompareFiles(const String &OriginalFile1, const String &OriginalFile2);
 
