@@ -518,16 +518,6 @@ int CChildFrame::Rescan2(bool &bIdentical)
 		m_ptBuf[0]->prepareForRescan();
 		m_ptBuf[1]->prepareForRescan();
 
-		// ..lasf DIFFRANGE of file which has EOL must be
-		// fixed to contain last line too
-		if (!m_diffWrapper.FixLastDiffRange(
-				m_ptBuf[0]->GetLineCount(),
-				m_ptBuf[1]->GetLineCount(),
-				m_diffWrapper.bIgnoreBlankLines))
-		{
-			nResult = RESCAN_FILE_ERR;
-		}
-
 		// Divide diff blocks to match lines.
 		if (COptionsMgr::Get(OPT_CMP_MATCH_SIMILAR_LINES))
 			AdjustDiffBlocks();
@@ -1388,13 +1378,7 @@ void CChildFrame::OnUpdateStatusNum()
 
 /**
  * @brief Build the diff array and prepare buffers accordingly (insert ghost lines, set WinMerge flags)
- *
- * @note Buffers may have different length after PrimeTextBuffers. Indeed, no
- * synchronization is needed after the last line. So no ghost line will be created
- * to face an ignored difference in the last line (typically : 'ignore blank lines'
- * + empty last line on one side).
- * If you feel that different length buffers are really strange, CHANGE FIRST
- * the last diff to take into account the empty last line.
+ * @note Buffers may have different length after PrimeTextBuffers() if last line lacks an EOL on one side.
  */
 void CChildFrame::PrimeTextBuffers()
 {
@@ -1413,8 +1397,8 @@ void CChildFrame::PrimeTextBuffers()
 	m_ptBuf[1]->RemoveAllGhostLines(LF_SKIPPED);
 	UINT lcount0 = m_ptBuf[0]->GetLineCount();
 	UINT lcount1 = m_ptBuf[1]->GetLineCount();
-// this ASSERT may be false because of empty last line (see function's note)
-//	ASSERT(lcount0new == lcount1new);
+	ASSERT(nContextLines != UINT_MAX || // neglect the case of limited context here as it can vary
+		lcount0new + m_diffWrapper.m_status.bLeftMissingNL == lcount1new + m_diffWrapper.m_status.bRightMissingNL);
 	m_ptBuf[0]->m_aLines.resize(lcount0new);
 	m_ptBuf[1]->m_aLines.resize(lcount1new);
 
@@ -1558,9 +1542,8 @@ void CChildFrame::PrimeTextBuffers()
 		LineInfo &info1 = m_ptBuf[1]->m_aLines[i];
 		if (((info0.m_dwFlags | info1.m_dwFlags) & LF_WINMERGE_FLAGS) == 0)
 		{
-			int len = info0.Length();
-			if (len != info1.Length() ||
-				memcmp(info0.GetLine(), info1.GetLine(), len * sizeof(TCHAR)) != 0)
+			if (info0.Length() != info1.Length() || info0.HasEol() != info1.HasEol() ||
+				memcmp(info0.GetLine(), info1.GetLine(), info0.Length() * sizeof(TCHAR)) != 0)
 			{
 				info0.m_dwFlags |= LF_TRIVIAL;
 				info1.m_dwFlags |= LF_TRIVIAL;
