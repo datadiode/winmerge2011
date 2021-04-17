@@ -10,6 +10,8 @@
 LPSTR NTAPI EatPrefix(LPCSTR text, LPCSTR prefix);
 LPWSTR NTAPI EatPrefix(LPCWSTR text, LPCWSTR prefix);
 LPWSTR NTAPI EatPrefixTrim(LPCWSTR text, LPCWSTR prefix);
+LPTSTR NTAPI ScanProfileSectVer(LPTSTR);
+LPTSTR NTAPI DumpProfileSectVer(LPTSTR);
 
 String GetModulePath(HMODULE hModule = NULL);
 DWORD_PTR GetShellImageList();

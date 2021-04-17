@@ -6,6 +6,7 @@
  */
 #include "StdAfx.h"
 #include "coretools.h"
+#include "VersionData.h"
 #include "paths.h"
 
 /**
@@ -126,6 +127,44 @@ LPWSTR NTAPI EatPrefixTrim(LPCWSTR text, LPCWSTR prefix)
 {
 	LPWSTR const trim = EatPrefix(text, prefix);
 	return trim ? trim + StrSpn(trim, _T(" \t\r\n")) : NULL;
+}
+
+LPTSTR NTAPI ScanProfileSectVer(LPTSTR p)
+{
+	p = EatPrefix(p, _T("version="));
+	if (p == NULL)
+		return NULL;
+	if (_tcsicmp(p, _T("ignore")) != 0)
+	{
+		ULARGE_INTEGER version = { 0xFFFFFFFF, 0xFFFFFFFF };
+		do
+		{
+			version.QuadPart <<= 16;
+			version.QuadPart |= _tcstoul(p, &p, 10);
+		} while (*p && *p++ == _T('.'));
+		while (HIWORD(version.HighPart) == 0xFFFF)
+			version.QuadPart <<= 16;
+		if (VS_FIXEDFILEINFO const *const pVffInfo =
+			reinterpret_cast<const VS_FIXEDFILEINFO *>(CVersionData::Load()->Data()))
+		{
+			if (pVffInfo->dwFileVersionLS != version.LowPart ||
+				pVffInfo->dwFileVersionMS != version.HighPart)
+			{
+				return NULL;
+			}
+		}
+	}
+	return p + _tcslen(p) + 1;
+}
+
+LPTSTR NTAPI DumpProfileSectVer(LPTSTR p)
+{
+	if (LPCWSTR const version = CVersionData::Load()->
+		Find(L"StringFileInfo")->First()->Find(L"FileVersion")->Data())
+	{
+		p += wsprintf(p, _T("version=%ls"), version) + 1;
+	}
+	return p;
 }
 
 HANDLE NTAPI RunIt(LPCTSTR szExeFile, LPCTSTR szArgs, LPCTSTR szDir, HANDLE *phReadPipe, WORD wShowWindow)

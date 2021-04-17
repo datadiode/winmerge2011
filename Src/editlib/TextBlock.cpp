@@ -6,7 +6,6 @@
 #include "StdAfx.h"
 #include "TextBlock.h"
 #include "coretools.h"
-#include "VersionData.h"
 
  // Tabsize is commented out since we have only GUI setting for it now.
  // Not removed because we may later want to have per-filetype settings again.
@@ -63,30 +62,9 @@ int const TextDefinition::m_SourceDefsCount = _countof(m_StaticSourceDefs);
 
 BOOL TextDefinition::ScanParserAssociations(LPTSTR p)
 {
-	p = EatPrefix(p, _T("version="));
+	p = ScanProfileSectVer(p);
 	if (p == NULL)
 		return FALSE;
-	if (_tcsicmp(p, _T("ignore")) != 0)
-	{
-		ULARGE_INTEGER version = { 0xFFFFFFFF, 0xFFFFFFFF };
-		do
-		{
-			version.QuadPart <<= 16;
-			version.QuadPart |= _tcstoul(p, &p, 10);
-		} while (*p && *p++ == _T('.'));
-		while (HIWORD(version.HighPart) == 0xFFFF)
-			version.QuadPart <<= 16;
-		if (VS_FIXEDFILEINFO const *const pVffInfo =
-			reinterpret_cast<const VS_FIXEDFILEINFO *>(CVersionData::Load()->Data()))
-		{
-			if (pVffInfo->dwFileVersionLS != version.LowPart ||
-				pVffInfo->dwFileVersionMS != version.HighPart)
-			{
-				return FALSE;
-			}
-		}
-	}
-	p += _tcslen(p) + 1;
 	TextDefinition *defs = new TextDefinition[_countof(m_StaticSourceDefs)];
 	memcpy(defs, m_StaticSourceDefs, sizeof m_StaticSourceDefs);
 	m_SourceDefs = defs;
@@ -135,11 +113,7 @@ BOOL TextDefinition::ScanParserAssociations(LPTSTR p)
 
 void TextDefinition::DumpParserAssociations(LPTSTR p)
 {
-	if (LPCWSTR version = CVersionData::Load()->
-		Find(L"StringFileInfo")->First()->Find(L"FileVersion")->Data())
-	{
-		p += wsprintf(p, _T("version=%ls"), version) + 1;
-	}
+	p = DumpProfileSectVer(p);
 	for (int i = 0; i < _countof(m_StaticSourceDefs); ++i)
 	{
 		TextDefinition const &def = m_SourceDefs[i];
