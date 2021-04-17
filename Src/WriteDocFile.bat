@@ -1,7 +1,8 @@
-setlocal EnableDelayedExpansion
+setlocal
 
 for /f "tokens=1,* delims=:" %%A in ('findstr /n $ %1') do (
   set line=%%B
+  setlocal EnableDelayedExpansion
   if not "!line!"=="" (
     set line=!line:[WinMergeTag]=%WinMergeTag%!
     set line=!line:[WinMergeCommitHash]=%GIT_DESCRIBE:~-40%!
@@ -17,4 +18,5 @@ for /f "tokens=1,* delims=:" %%A in ('findstr /n $ %1') do (
     set line=!line:[jqTag]=%jqTag%!
   )
   echo.!line!
+  endlocal
 )

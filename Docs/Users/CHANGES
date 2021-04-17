@@ -1,5 +1,7 @@
 [WinMergeTag]
 Changes since preceding release (not necessarily complete):
+• ArchiveSupport: Fix undefined behavior in low-memory situations (from 2.16)
+• Mess with lack of EOL on last line (#15)
 • Upgrade to Toxy 1.6.0-datadiode-49-gc904104
 • Drop PortableRoot environment variable in favor of WinMergeRoot/WinMergeDrive
 • FileFilterHelper::SetUserFilterPath(): Resolve environment variables (#14)

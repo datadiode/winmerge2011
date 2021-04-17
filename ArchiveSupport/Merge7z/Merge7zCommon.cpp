@@ -142,6 +142,7 @@ static HMODULE DllProxyHelper(LPCSTR *proxy, ...)
 HRESULT Format7zDLL::Interface::CreateObject(const GUID *interfaceID, void **outObject)
 {
 	PROPVARIANT value;
+	VariantInit((VARIANT *)&value);
 	HRESULT result = proxy->GetHandlerProperty(NArchive::NHandlerPropID::kClassID, &value);
 	if SUCCEEDED(result)
 	{
