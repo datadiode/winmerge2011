@@ -18,6 +18,8 @@ JSON Sorted = script:\FileTransforms\jq.wsc?options='--sort-keys'
 Protobuf Schema = script:\FileTransforms\protodec.wsc?options='--schema'
 Protobuf Content = script:\FileTransforms\protodec.wsc?options='--print'
 XML Ordenado = script:\FileTransforms\msxml.wsc?transform='\FileTransforms\msxml-sort.xslt'
+XML Less Sorted = script:\FileTransforms\msxml.wsc?options='--sort-attributes alpha'
+XML More Sorted = script:\FileTransforms\msxml.wsc?transform='\FileTransforms\msxml-sort.xslt':options='--sort-attributes alpha'
 Astyle Código Fonte Formatado = script:\FileTransforms\astyle.wsc?optfile='\FileTransforms\astyle.opt'
 Diga a partir da extensão do ficheiro = mapping:%SupplementFolder%\Supplement.ini?FileTransforms
 

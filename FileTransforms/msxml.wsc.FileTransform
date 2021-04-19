@@ -21,16 +21,27 @@ Const TidyCmdLine = """%WinMergeRoot%\tidy.exe"" -xml --char-encoding raw -inden
 Dim sh
 Set sh = CreateObject("WScript.Shell")
 
+Function LoadXml(path)
+	Dim xml
+	Set LoadXml = Nothing
+	If IsEmpty(path) Then Exit Function
+	Set xml = CreateObject(MsxmlProgID)
+	path = Replace(path, "\\?\UNC\", "\\")
+	path = Replace(path, "\\?\", "")
+	If xml.load(path) Then Set LoadXml = xml
+End Function
+
 Function OpenTextFile(path)
-	Dim doc, xslt, tidy, transform
-	Execute Arguments
-	Set doc = CreateObject(MsxmlProgID)
-	Set xslt = CreateObject(MsxmlProgID)
-	If xslt.load(transform) And doc.load(path) Then
-		Set tidy = sh.Exec(TidyCmdLine)
+	Dim doc, xslt, tidy, transform, options
+	If Not IsEmpty(Arguments) Then Execute Arguments
+	Set doc = Nothing
+	Set xslt = LoadXml(transform)
+	If Not xslt Is Nothing Then Set doc = LoadXml(path)
+	If Not doc Is Nothing Then
+		Set tidy = sh.Exec(TidyCmdLine & " " & options)
 		tidy.StdIn.Write doc.transformNode(xslt)
 	Else
-		Set tidy = sh.Exec(TidyCmdLine & " --sort-attributes alpha """ & path & """")
+		Set tidy = sh.Exec(TidyCmdLine & " " & options & " """ & path & """")
 	End If
 	Set OpenTextFile = tidy.StdOut
 End Function
