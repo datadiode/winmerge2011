@@ -1,7 +1,7 @@
 /**
- * @file  PropCompareImage.cpp
+ * @file  PropLexers.cpp
  *
- * @brief Implementation of PropCompareImage propertysheet
+ * @brief Implementation of PropLexers propertysheet
  */
 #include "stdafx.h"
 #include "OptionsPanel.h"

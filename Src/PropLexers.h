@@ -1,7 +1,7 @@
 /**
- * @file  PropCompareImage.h
+ * @file  PropLexers.h
  *
- * @brief Declaration of PropCompareImage propertysheet
+ * @brief Declaration of PropLexers propertysheet
  */
 
 /**
@@ -20,13 +20,10 @@ public:
 
 // Implementation
 protected:
-	template<DDX_Operation>
-			bool UpdateData();
 	virtual BOOL OnInitDialog() override;
 	virtual LRESULT WindowProc(UINT, WPARAM, LPARAM);
 	LRESULT OnNotify(NMHDR *);
 	void OnDefaults();
-	void OnLvnKeydown(NMHDR *);
 	void OnLvnItemactivate(NMHDR *);
 
 	HListView *m_pLv;
