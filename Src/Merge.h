@@ -73,6 +73,7 @@ public:
 	int ExitInstance(HRESULT);
 	int DoMessageBox(LPCTSTR lpszPrompt, UINT nType = MB_OK, UINT nIDPrompt = 0);
 
+	static void DumpFileTransformDefaults(LPTSTR);
 	static void InitializeSupplements();
 	// End MergeArgs.cpp
 

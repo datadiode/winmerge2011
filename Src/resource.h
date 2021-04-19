@@ -66,6 +66,7 @@
 #define IDD_PROPPAGE_LEXERS                     244
 #define IDD_PROPPAGE_COMPARE_SQLITE             245
 #define IDD_PROPPAGE_COMPARE_REOGRID            246
+#define IDD_PROPPAGE_FILETRANSFORMS             247
 #define IDI_ROTATE2                             302
 #define IDR_SPLASH                              308
 #define IDB_TOOLBAR_ENABLED                     311
@@ -146,10 +147,12 @@
 #define IDC_LEFT_BUTTON                         1001
 #define IDC_LFILTER_EDIT                        1001
 #define IDC_LV_LEXERS                           1001
+#define IDC_LV_FILETRANSFORMS                   1001
 #define IDC_TV_CLEARCASE_TYPEMGR_SETUP          1001
 #define IDC_FLDCONFIRM_IGNORE_FOLDER_STRUCTURE  1002
 #define IDC_LEFT_COMBO                          1002
 #define IDC_LEXERS_DEFAULTS                     1002
+#define IDC_FILETRANSFORMS_DEFAULTS             1002
 #define IDC_RIGHT_EDIT                          1002
 #define IDC_COMPARE_CACHE_RESULTS               1003
 #define IDC_RIGHT_BUTTON                        1003
@@ -562,6 +565,8 @@
 #define ID_COMPMETHOD_SIZE                      16437
 #define IDS_LEXERS_LEXERTITLE                   16438
 #define IDS_LEXERS_FILETYPESTITLE               16439
+#define IDS_FILETRANSFORMS_TYPETITLE            16440
+#define IDS_FILETRANSFORMS_METHTITLE            16441
 #define IDS_FILTERFILE_NAMETITLE                16448
 #define IDS_FILTERFILE_PATHTITLE                16449
 #define IDS_FILTER_TITLE                        16450

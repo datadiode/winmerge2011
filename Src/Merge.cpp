@@ -367,6 +367,57 @@ int CMergeApp::DoMessageBox(LPCTSTR lpszPrompt, UINT nType, UINT nIDPrompt)
 	return nResult;
 }
 
+void CMergeApp::DumpFileTransformDefaults(LPTSTR p)
+{
+	static const TCHAR defaults[] =
+		// Powerpoint2007TextParser
+		_T("pptx = script:\\FileTransforms\\ToxyExtract.wsc\0")
+		// Toxy: Word2003DocumentParser
+		_T("doc = script:\\FileTransforms\\ToxyExtract.wsc\0")
+		// Word2007TextParser
+		_T("docx = script:\\FileTransforms\\ToxyExtract.wsc\0")
+		// PDFTextParser
+		_T("pdf = script:\\FileTransforms\\ToxyExtract.wsc\0")
+		// EMLTextParser
+		_T("eml = script:\\FileTransforms\\ToxyExtract.wsc\0")
+		_T("cnm = script:\\FileTransforms\\ToxyExtract.wsc\0")
+		// MsgTextParser
+		_T("msg = script:\\FileTransforms\\ToxyExtract.wsc\0")
+		// VCardTextParser
+		_T("vcf = script:\\FileTransforms\\ToxyExtract.wsc\0")
+		// AudioMetadataParser
+		_T("mp3 = script:\\FileTransforms\\ToxyExtract.wsc?options='/metadata'\0")
+		_T("ape = script:\\FileTransforms\\ToxyExtract.wsc?options='/metadata'\0")
+		_T("wma = script:\\FileTransforms\\ToxyExtract.wsc?options='/metadata'\0")
+		_T("flac = script:\\FileTransforms\\ToxyExtract.wsc?options='/metadata'\0")
+		_T("aif = script:\\FileTransforms\\ToxyExtract.wsc?options='/metadata'\0")
+		_T("ogg = script:\\FileTransforms\\ToxyExtract.wsc?options='/metadata'\0")
+		_T("mpc = script:\\FileTransforms\\ToxyExtract.wsc?options='/metadata'\0")
+		_T("aac = script:\\FileTransforms\\ToxyExtract.wsc?options='/metadata'\0")
+		_T("m4a = script:\\FileTransforms\\ToxyExtract.wsc?options='/metadata'\0")
+		_T("m4v = script:\\FileTransforms\\ToxyExtract.wsc?options='/metadata'\0")
+		_T("avi = script:\\FileTransforms\\ToxyExtract.wsc?options='/metadata'\0")
+		// Visual Studio project files (just for suggestion, therefore outcommented by default)
+		_T("#~ csproj = script:\\FileTransforms\\msxml.wsc?transform='\\FileTransforms\\msxml-sort.xslt'\0")
+		_T("#~ csproj = script:\\FileTransforms\\msxml.wsc?options='--sort-attributes alpha'\0")
+		_T("#~ csproj = script:\\FileTransforms\\msxml.wsc?transform='\\FileTransforms\\msxml-sort.xslt':options='--sort-attributes alpha'\0")
+		_T("#~ props = script:\\FileTransforms\\msxml.wsc?transform='\\FileTransforms\\msxml-sort.xslt'\0")
+		_T("#~ props = script:\\FileTransforms\\msxml.wsc?options='--sort-attributes alpha'\0")
+		_T("#~ props = script:\\FileTransforms\\msxml.wsc?transform='\\FileTransforms\\msxml-sort.xslt':options='--sort-attributes alpha'\0")
+		_T("#~ targets = script:\\FileTransforms\\msxml.wsc?transform='\\FileTransforms\\msxml-sort.xslt'\0")
+		_T("#~ targets = script:\\FileTransforms\\msxml.wsc?options='--sort-attributes alpha'\0")
+		_T("#~ targets = script:\\FileTransforms\\msxml.wsc?transform='\\FileTransforms\\msxml-sort.xslt':options='--sort-attributes alpha'\0")
+		_T("#~ vcproj = script:\\FileTransforms\\msxml.wsc?transform='\\FileTransforms\\msxml-sort.xslt'\0")
+		_T("#~ vcproj = script:\\FileTransforms\\msxml.wsc?options='--sort-attributes alpha'\0")
+		_T("#~ vcproj = script:\\FileTransforms\\msxml.wsc?transform='\\FileTransforms\\msxml-sort.xslt':options='--sort-attributes alpha'\0")
+		_T("#~ vcxproj = script:\\FileTransforms\\msxml.wsc?transform='\\FileTransforms\\msxml-sort.xslt'\0")
+		_T("#~ vcxproj = script:\\FileTransforms\\msxml.wsc?options='--sort-attributes alpha'\0")
+		_T("#~ vcxproj = script:\\FileTransforms\\msxml.wsc?transform='\\FileTransforms\\msxml-sort.xslt':options='--sort-attributes alpha'\0");
+
+	p = DumpProfileSectVer(p);
+	memcpy(p, defaults, sizeof defaults);
+}
+
 /**
  * @brief Read various settings from Supplement.ini
  */
@@ -459,41 +510,7 @@ void CMergeApp::InitializeSupplements()
 	if (!GetPrivateProfileSection(_T("FileTransforms"), buffer, _countof(buffer), ini.c_str()) ||
 		!ScanProfileSectVer(buffer))
 	{
-		static const TCHAR defaults[] =
-			// Powerpoint2007TextParser
-			_T("pptx = script:\\FileTransforms\\ToxyExtract.wsc\0")
-			// Toxy: Word2003DocumentParser
-			_T("doc = script:\\FileTransforms\\ToxyExtract.wsc\0")
-			// Word2007TextParser
-			_T("docx = script:\\FileTransforms\\ToxyExtract.wsc\0")
-			// PDFTextParser
-			_T("pdf = script:\\FileTransforms\\ToxyExtract.wsc\0")
-			// EMLTextParser
-			_T("eml = script:\\FileTransforms\\ToxyExtract.wsc\0")
-			_T("cnm = script:\\FileTransforms\\ToxyExtract.wsc\0")
-			// MsgTextParser
-			_T("msg = script:\\FileTransforms\\ToxyExtract.wsc\0")
-			// VCardTextParser
-			_T("vcf = script:\\FileTransforms\\ToxyExtract.wsc\0")
-			// AudioMetadataParser
-			_T("mp3 = script:\\FileTransforms\\ToxyExtract.wsc?options='/metadata'\0")
-			_T("ape = script:\\FileTransforms\\ToxyExtract.wsc?options='/metadata'\0")
-			_T("wma = script:\\FileTransforms\\ToxyExtract.wsc?options='/metadata'\0")
-			_T("flac = script:\\FileTransforms\\ToxyExtract.wsc?options='/metadata'\0")
-			_T("aif = script:\\FileTransforms\\ToxyExtract.wsc?options='/metadata'\0")
-			_T("ogg = script:\\FileTransforms\\ToxyExtract.wsc?options='/metadata'\0")
-			_T("mpc = script:\\FileTransforms\\ToxyExtract.wsc?options='/metadata'\0")
-			_T("aac = script:\\FileTransforms\\ToxyExtract.wsc?options='/metadata'\0")
-			_T("m4a = script:\\FileTransforms\\ToxyExtract.wsc?options='/metadata'\0")
-			_T("m4v = script:\\FileTransforms\\ToxyExtract.wsc?options='/metadata'\0")
-			_T("avi = script:\\FileTransforms\\ToxyExtract.wsc?options='/metadata'\0")
-			// Visual Studio project files (just for suggestion, therefore outcommented by default)
-			_T("#~ csproj = script:\\FileTransforms\\msxml.wsc?transform='\\FileTransforms\\msxml-sort.xslt'\0")
-			_T("#~ props = script:\\FileTransforms\\msxml.wsc?transform='\\FileTransforms\\msxml-sort.xslt'\0")
-			_T("#~ targets = script:\\FileTransforms\\msxml.wsc?transform='\\FileTransforms\\msxml-sort.xslt'\0")
-			_T("#~ vcproj = script:\\FileTransforms\\msxml.wsc?transform='\\FileTransforms\\msxml-sort.xslt'\0")
-			_T("#~ vcxproj = script:\\FileTransforms\\msxml.wsc?transform='\\FileTransforms\\msxml-sort.xslt'\0");
-		memcpy(DumpProfileSectVer(buffer), defaults, sizeof defaults);
+		DumpFileTransformDefaults(buffer);
 		WritePrivateProfileSection(_T("FileTransforms"), buffer, ini.c_str());
 	}
 	// Initialize modelines support
