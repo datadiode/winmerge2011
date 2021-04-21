@@ -375,6 +375,11 @@ void CDiffWrapper::SetAlternativePaths(const String &altPath1, const String &alt
 	}
 }
 
+namespace msvcrt
+{
+	extern "C" _CRTIMP int __cdecl _topen(const TCHAR *, int, ...);
+}
+
 bool CDiffWrapper::RunFileDiff(DiffFileData &diffdata, TextDefinition const *pTextDefinition)
 {
 	SetToDiffUtils(diffdata);
@@ -397,17 +402,34 @@ bool CDiffWrapper::RunFileDiff(DiffFileData &diffdata, TextDefinition const *pTe
 	// debugging aid. Sometimes it is very useful to see
 	// what differences diff-engine sees!
 #ifdef _DEBUG
-	// throw the diff into a temp file
-	String sTempPath = env_GetTempPath(); // get path to Temp folder
-	String path = paths_ConcatPath(sTempPath, _T("Diff.txt"));
-
-	diffdata.outfile = _tfopen(path.c_str(), _T("w+"));
-	if (diffdata.outfile != NULL)
+	if (m_sPatchFile.empty())
 	{
-		struct file_cursor cursors[_countof(diffdata.file)];
-		print_normal_script(&diffdata, cursors, script);
-		fclose(diffdata.outfile);
-		diffdata.outfile = NULL;
+		// We are comparing from buffers, so expect dummy file descriptors
+		ASSERT(diffdata.file[0].desc == 0 && diffdata.file[1].desc == 1);
+		// throw the diff into a temp file
+		String sTempPath = env_GetTempPath(); // get path to Temp folder
+		String path = paths_ConcatPath(sTempPath, _T("Diff.txt"));
+		diffdata.outfile = _tfopen(path.c_str(), _T("w+"));
+		if (diffdata.outfile != NULL)
+		{
+			path = paths_ConcatPath(sTempPath, _T("1st.txt"));
+			diffdata.file[0].desc = msvcrt::_topen(path.c_str(), O_RDWR | O_BINARY | O_CREAT | O_TRUNC, _S_IREAD | _S_IWRITE);
+			_write(diffdata.file[0].desc, diffdata.file[0].buffer, diffdata.file[0].buffered);
+			_lseek(diffdata.file[0].desc, 0, SEEK_SET);
+			path = paths_ConcatPath(sTempPath, _T("2nd.txt"));
+			diffdata.file[1].desc = msvcrt::_topen(path.c_str(), O_RDWR | O_BINARY | O_CREAT | O_TRUNC, _S_IREAD | _S_IWRITE);
+			_write(diffdata.file[1].desc, diffdata.file[1].buffer, diffdata.file[1].buffered);
+			_lseek(diffdata.file[1].desc, 0, SEEK_SET);
+			struct file_cursor cursors[_countof(diffdata.file)];
+			print_normal_script(&diffdata, cursors, script);
+			_close(diffdata.file[0].desc);
+			_close(diffdata.file[1].desc);
+			fclose(diffdata.outfile);
+			diffdata.outfile = NULL;
+			// Restore dummy file descriptors
+			diffdata.file[0].desc = 0;
+			diffdata.file[1].desc = 1;
+		}
 	}
 #endif
 
