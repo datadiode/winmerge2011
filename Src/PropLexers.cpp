@@ -32,7 +32,7 @@ PropLexers::PropLexers()
 BOOL PropLexers::OnInitDialog()
 {
 	m_pLv = static_cast<HListView *>(GetDlgItem(IDC_LV_LEXERS));
-	m_pLv->SetExtendedStyle(LVS_EX_FULLROWSELECT);
+	m_pLv->SetExtendedStyle(LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP);
 	m_pLv->InsertColumn(0, LanguageSelect.LoadString(IDS_LEXERS_LEXERTITLE).c_str());
 	m_pLv->InsertColumn(1, LanguageSelect.LoadString(IDS_LEXERS_FILETYPESTITLE).c_str());
 	for (int i = 0; i < TextDefinition::m_SourceDefsCount; ++i)

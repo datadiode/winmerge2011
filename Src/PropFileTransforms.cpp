@@ -64,7 +64,7 @@ void PropFileTransforms::Scan(LPTSTR p)
 BOOL PropFileTransforms::OnInitDialog()
 {
 	m_pLv = static_cast<HListView *>(GetDlgItem(IDC_LV_LEXERS));
-	m_pLv->SetExtendedStyle(LVS_EX_FULLROWSELECT | LVS_EX_CHECKBOXES);
+	m_pLv->SetExtendedStyle(LVS_EX_FULLROWSELECT | LVS_EX_CHECKBOXES | LVS_EX_INFOTIP);
 	m_pLv->InsertColumn(0, LanguageSelect.LoadString(IDS_FILETRANSFORMS_TYPETITLE).c_str());
 	m_pLv->InsertColumn(1, LanguageSelect.LoadString(IDS_FILETRANSFORMS_METHTITLE).c_str());
 	String supplementFolder = COptionsMgr::Get(OPT_SUPPLEMENT_FOLDER);
