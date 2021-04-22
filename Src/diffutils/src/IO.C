@@ -718,7 +718,8 @@ find_identical_ends (struct comparison *cmp)
       slurp (&cmp->file[1]);
       buffer1 = prepare_text (cmp, &cmp->file[1], 1);
       /* If EOL was missing on one side, ensure same EOL type on both sides */
-      if (cmp->file[0].missing_newline != cmp->file[1].missing_newline)
+      if (cmp->file[0].buffered != 0 && cmp->file[1].buffered != 0 &&
+          cmp->file[0].missing_newline != cmp->file[1].missing_newline)
         {
           int const other = cmp->file[0].missing_newline ? 1 : 0;
           char *p = (char *)cmp->file[other].buffer + cmp->file[other].buffered;
