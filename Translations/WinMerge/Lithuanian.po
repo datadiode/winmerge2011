@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WinMerge\n"
 "Report-Msgid-Bugs-To: https://bugs.winmerge.org/\n"
-"POT-Creation-Date: 2021-02-13 19:33+0000\n"
-"PO-Revision-Date: 2021-02-15 14:15+0200\n"
+"POT-Creation-Date: 2021-04-21 07:03+0000\n"
+"PO-Revision-Date: 2021-04-22 06:50+0200\n"
 "Last-Translator: Tichij <tichij@mail.com>\n"
 "Language-Team: Lithuanian <winmerge-translate@lists.sourceforge.net>\n"
 "Language: lt\n"
@@ -2465,7 +2465,7 @@ msgstr "Lekseriø"
 #: Merge.rc:1576
 #, c-format
 msgid "File Transforms"
-msgstr ""
+msgstr "Failø transformavimo"
 
 #: Merge.rc:1587
 #, c-format
@@ -3911,12 +3911,12 @@ msgstr "Failø tipai"
 #: Merge.rc:2165
 #, c-format
 msgid "File type"
-msgstr ""
+msgstr "Failo tipas"
 
 #: Merge.rc:2166
 #, c-format
 msgid "Transform method"
-msgstr ""
+msgstr "Transformavimo metodas"
 
 #: Merge.rc:2167
 #, c-format
@@ -5261,9 +5261,9 @@ msgid ""
 " With the current options, they will be unified to the main type.\n"
 " Do you want to change the options and preserve the different EOL ?"
 msgstr ""
-"Faile '%1' yra skirtingø eilutës pabaigos tipø (Windows/Unix/Mac).\n"
-"Remiantis dabartinëmis nuostatomis, jos bus suvienodintos su pagrindiniu tipu.\n"
-"Ar norite pakeisti parametrus ir iðlaikyti skirtingus eilutës pabaigos tipus ?"
+"Faile '%1' yra skirtingø eilutës pabaigos formatø (Windows/Unix/Mac).\n"
+"Remiantis dabartinëmis nuostatomis, jie bus suvienodinti su pagrindiniu formatu.\n"
+"Ar norite pakeisti parametrus ir iðlaikyti skirtingus eilutës pabaigos formatus ?"
 
 #: Merge.rc:2397
 #, c-format
@@ -6200,7 +6200,7 @@ msgstr "„ReoGrid“ atpaþásta tik dalá „Excel“ failuose esanèio turinio\nbei áraðo
 #: Merge.rc:2554
 #, c-format
 msgid "ReoGrid might not preserve whitespace outside of values parsed from separator-delimited files.\nTherefore, beware of the potential loss of whitespace when saving back files."
-msgstr "„Reogrid“ gali neiðlaikyti uþ reikðmiø ribø esanèiø tarpø, iðtrauktø ið skyrikliais atskirtø failø.\nTodël saugokitës galimo tarpø praradimo iðsaugant failus atgal. "
+msgstr "„Reogrid“ gali neiðlaikyti uþ reikðmiø ribø esanèiø tarpø, iðtrauktø ið skyrikliais atskirtø failø.\nTodël saugokitës galimo tarpø praradimo iðsaugant failus atgal."
 
 #: Merge.rc:2555
 #, c-format
