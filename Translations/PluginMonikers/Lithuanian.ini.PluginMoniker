@@ -14,12 +14,12 @@ GEDCOM = script:\FileTransforms\gedcom.wsc
 Numeruotos eilutës = script:\FileTransforms\LinesNumbered.wsc
 Rikiuotos eilutës = script:\FileTransforms\LinesSorted.wsc
 JSON = script:\FileTransforms\jq.wsc
-Rikiuotas JSON = script:\FileTransforms\jq.wsc?options='--sort-keys'
+JSON rikiuotas = script:\FileTransforms\jq.wsc?options='--sort-keys'
 Protobuf schema = script:\FileTransforms\protodec.wsc?options='--schema'
 Protobuf turinys = script:\FileTransforms\protodec.wsc?options='--print'
-Rikiuotas XML = script:\FileTransforms\msxml.wsc?transform='\FileTransforms\msxml-sort.xslt'
-XML Less Sorted = script:\FileTransforms\msxml.wsc?options='--sort-attributes alpha'
-XML More Sorted = script:\FileTransforms\msxml.wsc?transform='\FileTransforms\msxml-sort.xslt':options='--sort-attributes alpha'
+XML rikiuotas = script:\FileTransforms\msxml.wsc?transform='\FileTransforms\msxml-sort.xslt'
+XML maþiau rikiuotas = script:\FileTransforms\msxml.wsc?options='--sort-attributes alpha'
+XML daugiau rikiuotas = script:\FileTransforms\msxml.wsc?transform='\FileTransforms\msxml-sort.xslt':options='--sort-attributes alpha'
 Astyle formato pirminis programos tekstas = script:\FileTransforms\astyle.wsc?optfile='\FileTransforms\astyle.opt'
 Spëti ið failo vardo plëtinio = mapping:%SupplementFolder%\Supplement.ini?FileTransforms
 
