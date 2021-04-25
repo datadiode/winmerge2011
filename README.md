@@ -5,10 +5,10 @@ whose development is driven forward with enthusiasm. Development of WinMerge 201
 ### November 2020 brings new features to WinMerge 2011
 
 ![SQLite Compare integrated into WinMerge GUI](Screenshots/SQLiteCompareHostedInWinMerge2011.png)  
-*SQLite 3 database file comparison powered by [SQLite Compare](https://github.com/datadiode/SQLiteCompare)*
+<sup>*SQLite 3 database file comparison powered by [SQLite Compare](https://github.com/datadiode/SQLiteCompare)*</sup>
 
 ![ReoGrid Compare integrated into WinMerge GUI](Screenshots/ReoGridCompareHostedInWinMerge2011.png)  
-*Excel .xlsx file comparison powered by [ReoGrid](https://github.com/datadiode/ReoGrid)*
+<sup>*Excel .xlsx file comparison powered by [ReoGrid](https://github.com/datadiode/ReoGrid)*</sup>
 
 ### Installers
 WinMerge 2011 installers come in the form of .CPL files, because .EXE files seem to be more prone to DLL injection attacks. You can also opt to extract the contained files using 7-Zip, in which case the application will maintain its settings in a .json file rather than in the Windows Registry (unless you prevent this by deleting the .json file after extraction).
