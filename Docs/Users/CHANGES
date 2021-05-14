@@ -1,6 +1,6 @@
 [WinMergeTag]
 Changes since preceding release (not necessarily complete):
-• Upgrade to ReoGrid 3.0.0.0-datadiode-010 for fixes in frozen region handling
+• Upgrade to ReoGrid 3.0.0.0-datadiode-013 for fixes in frozen region handling
 • DiffWrapper.cpp: Fix debug-only code which writes a diff file to aid debugging
 • Add Options page to control Compare As > Tell from filename extension behavior
 • msxml.wsc: Offer options Less/More Sorted to only/also sort attributes by name
