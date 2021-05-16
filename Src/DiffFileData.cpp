@@ -59,7 +59,9 @@ void *DiffFileData::AllocBuffer(int i, size_t len, size_t alloc_extra)
 	file[i].desc = i;
 	file[i].name = allocated_buffer_name;
 	file[i].buffered = len;
-	len += (alloc_extra & len / 2) + sizeof(word) + 1;
+	// Allocate 50% extra room for a necessary transcoding to UTF-8.
+	// Allocate enough room for appended newline and sentinel.
+	len += (alloc_extra & len / 2) + sizeof(word) + 2;
 	file[i].bufsize = len;
 	void *buffer = malloc(len);
 	file[i].buffer = static_cast<word *>(buffer);

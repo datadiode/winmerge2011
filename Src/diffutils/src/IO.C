@@ -159,7 +159,7 @@ slurp (struct file_data *current)
                      Allocate at least one block, to prevent overrunning the buffer
                      when comparing growing binary files. */
                   current->bufsize = MAX (current->bufsize,
-                                          (size_t) current->stat.st_size + (alloc_extra & (size_t) current->stat.st_size / 2) + sizeof (word) + 1);
+                                          (size_t) current->stat.st_size + (alloc_extra & (size_t) current->stat.st_size / 2) + sizeof (word) + 2);
                 }
               else
                 {
@@ -172,7 +172,7 @@ slurp (struct file_data *current)
         }
       /* Allocate 50% extra room for a necessary transcoding to UTF-8.
          Allocate enough room for appended newline and sentinel. */
-      current->bufsize = current->buffered + (alloc_extra & current->buffered / 2) + sizeof (word) + 1;
+      current->bufsize = current->buffered + (alloc_extra & current->buffered / 2) + sizeof (word) + 2;
       current->buffer = (word *) xrealloc (current->buffer, current->bufsize);
     }
 }
@@ -677,7 +677,8 @@ prepare_text (struct comparison *cmp, struct file_data *current, short side)
     }
 
   /* Don't use uninitialized storage when planting or using sentinels.  */
-  *(word *)(p + buffered) = 0;
+  /* One extra byte to allow to later prepend an added newline with \r  */
+  memset(p + buffered, 0, sizeof(word) + 1);
   return t;
 }
 
@@ -721,14 +722,31 @@ find_identical_ends (struct comparison *cmp)
       if (cmp->file[0].buffered != 0 && cmp->file[1].buffered != 0 &&
           cmp->file[0].missing_newline != cmp->file[1].missing_newline)
         {
-          int const other = cmp->file[0].missing_newline ? 1 : 0;
-          char *p = (char *)cmp->file[other].buffer + cmp->file[other].buffered;
-          if (*--p != '\n')
-            *p = '\n';
-          else if (p > (cmp->file[0].missing_newline ? buffer1 : buffer0) && *--p == '\r')
+          int i;
+          char *p, *q, *buffer;
+          if (cmp->file[0].missing_newline)
+            {
+              i = 0;
+              p = (char *)cmp->file[0].buffer + cmp->file[0].buffered;
+              q = (char *)cmp->file[1].buffer + cmp->file[1].buffered;
+              buffer = buffer1;
+            }
+          else
+            {
+              i = 1;
+              p = (char *)cmp->file[1].buffer + cmp->file[1].buffered;
+              q = (char *)cmp->file[0].buffer + cmp->file[0].buffered;
+              buffer = buffer0;
+            }
+          if (--q == buffer || *q == '\r')
+            {
+              *--p = *q;
+            }
+          else if (*--q == '\r')
             {
               *p = '\n';
-              --cmp->file[other].buffered;
+              *--p = '\r';
+              ++cmp->file[i].buffered;
             }
         }
     }
