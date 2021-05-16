@@ -6,8 +6,8 @@ echo GIT_DESCRIBE=%GIT_DESCRIBE%
 set FrhedTag=0.10909.2021
 set WinIMergeTag=1.0.25
 set SQLiteCompareTag=3.1.0.0-datadiode-008
-set ReoGridTag=3.0.0.0-datadiode-014
-set B2XTranslatorTag=1.0.0.0-datadiode-007
+set ReoGridTag=3.0.0.0-datadiode-016
+set B2XTranslatorTag=1.0.0.0-datadiode-010
 set ToxyTag=1.6.0-datadiode-49-gc904104
 set AStyleTag=3.1
 set HtmlTidyTag=5.7.28
@@ -49,6 +49,8 @@ for %%p in (
   https://github.com/datadiode/B2XTranslator/releases/download/%B2XTranslatorTag%/doc2x_%B2XTranslatorTag%-Release.zip!doc2x_Release
   https://github.com/datadiode/B2XTranslator/releases/download/%B2XTranslatorTag%/xls2x_%B2XTranslatorTag%-Debug.zip!xls2x_Debug
   https://github.com/datadiode/B2XTranslator/releases/download/%B2XTranslatorTag%/xls2x_%B2XTranslatorTag%-Release.zip!xls2x_Release
+  https://github.com/datadiode/B2XTranslator/releases/download/%B2XTranslatorTag%/OdfConverter_%B2XTranslatorTag%-Debug.zip!OdfConverter_Debug
+  https://github.com/datadiode/B2XTranslator/releases/download/%B2XTranslatorTag%/OdfConverter_%B2XTranslatorTag%-Release.zip!OdfConverter_Release
   https://raw.githubusercontent.com/WinMerge/freeimage/master/license-gplv3.txt!FreeImage_license-gplv3.txt
   https://github.com/WinMerge/winimerge/releases/download/v%WinIMergeTag%/winimerge-%WinIMergeTag:.=-%-0-exe.zip!winimerge-exe.zip
   https://github.com/datadiode/winmerge2011/releases/download/0.2011.210.381/WinMerge_0.2011.210.381_setup.cpl!WinMerge_0.2011.210.381_setup.cpl
@@ -90,6 +92,8 @@ MSBuild 3rdparty\AStyle\build\vs2010\AStyle.sln /t:Rebuild /p:Platform="x64" /p:
 "%SevenZip%" x -o3rdparty\B2XTranslator\src\Shell\xls2x\bin\Release\ "%~dp03rdparty\xls2x_Release"
 "%SevenZip%" x -o3rdparty\B2XTranslator\src\Shell\doc2x\bin\Debug\ "%~dp03rdparty\doc2x_Debug"
 "%SevenZip%" x -o3rdparty\B2XTranslator\src\Shell\doc2x\bin\Release\ "%~dp03rdparty\doc2x_Release"
+"%SevenZip%" x -o3rdparty\B2XTranslator\src\Shell\OdfConverter\bin\Debug\ "%~dp03rdparty\OdfConverter_Debug"
+"%SevenZip%" x -o3rdparty\B2XTranslator\src\Shell\OdfConverter\bin\Release\ "%~dp03rdparty\OdfConverter_Release"
 
 "%SevenZip%" x -o3rdparty -t# "%~dp03rdparty\WinMerge_0.2011.210.381_setup.cpl" 1.7zSfxHtm.exe
 "%SevenZip%" x -o3rdparty "%~dp03rdparty\1.7zSfxHtm.exe" DOWNLOADER
