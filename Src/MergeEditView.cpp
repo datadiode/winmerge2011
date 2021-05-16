@@ -641,6 +641,11 @@ void CMergeEditView::ShowDiff(bool bScroll)
 			// as possible. This usually brings next diff to the screen
 			// and we don't need to scroll into it.
 			int nLine = GetSubLineIndex(ptStart.y) - CONTEXT_LINES_ABOVE;
+			int const nMaxTopSubLine = std::min(
+				rgpView[0]->GetSubLineCount() - rgpView[0]->GetScreenLines(),
+				rgpView[1]->GetSubLineCount() - rgpView[1]->GetScreenLines());
+			if (nLine > nMaxTopSubLine)
+				nLine = nMaxTopSubLine;
 			if (nLine < 0)
 				nLine = 0;
 			m_pDocument->UpdateWindow();
