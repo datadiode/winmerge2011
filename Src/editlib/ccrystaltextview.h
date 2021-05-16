@@ -631,10 +631,6 @@ public:
 	void OnEditFind();
 	void OnEditRepeat();
 	BOOL OnMouseWheel(WPARAM, LPARAM);
-	void OnPageUp();
-	void OnExtPageUp();
-	void OnPageDown();
-	void OnExtPageDown();
 	void OnToggleBookmark(UINT nCmdID);
 	void OnGoBookmark(UINT nCmdID);
 	void OnClearBookmarks();
