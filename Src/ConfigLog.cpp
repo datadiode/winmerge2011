@@ -382,11 +382,12 @@ bool CConfigLog::DoFile(bool writing, String &sError)
 	WriteVersionOf1(1, _T("SQLiteCompare\\bin\\SQLiteCompare.exe"), false);
 	WriteVersionOf1(1, _T("ReoGridCompare\\bin\\ReoGridCompare.exe"), false);
 	WriteVersionOf1(1, _T("ToxyExtract\\bin\\ToxyExtract.exe"), false);
-	WriteVersionOf1(1, _T("B2XTranslator\\bin\\xls2x.exe"), false);
 
-	TCHAR path[MAX_PATH];
-	GetModuleFileName(0, path, _countof(path));
+	TCHAR path[MAX_PATH * 7]; // allows to safely move 6 levels down
+	GetModuleFileName(0, path, MAX_PATH);
 	LPTSTR pattern = PathFindFileName(path);
+	_tcscpy(pattern, _T("B2XTranslator\\bin\\*.exe"));
+	WriteVersionOf(1, path);
 	_tcscpy(pattern, _T("Merge7z\\*.dll"));
 	WriteVersionOf(1, path);
 
