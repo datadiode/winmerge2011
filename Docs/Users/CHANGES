@@ -1,5 +1,6 @@
 [WinMergeTag]
 Changes since preceding release (not necessarily complete):
+• Upgrade ReoGrid and B2XTranslator to allow loading of OpenDocument .ods files
 • Upgrade to ReoGrid 3.0.0.0-datadiode-014 for fixes in frozen region handling
 • DiffWrapper.cpp: Fix debug-only code which writes a diff file to aid debugging
 • Add Options page to control Compare As > Tell from filename extension behavior

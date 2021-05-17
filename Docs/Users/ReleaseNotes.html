@@ -60,7 +60,7 @@ It includes the following enhancements as compared to the previous stable releas
 	which allows its embedding into the WinMerge GUI.
 	<br>This modified version also fixes quite a number of bugs found in the original product, and continues to work independently from WinMerge.
 <li><p>Limited support for Excel .xlsx files,
-	and with the help of <a target='_blank' href='https://github.com/datadiode/B2XTranslator'>B2XTranslator</a> also for Excel 2003 .xls files,
+	and with the help of <a target='_blank' href='https://github.com/datadiode/B2XTranslator'>B2XTranslator</a> also for Excel 2003 .xls and OpenDocument .ods files,
 	is offered through <a target='_blank' href='https://github.com/datadiode/ReoGrid'>ReoGrid</a>.
 	<br>The ReoGrid Compare application implemented by that fork is specifically tailored to run inside the WinMerge GUI, but can also be used as a standalone application.
 	<p><u>An urgent warning on this one:</u>
@@ -76,9 +76,10 @@ It includes the following enhancements as compared to the previous stable releas
 <li><p>File transform scriptlet <i>ToxyExtract.wsc</i> can be used to convert various kinds of document files to plain text, or extract metadata from audio/video/image files.
 	<br>This feature makes use of <a target='_blank' href='https://github.com/datadiode/toxy'>toxy</a>,
 	which is bundled with WinMerge 2011 and appears to be a capable open-source replacement for xdoc2txt.
+<li><p>Options dialog page <i>Editor &rarr; File Transforms</i> allows to opt in and out of available file transform defaults as applied when user chooses to <i>Compare As &rarr; Tell from filename extension</i>.
 <li><p>The binary comparison view includes a Bookmarks menu.
 <li><p>Syntax highlighting supports AutoIt (adopted from WinMerge 2.16) and some aspects of Markdown (unindented headings, comments, HTML islands).
-<li><p>File type associations for syntax coloring are configurable in Options dialog.
+<li><p>File type associations for syntax coloring are configurable in Options dialog page <i>Editor &rarr; Lexers</i>.
 <li><p>Following a suggestion made ages ago on Bitbucket, the folder compare progress dialog offers an option to send an email when ready.
 <li><p>The text comparison view can be switched to <i>Table Layout</i> to achieve column-wise alignment of CSV-like files.
 	<br>The detailed procedure is to select one instance of the character which the file at hand uses as its field separator, and then type Ctrl+T, or invoke the command through toolbar or menu.
