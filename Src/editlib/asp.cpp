@@ -258,6 +258,7 @@ void TextDefinition::ParseLineAsp(TextBlock::Cookie &cookie, LPCTSTR const pszCh
 				{
 					// Extended comment <?....?>
 					if ((dwCookie & COOKIE_PARSER_GLOBAL) != SRCOPT_COOKIE(COOKIE_PARSER_MWSL) &&
+						(dwCookie & (COOKIE_STRING | COOKIE_EXT_COMMENT)) == 0 &&
 						pszChars[I] == '>' && ((pszChars[nPrevI] == '?' || pszChars[nPrevI] == '%')))
 					{
 						pBuf.m_bRecording = pBuf;
@@ -495,7 +496,7 @@ void TextDefinition::ParseLineAsp(TextBlock::Cookie &cookie, LPCTSTR const pszCh
 			// Extended comment <!--....-->
 			if (dwCookie & COOKIE_EXT_COMMENT)
 			{
-				switch (dwCookie & (COOKIE_PARSER | COOKIE_DTD | COOKIE_ASP))
+				switch (dwCookie & (COOKIE_DTD | COOKIE_ASP | COOKIE_SCRIPT) | ParseProcCookie(dwCookie))
 				{
 				case 0:
 				case COOKIE_PARSER_MARKDOWN:
@@ -542,7 +543,7 @@ void TextDefinition::ParseLineAsp(TextBlock::Cookie &cookie, LPCTSTR const pszCh
 				continue;
 			}
 
-			switch (dwCookie & COOKIE_PARSER)
+			switch (ParseProcCookie(dwCookie))
 			{
 			case 0:
 			case COOKIE_PARSER_MARKDOWN:
@@ -691,6 +692,7 @@ void TextDefinition::ParseLineAsp(TextBlock::Cookie &cookie, LPCTSTR const pszCh
 					continue;
 				}
 				break;
+			case COOKIE_PARSER_BASIC:
 			case COOKIE_SCRIPT | COOKIE_PARSER_VBSCRIPT:
 				break;
 			case COOKIE_SCRIPT | COOKIE_PARSER_JAVA:
