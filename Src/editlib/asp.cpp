@@ -178,7 +178,8 @@ void TextDefinition::ParseLineAsp(TextBlock::Cookie &cookie, LPCTSTR const pszCh
 					}
 				}
 				// Script start: <? or <% or <MWSL>
-				if (pszChars[I] == '<' && (
+				if ((dwCookie & (COOKIE_STRING | COOKIE_EXT_COMMENT)) == 0 &&
+					pszChars[I] == '<' && (
 					(dwCookie & COOKIE_PARSER_GLOBAL) == SRCOPT_COOKIE(COOKIE_PARSER_MWSL) ?
 					I + 5 < nLength &&
 					pszChars[I + 1] == 'M' &&
