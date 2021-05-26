@@ -518,6 +518,13 @@ int CChildFrame::Rescan2(bool &bIdentical)
 		m_ptBuf[0]->prepareForRescan();
 		m_ptBuf[1]->prepareForRescan();
 
+		// ..lasf DIFFRANGE of file which has EOL must be
+		// fixed to contain last line too
+		if (!m_diffWrapper.FixLastDiffRange(m_ptBuf[0]->GetLineCount(), m_ptBuf[1]->GetLineCount()))
+		{
+			nResult = RESCAN_FILE_ERR;
+		}
+
 		// Divide diff blocks to match lines.
 		if (COptionsMgr::Get(OPT_CMP_MATCH_SIMILAR_LINES))
 			AdjustDiffBlocks();
@@ -1397,8 +1404,7 @@ void CChildFrame::PrimeTextBuffers()
 	m_ptBuf[1]->RemoveAllGhostLines(LF_SKIPPED);
 	UINT lcount0 = m_ptBuf[0]->GetLineCount();
 	UINT lcount1 = m_ptBuf[1]->GetLineCount();
-	ASSERT(nContextLines != UINT_MAX || // neglect the case of limited context here as it can vary
-		lcount0new + m_diffWrapper.m_status.bLeftMissingNL == lcount1new + m_diffWrapper.m_status.bRightMissingNL);
+	ASSERT(lcount0new == lcount1new);
 	m_ptBuf[0]->m_aLines.resize(lcount0new);
 	m_ptBuf[1]->m_aLines.resize(lcount1new);
 
