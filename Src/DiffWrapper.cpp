@@ -414,11 +414,11 @@ bool CDiffWrapper::RunFileDiff(DiffFileData &diffdata, TextDefinition const *pTe
 		{
 			path = paths_ConcatPath(sTempPath, _T("1st.txt"));
 			diffdata.file[0].desc = msvcrt::_topen(path.c_str(), O_RDWR | O_BINARY | O_CREAT | O_TRUNC, _S_IREAD | _S_IWRITE);
-			_write(diffdata.file[0].desc, diffdata.file[0].buffer, diffdata.file[0].buffered);
+			_write(diffdata.file[0].desc, diffdata.file[0].buffer, static_cast<unsigned int>(diffdata.file[0].buffered));
 			_lseek(diffdata.file[0].desc, 0, SEEK_SET);
 			path = paths_ConcatPath(sTempPath, _T("2nd.txt"));
 			diffdata.file[1].desc = msvcrt::_topen(path.c_str(), O_RDWR | O_BINARY | O_CREAT | O_TRUNC, _S_IREAD | _S_IWRITE);
-			_write(diffdata.file[1].desc, diffdata.file[1].buffer, diffdata.file[1].buffered);
+			_write(diffdata.file[1].desc, diffdata.file[1].buffer, static_cast<unsigned int>(diffdata.file[1].buffered));
 			_lseek(diffdata.file[1].desc, 0, SEEK_SET);
 			struct file_cursor cursors[_countof(diffdata.file)];
 			print_normal_script(&diffdata, cursors, script);
