@@ -528,7 +528,12 @@ bool CDiffWrapper::FixLastDiffRange(int leftBufferLines, int rightBufferLines)
 	// If one file has EOL before EOF and other not...
 	if (m_status.bLeftMissingNL != m_status.bRightMissingNL)
 	{
-		if (nIgnoreWhitespace & (WHITESPACE_RADIO_OPTIONS_MASK | WHITESPACE_IGNORE_TRAILING_SPACE))
+		DIFFRANGE *dr = NULL;
+		if (int const count = m_pDiffList->GetSize())
+			dr = m_pDiffList->DiffRangeAt(count - 1);
+
+		if ((nIgnoreWhitespace & (WHITESPACE_RADIO_OPTIONS_MASK | WHITESPACE_IGNORE_TRAILING_SPACE)) &&
+			(dr == NULL || dr->end0 != leftBufferLines - 1 && dr->end1 != rightBufferLines - 1))
 		{
 			// we have to create the DIFF
 			DIFFRANGE dr;
@@ -546,13 +551,11 @@ bool CDiffWrapper::FixLastDiffRange(int leftBufferLines, int rightBufferLines)
 			}
 			dr.op = OP_TRIVIAL;
 
-			if (!AddDiffRange(dr.begin0, dr.end0, dr.begin1, dr.end1, dr.op))
-				return false;
+			return AddDiffRange(dr.begin0, dr.end0, dr.begin1, dr.end1, dr.op);
 		}
-		else if (int const count = m_pDiffList->GetSize())
-		{
-			DIFFRANGE *dr = m_pDiffList->DiffRangeAt(count - 1);
 
+		if (dr != NULL)
+		{
 			if (m_status.bRightMissingNL)
 			{
 				if (dr->op == OP_RIGHTONLY)
