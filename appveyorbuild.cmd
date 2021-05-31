@@ -7,7 +7,7 @@ set FrhedTag=0.10909.2021
 set WinIMergeTag=1.0.25
 set SQLiteCompareTag=3.1.0.0-datadiode-008
 set ReoGridTag=3.0.0-datadiode-66-g4616e16
-set B2XTranslatorTag=1.0.0-datadiode-18-geb5dc77
+set B2XTranslatorTag=1.0.0-datadiode-19-gaf4be09
 set ToxyTag=1.6.0-datadiode-49-gc904104
 set AStyleTag=3.1
 set HtmlTidyTag=5.7.28
@@ -92,8 +92,8 @@ MSBuild 3rdparty\AStyle\build\vs2010\AStyle.sln /t:Rebuild /p:Platform="x64" /p:
 "%SevenZip%" x -o3rdparty\B2XTranslator\src\Shell\xls2x\bin\Release\ "%~dp03rdparty\xls2x_Release"
 "%SevenZip%" x -o3rdparty\B2XTranslator\src\Shell\doc2x\bin\Debug\ "%~dp03rdparty\doc2x_Debug"
 "%SevenZip%" x -o3rdparty\B2XTranslator\src\Shell\doc2x\bin\Release\ "%~dp03rdparty\doc2x_Release"
-"%SevenZip%" x -o3rdparty\B2XTranslator\src\Shell\OdfConverter\bin\Debug\ "%~dp03rdparty\OdfConverter_Debug"
-"%SevenZip%" x -o3rdparty\B2XTranslator\src\Shell\OdfConverter\bin\Release\ "%~dp03rdparty\OdfConverter_Release"
+"%SevenZip%" x -o3rdparty\B2XTranslator\src\Shell\OdfConverter\bin\Debug\ -x!PresentationConverter*.* "%~dp03rdparty\OdfConverter_Debug"
+"%SevenZip%" x -o3rdparty\B2XTranslator\src\Shell\OdfConverter\bin\Release\ -x!PresentationConverter*.* "%~dp03rdparty\OdfConverter_Release"
 
 "%SevenZip%" x -o3rdparty -t# "%~dp03rdparty\WinMerge_0.2011.210.381_setup.cpl" 1.7zSfxHtm.exe
 "%SevenZip%" x -o3rdparty "%~dp03rdparty\1.7zSfxHtm.exe" DOWNLOADER
