@@ -6,7 +6,7 @@
 
 extern Merge7z::Proxy Merge7z;
 
-Merge7z::Format *ArchiveGuessFormat(LPCTSTR);
+Merge7z::Format *ArchiveGuessFormat(LPCTSTR, bool forced = true);
 
 String NTAPI GetClearTempPath(LPVOID pOwner, LPCTSTR pchExt);
 

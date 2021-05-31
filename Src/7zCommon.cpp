@@ -43,7 +43,7 @@ Last change: 2013-04-27 by Jochen Neubeck
  * - Check for filename extension mappings.
  * - Check for external command line tools.
  */
-Merge7z::Format *ArchiveGuessFormat(LPCTSTR path)
+Merge7z::Format *ArchiveGuessFormat(LPCTSTR path, bool forced)
 {
 	if (COptionsMgr::Get(OPT_ARCHIVE_ENABLE) == 0)
 		return NULL;
@@ -51,7 +51,7 @@ Merge7z::Format *ArchiveGuessFormat(LPCTSTR path)
 		return NULL;
 	if (PathIsDirectory(path))
 		return NULL;
-	return CExternalArchiveFormat::GuessFormat(path);
+	return CExternalArchiveFormat::GuessFormat(path, forced);
 }
 
 /**

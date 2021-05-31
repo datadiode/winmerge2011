@@ -2180,6 +2180,7 @@ bool CMainFrame::DoFileOpen(
 	CTempPathContext *pTempPathContext = NULL;
 	if (fDirectory == 0)
 	{
+		bool bForceAsArchive = false;
 		switch (idCompareAs)
 		{
 		case ID_MERGE_COMPARE_TEXT:
@@ -2190,6 +2191,7 @@ bool CMainFrame::DoFileOpen(
 		case ID_MERGE_COMPARE_ZIP:
 			dwLeftFlags |= FFILEOPEN_DETECTZIP;
 			dwRightFlags |= FFILEOPEN_DETECTZIP;
+			bForceAsArchive = true;
 			break;
 		case ID_MERGE_COMPARE_HEX:
 			// Open files in binary editor
@@ -2213,7 +2215,7 @@ bool CMainFrame::DoFileOpen(
 			// Handle archives using 7-zip
 			if (dwLeftFlags & dwRightFlags & FFILEOPEN_DETECTZIP)
 			{
-				if (Merge7z::Format *piHandler = ArchiveGuessFormat(filelocLeft.filepath.c_str()))
+				if (Merge7z::Format *piHandler = ArchiveGuessFormat(filelocLeft.filepath.c_str(), bForceAsArchive))
 				{
 					pTempPathContext = new CTempPathContext;
 					String path = GetClearTempPath(pTempPathContext, _T("0"));
@@ -2238,7 +2240,7 @@ bool CMainFrame::DoFileOpen(
 						filelocLeft.filepath.insert(0U, path);
 					} while (piHandler = ArchiveGuessFormat(filelocLeft.filepath.c_str()));
 					filelocLeft.filepath = path;
-					if (Merge7z::Format *piHandler = ArchiveGuessFormat(filelocRight.filepath.c_str()))
+					if (Merge7z::Format *piHandler = ArchiveGuessFormat(filelocRight.filepath.c_str(), bForceAsArchive))
 					{
 						path = GetClearTempPath(pTempPathContext, _T("1"));
 						do
@@ -2278,7 +2280,7 @@ bool CMainFrame::DoFileOpen(
 			}
 			else if (dwLeftFlags & FFILEOPEN_DETECTZIP)
 			{
-				if (Merge7z::Format *piHandler = ArchiveGuessFormat(filelocLeft.filepath.c_str()))
+				if (Merge7z::Format *piHandler = ArchiveGuessFormat(filelocLeft.filepath.c_str(), bForceAsArchive))
 				{
 					pTempPathContext = new CTempPathContext;
 					String path = GetClearTempPath(pTempPathContext, _T("0"));
@@ -2303,7 +2305,7 @@ bool CMainFrame::DoFileOpen(
 			}
 			else if (dwRightFlags & FFILEOPEN_DETECTZIP)
 			{
-				if (Merge7z::Format *piHandler = ArchiveGuessFormat(filelocRight.filepath.c_str()))
+				if (Merge7z::Format *piHandler = ArchiveGuessFormat(filelocRight.filepath.c_str(), bForceAsArchive))
 				{
 					pTempPathContext = new CTempPathContext;
 					String path = GetClearTempPath(pTempPathContext, _T("1"));

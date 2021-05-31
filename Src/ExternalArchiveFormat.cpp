@@ -358,7 +358,7 @@ HRESULT CExternalArchiveFormat::CompressArchive(HWND, LPCTSTR path, Merge7z::Dir
 /**
  * @brief Return a Merge7z::Format * to handle given archive file
  */
-Merge7z::Format *CExternalArchiveFormat::GuessFormat(LPCTSTR path)
+Merge7z::Format *CExternalArchiveFormat::GuessFormat(LPCTSTR path, bool forced)
 {
 	const Profile &profile = Profile::Get();
 	const LPCTSTR ext = PathFindExtension(path);
@@ -397,7 +397,7 @@ Merge7z::Format *CExternalArchiveFormat::GuessFormat(LPCTSTR path)
 			}
 		}
 	}
-	else
+	else if (!forced)
 	{
 		// The pattern is not included in ExternalArchiveFormat.ini.
 		// If explicitly configured to be handled otherwise, bypass the Merge7z.dll.

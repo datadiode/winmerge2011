@@ -15,7 +15,7 @@ private:
 	BOOL m_bLongPathPrefix;				// whether to allow a long path prefix
 	int m_nShowConsole;
 public:
-	static Merge7z::Format *GuessFormat(LPCTSTR);
+	static Merge7z::Format *GuessFormat(LPCTSTR, bool forced);
 	static String GetOpenFileFilterString();
 	CExternalArchiveFormat(const Profile &, LPCTSTR);
 	virtual HRESULT DeCompressArchive(HWND, LPCTSTR path, LPCTSTR folder);
