@@ -92,8 +92,8 @@ MSBuild 3rdparty\AStyle\build\vs2010\AStyle.sln /t:Rebuild /p:Platform="x64" /p:
 "%SevenZip%" x -o3rdparty\B2XTranslator\src\Shell\xls2x\bin\Release\ "%~dp03rdparty\xls2x_Release"
 "%SevenZip%" x -o3rdparty\B2XTranslator\src\Shell\doc2x\bin\Debug\ "%~dp03rdparty\doc2x_Debug"
 "%SevenZip%" x -o3rdparty\B2XTranslator\src\Shell\doc2x\bin\Release\ "%~dp03rdparty\doc2x_Release"
-"%SevenZip%" x -o3rdparty\B2XTranslator\src\Shell\OdfConverter\bin\Debug\ -x!PresentationConverter2*.* "%~dp03rdparty\OdfConverter_Debug"
-"%SevenZip%" x -o3rdparty\B2XTranslator\src\Shell\OdfConverter\bin\Release\ -x!PresentationConverter2*.* "%~dp03rdparty\OdfConverter_Release"
+"%SevenZip%" x -o3rdparty\B2XTranslator\src\Shell\OdfConverter\bin\Debug\ "%~dp03rdparty\OdfConverter_Debug"
+"%SevenZip%" x -o3rdparty\B2XTranslator\src\Shell\OdfConverter\bin\Release\ "%~dp03rdparty\OdfConverter_Release"
 
 "%SevenZip%" x -o3rdparty -t# "%~dp03rdparty\WinMerge_0.2011.210.381_setup.cpl" 1.7zSfxHtm.exe
 "%SevenZip%" x -o3rdparty "%~dp03rdparty\1.7zSfxHtm.exe" DOWNLOADER

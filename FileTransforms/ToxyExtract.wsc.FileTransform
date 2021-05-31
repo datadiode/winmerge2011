@@ -45,13 +45,19 @@ Class TempFile
 End Class
 
 Function OpenTextFile(path)
+	Dim temp
 	path = Replace(path, "\\?\UNC\", "\\")
 	path = Replace(path, "\\?\", "")
-	Dim temp
-	If InStr(path & "*", ".odt*") <> 0 Then
+	temp = path & "*"
+	If InStr(temp, ".odt*") <> 0 Or InStr(temp, ".ott*") <> 0 Then
 		Set tmpfile = New TempFile
 		temp = tmpfile.CreatePath(".docx")
 		sh.Run """%WinMergeRoot%\B2XTranslator\bin\OdfConverter.exe"" /ODT2DOCX /I """ & path & """ /O """ & temp & """", 0, True
+		path = temp
+	ElseIf InStr(temp, ".odp*") <> 0 Or InStr(temp, ".otp*") <> 0 Then
+		Set tmpfile = New TempFile
+		temp = tmpfile.CreatePath(".pptx")
+		sh.Run """%WinMergeRoot%\B2XTranslator\bin\OdfConverter.exe"" /ODP2PPTX /I """ & path & """ /O """ & temp & """", 0, True
 		path = temp
 	End If
 	Set OpenTextFile = sh.Exec("""%WinMergeRoot%\ToxyExtract\bin\ToxyExtract.exe"" " & options & " """ & path & """").StdOut

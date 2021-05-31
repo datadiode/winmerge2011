@@ -372,11 +372,14 @@ void CMergeApp::DumpFileTransformDefaults(LPTSTR p)
 	static const TCHAR defaults[] =
 		// Powerpoint2007TextParser
 		_T("pptx = script:\\FileTransforms\\ToxyExtract.wsc\0")
-		// Toxy: Word2003DocumentParser
+		_T("odp = script:\\FileTransforms\\ToxyExtract.wsc\0")
+		_T("otp = script:\\FileTransforms\\ToxyExtract.wsc\0")
+		// Word2003DocumentParser
 		_T("doc = script:\\FileTransforms\\ToxyExtract.wsc\0")
 		// Word2007TextParser
 		_T("docx = script:\\FileTransforms\\ToxyExtract.wsc\0")
 		_T("odt = script:\\FileTransforms\\ToxyExtract.wsc\0")
+		_T("ott = script:\\FileTransforms\\ToxyExtract.wsc\0")
 		// PDFTextParser
 		_T("pdf = script:\\FileTransforms\\ToxyExtract.wsc\0")
 		// EMLTextParser
