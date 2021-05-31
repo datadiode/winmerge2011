@@ -376,6 +376,7 @@ void CMergeApp::DumpFileTransformDefaults(LPTSTR p)
 		_T("doc = script:\\FileTransforms\\ToxyExtract.wsc\0")
 		// Word2007TextParser
 		_T("docx = script:\\FileTransforms\\ToxyExtract.wsc\0")
+		_T("odt = script:\\FileTransforms\\ToxyExtract.wsc\0")
 		// PDFTextParser
 		_T("pdf = script:\\FileTransforms\\ToxyExtract.wsc\0")
 		// EMLTextParser

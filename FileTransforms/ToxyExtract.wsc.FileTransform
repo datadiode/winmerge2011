@@ -19,16 +19,41 @@ Const Encoding = "UTF-8"
 
 Dim options
 
-Dim sh
+Dim sh, tmpfile
+
 Set sh = CreateObject("WScript.Shell")
 
 Sub put_Arguments(Arguments)
 	If Not IsEmpty(Arguments) Then Execute Arguments
 End Sub
 
+Class TempFile
+	Private fs, path
+
+	Private Sub Class_Initialize
+		Set fs = CreateObject("Scripting.FileSystemObject")
+	End Sub
+
+	Private Sub Class_Terminate
+		If Not IsEmpty(path) Then fs.DeleteFile path
+	End Sub
+
+	Public Function CreatePath(suffix)
+		path = fs.GetSpecialFolder(2) & "\" & Mid(CreateObject("Scriptlet.TypeLib").Guid, 2, 36) & suffix
+		CreatePath = path
+	End Function
+End Class
+
 Function OpenTextFile(path)
 	path = Replace(path, "\\?\UNC\", "\\")
 	path = Replace(path, "\\?\", "")
+	Dim temp
+	If InStr(path & "*", ".odt*") <> 0 Then
+		Set tmpfile = New TempFile
+		temp = tmpfile.CreatePath(".docx")
+		sh.Run """%WinMergeRoot%\B2XTranslator\bin\OdfConverter.exe"" /ODT2DOCX /I """ & path & """ /O """ & temp & """", 0, True
+		path = temp
+	End If
 	Set OpenTextFile = sh.Exec("""%WinMergeRoot%\ToxyExtract\bin\ToxyExtract.exe"" " & options & " """ & path & """").StdOut
 End Function
 </script>
