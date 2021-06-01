@@ -45,8 +45,11 @@
   <PropertyGroup>
     <PostBuildEvent>for %25%25P in (Win32 x64) do (
   xcopy /y . $(SolutionDir)Build\WinMerge\%25%25P\$(Configuration)\
-  xcopy /ysU $(SolutionDir)..\B2XTranslator\src\Shell\xls2x\bin\$(Configuration) $(SolutionDir)Build\WinMerge\%25%25P\$(Configuration)\B2XTranslator\bin\
-  xcopy /ysU $(SolutionDir)..\ReoGrid\Compare\bin\$(Configuration) $(SolutionDir)Build\WinMerge\%25%25P\$(Configuration)\ReoGridCompare\bin\
+  xcopy /ysU $(SolutionDir)..\B2XTranslator\src\Shell\xls2x\bin\$(Configuration)\net40 $(SolutionDir)Build\WinMerge\%25%25P\$(Configuration)\B2XTranslator\bin\
+  xcopy /ysU $(SolutionDir)..\B2XTranslator\src\Shell\doc2x\bin\$(Configuration)\net40 $(SolutionDir)Build\WinMerge\%25%25P\$(Configuration)\B2XTranslator\bin\
+  xcopy /ysU $(SolutionDir)..\B2XTranslator\src\Shell\ppt2x\bin\$(Configuration)\net40 $(SolutionDir)Build\WinMerge\%25%25P\$(Configuration)\B2XTranslator\bin\
+  xcopy /ysU $(SolutionDir)..\B2XTranslator\src\Shell\OdfConverter\bin\$(Configuration)\net40 $(SolutionDir)Build\WinMerge\%25%25P\$(Configuration)\B2XTranslator\bin\
+  xcopy /ysU $(SolutionDir)..\ReoGrid\Compare\bin\$(Configuration)\net40 $(SolutionDir)Build\WinMerge\%25%25P\$(Configuration)\ReoGridCompare\bin\
   xcopy /ysU $(SolutionDir)..\SQLiteCompare\SQLiteTurbo\bin\$(Configuration) $(SolutionDir)Build\WinMerge\%25%25P\$(Configuration)\SQLiteCompare\bin\
 )
 exit 0
