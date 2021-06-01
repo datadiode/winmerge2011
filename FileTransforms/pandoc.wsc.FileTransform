@@ -20,9 +20,10 @@ Const Encoding = "UTF-8"
 
 Dim TextType, options
 
-Dim sh, tmpfile
+Dim sh, fs, tmpfile
 
 Set sh = CreateObject("WScript.Shell")
+Set fs = CreateObject("Scripting.FileSystemObject")
 
 Sub put_Arguments(Arguments)
 	If Not IsEmpty(Arguments) Then Execute Arguments
@@ -51,14 +52,19 @@ Class TempFile
 End Class
 
 Function OpenTextFile(path)
-	Dim ex, temp
-	If InStr(path & "*", ".doc*") <> 0 Then
+	Dim ex, temp, ending
+	temp = path & "*"
+	If InStr(temp, ".doc*") <> 0 Or InStr(temp, ".dot*") <> 0 Then
 		Set tmpfile = New TempFile
-		temp = tmpfile.CreatePath(".docx")
+		temp = tmpfile.CreatePath(".*")
 		path = Replace(path, "\\?\UNC\", "\\")
 		path = Replace(path, "\\?\", "")
 		sh.Run """%WinMergeRoot%\B2XTranslator\bin\doc2x.exe"" """ & path & """ -o """ & temp & """", 0, True
-		path = temp
+		For Each ending In Split(".docx .docm .dotx .dotm")
+			path = Replace(temp, ".*", ending)
+			If fs.FileExists(path) Then Exit For
+		Next
+		options = options & " --from=docx"
 	End If
 	Set ex = sh.Exec("""pandoc.exe"" " & options & " """ & path & """")
 	If ex.StdOut.AtEndOfStream Then
