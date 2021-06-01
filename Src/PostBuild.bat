@@ -176,8 +176,6 @@ for %%$ in (
 	xcopy /y "%%~$$:$\*.dll" "%~2B2XTranslator\bin\"
 	xcopy /y "%%~$$:$\*.pdb" "%~2B2XTranslator\bin\"
 	xcopy /y "%%~$$:$\*.exe" "%~2B2XTranslator\bin\"
-	xcopy /y "..\..\B2XTranslator\LICENSE" "%~2B2XTranslator\"
-	if errorlevel 1 copy /y ..\3rdparty\B2XTranslator_LICENSE "%~2B2XTranslator\LICENSE"
 	set $=
 )
 
@@ -189,8 +187,17 @@ for %%$ in (
 	xcopy /y "%%~$$:$\*.dll" "%~2B2XTranslator\bin\"
 	xcopy /y "%%~$$:$\*.pdb" "%~2B2XTranslator\bin\"
 	xcopy /y "%%~$$:$\*.exe" "%~2B2XTranslator\bin\"
-	xcopy /y "..\..\B2XTranslator\LICENSE" "%~2B2XTranslator\"
-	if errorlevel 1 copy /y ..\3rdparty\B2XTranslator_LICENSE "%~2B2XTranslator\LICENSE"
+	set $=
+)
+
+REM Copy B2XTranslator\src\Shell\ppt2x
+set $=..\..\B2XTranslator\src\Shell\ppt2x\bin\%4\;..\3rdparty\B2XTranslator\src\Shell\ppt2x\bin\%4\
+for %%$ in (
+	.
+) do if not "%%~$$:$" == "" (
+	xcopy /y "%%~$$:$\*.dll" "%~2B2XTranslator\bin\"
+	xcopy /y "%%~$$:$\*.pdb" "%~2B2XTranslator\bin\"
+	xcopy /y "%%~$$:$\*.exe" "%~2B2XTranslator\bin\"
 	set $=
 )
 
@@ -202,10 +209,12 @@ for %%$ in (
 	xcopy /y "%%~$$:$\*.dll" "%~2B2XTranslator\bin\"
 	xcopy /y "%%~$$:$\*.pdb" "%~2B2XTranslator\bin\"
 	xcopy /y "%%~$$:$\*.exe" "%~2B2XTranslator\bin\"
-	xcopy /y "..\..\B2XTranslator\LICENSE" "%~2B2XTranslator\"
-	if errorlevel 1 copy /y ..\3rdparty\B2XTranslator_LICENSE "%~2B2XTranslator\LICENSE"
 	set $=
 )
+
+REM Copy B2XTranslator\LICENSE
+xcopy /y "..\..\B2XTranslator\LICENSE" "%~2B2XTranslator\"
+if errorlevel 1 copy /y ..\3rdparty\B2XTranslator_LICENSE "%~2B2XTranslator\LICENSE"
 
 REM Copy WinMerge.chm
 set $=..\..\winmerge2011_help\Build\Manual\htmlhelp\;..\3rdparty\

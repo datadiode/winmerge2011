@@ -59,6 +59,11 @@ Function OpenTextFile(path)
 		temp = tmpfile.CreatePath(".pptx")
 		sh.Run """%WinMergeRoot%\B2XTranslator\bin\OdfConverter.exe"" /ODP2PPTX /I """ & path & """ /O """ & temp & """", 0, True
 		path = temp
+	ElseIf InStr(temp, ".ppt*") <> 0 And InStr(options, "/metadata") = 0 Then
+		Set tmpfile = New TempFile
+		temp = tmpfile.CreatePath(".pptx")
+		sh.Run """%WinMergeRoot%\B2XTranslator\bin\ppt2x.exe"" """ & path & """ -o """ & temp & """", 0, True
+		path = temp
 	End If
 	Set OpenTextFile = sh.Exec("""%WinMergeRoot%\ToxyExtract\bin\ToxyExtract.exe"" " & options & " """ & path & """").StdOut
 End Function
