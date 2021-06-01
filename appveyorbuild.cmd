@@ -6,9 +6,9 @@ echo GIT_DESCRIBE=%GIT_DESCRIBE%
 set FrhedTag=0.10909.2021
 set WinIMergeTag=1.0.25
 set SQLiteCompareTag=3.1.0.0-datadiode-008
-set ReoGridTag=3.0.0-datadiode-66-g4616e16
+set ReoGridTag=3.0.0-datadiode-68-g446a30e
 set B2XTranslatorTag=1.0.0-datadiode-19-gaf4be09
-set ToxyTag=1.6.0-datadiode-49-gc904104
+set ToxyTag=1.6.0-datadiode-53-gafad5a5
 set AStyleTag=3.1
 set HtmlTidyTag=5.7.28
 set ProtoDecTag=0.6.3
@@ -49,6 +49,8 @@ for %%p in (
   https://github.com/datadiode/B2XTranslator/releases/download/%B2XTranslatorTag%/doc2x_%B2XTranslatorTag%-Release.zip!doc2x_Release
   https://github.com/datadiode/B2XTranslator/releases/download/%B2XTranslatorTag%/xls2x_%B2XTranslatorTag%-Debug.zip!xls2x_Debug
   https://github.com/datadiode/B2XTranslator/releases/download/%B2XTranslatorTag%/xls2x_%B2XTranslatorTag%-Release.zip!xls2x_Release
+  https://github.com/datadiode/B2XTranslator/releases/download/%B2XTranslatorTag%/ppt2x_%B2XTranslatorTag%-Debug.zip!ppt2x_Debug
+  https://github.com/datadiode/B2XTranslator/releases/download/%B2XTranslatorTag%/ppt2x_%B2XTranslatorTag%-Release.zip!ppt2x_Release
   https://github.com/datadiode/B2XTranslator/releases/download/%B2XTranslatorTag%/OdfConverter_%B2XTranslatorTag%-Debug.zip!OdfConverter_Debug
   https://github.com/datadiode/B2XTranslator/releases/download/%B2XTranslatorTag%/OdfConverter_%B2XTranslatorTag%-Release.zip!OdfConverter_Release
   https://raw.githubusercontent.com/WinMerge/freeimage/master/license-gplv3.txt!FreeImage_license-gplv3.txt
@@ -92,6 +94,8 @@ MSBuild 3rdparty\AStyle\build\vs2010\AStyle.sln /t:Rebuild /p:Platform="x64" /p:
 "%SevenZip%" x -o3rdparty\B2XTranslator\src\Shell\xls2x\bin\Release\ "%~dp03rdparty\xls2x_Release"
 "%SevenZip%" x -o3rdparty\B2XTranslator\src\Shell\doc2x\bin\Debug\ "%~dp03rdparty\doc2x_Debug"
 "%SevenZip%" x -o3rdparty\B2XTranslator\src\Shell\doc2x\bin\Release\ "%~dp03rdparty\doc2x_Release"
+"%SevenZip%" x -o3rdparty\B2XTranslator\src\Shell\ppt2x\bin\Debug\ "%~dp03rdparty\ppt2x_Debug"
+"%SevenZip%" x -o3rdparty\B2XTranslator\src\Shell\ppt2x\bin\Release\ "%~dp03rdparty\ppt2x_Release"
 "%SevenZip%" x -o3rdparty\B2XTranslator\src\Shell\OdfConverter\bin\Debug\ "%~dp03rdparty\OdfConverter_Debug"
 "%SevenZip%" x -o3rdparty\B2XTranslator\src\Shell\OdfConverter\bin\Release\ "%~dp03rdparty\OdfConverter_Release"
 
