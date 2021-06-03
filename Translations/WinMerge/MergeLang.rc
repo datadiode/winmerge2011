@@ -534,28 +534,29 @@ IDR_REOGRIDDOCTYPE MENU
     {
         MENUITEM "Merge.rc:535", ID_TOOLS_FILTERS
         MENUITEM "Merge.rc:536", ID_TOOLS_GENERATEPATCH
+        MENUITEM "Merge.rc:537", ID_TOOLS_COMPARE_SELECTION
     }
-    POPUP "Merge.rc:538"
+    POPUP "Merge.rc:539"
     {
-        MENUITEM "Merge.rc:540", ID_FILE_CLOSE
-        MENUITEM "Merge.rc:541", ID_WINDOW_CLOSEALL
+        MENUITEM "Merge.rc:541", ID_FILE_CLOSE
+        MENUITEM "Merge.rc:542", ID_WINDOW_CLOSEALL
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:543", ID_WINDOW_CHANGE_PANE
+        MENUITEM "Merge.rc:544", ID_WINDOW_CHANGE_PANE
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:545", ID_WINDOW_TILE_HORZ
-        MENUITEM "Merge.rc:546", ID_WINDOW_TILE_VERT
-        MENUITEM "Merge.rc:547", ID_WINDOW_CASCADE
+        MENUITEM "Merge.rc:546", ID_WINDOW_TILE_HORZ
+        MENUITEM "Merge.rc:547", ID_WINDOW_TILE_VERT
+        MENUITEM "Merge.rc:548", ID_WINDOW_CASCADE
     }
-    POPUP "Merge.rc:549"
+    POPUP "Merge.rc:550"
     {
-        MENUITEM "Merge.rc:551", ID_HELP_CONTENTS
-        MENUITEM "Merge.rc:552", ID_HELP_FRHED
+        MENUITEM "Merge.rc:552", ID_HELP_CONTENTS
+        MENUITEM "Merge.rc:553", ID_HELP_FRHED
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:554", ID_HELP_RELEASENOTES
-        MENUITEM "Merge.rc:555", ID_HELP_TRANSLATIONS
-        MENUITEM "Merge.rc:556", ID_HELP_GETCONFIG
+        MENUITEM "Merge.rc:555", ID_HELP_RELEASENOTES
+        MENUITEM "Merge.rc:556", ID_HELP_TRANSLATIONS
+        MENUITEM "Merge.rc:557", ID_HELP_GETCONFIG
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:558", ID_APP_ABOUT, INACTIVE
+        MENUITEM "Merge.rc:559", ID_APP_ABOUT, INACTIVE
     }
 }
 
@@ -563,78 +564,78 @@ IDR_REOGRIDDOCTYPE MENU
 
 IDR_SQLITEDOCTYPE MENU
 {
-    POPUP "Merge.rc:566"
+    POPUP "Merge.rc:567"
     {
-        MENUITEM "Merge.rc:568", ID_FILE_NEW
-        MENUITEM "Merge.rc:569", ID_FILE_OPEN
-        MENUITEM "Merge.rc:570", ID_FILE_OPENCONFLICT
-        MENUITEM "Merge.rc:571", ID_FILE_STARTCOLLECT
+        MENUITEM "Merge.rc:569", ID_FILE_NEW
+        MENUITEM "Merge.rc:570", ID_FILE_OPEN
+        MENUITEM "Merge.rc:571", ID_FILE_OPENCONFLICT
+        MENUITEM "Merge.rc:572", ID_FILE_STARTCOLLECT
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:573", ID_FILE_OPENPROJECT
-        MENUITEM "Merge.rc:574", ID_FILE_SAVEPROJECT
+        MENUITEM "Merge.rc:574", ID_FILE_OPENPROJECT
+        MENUITEM "Merge.rc:575", ID_FILE_SAVEPROJECT
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:576", ID_FILE_MRU_FILE1, INACTIVE
+        MENUITEM "Merge.rc:577", ID_FILE_MRU_FILE1, INACTIVE
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:578", ID_APP_EXIT
+        MENUITEM "Merge.rc:579", ID_APP_EXIT
     }
-    POPUP "Merge.rc:580"
+    POPUP "Merge.rc:581"
     {
-        MENUITEM "Merge.rc:582", ID_OPTIONS
+        MENUITEM "Merge.rc:583", ID_OPTIONS
     }
-    POPUP "Merge.rc:584"
+    POPUP "Merge.rc:585"
     {
-        POPUP "Merge.rc:586"
+        POPUP "Merge.rc:587"
         {
-            MENUITEM "Merge.rc:588", ID_TOOLBAR_NONE
-            MENUITEM "Merge.rc:589", ID_TOOLBAR_SMALL
-            MENUITEM "Merge.rc:590", ID_TOOLBAR_BIG
-            MENUITEM "Merge.rc:591", ID_TOOLBAR_HUGE
+            MENUITEM "Merge.rc:589", ID_TOOLBAR_NONE
+            MENUITEM "Merge.rc:590", ID_TOOLBAR_SMALL
+            MENUITEM "Merge.rc:591", ID_TOOLBAR_BIG
+            MENUITEM "Merge.rc:592", ID_TOOLBAR_HUGE
         }
-        MENUITEM "Merge.rc:593", ID_VIEW_STATUS_BAR, HELP
-        MENUITEM "Merge.rc:594", ID_VIEW_TAB_BAR, HELP
+        MENUITEM "Merge.rc:594", ID_VIEW_STATUS_BAR, HELP
+        MENUITEM "Merge.rc:595", ID_VIEW_TAB_BAR, HELP
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:596", ID_VIEW_LANGUAGE
+        MENUITEM "Merge.rc:597", ID_VIEW_LANGUAGE
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:598", ID_REFRESH
+        MENUITEM "Merge.rc:599", ID_REFRESH
     }
-    POPUP "Merge.rc:600"
+    POPUP "Merge.rc:601"
     {
-        MENUITEM "Merge.rc:602", ID_NEXTDIFF
-        MENUITEM "Merge.rc:603", ID_PREVDIFF
+        MENUITEM "Merge.rc:603", ID_NEXTDIFF
+        MENUITEM "Merge.rc:604", ID_PREVDIFF
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:605", ID_L2R
-        MENUITEM "Merge.rc:606", ID_R2L
+        MENUITEM "Merge.rc:606", ID_L2R
+        MENUITEM "Merge.rc:607", ID_R2L
     }
-    POPUP "Merge.rc:608"
+    POPUP "Merge.rc:609"
     {
-        MENUITEM "Merge.rc:610", ID_TOOLS_FILTERS
-        MENUITEM "Merge.rc:611", ID_TOOLS_GENERATEPATCH
+        MENUITEM "Merge.rc:611", ID_TOOLS_FILTERS
+        MENUITEM "Merge.rc:612", ID_TOOLS_GENERATEPATCH
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:613", ID_TOOLS_EXPORT_DATA_DIFFS
-		MENUITEM "Merge.rc:614", ID_TOOLS_GENERATE_CHANGE_SCRIPT_L2R
-		MENUITEM "Merge.rc:615", ID_TOOLS_GENERATE_CHANGE_SCRIPT_R2L
+        MENUITEM "Merge.rc:614", ID_TOOLS_EXPORT_DATA_DIFFS
+		MENUITEM "Merge.rc:615", ID_TOOLS_GENERATE_CHANGE_SCRIPT_L2R
+		MENUITEM "Merge.rc:616", ID_TOOLS_GENERATE_CHANGE_SCRIPT_R2L
     }
-    POPUP "Merge.rc:617"
+    POPUP "Merge.rc:618"
     {
-        MENUITEM "Merge.rc:619", ID_FILE_CLOSE
-        MENUITEM "Merge.rc:620", ID_WINDOW_CLOSEALL
+        MENUITEM "Merge.rc:620", ID_FILE_CLOSE
+        MENUITEM "Merge.rc:621", ID_WINDOW_CLOSEALL
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:622", ID_WINDOW_CHANGE_PANE
+        MENUITEM "Merge.rc:623", ID_WINDOW_CHANGE_PANE
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:624", ID_WINDOW_TILE_HORZ
-        MENUITEM "Merge.rc:625", ID_WINDOW_TILE_VERT
-        MENUITEM "Merge.rc:626", ID_WINDOW_CASCADE
+        MENUITEM "Merge.rc:625", ID_WINDOW_TILE_HORZ
+        MENUITEM "Merge.rc:626", ID_WINDOW_TILE_VERT
+        MENUITEM "Merge.rc:627", ID_WINDOW_CASCADE
     }
-    POPUP "Merge.rc:628"
+    POPUP "Merge.rc:629"
     {
-        MENUITEM "Merge.rc:630", ID_HELP_CONTENTS
-        MENUITEM "Merge.rc:631", ID_HELP_FRHED
+        MENUITEM "Merge.rc:631", ID_HELP_CONTENTS
+        MENUITEM "Merge.rc:632", ID_HELP_FRHED
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:633", ID_HELP_RELEASENOTES
-        MENUITEM "Merge.rc:634", ID_HELP_TRANSLATIONS
-        MENUITEM "Merge.rc:635", ID_HELP_GETCONFIG
+        MENUITEM "Merge.rc:634", ID_HELP_RELEASENOTES
+        MENUITEM "Merge.rc:635", ID_HELP_TRANSLATIONS
+        MENUITEM "Merge.rc:636", ID_HELP_GETCONFIG
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:637", ID_APP_ABOUT, INACTIVE
+        MENUITEM "Merge.rc:638", ID_APP_ABOUT, INACTIVE
     }
 }
 
@@ -642,69 +643,69 @@ IDR_SQLITEDOCTYPE MENU
 
 IDR_MAINFRAME MENU
 {
-    POPUP "Merge.rc:645"
+    POPUP "Merge.rc:646"
     {
-        MENUITEM "Merge.rc:647", ID_FILE_NEW
-        MENUITEM "Merge.rc:648", ID_FILE_OPEN
-        MENUITEM "Merge.rc:649", ID_FILE_OPENCONFLICT
-        MENUITEM "Merge.rc:650", ID_FILE_STARTCOLLECT
+        MENUITEM "Merge.rc:648", ID_FILE_NEW
+        MENUITEM "Merge.rc:649", ID_FILE_OPEN
+        MENUITEM "Merge.rc:650", ID_FILE_OPENCONFLICT
+        MENUITEM "Merge.rc:651", ID_FILE_STARTCOLLECT
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:652", ID_FILE_OPENPROJECT
-        MENUITEM "Merge.rc:653", ID_FILE_SAVEPROJECT
+        MENUITEM "Merge.rc:653", ID_FILE_OPENPROJECT
+        MENUITEM "Merge.rc:654", ID_FILE_SAVEPROJECT
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:655", ID_FILE_MRU_FILE1, INACTIVE
+        MENUITEM "Merge.rc:656", ID_FILE_MRU_FILE1, INACTIVE
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:657", ID_USE_DESKTOP_SPECIFIC_SETTINGS, HELP
+        MENUITEM "Merge.rc:658", ID_USE_DESKTOP_SPECIFIC_SETTINGS, HELP
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:659", ID_APP_EXIT
+        MENUITEM "Merge.rc:660", ID_APP_EXIT
     }
-    POPUP "Merge.rc:661"
+    POPUP "Merge.rc:662"
     {
-        MENUITEM "Merge.rc:663", ID_OPTIONS
+        MENUITEM "Merge.rc:664", ID_OPTIONS
     }
-    POPUP "Merge.rc:665"
+    POPUP "Merge.rc:666"
     {
-        MENUITEM "Merge.rc:667", ID_VIEW_SELECTFONT
-        MENUITEM "Merge.rc:668", ID_VIEW_USEDEFAULTFONT
+        MENUITEM "Merge.rc:668", ID_VIEW_SELECTFONT
+        MENUITEM "Merge.rc:669", ID_VIEW_USEDEFAULTFONT
         MENUITEM SEPARATOR
-        POPUP "Merge.rc:670"
+        POPUP "Merge.rc:671"
         {
-            MENUITEM "Merge.rc:672", ID_TOOLBAR_NONE
-            MENUITEM "Merge.rc:673", ID_TOOLBAR_SMALL
-            MENUITEM "Merge.rc:674", ID_TOOLBAR_BIG
-            MENUITEM "Merge.rc:675", ID_TOOLBAR_HUGE
+            MENUITEM "Merge.rc:673", ID_TOOLBAR_NONE
+            MENUITEM "Merge.rc:674", ID_TOOLBAR_SMALL
+            MENUITEM "Merge.rc:675", ID_TOOLBAR_BIG
+            MENUITEM "Merge.rc:676", ID_TOOLBAR_HUGE
         }
-        MENUITEM "Merge.rc:677", ID_VIEW_STATUS_BAR, HELP
-        MENUITEM "Merge.rc:678", ID_VIEW_TAB_BAR, HELP
+        MENUITEM "Merge.rc:678", ID_VIEW_STATUS_BAR, HELP
+        MENUITEM "Merge.rc:679", ID_VIEW_TAB_BAR, HELP
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:680", ID_VIEW_LANGUAGE
+        MENUITEM "Merge.rc:681", ID_VIEW_LANGUAGE
     }
-    POPUP "Merge.rc:682"
+    POPUP "Merge.rc:683"
     {
-        MENUITEM "Merge.rc:684", ID_TOOLS_FILTERS
-        MENUITEM "Merge.rc:685", ID_TOOLS_GENERATEPATCH
+        MENUITEM "Merge.rc:685", ID_TOOLS_FILTERS
+        MENUITEM "Merge.rc:686", ID_TOOLS_GENERATEPATCH
     }
-    POPUP "Merge.rc:687"
+    POPUP "Merge.rc:688"
     {
-        MENUITEM "Merge.rc:689", ID_FILE_CLOSE
-        MENUITEM "Merge.rc:690", ID_WINDOW_CLOSEALL
+        MENUITEM "Merge.rc:690", ID_FILE_CLOSE
+        MENUITEM "Merge.rc:691", ID_WINDOW_CLOSEALL
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:692", ID_WINDOW_CHANGE_PANE
+        MENUITEM "Merge.rc:693", ID_WINDOW_CHANGE_PANE
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:694", ID_WINDOW_TILE_HORZ
-        MENUITEM "Merge.rc:695", ID_WINDOW_TILE_VERT
-        MENUITEM "Merge.rc:696", ID_WINDOW_CASCADE
+        MENUITEM "Merge.rc:695", ID_WINDOW_TILE_HORZ
+        MENUITEM "Merge.rc:696", ID_WINDOW_TILE_VERT
+        MENUITEM "Merge.rc:697", ID_WINDOW_CASCADE
     }
-    POPUP "Merge.rc:698"
+    POPUP "Merge.rc:699"
     {
-        MENUITEM "Merge.rc:700", ID_HELP_CONTENTS
-        MENUITEM "Merge.rc:701", ID_HELP_FRHED
+        MENUITEM "Merge.rc:701", ID_HELP_CONTENTS
+        MENUITEM "Merge.rc:702", ID_HELP_FRHED
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:703", ID_HELP_RELEASENOTES
-        MENUITEM "Merge.rc:704", ID_HELP_TRANSLATIONS
-        MENUITEM "Merge.rc:705", ID_HELP_GETCONFIG
+        MENUITEM "Merge.rc:704", ID_HELP_RELEASENOTES
+        MENUITEM "Merge.rc:705", ID_HELP_TRANSLATIONS
+        MENUITEM "Merge.rc:706", ID_HELP_GETCONFIG
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:707", ID_APP_ABOUT, INACTIVE
+        MENUITEM "Merge.rc:708", ID_APP_ABOUT, INACTIVE
     }
 }
 
@@ -712,186 +713,186 @@ IDR_MAINFRAME MENU
 
 IDR_MERGEDOCTYPE MENU
 {
-    POPUP "Merge.rc:715"
+    POPUP "Merge.rc:716"
     {
-        MENUITEM "Merge.rc:717", ID_FILE_NEW
-        MENUITEM "Merge.rc:718", ID_FILE_OPEN
-        MENUITEM "Merge.rc:719", ID_FILE_OPENCONFLICT
-        MENUITEM "Merge.rc:720", ID_FILE_STARTCOLLECT
+        MENUITEM "Merge.rc:718", ID_FILE_NEW
+        MENUITEM "Merge.rc:719", ID_FILE_OPEN
+        MENUITEM "Merge.rc:720", ID_FILE_OPENCONFLICT
+        MENUITEM "Merge.rc:721", ID_FILE_STARTCOLLECT
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:722", ID_FILE_OPENPROJECT
-        MENUITEM "Merge.rc:723", ID_FILE_SAVEPROJECT
+        MENUITEM "Merge.rc:723", ID_FILE_OPENPROJECT
+        MENUITEM "Merge.rc:724", ID_FILE_SAVEPROJECT
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:725", ID_FILE_MRU_FILE1, INACTIVE
+        MENUITEM "Merge.rc:726", ID_FILE_MRU_FILE1, INACTIVE
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:727", ID_FILE_SAVE
-        POPUP "Merge.rc:728"
+        MENUITEM "Merge.rc:728", ID_FILE_SAVE
+        POPUP "Merge.rc:729"
         {
-            MENUITEM "Merge.rc:730", ID_FILE_SAVE_LEFT
-            MENUITEM "Merge.rc:731", ID_FILE_SAVEAS_LEFT
+            MENUITEM "Merge.rc:731", ID_FILE_SAVE_LEFT
+            MENUITEM "Merge.rc:732", ID_FILE_SAVEAS_LEFT
         }
-        POPUP "Merge.rc:733"
+        POPUP "Merge.rc:734"
         {
-            MENUITEM "Merge.rc:735", ID_FILE_SAVE_RIGHT
-            MENUITEM "Merge.rc:736", ID_FILE_SAVEAS_RIGHT
-        }
-        MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:739", ID_FILE_PRINT_PREVIEW
-        MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:741", ID_FILE_LEFT_READONLY, HELP
-        MENUITEM "Merge.rc:742", ID_FILE_RIGHT_READONLY, HELP
-        MENUITEM SEPARATOR
-        POPUP "Merge.rc:744"
-        {
-            MENUITEM "Merge.rc:746", ID_EOL_TO_DOS
-            MENUITEM "Merge.rc:747", ID_EOL_TO_UNIX
-            MENUITEM "Merge.rc:748", ID_EOL_TO_MAC
+            MENUITEM "Merge.rc:736", ID_FILE_SAVE_RIGHT
+            MENUITEM "Merge.rc:737", ID_FILE_SAVEAS_RIGHT
         }
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:751", ID_FILE_MERGINGMODE, HELP
+        MENUITEM "Merge.rc:740", ID_FILE_PRINT_PREVIEW
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:753", ID_FILE_ENCODING
+        MENUITEM "Merge.rc:742", ID_FILE_LEFT_READONLY, HELP
+        MENUITEM "Merge.rc:743", ID_FILE_RIGHT_READONLY, HELP
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:755", ID_APP_EXIT
+        POPUP "Merge.rc:745"
+        {
+            MENUITEM "Merge.rc:747", ID_EOL_TO_DOS
+            MENUITEM "Merge.rc:748", ID_EOL_TO_UNIX
+            MENUITEM "Merge.rc:749", ID_EOL_TO_MAC
+        }
+        MENUITEM SEPARATOR
+        MENUITEM "Merge.rc:752", ID_FILE_MERGINGMODE, HELP
+        MENUITEM SEPARATOR
+        MENUITEM "Merge.rc:754", ID_FILE_ENCODING
+        MENUITEM SEPARATOR
+        MENUITEM "Merge.rc:756", ID_APP_EXIT
     }
-    POPUP "Merge.rc:757"
+    POPUP "Merge.rc:758"
     {
-        MENUITEM "Merge.rc:759", ID_EDIT_UNDO
-        MENUITEM "Merge.rc:760", ID_EDIT_REDO
+        MENUITEM "Merge.rc:760", ID_EDIT_UNDO
+        MENUITEM "Merge.rc:761", ID_EDIT_REDO
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:762", ID_EDIT_CUT
-        MENUITEM "Merge.rc:763", ID_EDIT_COPY
-        MENUITEM "Merge.rc:764", ID_EDIT_PASTE
+        MENUITEM "Merge.rc:763", ID_EDIT_CUT
+        MENUITEM "Merge.rc:764", ID_EDIT_COPY
+        MENUITEM "Merge.rc:765", ID_EDIT_PASTE
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:766", ID_SELECT_NEXT_LINEDIFF
-        MENUITEM "Merge.rc:767", ID_EDIT_SELECT_ALL
+        MENUITEM "Merge.rc:767", ID_SELECT_NEXT_LINEDIFF
+        MENUITEM "Merge.rc:768", ID_EDIT_SELECT_ALL
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:769", ID_EDIT_FIND
-        MENUITEM "Merge.rc:770", ID_EDIT_REPLACE
+        MENUITEM "Merge.rc:770", ID_EDIT_FIND
+        MENUITEM "Merge.rc:771", ID_EDIT_REPLACE
         MENUITEM SEPARATOR
-        POPUP "Merge.rc:772"
+        POPUP "Merge.rc:773"
         {
-            MENUITEM "Merge.rc:774", ID_EDIT_COPY_LINENUMBERS
+            MENUITEM "Merge.rc:775", ID_EDIT_COPY_LINENUMBERS
         }
-        POPUP "Merge.rc:776"
+        POPUP "Merge.rc:777"
         {
-            MENUITEM "Merge.rc:778", ID_EDIT_TOGGLE_BOOKMARK
-            MENUITEM "Merge.rc:779", ID_EDIT_GOTO_NEXT_BOOKMARK
-            MENUITEM "Merge.rc:780", ID_EDIT_GOTO_PREV_BOOKMARK
-            MENUITEM "Merge.rc:781", ID_EDIT_CLEAR_ALL_BOOKMARKS
+            MENUITEM "Merge.rc:779", ID_EDIT_TOGGLE_BOOKMARK
+            MENUITEM "Merge.rc:780", ID_EDIT_GOTO_NEXT_BOOKMARK
+            MENUITEM "Merge.rc:781", ID_EDIT_GOTO_PREV_BOOKMARK
+            MENUITEM "Merge.rc:782", ID_EDIT_CLEAR_ALL_BOOKMARKS
         }
-        MENUITEM "Merge.rc:783", ID_EDIT_WMGOTO
+        MENUITEM "Merge.rc:784", ID_EDIT_WMGOTO
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:785", ID_OPTIONS
+        MENUITEM "Merge.rc:786", ID_OPTIONS
     }
-    POPUP "Merge.rc:787"
+    POPUP "Merge.rc:788"
     {
-        MENUITEM "Merge.rc:789", ID_VIEW_SELECTFONT
-        MENUITEM "Merge.rc:790", ID_VIEW_USEDEFAULTFONT
-        POPUP "Merge.rc:791"
+        MENUITEM "Merge.rc:790", ID_VIEW_SELECTFONT
+        MENUITEM "Merge.rc:791", ID_VIEW_USEDEFAULTFONT
+        POPUP "Merge.rc:792"
         {
-            MENUITEM "Merge.rc:793", ID_VIEW_ZOOMIN
-            MENUITEM "Merge.rc:794", ID_VIEW_ZOOMOUT
-            MENUITEM "Merge.rc:795", ID_VIEW_ZOOMNORMAL
+            MENUITEM "Merge.rc:794", ID_VIEW_ZOOMIN
+            MENUITEM "Merge.rc:795", ID_VIEW_ZOOMOUT
+            MENUITEM "Merge.rc:796", ID_VIEW_ZOOMNORMAL
         }
-        POPUP "Merge.rc:797"
+        POPUP "Merge.rc:798"
         {
-            MENUITEM "Merge.rc:799", ID_COLORSCHEME_FIRST
+            MENUITEM "Merge.rc:800", ID_COLORSCHEME_FIRST
             MENUITEM SEPARATOR
         }
-        POPUP "Merge.rc:802"
+        POPUP "Merge.rc:803"
         {
-            MENUITEM "Merge.rc:804", ID_VIEW_CONTEXT_UNLIMITED
+            MENUITEM "Merge.rc:805", ID_VIEW_CONTEXT_UNLIMITED
             MENUITEM SEPARATOR
-            MENUITEM "Merge.rc:806", ID_VIEW_CONTEXT_0
-            MENUITEM "Merge.rc:807", ID_VIEW_CONTEXT_1
-            MENUITEM "Merge.rc:808", ID_VIEW_CONTEXT_2
-            MENUITEM "Merge.rc:809", ID_VIEW_CONTEXT_3
-            MENUITEM "Merge.rc:810", ID_VIEW_CONTEXT_4
-            MENUITEM "Merge.rc:811", ID_VIEW_CONTEXT_5
-            MENUITEM "Merge.rc:812", ID_VIEW_CONTEXT_6
-            MENUITEM "Merge.rc:813", ID_VIEW_CONTEXT_7
-            MENUITEM "Merge.rc:814", ID_VIEW_CONTEXT_8
-            MENUITEM "Merge.rc:815", ID_VIEW_CONTEXT_9
+            MENUITEM "Merge.rc:807", ID_VIEW_CONTEXT_0
+            MENUITEM "Merge.rc:808", ID_VIEW_CONTEXT_1
+            MENUITEM "Merge.rc:809", ID_VIEW_CONTEXT_2
+            MENUITEM "Merge.rc:810", ID_VIEW_CONTEXT_3
+            MENUITEM "Merge.rc:811", ID_VIEW_CONTEXT_4
+            MENUITEM "Merge.rc:812", ID_VIEW_CONTEXT_5
+            MENUITEM "Merge.rc:813", ID_VIEW_CONTEXT_6
+            MENUITEM "Merge.rc:814", ID_VIEW_CONTEXT_7
+            MENUITEM "Merge.rc:815", ID_VIEW_CONTEXT_8
+            MENUITEM "Merge.rc:816", ID_VIEW_CONTEXT_9
         }
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:818", ID_VIEW_RESIZE_PANES, HELP
-        MENUITEM "Merge.rc:819", ID_VIEW_WHITESPACE, HELP
-        MENUITEM "Merge.rc:820", ID_VIEW_LINEDIFFS, HELP
-        MENUITEM "Merge.rc:821", ID_VIEW_LINENUMBERS, HELP
-        MENUITEM "Merge.rc:822", ID_VIEW_FILEMARGIN, HELP
-        MENUITEM "Merge.rc:823", ID_VIEW_RULER, HELP
-        MENUITEM "Merge.rc:824", ID_VIEW_TABLELAYOUT, HELP
-        MENUITEM "Merge.rc:825", ID_VIEW_WORDWRAP, HELP
-        MENUITEM "Merge.rc:826", ID_VIEW_SEPARATE_COMBINING_CHARS, HELP
+        MENUITEM "Merge.rc:819", ID_VIEW_RESIZE_PANES, HELP
+        MENUITEM "Merge.rc:820", ID_VIEW_WHITESPACE, HELP
+        MENUITEM "Merge.rc:821", ID_VIEW_LINEDIFFS, HELP
+        MENUITEM "Merge.rc:822", ID_VIEW_LINENUMBERS, HELP
+        MENUITEM "Merge.rc:823", ID_VIEW_FILEMARGIN, HELP
+        MENUITEM "Merge.rc:824", ID_VIEW_RULER, HELP
+        MENUITEM "Merge.rc:825", ID_VIEW_TABLELAYOUT, HELP
+        MENUITEM "Merge.rc:826", ID_VIEW_WORDWRAP, HELP
+        MENUITEM "Merge.rc:827", ID_VIEW_SEPARATE_COMBINING_CHARS, HELP
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:828", ID_VIEW_SWAPPANES
+        MENUITEM "Merge.rc:829", ID_VIEW_SWAPPANES
         MENUITEM SEPARATOR
-        POPUP "Merge.rc:830"
+        POPUP "Merge.rc:831"
         {
-            MENUITEM "Merge.rc:832", ID_TOOLBAR_NONE
-            MENUITEM "Merge.rc:833", ID_TOOLBAR_SMALL
-            MENUITEM "Merge.rc:834", ID_TOOLBAR_BIG
-            MENUITEM "Merge.rc:835", ID_TOOLBAR_HUGE
+            MENUITEM "Merge.rc:833", ID_TOOLBAR_NONE
+            MENUITEM "Merge.rc:834", ID_TOOLBAR_SMALL
+            MENUITEM "Merge.rc:835", ID_TOOLBAR_BIG
+            MENUITEM "Merge.rc:836", ID_TOOLBAR_HUGE
         }
-        MENUITEM "Merge.rc:837", ID_VIEW_STATUS_BAR, HELP
-        MENUITEM "Merge.rc:838", ID_VIEW_TAB_BAR, HELP
-        MENUITEM "Merge.rc:839", ID_VIEW_DETAIL_BAR, HELP
-        MENUITEM "Merge.rc:840", ID_VIEW_LOCATION_BAR, HELP
+        MENUITEM "Merge.rc:838", ID_VIEW_STATUS_BAR, HELP
+        MENUITEM "Merge.rc:839", ID_VIEW_TAB_BAR, HELP
+        MENUITEM "Merge.rc:840", ID_VIEW_DETAIL_BAR, HELP
+        MENUITEM "Merge.rc:841", ID_VIEW_LOCATION_BAR, HELP
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:842", ID_VIEW_LANGUAGE
+        MENUITEM "Merge.rc:843", ID_VIEW_LANGUAGE
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:844", ID_REFRESH
+        MENUITEM "Merge.rc:845", ID_REFRESH
     }
-    POPUP "Merge.rc:846"
+    POPUP "Merge.rc:847"
     {
-        MENUITEM "Merge.rc:848", ID_NEXTDIFF
-        MENUITEM "Merge.rc:849", ID_PREVDIFF
+        MENUITEM "Merge.rc:849", ID_NEXTDIFF
+        MENUITEM "Merge.rc:850", ID_PREVDIFF
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:851", ID_FIRSTDIFF
-        MENUITEM "Merge.rc:852", ID_CURDIFF
-        MENUITEM "Merge.rc:853", ID_LASTDIFF
+        MENUITEM "Merge.rc:852", ID_FIRSTDIFF
+        MENUITEM "Merge.rc:853", ID_CURDIFF
+        MENUITEM "Merge.rc:854", ID_LASTDIFF
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:855", ID_L2R
-        MENUITEM "Merge.rc:856", ID_R2L
+        MENUITEM "Merge.rc:856", ID_L2R
+        MENUITEM "Merge.rc:857", ID_R2L
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:858", ID_L2RNEXT
-        MENUITEM "Merge.rc:859", ID_R2LNEXT
+        MENUITEM "Merge.rc:859", ID_L2RNEXT
+        MENUITEM "Merge.rc:860", ID_R2LNEXT
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:861", ID_ALL_RIGHT
-        MENUITEM "Merge.rc:862", ID_ALL_LEFT
+        MENUITEM "Merge.rc:862", ID_ALL_RIGHT
+        MENUITEM "Merge.rc:863", ID_ALL_LEFT
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:864", ID_SET_SYNCPOINT, HELP
-        MENUITEM "Merge.rc:865", ID_CLEAR_SYNCPOINTS
+        MENUITEM "Merge.rc:865", ID_SET_SYNCPOINT, HELP
+        MENUITEM "Merge.rc:866", ID_CLEAR_SYNCPOINTS
     }
-    POPUP "Merge.rc:867"
+    POPUP "Merge.rc:868"
     {
-        MENUITEM "Merge.rc:869", ID_TOOLS_FILTERS
-        MENUITEM "Merge.rc:870", ID_TOOLS_GENERATEPATCH
-        MENUITEM "Merge.rc:871", ID_TOOLS_GENERATEREPORT
-        MENUITEM "Merge.rc:872", ID_TOOLS_COMPARE_SELECTION
+        MENUITEM "Merge.rc:870", ID_TOOLS_FILTERS
+        MENUITEM "Merge.rc:871", ID_TOOLS_GENERATEPATCH
+        MENUITEM "Merge.rc:872", ID_TOOLS_GENERATEREPORT
+        MENUITEM "Merge.rc:873", ID_TOOLS_COMPARE_SELECTION
     }
-    POPUP "Merge.rc:874"
+    POPUP "Merge.rc:875"
     {
-        MENUITEM "Merge.rc:876", ID_FILE_CLOSE
-        MENUITEM "Merge.rc:877", ID_WINDOW_CLOSEALL
+        MENUITEM "Merge.rc:877", ID_FILE_CLOSE
+        MENUITEM "Merge.rc:878", ID_WINDOW_CLOSEALL
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:879", ID_WINDOW_CHANGE_PANE
+        MENUITEM "Merge.rc:880", ID_WINDOW_CHANGE_PANE
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:881", ID_WINDOW_TILE_HORZ
-        MENUITEM "Merge.rc:882", ID_WINDOW_TILE_VERT
-        MENUITEM "Merge.rc:883", ID_WINDOW_CASCADE
+        MENUITEM "Merge.rc:882", ID_WINDOW_TILE_HORZ
+        MENUITEM "Merge.rc:883", ID_WINDOW_TILE_VERT
+        MENUITEM "Merge.rc:884", ID_WINDOW_CASCADE
     }
-    POPUP "Merge.rc:885"
+    POPUP "Merge.rc:886"
     {
-        MENUITEM "Merge.rc:887", ID_HELP_CONTENTS
-        MENUITEM "Merge.rc:888", ID_HELP_FRHED
+        MENUITEM "Merge.rc:888", ID_HELP_CONTENTS
+        MENUITEM "Merge.rc:889", ID_HELP_FRHED
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:890", ID_HELP_RELEASENOTES
-        MENUITEM "Merge.rc:891", ID_HELP_TRANSLATIONS
-        MENUITEM "Merge.rc:892", ID_HELP_GETCONFIG
+        MENUITEM "Merge.rc:891", ID_HELP_RELEASENOTES
+        MENUITEM "Merge.rc:892", ID_HELP_TRANSLATIONS
+        MENUITEM "Merge.rc:893", ID_HELP_GETCONFIG
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:894", ID_APP_ABOUT, INACTIVE
+        MENUITEM "Merge.rc:895", ID_APP_ABOUT, INACTIVE
     }
 }
 
@@ -901,24 +902,24 @@ IDR_POPUP_DIFF_OPTIONS MENU
 {
     POPUP "_POPUP_"
     {
-        POPUP "Merge.rc:904"
+        POPUP "Merge.rc:905"
         {
-            MENUITEM "Merge.rc:906", IDC_DIFF_WS_IGNORE_TAB_EXPANSION, HELP
-            MENUITEM "Merge.rc:907", IDC_DIFF_WS_IGNORE_TRAILING_SPACE, HELP
-            MENUITEM "Merge.rc:908", IDC_DIFF_WHITESPACE_COMPARE
-            MENUITEM "Merge.rc:909", IDC_DIFF_WHITESPACE_IGNORE
-            MENUITEM "Merge.rc:910", IDC_DIFF_WHITESPACE_IGNOREALL
+            MENUITEM "Merge.rc:907", IDC_DIFF_WS_IGNORE_TAB_EXPANSION, HELP
+            MENUITEM "Merge.rc:908", IDC_DIFF_WS_IGNORE_TRAILING_SPACE, HELP
+            MENUITEM "Merge.rc:909", IDC_DIFF_WHITESPACE_COMPARE
+            MENUITEM "Merge.rc:910", IDC_DIFF_WHITESPACE_IGNORE
+            MENUITEM "Merge.rc:911", IDC_DIFF_WHITESPACE_IGNOREALL
         }
-        MENUITEM "Merge.rc:912", IDC_DIFF_IGNORECASE, HELP
-        MENUITEM "Merge.rc:913", IDC_DIFF_IGNOREEOL, HELP
-        POPUP "Merge.rc:914"
+        MENUITEM "Merge.rc:913", IDC_DIFF_IGNORECASE, HELP
+        MENUITEM "Merge.rc:914", IDC_DIFF_IGNOREEOL, HELP
+        POPUP "Merge.rc:915"
         {
-            MENUITEM "Merge.rc:916", ID_COMPMETHOD_FULL_CONTENTS
-            MENUITEM "Merge.rc:917", ID_COMPMETHOD_QUICK_CONTENTS
-            MENUITEM "Merge.rc:918", ID_COMPMETHOD_BINARY_CONTENTS
-            MENUITEM "Merge.rc:919", ID_COMPMETHOD_MODDATE
-            MENUITEM "Merge.rc:920", ID_COMPMETHOD_DATESIZE
-            MENUITEM "Merge.rc:921", ID_COMPMETHOD_SIZE
+            MENUITEM "Merge.rc:917", ID_COMPMETHOD_FULL_CONTENTS
+            MENUITEM "Merge.rc:918", ID_COMPMETHOD_QUICK_CONTENTS
+            MENUITEM "Merge.rc:919", ID_COMPMETHOD_BINARY_CONTENTS
+            MENUITEM "Merge.rc:920", ID_COMPMETHOD_MODDATE
+            MENUITEM "Merge.rc:921", ID_COMPMETHOD_DATESIZE
+            MENUITEM "Merge.rc:922", ID_COMPMETHOD_SIZE
         }
     }
 }
@@ -929,78 +930,78 @@ IDR_POPUP_DIRVIEW MENU
 {
     POPUP "_ITEM_POPUP_"
     {
-        MENUITEM "Merge.rc:932", ID_MERGE_COMPARE
-        POPUP "Merge.rc:933"
+        MENUITEM "Merge.rc:933", ID_MERGE_COMPARE
+        POPUP "Merge.rc:934"
         {
-            MENUITEM "Merge.rc:935", ID_MERGE_COMPARE_TEXT
-            MENUITEM "Merge.rc:936", ID_MERGE_COMPARE_ZIP
-            MENUITEM "Merge.rc:937", ID_MERGE_COMPARE_HEX
-            MENUITEM "Merge.rc:938", ID_MERGE_COMPARE_IMG
-            MENUITEM "Merge.rc:939", ID_MERGE_COMPARE_REOGRID
-            MENUITEM "Merge.rc:940", ID_MERGE_COMPARE_SQLITE
-            MENUITEM "Merge.rc:941", ID_MERGE_COMPARE_XML
-            MENUITEM "Merge.rc:942", ID_SCRIPT_LAST
+            MENUITEM "Merge.rc:936", ID_MERGE_COMPARE_TEXT
+            MENUITEM "Merge.rc:937", ID_MERGE_COMPARE_ZIP
+            MENUITEM "Merge.rc:938", ID_MERGE_COMPARE_HEX
+            MENUITEM "Merge.rc:939", ID_MERGE_COMPARE_IMG
+            MENUITEM "Merge.rc:940", ID_MERGE_COMPARE_REOGRID
+            MENUITEM "Merge.rc:941", ID_MERGE_COMPARE_SQLITE
+            MENUITEM "Merge.rc:942", ID_MERGE_COMPARE_XML
+            MENUITEM "Merge.rc:943", ID_SCRIPT_LAST
         }
         MENUITEM SEPARATOR
-        POPUP "Merge.rc:945"
+        POPUP "Merge.rc:946"
         {
-            MENUITEM "Merge.rc:947", ID_DIR_COPY_LEFT_TO_RIGHT
-            MENUITEM "Merge.rc:948", ID_DIR_COPY_LEFT_TO_BROWSE
-            MENUITEM "Merge.rc:949", ID_DIR_COPY_RIGHT_TO_LEFT
-            MENUITEM "Merge.rc:950", ID_DIR_COPY_RIGHT_TO_BROWSE
+            MENUITEM "Merge.rc:948", ID_DIR_COPY_LEFT_TO_RIGHT
+            MENUITEM "Merge.rc:949", ID_DIR_COPY_LEFT_TO_BROWSE
+            MENUITEM "Merge.rc:950", ID_DIR_COPY_RIGHT_TO_LEFT
+            MENUITEM "Merge.rc:951", ID_DIR_COPY_RIGHT_TO_BROWSE
         }
-        POPUP "Merge.rc:952"
+        POPUP "Merge.rc:953"
         {
-            MENUITEM "Merge.rc:954", ID_DIR_MOVE_LEFT_TO_BROWSE
-            MENUITEM "Merge.rc:955", ID_DIR_MOVE_RIGHT_TO_BROWSE
+            MENUITEM "Merge.rc:955", ID_DIR_MOVE_LEFT_TO_BROWSE
+            MENUITEM "Merge.rc:956", ID_DIR_MOVE_RIGHT_TO_BROWSE
         }
-        POPUP "Merge.rc:957"
+        POPUP "Merge.rc:958"
         {
-            MENUITEM "Merge.rc:959", ID_DIR_DEL_LEFT
-            MENUITEM "Merge.rc:960", ID_DIR_DEL_RIGHT
-            MENUITEM "Merge.rc:961", ID_DIR_DEL_BOTH
+            MENUITEM "Merge.rc:960", ID_DIR_DEL_LEFT
+            MENUITEM "Merge.rc:961", ID_DIR_DEL_RIGHT
+            MENUITEM "Merge.rc:962", ID_DIR_DEL_BOTH
         }
-        MENUITEM "Merge.rc:963", ID_DIR_ITEM_RENAME
-        MENUITEM "Merge.rc:964", ID_DIR_HIDE_FILENAMES
+        MENUITEM "Merge.rc:964", ID_DIR_ITEM_RENAME
+        MENUITEM "Merge.rc:965", ID_DIR_HIDE_FILENAMES
         MENUITEM SEPARATOR
-        POPUP "Merge.rc:966"
+        POPUP "Merge.rc:967"
         {
-            MENUITEM "Merge.rc:968", ID_DIR_OPEN_LEFT
-            MENUITEM "Merge.rc:969", ID_DIR_OPEN_LEFT_WITHEDITOR
-            MENUITEM "Merge.rc:970", ID_DIR_OPEN_LEFT_WITH
+            MENUITEM "Merge.rc:969", ID_DIR_OPEN_LEFT
+            MENUITEM "Merge.rc:970", ID_DIR_OPEN_LEFT_WITHEDITOR
+            MENUITEM "Merge.rc:971", ID_DIR_OPEN_LEFT_WITH
             MENUITEM SEPARATOR
-            MENUITEM "Merge.rc:972", ID_DIR_OPEN_LEFT_FOLDER
+            MENUITEM "Merge.rc:973", ID_DIR_OPEN_LEFT_FOLDER
         }
-        POPUP "Merge.rc:974"
+        POPUP "Merge.rc:975"
         {
-            MENUITEM "Merge.rc:976", ID_DIR_OPEN_RIGHT
-            MENUITEM "Merge.rc:977", ID_DIR_OPEN_RIGHT_WITHEDITOR
-            MENUITEM "Merge.rc:978", ID_DIR_OPEN_RIGHT_WITH
+            MENUITEM "Merge.rc:977", ID_DIR_OPEN_RIGHT
+            MENUITEM "Merge.rc:978", ID_DIR_OPEN_RIGHT_WITHEDITOR
+            MENUITEM "Merge.rc:979", ID_DIR_OPEN_RIGHT_WITH
             MENUITEM SEPARATOR
-            MENUITEM "Merge.rc:980", ID_DIR_OPEN_RIGHT_FOLDER
+            MENUITEM "Merge.rc:981", ID_DIR_OPEN_RIGHT_FOLDER
         }
         MENUITEM SEPARATOR
-        POPUP "Merge.rc:983"
+        POPUP "Merge.rc:984"
         {
-            MENUITEM "Merge.rc:985", ID_DIR_COPY_PATHNAMES_LEFT
-            MENUITEM "Merge.rc:986", ID_DIR_COPY_PATHNAMES_RIGHT
-            MENUITEM "Merge.rc:987", ID_DIR_COPY_PATHNAMES_BOTH
+            MENUITEM "Merge.rc:986", ID_DIR_COPY_PATHNAMES_LEFT
+            MENUITEM "Merge.rc:987", ID_DIR_COPY_PATHNAMES_RIGHT
+            MENUITEM "Merge.rc:988", ID_DIR_COPY_PATHNAMES_BOTH
         }
-        MENUITEM "Merge.rc:989", ID_DIR_COPY_FILENAMES
+        MENUITEM "Merge.rc:990", ID_DIR_COPY_FILENAMES
         MENUITEM SEPARATOR
-        POPUP "Merge.rc:991"
+        POPUP "Merge.rc:992"
         {
-            MENUITEM "Merge.rc:993", ID_DIR_ZIP_LEFT
-            MENUITEM "Merge.rc:994", ID_DIR_ZIP_RIGHT
-            MENUITEM "Merge.rc:995", ID_DIR_ZIP_BOTH
-            MENUITEM "Merge.rc:996", ID_DIR_ZIP_BOTH_DIFFS_ONLY
+            MENUITEM "Merge.rc:994", ID_DIR_ZIP_LEFT
+            MENUITEM "Merge.rc:995", ID_DIR_ZIP_RIGHT
+            MENUITEM "Merge.rc:996", ID_DIR_ZIP_BOTH
+            MENUITEM "Merge.rc:997", ID_DIR_ZIP_BOTH_DIFFS_ONLY
         }
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:999", ID_DIR_RESCAN
+        MENUITEM "Merge.rc:1000", ID_DIR_RESCAN
     }
     POPUP "_HDR_POPUP_"
     {
-        MENUITEM "Merge.rc:1003", ID_TOOLS_CUSTOMIZECOLUMNS
+        MENUITEM "Merge.rc:1004", ID_TOOLS_CUSTOMIZECOLUMNS
     }
 }
 
@@ -1010,14 +1011,14 @@ IDR_POPUP_EDITOR_HEADERBAR MENU
 {
     POPUP "_POPUP_"
     {
-        MENUITEM "Merge.rc:1013", ID_EDITOR_COPY_PATH
-        MENUITEM "Merge.rc:1014", ID_EDITOR_COPY_FILENAME
+        MENUITEM "Merge.rc:1014", ID_EDITOR_COPY_PATH
+        MENUITEM "Merge.rc:1015", ID_EDITOR_COPY_FILENAME
     }
     POPUP "_POPUP_"
     {
-        MENUITEM "Merge.rc:1018", ID_MRGMAN_BASE
-        MENUITEM "Merge.rc:1019", ID_MRGMAN_SOURCE
-        MENUITEM "Merge.rc:1020", ID_MRGMAN_DESTINATION
+        MENUITEM "Merge.rc:1019", ID_MRGMAN_BASE
+        MENUITEM "Merge.rc:1020", ID_MRGMAN_SOURCE
+        MENUITEM "Merge.rc:1021", ID_MRGMAN_DESTINATION
     }
 }
 
@@ -1027,12 +1028,12 @@ IDR_POPUP_LOCATIONBAR MENU
 {
     POPUP "_POPUP_"
     {
-        MENUITEM "Merge.rc:1030", ID_LOCBAR_GOTOLINE
-        MENUITEM "Merge.rc:1031", ID_EDIT_WMGOTO
+        MENUITEM "Merge.rc:1031", ID_LOCBAR_GOTOLINE
+        MENUITEM "Merge.rc:1032", ID_EDIT_WMGOTO
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:1033", ID_DISPLAY_MOVED_NONE
-        MENUITEM "Merge.rc:1034", ID_DISPLAY_MOVED_ALL
-        MENUITEM "Merge.rc:1035", ID_DISPLAY_MOVED_FOLLOW_DIFF
+        MENUITEM "Merge.rc:1034", ID_DISPLAY_MOVED_NONE
+        MENUITEM "Merge.rc:1035", ID_DISPLAY_MOVED_ALL
+        MENUITEM "Merge.rc:1036", ID_DISPLAY_MOVED_FOLLOW_DIFF
     }
 }
 
@@ -1042,10 +1043,10 @@ IDR_POPUP_MERGEDETAILVIEW MENU
 {
     POPUP "_POPUP_"
     {
-        MENUITEM "Merge.rc:1045", ID_L2R
-        MENUITEM "Merge.rc:1046", ID_R2L
+        MENUITEM "Merge.rc:1046", ID_L2R
+        MENUITEM "Merge.rc:1047", ID_R2L
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:1048", ID_EDIT_COPY
+        MENUITEM "Merge.rc:1049", ID_EDIT_COPY
     }
 }
 
@@ -1055,29 +1056,29 @@ IDR_POPUP_MERGEVIEW MENU
 {
     POPUP "_POPUP_"
     {
-        MENUITEM "Merge.rc:1058", ID_L2R
-        MENUITEM "Merge.rc:1059", ID_R2L
+        MENUITEM "Merge.rc:1059", ID_L2R
+        MENUITEM "Merge.rc:1060", ID_R2L
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:1061", ID_SELECT_NEXT_LINEDIFF
+        MENUITEM "Merge.rc:1062", ID_SELECT_NEXT_LINEDIFF
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:1063", ID_EDIT_UNDO
-        MENUITEM "Merge.rc:1064", ID_EDIT_REDO
+        MENUITEM "Merge.rc:1064", ID_EDIT_UNDO
+        MENUITEM "Merge.rc:1065", ID_EDIT_REDO
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:1066", ID_EDIT_CUT
-        MENUITEM "Merge.rc:1067", ID_EDIT_COPY
-        MENUITEM "Merge.rc:1068", ID_EDIT_PASTE
+        MENUITEM "Merge.rc:1067", ID_EDIT_CUT
+        MENUITEM "Merge.rc:1068", ID_EDIT_COPY
+        MENUITEM "Merge.rc:1069", ID_EDIT_PASTE
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:1070", ID_EDIT_WMGOTO
+        MENUITEM "Merge.rc:1071", ID_EDIT_WMGOTO
         MENUITEM SEPARATOR
-        MENUITEM "Merge.rc:1072", ID_VIEW_TABLELAYOUT, HELP
+        MENUITEM "Merge.rc:1073", ID_VIEW_TABLELAYOUT, HELP
         MENUITEM SEPARATOR
-        POPUP "Merge.rc:1074"
+        POPUP "Merge.rc:1075"
         {
-            MENUITEM "Merge.rc:1076", ID_FILE_OPEN_REGISTERED
-            MENUITEM "Merge.rc:1077", ID_FILE_OPEN_WITHEDITOR
-            MENUITEM "Merge.rc:1078", ID_FILE_OPEN_WITH
+            MENUITEM "Merge.rc:1077", ID_FILE_OPEN_REGISTERED
+            MENUITEM "Merge.rc:1078", ID_FILE_OPEN_WITHEDITOR
+            MENUITEM "Merge.rc:1079", ID_FILE_OPEN_WITH
             MENUITEM SEPARATOR
-            MENUITEM "Merge.rc:1080", ID_FILE_OPEN_FOLDER
+            MENUITEM "Merge.rc:1081", ID_FILE_OPEN_FOLDER
         }
     }
 }
@@ -1089,161 +1090,161 @@ IDR_POPUP_MERGEVIEW MENU
 //
 IDD_ABOUTBOX DIALOGEX 0, 0, 366, 237
 STYLE DS_CENTER | DS_MODALFRAME | DS_SHELLFONT | WS_CAPTION | WS_POPUP | WS_SYSMENU
-CAPTION "Merge.rc:1092"
+CAPTION "Merge.rc:1093"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
     LTEXT           "", IDC_GNU_ASCII, 7, 50, 200, 121
-    LTEXT           "Merge.rc:1096", IDC_VERSION, 240, 155, 117, 20, SS_NOPREFIX
-    DEFPUSHBUTTON   "Merge.rc:1097", IDOK, 295, 220, 65, 14
+    LTEXT           "Merge.rc:1097", IDC_VERSION, 240, 155, 117, 20, SS_NOPREFIX
+    DEFPUSHBUTTON   "Merge.rc:1098", IDOK, 295, 220, 65, 14
     LTEXT           "[VERSION COPYRIGHT GOES HERE]", IDC_COMPANY, 7, 177, 350, 36
-    PUSHBUTTON      "Merge.rc:1099", IDC_OPEN_CONTRIBUTORS, 7, 220, 65, 14
-    CONTROL         "Merge.rc:1100", IDC_WWW,WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW, 120, 222, 167, 10
+    PUSHBUTTON      "Merge.rc:1100", IDC_OPEN_CONTRIBUTORS, 7, 220, 65, 14
+    CONTROL         "Merge.rc:1101", IDC_WWW,WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW, 120, 222, 167, 10
 }
 
 
 
 IDD_BROWSE_FOR_FILE DIALOGEX 0, 0, 460, 214
 STYLE DS_CENTER | DS_MODALFRAME | DS_SHELLFONT | WS_CAPTION | WS_CLIPCHILDREN | WS_POPUP | WS_THICKFRAME | WS_SYSMENU
-CAPTION "Merge.rc:1107"
+CAPTION "Merge.rc:1108"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
     CONTROL         "", IDC_TREE_FOLDER, WC_TREEVIEW, WS_TABSTOP | WS_BORDER | TVS_HASBUTTONS | TVS_HASLINES | TVS_LINESATROOT | TVS_EDITLABELS | TVS_SHOWSELALWAYS | TVS_INFOTIP | TVS_FULLROWSELECT, 4, 4, 166, 188, WS_EX_ACCEPTFILES
     CONTROL         "", IDC_LIST_FILE, WC_LISTVIEW, WS_TABSTOP | WS_BORDER | LVS_SHOWSELALWAYS | LVS_REPORT, 174, 4, 282, 188, WS_EX_ACCEPTFILES
-    LTEXT           "Merge.rc:1112", IDC_STATIC_FILTER, 4, 198, 60, 10, SS_LEFT, WS_EX_LEFT
+    LTEXT           "Merge.rc:1113", IDC_STATIC_FILTER, 4, 198, 60, 10, SS_LEFT, WS_EX_LEFT
     CONTROL         "", IDC_TAB_FILTER, WC_TABCONTROL, TCS_FLATBUTTONS | TCS_BUTTONS | TCS_MULTILINE | TCS_FIXEDWIDTH | TCS_FOCUSNEVER, 64, 196, 40, 13, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1114", IDC_BUTTON_NEW_FOLDER, 110, 196, 60, 14, 0, WS_EX_LEFT
-    LTEXT           "Merge.rc:1115", IDC_STATIC_FILENAME, 174, 198, 38, 10, SS_LEFT, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1115", IDC_BUTTON_NEW_FOLDER, 110, 196, 60, 14, 0, WS_EX_LEFT
+    LTEXT           "Merge.rc:1116", IDC_STATIC_FILENAME, 174, 198, 38, 10, SS_LEFT, WS_EX_LEFT
     COMBOBOX        IDC_COMBO_FILTER, 212, 196, 136, 150, WS_TABSTOP | WS_VSCROLL | CBS_DROPDOWN | CBS_AUTOHSCROLL, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1117", IDOK, 352, 196, 50, 14, 0, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1118", IDCANCEL, 406, 196, 50, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1118", IDOK, 352, 196, 50, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1119", IDCANCEL, 406, 196, 50, 14, 0, WS_EX_LEFT
 }
 
 
 
 IDD_BROWSE_FOR_FOLDER DIALOGEX 0, 0, 282, 214
 STYLE DS_CENTER | DS_MODALFRAME | DS_SHELLFONT | WS_CAPTION | WS_CLIPCHILDREN | WS_POPUP | WS_THICKFRAME | WS_SYSMENU
-CAPTION "Merge.rc:1125"
+CAPTION "Merge.rc:1126"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
     CONTROL         "", IDC_TREE_FOLDER, WC_TREEVIEW, WS_TABSTOP | WS_BORDER | TVS_HASBUTTONS | TVS_HASLINES | TVS_LINESATROOT | TVS_EDITLABELS | TVS_SHOWSELALWAYS | TVS_INFOTIP | TVS_FULLROWSELECT, 4, 4, 274, 188, WS_EX_ACCEPTFILES
-    LTEXT           "Merge.rc:1129", IDC_STATIC_FILTER, 4, 198, 60, 10, SS_LEFT, WS_EX_LEFT
+    LTEXT           "Merge.rc:1130", IDC_STATIC_FILTER, 4, 198, 60, 10, SS_LEFT, WS_EX_LEFT
     CONTROL         "", IDC_TAB_FILTER, WC_TABCONTROL, TCS_FLATBUTTONS | TCS_BUTTONS | TCS_MULTILINE | TCS_FIXEDWIDTH | TCS_FOCUSNEVER, 64, 196, 40, 13, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1131", IDC_BUTTON_NEW_FOLDER, 110, 196, 60, 14, 0, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1132", IDOK, 174, 196, 50, 14, 0, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1133", IDCANCEL, 228, 196, 50, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1132", IDC_BUTTON_NEW_FOLDER, 110, 196, 60, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1133", IDOK, 174, 196, 50, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1134", IDCANCEL, 228, 196, 50, 14, 0, WS_EX_LEFT
 }
 
 
 
 IDD_CLEARCASE DIALOGEX 0, 0, 279, 134
 STYLE DS_CENTER | DS_MODALFRAME | DS_SHELLFONT | WS_CAPTION | WS_POPUP | WS_SYSMENU
-CAPTION "Merge.rc:1140"
+CAPTION "Merge.rc:1141"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
-    DEFPUSHBUTTON   "Merge.rc:1143", IDOK, 129, 115, 70, 14, 0, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1144", IDCANCEL, 203, 115, 70, 14, 0, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1145", IDC_SAVE_AS, 129, 115, 70, 14, NOT WS_VISIBLE, WS_EX_LEFT
+    DEFPUSHBUTTON   "Merge.rc:1144", IDOK, 129, 115, 70, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1145", IDCANCEL, 203, 115, 70, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1146", IDC_SAVE_AS, 129, 115, 70, 14, NOT WS_VISIBLE, WS_EX_LEFT
     EDITTEXT        IDC_COMMENTS, 18, 21, 243, 56, WS_HSCROLL | WS_VSCROLL | ES_AUTOHSCROLL | ES_AUTOVSCROLL | ES_MULTILINE | ES_WANTRETURN, WS_EX_LEFT
-    LTEXT           "Merge.rc:1147", IDC_STATIC, 18, 7, 243, 10, SS_LEFT, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1148", IDC_MULTI_CHECKOUT, 17, 83, 243, 8, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1149", IDC_CHECKIN, 17, 93, 243, 8, 0, WS_EX_LEFT
+    LTEXT           "Merge.rc:1148", IDC_STATIC, 18, 7, 243, 10, SS_LEFT, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1149", IDC_MULTI_CHECKOUT, 17, 83, 243, 8, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1150", IDC_CHECKIN, 17, 93, 243, 8, 0, WS_EX_LEFT
 }
 
 
 
 IDD_COMPARE_STATISTICS DIALOGEX 0, 0, 257, 161
 STYLE DS_CENTER | DS_MODALFRAME | DS_SHELLFONT | WS_CAPTION | WS_POPUP | WS_SYSMENU
-CAPTION "Merge.rc:1156"
+CAPTION "Merge.rc:1157"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
-    LTEXT           "Merge.rc:1159", IDC_STATIC, 132, 7, 38, 8, SS_LEFT, WS_EX_LEFT
-    LTEXT           "Merge.rc:1160", IDC_STATIC, 71, 7, 39, 8, SS_LEFT, WS_EX_LEFT
-    GROUPBOX        "Merge.rc:1161", IDC_STATIC, 7, 15, 186, 37, 0, WS_EX_LEFT
-    RTEXT           "Merge.rc:1162", IDC_STATIC, 11, 25, 56, 8, SS_RIGHT, WS_EX_LEFT
+    LTEXT           "Merge.rc:1160", IDC_STATIC, 132, 7, 38, 8, SS_LEFT, WS_EX_LEFT
+    LTEXT           "Merge.rc:1161", IDC_STATIC, 71, 7, 39, 8, SS_LEFT, WS_EX_LEFT
+    GROUPBOX        "Merge.rc:1162", IDC_STATIC, 7, 15, 186, 37, 0, WS_EX_LEFT
+    RTEXT           "Merge.rc:1163", IDC_STATIC, 11, 25, 56, 8, SS_RIGHT, WS_EX_LEFT
     ICON            "", IDC_STAT_INOTEQUAL, 71, 23, 21, 20, SS_ICON, WS_EX_LEFT
     RTEXT           "", IDC_STAT_DIFFFILE, 86, 24, 38, 10, SS_RIGHT | SS_SUNKEN, WS_EX_LEFT
-    RTEXT           "Merge.rc:1165", IDC_STATIC, 11, 39, 56, 8, SS_RIGHT, WS_EX_LEFT
+    RTEXT           "Merge.rc:1166", IDC_STATIC, 11, 39, 56, 8, SS_RIGHT, WS_EX_LEFT
     ICON            "", IDC_STAT_IDIFFBINFILE, 71, 36, 21, 20, SS_ICON, WS_EX_LEFT
     RTEXT           "", IDC_STAT_DIFFBINARY, 86, 37, 38, 10, SS_RIGHT | SS_SUNKEN, WS_EX_LEFT
-    GROUPBOX        "Merge.rc:1168", IDC_STATIC, 7, 55, 186, 37, 0, WS_EX_LEFT
-    RTEXT           "Merge.rc:1169", IDC_STATIC, 11, 65, 56, 8, SS_RIGHT, WS_EX_LEFT
+    GROUPBOX        "Merge.rc:1169", IDC_STATIC, 7, 55, 186, 37, 0, WS_EX_LEFT
+    RTEXT           "Merge.rc:1170", IDC_STATIC, 11, 65, 56, 8, SS_RIGHT, WS_EX_LEFT
     ICON            "", IDC_STAT_ILUNIQFOLDER, 132, 63, 21, 20, SS_ICON, WS_EX_LEFT
     RTEXT           "", IDC_STAT_LUNIQFOLDER, 146, 64, 38, 10, SS_RIGHT | SS_SUNKEN, WS_EX_LEFT
     ICON            "", IDC_STAT_ILUNIQFILE, 71, 63, 21, 20, SS_ICON, WS_EX_LEFT
     RTEXT           "", IDC_STAT_LUNIQFILE, 86, 64, 38, 10, SS_RIGHT | SS_SUNKEN, WS_EX_LEFT
-    RTEXT           "Merge.rc:1174", IDC_STATIC, 11, 78, 56, 8, SS_RIGHT, WS_EX_LEFT
+    RTEXT           "Merge.rc:1175", IDC_STATIC, 11, 78, 56, 8, SS_RIGHT, WS_EX_LEFT
     ICON            "", IDC_STAT_IRUNIQFOLDER, 132, 76, 21, 20, SS_ICON, WS_EX_LEFT
     RTEXT           "", IDC_STAT_RUNIQFOLDER, 146, 77, 38, 10, SS_RIGHT | SS_SUNKEN, WS_EX_LEFT
     ICON            "", IDC_STAT_IRUNIQFILE, 71, 76, 21, 20, SS_ICON, WS_EX_LEFT
     RTEXT           "", IDC_STAT_RUNIQFILE, 86, 77, 38, 10, SS_RIGHT | SS_SUNKEN, WS_EX_LEFT
-    GROUPBOX        "Merge.rc:1179", IDC_STATIC, 7, 95, 186, 37, 0, WS_EX_LEFT
+    GROUPBOX        "Merge.rc:1180", IDC_STATIC, 7, 95, 186, 37, 0, WS_EX_LEFT
     ICON            "", IDC_STAT_IIDENTICFOLDER, 132, 103, 21, 20, SS_ICON, WS_EX_LEFT
     RTEXT           "", IDC_STAT_IDENTICFOLDER, 146, 104, 38, 10, SS_RIGHT | SS_SUNKEN, WS_EX_LEFT
-    RTEXT           "Merge.rc:1182", IDC_STATIC, 11, 105, 56, 8, SS_RIGHT, WS_EX_LEFT
+    RTEXT           "Merge.rc:1183", IDC_STATIC, 11, 105, 56, 8, SS_RIGHT, WS_EX_LEFT
     ICON            "", IDC_STAT_IEQUALFILE, 71, 103, 21, 20, SS_ICON, WS_EX_LEFT
     RTEXT           "", IDC_STAT_IDENTICFILE, 86, 104, 38, 10, SS_RIGHT | SS_SUNKEN, WS_EX_LEFT
-    RTEXT           "Merge.rc:1185", IDC_STATIC, 11, 118, 56, 8, SS_RIGHT, WS_EX_LEFT
+    RTEXT           "Merge.rc:1186", IDC_STATIC, 11, 118, 56, 8, SS_RIGHT, WS_EX_LEFT
     ICON            "", IDC_STAT_IEQUALBINFILE, 71, 116, 21, 20, SS_ICON, WS_EX_LEFT
     RTEXT           "", IDC_STAT_IDENTICBINARY, 86, 117, 38, 10, SS_RIGHT | SS_SUNKEN, WS_EX_LEFT
     CONTROL         "", IDC_STATIC, WC_STATIC, SS_ETCHEDHORZ, 7, 136, 183, 1, WS_EX_LEFT
-    RTEXT           "Merge.rc:1189", IDC_STATIC, 11, 142, 56, 8, SS_RIGHT, WS_EX_LEFT
+    RTEXT           "Merge.rc:1190", IDC_STATIC, 11, 142, 56, 8, SS_RIGHT, WS_EX_LEFT
     ICON            "", IDC_STAT_ITOTALFOLDERS, 132, 140, 21, 20, SS_ICON, WS_EX_LEFT
     RTEXT           "", IDC_STAT_TOTALFOLDER, 146, 141, 38, 10, SS_RIGHT | SS_SUNKEN, WS_EX_LEFT
     ICON            "", IDC_STAT_ITOTALFILES, 71, 140, 21, 20, SS_ICON, WS_EX_LEFT
     RTEXT           "", IDC_STAT_TOTALFILE, 86, 141, 38, 10, SS_RIGHT | SS_SUNKEN, WS_EX_LEFT
-    DEFPUSHBUTTON   "Merge.rc:1194", IDOK, 200, 140, 50, 14, 0, WS_EX_LEFT
+    DEFPUSHBUTTON   "Merge.rc:1195", IDOK, 200, 140, 50, 14, 0, WS_EX_LEFT
 }
 
 
 
 IDD_CONFIRM_COPY DIALOGEX 0, 0, 285, 110
 STYLE DS_CENTER | DS_MODALFRAME | DS_SHELLFONT | WS_CAPTION | WS_POPUP | WS_THICKFRAME | WS_SYSMENU
-CAPTION "Merge.rc:1201"
+CAPTION "Merge.rc:1202"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
     ICON            "", IDC_FLDCONFIRM_ICON, 7, 7, 20, 20, SS_ICON, WS_EX_LEFT
     LTEXT           "", IDC_FLDCONFIRM_QUERY, 45, 7, 233, 8, SS_LEFT, WS_EX_LEFT
-    LTEXT           "Merge.rc:1206", IDC_FLDCONFIRM_FROM_TEXT, 46, 19, 231, 8, SS_LEFT, WS_EX_LEFT
+    LTEXT           "Merge.rc:1207", IDC_FLDCONFIRM_FROM_TEXT, 46, 19, 231, 8, SS_LEFT, WS_EX_LEFT
     EDITTEXT        IDC_FLDCONFIRM_FROM_PATH, 45, 29, 233, 14, ES_AUTOHSCROLL | ES_READONLY, WS_EX_LEFT
-    LTEXT           "Merge.rc:1208", IDC_FLDCONFIRM_TO_TEXT, 46, 48, 230, 8, SS_LEFT, WS_EX_LEFT
+    LTEXT           "Merge.rc:1209", IDC_FLDCONFIRM_TO_TEXT, 46, 48, 230, 8, SS_LEFT, WS_EX_LEFT
     EDITTEXT        IDC_FLDCONFIRM_TO_PATH, 46, 58, 232, 14, ES_AUTOHSCROLL | ES_READONLY, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1210", IDC_FLDCONFIRM_MAKE_WRITABLE, 46, 79, 120, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1211", IDC_FLDCONFIRM_IGNORE_FOLDER_STRUCTURE, 46, 89, 120, 10, 0, WS_EX_LEFT
-    DEFPUSHBUTTON   "Merge.rc:1212", IDYES, 174, 89, 50, 14, 0, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1213", IDNO, 228, 89, 50, 14, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1211", IDC_FLDCONFIRM_MAKE_WRITABLE, 46, 79, 120, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1212", IDC_FLDCONFIRM_IGNORE_FOLDER_STRUCTURE, 46, 89, 120, 10, 0, WS_EX_LEFT
+    DEFPUSHBUTTON   "Merge.rc:1213", IDYES, 174, 89, 50, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1214", IDNO, 228, 89, 50, 14, 0, WS_EX_LEFT
 }
 
 
 
 IDD_DIRCMP_REPORT DIALOGEX 0, 0, 268, 81
 STYLE DS_CENTER | DS_MODALFRAME | DS_SHELLFONT | WS_CAPTION | WS_POPUP | WS_SYSMENU
-CAPTION "Merge.rc:1220"
+CAPTION "Merge.rc:1221"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
-    LTEXT           "Merge.rc:1223", IDC_STATIC, 7, 7, 100, 8, SS_LEFT, WS_EX_LEFT
+    LTEXT           "Merge.rc:1224", IDC_STATIC, 7, 7, 100, 8, SS_LEFT, WS_EX_LEFT
     COMBOBOX        IDC_REPORT_FILE, 7, 17, 197, 150, WS_TABSTOP | WS_VSCROLL | CBS_DROPDOWN | CBS_AUTOHSCROLL, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1225", IDC_REPORT_BROWSEFILE, 211, 18, 50, 14, 0, WS_EX_LEFT
-    LTEXT           "Merge.rc:1226", IDC_STATIC, 7, 37, 50, 8, SS_LEFT, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1226", IDC_REPORT_BROWSEFILE, 211, 18, 50, 14, 0, WS_EX_LEFT
+    LTEXT           "Merge.rc:1227", IDC_STATIC, 7, 37, 50, 8, SS_LEFT, WS_EX_LEFT
     COMBOBOX        IDC_REPORT_STYLECOMBO, 60, 35, 144, 150, WS_TABSTOP | WS_VSCROLL | CBS_DROPDOWNLIST | CBS_SORT, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1228", IDC_REPORT_COPYCLIPBOARD, 7, 53, 133, 10, BS_NOTIFY, WS_EX_LEFT
-    DEFPUSHBUTTON   "Merge.rc:1229", IDOK, 157, 60, 50, 14, 0, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1230", IDCANCEL, 211, 60, 50, 14, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1229", IDC_REPORT_COPYCLIPBOARD, 7, 53, 133, 10, BS_NOTIFY, WS_EX_LEFT
+    DEFPUSHBUTTON   "Merge.rc:1230", IDOK, 157, 60, 50, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1231", IDCANCEL, 211, 60, 50, 14, 0, WS_EX_LEFT
 }
 
 
 
 IDD_DIRCOLS DIALOGEX 0, 0, 307, 163
 STYLE DS_MODALFRAME | DS_SHELLFONT | WS_CAPTION | WS_POPUP | WS_SYSMENU
-CAPTION "Merge.rc:1237"
+CAPTION "Merge.rc:1238"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
     CONTROL         "", IDC_COLDLG_LIST, WC_LISTVIEW, WS_TABSTOP | WS_BORDER | LVS_ALIGNLEFT | LVS_SHOWSELALWAYS | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | LVS_REPORT, 7, 7, 134, 124, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1241", IDC_UP, 151, 8, 55, 14, 0, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1242", IDC_DOWN, 151, 26, 55, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1242", IDC_UP, 151, 8, 55, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1243", IDC_DOWN, 151, 26, 55, 14, 0, WS_EX_LEFT
     EDITTEXT        IDC_COLDLG_DESC, 151, 80, 145, 50, ES_MULTILINE | ES_READONLY, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1244", IDC_COLDLG_DEFAULTS, 7, 143, 70, 14, 0, WS_EX_LEFT
-    DEFPUSHBUTTON   "Merge.rc:1245", IDOK, 197, 143, 50, 14, 0, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1246", IDCANCEL, 251, 143, 50, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1245", IDC_COLDLG_DEFAULTS, 7, 143, 70, 14, 0, WS_EX_LEFT
+    DEFPUSHBUTTON   "Merge.rc:1246", IDOK, 197, 143, 50, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1247", IDCANCEL, 251, 143, 50, 14, 0, WS_EX_LEFT
 }
 
 
@@ -1251,18 +1252,18 @@ FONT 8, "MS Shell Dlg", 0, 0, 1
 IDD_DIRCOMP_PROGRESS DIALOGEX 0, 0, 256, 240
 STYLE DS_CENTER | DS_MODALFRAME | DS_SHELLFONT | WS_CAPTION | WS_VISIBLE | WS_POPUP
 EXSTYLE WS_EX_TOOLWINDOW
-CAPTION "Merge.rc:1254"
+CAPTION "Merge.rc:1255"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
-    DEFPUSHBUTTON   "Merge.rc:1257", IDC_PAUSE_CONTINUE, 134, 7, 64, 14, 0, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1258", IDCANCEL, 200, 7, 49, 14, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1259", IDC_SEND_EMAIL_WHEN_READY, 134, 28, 114, 8, 0, WS_EX_LEFT
+    DEFPUSHBUTTON   "Merge.rc:1258", IDC_PAUSE_CONTINUE, 134, 7, 64, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1259", IDCANCEL, 200, 7, 49, 14, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1260", IDC_SEND_EMAIL_WHEN_READY, 134, 28, 114, 8, 0, WS_EX_LEFT
     CONTROL         "", IDC_PROGRESSCOMPARE, PROGRESS_CLASS, WS_BORDER, 7, 68, 242, 9, WS_EX_LEFT
     RTEXT           "0", IDC_ITEMSCOMPARED, 95, 29, 30, 8, SS_RIGHT, WS_EX_LEFT
     RTEXT           "0", IDC_ITEMSTOTAL, 95, 19, 30, 8, SS_RIGHT, WS_EX_LEFT
-    LTEXT           "Merge.rc:1263", IDC_STATIC, 7, 7, 118, 8, SS_LEFT, WS_EX_LEFT
-    LTEXT           "Merge.rc:1264", IDC_STATIC, 7, 29, 85, 8, SS_LEFT, WS_EX_LEFT
-    LTEXT           "Merge.rc:1265", IDC_STATIC, 7, 19, 85, 8, SS_LEFT, WS_EX_LEFT
+    LTEXT           "Merge.rc:1264", IDC_STATIC, 7, 7, 118, 8, SS_LEFT, WS_EX_LEFT
+    LTEXT           "Merge.rc:1265", IDC_STATIC, 7, 29, 85, 8, SS_LEFT, WS_EX_LEFT
+    LTEXT           "Merge.rc:1266", IDC_STATIC, 7, 19, 85, 8, SS_LEFT, WS_EX_LEFT
     EDITTEXT        IDC_RIGHT_EDIT, 7, 54, 242, 12, NOT WS_TABSTOP | ES_AUTOHSCROLL | ES_READONLY, WS_EX_LEFT
     EDITTEXT        IDC_LEFT_EDIT, 7, 40, 242, 12, NOT WS_TABSTOP | ES_AUTOHSCROLL | ES_READONLY, WS_EX_LEFT
 }
@@ -1271,44 +1272,44 @@ FONT 8, "MS Shell Dlg", 0, 0, 1
 
 IDD_EDIT_FIND DIALOGEX 30, 73, 293, 74
 STYLE DS_CENTER | DS_MODALFRAME | DS_SHELLFONT | WS_CAPTION | WS_POPUP | WS_SYSMENU
-CAPTION "Merge.rc:1274"
+CAPTION "Merge.rc:1275"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
-    LTEXT           "Merge.rc:1277", IDC_STATIC, 7, 9, 50, 8, SS_LEFT, WS_EX_LEFT
+    LTEXT           "Merge.rc:1278", IDC_STATIC, 7, 9, 50, 8, SS_LEFT, WS_EX_LEFT
     COMBOBOX        IDC_EDIT_FINDTEXT, 59, 7, 160, 150, WS_TABSTOP | WS_VSCROLL | CBS_DROPDOWN | CBS_AUTOHSCROLL, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1279", IDC_EDIT_WHOLE_WORD, 7, 27, 140, 10, WS_GROUP, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1280", IDC_EDIT_MATCH_CASE, 7, 37, 140, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1281", IDC_EDIT_REGEXP, 7, 47, 140, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1282", IDC_FINDDLG_DONTWRAP, 7, 57, 140, 16, BS_VCENTER | BS_MULTILINE, WS_EX_LEFT
-    GROUPBOX        "Merge.rc:1283", IDC_STATIC, 148, 23, 70, 36, WS_GROUP, WS_EX_LEFT
-    AUTORADIOBUTTON "Merge.rc:1284", IDC_EDIT_DIRECTION_UP, 154, 34, 57, 10, WS_GROUP, WS_EX_LEFT
-    AUTORADIOBUTTON "Merge.rc:1285", IDC_EDIT_DIRECTION_DOWN, 154, 44, 57, 10, 0, WS_EX_LEFT
-    DEFPUSHBUTTON   "Merge.rc:1286", IDOK, 226, 7, 60, 14, WS_GROUP, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1287", IDCANCEL, 226, 24, 60, 14, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1280", IDC_EDIT_WHOLE_WORD, 7, 27, 140, 10, WS_GROUP, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1281", IDC_EDIT_MATCH_CASE, 7, 37, 140, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1282", IDC_EDIT_REGEXP, 7, 47, 140, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1283", IDC_FINDDLG_DONTWRAP, 7, 57, 140, 16, BS_VCENTER | BS_MULTILINE, WS_EX_LEFT
+    GROUPBOX        "Merge.rc:1284", IDC_STATIC, 148, 23, 70, 36, WS_GROUP, WS_EX_LEFT
+    AUTORADIOBUTTON "Merge.rc:1285", IDC_EDIT_DIRECTION_UP, 154, 34, 57, 10, WS_GROUP, WS_EX_LEFT
+    AUTORADIOBUTTON "Merge.rc:1286", IDC_EDIT_DIRECTION_DOWN, 154, 44, 57, 10, 0, WS_EX_LEFT
+    DEFPUSHBUTTON   "Merge.rc:1287", IDOK, 226, 7, 60, 14, WS_GROUP, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1288", IDCANCEL, 226, 24, 60, 14, 0, WS_EX_LEFT
 }
 
 
 
 IDD_EDIT_REPLACE DIALOGEX 36, 44, 314, 90
 STYLE DS_CENTER | DS_MODALFRAME | DS_SHELLFONT | WS_CAPTION | WS_POPUP | WS_SYSMENU
-CAPTION "Merge.rc:1294"
+CAPTION "Merge.rc:1295"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
-    LTEXT           "Merge.rc:1297", IDC_STATIC, 7, 9, 65, 8, SS_LEFT, WS_EX_LEFT
+    LTEXT           "Merge.rc:1298", IDC_STATIC, 7, 9, 65, 8, SS_LEFT, WS_EX_LEFT
     COMBOBOX        IDC_EDIT_FINDTEXT, 75, 7, 165, 150, WS_TABSTOP | WS_VSCROLL | CBS_DROPDOWN | CBS_AUTOHSCROLL | CBS_SORT, WS_EX_LEFT
-    LTEXT           "Merge.rc:1299", IDC_STATIC, 7, 24, 65, 8, SS_LEFT, WS_EX_LEFT
+    LTEXT           "Merge.rc:1300", IDC_STATIC, 7, 24, 65, 8, SS_LEFT, WS_EX_LEFT
     COMBOBOX        IDC_EDIT_REPLACE_WITH, 75, 22, 165, 150, WS_TABSTOP | WS_VSCROLL | CBS_DROPDOWN | CBS_AUTOHSCROLL | CBS_SORT, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1301", IDC_EDIT_WHOLE_WORD, 7, 44, 140, 10, WS_GROUP, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1302", IDC_EDIT_MATCH_CASE, 7, 54, 140, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1303", IDC_EDIT_REGEXP, 7, 64, 140, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1304", IDC_EDIT_SCOPE_DONT_WRAP, 7, 74, 140, 16, BS_VCENTER | BS_MULTILINE, WS_EX_LEFT
-    GROUPBOX        "Merge.rc:1305", IDC_STATIC, 149, 40, 90, 36, WS_GROUP, WS_EX_LEFT
-    AUTORADIOBUTTON "Merge.rc:1306", IDC_EDIT_SCOPE_SELECTION, 154, 51, 80, 10, WS_GROUP, WS_EX_LEFT
-    AUTORADIOBUTTON "Merge.rc:1307", IDC_EDIT_SCOPE_WHOLE_FILE, 154, 61, 80, 10, 0, WS_EX_LEFT
-    DEFPUSHBUTTON   "Merge.rc:1308", IDC_EDIT_SKIP, 247, 7, 60, 14, WS_GROUP, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1309", IDC_EDIT_REPLACE, 247, 24, 60, 14, 0, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1310", IDC_EDIT_REPLACE_ALL, 247, 41, 60, 14, 0, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1311", IDCANCEL, 247, 58, 60, 14, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1302", IDC_EDIT_WHOLE_WORD, 7, 44, 140, 10, WS_GROUP, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1303", IDC_EDIT_MATCH_CASE, 7, 54, 140, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1304", IDC_EDIT_REGEXP, 7, 64, 140, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1305", IDC_EDIT_SCOPE_DONT_WRAP, 7, 74, 140, 16, BS_VCENTER | BS_MULTILINE, WS_EX_LEFT
+    GROUPBOX        "Merge.rc:1306", IDC_STATIC, 149, 40, 90, 36, WS_GROUP, WS_EX_LEFT
+    AUTORADIOBUTTON "Merge.rc:1307", IDC_EDIT_SCOPE_SELECTION, 154, 51, 80, 10, WS_GROUP, WS_EX_LEFT
+    AUTORADIOBUTTON "Merge.rc:1308", IDC_EDIT_SCOPE_WHOLE_FILE, 154, 61, 80, 10, 0, WS_EX_LEFT
+    DEFPUSHBUTTON   "Merge.rc:1309", IDC_EDIT_SKIP, 247, 7, 60, 14, WS_GROUP, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1310", IDC_EDIT_REPLACE, 247, 24, 60, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1311", IDC_EDIT_REPLACE_ALL, 247, 41, 60, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1312", IDCANCEL, 247, 58, 60, 14, 0, WS_EX_LEFT
 }
 
 
@@ -1332,98 +1333,98 @@ FONT 8, "MS Shell Dlg", 0, 0, 1
     EDITTEXT        IDC_EDIT_SRC_LOCATION, 7, 34, 203, 12, NOT WS_TABSTOP | ES_MULTILINE | ES_READONLY, WS_EX_LEFT
     EDITTEXT        IDC_EDIT_DST_LOCATION, 7, 48, 203, 12, NOT WS_TABSTOP | ES_MULTILINE | ES_READONLY, WS_EX_LEFT
     CONTROL         "", IDC_PROGRESS_FILE, PROGRESS_CLASS, WS_BORDER, 7, 65, 203, 10, WS_EX_LEFT
-    DEFPUSHBUTTON   "Merge.rc:1335", IDC_PAUSE_CONTINUE, 45, 82, 60, 14, WS_GROUP, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1336", IDCANCEL, 112, 82, 60, 14, 0, WS_EX_LEFT
+    DEFPUSHBUTTON   "Merge.rc:1336", IDC_PAUSE_CONTINUE, 45, 82, 60, 14, WS_GROUP, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1337", IDCANCEL, 112, 82, 60, 14, 0, WS_EX_LEFT
 }
 
 
 
 IDD_FILEFILTERS DIALOGEX 0, 0, 365, 215
 STYLE DS_SHELLFONT | WS_CAPTION | WS_CHILDWINDOW
-CAPTION "Merge.rc:1343"
+CAPTION "Merge.rc:1344"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
     CONTROL         "", IDC_FILTERFILE_LIST, WC_LISTVIEW, WS_TABSTOP | WS_BORDER | LVS_SHOWSELALWAYS | LVS_NOSORTHEADER | LVS_SINGLESEL | LVS_REPORT, 7, 7, 350, 182, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1347", IDC_FILTERFILE_TEST_BTN, 7, 196, 70, 14, 0, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1348", IDC_FILTERFILE_INSTALL, 145, 196, 50, 14, 0, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1349", IDC_FILTERFILE_NEWBTN, 199, 196, 50, 14, 0, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1350", IDC_FILTERFILE_EDITBTN, 253, 196, 50, 14, 0, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1351", IDC_FILTERFILE_DELETEBTN, 307, 196, 50, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1348", IDC_FILTERFILE_TEST_BTN, 7, 196, 70, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1349", IDC_FILTERFILE_INSTALL, 145, 196, 50, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1350", IDC_FILTERFILE_NEWBTN, 199, 196, 50, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1351", IDC_FILTERFILE_EDITBTN, 253, 196, 50, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1352", IDC_FILTERFILE_DELETEBTN, 307, 196, 50, 14, 0, WS_EX_LEFT
 }
 
 
 
 IDD_GENERATE_PATCH DIALOGEX 0, 0, 340, 209
 STYLE DS_CENTER | DS_MODALFRAME | DS_SHELLFONT | WS_CAPTION | WS_POPUP | WS_SYSMENU
-CAPTION "Merge.rc:1358"
+CAPTION "Merge.rc:1359"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
-    LTEXT           "Merge.rc:1361", IDC_STATIC, 7, 10, 36, 8, SS_LEFT, WS_EX_LEFT
+    LTEXT           "Merge.rc:1362", IDC_STATIC, 7, 10, 36, 8, SS_LEFT, WS_EX_LEFT
     COMBOBOX        IDC_DIFF_FILE1, 48, 7, 230, 150, WS_TABSTOP | WS_VSCROLL | CBS_DROPDOWN | CBS_AUTOHSCROLL, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1363", IDC_DIFF_BROWSE_FILE1, 283, 7, 52, 14, 0, WS_EX_LEFT
-    LTEXT           "Merge.rc:1364", IDC_STATIC, 7, 27, 36, 8, SS_LEFT, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1364", IDC_DIFF_BROWSE_FILE1, 283, 7, 52, 14, 0, WS_EX_LEFT
+    LTEXT           "Merge.rc:1365", IDC_STATIC, 7, 27, 36, 8, SS_LEFT, WS_EX_LEFT
     COMBOBOX        IDC_DIFF_FILE2, 48, 24, 230, 150, WS_TABSTOP | WS_VSCROLL | CBS_DROPDOWN | CBS_AUTOHSCROLL, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1366", IDC_DIFF_BROWSE_FILE2, 283, 24, 52, 14, 0, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1367", IDC_DIFF_SWAPFILES, 283, 41, 52, 14, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1368", IDC_DIFF_APPENDFILE, 48, 51, 230, 10, 0, WS_EX_LEFT
-    LTEXT           "Merge.rc:1369", IDC_STATIC, 7, 66, 37, 8, SS_LEFT, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1367", IDC_DIFF_BROWSE_FILE2, 283, 24, 52, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1368", IDC_DIFF_SWAPFILES, 283, 41, 52, 14, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1369", IDC_DIFF_APPENDFILE, 48, 51, 230, 10, 0, WS_EX_LEFT
+    LTEXT           "Merge.rc:1370", IDC_STATIC, 7, 66, 37, 8, SS_LEFT, WS_EX_LEFT
     COMBOBOX        IDC_DIFF_FILERESULT, 48, 63, 230, 150, WS_TABSTOP | WS_VSCROLL | CBS_DROPDOWN | CBS_AUTOHSCROLL, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1371", IDC_DIFF_BROWSE_RESULT, 283, 63, 52, 14, 0, WS_EX_LEFT
-    GROUPBOX        "Merge.rc:1372", IDC_STATIC, 7, 81, 142, 70, 0, WS_EX_LEFT
-    LTEXT           "Merge.rc:1373", IDC_STATIC, 13, 95, 46, 8, SS_LEFT, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1372", IDC_DIFF_BROWSE_RESULT, 283, 63, 52, 14, 0, WS_EX_LEFT
+    GROUPBOX        "Merge.rc:1373", IDC_STATIC, 7, 81, 142, 70, 0, WS_EX_LEFT
+    LTEXT           "Merge.rc:1374", IDC_STATIC, 13, 95, 46, 8, SS_LEFT, WS_EX_LEFT
     COMBOBOX        IDC_DIFF_STYLE, 63, 92, 80, 150, WS_TABSTOP | WS_VSCROLL | CBS_DROPDOWNLIST, WS_EX_LEFT
-    LTEXT           "Merge.rc:1375", IDC_STATIC, 13, 109, 46, 8, SS_LEFT, WS_EX_LEFT
+    LTEXT           "Merge.rc:1376", IDC_STATIC, 13, 109, 46, 8, SS_LEFT, WS_EX_LEFT
     COMBOBOX        IDC_DIFF_CONTEXT, 63, 108, 80, 150, WS_TABSTOP | WS_VSCROLL | WS_DISABLED | CBS_DROPDOWN | CBS_SORT, WS_EX_LEFT
-    GROUPBOX        "Merge.rc:1377", IDC_STATIC, 155, 81, 180, 70, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1378", IDC_DIFF_WS_IGNORE_TAB_EXPANSION, 162, 93, 170, 10, WS_GROUP, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1379", IDC_DIFF_WS_IGNORE_TRAILING_SPACE, 162, 103, 170, 10, 0, WS_EX_LEFT
-    AUTORADIOBUTTON "Merge.rc:1380", IDC_DIFF_WHITESPACE_COMPARE, 162, 115, 170, 10, WS_GROUP | WS_TABSTOP, WS_EX_LEFT
-    AUTORADIOBUTTON "Merge.rc:1381", IDC_DIFF_WHITESPACE_IGNORE, 162, 125, 170, 10, WS_TABSTOP, WS_EX_LEFT
-    AUTORADIOBUTTON "Merge.rc:1382", IDC_DIFF_WHITESPACE_IGNOREALL, 162, 135, 170, 10, WS_TABSTOP, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1383", IDC_DIFF_IGNORE_BLANK_LINES, 7, 156, 142, 10, WS_GROUP, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1384", IDC_DIFF_APPLY_LINE_FILTERS, 7, 166, 142, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1385", IDC_DIFF_IGNORECASE, 7, 176, 142, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1386", IDC_DIFF_INCLCMDLINE, 155, 156, 170, 10, 0, WS_EX_LEFT
-    AUTO3STATE      "Merge.rc:1387", IDC_DIFF_USE_GENERIC_PATHS, 155, 166, 170, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1388", IDC_DIFF_OPENTOEDITOR, 155, 176, 170, 10, 0, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1389", IDC_DIFF_DEFAULTS, 7, 190, 70, 14, 0, WS_EX_LEFT
-    DEFPUSHBUTTON   "Merge.rc:1390", IDOK, 228, 190, 52, 14, 0, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1391", IDCANCEL, 283, 190, 52, 14, 0, WS_EX_LEFT
+    GROUPBOX        "Merge.rc:1378", IDC_STATIC, 155, 81, 180, 70, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1379", IDC_DIFF_WS_IGNORE_TAB_EXPANSION, 162, 93, 170, 10, WS_GROUP, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1380", IDC_DIFF_WS_IGNORE_TRAILING_SPACE, 162, 103, 170, 10, 0, WS_EX_LEFT
+    AUTORADIOBUTTON "Merge.rc:1381", IDC_DIFF_WHITESPACE_COMPARE, 162, 115, 170, 10, WS_GROUP | WS_TABSTOP, WS_EX_LEFT
+    AUTORADIOBUTTON "Merge.rc:1382", IDC_DIFF_WHITESPACE_IGNORE, 162, 125, 170, 10, WS_TABSTOP, WS_EX_LEFT
+    AUTORADIOBUTTON "Merge.rc:1383", IDC_DIFF_WHITESPACE_IGNOREALL, 162, 135, 170, 10, WS_TABSTOP, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1384", IDC_DIFF_IGNORE_BLANK_LINES, 7, 156, 142, 10, WS_GROUP, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1385", IDC_DIFF_APPLY_LINE_FILTERS, 7, 166, 142, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1386", IDC_DIFF_IGNORECASE, 7, 176, 142, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1387", IDC_DIFF_INCLCMDLINE, 155, 156, 170, 10, 0, WS_EX_LEFT
+    AUTO3STATE      "Merge.rc:1388", IDC_DIFF_USE_GENERIC_PATHS, 155, 166, 170, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1389", IDC_DIFF_OPENTOEDITOR, 155, 176, 170, 10, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1390", IDC_DIFF_DEFAULTS, 7, 190, 70, 14, 0, WS_EX_LEFT
+    DEFPUSHBUTTON   "Merge.rc:1391", IDOK, 228, 190, 52, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1392", IDCANCEL, 283, 190, 52, 14, 0, WS_EX_LEFT
 }
 
 
 
 IDD_LANGUAGE_SELECT DIALOGEX 0, 0, 214, 142
 STYLE DS_CENTER | DS_MODALFRAME | DS_SHELLFONT | WS_CAPTION | WS_CLIPCHILDREN | WS_POPUP | WS_THICKFRAME | WS_SYSMENU
-CAPTION "Merge.rc:1398"
+CAPTION "Merge.rc:1399"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
-    LTEXT           "Merge.rc:1401", IDC_STATIC, 7, 7, 140, 8, SS_LEFT, WS_EX_LEFT
+    LTEXT           "Merge.rc:1402", IDC_STATIC, 7, 7, 140, 8, SS_LEFT, WS_EX_LEFT
     LISTBOX         IDC_LANGUAGE_LIST, 7, 16, 200, 99, WS_GROUP | WS_TABSTOP | WS_VSCROLL | LBS_SORT | LBS_NOTIFY, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1403", IDOK, 47, 123, 52, 14, WS_GROUP, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1404", IDCANCEL, 115, 123, 52, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1404", IDOK, 47, 123, 52, 14, WS_GROUP, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1405", IDCANCEL, 115, 123, 52, 14, 0, WS_EX_LEFT
 }
 
 
 
 IDD_LOAD_SAVE_CODEPAGE DIALOGEX 0, 0, 178, 138
 STYLE DS_CENTER | DS_MODALFRAME | DS_SHELLFONT | WS_CAPTION | WS_POPUP | WS_THICKFRAME | WS_SYSMENU
-CAPTION "Merge.rc:1411"
+CAPTION "Merge.rc:1412"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
-    GROUPBOX        "Merge.rc:1414", IDC_AFFECTS_GROUP, 5, 7, 166, 36, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1415", IDC_AFFECTS_LEFT_BTN, 12, 18, 54, 8, 0, WS_EX_LEFT
-    LTEXT           "Merge.rc:1416", IDC_LEFT_FILES_LABEL, 70, 18, 93, 8, SS_LEFT, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1417", IDC_AFFECTS_RIGHT_BTN, 12, 29, 54, 8, 0, WS_EX_LEFT
-    LTEXT           "Merge.rc:1418", IDC_RIGHT_FILES_LABEL, 70, 29, 93, 8, SS_LEFT, WS_EX_LEFT
-    GROUPBOX        "Merge.rc:1419", IDC_CODEPAGE_GROUP, 5, 48, 166, 63, 0, WS_EX_LEFT
-    LTEXT           "Merge.rc:1420", IDC_LOAD_FILES_LABEL, 12, 64, 72, 10, SS_LEFT, WS_EX_LEFT
+    GROUPBOX        "Merge.rc:1415", IDC_AFFECTS_GROUP, 5, 7, 166, 36, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1416", IDC_AFFECTS_LEFT_BTN, 12, 18, 54, 8, 0, WS_EX_LEFT
+    LTEXT           "Merge.rc:1417", IDC_LEFT_FILES_LABEL, 70, 18, 93, 8, SS_LEFT, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1418", IDC_AFFECTS_RIGHT_BTN, 12, 29, 54, 8, 0, WS_EX_LEFT
+    LTEXT           "Merge.rc:1419", IDC_RIGHT_FILES_LABEL, 70, 29, 93, 8, SS_LEFT, WS_EX_LEFT
+    GROUPBOX        "Merge.rc:1420", IDC_CODEPAGE_GROUP, 5, 48, 166, 63, 0, WS_EX_LEFT
+    LTEXT           "Merge.rc:1421", IDC_LOAD_FILES_LABEL, 12, 64, 72, 10, SS_LEFT, WS_EX_LEFT
     COMBOBOX        IDC_LOAD_CODEPAGE_TEXTBOX, 86, 63, 75, 150, WS_TABSTOP | WS_VSCROLL | CBS_DROPDOWN | CBS_SORT, WS_EX_LEFT
-    LTEXT           "Merge.rc:1422", IDC_SAVE_FILES_LABEL, 12, 79, 67, 10, SS_LEFT, WS_EX_LEFT
+    LTEXT           "Merge.rc:1423", IDC_SAVE_FILES_LABEL, 12, 79, 67, 10, SS_LEFT, WS_EX_LEFT
     COMBOBOX        IDC_SAVE_CODEPAGE_TEXTBOX, 86, 79, 75, 150, WS_TABSTOP | WS_VSCROLL | CBS_DROPDOWN | CBS_SORT, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1424", IDC_LOAD_SAVE_SAME_CODEPAGE, 12, 96, 150, 10, 0, WS_EX_LEFT
-    DEFPUSHBUTTON   "Merge.rc:1425", IDOK, 65, 117, 50, 14, 0, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1426", IDCANCEL, 121, 117, 50, 14, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1425", IDC_LOAD_SAVE_SAME_CODEPAGE, 12, 96, 150, 10, 0, WS_EX_LEFT
+    DEFPUSHBUTTON   "Merge.rc:1426", IDOK, 65, 117, 50, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1427", IDCANCEL, 121, 117, 50, 14, 0, WS_EX_LEFT
 }
 
 
@@ -1440,32 +1441,32 @@ FONT 8, "MS Shell Dlg", 0, 0, 1
 IDD_OPEN DIALOGEX 0, 0, 374, 260
 STYLE DS_CENTER | DS_MODALFRAME | DS_SHELLFONT | WS_CAPTION | WS_CLIPCHILDREN | WS_POPUP | WS_THICKFRAME | WS_SYSMENU
 EXSTYLE WS_EX_ACCEPTFILES
-CAPTION "Merge.rc:1443"
+CAPTION "Merge.rc:1444"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
-    GROUPBOX        "Merge.rc:1446", IDC_FILES_DIRS_GROUP, 7, 7, 302, 111, WS_GROUP, WS_EX_TRANSPARENT
-    RTEXT           "Merge.rc:1447", IDC_STATIC, 13, 24, 65, 8, SS_RIGHT, WS_EX_LEFT
+    GROUPBOX        "Merge.rc:1447", IDC_FILES_DIRS_GROUP, 7, 7, 302, 111, WS_GROUP, WS_EX_TRANSPARENT
+    RTEXT           "Merge.rc:1448", IDC_STATIC, 13, 24, 65, 8, SS_RIGHT, WS_EX_LEFT
     CONTROL         "", IDC_LEFT_COMBO, "ComboBoxEx32", 0x52210042, 81, 22, 167, 150, 0x00000010
-    PUSHBUTTON      "Merge.rc:1449", IDC_LEFT_BUTTON, 252, 22, 50, 14, WS_GROUP, WS_EX_LEFT
-    RTEXT           "Merge.rc:1450", IDC_STATIC, 13, 40, 65, 8, SS_RIGHT, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1450", IDC_LEFT_BUTTON, 252, 22, 50, 14, WS_GROUP, WS_EX_LEFT
+    RTEXT           "Merge.rc:1451", IDC_STATIC, 13, 40, 65, 8, SS_RIGHT, WS_EX_LEFT
     CONTROL         "", IDC_RIGHT_COMBO, "ComboBoxEx32", 0x52210042, 81, 38, 167, 150, 0x00000010
-    PUSHBUTTON      "Merge.rc:1452", IDC_RIGHT_BUTTON, 252, 38, 50, 14, WS_GROUP, WS_EX_LEFT
-    RTEXT           "Merge.rc:1453", IDC_STATIC, 13, 56, 65, 8, SS_RIGHT, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1453", IDC_RIGHT_BUTTON, 252, 38, 50, 14, WS_GROUP, WS_EX_LEFT
+    RTEXT           "Merge.rc:1454", IDC_STATIC, 13, 56, 65, 8, SS_RIGHT, WS_EX_LEFT
     COMBOBOX        IDC_EXT_COMBO, 81, 54, 167, 150, WS_TABSTOP | WS_VSCROLL | CBS_DROPDOWN | CBS_AUTOHSCROLL, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1455", IDC_SELECT_FILTER, 252, 54, 50, 14, WS_GROUP, WS_EX_LEFT
-    RTEXT           "Merge.rc:1456", IDC_STATIC, 13, 56, 65, 8, NOT WS_VISIBLE | SS_RIGHT, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1456", IDC_SELECT_FILTER, 252, 54, 50, 14, WS_GROUP, WS_EX_LEFT
+    RTEXT           "Merge.rc:1457", IDC_STATIC, 13, 56, 65, 8, NOT WS_VISIBLE | SS_RIGHT, WS_EX_LEFT
     COMBOBOX        IDC_COMPARE_AS_COMBO, 81, 54, 167, 150, NOT WS_VISIBLE | WS_TABSTOP | WS_VSCROLL | CBS_DROPDOWNLIST, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1458", IDC_COMPARE_AS_CHECK, 252, 56, 50, 10, WS_GROUP, WS_EX_LEFT
-    AUTO3STATE      "Merge.rc:1459", IDC_RECURS_CHECK, 81, 86, 225, 10, WS_GROUP, WS_EX_LEFT
-    LTEXT           "Merge.rc:1460", IDC_OPEN_STATUS, 15, 102, 284, 8, SS_LEFT, WS_EX_LEFT
-    GROUPBOX        "Merge.rc:1461", IDC_SQL_QUERY_PARAMS_GROUP, 7, 125, 302, 129, WS_GROUP | WS_CLIPSIBLINGS, WS_EX_TRANSPARENT
+    AUTOCHECKBOX    "Merge.rc:1459", IDC_COMPARE_AS_CHECK, 252, 56, 50, 10, WS_GROUP, WS_EX_LEFT
+    AUTO3STATE      "Merge.rc:1460", IDC_RECURS_CHECK, 81, 86, 225, 10, WS_GROUP, WS_EX_LEFT
+    LTEXT           "Merge.rc:1461", IDC_OPEN_STATUS, 15, 102, 284, 8, SS_LEFT, WS_EX_LEFT
+    GROUPBOX        "Merge.rc:1462", IDC_SQL_QUERY_PARAMS_GROUP, 7, 125, 302, 129, WS_GROUP | WS_CLIPSIBLINGS, WS_EX_TRANSPARENT
     RTEXT           "", IDC_SQL_QUERY_PARAM_1_NAME, 13, 154, 65, 8, SS_RIGHT, WS_EX_LEFT
     RTEXT           "", IDC_SQL_QUERY_PARAM_2_NAME, 13, 170, 65, 8, SS_RIGHT, WS_EX_LEFT
     RTEXT           "", IDC_SQL_QUERY_PARAM_3_NAME, 13, 186, 65, 8, SS_RIGHT, WS_EX_LEFT
     RTEXT           "", IDC_SQL_QUERY_PARAM_4_NAME, 13, 202, 65, 8, SS_RIGHT, WS_EX_LEFT
     RTEXT           "", IDC_SQL_QUERY_PARAM_5_NAME, 13, 218, 65, 8, SS_RIGHT, WS_EX_LEFT
     RTEXT           "", IDC_SQL_QUERY_PARAM_6_NAME, 13, 234, 65, 8, SS_RIGHT, WS_EX_LEFT
-    AUTO3STATE      "Merge.rc:1468", IDC_SQL_QUERY_PARAMS_LEFT, 81, 140, 108, 10, 0, WS_EX_LEFT
+    AUTO3STATE      "Merge.rc:1469", IDC_SQL_QUERY_PARAMS_LEFT, 81, 140, 108, 10, 0, WS_EX_LEFT
     EDITTEXT        IDC_SQL_QUERY_PARAM_1_LEFT, 81, 152, 108, 14, ES_AUTOHSCROLL, WS_EX_LEFT
     EDITTEXT        IDC_SQL_QUERY_PARAM_2_LEFT, 81, 168, 108, 14, ES_AUTOHSCROLL, WS_EX_LEFT
     EDITTEXT        IDC_SQL_QUERY_PARAM_3_LEFT, 81, 184, 108, 14, ES_AUTOHSCROLL, WS_EX_LEFT
@@ -1473,7 +1474,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 1
     EDITTEXT        IDC_SQL_QUERY_PARAM_5_LEFT, 81, 216, 108, 14, ES_AUTOHSCROLL, WS_EX_LEFT
     EDITTEXT        IDC_SQL_QUERY_PARAM_6_LEFT, 81, 232, 108, 14, ES_AUTOHSCROLL, WS_EX_LEFT
     EDITTEXT        IDC_SQL_QUERY_FILTER_LEFT, 81, 152, 108, 94, WS_HSCROLL | WS_VSCROLL | ES_AUTOHSCROLL | ES_AUTOVSCROLL | ES_MULTILINE | ES_WANTRETURN, WS_EX_LEFT
-    AUTO3STATE      "Merge.rc:1476", IDC_SQL_QUERY_PARAMS_RIGHT, 193, 140, 108, 10, 0, WS_EX_LEFT
+    AUTO3STATE      "Merge.rc:1477", IDC_SQL_QUERY_PARAMS_RIGHT, 193, 140, 108, 10, 0, WS_EX_LEFT
     EDITTEXT        IDC_SQL_QUERY_PARAM_1_RIGHT, 193, 152, 108, 14, ES_AUTOHSCROLL, WS_EX_LEFT
     EDITTEXT        IDC_SQL_QUERY_PARAM_2_RIGHT, 193, 168, 108, 14, ES_AUTOHSCROLL, WS_EX_LEFT
     EDITTEXT        IDC_SQL_QUERY_PARAM_3_RIGHT, 193, 184, 108, 14, ES_AUTOHSCROLL, WS_EX_LEFT
@@ -1481,154 +1482,154 @@ FONT 8, "MS Shell Dlg", 0, 0, 1
     EDITTEXT        IDC_SQL_QUERY_PARAM_5_RIGHT, 193, 216, 108, 14, ES_AUTOHSCROLL, WS_EX_LEFT
     EDITTEXT        IDC_SQL_QUERY_PARAM_6_RIGHT, 193, 232, 108, 14, ES_AUTOHSCROLL, WS_EX_LEFT
     EDITTEXT        IDC_SQL_QUERY_FILTER_RIGHT, 193, 152, 108, 94, WS_HSCROLL | WS_VSCROLL | ES_AUTOHSCROLL | ES_AUTOVSCROLL | ES_MULTILINE | ES_WANTRETURN, WS_EX_LEFT
-    DEFPUSHBUTTON   "Merge.rc:1484", IDOK, 316, 11, 50, 14, WS_GROUP, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1485", IDCANCEL, 316, 28, 50, 14, 0, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1486", ID_HELP, 316, 45, 50, 14, 0, WS_EX_LEFT
+    DEFPUSHBUTTON   "Merge.rc:1485", IDOK, 316, 11, 50, 14, WS_GROUP, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1486", IDCANCEL, 316, 28, 50, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1487", ID_HELP, 316, 45, 50, 14, 0, WS_EX_LEFT
 }
 
 
 
 IDD_PREFERENCES DIALOGEX 0, 0, 343, 260
 STYLE DS_CENTER | DS_MODALFRAME | DS_SHELLFONT | WS_CAPTION | WS_POPUP | WS_SYSMENU
-CAPTION "Merge.rc:1493"
+CAPTION "Merge.rc:1494"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
     CONTROL         "", IDC_TREEOPT_PAGES, WC_TREEVIEW, WS_TABSTOP | WS_BORDER | TVS_DISABLEDRAGDROP | TVS_SHOWSELALWAYS, 7, 7, 96, 215, WS_EX_LEFT
     CONTROL         "", IDC_TREEOPT_HOSTFRAME, WC_STATIC, NOT WS_VISIBLE | WS_DISABLED | SS_BLACKFRAME, 110, 0, 225, 222, WS_EX_LEFT
     CONTROL         "", IDC_STATIC, WC_STATIC, SS_ETCHEDHORZ, 7, 230, 328, 1, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1499", IDC_TREEOPT_IMPORT, 7, 237, 50, 14, 0, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1500", IDC_TREEOPT_EXPORT, 62, 237, 50, 14, 0, WS_EX_LEFT
-    DEFPUSHBUTTON   "Merge.rc:1501", IDOK, 177, 237, 50, 14, 0, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1502", IDCANCEL, 231, 237, 50, 14, 0, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1503", IDC_TREEOPT_HELP, 285, 237, 50, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1500", IDC_TREEOPT_IMPORT, 7, 237, 50, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1501", IDC_TREEOPT_EXPORT, 62, 237, 50, 14, 0, WS_EX_LEFT
+    DEFPUSHBUTTON   "Merge.rc:1502", IDOK, 177, 237, 50, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1503", IDCANCEL, 231, 237, 50, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1504", IDC_TREEOPT_HELP, 285, 237, 50, 14, 0, WS_EX_LEFT
 }
 
 
 
 IDD_PROJFILES_PATHS DIALOGEX 0, 0, 322, 135
 STYLE DS_CENTER | DS_SHELLFONT | WS_CAPTION | WS_POPUP | WS_SYSMENU
-CAPTION "Merge.rc:1510"
+CAPTION "Merge.rc:1511"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
-    RTEXT           "Merge.rc:1513", IDC_STATIC, 7, 11, 40, 8, SS_RIGHT, WS_EX_LEFT
+    RTEXT           "Merge.rc:1514", IDC_STATIC, 7, 11, 40, 8, SS_RIGHT, WS_EX_LEFT
     EDITTEXT        IDC_PROJ_LFILE_EDIT, 50, 8, 210, 14, ES_AUTOHSCROLL, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1515", IDC_PROJ_LFILE_BROWSE, 265, 8, 50, 14, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1516", IDC_PROJFILE_LREADONLY, 50, 25, 208, 10, 0, WS_EX_LEFT
-    RTEXT           "Merge.rc:1517", IDC_STATIC, 7, 42, 40, 8, SS_RIGHT, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1516", IDC_PROJ_LFILE_BROWSE, 265, 8, 50, 14, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1517", IDC_PROJFILE_LREADONLY, 50, 25, 208, 10, 0, WS_EX_LEFT
+    RTEXT           "Merge.rc:1518", IDC_STATIC, 7, 42, 40, 8, SS_RIGHT, WS_EX_LEFT
     EDITTEXT        IDC_PROJ_RFILE_EDIT, 50, 40, 210, 14, ES_AUTOHSCROLL, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1519", IDC_PROJ_RFILE_BROWSE, 265, 40, 50, 14, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1520", IDC_PROJFILE_RREADONLY, 50, 57, 208, 10, 0, WS_EX_LEFT
-    RTEXT           "Merge.rc:1521", IDC_STATIC, 7, 74, 40, 8, SS_RIGHT, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1520", IDC_PROJ_RFILE_BROWSE, 265, 40, 50, 14, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1521", IDC_PROJFILE_RREADONLY, 50, 57, 208, 10, 0, WS_EX_LEFT
+    RTEXT           "Merge.rc:1522", IDC_STATIC, 7, 74, 40, 8, SS_RIGHT, WS_EX_LEFT
     EDITTEXT        IDC_PROJ_FILTER_EDIT, 50, 72, 210, 14, ES_AUTOHSCROLL, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1523", IDC_PROJ_FILTER_SELECT, 265, 72, 50, 14, 0, WS_EX_LEFT
-    AUTO3STATE      "Merge.rc:1524", IDC_PROJ_INC_SUBFOLDERS, 50, 90, 225, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1525", IDC_PROJ_CREATE_SPECIFIC_CONFIG_FILE, 50, 102, 225, 10, 0, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1526", IDC_PROJ_OPEN, 211, 114, 50, 14, 0, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1527", IDC_PROJ_SAVE, 265, 114, 50, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1524", IDC_PROJ_FILTER_SELECT, 265, 72, 50, 14, 0, WS_EX_LEFT
+    AUTO3STATE      "Merge.rc:1525", IDC_PROJ_INC_SUBFOLDERS, 50, 90, 225, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1526", IDC_PROJ_CREATE_SPECIFIC_CONFIG_FILE, 50, 102, 225, 10, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1527", IDC_PROJ_OPEN, 211, 114, 50, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1528", IDC_PROJ_SAVE, 265, 114, 50, 14, 0, WS_EX_LEFT
 }
 
 
 
 IDD_PROP_ARCHIVE DIALOGEX 105, 0, 235, 126
 STYLE DS_CONTROL | DS_SHELLFONT | WS_CAPTION | WS_CHILDWINDOW
-CAPTION "Merge.rc:1534"
+CAPTION "Merge.rc:1535"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
-    AUTOCHECKBOX    "Merge.rc:1537", IDC_ARCHIVE_ENABLE, 7, 7, 221, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1538", IDC_ARCHIVE_DETECTTYPE, 7, 17, 221, 10, WS_GROUP, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1538", IDC_ARCHIVE_ENABLE, 7, 7, 221, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1539", IDC_ARCHIVE_DETECTTYPE, 7, 17, 221, 10, WS_GROUP, WS_EX_LEFT
 }
 
 
 
 IDD_PROP_VSS DIALOGEX 105, 0, 236, 222
 STYLE DS_CONTROL | DS_SHELLFONT | WS_CAPTION | WS_CHILDWINDOW
-CAPTION "Merge.rc:1545"
+CAPTION "Merge.rc:1546"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
-    LTEXT           "Merge.rc:1548", IDC_STATIC, 7, 7, 221, 10, SS_LEFT, WS_EX_LEFT
+    LTEXT           "Merge.rc:1549", IDC_STATIC, 7, 7, 221, 10, SS_LEFT, WS_EX_LEFT
     COMBOBOX        IDC_VER_SYS, 7, 18, 167, 150, WS_TABSTOP | WS_VSCROLL | CBS_DROPDOWNLIST, WS_EX_LEFT
-    LTEXT           "Merge.rc:1550", IDC_VSS_L1, 7, 37, 221, 10, SS_LEFT, WS_EX_LEFT
+    LTEXT           "Merge.rc:1551", IDC_VSS_L1, 7, 37, 221, 10, SS_LEFT, WS_EX_LEFT
     EDITTEXT        IDC_PATH_EDIT, 7, 48, 167, 14, ES_AUTOHSCROLL, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1552", IDC_BROWSE_BUTTON, 179, 48, 50, 14, 0, WS_EX_LEFT
-    GROUPBOX        "Merge.rc:1553", IDC_STATIC, 7, 69, 221, 148, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1553", IDC_BROWSE_BUTTON, 179, 48, 50, 14, 0, WS_EX_LEFT
+    GROUPBOX        "Merge.rc:1554", IDC_STATIC, 7, 69, 221, 148, 0, WS_EX_LEFT
     CONTROL         "", IDC_TV_CLEARCASE_TYPEMGR_SETUP, WC_TREEVIEW, WS_TABSTOP | WS_BORDER | TVS_DISABLEDRAGDROP | TVS_SHOWSELALWAYS | TVS_FULLROWSELECT, 13, 80, 150, 132, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1555", IDC_COMPARE, 169, 80, 50, 8, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1556", IDC_XCOMPARE, 169, 90, 50, 8, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1557", IDC_MERGE, 169, 100, 50, 8, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1558", IDC_XMERGE, 169, 110, 50, 8, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1556", IDC_COMPARE, 169, 80, 50, 8, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1557", IDC_XCOMPARE, 169, 90, 50, 8, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1558", IDC_MERGE, 169, 100, 50, 8, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1559", IDC_XMERGE, 169, 110, 50, 8, 0, WS_EX_LEFT
 }
 
 
 
 IDD_PROPPAGE_LEXERS DIALOGEX 105, 0, 236, 222
 STYLE DS_CONTROL | DS_SHELLFONT | WS_CAPTION | WS_CHILDWINDOW
-CAPTION "Merge.rc:1565"
+CAPTION "Merge.rc:1566"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
     CONTROL         "", IDC_LV_LEXERS, WC_LISTVIEW, WS_TABSTOP | WS_BORDER | LVS_SHOWSELALWAYS | LVS_REPORT | LVS_NOSORTHEADER, 7, 7, 221, 196, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1569", IDC_LEXERS_DEFAULTS, 160, 208, 70, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1570", IDC_LEXERS_DEFAULTS, 160, 208, 70, 14, 0, WS_EX_LEFT
 }
 
 
 
 IDD_PROPPAGE_FILETRANSFORMS DIALOGEX 105, 0, 236, 222
 STYLE DS_CONTROL | DS_SHELLFONT | WS_CAPTION | WS_CHILDWINDOW
-CAPTION "Merge.rc:1576"
+CAPTION "Merge.rc:1577"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
     CONTROL         "", IDC_LV_FILETRANSFORMS, WC_LISTVIEW, WS_TABSTOP | WS_BORDER | LVS_SHOWSELALWAYS | LVS_REPORT | LVS_NOSORTHEADER, 7, 7, 221, 196, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1580", IDC_FILETRANSFORMS_DEFAULTS, 160, 208, 70, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1581", IDC_FILETRANSFORMS_DEFAULTS, 160, 208, 70, 14, 0, WS_EX_LEFT
 }
 
 
 
 IDD_PROPPAGE_BACKUPS DIALOGEX 105, 0, 236, 222
 STYLE DS_CONTROL | DS_SHELLFONT | WS_CAPTION | WS_CHILDWINDOW
-CAPTION "Merge.rc:1587"
+CAPTION "Merge.rc:1588"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
-    LTEXT           "Merge.rc:1590", IDC_STATIC, 7, 7, 222, 8, SS_LEFT, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1591", IDC_BACKUP_FOLDERCMP, 17, 17, 212, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1592", IDC_BACKUP_FILECMP, 17, 27, 212, 10, 0, WS_EX_LEFT
-    LTEXT           "Merge.rc:1593", IDC_STATIC, 7, 40, 222, 8, SS_LEFT, WS_EX_LEFT
-    AUTORADIOBUTTON "Merge.rc:1594", IDC_BACKUP_ORIGFOLD, 17, 50, 212, 10, WS_GROUP, WS_EX_LEFT
-    AUTORADIOBUTTON "Merge.rc:1595", IDC_BACKUP_GLOBALFOLD, 17, 59, 212, 10, 0, WS_EX_LEFT
+    LTEXT           "Merge.rc:1591", IDC_STATIC, 7, 7, 222, 8, SS_LEFT, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1592", IDC_BACKUP_FOLDERCMP, 17, 17, 212, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1593", IDC_BACKUP_FILECMP, 17, 27, 212, 10, 0, WS_EX_LEFT
+    LTEXT           "Merge.rc:1594", IDC_STATIC, 7, 40, 222, 8, SS_LEFT, WS_EX_LEFT
+    AUTORADIOBUTTON "Merge.rc:1595", IDC_BACKUP_ORIGFOLD, 17, 50, 212, 10, WS_GROUP, WS_EX_LEFT
+    AUTORADIOBUTTON "Merge.rc:1596", IDC_BACKUP_GLOBALFOLD, 17, 59, 212, 10, 0, WS_EX_LEFT
     EDITTEXT        IDC_BACKUP_FOLDER, 29, 70, 145, 14, WS_GROUP | ES_AUTOHSCROLL, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1597", IDC_BACKUP_BROWSE, 179, 70, 50, 14, 0, WS_EX_LEFT
-    LTEXT           "Merge.rc:1598", IDC_STATIC, 7, 89, 222, 8, SS_LEFT, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1599", IDC_BACKUP_APPEND_BAK, 17, 99, 212, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1600", IDC_BACKUP_APPEND_TIME, 17, 109, 212, 10, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1598", IDC_BACKUP_BROWSE, 179, 70, 50, 14, 0, WS_EX_LEFT
+    LTEXT           "Merge.rc:1599", IDC_STATIC, 7, 89, 222, 8, SS_LEFT, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1600", IDC_BACKUP_APPEND_BAK, 17, 99, 212, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1601", IDC_BACKUP_APPEND_TIME, 17, 109, 212, 10, 0, WS_EX_LEFT
 }
 
 
 
 IDD_PROPPAGE_CODEPAGE DIALOGEX 105, 0, 236, 222
 STYLE DS_CONTROL | DS_SHELLFONT | WS_CAPTION | WS_CHILDWINDOW
-CAPTION "Merge.rc:1607"
+CAPTION "Merge.rc:1608"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
-    GROUPBOX        "Merge.rc:1610", IDC_STATIC, 7, 7, 221, 91, 0, WS_EX_LEFT
-    LTEXT           "Merge.rc:1611", IDC_STATIC, 14, 20, 208, 19, SS_LEFT, WS_EX_LEFT
-    AUTORADIOBUTTON "Merge.rc:1612", IDC_CP_SYSTEM, 13, 42, 210, 10, WS_GROUP, WS_EX_LEFT
-    AUTORADIOBUTTON "Merge.rc:1613", IDC_CP_UI, 13, 55, 210, 10, 0, WS_EX_LEFT
-    AUTORADIOBUTTON "Merge.rc:1614", IDC_CP_CUSTOM, 13, 68, 210, 10, 0, WS_EX_LEFT
+    GROUPBOX        "Merge.rc:1611", IDC_STATIC, 7, 7, 221, 91, 0, WS_EX_LEFT
+    LTEXT           "Merge.rc:1612", IDC_STATIC, 14, 20, 208, 19, SS_LEFT, WS_EX_LEFT
+    AUTORADIOBUTTON "Merge.rc:1613", IDC_CP_SYSTEM, 13, 42, 210, 10, WS_GROUP, WS_EX_LEFT
+    AUTORADIOBUTTON "Merge.rc:1614", IDC_CP_UI, 13, 55, 210, 10, 0, WS_EX_LEFT
+    AUTORADIOBUTTON "Merge.rc:1615", IDC_CP_CUSTOM, 13, 68, 210, 10, 0, WS_EX_LEFT
     COMBOBOX        IDC_CUSTOM_CP_NUMBER, 26, 80, 196, 150, WS_GROUP | WS_TABSTOP | WS_VSCROLL | CBS_DROPDOWN | CBS_SORT, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1616", IDC_DETECT_CODEPAGE, 13, 104, 210, 29, BS_TOP | BS_MULTILINE, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1617", IDC_DETECT_CODEPAGE, 13, 104, 210, 29, BS_TOP | BS_MULTILINE, WS_EX_LEFT
 }
 
 
 
 IDD_PROPPAGE_COLORS_LIST DIALOGEX 105, 0, 236, 222
 STYLE DS_CONTROL | DS_SHELLFONT | WS_CAPTION | WS_CHILDWINDOW
-CAPTION "Merge.rc:1623"
+CAPTION "Merge.rc:1624"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
-    AUTOCHECKBOX    "Merge.rc:1626", IDC_DEFAULT_STANDARD_COLORS, 25, 14, 161, 10, 0, WS_EX_LEFT
-    GROUPBOX        "Merge.rc:1627", IDC_CUSTOM_COLORS_GROUP, 27, 33, 159, 111, 0, WS_EX_LEFT
-    LTEXT           "Merge.rc:1628", IDC_LEFTONLY_COLOR_LABEL, 31, 58, 78, 24, SS_LEFT, WS_EX_LEFT
-    LTEXT           "Merge.rc:1629", IDC_RIGHTONLY_COLOR_LABEL, 31, 87, 78, 24, SS_LEFT, WS_EX_LEFT
-    LTEXT           "Merge.rc:1630", IDC_SUSPICIOUS_COLOR_LABEL, 31, 116, 78, 24, SS_LEFT, WS_EX_LEFT
-    CTEXT           "Merge.rc:1631", IDC_BACKGROUND_COLUMN_LABEL, 96, 44, 50, 8, SS_CENTER, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1627", IDC_DEFAULT_STANDARD_COLORS, 25, 14, 161, 10, 0, WS_EX_LEFT
+    GROUPBOX        "Merge.rc:1628", IDC_CUSTOM_COLORS_GROUP, 27, 33, 159, 111, 0, WS_EX_LEFT
+    LTEXT           "Merge.rc:1629", IDC_LEFTONLY_COLOR_LABEL, 31, 58, 78, 24, SS_LEFT, WS_EX_LEFT
+    LTEXT           "Merge.rc:1630", IDC_RIGHTONLY_COLOR_LABEL, 31, 87, 78, 24, SS_LEFT, WS_EX_LEFT
+    LTEXT           "Merge.rc:1631", IDC_SUSPICIOUS_COLOR_LABEL, 31, 116, 78, 24, SS_LEFT, WS_EX_LEFT
+    CTEXT           "Merge.rc:1632", IDC_BACKGROUND_COLUMN_LABEL, 96, 44, 50, 8, SS_CENTER, WS_EX_LEFT
     CONTROL         "", IDC_LIST_LEFTONLY_BKGD_COLOR, WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW, 113, 58, 17, 14, WS_EX_LEFT
     CONTROL         "", IDC_LIST_RIGHTONLY_BKGD_COLOR, WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW, 113, 87, 17, 14, WS_EX_LEFT
     CONTROL         "", IDC_LIST_SUSPICIOUS_BKGD_COLOR, WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW, 113, 116, 17, 14, WS_EX_LEFT
@@ -1638,57 +1639,57 @@ FONT 8, "MS Shell Dlg", 0, 0, 1
 
 IDD_PROPPAGE_COLORS_SYNTAX DIALOGEX 105, 0, 236, 222
 STYLE DS_CONTROL | DS_SHELLFONT | WS_CAPTION | WS_CHILDWINDOW
-CAPTION "Merge.rc:1641"
+CAPTION "Merge.rc:1642"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
-    RTEXT           "Merge.rc:1644", IDC_STATIC, 0, 20, 70, 8, SS_RIGHT, WS_EX_LEFT
-    RTEXT           "Merge.rc:1645", IDC_STATIC, 0, 40, 70, 8, SS_RIGHT, WS_EX_LEFT
-    RTEXT           "Merge.rc:1646", IDC_STATIC, 0, 60, 70, 8, SS_RIGHT, WS_EX_LEFT
-    RTEXT           "Merge.rc:1647", IDC_STATIC, 0, 80, 70, 8, SS_RIGHT, WS_EX_LEFT
-    RTEXT           "Merge.rc:1648", IDC_STATIC, 0, 100, 70, 8, SS_RIGHT, WS_EX_LEFT
-    RTEXT           "Merge.rc:1649", IDC_STATIC, 0, 120, 70, 8, SS_RIGHT, WS_EX_LEFT
-    RTEXT           "Merge.rc:1650", IDC_STATIC, 0, 140, 70, 8, SS_RIGHT, WS_EX_LEFT
-    RTEXT           "Merge.rc:1651", IDC_STATIC, 0, 160, 70, 8, SS_RIGHT, WS_EX_LEFT
-    RTEXT           "Merge.rc:1652", IDC_STATIC, 0, 180, 70, 8, SS_RIGHT, WS_EX_LEFT
-    RTEXT           "Merge.rc:1653", IDC_STATIC, 0, 200, 70, 8, SS_RIGHT, WS_EX_LEFT
-    CTEXT           "Merge.rc:1654", IDC_STATIC, 68, 7, 37, 8, SS_CENTER, WS_EX_LEFT
+    RTEXT           "Merge.rc:1645", IDC_STATIC, 0, 20, 70, 8, SS_RIGHT, WS_EX_LEFT
+    RTEXT           "Merge.rc:1646", IDC_STATIC, 0, 40, 70, 8, SS_RIGHT, WS_EX_LEFT
+    RTEXT           "Merge.rc:1647", IDC_STATIC, 0, 60, 70, 8, SS_RIGHT, WS_EX_LEFT
+    RTEXT           "Merge.rc:1648", IDC_STATIC, 0, 80, 70, 8, SS_RIGHT, WS_EX_LEFT
+    RTEXT           "Merge.rc:1649", IDC_STATIC, 0, 100, 70, 8, SS_RIGHT, WS_EX_LEFT
+    RTEXT           "Merge.rc:1650", IDC_STATIC, 0, 120, 70, 8, SS_RIGHT, WS_EX_LEFT
+    RTEXT           "Merge.rc:1651", IDC_STATIC, 0, 140, 70, 8, SS_RIGHT, WS_EX_LEFT
+    RTEXT           "Merge.rc:1652", IDC_STATIC, 0, 160, 70, 8, SS_RIGHT, WS_EX_LEFT
+    RTEXT           "Merge.rc:1653", IDC_STATIC, 0, 180, 70, 8, SS_RIGHT, WS_EX_LEFT
+    RTEXT           "Merge.rc:1654", IDC_STATIC, 0, 200, 70, 8, SS_RIGHT, WS_EX_LEFT
+    CTEXT           "Merge.rc:1655", IDC_STATIC, 68, 7, 37, 8, SS_CENTER, WS_EX_LEFT
     CONTROL         "", IDC_SCOLOR_KEYWORDS, WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW, 78, 19, 17, 14, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1656", IDC_SCOLOR_KEYWORDS_BOLD, 105, 21, 55, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1657", IDC_SCOLOR_KEYWORDS_BOLD, 105, 21, 55, 10, 0, WS_EX_LEFT
     CONTROL         "", IDC_SCOLOR_FUNCTIONS, WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW, 78, 39, 17, 14, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1658", IDC_SCOLOR_FUNCTIONS_BOLD, 105, 40, 55, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1659", IDC_SCOLOR_FUNCTIONS_BOLD, 105, 40, 55, 10, 0, WS_EX_LEFT
     CONTROL         "", IDC_SCOLOR_COMMENTS, WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW, 78, 59, 17, 14, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1660", IDC_SCOLOR_COMMENTS_BOLD, 105, 60, 55, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1661", IDC_SCOLOR_COMMENTS_BOLD, 105, 60, 55, 10, 0, WS_EX_LEFT
     CONTROL         "", IDC_SCOLOR_NUMBERS, WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW, 78, 79, 17, 14, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1662", IDC_SCOLOR_NUMBERS_BOLD, 105, 80, 55, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1663", IDC_SCOLOR_NUMBERS_BOLD, 105, 80, 55, 10, 0, WS_EX_LEFT
     CONTROL         "", IDC_SCOLOR_OPERATORS, WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW, 78, 99, 17, 14, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1664", IDC_SCOLOR_OPERATORS_BOLD, 105, 100, 55, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1665", IDC_SCOLOR_OPERATORS_BOLD, 105, 100, 55, 10, 0, WS_EX_LEFT
     CONTROL         "", IDC_SCOLOR_STRINGS, WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW, 78, 119, 17, 14, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1666", IDC_SCOLOR_STRINGS_BOLD, 105, 120, 55, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1667", IDC_SCOLOR_STRINGS_BOLD, 105, 120, 55, 10, 0, WS_EX_LEFT
     CONTROL         "", IDC_SCOLOR_PREPROCESSOR, WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW, 78, 139, 17, 14, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1668", IDC_SCOLOR_PREPROCESSOR_BOLD, 105, 140, 55, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1669", IDC_SCOLOR_PREPROCESSOR_BOLD, 105, 140, 55, 10, 0, WS_EX_LEFT
     CONTROL         "", IDC_SCOLOR_USER1, WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW, 78, 159, 17, 14, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1670", IDC_SCOLOR_USER1_BOLD, 105, 160, 55, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1671", IDC_SCOLOR_USER1_BOLD, 105, 160, 55, 10, 0, WS_EX_LEFT
     CONTROL         "", IDC_SCOLOR_USER2, WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW, 78, 179, 17, 14, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1672", IDC_SCOLOR_USER2_BOLD, 105, 180, 55, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1673", IDC_SCOLOR_USER2_BOLD, 105, 180, 55, 10, 0, WS_EX_LEFT
     CONTROL         "", IDC_SCOLOR_USER3, WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW, 78, 199, 17, 14, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1674", IDC_SCOLOR_USER3_BOLD, 105, 200, 55, 10, 0, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1675", IDC_SCOLORS_BDEFAULTS, 160, 208, 70, 14, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1675", IDC_SCOLOR_USER3_BOLD, 105, 200, 55, 10, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1676", IDC_SCOLORS_BDEFAULTS, 160, 208, 70, 14, 0, WS_EX_LEFT
 }
 
 
 
 IDD_PROPPAGE_COLORS_TEXT DIALOGEX 105, 0, 236, 222
 STYLE DS_CONTROL | DS_SHELLFONT | WS_CAPTION | WS_CHILDWINDOW
-CAPTION "Merge.rc:1682"
+CAPTION "Merge.rc:1683"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
-    AUTOCHECKBOX    "Merge.rc:1685", IDC_DEFAULT_STANDARD_COLORS, 25, 14, 161, 10, 0, WS_EX_LEFT
-    GROUPBOX        "Merge.rc:1686", IDC_CUSTOM_COLORS_GROUP, 27, 33, 159, 111, 0, WS_EX_LEFT
-    LTEXT           "Merge.rc:1687", IDC_WHITESPACE_COLOR_LABEL, 31, 58, 78, 24, SS_LEFT, WS_EX_LEFT
-    LTEXT           "Merge.rc:1688", IDC_TEXT_COLOR_LABEL, 31, 87, 78, 24, SS_LEFT, WS_EX_LEFT
-    LTEXT           "Merge.rc:1689", IDC_SELECTION_COLOR_LABEL, 31, 116, 78, 24, SS_LEFT, WS_EX_LEFT
-    CTEXT           "Merge.rc:1690", IDC_BACKGROUND_COLUMN_LABEL, 96, 44, 50, 8, SS_CENTER, WS_EX_LEFT
-    CTEXT           "Merge.rc:1691", IDC_TEXT_COLUMN_LABEL, 139, 44, 50, 8, SS_CENTER, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1686", IDC_DEFAULT_STANDARD_COLORS, 25, 14, 161, 10, 0, WS_EX_LEFT
+    GROUPBOX        "Merge.rc:1687", IDC_CUSTOM_COLORS_GROUP, 27, 33, 159, 111, 0, WS_EX_LEFT
+    LTEXT           "Merge.rc:1688", IDC_WHITESPACE_COLOR_LABEL, 31, 58, 78, 24, SS_LEFT, WS_EX_LEFT
+    LTEXT           "Merge.rc:1689", IDC_TEXT_COLOR_LABEL, 31, 87, 78, 24, SS_LEFT, WS_EX_LEFT
+    LTEXT           "Merge.rc:1690", IDC_SELECTION_COLOR_LABEL, 31, 116, 78, 24, SS_LEFT, WS_EX_LEFT
+    CTEXT           "Merge.rc:1691", IDC_BACKGROUND_COLUMN_LABEL, 96, 44, 50, 8, SS_CENTER, WS_EX_LEFT
+    CTEXT           "Merge.rc:1692", IDC_TEXT_COLUMN_LABEL, 139, 44, 50, 8, SS_CENTER, WS_EX_LEFT
     CONTROL         "", IDC_WHITESPACE_BKGD_COLOR, WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW, 113, 58, 17, 14, WS_EX_LEFT
     CONTROL         "", IDC_REGULAR_BKGD_COLOR, WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW, 113, 87, 17, 14, WS_EX_LEFT
     CONTROL         "", IDC_REGULAR_TEXT_COLOR, WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW, 156, 87, 17, 14, WS_EX_LEFT
@@ -1700,349 +1701,349 @@ FONT 8, "MS Shell Dlg", 0, 0, 1
 
 IDD_PROPPAGE_COLORS_WINMERGE DIALOGEX 105, 0, 236, 222
 STYLE DS_CONTROL | DS_SHELLFONT | WS_CAPTION | WS_CHILDWINDOW
-CAPTION "Merge.rc:1703"
+CAPTION "Merge.rc:1704"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
-    CTEXT           "Merge.rc:1706", IDC_STATIC, 96, 15, 50, 8, SS_CENTER, WS_EX_LEFT
-    CTEXT           "Merge.rc:1707", IDC_STATIC, 145, 15, 38, 8, SS_CENTER, WS_EX_LEFT
-    CTEXT           "Merge.rc:1708", IDC_STATIC, 193, 15, 29, 8, SS_CENTER, WS_EX_LEFT
-    RTEXT           "Merge.rc:1709", IDC_STATIC, 7, 29, 90, 16, SS_RIGHT, WS_EX_LEFT
+    CTEXT           "Merge.rc:1707", IDC_STATIC, 96, 15, 50, 8, SS_CENTER, WS_EX_LEFT
+    CTEXT           "Merge.rc:1708", IDC_STATIC, 145, 15, 38, 8, SS_CENTER, WS_EX_LEFT
+    CTEXT           "Merge.rc:1709", IDC_STATIC, 193, 15, 29, 8, SS_CENTER, WS_EX_LEFT
+    RTEXT           "Merge.rc:1710", IDC_STATIC, 7, 29, 90, 16, SS_RIGHT, WS_EX_LEFT
     CONTROL         "", IDC_DIFFERENCE_COLOR, WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW, 113, 29, 17, 14, WS_EX_LEFT
     CONTROL         "", IDC_DIFFERENCE_DELETED_COLOR, WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW, 156, 29, 17, 14, WS_EX_LEFT
     CONTROL         "", IDC_DIFFERENCE_TEXT_COLOR, WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW | BS_LEFTTEXT, 199, 29, 17, 14, WS_EX_LEFT
-    RTEXT           "Merge.rc:1713", IDC_STATIC, 7, 49, 90, 16, SS_RIGHT, WS_EX_LEFT
+    RTEXT           "Merge.rc:1714", IDC_STATIC, 7, 49, 90, 16, SS_RIGHT, WS_EX_LEFT
     CONTROL         "", IDC_SEL_DIFFERENCE_COLOR, WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW, 113, 49, 17, 14, WS_EX_LEFT
     CONTROL         "", IDC_SEL_DIFFERENCE_DELETED_COLOR, WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW, 156, 49, 17, 14, WS_EX_LEFT
     CONTROL         "", IDC_SEL_DIFFERENCE_TEXT_COLOR, WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW | BS_LEFTTEXT, 199, 49, 17, 14, WS_EX_LEFT
-    RTEXT           "Merge.rc:1717", IDC_STATIC, 7, 69, 90, 16, SS_RIGHT, WS_EX_LEFT
+    RTEXT           "Merge.rc:1718", IDC_STATIC, 7, 69, 90, 16, SS_RIGHT, WS_EX_LEFT
     CONTROL         "", IDC_TRIVIAL_DIFF_COLOR, WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW, 113, 69, 17, 14, WS_EX_LEFT
     CONTROL         "", IDC_TRIVIAL_DIFF_DELETED_COLOR, WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW, 156, 69, 17, 14, WS_EX_LEFT
     CONTROL         "", IDC_TRIVIAL_DIFF_TEXT_COLOR, WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW | BS_LEFTTEXT, 199, 69, 17, 14, WS_EX_LEFT
-    RTEXT           "Merge.rc:1721", IDC_STATIC, 7, 89, 90, 16, SS_RIGHT, WS_EX_LEFT
+    RTEXT           "Merge.rc:1722", IDC_STATIC, 7, 89, 90, 16, SS_RIGHT, WS_EX_LEFT
     CONTROL         "", IDC_MOVEDBLOCK_COLOR, WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW, 113, 89, 17, 14, WS_EX_LEFT
     CONTROL         "", IDC_MOVEDBLOCK_DELETED_COLOR, WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW, 156, 89, 17, 14, WS_EX_LEFT
     CONTROL         "", IDC_MOVEDBLOCK_TEXT_COLOR, WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW | BS_LEFTTEXT, 199, 89, 17, 14, WS_EX_LEFT
-    RTEXT           "Merge.rc:1725", IDC_STATIC, 7, 109, 90, 16, SS_RIGHT, WS_EX_LEFT
+    RTEXT           "Merge.rc:1726", IDC_STATIC, 7, 109, 90, 16, SS_RIGHT, WS_EX_LEFT
     CONTROL         "", IDC_SEL_MOVEDBLOCK_COLOR, WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW, 113, 109, 17, 14, WS_EX_LEFT
     CONTROL         "", IDC_SEL_MOVEDBLOCK_DELETED_COLOR, WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW, 156, 109, 17, 14, WS_EX_LEFT
     CONTROL         "", IDC_SEL_MOVEDBLOCK_TEXT_COLOR, WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW | BS_LEFTTEXT, 199, 109, 17, 14, WS_EX_LEFT
-    RTEXT           "Merge.rc:1729", IDC_STATIC, 7, 129, 90, 16, SS_RIGHT, WS_EX_LEFT
+    RTEXT           "Merge.rc:1730", IDC_STATIC, 7, 129, 90, 16, SS_RIGHT, WS_EX_LEFT
     CONTROL         "", IDC_WORDDIFF_COLOR, WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW, 113, 129, 17, 14, WS_EX_LEFT
     CONTROL         "", IDC_WORDDIFF_DELETED_COLOR, WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW, 156, 129, 17, 14, WS_EX_LEFT
     CONTROL         "", IDC_WORDDIFF_TEXT_COLOR, WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW | BS_LEFTTEXT, 199, 129, 17, 14, WS_EX_LEFT
-    RTEXT           "Merge.rc:1733", IDC_STATIC, 7, 149, 90, 16, SS_RIGHT, WS_EX_LEFT
+    RTEXT           "Merge.rc:1734", IDC_STATIC, 7, 149, 90, 16, SS_RIGHT, WS_EX_LEFT
     CONTROL         "", IDC_SEL_WORDDIFF_COLOR, WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW, 113, 149, 17, 14, WS_EX_LEFT
     CONTROL         "", IDC_SEL_WORDDIFF_DELETED_COLOR, WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW, 156, 149, 17, 14, WS_EX_LEFT
     CONTROL         "", IDC_SEL_WORDDIFF_TEXT_COLOR, WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW | BS_LEFTTEXT, 199, 149, 17, 14, WS_EX_LEFT
-    AUTO3STATE      "Merge.rc:1737", IDC_CROSS_HATCH_DELETED_LINES, 7, 169, 220, 10, 0, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1738", IDC_COLORSCHEME_GITHUBBITBUCKET, 85, 208, 70, 14, 0, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1739", IDC_COLORDEFAULTS_BTN, 160, 208, 70, 14, 0, WS_EX_LEFT
+    AUTO3STATE      "Merge.rc:1738", IDC_CROSS_HATCH_DELETED_LINES, 7, 169, 220, 10, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1739", IDC_COLORSCHEME_GITHUBBITBUCKET, 85, 208, 70, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1740", IDC_COLORDEFAULTS_BTN, 160, 208, 70, 14, 0, WS_EX_LEFT
 }
 
 
 
 IDD_PROPPAGE_COMPARE DIALOGEX 105, 0, 236, 222
 STYLE DS_CONTROL | DS_SHELLFONT | WS_CAPTION | WS_CHILDWINDOW
-CAPTION "Merge.rc:1746"
+CAPTION "Merge.rc:1747"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
-    GROUPBOX        "Merge.rc:1749", IDC_STATIC, 7, 7, 221, 70, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1750", IDC_DIFF_WS_IGNORE_TAB_EXPANSION, 14, 19, 206, 10, WS_GROUP, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1751", IDC_DIFF_WS_IGNORE_TRAILING_SPACE, 14, 29, 206, 10, 0, WS_EX_LEFT
-    AUTORADIOBUTTON "Merge.rc:1752", IDC_DIFF_WHITESPACE_COMPARE, 14, 41, 206, 10, WS_GROUP, WS_EX_LEFT
-    AUTORADIOBUTTON "Merge.rc:1753", IDC_DIFF_WHITESPACE_IGNORE, 14, 51, 206, 10, 0, WS_EX_LEFT
-    AUTORADIOBUTTON "Merge.rc:1754", IDC_DIFF_WHITESPACE_IGNOREALL, 14, 61, 206, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1755", IDC_DIFF_IGNORE_BLANK_LINES, 7, 80, 221, 10, WS_GROUP, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1756", IDC_DIFF_IGNORECASE, 7, 90, 221, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1757", IDC_DIFF_IGNOREEOL, 7, 100, 221, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1758", IDC_MOVED_BLOCKS, 7, 110, 221, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1759", IDC_MATCH_SIMILAR_LINES, 7, 120, 221, 10, 0, WS_EX_LEFT
-    RTEXT           "Merge.rc:1760", IDC_STATIC, 7, 132, 160, 8, SS_RIGHT, WS_EX_LEFT
+    GROUPBOX        "Merge.rc:1750", IDC_STATIC, 7, 7, 221, 70, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1751", IDC_DIFF_WS_IGNORE_TAB_EXPANSION, 14, 19, 206, 10, WS_GROUP, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1752", IDC_DIFF_WS_IGNORE_TRAILING_SPACE, 14, 29, 206, 10, 0, WS_EX_LEFT
+    AUTORADIOBUTTON "Merge.rc:1753", IDC_DIFF_WHITESPACE_COMPARE, 14, 41, 206, 10, WS_GROUP, WS_EX_LEFT
+    AUTORADIOBUTTON "Merge.rc:1754", IDC_DIFF_WHITESPACE_IGNORE, 14, 51, 206, 10, 0, WS_EX_LEFT
+    AUTORADIOBUTTON "Merge.rc:1755", IDC_DIFF_WHITESPACE_IGNOREALL, 14, 61, 206, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1756", IDC_DIFF_IGNORE_BLANK_LINES, 7, 80, 221, 10, WS_GROUP, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1757", IDC_DIFF_IGNORECASE, 7, 90, 221, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1758", IDC_DIFF_IGNOREEOL, 7, 100, 221, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1759", IDC_MOVED_BLOCKS, 7, 110, 221, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1760", IDC_MATCH_SIMILAR_LINES, 7, 120, 221, 10, 0, WS_EX_LEFT
+    RTEXT           "Merge.rc:1761", IDC_STATIC, 7, 132, 160, 8, SS_RIGHT, WS_EX_LEFT
     EDITTEXT        IDC_MATCH_SIMILAR_LINES_MAX, 174, 130, 50, 12, ES_AUTOHSCROLL | ES_NUMBER, WS_EX_RTLREADING
-    LTEXT           "Merge.rc:1762", IDC_STATIC, 7, 152, 100, 9, SS_LEFT, WS_EX_LEFT
+    LTEXT           "Merge.rc:1763", IDC_STATIC, 7, 152, 100, 9, SS_LEFT, WS_EX_LEFT
     COMBOBOX        IDC_DIFF_ALGORITHM, 110, 150, 114, 150, WS_TABSTOP | WS_VSCROLL | CBS_DROPDOWNLIST, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1764", IDC_DIFF_MINIMAL, 7, 167, 221, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1765", IDC_DIFF_SPEED_LARGE_FILES, 7, 177, 221, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1766", IDC_INDENT_HEURISTIC, 7, 187, 221, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1767", IDC_FILTERCOMMENTS_CHECK, 7, 197, 221, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1768", IDC_DIFF_APPLY_HISTORIC_COST_LIMIT, 7, 212, 150, 10, 0, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1769", IDC_COMPARE_DEFAULTS, 160, 208, 70, 14, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1765", IDC_DIFF_MINIMAL, 7, 167, 221, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1766", IDC_DIFF_SPEED_LARGE_FILES, 7, 177, 221, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1767", IDC_INDENT_HEURISTIC, 7, 187, 221, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1768", IDC_FILTERCOMMENTS_CHECK, 7, 197, 221, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1769", IDC_DIFF_APPLY_HISTORIC_COST_LIMIT, 7, 212, 150, 10, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1770", IDC_COMPARE_DEFAULTS, 160, 208, 70, 14, 0, WS_EX_LEFT
 }
 
 
 
 IDD_PROPPAGE_COMPARE_FOLDER DIALOGEX 105, 0, 236, 222
 STYLE DS_CONTROL | DS_SHELLFONT | WS_CAPTION | WS_CHILDWINDOW
-CAPTION "Merge.rc:1776" //msgctxt Options dialog|Categories
+CAPTION "Merge.rc:1777" //msgctxt Options dialog|Categories
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
-    LTEXT           "Merge.rc:1779", IDC_STATIC, 7, 9, 100, 9, SS_LEFT, WS_EX_LEFT
+    LTEXT           "Merge.rc:1780", IDC_STATIC, 7, 9, 100, 9, SS_LEFT, WS_EX_LEFT
     COMBOBOX        IDC_COMPAREMETHODCOMBO, 110, 7, 114, 150, WS_TABSTOP | WS_VSCROLL | CBS_DROPDOWNLIST, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1781", IDC_COMPARE_STOPFIRST, 7, 28, 222, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1782", IDC_IGNORE_SMALLTIMEDIFF, 7, 39, 222, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1783", IDC_COMPARE_SELFCOMPARE, 7, 50, 222, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1784", IDC_COMPARE_WALKUNIQUES, 7, 61, 222, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1785", IDC_COMPARE_CACHE_RESULTS, 7, 72, 222, 8, 0, WS_EX_LEFT
-    LTEXT           "Merge.rc:1786", IDC_STATIC, 7, 85, 165, 8, SS_LEFT, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1782", IDC_COMPARE_STOPFIRST, 7, 28, 222, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1783", IDC_IGNORE_SMALLTIMEDIFF, 7, 39, 222, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1784", IDC_COMPARE_SELFCOMPARE, 7, 50, 222, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1785", IDC_COMPARE_WALKUNIQUES, 7, 61, 222, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1786", IDC_COMPARE_CACHE_RESULTS, 7, 72, 222, 8, 0, WS_EX_LEFT
+    LTEXT           "Merge.rc:1787", IDC_STATIC, 7, 85, 165, 8, SS_LEFT, WS_EX_LEFT
     EDITTEXT        IDC_COMPARE_QUICKC_LIMIT, 194, 83, 30, 12, ES_RIGHT | ES_NUMBER, WS_EX_LEFT
-    LTEXT           "Merge.rc:1788", IDC_STATIC, 7, 99, 165, 8
+    LTEXT           "Merge.rc:1789", IDC_STATIC, 7, 99, 165, 8
     EDITTEXT        IDC_COMPARE_BINARYC_LIMIT, 194, 97, 30, 12, ES_RIGHT | ES_NUMBER, WS_EX_LEFT
-    LTEXT           "Merge.rc:1790", IDC_STATIC, 7, 113, 165, 24, SS_LEFT, WS_EX_LEFT
+    LTEXT           "Merge.rc:1791", IDC_STATIC, 7, 113, 165, 24, SS_LEFT, WS_EX_LEFT
     EDITTEXT        IDC_COMPARE_THREAD_COUNT, 194, 127, 30, 12, ES_RIGHT | ES_NUMBER, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1792", IDC_COMPAREFOLDER_DEFAULTS, 160, 208, 70, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1793", IDC_COMPAREFOLDER_DEFAULTS, 160, 208, 70, 14, 0, WS_EX_LEFT
 }
 
 
 
 IDD_PROPPAGE_COMPARE_IMAGE DIALOGEX 105, 0, 236, 222
 STYLE DS_CONTROL | DS_SHELLFONT | WS_CAPTION | WS_CHILDWINDOW
-CAPTION "Merge.rc:1799"
+CAPTION "Merge.rc:1800"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 BEGIN
-    LTEXT           "Merge.rc:1802", IDC_STATIC, 7, 6, 200, 10
+    LTEXT           "Merge.rc:1803", IDC_STATIC, 7, 6, 200, 10
     COMBOBOX        IDC_FILEPATS, 7, 18, 223, 0, WS_TABSTOP | WS_VSCROLL | CBS_DROPDOWN | CBS_AUTOHSCROLL | CBS_NOINTEGRALHEIGHT
-    PUSHBUTTON      "Merge.rc:1804", IDC_DEFAULTS, 160, 208, 70, 14
+    PUSHBUTTON      "Merge.rc:1805", IDC_DEFAULTS, 160, 208, 70, 14
 END
 
 
 
 IDD_PROPPAGE_COMPARE_REOGRID DIALOGEX 105, 0, 236, 222
 STYLE DS_CONTROL | DS_SHELLFONT | WS_CAPTION | WS_CHILDWINDOW
-CAPTION "Merge.rc:1811"
+CAPTION "Merge.rc:1812"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 BEGIN
-    LTEXT           "Merge.rc:1814", IDC_STATIC, 7, 6, 200, 10
+    LTEXT           "Merge.rc:1815", IDC_STATIC, 7, 6, 200, 10
     COMBOBOX        IDC_FILEPATS, 7, 18, 223, 0, WS_TABSTOP | WS_VSCROLL | CBS_DROPDOWN | CBS_AUTOHSCROLL | CBS_NOINTEGRALHEIGHT
-    PUSHBUTTON      "Merge.rc:1816", IDC_DEFAULTS, 160, 208, 70, 14
+    PUSHBUTTON      "Merge.rc:1817", IDC_DEFAULTS, 160, 208, 70, 14
 END
 
 
 
 IDD_PROPPAGE_COMPARE_SQLITE DIALOGEX 105, 0, 236, 222
 STYLE DS_CONTROL | DS_SHELLFONT | WS_CAPTION | WS_CHILDWINDOW
-CAPTION "Merge.rc:1823"
+CAPTION "Merge.rc:1824"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 BEGIN
-    AUTORADIOBUTTON "Merge.rc:1826", IDC_COMPARESQLITE_DETECT_BY_SIGNATURE, 7, 6, 222, 10, WS_GROUP, WS_EX_LEFT
-    AUTORADIOBUTTON "Merge.rc:1827", IDC_COMPARESQLITE_DETECT_BY_FILENAME, 7, 17, 200, 10, 0, WS_EX_LEFT
+    AUTORADIOBUTTON "Merge.rc:1827", IDC_COMPARESQLITE_DETECT_BY_SIGNATURE, 7, 6, 222, 10, WS_GROUP, WS_EX_LEFT
+    AUTORADIOBUTTON "Merge.rc:1828", IDC_COMPARESQLITE_DETECT_BY_FILENAME, 7, 17, 200, 10, 0, WS_EX_LEFT
     COMBOBOX        IDC_COMPARESQLITE_PATTERNS, 7, 29, 223, 0, WS_GROUP | WS_TABSTOP | WS_VSCROLL | CBS_DROPDOWN | CBS_AUTOHSCROLL | CBS_NOINTEGRALHEIGHT
-    AUTOCHECKBOX    "Merge.rc:1829", IDC_COMPARESQLITE_PROMPT_FOR_OPTIONS, 7, 46, 222, 10, WS_GROUP, WS_EX_LEFT
-    AUTORADIOBUTTON "Merge.rc:1830", IDC_COMPARESQLITE_SCHEMA_ONLY, 7, 57, 222, 10, WS_GROUP, WS_EX_LEFT
-    AUTORADIOBUTTON "Merge.rc:1831", IDC_COMPARESQLITE_SCHEMA_AND_DATA, 7, 68, 222, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1832", IDC_COMPARESQLITE_BLOB_FIELDS, 17, 79, 222, 10, WS_GROUP, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1833", IDC_COMPARESQLITE_DEFAULTS, 160, 208, 70, 14, WS_GROUP, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1830", IDC_COMPARESQLITE_PROMPT_FOR_OPTIONS, 7, 46, 222, 10, WS_GROUP, WS_EX_LEFT
+    AUTORADIOBUTTON "Merge.rc:1831", IDC_COMPARESQLITE_SCHEMA_ONLY, 7, 57, 222, 10, WS_GROUP, WS_EX_LEFT
+    AUTORADIOBUTTON "Merge.rc:1832", IDC_COMPARESQLITE_SCHEMA_AND_DATA, 7, 68, 222, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1833", IDC_COMPARESQLITE_BLOB_FIELDS, 17, 79, 222, 10, WS_GROUP, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1834", IDC_COMPARESQLITE_DEFAULTS, 160, 208, 70, 14, WS_GROUP, WS_EX_LEFT
 END
 
 
 
 IDD_PROPPAGE_EDITOR DIALOGEX 105, 0, 236, 222
 STYLE DS_CONTROL | DS_SHELLFONT | WS_CAPTION | WS_CHILDWINDOW
-CAPTION "Merge.rc:1840"
+CAPTION "Merge.rc:1841"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
-    AUTOCHECKBOX    "Merge.rc:1843", IDC_HILITE_CHECK, 7, 7, 215, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1844", IDC_AUTOMRESCAN_CHECK, 7, 17, 215, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1845", IDC_MIXED_EOL, 7, 27, 215, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1846", IDC_HONOR_EDITOR_CONFIG, 7, 37, 215, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1847", IDC_HONOR_MODELINES, 7, 47, 215, 10, 0, WS_EX_LEFT
-    GROUPBOX        "Merge.rc:1848", IDC_STATIC, 7, 64, 221, 60, WS_GROUP, WS_EX_LEFT
-    LTEXT           "Merge.rc:1849", IDC_STATIC, 14, 73, 201, 8, SS_LEFT, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1844", IDC_HILITE_CHECK, 7, 7, 215, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1845", IDC_AUTOMRESCAN_CHECK, 7, 17, 215, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1846", IDC_MIXED_EOL, 7, 27, 215, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1847", IDC_HONOR_EDITOR_CONFIG, 7, 37, 215, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1848", IDC_HONOR_MODELINES, 7, 47, 215, 10, 0, WS_EX_LEFT
+    GROUPBOX        "Merge.rc:1849", IDC_STATIC, 7, 64, 221, 60, WS_GROUP, WS_EX_LEFT
+    LTEXT           "Merge.rc:1850", IDC_STATIC, 14, 73, 201, 8, SS_LEFT, WS_EX_LEFT
     EDITTEXT        IDC_TAB_EDIT, 24, 84, 18, 12, ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER, WS_EX_LEFT
-    AUTORADIOBUTTON "Merge.rc:1851", IDC_PROP_INSERT_TABS, 14, 100, 201, 10, WS_GROUP, WS_EX_LEFT
-    AUTORADIOBUTTON "Merge.rc:1852", IDC_PROP_INSERT_SPACES, 14, 110, 201, 10, 0, WS_EX_LEFT
-    GROUPBOX        "Merge.rc:1853", IDC_LINE_COLORING_GROUP, 7, 129, 221, 83, WS_GROUP, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1854", IDC_VIEW_LINE_DIFFERENCES, 14, 140, 201, 10, 0, WS_EX_LEFT
+    AUTORADIOBUTTON "Merge.rc:1852", IDC_PROP_INSERT_TABS, 14, 100, 201, 10, WS_GROUP, WS_EX_LEFT
+    AUTORADIOBUTTON "Merge.rc:1853", IDC_PROP_INSERT_SPACES, 14, 110, 201, 10, 0, WS_EX_LEFT
+    GROUPBOX        "Merge.rc:1854", IDC_LINE_COLORING_GROUP, 7, 129, 221, 83, WS_GROUP, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1855", IDC_VIEW_LINE_DIFFERENCES, 14, 140, 201, 10, 0, WS_EX_LEFT
     COMBOBOX        IDC_BREAK_TYPE, 24, 152, 198, 150, WS_GROUP | WS_TABSTOP | WS_VSCROLL | CBS_DROPDOWNLIST, WS_EX_LEFT
-    LTEXT           "Merge.rc:1856", IDC_BREAK_CHARS_LABEL, 24, 170, 194, 8, SS_LEFT, WS_EX_LEFT
+    LTEXT           "Merge.rc:1857", IDC_BREAK_CHARS_LABEL, 24, 170, 194, 8, SS_LEFT, WS_EX_LEFT
     EDITTEXT        IDC_BREAK_CHARS, 24, 181, 198, 12, ES_AUTOHSCROLL, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1858", IDC_EDITOR_CHARLEVEL, 24, 198, 194, 10, WS_GROUP, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1859", IDC_EDITOR_CHARLEVEL, 24, 198, 194, 10, WS_GROUP, WS_EX_LEFT
 }
 
 
 
 IDD_PROPPAGE_FILTER DIALOGEX 0, 0, 365, 215
 STYLE DS_CONTROL | DS_SHELLFONT | WS_CAPTION | WS_CHILDWINDOW
-CAPTION "Merge.rc:1865"
+CAPTION "Merge.rc:1866"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
-    AUTOCHECKBOX    "Merge.rc:1868", IDC_IGNOREREGEXP, 7, 7, 350, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1869", IDC_IGNOREREGEXP, 7, 7, 350, 10, 0, WS_EX_LEFT
     CONTROL         "", IDC_LFILTER_LIST, WC_TREEVIEW, WS_TABSTOP | WS_BORDER | TVS_EDITLABELS | TVS_SHOWSELALWAYS | TVS_INFOTIP | TVS_FULLROWSELECT, 7, 21, 350, 125, WS_EX_LEFT
-    LTEXT           "Merge.rc:1870", IDC_STATIC, 7, 151, 350, 8, SS_LEFT, WS_EX_LEFT
+    LTEXT           "Merge.rc:1871", IDC_STATIC, 7, 151, 350, 8, SS_LEFT, WS_EX_LEFT
     EDITTEXT        IDC_LFILTER_EDIT, 7, 163, 350, 26, WS_HSCROLL | ES_MULTILINE, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1872", IDC_LFILTER_ADDBTN, 199, 196, 50, 14, 0, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1873", IDC_LFILTER_EDITBTN, 253, 196, 50, 14, 0, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1874", IDC_LFILTER_REMOVEBTN, 307, 196, 50, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1873", IDC_LFILTER_ADDBTN, 199, 196, 50, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1874", IDC_LFILTER_EDITBTN, 253, 196, 50, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1875", IDC_LFILTER_REMOVEBTN, 307, 196, 50, 14, 0, WS_EX_LEFT
 }
 
 
 
 IDD_PROPPAGE_GENERAL DIALOGEX 105, 0, 236, 222
 STYLE DS_CONTROL | DS_SHELLFONT | WS_CAPTION | WS_CHILDWINDOW
-CAPTION "Merge.rc:1881"
+CAPTION "Merge.rc:1882"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
-    AUTOCHECKBOX    "Merge.rc:1884", IDC_SCROLL_CHECK, 7, 7, 220, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1885", IDC_ENABLE_SCROLL_ANIMATION, 7, 17, 220, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1886", IDC_ESC_CLOSES_WINDOW, 7, 37, 220, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1887", IDC_VERIFY_OPEN_PATHS, 7, 47, 220, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1888", IDC_SINGLE_INSTANCE, 7, 57, 220, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1889", IDC_ASK_MULTIWINDOW_CLOSE, 7, 67, 220, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1890", IDC_PRESERVE_FILETIME, 7, 77, 220, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1891", IDC_STARTUP_FOLDER_SELECT, 7, 87, 220, 10, 0, WS_EX_LEFT
-    LTEXT           "Merge.rc:1892", IDC_STATIC, 19, 101, 208, 8, SS_LEFT, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1885", IDC_SCROLL_CHECK, 7, 7, 220, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1886", IDC_ENABLE_SCROLL_ANIMATION, 7, 17, 220, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1887", IDC_ESC_CLOSES_WINDOW, 7, 37, 220, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1888", IDC_VERIFY_OPEN_PATHS, 7, 47, 220, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1889", IDC_SINGLE_INSTANCE, 7, 57, 220, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1890", IDC_ASK_MULTIWINDOW_CLOSE, 7, 67, 220, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1891", IDC_PRESERVE_FILETIME, 7, 77, 220, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1892", IDC_STARTUP_FOLDER_SELECT, 7, 87, 220, 10, 0, WS_EX_LEFT
+    LTEXT           "Merge.rc:1893", IDC_STATIC, 19, 101, 208, 8, SS_LEFT, WS_EX_LEFT
     COMBOBOX        IDC_AUTO_COMPLETE_SOURCE, 20, 111, 147, 150, WS_TABSTOP | WS_VSCROLL | CBS_DROPDOWNLIST, WS_EX_LEFT
-    GROUPBOX        "Merge.rc:1894", IDC_STATIC, 7, 130, 221, 37, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1895", IDC_MULTIDOC_DIRCMP, 15, 142, 206, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1896", IDC_MULTIDOC_FILECMP, 15, 152, 206, 10, 0, WS_EX_LEFT
-    LTEXT           "Merge.rc:1897", IDC_STATIC, 7, 183, 168, 48, SS_LEFT, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1898", IDC_RESET_ALL_MESSAGE_BOXES, 180, 197, 50, 14, 0, WS_EX_LEFT
+    GROUPBOX        "Merge.rc:1895", IDC_STATIC, 7, 130, 221, 37, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1896", IDC_MULTIDOC_DIRCMP, 15, 142, 206, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1897", IDC_MULTIDOC_FILECMP, 15, 152, 206, 10, 0, WS_EX_LEFT
+    LTEXT           "Merge.rc:1898", IDC_STATIC, 7, 183, 168, 48, SS_LEFT, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1899", IDC_RESET_ALL_MESSAGE_BOXES, 180, 197, 50, 14, 0, WS_EX_LEFT
 }
 
 
 
 IDD_PROPPAGE_HEX_EDITOR DIALOGEX 105, 0, 235, 215
 STYLE DS_CONTROL | DS_SHELLFONT | WS_CAPTION | WS_CHILDWINDOW
-CAPTION "Merge.rc:1905" //msgctxt Options dialog|Categories
+CAPTION "Merge.rc:1906" //msgctxt Options dialog|Categories
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
-    LTEXT           "Merge.rc:1908", IDC_STATIC, 7, 7, 220, 8, SS_LEFT, WS_EX_LEFT
+    LTEXT           "Merge.rc:1909", IDC_STATIC, 7, 7, 220, 8, SS_LEFT, WS_EX_LEFT
     EDITTEXT        IDC_BPL_EDIT, 17, 17, 45, 12, ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1910", IDC_BPL_AUTO, 7, 33, 220, 30, BS_TOP | BS_MULTILINE, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1911", IDC_BPL_AUTO, 7, 33, 220, 30, BS_TOP | BS_MULTILINE, WS_EX_LEFT
 }
 
 
 
 IDD_PROPPAGE_SHELL DIALOGEX 105, 0, 236, 222
 STYLE DS_CONTROL | DS_SHELLFONT | WS_CAPTION | WS_CHILDWINDOW
-CAPTION "Merge.rc:1917"
+CAPTION "Merge.rc:1918"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
-    GROUPBOX        "Merge.rc:1920", IDC_STATIC, 7, 7, 221, 56, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1921", IDC_EXPLORER_CONTEXT, 17, 18, 200, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1922", IDC_EXPLORER_ADVANCED, 27, 28, 190, 10, 0, WS_EX_LEFT
-    AUTO3STATE      "Merge.rc:1923", IDC_EXPLORER_SUBFOLDERS, 27, 38, 190, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1924", IDC_EXPLORER_IGNORE_FOLDER_STRUCTURE, 27, 48, 190, 10, 0, WS_EX_LEFT
-    GROUPBOX        "Merge.rc:1925", IDC_STATIC, 7, 68, 221, 26, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1926", IDC_ENABLE_DIR_SHELL_CONTEXT_MENU, 19, 79, 200, 10, 0, WS_EX_LEFT
-    GROUPBOX        "Merge.rc:1927", IDC_STATIC, 7, 99, 221, 26, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1928", IDC_ENABLE_MERGEEDIT_SHELL_CONTEXT_MENU, 19, 110, 200, 10, 0, WS_EX_LEFT
+    GROUPBOX        "Merge.rc:1921", IDC_STATIC, 7, 7, 221, 56, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1922", IDC_EXPLORER_CONTEXT, 17, 18, 200, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1923", IDC_EXPLORER_ADVANCED, 27, 28, 190, 10, 0, WS_EX_LEFT
+    AUTO3STATE      "Merge.rc:1924", IDC_EXPLORER_SUBFOLDERS, 27, 38, 190, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1925", IDC_EXPLORER_IGNORE_FOLDER_STRUCTURE, 27, 48, 190, 10, 0, WS_EX_LEFT
+    GROUPBOX        "Merge.rc:1926", IDC_STATIC, 7, 68, 221, 26, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1927", IDC_ENABLE_DIR_SHELL_CONTEXT_MENU, 19, 79, 200, 10, 0, WS_EX_LEFT
+    GROUPBOX        "Merge.rc:1928", IDC_STATIC, 7, 99, 221, 26, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1929", IDC_ENABLE_MERGEEDIT_SHELL_CONTEXT_MENU, 19, 110, 200, 10, 0, WS_EX_LEFT
 }
 
 
 
 IDD_PROPPAGE_SYSTEM DIALOGEX 105, 0, 235, 220
 STYLE DS_CONTROL | DS_SHELLFONT | WS_CAPTION | WS_CHILDWINDOW
-CAPTION "Merge.rc:1935"
+CAPTION "Merge.rc:1936"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
-    AUTOCHECKBOX    "Merge.rc:1938", IDC_USE_SHELL_FILE_OPERATIONS, 7, 7, 222, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1939", IDC_USE_RECYCLE_BIN, 7, 17, 222, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1940", IDC_USE_SHELL_FILE_BROWSE_DIALOGS, 7, 27, 222, 10, 0, WS_EX_LEFT
-    LTEXT           "Merge.rc:1941", IDC_STATIC, 7, 43, 222, 8, SS_LEFT, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1939", IDC_USE_SHELL_FILE_OPERATIONS, 7, 7, 222, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1940", IDC_USE_RECYCLE_BIN, 7, 17, 222, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:1941", IDC_USE_SHELL_FILE_BROWSE_DIALOGS, 7, 27, 222, 10, 0, WS_EX_LEFT
+    LTEXT           "Merge.rc:1942", IDC_STATIC, 7, 43, 222, 8, SS_LEFT, WS_EX_LEFT
     EDITTEXT        IDC_EXT_EDITOR_PATH, 7, 53, 167, 14, ES_AUTOHSCROLL, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1943", IDC_EXT_EDITOR_BROWSE, 179, 53, 50, 14, 0, WS_EX_LEFT
-    CONTROL         "Merge.rc:1944", IDC_LABEL_SUPPLEMENT_FOLDER, WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW, 7, 71, 222, 10, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1944", IDC_EXT_EDITOR_BROWSE, 179, 53, 50, 14, 0, WS_EX_LEFT
+    CONTROL         "Merge.rc:1945", IDC_LABEL_SUPPLEMENT_FOLDER, WC_BUTTON, WS_TABSTOP | WS_TABSTOP | BS_OWNERDRAW, 7, 71, 222, 10, WS_EX_LEFT
     COMBOBOX        IDC_SUPPLEMENT_FOLDER, 7, 81, 167, 150, WS_TABSTOP | WS_VSCROLL | CBS_DROPDOWN | CBS_AUTOHSCROLL, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1946", IDC_SUPPLEMENT_FOLDER_BROWSE, 179, 81, 50, 14, 0, WS_EX_LEFT
-    GROUPBOX        "Merge.rc:1947", IDC_STATIC, 7, 100, 221, 56, 0, WS_EX_LEFT
-    AUTORADIOBUTTON "Merge.rc:1948", IDC_TMPFOLDER_SYSTEM, 17, 112, 199, 10, WS_GROUP, WS_EX_LEFT
-    AUTORADIOBUTTON "Merge.rc:1949", IDC_TMPFOLDER_CUSTOM, 17, 122, 199, 10, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1947", IDC_SUPPLEMENT_FOLDER_BROWSE, 179, 81, 50, 14, 0, WS_EX_LEFT
+    GROUPBOX        "Merge.rc:1948", IDC_STATIC, 7, 100, 221, 56, 0, WS_EX_LEFT
+    AUTORADIOBUTTON "Merge.rc:1949", IDC_TMPFOLDER_SYSTEM, 17, 112, 199, 10, WS_GROUP, WS_EX_LEFT
+    AUTORADIOBUTTON "Merge.rc:1950", IDC_TMPFOLDER_CUSTOM, 17, 122, 199, 10, 0, WS_EX_LEFT
     EDITTEXT        IDC_TMPFOLDER_NAME, 27, 134, 138, 14, WS_GROUP | ES_AUTOHSCROLL, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1951", IDC_TMPFOLDER_BROWSE, 170, 134, 50, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1952", IDC_TMPFOLDER_BROWSE, 170, 134, 50, 14, 0, WS_EX_LEFT
 }
 
 
 
 IDD_SAVECLOSING DIALOGEX 0, 0, 262, 154
 STYLE DS_CENTER | DS_MODALFRAME | DS_SHELLFONT | WS_CAPTION | WS_CLIPCHILDREN | WS_POPUP | WS_THICKFRAME | WS_SYSMENU
-CAPTION "Merge.rc:1958"
+CAPTION "Merge.rc:1959"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
-    GROUPBOX        "Merge.rc:1961", IDC_SAVECLOSING_LEFTFRAME, 7, 7, 248, 55, WS_GROUP | WS_CLIPSIBLINGS, WS_EX_TRANSPARENT
+    GROUPBOX        "Merge.rc:1962", IDC_SAVECLOSING_LEFTFRAME, 7, 7, 248, 55, WS_GROUP | WS_CLIPSIBLINGS, WS_EX_TRANSPARENT
     EDITTEXT        IDC_SAVECLOSING_LEFTFILE, 16, 19, 230, 14, WS_GROUP | ES_AUTOHSCROLL | ES_READONLY, WS_EX_LEFT
-    AUTORADIOBUTTON "Merge.rc:1963", IDC_SAVECLOSING_SAVELEFT, 16, 36, 230, 10, WS_GROUP | WS_TABSTOP, WS_EX_LEFT
-    AUTORADIOBUTTON "Merge.rc:1964", IDC_SAVECLOSING_DISCARDLEFT, 16, 46, 230, 10, 0, WS_EX_LEFT
-    GROUPBOX        "Merge.rc:1965", IDC_SAVECLOSING_RIGHTFRAME, 7, 70, 248, 55, WS_GROUP | WS_CLIPSIBLINGS, WS_EX_TRANSPARENT
+    AUTORADIOBUTTON "Merge.rc:1964", IDC_SAVECLOSING_SAVELEFT, 16, 36, 230, 10, WS_GROUP | WS_TABSTOP, WS_EX_LEFT
+    AUTORADIOBUTTON "Merge.rc:1965", IDC_SAVECLOSING_DISCARDLEFT, 16, 46, 230, 10, 0, WS_EX_LEFT
+    GROUPBOX        "Merge.rc:1966", IDC_SAVECLOSING_RIGHTFRAME, 7, 70, 248, 55, WS_GROUP | WS_CLIPSIBLINGS, WS_EX_TRANSPARENT
     EDITTEXT        IDC_SAVECLOSING_RIGHTFILE, 16, 82, 230, 14, WS_GROUP | ES_AUTOHSCROLL | ES_READONLY, WS_EX_LEFT
-    AUTORADIOBUTTON "Merge.rc:1967", IDC_SAVECLOSING_SAVERIGHT, 16, 99, 230, 10, WS_GROUP | WS_TABSTOP, WS_EX_LEFT
-    AUTORADIOBUTTON "Merge.rc:1968", IDC_SAVECLOSING_DISCARDRIGHT, 16, 109, 230, 10, 0, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1969", IDC_SAVECLOSING_DISCARDALL, 7, 133, 75, 14, WS_GROUP, WS_EX_LEFT
-    DEFPUSHBUTTON   "Merge.rc:1970", IDOK, 149, 133, 50, 14, 0, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1971", IDCANCEL, 205, 133, 50, 14, 0, WS_EX_LEFT
+    AUTORADIOBUTTON "Merge.rc:1968", IDC_SAVECLOSING_SAVERIGHT, 16, 99, 230, 10, WS_GROUP | WS_TABSTOP, WS_EX_LEFT
+    AUTORADIOBUTTON "Merge.rc:1969", IDC_SAVECLOSING_DISCARDRIGHT, 16, 109, 230, 10, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1970", IDC_SAVECLOSING_DISCARDALL, 7, 133, 75, 14, WS_GROUP, WS_EX_LEFT
+    DEFPUSHBUTTON   "Merge.rc:1971", IDOK, 149, 133, 50, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1972", IDCANCEL, 205, 133, 50, 14, 0, WS_EX_LEFT
 }
 
 
 
 IDD_SHARED_FILTER DIALOGEX 0, 0, 250, 75
 STYLE DS_CENTER | DS_MODALFRAME | DS_SHELLFONT | WS_CAPTION | WS_POPUP
-CAPTION "Merge.rc:1978"
+CAPTION "Merge.rc:1979"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
-    LTEXT           "Merge.rc:1981", IDC_STATIC, 14, 7, 229, 11, SS_LEFT, WS_EX_LEFT
-    AUTORADIOBUTTON "Merge.rc:1982", IDC_SHARED, 20, 22, 223, 10, WS_GROUP, WS_EX_LEFT
-    AUTORADIOBUTTON "Merge.rc:1983", IDC_PRIVATE, 20, 37, 223, 10, 0, WS_EX_LEFT
-    DEFPUSHBUTTON   "Merge.rc:1984", IDOK, 65, 55, 50, 14, WS_GROUP, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:1985", IDCANCEL, 135, 55, 50, 14, 0, WS_EX_LEFT
+    LTEXT           "Merge.rc:1982", IDC_STATIC, 14, 7, 229, 11, SS_LEFT, WS_EX_LEFT
+    AUTORADIOBUTTON "Merge.rc:1983", IDC_SHARED, 20, 22, 223, 10, WS_GROUP, WS_EX_LEFT
+    AUTORADIOBUTTON "Merge.rc:1984", IDC_PRIVATE, 20, 37, 223, 10, 0, WS_EX_LEFT
+    DEFPUSHBUTTON   "Merge.rc:1985", IDOK, 65, 55, 50, 14, WS_GROUP, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:1986", IDCANCEL, 135, 55, 50, 14, 0, WS_EX_LEFT
 }
 
 
 
 IDD_TEST_FILTER DIALOGEX 0, 0, 249, 142
 STYLE DS_CENTER | DS_MODALFRAME | DS_SHELLFONT | WS_CAPTION | WS_POPUP
-CAPTION "Merge.rc:1992"
+CAPTION "Merge.rc:1993"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
-    LTEXT           "Merge.rc:1995", IDC_HEADER, 7, 7, 82, 8, SS_LEFT, WS_EX_LEFT
+    LTEXT           "Merge.rc:1996", IDC_HEADER, 7, 7, 82, 8, SS_LEFT, WS_EX_LEFT
     LTEXT           "(filter name)", IDC_HEADER_FILTER_NAME, 90, 6, 152, 8, SS_LEFT, WS_EX_LEFT
-    LTEXT           "Merge.rc:1997", IDC_PROMPT_LABEL, 7, 21, 80, 8, SS_LEFT, WS_EX_LEFT
+    LTEXT           "Merge.rc:1998", IDC_PROMPT_LABEL, 7, 21, 80, 8, SS_LEFT, WS_EX_LEFT
     EDITTEXT        IDC_TEST_TEXT, 90, 19, 152, 12, ES_AUTOHSCROLL, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:1999", IDC_IS_DIRECTORY, 7, 36, 92, 8, 0, WS_EX_LEFT
-    LTEXT           "Merge.rc:2000", IDC_STATIC, 7, 49, 34, 8, SS_LEFT, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:2000", IDC_IS_DIRECTORY, 7, 36, 92, 8, 0, WS_EX_LEFT
+    LTEXT           "Merge.rc:2001", IDC_STATIC, 7, 49, 34, 8, SS_LEFT, WS_EX_LEFT
     EDITTEXT        IDC_RESULTS, 7, 59, 235, 57, WS_HSCROLL | WS_VSCROLL | NOT WS_TABSTOP | ES_AUTOHSCROLL | ES_AUTOVSCROLL | ES_MULTILINE | ES_READONLY, WS_EX_LEFT
-    DEFPUSHBUTTON   "Merge.rc:2002", IDC_TEST_BTN, 133, 121, 50, 14, 0, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:2003", IDCANCEL, 192, 121, 50, 14, 0, WS_EX_LEFT
+    DEFPUSHBUTTON   "Merge.rc:2003", IDC_TEST_BTN, 133, 121, 50, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:2004", IDCANCEL, 192, 121, 50, 14, 0, WS_EX_LEFT
 }
 
 
 
 IDD_VSS DIALOGEX 0, 0, 257, 166
 STYLE DS_CENTER | DS_MODALFRAME | DS_SHELLFONT | WS_CAPTION | WS_POPUP | WS_SYSMENU
-CAPTION "Merge.rc:2010"
+CAPTION "Merge.rc:2011"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
     LTEXT           "", IDC_STATIC, 7, 7, 243, 47, SS_LEFT | SS_SUNKEN, WS_EX_LEFT
     LTEXT           "IDS_SAVEVSS_FMT", IDC_MESSAGE, 14, 13, 231, 34, SS_LEFT, WS_EX_LEFT
-    LTEXT           "Merge.rc:2015", IDC_STATIC, 7, 64, 50, 8, SS_LEFT, WS_EX_LEFT
+    LTEXT           "Merge.rc:2016", IDC_STATIC, 7, 64, 50, 8, SS_LEFT, WS_EX_LEFT
     COMBOBOX        IDC_DATABASE_LIST, 62, 63, 188, 150, WS_TABSTOP | WS_VSCROLL | CBS_DROPDOWN | CBS_AUTOHSCROLL, WS_EX_LEFT
-    LTEXT           "Merge.rc:2017", IDC_STATIC, 7, 81, 50, 8, SS_LEFT, WS_EX_LEFT
+    LTEXT           "Merge.rc:2018", IDC_STATIC, 7, 81, 50, 8, SS_LEFT, WS_EX_LEFT
     COMBOBOX        IDC_PROJECT_COMBO, 62, 78, 188, 150, WS_TABSTOP | WS_VSCROLL | CBS_DROPDOWN | CBS_AUTOHSCROLL, WS_EX_LEFT
-    LTEXT           "Merge.rc:2019", IDC_STATIC, 7, 99, 50, 8, SS_LEFT, WS_EX_LEFT
+    LTEXT           "Merge.rc:2020", IDC_STATIC, 7, 99, 50, 8, SS_LEFT, WS_EX_LEFT
     EDITTEXT        IDC_USER, 62, 96, 63, 14, ES_AUTOHSCROLL, WS_EX_LEFT
-    RTEXT           "Merge.rc:2021", IDC_STATIC, 132, 99, 55, 8, SS_RIGHT, WS_EX_LEFT
+    RTEXT           "Merge.rc:2022", IDC_STATIC, 132, 99, 55, 8, SS_RIGHT, WS_EX_LEFT
     EDITTEXT        IDC_PASSWORD, 190, 96, 60, 14, ES_AUTOHSCROLL | ES_PASSWORD, WS_EX_LEFT
-    AUTOCHECKBOX    "Merge.rc:2023", IDC_MULTI_CHECKOUT, 7, 125, 235, 8, 0, WS_EX_LEFT
-    DEFPUSHBUTTON   "Merge.rc:2024", IDOK, 41, 145, 70, 14, 0, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:2025", IDC_SAVE_AS, 115, 145, 70, 14, 0, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:2026", IDCANCEL, 190, 145, 60, 14, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Merge.rc:2024", IDC_MULTI_CHECKOUT, 7, 125, 235, 8, 0, WS_EX_LEFT
+    DEFPUSHBUTTON   "Merge.rc:2025", IDOK, 41, 145, 70, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:2026", IDC_SAVE_AS, 115, 145, 70, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:2027", IDCANCEL, 190, 145, 60, 14, 0, WS_EX_LEFT
 }
 
 
 
 IDD_WMGOTO DIALOGEX 0, 0, 210, 70
 STYLE DS_CENTER | DS_MODALFRAME | DS_SHELLFONT | WS_CAPTION | WS_POPUP | WS_SYSMENU
-CAPTION "Merge.rc:2033"
+CAPTION "Merge.rc:2034"
 FONT 8, "MS Shell Dlg", 0, 0, 1
 {
-    LTEXT           "Merge.rc:2036", IDC_STATIC, 7, 9, 36, 8, SS_LEFT, WS_EX_LEFT
+    LTEXT           "Merge.rc:2037", IDC_STATIC, 7, 9, 36, 8, SS_LEFT, WS_EX_LEFT
     EDITTEXT        IDC_WMGOTO_PARAM, 45, 7, 102, 14, ES_AUTOHSCROLL | ES_NUMBER, WS_EX_LEFT
-    GROUPBOX        "Merge.rc:2038", IDC_STATIC, 7, 27, 57, 35, 0, WS_EX_LEFT
-    AUTORADIOBUTTON "Merge.rc:2039", IDC_WMGOTO_FILELEFT, 13, 38, 48, 10, WS_GROUP, WS_EX_LEFT
-    AUTORADIOBUTTON "Merge.rc:2040", IDC_WMGOTO_FILERIGHT, 13, 48, 47, 10, 0, WS_EX_LEFT
-    GROUPBOX        "Merge.rc:2041", IDC_STATIC, 69, 27, 78, 35, 0, WS_EX_LEFT
-    AUTORADIOBUTTON "Merge.rc:2042", IDC_WMGOTO_TOLINE, 76, 38, 68, 10, WS_GROUP, WS_EX_LEFT
-    AUTORADIOBUTTON "Merge.rc:2043", IDC_WMGOTO_TODIFF, 76, 48, 68, 10, 0, WS_EX_LEFT
-    DEFPUSHBUTTON   "Merge.rc:2044", IDOK, 153, 7, 50, 14, 0, WS_EX_LEFT
-    PUSHBUTTON      "Merge.rc:2045", IDCANCEL, 153, 24, 50, 14, 0, WS_EX_LEFT
+    GROUPBOX        "Merge.rc:2039", IDC_STATIC, 7, 27, 57, 35, 0, WS_EX_LEFT
+    AUTORADIOBUTTON "Merge.rc:2040", IDC_WMGOTO_FILELEFT, 13, 38, 48, 10, WS_GROUP, WS_EX_LEFT
+    AUTORADIOBUTTON "Merge.rc:2041", IDC_WMGOTO_FILERIGHT, 13, 48, 47, 10, 0, WS_EX_LEFT
+    GROUPBOX        "Merge.rc:2042", IDC_STATIC, 69, 27, 78, 35, 0, WS_EX_LEFT
+    AUTORADIOBUTTON "Merge.rc:2043", IDC_WMGOTO_TOLINE, 76, 38, 68, 10, WS_GROUP, WS_EX_LEFT
+    AUTORADIOBUTTON "Merge.rc:2044", IDC_WMGOTO_TODIFF, 76, 48, 68, 10, 0, WS_EX_LEFT
+    DEFPUSHBUTTON   "Merge.rc:2045", IDOK, 153, 7, 50, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Merge.rc:2046", IDCANCEL, 153, 24, 50, 14, 0, WS_EX_LEFT
 }
 
 
@@ -2052,510 +2053,510 @@ FONT 8, "MS Shell Dlg", 0, 0, 1
 //
 STRINGTABLE
 {
-    IDS_IDLEMESSAGE               "Merge.rc:2055"
-    ID_FILE_NEW                   "Merge.rc:2056"
-    ID_FILE_OPEN                  "Merge.rc:2057"
-    ID_FILE_CLOSE                 "Merge.rc:2058"
-    ID_FILE_SAVE                  "Merge.rc:2059"
-    ID_FILE_SAVE_AS               "Merge.rc:2060"
-    ID_FILE_PAGE_SETUP            "Merge.rc:2061"
-    ID_FILE_PRINT_SETUP           "Merge.rc:2062"
-    ID_FILE_PRINT                 "Merge.rc:2063"
-    ID_FILE_PRINT_PREVIEW         "Merge.rc:2064"
-    ID_VIEW_SHOWHIDDENITEMS       "Merge.rc:2065"
-    ID_VIEW_TREEMODE              "Merge.rc:2066"
-    ID_VIEW_EXPAND_ALLSUBDIRS     "Merge.rc:2067"
-    ID_VIEW_COLLAPSE_ALLSUBDIRS   "Merge.rc:2068"
-    ID_FILE_OPENPROJECT           "Merge.rc:2069"
-    IDS_UNK_ERROR_READING_PROJECT "Merge.rc:2070"
-    IDS_UNK_ERROR_SAVING_PROJECT  "Merge.rc:2071"
-    IDS_PROJFILEDLG_CAPTION       "Merge.rc:2072"
-    IDS_PROJFILE_LOAD_SUCCESS     "Merge.rc:2073"
-    IDS_PROJFILE_SAVE_SUCCESS     "Merge.rc:2074"
-    ID_FILE_SAVEPROJECT           "Merge.rc:2075"
-    ID_APP_ABOUT                  "Merge.rc:2076"
-    ID_HELP_ABOUT_FRHED           "Merge.rc:2077"
-    ID_HELP_ABOUT_SQLITECOMPARE   "Merge.rc:2078"
-    ID_APP_EXIT                   "Merge.rc:2079"
-    ID_FILE_MRU_FILE1             "Merge.rc:2080"
-    ID_FILE_MRU_FILE2             "Merge.rc:2081"
-    ID_FILE_MRU_FILE3             "Merge.rc:2082"
-    ID_FILE_MRU_FILE4             "Merge.rc:2083"
-    ID_FILE_MRU_FILE5             "Merge.rc:2084"
-    ID_FILE_MRU_FILE6             "Merge.rc:2085"
-    ID_FILE_MRU_FILE7             "Merge.rc:2086"
-    ID_FILE_MRU_FILE8             "Merge.rc:2087"
-    ID_FILE_MRU_FILE9             "Merge.rc:2088"
-    ID_FILE_MRU_FILE10            "Merge.rc:2089"
-    ID_FILE_MRU_FILE11            "Merge.rc:2090"
-    ID_FILE_MRU_FILE12            "Merge.rc:2091"
-    ID_FILE_MRU_FILE13            "Merge.rc:2092"
-    ID_FILE_MRU_FILE14            "Merge.rc:2093"
-    ID_FILE_MRU_FILE15            "Merge.rc:2094"
-    ID_FILE_MRU_FILE16            "Merge.rc:2095"
-    ID_NEXT_PANE                  "Merge.rc:2096"
-    ID_PREV_PANE                  "Merge.rc:2097"
-    ID_WINDOW_CASCADE             "Merge.rc:2098"
-    ID_WINDOW_TILE_HORZ           "Merge.rc:2099"
-    ID_WINDOW_TILE_VERT           "Merge.rc:2100"
-    ID_EDIT_COPY                  "Merge.rc:2101"
-    ID_EDIT_CUT                   "Merge.rc:2102"
-    ID_EDIT_FIND                  "Merge.rc:2103"
-    ID_EDIT_PASTE                 "Merge.rc:2104"
-    ID_EDIT_REPEAT                "Merge.rc:2105"
-    ID_EDIT_REPLACE               "Merge.rc:2106"
-    ID_EDIT_SELECT_ALL            "Merge.rc:2107"
-    ID_EDIT_UNDO                  "Merge.rc:2108"
-    ID_EDIT_REDO                  "Merge.rc:2109"
-    ID_VIEW_TOOLBAR               "Merge.rc:2110"
-    ID_VIEW_STATUS_BAR            "Merge.rc:2111"
-    ID_VIEW_TAB_BAR               "Merge.rc:2112"
-    ID_VIEW_RESIZE_PANES          "Merge.rc:2113"
+    IDS_IDLEMESSAGE               "Merge.rc:2056"
+    ID_FILE_NEW                   "Merge.rc:2057"
+    ID_FILE_OPEN                  "Merge.rc:2058"
+    ID_FILE_CLOSE                 "Merge.rc:2059"
+    ID_FILE_SAVE                  "Merge.rc:2060"
+    ID_FILE_SAVE_AS               "Merge.rc:2061"
+    ID_FILE_PAGE_SETUP            "Merge.rc:2062"
+    ID_FILE_PRINT_SETUP           "Merge.rc:2063"
+    ID_FILE_PRINT                 "Merge.rc:2064"
+    ID_FILE_PRINT_PREVIEW         "Merge.rc:2065"
+    ID_VIEW_SHOWHIDDENITEMS       "Merge.rc:2066"
+    ID_VIEW_TREEMODE              "Merge.rc:2067"
+    ID_VIEW_EXPAND_ALLSUBDIRS     "Merge.rc:2068"
+    ID_VIEW_COLLAPSE_ALLSUBDIRS   "Merge.rc:2069"
+    ID_FILE_OPENPROJECT           "Merge.rc:2070"
+    IDS_UNK_ERROR_READING_PROJECT "Merge.rc:2071"
+    IDS_UNK_ERROR_SAVING_PROJECT  "Merge.rc:2072"
+    IDS_PROJFILEDLG_CAPTION       "Merge.rc:2073"
+    IDS_PROJFILE_LOAD_SUCCESS     "Merge.rc:2074"
+    IDS_PROJFILE_SAVE_SUCCESS     "Merge.rc:2075"
+    ID_FILE_SAVEPROJECT           "Merge.rc:2076"
+    ID_APP_ABOUT                  "Merge.rc:2077"
+    ID_HELP_ABOUT_FRHED           "Merge.rc:2078"
+    ID_HELP_ABOUT_SQLITECOMPARE   "Merge.rc:2079"
+    ID_APP_EXIT                   "Merge.rc:2080"
+    ID_FILE_MRU_FILE1             "Merge.rc:2081"
+    ID_FILE_MRU_FILE2             "Merge.rc:2082"
+    ID_FILE_MRU_FILE3             "Merge.rc:2083"
+    ID_FILE_MRU_FILE4             "Merge.rc:2084"
+    ID_FILE_MRU_FILE5             "Merge.rc:2085"
+    ID_FILE_MRU_FILE6             "Merge.rc:2086"
+    ID_FILE_MRU_FILE7             "Merge.rc:2087"
+    ID_FILE_MRU_FILE8             "Merge.rc:2088"
+    ID_FILE_MRU_FILE9             "Merge.rc:2089"
+    ID_FILE_MRU_FILE10            "Merge.rc:2090"
+    ID_FILE_MRU_FILE11            "Merge.rc:2091"
+    ID_FILE_MRU_FILE12            "Merge.rc:2092"
+    ID_FILE_MRU_FILE13            "Merge.rc:2093"
+    ID_FILE_MRU_FILE14            "Merge.rc:2094"
+    ID_FILE_MRU_FILE15            "Merge.rc:2095"
+    ID_FILE_MRU_FILE16            "Merge.rc:2096"
+    ID_NEXT_PANE                  "Merge.rc:2097"
+    ID_PREV_PANE                  "Merge.rc:2098"
+    ID_WINDOW_CASCADE             "Merge.rc:2099"
+    ID_WINDOW_TILE_HORZ           "Merge.rc:2100"
+    ID_WINDOW_TILE_VERT           "Merge.rc:2101"
+    ID_EDIT_COPY                  "Merge.rc:2102"
+    ID_EDIT_CUT                   "Merge.rc:2103"
+    ID_EDIT_FIND                  "Merge.rc:2104"
+    ID_EDIT_PASTE                 "Merge.rc:2105"
+    ID_EDIT_REPEAT                "Merge.rc:2106"
+    ID_EDIT_REPLACE               "Merge.rc:2107"
+    ID_EDIT_SELECT_ALL            "Merge.rc:2108"
+    ID_EDIT_UNDO                  "Merge.rc:2109"
+    ID_EDIT_REDO                  "Merge.rc:2110"
+    ID_VIEW_TOOLBAR               "Merge.rc:2111"
+    ID_VIEW_STATUS_BAR            "Merge.rc:2112"
+    ID_VIEW_TAB_BAR               "Merge.rc:2113"
+    ID_VIEW_RESIZE_PANES          "Merge.rc:2114"
     IDR_MAINFRAME                 "WinMerge"
-    IDC_MIXED_EOL                 "Merge.rc:2115"
-    IDC_STATIC_TITLE_LEFT         "Merge.rc:2116"
-    IDC_STATIC_TITLE_RIGHT        "Merge.rc:2117"
-    IDS_SPLASH_GPLTEXT            "Merge.rc:2118"
-    IDS_MESSAGEBOX_OK             "Merge.rc:2119"
-    IDS_MESSAGEBOX_CANCEL         "Merge.rc:2120"
-    IDS_MESSAGEBOX_ABORT          "Merge.rc:2121"
-    IDS_MESSAGEBOX_RETRY          "Merge.rc:2122"
-    IDS_MESSAGEBOX_IGNORE         "Merge.rc:2123"
-    IDS_MESSAGEBOX_IGNOREALL      "Merge.rc:2124"
-    IDS_MESSAGEBOX_YES            "Merge.rc:2125"
-    IDS_MESSAGEBOX_YES_TO_ALL     "Merge.rc:2126"
-    IDS_MESSAGEBOX_NO             "Merge.rc:2127"
-    IDS_MESSAGEBOX_NO_TO_ALL      "Merge.rc:2128"
-    IDS_MESSAGEBOX_CONTINUE       "Merge.rc:2129"
-    IDS_MESSAGEBOX_SKIP           "Merge.rc:2130"
-    IDS_MESSAGEBOX_SKIPALL        "Merge.rc:2131"
-    IDS_MESSAGEBOX_HELP           "Merge.rc:2132"
-    IDS_MESSAGEBOX_DONT_DISPLAY_AGAIN "Merge.rc:2133"
-    IDS_MESSAGEBOX_DONT_ASK_AGAIN "Merge.rc:2134"
-    IDS_OPTIONSPG_COMPARE         "Merge.rc:2135"
-    IDS_OPTIONSPG_EDITOR          "Merge.rc:2136"
-    IDS_OPTIONSPG_COLORS          "Merge.rc:2137"
-    IDS_TO                        "Merge.rc:2138"
-    IDS_FROM_LEFT                 "Merge.rc:2139"
-    IDS_TO_LEFT                   "Merge.rc:2140"
-    IDS_FROM_RIGHT                "Merge.rc:2141"
-    IDS_TO_RIGHT                  "Merge.rc:2142"
-    IDS_VERSION_FMT               "Merge.rc:2143"
-    IDS_OPTIONS_TITLE             "Merge.rc:2144"
-    IDS_MESSAGE_BOX_ARE_RESET     "Merge.rc:2145"
-    IDS_DIFF_OPEN_NO_SET_PROPS    "Merge.rc:2146"
-    IDS_RESET_OPTIONS_WARNING     "Merge.rc:2147"
-    IDS_OPEN_TITLE                "Merge.rc:2148"
-    IDS_PROGRAMFILES              "Merge.rc:2149"
-    IDS_ALLFILES                  "Merge.rc:2150"
-    IDS_PROJECTFILES              "Merge.rc:2151"
-    IDS_INIFILES                  "Merge.rc:2152"
-    IDS_TEXT_REPORT_FILES         "Merge.rc:2153"
-    IDS_HTML_REPORT_FILES         "Merge.rc:2154"
-    IDS_XML_REPORT_FILES          "Merge.rc:2155"
-    IDS_XLS_REPORT_FILES          "Merge.rc:2156"
-    ID_COMPMETHOD_FULL_CONTENTS   "Merge.rc:2157"
-    ID_COMPMETHOD_QUICK_CONTENTS  "Merge.rc:2158"
-    ID_COMPMETHOD_BINARY_CONTENTS "Merge.rc:2159"
-    ID_COMPMETHOD_MODDATE         "Merge.rc:2160"
-    ID_COMPMETHOD_DATESIZE        "Merge.rc:2161"
-    ID_COMPMETHOD_SIZE            "Merge.rc:2162"
-    IDS_LEXERS_LEXERTITLE         "Merge.rc:2163"
-    IDS_LEXERS_FILETYPESTITLE     "Merge.rc:2164"
-    IDS_FILETRANSFORMS_TYPETITLE  "Merge.rc:2165"
-    IDS_FILETRANSFORMS_METHTITLE  "Merge.rc:2166"
-    IDS_FILTERFILE_NAMETITLE      "Merge.rc:2167"
-    IDS_FILTERFILE_PATHTITLE      "Merge.rc:2168"
-    IDS_FILTER_TITLE              "Merge.rc:2169"
-    IDS_FILTERFILE_DESCTITLE      "Merge.rc:2170"
-    IDS_FILEFILTER_SAVENEW        "Merge.rc:2171"
-    IDS_FILEFILTER_FILEMASK       "Merge.rc:2172"
-    IDS_FILEFILTER_TMPL_MISSING   "Merge.rc:2173"
-    IDS_FILEFILTER_TMPL_COPY      "Merge.rc:2174"
-    IDS_FILEFILTER_NO_USERFOLDER  "Merge.rc:2175"
-    IDS_FILEFILTER_DELETE_FAIL    "Merge.rc:2176"
-    IDS_FILEFILTER_INSTALL        "Merge.rc:2177"
-    IDS_FILEFILTER_INSTALLFAIL    "Merge.rc:2178"
-    IDS_FILEFILTER_OVERWRITE      "Merge.rc:2179"
-    IDS_FILTERLINE_REGEXP         "Merge.rc:2180"
-    IDS_FILTERCHANGED             "Merge.rc:2181"
-    IDS_CC_CMD                    "Merge.rc:2182"
-    IDS_VSS_CMD                   "Merge.rc:2183"
-    IDS_TF_CMD                    "Merge.rc:2184"
-    IDS_DIRECTORY_WINDOW_TITLE    "Merge.rc:2185"
-    IDS_FILE_COMPARISON_TITLE     "Merge.rc:2186"
-    IDS_EMPTY_LEFT_FILE           "Merge.rc:2187"
-    IDS_EMPTY_RIGHT_FILE          "Merge.rc:2188"
-    IDS_CONFLICT_THEIRS_FILE      "Merge.rc:2189"
-    IDS_CONFLICT_MINE_FILE        "Merge.rc:2190"
-    IDS_STATUS_RESCANNING         "Merge.rc:2191"
-    IDS_STATUS_OPENING_SELECTION  "Merge.rc:2192"
-    IDS_STATUS_COPYL2R            "Merge.rc:2193"
-    IDS_STATUS_COPYR2L            "Merge.rc:2194"
-    IDS_STATUS_COPYALL2L          "Merge.rc:2195"
-    IDS_STATUS_COPYALL2R          "Merge.rc:2196"
-    IDS_STATUS_COPYFILES          "Merge.rc:2197"
-    IDS_STATUS_DELETEFILES        "Merge.rc:2198"
-    IDS_STATUS_MOVEFILES          "Merge.rc:2199"
-    IDS_STATUS_CREATEREPORT       "Merge.rc:2200"
-    IDS_STATUS_UNDO               "Merge.rc:2201"
-    IDS_STATUS_REDO               "Merge.rc:2202"
-    IDS_LINE_STATUS_INFO_EOL      "Merge.rc:2203"
-    IDS_EMPTY_LINE_STATUS_INFO    "Merge.rc:2204"
-    IDS_LINE_STATUS_INFO          "Merge.rc:2205"
-    IDS_MERGEMODE_MERGING         "Merge.rc:2206"
-    IDS_DIFF_NUMBER_STATUS_FMT    "Merge.rc:2207"
-    IDS_NO_DIFF_SEL_FMT           "Merge.rc:2208"
-    IDS_1_DIFF_FOUND              "Merge.rc:2209"
-    IDS_STATUSBAR_READONLY        "Merge.rc:2210"
-    IDS_DIRVIEW_STATUS_FMT_FOCUS  "Merge.rc:2211"
-    IDS_DIRVIEW_STATUS_FMT_NOFOCUS "Merge.rc:2212"
-    IDS_DIRVIEW_STATUS_COLLECTMODE "Merge.rc:2213"
-    IDS_ERROR_INCOMPARABLE        "Merge.rc:2214"
-    IDS_DIRSEL_TAG                "Merge.rc:2215"
-    IDS_OPEN_FILESDIRS            "Merge.rc:2216"
-    IDS_OPEN_LEFTINVALID          "Merge.rc:2217"
-    IDS_OPEN_RIGHTINVALID         "Merge.rc:2218"
-    IDS_OPEN_BOTHINVALID          "Merge.rc:2219"
-    IDS_OPEN_MISMATCH             "Merge.rc:2220"
-    IDS_ERROR_FILE_NOT_FOUND      "Merge.rc:2221"
-    IDS_ERROR_FILE_NOT_UNPACKED   "Merge.rc:2222"
-    IDS_ERROR_FILEMOVE            "Merge.rc:2223"
-    IDS_ERROR_FILECOPY            "Merge.rc:2224"
-    IDS_ERROR_FILEDELETE          "Merge.rc:2225"
-    IDS_ERROR_FILEOPEN            "Merge.rc:2226"
-    IDS_ERROR_CONF_RESOLVE        "Merge.rc:2227"
-    IDS_NOT_CONFLICT_FILE         "Merge.rc:2228"
-    IDS_TRASH_FILE                "Merge.rc:2229"
-    IDS_TRASH_FILE_ATTENTIVE      "Merge.rc:2230"
-    IDS_TRASH_FOLDER              "Merge.rc:2231"
-    IDS_TRASH_FOLDER_ATTENTIVE    "Merge.rc:2232"
-    IDS_TRASH_SELECTED_ITEMS      "Merge.rc:2233"
-    IDS_SAVE_AS_TITLE             "Merge.rc:2234"
-    IDS_SAVE_FMT                  "Merge.rc:2235"
-    IDS_SAVEREADONLY_FMT          "Merge.rc:2236"
-    IDS_ERROR_FILE_WRITEABLE      "Merge.rc:2237"
-    IDS_ERROR_BACKUP              "Merge.rc:2238"
-    IDS_BACKUP_FAILED_PROMPT      "Merge.rc:2239"
-    IDS_FILESAVE_FAILED           "Merge.rc:2240"
-    IDS_FILECHANGED_ONDISK        "Merge.rc:2241"
-    IDS_SAVEREADONLY_MULTI        "Merge.rc:2242"
-    IDS_FILECHANGED_RESCAN        "Merge.rc:2243"
-    IDS_SAVE_LEFT_AS              "Merge.rc:2244"
-    IDS_SAVE_RIGHT_AS             "Merge.rc:2245"
-    IDS_FILE_DISAPPEARED          "Merge.rc:2246"
-    IDS_VIEWS_OUTOFSYNC           "Merge.rc:2247"
-    IDS_NOPROJECT                 "Merge.rc:2248"
-    IDS_VSS_CHECKOUT_STATUS       "Merge.rc:2249"
-    IDS_VSSERROR                  "Merge.rc:2250"
-    IDS_VSS_RUN_ERROR             "Merge.rc:2251"
-    IDS_VSSFOLDER_AND_FILE_NOMATCH "Merge.rc:2252"
-    IDS_VSS_NODATABASES           "Merge.rc:2253"
-    IDS_VSS_ERRORFROM             "Merge.rc:2254"
-    IDS_VSS_CHECKINERROR          "Merge.rc:2255"
-    IDS_VSS_UNCOERROR             "Merge.rc:2256"
-    IDS_VCS_NONE                  "Merge.rc:2257"
-    IDS_VCS_VSS4                  "Merge.rc:2258"
-    IDS_VCS_VSS5                  "Merge.rc:2259"
-    IDS_VCS_CLEARCASE             "Merge.rc:2260"
-    IDS_VCS_TFS                   "Merge.rc:2261"
-    IDS_BREAK_ON_WHITESPACE       "Merge.rc:2262"
-    IDS_BREAK_ON_PUNCTUATION      "Merge.rc:2263"
-    ID_DIR_COPY_LEFT_TO_RIGHT     "Merge.rc:2264"
-    ID_DIR_COPY_LEFT_TO_BROWSE    "Merge.rc:2265"
-    ID_DIR_COPY_RIGHT_TO_LEFT     "Merge.rc:2266"
-    ID_DIR_COPY_RIGHT_TO_BROWSE   "Merge.rc:2267"
-    ID_DIR_DEL_LEFT               "Merge.rc:2268"
-    ID_DIR_DEL_RIGHT              "Merge.rc:2269"
-    ID_DIR_DEL_BOTH               "Merge.rc:2270"
-    ID_DIR_HIDE_FILENAMES         "Merge.rc:2271"
-    ID_DIR_ITEM_RENAME            "Merge.rc:2272"
-    IDS_SELECT_DESTFOLDER         "Merge.rc:2273"
-    IDS_SELECT_DEST_LEFT          "Merge.rc:2274"
-    IDS_SELECT_DEST_RIGHT         "Merge.rc:2275"
-    IDS_FILES_AFFECTED_FMT        "Merge.rc:2276"
-    IDS_CONFIRM_DELETE_SINGLE     "Merge.rc:2277"
-    IDS_CONFIRM_SINGLE_COPY       "Merge.rc:2278"
-    IDS_CONFIRM_MULTIPLE_COPY     "Merge.rc:2279"
-    IDS_DIRCMP_NOTSYNC            "Merge.rc:2280"
-    IDS_CONFIRM_SINGLE_MOVE       "Merge.rc:2281"
-    IDS_CONFIRM_MULTIPLE_MOVE     "Merge.rc:2282"
-    IDS_CONFIRM_COPY_CAPTION      "Merge.rc:2283"
-    IDS_CONFIRM_MOVE_CAPTION      "Merge.rc:2284"
-    ID_DIR_OPEN_LEFT              "Merge.rc:2285"
-    ID_DIR_OPEN_LEFT_WITHEDITOR   "Merge.rc:2286"
-    ID_DIR_OPEN_LEFT_WITH         "Merge.rc:2287"
-    ID_DIR_OPEN_RIGHT             "Merge.rc:2288"
-    ID_DIR_OPEN_RIGHT_WITHEDITOR  "Merge.rc:2289"
-    ID_DIR_OPEN_RIGHT_WITH        "Merge.rc:2290"
-    IDS_ERROR_EXECUTE_FILE        "Merge.rc:2291"
-    IDS_UNKNOWN_EXECUTE_FILE      "Merge.rc:2292"
-    ID_DIR_COPY_FILENAMES         "Merge.rc:2293"
-    ID_DIR_COPY_PATHNAMES_LEFT    "Merge.rc:2294"
-    ID_DIR_COPY_PATHNAMES_RIGHT   "Merge.rc:2295"
-    ID_DIR_COPY_PATHNAMES_BOTH    "Merge.rc:2296"
-    IDS_SHELL_CONTEXT_MENU_LEFT   "Merge.rc:2297"
-    IDS_SHELL_CONTEXT_MENU_RIGHT  "Merge.rc:2298"
-    IDS_UNKNOWN_ARCHIVE_FORMAT    "Merge.rc:2299"
-    IDS_CANT_STORE_1_AS_2         "Merge.rc:2300"
-    IDS_EXITCODE                  "Merge.rc:2301"
-    IDS_BROWSE_FOR_FILE_SEL_LIMIT "Merge.rc:2302"
-    ID_DIR_ZIP_LEFT               "Merge.rc:2303"
-    ID_DIR_ZIP_RIGHT              "Merge.rc:2304"
-    ID_DIR_ZIP_BOTH               "Merge.rc:2305"
-    ID_DIR_ZIP_BOTH_DIFFS_ONLY    "Merge.rc:2306"
-    ID_DIR_MOVE_LEFT_TO_BROWSE    "Merge.rc:2307"
-    ID_DIR_MOVE_RIGHT_TO_BROWSE   "Merge.rc:2308"
-    IDS_COLHDR_FILENAME           "Merge.rc:2309"
-    IDS_COLHDR_TIMEM              "Merge.rc:2310"
-    IDS_COLHDR_ATTRIBUTES         "Merge.rc:2311"
-    IDS_COLHDR_SIZE               "Merge.rc:2312"
-    IDS_COLHDR_DIR                "Merge.rc:2313" //msgctxt DirView|ColumnHeader
-    IDS_COLHDR_RESULT             "Merge.rc:2314"
-    IDS_COLHDR_LTIMEM             "Merge.rc:2315"
-    IDS_COLHDR_RTIMEM             "Merge.rc:2316"
-    IDS_COLHDR_EXTENSION          "Merge.rc:2317"
-    IDS_COLHDR_LSIZE              "Merge.rc:2318"
-    IDS_COLHDR_RSIZE              "Merge.rc:2319"
-    IDS_COLHDR_RSIZE_SHORT        "Merge.rc:2320"
-    IDS_COLHDR_LSIZE_SHORT        "Merge.rc:2321"
-    IDS_COLHDR_LTIMEC             "Merge.rc:2322"
-    IDS_COLHDR_RTIMEC             "Merge.rc:2323"
-    IDS_COLHDR_NEWER              "Merge.rc:2324"
-    IDS_COLHDR_LVERSION           "Merge.rc:2325"
-    IDS_COLHDR_RVERSION           "Merge.rc:2326"
-    IDS_COLHDR_RESULT_ABBR        "Merge.rc:2327"
-    IDS_COLHDR_LATTRIBUTES        "Merge.rc:2328"
-    IDS_COLHDR_RATTRIBUTES        "Merge.rc:2329"
-    IDS_COLHDR_LEOL_TYPE          "Merge.rc:2330"
-    IDS_COLHDR_REOL_TYPE          "Merge.rc:2331"
-    IDS_COLHDR_LENCODING          "Merge.rc:2332"
-    IDS_COLHDR_RENCODING          "Merge.rc:2333"
-    IDS_COLHDR_NIDIFFS            "Merge.rc:2334"
-    IDS_COLHDR_NSDIFFS            "Merge.rc:2335"
-    IDS_COLHDR_BINARY             "Merge.rc:2336" //msgctxt DirView|ColumnHeader
-    IDS_CANT_COMPARE_FILES        "Merge.rc:2337"
-    IDS_ABORTED_ITEM              "Merge.rc:2338"
-    IDS_FILE_SKIPPED              "Merge.rc:2339"
-    IDS_DIR_SKIPPED               "Merge.rc:2340"
-    IDS_LEFT_ONLY_IN_FMT          "Merge.rc:2341"
-    IDS_RIGHT_ONLY_IN_FMT         "Merge.rc:2342"
-    IDS_BIN_FILES_SAME            "Merge.rc:2343"
-    IDS_IDENTICAL                 "Merge.rc:2344"
-    IDS_BIN_FILES_DIFF            "Merge.rc:2345"
-    IDS_FILES_ARE_DIFFERENT       "Merge.rc:2346"
-    IDS_FOLDERS_ARE_DIFFERENT     "Merge.rc:2347"
-    IDS_LEFTONLY                  "Merge.rc:2348"
-    IDS_RIGHTONLY                 "Merge.rc:2349"
-    IDS_DIFFERENT                 "Merge.rc:2350"
-    IDS_CMPRES_ERROR              "Merge.rc:2351"
-    IDS_TEXT_FILES_SAME           "Merge.rc:2352"
-    IDS_TEXT_FILES_DIFF           "Merge.rc:2353"
-    IDS_ELAPSED_TIME              "Merge.rc:2354"
-    IDS_STATUS_SELITEM1           "Merge.rc:2355"
-    IDS_STATUS_SELITEMS           "Merge.rc:2356"
-    IDS_COLDESC_FILENAME          "Merge.rc:2357"
-    IDS_COLDESC_DIR               "Merge.rc:2358"
-    IDS_COLDESC_RESULT            "Merge.rc:2359"
-    IDS_COLDESC_LTIMEM            "Merge.rc:2360"
-    IDS_COLDESC_RTIMEM            "Merge.rc:2361"
-    IDS_COLDESC_EXTENSION         "Merge.rc:2362"
-    IDS_COLDESC_LSIZE             "Merge.rc:2363"
-    IDS_COLDESC_RSIZE             "Merge.rc:2364"
-    IDS_COLDESC_LSIZE_SHORT       "Merge.rc:2365"
-    IDS_COLDESC_RSIZE_SHORT       "Merge.rc:2366"
-    IDS_COLDESC_LTIMEC            "Merge.rc:2367"
-    IDS_COLDESC_RTIMEC            "Merge.rc:2368"
-    IDS_COLDESC_NEWER             "Merge.rc:2369"
-    IDS_COLDESC_LVERSION          "Merge.rc:2370"
-    IDS_COLDESC_RVERSION          "Merge.rc:2371"
-    IDS_COLDESC_RESULT_ABBR       "Merge.rc:2372"
-    IDS_COLDESC_LATTRIBUTES       "Merge.rc:2373"
-    IDS_COLDESC_RATTRIBUTES       "Merge.rc:2374"
-    IDS_COLDESC_LEOL_TYPE         "Merge.rc:2375"
-    IDS_COLDESC_REOL_TYPE         "Merge.rc:2376"
-    IDS_COLDESC_LENCODING         "Merge.rc:2377"
-    IDS_COLDESC_RENCODING         "Merge.rc:2378"
-    IDS_COLDESC_NIDIFFS           "Merge.rc:2379"
-    IDS_COLDESC_NSDIFFS           "Merge.rc:2380"
-    IDS_COLDESC_BINARY            "Merge.rc:2381"
-    IDS_DIRECTORY_REPORT_TITLE    "Merge.rc:2382"
-    IDS_REPORT_COMMALIST          "Merge.rc:2383"
-    IDS_REPORT_SEMICOLONLIST      "Merge.rc:2384"
-    IDS_REPORT_TABLIST            "Merge.rc:2385"
-    IDS_REPORT_SIMPLEHTML         "Merge.rc:2386"
-    IDS_REPORT_SIMPLEXML          "Merge.rc:2387"
-    IDS_REPORT_FILEOVERWRITE      "Merge.rc:2388"
-    IDS_REPORT_ERROR              "Merge.rc:2389"
-    IDS_REPORT_SUCCESS            "Merge.rc:2390"
-    IDS_FILE_TO_ITSELF            "Merge.rc:2391"
-    IDS_FILESSAME                 "Merge.rc:2392"
-    IDS_FILEERROR                 "Merge.rc:2393"
-    IDS_TEMP_FILEERROR            "Merge.rc:2394"
-    IDS_SUGGEST_IGNOREEOL         "Merge.rc:2395"
-    IDS_SUGGEST_PRESERVEEOL       "Merge.rc:2396"
-    IDS_INVALID_DIRECTORY         "Merge.rc:2397"
-    IDS_CANNOT_OPEN_BINARYFILE    "Merge.rc:2398"
-    IDS_SUGGEST_IGNORECODEPAGE    "Merge.rc:2399"
-    IDS_DIFFERENT_UNICODINGS      "Merge.rc:2400"
-    IDS_LOSSY_TRANSCODING_BOTH    "Merge.rc:2401"
-    IDS_LOSSY_TRANSCODING_RIGHT   "Merge.rc:2402"
-    IDS_LOSSY_TRANSCODING_LEFT    "Merge.rc:2403"
-    IDS_LINEDIFF_NODIFF           "Merge.rc:2404"
-    IDS_LINEDIFF_NODIFF_CAPTION   "Merge.rc:2405"
-    IDS_NUM_REPLACED              "Merge.rc:2406"
-    IDS_EDIT_TEXT_NOT_FOUND       "Merge.rc:2407"
-    ID_EDITOR_COPY_PATH           "Merge.rc:2408"
-    ID_EDITOR_COPY_FILENAME       "Merge.rc:2409"
-    IDS_DIFF_SUCCEEDED            "Merge.rc:2410"
-    IDS_DIFF_ITEM1NOTFOUND        "Merge.rc:2411"
-    IDS_DIFF_ITEM2NOTFOUND        "Merge.rc:2412"
-    IDS_DIFF_FILEOVERWRITE        "Merge.rc:2413"
-    IDS_DIFF_SELECTEDFILES        "Merge.rc:2414"
-    IDS_DIFF_NORMAL               "Merge.rc:2415"
-    IDS_DIFF_CONTEXT              "Merge.rc:2416"
-    IDS_DIFF_UNIFIED              "Merge.rc:2417"
-    IDS_FILEWRITE_ERROR           "Merge.rc:2418"
-    IDS_PATH_NOT_ABSOLUTE         "Merge.rc:2419"
-    IDS_MUST_SPECIFY_OUTPUT       "Merge.rc:2420"
-    IDS_CANNOT_CREATE_BINARYPATCH "Merge.rc:2421"
-    IDS_CANNOT_CREATE_DIRPATCH    "Merge.rc:2422"
-    IDS_SAVEFILES_FORPATCH        "Merge.rc:2423"
-    IDS_FOLDER_NOTEXIST           "Merge.rc:2424"
-    IDS_DIR_RESULTS_EMPTIED       "Merge.rc:2425"
-    IDS_OPT_EXPORT_CAPTION        "Merge.rc:2426"
-    IDS_OPT_IMPORT_CAPTION        "Merge.rc:2427"
-    IDS_OPT_IMPORT_DONE           "Merge.rc:2428"
-    IDS_OPT_EXPORT_DONE           "Merge.rc:2429"
-    IDS_OPT_IMPORT_ERR            "Merge.rc:2430"
-    IDS_OPT_EXPORT_ERR            "Merge.rc:2431"
-    IDS_CLOSEALL_WINDOWS          "Merge.rc:2432"
-    IDS_REGEXP_ERROR              "Merge.rc:2433"
-    IDS_REGEXP_NOMATCH            "Merge.rc:2434"
-    IDS_REGEXP_INVALID            "Merge.rc:2435"
-    IDS_REGEXP_COLL_CHAR          "Merge.rc:2436"
-    IDS_REGEXP_CHAR_CLASS         "Merge.rc:2437"
-    IDS_REGEXP_TRAILING_BS        "Merge.rc:2438"
-    IDS_REGEXP_INVALID_BACKREF    "Merge.rc:2439"
-    IDS_REGEXP_UNMATCHED_BRACK    "Merge.rc:2440"
-    IDS_REGEXP_UNMATCHED_PAREN    "Merge.rc:2441"
-    IDS_REGEXP_UNMATCHED_BRACE    "Merge.rc:2442"
-    IDS_REGEXP_INVALID_BRACE      "Merge.rc:2443"
-    IDS_REGEXP_RANGE_END          "Merge.rc:2444"
-    IDS_REGEXP_OUTOFMEM           "Merge.rc:2445"
-    IDS_REGEXP_INVALID_PREV_EXP   "Merge.rc:2446"
-    IDS_REGEXP_PREMATURE_END      "Merge.rc:2447"
-    IDS_REGEXP_TOO_BIG            "Merge.rc:2448"
-    IDS_REGEXP_UNMATCHED_RPAREN   "Merge.rc:2449"
-    IDS_EOL_DOS                   "Merge.rc:2450"
-    IDS_EOL_MAC                   "Merge.rc:2451"
-    IDS_EOL_UNIX                  "Merge.rc:2452"
-    IDS_EOL_MIXED                 "Merge.rc:2453"
-    IDS_EOL_BIN                   "Merge.rc:2454" //msgctxt EOL Type
-    IDS_EOL_LF                    "Merge.rc:2455"
-    IDS_EOL_CR                    "Merge.rc:2456"
-    IDS_EOL_CRLF                  "Merge.rc:2457"
-    IDS_EOL_NONE                  "Merge.rc:2458"
-    ID_FILE_SAVE_LEFT             "Merge.rc:2459"
-    ID_FILE_SAVE_RIGHT            "Merge.rc:2460"
-    ID_FILE_SAVEAS_LEFT           "Merge.rc:2461"
-    ID_FILE_SAVEAS_RIGHT          "Merge.rc:2462"
-    ID_FILE_LEFT_READONLY         "Merge.rc:2463"
-    ID_FILE_RIGHT_READONLY        "Merge.rc:2464"
-    ID_EOL_TO_DOS                 "Merge.rc:2465"
-    ID_EOL_TO_UNIX                "Merge.rc:2466"
-    ID_EOL_TO_MAC                 "Merge.rc:2467"
-    ID_FILE_MERGINGMODE           "Merge.rc:2468"
-    ID_FILE_ENCODING              "Merge.rc:2469"
-    ID_FILE_OPENCONFLICT          "Merge.rc:2470"
-    ID_FILE_STARTCOLLECT          "Merge.rc:2471"
-    ID_SELECT_NEXT_LINEDIFF       "Merge.rc:2472"
-    ID_EDIT_WMGOTO                "Merge.rc:2473"
-    ID_OPTIONS                    "Merge.rc:2474"
-    ID_REFRESH                    "Merge.rc:2475"
-    ID_VIEW_TABLELAYOUT           "Merge.rc:2476"
-    ID_EDIT_COPY_LINENUMBERS      "Merge.rc:2477"
-    ID_DIR_RESCAN                 "Merge.rc:2478"
-    ID_EDIT_TOGGLE_BOOKMARK       "Merge.rc:2479"
-    ID_EDIT_GOTO_NEXT_BOOKMARK    "Merge.rc:2480"
-    ID_EDIT_GOTO_PREV_BOOKMARK    "Merge.rc:2481"
-    ID_EDIT_CLEAR_ALL_BOOKMARKS   "Merge.rc:2482"
-    ID_OPTIONS_SHOWIDENTICAL      "Merge.rc:2483"
-    ID_OPTIONS_SHOWDIFFERENT      "Merge.rc:2484"
-    ID_OPTIONS_SHOWUNIQUELEFT     "Merge.rc:2485"
-    ID_OPTIONS_SHOWUNIQUERIGHT    "Merge.rc:2486"
-    ID_OPTIONS_SHOWBINARIES       "Merge.rc:2487"
-    ID_OPTIONS_SHOWSKIPPED        "Merge.rc:2488"
-    ID_VIEW_SELECTFONT            "Merge.rc:2489"
-    ID_VIEW_USEDEFAULTFONT        "Merge.rc:2490"
-    ID_VIEW_WHITESPACE            "Merge.rc:2491"
-    ID_VIEW_DETAIL_BAR            "Merge.rc:2492"
-    ID_VIEW_LOCATION_BAR          "Merge.rc:2493"
-    ID_VIEW_IMAGETOOLBOX          "Merge.rc:2494"
-    ID_VIEW_DIR_STATISTICS        "Merge.rc:2495"
-    ID_VIEW_LANGUAGE              "Merge.rc:2496"
-    ID_VIEW_LINEDIFFS             "Merge.rc:2497"
-    ID_VIEW_SWAPPANES             "Merge.rc:2498"
-    ID_VIEW_LINENUMBERS           "Merge.rc:2499"
-    ID_VIEW_WORDWRAP              "Merge.rc:2500"
-    ID_VIEW_FILEMARGIN            "Merge.rc:2501"
-    ID_VIEW_RULER                 "Merge.rc:2502"
-    ID_VIEW_ZOOMIN                "Merge.rc:2503"
-    ID_VIEW_ZOOMOUT               "Merge.rc:2504"
-    ID_VIEW_ZOOMNORMAL            "Merge.rc:2505"
-    ID_PREVDIFF                   "Merge.rc:2506"
-    ID_NEXTDIFF                   "Merge.rc:2507"
-    ID_FIRSTDIFF                  "Merge.rc:2508"
-    ID_CURDIFF                    "Merge.rc:2509"
-    ID_LASTDIFF                   "Merge.rc:2510"
-    ID_L2R                        "Merge.rc:2511"
-    ID_R2L                        "Merge.rc:2512"
-    ID_L2RNEXT                    "Merge.rc:2513"
-    ID_R2LNEXT                    "Merge.rc:2514"
-    ID_ALL_RIGHT                  "Merge.rc:2515"
-    ID_ALL_LEFT                   "Merge.rc:2516"
-    ID_MERGE_DELETE               "Merge.rc:2517"
-    ID_MERGE_COMPARE              "Merge.rc:2518"
-    ID_TOOLS_CUSTOMIZECOLUMNS     "Merge.rc:2519"
-    ID_TOOLS_GENERATEPATCH        "Merge.rc:2520"
-    ID_TOOLS_FILTERS              "Merge.rc:2521"
-    ID_TOOLS_GENERATEREPORT       "Merge.rc:2522"
-    ID_WINDOW_CHANGE_PANE         "Merge.rc:2523"
-    ID_WINDOW_CLOSEALL            "Merge.rc:2524"
-    ID_HELP_CONTENTS              "Merge.rc:2525"
-    ID_HELP_GETCONFIG             "Merge.rc:2526"
-    IDS_PRIVATEBUILD_FMT          "Merge.rc:2527"
-    ID_HELP_RELEASENOTES          "Merge.rc:2528"
-    ID_HELP_TRANSLATIONS          "Merge.rc:2529"
-    IDS_USERCHOICE_NONE           "Merge.rc:2530"
-    ID_FILE_OPEN_REGISTERED       "Merge.rc:2531"
-    ID_FILE_OPEN_WITHEDITOR       "Merge.rc:2532"
-    ID_FILE_OPEN_WITH             "Merge.rc:2533"
-    ID_DISPLAY_MOVED_NONE         "Merge.rc:2534"
-    ID_DISPLAY_MOVED_ALL          "Merge.rc:2535"
-    ID_DISPLAY_MOVED_FOLLOW_DIFF  "Merge.rc:2536"
-    ID_LOCBAR_GOTOLINE            "Merge.rc:2537"
-    IDS_AUTOCOMPLETE_DISABLED     "Merge.rc:2538"
-    IDS_AUTOCOMPLETE_FILE_SYS     "Merge.rc:2539"
-    IDS_AUTOCOMPLETE_MRU          "Merge.rc:2540"
-    ID_TOOLBAR_NONE               "Merge.rc:2541"
-    ID_TOOLBAR_SMALL              "Merge.rc:2542"
-    ID_TOOLBAR_BIG                "Merge.rc:2543"
-    IDS_SELECTION_LEFT            "Merge.rc:2544"
-    IDS_SELECTION_RIGHT           "Merge.rc:2545"
-    IDS_PRINT                     "Merge.rc:2546"
-    IDS_PAGE_SETUP                "Merge.rc:2547"
-    IDS_PAGE_ZOOM                 "Merge.rc:2548"
-    IDS_CONTENT_ZOOM              "Merge.rc:2549"
-    IDS_LINE_EXCLUDED             "Merge.rc:2550"
-    IDS_LINES_EXCLUDED            "Merge.rc:2551"
-    IDS_SHELL_CONTEXT_MENU        "Merge.rc:2552"
-    IDS_EXCEL_DATA_LOSS_WARNING   "Merge.rc:2553"
-    IDS_WHITESPACE_LOSS_WARNING   "Merge.rc:2554"
-    IDS_CODEPAGE_RELOAD_FILE      "Merge.rc:2555"
-    IDS_LEXER_RECOGNIZE_HTML4_TAGS"Merge.rc:2556"
-    IDS_LEXER_RECOGNIZE_HTML5_TAGS"Merge.rc:2557"
-    IDS_LEXER_RECOGNIZE_MWSL_TAG  "Merge.rc:2558"
+    IDC_MIXED_EOL                 "Merge.rc:2116"
+    IDC_STATIC_TITLE_LEFT         "Merge.rc:2117"
+    IDC_STATIC_TITLE_RIGHT        "Merge.rc:2118"
+    IDS_SPLASH_GPLTEXT            "Merge.rc:2119"
+    IDS_MESSAGEBOX_OK             "Merge.rc:2120"
+    IDS_MESSAGEBOX_CANCEL         "Merge.rc:2121"
+    IDS_MESSAGEBOX_ABORT          "Merge.rc:2122"
+    IDS_MESSAGEBOX_RETRY          "Merge.rc:2123"
+    IDS_MESSAGEBOX_IGNORE         "Merge.rc:2124"
+    IDS_MESSAGEBOX_IGNOREALL      "Merge.rc:2125"
+    IDS_MESSAGEBOX_YES            "Merge.rc:2126"
+    IDS_MESSAGEBOX_YES_TO_ALL     "Merge.rc:2127"
+    IDS_MESSAGEBOX_NO             "Merge.rc:2128"
+    IDS_MESSAGEBOX_NO_TO_ALL      "Merge.rc:2129"
+    IDS_MESSAGEBOX_CONTINUE       "Merge.rc:2130"
+    IDS_MESSAGEBOX_SKIP           "Merge.rc:2131"
+    IDS_MESSAGEBOX_SKIPALL        "Merge.rc:2132"
+    IDS_MESSAGEBOX_HELP           "Merge.rc:2133"
+    IDS_MESSAGEBOX_DONT_DISPLAY_AGAIN "Merge.rc:2134"
+    IDS_MESSAGEBOX_DONT_ASK_AGAIN "Merge.rc:2135"
+    IDS_OPTIONSPG_COMPARE         "Merge.rc:2136"
+    IDS_OPTIONSPG_EDITOR          "Merge.rc:2137"
+    IDS_OPTIONSPG_COLORS          "Merge.rc:2138"
+    IDS_TO                        "Merge.rc:2139"
+    IDS_FROM_LEFT                 "Merge.rc:2140"
+    IDS_TO_LEFT                   "Merge.rc:2141"
+    IDS_FROM_RIGHT                "Merge.rc:2142"
+    IDS_TO_RIGHT                  "Merge.rc:2143"
+    IDS_VERSION_FMT               "Merge.rc:2144"
+    IDS_OPTIONS_TITLE             "Merge.rc:2145"
+    IDS_MESSAGE_BOX_ARE_RESET     "Merge.rc:2146"
+    IDS_DIFF_OPEN_NO_SET_PROPS    "Merge.rc:2147"
+    IDS_RESET_OPTIONS_WARNING     "Merge.rc:2148"
+    IDS_OPEN_TITLE                "Merge.rc:2149"
+    IDS_PROGRAMFILES              "Merge.rc:2150"
+    IDS_ALLFILES                  "Merge.rc:2151"
+    IDS_PROJECTFILES              "Merge.rc:2152"
+    IDS_INIFILES                  "Merge.rc:2153"
+    IDS_TEXT_REPORT_FILES         "Merge.rc:2154"
+    IDS_HTML_REPORT_FILES         "Merge.rc:2155"
+    IDS_XML_REPORT_FILES          "Merge.rc:2156"
+    IDS_XLS_REPORT_FILES          "Merge.rc:2157"
+    ID_COMPMETHOD_FULL_CONTENTS   "Merge.rc:2158"
+    ID_COMPMETHOD_QUICK_CONTENTS  "Merge.rc:2159"
+    ID_COMPMETHOD_BINARY_CONTENTS "Merge.rc:2160"
+    ID_COMPMETHOD_MODDATE         "Merge.rc:2161"
+    ID_COMPMETHOD_DATESIZE        "Merge.rc:2162"
+    ID_COMPMETHOD_SIZE            "Merge.rc:2163"
+    IDS_LEXERS_LEXERTITLE         "Merge.rc:2164"
+    IDS_LEXERS_FILETYPESTITLE     "Merge.rc:2165"
+    IDS_FILETRANSFORMS_TYPETITLE  "Merge.rc:2166"
+    IDS_FILETRANSFORMS_METHTITLE  "Merge.rc:2167"
+    IDS_FILTERFILE_NAMETITLE      "Merge.rc:2168"
+    IDS_FILTERFILE_PATHTITLE      "Merge.rc:2169"
+    IDS_FILTER_TITLE              "Merge.rc:2170"
+    IDS_FILTERFILE_DESCTITLE      "Merge.rc:2171"
+    IDS_FILEFILTER_SAVENEW        "Merge.rc:2172"
+    IDS_FILEFILTER_FILEMASK       "Merge.rc:2173"
+    IDS_FILEFILTER_TMPL_MISSING   "Merge.rc:2174"
+    IDS_FILEFILTER_TMPL_COPY      "Merge.rc:2175"
+    IDS_FILEFILTER_NO_USERFOLDER  "Merge.rc:2176"
+    IDS_FILEFILTER_DELETE_FAIL    "Merge.rc:2177"
+    IDS_FILEFILTER_INSTALL        "Merge.rc:2178"
+    IDS_FILEFILTER_INSTALLFAIL    "Merge.rc:2179"
+    IDS_FILEFILTER_OVERWRITE      "Merge.rc:2180"
+    IDS_FILTERLINE_REGEXP         "Merge.rc:2181"
+    IDS_FILTERCHANGED             "Merge.rc:2182"
+    IDS_CC_CMD                    "Merge.rc:2183"
+    IDS_VSS_CMD                   "Merge.rc:2184"
+    IDS_TF_CMD                    "Merge.rc:2185"
+    IDS_DIRECTORY_WINDOW_TITLE    "Merge.rc:2186"
+    IDS_FILE_COMPARISON_TITLE     "Merge.rc:2187"
+    IDS_EMPTY_LEFT_FILE           "Merge.rc:2188"
+    IDS_EMPTY_RIGHT_FILE          "Merge.rc:2189"
+    IDS_CONFLICT_THEIRS_FILE      "Merge.rc:2190"
+    IDS_CONFLICT_MINE_FILE        "Merge.rc:2191"
+    IDS_STATUS_RESCANNING         "Merge.rc:2192"
+    IDS_STATUS_OPENING_SELECTION  "Merge.rc:2193"
+    IDS_STATUS_COPYL2R            "Merge.rc:2194"
+    IDS_STATUS_COPYR2L            "Merge.rc:2195"
+    IDS_STATUS_COPYALL2L          "Merge.rc:2196"
+    IDS_STATUS_COPYALL2R          "Merge.rc:2197"
+    IDS_STATUS_COPYFILES          "Merge.rc:2198"
+    IDS_STATUS_DELETEFILES        "Merge.rc:2199"
+    IDS_STATUS_MOVEFILES          "Merge.rc:2200"
+    IDS_STATUS_CREATEREPORT       "Merge.rc:2201"
+    IDS_STATUS_UNDO               "Merge.rc:2202"
+    IDS_STATUS_REDO               "Merge.rc:2203"
+    IDS_LINE_STATUS_INFO_EOL      "Merge.rc:2204"
+    IDS_EMPTY_LINE_STATUS_INFO    "Merge.rc:2205"
+    IDS_LINE_STATUS_INFO          "Merge.rc:2206"
+    IDS_MERGEMODE_MERGING         "Merge.rc:2207"
+    IDS_DIFF_NUMBER_STATUS_FMT    "Merge.rc:2208"
+    IDS_NO_DIFF_SEL_FMT           "Merge.rc:2209"
+    IDS_1_DIFF_FOUND              "Merge.rc:2210"
+    IDS_STATUSBAR_READONLY        "Merge.rc:2211"
+    IDS_DIRVIEW_STATUS_FMT_FOCUS  "Merge.rc:2212"
+    IDS_DIRVIEW_STATUS_FMT_NOFOCUS "Merge.rc:2213"
+    IDS_DIRVIEW_STATUS_COLLECTMODE "Merge.rc:2214"
+    IDS_ERROR_INCOMPARABLE        "Merge.rc:2215"
+    IDS_DIRSEL_TAG                "Merge.rc:2216"
+    IDS_OPEN_FILESDIRS            "Merge.rc:2217"
+    IDS_OPEN_LEFTINVALID          "Merge.rc:2218"
+    IDS_OPEN_RIGHTINVALID         "Merge.rc:2219"
+    IDS_OPEN_BOTHINVALID          "Merge.rc:2220"
+    IDS_OPEN_MISMATCH             "Merge.rc:2221"
+    IDS_ERROR_FILE_NOT_FOUND      "Merge.rc:2222"
+    IDS_ERROR_FILE_NOT_UNPACKED   "Merge.rc:2223"
+    IDS_ERROR_FILEMOVE            "Merge.rc:2224"
+    IDS_ERROR_FILECOPY            "Merge.rc:2225"
+    IDS_ERROR_FILEDELETE          "Merge.rc:2226"
+    IDS_ERROR_FILEOPEN            "Merge.rc:2227"
+    IDS_ERROR_CONF_RESOLVE        "Merge.rc:2228"
+    IDS_NOT_CONFLICT_FILE         "Merge.rc:2229"
+    IDS_TRASH_FILE                "Merge.rc:2230"
+    IDS_TRASH_FILE_ATTENTIVE      "Merge.rc:2231"
+    IDS_TRASH_FOLDER              "Merge.rc:2232"
+    IDS_TRASH_FOLDER_ATTENTIVE    "Merge.rc:2233"
+    IDS_TRASH_SELECTED_ITEMS      "Merge.rc:2234"
+    IDS_SAVE_AS_TITLE             "Merge.rc:2235"
+    IDS_SAVE_FMT                  "Merge.rc:2236"
+    IDS_SAVEREADONLY_FMT          "Merge.rc:2237"
+    IDS_ERROR_FILE_WRITEABLE      "Merge.rc:2238"
+    IDS_ERROR_BACKUP              "Merge.rc:2239"
+    IDS_BACKUP_FAILED_PROMPT      "Merge.rc:2240"
+    IDS_FILESAVE_FAILED           "Merge.rc:2241"
+    IDS_FILECHANGED_ONDISK        "Merge.rc:2242"
+    IDS_SAVEREADONLY_MULTI        "Merge.rc:2243"
+    IDS_FILECHANGED_RESCAN        "Merge.rc:2244"
+    IDS_SAVE_LEFT_AS              "Merge.rc:2245"
+    IDS_SAVE_RIGHT_AS             "Merge.rc:2246"
+    IDS_FILE_DISAPPEARED          "Merge.rc:2247"
+    IDS_VIEWS_OUTOFSYNC           "Merge.rc:2248"
+    IDS_NOPROJECT                 "Merge.rc:2249"
+    IDS_VSS_CHECKOUT_STATUS       "Merge.rc:2250"
+    IDS_VSSERROR                  "Merge.rc:2251"
+    IDS_VSS_RUN_ERROR             "Merge.rc:2252"
+    IDS_VSSFOLDER_AND_FILE_NOMATCH "Merge.rc:2253"
+    IDS_VSS_NODATABASES           "Merge.rc:2254"
+    IDS_VSS_ERRORFROM             "Merge.rc:2255"
+    IDS_VSS_CHECKINERROR          "Merge.rc:2256"
+    IDS_VSS_UNCOERROR             "Merge.rc:2257"
+    IDS_VCS_NONE                  "Merge.rc:2258"
+    IDS_VCS_VSS4                  "Merge.rc:2259"
+    IDS_VCS_VSS5                  "Merge.rc:2260"
+    IDS_VCS_CLEARCASE             "Merge.rc:2261"
+    IDS_VCS_TFS                   "Merge.rc:2262"
+    IDS_BREAK_ON_WHITESPACE       "Merge.rc:2263"
+    IDS_BREAK_ON_PUNCTUATION      "Merge.rc:2264"
+    ID_DIR_COPY_LEFT_TO_RIGHT     "Merge.rc:2265"
+    ID_DIR_COPY_LEFT_TO_BROWSE    "Merge.rc:2266"
+    ID_DIR_COPY_RIGHT_TO_LEFT     "Merge.rc:2267"
+    ID_DIR_COPY_RIGHT_TO_BROWSE   "Merge.rc:2268"
+    ID_DIR_DEL_LEFT               "Merge.rc:2269"
+    ID_DIR_DEL_RIGHT              "Merge.rc:2270"
+    ID_DIR_DEL_BOTH               "Merge.rc:2271"
+    ID_DIR_HIDE_FILENAMES         "Merge.rc:2272"
+    ID_DIR_ITEM_RENAME            "Merge.rc:2273"
+    IDS_SELECT_DESTFOLDER         "Merge.rc:2274"
+    IDS_SELECT_DEST_LEFT          "Merge.rc:2275"
+    IDS_SELECT_DEST_RIGHT         "Merge.rc:2276"
+    IDS_FILES_AFFECTED_FMT        "Merge.rc:2277"
+    IDS_CONFIRM_DELETE_SINGLE     "Merge.rc:2278"
+    IDS_CONFIRM_SINGLE_COPY       "Merge.rc:2279"
+    IDS_CONFIRM_MULTIPLE_COPY     "Merge.rc:2280"
+    IDS_DIRCMP_NOTSYNC            "Merge.rc:2281"
+    IDS_CONFIRM_SINGLE_MOVE       "Merge.rc:2282"
+    IDS_CONFIRM_MULTIPLE_MOVE     "Merge.rc:2283"
+    IDS_CONFIRM_COPY_CAPTION      "Merge.rc:2284"
+    IDS_CONFIRM_MOVE_CAPTION      "Merge.rc:2285"
+    ID_DIR_OPEN_LEFT              "Merge.rc:2286"
+    ID_DIR_OPEN_LEFT_WITHEDITOR   "Merge.rc:2287"
+    ID_DIR_OPEN_LEFT_WITH         "Merge.rc:2288"
+    ID_DIR_OPEN_RIGHT             "Merge.rc:2289"
+    ID_DIR_OPEN_RIGHT_WITHEDITOR  "Merge.rc:2290"
+    ID_DIR_OPEN_RIGHT_WITH        "Merge.rc:2291"
+    IDS_ERROR_EXECUTE_FILE        "Merge.rc:2292"
+    IDS_UNKNOWN_EXECUTE_FILE      "Merge.rc:2293"
+    ID_DIR_COPY_FILENAMES         "Merge.rc:2294"
+    ID_DIR_COPY_PATHNAMES_LEFT    "Merge.rc:2295"
+    ID_DIR_COPY_PATHNAMES_RIGHT   "Merge.rc:2296"
+    ID_DIR_COPY_PATHNAMES_BOTH    "Merge.rc:2297"
+    IDS_SHELL_CONTEXT_MENU_LEFT   "Merge.rc:2298"
+    IDS_SHELL_CONTEXT_MENU_RIGHT  "Merge.rc:2299"
+    IDS_UNKNOWN_ARCHIVE_FORMAT    "Merge.rc:2300"
+    IDS_CANT_STORE_1_AS_2         "Merge.rc:2301"
+    IDS_EXITCODE                  "Merge.rc:2302"
+    IDS_BROWSE_FOR_FILE_SEL_LIMIT "Merge.rc:2303"
+    ID_DIR_ZIP_LEFT               "Merge.rc:2304"
+    ID_DIR_ZIP_RIGHT              "Merge.rc:2305"
+    ID_DIR_ZIP_BOTH               "Merge.rc:2306"
+    ID_DIR_ZIP_BOTH_DIFFS_ONLY    "Merge.rc:2307"
+    ID_DIR_MOVE_LEFT_TO_BROWSE    "Merge.rc:2308"
+    ID_DIR_MOVE_RIGHT_TO_BROWSE   "Merge.rc:2309"
+    IDS_COLHDR_FILENAME           "Merge.rc:2310"
+    IDS_COLHDR_TIMEM              "Merge.rc:2311"
+    IDS_COLHDR_ATTRIBUTES         "Merge.rc:2312"
+    IDS_COLHDR_SIZE               "Merge.rc:2313"
+    IDS_COLHDR_DIR                "Merge.rc:2314" //msgctxt DirView|ColumnHeader
+    IDS_COLHDR_RESULT             "Merge.rc:2315"
+    IDS_COLHDR_LTIMEM             "Merge.rc:2316"
+    IDS_COLHDR_RTIMEM             "Merge.rc:2317"
+    IDS_COLHDR_EXTENSION          "Merge.rc:2318"
+    IDS_COLHDR_LSIZE              "Merge.rc:2319"
+    IDS_COLHDR_RSIZE              "Merge.rc:2320"
+    IDS_COLHDR_RSIZE_SHORT        "Merge.rc:2321"
+    IDS_COLHDR_LSIZE_SHORT        "Merge.rc:2322"
+    IDS_COLHDR_LTIMEC             "Merge.rc:2323"
+    IDS_COLHDR_RTIMEC             "Merge.rc:2324"
+    IDS_COLHDR_NEWER              "Merge.rc:2325"
+    IDS_COLHDR_LVERSION           "Merge.rc:2326"
+    IDS_COLHDR_RVERSION           "Merge.rc:2327"
+    IDS_COLHDR_RESULT_ABBR        "Merge.rc:2328"
+    IDS_COLHDR_LATTRIBUTES        "Merge.rc:2329"
+    IDS_COLHDR_RATTRIBUTES        "Merge.rc:2330"
+    IDS_COLHDR_LEOL_TYPE          "Merge.rc:2331"
+    IDS_COLHDR_REOL_TYPE          "Merge.rc:2332"
+    IDS_COLHDR_LENCODING          "Merge.rc:2333"
+    IDS_COLHDR_RENCODING          "Merge.rc:2334"
+    IDS_COLHDR_NIDIFFS            "Merge.rc:2335"
+    IDS_COLHDR_NSDIFFS            "Merge.rc:2336"
+    IDS_COLHDR_BINARY             "Merge.rc:2337" //msgctxt DirView|ColumnHeader
+    IDS_CANT_COMPARE_FILES        "Merge.rc:2338"
+    IDS_ABORTED_ITEM              "Merge.rc:2339"
+    IDS_FILE_SKIPPED              "Merge.rc:2340"
+    IDS_DIR_SKIPPED               "Merge.rc:2341"
+    IDS_LEFT_ONLY_IN_FMT          "Merge.rc:2342"
+    IDS_RIGHT_ONLY_IN_FMT         "Merge.rc:2343"
+    IDS_BIN_FILES_SAME            "Merge.rc:2344"
+    IDS_IDENTICAL                 "Merge.rc:2345"
+    IDS_BIN_FILES_DIFF            "Merge.rc:2346"
+    IDS_FILES_ARE_DIFFERENT       "Merge.rc:2347"
+    IDS_FOLDERS_ARE_DIFFERENT     "Merge.rc:2348"
+    IDS_LEFTONLY                  "Merge.rc:2349"
+    IDS_RIGHTONLY                 "Merge.rc:2350"
+    IDS_DIFFERENT                 "Merge.rc:2351"
+    IDS_CMPRES_ERROR              "Merge.rc:2352"
+    IDS_TEXT_FILES_SAME           "Merge.rc:2353"
+    IDS_TEXT_FILES_DIFF           "Merge.rc:2354"
+    IDS_ELAPSED_TIME              "Merge.rc:2355"
+    IDS_STATUS_SELITEM1           "Merge.rc:2356"
+    IDS_STATUS_SELITEMS           "Merge.rc:2357"
+    IDS_COLDESC_FILENAME          "Merge.rc:2358"
+    IDS_COLDESC_DIR               "Merge.rc:2359"
+    IDS_COLDESC_RESULT            "Merge.rc:2360"
+    IDS_COLDESC_LTIMEM            "Merge.rc:2361"
+    IDS_COLDESC_RTIMEM            "Merge.rc:2362"
+    IDS_COLDESC_EXTENSION         "Merge.rc:2363"
+    IDS_COLDESC_LSIZE             "Merge.rc:2364"
+    IDS_COLDESC_RSIZE             "Merge.rc:2365"
+    IDS_COLDESC_LSIZE_SHORT       "Merge.rc:2366"
+    IDS_COLDESC_RSIZE_SHORT       "Merge.rc:2367"
+    IDS_COLDESC_LTIMEC            "Merge.rc:2368"
+    IDS_COLDESC_RTIMEC            "Merge.rc:2369"
+    IDS_COLDESC_NEWER             "Merge.rc:2370"
+    IDS_COLDESC_LVERSION          "Merge.rc:2371"
+    IDS_COLDESC_RVERSION          "Merge.rc:2372"
+    IDS_COLDESC_RESULT_ABBR       "Merge.rc:2373"
+    IDS_COLDESC_LATTRIBUTES       "Merge.rc:2374"
+    IDS_COLDESC_RATTRIBUTES       "Merge.rc:2375"
+    IDS_COLDESC_LEOL_TYPE         "Merge.rc:2376"
+    IDS_COLDESC_REOL_TYPE         "Merge.rc:2377"
+    IDS_COLDESC_LENCODING         "Merge.rc:2378"
+    IDS_COLDESC_RENCODING         "Merge.rc:2379"
+    IDS_COLDESC_NIDIFFS           "Merge.rc:2380"
+    IDS_COLDESC_NSDIFFS           "Merge.rc:2381"
+    IDS_COLDESC_BINARY            "Merge.rc:2382"
+    IDS_DIRECTORY_REPORT_TITLE    "Merge.rc:2383"
+    IDS_REPORT_COMMALIST          "Merge.rc:2384"
+    IDS_REPORT_SEMICOLONLIST      "Merge.rc:2385"
+    IDS_REPORT_TABLIST            "Merge.rc:2386"
+    IDS_REPORT_SIMPLEHTML         "Merge.rc:2387"
+    IDS_REPORT_SIMPLEXML          "Merge.rc:2388"
+    IDS_REPORT_FILEOVERWRITE      "Merge.rc:2389"
+    IDS_REPORT_ERROR              "Merge.rc:2390"
+    IDS_REPORT_SUCCESS            "Merge.rc:2391"
+    IDS_FILE_TO_ITSELF            "Merge.rc:2392"
+    IDS_FILESSAME                 "Merge.rc:2393"
+    IDS_FILEERROR                 "Merge.rc:2394"
+    IDS_TEMP_FILEERROR            "Merge.rc:2395"
+    IDS_SUGGEST_IGNOREEOL         "Merge.rc:2396"
+    IDS_SUGGEST_PRESERVEEOL       "Merge.rc:2397"
+    IDS_INVALID_DIRECTORY         "Merge.rc:2398"
+    IDS_CANNOT_OPEN_BINARYFILE    "Merge.rc:2399"
+    IDS_SUGGEST_IGNORECODEPAGE    "Merge.rc:2400"
+    IDS_DIFFERENT_UNICODINGS      "Merge.rc:2401"
+    IDS_LOSSY_TRANSCODING_BOTH    "Merge.rc:2402"
+    IDS_LOSSY_TRANSCODING_RIGHT   "Merge.rc:2403"
+    IDS_LOSSY_TRANSCODING_LEFT    "Merge.rc:2404"
+    IDS_LINEDIFF_NODIFF           "Merge.rc:2405"
+    IDS_LINEDIFF_NODIFF_CAPTION   "Merge.rc:2406"
+    IDS_NUM_REPLACED              "Merge.rc:2407"
+    IDS_EDIT_TEXT_NOT_FOUND       "Merge.rc:2408"
+    ID_EDITOR_COPY_PATH           "Merge.rc:2409"
+    ID_EDITOR_COPY_FILENAME       "Merge.rc:2410"
+    IDS_DIFF_SUCCEEDED            "Merge.rc:2411"
+    IDS_DIFF_ITEM1NOTFOUND        "Merge.rc:2412"
+    IDS_DIFF_ITEM2NOTFOUND        "Merge.rc:2413"
+    IDS_DIFF_FILEOVERWRITE        "Merge.rc:2414"
+    IDS_DIFF_SELECTEDFILES        "Merge.rc:2415"
+    IDS_DIFF_NORMAL               "Merge.rc:2416"
+    IDS_DIFF_CONTEXT              "Merge.rc:2417"
+    IDS_DIFF_UNIFIED              "Merge.rc:2418"
+    IDS_FILEWRITE_ERROR           "Merge.rc:2419"
+    IDS_PATH_NOT_ABSOLUTE         "Merge.rc:2420"
+    IDS_MUST_SPECIFY_OUTPUT       "Merge.rc:2421"
+    IDS_CANNOT_CREATE_BINARYPATCH "Merge.rc:2422"
+    IDS_CANNOT_CREATE_DIRPATCH    "Merge.rc:2423"
+    IDS_SAVEFILES_FORPATCH        "Merge.rc:2424"
+    IDS_FOLDER_NOTEXIST           "Merge.rc:2425"
+    IDS_DIR_RESULTS_EMPTIED       "Merge.rc:2426"
+    IDS_OPT_EXPORT_CAPTION        "Merge.rc:2427"
+    IDS_OPT_IMPORT_CAPTION        "Merge.rc:2428"
+    IDS_OPT_IMPORT_DONE           "Merge.rc:2429"
+    IDS_OPT_EXPORT_DONE           "Merge.rc:2430"
+    IDS_OPT_IMPORT_ERR            "Merge.rc:2431"
+    IDS_OPT_EXPORT_ERR            "Merge.rc:2432"
+    IDS_CLOSEALL_WINDOWS          "Merge.rc:2433"
+    IDS_REGEXP_ERROR              "Merge.rc:2434"
+    IDS_REGEXP_NOMATCH            "Merge.rc:2435"
+    IDS_REGEXP_INVALID            "Merge.rc:2436"
+    IDS_REGEXP_COLL_CHAR          "Merge.rc:2437"
+    IDS_REGEXP_CHAR_CLASS         "Merge.rc:2438"
+    IDS_REGEXP_TRAILING_BS        "Merge.rc:2439"
+    IDS_REGEXP_INVALID_BACKREF    "Merge.rc:2440"
+    IDS_REGEXP_UNMATCHED_BRACK    "Merge.rc:2441"
+    IDS_REGEXP_UNMATCHED_PAREN    "Merge.rc:2442"
+    IDS_REGEXP_UNMATCHED_BRACE    "Merge.rc:2443"
+    IDS_REGEXP_INVALID_BRACE      "Merge.rc:2444"
+    IDS_REGEXP_RANGE_END          "Merge.rc:2445"
+    IDS_REGEXP_OUTOFMEM           "Merge.rc:2446"
+    IDS_REGEXP_INVALID_PREV_EXP   "Merge.rc:2447"
+    IDS_REGEXP_PREMATURE_END      "Merge.rc:2448"
+    IDS_REGEXP_TOO_BIG            "Merge.rc:2449"
+    IDS_REGEXP_UNMATCHED_RPAREN   "Merge.rc:2450"
+    IDS_EOL_DOS                   "Merge.rc:2451"
+    IDS_EOL_MAC                   "Merge.rc:2452"
+    IDS_EOL_UNIX                  "Merge.rc:2453"
+    IDS_EOL_MIXED                 "Merge.rc:2454"
+    IDS_EOL_BIN                   "Merge.rc:2455" //msgctxt EOL Type
+    IDS_EOL_LF                    "Merge.rc:2456"
+    IDS_EOL_CR                    "Merge.rc:2457"
+    IDS_EOL_CRLF                  "Merge.rc:2458"
+    IDS_EOL_NONE                  "Merge.rc:2459"
+    ID_FILE_SAVE_LEFT             "Merge.rc:2460"
+    ID_FILE_SAVE_RIGHT            "Merge.rc:2461"
+    ID_FILE_SAVEAS_LEFT           "Merge.rc:2462"
+    ID_FILE_SAVEAS_RIGHT          "Merge.rc:2463"
+    ID_FILE_LEFT_READONLY         "Merge.rc:2464"
+    ID_FILE_RIGHT_READONLY        "Merge.rc:2465"
+    ID_EOL_TO_DOS                 "Merge.rc:2466"
+    ID_EOL_TO_UNIX                "Merge.rc:2467"
+    ID_EOL_TO_MAC                 "Merge.rc:2468"
+    ID_FILE_MERGINGMODE           "Merge.rc:2469"
+    ID_FILE_ENCODING              "Merge.rc:2470"
+    ID_FILE_OPENCONFLICT          "Merge.rc:2471"
+    ID_FILE_STARTCOLLECT          "Merge.rc:2472"
+    ID_SELECT_NEXT_LINEDIFF       "Merge.rc:2473"
+    ID_EDIT_WMGOTO                "Merge.rc:2474"
+    ID_OPTIONS                    "Merge.rc:2475"
+    ID_REFRESH                    "Merge.rc:2476"
+    ID_VIEW_TABLELAYOUT           "Merge.rc:2477"
+    ID_EDIT_COPY_LINENUMBERS      "Merge.rc:2478"
+    ID_DIR_RESCAN                 "Merge.rc:2479"
+    ID_EDIT_TOGGLE_BOOKMARK       "Merge.rc:2480"
+    ID_EDIT_GOTO_NEXT_BOOKMARK    "Merge.rc:2481"
+    ID_EDIT_GOTO_PREV_BOOKMARK    "Merge.rc:2482"
+    ID_EDIT_CLEAR_ALL_BOOKMARKS   "Merge.rc:2483"
+    ID_OPTIONS_SHOWIDENTICAL      "Merge.rc:2484"
+    ID_OPTIONS_SHOWDIFFERENT      "Merge.rc:2485"
+    ID_OPTIONS_SHOWUNIQUELEFT     "Merge.rc:2486"
+    ID_OPTIONS_SHOWUNIQUERIGHT    "Merge.rc:2487"
+    ID_OPTIONS_SHOWBINARIES       "Merge.rc:2488"
+    ID_OPTIONS_SHOWSKIPPED        "Merge.rc:2489"
+    ID_VIEW_SELECTFONT            "Merge.rc:2490"
+    ID_VIEW_USEDEFAULTFONT        "Merge.rc:2491"
+    ID_VIEW_WHITESPACE            "Merge.rc:2492"
+    ID_VIEW_DETAIL_BAR            "Merge.rc:2493"
+    ID_VIEW_LOCATION_BAR          "Merge.rc:2494"
+    ID_VIEW_IMAGETOOLBOX          "Merge.rc:2495"
+    ID_VIEW_DIR_STATISTICS        "Merge.rc:2496"
+    ID_VIEW_LANGUAGE              "Merge.rc:2497"
+    ID_VIEW_LINEDIFFS             "Merge.rc:2498"
+    ID_VIEW_SWAPPANES             "Merge.rc:2499"
+    ID_VIEW_LINENUMBERS           "Merge.rc:2500"
+    ID_VIEW_WORDWRAP              "Merge.rc:2501"
+    ID_VIEW_FILEMARGIN            "Merge.rc:2502"
+    ID_VIEW_RULER                 "Merge.rc:2503"
+    ID_VIEW_ZOOMIN                "Merge.rc:2504"
+    ID_VIEW_ZOOMOUT               "Merge.rc:2505"
+    ID_VIEW_ZOOMNORMAL            "Merge.rc:2506"
+    ID_PREVDIFF                   "Merge.rc:2507"
+    ID_NEXTDIFF                   "Merge.rc:2508"
+    ID_FIRSTDIFF                  "Merge.rc:2509"
+    ID_CURDIFF                    "Merge.rc:2510"
+    ID_LASTDIFF                   "Merge.rc:2511"
+    ID_L2R                        "Merge.rc:2512"
+    ID_R2L                        "Merge.rc:2513"
+    ID_L2RNEXT                    "Merge.rc:2514"
+    ID_R2LNEXT                    "Merge.rc:2515"
+    ID_ALL_RIGHT                  "Merge.rc:2516"
+    ID_ALL_LEFT                   "Merge.rc:2517"
+    ID_MERGE_DELETE               "Merge.rc:2518"
+    ID_MERGE_COMPARE              "Merge.rc:2519"
+    ID_TOOLS_CUSTOMIZECOLUMNS     "Merge.rc:2520"
+    ID_TOOLS_GENERATEPATCH        "Merge.rc:2521"
+    ID_TOOLS_FILTERS              "Merge.rc:2522"
+    ID_TOOLS_GENERATEREPORT       "Merge.rc:2523"
+    ID_WINDOW_CHANGE_PANE         "Merge.rc:2524"
+    ID_WINDOW_CLOSEALL            "Merge.rc:2525"
+    ID_HELP_CONTENTS              "Merge.rc:2526"
+    ID_HELP_GETCONFIG             "Merge.rc:2527"
+    IDS_PRIVATEBUILD_FMT          "Merge.rc:2528"
+    ID_HELP_RELEASENOTES          "Merge.rc:2529"
+    ID_HELP_TRANSLATIONS          "Merge.rc:2530"
+    IDS_USERCHOICE_NONE           "Merge.rc:2531"
+    ID_FILE_OPEN_REGISTERED       "Merge.rc:2532"
+    ID_FILE_OPEN_WITHEDITOR       "Merge.rc:2533"
+    ID_FILE_OPEN_WITH             "Merge.rc:2534"
+    ID_DISPLAY_MOVED_NONE         "Merge.rc:2535"
+    ID_DISPLAY_MOVED_ALL          "Merge.rc:2536"
+    ID_DISPLAY_MOVED_FOLLOW_DIFF  "Merge.rc:2537"
+    ID_LOCBAR_GOTOLINE            "Merge.rc:2538"
+    IDS_AUTOCOMPLETE_DISABLED     "Merge.rc:2539"
+    IDS_AUTOCOMPLETE_FILE_SYS     "Merge.rc:2540"
+    IDS_AUTOCOMPLETE_MRU          "Merge.rc:2541"
+    ID_TOOLBAR_NONE               "Merge.rc:2542"
+    ID_TOOLBAR_SMALL              "Merge.rc:2543"
+    ID_TOOLBAR_BIG                "Merge.rc:2544"
+    IDS_SELECTION_LEFT            "Merge.rc:2545"
+    IDS_SELECTION_RIGHT           "Merge.rc:2546"
+    IDS_PRINT                     "Merge.rc:2547"
+    IDS_PAGE_SETUP                "Merge.rc:2548"
+    IDS_PAGE_ZOOM                 "Merge.rc:2549"
+    IDS_CONTENT_ZOOM              "Merge.rc:2550"
+    IDS_LINE_EXCLUDED             "Merge.rc:2551"
+    IDS_LINES_EXCLUDED            "Merge.rc:2552"
+    IDS_SHELL_CONTEXT_MENU        "Merge.rc:2553"
+    IDS_EXCEL_DATA_LOSS_WARNING   "Merge.rc:2554"
+    IDS_WHITESPACE_LOSS_WARNING   "Merge.rc:2555"
+    IDS_CODEPAGE_RELOAD_FILE      "Merge.rc:2556"
+    IDS_LEXER_RECOGNIZE_HTML4_TAGS"Merge.rc:2557"
+    IDS_LEXER_RECOGNIZE_HTML5_TAGS"Merge.rc:2558"
+    IDS_LEXER_RECOGNIZE_MWSL_TAG  "Merge.rc:2559"
 }
 
 
