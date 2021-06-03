@@ -66,7 +66,6 @@ private:
 	LRESULT OnWndMsg(WPARAM, LPARAM);
 
 	void OnToolsCompareSelection();
-	void OnEnable();
 
 	BYTE m_cmdStateSaveLeft;
 	BYTE m_cmdStateSaveRight;
@@ -97,6 +96,6 @@ private:
 	CMyComPtr<IAccessible> m_spAccRightHeader;
 	CMyComPtr<IAccessible> m_spAccLeftGrid;
 	CMyComPtr<IAccessible> m_spAccRightGrid;
-
-	std::vector<String> m_editText;
+	CMyComPtr<IAccessible> m_spAccLeftGridClient;
+	CMyComPtr<IAccessible> m_spAccRightGridClient;
 };

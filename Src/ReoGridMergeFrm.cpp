@@ -48,6 +48,16 @@ static void GetAccessibleValue(IAccessible *accessible, String &value)
 	value.assign(bstr, bstr.Length());
 }
 
+static void PutAccessibleValue(IAccessible *accessible, String const &value)
+{
+	VARIANT var;
+	var.vt = VT_I4;
+	var.lVal = CHILDID_SELF;
+	CMyComBSTR bstr(value.length(), value.c_str());
+	if (accessible)
+		accessible->put_accValue(var, bstr);
+}
+
 static long GetAccessibleState(IAccessible *accessible)
 {
 	VARIANT var;
@@ -228,6 +238,10 @@ void CReoGridMergeFrame::OpenDocs(
 								m_spAccLeftHeader = windowChildren.Find(NULL, ROLE_SYSTEM_TEXT);
 							}
 							m_spAccLeftGrid = clientChildren.Find(L"Grid", ROLE_SYSTEM_WINDOW);
+							if (AccChildren windowChildren = m_spAccLeftGrid)
+							{
+								m_spAccLeftGridClient = windowChildren.Find(L"Grid", ROLE_SYSTEM_CLIENT);
+							}
 						}
 					}
 					if (AccChildren windowChildren = clientChildren.Find(L"RightPanel", ROLE_SYSTEM_WINDOW))
@@ -239,6 +253,10 @@ void CReoGridMergeFrame::OpenDocs(
 								m_spAccRightHeader = windowChildren.Find(NULL, ROLE_SYSTEM_TEXT);
 							}
 							m_spAccRightGrid = clientChildren.Find(L"Grid", ROLE_SYSTEM_WINDOW);
+							if (AccChildren windowChildren = m_spAccRightGrid)
+							{
+								m_spAccRightGridClient = windowChildren.Find(L"Grid", ROLE_SYSTEM_CLIENT);
+							}
 						}
 					}
 				}
@@ -365,7 +383,13 @@ bool CReoGridMergeFrame::SaveModified()
  */
 void CReoGridMergeFrame::ReplaceSelection(int pane, String const &text)
 {
-	m_editText[pane] = text;
+	if (IAccessible *accessible =
+		pane == 0 ? m_spAccLeftGridClient :
+		pane == 1 ? m_spAccRightGridClient :
+		NULL)
+	{
+		PutAccessibleValue(accessible, text);
+	}
 }
 
 /**
@@ -403,76 +427,32 @@ void CReoGridMergeFrame::UpdateCmdUI()
 
 void CReoGridMergeFrame::OnToolsCompareSelection()
 {
-	if (m_editText.empty())
-	{
-		m_editText.resize(2);
-		if (HWND const hwnd = GetAccessibleHWnd(m_spAccLeftGrid))
-		{
-			::SetFocus(hwnd);
-			::SendMessage(hwnd, WM_KEYDOWN, VK_F2, 0);
-			if (HEdit *pwndEdit = GetFocusedEditControl())
-			{
-				pwndEdit->GetWindowText(m_editText[0]);
-				::SetFocus(hwnd);
-			}
-		}
-		if (HWND const hwnd = GetAccessibleHWnd(m_spAccRightGrid))
-		{
-			::SetFocus(hwnd);
-			::SendMessage(hwnd, WM_KEYDOWN, VK_F2, 0);
-			if (HEdit *pwndEdit = GetFocusedEditControl())
-			{
-				pwndEdit->GetWindowText(m_editText[1]);
-				::SetFocus(hwnd);
-			}
-		}
-	}
 	FileLocation filelocLeft, filelocRight;
 	filelocLeft.description = LanguageSelect.LoadString(IDS_SELECTION_LEFT);
 	filelocRight.description = LanguageSelect.LoadString(IDS_SELECTION_RIGHT);
 	CChildFrame *const pMergeDoc = new CChildFrame(m_pMDIFrame, NULL, this);
 	pMergeDoc->OpenDocs(filelocLeft, filelocRight, FALSE, FALSE);
-	int nSide = 0;
+	int pane = 0;
 	do
 	{
-		CDiffTextBuffer *const pTargetBuf = pMergeDoc->m_ptBuf[nSide];
-		CMergeEditView *const pTargetView = pMergeDoc->GetView(nSide);
+		CDiffTextBuffer *const pTargetBuf = pMergeDoc->m_ptBuf[pane];
+		CMergeEditView *const pTargetView = pMergeDoc->GetView(pane);
+		String text;
+		if (IAccessible *accessible =
+			pane == 0 ? m_spAccLeftGridClient :
+			pane == 1 ? m_spAccRightGridClient :
+			NULL)
+		{
+			GetAccessibleValue(accessible, text);
+		}
 		// Trick the TextBuffer to flag the to-be-inserted text as revision 0.
 		--pTargetBuf->m_dwCurrentRevisionNumber;
 		pTargetBuf->InsertText(pTargetView, 0, 0,
-			m_editText[nSide].c_str(), m_editText[nSide].length(), CE_ACTION_UNKNOWN, FALSE);
+			text.c_str(), text.length(), CE_ACTION_UNKNOWN, FALSE);
 		pTargetBuf->SetModified(false);
-	} while (nSide ^= 1);
+	} while (pane ^= 1);
 	pMergeDoc->FlushAndRescan();
 	pMergeDoc->ActivateFrame();
-}
-
-void CReoGridMergeFrame::OnEnable()
-{
-	if (!m_editText.empty())
-	{
-		if (HWND const hwnd = GetAccessibleHWnd(m_spAccLeftGrid))
-		{
-			::SetFocus(hwnd);
-			::SendMessage(hwnd, WM_KEYDOWN, VK_F2, 0);
-			if (HEdit *pwndEdit = GetFocusedEditControl())
-			{
-				pwndEdit->SetWindowText(m_editText[0].c_str());
-				::SetFocus(hwnd);
-			}
-		}
-		if (HWND const hwnd = GetAccessibleHWnd(m_spAccRightGrid))
-		{
-			::SetFocus(hwnd);
-			::SendMessage(hwnd, WM_KEYDOWN, VK_F2, 0);
-			if (HEdit *pwndEdit = GetFocusedEditControl())
-			{
-				pwndEdit->SetWindowText(m_editText[1].c_str());
-				::SetFocus(hwnd);
-			}
-		}
-		m_editText.clear();
-	}
 }
 
 /**
@@ -651,10 +631,6 @@ LRESULT CReoGridMergeFrame::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		CMainFrame::DoDefaultAction(m_spAccExit);
 		// Recover from main window occasionally being left inactive
 		m_pMDIFrame->SetActiveWindow();
-		break;
-	case WM_ENABLE:
-		if (wParam != 0)
-			OnEnable();
 		break;
 	}
 	return CDocFrame::WindowProc(uMsg, wParam, lParam);
