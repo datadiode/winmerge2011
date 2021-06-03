@@ -87,7 +87,7 @@ class CChildFrame
 	class DiffMap;
 	friend DiffMap;
 public:
-	CChildFrame(CMainFrame *, CDirFrame * = NULL, CChildFrame *pOpener = NULL);
+	CChildFrame(CMainFrame *, CDirFrame * = NULL, CEditorFrame *pOpener = NULL);
 
 	// IElementBehaviorFactory
 	STDMETHOD(FindBehavior)(BSTR, BSTR, IElementBehaviorSite *, IElementBehavior **);
@@ -134,7 +134,7 @@ public:
 	void UpdateHeaderPath(int pane);
 	void UpdateHeaderActivity(int pane, bool bActivate);
 	void RefreshOptions();
-	void OpenDocs(FileLocation &, FileLocation &, bool bROLeft, bool bRORight);
+	virtual void OpenDocs(FileLocation &, FileLocation &, bool bROLeft, bool bRORight) override;
 	void SwitchEncoding(int index, UINT codepage, bool reload);
 	int RightLineInMovedBlock(int leftLine);
 	int LeftLineInMovedBlock(int rightLine);
@@ -152,7 +152,8 @@ public:
 	void GetWordDiffArray(int nLineIndex, std::vector<wdiff> &worddiffs) const;
 
 	bool CanLimitContext() const;
-	bool SaveModified();
+	virtual bool SaveModified() override;
+	virtual void ReplaceSelection(int pane, String const &text) override;
 	void SetTitle();
 
 // Attributes
@@ -162,7 +163,7 @@ public:
 
 	UINT m_idContextLines;
 
-	CChildFrame *const m_pOpener;
+	CEditorFrame *const m_pOpener;
 	CDiffTextBuffer *m_ptBuf[MERGE_VIEW_COUNT]; /**< Left/Right side text buffer */
 
 	DiffList m_diffList;

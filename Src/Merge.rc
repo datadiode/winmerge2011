@@ -534,6 +534,7 @@ IDR_REOGRIDDOCTYPE MENU
     {
         MENUITEM "&Filters...", ID_TOOLS_FILTERS
         MENUITEM "&Generate Patch...", ID_TOOLS_GENERATEPATCH
+        MENUITEM "Compare &Selection...", ID_TOOLS_COMPARE_SELECTION
     }
     POPUP "&Window"
     {

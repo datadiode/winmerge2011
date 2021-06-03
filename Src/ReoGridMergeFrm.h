@@ -23,8 +23,9 @@ public:
 	CReoGridMergeFrame(CMainFrame *, CDirFrame * = NULL);
 
 // Operations
-	void OpenDocs(FileLocation &, FileLocation &, bool bROLeft, bool bRORight);
-	bool SaveModified();
+	virtual void OpenDocs(FileLocation &, FileLocation &, bool bROLeft, bool bRORight) override;
+	virtual bool SaveModified() override;
+	virtual void ReplaceSelection(int pane, String const &text) override;
 	void UpdateResources();
 
 	virtual void RecalcLayout() override;
@@ -64,6 +65,9 @@ private:
 	template<UINT>
 	LRESULT OnWndMsg(WPARAM, LPARAM);
 
+	void OnToolsCompareSelection();
+	void OnEnable();
+
 	BYTE m_cmdStateSaveLeft;
 	BYTE m_cmdStateSaveRight;
 
@@ -93,4 +97,6 @@ private:
 	CMyComPtr<IAccessible> m_spAccRightHeader;
 	CMyComPtr<IAccessible> m_spAccLeftGrid;
 	CMyComPtr<IAccessible> m_spAccRightGrid;
+
+	std::vector<String> m_editText;
 };

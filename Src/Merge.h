@@ -191,6 +191,7 @@ protected:
 public:
 	virtual void OpenDocs(FileLocation &filelocLeft, FileLocation &filelocRight, bool bROLeft, bool bRORight) = 0;
 	virtual bool SaveModified() = 0;
+	virtual void ReplaceSelection(int, String const &) { }
 	void DirDocClosing(CDirFrame *pDirDoc)
 	{
 		ASSERT(m_pDirDoc == pDirDoc);

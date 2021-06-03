@@ -1,5 +1,6 @@
 [WinMergeTag]
 Changes since preceding release (not necessarily complete):
+• ReoGridMergeFrm: Tools > Compare Selection compares selected cells in detail
 • Upgrade Toxy to recognize template flavors of supported office file types
 • Upgrade ReoGrid and B2XTranslator for recent bug fixes
 • asp.cpp: Fix some classic ASP/JSP/PHP syntax highlighting glitches

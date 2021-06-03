@@ -897,7 +897,7 @@ const LONG CChildFrame::FloatScriptDiffViewBar[] =
 /**
  * @brief Constructor.
  */
-CChildFrame::CChildFrame(CMainFrame *pMDIFrame, CDirFrame *pDirDoc, CChildFrame *pOpener)
+CChildFrame::CChildFrame(CMainFrame *pMDIFrame, CDirFrame *pDirDoc, CEditorFrame *pOpener)
 : CEditorFrame(pMDIFrame, pDirDoc, GetHandleSet<IDR_MERGEDOCTYPE>(), FloatScript, SplitScript)
 , m_pOpener(pOpener)
 #pragma warning(disable:warning_this_used_in_base_member_initializer_list)

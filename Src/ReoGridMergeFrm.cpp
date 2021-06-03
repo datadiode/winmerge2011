@@ -14,6 +14,7 @@
 #include "Merge.h"
 #include "MainFrm.h"
 #include "DirFrame.h"
+#include "MergeEditView.h"
 #include "LanguageSelect.h"
 #include "SaveClosingDlg.h"
 #include "ReoGridMergeFrm.h"
@@ -360,6 +361,14 @@ bool CReoGridMergeFrame::SaveModified()
 }
 
 /**
+ * @brief Replace selection upon File > Save from Tools > Compare Selection
+ */
+void CReoGridMergeFrame::ReplaceSelection(int pane, String const &text)
+{
+	m_editText[pane] = text;
+}
+
+/**
  * @brief Update any resources necessary after a GUI language change
  */
 void CReoGridMergeFrame::UpdateResources()
@@ -390,6 +399,80 @@ void CReoGridMergeFrame::UpdateCmdUI()
 		SetTitle();
 	}
 	UpdateLastCompareResult();
+}
+
+void CReoGridMergeFrame::OnToolsCompareSelection()
+{
+	if (m_editText.empty())
+	{
+		m_editText.resize(2);
+		if (HWND const hwnd = GetAccessibleHWnd(m_spAccLeftGrid))
+		{
+			::SetFocus(hwnd);
+			::SendMessage(hwnd, WM_KEYDOWN, VK_F2, 0);
+			if (HEdit *pwndEdit = GetFocusedEditControl())
+			{
+				pwndEdit->GetWindowText(m_editText[0]);
+				::SetFocus(hwnd);
+			}
+		}
+		if (HWND const hwnd = GetAccessibleHWnd(m_spAccRightGrid))
+		{
+			::SetFocus(hwnd);
+			::SendMessage(hwnd, WM_KEYDOWN, VK_F2, 0);
+			if (HEdit *pwndEdit = GetFocusedEditControl())
+			{
+				pwndEdit->GetWindowText(m_editText[1]);
+				::SetFocus(hwnd);
+			}
+		}
+	}
+	FileLocation filelocLeft, filelocRight;
+	filelocLeft.description = LanguageSelect.LoadString(IDS_SELECTION_LEFT);
+	filelocRight.description = LanguageSelect.LoadString(IDS_SELECTION_RIGHT);
+	CChildFrame *const pMergeDoc = new CChildFrame(m_pMDIFrame, NULL, this);
+	pMergeDoc->OpenDocs(filelocLeft, filelocRight, FALSE, FALSE);
+	int nSide = 0;
+	do
+	{
+		CDiffTextBuffer *const pTargetBuf = pMergeDoc->m_ptBuf[nSide];
+		CMergeEditView *const pTargetView = pMergeDoc->GetView(nSide);
+		// Trick the TextBuffer to flag the to-be-inserted text as revision 0.
+		--pTargetBuf->m_dwCurrentRevisionNumber;
+		pTargetBuf->InsertText(pTargetView, 0, 0,
+			m_editText[nSide].c_str(), m_editText[nSide].length(), CE_ACTION_UNKNOWN, FALSE);
+		pTargetBuf->SetModified(false);
+	} while (nSide ^= 1);
+	pMergeDoc->FlushAndRescan();
+	pMergeDoc->ActivateFrame();
+}
+
+void CReoGridMergeFrame::OnEnable()
+{
+	if (!m_editText.empty())
+	{
+		if (HWND const hwnd = GetAccessibleHWnd(m_spAccLeftGrid))
+		{
+			::SetFocus(hwnd);
+			::SendMessage(hwnd, WM_KEYDOWN, VK_F2, 0);
+			if (HEdit *pwndEdit = GetFocusedEditControl())
+			{
+				pwndEdit->SetWindowText(m_editText[0].c_str());
+				::SetFocus(hwnd);
+			}
+		}
+		if (HWND const hwnd = GetAccessibleHWnd(m_spAccRightGrid))
+		{
+			::SetFocus(hwnd);
+			::SendMessage(hwnd, WM_KEYDOWN, VK_F2, 0);
+			if (HEdit *pwndEdit = GetFocusedEditControl())
+			{
+				pwndEdit->SetWindowText(m_editText[1].c_str());
+				::SetFocus(hwnd);
+			}
+		}
+		m_editText.clear();
+	}
 }
 
 /**
@@ -520,6 +603,9 @@ LRESULT CReoGridMergeFrame::OnWndMsg<WM_COMMAND>(WPARAM wParam, LPARAM lParam)
 			::SetFocus(hwnd);
 		}
 		break;
+	case ID_TOOLS_COMPARE_SELECTION:
+		OnToolsCompareSelection();
+		break;
 	case ID_REFRESH:
 		CMainFrame::DoDefaultAction(m_spAccRecalculate);
 		break;
@@ -554,6 +640,7 @@ LRESULT CReoGridMergeFrame::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			m_pMDIFrame->UpdateCmdUI<ID_EDIT_COPY>(MF_ENABLED);
 			m_pMDIFrame->UpdateCmdUI<ID_EDIT_PASTE>(MF_ENABLED);
 			m_pMDIFrame->UpdateCmdUI<ID_REFRESH>(MF_ENABLED);
+			m_pMDIFrame->UpdateCmdUI<ID_TOOLS_COMPARE_SELECTION>(MF_ENABLED);
 			UpdateCmdUI();
 		}
 		break;
@@ -564,6 +651,10 @@ LRESULT CReoGridMergeFrame::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		CMainFrame::DoDefaultAction(m_spAccExit);
 		// Recover from main window occasionally being left inactive
 		m_pMDIFrame->SetActiveWindow();
+		break;
+	case WM_ENABLE:
+		if (wParam != 0)
+			OnEnable();
 		break;
 	}
 	return CDocFrame::WindowProc(uMsg, wParam, lParam);

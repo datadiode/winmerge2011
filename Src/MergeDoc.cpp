@@ -932,7 +932,7 @@ bool CChildFrame::DoSave(bool &bSaveSuccess, int nBuffer)
 		const int nEndChar = pView->GetLineLength(nEndLine);
 		String text;
 		pView->GetText(0, 0, nEndLine, nEndChar, text);
-		m_pOpener->m_pView[nBuffer]->ReplaceSelection(text.c_str(), text.length());
+		m_pOpener->ReplaceSelection(nBuffer, text);
 		CDiffTextBuffer *const pBuf = m_ptBuf[nBuffer];
 		pBuf->SetModified(false);
 		// remember revision number on save
@@ -1661,6 +1661,14 @@ bool CChildFrame::SaveModified()
 	}
 
 	return result;
+}
+
+/**
+ * @brief Replace selection upon File > Save from Tools > Compare Selection
+ */
+void CChildFrame::ReplaceSelection(int pane, String const &text)
+{
+	m_pView[pane]->ReplaceSelection(text.c_str(), text.length());
 }
 
 /** Rescan only if we did not Rescan during the last timeOutInSecond seconds*/
