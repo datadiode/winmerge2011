@@ -445,6 +445,7 @@ void CReoGridMergeFrame::OnToolsCompareSelection()
 		{
 			GetAccessibleValue(accessible, text);
 		}
+		pTargetBuf->SetCRLFMode(CRLF_STYLE_UNIX); // as per empirical evidence
 		// Trick the TextBuffer to flag the to-be-inserted text as revision 0.
 		--pTargetBuf->m_dwCurrentRevisionNumber;
 		pTargetBuf->InsertText(pTargetView, 0, 0,
