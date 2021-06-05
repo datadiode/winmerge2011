@@ -922,6 +922,11 @@ void CMergeEditView::OnConvertEolTo(UINT nID)
 		m_pDocument->UpdateHeaderPath(m_nThisPane);
 		m_pDocument->FlushAndRescan();
 	}
+	else
+	{
+		SetCRLFModeStatus(nStyle);
+		m_pDocument->UpdateCRLFModeCmdUI();
+	}
 }
 
 /**

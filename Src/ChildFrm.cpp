@@ -1144,6 +1144,24 @@ void CChildFrame::UpdateEditCmdUI()
 		MF_ENABLED : MF_GRAYED);
 }
 
+void CChildFrame::UpdateCRLFModeCmdUI()
+{
+	CMergeEditView *const pMergeView = GetActiveMergeView();
+	CDiffTextBuffer *const pTextBuffer = m_ptBuf[pMergeView->m_nThisPane];
+	BYTE const enable = pMergeView->QueryEditable() ? MF_ENABLED : MF_GRAYED;
+	int nStyle = pTextBuffer->GetCRLFMode();
+	if (COptionsMgr::Get(OPT_ALLOW_MIXED_EOL) || IsMixedEOL(pMergeView->m_nThisPane))
+	{
+		nStyle = CRLF_STYLE_AUTOMATIC;
+	}
+	m_pMDIFrame->UpdateCmdUI<ID_EOL_TO_DOS>(
+		enable | (nStyle == CRLF_STYLE_DOS ? MF_CHECKED : 0));
+	m_pMDIFrame->UpdateCmdUI<ID_EOL_TO_UNIX>(
+		enable | (nStyle == CRLF_STYLE_UNIX ? MF_CHECKED : 0));
+	m_pMDIFrame->UpdateCmdUI<ID_EOL_TO_MAC>(
+		enable | (nStyle == CRLF_STYLE_MAC ? MF_CHECKED : 0));
+}
+
 void CChildFrame::UpdateGeneralCmdUI()
 {
 	int firstDiff, lastDiff;
@@ -1223,19 +1241,7 @@ void CChildFrame::UpdateGeneralCmdUI()
 	m_pMDIFrame->UpdateCmdUI<ID_EDIT_REPLACE>(enable);
 
 	// EOL style
-	CDiffTextBuffer *const pTextBuffer = m_ptBuf[pMergeView->m_nThisPane];
-	int nStyle = pTextBuffer->GetCRLFMode();
-	if (COptionsMgr::Get(OPT_ALLOW_MIXED_EOL) ||
-		IsMixedEOL(pMergeView->m_nThisPane))
-	{
-		nStyle = CRLF_STYLE_AUTOMATIC;
-	}
-	m_pMDIFrame->UpdateCmdUI<ID_EOL_TO_DOS>(
-		enable | (nStyle == CRLF_STYLE_DOS ? MF_CHECKED : 0));
-	m_pMDIFrame->UpdateCmdUI<ID_EOL_TO_UNIX>(
-		enable | (nStyle == CRLF_STYLE_UNIX ? MF_CHECKED : 0));
-	m_pMDIFrame->UpdateCmdUI<ID_EOL_TO_MAC>(
-		enable | (nStyle == CRLF_STYLE_MAC ? MF_CHECKED : 0));
+	UpdateCRLFModeCmdUI();
 
 	// Bookmarks
 	UpdateBookmarkUI();

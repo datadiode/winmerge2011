@@ -105,6 +105,7 @@ public:
 	void UpdateCmdUI();
 	void UpdateReadOnlyCmdUI();
 	void UpdateEditCmdUI();
+	void UpdateCRLFModeCmdUI();
 	void UpdateGeneralCmdUI();
 	void UpdateBookmarkUI();
 	void UpdateSyncPointUI();
