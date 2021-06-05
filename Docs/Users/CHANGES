@@ -1,5 +1,7 @@
 [WinMergeTag]
 Changes since preceding release (not necessarily complete):
+• Assign Ctrl+K as keyboard shortcut for Tools > Compare Selection
+• MergeEditView: GUI overlooked EOL mode change when file had no EOLs at all
 • ReoGridMergeFrm: Tools > Compare Selection compares selected cells in detail
 • Upgrade Toxy to recognize template flavors of supported office file types
 • Upgrade ReoGrid and B2XTranslator for recent bug fixes
