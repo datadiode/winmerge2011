@@ -1069,8 +1069,8 @@ msgstr "Lyginti ið paveikslëlio iðtrauktà &tekstà"
 #: Merge.rc:537
 #: Merge.rc:873
 #, c-format
-msgid "Compare &Selection..."
-msgstr "Lyginti paþymëtà &sritá..."
+msgid "Compare &Selection...\tCtrl+K"
+msgstr "Lyginti paþymëtà &sritá...\tCtrl+K"
 
 #: Merge.rc:614
 #, c-format

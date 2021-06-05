@@ -534,7 +534,7 @@ IDR_REOGRIDDOCTYPE MENU
     {
         MENUITEM "&Filters...", ID_TOOLS_FILTERS
         MENUITEM "&Generate Patch...", ID_TOOLS_GENERATEPATCH
-        MENUITEM "Compare &Selection...", ID_TOOLS_COMPARE_SELECTION
+        MENUITEM "Compare &Selection...\tCtrl+K", ID_TOOLS_COMPARE_SELECTION
     }
     POPUP "&Window"
     {
@@ -870,7 +870,7 @@ IDR_MERGEDOCTYPE MENU
         MENUITEM "&Filters...", ID_TOOLS_FILTERS
         MENUITEM "&Generate Patch...", ID_TOOLS_GENERATEPATCH
         MENUITEM "Generate &Report...", ID_TOOLS_GENERATEREPORT
-        MENUITEM "Compare &Selection...", ID_TOOLS_COMPARE_SELECTION
+        MENUITEM "Compare &Selection...\tCtrl+K", ID_TOOLS_COMPARE_SELECTION
     }
     POPUP "&Window"
     {
@@ -2603,6 +2603,7 @@ IDR_MAINFRAME ACCELERATORS
     "G",            ID_EDIT_WMGOTO, VIRTKEY, CONTROL
     "H",            ID_EDIT_REPLACE, VIRTKEY, CONTROL
     "J",            ID_FILE_OPENPROJECT, VIRTKEY, CONTROL
+    "K",            ID_TOOLS_COMPARE_SELECTION, VIRTKEY, CONTROL
     "L",            ID_EDIT_LOWERCASE, VIRTKEY, CONTROL, SHIFT
     "M",            ID_VIEW_SEPARATE_COMBINING_CHARS, VIRTKEY, CONTROL
     "N",            ID_FILE_NEW, VIRTKEY, CONTROL

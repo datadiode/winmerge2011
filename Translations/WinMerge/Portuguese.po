@@ -1068,8 +1068,8 @@ msgstr ""
 #: Merge.rc:537
 #: Merge.rc:873
 #, c-format
-msgid "Compare &Selection..."
-msgstr "Comparar &selecção..."
+msgid "Compare &Selection...\tCtrl+K"
+msgstr "Comparar &selecção...\tCtrl+K"
 
 #: Merge.rc:614
 #, c-format

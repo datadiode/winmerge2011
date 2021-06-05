@@ -1066,8 +1066,8 @@ msgstr ""
 #: Merge.rc:537
 #: Merge.rc:873
 #, c-format
-msgid "Compare &Selection..."
-msgstr "‘I‘ğ‰ÓŠ‚ğ”äŠr(&S)"
+msgid "Compare &Selection...\tCtrl+K"
+msgstr "‘I‘ğ‰ÓŠ‚ğ”äŠr(&S)\tCtrl+K"
 
 #: Merge.rc:614
 #, c-format
