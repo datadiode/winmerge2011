@@ -41,7 +41,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///////////////////////////////////////////////////////////////////////////////
 // ReadMe
 //
-// This file implements the default application allocator. 
+// This file implements the default application allocator.
 // You can replace this allocator.cpp file with a different one,
 // you can define EASTL_USER_DEFINED_ALLOCATOR below to ignore this file,
 // or you can modify the EASTL config.h file to redefine how allocators work.
@@ -54,7 +54,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     {
 
         /// gDefaultAllocator
-        /// Default global allocator instance. 
+        /// Default global allocator instance.
         EASTL_API allocator   gDefaultAllocator;
         EASTL_API allocator* gpDefaultAllocator = &gDefaultAllocator;
 

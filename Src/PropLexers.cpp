@@ -21,7 +21,7 @@
 /**
  * @brief Constructor.
  */
-PropLexers::PropLexers() 
+PropLexers::PropLexers()
 : OptionsPanel(IDD_PROPPAGE_LEXERS, sizeof *this)
 {
 }
@@ -115,7 +115,7 @@ LRESULT PropLexers::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	return OptionsPanel::WindowProc(message, wParam, lParam);
 }
 
-/** 
+/**
  * @brief Reads options values from storage to UI.
  * Property sheet calls this before displaying GUI to load values
  * into members.
@@ -124,7 +124,7 @@ void PropLexers::ReadOptions()
 {
 }
 
-/** 
+/**
  * @brief Writes options values from UI to storage.
  * Property sheet calls this after dialog is closed with OK button to
  * store values in member variables.

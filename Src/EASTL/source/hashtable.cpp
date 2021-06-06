@@ -46,9 +46,9 @@ namespace eastl
     /// gpEmptyBucketArray
     ///
     /// A shared representation of an empty hash table. This is present so that
-    /// a new empty hashtable allocates no memory. It has two entries, one for 
+    /// a new empty hashtable allocates no memory. It has two entries, one for
     /// the first lone empty (NULL) bucket, and one for the non-NULL trailing sentinel.
-    /// 
+    ///
     EASTL_API void* gpEmptyBucketArray[2] = { NULL, (void*)uintptr_t(~0) };
 
 
@@ -58,7 +58,7 @@ namespace eastl
     /// This is an array of prime numbers. This is the same set of prime
     /// numbers suggested by the C++ standard proposal. These are numbers
     /// which are separated by 8% per entry.
-    /// 
+    ///
     /// To consider: Allow the user to specify their own prime number array.
     ///
     const uint32_t gPrimeNumberArray[] =
@@ -152,7 +152,7 @@ namespace eastl
 
 
     /// GetBucketCount
-    /// Return the smallest prime p such that alpha p >= nElementCount, where alpha 
+    /// Return the smallest prime p such that alpha p >= nElementCount, where alpha
     /// is the load factor. This function has a side effect of updating mnNextResize.
     ///
     uint32_t prime_rehash_policy::GetBucketCount(uint32_t nElementCount) const

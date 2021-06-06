@@ -39,7 +39,7 @@ namespace eastl
     /// gEmptyString
     ///
     /// gEmptyString is used for empty strings. This allows us to avoid allocating
-    /// memory for empty strings without having to add null pointer checks. 
+    /// memory for empty strings without having to add null pointer checks.
     /// The downside of this technique is that all empty strings share this same
     /// value and if any code makes an error and writes to this value with non-zero,
     /// then all existing empty strings will be wrecked and not just the one that

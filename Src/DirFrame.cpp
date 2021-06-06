@@ -88,19 +88,19 @@ CDirFrame::CDirFrame(CMainFrame *pMDIFrame)
 , m_nCompMethod(-1)
 , m_pTempPathContext(NULL)
 {
-    try
-    {
-	    Subclass(pMDIFrame->CreateChildHandle());
-	    LoadIcon(CompareStats::DIFFIMG_DIR);
-	    CreateClient();
-	    RecalcLayout();
-	    m_bAutoDelete = true;
-    }
-    catch (OException *)
-    {
+	try
+	{
+		Subclass(pMDIFrame->CreateChildHandle());
+		LoadIcon(CompareStats::DIFFIMG_DIR);
+		CreateClient();
+		RecalcLayout();
+		m_bAutoDelete = true;
+	}
+	catch (OException *)
+	{
 		Unconstruct();
 		throw;
-    }
+	}
 }
 
 /**

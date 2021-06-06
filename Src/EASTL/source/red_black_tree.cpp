@@ -29,14 +29,14 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// The tree insert and erase functions below are based on the original 
+// The tree insert and erase functions below are based on the original
 // HP STL tree functions. Use of these functions was been approved by
 // EA legal on November 4, 2005 and the approval documentation is available
 // from the EASTL maintainer or from the EA legal deparatment on request.
-// 
+//
 // Copyright (c) 1994
 // Hewlett-Packard Company
-// 
+//
 // Permission to use, copy, modify, distribute and sell this software
 // and its documentation for any purpose is hereby granted without fee,
 // provided that the above copyright notice appear in all copies and
@@ -68,18 +68,18 @@ namespace eastl
     ///
     EASTL_API rbtree_node_base* RBTreeIncrement(const rbtree_node_base* pNode)
     {
-        if(pNode->mpNodeRight) 
+        if(pNode->mpNodeRight)
         {
             pNode = pNode->mpNodeRight;
 
             while(pNode->mpNodeLeft)
                 pNode = pNode->mpNodeLeft;
         }
-        else 
+        else
         {
             rbtree_node_base* pNodeTemp = pNode->mpNodeParent;
 
-            while(pNode == pNodeTemp->mpNodeRight) 
+            while(pNode == pNodeTemp->mpNodeRight)
             {
                 pNode = pNodeTemp;
                 pNodeTemp = pNodeTemp->mpNodeParent;
@@ -113,7 +113,7 @@ namespace eastl
 
         rbtree_node_base* pNodeTemp = pNode->mpNodeParent;
 
-        while(pNode == pNodeTemp->mpNodeLeft) 
+        while(pNode == pNodeTemp->mpNodeLeft)
         {
             pNode     = pNodeTemp;
             pNodeTemp = pNodeTemp->mpNodeParent;
@@ -125,9 +125,9 @@ namespace eastl
 
 
     /// RBTreeGetBlackCount
-    /// Counts the number of black nodes in an red-black tree, from pNode down to the given bottom node.  
+    /// Counts the number of black nodes in an red-black tree, from pNode down to the given bottom node.
     /// We don't count red nodes because red-black trees don't really care about
-    /// red node counts; it is black node counts that are significant in the 
+    /// red node counts; it is black node counts that are significant in the
     /// maintenance of a balanced tree.
     ///
     EASTL_API size_t RBTreeGetBlackCount(const rbtree_node_base* pNodeTop, const rbtree_node_base* pNodeBottom)
@@ -136,10 +136,10 @@ namespace eastl
 
         for(; pNodeBottom; pNodeBottom = pNodeBottom->mpNodeParent)
         {
-            if(pNodeBottom->mColor == kRBTreeColorBlack) 
+            if(pNodeBottom->mColor == kRBTreeColorBlack)
                 ++nCount;
 
-            if(pNodeBottom == pNodeTop) 
+            if(pNodeBottom == pNodeTop)
                 break;
         }
 
@@ -148,7 +148,7 @@ namespace eastl
 
 
     /// RBTreeRotateLeft
-    /// Does a left rotation about the given node. 
+    /// Does a left rotation about the given node.
     /// If you want to understand tree rotation, any book on algorithms will
     /// discussion the topic in good detail.
     rbtree_node_base* RBTreeRotateLeft(rbtree_node_base* pNode, rbtree_node_base* pNodeRoot)
@@ -160,7 +160,7 @@ namespace eastl
         if(pNodeTemp->mpNodeLeft)
             pNodeTemp->mpNodeLeft->mpNodeParent = pNode;
         pNodeTemp->mpNodeParent = pNode->mpNodeParent;
-        
+
         if(pNode == pNodeRoot)
             pNodeRoot = pNodeTemp;
         else if(pNode == pNode->mpNodeParent->mpNodeLeft)
@@ -177,7 +177,7 @@ namespace eastl
 
 
     /// RBTreeRotateRight
-    /// Does a right rotation about the given node. 
+    /// Does a right rotation about the given node.
     /// If you want to understand tree rotation, any book on algorithms will
     /// discussion the topic in good detail.
     rbtree_node_base* RBTreeRotateRight(rbtree_node_base* pNode, rbtree_node_base* pNodeRoot)
@@ -207,11 +207,11 @@ namespace eastl
 
 
     /// RBTreeInsert
-    /// Insert a node into the tree and rebalance the tree as a result of the 
+    /// Insert a node into the tree and rebalance the tree as a result of the
     /// disturbance the node introduced.
     ///
     EASTL_API void RBTreeInsert(rbtree_node_base* pNode,
-                                rbtree_node_base* pNodeParent, 
+                                rbtree_node_base* pNodeParent,
                                 rbtree_node_base* pNodeAnchor,
                                 RBTreeSide insertionSide)
     {
@@ -245,24 +245,24 @@ namespace eastl
         }
 
         // Rebalance the tree.
-        while((pNode != pNodeRootRef) && (pNode->mpNodeParent->mColor == kRBTreeColorRed)) 
+        while((pNode != pNodeRootRef) && (pNode->mpNodeParent->mColor == kRBTreeColorRed))
         {
             rbtree_node_base* const pNodeParentParent = pNode->mpNodeParent->mpNodeParent;
 
-            if(pNode->mpNodeParent == pNodeParentParent->mpNodeLeft) 
+            if(pNode->mpNodeParent == pNodeParentParent->mpNodeLeft)
             {
                 rbtree_node_base* const pNodeTemp = pNodeParentParent->mpNodeRight;
 
-                if(pNodeTemp && (pNodeTemp->mColor == kRBTreeColorRed)) 
+                if(pNodeTemp && (pNodeTemp->mColor == kRBTreeColorRed))
                 {
                     pNode->mpNodeParent->mColor = kRBTreeColorBlack;
                     pNodeTemp->mColor = kRBTreeColorBlack;
                     pNodeParentParent->mColor = kRBTreeColorRed;
                     pNode = pNodeParentParent;
                 }
-                else 
+                else
                 {
-                    if(pNode == pNode->mpNodeParent->mpNodeRight) 
+                    if(pNode == pNode->mpNodeParent->mpNodeRight)
                     {
                         pNode = pNode->mpNodeParent;
                         pNodeRootRef = RBTreeRotateLeft(pNode, pNodeRootRef);
@@ -273,20 +273,20 @@ namespace eastl
                     pNodeRootRef = RBTreeRotateRight(pNodeParentParent, pNodeRootRef);
                 }
             }
-            else 
+            else
             {
                 rbtree_node_base* const pNodeTemp = pNodeParentParent->mpNodeLeft;
 
-                if(pNodeTemp && (pNodeTemp->mColor == kRBTreeColorRed)) 
+                if(pNodeTemp && (pNodeTemp->mColor == kRBTreeColorRed))
                 {
                     pNode->mpNodeParent->mColor = kRBTreeColorBlack;
                     pNodeTemp->mColor = kRBTreeColorBlack;
                     pNodeParentParent->mColor = kRBTreeColorRed;
                     pNode = pNodeParentParent;
                 }
-                else 
+                else
                 {
-                    if(pNode == pNode->mpNodeParent->mpNodeLeft) 
+                    if(pNode == pNode->mpNodeParent->mpNodeLeft)
                     {
                         pNode = pNode->mpNodeParent;
                         pNodeRootRef = RBTreeRotateRight(pNode, pNodeRootRef);
@@ -322,7 +322,7 @@ namespace eastl
             pNodeChild = pNodeSuccessor->mpNodeRight;  // pNodeChild might be null.
         else if(pNodeSuccessor->mpNodeRight == NULL)   // pNode has exactly one non-NULL child.
             pNodeChild = pNodeSuccessor->mpNodeLeft;   // pNodeChild is not null.
-        else 
+        else
         {
             // pNode has two non-null children. Set pNodeSuccessor to pNode's successor. pNodeChild might be NULL.
             pNodeSuccessor = pNodeSuccessor->mpNodeRight;
@@ -338,12 +338,12 @@ namespace eastl
         {
             pNodeChildParent = pNodeSuccessor->mpNodeParent;  // Assign pNodeReplacement's parent.
 
-            if(pNodeChild) 
+            if(pNodeChild)
                 pNodeChild->mpNodeParent = pNodeSuccessor->mpNodeParent;
 
             if(pNode == pNodeRootRef) // If the node being deleted is the root node...
                 pNodeRootRef = pNodeChild; // Set the new root node to be the pNodeReplacement.
-            else 
+            else
             {
                 if(pNode == pNode->mpNodeParent->mpNodeLeft) // If pNode is a left node...
                     pNode->mpNodeParent->mpNodeLeft  = pNodeChild;  // Make pNode's replacement node be on the same side.
@@ -359,7 +359,7 @@ namespace eastl
                 if(pNode->mpNodeRight && pNodeChild)
                 {
                     EASTL_ASSERT(pNodeChild != NULL); // Logically pNodeChild should always be valid.
-                    pNodeLeftmostRef = RBTreeGetMinChild(pNodeChild); 
+                    pNodeLeftmostRef = RBTreeGetMinChild(pNodeChild);
                 }
                 else
                     pNodeLeftmostRef = pNode->mpNodeParent; // This  makes (pNodeLeftmostRef == end()) if (pNode == root node)
@@ -382,7 +382,7 @@ namespace eastl
         {
             // Relink pNodeSuccessor in place of pNode. pNodeSuccessor is pNode's successor.
             // We specifically set pNodeSuccessor to be on the right child side of pNode, so fix up the left child side.
-            pNode->mpNodeLeft->mpNodeParent = pNodeSuccessor; 
+            pNode->mpNodeLeft->mpNodeParent = pNodeSuccessor;
             pNodeSuccessor->mpNodeLeft = pNode->mpNodeLeft;
 
             if(pNodeSuccessor == pNode->mpNodeRight) // If pNode's successor was at the bottom of the tree... (yes that's effectively what this statement means)
@@ -404,7 +404,7 @@ namespace eastl
                 pNodeRootRef = pNodeSuccessor;
             else if(pNode == pNode->mpNodeParent->mpNodeLeft)
                 pNode->mpNodeParent->mpNodeLeft = pNodeSuccessor;
-            else 
+            else
                 pNode->mpNodeParent->mpNodeRight = pNodeSuccessor;
 
             // Now pNode is disconnected from the tree.
@@ -414,15 +414,15 @@ namespace eastl
         }
 
         // Here we do tree balancing as per the conventional red-black tree algorithm.
-        if(pNode->mColor == kRBTreeColorBlack) 
-        { 
+        if(pNode->mColor == kRBTreeColorBlack)
+        {
             while((pNodeChild != pNodeRootRef) && ((pNodeChild == NULL) || (pNodeChild->mColor == kRBTreeColorBlack)))
             {
-                if(pNodeChild == pNodeChildParent->mpNodeLeft) 
+                if(pNodeChild == pNodeChildParent->mpNodeLeft)
                 {
                     rbtree_node_base* pNodeTemp = pNodeChildParent->mpNodeRight;
 
-                    if(pNodeTemp->mColor == kRBTreeColorRed) 
+                    if(pNodeTemp->mColor == kRBTreeColorRed)
                     {
                         pNodeTemp->mColor = kRBTreeColorBlack;
                         pNodeChildParent->mColor = kRBTreeColorRed;
@@ -431,15 +431,15 @@ namespace eastl
                     }
 
                     if(((pNodeTemp->mpNodeLeft  == NULL) || (pNodeTemp->mpNodeLeft->mColor  == kRBTreeColorBlack)) &&
-                        ((pNodeTemp->mpNodeRight == NULL) || (pNodeTemp->mpNodeRight->mColor == kRBTreeColorBlack))) 
+                        ((pNodeTemp->mpNodeRight == NULL) || (pNodeTemp->mpNodeRight->mColor == kRBTreeColorBlack)))
                     {
                         pNodeTemp->mColor = kRBTreeColorRed;
                         pNodeChild = pNodeChildParent;
                         pNodeChildParent = pNodeChildParent->mpNodeParent;
-                    } 
-                    else 
+                    }
+                    else
                     {
-                        if((pNodeTemp->mpNodeRight == NULL) || (pNodeTemp->mpNodeRight->mColor == kRBTreeColorBlack)) 
+                        if((pNodeTemp->mpNodeRight == NULL) || (pNodeTemp->mpNodeRight->mColor == kRBTreeColorBlack))
                         {
                             pNodeTemp->mpNodeLeft->mColor = kRBTreeColorBlack;
                             pNodeTemp->mColor = kRBTreeColorRed;
@@ -450,19 +450,19 @@ namespace eastl
                         pNodeTemp->mColor = pNodeChildParent->mColor;
                         pNodeChildParent->mColor = kRBTreeColorBlack;
 
-                        if(pNodeTemp->mpNodeRight) 
+                        if(pNodeTemp->mpNodeRight)
                             pNodeTemp->mpNodeRight->mColor = kRBTreeColorBlack;
 
                         pNodeRootRef = RBTreeRotateLeft(pNodeChildParent, pNodeRootRef);
                         break;
                     }
-                } 
-                else 
-                {   
+                }
+                else
+                {
                     // The following is the same as above, with mpNodeRight <-> mpNodeLeft.
                     rbtree_node_base* pNodeTemp = pNodeChildParent->mpNodeLeft;
 
-                    if(pNodeTemp->mColor == kRBTreeColorRed) 
+                    if(pNodeTemp->mColor == kRBTreeColorRed)
                     {
                         pNodeTemp->mColor        = kRBTreeColorBlack;
                         pNodeChildParent->mColor = kRBTreeColorRed;
@@ -472,15 +472,15 @@ namespace eastl
                     }
 
                     if(((pNodeTemp->mpNodeRight == NULL) || (pNodeTemp->mpNodeRight->mColor == kRBTreeColorBlack)) &&
-                        ((pNodeTemp->mpNodeLeft  == NULL) || (pNodeTemp->mpNodeLeft->mColor  == kRBTreeColorBlack))) 
+                        ((pNodeTemp->mpNodeLeft  == NULL) || (pNodeTemp->mpNodeLeft->mColor  == kRBTreeColorBlack)))
                     {
                         pNodeTemp->mColor = kRBTreeColorRed;
                         pNodeChild       = pNodeChildParent;
                         pNodeChildParent = pNodeChildParent->mpNodeParent;
-                    } 
-                    else 
+                    }
+                    else
                     {
-                        if((pNodeTemp->mpNodeLeft == NULL) || (pNodeTemp->mpNodeLeft->mColor == kRBTreeColorBlack)) 
+                        if((pNodeTemp->mpNodeLeft == NULL) || (pNodeTemp->mpNodeLeft->mColor == kRBTreeColorBlack))
                         {
                             pNodeTemp->mpNodeRight->mColor = kRBTreeColorBlack;
                             pNodeTemp->mColor              = kRBTreeColorRed;
@@ -492,7 +492,7 @@ namespace eastl
                         pNodeTemp->mColor = pNodeChildParent->mColor;
                         pNodeChildParent->mColor = kRBTreeColorBlack;
 
-                        if(pNodeTemp->mpNodeLeft) 
+                        if(pNodeTemp->mpNodeLeft)
                             pNodeTemp->mpNodeLeft->mColor = kRBTreeColorBlack;
 
                         pNodeRootRef = RBTreeRotateRight(pNodeChildParent, pNodeRootRef);

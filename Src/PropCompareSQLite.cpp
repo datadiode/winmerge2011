@@ -18,7 +18,7 @@
  * @brief Constructor.
  * @param [in] optionsMgr Pointer to COptionsMgr.
  */
-PropCompareSQLite::PropCompareSQLite() 
+PropCompareSQLite::PropCompareSQLite()
 : OptionsPanel(IDD_PROPPAGE_COMPARE_SQLITE, sizeof *this)
 {
 }
@@ -68,7 +68,7 @@ LRESULT PropCompareSQLite::WindowProc(UINT message, WPARAM wParam, LPARAM lParam
 	return OptionsPanel::WindowProc(message, wParam, lParam);
 }
 
-/** 
+/**
  * @brief Reads options values from storage to UI.
  * Property sheet calls this before displaying GUI to load values
  * into members.
@@ -84,7 +84,7 @@ void PropCompareSQLite::ReadOptions()
 	m_nCompareFlags &= SQLITE_CMP_RADIO_OPTIONS_MASK;
 }
 
-/** 
+/**
  * @brief Writes options values from UI to storage.
  * Property sheet calls this after dialog is closed with OK button to
  * store values in member variables.
@@ -99,7 +99,7 @@ void PropCompareSQLite::WriteOptions()
 		(m_bCompareBlobFields ? SQLITE_CMP_COMPARE_BLOB_FIELDS : 0));
 }
 
-/** 
+/**
  * @brief Sets options to defaults
  */
 void PropCompareSQLite::OnDefaults()

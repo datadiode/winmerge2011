@@ -21,7 +21,7 @@
 /**
  * @brief Constructor.
  */
-PropFileTransforms::PropFileTransforms() 
+PropFileTransforms::PropFileTransforms()
 : OptionsPanel(IDD_PROPPAGE_FILETRANSFORMS, sizeof *this)
 {
 }
@@ -144,7 +144,7 @@ LRESULT PropFileTransforms::WindowProc(UINT message, WPARAM wParam, LPARAM lPara
 	return OptionsPanel::WindowProc(message, wParam, lParam);
 }
 
-/** 
+/**
  * @brief Reads options values from storage to UI.
  * Property sheet calls this before displaying GUI to load values
  * into members.
@@ -153,7 +153,7 @@ void PropFileTransforms::ReadOptions()
 {
 }
 
-/** 
+/**
  * @brief Writes options values from UI to storage.
  * Property sheet calls this after dialog is closed with OK button to
  * store values in member variables.

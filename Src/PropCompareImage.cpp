@@ -18,7 +18,7 @@
  * @brief Constructor.
  * @param [in] optionsMgr Pointer to COptionsMgr.
  */
-PropCompareImage::PropCompareImage() 
+PropCompareImage::PropCompareImage()
 : OptionsPanel(IDD_PROPPAGE_COMPARE_IMAGE, sizeof *this)
 {
 }
@@ -56,7 +56,7 @@ LRESULT PropCompareImage::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	return OptionsPanel::WindowProc(message, wParam, lParam);
 }
 
-/** 
+/**
  * @brief Reads options values from storage to UI.
  * Property sheet calls this before displaying GUI to load values
  * into members.
@@ -66,7 +66,7 @@ void PropCompareImage::ReadOptions()
 	m_sFilePatterns = COptionsMgr::Get(OPT_CMP_IMG_FILEPATTERNS);
 }
 
-/** 
+/**
  * @brief Writes options values from UI to storage.
  * Property sheet calls this after dialog is closed with OK button to
  * store values in member variables.
@@ -77,7 +77,7 @@ void PropCompareImage::WriteOptions()
 	COptionsMgr::SaveOption(OPT_CMP_IMG_FILEPATTERNS, m_sFilePatterns);
 }
 
-/** 
+/**
  * @brief Sets options to defaults
  */
 void PropCompareImage::OnDefaults()

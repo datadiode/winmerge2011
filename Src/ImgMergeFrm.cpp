@@ -388,7 +388,7 @@ void CImgMergeFrame::SaveOptions()
 /**
  * @brief Saves both files
  */
-void CImgMergeFrame::OnFileSave() 
+void CImgMergeFrame::OnFileSave()
 {
 	for (int pane = 0; pane < m_pImgMergeWindow->GetPaneCount(); ++pane)
 		DoSave(pane);
@@ -397,7 +397,7 @@ void CImgMergeFrame::OnFileSave()
 /**
  * @brief Saves left-side file
  */
-void CImgMergeFrame::OnFileSaveLeft() 
+void CImgMergeFrame::OnFileSaveLeft()
 {
 	DoSave(0);
 }
@@ -688,7 +688,7 @@ void CImgMergeFrame::UpdateCmdUI()
 			text += string_format(_T("Dist:%g "), colorDistance01);
 		}
 
-		text += string_format(_T("Page:%d/%d Zoom:%d%% %dx%dpx %dbpp"), 
+		text += string_format(_T("Page:%d/%d Zoom:%d%% %dx%dpx %dbpp"),
 				m_pImgMergeWindow->GetCurrentPage(pane) + 1,
 				m_pImgMergeWindow->GetPageCount(pane),
 				static_cast<int>(m_pImgMergeWindow->GetZoom() * 100),

@@ -185,7 +185,7 @@ LRESULT COpenDlg::WndProcPathCombo(WNDPROC pfnSuper, HWND hWnd, UINT uMsg, WPARA
 	case WM_DRAWITEM:
 		// Wine seems to hide the edit control from the user while the list is
 		// dropped, but rather shows them a piece of owner drawn text instead.
-		if (wine_version) 
+		if (wine_version)
 			::CallWindowProc(pfnSuper, hWnd, uMsg, wParam, lParam);
 		if (!DrawItemPathCombo(hWnd, reinterpret_cast<DRAWITEMSTRUCT *>(lParam)) && !wine_version)
 			::CallWindowProc(pfnSuper, hWnd, uMsg, wParam, lParam);
