@@ -521,7 +521,7 @@ void CDirView::ListContextMenu(POINT point)
 	m_pCompareAsScriptMenu = pPopup->GetSubMenu(1);
 	// Disable "Compare As" if multiple items are selected, or if the selected
 	// item is unique or represents a folder.
-	if (pMDIFrame->QueryCmdState(ID_MERGE_COMPARE) & MF_GRAYED)
+	if ((pMDIFrame->QueryCmdState(ID_MERGE_COMPARE) & MF_GRAYED) || (nFileNames == 0))
 		pPopup->EnableMenuItem(1, MF_GRAYED | MF_BYPOSITION);
 
 	// invoke context menu
