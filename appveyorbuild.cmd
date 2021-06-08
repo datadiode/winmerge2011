@@ -5,9 +5,9 @@ echo GIT_DESCRIBE=%GIT_DESCRIBE%
 
 set FrhedTag=0.10909.2021
 set WinIMergeTag=1.0.25
-set SQLiteCompareTag=3.1.0.0-datadiode-008
+set SQLiteCompareTag=3.1.0-datadiode-14-g6cd7810
 set ReoGridTag=3.0.0-datadiode-75-g93465d8
-set B2XTranslatorTag=1.0.0-datadiode-19-gaf4be09
+set B2XTranslatorTag=1.0.0-datadiode-21-g9dd6b53
 set ToxyTag=1.6.0-datadiode-54-g2572b6e
 set AStyleTag=3.1
 set HtmlTidyTag=5.7.28

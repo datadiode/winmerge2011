@@ -169,45 +169,45 @@ for %%$ in (
 )
 
 REM Copy B2XTranslator\src\Shell\xls2x
-set $=..\..\B2XTranslator\src\Shell\xls2x\bin\%4\;..\3rdparty\B2XTranslator\src\Shell\xls2x\bin\%4\
+set $=..\..\B2XTranslator\src\Shell\xls2x\bin\%4\net40\;..\3rdparty\B2XTranslator\src\Shell\xls2x\bin\%4\
 for %%$ in (
 	.
 ) do if not "%%~$$:$" == "" (
-	xcopy /y "%%~$$:$\*.dll" "%~2B2XTranslator\bin\"
-	xcopy /y "%%~$$:$\*.pdb" "%~2B2XTranslator\bin\"
+	xcopy /ys "%%~$$:$\*.dll" "%~2B2XTranslator\bin\"
+	xcopy /ys "%%~$$:$\*.pdb" "%~2B2XTranslator\bin\"
 	xcopy /y "%%~$$:$\*.exe" "%~2B2XTranslator\bin\"
 	set $=
 )
 
 REM Copy B2XTranslator\src\Shell\doc2x
-set $=..\..\B2XTranslator\src\Shell\doc2x\bin\%4\;..\3rdparty\B2XTranslator\src\Shell\doc2x\bin\%4\
+set $=..\..\B2XTranslator\src\Shell\doc2x\bin\%4\net40\;..\3rdparty\B2XTranslator\src\Shell\doc2x\bin\%4\
 for %%$ in (
 	.
 ) do if not "%%~$$:$" == "" (
-	xcopy /y "%%~$$:$\*.dll" "%~2B2XTranslator\bin\"
-	xcopy /y "%%~$$:$\*.pdb" "%~2B2XTranslator\bin\"
+	xcopy /ys "%%~$$:$\*.dll" "%~2B2XTranslator\bin\"
+	xcopy /ys "%%~$$:$\*.pdb" "%~2B2XTranslator\bin\"
 	xcopy /y "%%~$$:$\*.exe" "%~2B2XTranslator\bin\"
 	set $=
 )
 
 REM Copy B2XTranslator\src\Shell\ppt2x
-set $=..\..\B2XTranslator\src\Shell\ppt2x\bin\%4\;..\3rdparty\B2XTranslator\src\Shell\ppt2x\bin\%4\
+set $=..\..\B2XTranslator\src\Shell\ppt2x\bin\%4\net40\;..\3rdparty\B2XTranslator\src\Shell\ppt2x\bin\%4\
 for %%$ in (
 	.
 ) do if not "%%~$$:$" == "" (
-	xcopy /y "%%~$$:$\*.dll" "%~2B2XTranslator\bin\"
-	xcopy /y "%%~$$:$\*.pdb" "%~2B2XTranslator\bin\"
+	xcopy /ys "%%~$$:$\*.dll" "%~2B2XTranslator\bin\"
+	xcopy /ys "%%~$$:$\*.pdb" "%~2B2XTranslator\bin\"
 	xcopy /y "%%~$$:$\*.exe" "%~2B2XTranslator\bin\"
 	set $=
 )
 
 REM Copy B2XTranslator\src\Shell\OdfConverter
-set $=..\..\B2XTranslator\src\Shell\OdfConverter\bin\%4\;..\3rdparty\B2XTranslator\src\Shell\OdfConverter\bin\%4\
+set $=..\..\B2XTranslator\src\Shell\OdfConverter\bin\%4\net40\;..\3rdparty\B2XTranslator\src\Shell\OdfConverter\bin\%4\
 for %%$ in (
 	.
 ) do if not "%%~$$:$" == "" (
-	xcopy /y "%%~$$:$\*.dll" "%~2B2XTranslator\bin\"
-	xcopy /y "%%~$$:$\*.pdb" "%~2B2XTranslator\bin\"
+	xcopy /ys "%%~$$:$\*.dll" "%~2B2XTranslator\bin\"
+	xcopy /ys "%%~$$:$\*.pdb" "%~2B2XTranslator\bin\"
 	xcopy /y "%%~$$:$\*.exe" "%~2B2XTranslator\bin\"
 	set $=
 )
