@@ -213,6 +213,14 @@ void CConfigLog::WriteVersionOf1(int indent, LPTSTR path, bool bDllGetVersion)
 			FreeLibrary(hinstDll);
 		}
 	}
+
+	HMODULE const handle = GetModuleHandle(path);
+
+	TCHAR root[MAX_PATH];
+	GetModuleFileName(NULL, root, MAX_PATH);
+	if (int const len = PathCommonPrefix(path, root, NULL))
+		path = PathFindNextComponent(path + len);
+
 	string_format text
 	(
 		name == path
@@ -220,7 +228,7 @@ void CConfigLog::WriteVersionOf1(int indent, LPTSTR path, bool bDllGetVersion)
 	:	_T("%*s%-24s %s path=%s\r\n"),
 		indent,
 		// Tilde prefix for modules currently mapped into WinMerge
-		GetModuleHandle(path) ? _T("~") : _T(""),
+		handle ? _T("~") : _T(""),
 		name,
 		sVersion.c_str(),
 		path
@@ -384,10 +392,12 @@ bool CConfigLog::DoFile(bool writing, String &sError)
 	WriteVersionOf1(1, _T("ToxyExtract\\bin\\ToxyExtract.exe"), false);
 
 	TCHAR path[MAX_PATH * 7]; // allows to safely move 6 levels down
-	GetModuleFileName(0, path, MAX_PATH);
+	GetModuleFileName(NULL, path, MAX_PATH);
 	LPTSTR pattern = PathFindFileName(path);
 	_tcscpy(pattern, _T("B2XTranslator\\bin\\*.exe"));
 	WriteVersionOf(1, path);
+	WriteVersionOf1(1, _T("B2XTranslator\\bin\\x86\\zlibwapi.dll"), false);
+	WriteVersionOf1(1, _T("B2XTranslator\\bin\\x64\\zlibwapi.dll"), false);
 	_tcscpy(pattern, _T("Merge7z\\*.dll"));
 	WriteVersionOf(1, path);
 
