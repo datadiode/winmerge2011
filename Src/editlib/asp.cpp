@@ -293,6 +293,61 @@ void TextDefinition::ParseLineAsp(TextBlock::Cookie &cookie, LPCTSTR const pszCh
 
 				switch (dwCookie & COOKIE_PARSER_GLOBAL)
 				{
+				case SRCOPT_COOKIE(COOKIE_PARSER_SMARTY):
+					if (dwCookie & COOKIE_EXT_COMMENT)
+						break;
+					if (pszChars[I] == '{')
+					{
+						if (pszChars[I + 1] == '*')
+						{
+							DEFINE_BLOCK(I, COLORINDEX_COMMENT);
+							dwCookie |= COOKIE_EXT_COMMENT;
+							bWasComment = Start;
+							continue;
+						}
+						bWasComment = False;
+						pBuf.m_bRecording = pBuf;
+						if (nScriptBegin >= 0)
+						{
+							DWORD const dwParser = ParseProcCookie(dwCookie);
+							(this->*ScriptParseProc(dwParser))(cookie, pszChars, I, nScriptBegin - 1, pBuf);
+							nScriptBegin = -1;
+						}
+						DEFINE_BLOCK(I, COLORINDEX_OPERATOR);
+						pBuf.m_bRecording = NULL;
+						nScriptBegin = I + 1;
+						dwScriptTagCookie &= COOKIE_PARSER;
+						dwScriptTagCookie |= dwCookie & (COOKIE_STRING | COOKIE_TEMPLATE_STRING);
+						dwCookie &= ~(COOKIE_PARSER | COOKIE_STRING);
+						dwCookie |= COOKIE_RAZOR_NESTING;
+						nIdentBegin = -1;
+						continue;
+					}
+					if (pszChars[I] == '}' && (dwCookie & COOKIE_RAZOR_NESTING))
+					{
+						pBuf.m_bRecording = pBuf;
+						if (nScriptBegin >= 0)
+						{
+							DWORD const dwParser = ParseProcCookie(dwCookie);
+							(this->*ScriptParseProc(dwParser))(cookie, pszChars, I, nScriptBegin - 1, pBuf);
+							nScriptBegin = -1;
+						}
+						DEFINE_BLOCK(I, COLORINDEX_OPERATOR);
+						dwCookie &= ~(COOKIE_PARSER | COOKIE_RAZOR_NESTING);
+						dwCookie |= dwScriptTagCookie & (COOKIE_STRING | COOKIE_TEMPLATE_STRING);
+						dwScriptTagCookie &= ~COOKIE_STRING;
+						if (dwCookie & COOKIE_TEMPLATE_STRING)
+						{
+							pBuf.m_bRecording = NULL;
+							nScriptBegin = I + 1;
+						}
+						if (!(dwCookie & COOKIE_ASP))
+							dwCookie |= dwScriptTagCookie & COOKIE_PARSER;
+						bRedefineBlock = TRUE;
+						bDecIndex = FALSE;
+						continue;
+					}
+					break;
 				case SRCOPT_COOKIE(COOKIE_PARSER_MWSL):
 					if (pszChars[I] == ':')
 					{
@@ -497,6 +552,19 @@ void TextDefinition::ParseLineAsp(TextBlock::Cookie &cookie, LPCTSTR const pszCh
 			// Extended comment <!--....-->
 			if (dwCookie & COOKIE_EXT_COMMENT)
 			{
+				switch (dwCookie & (COOKIE_PARSER_GLOBAL | COOKIE_PARSER))
+				{
+				case SRCOPT_COOKIE(COOKIE_PARSER_SMARTY):
+					if (I > 0 && pszChars[I] == '}' && pszChars[nPrevI] == '*' && bWasComment != Start)
+					{
+						dwCookie &= ~COOKIE_EXT_COMMENT;
+						bRedefineBlock = TRUE;
+						bWasComment = End;
+						continue;
+					}
+					bWasComment = False;
+					break;
+				}
 				switch (dwCookie & (COOKIE_DTD | COOKIE_ASP | COOKIE_SCRIPT) | ParseProcCookie(dwCookie))
 				{
 				case 0:
@@ -534,11 +602,9 @@ void TextDefinition::ParseLineAsp(TextBlock::Cookie &cookie, LPCTSTR const pszCh
 						dwCookie &= ~COOKIE_EXT_COMMENT;
 						bRedefineBlock = TRUE;
 						bWasComment = End;
+						continue;
 					}
-					else
-					{
-						bWasComment = False;
-					}
+					bWasComment = False;
 					break;
 				}
 				continue;

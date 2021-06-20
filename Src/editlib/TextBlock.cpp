@@ -50,6 +50,7 @@ TextDefinition const TextDefinition::m_StaticSourceDefs[] =
 	SRC_SGML, _T("Sgml"), _T("sgm;sgml"), &ParseLineSgml, SRCOPT_AUTOINDENT | SRCOPT_BRACEANSI, /*2,*/ _T("<!--"), _T("-->"), _T(""),
 	SRC_SH, _T("Shell"), _T("sh;conf"), &ParseLineSh, SRCOPT_INSERTTABS | SRCOPT_AUTOINDENT | SRCOPT_EOLNUNIX, /*4,*/ _T(""), _T(""), _T("#"),
 	SRC_SIOD, _T("SIOD"), _T("scm"), &ParseLineSiod, SRCOPT_AUTOINDENT | SRCOPT_BRACEANSI, /*2,*/ _T(";|"), _T("|;"), _T(";"),
+	SRC_SMARTY, _T("Smarty"), _T("tpl"), &ParseLineAsp, SRCOPT_AUTOINDENT | SRCOPT_BRACEANSI | SRCOPT_HTML_LEXIS | SRCOPT_COOKIE(COOKIE_PARSER_SMARTY), /*2,*/ _T("<!--"), _T("-->"), _T(""),
 	SRC_SQL, _T("SQL"), _T("sql"), &ParseLineSql, SRCOPT_AUTOINDENT, /*4,*/ _T("/*"), _T("*/"), _T("//"),
 	SRC_TCL, _T("TCL"), _T("tcl"), &ParseLineTcl, SRCOPT_AUTOINDENT | SRCOPT_BRACEANSI | SRCOPT_EOLNUNIX, /*2,*/ _T(""), _T(""), _T("#"),
 	SRC_TEX, _T("TEX"), _T("tex;sty;clo;ltx;fd;dtx"), &ParseLineTex, SRCOPT_AUTOINDENT, /*4,*/ _T(""), _T(""), _T("%"),
@@ -229,6 +230,8 @@ TextDefinition::ParseProc TextDefinition::ScriptParseProc(DWORD dwCookie)
 		return &ParseLinePerl;
 	case COOKIE_PARSER_PHP:
 		return &ParseLinePhp;
+	case COOKIE_PARSER_SMARTY:
+		return &ParseLineSmarty;
 	case COOKIE_PARSER_CSS:
 		return &ParseLineCss;
 	}

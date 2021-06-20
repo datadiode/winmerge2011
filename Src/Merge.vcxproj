@@ -310,6 +310,7 @@
     <ClCompile Include="editlib\razor.cpp" />
     <ClCompile Include="editlib\go.cpp" />
     <ClCompile Include="editlib\rust.cpp" />
+    <ClCompile Include="editlib\smarty.cpp" />
     <ClCompile Include="editlib\TextBlock.cpp" />
     <ClCompile Include="editlib\vhdl.cpp" />
     <ClCompile Include="EditorFilepathBar.cpp" />

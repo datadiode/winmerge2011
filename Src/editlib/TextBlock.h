@@ -96,6 +96,7 @@ public:
 #define COOKIE_PARSER_CSS       0x08000000UL
 #define COOKIE_PARSER_MWSL      0x09000000UL
 #define COOKIE_PARSER_MARKDOWN  0x0A000000UL
+#define COOKIE_PARSER_SMARTY    0x0B000000UL
 #define COOKIE_PARSER_GLOBAL    0xF0000000UL
 
 #define SRCOPT_COOKIE(X)        ((X) << 4)
@@ -149,6 +150,7 @@ struct TextDefinition
 		SRC_SGML,
 		SRC_SH,
 		SRC_SIOD,
+		SRC_SMARTY,
 		SRC_SQL,
 		SRC_TCL,
 		SRC_TEX,
@@ -235,6 +237,7 @@ private:
 	void ParseLineSgml(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf) const;
 	void ParseLineSh(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf) const;
 	void ParseLineSiod(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf) const;
+	void ParseLineSmarty(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf) const;
 	void ParseLineSql(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf) const;
 	void ParseLineTcl(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf) const;
 	void ParseLineTex(TextBlock::Cookie &cookie, LPCTSTR const pszChars, int const nLength, int I, TextBlock::Array &pBuf) const;

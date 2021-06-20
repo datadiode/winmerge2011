@@ -738,6 +738,9 @@
     <ClCompile Include="PropFileTransforms.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="editlib\smarty.cpp">
+      <Filter>EditLib</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\WindowPlacement.h">
