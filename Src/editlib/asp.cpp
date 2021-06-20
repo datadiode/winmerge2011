@@ -294,7 +294,7 @@ void TextDefinition::ParseLineAsp(TextBlock::Cookie &cookie, LPCTSTR const pszCh
 				switch (dwCookie & COOKIE_PARSER_GLOBAL)
 				{
 				case SRCOPT_COOKIE(COOKIE_PARSER_SMARTY):
-					if (dwCookie & COOKIE_EXT_COMMENT)
+					if (dwCookie & (COOKIE_EXT_COMMENT | COOKIE_SCRIPT))
 						break;
 					if (pszChars[I] == '{')
 					{
