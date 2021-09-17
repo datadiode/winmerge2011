@@ -535,7 +535,8 @@ LRESULT CDirFrame::OnWndMsg<WM_CONTEXTMENU>(WPARAM, LPARAM lParam)
 {
 	POINT point;
 	POINTSTOPOINT(point, lParam);
-	if (lParam == MAKELPARAM(-1, -1))
+	// Context menu opened using keyboard has no coordinates
+	if (point.x == -1 && point.y == -1)
 	{
 		point.x = point.y = 5;
 		m_pDirView->ClientToScreen(&point);
