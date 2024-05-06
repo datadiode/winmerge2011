@@ -9,7 +9,7 @@ set SQLiteCompareTag=3.1.0-datadiode-14-g6cd7810
 set ReoGridTag=3.0.0-datadiode-75-g93465d8
 set B2XTranslatorTag=1.0.0-datadiode-21-g9dd6b53
 set ToxyTag=1.6.0-datadiode-54-g2572b6e
-set AStyleTag=3.4.14
+set AStyleTag=3.4.12
 set HtmlTidyTag=5.7.28
 set ProtoDecTag=0.6.3
 set jqTag=1.6
@@ -26,7 +26,7 @@ for %%p in (
   https://7-zip.org/a/7z1900-x64.msi!7z1900-x64.msi
   https://github.com/kornelski/7z/archive/a6e2c7e401a3e5976e8522de518a169b0d8a7fac.zip!7z1900-src.zip
   https://github.com/edotstudios/tidy-html5/archive/%HtmlTidyTag%.zip!tidy-html5.zip
-  https://fossies.org/windows/misc/astyle-%AStyleTag%-x64.zip!AStyle_windows.zip
+  https://github.com/szepeviktor/astyle/archive/v%AStyleTag%.zip!AStyle_windows.zip
   https://github.com/schdub/protodec/releases/download/v%ProtoDecTag%-win/protodec.exe!protodec\protodec.exe
   https://raw.githubusercontent.com/stedolan/jq/master/COPYING!jq\COPYING
   https://github.com/stedolan/jq/releases/download/jq-%jqTag%/jq-win32.exe!jq\jq-win32.exe
@@ -73,8 +73,8 @@ call 3rdparty\configure.bat
 MSBuild 3rdparty\tidy\build32\tidy.sln /t:Rebuild /p:Platform="Win32" /p:Configuration="MinSizeRel"
 MSBuild 3rdparty\tidy\build64\tidy.sln /t:Rebuild /p:Platform="x64" /p:Configuration="MinSizeRel"
 
-MSBuild 3rdparty\astyle-%AStyleTag%-x64\build\vs2015\AStyle.sln /t:Rebuild /p:Platform="Win32" /p:Configuration="Static"
-MSBuild 3rdparty\astyle-%AStyleTag%-x64\build\vs2015\AStyle.sln /t:Rebuild /p:Platform="x64" /p:Configuration="Static"
+MSBuild 3rdparty\astyle-%AStyleTag%\build\vs2015\AStyle.sln /t:Rebuild /p:Platform="Win32" /p:Configuration="Static"
+MSBuild 3rdparty\astyle-%AStyleTag%\build\vs2015\AStyle.sln /t:Rebuild /p:Platform="x64" /p:Configuration="Static"
 
 "%SevenZip%" x -o3rdparty\Frhed\Build\FRHED\Win32\UnicodeDebug\ "%~dp03rdparty\Frhed_Win32-UnicodeDebug"
 "%SevenZip%" x -o3rdparty\Frhed\Build\FRHED\Win32\UnicodeRelease\ "%~dp03rdparty\Frhed_Win32-UnicodeRelease"
