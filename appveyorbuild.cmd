@@ -10,7 +10,7 @@ set ReoGridTag=3.0.0-datadiode-75-g93465d8
 set B2XTranslatorTag=1.0.0-datadiode-21-g9dd6b53
 set ToxyTag=1.6.0-datadiode-54-g2572b6e
 set AStyleTag=3.1
-set HtmlTidyTag=5.7.28
+set HtmlTidyTag=5.8.0
 set ProtoDecTag=0.6.3
 set jqTag=1.6
 
