@@ -73,8 +73,8 @@ call 3rdparty\configure.bat
 MSBuild 3rdparty\tidy\build32\tidy.sln /t:Rebuild /p:Platform="Win32" /p:Configuration="MinSizeRel"
 MSBuild 3rdparty\tidy\build64\tidy.sln /t:Rebuild /p:Platform="x64" /p:Configuration="MinSizeRel"
 
-MSBuild 3rdparty\AStyle\build\vs2010\AStyle.sln /t:Rebuild /p:Platform="Win32" /p:Configuration="Static"
-MSBuild 3rdparty\AStyle\build\vs2010\AStyle.sln /t:Rebuild /p:Platform="x64" /p:Configuration="Static"
+MSBuild 3rdparty\AStyle\build\vs2015\AStyle.sln /t:Rebuild /p:Platform="Win32" /p:Configuration="Static"
+MSBuild 3rdparty\AStyle\build\vs2015\AStyle.sln /t:Rebuild /p:Platform="x64" /p:Configuration="Static"
 
 "%SevenZip%" x -o3rdparty\Frhed\Build\FRHED\Win32\UnicodeDebug\ "%~dp03rdparty\Frhed_Win32-UnicodeDebug"
 "%SevenZip%" x -o3rdparty\Frhed\Build\FRHED\Win32\UnicodeRelease\ "%~dp03rdparty\Frhed_Win32-UnicodeRelease"
