@@ -2,6 +2,10 @@ version: 1.0.{build}
 image: Visual Studio 2015
 configuration: Release
 platform: Win32
+
+install:
+- rd /s /q "C:\Program Files\dotnet\sdk\1.0.1"
+
 build_script:
 - cmd: >-
     appveyorbuild.cmd Win32!Debug x64!Debug Win32!Release x64!Release
