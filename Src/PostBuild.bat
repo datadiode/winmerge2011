@@ -24,13 +24,7 @@ goto :PlatformName$%3
 :PlatformName$Win32
 
 REM Copy AStyle
-set $=..\3rdparty\AStyle\build\vs2010\binstatic\
-for %%$ in (
-	AStyle.exe
-) do if not "%%~$$:$" == "" (
-	xcopy /y "%%~$$:$" "%~2"
-	set $=
-)
+for /R ..\3rdparty %f in (build\vs2015\x86\binstatic\AStyle.exe) do if exist "%f" copy /y "%f" "%~2"
 
 REM Copy tidy
 set $=..\3rdparty\tidy\build32\MinSizeRel\
@@ -68,13 +62,7 @@ goto :PlatformName$
 :PlatformName$x64
 
 REM Copy AStyle
-set $=..\3rdparty\AStyle\build\vs2010\x64\binstatic\
-for %%$ in (
-	AStyle.exe
-) do if not "%%~$$:$" == "" (
-	xcopy /y "%%~$$:$" "%~2"
-	set $=
-)
+for /R ..\3rdparty %f in (build\vs2015\x64\binstatic\AStyle.exe) do if exist "%f" copy /y "%f" "%~2"
 
 REM Copy tidy
 set $=..\3rdparty\tidy\build64\MinSizeRel\
