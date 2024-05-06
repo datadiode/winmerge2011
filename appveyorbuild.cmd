@@ -10,7 +10,7 @@ set ReoGridTag=3.0.0-datadiode-75-g93465d8
 set B2XTranslatorTag=1.0.0-datadiode-21-g9dd6b53
 set ToxyTag=1.6.0-datadiode-54-g2572b6e
 set AStyleTag=3.4.14
-set HtmlTidyTag=5.6.0
+set HtmlTidyTag=5.7.28
 set ProtoDecTag=0.6.3
 set jqTag=1.6
 
@@ -25,7 +25,7 @@ for %%p in (
   https://7-zip.org/a/7z1900.msi!7z1900.msi
   https://7-zip.org/a/7z1900-x64.msi!7z1900-x64.msi
   https://github.com/kornelski/7z/archive/a6e2c7e401a3e5976e8522de518a169b0d8a7fac.zip!7z1900-src.zip
-  https://github.com/htacg/tidy-html5/archive/%HtmlTidyTag%.zip!tidy-html5.zip
+  https://github.com/edotstudios/tidy-html5/archive/%HtmlTidyTag%.zip!tidy-html5.zip
   https://fossies.org/windows/misc/astyle-%AStyleTag%-x64.zip!AStyle_windows.zip
   https://github.com/schdub/protodec/releases/download/v%ProtoDecTag%-win/protodec.exe!protodec\protodec.exe
   https://raw.githubusercontent.com/stedolan/jq/master/COPYING!jq\COPYING
