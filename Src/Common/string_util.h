@@ -70,7 +70,7 @@ void VerifyKeyword(BOOL (*pfnIsKeyword)(LPCTSTR, int), LPCTSTR key, int len)
 {
 	static TCHAR match[100] = _T("");
 	// Is the same keyword listed twice?
-	assert(compare(match, key, len) != 0 || match[len] != _T('\0'));
+	assert(len == 0 || compare(match, key, len) != 0 || match[len] != _T('\0'));
 	memcpy(match, key, len * sizeof(TCHAR));
 	match[len] = _T('\0');
 	// Is there an issue with keyword detection?
