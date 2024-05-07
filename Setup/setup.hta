@@ -94,12 +94,12 @@ button
 {
 	width: 100%;
 	margin-left: 1em;
-	margin-right: 36em;
+	margin-right: 46em;
 }
 #PbFolder
 {
 	position: absolute;
-	right: 22em;
+	right: 32em;
 }
 #media
 {
@@ -214,7 +214,7 @@ Sub Window_OnError(description, url, line)
 End Sub
 
 Sub Job_Uninstall
-	sProgFolder = fso.GetParentFolderName(app.icon)
+	sProgFolder = fso.GetParentFolderName(location.pathname)
 	If MsgBox("Are you sure you want to uninstall WinMerge 2011 from folder" & vbLf & sProgFolder & "?", vbYesNo Or vbExclamation, document.title) = vbYes Then
 		If TerminateWinMerge(document.title) Then
 			DeleteLink "Desktop"
@@ -329,12 +329,16 @@ Sub RegisterShellExtension(flags)
 	sha.ShellExecute "RegSvr32.exe", flags & """" & sProgFolder & "\ShellExtensionU.dll""", "", verb
 End Sub
 
+Function ReplaceExecutableName(haystack)
+	ReplaceExecutableName = Replace(haystack, "WinMergeU.", "devenv.", 1, Abs(DG.checked), vbTextCompare)
+End Function
+
 Sub WriteExecutablePath(root)
 	' This still goes to WinMerge rather than WinMurge key because 3rd parties expect it there
-	sh.RegWrite root & "\Software\Thingamahoochie\WinMerge\Executable", sProgFolder & "\WinMergeU.exe"
+	sh.RegWrite root & "\Software\Thingamahoochie\WinMerge\Executable", sProgFolder & ReplaceExecutableName("\WinMergeU.exe")
 	Select Case sha.GetSystemInformation("ProcessorArchitecture")
 	Case PROCESSOR_ARCHITECTURE_IA64, PROCESSOR_ARCHITECTURE_AMD64
-		sh.RegWrite root & "\Software\Wow6432Node\Thingamahoochie\WinMerge\Executable", sProgFolder & "\WinMergeU.exe"
+		sh.RegWrite root & "\Software\Wow6432Node\Thingamahoochie\WinMerge\Executable", sProgFolder & ReplaceExecutableName("\WinMergeU.exe")
 	End Select
 End Sub
 
@@ -344,11 +348,11 @@ Sub CreateLink(ByVal sPath)
 	Else
 		sPath = BuildLinkName(sPath)
 		With sh.CreateShortcut(sPath)
-			.TargetPath = sProgFolder & "\WinMergeU.exe"
+			.TargetPath = sProgFolder & ReplaceExecutableName("\WinMergeU.exe")
 			.WindowStyle = 1
 			.Description = "WinMerge"
 			.WorkingDirectory = sProgFolder
-			.IconLocation = sProgFolder & "\WinMergeU.exe"
+			.IconLocation = sProgFolder & ReplaceExecutableName("\WinMergeU.exe")
 			.Save
 		End With
 	End If
@@ -399,6 +403,10 @@ Function InstallFiles
 	End If
 	fso.CreateFolder sProgFolder
 	fso.CopyFolder sThisFolder, sProgFolder
+	If DG.checked Then
+		fso.MoveFile sProgFolder & "\WinMergeU.exe", sProgFolder & ReplaceExecutableName("\WinMergeU.exe")
+		fso.MoveFile sProgFolder & "\WinMergeU.json", sProgFolder & ReplaceExecutableName("\WinMergeU.json")
+	End If
 	InstallFiles = True
 End Function
 
@@ -411,7 +419,7 @@ End Sub
 Sub Apply
 	Dim element, sSetupCmdLine
 	document.body.style.cursor = "arrow"
-	sThisFolder = fso.GetParentFolderName(app.icon)
+	sThisFolder = fso.GetParentFolderName(location.pathname)
 	If maintenance.disabled Then
 		sTempFolder = fso.GetParentFolderName(sThisFolder)
 		sProgFolder = EdFolder.value
@@ -419,7 +427,7 @@ Sub Apply
 		' Preserve existing WinMergeU.json from former installation if present
 		If Not IsEmpty(sMoveFolder) Then
 			On Error Resume Next
-			fso.CopyFile sMoveFolder & "\WinMergeU.json", sProgFolder & "\WinMergeU.json"
+			fso.CopyFile sMoveFolder & ReplaceExecutableName("\WinMergeU.json"), sProgFolder & ReplaceExecutableName("\WinMergeU.json")
 			On Error GoTo 0
 		End If
 	Else
@@ -427,7 +435,7 @@ Sub Apply
 	End If
 	If Not PortableMedia.checked Then
 		On Error Resume Next
-		fso.DeleteFile sProgFolder & "\WinMergeU.json"
+		fso.DeleteFile sProgFolder & ReplaceExecutableName("\WinMergeU.json")
 		' If not yet existing, create WinMurge key as a copy of existing WinMerge key
 		sh.RegRead "HKCU\Software\Thingamahoochie\WinMurge\"
 		If Err.Number <> 0 Then sh.Run """%windir%\system32\reg.exe"" copy HKCU\Software\Thingamahoochie\WinMerge HKCU\Software\Thingamahoochie\WinMurge /f /s", 0, True
@@ -447,13 +455,13 @@ Sub Apply
 		If maintenance.disabled Then
 			sh.RegWrite "HKCR\.WinMerge\", "WinMerge.Project.File"
 			sh.RegWrite "HKCR\WinMerge.Project.File\", "WinMerge Project File"
-			sh.RegWrite "HKCR\WinMerge.Project.File\DefaultIcon\", """" & sProgFolder & "\WinMergeU.exe"",1"
+			sh.RegWrite "HKCR\WinMerge.Project.File\DefaultIcon\", """" & sProgFolder & ReplaceExecutableName("\WinMergeU.exe"",1")
 			sh.RegWrite "HKCR\WinMerge.Project.File\shell\edit\command\", """NOTEPAD.EXE"" ""%1"""
-			sh.RegWrite "HKCR\WinMerge.Project.File\shell\open\command\", """" & sProgFolder & "\WinMergeU.exe"" /run ""%1"" %*"
+			sh.RegWrite "HKCR\WinMerge.Project.File\shell\open\command\", """" & sProgFolder & ReplaceExecutableName("\WinMergeU.exe"" /run ""%1"" %*")
 			WriteExecutablePath "HKLM"
 			' Do the ARP stuff
 			sSetupCmdLine = sh.ExpandEnvironmentStrings("""%SystemRoot%\system32\mshta.exe"" """ & sProgFolder & "\setup.hta""")
-			sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\DisplayIcon", sProgFolder & "\WinMergeU.exe"
+			sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\DisplayIcon", sProgFolder & ReplaceExecutableName("\WinMergeU.exe")
 			sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\DisplayName", "WinMerge 2011"
 			sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\DisplayVersion", version
 			sh.RegWrite "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\WinMerge 2011\InstallDate", TimeStampNow(8)
@@ -535,6 +543,7 @@ Sub Job_Default
 	For Each element In shortcuts.getElementsByTagName("INPUT")
 		element.checked = LinkExists(element.id)
 	Next
+	DG.checked = fso.FileExists(fso.GetParentFolderName(location.pathname) & "\devenv.exe")
 	readme.frameElement.src = "Docs/ReleaseNotes.html"
 End Sub
 
@@ -572,7 +581,7 @@ End Sub
 <td>
 <textarea readonly>
 Copyright &#169; 1996-2011 Dean Grimm / Thingamahoochie Software
-Copyright &#169; 2002-2021 WinMerge Team
+Copyright &#169; 2002-2024 WinMerge Team
 
 WinMerge 2011 is free software; you can redistribute it and/or modify it under the terms of the GNU Affero General Public License version 3 as published by the Free Software Foundation.
 
@@ -613,6 +622,7 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 <button id='PbFolder' accesskey='B'><u>B</u>rowse</button>
 <span id='media'>
 <input id='PortableMedia' type='checkbox'/><label for='PortableMedia'>Portable Media</label>
+<input id='DG' type='checkbox'/><label for='DG'>Work around DG</label>
 </span>
 <button id='PbOK' accesskey='O'><u>O</u>K</button>
 <button id='PbCancel' accesskey='C'><u>C</u>ancel</button>

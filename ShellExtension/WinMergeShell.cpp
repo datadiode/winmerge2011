@@ -308,11 +308,17 @@ HRESULT CWinMergeShell::InvokeCommand(LPCMINVOKECOMMANDINFO pCmdInfo)
 	// Guess path to WinMerge executable
 	TCHAR strWinMergePath[MAX_PATH];
 	GetModuleFileName(m_hInstance, strWinMergePath, _countof(strWinMergePath));
-	PathRemoveFileSpec(strWinMergePath);
-	PathAppend(strWinMergePath, _T("WinMergeU.exe"));
 
-	// Check that file we are trying to execute exists
-	if (!PathFileExists(strWinMergePath))
+	// Check that file we are trying to execute exists, and if not, also check
+	// for existence of devenv.exe to support the Digital Guardian workaround.
+	LPCTSTR strWinMergeName = _T("WinMergeU.exe\0devenv.exe\0");
+	do
+	{
+		PathRemoveFileSpec(strWinMergePath);
+		PathAppend(strWinMergePath, strWinMergeName);
+	} while (!PathFileExists(strWinMergePath) && *(strWinMergeName += lstrlen(strWinMergeName) + 1));
+
+	if (!*strWinMergeName) // All possible names tried to no avail?
 		return S_FALSE;
 
 	PathQuoteSpaces(strWinMergePath);
