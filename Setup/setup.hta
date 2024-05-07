@@ -539,11 +539,16 @@ Sub Job_Version
 End Sub
 
 Sub Job_Default
-	Dim element
+	Dim element, folder
 	For Each element In shortcuts.getElementsByTagName("INPUT")
 		element.checked = LinkExists(element.id)
 	Next
-	DG.checked = fso.FileExists(fso.GetParentFolderName(location.pathname) & "\devenv.exe")
+	If EdFolder.value <> "" Then
+		folder = EdFolder.value
+	Else
+		folder = fso.GetParentFolderName(location.pathname)
+	End If
+	DG.checked = fso.FileExists(folder & "\devenv.exe")
 	readme.frameElement.src = "Docs/ReleaseNotes.html"
 End Sub
 
